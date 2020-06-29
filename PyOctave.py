@@ -13,15 +13,18 @@ __all__ = ['octavefilter', 'getansifrequencies', 'normalizedfreq']
 
 def octavefilter(x, fs, fraction=1, order=6, limits=None, show=0):
     """
-    Filter a signal with octave or fractional octave filter bank. This method uses a Butterworth filter with
-    Second-Order Sections coefficients. To obtain the correct coefficients, a subsampling is applied to the signal in
-    each filtered band.
+    Filter a signal with octave or fractional octave filter bank. This
+    method uses a Butterworth filter with Second-Order Sections
+    coefficients. To obtain the correct coefficients, a subsampling is
+    applied to the signal in each filtered band.
 
     :param x: Signal
     :param fs: Sample rate
-    :param fraction: Bandwidth 'b'. Examples: 1/3-octave b=3, 1-octave b=1, 2/3-octave b = 3/2. [Optional] Default: 1.
+    :param fraction: Bandwidth 'b'. Examples: 1/3-octave b=3, 1-octave b=1,
+    2/3-octave b = 3/2. [Optional] Default: 1.
     :param order: Order of Butterworth filter. [Optional] Default: 6.
-    :param limits: Minimum and maximum limit frequencies. [Optional] Default [12,20000]
+    :param limits: Minimum and maximum limit frequencies. [Optional] Default
+    [12,20000]
     :param show: Boolean for plot o not the filter response.
     :returns: Sound Pressure Level and Frequency array
     """
@@ -103,7 +106,8 @@ def _showfilter(sos, freq, freq_u, freq_d, fs, factor):
     plt.xlim(freq_d[0] * 0.8, freq_u[-1] * 1.2)
     plt.ylim(-4, 1)
     ax.set_xticks([16, 31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000])
-    ax.set_xticklabels(['16', '31.5', '63', '125', '250', '500', '1k', '2k', '4k', '8k', '16k'])
+    ax.set_xticklabels(['16', '31.5', '63', '125', '250', '500',
+                        '1k', '2k', '4k', '8k', '16k'])
     plt.show()
 
 
@@ -119,9 +123,11 @@ def _genfreqs(limits, fraction, fs):
 
 def normalizedfreq(fraction):
     """
-    Normalized frequencies for one-octave and third-octave band. [IEC 61260-1-2014]
+    Normalized frequencies for one-octave and third-octave band. [IEC
+    61260-1-2014]
 
-    :param fraction: Octave type, for one octave fraction=1, for third-octave fraction=3
+    :param fraction: Octave type, for one octave fraction=1,
+    for third-octave fraction=3
     :type fraction: int
     :returns: frequencies array
     :rtype: list
@@ -134,8 +140,9 @@ def normalizedfreq(fraction):
 
 def _thirdoctave():
     # IEC 61260 - 1 - 2014 (added 12.5, 16, 20 Hz)
-    return [12.5, 16, 20, 25, 31.5, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600,
-            2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000]
+    return [12.5, 16, 20, 25, 31.5, 40, 50, 63, 80, 100, 125, 160, 200, 250,
+            315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000,
+            5000, 6300, 8000, 10000, 12500, 16000, 20000]
 
 
 def _oneoctave():
@@ -157,8 +164,10 @@ def getansifrequencies(fraction, limits=None):
     """ ANSI s1.11-2004 && IEC 61260-1-2014
     Array of frequencies and its edges according to the ANSI and IEC standard.
 
-    :param fraction: Bandwidth 'b'. Examples: 1/3-octave b=3, 1-octave b=1, 2/3-octave b = 3/2
-    :param limits: It is a list with the minimum and maximum frequency that the array should have. Example: [12,20000]
+    :param fraction: Bandwidth 'b'. Examples: 1/3-octave b=3, 1-octave b=1,
+    2/3-octave b = 3/2
+    :param limits: It is a list with the minimum and maximum frequency that
+    the array should have. Example: [12,20000]
     :returns: Frequency array, lower edge array and upper edge array
     :rtype: list, list, list
     """
@@ -194,9 +203,13 @@ def getansifrequencies(fraction, limits=None):
 
 def _initindex(f, fr, g, b):
     if b % 2:  # ODD ('x' solve from ANSI s1.11, eq. 3)
-        return np.round((b * np.log(f / fr) + 30 * np.log(g)) / np.log(g))
+        return np.round(
+                (b * np.log(f / fr) + 30 * np.log(g)) / np.log(g)
+                )
     else:  # EVEN ('x' solve from ANSI s1.11, eq. 4)
-        return np.round((2 * b * np.log(f / fr) + 59 * np.log(g)) / (2 * np.log(g)))
+        return np.round(
+                (2 * b * np.log(f / fr) + 59 * np.log(g)) / (2 * np.log(g))
+                )
 
 
 def _ratio(g, x, b):
@@ -219,5 +232,6 @@ def _downsamplingfactor(freq, fs):
     guard = 0.10
     factor = (np.floor((fs / (2+guard)) / np.array(freq))).astype('int')
     for idx in range(len(factor)):
-        factor[idx] = max(min(factor[idx], 50), 1)  # Factor between 1<factor<50
+        # Factor between 1<factor<50
+        factor[idx] = max(min(factor[idx], 50), 1)
     return factor
