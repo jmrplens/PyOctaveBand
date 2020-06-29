@@ -12,7 +12,7 @@ fraction # Bandwidth 'b'. Examples: 1/3-octave b=3, 1-octave b=1, 2/3-octave b =
 order # Order of Butterworth filter. [Optional] Default: 6.
 limits # Minimum and maximum limit frequencies. [Optional] Default [12,20000]
 show # Boolean for plot o not the filter response.
-octaveFilter(x, fs, fraction=1, order=6, limits=None, show=0)
+spl, freq = octaveFilter(x, fs, fraction=1, order=6, limits=None, show=0)
 ```
 
 ##### getANSIFrequencies
@@ -21,14 +21,14 @@ Returns the frequency vector according to ANSI s1.11-2004 and IEC 61260-1-2014 s
 ```python
 fraction # Bandwidth 'b'. Examples: 1/3-octave b=3, 1-octave b=1, 2/3-octave b = 3/2.
 limits # Minimum and maximum limit frequencies. [Optional] Default [12,20000]
-getANSIFrequencies(fraction, limits=None)
+freq = getANSIFrequencies(fraction, limits=None)
 ```
 
 ##### normalizedFreq
 Returns the normalized frequency vector according to ANSI s1.11-2004 and IEC 61260-1-2014. Only for octave and third octave bands.
 ```python
 fraction # Bandwidth 'b'. For 1/3-octave b=3 and b=1 for one-octave.
-normalizedFreq(fraction)
+freq = normalizedFreq(fraction)
 ```
 
 ### The filter
