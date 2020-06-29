@@ -218,7 +218,8 @@ def _printwarn(msg):
 
 
 def _downsamplingfactor(freq, fs):
-    factor = ((fs / 2) / np.array(freq)).astype('int')
+    guard = 0.10
+    factor = (np.floor((fs / (2+guard)) / np.array(freq))).astype('int')
     for ii in range(len(factor)):
         factor[ii] = max(min(factor[ii], 50), 1)  # Factor between 1<factor<50
     return factor
