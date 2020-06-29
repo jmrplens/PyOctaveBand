@@ -21,7 +21,7 @@ def octaveFilter(x, fs, fraction=1, order=6, limits=None, show=0):
     :param fs: Sample rate
     :param fraction: Bandwidth 'b'. Examples: 1/3-octave b=3, 1-octave b=1, 2/3-octave b = 3/2. [Optional] Default: 1.
     :param order: Order of Butterworth filter. [Optional] Default: 6.
-    :param limits: Lower and upper limit frequencies. [Optional] Default [12,20000]
+    :param limits: Minimum and maximum limit frequencies. [Optional] Default [12,20000]
     :param show: Boolean for plot o not the filter response.
     :returns: Sound Pressure Level and Frequency array
     """

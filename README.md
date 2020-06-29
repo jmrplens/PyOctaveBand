@@ -1,6 +1,39 @@
 # PyOctave
 Octave-Band and Fractional Octave-Band filter. For signal in time domain.
 
+### Public Methods
+
+##### octaveFilter
+The function that filters the input signal according to the selected parameters.
+```python
+x # signal
+fs # sample rate
+fraction # Bandwidth 'b'. Examples: 1/3-octave b=3, 1-octave b=1, 2/3-octave b = 3/2. [Optional] Default: 1
+order # Order of Butterworth filter. [Optional] Default: 6.
+limits # Minimum and maximum limit frequencies. [Optional] Default [12,20000]
+show # Boolean for plot o not the filter response.
+octaveFilter(x, fs, fraction=1, order=6, limits=None, show=0)
+```
+
+##### getANSIFrequencies
+Returns the frequency vector according to ANSI s1.11-2004 and IEC 61260-1-2014 standards.
+
+```python
+fraction # Bandwidth 'b'. Examples: 1/3-octave b=3, 1-octave b=1, 2/3-octave b = 3/2.
+limits # Minimum and maximum limit frequencies. [Optional] Default [12,20000]
+getANSIFrequencies(fraction, limits=None)
+```
+
+##### normalizedFreq
+Returns the normalized frequency vector according to ANSI s1.11-2004 and IEC 61260-1-2014. Only for octave and third octave bands.
+```python
+fraction # Bandwidth 'b'. For 1/3-octave b=3 and b=1 for one-octave.
+normalizedFreq(fraction)
+```
+
+### Frequency values
+The values of the center frequencies and the upper and lower edges are obtained with the calculation defined in the ANSI s1.11-2004 and IEC 61260-1-2014 standards.
+
 ### Automatic downsampling
 To obtain the best filter coefficients, especially at low frequency, it is necessary to downsampling, this is done automatically by calculating the necessary downsampling factor for each frequency band.
 
