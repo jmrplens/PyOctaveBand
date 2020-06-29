@@ -102,3 +102,12 @@ The result is as follows:
 | 1/12 Octave filter       | 1/24 Octave filter      | 
 |:-------------:|:-------------:|
 | <img src="http://jmrplens.com/GitHub_PyOctave/12.png" width="100%"></img>      | <img src="http://jmrplens.com/GitHub_PyOctave/24.png" width="100%"></img>  |
+
+# Roadmap
+
+- Add multichannel support
+
+If you have any suggestions or you found an error please, make a [Pull Request](https://github.com/jmrplens/PyOctave/pulls) or [contact me](mailto:info@jmrplens.com).
+
+# Author
+Jose M. Requena Plens, 2020. (info@jmrplens.com   | joreple@upv.es)
