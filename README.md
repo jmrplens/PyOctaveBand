@@ -94,3 +94,7 @@ The result is as follows:
 | One Octave filter       | One-Third Octave filter      | 
 |:-------------:|:-------------:|
 | <img src="http://jmrplens.com/GitHub_PyOctave/response1.png" width="100%"></img>      | <img src="http://jmrplens.com/GitHub_PyOctave/response.png" width="100%"></img>  |
+
+| 1/12 Octave filter       | 1/24 Octave filter      | 
+|:-------------:|:-------------:|
+| <img src="http://jmrplens.com/GitHub_PyOctave/12.png" width="100%"></img>      | <img src="http://jmrplens.com/GitHub_PyOctave/24.png" width="100%"></img>  |
