@@ -52,6 +52,10 @@ x # signal
 xdown = scipy.signal.decimate(x, factor)
 ```
 
+### Anti-aliasing
+The frequency bands of the filters that are above the Nyquist's frequency (`sample_rate/2`) are automatically removed because the values will not be correct.
+
+
 ### Examples of filter responses
 | Fraction | Butterworth order: 6       | Butterworth order: 16      | 
 |:-------------:|:-------------:|:-------------:|
