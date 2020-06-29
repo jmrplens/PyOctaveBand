@@ -3,7 +3,7 @@ Octave-Band and Fractional Octave-Band filter. For signal in time domain.
 
 ### Public Methods
 
-##### octaveFilter
+##### octavefilter
 The function that filters the input signal according to the selected parameters.
 ```python
 x # signal
@@ -12,23 +12,23 @@ fraction # Bandwidth 'b'. Examples: 1/3-octave b=3, 1-octave b=1, 2/3-octave b =
 order # Order of Butterworth filter. [Optional] Default: 6.
 limits # Minimum and maximum limit frequencies. [Optional] Default [12,20000]
 show # Boolean for plot o not the filter response.
-spl, freq = octaveFilter(x, fs, fraction=1, order=6, limits=None, show=0)
+spl, freq = octavefilter(x, fs, fraction=1, order=6, limits=None, show=0)
 ```
 
-##### getANSIFrequencies
+##### getansifrequencies
 Returns the frequency vector according to ANSI s1.11-2004 and IEC 61260-1-2014 standards.
 
 ```python
 fraction # Bandwidth 'b'. Examples: 1/3-octave b=3, 1-octave b=1, 2/3-octave b = 3/2.
 limits # Minimum and maximum limit frequencies. [Optional] Default [12,20000]
-freq = getANSIFrequencies(fraction, limits=None)
+freq = getansifrequencies(fraction, limits=None)
 ```
 
-##### normalizedFreq
+##### normalizedfreq
 Returns the normalized frequency vector according to ANSI s1.11-2004 and IEC 61260-1-2014. Only for octave and third octave bands.
 ```python
 fraction # Bandwidth 'b'. For 1/3-octave b=3 and b=1 for one-octave.
-freq = normalizedFreq(fraction)
+freq = normalizedfreq(fraction)
 ```
 
 ### The filter
@@ -86,7 +86,7 @@ y = 100 \
        + np.sin(2 * np.pi * f6 * x))
 
 # Filter
-spl, freq = PyOctave.octaveFilter(y, fs=fs, fraction=3, order=6, limits=[12, 20000], show=1)
+spl, freq = PyOctave.octavefilter(y, fs=fs, fraction=3, order=6, limits=[12, 20000], show=1)
 ```
 
 The result is as follows:

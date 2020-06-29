@@ -27,7 +27,7 @@ y = 100 \
        + np.sin(2 * np.pi * f6 * x))
 
 # Filter
-spl, freq = PyOctave.octaveFilter(y, fs=fs, fraction=3, order=6, limits=[12, 20000], show=1)
+spl, freq = PyOctave.octavefilter(y, fs=fs, fraction=3, order=6, limits=[12, 20000], show=1)
 
 # Show octave spectrum
 fig, ax = plt.subplots()

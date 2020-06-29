@@ -8,10 +8,10 @@ from scipy import signal
 import matplotlib.pyplot as plt
 
 # Public methods
-__all__ = ['octaveFilter', 'getANSIFrequencies', 'normalizedFreq']
+__all__ = ['octavefilter', 'getansifrequencies', 'normalizedfreq']
 
 
-def octaveFilter(x, fs, fraction=1, order=6, limits=None, show=0):
+def octavefilter(x, fs, fraction=1, order=6, limits=None, show=0):
     """
     Filter a signal with octave or fractional octave filter bank. This method uses a Butterworth filter with
     Second-Order Sections coefficients. To obtain the correct coefficients, a subsampling is applied to the signal in
@@ -39,16 +39,14 @@ def octaveFilter(x, fs, fraction=1, order=6, limits=None, show=0):
     factor = _downsamplingfactor(freq_u, fs)
 
     # Get SOS filter coefficients (3D - matrix with size: [freq,order,6])
-    sos = _butterSOSfilter(freq, freq_d, freq_u, fs, order, factor, show)
+    sos = _buttersosfilter(freq, freq_d, freq_u, fs, order, factor, show)
 
     # Create array with SPL for each frequency band
     spl = np.zeros([len(freq)])
     for jj in range(len(freq)):
-        print('\r', 'Processing: {:.1f} Hz'.format(freq[jj]), end='')
         sd = signal.decimate(x, int(factor[jj]))
         y = signal.sosfilt(sos[jj], sd)
         spl[jj] = 20 * np.log10(np.std(y) / 2e-5)
-    print('\rDone!')
     return spl.tolist(), freq
 
 
@@ -61,17 +59,17 @@ def _typesignal(x):
         return list(x)
 
 
-def _butterSOSfilter(freq, freq_d, freq_u, fs, order, factor, show=0):
+def _buttersosfilter(freq, freq_d, freq_u, fs, order, factor, show=0):
     # Initialize coefficients matrix
     sos = [[[]] for i in range(len(freq))]
     # Generate coefficients for each frequency band
     for idx, (lower, upper) in enumerate(zip(freq_d, freq_u)):
         # Downsampling to improve filter coefficients
-        Fsd = fs / factor[idx]  # New sampling rate
+        fsd = fs / factor[idx]  # New sampling rate
         # Butterworth Filter with SOS coefficients
         sos[idx] = signal.butter(
             N=order,
-            Wn=np.array([lower, upper]) / (Fsd / 2),
+            Wn=np.array([lower, upper]) / (fsd / 2),
             btype='bandpass',
             analog=False,
             output='sos')
@@ -83,17 +81,17 @@ def _butterSOSfilter(freq, freq_d, freq_u, fs, order, factor, show=0):
 
 
 def _showfilter(sos, freq, freq_u, freq_d, fs, factor):
-    N = 8192
-    w = np.zeros([N, len(freq)])
-    h = np.zeros([N, len(freq)], dtype=np.complex_)
+    wn = 8192
+    w = np.zeros([wn, len(freq)])
+    h = np.zeros([wn, len(freq)], dtype=np.complex_)
 
     for idx in range(len(freq)):
-        Fsd = fs / factor[idx]  # New sampling rate
+        fsd = fs / factor[idx]  # New sampling rate
         w[:, idx], h[:, idx] = signal.sosfreqz(
             sos[idx],
-            worN=N,
+            worN=wn,
             whole=False,
-            fs=Fsd)
+            fs=fsd)
 
     fig, ax = plt.subplots()
     ax.semilogx(w, 20 * np.log10(abs(h) + np.finfo(float).eps), 'b')
@@ -111,15 +109,15 @@ def _showfilter(sos, freq, freq_u, freq_d, fs, factor):
 
 def _genfreqs(limits, fraction, fs):
     # Generate frequencies
-    freq, freq_d, freq_u = getANSIFrequencies(fraction, limits)
+    freq, freq_d, freq_u = getansifrequencies(fraction, limits)
 
     # Remove outer frequency to prevent filter error (fs/2 < freq)
-    freq, freq_d, freq_u = _deleteOuters(freq, freq_d, freq_u, fs)
+    freq, freq_d, freq_u = _deleteouters(freq, freq_d, freq_u, fs)
 
     return freq, freq_d, freq_u
 
 
-def normalizedFreq(fraction):
+def normalizedfreq(fraction):
     """
     Normalized frequencies for one-octave and third-octave band. [IEC 61260-1-2014]
 
@@ -128,24 +126,24 @@ def normalizedFreq(fraction):
     :returns: frequencies array
     :rtype: list
     """
-    predefined = {1: _oneOctave(),
-                  3: _thirdOctave(),
+    predefined = {1: _oneoctave(),
+                  3: _thirdoctave(),
                   }
     return predefined[fraction]
 
 
-def _thirdOctave():
+def _thirdoctave():
     # IEC 61260 - 1 - 2014 (added 12.5, 16, 20 Hz)
     return [12.5, 16, 20, 25, 31.5, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600,
             2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000]
 
 
-def _oneOctave():
+def _oneoctave():
     # IEC 61260 - 1 - 2014 (added 16 Hz)
     return [16, 31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]
 
 
-def _deleteOuters(freq, freq_d, freq_u, fs):
+def _deleteouters(freq, freq_d, freq_u, fs):
     idx = np.asarray(np.where(np.array(freq_u) > fs / 2))
     if any(idx[0]):
         _printwarn('Low sampling rate, frequencies above fs/2 will be removed')
@@ -155,7 +153,7 @@ def _deleteOuters(freq, freq_d, freq_u, fs):
     return freq, freq_d, freq_u
 
 
-def getANSIFrequencies(fraction, limits=None):
+def getansifrequencies(fraction, limits=None):
     """ ANSI s1.11-2004 && IEC 61260-1-2014
     Array of frequencies and its edges according to the ANSI and IEC standard.
 
@@ -168,49 +166,49 @@ def getANSIFrequencies(fraction, limits=None):
     if limits is None:
         limits = [12, 20000]
 
-    # Octave ratio G (ANSI s1.11, 3.2, pg. 2)
-    G = 10 ** (3 / 10)  # Or G = 2
+    # Octave ratio g (ANSI s1.11, 3.2, pg. 2)
+    g = 10 ** (3 / 10)  # Or g = 2
     # Reference frequency (ANSI s1.11, 3.4, pg. 2)
     fr = 1000
 
     # Get starting index 'x' and first center frequency
-    x = _initindex(limits[0], fr, G, fraction)
-    freq = _ratio(G, x, fraction) * fr
+    x = _initindex(limits[0], fr, g, fraction)
+    freq = _ratio(g, x, fraction) * fr
 
     # Get each frequency until reach maximum frequency
     freq_x = 0
-    while freq_x * _bandedge(G, fraction) < limits[1]:
+    while freq_x * _bandedge(g, fraction) < limits[1]:
         # Increase index
         x = x + 1
         # New frequency
-        freq_x = _ratio(G, x, fraction) * fr
+        freq_x = _ratio(g, x, fraction) * fr
         # Store new frequency
         freq = np.append(freq, freq_x)
 
     # Get band-edges
-    freq_d = freq / _bandedge(G, fraction)
-    freq_u = freq * _bandedge(G, fraction)
+    freq_d = freq / _bandedge(g, fraction)
+    freq_u = freq * _bandedge(g, fraction)
 
     return freq.tolist(), freq_d.tolist(), freq_u.tolist()
 
 
-def _initindex(f, fr, G, b):
+def _initindex(f, fr, g, b):
     if b % 2:  # ODD ('x' solve from ANSI s1.11, eq. 3)
-        return np.round((b * np.log(f / fr) + 30 * np.log(G)) / np.log(G))
+        return np.round((b * np.log(f / fr) + 30 * np.log(g)) / np.log(g))
     else:  # EVEN ('x' solve from ANSI s1.11, eq. 4)
-        return np.round((2 * b * np.log(f / fr) + 59 * np.log(G)) / (2 * np.log(G)))
+        return np.round((2 * b * np.log(f / fr) + 59 * np.log(g)) / (2 * np.log(g)))
 
 
-def _ratio(G, x, b):
+def _ratio(g, x, b):
     if b % 2:  # ODD (ANSI s1.11, eq. 3)
-        return G ** ((x - 30) / b)
+        return g ** ((x - 30) / b)
     else:  # EVEN (ANSI s1.11, eq. 4)
-        return G ** ((2 * x - 59) / (2 * b))
+        return g ** ((2 * x - 59) / (2 * b))
 
 
-def _bandedge(G, b):
+def _bandedge(g, b):
     # Band-edge ratio (ANSI s1.11, 3.7, pg. 3)
-    return G ** (1 / (2 * b))
+    return g ** (1 / (2 * b))
 
 
 def _printwarn(msg):
