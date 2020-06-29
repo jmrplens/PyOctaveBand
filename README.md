@@ -31,6 +31,9 @@ fraction # Bandwidth 'b'. For 1/3-octave b=3 and b=1 for one-octave.
 normalizedFreq(fraction)
 ```
 
+### The filter
+The filter used to design the octave filter bank is a Butterworth with SOS coefficients. You can find more information about the filter here: [scipy.signal.butter](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.butter.html).
+
 ### Frequency values
 The values of the center frequencies and the upper and lower edges are obtained with the calculation defined in the ANSI s1.11-2004 and IEC 61260-1-2014 standards.
 
