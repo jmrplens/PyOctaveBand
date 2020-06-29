@@ -43,10 +43,10 @@ def octavefilter(x, fs, fraction=1, order=6, limits=None, show=0):
 
     # Create array with SPL for each frequency band
     spl = np.zeros([len(freq)])
-    for jj in range(len(freq)):
-        sd = signal.decimate(x, int(factor[jj]))
-        y = signal.sosfilt(sos[jj], sd)
-        spl[jj] = 20 * np.log10(np.std(y) / 2e-5)
+    for idx in range(len(freq)):
+        sd = signal.decimate(x, factor[idx])
+        y = signal.sosfilt(sos[idx], sd)
+        spl[idx] = 20 * np.log10(np.std(y) / 2e-5)
     return spl.tolist(), freq
 
 
@@ -218,6 +218,6 @@ def _printwarn(msg):
 def _downsamplingfactor(freq, fs):
     guard = 0.10
     factor = (np.floor((fs / (2+guard)) / np.array(freq))).astype('int')
-    for ii in range(len(factor)):
-        factor[ii] = max(min(factor[ii], 50), 1)  # Factor between 1<factor<50
+    for idx in range(len(factor)):
+        factor[idx] = max(min(factor[idx], 50), 1)  # Factor between 1<factor<50
     return factor
