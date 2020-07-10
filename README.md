@@ -68,7 +68,7 @@ The frequency bands of the filters that are above the Nyquist's frequency (`samp
 This example is included in the file test.py.
 
 ```python
-import PyOctave
+import PyOctaveBand
 import numpy as np
 
 # Sample rate and duration
@@ -90,7 +90,7 @@ y = 100 \
        + np.sin(2 * np.pi * f6 * x))
 
 # Filter
-spl, freq = PyOctave.octavefilter(y, fs=fs, fraction=3, order=6, limits=[12, 20000], show=1)
+spl, freq = PyOctaveBand.octavefilter(y, fs=fs, fraction=3, order=6, limits=[12, 20000], show=1)
 ```
 
 The result is as follows:

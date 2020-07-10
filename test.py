@@ -1,10 +1,10 @@
 #  Copyright (c) 2020. Jose M. Requena-Plens
 
 """
-Demo test for PyOctave.py
+Demo test for PyOctaveBand.py
 """
 
-import PyOctave
+import PyOctaveBand
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -27,7 +27,7 @@ y = 100 \
        + np.sin(2 * np.pi * f6 * x))
 
 # Filter
-spl, freq = PyOctave.octavefilter(y, fs=fs, fraction=3, order=6, limits=[12, 20000], show=1)
+spl, freq = PyOctaveBand.octavefilter( y, fs=fs, fraction=3, order=6, limits=[12, 20000], show=1 )
 
 # Show octave spectrum
 fig, ax = plt.subplots()
