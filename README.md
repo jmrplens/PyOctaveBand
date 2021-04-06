@@ -1,3 +1,5 @@
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?hosted_button_id=BLP3R6VGYJB4Q)
+
 # PyOctaveBand
 Octave-Band and Fractional Octave-Band filter. For signal in time domain.
 
@@ -112,4 +114,4 @@ If you have any suggestions or you found an error please, make a [Pull Request](
 # Author
 Jose M. Requena Plens, 2020. (info@jmrplens.com   | joreple@upv.es)
 
-Donations: https://paypal.me/jmrplens
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?hosted_button_id=BLP3R6VGYJB4Q)
