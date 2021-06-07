@@ -15,7 +15,13 @@ fraction # Bandwidth 'b'. Examples: 1/3-octave b=3, 1-octave b=1, 2/3-octave b =
 order # Order of Butterworth filter. [Optional] Default: 6.
 limits # Minimum and maximum limit frequencies. [Optional] Default [12,20000]
 show # Boolean for plot o not the filter response.
-spl, freq = octavefilter(x, fs, fraction=1, order=6, limits=None, show=0)
+sigbands # Boolean to also return the signal in the time domain divided into bands. A list with as many arrays as there are frequency bands
+
+# Only octave spectra
+spl, freq = octavefilter(x, fs, fraction=1, order=6, limits=None, show=0, sigbands=0)
+
+# Octave spectra and bands in time domain
+spl, freq, xb = octavefilter(x, fs, fraction=1, order=6, limits=None, show=0, sigbands=1)
 ```
 
 ##### getansifrequencies
@@ -73,6 +79,7 @@ This example is included in the file test.py.
 ```python
 import PyOctaveBand
 import numpy as np
+import scipy.io.wavfile
 
 # Sample rate and duration
 fs = 48000
@@ -92,8 +99,18 @@ y = 100 \
        + np.sin(2 * np.pi * f5 * x)
        + np.sin(2 * np.pi * f6 * x))
 
-# Filter
+# Filter (only octave spectra)
 spl, freq = PyOctaveBand.octavefilter(y, fs=fs, fraction=3, order=6, limits=[12, 20000], show=1)
+
+# Filter (get spectra and signal in bands)
+splb, freqb, xb = PyOctaveBand.octavefilter(y, fs=fs, fraction=3, order=6, limits=[12, 20000], show=0, sigbands=1)
+
+# Store signal in bands in separated wav files
+for idx in range(len(freq)):
+    scipy.io.wavfile.write(
+            "test_"+str(round(freq[idx]))+"_Hz.wav",
+            fs,
+            xb[idx]/np.max(xb[idx]))
 ```
 
 The result is as follows:
