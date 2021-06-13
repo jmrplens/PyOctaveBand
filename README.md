@@ -130,7 +130,7 @@ The result is as follows:
 If you have any suggestions or you found an error please, make a [Pull Request](https://github.com/jmrplens/PyOctave/pulls) or [contact me](mailto:info@jmrplens.com).
 
 # Author
-Jose M. Requena Plens, 2020. (info@jmrplens.com   | joreple@upv.es)
+Jose M. Requena Plens, 2020. joreple@upv.es
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?hosted_button_id=BLP3R6VGYJB4Q)
 [![Donate](https://img.shields.io/badge/Donate-Ko--fi-brightgreen?color=ff5f5f)](https://ko-fi.com/jmrplens) 
