@@ -68,9 +68,9 @@ The frequency bands of the filters that are above the Nyquist's frequency (`samp
 ### Examples of filter responses
 | Fraction | Butterworth order: 6       | Butterworth order: 16      | 
 |:-------------:|:-------------:|:-------------:|
-| 1-octave | <img src="http://jmrplens.com/GitHub_PyOctave/one.png" width="100%"></img>      | <img src="http://jmrplens.com/GitHub_PyOctave/one16.png" width="100%"></img>  |
-| 1/3-octave | <img src="http://jmrplens.com/GitHub_PyOctave/third.png" width="100%"></img>      | <img src="http://jmrplens.com/GitHub_PyOctave/third16.png" width="100%"></img>  |
-| 2/3-octave | <img src="http://jmrplens.com/GitHub_PyOctave/twothird.png" width="100%"></img>      | <img src="http://jmrplens.com/GitHub_PyOctave/twothird16.png" width="100%"></img>  |
+| 1-octave | <img src="https://github.com/jmrplens/PyOctaveBand/blob/1670365c01c70383e1c142c24fa91563cb9342b9/.github/images/one.png" width="100%"></img>      | <img src="https://github.com/jmrplens/PyOctaveBand/blob/1670365c01c70383e1c142c24fa91563cb9342b9/.github/images/one16.png" width="100%"></img>  |
+| 1/3-octave | <img src="https://github.com/jmrplens/PyOctaveBand/blob/1670365c01c70383e1c142c24fa91563cb9342b9/.github/images/third.png" width="100%"></img>      | <img src="https://github.com/jmrplens/PyOctaveBand/blob/1670365c01c70383e1c142c24fa91563cb9342b9/.github/images/third16.png" width="100%"></img>  |
+| 2/3-octave | <img src="https://github.com/jmrplens/PyOctaveBand/blob/1670365c01c70383e1c142c24fa91563cb9342b9/.github/images/twothird.png" width="100%"></img>      | <img src="https://github.com/jmrplens/PyOctaveBand/blob/1670365c01c70383e1c142c24fa91563cb9342b9/.github/images/twothird16.png" width="100%"></img>  |
 
 ### Usage example
 
@@ -117,11 +117,11 @@ The result is as follows:
 
 | One Octave filter       | One-Third Octave filter      | 
 |:-------------:|:-------------:|
-| <img src="http://jmrplens.com/GitHub_PyOctave/response1.png" width="100%"></img>      | <img src="http://jmrplens.com/GitHub_PyOctave/response.png" width="100%"></img>  |
+| <img src="https://github.com/jmrplens/PyOctaveBand/blob/1670365c01c70383e1c142c24fa91563cb9342b9/.github/images/response1.png" width="100%"></img>      | <img src="https://github.com/jmrplens/PyOctaveBand/blob/1670365c01c70383e1c142c24fa91563cb9342b9/.github/images/response.png" width="100%"></img>  |
 
 | 1/12 Octave filter       | 1/24 Octave filter      | 
 |:-------------:|:-------------:|
-| <img src="http://jmrplens.com/GitHub_PyOctave/12.png" width="100%"></img>      | <img src="http://jmrplens.com/GitHub_PyOctave/24.png" width="100%"></img>  |
+| <img src="https://github.com/jmrplens/PyOctaveBand/blob/1670365c01c70383e1c142c24fa91563cb9342b9/.github/images/12.png" width="100%"></img>      | <img src="https://github.com/jmrplens/PyOctaveBand/blob/1670365c01c70383e1c142c24fa91563cb9342b9/.github/images/24.png" width="100%"></img>  |
 
 # Roadmap
 
