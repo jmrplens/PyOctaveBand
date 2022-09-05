@@ -51,7 +51,7 @@ def octavefilter(x, fs, fraction=1, order=6, limits=None, show=0, sigbands =0):
         spl = np.zeros([len(freq)])
         xb = []
         for idx in range(len(freq)):
-            sd = signal.decimate(x, factor[idx])
+            sd = signal.resample(x, round(len(x) / factor[idx]))
             y = signal.sosfilt(sos[idx], sd)
             spl[idx] = 20 * np.log10(np.std(y) / 2e-5)
             xb.append(signal.resample_poly(y,factor[idx],1))
@@ -60,7 +60,7 @@ def octavefilter(x, fs, fraction=1, order=6, limits=None, show=0, sigbands =0):
         # Create array with SPL for each frequency band
         spl = np.zeros([len(freq)])
         for idx in range(len(freq)):
-            sd = signal.decimate(x, factor[idx])
+            sd = signal.resample(x, round(len(x) / factor[idx]))
             y = signal.sosfilt(sos[idx], sd)
             spl[idx] = 20 * np.log10(np.std(y) / 2e-5)
         return spl.tolist(), freq
