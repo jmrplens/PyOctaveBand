@@ -54,11 +54,11 @@ fs # sample rate
 freq # frequency
 factor = ((fs / 2) / freq)
 ```
-The resampling is done with the decimate function of the [SciPy library](https://www.scipy.org/scipylib/index.html):
+The resampling is done with the resample function of the [SciPy library](https://www.scipy.org/scipylib/index.html) (Thanks to [@ashley-b](https://github.com/ashley-b) - [ISSUE](https://github.com/jmrplens/PyOctaveBand/issues/2)) :
 
 ```python
 x # signal
-xdown = scipy.signal.decimate(x, factor)
+xdown = signal.resample(x, round(len(x) / factor))
 ```
 
 ### Anti-aliasing
@@ -130,7 +130,7 @@ The result is as follows:
 If you have any suggestions or you found an error please, make a [Pull Request](https://github.com/jmrplens/PyOctave/pulls) or [contact me](mailto:info@jmrplens.com).
 
 # Author
-Jose M. Requena Plens, 2020. joreple@upv.es
+Jose M. Requena Plens, 2020.
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?hosted_button_id=BLP3R6VGYJB4Q)
 [![Donate](https://img.shields.io/badge/Donate-Ko--fi-brightgreen?color=ff5f5f)](https://ko-fi.com/jmrplens) 
