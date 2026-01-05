@@ -2,8 +2,9 @@ import os
 
 import matplotlib.pyplot as plt
 import numpy as np
-from pyoctaveband import octavefilter
 from scipy import signal as scipy_signal
+
+from pyoctaveband import octavefilter
 
 # Constants for professional styling
 LABEL_FREQ_HZ = "Frequency [Hz]"
