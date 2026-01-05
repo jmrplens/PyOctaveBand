@@ -1,13 +1,7 @@
 import os
-import sys
-
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal as scipy_signal
-
-# Add src to path to use the local package
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "src")))
-
 from pyoctaveband import octavefilter
 
 # Constants for professional styling
@@ -65,7 +59,6 @@ def generate_filter_responses(output_dir: str) -> None:
     ]
 
     for filename, fraction, order in configs:
-        print(f"Generating {filename}...")
         octavefilter(
             x,
             fs=fs,
@@ -87,7 +80,6 @@ def generate_signal_responses(output_dir: str) -> None:
 
     for frac, filename, title in [(1, "signal_response_fraction_1.png", "1/1 Octave Band Analysis"), 
                                   (3, "signal_response_fraction_3.png", "1/3 Octave Band Analysis")]:
-        print(f"Generating {filename}...")
         spl, freq = octavefilter(y, fs=fs, fraction=frac, order=6, limits=[12, 20000], show=False)
         
         _, ax = plt.subplots()
@@ -99,7 +91,6 @@ def generate_signal_responses(output_dir: str) -> None:
 
 def generate_multichannel_response(output_dir: str) -> None:
     """Generate analysis plot for a stereo signal."""
-    print("Generating signal_response_multichannel.png...")
     fs = 48000
     duration = 5
     t = np.linspace(0, duration, int(fs * duration), endpoint=False)
@@ -140,7 +131,6 @@ def generate_multichannel_response(output_dir: str) -> None:
 
 def generate_decomposition_plot(output_dir: str) -> None:
     """Generate time-domain decomposition plot with synchronized axes."""
-    print("Generating signal_decomposition.png...")
     fs = 8000
     duration = 0.5
     t = np.linspace(0, duration, int(fs * duration), endpoint=False)
@@ -155,7 +145,6 @@ def generate_decomposition_plot(output_dir: str) -> None:
     _, axes = plt.subplots(num_plots, 1, figsize=(10, 2 * num_plots), sharex=True)
     
     # Fixed Y limits for all plots to allow direct comparison
-    # The composite signal has peak at 2.0, individual bands at 1.0.
     y_lim = (-2.5, 2.5)
     
     # Original Signal
@@ -188,4 +177,3 @@ if __name__ == "__main__":
     generate_signal_responses(img_dir)
     generate_multichannel_response(img_dir)
     generate_decomposition_plot(img_dir)
-    print("Graphics generated successfully.")
