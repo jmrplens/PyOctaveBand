@@ -236,19 +236,26 @@ def _showfilter(
         fsd = fs / factor[idx]  # New sampling rate
         w[:, idx], h[:, idx] = signal.sosfreqz(sos[idx], worN=wn, whole=False, fs=fsd)
 
-    fig, ax = plt.subplots()
-    ax.semilogx(w, 20 * np.log10(abs(h) + np.finfo(float).eps), "b")
-    ax.grid(which="major")
-    ax.grid(which="minor", linestyle=":")
-    ax.set_xlabel(r"Frequency [Hz]")
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.semilogx(w, 20 * np.log10(abs(h) + np.finfo(float).eps), color="#1f77b4", linewidth=1.2)
+    
+    ax.set_title("Filter Bank Frequency Response", fontweight="bold", pad=15)
+    ax.set_xlabel("Frequency [Hz]")
     ax.set_ylabel("Amplitude [dB]")
-    ax.set_title("Second-Order Sections - Butterworth Filter")
+    
+    ax.grid(which="major", color="#e0e0e0", linestyle="-")
+    ax.grid(which="minor", color="#e0e0e0", linestyle=":", alpha=0.4)
+    
     plt.xlim(freq_d[0] * 0.8, freq_u[-1] * 1.2)
     plt.ylim(-4, 1)
-    ax.set_xticks([16, 31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000])
-    ax.set_xticklabels(["16", "31.5", "63", "125", "250", "500", "1k", "2k", "4k", "8k", "16k"])
+    
+    xticks = [16, 31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]
+    xticklabels = ["16", "31.5", "63", "125", "250", "500", "1k", "2k", "4k", "8k", "16k"]
+    ax.set_xticks(xticks)
+    ax.set_xticklabels(xticklabels)
+    
     if plot_file:
-        plt.savefig(plot_file)
+        plt.savefig(plot_file, dpi=150, bbox_inches="tight")
     if show:
         plt.show()
     plt.close(fig)
