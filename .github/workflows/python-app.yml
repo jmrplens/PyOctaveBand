@@ -79,6 +79,12 @@ jobs:
     - name: Generate graphs
       run: python generate_graphs.py
     
+    - name: Upload Graphs
+      uses: actions/upload-artifact@v4
+      with:
+        name: generated-graphs
+        path: .github/images/*.png
+
     - name: Deploy Images to Assets Branch
       run: |
         git config --global user.name "github-actions[bot]"
@@ -108,12 +114,6 @@ jobs:
         git commit -m "Add graphs for run ${{ github.run_id }}"
         git push origin assets
       continue-on-error: true
-
-    - name: Upload Graphs
-      uses: actions/upload-artifact@v4
-      with:
-        name: generated-graphs
-        path: .github/images/*.png
 
   pr-comment:
     needs: [quality, tests, graphs]
