@@ -3,13 +3,13 @@
 [![Python application](https://github.com/jmrplens/PyOctaveBand/actions/workflows/python-app.yml/badge.svg)](https://github.com/jmrplens/PyOctaveBand/actions/workflows/python-app.yml)
 
 # PyOctaveBand
-Octave-Band and Fractional Octave-Band filter for signals in the time domain.
+Octave-Band and Fractional Octave-Band filter for signals in the time domain. Implementation according to ANSI s1.11-2004 and IEC 61260-1-2014.
 
 ### Getting Started
 
 #### Installation
 
-To use `PyOctaveBand` in your project, you can either clone the repository or add it as a git submodule:
+To use `PyOctaveBand`, you can clone the repository or add it as a git submodule:
 
 **Cloning the repository:**
 ```bash
@@ -21,43 +21,42 @@ pip install .
 **As a Git Submodule:**
 ```bash
 git submodule add https://github.com/jmrplens/PyOctaveBand.git
+# Install in editable mode to use within your project
 pip install -e ./PyOctaveBand
 ```
 
 #### Integration / Usage
 
-Here is a simple example of how to use `PyOctaveBand` in your own Python project:
-
 ```python
 import numpy as np
 from pyoctaveband import octavefilter
 
-# 1. Prepare your signal (e.g., a 1 second sine wave at 1000 Hz)
+# 1. Prepare your signal (e.g., 1 second sine wave at 1000 Hz)
 fs = 48000
 t = np.linspace(0, 1, fs)
 signal = np.sin(2 * np.pi * 1000 * t)
 
 # 2. Apply the 1/3 octave band filter
+# Returns: spl (Sound Pressure Level) and freq (Center frequencies)
 spl, freq = octavefilter(signal, fs=fs, fraction=3)
 
-# 3. Print results
 print(f"Center Frequencies: {freq}")
 print(f"SPL per band: {spl}")
 ```
 
 #### Multichannel Support
-PyOctaveBand supports multichannel signals. Input `x` can be a 1D array (single channel) or a 2D array with shape `(channels, samples)`.
+PyOctaveBand supports multichannel processing. Input `x` can be a 1D array or a 2D array with shape `(channels, samples)`.
 
 ### Public Methods
 
 ##### octavefilter
-The function that filters the input signal according to the selected parameters.
+Filters the input signal according to the selected parameters.
 ```python
-# Returns Sound Pressure Level and Frequency array
-spl, freq = octavefilter(x, fs, fraction=1, order=6, limits=None, show=False, sigbands=False)
+# Returns Sound Pressure Level and Frequencies
+spl, freq = octavefilter(x, fs, fraction=1, order=6, limits=None)
 
-# Returns SPL, frequencies, and the signals filtered into bands
-spl, freq, xb = octavefilter(x, fs, fraction=1, order=6, limits=None, show=False, sigbands=True)
+# Returns SPL, Frequencies, and the filtered signals divided into bands
+spl, freq, xb = octavefilter(x, fs, fraction=3, sigbands=True)
 ```
 
 ##### getansifrequencies
@@ -67,15 +66,17 @@ freq, freq_d, freq_u = getansifrequencies(fraction, limits=None)
 ```
 
 ##### normalizedfreq
-Returns the normalized frequency vector according to ANSI s1.11-2004 and IEC 61260-1-2014.
+Returns normalized frequency vectors for octave and 1/3 octave bands.
 ```python
 freq = normalizedfreq(fraction)
 ```
 
-### The filter
-The filter bank is designed using Butterworth filters with Second-Order Sections (SOS) coefficients. Automatic downsampling is applied to ensure filter stability and accuracy, especially for low-frequency bands.
+### The Filter
+The library uses Butterworth filters with Second-Order Sections (SOS) coefficients. It applies automatic downsampling for low-frequency bands to maintain numerical stability and ensure the filter response matches the standards perfectly.
 
-### Examples of filter responses
+### Examples of Filter Bank Responses
+The following plots show the frequency response of the designed filters. The red dashed line indicates the **-3 dB** point.
+
 | Fraction | Butterworth order: 6       | Butterworth order: 16      | 
 |:-------------:|:-------------:|:-------------:|
 | 1-octave | <img src=".github/images/filter_fraction_1_order_6.png" width="100%"></img>      | <img src=".github/images/filter_fraction_1_order_16.png" width="100%"></img>  |
@@ -84,12 +85,12 @@ The filter bank is designed using Butterworth filters with Second-Order Sections
 
 ### Signal Analysis Examples
 
-| One Octave Analysis       | One-Third Octave Analysis      | 
+| 1/1 Octave Band Analysis       | 1/3 Octave Band Analysis      | 
 |:-------------:|:-------------:|
 | <img src=".github/images/signal_response_fraction_1.png" width="100%"></img>      | <img src=".github/images/signal_response_fraction_3.png" width="100%"></img>  |
 
 #### Multichannel Processing
-This plot shows the simultaneous analysis of a stereo signal (Left: Pink Noise, Right: Logarithmic Sweep).
+Simultaneous analysis of a stereo signal (Left Channel: Pink Noise, Right Channel: Logarithmic Sine Sweep).
 
 <img src=".github/images/signal_response_multichannel.png" width="100%"></img>
 
@@ -98,25 +99,37 @@ By setting `sigbands=True`, you can retrieve the signal components for each indi
 
 <img src=".github/images/signal_decomposition.png" width="100%"></img>
 
+<details>
+<summary><b>Click to see the code for this example</b></summary>
+
+```python
+import numpy as np
+from pyoctaveband import octavefilter
+
+# 1. Generate a composite signal (Sum of 250Hz and 1000Hz sines)
+fs = 8000
+t = np.linspace(0, 0.5, fs // 2, endpoint=False)
+y = np.sin(2 * np.pi * 250 * t) + np.sin(2 * np.pi * 1000 * t)
+
+# 2. Filter into 1/1 octave bands and get time-domain signals
+# We use sigbands=True to get the 'xb' list of filtered signals
+spl, freq, xb = octavefilter(y, fs=fs, fraction=1, sigbands=True)
+
+# 'xb' contains the isolated signal for each band
+# xb[i] corresponds to the center frequency freq[i]
+```
+</details>
+
 # Development
 
 ### Running Tests
 ```bash
-python tests/test_basic.py
-python tests/test_multichannel.py
-python tests/test_audio_processing.py
+make check
 ```
 
 ### Generating Graphs
-To regenerate the images used in this README:
 ```bash
 python generate_graphs.py
-```
-
-### Code Quality & Security
-Run local checks using the `Makefile`:
-```bash
-make check
 ```
 
 # Roadmap
@@ -124,7 +137,7 @@ make check
 - Support for more filter types (Chebyshev, etc.)
 
 ## Contributing
-If you have any suggestions or found an error, please check [CONTRIBUTING.md](CONTRIBUTING.md) and open an [Issue](https://github.com/jmrplens/PyOctaveBand/issues) or a [Pull Request](https://github.com/jmrplens/PyOctaveBand/pulls).
+Please check [CONTRIBUTING.md](CONTRIBUTING.md) and open an [Issue](https://github.com/jmrplens/PyOctaveBand/issues) or a [Pull Request](https://github.com/jmrplens/PyOctaveBand/pulls).
 
 # Author
 Jose M. Requena Plens, 2020.

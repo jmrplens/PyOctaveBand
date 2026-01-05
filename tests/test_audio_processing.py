@@ -1,27 +1,35 @@
+#  Copyright (c) 2026. Jose M. Requena-Plens
+"""
+Advanced audio processing tests including Pink Noise spectral analysis.
+"""
+
 import os
 import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 
+# Ensure local package is used
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
 
-import pyoctaveband as PyOctaveBand
+from pyoctaveband import octavefilter
 
 
 def generate_pink_noise(samples: int) -> np.ndarray:
     """
     Generate pink noise (1/f noise) using the Voss-McCartney algorithm.
+    
+    :param samples: Number of samples to generate.
+    :return: Normalized pink noise array.
     """
-    # Number of columns for the Voss algorithm
     num_cols = 16
-    rng = np.random.default_rng()
+    rng = np.random.default_rng(42)  # Seeded for reproducibility
     array = np.empty((samples, num_cols))
     array.fill(np.nan)
     array[0, :] = rng.random(num_cols)
     array[:, 0] = rng.random(samples)
 
-    # Voss algorithm: update random values at geometric intervals
+    # Update random values at geometric intervals
     for i in range(1, samples):
         for j in range(1, num_cols):
             if i % (2**j) == 0:
@@ -29,68 +37,61 @@ def generate_pink_noise(samples: int) -> np.ndarray:
             else:
                 array[i, j] = array[i - 1, j]
 
-    # Sum along rows to get pink noise
     pink = np.sum(array, axis=1)
-
-    # Normalize
     pink = pink - np.mean(pink)
-    pink = pink / np.max(np.abs(pink))
-    return pink
+    return pink / np.max(np.abs(pink))
 
 
 def test_pink_noise_flatness() -> None:
     """
-    Test that filtering pink noise with 1/3 octave bands results in a relatively flat spectrum.
-    Pink noise has equal energy per octave (and thus per fractional octave band).
+    Verify that pink noise has approximately equal energy per fractional octave.
+    The resulting SPL spectrum should be relatively flat.
     """
     print("Generating Pink Noise...")
     fs = 48000
-    duration = 5  # seconds
-    samples = fs * duration
+    duration = 5.0
+    samples = int(fs * duration)
     x = generate_pink_noise(samples)
 
-    print("Filtering with 1/3 octave bands...")
-    # Using 1/3 octave bands
-    spl, freq = PyOctaveBand.octavefilter(x, fs=fs, fraction=3, order=6, limits=[20, 20000])
+    print("Analyzing with 1/3 octave bands...")
+    spl, freq = octavefilter(x, fs=fs, fraction=3, order=6, limits=[20, 20000])
 
-    # Calculate mean deviation from the average SPL
     mean_spl = np.mean(spl)
     std_spl = np.std(spl)
 
     print(f"Mean SPL: {mean_spl:.2f} dB")
-    print(f"Standard Deviation of SPL across bands: {std_spl:.2f} dB")
+    print(f"Standard Deviation: {std_spl:.2f} dB")
 
-    # Create a plot
+    # Plot results for visual verification
     _, ax = plt.subplots(figsize=(10, 6))
-    ax.semilogx(freq, spl, "b-o", label="Measured SPL")
-    ax.axhline(mean_spl, color="r", linestyle="--", label="Mean SPL")
+    ax.semilogx(freq, spl, "b-o", label="Measured SPL", markerfacecolor="white")
+    ax.axhline(mean_spl, color="r", linestyle="--", label="Mean SPL", alpha=0.7)
 
-    ax.grid(which="major")
-    ax.grid(which="minor", linestyle=":")
-    ax.set_xlabel(r"Frequency [Hz]")
+    ax.set_title("Pink Noise 1/3 Octave Spectrum (Flatness Check)", fontweight="bold")
+    ax.set_xlabel("Frequency [Hz]")
     ax.set_ylabel("Level [dB]")
-    ax.set_title("1/3 Octave Band Spectrum of Pink Noise (Should be flat)")
+    ax.grid(True, which="both", alpha=0.3)
     ax.legend()
 
     plt.xlim(16, 20000)
-    ax.set_xticks([16, 31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000])
-    ax.set_xticklabels(["16", "31.5", "63", "125", "250", "500", "1k", "2k", "4k", "8k", "16k"])
+    xticks = [16, 31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]
+    xticklabels = ["16", "31.5", "63", "125", "250", "500", "1k", "2k", "4k", "8k", "16k"]
+    ax.set_xticks(xticks)
+    ax.set_xticklabels(xticklabels)
 
     output_file = "tests/pink_noise_test.png"
-    plt.savefig(output_file)
-    print(f"Plot saved to {output_file}")
+    plt.savefig(output_file, dpi=150)
+    print(f"Test plot saved to {output_file}")
 
-    # Assertion: Ideally, pink noise spectrum is flat.
-    # Allow some tolerance due to randomness and filter edge effects
-    # We ignore the very ends (lowest and highest bands) where filter performance might drop
-    valid_spl = spl[2:-2]
+    # Check flatness in central bands (ignoring edges)
+    valid_spl = np.array(spl)[2:-2]
     deviation = np.max(np.abs(valid_spl - np.mean(valid_spl)))
     print(f"Max deviation in central bands: {deviation:.2f} dB")
 
-    if deviation < 3.0:  # 3dB tolerance is generous but reasonable for this simple test
+    if deviation < 3.0:
         print("PASS: Spectrum is approximately flat.")
     else:
-        print("WARNING: Spectrum deviation is high.")
+        print("FAIL: Spectrum deviation is too high.")
 
 
 if __name__ == "__main__":
