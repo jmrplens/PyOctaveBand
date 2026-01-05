@@ -7,9 +7,13 @@ Implementation according to ANSI s1.11-2004 and IEC 61260-1-2014.
 import warnings
 from typing import List, Optional, Tuple, Union, cast
 
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
+
+# Use non-interactive backend for plots
+matplotlib.use("Agg")
 
 # Public methods
 __all__ = ["octavefilter", "getansifrequencies", "normalizedfreq"]
@@ -289,7 +293,7 @@ def getansifrequencies(
     g = 10 ** (3 / 10)
     fr = 1000
 
-    x = _initindex(limits[0], fr, g, fraction)
+    x = _init_index(limits[0], fr, g, fraction)
     freq = np.array([_ratio(g, x, fraction) * fr])
 
     freq_x = freq[0]
@@ -304,7 +308,7 @@ def getansifrequencies(
     return freq.tolist(), freq_d.tolist(), freq_u.tolist()
 
 
-def _initindex(f: float, fr: float, g: float, b: float) -> int:
+def _init_index(f: float, fr: float, g: float, b: float) -> int:
     """Calculate starting index for band generation."""
     if round(b) % 2:
         return int(np.round((b * np.log(f / fr) + 30 * np.log(g)) / np.log(g)))
