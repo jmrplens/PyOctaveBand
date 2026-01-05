@@ -47,7 +47,7 @@ jobs:
         python generate_graphs.py
 
     - name: Snyk Security Scan
-      uses: snyk/actions/python@master
+      uses: snyk/actions/python@9adf32b1121593767fc3c057af55b55db032dc04
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       continue-on-error: true
@@ -55,15 +55,15 @@ jobs:
         args: --sarif-file-output=snyk.sarif
 
     - name: Upload Snyk scan results to GitHub Code Scanning
-      uses: github/codeql-action/upload-sarif@v3
+      uses: github/codeql-action/upload-sarif@6bb031afdd747485962ca697cffec0a92e622a33
       continue-on-error: true
       with:
         sarif_file: snyk.sarif
 
     - name: SonarQube Scan
-      uses: SonarSource/sonarqube-scan-action@v4
+      uses: SonarSource/sonarqube-scan-action@bfd4e558cda28cda6b5defafb9232d191be8c203
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.TOKEN_GH }}
       continue-on-error: true
 
