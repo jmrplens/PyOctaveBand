@@ -1,8 +1,50 @@
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?hosted_button_id=BLP3R6VGYJB4Q)
 [![Donate](https://img.shields.io/badge/Donate-Ko--fi-brightgreen?color=ff5f5f)](https://ko-fi.com/jmrplens) 
+[![Python application](https://github.com/jmrplens/PyOctaveBand/actions/workflows/python-app.yml/badge.svg)](https://github.com/jmrplens/PyOctaveBand/actions/workflows/python-app.yml)
 
 # PyOctaveBand
 Octave-Band and Fractional Octave-Band filter. For signal in time domain.
+
+### Getting Started
+
+#### Installation
+
+You can install the package directly from source:
+
+```bash
+pip install .
+```
+Or if you are developing locally:
+```bash
+pip install -e .
+```
+
+#### Integration / Usage
+
+Here is a simple example of how to use `PyOctaveBand` in your own Python project to filter a signal:
+
+```python
+import numpy as np
+from pyoctaveband import octavefilter
+
+# 1. Prepare your signal (e.g., a 1 second sine wave at 1000 Hz)
+fs = 48000
+t = np.linspace(0, 1, fs)
+signal = np.sin(2 * np.pi * 1000 * t)
+
+# 2. Apply the 1/3 octave band filter
+# Returns:
+# - spl: Sound Pressure Level for each band
+# - freq: Center frequencies of the bands
+spl, freq = octavefilter(signal, fs=fs, fraction=3)
+
+# 3. Print results
+print(f"Center Frequencies: {freq}")
+print(f"SPL per band: {spl}")
+```
+
+#### Multichannel Support
+PyOctaveBand supports multichannel signals. Input `x` can be a 1D array (single channel) or a 2D array with shape `(channels, samples)`.
 
 ### Public Methods
 
@@ -68,13 +110,13 @@ The frequency bands of the filters that are above the Nyquist's frequency (`samp
 ### Examples of filter responses
 | Fraction | Butterworth order: 6       | Butterworth order: 16      | 
 |:-------------:|:-------------:|:-------------:|
-| 1-octave | <img src="https://github.com/jmrplens/PyOctaveBand/blob/1670365c01c70383e1c142c24fa91563cb9342b9/.github/images/one.png" width="100%"></img>      | <img src="https://github.com/jmrplens/PyOctaveBand/blob/1670365c01c70383e1c142c24fa91563cb9342b9/.github/images/one16.png" width="100%"></img>  |
-| 1/3-octave | <img src="https://github.com/jmrplens/PyOctaveBand/blob/1670365c01c70383e1c142c24fa91563cb9342b9/.github/images/third.png" width="100%"></img>      | <img src="https://github.com/jmrplens/PyOctaveBand/blob/1670365c01c70383e1c142c24fa91563cb9342b9/.github/images/third16.png" width="100%"></img>  |
-| 2/3-octave | <img src="https://github.com/jmrplens/PyOctaveBand/blob/1670365c01c70383e1c142c24fa91563cb9342b9/.github/images/twothird.png" width="100%"></img>      | <img src="https://github.com/jmrplens/PyOctaveBand/blob/1670365c01c70383e1c142c24fa91563cb9342b9/.github/images/twothird16.png" width="100%"></img>  |
+| 1-octave | <img src=".github/images/filter_fraction_1_order_6.png" width="100%"></img>      | <img src=".github/images/filter_fraction_1_order_16.png" width="100%"></img>  | 
+| 1/3-octave | <img src=".github/images/filter_fraction_3_order_6.png" width="100%"></img>      | <img src=".github/images/filter_fraction_3_order_16.png" width="100%"></img>  | 
+| 2/3-octave | <img src=".github/images/filter_fraction_1.5_order_6.png" width="100%"></img>      | <img src=".github/images/filter_fraction_1.5_order_16.png" width="100%"></img>  | 
 
 ### Usage example
 
-This example is included in the file test.py.
+This example is included in the file `tests/test_basic.py`.
 
 ```python
 import PyOctaveBand
@@ -117,20 +159,60 @@ The result is as follows:
 
 | One Octave filter       | One-Third Octave filter      | 
 |:-------------:|:-------------:|
-| <img src="https://github.com/jmrplens/PyOctaveBand/blob/1670365c01c70383e1c142c24fa91563cb9342b9/.github/images/response1.png" width="100%"></img>      | <img src="https://github.com/jmrplens/PyOctaveBand/blob/1670365c01c70383e1c142c24fa91563cb9342b9/.github/images/response.png" width="100%"></img>  |
+| <img src=".github/images/signal_response_fraction_1.png" width="100%"></img>      | <img src=".github/images/signal_response_fraction_3.png" width="100%"></img>  | 
 
 | 1/12 Octave filter       | 1/24 Octave filter      | 
 |:-------------:|:-------------:|
-| <img src="https://github.com/jmrplens/PyOctaveBand/blob/1670365c01c70383e1c142c24fa91563cb9342b9/.github/images/12.png" width="100%"></img>      | <img src="https://github.com/jmrplens/PyOctaveBand/blob/1670365c01c70383e1c142c24fa91563cb9342b9/.github/images/24.png" width="100%"></img>  |
+| <img src=".github/images/filter_fraction_12_order_6.png" width="100%"></img>      | <img src=".github/images/filter_fraction_24_order_6.png" width="100%"></img>  | 
+
+### Multichannel Processing Example
+
+This plot shows the analysis of a stereo signal where:
+- **Left Channel (Blue):** Pink Noise (Equal energy per octave)
+- **Right Channel (Red):** Logarithmic Sine Sweep (50Hz - 10kHz)
+
+<img src=".github/images/signal_response_multichannel.png" width="100%"></img>
+
+# Development
+
+### Running Tests
+To run the included tests:
+```bash
+python tests/test_basic.py
+python tests/test_multichannel.py
+python tests/test_audio_processing.py
+```
+
+### Generating Graphs
+To regenerate the images used in this README:
+```bash
+python generate_graphs.py
+```
+
+### Code Quality & Security
+This project uses several tools to ensure code quality:
+- **Linting & Formatting**: `ruff`
+- **Type Checking**: `mypy`
+- **Security Analysis**: `bandit`, `Snyk`, `SonarQube`
+
+You can run these locally using the `Makefile`:
+```bash
+make check
+```
+
+#### CI Configuration
+To enable Snyk and SonarQube in the CI pipeline, add the following **Repository Secrets** on GitHub:
+- `SNYK_TOKEN`: Your Snyk API Token.
+- `SONAR_TOKEN`: Your SonarQube/SonarCloud Token.
+- `SONAR_HOST_URL`: (Optional) Your SonarQube server URL (if using self-hosted).
 
 # Roadmap
 
-- Add multichannel support
+- Performance optimizations for very long signals
+- Support for more filter types (Chebyshev, etc.)
 
-If you have any suggestions or you found an error please, make a [Pull Request](https://github.com/jmrplens/PyOctave/pulls) or [contact me](mailto:info@jmrplens.com).
+## Contributing
+If you have any suggestions or found an error, please check [CONTRIBUTING.md](CONTRIBUTING.md) and open an [Issue](https://github.com/jmrplens/PyOctaveBand/issues) or a [Pull Request](https://github.com/jmrplens/PyOctaveBand/pulls).
 
 # Author
 Jose M. Requena Plens, 2020.
-
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?hosted_button_id=BLP3R6VGYJB4Q)
-[![Donate](https://img.shields.io/badge/Donate-Ko--fi-brightgreen?color=ff5f5f)](https://ko-fi.com/jmrplens) 
