@@ -5,6 +5,7 @@ Advanced audio processing tests including Pink Noise spectral analysis.
 
 import matplotlib.pyplot as plt
 import numpy as np
+
 from pyoctaveband import octavefilter
 
 
