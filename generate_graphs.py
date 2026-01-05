@@ -1,8 +1,9 @@
 import os
+
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy import signal as scipy_signal
 from pyoctaveband import octavefilter
+from scipy import signal as scipy_signal
 
 # Constants for professional styling
 LABEL_FREQ_HZ = "Frequency [Hz]"
@@ -12,15 +13,18 @@ COLOR_SECONDARY = "#d62728"
 COLOR_GRID = "#e0e0e0"
 
 # Global matplotlib configuration
-plt.rcParams.update({
-    "font.size": 10,
-    "axes.grid": True,
-    "grid.alpha": 0.5,
-    "grid.linestyle": "--",
-    "figure.figsize": (10, 6),
-    "figure.dpi": 150,
-    "savefig.bbox": "tight"
-})
+plt.rcParams.update(
+    {
+        "font.size": 10,
+        "axes.grid": True,
+        "grid.alpha": 0.5,
+        "grid.linestyle": "--",
+        "figure.figsize": (10, 6),
+        "figure.dpi": 150,
+        "savefig.bbox": "tight",
+    }
+)
+
 
 def apply_axis_styling(ax, title, xlim=None, ylim=None):
     """Apply consistent styling to plots."""
@@ -29,17 +33,18 @@ def apply_axis_styling(ax, title, xlim=None, ylim=None):
     ax.set_ylabel(LABEL_LEVEL_DB)
     ax.grid(which="major", color=COLOR_GRID, linestyle="-")
     ax.grid(which="minor", color=COLOR_GRID, linestyle=":", alpha=0.4)
-    
+
     if xlim:
         ax.set_xlim(xlim)
     if ylim:
         ax.set_ylim(ylim)
-        
+
     # Standard Octave Ticks
     xticks = [16, 31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]
     xticklabels = ["16", "31.5", "63", "125", "250", "500", "1k", "2k", "4k", "8k", "16k"]
     ax.set_xticks(xticks)
     ax.set_xticklabels(xticklabels)
+
 
 def generate_filter_responses(output_dir: str) -> None:
     """Generate plots for the filter bank responses."""
@@ -70,6 +75,7 @@ def generate_filter_responses(output_dir: str) -> None:
         )
         plt.close("all")
 
+
 def generate_signal_responses(output_dir: str) -> None:
     """Generate spectral analysis plots for a complex signal."""
     fs = 48000
@@ -78,16 +84,28 @@ def generate_signal_responses(output_dir: str) -> None:
     freqs = [20, 100, 500, 2000, 4000, 15000]
     y = 100 * np.sum([np.sin(2 * np.pi * f * t) for f in freqs], axis=0)
 
-    for frac, filename, title in [(1, "signal_response_fraction_1.png", "1/1 Octave Band Analysis"), 
-                                  (3, "signal_response_fraction_3.png", "1/3 Octave Band Analysis")]:
+    for frac, filename, title in [
+        (1, "signal_response_fraction_1.png", "1/1 Octave Band Analysis"),
+        (3, "signal_response_fraction_3.png", "1/3 Octave Band Analysis"),
+    ]:
         spl, freq = octavefilter(y, fs=fs, fraction=frac, order=6, limits=[12, 20000], show=False)
-        
+
         _, ax = plt.subplots()
-        ax.semilogx(freq, spl, marker="o", markersize=5, linestyle="-", color=COLOR_PRIMARY, 
-                    linewidth=1.5, markerfacecolor="white", markeredgewidth=1.5)
+        ax.semilogx(
+            freq,
+            spl,
+            marker="o",
+            markersize=5,
+            linestyle="-",
+            color=COLOR_PRIMARY,
+            linewidth=1.5,
+            markerfacecolor="white",
+            markeredgewidth=1.5,
+        )
         apply_axis_styling(ax, title, xlim=(11, 25000))
         plt.savefig(os.path.join(output_dir, filename))
         plt.close()
+
 
 def generate_multichannel_response(output_dir: str) -> None:
     """Generate analysis plot for a stereo signal."""
@@ -118,57 +136,77 @@ def generate_multichannel_response(output_dir: str) -> None:
     spl, freq = octavefilter(x, fs=fs, fraction=3, order=6, limits=[20, 20000])
 
     _, ax = plt.subplots()
-    ax.semilogx(freq, spl[0], marker="o", markersize=5, label="Left: Pink Noise", 
-                color=COLOR_PRIMARY, alpha=0.8, markerfacecolor="white", markeredgewidth=1.2)
-    ax.semilogx(freq, spl[1], marker="s", markersize=5, label="Right: Log Sweep", 
-                color=COLOR_SECONDARY, alpha=0.8, markerfacecolor="white", markeredgewidth=1.2)
-    
+    ax.semilogx(
+        freq,
+        spl[0],
+        marker="o",
+        markersize=5,
+        label="Left: Pink Noise",
+        color=COLOR_PRIMARY,
+        alpha=0.8,
+        markerfacecolor="white",
+        markeredgewidth=1.2,
+    )
+    ax.semilogx(
+        freq,
+        spl[1],
+        marker="s",
+        markersize=5,
+        label="Right: Log Sweep",
+        color=COLOR_SECONDARY,
+        alpha=0.8,
+        markerfacecolor="white",
+        markeredgewidth=1.2,
+    )
+
     apply_axis_styling(ax, "Multichannel Analysis (1/3 Octave)", xlim=(16, 20000))
     ax.legend(frameon=True, loc="upper right")
-    
+
     plt.savefig(os.path.join(output_dir, "signal_response_multichannel.png"))
     plt.close()
+
 
 def generate_decomposition_plot(output_dir: str) -> None:
     """Generate time-domain decomposition plot with synchronized axes."""
     fs = 8000
     duration = 0.5
     t = np.linspace(0, duration, int(fs * duration), endpoint=False)
-    
+
     # Signal: sum of 250Hz and 1000Hz sines
     y = np.sin(2 * np.pi * 250 * t) + np.sin(2 * np.pi * 1000 * t)
-    
+
     # Filter into 1/1 octave bands
     _, freq, xb = octavefilter(y, fs=fs, fraction=1, order=6, limits=[100, 2000], sigbands=True)
-    
+
     num_plots = len(xb) + 1
     _, axes = plt.subplots(num_plots, 1, figsize=(10, 2 * num_plots), sharex=True)
-    
+
     # Fixed Y limits for all plots to allow direct comparison
     y_lim = (-2.5, 2.5)
-    
+
     # Original Signal
     axes[0].plot(t, y, color="black", linewidth=1.2)
     axes[0].set_title("Original Signal (250 Hz + 1000 Hz Sum)", fontweight="bold")
-    
+
     colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"]
-    
+
     # Filtered Bands
     for i, (band_signal, f_center) in enumerate(zip(xb, freq)):
-        axes[i+1].plot(t, band_signal, color=colors[i % len(colors)], linewidth=1.2)
-        axes[i+1].set_title(f"Octave Band: {f_center:.0f} Hz", fontsize=10)
-        
+        axes[i + 1].plot(t, band_signal, color=colors[i % len(colors)], linewidth=1.2)
+        axes[i + 1].set_title(f"Octave Band: {f_center:.0f} Hz", fontsize=10)
+
     for ax in axes:
         ax.set_ylim(y_lim)
         ax.set_ylabel("Amplitude")
         ax.grid(True, alpha=0.3)
-        
+
     axes[-1].set_xlabel("Time [s]")
-    axes[-1].set_xlim(0, 0.04) # Show first 40ms for clear waveform detail
+    axes[-1].set_xlim(0, 0.04)  # Show first 40ms for clear waveform detail
 
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, "signal_decomposition.png"))
     plt.close()
+
 
 if __name__ == "__main__":
     img_dir = ".github/images"
