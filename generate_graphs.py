@@ -152,7 +152,7 @@ def generate_decomposition_plot(output_dir: str) -> None:
     _, freq, xb = octavefilter(y, fs=fs, fraction=1, order=6, limits=[100, 2000], sigbands=True)
     
     num_plots = len(xb) + 1
-    fig, axes = plt.subplots(num_plots, 1, figsize=(10, 2 * num_plots), sharex=True)
+    _, axes = plt.subplots(num_plots, 1, figsize=(10, 2 * num_plots), sharex=True)
     
     # Fixed Y limits for all plots to allow direct comparison
     # The composite signal has peak at 2.0, individual bands at 1.0.
