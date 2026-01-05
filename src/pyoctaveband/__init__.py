@@ -239,6 +239,9 @@ def _showfilter(
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.semilogx(w, 20 * np.log10(abs(h) + np.finfo(float).eps), color="#1f77b4", linewidth=1.2)
     
+    # Add -3dB reference line
+    ax.axhline(-3, color="#d62728", linestyle="--", alpha=0.5, linewidth=1, label="-3 dB")
+    
     ax.set_title("Filter Bank Frequency Response", fontweight="bold", pad=15)
     ax.set_xlabel("Frequency [Hz]")
     ax.set_ylabel("Amplitude [dB]")
