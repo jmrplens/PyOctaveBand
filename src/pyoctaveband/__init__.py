@@ -28,8 +28,8 @@ def octavefilter(
     """
     Filter a signal with octave or fractional octave filter bank.
 
-    This method uses a Butterworth filter with Second-Order Sections (SOS) 
-    coefficients. To obtain the correct coefficients, automatic subsampling 
+    This method uses a Butterworth filter with Second-Order Sections (SOS)
+    coefficients. To obtain the correct coefficients, automatic subsampling
     is applied to the signal in each filtered band.
 
     Multichannel support: If x is 2D (channels, samples), each channel is filtered.
@@ -187,21 +187,21 @@ def _showfilter(
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.semilogx(w, 20 * np.log10(abs(h) + np.finfo(float).eps), color="#1f77b4", linewidth=1.2)
     ax.axhline(-3, color="#d62728", linestyle="--", alpha=0.5, linewidth=1, label="-3 dB")
-    
+
     ax.set_title("Filter Bank Frequency Response", fontweight="bold", pad=15)
     ax.set_xlabel("Frequency [Hz]")
     ax.set_ylabel("Amplitude [dB]")
     ax.grid(which="major", color="#e0e0e0", linestyle="-")
     ax.grid(which="minor", color="#e0e0e0", linestyle=":", alpha=0.4)
-    
+
     plt.xlim(freq_d[0] * 0.8, freq_u[-1] * 1.2)
     plt.ylim(-4, 1)
-    
+
     xticks = [16, 31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]
     xticklabels = ["16", "31.5", "63", "125", "250", "500", "1k", "2k", "4k", "8k", "16k"]
     ax.set_xticks(xticks)
     ax.set_xticklabels(xticklabels)
-    
+
     if plot_file:
         plt.savefig(plot_file, dpi=150, bbox_inches="tight")
     if show:
@@ -220,9 +220,39 @@ def normalizedfreq(fraction: int) -> List[float]:
     predefined = {
         1: [16, 31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000],
         3: [
-            12.5, 16, 20, 25, 31.5, 40, 50, 63, 80, 100, 125, 160, 200, 250,
-            315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000,
-            5000, 6300, 8000, 10000, 12500, 16000, 20000,
+            12.5,
+            16,
+            20,
+            25,
+            31.5,
+            40,
+            50,
+            63,
+            80,
+            100,
+            125,
+            160,
+            200,
+            250,
+            315,
+            400,
+            500,
+            630,
+            800,
+            1000,
+            1250,
+            1600,
+            2000,
+            2500,
+            3150,
+            4000,
+            5000,
+            6300,
+            8000,
+            10000,
+            12500,
+            16000,
+            20000,
         ],
     }
     if fraction not in predefined:
@@ -240,7 +270,7 @@ def _deleteouters(
 
     idx = np.nonzero(freq_u_arr > fs / 2)[0]
     if len(idx) > 0:
-        warnings.warn("Low sampling rate: frequencies above fs/2 removed")
+        warnings.warn("Low sampling rate: frequencies above fs/2 removed", stacklevel=2)
         freq_arr = np.delete(freq_arr, idx)
         freq_d_arr = np.delete(freq_d_arr, idx)
         freq_u_arr = np.delete(freq_u_arr, idx)
