@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  node-forge: '>=1.3.2'
+
 importers:
 
   .:
@@ -224,8 +227,8 @@ packages:
     resolution: {integrity: sha512-ZDY+bPm5zTTF+YpCrAU9nK0UgICYPT0QtT1NZWFv4s++TNkcgVaT0g6+4R2uI4MjQjzysHB1zxuWL50hzaeXiw==}
     engines: {node: '>= 0.6'}
 
-  node-forge@1.3.1:
-    resolution: {integrity: sha512-dPEtOeMvF9VMcYV/1Wb8CPoVAXtp6MKMlcbAt4ddqmGqUJ6fQZFXkNZNkNlfevtNkGtaSoXf/vNNNSvgrdXwtA==}
+  node-forge@1.3.3:
+    resolution: {integrity: sha512-rLvcdSyRCyouf6jcOIPe/BgwG/d7hKjzMKOas33/pHEr6gbq18IK9zV7DiPvzsz0oBJPme6qr6H6kGZuI9/DZg==}
     engines: {node: '>= 6.13.0'}
 
   object-keys@1.1.1:
@@ -505,7 +508,7 @@ snapshots:
     dependencies:
       mime-db: 1.52.0
 
-  node-forge@1.3.1: {}
+  node-forge@1.3.3: {}
 
   object-keys@1.1.1: {}
 
@@ -546,7 +549,7 @@ snapshots:
       commander: 13.1.0
       fs-extra: 11.3.2
       hpagent: 1.2.0
-      node-forge: 1.3.1
+      node-forge: 1.3.3
       properties-file: 3.6.1
       proxy-from-env: 1.1.0
       semver: 7.7.2
