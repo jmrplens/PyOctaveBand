@@ -3,8 +3,8 @@
 Advanced audio processing tests including Pink Noise spectral analysis.
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from pyoctaveband import octavefilter
 
 
@@ -45,7 +45,7 @@ def test_pink_noise_flatness() -> None:
     spl, freq = octavefilter(x, fs=fs, fraction=3, order=6, limits=[20, 20000])
 
     mean_spl = np.mean(spl)
-    
+
     # Check flatness in central bands (ignoring edges)
     valid_spl = np.array(spl)[2:-2]
     deviation = np.max(np.abs(valid_spl - np.mean(valid_spl)))
