@@ -79,7 +79,30 @@ def octavefilter(
     # Get SOS filter coefficients (3D - matrix with size: [freq,order,6])
     sos = _buttersosfilter(freq, freq_d, freq_u, fs, order, factor, show, plot_file)
 
-    # Create array with SPL for each frequency band and channel
+    # Process all bands and channels
+    spl, xb = _process_bands(x_proc, num_channels, num_bands, factor, sos, sigbands)
+
+    # Format output
+    if not is_multichannel:
+        spl = spl[0]
+        if sigbands and xb is not None:
+            xb = [band[0] for band in xb]
+
+    if sigbands and xb is not None:
+        return spl, freq, xb
+    else:
+        return spl, freq
+
+
+def _process_bands(
+    x_proc: np.ndarray,
+    num_channels: int,
+    num_bands: int,
+    factor: np.ndarray,
+    sos: List[np.ndarray],
+    sigbands: bool,
+) -> Tuple[np.ndarray, Optional[List[np.ndarray]]]:
+    """Internal helper to process each frequency band."""
     spl = np.zeros([num_channels, num_bands])
     xb: Optional[List[np.ndarray]] = [np.array([]) for _ in range(num_bands)] if sigbands else None
 
@@ -94,28 +117,21 @@ def octavefilter(
             spl[ch, idx] = 20 * np.log10(np.max([np.std(y), np.finfo(float).eps]) / 2e-5)
 
             if sigbands and xb is not None:
-                # Resample back to original sample rate
-                y_resampled = signal.resample_poly(y, factor[idx], 1)
-                # Ensure the length matches original (resample_poly might differ by 1)
-                if len(y_resampled) > x_proc.shape[1]:
-                    y_resampled = y_resampled[: x_proc.shape[1]]
-                elif len(y_resampled) < x_proc.shape[1]:
-                    y_resampled = np.pad(y_resampled, (0, x_proc.shape[1] - len(y_resampled)))
-
+                y_resampled = _resample_to_length(y, int(factor[idx]), x_proc.shape[1])
                 if ch == 0:
                     xb[idx] = np.zeros([num_channels, x_proc.shape[1]])
                 xb[idx][ch] = y_resampled
+    return spl, xb
 
-    # Format output
-    if not is_multichannel:
-        spl = spl[0]
-        if sigbands and xb is not None:
-            xb = [band[0] for band in xb]
 
-    if sigbands and xb is not None:
-        return spl, freq, xb
-    else:
-        return spl, freq
+def _resample_to_length(y: np.ndarray, factor: int, target_length: int) -> np.ndarray:
+    """Resample signal back to original sample rate and ensure exact length."""
+    y_resampled = signal.resample_poly(y, factor, 1)
+    if len(y_resampled) > target_length:
+        y_resampled = y_resampled[:target_length]
+    elif len(y_resampled) < target_length:
+        y_resampled = np.pad(y_resampled, (0, target_length - len(y_resampled)))
+    return cast(np.ndarray, y_resampled)
 
 
 def _typesignal(x: Union[List[float], np.ndarray, Tuple[float, ...]]) -> np.ndarray:
@@ -356,7 +372,7 @@ def _deleteouters(
     freq_d_arr = np.array(freq_d)
     freq_u_arr = np.array(freq_u)
 
-    idx = np.where(freq_u_arr > fs / 2)[0]
+    idx = np.nonzero(freq_u_arr > fs / 2)[0]
     if len(idx) > 0:
         _printwarn("Low sampling rate, frequencies above fs/2 will be removed")
         freq_arr = np.delete(freq_arr, idx)
@@ -367,7 +383,8 @@ def _deleteouters(
 
 
 def getansifrequencies(
-    fraction: float, limits: Optional[List[float]] = None
+    fraction: float,
+    limits: Optional[List[float]] = None,
 ) -> Tuple[List[float], List[float], List[float]]:
     """
     Calculate array of frequencies and its edges according to ANSI s1.11-2004 & IEC 61260-1-2014.

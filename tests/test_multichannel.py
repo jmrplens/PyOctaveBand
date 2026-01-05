@@ -1,14 +1,15 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
-
 import numpy as np
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
 
 import pyoctaveband as PyOctaveBand
 
 
-def test_multichannel():
+def test_multichannel() -> None:
+    """Test multichannel signal processing."""
     fs = 48000
     duration = 1.0
     t = np.linspace(0, duration, int(fs * duration), endpoint=False)
@@ -17,8 +18,8 @@ def test_multichannel():
     ch1 = np.sin(2 * np.pi * 500 * t)
 
     # Channel 2: White Noise (High energy across all bands)
-    np.random.seed(42)  # Fixed seed for reproducibility
-    ch2 = np.random.randn(len(t))
+    rng = np.random.default_rng(42)  # Fixed seed for reproducibility
+    ch2 = rng.standard_normal(len(t))
 
     x = np.vstack((ch1, ch2))
 

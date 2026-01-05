@@ -1,19 +1,25 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "src")))
-
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal as scipy_signal
 
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "src")))
+
 import pyoctaveband as PyOctaveBand
 
+# Constants for common labels to avoid duplication
+LABEL_FREQ_HZ = r"Frequency [Hz]"
+LABEL_LEVEL_DB = "Level [dB]"
 
-def generate_filter_responses(output_dir):
+
+def generate_filter_responses(output_dir: str) -> None:
+    """Generate plots for different filter configurations."""
     fs = 48000
     # Dummy signal
-    x = np.random.randn(fs)
+    rng = np.random.default_rng()
+    x = rng.standard_normal(fs)
 
     # (filename, fraction, order)
     # Using consistent naming: filter_fraction_{fraction}_order_{order}.png
@@ -36,13 +42,14 @@ def generate_filter_responses(output_dir):
             fraction=fraction,
             order=order,
             limits=[12, 20000],
-            show=0,
+            show=False,
             plot_file=os.path.join(output_dir, filename),
         )
         plt.close("all")
 
 
-def generate_signal_responses(output_dir):
+def generate_signal_responses(output_dir: str) -> None:
+    """Generate plots for single channel signal analysis."""
     fs = 48000
     duration = 5
     x = np.arange(np.round(fs * duration)) / fs
@@ -58,14 +65,14 @@ def generate_signal_responses(output_dir):
 
     # Single Channel 1 Octave
     print("Generating signal_response_fraction_1.png...")
-    spl, freq = PyOctaveBand.octavefilter(y, fs=fs, fraction=1, order=6, limits=[12, 20000], show=0)
+    spl, freq = PyOctaveBand.octavefilter(y, fs=fs, fraction=1, order=6, limits=[12, 20000], show=False)
 
-    fig, ax = plt.subplots(figsize=(10, 5))
+    _, ax = plt.subplots(figsize=(10, 5))
     ax.semilogx(freq, spl, "b-o")
     ax.grid(which="major")
     ax.grid(which="minor", linestyle=":")
-    ax.set_xlabel(r"Frequency [Hz]")
-    ax.set_ylabel("Level [dB]")
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel(LABEL_LEVEL_DB)
     plt.xlim(11, 25000)
     ax.set_xticks([16, 31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000])
     ax.set_xticklabels(["16", "31.5", "63", "125", "250", "500", "1k", "2k", "4k", "8k", "16k"])
@@ -75,14 +82,14 @@ def generate_signal_responses(output_dir):
 
     # Single Channel 1/3 Octave
     print("Generating signal_response_fraction_3.png...")
-    spl, freq = PyOctaveBand.octavefilter(y, fs=fs, fraction=3, order=6, limits=[12, 20000], show=0)
+    spl, freq = PyOctaveBand.octavefilter(y, fs=fs, fraction=3, order=6, limits=[12, 20000], show=False)
 
-    fig, ax = plt.subplots(figsize=(10, 5))
+    _, ax = plt.subplots(figsize=(10, 5))
     ax.semilogx(freq, spl, "b-o")
     ax.grid(which="major")
     ax.grid(which="minor", linestyle=":")
-    ax.set_xlabel(r"Frequency [Hz]")
-    ax.set_ylabel("Level [dB]")
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel(LABEL_LEVEL_DB)
     plt.xlim(11, 25000)
     ax.set_xticks([16, 31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000])
     ax.set_xticklabels(["16", "31.5", "63", "125", "250", "500", "1k", "2k", "4k", "8k", "16k"])
@@ -91,23 +98,24 @@ def generate_signal_responses(output_dir):
     plt.close()
 
 
-def generate_multichannel_response(output_dir):
+def generate_multichannel_response(output_dir: str) -> None:
+    """Generate plot for multichannel signal analysis."""
     print("Generating signal_response_multichannel.png...")
     fs = 48000
     duration = 5
     t = np.linspace(0, duration, int(fs * duration), endpoint=False)
 
-    # Channel 1: Pink Noise (High energy in low freqs, dropping 3dB/oct)
-    # Using the Voss-McCartney algorithm implementation for consistency
+    # Channel 1: Pink Noise
+    rng = np.random.default_rng()
     num_cols = 16
     array = np.empty((len(t), num_cols))
     array.fill(np.nan)
-    array[0, :] = np.random.random(num_cols)
-    array[:, 0] = np.random.random(len(t))
+    array[0, :] = rng.random(num_cols)
+    array[:, 0] = rng.random(len(t))
     for i in range(1, len(t)):
         for j in range(1, num_cols):
             if i % (2**j) == 0:
-                array[i, j] = np.random.random()
+                array[i, j] = rng.random()
             else:
                 array[i, j] = array[i - 1, j]
     pink_noise = np.sum(array, axis=1)
@@ -123,7 +131,7 @@ def generate_multichannel_response(output_dir):
     # Filter with 1/3 Octave
     spl, freq = PyOctaveBand.octavefilter(x, fs=fs, fraction=3, order=6, limits=[20, 20000])
 
-    fig, ax = plt.subplots(figsize=(10, 6))
+    _, ax = plt.subplots(figsize=(10, 6))
 
     # Plot Channel 1
     ax.semilogx(freq, spl[0], "b-o", label="Left Ch: Pink Noise", alpha=0.7)
@@ -132,8 +140,8 @@ def generate_multichannel_response(output_dir):
 
     ax.grid(which="major")
     ax.grid(which="minor", linestyle=":")
-    ax.set_xlabel(r"Frequency [Hz]")
-    ax.set_ylabel("Level [dB]")
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel(LABEL_LEVEL_DB)
     ax.set_title("Multichannel 1/3 Octave Band Analysis")
     ax.legend()
 
@@ -146,9 +154,9 @@ def generate_multichannel_response(output_dir):
 
 
 if __name__ == "__main__":
-    output_dir = ".github/images"
-    os.makedirs(output_dir, exist_ok=True)
-    generate_filter_responses(output_dir)
-    generate_signal_responses(output_dir)
-    generate_multichannel_response(output_dir)
+    output_dir_main = ".github/images"
+    os.makedirs(output_dir_main, exist_ok=True)
+    generate_filter_responses(output_dir_main)
+    generate_signal_responses(output_dir_main)
+    generate_multichannel_response(output_dir_main)
     print("Done.")
