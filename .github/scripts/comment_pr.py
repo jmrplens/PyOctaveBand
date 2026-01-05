@@ -1,16 +1,16 @@
 import os
 import xml.etree.ElementTree as ET
-import sys
+
 
 def parse_test_results(test_dir):
     summary = []
     total_tests = 0
     total_failures = 0
-    
+
     if not os.path.exists(test_dir):
         return "No test results found.", 0, 0
 
-    files = [f for f in os.listdir(test_dir) if f.endswith('.xml')]
+    files = [f for f in os.listdir(test_dir) if f.endswith(".xml")]
     files.sort()
 
     summary.append("| Python Version | Tests | Failures | Status |")
@@ -20,25 +20,22 @@ def parse_test_results(test_dir):
         try:
             tree = ET.parse(os.path.join(test_dir, f))
             root = tree.getroot()
-            # JUnit XML structure: <testsuite tests="N" failures="M" ...>
-            # pytest puts attributes on the root <testsuite> or <testsuites>
-            
-            if root.tag == 'testsuites':
-                # iterate over suites
+
+            if root.tag == "testsuites":
                 tests = 0
                 failures = 0
                 for suite in root:
-                    tests += int(suite.attrib.get('tests', 0))
-                    failures += int(suite.attrib.get('failures', 0))
+                    tests += int(suite.attrib.get("tests", 0))
+                    failures += int(suite.attrib.get("failures", 0))
             else:
-                tests = int(root.attrib.get('tests', 0))
-                failures = int(root.attrib.get('failures', 0))
+                tests = int(root.attrib.get("tests", 0))
+                failures = int(root.attrib.get("failures", 0))
 
-            version = f.replace('test-results-', '').replace('.xml', '')
+            version = f.replace("test-results-", "").replace(".xml", "")
             status = "✅ Passed" if failures == 0 else "❌ Failed"
-            
+
             summary.append(f"| {version} | {tests} | {failures} | {status} |")
-            
+
             total_tests += tests
             total_failures += failures
         except Exception as e:
@@ -46,43 +43,40 @@ def parse_test_results(test_dir):
 
     return "\n".join(summary), total_tests, total_failures
 
+
 def generate_image_gallery(image_dir, repo, run_id):
     if not os.path.exists(image_dir):
         return "No images generated."
-        
-    images = [f for f in os.listdir(image_dir) if f.endswith('.png')]
+
+    images = [f for f in os.listdir(image_dir) if f.endswith(".png")]
     images.sort()
-    
+
     markdown = []
     markdown.append("### Generated Graphs")
     markdown.append("")
-    
-    # Grid layout using HTML table for better presentation in GitHub comments
-    # or just standard markdown images.
-    # We will use standard markdown for simplicity, maybe 2 per row?
-    # GitHub markdown doesn't support float/grid easily without HTML.
-    
+
     base_url = f"https://raw.githubusercontent.com/{repo}/assets/{run_id}"
-    
+
     for img in images:
         img_url = f"{base_url}/{img}"
         markdown.append(f"![{img}]({img_url})")
         markdown.append(f"*{img}*")
         markdown.append("")
-        
+
     return "\n".join(markdown)
 
+
 def main():
-    repo = os.environ.get('GITHUB_REPOSITORY')
-    run_id = os.environ.get('GITHUB_RUN_ID')
-    test_dir = 'test-results'
-    image_dir = 'generated-graphs'
-    
+    repo = os.environ.get("GITHUB_REPOSITORY")
+    run_id = os.environ.get("GITHUB_RUN_ID")
+    test_dir = "test-results"
+    image_dir = "generated-graphs"
+
     test_table, tests, failures = parse_test_results(test_dir)
     image_gallery = generate_image_gallery(image_dir, repo, run_id)
-    
+
     status_emoji = "🚀" if failures == 0 else "❌"
-    
+
     body = f"""## CI Results {status_emoji}
 
 ### Test Summary
@@ -92,9 +86,10 @@ def main():
 
 [View Full Artifacts](https://github.com/{repo}/actions/runs/{run_id})
 """
-    
-    with open('pr_comment_body.md', 'w') as f:
+
+    with open("pr_comment_body.md", "w") as f:
         f.write(body)
+
 
 if __name__ == "__main__":
     main()
