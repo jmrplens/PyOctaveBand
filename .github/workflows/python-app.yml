@@ -94,6 +94,7 @@ jobs:
         # Checkout assets branch or create orphan if it doesn't exist
         if git show-ref --verify --quiet refs/remotes/origin/assets; then
           git checkout assets
+          git pull origin assets
         else
           git checkout --orphan assets
           git rm -rf .
