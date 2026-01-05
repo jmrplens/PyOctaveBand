@@ -59,9 +59,12 @@ def generate_image_gallery(image_dir, repo, run_id):
 
     for img in images:
         img_url = f"{base_url}/{img}"
-        markdown.append(f"![{img}]({img_url})")
-        markdown.append(f"*{img}*")
+        markdown.append("<details>")
+        markdown.append(f"<summary>🔍 View {img}</summary>")
         markdown.append("")
+        markdown.append(f"![{img}]({img_url})")
+        markdown.append("")
+        markdown.append("</details>")
 
     return "\n".join(markdown)
 
