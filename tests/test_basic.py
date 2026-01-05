@@ -5,6 +5,7 @@ Basic test and usage example for pyoctaveband.
 """
 
 import numpy as np
+
 import pyoctaveband as PyOctaveBand
 
 
