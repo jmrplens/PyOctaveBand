@@ -4,6 +4,7 @@ Multichannel processing validation tests.
 """
 
 import numpy as np
+
 from pyoctaveband import octavefilter
 
 
