@@ -33,7 +33,9 @@ def test_octave_filter_sigbands():
     y = np.sin(2 * np.pi * 1000 * t)
 
     # 2. Filter and get signals in time-domain bands
-    spl, freq, xb = PyOctaveBand.octavefilter(y, fs=fs, fraction=1, order=6, limits=[500, 2000], show=False, sigbands=True)
+    spl, freq, xb = PyOctaveBand.octavefilter(
+        y, fs=fs, fraction=1, order=6, limits=[500, 2000], show=False, sigbands=True
+    )
 
     assert len(xb) == len(freq)
     assert xb[0].shape == y.shape
