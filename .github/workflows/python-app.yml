@@ -61,9 +61,9 @@ jobs:
         sarif_file: snyk.sarif
 
     - name: SonarQube Scan
-      uses: SonarSource/sonarqube-scan-action@v2.1.0
+      uses: SonarSource/sonarqube-scan-action@v4
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       continue-on-error: true
 
