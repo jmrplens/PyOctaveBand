@@ -4,6 +4,7 @@ Octave-Band and Fractional Octave-Band filter for signals in the time domain.
 Implementation according to ANSI s1.11-2004 and IEC 61260-1-2014.
 """
 
+import warnings
 from typing import List, Optional, Tuple, Union, cast
 
 import matplotlib.pyplot as plt
@@ -239,7 +240,7 @@ def _deleteouters(
 
     idx = np.nonzero(freq_u_arr > fs / 2)[0]
     if len(idx) > 0:
-        _printwarn("Low sampling rate: frequencies above fs/2 removed")
+        warnings.warn("Low sampling rate: frequencies above fs/2 removed")
         freq_arr = np.delete(freq_arr, idx)
         freq_d_arr = np.delete(freq_d_arr, idx)
         freq_u_arr = np.delete(freq_u_arr, idx)
@@ -290,11 +291,6 @@ def _ratio(g: float, x: int, b: float) -> float:
 def _bandedge(g: float, b: float) -> float:
     """Calculate band-edge ratio."""
     return float(g ** (1 / (2 * b)))
-
-
-def _printwarn(msg: str) -> None:
-    """Log formatted warning."""
-    print(f"*********\n{msg}\n*********")
 
 
 def _downsamplingfactor(freq: List[float], fs: int) -> np.ndarray:
