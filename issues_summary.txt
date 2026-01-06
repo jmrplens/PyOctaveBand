@@ -1,0 +1,52 @@
+jmrplens_PyOctaveBand:src/pyoctaveband/__init__.py:34 - Function "octavefilter" has 14 parameters, which is greater than the 13 authorized.
+jmrplens_PyOctaveBand:tests/test_errors_and_edge_cases.py:70 - Use a "numpy.random.Generator" here instead of this legacy function.
+jmrplens_PyOctaveBand:tests/test_errors_and_edge_cases.py:88 - Use a "numpy.random.Generator" here instead of this legacy function.
+jmrplens_PyOctaveBand:tests/test_errors_and_edge_cases.py:106 - Use a "numpy.random.Generator" here instead of this legacy function.
+jmrplens_PyOctaveBand:tests/test_errors_and_edge_cases.py:145 - Use a "numpy.random.Generator" here instead of this legacy function.
+jmrplens_PyOctaveBand:tests/test_errors_and_edge_cases.py:203 - Use a "numpy.random.Generator" here instead of this legacy function.
+jmrplens_PyOctaveBand:tests/test_errors_and_edge_cases.py:204 - Use a "numpy.random.Generator" here instead of this legacy function.
+jmrplens_PyOctaveBand:tests/test_parametric_filters.py:37 - Replace the unused local variable "freq" with "_".
+jmrplens_PyOctaveBand:tests/test_parametric_filters.py:61 - Replace the unused local variable "freq" with "_".
+jmrplens_PyOctaveBand:src/pyoctaveband/calibration.py:29 - Remove this commented out code.
+jmrplens_PyOctaveBand:generate_graphs.py:None - Remove the unused local variable "f".
+jmrplens_PyOctaveBand:generate_graphs.py:306 - Replace the unused local variable "fig" with "_".
+jmrplens_PyOctaveBand:generate_graphs.py:348 - Replace the unused local variable "fig" with "_".
+jmrplens_PyOctaveBand:generate_graphs.py:372 - Replace the unused local variable "hp" with "_".
+jmrplens_PyOctaveBand:generate_graphs.py:375 - Replace the unused local variable "w_lp" with "_".
+jmrplens_PyOctaveBand:generate_graphs.py:384 - Replace the unused local variable "fig" with "_".
+jmrplens_PyOctaveBand:tests/test_parametric_filters.py:201 - Use a "numpy.random.Generator" here instead of this legacy function.
+jmrplens_PyOctaveBand:tests/test_parametric_filters.py:227 - Use a "numpy.random.Generator" here instead of this legacy function.
+jmrplens_PyOctaveBand:src/pyoctaveband/core.py:130 - Refactor this function to reduce its Cognitive Complexity from 25 to the 15 allowed.
+jmrplens_PyOctaveBand:generate_graphs.py:73 - Replace the unused local variable "fig" with "_".
+jmrplens_PyOctaveBand:generate_graphs.py:257 - Replace the unused local variable "fig" with "_".
+jmrplens_PyOctaveBand:tests/test_basic.py:69 - Replace the unused local variable "spl" with "_".
+jmrplens_PyOctaveBand:.github/workflows/python-app.yml:10 - Move this write permission from workflow level to job level.
+jmrplens_PyOctaveBand:.github/workflows/python-app.yml:11 - Move this write permission from workflow level to job level.
+jmrplens_PyOctaveBand:.github/workflows/python-app.yml:12 - Move this write permission from workflow level to job level.
+jmrplens_PyOctaveBand:tests/test_advanced.py:33 - Use a "numpy.random.Generator" here instead of this legacy function.
+jmrplens_PyOctaveBand:tests/test_advanced.py:36 - Replace the unused local variable "spl1" with "_".
+jmrplens_PyOctaveBand:tests/test_advanced.py:38 - Replace the unused local variable "spl3" with "_".
+jmrplens_PyOctaveBand:tests/test_advanced.py:42 - Replace the unused local variable "spl2" with "_".
+jmrplens_PyOctaveBand:tests/test_advanced.py:122 - Use a "numpy.random.Generator" here instead of this legacy function.
+jmrplens_PyOctaveBand:tests/test_advanced.py:147 - Use a "numpy.random.Generator" here instead of this legacy function.
+jmrplens_PyOctaveBand:tests/test_advanced.py:158 - Replace the unused local variable "freq" with "_".
+jmrplens_PyOctaveBand:tests/test_advanced.py:180 - Replace the unused local variable "freq" with "_".
+jmrplens_PyOctaveBand:tests/test_advanced.py:209 - Use a "numpy.random.Generator" here instead of this legacy function.
+jmrplens_PyOctaveBand:tests/test_advanced.py:214 - Replace the unused local variable "spl" with "_".
+jmrplens_PyOctaveBand:tests/test_advanced.py:236 - Use a "numpy.random.Generator" here instead of this legacy function.
+jmrplens_PyOctaveBand:tests/test_advanced.py:240 - Replace the unused local variable "freq" with "_".
+jmrplens_PyOctaveBand:tests/test_advanced.py:243 - Replace the unused local variable "freq2" with "_".
+jmrplens_PyOctaveBand:tests/test_parametric.py:37 - Replace the unused local variable "spl" with "_".
+jmrplens_PyOctaveBand:tests/test_parametric.py:62 - Use a "numpy.random.Generator" here instead of this legacy function.
+jmrplens_PyOctaveBand:tests/test_parametric.py:64 - Replace the unused local variable "freq" with "_".
+jmrplens_PyOctaveBand:tests/test_parametric.py:91 - Use a "numpy.random.Generator" here instead of this legacy function.
+jmrplens_PyOctaveBand:tests/test_parametric.py:93 - Use a "numpy.random.Generator" here instead of this legacy function.
+jmrplens_PyOctaveBand:tests/test_parametric.py:206 - Use a "numpy.random.Generator" here instead of this legacy function.
+jmrplens_PyOctaveBand:tests/test_parametric.py:213 - Replace the unused local variable "freq2" with "_".
+jmrplens_PyOctaveBand:tests/test_performance.py:32 - Use a "numpy.random.Generator" here instead of this legacy function.
+jmrplens_PyOctaveBand:tests/test_basic.py:None - Replace the unused local variable "spl" with "_".
+jmrplens_PyOctaveBand:tests/test_basic.py:None - Replace the unused local variable "spl" with "_".
+jmrplens_PyOctaveBand:.github/workflows/python-app.yml:None - Move this write permission from workflow level to job level.
+jmrplens_PyOctaveBand:.github/workflows/python-app.yml:None - Move this write permission from workflow level to job level.
+jmrplens_PyOctaveBand:.github/workflows/python-app.yml:None - Move this write permission from workflow level to job level.
+jmrplens_PyOctaveBand:.github/workflows/python-app.yml:None - Move this read permission from workflow level to job level.

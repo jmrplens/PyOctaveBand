@@ -155,30 +155,32 @@ class OctaveFilterBank:
                 else:
                     sd = x_proc[ch]
                 
-                y = signal.sosfilt(self.sos[idx], sd)
+                filtered_signal = signal.sosfilt(self.sos[idx], sd)
 
-                # Sound Level Calculation
-                if mode.lower() == "rms":
-                    val_linear = np.std(y)
-                elif mode.lower() == "peak":
-                    val_linear = np.max(np.abs(y))
-                else:
-                    raise ValueError("Invalid mode. Use 'rms' or 'peak'.")
-
-                if self.dbfs:
-                    # dBFS: 0 dB is RMS = 1.0 or Peak = 1.0
-                    val = 20 * np.log10(np.max([val_linear, np.finfo(float).eps]))
-                else:
-                    # Physical SPL: apply sensitivity and use 20uPa reference
-                    pressure_pa = val_linear * self.calibration_factor
-                    val = 20 * np.log10(np.max([pressure_pa, np.finfo(float).eps]) / 2e-5)
-                
-                spl[ch, idx] = val
+                # Sound Level Calculation extracted to reduce complexity
+                spl[ch, idx] = self._calculate_level(filtered_signal, mode)
 
                 if sigbands and xb is not None:
                     # Restore original length
-                    y_resampled = _resample_to_length(y, int(self.factor[idx]), x_proc.shape[1])
+                    y_resampled = _resample_to_length(filtered_signal, int(self.factor[idx]), x_proc.shape[1])
                     if ch == 0:
                         xb[idx] = np.zeros([num_channels, x_proc.shape[1]])
                     xb[idx][ch] = y_resampled
         return spl, xb
+
+    def _calculate_level(self, y: np.ndarray, mode: str) -> float:
+        """Calculate the level (RMS or Peak) in dB."""
+        if mode.lower() == "rms":
+            val_linear = np.std(y)
+        elif mode.lower() == "peak":
+            val_linear = np.max(np.abs(y))
+        else:
+            raise ValueError("Invalid mode. Use 'rms' or 'peak'.")
+
+        if self.dbfs:
+            # dBFS: 0 dB is RMS = 1.0 or Peak = 1.0
+            return float(20 * np.log10(np.max([val_linear, np.finfo(float).eps])))
+        
+        # Physical SPL: apply sensitivity and use 20uPa reference
+        pressure_pa = val_linear * self.calibration_factor
+        return float(20 * np.log10(np.max([pressure_pa, np.finfo(float).eps]) / 2e-5))

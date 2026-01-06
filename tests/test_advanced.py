@@ -9,7 +9,7 @@ import pytest
 from pyoctaveband import normalizedfreq, octavefilter
 
 
-def test_fraction_validation():
+def test_fraction_validation() -> None:
     """
     Test the filter's behavior with standard and non-standard fractional bandwidths.
 
@@ -30,16 +30,17 @@ def test_fraction_validation():
       as it relies on a lookup table for IEC standards.
     """
     fs = 48000
-    x = np.random.randn(fs)  # 1 second of noise
+    rng = np.random.default_rng(42)
+    x = rng.standard_normal(fs)  # 1 second of noise
 
     # Standard fractions
-    spl1, freq1 = octavefilter(x, fs, fraction=1)
+    _, freq1 = octavefilter(x, fs, fraction=1)
     assert len(freq1) > 0
-    spl3, freq3 = octavefilter(x, fs, fraction=3)
+    _, freq3 = octavefilter(x, fs, fraction=3)
     assert len(freq3) > len(freq1)
 
     # Non-standard fraction (should work mathematically via _genfreqs)
-    spl2, freq2 = octavefilter(x, fs, fraction=2)
+    _, freq2 = octavefilter(x, fs, fraction=2)
     assert len(freq2) > 0
 
     # normalizedfreq only supports 1 and 3
@@ -47,7 +48,7 @@ def test_fraction_validation():
         normalizedfreq(2)
 
 
-def test_invalid_inputs():
+def test_invalid_inputs() -> None:
     """
     Test input validation logic for invalid parameters.
 
@@ -99,7 +100,7 @@ def test_invalid_inputs():
         octavefilter(x, fs, filter_type="invalid_type")
 
 
-def test_short_signal():
+def test_short_signal() -> None:
     """
     Test processing of a signal shorter than the downsampling factor.
 
@@ -119,7 +120,8 @@ def test_short_signal():
     # Lowest frequency 12Hz requires large downsampling factor
     # approx factor = fs / (2*freq) -> 48000 / 24 = 2000
     # Let's try a very short signal
-    x = np.random.randn(100) 
+    rng = np.random.default_rng(42)
+    x = rng.standard_normal(100) 
     
     # This might fail if resample produces empty array or 0 length
     spl, freq = octavefilter(x, fs, limits=[12, 100])
@@ -128,7 +130,7 @@ def test_short_signal():
     assert len(spl) == len(freq)
 
 
-def test_nan_handling():
+def test_nan_handling() -> None:
     """
     Test the behavior when the input signal contains NaN values.
 
@@ -144,23 +146,16 @@ def test_nan_handling():
     - The output SPL array should contain NaNs, confirming standard signal processing behavior.
     """
     fs = 48000
-    x = np.random.randn(4800)
+    rng = np.random.default_rng(42)
+    x = rng.standard_normal(4800)
     x[100] = np.nan
     
-    # It will likely propagate NaNs or crash in filtering
-    # We want to know what happens. 
-    # Current implementation: _typesignal -> numpy array. 
-    # signal.resample propogates NaNs. 
-    # signal.sosfilt propagates NaNs. 
-    # np.std(NaN) -> NaN.
-    # 20*log10(NaN) -> NaN.
-    
-    spl, freq = octavefilter(x, fs)
+    spl, _ = octavefilter(x, fs)
     # Expect NaNs in SPL
     assert np.isnan(spl).any()
 
 
-def test_silence():
+def test_silence() -> None:
     """
     Test the filter's output for a completely silent input signal.
 
@@ -177,18 +172,13 @@ def test_silence():
     fs = 48000
     x = np.zeros(fs)
     
-    spl, freq = octavefilter(x, fs)
+    spl, _ = octavefilter(x, fs)
     
     # Should be very low dB (approx -inf, but code clips to eps)
-    # 20 * log10(eps / 2e-5)
-    # eps is approx 2.22e-16
-    # 2.22e-16 / 2e-5 = 1.11e-11
-    # 20 * log10(1e-11) = -220 dB
-    
     assert np.all(spl < -100)
 
 
-def test_nyquist_limit():
+def test_nyquist_limit() -> None:
     """
     Test handling of requested frequency bands that exceed the Nyquist limit.
 
@@ -206,17 +196,18 @@ def test_nyquist_limit():
     - The returned frequencies should all be less than 500 Hz.
     """
     fs = 1000 # Nyquist 500
-    x = np.random.randn(fs)
+    rng = np.random.default_rng(42)
+    x = rng.standard_normal(fs)
     
     # Request up to 1000Hz
     # _deleteouters should warn and remove high bands
     with pytest.warns(UserWarning, match="frequencies above fs/2 removed"):
-        spl, freq = octavefilter(x, fs, limits=[10, 1000])
+        _, freq = octavefilter(x, fs, limits=[10, 1000])
         
     assert np.all(np.array(freq) < fs/2)
 
 
-def test_high_order_stability():
+def test_high_order_stability() -> None:
     """
     Test the numerical stability of high-order filters.
 
@@ -233,12 +224,13 @@ def test_high_order_stability():
     - The output should be valid numbers (not NaNs or Infs), confirming the SOS implementation works correctly.
     """
     fs = 48000
-    x = np.random.randn(fs)
+    rng = np.random.default_rng(42)
+    x = rng.standard_normal(fs)
     
     # Order 12 or 24 is quite high for standard IIR, but SOS is better.
     # We just want to ensure it doesn't explode into NaNs.
-    spl, freq = octavefilter(x, fs, order=12)
+    spl, _ = octavefilter(x, fs, order=12)
     assert not np.isnan(spl).any()
     
-    spl2, freq2 = octavefilter(x, fs, order=24)
+    spl2, _ = octavefilter(x, fs, order=24)
     assert not np.isnan(spl2).any()
