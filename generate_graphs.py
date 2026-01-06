@@ -264,6 +264,103 @@ def generate_decomposition_plot(output_dir: str) -> None:
     plt.close()
 
 
+def generate_weighting_responses(output_dir: str) -> None:
+    """Plot A, C and Z weighting frequency responses."""
+    print("Generating weighting_responses.png...")
+    fs = 48000
+    f = np.logspace(np.log10(10), np.log10(22000), 1000)
+    
+    from pyoctaveband import weighting_filter
+    
+    fig, ax = plt.subplots()
+    
+    curves = [
+        ("A", "A-Weighting", COLOR_PRIMARY),
+        ("C", "C-Weighting", COLOR_SECONDARY),
+        ("Z", "Z-Weighting (Flat)", "black")
+    ]
+    
+    for code, label, color in curves:
+        # We need to measure response. Simplest way: IR then FFT
+        impulse = np.zeros(fs)
+        impulse[0] = 1.0
+        weighted = weighting_filter(impulse, fs, curve=code)
+        
+        # Frequency response
+        w, h = scipy_signal.freqz(weighted, [1], worN=8192, fs=fs)
+        ax.semilogx(w, 20 * np.log10(np.abs(h) + 1e-9), label=label, color=color)
+
+    apply_axis_styling(ax, "Frequency Weighting Curves (IEC 61672-1)", xlim=(10, 22000), ylim=(-50, 5))
+    ax.legend()
+    plt.savefig(os.path.join(output_dir, "weighting_responses.png"))
+    plt.close()
+
+
+def generate_time_weighting_plot(output_dir: str) -> None:
+    """Visualize Fast and Slow time weighting response to a burst."""
+    print("Generating time_weighting_analysis.png...")
+    fs = 1000
+    t = np.linspace(0, 3, fs * 3, endpoint=False)
+    
+    # 500ms burst of noise
+    rng = np.random.default_rng(42)
+    x = np.zeros_like(t)
+    x[fs:fs+int(fs*0.5)] = rng.standard_normal(int(fs*0.5))
+    
+    from pyoctaveband import time_weighting
+    
+    # Square for energy
+    x_sq = x**2
+    fast = time_weighting(x, fs, mode="fast")
+    slow = time_weighting(x, fs, mode="slow")
+    
+    fig, ax = plt.subplots()
+    ax.plot(t, x_sq, color=COLOR_GRID, alpha=0.5, label="Instantaneous Energy ($x^2$)")
+    ax.plot(t, fast, color=COLOR_PRIMARY, label="Fast (125ms)")
+    ax.plot(t, slow, color=COLOR_SECONDARY, label="Slow (1000ms)")
+    
+    ax.set_title("Time Weighting Ballistics (Fast vs Slow)", fontweight="bold")
+    ax.set_xlabel("Time [s]")
+    ax.set_ylabel("Squared Amplitude")
+    ax.legend()
+    ax.set_xlim(0.8, 3.0)
+    plt.savefig(os.path.join(output_dir, "time_weighting_analysis.png"))
+    plt.close()
+
+
+def generate_crossover_plot(output_dir: str) -> None:
+    """Visualize Linkwitz-Riley 4th Order Crossover."""
+    print("Generating crossover_lr4.png...")
+    fs = 48000
+    # Log sweep for testing
+    t = np.linspace(0, 1, fs, endpoint=False)
+    x = scipy_signal.chirp(t, f0=20, t1=1, f1=20000, method='logarithmic')
+    
+    from pyoctaveband import linkwitz_riley
+    
+    lp, hp = linkwitz_riley(x, fs, freq=1000, order=4)
+    
+    # Frequency analysis
+    w_lp, h_lp = scipy_signal.freqz(lp, x, worN=8192, fs=fs) # This is not correct for freqz, 
+    # better to use IR
+    impulse = np.zeros(fs)
+    impulse[0] = 1.0
+    lp_ir, hp_ir = linkwitz_riley(impulse, fs, freq=1000, order=4)
+    
+    w, h_lp = scipy_signal.freqz(lp_ir, worN=8192, fs=fs)
+    _, h_hp = scipy_signal.freqz(hp_ir, worN=8192, fs=fs)
+    
+    fig, ax = plt.subplots()
+    ax.semilogx(w, 20 * np.log10(np.abs(h_lp) + 1e-9), color=COLOR_PRIMARY, label="Low Pass (LR4)")
+    ax.semilogx(w, 20 * np.log10(np.abs(h_hp) + 1e-9), color=COLOR_SECONDARY, label="High Pass (LR4)")
+    ax.semilogx(w, 20 * np.log10(np.abs(h_lp + h_hp) + 1e-9), color="black", linestyle="--", label="Sum (Flat)")
+
+    apply_axis_styling(ax, "Linkwitz-Riley Crossover (4th Order @ 1kHz)", xlim=(20, 20000), ylim=(-60, 5))
+    ax.legend()
+    plt.savefig(os.path.join(output_dir, "crossover_lr4.png"))
+    plt.close()
+
+
 if __name__ == "__main__":
     img_dir = ".github/images"
     os.makedirs(img_dir, exist_ok=True)
@@ -274,5 +371,10 @@ if __name__ == "__main__":
     generate_signal_responses(img_dir)
     generate_multichannel_response(img_dir)
     generate_decomposition_plot(img_dir)
+    
+    # NEW PLOTS
+    generate_weighting_responses(img_dir)
+    generate_time_weighting_plot(img_dir)
+    generate_crossover_plot(img_dir)
     
     print("Graphics generated successfully.")

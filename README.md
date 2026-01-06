@@ -3,135 +3,171 @@
 [![Python application](https://github.com/jmrplens/PyOctaveBand/actions/workflows/python-app.yml/badge.svg)](https://github.com/jmrplens/PyOctaveBand/actions/workflows/python-app.yml)
 
 # PyOctaveBand
-Octave-Band and Fractional Octave-Band filter for signals in the time domain. Implementation according to ANSI s1.11-2004 and IEC 61260-1-2014.
+Advanced Octave-Band and Fractional Octave-Band filter bank for signals in the time domain. Fully compliant with **ANSI s1.11-2004** and **IEC 61260-1-2014**.
 
-### Getting Started
+This library provides professional-grade tools for acoustic analysis, including frequency weighting (A, C, Z), time ballistics (Fast, Slow, Impulse), and multiple filter architectures (Butterworth, Chebyshev, Elliptic, Bessel).
 
-#### Installation
+---
 
-To use `PyOctaveBand`, you can clone the repository or add it as a git submodule:
+## 🚀 Getting Started
 
-**Cloning the repository:**
+### Installation
+
 ```bash
-git clone https://github.com/jmrplens/PyOctaveBand.git
-cd PyOctaveBand
 pip install .
 ```
 
-**As a Git Submodule:**
-```bash
-git submodule add https://github.com/jmrplens/PyOctaveBand.git
-# Install in editable mode to use within your project
-pip install -e ./PyOctaveBand
-```
-
-#### Integration / Usage
+### Basic Usage: 1/3 Octave Analysis
+Analyze a signal and get the Sound Pressure Level (SPL) per frequency band.
 
 ```python
 import numpy as np
 from pyoctaveband import octavefilter
 
-# 1. Prepare your signal (e.g., 1 second sine wave at 1000 Hz)
 fs = 48000
 t = np.linspace(0, 1, fs)
-signal = np.sin(2 * np.pi * 1000 * t)
+# Composite signal: 100Hz + 1000Hz
+signal = np.sin(2 * np.pi * 100 * t) + np.sin(2 * np.pi * 1000 * t)
 
-# 2. Apply the 1/3 octave band filter
-# Returns: spl (Sound Pressure Level) and freq (Center frequencies)
+# Apply 1/3 octave filter bank
 spl, freq = octavefilter(signal, fs=fs, fraction=3)
 
-print(f"Center Frequencies: {freq}")
-print(f"SPL per band: {spl}")
+print(f"Bands: {freq}")
+print(f"SPL [dB]: {spl}")
 ```
 
-#### Multichannel Support
-PyOctaveBand supports multichannel processing. Input `x` can be a 1D array or a 2D array with shape `(channels, samples)`.
+---
 
-### Public Methods
+## 🛠️ Advanced Filter Architecture
 
-##### octavefilter
-Filters the input signal according to the selected parameters.
+PyOctaveBand allows choosing between different filter types to balance between roll-off steepness and transient response (ringing).
+
+### Filter Type Comparison
+Different architectures offer different trade-offs in the stopband attenuation.
+
+<img src=".github/images/filter_type_comparison.png" width="80%"></img>
+
+| Type | Name | Description |
+| :--- | :--- | :--- |
+| `butter` | **Butterworth** | Maximally flat passband. Standard for acoustic measurements. |
+| `cheby1` | **Chebyshev I** | Steeper roll-off than Butterworth, with ripple in the passband. |
+| `ellip` | **Elliptic** | Steepest transition, with ripples in both passband and stopband. |
+| `bessel` | **Bessel** | Best phase response and minimal group delay (no overshoot). |
+
+#### Usage:
 ```python
-# Returns Sound Pressure Level and Frequencies
-spl, freq = octavefilter(x, fs, fraction=1, order=6, limits=None)
-
-# Advanced filters: 'butter', 'cheby1', 'cheby2', 'ellip', 'bessel'
-spl, freq = octavefilter(x, fs, filter_type='cheby1', ripple=1.0)
+# Use a high-selectivity Elliptic filter for better isolation
+spl, freq = octavefilter(signal, fs, filter_type='ellip', attenuation=80.0)
 ```
 
-##### OctaveFilterBank (Class)
-For high-performance applications where you need to filter multiple signals with the same configuration, use the `OctaveFilterBank` class. This avoids re-calculating filter coefficients for every call.
+---
+
+## 🔊 Acoustic Weighting (A, C, Z)
+
+Frequency weighting curves are used to simulate the human ear's sensitivity to different frequencies at different levels.
+
+<img src=".github/images/weighting_responses.png" width="80%"></img>
+
+*   **A-Weighting (`A`):** Standard for environmental noise and hearing protection (IEC 61672-1).
+*   **C-Weighting (`C`):** Used for peak sound pressure and high-level noise analysis.
+*   **Z-Weighting (`Z`):** Zero weighting, completely flat response.
+
+```python
+from pyoctaveband import weighting_filter, octavefilter
+
+# 1. Apply A-weighting to the raw signal
+weighted_signal = weighting_filter(signal, fs, curve='A')
+
+# 2. Perform octave analysis on the weighted signal
+spl, freq = octavefilter(weighted_signal, fs, fraction=1)
+```
+
+---
+
+## ⏱️ Time Weighting and Integration
+
+In acoustics, sound pressure level is often measured with specific time ballistics to capture the "perceived" energy over time.
+
+<img src=".github/images/time_weighting_analysis.png" width="80%"></img>
+
+*   **Fast (`fast`):** 125ms time constant. Used for most noise measurements.
+*   **Slow (`slow`):** 1000ms time constant. Used for steady-state noise.
+*   **Impulse (`impulse`):** 35ms rise time. Used for impulsive sounds like gunshots or impacts.
+
+```python
+from pyoctaveband import time_weighting
+
+# Calculate the time-varying Mean Square value (energy envelope)
+energy_envelope = time_weighting(signal, fs, mode='fast')
+
+# Convert to instantaneous SPL (dB)
+spl_t = 10 * np.log10(energy_envelope / (2e-5)**2)
+```
+
+---
+
+## ⚡ High Performance: OctaveFilterBank Class
+
+For applications that process many signals with the same configuration (e.g., real-time monitoring), use the `OctaveFilterBank` class. It pre-calculates the filter coefficients only once.
 
 ```python
 from pyoctaveband import OctaveFilterBank
 
-# Initialize the bank once
-bank = OctaveFilterBank(fs=48000, fraction=3, order=6)
+# Initialize the bank (expensive operation)
+bank = OctaveFilterBank(fs=48000, fraction=3, filter_type='butter')
 
-# Filter multiple signals efficiently
-spl1, freq = bank.filter(signal1)
-spl2, freq = bank.filter(signal2)
+# Process signals efficiently (reusing SOS coefficients)
+for frame in stream:
+    spl, freq = bank.filter(frame)
 ```
 
-##### getansifrequencies
-Returns the frequency vector according to ANSI s1.11-2004 and IEC 61260-1-2014 standards.
+---
+
+## 🔀 Linkwitz-Riley Crossover
+
+Used in professional audio to split signals into low and high frequency bands while maintaining a perfectly flat sum and aligned phase.
+
+<img src=".github/images/crossover_lr4.png" width="80%"></img>
+
 ```python
-freq, freq_d, freq_u = getansifrequencies(fraction, limits=None)
+from pyoctaveband import linkwitz_riley
+
+# Split at 800 Hz using a 4th order Linkwitz-Riley crossover
+low_band, high_band = linkwitz_riley(signal, fs, freq=800, order=4)
+
+# Summing low + high results in the original signal (flat response)
+original_reconstructed = low_band + high_band
 ```
 
-### The Filter
-The library supports multiple filter architectures (Butterworth, Chebyshev, Elliptic, Bessel) with Second-Order Sections (SOS) coefficients. It applies automatic downsampling for low-frequency bands to maintain numerical stability and ensure the filter response matches the standards perfectly.
+---
 
-### Filter Type Comparison
-Comparison of different filter types for the same band (1kHz, order 6).
+## 📊 Signal Decomposition and Stability
 
-<img src=".github/images/filter_type_comparison.png" width="80%"></img>
+By setting `sigbands=True`, you can retrieve the time-domain components of each band. PyOctaveBand ensures stability even in the lowest frequency bands (down to 16Hz) using high-precision poliphase resampling.
 
-### Examples of Filter Bank Responses
-The following plots show the frequency response of the designed filters across the full spectrum.
+<img src=".github/images/signal_decomposition.png" width="80%"></img>
 
-| Fraction | Butterworth       | Chebyshev I (1dB ripple)      | Elliptic (1dB, 60dB) |
-|:-------------:|:-------------:|:-------------:|:-------------:|
-| 1-octave | <img src=".github/images/filter_butter_fraction_1_order_6.png" width="100%"></img> | <img src=".github/images/filter_cheby1_fraction_1_order_6.png" width="100%"></img> | <img src=".github/images/filter_ellip_fraction_1_order_6.png" width="100%"></img> |
-| 1/3-octave | <img src=".github/images/filter_butter_fraction_3_order_6.png" width="100%"></img> | <img src=".github/images/filter_cheby1_fraction_3_order_6.png" width="100%"></img> | <img src=".github/images/filter_ellip_fraction_3_order_6.png" width="100%"></img> |
+*The bottom plot shows the **Impulse Response** of a band, demonstrating the stability and decay characteristics of the filter.*
 
-### Signal Analysis Examples
+---
 
-| 1/1 Octave Band Analysis       | 1/3 Octave Band Analysis      | 
-|:-------------:|:-------------:|
-| <img src=".github/images/signal_response_fraction_1.png" width="100%"></img>      | <img src=".github/images/signal_response_fraction_3.png" width="100%"></img>  |
+## 🧪 Development and Verification
 
-#### Multichannel Processing
-Simultaneous analysis of a stereo signal (Left Channel: Pink Noise, Right Channel: Logarithmic Sine Sweep).
+PyOctaveBand includes a rigorous test suite that verifies:
+- Spectral isolation (>20dB at 2 octaves).
+- Standard A/C weighting gains at 100Hz, 1kHz, and 8kHz.
+- Filter stability via IR tail energy analysis.
+- Multichannel processing integrity.
 
-<img src=".github/images/signal_response_multichannel.png" width="100%"></img>
-
-#### Signal Decomposition and Stability
-By setting `sigbands=True`, you can retrieve the signal components for each individual frequency band. The last plot shows the **Impulse Response** of a specific band, useful for visualizing filter stability.
-
-<img src=".github/images/signal_decomposition.png" width="100%"></img>
-
-# Development
-
-### Modular Architecture
-The codebase is organized into specialized modules:
-- `core.py`: Main `OctaveFilterBank` class and processing logic.
-- `filter_design.py`: SOS filter design and visualization tools.
-- `frequencies.py`: ANSI/IEC standard frequency calculations.
-- `utils.py`: Signal validation and resampling utilities.
-
-### Running Tests
+### Run Tests
 ```bash
-make check
+pytest tests/
 ```
 
-### Generating Graphs
+### Generate Benchmark Report
 ```bash
-python generate_graphs.py
+python scripts/benchmark_filters.py
 ```
-
-## Contributing
-Please check [CONTRIBUTING.md](CONTRIBUTING.md) and open an [Issue](https://github.com/jmrplens/PyOctaveBand/issues) or a [Pull Request](https://github.com/jmrplens/PyOctaveBand/pulls).
 
 # Author
-Jose M. Requena Plens, 2020.
+Jose M. Requena Plens, 2020 - 2026.
