@@ -240,8 +240,8 @@ def generate_multichannel_response(output_dir: str) -> None:
 
 
 def generate_decomposition_plot(output_dir: str) -> None:
-    """Generate time-domain decomposition plot with impulse response."""
-    print("Generating signal_decomposition.png...")
+    """Generate time-domain decomposition plot comparing two filter types (Butterworth vs Elliptic)."""
+    print("Generating signal_decomposition.png with comparison...")
     fs = 8000
     duration = 0.5
     t = np.linspace(0, duration, int(fs * duration), endpoint=False)
@@ -249,47 +249,52 @@ def generate_decomposition_plot(output_dir: str) -> None:
     # Signal: sum of 250Hz and 1000Hz sines
     y = np.sin(2 * np.pi * 250 * t) + np.sin(2 * np.pi * 1000 * t)
 
-    # Filter into 1/1 octave bands
-    bank = OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100, 2000])
-    _, freq, xb = bank.filter(y, sigbands=True)
+    # Filter into 1/1 octave bands with two different architectures
+    bank_butter = OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100, 2000], filter_type="butter")
+    bank_ellip = OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100, 2000], filter_type="ellip")
+    
+    _, freq, xb_butter = bank_butter.filter(y, sigbands=True)
+    _, _, xb_ellip = bank_ellip.filter(y, sigbands=True)
 
-    num_plots = len(xb) + 2 # +1 for original, +1 for impulse response
-    _, axes = plt.subplots(num_plots, 1, figsize=(10, 1.8 * num_plots), sharex=False)
+    num_plots = len(xb_butter) + 2 # +1 for original, +1 for impulse response
+    _, axes = plt.subplots(num_plots, 1, figsize=(10, 2.2 * num_plots), sharex=False)
 
     # Fixed Y limits for decomposition
-    y_lim = (-2.5, 2.5)
+    y_lim = (-2.8, 2.8)
 
     # 1. Original Signal
-    axes[0].plot(t, y, color="black", linewidth=1.2)
+    axes[0].plot(t, y, color="black", linewidth=1.5)
     axes[0].set_title("Original Signal (250 Hz + 1000 Hz Sum)", fontweight="bold")
     axes[0].set_ylim(y_lim)
     axes[0].set_xlim(0, 0.04)
 
-    colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"]
-
-    # 2. Filtered Bands
-    for i, (band_signal, f_center) in enumerate(zip(xb, freq)):
-        axes[i + 1].plot(t, band_signal, color=colors[i % len(colors)], linewidth=1.2)
-        axes[i + 1].set_title(f"Octave Band: {f_center:.0f} Hz", fontsize=10)
+    # 2. Filtered Bands Comparison
+    for i, (f_center) in enumerate(freq):
+        axes[i + 1].plot(t, xb_butter[i], color=COLOR_PRIMARY, linewidth=1.5, label="Butterworth (Flat)")
+        axes[i + 1].plot(t, xb_ellip[i], color=COLOR_SECONDARY, linewidth=1.2, linestyle="--", alpha=0.9, label="Elliptic (Steep)")
+        axes[i + 1].set_title(f"Octave Band: {f_center:.0f} Hz", fontsize=11, fontweight="bold")
         axes[i + 1].set_ylim(y_lim)
         axes[i + 1].set_xlim(0, 0.04)
+        if i == 0:
+            axes[i+1].legend(loc="upper right", fontsize=9, framealpha=0.8)
 
-    # 3. Impulse Response (Stability Visualization)
-    # Generate a separate impulse
+    # 3. Impulse Response (Stability/Transient Visualization)
     impulse = np.zeros(len(t))
     impulse[0] = 1.0
-    _, _, ir_bands = bank.filter(impulse, sigbands=True)
-    # Plot IR of the 1000Hz band (index 3 if bands are 125, 250, 500, 1000, 2000)
-    # Let's find index of 1000Hz
+    _, _, ir_butter = bank_butter.filter(impulse, sigbands=True)
+    _, _, ir_ellip = bank_ellip.filter(impulse, sigbands=True)
+    
     idx_1000 = np.argmin(np.abs(np.array(freq) - 1000))
-    axes[-1].plot(t, ir_bands[idx_1000], color=COLOR_SECONDARY, linewidth=1.2)
-    axes[-1].set_title(f"Impulse Response ({freq[idx_1000]:.0f} Hz Band) - Stability View", fontweight="bold")
+    axes[-1].plot(t, ir_butter[idx_1000], color=COLOR_PRIMARY, linewidth=1.5, label="Butterworth")
+    axes[-1].plot(t, ir_ellip[idx_1000], color=COLOR_SECONDARY, linewidth=1.2, linestyle="--", alpha=0.9, label="Elliptic")
+    axes[-1].set_title(f"Impulse Response ({freq[idx_1000]:.0f} Hz Band) - Transient/Stability Comparison", fontweight="bold")
     axes[-1].set_xlim(0, 0.04)
     axes[-1].set_xlabel("Time [s]")
+    axes[-1].legend(loc="upper right", fontsize=9, framealpha=0.8)
 
     for ax in axes:
-        ax.set_ylabel("Amp")
-        ax.grid(True, alpha=0.3)
+        ax.set_ylabel("Amplitude")
+        ax.grid(True, which="both", alpha=0.4, linestyle=":")
 
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, "signal_decomposition.png"))
