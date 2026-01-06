@@ -69,24 +69,6 @@ jobs:
           coverage.xml
       if: always()
 
-  sonar:
-    needs: tests
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    - name: Download coverage report
-      uses: actions/download-artifact@v4
-      with:
-        name: test-results-3.13
-    - name: SonarCloud Scan
-      uses: SonarSource/sonarcloud-github-action@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
   graphs:
     runs-on: ubuntu-latest
     permissions:
