@@ -4,11 +4,14 @@ Core processing logic and FilterBank class for pyoctaveband.
 """
 
 from typing import List, Optional, Tuple, Union
+
 import numpy as np
 from scipy import signal
-from .utils import _typesignal, _resample_to_length, _downsamplingfactor
-from .frequencies import _genfreqs
+
 from .filter_design import _design_sos_filter
+from .frequencies import _genfreqs
+from .utils import _downsamplingfactor, _resample_to_length, _typesignal
+
 
 class OctaveFilterBank:
     """

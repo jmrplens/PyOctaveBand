@@ -4,9 +4,11 @@ Performance tests to verify coefficient reuse in OctaveFilterBank.
 """
 
 import time
+
 import numpy as np
-import pytest
-from pyoctaveband import octavefilter, OctaveFilterBank
+
+from pyoctaveband import OctaveFilterBank, octavefilter
+
 
 def test_filterbank_reuse_performance():
     """

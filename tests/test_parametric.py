@@ -5,8 +5,9 @@ Parametric tests using pytest best practices for signal processing verification.
 
 import numpy as np
 import pytest
-from scipy import signal
-from pyoctaveband import octavefilter, getansifrequencies, OctaveFilterBank
+
+from pyoctaveband import OctaveFilterBank, octavefilter
+
 
 @pytest.mark.parametrize("fraction, expected_bands", [
     (1, 11),  # Standard 1 octave bands in [12, 20000] approx
@@ -135,8 +136,10 @@ def test_frequency_isolation(target_freq, filter_type):
     # The SPL should be highest at this index
     max_spl_idx = np.argmax(spl)
     
-    assert closest_idx == max_spl_idx, \
-        f"Tone at {target_freq}Hz peaked at {freq[max_spl_idx]}Hz band instead of {freq[closest_idx]}Hz for {filter_type}"
+    assert closest_idx == max_spl_idx, (
+        f"Tone at {target_freq}Hz peaked at {freq[max_spl_idx]}Hz band "
+        f"instead of {freq[closest_idx]}Hz for {filter_type}"
+    )
     
     # Check attenuation of distant bands (e.g., 2 octaves away)
     peak_val = spl[closest_idx]

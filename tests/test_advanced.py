@@ -5,7 +5,8 @@ Advanced tests for input validation, edge cases, and robustness.
 
 import numpy as np
 import pytest
-from pyoctaveband import octavefilter, normalizedfreq
+
+from pyoctaveband import normalizedfreq, octavefilter
 
 
 def test_fraction_validation():
@@ -25,7 +26,8 @@ def test_fraction_validation():
     **Expectation:**
     - Filtering should succeed and return frequency bands for all valid integer fractions.
     - Higher denominators (smaller bandwidths) should result in more bands (fraction=3 > fraction=1).
-    - `normalizedfreq` should raise a `ValueError` for non-standard fractions, as it relies on a lookup table for IEC standards.
+    - `normalizedfreq` should raise a `ValueError` for non-standard fractions,
+      as it relies on a lookup table for IEC standards.
     """
     fs = 48000
     x = np.random.randn(fs)  # 1 second of noise

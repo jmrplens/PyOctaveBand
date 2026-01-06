@@ -4,8 +4,10 @@ Frequency calculation logic according to ANSI/IEC standards.
 """
 
 import warnings
-import numpy as np
 from typing import List, Optional, Tuple
+
+import numpy as np
+
 
 def getansifrequencies(
     fraction: float,

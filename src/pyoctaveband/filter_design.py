@@ -4,9 +4,11 @@ Filter design and visualization for pyoctaveband.
 """
 
 from typing import List, Optional
+
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
-import matplotlib.pyplot as plt
+
 
 def _design_sos_filter(
     freq: List[float],
