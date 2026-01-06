@@ -26,7 +26,7 @@ class OctaveFilterBank:
         order: int = 6,
         limits: Optional[List[float]] = None,
         filter_type: str = "butter",
-        ripple: float = 1.0,
+        ripple: float = 0.1,
         attenuation: float = 60.0,
         show: bool = False,
         plot_file: Optional[str] = None,
@@ -113,7 +113,12 @@ class OctaveFilterBank:
         for idx in range(self.num_bands):
             for ch in range(num_channels):
                 # Resample signal for this specific band to improve accuracy
-                sd = signal.resample(x_proc[ch], round(len(x_proc[ch]) / self.factor[idx]))
+                # Use resample_poly for better stability than FFT-based resample
+                if self.factor[idx] > 1:
+                    sd = signal.resample_poly(x_proc[ch], 1, self.factor[idx])
+                else:
+                    sd = x_proc[ch]
+                
                 y = signal.sosfilt(self.sos[idx], sd)
 
                 # Standard reference pressure for SPL calculation: 2e-5 Pa

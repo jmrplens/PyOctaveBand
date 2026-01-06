@@ -29,7 +29,7 @@ def octavefilter(
     sigbands: bool = False,
     plot_file: Optional[str] = None,
     filter_type: str = "butter",
-    ripple: float = 1.0,
+    ripple: float = 0.1,
     attenuation: float = 60.0,
 ) -> Union[Tuple[np.ndarray, List[float]], Tuple[np.ndarray, List[float], List[np.ndarray]]]:
     """

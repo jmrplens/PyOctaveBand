@@ -5,20 +5,20 @@ This report compares the performance and characteristics of the available filter
 ## 1. Spectral Isolation (at 1kHz)
 | Filter Type | Peak SPL (dB) | Atten. -1 Oct (dB) | Atten. +1 Oct (dB) | Atten. -2 Oct (dB) | Atten. +2 Oct (dB) |
 |---|---|---|---|---|---|
-| butter | 90.96 | 270.0 | 26.7 | 282.3 | 54.8 |
-| cheby1 | 90.30 | 269.4 | 41.0 | 282.1 | 54.8 |
-| cheby2 | 90.82 | 270.1 | 48.5 | 283.3 | 58.9 |
-| ellip | 90.69 | 270.0 | 43.9 | 282.6 | 55.2 |
-| bessel | 89.53 | 269.2 | 27.4 | 282.0 | 56.1 |
+| butter | 90.96 | 40.0 | 32.3 | 46.8 | 57.7 |
+| cheby1 | 90.96 | 39.8 | 40.2 | 46.5 | 57.2 |
+| cheby2 | 90.96 | 42.5 | 50.4 | 49.2 | 61.6 |
+| ellip | 90.95 | 39.9 | 45.1 | 46.6 | 57.1 |
+| bessel | 90.54 | 41.6 | 33.6 | 48.4 | 60.1 |
 
 ## 2. Stability and Performance
 | Filter Type | Max IR Tail Energy | Stability Status | Avg. Execution Time (s) |
 |---|---|---|---|
-| butter | 3.62e-09 | ✅ Stable | 0.0279 |
-| cheby1 | 5.69e-07 | ✅ Stable | 0.0284 |
-| cheby2 | 2.11e-07 | ✅ Stable | 0.0289 |
-| ellip | 1.12e-06 | ⚠️ Ringing | 0.0300 |
-| bessel | 3.95e-14 | ✅ Stable | 0.0383 |
+| butter | 1.29e-09 | ✅ Stable | 0.0353 |
+| cheby1 | 2.04e-07 | ✅ Stable | 0.0348 |
+| cheby2 | 2.12e-07 | ✅ Stable | 0.0355 |
+| ellip | 4.95e-07 | ✅ Stable | 0.0359 |
+| bessel | 4.21e-15 | ✅ Stable | 0.0451 |
 
 ## 3. Analysis Summary
 - **Butterworth:** Best compromise, maximally flat passband.

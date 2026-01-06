@@ -28,6 +28,6 @@ def _resample_to_length(y: np.ndarray, factor: int, target_length: int) -> np.nd
 
 def _downsamplingfactor(freq: List[float], fs: int) -> np.ndarray:
     """Compute optimal downsampling factors for filter stability."""
-    guard = 0.10
+    guard = 0.50
     factor = (np.floor((fs / (2 + guard)) / np.array(freq))).astype("int")
-    return cast(np.ndarray, np.clip(factor, 1, 50))
+    return cast(np.ndarray, np.clip(factor, 1, 500))
