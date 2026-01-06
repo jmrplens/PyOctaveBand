@@ -4,8 +4,7 @@ on:
   push:
     branches:
       - main
-    paths-ignore:
-      - '**/README.md'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -13,7 +12,7 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-    if: "!contains(github.event.head_commit.message, 'skip ci') && !contains(github.event.head_commit.message, 'bump version')"
+    if: github.repository == 'jmrplens/PyOctaveBand' && !contains(github.event.head_commit.message, 'skip ci')
     steps:
       - uses: actions/checkout@v4
         with:
@@ -33,8 +32,9 @@ jobs:
       - name: Bump version
         id: bump
         run: |
-          # Read current version from pyproject.toml (only matching the one at the start of the line)
-          CURRENT_VERSION=$(grep -m 1 -oP '^version = "\K[^" ]+' pyproject.toml)
+          # Read current version from pyproject.toml
+          # Look for 'version =' specifically in the [project] section or at line start
+          CURRENT_VERSION=$(grep -m 1 -oP '^version\s*=\s*"\K[^"]+' pyproject.toml)
           echo "Current version: $CURRENT_VERSION"
           
           # Increment patch version
@@ -77,9 +77,6 @@ jobs:
           name: Release v${{ steps.bump.outputs.version }}
           body: |
             Automated release for version v${{ steps.bump.outputs.version }}
-            
-            Changes in this release:
-            ${{ github.event.head_commit.message }}
           draft: false
           prerelease: false
         env:
