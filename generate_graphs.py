@@ -300,7 +300,6 @@ def generate_weighting_responses(output_dir: str) -> None:
     """Plot A, C and Z weighting frequency responses."""
     print("Generating weighting_responses.png...")
     fs = 48000
-    f = np.logspace(np.log10(10), np.log10(22000), 1000)
     
     from pyoctaveband import weighting_filter
     

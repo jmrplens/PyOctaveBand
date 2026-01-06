@@ -4,15 +4,8 @@ Tests for parametric filters: Weighting (A, C), Time Weighting and Linkwitz-Rile
 """
 
 import numpy as np
-import pytest
 
-from pyoctaveband import (
-    calculate_sensitivity, 
-    linkwitz_riley, 
-    octavefilter, 
-    time_weighting, 
-    weighting_filter
-)
+from pyoctaveband import calculate_sensitivity, linkwitz_riley, octavefilter, time_weighting, weighting_filter
 
 
 def test_calibration_logic() -> None:
