@@ -17,7 +17,7 @@ This library provides professional-grade tools for acoustic analysis, including 
 3. [🔊 Acoustic Weighting (A, C, Z)](#-acoustic-weighting-a-c-z)
 4. [⏱️ Time Weighting and Integration](#️-time-weighting-and-integration)
 5. [⚡ Performance: OctaveFilterBank](#-performance-octavefilterbank-class)
-6. [🔀 Linkwitz-Riley Crossover](#-linkwitz-riley-crossover)
+6. [🔍 Filter Usage and Examples](#-filter-usage-and-examples)
 7. [📊 Signal Decomposition](#-signal-decomposition-and-stability)
 8. [📖 Theory and Equations](#-theoretical-background)
 9. [🧪 Testing and Quality](#-development-and-verification)
@@ -155,19 +155,66 @@ for frame in stream:
 
 ---
 
-## 🔀 Linkwitz-Riley Crossover
+## 🔍 Filter Usage and Examples
 
-Perfect for splitting audio into sub/top or multi-way systems.
+This section provides detailed examples and characteristics for each supported filter architecture.
 
-<img src=".github/images/crossover_lr4.png" width="80%"></img>
+### 1. Butterworth (`butter`)
+The Butterworth filter is known for its **maximally flat passband**. It is the standard choice for acoustic measurements where no ripple is allowed within the frequency bands.
+
+```python
+from pyoctaveband import octavefilter
+# Default standard measurement
+spl, freq = octavefilter(x, fs, filter_type='butter')
+```
+<img src=".github/images/filter_butter_fraction_3_order_6.png" width="60%"></img>
+
+### 2. Chebyshev I (`cheby1`)
+Chebyshev Type I filters provide a **steeper roll-off** than Butterworth at the expense of ripples in the passband. Useful when high selectivity is needed near the cut-off frequencies.
+
+```python
+# Selectivity with 0.1 dB passband ripple
+spl, freq = octavefilter(x, fs, filter_type='cheby1', ripple=0.1)
+```
+<img src=".github/images/filter_cheby1_fraction_3_order_6.png" width="60%"></img>
+
+### 3. Chebyshev II (`cheby2`)
+Also known as Inverse Chebyshev, it has a **flat passband** and ripples in the stopband. It provides faster roll-off than Butterworth without affecting the signal in the passband.
+
+```python
+# Flat passband with 60 dB stopband attenuation
+spl, freq = octavefilter(x, fs, filter_type='cheby2', attenuation=60)
+```
+<img src=".github/images/filter_cheby2_fraction_3_order_6.png" width="60%"></img>
+
+### 4. Elliptic (`ellip`)
+Elliptic (Cauer) filters have the **shortest transition width** (steepest roll-off) for a given order. They feature ripples in both the passband and stopband.
+
+```python
+# Maximum selectivity for extreme band isolation
+spl, freq = octavefilter(x, fs, filter_type='ellip', ripple=0.1, attenuation=60)
+```
+<img src=".github/images/filter_ellip_fraction_3_order_6.png" width="60%"></img>
+
+### 5. Bessel (`bessel`)
+Bessel filters are optimized for **linear phase response** and minimal group delay. They preserve the shape of filtered waveforms (transients) better than any other type, but have the slowest roll-off.
+
+```python
+# Best for pulse analysis and transient preservation
+spl, freq = octavefilter(x, fs, filter_type='bessel')
+```
+<img src=".github/images/filter_bessel_fraction_3_order_6.png" width="60%"></img>
+
+### 6. Linkwitz-Riley (`lr`)
+Specifically designed for **audio crossovers**. Linkwitz-Riley filters (typically 4th order) allow splitting a signal into bands that, when summed, result in a perfectly flat magnitude response and zero phase difference between bands at the crossover.
 
 ```python
 from pyoctaveband import linkwitz_riley
-
-# Split at 1000 Hz using LR4
+# Split signal into Low and High bands at 1000 Hz
 low, high = linkwitz_riley(signal, fs, freq=1000, order=4)
-# (low + high) will be identical to original signal in magnitude and phase.
+# Reconstruction: low + high == signal (flat response)
 ```
+<img src=".github/images/crossover_lr4.png" width="60%"></img>
 
 ---
 
