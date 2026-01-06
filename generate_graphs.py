@@ -240,8 +240,8 @@ def generate_multichannel_response(output_dir: str) -> None:
 
 
 def generate_decomposition_plot(output_dir: str) -> None:
-    """Generate time-domain decomposition plot comparing two filter types (Butterworth vs Elliptic)."""
-    print("Generating signal_decomposition.png with comparison...")
+    """Generate time-domain decomposition plot comparing two filter types (Butterworth vs Chebyshev II)."""
+    print("Generating signal_decomposition.png with comparison (Butter vs Cheby2)...")
     fs = 8000
     duration = 0.5
     t = np.linspace(0, duration, int(fs * duration), endpoint=False)
@@ -250,14 +250,15 @@ def generate_decomposition_plot(output_dir: str) -> None:
     y = np.sin(2 * np.pi * 250 * t) + np.sin(2 * np.pi * 1000 * t)
 
     # Filter into 1/1 octave bands with two different architectures
+    # We use Chebyshev II (flat passband, no ripple)
     bank_butter = OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100, 2000], filter_type="butter")
-    bank_ellip = OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100, 2000], filter_type="ellip")
+    bank_cheby2 = OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100, 2000], filter_type="cheby2")
     
     _, freq, xb_butter = bank_butter.filter(y, sigbands=True)
-    _, _, xb_ellip = bank_ellip.filter(y, sigbands=True)
+    _, _, xb_cheby2 = bank_cheby2.filter(y, sigbands=True)
 
     num_plots = len(xb_butter) + 2 # +1 for original, +1 for impulse response
-    _, axes = plt.subplots(num_plots, 1, figsize=(10, 2.2 * num_plots), sharex=False)
+    fig, axes = plt.subplots(num_plots, 1, figsize=(10, 2.2 * num_plots), sharex=False)
 
     # Fixed Y limits for decomposition
     y_lim = (-2.8, 2.8)
@@ -271,7 +272,7 @@ def generate_decomposition_plot(output_dir: str) -> None:
     # 2. Filtered Bands Comparison
     for i, (f_center) in enumerate(freq):
         axes[i + 1].plot(t, xb_butter[i], color=COLOR_PRIMARY, linewidth=1.5, label="Butterworth (Flat)")
-        axes[i + 1].plot(t, xb_ellip[i], color=COLOR_SECONDARY, linewidth=1.2, linestyle="--", alpha=0.9, label="Elliptic (Steep)")
+        axes[i + 1].plot(t, xb_cheby2[i], color=COLOR_SECONDARY, linewidth=1.2, linestyle="--", alpha=0.9, label="Chebyshev II")
         axes[i + 1].set_title(f"Octave Band: {f_center:.0f} Hz", fontsize=11, fontweight="bold")
         axes[i + 1].set_ylim(y_lim)
         axes[i + 1].set_xlim(0, 0.04)
@@ -282,11 +283,11 @@ def generate_decomposition_plot(output_dir: str) -> None:
     impulse = np.zeros(len(t))
     impulse[0] = 1.0
     _, _, ir_butter = bank_butter.filter(impulse, sigbands=True)
-    _, _, ir_ellip = bank_ellip.filter(impulse, sigbands=True)
+    _, _, ir_cheby2 = bank_cheby2.filter(impulse, sigbands=True)
     
     idx_1000 = np.argmin(np.abs(np.array(freq) - 1000))
     axes[-1].plot(t, ir_butter[idx_1000], color=COLOR_PRIMARY, linewidth=1.5, label="Butterworth")
-    axes[-1].plot(t, ir_ellip[idx_1000], color=COLOR_SECONDARY, linewidth=1.2, linestyle="--", alpha=0.9, label="Elliptic")
+    axes[-1].plot(t, ir_cheby2[idx_1000], color=COLOR_SECONDARY, linewidth=1.2, linestyle="--", alpha=0.9, label="Chebyshev II")
     axes[-1].set_title(f"Impulse Response ({freq[idx_1000]:.0f} Hz Band) - Transient/Stability Comparison", fontweight="bold")
     axes[-1].set_xlim(0, 0.04)
     axes[-1].set_xlabel("Time [s]")
@@ -299,6 +300,7 @@ def generate_decomposition_plot(output_dir: str) -> None:
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, "signal_decomposition.png"))
     plt.close()
+
 
 
 def generate_weighting_responses(output_dir: str) -> None:
