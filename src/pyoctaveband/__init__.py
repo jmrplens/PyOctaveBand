@@ -41,6 +41,7 @@ def octavefilter(
     show: bool = False,
     sigbands: bool = False,
     plot_file: str | None = None,
+    detrend: bool = True,
     **kwargs: str | float | bool
 ) -> Tuple[np.ndarray, List[float]] | Tuple[np.ndarray, List[float], List[np.ndarray]]:
     """
@@ -68,6 +69,8 @@ def octavefilter(
     :type sigbands: bool
     :param plot_file: Path to save the filter response plot.
     :type plot_file: Optional[str]
+    :param detrend: If True, remove DC offset before filtering. Default: True.
+    :type detrend: bool
     :param filter_type: (Optional) Type of filter ('butter', 'cheby1', 'cheby2', 'ellip', 'bessel'). Default: 'butter'.
     :param ripple: (Optional) Passband ripple in dB (for cheby1, ellip). Default: 0.1.
     :param attenuation: (Optional) Stopband attenuation in dB (for cheby2, ellip). Default: 60.0.
@@ -93,4 +96,4 @@ def octavefilter(
         dbfs=cast(bool, kwargs.get("dbfs", False))
     )
     
-    return filter_bank.filter(x, sigbands=sigbands, mode=cast(str, kwargs.get("mode", "rms")))
+    return filter_bank.filter(x, sigbands=sigbands, mode=cast(str, kwargs.get("mode", "rms")), detrend=detrend)
