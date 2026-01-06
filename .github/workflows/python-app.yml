@@ -58,7 +58,8 @@ jobs:
       run: |
         pytest --junitxml=test-results-${{ matrix.python-version }}.xml --cov=src --cov-report=xml
     - name: Run Filter Benchmark
-...
+      run: |
+        python scripts/benchmark_filters.py
     - name: Upload Test Results
       uses: actions/upload-artifact@v4
       with:
