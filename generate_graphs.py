@@ -95,16 +95,19 @@ def generate_filter_type_comparison(output_dir: str) -> None:
     
     # Sub-plot styling (Zoom around 1kHz and -3dB)
     axins.set_xlim(650, 1500)
-    axins.set_ylim(-6, 0.5) # As requested: from -6 to 0.5
+    axins.set_ylim(-6, 0.5)  # As requested: from -6 to 0.5
     axins.grid(True, which="both", alpha=0.3)
     axins.set_title("Zoom at -3 dB (Log Scale)", fontsize=9)
-    
+
     # Fix x-ticks for log scale zoom to look right
-    from matplotlib.ticker import ScalarFormatter
+    from matplotlib.ticker import NullFormatter, ScalarFormatter
+
     axins.xaxis.set_major_formatter(ScalarFormatter())
+    axins.xaxis.set_minor_formatter(NullFormatter())  # Hide minor tick labels
+    axins.xaxis.get_major_formatter().set_scientific(False)  # Disable scientific notation
     axins.set_xticks([707, 1000, 1414])
-    axins.set_xticklabels(["707", "1k", "1.4k"], fontsize=8)
-    
+    axins.set_xticklabels(["707", "1000", "1414"], fontsize=8)
+
     ax.legend(loc="upper right")
     plt.savefig(os.path.join(output_dir, "filter_type_comparison.png"))
     plt.close()
