@@ -1,11 +1,14 @@
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?hosted_button_id=BLP3R6VGYJB4Q)
 [![Donate](https://img.shields.io/badge/Donate-Ko--fi-brightgreen?color=ff5f5f)](https://ko-fi.com/jmrplens) 
+[![PyPI version](https://badge.fury.io/py/PyOctaveBand.svg)](https://pypi.org/project/PyOctaveBand/)
 [![Python application](https://github.com/jmrplens/PyOctaveBand/actions/workflows/python-app.yml/badge.svg)](https://github.com/jmrplens/PyOctaveBand/actions/workflows/python-app.yml)
 
 # PyOctaveBand
 Advanced Octave-Band and Fractional Octave-Band filter bank for signals in the time domain. Fully compliant with **ANSI s1.11-2004** and **IEC 61260-1-2014**.
 
 This library provides professional-grade tools for acoustic analysis, including frequency weighting (A, C, Z), time ballistics (Fast, Slow, Impulse), and multiple filter architectures.
+
+Now available on [PyPI](https://pypi.org/project/PyOctaveBand/).
 
 ---
 
@@ -45,7 +48,13 @@ This library provides professional-grade tools for acoustic analysis, including 
 
 ### Installation
 
-You can install `PyOctaveBand` by cloning the repository or adding it as a git submodule to your project.
+You can install `PyOctaveBand` directly from PyPI:
+
+```bash
+pip install PyOctaveBand
+```
+
+Alternatively, you can install it by cloning the repository:
 
 **Option 1: Cloning and Installing**
 ```bash
