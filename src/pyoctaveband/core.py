@@ -94,7 +94,8 @@ class OctaveFilterBank:
         self, 
         x: List[float] | np.ndarray, 
         sigbands: bool = False,
-        mode: str = "rms"
+        mode: str = "rms",
+        detrend: bool = True
     ) -> Tuple[np.ndarray, List[float]] | Tuple[np.ndarray, List[float], List[np.ndarray]]:
         """
         Apply the pre-designed filter bank to a signal.
@@ -102,11 +103,17 @@ class OctaveFilterBank:
         :param x: Input signal (1D array or 2D array [channels, samples]).
         :param sigbands: If True, also return the signal in the time domain divided into bands.
         :param mode: 'rms' for energy-based level, 'peak' for peak-holding level.
+        :param detrend: If True, remove DC offset from signal before filtering (Default: True).
         :return: A tuple containing (SPL_array, Frequencies_list) or (SPL_array, Frequencies_list, signals).
         """
         
         # Convert input to numpy array
         x_proc = _typesignal(x)
+
+        # Handle DC offset removal
+        if detrend:
+            # Axis -1 handles both 1D and 2D arrays correctly
+            x_proc = signal.detrend(x_proc, axis=-1, type='constant')
 
         # Handle multichannel detection
         is_multichannel = x_proc.ndim > 1
