@@ -291,19 +291,19 @@ fs = 8000
 t = np.linspace(0, 0.5, fs // 2, endpoint=False)
 y = np.sin(2 * np.pi * 250 * t) + np.sin(2 * np.pi * 1000 * t)
 
-# 2. Compare architectures (Butterworth vs Chebyshev I)
+# 2. Compare architectures (Butterworth vs Elliptic)
 # Filter with Butterworth (default)
 spl_b, freq, xb_butter = octavefilter(y, fs=fs, fraction=1, sigbands=True, filter_type='butter')
 
-# Filter with Chebyshev I (ripples in passband, steeper roll-off)
-spl_c, _, xb_cheby = octavefilter(y, fs=fs, fraction=1, sigbands=True, filter_type='cheby1')
+# Filter with Elliptic (steeper roll-off, more phase shift)
+spl_e, _, xb_ellip = octavefilter(y, fs=fs, fraction=1, sigbands=True, filter_type='ellip')
 
-# 'xb_butter' and 'xb_cheby' contain the time-domain signals per band
+# 'xb_butter' and 'xb_ellip' contain the time-domain signals per band
 ```
 
 <img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/signal_decomposition.png" width="80%"></img>
 
-*The plot compares the **Butterworth** (solid blue) and **Chebyshev I** (dashed red) responses. The bottom plot shows the **Impulse Response**, highlighting the differences in stability and decay.*
+*The plot compares the **Butterworth** (solid blue) and **Elliptic** (dashed red) responses. The bottom plot shows the **Impulse Response**, highlighting the differences in stability and transient decay.*
 
 ---
 
