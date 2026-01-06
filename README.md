@@ -25,8 +25,22 @@ This library provides professional-grade tools for acoustic analysis, including 
 ## 🚀 Getting Started
 
 ### Installation
+
+You can install `PyOctaveBand` by cloning the repository or adding it as a git submodule to your project.
+
+**Option 1: Cloning and Installing**
 ```bash
+git clone https://github.com/jmrplens/PyOctaveBand.git
+cd PyOctaveBand
 pip install .
+```
+
+**Option 2: Git Submodule (Recommended for projects)**
+Add PyOctaveBand as a dependency within your own git repository:
+```bash
+git submodule add https://github.com/jmrplens/PyOctaveBand.git
+# Then install in editable mode to use it from your project
+pip install -e ./PyOctaveBand
 ```
 
 ### Basic Usage: 1/3 Octave Analysis

@@ -53,34 +53,54 @@ def apply_axis_styling(ax, title, xlim=None, ylim=None):
 
 
 def generate_filter_type_comparison(output_dir: str) -> None:
-    """Compare different filter architectures."""
+    """Compare different filter architectures with a zoom inset."""
     print("Generating filter_type_comparison.png...")
     fs = 48000
     fraction = 1
     order = 6
     
-    # We'll use a specific band (1kHz) to show the difference
-    limits = [500, 2000]
+    # We want exactly the 1000Hz band
+    limits = [800, 1200]
     
     filters = [
         ("butter", "Butterworth", COLOR_PRIMARY, "-"),
-        ("cheby1", "Chebyshev I (1dB ripple)", COLOR_SECONDARY, "--"),
-        ("ellip", "Elliptic (1dB ripple, 60dB atten)", COLOR_TERTIARY, "-."),
+        ("cheby1", "Chebyshev I (0.1dB ripple)", COLOR_SECONDARY, "--"),
+        ("ellip", "Elliptic (0.1dB ripple, 60dB atten)", COLOR_TERTIARY, "-."),
     ]
     
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(10, 7))
+    
+    # Create inset axis for zoom
+    from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+    axins = inset_axes(ax, width="35%", height="35%", loc="lower left", borderpad=3)
     
     for f_type, label, color, style in filters:
         bank = OctaveFilterBank(fs, fraction=fraction, order=order, limits=limits, filter_type=f_type)
-        # Get 1000Hz band SOS
-        idx = 0 # only one band expected
+        
+        # Find index of 1000Hz band
+        idx = np.argmin(np.abs(np.array(bank.freq) - 1000))
+        
         fsd = fs / bank.factor[idx]
-        w, h = scipy_signal.sosfreqz(bank.sos[idx], worN=8192, fs=fsd)
-        ax.semilogx(w, 20 * np.log10(np.abs(h) + 1e-9), label=label, color=color, linestyle=style)
+        w, h = scipy_signal.sosfreqz(bank.sos[idx], worN=16384, fs=fsd)
+        mag_db = 20 * np.log10(np.abs(h) + 1e-9)
+        
+        ax.semilogx(w, mag_db, label=label, color=color, linestyle=style)
+        axins.semilogx(w, mag_db, color=color, linestyle=style)
 
     ax.axhline(-3, color="black", linestyle=":", alpha=0.3, label="-3 dB")
-    apply_axis_styling(ax, "Filter Type Comparison (Order 6, 1kHz Band)", xlim=(200, 5000), ylim=(-80, 5))
-    ax.legend()
+    axins.axhline(-3, color="black", linestyle=":", alpha=0.3)
+    
+    apply_axis_styling(ax, "Filter Architecture Comparison (Order 6, 1kHz Band)", xlim=(100, 8000), ylim=(-80, 5))
+    
+    # Sub-plot styling (Zoom around 1kHz and -3dB)
+    axins.set_xlim(650, 1500)
+    axins.set_ylim(-5, 1)
+    axins.grid(True, which="both", alpha=0.3)
+    axins.set_title("Zoom at -3 dB", fontsize=9)
+    axins.set_xticks([707, 1000, 1414])
+    axins.set_xticklabels(["707", "1k", "1.4k"], fontsize=8)
+    
+    ax.legend(loc="upper right")
     plt.savefig(os.path.join(output_dir, "filter_type_comparison.png"))
     plt.close()
 
