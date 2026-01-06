@@ -12,6 +12,8 @@ This library provides professional-grade tools for acoustic analysis, including 
 ## 📑 Table of Contents
 1. [🚀 Getting Started](#-getting-started)
 2. [🛠️ Filter Architectures](#️-filter-architectures)
+    - [Comparison and Zoom](#filter-comparison-and-zoom)
+    - [Gallery of Responses](#gallery-of-filter-bank-responses)
 3. [🔊 Acoustic Weighting (A, C, Z)](#-acoustic-weighting-a-c-z)
 4. [⏱️ Time Weighting and Integration](#️-time-weighting-and-integration)
 5. [⚡ Performance: OctaveFilterBank](#-performance-octavefilterbank-class)
@@ -66,26 +68,37 @@ print(f"SPL [dB]: {spl}")
 
 ## 🛠️ Filter Architectures
 
-PyOctaveBand allows choosing between different filter types to balance between roll-off steepness and transient response (ringing).
+PyOctaveBand supports several filter types, each with its own transfer function characteristic.
 
-### Filter Comparison Table
-
-| Type | Name | Description | Best For |
-| :--- | :--- | :--- | :--- |
-| `butter` | **Butterworth** | Maximally flat passband. | Standard acoustic measurements. |
-| `cheby1` | **Chebyshev I** | Steeper roll-off, ripple in passband. | High selectivity requirements. |
-| `cheby2` | **Chebyshev II** | Flat passband, ripple in stopband. | Clean passband with good rejection. |
-| `ellip` | **Elliptic** | Steepest transition, ripples in both. | Extreme isolation between bands. |
-| `bessel` | **Bessel** | Linear phase, minimal group delay. | Preserving pulse shapes/transients. |
-| `lr` | **Linkwitz-Riley**| 4th order (LR4), flat sum response. | Audio crossovers and band splitting. |
+### Filter Comparison and Zoom
+We use Second-Order Sections (SOS) for all filters to ensure numerical stability. The following plot compares the architectures focusing on the -3 dB crossover point.
 
 <img src=".github/images/filter_type_comparison.png" width="80%"></img>
+
+| Type | Name | Usage Example | Best For | 
+| :--- | :--- | :--- | :--- |
+| `butter` | **Butterworth** | `octavefilter(x, fs, filter_type='butter')` | General acoustic measurement. |
+| `cheby1` | **Chebyshev I** | `octavefilter(x, fs, filter_type='cheby1', ripple=0.1)` | Sharper roll-off at the cost of ripple. |
+| `cheby2` | **Chebyshev II** | `octavefilter(x, fs, filter_type='cheby2', attenuation=60)` | Flat passband with stopband zeros. |
+| `ellip` | **Elliptic** | `octavefilter(x, fs, filter_type='ellip', ripple=0.1, attenuation=60)` | Maximum selectivity. |
+| `bessel` | **Bessel** | `octavefilter(x, fs, filter_type='bessel')` | Preserving transient waveform shapes. |
+
+### Gallery of Filter Bank Responses
+Full spectral view of the filter banks for Octave (1/1) and 1/3-Octave fractions.
+
+| Architecture | 1/1 Octave (Fraction=1) | 1/3 Octave (Fraction=3) |
+| :--- | :--- | :--- |
+| **Butterworth** | <img src=".github/images/filter_butter_fraction_1_order_6.png" width="100%"> | <img src=".github/images/filter_butter_fraction_3_order_6.png" width="100%"> |
+| **Chebyshev I** | <img src=".github/images/filter_cheby1_fraction_1_order_6.png" width="100%"> | <img src=".github/images/filter_cheby1_fraction_3_order_6.png" width="100%"> |
+| **Chebyshev II** | <img src=".github/images/filter_cheby2_fraction_1_order_6.png" width="100%"> | <img src=".github/images/filter_cheby2_fraction_3_order_6.png" width="100%"> |
+| **Elliptic** | <img src=".github/images/filter_ellip_fraction_1_order_6.png" width="100%"> | <img src=".github/images/filter_ellip_fraction_3_order_6.png" width="100%"> |
+| **Bessel** | <img src=".github/images/filter_bessel_fraction_1_order_6.png" width="100%"> | <img src=".github/images/filter_bessel_fraction_3_order_6.png" width="100%"> |
 
 ---
 
 ## 🔊 Acoustic Weighting (A, C, Z)
 
-Frequency weighting curves simulate the human ear's sensitivity.
+Frequency weighting curves simulate the human ear\'s sensitivity.
 
 <img src=".github/images/weighting_responses.png" width="80%"></img>
 
@@ -98,6 +111,9 @@ from pyoctaveband import weighting_filter
 
 # Apply A-weighting to the raw signal
 weighted_signal = weighting_filter(signal, fs, curve='A')
+
+# Apply C-weighting for peak analysis
+c_weighted_signal = weighting_filter(signal, fs, curve='C')
 ```
 
 ---
@@ -165,14 +181,18 @@ Retrieve the time-domain components of each band with `sigbands=True`.
 
 ## 📖 Theoretical Background
 
-### Octave Band Frequencies (ANSI S1.11)
-The exact mid-band frequencies ($f_m$) and band edges ($f_1, f_2$) are calculated using a base-10 system:
-- Exact mid-band: $f_m = f_r \cdot 10^{\frac{3x}{10b}}$ (for odd $b$)
-- Band edges: $f_1 = f_m \cdot G^{-1/2b}$ and $f_2 = f_m \cdot G^{1/2b}$
-Where $G = 10^{0.3}$ and $f_r = 1000$ Hz.
+### Octave Band Frequencies (ANSI S1.11 / IEC 61260)
+The mid-band frequencies ($f_m$) and edges ($f_1, f_2$) use a base-10 ratio $G = 10^{0.3}$:
+- Mid-band: $f_m = 1000 \cdot G^{x/b}$ (for odd $b$)
+- Band edges: $f_1 = f_m \cdot G^{-1/2b}$, $f_2 = f_m \cdot G^{1/2b}$
+
+### Magnitude Responses $|H(j\omega)|$
+1.  **Butterworth:** $|H(j\omega)| = \frac{1}{\sqrt{1 + (\omega/\omega_c)^{2n}}}$ (Maximally flat)
+2.  **Chebyshev I:** $|H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 T_n^2(\omega/\omega_c)}}$ ($T_n$ is Chebyshev polynomial)
+3.  **Elliptic:** $|H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 R_n^2(\omega/\omega_c, L)}}$ ($R_n$ is Jacobian elliptic function)
 
 ### Weighting Curves (IEC 61672-1)
-The A-weighting transfer function in the frequency domain is defined as:
+The A-weighting transfer function:
 $$R_A(f) = \frac{12194^2 \cdot f^4}{(f^2 + 20.6^2)\sqrt{(f^2 + 107.7^2)(f^2 + 737.9^2)}(f^2 + 12194^2)}$$
 $$A(f) = 20 \log_{10}(R_A(f)) + 2.00$$
 

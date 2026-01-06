@@ -123,7 +123,9 @@ def generate_filter_responses(output_dir: str) -> None:
     filter_types = [
         ("butter", "butter"),
         ("cheby1", "cheby1"),
+        ("cheby2", "cheby2"),
         ("ellip", "ellip"),
+        ("bessel", "bessel"),
     ]
 
     configs = [
