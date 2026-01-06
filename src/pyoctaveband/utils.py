@@ -20,7 +20,7 @@ def _typesignal(x: List[float] | np.ndarray | Tuple[float, ...]) -> np.ndarray:
     """
     if isinstance(x, np.ndarray):
         return x
-    return cast(np.ndarray, np.atleast_1d(np.array(x)))
+    return np.atleast_1d(np.array(x))
 
 
 def _resample_to_length(y: np.ndarray, factor: int, target_length: int) -> np.ndarray:
