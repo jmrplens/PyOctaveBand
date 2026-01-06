@@ -4,7 +4,9 @@ Octave-Band and Fractional Octave-Band filter for signals in the time domain.
 Implementation according to ANSI s1.11-2004 and IEC 61260-1-2014.
 """
 
-from typing import List, Optional, Tuple, Union, cast
+from __future__ import annotations
+
+from typing import List, Tuple, cast
 
 import matplotlib
 import numpy as np
@@ -31,16 +33,16 @@ __all__ = [
 
 
 def octavefilter(
-    x: Union[List[float], np.ndarray],
+    x: List[float] | np.ndarray,
     fs: int,
     fraction: float = 1,
     order: int = 6,
-    limits: Optional[List[float]] = None,
+    limits: List[float] | None = None,
     show: bool = False,
     sigbands: bool = False,
-    plot_file: Optional[str] = None,
-    **kwargs: Union[str, float, bool]
-) -> Union[Tuple[np.ndarray, List[float]], Tuple[np.ndarray, List[float], List[np.ndarray]]]:
+    plot_file: str | None = None,
+    **kwargs: str | float | bool
+) -> Tuple[np.ndarray, List[float]] | Tuple[np.ndarray, List[float], List[np.ndarray]]:
     """
     Filter a signal with octave or fractional octave filter bank.
 

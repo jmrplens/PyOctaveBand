@@ -3,13 +3,15 @@
 Signal processing utilities for pyoctaveband.
 """
 
-from typing import List, Tuple, Union, cast
+from __future__ import annotations
+
+from typing import List, Tuple, cast
 
 import numpy as np
 from scipy import signal
 
 
-def _typesignal(x: Union[List[float], np.ndarray, Tuple[float, ...]]) -> np.ndarray:
+def _typesignal(x: List[float] | np.ndarray | Tuple[float, ...]) -> np.ndarray:
     """
     Ensure signal is a numpy array.
 

@@ -3,7 +3,9 @@
 Core processing logic and FilterBank class for pyoctaveband.
 """
 
-from typing import List, Optional, Tuple, Union, cast
+from __future__ import annotations
+
+from typing import List, Tuple, cast
 
 import numpy as np
 from scipy import signal
@@ -24,12 +26,12 @@ class OctaveFilterBank:
         fs: int,
         fraction: float = 1,
         order: int = 6,
-        limits: Optional[List[float]] = None,
+        limits: List[float] | None = None,
         filter_type: str = "butter",
         ripple: float = 0.1,
         attenuation: float = 60.0,
         show: bool = False,
-        plot_file: Optional[str] = None,
+        plot_file: str | None = None,
         calibration_factor: float = 1.0,
         dbfs: bool = False,
     ) -> None:
@@ -90,10 +92,10 @@ class OctaveFilterBank:
 
     def filter(
         self, 
-        x: Union[List[float], np.ndarray], 
+        x: List[float] | np.ndarray, 
         sigbands: bool = False,
         mode: str = "rms"
-    ) -> Union[Tuple[np.ndarray, List[float]], Tuple[np.ndarray, List[float], List[np.ndarray]]]:
+    ) -> Tuple[np.ndarray, List[float]] | Tuple[np.ndarray, List[float], List[np.ndarray]]:
         """
         Apply the pre-designed filter bank to a signal.
 
@@ -133,7 +135,7 @@ class OctaveFilterBank:
         num_channels: int,
         sigbands: bool,
         mode: str = "rms"
-    ) -> Tuple[np.ndarray, Optional[List[np.ndarray]]]:
+    ) -> Tuple[np.ndarray, List[np.ndarray] | None]:
         """
         Process signal through each frequency band.
 
@@ -144,7 +146,7 @@ class OctaveFilterBank:
         :return: A tuple containing (SPL_array, Optional_List_of_filtered_signals).
         """
         spl = np.zeros([num_channels, self.num_bands])
-        xb: Optional[List[np.ndarray]] = [np.array([]) for _ in range(self.num_bands)] if sigbands else None
+        xb: List[np.ndarray] | None = [np.array([]) for _ in range(self.num_bands)] if sigbands else None
 
         for idx in range(self.num_bands):
             for ch in range(num_channels):

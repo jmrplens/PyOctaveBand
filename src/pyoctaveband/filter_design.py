@@ -3,7 +3,9 @@
 Filter design and visualization for pyoctaveband.
 """
 
-from typing import List, Optional
+from __future__ import annotations
+
+from typing import List
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -21,7 +23,7 @@ def _design_sos_filter(
     ripple: float,
     attenuation: float,
     show: bool = False,
-    plot_file: Optional[str] = None,
+    plot_file: str | None = None,
 ) -> List[np.ndarray]:
     """
     Generate SOS coefficients for the filter bank.
@@ -69,7 +71,7 @@ def _showfilter(
     fs: int,
     factor: np.ndarray,
     show: bool = False,
-    plot_file: Optional[str] = None,
+    plot_file: str | None = None,
 ) -> None:
     """
     Visualize filter bank frequency response.

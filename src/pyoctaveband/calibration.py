@@ -3,13 +3,15 @@
 Calibration utilities for mapping digital signals to physical SPL levels.
 """
 
-from typing import List, Union
+from __future__ import annotations
+
+from typing import List
 
 import numpy as np
 
 
 def calculate_sensitivity(
-    ref_signal: Union[List[float], np.ndarray], 
+    ref_signal: List[float] | np.ndarray, 
     target_spl: float = 94.0, 
     ref_pressure: float = 2e-5
 ) -> float:

@@ -4,7 +4,9 @@ Weighting filters (A, C, Z) and time weighting utilities for audio analysis.
 Implementation according to IEC 61672-1:2013.
 """
 
-from typing import List, Tuple, Union, cast
+from __future__ import annotations
+
+from typing import List, Tuple, cast
 
 import numpy as np
 from scipy import signal
@@ -12,7 +14,7 @@ from scipy import signal
 from .utils import _typesignal
 
 
-def weighting_filter(x: Union[List[float], np.ndarray], fs: int, curve: str = "A") -> np.ndarray:
+def weighting_filter(x: List[float] | np.ndarray, fs: int, curve: str = "A") -> np.ndarray:
     """
     Apply frequency weighting (A or C) to a signal.
     
@@ -68,7 +70,7 @@ def weighting_filter(x: Union[List[float], np.ndarray], fs: int, curve: str = "A
     return cast(np.ndarray, signal.sosfilt(sos, x_proc))
 
 
-def time_weighting(x: Union[List[float], np.ndarray], fs: int, mode: str = "fast") -> np.ndarray:
+def time_weighting(x: List[float] | np.ndarray, fs: int, mode: str = "fast") -> np.ndarray:
     """
     Apply time weighting to a signal (Exponential averaging).
     
@@ -101,7 +103,7 @@ def time_weighting(x: Union[List[float], np.ndarray], fs: int, mode: str = "fast
 
 
 def linkwitz_riley(
-    x: Union[List[float], np.ndarray], 
+    x: List[float] | np.ndarray, 
     fs: int, 
     freq: float, 
     order: int = 4

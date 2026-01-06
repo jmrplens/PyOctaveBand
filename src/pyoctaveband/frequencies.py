@@ -3,15 +3,17 @@
 Frequency calculation logic according to ANSI/IEC standards.
 """
 
+from __future__ import annotations
+
 import warnings
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 
 import numpy as np
 
 
 def getansifrequencies(
     fraction: float,
-    limits: Optional[List[float]] = None,
+    limits: List[float] | None = None,
 ) -> Tuple[List[float], List[float], List[float]]:
     """
     Calculate frequencies according to ANSI/IEC standards.
