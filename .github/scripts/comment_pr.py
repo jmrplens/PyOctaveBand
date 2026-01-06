@@ -10,17 +10,26 @@ def parse_test_results(test_dir):
     if not os.path.exists(test_dir):
         return "No test results found.", 0, 0
 
-    files = []
+    # Distinguish between test results and coverage reports
+    test_files = []
+    coverage_files = {} # version -> path
+    
     for root, _, filenames in os.walk(test_dir):
         for filename in filenames:
-            if filename.endswith(".xml"):
-                files.append(os.path.join(root, filename))
-    files.sort()
+            f_path = os.path.join(root, filename)
+            if filename.startswith("test-results-") and filename.endswith(".xml"):
+                test_files.append(f_path)
+            elif filename == "coverage.xml":
+                # Extract version from parent directory name
+                version = os.path.basename(root).replace("test-results-", "")
+                coverage_files[version] = f_path
+                
+    test_files.sort()
 
-    summary.append("| Python Version | Tests | Failures | Status |")
-    summary.append("|---|---|---|---|")
+    summary.append("| Python Version | Tests | Failures | Coverage | Status |")
+    summary.append("|---|---|---|---|---|")
 
-    for f_path in files:
+    for f_path in test_files:
         f_name = os.path.basename(f_path)
         try:
             tree = ET.parse(f_path)
@@ -37,14 +46,25 @@ def parse_test_results(test_dir):
                 failures = int(root.attrib.get("failures", 0))
 
             version = f_name.replace("test-results-", "").replace(".xml", "")
-            status = "✅ Passed" if failures == 0 else "❌ Failed"
+            
+            # Parse coverage for this version if available
+            coverage_pct = "-"
+            if version in coverage_files:
+                try:
+                    cov_tree = ET.parse(coverage_files[version])
+                    cov_root = cov_tree.getroot()
+                    line_rate = float(cov_root.attrib.get("line-rate", 0))
+                    coverage_pct = f"{line_rate * 100:.1f}%"
+                except Exception:
+                    coverage_pct = "error"
 
-            summary.append(f"| {version} | {tests} | {failures} | {status} |")
+            status = "✅ Passed" if failures == 0 else "❌ Failed"
+            summary.append(f"| {version} | {tests} | {failures} | {coverage_pct} | {status} |")
 
             total_tests += tests
             total_failures += failures
         except Exception as e:
-            summary.append(f"| {f_name} | - | - | ⚠️ Error parsing: {e} |")
+            summary.append(f"| {f_name} | - | - | - | ⚠️ Error parsing: {e} |")
 
     return "\n".join(summary), total_tests, total_failures
 

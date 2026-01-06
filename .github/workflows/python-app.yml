@@ -83,7 +83,7 @@ jobs:
       with:
         name: test-results-3.13
     - name: SonarCloud Scan
-      uses: SonarSource/sonarcloud-github-action@master
+      uses: SonarSource/sonarqube-scan-action@master
       env:
         GITHUB_TOKEN: ${{ secrets.TOKEN_GH }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
