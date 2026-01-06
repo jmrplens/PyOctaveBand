@@ -5,14 +5,26 @@
 # PyOctaveBand
 Advanced Octave-Band and Fractional Octave-Band filter bank for signals in the time domain. Fully compliant with **ANSI s1.11-2004** and **IEC 61260-1-2014**.
 
-This library provides professional-grade tools for acoustic analysis, including frequency weighting (A, C, Z), time ballistics (Fast, Slow, Impulse), and multiple filter architectures (Butterworth, Chebyshev, Elliptic, Bessel).
+This library provides professional-grade tools for acoustic analysis, including frequency weighting (A, C, Z), time ballistics (Fast, Slow, Impulse), and multiple filter architectures.
+
+---
+
+## 📑 Table of Contents
+1. [🚀 Getting Started](#-getting-started)
+2. [🛠️ Filter Architectures](#️-filter-architectures)
+3. [🔊 Acoustic Weighting (A, C, Z)](#-acoustic-weighting-a-c-z)
+4. [⏱️ Time Weighting and Integration](#️-time-weighting-and-integration)
+5. [⚡ Performance: OctaveFilterBank](#-performance-octavefilterbank-class)
+6. [🔀 Linkwitz-Riley Crossover](#-linkwitz-riley-crossover)
+7. [📊 Signal Decomposition](#-signal-decomposition-and-stability)
+8. [📖 Theory and Equations](#-theoretical-background)
+9. [🧪 Testing and Quality](#-development-and-verification)
 
 ---
 
 ## 🚀 Getting Started
 
 ### Installation
-
 ```bash
 pip install .
 ```
@@ -38,85 +50,75 @@ print(f"SPL [dB]: {spl}")
 
 ---
 
-## 🛠️ Advanced Filter Architecture
+## 🛠️ Filter Architectures
 
 PyOctaveBand allows choosing between different filter types to balance between roll-off steepness and transient response (ringing).
 
-### Filter Type Comparison
-Different architectures offer different trade-offs in the stopband attenuation.
+### Filter Comparison Table
+
+| Type | Name | Description | Best For |
+| :--- | :--- | :--- | :--- |
+| `butter` | **Butterworth** | Maximally flat passband. | Standard acoustic measurements. |
+| `cheby1` | **Chebyshev I** | Steeper roll-off, ripple in passband. | High selectivity requirements. |
+| `cheby2` | **Chebyshev II** | Flat passband, ripple in stopband. | Clean passband with good rejection. |
+| `ellip` | **Elliptic** | Steepest transition, ripples in both. | Extreme isolation between bands. |
+| `bessel` | **Bessel** | Linear phase, minimal group delay. | Preserving pulse shapes/transients. |
+| `lr` | **Linkwitz-Riley**| 4th order (LR4), flat sum response. | Audio crossovers and band splitting. |
 
 <img src=".github/images/filter_type_comparison.png" width="80%"></img>
-
-| Type | Name | Description |
-| :--- | :--- | :--- |
-| `butter` | **Butterworth** | Maximally flat passband. Standard for acoustic measurements. |
-| `cheby1` | **Chebyshev I** | Steeper roll-off than Butterworth, with ripple in the passband. |
-| `ellip` | **Elliptic** | Steepest transition, with ripples in both passband and stopband. |
-| `bessel` | **Bessel** | Best phase response and minimal group delay (no overshoot). |
-
-#### Usage:
-```python
-# Use a high-selectivity Elliptic filter for better isolation
-spl, freq = octavefilter(signal, fs, filter_type='ellip', attenuation=80.0)
-```
 
 ---
 
 ## 🔊 Acoustic Weighting (A, C, Z)
 
-Frequency weighting curves are used to simulate the human ear's sensitivity to different frequencies at different levels.
+Frequency weighting curves simulate the human ear's sensitivity.
 
 <img src=".github/images/weighting_responses.png" width="80%"></img>
 
-*   **A-Weighting (`A`):** Standard for environmental noise and hearing protection (IEC 61672-1).
-*   **C-Weighting (`C`):** Used for peak sound pressure and high-level noise analysis.
+*   **A-Weighting (`A`):** Standard for environmental noise (IEC 61672-1).
+*   **C-Weighting (`C`):** Used for peak sound pressure and high-level noise.
 *   **Z-Weighting (`Z`):** Zero weighting, completely flat response.
 
 ```python
-from pyoctaveband import weighting_filter, octavefilter
+from pyoctaveband import weighting_filter
 
-# 1. Apply A-weighting to the raw signal
+# Apply A-weighting to the raw signal
 weighted_signal = weighting_filter(signal, fs, curve='A')
-
-# 2. Perform octave analysis on the weighted signal
-spl, freq = octavefilter(weighted_signal, fs, fraction=1)
 ```
 
 ---
 
 ## ⏱️ Time Weighting and Integration
 
-In acoustics, sound pressure level is often measured with specific time ballistics to capture the "perceived" energy over time.
+Accurate SPL measurement requires capturing energy over specific time windows.
 
 <img src=".github/images/time_weighting_analysis.png" width="80%"></img>
 
-*   **Fast (`fast`):** 125ms time constant. Used for most noise measurements.
-*   **Slow (`slow`):** 1000ms time constant. Used for steady-state noise.
-*   **Impulse (`impulse`):** 35ms rise time. Used for impulsive sounds like gunshots or impacts.
+*   **Fast (`fast`):** $\tau = 125$ ms. Standard for noise fluctuations.
+*   **Slow (`slow`):** $\tau = 1000$ ms. Standard for steady noise.
+*   **Impulse (`impulse`):** 35 ms rise time. For explosive sounds.
 
 ```python
 from pyoctaveband import time_weighting
 
-# Calculate the time-varying Mean Square value (energy envelope)
+# Calculate energy envelope (Mean Square)
 energy_envelope = time_weighting(signal, fs, mode='fast')
-
-# Convert to instantaneous SPL (dB)
+# dB SPL relative to 20μPa
 spl_t = 10 * np.log10(energy_envelope / (2e-5)**2)
 ```
 
 ---
 
-## ⚡ High Performance: OctaveFilterBank Class
+## ⚡ Performance: OctaveFilterBank Class
 
-For applications that process many signals with the same configuration (e.g., real-time monitoring), use the `OctaveFilterBank` class. It pre-calculates the filter coefficients only once.
+Pre-calculating coefficients saves significant CPU time when processing multiple frames.
 
 ```python
 from pyoctaveband import OctaveFilterBank
 
-# Initialize the bank (expensive operation)
 bank = OctaveFilterBank(fs=48000, fraction=3, filter_type='butter')
 
-# Process signals efficiently (reusing SOS coefficients)
+# Process multiple signals efficiently
 for frame in stream:
     spl, freq = bank.filter(frame)
 ```
@@ -125,47 +127,64 @@ for frame in stream:
 
 ## 🔀 Linkwitz-Riley Crossover
 
-Used in professional audio to split signals into low and high frequency bands while maintaining a perfectly flat sum and aligned phase.
+Perfect for splitting audio into sub/top or multi-way systems.
 
 <img src=".github/images/crossover_lr4.png" width="80%"></img>
 
 ```python
 from pyoctaveband import linkwitz_riley
 
-# Split at 800 Hz using a 4th order Linkwitz-Riley crossover
-low_band, high_band = linkwitz_riley(signal, fs, freq=800, order=4)
-
-# Summing low + high results in the original signal (flat response)
-original_reconstructed = low_band + high_band
+# Split at 1000 Hz using LR4
+low, high = linkwitz_riley(signal, fs, freq=1000, order=4)
+# (low + high) will be identical to original signal in magnitude and phase.
 ```
 
 ---
 
 ## 📊 Signal Decomposition and Stability
 
-By setting `sigbands=True`, you can retrieve the time-domain components of each band. PyOctaveBand ensures stability even in the lowest frequency bands (down to 16Hz) using high-precision poliphase resampling.
+Retrieve the time-domain components of each band with `sigbands=True`.
 
 <img src=".github/images/signal_decomposition.png" width="80%"></img>
 
-*The bottom plot shows the **Impulse Response** of a band, demonstrating the stability and decay characteristics of the filter.*
+---
+
+## 📖 Theoretical Background
+
+### Octave Band Frequencies (ANSI S1.11)
+The exact mid-band frequencies ($f_m$) and band edges ($f_1, f_2$) are calculated using a base-10 system:
+- Exact mid-band: $f_m = f_r \cdot 10^{\frac{3x}{10b}}$ (for odd $b$)
+- Band edges: $f_1 = f_m \cdot G^{-1/2b}$ and $f_2 = f_m \cdot G^{1/2b}$
+Where $G = 10^{0.3}$ and $f_r = 1000$ Hz.
+
+### Weighting Curves (IEC 61672-1)
+The A-weighting transfer function in the frequency domain is defined as:
+$$R_A(f) = \frac{12194^2 \cdot f^4}{(f^2 + 20.6^2)\sqrt{(f^2 + 107.7^2)(f^2 + 737.9^2)}(f^2 + 12194^2)}$$
+$$A(f) = 20 \log_{10}(R_A(f)) + 2.00$$
+
+### Time Integration
+Implemented as a first-order IIR exponential integrator:
+$$y[n] = \alpha \cdot x^2[n] + (1 - \alpha) \cdot y[n-1]$$
+$$\alpha = 1 - e^{-1 / (f_s \cdot \tau)}$$
 
 ---
 
 ## 🧪 Development and Verification
 
-PyOctaveBand includes a rigorous test suite that verifies:
-- Spectral isolation (>20dB at 2 octaves).
-- Standard A/C weighting gains at 100Hz, 1kHz, and 8kHz.
-- Filter stability via IR tail energy analysis.
-- Multichannel processing integrity.
+We maintain 100% stability and compliance through a rigorous test suite.
 
-### Run Tests
+### Test Categories
+1.  **Isolation Tests:** Verifies that a pure 1kHz tone is attenuated by >20dB in the 250Hz and 4kHz bands.
+2.  **Weighting Response:** Checks gains at 100Hz (-19.1dB for A) and 1kHz (0dB).
+3.  **Stability (IR Tail):** Analyzes the Impulse Response of every filter. Energy in the last 100ms must be $< 10^{-6}$ to pass.
+4.  **Crossover Flatness:** Verifies that the sum of Linkwitz-Riley bands has $< 0.1$ dB deviation.
+
+### Commands
 ```bash
+# Run full suite
 pytest tests/
-```
 
-### Generate Benchmark Report
-```bash
+# Generate technical report
 python scripts/benchmark_filters.py
 ```
 
