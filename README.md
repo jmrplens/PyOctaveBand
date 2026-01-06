@@ -305,6 +305,10 @@ spl_c2, _, xb_cheby2 = octavefilter(y, fs=fs, fraction=1, sigbands=True, filter_
 
 *The plot compares the **Butterworth** (solid blue) and **Chebyshev II** (dashed red) responses. The bottom plot shows the **Impulse Response**, highlighting the differences in stability and transient decay.*
 
+> [!NOTE]
+> **Why do the signals look shifted in time?**
+> Digital IIR filters (like Butterworth or Chebyshev) have **non-linear phase responses**, which results in frequency-dependent **Group Delay**. In the 250 Hz band, you can see that the Chebyshev II filter has a different propagation delay compared to the Butterworth filter. This is a normal physical property of these architectures: more aggressive frequency roll-offs usually come at the cost of higher group delay and phase distortion.
+
 ---
 
 ## 📖 Theoretical Background
