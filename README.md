@@ -1,6 +1,6 @@
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?hosted_button_id=BLP3R6VGYJB4Q)
 [![Donate](https://img.shields.io/badge/Donate-Ko--fi-brightgreen?color=ff5f5f)](https://ko-fi.com/jmrplens) 
-[![PyPI version](https://badge.fury.io/py/PyOctaveBand.svg)](https://pypi.org/project/PyOctaveBand/)
+[![PyPI version](https://img.shields.io/pypi/v/PyOctaveBand)](https://pypi.org/project/PyOctaveBand/)
 [![Python application](https://github.com/jmrplens/PyOctaveBand/actions/workflows/python-app.yml/badge.svg)](https://github.com/jmrplens/PyOctaveBand/actions/workflows/python-app.yml)
 
 # PyOctaveBand
@@ -106,6 +106,17 @@ spl, freq = octavefilter(signal, fs=fs, fraction=3)
 
 print(f"Bands: {freq}")
 print(f"SPL [dB]: {spl}")
+
+# OR: Import an audio file
+from scipy.io import wavfile
+
+# Load standard WAV file
+fs, signal = wavfile.read("measurement.wav")
+
+# Analyze
+# Note: To obtain real-world SPL values, you must calibrate the input.
+# See the [Physical Calibration](#physical-calibration-sonómetro) section.
+spl, freq = octavefilter(signal, fs=fs, fraction=3)
 ```
 
 ---
@@ -284,7 +295,18 @@ spl, freq = octavefilter(signal, fs, calibration_factor=sensitivity)
 ```
 
 ### Digital Analysis (dBFS)
-...
+If you are working with digital audio files (e.g., WAV, FLAC) and want to analyze levels relative to Full Scale rather than physical pressure, you can use the `dbfs=True` parameter.
+
+In this mode:
+*   **0 dBFS** corresponds to a numeric signal level of 1.0 (RMS or Peak).
+*   Useful for analyzing headroom, digital mastering, or normalized signals.
+
+```python
+# Assume 'signal' is normalized between -1.0 and 1.0
+spl_dbfs, freq = octavefilter(signal, fs, dbfs=True)
+# Results will be negative (e.g., -20 dBFS)
+```
+
 ### RMS vs Peak Levels
 PyOctaveBand supports two measurement modes to align with professional software like BK:
 - **RMS (`mode='rms'`)**: Energy-based level (standard).
