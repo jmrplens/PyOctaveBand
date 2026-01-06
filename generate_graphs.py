@@ -64,8 +64,10 @@ def generate_filter_type_comparison(output_dir: str) -> None:
     
     filters = [
         ("butter", "Butterworth", COLOR_PRIMARY, "-"),
-        ("cheby1", "Chebyshev I (0.1dB ripple)", COLOR_SECONDARY, "--"),
-        ("ellip", "Elliptic (0.1dB ripple, 60dB atten)", COLOR_TERTIARY, "-."),
+        ("cheby1", "Chebyshev I", COLOR_SECONDARY, "--"),
+        ("cheby2", "Chebyshev II", COLOR_TERTIARY, ":"),
+        ("ellip", "Elliptic", "#9467bd", "-."),
+        ("bessel", "Bessel", "#8c564b", "-"),
     ]
     
     fig, ax = plt.subplots(figsize=(10, 7))
@@ -95,7 +97,7 @@ def generate_filter_type_comparison(output_dir: str) -> None:
     
     # Sub-plot styling (Zoom around 1kHz and -3dB)
     axins.set_xlim(650, 1500)
-    axins.set_ylim(-6, 0.5)  # As requested: from -6 to 0.5
+    axins.set_ylim(-4, 0.5)  # Adjusted: from -4 to 0.5
     axins.grid(True, which="both", alpha=0.3)
     axins.set_title("Zoom at -3 dB (Log Scale)", fontsize=9)
 
