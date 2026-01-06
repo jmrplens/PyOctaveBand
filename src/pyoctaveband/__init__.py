@@ -9,6 +9,7 @@ from typing import List, Optional, Tuple, Union
 import matplotlib
 import numpy as np
 
+from .calibration import calculate_sensitivity
 from .core import OctaveFilterBank
 from .frequencies import getansifrequencies, normalizedfreq
 from .parametric_filters import linkwitz_riley, time_weighting, weighting_filter
@@ -25,6 +26,7 @@ __all__ = [
     "weighting_filter",
     "time_weighting",
     "linkwitz_riley",
+    "calculate_sensitivity",
 ]
 
 
@@ -40,6 +42,8 @@ def octavefilter(
     filter_type: str = "butter",
     ripple: float = 0.1,
     attenuation: float = 60.0,
+    calibration_factor: float = 1.0,
+    dbfs: bool = False,
 ) -> Union[Tuple[np.ndarray, List[float]], Tuple[np.ndarray, List[float], List[np.ndarray]]]:
     """
     Filter a signal with octave or fractional octave filter bank.
@@ -68,10 +72,14 @@ def octavefilter(
     :type plot_file: Optional[str]
     :param filter_type: Type of filter ('butter', 'cheby1', 'cheby2', 'ellip', 'bessel'). Default: 'butter'.
     :type filter_type: str
-    :param ripple: Passband ripple in dB (for cheby1, ellip). Default: 1.0.
+    :param ripple: Passband ripple in dB (for cheby1, ellip). Default: 0.1.
     :type ripple: float
     :param attenuation: Stopband attenuation in dB (for cheby2, ellip). Default: 60.0.
     :type attenuation: float
+    :param calibration_factor: Sensitivity multiplier to map digital units to Pascals. Default: 1.0.
+    :type calibration_factor: float
+    :param dbfs: If True, return results in dB relative to Full Scale (0 dB = RMS 1.0). Default: False.
+    :type dbfs: bool
     :return: A tuple containing (SPL_array, Frequencies_list) if sigbands is False,
              or (SPL_array, Frequencies_list, List_of_filtered_signals) if sigbands is True.
     :rtype: Union[Tuple[np.ndarray, List[float]], Tuple[np.ndarray, List[float], List[np.ndarray]]]
@@ -87,7 +95,9 @@ def octavefilter(
         ripple=ripple,
         attenuation=attenuation,
         show=show,
-        plot_file=plot_file
+        plot_file=plot_file,
+        calibration_factor=calibration_factor,
+        dbfs=dbfs
     )
     
     return filter_bank.filter(x, sigbands=sigbands)

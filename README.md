@@ -18,9 +18,10 @@ This library provides professional-grade tools for acoustic analysis, including 
 4. [⏱️ Time Weighting and Integration](#️-time-weighting-and-integration)
 5. [⚡ Performance: OctaveFilterBank](#-performance-octavefilterbank-class)
 6. [🔍 Filter Usage and Examples](#-filter-usage-and-examples)
-7. [📊 Signal Decomposition](#-signal-decomposition-and-stability)
-8. [📖 Theory and Equations](#-theoretical-background)
-9. [🧪 Testing and Quality](#-development-and-verification)
+7. [📏 Calibration and dBFS](#-calibration-and-dbfs)
+8. [📊 Signal Decomposition](#-signal-decomposition-and-stability)
+9. [📖 Theory and Equations](#-theoretical-background)
+10. [🧪 Testing and Quality](#-development-and-verification)
 
 ---
 
@@ -215,6 +216,38 @@ low, high = linkwitz_riley(signal, fs, freq=1000, order=4)
 # Reconstruction: low + high == signal (flat response)
 ```
 <img src=".github/images/crossover_lr4.png" width="60%"></img>
+
+---
+
+## 📏 Calibration and dBFS
+
+PyOctaveBand can return results in physical **Sound Pressure Level (dB SPL)** or digital **decibels relative to Full Scale (dBFS)**.
+
+### Physical Calibration (Sonómetro)
+To get accurate SPL measurements from a digital recording, you must first calculate the sensitivity of your measurement chain using a reference tone (e.g., 94 dB @ 1kHz).
+
+```python
+from pyoctaveband import octavefilter, calculate_sensitivity
+
+# 1. Record your 94dB calibrator signal
+# ref_signal = ... (your recording)
+
+# 2. Calculate sensitivity factor
+sensitivity = calculate_sensitivity(ref_signal, target_spl=94.0)
+
+# 3. Apply calibration to your measurements
+spl, freq = octavefilter(signal, fs, calibration_factor=sensitivity)
+# Now 'spl' values are in real-world dB SPL!
+```
+
+### Digital Analysis (dBFS)
+If you don't have physical calibration, you can work in dBFS where **0 dB** corresponds to a Root Mean Square (RMS) level of 1.0.
+
+```python
+# Returns results relative to digital full scale
+spl_dbfs, freq = octavefilter(signal, fs, dbfs=True)
+# A full-scale sine wave will show -3.01 dBFS in its center band.
+```
 
 ---
 

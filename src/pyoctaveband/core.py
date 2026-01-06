@@ -30,6 +30,8 @@ class OctaveFilterBank:
         attenuation: float = 60.0,
         show: bool = False,
         plot_file: Optional[str] = None,
+        calibration_factor: float = 1.0,
+        dbfs: bool = False,
     ):
         if fs <= 0:
             raise ValueError("Sample rate 'fs' must be positive.")
@@ -57,6 +59,8 @@ class OctaveFilterBank:
         self.filter_type = filter_type
         self.ripple = ripple
         self.attenuation = attenuation
+        self.calibration_factor = calibration_factor
+        self.dbfs = dbfs
 
         # Generate frequencies
         self.freq, self.freq_d, self.freq_u = _genfreqs(limits, fraction, fs)
@@ -121,8 +125,18 @@ class OctaveFilterBank:
                 
                 y = signal.sosfilt(self.sos[idx], sd)
 
-                # Standard reference pressure for SPL calculation: 2e-5 Pa
-                spl[ch, idx] = 20 * np.log10(np.max([np.std(y), np.finfo(float).eps]) / 2e-5)
+                # Sound Level Calculation
+                rms = np.std(y)
+                if self.dbfs:
+                    # dBFS: 0 dB is RMS = 1.0 (Standard digital scale)
+                    # Note: A full-scale sine (peak 1.0) will result in -3.01 dBFS RMS
+                    val = 20 * np.log10(np.max([rms, np.finfo(float).eps]))
+                else:
+                    # Physical SPL: apply sensitivity and use 20uPa reference
+                    pressure_pa = rms * self.calibration_factor
+                    val = 20 * np.log10(np.max([pressure_pa, np.finfo(float).eps]) / 2e-5)
+                
+                spl[ch, idx] = val
 
                 if sigbands and xb is not None:
                     # Restore original length
