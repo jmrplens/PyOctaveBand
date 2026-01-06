@@ -1,7 +1,9 @@
 import time
+
 import numpy as np
+
 from pyoctaveband import octavefilter
-import os
+
 
 def benchmark_isolation(filter_type, target_freq=1000, fs=48000):
     duration = 1.0
@@ -53,12 +55,21 @@ def main():
     markdown.append("\nThis report compares the performance and characteristics of the available filter types.")
     
     markdown.append("\n## 1. Spectral Isolation (at 1kHz)")
-    markdown.append("| Filter Type | Peak SPL (dB) | Atten. -1 Oct (dB) | Atten. +1 Oct (dB) | Atten. -2 Oct (dB) | Atten. +2 Oct (dB) |")
+    header = (
+        "| Filter Type | Peak SPL (dB) | Atten. -1 Oct (dB) | "
+        "Atten. +1 Oct (dB) | Atten. -2 Oct (dB) | Atten. +2 Oct (dB) |"
+    )
+    markdown.append(header)
     markdown.append("|---|---|---|---|---|---|")
     
     for f in filters:
         iso = benchmark_isolation(f)
-        markdown.append(f"| {f} | {iso.get('peak',0):.2f} | {iso.get('-1_oct',0):.1f} | {iso.get('+1_oct',0):.1f} | {iso.get('-2_oct',0):.1f} | {iso.get('+2_oct',0):.1f} |")
+        row = (
+            f"| {f} | {iso.get('peak',0):.2f} | {iso.get('-1_oct',0):.1f} | "
+            f"{iso.get('+1_oct',0):.1f} | {iso.get('-2_oct',0):.1f} | "
+            f"{iso.get('+2_oct',0):.1f} |"
+        )
+        markdown.append(row)
 
     markdown.append("\n## 2. Stability and Performance")
     markdown.append("| Filter Type | Max IR Tail Energy | Stability Status | Avg. Execution Time (s) |")
