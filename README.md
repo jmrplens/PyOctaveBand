@@ -280,7 +280,7 @@ spl_peak, freq = octavefilter(signal, fs, mode='peak')
 
 ## 📊 Signal Decomposition and Stability
 
-By setting `sigbands=True`, you can retrieve the time-domain components of each band. This is useful for advanced analysis or signal reconstruction.
+By setting `sigbands=True`, you can retrieve the time-domain components of each band. This allows for advanced analysis or comparing how different architectures (e.g., Butterworth vs Chebyshev) affect the signal phase and transient response.
 
 ```python
 import numpy as np
@@ -291,16 +291,19 @@ fs = 8000
 t = np.linspace(0, 0.5, fs // 2, endpoint=False)
 y = np.sin(2 * np.pi * 250 * t) + np.sin(2 * np.pi * 1000 * t)
 
-# 2. Filter into octave bands and get time-domain signals (sigbands=True)
-spl, freq, xb = octavefilter(y, fs=fs, fraction=1, sigbands=True)
+# 2. Compare architectures (Butterworth vs Chebyshev I)
+# Filter with Butterworth (default)
+spl_b, freq, xb_butter = octavefilter(y, fs=fs, fraction=1, sigbands=True, filter_type='butter')
 
-# 'xb' is a list of arrays, where xb[i] is the signal filtered in band freq[i]
-# Each band in 'xb' has the same length as the original input 'y'.
+# Filter with Chebyshev I (ripples in passband, steeper roll-off)
+spl_c, _, xb_cheby = octavefilter(y, fs=fs, fraction=1, sigbands=True, filter_type='cheby1')
+
+# 'xb_butter' and 'xb_cheby' contain the time-domain signals per band
 ```
 
 <img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/signal_decomposition.png" width="80%"></img>
 
-*The bottom plot shows the **Impulse Response** of a band, demonstrating the stability and decay characteristics of the filter.*
+*The plot compares the **Butterworth** (solid blue) and **Chebyshev I** (dashed red) responses. The bottom plot shows the **Impulse Response**, highlighting the differences in stability and decay.*
 
 ---
 
