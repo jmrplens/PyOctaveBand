@@ -76,16 +76,16 @@ pip install -e ./PyOctaveBand
 
 All core functionality can be imported directly from the `pyoctaveband` package.
 
-| Name | Type | Description | Usage Snippet |
+| Name | Type | Description (Inputs) | Usage Snippet (Outputs) |
 | :--- | :--- | :--- | :--- |
-| `octavefilter` | `function` | High-level fractional octave analysis. | `spl, f = octavefilter(x, fs, fraction=3)` |
-| `OctaveFilterBank` | `class` | Class-based bank for efficient processing. | `bank = OctaveFilterBank(fs, fraction=3)` |
-| `weighting_filter` | `function` | Apply A, C, or Z frequency weighting. | `y = weighting_filter(x, fs, curve='A')` |
-| `time_weighting` | `function` | Capture energy with time ballistics. | `env = time_weighting(x, fs, mode='fast')` |
-| `linkwitz_riley` | `function` | 4th order audio crossover filter. | `lo, hi = linkwitz_riley(x, fs, freq=1000)` |
-| `calculate_sensitivity` | `function`| Calibrate digital signals to physical SPL. | `s = calculate_sensitivity(ref, target_spl=94)` |
-| `getansifrequencies` | `function` | Generate preferred ANSI frequencies. | `f = getansifrequencies(fraction=3)` |
-| `normalizedfreq` | `function` | Compute band edge frequencies. | `f_low, f_up = normalizedfreq(1000, 3)` |
+| `octavefilter` | `function` | **High-level analysis.**<br>• `x`: Signal array<br>• `fs`: Sample rate [Hz]<br>• `fraction`: 1, 3, etc. (Default: 1)<br>• `order`: Filter order (Default: 6)<br>• `filter_type`: 'butter', 'cheby1', 'cheby2', 'ellip', 'bessel' (Default: 'butter')<br>• `sigbands`: Return time signals (Default: False) | `spl, freq = octavefilter(x, fs, fraction=1, order=6, filter_type='butter', sigbands=False)`<br><br>• `spl`: 1D array of levels [dB]<br>• `freq`: List of mid-band frequencies [Hz] |
+| `OctaveFilterBank` | `class` | **Efficient bank implementation.**<br>• `fs`: Sample rate [Hz]<br>• `fraction`: 1, 3, etc.<br>• `order`: Filter order<br>• `limits`: [f_min, f_max] (Default: [12, 20000])<br>• `filter_type`: Architecture name | `bank = OctaveFilterBank(fs=48000, fraction=3, order=6, filter_type='butter')`<br>`spl, f = bank.filter(x)`<br><br>• `bank`: Instance of the filter bank |
+| `weighting_filter` | `function` | **Acoustic weighting.**<br>• `x`: Signal array<br>• `fs`: Sample rate [Hz]<br>• `curve`: 'A', 'C', or 'Z' (Default: 'A') | `y = weighting_filter(x, fs, curve='A')`<br><br>• `y`: 1D array of weighted signal |
+| `time_weighting` | `function` | **Energy capture.**<br>• `x`: Signal array<br>• `fs`: Sample rate [Hz]<br>• `mode`: 'fast', 'slow', or 'impulse' | `env = time_weighting(x, fs, mode='fast')`<br><br>• `env`: 1D array of energy envelope (Mean Square) |
+| `linkwitz_riley` | `function` | **Audio crossover.**<br>• `x`: Signal array<br>• `fs`: Sample rate [Hz]<br>• `freq`: Crossover frequency [Hz]<br>• `order`: 4 or 8 (Default: 4) | `lo, hi = linkwitz_riley(x, fs, freq=1000, order=4)`<br><br>• `lo`: Low-pass filtered signal<br>• `hi`: High-pass filtered signal |
+| `calculate_sensitivity` | `function`| **SPL Calibration.**<br>• `x_ref`: Calibration signal<br>• `fs`: Sample rate [Hz]<br>• `target_spl`: Level of calibrator (Default: 94.0) | `s = calculate_sensitivity(x_ref, fs, target_spl=94.0)`<br><br>• `s`: Float (multiplier for pressure) |
+| `getansifrequencies` | `function` | **ANSI Frequency generator.**<br>• `fraction`: 1, 3, etc. (Default: 1)<br>• `limits`: [f_min, f_max] (Default: [12, 20000]) | `f = getansifrequencies(fraction=3, limits=[20, 20000])`<br><br>• `f`: List of center frequencies [Hz] |
+| `normalizedfreq` | `function` | **Band edge calculator.**<br>• `freq`: Center frequency [Hz]<br>• `fraction`: 1, 3, etc. | `f_low, f_up = normalizedfreq(1000, 3)`<br><br>• `f_low`: Lower cut-off frequency [Hz]<br>• `f_up`: Upper cut-off frequency [Hz] |
 
 ---
 
