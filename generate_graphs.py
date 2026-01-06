@@ -70,10 +70,10 @@ def generate_filter_type_comparison(output_dir: str) -> None:
     
     fig, ax = plt.subplots(figsize=(10, 7))
     
-    # Create inset axis for zoom
+    # Create inset axis for zoom (increased height to 45%)
     from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-    axins = inset_axes(ax, width="35%", height="35%", loc="upper left", borderpad=3)
-    axins.set_xscale("log")
+    axins = inset_axes(ax, width="35%", height="45%", loc="upper left", borderpad=3)
+    axins.set_xscale("log") # Explicitly set log scale
     
     for f_type, label, color, style in filters:
         bank = OctaveFilterBank(fs, fraction=fraction, order=order, limits=limits, filter_type=f_type)
@@ -86,7 +86,7 @@ def generate_filter_type_comparison(output_dir: str) -> None:
         mag_db = 20 * np.log10(np.abs(h) + 1e-9)
         
         ax.semilogx(w, mag_db, label=label, color=color, linestyle=style)
-        axins.semilogx(w, mag_db, color=color, linestyle=style)
+        axins.plot(w, mag_db, color=color, linestyle=style) # plot is fine if scale is set
 
     ax.axhline(-3, color="black", linestyle=":", alpha=0.3, label="-3 dB")
     axins.axhline(-3, color="black", linestyle=":", alpha=0.3)
@@ -95,9 +95,13 @@ def generate_filter_type_comparison(output_dir: str) -> None:
     
     # Sub-plot styling (Zoom around 1kHz and -3dB)
     axins.set_xlim(650, 1500)
-    axins.set_ylim(-5, 1)
+    axins.set_ylim(-6, 0.5) # As requested: from -6 to 0.5
     axins.grid(True, which="both", alpha=0.3)
-    axins.set_title("Zoom at -3 dB", fontsize=9)
+    axins.set_title("Zoom at -3 dB (Log Scale)", fontsize=9)
+    
+    # Fix x-ticks for log scale zoom to look right
+    from matplotlib.ticker import ScalarFormatter
+    axins.xaxis.set_major_formatter(ScalarFormatter())
     axins.set_xticks([707, 1000, 1414])
     axins.set_xticklabels(["707", "1k", "1.4k"], fontsize=8)
     
