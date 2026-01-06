@@ -355,21 +355,38 @@ spl_c2, _, xb_cheby2 = octavefilter(y, fs=fs, fraction=1, sigbands=True, filter_
 ## 📖 Theoretical Background
 
 ### Octave Band Frequencies (ANSI S1.11 / IEC 61260)
-The mid-band frequencies ($f_m$) and edges ($f_1, f_2$) use a base-10 ratio $G = 10^{0.3}$:
-- Mid-band: $f_m = 1000 \cdot G^{x/b}$ (for odd $b$)
-- Band edges: $f_1 = f_m \cdot G^{-1/2b}$, $f_2 = f_m \cdot G^{1/2b}$
+The mid-band frequencies (fm) and edges (f1, f2) use a base-10 ratio:
+$$ G = 10^{0.3} $$
 
-### Magnitude Responses $|H(j\omega)|$
+*   **Mid-band:**
+    $$ f_m = 1000 \cdot G^{x/b} $$
+    (for odd b)
+*   **Band edges:**
+    $$ f_1 = f_m \cdot G^{-1/2b}, \quad f_2 = f_m \cdot G^{1/2b} $$
+
+### Magnitude Responses |H(jw)|
 The library implements standard classical filter prototypes:
-1.  **Butterworth:** $|H(j\omega)| = \frac{1}{\sqrt{1 + (\omega/\omega_c)^{2n}}}$ (Maximally flat passband)
-2.  **Chebyshev I:** $|H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 T_n^2(\omega/\omega_c)}}$ (Equiripple in passband, steeper roll-off)
+
+1.  **Butterworth:** Maximally flat passband.
+    $$ |H(j\omega)| = \frac{1}{\sqrt{1 + (\omega/\omega_c)^{2n}}} $$
+
+2.  **Chebyshev I:** Equiripple in passband, steeper roll-off.
+    $$ |H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 T_n^2(\omega/\omega_c)}} $$
+
 3.  **Chebyshev II:** Inverse Chebyshev, equiripple in stopband, flat passband.
-4.  **Elliptic:** $|H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 R_n^2(\omega/\omega_c, L)}}$ (Equiripple in both, maximum selectivity)
+    $$ |H(j\omega)| = \frac{1}{\sqrt{1 + \frac{1}{\epsilon^2 T_n^2(\omega_{stop}/\omega)}}} $$
+
+4.  **Elliptic:** Equiripple in both, maximum selectivity.
+    $$ |H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 R_n^2(\omega/\omega_c, L)}} $$
+
+5.  **Bessel:** Maximally flat group delay (linear phase).
+    $$ H(s) = \frac{\theta_n(0)}{\theta_n(s/\omega_0)} $$
+    (Where $\theta_n$ is the reverse Bessel polynomial)
 
 ### Filter Bank Design & Numerical Stability
 To ensure **100% stability** across the entire audible spectrum (even at low frequencies like 16Hz with high sample rates), PyOctaveBand employs two critical strategies:
 
-1.  **Second-Order Sections (SOS):** All filters are implemented as a series of cascaded biquads. This avoids the catastrophic numerical precision loss associated with high-order transfer functions ($a, b$ coefficients).
+1.  **Second-Order Sections (SOS):** All filters are implemented as a series of cascaded biquads. This avoids the catastrophic numerical precision loss associated with high-order transfer functions (coefficients a, b).
 2.  **Multi-rate Decimation:** For low-frequency bands, the signal is automatically downsampled (decimated) before filtering and upsampled afterwards. This keeps the digital pole locations far from the unit circle boundary, preventing oscillation and noise.
 
 ### Weighting Curves (IEC 61672-1)
@@ -381,7 +398,7 @@ $$A(f) = 20 \log_{10}(R_A(f)) + 2.00$$
 Implemented as a first-order IIR exponential integrator:
 $$y[n] = \alpha \cdot x^2[n] + (1 - \alpha) \cdot y[n-1]$$
 $$\alpha = 1 - e^{-1 / (f_s \cdot \tau)}$$
-Where $\tau$ is the time constant (e.g., 125ms for Fast).
+Where `tau` is the time constant (e.g., 125ms for Fast).
 
 ---
 
