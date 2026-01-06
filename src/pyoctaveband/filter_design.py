@@ -23,7 +23,22 @@ def _design_sos_filter(
     show: bool = False,
     plot_file: Optional[str] = None,
 ) -> List[np.ndarray]:
-    """Generate SOS coefficients for the filter bank."""
+    """
+    Generate SOS coefficients for the filter bank.
+
+    :param freq: Center frequencies.
+    :param freq_d: Lower edge frequencies.
+    :param freq_u: Upper edge frequencies.
+    :param fs: Original sample rate.
+    :param order: Filter order.
+    :param factor: Downsampling factors per band.
+    :param filter_type: Type of filter.
+    :param ripple: Passband ripple (dB).
+    :param attenuation: Stopband attenuation (dB).
+    :param show: If True, plot response.
+    :param plot_file: Path to save plot.
+    :return: List of SOS coefficient arrays.
+    """
     sos = [np.array([]) for _ in range(len(freq))]
 
     for idx, (lower, upper) in enumerate(zip(freq_d, freq_u)):
@@ -56,7 +71,18 @@ def _showfilter(
     show: bool = False,
     plot_file: Optional[str] = None,
 ) -> None:
-    """Visualize filter bank frequency response."""
+    """
+    Visualize filter bank frequency response.
+
+    :param sos: List of SOS coefficients.
+    :param freq: Center frequencies.
+    :param freq_u: Upper edges.
+    :param freq_d: Lower edges.
+    :param fs: Original sample rate.
+    :param factor: Downsampling factors.
+    :param show: If True, show the plot.
+    :param plot_file: Path to save the plot.
+    """
     wn = 8192
     w = np.zeros([wn, len(freq)])
     h: np.ndarray = np.zeros([wn, len(freq)], dtype=np.complex128)

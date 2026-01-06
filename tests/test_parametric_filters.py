@@ -4,12 +4,33 @@ Tests for parametric filters: Weighting (A, C), Time Weighting and Linkwitz-Rile
 """
 
 import numpy as np
+import pytest
 
-from pyoctaveband import calculate_sensitivity, linkwitz_riley, octavefilter, time_weighting, weighting_filter
+from pyoctaveband import (
+    calculate_sensitivity, 
+    linkwitz_riley, 
+    octavefilter, 
+    time_weighting, 
+    weighting_filter
+)
 
 
-def test_calibration_logic():
-    """Verify that calibration correctly maps digital RMS to target SPL."""
+def test_calibration_logic() -> None:
+    """
+    Verify that calibration correctly maps digital RMS to target SPL.
+
+    **Purpose:**
+    Confirm that the `calculate_sensitivity` function produces a multiplier that accurately
+    scales a digital signal to a known physical Sound Pressure Level (SPL) in dB.
+
+    **Verification:**
+    - Simulate a digital recording of a calibrator tone (e.g., 94 dB).
+    - Calculate the sensitivity factor.
+    - Analyze the same signal using that factor.
+
+    **Expectation:**
+    - The resulting SPL must be exactly the target value (e.g., 94.0 dB).
+    """
     fs = 48000
     # Create a 'recording' of a 94dB tone (RMS = 0.5 for example)
     rms_ref = 0.5
@@ -25,8 +46,20 @@ def test_calibration_logic():
     # It should be exactly 94 dB
     assert abs(spl[0] - 94.0) < 0.01
 
-def test_dbfs_logic():
-    """Verify dBFS mode returns RMS relative to 1.0."""
+
+def test_dbfs_logic() -> None:
+    """
+    Verify dBFS mode returns RMS relative to 1.0.
+
+    **Purpose:**
+    Ensure the `dbfs=True` option correctly calculates decibels relative to full scale (0 dBFS = RMS of 1.0).
+
+    **Verification:**
+    - Pass a sine wave with a peak of 1.0 (RMS = 0.707).
+
+    **Expectation:**
+    - The output should be approximately -3.01 dBFS.
+    """
     fs = 48000
     # Sine wave with peak 1.0 -> RMS 0.707 -> -3.01 dBFS
     t = np.linspace(0, 1, fs)
@@ -36,13 +69,21 @@ def test_dbfs_logic():
     
     assert abs(spl[0] - (-3.01)) < 0.05
 
-def test_a_weighting_response():
+
+def test_a_weighting_response() -> None:
     """
     Verify A-weighting frequency response.
-    Standard values:
-    100Hz: -19.1 dB
-    1000Hz: 0 dB
-    8000Hz: -1.1 dB
+
+    **Purpose:**
+    Confirm that the A-weighting filter matches the standardized IEC 61672-1:2013 gains at key frequencies.
+
+    **Verification:**
+    - Measure gain at 100Hz (expected -19.1 dB).
+    - Measure gain at 1000Hz (expected 0.0 dB).
+    - Measure gain at 8000Hz (expected -1.1 dB).
+
+    **Expectation:**
+    - Measured gains should match standard values within 1.0 dB.
     """
     fs = 48000
     duration = 1.0
@@ -60,13 +101,21 @@ def test_a_weighting_response():
         gain_db = 20 * np.log10(np.std(y) / np.std(x))
         assert abs(gain_db - expected) < 1.0, f"A-weighting at {f}Hz failed. Got {gain_db:.1f}dB, expected {expected}dB"
 
-def test_c_weighting_response():
+
+def test_c_weighting_response() -> None:
     """
     Verify C-weighting frequency response.
-    Standard values:
-    31.5Hz: -3.0 dB
-    1000Hz: 0 dB
-    8000Hz: -3.0 dB
+
+    **Purpose:**
+    Confirm that the C-weighting filter matches the standardized IEC 61672-1:2013 gains.
+
+    **Verification:**
+    - Measure gain at 31.5Hz (expected -3.0 dB).
+    - Measure gain at 1000Hz (expected 0.0 dB).
+    - Measure gain at 8000Hz (expected -3.0 dB).
+
+    **Expectation:**
+    - Measured gains should match standard values within 1.0 dB.
     """
     fs = 48000
     duration = 1.0
@@ -82,10 +131,20 @@ def test_c_weighting_response():
         gain_db = 20 * np.log10(np.std(y) / np.std(x))
         assert abs(gain_db - expected) < 1.0, f"C-weighting at {f}Hz failed. Got {gain_db:.1f}dB, expected {expected}dB"
 
-def test_time_weighting_fast():
+
+def test_time_weighting_fast() -> None:
     """
     Verify Fast (125ms) time weighting response to a step.
-    The signal should reach ~63% of its final value in one tau (125ms).
+
+    **Purpose:**
+    Validate the exponential integration constant ($\tau$) for time ballistics.
+
+    **Verification:**
+    - Apply a unit step (DC 1.0) to the fast integrator.
+    - Measure the value at $t = \tau$.
+
+    **Expectation:**
+    - The value should be approximately $1 - e^{-1} \approx 0.632$ (63.2% rise).
     """
     fs = 1000
     tau = 0.125
@@ -98,10 +157,22 @@ def test_time_weighting_fast():
     # Expected: 1 - exp(-1) approx 0.632
     assert abs(y[idx_tau] - 0.632) < 0.05
 
-def test_linkwitz_riley_sum():
+
+def test_linkwitz_riley_sum() -> None:
     """
     Verify that the sum of Linkwitz-Riley bands is flat.
-    The gain of the sum should be 1.0 (0 dB).
+
+    **Purpose:**
+    The defining characteristic of an LR4 crossover is that the combined response of the
+    low-pass and high-pass bands is perfectly flat.
+
+    **Verification:**
+    - Split white noise at 1000 Hz using `linkwitz_riley`.
+    - Sum the resulting bands.
+    - Measure the total RMS gain.
+
+    **Expectation:**
+    - The gain of the sum should be 1.0 (0 dB) with very low error ($< 0.1$ dB).
     """
     fs = 48000
     x = np.random.randn(fs)
@@ -116,8 +187,20 @@ def test_linkwitz_riley_sum():
     gain_db = 20 * np.log10(np.std(y_sum) / np.std(x))
     assert abs(gain_db) < 0.1, f"Linkwitz-Riley sum not flat: {gain_db:.2f} dB"
 
-def test_weighting_z_bypass():
-    """Verify Z-weighting is a bypass."""
+
+def test_weighting_z_bypass() -> None:
+    """
+    Verify Z-weighting is a bypass.
+
+    **Purpose:**
+    Confirm that 'Z' (Zero weighting) does not modify the signal.
+
+    **Verification:**
+    - Compare input and output arrays.
+
+    **Expectation:**
+    - Arrays must be identical.
+    """
     x = np.random.randn(1000)
     y = weighting_filter(x, 48000, curve="Z")
     assert np.all(x == y)

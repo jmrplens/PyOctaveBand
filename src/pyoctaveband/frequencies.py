@@ -13,7 +13,13 @@ def getansifrequencies(
     fraction: float,
     limits: Optional[List[float]] = None,
 ) -> Tuple[List[float], List[float], List[float]]:
-    """Calculate frequencies according to ANSI/IEC standards."""
+    """
+    Calculate frequencies according to ANSI/IEC standards.
+
+    :param fraction: Bandwidth fraction (e.g., 1, 3).
+    :param limits: [f_min, f_max] limits.
+    :return: Tuple of (center_freqs, lower_edges, upper_edges).
+    """
     if limits is None:
         limits = [12, 20000]
 
@@ -34,26 +40,59 @@ def getansifrequencies(
 
     return freq.tolist(), freq_d.tolist(), freq_u.tolist()
 
+
 def _initindex(f: float, fr: float, g: float, b: float) -> int:
-    """Calculate starting index for band generation."""
+    """
+    Calculate starting index for band generation.
+
+    :param f: Frequency.
+    :param fr: Reference frequency.
+    :param g: Base ratio.
+    :param b: Bandwidth fraction.
+    :return: Index integer.
+    """
     if round(b) % 2:
         return int(np.round((b * np.log(f / fr) + 30 * np.log(g)) / np.log(g)))
     return int(np.round((2 * b * np.log(f / fr) + 59 * np.log(g)) / (2 * np.log(g))))
 
+
 def _ratio(g: float, x: int, b: float) -> float:
-    """Calculate ratio for center frequency."""
+    """
+    Calculate ratio for center frequency.
+
+    :param g: Base ratio.
+    :param x: Index.
+    :param b: Bandwidth fraction.
+    :return: Frequency ratio.
+    """
     if round(b) % 2:
         return float(g ** ((x - 30) / b))
     return float(g ** ((2 * x - 59) / (2 * b)))
 
+
 def _bandedge(g: float, b: float) -> float:
-    """Calculate band-edge ratio."""
+    """
+    Calculate band-edge ratio.
+
+    :param g: Base ratio.
+    :param b: Bandwidth fraction.
+    :return: Edge ratio.
+    """
     return float(g ** (1 / (2 * b)))
+
 
 def _deleteouters(
     freq: List[float], freq_d: List[float], freq_u: List[float], fs: int
 ) -> Tuple[List[float], List[float], List[float]]:
-    """Remove bands exceeding the Nyquist frequency."""
+    """
+    Remove bands exceeding the Nyquist frequency.
+
+    :param freq: Center frequencies.
+    :param freq_d: Lower edges.
+    :param freq_u: Upper edges.
+    :param fs: Sample rate.
+    :return: Filtered (center, lower, upper) frequencies.
+    """
     freq_arr = np.array(freq)
     freq_d_arr = np.array(freq_d)
     freq_u_arr = np.array(freq_u)
@@ -67,13 +106,27 @@ def _deleteouters(
 
     return freq_arr.tolist(), freq_d_arr.tolist(), freq_u_arr.tolist()
 
+
 def _genfreqs(limits: List[float], fraction: float, fs: int) -> Tuple[List[float], List[float], List[float]]:
-    """Determine band frequencies within limits."""
+    """
+    Determine band frequencies within limits.
+
+    :param limits: [f_min, f_max].
+    :param fraction: Bandwidth fraction.
+    :param fs: Sample rate.
+    :return: Tuple of center, lower, and upper frequencies.
+    """
     freq, freq_d, freq_u = getansifrequencies(fraction, limits)
     return _deleteouters(freq, freq_d, freq_u, fs)
 
+
 def normalizedfreq(fraction: int) -> List[float]:
-    """Get standardized IEC center frequencies."""
+    """
+    Get standardized IEC center frequencies.
+
+    :param fraction: 1 or 3 (Octave or 1/3 Octave).
+    :return: List of standard frequencies.
+    """
     predefined = {
         1: [16, 31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000],
         3: [

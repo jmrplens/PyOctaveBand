@@ -13,7 +13,7 @@ from pyoctaveband import OctaveFilterBank, octavefilter
     (1, 11),  # Standard 1 octave bands in [12, 20000] approx
     (3, 33),  # Standard 1/3 octave
 ])
-def test_band_count_estimates(fraction, expected_bands):
+def test_band_count_estimates(fraction: float, expected_bands: int) -> None:
     """
     Verify that the filter bank generates the expected number of frequency bands.
 
@@ -41,7 +41,7 @@ def test_band_count_estimates(fraction, expected_bands):
 
 
 @pytest.mark.parametrize("dtype", [np.float32, np.float64])
-def test_input_dtypes(dtype):
+def test_input_dtypes(dtype: np.dtype) -> None:
     """
     Ensure the library correctly handles different floating-point precisions.
 
@@ -67,7 +67,7 @@ def test_input_dtypes(dtype):
 
 
 @pytest.mark.parametrize("channels", [1, 2, 4])
-def test_multichannel_shapes(channels):
+def test_multichannel_shapes(channels: int) -> None:
     """
     Verify the library handles different channel counts (Mono, Stereo, Multichannel).
 
@@ -103,7 +103,7 @@ def test_multichannel_shapes(channels):
 
 @pytest.mark.parametrize("filter_type", ["butter", "cheby1", "cheby2", "ellip", "bessel"])
 @pytest.mark.parametrize("target_freq", [63, 1000, 8000])
-def test_frequency_isolation(target_freq, filter_type):
+def test_frequency_isolation(target_freq: float, filter_type: str) -> None:
     """
     Critical Audio Test: Verify spectral isolation of pure tones.
 
@@ -154,7 +154,7 @@ def test_frequency_isolation(target_freq, filter_type):
 
 
 @pytest.mark.parametrize("filter_type", ["butter", "cheby1", "cheby2", "ellip", "bessel"])
-def test_impulse_response_decay(filter_type):
+def test_impulse_response_decay(filter_type: str) -> None:
     """
     Verify filter stability using the Impulse Response (IR).
 
@@ -185,8 +185,22 @@ def test_impulse_response_decay(filter_type):
         assert energy < 1e-5, f"Filter {filter_type} unstable or ringing too long"
 
 
-def test_filterbank_class_direct():
-    """Verify direct usage of OctaveFilterBank class."""
+def test_filterbank_class_direct() -> None:
+    """
+    Verify direct usage of OctaveFilterBank class.
+
+    **Purpose:**
+    Confirm that the class can be instantiated and used independently of the wrapper function.
+
+    **Verification:**
+    - Instantiate `OctaveFilterBank`.
+    - Process noise.
+    - Process a scaled version of the same noise.
+
+    **Expectation:**
+    - Output should be valid.
+    - Scaled input should result in lower SPL.
+    """
     fs = 44100
     bank = OctaveFilterBank(fs, fraction=3)
     x = np.random.randn(fs)
@@ -198,4 +212,3 @@ def test_filterbank_class_direct():
     # Test reuse
     spl2, freq2 = bank.filter(x * 0.5)
     assert np.all(spl2 < spl)
-

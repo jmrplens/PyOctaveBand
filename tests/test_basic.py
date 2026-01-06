@@ -9,7 +9,7 @@ import numpy as np
 import pyoctaveband as PyOctaveBand
 
 
-def test_octave_filter_basic():
+def test_octave_filter_basic() -> None:
     """
     Basic sanity check for the octave filter.
 
@@ -43,7 +43,7 @@ def test_octave_filter_basic():
     assert not np.isnan(spl).any()
 
 
-def test_octave_filter_sigbands():
+def test_octave_filter_sigbands() -> None:
     """
     Test the retrieval of time-domain filtered signals (`sigbands=True`).
 

@@ -239,7 +239,7 @@ low, high = linkwitz_riley(signal, fs, freq=1000, order=4)
 
 PyOctaveBand can return results in physical **Sound Pressure Level (dB SPL)** or digital **decibels relative to Full Scale (dBFS)**.
 
-### Physical Calibration (Sonómetro)
+### Physical Calibration (Sound Level Meter)
 To get accurate SPL measurements from a digital recording, you must first calculate the sensitivity of your measurement chain using a reference tone (e.g., 94 dB @ 1kHz).
 
 ```python

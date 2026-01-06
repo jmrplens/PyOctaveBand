@@ -32,7 +32,22 @@ class OctaveFilterBank:
         plot_file: Optional[str] = None,
         calibration_factor: float = 1.0,
         dbfs: bool = False,
-    ):
+    ) -> None:
+        """
+        Initialize the Octave Filter Bank.
+
+        :param fs: Sample rate in Hz.
+        :param fraction: Bandwidth fraction (e.g., 1 for octave, 3 for 1/3 octave).
+        :param order: Filter order.
+        :param limits: Frequency limits [f_min, f_max].
+        :param filter_type: Type of filter ('butter', 'cheby1', 'cheby2', 'ellip', 'bessel').
+        :param ripple: Passband ripple in dB.
+        :param attenuation: Stopband attenuation in dB.
+        :param show: If True, show the filter response plot.
+        :param plot_file: Path to save the filter response plot.
+        :param calibration_factor: Calibration factor for SPL calculation.
+        :param dbfs: If True, calculate SPL in dBFS.
+        """
         if fs <= 0:
             raise ValueError("Sample rate 'fs' must be positive.")
         if fraction <= 0:
@@ -78,7 +93,13 @@ class OctaveFilterBank:
         x: Union[List[float], np.ndarray], 
         sigbands: bool = False
     ) -> Union[Tuple[np.ndarray, List[float]], Tuple[np.ndarray, List[float], List[np.ndarray]]]:
-        """Apply the pre-designed filter bank to a signal."""
+        """
+        Apply the pre-designed filter bank to a signal.
+
+        :param x: Input signal (1D array or 2D array [channels, samples]).
+        :param sigbands: If True, also return the signal in the time domain divided into bands.
+        :return: A tuple containing (SPL_array, Frequencies_list) or (SPL_array, Frequencies_list, signals).
+        """
         
         # Convert input to numpy array
         x_proc = _typesignal(x)
@@ -110,7 +131,14 @@ class OctaveFilterBank:
         num_channels: int,
         sigbands: bool,
     ) -> Tuple[np.ndarray, Optional[List[np.ndarray]]]:
-        """Process signal through each frequency band."""
+        """
+        Process signal through each frequency band.
+
+        :param x_proc: Standardized 2D input signal [channels, samples].
+        :param num_channels: Number of channels.
+        :param sigbands: If True, return filtered bands.
+        :return: A tuple containing (SPL_array, Optional_List_of_filtered_signals).
+        """
         spl = np.zeros([num_channels, self.num_bands])
         xb: Optional[List[np.ndarray]] = [np.array([]) for _ in range(self.num_bands)] if sigbands else None
 

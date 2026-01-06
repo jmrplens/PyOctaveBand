@@ -10,13 +10,22 @@ import numpy as np
 from pyoctaveband import OctaveFilterBank, octavefilter
 
 
-def test_filterbank_reuse_performance():
+def test_filterbank_reuse_performance() -> None:
     """
     Verify that reusing OctaveFilterBank is faster than calling octavefilter multiple times.
     
     **Purpose:**
     The refactored class-based approach allows pre-calculating SOS coefficients.
     Subsequent filtering should be faster as it skips the design phase.
+
+    **Verification:**
+    - Perform 10 iterations of filtering using the functional API (which re-designs every time).
+    - Perform 10 iterations of filtering using a pre-initialized `OctaveFilterBank`.
+    - Measure and compare the total execution time.
+
+    **Expectation:**
+    - Class-based filtering (after initialization) must be significantly faster.
+    - Total time (init + 10 filters) should also be less than 10 functional calls.
     """
     fs = 48000
     duration = 0.5

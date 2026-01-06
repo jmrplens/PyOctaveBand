@@ -67,6 +67,7 @@ def weighting_filter(x: Union[List[float], np.ndarray], fs: int, curve: str = "A
     
     return cast(np.ndarray, signal.sosfilt(sos, x_proc))
 
+
 def time_weighting(x: Union[List[float], np.ndarray], fs: int, mode: str = "fast") -> np.ndarray:
     """
     Apply time weighting to a signal (Exponential averaging).
@@ -97,6 +98,7 @@ def time_weighting(x: Union[List[float], np.ndarray], fs: int, mode: str = "fast
     
     # We apply the weighting to the squared signal to get the Mean Square value
     return cast(np.ndarray, signal.lfilter(b, a, x_proc**2))
+
 
 def linkwitz_riley(
     x: Union[List[float], np.ndarray], 
