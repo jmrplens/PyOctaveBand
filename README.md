@@ -220,9 +220,27 @@ low, high = linkwitz_riley(signal, fs, freq=1000, order=4)
 
 ## 📊 Signal Decomposition and Stability
 
-Retrieve the time-domain components of each band with `sigbands=True`.
+By setting `sigbands=True`, you can retrieve the time-domain components of each band. This is useful for advanced analysis or signal reconstruction.
+
+```python
+import numpy as np
+from pyoctaveband import octavefilter
+
+# 1. Generate a signal (Sum of 250Hz and 1000Hz)
+fs = 8000
+t = np.linspace(0, 0.5, fs // 2, endpoint=False)
+y = np.sin(2 * np.pi * 250 * t) + np.sin(2 * np.pi * 1000 * t)
+
+# 2. Filter into octave bands and get time-domain signals (sigbands=True)
+spl, freq, xb = octavefilter(y, fs=fs, fraction=1, sigbands=True)
+
+# 'xb' is a list of arrays, where xb[i] is the signal filtered in band freq[i]
+# Each band in 'xb' has the same length as the original input 'y'.
+```
 
 <img src=".github/images/signal_decomposition.png" width="80%"></img>
+
+*The bottom plot shows the **Impulse Response** of a band, demonstrating the stability and decay characteristics of the filter.*
 
 ---
 
