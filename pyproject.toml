@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "PyOctaveBand"
-version = "1.0.2"
+version = "1.0.3"
 authors = [
   { name="Jose Manuel Requena Plens", email="jmrplens@gmail.com" },
 ]
