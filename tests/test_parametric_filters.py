@@ -5,70 +5,38 @@ Tests for parametric filters: Weighting (A, C), Time Weighting and Linkwitz-Rile
 
 import numpy as np
 
-from pyoctaveband import calculate_sensitivity, linkwitz_riley, time_weighting, weighting_filter
+from pyoctaveband import calculate_sensitivity, linkwitz_riley, octavefilter, time_weighting, weighting_filter
 
 
 def test_calibration_logic():
-
     """Verify that calibration correctly maps digital RMS to target SPL."""
-
     fs = 48000
-
     # Create a 'recording' of a 94dB tone (RMS = 0.5 for example)
-
     rms_ref = 0.5
-
     t = np.linspace(0, 1, fs)
-
     ref_signal = rms_ref * np.sqrt(2) * np.sin(2 * np.pi * 1000 * t)
-
     
-
     # Calculate sensitivity
-
     factor = calculate_sensitivity(ref_signal, target_spl=94.0)
-
     
-
     # Analyze same signal with that factor
-
-    from pyoctaveband import octavefilter
-
     spl, freq = octavefilter(ref_signal, fs, fraction=1, limits=[800, 1200], calibration_factor=factor)
-
     
-
     # It should be exactly 94 dB
-
     assert abs(spl[0] - 94.0) < 0.01
 
-
-
 def test_dbfs_logic():
-
     """Verify dBFS mode returns RMS relative to 1.0."""
-
     fs = 48000
-
     # Sine wave with peak 1.0 -> RMS 0.707 -> -3.01 dBFS
-
     t = np.linspace(0, 1, fs)
-
     x = np.sin(2 * np.pi * 1000 * t)
-
     
-
-    from pyoctaveband import octavefilter
-
     spl, freq = octavefilter(x, fs, fraction=1, limits=[800, 1200], dbfs=True)
-
     
-
     assert abs(spl[0] - (-3.01)) < 0.05
 
-
-
-
+def test_a_weighting_response():
     """
     Verify A-weighting frequency response.
     Standard values:
@@ -142,8 +110,6 @@ def test_linkwitz_riley_sum():
     lp, hp = linkwitz_riley(x, fs, freq=1000, order=4)
     
     # Sum of bands
-    # For LR4, the signals are in phase, but we might need to invert one depending on implementation.
-    # Actually, LR4 sum is flat when summed directly.
     y_sum = lp + hp
     
     # Check RMS ratio
