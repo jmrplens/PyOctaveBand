@@ -70,7 +70,7 @@ def generate_filter_type_comparison(output_dir: str) -> None:
         ("bessel", "Bessel", "#8c564b", "-"),
     ]
     
-    fig, ax = plt.subplots(figsize=(10, 7))
+    _, ax = plt.subplots(figsize=(10, 7))
     
     # Create inset axis for zoom (increased height to 45%)
     from mpl_toolkits.axes_grid1.inset_locator import inset_axes
@@ -88,7 +88,7 @@ def generate_filter_type_comparison(output_dir: str) -> None:
         mag_db = 20 * np.log10(np.abs(h) + 1e-9)
         
         ax.semilogx(w, mag_db, label=label, color=color, linestyle=style)
-        axins.plot(w, mag_db, color=color, linestyle=style) # plot is fine if scale is set
+        axins.plot(w, mag_db, color=color, linestyle=style)
 
     ax.axhline(-3, color="black", linestyle=":", alpha=0.3, label="-3 dB")
     axins.axhline(-3, color="black", linestyle=":", alpha=0.3)
@@ -254,7 +254,7 @@ def generate_decomposition_plot(output_dir: str) -> None:
     _, freq, xb = bank.filter(y, sigbands=True)
 
     num_plots = len(xb) + 2 # +1 for original, +1 for impulse response
-    fig, axes = plt.subplots(num_plots, 1, figsize=(10, 1.8 * num_plots), sharex=False)
+    _, axes = plt.subplots(num_plots, 1, figsize=(10, 1.8 * num_plots), sharex=False)
 
     # Fixed Y limits for decomposition
     y_lim = (-2.5, 2.5)
@@ -303,7 +303,7 @@ def generate_weighting_responses(output_dir: str) -> None:
     
     from pyoctaveband import weighting_filter
     
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     
     curves = [
         ("A", "A-Weighting", COLOR_PRIMARY),
@@ -345,7 +345,7 @@ def generate_time_weighting_plot(output_dir: str) -> None:
     fast = time_weighting(x, fs, mode="fast")
     slow = time_weighting(x, fs, mode="slow")
     
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     ax.plot(t, x_sq, color=COLOR_GRID, alpha=0.5, label="Instantaneous Energy ($x^2$)")
     ax.plot(t, fast, color=COLOR_PRIMARY, label="Fast (125ms)")
     ax.plot(t, slow, color=COLOR_SECONDARY, label="Slow (1000ms)")
@@ -363,17 +363,11 @@ def generate_crossover_plot(output_dir: str) -> None:
     """Visualize Linkwitz-Riley 4th Order Crossover."""
     print("Generating crossover_lr4.png...")
     fs = 48000
-    # Log sweep for testing
-    t = np.linspace(0, 1, fs, endpoint=False)
-    x = scipy_signal.chirp(t, f0=20, t1=1, f1=20000, method='logarithmic')
     
     from pyoctaveband import linkwitz_riley
     
-    lp, hp = linkwitz_riley(x, fs, freq=1000, order=4)
-    
     # Frequency analysis
-    w_lp, h_lp = scipy_signal.freqz(lp, x, worN=8192, fs=fs) # This is not correct for freqz, 
-    # better to use IR
+    # Measure response using IR
     impulse = np.zeros(fs)
     impulse[0] = 1.0
     lp_ir, hp_ir = linkwitz_riley(impulse, fs, freq=1000, order=4)
@@ -381,7 +375,7 @@ def generate_crossover_plot(output_dir: str) -> None:
     w, h_lp = scipy_signal.freqz(lp_ir, worN=8192, fs=fs)
     _, h_hp = scipy_signal.freqz(hp_ir, worN=8192, fs=fs)
     
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     ax.semilogx(w, 20 * np.log10(np.abs(h_lp) + 1e-9), color=COLOR_PRIMARY, label="Low Pass (LR4)")
     ax.semilogx(w, 20 * np.log10(np.abs(h_hp) + 1e-9), color=COLOR_SECONDARY, label="High Pass (LR4)")
     ax.semilogx(w, 20 * np.log10(np.abs(h_lp + h_hp) + 1e-9), color="black", linestyle="--", label="Sum (Flat)")

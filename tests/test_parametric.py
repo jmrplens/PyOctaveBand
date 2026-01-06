@@ -34,7 +34,7 @@ def test_band_count_estimates(fraction: float, expected_bands: int) -> None:
     x = np.zeros(fs)
     limits = [12, 20000]
     
-    spl, freq = octavefilter(x, fs, fraction=fraction, limits=limits)
+    _, freq = octavefilter(x, fs, fraction=fraction, limits=limits)
     
     # We allow some flexibility as exact count depends on limits implementation details
     assert abs(len(freq) - expected_bands) <= 2, f"Expected approx {expected_bands} bands, got {len(freq)}"
@@ -59,9 +59,10 @@ def test_input_dtypes(dtype: np.dtype) -> None:
     - The internal processing (via scipy/numpy) usually promotes to float64, so the output dtype is checked.
     """
     fs = 48000
-    x = np.random.randn(fs).astype(dtype)
+    rng = np.random.default_rng(42)
+    x = rng.standard_normal(fs).astype(dtype)
     
-    spl, freq = octavefilter(x, fs)
+    spl, _ = octavefilter(x, fs)
     assert not np.isnan(spl).any()
     assert spl.dtype == np.float64 # Internal processing is likely float64
 
@@ -86,11 +87,12 @@ def test_multichannel_shapes(channels: int) -> None:
     fs = 48000
     duration = 0.1
     samples = int(fs * duration)
+    rng = np.random.default_rng(42)
     
     if channels == 1:
-        x = np.random.randn(samples)
+        x = rng.standard_normal(samples)
     else:
-        x = np.random.randn(channels, samples)
+        x = rng.standard_normal((channels, samples))
         
     spl, freq = octavefilter(x, fs)
     
@@ -202,13 +204,14 @@ def test_filterbank_class_direct() -> None:
     - Scaled input should result in lower SPL.
     """
     fs = 44100
+    rng = np.random.default_rng(42)
     bank = OctaveFilterBank(fs, fraction=3)
-    x = np.random.randn(fs)
+    x = rng.standard_normal(fs)
     
     spl, freq = bank.filter(x)
     assert len(freq) > 0
     assert spl.shape == (len(freq),)
     
     # Test reuse
-    spl2, freq2 = bank.filter(x * 0.5)
+    spl2, _ = bank.filter(x * 0.5)
     assert np.all(spl2 < spl)

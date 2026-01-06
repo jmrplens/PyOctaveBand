@@ -29,7 +29,8 @@ def test_filterbank_reuse_performance() -> None:
     """
     fs = 48000
     duration = 0.5
-    x = np.random.randn(int(fs * duration))
+    rng = np.random.default_rng(42)
+    x = rng.standard_normal(int(fs * duration))
     num_iterations = 10
     
     # 1. Using functional API (re-designs every time)

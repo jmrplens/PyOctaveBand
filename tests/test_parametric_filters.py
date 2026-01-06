@@ -34,7 +34,7 @@ def test_calibration_logic() -> None:
     factor = calculate_sensitivity(ref_signal, target_spl=94.0)
     
     # Analyze same signal with that factor
-    spl, freq = octavefilter(ref_signal, fs, fraction=1, limits=[800, 1200], calibration_factor=factor)
+    spl, _ = octavefilter(ref_signal, fs, fraction=1, limits=[800, 1200], calibration_factor=factor)
     
     # It should be exactly 94 dB
     assert abs(spl[0] - 94.0) < 0.01
@@ -58,7 +58,7 @@ def test_dbfs_logic() -> None:
     t = np.linspace(0, 1, fs)
     x = np.sin(2 * np.pi * 1000 * t)
     
-    spl, freq = octavefilter(x, fs, fraction=1, limits=[800, 1200], dbfs=True)
+    spl, _ = octavefilter(x, fs, fraction=1, limits=[800, 1200], dbfs=True)
     
     assert abs(spl[0] - (-3.01)) < 0.05
 
@@ -82,7 +82,6 @@ def test_peak_mode_logic() -> None:
     x = np.zeros(fs)
     x[100] = 0.5  # Large peak
     
-    from pyoctaveband import octavefilter
     spl_rms, _ = octavefilter(x, fs, mode="rms", fraction=1)
     spl_peak, _ = octavefilter(x, fs, mode="peak", fraction=1)
     
@@ -92,6 +91,7 @@ def test_peak_mode_logic() -> None:
     # Theoretical peak for 0.5: 20*log10(0.5 / 2e-5) = 20*log10(25000) approx 87.9 dB
     # (Minus some attenuation due to the filter bandwidth and energy spreading)
     assert np.max(spl_peak) > 75.0
+
 
 def test_a_weighting_response() -> None:
     """
@@ -198,7 +198,8 @@ def test_linkwitz_riley_sum() -> None:
     - The gain of the sum should be 1.0 (0 dB) with very low error ($< 0.1$ dB).
     """
     fs = 48000
-    x = np.random.randn(fs)
+    rng = np.random.default_rng(42)
+    x = rng.standard_normal(fs)
     
     # Split at 1000 Hz
     lp, hp = linkwitz_riley(x, fs, freq=1000, order=4)
@@ -224,6 +225,7 @@ def test_weighting_z_bypass() -> None:
     **Expectation:**
     - Arrays must be identical.
     """
-    x = np.random.randn(1000)
+    rng = np.random.default_rng(42)
+    x = rng.standard_normal(1000)
     y = weighting_filter(x, 48000, curve="Z")
     assert np.all(x == y)

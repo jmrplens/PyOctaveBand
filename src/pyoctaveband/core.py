@@ -3,7 +3,7 @@
 Core processing logic and FilterBank class for pyoctaveband.
 """
 
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union, cast
 
 import numpy as np
 from scipy import signal
@@ -148,16 +148,10 @@ class OctaveFilterBank:
 
         for idx in range(self.num_bands):
             for ch in range(num_channels):
-                # Resample signal for this specific band to improve accuracy
-                # Use resample_poly for better stability than FFT-based resample
-                if self.factor[idx] > 1:
-                    sd = signal.resample_poly(x_proc[ch], 1, self.factor[idx])
-                else:
-                    sd = x_proc[ch]
-                
-                filtered_signal = signal.sosfilt(self.sos[idx], sd)
+                # Core DSP logic extracted to reduce complexity
+                filtered_signal = self._filter_and_resample(x_proc[ch], idx)
 
-                # Sound Level Calculation extracted to reduce complexity
+                # Sound Level Calculation
                 spl[ch, idx] = self._calculate_level(filtered_signal, mode)
 
                 if sigbands and xb is not None:
@@ -167,6 +161,15 @@ class OctaveFilterBank:
                         xb[idx] = np.zeros([num_channels, x_proc.shape[1]])
                     xb[idx][ch] = y_resampled
         return spl, xb
+
+    def _filter_and_resample(self, x_ch: np.ndarray, idx: int) -> np.ndarray:
+        """Resample and filter a single channel for a specific band."""
+        if self.factor[idx] > 1:
+            sd = signal.resample_poly(x_ch, 1, self.factor[idx])
+        else:
+            sd = x_ch
+        
+        return cast(np.ndarray, signal.sosfilt(self.sos[idx], sd))
 
     def _calculate_level(self, y: np.ndarray, mode: str) -> float:
         """Calculate the level (RMS or Peak) in dB."""

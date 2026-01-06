@@ -26,6 +26,5 @@ def calculate_sensitivity(
     if rms_ref == 0:
         raise ValueError("Reference signal is silent, cannot calibrate.")
         
-    # target_spl = 20 * log10( (rms_ref * factor) / ref_pressure )
     factor = (ref_pressure * 10**(target_spl / 20)) / rms_ref
     return float(factor)

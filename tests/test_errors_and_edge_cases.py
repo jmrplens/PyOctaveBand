@@ -67,7 +67,8 @@ def test_weighting_filter_invalid() -> None:
     **Expectation:**
     - Raise `ValueError`.
     """
-    x = np.random.randn(1000)
+    rng = np.random.default_rng(42)
+    x = rng.standard_normal(1000)
     with pytest.raises(ValueError, match="must be 'A', 'C' or 'Z'"):
         weighting_filter(x, 48000, curve="B")
 
@@ -85,7 +86,8 @@ def test_time_weighting_invalid() -> None:
     **Expectation:**
     - Raise `ValueError`.
     """
-    x = np.random.randn(1000)
+    rng = np.random.default_rng(42)
+    x = rng.standard_normal(1000)
     with pytest.raises(ValueError, match="Invalid time weighting mode"):
         time_weighting(x, 48000, mode="instant")
 
@@ -103,7 +105,8 @@ def test_linkwitz_riley_invalid() -> None:
     **Expectation:**
     - Raise `ValueError`.
     """
-    x = np.random.randn(1000)
+    rng = np.random.default_rng(42)
+    x = rng.standard_normal(1000)
     with pytest.raises(ValueError, match="order must be even"):
         linkwitz_riley(x, 48000, freq=1000, order=3)
 
@@ -142,7 +145,8 @@ def test_octave_filter_vs_class_consistency() -> None:
     - Arrays should be numerically identical.
     """
     fs = 44100
-    x = np.random.randn(fs)
+    rng = np.random.default_rng(42)
+    x = rng.standard_normal(fs)
     params = {
         "fs": fs,
         "fraction": 3,
@@ -200,8 +204,9 @@ def test_multichannel_consistency() -> None:
     - SPL values for each channel should match exactly.
     """
     fs = 16000
-    x1 = np.random.randn(fs)
-    x2 = np.random.randn(fs)
+    rng = np.random.default_rng(42)
+    x1 = rng.standard_normal(fs)
+    x2 = rng.standard_normal(fs)
     x_stereo = np.vstack((x1, x2))
     
     bank = OctaveFilterBank(fs, fraction=1)

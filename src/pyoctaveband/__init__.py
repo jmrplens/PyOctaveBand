@@ -4,7 +4,7 @@ Octave-Band and Fractional Octave-Band filter for signals in the time domain.
 Implementation according to ANSI s1.11-2004 and IEC 61260-1-2014.
 """
 
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union, cast
 
 import matplotlib
 import numpy as np
@@ -39,12 +39,7 @@ def octavefilter(
     show: bool = False,
     sigbands: bool = False,
     plot_file: Optional[str] = None,
-    filter_type: str = "butter",
-    ripple: float = 0.1,
-    attenuation: float = 60.0,
-    calibration_factor: float = 1.0,
-    dbfs: bool = False,
-    mode: str = "rms",
+    **kwargs: Union[str, float, bool]
 ) -> Union[Tuple[np.ndarray, List[float]], Tuple[np.ndarray, List[float], List[np.ndarray]]]:
     """
     Filter a signal with octave or fractional octave filter bank.
@@ -71,20 +66,13 @@ def octavefilter(
     :type sigbands: bool
     :param plot_file: Path to save the filter response plot.
     :type plot_file: Optional[str]
-    :param filter_type: Type of filter ('butter', 'cheby1', 'cheby2', 'ellip', 'bessel'). Default: 'butter'.
-    :type filter_type: str
-    :param ripple: Passband ripple in dB (for cheby1, ellip). Default: 0.1.
-    :type ripple: float
-    :param attenuation: Stopband attenuation in dB (for cheby2, ellip). Default: 60.0.
-    :type attenuation: float
-    :param calibration_factor: Sensitivity multiplier to map digital units to Pascals. Default: 1.0.
-    :type calibration_factor: float
-    :param dbfs: If True, return results in dB relative to Full Scale (0 dB = RMS 1.0). Default: False.
-    :type dbfs: bool
-    :param mode: 'rms' for energy-based level (default), 'peak' for peak-holding level.
-    :type mode: str
-    :return: A tuple containing (SPL_array, Frequencies_list) if sigbands is False,
-             or (SPL_array, Frequencies_list, List_of_filtered_signals) if sigbands is True.
+    :param filter_type: (Optional) Type of filter ('butter', 'cheby1', 'cheby2', 'ellip', 'bessel'). Default: 'butter'.
+    :param ripple: (Optional) Passband ripple in dB (for cheby1, ellip). Default: 0.1.
+    :param attenuation: (Optional) Stopband attenuation in dB (for cheby2, ellip). Default: 60.0.
+    :param calibration_factor: (Optional) Sensitivity multiplier. Default: 1.0.
+    :param dbfs: (Optional) If True, return results in dBFS. Default: False.
+    :param mode: (Optional) 'rms' or 'peak'. Default: 'rms'.
+    :return: A tuple containing (SPL_array, Frequencies_list) or (SPL_array, Frequencies_list, signals).
     :rtype: Union[Tuple[np.ndarray, List[float]], Tuple[np.ndarray, List[float], List[np.ndarray]]]
     """
     
@@ -94,13 +82,13 @@ def octavefilter(
         fraction=fraction,
         order=order,
         limits=limits,
-        filter_type=filter_type,
-        ripple=ripple,
-        attenuation=attenuation,
+        filter_type=cast(str, kwargs.get("filter_type", "butter")),
+        ripple=cast(float, kwargs.get("ripple", 0.1)),
+        attenuation=cast(float, kwargs.get("attenuation", 60.0)),
         show=show,
         plot_file=plot_file,
-        calibration_factor=calibration_factor,
-        dbfs=dbfs
+        calibration_factor=cast(float, kwargs.get("calibration_factor", 1.0)),
+        dbfs=cast(bool, kwargs.get("dbfs", False))
     )
     
-    return filter_bank.filter(x, sigbands=sigbands, mode=mode)
+    return filter_bank.filter(x, sigbands=sigbands, mode=cast(str, kwargs.get("mode", "rms")))
