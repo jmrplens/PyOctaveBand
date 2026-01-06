@@ -31,24 +31,23 @@ jobs:
                 python -m pip install --upgrade pip
                 pip install build twine
       
-            - name: Bump version
-              id: bump
-              run: |
-                # Read current version from pyproject.toml
-                CURRENT_VERSION=$(grep -oP 'version = "\K[^"]+' pyproject.toml)
-                echo "Current version: $CURRENT_VERSION"
-                
-                # Increment patch version
-                IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
-                NEW_PATCH=$((patch + 1))
-                NEW_VERSION="$major.$minor.$NEW_PATCH"
-                echo "New version: $NEW_VERSION"
-                
-                # Update pyproject.toml
-                sed -i "s/version = \"$CURRENT_VERSION\"/version = \"$NEW_VERSION\"/" pyproject.toml
-                
-                echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
-      
+                  - name: Bump version
+                    id: bump
+                    run: |
+                      # Read current version from pyproject.toml (only matching the one at the start of the line)
+                      CURRENT_VERSION=$(grep -m 1 -oP '^version = "\K[^"]+' pyproject.toml)
+                      echo "Current version: $CURRENT_VERSION"
+                      
+                      # Increment patch version
+                      IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+                      NEW_PATCH=$((patch + 1))
+                      NEW_VERSION="$major.$minor.$NEW_PATCH"
+                      echo "New version: $NEW_VERSION"
+                      
+                      # Update pyproject.toml
+                      sed -i "s/^version = \"$CURRENT_VERSION\"/version = \"$NEW_VERSION\"/" pyproject.toml
+                      
+                      echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT      
             - name: Commit and push changes
               run: |
                 git config --global user.name "github-actions[bot]"
