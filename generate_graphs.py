@@ -72,7 +72,8 @@ def generate_filter_type_comparison(output_dir: str) -> None:
     
     # Create inset axis for zoom
     from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-    axins = inset_axes(ax, width="35%", height="35%", loc="lower left", borderpad=3)
+    axins = inset_axes(ax, width="35%", height="35%", loc="upper left", borderpad=3)
+    axins.set_xscale("log")
     
     for f_type, label, color, style in filters:
         bank = OctaveFilterBank(fs, fraction=fraction, order=order, limits=limits, filter_type=f_type)
