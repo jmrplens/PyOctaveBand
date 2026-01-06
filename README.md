@@ -70,6 +70,25 @@ git submodule add https://github.com/jmrplens/PyOctaveBand.git
 pip install -e ./PyOctaveBand
 ```
 
+---
+
+## 📖 Quick API Reference
+
+All core functionality can be imported directly from the `pyoctaveband` package.
+
+| Name | Type | Description | Usage Snippet |
+| :--- | :--- | :--- | :--- |
+| `octavefilter` | `function` | High-level fractional octave analysis. | `spl, f = octavefilter(x, fs, fraction=3)` |
+| `OctaveFilterBank` | `class` | Class-based bank for efficient processing. | `bank = OctaveFilterBank(fs, fraction=3)` |
+| `weighting_filter` | `function` | Apply A, C, or Z frequency weighting. | `y = weighting_filter(x, fs, curve='A')` |
+| `time_weighting` | `function` | Capture energy with time ballistics. | `env = time_weighting(x, fs, mode='fast')` |
+| `linkwitz_riley` | `function` | 4th order audio crossover filter. | `lo, hi = linkwitz_riley(x, fs, freq=1000)` |
+| `calculate_sensitivity` | `function`| Calibrate digital signals to physical SPL. | `s = calculate_sensitivity(ref, target_spl=94)` |
+| `getansifrequencies` | `function` | Generate preferred ANSI frequencies. | `f = getansifrequencies(fraction=3)` |
+| `normalizedfreq` | `function` | Compute band edge frequencies. | `f_low, f_up = normalizedfreq(1000, 3)` |
+
+---
+
 ### Basic Usage: 1/3 Octave Analysis
 Analyze a signal and get the Sound Pressure Level (SPL) per frequency band.
 
@@ -315,9 +334,17 @@ The mid-band frequencies ($f_m$) and edges ($f_1, f_2$) use a base-10 ratio $G =
 - Band edges: $f_1 = f_m \cdot G^{-1/2b}$, $f_2 = f_m \cdot G^{1/2b}$
 
 ### Magnitude Responses $|H(j\omega)|$
-1.  **Butterworth:** $|H(j\omega)| = \frac{1}{\sqrt{1 + (\omega/\omega_c)^{2n}}}$ (Maximally flat)
-2.  **Chebyshev I:** $|H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 T_n^2(\omega/\omega_c)}}$ ($T_n$ is Chebyshev polynomial)
-3.  **Elliptic:** $|H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 R_n^2(\omega/\omega_c, L)}}$ ($R_n$ is Jacobian elliptic function)
+The library implements standard classical filter prototypes:
+1.  **Butterworth:** $|H(j\omega)| = \frac{1}{\sqrt{1 + (\omega/\omega_c)^{2n}}}$ (Maximally flat passband)
+2.  **Chebyshev I:** $|H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 T_n^2(\omega/\omega_c)}}$ (Equiripple in passband, steeper roll-off)
+3.  **Chebyshev II:** Inverse Chebyshev, equiripple in stopband, flat passband.
+4.  **Elliptic:** $|H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 R_n^2(\omega/\omega_c, L)}}$ (Equiripple in both, maximum selectivity)
+
+### Filter Bank Design & Numerical Stability
+To ensure **100% stability** across the entire audible spectrum (even at low frequencies like 16Hz with high sample rates), PyOctaveBand employs two critical strategies:
+
+1.  **Second-Order Sections (SOS):** All filters are implemented as a series of cascaded biquads. This avoids the catastrophic numerical precision loss associated with high-order transfer functions ($a, b$ coefficients).
+2.  **Multi-rate Decimation:** For low-frequency bands, the signal is automatically downsampled (decimated) before filtering and upsampled afterwards. This keeps the digital pole locations far from the unit circle boundary, preventing oscillation and noise.
 
 ### Weighting Curves (IEC 61672-1)
 The A-weighting transfer function:
@@ -328,6 +355,7 @@ $$A(f) = 20 \log_{10}(R_A(f)) + 2.00$$
 Implemented as a first-order IIR exponential integrator:
 $$y[n] = \alpha \cdot x^2[n] + (1 - \alpha) \cdot y[n-1]$$
 $$\alpha = 1 - e^{-1 / (f_s \cdot \tau)}$$
+Where $\tau$ is the time constant (e.g., 125ms for Fast).
 
 ---
 
