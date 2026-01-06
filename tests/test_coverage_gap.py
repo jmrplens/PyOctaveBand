@@ -4,21 +4,50 @@ Specific tests to close coverage gaps in core logic and visualization.
 """
 
 import os
+
 import numpy as np
 import pytest
-from pyoctaveband.utils import _typesignal, _resample_to_length
+
+from pyoctaveband.core import OctaveFilterBank
 from pyoctaveband.filter_design import _design_sos_filter, _showfilter
 from pyoctaveband.frequencies import getansifrequencies, normalizedfreq
-from pyoctaveband.core import OctaveFilterBank
+from pyoctaveband.utils import _resample_to_length, _typesignal
+
 
 def test_typesignal_bypass() -> None:
-    """Cover the branch where input is already a numpy array (identity check)."""
+    """
+    Cover the branch where input is already a numpy array (identity check).
+
+    **Purpose:**
+    Verify that the `_typesignal` utility function efficiently handles cases where the
+    input is already a numpy array, avoiding redundant wrappers or copies.
+
+    **Verification:**
+    - Pass an existing `np.ndarray` to the function.
+    - Check that the returned object is the exact same reference.
+
+    **Expectation:**
+    - The output must be identical to the input (object identity).
+    """
     x = np.array([1.0, 2.0])
     y = _typesignal(x)
     assert x is y # Confirms it doesn't re-wrap if already an ndarray
 
 def test_resample_to_length_padding() -> None:
-    """Cover the branch where padding is needed in _resample_to_length."""
+    """
+    Cover the branch where padding is needed in _resample_to_length.
+
+    **Purpose:**
+    Verify that the signal reconstruction logic correctly applies zero-padding when the
+    resampling process results in a signal slightly shorter than the target length.
+
+    **Verification:**
+    - Call `_resample_to_length` with parameters that force a mismatch (resampled < target).
+    
+    **Expectation:**
+    - The final signal must have exactly the target length.
+    - The extra samples at the end must be zero.
+    """
     # Create a case where length < target_length
     # signal length 10, factor 2 -> resampled 20.
     # Target 25 -> needs padding of 5.
@@ -33,7 +62,16 @@ def test_showfilter_visual() -> None:
     Test the visualization logic (_showfilter).
     
     **Purpose:**
-    Ensure that the plotting logic works without errors and correctly produces a file.
+    Ensure that the plotting logic works without errors, correctly handles the branch 
+    where no output is requested, and correctly produces a file when a path is provided.
+
+    **Verification:**
+    - Call `_showfilter` with a valid file path.
+    - Call `_showfilter` with `plot_file=None` and `show=False`.
+
+    **Expectation:**
+    - When a path is provided, the file must be created on disk.
+    - When no output is requested, the function must exit cleanly.
     """
     fs = 8000
     sos = [np.array([[1, 0, 0, 1, 0, 0]])] # Dummy SOS
@@ -57,18 +95,53 @@ def test_showfilter_visual() -> None:
             os.remove(plot_path)
 
 def test_getansifrequencies_default_limits() -> None:
-    """Cover the branch where limits is None."""
+    """
+    Cover the branch where limits is None in getansifrequencies.
+
+    **Purpose:**
+    Verify that the frequency generation logic uses the standard default limits
+    [12, 20000] when none are provided.
+
+    **Verification:**
+    - Call `getansifrequencies` with `limits=None`.
+
+    **Expectation:**
+    - The generated frequency list should be valid and cover the default range.
+    """
     freq, _, _ = getansifrequencies(fraction=1, limits=None)
     assert len(freq) > 0
     assert freq[0] > 10 # Default range starts at ~16Hz
 
 def test_normalizedfreq_error() -> None:
-    """Directly cover the ValueError in normalizedfreq."""
+    """
+    Directly cover the ValueError in normalizedfreq.
+
+    **Purpose:**
+    Ensure that requesting normalized frequencies for non-standard fractions 
+    raises a meaningful error.
+
+    **Verification:**
+    - Call `normalizedfreq` with an unsupported fraction (e.g., 5).
+
+    **Expectation:**
+    - Raise `ValueError`.
+    """
     with pytest.raises(ValueError, match="Normalized frequencies only available"):
         normalizedfreq(5)
 
 def test_design_sos_invalid_type() -> None:
-    """Forced test for invalid filter type in the internal design function."""
+    """
+    Forced test for invalid filter type in the internal design function.
+
+    **Purpose:**
+    Close coverage for the branch in `_design_sos_filter` where an unknown filter string is passed.
+
+    **Verification:**
+    - Call the internal design function with an invalid name.
+
+    **Expectation:**
+    - The function should return a list of empty arrays without crashing (validation is at the class level).
+    """
     # The internal function returns empty arrays for unknown types instead of raising
     # because the validation is done at the class level.
     res = _design_sos_filter([100], [70], [140], 8000, 2, np.array([1]), "invalid", 0.1, 60)
@@ -76,7 +149,18 @@ def test_design_sos_invalid_type() -> None:
     assert res[0].size == 0
 
 def test_calculate_level_invalid_mode() -> None:
-    """Directly cover the invalid mode branch in _calculate_level."""
+    """
+    Directly cover the invalid mode branch in _calculate_level.
+
+    **Purpose:**
+    Ensure that the private level calculation method validates its mode argument.
+
+    **Verification:**
+    - Instantiate a bank and call `_calculate_level` with an unknown mode.
+
+    **Expectation:**
+    - Raise `ValueError`.
+    """
     bank = OctaveFilterBank(48000)
     with pytest.raises(ValueError, match="Invalid mode"):
         bank._calculate_level(np.array([1.0]), "unknown_mode")
