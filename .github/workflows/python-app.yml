@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [ "master", "main" ]
 
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
 jobs:
   quality:
     runs-on: ubuntu-latest
@@ -54,11 +59,16 @@ jobs:
     - name: Run tests
       run: |
         pytest --junitxml=test-results-${{ matrix.python-version }}.xml
+    - name: Run Filter Benchmark
+      run: |
+        python scripts/benchmark_filters.py
     - name: Upload Test Results
       uses: actions/upload-artifact@v4
       with:
         name: test-results-${{ matrix.python-version }}
-        path: test-results-${{ matrix.python-version }}.xml
+        path: |
+          test-results-${{ matrix.python-version }}.xml
+          filter_benchmark_report.md
       if: always()
 
   graphs:

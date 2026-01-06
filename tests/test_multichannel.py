@@ -9,7 +9,28 @@ from pyoctaveband import octavefilter
 
 
 def test_multichannel() -> None:
-    """Validate processing of signals with multiple channels (stereo)."""
+    """
+    Validate processing of signals with multiple channels (e.g., stereo).
+
+    **Purpose:**
+    Verify that the `octavefilter` function can independently process multiple audio channels
+    passed as a single 2D array, without "crosstalk" (mixing) between them.
+
+    **Verification:**
+    - Create a 2-channel signal.
+    - Channel 0: A pure sine wave at 500 Hz.
+    - Channel 1: Gaussian white noise.
+    - Process both simultaneously.
+
+    **Expectation:**
+    - The output SPL array should have shape (2, num_bands).
+    - Channel 0's spectrum should show a distinct peak at the 500 Hz band.
+    - Channel 1's spectrum should be relatively flat (broadband).
+    - Specifically, the standard deviation of SPL values for the tone (Channel 0) should be
+      higher than that of the noise (Channel 1), as the tone concentrates energy in one band.
+    - When `sigbands=True`, the time-domain output `xb` should also be structured as
+      List[ndarray(channels, samples)].
+    """
     fs = 48000
     duration = 1.0
     t = np.linspace(0, duration, int(fs * duration), endpoint=False)

@@ -55,8 +55,22 @@ Filters the input signal according to the selected parameters.
 # Returns Sound Pressure Level and Frequencies
 spl, freq = octavefilter(x, fs, fraction=1, order=6, limits=None)
 
-# Returns SPL, Frequencies, and the filtered signals divided into bands
-spl, freq, xb = octavefilter(x, fs, fraction=3, sigbands=True)
+# Advanced filters: 'butter', 'cheby1', 'cheby2', 'ellip', 'bessel'
+spl, freq = octavefilter(x, fs, filter_type='cheby1', ripple=1.0)
+```
+
+##### OctaveFilterBank (Class)
+For high-performance applications where you need to filter multiple signals with the same configuration, use the `OctaveFilterBank` class. This avoids re-calculating filter coefficients for every call.
+
+```python
+from pyoctaveband import OctaveFilterBank
+
+# Initialize the bank once
+bank = OctaveFilterBank(fs=48000, fraction=3, order=6)
+
+# Filter multiple signals efficiently
+spl1, freq = bank.filter(signal1)
+spl2, freq = bank.filter(signal2)
 ```
 
 ##### getansifrequencies
@@ -65,23 +79,21 @@ Returns the frequency vector according to ANSI s1.11-2004 and IEC 61260-1-2014 s
 freq, freq_d, freq_u = getansifrequencies(fraction, limits=None)
 ```
 
-##### normalizedfreq
-Returns normalized frequency vectors for octave and 1/3 octave bands.
-```python
-freq = normalizedfreq(fraction)
-```
-
 ### The Filter
-The library uses Butterworth filters with Second-Order Sections (SOS) coefficients. It applies automatic downsampling for low-frequency bands to maintain numerical stability and ensure the filter response matches the standards perfectly.
+The library supports multiple filter architectures (Butterworth, Chebyshev, Elliptic, Bessel) with Second-Order Sections (SOS) coefficients. It applies automatic downsampling for low-frequency bands to maintain numerical stability and ensure the filter response matches the standards perfectly.
+
+### Filter Type Comparison
+Comparison of different filter types for the same band (1kHz, order 6).
+
+<img src=".github/images/filter_type_comparison.png" width="80%"></img>
 
 ### Examples of Filter Bank Responses
-The following plots show the frequency response of the designed filters. The red dashed line indicates the **-3 dB** point.
+The following plots show the frequency response of the designed filters across the full spectrum.
 
-| Fraction | Butterworth order: 6       | Butterworth order: 16      | 
-|:-------------:|:-------------:|:-------------:|
-| 1-octave | <img src=".github/images/filter_fraction_1_order_6.png" width="100%"></img>      | <img src=".github/images/filter_fraction_1_order_16.png" width="100%"></img>  |
-| 1/3-octave | <img src=".github/images/filter_fraction_3_order_6.png" width="100%"></img>      | <img src=".github/images/filter_fraction_3_order_16.png" width="100%"></img>  |
-| 2/3-octave | <img src=".github/images/filter_fraction_1.5_order_6.png" width="100%"></img>      | <img src=".github/images/filter_fraction_1.5_order_16.png" width="100%"></img>  |
+| Fraction | Butterworth       | Chebyshev I (1dB ripple)      | Elliptic (1dB, 60dB) |
+|:-------------:|:-------------:|:-------------:|:-------------:|
+| 1-octave | <img src=".github/images/filter_butter_fraction_1_order_6.png" width="100%"></img> | <img src=".github/images/filter_cheby1_fraction_1_order_6.png" width="100%"></img> | <img src=".github/images/filter_ellip_fraction_1_order_6.png" width="100%"></img> |
+| 1/3-octave | <img src=".github/images/filter_butter_fraction_3_order_6.png" width="100%"></img> | <img src=".github/images/filter_cheby1_fraction_3_order_6.png" width="100%"></img> | <img src=".github/images/filter_ellip_fraction_3_order_6.png" width="100%"></img> |
 
 ### Signal Analysis Examples
 
@@ -94,33 +106,19 @@ Simultaneous analysis of a stereo signal (Left Channel: Pink Noise, Right Channe
 
 <img src=".github/images/signal_response_multichannel.png" width="100%"></img>
 
-#### Signal Decomposition (Time Domain)
-By setting `sigbands=True`, you can retrieve the signal components for each individual frequency band.
+#### Signal Decomposition and Stability
+By setting `sigbands=True`, you can retrieve the signal components for each individual frequency band. The last plot shows the **Impulse Response** of a specific band, useful for visualizing filter stability.
 
 <img src=".github/images/signal_decomposition.png" width="100%"></img>
 
-<details>
-<summary><b>Click to see the code for this example</b></summary>
-
-```python
-import numpy as np
-from pyoctaveband import octavefilter
-
-# 1. Generate a composite signal (Sum of 250Hz and 1000Hz sines)
-fs = 8000
-t = np.linspace(0, 0.5, fs // 2, endpoint=False)
-y = np.sin(2 * np.pi * 250 * t) + np.sin(2 * np.pi * 1000 * t)
-
-# 2. Filter into 1/1 octave bands and get time-domain signals
-# We use sigbands=True to get the 'xb' list of filtered signals
-spl, freq, xb = octavefilter(y, fs=fs, fraction=1, sigbands=True)
-
-# 'xb' contains the isolated signal for each band
-# xb[i] corresponds to the center frequency freq[i]
-```
-</details>
-
 # Development
+
+### Modular Architecture
+The codebase is organized into specialized modules:
+- `core.py`: Main `OctaveFilterBank` class and processing logic.
+- `filter_design.py`: SOS filter design and visualization tools.
+- `frequencies.py`: ANSI/IEC standard frequency calculations.
+- `utils.py`: Signal validation and resampling utilities.
 
 ### Running Tests
 ```bash
@@ -131,10 +129,6 @@ make check
 ```bash
 python generate_graphs.py
 ```
-
-# Roadmap
-- Performance optimizations for very long signals
-- Support for more filter types (Chebyshev, etc.)
 
 ## Contributing
 Please check [CONTRIBUTING.md](CONTRIBUTING.md) and open an [Issue](https://github.com/jmrplens/PyOctaveBand/issues) or a [Pull Request](https://github.com/jmrplens/PyOctaveBand/pulls).

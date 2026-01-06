@@ -10,15 +10,20 @@ def parse_test_results(test_dir):
     if not os.path.exists(test_dir):
         return "No test results found.", 0, 0
 
-    files = [f for f in os.listdir(test_dir) if f.endswith(".xml")]
+    files = []
+    for root, _, filenames in os.walk(test_dir):
+        for filename in filenames:
+            if filename.endswith(".xml"):
+                files.append(os.path.join(root, filename))
     files.sort()
 
     summary.append("| Python Version | Tests | Failures | Status |")
     summary.append("|---|---|---|---|")
 
-    for f in files:
+    for f_path in files:
+        f_name = os.path.basename(f_path)
         try:
-            tree = ET.parse(os.path.join(test_dir, f))
+            tree = ET.parse(f_path)
             root = tree.getroot()
 
             if root.tag == "testsuites":
@@ -31,7 +36,7 @@ def parse_test_results(test_dir):
                 tests = int(root.attrib.get("tests", 0))
                 failures = int(root.attrib.get("failures", 0))
 
-            version = f.replace("test-results-", "").replace(".xml", "")
+            version = f_name.replace("test-results-", "").replace(".xml", "")
             status = "✅ Passed" if failures == 0 else "❌ Failed"
 
             summary.append(f"| {version} | {tests} | {failures} | {status} |")
@@ -39,7 +44,7 @@ def parse_test_results(test_dir):
             total_tests += tests
             total_failures += failures
         except Exception as e:
-            summary.append(f"| {f} | - | - | ⚠️ Error parsing: {e} |")
+            summary.append(f"| {f_name} | - | - | ⚠️ Error parsing: {e} |")
 
     return "\n".join(summary), total_tests, total_failures
 
@@ -77,6 +82,14 @@ def main():
 
     test_table, tests, failures = parse_test_results(test_dir)
     image_gallery = generate_image_gallery(image_dir, repo, run_id)
+    
+    benchmark_report = ""
+    # Look for the benchmark report in the downloaded artifacts
+    for root, _, filenames in os.walk(test_dir):
+        if "filter_benchmark_report.md" in filenames:
+            with open(os.path.join(root, "filter_benchmark_report.md"), "r") as f:
+                benchmark_report = f.read()
+            break
 
     status_emoji = "🚀" if failures == 0 else "❌"
 
@@ -85,10 +98,11 @@ def main():
 ### Test Summary
 {test_table}
 
+{benchmark_report}
+
 {image_gallery}
 
-[View Full Artifacts](https://github.com/{repo}/actions/runs/{run_id})
-"""
+[View Full Artifacts](https://github.com/{repo}/actions/runs/{run_id})"""
 
     with open("pr_comment_body.md", "w") as f:
         f.write(body)

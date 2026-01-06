@@ -35,8 +35,22 @@ def generate_pink_noise(samples: int) -> np.ndarray:
 
 def test_pink_noise_flatness() -> None:
     """
-    Verify that pink noise has approximately equal energy per fractional octave.
-    The resulting SPL spectrum should be relatively flat.
+    Verify that Pink Noise produces a flat spectrum on a fractional octave analyzer.
+
+    **Purpose:**
+    Pink noise has equal energy per octave (or fractional octave). This is a fundamental property used
+    for calibrating audio systems. If we analyze pink noise with a 1/3 octave filter bank,
+    the resulting SPL values should be approximately constant across all bands.
+
+    **Verification:**
+    - Generate 2 seconds of pink noise using the Voss-McCartney algorithm.
+    - Analyze it with a 1/3 octave filter.
+    - Calculate the deviation of the SPL values from the mean.
+
+    **Expectation:**
+    - The SPL spectrum should be relatively flat.
+    - The maximum deviation from the mean SPL (ignoring edge bands due to filter transient/boundary effects)
+      should be small (< 3 dB).
     """
     fs = 48000
     duration = 2.0  # Reduced for faster test
