@@ -241,8 +241,8 @@ def generate_multichannel_response(output_dir: str) -> None:
 
 def generate_decomposition_plot(output_dir: str) -> None:
     """Generate time-domain decomposition plot comparing two filter types (Butterworth vs Chebyshev II)."""
-    print("Generating signal_decomposition.png with comparison (Butter vs Cheby2)...")
-    fs = 8000
+    print("Generating signal_decomposition.png with comparison (Butter vs Cheby2) @ 48kHz...")
+    fs = 48000
     duration = 0.5
     t = np.linspace(0, duration, int(fs * duration), endpoint=False)
 
@@ -265,7 +265,7 @@ def generate_decomposition_plot(output_dir: str) -> None:
 
     # 1. Original Signal
     axes[0].plot(t, y, color="black", linewidth=1.5)
-    axes[0].set_title("Original Signal (250 Hz + 1000 Hz Sum)", fontweight="bold")
+    axes[0].set_title("Original Signal (250 Hz + 1000 Hz Sum) @ 48 kHz", fontweight="bold")
     axes[0].set_ylim(y_lim)
     axes[0].set_xlim(0, 0.04)
 
