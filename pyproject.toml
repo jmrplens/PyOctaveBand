@@ -1,12 +1,34 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "PyOctaveBand"
-version = "1.0.0"
+version = "1.0.1"
+authors = [
+  { name="Jose Manuel Requena Plens", email="jmrplens@gmail.com" },
+]
 description = "Octave-Band and Fractional Octave-Band filter for signals in time domain."
-...
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy",
+    "scipy",
+    "matplotlib",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/jmrplens/PyOctaveBand"
+"Bug Tracker" = "https://github.com/jmrplens/PyOctaveBand/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [tool.mypy]
 python_version = "3.13"
 strict = true
@@ -19,4 +41,3 @@ exclude_dirs = ["tests", ".venv"]
 filterwarnings = [
     "ignore:Low sampling rate:UserWarning",
 ]
-
