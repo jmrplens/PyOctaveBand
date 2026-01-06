@@ -48,23 +48,22 @@ Now available on [PyPI](https://pypi.org/project/PyOctaveBand/).
 
 ### Installation
 
-You can install `PyOctaveBand` directly from PyPI:
-
+**Option 1: From PyPI (Recommended)**
+Install `PyOctaveBand` directly using pip:
 ```bash
 pip install PyOctaveBand
 ```
 
-Alternatively, you can install it by cloning the repository:
-
-**Option 1: Cloning and Installing**
+**Option 2: Cloning and Installing**
+Clone the repository and install it manually:
 ```bash
 git clone https://github.com/jmrplens/PyOctaveBand.git
 cd PyOctaveBand
 pip install .
 ```
 
-**Option 2: Git Submodule (Recommended for projects)**
-Add PyOctaveBand as a dependency within your own git repository:
+**Option 3: Git Submodule**
+Add `PyOctaveBand` as a dependency within your own git repository:
 ```bash
 git submodule add https://github.com/jmrplens/PyOctaveBand.git
 # Then install in editable mode to use it from your project
