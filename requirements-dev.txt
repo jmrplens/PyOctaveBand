@@ -2,3 +2,5 @@ ruff
 mypy
 bandit
 types-setuptools
+pytest
+pytest-cov

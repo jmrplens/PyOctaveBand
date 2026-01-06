@@ -1,4 +1,4 @@
-name: Python application
+name: Python CI
 
 on:
   push:
@@ -10,38 +10,176 @@ permissions:
   contents: read
 
 jobs:
-  ci:
+  quality:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-    - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.2.2
-      with:
-        fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+    - uses: actions/checkout@v4
     - name: Set up Python 3.13
-      uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.3.0
+      uses: actions/setup-python@v5
       with:
         python-version: "3.13"
+        cache: 'pip'
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -r requirements-dev.txt
         pip install -e .
-    
     - name: Lint with Ruff
       run: ruff check .
-      
     - name: Type check with Mypy
       run: mypy src
-      
     - name: Security check with Bandit
       run: bandit -r src
 
+  tests:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+        pip install -e .
     - name: Run tests
       run: |
-        python tests/test_basic.py
-        python tests/test_multichannel.py
-        python tests/test_audio_processing.py
-
-    - name: Verify graph generation
+        pytest --junitxml=test-results-${{ matrix.python-version }}.xml --cov=src --cov-report=xml
+    - name: Run Filter Benchmark
       run: |
-        python generate_graphs.py
+        python scripts/benchmark_filters.py
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results-${{ matrix.python-version }}
+        path: |
+          test-results-${{ matrix.python-version }}.xml
+          filter_benchmark_report.md
+          coverage.xml
+      if: always()
+
+  sonar:
+    needs: tests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Download coverage report
+      uses: actions/download-artifact@v4
+      with:
+        name: test-results-3.13
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarqube-scan-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.TOKEN_GH }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  graphs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.13"
+        cache: 'pip'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -e .
+    - name: Generate graphs
+      run: python generate_graphs.py
+    
+    - name: Upload Graphs
+      uses: actions/upload-artifact@v4
+      with:
+        name: generated-graphs
+        path: .github/images/*.png
+
+    - name: Deploy Images to Assets Branch
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        
+        # Stash generated images temporarily
+        mkdir -p temp_images
+        cp .github/images/*.png temp_images/
+        
+        # Fetch all branches to ensure we can switch to assets if it exists
+        git fetch origin
+        
+        # Checkout assets branch or create orphan if it doesn't exist
+        if git show-ref --verify --quiet refs/remotes/origin/assets; then
+          git checkout assets
+          git pull origin assets
+        else
+          git checkout --orphan assets
+          git rm -rf .
+        fi
+        
+        # Create directory for this run
+        mkdir -p ${{ github.run_id }}
+        cp temp_images/*.png ${{ github.run_id }}/
+        
+        git add ${{ github.run_id }}/
+        git commit -m "Add graphs for run ${{ github.run_id }}"
+        git push origin assets
+      continue-on-error: true
+
+  pr-comment:
+    needs: [quality, tests, graphs]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    steps:
+    - uses: actions/checkout@v4
+    - name: Download Test Results
+      uses: actions/download-artifact@v4
+      with:
+        pattern: test-results-*
+        path: test-results
+    - name: Download Graphs
+      uses: actions/download-artifact@v4
+      with:
+        name: generated-graphs
+        path: generated-graphs
+    
+    - name: Generate Comment Body
+      run: python .github/scripts/comment_pr.py
+      env:
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        GITHUB_RUN_ID: ${{ github.run_id }}
+
+    - name: Post PR Comment
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const body = fs.readFileSync('pr_comment_body.md', 'utf8');
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: body
+          })
