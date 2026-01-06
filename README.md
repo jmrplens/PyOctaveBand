@@ -48,23 +48,22 @@ Now available on [PyPI](https://pypi.org/project/PyOctaveBand/).
 
 ### Installation
 
-You can install `PyOctaveBand` directly from PyPI:
-
+**Option 1: From PyPI (Recommended)**
+Install `PyOctaveBand` directly using pip:
 ```bash
 pip install PyOctaveBand
 ```
 
-Alternatively, you can install it by cloning the repository:
-
-**Option 1: Cloning and Installing**
+**Option 2: Cloning and Installing**
+Clone the repository and install it manually:
 ```bash
 git clone https://github.com/jmrplens/PyOctaveBand.git
 cd PyOctaveBand
 pip install .
 ```
 
-**Option 2: Git Submodule (Recommended for projects)**
-Add PyOctaveBand as a dependency within your own git repository:
+**Option 3: Git Submodule**
+Add `PyOctaveBand` as a dependency within your own git repository:
 ```bash
 git submodule add https://github.com/jmrplens/PyOctaveBand.git
 # Then install in editable mode to use it from your project
@@ -99,7 +98,7 @@ PyOctaveBand supports several filter types, each with its own transfer function 
 ### Filter Comparison and Zoom
 We use Second-Order Sections (SOS) for all filters to ensure numerical stability. The following plot compares the architectures focusing on the -3 dB crossover point.
 
-<img src=".github/images/filter_type_comparison.png" width="80%"></img>
+<img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/filter_type_comparison.png" width="80%"></img>
 
 | Type | Name | Usage Example | Best For | 
 | :--- | :--- | :--- | :--- |
@@ -114,11 +113,11 @@ Full spectral view of the filter banks for Octave (1/1) and 1/3-Octave fractions
 
 | Architecture | 1/1 Octave (Fraction=1) | 1/3 Octave (Fraction=3) |
 | :--- | :--- | :--- |
-| **Butterworth** | <img src=".github/images/filter_butter_fraction_1_order_6.png" width="100%"> | <img src=".github/images/filter_butter_fraction_3_order_6.png" width="100%"> |
-| **Chebyshev I** | <img src=".github/images/filter_cheby1_fraction_1_order_6.png" width="100%"> | <img src=".github/images/filter_cheby1_fraction_3_order_6.png" width="100%"> |
-| **Chebyshev II** | <img src=".github/images/filter_cheby2_fraction_1_order_6.png" width="100%"> | <img src=".github/images/filter_cheby2_fraction_3_order_6.png" width="100%"> |
-| **Elliptic** | <img src=".github/images/filter_ellip_fraction_1_order_6.png" width="100%"> | <img src=".github/images/filter_ellip_fraction_3_order_6.png" width="100%"> |
-| **Bessel** | <img src=".github/images/filter_bessel_fraction_1_order_6.png" width="100%"> | <img src=".github/images/filter_bessel_fraction_3_order_6.png" width="100%"> |
+| **Butterworth** | <img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/filter_butter_fraction_1_order_6.png" width="100%"> | <img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/filter_butter_fraction_3_order_6.png" width="100%"> |
+| **Chebyshev I** | <img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/filter_cheby1_fraction_1_order_6.png" width="100%"> | <img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/filter_cheby1_fraction_3_order_6.png" width="100%"> |
+| **Chebyshev II** | <img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/filter_cheby2_fraction_1_order_6.png" width="100%"> | <img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/filter_cheby2_fraction_3_order_6.png" width="100%"> |
+| **Elliptic** | <img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/filter_ellip_fraction_1_order_6.png" width="100%"> | <img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/filter_ellip_fraction_3_order_6.png" width="100%"> |
+| **Bessel** | <img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/filter_bessel_fraction_1_order_6.png" width="100%"> | <img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/filter_bessel_fraction_3_order_6.png" width="100%"> |
 
 ---
 
@@ -126,7 +125,7 @@ Full spectral view of the filter banks for Octave (1/1) and 1/3-Octave fractions
 
 Frequency weighting curves simulate the human ear\'s sensitivity.
 
-<img src=".github/images/weighting_responses.png" width="80%"></img>
+<img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/weighting_responses.png" width="80%"></img>
 
 *   **A-Weighting (`A`):** Standard for environmental noise (IEC 61672-1).
 *   **C-Weighting (`C`):** Used for peak sound pressure and high-level noise.
@@ -148,7 +147,7 @@ c_weighted_signal = weighting_filter(signal, fs, curve='C')
 
 Accurate SPL measurement requires capturing energy over specific time windows.
 
-<img src=".github/images/time_weighting_analysis.png" width="80%"></img>
+<img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/time_weighting_analysis.png" width="80%"></img>
 
 *   **Fast (`fast`):** $\tau = 125$ ms. Standard for noise fluctuations.
 *   **Slow (`slow`):** $\tau = 1000$ ms. Standard for steady noise.
@@ -193,7 +192,7 @@ from pyoctaveband import octavefilter
 # Default standard measurement
 spl, freq = octavefilter(x, fs, filter_type='butter')
 ```
-<img src=".github/images/filter_butter_fraction_3_order_6.png" width="60%"></img>
+<img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/filter_butter_fraction_3_order_6.png" width="60%"></img>
 
 ### 2. Chebyshev I (`cheby1`)
 Chebyshev Type I filters provide a **steeper roll-off** than Butterworth at the expense of ripples in the passband. Useful when high selectivity is needed near the cut-off frequencies.
@@ -202,7 +201,7 @@ Chebyshev Type I filters provide a **steeper roll-off** than Butterworth at the 
 # Selectivity with 0.1 dB passband ripple
 spl, freq = octavefilter(x, fs, filter_type='cheby1', ripple=0.1)
 ```
-<img src=".github/images/filter_cheby1_fraction_3_order_6.png" width="60%"></img>
+<img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/filter_cheby1_fraction_3_order_6.png" width="60%"></img>
 
 ### 3. Chebyshev II (`cheby2`)
 Also known as Inverse Chebyshev, it has a **flat passband** and ripples in the stopband. It provides faster roll-off than Butterworth without affecting the signal in the passband.
@@ -211,7 +210,7 @@ Also known as Inverse Chebyshev, it has a **flat passband** and ripples in the s
 # Flat passband with 60 dB stopband attenuation
 spl, freq = octavefilter(x, fs, filter_type='cheby2', attenuation=60)
 ```
-<img src=".github/images/filter_cheby2_fraction_3_order_6.png" width="60%"></img>
+<img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/filter_cheby2_fraction_3_order_6.png" width="60%"></img>
 
 ### 4. Elliptic (`ellip`)
 Elliptic (Cauer) filters have the **shortest transition width** (steepest roll-off) for a given order. They feature ripples in both the passband and stopband.
@@ -220,7 +219,7 @@ Elliptic (Cauer) filters have the **shortest transition width** (steepest roll-o
 # Maximum selectivity for extreme band isolation
 spl, freq = octavefilter(x, fs, filter_type='ellip', ripple=0.1, attenuation=60)
 ```
-<img src=".github/images/filter_ellip_fraction_3_order_6.png" width="60%"></img>
+<img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/filter_ellip_fraction_3_order_6.png" width="60%"></img>
 
 ### 5. Bessel (`bessel`)
 Bessel filters are optimized for **linear phase response** and minimal group delay. They preserve the shape of filtered waveforms (transients) better than any other type, but have the slowest roll-off.
@@ -229,7 +228,7 @@ Bessel filters are optimized for **linear phase response** and minimal group del
 # Best for pulse analysis and transient preservation
 spl, freq = octavefilter(x, fs, filter_type='bessel')
 ```
-<img src=".github/images/filter_bessel_fraction_3_order_6.png" width="60%"></img>
+<img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/filter_bessel_fraction_3_order_6.png" width="60%"></img>
 
 ### 6. Linkwitz-Riley (`lr`)
 Specifically designed for **audio crossovers**. Linkwitz-Riley filters (typically 4th order) allow splitting a signal into bands that, when summed, result in a perfectly flat magnitude response and zero phase difference between bands at the crossover.
@@ -240,7 +239,7 @@ from pyoctaveband import linkwitz_riley
 low, high = linkwitz_riley(signal, fs, freq=1000, order=4)
 # Reconstruction: low + high == signal (flat response)
 ```
-<img src=".github/images/crossover_lr4.png" width="60%"></img>
+<img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/crossover_lr4.png" width="60%"></img>
 
 ---
 
@@ -299,7 +298,7 @@ spl, freq, xb = octavefilter(y, fs=fs, fraction=1, sigbands=True)
 # Each band in 'xb' has the same length as the original input 'y'.
 ```
 
-<img src=".github/images/signal_decomposition.png" width="80%"></img>
+<img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/signal_decomposition.png" width="80%"></img>
 
 *The bottom plot shows the **Impulse Response** of a band, demonstrating the stability and decay characteristics of the filter.*
 
