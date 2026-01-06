@@ -91,13 +91,15 @@ class OctaveFilterBank:
     def filter(
         self, 
         x: Union[List[float], np.ndarray], 
-        sigbands: bool = False
+        sigbands: bool = False,
+        mode: str = "rms"
     ) -> Union[Tuple[np.ndarray, List[float]], Tuple[np.ndarray, List[float], List[np.ndarray]]]:
         """
         Apply the pre-designed filter bank to a signal.
 
         :param x: Input signal (1D array or 2D array [channels, samples]).
         :param sigbands: If True, also return the signal in the time domain divided into bands.
+        :param mode: 'rms' for energy-based level, 'peak' for peak-holding level.
         :return: A tuple containing (SPL_array, Frequencies_list) or (SPL_array, Frequencies_list, signals).
         """
         
@@ -112,7 +114,7 @@ class OctaveFilterBank:
         num_channels = x_proc.shape[0]
 
         # Process signal across all bands and channels
-        spl, xb = self._process_bands(x_proc, num_channels, sigbands)
+        spl, xb = self._process_bands(x_proc, num_channels, sigbands, mode=mode)
 
         # Format output based on input dimensionality
         if not is_multichannel:
@@ -130,6 +132,7 @@ class OctaveFilterBank:
         x_proc: np.ndarray,
         num_channels: int,
         sigbands: bool,
+        mode: str = "rms"
     ) -> Tuple[np.ndarray, Optional[List[np.ndarray]]]:
         """
         Process signal through each frequency band.
@@ -137,6 +140,7 @@ class OctaveFilterBank:
         :param x_proc: Standardized 2D input signal [channels, samples].
         :param num_channels: Number of channels.
         :param sigbands: If True, return filtered bands.
+        :param mode: 'rms' or 'peak'.
         :return: A tuple containing (SPL_array, Optional_List_of_filtered_signals).
         """
         spl = np.zeros([num_channels, self.num_bands])
@@ -154,14 +158,19 @@ class OctaveFilterBank:
                 y = signal.sosfilt(self.sos[idx], sd)
 
                 # Sound Level Calculation
-                rms = np.std(y)
+                if mode.lower() == "rms":
+                    val_linear = np.std(y)
+                elif mode.lower() == "peak":
+                    val_linear = np.max(np.abs(y))
+                else:
+                    raise ValueError("Invalid mode. Use 'rms' or 'peak'.")
+
                 if self.dbfs:
-                    # dBFS: 0 dB is RMS = 1.0 (Standard digital scale)
-                    # Note: A full-scale sine (peak 1.0) will result in -3.01 dBFS RMS
-                    val = 20 * np.log10(np.max([rms, np.finfo(float).eps]))
+                    # dBFS: 0 dB is RMS = 1.0 or Peak = 1.0
+                    val = 20 * np.log10(np.max([val_linear, np.finfo(float).eps]))
                 else:
                     # Physical SPL: apply sensitivity and use 20uPa reference
-                    pressure_pa = rms * self.calibration_factor
+                    pressure_pa = val_linear * self.calibration_factor
                     val = 20 * np.log10(np.max([pressure_pa, np.finfo(float).eps]) / 2e-5)
                 
                 spl[ch, idx] = val

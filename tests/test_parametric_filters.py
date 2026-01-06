@@ -70,6 +70,36 @@ def test_dbfs_logic() -> None:
     assert abs(spl[0] - (-3.01)) < 0.05
 
 
+def test_peak_mode_logic() -> None:
+    """
+    Verify that Peak mode returns the absolute maximum of the filtered band.
+
+    **Purpose:**
+    Addressing Issue #10 regarding consistency with professional software (peak-holding).
+
+    **Verification:**
+    - Create a signal with a single high peak (impulse-like).
+    - Compare RMS vs Peak output.
+
+    **Expectation:**
+    - Peak value should be significantly higher than RMS for a transient signal.
+    - Peak value should match 20*log10(max_abs / 2e-5) approximately.
+    """
+    fs = 48000
+    x = np.zeros(fs)
+    x[100] = 0.5  # Large peak
+    
+    from pyoctaveband import octavefilter
+    spl_rms, _ = octavefilter(x, fs, mode="rms", fraction=1)
+    spl_peak, _ = octavefilter(x, fs, mode="peak", fraction=1)
+    
+    # Peak must be greater than RMS for an impulse
+    assert np.all(spl_peak > spl_rms)
+    
+    # Theoretical peak for 0.5: 20*log10(0.5 / 2e-5) = 20*log10(25000) approx 87.9 dB
+    # (Minus some attenuation due to the filter bandwidth and energy spreading)
+    assert np.max(spl_peak) > 75.0
+
 def test_a_weighting_response() -> None:
     """
     Verify A-weighting frequency response.

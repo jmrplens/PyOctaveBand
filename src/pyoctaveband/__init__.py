@@ -44,6 +44,7 @@ def octavefilter(
     attenuation: float = 60.0,
     calibration_factor: float = 1.0,
     dbfs: bool = False,
+    mode: str = "rms",
 ) -> Union[Tuple[np.ndarray, List[float]], Tuple[np.ndarray, List[float], List[np.ndarray]]]:
     """
     Filter a signal with octave or fractional octave filter bank.
@@ -80,6 +81,8 @@ def octavefilter(
     :type calibration_factor: float
     :param dbfs: If True, return results in dB relative to Full Scale (0 dB = RMS 1.0). Default: False.
     :type dbfs: bool
+    :param mode: 'rms' for energy-based level (default), 'peak' for peak-holding level.
+    :type mode: str
     :return: A tuple containing (SPL_array, Frequencies_list) if sigbands is False,
              or (SPL_array, Frequencies_list, List_of_filtered_signals) if sigbands is True.
     :rtype: Union[Tuple[np.ndarray, List[float]], Tuple[np.ndarray, List[float], List[np.ndarray]]]
@@ -100,4 +103,4 @@ def octavefilter(
         dbfs=dbfs
     )
     
-    return filter_bank.filter(x, sigbands=sigbands)
+    return filter_bank.filter(x, sigbands=sigbands, mode=mode)

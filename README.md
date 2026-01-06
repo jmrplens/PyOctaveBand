@@ -257,12 +257,15 @@ spl, freq = octavefilter(signal, fs, calibration_factor=sensitivity)
 ```
 
 ### Digital Analysis (dBFS)
-If you don't have physical calibration, you can work in dBFS where **0 dB** corresponds to a Root Mean Square (RMS) level of 1.0.
+...
+### RMS vs Peak Levels
+PyOctaveBand supports two measurement modes to align with professional software like BK:
+- **RMS (`mode='rms'`)**: Energy-based level (standard).
+- **Peak (`mode='peak'`)**: Absolute maximum value reached in the frame (Peak-holding).
 
 ```python
-# Returns results relative to digital full scale
-spl_dbfs, freq = octavefilter(signal, fs, dbfs=True)
-# A full-scale sine wave will show -3.01 dBFS in its center band.
+# Measure peak-holding levels for impact analysis
+spl_peak, freq = octavefilter(signal, fs, mode='peak')
 ```
 
 ---
