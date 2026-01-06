@@ -11,12 +11,21 @@ import numpy as np
 
 from .core import OctaveFilterBank
 from .frequencies import getansifrequencies, normalizedfreq
+from .parametric_filters import linkwitz_riley, time_weighting, weighting_filter
 
 # Use non-interactive backend for plots
 matplotlib.use("Agg")
 
 # Public methods
-__all__ = ["octavefilter", "getansifrequencies", "normalizedfreq", "OctaveFilterBank"]
+__all__ = [
+    "octavefilter",
+    "getansifrequencies",
+    "normalizedfreq",
+    "OctaveFilterBank",
+    "weighting_filter",
+    "time_weighting",
+    "linkwitz_riley",
+]
 
 
 def octavefilter(
