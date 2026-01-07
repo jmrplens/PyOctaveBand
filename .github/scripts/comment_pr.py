@@ -98,18 +98,22 @@ def main():
     repo = os.environ.get("GITHUB_REPOSITORY")
     run_id = os.environ.get("GITHUB_RUN_ID")
     test_dir = "test-results"
-    image_dir = "generated-graphs"
 
     test_table, tests, failures = parse_test_results(test_dir)
-    image_gallery = generate_image_gallery(image_dir, repo, run_id)
     
     benchmark_report = ""
-    # Look for the benchmark report in the downloaded artifacts
-    for root, _, filenames in os.walk(test_dir):
-        if "filter_benchmark_report.md" in filenames:
-            with open(os.path.join(root, "filter_benchmark_report.md"), "r") as f:
-                benchmark_report = f.read()
-            break
+    # Read the benchmark report generated in the previous step of the workflow
+    if os.path.exists("filter_benchmark_report.md"):
+        with open("filter_benchmark_report.md", "r") as f:
+            report_content = f.read()
+            sha = os.environ.get("GITHUB_SHA")
+            if repo and sha:
+                # Make image paths absolute so they render in the PR comment
+                # Using raw.githubusercontent.com for reliable rendering
+                report_content = report_content.replace("](.github/images", f"](https://raw.githubusercontent.com/{repo}/{sha}/.github/images")
+            
+            # Wrap the report in a details block
+            benchmark_report = f"### Technical Benchmark Summary\n\n<details>\n<summary>📊 View Benchmark Details</summary>\n\n{report_content}\n\n</details>"
 
     status_emoji = "🚀" if failures == 0 else "❌"
 
@@ -119,8 +123,6 @@ def main():
 {test_table}
 
 {benchmark_report}
-
-{image_gallery}
 
 [View Full Artifacts](https://github.com/{repo}/actions/runs/{run_id})"""
 
