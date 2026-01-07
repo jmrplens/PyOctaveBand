@@ -26,17 +26,33 @@ def _typesignal(x: List[float] | np.ndarray | Tuple[float, ...]) -> np.ndarray:
 def _resample_to_length(y: np.ndarray, factor: int, target_length: int) -> np.ndarray:
     """
     Resample signal and ensure the output matches target_length exactly.
+    Handles both 1D and 2D (channels, samples) arrays.
 
     :param y: Input signal.
     :param factor: Resampling factor.
     :param target_length: Target length.
     :return: Resampled signal.
     """
-    y_resampled = signal.resample_poly(y, factor, 1)
-    if len(y_resampled) > target_length:
-        y_resampled = y_resampled[:target_length]
-    elif len(y_resampled) < target_length:
-        y_resampled = np.pad(y_resampled, (0, target_length - len(y_resampled)))
+    y_resampled = signal.resample_poly(y, factor, 1, axis=-1)
+    current_length = y_resampled.shape[-1]
+    
+    if current_length > target_length:
+        # Slice along the last axis
+        if y_resampled.ndim == 1:
+            y_resampled = y_resampled[:target_length]
+        else:
+            y_resampled = y_resampled[..., :target_length]
+            
+    elif current_length < target_length:
+        diff = target_length - current_length
+        if y_resampled.ndim == 1:
+            pad_width = (0, diff)
+        else:
+            # Pad only the last axis
+            pad_width = [(0, 0)] * (y_resampled.ndim - 1) + [(0, diff)]
+            
+        y_resampled = np.pad(y_resampled, pad_width, mode='constant')
+        
     return cast(np.ndarray, y_resampled)
 
 

@@ -76,30 +76,51 @@ def time_weighting(x: List[float] | np.ndarray, fs: int, mode: str = "fast") -> 
     
     :param x: Input signal (raw pressure/voltage). The function squares it internally.
     :param fs: Sample rate.
-    :param mode: 'fast' (125ms), 'slow' (1000ms), 'impulse' (35ms rise).
+    :param mode: 'fast' (125ms), 'slow' (1000ms), 'impulse' (35ms rise, 1500ms fall).
     :return: Time-weighted squared signal (sound pressure level envelope).
     """
     x_proc = _typesignal(x)
+    x_sq = x_proc**2
     
-    modes = {
-        "fast": 0.125,
-        "slow": 1.0,
-        "impulse": 0.035
-    }
+    mode_lower = mode.lower()
     
-    if mode.lower() not in modes:
-        raise ValueError(f"Invalid time weighting mode. Use {list(modes.keys())}")
+    if mode_lower in ["fast", "slow"]:
+        tau = 0.125 if mode_lower == "fast" else 1.0
+        alpha = 1 - np.exp(-1 / (fs * tau))
+        b = [alpha]
+        a = [1, -(1 - alpha)]
+        # We apply the weighting to the squared signal to get the Mean Square value
+        return cast(np.ndarray, signal.lfilter(b, a, x_sq, axis=-1))
         
-    tau = modes[mode.lower()]
-    
-    # RC filter implementation: y[n] = y[n-1] + (x[n] - y[n-1]) * dt / tau
-    # This is a first order IIR filter
-    alpha = 1 - np.exp(-1 / (fs * tau))
-    b = [alpha]
-    a = [1, -(1 - alpha)]
-    
-    # We apply the weighting to the squared signal to get the Mean Square value
-    return cast(np.ndarray, signal.lfilter(b, a, x_proc**2))
+    elif mode_lower == "impulse":
+        # IEC 61672-1: 35ms for rising, 1500ms for falling
+        tau_rise = 0.035
+        tau_fall = 1.5
+        
+        alpha_rise = 1 - np.exp(-1 / (fs * tau_rise))
+        alpha_fall = 1 - np.exp(-1 / (fs * tau_fall))
+        
+        # Iterate over time (last axis) to handle asymmetric logic
+        # Move time axis to front for iteration
+        x_t = np.moveaxis(x_sq, -1, 0)
+        y_t = np.zeros_like(x_t)
+        
+        # Initialize state (channels shape)
+        curr_y = np.zeros(x_t.shape[1:])
+        
+        # Simple loop over time samples
+        for i, val in enumerate(x_t):
+            # Vectorized over channels
+            rising = val > curr_y
+            diff = val - curr_y
+            curr_y += np.where(rising, alpha_rise, alpha_fall) * diff
+            y_t[i] = curr_y
+            
+        # Move time axis back
+        return np.moveaxis(y_t, 0, -1)
+
+    else:
+        raise ValueError("Invalid time weighting mode. Use ['fast', 'slow', 'impulse']")
 
 
 def linkwitz_riley(

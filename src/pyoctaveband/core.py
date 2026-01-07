@@ -179,43 +179,51 @@ class OctaveFilterBank:
         xb: List[np.ndarray] | None = [np.array([]) for _ in range(self.num_bands)] if sigbands else None
 
         for idx in range(self.num_bands):
-            for ch in range(num_channels):
-                # Core DSP logic extracted to reduce complexity
-                filtered_signal = self._filter_and_resample(x_proc[ch], idx)
+            # Vectorized processing for all channels
+            filtered_signal = self._filter_and_resample(x_proc, idx)
 
-                # Sound Level Calculation
-                spl[ch, idx] = self._calculate_level(filtered_signal, mode)
+            # Sound Level Calculation (returns array of shape [num_channels])
+            spl[:, idx] = self._calculate_level(filtered_signal, mode)
 
-                if sigbands and xb is not None:
-                    # Restore original length
-                    y_resampled = _resample_to_length(filtered_signal, int(self.factor[idx]), x_proc.shape[1])
-                    if ch == 0:
-                        xb[idx] = np.zeros([num_channels, x_proc.shape[1]])
-                    xb[idx][ch] = y_resampled
+            if sigbands and xb is not None:
+                # Restore original length
+                # filtered_signal is [channels, downsampled_samples]
+                y_resampled = _resample_to_length(filtered_signal, int(self.factor[idx]), x_proc.shape[1])
+                xb[idx] = y_resampled
+                
         return spl, xb
 
-    def _filter_and_resample(self, x_ch: np.ndarray, idx: int) -> np.ndarray:
-        """Resample and filter a single channel for a specific band."""
+    def _filter_and_resample(self, x: np.ndarray, idx: int) -> np.ndarray:
+        """Resample and filter for a specific band (vectorized)."""
         if self.factor[idx] > 1:
-            sd = signal.resample_poly(x_ch, 1, self.factor[idx])
+            # axis=-1 is default for resample_poly, but being explicit is good
+            sd = signal.resample_poly(x, 1, self.factor[idx], axis=-1)
         else:
-            sd = x_ch
+            sd = x
         
-        return cast(np.ndarray, signal.sosfilt(self.sos[idx], sd))
+        # sosfilt supports axis=-1 by default
+        return cast(np.ndarray, signal.sosfilt(self.sos[idx], sd, axis=-1))
 
-    def _calculate_level(self, y: np.ndarray, mode: str) -> float:
+    def _calculate_level(self, y: np.ndarray, mode: str) -> float | np.ndarray:
         """Calculate the level (RMS or Peak) in dB."""
         if mode.lower() == "rms":
-            val_linear = np.std(y)
+            # Use mean of squares for correct RMS (root mean square)
+            # axis=-1 ensures it works for 1D and 2D arrays
+            val_linear = np.sqrt(np.mean(y**2, axis=-1))
         elif mode.lower() == "peak":
-            val_linear = np.max(np.abs(y))
+            val_linear = np.max(np.abs(y), axis=-1)
         else:
             raise ValueError("Invalid mode. Use 'rms' or 'peak'.")
 
+        eps = np.finfo(float).eps
+        
+        # Ensure val_linear is at least eps to avoid log(0)
+        val_linear = np.maximum(val_linear, eps)
+
         if self.dbfs:
             # dBFS: 0 dB is RMS = 1.0 or Peak = 1.0
-            return float(20 * np.log10(np.max([val_linear, np.finfo(float).eps])))
+            return 20 * np.log10(val_linear)
         
         # Physical SPL: apply sensitivity and use 20uPa reference
         pressure_pa = val_linear * self.calibration_factor
-        return float(20 * np.log10(np.max([pressure_pa, np.finfo(float).eps]) / 2e-5))
+        return 20 * np.log10(np.maximum(pressure_pa, eps) / 2e-5)
