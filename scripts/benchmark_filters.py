@@ -140,7 +140,8 @@ def benchmark_multichannel_scaling(fs: int = 48000, max_channels: int = 16) -> L
     bank = OctaveFilterBank(fs, fraction=3)
     
     for n in [1, 2, 4, 8, 16]:
-        if n > max_channels: break
+        if n > max_channels:
+            break
         x = np.tile(np.sin(2 * np.pi * 1000 * t), (n, 1))
         bank.filter(x)
         
