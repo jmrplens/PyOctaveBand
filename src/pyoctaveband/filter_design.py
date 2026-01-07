@@ -106,8 +106,31 @@ def _showfilter(
     plt.xlim(freq_d[0] * 0.8, freq_u[-1] * 1.2)
     plt.ylim(-4, 1)
 
-    xticks = [16, 31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]
-    xticklabels = ["16", "31.5", "63", "125", "250", "500", "1k", "2k", "4k", "8k", "16k"]
+    # Dynamic ticks based on range
+    f_min = freq_d[0] * 0.8
+    f_max = freq_u[-1] * 1.2
+    
+    # Standard frequencies for ticks
+    all_ticks = [
+        0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 
+        1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000
+    ]
+    xticks = [f for f in all_ticks if f_min <= f <= f_max]
+    
+    # If too few ticks, use simpler logic
+    if len(xticks) < 3:
+        # Fallback to powers of 10
+        p_min = int(np.floor(np.log10(f_min)))
+        p_max = int(np.ceil(np.log10(f_max)))
+        xticks = [10**p for p in range(p_min, p_max + 1)]
+
+    xticklabels = []
+    for f in xticks:
+        if f >= 1000:
+            xticklabels.append(f"{f/1000:g}k")
+        else:
+            xticklabels.append(f"{f:g}")
+            
     ax.set_xticks(xticks)
     ax.set_xticklabels(xticklabels)
 

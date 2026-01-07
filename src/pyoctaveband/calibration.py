@@ -24,7 +24,7 @@ def calculate_sensitivity(
     :param ref_pressure: Reference pressure (default 20 microPascals).
     :return: Calibration factor (sensitivity multiplier).
     """
-    rms_ref = np.std(ref_signal)
+    rms_ref = np.sqrt(np.mean(np.array(ref_signal)**2))
     if rms_ref == 0:
         raise ValueError("Reference signal is silent, cannot calibrate.")
         

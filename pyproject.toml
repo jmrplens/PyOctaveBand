@@ -10,7 +10,7 @@ authors = [
 ]
 description = "Octave-Band and Fractional Octave-Band filter for signals in time domain."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -20,6 +20,7 @@ dependencies = [
     "numpy",
     "scipy",
     "matplotlib",
+    "numba",
 ]
 
 [project.urls]
@@ -30,7 +31,7 @@ dependencies = [
 where = ["src"]
 
 [tool.mypy]
-python_version = "3.13"
+python_version = "3.11"
 strict = true
 ignore_missing_imports = true
 
