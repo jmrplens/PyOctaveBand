@@ -51,11 +51,17 @@ To check coverage locally:
 pytest --cov=src/pyoctaveband --cov-report=term-missing tests/
 ```
 
-### 4. Graph Generation (Optional)
-If you modify the filter logic or visualization code, please regenerate the documentation graphs to verify visual correctness:
+### 4. Graph & Benchmark Generation (Required)
+If you modify the core DSP logic, filter design, or visualization code, you **MUST** regenerate the documentation graphs and the technical benchmark report before submitting your Pull Request. The CI does not perform automatic updates to maintain a clean history.
+
 ```bash
+# Regenerate documentation graphs
 python generate_graphs.py
+
+# Regenerate technical benchmark report
+python scripts/benchmark_filters.py
 ```
+Check that the images in `.github/images/` and the `filter_benchmark_report.md` file reflect your changes correctly.
 
 ## 🚀 How to Contribute
 

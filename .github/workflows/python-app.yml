@@ -69,65 +69,6 @@ jobs:
           coverage.xml
       if: always()
 
-  assets:
-    needs: tests
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    permissions:
-      contents: write
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        token: ${{ secrets.TOKEN_GH || github.token }}
-    
-    - name: Set up Python 3.13
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.13"
-        cache: 'pip'
-        
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install -e .
-        
-    - name: Regenerate all assets
-      run: |
-        python generate_graphs.py
-        python scripts/benchmark_filters.py
-        
-    - name: Commit and Push changes
-      run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        
-        # Check for changes in assets
-        git add .github/images/ filter_benchmark_report.md
-        
-        if git diff --staged --quiet; then
-          echo "No changes in assets detected."
-        else
-          echo "Changes detected, pushing updates..."
-          
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            # Standard commit for PRs (no amend to avoid rebase hell)
-            git commit -m "chore: update assets for PR [skip ci]"
-            git push origin HEAD:${{ github.head_ref }}
-          else
-            # Clean amend for main branch
-            # Append [skip ci] to the original message to prevent loops
-            orig_msg=$(git log -1 --pretty=%B)
-            if [[ "$orig_msg" != *"[skip ci]"* ]]; then
-              git commit --amend -m "$orig_msg [skip ci]"
-            else
-              git commit --amend --no-edit
-            fi
-            git push origin ${{ github.ref_name }} --force
-          fi
-        fi
-
   sonar:
     needs: tests
     runs-on: ubuntu-latest
