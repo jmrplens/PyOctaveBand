@@ -6,12 +6,7 @@ Implementation according to ANSI s1.11-2004 and IEC 61260-1-2014.
 
 from __future__ import annotations
 
-from typing import List, Tuple, cast, overload
-
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
+from typing import List, Tuple, overload, Literal
 
 import matplotlib
 import numpy as np
@@ -19,10 +14,12 @@ import numpy as np
 from .calibration import calculate_sensitivity
 from .core import OctaveFilterBank
 from .frequencies import getansifrequencies, normalizedfreq
-from .parametric_filters import linkwitz_riley, time_weighting, weighting_filter
+from .parametric_filters import WeightingFilter, linkwitz_riley, time_weighting, weighting_filter
 
 # Use non-interactive backend for plots
 matplotlib.use("Agg")
+
+__version__ = "1.1.0"
 
 # Public methods
 __all__ = [
@@ -30,6 +27,7 @@ __all__ = [
     "getansifrequencies",
     "normalizedfreq",
     "OctaveFilterBank",
+    "WeightingFilter",
     "weighting_filter",
     "time_weighting",
     "linkwitz_riley",
@@ -48,7 +46,12 @@ def octavefilter(
     sigbands: Literal[False] = False,
     plot_file: str | None = None,
     detrend: bool = True,
-    **kwargs: str | float | bool
+    filter_type: str = "butter",
+    ripple: float = 0.1,
+    attenuation: float = 60.0,
+    calibration_factor: float = 1.0,
+    dbfs: bool = False,
+    mode: str = "rms",
 ) -> Tuple[np.ndarray, List[float]]: ...
 
 
@@ -63,7 +66,12 @@ def octavefilter(
     sigbands: Literal[True] = True,
     plot_file: str | None = None,
     detrend: bool = True,
-    **kwargs: str | float | bool
+    filter_type: str = "butter",
+    ripple: float = 0.1,
+    attenuation: float = 60.0,
+    calibration_factor: float = 1.0,
+    dbfs: bool = False,
+    mode: str = "rms",
 ) -> Tuple[np.ndarray, List[float], List[np.ndarray]]: ...
 
 
@@ -77,7 +85,12 @@ def octavefilter(
     sigbands: bool = False,
     plot_file: str | None = None,
     detrend: bool = True,
-    **kwargs: str | float | bool
+    filter_type: str = "butter",
+    ripple: float = 0.1,
+    attenuation: float = 60.0,
+    calibration_factor: float = 1.0,
+    dbfs: bool = False,
+    mode: str = "rms",
 ) -> Tuple[np.ndarray, List[float]] | Tuple[np.ndarray, List[float], List[np.ndarray]]:
     """
     Filter a signal with octave or fractional octave filter bank.
@@ -106,12 +119,12 @@ def octavefilter(
     :type plot_file: Optional[str]
     :param detrend: If True, remove DC offset before filtering. Default: True.
     :type detrend: bool
-    :param filter_type: (Optional) Type of filter ('butter', 'cheby1', 'cheby2', 'ellip', 'bessel'). Default: 'butter'.
-    :param ripple: (Optional) Passband ripple in dB (for cheby1, ellip). Default: 0.1.
-    :param attenuation: (Optional) Stopband attenuation in dB (for cheby2, ellip). Default: 60.0.
-    :param calibration_factor: (Optional) Sensitivity multiplier. Default: 1.0.
-    :param dbfs: (Optional) If True, return results in dBFS. Default: False.
-    :param mode: (Optional) 'rms' or 'peak'. Default: 'rms'.
+    :param filter_type: Type of filter ('butter', 'cheby1', 'cheby2', 'ellip', 'bessel'). Default: 'butter'.
+    :param ripple: Passband ripple in dB (for cheby1, ellip). Default: 0.1.
+    :param attenuation: Stopband attenuation in dB (for cheby2, ellip). Default: 60.0.
+    :param calibration_factor: Calibration factor for SPL calculation. Default: 1.0.
+    :param dbfs: If True, return results in dBFS. Default: False.
+    :param mode: 'rms' or 'peak'. Default: 'rms'.
     :return: A tuple containing (SPL_array, Frequencies_list) or (SPL_array, Frequencies_list, signals).
     :rtype: Union[Tuple[np.ndarray, List[float]], Tuple[np.ndarray, List[float], List[np.ndarray]]]
     """
@@ -122,16 +135,16 @@ def octavefilter(
         fraction=fraction,
         order=order,
         limits=limits,
-        filter_type=cast(str, kwargs.get("filter_type", "butter")),
-        ripple=cast(float, kwargs.get("ripple", 0.1)),
-        attenuation=cast(float, kwargs.get("attenuation", 60.0)),
+        filter_type=filter_type,
+        ripple=ripple,
+        attenuation=attenuation,
         show=show,
         plot_file=plot_file,
-        calibration_factor=cast(float, kwargs.get("calibration_factor", 1.0)),
-        dbfs=cast(bool, kwargs.get("dbfs", False))
+        calibration_factor=calibration_factor,
+        dbfs=dbfs
     )
     
     if sigbands:
-        return filter_bank.filter(x, sigbands=True, mode=cast(str, kwargs.get("mode", "rms")), detrend=detrend)
+        return filter_bank.filter(x, sigbands=True, mode=mode, detrend=detrend)
     else:
-        return filter_bank.filter(x, sigbands=False, mode=cast(str, kwargs.get("mode", "rms")), detrend=detrend)
+        return filter_bank.filter(x, sigbands=False, mode=mode, detrend=detrend)

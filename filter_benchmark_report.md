@@ -1,28 +1,36 @@
-# Filter Architecture Benchmark Report
+# PyOctaveBand: Technical Benchmark Report
 
-This report compares the performance and characteristics of the available filter types.
+Generated: 2026-01-07 09:42:54
 
-## 1. Spectral Isolation (at 1kHz)
-| Filter Type | Peak SPL (dB) | Atten. -1 Oct (dB) | Atten. +1 Oct (dB) | Atten. -2 Oct (dB) | Atten. +2 Oct (dB) |
-|---|---|---|---|---|---|
-| butter | 90.96 | 40.0 | 32.3 | 46.8 | 57.7 |
-| cheby1 | 90.96 | 39.8 | 40.2 | 46.5 | 57.2 |
-| cheby2 | 90.96 | 42.5 | 50.4 | 49.2 | 61.6 |
-| ellip | 90.95 | 39.9 | 45.1 | 46.6 | 57.1 |
-| bessel | 90.54 | 41.6 | 33.6 | 48.4 | 60.1 |
+## 1. Test Signal Parameters
+- **Sample Rate:** 96.0 kHz
+- **Duration:** 10.0 seconds
+- **Signal Types:** White Noise (Stability) / Pure Sine (Precision)
+- **Precision:** 64-bit Floating Point
 
-## 2. Stability and Performance
-| Filter Type | Max IR Tail Energy | Stability Status | Avg. Execution Time (s) |
-|---|---|---|---|
-| butter | 1.29e-09 | ✅ Stable | 0.0353 |
-| cheby1 | 2.04e-07 | ✅ Stable | 0.0348 |
-| cheby2 | 2.12e-07 | ✅ Stable | 0.0355 |
-| ellip | 4.95e-07 | ✅ Stable | 0.0359 |
-| bessel | 4.21e-15 | ✅ Stable | 0.0451 |
+## 2. Crossover (Linkwitz-Riley)
+![Crossover](.github/images/benchmark/benchmark_crossover.png)
 
-## 3. Analysis Summary
-- **Butterworth:** Best compromise, maximally flat passband.
-- **Chebyshev I:** Steeper roll-off than Butterworth but with passband ripple.
-- **Chebyshev II:** Flat passband, ripple in the stopband.
-- **Elliptic:** Steepest transition but ripples in both passband and stopband.
-- **Bessel:** Best phase response and minimal ringing (group delay), but slowest roll-off.
+- **Flatness Error:** 0.000000 dB (Target < 0.01)
+
+## 3. Precision & Isolation
+![Precision](.github/images/benchmark/benchmark_precision.png)
+
+| Type | Error (dB) | Isolation | Ripple | GD Std (ms) |
+|:---|:---:|:---:|:---:|:---:|
+| butter | 2.46e-03 | 31.3 dB | 0.2705 dB | 2847.826 |
+| cheby1 | 3.38e-03 | 40.5 dB | 0.1000 dB | 3551.677 |
+| cheby2 | 3.26e-03 | 57.8 dB | 29.4187 dB | 4790.013 |
+| ellip | 9.41e-03 | 54.2 dB | 0.1000 dB | 4700.881 |
+| bessel | 5.20e-01 | 32.5 dB | 5.9845 dB | 1380.212 |
+
+## 4. Performance
+![Performance](.github/images/benchmark/benchmark_performance.png)
+
+| Channels | Exec Time (s) | Speedup |
+|:---|:---:|:---:|
+| 1 | 0.542 | 1.00x |
+| 2 | 1.060 | 1.02x |
+| 4 | 2.091 | 1.04x |
+| 8 | 4.170 | 1.04x |
+| 16 | 8.398 | 1.03x |
