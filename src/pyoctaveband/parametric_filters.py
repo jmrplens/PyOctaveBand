@@ -104,7 +104,7 @@ def weighting_filter(x: List[float] | np.ndarray, fs: int, curve: str = "A") -> 
     return wf.filter(x)
 
 
-@jit("float64[:,:](float64[:,:], float64, float64)", nopython=True, cache=True)  # type: ignore
+@jit(nopython=True, cache=True)  # type: ignore
 def _apply_impulse_kernel(x_t: np.ndarray, alpha_rise: float, alpha_fall: float) -> np.ndarray:
     """Numba-optimized kernel for asymmetric time weighting."""
     y_t = np.zeros_like(x_t)
