@@ -30,7 +30,7 @@ Now available on [PyPI](https://pypi.org/project/PyOctaveBand/).
     - [5. Bessel](#5-bessel-bessel)
     - [6. Linkwitz-Riley](#6-linkwitz-riley-lr)
 7. [📏 Calibration and dBFS](#-calibration-and-dbfs)
-    - [Physical Calibration](#physical-calibration-sonómetro)
+    - [Physical Calibration](#physical-calibration-sound-level-meter)
     - [Digital Analysis (dBFS)](#digital-analysis-dbfs)
 8. [📊 Signal Decomposition](#-signal-decomposition-and-stability)
 9. [📖 Theory and Equations](#-theoretical-background)

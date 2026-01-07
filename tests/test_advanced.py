@@ -34,16 +34,13 @@ def test_fraction_validation() -> None:
     x = rng.standard_normal(fs)  # 1 second of noise
 
     # Standard fractions
-    res1 = octavefilter(x, fs, fraction=1)
-    _, freq1 = res1  # type: ignore
+    _, freq1 = octavefilter(x, fs, fraction=1)
     assert len(freq1) > 0
-    res3 = octavefilter(x, fs, fraction=3)
-    _, freq3 = res3  # type: ignore
+    _, freq3 = octavefilter(x, fs, fraction=3)
     assert len(freq3) > len(freq1)
 
     # Non-standard fraction (should work mathematically via _genfreqs)
-    res2 = octavefilter(x, fs, fraction=2)
-    _, freq2 = res2  # type: ignore
+    _, freq2 = octavefilter(x, fs, fraction=2)
     assert len(freq2) > 0
 
     # normalizedfreq only supports 1 and 3
@@ -127,8 +124,7 @@ def test_short_signal() -> None:
     x = rng.standard_normal(100) 
     
     # This might fail if resample produces empty array or 0 length
-    res = octavefilter(x, fs, limits=[12.0, 100.0])
-    spl, freq = res  # type: ignore
+    spl, freq = octavefilter(x, fs, limits=[12.0, 100.0])
     
     assert not np.isnan(spl).any()
     assert len(spl) == len(freq)
@@ -154,8 +150,7 @@ def test_nan_handling() -> None:
     x = rng.standard_normal(4800)
     x[100] = np.nan
     
-    res = octavefilter(x, fs)
-    spl, _ = res  # type: ignore
+    spl, _ = octavefilter(x, fs)
     # Expect NaNs in SPL
     assert np.isnan(spl).any()
 
@@ -177,8 +172,7 @@ def test_silence() -> None:
     fs = 48000
     x = np.zeros(fs)
     
-    res = octavefilter(x, fs)
-    spl, _ = res  # type: ignore
+    spl, _ = octavefilter(x, fs)
     
     # Should be very low dB (approx -inf, but code clips to eps)
     assert np.all(spl < -100)
@@ -208,8 +202,7 @@ def test_nyquist_limit() -> None:
     # Request up to 1000Hz
     # _deleteouters should warn and remove high bands
     with pytest.warns(UserWarning, match="frequencies above fs/2 removed"):
-        res = octavefilter(x, fs, limits=[10.0, 1000.0])
-        _, freq = res  # type: ignore
+        _, freq = octavefilter(x, fs, limits=[10.0, 1000.0])
         
     assert np.all(np.array(freq) < fs/2)
 
@@ -236,10 +229,8 @@ def test_high_order_stability() -> None:
     
     # Order 12 or 24 is quite high for standard IIR, but SOS is better.
     # We just want to ensure it doesn't explode into NaNs.
-    res1 = octavefilter(x, fs, order=12)
-    spl, _ = res1  # type: ignore
+    spl, _ = octavefilter(x, fs, order=12)
     assert not np.isnan(spl).any()
     
-    res2 = octavefilter(x, fs, order=24)
-    spl2, _ = res2  # type: ignore
+    spl2, _ = octavefilter(x, fs, order=24)
     assert not np.isnan(spl2).any()

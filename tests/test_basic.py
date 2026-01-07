@@ -36,8 +36,7 @@ def test_octave_filter_basic() -> None:
     y = 100 * np.sum([np.sin(2 * np.pi * f * t) for f in freqs], axis=0)
 
     # 1. Filter and get only SPL spectrum
-    res = PyOctaveBand.octavefilter(y, fs=fs, fraction=3, order=6, limits=[12, 20000], show=False)
-    spl, freq = res  # type: ignore
+    spl, freq = PyOctaveBand.octavefilter(y, fs=fs, fraction=3, order=6, limits=[12, 20000], show=False)
 
     assert len(spl) == len(freq)
     assert len(freq) > 0
@@ -67,10 +66,9 @@ def test_octave_filter_sigbands() -> None:
     y = np.sin(2 * np.pi * 1000 * t)
 
     # 2. Filter and get signals in time-domain bands
-    res_sig = PyOctaveBand.octavefilter(
+    _, freq, xb = PyOctaveBand.octavefilter(
         y, fs=fs, fraction=1, order=6, limits=[500, 2000], show=False, sigbands=True
     )
-    _, freq, xb = res_sig  # type: ignore
 
     assert len(xb) == len(freq)
     assert xb[0].shape == y.shape

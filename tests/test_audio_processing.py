@@ -59,8 +59,7 @@ def test_pink_noise_flatness() -> None:
     samples = int(fs * duration)
     x = generate_pink_noise(samples)
 
-    res = octavefilter(x, fs=fs, fraction=3, order=6, limits=[20, 20000])
-    spl, freq = res  # type: ignore
+    spl, freq = octavefilter(x, fs=fs, fraction=3, order=6, limits=[20, 20000])
 
     mean_spl = np.mean(spl)
 

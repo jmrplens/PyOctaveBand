@@ -5,7 +5,12 @@ Core processing logic and FilterBank class for pyoctaveband.
 
 from __future__ import annotations
 
-from typing import List, Tuple, cast
+from typing import List, Tuple, cast, overload
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 import numpy as np
 from scipy import signal
@@ -89,6 +94,24 @@ class OctaveFilterBank:
             self.freq, self.freq_d, self.freq_u, fs, order, self.factor, 
             filter_type, ripple, attenuation, show, plot_file
         )
+
+    @overload
+    def filter(
+        self, 
+        x: List[float] | np.ndarray, 
+        sigbands: Literal[False] = False,
+        mode: str = "rms",
+        detrend: bool = True
+    ) -> Tuple[np.ndarray, List[float]]: ...
+
+    @overload
+    def filter(
+        self, 
+        x: List[float] | np.ndarray, 
+        sigbands: Literal[True],
+        mode: str = "rms",
+        detrend: bool = True
+    ) -> Tuple[np.ndarray, List[float], List[np.ndarray]]: ...
 
     def filter(
         self, 

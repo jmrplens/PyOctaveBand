@@ -152,13 +152,11 @@ def test_octave_filter_vs_class_consistency() -> None:
     filter_type = "butter"
     
     # 1. Using function
-    res_func = octavefilter(x, fs=fs, fraction=fraction, order=order, filter_type=filter_type)
-    spl_func, freq_func = res_func # type: ignore
+    spl_func, freq_func = octavefilter(x, fs=fs, fraction=fraction, order=order, filter_type=filter_type)
     
     # 2. Using class
     bank = OctaveFilterBank(fs=fs, fraction=fraction, order=order, filter_type=filter_type)
-    res_class = bank.filter(x)
-    spl_class, freq_class = res_class # type: ignore
+    spl_class, freq_class = bank.filter(x)
     
     assert np.allclose(spl_func, spl_class)
     assert np.allclose(freq_func, freq_class)
@@ -180,8 +178,7 @@ def test_single_sample_signal() -> None:
     """
     fs = 48000
     x = np.array([1.0])
-    res = octavefilter(x, fs)
-    spl, freq = res # type: ignore
+    spl, freq = octavefilter(x, fs)
     assert len(spl) == len(freq)
     assert not np.isnan(spl).any()
 
@@ -212,14 +209,11 @@ def test_multichannel_consistency() -> None:
     bank = OctaveFilterBank(fs, fraction=1)
     
     # Separate
-    res1 = bank.filter(x1)
-    spl1, _ = res1 # type: ignore
-    res2 = bank.filter(x2)
-    spl2, _ = res2 # type: ignore
+    spl1, _ = bank.filter(x1)
+    spl2, _ = bank.filter(x2)
     
     # Together
-    res_stereo = bank.filter(x_stereo)
-    spl_stereo, _ = res_stereo # type: ignore
+    spl_stereo, _ = bank.filter(x_stereo)
     
     assert np.allclose(spl_stereo[0], spl1)
     assert np.allclose(spl_stereo[1], spl2)

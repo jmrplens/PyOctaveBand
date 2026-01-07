@@ -161,9 +161,7 @@ def generate_signal_responses(output_dir: str) -> None:
     ]:
         print(f"Generating {filename}...")
         bank = OctaveFilterBank(fs=fs, fraction=frac, order=6, limits=[12.0, 20000.0])
-        res = bank.filter(y)
-        # Type ignore for unpacking Union return
-        spl, freq = res  # type: ignore
+        spl, freq = bank.filter(y)
 
         _, ax = plt.subplots()
         ax.semilogx(
@@ -202,8 +200,7 @@ def generate_multichannel_response(output_dir: str) -> None:
 
     x = np.vstack((ch1, ch2))
     bank = OctaveFilterBank(fs=fs, fraction=3, order=6, limits=[20.0, 20000.0])
-    res = bank.filter(x)
-    spl, freq = res # type: ignore
+    spl, freq = bank.filter(x)
 
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
 
@@ -266,11 +263,9 @@ def generate_decomposition_plot(output_dir: str) -> None:
     bank_cheby2 = OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100.0, 2000.0], filter_type="cheby2")
     
     # Cast to 3-tuple to satisfy mypy unpacking
-    res_b = bank_butter.filter(y, sigbands=True)
-    _, freq, xb_butter = res_b  # type: ignore
+    _, freq, xb_butter = bank_butter.filter(y, sigbands=True)
     
-    res_c = bank_cheby2.filter(y, sigbands=True)
-    _, _, xb_cheby2 = res_c  # type: ignore
+    _, _, xb_cheby2 = bank_cheby2.filter(y, sigbands=True)
 
     if xb_butter is None or xb_cheby2 is None:
         raise ValueError("Signal bands should not be None")

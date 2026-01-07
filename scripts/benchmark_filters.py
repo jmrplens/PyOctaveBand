@@ -44,7 +44,7 @@ def benchmark_stability(filter_type: str, fs: int = 48000) -> tuple[float, float
     start_time = time.time()
     # Explicit unpacking with type ignore or check because octavefilter return type is Union
     res = octavefilter(x, fs, fraction=1, sigbands=True, filter_type=filter_type)
-    _, _, signals = res  # type: ignore
+    _, _, signals = res
     
     exec_time = time.time() - start_time
     
