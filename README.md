@@ -376,53 +376,54 @@ $$
 G = 10^{0.3}
 $$
 
-*   **Mid-band:**
+**Mid-band:**
 
-    $$
-    f_m = 1000 \cdot G^{x/b}
-    $$
+$$
+f_m = 1000 \cdot G^{x/b}
+$$
 
-    (for odd b)
-*   **Band edges:**
+(for odd b)
 
-    $$
-    f_1 = f_m \cdot G^{-1/2b}, \quad f_2 = f_m \cdot G^{1/2b}
-    $$
+**Band edges:**
+
+$$
+f_1 = f_m \cdot G^{-1/2b}, \quad f_2 = f_m \cdot G^{1/2b}
+$$
 
 ### Magnitude Responses |H(jw)|
 The library implements standard classical filter prototypes:
 
-1.  **Butterworth:** Maximally flat passband.
+**1. Butterworth:** Maximally flat passband.
 
-    $$
-    |H(j\omega)| = \frac{1}{\sqrt{1 + (\omega/\omega_c)^{2n}}}
-    $$
+$$
+|H(j\omega)| = \frac{1}{\sqrt{1 + (\omega/\omega_c)^{2n}}}
+$$
 
-2.  **Chebyshev I:** Equiripple in passband, steeper roll-off.
+**2. Chebyshev I:** Equiripple in passband, steeper roll-off.
 
-    $$
-    |H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 T_n^2(\omega/\omega_c)}}
-    $$
+$$
+|H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 T_n^2(\omega/\omega_c)}}
+$$
 
-3.  **Chebyshev II:** Inverse Chebyshev, equiripple in stopband, flat passband.
+**3. Chebyshev II:** Inverse Chebyshev, equiripple in stopband, flat passband.
 
-    $$
-    |H(j\omega)| = \frac{1}{\sqrt{1 + \frac{1}{\epsilon^2 T_n^2(\omega_{stop}/\omega)}}}
-    $$
+$$
+|H(j\omega)| = \frac{1}{\sqrt{1 + \frac{1}{\epsilon^2 T_n^2(\omega_{stop}/\omega)}}}
+$$
 
-4.  **Elliptic:** Equiripple in both, maximum selectivity.
+**4. Elliptic:** Equiripple in both, maximum selectivity.
 
-    $$
-    |H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 R_n^2(\omega/\omega_c, L)}}
-    $$
+$$
+|H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 R_n^2(\omega/\omega_c, L)}}
+$$
 
-5.  **Bessel:** Maximally flat group delay (linear phase).
+**5. Bessel:** Maximally flat group delay (linear phase).
 
-    $$
-    H(s) = \frac{\theta_n(0)}{\theta_n(s/\omega_0)}
-    $$
+$$
+H(s) = \frac{\theta_n(0)}{\theta_n(s/\omega_0)}
+$$
 
-    (Where $\theta_n$ is the reverse Bessel polynomial)
+(Where $\theta_n$ is the reverse Bessel polynomial)
 
 ### Filter Bank Design & Numerical Stability
 To ensure **100% stability** across the entire audible spectrum (even at low frequencies like 16Hz with high sample rates), PyOctaveBand employs two critical strategies:
