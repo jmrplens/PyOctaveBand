@@ -371,31 +371,57 @@ spl_c2, _, xb_cheby2 = octavefilter(y, fs=fs, fraction=1, sigbands=True, filter_
 
 ### Octave Band Frequencies (ANSI S1.11 / IEC 61260)
 The mid-band frequencies (fm) and edges (f1, f2) use a base-10 ratio:
-$$ G = 10^{0.3} $$
+
+$$
+G = 10^{0.3}
+$$
 
 *   **Mid-band:**
-    $$ f_m = 1000 \cdot G^{x/b} $$
+
+    $$
+    f_m = 1000 \cdot G^{x/b}
+    $$
+
     (for odd b)
 *   **Band edges:**
-    $$ f_1 = f_m \cdot G^{-1/2b}, \quad f_2 = f_m \cdot G^{1/2b} $$
+
+    $$
+    f_1 = f_m \cdot G^{-1/2b}, \quad f_2 = f_m \cdot G^{1/2b}
+    $$
 
 ### Magnitude Responses |H(jw)|
 The library implements standard classical filter prototypes:
 
 1.  **Butterworth:** Maximally flat passband.
-    $$ |H(j\omega)| = \frac{1}{\sqrt{1 + (\omega/\omega_c)^{2n}}} $$
+
+    $$
+    |H(j\omega)| = \frac{1}{\sqrt{1 + (\omega/\omega_c)^{2n}}}
+    $$
 
 2.  **Chebyshev I:** Equiripple in passband, steeper roll-off.
-    $$ |H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 T_n^2(\omega/\omega_c)}} $$
+
+    $$
+    |H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 T_n^2(\omega/\omega_c)}}
+    $$
 
 3.  **Chebyshev II:** Inverse Chebyshev, equiripple in stopband, flat passband.
-    $$ |H(j\omega)| = \frac{1}{\sqrt{1 + \frac{1}{\epsilon^2 T_n^2(\omega_{stop}/\omega)}}} $$
+
+    $$
+    |H(j\omega)| = \frac{1}{\sqrt{1 + \frac{1}{\epsilon^2 T_n^2(\omega_{stop}/\omega)}}}
+    $$
 
 4.  **Elliptic:** Equiripple in both, maximum selectivity.
-    $$ |H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 R_n^2(\omega/\omega_c, L)}} $$
+
+    $$
+    |H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 R_n^2(\omega/\omega_c, L)}}
+    $$
 
 5.  **Bessel:** Maximally flat group delay (linear phase).
-    $$ H(s) = \frac{\theta_n(0)}{\theta_n(s/\omega_0)} $$
+
+    $$
+    H(s) = \frac{\theta_n(0)}{\theta_n(s/\omega_0)}
+    $$
+
     (Where $\theta_n$ is the reverse Bessel polynomial)
 
 ### Filter Bank Design & Numerical Stability
@@ -406,13 +432,26 @@ To ensure **100% stability** across the entire audible spectrum (even at low fre
 
 ### Weighting Curves (IEC 61672-1)
 The A-weighting transfer function:
-$$R_A(f) = \frac{12194^2 \cdot f^4}{(f^2 + 20.6^2)\sqrt{(f^2 + 107.7^2)(f^2 + 737.9^2)}(f^2 + 12194^2)}$$
-$$A(f) = 20 \log_{10}(R_A(f)) + 2.00$$
+
+$$
+R_A(f) = \frac{12194^2 \cdot f^4}{(f^2 + 20.6^2)\sqrt{(f^2 + 107.7^2)(f^2 + 737.9^2)}(f^2 + 12194^2)}
+$$
+
+$$
+A(f) = 20 \log_{10}(R_A(f)) + 2.00
+$$
 
 ### Time Integration
 Implemented as a first-order IIR exponential integrator:
-$$y[n] = \alpha \cdot x^2[n] + (1 - \alpha) \cdot y[n-1]$$
-$$\alpha = 1 - e^{-1 / (f_s \cdot \tau)}$$
+
+$$
+y[n] = \alpha \cdot x^2[n] + (1 - \alpha) \cdot y[n-1]
+$$
+
+$$
+\alpha = 1 - e^{-1 / (f_s \cdot \tau)}
+$$
+
 Where `tau` is the time constant (e.g., 125ms for Fast).
 
 ---
