@@ -70,6 +70,51 @@ def weighting_filter(x: List[float] | np.ndarray, fs: int, curve: str = "A") -> 
     return cast(np.ndarray, signal.sosfilt(sos, x_proc))
 
 
+try:
+    from numba import jit
+    HAS_NUMBA = True
+except ImportError:
+    HAS_NUMBA = False
+    # Mock jit for fallback or type checking
+    def jit(*args, **kwargs):
+        def decorator(func):
+            return func
+        return decorator
+
+@jit(nopython=True)
+def _apply_impulse_kernel(x_t: np.ndarray, alpha_rise: float, alpha_fall: float) -> np.ndarray:
+    """Numba-optimized kernel for asymmetric time weighting."""
+    y_t = np.zeros_like(x_t)
+    curr_y = np.zeros(x_t.shape[1:])
+    
+    for i in range(x_t.shape[0]):
+        val = x_t[i]
+        rising = val > curr_y
+        
+        # Manually compute diff to avoid creating temporary arrays in loop
+        # curr_y += np.where(rising, alpha_rise, alpha_fall) * (val - curr_y)
+        
+        # Explicit loop over channels is faster in Numba than array operations usually
+        # But for simplicity and since shape[1:] can be anything, we keep array ops
+        # Numba handles basic numpy array ops well
+        
+        # Calculate factor
+        factor = np.empty_like(curr_y)
+        for ch in range(curr_y.size):
+            # Flat indexing logic or assume 1D channel for now? 
+            # x_t is [time, channels...]
+            # Let's trust numba's array broadcasting if simpler
+            pass
+            
+        # Numba supports numpy broadcasting, so:
+        diff = val - curr_y
+        # Where is supported in nopython mode
+        factor = np.where(rising, alpha_rise, alpha_fall)
+        curr_y += factor * diff
+        y_t[i] = curr_y
+        
+    return y_t
+
 def time_weighting(x: List[float] | np.ndarray, fs: int, mode: str = "fast") -> np.ndarray:
     """
     Apply time weighting to a signal (Exponential averaging).
@@ -100,21 +145,22 @@ def time_weighting(x: List[float] | np.ndarray, fs: int, mode: str = "fast") -> 
         alpha_rise = 1 - np.exp(-1 / (fs * tau_rise))
         alpha_fall = 1 - np.exp(-1 / (fs * tau_fall))
         
-        # Iterate over time (last axis) to handle asymmetric logic
         # Move time axis to front for iteration
         x_t = np.moveaxis(x_sq, -1, 0)
-        y_t = np.zeros_like(x_t)
         
-        # Initialize state (channels shape)
-        curr_y = np.zeros(x_t.shape[1:])
-        
-        # Simple loop over time samples
-        for i, val in enumerate(x_t):
-            # Vectorized over channels
-            rising = val > curr_y
-            diff = val - curr_y
-            curr_y += np.where(rising, alpha_rise, alpha_fall) * diff
-            y_t[i] = curr_y
+        if HAS_NUMBA:
+            # Ensure contiguous array for Numba
+            x_t = np.ascontiguousarray(x_t)
+            y_t = _apply_impulse_kernel(x_t, alpha_rise, alpha_fall)
+        else:
+            # Fallback pure python implementation
+            y_t = np.zeros_like(x_t)
+            curr_y = np.zeros(x_t.shape[1:])
+            for i, val in enumerate(x_t):
+                rising = val > curr_y
+                diff = val - curr_y
+                curr_y += np.where(rising, alpha_rise, alpha_fall) * diff
+                y_t[i] = curr_y
             
         # Move time axis back
         return np.moveaxis(y_t, 0, -1)
