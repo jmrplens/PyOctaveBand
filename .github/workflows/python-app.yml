@@ -55,6 +55,8 @@ jobs:
         pip install -r requirements-dev.txt
         pip install -e .
     - name: Run tests
+      env:
+        NUMBA_DISABLE_JIT: 1
       run: |
         pytest --junitxml=test-results-${{ matrix.python-version }}.xml --cov=src --cov-report=xml
     - name: Upload Test Results
