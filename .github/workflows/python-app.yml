@@ -1,11 +1,11 @@
 name: Python CI
 
-# This workflow ensures code quality and technical integrity.
 on:
   push:
     branches: [ "master", "main" ]
   pull_request:
     branches: [ "master", "main" ]
+  workflow_dispatch:
 
 permissions:
   contents: read
