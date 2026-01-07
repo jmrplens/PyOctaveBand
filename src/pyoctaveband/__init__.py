@@ -47,10 +47,11 @@ def octavefilter(
     plot_file: str | None = None,
     detrend: bool = True,
     filter_type: str = "butter",
+    ripple: float = 0.1,
+    attenuation: float = 60.0,
     calibration_factor: float = 1.0,
     dbfs: bool = False,
     mode: str = "rms",
-    **kwargs: float
 ) -> Tuple[np.ndarray, List[float]]: ...
 
 
@@ -66,10 +67,11 @@ def octavefilter(
     plot_file: str | None = None,
     detrend: bool = True,
     filter_type: str = "butter",
+    ripple: float = 0.1,
+    attenuation: float = 60.0,
     calibration_factor: float = 1.0,
     dbfs: bool = False,
     mode: str = "rms",
-    **kwargs: float
 ) -> Tuple[np.ndarray, List[float], List[np.ndarray]]: ...
 
 
@@ -84,10 +86,11 @@ def octavefilter(
     plot_file: str | None = None,
     detrend: bool = True,
     filter_type: str = "butter",
+    ripple: float = 0.1,
+    attenuation: float = 60.0,
     calibration_factor: float = 1.0,
     dbfs: bool = False,
     mode: str = "rms",
-    **kwargs: float
 ) -> Tuple[np.ndarray, List[float]] | Tuple[np.ndarray, List[float], List[np.ndarray]]:
     """
     Filter a signal with octave or fractional octave filter bank.
@@ -117,12 +120,11 @@ def octavefilter(
     :param detrend: If True, remove DC offset before filtering. Default: True.
     :type detrend: bool
     :param filter_type: Type of filter ('butter', 'cheby1', 'cheby2', 'ellip', 'bessel'). Default: 'butter'.
+    :param ripple: Passband ripple in dB (for cheby1, ellip). Default: 0.1.
+    :param attenuation: Stopband attenuation in dB (for cheby2, ellip). Default: 60.0.
     :param calibration_factor: Calibration factor for SPL calculation. Default: 1.0.
     :param dbfs: If True, return results in dBFS. Default: False.
     :param mode: 'rms' or 'peak'. Default: 'rms'.
-    :param kwargs: Additional design parameters:
-        - ripple: Passband ripple in dB (for cheby1, ellip). Default: 0.1.
-        - attenuation: Stopband attenuation in dB (for cheby2, ellip). Default: 60.0.
     :return: A tuple containing (SPL_array, Frequencies_list) or (SPL_array, Frequencies_list, signals).
     :rtype: Union[Tuple[np.ndarray, List[float]], Tuple[np.ndarray, List[float], List[np.ndarray]]]
     """
@@ -134,8 +136,8 @@ def octavefilter(
         order=order,
         limits=limits,
         filter_type=filter_type,
-        ripple=kwargs.get("ripple", 0.1),
-        attenuation=kwargs.get("attenuation", 60.0),
+        ripple=ripple,
+        attenuation=attenuation,
         show=show,
         plot_file=plot_file,
         calibration_factor=calibration_factor,
