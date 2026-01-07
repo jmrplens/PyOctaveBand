@@ -1,5 +1,6 @@
 name: Python CI
 
+# This workflow ensures code quality and technical integrity.
 on:
   push:
     branches: [ "master", "main" ]
