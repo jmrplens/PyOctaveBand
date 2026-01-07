@@ -96,6 +96,23 @@ def test_normalizedfreq_coverage() -> None:
     with pytest.raises(ValueError):
         normalizedfreq(5)
 
+def test_weighting_filter_class():
+    from pyoctaveband import WeightingFilter
+    fs = 48000
+    wf = WeightingFilter(fs, curve="A")
+    x = np.random.randn(2, fs)
+    y = wf.filter(x)
+    assert y.shape == x.shape
+    
+    wf_z = WeightingFilter(fs, curve="Z")
+    y_z = wf_z.filter(x)
+    assert np.all(y_z == x)
+    
+    with pytest.raises(ValueError):
+        WeightingFilter(0)
+    with pytest.raises(ValueError):
+        WeightingFilter(fs, curve="invalid")
+
 def test_octavefilterbank_repr() -> None:
     from pyoctaveband.core import OctaveFilterBank
     bank = OctaveFilterBank(48000)

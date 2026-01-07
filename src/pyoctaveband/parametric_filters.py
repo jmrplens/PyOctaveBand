@@ -15,6 +15,82 @@ from scipy import signal
 from .utils import _typesignal
 
 
+class WeightingFilter:
+    """
+    Class-based frequency weighting filter (A, C, Z).
+    Allows pre-calculating and reusing filter coefficients.
+    """
+
+    def __init__(self, fs: int, curve: str = "A") -> None:
+        """
+        Initialize the weighting filter.
+
+        :param fs: Sample rate in Hz.
+        :param curve: 'A', 'C' or 'Z'.
+        """
+        if fs <= 0:
+            raise ValueError("Sample rate 'fs' must be positive.")
+
+        self.fs = fs
+        self.curve = curve.upper()
+
+        if self.curve == "Z":
+            self.sos = np.array([])
+            return
+
+        if self.curve not in ["A", "C"]:
+            raise ValueError("Weighting curve must be 'A', 'C' or 'Z'")
+
+        # Analog ZPK for A and C weighting
+        # f1, f2, f3, f4 constants as per IEC 61672-1
+        f1 = 20.598997
+        f4 = 12194.217
+
+        if self.curve == "A":
+            f2 = 107.65265
+            f3 = 737.86223
+            # Zeros at 0 Hz
+            z = np.array([0, 0, 0, 0])
+            # Poles
+            p = np.array(
+                [
+                    -2 * np.pi * f1,
+                    -2 * np.pi * f1,
+                    -2 * np.pi * f4,
+                    -2 * np.pi * f4,
+                    -2 * np.pi * f2,
+                    -2 * np.pi * f3,
+                ]
+            )
+            # k chosen to give 0 dB at 1000 Hz
+            k = 3.5174303309e13
+
+        else:  # C weighting
+            z = np.array([0, 0])
+            p = np.array([-2 * np.pi * f1, -2 * np.pi * f1, -2 * np.pi * f4, -2 * np.pi * f4])
+            k = 5.91797e8
+
+        # Recalculate k to ensure 0dB at 1kHz
+        w = 2 * np.pi * 1000
+        h = k * np.prod(1j * w - z) / np.prod(1j * w - p)
+        k = k / np.abs(h)
+
+        zd, pd, kd = signal.bilinear_zpk(z, p, k, fs)
+        self.sos = signal.zpk2sos(zd, pd, kd)
+
+    def filter(self, x: List[float] | np.ndarray) -> np.ndarray:
+        """
+        Apply the weighting filter to a signal.
+
+        :param x: Input signal.
+        :return: Weighted signal.
+        """
+        x_proc = _typesignal(x)
+        if self.curve == "Z":
+            return x_proc
+        return cast(np.ndarray, signal.sosfilt(self.sos, x_proc, axis=-1))
+
+
 def weighting_filter(x: List[float] | np.ndarray, fs: int, curve: str = "A") -> np.ndarray:
     """
     Apply frequency weighting (A or C) to a signal.
@@ -24,51 +100,8 @@ def weighting_filter(x: List[float] | np.ndarray, fs: int, curve: str = "A") -> 
     :param curve: 'A', 'C' or 'Z' (Z is zero weighting/bypass).
     :return: Weighted signal.
     """
-    x_proc = _typesignal(x)
-    curve = curve.upper()
-    
-    if curve == "Z":
-        return x_proc
-        
-    if curve not in ["A", "C"]:
-        raise ValueError("Weighting curve must be 'A', 'C' or 'Z'")
-
-    # Analog ZPK for A and C weighting
-    # f1, f2, f3, f4 constants as per IEC 61672-1
-    f1 = 20.598997
-    f4 = 12194.217
-    
-    if curve == "A":
-        f2 = 107.65265
-        f3 = 737.86223
-        # Zeros at 0 Hz
-        z = np.array([0, 0, 0, 0])
-        # Poles
-        p = np.array([-2*np.pi*f1, -2*np.pi*f1, -2*np.pi*f4, -2*np.pi*f4, 
-                      -2*np.pi*f2, -2*np.pi*f3])
-        # k chosen to give 0 dB at 1000 Hz
-        # Reference gain at 1000Hz for A weighting: 10^(A1000/20) = 1.0 (0 dB)
-        k = 3.5174303309e13
-        
-        # Recalculate k to ensure 0dB at 1kHz
-        w = 2 * np.pi * 1000
-        h = k * np.prod(1j * w - z) / np.prod(1j * w - p)
-        k = k / np.abs(h)
-        
-    else: # C weighting
-        z = np.array([0, 0])
-        p = np.array([-2*np.pi*f1, -2*np.pi*f1, -2*np.pi*f4, -2*np.pi*f4])
-        k = 5.91797e8
-        
-        # Recalculate k to ensure 0dB at 1kHz
-        w = 2 * np.pi * 1000
-        h = k * np.prod(1j * w - z) / np.prod(1j * w - p)
-        k = k / np.abs(h)
-
-    zd, pd, kd = signal.bilinear_zpk(z, p, k, fs)
-    sos = signal.zpk2sos(zd, pd, kd)
-    
-    return cast(np.ndarray, signal.sosfilt(sos, x_proc))
+    wf = WeightingFilter(fs, curve)
+    return wf.filter(x)
 
 
 @jit(nopython=True)  # type: ignore

@@ -14,7 +14,7 @@ import numpy as np
 from .calibration import calculate_sensitivity
 from .core import OctaveFilterBank
 from .frequencies import getansifrequencies, normalizedfreq
-from .parametric_filters import linkwitz_riley, time_weighting, weighting_filter
+from .parametric_filters import WeightingFilter, linkwitz_riley, time_weighting, weighting_filter
 
 # Use non-interactive backend for plots
 matplotlib.use("Agg")
@@ -27,6 +27,7 @@ __all__ = [
     "getansifrequencies",
     "normalizedfreq",
     "OctaveFilterBank",
+    "WeightingFilter",
     "weighting_filter",
     "time_weighting",
     "linkwitz_riley",
