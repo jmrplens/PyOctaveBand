@@ -137,7 +137,7 @@ def generate_filter_type_comparison(output_dir: str) -> None:
     axins.set_xticks([707, 1000, 1414])
     axins.set_xticklabels(["707", "1000", "1414"], fontsize=8)
 
-    ax.legend(loc="upper right")
+    ax.legend(loc="lower right")
     plt.savefig(os.path.join(output_dir, "filter_type_comparison.png"))
     plt.close()
 
@@ -198,7 +198,7 @@ def generate_signal_responses(output_dir: str) -> None:
         # Shift PSD to match SPL peak roughly
         Pxx_db += (np.max(spl) - np.max(Pxx_db)) - 5 # Shift slightly below
         
-        ax.semilogx(f_psd, Pxx_db, color="gray", alpha=0.3, linewidth=0.8, label="Raw Signal Spectrum (PSD)", zorder=0)
+        ax.semilogx(f_psd, Pxx_db, color="gray", alpha=0.6, linewidth=1.2, label="Raw Signal Spectrum (PSD)", zorder=0)
         
         ax.semilogx(
             freq,
@@ -213,7 +213,7 @@ def generate_signal_responses(output_dir: str) -> None:
             label=f"Measured {frac}/1 Octave Bands"
         )
         apply_axis_styling(ax, title, xlim=(11, 25000))
-        ax.legend(loc="upper right")
+        ax.legend(loc="lower right")
         plt.savefig(os.path.join(output_dir, filename))
         plt.close()
 
@@ -252,7 +252,7 @@ def generate_multichannel_response(output_dir: str) -> None:
     Pxx_db2 += (np.max(spl[1]) - np.max(Pxx_db2)) # Align peaks
 
     # Plot Left Channel
-    ax1.semilogx(f_psd1, Pxx_db1, color="gray", alpha=0.3, linewidth=0.8, label="Raw PSD", zorder=0)
+    ax1.semilogx(f_psd1, Pxx_db1, color="gray", alpha=0.6, linewidth=1.2, label="Raw PSD", zorder=0)
     ax1.semilogx(
         freq,
         spl[0],
@@ -267,11 +267,11 @@ def generate_multichannel_response(output_dir: str) -> None:
     )
     # Use standard styling but override title
     apply_axis_styling(ax1, "Multichannel Analysis (Stereo Input)", xlim=(16, 20000))
-    ax1.legend(loc="upper right")
+    ax1.legend(loc="lower right")
     # Let Y-axis autoscale
 
     # Plot Right Channel
-    ax2.semilogx(f_psd2, Pxx_db2, color="gray", alpha=0.3, linewidth=0.8, label="Raw PSD", zorder=0)
+    ax2.semilogx(f_psd2, Pxx_db2, color="gray", alpha=0.6, linewidth=1.2, label="Raw PSD", zorder=0)
     ax2.semilogx(
         freq,
         spl[1],
@@ -286,7 +286,7 @@ def generate_multichannel_response(output_dir: str) -> None:
     )
     apply_axis_styling(ax2, "", xlim=(16, 20000))
     ax2.set_title("") # Remove title from bottom plot
-    ax2.legend(loc="upper right")
+    ax2.legend(loc="lower right")
     # Let Y-axis autoscale
 
     plt.tight_layout()
@@ -390,7 +390,7 @@ def generate_weighting_responses(output_dir: str) -> None:
         ax.semilogx(w, 20 * np.log10(np.abs(h) + 1e-9), label=label, color=color)
 
     apply_axis_styling(ax, "Frequency Weighting Curves (IEC 61672-1)", xlim=(10, 22000), ylim=(-50, 5))
-    ax.legend()
+    ax.legend(loc="lower right")
     plt.savefig(os.path.join(output_dir, "weighting_responses.png"))
     plt.close()
 
@@ -421,7 +421,7 @@ def generate_time_weighting_plot(output_dir: str) -> None:
     ax.set_title("Time Weighting Ballistics (Fast vs Slow)", fontweight="bold")
     ax.set_xlabel("Time [s]")
     ax.set_ylabel("Squared Amplitude")
-    ax.legend()
+    ax.legend(loc="lower right")
     ax.set_xlim(0.8, 3.0)
     plt.savefig(os.path.join(output_dir, "time_weighting_analysis.png"))
     plt.close()
@@ -449,7 +449,7 @@ def generate_crossover_plot(output_dir: str) -> None:
     ax.semilogx(w, 20 * np.log10(np.abs(h_lp + h_hp) + 1e-9), color="black", linestyle="--", label="Sum (Flat)")
 
     apply_axis_styling(ax, "Linkwitz-Riley Crossover (4th Order @ 1kHz)", xlim=(20, 20000), ylim=(-60, 5))
-    ax.legend()
+    ax.legend(loc="lower right")
     plt.savefig(os.path.join(output_dir, "crossover_lr4.png"))
     plt.close()
 
