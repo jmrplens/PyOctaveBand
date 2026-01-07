@@ -32,8 +32,8 @@ def get_cpu_info() -> str:
     try:
         if platform.system() == "Linux":
             import subprocess
-            # Use list of arguments instead of shell=True for security
-            output = subprocess.check_output(["grep", "model name", "/proc/cpuinfo"]).decode()
+            # Use absolute path instead of partial path for security (B607)
+            output = subprocess.check_output(["/usr/bin/grep", "model name", "/proc/cpuinfo"]).decode()
             for line in output.splitlines():
                 if "model name" in line:
                     return line.split(":")[1].strip()

@@ -97,7 +97,7 @@ jobs:
         python generate_graphs.py
         python scripts/benchmark_filters.py
         
-    - name: Commit and Push changes (Amend)
+    - name: Commit and Push changes
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -108,9 +108,23 @@ jobs:
         if git diff --staged --quiet; then
           echo "No changes in assets detected."
         else
-          echo "Changes detected, amending commit..."
-          git commit --amend --no-edit
-          git push origin ${{ github.ref_name }} --force
+          echo "Changes detected, pushing updates..."
+          
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            # Standard commit for PRs (no amend to avoid rebase hell)
+            git commit -m "chore: update assets for PR [skip ci]"
+            git push origin HEAD:${{ github.head_ref }}
+          else
+            # Clean amend for main branch
+            # Append [skip ci] to the original message to prevent loops
+            orig_msg=$(git log -1 --pretty=%B)
+            if [[ "$orig_msg" != *"[skip ci]"* ]]; then
+              git commit --amend -m "$orig_msg [skip ci]"
+            else
+              git commit --amend --no-edit
+            fi
+            git push origin ${{ github.ref_name }} --force
+          fi
         fi
 
   sonar:
