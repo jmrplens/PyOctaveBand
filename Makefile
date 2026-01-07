@@ -43,8 +43,9 @@ sonar:
 	@if [ -f .env ]; then export $$(cat .env | xargs) && $(PNPM) exec sonar-scanner; else $(PNPM) exec sonar-scanner; fi
 
 test:
-	$(PYTHON) tests/test_basic.py
-	$(PYTHON) tests/test_multichannel.py
-	$(PYTHON) tests/test_audio_processing.py
+	$(PYTHON) -m pytest tests/
+
+coverage:
+	$(PYTHON) -m pytest --cov=src/pyoctaveband --cov-report=term-missing tests/
 
 check: lint security test
