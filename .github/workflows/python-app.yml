@@ -57,18 +57,68 @@ jobs:
     - name: Run tests
       run: |
         pytest --junitxml=test-results-${{ matrix.python-version }}.xml --cov=src --cov-report=xml
-    - name: Run Filter Benchmark
-      run: |
-        python scripts/benchmark_filters.py
     - name: Upload Test Results
       uses: actions/upload-artifact@v4
       with:
         name: test-results-${{ matrix.python-version }}
         path: |
           test-results-${{ matrix.python-version }}.xml
-          filter_benchmark_report.md
           coverage.xml
       if: always()
+
+  assets:
+    needs: tests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.TOKEN_GH || github.token }}
+    
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.13"
+        cache: 'pip'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -e .
+        
+    - name: Regenerate all assets
+      run: |
+        python generate_graphs.py
+        python scripts/benchmark_filters.py
+        
+    - name: Commit and Push changes (Amend)
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        
+        # Check for changes in assets
+        git add .github/images/ filter_benchmark_report.md
+        
+        if git diff --staged --quiet; then
+          echo "No changes in assets detected."
+        else
+          echo "Changes detected, amending commit..."
+          
+          # Amend the commit that triggered the action
+          # Note: This is only safe in PR branches or non-protected branches
+          git commit --amend --no-edit
+          
+          # Force push to update the branch
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            git push origin HEAD:${{ github.head_ref }} --force
+          else
+            git push origin ${{ github.ref_name }} --force
+          fi
+        fi
 
   sonar:
     needs: tests
@@ -88,63 +138,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.TOKEN_GH }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  graphs:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python 3.13
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.13"
-        cache: 'pip'
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install -e .
-    - name: Generate graphs
-      run: python generate_graphs.py
-    
-    - name: Upload Graphs
-      uses: actions/upload-artifact@v4
-      with:
-        name: generated-graphs
-        path: .github/images/*.png
-
-    - name: Deploy Images to Assets Branch
-      run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        
-        # Stash generated images temporarily
-        mkdir -p temp_images
-        cp .github/images/*.png temp_images/
-        
-        # Fetch all branches to ensure we can switch to assets if it exists
-        git fetch origin
-        
-        # Checkout assets branch or create orphan if it doesn't exist
-        if git show-ref --verify --quiet refs/remotes/origin/assets; then
-          git checkout assets
-          git pull origin assets
-        else
-          git checkout --orphan assets
-          git rm -rf .
-        fi
-        
-        # Create directory for this run
-        mkdir -p ${{ github.run_id }}
-        cp temp_images/*.png ${{ github.run_id }}/
-        
-        git add ${{ github.run_id }}/
-        git commit -m "Add graphs for run ${{ github.run_id }}"
-        git push origin assets
-      continue-on-error: true
-
   pr-comment:
-    needs: [quality, tests, graphs]
+    needs: [quality, tests, assets]
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     permissions:
@@ -158,11 +153,6 @@ jobs:
       with:
         pattern: test-results-*
         path: test-results
-    - name: Download Graphs
-      uses: actions/download-artifact@v4
-      with:
-        name: generated-graphs
-        path: generated-graphs
     
     - name: Generate Comment Body
       run: python .github/scripts/comment_pr.py
