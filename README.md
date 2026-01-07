@@ -4,7 +4,7 @@
 [![Python application](https://github.com/jmrplens/PyOctaveBand/actions/workflows/python-app.yml/badge.svg)](https://github.com/jmrplens/PyOctaveBand/actions/workflows/python-app.yml)
 
 # PyOctaveBand
-Advanced Octave-Band and Fractional Octave-Band filter bank for signals in the time domain. Fully compliant with **ANSI s1.11-2004** and **IEC 61260-1-2014**.
+Advanced Octave-Band and Fractional Octave-Band filter bank for signals in the time domain. Fully compliant with **ANSI S1.11-2004** (Filters) and **IEC 61672-1:2013** (Time Weighting).
 
 This library provides professional-grade tools for acoustic analysis, including frequency weighting (A, C, Z), time ballistics (Fast, Slow, Impulse), and multiple filter architectures.
 
@@ -21,7 +21,7 @@ Now available on [PyPI](https://pypi.org/project/PyOctaveBand/).
     - [Gallery of Responses](#gallery-of-filter-bank-responses)
 3. [🔊 Acoustic Weighting (A, C, Z)](#-acoustic-weighting-a-c-z)
 4. [⏱️ Time Weighting and Integration](#️-time-weighting-and-integration)
-5. [⚡ Performance: OctaveFilterBank](#-performance-octavefilterbank-class)
+5. [⚡ Performance: Multichannel & Vectorization](#-performance-multichannel--vectorization)
 6. [🔍 Filter Usage and Examples](#-filter-usage-and-examples)
     - [1. Butterworth](#1-butterworth-butter)
     - [2. Chebyshev I](#2-chebyshev-i-cheby1)
@@ -124,7 +124,7 @@ spl, freq = octavefilter(signal, fs=fs, fraction=3)
 *Example of a 1/3 Octave Band spectrum analysis of a complex signal.*
 
 ### Multichannel Support
-PyOctaveBand natively supports multichannel signals (e.g., Stereo, 5.1, Microphone Arrays) without loops. Input arrays of shape `(N_channels, N_samples)` are processed in parallel.
+PyOctaveBand natively supports multichannel signals (e.g., Stereo, 5.1, Microphone Arrays) using **fully vectorized operations**. Input arrays of shape `(N_channels, N_samples)` are processed in parallel, offering significant performance gains over iterative loops.
 
 <img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/signal_response_multichannel.png" width="80%"></img>
 
@@ -186,13 +186,13 @@ c_weighted_signal = weighting_filter(signal, fs, curve='C')
 
 ## ⏱️ Time Weighting and Integration
 
-Accurate SPL measurement requires capturing energy over specific time windows.
+Accurate SPL measurement requires capturing energy over specific time windows. PyOctaveBand implements exact time constants per **IEC 61672-1:2013**.
 
 <img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/time_weighting_analysis.png" width="80%"></img>
 
 *   **Fast (`fast`):** $\tau = 125$ ms. Standard for noise fluctuations.
 *   **Slow (`slow`):** $\tau = 1000$ ms. Standard for steady noise.
-*   **Impulse (`impulse`):** 35 ms rise time. For explosive sounds.
+*   **Impulse (`impulse`):** **Asymmetric** ballistics. 35 ms rise time for rapid onset capture, 1500 ms decay for readability.
 
 ```python
 from pyoctaveband import time_weighting
@@ -205,9 +205,9 @@ spl_t = 10 * np.log10(energy_envelope / (2e-5)**2)
 
 ---
 
-## ⚡ Performance: OctaveFilterBank Class
+## ⚡ Performance: Multichannel & Vectorization
 
-Pre-calculating coefficients saves significant CPU time when processing multiple frames.
+The `OctaveFilterBank` class is highly optimized for real-time and batch processing. It uses NumPy vectorization to handle multichannel audio arrays (e.g., 64-channel microphone arrays) without explicit Python loops, ensuring maximum throughput.
 
 ```python
 from pyoctaveband import OctaveFilterBank
