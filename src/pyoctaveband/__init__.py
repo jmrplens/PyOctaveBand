@@ -6,7 +6,7 @@ Implementation according to ANSI s1.11-2004 and IEC 61260-1-2014.
 
 from __future__ import annotations
 
-from typing import List, Tuple, cast, overload, Literal
+from typing import List, Tuple, overload, Literal
 
 import matplotlib
 import numpy as np

@@ -9,6 +9,7 @@ from __future__ import annotations
 from typing import List, Tuple, cast
 
 import numpy as np
+from numba import jit
 from scipy import signal
 
 from .utils import _typesignal
@@ -70,9 +71,7 @@ def weighting_filter(x: List[float] | np.ndarray, fs: int, curve: str = "A") -> 
     return cast(np.ndarray, signal.sosfilt(sos, x_proc))
 
 
-from numba import jit
-
-@jit(nopython=True)
+@jit(nopython=True)  # type: ignore
 def _apply_impulse_kernel(x_t: np.ndarray, alpha_rise: float, alpha_fall: float) -> np.ndarray:
     """Numba-optimized kernel for asymmetric time weighting."""
     y_t = np.zeros_like(x_t)

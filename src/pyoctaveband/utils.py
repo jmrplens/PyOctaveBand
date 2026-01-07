@@ -33,7 +33,7 @@ def _resample_to_length(y: np.ndarray, factor: int, target_length: int) -> np.nd
     :param target_length: Target length.
     :return: Resampled signal.
     """
-    y_resampled = signal.resample_poly(y, factor, 1, axis=-1)
+    y_resampled = cast(np.ndarray, signal.resample_poly(y, factor, 1, axis=-1))
     current_length = y_resampled.shape[-1]
     
     if current_length > target_length:
@@ -49,7 +49,7 @@ def _resample_to_length(y: np.ndarray, factor: int, target_length: int) -> np.nd
             
         y_resampled = np.pad(y_resampled, pad_width, mode='constant')
         
-    return cast(np.ndarray, y_resampled)
+    return y_resampled
 
 
 def _downsamplingfactor(freq: List[float], fs: int) -> np.ndarray:
@@ -62,4 +62,4 @@ def _downsamplingfactor(freq: List[float], fs: int) -> np.ndarray:
     """
     guard = 0.50
     factor = (np.floor((fs / (2 + guard)) / np.array(freq))).astype("int")
-    return cast(np.ndarray, np.clip(factor, 1, 500))
+    return np.clip(factor, 1, 500)
