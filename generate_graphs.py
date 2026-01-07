@@ -396,15 +396,17 @@ def generate_weighting_responses(output_dir: str) -> None:
 
 
 def generate_time_weighting_plot(output_dir: str) -> None:
-    """Visualize Fast and Slow time weighting response to a burst."""
+    """Visualize Fast, Slow and Impulse time weighting response to a burst."""
     print("Generating time_weighting_analysis.png...")
     fs = 1000
-    t = np.linspace(0, 3, fs * 3, endpoint=False)
+    t = np.linspace(0, 4, fs * 4, endpoint=False)
     
-    # 500ms burst of noise
+    # 500ms burst of noise starting at 1.0s
     rng = np.random.default_rng(42)
     x = np.zeros_like(t)
-    x[fs:fs+int(fs*0.5)] = rng.standard_normal(int(fs*0.5))
+    start_idx = int(fs * 1.0)
+    end_idx = int(fs * 1.5)
+    x[start_idx:end_idx] = rng.standard_normal(end_idx - start_idx)
     
     from pyoctaveband import time_weighting
     
@@ -412,17 +414,27 @@ def generate_time_weighting_plot(output_dir: str) -> None:
     x_sq = x**2
     fast = time_weighting(x, fs, mode="fast")
     slow = time_weighting(x, fs, mode="slow")
+    impulse = time_weighting(x, fs, mode="impulse")
     
     _, ax = plt.subplots()
-    ax.plot(t, x_sq, color=COLOR_GRID, alpha=0.5, label="Instantaneous Energy ($x^2$)")
+    # Normalize for better visualization
+    # We normalized x_sq to peak at 1 for the plot
+    peak = np.max(x_sq)
+    x_sq /= peak
+    fast /= peak
+    slow /= peak
+    impulse /= peak
+    
+    ax.plot(t, x_sq, color=COLOR_GRID, alpha=0.5, label="Input Burst (Normalized)")
     ax.plot(t, fast, color=COLOR_PRIMARY, label="Fast (125ms)")
     ax.plot(t, slow, color=COLOR_SECONDARY, label="Slow (1000ms)")
+    ax.plot(t, impulse, color="purple", linestyle="-.", linewidth=1.5, label="Impulse (35ms/1.5s)")
     
-    ax.set_title("Time Weighting Ballistics (Fast vs Slow)", fontweight="bold")
+    ax.set_title("Time Weighting Ballistics (IEC 61672-1)", fontweight="bold")
     ax.set_xlabel("Time [s]")
-    ax.set_ylabel("Squared Amplitude")
-    ax.legend(loc="lower right")
-    ax.set_xlim(0.8, 3.0)
+    ax.set_ylabel("Normalized Response")
+    ax.legend(loc="upper right")
+    ax.set_xlim(0.8, 3.5)
     plt.savefig(os.path.join(output_dir, "time_weighting_analysis.png"))
     plt.close()
 
