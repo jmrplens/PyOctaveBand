@@ -97,7 +97,7 @@ jobs:
         python generate_graphs.py
         python scripts/benchmark_filters.py
         
-    - name: Commit and Push changes (Amend)
+    - name: Commit and Push changes
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -108,16 +108,15 @@ jobs:
         if git diff --staged --quiet; then
           echo "No changes in assets detected."
         else
-          echo "Changes detected, amending commit..."
+          echo "Changes detected, pushing updates..."
           
-          # Amend the commit that triggered the action
-          # Note: This is only safe in PR branches or non-protected branches
-          git commit --amend --no-edit
-          
-          # Force push to update the branch
           if [ "${{ github.event_name }}" == "pull_request" ]; then
-            git push origin HEAD:${{ github.head_ref }} --force
+            # Standard commit for PRs to avoid rebase hell
+            git commit -m "chore: update assets for PR"
+            git push origin HEAD:${{ github.head_ref }}
           else
+            # Clean amend for main branch
+            git commit --amend --no-edit
             git push origin ${{ github.ref_name }} --force
           fi
         fi
