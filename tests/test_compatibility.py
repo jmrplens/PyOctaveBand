@@ -6,7 +6,7 @@ Tests for backward compatibility and import fallbacks.
 import builtins
 import importlib
 import sys
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Tuple
 from unittest.mock import patch
 
 import pytest
