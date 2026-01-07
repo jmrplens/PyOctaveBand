@@ -5,12 +5,7 @@ Core processing logic and FilterBank class for pyoctaveband.
 
 from __future__ import annotations
 
-from typing import List, Tuple, cast, overload
-
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
+from typing import List, Tuple, cast, overload, Literal
 
 import numpy as np
 from scipy import signal
@@ -93,6 +88,13 @@ class OctaveFilterBank:
         self.sos = _design_sos_filter(
             self.freq, self.freq_d, self.freq_u, fs, order, self.factor, 
             filter_type, ripple, attenuation, show, plot_file
+        )
+
+    def __repr__(self) -> str:
+        return (
+            f"OctaveFilterBank(fs={self.fs}, fraction={self.fraction}, order={self.order}, "
+            f"limits={self.limits}, filter_type='{self.filter_type}', "
+            f"num_bands={self.num_bands})"
         )
 
     @overload

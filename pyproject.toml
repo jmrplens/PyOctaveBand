@@ -20,6 +20,7 @@ dependencies = [
     "numpy",
     "scipy",
     "matplotlib",
+    "numba",
 ]
 
 [project.urls]
