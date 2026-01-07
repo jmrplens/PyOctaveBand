@@ -6,7 +6,7 @@ Tests for backward compatibility and import fallbacks.
 import builtins
 import importlib
 import sys
-from typing import Any
+from typing import Any, Dict, Optional, Tuple, Union
 from unittest.mock import patch
 
 import pytest
@@ -34,7 +34,13 @@ def test_import_literal_fallback() -> None:
     # 2. Mock import to fail for typing.Literal
     real_import = builtins.__import__
 
-    def side_effect(name: str, globals: dict[str, Any] | None = None, locals: dict[str, Any] | None = None, fromlist: tuple[str, ...] | None = (), level: int = 0) -> Any:
+    def side_effect(
+        name: str, 
+        globals: Optional[Dict[str, Any]] = None, 
+        locals: Optional[Dict[str, Any]] = None, 
+        fromlist: Optional[Tuple[str, ...]] = (), 
+        level: int = 0
+    ) -> Any:
         if name == "typing" and fromlist is not None and "Literal" in fromlist:
             raise ImportError("Mocked ImportError for Literal")
         return real_import(name, globals, locals, fromlist, level)
