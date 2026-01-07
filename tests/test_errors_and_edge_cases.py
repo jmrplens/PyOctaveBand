@@ -147,18 +147,15 @@ def test_octave_filter_vs_class_consistency() -> None:
     fs = 44100
     rng = np.random.default_rng(42)
     x = rng.standard_normal(fs)
-    params = {
-        "fs": fs,
-        "fraction": 3,
-        "order": 6,
-        "filter_type": "butter"
-    }
+    fraction = 3
+    order = 6
+    filter_type = "butter"
     
     # 1. Using function
-    spl_func, freq_func = octavefilter(x, **params)
+    spl_func, freq_func = octavefilter(x, fs=fs, fraction=fraction, order=order, filter_type=filter_type)
     
     # 2. Using class
-    bank = OctaveFilterBank(**params)
+    bank = OctaveFilterBank(fs=fs, fraction=fraction, order=order, filter_type=filter_type)
     spl_class, freq_class = bank.filter(x)
     
     assert np.allclose(spl_func, spl_class)

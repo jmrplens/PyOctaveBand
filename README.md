@@ -1,6 +1,6 @@
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?hosted_button_id=BLP3R6VGYJB4Q)
 [![Donate](https://img.shields.io/badge/Donate-Ko--fi-brightgreen?color=ff5f5f)](https://ko-fi.com/jmrplens) 
-[![PyPI version](https://badge.fury.io/py/PyOctaveBand.svg)](https://pypi.org/project/PyOctaveBand/)
+[![PyPI version](https://img.shields.io/pypi/v/PyOctaveBand)](https://pypi.org/project/PyOctaveBand/)
 [![Python application](https://github.com/jmrplens/PyOctaveBand/actions/workflows/python-app.yml/badge.svg)](https://github.com/jmrplens/PyOctaveBand/actions/workflows/python-app.yml)
 
 # PyOctaveBand
@@ -30,7 +30,7 @@ Now available on [PyPI](https://pypi.org/project/PyOctaveBand/).
     - [5. Bessel](#5-bessel-bessel)
     - [6. Linkwitz-Riley](#6-linkwitz-riley-lr)
 7. [📏 Calibration and dBFS](#-calibration-and-dbfs)
-    - [Physical Calibration](#physical-calibration-sonómetro)
+    - [Physical Calibration](#physical-calibration-sound-level-meter)
     - [Digital Analysis (dBFS)](#digital-analysis-dbfs)
 8. [📊 Signal Decomposition](#-signal-decomposition-and-stability)
 9. [📖 Theory and Equations](#-theoretical-background)
@@ -78,14 +78,14 @@ All core functionality can be imported directly from the `pyoctaveband` package.
 
 | Name | Type | Description (Inputs) | Usage Snippet (Outputs) |
 | :--- | :--- | :--- | :--- |
-| `octavefilter` | `function` | **High-level analysis.**<br>• `x`: Signal array<br>• `fs`: Sample rate [Hz]<br>• `fraction`: 1, 3, etc. (Default: 1)<br>• `order`: Filter order (Default: 6)<br>• `limits`: [f_min, f_max] (Default: [12, 20000])<br>• `filter_type`: 'butter', 'cheby1', 'cheby2', 'ellip', 'bessel' (Default: 'butter')<br>• `sigbands`: Return time signals (Default: False)<br>• `detrend`: Remove DC offset (Default: True)<br>• `calibration_factor`: Sensitivity multiplier (Default: 1.0)<br>• `dbfs`: Output in dBFS instead of dB SPL (Default: False)<br>• `mode`: 'rms' or 'peak' (Default: 'rms') | `spl, freq = octavefilter(x, fs, ...)`<br>• `spl`: levels [dB]<br>• `freq`: frequencies [Hz]<br><br>**With `sigbands=True`:**<br>`spl, freq, xb = octavefilter(x, fs, sigbands=True)`<br>• `xb`: List of filtered signals (one per band)<br><br>**Calibrated usage:**<br>`spl, f = octavefilter(x, fs, calibration_factor=0.05)` |
-| `OctaveFilterBank` | `class` | **Efficient bank implementation.**<br>• `fs`: Sample rate [Hz]<br>• `fraction`: 1, 3, etc.<br>• `order`: Filter order<br>• `limits`: [f_min, f_max] (Default: [12, 20000])<br>• `filter_type`: Architecture name<br>• `calibration_factor`: Sensitivity multiplier<br>• `dbfs`: Use dBFS (Default: False) | `bank = OctaveFilterBank(fs=48000, fraction=3, order=6, filter_type='butter', calibration_factor=1.0)`<br>`spl, f = bank.filter(x, sigbands=False, mode='rms', detrend=True)`<br><br>• `bank`: Instance of the filter bank |
+| `octavefilter` | `function` | **High-level analysis.**<br>• `x`: Signal array<br>• `fs`: Sample rate [Hz]<br>• `fraction`: 1, 3, etc. (Default: 1)<br>• `order`: Filter order (Default: 6)<br>• `limits`: [f_min, f_max] (Default: [12, 20000])<br>• `filter_type`: 'butter', 'cheby1', 'cheby2', 'ellip', 'bessel' (Default: 'butter')<br>• `sigbands`: Return time signals (Default: False)<br>• `detrend`: Remove DC offset (Default: True)<br>• `calibration_factor`: Sensitivity multiplier (Default: 1.0)<br>• `dbfs`: Output in dBFS instead of dB SPL (Default: False)<br>• `mode`: 'rms' or 'peak' (Default: 'rms')<br>• `show`: Plot response (Default: False)<br>• `plot_file`: Path to save plot (Default: None)<br>• `ripple`: Passband ripple [dB] (for cheby1/ellip)<br>• `attenuation`: Stopband atten. [dB] (for cheby2/ellip) | `spl, freq = octavefilter(x, fs, ...)`<br>• `spl`: levels [dB]<br>• `freq`: frequencies [Hz]<br><br>**With `sigbands=True`:**<br>`spl, freq, xb = octavefilter(x, fs, sigbands=True)`<br>• `xb`: List of filtered signals (one per band)<br><br>**Calibrated usage:**<br>`spl, f = octavefilter(x, fs, calibration_factor=0.05)` |
+| `OctaveFilterBank` | `class` | **Efficient bank implementation.**<br>• `fs`: Sample rate [Hz]<br>• `fraction`: 1, 3, etc.<br>• `order`: Filter order<br>• `limits`: [f_min, f_max] (Default: [12, 20000])<br>• `filter_type`: Architecture name<br>• `show`: Plot response (Default: False)<br>• `plot_file`: Path to save plot (Default: None)<br>• `calibration_factor`: Sensitivity multiplier<br>• `dbfs`: Use dBFS (Default: False)<br>• `ripple`: Passband ripple [dB]<br>• `attenuation`: Stopband attenuation [dB] | `bank = OctaveFilterBank(fs=48000, fraction=3, order=6, filter_type='butter', show=True)`<br>`spl, f = bank.filter(x, sigbands=False, mode='rms', detrend=True)`<br><br>• `bank`: Instance of the filter bank |
 | `weighting_filter` | `function` | **Acoustic weighting.**<br>• `x`: Signal array<br>• `fs`: Sample rate [Hz]<br>• `curve`: 'A', 'C', or 'Z' (Default: 'A') | `y = weighting_filter(x, fs, curve='A')`<br><br>• `y`: 1D array of weighted signal |
-| `time_weighting` | `function` | **Energy capture.**<br>• `x`: Signal array<br>• `fs`: Sample rate [Hz]<br>• `mode`: 'fast', 'slow', or 'impulse' | `env = time_weighting(x, fs, mode='fast')`<br><br>• `env`: 1D array of energy envelope (Mean Square) |
-| `linkwitz_riley` | `function` | **Audio crossover.**<br>• `x`: Signal array<br>• `fs`: Sample rate [Hz]<br>• `freq`: Crossover frequency [Hz]<br>• `order`: 4 or 8 (Default: 4) | `lo, hi = linkwitz_riley(x, fs, freq=1000, order=4)`<br><br>• `lo`: Low-pass filtered signal<br>• `hi`: High-pass filtered signal |
-| `calculate_sensitivity` | `function`| **SPL Calibration.**<br>• `x_ref`: Calibration signal<br>• `fs`: Sample rate [Hz]<br>• `target_spl`: Level of calibrator (Default: 94.0) | `s = calculate_sensitivity(x_ref, fs, target_spl=94.0)`<br><br>• `s`: Float (multiplier for pressure) |
-| `getansifrequencies` | `function` | **ANSI Frequency generator.**<br>• `fraction`: 1, 3, etc. (Default: 1)<br>• `limits`: [f_min, f_max] (Default: [12, 20000]) | `f = getansifrequencies(fraction=3, limits=[20, 20000])`<br><br>• `f`: List of center frequencies [Hz] |
-| `normalizedfreq` | `function` | **Band edge calculator.**<br>• `freq`: Center frequency [Hz]<br>• `fraction`: 1, 3, etc. | `f_low, f_up = normalizedfreq(1000, 3)`<br><br>• `f_low`: Lower cut-off frequency [Hz]<br>• `f_up`: Upper cut-off frequency [Hz] |
+| `time_weighting` | `function` | **Energy capture.**<br>• `x`: Raw signal array (squared internally)<br>• `fs`: Sample rate [Hz]<br>• `mode`: 'fast', 'slow', or 'impulse' | `env = time_weighting(x, fs, mode='fast')`<br><br>• `env`: 1D array of energy envelope (Mean Square) |
+| `linkwitz_riley` | `function` | **Audio crossover.**<br>• `x`: Signal array<br>• `fs`: Sample rate [Hz]<br>• `freq`: Crossover frequency [Hz]<br>• `order`: Any even number (Default: 4) | `lo, hi = linkwitz_riley(x, fs, freq=1000, order=4)`<br><br>• `lo`: Low-pass filtered signal<br>• `hi`: High-pass filtered signal |
+| `calculate_sensitivity` | `function`| **SPL Calibration.**<br>• `ref_signal`: Calibration signal<br>• `target_spl`: Level of calibrator (Default: 94.0)<br>• `ref_pressure`: Reference pressure (Default: 20e-6) | `s = calculate_sensitivity(ref_signal, target_spl=94.0)`<br><br>• `s`: Float (multiplier for pressure) |
+| `getansifrequencies` | `function` | **ANSI Frequency generator.**<br>• `fraction`: 1, 3, etc. (Required)<br>• `limits`: [f_min, f_max] (Default: [12, 20000]) | `f_cen, f_low, f_high = getansifrequencies(fraction=3)`<br><br>• `f_cen`: List of center frequencies [Hz]<br>• `f_low`: List of lower edges [Hz]<br>• `f_high`: List of upper edges [Hz] |
+| `normalizedfreq` | `function` | **Standard IEC Frequencies.**<br>• `fraction`: 1 or 3 | `freqs = normalizedfreq(fraction=3)`<br><br>• `freqs`: List of standard center frequencies [Hz] |
 
 ---
 
@@ -106,7 +106,29 @@ spl, freq = octavefilter(signal, fs=fs, fraction=3)
 
 print(f"Bands: {freq}")
 print(f"SPL [dB]: {spl}")
+
+# OR: Import an audio file
+from scipy.io import wavfile
+
+# Load standard WAV file
+fs, signal = wavfile.read("measurement.wav")
+
+# Analyze
+# Note: To obtain real-world SPL values, you must calibrate the input.
+# See the [Physical Calibration](#physical-calibration-sonómetro) section.
+spl, freq = octavefilter(signal, fs=fs, fraction=3)
 ```
+
+<img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/signal_response_fraction_3.png" width="80%"></img>
+
+*Example of a 1/3 Octave Band spectrum analysis of a complex signal.*
+
+### Multichannel Support
+PyOctaveBand natively supports multichannel signals (e.g., Stereo, 5.1, Microphone Arrays) without loops. Input arrays of shape `(N_channels, N_samples)` are processed in parallel.
+
+<img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/signal_response_multichannel.png" width="80%"></img>
+
+*Simultaneous analysis of a Stereo signal: Left Channel (Pink Noise) vs Right Channel (Log Sine Sweep).*
 
 ---
 
@@ -192,9 +214,13 @@ from pyoctaveband import OctaveFilterBank
 
 bank = OctaveFilterBank(fs=48000, fraction=3, filter_type='butter')
 
+# Access computed properties
+# bank.freq (center), bank.freq_d (lower), bank.freq_u (upper), bank.sos (coefficients)
+
 # Process multiple signals efficiently
 for frame in stream:
-    spl, freq = bank.filter(frame)
+    # detrend=True (default) removes DC offset to improve low-freq accuracy
+    spl, freq = bank.filter(frame, detrend=True)
 ```
 
 ---
@@ -250,7 +276,7 @@ spl, freq = octavefilter(x, fs, filter_type='bessel')
 <img src="https://raw.githubusercontent.com/jmrplens/PyOctaveBand/main/.github/images/filter_bessel_fraction_3_order_6.png" width="60%"></img>
 
 ### 6. Linkwitz-Riley (`lr`)
-Specifically designed for **audio crossovers**. Linkwitz-Riley filters (typically 4th order) allow splitting a signal into bands that, when summed, result in a perfectly flat magnitude response and zero phase difference between bands at the crossover.
+Specifically designed for **audio crossovers**. Linkwitz-Riley filters (typically 4th order, but any even order is supported) allow splitting a signal into bands that, when summed, result in a perfectly flat magnitude response and zero phase difference between bands at the crossover.
 
 ```python
 from pyoctaveband import linkwitz_riley
@@ -284,7 +310,18 @@ spl, freq = octavefilter(signal, fs, calibration_factor=sensitivity)
 ```
 
 ### Digital Analysis (dBFS)
-...
+If you are working with digital audio files (e.g., WAV, FLAC) and want to analyze levels relative to Full Scale rather than physical pressure, you can use the `dbfs=True` parameter.
+
+In this mode:
+*   **0 dBFS** corresponds to a numeric signal level of 1.0 (RMS or Peak).
+*   Useful for analyzing headroom, digital mastering, or normalized signals.
+
+```python
+# Assume 'signal' is normalized between -1.0 and 1.0
+spl_dbfs, freq = octavefilter(signal, fs, dbfs=True)
+# Results will be negative (e.g., -20 dBFS)
+```
+
 ### RMS vs Peak Levels
 PyOctaveBand supports two measurement modes to align with professional software like BK:
 - **RMS (`mode='rms'`)**: Energy-based level (standard).
@@ -333,21 +370,38 @@ spl_c2, _, xb_cheby2 = octavefilter(y, fs=fs, fraction=1, sigbands=True, filter_
 ## 📖 Theoretical Background
 
 ### Octave Band Frequencies (ANSI S1.11 / IEC 61260)
-The mid-band frequencies ($f_m$) and edges ($f_1, f_2$) use a base-10 ratio $G = 10^{0.3}$:
-- Mid-band: $f_m = 1000 \cdot G^{x/b}$ (for odd $b$)
-- Band edges: $f_1 = f_m \cdot G^{-1/2b}$, $f_2 = f_m \cdot G^{1/2b}$
+The mid-band frequencies (fm) and edges (f1, f2) use a base-10 ratio:
+$$ G = 10^{0.3} $$
 
-### Magnitude Responses $|H(j\omega)|$
+*   **Mid-band:**
+    $$ f_m = 1000 \cdot G^{x/b} $$
+    (for odd b)
+*   **Band edges:**
+    $$ f_1 = f_m \cdot G^{-1/2b}, \quad f_2 = f_m \cdot G^{1/2b} $$
+
+### Magnitude Responses |H(jw)|
 The library implements standard classical filter prototypes:
-1.  **Butterworth:** $|H(j\omega)| = \frac{1}{\sqrt{1 + (\omega/\omega_c)^{2n}}}$ (Maximally flat passband)
-2.  **Chebyshev I:** $|H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 T_n^2(\omega/\omega_c)}}$ (Equiripple in passband, steeper roll-off)
+
+1.  **Butterworth:** Maximally flat passband.
+    $$ |H(j\omega)| = \frac{1}{\sqrt{1 + (\omega/\omega_c)^{2n}}} $$
+
+2.  **Chebyshev I:** Equiripple in passband, steeper roll-off.
+    $$ |H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 T_n^2(\omega/\omega_c)}} $$
+
 3.  **Chebyshev II:** Inverse Chebyshev, equiripple in stopband, flat passband.
-4.  **Elliptic:** $|H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 R_n^2(\omega/\omega_c, L)}}$ (Equiripple in both, maximum selectivity)
+    $$ |H(j\omega)| = \frac{1}{\sqrt{1 + \frac{1}{\epsilon^2 T_n^2(\omega_{stop}/\omega)}}} $$
+
+4.  **Elliptic:** Equiripple in both, maximum selectivity.
+    $$ |H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 R_n^2(\omega/\omega_c, L)}} $$
+
+5.  **Bessel:** Maximally flat group delay (linear phase).
+    $$ H(s) = \frac{\theta_n(0)}{\theta_n(s/\omega_0)} $$
+    (Where $\theta_n$ is the reverse Bessel polynomial)
 
 ### Filter Bank Design & Numerical Stability
 To ensure **100% stability** across the entire audible spectrum (even at low frequencies like 16Hz with high sample rates), PyOctaveBand employs two critical strategies:
 
-1.  **Second-Order Sections (SOS):** All filters are implemented as a series of cascaded biquads. This avoids the catastrophic numerical precision loss associated with high-order transfer functions ($a, b$ coefficients).
+1.  **Second-Order Sections (SOS):** All filters are implemented as a series of cascaded biquads. This avoids the catastrophic numerical precision loss associated with high-order transfer functions (coefficients a, b).
 2.  **Multi-rate Decimation:** For low-frequency bands, the signal is automatically downsampled (decimated) before filtering and upsampled afterwards. This keeps the digital pole locations far from the unit circle boundary, preventing oscillation and noise.
 
 ### Weighting Curves (IEC 61672-1)
@@ -359,7 +413,7 @@ $$A(f) = 20 \log_{10}(R_A(f)) + 2.00$$
 Implemented as a first-order IIR exponential integrator:
 $$y[n] = \alpha \cdot x^2[n] + (1 - \alpha) \cdot y[n-1]$$
 $$\alpha = 1 - e^{-1 / (f_s \cdot \tau)}$$
-Where $\tau$ is the time constant (e.g., 125ms for Fast).
+Where `tau` is the time constant (e.g., 125ms for Fast).
 
 ---
 

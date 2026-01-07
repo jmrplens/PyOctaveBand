@@ -32,7 +32,7 @@ def test_band_count_estimates(fraction: float, expected_bands: int) -> None:
     fs = 48000
     # Generate dummy signal
     x = np.zeros(fs)
-    limits = [12, 20000]
+    limits = [12.0, 20000.0]
     
     _, freq = octavefilter(x, fs, fraction=fraction, limits=limits)
     
@@ -129,7 +129,7 @@ def test_frequency_isolation(target_freq: float, filter_type: str) -> None:
     # Generate pure tone
     x = np.sin(2 * np.pi * target_freq * t)
     
-    spl, freq = octavefilter(x, fs, fraction=1, limits=[20, 16000], filter_type=filter_type)
+    spl, freq = octavefilter(x, fs, fraction=1, limits=[20.0, 16000.0], filter_type=filter_type)
     
     # Find the band closest to target_freq
     freq_arr = np.array(freq)

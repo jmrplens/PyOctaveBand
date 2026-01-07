@@ -6,7 +6,12 @@ Implementation according to ANSI s1.11-2004 and IEC 61260-1-2014.
 
 from __future__ import annotations
 
-from typing import List, Tuple, cast
+from typing import List, Tuple, cast, overload
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 import matplotlib
 import numpy as np
@@ -30,6 +35,36 @@ __all__ = [
     "linkwitz_riley",
     "calculate_sensitivity",
 ]
+
+
+@overload
+def octavefilter(
+    x: List[float] | np.ndarray,
+    fs: int,
+    fraction: float = 1,
+    order: int = 6,
+    limits: List[float] | None = None,
+    show: bool = False,
+    sigbands: Literal[False] = False,
+    plot_file: str | None = None,
+    detrend: bool = True,
+    **kwargs: str | float | bool
+) -> Tuple[np.ndarray, List[float]]: ...
+
+
+@overload
+def octavefilter(
+    x: List[float] | np.ndarray,
+    fs: int,
+    fraction: float = 1,
+    order: int = 6,
+    limits: List[float] | None = None,
+    show: bool = False,
+    sigbands: Literal[True] = True,
+    plot_file: str | None = None,
+    detrend: bool = True,
+    **kwargs: str | float | bool
+) -> Tuple[np.ndarray, List[float], List[np.ndarray]]: ...
 
 
 def octavefilter(
@@ -96,4 +131,7 @@ def octavefilter(
         dbfs=cast(bool, kwargs.get("dbfs", False))
     )
     
-    return filter_bank.filter(x, sigbands=sigbands, mode=cast(str, kwargs.get("mode", "rms")), detrend=detrend)
+    if sigbands:
+        return filter_bank.filter(x, sigbands=True, mode=cast(str, kwargs.get("mode", "rms")), detrend=detrend)
+    else:
+        return filter_bank.filter(x, sigbands=False, mode=cast(str, kwargs.get("mode", "rms")), detrend=detrend)

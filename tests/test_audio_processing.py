@@ -3,6 +3,8 @@
 Advanced audio processing tests including Pink Noise spectral analysis.
 """
 
+from typing import cast
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -30,7 +32,7 @@ def generate_pink_noise(samples: int) -> np.ndarray:
 
     pink = np.sum(array, axis=1)
     pink = pink - np.mean(pink)
-    return pink / np.max(np.abs(pink))
+    return cast(np.ndarray, pink / np.max(np.abs(pink)))
 
 
 def test_pink_noise_flatness() -> None:
@@ -68,7 +70,7 @@ def test_pink_noise_flatness() -> None:
     # Plot results for visual verification (optional in CI)
     _, ax = plt.subplots(figsize=(10, 6))
     ax.semilogx(freq, spl, "b-o", label="Measured SPL", markerfacecolor="white")
-    ax.axhline(mean_spl, color="r", linestyle="--", label="Mean SPL", alpha=0.7)
+    ax.axhline(float(mean_spl), color="r", linestyle="--", label="Mean SPL", alpha=0.7)
     ax.set_title("Pink Noise 1/3 Octave Spectrum (Flatness Check)", fontweight="bold")
     ax.set_xlabel("Frequency [Hz]")
     ax.set_ylabel("Level [dB]")

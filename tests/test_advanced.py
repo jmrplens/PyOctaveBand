@@ -73,19 +73,19 @@ def test_invalid_inputs() -> None:
 
     # Invalid limits: reversed
     with pytest.raises(ValueError, match="lower limit must be less than the upper limit"):
-        octavefilter(x, fs, limits=[20000, 100])
+        octavefilter(x, fs, limits=[20000.0, 100.0])
 
     # Invalid limits: non-positive
     with pytest.raises(ValueError, match="Limit frequencies must be positive"):
-        octavefilter(x, fs, limits=[0, 1000])
+        octavefilter(x, fs, limits=[0.0, 1000.0])
 
     # Invalid limits: wrong length
     with pytest.raises(ValueError, match="Limits must be a list of two frequencies"):
-        octavefilter(x, fs, limits=[100, 500, 1000])
+        octavefilter(x, fs, limits=[100.0, 500.0, 1000.0])
 
     # Invalid fs
     with pytest.raises(ValueError, match="Sample rate 'fs' must be positive"):
-        octavefilter(x, 0, limits=[100, 1000])
+        octavefilter(x, 0, limits=[100.0, 1000.0])
 
     # Invalid fraction
     with pytest.raises(ValueError, match="Bandwidth 'fraction' must be positive"):
@@ -124,7 +124,7 @@ def test_short_signal() -> None:
     x = rng.standard_normal(100) 
     
     # This might fail if resample produces empty array or 0 length
-    spl, freq = octavefilter(x, fs, limits=[12, 100])
+    spl, freq = octavefilter(x, fs, limits=[12.0, 100.0])
     
     assert not np.isnan(spl).any()
     assert len(spl) == len(freq)
@@ -202,7 +202,7 @@ def test_nyquist_limit() -> None:
     # Request up to 1000Hz
     # _deleteouters should warn and remove high bands
     with pytest.warns(UserWarning, match="frequencies above fs/2 removed"):
-        _, freq = octavefilter(x, fs, limits=[10, 1000])
+        _, freq = octavefilter(x, fs, limits=[10.0, 1000.0])
         
     assert np.all(np.array(freq) < fs/2)
 

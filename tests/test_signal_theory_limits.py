@@ -122,7 +122,8 @@ def test_multichannel_mismatched_lengths() -> None:
     x = [[1.0, 2.0, 3.0], [1.0, 2.0]]
     # This should probably raise an error or handle it via numpy's default behavior
     with pytest.raises(Exception):
-        octavefilter(x, fs)
+        # type ignore because list of lists of floats is technically not what we hint, but what user might pass
+        octavefilter(x, fs) # type: ignore
 
 
 def test_sos_stability_at_low_freq_high_fs() -> None:
