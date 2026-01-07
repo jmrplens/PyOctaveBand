@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 from pyoctaveband.utils import _resample_to_length
 from pyoctaveband.parametric_filters import time_weighting, weighting_filter
 

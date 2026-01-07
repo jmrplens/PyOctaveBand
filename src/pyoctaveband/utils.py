@@ -37,20 +37,15 @@ def _resample_to_length(y: np.ndarray, factor: int, target_length: int) -> np.nd
     current_length = y_resampled.shape[-1]
     
     if current_length > target_length:
-        # Slice along the last axis
-        if y_resampled.ndim == 1:
-            y_resampled = y_resampled[:target_length]
-        else:
-            y_resampled = y_resampled[..., :target_length]
+        # Slice along the last axis (works for both 1D and 2D)
+        y_resampled = y_resampled[..., :target_length]
             
     elif current_length < target_length:
         diff = target_length - current_length
-        pad_width: List[Tuple[int, int]]
-        if y_resampled.ndim == 1:
-            pad_width = [(0, diff)]
-        else:
-            # Pad only the last axis
-            pad_width = [(0, 0)] * (y_resampled.ndim - 1) + [(0, diff)]
+        # Pad only the last axis. This works for both 1D and 2D arrays.
+        # For 1D, pad_width becomes `[(0, diff)]`.
+        # For 2D, pad_width becomes `[(0, 0), (0, diff)]`.
+        pad_width: List[Tuple[int, int]] = [(0, 0)] * (y_resampled.ndim - 1) + [(0, diff)]
             
         y_resampled = np.pad(y_resampled, pad_width, mode='constant')
         
