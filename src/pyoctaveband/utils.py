@@ -45,8 +45,9 @@ def _resample_to_length(y: np.ndarray, factor: int, target_length: int) -> np.nd
             
     elif current_length < target_length:
         diff = target_length - current_length
+        pad_width: List[Tuple[int, int]]
         if y_resampled.ndim == 1:
-            pad_width = (0, diff)
+            pad_width = [(0, diff)]
         else:
             # Pad only the last axis
             pad_width = [(0, 0)] * (y_resampled.ndim - 1) + [(0, diff)]

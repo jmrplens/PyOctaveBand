@@ -222,8 +222,8 @@ class OctaveFilterBank:
 
         if self.dbfs:
             # dBFS: 0 dB is RMS = 1.0 or Peak = 1.0
-            return 20 * np.log10(val_linear)
+            return cast(np.ndarray, 20 * np.log10(val_linear))
         
         # Physical SPL: apply sensitivity and use 20uPa reference
         pressure_pa = val_linear * self.calibration_factor
-        return 20 * np.log10(np.maximum(pressure_pa, eps) / 2e-5)
+        return cast(np.ndarray, 20 * np.log10(np.maximum(pressure_pa, eps) / 2e-5))
