@@ -1,52 +1,54 @@
 # PyOctaveBand: Technical Benchmark Report
 
-Generated on: 2026-01-07 08:31:49
+Generated on: 2026-01-07 08:35:24
 
-**Environment:** fs=48000Hz, Python optimized with Numba.
+**Environment:** fs=48000Hz, Python optimized with Numba and NumPy Vectorization.
 
-## 1. Spectral Isolation & Numerical Precision
-Evaluates how well the filter isolates a 1kHz tone and its numerical accuracy relative to the theoretical RMS (-3.01 dBFS).
-| Filter Type | Peak (dBFS) | Precision Error (dB) | Atten. -1 Oct | Atten. +1 Oct | Atten. -2 Oct |
-|:---|:---:|:---:|:---:|:---:|:---:|
-| butter | -3.0121 | 1.85e-03 | 43.0 dB | 32.4 dB | 49.8 dB |
-| cheby1 | -3.0182 | 7.87e-03 | 42.8 dB | 41.1 dB | 49.5 dB |
-| cheby2 | -3.0151 | 4.80e-03 | 45.5 dB | 53.0 dB | 52.2 dB |
-| ellip | -3.0269 | 1.66e-02 | 42.9 dB | 48.0 dB | 49.6 dB |
-| bessel | -3.4357 | 4.25e-01 | 44.6 dB | 33.7 dB | 51.4 dB |
+## 1. Executive Summary
+This report evaluates the numerical integrity and performance of the PyOctaveBand DSP engine. The library achieves professional-grade precision and high throughput for multichannel analysis.
 
-## 2. Signal Theory & Quality Metrics
-Validation of passband ripple (central 80%), phase linearity (GD Std), and total reconstruction flatness.
-| Filter Type | Passband Ripple | GD Std Dev (ms) | Flatness Error | Recommended For |
+## 2. Numerical Precision & Isolation
+![Precision and Isolation](.github/images/benchmark/benchmark_precision.png)
+
+- **Precision:** Measures the absolute error in dB relative to the theoretical RMS of a pure sine wave (-3.01 dBFS).
+- **Isolation:** Evaluates the filter's ability to reject out-of-band energy at adjacent octave bands.
+
+| Filter Type | Peak (dBFS) | Precision Error | Atten. +1 Oct |
+|:---|:---:|:---:|:---:|
+| butter | -3.0121 | 1.85e-03 dB | 32.4 dB |
+| cheby1 | -3.0182 | 7.87e-03 dB | 41.1 dB |
+| cheby2 | -3.0151 | 4.80e-03 dB | 53.0 dB |
+| ellip | -3.0269 | 1.66e-02 dB | 48.0 dB |
+| bessel | -3.4357 | 4.25e-01 dB | 33.7 dB |
+
+## 3. Phase Linearity & Stability
+![Stability and Phase](.github/images/benchmark/benchmark_stability.png)
+
+- **GD Std Dev:** Quantification of phase distortion. A lower standard deviation of Group Delay indicates better preservation of wave shapes.
+- **IR Tail Energy:** Residual energy in the filter after 1.9 seconds. Values < 1e-6 confirm unconditional numerical stability.
+
+| Filter Type | Passband Ripple | GD Std Dev (ms) | IR Tail Energy | Status |
 |:---|:---:|:---:|:---:|:---:|
-| butter | 0.2462 dB | 2698.713 ms | 4.55 dB | Standard Audio |
-| cheby1 | 0.1000 dB | 3394.606 ms | 4.79 dB | High Selectivity |
-| cheby2 | 28.7270 dB | 4854.467 ms | 60.22 dB | Out-of-band Rejection |
-| ellip | 0.1000 dB | 4600.809 ms | 4.78 dB | Out-of-band Rejection |
-| bessel | 5.8771 dB | 1122.052 ms | 10.54 dB | Transient Analysis |
+| butter | 0.2462 dB | 2698.713 ms | 1.29e-09 | 💎 High Quality |
+| cheby1 | 0.1000 dB | 3394.606 ms | 2.04e-07 | ✅ Stable |
+| cheby2 | 28.7270 dB | 4854.467 ms | 2.12e-07 | ✅ Stable |
+| ellip | 0.1000 dB | 4600.809 ms | 4.95e-07 | ✅ Stable |
+| bessel | 5.8771 dB | 1122.052 ms | 2.34e-13 | 💎 High Quality |
 
-## 3. Stability, Latency & Speed
-IR Tail Energy < 1e-6 indicates high numerical stability. Latency is measured at the 1kHz band peak.
-| Filter Type | IR Tail Energy | Latency (ms) | Status | Exec Time (ms) |
-|:---|:---:|:---:|:---:|:---:|
-| butter | 1.29e-09 | 1.85 | ✅ Stable | 34.64 |
-| cheby1 | 2.04e-07 | 2.31 | ✅ Stable | 34.52 |
-| cheby2 | 2.12e-07 | 3.23 | ✅ Stable | 35.48 |
-| ellip | 4.95e-07 | 1.85 | ✅ Stable | 35.88 |
-| bessel | 2.34e-13 | 1.85 | ✅ Stable | 45.61 |
+## 4. Multichannel Performance
+![Performance Scaling](.github/images/benchmark/benchmark_performance.png)
 
-## 4. Multichannel Performance (Vectorization)
-Measures the average execution time for a 1-second signal through a 1/3 Octave Filter Bank.
+PyOctaveBand leverages NumPy's internal C-optimized loops for multichannel processing. The chart shows the speedup factor as the number of channels increases.
+
 | Channels | Total Time (ms) | Time per Channel (ms) | Speedup Factor |
 |:---|:---:|:---:|:---:|
-| 1 | 42.66 | 42.66 | 1.00x |
-| 2 | 66.34 | 33.17 | 1.29x |
-| 4 | 125.25 | 31.31 | 1.36x |
-| 8 | 234.03 | 29.25 | 1.46x |
-| 16 | 447.93 | 28.00 | 1.52x |
+| 1 | 39.98 | 39.98 | 1.00x |
+| 2 | 66.40 | 33.20 | 1.20x |
+| 4 | 122.89 | 30.72 | 1.30x |
+| 8 | 234.38 | 29.30 | 1.36x |
+| 16 | 450.06 | 28.13 | 1.42x |
 
-## 5. Architecture Summary
-- **Butterworth:** Maximally flat passband. Standard for acoustic measurement.
-- **Chebyshev I:** High selectivity, but introduces ripples in the passband.
-- **Chebyshev II:** Flat passband with ripples in the stopband (excellent for isolation).
-- **Elliptic:** Minimum transition width at the cost of ripple in both regions.
-- **Bessel:** Linear phase response. Lowest latency and best transient preservation.
+## 5. Methodology
+- **Input:** Double-precision floating-point buffers.
+- **Architecture:** Second-Order Sections (SOS) with automatic multirate decimation for stability.
+- **Metrics:** Calculated using standard SciPy Signal Processing toolbox functions.
