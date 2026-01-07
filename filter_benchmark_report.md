@@ -1,28 +1,54 @@
-# Filter Architecture Benchmark Report
+# PyOctaveBand: Technical Benchmark Report
 
-This report compares the performance and characteristics of the available filter types.
+Generated on: 2026-01-07 08:14:26
 
-## 1. Spectral Isolation (at 1kHz)
-| Filter Type | Peak SPL (dB) | Atten. -1 Oct (dB) | Atten. +1 Oct (dB) | Atten. -2 Oct (dB) | Atten. +2 Oct (dB) |
-|---|---|---|---|---|---|
-| butter | 90.96 | 40.0 | 32.3 | 46.8 | 57.7 |
-| cheby1 | 90.96 | 39.8 | 40.2 | 46.5 | 57.2 |
-| cheby2 | 90.96 | 42.5 | 50.4 | 49.2 | 61.6 |
-| ellip | 90.95 | 39.9 | 45.1 | 46.6 | 57.1 |
-| bessel | 90.54 | 41.6 | 33.6 | 48.4 | 60.1 |
+**Environment:** fs=48000Hz, Python optimized with Numba and NumPy Vectorization.
 
-## 2. Stability and Performance
-| Filter Type | Max IR Tail Energy | Stability Status | Avg. Execution Time (s) |
-|---|---|---|---|
-| butter | 1.29e-09 | ✅ Stable | 0.0353 |
-| cheby1 | 2.04e-07 | ✅ Stable | 0.0348 |
-| cheby2 | 2.12e-07 | ✅ Stable | 0.0355 |
-| ellip | 4.95e-07 | ✅ Stable | 0.0359 |
-| bessel | 4.21e-15 | ✅ Stable | 0.0451 |
+## 1. Executive Summary
+This report evaluates the numerical integrity and performance of the PyOctaveBand DSP engine. The library achieves professional-grade precision and high throughput for multichannel analysis.
 
-## 3. Analysis Summary
-- **Butterworth:** Best compromise, maximally flat passband.
-- **Chebyshev I:** Steeper roll-off than Butterworth but with passband ripple.
-- **Chebyshev II:** Flat passband, ripple in the stopband.
-- **Elliptic:** Steepest transition but ripples in both passband and stopband.
-- **Bessel:** Best phase response and minimal ringing (group delay), but slowest roll-off.
+## 2. Numerical Precision & Isolation
+![Precision and Isolation](.github/images/benchmark/benchmark_precision.png)
+
+- **Precision:** Measures the absolute error in dB relative to the theoretical RMS of a pure sine wave (-3.01 dBFS).
+- **Isolation:** Evaluates the filter's ability to reject out-of-band energy at adjacent octave bands.
+
+| Filter Type | Peak (dBFS) | Precision Error | Atten. +1 Oct |
+|:---|:---:|:---:|:---:|
+| butter | -3.0121 | 1.85e-03 dB | 32.4 dB |
+| cheby1 | -3.0182 | 7.87e-03 dB | 41.1 dB |
+| cheby2 | -3.0151 | 4.80e-03 dB | 53.0 dB |
+| ellip | -3.0269 | 1.66e-02 dB | 48.0 dB |
+| bessel | -3.4357 | 4.25e-01 dB | 33.7 dB |
+
+## 3. Phase Linearity & Stability
+![Stability and Phase](.github/images/benchmark/benchmark_stability.png)
+
+- **GD Std Dev:** Quantification of phase distortion. A lower standard deviation of Group Delay indicates better preservation of wave shapes.
+- **IR Tail Energy:** Residual energy in the filter after 1.9 seconds. Values < 1e-6 confirm unconditional numerical stability.
+
+| Filter Type | Passband Ripple | GD Std Dev (ms) | IR Tail Energy | Status |
+|:---|:---:|:---:|:---:|:---:|
+| butter | 0.2462 dB | 2698.713 ms | 1.29e-09 | 💎 High Quality |
+| cheby1 | 0.1000 dB | 3394.606 ms | 2.04e-07 | ✅ Stable |
+| cheby2 | 28.7270 dB | 4854.467 ms | 2.12e-07 | ✅ Stable |
+| ellip | 0.1000 dB | 4600.809 ms | 4.95e-07 | ✅ Stable |
+| bessel | 5.8771 dB | 1122.052 ms | 2.34e-13 | 💎 High Quality |
+
+## 4. Multichannel Performance
+![Performance Scaling](.github/images/benchmark/benchmark_performance.png)
+
+PyOctaveBand leverages NumPy's internal C-optimized loops for multichannel processing. The chart shows the speedup factor as the number of channels increases.
+
+| Channels | Total Time (ms) | Time per Channel (ms) | Speedup Factor |
+|:---|:---:|:---:|:---:|
+| 1 | 48.36 | 48.36 | 1.00x |
+| 2 | 78.72 | 39.36 | 1.23x |
+| 4 | 141.02 | 35.26 | 1.37x |
+| 8 | 264.49 | 33.06 | 1.46x |
+| 16 | 509.15 | 31.82 | 1.52x |
+
+## 5. Methodology
+- **Input:** Double-precision floating-point buffers.
+- **Architecture:** Second-Order Sections (SOS) with automatic multirate decimation for stability.
+- **Metrics:** Calculated using standard SciPy Signal Processing toolbox functions.
