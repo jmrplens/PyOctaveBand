@@ -125,3 +125,68 @@ def test_calculate_level_invalid_mode() -> None:
     bank = OctaveFilterBank(48000)
     with pytest.raises(ValueError, match="Invalid mode"):
         bank._calculate_level(np.array([1.0]), "unknown_mode")
+
+
+def test_even_fraction_logic() -> None:
+    """
+    Cover the 'round(b) % 2 == 0' branch in frequencies.py (_initindex, _ratio).
+    """
+    # fraction=2 (1/2 octave) is even.
+    freq, _, _ = getansifrequencies(fraction=2, limits=[100, 1000])
+    assert len(freq) > 0
+    # Basic check that frequencies are increasing
+    assert np.all(np.diff(freq) > 0)
+
+
+def test_resample_to_length_truncation() -> None:
+    """
+    Cover the branch where truncation is needed in _resample_to_length.
+    (len(y_resampled) > target_length).
+    """
+    # Signal length 10, factor 2 -> resampled ~20.
+    # Target 15 -> needs truncation.
+    x = np.ones(10)
+    target = 15
+    y = _resample_to_length(x, 2, target)
+    assert len(y) == target
+    # The default resample_poly might produce boundary effects, but length is key here.
+
+
+def test_low_fs_warning() -> None:
+    """
+    Cover the warning branch in _deleteouters when bands exceed Nyquist.
+    """
+    fs = 1000  # Nyquist 500
+    # Request bands up to 2000 Hz
+    with pytest.warns(UserWarning, match="frequencies above fs/2 removed"):
+        freq, _, _ = getansifrequencies(fraction=1, limits=[100, 2000])
+        # Manually verify removal happened if we were calling _genfreqs, 
+        # but here we test the warning mechanism which is triggered in higher level calls
+        # actually getansifrequencies doesn't warn, _genfreqs does.
+        # Let's call OctaveFilterBank which calls _genfreqs
+        OctaveFilterBank(fs, limits=[100, 2000])
+
+
+def test_typesignal_tuple() -> None:
+    """Cover the branch where input is a tuple."""
+    x = (1.0, 2.0, 3.0)
+    y = _typesignal(x)
+    assert isinstance(y, np.ndarray)
+    assert len(y) == 3
+
+
+def test_all_filter_architectures_design() -> None:
+    """
+    Ensure _design_sos_filter runs without error for all supported types
+    and parameters.
+    """
+    types = ["butter", "cheby1", "cheby2", "ellip", "bessel"]
+    fs = 48000
+    for ft in types:
+        # We just check it doesn't crash and returns valid SOS
+        sos = _design_sos_filter(
+            freq=[1000], freq_d=[707], freq_u=[1414], fs=fs, order=4, 
+            factor=np.array([1]), filter_type=ft, ripple=1.0, attenuation=40.0
+        )
+        assert len(sos) == 1
+        assert len(sos[0]) > 0
