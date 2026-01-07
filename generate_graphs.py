@@ -54,6 +54,31 @@ def apply_axis_styling(ax: Any, title: str, xlim: tuple[float, float] | None = N
     ax.set_xticklabels(xticklabels)
 
 
+def plot_psd(ax: Any, x: np.ndarray, fs: int, label: str = "Raw Signal PSD", color: str = "gray", alpha: float = 0.3) -> None:
+    """Calculate and plot the Power Spectral Density of the raw signal."""
+    # Use Welch's method for a smooth PSD estimate
+    f, Pxx = scipy_signal.welch(x, fs, nperseg=4096)
+    
+    # Convert to dB (relative to max to match SPL scale roughly or just show shape)
+    # Since SPL is calibrated differently, we just want to show the 'shape' of the spectrum
+    # in the background. We can normalize Pxx to match the peak of the octave bands roughly
+    # or just plot it as is if we had calibrated units.
+    # Here we'll just plot relative dB
+    
+    # Avoid log(0)
+    Pxx_db = 10 * np.log10(Pxx + 1e-12)
+    
+    # Normalize PSD peak to 0 dB for visualization shape, then shift down? 
+    # Or better: don't normalize, just plot. But PSD density vs Octave Band Power (integrated) 
+    # are different units (dB/Hz vs dB).
+    # So we will plot it on a secondary Y axis or just scaled to fit nicely in background.
+    
+    # Let's shift it so its mean roughly aligns with the mean of the SPL for visualization
+    # This is purely for qualitative comparison of "where the energy is".
+    
+    ax.semilogx(f, Pxx_db, color=color, alpha=alpha, linewidth=1, label=label, zorder=0)
+
+
 def generate_filter_type_comparison(output_dir: str) -> None:
     """Compare different filter architectures with a zoom inset."""
     print("Generating filter_type_comparison.png...")
@@ -164,6 +189,17 @@ def generate_signal_responses(output_dir: str) -> None:
         spl, freq = bank.filter(y)
 
         _, ax = plt.subplots()
+        
+        # Plot PSD of raw signal in background
+        # We need to scale PSD to comparable levels. 
+        # A simple hack for visualization is to align the max of PSD to max of SPL
+        f_psd, Pxx = scipy_signal.welch(y, fs, nperseg=8192)
+        Pxx_db = 10 * np.log10(Pxx + 1e-12)
+        # Shift PSD to match SPL peak roughly
+        Pxx_db += (np.max(spl) - np.max(Pxx_db)) - 5 # Shift slightly below
+        
+        ax.semilogx(f_psd, Pxx_db, color="gray", alpha=0.3, linewidth=0.8, label="Raw Signal Spectrum (PSD)", zorder=0)
+        
         ax.semilogx(
             freq,
             spl,
@@ -174,8 +210,10 @@ def generate_signal_responses(output_dir: str) -> None:
             linewidth=1.5,
             markerfacecolor="white",
             markeredgewidth=1.5,
+            label=f"Measured {frac}/1 Octave Bands"
         )
         apply_axis_styling(ax, title, xlim=(11, 25000))
+        ax.legend(loc="upper right")
         plt.savefig(os.path.join(output_dir, filename))
         plt.close()
 
@@ -204,7 +242,17 @@ def generate_multichannel_response(output_dir: str) -> None:
 
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
 
+    # Calculate PSDs for background
+    f_psd1, Pxx1 = scipy_signal.welch(x[0], fs, nperseg=4096)
+    Pxx_db1 = 10 * np.log10(Pxx1 + 1e-12)
+    Pxx_db1 += (np.max(spl[0]) - np.max(Pxx_db1)) # Align peaks
+    
+    f_psd2, Pxx2 = scipy_signal.welch(x[1], fs, nperseg=4096)
+    Pxx_db2 = 10 * np.log10(Pxx2 + 1e-12)
+    Pxx_db2 += (np.max(spl[1]) - np.max(Pxx_db2)) # Align peaks
+
     # Plot Left Channel
+    ax1.semilogx(f_psd1, Pxx_db1, color="gray", alpha=0.3, linewidth=0.8, label="Raw PSD", zorder=0)
     ax1.semilogx(
         freq,
         spl[0],
@@ -223,6 +271,7 @@ def generate_multichannel_response(output_dir: str) -> None:
     # Let Y-axis autoscale
 
     # Plot Right Channel
+    ax2.semilogx(f_psd2, Pxx_db2, color="gray", alpha=0.3, linewidth=0.8, label="Raw PSD", zorder=0)
     ax2.semilogx(
         freq,
         spl[1],
