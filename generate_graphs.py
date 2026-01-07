@@ -1,5 +1,6 @@
 import os
 import sys
+from typing import Any, Tuple, List, cast
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -32,7 +33,8 @@ plt.rcParams.update(
 )
 
 
-def apply_axis_styling(ax, title, xlim=None, ylim=None):
+
+def apply_axis_styling(ax: Any, title: str, xlim: tuple[float, float] | None = None, ylim: tuple[float, float] | None = None) -> None:
     """Apply consistent styling to plots."""
     ax.set_title(title, fontweight="bold", pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
@@ -60,7 +62,7 @@ def generate_filter_type_comparison(output_dir: str) -> None:
     order = 6
     
     # We want exactly the 1000Hz band
-    limits = [800, 1200]
+    limits = [800.0, 1200.0]
     
     filters = [
         ("butter", "Butterworth", COLOR_PRIMARY, "-"),
@@ -137,7 +139,7 @@ def generate_filter_responses(output_dir: str) -> None:
         for fraction, order in configs:
             filename = f"filter_{f_type_name}_fraction_{fraction}_order_{order}.png"
             print(f"Generating {filename}...")
-            bank = OctaveFilterBank(fs=fs, fraction=fraction, order=order, limits=[12, 20000], filter_type=f_type)
+            bank = OctaveFilterBank(fs=fs, fraction=fraction, order=order, limits=[12.0, 20000.0], filter_type=f_type)
             
             from pyoctaveband.filter_design import _showfilter
             _showfilter(bank.sos, bank.freq, bank.freq_u, bank.freq_d, fs, bank.factor, 
@@ -158,8 +160,10 @@ def generate_signal_responses(output_dir: str) -> None:
         (3, "signal_response_fraction_3.png", "1/3 Octave Band Analysis"),
     ]:
         print(f"Generating {filename}...")
-        bank = OctaveFilterBank(fs=fs, fraction=frac, order=6, limits=[12, 20000])
-        spl, freq = bank.filter(y)
+        bank = OctaveFilterBank(fs=fs, fraction=frac, order=6, limits=[12.0, 20000.0])
+        res = bank.filter(y)
+        # Type ignore for unpacking Union return
+        spl, freq = res  # type: ignore
 
         _, ax = plt.subplots()
         ax.semilogx(
@@ -179,62 +183,69 @@ def generate_signal_responses(output_dir: str) -> None:
 
 
 def generate_multichannel_response(output_dir: str) -> None:
-    """Generate analysis plot for a stereo signal."""
+    """Generate analysis plot for a stereo signal with separate subplots."""
     print("Generating signal_response_multichannel.png...")
     fs = 48000
     duration = 5
     t = np.linspace(0, duration, int(fs * duration), endpoint=False)
 
     rng = np.random.default_rng(42)
-    # Channel 1: Pink Noise (Voss-McCartney)
-    num_cols = 16
-    array = np.empty((len(t), num_cols))
-    array.fill(np.nan)
-    array[0, :] = rng.random(num_cols)
-    array[:, 0] = rng.random(len(t))
-    for i in range(1, len(t)):
-        for j in range(1, num_cols):
-            if i % (2**j) == 0:
-                array[i, j] = rng.random()
-            else:
-                array[i, j] = array[i - 1, j]
-    ch1 = np.sum(array, axis=1)
+    # Channel 1: Pink Noise (Voss-McCartney simplified)
+    # Good enough for visualization
+    white = rng.standard_normal(len(t))
+    b, a = scipy_signal.butter(1, 0.04) # -3dB/oct approx
+    ch1 = scipy_signal.lfilter(b, a, white)
     ch1 = (ch1 - np.mean(ch1)) / np.max(np.abs(ch1))
 
     # Channel 2: Logarithmic Sine Sweep
     ch2 = scipy_signal.chirp(t, f0=50, t1=duration, f1=10000, method="logarithmic")
 
     x = np.vstack((ch1, ch2))
-    bank = OctaveFilterBank(fs=fs, fraction=3, order=6, limits=[20, 20000])
-    spl, freq = bank.filter(x)
+    bank = OctaveFilterBank(fs=fs, fraction=3, order=6, limits=[20.0, 20000.0])
+    res = bank.filter(x)
+    spl, freq = res # type: ignore
 
-    _, ax = plt.subplots()
-    ax.semilogx(
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
+
+    # Plot Left Channel
+    ax1.semilogx(
         freq,
         spl[0],
         marker="o",
         markersize=5,
-        label="Left: Pink Noise",
+        label="Left Channel: Pink Noise",
         color=COLOR_PRIMARY,
-        alpha=0.8,
+        linestyle="-",
+        linewidth=1.5,
         markerfacecolor="white",
         markeredgewidth=1.2,
     )
-    ax.semilogx(
+    ax1.set_ylabel(LABEL_LEVEL_DB)
+    ax1.set_title("Multichannel Analysis (Stereo Input)", fontweight="bold", pad=12)
+    ax1.grid(which="major", color=COLOR_GRID, linestyle="-")
+    ax1.grid(which="minor", color=COLOR_GRID, linestyle=":", alpha=0.4)
+    ax1.legend(loc="upper right")
+    ax1.set_ylim(-40, 0)
+
+    # Plot Right Channel
+    ax2.semilogx(
         freq,
         spl[1],
         marker="s",
         markersize=5,
-        label="Right: Log Sweep",
+        label="Right Channel: Log Sine Sweep",
         color=COLOR_SECONDARY,
-        alpha=0.8,
+        linestyle="-",
+        linewidth=1.5,
         markerfacecolor="white",
         markeredgewidth=1.2,
     )
+    apply_axis_styling(ax2, "", xlim=(16, 20000))
+    ax2.set_title("") # Remove title from bottom plot
+    ax2.legend(loc="upper right")
+    ax2.set_ylim(-15, 5)
 
-    apply_axis_styling(ax, "Multichannel Analysis (1/3 Octave)", xlim=(16, 20000))
-    ax.legend(frameon=True, loc="upper right")
-
+    plt.tight_layout()
     plt.savefig(os.path.join(output_dir, "signal_response_multichannel.png"))
     plt.close()
 
@@ -251,14 +262,22 @@ def generate_decomposition_plot(output_dir: str) -> None:
 
     # Filter into 1/1 octave bands with two different architectures
     # We use Chebyshev II (flat passband, no ripple)
-    bank_butter = OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100, 2000], filter_type="butter")
-    bank_cheby2 = OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100, 2000], filter_type="cheby2")
+    bank_butter = OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100.0, 2000.0], filter_type="butter")
+    bank_cheby2 = OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100.0, 2000.0], filter_type="cheby2")
     
-    _, freq, xb_butter = bank_butter.filter(y, sigbands=True)
-    _, _, xb_cheby2 = bank_cheby2.filter(y, sigbands=True)
+    # Cast to 3-tuple to satisfy mypy unpacking
+    res_b = bank_butter.filter(y, sigbands=True)
+    _, freq, xb_butter = res_b  # type: ignore
+    
+    res_c = bank_cheby2.filter(y, sigbands=True)
+    _, _, xb_cheby2 = res_c  # type: ignore
+
+    if xb_butter is None or xb_cheby2 is None:
+        raise ValueError("Signal bands should not be None")
 
     num_plots = len(xb_butter) + 2 # +1 for original, +1 for impulse response
     fig, axes = plt.subplots(num_plots, 1, figsize=(10, 2.2 * num_plots), sharex=False)
+
 
     # Fixed Y limits for decomposition
     y_lim = (-2.8, 2.8)

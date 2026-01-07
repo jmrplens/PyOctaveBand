@@ -34,13 +34,16 @@ def test_fraction_validation() -> None:
     x = rng.standard_normal(fs)  # 1 second of noise
 
     # Standard fractions
-    _, freq1 = octavefilter(x, fs, fraction=1)
+    res1 = octavefilter(x, fs, fraction=1)
+    _, freq1 = res1  # type: ignore
     assert len(freq1) > 0
-    _, freq3 = octavefilter(x, fs, fraction=3)
+    res3 = octavefilter(x, fs, fraction=3)
+    _, freq3 = res3  # type: ignore
     assert len(freq3) > len(freq1)
 
     # Non-standard fraction (should work mathematically via _genfreqs)
-    _, freq2 = octavefilter(x, fs, fraction=2)
+    res2 = octavefilter(x, fs, fraction=2)
+    _, freq2 = res2  # type: ignore
     assert len(freq2) > 0
 
     # normalizedfreq only supports 1 and 3
@@ -73,19 +76,19 @@ def test_invalid_inputs() -> None:
 
     # Invalid limits: reversed
     with pytest.raises(ValueError, match="lower limit must be less than the upper limit"):
-        octavefilter(x, fs, limits=[20000, 100])
+        octavefilter(x, fs, limits=[20000.0, 100.0])
 
     # Invalid limits: non-positive
     with pytest.raises(ValueError, match="Limit frequencies must be positive"):
-        octavefilter(x, fs, limits=[0, 1000])
+        octavefilter(x, fs, limits=[0.0, 1000.0])
 
     # Invalid limits: wrong length
     with pytest.raises(ValueError, match="Limits must be a list of two frequencies"):
-        octavefilter(x, fs, limits=[100, 500, 1000])
+        octavefilter(x, fs, limits=[100.0, 500.0, 1000.0])
 
     # Invalid fs
     with pytest.raises(ValueError, match="Sample rate 'fs' must be positive"):
-        octavefilter(x, 0, limits=[100, 1000])
+        octavefilter(x, 0, limits=[100.0, 1000.0])
 
     # Invalid fraction
     with pytest.raises(ValueError, match="Bandwidth 'fraction' must be positive"):
@@ -124,7 +127,8 @@ def test_short_signal() -> None:
     x = rng.standard_normal(100) 
     
     # This might fail if resample produces empty array or 0 length
-    spl, freq = octavefilter(x, fs, limits=[12, 100])
+    res = octavefilter(x, fs, limits=[12.0, 100.0])
+    spl, freq = res  # type: ignore
     
     assert not np.isnan(spl).any()
     assert len(spl) == len(freq)
@@ -150,7 +154,8 @@ def test_nan_handling() -> None:
     x = rng.standard_normal(4800)
     x[100] = np.nan
     
-    spl, _ = octavefilter(x, fs)
+    res = octavefilter(x, fs)
+    spl, _ = res  # type: ignore
     # Expect NaNs in SPL
     assert np.isnan(spl).any()
 
@@ -172,7 +177,8 @@ def test_silence() -> None:
     fs = 48000
     x = np.zeros(fs)
     
-    spl, _ = octavefilter(x, fs)
+    res = octavefilter(x, fs)
+    spl, _ = res  # type: ignore
     
     # Should be very low dB (approx -inf, but code clips to eps)
     assert np.all(spl < -100)
@@ -202,7 +208,8 @@ def test_nyquist_limit() -> None:
     # Request up to 1000Hz
     # _deleteouters should warn and remove high bands
     with pytest.warns(UserWarning, match="frequencies above fs/2 removed"):
-        _, freq = octavefilter(x, fs, limits=[10, 1000])
+        res = octavefilter(x, fs, limits=[10.0, 1000.0])
+        _, freq = res  # type: ignore
         
     assert np.all(np.array(freq) < fs/2)
 
@@ -229,8 +236,10 @@ def test_high_order_stability() -> None:
     
     # Order 12 or 24 is quite high for standard IIR, but SOS is better.
     # We just want to ensure it doesn't explode into NaNs.
-    spl, _ = octavefilter(x, fs, order=12)
+    res1 = octavefilter(x, fs, order=12)
+    spl, _ = res1  # type: ignore
     assert not np.isnan(spl).any()
     
-    spl2, _ = octavefilter(x, fs, order=24)
+    res2 = octavefilter(x, fs, order=24)
+    spl2, _ = res2  # type: ignore
     assert not np.isnan(spl2).any()

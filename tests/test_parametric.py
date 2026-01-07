@@ -32,9 +32,10 @@ def test_band_count_estimates(fraction: float, expected_bands: int) -> None:
     fs = 48000
     # Generate dummy signal
     x = np.zeros(fs)
-    limits = [12, 20000]
+    limits = [12.0, 20000.0]
     
-    _, freq = octavefilter(x, fs, fraction=fraction, limits=limits)
+    res = octavefilter(x, fs, fraction=fraction, limits=limits)
+    _, freq = res # type: ignore
     
     # We allow some flexibility as exact count depends on limits implementation details
     assert abs(len(freq) - expected_bands) <= 2, f"Expected approx {expected_bands} bands, got {len(freq)}"
@@ -62,7 +63,8 @@ def test_input_dtypes(dtype: np.dtype) -> None:
     rng = np.random.default_rng(42)
     x = rng.standard_normal(fs).astype(dtype)
     
-    spl, _ = octavefilter(x, fs)
+    res = octavefilter(x, fs)
+    spl, _ = res  # type: ignore
     assert not np.isnan(spl).any()
     assert spl.dtype == np.float64 # Internal processing is likely float64
 
@@ -94,7 +96,8 @@ def test_multichannel_shapes(channels: int) -> None:
     else:
         x = rng.standard_normal((channels, samples))
         
-    spl, freq = octavefilter(x, fs)
+    res = octavefilter(x, fs)
+    spl, freq = res  # type: ignore
     
     if channels == 1:
         assert spl.ndim == 1
@@ -129,7 +132,8 @@ def test_frequency_isolation(target_freq: float, filter_type: str) -> None:
     # Generate pure tone
     x = np.sin(2 * np.pi * target_freq * t)
     
-    spl, freq = octavefilter(x, fs, fraction=1, limits=[20, 16000], filter_type=filter_type)
+    res = octavefilter(x, fs, fraction=1, limits=[20.0, 16000.0], filter_type=filter_type)
+    spl, freq = res  # type: ignore
     
     # Find the band closest to target_freq
     freq_arr = np.array(freq)
@@ -177,7 +181,8 @@ def test_impulse_response_decay(filter_type: str) -> None:
     x[0] = 1.0 # Impulse
     
     # Use sigbands=True to get time domain signals
-    _, _, signals = octavefilter(x, fs, fraction=1, sigbands=True, filter_type=filter_type)
+    res = octavefilter(x, fs, fraction=1, sigbands=True, filter_type=filter_type)
+    _, _, signals = res  # type: ignore
     
     for band_sig in signals:
         # Check that the end of the signal is close to zero (decayed)
@@ -208,10 +213,12 @@ def test_filterbank_class_direct() -> None:
     bank = OctaveFilterBank(fs, fraction=3)
     x = rng.standard_normal(fs)
     
-    spl, freq = bank.filter(x)
+    res = bank.filter(x)
+    spl, freq = res  # type: ignore
     assert len(freq) > 0
     assert spl.shape == (len(freq),)
     
     # Test reuse
-    spl2, _ = bank.filter(x * 0.5)
+    res2 = bank.filter(x * 0.5)
+    spl2, _ = res2  # type: ignore
     assert np.all(spl2 < spl)

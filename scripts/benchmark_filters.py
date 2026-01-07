@@ -5,52 +5,61 @@ import numpy as np
 from pyoctaveband import octavefilter
 
 
-def benchmark_isolation(filter_type, target_freq=1000, fs=48000):
+def benchmark_isolation(filter_type: str, target_freq: float = 1000, fs: int = 48000) -> dict[str, float]:
     duration = 1.0
     t = np.linspace(0, duration, int(fs * duration), endpoint=False)
     x = np.sin(2 * np.pi * target_freq * t)
     
     # Analyze with 1-octave bands
-    spl, freq = octavefilter(x, fs, fraction=1, limits=[62, 16000], filter_type=filter_type)
-    
+    result = octavefilter(x, fs, fraction=1, limits=[62, 16000], filter_type=filter_type)
+    # Check return format
+    if len(result) == 2:
+        spl, freq = result
+    else:
+        # Should not happen with sigbands=False, but for type safety
+        spl, freq, _ = result
+
     freq_arr = np.array(freq)
     closest_idx = np.argmin(np.abs(freq_arr - target_freq))
     peak_val = spl[closest_idx]
     
     # Calculate attenuation at +/- 1 and +/- 2 octaves (indices since fraction=1)
-    results = {"peak": peak_val}
+    results = {"peak": float(peak_val)}
     
     if closest_idx - 1 >= 0:
-        results["-1_oct"] = peak_val - spl[closest_idx - 1]
+        results["-1_oct"] = float(peak_val - spl[closest_idx - 1])
     if closest_idx + 1 < len(spl):
-        results["+1_oct"] = peak_val - spl[closest_idx + 1]
+        results["+1_oct"] = float(peak_val - spl[closest_idx + 1])
     if closest_idx - 2 >= 0:
-        results["-2_oct"] = peak_val - spl[closest_idx - 2]
+        results["-2_oct"] = float(peak_val - spl[closest_idx - 2])
     if closest_idx + 2 < len(spl):
-        results["+2_oct"] = peak_val - spl[closest_idx + 2]
+        results["+2_oct"] = float(peak_val - spl[closest_idx + 2])
         
     return results
 
-def benchmark_stability(filter_type, fs=48000):
+def benchmark_stability(filter_type: str, fs: int = 48000) -> tuple[float, float]:
     x = np.zeros(fs)
     x[0] = 1.0
     
     start_time = time.time()
-    _, _, signals = octavefilter(x, fs, fraction=1, sigbands=True, filter_type=filter_type)
+    # Explicit unpacking with type ignore or check because octavefilter return type is Union
+    res = octavefilter(x, fs, fraction=1, sigbands=True, filter_type=filter_type)
+    _, _, signals = res  # type: ignore
+    
     exec_time = time.time() - start_time
     
-    max_tail_energy = 0
+    max_tail_energy = 0.0
     for band_sig in signals:
         tail = band_sig[-int(fs*0.1):]
         energy = np.sum(tail**2)
-        max_tail_energy = max(max_tail_energy, energy)
+        max_tail_energy = max(max_tail_energy, float(energy))
         
     return max_tail_energy, exec_time
 
-def main():
+def main() -> None:
     filters = ["butter", "cheby1", "cheby2", "ellip", "bessel"]
     
-    markdown = []
+    markdown: list[str] = []
     markdown.append("# Filter Architecture Benchmark Report")
     markdown.append("\nThis report compares the performance and characteristics of the available filter types.")
     
@@ -87,8 +96,8 @@ def main():
     markdown.append("- **Elliptic:** Steepest transition but ripples in both passband and stopband.")
     markdown.append("- **Bessel:** Best phase response and minimal ringing (group delay), but slowest roll-off.")
 
-    with open("filter_benchmark_report.md", "w") as f:
-        f.write("\n".join(markdown))
+    with open("filter_benchmark_report.md", "w") as f_out:
+        f_out.write("\n".join(markdown))
     
     print("Benchmark report generated: filter_benchmark_report.md")
 

@@ -34,7 +34,8 @@ def test_calibration_logic() -> None:
     factor = calculate_sensitivity(ref_signal, target_spl=94.0)
     
     # Analyze same signal with that factor
-    spl, _ = octavefilter(ref_signal, fs, fraction=1, limits=[800, 1200], calibration_factor=factor)
+    res = octavefilter(ref_signal, fs, fraction=1, limits=[800, 1200], calibration_factor=factor)
+    spl, _ = res  # type: ignore
     
     # It should be exactly 94 dB
     assert abs(spl[0] - 94.0) < 0.01
@@ -58,7 +59,8 @@ def test_dbfs_logic() -> None:
     t = np.linspace(0, 1, fs)
     x = np.sin(2 * np.pi * 1000 * t)
     
-    spl, _ = octavefilter(x, fs, fraction=1, limits=[800, 1200], dbfs=True)
+    res = octavefilter(x, fs, fraction=1, limits=[800, 1200], dbfs=True)
+    spl, _ = res  # type: ignore
     
     assert abs(spl[0] - (-3.01)) < 0.05
 
@@ -82,8 +84,11 @@ def test_peak_mode_logic() -> None:
     x = np.zeros(fs)
     x[100] = 0.5  # Large peak
     
-    spl_rms, _ = octavefilter(x, fs, mode="rms", fraction=1)
-    spl_peak, _ = octavefilter(x, fs, mode="peak", fraction=1)
+    res_rms = octavefilter(x, fs, mode="rms", fraction=1)
+    res_peak = octavefilter(x, fs, mode="peak", fraction=1)
+    
+    spl_rms, _ = res_rms  # type: ignore
+    spl_peak, _ = res_peak  # type: ignore
     
     # Peak must be greater than RMS for an impulse
     assert np.all(spl_peak > spl_rms)

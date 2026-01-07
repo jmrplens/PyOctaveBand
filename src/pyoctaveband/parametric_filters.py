@@ -74,7 +74,7 @@ def time_weighting(x: List[float] | np.ndarray, fs: int, mode: str = "fast") -> 
     """
     Apply time weighting to a signal (Exponential averaging).
     
-    :param x: Input signal (usually the squared signal x^2).
+    :param x: Input signal (raw pressure/voltage). The function squares it internally.
     :param fs: Sample rate.
     :param mode: 'fast' (125ms), 'slow' (1000ms), 'impulse' (35ms rise).
     :return: Time-weighted squared signal (sound pressure level envelope).
