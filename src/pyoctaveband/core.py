@@ -209,9 +209,9 @@ class OctaveFilterBank:
     def _calculate_level(self, y: np.ndarray, mode: str) -> float | np.ndarray:
         """Calculate the level (RMS or Peak) in dB."""
         if mode.lower() == "rms":
-            # Use mean of squares for correct RMS (root mean square)
-            # axis=-1 ensures it works for 1D and 2D arrays
-            val_linear = np.sqrt(np.mean(y**2, axis=-1))
+            # Use norm for better performance and reduced memory overhead
+            # RMS = ||y|| / sqrt(N)
+            val_linear = np.linalg.norm(y, axis=-1) / np.sqrt(y.shape[-1])
         elif mode.lower() == "peak":
             val_linear = np.max(np.abs(y), axis=-1)
         else:

@@ -1,54 +1,36 @@
 # PyOctaveBand: Technical Benchmark Report
 
-Generated on: 2026-01-07 08:14:26
+Generated: 2026-01-07 09:42:54
 
-**Environment:** fs=48000Hz, Python optimized with Numba and NumPy Vectorization.
+## 1. Test Signal Parameters
+- **Sample Rate:** 96.0 kHz
+- **Duration:** 10.0 seconds
+- **Signal Types:** White Noise (Stability) / Pure Sine (Precision)
+- **Precision:** 64-bit Floating Point
 
-## 1. Executive Summary
-This report evaluates the numerical integrity and performance of the PyOctaveBand DSP engine. The library achieves professional-grade precision and high throughput for multichannel analysis.
+## 2. Crossover (Linkwitz-Riley)
+![Crossover](.github/images/benchmark/benchmark_crossover.png)
 
-## 2. Numerical Precision & Isolation
-![Precision and Isolation](.github/images/benchmark/benchmark_precision.png)
+- **Flatness Error:** 0.000000 dB (Target < 0.01)
 
-- **Precision:** Measures the absolute error in dB relative to the theoretical RMS of a pure sine wave (-3.01 dBFS).
-- **Isolation:** Evaluates the filter's ability to reject out-of-band energy at adjacent octave bands.
+## 3. Precision & Isolation
+![Precision](.github/images/benchmark/benchmark_precision.png)
 
-| Filter Type | Peak (dBFS) | Precision Error | Atten. +1 Oct |
-|:---|:---:|:---:|:---:|
-| butter | -3.0121 | 1.85e-03 dB | 32.4 dB |
-| cheby1 | -3.0182 | 7.87e-03 dB | 41.1 dB |
-| cheby2 | -3.0151 | 4.80e-03 dB | 53.0 dB |
-| ellip | -3.0269 | 1.66e-02 dB | 48.0 dB |
-| bessel | -3.4357 | 4.25e-01 dB | 33.7 dB |
-
-## 3. Phase Linearity & Stability
-![Stability and Phase](.github/images/benchmark/benchmark_stability.png)
-
-- **GD Std Dev:** Quantification of phase distortion. A lower standard deviation of Group Delay indicates better preservation of wave shapes.
-- **IR Tail Energy:** Residual energy in the filter after 1.9 seconds. Values < 1e-6 confirm unconditional numerical stability.
-
-| Filter Type | Passband Ripple | GD Std Dev (ms) | IR Tail Energy | Status |
+| Type | Error (dB) | Isolation | Ripple | GD Std (ms) |
 |:---|:---:|:---:|:---:|:---:|
-| butter | 0.2462 dB | 2698.713 ms | 1.29e-09 | 💎 High Quality |
-| cheby1 | 0.1000 dB | 3394.606 ms | 2.04e-07 | ✅ Stable |
-| cheby2 | 28.7270 dB | 4854.467 ms | 2.12e-07 | ✅ Stable |
-| ellip | 0.1000 dB | 4600.809 ms | 4.95e-07 | ✅ Stable |
-| bessel | 5.8771 dB | 1122.052 ms | 2.34e-13 | 💎 High Quality |
+| butter | 2.46e-03 | 31.3 dB | 0.2705 dB | 2847.826 |
+| cheby1 | 3.38e-03 | 40.5 dB | 0.1000 dB | 3551.677 |
+| cheby2 | 3.26e-03 | 57.8 dB | 29.4187 dB | 4790.013 |
+| ellip | 9.41e-03 | 54.2 dB | 0.1000 dB | 4700.881 |
+| bessel | 5.20e-01 | 32.5 dB | 5.9845 dB | 1380.212 |
 
-## 4. Multichannel Performance
-![Performance Scaling](.github/images/benchmark/benchmark_performance.png)
+## 4. Performance
+![Performance](.github/images/benchmark/benchmark_performance.png)
 
-PyOctaveBand leverages NumPy's internal C-optimized loops for multichannel processing. The chart shows the speedup factor as the number of channels increases.
-
-| Channels | Total Time (ms) | Time per Channel (ms) | Speedup Factor |
-|:---|:---:|:---:|:---:|
-| 1 | 48.36 | 48.36 | 1.00x |
-| 2 | 78.72 | 39.36 | 1.23x |
-| 4 | 141.02 | 35.26 | 1.37x |
-| 8 | 264.49 | 33.06 | 1.46x |
-| 16 | 509.15 | 31.82 | 1.52x |
-
-## 5. Methodology
-- **Input:** Double-precision floating-point buffers.
-- **Architecture:** Second-Order Sections (SOS) with automatic multirate decimation for stability.
-- **Metrics:** Calculated using standard SciPy Signal Processing toolbox functions.
+| Channels | Exec Time (s) | Speedup |
+|:---|:---:|:---:|
+| 1 | 0.542 | 1.00x |
+| 2 | 1.060 | 1.02x |
+| 4 | 2.091 | 1.04x |
+| 8 | 4.170 | 1.04x |
+| 16 | 8.398 | 1.03x |
