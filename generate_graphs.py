@@ -217,12 +217,10 @@ def generate_multichannel_response(output_dir: str) -> None:
         markerfacecolor="white",
         markeredgewidth=1.2,
     )
-    ax1.set_ylabel(LABEL_LEVEL_DB)
-    ax1.set_title("Multichannel Analysis (Stereo Input)", fontweight="bold", pad=12)
-    ax1.grid(which="major", color=COLOR_GRID, linestyle="-")
-    ax1.grid(which="minor", color=COLOR_GRID, linestyle=":", alpha=0.4)
+    # Use standard styling but override title
+    apply_axis_styling(ax1, "Multichannel Analysis (Stereo Input)", xlim=(16, 20000))
     ax1.legend(loc="upper right")
-    ax1.set_ylim(-40, 0)
+    # Let Y-axis autoscale
 
     # Plot Right Channel
     ax2.semilogx(
@@ -240,7 +238,7 @@ def generate_multichannel_response(output_dir: str) -> None:
     apply_axis_styling(ax2, "", xlim=(16, 20000))
     ax2.set_title("") # Remove title from bottom plot
     ax2.legend(loc="upper right")
-    ax2.set_ylim(-15, 5)
+    # Let Y-axis autoscale
 
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, "signal_response_multichannel.png"))
