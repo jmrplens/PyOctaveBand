@@ -105,9 +105,15 @@ def main():
     # Read the benchmark report generated in the previous step of the workflow
     if os.path.exists("filter_benchmark_report.md"):
         with open("filter_benchmark_report.md", "r") as f:
-            benchmark_report = f.read()
+            report_content = f.read()
+            sha = os.environ.get("GITHUB_SHA")
+            if repo and sha:
+                # Make image paths absolute so they render in the PR comment
+                # Using raw.githubusercontent.com for reliable rendering
+                report_content = report_content.replace("](.github/images", f"](https://raw.githubusercontent.com/{repo}/{sha}/.github/images")
+            
             # Wrap the report in a details block
-            benchmark_report = f"### Technical Benchmark Summary\n\n<details>\n<summary>📊 View Benchmark Details</summary>\n\n{benchmark_report}\n\n</details>"
+            benchmark_report = f"### Technical Benchmark Summary\n\n<details>\n<summary>📊 View Benchmark Details</summary>\n\n{report_content}\n\n</details>"
 
     status_emoji = "🚀" if failures == 0 else "❌"
 
