@@ -4,9 +4,10 @@ Tests for backward compatibility and import fallbacks.
 """
 
 import builtins
+import importlib
 import sys
-from importlib import reload
-from unittest.mock import MagicMock, patch
+from typing import Any
+from unittest.mock import patch
 
 import pytest
 
@@ -33,7 +34,7 @@ def test_import_literal_fallback() -> None:
     # 2. Mock import to fail for typing.Literal
     real_import = builtins.__import__
 
-    def side_effect(name, globals=None, locals=None, fromlist=(), level=0):
+    def side_effect(name: str, globals: dict[str, Any] | None = None, locals: dict[str, Any] | None = None, fromlist: tuple[str, ...] | None = (), level: int = 0) -> Any:
         if name == "typing" and fromlist is not None and "Literal" in fromlist:
             raise ImportError("Mocked ImportError for Literal")
         return real_import(name, globals, locals, fromlist, level)
@@ -41,14 +42,14 @@ def test_import_literal_fallback() -> None:
     try:
         with patch("builtins.__import__", side_effect=side_effect):
             # 3. Import should trigger the except block
-            import pyoctaveband.core
+            importlib.import_module("pyoctaveband.core")
             # Verify typing_extensions was used (we can't easily verify the variable source
             # without inspecting bytecode, but execution of the line is what coverage tracks)
             
             # Unload again to test __init__.py
             if "pyoctaveband" in sys.modules:
                 del sys.modules["pyoctaveband"]
-            import pyoctaveband
+            importlib.import_module("pyoctaveband")
 
     except ImportError:
         pytest.fail("The fallback import failed (typing_extensions missing?)")
@@ -56,5 +57,3 @@ def test_import_literal_fallback() -> None:
         # Restore state
         for mod, value in original_modules.items():
             sys.modules[mod] = value
-        # Ensure we can import normally again
-        import pyoctaveband
