@@ -32,8 +32,11 @@ def get_cpu_info() -> str:
     try:
         if platform.system() == "Linux":
             import subprocess
-            cmd = "cat /proc/cpuinfo | grep 'model name' | head -n 1 | cut -d':' -f2"
-            return subprocess.check_output(cmd, shell=True).decode().strip()
+            # Use list of arguments instead of shell=True for security
+            output = subprocess.check_output(["grep", "model name", "/proc/cpuinfo"]).decode()
+            for line in output.splitlines():
+                if "model name" in line:
+                    return line.split(":")[1].strip()
         return platform.processor()
     except Exception:
         return "Unknown Processor"
