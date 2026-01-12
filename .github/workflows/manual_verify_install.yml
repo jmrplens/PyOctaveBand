@@ -1,0 +1,38 @@
+name: Manual Verify Installation
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Specific version to install (optional, defaults to latest)'
+        required: false
+        default: ''
+
+jobs:
+  verify-pypi-install:
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.13"]
+    steps:
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install latest PyOctaveBand
+        if: ${{ inputs.version == '' }}
+        run: pip install pyoctaveband
+
+      - name: Install specific PyOctaveBand version
+        if: ${{ inputs.version != '' }}
+        run: pip install pyoctaveband==${{ inputs.version }}
+
+      - name: Verify Import
+        run: python -c "import pyoctaveband; print('Successfully imported pyoctaveband version:', pyoctaveband.__version__)"
