@@ -138,8 +138,15 @@ Normalizar frente a un reflector plano de referencia del mismo tamaño elimina
 la difracción de borde (cláusula 8.2, Fórmula 7):
 $d_{\theta,n} = (d_\theta - d_{\theta,r})/(1 - d_{\theta,r})$. El valor a
 incidencia aleatoria promedia los ángulos de fuente con pesos 1:3:3:3:3 para
-0°, ±30°, ±60° (cláusula 8.4). Anclajes: niveles (70, 74, 68, 72) dB →
-$d = 0{,}7367$; factor de área del cénit 1,5710.
+0°, ±30°, ±60° (cláusula 8.4). Anclajes: el arco de 37 receptores predicho
+por el modelo para el QRD N = 7 publicado de seis periodos (Cox & D'Antonio
+3.ª ed., Apéndice B; Hargreaves et al. 2000, Tabla I) a 1000 Hz da
+$d_\theta = 0{,}1099$, su referencia plana $0{,}0049$ y
+$d_{\theta,n} = 0{,}1055$; las predicciones del modelo promediadas por banda
+coinciden con la difusión normalizada BEM publicada del Apéndice B en las
+bandas de 200-400 Hz dentro de 0,01 (anclaje de baja frecuencia: la
+desviación absoluta media en banda ancha 100-5000 Hz ronda 0,09); factor de
+área del cénit 1,5710.
 
 Consulta la [guía de dispersión superficial](/phonometry/es/guides/surface-scattering/) para su uso.
 

@@ -136,10 +136,13 @@ at the zenith). Normalizing against a flat reference reflector of the same
 size removes edge diffraction (clause 8.2, Formula 7):
 $d_{\theta,n} = (d_\theta - d_{\theta,r})/(1 - d_{\theta,r})$. The
 random-incidence value averages the source angles with weights 1:3:3:3:3 for
-0°, ±30°, ±60° (clause 8.4). Anchor: the 37-receiver single-plane arc of a
-COMSOL N = 7 quadratic-residue diffuser at 1000 Hz (Requena-Plens, UPV MSc
-thesis, 2018) gives $d_\theta = 0.7572$, its flat reference $0.1391$, and
-$d_{\theta,n} = 0.7180$; zenith area factor 1.5710.
+0°, ±30°, ±60° (clause 8.4). Anchors: the model-predicted 37-receiver arc of
+the published six-period N = 7 QRD (Cox & D'Antonio 3rd ed., Appendix B;
+Hargreaves et al. 2000, Table I) at 1000 Hz gives $d_\theta = 0.1099$, its
+flat reference $0.0049$ and $d_{\theta,n} = 0.1055$; the band-averaged model
+predictions match the published Appendix B BEM normalised diffusion in the
+200-400 Hz bands within 0.01 (a low-band anchor: the broadband 100-5000 Hz
+mean absolute deviation is about 0.09); zenith area factor 1.5710.
 
 See the [Surface Scattering guide](/phonometry/guides/surface-scattering/) for usage.
 

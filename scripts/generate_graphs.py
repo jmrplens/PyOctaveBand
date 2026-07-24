@@ -7631,23 +7631,27 @@ def generate_scattering_coefficient(output_dir: str) -> None:
 def generate_diffusion_polar(output_dir: str) -> None:
     """ISO 17497-2: polar reflected response and its diffusion coefficient d."""
     print("Generating diffusion_polar.png...")
-    from phonometry import directional_diffusion
+    from phonometry import (
+        directional_diffusion,
+        predict_diffuser_polar_response,
+        qrd_well_depths,
+    )
 
     # Reflected sound-pressure levels L_i(theta) on the standard 37-point
-    # semicircle (-90 to 90 deg, 5 deg spacing) of a real N = 7 quadratic-
-    # residue diffuser: a COMSOL free-field prediction at 1000 Hz, normal
-    # incidence, in the plane of maximum diffusion (Requena-Plens, UPV MSc
-    # thesis, 2018). The energy spreads into several lobes, so the ISO 17497-2
-    # Formula (5) autocorrelation coefficient d is high.
+    # semicircle (-90 to 90 deg, 5 deg spacing) of a published diffuser
+    # geometry: the N = 7 QRD, 6 periods, 3.6 m wide, 0.2 m deep array of
+    # Cox & D'Antonio 3e Appendix B section 7 (the commercial N = 7 QRD of
+    # Hargreaves et al. 2000, Table I), predicted with the library's own
+    # Fraunhofer far-field model at 1000 Hz, normal incidence, and rounded to
+    # the 1e-3 dB precision of the committed tests/reference_data.py arc. Six
+    # periods of a periodic QRD concentrate the reflected energy into grating
+    # lobes, so the ISO 17497-2 Formula (5) coefficient d is modest.
     angles = np.arange(-90.0, 90.5, 5.0)
-    levels = np.array([
-        61.443, 60.511, 55.791, 51.232, 56.85, 59.48, 59.919, 59.14, 58.339,
-        58.366, 58.985, 59.558, 59.611, 59.294, 58.611, 57.655, 56.798, 56.2,
-        55.546, 55.677, 56.044, 56.575, 57.134, 57.315, 56.918, 55.867,
-        53.531, 50.622, 50.659, 54.334, 57.268, 58.66, 57.916, 52.472, 46.71,
-        58.406, 61.443,
-    ])
-    result = directional_diffusion(angles, levels)
+    depths = qrd_well_depths(7, 490.0, speed_of_sound=343.0)  # deepest 0.2 m
+    predicted = predict_diffuser_polar_response(
+        3.6 / 42, 1000.0, depths=depths, periods=6, speed_of_sound=343.0,
+    )
+    result = directional_diffusion(angles, np.round(predicted.levels, 3))
 
     _fig, ax = plt.subplots(figsize=(8.0, 7.5),
                            subplot_kw={"projection": "polar"})

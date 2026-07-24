@@ -9,7 +9,17 @@ references:
     edition: "3.ª ed."
     publisher: "CRC Press"
     doi: "10.1201/9781315369211"
-    note: "ISBN 978-1-4987-4099-9. La monografía de referencia sobre teoría y diseño de difusores, de los autores del método del coeficiente de difusión de ISO 17497-2: la distinción dispersión-difusión, los montajes de medida y la guía de diseño que esta página condensa."
+    note: "ISBN 978-1-4987-4099-9. La monografía de referencia sobre teoría y diseño de difusores, de los autores del método del coeficiente de difusión de ISO 17497-2: la distinción dispersión-difusión, los montajes de medida y la guía de diseño que esta página condensa. El Apéndice B (tabla de coeficientes de difusión normalizados, pp. 481-485) es el anclaje BEM publicado del modelo de predicción de difusores de esta página."
+  - type: article
+    authors: ["Hargreaves, T. J.", "Cox, T. J.", "Lam, Y. W.", "D'Antonio, P."]
+    year: 2000
+    title: "Surface diffusion coefficients for room acoustics: Free-field measures of single-plane diffusion"
+    journal: "The Journal of the Acoustical Society of America"
+    volume: 108
+    issue: 4
+    pages: "1710-1720"
+    doi: "10.1121/1.1310192"
+    note: "El método del coeficiente de difusión en campo libre que sustenta ISO 17497-2; su Tabla I documenta la geometría del QRD comercial N = 7 (0,2 m de profundidad máxima de pozo) usada en el ejemplo de esta página."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2004
@@ -256,45 +266,45 @@ colimado (d = 0,32) en un abanico ancho (d = 0,63).
   description="Simulación FDTD 2D de un frente de onda plano incidiendo sobre un panel rígido plano y un difusor de Schroeder de residuos cuadráticos lado a lado. El panel plano devuelve un haz especular colimado mientras que los pozos del difusor reparten la misma energía en un abanico ancho, y el campo dispersado sobre un arco de receptores da coeficientes de difusión de 0,32 frente a 0,63."
 />
 
-La respuesta de un solo plano de abajo es un campo físico real: una simulación
-propia en campo libre por elementos finitos (COMSOL) de un difusor de residuos
-cuadráticos $N = 7$ y su panel de referencia plano a 1000 Hz, incidencia normal,
-muestreada en el semicírculo estándar de 37 puntos (espaciado de 5°, de $-90°$ a
-$+90°$) en el plano de máxima difusión, producida por el mantenedor (J. M.
-Requena-Plens). Los niveles polares son $L_i = 20\,\lg|p_i|$; el coeficiente de
-difusión se valida de forma cruzada frente a una implementación MATLAB
-independiente de la Fórmula (5) de la ISO 17497-2, y los mismos valores
-alimentan el conjunto de conformidad de phonometry.
+La respuesta de un solo plano de abajo es la predicción en campo lejano de una
+geometría de difusor publicada: un difusor de residuos cuadráticos $N = 7$ de
+6 periodos, 3,6 m de anchura total y 0,2 m de profundidad máxima de pozo (la
+fila "N = 7 QRD, 6 periods, 0.2 m deep" de Cox & D'Antonio, *Acoustic
+Absorbers and Diffusers*, 3.ª ed., Apéndice B; el QRD comercial N = 7 medido
+por Hargreaves, Cox, Lam & D'Antonio, *J. Acoust. Soc. Am.* 108(4), 1710-1720,
+2000, Tabla I) y su panel de referencia plano de igual huella, a 1000 Hz,
+incidencia normal, en el semicírculo estándar de 37 puntos (espaciado de 5°,
+de $-90°$ a $+90°$). Los mismos niveles del modelo alimentan el conjunto de
+conformidad de phonometry como oráculo aritmético de las Fórmulas (5) y (7);
+el anclaje externo de terceros compara la difusión normalizada del modelo
+promediada por banda con la tabla BEM publicada del Apéndice B en las bandas
+de 200-400 Hz (acuerdo dentro de 0,01; en todo el rango publicado de
+100-5000 Hz la desviación absoluta media modelo-BEM ronda 0,09, porque la
+difracción de borde queda fuera del modelo de Fraunhofer).
 
 ```python
 from phonometry import materials
 
-# Niveles reflejados L_i (dB) en el semicírculo de 37 puntos de un QRD N = 7.
-levels_qrd = [
-    61.443, 60.511, 55.791, 51.232, 56.85, 59.48, 59.919, 59.14, 58.339,
-    58.366, 58.985, 59.558, 59.611, 59.294, 58.611, 57.655, 56.798, 56.2,
-    55.546, 55.677, 56.044, 56.575, 57.134, 57.315, 56.918, 55.867, 53.531,
-    50.622, 50.659, 54.334, 57.268, 58.66, 57.916, 52.472, 46.71, 58.406,
-    61.443,
-]
-# El panel de referencia plano en el mismo arco: un par de lóbulos especulares.
-levels_flat = [
-    73.804, 72.804, 69.83, 63.815, 50.582, 50.868, 54.513, 52.14, 46.395,
-    34.212, 22.254, 24.862, 18.418, 31.312, 34.995, 36.243, 36.561, 36.589,
-    37.443, 37.472, 37.49, 37.28, 36.3, 33.366, 25.005, 19.73, 19.306,
-    33.885, 46.012, 51.814, 54.227, 50.513, 50.823, 63.842, 69.835, 72.802,
-    73.804,
-]
+# La geometría publicada: QRD N = 7, 6 periodos, 3,6 m de ancho, 0,2 m de
+# profundidad (Cox & D'Antonio 3.ª ed., Apéndice B; Hargreaves et al. 2000,
+# Tabla I). La frecuencia de diseño de 490 Hz deja el pozo más profundo en
+# exactamente 0,2 m.
+depths = materials.qrd_well_depths(7, 490.0)   # [0, 0.05, 0.2, 0.1, ...] m
+qrd = materials.predict_diffuser_polar_response(
+    3.6 / 42, 1000.0, depths=depths, periods=6)
+# El panel de referencia plano: la misma huella de 3,6 m con pozos a cero.
+flat = materials.predict_diffuser_polar_response(
+    3.6 / 42, 1000.0, depths=[0.0] * 7, periods=6)
 
-d = materials.directional_diffusion_coefficient(levels_qrd)    # fórmula (5)
-print(round(float(d), 4))            # 0.7572
-d_ref = materials.directional_diffusion_coefficient(levels_flat)
-print(round(float(d_ref), 4))        # 0.1391
+d = materials.directional_diffusion_coefficient(qrd.levels)    # fórmula (5)
+print(round(float(d), 4))            # 0.1099
+d_ref = materials.directional_diffusion_coefficient(flat.levels)
+print(round(float(d_ref), 4))        # 0.0049
 
 # Normaliza frente a la referencia plana para aislar el efecto propio del
 # difusor (fórmula (7)): d_n = (d - d_ref) / (1 - d_ref).
 d_n = materials.normalized_diffusion_coefficient(d, d_ref)
-print(round(float(d_n), 4))          # 0.718
+print(round(float(d_n), 4))          # 0.1055
 
 # Valor de incidencia aleatoria: promedia los coeficientes de banda sobre las
 # posiciones de fuente, con la ponderación 2-D de la norma (0 grados -> 1,
@@ -312,20 +322,24 @@ representable. Reutilizando los niveles polares del QRD de arriba:
 import numpy as np
 from phonometry import materials
 
-# levels_qrd: los 37 niveles del QRD definidos en el ejemplo de arriba.
+# qrd.levels: los 37 niveles predichos del QRD del ejemplo de arriba.
 angles = np.arange(-90.0, 90.5, 5.0)
 
-result = materials.directional_diffusion(angles, levels_qrd)
-print(round(result.coefficient, 2))   # 0.76
+result = materials.directional_diffusion(angles, qrd.levels)
+print(round(result.coefficient, 2))   # 0.11
 result.plot()   # respuesta polar reflejada, d en el título (requiere matplotlib)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_polar_es.svg" alt="Un diagrama polar del nivel de presión sonora reflejado de un difusor de residuos cuadráticos N=7 sobre 37 receptores de -90 a 90 grados, con la energía repartida por el semicírculo en varios lóbulos, dando un coeficiente de difusión por autocorrelación d de aproximadamente 0,76" width="72%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_polar_es.svg" alt="Un diagrama polar del nivel de presión sonora reflejado predicho de un difusor de residuos cuadráticos N=7 de seis periodos sobre 37 receptores de -90 a 90 grados, con la energía concentrada en un abanico de lóbulos de red discretos, dando un coeficiente de difusión por autocorrelación d de aproximadamente 0,11" width="72%" />
 
-*El QRD reparte la energía reflejada por el semicírculo en varios lóbulos en
-lugar de un único pico especular, de modo que el coeficiente de difusión por
-autocorrelación es alto ($d \approx 0{,}76$). El panel de referencia plano
-colapsa la respuesta en un par especular estrecho y baja a $d \approx 0{,}14$.*
+*La matriz periódica de QRD divide la energía reflejada en un abanico de
+lóbulos de red discretos en lugar de un único pico especular, pero seis
+repeticiones del mismo periodo concentran la energía en esas pocas
+direcciones, así que el coeficiente de difusión por autocorrelación se queda
+en un valor modesto ($d \approx 0{,}11$). El panel de referencia plano colapsa
+solo en la dirección especular y baja a $d \approx 0{,}005$; esta penalización
+por lóbulos de las matrices periódicas es justo el motivo por el que
+Cox & D'Antonio recomiendan disposiciones moduladas.*
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -335,12 +349,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import materials
 
-# levels_qrd: los 37 niveles reflejados L_i del QRD N = 7 del ejemplo de arriba
-# (campo lejano COMSOL, 1000 Hz, incidencia normal), en el semicírculo de -90 a
-# 90 grados con espaciado de 5 grados. La energía se reparte en varios lóbulos,
-# así que el coeficiente d de la fórmula (5) es alto.
+# qrd.levels: los 37 niveles predichos L_i del QRD N = 7 de seis periodos del
+# ejemplo de arriba (modelo de campo lejano de Fraunhofer, geometría publicada
+# del Apéndice B de Cox & D'Antonio, 1000 Hz, incidencia normal) en el
+# semicírculo de -90 a 90 grados con espaciado de 5 grados. La matriz
+# periódica concentra la energía en lóbulos de red, así que el coeficiente d
+# de la fórmula (5) es modesto.
 angles = np.arange(-90.0, 90.5, 5.0)
-result = materials.directional_diffusion(angles, levels_qrd)
+result = materials.directional_diffusion(angles, qrd.levels)
 
 # result es el DiffusionResult calculado arriba. En una línea:
 result.plot()
