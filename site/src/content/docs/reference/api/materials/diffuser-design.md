@@ -151,7 +151,7 @@ exactly one.
 | `periods` | Number of repetitions `N_p` of the single period; the grating lobes that define a Schroeder diffuser require `periods >= 2`. |
 | `speed_of_sound` | Speed of sound `c`, in metres per second. |
 | `include_aperture` | Include the single-well aperture directivity `sinc(k w (sin psi + sin theta) / 2)` of Eq. (9.32); defaults to `True`. |
-| `include_obliquity` | Include the Kirchhoff obliquity factor `(1 + cos theta) / 2` of Eq. (9.32); defaults to `True`. |
+| `include_obliquity` | Include the Kirchhoff obliquity factor `(cos theta + cos psi) / 2`, the oblique-source generalisation of the normal-incidence `(1 + cos theta) / 2` of Eq. (9.32); defaults to `True`. |
 
 **Returns:** A [`DiffuserPolarResponse`](/phonometry/reference/api/materials/diffuser-design/#diffuserpolarresponse) with the per-angle levels, the directional diffusion coefficient and `.plot()`.
 

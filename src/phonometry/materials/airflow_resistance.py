@@ -399,6 +399,9 @@ def piston_volume_flow_rate(
         raise ValueError("'stroke_amplitude' must be non-negative.")
     if piston_area <= 0.0:
         raise ValueError("'piston_area' must be positive.")
+    # Normative clause 6.2 form q_v = 2*pi*f*h*A_P verbatim; Annex A.2 prints
+    # the rms variant j*omega*A_P*h/sqrt(2) (internal tension in the standard,
+    # the normative text wins).
     return 2.0 * math.pi * frequency * stroke_amplitude * piston_area
 
 

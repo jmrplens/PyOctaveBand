@@ -164,8 +164,9 @@ def installed_dynamic_stiffness(
       criterion ``s't >> s'a`` (clause 8.2). This implementation applies its own
       engineering threshold: ``s'a`` below 10 % of ``s't`` is treated as
       negligible and ``s' = s't`` (a :class:`DynamicStiffnessWarning` is
-      emitted); above it the result is ``nan``, as the method cannot resolve
-      ``s'``.
+      emitted; clause 8.2 requires the error caused by disregarding ``s'a`` to
+      be stated in the test report); above it the result is ``nan``, as the
+      method cannot resolve ``s'``.
 
     :param apparent_stiffness: Apparent dynamic stiffness ``s't``, in N/m3.
     :param airflow_resistivity: Lateral airflow resistivity ``r``, in kPa.s/m2
@@ -197,7 +198,9 @@ def installed_dynamic_stiffness(
         return float("nan")
     warnings.warn(
         "airflow resistivity below 10 kPa.s/m2: s' is taken as s't with the "
-        "enclosed-gas term disregarded; state the estimated error (clause 8.2).",
+        "enclosed-gas term disregarded; EN 29052-1 requires the reason and "
+        "the estimated error caused by disregarding s'a to be stated in the "
+        "test report (clause 8.2).",
         DynamicStiffnessWarning,
         stacklevel=2,
     )

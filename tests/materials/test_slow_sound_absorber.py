@@ -219,6 +219,32 @@ def test_panel_optional_correction_branches_stay_passive() -> None:
         assert np.all(np.abs(out.reflection) <= 1.0 + 1e-9)
 
 
+def test_slit_radiation_correction_lowers_resonance() -> None:
+    """The slit-radiation end correction is an added mass: it lowers the peak.
+
+    The papers print the series impedance as ``-i w dl rho0 / (phi S0)``;
+    conjugated to the e^{+j w t} convention of this module it is
+    ``+j w rho0 dl / (phi S0)``, an added radiation mass, which must move the
+    slit-panel resonance down. Hand-derived pin for the base geometry
+    (h = 1 mm, a = 30 mm, d = 50 mm): the absorption peak sits at 378.55 Hz
+    without the correction and at 370.85 Hz with it (a -7.7 Hz shift).
+    Transcribing the printed sign literally would instead raise the peak to
+    386.8 Hz, which this test guards against.
+    """
+    f = np.linspace(300.0, 450.0, 3001)
+    res = _base_resonator()
+    kwargs = {"slit_height": 1.0e-3, "lattice_step": 3.0e-2, "period": 5.0e-2}
+    without = slit_helmholtz_absorber(f, res, slit_radiation=False, **kwargs)
+    with_rad = slit_helmholtz_absorber(f, res, slit_radiation=True, **kwargs)
+    peak_without = float(f[int(np.argmax(without.absorption))])
+    peak_with = float(f[int(np.argmax(with_rad.absorption))])
+    # Direction: the radiation mass lowers the resonance.
+    assert peak_with < peak_without
+    # Pinned values (grid step 0.05 Hz).
+    assert peak_without == pytest.approx(378.55, abs=0.1)
+    assert peak_with == pytest.approx(370.85, abs=0.1)
+
+
 def test_panel_passivity_random_geometries() -> None:
     rng = np.random.default_rng(20240724)
     f = np.linspace(80.0, 900.0, 60)

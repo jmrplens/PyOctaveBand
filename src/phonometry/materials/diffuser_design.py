@@ -207,8 +207,11 @@ def _scattered_pressure(
         # Fourier transform of one well of width w: the single-well directivity.
         pressure = pressure * np.sinc(k * well_width * spatial / (2.0 * np.pi))
     if include_obliquity:
-        # Kirchhoff obliquity factor (1 + cos theta) / 2 of Eq. (9.32).
-        pressure = pressure * (1.0 + np.cos(theta)) / 2.0
+        # Kirchhoff obliquity factor. Cox and D'Antonio Eq. (9.32) print the
+        # normal-incidence form (1 + cos theta) / 2; for an oblique source the
+        # Kirchhoff-approximation factor generalises to the symmetric
+        # (cos theta + cos psi) / 2, which reduces to Eq. (9.32) at psi = 0.
+        pressure = pressure * (np.cos(theta) + math.cos(psi)) / 2.0
     return np.asarray(pressure, dtype=np.complex128)
 
 
@@ -362,7 +365,9 @@ def predict_diffuser_polar_response(
         ``sinc(k w (sin psi + sin theta) / 2)`` of Eq. (9.32); defaults to
         ``True``.
     :param include_obliquity: Include the Kirchhoff obliquity factor
-        ``(1 + cos theta) / 2`` of Eq. (9.32); defaults to ``True``.
+        ``(cos theta + cos psi) / 2``, the oblique-source generalisation of
+        the normal-incidence ``(1 + cos theta) / 2`` of Eq. (9.32); defaults
+        to ``True``.
     :return: A :class:`DiffuserPolarResponse` with the per-angle levels, the
         directional diffusion coefficient and ``.plot()``.
     :raises ValueError: for invalid geometry, or if not exactly one of ``depths``
