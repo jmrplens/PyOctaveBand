@@ -264,29 +264,114 @@ def _bark_center_hz(z: NDArray[np.float64] | float) -> Any:
     return np.interp(z, _INV_GRID_BARK, _INV_GRID_HZ)
 
 
-def _analyze(sig: NDArray[np.float64]) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
-    """Un-calibrated Osses 2016 sum (``C_FS = 1``) of a model-rate signal.
+def _band_envelopes(
+    frame: NDArray[np.float64],
+    z_axis: NDArray[np.float64],
+    band_center_hz: NDArray[np.float64],
+) -> NDArray[np.float64]:
+    """Excitation-pattern envelopes of one frame, shape ``(47, n)``.
 
-    Runs the full front-end -- ear transmission, 47-band excitation filter bank,
-    generalised modulation depth ``m*``, neighbour cross-covariance ``k`` and the
-    weighted sum of Eq. (1) without the ``C_FS`` scale -- over 2 s frames with
-    50 % overlap. Returns the per-frame raw sums, the frame-averaged raw specific
-    pattern and the Bark axis. The public :func:`fluctuation_strength` multiplies
-    these by :func:`_c_fs`; keeping the scale out here lets the calibration be
-    derived from this same path without recursion.
+    Excitation front-end of Osses 2016 §2.1.1/2.1.2: Hann-windowed spectrum,
+    per-component level after the ear transmission, relative component and
+    excitation floors, triangular excitation spread onto the 47 observation
+    points and the inverse FFT back to band time signals.
+    """
+    n = frame.size
+    fs_v = float(_FS_SAMPLE_RATE)
+    p_ref = 2e-5
+    # Excitation patterns in the frequency domain.
+    spec = np.fft.rfft(frame * np.hanning(n))
+    freqs = np.asarray(np.fft.rfftfreq(n, d=1.0 / fs_v), dtype=np.float64)
+    mag = np.abs(spec) * 2.0 / n
+    # Per-component level (dB SPL) after the ear transmission.
+    with np.errstate(divide="ignore"):
+        lvl = 20.0 * np.log10(np.maximum(mag, 1e-12) / p_ref)
+    lvl = lvl + _terhardt_a0_db(freqs)
+    z_comp = _hz_to_bark(freqs)
+
+    # Only components above a floor contribute.
+    active = np.where(mag > mag.max() * 1e-4)[0] if mag.size else np.array([], int)
+    f_act = freqs[active]
+    lvl_act = lvl[active]
+    z_act = z_comp[active]
+    spec_act = spec[active]
+    inv_mag_act = 1.0 / np.maximum(mag[active], 1e-12)
+    s2_act = 24.0 + 230.0 / np.maximum(f_act, 1.0) - 0.2 * lvl_act
+    lvl_floor = lvl_act.max() - 60.0 if active.size else 0.0
+
+    # Build the 47 band time signals from the triangular excitation,
+    # vectorising the inverse FFT across all bands in one call.
+    band_spec = np.zeros((_N_FILTERS, freqs.size), dtype=np.complex128)
+    for i, zi in enumerate(z_axis):
+        # Excitation contribution of each active component to band i.
+        dz = zi - z_act
+        contrib_db = np.where(
+            f_act < band_center_hz[i],
+            lvl_act - s2_act * dz,  # component below observation point
+            lvl_act + _S1 * dz,  # component above (dz<0): -S1|dz|
+        )
+        weight = 10.0 ** (contrib_db / 20.0)
+        weight[contrib_db < lvl_floor] = 0.0
+        band_spec[i, active] = spec_act * (weight * inv_mag_act)
+    return np.abs(np.fft.irfft(band_spec, n=n, axis=1))
+
+
+def _modulation_depth(
+    band_env: NDArray[np.float64], env_sos: Any
+) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+    """Generalised modulation depth m* per band (Osses 2016 §2.1.3).
+
+    Returns ``(m_star, h_bp)`` with ``h_bp`` the band-pass-filtered envelopes
+    (needed again for the neighbour cross-covariance).
     """
     from scipy import signal as sp_signal
 
+    h0 = band_env.mean(axis=1)
+    h_bp = np.asarray(sp_signal.sosfilt(env_sos, band_env, axis=1))
+    rms_bp = np.sqrt(np.mean(h_bp**2, axis=1))
+    with np.errstate(divide="ignore", invalid="ignore"):
+        m_star = np.where(h0 > 0.0, rms_bp / h0, 0.0)
+    # 3:1 compression above the knee.
+    over = m_star > _COMPRESSION_THRESHOLD
+    m_star[over] = _COMPRESSION_THRESHOLD + (m_star[over] - _COMPRESSION_THRESHOLD) / _COMPRESSION_RATIO
+    return m_star, h_bp
+
+
+def _neighbour_covariance(h_bp: NDArray[np.float64]) -> NDArray[np.float64]:
+    """Cross covariance |k_{i-2}·k_{i+2}| with the bands two indices away
+    (Osses 2016 Eq. 9), with ``k = 1`` at the filter-bank edges."""
+    k = np.ones(_N_FILTERS)
+    for i in range(_N_FILTERS):
+        lo = i - 2
+        hi = i + 2
+        k_lo = _cross_covariance(h_bp[lo], h_bp[i]) if lo >= 0 else 1.0
+        k_hi = _cross_covariance(h_bp[i], h_bp[hi]) if hi < _N_FILTERS else 1.0
+        k[i] = abs(k_lo * k_hi)
+    return k
+
+
+def _analyze(sig: NDArray[np.float64]) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+    """Un-calibrated Osses 2016 sum (``C_FS = 1``) of a model-rate signal.
+
+    Runs the full front-end -- ear transmission, 47-band excitation filter bank
+    (:func:`_band_envelopes`), generalised modulation depth ``m*``
+    (:func:`_modulation_depth`), neighbour cross-covariance ``k``
+    (:func:`_neighbour_covariance`) and the weighted sum of Eq. (1) without the
+    ``C_FS`` scale -- over 2 s frames with 50 % overlap. Returns the per-frame
+    raw sums, the frame-averaged raw specific pattern and the Bark axis. The
+    public :func:`fluctuation_strength` multiplies these by :func:`_c_fs`;
+    keeping the scale out here lets the calibration be derived from this same
+    path without recursion.
+    """
     # Observation points (centre frequencies) of the 47 filters.
     z_axis = np.arange(1, _N_FILTERS + 1, dtype=np.float64) * _BARK_SPACING
     g_z = _g_weight(z_axis)
     band_center_hz = np.asarray(_bark_center_hz(z_axis), dtype=np.float64)
 
     env_sos = _bandpass_envelope_filter(float(_FS_SAMPLE_RATE))
-    fs_v = float(_FS_SAMPLE_RATE)
 
     # 2 s frames, 50 % overlap.
-    frame_len = round(2.0 * fs_v)
+    frame_len = round(2.0 * float(_FS_SAMPLE_RATE))
     frame_len = min(frame_len, sig.size)
     hop = max(1, frame_len // 2)
     starts = list(range(0, max(1, sig.size - frame_len + 1), hop))
@@ -296,66 +381,13 @@ def _analyze(sig: NDArray[np.float64]) -> tuple[NDArray[np.float64], NDArray[np.
     fs_frames: list[float] = []
     specific_accum = np.zeros(_N_FILTERS)
 
-    p_ref = 2e-5
     for start in starts:
         frame = sig[start : start + frame_len]
-        n = frame.size
-        if n < 16:
+        if frame.size < 16:
             continue
-        # Excitation patterns in the frequency domain.
-        spec = np.fft.rfft(frame * np.hanning(n))
-        freqs = np.asarray(np.fft.rfftfreq(n, d=1.0 / fs_v), dtype=np.float64)
-        mag = np.abs(spec) * 2.0 / n
-        # Per-component level (dB SPL) after the ear transmission.
-        with np.errstate(divide="ignore"):
-            lvl = 20.0 * np.log10(np.maximum(mag, 1e-12) / p_ref)
-        lvl = lvl + _terhardt_a0_db(freqs)
-        z_comp = _hz_to_bark(freqs)
-
-        # Only components above a floor contribute.
-        active = np.where(mag > mag.max() * 1e-4)[0] if mag.size else np.array([], int)
-        f_act = freqs[active]
-        lvl_act = lvl[active]
-        z_act = z_comp[active]
-        spec_act = spec[active]
-        inv_mag_act = 1.0 / np.maximum(mag[active], 1e-12)
-        s2_act = 24.0 + 230.0 / np.maximum(f_act, 1.0) - 0.2 * lvl_act
-        lvl_floor = lvl_act.max() - 60.0 if active.size else 0.0
-
-        # Build the 47 band time signals from the triangular excitation,
-        # vectorising the inverse FFT across all bands in one call.
-        band_spec = np.zeros((_N_FILTERS, freqs.size), dtype=np.complex128)
-        for i, zi in enumerate(z_axis):
-            # Excitation contribution of each active component to band i.
-            dz = zi - z_act
-            contrib_db = np.where(
-                f_act < band_center_hz[i],
-                lvl_act - s2_act * dz,  # component below observation point
-                lvl_act + _S1 * dz,  # component above (dz<0): -S1|dz|
-            )
-            weight = 10.0 ** (contrib_db / 20.0)
-            weight[contrib_db < lvl_floor] = 0.0
-            band_spec[i, active] = spec_act * (weight * inv_mag_act)
-        band_env = np.abs(np.fft.irfft(band_spec, n=n, axis=1))
-
-        # Generalised modulation depth m* per band.
-        h0 = band_env.mean(axis=1)
-        h_bp = sp_signal.sosfilt(env_sos, band_env, axis=1)
-        rms_bp = np.sqrt(np.mean(h_bp**2, axis=1))
-        with np.errstate(divide="ignore", invalid="ignore"):
-            m_star = np.where(h0 > 0.0, rms_bp / h0, 0.0)
-        # 3:1 compression above the knee.
-        over = m_star > _COMPRESSION_THRESHOLD
-        m_star[over] = _COMPRESSION_THRESHOLD + (m_star[over] - _COMPRESSION_THRESHOLD) / _COMPRESSION_RATIO
-
-        # Cross covariance with the bands two indices away.
-        k = np.ones(_N_FILTERS)
-        for i in range(_N_FILTERS):
-            lo = i - 2
-            hi = i + 2
-            k_lo = _cross_covariance(h_bp[lo], h_bp[i]) if lo >= 0 else 1.0
-            k_hi = _cross_covariance(h_bp[i], h_bp[hi]) if hi < _N_FILTERS else 1.0
-            k[i] = abs(k_lo * k_hi)
+        band_env = _band_envelopes(frame, z_axis, band_center_hz)
+        m_star, h_bp = _modulation_depth(band_env, env_sos)
+        k = _neighbour_covariance(h_bp)
 
         f_specific = (m_star**_P_M) * (k**_P_K) * g_z
         specific_accum += f_specific
