@@ -179,7 +179,7 @@ $$
 $$
 
 que tiende a `5 dB` en el límite de sombra `N → 0` y aproxima la curva de
-fuente puntual de Maekawa dentro de unos 1.5 dB.
+fuente puntual de Maekawa dentro de unos 1,5 dB.
 
 ```python
 from phonometry import barrier_insertion_loss, kurze_anderson_attenuation
@@ -220,6 +220,44 @@ il = barrier_insertion_loss(bands, 1.0, 50.0, 4.0, 100.0, 1.5,
 il.ground        # True: se aplicó el modelo coherente de cuatro caminos
 il.plot()
 ```
+
+Los tres modelos lado a lado sobre la misma geometría cuentan toda la
+historia: el ajuste de Kurze-Anderson y el semiplano exacto se siguen a menos
+de 1,5 dB a lo largo de tres décadas de número de Fresnel, mientras que el
+modelo coherente con suelo oscila decenas de decibelios alrededor de ellos,
+hacia arriba donde la barrera elimina el valle del efecto suelo del camino sin
+apantallar, hacia abajo donde los cuatro caminos difractados interfieren
+destructivamente.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/barrier_insertion_loss_methods_es.svg" alt="Pérdida por inserción de barrera frente a la frecuencia en eje logarítmico para una pantalla de 4 m entre una fuente a 1 m de altura a 50 m y un receptor a 1,5 m a 100 m. La curva a trazos de Kurze-Anderson y la curva continua del semiplano rígido exacto suben juntas desde unos 6 dB a 50 Hz hasta 19 dB a 5 kHz, sin separarse más de 1,5 dB; la curva coherente de cuatro caminos con suelo oscila alrededor de ellas, superando 45 dB cerca de 230 Hz donde desaparece el valle del efecto suelo sin barrera y cayendo por debajo de -10 dB cerca de 550 Hz, con una línea punteada del límite rasante de 5 dB por debajo" width="90%" />
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import barrier_insertion_loss
+
+# La barrera de 4 m de los fragmentos anteriores, en una malla fina de frecuencia.
+freqs = np.geomspace(50.0, 5000.0, 240)
+il_ka = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
+                               method="kurze_anderson")
+il_ex = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
+                               method="exact")
+il_gr = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
+                               method="exact", ground_flow_resistivity=2e5)
+fig, ax = plt.subplots(figsize=(11, 6.4))
+ax.semilogx(freqs, il_ka.insertion_loss, "--", label="Kurze-Anderson (pantalla delgada)")
+ax.semilogx(freqs, il_ex.insertion_loss, label="Semiplano rígido exacto")
+ax.semilogx(freqs, il_gr.insertion_loss, label="Exacto + suelo coherente (cuatro caminos)")
+ax.axhline(5.0, color="k", ls=":", label="Límite rasante (5 dB)")
+ax.set(xlabel="Frecuencia [Hz]", ylabel="Pérdida por inserción [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 ## Relación con ISO 9613-2
 

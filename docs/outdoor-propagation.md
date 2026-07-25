@@ -292,6 +292,7 @@ print(np.round(att.a_div, 1))     # [57. 57. 57. 57. 57. 57. 57. 57.]  divergenc
 print(np.round(att.a_gr, 2))      # [-4.65  2.34 13.79  9.76  1.3  -0.   -0.   -0.  ]
 print(np.round(att.a_bar, 2))     # [13.78  8.89  0.    6.69 18.01 20.   20.   20.  ]
 print(np.round(att.a_total, 1))   # [66.2 68.3 71.  73.9 77.1 78.8 82.3 96. ]
+att.plot()                        # the stacked breakdown above (needs matplotlib)
 
 # Predicted receiver level from an octave-band sound power Lw = 95 dB
 lw = np.full(len(bands), 95.0)
@@ -512,6 +513,86 @@ See the [Theory](theory-environment-transport.md) page for the full derivation, 
 [Room Acoustics guide](room-acoustics.md) for how $\alpha$ feeds
 ISO 354, and the [Occupational Noise Exposure guide](occupational-exposure.md) for the ISO 9612 occupational
 exposure that consumes A-weighted levels.
+
+## 4. Prediction reports (`.report()`)
+
+Both outdoor-propagation results render a one-page PDF **prediction** fiche.
+They are clearly labelled predictions, not measurements: the sheet states the
+meteorological and ground assumptions and, for the barrier, names the actual
+diffraction model behind the number.
+
+`OutdoorAttenuation.report(path)` boxes the octave-band range of the total
+attenuation on its own; pass a `SourceEmission` (the source sound power and
+directivity) to add the source power and downwind level to the table and box the
+A-weighted downwind level `LAT(DW)` at the receiver instead. A limit
+level supplied through the metadata `requirement` then adds a PASS/FAIL verdict
+(a lower level is better). Pass `language="es"` for the Spanish fiche.
+
+```python
+import numpy as np
+from phonometry import (
+    Barrier,
+    ReportMetadata,
+    SourceEmission,
+    outdoor_propagation_attenuation,
+)
+
+freqs = np.array([63, 125, 250, 500, 1000, 2000, 4000, 8000], dtype=float)
+lw = np.array([95, 100, 103, 105, 104, 101, 95, 88], dtype=float)
+result = outdoor_propagation_attenuation(
+    200.0, 4.0, 2.0, freqs, 1.0, 1.0, 1.0,
+    barrier=Barrier(source_to_edge=105.0, edge_to_receiver=105.0),
+    temperature=10.0, relative_humidity=70.0,
+)
+result.report(
+    "outdoor_attenuation.pdf",
+    metadata=ReportMetadata(
+        specimen="Industrial fan plant (point source)",
+        test_room="Nearest dwelling facade",
+        requirement=50.0,  # maximum acceptable A-weighted downwind level
+    ),
+    source_emission=SourceEmission(sound_power_level=lw),
+)
+```
+
+Rendered examples of both fiches, regenerated with `make reports`, are kept in
+the repository. Click either preview to open the PDF:
+
+[![ISO 9613-2 outdoor propagation example report: a metadata header with the propagation distance, a per-band table of the source power level Lw and the divergence, atmospheric, ground and barrier attenuation terms with the total A and the downwind level LfT(DW), the attenuation-breakdown plot and the boxed A-weighted downwind level LAT(DW) = 29.9 dB with a PASS verdict against a 50 dB limit](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso9613_outdoor_attenuation_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso9613_outdoor_attenuation_example.pdf)
+
+*Outdoor propagation fiche (`OutdoorAttenuation.report`), the A-weighted
+downwind level at the receiver.*
+
+Before committing the fiche, `result.plot()` draws the same per-band
+attenuation breakdown interactively (the stacked figure of section 2).
+
+`BarrierInsertionLoss.report(path)` boxes the mean insertion loss over the
+octave bands; a minimum required insertion loss supplied through `requirement`
+adds a PASS/FAIL verdict (a higher insertion loss is better).
+
+```python
+import numpy as np
+from phonometry import ReportMetadata, barrier_insertion_loss
+
+freqs = np.array([63, 125, 250, 500, 1000, 2000, 4000, 8000], dtype=float)
+result = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5)
+result.report(
+    "barrier_insertion_loss.pdf",
+    metadata=ReportMetadata(
+        specimen="Roadside noise barrier, 4 m high",
+        requirement=8.0,  # minimum required mean insertion loss
+    ),
+)
+```
+
+[![Barrier insertion loss example report: a metadata header naming the ground model, a per-band table of the insertion loss, the insertion-loss spectrum plot and the boxed mean insertion loss IL = 12.9 dB with a PASS verdict against an 8 dB minimum; the basis line names the wave-theoretic rigid-screen diffraction model, a complement to the ISO 9613-2 screening term](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso9613_barrier_insertion_loss_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso9613_barrier_insertion_loss_example.pdf)
+
+*Barrier insertion loss fiche (`BarrierInsertionLoss.report`), the mean
+insertion loss over the octave bands.*
+
+Here too `result.plot()` previews the insertion-loss spectrum of the fiche;
+the [ground and barriers guide](ground-barriers.md) draws the same result
+against the exact half-plane and coherent-ground models.
 
 ## References
 

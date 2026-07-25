@@ -143,6 +143,25 @@ partir de los ángulos de depresión 15°/30°/45°, y `source_level_uncertainty
 incertidumbre expandida tabulada (5 dB ≤100 Hz, 3 dB 125 Hz–16 kHz, 4 dB
 >16 kHz).
 
+Lo que convierte estas formas cerradas en un número *comparable* es la
+disciplina de medida con que la ISO 17208-1 las envuelve. El buque recorre un
+rumbo recto frente a una línea vertical de tres hidrófonos con un punto de
+máxima aproximación de 100 m o una eslora, lo que sea mayor, en aguas de al
+menos 150 m o 1,5 esloras de profundidad para que el fondo quede fuera de la
+escena (apartados 5.2, 5.4). Solo puntúa la **ventana de datos** de ±30°
+alrededor del CPA: el promediado corre mientras el buque cruza una ventana de
+longitud $2\,d_{CPA}\tan 30°$ (aproximadamente 1,15 distancias de CPA),
+centrada en el aspecto de través para el que se define el nivel de ruido
+radiado (apartado 3, figura 3). Se exigen cuatro pasadas, dos por banda; los
+tres niveles de hidrófono de cada pasada se promedian en potencia (fórmula 8),
+las pasadas se promedian después aritméticamente (fórmula 9), y babor y
+estribor se reportan también por separado, porque un buque real no radia de
+forma simétrica (apartado 6.5). El ruido de fondo se mide al principio y al
+final de cada periodo de ensayo y se aplica por banda la corrección al estilo
+de la ISO 3744; el límite de viento recomendado es de 20 kn para buques de más
+de 100 m (apartado 5.3). Si se omite algo de esto, el número que se cita es un
+nivel, pero no un nivel de ruido radiado ISO 17208.
+
 ## 3. Sonido del hincado de pilotes (ISO 18406)
 
 El hincado de pilotes por percusión radia un pulso impulsivo por cada golpe de
@@ -187,6 +206,23 @@ res.plot()   # forma de onda + energía acumulada (necesita matplotlib)
 `pile_strike_metrics` agrupa el SEL por golpe, el nivel de pico, el SPL/Leq y la
 duración de pulso al 90 % de energía de un golpe registrado; `cumulative_sel`
 suma una secuencia de SEL por golpe distintos.
+
+Estas son las métricas en que está escrita la regulación. La ISO 18406 existe
+porque las cimentaciones de parques eólicos marinos, de plataformas de
+hidrocarburos y de puentes se autorizan bajo marcos de evaluación de impacto
+ambiental que exigen monitorizar el sonido radiado, y su alcance se dibuja en
+consecuencia: hincado percusivo en aguas de 4 a 100 m, con el vibrohincado y
+las tablestacas excluidos (apartado 1). La campaña mínima es una posición de
+medida **lo más cerca posible de 750 m** del pilote, registrando la secuencia
+de hincado completa y reportando la distancia real; el estándar es explícito
+en que los 750 m se eligen por comparabilidad con el gran cuerpo de medidas
+existente, no porque el límite de ningún regulador viva ahí, y en que un nivel
+a una sola distancia no tiene valor predictivo para otros emplazamientos
+(apartado 6.1.2, notas 1-2). Los criterios de impacto sobre la fauna marina se
+formulan exactamente en las magnitudes de esta sección, un tope al SEL por
+golpe o acumulado y al nivel de pico a una distancia declarada, y por eso
+`pile_strike_metrics` los reporta juntos y `cumulative_sel` sigue la suma
+energética golpe a golpe de las fórmulas 8-9.
 
 ## Véase también
 

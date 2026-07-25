@@ -94,6 +94,23 @@ res.plot()   # RNL, Ls and ΔL vs frequency (needs matplotlib)
 15°/30°/45° depression angles, and `source_level_uncertainty` the tabulated
 expanded uncertainty (5 dB ≤100 Hz, 3 dB 125 Hz–16 kHz, 4 dB >16 kHz).
 
+What turns these closed forms into a *comparable* number is the measurement
+discipline ISO 17208-1 wraps around them. The ship transits a straight course
+past a vertical string of three hydrophones at a closest point of approach of
+100 m or one ship length, whichever is greater, in water at least 150 m or
+1.5 ship lengths deep so the bottom stays out of the picture (Clauses 5.2,
+5.4). Only the **data window** of ±30° about the CPA is scored: the averaging
+runs while the ship crosses a window of length `2·d_CPA·tan 30°` (about
+1.15 CPA distances), centred on the beam aspect the radiated noise level is
+defined for (Clause 3, Figure 3). Four runs are required, two per side; each
+run's three hydrophone levels are power-averaged (Formula 8), the runs are
+then arithmetically averaged (Formula 9), and port and starboard are also
+reported separately, because a real ship does not radiate symmetrically
+(Clause 6.5). Background noise is measured at the start and end of each test
+period and the ISO 3744-style correction applied per band; the recommended
+wind limit is 20 kn for ships above 100 m (Clause 5.3). Skip any of this and
+the number you quote is a level, but not an ISO 17208 radiated noise level.
+
 ## 3. Pile-driving sound (ISO 18406)
 
 Percussive pile driving radiates one impulsive pulse per hammer strike. Each
@@ -137,6 +154,22 @@ res.plot()   # waveform + cumulative energy (needs matplotlib)
 `pile_strike_metrics` bundles the single-strike SEL, the peak sound pressure
 level, the SPL/Leq and the 90 %-energy pulse duration for one recorded strike;
 `cumulative_sel` sums a sequence of differing per-strike SELs.
+
+These are the metrics that regulation is written in. ISO 18406 exists because
+offshore wind-farm, oil-and-gas and bridge foundations are consented under
+environmental impact frameworks that require the radiated sound to be
+monitored, and its scope is drawn accordingly: percussive driving in 4 to
+100 m of water, with vibro- and sheet-piling excluded (Clause 1). The minimum
+campaign is one measurement position **as close as possible to 750 m** from
+the pile, recording the entire driving sequence and reporting the actual
+range; the standard is explicit that 750 m is chosen for comparability with
+the large body of existing measurements, not because any regulator's limit
+lives there, and that a single-range level has no predictive value for other
+sites (Clause 6.1.2, Notes 1–2). Impact criteria for marine fauna are phrased
+in exactly the quantities of this section, a cap on the single-strike or
+cumulative SEL and on the peak level at a stated range, which is why
+`pile_strike_metrics` reports them together and `cumulative_sel` follows the
+strike-by-strike energy sum of Formulae 8–9.
 
 ## References
 

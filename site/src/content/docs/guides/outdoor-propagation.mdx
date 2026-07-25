@@ -353,6 +353,7 @@ print(np.round(att.a_div, 1))     # [57. 57. 57. 57. 57. 57. 57. 57.]  divergenc
 print(np.round(att.a_gr, 2))      # [-4.65  2.34 13.79  9.76  1.3  -0.   -0.   -0.  ]
 print(np.round(att.a_bar, 2))     # [13.78  8.89  0.    6.69 18.01 20.   20.   20.  ]
 print(np.round(att.a_total, 1))   # [66.2 68.3 71.  73.9 77.1 78.8 82.3 96. ]
+att.plot()                        # the stacked breakdown above (needs matplotlib)
 
 # Predicted receiver level from an octave-band sound power Lw = 95 dB
 lw = np.full(len(bands), 95.0)
@@ -630,6 +631,9 @@ result.report(
 	caption="Outdoor propagation fiche (OutdoorAttenuation.report), the A-weighted downwind level at the receiver."
 />
 
+Before committing the fiche, `result.plot()` draws the same per-band
+attenuation breakdown interactively (the stacked figure of section 2).
+
 `BarrierInsertionLoss.report(path)` boxes the mean insertion loss over the
 octave bands; a minimum required insertion loss supplied through `requirement`
 adds a PASS/FAIL verdict (a higher insertion loss is better).
@@ -655,6 +659,10 @@ result.report(
 	description="One-page barrier insertion-loss prediction fiche: a metadata header naming the ground model, a per-band table of the insertion loss, the insertion-loss spectrum plot and the boxed mean insertion loss IL = 12.9 dB with a PASS verdict against an 8 dB minimum. The basis line names the wave-theoretic rigid-screen diffraction model, a complement to the ISO 9613-2 screening term."
 	caption="Barrier insertion loss fiche (BarrierInsertionLoss.report), the mean insertion loss over the octave bands."
 />
+
+Here too `result.plot()` previews the insertion-loss spectrum of the fiche;
+the [ground and barriers guide](/phonometry/guides/ground-barriers/) draws the
+same result against the exact half-plane and coherent-ground models.
 
 ## See also
 

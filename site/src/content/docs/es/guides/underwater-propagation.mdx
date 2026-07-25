@@ -150,7 +150,14 @@ references:
     edition: "2.ª ed."
     publisher: "Springer"
     doi: "10.1007/978-1-4419-8678-8"
-    note: "Los solvers de modos normales, trazado de rayos y ecuación parabólica split-step Fourier de la sección de solvers numéricos."
+    note: "Los solvers de modos normales (cap. 5), trazado de rayos (cap. 3) y ecuación parabólica split-step Fourier (cap. 6) de la sección de solvers numéricos, y la guía de selección de modelo del cap. 1."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2017
+    title: "Underwater acoustics — Terminology"
+    designation: "ISO 18405:2017"
+    url: "https://www.iso.org/standard/62406.html"
+    note: "Las definiciones normalizadas (pérdida por propagación, nivel de fuente, nivel de presión acústica re 1 µPa) tras las magnitudes de esta página."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -540,6 +547,86 @@ underwater.parabolic_equation(50.0, [0.0, 200.0], [1500.0, 1500.0],
 
 Los tres asumen una columna de agua independiente de la distancia con superficie
 de presión-liberada.
+
+## Elegir modelo
+
+Todas las funciones anteriores responden a la misma pregunta, "cuánto nivel
+sobrevive al camino", a distinto precio en física. La terminología sigue en
+toda la página la ISO 18405:2017 (pérdida por propagación, nivel de fuente,
+niveles re 1 µPa).
+
+**Velocidad del sonido.** Las tres ecuaciones coinciden a menos de 1 m/s
+dentro de su dominio común, así que la elección va de *rango de validez*, no
+de exactitud. La forma **UNESCO / Chen-Millero** por defecto (en la
+reformulación de Wong y Zhu de 1995) cubre de 0 a 40 °C, de 0 a 40 ppt y de 0
+a 1000 bar, la envolvente más amplia, y es el estándar internacional.
+**Del Grosso** (1974) queda restringida a 0-30 °C y 30-40 ppt, pero algunos
+autores la prefieren para trabajo de océano profundo dentro de ese dominio
+(buena parte de la literatura del canal SOFAR la usa). **Mackenzie** (1981)
+cambia presión por profundidad directamente (2-30 °C, 25-40 ppt, 0-8000 m),
+lo que la convierte en la opción cómoda cuando se dispone de una profundidad
+de ecosonda y no de una presión de CTD; las otras dos convierten profundidad a
+presión internamente mediante Leroy y Parthiot (1998).
+
+**Absorción.** **Francois-Garrison** (1982) es la referencia y el valor por
+defecto: incorpora las relajaciones del ácido bórico, el sulfato de magnesio y
+el agua pura con sus dependencias completas de temperatura, salinidad y
+profundidad, y es fiable desde unos 100 Hz hasta 1 MHz. **Ainslie-McColm**
+(1998) es una simplificación deliberada de la misma física que se mantiene a
+menos de un 10 % de ella en ese rango; úsese cuando una fórmula legible
+importe más que el último punto porcentual. **Thorp** (1967) depende solo de
+la frecuencia (lleva incorporada agua a 4 °C cerca de 1000 m) y es anterior a
+ambas; resérvese para estimaciones rápidas de baja frecuencia por debajo de
+unas decenas de kHz y para comparar con literatura antigua que la usó.
+
+**Ley de ensanchamiento.** El ensanchamiento esférico ($20\lg R$) describe un
+frente de onda que se expande libremente en tres dimensiones, antes de que
+ningún contorno lo confine; el cilíndrico ($10\lg R$) describe energía
+atrapada entre la superficie y el fondo (o en el canal SOFAR) que solo puede
+expandirse en distancia. La ley `"practical"` empalma ambos en una distancia
+de transición $R_0$, físicamente del orden de la profundidad del agua (o del
+canal): esférico mientras el frente no ha llenado el conducto, cilíndrico
+cuando ya lo ha hecho. En el ejemplo de 10 kHz de arriba la elección no es
+cosmética: frente a la misma figura de mérito de 87 dB, el ensanchamiento
+solo esférico predice detección hasta unos 8,7 km, mientras que la ley
+práctica con $R_0 = 1000$ m la estira hasta unos 15,8 km. Cuando la ley de
+ensanchamiento es la mayor incertidumbre del presupuesto, esa es la señal de
+dejar la forma cerrada y calcular el campo.
+
+**¿Forma cerrada o solver?** La pérdida por transmisión en forma cerrada no
+sabe nada del perfil de velocidad del sonido, del fondo ni de la superficie;
+es honesta para caminos cortos, directos y sin contornos, y para presupuestos
+de sonar de primera pasada. Cuando la refracción y los contornos deciden la
+respuesta, elíjase el solver por frecuencia y geometría (Jensen et al. 2011,
+cap. 1):
+
+| Solver | Régimen natural | Qué aporta |
+|---|---|---|
+| `ray_trace` | Alta frecuencia (profundidad ≫ λ), océano profundo | Geometría de eigenrayos, tiempos de propagación, zonas de convergencia; coste independiente de la frecuencia |
+| `normal_modes` | Baja frecuencia, aguas someras, independiente de la distancia | Suma modal exacta con pocos modos propagantes ($m < kD/\pi$); la solución de referencia en su régimen |
+| `parabolic_equation` | Baja frecuencia, caminos largos de un solo sentido | TL($z$,$r$) de campo completo con refracción; marcha perfiles arbitrarios en distancia |
+
+En la práctica las fronteras se difuminan: los rayos siguen siendo útiles a
+frecuencias sorprendentemente bajas para trabajo de tiempos de propagación, y
+la PE sigue siendo el caballo de batalla bastante por encima de su régimen
+formal de ángulos pequeños. Cuando dos de los tres coinciden en un caso, como
+hacen los modos y la PE en la figura de arriba, esa coincidencia es la prueba
+práctica de convergencia.
+
+**Un presupuesto de sonar resuelto.** Encadenando las piezas de punta a
+punta: una fuente de 140 dB re 1 µPa²/Hz a 10 kHz, un nivel espectral de
+ruido ambiental de 60 dB, una ganancia de array de 15 dB y un umbral de
+detección de 8 dB dan la figura de mérito
+$FOM = 140 - (60 - 15) - 8 = 87$ dB que calcula `passive_sonar_equation`
+arriba. La curva de pérdida por transmisión de la primera sección (10 °C,
+35 ppt, 100 m, $\alpha = 0,95$ dB/km) cruza los 87 dB hacia los 15,8 km con
+la ley práctica: ese cruce *es* la distancia de detección predicha, y cada
+término del presupuesto lo mueve. Recórtese el índice de directividad a
+7,5 dB y la figura de mérito cae a 79,5 dB, así que la distancia baja a donde
+la curva de TL cruce ese valor; dóblese la frecuencia a 20 kHz y $\alpha$ más que
+se triplica hasta 3,3 dB/km, tirando del cruce bruscamente hacia dentro.
+Este acoplamiento entre el modelo de absorción, la ley de ensanchamiento y la
+ecuación del sonar es la razón de que los tres vivan en un mismo módulo.
 
 ## Véase también
 

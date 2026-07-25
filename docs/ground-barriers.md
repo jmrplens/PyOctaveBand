@@ -79,6 +79,36 @@ it enters the Weyl-Van der Pol formulas.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ground_effect_spherical_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ground_effect_spherical.svg" alt="Excess attenuation (level re free field) against frequency on a log axis for four ground types. Fresh snow (10 kPa) dips deepest and lowest in frequency, near minus 18 dB around 150 Hz; forest floor (50 kPa) reaches about minus 15 dB near 290 Hz and grassland (200 kPa) about minus 12 dB near 540 Hz; asphalt (20000 kPa) hugs the plus 6 dB hard-ground enhancement limit until a deep dip near 2.4 kHz. A dotted line marks the plus 6 dB hard-ground limit and a solid line the 0 dB free field" width="90%"></picture>
 
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import ground_effect
+
+freqs = np.geomspace(50.0, 4000.0, 400)
+grounds = [
+    ("Fresh snow (10 kPa)", 10e3, "#2ca02c"),
+    ("Forest floor (50 kPa)", 50e3, "#9467bd"),
+    ("Grassland (200 kPa)", 200e3, "#1f77b4"),
+    ("Asphalt (20000 kPa)", 20000e3, "#d62728"),
+]
+fig, ax = plt.subplots(figsize=(11, 6.4))
+for label, sigma, color in grounds:
+    res = ground_effect(freqs, 1.0, 1.5, 50.0, flow_resistivity=sigma)
+    ax.plot(freqs, res.excess_attenuation, color=color, label=label)
+ax.axhline(6.0, color="k", ls=":", label="Hard-ground limit (+6 dB)")
+ax.axhline(0.0, color="k", lw=0.8)
+ax.set_xscale("log")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Level re free field [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
 **Limits reproduced by the implementation** (each a pinned test or conformance
 anchor): an acoustically hard ground (`|Z| → ∞`) gives `Rp → 1`, `|w| → 0`,
 `F → 1` and `Q → 1`, so `ΔL` reaches `+6 dB` in phase; the effective flow
@@ -142,6 +172,43 @@ il = barrier_insertion_loss(bands, 1.0, 50.0, 4.0, 100.0, 1.5,
 il.ground        # True: the four-path coherent ground model was applied
 il.plot()
 ```
+
+The three models side by side on the same geometry tell the whole story: the
+Kurze-Anderson fit and the exact half-plane track each other to within about
+1.5 dB across three decades of Fresnel number, while the coherent ground model
+swings tens of decibels around them, up where the barrier removes the
+ground-effect dip of the unscreened path, down where the four diffracted paths
+interfere destructively.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/barrier_insertion_loss_methods_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/barrier_insertion_loss_methods.svg" alt="Barrier insertion loss against frequency on a log axis for a 4 m screen between a 1 m source at 50 m and a 1.5 m receiver at 100 m. The dashed Kurze-Anderson curve and the solid exact rigid half-plane curve rise together from about 6 dB at 50 Hz to 19 dB at 5 kHz, never more than about 1.5 dB apart; the coherent four-path ground curve oscillates around them, peaking above 45 dB near 230 Hz where the unscreened ground dip is removed and falling below minus 10 dB near 550 Hz, with a dotted 5 dB grazing-limit line underneath" width="90%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import barrier_insertion_loss
+
+# The 4 m barrier of the snippets above, on a fine frequency grid.
+freqs = np.geomspace(50.0, 5000.0, 240)
+il_ka = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
+                               method="kurze_anderson")
+il_ex = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
+                               method="exact")
+il_gr = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
+                               method="exact", ground_flow_resistivity=2e5)
+fig, ax = plt.subplots(figsize=(11, 6.4))
+ax.semilogx(freqs, il_ka.insertion_loss, "--", label="Kurze-Anderson (thin screen)")
+ax.semilogx(freqs, il_ex.insertion_loss, label="Exact rigid half-plane")
+ax.semilogx(freqs, il_gr.insertion_loss, label="Exact + coherent ground (four paths)")
+ax.axhline(5.0, color="k", ls=":", label="Grazing limit (5 dB)")
+ax.set(xlabel="Frequency [Hz]", ylabel="Insertion loss [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 ## Relation to ISO 9613-2
 

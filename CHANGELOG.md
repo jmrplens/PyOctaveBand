@@ -287,6 +287,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   band audibility with a hearing loss, the ISO 7029 fractile band, the
   ISO 1999 NIPTS audiogram, the STOI per-band correlation and the IEC 60268-16
   per-band MTI.
+- Environment and underwater documentation: four new figures with their
+  reproducible code blocks (the log-linear effective sound-speed profiles,
+  the downward-refraction ray fan and the GFPE level-versus-range cut of the
+  atmospheric-refraction guide, and the Kurze-Anderson / exact half-plane /
+  coherent-ground barrier insertion-loss comparison of the ground-and-barriers
+  guide), in English, Spanish, light and dark variants. New prose: a
+  "when does refraction matter" introduction (Attenborough & Van Renterghem
+  2021, Ch. 11), a "Choosing a model" section in the underwater-propagation
+  guide (sound-speed and absorption validity ranges, spreading-law guidance,
+  the ray/mode/PE selection table after Jensen et al. 2011 Ch. 1, and a worked
+  sonar budget), and the ISO 17208-1 measurement-discipline and ISO 18406
+  regulatory-context paragraphs of the underwater-acoustics guide. The
+  outdoor-propagation docs mirror gains the missing "Prediction reports"
+  section and all six pages are re-synced across the site guides, the Spanish
+  mirrors and the `docs/*.md` tree, with `.plot()` one-liners added next to
+  every plottable snippet.
 - ISO 1999 `combine_age_and_noise()` applies Formula (1)
   (`H' = H + N - H*N/120`) to an age component the caller supplies, which
   clause 6.2 explicitly allows (a database B of the country under
