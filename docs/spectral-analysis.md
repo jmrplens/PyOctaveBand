@@ -143,6 +143,55 @@ print(res.magnitude_random_error[100], res.phase_std[100])  # bin 100 errors
 res.plot()   # magnitude, phase with ±sigma band, coherence
 ```
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cross_spectral_density_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cross_spectral_density.svg" alt="Two panels for the cross-spectral density of a two-sensor path with a 2 millisecond delay: the Welch magnitude estimate fluctuating around a flat level, and below it the unwrapped cross-spectrum phase falling as a straight line on a logarithmic frequency axis, lying exactly on the dashed minus two pi f tau reference with a narrow one-sigma band around it" width="86%"></picture>
+
+*The cross-spectral density of a 2 ms delay path: the unwrapped phase is
+exactly the line −2πfτ, so its slope reads the propagation delay directly,
+and the ±1 s.d. band of Eq. 9.52 quantifies how far to trust it per
+frequency.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import cross_spectral_density, noise_signal
+
+fs = 8000.0
+tau = 0.002                                   # 2 ms = 16 samples
+delay = int(tau * fs)
+x = noise_signal(fs, 8.0, seed=8)
+noise = noise_signal(fs, 8.0, rms=0.3, seed=9)
+y = 0.9 * np.concatenate([np.zeros(delay), x[:-delay]]) + noise
+
+res = cross_spectral_density(x, y, fs)
+
+# One line — magnitude, phase with its ±sigma band and coherence:
+res.plot()
+plt.show()
+
+# By hand, from the fields the result carries:
+band = (res.frequencies >= 20) & (res.frequencies <= 3500)
+freqs = res.frequencies[band]
+fig, (ax_m, ax_p) = plt.subplots(2, 1, sharex=True)
+ax_m.semilogx(freqs, 10 * np.log10(res.magnitude[band]),
+              label="|Gxy| (Welch estimate)")
+ax_m.set_ylabel("Magnitude [dB]")
+ax_p.semilogx(freqs, res.phase[band], label="Unwrapped phase")
+ax_p.fill_between(freqs, res.phase[band] - res.phase_std[band],
+                  res.phase[band] + res.phase_std[band], alpha=0.25,
+                  label="±1 s.d. (Eq. 9.52)")
+ax_p.semilogx(freqs, -2 * np.pi * freqs * tau, "r--",
+              label="slope -2·pi·f·tau")
+ax_p.set(xlabel="Frequency [Hz]", ylabel="Phase [rad]")
+for ax in (ax_m, ax_p):
+    ax.legend()
+plt.show()
+```
+
+</details>
+
 ## 3. Coherent output spectrum and spectral SNR
 
 In the single-input/single-output model the measured output autospectrum
@@ -184,6 +233,51 @@ print(np.median(res.coherence))          # -> SNR/(1+SNR) = 0.719
 print(np.median(res.snr_db))             # -> 10·lg(2.56) = 4.1 dB
 res.plot()                               # Gyy, Gvv, Gnn and the SNR panel
 ```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/coherent_output_snr_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/coherent_output_snr.svg" alt="Two panels for the coherent output spectrum of a white noise system with additive noise: the measured output spectrum with the coherent part about 1.5 decibels below it and the uncorrelated noise floor about 6 decibels lower still, and below them the spectral signal-to-noise ratio fluctuating around the dashed closed-form line at 4.1 decibels" width="86%"></picture>
+
+*The exact split of the snippet's model: `Gvv = γ²·Gyy` explains the output
+except for the flat noise remainder `Gnn`, and the spectral SNR scatters
+around its closed form 10·lg(0.64/0.25) = 4.1 dB at every frequency.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import coherent_output_spectrum, noise_signal
+
+fs = 48000.0
+x = noise_signal(fs, 8.0, color="white", seed=1)
+noise = noise_signal(fs, 8.0, color="white", rms=0.5, seed=2)
+y = 0.8 * x + noise                      # SNR = 0.64/0.25 per band
+
+res = coherent_output_spectrum(x, y, fs, nperseg=2048)
+
+# One line — the three spectra and the SNR panel:
+res.plot()
+plt.show()
+
+# By hand, from the fields the result carries:
+band = (res.frequencies >= 20) & (res.frequencies <= 20000)
+freqs = res.frequencies[band]
+fig, (ax_g, ax_s) = plt.subplots(2, 1, sharex=True)
+for values, style, label in ((res.output_psd, "-", "Gyy (measured)"),
+                             (res.coherent_psd, "--", "Gvv (coherent)"),
+                             (res.noise_psd, ":", "Gnn (noise)")):
+    ax_g.semilogx(freqs, 10 * np.log10(values[band]), style, label=label)
+ax_g.set_ylabel("Spectral density [dB re 1/Hz]")
+ax_s.semilogx(freqs, res.snr_db[band], label="Spectral SNR [dB]")
+ax_s.axhline(10 * np.log10(0.64 / 0.25), color="r", linestyle="--",
+             label="closed form 4.1 dB")
+ax_s.set(xlabel="Frequency [Hz]", ylabel="SNR [dB]")
+for ax in (ax_g, ax_s):
+    ax.legend()
+plt.show()
+```
+
+</details>
 
 The `coherence_bias` field reports the small positive bias of the coherence
 estimate, `b[γ̂²] ≈ (1-γ²)²/nd` (Eq. 9.75), negligible once `nd` reaches a
