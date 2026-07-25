@@ -34,6 +34,7 @@ from .human_vibration import (
     running_rms,
     vibration_dose_value,
     vibration_total_value,
+    wbv_exposure_basis,
     weighted_acceleration,
     weighting_factors,
 )
@@ -201,6 +202,7 @@ __all__ = [
     "vibration_dose_value",
     "vibration_total_value",
     "wave_vibration_reduction_index",
+    "wbv_exposure_basis",
     "weighted_acceleration",
     "weighting_factors",
 ]

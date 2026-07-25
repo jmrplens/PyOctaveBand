@@ -22,6 +22,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and apply the new lint fixes across the tree. No runtime behavior changes.
 
 ### Added
+- `vibration.wbv_exposure_basis()`: the whole-body daily-exposure basis of
+  Directive 2002/44/EC (Annex, Part B, point 1), the highest of the
+  frequency-weighted axis values `1,4*a_wx`, `1,4*a_wy`, `a_wz` for a seated
+  or standing worker. `daily_vibration_exposure` now documents which magnitude
+  each kind must be fed with for a Directive-conforming assessment: the Part A
+  vector total `a_hv` for hand-arm, the Part B dominant-axis value for
+  whole-body (not the ISO 2631-1 Eq. (10) vector total `a_v`).
 - `materials.diffuser_design`: far-field polar-response and diffusion-coefficient
   prediction of a Schroeder phase-grating diffuser from its surface design,
   complementing the measurement-only `materials.scattering_diffusion`.
@@ -2042,6 +2049,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   assertion is untouched.
 
 ### Fixed
+- The whole-body daily vibration exposure fiche labels its per-operation
+  magnitude `a_w,max` per Directive 2002/44/EC Annex Part B point 1 (the
+  highest frequency-weighted axis value `max(1,4*a_wx, 1,4*a_wy, a_wz)`)
+  instead of presenting it as the ISO 2631-1 Eq. (10) vector total `a_v`, and
+  a printed note states that basis (EN/ES). The measurement-chain diagram and
+  the human-vibration guide (EN/ES) state the same Part B basis; the hand-arm
+  side keeps the Part A vector total `a_hv`.
+- The boxed exposure zone of the daily vibration exposure fiche is now derived
+  from the same displayed-rounded comparisons as the assessment rows and the
+  verdict, so an `A(8)` that prints exactly at a threshold (for example 4,997
+  displaying as 5,00) can no longer show a boxed zone one step below its own
+  Exceeded row.
+- The ISO 10848 `Kij` fiche distinguishes an empty single-number mean caused
+  by every in-range band being bracketed for poor modal overlap (M < 0,25)
+  from a spectrum with no bands in the Annex A range (EN/ES).
+- Spanish ISO 2631-5 outputs: the injury-probability plot title translates the
+  subject sex ("hombre"/"mujer") and the fiche's clause references print
+  "Fórmula (n)" instead of the untranslated "Formula (n)".
 - `shaped_sweep_signal()` no longer returns a NaN or infinite crest factor
   when a very small `seconds` next to a dominant `start_delay` rounds the two
   edges of the constant-envelope window onto the same sample and leaves an

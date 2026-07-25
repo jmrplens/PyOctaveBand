@@ -141,6 +141,36 @@ def test_hav_directive_boundaries_on_displayed_value(
     assert verdict in text
 
 
+@pytest.mark.parametrize(
+    ("a_hv", "box_phrase", "n_exceeded", "verdict"),
+    [
+        # Displays 2.50: the box, the EAV row and the verdict all read the
+        # displayed value, so the box says "at or above the action value"
+        # while the EAV row says Exceeded and the ELV verdict stays PASS.
+        (2.495, "at or above the exposure action value", 1, "PASS"),
+        # Displays 5.00: the ELV row says Exceeded and the verdict FAIL, so
+        # the boxed zone must say "at or above the limit value" too (the raw
+        # value 4.997 would place it one zone lower).
+        (4.997, "at or above the exposure limit value", 2, "FAIL"),
+    ],
+)
+def test_boxed_zone_agrees_with_displayed_rows_and_verdict(
+    tmp_path, a_hv: float, box_phrase: str, n_exceeded: int, verdict: str
+) -> None:
+    """The boxed zone phrase derives from the same displayed-rounded compare."""
+    pytest.importorskip("reportlab")
+    pytest.importorskip("matplotlib")
+    res = daily_vibration_exposure([a_hv], [8 * 3600.0], kind="hav", labels=["op"])
+    out = tmp_path / f"box_{a_hv}.pdf"
+    res.report(str(out))
+    text = _extract_text(str(out))
+    assert box_phrase in text
+    assert "below the exposure action value" not in text
+    assert text.count("Exceeded") == n_exceeded
+    assert text.count("Not exceeded") == 2 - n_exceeded
+    assert verdict in text
+
+
 def test_verdict_sentence_states_the_actual_relation(tmp_path) -> None:
     """The verdict sentence agrees with its PASS/FAIL banner, both directions."""
     pytest.importorskip("reportlab")
@@ -178,6 +208,24 @@ def test_whole_body_thresholds_and_basis(tmp_path) -> None:
     # 0.80 is in the action zone (>= 0.5, < 1.15): EAV exceeded, ELV not.
     assert text.count("Exceeded") == 1
     assert "PASS" in text
+    # The fiche labels the whole-body basis per Directive 2002/44/EC Annex
+    # Part B point 1 (the highest axis value), not the ISO 2631-1 vector total.
+    assert "highest frequency-weighted axis value" in text
+    assert "Annex Part B point 1" in text
+
+
+def test_whole_body_spanish_states_part_b_basis(tmp_path) -> None:
+    """The Spanish whole-body fiche carries the translated Part B basis note."""
+    pytest.importorskip("reportlab")
+    pytest.importorskip("matplotlib")
+    res = daily_vibration_exposure(
+        [0.8], [8 * 3600.0], kind="wbv", labels=["conducción de tractor"]
+    )
+    out = tmp_path / "wbv_es.pdf"
+    res.report(str(out), language="es")
+    text = _extract_text(str(out))
+    assert "el mayor valor por eje ponderado en frecuencia" in text
+    assert "parte B, punto 1" in text
 
 
 # --- metadata -----------------------------------------------------------------

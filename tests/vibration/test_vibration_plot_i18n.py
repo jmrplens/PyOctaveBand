@@ -49,6 +49,44 @@ def test_rigid_mass_spanish_labels() -> None:
     assert axes_es[1].get_xlabel() == "Frecuencia [Hz]"
 
 
+def test_multiple_shock_spanish_title_translates_sex() -> None:
+    pytest.importorskip("matplotlib")
+    import matplotlib
+
+    matplotlib.use("Agg")
+    from phonometry.vibration.multiple_shock_vibration import (
+        MZ_MALE,
+        RISK_THRESHOLDS_MALE,
+        MultipleShockResult,
+        compression_dose,
+        dose_from_peaks,
+        injury_probability,
+        injury_risk,
+    )
+
+    peaks = np.full(5, 40.0)
+    dz = dose_from_peaks(peaks)
+    sd = compression_dose(dz, mz=MZ_MALE)
+    r = injury_risk(sd, start_age=20.0, years=20, days_per_year=120.0, sex="male")
+    res = MultipleShockResult(
+        sex="male",
+        acceleration_dose=dz,
+        daily_dose=dz,
+        compression_dose=sd,
+        risk=r,
+        probability=float(injury_probability(r, sex="male")),
+        start_age=20.0,
+        years=20,
+        days_per_year=120.0,
+        peaks=peaks,
+        risk_thresholds=RISK_THRESHOLDS_MALE,
+    )
+    ax_en = res.plot(language="en")
+    assert ax_en.get_title() == "ISO 2631-5 injury probability — male"
+    ax_es = res.plot(language="es")
+    assert ax_es.get_title() == "ISO 2631-5 probabilidad de lesión — hombre"
+
+
 def test_unknown_language_raises() -> None:
     pytest.importorskip("matplotlib")
     import matplotlib

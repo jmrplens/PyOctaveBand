@@ -44,7 +44,11 @@ standards' own analog definitions, clean-room:
 * **Directive 2002/44/EC** - the daily exposure action and limit values
   (Article 3) that ISO does not fix: hand-arm `A(8)` EAV `2,5` /
   ELV `5` m/s2; whole-body `A(8)` EAV `0,5` / ELV `1,15` m/s2 (or VDV
-  EAV `9,1` / ELV `21` m/s^1,75).
+  EAV `9,1` / ELV `21` m/s^1,75).  The hand-arm `A(8)` is based on the
+  ISO 5349-1 vector total `a_hv` (Annex, Part A, point 1); the whole-body
+  `A(8)` is based on the *highest* of the frequency-weighted axis values
+  `1,4*a_wx`, `1,4*a_wy`, `a_wz` (Annex, Part B, point 1; see
+  [`wbv_exposure_basis`](/phonometry/reference/api/vibration/human-vibration/#wbv_exposure_basis)), not on the ISO 2631-1 Eq. (10) vector total.
 
 The band (spectrum) method and the exposure arithmetic carry the standards'
 worked-example oracles; the time-domain metrics operate on a weighted
@@ -139,7 +143,9 @@ daily_exposure(total_value: float, duration_s: float) -> float
 Daily exposure `A(8)` for one operation (ISO 5349-1 Eq. (2)).
 
 `A(8) = a_hv * sqrt(T / T0)` with `T0 = 8 h`.  The identical form gives
-the whole-body `A(8)` used by Directive 2002/44/EC.
+the whole-body `A(8)` of Directive 2002/44/EC, whose magnitude is the
+Annex Part B dominant-axis value (see [`wbv_exposure_basis`](/phonometry/reference/api/vibration/human-vibration/#wbv_exposure_basis)) rather
+than a vector total.
 
 **Parameters**
 
@@ -174,11 +180,18 @@ Combines the operations via the partial exposures of ISO 5349-1/-2
 Eqs. (2)/(3) and assesses the resulting `A(8)` against the Directive
 2002/44/EC action and limit values for `kind`.
 
+The Directive fixes the per-operation magnitude each kind must be fed
+with (Annex, points 1): for `kind="hav"` the ISO 5349-1 Eq. (1) vector
+total `a_hv` (Part A); for `kind="wbv"` the *highest* frequency-
+weighted axis value `max(1,4*a_wx, 1,4*a_wy, a_wz)` that
+[`wbv_exposure_basis`](/phonometry/reference/api/vibration/human-vibration/#wbv_exposure_basis) returns (Part B), **not** the ISO 2631-1
+Eq. (10) vector total `a_v`.
+
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `total_values` | Vibration total value `a_hvi` per operation, in m/s2. |
+| `total_values` | Per-operation vibration magnitude, in m/s2: the hand-arm vibration total value `a_hv,i` (`kind="hav"`) or the Directive Part B dominant-axis value of [`wbv_exposure_basis`](/phonometry/reference/api/vibration/human-vibration/#wbv_exposure_basis) (`kind="wbv"`). |
 | `durations_s` | Duration `T_i` per operation, in seconds. |
 | `kind` | `"hav"` or `"wbv"` (selects the EAV/ELV). |
 | `labels` | Optional operation labels; defaults to `op 1`, `op 2`, ... |
@@ -255,7 +268,9 @@ practice: the standard-basis line naming the applied ISO method
 whole-body vibration) and the Directive 2002/44/EC it is assessed
 against, an optional metadata header (company, operator/worker,
 workplace, instrumentation, calibration), the per-operation exposure
-analysis (the vibration total value, the daily exposure time `T_i` and
+analysis (the vibration magnitude - the hand-arm vector total `a_hv`
+or the whole-body Directive Part B dominant-axis value `a_w,max` -
+the daily exposure time `T_i` and
 the partial exposure `A_i(8)` of ISO 5349-1/-2 Eq. (2), closed by the
 daily total and the combined `A(8)` of Eq. (3)), the per-operation
 contribution chart, the boxed `A(8)` with its exposure zone, an
@@ -526,7 +541,9 @@ partial_exposure(total_value: float, duration_s: float) -> float
 Daily exposure `A(8)` for one operation (ISO 5349-1 Eq. (2)).
 
 `A(8) = a_hv * sqrt(T / T0)` with `T0 = 8 h`.  The identical form gives
-the whole-body `A(8)` used by Directive 2002/44/EC.
+the whole-body `A(8)` of Directive 2002/44/EC, whose magnitude is the
+Annex Part B dominant-axis value (see [`wbv_exposure_basis`](/phonometry/reference/api/vibration/human-vibration/#wbv_exposure_basis)) rather
+than a vector total.
 
 **Parameters**
 
@@ -678,6 +695,40 @@ WBV_ELV_A8 = 1.15
 ```python
 WBV_ELV_VDV = 21.0
 ```
+
+## wbv_exposure_basis
+
+```python
+wbv_exposure_basis(a_wx: float, a_wy: float, a_wz: float) -> float
+```
+
+Whole-body exposure basis of Directive 2002/44/EC (Annex, Part B).
+
+`max(1,4*a_wx, 1,4*a_wy, a_wz)` - the Directive bases the whole-body
+daily exposure `A(8)` on the *highest* of the frequency-weighted axis
+values `1,4*a_wx`, `1,4*a_wy`, `a_wz` for a seated or standing
+worker (Annex, Part B, point 1, with the ISO 2631-1 clause 7.2.3
+multiplying factors), **not** on the ISO 2631-1 Eq. (10) vector total
+`a_v`.  Feed the returned dominant-axis value to
+[`daily_vibration_exposure`](/phonometry/reference/api/vibration/human-vibration/#daily_vibration_exposure) (`kind="wbv"`) for a
+Directive-conforming whole-body assessment; the hand-arm basis is the
+vector total `a_hv` instead (Annex, Part A, point 1).
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `a_wx` | `Wd`-weighted r.m.s. acceleration on the x axis, in m/s2. |
+| `a_wy` | `Wd`-weighted r.m.s. acceleration on the y axis, in m/s2. |
+| `a_wz` | `Wk`-weighted r.m.s. acceleration on the z axis, in m/s2. |
+
+**Returns:** The dominant-axis value `max(1,4*a_wx, 1,4*a_wy, a_wz)`, in m/s2.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for a negative or non-finite axis value. |
 
 ## weighted_acceleration
 

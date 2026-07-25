@@ -5,10 +5,11 @@
 Vibration transmitted to a person is evaluated with the same measurement chain
 whatever its origin: the acceleration is **frequency-weighted** to reflect how
 the body responds at each frequency, reduced to a **weighted r.m.s.**
-acceleration (with dose measures for shocks and long records), combined across
-axes into a **vibration total value**, and finally normalised to an **8-hour
-daily exposure** `A(8)` that is compared against the action and limit values of
-the European directive.
+acceleration (with dose measures for shocks and long records), condensed across
+axes into a single magnitude (the **vibration total value** for hand-arm
+exposure and for comfort; the **highest axis value** for the whole-body health
+assessment), and finally normalised to an **8-hour daily exposure** `A(8)` that
+is compared against the action and limit values of the European directive.
 
 The weightings themselves are defined once, in **ISO 8041-1:2017**, as a cascade
 of analog filters; **ISO 2631-1** applies them to whole-body vibration,
@@ -16,7 +17,7 @@ of analog filters; **ISO 2631-1** applies them to whole-body vibration,
 and **ISO 5349-1/-2** to hand-transmitted vibration. This page covers the whole
 chain.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_human_vibration_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_human_vibration.svg" alt="Whole-body vibration measurement chain: a triaxial accelerometer at the seat/body interface of a seated person measures the x, y and z acceleration; each axis is band-limited and frequency-weighted (Wk vertical, Wd horizontal) per ISO 8041-1, reduced to a weighted r.m.s. a_w and VDV per ISO 2631-1, combined into the vibration total value a_v, normalised to the daily exposure A(8) and assessed against the EAV and ELV of Directive 2002/44/EC" width="94%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_human_vibration_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_human_vibration.svg" alt="Whole-body vibration measurement chain: a triaxial accelerometer at the seat/body interface of a seated person measures the x, y and z acceleration; each axis is band-limited and frequency-weighted (Wk vertical, Wd horizontal) per ISO 8041-1, reduced to a weighted r.m.s. a_w and VDV per ISO 2631-1, and the highest frequency-weighted axis value max(1.4 a_wx, 1.4 a_wy, a_wz) is normalised to the daily exposure A(8) and assessed against the EAV and ELV of Directive 2002/44/EC" width="94%"></picture>
 
 ## 1. Frequency weightings (ISO 8041-1)
 
@@ -234,11 +235,24 @@ duration and what the passengers are trying to do. For orientation, the median
 perception threshold of a `Wk`-weighted vibration is about 0.015 m/s² peak
 (Annex C).
 
-The **daily exposure** normalises the total value to a reference 8-hour day
-($T_0 = 28\,800$ s). For a single operation $A(8) = a_v\,\sqrt{T/T_0}$; several
-operations combine through their partial exposures $A_i(8) = a_{vi}\,\sqrt{T_i/T_0}$
-as $A(8) = \sqrt{\sum_i A_i(8)^2}$ (ISO 5349-1 Eqs. (2)/(3); ISO 5349-2
-Eqs. (1)–(3)).
+The **daily exposure** normalises the exposure magnitude $a$ to a reference
+8-hour day ($T_0 = 28\,800$ s). For a single operation $A(8) = a\,\sqrt{T/T_0}$;
+several operations combine through their partial exposures
+$A_i(8) = a_i\,\sqrt{T_i/T_0}$ as $A(8) = \sqrt{\sum_i A_i(8)^2}$ (ISO 5349-1
+Eqs. (2)/(3); ISO 5349-2 Eqs. (1)–(3)). Directive 2002/44/EC fixes which
+magnitude $a$ each kind is based on (Annex, points 1): for hand-arm vibration
+the vector total $a_{hv}$ (Part A), but for whole-body vibration the *highest*
+frequency-weighted axis value $\max(1.4\,a_{wx},\,1.4\,a_{wy},\,a_{wz})$
+(Part B), not the vector total $a_v$ above. `wbv_exposure_basis` returns that
+dominant-axis value:
+
+```python
+from phonometry import vibration
+
+# Directive 2002/44/EC whole-body basis (Annex Part B): the dominant axis.
+a = vibration.wbv_exposure_basis(0.35, 0.28, 0.62)
+print(round(a, 3))    # 0.62  m/s^2 (max of 0.49, 0.392, 0.62; not a_v = 0.882)
+```
 
 `daily_vibration_exposure` builds the partial exposures, combines them and
 assesses the result against **Directive 2002/44/EC**: hand-arm action value
@@ -325,8 +339,9 @@ for hand-transmitted vibration, ISO 2631-1 for whole-body vibration) and the
 directive it is assessed against, a header grid (company via `client`,
 operator/worker via `specimen`, workplace via `test_room`, and the
 `instrumentation` and `calibration` free-text fields of `ReportMetadata`), the
-per-operation exposure analysis (each operation's vibration total value
-$a_{hv}$ or $a_v$, its daily exposure time $T_i$ and the partial exposure
+per-operation exposure analysis (each operation's vibration magnitude, the
+hand-arm vector total $a_{hv}$ or the whole-body Directive Part B dominant-axis
+value $a_{w,max}$, its daily exposure time $T_i$ and the partial exposure
 $A_i(8)$, closed by the daily total and the combined $A(8)$) with the
 contribution chart, and the boxed $A(8)$ with its exposure zone. The fiche then
 assesses $A(8)$ against Directive 2002/44/EC (Article 3): the exposure action

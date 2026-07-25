@@ -84,6 +84,8 @@ _STRINGS: dict[str, str] = {
     "limit": "límite",
     "peak at {v} Hz": "máximo en {v} Hz",
     "ISO 2631-5 injury probability — {sex}": "ISO 2631-5 probabilidad de lesión — {sex}",
+    "male": "hombre",
+    "female": "mujer",
     r"$R$ = {r},  $\Pi$ = {p} %": r"$R$ = {r},  $\Pi$ = {p} %",
 }
 
@@ -491,7 +493,11 @@ def plot_multiple_shock(
                **kwargs)
     ax.set_xlabel(_t("Stress variable $R$", language))
     ax.set_ylabel(_t("Probability of lumbar injury [%]", language))
-    ax.set_title(_t("ISO 2631-5 injury probability — {sex}", language).format(sex=result.sex))
+    ax.set_title(
+        _t("ISO 2631-5 injury probability — {sex}", language).format(
+            sex=_t(str(result.sex), language)
+        )
+    )
     ax.set_xlim(left=0.0)
     ax.set_ylim(0.0, 100.0)
     ax.legend(loc="lower right", fontsize="small")

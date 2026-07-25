@@ -195,37 +195,40 @@ def _analysis_table(result: MultipleShockResult, language: str = "en") -> Any:
 
     header_style, label_style, value_style = analysis_cell_styles("iso26315")
     ms2 = _unit_ms2()
+    # The clause references keep their number verbatim; only the word
+    # "Formula" is localised.
+    formula = t("Formula", language)
 
     rows: list[tuple[str, str, str, str]] = [
         (
             t("Acceleration dose", language),
             "D<sub>z</sub>",
             f"{_fmt(result.acceleration_dose, _DOSE_DECIMALS, language)} {ms2}",
-            "Formula (3)",
+            f"{formula} (3)",
         ),
         (
             t("Daily acceleration dose", language),
             "D<sub>zd</sub>",
             f"{_fmt(result.daily_dose, _DOSE_DECIMALS, language)} {ms2}",
-            "Formula (4)",
+            f"{formula} (4)",
         ),
         (
             t("Daily compressive stress", language),
             "S<sub>d</sub>",
             f"{_fmt(result.compression_dose, _DOSE_DECIMALS, language)} MPa",
-            "Formula (C.1)",
+            f"{formula} (C.1)",
         ),
         (
             t("Cumulative stress variable", language),
             "R",
             _fmt(result.risk, _R_DECIMALS, language),
-            "Formula (C.3)",
+            f"{formula} (C.3)",
         ),
         (
             t("Probability of lumbar injury", language),
             "&#928;",
             _fmt_percent(result.probability, language),
-            "Formula (C.5)",
+            f"{formula} (C.5)",
         ),
     ]
 
