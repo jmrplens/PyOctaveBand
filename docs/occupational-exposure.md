@@ -80,6 +80,8 @@ print(f"job      LEX,8h = {job.lex_8h:.1f} dB   U = {job.expanded_uncertainty:.1
 # job      LEX,8h = 88.2 dB   U = 3.8 dB
 print(f"full-day LEX,8h = {full.lex_8h:.1f} dB   U = {full.expanded_uncertainty:.1f} dB")
 # full-day LEX,8h = 90.1 dB   U = 3.4 dB
+
+res.plot()   # the figure below: task contributions with LEX,8h and LEX,8h + U
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/exposure_uncertainty_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/exposure_uncertainty.svg" alt="ISO 9612 Annex D task-based exposure: the three task LEX,8h contributions as bars, the energy-summed daily LEX,8h line and the one-sided 95 % upper limit LEX,8h + U band above it" width="80%"></picture>

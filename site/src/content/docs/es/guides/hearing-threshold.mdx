@@ -62,6 +62,8 @@ print(result.median[8].round(1))  # 26.2 dB a 4000 Hz
 
 # El decil que peor oye (percentil 90) a 4000 Hz:
 print(hearing.age_threshold(65, "male", fractile=0.9).threshold[8].round(1))  # 50.3
+
+result.plot()   # la mediana con la banda de fractiles 10-90 % (necesita matplotlib)
 ```
 
 La pérdida es mayor en las altas frecuencias y crece con la edad: el
@@ -92,6 +94,56 @@ mediana, así que los percentiles extremos del lado malo se mueven con la edad
 mucho más deprisa de lo que el lado bueno llega a mejorar. Un audiograma
 individual puede caer en cualquier punto de ese abanico; el modelo te dice
 cuán *sorprendente* es, no cuál debería ser.
+
+`AgeThresholdResult.plot()` dibuja ese abanico directamente: la mediana, el
+fractil pedido y la banda del 10 % al 90 % entre ambos, sobre un eje de
+audiograma.
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/age_threshold_fractiles_es.svg"
+  alt="Desviación del umbral de audición según ISO 7029 de un hombre de 70 años sobre un eje de audiograma invertido de 125 Hz a 8000 Hz: la mediana sube desde unos 3 dB a 125 Hz hasta unos 45 dB a 8000 Hz, el fractil 90 % pedido queda muy por debajo y la banda sombreada del 10 al 90 por ciento se ensancha hacia las frecuencias altas"
+  width="88%"
+/>
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import hearing
+
+# Un hombre de 70 años, decil que peor oye: la pendiente mediana de la
+# presbiacusia con la dispersión poblacional a su alrededor.
+res = hearing.age_threshold(70, "male", fractile=0.9)
+print(res.median.round(1))
+print(res.threshold.round(1))     # el fractil 90 %
+
+# En una línea: la mediana, el fractil y la banda 10-90 %.
+res.plot()
+plt.show()
+```
+
+</details>
+
+La banda es justo el sentido del modelo. A 500 Hz los fractiles de una persona
+de 70 años abarcan unos pocos decibelios, así que un audiograma individual ahí
+resulta informativo; a 8 kHz abarcan decenas de decibelios, de modo que un
+único valor medido dice poco sobre si ese oído es atípico. Cualquier
+afirmación del tipo «esta persona ha perdido más audición de lo que explica su
+edad» es una afirmación sobre dónde cae dentro de este abanico, y necesita el
+fractil, no la mediana.
+
+**A dónde va después la componente de edad.** ISO 7029 no es solo una
+referencia audiológica: es la entrada de *edad* del modelo de pérdida auditiva
+inducida por ruido. ISO 1999:2013 la llama base de datos A y su Fórmula (1)
+del apartado 6.1 combina el umbral por edad `H` con el desplazamiento inducido
+por ruido `N` en el umbral que mostraría un audiograma real,
+`H' = H + N - HN/120`, con el mismo fractil. En la práctica eso encadena las
+dos guías: elige aquí la población y el fractil, añade allí la exposición y
+compara el resultado, nunca la componente de ruido sola, con un audiograma
+medido. La
+[guía de pérdida auditiva inducida por ruido](/phonometry/es/guides/noise-induced-hearing-loss/)
+retoma la cadena en ese punto.
 
 ## 2. Umbral de referencia de la audición (ISO 389-7)
 
@@ -155,4 +207,12 @@ componente de edad, es el tema de la guía de
 
 ## Véase también
 
+- [Pérdida auditiva inducida por ruido](/phonometry/es/guides/noise-induced-hearing-loss/):
+  el modelo de ISO 1999 que añade la componente de ruido sobre esta componente de edad.
+- [Índice de inteligibilidad del habla](/phonometry/es/guides/speech-intelligibility/): un
+  umbral elevado como entrada, y lo que cuesta en audibilidad del habla.
+- [Sonoridad](/phonometry/es/guides/loudness/): el umbral de audición de ISO 226:2023, la
+  contraparte en tonos puros y campo libre del cero audiométrico de la sección 2.
+- [Exposición laboral al ruido](/phonometry/es/guides/occupational-exposure/): el nivel de
+  exposición diario de ISO 9612 que impulsa la componente de ruido.
 - Referencia de la API: [`hearing.threshold`](/phonometry/es/reference/api/hearing/threshold/).

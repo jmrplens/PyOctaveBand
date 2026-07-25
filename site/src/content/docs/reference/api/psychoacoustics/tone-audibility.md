@@ -748,12 +748,30 @@ Tone frequency of the decisive (most audible) tone, in Hz.
 ToneAudibilityResult.plot(
     ax: Axes | None = None,
     *,
+    view: str = 'audibility',
     language: str = 'en',
     **kwargs: Any,
 ) -> Axes
 ```
 
-Plot the per-tone audibility `ΔL` against tone frequency.
+Plot the assessment, either as audibilities or as levels.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `ax` | Existing axes to draw on, or `None` to create a figure. |
+| `view` | `"audibility"` (default) draws the per-tone audibility `ΔL` against tone frequency, with the decisive tone highlighted; `"levels"` draws the tone levels `Lpt` above the critical-band masking noise `Lpn` on a continuous frequency axis, the view the `.report()` fiche embeds. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the primary artist call. |
+
+**Returns:** The axes.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If `view` is not one of the two names above. |
 
 ### ToneAudibilityResult.report()
 

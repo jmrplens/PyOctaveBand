@@ -309,6 +309,12 @@ res = psychoacoustics.loudness_moore_glasberg(x, fs, field="free", presentation=
 res.plot()   # specific loudness N'(i) over the ERB-number (Cam) scale
 ```
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/moore_glasberg_specific_loudness_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/moore_glasberg_specific_loudness.svg" alt="ISO 532-2 specific loudness over the ERB-number scale for a 1 kHz tone at 40 dB SPL: a single rounded peak near 15 Cam whose area is the total loudness of 1 sone" width="80%"></picture>
+
+*The ISO 532-2 pattern of the definitional 1 sone anchor. The peak is not a
+spectral line but the excitation the roex filters produce around the tone, so
+its width is the auditory filter, not the analysis resolution.*
+
 <details>
 <summary>Show the code for this figure</summary>
 

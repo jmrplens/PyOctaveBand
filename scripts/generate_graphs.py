@@ -9917,6 +9917,239 @@ def generate_mobility_result_lines(output_dir: str) -> None:
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "mobility_result_lines.svg")
+def generate_tone_prominence_assessment(output_dir: str) -> None:
+    """ECMA-418-1 TNR of a fan tone against the clause 11.5 criterion."""
+    print("Generating tone_prominence_assessment...")
+    from phonometry import psychoacoustics
+
+    # A 250 Hz fan tone recorded in broadband machinery noise: 10 s at 48 kHz,
+    # the tone 15.1 dB above the masking noise of its critical band against a
+    # 13.0 dB criterion, so it is prominent with about 2 dB to spare.
+    fs = 48000
+    rng = np.random.default_rng(4)
+    t = np.arange(10 * fs) / fs
+    x = (np.sqrt(2) * 0.011 * np.sin(2 * np.pi * 250.0 * t)
+         + 0.03 * rng.standard_normal(t.size))
+    res = psychoacoustics.tone_to_noise_ratio(x, fs)
+
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    res.plot(ax=ax, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "tone_prominence_assessment.svg")
+    plt.close()
+
+
+def generate_tone_audibility_levels(output_dir: str) -> None:
+    """ISO/PAS 20065 tone levels above the critical-band masking noise."""
+    print("Generating tone_audibility_levels...")
+    from phonometry import psychoacoustics
+
+    # ISO/PAS 20065 Annex E combustion-engine spectrum 1 (Delta f = 2.7 Hz):
+    # the levels view of the same assessment the audibility bars summarise.
+    ft = [118.4, 137.3, 158.8, 314.9, 433.4, 592.2, 629.8, 643.3, 1582.7]
+    lt = [64.56, 67.96, 68.63, 68.50, 73.17, 78.31, 75.00, 79.75, 71.07]
+    ls = [48.91, 49.22, 50.50, 52.85, 58.29, 59.53, 59.71, 61.98, 54.16]
+    res = psychoacoustics.assess_tones(ft, lt, ls, 2.7)
+
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    res.plot(ax=ax, view="levels", language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "tone_audibility_levels.svg")
+    plt.close()
+
+
+def generate_impulsive_sound_onsets(output_dir: str) -> None:
+    """ISO/PAS 1996-3 LpAF history with the detected impulse onsets."""
+    print("Generating impulsive_sound_onsets...")
+    import warnings as _warnings
+
+    from phonometry import environmental
+
+    # Three hammer strikes over a 55 dB(A) background, 6 s at 48 kHz: the
+    # objective chain samples LpAF, detects the onsets and rates the source.
+    fs = 48000
+    rng = np.random.default_rng(7)
+    t = np.arange(int(6.0 * fs)) / fs
+    background = rng.standard_normal(t.size)
+    background *= 2e-5 * 10 ** (55 / 20) / np.sqrt(np.mean(background**2))
+    signal = background.copy()
+    for onset_time in (1.0, 2.6, 4.2):
+        decay = np.exp(-(t - onset_time) / 0.08) * (t >= onset_time)
+        strike = decay * rng.standard_normal(t.size)
+        window = (t >= onset_time) & (t < onset_time + 0.1)
+        strike *= 2e-5 * 10 ** (95 / 20) / np.sqrt(np.mean(strike[window] ** 2))
+        signal += strike
+    with _warnings.catch_warnings():
+        # The synthetic interval is shorter than the assessment period.
+        _warnings.simplefilter("ignore")
+        res = environmental.impulsive_sound_adjustment(signal, fs)
+
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    res.plot(ax=ax, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "impulsive_sound_onsets.svg")
+    plt.close()
+
+
+def generate_moore_glasberg_specific_loudness(output_dir: str) -> None:
+    """ISO 532-2 specific loudness over the ERB-number (Cam) scale."""
+    print("Generating moore_glasberg_specific_loudness...")
+    from phonometry import psychoacoustics
+
+    # The definitional anchor of the sone: a 1 kHz tone at 40 dB SPL, free
+    # field, binaural -> N = 1 sone, with the excitation pattern spreading
+    # around the tone's ERB.
+    fs = 48000
+    x = (np.sqrt(2) * 2e-5 * 10 ** (40 / 20)
+         * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs))
+    res = psychoacoustics.loudness_moore_glasberg(
+        x, fs, field="free", presentation="binaural")
+
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    res.plot(ax=ax, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "moore_glasberg_specific_loudness.svg")
+    plt.close()
+
+
+def generate_sottek_specific_tonality(output_dir: str) -> None:
+    """ECMA-418-2 average specific tonality T'(z) of a 1 kHz tone."""
+    print("Generating sottek_specific_tonality...")
+    from phonometry import psychoacoustics
+
+    fs = 48000
+    t = np.arange(int(1.2 * fs)) / fs
+    x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * t)
+    res = psychoacoustics.tonality_ecma(x, fs, field="free")
+
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    # A supplied axes draws the specific-tonality panel alone (the tonality
+    # concentrated in the tone's critical band), not the T(l) trace.
+    res.plot(ax=ax, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "sottek_specific_tonality.svg")
+    plt.close()
+
+
+def generate_fluctuation_strength_specific(output_dir: str) -> None:
+    """Specific fluctuation strength over the Bark axis (Osses 2016 model)."""
+    print("Generating fluctuation_strength_specific...")
+    from phonometry import psychoacoustics
+
+    # The reference-like stimulus: a 1 kHz tone at 70 dB SPL, fully amplitude
+    # modulated at 4 Hz, where the sensation peaks.
+    fs = 48000
+    t = np.arange(int(2.0 * fs)) / fs
+    am = (1.0 + np.sin(2 * np.pi * 4.0 * t)) * np.sin(2 * np.pi * 1000 * t)
+    am = am / np.sqrt(np.mean(am**2)) * 2e-5 * 10 ** (70 / 20)
+    res = psychoacoustics.fluctuation_strength(am, float(fs))
+
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    res.plot(ax=ax, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "fluctuation_strength_specific.svg")
+    plt.close()
+
+
+def generate_sii_hearing_loss(output_dir: str) -> None:
+    """ANSI S3.5-1997 band audibility with a sloping hearing loss."""
+    print("Generating sii_hearing_loss...")
+    from phonometry import speech_intelligibility_index, standard_speech_spectrum
+
+    # The same speech and office noise as the reference SII figure, heard by a
+    # listener with a sloping high-frequency loss: the consonant-bearing bands
+    # fall below the raised internal noise and the index drops from 0.46 to
+    # 0.36.
+    speech = standard_speech_spectrum("normal")
+    noise = np.array([38.0, 37.0, 36.0, 34.0, 32.0, 30.0, 28.0, 26.0, 24.0,
+                      22.0, 20.0, 18.0, 16.0, 14.0, 12.0, 10.0, 8.0, 6.0])
+    threshold = np.array([5.0, 5.0, 5.0, 5.0, 8.0, 10.0, 12.0, 15.0, 18.0,
+                          22.0, 28.0, 35.0, 42.0, 48.0, 55.0, 60.0, 65.0, 70.0])
+    res = speech_intelligibility_index(speech, noise, threshold=threshold)
+
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    res.plot(ax=ax, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "sii_hearing_loss.svg")
+    plt.close()
+
+
+def generate_age_threshold_fractiles(output_dir: str) -> None:
+    """ISO 7029 age-related threshold with its 10-90 % fractile band."""
+    print("Generating age_threshold_fractiles...")
+    from phonometry import hearing
+
+    # A 70-year-old man at the worst-hearing decile: the median presbycusis
+    # slope with the population spread around it.
+    res = hearing.age_threshold(70, "male", fractile=0.9)
+
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    res.plot(ax=ax, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "age_threshold_fractiles.svg")
+    plt.close()
+
+
+def generate_nipts_audiogram(output_dir: str) -> None:
+    """ISO 1999 NIPTS spectrum of a long, loud exposure with its spread."""
+    print("Generating nipts_audiogram...")
+    from phonometry import hearing
+
+    # 40 years at an 8 h-normalised 95 dB(A), most-susceptible tenth: the
+    # 4 kHz notch of noise damage.
+    res = hearing.nipts(95.0, 40.0, fractile=0.9)
+
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    res.plot(ax=ax, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "nipts_audiogram.svg")
+    plt.close()
+
+
+def generate_stoi_band_scores(output_dir: str) -> None:
+    """Per-band intermediate correlation behind a STOI index."""
+    print("Generating stoi_band_scores...")
+    from scipy import signal as sp_signal
+
+    from phonometry import stoi
+
+    # Speech-like material (band-limited noise with a 3.5 Hz syllabic
+    # envelope) in a flat masker at 0 dB SNR: the low bands lose most of the
+    # envelope correlation, the consonant bands keep it.
+    fs = 10000
+    rng = np.random.default_rng(11)
+    t = np.arange(4 * fs) / fs
+    b, a = sp_signal.butter(2, [200 / (fs / 2), 4000 / (fs / 2)], btype="band")
+    carrier = sp_signal.lfilter(b, a, rng.standard_normal(t.size))
+    clean = carrier * (0.15 + 0.85 * np.abs(np.sin(2 * np.pi * 3.5 * t)) ** 2)
+    masker = rng.standard_normal(clean.size)
+    gain = np.sqrt(np.mean(clean**2)) / np.sqrt(np.mean(masker**2))
+    res = stoi(clean, clean + gain * masker, fs)
+
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    res.plot(ax=ax, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "stoi_band_scores.svg")
+    plt.close()
+
+
+def generate_sti_band_mti(output_dir: str) -> None:
+    """IEC 60268-16 per-band modulation transfer index of a real room."""
+    print("Generating sti_band_mti...")
+    from phonometry import sti_from_impulse_response
+
+    # A reverberant hall (T60 = 0.9 s) with a 15 dB speech-to-noise ratio:
+    # the per-band MTI bars behind the single STI number and its rating.
+    fs = 48000
+    rng = np.random.default_rng(0)
+    n = np.arange(fs)
+    ir = rng.standard_normal(fs) * np.exp(-6.9078 * n / fs / 0.9)
+    res = sti_from_impulse_response(ir, fs, snr=15.0)
+
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    res.plot(ax=ax, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "sti_band_mti.svg")
     plt.close()
 
 
@@ -10177,6 +10410,22 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_single_panel_rating,
     generate_junction_kij_thickness,
     generate_mobility_result_lines,
+    # Perception, hearing and speech: single-concept result figures drawn by
+    # the results' own .plot() (ECMA-418-1 tone prominence, ISO/PAS 20065 tone
+    # levels, ISO/PAS 1996-3 onsets, ISO 532-2 and ECMA-418-2 patterns, the
+    # Osses fluctuation strength, ANSI S3.5 audibility with hearing loss,
+    # ISO 7029 / ISO 1999 thresholds, STOI band scores and the STI MTI bars).
+    generate_tone_prominence_assessment,
+    generate_tone_audibility_levels,
+    generate_impulsive_sound_onsets,
+    generate_moore_glasberg_specific_loudness,
+    generate_sottek_specific_tonality,
+    generate_fluctuation_strength_specific,
+    generate_sii_hearing_loss,
+    generate_age_threshold_fractiles,
+    generate_nipts_audiogram,
+    generate_stoi_band_scores,
+    generate_sti_band_mti,
 )
 
 

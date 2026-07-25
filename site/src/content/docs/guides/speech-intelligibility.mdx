@@ -64,6 +64,8 @@ from phonometry import hearing
 result = hearing.speech_intelligibility_index("normal")
 print(round(result.sii, 3))          # 0.996  (nearly everything audible)
 print(round(hearing.sii.BAND_IMPORTANCE.sum(), 6))   # 1.0
+
+result.plot()   # per-band audibility and its weighted contribution (needs matplotlib)
 ```
 
 With no noise and a normal hearing threshold the standard speech spectrum is
@@ -132,6 +134,8 @@ noise = np.array([38.0, 37.0, 36.0, 34.0, 32.0, 30.0, 28.0, 26.0, 24.0,
 result = hearing.speech_intelligibility_index(speech, noise)
 print(round(result.sii, 2))                # 0.46
 print(result.band_audibility.round(2))     # per-band Ai
+
+result.plot()   # the figure below: Ai and the weighted contribution per band
 ```
 
 <ThemeImage
@@ -179,6 +183,49 @@ A raised hearing threshold (`threshold=`) lifts the equivalent internal noise
 and lowers the index, exactly as added masking noise does. The `SIIResult` also
 carries the per-band masking $Z_i$, disturbance $D_i$, audibility $A_i$ and
 importance $I_i$, and its `.plot()` renders the figure above.
+
+The same speech and noise heard by a listener with a sloping high-frequency
+loss shows what that costs, band by band:
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_hearing_loss.svg"
+  alt="Band audibility of the standard normal-effort speech spectrum in the same broadband noise, for a listener with a sloping high-frequency hearing loss: the bands up to 800 Hz keep much of their audibility, the bands from 4000 Hz up fall to zero, and the resulting SII is 0.36 against the 0.46 of a normal-hearing listener"
+  width="90%"
+/>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import hearing
+
+# The same speech and office noise as above, heard through a sloping
+# high-frequency loss (hearing threshold levels at the 18 band centres).
+speech = hearing.standard_speech_spectrum("normal")
+noise = np.array([38.0, 37.0, 36.0, 34.0, 32.0, 30.0, 28.0, 26.0, 24.0,
+                  22.0, 20.0, 18.0, 16.0, 14.0, 12.0, 10.0, 8.0, 6.0])
+threshold = np.array([5.0, 5.0, 5.0, 5.0, 8.0, 10.0, 12.0, 15.0, 18.0,
+                      22.0, 28.0, 35.0, 42.0, 48.0, 55.0, 60.0, 65.0, 70.0])
+res = hearing.speech_intelligibility_index(speech, noise, threshold=threshold)
+print(round(res.sii, 3))       # 0.358  (0.458 with normal hearing)
+
+# One line: the same audibility bars, now limited by the hearing threshold.
+res.plot()
+plt.show()
+```
+
+</details>
+
+The loss removes the bands that carry the consonant cues, which is why the
+index falls by a fifth while the *level* of the speech has not changed at all.
+This is the practical use of the SII in audiology and in noise control for
+occupied spaces: a target index can be met either by lowering the noise or by
+restoring audibility (amplification), and the band profile says which bands
+the effort has to go into. The age-related thresholds of ISO 7029 make a
+convenient population input, see the
+[hearing-threshold guide](/phonometry/guides/hearing-threshold/).
 
 ## 4. Vocal effort
 

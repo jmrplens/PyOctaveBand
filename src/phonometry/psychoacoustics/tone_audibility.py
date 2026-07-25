@@ -1032,12 +1032,39 @@ class ToneAudibilityResult:
         """Tone frequency of the decisive (most audible) tone, in Hz."""
         return float(self.tone_frequencies[int(np.argmax(self.audibilities))])
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
-        """Plot the per-tone audibility ``ΔL`` against tone frequency."""
-        from .._i18n import check_language
-        from .._plot.psychoacoustics import plot_tone_audibility
+    def plot(
+        self,
+        ax: Axes | None = None,
+        *,
+        view: str = "audibility",
+        language: str = "en",
+        **kwargs: Any,
+    ) -> Axes:
+        """Plot the assessment, either as audibilities or as levels.
 
-        return plot_tone_audibility(self, ax=ax, language=check_language(language), **kwargs)
+        :param ax: Existing axes to draw on, or ``None`` to create a figure.
+        :param view: ``"audibility"`` (default) draws the per-tone audibility
+            ``ΔL`` against tone frequency, with the decisive tone highlighted;
+            ``"levels"`` draws the tone levels ``Lpt`` above the critical-band
+            masking noise ``Lpn`` on a continuous frequency axis, the view the
+            ``.report()`` fiche embeds.
+        :param language: Label language, ``"en"`` (default) or ``"es"``.
+        :param kwargs: Forwarded to the primary artist call.
+        :return: The axes.
+        :raises ValueError: If ``view`` is not one of the two names above.
+        """
+        from .._i18n import check_language
+        from .._plot.psychoacoustics import (
+            plot_tone_audibility,
+            plot_tone_audibility_levels,
+        )
+
+        if view not in ("audibility", "levels"):
+            raise ValueError(
+                f"Unknown view {view!r}; use 'audibility' or 'levels'."
+            )
+        render = plot_tone_audibility if view == "audibility" else plot_tone_audibility_levels
+        return render(self, ax=ax, language=check_language(language), **kwargs)
 
     def report(
         self,

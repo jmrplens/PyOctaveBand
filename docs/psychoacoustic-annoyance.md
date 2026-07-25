@@ -81,6 +81,8 @@ from phonometry import psychoacoustics
 res = psychoacoustics.psychoacoustic_annoyance(30.0, 2.0, 0.5, 0.3)   # N5, S, F, R
 print(round(res.annoyance, 4))   # 37.0478
 print(round(res.w_s, 4), round(res.w_fr, 4))   # 0.1001 0.2125
+
+res.plot()   # PA beside its wS and wFR weightings (needs matplotlib)
 ```
 
 The figure above sweeps `PA` against `N5` for three profiles: a neutral baseline
@@ -101,6 +103,8 @@ from phonometry import psychoacoustics
 
 res = psychoacoustics.psychoacoustic_annoyance_from_signal(x, fs, field="free")
 print(res.annoyance, res.n5, res.sharpness, res.roughness, res.fluctuation_strength)
+
+res.plot()   # the same PA / wS / wFR view, now from the four derived sensations
 ```
 
 > **Model-mixing caveat.** This composite mixes model families: Zwicker-family
@@ -197,6 +201,46 @@ res = psychoacoustics.fluctuation_strength(x, fs)
 print(res.fluctuation_strength)   # vacil
 res.plot()   # specific fluctuation strength F′(z) over the Bark axis (needs matplotlib)
 ```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength_specific_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength_specific.svg" alt="Specific fluctuation strength over the Bark axis for a 1 kHz tone at 70 dB SPL fully amplitude-modulated at 4 Hz: the sensation is concentrated in the critical bands around the carrier near 8 Bark and integrates to about 1.1 vacil" width="82%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import psychoacoustics
+
+# The reference-like stimulus: a 1 kHz tone at 70 dB SPL, 100 % amplitude
+# modulated at 4 Hz, where the sensation peaks.
+fs = 48000
+t = np.arange(int(2.0 * fs)) / fs
+am = (1.0 + np.sin(2 * np.pi * 4.0 * t)) * np.sin(2 * np.pi * 1000 * t)
+am = am / np.sqrt(np.mean(am ** 2)) * 2e-5 * 10 ** (70 / 20)
+res = psychoacoustics.fluctuation_strength(am, float(fs))
+print(round(res.fluctuation_strength, 2))    # 1.09 vacil
+
+# One line: the specific fluctuation strength over the Bark axis.
+res.plot()
+plt.show()
+
+# Or draw f'(z) by hand from the arrays the result carries:
+fig, ax = plt.subplots()
+ax.fill_between(res.bark_axis, res.specific, alpha=0.3)
+ax.plot(res.bark_axis, res.specific)
+ax.set_xlabel("Critical-band rate z [Bark]")
+ax.set_ylabel("Specific fluctuation strength [vacil/Bark]")
+plt.show()
+```
+
+</details>
+
+The sensation stays where the modulated energy is, in the critical bands
+around the carrier, which is exactly why the closed form of section 3.1 and
+the signal model diverge for **broadband** modulated noise: there the
+modulation is spread over the whole Bark axis and the band-by-band model
+accumulates more of it than the single closed form allows.
 
 > **No numeric standard.** Fluctuation strength has no ISO/IEC standard. This is
 > a clean-room implementation from the Osses 2016 paper, calibrated so that the

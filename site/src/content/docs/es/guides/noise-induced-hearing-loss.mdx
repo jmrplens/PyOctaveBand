@@ -76,6 +76,8 @@ print(r.median.round(1))          # [ 0.   0.1  4.1 10.2 12.9  8.5]
 # El décimo más susceptible de la población (percentil 90):
 print(hearing.nipts(90.0, 20.0, fractile=0.9).value.round(1))
 # [ 0.   0.1  7.7 16.2 17.8 13.6]
+
+r.plot()   # el espectro de NIPTS con su banda de fractiles (necesita matplotlib)
 ```
 
 El desplazamiento alcanza su máximo cerca de 4 kHz y se acentúa con el nivel y
@@ -83,6 +85,40 @@ la duración. Por debajo del corte (aquí 500 Hz, $L_0 = 93$ dB, y 1000 Hz,
 $L_0 = 89$ dB, a 90 dB) el ruido no produce desplazamiento permanente. Para
 duraciones menores de 10 años la mediana se extrapola del valor a 10 años
 (Fórmula 3); puede pedirse un subconjunto de frecuencias con `frequencies=`.
+
+Una carrera más larga y más ruidosa hace inconfundible la forma:
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/nipts_audiogram_es.svg"
+  alt="Desplazamiento permanente del umbral inducido por ruido según ISO 1999 tras 40 años a 95 dB(A) normalizados a 8 h, sobre un eje de audiograma invertido de 500 Hz a 6000 Hz: la mediana es casi nula a 500 Hz y se hunde hasta unos 26 dB a 4000 Hz antes de recuperarse a 6000 Hz, y la banda de fractiles del 10 al 90 por ciento a su alrededor llega a casi 37 dB para el décimo más susceptible"
+  width="88%"
+/>
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import hearing
+
+# 40 años a 95 dB(A) normalizados a 8 h, décimo más susceptible.
+res = hearing.nipts(95.0, 40.0, fractile=0.9)
+print(res.median.round(1))    # la mediana N50
+print(res.value.round(1))     # el fractil 90 %
+
+# En una línea: la mediana, el fractil y la banda 10-90 %.
+res.plot()
+plt.show()
+```
+
+</details>
+
+La muesca de 3 kHz a 4 kHz, con recuperación parcial a 6 kHz, es la firma del
+daño por ruido y la razón de que la vigilancia audiométrica ensaye esas
+frecuencias. Sale del modelo en lugar de imponérsele: el nivel de corte $L_0$
+y los coeficientes $u$, $v$ de la Tabla 1 son mínimos donde el oído es más
+vulnerable, de modo que el mismo $L_{EX,8h}$ compra mucho más desplazamiento a
+4 kHz que a 500 Hz.
 
 ## 2. Edad y ruido combinados: HTLAN (cláusula 6.1)
 
@@ -105,6 +141,8 @@ h = hearing.htlan(60, "male", 95.0, 30.0, fractile=0.5)
 print(h.htla.round(1))       # [ 6.   7.8 12.5 16.6 20.2 25.9]  solo edad
 print(h.nipts.round(1))      # [ 0.5  3.  11.8 21.6 24.8 17.6]  solo ruido
 print(h.threshold.round(1))  # [ 6.5 10.7 23.  35.2 40.8 39.8]  edad + ruido
+
+h.plot()   # las tres curvas de la figura de abajo: HTLA, NIPTS y HTLAN
 ```
 
 A 4 kHz la componente de edad (20,2 dB) y la de ruido (24,8 dB) se combinan en

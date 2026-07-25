@@ -18,12 +18,16 @@ from __future__ import annotations
 
 import warnings
 from dataclasses import dataclass
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
 from .._internal.utils import _typesignal
 from .._internal.warnings import PhonometryWarning
 from ..metrology.spectra import _welch_autospectrum
+
+if TYPE_CHECKING:
+    from matplotlib.axes import Axes
 
 
 class TonalityWarning(PhonometryWarning):
@@ -108,6 +112,30 @@ class ToneAssessment:
     ratio_db: float
     criterion_db: float
     prominent: bool
+
+    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+        """Plot the assessed tone against the ECMA-418-1 prominence criterion.
+
+        Draws the frequency-dependent criterion curve over the 89.1 Hz -
+        11.2 kHz range of interest with this tone at its own frequency and
+        the margin to the criterion marked; a tone on or above the curve is
+        prominent. The criterion family (tone-to-noise ratio, clause 11, or
+        prominence ratio, clause 12) is recovered from ``criterion_db``.
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+
+        :param ax: Existing axes to draw on, or ``None`` to create a figure.
+        :param language: Label language, ``"en"`` (default) or ``"es"``.
+        :param kwargs: Forwarded to the assessed-tone marker ``plot`` call.
+        :return: The axes.
+        """
+        from .._i18n import check_language
+        from .._plot.psychoacoustics import plot_tone_assessment
+
+        return plot_tone_assessment(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def _critical_band(f0: float) -> tuple[float, float, float]:

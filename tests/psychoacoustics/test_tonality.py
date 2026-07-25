@@ -208,6 +208,48 @@ def test_numeric_noise_power_warns() -> None:
         prominence_ratio(dc, FS, tone_freq=1000.0)
 
 
+def test_plot_draws_criterion_curve_and_the_assessed_tone() -> None:
+    """The TNR plot marks the tone against the clause 11.5 criterion curve."""
+    pytest.importorskip("matplotlib")
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    res = tone_to_noise_ratio(_tone_in_noise(1000.0, 0.1, 0.02), FS)
+    ax = res.plot()
+    # The marker sits at (frequency, ratio) and the criterion curve passes
+    # through the criterion value at that frequency.
+    marker = ax.lines[-1]
+    assert marker.get_xdata()[0] == pytest.approx(res.frequency)
+    assert marker.get_ydata()[0] == pytest.approx(res.ratio_db)
+    criterion_curve = ax.lines[0]
+    at_tone = np.interp(res.frequency, criterion_curve.get_xdata(),
+                        criterion_curve.get_ydata())
+    assert at_tone == pytest.approx(res.criterion_db, abs=0.1)
+    assert "TNR" in ax.get_title() and "prominent" in ax.get_title()
+    plt.close("all")
+
+
+def test_plot_labels_the_prominence_ratio_family() -> None:
+    """A PR result selects the clause 12.6 criterion and its own label."""
+    pytest.importorskip("matplotlib")
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    res = prominence_ratio(_tone_in_noise(250.0, 0.1, 0.02), FS, tone_freq=250.0)
+    ax = res.plot()
+    assert "Prominence ratio" in ax.get_ylabel()
+    ax_es = res.plot(language="es")
+    assert "prominencia" in ax_es.get_ylabel()
+    assert "," in ax_es.get_title()  # Spanish decimal comma
+    with pytest.raises(ValueError, match="Unknown language"):
+        res.plot(language="xx")
+    plt.close("all")
+
+
 # The clause 8/9 lower-threshold-of-hearing screen (ECMA-418-1 Formula (1),
 # coefficients near 87.3212 and 8.621226 in clause 9.1) is NOT implemented:
 # the prominent verdict is the numeric criterion only (see the module

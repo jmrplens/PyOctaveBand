@@ -80,6 +80,8 @@ result = environmental.impulse_prominence([1200.0, 300.0, 60.0], [32.0, 18.0, 11
 print(result.per_impulse.round(2))  # [12.25  9.94  7.42]
 print(round(result.prominence, 2))  # 12.25  (el impulso determinante)
 print(round(result.adjustment, 2))  # 13.05  dB
+
+result.plot()   # la curva KI(P) de la sección 2 con estos impulsos marcados
 ```
 
 Un solo impulso se evalúa directamente con `predicted_prominence`:
@@ -198,7 +200,57 @@ result = environmental.impulsive_sound_adjustment(signal, fs)
 print(result.category)                  # p. ej. 'highly impulsive'
 print(round(result.adjustment, 1))      # KI en dB (de 0,0 a unos 9 dB en casos típicos)
 print(round(result.adjusted_laeq, 1))   # LAeq + KI
+
+result.plot()   # la historia de LpAF con los inicios detectados (necesita matplotlib)
 ```
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impulsive_sound_onsets_es.svg"
+  alt="Historia de nivel con ponderación A y constante F de tres golpes de martillo sobre un fondo de 55 dB(A) a lo largo de seis segundos: cada golpe sube de unos 52 dB a 89 dB, se marcan los puntos de inicio y fin del crecimiento detectado con la recta de mínimos cuadrados, se anota la diferencia de nivel determinante de 36,8 dB y el título indica una prominencia de 11,34 con un ajuste de 11,42 dB, categoría altamente impulsiva"
+  width="90%"
+/>
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import environmental
+
+# Tres golpes de martillo sobre un fondo de 55 dB(A), 6 s a 48 kHz.
+fs = 48000
+rng = np.random.default_rng(7)
+t = np.arange(int(6.0 * fs)) / fs
+background = rng.standard_normal(t.size)
+background *= 2e-5 * 10 ** (55 / 20) / np.sqrt(np.mean(background ** 2))
+signal = background.copy()
+for onset_time in (1.0, 2.6, 4.2):
+    decay = np.exp(-(t - onset_time) / 0.08) * (t >= onset_time)
+    strike = decay * rng.standard_normal(t.size)
+    window = (t >= onset_time) & (t < onset_time + 0.1)
+    strike *= 2e-5 * 10 ** (95 / 20) / np.sqrt(np.mean(strike[window] ** 2))
+    signal += strike
+
+res = environmental.impulsive_sound_adjustment(signal, fs)
+print(res.category, round(res.prominence, 2), round(res.adjustment, 2))
+# highly impulsive 11.34 11.42
+
+# En una línea: la historia de nivel con los inicios, las rectas ajustadas y
+# la diferencia de nivel determinante.
+res.plot()
+plt.show()
+```
+
+</details>
+
+De la figura conviene leer dos cosas. Las rectas de inicio son ajustes por
+mínimos cuadrados sobre el crecimiento detectado, así que un ajuste tendido
+sobre un flanco visiblemente abrupto indica que la historia de nivel se
+registró con demasiada poca resolución. Y la diferencia de nivel se mide desde
+el nivel *justo antes* del inicio, no desde el fondo a largo plazo, por lo que
+un segundo golpe que llega sobre la cola del anterior puntúa un `LD` menor del
+que aparenta merecer.
 
 Como la tasa de crecimiento y la diferencia de nivel son *diferencias* de
 nivel, el ajuste es insensible a la calibración absoluta del sonómetro

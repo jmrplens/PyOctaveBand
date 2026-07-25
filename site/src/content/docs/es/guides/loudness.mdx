@@ -384,6 +384,13 @@ res = psychoacoustics.loudness_moore_glasberg(x, fs, field="free", presentation=
 res.plot()   # sonoridad específica N'(i) sobre la escala del número ERB (Cam)
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/moore_glasberg_specific_loudness_es.svg" alt="Sonoridad específica de ISO 532-2 sobre la escala del número ERB para un tono de 1 kHz a 40 dB SPL: un único pico redondeado cerca de 15 Cam cuya área es la sonoridad total de 1 sonio" width="80%" />
+
+*El patrón de ISO 532-2 del ancla definitoria de 1 sonio. El pico no es una
+línea espectral sino la excitación que producen los filtros roex alrededor del
+tono, así que su anchura es la del filtro auditivo, no la de la resolución de
+análisis.*
+
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
