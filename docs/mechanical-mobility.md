@@ -227,7 +227,48 @@ f = np.logspace(np.log10(0.5), np.log10(200.0), 400)
 res = vibration.sdof_mobility_result(f, mass=2.0, stiffness=8000.0, damping=5.0)
 z = res.to("impedance")                        # impedance = 1/Y per frequency
 print(res.frequencies[int(np.argmax(res.magnitude))].round(1))   # ~10.1 Hz
+
+res.plot()   # |Y(f)| with the resonance marked (needs matplotlib)
 ```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mobility_result_lines_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mobility_result_lines.svg" alt="Driving-point mobility magnitude of a single-degree-of-freedom resonator on log-log axes, climbing along the stiffness line below resonance, falling along the mass line above it, and peaking at one over the damping coefficient at the resonance" width="82%"></picture>
+
+*Reading a driving-point mobility is a structural diagnosis: below the
+resonance the magnitude climbs along the **stiffness line** `ω/k`,
+above it it falls along the **mass line** `1/(ωm)`, and the height of
+the peak between them is `1/c`, a direct read of the damping (Section 1).*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import vibration
+
+m, k, c = 2.0, 8000.0, 5.0
+f = np.logspace(np.log10(0.5), np.log10(200.0), 400)
+res = vibration.sdof_mobility_result(f, mass=m, stiffness=k, damping=c)
+
+# One line — |Y(f)| with the resonance marked:
+res.plot()
+plt.show()
+
+# By hand, adding the stiffness and mass asymptotes the prose describes:
+w = 2.0 * np.pi * f
+fig, ax = plt.subplots()
+ax.loglog(f, res.magnitude, label="driving-point |Y(f)|")
+ax.loglog(f, w / k, ":", label="stiffness line ω/k")
+ax.loglog(f, 1.0 / (w * m), ":", label="mass line 1/(ωm)")
+ax.axhline(1.0 / c, ls="--", color="0.6", label="peak |Y| = 1/c")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Mobility |Y| [m/(N·s)]")
+ax.set_title("Reading a driving-point mobility (ISO 7626-1)")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 **Test-report fiche.** `MobilityResult.report(path)` renders a one-page
 mechanical-mobility measurement report (ISO 7626-1:2011 FRF definitions,
@@ -241,6 +282,19 @@ the peak mobility magnitude and the phase there), and a boxed peak mobility
 pass/fail verdict; `language="es"` renders the Spanish fiche. The fiche always
 embeds the `|Y(f)|` spectrum, so it needs both the report and plot extras
 (`pip install "phonometry[report,plot]"`).
+
+```python
+from phonometry import ReportMetadata, vibration
+
+res = vibration.sdof_mobility_result(f, mass=2.0, stiffness=8000.0, damping=5.0)
+res.report(
+    "mobility.pdf",
+    metadata=ReportMetadata(
+        specimen="Machine support bracket (driving point)",
+        measurement_standard="ISO 7626-2",
+    ),
+)   # one-page fiche (needs phonometry[report,plot])
+```
 
 [![ISO 7626 mechanical-mobility example report: a metadata header, a table of the FRF characteristic points (type, frequency range, peak frequency, peak mobility and phase) beside the mobility magnitude spectrum, and the boxed peak mobility](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso7626_mobility_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso7626_mobility_example.pdf)
 

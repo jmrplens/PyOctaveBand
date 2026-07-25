@@ -43,6 +43,13 @@ eps = np.array([0.20, 0.45, 0.75, 0.95, 1.00, 1.00])
 lw_max = emission.radiated_sound_power_level(lv, 1.6)  # Part 1, eps = 1
 lw_eng = emission.radiated_sound_power_level(lv, 1.6, radiation_factor=eps)  # Part 2
 
+# One line — the LW(f) spectrum of one determination as a result object:
+res = emission.sound_power_from_vibration(lv, area=1.6, radiation_factor=eps,
+                                          frequencies=bands)
+res.plot()
+plt.show()
+
+# By hand, comparing the two parts:
 x = np.arange(bands.size)
 fig, ax = plt.subplots()
 ax.bar(x - 0.2, lw_max, width=0.4, label="Part 1 upper limit ($\\varepsilon$ = 1)")
@@ -77,6 +84,8 @@ print(round(upper.total_level, 1))               # e.g. 89.4  dB re 1 pW
 eps = np.array([0.45, 0.75, 0.95, 1.00])
 eng = emission.sound_power_from_vibration(lv, area=1.6, radiation_factor=eps, frequencies=bands)
 print(np.round(eng.sound_power_level, 1))        # per-band L_W
+
+eng.plot()   # the LW(f) spectrum, as in the figure above (needs matplotlib)
 ```
 
 ## 2. Velocity level, calibration and the radiation factor

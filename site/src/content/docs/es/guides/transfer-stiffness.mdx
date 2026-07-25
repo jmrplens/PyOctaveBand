@@ -71,6 +71,13 @@ k_true = k + 1j * 2.0 * np.pi * f * c
 t = vibration.base_transmissibility(f, m2, k, c)
 k_indirect = vibration.transfer_stiffness_indirect(f, t, m2)  # avisa donde T no es pequeña
 
+# Una línea: la determinación indirecta empaquetada como resultado dibuja su
+# propio espectro de nivel Lk(f):
+res = vibration.indirect_transfer_stiffness_result(f, t, blocking_mass=m2)
+res.plot(language="es")
+plt.show()
+
+# A mano, la rigidez verdadera del elemento frente a la estimación indirecta:
 fig, ax = plt.subplots()
 ax.semilogx(f, vibration.transfer_stiffness_level(k_true),
             label="$L_k$ real de $k+j\\omega c$")
@@ -147,6 +154,8 @@ f = np.logspace(1.5, 3.3, 200)
 t = vibration.base_transmissibility(f, mass=8.0, stiffness=1e6, damping=120.0)
 res = vibration.indirect_transfer_stiffness_result(f, t, blocking_mass=8.0)
 print(round(float(res.level[-1]), 1))      # ~126  dB re 1 N/m (alta f)
+
+res.plot()   # el espectro de nivel Lk(f), como en la figura de arriba (requiere matplotlib)
 ```
 
 El `TransferStiffnessResult` transporta el `k₂₁` complejo y expone `.level`,

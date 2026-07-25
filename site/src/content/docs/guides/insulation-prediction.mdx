@@ -127,6 +127,8 @@ for name, rw, k_ff, k_fd, lf in elements:
 res = building.predicted_airborne_insulation(r_direct=57.0, flanking_paths=paths)
 print(round(res.r_prime_w, 1))                          # 52.2  ->  R'w = 52 dB
 print(res.dominant.label, round(res.dominant.fraction, 2))   # Dd 0.33 (direct dominates)
+
+res.plot()   # per-path share of the transmitted energy, largest first (needs matplotlib)
 ```
 
 <details>
@@ -213,7 +215,48 @@ print(round(ln_eq, 1), k, round(imp.l_prime_n_w, 1))     # 76.2 2 45.2  ->  L'n,
 # Exact Formula (3): L'nT,w = L'n,w - 10 lg(0.032 V). Annex E.3's own rounding
 # of the factor to 10 lg(V/30) sits 0.18 dB below; both give L'nT,w = 43 dB.
 print(round(building.standardized_impact_level(imp.l_prime_n_w, 50.0), 1))   # 43.2  L'nT,w
+
+imp.plot()   # the Formula (21) terms as bars: Ln,w,eq - dLw + K -> L'n,w (needs matplotlib)
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_prediction_terms.svg" alt="The EN 12354-2 Annex E.3 impact prediction as its Formula 21 terms: the bare-floor equivalent level of 76.2 dB, the minus 33 dB floating-floor improvement, the plus 2 dB flanking correction, and the resulting predicted apparent impact level of 45.2 dB" width="80%" />
+
+*The whole EN 12354-2 simplified model is one subtraction: the massive bare
+floor starts at $L_{n,w,eq} = 76.2$ dB, the floating floor buys back 33 dB,
+and the flanking correction returns 2 dB, landing at $L'_{n,w} = 45$ dB.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+# EN 12354-2 Annex E.3: 0.14 m concrete floor (m' = 322 kg/m2), floating
+# floor delta-Lw = 33 dB, mean flanking mass 145 kg/m2.
+ln_eq = building.equivalent_impact_level(322.0)
+k = building.impact_flanking_correction(322.0, 145.0)
+imp = building.predicted_impact_insulation(ln_w_eq=ln_eq, delta_l_w=33.0,
+                                           k_correction=k)
+
+# One line — the Formula (21) terms as bars:
+imp.plot()
+plt.show()
+
+# By hand, from the result's fields:
+labels = ["Ln,w,eq", "-dLw", "+K", "L'n,w"]
+values = [imp.ln_w_eq, -imp.delta_l_w, imp.k_correction, imp.l_prime_n_w]
+fig, ax = plt.subplots()
+ax.bar(np.arange(4), values)
+ax.axhline(0.0, color="k", lw=0.8)
+ax.set_xticks(np.arange(4), labels)
+ax.set_ylabel("Level / correction [dB]")
+ax.set_title(f"L'n,w = {imp.l_prime_n_w:.1f} dB (EN 12354-2 Annex E.3)")
+plt.show()
+```
+
+</details>
 
 The airborne counterpart of that closure is Formula (5b),
 $D_{nT} = R' + 10\lg(0.32\,V/S_s)$, exposed as `standardized_level_difference`;
@@ -383,6 +426,8 @@ elements = [
 fac = building.facade_sound_reduction(elements, area=11.3, volume=50.0,
                              frequencies=[125, 250, 500, 1000, 2000], bands="octave")
 print(fac.r_tr_s_w, fac.c_tr, fac.d_2m_nt_w)   # 31 -3 33  (R'tr,s,w / Ctr / D2m,nT,w)
+
+fac.plot()   # per-element partial indices with R' and D2m,nT overlaid (needs matplotlib)
 ```
 
 <details>
@@ -489,7 +534,53 @@ print(round(seg.l_w[0], 1), round(seg.l_w[1], 1))     # 59.8 61.2  (LW at 63/125
 # Exterior level 5 m in front of the centre of the 60×10 m side (LWA = 62.9 dB(A)).
 a_tot = building.outdoor_attenuation(width=60.0, height=10.0, distance=5.0)
 print(round(a_tot, 1), round(building.outdoor_level(62.9, a_tot), 1))   # 26.3 36.6
+
+seg.plot()   # radiated LW per octave with the A-weighted LWA line (needs matplotlib)
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/radiated_power_outdoor.svg" alt="Radiated sound power level per octave band of the EN 12354-4 Annex G wall segment with an industrial door, with the A-weighted single number drawn as a dashed line across the bars" width="80%" />
+
+*The Annex G side-1 segment: the wall dominates the area but the door's
+weaker $R$ carries the radiated power, so the octave spectrum stays flat
+where the wall alone would fall. The dashed line is the A-weighted single
+number $L_{WA}$ formed from the octave bands.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+# EN 12354-4 Annex G, side 1: a 10×20 m concrete wall segment with a 6×4 m
+# industrial door, inside level Lp,in, Cd = -5 dB.
+bands = [63, 125, 250, 500, 1000, 2000, 4000, 8000]
+seg = building.radiated_sound_power(
+    [building.FacadeElement("wall", area=176.0, r=[32, 36, 36, 33, 39, 49, 57, 63]),
+     building.FacadeElement("door", area=24.0,  r=[21, 23, 28, 30, 30, 30, 30, 30])],
+    lp_in=[70, 74, 76, 72, 70, 67, 62, 57], area=200.0, c_d=-5.0,
+    r_prime_cap=40.0, octave_bands=bands)
+
+# One line — LW per octave with the A-weighted LWA line:
+seg.plot()
+plt.show()
+
+# By hand, from the result's fields:
+x = np.arange(len(bands))
+fig, ax = plt.subplots()
+ax.bar(x, seg.l_w, label="radiated LW per octave")
+ax.axhline(seg.l_w_dba, ls="--", color="tab:red",
+           label=f"LWA = {seg.l_w_dba:.1f} dB(A)")
+ax.set_xticks(x, [str(b) for b in bands])
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Radiated sound power level [dB re 1 pW]")
+ax.set_title("EN 12354-4 radiated sound power (Annex G)")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 > **Worked-example note.** The 2000 worked examples carry small internal rounding
 > inconsistencies at the higher octave bands (Part 3's printed $R'$ disagrees with

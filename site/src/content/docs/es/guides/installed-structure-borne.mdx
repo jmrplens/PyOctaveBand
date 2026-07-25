@@ -10,6 +10,13 @@ references:
     publisher: "Springer"
     doi: "10.1007/b137728"
     note: "El acoplamiento de movilidades fuente-receptor y la transmisión estructural a través de uniones que sustentan el término de acoplamiento y el modelo de vías. ISBN 978-3-540-22696-3."
+  - type: book
+    authors: ["Hopkins, C."]
+    year: 2007
+    title: "Sound insulation"
+    publisher: "Butterworth-Heinemann"
+    doi: "10.4324/9780080550473"
+    note: "Sección 2.8 (impedancia y movilidad en el punto de excitación): la potencia que una fuente mecánica inyecta en una placa a través de las movilidades de fuente y receptor, la lectura de acústica de la edificación del término de acoplamiento de la cláusula 4.4.3. ISBN 978-0-7506-6526-1."
   - type: standard
     organization: "European Committee for Standardization"
     year: 2009
@@ -86,6 +93,19 @@ velocidad** (movilidad de fuente baja, Fórmula 19d); un soporte elástico añad
 movilidad de transferencia `Y_k` dentro del módulo (Fórmula 19e). El nivel de
 potencia **instalada** es entonces (Fórmula 18b) `L_Ws,inst = L_Ws,c − D_C`.
 
+La física detrás de `D_C` es la clásica potencia de entrada de una placa
+excitada en un punto: solo la parte real de la movilidad en el punto de
+excitación del receptor absorbe potencia, y el desajuste entre `Y_s` e `Y_i`
+decide cuánta de la capacidad de la fuente entra realmente en la estructura
+(Hopkins 2007, Sección 2.8). Las propias movilidades vienen de la
+[cadena de movilidad mecánica](/phonometry/es/guides/mechanical-mobility/):
+medidas según ISO 7626, o de las formas cerradas de placa infinita de la
+[teoría de paneles](/phonometry/es/guides/panel-sound-insulation/) cuando no
+hay medición. Una bomba sobre una losa de hormigón es la fuente de fuerza de
+libro: la movilidad de su carcasa queda órdenes de magnitud por encima de la
+de la losa, así que `D_C` se reduce a la Fórmula 19c y la potencia inyectada
+deja de depender del receptor.
+
 ```python
 from phonometry import building
 
@@ -139,6 +159,8 @@ res = building.installed_source_prediction(
 )
 print(np.round(res.total_level, 1))      # total L_n,s por banda
 print(round(res.overall_level, 1))       # nivel sumado en bandas [dB]
+
+res.plot()   # la cascada L_n,s por camino y total, como en la figura de arriba (requiere matplotlib)
 ```
 
 El `InstalledSourceResult` transporta los niveles por camino, el total por banda,
@@ -211,4 +233,14 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 
 ## Véase también
 
+- [Potencia de ruido estructural de equipos (EN 15657)](/phonometry/es/guides/structure-borne-power/):
+  la caracterización sobre placa receptora que aporta `L_Ws,c` y la movilidad
+  de fuente que consume esta predicción.
+- [Movilidad mecánica y la familia de FRF (ISO 7626-1)](/phonometry/es/guides/mechanical-mobility/):
+  las `Y_s` e `Y_i` medidas tras el término de acoplamiento.
+- [Transmisión de ondas de flexión en uniones de placas](/phonometry/es/guides/junction-transmission/):
+  la física de unión que lleva la potencia instalada a los radiadores por
+  flancos.
+- [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/):
+  los miembros aéreo y de impactos de la misma familia de predicción.
 - Referencia de la API: [`building.installed_structure_borne`](/phonometry/es/reference/api/building/installed-structure-borne/).

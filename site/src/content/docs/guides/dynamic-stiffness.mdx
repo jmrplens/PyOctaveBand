@@ -42,6 +42,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import materials
 
+# One line — from a measured resonance, the result draws its own f0(s')
+# design curve with the determination marked:
+res = materials.floating_floor_resonance(
+    resonant_frequency=25.0, total_mass_per_area=200.0,
+    floor_mass_per_area=120.0,
+    airflow_resistivity=50.0, thickness=0.020, porosity=0.9,
+)
+res.plot()
+plt.show()
+
+# By hand, the same design curve for a light and a heavy floating floor:
 s = np.logspace(np.log10(2.0), np.log10(100.0), 300)   # MN/m3
 for m in (40.0, 120.0):
     plt.semilogx(s, materials.natural_frequency(s * 1e6, m), label=f"m' = {m:g} kg/m²")
@@ -122,6 +133,8 @@ res = materials.floating_floor_resonance(
 )
 print(round(res.dynamic_stiffness / 1e6, 2), round(res.natural_frequency, 1))
 # 10.49 47.1
+
+res.plot()   # the f0(s') design curve with this determination marked (needs matplotlib)
 ```
 
 The `DynamicStiffnessResult` carries the apparent, enclosed-gas and installed

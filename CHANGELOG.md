@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- `ExtendedWeightedRatingResult.plot()` and `ExtendedImpactRatingResult.plot()`
+  (ISO 717-1 Annex B / ISO 717-2 A.2.1): the enlarged-range results now carry
+  the full measured band curve (`band_centers`, `measured`) and draw it
+  against the shifted reference on the 16 core bands, with the unfavourable
+  deviations shaded, the enlarged-range bands marked and every covered
+  adaptation term in the title (English and Spanish labels).
+- Building and structure-borne documentation figures: twelve new deterministic
+  figures across the field/laboratory/prediction insulation guides and the
+  structure-borne pages (enlarged-range rating, ISO 16283-1 field chain,
+  ISO 16283-3 facade quantities, ISO 10052 survey impact, ISO 10140
+  laboratory quantities, ISO 15186-1 small elements, ISO 10848 flanking
+  Dn,f, EN 12354-2 impact terms, EN 12354-4 radiated power, the rated Sharp
+  panel, the wave-approach junction Kij design chart and the ISO 7626
+  driving-point mobility reading), each embedded next to its snippet in the
+  English guide, the Spanish mirror and the docs mirror with the dual
+  one-line `.plot()` / hand-written matplotlib code blocks, plus one-line
+  `res.plot()` mentions throughout the building and vibration guides.
+- Junction-transmission guide: a worked example feeding the wave-approach
+  `K12` of a 100/200 mm concrete X-junction into the EN 12354-1 flanking
+  model, and a See-also section; the EN 12354-5 guide cites Hopkins (2007)
+  Section 2.8 for the point-excited-plate power input behind the coupling
+  term and links the mobility chain. The docs mirrors regain their missing
+  ISO 10052 survey-report, ISO 16283-3 facade-report, ISO 10846 fiche and
+  panel concept sections.
+
 ### Fixed
 
 - `.report()` fiches: consecutive lines of wrapped prose no longer collide

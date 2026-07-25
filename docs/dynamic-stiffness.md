@@ -23,6 +23,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import materials
 
+# One line — from a measured resonance, the result draws its own f0(s')
+# design curve with the determination marked:
+res = materials.floating_floor_resonance(
+    resonant_frequency=25.0, total_mass_per_area=200.0,
+    floor_mass_per_area=120.0,
+    airflow_resistivity=50.0, thickness=0.020, porosity=0.9,
+)
+res.plot()
+plt.show()
+
+# By hand, the same design curve for a light and a heavy floating floor:
 s = np.logspace(np.log10(2.0), np.log10(100.0), 300)   # MN/m3
 for m in (40.0, 120.0):
     plt.semilogx(s, materials.natural_frequency(s * 1e6, m), label=f"m' = {m:g} kg/m²")
@@ -103,6 +114,8 @@ res = materials.floating_floor_resonance(
 )
 print(round(res.dynamic_stiffness / 1e6, 2), round(res.natural_frequency, 1))
 # 10.49 47.1
+
+res.plot()   # the f0(s') design curve with this determination marked (needs matplotlib)
 ```
 
 The `DynamicStiffnessResult` carries the apparent, enclosed-gas and installed
@@ -120,6 +133,24 @@ dynamic stiffness $s'_t$ (no pass/fail). Clause 9 rounds every stiffness to the
 nearest MN/m³; `language="es"` renders the Spanish fiche. The fiche always
 embeds the $f_0(s')$ design curve, so it needs both the report and plot extras
 (`pip install "phonometry[report,plot]"`).
+
+```python
+from phonometry import ReportMetadata, materials
+
+res = materials.floating_floor_resonance(
+    resonant_frequency=45.0, total_mass_per_area=200.0,
+    floor_mass_per_area=110.0,
+    airflow_resistivity=50.0, thickness=0.020, porosity=0.9,
+)
+res.report(
+    "dynamic_stiffness.pdf",
+    metadata=ReportMetadata(
+        specimen="20 mm mineral-wool resilient layer",
+        mass_per_area=200.0, thickness=0.020,   # thickness d in metres (20 mm)
+        measurement_standard="EN 29052-1",
+    ),
+)   # one-page fiche (needs phonometry[report,plot])
+```
 
 [![EN 29052-1 dynamic-stiffness example report: a metadata header with the total mass per unit area and the loaded thickness, a metrics table of the resonant frequency, the apparent, enclosed-gas and installed dynamic stiffnesses and the natural frequency beside the f0(s') design curve, and the boxed apparent dynamic stiffness s't](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/en29052_dynamic_stiffness_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/en29052_dynamic_stiffness_example.pdf)
 

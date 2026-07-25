@@ -65,6 +65,18 @@ mobility, Formula 19c) and to `−10 lg(|Y_s|·Re{Z_i})` for a **velocity source
 mobility `Y_k` inside the modulus (Formula 19e). The **installed** power level is
 then (Formula 18b) `L_Ws,inst = L_Ws,c − D_C`.
 
+The physics behind `D_C` is the classical power input of a point-excited
+plate: only the real part of the receiver's driving-point mobility absorbs
+power, and the mismatch between `Y_s` and `Y_i` decides how much of the
+source's capability ever enters the structure (Hopkins 2007, Section 2.8).
+The mobilities themselves come from the
+[mechanical-mobility chain](mechanical-mobility.md): measured per ISO 7626,
+or from the infinite-plate closed forms of
+[panel theory](panel-sound-insulation.md) when no measurement exists. A pump
+on a concrete slab is the textbook force source: its casing mobility is
+orders of magnitude above the slab's, so `D_C` collapses to Formula 19c and
+the injected power no longer depends on the receiver at all.
+
 ```python
 from phonometry import building
 
@@ -116,6 +128,8 @@ res = building.installed_source_prediction(
 )
 print(np.round(res.total_level, 1))      # total L_n,s per band
 print(round(res.overall_level, 1))       # band-summed level [dB]
+
+res.plot()   # the per-path and total L_n,s cascade, as in the figure above (needs matplotlib)
 ```
 
 The `InstalledSourceResult` carries the per-path levels, the total per band, the
@@ -181,6 +195,19 @@ repository. Click the preview to open the PDF:
 EN 12354-5 estimate of the normalised structure-borne SPL in the receiving
 room.*
 
+## See also
+
+- [Structure-borne sound power of equipment (EN 15657)](structure-borne-power.md):
+  the reception-plate characterisation that supplies `L_Ws,c` and the source
+  mobility this prediction consumes.
+- [Mechanical mobility and the FRF family (ISO 7626-1)](mechanical-mobility.md):
+  the measured `Y_s` and `Y_i` behind the coupling term.
+- [Bending-wave transmission at plate junctions](junction-transmission.md):
+  the junction physics that carries the installed power to the flanking
+  radiators.
+- [Predicting Sound Insulation (EN 12354)](insulation-prediction.md): the
+  airborne and impact members of the same prediction family.
+
 ## References
 
 - Cremer, L., Heckl, M., & Petersson, B. A. T. (2005). *Structure-borne
@@ -189,6 +216,11 @@ room.*
   [doi:10.1007/b137728](https://doi.org/10.1007/b137728).
   The source-receiver mobility coupling and the structure-borne transmission
   across junctions behind the coupling term and the path model.
+- Hopkins, C. (2007). *Sound insulation*. Butterworth-Heinemann.
+  ISBN 978-0-7506-6526-1.
+  [doi:10.4324/9780080550473](https://doi.org/10.4324/9780080550473).
+  Section 2.8 (driving-point impedance and mobility): the power a mechanical
+  source injects into a plate through the source and receiver mobilities.
 
 ## Standards
 

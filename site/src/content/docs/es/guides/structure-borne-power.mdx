@@ -62,6 +62,11 @@ low = building.reception_plate_power(lv_low, bands, mass_per_area=600.0,
 high = building.reception_plate_power(lv_low + 6.0, bands, mass_per_area=150.0,
                                       area=2.0, reverberation_time=0.5)
 
+# Una línea: las barras L_Ws(f) de una determinación con su total sumado en bandas:
+low.plot(language="es")
+plt.show()
+
+# A mano, comparando las dos placas desde los campos de los resultados:
 x = np.arange(bands.size)
 fig, ax = plt.subplots()
 ax.bar(x - 0.2, low.power_level, width=0.4, label="placa de baja movilidad")
@@ -123,6 +128,8 @@ res = building.reception_plate_power(
 )
 print(np.round(res.power_level, 1))     # L_Ws por banda
 print(round(res.total_level, 1))        # nivel sumado en bandas [dB re 1 pW]
+
+res.plot()   # las barras L_Ws(f) con el total sumado en bandas, como en la figura de arriba (requiere matplotlib)
 ```
 
 ## 2. Placas de baja y alta movilidad

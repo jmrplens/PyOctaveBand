@@ -58,10 +58,63 @@ print(round(fc))                                      # 2107 Hz (Hopkins declare
 res = single_panel_transmission_loss(bands, mass, critical_frequency=fc,
                                      loss_factor=0.024)
 print(round(res.rating().rating))                     # 32  ->  Rw = 32 dB (catalogue 6 mm glass)
+
+res.plot()   # predicted R(f) with the critical frequency marked (needs matplotlib)
 ```
 
 The predicted spectrum plugs straight into the ISO 717-1 rating through
 `res.rating()`, and into EN 12354 as the "predicted" element $R$.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/single_panel_rating_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/single_panel_rating.svg" alt="Predicted sound reduction index of a 6 mm float glass pane per one-third-octave band against the shifted ISO 717-1 reference curve, with the coincidence dip at about 2100 Hz marked, the unfavourable deviations shaded and the Rw rating annotated" width="80%"></picture>
+
+*The predicted Sharp spectrum rated exactly like a measurement: the
+coincidence dip at `fc ~ 2.1 kHz` collects most of the unfavourable
+deviations, and the shifted reference read at 500 Hz gives the catalogue
+`Rw = 32 dB` of 6 mm glass.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import (
+    coincidence_frequency, plate_bending_stiffness,
+    single_panel_transmission_loss,
+)
+
+# 6 mm float glass: E = 62 GPa, rho = 2500 kg/m3, nu = 0.24, eta = 0.024.
+bands = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
+                  1000, 1250, 1600, 2000, 2500, 3150], dtype=float)
+mass = 2500.0 * 0.006
+bp = plate_bending_stiffness(6.2e10, 0.006, 0.24)
+fc = coincidence_frequency(mass, bp)
+res = single_panel_transmission_loss(bands, mass, critical_frequency=fc,
+                                     loss_factor=0.024)
+w = res.rating()
+
+# One line each — the predicted R(f), or the rated curve vs the reference:
+res.plot()
+w.plot()
+plt.show()
+
+# By hand, combining both on one axes:
+fig, ax = plt.subplots()
+ax.semilogx(bands, res.transmission_loss, "o-", label="predicted R (Sharp)")
+ax.semilogx(w.band_centers, w.shifted_reference, "s--",
+            label="shifted reference")
+ax.fill_between(w.band_centers, w.measured, w.shifted_reference,
+                where=w.measured < w.shifted_reference, interpolate=True,
+                alpha=0.3, label="unfavourable deviations")
+ax.axvline(fc, ls=":", color="tab:green", label=f"fc = {fc:.0f} Hz")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Sound reduction index R [dB]")
+ax.set_title(f"Rw = {w.rating} dB  (C={w.c:+d}; Ctr={w.ctr:+d})")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 ## Double wall: the mass-spring-mass resonance (Bies 7.2.6)
 
@@ -93,6 +146,8 @@ print(round(float(dw.transmission_loss[0]), 1),
 # A mineral-wool fill (a materials porous model) lowers the resonance:
 fill = miki([f0], 7000.0)
 print(round(mass_spring_mass_resonance(12.0, 12.0, 0.075, cavity_medium=fill)))  # < 89 Hz
+
+dw.plot()   # double-wall R(f) with the mass-spring-mass resonance marked (needs matplotlib)
 ```
 
 ## Slits, holes and apertures (Hopkins 4.3.10)
@@ -144,6 +199,8 @@ print(sig.radiation_efficiency[bands == 2000].round(2))    # ~2.5 (peak at coinc
 lw = sound_power_from_vibration(velocity_level=80.0, area=1.875,
                                 radiation_factor=sig.radiation_efficiency,
                                 frequencies=bands)
+
+sig.plot()   # sigma(f) with the coincidence peak (needs matplotlib)
 ```
 
 ## Point mobilities of infinite structures (Cremer Table 5.1)
@@ -164,6 +221,55 @@ print(round(z_plate))                                 # real, frequency independ
 w = injected_power(force=10.0, mobility=1.0 / z_plate)
 print(round(float(w) * 1e3, 3), "mW")                 # W = |F|^2 / (16 sqrt(B' m''))
 ```
+
+<details>
+<summary>Show the code for the concept figure</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import (
+    coincidence_frequency, composite_transmission_loss,
+    double_wall_transmission_loss, mass_law_transmission_loss,
+    mass_spring_mass_resonance, plate_bending_stiffness,
+    radiation_efficiency, single_panel_transmission_loss,
+)
+
+bands = np.array([50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
+                  1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000], dtype=float)
+fig, ax = plt.subplots(2, 2, figsize=(12, 9))
+
+bp = plate_bending_stiffness(6.2e10, 0.006, 0.24)
+fc = coincidence_frequency(15.0, bp)
+ml = mass_law_transmission_loss(bands, 15.0, incidence="field")
+sp = single_panel_transmission_loss(bands, 15.0, critical_frequency=fc, loss_factor=0.024)
+ax[0, 0].semilogx(bands, ml, "--", label="field-incidence mass law")
+ax[0, 0].semilogx(bands, sp.transmission_loss, "-o", ms=3, label="single panel R (Sharp)")
+ax[0, 0].axvline(fc, ls=":", color="r"); ax[0, 0].set_title("Single panel")
+
+dw = double_wall_transmission_loss(bands, 12.0, 12.0, 0.075)
+ax[0, 1].semilogx(bands, mass_law_transmission_loss(bands, 24.0), "--", label="single leaf")
+ax[0, 1].semilogx(bands, dw.transmission_loss, "-o", ms=3, label="double wall")
+ax[0, 1].axvline(mass_spring_mass_resonance(12.0, 12.0, 0.075), ls=":", color="r")
+ax[0, 1].set_title("Double wall")
+
+sig = radiation_efficiency(bands, 1.5, 1.25, fc)
+ax[1, 0].loglog(bands, sig.radiation_efficiency, "-o", ms=3, label=r"$\sigma(f)$")
+ax[1, 0].axhline(1.0, ls=":"); ax[1, 0].set_title("Radiation efficiency")
+
+wall = sp.transmission_loss
+comp = [float(composite_transmission_loss([0.99, 0.01], [w, 0.0])) for w in wall]
+ax[1, 1].semilogx(bands, wall, "-o", ms=3, label="solid wall")
+ax[1, 1].semilogx(bands, comp, "-s", ms=3, label="wall + 1 % slit")
+ax[1, 1].axhline(20.0, ls=":"); ax[1, 1].set_title("Composite with aperture")
+
+for a in ax.flat:
+    a.set_xlabel("Frequency [Hz]"); a.legend(fontsize=8); a.grid(alpha=0.3)
+fig.suptitle("Theoretical panel sound insulation")
+fig.tight_layout(); plt.show()
+```
+
+</details>
 
 ## References
 

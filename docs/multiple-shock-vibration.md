@@ -118,6 +118,8 @@ result = vibration.multiple_shock_assessment(
 print(round(result.acceleration_dose, 2))  # 20.94  m/s2
 print(round(result.risk, 2))               # 0.46
 print(round(result.probability, 2))        # 0.03
+
+result.plot()   # the injury-probability curve with this assessment's R marked (needs matplotlib)
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/multiple_shock_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/multiple_shock.svg" alt="Two panels. Left: the seat-to-spine transmissibility rising to about 1.6 near a 5 Hz resonance then rolling off to near zero by 80 Hz. Right: the probability of lumbar injury as a Weibull function of the stress variable R for male and female, with the 10, 50 and 90 percent risk levels marked and the Annex C male worked example at R = 1.22, about 37 percent" width="96%"></picture>

@@ -41,6 +41,8 @@ if TYPE_CHECKING:
     from ..building.installed_structure_borne import InstalledSourceResult
     from ..building.insulation import (
         AirborneInsulationResult,
+        ExtendedImpactRatingResult,
+        ExtendedWeightedRatingResult,
         FacadeInsulationResult,
         ImpactInsulationResult,
         ImpactRatingResult,
@@ -96,6 +98,10 @@ _STRINGS: dict[str, str] = {
     "situation": "situación",
     "sigma_R95 upper limit": "límite superior sigma_R95",
     "limit of measurement (> delta-L)": "límite de medición (> delta-L)",
+    "enlarged range (Annex B)": "rango ampliado (Anexo B)",
+    "enlarged range (A.2.1)": "rango ampliado (A.2.1)",
+    "Measured": "Medido",
+    "Shifted reference (core bands)": "Referencia desplazada (bandas 100-3150 Hz)",
     "Improvement of impact sound insulation delta-L [dB]": "Mejora del aislamiento a ruido de impacto delta-L [dB]",
     "ISO 16251-1 Floor-Covering Impact Sound Improvement": "Mejora del aislamiento a ruido de impacto de revestimiento de suelo ISO 16251-1",
 }
@@ -261,6 +267,163 @@ def plot_impact_rating(
     )
     localize_axes(ax, language)
     return ax
+
+
+def _require_extended_curve(
+    result: ExtendedWeightedRatingResult | ExtendedImpactRatingResult,
+) -> None:
+    if result.band_centers is None or result.measured is None:
+        raise ValueError(
+            "This extended rating result carries no band curve to plot (it "
+            "was constructed without band_centers/measured data)."
+        )
+
+
+def _plot_extended_rating(
+    result: ExtendedWeightedRatingResult | ExtendedImpactRatingResult,
+    *,
+    impact: bool,
+    title: str,
+    ylabel: str,
+    span_label: str,
+    ax: Axes | None,
+    language: str,
+    **kwargs: Any,
+) -> Axes:
+    """Shared renderer for the two enlarged-range ISO 717 rating plots."""
+    from .._i18n import localize_axes
+    from .common import _t as _t_common
+
+    _require_extended_curve(result)
+    _require_rating_curve(result.core)
+    ax = ax if ax is not None else _new_axes()
+    freqs = np.asarray(result.band_centers, dtype=np.float64)
+    measured = np.asarray(result.measured, dtype=np.float64)
+    core_freqs = np.asarray(result.core.band_centers, dtype=np.float64)
+    core_measured = np.asarray(result.core.measured, dtype=np.float64)
+    core_ref = np.asarray(result.core.shifted_reference, dtype=np.float64)
+
+    # Mark the bands outside the 100-3150 Hz core as the enlarged range.
+    if float(freqs.min()) < float(core_freqs.min()):
+        ax.axvspan(float(freqs.min()), float(core_freqs.min()),
+                   color=_C_MUTED, alpha=0.12, label=_t(span_label, language))
+    if float(freqs.max()) > float(core_freqs.max()):
+        label = None if float(freqs.min()) < float(core_freqs.min()) else _t(
+            span_label, language
+        )
+        ax.axvspan(float(core_freqs.max()), float(freqs.max()),
+                   color=_C_MUTED, alpha=0.12, label=label)
+
+    kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault("label", _t("Measured", language))
+    ax.plot(freqs, measured, "o-", **kwargs)
+    ax.plot(core_freqs, core_ref, "s--", color=_C_REFERENCE,
+            label=_t("Shifted reference (core bands)", language))
+    unfavourable = (
+        core_measured > core_ref if impact else core_measured < core_ref
+    )
+    ax.fill_between(
+        core_freqs, core_measured, core_ref, where=unfavourable.tolist(),
+        color=_C_SECONDARY, alpha=0.4,
+        label=_t_common("Unfavourable deviations", language), interpolate=True,
+    )
+    _freq_axis(ax, freqs, language=language)
+    ax.set_ylabel(ylabel)
+    ax.set_title(title)
+    ax.grid(True, which="both", alpha=0.3)
+    ax.legend(loc="best", fontsize="small")
+    localize_axes(ax, language)
+    return ax
+
+
+def _extended_terms_line(
+    terms: list[tuple[str, float | None]], language: str, decimals: int
+) -> str:
+    """Format the available Annex B adaptation terms as ``name = value dB``."""
+    from .._i18n import format_number
+
+    parts = [
+        f"{name} = {format_number(value, language, decimals=decimals)}"
+        for name, value in terms
+        if value is not None
+    ]
+    return "; ".join(parts)
+
+
+def plot_extended_weighted_rating(
+    result: ExtendedWeightedRatingResult, ax: Axes | None = None,
+    language: str = "en", **kwargs: Any
+) -> Axes:
+    """Enlarged-range airborne rating curve vs shifted reference (ISO 717-1 Annex B).
+
+    :param result: An
+        :class:`~phonometry.insulation.ExtendedWeightedRatingResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the measured-curve ``plot`` call.
+    :return: The axes.
+    """
+    from .._i18n import format_number
+
+    decimals = 0 if float(result.rating).is_integer() else 1
+    title = (
+        f"ISO 717-1 Rw (C={format_number(result.c, language, decimals=decimals)}; "
+        f"Ctr={format_number(result.ctr, language, decimals=decimals)}) = "
+        f"{format_number(result.rating, language, decimals=decimals)} dB"
+    )
+    extended = _extended_terms_line(
+        [
+            ("C50-3150", result.c_50_3150),
+            ("C50-5000", result.c_50_5000),
+            ("C100-5000", result.c_100_5000),
+            ("Ctr,50-3150", result.ctr_50_3150),
+            ("Ctr,50-5000", result.ctr_50_5000),
+            ("Ctr,100-5000", result.ctr_100_5000),
+        ],
+        language, decimals,
+    )
+    if extended:
+        title = f"{title}\n{extended}"
+    return _plot_extended_rating(
+        result, impact=False, title=title,
+        ylabel=_t("Sound reduction index [dB]", language),
+        span_label="enlarged range (Annex B)", ax=ax, language=language,
+        **kwargs,
+    )
+
+
+def plot_extended_impact_rating(
+    result: ExtendedImpactRatingResult, ax: Axes | None = None,
+    language: str = "en", **kwargs: Any
+) -> Axes:
+    """Enlarged-range impact rating curve vs shifted reference (ISO 717-2 A.2.1).
+
+    :param result: An
+        :class:`~phonometry.insulation.ExtendedImpactRatingResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the measured-curve ``plot`` call.
+    :return: The axes.
+    """
+    from .._i18n import format_number
+
+    decimals = 0 if float(result.rating).is_integer() else 1
+    title = (
+        f"ISO 717-2 {_t('impact rating', language)} "
+        f"(CI={format_number(result.ci, language, decimals=decimals)}) = "
+        f"{format_number(result.rating, language, decimals=decimals)} dB"
+    )
+    if result.ci_50_2500 is not None:
+        title = (
+            f"{title}\nCI,50-2500 = "
+            f"{format_number(result.ci_50_2500, language, decimals=decimals)}"
+        )
+    return _plot_extended_rating(
+        result, impact=True, title=title,
+        ylabel=_t("Impact sound pressure level [dB]", language),
+        span_label="enlarged range (A.2.1)", ax=ax, language=language,
+        **kwargs,
+    )
 
 
 def plot_facade_insulation(

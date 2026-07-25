@@ -130,6 +130,8 @@ for name, rw, k_ff, k_fd, lf in elements:
 res = building.predicted_airborne_insulation(r_direct=57.0, flanking_paths=paths)
 print(round(res.r_prime_w, 1))                          # 52.2  ->  R'w = 52 dB
 print(res.dominant.label, round(res.dominant.fraction, 2))   # Dd 0.33 (domina el directo)
+
+res.plot()   # fracción de energía transmitida por camino, de mayor a menor (requiere matplotlib)
 ```
 
 <details>
@@ -218,7 +220,48 @@ print(round(ln_eq, 1), k, round(imp.l_prime_n_w, 1))     # 76.2 2 45.2  ->  L'n,
 # Fórmula (3) exacta: L'nT,w = L'n,w - 10 lg(0.032 V). El redondeo del propio
 # Anexo E.3 a 10 lg(V/30) queda 0.18 dB por debajo; ambos dan L'nT,w = 43 dB.
 print(round(building.standardized_impact_level(imp.l_prime_n_w, 50.0), 1))   # 43.2  L'nT,w
+
+imp.plot()   # los términos de la Fórmula (21) como barras: Ln,w,eq - dLw + K -> L'n,w (requiere matplotlib)
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_prediction_terms_es.svg" alt="La predicción de impactos del Anexo E.3 de EN 12354-2 como sus términos de la Fórmula 21: el nivel equivalente del forjado desnudo de 76,2 dB, la mejora de menos 33 dB del suelo flotante, la corrección de flancos de más 2 dB y el nivel de impactos aparente previsto resultante de 45,2 dB" width="80%" />
+
+*Todo el modelo simplificado de EN 12354-2 es una resta: el forjado masivo
+desnudo parte de $L_{n,w,eq} = 76{,}2$ dB, el suelo flotante recupera 33 dB
+y la corrección de flancos devuelve 2 dB, quedando en $L'_{n,w} = 45$ dB.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+# EN 12354-2 Anexo E.3: forjado de hormigón de 0,14 m (m' = 322 kg/m2),
+# suelo flotante con delta-Lw = 33 dB, masa media de flancos de 145 kg/m2.
+ln_eq = building.equivalent_impact_level(322.0)
+k = building.impact_flanking_correction(322.0, 145.0)
+imp = building.predicted_impact_insulation(ln_w_eq=ln_eq, delta_l_w=33.0,
+                                           k_correction=k)
+
+# Una línea: los términos de la Fórmula (21) como barras:
+imp.plot(language="es")
+plt.show()
+
+# A mano, desde los campos del resultado:
+labels = ["Ln,w,eq", "-dLw", "+K", "L'n,w"]
+values = [imp.ln_w_eq, -imp.delta_l_w, imp.k_correction, imp.l_prime_n_w]
+fig, ax = plt.subplots()
+ax.bar(np.arange(4), values)
+ax.axhline(0.0, color="k", lw=0.8)
+ax.set_xticks(np.arange(4), labels)
+ax.set_ylabel("Nivel / corrección [dB]")
+ax.set_title(f"L'n,w = {imp.l_prime_n_w:.1f} dB (EN 12354-2 Anexo E.3)")
+plt.show()
+```
+
+</details>
 
 La contrapartida aérea de ese cierre es la Fórmula (5b),
 $D_{nT} = R' + 10\lg(0.32\,V/S_s)$, expuesta como
@@ -391,6 +434,8 @@ elements = [
 fac = building.facade_sound_reduction(elements, area=11.3, volume=50.0,
                              frequencies=[125, 250, 500, 1000, 2000], bands="octave")
 print(fac.r_tr_s_w, fac.c_tr, fac.d_2m_nt_w)   # 31 -3 33  (R'tr,s,w / Ctr / D2m,nT,w)
+
+fac.plot()   # índices parciales por elemento con R' y D2m,nT superpuestos (requiere matplotlib)
 ```
 
 <details>
@@ -502,7 +547,53 @@ print(round(seg.l_w[0], 1), round(seg.l_w[1], 1))     # 59.8 61.2  (LW a 63/125 
 # Nivel exterior a 5 m frente al centro del lado de 60×10 m (LWA = 62.9 dB(A)).
 a_tot = building.outdoor_attenuation(width=60.0, height=10.0, distance=5.0)
 print(round(a_tot, 1), round(building.outdoor_level(62.9, a_tot), 1))   # 26.3 36.6
+
+seg.plot()   # LW radiada por octava con la línea de LWA ponderada A (requiere matplotlib)
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/radiated_power_outdoor_es.svg" alt="Nivel de potencia acústica radiada por banda de octava del segmento de muro con puerta industrial del Anexo G de EN 12354-4, con el valor único ponderado A dibujado como línea discontinua sobre las barras" width="80%" />
+
+*El segmento del lado 1 del Anexo G: el muro domina la superficie pero la
+$R$ más débil de la puerta gobierna la potencia radiada, así que el espectro
+de octavas se mantiene plano donde el muro solo caería. La línea discontinua
+es el valor único ponderado A $L_{WA}$ formado a partir de las octavas.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+# EN 12354-4 Anexo G, lado 1: un segmento de muro de hormigón de 10×20 m con
+# una puerta industrial de 6×4 m, nivel interior Lp,in y Cd = -5 dB.
+bands = [63, 125, 250, 500, 1000, 2000, 4000, 8000]
+seg = building.radiated_sound_power(
+    [building.FacadeElement("muro", area=176.0, r=[32, 36, 36, 33, 39, 49, 57, 63]),
+     building.FacadeElement("puerta", area=24.0, r=[21, 23, 28, 30, 30, 30, 30, 30])],
+    lp_in=[70, 74, 76, 72, 70, 67, 62, 57], area=200.0, c_d=-5.0,
+    r_prime_cap=40.0, octave_bands=bands)
+
+# Una línea: LW por octava con la línea de LWA ponderada A:
+seg.plot(language="es")
+plt.show()
+
+# A mano, desde los campos del resultado:
+x = np.arange(len(bands))
+fig, ax = plt.subplots()
+ax.bar(x, seg.l_w, label="LW radiada por octava")
+ax.axhline(seg.l_w_dba, ls="--", color="tab:red",
+           label=f"LWA = {seg.l_w_dba:.1f} dB(A)")
+ax.set_xticks(x, [str(b) for b in bands])
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("Nivel de potencia acústica radiada [dB re 1 pW]")
+ax.set_title("Potencia sonora radiada EN 12354-4 (Anexo G)")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 > **Nota sobre los ejemplos resueltos.** Los ejemplos resueltos de 2000 arrastran
 > pequeñas inconsistencias internas de redondeo en las bandas de octava altas (el

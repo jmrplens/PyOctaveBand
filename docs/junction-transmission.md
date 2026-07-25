@@ -158,12 +158,92 @@ res = junction_transmission("X", 0.1, 3200.0, 240.0, 0.1, 3200.0, 240.0)
 kij = wave_vibration_reduction_index(res.corner_average,
                                      res.critical_frequency2)  # 7.33 dB
 kij = res.corner_reduction_index  # the same, precomputed on the result
+
+res.plot()   # tau(theta) for this junction's corner and straight paths (needs matplotlib)
 ```
+
+The junction descriptor is a *design* quantity: sweeping the receiving
+plate's thickness shows how much a mass change at the junction buys. The
+corner paths stiffen quickly with a heavier receiving plate, while the
+straight (in-line) path of the X-junction rises fastest of all, since the
+perpendicular plates increasingly pin the junction line:
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/junction_kij_thickness_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/junction_kij_thickness.svg" alt="Wave-approach vibration reduction index Kij versus the thickness ratio of two concrete plates for the X-junction corner and straight paths, the T-junction corner and the L-junction corner, with the identical-plates X-junction value of about 7.3 dB marked" width="82%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import junction_transmission, wave_vibration_reduction_index
+
+# Concrete plates (cL = 3200 m/s, rho = 2400 kg/m3): plate 1 fixed at
+# 100 mm, plate 2 swept from 50 mm to 400 mm.
+h1, cl, rho = 0.1, 3200.0, 2400.0
+ratios = np.linspace(0.5, 4.0, 36)
+kij_corner = []
+for ratio in ratios:
+    h2 = h1 * float(ratio)
+    res = junction_transmission("X", h1, cl, rho * h1, h2, cl, rho * h2)
+    kij_corner.append(res.corner_reduction_index)
+
+fig, ax = plt.subplots()
+ax.plot(ratios, kij_corner, label="X corner")
+ax.set_xlabel("Thickness ratio h2/h1")
+ax.set_ylabel("Vibration reduction index Kij [dB]")
+ax.set_title("Wave-approach junction Kij (Hopkins Eq. 5.116)")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+## 5. Worked example: feeding Kij into EN 12354
+
+The number this page predicts is exactly what the EN 12354-1 flanking model
+consumes. Take the 100 mm / 200 mm concrete X-junction from the figure at
+the top: its corner path gives `K12 = 9.8` dB. Handing that to
+`flanking_element` in place of a tabulated Annex E value prices the
+junction's three flanking paths and their effect on the apparent rating:
+
+```python
+from phonometry import building, junction_transmission
+
+# The 100 mm / 200 mm concrete X-junction of the opening figure:
+res = junction_transmission("X", 0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
+k12 = res.corner_reduction_index                     # 9.8 dB (corner path)
+
+# Feed it to the EN 12354-1 simplified model as this junction's Kij:
+ff, df, fd = building.flanking_element(
+    label="floor", r_flanking=49.0, r_separating=57.0,
+    k_ff=k12, k_fd=k12, k_df=k12, separating_area=11.5, coupling_length=4.5)
+pred = building.predicted_airborne_insulation(r_direct=57.0,
+                                              flanking_paths=[ff, df, fd])
+print(round(pred.r_prime_w, 1))                      # 55.4  (Rw 57 direct)
+print(pred.dominant.label, round(pred.dominant.fraction, 2))   # Dd 0.68
+```
+
+One junction with a moderate `Kij` already trims 1.6 dB off the direct
+`Rw = 57 dB`; a full building repeats this for every junction, which is the
+[EN 12354 prediction guide](insulation-prediction.md).
 
 The measured, EN 12354 counterpart of `Kij` (from the direction-averaged
 velocity level difference) is the separate
 [flanking-transmission](insulation-field.md) `vibration_reduction_index`; this
 guide is the closed-form *predicted* value from the wave approach.
+
+## See also
+
+- [Predicting Sound Insulation (EN 12354)](insulation-prediction.md): the
+  flanking model that consumes `Kij` junction by junction.
+- [Laboratory Insulation Measurement](insulation-lab.md): the ISO 10848
+  measurement of `Kij` from velocity level differences, the empirical
+  counterpart of this page's closed forms.
+- [Structure-borne sound power of equipment (EN 15657)](structure-borne-power.md):
+  the source power that these junction transmissions carry through a building.
+- [Mechanical mobility and the FRF family (ISO 7626-1)](mechanical-mobility.md):
+  the plate mobilities behind the wave parameters.
 
 ## References
 

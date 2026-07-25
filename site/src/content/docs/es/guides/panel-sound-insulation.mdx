@@ -94,11 +94,64 @@ print(round(fc))                                      # 2107 Hz (Hopkins declara
 res = single_panel_transmission_loss(bands, mass, critical_frequency=fc,
                                      loss_factor=0.024)
 print(round(res.rating().rating))                     # 32  ->  Rw = 32 dB (vidrio 6 mm de catálogo)
+
+res.plot()   # R(f) previsto con la frecuencia crítica marcada (requiere matplotlib)
 ```
 
 El espectro predicho entra directamente en el índice ISO 717-1 mediante
 `res.rating()`, y en EN 12354 como el $R$ de elemento "predicho" allí donde la
 norma exigiría una medida de laboratorio.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/single_panel_rating_es.svg" alt="Índice de reducción acústica previsto de un vidrio flotado de 6 mm por banda de tercio de octava frente a la curva de referencia ISO 717-1 desplazada, con el valle de coincidencia hacia 2100 Hz marcado, las desviaciones desfavorables sombreadas y el índice Rw anotado" width="80%" />
+
+*El espectro de Sharp previsto se evalúa exactamente como una medición: el
+valle de coincidencia en $f_c \approx 2{,}1$ kHz concentra la mayor parte
+de las desviaciones desfavorables, y la referencia desplazada leída a
+500 Hz da el $R_w = 32$ dB de catálogo del vidrio de 6 mm.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import (
+    coincidence_frequency, plate_bending_stiffness,
+    single_panel_transmission_loss,
+)
+
+# Vidrio flotado de 6 mm: E = 62 GPa, rho = 2500 kg/m3, nu = 0,24, eta = 0,024.
+bands = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
+                  1000, 1250, 1600, 2000, 2500, 3150], dtype=float)
+mass = 2500.0 * 0.006
+bp = plate_bending_stiffness(6.2e10, 0.006, 0.24)
+fc = coincidence_frequency(mass, bp)
+res = single_panel_transmission_loss(bands, mass, critical_frequency=fc,
+                                     loss_factor=0.024)
+w = res.rating()
+
+# Una línea cada una: el R(f) previsto, o la curva evaluada frente a la referencia:
+res.plot(language="es")
+w.plot(language="es")
+plt.show()
+
+# A mano, combinando ambas en unos mismos ejes:
+fig, ax = plt.subplots()
+ax.semilogx(bands, res.transmission_loss, "o-", label="R previsto (Sharp)")
+ax.semilogx(w.band_centers, w.shifted_reference, "s--",
+            label="referencia desplazada")
+ax.fill_between(w.band_centers, w.measured, w.shifted_reference,
+                where=w.measured < w.shifted_reference, interpolate=True,
+                alpha=0.3, label="desviaciones desfavorables")
+ax.axvline(fc, ls=":", color="tab:green", label=f"fc = {fc:.0f} Hz")
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("Índice de reducción acústica R [dB]")
+ax.set_title(f"Rw = {w.rating} dB  (C={w.c:+d}; Ctr={w.ctr:+d})")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 ## Pared doble: la resonancia masa-muelle-masa (Bies 7.2.6)
 
@@ -134,6 +187,8 @@ print(round(float(dw.transmission_loss[0]), 1),
 # Un relleno de lana mineral (un modelo poroso de materials) baja la resonancia:
 fill = miki([f0], 7000.0)
 print(round(mass_spring_mass_resonance(12.0, 12.0, 0.075, cavity_medium=fill)))  # < 89 Hz
+
+dw.plot()   # R(f) de pared doble con la resonancia masa-muelle-masa marcada (requiere matplotlib)
 ```
 
 ## Rendijas, orificios y aberturas (Hopkins 4.3.10)
@@ -191,6 +246,8 @@ print(sig.radiation_efficiency[bands == 2000].round(2))    # ~2.5 (pico en coinc
 lw = sound_power_from_vibration(velocity_level=80.0, area=1.875,
                                 radiation_factor=sig.radiation_efficiency,
                                 frequencies=bands)
+
+sig.plot()   # sigma(f) con el pico de coincidencia (requiere matplotlib)
 ```
 
 ## Movilidades puntuales de estructuras infinitas (Cremer Tabla 5.1)
