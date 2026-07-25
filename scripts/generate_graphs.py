@@ -1296,7 +1296,7 @@ _ES_EXACT = {
     "peak $|Y| = 1/c$ (damping)": "pico $|Y| = 1/c$ (amortiguamiento)",
     "Mobility $|Y|$ [m/(N·s)]": "Movilidad $|Y|$ [m/(N·s)]",
     # Atmospheric refraction (effective profiles, ray fan, GFPE range cut) and
-    # wave-theoretic barrier insertion loss (WP environment figures).
+    # wave-theoretic barrier insertion loss (ground-and-barriers guide).
     "Effective Sound-Speed Profiles (Salomons Eq. 4.5)":
         "Perfiles de velocidad efectiva del sonido (Salomons ec. 4.5)",
     "Downward refraction (b = +1 m/s)": "Refracción hacia abajo (b = +1 m/s)",
