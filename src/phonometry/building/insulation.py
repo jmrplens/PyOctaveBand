@@ -640,6 +640,13 @@ class FacadeInsulationResult:
     frequencies: np.ndarray | None = None
     method: str = "loudspeaker"
 
+    def __post_init__(self) -> None:
+        if self.method not in _FACADE_CORRECTION:
+            raise ValueError(
+                "'method' must be 'loudspeaker' or 'road_traffic', got "
+                f"{self.method!r}."
+            )
+
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the per-band façade insulation profile (ISO 16283-3).
 

@@ -189,8 +189,9 @@ installed_source_prediction(
 
 Predict the installed structure-borne SPL over several paths (EN 12354-5).
 
-The band count is set by the widest per-band input (the source levels or
-any path's `adjustment_term` / `flanking_reduction_index`); every
+The band count is set by the widest per-band input (the characteristic
+power level, the `coupling_term` or any path's `adjustment_term` /
+`flanking_reduction_index`); every
 per-band input must carry one value or that count, and single values
 broadcast across the bands (a single-number source level with per-band
 path data is valid, and the result's `installed_power_level` is
