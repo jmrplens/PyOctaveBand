@@ -99,6 +99,11 @@ def test_report_states_audibility_adjustment_and_frequency(tmp_path) -> None:
     assert f"K = {k} dB" in text
     assert f"{result.decisive_frequency:.1f} Hz" in text
     assert "Table J.1" in text
+    # Table J.1 is defined on the mean audibility of the J assessed spectra;
+    # a single-spectrum assessment says so rather than implying otherwise.
+    assert "mean audibility" in text
+    assert "Clause 5.3.9, Formula (20)" in text
+    assert "single spectrum" in text
 
 
 def test_metadata_appears_and_one_page(tmp_path) -> None:
@@ -168,6 +173,8 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     text = _extract_text(str(out))
     assert "Evaluación de la audibilidad tonal" in text
     assert "ajuste tonal" in text
+    assert "audibilidad media" in text  # the Clause 5.3.9 caveat
+    assert "un único espectro" in text
     assert re.search(r"\d,\d", text) is not None  # comma decimal separator
 
 

@@ -278,7 +278,7 @@ def plot_age_threshold(
     su = np.asarray(result.spread_upper, dtype=np.float64)
     sl = np.asarray(result.spread_lower, dtype=np.float64)
 
-    _fractile_band(ax, freqs, median, sl, su, color=_C_PRIMARY_LIGHT)
+    _fractile_band(ax, freqs, median, sl, su, color=_C_PRIMARY_LIGHT, language=language)
     kwargs.setdefault("color", _C_PRIMARY)
     ax.plot(freqs, median, "o-", label=_t("Median", language), **kwargs)
     if abs(result.fractile - 0.5) > 1e-9:
@@ -317,7 +317,10 @@ def plot_nipts(
     du = np.asarray(result.spread_upper, dtype=np.float64)
     dl = np.asarray(result.spread_lower, dtype=np.float64)
 
-    _fractile_band(ax, freqs, median, dl, du, color=_C_SECONDARY_LIGHT, floor=0.0)
+    _fractile_band(
+        ax, freqs, median, dl, du, color=_C_SECONDARY_LIGHT, floor=0.0,
+        language=language,
+    )
     kwargs.setdefault("color", _C_SECONDARY)
     ax.plot(freqs, median, "o-", label=_t("Median $N_{50}$", language), **kwargs)
     if abs(result.fractile - 0.5) > 1e-9:

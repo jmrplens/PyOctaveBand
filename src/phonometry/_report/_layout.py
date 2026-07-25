@@ -718,11 +718,19 @@ def verdict_flow(
 
 
 def footer_flow(
-    metadata: ReportMetadata | None, language: str = "en"
+    metadata: ReportMetadata | None,
+    language: str = "en",
+    *,
+    disclaimer: str | None = None,
 ) -> list[Any]:
     """Build the footer identity block plus the always-present disclaimer.
 
-    Called only after the renderer has imported reportlab.
+    ``disclaimer`` overrides the default specimen-scoped sentence ("The
+    results relate only to the tested specimen."), which fits a laboratory
+    measurement on a physical specimen. Prediction fiches and the
+    population-statistics fiches pass their own English key (translated via
+    :func:`t` before display) so the scope statement matches what the fiche
+    actually reports. Called only after the renderer has imported reportlab.
     """
     from reportlab.lib import colors
     from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
@@ -783,11 +791,13 @@ def footer_flow(
     elif lines:
         flow.append(Paragraph(sign_blank, sign_style))
 
+    if disclaimer is None:
+        disclaimer = "The results relate only to the tested specimen."
     flow.append(Spacer(1, 4))
     flow.append(
         Paragraph(
             f"<font color='{_ACCENT_HEX}'>&#9632;</font> "
-            f"{t('The results relate only to the tested specimen.', language)}",
+            f"{t(disclaimer, language)}",
             disclaimer_style,
         )
     )

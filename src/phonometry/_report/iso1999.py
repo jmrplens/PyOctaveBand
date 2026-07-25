@@ -69,6 +69,14 @@ _HANDICAP_SET: tuple[float, float, float] = (2000.0, 3000.0, 4000.0)
 #: The compression-term denominator of the HTLAN Formula (1).
 _HTLAN_DENOM = 120.0
 
+#: Footer scope statement of the ISO 1999 fiches: the results describe a
+#: population under the stated exposure, not a tested specimen or any single
+#: person. English key, translated via :func:`t` at render time.
+_POPULATION_DISCLAIMER = (
+    "The results are a statistical prediction for the stated population and "
+    "exposure conditions; they do not describe any individual person."
+)
+
 
 def _fmt_db(value: float, language: str = "en") -> str:
     """A threshold shift or level rounded to one decimal place."""
@@ -112,12 +120,32 @@ def _representative(
     return False, float(vals[peak]), float(frequencies[peak])
 
 
+def _iso_q_percent(fractile: float) -> float:
+    """The ISO 1999 percentage ``Q`` for a library ``fractile``.
+
+    ISO 1999:2013 states its distributions for a percentage ``Q`` of the
+    population whose values are *worse* (larger) than ``N_Q``/``H_Q``
+    (Formulae (4)/(5), 6.3.2): ``Q = 10 %`` is the most-susceptible tenth.
+    The library's ``fractile`` is the complementary fraction with *smaller*
+    values, so ``Q = 100 (1 - fractile)``.
+    """
+    return round(100.0 * (1.0 - float(fractile)), 6)
+
+
 def _fractile_phrase(fractile: float, language: str = "en") -> str:
-    """A short gloss of the population fractile for the exposure conditions."""
-    q = decimal_comma(f"{fractile:g}", language)
+    """A short gloss of the population fractile, in ISO 1999's own ``Q``.
+
+    ``Q`` is printed with the meaning ISO 1999:2013 gives it in 6.3.2
+    (Formulae (4)/(5)): the percentage of the population predicted to have
+    values worse (larger) than the stated ones, so a request for the library
+    fractile 0.9 prints ``Q = 10 %``.
+    """
+    q = decimal_comma(f"{_iso_q_percent(fractile):g}", language)
     if abs(fractile - 0.5) < 1e-9:
-        return t("Population fractile Q = {q} (median)", language).format(q=q)
-    return t("Population fractile Q = {q}", language).format(q=q)
+        return t("Population fractile Q = {q} % (median)", language).format(q=q)
+    return t(
+        "Population fractile Q = {q} % (fraction with worse hearing)", language
+    ).format(q=q)
 
 
 # --------------------------------------------------------------------------- #
@@ -289,8 +317,17 @@ def render_nipts_report(
         text, passed = _nipts_verdict(result, metadata.requirement, language)
         flow.extend(verdict_flow(text, passed, styles, language))
 
-    flow.extend(_prediction_notes(language))
-    flow.extend(footer_flow(metadata, language))
+    is_handicap, _, _ = _representative(result.frequencies, result.value)
+    flow.extend(
+        _prediction_notes(
+            language,
+            l_ex=float(result.l_ex),
+            years=float(result.years),
+            fractile=float(result.fractile),
+            handicap_mean=is_handicap,
+        )
+    )
+    flow.extend(footer_flow(metadata, language, disclaimer=_POPULATION_DISCLAIMER))
 
     return build_document(path, flow, title)
 
@@ -448,14 +485,62 @@ def render_htlan_report(
         text, passed = _htlan_verdict(result, metadata.requirement, language)
         flow.extend(verdict_flow(text, passed, styles, language))
 
-    flow.extend(_prediction_notes(language))
-    flow.extend(footer_flow(metadata, language))
+    is_handicap, _, _ = _representative(result.frequencies, result.threshold)
+    flow.extend(
+        _prediction_notes(
+            language,
+            l_ex=float(result.l_ex),
+            years=float(result.years),
+            fractile=float(result.fractile),
+            handicap_mean=is_handicap,
+            with_age_component=True,
+        )
+    )
+    flow.extend(footer_flow(metadata, language, disclaimer=_POPULATION_DISCLAIMER))
 
     return build_document(path, flow, title)
 
 
-def _prediction_notes(language: str = "en") -> list[Any]:
-    """The shared statistical-prediction notes of the ISO 1999 fiches."""
+def _outside_validated_domain(l_ex: float, years: float, fractile: float) -> bool:
+    """Whether the exposure conditions leave the standard's validated domain.
+
+    The bounds live with the calculation
+    (:mod:`~phonometry.hearing.noise_induced_hearing_loss`, which also warns at
+    call time); the fiche re-evaluates them so the caveat always accompanies an
+    extrapolated print-out.
+    """
+    from ..hearing.noise_induced_hearing_loss import (
+        VALIDATED_FRACTILES,
+        VALIDATED_L_EX_MAX,
+        VALIDATED_YEARS,
+    )
+
+    return (
+        l_ex > VALIDATED_L_EX_MAX
+        or not VALIDATED_YEARS[0] <= years <= VALIDATED_YEARS[1]
+        or not VALIDATED_FRACTILES[0] <= fractile <= VALIDATED_FRACTILES[1]
+    )
+
+
+def _prediction_notes(
+    language: str = "en",
+    *,
+    l_ex: float,
+    years: float,
+    fractile: float,
+    handicap_mean: bool,
+    with_age_component: bool = False,
+) -> list[Any]:
+    """The shared statistical-prediction notes of the ISO 1999 fiches.
+
+    Always states the population-statistics character and ISO 1999's own
+    reading of the percentage ``Q`` (6.3.2, Formulae (4)/(5): the fraction with
+    worse hearing). ``handicap_mean`` adds the Scope NOTE 1 caveat that the
+    2/3/4 kHz combination is the user's choice, ``with_age_component`` adds the
+    source of the age-related threshold ``H`` (ISO 7029:2017), and exposure
+    conditions outside the standard's validated domain add an explicit
+    extrapolation caveat.
+    """
     from reportlab.lib import colors
     from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
     from reportlab.platypus import Paragraph
@@ -467,7 +552,7 @@ def _prediction_notes(language: str = "en") -> list[Any]:
         fontSize=7.5, leading=10, textColor=colors.HexColor(_MUTED_HEX),
         spaceBefore=6,
     )
-    return [
+    notes: list[Any] = [
         Paragraph(
             t(
                 "These values are a statistical prediction for a noise-exposed "
@@ -479,12 +564,54 @@ def _prediction_notes(language: str = "en") -> list[Any]:
         ),
         Paragraph(
             t(
-                "The population fractile Q is the fraction of the noise-exposed "
-                "population predicted to show a smaller threshold shift, so a "
-                "higher fractile is a more-susceptible individual "
-                "(ISO 1999:2013, 6.3.2).",
+                "Q is the percentage of the noise-exposed population predicted "
+                "to show a larger (worse) value than the one stated, as "
+                "ISO 1999:2013 defines it (6.3.2, Formulae (4) and (5)); "
+                "Q = 10 % is the most-susceptible tenth.",
                 language,
             ),
             note_style,
         ),
     ]
+    if with_age_component:
+        notes.append(
+            Paragraph(
+                t(
+                    "The age component H (database A) is evaluated from "
+                    "ISO 7029:2017, the edition ISO 1999:2013 references "
+                    "undated (6.2.2); its values differ from the illustrative "
+                    "Table A.3 selection, which derives from an earlier "
+                    "ISO 7029 edition.",
+                    language,
+                ),
+                note_style,
+            )
+        )
+    if handicap_mean:
+        notes.append(
+            Paragraph(
+                t(
+                    "ISO 1999:2013 does not specify frequencies or frequency "
+                    "combinations for evaluating hearing disability (Scope, "
+                    "NOTE 1); the 2/3/4 kHz average shown is a commonly used "
+                    "descriptor whose choice is left to the user.",
+                    language,
+                ),
+                note_style,
+            )
+        )
+    if _outside_validated_domain(l_ex, years, fractile):
+        notes.append(
+            Paragraph(
+                t(
+                    "The stated conditions lie outside the validated domain of "
+                    "ISO 1999:2013 (exposure durations of 1 year to 40 years, "
+                    "fractiles Q of 5 % to 95 %, exposure levels up to the "
+                    "100 dB covered by Annex D); these values are an "
+                    "extrapolation.",
+                    language,
+                ),
+                note_style,
+            )
+        )
+    return notes

@@ -105,6 +105,13 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     assert "IL = R - C" in text
     assert "24.00" in text  # external surface area S_E
     assert "30.00" in text  # internal surface area S_i
+    # The fiche reports a model prediction, so it says so and does not carry
+    # the measurement fiches' specimen-scoped footer.
+    assert "Predicted insertion loss" in text
+    assert "not a measurement" in text
+    assert "Predicted (estimated) result" in text
+    assert "tested specimen" not in text
+    assert "prediction computed from the stated inputs" in text
 
 
 def test_verbose_adds_room_constant_column(tmp_path) -> None:

@@ -90,6 +90,12 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     assert "Munjal" in text
     assert "four-pole" in text
     assert "expansion chamber" in text
+    # The fiche reports a model prediction, not a bench measurement.
+    assert "Predicted transmission loss" in text
+    assert "not a measurement" in text
+    assert "Predicted (estimated) result" in text
+    assert "tested specimen" not in text
+    assert "prediction computed from the stated inputs" in text
 
 
 def test_insertion_loss_column_when_impedances_given(tmp_path) -> None:
@@ -159,6 +165,12 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     assert "Pérdida por transmisión de silenciador reactivo" in text
     assert "Pérdida por transmisión media" in text
     assert f"{float(np.mean(_oracle_tl())):.1f}".replace(".", ",") in text
+    # The device kind is result data but a fixed vocabulary word, so it is
+    # translated rather than printed in English.
+    assert "Dispositivo: cámara de expansión" in text
+    assert "expansion chamber" not in text
+    assert "Se trata de una predicción" in text
+    assert "no son una medición de una probeta" in text
 
 
 def test_unknown_engine_rejected(tmp_path) -> None:

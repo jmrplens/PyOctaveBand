@@ -15,7 +15,7 @@
 
 ## Numerical conformance report
 
-&#9989; **423/423 conformance checks pass** across 53 domains and 278 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+&#9989; **427/427 conformance checks pass** across 53 domains and 278 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
 
@@ -118,12 +118,13 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary>&#9989; <b>Speech transmission (IEC 60268-16)</b>: 100% (9/9)</summary>
+<summary>&#9989; <b>Speech transmission (IEC 60268-16)</b>: 100% (10/10)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
 | IEC 60268-16:2020 A.2.2 | STI weighting-factor pair (500 Hz + 1 kHz bands) | 0.398 (+/-0.001) | 0.398 | 0 | &#9989; |
 | IEC 60268-16:2020 A.3.1.2 | Uniform MTF m=0.5 maps to STI=0.5 | 0.5 (+/-0.01) | 0.5 | 0 | &#9989; |
+| IEC 60268-16 Annex M | Full-STI worked example: printed MTF + speech/noise spectra -> STI | STI 0.76 (MTI row of step 4c) | STI 0.758 (max MTI dev 0.00) | -0.002 | &#9989; |
 | IEC 60268-16:2020 C.3.2 | STIPA direct method, Formula (C.1) signal at m=0.2 | 0.3 (+/-0.01) | 0.2992 | -0.001 | &#9989; |
 | IEC 60268-16:2020 C.3.2 | STIPA direct method, Formula (C.1) signal at m=0.5 | 0.5 (+/-0.01) | 0.4998 | 0 | &#9989; |
 | IEC 60268-16:2020 C.3.2 | STIPA direct method, Formula (C.1) signal at m=0.8 | 0.7 (+/-0.01) | 0.7002 | 0 | &#9989; |
@@ -428,13 +429,16 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary>&#9989; <b>Noise-induced hearing loss (ISO 1999)</b>: 100% (3/3)</summary>
+<summary>&#9989; <b>Noise-induced hearing loss (ISO 1999)</b>: 100% (6/6)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
 | ISO 1999:2013 Table D.2 | Median NIPTS, 4 kHz, 90 dB, 20 yr | 13 dB (+/-0.5 dB) | 12.9 dB | -0.057 dB | &#9989; |
 | ISO 1999:2013 Table D.2 | Worst-10 % NIPTS, 4 kHz, 90 dB, 20 yr | 18 dB (+/-0.5 dB) | 17.8 dB | -0.239 dB | &#9989; |
 | ISO 1999:2013 Table D.4 | Worst-10 % NIPTS, 3 kHz, 100 dB, 40 yr | 60 dB (+/-0.5 dB) | 59.8 dB | -0.172 dB | &#9989; |
+| ISO 1999:2013 Annex C, Formulae (C.6) to (C.8) | NIPTS at 1/2/4 kHz, 90 dB, 30 yr, Q = 10 % (annex inputs) | 0, 9, 19 dB | 0, 9, 19 dB | 0 dB | &#9989; |
+| ISO 1999:2013 Annex C, Formula (C.5) | Compressed 4 kHz shift, Formula (1) with the annex's H = 36 dB | 13.3 dB (+/-0.1 dB) | 13.3 dB | 0 dB | &#9989; |
+| ISO 1999:2013 Annex C, Formula (C.11) | Hearing threshold level with age and noise, 1/2/4 kHz mean, Q = 10 % | 31.1 dB (+/-0.1 dB) | 31.1 dB | 0 dB | &#9989; |
 
 </details>
 

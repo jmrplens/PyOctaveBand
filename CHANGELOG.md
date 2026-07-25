@@ -90,6 +90,80 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   adds an extrapolation note), and documents the combined "RH" tag as a
   diagnostic extension beyond the clause D.3.5 letters (N, R, H, RV; the
   RV vibration/rattle tag needs the Table 6 test and is not implemented).
+- ISO 1999 `nipts()`/`htlan()` now warn (`NoiseInducedHearingLossWarning`) when
+  the exposure conditions leave the domain the standard validates: exposure
+  durations outside 1-40 years (clause 6.3.1), fractiles in the distribution
+  tails the standard says "should not be estimated" (Q below 5 % or above
+  95 %, clause 6.3.2), and exposure levels above the 100 dB its data cover.
+  Previously a 130 dB / 60-year / Q = 1 % request returned a 357,9 dB
+  threshold shift with no indication that it was an extrapolation; the
+  prediction still runs, and both fiches now print the caveat.
+- The HVAC elbow insertion loss picked the wrong row of Bies Table 8.11 for a
+  `W/lambda` ratio landing exactly on a bin edge (0,14 / 0,28 / 0,55 / 1,11 /
+  2,22). The table's rows read "a <= W/lambda < b", so an edge opens its row:
+  at W/lambda = 0,14 a square unlined bend is now 1 dB, not 0 dB.
+- The STI and SII fiches printed the requirement with one decimal while
+  showing the measured value at full precision, so a verdict could contradict
+  itself ("STI = 0.50, required >= 0.5 -> FAIL" for a 0,52 requirement) and an
+  SII minimum of 0,75 printed as "0.8". Both now print the requirement at the
+  quantity's own display precision.
+- The ISO 1999 fiches printed the library's fractile as ISO 1999's percentage
+  `Q`, inverting its meaning: the standard's `Q` (6.3.2, Formulae (4)/(5)) is
+  the fraction of the population with *worse* hearing, so the
+  most-susceptible tenth is Q = 10 %, not 0,9. The fiches now print ISO's `Q`
+  with its own definition and cite the clause correctly.
+- The ISO/PAS 1996-3 fiche justified a zero adjustment with "governing
+  P <= 5" even when the adjustment was withheld by the onset-rate gate
+  instead, contradicting its own boxed P. The note now states whichever gate
+  governs, and the assessment period reflects the interval analysed rather
+  than a hardcoded 30 min (the standard's Clause 5 default, now the default of
+  the new `assessment_period_min` argument).
+- The wind-turbine tonality fiche cited "subclauses 9.5.2-9.5.5" of
+  IEC 61400-11 for a chain that runs through 9.5.6 to 9.5.8 (Formulae 31-34);
+  the citation now spans 9.5.2 to 9.5.8.
+- The noise-control fiches decided verdicts on the half-away-from-zero display
+  rounding but printed the value with Python's round-half-to-even formatting,
+  which could disagree at a boundary (0,25 printed as 0.2 against a verdict
+  taken on 0,3). Both now use the display rounding.
+- The shared 10-90 % fractile band of the hearing plots carried a hardcoded
+  English legend entry in Spanish figures.
+
+### Added
+
+- ISO 1999 `combine_age_and_noise()` applies Formula (1)
+  (`H' = H + N - H*N/120`) to an age component the caller supplies, which
+  clause 6.2 explicitly allows (a database B of the country under
+  consideration). It is the composition `htlan()` uses internally, and it
+  carries the new ISO 1999 Annex C conformance oracle: the annex's worked
+  example (90 dB, 30 years, 1/2/4 kHz at Q = 10 %) reproduces its printed
+  13,3 dB compressed shift at 4 kHz and its 31,1 dB combined threshold.
+- An independent IEC 60268-16 Annex M conformance oracle: the annex's printed
+  MTF matrix, speech spectrum and ambient noise reproduce its published MTI
+  row and STI = 0,76 end to end, exercising the whole A.5.3 to A.5.6 chain.
+- `docs/ERRATA.md` records two further defects: ISO/PAS 1996-3:2022 Clause 5
+  swaps the 3.4/3.5 cross-references of the onset rate and level difference,
+  and ISO 9613-2:1996 Table 2 prints 4,1 dB/km at 15 °C / 80 % / 1 kHz where
+  ISO 9613-1 gives 4,15 (the library computes the coefficient directly, so it
+  is unaffected).
+
+### Changed
+
+- The machine-enclosure, reactive-silencer and HVAC duct-noise fiches now read
+  as the model predictions they are, following the EN/ISO 12354 prediction
+  exemplar: a prediction-basis line, a prediction statement naming what the
+  model does not represent, and a prediction-scoped footer in place of "the
+  results relate only to the tested specimen". The committed examples drop
+  their measurement framing accordingly.
+- The ISO 1999 fiches state the ISO 7029:2017 source of their age component
+  `H` (which diverges from the illustrative Table A.3 selection), carry the
+  Scope NOTE 1 caveat that the 2/3/4 kHz combination is the user's own choice,
+  and close with a population-appropriate scope statement.
+- The ISO 1996-2 tonal fiche notes that Table J.1 is defined on the mean
+  audibility of the J assessed spectra (ISO/PAS 20065 Clause 5.3.9), which a
+  single-spectrum assessment stands in for.
+- The Spanish silencer and HVAC fiches translate the device kind and the duct
+  element label ("Dispositivo: cámara de expansión", "Codo (rectangular, con
+  absorbente, W = 300 mm)"), keeping symbols, numbers and units as written.
 
 - Adopt ruff 0.16 and its broadened default rule set: modernize type
 - ISO 17497-2 diffusion oracle: replace the in-house COMSOL simulation arc

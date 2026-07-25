@@ -300,3 +300,41 @@ def test_non_prominent_impulse_reports_zero_adjustment(tmp_path) -> None:
     assert result.adjustment == 0.0
     assert "No prominent impulse is present" in text
     assert "K = 0" in text or "0 dB" in text
+
+
+def test_non_qualifying_set_justifies_on_the_onset_gate(tmp_path) -> None:
+    """With no qualifying onset the note cites the onset gate, not P <= 5.
+
+    Both gates can withhold the adjustment. Here every onset rate is at or
+    below 10 dB/s (clauses 4.5/8), so no adjustment can arise whatever the
+    arithmetic prominence is; the governing P shown is informational and
+    exceeds 5, so a "P <= 5" justification would contradict the fiche's own
+    boxed number.
+    """
+    with pytest.warns(nt.ImpulseProminenceWarning):
+        result = nt.impulse_prominence([10.0, 8.0], [40.0, 30.0])
+    assert result.adjustment == 0.0
+    assert result.prominence > 5.0  # informational only
+    out = tmp_path / "no_qualifying.pdf"
+    result.report(str(out))
+    _assert_one_page(str(out))
+    text = _extract_text(str(out)).replace("\n", " ")
+    assert "No level rise qualifies as an impulse" in text
+    assert "informational only" in text
+    assert "No prominent impulse is present" not in text
+
+
+def test_assessment_period_reflects_the_analysed_interval(tmp_path) -> None:
+    """The header prints the analysed interval, defaulting to the 30 min default."""
+    default_out = tmp_path / "default.pdf"
+    _result().report(str(default_out))
+    assert "30 min" in _extract_text(str(default_out))
+
+    other = nt.impulse_prominence(
+        _ONSET_RATES, _LEVEL_DIFFERENCES, assessment_period_min=15.0
+    )
+    other_out = tmp_path / "quarter_hour.pdf"
+    other.report(str(other_out))
+    text = _extract_text(str(other_out))
+    assert "15 min" in text
+    assert "30 min" not in text

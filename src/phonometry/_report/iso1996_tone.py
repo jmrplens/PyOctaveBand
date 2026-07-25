@@ -407,6 +407,23 @@ def render_tone_audibility_report(
             basis_strip_style,
         )
     )
+    # Table J.1 is keyed on the mean audibility over the J staggered spectra of
+    # ISO/PAS 20065 Clause 5.3.9; this fiche assesses the one spectrum supplied,
+    # whose decisive audibility is that mean only for J = 1.
+    flow.append(
+        Paragraph(
+            t(
+                "Table J.1 assigns K from the mean audibility &#916;L, the "
+                "energy mean of the decisive audibilities of the J assessed "
+                "spectra (ISO/PAS 20065:2016, Clause 5.3.9, Formula (20)). "
+                "This fiche assesses a single spectrum, so the K shown follows "
+                "from its decisive audibility; where several staggered spectra "
+                "are assessed, rate their mean audibility instead.",
+                language,
+            ),
+            basis_strip_style,
+        )
+    )
     flow.extend(footer_flow(metadata, language))
 
     return build_document(path, flow, title)

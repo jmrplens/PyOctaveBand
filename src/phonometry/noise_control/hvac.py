@@ -90,7 +90,10 @@ _END_REFLECTION_FREE: NDArray[np.float64] = np.array(
 # ---------------------------------------------------------------------------
 # Bies Table 8.11 -- elbow/bend insertion loss (dB per bend) vs W / lambda.
 # The five columns are the supported (bend_type, vanes, lined, round) cases;
-# each row is the value for the W/lambda band whose upper edge is the key.
+# each row is the value for the W/lambda band whose upper edge is the key. The
+# printed rows read "W/lambda < 0.14", "0.14 <= W/lambda < 0.28" and so on, so
+# each edge opens its row rather than closing the one below (see
+# :func:`elbow_insertion_loss`).
 # ---------------------------------------------------------------------------
 _ELBOW_WL_UPPER: NDArray[np.float64] = np.array(
     [0.14, 0.28, 0.55, 1.11, 2.22, np.inf]
@@ -285,7 +288,10 @@ def elbow_insertion_loss(
         raise ValueError("'bend_type' must be 'square' or 'round'.")
     col = _ELBOW_TABLE[key]
     wl = w * f / c
-    idx = np.searchsorted(_ELBOW_WL_UPPER, wl, side="left")
+    # Table 8.11 bounds each row as "a <= W/lambda < b", so a ratio exactly on
+    # a bound belongs to the row it opens: side="right" places W/lambda = 0.14
+    # in the 0.14-0.28 row (1 dB), not in the row below it (0 dB).
+    idx = np.searchsorted(_ELBOW_WL_UPPER, wl, side="right")
     idx = np.clip(idx, 0, col.size - 1)
     values = col[idx]
     return HvacSpectrumResult(

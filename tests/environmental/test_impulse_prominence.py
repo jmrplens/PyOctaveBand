@@ -131,3 +131,23 @@ def test_onset_rate_gate_governing_from_qualifying_only() -> None:
     assert res.adjustment == pytest.approx(
         float(nt.impulse_adjustment(p_qualifying))
     )
+
+
+def test_assessment_period_defaults_and_validates() -> None:
+    """The assessment interval defaults to the standard's 30 min and is positive.
+
+    ISO/PAS 1996-3:2022 Clause 5 sets 30 min as the *default* assessment time
+    interval, so another interval may be carried instead.
+    """
+    default = nt.impulse_prominence([1200.0], [32.0])
+    assert default.assessment_period_min == nt.DEFAULT_ASSESSMENT_PERIOD_MIN
+    assert default.assessment_period_min == 30.0
+
+    other = nt.impulse_prominence([1200.0], [32.0], assessment_period_min=5.0)
+    assert other.assessment_period_min == 5.0
+    # The interval does not touch the prominence chain.
+    assert other.prominence == pytest.approx(default.prominence)
+
+    for bad in (0.0, -5.0, float("nan"), float("inf")):
+        with pytest.raises(ValueError, match="assessment_period_min"):
+            nt.impulse_prominence([1200.0], [32.0], assessment_period_min=bad)

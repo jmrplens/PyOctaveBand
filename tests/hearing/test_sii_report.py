@@ -112,6 +112,56 @@ def test_verdict_passes_at_or_above_requirement(tmp_path) -> None:
     assert "FAIL" in _extract_text(str(out_fail))
 
 
+def test_verdict_prints_the_requirement_at_full_precision(tmp_path) -> None:
+    """The requirement is printed at the SII's own three decimals.
+
+    A one-decimal requirement would print a 0.75 minimum as "0.8", above the
+    SII that passed it.
+    """
+    pytest.importorskip("reportlab")
+    pytest.importorskip("matplotlib")
+    res = _example_c2()
+    out = tmp_path / "req075.pdf"
+    res.report(str(out), metadata=ReportMetadata(requirement=0.75))
+    text = _extract_text(str(out)).replace("\n", " ")
+    assert "SII = 0.851" in text
+    assert "0.750" in text
+    # The entity renders as a glyph in the PDF, so the negative assertion has
+    # to look for what a reader would actually see.
+    assert "required ≥ 0.8" not in text
+    assert "required ≥ 0.750" in text
+    assert "PASS" in text
+
+
+def test_verdict_boundary_at_the_displayed_precision(tmp_path) -> None:
+    """A requirement equal to the displayed SII passes; one digit above fails."""
+    pytest.importorskip("reportlab")
+    pytest.importorskip("matplotlib")
+    res = _example_c2()  # SII = 0.851
+    out_eq = tmp_path / "eq.pdf"
+    res.report(str(out_eq), metadata=ReportMetadata(requirement=0.851))
+    assert "PASS" in _extract_text(str(out_eq))
+    out_over = tmp_path / "over.pdf"
+    res.report(str(out_over), metadata=ReportMetadata(requirement=0.852))
+    assert "FAIL" in _extract_text(str(out_over))
+
+
+def test_verdict_decides_on_the_requirement_it_prints(tmp_path) -> None:
+    """A requirement with hidden digits is judged on the value shown.
+
+    0.85104 prints as "0.851"; deciding on the unrounded number would fail an
+    SII of 0.851 while printing "SII = 0.851, required >= 0.851".
+    """
+    pytest.importorskip("reportlab")
+    pytest.importorskip("matplotlib")
+    res = _example_c2()  # SII = 0.851
+    out = tmp_path / "hidden.pdf"
+    res.report(str(out), metadata=ReportMetadata(requirement=0.85104))
+    text = _extract_text(str(out)).replace("\n", " ")
+    assert "SII = 0.851" in text
+    assert "PASS" in text
+
+
 # --- metadata ------------------------------------------------------------------
 
 

@@ -56,6 +56,8 @@ qualification (> 10 dB/s, clause 4.5) is enforced by
 impulse_prominence(
     onset_rates: ArrayLike,
     level_differences: ArrayLike,
+    *,
+    assessment_period_min: float = 30.0,
 ) -> ImpulseProminenceResult
 ```
 
@@ -76,6 +78,7 @@ the adjustment is 0 dB when no event qualifies).
 | :--- | :--- |
 | `onset_rates` | Onset rate of each impulse, in dB/s (> 0). |
 | `level_differences` | Level difference of each impulse, in dB (> 0). |
+| `assessment_period_min` | The assessment time interval the impulses were selected over, in minutes; the standard's default is 30 min (Clause 5), and the value is carried through to the fiche. |
 
 **Returns:** An [`ImpulseProminenceResult`](/phonometry/reference/api/environment/impulse-prominence/#impulseprominenceresult) with the per-impulse and governing values and `.plot()`.
 
@@ -83,7 +86,7 @@ the adjustment is 0 dB when no event qualifies).
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | for empty input, mismatched lengths, or a non-positive onset rate or level difference. |
+| ValueError | for empty input, mismatched lengths, a non-positive onset rate or level difference, or an assessment period that is not positive and finite. |
 
 ## ImpulseProminenceResult
 
@@ -95,6 +98,7 @@ ImpulseProminenceResult(
     qualifies: np.ndarray,
     prominence: float,
     adjustment: float,
+    assessment_period_min: float = 30.0,
 )
 ```
 
@@ -110,6 +114,7 @@ Prominence of a set of candidate impulses (NT ACOU 112:2002).
 | `qualifies` | Whether each event qualifies as an impulse: onset rate above 10 dB/s (clause 4.5; clause 8 applies the adjustment "for sounds with onset rates larger than 10 dB/s" only). |
 | `prominence` | The governing prominence: the highest `P` among the qualifying impulses (clause 7), or the highest overall (informational) when none qualifies. |
 | `adjustment` | The LAeq adjustment `KI`, in dB, of the governing qualifying impulse (Formula 2); 0 dB when no event qualifies. |
+| `assessment_period_min` | The assessment time interval the impulses were selected over, in minutes (Clause 5; 30 min by default). |
 
 ### ImpulseProminenceResult.plot()
 
@@ -145,7 +150,7 @@ Render an impulsive-sound prominence assessment fiche to a PDF.
 Writes a one-page assessment report following NT ACOU 112:2002 (carried
 into ISO/PAS 1996-3:2022): the standard-basis line, an optional metadata
 header (source/situation, client, measurement position, instrumentation
-and date, with the 30-minute assessment period always shown), a
+and date, always followed by this result's `assessment_period_min`), a
 full-width per-impulse table (onset rate, level difference, predicted
 prominence `P` and whether the onset qualifies as an impulse) above the
 adjustment-curve plot `KI(P)` with the candidate impulses marked, the

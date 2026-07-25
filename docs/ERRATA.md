@@ -368,6 +368,54 @@ to the issuing body, with date and reference).
   in [`distortion.py`](../src/phonometry/electroacoustics/distortion.py).
 - **Status:** unreported.
 
+## ISO/PAS 1996-3:2022, Clause 5 (cross-references of r and d)
+
+- **Location:** Clause 5, Formula (2), the definitions of the symbols of the
+  prominence P = 3 lg[r/(dB/s)] + 2 lg(d/dB).
+- **The print:** "r is the onset rate (OR) as defined in 3.4" and "d is the
+  level difference (LD) as defined in 3.5".
+- **The problem:** the two cross-references are swapped. The document's own
+  terms and definitions set 3.4 as the *level difference* LD ("difference in
+  decibels of L_pAF between the level of the end point L_e and the level of
+  the starting point L_s of the onset") and 3.5 as the *onset rate* OR
+  ("slope in decibels per second of the straight line that gives the best
+  approximation to the onset"). Read literally, Formula (2) would take three
+  times the logarithm of a level difference plus twice the logarithm of a
+  slope, inverting the weights the method assigns to the two quantities. The
+  spelled-out names in the same list ("the onset rate (OR)", "the level
+  difference (LD)") and the units given for each ("dB/s" for r, "dB" for d)
+  make the intended reading unambiguous.
+- **Evidence:** side-by-side reading of 3.4, 3.5 and the Clause 5 symbol
+  list; the units printed with each symbol contradict the clause numbers
+  printed with them.
+- **Library behaviour:** implements the spelled-out reading, weighting the
+  onset rate by 3 and the level difference by 2 (`predicted_prominence` in
+  [`impulse_prominence.py`](../src/phonometry/environmental/impulse_prominence.py)),
+  which is also the NT ACOU 112:2002 form the PAS carries over.
+- **Status:** unreported.
+
+## ISO 9613-2:1996, Table 2 (15 °C / 80 % / 1 kHz cell)
+
+- **Location:** Table 2, "Atmospheric attenuation coefficient α for octave
+  bands of noise", row 15 °C / 80 % relative humidity, column 1 kHz.
+- **The print:** α = 4,1 dB/km.
+- **The problem:** Table 2 is a rounded extract of ISO 9613-1, to which the
+  clause itself defers ("For values of α at atmospheric conditions not
+  covered in table 2, see ISO 9613-1"). Evaluating the ISO 9613-1 pure-tone
+  formula at 1 kHz, 15 °C, 80 % RH and 101,325 kPa gives 4,1511 dB/km, which
+  rounds to 4,2, not the printed 4,1. The neighbouring cells of the same row
+  round correctly (2 kHz: 8,338 -> printed 8,3; 4 kHz: 23,86 -> 23,7 at the
+  exact band centre), as do the 1 kHz cells of the other rows (15 °C / 50 %:
+  4,164 -> printed 4,2), so the defect is confined to this cell.
+- **Evidence:** independent evaluation of the ISO 9613-1 coefficient at both
+  the nominal and the exact band-centre frequency (4,1511 dB/km either way,
+  1 kHz being both).
+- **Library behaviour:** unaffected. The library never reads Table 2: it
+  computes A_atm from the ISO 9613-1 formula directly
+  ([`air_absorption.py`](../src/phonometry/environmental/air_absorption.py)),
+  so it yields 4,15 dB/km for this condition.
+- **Status:** unreported.
+
 ## NORAH2 rotorcraft guidance SC01.D1.5d (EASA.2020.FC.06), Eq. (27)
 
 - **Location:** section A.4.2, Eq. (27) (atmospheric absorption coefficient).

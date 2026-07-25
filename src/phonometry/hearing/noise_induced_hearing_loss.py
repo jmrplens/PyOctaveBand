@@ -22,11 +22,13 @@ Formulae 4/5, Table 2), clamped at zero. The HTLAN combines the age component
 from __future__ import annotations
 
 import math
+import warnings
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
+from .._internal.warnings import PhonometryWarning
 from .threshold import age_threshold
 
 if TYPE_CHECKING:
@@ -68,6 +70,67 @@ _XY: np.ndarray = np.array(
 )
 
 _HTLAN_DENOM = 120.0  # the compression term denominator of Formula (1).
+
+#: Exposure durations, in years, the standard validates: Formula (2) covers
+#: 10 to 40 years and Formula (3) is "valid for exposure durations between
+#: 1 year and 10 years"; below 1 year its results "represent an extrapolation"
+#: (clause 6.3.1).
+VALIDATED_YEARS: tuple[float, float] = (1.0, 40.0)
+
+#: Population fractiles the standard considers reliable. In ISO 1999's ``Q``
+#: (the percentage with worse hearing) the "tails of the statistical
+#: distributions for 0 % < Q < 5 % and for 95 % < Q < 100 % are unreliable and
+#: should not be estimated" (clause 6.3.2); in the library's complementary
+#: ``fractile`` that is the closed interval 0.05 to 0.95.
+VALIDATED_FRACTILES: tuple[float, float] = (0.05, 0.95)
+
+#: Highest noise exposure level, in dB, covered by the standard's data: the
+#: Annex D examples span L_EX,8h = 85 dB to 100 dB, and the Scope's NOTE 4
+#: "restrict[s] the validity to the stated ranges of the variables,
+#: percentages, sound exposure levels, and frequency ranges" (use beyond
+#: 200 Pa / 140 dB is explicitly "recognized as extrapolation").
+VALIDATED_L_EX_MAX: float = 100.0
+
+
+class NoiseInducedHearingLossWarning(PhonometryWarning):
+    """Warns when an ISO 1999 prediction leaves the standard's validated domain."""
+
+
+def _warn_outside_domain(l_ex: float, years: float, fractile: float) -> None:
+    """Warn (once per offending input) outside the validated ISO 1999 domain.
+
+    The quadratic Formula (2) grows without bound in ``(L_EX,8h - L0)``, so
+    beyond the standard's stated ranges it produces threshold shifts with no
+    physical meaning (hundreds of dB at extreme levels) rather than failing
+    loudly; these warnings mark such results as extrapolations while leaving
+    the computation available (only non-positive durations and fractiles
+    outside (0, 1) are rejected outright).
+    """
+    if not VALIDATED_YEARS[0] <= years <= VALIDATED_YEARS[1]:
+        warnings.warn(
+            f"exposure duration {years:g} years is outside the 1-40 year "
+            f"range ISO 1999:2013 validates (clause 6.3.1); the result is an "
+            f"extrapolation.",
+            NoiseInducedHearingLossWarning,
+            stacklevel=3,
+        )
+    if not VALIDATED_FRACTILES[0] <= fractile <= VALIDATED_FRACTILES[1]:
+        warnings.warn(
+            f"fractile {fractile:g} lies in the distribution tails "
+            f"(Q < 5 % or Q > 95 %) that ISO 1999:2013 calls unreliable and "
+            f"says should not be estimated (clause 6.3.2).",
+            NoiseInducedHearingLossWarning,
+            stacklevel=3,
+        )
+    if l_ex > VALIDATED_L_EX_MAX:
+        warnings.warn(
+            f"L_EX,8h = {l_ex:g} dB exceeds the 100 dB covered by "
+            f"ISO 1999:2013 (Annex D; Scope NOTE 4 restricts validity to the "
+            f"stated exposure levels), so the quadratic Formula (2) is used "
+            f"outside its supporting data; the result is an extrapolation.",
+            NoiseInducedHearingLossWarning,
+            stacklevel=3,
+        )
 
 
 @dataclass(frozen=True)
@@ -171,7 +234,8 @@ class HtlanResult:
     :ivar years: Exposure duration, in years.
     :ivar fractile: Population fractile (0-1) applied to both components.
     :ivar frequencies: Audiometric frequencies, in hertz.
-    :ivar htla: Age component ``H`` (HTLA, database A = ISO 7029).
+    :ivar htla: Age component ``H`` (HTLA, database A, evaluated from
+        ISO 7029:2017, the edition ISO 1999:2013 references undated in 6.2.2).
     :ivar nipts: Noise component ``N`` (NIPTS at ``fractile``).
     :ivar threshold: Combined HTLAN ``H' = H + N - H*N/120``.
     """
@@ -323,11 +387,18 @@ def nipts(
     :return: A :class:`NiptsResult` with the distribution and ``.plot()``.
     :raises ValueError: for a non-positive duration, a fractile outside (0, 1),
         or an unknown frequency.
+
+    Outside the standard's validated domain (durations of
+    :data:`VALIDATED_YEARS`, fractiles of :data:`VALIDATED_FRACTILES`,
+    exposure levels up to :data:`VALIDATED_L_EX_MAX`) the computation still
+    runs but a :class:`NoiseInducedHearingLossWarning` marks the result as an
+    extrapolation, and the ``.report()`` fiche prints the matching caveat.
     """
     if years <= 0.0:
         raise ValueError(f"years must be positive; got {years}.")
     if not 0.0 < fractile < 1.0:
         raise ValueError(f"fractile must be in (0, 1); got {fractile}.")
+    _warn_outside_domain(float(l_ex), float(years), float(fractile))
 
     from scipy.special import ndtri  # standard-normal quantile
 
@@ -347,6 +418,29 @@ def nipts(
     )
 
 
+def combine_age_and_noise(htla: ArrayLike, nipts_value: ArrayLike) -> np.ndarray:
+    """Combine the age and noise components by Formula (1) (clause 6.1).
+
+    ``H' = H + N - H*N/120``, the hearing threshold level associated with age
+    and noise. The formula "is applicable only to corresponding percentage
+    values of H', H and N", so both components must be taken at the same
+    population percentage.
+
+    Exposed separately from :func:`htlan` because clause 6.2 lets the user
+    supply their own HTLA database: 6.2.3 recommends a database B collected on
+    a control population of the country under consideration, and 6.2.4 makes
+    the choice between databases A and B depend on the question being answered.
+    Feeding such a database here combines it with the library's NIPTS.
+
+    :param htla: Age-associated hearing threshold level ``H``, in dB.
+    :param nipts_value: Noise-induced permanent threshold shift ``N``, in dB.
+    :return: The combined threshold ``H'``, in dB.
+    """
+    h = np.asarray(htla, dtype=np.float64)
+    n = np.asarray(nipts_value, dtype=np.float64)
+    return h + n - h * n / _HTLAN_DENOM
+
+
 def htlan(
     age: float,
     sex: Literal["male", "female"],
@@ -357,7 +451,8 @@ def htlan(
 ) -> HtlanResult:
     """Hearing threshold level associated with age and noise (clause 6.1).
 
-    Combines the age component ``H`` (HTLA from database A, i.e. ISO 7029, at
+    Combines the age component ``H`` (HTLA from database A, evaluated from
+    ISO 7029:2017 - the edition ISO 1999:2013 references undated in 6.2.2 - at
     the same population fractile) with the noise component ``N`` (the NIPTS at
     that fractile) by Formula (1): ``H' = H + N - H*N/120``. The formula applies
     to corresponding percentage values, so the same ``fractile`` drives both
@@ -374,11 +469,16 @@ def htlan(
         ``.plot()``.
     :raises ValueError: for an age below 18, an unknown sex, a non-positive
         duration, a fractile outside (0, 1), or an unknown frequency.
+
+    The noise component inherits the validated-domain checks of :func:`nipts`,
+    so exposure conditions outside the standard's stated ranges raise a
+    :class:`NoiseInducedHearingLossWarning` and the ``.report()`` fiche prints
+    the extrapolation caveat.
     """
     freqs = _select(NIPTS_FREQUENCIES, frequencies)
     htla = age_threshold(age, sex, fractile, frequencies=freqs).threshold
     noise = nipts(l_ex, years, fractile, frequencies=freqs).value
-    threshold = htla + noise - htla * noise / _HTLAN_DENOM
+    threshold = combine_age_and_noise(htla, noise)
 
     return HtlanResult(
         age=float(age),

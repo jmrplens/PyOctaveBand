@@ -94,6 +94,7 @@ _STRINGS: dict[str, str] = {
     "Unfavourable deviations": "Desviaciones desfavorables",
     "Time [s]": "Tiempo [s]",
     "Sample": "Muestra",
+    "10-90 % fractile band": "Banda de fractiles 10-90 %",
 }
 
 
@@ -249,18 +250,22 @@ def _fractile_band(
     *,
     color: str,
     floor: float | None = None,
+    language: str = "en",
 ) -> None:
     """Shade the 10-90 % fractile band around a median spectrum.
 
     The band spans ``median - z90*spread_lower`` to ``median +
     z90*spread_upper`` with the standard-normal :data:`_Z90` quantile;
-    ``floor`` clamps the lower edge (e.g. NIPTS cannot be negative).
+    ``floor`` clamps the lower edge (e.g. NIPTS cannot be negative). The legend
+    entry is drawn here, so it goes through this module's own :func:`_t` for
+    parity with the localised labels its callers set.
     """
     lower = median - _Z90 * spread_lower
     if floor is not None:
         lower = np.maximum(lower, floor)
     ax.fill_between(freqs, lower, median + _Z90 * spread_upper,
-                    color=color, alpha=0.5, label="10-90 % fractile band")
+                    color=color, alpha=0.5,
+                    label=_t("10-90 % fractile band", language))
 
 
 def _hatch_invalid(bars: BarContainer, mask: np.ndarray) -> None:

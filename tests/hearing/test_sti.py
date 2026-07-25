@@ -20,6 +20,13 @@ from itertools import pairwise
 
 import numpy as np
 import pytest
+from reference_data import (
+    IEC60268_16_ANNEX_M_AMBIENT,
+    IEC60268_16_ANNEX_M_LEVEL,
+    IEC60268_16_ANNEX_M_MTF,
+    IEC60268_16_ANNEX_M_MTI,
+    IEC60268_16_ANNEX_M_STI,
+)
 
 from phonometry import STIResult, sti_from_impulse_response, stipa, stipa_signal
 from phonometry.hearing.sti import (
@@ -423,3 +430,30 @@ def test_stipa_direct_method_modulation_depth_staircase(i: int) -> None:
     x = _c32_signal(m, FS, seconds=16.0)
     res = stipa(x, FS)
     assert res.sti == pytest.approx(_C32_STI_STAIRCASE[i], abs=0.05)
+
+
+def test_annex_m_full_sti_worked_example() -> None:
+    """Reproduce the IEC 60268-16 Annex M full-STI worked example.
+
+    The annex prints the adjusted MTF matrix before noise, masking and
+    threshold are applied, together with the operational speech and ambient
+    noise spectra; combining them must give back its printed MTI row (step 4c)
+    and STI. This is an independent oracle for the whole A.5.3 to A.5.6 chain:
+    auditory masking, the reception threshold, the SNR clamp, the per-band MTI
+    average and the alpha/beta band weighting.
+    """
+    mtf = np.asarray(IEC60268_16_ANNEX_M_MTF, dtype=float).T  # bands x mod freqs
+    assert mtf.shape == (_NUM_BANDS, _MOD_FREQS.size)
+    result = _sti_from_mtf(
+        mtf,
+        level=np.asarray(IEC60268_16_ANNEX_M_LEVEL, dtype=float),
+        ambient=np.asarray(IEC60268_16_ANNEX_M_AMBIENT, dtype=float),
+    )
+    # Exact at the annex's own two decimals: a tolerance of 0,01 on top of the
+    # rounding would accept the neighbouring cent (0,75 for a printed 0,76).
+    np.testing.assert_array_equal(
+        np.round(result.mti, 2),
+        np.asarray(IEC60268_16_ANNEX_M_MTI, dtype=float),
+    )
+    assert result.sti == pytest.approx(IEC60268_16_ANNEX_M_STI, abs=0.005)
+    assert round(result.sti, 2) == IEC60268_16_ANNEX_M_STI

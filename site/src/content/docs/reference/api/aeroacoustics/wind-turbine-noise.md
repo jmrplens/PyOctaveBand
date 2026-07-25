@@ -214,7 +214,7 @@ WindTurbineTonalityResult.report(
 Render a wind-turbine tonal audibility assessment fiche to a PDF.
 
 Writes a one-page tonality-assessment report following
-IEC 61400-11:2012+A1:2018 (subclauses 9.5.2-9.5.5): the standard-basis
+IEC 61400-11:2012+A1:2018 (subclauses 9.5.2 to 9.5.8): the standard-basis
 line, an optional metadata header (source/situation, client, measurement
 position, instrumentation and date), a two-panel body with the
 critical-band / masking analysis in a metrics table (tone frequency,

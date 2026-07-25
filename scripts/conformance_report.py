@@ -1011,6 +1011,36 @@ def _chk_sti_uniform() -> Outcome:
     return numeric(0.5, computed, 0.01, places=4)
 
 
+@register(
+    "Speech transmission (IEC 60268-16)",
+    "IEC 60268-16 Annex M",
+    "Full-STI worked example: printed MTF + speech/noise spectra -> STI",
+)
+def _chk_sti_annex_m() -> Outcome:
+    """End-to-end A.5.3-A.5.6 chain on the annex's own worked example."""
+    mtf = np.asarray(ref.IEC60268_16_ANNEX_M_MTF, dtype=float).T
+    result = _sti_from_mtf(
+        mtf,
+        level=np.asarray(ref.IEC60268_16_ANNEX_M_LEVEL, dtype=float),
+        ambient=np.asarray(ref.IEC60268_16_ANNEX_M_AMBIENT, dtype=float),
+    )
+    mti_delta = float(
+        np.max(
+            np.abs(
+                np.round(result.mti, 2)
+                - np.asarray(ref.IEC60268_16_ANNEX_M_MTI, dtype=float)
+            )
+        )
+    )
+    outcome = numeric(ref.IEC60268_16_ANNEX_M_STI, float(result.sti), 0.005, places=3)
+    return Outcome(
+        expected=f"STI {ref.IEC60268_16_ANNEX_M_STI} (MTI row of step 4c)",
+        computed=f"STI {result.sti:.3f} (max MTI dev {mti_delta:.2f})",
+        delta=outcome.delta,
+        passed=outcome.passed and mti_delta <= 0.01,
+    )
+
+
 # Ed.5 STIPA verification-signal parameters (restating the standard, not
 # the implementation): Table B.1 modulation pairs, A.6.1 male spectrum.
 _STI_CENTERS = [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]
@@ -3772,6 +3802,66 @@ def _chk_nihl_fractile() -> Outcome:
 def _chk_nihl_high() -> Outcome:
     value = float(ph.nipts(100.0, 40.0, 0.9).value[3])
     return numeric(ref.ISO1999_N10_3K_100_40, value, 0.5, unit="dB", places=1)
+
+
+@register(
+    _NIHL,
+    "ISO 1999:2013 Annex C, Formulae (C.6) to (C.8)",
+    "NIPTS at 1/2/4 kHz, 90 dB, 30 yr, Q = 10 % (annex inputs)",
+)
+def _chk_nihl_annex_c_nipts() -> Outcome:
+    """The Table D.2 shifts the Annex C example takes as its noise input."""
+    value = np.round(
+        ph.nipts(90.0, 30.0, 0.9, frequencies=[1000.0, 2000.0, 4000.0]).value
+    )
+    expected = np.asarray(ref.ISO1999_ANNEX_C_N, dtype=float)
+    delta = float(np.max(np.abs(value - expected)))
+    return Outcome(
+        expected=", ".join(f"{v:.0f}" for v in expected) + " dB",
+        computed=", ".join(f"{v:.0f}" for v in value) + " dB",
+        delta=f"{delta:.0f} dB",
+        passed=delta <= 0.0,
+    )
+
+
+@register(
+    _NIHL,
+    "ISO 1999:2013 Annex C, Formula (C.5)",
+    "Compressed 4 kHz shift, Formula (1) with the annex's H = 36 dB",
+)
+def _chk_nihl_annex_c_compression() -> Outcome:
+    """The annex reduces the 19 dB shift at 4 kHz by the H*N/120 term."""
+    h = ref.ISO1999_ANNEX_C_H[2]
+    n = ref.ISO1999_ANNEX_C_N[2]
+    # H' - H is what Formula (1) leaves of the noise component at that band.
+    value = float(ph.combine_age_and_noise(h, n)) - h
+    return numeric(
+        ref.ISO1999_ANNEX_C_N_4K_COMPRESSED, value, 0.05, unit="dB", places=1
+    )
+
+
+@register(
+    _NIHL,
+    "ISO 1999:2013 Annex C, Formula (C.11)",
+    "Hearing threshold level with age and noise, 1/2/4 kHz mean, Q = 10 %",
+)
+def _chk_nihl_annex_c_htlan() -> Outcome:
+    """The end of the annex chain: the mean H plus the mean compressed shift.
+
+    The age component is the annex's own Table A.3 selection rather than the
+    library's ISO 7029:2017 evaluation, so this exercises the Formula (1)
+    combination on the standard's stated inputs (see the source note the
+    ISO 1999 fiche prints). The annex applies the compression term only where
+    it matters, taking the shift straight from Table D.2 "when (H + N) < 40 dB"
+    (its Formula (C.4) approximation); here that leaves only the 4 kHz band
+    compressed.
+    """
+    h = np.asarray(ref.ISO1999_ANNEX_C_H, dtype=float)
+    n = np.asarray(ref.ISO1999_ANNEX_C_N, dtype=float)
+    compressed = ph.combine_age_and_noise(h, n) - h
+    noise = np.where(h + n > ref.ISO1999_ANNEX_C_COMPRESSION_FENCE, compressed, n)
+    value = float(np.mean(h) + np.mean(noise))
+    return numeric(ref.ISO1999_ANNEX_C_HTLAN, value, 0.05, unit="dB", places=1)
 
 
 _MSV = "Multiple-shock whole-body vibration (ISO 2631-5)"

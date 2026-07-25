@@ -150,13 +150,13 @@ def _basis_line(measurement_standard: str | None, language: str = "en") -> str:
     if measurement_standard:
         return t(
             "{standard} tonal audibility of a wind turbine per "
-            "IEC 61400-11:2012+A1:2018 (subclauses 9.5.2-9.5.5); a tone is "
+            "IEC 61400-11:2012+A1:2018 (subclauses 9.5.2 to 9.5.8); a tone is "
             "audible when the tonal audibility &#916;L<sub>a</sub> exceeds 0 dB.",
             language,
         ).format(standard=html.escape(measurement_standard))
     return t(
         "Tonal audibility of a wind turbine per IEC 61400-11:2012+A1:2018 "
-        "(subclauses 9.5.2-9.5.5); a tone is audible when the tonal audibility "
+        "(subclauses 9.5.2 to 9.5.8); a tone is audible when the tonal audibility "
         "&#916;L<sub>a</sub> exceeds 0 dB.",
         language,
     )

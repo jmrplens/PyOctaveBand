@@ -101,20 +101,62 @@ def _a_weighted_total(
 
 
 def _basis(result: Any, language: str = "en") -> str:
-    """The method-basis line naming the reported quantity and the Bies chapter."""
+    """The prediction-basis line naming the quantity and the Bies chapter."""
     if _is_power(result):
         return t(
-            "Determination of the flow-generated (regenerated) octave-band sound "
-            "power level of a duct element (Bies, Hansen &amp; Howard, "
-            "Engineering Noise Control 5th ed., Chapter 8, section 8.15; "
-            "VDI 2081-1).",
+            "Predicted flow-generated (regenerated) octave-band sound power "
+            "level of a duct element (Bies, Hansen &amp; Howard, Engineering "
+            "Noise Control 5th ed., Chapter 8, section 8.15; VDI 2081-1). This "
+            "is a prediction from design data, not a measurement.",
             language,
         )
     return t(
-        "Determination of the octave-band attenuation of a duct element (Bies, "
-        "Hansen &amp; Howard, Engineering Noise Control 5th ed., Chapter 8).",
+        "Predicted octave-band attenuation of a duct element (Bies, Hansen "
+        "&amp; Howard, Engineering Noise Control 5th ed., Chapter 8). This is "
+        "a prediction from design data, not a measurement.",
         language,
     )
+
+
+def _prediction_statement(result: Any, language: str = "en") -> str:
+    """The prediction statement printed under the boxed figure."""
+    if _is_power(result):
+        return t(
+            "Predicted (estimated) result computed from the declared duct "
+            "geometry and flow conditions by an empirical spectrum model; it "
+            "is not a measurement. The realised level also depends on the "
+            "upstream flow condition and on fittings near the element.",
+            language,
+        )
+    return t(
+        "Predicted (estimated) result computed from the declared element "
+        "geometry by a design model; it is not a measurement. Path "
+        "attenuations of a real installation also depend on the duct "
+        "construction and on breakout along the run.",
+        language,
+    )
+
+
+def _element_label(result: Any, language: str = "en") -> str:
+    """The element label, with its descriptive words translated.
+
+    The result carries a short English label built from the element kind and
+    its configuration and dimensions, e.g. ``"Elbow (square, lined, W = 300
+    mm)"``. The kind and each configuration word are translated; a
+    comma-separated item holding a quantity (``W = 300 mm``) is a symbol,
+    number and unit, so it is left exactly as the domain wrote it.
+    """
+    label = str(getattr(result, "label", ""))
+    if not label or language == "en":
+        return label
+    head, sep, tail = label.partition(" (")
+    if not sep:
+        return t(head, language)
+    parts = [
+        item if "=" in item else t(item, language)
+        for item in tail.rstrip(")").split(", ")
+    ]
+    return f"{t(head, language)} ({', '.join(parts)})"
 
 
 def _caption(result: Any, language: str = "en") -> str:
@@ -192,7 +234,7 @@ def _statement(
     boxes the mean attenuation (more is better) with its band range.
     """
     values = np.asarray(result.values, dtype=np.float64)
-    label = str(getattr(result, "label", ""))
+    label = _element_label(result, language)
     if _is_power(result):
         overall = _overall_level(values)
         lwa = _a_weighted_total(values, corrections)
@@ -323,5 +365,6 @@ def render_hvac_report(
         basis_strips=_basis_strip(result, corrections, language),
         metadata=metadata,
         language=language,
+        prediction_statement=_prediction_statement(result, language),
         verdict=verdict,
     )

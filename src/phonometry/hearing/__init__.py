@@ -3,7 +3,14 @@
 
 from __future__ import annotations
 
-from .noise_induced_hearing_loss import HtlanResult, NiptsResult, htlan, nipts
+from .noise_induced_hearing_loss import (
+    HtlanResult,
+    NiptsResult,
+    NoiseInducedHearingLossWarning,
+    combine_age_and_noise,
+    htlan,
+    nipts,
+)
 from .objective_intelligibility import STOIResult, stoi
 from .occupational_exposure import (
     COVERAGE_FACTOR,
@@ -45,6 +52,7 @@ __all__ = [
     "ExposureResult",
     "HtlanResult",
     "NiptsResult",
+    "NoiseInducedHearingLossWarning",
     "OccupationalExposureWarning",
     "SIIResult",
     "STIResult",
@@ -54,6 +62,7 @@ __all__ = [
     "Task",
     "TaskContribution",
     "age_threshold",
+    "combine_age_and_noise",
     "full_day_exposure",
     "htlan",
     "job_based_exposure",

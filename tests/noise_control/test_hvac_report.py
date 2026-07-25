@@ -106,6 +106,12 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     assert "63" in text and "4000" in text
     assert "Octave-band regenerated sound power levels" in text
     assert "VDI 2081-1" in text
+    # The fiche reports a model prediction, not an in-duct measurement.
+    assert "Predicted flow-generated" in text
+    assert "not a measurement" in text
+    assert "Predicted (estimated) result" in text
+    assert "tested specimen" not in text
+    assert "prediction computed from the stated inputs" in text
 
 
 def test_verbose_adds_a_weighting_columns(tmp_path) -> None:
@@ -175,6 +181,55 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     assert "Espectro de ruido de conducto de climatización" in text
     assert "Nivel de potencia acústica ponderado A" in text
     assert f"{_oracle_lwa():.1f}".replace(".", ",") in text
+    assert "Se trata de una predicción" in text
+    assert "no son una medición de una probeta" in text
+
+
+def test_spanish_report_translates_the_element_label(tmp_path) -> None:
+    """The element label's descriptive words are translated, its numbers kept."""
+    pytest.importorskip("reportlab")
+    pytest.importorskip("svglib")
+    pytest.importorskip("matplotlib")
+    bands = np.array([63, 125, 250, 500, 1000, 2000], dtype=float)
+    res = hvac.elbow_insertion_loss(bands, 0.3, bend_type="square", lined=True)
+    out = tmp_path / "label_es.pdf"
+    res.report(str(out), language="es")
+    text = _extract_text(str(out))
+    assert "Codo (rectangular, con absorbente, W = 300 mm)" in text
+    assert "Elbow" not in text
+
+
+@pytest.mark.parametrize(
+    ("value", "printed"),
+    [(0.25, "0.3"), (0.35, "0.4"), (-0.25, "-0.3")],
+)
+def test_verdict_prints_the_value_its_verdict_used(value: float, printed: str) -> None:
+    """A half-way value prints the display rounding the verdict was decided on.
+
+    Python's own formatting rounds halves to even (0.25 -> "0.2"), which would
+    contradict a verdict decided on the half-away-from-zero display rounding
+    the fiches use throughout.
+    """
+    from phonometry._report._noise_control_fiche import performance_verdict
+
+    text, _ = performance_verdict(
+        value, value, "D", higher_is_better=True, language="en"
+    )
+    assert f"D = {printed} dB" in text
+    assert f"&#8805; {printed} dB" in text
+
+
+def test_verdict_boundary_passes_on_the_displayed_value() -> None:
+    """A value that displays as its requirement passes, in both directions."""
+    from phonometry._report._noise_control_fiche import performance_verdict
+
+    _, higher = performance_verdict(
+        0.25, 0.3, "D", higher_is_better=True, language="en"
+    )
+    _, lower = performance_verdict(
+        0.25, 0.3, "L", higher_is_better=False, language="en"
+    )
+    assert higher and lower
 
 
 def test_unknown_engine_rejected(tmp_path) -> None:
