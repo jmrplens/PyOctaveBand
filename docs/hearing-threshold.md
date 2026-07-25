@@ -72,7 +72,7 @@ it is, not what it should be.
 `AgeThresholdResult.plot()` draws that fan directly: the median, the requested
 fractile and the 10 % to 90 % band between them, on an audiogram axis.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/age_threshold_fractiles_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/age_threshold_fractiles.svg" alt="ISO 7029 hearing-threshold deviation of a 70-year-old man on an inverted audiogram axis from 125 Hz to 8000 Hz: the median rises from about 3 dB at 125 Hz to about 45 dB at 8000 Hz, the requested 90 % fractile runs well below it, and the shaded 10 to 90 percent band widens toward the high frequencies" width="88%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/age_threshold_fractiles_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/age_threshold_fractiles.svg" alt="ISO 7029 hearing-threshold deviation of a 70-year-old man on an inverted audiogram axis from 125 Hz to 8000 Hz: the median deepens from about 10 dB at 125 Hz to 50 dB at 8000 Hz, the requested 90 % fractile from about 22 dB to 74 dB, and the shaded 10 to 90 percent band between them widens steadily toward the high frequencies" width="88%"></picture>
 
 <details>
 <summary>Show the code for this figure</summary>
