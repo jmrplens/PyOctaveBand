@@ -1295,6 +1295,29 @@ _ES_EXACT = {
     r"mass line $1/(\omega m)$": r"línea de masa $1/(\omega m)$",
     "peak $|Y| = 1/c$ (damping)": "pico $|Y| = 1/c$ (amortiguamiento)",
     "Mobility $|Y|$ [m/(N·s)]": "Movilidad $|Y|$ [m/(N·s)]",
+    # Atmospheric refraction (effective profiles, ray fan, GFPE range cut) and
+    # wave-theoretic barrier insertion loss (WP environment figures).
+    "Effective Sound-Speed Profiles (Salomons Eq. 4.5)":
+        "Perfiles de velocidad efectiva del sonido (Salomons ec. 4.5)",
+    "Downward refraction (b = +1 m/s)": "Refracción hacia abajo (b = +1 m/s)",
+    "Upward refraction (b = -1 m/s)": "Refracción hacia arriba (b = -1 m/s)",
+    "Sound Rays under Downward Refraction (b = +1 m/s)":
+        "Rayos sonoros con refracción hacia abajo (b = +1 m/s)",
+    "shallow rays are bent back to the ground\nand bounce on down-range":
+        "los rayos rasantes se curvan de vuelta al suelo\ny rebotan a lo largo de la distancia",
+    "GFPE Relative Level at the Receiver Height (400 Hz, 2 m)":
+        "Nivel relativo GFPE a la altura del receptor (400 Hz, 2 m)",
+    "Downward (b = +1 m/s)": "Hacia abajo (b = +1 m/s)",
+    "Homogeneous (b = 0)": "Homogénea (b = 0)",
+    "Upward (b = -1 m/s)": "Hacia arriba (b = -1 m/s)",
+    "Wave-Theoretic Barrier Insertion Loss":
+        "Pérdida por inserción de barrera (teoría ondulatoria)",
+    "Kurze-Anderson (thin screen)": "Kurze-Anderson (pantalla delgada)",
+    "Exact rigid half-plane": "Semiplano rígido exacto",
+    "Exact + coherent ground (four paths)":
+        "Exacto + suelo coherente (cuatro caminos)",
+    "Grazing limit (5 dB)": "Límite rasante (5 dB)",
+    "Insertion loss [dB]": "Pérdida por inserción [dB]",
 }
 
 _ES_PATTERNS = [
@@ -10150,6 +10173,159 @@ def generate_sti_band_mti(output_dir: str) -> None:
     res.plot(ax=ax, language=_LANG)
     plt.tight_layout()
     save_figure(output_dir, "sti_band_mti.svg")
+def generate_atmospheric_sound_speed_profiles(output_dir: str) -> None:
+    """Log-linear effective sound-speed profiles: downward vs upward refraction."""
+    print("Generating atmospheric_sound_speed_profiles...")
+    from phonometry import log_linear_sound_speed_profile
+
+    down = log_linear_sound_speed_profile(+1.0, ground_speed=340.0, max_height=60.0)
+    up = log_linear_sound_speed_profile(-1.0, ground_speed=340.0, max_height=60.0)
+    _fig, ax = plt.subplots(figsize=(7.0, 7.5))
+    ax.plot(down.sound_speeds, down.heights, color=COLOR_PRIMARY, linewidth=2.0,
+            label="Downward refraction (b = +1 m/s)", zorder=3)
+    ax.plot(up.sound_speeds, up.heights, color=COLOR_SECONDARY, linewidth=2.0,
+            label="Upward refraction (b = -1 m/s)", zorder=3)
+    ax.axvline(340.0, color=COLOR_FG, linestyle=":", linewidth=0.9, alpha=0.6)
+    ax.set_xlabel("Effective sound speed [m/s]")
+    ax.set_ylabel("Height [m]")
+    ax.set_ylim(0.0, 60.0)
+    ax.set_title("Effective Sound-Speed Profiles (Salomons Eq. 4.5)",
+                 fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper center", fontsize=9)
+    plt.tight_layout()
+    save_figure(output_dir, "atmospheric_sound_speed_profiles.svg")
+    plt.close()
+
+
+def generate_atmospheric_ray_fan(output_dir: str) -> None:
+    """Downward-refraction ray fan: every ray returns to the ground and bounces."""
+    print("Generating atmospheric_ray_fan...")
+    from phonometry import atmospheric_ray_paths, log_linear_sound_speed_profile
+
+    profile = log_linear_sound_speed_profile(+1.0, ground_speed=340.0,
+                                             max_height=60.0)
+    zs = 2.0
+    rays = atmospheric_ray_paths(profile, source_height=zs,
+                                 launch_angles_deg=np.linspace(-8.0, 8.0, 17),
+                                 max_range=600.0, n_steps=600)
+    _fig, ax = plt.subplots(figsize=(11.0, 5.6))
+    for i in range(rays.heights.shape[0]):
+        ax.plot(rays.ranges[i], rays.heights[i], color=COLOR_PRIMARY, lw=0.8,
+                alpha=0.7, zorder=2)
+    ax.plot([0.0], [zs], "o", color=COLOR_SECONDARY, ms=7, zorder=4,
+            label="Source")
+    ax.axhline(0.0, color=COLOR_FG, lw=1.0, alpha=0.7)
+    ax.set_xlabel("Range [m]")
+    ax.set_ylabel("Height [m]")
+    ax.set_xlim(0.0, 600.0)
+    ax.set_ylim(0.0, 40.0)
+    ax.set_title("Sound Rays under Downward Refraction (b = +1 m/s)",
+                 fontweight="bold", pad=12)
+    ax.text(0.985, 0.94, "shallow rays are bent back to the ground\nand bounce on down-range",
+            transform=ax.transAxes, va="top", ha="right", fontsize=9,
+            color=COLOR_FG)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", fontsize=9)
+    plt.tight_layout()
+    save_figure(output_dir, "atmospheric_ray_fan.svg")
+    plt.close()
+
+
+def generate_atmospheric_pe_range(output_dir: str) -> None:
+    """GFPE relative level vs range at 2 m for three refraction conditions."""
+    print("Generating atmospheric_pe_range...")
+    import warnings as _warnings
+
+    from phonometry import (
+        atmospheric_parabolic_equation,
+        linear_sound_speed_profile,
+        log_linear_sound_speed_profile,
+        shadow_zone_distance,
+    )
+
+    c0, zs, zr = 340.0, 2.0, 2.0
+    cases = [
+        (log_linear_sound_speed_profile(+1.0, ground_speed=c0, max_height=60.0),
+         COLOR_PRIMARY, "-", "Downward (b = +1 m/s)"),
+        (linear_sound_speed_profile(0.0, ground_speed=c0, max_height=60.0),
+         COLOR_FG, "--", "Homogeneous (b = 0)"),
+        (log_linear_sound_speed_profile(-1.0, ground_speed=c0, max_height=60.0),
+         COLOR_SECONDARY, "-", "Upward (b = -1 m/s)"),
+    ]
+    _fig, ax = plt.subplots(figsize=(11.0, 6.2))
+    with _warnings.catch_warnings():
+        _warnings.simplefilter("ignore")
+        for profile, color, ls, label in cases:
+            pe = atmospheric_parabolic_equation(400.0, profile, source_height=zs,
+                                                flow_resistivity=200e3,
+                                                max_range=600.0, max_height=40.0)
+            ax.plot(pe.ranges, pe.level_at_height(zr), color=color, ls=ls,
+                    lw=1.6, label=label, zorder=3)
+    # The closed-form shadow boundary of the equivalent linear upward gradient
+    # (the 10 m mean gradient of the log profile), as in the page-top figure.
+    up_prof = cases[2][0]
+    grad = (up_prof.speed_at(10.0) - c0) / 10.0
+    x_sh = shadow_zone_distance(float(grad), zs, zr, ground_speed=c0)
+    ax.axvline(x_sh, color=COLOR_SECONDARY, ls=":", lw=1.2, zorder=2,
+               label="Shadow-zone boundary")
+    ax.axhline(0.0, color=COLOR_FG, lw=0.8, alpha=0.6)
+    ax.set_xlabel("Range [m]")
+    ax.set_ylabel("Level re free field [dB]")
+    ax.set_xlim(0.0, 600.0)
+    ax.set_ylim(-40.0, 10.0)
+    ax.set_title("GFPE Relative Level at the Receiver Height (400 Hz, 2 m)",
+                 fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower left", fontsize=9)
+    plt.tight_layout()
+    save_figure(output_dir, "atmospheric_pe_range.svg")
+    plt.close()
+
+
+def generate_barrier_insertion_loss_methods(output_dir: str) -> None:
+    """Wave-theoretic barrier insertion loss: Kurze-Anderson, exact, exact + ground."""
+    print("Generating barrier_insertion_loss_methods...")
+    import warnings as _warnings
+
+    from phonometry import barrier_insertion_loss
+
+    # A 4 m barrier 50 m from a 1 m source, receiver 1.5 m high at 100 m
+    # (the geometry of the ground-barriers guide snippets).
+    freqs = np.geomspace(50.0, 5000.0, 240)
+    with _warnings.catch_warnings():
+        _warnings.simplefilter("ignore")
+        il_ka = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
+                                       method="kurze_anderson")
+        il_ex = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
+                                       method="exact")
+        il_gr = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
+                                       method="exact",
+                                       ground_flow_resistivity=2e5)
+    _fig, ax = plt.subplots(figsize=(11.0, 6.4))
+    ax.plot(freqs, il_ka.insertion_loss, color=COLOR_TERTIARY, lw=1.8,
+            ls="--", label="Kurze-Anderson (thin screen)", zorder=3)
+    ax.plot(freqs, il_ex.insertion_loss, color=COLOR_PRIMARY, lw=1.8,
+            label="Exact rigid half-plane", zorder=3)
+    ax.plot(freqs, il_gr.insertion_loss, color=COLOR_SECONDARY, lw=1.4,
+            alpha=0.9, label="Exact + coherent ground (four paths)", zorder=2)
+    ax.axhline(5.0, color=COLOR_FG, ls=":", lw=1.0, alpha=0.7,
+               label="Grazing limit (5 dB)")
+    ax.set_xscale("log")
+    ax.set_xlabel("Frequency [Hz]")
+    ax.set_ylabel("Insertion loss [dB]")
+    ax.set_xlim(50.0, 5000.0)
+    format_frequency_axis(ax, 50.0, 5000.0)
+    ax.set_title("Wave-Theoretic Barrier Insertion Loss",
+                 fontweight="bold", pad=12)
+    ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", fontsize=9)
+    plt.tight_layout()
+    save_figure(output_dir, "barrier_insertion_loss_methods.svg")
     plt.close()
 
 
@@ -10426,6 +10602,12 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_nipts_audiogram,
     generate_stoi_band_scores,
     generate_sti_band_mti,
+    # Atmospheric refraction (profiles, ray fan, GFPE range cut) and
+    # wave-theoretic barrier insertion loss.
+    generate_atmospheric_sound_speed_profiles,
+    generate_atmospheric_ray_fan,
+    generate_atmospheric_pe_range,
+    generate_barrier_insertion_loss_methods,
 )
 
 
