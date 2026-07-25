@@ -76,10 +76,13 @@ Piersol con la coherencia ordinaria `γ²`. Toda magnitud tiene un oráculo
 analítico exacto (señales sintéticas con amplitudes armónicas y de
 intermodulación conocidas, un oráculo de Fourier de seno recortado, una
 síntesis completa de la señal de ensayo DIM y un camino LTI conocido), así que
-los valores son verificables y no ajustados. Una
-sección final cubre las convenciones de sensibilidad de IEC 60268-4
-(micrófonos) e IEC 60268-5 (altavoces), donde fallan la mayoría de las
-comparaciones entre hojas de datos.
+los valores son verificables y no ajustados. Las secciones finales cubren las
+convenciones de sensibilidad de IEC 60268-4 (micrófonos) e IEC 60268-5
+(altavoces), donde fallan la mayoría de las comparaciones entre hojas de
+datos, el modelo de radiación del pistón con pantalla que hay detrás de la
+directividad de los altavoces, y los informes de características nominales de
+altavoz (IEC 60268-5) y micrófono (IEC 60268-4) que componen las hojas de
+datos de las normas a partir de una respuesta medida.
 
 ## 1. Distorsión armónica (IEC 60268-3 14.12.2–5)
 
@@ -259,10 +262,40 @@ from phonometry import electroacoustics
 
 md = electroacoustics.modulation_distortion(signal, fs, 60.0, 7000.0)
 print(md.d2, md.d3, md.smpte)                                       # 14.12.7
+md.plot()   # portadora y bandas laterales de modulación, d2/d3 anotadas (necesita matplotlib)
 dfd2 = electroacoustics.difference_frequency_distortion(signal, fs, 13e3, 14e3, order=2)
 tdfd = electroacoustics.total_difference_frequency_distortion(signal, fs)         # 8/11,95 kHz
 dim = electroacoustics.dynamic_intermodulation_distortion(signal, fs)             # DIM (15k/3,15k)
 ```
+
+El `ModulationDistortionResult` se puede dibujar: `.plot()` traza la amplitud
+de salida en la portadora `f₂` (la referencia de 0 dB) y las cuatro bandas
+laterales de modulación en `f₂ ± f₁` y `f₂ ± 2f₁`, la contraparte de
+modulación del espectro armónico de la sección 1. La relación asimétrica entre
+los pares `n = 2` y `n = 3` lee de un vistazo el equilibrio entre los términos
+cuadrático y cúbico de la no linealidad:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/modulation_distortion_es.svg" alt="Espectro de distorsión de modulación de un ensayo de dos tonos de 60 Hz más 7 kHz a través de un amplificador débilmente no lineal: la portadora a 7 kHz como referencia de 0 dB y las cuatro bandas laterales de intermodulación a 7 kHz más menos 60 y 120 Hz marcadas con su orden, anotado con los valores por orden d2 y d3 de IEC 60268-3 y el RMS combinado SMPTE" width="82%" />
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import electroacoustics
+
+fs = 48000
+t = np.arange(fs) / fs                        # 1 s -> los tonos caen en bins de la FFT
+x = np.sin(2 * np.pi * 60.0 * t) + 0.25 * np.sin(2 * np.pi * 7000.0 * t)
+signal = x + 0.04 * x**2 + 0.012 * x**3       # salida de un dispositivo débilmente no lineal
+
+md = electroacoustics.modulation_distortion(signal, fs, 60.0, 7000.0)
+md.plot(language="es")
+plt.show()
+```
+
+</details>
 
 ## 4. Respuesta en frecuencia y coherencia (Bendat y Piersol)
 
@@ -394,6 +427,30 @@ print(round(res.radiation_mass, 4))            # 8 rho a^3 / 3, kg
 print(round(float(res.directivity_index[0]), 2))  # 3.01 dB, límite de semiespacio
 res.plot()                                      # R1 y X1 vs ka
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_radiation_impedance_es.svg" alt="Resistencia de radiación normalizada R1 y reactancia X1 de un pistón circular con pantalla de 75 mm frente a ka en eje logarítmico: R1 sube desde ka al cuadrado entre dos hasta la unidad con rizados decrecientes, mientras la X1 de tipo masa alcanza su máximo cerca de ka de 1,4 y decae, con el límite de alta frecuencia R1 igual a 1 marcado" width="82%" />
+
+*El `.plot()` del resultado es la figura clásica de impedancia de Beranek y
+Mellow calculada para este pistón: por debajo de `ka ≈ 1` la carga es casi
+puramente de tipo masa (`X₁` domina y `R₁ ∝ (ka)²`, el régimen en el que la
+salida de un altavoz está limitada por rigidez y masa), y por encima la
+resistencia se asienta en `ρcS` con rizados de interferencia mientras la
+reactancia se desvanece.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import radiating_piston
+
+res = radiating_piston(radius=0.075, frequencies=np.geomspace(20, 20000, 400))
+res.plot(language="es")   # R1 y X1 normalizadas frente a ka
+plt.show()
+```
+
+</details>
 
 `radiating_piston` devuelve un `RadiatingPistonResult` con la `resistance` y
 `reactance` normalizadas, la `radiation_resistance`/`radiation_reactance`
