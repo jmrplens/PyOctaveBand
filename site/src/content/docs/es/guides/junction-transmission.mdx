@@ -158,9 +158,91 @@ res = junction_transmission("X", 0.1, 3200.0, 240.0, 0.1, 3200.0, 240.0)
 kij = wave_vibration_reduction_index(res.corner_average,
                                      res.critical_frequency2)  # 7.33 dB
 kij = res.corner_reduction_index  # lo mismo, precalculado en el resultado
+
+res.plot()   # tau(theta) de los caminos de esquina y recto de esta unión (requiere matplotlib)
 ```
+
+El descriptor de unión es una magnitud de *diseño*: barrer el espesor de la
+placa receptora muestra cuánto aporta un cambio de masa en la unión. Los
+caminos de esquina se endurecen deprisa con una placa receptora más pesada,
+mientras que el camino recto (en línea) de la unión en X es el que más sube,
+porque las placas perpendiculares fijan cada vez más la línea de unión:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/junction_kij_thickness_es.svg" alt="Índice de reducción de vibraciones Kij del enfoque ondulatorio frente a la relación de espesores de dos placas de hormigón para los caminos de esquina y recto de la unión en X, la esquina de la unión en T y la esquina de la unión en L, con el valor de la unión en X de placas idénticas de unos 7,3 dB marcado" width="82%" />
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import junction_transmission, wave_vibration_reduction_index
+
+# Placas de hormigón (cL = 3200 m/s, rho = 2400 kg/m3): placa 1 fija en
+# 100 mm, placa 2 en barrido de 50 mm a 400 mm.
+h1, cl, rho = 0.1, 3200.0, 2400.0
+ratios = np.linspace(0.5, 4.0, 36)
+kij_corner = []
+for ratio in ratios:
+    h2 = h1 * float(ratio)
+    res = junction_transmission("X", h1, cl, rho * h1, h2, cl, rho * h2)
+    kij_corner.append(res.corner_reduction_index)
+
+fig, ax = plt.subplots()
+ax.plot(ratios, kij_corner, label="X esquina")
+ax.set_xlabel("Relación de espesores h2/h1")
+ax.set_ylabel("Índice de reducción de vibraciones Kij [dB]")
+ax.set_title("Kij de unión por el enfoque ondulatorio (Hopkins Ec. 5.116)")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+## 5. Ejemplo resuelto: llevar Kij a la EN 12354
+
+El número que predice esta página es exactamente el que consume el modelo de
+flancos de EN 12354-1. Toma la unión en X de hormigón de 100 mm / 200 mm de
+la figura inicial: su camino de esquina da `K12 = 9,8` dB. Entregarlo a
+`flanking_element` en lugar de un valor tabulado del Anexo E valora los tres
+caminos de flancos de la unión y su efecto sobre el índice aparente:
+
+```python
+from phonometry import building, junction_transmission
+
+# La unión en X de hormigón de 100 mm / 200 mm de la figura inicial:
+res = junction_transmission("X", 0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
+k12 = res.corner_reduction_index                     # 9.8 dB (camino de esquina)
+
+# Llévalo al modelo simplificado de EN 12354-1 como Kij de esta unión:
+ff, df, fd = building.flanking_element(
+    label="suelo", r_flanking=49.0, r_separating=57.0,
+    k_ff=k12, k_fd=k12, k_df=k12, separating_area=11.5, coupling_length=4.5)
+pred = building.predicted_airborne_insulation(r_direct=57.0,
+                                              flanking_paths=[ff, df, fd])
+print(round(pred.r_prime_w, 1))                      # 55.4  (Rw 57 directo)
+print(pred.dominant.label, round(pred.dominant.fraction, 2))   # Dd 0.68
+```
+
+Una sola unión con un `Kij` moderado ya recorta 1,6 dB al $R_w = 57$ dB
+directo; un edificio completo repite esto para cada unión, que es la
+[guía de predicción EN 12354](/phonometry/es/guides/insulation-prediction/).
 
 La contraparte medida de la EN 12354 de `Kij` (a partir de la diferencia de
 niveles de velocidad promediada en dirección) es el `vibration_reduction_index`
 separado de la transmisión por flancos; esta página es el valor *predicho* en
 forma cerrada del enfoque ondulatorio.
+
+## Véase también
+
+- [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/):
+  el modelo de flancos que consume `Kij` unión a unión.
+- [Medición del aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/):
+  la medición ISO 10848 de `Kij` a partir de diferencias de niveles de
+  velocidad, la contraparte empírica de las formas cerradas de esta página.
+- [Potencia de ruido estructural de equipos (EN 15657)](/phonometry/es/guides/structure-borne-power/):
+  la potencia de la fuente que estas transmisiones de unión reparten por el
+  edificio.
+- [Movilidad mecánica y la familia de FRF (ISO 7626-1)](/phonometry/es/guides/mechanical-mobility/):
+  las movilidades de placa tras los parámetros de onda.
+- Referencia de la API: [`vibration.junction_transmission`](/phonometry/es/reference/api/vibration/junction-transmission/).
