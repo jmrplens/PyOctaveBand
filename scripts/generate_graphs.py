@@ -10200,7 +10200,8 @@ def generate_all(img_dir: str) -> None:
 # outside the figure pipeline. Kept out of generate_all()/`make graphs` so
 # ordinary figure regeneration stays fast; produced by `make animations` (or `make posters` to re-extract the
 # stills from the committed WebMs without re-rendering).
-# =============================================================_ANIM_FPS = 20
+# ====================================================================
+_ANIM_FPS = 20
 _ANIM_SECONDS = 12
 _ANIM_FRAMES = _ANIM_FPS * _ANIM_SECONDS
 # Closing hold appended to each schematic timeline: the settled verdict frame
@@ -13262,7 +13263,8 @@ def generate_animations(output_dir: str,
 # tasks are distributed over a process pool. Language and theme are applied
 # inside the worker before each figure runs, exactly as the sequential loop
 # did, so the output bytes are identical either way.
-# =============================================================_VARIANTS: tuple[tuple[str, bool], ...] = (
+# ====================================================================
+_VARIANTS: tuple[tuple[str, bool], ...] = (
     ("en", False),
     ("en", True),
     ("es", False),
