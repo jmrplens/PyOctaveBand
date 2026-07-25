@@ -128,7 +128,57 @@ x = noise_signal(44100, 5.0, color="pink", seed=1)
 res = resample_signal(x, 44100, 48000)   # 120 dB de rechazo de alias
 print(res.up, res.down)                  # 160, 147
 print(res.n_taps, res.passband_edge_hz)  # FIR diseñado, 20947.5 Hz
+res.plot()   # el filtro antisolapamiento entregado frente a su especificación
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/resampling_antialias_es.svg" alt="Respuesta en magnitud del filtro antisolapamiento diseñado para un remuestreo polifásico de 44,1 a 48 kilohercios sobre un eje de frecuencia logarítmico: banda de paso plana hasta el borde discontinuo justo por debajo de 21 kilohercios, transición abrupta hasta el borde de la banda atenuada en 22,05 kilohercios, y un suelo de banda atenuada que se mantiene por debajo de la línea punteada de atenuación de diseño de menos 120 decibelios a lo largo de la banda rechazada sombreada" width="82%" />
+
+*El filtro antisolapamiento entregado por la conversión 44,1 → 48 kHz por
+defecto: la banda atenuada empieza exactamente en la frecuencia de Nyquist
+menor (donde se pliegan los alias) y se mantiene bajo la línea de diseño de
+−120 dB; la banda de paso termina un 5 % por debajo, plana dentro de la
+misma cota de rizado.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal
+from phonometry import noise_signal, resample_signal
+
+x = noise_signal(44100, 5.0, color="pink", seed=1)
+res = resample_signal(x, 44100, 48000)   # 120 dB de rechazo de alias
+
+# res es el ResampledSignalResult calculado en el ejemplo de arriba.
+# Una línea: el filtro antisolapamiento entregado frente a su especificación:
+res.plot(language="es")
+plt.show()
+
+# A mano, desde los coeficientes que lleva el resultado, reflejando lo que
+# dibuja ResampledSignalResult.plot():
+fs_up = res.original_fs * res.up
+freqs, h = signal.freqz(res.filter_taps, worN=1 << 18, fs=fs_up)
+mag_db = 20 * np.log10(np.maximum(np.abs(h), 1e-300))
+view = (freqs > 0) & (freqs <= 4 * res.stopband_edge_hz)
+
+fig, ax = plt.subplots()
+ax.semilogx(freqs[view], mag_db[view], label="Filtro antisolapamiento |H(f)|")
+ax.axvline(res.passband_edge_hz, color="g", linestyle="--",
+           label="Borde de la banda de paso")
+ax.axvline(res.stopband_edge_hz, color="r", linestyle="--",
+           label="Borde de la banda atenuada (pliegue de alias)")
+ax.axhline(-res.stopband_attenuation_db, color="k", linestyle=":",
+           label="Atenuación de diseño -120 dB")
+ax.axvspan(res.stopband_edge_hz, 4 * res.stopband_edge_hz,
+           color="r", alpha=0.08)
+ax.set(xlabel="Frecuencia [Hz]", ylabel="Magnitud [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 Los coeficientes diseñados viajan con el resultado (`filter_taps`), así que
 la especificación es *comprobable*: la batería de tests mide la respuesta en
@@ -197,3 +247,11 @@ mitad de muestreo del
 [trabajo de correlación y retardo](/phonometry/es/guides/correlation-delay/),
 donde la alineación submuestra es la diferencia entre promediar respuestas
 al impulso y emborronarlas.
+
+## Véase también
+
+- [Ponderación temporal](/phonometry/es/guides/time-weighting/): la balística de detector que ejercitan las salvas de tono (IEC 61672-1, Tabla 4).
+- [Correlación y retardo](/phonometry/es/guides/correlation-delay/): el trabajo de alineación construido sobre el núcleo de retardo fraccionario.
+- [Promediado síncrono](/phonometry/es/guides/synchronous-averaging/): alineación de períodos con el mismo desplazamiento de banda limitada cuando `fs·T` no es entero.
+- [Análisis espectral](/phonometry/es/guides/spectral-analysis/): la verificación del ruido de colores y las métricas de ventanas.
+- Referencia de la API: [`metrology.signals`](/phonometry/es/reference/api/spectra/signals/).

@@ -43,6 +43,40 @@ the generator is verified.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_train_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_train.svg" alt="IEC 60268-1 tone bursts: a single 5 ms burst of 5 kHz tone starting at a zero crossing with its rectangular gating envelope, and a repetitive train of four bursts at 10 bursts per second with a 5 percent duty cycle" width="82%"></picture>
 
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import tone_burst
+
+fs = 48000.0
+single = tone_burst(fs, 5000, 25, pre_silence=0.001, post_silence=0.001)
+train = tone_burst(fs, 5000, 25, repetitions=4, repetition_rate=10)
+
+fig, axes = plt.subplots(2, 1, figsize=(10, 6.4))
+t_ms = 1e3 * np.arange(single.signal.size) / single.fs
+axes[0].plot(t_ms, single.signal, lw=0.9)
+axes[0].plot(t_ms, single.envelope, "r--", label="Gating envelope")
+axes[0].plot(t_ms, -single.envelope, "r--")
+axes[0].set_xlabel("Time [ms]")
+
+t_s = np.arange(train.signal.size) / train.fs
+axes[1].plot(t_s, train.signal, lw=0.5)
+axes[1].plot(t_s, train.envelope, "r--", label="Gating envelope")
+axes[1].plot(t_s, -train.envelope, "r--")
+axes[1].set_xlabel("Time [s]")
+
+for ax in axes:
+    ax.set_ylabel("Amplitude")
+    ax.legend(loc="upper right")
+plt.tight_layout()
+plt.show()
+```
+
+</details>
+
 These are the bursts behind the
 [Fast/Slow/Impulse ballistics](time-weighting.md) reference responses
 (IEC 61672-1 Table 4 uses 4 kHz tonebursts of 200, 50 and 10 ms) and the
@@ -72,7 +106,56 @@ x = noise_signal(44100, 5.0, color="pink", seed=1)
 res = resample_signal(x, 44100, 48000)   # 120 dB alias rejection
 print(res.up, res.down)                  # 160, 147
 print(res.n_taps, res.passband_edge_hz)  # designed FIR, 20947.5 Hz
+res.plot()   # the delivered anti-alias filter against its design spec
 ```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/resampling_antialias_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/resampling_antialias.svg" alt="Magnitude response of the anti-alias filter designed for a 44.1 to 48 kilohertz polyphase resampling on a logarithmic frequency axis: a flat passband up to the dashed passband edge just below 21 kilohertz, a steep transition to the dashed stopband edge at 22.05 kilohertz, and a stopband floor staying below the dotted minus 120 decibel design-attenuation line across the shaded rejected band" width="82%"></picture>
+
+*The delivered anti-alias filter of the default 44.1 → 48 kHz conversion:
+the stopband starts exactly at the smaller Nyquist frequency (where aliases
+fold) and stays below the −120 dB design line; the passband ends 5 % below
+it, flat within the same ripple bound.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal
+from phonometry import noise_signal, resample_signal
+
+x = noise_signal(44100, 5.0, color="pink", seed=1)
+res = resample_signal(x, 44100, 48000)   # 120 dB alias rejection
+
+# res is the ResampledSignalResult computed in the example above.
+# One line — the delivered anti-alias filter against its design spec:
+res.plot()
+plt.show()
+
+# By hand, from the taps the result carries — mirroring what
+# ResampledSignalResult.plot() draws:
+fs_up = res.original_fs * res.up
+freqs, h = signal.freqz(res.filter_taps, worN=1 << 18, fs=fs_up)
+mag_db = 20 * np.log10(np.maximum(np.abs(h), 1e-300))
+view = (freqs > 0) & (freqs <= 4 * res.stopband_edge_hz)
+
+fig, ax = plt.subplots()
+ax.semilogx(freqs[view], mag_db[view], label="Anti-alias filter |H(f)|")
+ax.axvline(res.passband_edge_hz, color="g", linestyle="--",
+           label="Passband edge")
+ax.axvline(res.stopband_edge_hz, color="r", linestyle="--",
+           label="Stopband edge (alias fold)")
+ax.axhline(-res.stopband_attenuation_db, color="k", linestyle=":",
+           label="Design attenuation -120 dB")
+ax.axvspan(res.stopband_edge_hz, 4 * res.stopband_edge_hz,
+           color="r", alpha=0.08)
+ax.set(xlabel="Frequency [Hz]", ylabel="Magnitude [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 The designed taps travel with the result (`filter_taps`), so the
 specification is *checkable*: the test suite measures the frequency response
@@ -134,6 +217,17 @@ resampler and fractional delay are the sample-rate half of
 [correlation and delay work](correlation-delay.md), where sub-sample
 alignment is the difference between averaging impulse responses and
 smearing them.
+
+## See also
+
+- [Time Weighting](time-weighting.md): the detector ballistics the tone
+  bursts exercise (IEC 61672-1 Table 4).
+- [Correlation and delay](correlation-delay.md): the alignment work built
+  on the fractional-delay kernel.
+- [Synchronous averaging](synchronous-averaging.md): period alignment with
+  the same band-limited shift when `fs·T` is not an integer.
+- [Spectral analysis](spectral-analysis.md): the colored-noise verification
+  and the window metrics.
 
 ## References
 
