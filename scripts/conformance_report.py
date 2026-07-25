@@ -1785,10 +1785,10 @@ def _chk_intensity_ri_rw() -> Outcome:
 @register(
     "Room & building acoustics",
     "ISO 15186-1:2000 Annex B, Table B.1",
-    "Adaptation term Kc: all 18 printed rows; (B.1) reduces to (B.2)",
+    "Adaptation term Kc: all 21 printed rows; (B.1) reduces to (B.2)",
 )
 def _chk_intensity_kc_annexb() -> Outcome:
-    # The printed Table B.1 (18 one-third-octave rows, one decimal) is the
+    # The printed Table B.1 (21 one-third-octave rows, one decimal) is the
     # independent oracle; additionally Formula (B.1) with Sb2 = 117 m²,
     # V2 = 81 m³, c = 340 m/s must reduce to (B.2) Kc = 10 lg(1 + 61,4/f).
     b2 = ph.adaptation_term_kc(ref.ISO15186_1_KC_BANDS)

@@ -172,6 +172,11 @@ _STRINGS: dict[str, str] = {
     "Evaluation based on laboratory measurement results obtained by a precision method with the standard tapping machine.": "Evaluación basada en resultados de medidas en laboratorio obtenidos mediante un método de precisión con la máquina de impactos normalizada.",
     "Evaluation based on laboratory measurement results obtained by the sound-intensity method (transmitted sound power measured directly over the measurement surface).": "Evaluación basada en resultados de medidas en laboratorio obtenidos mediante el método de intensidad sonora (potencia acústica transmitida medida directamente sobre la superficie de medición).",
     "Evaluation based on laboratory measurement results obtained by the sound-intensity method (transmitted sound power measured directly over the measurement surface enclosing the element).": "Evaluación basada en resultados de medidas en laboratorio obtenidos mediante el método de intensidad sonora (potencia acústica transmitida medida directamente sobre la superficie de medición que encierra el elemento).",
+    "Test object area S = {s} m<super>2</super>; measurement surface area S<sub>m</sub> = {sm} m<super>2</super> (ISO 15186-1:2000 Clause 8).": "Área del objeto de ensayo S = {s} m<super>2</super>; área de la superficie de medición S<sub>m</sub> = {sm} m<super>2</super> (ISO 15186-1:2000, apartado 8).",
+    "Test object area S = {s} m<super>2</super> (ISO 15186-1:2000 Clause 8).": "Área del objeto de ensayo S = {s} m<super>2</super> (ISO 15186-1:2000, apartado 8).",
+    "Measurement surface area S<sub>m</sub> = {sm} m<super>2</super> (ISO 15186-1:2000 Clause 8).": "Área de la superficie de medición S<sub>m</sub> = {sm} m<super>2</super> (ISO 15186-1:2000, apartado 8).",
+    "DI,n,e is the per-unit value of N = {n} element units measured together.": "DI,n,e es el valor por unidad de N = {n} unidades del elemento medidas conjuntamente.",
+    "R<sub>I,M</sub> [dB]": "R<sub>I,M</sub> [dB]",
     "{sym} = {rating} dB, required &#8805; {req} dB": "{sym} = {rating} dB, exigido &#8805; {req} dB",
     "{sym} = {rating} dB, required &#8804; {req} dB": "{sym} = {rating} dB, exigido &#8804; {req} dB",
     # --- iso11654 statement / verdict ------------------------------------

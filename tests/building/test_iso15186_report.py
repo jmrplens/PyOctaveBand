@@ -171,7 +171,7 @@ def test_octave_band_verbose_declares_band_resolution(tmp_path) -> None:
     _octave_result(with_kc=True).report(str(out), verbose=True)
     _assert_one_page(str(out))
     text = " ".join(_extract_text(str(out)).split())
-    assert "Octave-band" in text  # band resolution stated (ISO 717-1 Clause 4.4)
+    assert "Octave-band" in text  # band resolution stated (ISO 717-1 Clause 5.3)
     assert "Kc-modified" in text  # the RI,M column is present
 
 
@@ -278,3 +278,42 @@ def test_rating_without_per_band_data_rejected(tmp_path) -> None:
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="per-band"):
         result.report(out)
+
+
+def test_clause8_areas_stated_in_statement(tmp_path) -> None:
+    """The statement carries S and Sm when the result holds them (Clause 8 g)."""
+    out = tmp_path / "areas.pdf"
+    _intensity_result().report(str(out))
+    text = " ".join(_extract_text(str(out)).split())
+    assert "Test object area S = 10" in text
+    assert "= 12" in text  # Sm = 12 m2
+    assert "Clause 8" in text
+
+
+def test_clause8_fpi_and_residual_columns(tmp_path) -> None:
+    """Supplied FpI and dpI0 spectra are annexed as table columns (Clause 8 i)."""
+    result = _intensity_result()
+    fpi = np.full(16, 4.0)
+    residual = np.full(16, 18.0)
+    out = tmp_path / "fpi.pdf"
+    result.report(str(out), fpi=fpi, residual_index=residual)
+    _assert_one_page(str(out))
+    text = " ".join(_extract_text(str(out)).split())
+    assert "4.0" in text  # the FpI column values
+    assert "18.0" in text  # the dpI0 column values
+    # Verbose keeps the qualification columns beside the RI,M column too.
+    out2 = tmp_path / "fpi_verbose.pdf"
+    _intensity_result(with_kc=True).report(
+        str(out2), verbose=True, fpi=fpi, residual_index=residual
+    )
+    _assert_one_page(str(out2))
+
+
+def test_clause8_fpi_wrong_band_count_rejected(tmp_path) -> None:
+    """An FpI spectrum not matching the reported bands is rejected."""
+    result = _intensity_result()
+    out = str(tmp_path / "x.pdf")
+    with pytest.raises(ValueError, match="fpi"):
+        result.report(out, fpi=np.full(5, 4.0))
+    with pytest.raises(ValueError, match="residual_index"):
+        result.report(out, residual_index=np.full(3, 18.0))

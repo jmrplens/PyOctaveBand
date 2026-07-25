@@ -16,6 +16,12 @@ laboratory reports rated per ISO 717-1:
   elements (Clause 3.9, Formula (8)), rated ``DI,n,e,w`` by the same ISO 717-1
   airborne machinery; its verbose table shows the ISO 717 evaluation per band.
 
+Clause 8 support: the method statement appends the test-object and
+measurement-surface areas ``S`` / ``Sm`` (Clause 8 g) when the result carries
+them, and the optional per-band surface pressure-intensity indicator ``FpI``
+and pressure-residual intensity index ``δpI0`` (Clause 8 i) are annexed as
+table columns when the caller supplies them.
+
 Both quantities are ISO 717-1-rated insulation curves, so the shared two-panel
 skeleton (title and basis line, optional metadata header, per-band table
 beside the measured-versus-shifted-reference curve, boxed single-number
@@ -42,6 +48,7 @@ from ._insulation_fiche import (
     iso717_columns_builder,
     render_insulation_fiche,
 )
+from ._layout import fmt_num
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
@@ -71,6 +78,82 @@ _SPEC: dict[str, str] = {
     ),
 }
 
+#: The content width of the left-hand table cell, in mm (the compact cell of
+#: the shared two-panel insulation skeleton).
+_LEFT_CELL_MM = 56.0
+
+
+def _qualification_columns(
+    fpi: Sequence[float] | np.ndarray | None,
+    residual_index: Sequence[float] | np.ndarray | None,
+    n_bands: int,
+) -> list[Column]:
+    """The optional Clause 8 i) columns: ``FpI`` and ``δpI0`` per band.
+
+    Validates the supplied arrays against the reported band count and returns
+    them as table columns (symbols with units are never translated).
+
+    :raises ValueError: If an array does not match the band count or is not
+        finite.
+    """
+    columns: list[Column] = []
+    for name, header, values in (
+        ("fpi", "F<sub>pI</sub> [dB]", fpi),
+        ("residual_index", "&#948;<sub>pI0</sub> [dB]", residual_index),
+    ):
+        if values is None:
+            continue
+        arr = np.asarray(values, dtype=np.float64)
+        if arr.shape != (n_bands,):
+            raise ValueError(
+                f"'{name}' must carry one value per reported band "
+                f"({n_bands}); got shape {arr.shape}."
+            )
+        if not np.all(np.isfinite(arr)):
+            raise ValueError(f"'{name}' must contain only finite values.")
+        columns.append((header, arr, 1))
+    return columns
+
+
+def _even_widths(n_columns: int) -> Any:
+    """Even column widths spanning the compact left cell, in points."""
+    from reportlab.lib.units import mm
+
+    return [(_LEFT_CELL_MM / n_columns) * mm] * n_columns
+
+
+def _areas_sentence(
+    area: float | None, measurement_area: float | None, language: str
+) -> str:
+    """The Clause 8 g) sentence stating ``S`` and ``Sm``, or ``""``.
+
+    Pre-translated, so the caller can append it to an already-translated
+    statement (a re-translation of the composed text is a no-op).
+    """
+    if area is not None and measurement_area is not None:
+        key = (
+            "Test object area S = {s} m<super>2</super>; measurement surface "
+            "area S<sub>m</sub> = {sm} m<super>2</super> (ISO 15186-1:2000 "
+            "Clause 8)."
+        )
+    elif area is not None:
+        key = "Test object area S = {s} m<super>2</super> (ISO 15186-1:2000 Clause 8)."
+    elif measurement_area is not None:
+        key = (
+            "Measurement surface area S<sub>m</sub> = {sm} m<super>2</super> "
+            "(ISO 15186-1:2000 Clause 8)."
+        )
+    else:
+        return ""
+    return " " + t(key, language).format(
+        s=fmt_num(float(area), language) if area is not None else "",
+        sm=(
+            fmt_num(float(measurement_area), language)
+            if measurement_area is not None
+            else ""
+        ),
+    )
+
 
 def render_iso15186_report(
     result: IntensityReductionResult,
@@ -80,6 +163,8 @@ def render_iso15186_report(
     metadata: ReportMetadata | None = None,
     verbose: bool = False,
     language: str = "en",
+    fpi: Sequence[float] | np.ndarray | None = None,
+    residual_index: Sequence[float] | np.ndarray | None = None,
 ) -> str:
     """Render an ISO 15186-1 intensity sound-insulation test report to a PDF.
 
@@ -95,21 +180,30 @@ def render_iso15186_report(
     :param verbose: When ``True`` and the modified index ``RI,M`` is present,
         the left table annexes ``RI,M`` beside the reported ``RI``.
     :param language: ``"en"`` (default) or ``"es"``.
+    :param fpi: Optional per-band ``FpI`` (Clause 8 i), annexed as a column.
+    :param residual_index: Optional per-band ``δpI0`` (Clause 8 i), annexed
+        as a column.
     :return: The written ``path`` as a :class:`str`.
+    :raises ValueError: If ``fpi`` / ``residual_index`` do not match the band
+        count.
     :raises ImportError: If reportlab (or, for the figure, matplotlib) is
         not installed.
     """
     modified = result.r_i_modified
+    extra = _qualification_columns(
+        fpi, residual_index, int(np.asarray(result.r_i).size)
+    )
 
     def build_columns(
         value_header: str, curve: np.ndarray, verbose: bool, language: str
     ) -> tuple[Sequence[Column], str, Any]:
-        """The table: ``f | RI`` or, verbose with Kc, ``f | RI | RI,M``."""
+        """The table: ``f | RI`` plus the optional ``RI,M`` / ``FpI`` / ``δpI0``."""
         from reportlab.lib.units import mm
 
-        # ISO 717-1 Clause 4.4 requires stating whether the rating came from
-        # one-third-octave or octave bands; both the plain and the verbose
-        # caption declare the set (the verbose one also names the RI,M column).
+        # ISO 717-1:2020 Clause 5.3 requires stating whether the rating came
+        # from one-third-octave or octave bands; both the plain and the
+        # verbose caption declare the set (the verbose one also names the
+        # RI,M column).
         is_octave = np.asarray(rating.band_centers).size == 5
         if verbose and modified is not None:
             columns: list[Column] = [
@@ -119,6 +213,7 @@ def render_iso15186_report(
                     np.asarray(modified, dtype=np.float64),
                     1,
                 ),
+                *extra,
             ]
             caption_key = (
                 "Octave-band {vh} and Kc-modified index"
@@ -126,7 +221,10 @@ def render_iso15186_report(
                 else "One-third-octave {vh} and Kc-modified index"
             )
             caption = t(caption_key, language).format(vh=_SPEC["symbol"])
-            col_widths = [12 * mm] + [22 * mm for _ in columns]
+            if extra:
+                col_widths = _even_widths(len(columns) + 1)
+            else:
+                col_widths = [12 * mm] + [22 * mm for _ in columns]
             return columns, caption, col_widths
         caption_key = (
             "Octave-band {vh} [dB]"
@@ -134,11 +232,20 @@ def render_iso15186_report(
             else "One-third-octave {vh} [dB]"
         )
         caption = t(caption_key, language).format(vh=_SPEC["symbol"])
+        if extra:
+            columns = [(value_header, curve, 1), *extra]
+            return columns, caption, _even_widths(len(columns) + 1)
         return [(value_header, curve, 1)], caption, None
 
+    spec = dict(_SPEC)
+    spec["statement"] = t(_SPEC["statement"], language) + _areas_sentence(
+        getattr(result, "area", None),
+        getattr(result, "measurement_area", None),
+        language,
+    )
     return render_insulation_fiche(
         result, rating, path,
-        spec=_SPEC,
+        spec=spec,
         is_impact=False,
         curve_attr="r_i",
         build_columns=build_columns,
@@ -173,6 +280,24 @@ _DINE_SPEC: dict[str, str] = {
 }
 
 
+def _element_extras_sentence(
+    result: IntensityElementNormalizedResult, language: str
+) -> str:
+    """The Clause 8 g) sentence for the element fiche: ``Sm`` and ``N``."""
+    sentence = _areas_sentence(
+        None, getattr(result, "measurement_area", None), language
+    )
+    n = int(getattr(result, "n", 1))
+    if n > 1:
+        note = t(
+            "DI,n,e is the per-unit value of N = {n} element units measured "
+            "together.",
+            language,
+        ).format(n=n)
+        sentence = f"{sentence} {note}" if sentence else f" {note}"
+    return sentence
+
+
 def render_iso15186_element_report(
     result: IntensityElementNormalizedResult,
     rating: WeightedRatingResult,
@@ -181,6 +306,8 @@ def render_iso15186_element_report(
     metadata: ReportMetadata | None = None,
     verbose: bool = False,
     language: str = "en",
+    fpi: Sequence[float] | np.ndarray | None = None,
+    residual_index: Sequence[float] | np.ndarray | None = None,
 ) -> str:
     """Render an ISO 15186-1 element-normalized insulation report to a PDF.
 
@@ -196,25 +323,56 @@ def render_iso15186_element_report(
         per band (the ``DI,n,e`` value, the shifted reference and the
         unfavourable deviation) instead of the two-column form.
     :param language: ``"en"`` (default) or ``"es"``.
+    :param fpi: Optional per-band ``FpI`` (Clause 8 i), annexed as a column
+        of the two-column form.
+    :param residual_index: Optional per-band ``δpI0`` (Clause 8 i), annexed
+        as a column of the two-column form.
     :return: The written ``path`` as a :class:`str`.
+    :raises ValueError: If ``fpi`` / ``residual_index`` do not match the band
+        count.
     :raises ImportError: If reportlab (or, for the figure, matplotlib) is not
         installed.
     """
-    # ISO 717-1 Clause 4.4 requires the table caption to state the band set;
-    # the rating carries 5 centres for octave bands, 16 for one-third octaves.
+    # ISO 717-1:2020 Clause 5.3 requires the table caption to state the band
+    # set; the rating carries 5 centres for octave bands, 16 for one-third
+    # octaves.
     band_set = (
         "Octave-band"
         if np.asarray(rating.band_centers).size == 5
         else "One-third-octave"
     )
+    extra = _qualification_columns(
+        fpi, residual_index, int(np.asarray(result.d_i_n_e).size)
+    )
+    iso717_build = iso717_columns_builder(
+        rating, False, _DINE_SPEC["symbol"], band_set=band_set
+    )
+
+    def build_columns(
+        value_header: str, curve: np.ndarray, verbose: bool, language: str
+    ) -> tuple[Sequence[Column], str, Any]:
+        """The ISO 717 table; the ``FpI`` / ``δpI0`` columns replace verbose."""
+        if not extra:
+            return iso717_build(value_header, curve, verbose, language)
+        # The compact left cell cannot hold the verbose ISO 717 evaluation
+        # plus the qualification columns, so the Clause 8 i) content takes
+        # precedence whenever it is supplied.
+        columns: list[Column] = [(value_header, curve, 1), *extra]
+        caption = t(f"{band_set} {{vh}} [dB]", language).format(
+            vh=_DINE_SPEC["symbol"]
+        )
+        return columns, caption, _even_widths(len(columns) + 1)
+
+    spec = dict(_DINE_SPEC)
+    spec["statement"] = t(
+        _DINE_SPEC["statement"], language
+    ) + _element_extras_sentence(result, language)
     return render_insulation_fiche(
         result, rating, path,
-        spec=_DINE_SPEC,
+        spec=spec,
         is_impact=False,
         curve_attr="d_i_n_e",
-        build_columns=iso717_columns_builder(
-            rating, False, _DINE_SPEC["symbol"], band_set=band_set
-        ),
+        build_columns=build_columns,
         metadata=metadata,
         verbose=verbose,
         language=language,

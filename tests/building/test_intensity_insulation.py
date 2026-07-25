@@ -101,7 +101,7 @@ def test_ri_rating_none_off_band_count() -> None:
 
 
 def test_kc_reproduces_printed_table_b1() -> None:
-    """Kc reproduces all 18 printed Table B.1 rows at one decimal place."""
+    """Kc reproduces all 21 printed Table B.1 rows at one decimal place."""
     kc = adaptation_term_kc(ref.ISO15186_1_KC_BANDS)
     np.testing.assert_allclose(kc, ref.ISO15186_1_KC_B1_PRINTED, atol=0.05)
 
@@ -134,15 +134,24 @@ def test_kc_requires_both_room_parameters() -> None:
 
 
 def test_element_normalized_difference_formula_8() -> None:
-    """DI,n,e = Lp1 - 6 - (LIn + 10 lg(Sm/A0) + 10 lg N)."""
+    """DI,n,e = Lp1 - 6 - (LIn + 10 lg(Sm/A0)) + 10 lg N (corrected sign).
+
+    The printed Formula (8) subtracts its 10 lg(N) term, which contradicts
+    ISO 10140-2:2010 Formula (6) and ISO 15186-2:2010 Formula (12) (see
+    docs/ERRATA.md); the per-unit value adds it, and n > 1 warns about the
+    deviation from the print.
+    """
     d = intensity_element_normalized_difference(
         [80.0], [40.0], measurement_area=10.0, n=1
     )
     assert d.d_i_n_e[0] == pytest.approx(34.0)  # Sm = A0, N = 1
-    d2 = intensity_element_normalized_difference(
-        [80.0], [40.0], measurement_area=10.0, n=2
-    )
-    assert d2.d_i_n_e[0] == pytest.approx(34.0 - 10.0 * np.log10(2.0))
+    with pytest.warns(UserWarning, match="Formula \\(8\\)"):
+        d2 = intensity_element_normalized_difference(
+            [80.0], [40.0], measurement_area=10.0, n=2
+        )
+    assert d2.d_i_n_e[0] == pytest.approx(34.0 + 10.0 * np.log10(2.0))
+    assert d2.n == 2
+    assert d2.measurement_area == pytest.approx(10.0)
 
 
 def test_element_normalized_rejects_bad_n() -> None:

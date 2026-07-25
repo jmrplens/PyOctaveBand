@@ -135,6 +135,30 @@ to the issuing body, with date and reference).
   inconsistencies next to the affected anchors.
 - **Status:** unreported.
 
+## ISO 15186-1:2000, Clause 3.9, Formula (8) (sign of the 10 lg N term)
+
+- **Location:** Clause 3.9, Formula (8), the intensity element normalized
+  level difference for N small building elements measured together.
+- **The print:** DI,n,e = Lp1 − 6 − (LIn + 10 lg(Sm/A0) + 10 lg(N)), i.e. the
+  10 lg N term is subtracted.
+- **The problem:** the subtracted sign cannot be derived. Measuring N
+  identical units within one measurement surface raises the transmitted
+  power (and hence LIn + 10 lg Sm) by 10 lg N, so recovering the per-unit
+  DI,n,e requires *adding* 10 lg N. The pressure-based equivalent,
+  ISO 10140-2:2010 Formula (6), prints exactly that correction
+  (Dn,e = L1 − L2 + 10 lg(nA0/A)), and ISO 15186-2:2010 Formula (12) prints
+  Formula (8) without any N term (the N = 1 case, with which both signs
+  agree). As printed, installing more units would *lower* the per-unit
+  rating by 20 lg N relative to the derivable value.
+- **Evidence:** page render of the printed formula; derivation from the
+  diffuse-field receiving-room relation L2 = LW + 10 lg(4/A) against
+  ISO 10140-2:2010 Formula (6); cross-check against ISO 15186-2:2010
+  Formula (12) and Hopkins, *Sound Insulation* (2007), Eq. 3.45.
+- **Library behaviour:** implements the derivable per-unit form
+  (`intensity_element_normalized_difference`, +10 lg N) and emits a warning
+  whenever n > 1, where the result deviates from the print.
+- **Status:** unreported.
+
 ## ISO 12999-1:2020, Table 4 (missing 500 Hz row)
 
 - **Location:** Table 4 (in-situ uncertainties per band).
