@@ -74,8 +74,10 @@ import ReportPreview from '../../../../components/ReportPreview.astro';
 La vibración transmitida a una persona se evalúa con la misma cadena de medida
 sea cual sea su origen: la aceleración se **pondera en frecuencia** para reflejar
 cómo responde el cuerpo a cada frecuencia, se reduce a una aceleración **eficaz
-ponderada** (con medidas de dosis para choques y registros largos), se combina
-entre ejes en un **valor total de vibración** y, por último, se normaliza a una
+ponderada** (con medidas de dosis para choques y registros largos), se condensa
+entre ejes en una sola magnitud (el **valor total de vibración** para la
+exposición mano-brazo y para el confort; el **valor del eje más alto** para la
+evaluación de salud de cuerpo completo) y, por último, se normaliza a una
 **exposición diaria de 8 horas** `A(8)` que se compara con los valores de acción
 y límite de la directiva europea.
 
@@ -85,7 +87,7 @@ completo, **ISO 2631-2** a la vibración en edificios, **ISO 2631-4** al confort
 de marcha ferroviaria e **ISO 5349-1/-2** a la vibración transmitida a la mano.
 Esta página recorre toda la cadena.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_human_vibration_es.svg" alt="Cadena de medida de vibración de cuerpo completo: un acelerómetro triaxial en la interfaz asiento/cuerpo de una persona sentada mide la aceleración x, y y z; cada eje se limita en banda y se pondera en frecuencia (Wk vertical, Wd horizontal) según ISO 8041-1, se reduce a un valor eficaz ponderado a_w y VDV según ISO 2631-1, se combina en el valor total de vibración a_v, se normaliza a la exposición diaria A(8) y se evalúa frente al VAE y el VLE de la Directiva 2002/44/CE" width="94%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_human_vibration_es.svg" alt="Cadena de medida de vibración de cuerpo completo: un acelerómetro triaxial en la interfaz asiento/cuerpo de una persona sentada mide la aceleración x, y y z; cada eje se limita en banda y se pondera en frecuencia (Wk vertical, Wd horizontal) según ISO 8041-1, se reduce a un valor eficaz ponderado a_w y VDV según ISO 2631-1, y el mayor valor por eje ponderado en frecuencia max(1,4 a_wx, 1,4 a_wy, a_wz) se normaliza a la exposición diaria A(8) y se evalúa frente al VAE y el VLE de la Directiva 2002/44/CE" width="94%" loading="eager" />
 
 ## 1. Ponderaciones frecuenciales (ISO 8041-1)
 
@@ -308,11 +310,26 @@ del trayecto y de lo que los pasajeros intentan hacer. Como orientación, el
 umbral mediano de percepción de una vibración ponderada con `Wk` es de unos
 0,015 m/s² de pico (Anexo C).
 
-La **exposición diaria** normaliza el valor total a una jornada de referencia de
-8 horas ($T_0 = 28\,800$ s). Para una sola operación $A(8) = a_v\,\sqrt{T/T_0}$;
-varias operaciones se combinan mediante sus exposiciones parciales
-$A_i(8) = a_{vi}\,\sqrt{T_i/T_0}$ como $A(8) = \sqrt{\sum_i A_i(8)^2}$ (ISO 5349-1,
-ecs. (2)/(3); ISO 5349-2, ecs. (1)–(3)).
+La **exposición diaria** normaliza la magnitud de exposición $a$ a una jornada
+de referencia de 8 horas ($T_0 = 28\,800$ s). Para una sola operación
+$A(8) = a\,\sqrt{T/T_0}$; varias operaciones se combinan mediante sus
+exposiciones parciales $A_i(8) = a_i\,\sqrt{T_i/T_0}$ como
+$A(8) = \sqrt{\sum_i A_i(8)^2}$ (ISO 5349-1, ecs. (2)/(3); ISO 5349-2,
+ecs. (1)–(3)). La Directiva 2002/44/CE fija en qué magnitud $a$ se basa cada
+tipo (anexo, puntos 1): para la vibración mano-brazo el total vectorial
+$a_{hv}$ (parte A), pero para la vibración de cuerpo completo el valor por eje
+ponderado en frecuencia *más alto*
+$\max(1{,}4\,a_{wx},\,1{,}4\,a_{wy},\,a_{wz})$ (parte B), no el total
+vectorial $a_v$ de arriba. `wbv_exposure_basis` devuelve ese valor del eje
+dominante:
+
+```python
+from phonometry import vibration
+
+# Base de cuerpo completo de la Directiva 2002/44/CE (anexo, parte B): el eje dominante.
+a = vibration.wbv_exposure_basis(0.35, 0.28, 0.62)
+print(round(a, 3))    # 0.62  m/s^2 (máximo de 0.49, 0.392, 0.62; no a_v = 0.882)
+```
 
 `daily_vibration_exposure` construye las exposiciones parciales, las combina y
 evalúa el resultado frente a la **Directiva 2002/44/CE**: valor de acción de
@@ -401,10 +418,12 @@ la línea de base normativa que nombra el método ISO aplicado (ISO 5349-1/-2 pa
 la vibración transmitida a la mano, ISO 2631-1 para la de cuerpo completo) y la
 directiva frente a la que se evalúa, una rejilla de cabecera (empresa,
 operador/trabajador, lugar de trabajo, instrumentación y calibración), el
-análisis de la exposición por operación (el valor total de vibración $a_{hv}$ o
-$a_v$ de cada operación, su tiempo de exposición diario $T_i$ y la exposición
-parcial $A_i(8)$, cerrado por el total diario y el $A(8)$ combinado) con el
-gráfico de aportes, y el $A(8)$ recuadrado con su zona de exposición.
+análisis de la exposición por operación (la magnitud de vibración de cada
+operación, el total vectorial mano-brazo $a_{hv}$ o el valor del eje dominante
+$a_{w,max}$ de la parte B de la Directiva para cuerpo completo, su tiempo de
+exposición diario $T_i$ y la exposición parcial $A_i(8)$, cerrado por el total
+diario y el $A(8)$ combinado) con el gráfico de aportes, y el $A(8)$ recuadrado
+con su zona de exposición.
 
 Como el número existe para compararse con la ley, la ficha evalúa entonces
 $A(8)$ frente a la **Directiva 2002/44/CE** (artículo 3): el valor de exposición

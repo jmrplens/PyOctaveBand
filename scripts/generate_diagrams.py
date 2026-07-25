@@ -2500,10 +2500,13 @@ def _d_human_vibration(s: SVG, th: Theme) -> None:
     # Feed the setup into the chain.
     s.arrow(252, oy, x0 - 6, 132, th.fg, 2.0)
 
-    # --- Bottom: vector sum, daily exposure and the Directive assessment ---
+    # --- Bottom: dominant axis, daily exposure and the Directive assessment ---
+    # The Directive's whole-body A(8) is based on the HIGHEST frequency-
+    # weighted axis value (1,4 a_wx, 1,4 a_wy, a_wz), Annex Part B point 1 -
+    # not on the ISO 2631-1 Eq. (10) vector total a_v.
     s.arrow(cx, 388, cx, 424, th.fg, 2.0)
     s.rect(400, 424, 470, 78, "none", th.secondary, rx=12, sw=2, dash="6,5")
-    s.text(635, 452, "a_v = √(Σ k_j² a_wj²)   →   A(8) = a_v·√(T/T₀)",
+    s.text(635, 452, "A(8) = max(1.4·a_wx , 1.4·a_wy , a_wz)·√(T/T₀)",
            20, th.fg, "middle", bold=True)
     s.text(635, 480, "assessed vs EAV / ELV (Directive 2002/44/EC)",
            18, th.secondary, "middle")

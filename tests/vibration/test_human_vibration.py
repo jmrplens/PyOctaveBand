@@ -276,6 +276,29 @@ def test_vibration_total_value_with_k_factors() -> None:
     assert got == pytest.approx(expected)
 
 
+def test_wbv_exposure_basis_x_axis_dominates() -> None:
+    # Directive 2002/44/EC Annex Part B point 1: A(8) is based on the highest
+    # of 1,4*a_wx, 1,4*a_wy, a_wz. Here 1,4*0,5 = 0,7 beats a_wz = 0,6.
+    assert hv.wbv_exposure_basis(0.5, 0.2, 0.6) == pytest.approx(0.7)
+
+
+def test_wbv_exposure_basis_z_axis_dominates_and_differs_from_vector_total() -> None:
+    # Same axis set as the docs example: max(0,49; 0,392; 0,62) = 0,62, well
+    # below the ISO 2631-1 Eq. (10) vector total 0,882 for the same axes.
+    basis = hv.wbv_exposure_basis(0.35, 0.28, 0.62)
+    assert basis == pytest.approx(0.62)
+    total = hv.vibration_total_value([0.35, 0.28, 0.62], k=[1.4, 1.4, 1.0])
+    assert total == pytest.approx(0.882, abs=5e-4)
+    assert basis < total
+
+
+def test_wbv_exposure_basis_rejects_negative_or_nonfinite() -> None:
+    with pytest.raises(ValueError, match="non-negative"):
+        hv.wbv_exposure_basis(-0.1, 0.2, 0.3)
+    with pytest.raises(ValueError, match="non-negative"):
+        hv.wbv_exposure_basis(0.1, math.nan, 0.3)
+
+
 def test_iso5349_2_example_e2_1_single_tool() -> None:
     """ISO 5349-2 E.2.1: a_hv=7,4 m/s2, T=2,5 h -> A(8)=4,1 m/s2."""
     a8 = hv.daily_exposure(7.4, 2.5 * 3600.0)

@@ -5,7 +5,7 @@ Renders a
 :class:`~phonometry.vibration.human_vibration.DailyVibrationExposure` to a
 one-page PDF laid out like a hand-arm / whole-body vibration exposure
 assessment sheet (the layout the HSE exposure calculators and the EU Good
-Practice Guides use): each operation's vibration total value and daily
+Practice Guides use): each operation's vibration magnitude and daily
 exposure time combine into the 8-hour daily exposure ``A(8)``, which is then
 assessed against Directive 2002/44/EC (Article 3):
 
@@ -15,7 +15,9 @@ assessed against Directive 2002/44/EC (Article 3):
 * an optional metadata header grid: company, operator/worker, workplace, date
   and the instrumentation and calibration free text;
 * the exposure analysis: a full-width per-operation table (operation, the
-  vibration total value ``a_hv`` (hand-arm) or ``a_v`` (whole-body), the daily
+  vibration magnitude - the vector total ``a_hv`` (hand-arm, Directive
+  2002/44/EC Annex Part A) or the dominant-axis value ``a_w,max`` (whole-body,
+  Annex Part B) - the daily
   exposure time ``T_i`` and the partial exposure ``A_i(8)`` of ISO 5349-1/-2
   Eq. (2)) closed by the daily-total row (total exposure time and the combined
   ``A(8)`` of Eq. (3)); ``verbose=True`` adds the per-operation share of the
@@ -76,15 +78,21 @@ if TYPE_CHECKING:
 #: exceedance comparisons are evaluated on the value rounded to this precision.
 _ACC_DECIMALS = 2
 
-#: Per-kind labels: the standard, the vibration-total-value symbol and the
-#: exposure-response note. ``a_hv`` for hand-arm (ISO 5349-1 Eq. (1)), ``a_v``
-#: for whole-body (ISO 2631-1 Eq. (10)).
+#: Per-kind labels: the standard, the per-operation magnitude symbol and the
+#: exposure-response note. ``a_hv`` for hand-arm (the ISO 5349-1 Eq. (1)
+#: vector total, Directive 2002/44/EC Annex Part A point 1); ``a_w,max`` for
+#: whole-body (the highest frequency-weighted axis value
+#: ``max(1,4*a_wx, 1,4*a_wy, a_wz)``, Annex Part B point 1 - not the
+#: ISO 2631-1 Eq. (10) vector total ``a_v``).
 _KIND_STANDARD: dict[str, str] = {
     "hav": "ISO 5349-1:2001 / ISO 5349-2:2001",
     "wbv": "ISO 2631-1:1997",
 }
 _KIND_QUANTITY: dict[str, str] = {"hav": "hand-arm", "wbv": "whole-body"}
-_KIND_TOTAL_SYMBOL: dict[str, str] = {"hav": "a<sub>hv</sub>", "wbv": "a<sub>v</sub>"}
+_KIND_TOTAL_SYMBOL: dict[str, str] = {
+    "hav": "a<sub>hv</sub>",
+    "wbv": "a<sub>w,max</sub>",
+}
 
 
 def _unit(metric: str, language: str = "en") -> str:
@@ -169,7 +177,7 @@ def _operations_table(
     header_style, label_style, value_style = analysis_cell_styles("humanvib")
     kind = str(result.assessment.kind)
     unit = _unit("a8", language)
-    total_symbol = _KIND_TOTAL_SYMBOL.get(kind, "a<sub>v</sub>")
+    total_symbol = _KIND_TOTAL_SYMBOL.get(kind, "a<sub>w,max</sub>")
 
     headers = [
         t("Operation", language),
@@ -287,7 +295,8 @@ def _assessment_table(result: DailyVibrationExposure, language: str = "en") -> A
     return stacked_table(data, [66 * mm, 32 * mm, 42 * mm, 34 * mm])
 
 
-#: The exposure-zone phrase for the boxed result, keyed by the assessment zone.
+#: The exposure-zone phrase for the boxed result, keyed by the zone derived
+#: from the displayed-rounded comparisons (:func:`_displayed_zone`).
 _ZONE_LABELS: dict[str, str] = {
     "below action": "below the exposure action value",
     "action": "at or above the exposure action value",
@@ -295,11 +304,28 @@ _ZONE_LABELS: dict[str, str] = {
 }
 
 
+def _displayed_zone(assessment: Any) -> str:
+    """The exposure zone evaluated on the value rounded as displayed.
+
+    The assessment rows and the verdict compare ``A(8)`` rounded exactly as
+    the fiche prints it, so the boxed zone phrase derives from the same
+    displayed-rounded comparisons: an ``A(8)`` that prints equal to a
+    threshold can never sit in the box one zone below the row beside it.
+    """
+    displayed = display_round(float(assessment.value), _ACC_DECIMALS)
+    if displayed >= display_round(float(assessment.limit_value), _ACC_DECIMALS):
+        return "limit"
+    if displayed >= display_round(float(assessment.action_value), _ACC_DECIMALS):
+        return "action"
+    return "below action"
+
+
 def _statement(result: DailyVibrationExposure, language: str = "en") -> str:
     """The boxed result statement: the daily exposure ``A(8)`` and its zone."""
     assessment = result.assessment
     unit = _unit(str(assessment.metric), language)
-    zone = t(_ZONE_LABELS.get(str(assessment.zone), str(assessment.zone)), language)
+    zone_key = _displayed_zone(assessment)
+    zone = t(_ZONE_LABELS.get(zone_key, zone_key), language)
     return t(
         "Daily vibration exposure A(8) = <b>{a8} {unit}</b> &nbsp; ({zone})",
         language,
@@ -440,6 +466,20 @@ def render_human_vibration_report(
             "produces vibration-white-finger in 10 % of an exposed group."
         )
     else:
+        flow.append(
+            Paragraph(
+                t(
+                    "The whole-body exposure basis a<sub>w,max</sub> is the "
+                    "highest frequency-weighted axis value "
+                    "max(1.4&#183;a<sub>wx</sub>; 1.4&#183;a<sub>wy</sub>; "
+                    "a<sub>wz</sub>) for a seated or standing worker "
+                    "(Directive 2002/44/EC, Annex Part B point 1), not the "
+                    "ISO 2631-1 vector total a<sub>v</sub>.",
+                    language,
+                ),
+                note_style,
+            )
+        )
         exposure_note = (
             "ISO 2631-1:1997 defines no exposure limit; its informative "
             "Annexes B and C give the health-guidance caution zone as the range "

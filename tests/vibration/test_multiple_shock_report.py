@@ -201,6 +201,9 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     assert "probabilidad moderada de un efecto adverso para la salud" in text
     assert "1,22" in text  # comma decimal separator
     assert "55,97" in text
+    # The clause references translate the word and keep the number verbatim.
+    assert "Fórmula (C.3)" in text
+    assert "Formula (C.3)" not in text
 
 
 # --- rendering contract -------------------------------------------------------

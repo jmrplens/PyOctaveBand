@@ -367,6 +367,7 @@ _STRINGS: dict[str, str] = {
     "The exposure action value (EAV) and exposure limit value (ELV) are daily exposures A(8) (Directive 2002/44/EC, Article 3). Reaching the EAV triggers the employer's programme of control measures and the workers' entitlement to health surveillance (Articles 5 and 8); the ELV shall not be exceeded (Article 5).": "El valor de exposición que da lugar a una acción (EAV) y el valor límite de exposición (ELV) son exposiciones diarias A(8) (Directiva 2002/44/CE, artículo 3). Alcanzar el EAV activa el programa de medidas de control del empresario y el derecho de los trabajadores a la vigilancia de la salud (artículos 5 y 8); el ELV no debe superarse (artículo 5).",
     "ISO 5349-1:2001 defines no safe exposure limit; the daily exposure A(8) is the recommended basis for any exposure criterion, and its informative Annex C relates A(8) to the lifetime exposure that produces vibration-white-finger in 10 % of an exposed group.": "La ISO 5349-1:2001 no define ningún límite de exposición seguro; la exposición diaria A(8) es la base recomendada para cualquier criterio de exposición, y su anexo C informativo relaciona A(8) con la exposición a lo largo de la vida que produce dedo blanco por vibración en el 10 % de un grupo expuesto.",
     "ISO 2631-1:1997 defines no exposure limit; its informative Annexes B and C give the health-guidance caution zone as the range of magnitudes for which health effects are potentially present.": "La ISO 2631-1:1997 no define ningún límite de exposición; sus anexos B y C informativos ofrecen la zona de precaución de la guía de salud como el intervalo de magnitudes para el que los efectos sobre la salud están potencialmente presentes.",
+    "The whole-body exposure basis a<sub>w,max</sub> is the highest frequency-weighted axis value max(1.4&#183;a<sub>wx</sub>; 1.4&#183;a<sub>wy</sub>; a<sub>wz</sub>) for a seated or standing worker (Directive 2002/44/EC, Annex Part B point 1), not the ISO 2631-1 vector total a<sub>v</sub>.": "La base de la exposición de cuerpo completo a<sub>w,max</sub> es el mayor valor por eje ponderado en frecuencia max(1,4&#183;a<sub>wx</sub>; 1,4&#183;a<sub>wy</sub>; a<sub>wz</sub>) para un trabajador sentado o de pie (Directiva 2002/44/CE, anexo, parte B, punto 1), no el total vectorial a<sub>v</sub> de la ISO 2631-1.",
     # --- mechanical mobility FRF (ISO 7626) --------------------------------
     "Mechanical mobility measurement": "Medición de la movilidad mecánica",
     "Mobility FRF characteristics": "Características de la FRF de movilidad",
@@ -573,6 +574,7 @@ _STRINGS: dict[str, str] = {
     "Subject sex": "Sexo del sujeto",
     "male": "hombre",
     "female": "mujer",
+    "Formula": "Fórmula",
     "Age at start b [years]": "Edad al inicio b [años]",
     "Exposure duration n [years]": "Duración de la exposición n [años]",
     "Exposure days per year N": "Días de exposición por año N",
@@ -753,6 +755,7 @@ _STRINGS: dict[str, str] = {
     "Bands averaged: {n}": "Bandas promediadas: {n}",
     "Bracketed (M &lt; 0,25): {n}": "Entre corchetes (M &lt; 0,25): {n}",
     "No single-number K<sub>ij</sub> (no bands in the Annex A range)": "Sin número único K<sub>ij</sub> (no hay bandas en el intervalo del anexo A)",
+    "No single-number K<sub>ij</sub> (all in-range bands bracketed, M &lt; 0,25)": "Sin número único K<sub>ij</sub> (todas las bandas del intervalo entre corchetes, M &lt; 0,25)",
     "Single-number K<sub>ij</sub> = <b>{value} dB</b>": "Número único K<sub>ij</sub> = <b>{value} dB</b>",
     "Values in brackets are bracketed bands, excluded from the single number.": "Los valores entre corchetes son bandas excluidas del número único.",
     # --- ISO 9613-2 outdoor propagation / barrier insertion loss ---------

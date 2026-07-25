@@ -177,6 +177,50 @@ def test_kij_mean_membership_excludes_out_of_range_bands() -> None:
     assert bool(in_mean[list(_FREQS).index(250)])
 
 
+def test_kij_fiche_distinguishes_all_bracketed_from_out_of_range(tmp_path) -> None:
+    """An empty mean states why: every in-range band bracketed (M < 0,25)."""
+    result = building.vibration_reduction_index(
+        _DV,
+        junction_length=4.0,
+        area_i=12.0,
+        area_j=10.0,
+        frequency=_FREQS,
+        modal_overlap=0.1,  # every band bracketed -> no single number
+    )
+    assert result.single_number is None
+    out = tmp_path / "kij_all_bracketed.pdf"
+    result.report(str(out))
+    text = " ".join(_extract_text(str(out)).split())
+    assert "all in-range bands bracketed" in text
+    assert "no bands in the Annex A range" not in text
+    out_es = tmp_path / "kij_all_bracketed_es.pdf"
+    result.report(str(out_es), language="es")
+    text_es = " ".join(_extract_text(str(out_es)).split())
+    assert "todas las bandas del intervalo entre corchetes" in text_es
+
+
+def test_kij_fiche_states_no_bands_in_annex_a_range(tmp_path) -> None:
+    """A spectrum entirely outside the Annex A range keeps the range message."""
+    high_freqs = [1600.0, 2000.0, 2500.0]
+    result = building.vibration_reduction_index(
+        [10.0, 11.0, 12.0],
+        junction_length=4.0,
+        area_i=12.0,
+        area_j=10.0,
+        frequency=high_freqs,
+    )
+    assert result.single_number is None
+    out = tmp_path / "kij_out_of_range.pdf"
+    result.report(str(out))
+    text = " ".join(_extract_text(str(out)).split())
+    assert "no bands in the Annex A range" in text
+    assert "all in-range bands bracketed" not in text
+    out_es = tmp_path / "kij_out_of_range_es.pdf"
+    result.report(str(out_es), language="es")
+    text_es = " ".join(_extract_text(str(out_es)).split())
+    assert "no hay bandas en el intervalo del anexo A" in text_es
+
+
 def test_kij_fiche_without_frequencies_rejected(tmp_path) -> None:
     """A Kij result with no band frequencies cannot be reported."""
     result = building.vibration_reduction_index([5.0, 6.0, 7.0], 2.0, 4.0, 4.0)
