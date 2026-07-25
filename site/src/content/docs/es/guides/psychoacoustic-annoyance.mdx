@@ -262,7 +262,7 @@ res = psychoacoustics.fluctuation_strength(am, float(fs))
 print(round(res.fluctuation_strength, 2))    # 1.09 vacil
 
 # En una línea: la intensidad de fluctuación específica sobre el eje de Bark.
-res.plot()
+res.plot(language="es")
 plt.show()
 
 # O dibuja f'(z) a mano con los arrays que ya lleva el resultado:

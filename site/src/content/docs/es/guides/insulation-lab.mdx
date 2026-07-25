@@ -658,7 +658,7 @@ covering = bare - np.array([5, 8, 10, 14, 18, 23, 30, 31,
                             39, 49, 53, 57, 60, 67, 68, 71])
 res = building.impact_improvement(bare, covering, freqs)
 print(res.delta_lw)   # mejora ponderada delta-Lw = 29 dB (ISO 717-2)
-res.plot()
+res.plot(language="es")
 plt.show()
 ```
 
@@ -776,7 +776,7 @@ res = building.vibration_reduction_index(
     structural_reverberation_time_i=0.35, structural_reverberation_time_j=0.40,
 )
 print(res.single_number)   # Kij medio entre 200 y 1250 Hz (Anexo A)
-res.plot()
+res.plot(language="es")
 plt.show()
 ```
 
@@ -853,7 +853,7 @@ dnf = building.normalized_flanking_level_difference(
 )
 
 # Una línea: Dn,f frente a la referencia ISO 717-1 desplazada:
-dnf.plot()
+dnf.plot(language="es")
 plt.show()
 
 # A mano, desde el índice que porta el resultado:

@@ -240,7 +240,7 @@ system[80], system[1400], system[3100] = 1.0, 0.5, 0.32
 ir = room.impulse_response(fftconvolve(sweep, system), sweep, fs, length=system.size)
 
 # Una línea: forma de onda + log-magnitud / decaimiento de Schroeder
-ir.plot()
+ir.plot(language="es")
 
 # A mano: la envolvente log-magnitud normalizada en dB
 import matplotlib.pyplot as plt
@@ -426,7 +426,7 @@ time, level = room.decay_curve(ir, fs)                    # curva de Schroeder (
 
 # En una línea — la curva de Schroeder con los ajustes rectos EDT/T20/T30:
 decay = room.decay_curve(ir, fs)          # un DecayCurve (se sigue desempaquetando como time, level)
-decay.plot()
+decay.plot(language="es")
 plt.show()
 
 # A mano, el decaimiento es solo la curva de Schroeder; marca los niveles de evaluación:
@@ -483,7 +483,7 @@ for fc, t60 in [(125.0, 1.4), (250.0, 1.25), (500.0, 1.1),
 
 # Una línea: barras EDT/T20/T30 por banda + C50/C80 (requiere matplotlib).
 octaves = room.room_parameters(ir, fs)
-octaves.plot()
+octaves.plot(language="es")
 plt.show()
 
 # A mano: el espectro de T30 desde los campos del resultado.
@@ -701,7 +701,7 @@ m = room.open_plan_metrics(r, lp, sti)
 # En una línea: la regresión D2,S reconstruida con los campos del resultado,
 # con los cruces rD / rP marcados (la figura superior añade además los puntos
 # medidos y el eje de STI):
-m.plot()
+m.plot(language="es")
 plt.show()
 ```
 

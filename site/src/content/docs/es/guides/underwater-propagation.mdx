@@ -200,7 +200,7 @@ tl = underwater.transmission_loss(ranges, 10e3, law="practical",
                                   transition_range=1000.0, temperature=10.0,
                                   salinity=35.0, depth=100.0)
 print(f"alpha = {tl.absorption_coefficient:.2f} dB/km")   # alpha = 0.95 dB/km
-tl.plot()   # TL total con las contribuciones de ensanchamiento y absorción
+tl.plot(language="es")   # TL total con las contribuciones de ensanchamiento y absorción
 plt.show()
 ```
 
@@ -239,7 +239,7 @@ from phonometry import underwater
 depths = np.linspace(0.0, 3000.0, 121)
 temps = 4.0 + 14.0 / (1.0 + (np.maximum(depths - 80.0, 0.0) / 250.0) ** 2)
 profile = underwater.sound_speed_profile(depths, temps, 35.0, model="unesco")
-profile.plot()   # velocidad del sonido frente a profundidad, mínimo en el eje del canal
+profile.plot(language="es")   # velocidad del sonido frente a profundidad, mínimo en el eje del canal
 plt.show()
 ```
 
@@ -301,7 +301,7 @@ se = underwater.passive_sonar_equation(source_level=140.0, transmission_loss=tl,
                                        noise_level=60.0, directivity_index=15.0,
                                        detection_threshold=8.0)
 print(f"figura de mérito = {se.figure_of_merit:.1f} dB")  # figura de mérito = 87.0 dB
-se.plot()   # exceso de señal frente a pérdida por transmisión, cruce por cero en la FOM
+se.plot(language="es")   # exceso de señal frente a pérdida por transmisión, cruce por cero en la FOM
 plt.show()
 ```
 
@@ -346,7 +346,7 @@ phi = np.linspace(0.0, 90.0, 361)
 bl = underwater.bottom_reflection_loss(phi, rho1=1000.0, c1=1500.0,
                                        rho2=1900.0, c2=1650.0)
 print(f"ángulo crítico = {bl.critical_angle:.1f} deg")   # ángulo crítico = 24.6 deg
-bl.plot()   # pérdida en el fondo frente al ángulo rasante
+bl.plot(language="es")   # pérdida en el fondo frente al ángulo rasante
 plt.show()
 ```
 
@@ -384,7 +384,7 @@ phi = np.linspace(0.0, 90.0, 361)
 sr = underwater.seabed_reflection(phi, rho1=1000.0, c1=1500.0,
                                   rho2=1900.0, c2=1650.0)
 print(f"|R| en incidencia normal = {sr.magnitude[-1]:.3f}")  # 0.353
-sr.plot()   # módulo del coeficiente de reflexión frente al ángulo rasante
+sr.plot(language="es")   # módulo del coeficiente de reflexión frente al ángulo rasante
 plt.show()
 ```
 
@@ -523,7 +523,7 @@ c = 1500.0 * (1.0 + 0.00737 * (eta - 1.0 + np.exp(-eta)))
 field = underwater.parabolic_equation(50.0, z, c, source_depth=1000.0,
                                       max_range=50_000.0, range_step=50.0,
                                       n_depth_points=512)
-field.plot()   # campo TL(z, r) mostrando las zonas de convergencia
+field.plot(language="es")   # campo TL(z, r) mostrando las zonas de convergencia
 plt.show()
 ```
 

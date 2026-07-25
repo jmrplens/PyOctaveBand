@@ -93,7 +93,7 @@ from phonometry import log_linear_sound_speed_profile
 bajada = log_linear_sound_speed_profile(+1.0, ground_speed=340.0, max_height=60.0)
 subida = log_linear_sound_speed_profile(-1.0, ground_speed=340.0, max_height=60.0)
 ax = bajada.plot(color="#1f77b4")
-subida.plot(ax=ax, color="#d62728")
+subida.plot(ax=ax, color="#d62728", language="es")
 plt.show()
 ```
 
@@ -140,7 +140,7 @@ perfil = log_linear_sound_speed_profile(+1.0, ground_speed=340.0)
 rayos = atmospheric_ray_paths(perfil, source_height=2.0,
                               launch_angles_deg=np.linspace(-8.0, 8.0, 17),
                               max_range=600.0, n_steps=600)
-rayos.plot()   # los rayos rasantes vuelven al suelo y rebotan a lo largo
+rayos.plot(language="es")   # los rayos rasantes vuelven al suelo y rebotan a lo largo
 plt.show()
 ```
 

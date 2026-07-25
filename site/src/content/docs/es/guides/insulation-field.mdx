@@ -184,7 +184,7 @@ R = [20.4, 16.3, 17.7, 22.6, 22.4, 22.7, 24.8, 26.6,
 w = building.weighted_rating(R)
 
 # En una línea — la curva medida frente a la referencia ISO 717-1 desplazada:
-w.plot()
+w.plot(language="es")
 plt.show()
 
 # A mano, con los campos de la curva por banda que ahora lleva el resultado:
@@ -396,7 +396,7 @@ imp = building.impact_insulation(li, t2, volume=50.0)
 res_imp = building.weighted_impact_rating(imp.l_n_t)
 
 # En una línea — L'nT medido frente a la referencia ISO 717-2 desplazada (exceso sombreado):
-res_imp.plot()
+res_imp.plot(language="es")
 plt.show()
 
 # A mano, con la curva por banda que ahora lleva el resultado (signo opuesto: la
@@ -1081,7 +1081,7 @@ k = building.reverberation_index([0.70, 0.60, 0.50, 0.45, 0.40])
 impact = building.survey_impact_insulation(li, k, volume=50.0)
 
 # Una línea: L'nT frente a la referencia ISO 717-2 desplazada:
-impact.plot()
+impact.plot(language="es")
 plt.show()
 
 # A mano, mostrando el cambio de signo de la corrección:

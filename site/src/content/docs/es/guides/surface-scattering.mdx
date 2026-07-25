@@ -178,7 +178,7 @@ alpha_spec = 0.11 + 0.75 * (np.log10(freqs / 250) / np.log10(4000 / 250))
 result = materials.scattering_coefficient_spectrum(freqs, alpha_spec, alpha_s)
 
 # result es el ScatteringResult calculado arriba. En una línea:
-result.plot()
+result.plot(language="es")
 plt.show()
 
 # A mano, a partir de los campos del resultado, replicando lo que dibuja ScatteringResult.plot():
@@ -361,7 +361,7 @@ angles = np.arange(-90.0, 90.5, 5.0)
 result = materials.directional_diffusion(angles, qrd.levels)
 
 # result es el DiffusionResult calculado arriba. En una línea:
-result.plot()
+result.plot(language="es")
 plt.show()
 
 # A mano: un diagrama polar de los niveles, con d anotado en el título.
@@ -508,7 +508,7 @@ depths = materials.qrd_well_depths(7, 500.0)
 qrd = materials.predicted_diffusion_spectrum(0.10, freqs, depths=depths, periods=5)
 
 # El DiffusionSpectrum dibuja la d(f) predicha directamente. Una linea:
-qrd.plot()
+qrd.plot(language="es")
 plt.show()
 
 # A mano: d(f) predicha para el QRD frente a la referencia plana.
@@ -701,7 +701,7 @@ hr = kr * 0.85 * np.roll(lfilter(taps, 1.0, hi), shift)
 result = materials.insitu_absorption_spectrum(hi, hr, fs)
 
 # result es el InsituAbsorptionResult calculado arriba. En una línea:
-result.plot()
+result.plot(language="es")
 plt.show()
 
 # A mano: un diagrama de barras de alpha sobre las bandas de tercio de octava.

@@ -147,7 +147,7 @@ res = stoi(clean, clean + gain * masker, fs)
 print(round(res.value, 3))    # 0.727
 
 # En una línea: la correlación intermedia por banda que hay tras el índice.
-res.plot()
+res.plot(language="es")
 plt.show()
 
 # A mano, reproduciendo lo que dibuja STOIResult.plot():

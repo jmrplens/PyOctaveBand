@@ -314,7 +314,7 @@ res = emission.sound_power_pressure(
 )
 
 # res es el SoundPowerResult calculado arriba. Una línea:
-res.plot()
+res.plot(language="es")
 plt.show()
 
 # A mano: un espectro de barras de LW con el total ponderado A en el título.
@@ -495,7 +495,7 @@ rev = emission.sound_power_reverberation(
 )
 
 # rev es el ReverberationSoundPowerResult calculado arriba. Una línea:
-rev.plot()
+rev.plot(language="es")
 plt.show()
 
 # A mano: un espectro de barras de LW con el total ponderado A en el título.
@@ -661,7 +661,7 @@ res = emission.sound_power_intensity(
 )
 
 # res es el SoundPowerIntensityResult calculado arriba. Una línea:
-res.plot()
+res.plot(language="es")
 plt.show()
 
 # A mano: un espectro de barras de LW con el total ponderado A en el título.
@@ -825,7 +825,7 @@ levels = base[None, :] + rng.normal(0.0, 1.0, (40, freqs.size))
 result = emission.sound_power_anechoic(levels, "hemisphere", radius=1.0, frequencies=freqs)
 
 # result es el PrecisionSoundPowerResult calculado arriba. Una línea:
-result.plot()
+result.plot(language="es")
 plt.show()
 
 # A mano: un espectro de barras de LW con el total ponderado A en el título.
@@ -925,7 +925,7 @@ partial_intensity[:, 0] = [2.0e-6, -3.0e-6, -4.0e-6, -1.0e-6]   # banda de poten
 result = emission.sound_power_intensity_precision(partial_intensity, areas, frequencies=freqs)
 
 # result es el PrecisionIntensityResult calculado arriba. Una línea:
-result.plot()
+result.plot(language="es")
 plt.show()
 
 # A mano: bandas determinadas como barras de LW; una banda no aplicable (su LW es NaN)

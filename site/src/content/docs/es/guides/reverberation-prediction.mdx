@@ -142,7 +142,7 @@ m = environmental.air_attenuation_m(bands, 20.0, 50.0)   # aire a 20 C / 50 % HR
 res = room.reverberation_time_models((10.0, 7.0, 3.5),
                                      (alpha_x, alpha_y, alpha_z),
                                      air_attenuation=m, frequencies=bands)
-res.plot()   # las cinco curvas de modelo por banda
+res.plot(language="es")   # las cinco curvas de modelo por banda
 plt.show()
 ```
 

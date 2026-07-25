@@ -227,7 +227,7 @@ track = np.column_stack([np.zeros_like(t), speed * (t - 65.0),
                          np.full_like(t, 150.0)])
 event = aircraft.rotorcraft_event_level(
     [h], [speed], [0.0], t, track, (120.0, 0.0), flow_resistivity="D")
-event.plot()
+event.plot(language="es")
 plt.show()
 ```
 
@@ -322,7 +322,7 @@ flat = aircraft.ground_effect_adjustment(freqs, 90.0, 1.2, 600.0,
                                          flow_resistivity="D")
 
 fig, (ax, ax2) = plt.subplots(2, 1, figsize=(9, 7))
-res.plot(ax=ax)
+res.plot(ax=ax, language="es")
 ax2.axhline(0.0, color="0.5", linewidth=1.0)
 ax2.semilogx(freqs, flat, ls="--", marker="s", markersize=3,
              label="Suelo plano (sin colina)")

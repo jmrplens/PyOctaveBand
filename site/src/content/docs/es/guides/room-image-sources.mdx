@@ -136,7 +136,7 @@ res = room.image_source_rir((7.0, 5.0, 3.0), (2.0, 1.6, 1.5),
                             (5.2, 3.4, 1.7), 0.12, fs=48000, max_order=10)
 
 # Una línea: el reflectograma (nivel en dB rel. directo vs tiempo, por orden).
-res.plot()
+res.plot(language="es")
 plt.show()
 
 # A mano: dispersión de las amplitudes de reflexión coloreadas por orden.
@@ -265,7 +265,7 @@ field = room.steady_state_field(
 )
 
 # Una línea: niveles directo, reverberante y total con rc marcada.
-field.plot()
+field.plot(language="es")
 plt.show()
 
 # A mano, desde los campos del resultado:

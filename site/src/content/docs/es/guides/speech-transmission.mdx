@@ -161,7 +161,7 @@ res = hearing.sti_from_impulse_response(ir, fs, snr=15.0)
 print(round(res.sti, 3), res.rating)      # 0.583 E
 
 # En una línea: las barras de MTI por banda con el STI y su valoración.
-res.plot()
+res.plot(language="es")
 plt.show()
 
 # A mano, reproduciendo lo que dibuja STIResult.plot():

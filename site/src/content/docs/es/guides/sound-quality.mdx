@@ -151,7 +151,7 @@ res = psychoacoustics.tonality_ecma(x, fs, field="free")
 
 # En una línea: al pasar unos ejes se dibuja solo el panel de tonalidad específica.
 fig, ax = plt.subplots()
-res.plot(ax=ax)
+res.plot(ax=ax, language="es")
 plt.show()
 
 # O dibuja T'(z) a mano frente a la escala de razón de banda crítica:

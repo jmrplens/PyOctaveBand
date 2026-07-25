@@ -144,7 +144,7 @@ levels_28 = np.full(28, 60.0)                             # 28 niveles de tercio
 res = psychoacoustics.loudness_zwicker_from_spectrum(levels_28, field="diffuse")
 
 # En una línea — el patrón de sonoridad específica N'(z) desde el resultado:
-res.plot()
+res.plot(language="es")
 plt.show()
 
 # O reproduce la figura a mano — dos patrones con el mismo nivel de banda (60 dB),
@@ -268,7 +268,7 @@ from phonometry import psychoacoustics
 
 # Una línea — la familia de curvas directamente desde el resultado:
 res = psychoacoustics.equal_loudness_contours()
-res.plot()
+res.plot(language="es")
 plt.show()
 
 # O reproduce la figura a mano — Fórmula (1) de ISO 226:2023 en las 29
@@ -407,7 +407,7 @@ x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * np.arange(fs
 res = psychoacoustics.loudness_moore_glasberg(x, fs, field="free", presentation="binaural")
 
 # En una línea — el patrón de sonoridad específica N'(i) directo del resultado:
-res.plot()
+res.plot(language="es")
 plt.show()
 
 # O dibújalo a mano desde la rejilla del número ERB que ya lleva el resultado:
@@ -476,7 +476,7 @@ x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * t)
 res = psychoacoustics.loudness_moore_glasberg_time(x, fs, field="free")
 
 # El resultado lleva ambas trazas sobre un eje temporal de 1 ms:
-res.plot()
+res.plot(language="es")
 plt.show()
 
 # O dibújalas directamente para ver la STL rápida frente a la LTL lenta:
@@ -547,7 +547,7 @@ x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * t)
 res = psychoacoustics.loudness_ecma(x, fs, field="free")
 
 # El resultado lleva la sonoridad específica media sobre las 53 bandas Bark_HMS:
-res.plot()
+res.plot(language="es")
 plt.show()
 
 # O dibuja N'(z) a mano frente a la escala de tasa de banda crítica:

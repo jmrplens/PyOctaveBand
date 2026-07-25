@@ -146,7 +146,7 @@ from phonometry import materials
 
 # Coeficientes prácticos del Anexo A.2 de ISO 11654 a 250/500/1000/2000/4000 Hz
 result = materials.weighted_absorption([0.35, 1.00, 0.65, 0.60, 0.55])
-result.plot()   # curva práctica frente a la referencia desplazada
+result.plot(language="es")   # curva práctica frente a la referencia desplazada
 plt.show()
 ```
 
@@ -313,7 +313,7 @@ m = materials.measure_sound_absorption(
 )
 
 # Una línea: el espectro de alpha_s sobre el eje de bandas de tercio de octava.
-m.plot()
+m.plot(language="es")
 plt.show()
 
 # A mano, desde los campos del resultado:
@@ -725,7 +725,7 @@ result = materials.two_microphone_impedance(
 )
 
 # Una línea: alpha(f) con |r| superpuesto.
-result.plot()
+result.plot(language="es")
 plt.show()
 
 # A mano, desde los campos del resultado:
@@ -870,7 +870,7 @@ tm = materials.TransferMatrix(t11=chain[0, 0], t12=chain[0, 1],
                               t21=chain[1, 0], t22=chain[1, 1])
 
 # Una línea: TL(f) en el eje izquierdo, absorción con respaldo rígido a la derecha.
-tm.plot(f, 407.0)
+tm.plot(f, 407.0, language="es")
 plt.show()
 
 # A mano, desde los métodos de la matriz:
@@ -1028,7 +1028,7 @@ freqs = [63, 80, 100, 125, 160, 200, 250, 315, 400, 500,
 alpha_s = [0.33, 0.35, 0.39, 0.38, 0.37, 0.36, 0.36, 0.36, 0.43, 0.49,
            0.58, 0.63, 0.68, 0.71, 0.73, 0.75, 0.77, 0.79, 0.81, 0.81]
 result = materials.sound_absorption_coefficient_uncertainty(alpha_s, freqs, confidence=0.95)
-result.plot()   # alpha_s con la banda +/-U (k = 2) de reproducibilidad
+result.plot(language="es")   # alpha_s con la banda +/-U (k = 2) de reproducibilidad
 plt.show()
 ```
 </details>
