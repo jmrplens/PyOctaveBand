@@ -205,10 +205,30 @@ elegirlo:
 ```python
 res = miso_coherence([x1, x2, x3], y, fs, order=(2, 0, 1))
 res.order            # (2, 0, 1): el orden aplicado
+res.plot(language="es")   # los dos paneles, recalculados en el orden aplicado
 ```
+
+Merece la pena nombrar dos escollos prácticos. *Promediado*: cada paso de
+condicionamiento gasta un grado de libertad, así que con pocos segmentos
+las coherencias parciales de las últimas entradas del orden son los números
+menos fiables de la página; promedia con generosidad antes de leer una
+coherencia parcial pequeña como cero. *Sesgo por retardo*: como la
+coherencia ordinaria, la estimación de Welch queda sesgada a la baja cuando
+un retardo global entre una entrada y la salida se convierte en una
+fracción apreciable de la longitud del segmento; elimina primero los
+retardos de propagación conocidos (ver
+[Correlación y retardo](/phonometry/es/guides/correlation-delay/)) y
+mantén `nperseg` bien por encima del mayor retardo restante.
 
 Los estimadores comparten el núcleo de Welch de la página de
 [análisis espectral calibrado](/phonometry/es/guides/spectral-analysis/)
 (mismo enventanado de Hann, solape del 50 % y calibración sin quitar
 tendencia), de modo que una coherencia MISO y un `power_spectral_density`
 calculados con la misma longitud de segmento son consistentes bin a bin.
+
+## Véase también
+
+- [Análisis espectral](/phonometry/es/guides/spectral-analysis/): el espectro de salida coherente de una entrada que esta página generaliza, y el núcleo de Welch compartido.
+- [Correlación y retardo](/phonometry/es/guides/correlation-delay/): estimar y eliminar los retardos globales que sesgan la coherencia a la baja.
+- [Multicanal y rendimiento](/phonometry/es/guides/multichannel/): la ruta por canal que este análisis cruzado complementa.
+- Referencia de la API: [`metrology.miso`](/phonometry/es/reference/api/spectra/miso/).

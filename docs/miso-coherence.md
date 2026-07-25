@@ -147,13 +147,40 @@ coherence carries `nd-(q-1)` (Eq. 9.98). The result exposes
 the effective average count `n_averages`.
 
 The ordinary and multiple coherences do not depend on the conditioning order,
-but the partial coherences and the coherent-output decomposition do. Absent a
-physical ordering, Bendat & Piersol (Section 7.2.4) recommend ordering the
-inputs by descending ordinary coherence with the output; pass `order` to
-choose (for example `order=(2, 0, 1)`). The estimators share the Welch core of
-the [calibrated spectral analysis](spectral-analysis.md) page, so a MISO
+but the partial coherences and the coherent-output decomposition do: each
+input is conditioned on whatever precedes it. Absent a physical ordering,
+Bendat & Piersol (Section 7.2.4) recommend ordering the inputs by descending
+ordinary coherence with the output. Pass `order` to choose:
+
+```python
+res = miso_coherence([x1, x2, x3], y, fs, order=(2, 0, 1))
+res.order            # (2, 0, 1): the order actually applied
+res.plot()           # the two panels, recomputed in the applied order
+```
+
+Two practical pitfalls are worth naming. *Averaging*: every conditioning
+step spends a degree of freedom, so with few segments the partial
+coherences of the last-ordered inputs are the least trustworthy numbers on
+the page; average generously before reading a small partial coherence as
+zero. *Delay bias*: like the ordinary coherence, the Welch estimate is
+biased low when a bulk delay between an input and the output becomes a
+noticeable fraction of the segment length; remove known propagation delays
+first (see [Correlation and delay](correlation-delay.md)) and keep
+`nperseg` well above the longest remaining delay.
+
+The estimators share the Welch core of the
+[calibrated spectral analysis](spectral-analysis.md) page, so a MISO
 coherence and a `power_spectral_density` computed with the same segment length
 are consistent bin by bin.
+
+## See also
+
+- [Spectral analysis](spectral-analysis.md): the single-input coherent
+  output spectrum this page generalizes, and the shared Welch core.
+- [Correlation and delay](correlation-delay.md): estimating and removing
+  the bulk delays that bias coherence low.
+- [Multichannel and Performance](multichannel.md): the per-channel path
+  this cross-channel analysis complements.
 
 ## References
 
