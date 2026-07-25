@@ -2,12 +2,32 @@
 
 # Multichannel and Performance
 
-## Multichannel Support
+Most real measurement sessions produce more than one channel: the two ears
+of a dummy head, the microphone pair of an intensity probe, the several
+positions of a room survey, the capsules of a beamforming array. The
+convention for all of them is one array of shape `(channels, samples)`
+processed in a single call: every function runs along the last (time) axis
+and preserves the leading channel axis, so each row is analyzed exactly as
+if it were the only one.
 
-phonometry natively supports multichannel signals (e.g., Stereo, 5.1,
-Microphone Arrays) using **fully vectorized operations**. Input arrays of shape
-`(N_channels, N_samples)` are processed in parallel, offering significant
-performance gains over iterative loops.
+That per-channel guarantee is normative, not just convenient. The band
+filters applied to each row are the IEC 61260-1 designs and the weightings
+and detector ballistics are the IEC 61672-1 ones, unchanged from the
+single-channel path; the vectorization batches the arithmetic across rows
+(one filter design, one SciPy call) and never mixes them. This is the
+textbook procedure for multiple data records (Bendat & Piersol 2010,
+§10.4.2): analyze each record individually first, and compute anything
+joint as a separate, explicit step.
+
+Use this page when your channels are parallel recordings on the same clock
+and you want per-channel spectra or levels. When the question is *between*
+channels (what is the delay from A to B, how much of B is explained by A),
+that is cross-channel analysis: see
+[Correlation and delay](correlation-delay.md) and
+[Multiple and partial coherence](miso-coherence.md), the implementations of
+the Bendat & Piersol cross-correlation and multiple-input models.
+
+## A stereo analysis in one call
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_multichannel_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_multichannel.svg" alt="Stereo analysis: pink noise and logarithmic sweep resolved per channel in one-third-octave bands" width="80%"></picture>
 
@@ -106,10 +126,10 @@ spelling out:
 
 ## Performance: Vectorization and caching
 
-The `OctaveFilterBank` class is highly optimized for real-time and batch
-processing. It uses NumPy vectorization to handle multichannel audio arrays
-(e.g., 64-channel microphone arrays) without explicit Python loops, ensuring
-maximum throughput.
+`OctaveFilterBank` is the tool for repeated or streaming analysis: one bank
+designs its filters once and applies them to every frame, and NumPy
+broadcasting covers all channels of a frame in one filtering call per band,
+with no Python loop over channels.
 
 ```python
 import numpy as np
@@ -146,8 +166,27 @@ Additional performance notes:
 - **Optional numba**: the `impulse` time weighting kernel is JIT-compiled when
   numba is installed (`pip install phonometry[perf]`).
 
+## See also
+
+- [Correlation and delay](correlation-delay.md): the cross-channel
+  time-domain questions (delay, alignment) the per-channel path deliberately
+  leaves to you.
+- [Multiple and partial coherence](miso-coherence.md): which of several
+  correlated channels actually drives a response (Bendat & Piersol Ch. 7).
+- [Block Processing](block-processing.md): the streaming counterpart, with
+  one filter state per channel.
+- [Levels](levels.md): the per-channel level metrics, and why dB values are
+  combined energetically.
+
 ## References
 
+- Bendat, J. S., & Piersol, A. G. (2010). *Random data: Analysis and
+  measurement procedures* (4th ed.). Wiley.
+  [doi:10.1002/9781118032428](https://doi.org/10.1002/9781118032428).
+  Section 10.4.2 (the procedure for analyzing multiple data records:
+  individual per-record analysis first, joint cross-record analysis as a
+  separate, deliberate step) and Chapter 7 (the multiple-input/output
+  models that joint step leads to).
 - International Electrotechnical Commission. (2014). *Electroacoustics —
   Octave-band and fractional-octave-band filters — Part 1: Specifications*
   (IEC 61260-1:2014).
