@@ -958,7 +958,7 @@ facade.report("D2mnTw_survey.pdf")                       # D2m,nT,w (C; Ctr)
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_impact_insulation_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_impact_insulation.svg" alt="Survey-method impact insulation: the measured octave-band impact level Li and the standardized L'nT with the reverberation-index correction shaded between them, the L'nT,w rating annotated and a note that a live room lowers the standardized impact level" width="80%"></picture>
 
 *The impact survey applies the reverberation index with the opposite sign,
-`L'nT = Li − k`: a live receiving room (`T > T0`) *lowers* the standardized
+`L'nT = Li − k`: a live receiving room (`T > T0`) **lowers** the standardized
 impact level. As in the airborne case, the automatic rating appears for
 exactly 5 octave (or 16 one-third-octave) values.*
 
