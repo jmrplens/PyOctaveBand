@@ -276,6 +276,25 @@ def test_resample_invalid_parameters() -> None:
         ph.resample_signal(two_dimensional, FS, 32000.0)
 
 
+def test_resample_plot_filter_and_edges() -> None:
+    x = ph.noise_signal(FS, 0.2, seed=5)
+    res = ph.resample_signal(x, FS, 32000.0, stopband_attenuation_db=100.0)
+    ax = res.plot(linewidth=2)
+    # The magnitude trace echoes the requested kwargs.
+    assert any(line.get_linewidth() == 2.0 for line in ax.lines)
+    # Both design edges are drawn as vertical lines at their exact Hz.
+    xs = {line.get_xdata()[0] for line in ax.lines if len(line.get_xdata()) == 2}
+    assert res.passband_edge_hz in xs
+    assert res.stopband_edge_hz in xs
+    # The attenuation line sits at -A dB.
+    ys = {line.get_ydata()[0] for line in ax.lines if len(line.get_ydata()) == 2}
+    assert -res.stopband_attenuation_db in ys
+    assert "Polyphase resampling" in ax.get_title()
+    assert "160/240" not in ax.get_title()  # reduced ratio, not the raw rates
+    assert f"L/M = {res.up}/{res.down}" in ax.get_title()
+    plt.close("all")
+
+
 # ---------------------------------------------------------------------------
 # Fractional delay
 # ---------------------------------------------------------------------------

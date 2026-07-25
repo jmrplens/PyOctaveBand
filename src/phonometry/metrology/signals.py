@@ -442,6 +442,26 @@ class ResampledSignalResult:
         """Length of the designed anti-alias FIR."""
         return int(self.filter_taps.size)
 
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
+        """Plot the delivered anti-alias filter against its design spec.
+
+        The magnitude response of :attr:`filter_taps` with the passband
+        edge, the stopband edge at the alias fold, the designed stopband
+        attenuation and the rejected band shaded.
+
+        :param ax: Existing axes, or ``None`` to create a figure.
+        :param language: Label language, ``"en"`` (default) or ``"es"``.
+        :param kwargs: Forwarded to the magnitude ``plot`` call.
+        :return: The axes.
+        """
+        from .._i18n import check_language
+        from .._plot.metrology import plot_resampled_signal
+
+        check_language(language)
+        return plot_resampled_signal(self, ax=ax, language=language, **kwargs)
+
 
 def resample_signal(
     x: NDArray[np.float64] | list[float],

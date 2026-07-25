@@ -234,6 +234,20 @@ def test_tone_burst_es_and_bad_language() -> None:
         res.plot(language="xx")
 
 
+def test_resampled_signal_es_and_bad_language() -> None:
+    res = ph.resample_signal(
+        ph.noise_signal(FS, 0.2, seed=5), FS, 32000.0
+    )
+    ax = res.plot(language="es")
+    assert "Remuestreo polifásico" in ax.get_title()
+    assert ax.get_xlabel() == "Frecuencia [Hz]"
+    assert "Filtro antisolapamiento" in _labels(ax)
+    assert "Borde de la banda de paso" in _labels(ax)
+    plt.close("all")
+    with pytest.raises(ValueError):
+        res.plot(language="xx")
+
+
 def test_window_metrics_es_and_bad_language() -> None:
     res = ph.window_metrics("hann", 1024)
     axes = res.plot(language="es")

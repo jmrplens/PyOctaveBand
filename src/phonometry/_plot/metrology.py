@@ -31,7 +31,7 @@ if TYPE_CHECKING:
         StationarityTestResult,
         TrendTestResult,
     )
-    from ..metrology.signals import ToneBurstResult
+    from ..metrology.signals import ResampledSignalResult, ToneBurstResult
     from ..metrology.spectra import (
         CoherentOutputSpectrumResult,
         CrossSpectralDensityResult,
@@ -235,6 +235,16 @@ _STRINGS: dict[str, str] = {
     "Frequency [orders]": "Frecuencia [órdenes]",
     r"Comb filter $|C(f)|$ (Eq. 8)": r"Filtro peine $|C(f)|$ (Ec. 8)",
     "Harmonics of $1/T$": "Armónicos de $1/T$",
+    "Anti-alias filter $|H(f)|$": "Filtro antisolapamiento $|H(f)|$",
+    "Passband edge": "Borde de la banda de paso",
+    "Stopband edge (alias fold)":
+        "Borde de la banda atenuada (pliegue de alias)",
+    "Design attenuation −{a} dB": "Atenuación de diseño −{a} dB",
+    "Rejected band (would fold back as aliases)":
+        "Banda rechazada (se plegaría como alias)",
+    "Polyphase resampling {fs0} Hz → {fs1} Hz (L/M = {up}/{down}, {taps} taps)":
+        "Remuestreo polifásico {fs0} Hz → {fs1} Hz "
+        "(L/M = {up}/{down}, {taps} coeficientes)",
 }
 
 
@@ -1243,6 +1253,74 @@ def plot_tone_burst(
     ax.set_ylabel(_t("Amplitude", language))
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     ax.grid(True, alpha=0.3)
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_resampled_signal(
+    result: ResampledSignalResult, ax: Axes | None = None, *,
+    language: str = "en", **kwargs: Any
+) -> Axes:
+    """Anti-alias filter magnitude with the design edges and attenuation.
+
+    The magnitude response of the Kaiser lowpass the polyphase engine
+    applied (evaluated from :attr:`filter_taps` at the intermediate rate
+    ``original_fs·up``), with the passband edge, the stopband edge at the
+    smaller Nyquist frequency (where aliases fold), the designed stopband
+    attenuation line and the rejected band shaded — the delivered
+    anti-alias spec, read off the delivered filter.
+
+    :param result: A
+        :class:`~phonometry.metrology.signals.ResampledSignalResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the magnitude ``plot`` call.
+    :return: The axes.
+    """
+    from scipy import signal as sp_signal
+
+    from .._i18n import format_number, localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    fs_up = result.original_fs * result.up
+    freqs, h = sp_signal.freqz(result.filter_taps, worN=1 << 14, fs=fs_up)
+    tiny = np.finfo(np.float64).tiny
+    mag_db = 20.0 * np.log10(np.maximum(np.abs(h), tiny))
+    pos = freqs > 0.0
+    kwargs.setdefault("color", _C_PRIMARY)
+    if "lw" not in kwargs and "linewidth" not in kwargs:
+        kwargs["lw"] = 1.2
+    ax.semilogx(freqs[pos], mag_db[pos],
+                label=_t("Anti-alias filter $|H(f)|$", language), **kwargs)
+    ax.axvline(result.passband_edge_hz, color=_C_TERTIARY, linestyle="--",
+               lw=1.2, label=_t("Passband edge", language))
+    ax.axvline(result.stopband_edge_hz, color=_C_SECONDARY, linestyle="--",
+               lw=1.2, label=_t("Stopband edge (alias fold)", language))
+    atten = format_number(result.stopband_attenuation_db, language,
+                          decimals=0)
+    ax.axhline(-result.stopband_attenuation_db, color=_C_MUTED,
+               linestyle=":", lw=1.2,
+               label=_t("Design attenuation −{a} dB", language, a=atten))
+    ax.axvspan(result.stopband_edge_hz, fs_up / 2.0, color=_C_SECONDARY,
+               alpha=0.08,
+               label=_t("Rejected band (would fold back as aliases)",
+                        language))
+    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_ylabel(_t("Magnitude [dB]", language))
+    ax.set_ylim(-result.stopband_attenuation_db - 40.0, 10.0)
+    fs0 = format_number(result.original_fs, language, decimals=0)
+    fs1 = format_number(result.fs, language, decimals=0)
+    ax.set_title(_t(
+        "Polyphase resampling {fs0} Hz → {fs1} Hz (L/M = {up}/{down}, "
+        "{taps} taps)",
+        language, fs0=fs0, fs1=fs1, up=result.up, down=result.down,
+        taps=result.n_taps,
+    ))
+    ax.grid(True, which="both", alpha=0.3)
+    ax.legend(loc="lower left", fontsize="small")
+    format_frequency_axis(
+        ax, result.stopband_edge_hz / 8.0, fs_up / 2.0, minor=None
+    )
     localize_axes(ax, language)
     return ax
 
