@@ -1,20 +1,11 @@
-/* Page header chips and API sidebar treatments: switchable prototypes.
+/* Page header chips and API sidebar treatments.
 
-   The sidebar carries no standards information at all. That decision is
-   final: the tree stays exactly as it is and everything about "what governs
-   this page" lives in the page header, one row per page, derived from the
-   page's own `references` frontmatter (PageChips.astro plus
-   src/lib/reference-chips.ts).
-
-   Two independent attributes on <html>, applied before first paint by the
-   switcher script in Head.astro and persisted in localStorage:
-
-     data-page-chips='header'  the quiet run: tinted text, one small colour
-                               dot leading each category.
-     data-page-chips='pills'   the same content as outlined pills, so the
-                               chips read as the links they are.
-     data-page-chips='filled'  outlined pills with a faint category tint.
-     data-page-chips='off'     no run at all.
+   The sidebar carries no standards information at all, and the page chips
+   have one presentation: an outlined pill per source. Both decisions are
+   final, so neither is switchable any more. What is left of the prototype is
+   the API sidebar treatment, still under `data-api-style` on <html>, applied
+   before first paint by the switcher script in Head.astro and persisted in
+   localStorage:
 
      data-api-style='inline'    the API reference group renders fully
                                 expanded in place (status quo).
@@ -32,51 +23,50 @@
    values on :root, light overrides on [data-theme='light']). */
 
 :root {
-  /* Category colours, dark theme. `*-accent` is the leading dot and the pill
-     border, `*-ink` the text, `*-tint` the filled pill background. */
-  --chip-standard-accent: #6fdcc8;
+  /* Category colours, dark theme. `*-ink` is the pill text, `*-line` its
+     border, `*-tint` the hover fill. The border alphas are the lowest that
+     clear 3:1 against the page background (WCAG 1.4.11 non-text contrast),
+     measured on the composited colour rather than assumed. */
   --chip-standard-ink: #7ee8d5;
+  --chip-standard-line: rgb(111 220 200 / 50%);
   --chip-standard-tint: rgb(111 220 200 / 18%);
-  --chip-standard-tint-strong: rgb(111 220 200 / 32%);
-  --chip-standard-line: rgb(111 220 200 / 38%);
-  --chip-theory-accent: #e6b84e;
   --chip-theory-ink: #f4c04e;
+  --chip-theory-line: rgb(230 184 78 / 50%);
   --chip-theory-tint: rgb(230 184 78 / 18%);
-  --chip-theory-tint-strong: rgb(230 184 78 / 32%);
-  --chip-theory-line: rgb(230 184 78 / 38%);
   --chip-ink-muted: hsl(224, 8%, 62%);
+  --chip-more-line: hsl(224, 8%, 45%);
 }
 
 :root[data-theme='light'] {
-  --chip-standard-accent: #128273;
   --chip-standard-ink: #0c5c52;
+  --chip-standard-line: rgb(18 130 115 / 80%);
   --chip-standard-tint: rgb(18 130 115 / 12%);
-  --chip-standard-tint-strong: rgb(18 130 115 / 22%);
-  --chip-standard-line: rgb(18 130 115 / 35%);
-  --chip-theory-accent: #a8760a;
   --chip-theory-ink: #855107;
+  --chip-theory-line: rgb(168 118 10 / 90%);
   --chip-theory-tint: rgb(168 118 10 / 13%);
-  --chip-theory-tint-strong: rgb(168 118 10 / 24%);
-  --chip-theory-line: rgb(168 118 10 / 35%);
   --chip-ink-muted: hsl(224, 7%, 42%);
+  --chip-more-line: hsl(224, 7%, 55%);
 }
 
 /* ---------------------------------------------------------------------------
-   PAGE CHIPS, shared structure. One run per category under the H1: the
-   standards that govern the page, then the works its methods are attributed
-   to. Every chip links to its full entry in the page bibliography.
+   PAGE CHIPS. One run per category under the H1: the standards that govern
+   the page, then the works its methods are attributed to. Every chip is a
+   link into the page bibliography and looks like one, because an outlined
+   pill is the smallest affordance that says "clickable" without filling
+   anything in. The border colour carries the category, so nothing else has
+   to.
+
+   Rendered by PageChips.astro from the page's own `references` frontmatter;
+   a page without references renders no markup at all.
    --------------------------------------------------------------------------- */
 
 .page-chips {
-  display: none;
-}
-
-:root[data-page-chips='header'] .page-chips,
-:root[data-page-chips='pills'] .page-chips,
-:root[data-page-chips='filled'] .page-chips {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
+  /* Wider between the two category runs than inside one, so the standards and
+     the named works read as two groups without needing a separator. */
+  gap: 0.3rem 1.1rem;
   margin-block-start: 0.55rem;
   font-size: var(--sl-text-sm);
   line-height: 1.5;
@@ -85,127 +75,46 @@
 .page-chips .chip-run {
   display: inline-flex;
   flex-wrap: wrap;
-  align-items: baseline;
-}
-
-.page-chips .page-chip {
-  font-weight: 500;
-  white-space: nowrap;
-  text-decoration: none;
-}
-
-.page-chips .chip-standard {
-  color: var(--chip-standard-ink);
-}
-.page-chips .chip-theory {
-  color: var(--chip-theory-ink);
-}
-.page-chips .chip-more {
-  color: var(--chip-ink-muted);
-}
-
-/* ---------------------------------------------------------------------------
-   STYLE 'header': a run of tinted text. One leading dot per category run
-   carries the whole legend, so nothing needs a box and the line reads as the
-   dateline of a standard rather than as a row of tags.
-   --------------------------------------------------------------------------- */
-
-:root[data-page-chips='header'] .page-chips {
-  gap: 0.15rem 1.15rem;
-}
-:root[data-page-chips='header'] .chip-run {
-  gap: 0.15rem 0.7rem;
-}
-
-:root[data-page-chips='header'] .chip-run::before {
-  content: '';
-  flex: 0 0 auto;
-  align-self: center;
-  inline-size: 0.4rem;
-  block-size: 0.4rem;
-  margin-inline-end: 0.1rem;
-  border-radius: 50%;
-}
-:root[data-page-chips='header'] .chip-run-standard::before {
-  background: var(--chip-standard-accent);
-}
-:root[data-page-chips='header'] .chip-run-reference::before {
-  background: var(--chip-theory-accent);
-}
-
-:root[data-page-chips='header'] .page-chip:hover,
-:root[data-page-chips='header'] .page-chip:focus-visible {
-  text-decoration: underline;
-  text-underline-offset: 0.25em;
-}
-
-/* ---------------------------------------------------------------------------
-   STYLES 'pills' and 'filled': the same content inside a bordered chip, so
-   the clickability is visible without hovering. The border colour carries
-   the category, which lets the pill stay small, low contrast and unfilled
-   (or barely filled) instead of turning into the badge that was rejected in
-   the sidebar experiment.
-   --------------------------------------------------------------------------- */
-
-:root[data-page-chips='pills'] .page-chips,
-:root[data-page-chips='filled'] .page-chips {
-  align-items: center;
-  /* The gap between the two category runs is wider than the gap inside one,
-     so the standards and the named works still read as two groups without a
-     dot to mark the boundary. */
-  gap: 0.3rem 1.1rem;
-}
-:root[data-page-chips='pills'] .chip-run,
-:root[data-page-chips='filled'] .chip-run {
   align-items: center;
   gap: 0.3rem 0.35rem;
 }
 
-:root[data-page-chips='pills'] .page-chip,
-:root[data-page-chips='filled'] .page-chip {
+.page-chips .page-chip {
   padding: 0.1rem 0.5rem;
   border: 1px solid var(--chip-line, var(--sl-color-gray-5));
   border-radius: 999px;
   font-size: 0.75rem;
+  font-weight: 500;
   line-height: 1.5;
+  white-space: nowrap;
+  text-decoration: none;
   transition:
     background-color 0.12s ease,
     border-color 0.12s ease;
 }
 
-:root[data-page-chips='pills'] .chip-standard,
-:root[data-page-chips='filled'] .chip-standard {
+.page-chips .chip-standard {
   --chip-line: var(--chip-standard-line);
   --chip-fill: var(--chip-standard-tint);
-  --chip-fill-strong: var(--chip-standard-tint-strong);
+  color: var(--chip-standard-ink);
 }
-:root[data-page-chips='pills'] .chip-theory,
-:root[data-page-chips='filled'] .chip-theory {
+.page-chips .chip-theory {
   --chip-line: var(--chip-theory-line);
   --chip-fill: var(--chip-theory-tint);
-  --chip-fill-strong: var(--chip-theory-tint-strong);
+  color: var(--chip-theory-ink);
+}
+.page-chips .chip-more {
+  --chip-line: var(--chip-more-line);
+  --chip-fill: var(--sl-color-gray-6);
+  color: var(--chip-ink-muted);
 }
 
-:root[data-page-chips='filled'] .page-chip {
-  background: var(--chip-fill, transparent);
-}
-
-/* Hover and focus: the tint appears (outlined) or deepens (filled) and the
-   border firms up, so the state is legible in both themes without moving
-   anything. */
-:root[data-page-chips='pills'] .page-chip:hover,
-:root[data-page-chips='pills'] .page-chip:focus-visible,
-:root[data-page-chips='filled'] .page-chip:hover,
-:root[data-page-chips='filled'] .page-chip:focus-visible {
-  background: var(--chip-fill-strong, var(--sl-color-gray-6));
+/* Hover and focus fill the pill with a faint category tint and firm up the
+   border, so the state is legible in both themes without moving anything. */
+.page-chips .page-chip:hover,
+.page-chips .page-chip:focus-visible {
+  background: var(--chip-fill);
   border-color: currentColor;
-}
-
-:root[data-page-chips='pills'] .chip-more,
-:root[data-page-chips='filled'] .chip-more {
-  --chip-line: var(--sl-color-gray-5);
-  --chip-fill: transparent;
-  --chip-fill-strong: var(--sl-color-gray-6);
 }
 
 /* ---------------------------------------------------------------------------

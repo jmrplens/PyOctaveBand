@@ -9,9 +9,9 @@
  * References section at the bottom, and every chip links to its full entry
  * there. Pages without references render nothing.
  *
- * The markup is the same for every presentation; `data-page-chips` on <html>
- * picks between the quiet text run, the outlined pills, the filled pills and
- * nothing at all (src/styles/ux-variants.css), so switching costs no rebuild.
+ * The presentation is settled: one outlined pill per source, styled in
+ * src/styles/ux-variants.css. Nothing here is switchable; the only reason
+ * this component renders nothing is a page with no `references`.
  */
 import { pageChips } from '../lib/reference-chips';
 

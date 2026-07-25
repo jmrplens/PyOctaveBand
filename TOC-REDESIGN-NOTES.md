@@ -1,9 +1,13 @@
 # Standards in the docs: page header chips and the API sidebar
 
-Experimental branch `feat/toc-sidebar-info`. It does not merge and has no PR:
-it exists so I can compare presentations live on the running site and then
-keep one. The target is the desktop reader; a design only has to survive a
-phone, it is not judged there.
+Experimental branch `feat/toc-sidebar-info`. It does not merge and has no PR.
+Both design questions it was opened for are now settled: the sidebar carries
+no standards information, and the page header carries it as one outlined pill
+per source. Neither is switchable any more. What is still a prototype is the
+API sidebar treatment, which keeps its switcher.
+
+The target is the desktop reader; a design only has to survive a phone, it is
+not judged there.
 
 ## The sidebar decision is final
 
@@ -71,18 +75,24 @@ bibliography does not move them). The target clears the sticky header and is
 highlighted on arrival, so a click on `ISO 10140` lands the reader on the
 right line of a fourteen-entry list.
 
-### Presentations
+### Presentation: one outlined pill per source
 
-`data-page-chips` on `<html>`, localStorage key `pageChips`:
+Settled. Each chip is a 12 px label in a fully rounded 1 px outline, tinted by
+category (standards teal, named works amber), with a faint category fill on
+hover and focus. Nothing is filled at rest.
 
-| Value | What the reader sees |
-| --- | --- |
-| `header` | Tinted text, one small colour dot leading each category run. No boxes. |
-| `pills` (my recommendation) | The same content as outlined pills: 12 px text, 1 px category-coloured border at 38 % alpha, fully rounded, transparent inside. |
-| `filled` | The same pills with a faint category tint inside (18 % dark, 12 % light). |
-| `off` | Nothing. |
+The reasoning: the chips are links, and as plain text they looked exactly like
+prose, so their clickability was undiscoverable. An outline is the smallest
+mark that says "interactive" without filling anything in, and the border
+colour carries the category so nothing else has to. The objection that killed
+the sidebar chips does not transfer, because that was a decoration repeated
+down 150 rows of a tall tree and this is one row per page in a band that is
+otherwise empty. The two presentations that lost, a plain tinted text run and
+the same pills with a permanent fill, are deleted along with their CSS and the
+`data-page-chips` attribute that switched between them.
 
-`data-api-style`, localStorage key `apiStyle`:
+The only remaining API prototype dimension is `data-api-style`, localStorage
+key `apiStyle`:
 
 | Value | What the reader sees |
 | --- | --- |
@@ -90,50 +100,73 @@ right line of a fourteen-entry list.
 | `collapsed` | The API group gets a caret and folds. Folded on guide pages, open on API pages, and the reader's choice is kept for the session. |
 | `inline` | Status quo: the whole API tree always expanded in place. |
 
+### Border contrast
+
+The pill outline is a decoration in the sense that the link is identified by
+its text, but it is the only thing that draws the pill, so it is held to the
+3:1 of WCAG 1.4.11 rather than left as a hairline. The alphas are the lowest
+that clear it, measured on the composited colour against the page background:
+
+| | dark | light |
+| --- | --- | --- |
+| standards border | 50 % alpha, 3.60:1 | 80 % alpha, 3.33:1 |
+| works border | 50 % alpha, 3.32:1 | 90 % alpha, 3.40:1 |
+| standards text | 12.16:1 | 7.87:1 |
+| works text | 10.56:1 | 6.61:1 |
+
+Dark was already close and cost nothing. Light had to go from 35 % to 80 and
+90 %, which is a visible change: the outlines go from a whisper to a defined
+thin stroke. I judged that as the pills gaining an edge rather than gaining
+weight, since the text size, the padding, the radius and the spacing are all
+untouched from the version that was approved, and the light amber cannot
+reach 3:1 at all below 85 % because solid `#a8760a` on white is only 3.99:1.
+If it reads too crisp on the real screen, the two `--chip-*-line` values in
+`src/styles/ux-variants.css` are the single place to soften it, at the cost
+of the criterion.
+
+### Which sources survive the cap
+
+Five standards and three named works fit on one line at a desktop reading
+width; the rest folds into one `+N more` link. Which ones survive is now
+deterministic and under the page author's control:
+
+- add `primary: true` to a `references` entry to promote it. Flagged entries
+  come first within their category run, and everything else keeps frontmatter
+  order. The sort is stable, so a page that flags nothing behaves exactly as
+  it did before.
+- Flag the standard the page actually implements, or the work its method is
+  named after. A page whose bibliography is shorter than the caps does not
+  need the flag at all, which is most pages.
+- The field is optional on every reference type and documented in the schema
+  (`src/content.config.ts`).
+
 ### How to switch
 
-- The round "UX" button at the bottom right opens the switcher, now with two
-  groups: page chips and API sidebar. The choice is remembered across pages
-  and reloads.
-- From the console: `document.documentElement.dataset.pageChips = 'pills'`,
-  `document.documentElement.dataset.apiStyle = 'collapsed'`. To make it stick,
-  `localStorage.setItem('pageChips', 'pills')`.
-- Defaults for a fresh browser are `header` and `split`.
+- The round "API" button at the bottom right opens the switcher, which now
+  holds the API treatment and nothing else. The choice is remembered across
+  pages and reloads.
+- From the console: `document.documentElement.dataset.apiStyle = 'collapsed'`.
+  To make it stick, `localStorage.setItem('apiStyle', 'collapsed')`.
+- The default for a fresh browser is `split`. The page chips have no switch:
+  they render whenever the page has a `references` block.
 
 ## Screenshots
 
 In `ux-variants2/`, all desktop at 1440 x 1000 unless the name says otherwise.
-The screenshots of the five rejected sidebar variants were removed along with
-the code; they are in the branch history if they are ever wanted again.
-
-Page chips, on a page with eight chips (Laboratory Insulation Measurement), a
-page with a single chip, a page that overflows the caps and a page with no
-references at all:
+The screenshots of the five rejected sidebar variants, and of the two rejected
+chip presentations, were removed along with their code; they are in the branch
+history if they are ever wanted again.
 
 | File | What it shows |
 | --- | --- |
-| `chips-header-many-dark-desktop-en.png` | Text run, dark. |
-| `chips-header-many-light-desktop-en.png` | Text run, light. |
-| `chips-header-many-dark-desktop-es.png` | Text run in Spanish, under a two-line H1. |
-| `chips-header-single-dark-desktop-en.png` | Text run, one reference and no standard. |
-| `chips-header-overflow-light-desktop-en.png` | Text run with `+12 more`. |
-| `chips-pills-many-dark-desktop-en.png` | Outlined pills, dark. |
-| `chips-pills-many-light-desktop-en.png` | Outlined pills, light. |
-| `chips-pills-many-dark-desktop-es.png` | Outlined pills in Spanish. |
-| `chips-pills-single-light-desktop-en.png` | Outlined pills, single chip. |
-| `chips-pills-overflow-dark-desktop-en.png` | Outlined pills with the `+12 more` pill. |
-| `chips-filled-many-dark-desktop-en.png` | Filled pills, dark. |
-| `chips-filled-many-light-desktop-en.png` | Filled pills, light. |
-| `chips-filled-many-light-desktop-es.png` | Filled pills in Spanish. |
-| `chips-filled-single-dark-desktop-en.png` | Filled pills, single chip. |
+| `chips-pills-many-dark-desktop-en.png` | The dense case, dark: five ISO families and three books on one line. |
+| `chips-pills-many-light-desktop-en.png` | The same in light, with the 3:1 outlines. |
+| `chips-pills-many-dark-desktop-es.png` | The same page in Spanish, under a two-line H1. |
+| `chips-pills-single-light-desktop-en.png` | A page with one reference and no standard. |
+| `chips-pills-overflow-dark-desktop-en.png` | Sixteen references: one standard, three works and the `+12 more` pill. |
 | `chips-none-light-desktop-en.png` | A page with no `references` block: nothing rendered. |
-| `chips-anchorjump-light-desktop-en.png` | After clicking `ISO 10140`: the matching entry, highlighted and clear of the header. |
+| `chips-anchorjump-light-desktop-en.png` | After clicking the `ISO 10140` pill: the matching bibliography entry, highlighted and clear of the header. |
 | `chips-anchorjump-dark-desktop-es.png` | The same jump on the Spanish build. |
-
-Sidebar and API:
-
-| File | What it shows |
-| --- | --- |
 | `sidebar-final-dark-desktop-en.png` | The tree as it stays: no chips, no annotations. |
 | `api-inline-guidepage-dark-desktop-en.png` | API tree expanded in place on a guide page. |
 | `api-collapsed-guidepage-dark-desktop-en.png` | API group folded behind a caret. |
@@ -142,48 +175,26 @@ Sidebar and API:
 | `api-collapsed-apipage-dark-desktop-en.png` | Collapsed treatment on an API page: it opens the group by itself and adds the caret. |
 | `api-split-apipage-dark-desktop-en.png` | Split on an API page: back link plus reference only. |
 | `api-split-apipage-dark-mobile-en.png` | The same at 390 px. |
-| `switcher-widget-dark-desktop-en.png` | The switcher, now two groups. |
+| `switcher-widget-dark-desktop-en.png` | The switcher, down to the API treatment alone. |
 
-## Design critique of the three chip presentations
+## Why the pill, and what it cost
 
-**header (text run).** The quietest, and the one that reads most like the
-dateline of a standard: no boxes, two coloured dots carrying the entire
-legend, the run sitting under the H1 as if it were part of the title block.
-Its flaw is the one that prompted this round: the chips are links and they
-look exactly like plain text, so nothing tells the reader they can click
-through to the bibliography. The affordance appears only on hover, which is
-the definition of undiscoverable.
+The three presentations that were compared live were a tinted text run with a
+category dot per run, the outlined pill, and the outlined pill with a
+permanent fill. The pill won and the other two are deleted.
 
-**pills (outlined).** My recommendation. It buys the affordance with the
-least possible ink: a 1 px border at 38 % alpha and a full radius, 12 px text
-instead of 14. The shape says "interactive", the border colour says which
-category, and nothing is filled, so the run stays a hairline drawing rather
-than a block of colour. The noise objection that killed the sidebar chips
-genuinely does not transfer: that was a decoration repeated down 150 rows of
-a tall tree, this is one row per page in a band that is otherwise empty.
-Eight pills still fit on one line at a desktop width, and the gap between the
-two category runs is wider than the gap inside a run, so the standards and
-the named works still read as two groups without needing the dots.
+The text run was the quietest and read most like the dateline of a standard,
+but it hid the fact that the chips are links: the only affordance was a hover
+underline, which nobody hovers to discover. The filled pill added a third
+visual channel that repeated what the border and the text colour already said,
+and at eight chips the row started to read as a strip of status badges rather
+than a citation line; the fill also had to stay so faint to avoid that, that
+on the dark theme it was nearly invisible anyway.
 
-**filled.** The same pills with a faint category tint. It groups each chip
-slightly better and makes the category legible without reading the border
-colour, but it adds a third visual channel (fill) that repeats what the
-border and the text colour already say, and at eight chips the row starts to
-read as a strip of status badges rather than as a citation line. The fill
-also has to stay very low (18 % dark, 12 % light) to avoid that, and at that
-alpha it is nearly invisible on the dark theme anyway, which makes it a lot
-of machinery for very little.
-
-Ranking: `pills`, then `header`, then `filled`. If discoverability turns out
-not to be worth any ink at all, `header` is the fallback and nothing else
-changes; the three styles share all their markup.
-
-One caveat before shipping pills: the border sits at 1.2:1 against the light
-background and 2.3:1 against the dark one. That is fine as decoration, since
-the link is identified by its text, which clears 5.9:1 to 8.1:1, but it would
-not pass as a UI component boundary under WCAG 1.4.11 if anyone argued that
-it is one. Raising the border alpha fixes it and costs some quiet; I left it
-quiet.
+The outlined pill buys the affordance for one hairline per chip. What it cost
+is the light-theme outline going to 80 and 90 % alpha to clear 3:1, which is
+the one visible change from the version that was approved at 35 %. Numbers and
+the single place to soften it are in the border contrast section above.
 
 ## `split` versus `starlight-sidebar-topics`
 
@@ -210,19 +221,29 @@ The plugin docs do not say. That is an afternoon, not a blocker.
 Checked in Chrome at 1440 x 1000, both themes, EN and ES, on a guide page and
 an API page:
 
-- All four `data-page-chips` values and all three `data-api-style` values
-  render as intended, including the API caret toggle and its session memory.
+- The chips render unconditionally wherever a page has references, in the one
+  settled style, and all three `data-api-style` values still work including
+  the caret toggle and its session memory.
 - The sidebar renders no chips, no annotation line and no hover card in any
-  state, and no `data-toc-style`, `.sidebar-chips`, `.page-standards` or
-  `.section-standards` remains anywhere in `site/src` or `scripts/`.
+  state, and no `data-toc-style`, `data-page-chips`, `.sidebar-chips`,
+  `.page-standards` or `.section-standards` remains anywhere in `site/src` or
+  `scripts/`.
 - Every chip link resolves to an element on the page, on EN and on ES, with
   eight chips and with one. The caps produce `+12 more` on the heaviest page.
   Pages without a `references` block render no markup at all.
-- All three chip presentations keep the run on one line at 1440 px on the
-  densest page.
-- Text contrast measured against the composited chip background: 8.08:1 and
-  7.24:1 dark, 7.18:1 and 5.94:1 light, all above the 4.5:1 that 12 px text
-  needs.
+- The run stays on one line at 1440 px on the densest page.
+- Contrast, measured on the composited colours (see the table above): borders
+  3.60:1 and 3.32:1 dark, 3.33:1 and 3.40:1 light, all clearing 3:1; text
+  12.16:1 and 10.56:1 dark, 7.87:1 and 6.61:1 light, all clearing the 4.5:1
+  that 12 px text needs. Measure these after the theme transition settles: the
+  0.12 s border transition makes a synchronous read return the previous
+  theme's colour, which is how I first mis-measured them.
+- The `primary: true` flag was exercised end to end by flagging one entry on
+  the aircraft-noise page, confirming it jumped to the front of its run, and
+  reverting the flag.
+- The ICAO Annex 16 entry now carries `designation: "ICAO Annex 16, Vol. I,
+  8th ed."` (and the `8.ª ed.` mirror in Spanish) instead of a bare edition
+  string, so that page finally derives an `ICAO Annex 16` chip.
 - `pnpm --dir site build` succeeds and the Starlight link validator reports
   all internal links valid; `pnpm run html-validate` passes; `pnpm run pa11y`
   passes 46 of 46 URLs at WCAG2AA; `node scripts/check-i18n-parity.mjs`
@@ -230,26 +251,26 @@ an API page:
 
 Known limits:
 
-- pa11y only exercises the default combination, since it starts from an empty
-  `localStorage`. That covers the `header` style; `pills` and `filled` were
-  checked by hand with the contrast figures above.
-- One content oddity the chips exposed: the ICAO Annex 16 entry on the
-  aircraft-noise page carries `designation: "8th ed."`, an edition rather
-  than a document number, so no chip is derived for it. The helper skips
-  designations of that shape rather than printing "8th ed." in the header.
-  The real fix is in the frontmatter, on both language versions; I left it
-  alone to keep this branch to presentation.
+- pa11y exercises the chips, since they are no longer behind a switch, but
+  only the default API treatment.
+- The same aircraft-noise page has a second cryptic designation,
+  `Doc 9501, 3rd ed.`, which yields a `Doc 9501` chip with no issuing body in
+  it. Prefixing it `ICAO Doc 9501` would read better; I left it alone because
+  the brief was the Annex 16 block only.
 
 ## What is prototype scaffolding
 
-When a presentation is chosen, these come out:
+The page chips are not a prototype any more: `src/lib/reference-chips.ts`,
+`PageChips.astro`, the minimal `PageTitle.astro` override that mounts it, the
+`.page-chips` rules and the bibliography anchors and `:target` highlight in
+`References.astro` are all keepers, as is the `primary` field in the content
+schema.
+
+What still comes out when the API treatment is chosen:
 
 - both inline scripts at the bottom of `Head.astro` and the `.toc-switcher`
   rules in `src/styles/ux-variants.css`;
-- the `data-page-chips` gate and the two presentations not chosen;
+- the two treatments not chosen;
 - the `api-caret` button in `SidebarSublist.astro` and the `topic-back` link
-  in `Sidebar.astro`, if the API split is done with the plugin instead.
-
-What stays: `src/lib/reference-chips.ts`, `PageChips.astro`, the minimal
-`PageTitle.astro` override that mounts it, and the bibliography anchors and
-`:target` highlight in `References.astro`.
+  in `Sidebar.astro`, if the split is done with `starlight-sidebar-topics`
+  instead.

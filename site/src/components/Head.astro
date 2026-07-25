@@ -97,61 +97,50 @@ const breadcrumbList = isHome
 <meta name="twitter:title" content={title} />
 {description && <meta name="twitter:description" content={description} />}
 
-{/* Docs UX experiment (TOC-REDESIGN-NOTES.md): apply the persisted variant
-    attributes (`data-page-chips`, `data-api-style`) before first paint, then
-    mount the floating switcher. Prototype-only; both scripts come out when a
-    variant is chosen. */}
+{/* API sidebar experiment (TOC-REDESIGN-NOTES.md): apply the persisted
+    treatment before first paint, then mount the floating switcher.
+    Prototype-only; both scripts come out when a treatment is chosen. */}
 <script is:inline>
   (() => {
     const d = document.documentElement;
     let api = 'split';
-    let page = 'header';
     try {
       api = localStorage.getItem('apiStyle') || api;
-      page = localStorage.getItem('pageChips') || page;
     } catch {}
     d.dataset.apiStyle = api;
-    d.dataset.pageChips = page;
     d.dataset.area = /\/reference\/api(\/|$)/.test(location.pathname) ? 'api' : 'guides';
   })();
 </script>
 <script is:inline>
   document.addEventListener('DOMContentLoaded', () => {
     const d = document.documentElement;
-    const PAGE = ['header', 'pills', 'filled', 'off'];
     const API = ['split', 'collapsed', 'inline'];
-
-    const radios = (name, values, current) =>
-      values
-        .map(
-          (v) =>
-            `<label><input type="radio" name="${name}" value="${v}"${
-              v === current ? ' checked' : ''
-            }>${v}</label>`
-        )
-        .join('');
 
     const widget = document.createElement('details');
     widget.className = 'toc-switcher';
     widget.innerHTML =
-      '<summary title="Docs UX switcher">UX</summary>' +
+      '<summary title="API sidebar switcher">API</summary>' +
       '<div class="toc-switcher-panel">' +
-      `<fieldset><legend>Page chips</legend>${radios('pageChips', PAGE, d.dataset.pageChips)}</fieldset>` +
-      `<fieldset><legend>API sidebar</legend>${radios('apiStyle', API, d.dataset.apiStyle)}</fieldset>` +
+      `<fieldset><legend>API sidebar</legend>${API.map(
+        (v) =>
+          `<label><input type="radio" name="apiStyle" value="${v}"${
+            v === d.dataset.apiStyle ? ' checked' : ''
+          }>${v}</label>`
+      ).join('')}</fieldset>` +
       '</div>';
     document.body.appendChild(widget);
 
     widget.addEventListener('change', (event) => {
       const input = event.target;
       if (!(input instanceof HTMLInputElement)) return;
-      d.dataset[input.name] = input.value;
+      d.dataset.apiStyle = input.value;
       try {
-        localStorage.setItem(input.name, input.value);
+        localStorage.setItem('apiStyle', input.value);
       } catch {}
       applyApiFold();
     });
 
-    // Collapsed API treatment: initial fold state and caret wiring.
+    // Collapsed treatment: initial fold state and caret wiring.
     const apiGroup = document.querySelector('#starlight__sidebar .api-group');
     const caret = apiGroup?.querySelector('.api-caret');
     const apiList = apiGroup?.querySelector('ul');
