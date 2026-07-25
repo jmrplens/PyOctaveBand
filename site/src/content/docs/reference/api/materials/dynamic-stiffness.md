@@ -273,8 +273,9 @@ lateral airflow resistivity `r`:
   criterion `s't >> s'a` (clause 8.2). This implementation applies its own
   engineering threshold: `s'a` below 10 % of `s't` is treated as
   negligible and `s' = s't` (a [`DynamicStiffnessWarning`](/phonometry/reference/api/materials/dynamic-stiffness/#dynamicstiffnesswarning) is
-  emitted); above it the result is `nan`, as the method cannot resolve
-  `s'`.
+  emitted; clause 8.2 requires the error caused by disregarding `s'a` to
+  be stated in the test report); above it the result is `nan`, as the
+  method cannot resolve `s'`.
 
 **Parameters**
 

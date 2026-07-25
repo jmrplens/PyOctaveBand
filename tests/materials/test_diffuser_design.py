@@ -103,6 +103,38 @@ def test_qrd_normalized_diffusion_2k_value() -> None:
     assert float(spectrum.normalized[0]) == pytest.approx(0.208, abs=1e-3)
 
 
+# --- Kirchhoff obliquity factor ----------------------------------------------
+@pytest.mark.parametrize("psi", [0.0, 30.0, 60.0])
+def test_obliquity_factor_is_symmetric_kirchhoff(psi: float) -> None:
+    """The obliquity factor is the symmetric Kirchhoff (cos theta + cos psi)/2.
+
+    Cox & D'Antonio Eq. (9.32) derive the factor for a normal-incidence
+    source, (1 + cos theta) / 2; under the Kirchhoff approximation an oblique
+    source at psi carries the symmetric (cos theta + cos psi) / 2, which
+    reduces to Eq. (9.32) exactly at psi = 0 (so all normal-incidence anchors
+    are untouched).
+    """
+    from phonometry.materials.diffuser_design import _scattered_pressure
+
+    depths = qrd_well_depths(7, 500.0)
+    freq, c = 1000.0, 343.0
+    k = 2.0 * np.pi * freq / c
+    reflection = np.exp(-2j * k * depths)
+    angles = np.asarray(DEFAULT_POLAR_ANGLES, dtype=np.float64)
+    common = {
+        "source_angle": psi, "periods": 3, "speed_of_sound": c,
+        "include_aperture": True,
+    }
+    with_factor = _scattered_pressure(
+        reflection, 0.10, freq, angles, include_obliquity=True, **common
+    )
+    without = _scattered_pressure(
+        reflection, 0.10, freq, angles, include_obliquity=False, **common
+    )
+    expected = (np.cos(np.radians(angles)) + np.cos(np.radians(psi))) / 2.0
+    np.testing.assert_allclose(with_factor, without * expected)
+
+
 # --- The explicit reflection path matches the rigid-bottom depths path --------
 def test_reflection_path_matches_depths_path() -> None:
     depths = qrd_well_depths(7, 500.0)

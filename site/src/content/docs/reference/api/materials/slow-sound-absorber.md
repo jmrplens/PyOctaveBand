@@ -54,7 +54,11 @@ phonometry (a passive medium has `Im(k) < 0`):
 * **Transfer matrix.** The panel is the chain
   `M_dl (M_s M_HR M_s)...` of half-lattice slit steps (Appl. Sci. Eq. (2)),
   resonators as point shunt scatterers (Eq. (3)) and the slit-radiation end
-  correction (Eq. (3)/(A27)). The rigidly-backed reflection factor is
+  correction (Eq. (3)/(A27)). The slit-radiation series impedance is printed
+  in the sources as `-i w dl_slit rho0 / (phi_t S0)`; like the duct series
+  it is used conjugated here (`+j w`), so it acts as the added radiation
+  mass it models and lowers the slit-panel resonance. The rigidly-backed
+  reflection factor is
   `R = (T11 cos(theta) - Z0 T21) / (T11 cos(theta) + Z0 T21)` with
   `Z0 = rho0 c0 / S0` (Eq. (4)), and `alpha = 1 - |R|^2`. Perfect
   absorption (critical coupling) is reached when the reflection zero sits on

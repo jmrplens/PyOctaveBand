@@ -46,7 +46,11 @@ phonometry (a passive medium has ``Im(k) < 0``):
 * **Transfer matrix.** The panel is the chain
   ``M_dl (M_s M_HR M_s)...`` of half-lattice slit steps (Appl. Sci. Eq. (2)),
   resonators as point shunt scatterers (Eq. (3)) and the slit-radiation end
-  correction (Eq. (3)/(A27)). The rigidly-backed reflection factor is
+  correction (Eq. (3)/(A27)). The slit-radiation series impedance is printed
+  in the sources as ``-i w dl_slit rho0 / (phi_t S0)``; like the duct series
+  it is used conjugated here (``+j w``), so it acts as the added radiation
+  mass it models and lowers the slit-panel resonance. The rigidly-backed
+  reflection factor is
   ``R = (T11 cos(theta) - Z0 T21) / (T11 cos(theta) + Z0 T21)`` with
   ``Z0 = rho0 c0 / S0`` (Eq. (4)), and ``alpha = 1 - |R|^2``. Perfect
   absorption (critical coupling) is reached when the reflection zero sits on
@@ -425,9 +429,12 @@ def _panel_transfer_matrix(
     arg = k_s * lattice_step / 2.0
     cos_h, sin_h = np.cos(arg), np.sin(arg)
     ms = np.array([[cos_h, 1j * z_s * sin_h], [1j * sin_h / z_s, cos_h]])
-    # Front slit-radiation correction (series impedance).
+    # Front slit-radiation correction (series impedance). The papers print
+    # this term as -i w dl rho0 / (phi S0); like the duct series it is
+    # conjugated here to the e^{+j w t} convention, where a radiation mass is
+    # +j w rho0 dl / (phi S0) and must lower the slit-panel resonance.
     dl_slit = _slit_radiation_length(slit_height, period) if slit_radiation else 0.0
-    z_dl = -1j * omega * dl_slit * rho0 / (phit * area_cell)
+    z_dl = 1j * omega * dl_slit * rho0 / (phit * area_cell)
     total = np.array([[ones, z_dl], [zeros, ones]])
     for res in resonators:
         z_hr = helmholtz_resonator_impedance(
