@@ -93,11 +93,64 @@ print(round(fc))                                      # 2107 Hz (Hopkins declare
 res = single_panel_transmission_loss(bands, mass, critical_frequency=fc,
                                      loss_factor=0.024)
 print(round(res.rating().rating))                     # 32  ->  Rw = 32 dB (catalogue 6 mm glass)
+
+res.plot()   # predicted R(f) with the critical frequency marked (needs matplotlib)
 ```
 
 The predicted spectrum plugs straight into the ISO 717-1 rating through
 `res.rating()`, and into EN 12354 as the "predicted" element $R$ where the
 standard would otherwise demand a laboratory measurement.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/single_panel_rating.svg" alt="Predicted sound reduction index of a 6 mm float glass pane per one-third-octave band against the shifted ISO 717-1 reference curve, with the coincidence dip at about 2100 Hz marked, the unfavourable deviations shaded and the Rw rating annotated" width="80%" />
+
+*The predicted Sharp spectrum rated exactly like a measurement: the
+coincidence dip at $f_c \approx 2.1$ kHz collects most of the unfavourable
+deviations, and the shifted reference read at 500 Hz gives the catalogue
+$R_w = 32$ dB of 6 mm glass.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import (
+    coincidence_frequency, plate_bending_stiffness,
+    single_panel_transmission_loss,
+)
+
+# 6 mm float glass: E = 62 GPa, rho = 2500 kg/m3, nu = 0.24, eta = 0.024.
+bands = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
+                  1000, 1250, 1600, 2000, 2500, 3150], dtype=float)
+mass = 2500.0 * 0.006
+bp = plate_bending_stiffness(6.2e10, 0.006, 0.24)
+fc = coincidence_frequency(mass, bp)
+res = single_panel_transmission_loss(bands, mass, critical_frequency=fc,
+                                     loss_factor=0.024)
+w = res.rating()
+
+# One line each — the predicted R(f), or the rated curve vs the reference:
+res.plot()
+w.plot()
+plt.show()
+
+# By hand, combining both on one axes:
+fig, ax = plt.subplots()
+ax.semilogx(bands, res.transmission_loss, "o-", label="predicted R (Sharp)")
+ax.semilogx(w.band_centers, w.shifted_reference, "s--",
+            label="shifted reference")
+ax.fill_between(w.band_centers, w.measured, w.shifted_reference,
+                where=w.measured < w.shifted_reference, interpolate=True,
+                alpha=0.3, label="unfavourable deviations")
+ax.axvline(fc, ls=":", color="tab:green", label=f"fc = {fc:.0f} Hz")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Sound reduction index R [dB]")
+ax.set_title(f"Rw = {w.rating} dB  (C={w.c:+d}; Ctr={w.ctr:+d})")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 ## Double wall: the mass-spring-mass resonance (Bies 7.2.6)
 
@@ -132,6 +185,8 @@ print(round(float(dw.transmission_loss[0]), 1),
 # A mineral-wool fill (a materials porous model) lowers the resonance:
 fill = miki([f0], 7000.0)
 print(round(mass_spring_mass_resonance(12.0, 12.0, 0.075, cavity_medium=fill)))  # < 89 Hz
+
+dw.plot()   # double-wall R(f) with the mass-spring-mass resonance marked (needs matplotlib)
 ```
 
 ## Slits, holes and apertures (Hopkins 4.3.10)
@@ -189,6 +244,8 @@ print(sig.radiation_efficiency[bands == 2000].round(2))    # ~2.5 (peak at coinc
 lw = sound_power_from_vibration(velocity_level=80.0, area=1.875,
                                 radiation_factor=sig.radiation_efficiency,
                                 frequencies=bands)
+
+sig.plot()   # sigma(f) with the coincidence peak (needs matplotlib)
 ```
 
 ## Point mobilities of infinite structures (Cremer Table 5.1)
