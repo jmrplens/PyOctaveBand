@@ -106,8 +106,8 @@ page itself carries the information.
 | `api-inline-guidepage-dark-desktop-en.png` | API tree expanded in place on a guide page. |
 | `api-collapsed-guidepage-dark-desktop-en.png` | API group folded behind a caret. |
 | `api-split-guidepage-dark-desktop-en.png` | API group reduced to a label with an arrow. |
-| `api-inline-apipage-dark-desktop-en.png` | Status quo on an API page. |
-| `api-collapsed-apipage-dark-desktop-en.png` | Collapsed mode on an API page (opens itself). |
+| `api-inline-apipage-dark-desktop-en.png` | Status quo on an API page: the whole guides tree still sits above the reference, which is what you scroll past to reach it. |
+| `api-collapsed-apipage-dark-desktop-en.png` | Collapsed mode on an API page. It opens the group by itself, so the top of the tree is identical to the previous shot; the difference is further down, where the group carries a caret. |
 | `api-split-apipage-dark-desktop-en.png` | Split mode on an API page: back link plus reference only. |
 | `api-split-apipage-dark-mobile-en.png` | The same on a phone. |
 | `switcher-widget-dark-desktop-en.png` | The switcher panel. |
