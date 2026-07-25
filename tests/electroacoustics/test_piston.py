@@ -165,6 +165,24 @@ def test_directivity_pattern_plot() -> None:
         res.plot(language="xx")
 
 
+def test_directivity_pattern_plot_kwargs_single_ka_only() -> None:
+    # User plot kwargs restyle a single-ka curve, but are ignored for a
+    # multi-ka family: one color/label would collapse the per-curve styling.
+    import matplotlib
+
+    matplotlib.use("Agg")
+    single = piston_directivity_pattern(5.0)
+    ax = single.plot(color="crimson", label="mine")
+    assert ax.lines[0].get_color() == "crimson"
+    assert ax.lines[0].get_label() == "mine"
+
+    family = piston_directivity_pattern([2.0, 5.0, 10.0])
+    ax_family = family.plot(color="crimson")
+    colors = {line.get_color() for line in ax_family.lines}
+    assert "crimson" not in colors
+    assert len(colors) == 3
+
+
 def test_directivity_pattern_validation() -> None:
     # Build the arguments up front so only the throwing call sits in each block.
     ka_one = [1.0]
