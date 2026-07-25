@@ -202,8 +202,9 @@ to the issuing body, with date and reference).
   misprint note in the docstring.
 - **Status:** corrected upstream — ISO 10848-1:2017 (second edition) prints
   the π-free form in its Formula (5), fc = c0²/(1,8 h cL), confirming the
-  2006 print as a misprint. No report needed; recorded for the 2006 edition
-  the library cites alongside the 2017 confirmation.
+  2006 print as a misprint. No report is needed. The entry is retained
+  because the library cites the 2006 edition, whose print carries the
+  defect; the 2017 edition stands as the confirmation.
 
 ## ISO 12999-1:2020, Table 4 (missing 500 Hz row)
 
