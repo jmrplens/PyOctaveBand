@@ -194,7 +194,13 @@ from phonometry import sweep_signal, swept_sine_distortion
 
 x = sweep_signal(fs, f1, f2, seconds)          # el ESS de ISO 18233
 res = swept_sine_distortion(y, fs, f1, f2, seconds, method="farina")
+res.plot()   # los mismos paneles |Hn| + THD(f) que el método sincronizado (necesita matplotlib)
 ```
+
+El resultado es el mismo `SweptSineDistortionResult` dibujable que el del
+método sincronizado, así que los paneles `|Hn|` y `THD(f)` de la figura de la
+sección 1 se leen idénticos; entre los dos métodos solo cambian las fases de
+los armónicos (y el tope de banda de cada orden).
 
 Reglas de dimensionado para ambos métodos: el par de llegadas más próximo
 dista `L·ln(N/(N-1))` segundos, así que la ventana por orden (`ir_length`,
@@ -230,6 +236,41 @@ res = phase_decomposition(H, fs)       # todo sobre un mismo eje
 res.excess_group_delay                 # la parte paso-todo, en s
 res.plot()                             # magnitud, fases, retardos de grupo
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/phase_decomposition_es.svg" alt="Tres paneles apilados de la descomposición fase mínima / paso-todo de un ecualizador de campana de +6 dB medido a través de una latencia de 2,5 ms: la joroba de magnitud en 1 kHz, la fase medida cayendo con la frecuencia mientras la fase mínima se mantiene pequeña y el exceso de fase lleva la rampa lineal del retardo, y los retardos de grupo donde el retardo de grupo de exceso lee 2,5 ms planos" width="82%" />
+
+*Un ecualizador de campana de +6 dB medido a través de una latencia de
+procesado de 2,5 ms: la parte de fase mínima lleva solo la pequeña ondulación
+de fase que un ecualizador podría invertir, el exceso de fase es la rampa pura
+`−2πf·t₀` del retardo, y el retardo de grupo de exceso lee la latencia
+directamente como una línea plana de 2,5 ms.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal as sp_signal
+from phonometry import phase_decomposition
+
+fs = 48000.0
+delay = int(0.0025 * fs)                      # una latencia de procesado de 2,5 ms
+gain_a = 10.0 ** (6.0 / 40.0)                 # EQ de campana +6 dB en 1 kHz, Q = 1
+w0 = 2.0 * np.pi * 1000.0 / fs
+alpha = np.sin(w0) / 2.0
+b = np.array([1 + alpha * gain_a, -2 * np.cos(w0), 1 - alpha * gain_a])
+a = np.array([1 + alpha / gain_a, -2 * np.cos(w0), 1 - alpha / gain_a])
+imp = np.zeros(16384)
+imp[delay] = 1.0
+ir = sp_signal.lfilter(b / a[0], a / a[0], imp)
+
+res = phase_decomposition(np.fft.rfft(ir), fs)
+res.plot(language="es")   # |H|, las tres fases y los retardos de grupo
+plt.show()
+```
+
+</details>
 
 La descomposición `H = H_min · H_ap` separa lo que un ecualizador puede
 invertir (`H_min`, fase mínima, causal y causalmente invertible) de lo que
