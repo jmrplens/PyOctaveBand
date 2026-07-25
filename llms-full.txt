@@ -590,14 +590,13 @@ difference between bands at the crossover.
 import numpy as np
 from phonometry import metrology
 
-# A calibrated signal in Pa so the guide runs standalone
+# recording: a calibrated capture in Pa so the guide runs standalone
 fs = 48000
-x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
-signal = x
-# Split signal into Low and High bands at 1000 Hz
-low, high = metrology.linkwitz_riley(signal, fs, freq=1000, order=4)
-# Reconstruction: low + high == signal (flat response)
+# Split the recording into Low and High bands at 1000 Hz
+low, high = metrology.linkwitz_riley(recording, fs, freq=1000, order=4)
+# Reconstruction: low + high == recording (flat response)
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/crossover_lr4_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/crossover_lr4.svg" alt="Linkwitz-Riley 4th-order crossover: low-pass, high-pass and their flat sum" width="60%"></picture>
@@ -901,6 +900,7 @@ from phonometry import OctaveFilterBank, ReportMetadata, filter_class_compliance
 
 bank = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[125, 4000])
 result = filter_class_compliance(bank)   # overall_class == 1
+result.plot()   # the worst-margin band on its class corridor
 
 result.report(
     "iec61260.pdf",
@@ -919,6 +919,7 @@ dropped; a higher-order bank can then be certified to class 0:
 ```python
 bank = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[250, 4000])
 result = filter_class_compliance(bank, edition="1995")   # overall_class == 0
+result.plot()   # the class-0 corridor of the 1995 edition
 result.report(
     "iec61260_1995.pdf",
     metadata=ReportMetadata(
@@ -1685,8 +1686,30 @@ weighting, from its published rational transfer function.
 
 # Time Weighting and Integration
 
-Accurate SPL measurement requires capturing energy over specific time windows.
-phonometry implements exact time constants per **IEC 61672-1:2013**.
+A displayed sound level is always a *time-weighted* level: before anything
+reaches the readout, the squared, frequency-weighted pressure passes
+through an exponential detector whose time constant sets how quickly the
+level follows the signal. This page is that detector, implemented as a
+sample-exact recursive filter: the Fast and Slow characteristics of
+IEC 61672-1:2013 (clause 5.7), the legacy asymmetric Impulse ballistics,
+streaming state for block processing, and the toneburst verification
+against the standard's Table 4.
+
+The names are older than the mathematics. FAST and SLOW were literal
+descriptions of a needle movement, standardized for analog meters in
+ANSI S1.4-1983 and IEC 60651 and carried into IEC 61672-1 as the F and S
+exponential constants; IMPULSE was added in the same era for impact noise
+and has since been dropped from the requirements, surviving in instruments
+only for legacy procedures (the "Choosing F, S or I" guidance below says
+when each is defensible; Bies, Hansen & Howard 2017, §3.6 covers the
+instrument practice).
+
+Two sibling pages complete the chain. The detector output is the level
+track that the percentile levels $L_N$ of [Levels](https://jmrplens.github.io/phonometry/guides/levels/) are defined
+on, while the integrated metrics ($L_{eq}$, SEL) bypass the detector
+entirely; and the full IEC 61672-1 instrument chain that wraps this
+detector (weighting, ranges, periodic tests) is the subject of
+[Build a sound level meter](sound-level-meter.md).
 
 ## 1. The exponential detector
 
@@ -1922,6 +1945,19 @@ these envelopes, and [Why phonometry](https://jmrplens.github.io/phonometry/refe
   [IEC webstore](https://webstore.iec.ch/en/publication/5708).
   The exponential-detector definition, the F and S time constants and the
   Table 4 toneburst responses the ballistics are verified against in CI.
+- American National Standards Institute. (1983). *Specification for sound
+  level meters* (ANSI S1.4-1983).
+  [ANSI webstore](https://webstore.ansi.org/standards/asa/ansiasas11983).
+  The classic analog meter specification: the FAST/SLOW dynamic
+  characteristics the F and S constants descend from, and the IMPULSE
+  characteristic (35 ms rise, slow decay) that IEC 61672-1 no longer
+  specifies.
+- Bies, D. A., Hansen, C. H., & Howard, C. Q. (2017). *Engineering noise
+  control* (5th ed.). CRC Press.
+  [doi:10.1201/9781351228152](https://doi.org/10.1201/9781351228152).
+  Sections 3.2 and 3.6 (sound level meters and the measurement of
+  time-varying sound: what the F/S/I readouts mean in instrument
+  practice). ISBN 978-1-4987-2405-0.
 
 ## Standards
 
@@ -1938,7 +1974,44 @@ in CI.
 
 # Integrated and Statistical Levels
 
-Environmental noise metrics computed directly from the raw (calibrated) signal.
+A noise measurement rarely ends with a waveform: it ends with a handful of
+single numbers that a limit, a regulation or a report can be checked
+against. This page is that reduction chain, computed directly from the
+calibrated signal in pascals rather than from meter readouts: the
+equivalent continuous level $L_{eq}$/$L_{Aeq}$, the percentile levels
+$L_N$, the event and peak measures ($L_{AE}$/SEL, $L_{Cpeak}$), the noise
+dose of IEC 61252 and the whole-day descriptors $L_{den}$/$L_{dn}$ with
+the ISO 1996-1 rating levels. Working from the signal means each
+definition (an integral, a percentile, an energy sum) is applied exactly,
+with no detector or display approximation in between.
+
+Which descriptor fits which question follows the ISO 1996-1 quantity
+families (BS 7445-1 is the survey-practice guide to the same choice, and
+Bies, Hansen & Howard 2017, §2.5 surveys them side by side):
+
+- **Accumulated exposure over an interval**: $L_{eq}$/$L_{Aeq}$, the
+  energy mean. It answers "how much sound arrived in total", regardless of
+  how it was distributed in time.
+- **How the fluctuating level was distributed**: the percentiles $L_N$:
+  $L_{90}$ as the background level, $L_{10}$ as the intrusive traffic
+  indicator, $L_{50}$ as the median. Two signals with the same $L_{Aeq}$
+  can have very different $L_{10} - L_{90}$ spreads.
+- **Single events of different durations, compared fairly**: SEL, the
+  event's whole energy normalized to one second.
+- **Hearing-risk screening**: $L_{Cpeak}$ and the dose measures, which
+  feed the occupational workflow of
+  [Occupational Noise Exposure](https://jmrplens.github.io/phonometry/guides/occupational-exposure/).
+- **Long-term community annoyance**: $L_{den}$/$L_{dn}$ and the ISO
+  1996-1 rating levels, which weight evening and night energy before
+  averaging the day.
+
+Two boundaries with the sibling pages are worth keeping sharp. The
+integrated metrics here deliberately bypass the exponential detector:
+$L_{eq}$ and SEL have no time constant, and Fast/Slow ballistics enter
+only through the percentile levels, which are defined on the time-weighted
+level track (see [Time Weighting](https://jmrplens.github.io/phonometry/guides/time-weighting/)). And everything on
+this page assumes the signal is already in pascals: the sensitivity factor
+that gets it there is the subject of [Calibration](https://jmrplens.github.io/phonometry/guides/calibration/).
 
 ## Leq and LAeq
 
@@ -2369,7 +2442,9 @@ spread beyond 3 dB, where the substitute grossly inflates.
 from phonometry import environmental
 
 # Tonal adjustment for a prominent tone:
-kt = environmental.assess_tonal_audibility(54.1, 45.2, 430.0).adjustment      # 6 dB
+tonal = environmental.assess_tonal_audibility(54.1, 45.2, 430.0)  # TonalAssessmentResult
+kt = tonal.adjustment                                             # 6 dB
+tonal.plot()   # this audibility on the Kt curve, as in the figure above
 
 # Subtract residual (background) noise from a measured level:
 corr = environmental.residual_sound_correction(measured_level=58.0, residual_level=50.0)
@@ -2471,6 +2546,18 @@ and the ISO 226 equal-loudness contours live with the perception metrics in
   [Publisher page](https://www.wiley.com/en-us/Fundamentals+of+Acoustics%2C+4th+Edition-p-9780471847892).
   The sound-pressure, energy and level definitions underneath Leq, SEL and
   the dose measures.
+- British Standards Institution. (2003). *Description and measurement of
+  environmental noise — Guide to quantities and procedures* (BS 7445-1:2003).
+  [BSI Knowledge](https://knowledge.bsigroup.com/products/description-and-measurement-of-environmental-noise-guide-to-quantities-and-procedures).
+  The survey-practice companion of ISO 1996-1: which descriptor family fits
+  which assessment question (BS 7445-2:1991 covers the land-use data
+  acquisition).
+- Bies, D. A., Hansen, C. H., & Howard, C. Q. (2017). *Engineering noise
+  control* (5th ed.). CRC Press.
+  [doi:10.1201/9781351228152](https://doi.org/10.1201/9781351228152).
+  Section 2.5 (the noise measures: Leq, Ldn, L10/L90 and their intended
+  uses) and Section 2.15 (environmental noise surveys). ISBN
+  978-1-4987-2405-0.
 
 ## Standards
 
@@ -11203,8 +11290,29 @@ dual-number and single-number declaration forms, the declared value
 
 # Calibration and dBFS
 
-phonometry can return results in physical **Sound Pressure Level (dB SPL)** or
-digital **decibels relative to Full Scale (dBFS)**.
+Every level this library reports is only as trustworthy as the one number
+this page produces: the sensitivity factor that converts digital units into
+pascals. The page covers both reference frames a recording can be analyzed
+in: physical **dB SPL**, obtained by calibrating the chain against an
+IEC 60942 acoustic calibrator, and digital **dBFS**, levels relative to
+full scale with no physical claim attached.
+
+Choosing between them is a question about your measurement chain, not
+about preference. Work in dB SPL whenever the result faces a physical
+criterion (a noise limit, an exposure threshold, any acoustics standard);
+that requires a calibrator recording made through the *same, untouched*
+chain as the measurement. Work in dBFS when the signal never had a
+calibrated analog front end (loudness normalization, codec and interface
+tests, file-only analysis) or when no calibration tone exists, in which
+case absolute SPL statements are simply out of reach.
+
+The workflow around the factor matters as much as the formula: derive it
+before and re-check it after each session, verify meter and calibrator
+periodically in the laboratory (IEC 61672-3 and IEC 60942; Bies, Hansen &
+Howard 2017, §3.4), and treat the pre/post difference as your drift bound.
+The field, laboratory and drift section below turns that into concrete
+rules, and the [Build a sound level meter](sound-level-meter.md)
+walkthrough starts from exactly this step before any level is computed.
 
 ## Why calibrate? The theory
 
@@ -11454,6 +11562,12 @@ identical whether you pass the raw integer array or a float conversion.
   [IEC webstore](https://webstore.iec.ch/en/publication/5710).
   The laboratory verification procedure behind the periodic checks
   recommended above.
+- Bies, D. A., Hansen, C. H., & Howard, C. Q. (2017). *Engineering noise
+  control* (5th ed.). CRC Press.
+  [doi:10.1201/9781351228152](https://doi.org/10.1201/9781351228152).
+  Sections 3.1.5 and 3.4 (microphone field effects and sound level meter
+  calibration: the electrical and acoustic calibration practice this
+  page's workflow follows). ISBN 978-1-4987-2405-0.
 
 ## Standards
 
@@ -11643,10 +11757,55 @@ from phonometry import trend_test
 rng = np.random.default_rng(3)
 res = trend_test(rng.standard_normal(40), method="runs")
 print(res.statistic, res.bounds, res.trend_free)
+res.plot()   # the sequence about its median with the runs verdict
 
 alternating = np.tile([1.0, -1.0], 10)   # 20 runs: rejected the other way
 print(trend_test(alternating, method="runs").trend_free)   # False
 ```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/runs_test_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/runs_test.svg" alt="Two panels of sequences classified about their median, points above in blue and below in red. Left: forty Gaussian observations with twenty runs inside the acceptance region from fourteen to twenty-seven, verdict trend-free. Right: a strictly alternating twenty-value sequence also giving twenty runs, but against the acceptance region from six to fifteen for twenty values, verdict rejected for too-rapid alternation" width="92%"></picture>
+
+*The two-sided verdict of the runs test: 20 runs is unremarkable for 40
+Gaussian observations (left, accepted), but the same count from a strictly
+alternating 20-value sequence exceeds its upper bound (right, rejected):
+too *many* runs is as non-random as too few.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import trend_test
+
+rng = np.random.default_rng(3)
+sequences = [rng.standard_normal(40), np.tile([1.0, -1.0], 10)]
+
+# One line per sequence — the tested values with the verdict:
+trend_test(sequences[0], method="runs").plot()
+plt.show()
+
+# Both verdicts side by side, classified about the median:
+fig, axes = plt.subplots(1, 2, figsize=(11, 4.5))
+for ax, seq in zip(axes, sequences):
+    res = trend_test(seq, method="runs")
+    idx = np.arange(1, seq.size + 1)
+    median = np.median(seq)
+    above = seq > median
+    ax.plot(idx, seq, "0.7", lw=0.7)
+    ax.scatter(idx[above], seq[above], label="above the median")
+    ax.scatter(idx[~above], seq[~above], color="r",
+               label="below the median")
+    ax.axhline(median, color="k", linestyle="--")
+    lo, hi = res.bounds
+    verdict = "trend-free" if res.trend_free else "rejected"
+    ax.set_title(f"r = {res.statistic} runs, accept ({lo}, {hi}]: {verdict}")
+    ax.set(xlabel="Sample index", ylabel="Sequence value")
+    ax.legend()
+plt.show()
+```
+
+</details>
 
 The reverse arrangement test is the more powerful of the two against the
 monotonic trends that dominate practice (B&P Sec. 4.5.2), which is why it
@@ -11759,6 +11918,7 @@ x = np.sin(2 * np.pi * 60.0 * t)          # narrowband: r is essentially 1
 res = peak_statistics(x, fs)
 print(round(res.irregularity_factor, 3))       # 0.997
 print(res.peak_exceedance(4.0))                # exp(-8): about 1 in 3000
+res.plot()   # empirical exceedance against the Rice mixture (figure below)
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rice_peak_distribution_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rice_peak_distribution.svg" alt="Peak-height exceedance probability of low-pass Gaussian noise on a logarithmic axis against the standardized peak height from minus two point five to four point five: the empirical staircase from half a million samples follows the Rice mixture curve for irregularity factor zero point seven four six, clearly below the dashed Rayleigh limit and above the dotted Gaussian limit, with a visible fraction of negative maxima" width="82%"></picture>
@@ -11995,6 +12155,55 @@ print(res.magnitude_random_error[100], res.phase_std[100])  # bin 100 errors
 res.plot()   # magnitude, phase with ±sigma band, coherence
 ```
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cross_spectral_density_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cross_spectral_density.svg" alt="Two panels for the cross-spectral density of a two-sensor path with a 2 millisecond delay: the Welch magnitude estimate fluctuating around a flat level, and below it the unwrapped cross-spectrum phase falling as a straight line on a logarithmic frequency axis, lying exactly on the dashed minus two pi f tau reference with a narrow one-sigma band around it" width="86%"></picture>
+
+*The cross-spectral density of a 2 ms delay path: the unwrapped phase is
+exactly the line −2πfτ, so its slope reads the propagation delay directly,
+and the ±1 s.d. band of Eq. 9.52 quantifies how far to trust it per
+frequency.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import cross_spectral_density, noise_signal
+
+fs = 8000.0
+tau = 0.002                                   # 2 ms = 16 samples
+delay = int(tau * fs)
+x = noise_signal(fs, 8.0, seed=8)
+noise = noise_signal(fs, 8.0, rms=0.3, seed=9)
+y = 0.9 * np.concatenate([np.zeros(delay), x[:-delay]]) + noise
+
+res = cross_spectral_density(x, y, fs)
+
+# One line — magnitude, phase with its ±sigma band and coherence:
+res.plot()
+plt.show()
+
+# By hand, from the fields the result carries:
+band = (res.frequencies >= 20) & (res.frequencies <= 3500)
+freqs = res.frequencies[band]
+fig, (ax_m, ax_p) = plt.subplots(2, 1, sharex=True)
+ax_m.semilogx(freqs, 10 * np.log10(res.magnitude[band]),
+              label="|Gxy| (Welch estimate)")
+ax_m.set_ylabel("Magnitude [dB]")
+ax_p.semilogx(freqs, res.phase[band], label="Unwrapped phase")
+ax_p.fill_between(freqs, res.phase[band] - res.phase_std[band],
+                  res.phase[band] + res.phase_std[band], alpha=0.25,
+                  label="±1 s.d. (Eq. 9.52)")
+ax_p.semilogx(freqs, -2 * np.pi * freqs * tau, "r--",
+              label="slope -2·pi·f·tau")
+ax_p.set(xlabel="Frequency [Hz]", ylabel="Phase [rad]")
+for ax in (ax_m, ax_p):
+    ax.legend()
+plt.show()
+```
+
+</details>
+
 ## 3. Coherent output spectrum and spectral SNR
 
 In the single-input/single-output model the measured output autospectrum
@@ -12036,6 +12245,51 @@ print(np.median(res.coherence))          # -> SNR/(1+SNR) = 0.719
 print(np.median(res.snr_db))             # -> 10·lg(2.56) = 4.1 dB
 res.plot()                               # Gyy, Gvv, Gnn and the SNR panel
 ```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/coherent_output_snr_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/coherent_output_snr.svg" alt="Two panels for the coherent output spectrum of a white noise system with additive noise: the measured output spectrum with the coherent part about 1.5 decibels below it and the uncorrelated noise floor about 6 decibels lower still, and below them the spectral signal-to-noise ratio fluctuating around the dashed closed-form line at 4.1 decibels" width="86%"></picture>
+
+*The exact split of the snippet's model: `Gvv = γ²·Gyy` explains the output
+except for the flat noise remainder `Gnn`, and the spectral SNR scatters
+around its closed form 10·lg(0.64/0.25) = 4.1 dB at every frequency.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import coherent_output_spectrum, noise_signal
+
+fs = 48000.0
+x = noise_signal(fs, 8.0, color="white", seed=1)
+noise = noise_signal(fs, 8.0, color="white", rms=0.5, seed=2)
+y = 0.8 * x + noise                      # SNR = 0.64/0.25 per band
+
+res = coherent_output_spectrum(x, y, fs, nperseg=2048)
+
+# One line — the three spectra and the SNR panel:
+res.plot()
+plt.show()
+
+# By hand, from the fields the result carries:
+band = (res.frequencies >= 20) & (res.frequencies <= 20000)
+freqs = res.frequencies[band]
+fig, (ax_g, ax_s) = plt.subplots(2, 1, sharex=True)
+for values, style, label in ((res.output_psd, "-", "Gyy (measured)"),
+                             (res.coherent_psd, "--", "Gvv (coherent)"),
+                             (res.noise_psd, ":", "Gnn (noise)")):
+    ax_g.semilogx(freqs, 10 * np.log10(values[band]), style, label=label)
+ax_g.set_ylabel("Spectral density [dB re 1/Hz]")
+ax_s.semilogx(freqs, res.snr_db[band], label="Spectral SNR [dB]")
+ax_s.axhline(10 * np.log10(0.64 / 0.25), color="r", linestyle="--",
+             label="closed form 4.1 dB")
+ax_s.set(xlabel="Frequency [Hz]", ylabel="SNR [dB]")
+for ax in (ax_g, ax_s):
+    ax.legend()
+plt.show()
+```
+
+</details>
 
 The `coherence_bias` field reports the small positive bias of the coherence
 estimate, `b[γ̂²] ≈ (1-γ²)²/nd` (Eq. 9.75), negligible once `nd` reaches a
@@ -12445,13 +12699,40 @@ coherence carries `nd-(q-1)` (Eq. 9.98). The result exposes
 the effective average count `n_averages`.
 
 The ordinary and multiple coherences do not depend on the conditioning order,
-but the partial coherences and the coherent-output decomposition do. Absent a
-physical ordering, Bendat & Piersol (Section 7.2.4) recommend ordering the
-inputs by descending ordinary coherence with the output; pass `order` to
-choose (for example `order=(2, 0, 1)`). The estimators share the Welch core of
-the [calibrated spectral analysis](https://jmrplens.github.io/phonometry/guides/spectral-analysis/) page, so a MISO
+but the partial coherences and the coherent-output decomposition do: each
+input is conditioned on whatever precedes it. Absent a physical ordering,
+Bendat & Piersol (Section 7.2.4) recommend ordering the inputs by descending
+ordinary coherence with the output. Pass `order` to choose:
+
+```python
+res = miso_coherence([x1, x2, x3], y, fs, order=(2, 0, 1))
+res.order            # (2, 0, 1): the order actually applied
+res.plot()           # the two panels, recomputed in the applied order
+```
+
+Two practical pitfalls are worth naming. *Averaging*: every conditioning
+step spends a degree of freedom, so with few segments the partial
+coherences of the last-ordered inputs are the least trustworthy numbers on
+the page; average generously before reading a small partial coherence as
+zero. *Delay bias*: like the ordinary coherence, the Welch estimate is
+biased low when a bulk delay between an input and the output becomes a
+noticeable fraction of the segment length; remove known propagation delays
+first (see [Correlation and delay](https://jmrplens.github.io/phonometry/guides/correlation-delay/)) and keep
+`nperseg` well above the longest remaining delay.
+
+The estimators share the Welch core of the
+[calibrated spectral analysis](https://jmrplens.github.io/phonometry/guides/spectral-analysis/) page, so a MISO
 coherence and a `power_spectral_density` computed with the same segment length
 are consistent bin by bin.
+
+## See also
+
+- [Spectral analysis](https://jmrplens.github.io/phonometry/guides/spectral-analysis/): the single-input coherent
+  output spectrum this page generalizes, and the shared Welch core.
+- [Correlation and delay](https://jmrplens.github.io/phonometry/guides/correlation-delay/): estimating and removing
+  the bulk delays that bias coherence low.
+- [Multichannel and Performance](https://jmrplens.github.io/phonometry/guides/multichannel/): the per-channel path
+  this cross-channel analysis complements.
 
 ## References
 
@@ -12508,6 +12789,53 @@ peak = np.argmax(res.values)
 print(res.lags[peak], res.values[peak])   # delay and its coefficient
 res.plot()
 ```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/correlation_normalizations_dark.webp"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/correlation_normalizations.webp" alt="Two panels for a two-sensor delay model. Top: the correlation coefficient function over plus and minus 50 milliseconds of lag, a flat noise floor near zero with one sharp peak of about 0.85 exactly on the dashed true-delay line at plus 12.5 milliseconds. Bottom: the biased and unbiased estimates over the full plus and minus 2 seconds of lag; the biased noise floor tapers toward the record ends while the unbiased one fans out with growing variance there" width="86%"></picture>
+
+*The two-sensor delay model `y(t) = 0.8·x(t−τ0) + n(t)` under the three
+normalizations: the coefficient function is bounded and peaks at +τ0 (top);
+over the full lag range the biased estimate tapers toward the ends while
+the unbiased one pays for its unbiasedness with variance that grows there
+(bottom).*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import correlation, noise_signal
+
+fs = 8192.0
+delay = 102                                  # 12.45 ms
+x = noise_signal(fs, 2.0, seed=4)
+interference = noise_signal(fs, 2.0, rms=0.5, seed=5)
+y = 0.8 * np.concatenate([np.zeros(delay), x[:-delay]]) + interference
+
+res = correlation(x, y, fs, normalization="coefficient", max_lag=0.05)
+
+# One line — the correlation estimate against the lag in seconds:
+res.plot()
+plt.show()
+
+# The three normalizations by hand, from the same records:
+biased = correlation(x, y, fs, normalization="biased")
+unbiased = correlation(x, y, fs, normalization="unbiased")
+
+fig, (ax_c, ax_n) = plt.subplots(2, 1)
+ax_c.plot(1e3 * res.lags, res.values, label="coefficient")
+ax_c.axvline(1e3 * delay / fs, color="r", linestyle="--",
+             label="true delay")
+ax_c.set(xlabel="Lag [ms]", ylabel="Correlation")
+ax_n.plot(unbiased.lags, unbiased.values, "r", lw=0.5, label="unbiased")
+ax_n.plot(biased.lags, biased.values, lw=0.5, label="biased")
+ax_n.set(xlabel="Lag [s]", ylabel="Correlation")
+for ax in (ax_c, ax_n):
+    ax.legend()
+plt.show()
+```
+
+</details>
 
 The result always carries the coefficient function alongside the requested
 normalization, because the coefficient is what the error formulas need. For
@@ -12647,6 +12975,49 @@ res = align_impulse_responses(ir_b, ir_a, fs)  # remove the estimated delay
 res.plot()                                     # reference vs aligned overlay
 ```
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ir_alignment_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ir_alignment.svg" alt="A band-limited reference pulse at 5 milliseconds, a measured copy delayed by 7.37 samples drawn dashed and visibly shifted right, and the aligned response drawn dotted lying exactly on top of the reference, with a note reading estimated delay removed 7.36 samples" width="86%"></picture>
+
+*A measured IR delayed by a fractional 7.37 samples (dashed) is aligned
+back onto its reference: the band-limited shift removes the estimated
+7.36 samples and the aligned trace (dotted) lands on the reference.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal as sp_signal
+from phonometry import align_impulse_responses, fractional_delay
+
+fs = 48000.0
+t = np.arange(int(0.03 * fs)) / fs
+rng = np.random.default_rng(6)
+# Band-limited reference pulse: a 2 kHz Gaussian tone burst at 5 ms.
+ir_a = sp_signal.gausspulse(t - 0.005, fc=2000.0, bw=0.5)
+ir_b = fractional_delay(ir_a, 7.37)[: ir_a.size]
+ir_b += 0.005 * rng.standard_normal(ir_a.size)
+
+res = align_impulse_responses(ir_b, ir_a, fs)
+
+# One line — reference and aligned IR overlaid:
+res.plot()
+plt.show()
+
+# By hand, from the fields the result carries:
+t_ms = 1e3 * t
+fig, ax = plt.subplots()
+ax.plot(t_ms, res.reference, lw=1.6, label="Reference IR")
+ax.plot(t_ms, ir_b, "0.5", lw=1.0, linestyle="--", label="Measured IR")
+ax.plot(t_ms, res.aligned[: t.size], "r:", label="Aligned IR")
+ax.set(xlabel="Time [ms]", ylabel="Amplitude",
+       title=f"delay removed: {res.delay_samples:.2f} samples")
+ax.legend()
+plt.show()
+```
+
+</details>
+
 `align_impulse_responses` removes the estimated delay with an exact
 band-limited fractional shift (a frequency-domain phase ramp over a
 zero-padded record, so nothing wraps around): the tool for averaging IR
@@ -12681,6 +13052,49 @@ res.plot()               # signal + envelope, instantaneous frequency
 
 slow = envelope(x, fs, decimation_factor=32)   # anti-aliased, fs/32
 ```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hilbert_envelope_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hilbert_envelope.svg" alt="Two panels for a decaying 250 hertz mode in light noise. Top: the oscillating signal with the smooth exponential Hilbert envelope tracing its decay above and below. Bottom: the instantaneous frequency staying on the dashed 250 hertz carrier line while the mode is strong and jittering increasingly as the signal decays into the noise floor" width="86%"></picture>
+
+*The Hilbert quantities of a struck 250 Hz mode: the envelope traces the
+exponential decay (top), and the instantaneous frequency sits on the
+carrier while the mode dominates, jittering as the signal sinks into the
+noise floor (bottom, ×8 anti-aliased decimation).*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import envelope
+
+fs = 8192.0
+t = np.arange(int(0.4 * fs)) / fs
+rng = np.random.default_rng(7)
+x = np.exp(-t / 0.1) * np.sin(2 * np.pi * 250.0 * t)   # a struck mode
+x += 0.001 * rng.standard_normal(t.size)
+
+res = envelope(x, fs, decimation_factor=8)
+
+# One line — signal + envelope and the instantaneous frequency:
+res.plot()
+plt.show()
+
+# By hand, from the fields the result carries:
+fig, (ax_e, ax_f) = plt.subplots(2, 1, sharex=True)
+ax_e.plot(t, res.signal, lw=0.6, label="Signal")
+ax_e.plot(res.times, res.envelope, "r", lw=1.8, label="Envelope A(t)")
+ax_e.plot(res.times, -res.envelope, "r", lw=1.8)
+ax_e.legend()
+ax_f.plot(res.times, res.instantaneous_frequency, lw=0.9,
+          label="Instantaneous frequency f(t)")
+ax_f.axhline(250.0, color="g", linestyle="--", label="carrier 250 Hz")
+ax_f.set(xlabel="Time [s]", ylabel="Frequency [Hz]", ylim=(230, 270))
+ax_f.legend()
+plt.show()
+```
+
+</details>
 
 The envelope of a band-limited signal is itself low-frequency, so the result
 offers optional **decimation**: a zero-phase FIR anti-alias filter by
@@ -12770,6 +13184,40 @@ the generator is verified.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_train_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_train.svg" alt="IEC 60268-1 tone bursts: a single 5 ms burst of 5 kHz tone starting at a zero crossing with its rectangular gating envelope, and a repetitive train of four bursts at 10 bursts per second with a 5 percent duty cycle" width="82%"></picture>
 
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import tone_burst
+
+fs = 48000.0
+single = tone_burst(fs, 5000, 25, pre_silence=0.001, post_silence=0.001)
+train = tone_burst(fs, 5000, 25, repetitions=4, repetition_rate=10)
+
+fig, axes = plt.subplots(2, 1, figsize=(10, 6.4))
+t_ms = 1e3 * np.arange(single.signal.size) / single.fs
+axes[0].plot(t_ms, single.signal, lw=0.9)
+axes[0].plot(t_ms, single.envelope, "r--", label="Gating envelope")
+axes[0].plot(t_ms, -single.envelope, "r--")
+axes[0].set_xlabel("Time [ms]")
+
+t_s = np.arange(train.signal.size) / train.fs
+axes[1].plot(t_s, train.signal, lw=0.5)
+axes[1].plot(t_s, train.envelope, "r--", label="Gating envelope")
+axes[1].plot(t_s, -train.envelope, "r--")
+axes[1].set_xlabel("Time [s]")
+
+for ax in axes:
+    ax.set_ylabel("Amplitude")
+    ax.legend(loc="upper right")
+plt.tight_layout()
+plt.show()
+```
+
+</details>
+
 These are the bursts behind the
 [Fast/Slow/Impulse ballistics](https://jmrplens.github.io/phonometry/guides/time-weighting/) reference responses
 (IEC 61672-1 Table 4 uses 4 kHz tonebursts of 200, 50 and 10 ms) and the
@@ -12799,7 +13247,56 @@ x = noise_signal(44100, 5.0, color="pink", seed=1)
 res = resample_signal(x, 44100, 48000)   # 120 dB alias rejection
 print(res.up, res.down)                  # 160, 147
 print(res.n_taps, res.passband_edge_hz)  # designed FIR, 20947.5 Hz
+res.plot()   # the delivered anti-alias filter against its design spec
 ```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/resampling_antialias_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/resampling_antialias.svg" alt="Magnitude response of the anti-alias filter designed for a 44.1 to 48 kilohertz polyphase resampling on a logarithmic frequency axis: a flat passband up to the dashed passband edge just below 21 kilohertz, a steep transition to the dashed stopband edge at 22.05 kilohertz, and a stopband floor staying below the dotted minus 120 decibel design-attenuation line across the shaded rejected band" width="82%"></picture>
+
+*The delivered anti-alias filter of the default 44.1 → 48 kHz conversion:
+the stopband starts exactly at the smaller Nyquist frequency (where aliases
+fold) and stays below the −120 dB design line; the passband ends 5 % below
+it, flat within the same ripple bound.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal
+from phonometry import noise_signal, resample_signal
+
+x = noise_signal(44100, 5.0, color="pink", seed=1)
+res = resample_signal(x, 44100, 48000)   # 120 dB alias rejection
+
+# res is the ResampledSignalResult computed in the example above.
+# One line — the delivered anti-alias filter against its design spec:
+res.plot()
+plt.show()
+
+# By hand, from the taps the result carries — mirroring what
+# ResampledSignalResult.plot() draws:
+fs_up = res.original_fs * res.up
+freqs, h = signal.freqz(res.filter_taps, worN=1 << 18, fs=fs_up)
+mag_db = 20 * np.log10(np.maximum(np.abs(h), 1e-300))
+view = (freqs > 0) & (freqs <= 4 * res.stopband_edge_hz)
+
+fig, ax = plt.subplots()
+ax.semilogx(freqs[view], mag_db[view], label="Anti-alias filter |H(f)|")
+ax.axvline(res.passband_edge_hz, color="g", linestyle="--",
+           label="Passband edge")
+ax.axvline(res.stopband_edge_hz, color="r", linestyle="--",
+           label="Stopband edge (alias fold)")
+ax.axhline(-res.stopband_attenuation_db, color="k", linestyle=":",
+           label="Design attenuation -120 dB")
+ax.axvspan(res.stopband_edge_hz, 4 * res.stopband_edge_hz,
+           color="r", alpha=0.08)
+ax.set(xlabel="Frequency [Hz]", ylabel="Magnitude [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 The designed taps travel with the result (`filter_taps`), so the
 specification is *checkable*: the test suite measures the frequency response
@@ -12861,6 +13358,17 @@ resampler and fractional delay are the sample-rate half of
 [correlation and delay work](https://jmrplens.github.io/phonometry/guides/correlation-delay/), where sub-sample
 alignment is the difference between averaging impulse responses and
 smearing them.
+
+## See also
+
+- [Time Weighting](https://jmrplens.github.io/phonometry/guides/time-weighting/): the detector ballistics the tone
+  bursts exercise (IEC 61672-1 Table 4).
+- [Correlation and delay](https://jmrplens.github.io/phonometry/guides/correlation-delay/): the alignment work built
+  on the fractional-delay kernel.
+- [Synchronous averaging](https://jmrplens.github.io/phonometry/guides/synchronous-averaging/): period alignment with
+  the same band-limited shift when `fs·T` is not an integer.
+- [Spectral analysis](https://jmrplens.github.io/phonometry/guides/spectral-analysis/): the colored-noise verification
+  and the window metrics.
 
 ## References
 
@@ -12928,6 +13436,48 @@ res = cepstrum(x, fs, kind="power")
 print(res.quefrencies[:3], res.cepstrum.shape)   # quefrency axis, in s
 res.plot()
 ```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cepstrum_variants_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cepstrum_variants.svg" alt="The power, real and complex cepstra of a wavelet with one 8 millisecond echo overlaid against quefrency up to 20 milliseconds: all three carry a sharp positive spike at 8 milliseconds and a small negative one at 16 milliseconds, the source wavelet fills the region below about 2 milliseconds, and an inset zoom on the first rahmonic shows the power and complex spikes reaching 0.5 while the real cepstrum reaches exactly half of that" width="86%"></picture>
+
+*The three variants of one echo-carrying record (a band-limited wavelet
+plus a reflection at 8 ms, a = 0.5). All three carry the rahmonics at 8 and
+16 ms with heights a and −a²/2 (Milner's signed convention); the inset
+shows the real cepstrum at exactly half the power cepstrum, and the source
+wavelet concentrates below 2 ms.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal as sp_signal
+from phonometry import cepstrum
+
+fs = 48000.0
+# A band-limited source wavelet plus one reflection at 8 ms (a = 0.5)
+b, a = sp_signal.butter(2, 0.3)
+s = np.zeros(4096)
+s[37:37 + 256] = sp_signal.lfilter(b, a, np.r_[1.0, np.zeros(255)])
+x = s + 0.5 * np.roll(s, 384)
+
+# One line per variant — each CepstrumResult draws itself:
+cepstrum(x, fs, kind="power").plot()
+plt.show()
+
+# The three variants overlaid by hand on one quefrency axis:
+fig, ax = plt.subplots()
+for kind, style in (("power", "-"), ("real", "--"), ("complex", ":")):
+    res = cepstrum(x, fs, kind=kind)
+    q_ms = 1e3 * res.quefrencies
+    mask = (q_ms > 0.5) & (q_ms <= 20.0)
+    ax.plot(q_ms[mask], res.cepstrum[mask], style, label=f"{kind} cepstrum")
+ax.set(xlabel="Quefrency [ms]", ylabel="Cepstrum")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 The result carries the full periodic quefrency axis (`0 .. (nfft-1)/fs`);
 quefrencies above `nfft/(2·fs)` are the mirrored negative quefrencies, where
@@ -13047,6 +13597,57 @@ print(np.allclose(low.liftered_db + high.liftered_db, low.spectrum_db))
 low.plot()
 ```
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lifter_split_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lifter_split.svg" alt="Two panels over 500 to 2000 hertz for a wavelet carrying a pure 8 millisecond echo: the log spectrum oscillates with a 125 hertz ripple around the flat lowpass-liftered envelope, and below it the highpass-liftered ripple alone swings exactly between the dashed closed-form bounds at plus 3.5 and minus 6 decibels" width="86%"></picture>
+
+*The 4 ms lifter split on a pure-echo record: the lowpass side returns the
+smooth spectral envelope, the highpass side isolates the echo's 125 Hz
+ripple, swinging exactly between the closed forms 20·lg(1±a) = +3.5 and
+−6.0 dB.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal as sp_signal
+from phonometry import lifter
+
+fs = 48000.0
+# A band-limited wavelet carrying a pure 8 ms echo (a = 0.5), so the
+# highpass ripple has the exact closed-form bounds.
+b, a = sp_signal.butter(2, 0.3)
+s = np.zeros(4096)
+s[37:37 + 256] = sp_signal.lfilter(b, a, np.r_[1.0, np.zeros(255)])
+x = s + 0.5 * np.roll(s, 384)
+
+low = lifter(x, fs, cutoff=0.004, mode="lowpass")
+high = lifter(x, fs, cutoff=0.004, mode="highpass")
+
+# One line — the cepstrum with the cutoff and the two log spectra:
+low.plot()
+plt.show()
+
+# The envelope/ripple split by hand, zoomed on 500-2000 Hz:
+band = (low.frequencies >= 500) & (low.frequencies <= 2000)
+fig, axes = plt.subplots(2, 1, sharex=True)
+axes[0].semilogx(low.frequencies[band], low.spectrum_db[band], "0.6",
+                 lw=0.7, label="Log spectrum")
+axes[0].semilogx(low.frequencies[band], low.liftered_db[band], lw=2,
+                 label="Lowpass lifter: envelope")
+axes[1].semilogx(high.frequencies[band], high.liftered_db[band], "r",
+                 label="Highpass lifter: ripple")
+for bound in (20 * np.log10(1.5), 20 * np.log10(0.5)):
+    axes[1].axhline(bound, color="g", linestyle="--")
+axes[1].set_xlabel("Frequency [Hz]")
+for ax in axes:
+    ax.set_ylabel("Magnitude [dB]")
+    ax.legend()
+plt.show()
+```
+
+</details>
+
 For the pure-echo signal the highpass ripple swings between the closed forms
 `20·log10(1+a)` and `20·log10(1-a)` dB, another oracle the tests pin. In
 speech analysis the identical operation separates the vocal-tract envelope
@@ -13073,6 +13674,7 @@ x[37:293] = sp_signal.lfilter(b, a, np.r_[1.0, np.zeros(255)])
 res = cepstrum(x, fs, kind="complex")
 print(res.linear_phase_samples)              # negative: a bulk delay removed
 print(np.max(np.abs(res.invert() - x)))      # ~1e-14
+res.plot()   # the complex cepstrum against quefrency (as in the figure above)
 ```
 
 Between the log and the inverse transform anything can be edited - that is
@@ -13238,12 +13840,12 @@ periodic = (
     + 0.5 * np.cos(2.0 * np.pi * 3.0 * phase + 0.4)
     - 0.3 * np.cos(2.0 * np.pi * 6.0 * phase)
 )
-signal = periodic + noise_signal(fs, phase.size / fs, rms=0.9, seed=11)
-res = time_synchronous_average(signal, fs, period, n_averages=n_avg)
+recording = periodic + noise_signal(fs, phase.size / fs, rms=0.9, seed=11)
+res = time_synchronous_average(recording, fs, period, n_averages=n_avg)
 
 fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(11, 4.6))
 t_ms = 1e3 * res.times
-ax0.plot(t_ms, signal[:m], color="#cccccc", label="One noisy period")
+ax0.plot(t_ms, recording[:m], color="#cccccc", label="One noisy period")
 ax0.plot(t_ms, res.period_waveform, color="#1f77b4", lw=1.8,
          label=f"Average of N = {n_avg} periods")
 ax0.plot(t_ms, periodic[:m], "--", color="#d62728", label="True waveform")
@@ -13306,10 +13908,58 @@ of `10·log₁₀ N` dB, reported as `noise_reduction_db`, with the amplitude ga
 `√N` as `amplitude_snr_gain`:
 
 ```python
-res = time_synchronous_average(signal, fs, period, n_averages=100)
+res = time_synchronous_average(recording, fs, period, n_averages=100)
 res.noise_reduction_db      # 20.0 dB = 10*log10(100)
 res.amplitude_snr_gain      # 10.0   = sqrt(100)
+res.plot()                  # averaged waveform + the comb it applied
 ```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tsa_noise_reduction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tsa_noise_reduction.svg" alt="Log-log plot of the RMS error of the synchronous average against the number of averages from 1 to 128: the measured error markers fall along the dashed ideal one-over-square-root-of-N line, dropping from about 1 at a single period to below 0.1 at 128 averages" width="82%"></picture>
+
+*The √N law measured end to end: the RMS error of the averaged waveform of
+a three-harmonic gear signature in unit-variance noise falls along the
+ideal σ/√N line as the number of averaged periods grows from 1 to 128.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import time_synchronous_average
+
+fs = 8192.0
+samples = 256
+period = samples / fs
+m = np.arange(samples) / fs
+true = (np.cos(2 * np.pi * m / period)
+        + 0.5 * np.cos(2 * np.pi * 3 * m / period + 0.7)
+        + 0.25 * np.cos(2 * np.pi * 5 * m / period + 1.1))
+rng = np.random.default_rng(5)
+recording = np.tile(true, 128) + rng.standard_normal(128 * samples)
+
+counts = [1, 2, 4, 8, 16, 32, 64, 128]
+errors = []
+for n in counts:
+    res = time_synchronous_average(recording[:n * samples], fs, period,
+                                   n_averages=n)
+    errors.append(np.sqrt(np.mean((res.period_waveform - true) ** 2)))
+
+# One line — the averaged waveform and the comb filter it applied:
+res.plot()
+plt.show()
+
+# The sqrt(N) law by hand: measured error against the ideal line:
+fig, ax = plt.subplots()
+ax.loglog(counts, errors, "o-", label="measured RMS error")
+ax.loglog(counts, 1 / np.sqrt(np.array(counts)), "r--",
+          label="ideal sigma/sqrt(N)")
+ax.set(xlabel="Number of averages N", ylabel="RMS error")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 This law is the ideal one: it holds when the noise is uncorrelated from one
 period to the next, so colored or synchronous noise that is correlated across
@@ -13339,10 +13989,10 @@ both combs around order 32; the end-to-end average confirms it:
 ```python
 # true 8th-order component plus a strong interferer at 32.05 orders
 phase = np.arange(41 * 256) / 256
-signal = np.cos(2 * np.pi * 8.0 * phase) + 0.7 * np.cos(2 * np.pi * 32.05 * phase)
+recording = np.cos(2 * np.pi * 8.0 * phase) + 0.7 * np.cos(2 * np.pi * 32.05 * phase)
 
-leak_20 = time_synchronous_average(signal, fs, period, n_averages=20)
-leak_32 = time_synchronous_average(signal, fs, period, n_averages=32)
+leak_20 = time_synchronous_average(recording, fs, period, n_averages=20)
+leak_32 = time_synchronous_average(recording, fs, period, n_averages=32)
 # leak_20.period_waveform matches the clean 8th-order tone; leak_32 does not
 ```
 
@@ -13364,8 +14014,8 @@ that interpolation error (`interpolated` is `True`):
 fs = 8192.0
 period = 1.0 / 31.7                       # fs * period is not an integer
 t = np.arange(int(40 * period * fs)) / fs
-signal = np.cos(2.0 * np.pi * t / period)  # one cycle per revolution
-res = time_synchronous_average(signal, fs, period)
+recording = np.cos(2.0 * np.pi * t / period)  # one cycle per revolution
+res = time_synchronous_average(recording, fs, period)
 res.interpolated                          # True: fractional-delay alignment
 res.samples_per_period                    # integer samples of one period
 ```
@@ -13379,6 +14029,47 @@ The band-limited alignment shares its kernel with the sub-sample
 impulse-response alignment of the [test-signals page](https://jmrplens.github.io/phonometry/guides/test-signals/), and
 the recovered waveform, being exactly one period, can be tiled to reconstruct
 the synchronous part of the signal for subtraction or for order analysis.
+
+## Which diagnostics tool, and when
+
+TSA, the cepstrum and the envelope spectrum answer different questions
+about a rotating machine, and they compose rather than compete:
+
+- **TSA** needs the period (a tacho pulse or a trusted shaft speed) and
+  returns *the waveform itself*, one revolution of it: the tool when you
+  want to see what a specific shaft or gear does per turn, tooth by tooth.
+- **The [cepstrum](https://jmrplens.github.io/phonometry/guides/cepstrum-echoes/)** needs no reference and detects
+  *any* periodic family in the spectrum (harmonics, sidebands): the tool
+  when the period is unknown or several families overlap and must be
+  separated.
+- **The [envelope spectrum](https://jmrplens.github.io/phonometry/guides/cepstrum-echoes/#5-the-envelope-spectrum-modulations-as-lines)**
+  finds periodicities of the *amplitude*: the tool for bearing-style
+  faults, whose repetition rate modulates a high-frequency resonance
+  instead of appearing as a low-frequency tone.
+
+The composition is standard practice: average synchronously first, then
+subtract; the `residual` field is the record with the synchronous part
+removed, which is exactly what the envelope spectrum should be run on once
+the strong gear components no longer mask the modulation.
+
+## See also
+
+- [Cepstrum and echoes](https://jmrplens.github.io/phonometry/guides/cepstrum-echoes/): reference-free detection of
+  harmonic and sideband families, and the envelope spectrum.
+- [Correlation and delay](https://jmrplens.github.io/phonometry/guides/correlation-delay/): the Hilbert envelope
+  behind envelope analysis.
+- [Test signals](https://jmrplens.github.io/phonometry/guides/test-signals/): the fractional-delay kernel the
+  non-integer period alignment uses.
+
+## References
+
+- McFadden, P. D. (1987). A revised model for the extraction of periodic
+  waveforms by time domain averaging. *Mechanical Systems and Signal
+  Processing*, 1(1), 83-95.
+  [doi:10.1016/0888-3270(87)90043-2](https://doi.org/10.1016/0888-3270(87)90043-2).
+  The comb-filter model of synchronous averaging (Eq. 8, magnitude Eq. 9)
+  and the node-selection rule for rejecting a non-harmonic interfering
+  order.
 
 ---
 
@@ -13890,12 +14581,32 @@ tolerance claim of the underlying pages holds unchanged in streaming use.
 
 # Multichannel and Performance
 
-## Multichannel Support
+Most real measurement sessions produce more than one channel: the two ears
+of a dummy head, the microphone pair of an intensity probe, the several
+positions of a room survey, the capsules of a beamforming array. The
+convention for all of them is one array of shape `(channels, samples)`
+processed in a single call: every function runs along the last (time) axis
+and preserves the leading channel axis, so each row is analyzed exactly as
+if it were the only one.
 
-phonometry natively supports multichannel signals (e.g., Stereo, 5.1,
-Microphone Arrays) using **fully vectorized operations**. Input arrays of shape
-`(N_channels, N_samples)` are processed in parallel, offering significant
-performance gains over iterative loops.
+That per-channel guarantee is normative, not just convenient. The band
+filters applied to each row are the IEC 61260-1 designs and the weightings
+and detector ballistics are the IEC 61672-1 ones, unchanged from the
+single-channel path; the vectorization batches the arithmetic across rows
+(one filter design, one SciPy call) and never mixes them. This is the
+textbook procedure for multiple data records (Bendat & Piersol 2010,
+§10.4.2): analyze each record individually first, and compute anything
+joint as a separate, explicit step.
+
+Use this page when your channels are parallel recordings on the same clock
+and you want per-channel spectra or levels. When the question is *between*
+channels (what is the delay from A to B, how much of B is explained by A),
+that is cross-channel analysis: see
+[Correlation and delay](https://jmrplens.github.io/phonometry/guides/correlation-delay/) and
+[Multiple and partial coherence](https://jmrplens.github.io/phonometry/guides/miso-coherence/), the implementations of
+the Bendat & Piersol cross-correlation and multiple-input models.
+
+## A stereo analysis in one call
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_multichannel_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_multichannel.svg" alt="Stereo analysis: pink noise and logarithmic sweep resolved per channel in one-third-octave bands" width="80%"></picture>
 
@@ -13994,10 +14705,10 @@ spelling out:
 
 ## Performance: Vectorization and caching
 
-The `OctaveFilterBank` class is highly optimized for real-time and batch
-processing. It uses NumPy vectorization to handle multichannel audio arrays
-(e.g., 64-channel microphone arrays) without explicit Python loops, ensuring
-maximum throughput.
+`OctaveFilterBank` is the tool for repeated or streaming analysis: one bank
+designs its filters once and applies them to every frame, and NumPy
+broadcasting covers all channels of a frame in one filtering call per band,
+with no Python loop over channels.
 
 ```python
 import numpy as np
@@ -14034,8 +14745,27 @@ Additional performance notes:
 - **Optional numba**: the `impulse` time weighting kernel is JIT-compiled when
   numba is installed (`pip install phonometry[perf]`).
 
+## See also
+
+- [Correlation and delay](https://jmrplens.github.io/phonometry/guides/correlation-delay/): the cross-channel
+  time-domain questions (delay, alignment) the per-channel path deliberately
+  leaves to you.
+- [Multiple and partial coherence](https://jmrplens.github.io/phonometry/guides/miso-coherence/): which of several
+  correlated channels actually drives a response (Bendat & Piersol Ch. 7).
+- [Block Processing](https://jmrplens.github.io/phonometry/guides/block-processing/): the streaming counterpart, with
+  one filter state per channel.
+- [Levels](https://jmrplens.github.io/phonometry/guides/levels/): the per-channel level metrics, and why dB values are
+  combined energetically.
+
 ## References
 
+- Bendat, J. S., & Piersol, A. G. (2010). *Random data: Analysis and
+  measurement procedures* (4th ed.). Wiley.
+  [doi:10.1002/9781118032428](https://doi.org/10.1002/9781118032428).
+  Section 10.4.2 (the procedure for analyzing multiple data records:
+  individual per-record analysis first, joint cross-record analysis as a
+  separate, deliberate step) and Chapter 7 (the multiple-input/output
+  models that joint step leads to).
 - International Electrotechnical Commission. (2014). *Electroacoustics —
   Octave-band and fractional-octave-band filters — Part 1: Specifications*
   (IEC 61260-1:2014).
