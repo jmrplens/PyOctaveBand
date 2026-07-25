@@ -36,6 +36,13 @@ k_true = k + 1j * 2.0 * np.pi * f * c
 t = vibration.base_transmissibility(f, m2, k, c)
 k_indirect = vibration.transfer_stiffness_indirect(f, t, m2)  # warns where T is not small
 
+# One line — the indirect determination bundled as a result draws its own
+# Lk(f) level spectrum:
+res = vibration.indirect_transfer_stiffness_result(f, t, blocking_mass=m2)
+res.plot()
+plt.show()
+
+# By hand, the true element stiffness against the indirect-method estimate:
 fig, ax = plt.subplots()
 ax.semilogx(f, vibration.transfer_stiffness_level(k_true),
             label="true $L_k$ of $k+j\\omega c$")
@@ -112,6 +119,8 @@ f = np.logspace(1.5, 3.3, 200)
 t = vibration.base_transmissibility(f, mass=8.0, stiffness=1e6, damping=120.0)
 res = vibration.indirect_transfer_stiffness_result(f, t, blocking_mass=8.0)
 print(round(float(res.level[-1]), 1))      # ~126  dB re 1 N/m (high-f)
+
+res.plot()   # the Lk(f) level spectrum, as in the figure above (needs matplotlib)
 ```
 
 The `TransferStiffnessResult` carries the complex `k₂₁` and exposes `.level`,
@@ -195,6 +204,49 @@ k = 1e6 + 5e4j                                  # N/m, at 250 Hz
 Z = vibration.convert_frf(k, 250.0, "dynamic_stiffness", "impedance")
 print(abs(complex(vibration.convert_frf(Z, 250.0, "impedance", "dynamic_stiffness"))))  # 1.0012e6
 ```
+
+## 5. Test-report fiche
+
+`TransferStiffnessResult.report(path)` renders a one-page
+dynamic-transfer-stiffness characterisation report for a resilient element
+(ISO 10846-1:2008 definition; determined by the direct method, ISO 10846-2:2008,
+or the indirect blocking-mass method, ISO 10846-3:2002). The transfer stiffness
+is a continuous frequency-response function, not an octave-band quantity, so the
+sheet presents it honestly as the `Lk(f)` level spectrum plus a compact table
+of characteristic points (the determination method, the blocking mass for the
+indirect method, the frequency range, and the low-frequency stiffness plateau
+`|k2,1|`, its level `Lk` and the loss factor there), and a boxed
+low-frequency `Lk` (the plateau that characterises the element below its
+internal resonances). It is a characterisation, so there is no pass/fail
+verdict; `language="es"` renders the Spanish fiche. The fiche always embeds the
+`Lk(f)` spectrum, so it needs both the report and plot extras
+(`pip install "phonometry[report,plot]"`).
+
+```python
+import numpy as np
+from phonometry import ReportMetadata, TransferStiffnessResult, transfer_stiffness_direct
+
+freqs = np.array([20, 31.5, 50, 80, 125, 200, 315, 500, 800, 1250, 2000], dtype=float)
+k21 = 1e6 + 1j * (2 * np.pi * freqs) * 80.0     # Kelvin-Voigt element k + jwc
+u1 = 1e-6 + 0j
+k = transfer_stiffness_direct(k21 * u1, u1)     # direct method: k2,1 = F2,b/u1
+res = TransferStiffnessResult(frequencies=freqs, transfer_stiffness=k)
+res.report(
+    "transfer_stiffness.pdf",
+    metadata=ReportMetadata(
+        specimen="Rubber vibration isolator",
+        measurement_standard="ISO 10846-2",
+    ),
+)   # one-page fiche (needs phonometry[report,plot])
+```
+
+The example fiche is regenerated with `make reports` and kept in the
+repository. Click the preview to open the PDF:
+
+[![ISO 10846 dynamic-transfer-stiffness example report: a metadata header, a table of the FRF characteristic points (the determination method, the frequency range and the low-frequency stiffness, level and loss factor) beside the transfer-stiffness level spectrum, and the boxed low-frequency level](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10846_transfer_stiffness_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10846_transfer_stiffness_example.pdf)
+
+*Dynamic-transfer-stiffness fiche (`TransferStiffnessResult.report`): the FRF
+characteristic points and the transfer-stiffness level spectrum.*
 
 ## References
 
