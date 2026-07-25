@@ -159,6 +159,25 @@ to the issuing body, with date and reference).
   whenever n > 1, where the result deviates from the print.
 - **Status:** unreported.
 
+## ISO 10848-1:2006, Clause 8.1.1, Formula (20) (spurious π in the critical frequency)
+
+- **Location:** Clause 8.1.1, Formula (20), the thin-plate critical frequency
+  used by the test-facility flanking criterion of Formula (19).
+- **The print:** fc = c0² / (1,8 cL · h · π).
+- **The problem:** the constant 1,8 is itself the rounded 2π/√12 ≈ 1,814 of
+  the thin-plate dispersion relation, so the extra π double-counts it and
+  would misplace fc by a factor π (e.g. a 100 mm concrete element with
+  cL = 3500 m/s: 187 Hz without the π, 59 Hz with it, far from any measured
+  coincidence dip).
+- **Evidence:** derivation from the thin-plate dispersion relation (Hopkins,
+  *Sound Insulation* (2007), Eq. 2.201, fc = c0²/(1,8 cL h)); ISO
+  12354-1:2017 prints the same π-free form in its symbol definitions
+  (fc = c0²/(1,8 cL t)).
+- **Library behaviour:** implements the π-free form
+  (`phonometry.building.flanking_transmission.critical_frequency`), with a
+  misprint note in the docstring.
+- **Status:** unreported.
+
 ## ISO 12999-1:2020, Table 4 (missing 500 Hz row)
 
 - **Location:** Table 4 (in-situ uncertainties per band).

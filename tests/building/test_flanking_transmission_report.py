@@ -271,6 +271,27 @@ def test_dnf_fiche_verbose_and_verdict(tmp_path) -> None:
     assert "Unfav. dev." in text
 
 
+def test_dnf_fiche_part_selects_basis_designation(tmp_path) -> None:
+    """``part`` selects the governing ISO 10848 part named in the basis line."""
+    result = _dnf_result()
+    for part, designation in ((3, "ISO 10848-3:2006"), (4, "ISO 10848-4:2010")):
+        out = tmp_path / f"dnf_part{part}.pdf"
+        result.report(str(out), part=part)
+        _assert_one_page(str(out))
+        text = _extract_text(str(out))
+        assert designation in text
+        assert "ISO 10848-2:2006" not in text
+
+
+def test_dnf_fiche_unknown_part_rejected(tmp_path) -> None:
+    """A part outside 2/3/4 is rejected."""
+    out = str(tmp_path / "x.pdf")
+    with pytest.raises(ValueError, match="'part' must be 2, 3 or 4"):
+        _dnf_result().report(out, part=1)
+    with pytest.raises(ValueError, match="'part' must be 2, 3 or 4"):
+        _lnf_result().report(out, part=5)
+
+
 def test_dnf_fiche_without_rating_rejected(tmp_path) -> None:
     """A band count that yields no ISO 717 rating cannot be reported."""
     result = building.normalized_flanking_level_difference(
@@ -299,6 +320,16 @@ def test_lnf_fiche_rating_and_basis(tmp_path) -> None:
     assert "PASS" in text  # Ln,f,w = 49 dB <= 55 dB
 
 
+def test_lnf_fiche_part_selects_basis_designation(tmp_path) -> None:
+    """``part=4`` names ISO 10848-4:2010 on the Ln,f basis line."""
+    out = tmp_path / "lnf_part4.pdf"
+    _lnf_result().report(str(out), part=4)
+    _assert_one_page(str(out))
+    text = _extract_text(str(out))
+    assert "ISO 10848-4:2010" in text
+    assert "ISO 10848-2:2006" not in text
+
+
 def test_lnf_fiche_spanish(tmp_path) -> None:
     """``language="es"`` renders the Spanish Ln,f fiche."""
     out = tmp_path / "lnf_es.pdf"
@@ -306,6 +337,7 @@ def test_lnf_fiche_spanish(tmp_path) -> None:
     _assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Aislamiento acústico por flancos a ruido de impactos" in text
+    assert "ISO 10848-2:2006" in text  # the {standard} template is filled
 
 
 # --------------------------------------------------------------------------- #
