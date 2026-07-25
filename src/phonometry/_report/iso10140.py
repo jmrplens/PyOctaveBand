@@ -6,7 +6,7 @@ Renders a
 (laboratory airborne, ISO 10140-2:2010) or
 :class:`~phonometry.building.lab_insulation.LabImpactInsulationResult`
 (laboratory impact, ISO 10140-3:2010) to the one-page laboratory test report
-each standard's Clause 6 prescribes, laid out like the accredited laboratory
+each standard's Clause 9 prescribes, laid out like the accredited laboratory
 reports rated per ISO 717. The shared two-panel skeleton (title and basis
 line, optional metadata header, per-band table beside the
 measured-versus-shifted-reference curve, boxed single-number rating, method
@@ -125,8 +125,9 @@ def render_iso10140_report(
             caption = t("Per-band quantity and absorption area", language)
             col_widths = [12 * mm] + [22 * mm for _ in columns]
             return columns, caption, col_widths
-        # ISO 717-1/-2 Clause 4.4 requires stating whether the rating came
-        # from one-third-octave or octave bands; the caption declares the set.
+        # ISO 717-1:2020 Clause 5.3 / ISO 717-2:2020 Clause 4.4 require
+        # stating whether the rating came from one-third-octave or octave
+        # bands; the caption declares the set.
         caption_key = (
             "Octave-band {vh} [dB]"
             if np.asarray(rating.band_centers).size == 5

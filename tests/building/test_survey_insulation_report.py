@@ -125,6 +125,9 @@ def test_airborne_one_third_octave_caption(tmp_path) -> None:
     text = _extract_text(str(out))
     assert "One-third-octave" in text
     assert "Octave-band" not in text
+    # The basis line also declares the actual band set, not "octave bands".
+    assert "one-third-octave bands" in text
+    assert "octave bands)" not in text.replace("one-third-octave bands", "")
 
 
 def test_airborne_verbose_and_verdict_pass(tmp_path) -> None:
