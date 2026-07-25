@@ -117,7 +117,8 @@ class EQSection:
         steepest monotonic slope, and ``S`` must stay below the
         gain-dependent bound ``(A + 1/A)/(A + 1/A - 2)`` with
         ``A = 10^(gain_db/40)``, beyond which the cookbook's alpha turns
-        complex).
+        complex; at 0 dB gain ``A = 1``, the bound is unbounded and every
+        positive slope is admissible).
     """
 
     filter_type: EQFilterType
@@ -149,7 +150,28 @@ def _validate_section(section: EQSection) -> None:
             raise ValueError(f"'{name}' must be finite, got {value!r}.")
     if section.f0 <= 0:
         raise ValueError("Centre frequency 'f0' must be positive.")
+    _gain_amplitude(section.gain_db)
     _validate_section_parameterization(section)
+
+
+def _gain_amplitude(gain_db: float) -> float:
+    """The cookbook's amplitude ``A = 10^(gain_db/40)``, representable.
+
+    A finite but extreme ``gain_db`` overflows the power (about
+    +12320 dB) or underflows it to zero (about -12320 dB), where the
+    designers would divide by zero; both are rejected with the documented
+    :class:`ValueError` instead of leaking raw arithmetic errors.
+    """
+    try:
+        big_a = float(10.0 ** (gain_db / 40.0))
+    except OverflowError:
+        big_a = math.inf
+    if big_a == 0.0 or not math.isfinite(big_a):
+        raise ValueError(
+            f"'gain_db' = {gain_db:g} dB is outside the representable "
+            "range: 10^(gain_db/40) must be a positive finite number."
+        )
+    return big_a
 
 
 def _validate_shelf_slope(section: EQSection) -> None:
@@ -162,7 +184,7 @@ def _validate_shelf_slope(section: EQSection) -> None:
     """
     if section.slope is None:
         return
-    big_a = 10.0 ** (section.gain_db / 40.0)
+    big_a = _gain_amplitude(section.gain_db)
     a_sum = big_a + 1.0 / big_a
     if a_sum <= 2.0:  # A = 1 (gain 0 dB): every positive slope is fine
         return
@@ -351,7 +373,7 @@ def _section_sos(fs: float, section: EQSection) -> NDArray[np.float64]:
             f"Nyquist frequency {fs / 2} Hz."
         )
     w0 = 2 * math.pi * section.f0 / fs
-    big_a = 10.0 ** (section.gain_db / 40.0)
+    big_a = _gain_amplitude(section.gain_db)
     alpha = _section_alpha(section, w0, big_a)
     b, a = _DESIGNERS[section.filter_type](math.cos(w0), math.sin(w0), alpha, big_a)
     a0 = a[0]

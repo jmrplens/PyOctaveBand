@@ -116,6 +116,14 @@ def comb_filter_response(
     if not np.all(np.isfinite(freqs)):
         raise ValueError("'frequencies' must be finite.")
     order = freqs * period_v
+    # Finite inputs can still overflow the phase products f*T and N*pi*f*T
+    # (sin(inf) is NaN); reject them so the bounded-response contract holds.
+    if not np.all(np.isfinite(n * np.pi * order)):
+        raise ValueError(
+            "'frequencies' * 'period' (times n_averages*pi) overflows the "
+            "floating-point range; the comb filter cannot be evaluated at "
+            "such orders."
+        )
     lower = np.sin(np.pi * order)
     upper = np.sin(n * np.pi * order)
     with np.errstate(divide="ignore", invalid="ignore"):

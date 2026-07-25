@@ -11397,7 +11397,10 @@ computes the three standard variants over the quefrency axis:
 
 - `'power'` (default): the inverse DFT of `ln|X|²` (Milner's Fig. 21). Real,
   even and phase-blind - the workhorse for echo and harmonic-family
-  detection;
+  detection. This is Milner's *signed* cepstrum of the log-power spectrum;
+  Bogert's original 1963 "power cepstrum" squares once more and is
+  non-negative - the library follows Milner throughout, so negative
+  rahmonics keep their sign;
 - `'real'`: the inverse DFT of `ln|X|` - exactly half the power cepstrum,
   and the quantity whose causal folding is the minimum-phase reconstruction
   (below);
@@ -11440,8 +11443,9 @@ $$
 
 so the cepstrum carries a spike train at the **rahmonics** `n·t0` with
 amplitudes `a, -a²/2, a³/3, ...` (their sum is `ln(1+a)`), regardless of the
-spectrum of `s` itself, which concentrates at low quefrencies. On the power
-cepstrum the first spike's height is exactly the reflection coefficient `a` -
+spectrum of `s` itself, which concentrates at low quefrencies. On the signed
+cepstrum of the log-power spectrum (`kind='power'`, Milner's convention) the
+first spike's height is exactly the reflection coefficient `a` -
 of either sign - a closed form the tests and the conformance suite pin to
 1e-10. `echo_detection` automates the reading: it picks the largest
 `|cepstrum|` peak in the searched band (so an inverting reflection, `a < 0`,
@@ -11587,7 +11591,10 @@ scalloping loss, up to about 1.4 dB for the default Hann). The optional
 `band=(low, high)` argument reproduces the figure's band-pass front end -
 the classical bearing-envelope chain: isolate the structural-resonance band
 excited by the defect impacts with a zero-phase band-pass, then envelope
-it - so an out-of-band interferer never reaches the detector.
+it - so an out-of-band interferer is strongly attenuated before the
+detector (the roll-off of a fourth-order Butterworth applied forward and
+backward; the rejection is finite, and the zero-phase pass leaves small
+transients at the record edges).
 
 For an AM tone `A0·(1 + m·cos(2πfm·t))·cos(2πfc·t)` with `fm` on an
 analysis bin the closed forms are:

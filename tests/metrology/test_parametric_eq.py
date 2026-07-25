@@ -476,6 +476,21 @@ def test_rejects_non_finite_parameters(kwargs: dict) -> None:
         ph.EQSection("peaking", **kwargs)
 
 
+@pytest.mark.parametrize("gain_db", [1e308, -1e308])
+@pytest.mark.parametrize(
+    ("filter_type", "kwargs"),
+    [("peaking", {}), ("lowshelf", {"slope": 1.0})],
+)
+def test_extreme_finite_gain_raises_value_error(
+    gain_db: float, filter_type: str, kwargs: dict
+) -> None:
+    # 10^(gain_db/40) overflows for huge positive gains and underflows to
+    # zero (then divides by zero in the designers) for huge negative ones;
+    # both used to leak raw OverflowError/ZeroDivisionError.
+    with pytest.raises(ValueError, match="representable"):
+        ph.EQSection(filter_type, 1000.0, gain_db=gain_db, **kwargs)
+
+
 def test_shelf_slope_beyond_gain_bound_raises_informatively() -> None:
     # A = 10^(9/40): the alpha recipe is real only below
     # (A + 1/A)/(A + 1/A - 2) = 8.2869...; beyond it the raw math would

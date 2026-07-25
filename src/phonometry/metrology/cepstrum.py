@@ -432,8 +432,8 @@ class EchoDetectionResult:
         and its two neighbours, so an off-sample delay is estimated to a
         fraction of a sample.
     :ivar delay_samples: The peak position in whole samples (no
-        interpolation): the index at which :attr:`reflection_coefficient`
-        is read, so :attr:`delay` differs from ``delay_samples/fs`` by the
+        interpolation): the index at which ``reflection_coefficient``
+        is read, so ``delay`` differs from ``delay_samples/fs`` by the
         interpolated sub-sample offset (at most half a sample).
     :ivar reflection_coefficient: Signed cepstrum value at the peak sample.
         For a single in-record echo ``x(t) = s(t) + a s(t - t0)`` the power

@@ -335,6 +335,13 @@ def tone_burst(
         raise ValueError(
             "The burst is shorter than 2 samples; increase 'cycles' or 'fs'."
         )
+    rate_v, period, duty = _tone_burst_period(
+        fs_v, n_on, repetitions_v, repetition_rate
+    )
+
+    # Warn only once every configuration check has passed, so an invalid
+    # repetition setup raises instead of warning first (which would mask
+    # the error under a warnings-as-errors filter).
     delta = n_on - exact_samples  # gate-close offset from the zero crossing
     if abs(delta) > 1e-9:
         residual = amplitude_v * math.sin(2.0 * math.pi * f_v * delta / fs_v)
@@ -348,10 +355,6 @@ def tone_burst(
             PhonometryWarning,
             stacklevel=2,
         )
-
-    rate_v, period, duty = _tone_burst_period(
-        fs_v, n_on, repetitions_v, repetition_rate
-    )
 
     n_pre = round(float(pre_silence) * fs_v)
     n_post = round(float(post_silence) * fs_v)

@@ -255,15 +255,24 @@ class EnvelopeSpectrumResult:
 
 def _bandpass_pre_filter(
     xa: NDArray[np.float64], fs: float, band: tuple[float, float]
-) -> NDArray[np.float64]:
-    """Zero-phase 4th-order Butterworth band-pass ahead of the detector."""
+) -> tuple[NDArray[np.float64], tuple[float, float]]:
+    """Zero-phase 4th-order Butterworth band-pass ahead of the detector.
+
+    Returns the filtered record and the validated ``(low, high)`` edges.
+    """
     from scipy import signal as sp_signal
 
-    low, high = float(band[0]), float(band[1])
+    try:
+        low, high = (float(edge) for edge in band)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(
+            "'band' must be a pair of numeric (low, high) edges in Hz, "
+            f"got {band!r}."
+        ) from exc
     if not 0.0 < low < high < fs / 2.0:
         raise ValueError(
             "'band' must satisfy 0 < low < high < fs/2; got "
-            f"({band[0]!r}, {band[1]!r}) at fs = {fs:g} Hz."
+            f"({low:g}, {high:g}) at fs = {fs:g} Hz."
         )
     sos = sp_signal.butter(4, (low, high), btype="bandpass", fs=fs,
                            output="sos")
@@ -276,7 +285,8 @@ def _bandpass_pre_filter(
             f"band-pass pre-filter, which needs at least {min_length} "
             "samples of padding; lengthen the record or omit 'band'."
         )
-    return np.asarray(sp_signal.sosfiltfilt(sos, xa), dtype=np.float64)
+    filtered = np.asarray(sp_signal.sosfiltfilt(sos, xa), dtype=np.float64)
+    return filtered, (low, high)
 
 
 def envelope_spectrum(
@@ -357,8 +367,7 @@ def envelope_spectrum(
 
     band_v: tuple[float, float] | None = None
     if band is not None:
-        xa = _bandpass_pre_filter(xa, fs_v, band)
-        band_v = (float(band[0]), float(band[1]))
+        xa, band_v = _bandpass_pre_filter(xa, fs_v, band)
 
     env = np.asarray(np.abs(sp_signal.hilbert(xa)), dtype=np.float64)
     detector = env**2 if kind == "squared" else env

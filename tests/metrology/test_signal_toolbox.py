@@ -131,6 +131,20 @@ def test_tone_burst_incommensurate_frequency_warns() -> None:
     assert "-0.058" in message
 
 
+def test_tone_burst_invalid_config_raises_before_warning() -> None:
+    """An invalid repetition setup raises even for incommensurate bursts.
+
+    Under a warnings-as-errors filter the incommensurate warning must not
+    pre-empt the configuration ValueError.
+    """
+    import warnings as _warnings
+
+    with _warnings.catch_warnings():
+        _warnings.simplefilter("error", ph.PhonometryWarning)
+        with pytest.raises(ValueError, match="repetition_rate"):
+            ph.tone_burst(FS, 997.0, 10, repetitions=2)
+
+
 def test_tone_burst_commensurate_frequency_does_not_warn() -> None:
     import warnings as _warnings
 

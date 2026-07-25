@@ -342,6 +342,10 @@ def test_envelope_spectrum_band_validation() -> None:
     for band in ((0.0, 100.0), (200.0, 100.0), (100.0, FS / 2.0)):
         with pytest.raises(ValueError, match="band"):
             ph.envelope_spectrum(x, FS, band=band)
+    # Malformed shapes: not exactly two numeric edges.
+    for bad in ((700.0,), (700.0, 900.0, 1300.0), (700.0, None)):
+        with pytest.raises(ValueError, match="pair"):
+            ph.envelope_spectrum(x, FS, band=bad)  # type: ignore[arg-type]
     # A record shorter than the zero-phase padding fails informatively.
     with pytest.raises(ValueError, match="too short"):
         ph.envelope_spectrum(x[:20], FS, band=(700.0, 1300.0))

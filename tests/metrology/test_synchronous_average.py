@@ -305,6 +305,15 @@ def test_comb_filter_response_validation() -> None:
         comb_filter_response(one, -1.0, 2)
 
 
+def test_comb_filter_response_rejects_overflowing_order() -> None:
+    # Finite f and T whose product overflows would give sin(inf) = NaN
+    # instead of the documented bounded response.
+    with pytest.raises(ValueError, match="overflows"):
+        comb_filter_response(np.array([1e308]), 1e308, 3)
+    with pytest.raises(ValueError, match="overflows"):
+        comb_filter_response(np.array([1e307]), 100.0, 2**40)
+
+
 def test_plot_returns_axes() -> None:
     one = _periodic(PERIOD, M, (1.0, 3.0))
     result = ph.time_synchronous_average(_repeat(one, 8), FS, PERIOD)
