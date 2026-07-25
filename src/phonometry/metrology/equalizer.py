@@ -166,7 +166,7 @@ def _gain_amplitude(gain_db: float) -> float:
         big_a = float(10.0 ** (gain_db / 40.0))
     except OverflowError:
         big_a = math.inf
-    if big_a == 0.0 or not math.isfinite(big_a):
+    if not (big_a > 0.0 and math.isfinite(big_a)):
         raise ValueError(
             f"'gain_db' = {gain_db:g} dB is outside the representable "
             "range: 10^(gain_db/40) must be a positive finite number."
