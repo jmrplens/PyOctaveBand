@@ -184,6 +184,72 @@ def test_modulation_distortion_iec_per_order() -> None:
     assert res.smpte == pytest.approx(smpte, rel=1e-6)
 
 
+def test_modulation_distortion_carries_sideband_spectrum() -> None:
+    # The result carries the measured carrier and sideband amplitudes (the
+    # data behind .plot()), in ascending frequency order:
+    # f2-2f1, f2-f1, f2+f1, f2+2f1.
+    fl, fh, ah = 250.0, 8000.0, 0.25
+    x = (
+        _tone(fl)
+        + _tone(fh, ah)
+        + _tone(fh + fl, 0.02)
+        + _tone(fh - fl, 0.02)
+        + _tone(fh + 2 * fl, 0.01)
+        + _tone(fh - 2 * fl, 0.01)
+    )
+    res = modulation_distortion(x, FS, fl, fh)
+    assert res.f_low == fl and res.f_high == fh
+    assert res.carrier_amplitude == pytest.approx(ah, rel=1e-6)
+    np.testing.assert_allclose(
+        res.sideband_frequencies,
+        [fh - 2 * fl, fh - fl, fh + fl, fh + 2 * fl],
+    )
+    np.testing.assert_allclose(
+        res.sideband_amplitudes, [0.01, 0.02, 0.02, 0.01], rtol=1e-6
+    )
+
+
+def test_modulation_distortion_plot_marks_carrier_and_sidebands() -> None:
+    import matplotlib.pyplot as plt
+
+    from phonometry import ModulationDistortionResult
+
+    fl, fh = 250.0, 8000.0
+    x = (
+        _tone(fl)
+        + _tone(fh, 0.25)
+        + _tone(fh + fl, 0.02)
+        + _tone(fh - fl, 0.02)
+        + _tone(fh + 2 * fl, 0.01)
+        + _tone(fh - 2 * fl, 0.01)
+    )
+    res = modulation_distortion(x, FS, fl, fh)
+    ax = res.plot()
+    # The carrier marker sits at (f_high, 0 dB); the four sidebands read
+    # 20*lg(a_s / carrier) re the carrier.
+    xs = np.concatenate([line.get_xdata() for line in ax.lines])
+    assert fh in xs and fh - 2 * fl in xs and fh + 2 * fl in xs
+    sb_line = ax.lines[-1]
+    np.testing.assert_allclose(
+        sb_line.get_ydata(),
+        20.0 * np.log10(np.array([0.01, 0.02, 0.02, 0.01]) / 0.25),
+        atol=1e-6,
+    )
+    assert "d₂" in ax.get_title() and "SMPTE" in ax.get_title()
+    plt.close("all")
+    # Spanish labels and the unknown-language rejection.
+    ax_es = res.plot(language="es")
+    assert ax_es.get_ylabel() == "Nivel respecto a la portadora [dB]"
+    plt.close("all")
+    with pytest.raises(ValueError):
+        res.plot(language="xx")
+    # A hand-built result without the spectral fields cannot be plotted.
+    bare = ModulationDistortionResult(d2=0.1, d3=0.05, smpte=0.08)
+    with pytest.raises(ValueError, match="no sideband spectrum"):
+        bare.plot()
+    plt.close("all")
+
+
 def test_difference_frequency_distortion_iec() -> None:
     # IEC 60268-3 14.12.8.1: equal tones f1 = 13 kHz, f2 = 14 kHz (amp 0.5);
     # 2nd-order product at f2 - f1 = 1 kHz (0.03); 3rd-order at 2f1 - f2 and

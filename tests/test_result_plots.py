@@ -535,6 +535,21 @@ def _slit_aperture() -> ph.ApertureTransmissionResult:
     return ph.slit_transmission_coefficient(_PANEL_BANDS, 0.002, 0.1)
 
 
+def _modulation() -> ph.ModulationDistortionResult:
+    t = np.arange(FS) / FS
+    x = (np.sin(2 * np.pi * 250.0 * t) + 0.25 * np.sin(2 * np.pi * 8000.0 * t)
+         + 0.02 * np.sin(2 * np.pi * 8250.0 * t)
+         + 0.02 * np.sin(2 * np.pi * 7750.0 * t))
+    return ph.modulation_distortion(x, FS, 250.0, 8000.0)
+
+
+def _field_indicators() -> ph.FieldIndicators:
+    rng = np.random.default_rng(9614)
+    lp = 74.0 + rng.normal(0.0, 0.8, (8, 4))
+    i_n = 1.0e-5 * (1.0 + rng.normal(0.0, 0.2, (8, 4)))
+    return ph.field_indicators(lp, i_n, [125.0, 250.0, 500.0, 1000.0])
+
+
 _KWARG_PLOT_CASES = [
     ("zwicker", _zwicker_stationary, "line"),
     ("sti", _sti, "bar"),
@@ -566,6 +581,8 @@ _KWARG_PLOT_CASES = [
     ("single_panel", _single_panel, "line"),
     ("double_wall", _double_wall, "line"),
     ("slit_aperture", _slit_aperture, "line"),
+    ("modulation_distortion", _modulation, "line"),
+    ("field_indicators", _field_indicators, "line"),
 ]
 
 

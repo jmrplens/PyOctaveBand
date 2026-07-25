@@ -604,11 +604,48 @@ class ModulationDistortionResult:
         the output amplitude at ``f2``.
     :ivar smpte: Combined-RMS convention of SMPTE-type analyzers (not an
         IEC 60268-3 quantity): ``√(Σ aₛ²) / a_f2`` over all four sidebands.
+    :ivar f_low: Low modulating tone ``f1``, in Hz.
+    :ivar f_high: High carrier tone ``f2``, in Hz.
+    :ivar carrier_amplitude: Measured output amplitude at ``f2`` (the
+        reference of the per-order ratios).
+    :ivar sideband_frequencies: The four intermodulation product
+        frequencies in ascending order: ``f2 − 2f1``, ``f2 − f1``,
+        ``f2 + f1`` and ``f2 + 2f1``, in Hz.
+    :ivar sideband_amplitudes: Measured peak amplitudes at
+        ``sideband_frequencies`` (zero for a product that falls outside
+        the analysis band or cannot be separated from a primary tone).
     """
 
     d2: float
     d3: float
     smpte: float
+    f_low: float | None = None
+    f_high: float | None = None
+    carrier_amplitude: float | None = None
+    sideband_frequencies: NDArray[np.float64] | None = None
+    sideband_amplitudes: NDArray[np.float64] | None = None
+
+    def plot(self, ax: Axes | None = None, *, language: str = "en",
+             **kwargs: Any) -> Axes:
+        """Plot the carrier and its modulation sidebands, with d2/d3 annotated.
+
+        Draws the output amplitude at ``f2`` (the 0 dB reference) and the four
+        intermodulation sidebands at ``f2 ± f1`` and ``f2 ± 2f1`` as a
+        stem-style spectrum in dB relative to the carrier, the modulation
+        counterpart of :meth:`HarmonicDistortionResult.plot`.
+
+        :param ax: Existing axes, or ``None`` to create a figure.
+        :param language: Label language, ``"en"`` (default) or ``"es"``.
+        :param kwargs: Forwarded to the marker ``plot`` call.
+        :return: The axes.
+        :raises ValueError: If the result carries no sideband spectrum data
+            (a result constructed by hand without the spectral fields).
+        """
+        from .._i18n import check_language
+        from .._plot.electroacoustics import plot_modulation_distortion
+
+        check_language(language)
+        return plot_modulation_distortion(self, ax=ax, language=language, **kwargs)
 
 
 def modulation_distortion(
@@ -668,7 +705,22 @@ def modulation_distortion(
     smpte = float(
         np.sqrt(sum(a**2 for pair in sidebands.values() for a in pair)) / carrier
     )
-    return ModulationDistortionResult(d2=float(d2), d3=float(d3), smpte=smpte)
+    # Sideband spectrum in ascending frequency order: f2-2f1, f2-f1, f2+f1,
+    # f2+2f1 (the ``sidebands`` pairs are stored (upper, lower) per order).
+    sb_freqs = np.array([fh - 2.0 * fl, fh - fl, fh + fl, fh + 2.0 * fl])
+    sb_amps = np.array(
+        [sidebands[3][1], sidebands[2][1], sidebands[2][0], sidebands[3][0]]
+    )
+    return ModulationDistortionResult(
+        d2=float(d2),
+        d3=float(d3),
+        smpte=smpte,
+        f_low=fl,
+        f_high=fh,
+        carrier_amplitude=carrier,
+        sideband_frequencies=sb_freqs,
+        sideband_amplitudes=sb_amps,
+    )
 
 
 def difference_frequency_distortion(

@@ -1319,6 +1319,47 @@ _ES_EXACT = {
     "Kurze-Anderson grazing limit (5 dB)":
         "Límite rasante de Kurze-Anderson (5 dB)",
     "Insertion loss [dB]": "Pérdida por inserción [dB]",
+    # --- WP emission & electroacoustics figures (result .plot() labels) ---
+    "Carrier f₂": "Portadora f₂",
+    "Sidebands f₂ ± n·f₁": "Bandas laterales f₂ ± n·f₁",
+    "Level re carrier [dB]": "Nivel respecto a la portadora [dB]",
+    "$R_1$ (resistance)": "$R_1$ (resistencia)",
+    "$X_1$ (reactance)": "$X_1$ (reactancia)",
+    r"Normalized radiation impedance $Z_r / \rho c S$":
+        r"Impedancia de radiación normalizada $Z_r / \rho c S$",
+    "Baffled circular piston radiation impedance":
+        "Impedancia de radiación de un pistón circular con pantalla",
+    "F2 (surface pressure-intensity)": "F2 (presión-intensidad superficial)",
+    "F3 (negative partial power)": "F3 (potencia parcial negativa)",
+    "Dynamic capability Ld": "Capacidad dinámica Ld",
+    "F4 (non-uniformity)": "F4 (no uniformidad)",
+    "Indicator [dB]": "Indicador [dB]",
+    "Field non-uniformity F4": "No uniformidad del campo F4",
+    "ISO 9614-1 field indicators": "Indicadores de campo ISO 9614-1",
+    "Helmholtz resonator": "Resonador de Helmholtz",
+    "Quarter-wave tube": "Tubo de cuarto de onda",
+    "Side-branch resonators: transmission loss (Bies Eqs. 8.44, 8.46)":
+        "Resonadores en derivación: pérdida de transmisión (Bies Ecs. 8.44, 8.46)",
+    "Duct end reflection loss (ASHRAE Table 8.14)":
+        "Pérdida por reflexión del extremo del conducto (ASHRAE Tabla 8.14)",
+    "End reflection loss [dB]": "Pérdida por reflexión del extremo [dB]",
+    "Duct diameter": "Diámetro del conducto",
+    "Panel R": "R del panel",
+    "Interior correction C": "Corrección interior C",
+    "Insertion loss (R - C)": "Pérdida por inserción (R - C)",
+    "Machine enclosure insertion loss":
+        "Pérdida por inserción de encapsulado de máquina",
+    "Measured phase": "Fase medida",
+    "Minimum phase (from |H|)": "Fase mínima (de |H|)",
+    "Excess phase (all-pass)": "Fase de exceso (pasa-todo)",
+    "Phase [rad]": "Fase [rad]",
+    "Minimum-phase / all-pass decomposition":
+        "Descomposición fase mínima / pasa-todo",
+    "Group delay": "Retardo de grupo",
+    "Excess group delay": "Retardo de grupo de exceso",
+    "Momentary (400 ms)": "Momentánea (400 ms)",
+    "Short-term (3 s)": "Corto plazo (3 s)",
+    "Programme loudness (EBU R 128)": "Sonoridad de programa (EBU R 128)",
 }
 
 _ES_PATTERNS = [
@@ -1517,6 +1558,9 @@ _ES_PATTERNS = [
      ("por debajo de f0: dominio de la rigidez, |Y| ~ ω/k\n"
       "por encima de f0: dominio de la masa, |Y| ~ 1/(ωm)\n"
       "f0 = \\1 Hz,  1/c = \\2 m/(N·s)")),
+    # Programme-loudness .plot() legend lines (loudness_gating/loudness_range).
+    (r"^Integrated (.+) LUFS$", r"Integrada \1 LUFS"),
+    (r"^Ungated mean (.+) LUFS$", r"Media sin puerta \1 LUFS"),
 ]
 
 
@@ -10327,6 +10371,264 @@ def generate_barrier_insertion_loss_methods(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
     plt.tight_layout()
     save_figure(output_dir, "barrier_insertion_loss_methods.svg")
+def generate_modulation_distortion(output_dir: str) -> None:
+    """IEC 60268-3 14.12.7 modulation sidebands via ModulationDistortionResult.plot()."""
+    print("Generating modulation_distortion.svg...")
+    from phonometry import modulation_distortion
+
+    # The standard two-tone test: a large low tone f1 = 60 Hz and a small high
+    # tone f2 = 7 kHz (4:1), captured at the output of a weakly non-linear
+    # amplifier (a memoryless polynomial stands in for the device). One second
+    # at 48 kHz puts every tone on an FFT bin (coherent sampling).
+    fs = 48000
+    t = np.arange(fs) / fs
+    x = 1.0 * np.sin(2.0 * np.pi * 60.0 * t) + 0.25 * np.sin(2.0 * np.pi * 7000.0 * t)
+    y = x + 0.04 * x**2 + 0.012 * x**3
+
+    res = modulation_distortion(y, fs, 60.0, 7000.0)
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    # The result's own .plot() draws the carrier (0 dB reference) and the four
+    # modulation sidebands at f2 +/- f1 and f2 +/- 2 f1, annotated with the
+    # per-order d2/d3 and the SMPTE combined RMS.
+    res.plot(ax=ax)
+    ax.set_xlim(6600.0, 7400.0)
+    plt.tight_layout()
+    save_figure(output_dir, "modulation_distortion.svg")
+    plt.close()
+
+
+def generate_piston_radiation_impedance(output_dir: str) -> None:
+    """Baffled-piston R1/X1 against ka via RadiatingPistonResult.plot()."""
+    print("Generating piston_radiation_impedance.svg...")
+    from phonometry import radiating_piston
+
+    # A 75 mm-radius piston (a typical mid-woofer cone) over the audio band:
+    # ka runs from well below 0.1 (mass-controlled) past 10 (resistive).
+    res = radiating_piston(radius=0.075, frequencies=np.geomspace(20.0, 20000.0, 400))
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    # The result's own .plot() draws the normalized radiation resistance R1 and
+    # reactance X1 against ka (the classic Beranek & Mellow figure).
+    res.plot(ax=ax)
+    plt.tight_layout()
+    save_figure(output_dir, "piston_radiation_impedance.svg")
+    plt.close()
+
+
+def generate_field_indicators(output_dir: str) -> None:
+    """ISO 9614-1 F2/F3/F4 per band vs dynamic capability via FieldIndicators.plot()."""
+    print("Generating field_indicators.svg...")
+    from phonometry import emission
+
+    # A 10-position discrete-point scan (ISO 9614-1) of a machine in an
+    # ordinary room. The surface pressure is nearly uniform; the normal
+    # intensity per band is set so the pressure-intensity gap widens towards
+    # low frequency (the field turns reactive), with two inward-flowing
+    # positions in the 125 Hz band (F3 rises above F2 there).
+    freqs = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+    delta_pi = np.array([10.5, 8.5, 6.0, 4.5, 3.5, 3.0])   # target Lp - L|In| per band
+    rng = np.random.default_rng(9614)
+    lp = 78.0 + rng.normal(0.0, 0.4, (10, freqs.size))
+    i_mean = 10.0 ** ((78.0 - delta_pi) / 10.0) * 1.0e-12
+    i_n = i_mean[None, :] * (1.0 + rng.normal(0.0, 0.18, (10, freqs.size)))
+    # Two positions see net inward flow in the 125 Hz band; rescale the rest so
+    # the algebraic band mean keeps its target (the band stays determinable).
+    i_n[:2, 0] = -0.35 * i_mean[0]
+    i_n[2:, 0] *= (10.0 * i_mean[0] - i_n[:2, 0].sum()) / i_n[2:, 0].sum()
+
+    fi = emission.field_indicators(lp, i_n, freqs)
+    ld = emission.dynamic_capability_index(18.0)   # delta_pI0 = 18 dB, K = 10 dB
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    # The result's own .plot() draws F2 and F3 per band, the dynamic
+    # capability Ld (criterion 1: adequate where Ld > F2) and F4 on a twin axis.
+    fi.plot(ax=ax, dynamic_capability=ld)
+    plt.tight_layout()
+    save_figure(output_dir, "field_indicators.svg")
+    plt.close()
+
+
+def generate_silencer_side_branch(output_dir: str) -> None:
+    """Helmholtz and quarter-wave side branches shorting the duct at tuning."""
+    print("Generating silencer_side_branch.svg...")
+    from phonometry import helmholtz_resonator, quarter_wave_resonator
+
+    freqs = np.linspace(20.0, 600.0, 4000)
+    hr = helmholtz_resonator(freqs, duct_area=0.01, neck_area=1e-4,
+                             neck_length=0.02, cavity_volume=1e-3)
+    qw = quarter_wave_resonator(freqs, duct_area=0.01, length=0.3,
+                                branch_area=2e-3)
+
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    ax.plot(freqs, hr.transmission_loss, color=COLOR_PRIMARY, lw=1.8,
+            label="Helmholtz resonator")
+    ax.plot(freqs, qw.transmission_loss, color=COLOR_SECONDARY, lw=1.8,
+            ls="--", label="Quarter-wave tube")
+    for res_f in (hr.resonances[0], qw.resonances[0]):
+        ax.axvline(float(res_f), color=COLOR_TERTIARY, ls=":", lw=1.0)
+    ax.set_xlim(20.0, 600.0)
+    ax.set_ylim(0.0, 50.0)
+    format_frequency_axis(ax, 20.0, 600.0)
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Transmission loss [dB]")
+    ax.set_title("Side-branch resonators: transmission loss (Bies Eqs. 8.44, 8.46)",
+                 fontweight="bold", pad=10)
+    ax.grid(True, which="both", alpha=0.4)
+    ax.legend(loc="upper right", fontsize="small")
+    plt.tight_layout()
+    save_figure(output_dir, "silencer_side_branch.svg")
+    plt.close()
+
+
+def generate_hvac_end_reflection(output_dir: str) -> None:
+    """ASHRAE duct end reflection loss for three diameters (HvacSpectrumResult)."""
+    print("Generating hvac_end_reflection.svg...")
+    from phonometry.noise_control import hvac
+
+    bands = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0]
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    for diameter, color in ((0.15, COLOR_PRIMARY), (0.30, COLOR_SECONDARY),
+                            (0.60, COLOR_TERTIARY)):
+        er = hvac.end_reflection_loss(bands, diameter=diameter,
+                                      termination="flush")
+        ax.semilogx(np.asarray(er.frequencies), np.asarray(er.values), "o-",
+                    color=color, lw=1.8, ms=4,
+                    label=f"D = {int(diameter * 1000)} mm")
+    ax.set_xlim(50.0, 2500.0)
+    ax.set_ylim(bottom=0.0)
+    format_frequency_axis(ax, 50.0, 2500.0)
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("End reflection loss [dB]")
+    ax.set_title("Duct end reflection loss (ASHRAE Table 8.14)",
+                 fontweight="bold", pad=10)
+    ax.grid(True, which="both", alpha=0.4)
+    ax.legend(loc="upper right", fontsize="small", title="Duct diameter")
+    plt.tight_layout()
+    save_figure(output_dir, "hvac_end_reflection.svg")
+    plt.close()
+
+
+def generate_enclosure_insertion_loss(output_dir: str) -> None:
+    """Machine-enclosure IL = R - C per band via EnclosureResult.plot()."""
+    print("Generating enclosure_insertion_loss.svg...")
+    from phonometry import enclosure_insertion_loss
+
+    # A measured panel transmission loss combined with a modest interior
+    # lining (mean absorption 0.3): the reverberant build-up inside the small
+    # hard cavity spends part of the panel R.
+    bands = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+    panel_r = np.array([18.0, 24.0, 30.0, 36.0, 42.0, 46.0])
+    enc = enclosure_insertion_loss(
+        panel_r, external_area=6.0, internal_area=5.0,
+        internal_absorption=0.3, frequencies=bands,
+    )
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    # The result's own .plot() draws the panel R, the interior correction C
+    # and the net insertion loss IL = R - C.
+    enc.plot(ax=ax)
+    plt.tight_layout()
+    save_figure(output_dir, "enclosure_insertion_loss.svg")
+    plt.close()
+
+
+def generate_phase_decomposition(output_dir: str) -> None:
+    """Minimum-phase / all-pass split of a delayed band-pass response."""
+    print("Generating phase_decomposition.svg...")
+    from scipy import signal as sp_signal
+
+    from phonometry import phase_decomposition
+
+    # A strictly minimum-phase equalizer response (an RBJ +6 dB peaking biquad
+    # at 1 kHz) measured through a 2.5 ms latency (a digital processing
+    # delay): the minimum-phase part carries what an equalizer can invert, the
+    # all-pass excess carries the pure delay, read directly off the flat
+    # excess group delay.
+    fs = 48000.0
+    delay = int(0.0025 * fs)                      # 2.5 ms
+    gain_a = 10.0 ** (6.0 / 40.0)                 # +6 dB peaking gain
+    w0 = 2.0 * np.pi * 1000.0 / fs
+    alpha = np.sin(w0) / (2.0 * 1.0)              # Q = 1
+    b = np.array([1.0 + alpha * gain_a, -2.0 * np.cos(w0), 1.0 - alpha * gain_a])
+    a = np.array([1.0 + alpha / gain_a, -2.0 * np.cos(w0), 1.0 - alpha / gain_a])
+    imp = np.zeros(16384)
+    imp[delay] = 1.0
+    ir = sp_signal.lfilter(b / a[0], a / a[0], imp)
+
+    res = phase_decomposition(np.fft.rfft(ir), fs)
+    # The result's own .plot() draws three stacked panels: |H|, the measured /
+    # minimum / excess phases and the total and excess group delays.
+    res.plot()
+    plt.gcf().set_size_inches(9.0, 8.0)
+    plt.tight_layout()
+    save_figure(output_dir, "phase_decomposition.svg")
+    plt.close()
+
+
+def _r128_noise_programme(sections: list[tuple[float, float]], fs: int) -> np.ndarray:
+    """Deterministic band-limited noise programme from (level dBFS, seconds)."""
+    from scipy import signal as sp_signal
+
+    rng = np.random.default_rng(3341)
+    sos = sp_signal.butter(2, 2000.0, fs=fs, output="sos")
+    chunks = []
+    for level, seconds in sections:
+        noise = sp_signal.sosfilt(sos, rng.standard_normal(int(seconds * fs)))
+        noise /= np.sqrt(np.mean(noise**2))
+        chunks.append(10.0 ** (level / 20.0) * noise)
+    return np.concatenate(chunks)
+
+
+def generate_loudness_gating(output_dir: str) -> None:
+    """BS.1770 gating: a long quiet tail does not drag the integrated loudness."""
+    print("Generating loudness_gating.svg...")
+    from phonometry import program_loudness
+
+    # 20 s of programme material on the -23 LUFS target followed by 40 s of
+    # quiet room ambience ~29 LU lower: the -70 LUFS absolute gate keeps
+    # everything, but the relative gate (10 LU below the survivors) drops the
+    # tail, so the integrated loudness stays on the foreground while the
+    # ungated mean sinks. The programme is loudness-normalised to -23.0 LUFS
+    # first, exactly as a delivery workflow would.
+    fs = 48000
+    from phonometry import integrated_loudness
+
+    x = _r128_noise_programme([(-23.0, 20.0), (-52.0, 40.0)], fs)
+    x *= 10.0 ** ((-23.0 - integrated_loudness(np.vstack([x, x]), fs)) / 20.0)
+    res = program_loudness(np.vstack([x, x]), fs)
+
+    _fig, ax = plt.subplots(figsize=(10.5, 5.8))
+    # The result's own .plot() draws the momentary and short-term traces, the
+    # integrated line and the LRA band.
+    res.plot(ax=ax)
+    finite = res.momentary[np.isfinite(res.momentary)]
+    ungated = 10.0 * np.log10(np.mean(10.0 ** (finite / 10.0)))
+    ax.axhline(ungated, color=COLOR_TERTIARY, ls="-.", lw=1.6,
+               label=f"Ungated mean {ungated:.1f} LUFS")
+    ax.legend(loc="center right", fontsize=9)
+    plt.tight_layout()
+    save_figure(output_dir, "loudness_gating.svg")
+    plt.close()
+
+
+def generate_loudness_range(output_dir: str) -> None:
+    """EBU Tech 3342 loudness range on its two-step reference case (LRA = 10 LU)."""
+    print("Generating loudness_range.svg...")
+    from phonometry import program_loudness
+
+    # EBU Tech 3342 test case 1: 20 s at -20 dBFS then 20 s at -30 dBFS. The
+    # short-term distribution has two plateaus 10 LU apart, and the P10-P95
+    # spread reads exactly LRA = 10.0 LU (the shaded band of the plot).
+    fs = 48000
+    t = np.arange(20 * fs) / fs
+    tone = np.sin(2.0 * np.pi * 1000.0 * t)
+    x = np.concatenate([10.0 ** (-20.0 / 20.0) * tone,
+                        10.0 ** (-30.0 / 20.0) * tone])
+    res = program_loudness(np.vstack([x, x]), fs)
+
+    _fig, ax = plt.subplots(figsize=(10.5, 5.8))
+    # The result's own .plot() shades the loudness range between its 10th and
+    # 95th percentile edges under the momentary / short-term / integrated traces.
+    res.plot(ax=ax)
+    plt.tight_layout()
+    save_figure(output_dir, "loudness_range.svg")
     plt.close()
 
 
@@ -10609,6 +10911,18 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_atmospheric_ray_fan,
     generate_atmospheric_pe_range,
     generate_barrier_insertion_loss_methods,
+    # Emission & electroacoustics: modulation sidebands, piston radiation
+    # impedance, ISO 9614-1 field indicators, side-branch silencers, HVAC end
+    # reflection, machine enclosures, phase decomposition and R 128 loudness.
+    generate_modulation_distortion,
+    generate_piston_radiation_impedance,
+    generate_field_indicators,
+    generate_silencer_side_branch,
+    generate_hvac_end_reflection,
+    generate_enclosure_insertion_loss,
+    generate_phase_decomposition,
+    generate_loudness_gating,
+    generate_loudness_range,
 )
 
 
