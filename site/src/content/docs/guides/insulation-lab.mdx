@@ -191,6 +191,58 @@ the limit of measurement; catch it with `warnings.simplefilter("error",
 LabInsulationWarning)`. The automatic rating is formed only when exactly 16
 one-third-octave or 5 octave values are supplied (`rating` is `None` otherwise).
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lab_insulation_result.svg" alt="The two ISO 10140 laboratory quantities side by side: the measured sound reduction index R against the shifted ISO 717-1 reference on the left, and the normalized impact sound pressure level Ln against the shifted ISO 717-2 reference on the right, each panel annotated with its single-number rating" width="92%" />
+
+*The two laboratory quantities of ISO 10140 with their ISO 717 ratings: the
+airborne $R$ is rated where the reference sits **above** the measurement,
+the impact $L_n$ where the measurement sits **above** the reference (a
+higher impact level is worse). `lab.plot()` and `imp.plot()` draw either
+panel on its own.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+# The ISO 717-1 Annex C wall in an ISO 10140 suite (S = 10 m2, V = 50 m3,
+# T = 0.8 s) and the ISO 717-2 Annex C floor under the tapping machine.
+r = np.array([20.4, 16.3, 17.7, 22.6, 22.4, 22.7, 24.8, 26.6,
+              28.0, 30.5, 31.8, 32.5, 33.4, 33.0, 31.0, 25.5])
+l1 = np.full(16, 90.0)
+t2 = np.full(16, 0.8)
+lab = building.lab_airborne_insulation(l1, l1 - r, t2, area=10.0, volume=50.0)
+li = np.array([62.1, 63.2, 63.5, 66.2, 68.5, 70.0, 71.7, 73.1,
+               73.8, 73.5, 73.8, 73.3, 73.1, 73.0, 72.4, 71.2])
+imp = building.lab_impact_insulation(li, t2, volume=50.0)
+
+# One line each — R (or Ln) vs its shifted ISO 717 reference:
+lab.plot()
+imp.plot()
+plt.show()
+
+# By hand, both panels from the results' fields:
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4.5))
+ax1.semilogx(lab.rating.band_centers, lab.r, "o-", label="measured R")
+ax1.semilogx(lab.rating.band_centers, lab.rating.shifted_reference, "s--",
+             label="shifted reference")
+ax1.set_title(f"Rw = {lab.rating.rating} dB")
+ax2.semilogx(imp.rating.band_centers, imp.l_n, "o-", label="normalized Ln")
+ax2.semilogx(imp.rating.band_centers, imp.rating.shifted_reference, "s--",
+             label="shifted reference")
+ax2.set_title(f"Ln,w = {imp.rating.rating} dB")
+for ax in (ax1, ax2):
+    ax.set_xlabel("Frequency [Hz]")
+    ax.legend()
+ax1.set_ylabel("Sound reduction index R [dB]")
+ax2.set_ylabel("Impact sound pressure level Ln [dB]")
+plt.show()
+```
+
+</details>
+
 ### `lab_airborne_insulation()` / `lab_impact_insulation()` parameters
 
 | Parameter | Type | Units | Range / default | Notes |
@@ -243,6 +295,7 @@ r = np.array([20.4, 16.3, 17.7, 22.6, 22.4, 22.7, 24.8, 26.6,
 lab = building.lab_airborne_insulation(
     l1, l1 - r, np.full(16, 0.8), area=10.0, volume=50.0
 )
+lab.plot()   # measured R vs shifted ISO 717-1 reference (needs matplotlib)
 metadata = ReportMetadata(
     specimen="100 mm autoclaved aerated concrete block wall",
     client="Example client",
@@ -473,6 +526,7 @@ l_in = np.array([57.9, 62.0, 60.6, 55.7, 55.9, 55.6, 53.5, 51.7,
 res = building.intensity_element_normalized_difference(
     np.full(16, lp1), l_in, measurement_area=sm, n=n
 )
+res.plot()   # DI,n,e vs shifted ISO 717-1 reference (needs matplotlib)
 metadata = ReportMetadata(
     specimen="Trickle ventilator in a 100 mm masonry wall",
     measurement_standard="ISO 15186-1",
@@ -482,6 +536,52 @@ metadata = ReportMetadata(
 )
 res.report("DIne.pdf", metadata=metadata)               # DI,n,e,w (C; Ctr)
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_element_insulation.svg" alt="Element-normalized level difference DI,n,e of a trickle ventilator per one-third-octave band against the shifted ISO 717-1 reference curve, with the unfavourable deviations shaded and the DI,n,e,w rating annotated" width="80%" />
+
+*The small element is rated exactly like a wall: $D_{I,n,e}$ feeds the
+ISO 717-1 engine and the unfavourable deviations (reference above the
+measurement) set $D_{I,n,e,w}$. The $10\lg(S_m/A_0)$ normalization replaces
+the specimen-area term, so the number describes the element irrespective of
+the wall it sits in.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+# A trickle ventilator in a masonry wall: source-room SPL 85 dB and the
+# normal intensity level over the Sm = 12 m2 measurement surface.
+l_in = np.array([57.9, 62.0, 60.6, 55.7, 55.9, 55.6, 53.5, 51.7,
+                 50.3, 47.8, 46.5, 45.8, 44.9, 45.3, 47.3, 52.8])
+res = building.intensity_element_normalized_difference(
+    np.full(16, 85.0), l_in, measurement_area=12.0, n=1
+)
+
+# One line — DI,n,e vs the shifted ISO 717-1 reference:
+res.plot()
+plt.show()
+
+# By hand, from the rating the result carries:
+w = res.rating
+fig, ax = plt.subplots()
+ax.semilogx(w.band_centers, res.d_i_n_e, "o-", label="DI,n,e (element)")
+ax.semilogx(w.band_centers, w.shifted_reference, "s--",
+            label="shifted reference")
+ax.fill_between(w.band_centers, w.measured, w.shifted_reference,
+                where=w.measured < w.shifted_reference, interpolate=True,
+                alpha=0.3, label="unfavourable deviations")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Element normalized level difference [dB]")
+ax.set_title(f"DI,n,e,w = {w.rating} dB  (C={w.c:+d}; Ctr={w.ctr:+d})")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 <ReportPreview
 	name="iso15186_element_example"
@@ -563,6 +663,7 @@ res.delta_lw          # weighted single number (rated on the 100-3150 Hz sub-ran
 res.ci_delta          # spectrum adaptation term CI,delta (Formula (A.4))
 res.limited           # bands at the 1.3 dB limit of measurement (> delta-L)
 res.octave_bands()    # (octave freqs, delta-L_oct) via Formula (5)
+res.plot()            # the delta-L(f) improvement spectrum above (needs matplotlib)
 ```
 
 ### ISO 16251-1 impact-improvement report (`.report()`)
@@ -696,7 +797,57 @@ m = building.modal_overlap_factor(s_i, critical_frequency=85.0,
 res_m = building.vibration_reduction_index(dbar, lij, s_i, s_j, frequency=freqs,
                                   modal_overlap=m)   # M < 0.25 bands bracketed
 res_m.bracketed    # per-band flags; bracketed bands leave the single number
+
+# With 16 one-third-octave (or 5 octave) bands, dnf.plot() draws Dn,f vs the
+# shifted ISO 717-1 reference with Dn,f,w annotated (needs matplotlib):
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/flanking_level_difference.svg" alt="Normalized flanking level difference Dn,f per one-third-octave band against the shifted ISO 717-1 reference curve, with the unfavourable deviations shaded and the Dn,f,w rating annotated" width="80%" />
+
+*The overall flanking descriptor $D_{n,f}$ is an airborne quantity, so its
+single number $D_{n,f,w}$ comes from the unchanged ISO 717-1 engine; it
+drops straight into the EN 12354-1 model as the flanking-path datum of the
+tested junction (the impact counterpart $L_{n,f}$ rates per ISO 717-2 the
+same way).*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+# A lightweight junction in the laboratory: source-room level, receiving-room
+# level over the flanking path, and the receiving-room absorption area.
+l1 = np.full(16, 80.0)
+dnf_target = np.array([48, 49, 50, 51, 52, 54, 55, 57,
+                       58, 59, 60, 61, 62, 63, 64, 65], dtype=float)
+dnf = building.normalized_flanking_level_difference(
+    l1, l1 - dnf_target, absorption_area=np.full(16, 10.0)
+)
+
+# One line — Dn,f vs the shifted ISO 717-1 reference:
+dnf.plot()
+plt.show()
+
+# By hand, from the rating the result carries:
+w = dnf.rating
+fig, ax = plt.subplots()
+ax.semilogx(w.band_centers, dnf.d_n_f, "o-", label="Dn,f (flanking)")
+ax.semilogx(w.band_centers, w.shifted_reference, "s--",
+            label="shifted reference")
+ax.fill_between(w.band_centers, w.measured, w.shifted_reference,
+                where=w.measured < w.shifted_reference, interpolate=True,
+                alpha=0.3, label="unfavourable deviations")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Normalized flanking level difference [dB]")
+ax.set_title(f"Dn,f,w = {w.rating} dB  (C={w.c:+d}; Ctr={w.ctr:+d})")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 ### ISO 10848 flanking-transmission reports (`.report()`)
 
