@@ -785,6 +785,59 @@ def test_impedance_tube_plot_alpha_and_reflection() -> None:
     plt.close("all")
 
 
+def _transfer_matrix() -> tuple[ph.TransferMatrix, np.ndarray, float]:
+    f = np.linspace(200.0, 1600.0, 40)
+    rho_c = 407.0
+    k = 2.0 * np.pi * f / 343.2
+    tm = ph.air_layer_transfer_matrix(k, 0.05, rho_c)
+    return tm, f, rho_c
+
+
+def test_transfer_matrix_plot_tl_and_absorption() -> None:
+    tm, f, rho_c = _transfer_matrix()
+    ax = tm.plot(f, rho_c)
+    # Primary axis: the Eq. (26) transmission loss (0 dB for a pure air layer).
+    np.testing.assert_allclose(
+        ax.lines[0].get_ydata(), tm.transmission_loss(rho_c), atol=1e-12
+    )
+    # Twin axis: the Eq. (28) hard-backed absorption companion on a 0..1 scale.
+    twins = [
+        other for other in ax.figure.axes
+        if other is not ax and other.bbox.bounds == ax.bbox.bounds
+    ]
+    assert len(twins) == 1
+    np.testing.assert_allclose(
+        twins[0].lines[0].get_ydata(), tm.absorption_hard_backed(rho_c)
+    )
+    assert twins[0].get_ylim() == (0.0, 1.05)
+    plt.close("all")
+
+
+def test_transfer_matrix_plot_forwards_kwargs_and_composes() -> None:
+    tm, f, rho_c = _transfer_matrix()
+    ax = tm.plot(f, rho_c, linewidth=2, color="red")
+    line = ax.lines[0]
+    assert line.get_linewidth() == 2.0
+    assert plt.matplotlib.colors.to_rgba(line.get_color()) == (
+        plt.matplotlib.colors.to_rgba("red")
+    )
+    plt.close("all")
+    fig, external = plt.subplots()
+    out = tm.plot(f, rho_c, ax=external)
+    assert out is external
+    plt.close(fig)
+
+
+def test_transfer_matrix_plot_spanish_and_bad_language() -> None:
+    tm, f, rho_c = _transfer_matrix()
+    ax = tm.plot(f, rho_c, language="es")
+    assert "ASTM E2611" in ax.get_title()
+    assert "matriz de transferencia" in ax.get_title()
+    plt.close("all")
+    with pytest.raises(ValueError, match="language"):
+        tm.plot(f, rho_c, language="fr")
+
+
 def test_layered_absorber_plot_alpha_and_reflection() -> None:
     res = _layered_absorber()
     ax = res.plot()

@@ -93,6 +93,7 @@ res = simulation.fdtd_simulation(
 )
 print(res.size)                  # (3.0, 2.0)  metros
 print(round(res.dt * 1e6, 2))    # 12.37  microsegundos (CN = 0.6)
+res.plot()                       # historias de presión en las sondas (figura del §3)
 ```
 
 La malla es de índices: la celda ``(ix, iy)`` tiene su centro en
@@ -225,6 +226,52 @@ sel = (freqs > 250) & (freqs < 350)
 print(round(0.5 * 343.0 * float(np.hypot(1 / lx, 1 / ly)), 1))  # 299.1  modo (1,1) exacto
 print(round(float(freqs[sel][np.argmax(spec[sel])]), 1))        # 298.9  medido
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fdtd_room_modes_es.svg" alt="Espectro de la presión en la sonda de una caja FDTD rígida de 1,0 por 0,7 metros entre 100 y 450 Hz: cinco picos agudos que caen sobre las frecuencias modales analíticas punteadas de los modos (1,0), (0,1), (1,1), (2,0) y (2,1)" width="88%" />
+
+*El espectro en la sonda del ensayo de caja rígida presenta sus picos
+exactamente sobre las frecuencias modales analíticas
+$f = (c/2)\sqrt{(n_x/L_x)^2 + (n_y/L_y)^2}$ (Kuttruff 6.ª ed., cap. 3). El
+desplazamiento apenas visible hacia la izquierda de los picos más altos es
+la dispersión numérica del §4: las longitudes de onda cortas viajan
+ligeramente lentas en la malla, así que las resonancias modeladas leen por
+debajo en una fracción de porcentaje.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import simulation
+
+lx, ly, dx, c = 1.0, 0.7, 0.02, 343.0
+nx, ny = round(lx / dx), round(ly / dx)
+res = simulation.fdtd_simulation(
+    c, dx, 0.35, shape=(ny, nx),
+    sources=[simulation.GaussianPulse(ix=7, iy=5, width=2.0e-4)],
+    probes=[(nx - 4, ny - 3)],
+)
+
+# Una línea: la historia de presión en la sonda de la que sale el espectro.
+res.plot()
+plt.show()
+
+# La comprobación modal: espectro en la sonda frente a los modos analíticos.
+p = res.pressures[0]
+spec = np.abs(np.fft.rfft(p * np.hanning(p.size), n=8 * p.size))
+freqs = np.fft.rfftfreq(8 * p.size, res.dt)
+sel = (freqs >= 100) & (freqs <= 450)
+fig, ax = plt.subplots()
+ax.plot(freqs[sel], 20 * np.log10(spec[sel] / spec[sel].max()))
+for mx, my in [(1, 0), (0, 1), (1, 1), (2, 0), (2, 1)]:
+    ax.axvline(0.5 * c * np.hypot(mx / lx, my / ly), ls=":", color="tab:red")
+ax.set(xlabel="Frecuencia [Hz]", ylabel="Espectro en la sonda [dB re máx]",
+       ylim=(-60, 6))
+plt.show()
+```
+
+</details>
 
 El dominio es **bidimensional**, y eso cambia la física, no solo el coste.
 Una fuente puntual 2D es físicamente una **fuente lineal** infinita: su

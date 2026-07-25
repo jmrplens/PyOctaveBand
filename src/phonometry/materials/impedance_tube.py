@@ -894,6 +894,47 @@ class TransferMatrix:
         t21 = np.asarray(self.t21, dtype=np.complex128)
         return np.asarray(np.sqrt(t12 / t21), dtype=np.complex128)
 
+    def plot(
+        self,
+        frequency: ArrayLike,
+        characteristic_impedance: float,
+        ax: Axes | None = None,
+        *,
+        language: str = "en",
+        **kwargs: Any,
+    ) -> Axes:
+        """Plot the transmission loss with the hard-backed absorption overlaid.
+
+        Reads the four-pole entries out as the two ASTM E2611-19 spectra a
+        laboratory quotes: the normal-incidence transmission loss ``TLn(f)``
+        (Eq. (26), the primary curve, left axis) and the hard-backed
+        absorption coefficient ``alpha(f)`` (Eq. (28), a muted companion on a
+        0..1 right axis). The matrix itself carries no frequency axis, so the
+        ``frequency`` vector of the measurement (matching the shape of the
+        entries) and the air characteristic impedance ``rho c`` must be
+        supplied.
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes` of the transmission-loss curve.
+
+        :param frequency: Frequency vector ``f``, in hertz, matching the shape
+            of the matrix entries.
+        :param characteristic_impedance: Characteristic impedance ``rho c`` of
+            the air in the tube, in rayls.
+        :param ax: Existing axes, or ``None`` to create a figure.
+        :param language: Plot language: ``"en"`` (default) or ``"es"``.
+        :param kwargs: Forwarded to the transmission-loss ``plot`` call.
+        :return: The axes.
+        """
+        from .._i18n import check_language
+        from .._plot.materials import plot_transfer_matrix
+
+        check_language(language)
+        return plot_transfer_matrix(
+            self, frequency, characteristic_impedance, ax=ax,
+            language=language, **kwargs,
+        )
+
 
 def air_layer_transfer_matrix(
     wavenumber: ArrayLike, thickness: float, characteristic_impedance: float

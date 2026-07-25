@@ -40,6 +40,7 @@ print(nc.method)                  # 'tangency'  (the NC-32 curve is exceeded)
 print(round(nc.rating, 1))        # 42.5
 print(nc.governing_frequency)     # 250.0  (the tangent band)
 print(nc.label)                   # 'NC-42.5 (250 Hz)'
+nc.plot()   # the spectrum over the NC curve family (left panel below)
 ```
 
 Because a tangency rating interpolates between the tabulated curves it is a
@@ -86,6 +87,7 @@ rc = room.room_criterion(spl)
 print(rc.label)             # RC-35(R)   -  a rumbly room
 print(round(rc.lmf, 1))     # 35.3
 print(rc.classification)    # R
+rc.plot()   # the spectrum over the RC reference (right panel below)
 ```
 
 The strong low-frequency content of this spectrum lifts the 63–250 Hz bands

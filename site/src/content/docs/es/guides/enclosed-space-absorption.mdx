@@ -114,6 +114,7 @@ result = room.enclosed_space_reverberation(
 )
 print(result.reverberation_time.round(2))
 # [2.13 1.03 0.62 0.48 0.43 0.42 0.4 ]
+result.plot()   # la figura de abajo: A y T por banda de octava
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosed_space_absorption_es.svg" alt="Dos paneles para una oficina de 60 metros cúbicos con techo desnudo frente a techo acústico: el área de absorción equivalente por banda de octava, mucho mayor con el techo acústico, y el tiempo de reverberación cayendo desde unos cinco segundos a baja frecuencia con el techo desnudo hasta menos de un segundo con el techo acústico" width="96%" />

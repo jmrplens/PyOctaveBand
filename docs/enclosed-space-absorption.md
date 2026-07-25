@@ -87,6 +87,7 @@ result = room.enclosed_space_reverberation(
 )
 print(result.reverberation_time.round(2))
 # [2.13 1.03 0.62 0.48 0.43 0.42 0.4 ]
+result.plot()   # the figure below: A and T per octave band
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosed_space_absorption_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosed_space_absorption.svg" alt="Two panels for a 60 cubic metre office with a bare versus an acoustically-treated ceiling. Left: the equivalent absorption area per octave band, much higher across mid and high frequencies with the acoustic ceiling. Right: the reverberation time per octave band, falling from around five seconds at low frequency for the bare room to under one second with the acoustic ceiling" width="96%"></picture>
@@ -160,6 +161,65 @@ side: the standard's own accuracy clause records measured reverberation
 times up to twice the prediction in low-diffusivity rooms. The classical
 alternatives for those cases live in
 [Reverberation-time prediction](reverberation-prediction.md).
+
+## 4. Enclosed-space report (`.report()`)
+
+`ReverberationResult.report(path)` renders a one-page PDF fiche characterising
+the enclosed space: a basis line naming EN 12354-6:2003, an optional metadata
+header block (client, room, description, room volume, object fraction, climate),
+a per-band table of the equivalent sound absorption area $A$ and the
+reverberation time $T$ beside the reverberation-time plot (`.plot()`), and the
+boxed mid-frequency reverberation time with the mid-frequency absorption area
+alongside. EN 12354-6 gives a diffuse-field **estimate**, not a measurement, so
+no PASS/FAIL verdict is emitted; a target reverberation time supplied through
+the metadata's `requirement` field is printed as a reference line only, since a
+room reverberation time is a target range rather than a strictly
+higher/lower-is-better quantity. It uses the same `ReportMetadata` container
+(documented under
+[Field insulation](insulation-field.md#report-metadata-reportmetadata)) and
+rendering engine as the other fiches; passing `metadata=None` produces a bare
+characterisation fiche. Rendering needs reportlab
+(`pip install phonometry[report]`); only `engine="reportlab"` is supported. The
+fiche renders in English by default; pass `language="es"` for a Spanish fiche
+(translated fixed strings and a comma decimal separator).
+
+```python
+from phonometry import (
+    enclosed_space_reverberation, hard_object_absorption, object_fraction,
+    ReportMetadata,
+)
+
+surfaces = [                                   # per octave band, 125 Hz - 8 kHz
+    (20.0, [0.05, 0.10, 0.20, 0.30, 0.40, 0.50, 0.55]),  # carpeted floor
+    (20.0, [0.20, 0.40, 0.65, 0.75, 0.80, 0.80, 0.75]),  # acoustic ceiling
+    (45.0, [0.02, 0.02, 0.03, 0.04, 0.05, 0.05, 0.05]),  # painted-plaster walls
+]
+volumes = [0.5, 0.8, 0.3]                      # furniture, m^3
+result = enclosed_space_reverberation(
+    surfaces, 50.0,
+    objects=hard_object_absorption(volumes),
+    object_fraction=object_fraction(volumes, 50.0),
+    air_condition="20C_50-70",
+)
+result.report(
+    "enclosed_space_fiche.pdf",
+    metadata=ReportMetadata(
+        specimen="Meeting room, furnished",
+        test_room="Meeting room M2",
+        measurement_standard="EN 12354-6",
+        temperature=20.0, relative_humidity=55.0,
+        laboratory="Phonometry Reference Laboratory",
+        requirement=0.6,          # printed as a target reference line, no verdict
+    ),
+)                                 # the per-band A/T table + the boxed T_mid
+```
+
+The example fiche, regenerated with `make reports`, is kept rendered in the
+repository. Click the preview to open the PDF:
+
+[![EN 12354-6 enclosed-space example report: a metadata header with the room volume and object fraction, the octave-band table of the equivalent sound absorption area A and the reverberation time T from 125 Hz to 8 kHz beside the reverberation-time plot, and the boxed mid-frequency reverberation time with the mid-frequency absorption area alongside](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/enclosed_space_absorption_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/enclosed_space_absorption_example.pdf)
+
+*Enclosed-space fiche (`ReverberationResult.report`), the per-band A/T table and the boxed $T_\text{mid}$.*
 
 ## References
 

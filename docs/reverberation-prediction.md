@@ -155,6 +155,7 @@ res = room.reverberation_time_models(
 print(res.sabine.round(2))         # [0.74 0.47 0.37 0.31 0.3  0.3 ]
 print(res.arau_puchades.round(2))  # [0.79 0.51 0.38 0.29 0.26 0.27]
 print(res.fitzroy.round(2))        # [1.02 0.79 0.66 0.57 0.51 0.51]
+res.plot()   # the five model curves per band (the figure above)
 ```
 
 <details>
@@ -246,6 +247,58 @@ bare, beyond what the furniture's own absorption area accounts for. In
 practice, quote a *band* of predictions (Sabine and Eyring, or Fitzroy and
 Arau-Puchades for axial cases) rather than a single value; where the models
 spread, the room is telling you its field is not diffuse.
+
+## 5. Prediction report (`.report()`)
+
+`ReverberationModelResult.report(path)` renders a one-page PDF fiche of the
+prediction: a basis line marking it a **design-stage prediction** by the five
+statistical-acoustics models, an optional metadata header block (client, room,
+description, room volume, total surface area, climate), a per-band table with
+one reverberation-time column per model beside the model comparison plot
+(`.plot()`), and the boxed mid-frequency reverberation time from Arau-Puchades
+(the recommended model for a non-uniform absorption distribution) with the
+per-model spread alongside. It is a prediction, not a measurement: the five
+models bracket the reverberation time likely to occur, so no PASS/FAIL verdict
+is emitted. A target reverberation time supplied through the metadata's
+`requirement` field is printed as a reference line only, since a room
+reverberation time is a target range rather than a strictly
+higher/lower-is-better quantity. It uses the same `ReportMetadata` container
+(documented under
+[Field insulation](insulation-field.md#report-metadata-reportmetadata)) and
+rendering engine as the other fiches; passing `metadata=None` produces a bare
+prediction fiche. Rendering needs reportlab (`pip install phonometry[report]`);
+only `engine="reportlab"` is supported. The fiche renders in English by default;
+pass `language="es"` for a Spanish fiche (translated fixed strings and a comma
+decimal separator).
+
+```python
+from phonometry import reverberation_time_models, ReportMetadata
+
+result = reverberation_time_models(
+    (8.0, 5.0, 3.0),                       # a shoebox room, one treated wall pair
+    ([0.10, 0.15, 0.30, 0.45, 0.55, 0.60], # treated wall pair, per octave band
+     [0.08, 0.10, 0.12, 0.15, 0.18, 0.20], # side walls
+     [0.05, 0.08, 0.10, 0.12, 0.15, 0.18]),# floor/ceiling
+    frequencies=[125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0],
+)
+result.report(
+    "reverberation_fiche.pdf",
+    metadata=ReportMetadata(
+        specimen="Classroom, one wall lined with a broadband absorber",
+        test_room="Classroom C1",
+        temperature=20.0, relative_humidity=50.0,
+        laboratory="Phonometry Reference Laboratory",
+        requirement=0.8,          # printed as a target reference line, no verdict
+    ),
+)                                 # the five-model table + the boxed T_mid
+```
+
+The example fiche, regenerated with `make reports`, is kept rendered in the
+repository. Click the preview to open the PDF:
+
+[![Reverberation-time prediction example report: a metadata header with the room volume and total surface area, the octave-band table with one reverberation-time column per model (Sabine, Eyring, Millington-Sette, Fitzroy and Arau-Puchades from 125 Hz to 4 kHz) beside the five-model comparison plot, the boxed mid-frequency reverberation time from Arau-Puchades with the per-model spread alongside, and a target reverberation-time reference line](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/reverberation_prediction_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/reverberation_prediction_example.pdf)
+
+*Reverberation-time prediction fiche (`ReverberationModelResult.report`), the five-model table and the boxed $T_\text{mid}$.*
 
 ## References
 

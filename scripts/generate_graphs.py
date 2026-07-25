@@ -1222,6 +1222,13 @@ _ES_EXACT = {
     "dialogue": "diálogo",
     "music": "música",
     "fade-out": "fundido",
+    # Rooms & materials result figures (WP: rooms & materials)
+    r"Normal incidence $\alpha(0°)$": r"Incidencia normal $\alpha(0°)$",
+    "Probe pressure spectrum": "Espectro de presión en la sonda",
+    "Analytic mode frequencies": "Frecuencias modales analíticas",
+    "Rigid-box FDTD probe spectrum vs analytic modes":
+        "Espectro FDTD en la sonda de una caja rígida frente a los modos analíticos",
+    "Probe spectrum [dB re max]": "Espectro en la sonda [dB re máx]",
 }
 
 _ES_PATTERNS = [
@@ -8957,6 +8964,235 @@ def generate_shaped_sweep(output_dir: str) -> None:
     plt.close()
 
 
+def generate_sound_absorption_measurement(output_dir: str) -> None:
+    """ISO 354: reverberation-room alpha_s spectrum from the two decay times."""
+    print("Generating sound_absorption_measurement...")
+    from phonometry import materials
+
+    # The materials guide's ISO 354 example: one-third-octave reverberation
+    # times of a 200 m^3 room, empty (T1) and with a 10.8 m^2 porous absorber
+    # sample installed (T2), inverted through Sabine to the alpha_s spectrum.
+    freqs = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
+                      1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000], float)
+    t_empty = np.array([9.0, 9.0, 8.8, 8.6, 8.4, 8.2, 8.0, 7.8, 7.5, 7.2,
+                        6.9, 6.6, 6.2, 5.8, 5.4, 5.0, 4.6, 4.2])
+    t_specimen = np.array([8.4, 8.2, 7.7, 7.2, 6.5, 5.7, 4.9, 4.2, 3.6, 3.15,
+                           2.85, 2.65, 2.55, 2.5, 2.55, 2.6, 2.7, 2.85])
+    m = materials.measure_sound_absorption(
+        freqs, t_empty, t_specimen, volume=200.0, area=10.8, temperature=20.0
+    )
+    m.plot(language=_LANG)
+    plt.gcf().set_size_inches(10, 6)
+    plt.tight_layout()
+    save_figure(output_dir, "sound_absorption_measurement.svg")
+    plt.close()
+
+
+def generate_impedance_tube_result(output_dir: str) -> None:
+    """ISO 10534-2: alpha(f) and |r| of a porous sample in a 100 mm tube."""
+    print("Generating impedance_tube_result...")
+    from phonometry import materials
+
+    # A 50 mm porous absorber (Miki model, sigma = 20 kPa s/m^2) measured in a
+    # 100 mm tube with 100 mm microphone spacing (working band roughly 170 Hz
+    # to 1.5 kHz): the layer model provides the true reflection factor, from
+    # which the measured transfer function H12 is synthesised and reduced back
+    # through the Clause 7 chain.
+    f = np.linspace(200.0, 1500.0, 260)
+    med = materials.miki(f, 20000.0)
+    layer = materials.layered_absorber(f, [materials.PorousLayer(0.05, med)])
+    spacing, x1, c0 = 0.10, 0.20, 343.2
+    k0 = materials.tube_wavenumber(f, c0)
+    x2 = x1 - spacing
+    r_true = layer.reflection
+    h12 = (np.exp(1j * k0 * x2) + r_true * np.exp(-1j * k0 * x2)) / \
+          (np.exp(1j * k0 * x1) + r_true * np.exp(-1j * k0 * x1))
+    result = materials.two_microphone_impedance(
+        h12, frequency=f, spacing=spacing, x1=x1, speed_of_sound=c0,
+        characteristic_impedance=407.0, diameter=0.10,
+    )
+    result.plot(language=_LANG)
+    plt.gcf().set_size_inches(10, 6)
+    plt.tight_layout()
+    save_figure(output_dir, "impedance_tube_result.svg")
+    plt.close()
+
+
+def generate_transfer_matrix_tl(output_dir: str) -> None:
+    """ASTM E2611: TL and hard-backed absorption from the four-pole matrix."""
+    print("Generating transfer_matrix_tl...")
+    from phonometry import materials
+
+    # The chain matrix of a 50 mm porous layer (Miki, sigma = 20 kPa s/m^2)
+    # exposed by the layer solver, read back through the ASTM E2611 machinery:
+    # the four-pole entries give the normal-incidence transmission loss and the
+    # hard-backed absorption of the same specimen.
+    f = np.linspace(200.0, 1600.0, 300)
+    med = materials.miki(f, 20000.0)
+    layer = materials.layered_absorber(f, [materials.PorousLayer(0.05, med)])
+    chain = layer.transfer_matrix
+    tm = materials.TransferMatrix(
+        t11=chain[0, 0], t12=chain[0, 1], t21=chain[1, 0], t22=chain[1, 1]
+    )
+    tm.plot(f, 407.0, language=_LANG)
+    plt.gcf().set_size_inches(10, 6)
+    plt.tight_layout()
+    save_figure(output_dir, "transfer_matrix_tl.svg")
+    plt.close()
+
+
+def generate_porous_medium_model(output_dir: str) -> None:
+    """Miki equivalent fluid: normalised Zc and k of a porous material."""
+    print("Generating porous_medium_model...")
+    from phonometry import materials
+
+    # The porous-absorbers guide's model example: a rockwool-class material of
+    # flow resistivity 20 kPa s/m^2 evaluated with the Miki (1990) regression.
+    f = np.geomspace(100.0, 5000.0, 260)
+    med = materials.miki(f, 20000.0)
+    med.plot(language=_LANG)
+    plt.gcf().set_size_inches(10, 6)
+    plt.tight_layout()
+    save_figure(output_dir, "porous_medium_model.svg")
+    plt.close()
+
+
+def generate_mpp_absorption_peak(output_dir: str) -> None:
+    """Maa (1998) Fig. 5 microperforated panel: resonant absorption peak."""
+    print("Generating mpp_absorption_peak...")
+    from phonometry import materials
+
+    # Maa's own design: d = t = 0.2 mm, holes every 2.5 mm, 6 cm cavity. The
+    # viscous losses in the submillimetre holes absorb without any porous
+    # material; the peak reaches alpha = 0.96 near 677 Hz.
+    eps = (np.pi / 4.0) * (0.2 / 2.5) ** 2
+    f = np.linspace(100.0, 4000.0, 1200)
+    res = materials.layered_absorber(
+        f, [materials.MicroperforatedPlateLayer(0.2e-3, 0.1e-3, eps),
+            materials.AirLayer(0.06)],
+    )
+    ax = res.plot(language=_LANG)
+    format_frequency_axis(ax, 100.0, 4000.0)
+    plt.gcf().set_size_inches(10, 6)
+    plt.tight_layout()
+    save_figure(output_dir, "mpp_absorption_peak.svg")
+    plt.close()
+
+
+def generate_diffuse_field_absorption(output_dir: str) -> None:
+    """Paris integral: random-incidence vs normal-incidence absorption."""
+    print("Generating diffuse_field_absorption...")
+    from phonometry import materials
+
+    # A 50 mm porous layer (Miki, sigma = 20 kPa s/m^2): the diffuse-field
+    # coefficient exceeds the normal-incidence one at low frequency because
+    # the oblique waves travel a longer path inside the layer.
+    f = np.geomspace(125.0, 4000.0, 200)
+    layers: list[Any] = [materials.PorousLayer(0.05, materials.miki(f, 20000.0))]
+    normal = materials.layered_absorber(f, layers)
+    diffuse = materials.diffuse_field_absorption(f, layers)
+    ax = diffuse.plot(language=_LANG)
+    ax.plot(f, normal.absorption, ls="--", color=COLOR_SECONDARY,
+            label=r"Normal incidence $\alpha(0°)$")
+    ax.legend(loc="best", fontsize="small")
+    plt.gcf().set_size_inches(10, 6)
+    plt.tight_layout()
+    save_figure(output_dir, "diffuse_field_absorption.svg")
+    plt.close()
+
+
+def generate_steady_state_field(output_dir: str) -> None:
+    """Bies steady-state room field: direct, reverberant, total and rc."""
+    print("Generating steady_state_field...")
+    from phonometry import room
+
+    # A 90 dB re 1 pW source in a 12 x 8 x 4 m workshop (S = 352 m^2) with a
+    # mean Sabine absorption of 0.15: the total level follows the 1/r^2 direct
+    # field close in and flattens onto the reverberant plateau beyond rc.
+    field = room.steady_state_field(
+        sound_power_level=90.0, surface_area=352.0, mean_absorption=0.15,
+    )
+    field.plot(language=_LANG)
+    plt.gcf().set_size_inches(10, 6)
+    plt.tight_layout()
+    save_figure(output_dir, "steady_state_field.svg")
+    plt.close()
+
+
+def generate_room_parameters_bands(output_dir: str) -> None:
+    """ISO 3382: per-band EDT/T20/T30 and C50/C80 of a synthetic room IR."""
+    print("Generating room_parameters_bands...")
+    from phonometry import room
+
+    # A synthetic room impulse response with a frequency-dependent decay:
+    # octave-band noise carriers whose T60 falls from 1.4 s at 125 Hz to
+    # 0.7 s at 4 kHz, the classic behaviour of a furnished, treated room.
+    fs = 48000
+    rng = np.random.default_rng(3382)
+    t = np.arange(int(1.6 * fs)) / fs
+    t60 = {125.0: 1.4, 250.0: 1.25, 500.0: 1.1,
+           1000.0: 1.0, 2000.0: 0.85, 4000.0: 0.7}
+    ir = np.zeros_like(t)
+    for fc, t60_band in t60.items():
+        sos = scipy_signal.butter(
+            4, [fc / np.sqrt(2.0), fc * np.sqrt(2.0)], btype="bandpass",
+            fs=fs, output="sos",
+        )
+        carrier = scipy_signal.sosfilt(sos, rng.standard_normal(t.size))
+        ir += carrier * np.exp(-3.0 * np.log(10.0) / t60_band * t)
+    res = room.room_parameters(ir, fs)
+    res.plot(language=_LANG)
+    plt.gcf().set_size_inches(12.5, 5.4)
+    plt.tight_layout()
+    save_figure(output_dir, "room_parameters_bands.svg")
+    plt.close()
+
+
+def generate_fdtd_room_modes(output_dir: str) -> None:
+    """Rigid-box FDTD probe spectrum against the analytic room modes."""
+    print("Generating fdtd_room_modes...")
+    from phonometry import simulation
+
+    # The fdtd-simulation guide's oracle run: a rigid 1.0 x 0.7 m box excited
+    # by a Gaussian pulse; the probe spectrum peaks at the analytic rigid-room
+    # mode frequencies f = (c/2) sqrt((nx/Lx)^2 + (ny/Ly)^2).
+    lx, ly, dx, c = 1.0, 0.7, 0.02, 343.0
+    nx, ny = round(lx / dx), round(ly / dx)
+    res = simulation.fdtd_simulation(
+        c, dx, 0.35, shape=(ny, nx),
+        sources=[simulation.GaussianPulse(ix=7, iy=5, width=2.0e-4)],
+        probes=[(nx - 4, ny - 3)],
+    )
+    p = res.pressures[0]
+    spec = np.abs(np.fft.rfft(p * np.hanning(p.size), n=8 * p.size))
+    freqs = np.fft.rfftfreq(8 * p.size, res.dt)
+    sel = (freqs >= 100.0) & (freqs <= 450.0)
+    level = 20.0 * np.log10(spec[sel] / np.max(spec[sel]))
+
+    _, ax = plt.subplots(figsize=(10, 6))
+    ax.plot(freqs[sel], level, color=COLOR_PRIMARY, linewidth=1.6,
+            label="Probe pressure spectrum", zorder=3)
+    modes = [(1, 0), (0, 1), (1, 1), (2, 0), (2, 1)]
+    for i, (mx, my) in enumerate(modes):
+        f_mode = 0.5 * c * float(np.hypot(mx / lx, my / ly))
+        ax.axvline(f_mode, color=COLOR_SECONDARY, linestyle=":", linewidth=1.2,
+                   zorder=2,
+                   label="Analytic mode frequencies" if i == 0 else None)
+        ax.annotate(f"({mx},{my})", xy=(f_mode, 1.5), ha="center", fontsize=9,
+                    color=COLOR_FG)
+    ax.set_title("Rigid-box FDTD probe spectrum vs analytic modes",
+                 fontweight="bold", pad=14)
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Probe spectrum [dB re max]")
+    ax.set_xlim(100.0, 450.0)
+    ax.set_ylim(-60.0, 6.0)
+    ax.grid(which="major", color=COLOR_GRID, linestyle="-", alpha=0.5)
+    ax.legend(loc="lower right", fontsize=9)
+    plt.tight_layout()
+    save_figure(output_dir, "fdtd_room_modes.svg")
+    plt.close()
+
+
 _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_filter_type_comparison,
     generate_filter_responses,
@@ -9184,6 +9420,19 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     # Theoretical panel sound insulation (single/double wall, radiation, slit).
     generate_panel_insulation_concept,
     generate_silencer_expansion_chamber,
+    # Rooms & materials result plots: ISO 354 measurement, ISO 10534-2 tube
+    # result, ASTM E2611 transfer matrix, porous models, MPP peak, Paris
+    # integral, Bies steady-state field, ISO 3382 per-band parameters and the
+    # rigid-box FDTD mode oracle.
+    generate_sound_absorption_measurement,
+    generate_impedance_tube_result,
+    generate_transfer_matrix_tl,
+    generate_porous_medium_model,
+    generate_mpp_absorption_peak,
+    generate_diffuse_field_absorption,
+    generate_steady_state_field,
+    generate_room_parameters_bands,
+    generate_fdtd_room_modes,
 )
 
 
@@ -12313,6 +12562,7 @@ _FIGURE_WEIGHTS: dict[str, float] = {
     "schroeder_decay": 1.3,
     "excitation_signals": 1.2,
     "crossover_plot": 1.1,
+    "fdtd_room_modes": 2.0,
 }
 
 # A registry rename must not silently degroup a cached figure (a 4x

@@ -186,6 +186,44 @@ print(np.round(jca.normalized_impedance[0], 3))   # (2.321-2.075j)
 db.plot()   # componentes normalizadas de Zc y k frente a la frecuencia
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/porous_medium_model_es.svg" alt="Impedancia característica y número de onda normalizados de un material poroso con resistividad al flujo de 20 kPa s/m2 predichos por el modelo de Miki en una rejilla log-log: las componentes reales e imaginarias caen hacia la unidad y hacia cero al subir la frecuencia" width="80%" />
+
+*La presentación clásica de un modelo de fluido equivalente (Cox y D'Antonio
+3.ª ed., figs. 6.19–6.20): a baja frecuencia dominan las fuerzas viscosas y
+el material se ve rígido y con pérdidas (las cuatro componentes grandes); al
+subir la frecuencia las componentes caen hacia los límites de aire libre
+$Z_c \to \rho_0 c_0$ y $k \to k_0$, de modo que una capa delgada solo
+trabaja donde su espesor es una fracción apreciable de la longitud de onda
+dentro del material.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import materials
+
+f = np.geomspace(100.0, 5000.0, 260)
+mk = materials.miki(f, 20000.0)          # sigma = 20 kPa s/m^2
+
+# Una línea: componentes normalizadas de Zc y k en una rejilla log-log.
+mk.plot()
+plt.show()
+
+# A mano, desde los campos del resultado:
+fig, ax = plt.subplots()
+ax.loglog(f, mk.normalized_impedance.real, label="Re(Zc)/rho c")
+ax.loglog(f, -mk.normalized_impedance.imag, "--", label="-Im(Zc)/rho c")
+ax.loglog(f, mk.normalized_wavenumber.real, label="Re(k)/k0")
+ax.loglog(f, -mk.normalized_wavenumber.imag, "--", label="-Im(k)/k0")
+ax.set(xlabel="Frecuencia [Hz]", ylabel="Valor característico normalizado")
+ax.legend()
+plt.show()
+```
+
+</details>
+
 Los tres modelos coinciden estrechamente dentro del rango de ajuste de
 Delany–Bazley (Cox & D'Antonio, figs. 6.19–6.21, hacen la misma
 comparación); JCA extiende la predicción con base física fuera de él. Un
@@ -327,7 +365,48 @@ res = materials.layered_absorber(
 i = np.argmax(res.absorption)
 print(f"alpha máximo = {res.absorption[i]:.2f} a {f[i]:.0f} Hz")
 # alpha máximo = 0.96 a 677 Hz
+res.plot()   # alpha(f) con |R| superpuesto: el pico resonante del MPP
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mpp_absorption_peak_es.svg" alt="Absorción predicha del panel microperforado de Maa sobre una cámara de 6 cm: un pico resonante ancho que alcanza alpha 0,96 cerca de 677 Hz, con el módulo del factor de reflexión como su imagen especular, y un rasgo secundario estrecho cerca de la resonancia de media onda de la cámara a 2,9 kHz" width="80%" />
+
+*El propio diseño de la fig. 5 de Maa, sin material poroso alguno: las
+pérdidas viscosas de los orificios submilimétricos amortiguan la resonancia
+panel-cámara en un pico de absorción ancho. El rasgo estrecho cerca de
+2,9 kHz es la resonancia de media onda de la cámara, donde la cámara
+presenta un nodo de presión al panel y la absorción se hunde antes de que la
+siguiente resonancia la recupere.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import materials
+
+# Maa (1998), fig. 5: d = t = 0,2 mm, orificios cada 2,5 mm, cámara de 6 cm.
+eps = (np.pi / 4.0) * (0.2 / 2.5) ** 2
+f = np.linspace(100.0, 4000.0, 1200)
+res = materials.layered_absorber(
+    f, [materials.MicroperforatedPlateLayer(0.2e-3, 0.1e-3, eps),
+        materials.AirLayer(0.06)],
+)
+
+# Una línea: alpha(f) con |R| superpuesto.
+res.plot()
+plt.show()
+
+# A mano, desde los campos del resultado:
+fig, ax = plt.subplots()
+ax.semilogx(f, res.absorption, label="Absorción alpha")
+ax.semilogx(f, np.abs(res.reflection), "--", label="Factor de reflexión |R|")
+ax.set(xlabel="Frecuencia [Hz]", ylabel="Coeficiente")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 **Membrana.** Una lámina impermeable flexible es la masa superficial
 $z = j\omega m$ (Cox ec. 7.14; Bies ec. D.96); sobre una cámara resuena en
@@ -365,13 +444,46 @@ from phonometry import materials
 f = np.array([250.0, 500.0, 1000.0, 2000.0])
 med = materials.miki(f, 20000.0)
 layers = [materials.PorousLayer(0.05, med)]
-normal = materials.layered_absorber(f, layers).absorption
-diffuse = materials.diffuse_field_absorption(f, layers).absorption
-print(np.round(normal, 2))    # [0.26 0.62 0.94 0.95]
-print(np.round(diffuse, 2))   # [0.37 0.68 0.9  0.95]
+normal = materials.layered_absorber(f, layers)
+diffuse = materials.diffuse_field_absorption(f, layers)
+print(np.round(normal.absorption, 2))    # [0.26 0.62 0.94 0.95]
+print(np.round(diffuse.absorption, 2))   # [0.37 0.68 0.9  0.95]
+diffuse.plot()   # alpha_dif(f); superpón normal.absorption para comparar
 
 print(round(float(materials.statistical_absorption(1.567 + 0j)), 3))  # 0.951
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuse_field_absorption_es.svg" alt="Absorción de incidencia aleatoria de una capa porosa de 50 mm por la integral de Paris comparada con su coeficiente a incidencia normal: la curva de campo difuso queda claramente por encima de la de incidencia normal por debajo de 700 Hz y ambas convergen hacia 0,95 a alta frecuencia" width="80%" />
+
+*Por qué la cámara reverberante lee más alto que el tubo: la integral de
+Paris pondera los ángulos oblicuos, cuyas ondas recorren un camino más largo
+dentro de la capa, así que $\alpha_{dif}$ supera al $\alpha(0°)$ de
+incidencia normal justo donde la capa es delgada frente a la longitud de
+onda. Es la contraparte de modelo de la discusión tubo frente a cámara
+reverberante de
+[Materiales acústicos](/phonometry/es/guides/materials/).*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import materials
+
+f = np.geomspace(125.0, 4000.0, 200)
+layers = [materials.PorousLayer(0.05, materials.miki(f, 20000.0))]
+normal = materials.layered_absorber(f, layers)
+diffuse = materials.diffuse_field_absorption(f, layers)
+
+# Una línea, y después la superposición de incidencia normal en los mismos ejes:
+ax = diffuse.plot()
+ax.plot(f, normal.absorption, "--", label="Incidencia normal alpha(0)")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 ## 5. Paneles ranurados de sonido lento con resonadores de Helmholtz
 
@@ -429,7 +541,7 @@ res = slit_helmholtz_absorber(
 res.plot()   # alpha(f) con |R| superpuesto; pico = 1 a 300 Hz
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slow_sound_absorber.svg" alt="Absorción de un panel ranurado con un resonador de Helmholtz: el diseño con acoplamiento crítico alcanza alpha = 1 a 300 Hz, mientras que estrechar la ranura (más pérdida) o ensancharla (menos pérdida) rompe el equilibrio y baja el pico; la profundidad del panel es lambda/38" width="80%" loading="lazy" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slow_sound_absorber_es.svg" alt="Absorción de un panel ranurado con un resonador de Helmholtz: el diseño con acoplamiento crítico alcanza alpha = 1 a 300 Hz, mientras que estrechar la ranura (más pérdida) o ensancharla (menos pérdida) rompe el equilibrio y baja el pico; la profundidad del panel es lambda/38" width="80%" loading="lazy" />
 
 *Un resonador, una ranura, un equilibrio entre pérdida y fuga. El diseño con
 acoplamiento crítico alcanza $\alpha = 1$ a 300 Hz en un panel de solo

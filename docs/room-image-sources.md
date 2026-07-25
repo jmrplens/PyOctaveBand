@@ -71,6 +71,7 @@ res = room.image_source_rir(
 print(res.ir.shape)                          # (n_samples,) broadband RIR
 print(round(res.direct_time * 1000, 2))      # direct-sound arrival, ms
 print(res.times.size, room.audible_image_count(12) + 1)  # images + direct source
+res.plot()   # the reflectogram of the figure below
 
 # Feed the synthetic RIR straight into the ISO 3382 decay analysis.
 params = room.room_parameters(res.ir, res.fs, limits=None)
@@ -93,7 +94,51 @@ length-6 vector to set each wall separately (order
 `x0, xL, y0, yL, z0, zL`); and pass `air_attenuation` (the intensity
 coefficient `m` from `air_attenuation_m`) to add the `exp(−m r / 2)` air loss.
 
+```python
+import numpy as np
+from phonometry import room
+
+freqs = [250.0, 500.0, 1000.0, 2000.0]
+alpha = np.array([[0.10, 0.15, 0.25, 0.40]] * 6)     # (6 walls, 4 bands)
+res = room.image_source_rir((7.0, 5.0, 3.0), (2.0, 1.6, 1.5), (5.2, 3.4, 1.7),
+                            alpha, fs=48000, max_order=12, frequencies=freqs)
+print(res.ir.shape)                                  # (4 bands, n_samples)
+print(np.round(np.sum(res.ir ** 2, axis=1), 4))      # more absorption -> less energy
+```
+
 ![Image-source reflectogram: the synthetic room impulse response of a 7x5x3 m room as a cloud of reflections coloured by reflection order, decaying under the 1/r spreading envelope with the direct sound marked at order 0](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/image_source_reflectogram.webp)
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import room
+
+res = room.image_source_rir((7.0, 5.0, 3.0), (2.0, 1.6, 1.5),
+                            (5.2, 3.4, 1.7), 0.12, fs=48000, max_order=10)
+
+# One line: the reflectogram (level in dB re direct vs arrival time, by order).
+res.plot()
+plt.show()
+
+# By hand: scatter the reflection amplitudes coloured by order.
+t_ms = np.asarray(res.times) * 1e3
+amp = np.asarray(res.amplitudes)
+level = 20 * np.log10(np.abs(amp) / np.max(np.abs(amp)))
+order = np.asarray(res.orders)
+fig, ax = plt.subplots()
+sc = ax.scatter(t_ms[order > 0], level[order > 0], c=order[order > 0],
+                cmap="viridis", s=18)
+ax.stem([t_ms[order == 0][0]], [0.0])         # direct sound
+fig.colorbar(sc, label="Reflection order")
+ax.set_xlabel("Arrival time [ms]"); ax.set_ylabel("Level re direct [dB]")
+ax.set_xlim(0, 120); ax.set_ylim(-60, 5)
+plt.show()
+```
+
+</details>
 
 **Reproducing the statistical decay.** The fitted initial decay slope of the
 reverberant energy density of the synthetic RIR recovers the **Eyring**
@@ -161,6 +206,46 @@ print(round(float(room.room_constant(100.0, 0.2)), 1))            # 25.0
 print(round(float(room.critical_distance(25.0)), 3))              # 0.705
 print(round(float(room.steady_state_spl(90.0, 5.0, 25.0)), 2))    # far-field level
 ```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/steady_state_field_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/steady_state_field.svg" alt="Steady-state room field of a 90 dB source in a workshop with a room constant of 62 square metres: the total sound pressure level follows the 6 dB-per-doubling direct field close to the source, crosses the constant reverberant plateau at the 1.11 m critical distance and flattens onto it beyond" width="80%"></picture>
+
+*A 90 dB re 1 pW source in a 12 x 8 x 4 m workshop with a mean absorption of
+0.15: within $r_c = 1.11$ m moving away drops the level 6 dB per doubling;
+beyond it the reverberant plateau takes over and only absorption, not
+distance, lowers the level (Bies 5e, §6.4).*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import room
+
+field = room.steady_state_field(
+    sound_power_level=90.0,     # Lw, dB re 1 pW
+    surface_area=352.0,          # a 12 x 8 x 4 m workshop
+    mean_absorption=0.15,
+)
+
+# One line: direct, reverberant and total levels with rc marked.
+field.plot()
+plt.show()
+
+# By hand, from the result's fields:
+fig, ax = plt.subplots()
+ax.semilogx(field.distances, field.direct, "--", label="Direct field")
+ax.semilogx(field.distances, field.reverberant, ":", label="Reverberant field")
+ax.semilogx(field.distances, field.total, label="Total")
+ax.axvline(field.critical_distance, ls="-.",
+           label=f"rc = {field.critical_distance:.2f} m")
+ax.set_xlabel("Distance from source [m]")
+ax.set_ylabel("Sound pressure level [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 The **Schroeder frequency**
 

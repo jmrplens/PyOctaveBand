@@ -81,6 +81,7 @@ print(nc.method)                  # 'tangency'  (se supera la curva NC-32)
 print(round(nc.rating, 1))        # 42.5
 print(nc.governing_frequency)     # 250.0  (la banda tangente)
 print(nc.label)                   # 'NC-42.5 (250 Hz)'
+nc.plot()   # el espectro sobre la familia de curvas NC (panel izquierdo de abajo)
 ```
 
 Como la calificación de tangencia interpola entre las curvas tabuladas es un
@@ -129,6 +130,7 @@ rc = room.room_criterion(spl)
 print(rc.label)             # RC-35(R)   -  una sala retumbante
 print(round(rc.lmf, 1))     # 35.3
 print(rc.classification)    # R
+rc.plot()   # el espectro sobre la referencia RC (panel derecho de abajo)
 ```
 
 El fuerte contenido de baja frecuencia de este espectro eleva las bandas de

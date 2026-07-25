@@ -221,6 +221,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `TransferMatrix.plot(frequency, characteristic_impedance)` (ASTM E2611-19):
+  the four-pole entries read out as the two spectra a transmission-tube
+  laboratory quotes, the normal-incidence transmission loss `TLn(f)`
+  (Eq. (26)) with the hard-backed absorption coefficient (Eq. (28)) on a
+  companion axis, in English and Spanish like every other result `.plot()`.
+- Nine result figures across the rooms & materials documentation (EN and ES
+  guides plus the `docs/` mirrors), each generated from a realistic example
+  through the public API and its `.plot()`: the ISO 354 reverberation-room
+  `alpha_s` spectrum, the ISO 10534-2 two-microphone tube result, the
+  ASTM E2611 transfer-matrix transmission loss, the Miki porous-medium
+  characteristic values, the Maa microperforated-panel absorption peak, the
+  Paris-integral diffuse-field versus normal-incidence absorption, the Bies
+  steady-state room field with its critical distance, the ISO 3382 per-band
+  decay-time/clarity summary, and the rigid-box FDTD probe spectrum against
+  the analytic room modes. Every snippet whose result exposes a `.plot()` now
+  mentions the one-liner next to its figure.
+- The rooms & materials `docs/` mirrors regain section parity with the site
+  guides: the EN 12354-6 enclosed-space report fiche, the reverberation-time
+  prediction report fiche and the Schroeder-diffuser prediction section
+  (with its figure) are now documented in `docs/` too, and the image-source
+  guide gains the Validation summary in both site languages.
 - ISO 1999 `combine_age_and_noise()` applies Formula (1)
   (`H' = H + N - H*N/120`) to an age component the caller supplies, which
   clause 6.2 explicitly allows (a database B of the country under

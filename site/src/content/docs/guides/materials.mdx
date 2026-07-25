@@ -160,6 +160,7 @@ print(result.rating_label)          # 0.60(M)
 print(result.alpha_w)               # 0.6
 print(result.absorption_class)      # C
 print(round(result.unfavourable_sum, 2))  # 0.05
+result.plot()   # the figure above: practical curve vs shifted reference
 
 # A bare alpha_w also maps straight to its class (Table B.1)
 print(materials.absorption_class(0.85))       # B
@@ -278,6 +279,49 @@ m = materials.measure_sound_absorption(
 print(m.alpha_s[7])   # alpha_s at 500 Hz: 0.328...
 m.plot()              # alpha_s versus one-third-octave frequency
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_absorption_measurement.svg" alt="ISO 354 reverberation-room sound absorption: the alpha_s spectrum of a porous absorber sample over the one-third-octave bands from 100 Hz to 5000 Hz, rising from near zero at low frequency to a broad maximum around 0.69 near 1600 Hz and easing off above" width="80%" />
+
+*The Sabine inversion of the two decay times: the porous sample barely
+changes the long low-frequency decays ($\alpha_s \to 0$), bites hardest where
+its thickness approaches a quarter wavelength, and eases off at high
+frequency, a typical thin-porous-absorber signature (Cox & D'Antonio 3e,
+Ch. 5).*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import materials
+
+freqs = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
+                  1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000], float)
+t_empty = np.array([9.0, 9.0, 8.8, 8.6, 8.4, 8.2, 8.0, 7.8, 7.5, 7.2,
+                    6.9, 6.6, 6.2, 5.8, 5.4, 5.0, 4.6, 4.2])
+t_specimen = np.array([8.4, 8.2, 7.7, 7.2, 6.5, 5.7, 4.9, 4.2, 3.6, 3.15,
+                       2.85, 2.65, 2.55, 2.5, 2.55, 2.6, 2.7, 2.85])
+m = materials.measure_sound_absorption(
+    freqs, t_empty, t_specimen, volume=200.0, area=10.8, temperature=20.0
+)
+
+# One line: the alpha_s spectrum over the one-third-octave band axis.
+m.plot()
+plt.show()
+
+# By hand, from the result's fields:
+fig, ax = plt.subplots()
+ax.plot(np.arange(freqs.size), m.alpha_s, "o-")
+ax.set_xticks(np.arange(freqs.size))
+ax.set_xticklabels([f"{f:g}" if f < 1000 else f"{f/1000:g}k" for f in freqs],
+                   rotation=45)
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Sound absorption coefficient alpha_s")
+plt.show()
+```
+
+</details>
 
 ### ISO 354 report (`.report()`)
 
@@ -400,6 +444,7 @@ r = materials.static_airflow_resistance(u, dp, area=area, thickness=0.05)
 print(round(r.specific_resistance))   # 16200   R_s [Pa*s/m]
 print(round(r.resistivity))           # 324000  sigma [Pa*s/m^2]
 print(round(r.linear_coefficient))    # 16000   a = R_s at u -> 0
+r.plot()   # the figure above: the fitted dp(u) with the evaluation point
 ```
 
 ### ISO 9053-1 report (`.report()`)
@@ -630,6 +675,53 @@ tube attenuation; correct any microphone mismatch beforehand with
 `apply_mic_calibration`. Its `.plot()` draws the absorption spectrum
 $\alpha(f)$ with the reflection-factor magnitude $|r|$ overlaid.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impedance_tube_result.svg" alt="ISO 10534-2 two-microphone tube result for a 50 mm porous absorber: the normal-incidence absorption coefficient rising from about 0.2 at 200 Hz towards 0.97 above 1 kHz, with the reflection-factor magnitude falling as its mirror image" width="80%" />
+
+*A 50 mm porous absorber measured over the working band of a 100 mm tube:
+the absorption climbs as the layer thickness grows against the wavelength,
+and $|r|$ falls as its mirror image ($\alpha = 1 - |r|^2$).*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import materials
+
+# A 50 mm porous absorber (Miki, sigma = 20 kPa s/m^2) in a 100 mm tube with
+# 100 mm spacing (working band ~170 Hz to 1.5 kHz): the layer model supplies
+# the true reflection factor, from which the transfer function H12 follows.
+f = np.linspace(200.0, 1500.0, 260)
+med = materials.miki(f, 20000.0)
+layer = materials.layered_absorber(f, [materials.PorousLayer(0.05, med)])
+spacing, x1, c0 = 0.10, 0.20, 343.2
+k0 = materials.tube_wavenumber(f, c0)
+x2 = x1 - spacing
+r_true = layer.reflection
+h12 = (np.exp(1j*k0*x2) + r_true*np.exp(-1j*k0*x2)) / \
+      (np.exp(1j*k0*x1) + r_true*np.exp(-1j*k0*x1))
+result = materials.two_microphone_impedance(
+    h12, frequency=f, spacing=spacing, x1=x1, speed_of_sound=c0,
+    characteristic_impedance=407.0, diameter=0.10,
+)
+
+# One line: alpha(f) with |r| overlaid.
+result.plot()
+plt.show()
+
+# By hand, from the result's fields:
+fig, ax = plt.subplots()
+ax.plot(f, result.absorption, label="Absorption alpha")
+ax.plot(f, np.abs(result.reflection), "--", label="Reflection factor |r|")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Coefficient")
+ax.legend()
+plt.show()
+```
+
+</details>
+
 ### ISO 10534-2 report (`.report()`)
 
 `ImpedanceTubeResult.report(path)` renders a one-page PDF fiche laid out like an
@@ -712,7 +804,67 @@ print(np.round(tm.transmission_loss(rho_c), 6))   # [0. 0. 0.]
 `(H1, H2, H3, H4)` of each load; its methods
 (`transmission_loss`, `reflection_hard_backed`, `absorption_hard_backed`,
 `characteristic_impedance_material`, `material_wavenumber`) then read off the
-ASTM E2611 quantities.
+ASTM E2611 quantities, and its `.plot(frequency, rho_c)` draws the
+transmission loss with the hard-backed absorption overlaid. The matrix does
+not have to come from a measurement: the
+[multilayer solver](/phonometry/guides/porous-absorbers/) exposes the chain
+matrix of any modelled stack in the same convention, so a predicted specimen
+can be read out exactly like a measured one.
+
+```python
+import numpy as np
+from phonometry import materials
+
+# The chain matrix of a modelled 50 mm porous layer, read back through the
+# ASTM E2611 machinery: TL and hard-backed absorption of the same specimen.
+f = np.linspace(200.0, 1600.0, 300)
+med = materials.miki(f, 20000.0)
+layer = materials.layered_absorber(f, [materials.PorousLayer(0.05, med)])
+chain = layer.transfer_matrix                       # shape (2, 2, len(f))
+tm = materials.TransferMatrix(t11=chain[0, 0], t12=chain[0, 1],
+                              t21=chain[1, 0], t22=chain[1, 1])
+print(np.round(float(tm.transmission_loss(407.0)[-1]), 1))   # 9.7 dB at 1.6 kHz
+tm.plot(f, 407.0)   # TL(f) with the hard-backed absorption overlaid
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/transfer_matrix_tl.svg" alt="ASTM E2611 transfer-matrix quantities of a 50 mm porous layer: the normal-incidence transmission loss rising from about 6.6 dB at 200 Hz to over 9 dB at 1.6 kHz on the left axis, and the hard-backed absorption coefficient rising from 0.19 to about 0.97 on the right axis" width="80%" />
+
+*The same four-pole entries answer two different questions: how much sound
+the free-standing layer lets through (the transmission loss, Eq. (26)) and
+how much the rigidly-backed layer absorbs (Eq. (28)).*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import materials
+
+f = np.linspace(200.0, 1600.0, 300)
+med = materials.miki(f, 20000.0)
+layer = materials.layered_absorber(f, [materials.PorousLayer(0.05, med)])
+chain = layer.transfer_matrix                       # shape (2, 2, len(f))
+tm = materials.TransferMatrix(t11=chain[0, 0], t12=chain[0, 1],
+                              t21=chain[1, 0], t22=chain[1, 1])
+
+# One line: TL(f) on the left axis, hard-backed absorption on the right.
+tm.plot(f, 407.0)
+plt.show()
+
+# By hand, from the matrix methods:
+fig, ax = plt.subplots()
+ax.plot(f, tm.transmission_loss(407.0), label="Transmission loss TL_n")
+twin = ax.twinx()
+twin.plot(f, tm.absorption_hard_backed(407.0), "--", color="gray",
+          label="Hard-backed absorption alpha")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Transmission loss TL_n [dB]")
+twin.set_ylabel("Hard-backed absorption alpha")
+plt.show()
+```
+
+</details>
 
 **Mounting pitfalls.** Most bad tube data are made at the sample holder, long
 before the signal processing. The recurring failures:
@@ -862,6 +1014,7 @@ from phonometry import materials
 r = materials.sound_absorption_coefficient_uncertainty([0.68], [1000], confidence=0.95)
 print(round(float(r.standard_uncertainty[0]), 4))            # 0.0422 (sigma_R)
 print(float(r.reported_expanded_uncertainty[0]))             # 0.08  (U, k=2)
+r.plot()   # the figure above: alpha_s with its +/-U (k = 2) ribbon
 
 # Single-number ratings (Clause 7 worked examples).
 print(float(materials.weighted_coefficient_uncertainty(0.70).reported_expanded_uncertainty[0]))  # 0.07

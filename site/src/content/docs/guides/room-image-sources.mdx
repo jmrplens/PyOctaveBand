@@ -97,6 +97,8 @@ print(res.ir.shape)                          # (n_samples,) broadband RIR
 print(round(res.direct_time * 1000, 2))      # direct-sound arrival, ms
 print(res.times.size == room.audible_image_count(12) + 1)   # images + source
 
+res.plot()   # the reflectogram of the figure below
+
 # The synthetic RIR flows straight into the ISO 3382 decay analysis.
 params = room.room_parameters(res.ir, res.fs, limits=None)
 print(bool(params.t30_valid[0]))             # True: the decay window is usable
@@ -236,7 +238,49 @@ field.plot()                                    # direct / reverberant / total v
 The `SteadyFieldResult.plot()` draws the direct, reverberant and total levels
 against distance with the critical distance marked: the total curve follows the
 $1/r^2$ direct field near the source and flattens onto the reverberant plateau
-beyond $r_c$. The building blocks are exposed individually, so an emission
+beyond $r_c$.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/steady_state_field.svg" alt="Steady-state room field of a 90 dB source in a workshop with a room constant of 62 square metres: the total sound pressure level follows the 6 dB-per-doubling direct field close to the source, crosses the constant reverberant plateau at the 1.11 m critical distance and flattens onto it beyond" width="80%" />
+
+*A 90 dB re 1 pW source in a 12 x 8 x 4 m workshop with a mean absorption of
+0.15: within $r_c = 1.11$ m moving away drops the level 6 dB per doubling;
+beyond it the reverberant plateau takes over and only absorption, not
+distance, lowers the level (Bies 5e, §6.4).*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import room
+
+field = room.steady_state_field(
+    sound_power_level=90.0,     # Lw, dB re 1 pW
+    surface_area=352.0,          # a 12 x 8 x 4 m workshop
+    mean_absorption=0.15,
+)
+
+# One line: direct, reverberant and total levels with rc marked.
+field.plot()
+plt.show()
+
+# By hand, from the result's fields:
+fig, ax = plt.subplots()
+ax.semilogx(field.distances, field.direct, "--", label="Direct field")
+ax.semilogx(field.distances, field.reverberant, ":", label="Reverberant field")
+ax.semilogx(field.distances, field.total, label="Total")
+ax.axvline(field.critical_distance, ls="-.",
+           label=f"rc = {field.critical_distance:.2f} m")
+ax.set_xlabel("Distance from source [m]")
+ax.set_ylabel("Sound pressure level [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+The building blocks are exposed individually, so an emission
 measurement can flow straight into a level prediction:
 
 ```python
@@ -281,6 +325,24 @@ Returns a `SteadyFieldResult` (`distances`, `direct`, `reverberant`, `total`,
 `critical_distance`, `room_constant`) with `.plot()`. The pieces
 `room_constant`, `critical_distance`, `schroeder_frequency` and
 `steady_state_spl` are also callable directly (each accepting per-band arrays).
+
+## Validation
+
+The implementations are checked against the closed forms and the source
+texts' own numeric anchors (see the
+[conformance report](/phonometry/reference/conformance/)):
+
+- the direct-sound amplitude $1/(4\pi r)$ and delay $r/c$ (exact geometry),
+  the audible image count (Kuttruff 6e, Eq. (9.23)) and the reflection
+  density (Eq. (4.6));
+- the Eyring reverberation time recovered from the decay of the synthetic
+  RIR in the near-cubic limit (documented ≈ 10 % tolerance), and an
+  independent [2D FDTD solver](/phonometry/guides/fdtd-simulation/)
+  reproducing the rigid-wall echo delay and the uniform-damping $T_{60}$;
+- the room constant, the critical distance as the exact direct/reverberant
+  crossover, the Schroeder frequency (Kuttruff's classroom example,
+  $V = 200$ m³, $T = 1$ s → 141 Hz) and the steady-state level (Bies 5e,
+  Eq. (6.43)).
 
 ## See also
 
