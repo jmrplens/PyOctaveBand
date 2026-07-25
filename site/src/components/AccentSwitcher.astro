@@ -1,0 +1,169 @@
+---
+/**
+ * Experimental colour-direction switcher.
+ *
+ * Three complete palettes live in src/styles/theme-directions.css, keyed on a
+ * `data-accent` attribute on <html>. The attribute is stamped before first
+ * paint by the inline script in Head.astro (so there is no flash) and read
+ * back from localStorage under `phonometry:accent`; this control only writes
+ * it. It is a prototype affordance for choosing a direction, not a feature
+ * meant to ship: once a direction is picked, the winning block becomes the
+ * unconditional `:root` rule and this component goes away.
+ *
+ * Rendered from Footer.astro so it exists on every page, splash included, and
+ * positioned fixed. The buttons are real <button>s in a labelled group with
+ * `aria-pressed`, so the control is reachable and announced; the panel starts
+ * collapsed on narrow viewports to stay out of the reading column.
+ */
+const DIRECTIONS = [
+	{ id: 'instrument', label: 'Instrument' },
+	{ id: 'blueprint', label: 'Blueprint' },
+	{ id: 'graphite', label: 'Graphite' },
+] as const;
+---
+
+<div class="accent-switcher" id="accent-switcher">
+	<button
+		type="button"
+		class="accent-toggle"
+		aria-expanded="false"
+		aria-controls="accent-options"
+		data-accent-toggle
+	>
+		<span class="accent-toggle-dot" aria-hidden="true"></span>
+		<span class="accent-toggle-label">Colour</span>
+	</button>
+	<div class="accent-options" id="accent-options" role="group" aria-label="Colour direction" hidden>
+		{
+			DIRECTIONS.map((d) => (
+				<button type="button" class="accent-option" data-accent-set={d.id} aria-pressed="false">
+					<span class={`accent-swatch accent-swatch-${d.id}`} aria-hidden="true" />
+					{d.label}
+				</button>
+			))
+		}
+	</div>
+</div>
+
+<script is:inline>
+	(() => {
+		const root = document.documentElement;
+		const KEY = 'phonometry:accent';
+		const panel = document.getElementById('accent-switcher');
+		if (!panel) return;
+		const options = panel.querySelector('#accent-options');
+		const toggle = panel.querySelector('[data-accent-toggle]');
+
+		const sync = () => {
+			const active = root.dataset.accent || 'instrument';
+			for (const btn of panel.querySelectorAll('[data-accent-set]')) {
+				btn.setAttribute('aria-pressed', String(btn.dataset.accentSet === active));
+			}
+		};
+
+		for (const btn of panel.querySelectorAll('[data-accent-set]')) {
+			btn.addEventListener('click', () => {
+				root.dataset.accent = btn.dataset.accentSet;
+				try {
+					localStorage.setItem(KEY, btn.dataset.accentSet);
+				} catch {
+					/* private mode: the choice just does not survive the tab */
+				}
+				sync();
+			});
+		}
+
+		toggle?.addEventListener('click', () => {
+			const open = toggle.getAttribute('aria-expanded') === 'true';
+			toggle.setAttribute('aria-expanded', String(!open));
+			if (options) options.hidden = open;
+		});
+
+		sync();
+	})();
+</script>
+
+<style>
+	.accent-switcher {
+		position: fixed;
+		inset-block-end: 0.75rem;
+		inset-inline-end: 0.75rem;
+		z-index: 50;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 0.375rem;
+		font-family: var(--__sl-font-mono);
+		font-size: var(--sl-text-2xs);
+		line-height: 1;
+	}
+
+	.accent-toggle,
+	.accent-option {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.4rem 0.6rem;
+		border: 1px solid var(--ph-border);
+		border-radius: var(--ph-radius, 4px);
+		background: var(--ph-surface-raised, var(--sl-color-bg));
+		color: var(--sl-color-gray-2);
+		cursor: pointer;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		box-shadow: var(--sl-shadow-sm);
+	}
+
+	.accent-toggle:hover,
+	.accent-option:hover {
+		border-color: var(--ph-border-strong);
+		color: var(--sl-color-white);
+	}
+
+	.accent-toggle-dot {
+		width: 0.55rem;
+		height: 0.55rem;
+		border-radius: 50%;
+		background: var(--ph-mark);
+	}
+
+	.accent-options {
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
+		gap: 0.25rem;
+	}
+	/* `display: flex` would otherwise beat the user-agent [hidden] rule. */
+	.accent-options[hidden] {
+		display: none;
+	}
+
+	.accent-option[aria-pressed='true'] {
+		border-color: var(--ph-mark);
+		color: var(--sl-color-white);
+	}
+
+	.accent-swatch {
+		width: 0.75rem;
+		height: 0.75rem;
+		border-radius: 2px;
+		border: 1px solid var(--ph-border-strong);
+	}
+	/* Fixed swatch colours: each one previews its own direction, so they
+	   cannot follow the active palette's tokens. */
+	.accent-swatch-instrument {
+		background: linear-gradient(135deg, #0a6f8c 50%, #35b8d8 50%);
+	}
+	.accent-swatch-blueprint {
+		background: linear-gradient(135deg, #23479a 50%, #78a2f0 50%);
+	}
+	.accent-swatch-graphite {
+		background: linear-gradient(135deg, #8a4b06 50%, #e0a33e 50%);
+	}
+
+	@media print {
+		.accent-switcher {
+			display: none;
+		}
+	}
+</style>

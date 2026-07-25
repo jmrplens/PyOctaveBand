@@ -88,6 +88,26 @@ const breadcrumbList = isHome
 ---
 
 <Default><slot /></Default>
+{/*
+  Experimental colour directions: stamp the stored `data-accent` on <html>
+  before first paint, so switching a direction never flashes the default one.
+  Runs inline in <head> with no dependencies; a missing or unknown value falls
+  back to `instrument`, which is also the unconditional `:root` block in
+  src/styles/theme-directions.css, so the site is correct with JS disabled.
+*/}
+<script is:inline>
+  (() => {
+    var allowed = ['instrument', 'blueprint', 'graphite'];
+    var stored;
+    try {
+      stored = localStorage.getItem('phonometry:accent');
+    } catch (e) {
+      stored = null;
+    }
+    document.documentElement.dataset.accent =
+      allowed.indexOf(stored) !== -1 ? stored : 'instrument';
+  })();
+</script>
 {techArticle && (
   <script type="application/ld+json" set:html={JSON.stringify(techArticle)} />
 )}

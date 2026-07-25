@@ -255,6 +255,10 @@ export default defineConfig({
         MarkdownContent: './src/components/MarkdownContent.astro',
       },
       customCss: [
+        // Experimental colour directions. Unlayered, so its `:root` blocks
+        // win over Starlight's `@layer starlight.base` defaults; loaded first
+        // so the later sheets can still reference the tokens it defines.
+        './src/styles/theme-directions.css',
         './src/styles/katex.css',
         './src/styles/theme-images.css',
         './src/styles/theme-tables.css',
