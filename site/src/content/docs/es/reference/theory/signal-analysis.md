@@ -113,7 +113,7 @@ octava en torno a 1 kHz es aproximadamente:
 
 | Banda nominal | Borde inferior | Centro | Borde superior | Ancho |
 | :--- | ---: | ---: | ---: | ---: |
-| 1 kHz | 891.25 Hz | 1000.00 Hz | 1122.02 Hz | 230.77 Hz |
+| 1 kHz | 891,25 Hz | 1000,00 Hz | 1122,02 Hz | 230,77 Hz |
 
 Puedes inspeccionar las bandas exactas con:
 
