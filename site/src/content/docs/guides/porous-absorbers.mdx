@@ -181,6 +181,43 @@ print(np.round(jca.normalized_impedance[0], 3))   # (2.321-2.075j)
 db.plot()   # normalised Zc and k components vs frequency
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/porous_medium_model.svg" alt="Normalised characteristic impedance and wavenumber of a porous material with a flow resistivity of 20 kPa s/m2 predicted by the Miki model on a log-log grid: the real and imaginary components all fall towards unity and zero as frequency rises" width="80%" />
+
+*The classical presentation of an equivalent-fluid model (Cox & D'Antonio
+3e, Figs. 6.19–6.20): at low frequency the viscous forces dominate and the
+material looks stiff and lossy (all four components large); as frequency
+rises the components fall towards the free-air limits
+$Z_c \to \rho_0 c_0$ and $k \to k_0$, so a thin layer only works where its
+thickness is a fair fraction of the wavelength inside the material.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import materials
+
+f = np.geomspace(100.0, 5000.0, 260)
+mk = materials.miki(f, 20000.0)          # sigma = 20 kPa s/m^2
+
+# One line: normalised Zc and k components on a log-log grid.
+mk.plot()
+plt.show()
+
+# By hand, from the result's fields:
+fig, ax = plt.subplots()
+ax.loglog(f, mk.normalized_impedance.real, label="Re(Zc)/rho c")
+ax.loglog(f, -mk.normalized_impedance.imag, "--", label="-Im(Zc)/rho c")
+ax.loglog(f, mk.normalized_wavenumber.real, label="Re(k)/k0")
+ax.loglog(f, -mk.normalized_wavenumber.imag, "--", label="-Im(k)/k0")
+ax.set(xlabel="Frequency [Hz]", ylabel="Normalised characteristic value")
+ax.legend()
+plt.show()
+```
+
+</details>
+
 The three models agree closely over the Delany–Bazley fit range (Cox &
 D'Antonio Figs. 6.19–6.21 make the same comparison); JCA extends the
 prediction physically outside it. A `PorousMediumResult` built from measured
@@ -316,7 +353,47 @@ res = materials.layered_absorber(
 i = np.argmax(res.absorption)
 print(f"peak alpha = {res.absorption[i]:.2f} at {f[i]:.0f} Hz")
 # peak alpha = 0.96 at 677 Hz
+res.plot()   # alpha(f) with |R| overlaid: the resonant MPP peak
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mpp_absorption_peak.svg" alt="Predicted absorption of Maa's microperforated panel over a 6 cm cavity: a broad resonant peak reaching alpha 0.96 near 677 Hz, with the reflection-factor magnitude as its mirror image, and a narrow secondary feature near the half-wave cavity resonance at 2.9 kHz" width="80%" />
+
+*Maa's own Fig. 5 design, no porous material anywhere: the viscous losses in
+the submillimetre holes damp the panel-cavity resonance into a broad
+absorption peak. The narrow feature near 2.9 kHz is the half-wave cavity
+resonance, where the cavity presents a pressure node to the panel and the
+absorption collapses before the next resonance restores it.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import materials
+
+# Maa (1998) Fig. 5: d = t = 0.2 mm, holes every 2.5 mm, cavity 6 cm.
+eps = (np.pi / 4.0) * (0.2 / 2.5) ** 2
+f = np.linspace(100.0, 4000.0, 1200)
+res = materials.layered_absorber(
+    f, [materials.MicroperforatedPlateLayer(0.2e-3, 0.1e-3, eps),
+        materials.AirLayer(0.06)],
+)
+
+# One line: alpha(f) with |R| overlaid.
+res.plot()
+plt.show()
+
+# By hand, from the result's fields:
+fig, ax = plt.subplots()
+ax.semilogx(f, res.absorption, label="Absorption alpha")
+ax.semilogx(f, np.abs(res.reflection), "--", label="Reflection factor |R|")
+ax.set(xlabel="Frequency [Hz]", ylabel="Coefficient")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 **Membrane.** A limp impervious sheet is the surface mass $z = j\omega m$
 (Cox Eq. 7.14; Bies Eq. D.96); over a cavity it resonates at the classical
@@ -353,13 +430,45 @@ from phonometry import materials
 f = np.array([250.0, 500.0, 1000.0, 2000.0])
 med = materials.miki(f, 20000.0)
 layers = [materials.PorousLayer(0.05, med)]
-normal = materials.layered_absorber(f, layers).absorption
-diffuse = materials.diffuse_field_absorption(f, layers).absorption
-print(np.round(normal, 2))    # [0.26 0.62 0.94 0.95]
-print(np.round(diffuse, 2))   # [0.37 0.68 0.9  0.95]
+normal = materials.layered_absorber(f, layers)
+diffuse = materials.diffuse_field_absorption(f, layers)
+print(np.round(normal.absorption, 2))    # [0.26 0.62 0.94 0.95]
+print(np.round(diffuse.absorption, 2))   # [0.37 0.68 0.9  0.95]
+diffuse.plot()   # alpha_dif(f); overlay normal.absorption to compare
 
 print(round(float(materials.statistical_absorption(1.567 + 0j)), 3))  # 0.951
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuse_field_absorption.svg" alt="Random-incidence absorption of a 50 mm porous layer by the Paris integral compared with its normal-incidence coefficient: the diffuse-field curve sits clearly above the normal-incidence one below 700 Hz and the two converge towards 0.95 at high frequency" width="80%" />
+
+*Why the reverberation room reads higher than the tube: the Paris integral
+weights the oblique angles, whose waves travel a longer path inside the
+layer, so $\alpha_{dif}$ exceeds the normal-incidence $\alpha(0°)$ exactly
+where the layer is thin against the wavelength. This is the model-side
+counterpart of the tube-versus-reverberation-room discussion of
+[Acoustic Materials](/phonometry/guides/materials/).*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import materials
+
+f = np.geomspace(125.0, 4000.0, 200)
+layers = [materials.PorousLayer(0.05, materials.miki(f, 20000.0))]
+normal = materials.layered_absorber(f, layers)
+diffuse = materials.diffuse_field_absorption(f, layers)
+
+# One line, then the normal-incidence overlay on the same axes:
+ax = diffuse.plot()
+ax.plot(f, normal.absorption, "--", label="Normal incidence alpha(0)")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 ## 5. Slow-sound slit panels with Helmholtz resonators
 

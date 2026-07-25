@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from ..materials.airflow_resistance import StaticAirflowResult
     from ..materials.diffuser_design import DiffuserPolarResponse
     from ..materials.dynamic_stiffness import DynamicStiffnessResult
-    from ..materials.impedance_tube import ImpedanceTubeResult
+    from ..materials.impedance_tube import ImpedanceTubeResult, TransferMatrix
     from ..materials.porous_absorber import (
         DiffuseFieldAbsorptionResult,
         LayeredAbsorberResult,
@@ -102,6 +102,12 @@ _STRINGS: dict[str, str] = {
     "Reflection factor $|R|$": "Factor de reflexión $|R|$",
     r"Absorption $\alpha(\theta)$": r"Absorción $\alpha(\theta)$",
     r"Absorption $\alpha_{dif}$": r"Absorción $\alpha_{dif}$",
+    "Transmission loss $TL_n$": "Pérdida de transmisión $TL_n$",
+    "Transmission loss $TL_n$ [dB]": "Pérdida de transmisión $TL_n$ [dB]",
+    r"Hard-backed absorption $\alpha$":
+        r"Absorción con respaldo rígido $\alpha$",
+    "ASTM E2611 transfer-matrix quantities":
+        "Magnitudes de la matriz de transferencia ASTM E2611",
 }
 
 
@@ -842,3 +848,58 @@ def plot_diffuser_polar_response(
     )
     localize_axes(ax, language)
     return cast("Axes", ax)
+
+
+def plot_transfer_matrix(
+    matrix: TransferMatrix,
+    frequency: Any,
+    characteristic_impedance: float,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Transmission loss and hard-backed absorption of a transfer matrix.
+
+    Reads the ASTM E2611-19 four-pole entries out as the two spectra a
+    transmission-tube laboratory quotes: the normal-incidence transmission
+    loss ``TLn(f)`` (Eq. (26)) as the primary curve on the left axis, and the
+    hard-backed absorption coefficient ``alpha(f)`` (Eq. (28)) as a muted
+    companion on a 0..1 right axis.
+
+    :param matrix: A :class:`~phonometry.materials.impedance_tube.TransferMatrix`.
+    :param frequency: Frequency vector ``f``, in hertz, matching the shape of
+        the matrix entries.
+    :param characteristic_impedance: Characteristic impedance ``rho c`` of the
+        air in the tube, in rayls.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param kwargs: Forwarded to the transmission-loss ``plot`` call.
+    :return: The axes carrying the transmission-loss curve.
+    """
+    from .._i18n import localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    freqs = np.asarray(frequency, dtype=np.float64)
+    tl = np.asarray(matrix.transmission_loss(characteristic_impedance),
+                    dtype=np.float64)
+    alpha = np.asarray(matrix.absorption_hard_backed(characteristic_impedance),
+                       dtype=np.float64)
+    kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault("label", _t("Transmission loss $TL_n$", language))
+    ax.plot(freqs, tl, **kwargs)
+    twin = ax.twinx()
+    twin.plot(freqs, alpha, ls="--", color=_C_MUTED,
+              label=_t(r"Hard-backed absorption $\alpha$", language))
+    twin.set_ylim(0.0, 1.05)
+    twin.set_ylabel(_t(r"Hard-backed absorption $\alpha$", language))
+    format_frequency_axis(ax, float(freqs.min()), float(freqs.max()))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
+    ax.set_ylabel(_t("Transmission loss $TL_n$ [dB]", language))
+    ax.set_ylim(bottom=0.0)
+    ax.set_title(_t("ASTM E2611 transfer-matrix quantities", language))
+    lines, labels = ax.get_legend_handles_labels()
+    tlines, tlabels = twin.get_legend_handles_labels()
+    ax.legend(lines + tlines, labels + tlabels, loc="best", fontsize="small")
+    ax.grid(True, which="both", alpha=0.3)
+    localize_axes(ax, language)
+    localize_axes(twin, language)
+    return ax
