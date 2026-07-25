@@ -312,7 +312,7 @@ printed coefficient tables (Bies Table D.1, Miki Eqs. 30–34), the solver to
 the closed forms above and to the `TransferMatrix` recovery of the
 [impedance-tube page](materials.md), the MPP to Maa's own approximation
 (stated ~6 % agreement with the exact Eq. 2), design example and Table I,
-and the Paris integral to its locally reacting closed form. Three misprints
+and the Paris integral to its locally reacting closed form. Five misprints
 found in the sources during this work are recorded in the
 [errata registry](ERRATA.md).
 
