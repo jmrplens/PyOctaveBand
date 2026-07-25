@@ -357,14 +357,13 @@ difference between bands at the crossover.
 import numpy as np
 from phonometry import metrology
 
-# A calibrated signal in Pa so the guide runs standalone
+# recording: a calibrated capture in Pa so the guide runs standalone
 fs = 48000
-x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
-signal = x
-# Split signal into Low and High bands at 1000 Hz
-low, high = metrology.linkwitz_riley(signal, fs, freq=1000, order=4)
-# Reconstruction: low + high == signal (flat response)
+# Split the recording into Low and High bands at 1000 Hz
+low, high = metrology.linkwitz_riley(recording, fs, freq=1000, order=4)
+# Reconstruction: low + high == recording (flat response)
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/crossover_lr4_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/crossover_lr4.svg" alt="Linkwitz-Riley 4th-order crossover: low-pass, high-pass and their flat sum" width="60%"></picture>
@@ -668,6 +667,7 @@ from phonometry import OctaveFilterBank, ReportMetadata, filter_class_compliance
 
 bank = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[125, 4000])
 result = filter_class_compliance(bank)   # overall_class == 1
+result.plot()   # the worst-margin band on its class corridor
 
 result.report(
     "iec61260.pdf",
@@ -686,6 +686,7 @@ dropped; a higher-order bank can then be certified to class 0:
 ```python
 bank = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[250, 4000])
 result = filter_class_compliance(bank, edition="1995")   # overall_class == 0
+result.plot()   # the class-0 corridor of the 1995 edition
 result.report(
     "iec61260_1995.pdf",
     metadata=ReportMetadata(
