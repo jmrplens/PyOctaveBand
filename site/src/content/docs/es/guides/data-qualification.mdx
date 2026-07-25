@@ -213,10 +213,56 @@ from phonometry import trend_test
 rng = np.random.default_rng(3)
 res = trend_test(rng.standard_normal(40), method="runs")
 print(res.statistic, res.bounds, res.trend_free)
+res.plot(language="es")   # la secuencia sobre su mediana con el veredicto
 
 alternating = np.tile([1.0, -1.0], 10)   # 20 rachas: rechazado por el otro lado
 print(trend_test(alternating, method="runs").trend_free)   # False
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/runs_test_es.svg" alt="Dos paneles de secuencias clasificadas respecto a su mediana, puntos por encima en azul y por debajo en rojo. Izquierda: cuarenta observaciones gaussianas con veinte rachas dentro de la región de aceptación de catorce a veintisiete, veredicto sin tendencia. Derecha: una secuencia de veinte valores estrictamente alternante que también da veinte rachas, pero contra la región de aceptación de seis a quince para veinte valores, veredicto rechazado por alternancia demasiado rápida" width="92%" />
+
+*El veredicto bilateral del test de rachas: 20 rachas no llaman la atención
+en 40 observaciones gaussianas (izquierda, aceptado), pero el mismo
+recuento en una secuencia alternante de 20 valores supera su cota superior
+(derecha, rechazado): demasiadas rachas es tan poco aleatorio como
+demasiado pocas.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import trend_test
+
+rng = np.random.default_rng(3)
+sequences = [rng.standard_normal(40), np.tile([1.0, -1.0], 10)]
+
+# Una línea por secuencia: los valores analizados con el veredicto:
+trend_test(sequences[0], method="runs").plot(language="es")
+plt.show()
+
+# Los dos veredictos lado a lado, clasificados respecto a la mediana:
+fig, axes = plt.subplots(1, 2, figsize=(11, 4.5))
+for ax, seq in zip(axes, sequences):
+    res = trend_test(seq, method="runs")
+    idx = np.arange(1, seq.size + 1)
+    median = np.median(seq)
+    above = seq > median
+    ax.plot(idx, seq, "0.7", lw=0.7)
+    ax.scatter(idx[above], seq[above], label="sobre la mediana")
+    ax.scatter(idx[~above], seq[~above], color="r",
+               label="bajo la mediana")
+    ax.axhline(median, color="k", linestyle="--")
+    lo, hi = res.bounds
+    verdict = "sin tendencia" if res.trend_free else "rechazada"
+    ax.set_title(f"r = {res.statistic} rachas, aceptación ({lo}, {hi}]: {verdict}")
+    ax.set(xlabel="Índice de muestra", ylabel="Valor de la secuencia")
+    ax.legend()
+plt.show()
+```
+
+</details>
 
 El test de inversiones de orden es el más potente de los dos frente a las
 tendencias monótonas que dominan la práctica (B&P Sec. 4.5.2), y por eso es
@@ -331,6 +377,7 @@ x = np.sin(2 * np.pi * 60.0 * t)          # banda estrecha: r es en esencia 1
 res = peak_statistics(x, fs)
 print(round(res.irregularity_factor, 3))       # 0.997
 print(res.peak_exceedance(4.0))                # exp(-8): aprox. 1 entre 3000
+res.plot(language="es")   # excedencia empírica contra la mezcla de Rice (figura de abajo)
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rice_peak_distribution_es.svg" alt="Probabilidad de excedencia de la altura de pico de ruido gaussiano paso bajo en eje logarítmico frente a la altura de pico estandarizada desde menos dos coma cinco hasta cuatro coma cinco: la escalera empírica de medio millón de muestras sigue la curva de mezcla de Rice para un factor de irregularidad de cero coma siete cuatro seis, claramente por debajo del límite de Rayleigh discontinuo y por encima del límite gaussiano punteado, con una fracción visible de máximos negativos" width="82%" loading="eager" />
