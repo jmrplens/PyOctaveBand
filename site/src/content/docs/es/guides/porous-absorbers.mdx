@@ -477,7 +477,7 @@ normal = materials.layered_absorber(f, layers)
 diffuse = materials.diffuse_field_absorption(f, layers)
 
 # Una línea, y después la superposición de incidencia normal en los mismos ejes:
-ax = diffuse.plot()
+ax = diffuse.plot(language="es")
 ax.plot(f, normal.absorption, "--", label="Incidencia normal alpha(0)")
 ax.legend()
 plt.show()

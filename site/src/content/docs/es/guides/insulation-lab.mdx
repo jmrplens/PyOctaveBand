@@ -224,8 +224,8 @@ li = np.array([62.1, 63.2, 63.5, 66.2, 68.5, 70.0, 71.7, 73.1,
 imp = building.lab_impact_insulation(li, t2, volume=50.0)
 
 # Una línea cada uno: R (o Ln) frente a su referencia ISO 717 desplazada:
-lab.plot()
-imp.plot()
+lab.plot(language="es")
+imp.plot(language="es")
 plt.show()
 
 # A mano, ambos paneles desde los campos de los resultados:
@@ -575,7 +575,7 @@ res = building.intensity_element_normalized_difference(
 )
 
 # Una línea: DI,n,e frente a la referencia ISO 717-1 desplazada:
-res.plot()
+res.plot(language="es")
 plt.show()
 
 # A mano, desde el índice que porta el resultado:

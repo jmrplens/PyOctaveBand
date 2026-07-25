@@ -92,7 +92,7 @@ from phonometry import log_linear_sound_speed_profile
 # Las dos capas superficiales canónicas de la Ec. 4.5 de Salomons sobre pasto.
 bajada = log_linear_sound_speed_profile(+1.0, ground_speed=340.0, max_height=60.0)
 subida = log_linear_sound_speed_profile(-1.0, ground_speed=340.0, max_height=60.0)
-ax = bajada.plot(color="#1f77b4")
+ax = bajada.plot(color="#1f77b4", language="es")
 subida.plot(ax=ax, color="#d62728", language="es")
 plt.show()
 ```

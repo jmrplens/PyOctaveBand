@@ -150,8 +150,8 @@ from phonometry import room
 spl = np.array([62.0, 62.0, 59.0, 57.0, 52.0, 42.0, 35.0, 29.0, 24.0, 19.0])
 
 # En una línea cada uno:
-room.noise_criterion(spl).plot()
-room.room_criterion(spl).plot()
+room.noise_criterion(spl).plot(language="es")
+room.room_criterion(spl).plot(language="es")
 plt.show()
 
 # A mano, reproduciendo lo que dibujan NCResult.plot() / RCResult.plot():

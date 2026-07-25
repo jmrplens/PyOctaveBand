@@ -132,7 +132,7 @@ walls_floor = [(54.0, plaster), (20.0, plaster)]
 for ceiling in (plaster, tile):
     room.enclosed_space_reverberation(
         [*walls_floor, (20.0, ceiling)], 60.0, air_condition="20C_50-70",
-    ).plot()
+    ).plot(language="es")
 plt.show()
 ```
 

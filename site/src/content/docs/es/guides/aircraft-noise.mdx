@@ -141,7 +141,7 @@ shape = 15.0 * np.exp(-((np.log10(aircraft.NOY_BANDS) - np.log10(400.0)) ** 2) /
 gain = 30.0 * np.exp(-((idx - 20.0) ** 2) / (2 * 5.0**2)) - 5.0
 spectra = (55.0 + shape)[None, :] + gain[:, None]
 spectra[:, 17] += 12.0 * np.exp(-((idx - 20.0) ** 2) / (2 * 6.0**2))  # tono de ventilador 2500 Hz
-aircraft.effective_perceived_noise_level(spectra, dt).plot()
+aircraft.effective_perceived_noise_level(spectra, dt).plot(language="es")
 ```
 
 </details>
@@ -328,7 +328,7 @@ de los segmentos de rodaje de despegue, `start_of_roll_directivity` (ΔSOR).
 sobre una malla en tierra (marca los segmentos de rodaje con una máscara
 `ground_roll`).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airport_contour.webp" alt="Contorno SEL de un despegue: huella alargada a lo largo de la trayectoria, más intensa cerca del rodaje" width="90%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airport_contour_es.webp" alt="Contorno SEL de un despegue: huella alargada a lo largo de la trayectoria, más intensa cerca del rodaje" width="90%" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -355,7 +355,7 @@ path = np.column_stack([xs, np.zeros_like(xs), z, power, np.full_like(xs, 82.3)]
 contour = aircraft.noise_contour(path, powers, distances, sel, lmax,
                                  x=np.linspace(-2500.0, 20000.0, 56),
                                  y=np.linspace(-6000.0, 6000.0, 44))
-contour.plot()   # huella SEL de evento único (requiere matplotlib)
+contour.plot(language="es")   # huella SEL de evento único (requiere matplotlib)
 plt.show()
 ```
 

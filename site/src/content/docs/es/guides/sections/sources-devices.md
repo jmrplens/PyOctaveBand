@@ -57,7 +57,7 @@ nivelar un programa, ve a
 ## Páginas de esta sección
 
 - [Intensidad acústica (p-p)](/phonometry/es/guides/intensity/): intensidad
-  sonora con dos micrófonos según IEC 61043 con los indicadores de campo de
+  acústica con dos micrófonos según IEC 61043 con los indicadores de campo de
   ISO 9614-1.
 - [Potencia acústica](/phonometry/es/guides/sound-power/): el nivel de potencia
   acústica por superficie envolvente, cámara reverberante, barrido de

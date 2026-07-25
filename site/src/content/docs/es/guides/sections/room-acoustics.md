@@ -5,7 +5,7 @@ description: "El campo sonoro dentro de una sala: medición de la respuesta al i
 
 Casi todo lo que importa del campo sonoro dentro de una sala se sigue de dos
 magnitudes: su **respuesta al impulso**, que puede medirse, y su **absorción
-sonora**, que puede diseñarse. Las cuatro páginas de esta sección cubren la
+acústica**, que puede diseñarse. Las cuatro páginas de esta sección cubren la
 cadena de medición construida sobre la primera, la cadena de predicción
 construida sobre la segunda, y la valoración del ruido de fondo que ocupa la
 sala entre medias.
