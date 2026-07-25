@@ -72,6 +72,7 @@ system = np.zeros(fs); system[100] = 1.0; system[2000] = 0.4   # direct + reflec
 recorded = fftconvolve(sweep, system)
 ir = room.impulse_response(recorded, sweep, fs, method="spectral")
 print(int(np.argmax(np.abs(ir))))                    # 100: direct sound recovered
+ir.plot()                     # waveform + Schroeder envelope (figure below)
 
 # Farina inverse-filter variant (needs the sweep band)
 ir_f = room.impulse_response(recorded, sweep, fs, method="farina", f_range=(20.0, 20000.0))
@@ -350,6 +351,55 @@ For this single-slope decay EDT, T20 and T30 all return ≈ 1.0 s, and the
 energy parameters match their closed forms (C80 = 3.05 dB, D50 = 0.499,
 Ts = 72 ms). A real room has a steeper early slope, so EDT < T30.
 
+On a real, frequency-dependent decay the per-band `.plot()` is the working
+summary of the whole measurement: the decay times as grouped bars per octave
+(invalid bands hatched) over a second panel with C50 and C80.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_parameters_bands_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_parameters_bands.svg" alt="ISO 3382 per-band parameters of a synthetic room impulse response: grouped EDT, T20 and T30 bars per octave band falling from about 1.4 s at 125 Hz to 0.7 s at 4 kHz, over a second panel where C50 and C80 rise with frequency" width="92%"></picture>
+
+*A room whose reverberation time falls from 1.4 s at 125 Hz to 0.7 s at
+4 kHz, the typical signature of a furnished room whose absorption grows with
+frequency; clarity rises as the decay shortens.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal
+from phonometry import room
+
+# A synthetic room IR with a frequency-dependent decay: octave-band noise
+# carriers whose T60 falls from 1.4 s at 125 Hz to 0.7 s at 4 kHz.
+fs = 48000
+rng = np.random.default_rng(3382)
+t = np.arange(int(1.6 * fs)) / fs
+ir = np.zeros_like(t)
+for fc, t60 in [(125.0, 1.4), (250.0, 1.25), (500.0, 1.1),
+                (1000.0, 1.0), (2000.0, 0.85), (4000.0, 0.7)]:
+    sos = signal.butter(4, [fc / np.sqrt(2), fc * np.sqrt(2)],
+                        btype="bandpass", fs=fs, output="sos")
+    carrier = signal.sosfilt(sos, rng.standard_normal(t.size))
+    ir += carrier * np.exp(-3.0 * np.log(10.0) / t60 * t)
+
+# One line: per-band EDT/T20/T30 bars + C50/C80 (needs matplotlib).
+octaves = room.room_parameters(ir, fs)
+octaves.plot()
+plt.show()
+
+# By hand: the T30 spectrum from the result's fields.
+fig, ax = plt.subplots()
+ax.bar(np.arange(octaves.t30.size), octaves.t30)
+ax.set_xticks(np.arange(octaves.t30.size))
+ax.set_xticklabels([f"{f:g}" for f in octaves.frequency])
+ax.set_xlabel("Octave-band centre frequency [Hz]")
+ax.set_ylabel("T30 [s]")
+plt.show()
+```
+
+</details>
+
 **Reading EDT, T20 and T30 against each other.** The three times
 extrapolate the same 60 dB decay from different windows, so their
 disagreement carries information:
@@ -512,6 +562,7 @@ sti = 0.70 - 0.03 * r                                 # STI per position
 m = room.open_plan_metrics(r, lp, sti)
 print(round(m.d2s, 1), round(m.lp_as_4m, 1))         # 7.0 dB, 51.0 dB
 print(round(m.rd, 1), round(m.rp, 1))                # 6.7 m, 16.7 m
+m.plot()   # the spatial-decay regression of the figure below
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_decay_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_decay.svg" alt="Open-plan spatial decay: A-weighted speech level and STI against source distance on a log axis, with the D2,S regression, the Lp,A,S,4m marker at 4 m and the rD and rP distance crossings" width="80%"></picture>

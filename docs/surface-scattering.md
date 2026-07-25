@@ -217,6 +217,8 @@ qrd = materials.predict_diffuser_polar_response(
 flat = materials.predict_diffuser_polar_response(
     3.6 / 42, 1000.0, depths=[0.0] * 7, periods=6)
 
+qrd.plot()   # predicted polar response, d in the title (needs matplotlib)
+
 d = materials.directional_diffusion_coefficient(qrd.levels)    # Formula (5)
 print(round(float(d), 4))            # 0.1099
 d_ref = materials.directional_diffusion_coefficient(flat.levels)
@@ -307,7 +309,119 @@ column to the table (the curve always draws $d_n$ as a companion when present).
 A single band's polar response is itself reportable through
 `DiffusionResult.report(path)`.
 
+```python
+import numpy as np
+from phonometry import materials
+
+# One diffusion coefficient per band (here a closed-form example). In practice
+# each band's random-incidence d is the source-position average of the
+# directional coefficients: for band k, average directional_diffusion_coefficient
+# over the source positions with random_incidence_diffusion (Clause 8.4).
+freqs = np.array([250, 500, 1000, 2000, 4000], float)
+d = np.array([0.30, 0.45, 0.60, 0.75, 0.88])
+spectrum = materials.diffusion_spectrum(freqs, d)
+spectrum.plot()    # d(f) on the band axis (needs matplotlib)
+spectrum.report("diffusion.pdf")   # one-page fiche (needs phonometry[report])
+```
+
 [![ISO 17497-2 diffusion example report: a metadata header, the per-one-third-octave table of the diffusion coefficient d beside the d(f) band-axis curve (with the normalised d_n drawn as a companion curve), and the boxed characterisation headline over the tested frequency range](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso17497_diffusion_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso17497_diffusion_example.pdf)
+
+### Predicting diffusion from a diffuser design
+
+The autocorrelation coefficient above reduces a *measured* polar response. The
+same coefficient can be *predicted* from the physical design of a Schroeder
+phase-grating diffuser, so a well-depth sequence can be graded before a sample
+is built. `predict_diffuser_polar_response` evaluates the single-plane
+Fraunhofer (far-field) model of Cox and D'Antonio: each rigid-bottom well of
+depth $d_n$ contributes a pressure reflection coefficient
+$R_n = e^{-2 j k d_n}$, and the scattered pressure at reflection angle $\theta$
+for a source at incidence $\psi$ is the sum over the wells of the periodic
+surface (Eq. (5.8)),
+
+$$
+p(\theta) = F(\theta) \sum_n R_n \, e^{\,j k x_n (\sin\psi + \sin\theta)},
+$$
+
+with $x_n$ the well centre and $k = 2\pi f / c$. The predicted polar levels
+$L_i = 20\lg|p(\theta_i)|$ feed the same `directional_diffusion_coefficient` as
+a measurement. For a quadratic residue diffuser the depth sequence follows from
+the prime generator $N$ and design frequency $f_0$ (Eqs. (10.2)/(10.3)):
+$s_n = n^2 \bmod N$ and $d_n = s_n \lambda_0 / (2N)$ with $\lambda_0 = c/f_0$.
+
+```python
+import numpy as np
+from phonometry import materials
+
+# An N = 7 quadratic residue diffuser, design frequency 500 Hz.
+depths = materials.qrd_well_depths(7, 500.0)   # Eqs. (10.2)/(10.3)
+print(np.round(depths * 100, 1))               # well depths in cm:
+                                               # [ 0.   4.9 19.6  9.8  9.8 19.6  4.9]
+
+# Predicted far-field polar response at one frequency (5 repeated periods,
+# 10 cm wells), reduced to the ISO 17497-2 directional diffusion coefficient.
+surface = materials.predict_diffuser_polar_response(0.10, 2000.0, depths=depths,
+                                                    periods=5)
+print(round(surface.coefficient, 3))           # 0.210
+surface.plot()   # predicted polar response, d in the title (needs matplotlib)
+
+# The spectrum variant normalises band by band against the same-footprint flat
+# reference (Formula (7)): the flat panel maps to exactly zero, the QRD well
+# above it.
+freqs = np.array([500, 1000, 2000, 4000], float)
+qrd = materials.predicted_diffusion_spectrum(0.10, freqs, depths=depths, periods=5)
+print(np.round(qrd.normalized, 3))             # [0.352 0.275 0.208 0.073]
+
+flat = materials.predicted_diffusion_spectrum(0.10, freqs,
+                                        depths=np.zeros_like(depths), periods=5)
+print(np.round(flat.normalized, 3))            # [0. 0. 0. 0.]
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuser_prediction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuser_prediction.svg" alt="Predicted diffusion coefficient over the one-third-octave bands from 250 to 5000 Hz for an N = 7 quadratic residue diffuser design compared with a flat panel of the same footprint: the QRD curve sits well above the near-zero flat-panel curve across the band" width="88%"></picture>
+
+*Predicted from the design alone: the N = 7 QRD spreads the reflected energy
+far more evenly than the flat panel of the same footprint, so its predicted
+diffusion coefficient sits well above the near-specular flat reference across
+the band. This is a far-field design estimate, not a substitute for an
+ISO 17497-2 measurement; like every Fourier diffuser model it loses accuracy at
+low frequency, at grazing angles and for strongly absorbing surfaces. An
+arbitrary complex per-well reflection sequence can be supplied through the
+`reflection` argument, so an admittance or resonator-loaded surface computed
+elsewhere can be graded the same way.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import materials
+
+# N = 7 QRD (design frequency 500 Hz, 10 cm wells, five periods) versus the
+# flat panel of the same footprint, over the one-third-octave bands.
+freqs = np.array([250, 315, 400, 500, 630, 800, 1000, 1250, 1600,
+                  2000, 2500, 3150, 4000, 5000], float)
+depths = materials.qrd_well_depths(7, 500.0)
+qrd = materials.predicted_diffusion_spectrum(0.10, freqs, depths=depths, periods=5)
+
+# The DiffusionSpectrum plots the predicted d(f) directly. One line:
+qrd.plot()
+plt.show()
+
+# By hand: predicted d(f) for the QRD against the flat reference.
+flat = materials.predicted_diffusion_spectrum(0.10, freqs,
+                                depths=np.zeros_like(depths), periods=5,
+                                normalize=False)
+fig, ax = plt.subplots()
+ax.semilogx(freqs, qrd.diffusion, "o-", color="#1f77b4", label="N = 7 QRD design")
+ax.semilogx(freqs, flat.diffusion, "s--", color="#d62728", label="Flat panel")
+ax.set_ylim(0.0, 1.0)
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Predicted diffusion coefficient d")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 ## Scattering or diffusion? Two coefficients, two jobs
 

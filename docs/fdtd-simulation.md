@@ -69,6 +69,7 @@ res = simulation.fdtd_simulation(
 )
 print(res.size)                  # (3.0, 2.0)  metres
 print(round(res.dt * 1e6, 2))    # 12.37  microseconds (CN = 0.6)
+res.plot()                       # probe pressure histories (figure in §3)
 ```
 
 The grid is index-based: cell ``(ix, iy)`` has its centre at
@@ -197,6 +198,51 @@ sel = (freqs > 250) & (freqs < 350)
 print(round(0.5 * 343.0 * float(np.hypot(1 / lx, 1 / ly)), 1))  # 299.1  exact (1,1) mode
 print(round(float(freqs[sel][np.argmax(spec[sel])]), 1))        # 298.9  measured
 ```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fdtd_room_modes_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fdtd_room_modes.svg" alt="Spectrum of the probe pressure of a rigid 1.0 by 0.7 metre FDTD box between 100 and 450 Hz: five sharp peaks that land on the dotted analytic mode frequencies of the (1,0), (0,1), (1,1), (2,0) and (2,1) modes" width="88%"></picture>
+
+*The probe spectrum of the rigid-box run peaks exactly on the analytic mode
+frequencies $f = (c/2)\sqrt{(n_x/L_x)^2 + (n_y/L_y)^2}$ (Kuttruff 6e,
+Ch. 3). The barely visible leftward offset of the highest peaks is the
+numerical dispersion of the accuracy section below: short wavelengths
+propagate slightly slow on the grid, so the modelled resonances under-read
+by a fraction of a percent.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import simulation
+
+lx, ly, dx, c = 1.0, 0.7, 0.02, 343.0
+nx, ny = round(lx / dx), round(ly / dx)
+res = simulation.fdtd_simulation(
+    c, dx, 0.35, shape=(ny, nx),
+    sources=[simulation.GaussianPulse(ix=7, iy=5, width=2.0e-4)],
+    probes=[(nx - 4, ny - 3)],
+)
+
+# One line: the raw probe pressure history the spectrum is computed from.
+res.plot()
+plt.show()
+
+# The mode check: probe spectrum against the analytic rigid-room modes.
+p = res.pressures[0]
+spec = np.abs(np.fft.rfft(p * np.hanning(p.size), n=8 * p.size))
+freqs = np.fft.rfftfreq(8 * p.size, res.dt)
+sel = (freqs >= 100) & (freqs <= 450)
+fig, ax = plt.subplots()
+ax.plot(freqs[sel], 20 * np.log10(spec[sel] / spec[sel].max()))
+for mx, my in [(1, 0), (0, 1), (1, 1), (2, 0), (2, 1)]:
+    ax.axvline(0.5 * c * np.hypot(mx / lx, my / ly), ls=":", color="tab:red")
+ax.set(xlabel="Frequency [Hz]", ylabel="Probe spectrum [dB re max]",
+       ylim=(-60, 6))
+plt.show()
+```
+
+</details>
 
 The domain is **two-dimensional**, and that changes the physics, not just
 the cost. A 2D point source is physically an infinite **line source**: its
