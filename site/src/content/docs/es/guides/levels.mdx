@@ -31,12 +31,66 @@ references:
     publisher: "Wiley"
     url: "https://www.wiley.com/en-us/Fundamentals+of+Acoustics%2C+4th+Edition-p-9780471847892"
     note: "Las definiciones de presión sonora, energía y nivel que sostienen Leq, SEL y las medidas de dosis (ISBN 978-0-471-84789-2)."
+  - type: standard
+    organization: "British Standards Institution"
+    year: 2003
+    title: "Description and measurement of environmental noise — Guide to quantities and procedures"
+    designation: "BS 7445-1:2003"
+    url: "https://knowledge.bsigroup.com/products/description-and-measurement-of-environmental-noise-guide-to-quantities-and-procedures"
+    note: "El compañero de práctica de medición de ISO 1996-1: qué familia de descriptores encaja con cada pregunta de evaluación, y los procedimientos de medición a su alrededor (BS 7445-2:1991 cubre la adquisición de datos para usos del suelo)."
+  - type: book
+    authors: ["Bies, D. A.", "Hansen, C. H.", "Howard, C. Q."]
+    year: 2017
+    title: "Engineering noise control"
+    edition: "5th ed."
+    publisher: "CRC Press"
+    doi: "10.1201/9781351228152"
+    note: "La sección 2.5 (las medidas de ruido: Leq, Ldn, L10/L90 y sus usos previstos) y la sección 2.15 (campañas de ruido ambiental). ISBN 978-1-4987-2405-0."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
-Métricas de ruido ambiental calculadas directamente sobre la señal cruda
-(calibrada).
+Una medición de ruido rara vez termina en una forma de onda: termina en un
+puñado de números únicos que se pueden contrastar con un límite, un
+reglamento o un informe. Esta página es esa cadena de reducción, calculada
+directamente sobre la señal calibrada en pascales y no sobre lecturas de un
+sonómetro: el nivel continuo equivalente $L_{eq}$/$L_{Aeq}$, los niveles
+percentiles $L_N$, las medidas de sucesos y de pico ($L_{AE}$/SEL,
+$L_{Cpeak}$), la dosis de ruido de IEC 61252 y los descriptores de día
+completo $L_{den}$/$L_{dn}$ con los niveles de evaluación de ISO 1996-1.
+Trabajar desde la señal significa aplicar cada definición (una integral, un
+percentil, una suma de energías) de forma exacta, sin aproximaciones de
+detector ni de pantalla por medio.
+
+Qué descriptor encaja con qué pregunta sigue las familias de magnitudes de
+ISO 1996-1 (BS 7445-1 es la guía de práctica de medición sobre esa misma
+elección, y Bies, Hansen y Howard 2017, §2.5 las repasa en paralelo):
+
+- **Exposición acumulada en un intervalo**: $L_{eq}$/$L_{Aeq}$, la media
+  energética. Responde a "cuánto sonido llegó en total", sin importar cómo
+  se repartió en el tiempo.
+- **Cómo se distribuyó el nivel fluctuante**: los percentiles $L_N$:
+  $L_{90}$ como nivel de fondo, $L_{10}$ como indicador de intrusión de
+  tráfico, $L_{50}$ como mediana. Dos señales con el mismo $L_{Aeq}$ pueden
+  tener dispersiones $L_{10} - L_{90}$ muy distintas.
+- **Sucesos aislados de duraciones distintas, comparados con justicia**:
+  SEL, toda la energía del suceso normalizada a un segundo.
+- **Cribado de riesgo auditivo**: $L_{Cpeak}$ y las medidas de dosis, que
+  alimentan el flujo laboral de
+  [Exposición laboral (ISO 9612)](/phonometry/es/guides/occupational-exposure/).
+- **Molestia comunitaria a largo plazo**: $L_{den}$/$L_{dn}$ y los niveles
+  de evaluación de ISO 1996-1, que penalizan la energía de tarde y noche
+  antes de promediar el día.
+
+Conviene mantener nítidas dos fronteras con las páginas hermanas. Las
+métricas integradas de esta página evitan deliberadamente el detector
+exponencial: $L_{eq}$ y SEL no tienen constante de tiempo, y las balísticas
+Fast/Slow solo entran por los niveles percentiles, definidos sobre la traza
+de nivel con ponderación temporal (ver
+[Ponderación temporal](/phonometry/es/guides/time-weighting/)). Y todo lo
+de esta página asume la señal ya en pascales: el factor de sensibilidad que
+la lleva ahí es el asunto de
+[Calibración](/phonometry/es/guides/calibration/).
 
 ## Leq y LAeq
 
@@ -474,7 +528,9 @@ groseramente.
 ```python
 from phonometry import environmental
 
-kt = environmental.assess_tonal_audibility(54.1, 45.2, 430.0).adjustment      # 6 dB
+tonal = environmental.assess_tonal_audibility(54.1, 45.2, 430.0)  # TonalAssessmentResult
+kt = tonal.adjustment                                             # 6 dB
+tonal.plot()   # esta audibilidad sobre la curva de Kt, como en la figura de arriba
 corr = environmental.residual_sound_correction(measured_level=58.0, residual_level=50.0)
 u = environmental.combined_standard_uncertainty([0.59, 0.3, 2.0, 0.40, 0.38])  # 2,18 dB (G.2)
 environmental.expanded_uncertainty(u)                            # 4,36 dB (k = 2)
@@ -568,4 +624,8 @@ responden objetivamente a partir de medias cuadráticas por segmento.
 
 ## Véase también
 
+- [Ponderación temporal](/phonometry/es/guides/time-weighting/): el detector Fast/Slow/Impulse sobre el que se definen los niveles percentiles.
+- [Calibración](/phonometry/es/guides/calibration/): el factor de sensibilidad que convierte unidades digitales en los pascales que todo nivel de esta página asume.
+- [Exposición laboral (ISO 9612)](/phonometry/es/guides/occupational-exposure/): las estrategias de medición en el puesto de trabajo que alimentan las medidas de dosis.
+- [Multicanal y rendimiento](/phonometry/es/guides/multichannel/): niveles por canal y cómo combinarlos energéticamente.
 - Referencia de la API: [`metrology.levels`](/phonometry/es/reference/api/levels/levels/), [`environmental.measurement`](/phonometry/es/reference/api/environment/measurement/) y [`environmental.rating`](/phonometry/es/reference/api/environment/rating/).

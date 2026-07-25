@@ -2,7 +2,44 @@
 
 # Integrated and Statistical Levels
 
-Environmental noise metrics computed directly from the raw (calibrated) signal.
+A noise measurement rarely ends with a waveform: it ends with a handful of
+single numbers that a limit, a regulation or a report can be checked
+against. This page is that reduction chain, computed directly from the
+calibrated signal in pascals rather than from meter readouts: the
+equivalent continuous level $L_{eq}$/$L_{Aeq}$, the percentile levels
+$L_N$, the event and peak measures ($L_{AE}$/SEL, $L_{Cpeak}$), the noise
+dose of IEC 61252 and the whole-day descriptors $L_{den}$/$L_{dn}$ with
+the ISO 1996-1 rating levels. Working from the signal means each
+definition (an integral, a percentile, an energy sum) is applied exactly,
+with no detector or display approximation in between.
+
+Which descriptor fits which question follows the ISO 1996-1 quantity
+families (BS 7445-1 is the survey-practice guide to the same choice, and
+Bies, Hansen & Howard 2017, §2.5 surveys them side by side):
+
+- **Accumulated exposure over an interval**: $L_{eq}$/$L_{Aeq}$, the
+  energy mean. It answers "how much sound arrived in total", regardless of
+  how it was distributed in time.
+- **How the fluctuating level was distributed**: the percentiles $L_N$:
+  $L_{90}$ as the background level, $L_{10}$ as the intrusive traffic
+  indicator, $L_{50}$ as the median. Two signals with the same $L_{Aeq}$
+  can have very different $L_{10} - L_{90}$ spreads.
+- **Single events of different durations, compared fairly**: SEL, the
+  event's whole energy normalized to one second.
+- **Hearing-risk screening**: $L_{Cpeak}$ and the dose measures, which
+  feed the occupational workflow of
+  [Occupational Noise Exposure](occupational-exposure.md).
+- **Long-term community annoyance**: $L_{den}$/$L_{dn}$ and the ISO
+  1996-1 rating levels, which weight evening and night energy before
+  averaging the day.
+
+Two boundaries with the sibling pages are worth keeping sharp. The
+integrated metrics here deliberately bypass the exponential detector:
+$L_{eq}$ and SEL have no time constant, and Fast/Slow ballistics enter
+only through the percentile levels, which are defined on the time-weighted
+level track (see [Time Weighting](time-weighting.md)). And everything on
+this page assumes the signal is already in pascals: the sensitivity factor
+that gets it there is the subject of [Calibration](calibration.md).
 
 ## Leq and LAeq
 
@@ -433,7 +470,9 @@ spread beyond 3 dB, where the substitute grossly inflates.
 from phonometry import environmental
 
 # Tonal adjustment for a prominent tone:
-kt = environmental.assess_tonal_audibility(54.1, 45.2, 430.0).adjustment      # 6 dB
+tonal = environmental.assess_tonal_audibility(54.1, 45.2, 430.0)  # TonalAssessmentResult
+kt = tonal.adjustment                                             # 6 dB
+tonal.plot()   # this audibility on the Kt curve, as in the figure above
 
 # Subtract residual (background) noise from a measured level:
 corr = environmental.residual_sound_correction(measured_level=58.0, residual_level=50.0)
@@ -535,6 +574,18 @@ and the ISO 226 equal-loudness contours live with the perception metrics in
   [Publisher page](https://www.wiley.com/en-us/Fundamentals+of+Acoustics%2C+4th+Edition-p-9780471847892).
   The sound-pressure, energy and level definitions underneath Leq, SEL and
   the dose measures.
+- British Standards Institution. (2003). *Description and measurement of
+  environmental noise — Guide to quantities and procedures* (BS 7445-1:2003).
+  [BSI Knowledge](https://knowledge.bsigroup.com/products/description-and-measurement-of-environmental-noise-guide-to-quantities-and-procedures).
+  The survey-practice companion of ISO 1996-1: which descriptor family fits
+  which assessment question (BS 7445-2:1991 covers the land-use data
+  acquisition).
+- Bies, D. A., Hansen, C. H., & Howard, C. Q. (2017). *Engineering noise
+  control* (5th ed.). CRC Press.
+  [doi:10.1201/9781351228152](https://doi.org/10.1201/9781351228152).
+  Section 2.5 (the noise measures: Leq, Ldn, L10/L90 and their intended
+  uses) and Section 2.15 (environmental noise surveys). ISBN
+  978-1-4987-2405-0.
 
 ## Standards
 
