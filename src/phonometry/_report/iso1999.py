@@ -171,7 +171,8 @@ def _nipts_table(
 ) -> Any:
     """The per-audiometric-frequency NIPTS table (median and fractile value)."""
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph
+
+    from ._layout import fiche_paragraph as Paragraph
 
     header_style, label_style, value_style = analysis_cell_styles("iso1999n")
 
@@ -270,7 +271,9 @@ def render_nipts_report(
     try:
         from reportlab.lib import colors
         from reportlab.lib.units import mm
-        from reportlab.platypus import Paragraph, Spacer
+        from reportlab.platypus import Spacer
+
+        from ._layout import fiche_paragraph as Paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -340,7 +343,8 @@ def _htlan_table(
 ) -> Any:
     """The per-audiometric-frequency HTLAN table (age, noise and combined)."""
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph
+
+    from ._layout import fiche_paragraph as Paragraph
 
     header_style, label_style, value_style = analysis_cell_styles("iso1999h")
 
@@ -438,7 +442,9 @@ def render_htlan_report(
     try:
         from reportlab.lib import colors
         from reportlab.lib.units import mm
-        from reportlab.platypus import Paragraph, Spacer
+        from reportlab.platypus import Spacer
+
+        from ._layout import fiche_paragraph as Paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -543,9 +549,9 @@ def _prediction_notes(
     """
     from reportlab.lib import colors
     from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
-    from reportlab.platypus import Paragraph
 
     from ._layout import _MUTED_HEX
+    from ._layout import fiche_paragraph as Paragraph
 
     note_style = ParagraphStyle(
         "iso1999_notes", parent=getSampleStyleSheet()["Normal"],

@@ -174,7 +174,8 @@ def _target_line(requirement: float, styles: Any, language: str) -> list[Any]:
     """
     from reportlab.lib import colors
     from reportlab.lib.styles import ParagraphStyle
-    from reportlab.platypus import Paragraph
+
+    from ._layout import fiche_paragraph as Paragraph
 
     style = ParagraphStyle(
         "reverb_target", parent=styles["Normal"], fontSize=9.5, leading=13,
@@ -237,7 +238,8 @@ def _header_grid(
 def _models_table(result: ReverberationModelResult, language: str) -> Any:
     """Build the per-band table with one reverberation-time column per model."""
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph
+
+    from ._layout import fiche_paragraph as Paragraph
 
     head = _band_header_style()
     header = [Paragraph(t("f [Hz]", language), head)]
@@ -307,7 +309,9 @@ def render_reverberation_models_report(
     del verbose  # every model column is always shown; kept for signature parity
     try:
         from reportlab.lib import colors
-        from reportlab.platypus import Paragraph, Spacer
+        from reportlab.platypus import Spacer
+
+        from ._layout import fiche_paragraph as Paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -390,7 +394,8 @@ def render_reverberation_models_report(
 def _enclosed_table(result: ReverberationResult, language: str) -> Any:
     """Build the per-band ``f | A | T`` table of the enclosed-space fiche."""
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph
+
+    from ._layout import fiche_paragraph as Paragraph
 
     head = _band_header_style()
     header = [
@@ -466,7 +471,9 @@ def render_enclosed_space_report(
     del verbose  # A and T are always shown; kept for signature parity
     try:
         from reportlab.lib import colors
-        from reportlab.platypus import Paragraph, Spacer
+        from reportlab.platypus import Spacer
+
+        from ._layout import fiche_paragraph as Paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)

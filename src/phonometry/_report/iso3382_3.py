@@ -219,7 +219,9 @@ def render_iso3382_3_report(
     try:
         from reportlab.lib import colors
         from reportlab.lib.units import mm
-        from reportlab.platypus import Paragraph, Spacer
+        from reportlab.platypus import Spacer
+
+        from ._layout import fiche_paragraph as Paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)

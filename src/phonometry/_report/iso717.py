@@ -250,7 +250,8 @@ def _value_table(
     Called only after :func:`render_iso717_report` has imported reportlab.
     """
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph
+
+    from ._layout import fiche_paragraph as Paragraph
 
     head_style = band_table_header_style()
 
@@ -413,7 +414,9 @@ def render_iso717_report(
     try:
         from reportlab.lib import colors
         from reportlab.lib.units import mm
-        from reportlab.platypus import Paragraph, Spacer
+        from reportlab.platypus import Spacer
+
+        from ._layout import fiche_paragraph as Paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)

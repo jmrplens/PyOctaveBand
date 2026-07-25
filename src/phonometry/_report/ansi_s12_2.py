@@ -144,7 +144,9 @@ def _value_table(
     imported reportlab.
     """
     from reportlab.lib import colors
-    from reportlab.platypus import Paragraph, Table, TableStyle
+    from reportlab.platypus import Table, TableStyle
+
+    from ._layout import fiche_paragraph as Paragraph
 
     accent = colors.HexColor(_ACCENT_HEX)
     light = colors.HexColor(_LIGHT_HEX)
@@ -216,7 +218,7 @@ def _assemble_left(
     language: str,
 ) -> tuple[list[Any], list[Any]]:
     """Wrap the caption and value table into a two-panel left cell."""
-    from reportlab.platypus import Paragraph
+    from ._layout import fiche_paragraph as Paragraph
 
     caption = t("Octave-band sound pressure levels", language)
     left_cell = [
@@ -451,7 +453,9 @@ def _render_room_noise(
     try:
         from reportlab.lib import colors
         from reportlab.lib.units import mm
-        from reportlab.platypus import Paragraph, Spacer
+        from reportlab.platypus import Spacer
+
+        from ._layout import fiche_paragraph as Paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)

@@ -163,7 +163,8 @@ def _value_table(
     Called only after the renderer has imported reportlab.
     """
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph
+
+    from ._layout import fiche_paragraph as Paragraph
 
     head_style = band_table_header_style()
     freqs = np.asarray(result.frequencies, dtype=np.float64)
@@ -260,7 +261,8 @@ def _body(
     Called only after the renderer has imported reportlab.
     """
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph
+
+    from ._layout import fiche_paragraph as Paragraph
 
     ln_r = _reference_floor_with_covering(result) if verbose else None
     caption = t(
@@ -329,7 +331,9 @@ def render_iso16251_report(
     try:
         from reportlab.lib import colors
         from reportlab.lib.styles import ParagraphStyle
-        from reportlab.platypus import Paragraph, Spacer
+        from reportlab.platypus import Spacer
+
+        from ._layout import fiche_paragraph as Paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)

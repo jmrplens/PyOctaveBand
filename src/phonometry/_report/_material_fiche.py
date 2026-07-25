@@ -126,7 +126,9 @@ def render_material_fiche(
     try:
         from reportlab.lib import colors
         from reportlab.lib.units import mm
-        from reportlab.platypus import Paragraph, Spacer
+        from reportlab.platypus import Spacer
+
+        from ._layout import fiche_paragraph as Paragraph
     except ImportError as exc:
         from ._layout import _REPORTLAB_HINT
 

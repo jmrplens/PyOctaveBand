@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- `.report()` fiches: consecutive lines of wrapped prose no longer collide
+  vertically when the text carries `<sub>`/`<super>` markup (e.g. the
+  EN 12354-5 formula strip, where the subscripts of `L_n,s,ij` overprinted
+  the next line). reportlab shifts a script by half the font size but spaces
+  lines by the style's fixed leading alone (its `autoLeading` modes ignore
+  the script rise), so every fiche paragraph is now built through a shared
+  factory that moderates the shift to the typographic quarter-em, which fits
+  inside the fixed leading of every fiche style; the committed example fiches
+  are regenerated accordingly.
 - Restore the `phonometry._plotting` compatibility re-exports that were lost
   during the lint modernization: the module is again a silent re-export of
   every plot renderer moved to `phonometry._plot` (kept for one deprecation

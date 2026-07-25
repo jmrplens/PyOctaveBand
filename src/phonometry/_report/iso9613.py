@@ -188,7 +188,8 @@ def _attenuation_table(
     ``L_A``, whose energy sum is the boxed ``LAT(DW)``.
     """
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph
+
+    from ._layout import fiche_paragraph as Paragraph
 
     header_style, _, value_style = analysis_cell_styles("iso9613atten")
     freqs = np.asarray(result.frequencies, dtype=np.float64)
@@ -339,7 +340,9 @@ def render_outdoor_attenuation_report(
     try:
         from reportlab.lib import colors
         from reportlab.lib.units import mm
-        from reportlab.platypus import Paragraph, Spacer
+        from reportlab.platypus import Spacer
+
+        from ._layout import fiche_paragraph as Paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -483,7 +486,8 @@ def _barrier_table(
 ) -> Any:
     """The per-band barrier insertion-loss table (``IL`` and, verbose, ``N``)."""
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph
+
+    from ._layout import fiche_paragraph as Paragraph
 
     header_style, _, value_style = analysis_cell_styles("iso9613bar")
     freqs = np.asarray(result.frequencies, dtype=np.float64)
@@ -556,7 +560,9 @@ def render_barrier_insertion_loss_report(
     try:
         from reportlab.lib import colors
         from reportlab.lib.units import mm
-        from reportlab.platypus import Paragraph, Spacer
+        from reportlab.platypus import Spacer
+
+        from ._layout import fiche_paragraph as Paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)

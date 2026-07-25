@@ -158,7 +158,8 @@ def _key_quantity_table(
     """
     from reportlab.lib import colors
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph
+
+    from ._layout import fiche_paragraph as Paragraph
 
     header_style, label_style, value_style = analysis_cell_styles("iso1996tone")
 
@@ -301,7 +302,9 @@ def render_tone_audibility_report(
     try:
         from reportlab.lib import colors
         from reportlab.lib.units import mm
-        from reportlab.platypus import Paragraph, Spacer
+        from reportlab.platypus import Spacer
+
+        from ._layout import fiche_paragraph as Paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
