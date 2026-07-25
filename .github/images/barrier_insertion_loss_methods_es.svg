@@ -738,7 +738,7 @@ L 71.033594 81.808828
 " style="fill: none; stroke-dasharray: 1,1.65; stroke-dashoffset: 0; stroke: #000000; stroke-opacity: 0.7"/>
     </g>
     <g id="text_20">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="78.233594" y="84.958828" transform="rotate(-0 78.233594 84.958828)">Límite rasante (5 dB)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="78.233594" y="84.958828" transform="rotate(-0 78.233594 84.958828)">Límite rasante de Kurze-Anderson (5 dB)</text>
     </g>
    </g>
   </g>

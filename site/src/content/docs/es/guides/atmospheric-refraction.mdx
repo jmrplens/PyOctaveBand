@@ -220,6 +220,7 @@ from phonometry import (
     atmospheric_parabolic_equation,
     linear_sound_speed_profile,
     log_linear_sound_speed_profile,
+    shadow_zone_distance,
 )
 
 casos = [
@@ -235,6 +236,12 @@ with warnings.catch_warnings():
                                             flow_resistivity=200e3,
                                             max_range=600.0, max_height=40.0)
         ax.plot(pe.ranges, pe.level_at_height(2.0), label=etiqueta)
+# El límite en forma cerrada del gradiente lineal equivalente hacia arriba
+# (su media a 10 m), la línea punteada de la figura.
+subida = casos[2][0]
+grad = float(subida.speed_at(10.0) - 340.0) / 10.0
+ax.axvline(shadow_zone_distance(grad, 2.0, 2.0, ground_speed=340.0),
+           color="k", ls=":", label="Límite de la zona de sombra")
 ax.set(xlabel="Distancia [m]", ylabel="Nivel respecto al campo libre [dB]",
        ylim=(-40, 10))
 ax.legend()

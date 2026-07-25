@@ -252,6 +252,7 @@ from phonometry import (
     atmospheric_parabolic_equation,
     linear_sound_speed_profile,
     log_linear_sound_speed_profile,
+    shadow_zone_distance,
 )
 
 cases = [
@@ -267,6 +268,12 @@ with warnings.catch_warnings():
                                             flow_resistivity=200e3,
                                             max_range=600.0, max_height=40.0)
         ax.plot(pe.ranges, pe.level_at_height(2.0), label=label)
+# The closed-form boundary of the equivalent linear upward gradient (its
+# 10 m mean), the dotted line of the figure.
+up = cases[2][0]
+grad = float(up.speed_at(10.0) - 340.0) / 10.0
+ax.axvline(shadow_zone_distance(grad, 2.0, 2.0, ground_speed=340.0),
+           color="k", ls=":", label="Shadow-zone boundary")
 ax.set(xlabel="Range [m]", ylabel="Level re free field [dB]", ylim=(-40, 10))
 ax.legend()
 plt.show()

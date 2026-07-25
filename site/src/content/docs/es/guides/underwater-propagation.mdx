@@ -603,8 +603,8 @@ cap. 1):
 | Solver | Régimen natural | Qué aporta |
 |---|---|---|
 | `ray_trace` | Alta frecuencia (profundidad ≫ λ), océano profundo | Geometría de eigenrayos, tiempos de propagación, zonas de convergencia; coste independiente de la frecuencia |
-| `normal_modes` | Baja frecuencia, aguas someras, independiente de la distancia | Suma modal exacta con pocos modos propagantes ($m < kD/\pi$); la solución de referencia en su régimen |
-| `parabolic_equation` | Baja frecuencia, caminos largos de un solo sentido | TL($z$,$r$) de campo completo con refracción; marcha perfiles arbitrarios en distancia |
+| `normal_modes` | Baja frecuencia, aguas someras, independiente de la distancia | Suma modal por diferencias finitas con pocos modos propagantes ($m < kD/\pi$); la solución de referencia en su régimen, validada frente a los modos exactos de la guía de ondas ideal |
+| `parabolic_equation` | Baja frecuencia, caminos largos de un solo sentido | TL($z$,$r$) de campo completo con refracción, marchada en distancia sobre el $c(z)$ independiente de la distancia que asumen los tres solvers |
 
 En la práctica las fronteras se difuminan: los rayos siguen siendo útiles a
 frecuencias sorprendentemente bajas para trabajo de tiempos de propagación, y

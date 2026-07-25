@@ -1316,7 +1316,8 @@ _ES_EXACT = {
     "Exact rigid half-plane": "Semiplano rígido exacto",
     "Exact + coherent ground (four paths)":
         "Exacto + suelo coherente (cuatro caminos)",
-    "Grazing limit (5 dB)": "Límite rasante (5 dB)",
+    "Kurze-Anderson grazing limit (5 dB)":
+        "Límite rasante de Kurze-Anderson (5 dB)",
     "Insertion loss [dB]": "Pérdida por inserción [dB]",
 }
 
@@ -10313,7 +10314,7 @@ def generate_barrier_insertion_loss_methods(output_dir: str) -> None:
     ax.plot(freqs, il_gr.insertion_loss, color=COLOR_SECONDARY, lw=1.4,
             alpha=0.9, label="Exact + coherent ground (four paths)", zorder=2)
     ax.axhline(5.0, color=COLOR_FG, ls=":", lw=1.0, alpha=0.7,
-               label="Grazing limit (5 dB)")
+               label="Kurze-Anderson grazing limit (5 dB)")
     ax.set_xscale("log")
     ax.set_xlabel("Frequency [Hz]")
     ax.set_ylabel("Insertion loss [dB]")

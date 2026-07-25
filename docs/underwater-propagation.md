@@ -515,8 +515,8 @@ and boundaries decide the answer, pick the solver by frequency and geometry
 | Solver | Natural regime | What it buys you |
 |---|---|---|
 | `ray_trace` | High frequency (water depth ≫ λ), deep water | Eigenray geometry, travel times, convergence zones; cost independent of frequency |
-| `normal_modes` | Low frequency, shallow water, range-independent | Exact modal sum with few propagating modes (`m < kD/π`); the reference solution for its regime |
-| `parabolic_equation` | Low frequency, long one-way paths | Full-field TL(z, r) with refraction; marches arbitrary profiles in range |
+| `normal_modes` | Low frequency, shallow water, range-independent | Finite-difference modal sum with few propagating modes (`m < kD/π`); the reference solution for its regime, validated against the ideal waveguide's exact modes |
+| `parabolic_equation` | Low frequency, long one-way paths | Full-field TL(z, r) with refraction, marched in range over the range-independent `c(z)` all three solvers assume |
 
 The boundaries blur in practice: rays remain usable at surprisingly low
 frequencies for travel-time work, and the PE remains the workhorse well above
