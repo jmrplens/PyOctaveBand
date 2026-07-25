@@ -45,7 +45,7 @@ absorción.
 - [Predicción del tiempo de reverberación (Sabine, Arau)](/phonometry/es/guides/reverberation-prediction/):
   los modelos de Sabine, Eyring, Millington-Sette, Fitzroy y Arau-Puchades
   con el término de absorción del aire.
-- [Absorción sonora en recintos (EN 12354-6)](/phonometry/es/guides/enclosed-space-absorption/):
+- [Absorción acústica en recintos (EN 12354-6)](/phonometry/es/guides/enclosed-space-absorption/):
   la predicción normativa del área de absorción equivalente total y el tiempo
   de reverberación de una sala.
 

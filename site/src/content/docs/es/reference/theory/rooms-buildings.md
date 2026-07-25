@@ -215,7 +215,7 @@ ISO 717-2 se reproducen exactamente (tercios $L_{n,w} = 79$, $C_I = -11$;
 octavas $54$, $0$), mediante la misma búsqueda de desplazamiento monótono que
 ISO 717-1 ejecutada sobre las curvas negadas.
 
-La absorción sonora (ISO 354) mide el área de absorción equivalente a partir de
+La absorción acústica (ISO 354) mide el área de absorción equivalente a partir de
 la relación de Sabine aplicada a una cámara reverberante vacía y con la muestra:
 $A = 55{,}3\ V/(c\ T) - 4 V m$ (el término $4 V m$ es la absorción del aire, $m$ el
 coeficiente de atenuación en potencia en 1/m), de modo que el área de la muestra
@@ -292,7 +292,7 @@ Anexo E.3 de EN 12354-2 ($L'_{n,w} = 45$ dB) se reproducen exactamente; se
 declara que el modelo simplificado tiene una desviación típica de unos 2 dB
 (Cláusula 5).
 
-### Absorción sonora en recintos (EN 12354-6)
+### Absorción acústica en recintos (EN 12354-6)
 
 EN 12354-6:2003 predice el área de absorción equivalente de un recinto a
 partir de sus partes (el modelo normativo de la Cláusula 4). El total
@@ -321,7 +321,7 @@ reproducen: la sala desnuda de 29,75 m³ da $A = 2{,}26$ m² y $T = 2{,}1$ s a
 baja $T$ a 0,9 s. El método informativo del Anexo D para espacios irregulares
 y absorción distribuida de forma no uniforme queda fuera de alcance.
 
-Consulta la [guía de absorción sonora en recintos](/phonometry/es/guides/enclosed-space-absorption/) para su uso.
+Consulta la [guía de absorción acústica en recintos](/phonometry/es/guides/enclosed-space-absorption/) para su uso.
 
 ### Incertidumbre de medición (ISO 12999-1)
 

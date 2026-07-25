@@ -203,7 +203,7 @@ que las guías incorporan sus secciones de Referencias.
   los parámetros perceptivos de sala.
   Citado por [Acústica de salas](/phonometry/es/guides/room-acoustics/),
   [Predicción del tiempo de reverberación](/phonometry/es/guides/reverberation-prediction/) y
-  [Absorción sonora en recintos](/phonometry/es/guides/enclosed-space-absorption/).
+  [Absorción acústica en recintos](/phonometry/es/guides/enclosed-space-absorption/).
 - Sabine, W. C. (1922). *Collected papers on acoustics*. Harvard University
   Press.
   [Escaneo libre en Internet Archive](https://archive.org/details/collectedpaperso00sabi).
@@ -307,14 +307,14 @@ que las guías incorporan sus secciones de Referencias.
   La medición de absorción en cámara reverberante que sustenta los datos de
   superficie.
   Citado por [Acústica de salas](/phonometry/es/guides/room-acoustics/) y
-  [Absorción sonora en recintos](/phonometry/es/guides/enclosed-space-absorption/).
+  [Absorción acústica en recintos](/phonometry/es/guides/enclosed-space-absorption/).
 - European Committee for Standardization. (2003). *Building acoustics —
   Estimation of acoustic performance of buildings from the performance of
   elements — Part 6: Sound absorption in enclosed spaces*
   (EN 12354-6:2003).
   [Ficha en BSI Knowledge (BS EN 12354-6:2003)](https://knowledge.bsigroup.com/products/building-acoustics-estimation-of-acoustic-performance-of-buildings-from-the-performance-of-elements-sound-absorption-in-enclosed-spaces).
   El miembro de absorción de la familia de predicción EN 12354.
-  Citado por [Absorción sonora en recintos](/phonometry/es/guides/enclosed-space-absorption/).
+  Citado por [Absorción acústica en recintos](/phonometry/es/guides/enclosed-space-absorption/).
 - Acoustical Society of America. (2019). *Criteria for evaluating room
   noise* (ANSI/ASA S12.2-2019).
   [Tienda ANSI](https://webstore.ansi.org/standards/asa/ansiasas122019).

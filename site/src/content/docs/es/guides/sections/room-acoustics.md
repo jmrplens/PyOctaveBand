@@ -24,7 +24,7 @@ La predicción recibe dos páginas porque conviven dos tradiciones.
 cubre las fórmulas estadísticas clásicas (Sabine, Eyring, Millington-Sette,
 Fitzroy y Arau-Puchades), incluidos los modelos que manejan una distribución
 de absorción no uniforme.
-[Absorción sonora en recintos (EN 12354-6)](/phonometry/es/guides/enclosed-space-absorption/)
+[Absorción acústica en recintos (EN 12354-6)](/phonometry/es/guides/enclosed-space-absorption/)
 cubre la versión normativa europea de la misma física: el área de absorción
 equivalente total ensamblada desde superficies, objetos y aire, y el tiempo
 de reverberación que se sigue de ella, como norma citable en un informe de
@@ -56,6 +56,6 @@ inteligibilidad del habla que ofrece una sala la cuantifica el
   las valoraciones NC por tangencia y RC Mark II de ANSI/ASA S12.2-2019.
 - [Predicción del tiempo de reverberación (Sabine, Arau)](/phonometry/es/guides/reverberation-prediction/):
   los cinco modelos estadísticos con el término de absorción del aire.
-- [Absorción sonora en recintos (EN 12354-6)](/phonometry/es/guides/enclosed-space-absorption/):
+- [Absorción acústica en recintos (EN 12354-6)](/phonometry/es/guides/enclosed-space-absorption/):
   la predicción normativa del área de absorción equivalente y el tiempo de
   reverberación.

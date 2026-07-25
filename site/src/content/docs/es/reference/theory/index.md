@@ -15,7 +15,7 @@ La referencia de teoría explica las normas, las matemáticas y las decisiones d
 - [Integración temporal](/phonometry/es/reference/theory/signal-analysis/#integración-temporal)
 - [Ponderación G (ISO 7196)](/phonometry/es/reference/theory/signal-analysis/#ponderación-g-iso-7196)
 - [Métricas de evento y de dosis](/phonometry/es/reference/theory/signal-analysis/#métricas-de-evento-y-de-dosis)
-- [Intensidad acústica (IEC 61043)](/phonometry/es/reference/theory/signal-analysis/#intensidad-acustica-iec-61043)
+- [Intensidad acústica (IEC 61043)](/phonometry/es/reference/theory/signal-analysis/#intensidad-acústica-iec-61043)
 - [Incertidumbre de medida (ISO/IEC Guide 98-3: GUM y Suplemento 1)](/phonometry/es/reference/theory/signal-analysis/#incertidumbre-de-medida-isoiec-guide-98-3-gum-y-suplemento-1)
 
 ## [Percepción y audición](/phonometry/es/reference/theory/perception/)

@@ -183,7 +183,7 @@ Consulta la [guía de dispersión superficial](/phonometry/es/guides/surface-sca
 
 ## Caracterización de materiales acústicos (ISO 11654, ISO 9053-1/2, ISO 10534-1/2, ASTM E2611)
 
-### Absorción sonora ponderada (ISO 11654)
+### Absorción acústica ponderada (ISO 11654)
 
 ISO 11654:1997 condensa una curva de absorción en tercios de octava de ISO 354
 en un solo número. El coeficiente práctico $\alpha_p$ promedia los tres
