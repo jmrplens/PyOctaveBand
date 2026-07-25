@@ -637,6 +637,58 @@ plt.show()
 
 </details>
 
+### ISO 10534-2 report (`.report()`)
+
+`ImpedanceTubeResult.report(path)` renders a one-page PDF fiche laid out like an
+accredited normal-incidence impedance-tube test report (ISO 10534-2:2001): a
+standard-basis line, a metadata header block, the per-frequency table (the
+absorption coefficient $\alpha$ and the real and imaginary parts of the
+normalised surface impedance $z = Z/\rho c_0$) beside the $\alpha(f)$ curve (the
+result's own `.plot()`, on a continuous logarithmic frequency axis), a boxed
+characterisation headline and a footer with the fixed disclaimer. ISO 10534-2 is
+a characterisation, so the fiche carries no pass/fail verdict and no
+single-number rating; the normal-incidence coefficient is not comparable to the
+random-incidence $\alpha_s$/$\alpha_w$ of ISO 354 / ISO 11654. Setting
+`verbose=True` inserts the reflection-factor magnitude $|r|$ column.
+
+It uses the same `ReportMetadata` container and rendering engine as the other
+fiches. The measured frequency range is taken from the result; the applicable
+descriptive and geometric `ReportMetadata` fields are `client`, `manufacturer`,
+`specimen`, `tube_diameter`, `mic_spacing`, `mounting`, `test_room`,
+`test_date`, `temperature`, `pressure`, `measurement_standard`, `laboratory`,
+`operator`, `report_id` and `notes` (`tube_diameter` and `mic_spacing` are given
+in metres and printed in millimetres). The `requirement` field is ignored
+(ISO 10534-2 has no verdict). Rendering needs reportlab
+(`pip install phonometry[report]`); only `engine="reportlab"` is supported. Pass
+`language="es"` for a Spanish fiche (translated fixed strings and a comma
+decimal separator).
+
+```python
+from phonometry import materials, ReportMetadata
+
+result = materials.two_microphone_impedance(
+    h12, frequency=freqs, spacing=0.05, x1=0.10,
+    speed_of_sound=c0, characteristic_impedance=rho_c, diameter=0.10,
+)
+result.report(
+    "alpha_fiche.pdf",
+    metadata=ReportMetadata(
+        specimen="Resistive facing over an 86 mm rigidly-backed air cavity",
+        tube_diameter=0.10,            # m (printed as 100 mm)
+        mic_spacing=0.05,              # m (printed as 50 mm)
+        measurement_standard="ISO 10534-2",
+        laboratory="Phonometry Reference Laboratory",
+    ),
+)                       # normal-incidence alpha and impedance over the tube band
+```
+
+The example fiche, regenerated with `make reports`, is kept rendered in the
+repository. Click the preview to open the PDF:
+
+[![ISO 10534-2 impedance-tube example report: a metadata header with the tube diameter, microphone spacing and measured frequency range, the per-frequency table of the absorption coefficient alpha and the real and imaginary parts of the normalised surface impedance z beside the alpha curve on a logarithmic frequency axis, and the boxed characterisation headline](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10534_impedance_tube_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10534_impedance_tube_example.pdf)
+
+*Normal-incidence impedance-tube fiche (`ImpedanceTubeResult.report`), the $\alpha$ spectrum with the surface impedance.*
+
 **Transmission loss (ASTM E2611).** With four microphones (two upstream, two
 downstream of the sample) a two-load (or one-load) measurement recovers the
 sample's transfer matrix, whose entries give the normal-incidence transmission

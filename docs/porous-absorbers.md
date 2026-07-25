@@ -401,6 +401,37 @@ res.plot()   # alpha(f) with |R| overlaid; peak = 1 at 300 Hz
 coupled design reaches $\alpha = 1$ at 300 Hz in a panel only $\lambda/38$
 deep; detuning the slit height drops the peak below one.*
 
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import (
+    HelmholtzResonator, critical_coupling_design, slit_helmholtz_absorber,
+)
+
+a, d, f0 = 3.0e-2, 5.0e-2, 300.0
+base = HelmholtzResonator(1.0e-3, 3.0e-3, 30.0e-3, 27.0e-3)
+design = critical_coupling_design(f0, base, lattice_step=a, period=d)
+h0 = design.slit_height
+
+f = np.linspace(150.0, 500.0, 700)
+fig, ax = plt.subplots()
+for factor, label in [(1.0, "critically coupled"),
+                      (0.6, "narrow slit"), (1.7, "wide slit")]:
+    res = slit_helmholtz_absorber(
+        f, design.resonator, slit_height=factor * h0,
+        lattice_step=a, period=d,
+    )
+    ax.plot(f, res.absorption, label=label)
+ax.set(xlabel="Frequency [Hz]", ylabel="Absorption coefficient")
+ax.legend()
+plt.show()
+```
+
+</details>
+
 ## Practical notes
 
 **Fit ranges.** Delany–Bazley warns (and extrapolates) outside

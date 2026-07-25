@@ -5756,6 +5756,38 @@ print(np.round(np.sum(res.ir ** 2, axis=1), 4))      # more absorption -> less e
 
 ![Image-source reflectogram: the synthetic room impulse response of a 7x5x3 m room as a cloud of reflections coloured by reflection order, decaying under the 1/r spreading envelope with the direct sound marked at order 0](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/image_source_reflectogram.webp)
 
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import room
+
+res = room.image_source_rir((7.0, 5.0, 3.0), (2.0, 1.6, 1.5),
+                            (5.2, 3.4, 1.7), 0.12, fs=48000, max_order=10)
+
+# One line: the reflectogram (level in dB re direct vs arrival time, by order).
+res.plot()
+plt.show()
+
+# By hand: scatter the reflection amplitudes coloured by order.
+t_ms = np.asarray(res.times) * 1e3
+amp = np.asarray(res.amplitudes)
+level = 20 * np.log10(np.abs(amp) / np.max(np.abs(amp)))
+order = np.asarray(res.orders)
+fig, ax = plt.subplots()
+sc = ax.scatter(t_ms[order > 0], level[order > 0], c=order[order > 0],
+                cmap="viridis", s=18)
+ax.stem([t_ms[order == 0][0]], [0.0])         # direct sound
+fig.colorbar(sc, label="Reflection order")
+ax.set_xlabel("Arrival time [ms]"); ax.set_ylabel("Level re direct [dB]")
+ax.set_xlim(0, 120); ax.set_ylim(-60, 5)
+plt.show()
+```
+
+</details>
+
 **Reproducing the statistical decay.** The fitted initial decay slope of the
 reverberant energy density of the synthetic RIR recovers the **Eyring**
 reverberation time `T = −24 V ln 10 / (c S ln(1 − ᾱ))` (Kuttruff Equation
