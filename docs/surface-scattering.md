@@ -189,43 +189,43 @@ a collimated specular beam (d = 0.32) into a wide fan (d = 0.63).
 
 [Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_diffusion.webm)
 
-The single-plane response below is a real physical field: an in-house COMSOL
-finite-element free-field simulation of an N = 7 quadratic-residue diffuser and
-its flat reference panel at 1000 Hz, normal incidence, sampled on the standard
-37-point semicircle (5 deg spacing, -90 to +90 deg) in the plane of maximum
-diffusion, produced by the maintainer (Requena-Plens) and cross-validated
-against an independent MATLAB implementation of ISO 17497-2 Formula (5); the
-same values drive the phonometry conformance suite.
+The single-plane response below is the far-field prediction of a published
+diffuser geometry: an N = 7 quadratic-residue diffuser of 6 periods, 3.6 m
+total width and 0.2 m maximum well depth (the "N = 7 QRD, 6 periods, 0.2 m
+deep" row of Cox & D'Antonio, *Acoustic Absorbers and Diffusers*, 3rd ed.,
+Appendix B; the commercial N = 7 QRD measured by Hargreaves, Cox, Lam &
+D'Antonio, *J. Acoust. Soc. Am.* 108(4), 1710-1720, 2000, Table I) and its
+equal-footprint flat reference panel, at 1000 Hz, normal incidence, on the
+standard 37-point semicircle (5 deg spacing, -90 to +90 deg). The same model
+levels drive the phonometry conformance suite as an arithmetic oracle for
+Formulas (5) and (7); the external third-party anchor checks the model's
+band-averaged normalised diffusion against the published Appendix B BEM table
+in the 200-400 Hz bands (agreement within 0.01; over the full published
+100-5000 Hz range the model-vs-BEM mean absolute deviation is about 0.09,
+because edge diffraction is outside the Fraunhofer model).
 
 ```python
 from phonometry import materials
 
-# Reflected levels L_i (dB) on the 37-point semicircle of an N = 7 QRD.
-levels_qrd = [
-    61.443, 60.511, 55.791, 51.232, 56.85, 59.48, 59.919, 59.14, 58.339,
-    58.366, 58.985, 59.558, 59.611, 59.294, 58.611, 57.655, 56.798, 56.2,
-    55.546, 55.677, 56.044, 56.575, 57.134, 57.315, 56.918, 55.867, 53.531,
-    50.622, 50.659, 54.334, 57.268, 58.66, 57.916, 52.472, 46.71, 58.406,
-    61.443,
-]
-# The flat reference panel on the same arc: a strong specular pair of lobes.
-levels_flat = [
-    73.804, 72.804, 69.83, 63.815, 50.582, 50.868, 54.513, 52.14, 46.395,
-    34.212, 22.254, 24.862, 18.418, 31.312, 34.995, 36.243, 36.561, 36.589,
-    37.443, 37.472, 37.49, 37.28, 36.3, 33.366, 25.005, 19.73, 19.306,
-    33.885, 46.012, 51.814, 54.227, 50.513, 50.823, 63.842, 69.835, 72.802,
-    73.804,
-]
+# The published geometry: N = 7 QRD, 6 periods, 3.6 m wide, 0.2 m deep
+# (Cox & D'Antonio 3rd ed., Appendix B; Hargreaves et al. 2000, Table I).
+# Design frequency 490 Hz puts the deepest well at exactly 0.2 m.
+depths = materials.qrd_well_depths(7, 490.0)   # [0, 0.05, 0.2, 0.1, ...] m
+qrd = materials.predict_diffuser_polar_response(
+    3.6 / 42, 1000.0, depths=depths, periods=6)
+# The flat reference panel: the same 3.6 m footprint with zero-depth wells.
+flat = materials.predict_diffuser_polar_response(
+    3.6 / 42, 1000.0, depths=[0.0] * 7, periods=6)
 
-d = materials.directional_diffusion_coefficient(levels_qrd)    # Formula (5)
-print(round(float(d), 4))            # 0.7572
-d_ref = materials.directional_diffusion_coefficient(levels_flat)
-print(round(float(d_ref), 4))        # 0.1391
+d = materials.directional_diffusion_coefficient(qrd.levels)    # Formula (5)
+print(round(float(d), 4))            # 0.1099
+d_ref = materials.directional_diffusion_coefficient(flat.levels)
+print(round(float(d_ref), 4))        # 0.0049
 
 # Normalise against the flat reference to isolate the diffuser's own effect
 # (Formula (7)): d_n = (d - d_ref) / (1 - d_ref).
 d_n = materials.normalized_diffusion_coefficient(d, d_ref)
-print(round(float(d_n), 4))          # 0.718
+print(round(float(d_n), 4))          # 0.1055
 
 # Random-incidence value: average the band coefficients over source positions,
 # with the standard's 2-D weighting (0 deg -> 1, +/-30/+/-60 deg -> 3).
@@ -242,20 +242,23 @@ polar levels from above:
 import numpy as np
 from phonometry import materials
 
-# levels_qrd: the 37 QRD levels defined in the example above.
+# qrd.levels: the 37 predicted QRD levels from the example above.
 angles = np.arange(-90.0, 90.5, 5.0)
 
-result = materials.directional_diffusion(angles, levels_qrd)
-print(round(result.coefficient, 2))   # 0.76
+result = materials.directional_diffusion(angles, qrd.levels)
+print(round(result.coefficient, 2))   # 0.11
 result.plot()   # polar reflected response, d in the title (needs matplotlib)
 ```
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_polar_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_polar.svg" alt="A polar plot of the reflected sound-pressure level of an N=7 quadratic-residue diffuser over 37 receivers from -90 to 90 degrees, the energy spread across the semicircle in several lobes, giving an autocorrelation diffusion coefficient d of about 0.76" width="72%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_polar_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_polar.svg" alt="A polar plot of the predicted reflected sound-pressure level of a six-period N=7 quadratic-residue diffuser over 37 receivers from -90 to 90 degrees, the energy concentrated in a fan of discrete grating lobes, giving an autocorrelation diffusion coefficient d of about 0.11" width="72%"></picture>
 
-*The QRD spreads the reflected energy across the semicircle into several lobes
-rather than one specular spike, so the autocorrelation diffusion coefficient is
-high ($d \approx 0.76$). The flat reference panel collapses the response into a
-narrow specular pair and drops to $d \approx 0.14$.*
+*The periodic QRD array splits the reflected energy into a fan of discrete
+grating lobes rather than one specular spike, but six repetitions of the same
+period concentrate the energy in those few directions, so the autocorrelation
+diffusion coefficient stays modest ($d \approx 0.11$). The flat reference
+panel collapses into the specular direction alone and drops to
+$d \approx 0.005$; this lobing penalty of periodic arrays is exactly why
+Cox & D'Antonio recommend modulated arrangements.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -265,12 +268,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import materials
 
-# levels_qrd: the 37 reflected levels L_i of the N = 7 QRD from the example
-# above (COMSOL far-field, 1000 Hz, normal incidence), on the -90..90 deg,
-# 5 deg semicircle. The energy spreads into several lobes, so the Formula (5)
-# coefficient d is high.
+# qrd.levels: the 37 predicted levels L_i of the six-period N = 7 QRD from
+# the example above (Fraunhofer far-field model, published Cox & D'Antonio
+# Appendix B geometry, 1000 Hz, normal incidence) on the -90..90 deg, 5 deg
+# semicircle. The periodic array concentrates the energy into grating lobes,
+# so the Formula (5) coefficient d is modest.
 angles = np.arange(-90.0, 90.5, 5.0)
-result = materials.directional_diffusion(angles, levels_qrd)
+result = materials.directional_diffusion(angles, qrd.levels)
 
 # result is the DiffusionResult computed above. One line:
 result.plot()
@@ -543,7 +547,17 @@ print(round(s_min, 3), round(s_max, 3))    # 0.078 0.086  (metres)
   The reference monograph on diffuser theory and design, by the authors
   behind the ISO 17497-2 diffusion-coefficient method: the
   scattering-versus-diffusion distinction, the
-  measurement rigs and the design guidance this page condenses.
+  measurement rigs and the design guidance this page condenses. Appendix B
+  (Normalized diffusion coefficient table, pp. 481-485) is the published BEM
+  anchor for the diffuser-prediction model on this page.
+- Hargreaves, T. J., Cox, T. J., Lam, Y. W., & D'Antonio, P. (2000). Surface
+  diffusion coefficients for room acoustics: Free-field measures of
+  single-plane diffusion. *The Journal of the Acoustical Society of America*,
+  108(4), 1710-1720.
+  [doi:10.1121/1.1310192](https://doi.org/10.1121/1.1310192).
+  The free-field diffusion-coefficient method behind ISO 17497-2; its Table I
+  documents the commercial N = 7 QRD geometry (0.2 m maximum well depth) used
+  in the worked example above.
 - International Organization for Standardization. (2004). *Acoustics —
   Sound-scattering properties of surfaces — Part 1: Measurement of the
   random-incidence scattering coefficient in a reverberation room*
