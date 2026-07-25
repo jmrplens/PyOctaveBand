@@ -100,6 +100,7 @@ x = np.concatenate([tone(-23.0, 10.0), tone(-50.0, 30.0)])
 res = broadcast.program_loudness(np.vstack([x, x]), fs)
 print(round(res.integrated, 1))            # -23.1  LUFS (the tail is gated)
 print(round(res.relative_threshold, 1))    # -39.0  LUFS
+res.plot()   # the loudness trace: the integrated line ignores the tail (needs matplotlib)
 ```
 
 An ungated mean over the same 40 s would sit near −29 LUFS: the gating is
@@ -107,7 +108,50 @@ what makes wide-loudness-range programmes match on air. EBU R 128 normalises
 this integrated value to **−23.0 LUFS**; where the target is not practically
 achievable (live programmes, for example) a tolerance of ±1.0 LU is
 permitted, and quality-control workflows allow ±0.2 LU for measurement
-error.
+error. The figure makes the gate visible on a shaped-noise programme with a
+long quiet tail:
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_gating_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_gating.svg" alt="EBU R 128 metering of 20 seconds of programme on the -23 LUFS target followed by 40 seconds of quiet ambience about 29 LU lower: the momentary and short-term traces step down at 20 seconds, the dashed integrated line stays at -23.0 LUFS because the relative gate drops the tail, and a dash-dotted line marks the ungated mean sinking to -27.7 LUFS" width="96%"></picture>
+
+*The relative gate (10 LU below the survivors) drops every block of the tail,
+so the integrated loudness holds the foreground at −23.0 LUFS while the
+ungated energy mean sinks towards −27.7 LUFS — and would keep sinking with
+every extra minute of ambience. Without the gate, quiet passages would let
+the foreground of a film mix ride far above the target.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal
+from phonometry import broadcast
+
+fs = 48000
+rng = np.random.default_rng(3341)
+sos = signal.butter(2, 2000.0, fs=fs, output="sos")
+chunks = []
+# 20 s of programme material, then 40 s of quiet room ambience ~29 LU lower.
+for level, seconds in [(-23.0, 20.0), (-52.0, 40.0)]:
+    noise = signal.sosfilt(sos, rng.standard_normal(int(seconds * fs)))
+    noise /= np.sqrt(np.mean(noise ** 2))
+    chunks.append(10 ** (level / 20) * noise)
+x = np.concatenate(chunks)
+# Loudness-normalise the programme to the R 128 target, then meter it.
+x *= 10 ** ((-23.0 - broadcast.integrated_loudness(np.vstack([x, x]), fs)) / 20)
+res = broadcast.program_loudness(np.vstack([x, x]), fs)
+
+ax = res.plot()
+finite = res.momentary[np.isfinite(res.momentary)]
+ungated = 10 * np.log10(np.mean(10 ** (finite / 10)))
+ax.axhline(ungated, ls="-.", color="#2ca02c",
+           label=f"Ungated mean {ungated:.1f} LUFS")
+ax.legend(loc="center right")
+plt.show()
+```
+
+</details>
 
 ## 3. EBU Mode: momentary, short-term, integrated
 
@@ -134,6 +178,7 @@ x = np.concatenate([tone(-36.0, 10.0), tone(-23.0, 60.0), tone(-36.0, 10.0)])
 res = broadcast.program_loudness(np.vstack([x, x]), fs)
 print(round(res.integrated, 1), round(res.max_momentary, 1),
       round(res.max_short_term, 1))         # -23.0 -23.0 -23.0
+res.plot()   # M/S traces, integrated line and LRA band (needs matplotlib)
 ```
 
 The frozen `ProgramLoudnessResult` carries the M and S series with their
@@ -197,7 +242,38 @@ def tone(level_dbfs, seconds):
 x = np.concatenate([tone(-20.0, 20.0), tone(-30.0, 20.0)])
 res = broadcast.program_loudness(np.vstack([x, x]), fs)
 print(round(res.loudness_range, 1))         # 10.0  LU
+res.plot()   # the shaded LRA band spans the P10-P95 spread (needs matplotlib)
 ```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_range_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_range.svg" alt="EBU R 128 metering of the Tech 3342 reference case of 20 seconds at -20 dBFS followed by 20 seconds at -30 dBFS: the short-term trace steps between two plateaus 10 LU apart, the shaded loudness-range band spans exactly those plateaus for LRA equal to 10.0 LU, and the integrated line sits between them" width="96%"></picture>
+
+*On the Tech 3342 reference case the short-term distribution has two plateaus
+10 LU apart, and the shaded band between the 10th and 95th percentile edges
+reads exactly `LRA = 10.0 LU`; the integrated loudness settles between the
+plateaus. On real programmes the same band tells a dialogue-normalised drama
+(LRA around 10-20 LU) from a compressed commercial (a few LU) at a glance.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import broadcast
+
+fs = 48000
+def tone(level_dbfs, seconds):
+    t = np.arange(int(seconds * fs)) / fs
+    return 10 ** (level_dbfs / 20) * np.sin(2 * np.pi * 1000.0 * t)
+
+# EBU Tech 3342 test case 1: 20 s at -20 dBFS, then 20 s at -30 dBFS.
+x = np.concatenate([tone(-20.0, 20.0), tone(-30.0, 20.0)])
+res = broadcast.program_loudness(np.vstack([x, x]), fs)
+res.plot()   # the LRA band spans exactly the 10 LU between the plateaus
+plt.show()
+```
+
+</details>
 
 `loudness_range()` is also available standalone on any short-term loudness
 vector, following the Tech 3342 reference implementation (including its
