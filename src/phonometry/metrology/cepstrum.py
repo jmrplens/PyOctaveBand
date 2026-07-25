@@ -13,7 +13,10 @@ periodic spectral ripple from harmonics, reflections or echoes concentrates
 at the quefrency of its period. Three variants are standard:
 
 * the **power cepstrum**, the inverse transform of the log *power* spectrum
-  ``ln|X|^2`` (Milner Fig. 21) -- real, even, phase-blind;
+  ``ln|X|^2`` (Milner Fig. 21) -- real, even, phase-blind. (Convention
+  note: Bogert, Healy & Tukey's original 1963 power cepstrum squares once
+  more, ``|IDFT(ln|X|^2)|^2``; this module follows Milner's linear
+  ``IDFT(ln|X|^2)`` throughout.);
 * the **real cepstrum**, the inverse transform of ``ln|X|`` -- exactly half
   the power cepstrum, and the quantity whose causal folding yields the
   minimum-phase reconstruction of :func:`phonometry.minimum_phase`
@@ -397,20 +400,49 @@ def lifter(
     )
 
 
+def _parabolic_offset(
+    magnitude: NDArray[np.float64], peak: int, lo: int, hi: int
+) -> float:
+    """Sub-sample offset of a peak by quadratic (parabolic) interpolation.
+
+    Fits a parabola through ``magnitude`` at ``peak - 1, peak, peak + 1``
+    and returns the vertex offset in ``[-0.5, 0.5]`` samples: the standard
+    three-point refinement of a delay that falls between quefrency bins.
+    Zero when the peak sits at an edge of the searched band or the triple
+    is not concave.
+    """
+    if peak <= lo or peak >= hi:
+        return 0.0
+    y0, y1, y2 = magnitude[peak - 1 : peak + 2]
+    curvature = y0 - 2.0 * y1 + y2
+    if curvature >= 0.0:
+        return 0.0
+    return float(np.clip(0.5 * (y0 - y2) / curvature, -0.5, 0.5))
+
+
 @dataclass(frozen=True)
 class EchoDetectionResult:
     """An echo delay and reflection coefficient read off the power cepstrum.
 
     :ivar quefrencies: Quefrency axis, in seconds.
     :ivar cepstrum: Power cepstrum searched.
-    :ivar delay: Quefrency of the highest cepstral peak in the searched
-        band: the echo delay, in seconds.
-    :ivar delay_samples: The same delay in samples.
-    :ivar reflection_coefficient: Height of the peak. For a single in-record
-        echo ``x(t) = s(t) + a s(t - t0)`` the power cepstrum's first
-        rahmonic height is exactly ``a`` (the ``n = 1`` term of the
-        ``ln(1 + a e^{-j theta})`` series), so the height estimates the
-        reflection coefficient directly.
+    :ivar delay: The echo delay, in seconds: the quefrency of the largest
+        ``|cepstrum|`` peak in the searched band, refined by quadratic
+        (parabolic) interpolation of ``|cepstrum|`` through the peak sample
+        and its two neighbours, so an off-sample delay is estimated to a
+        fraction of a sample.
+    :ivar delay_samples: The peak position in whole samples (no
+        interpolation).
+    :ivar reflection_coefficient: Signed cepstrum value at the peak sample.
+        For a single in-record echo ``x(t) = s(t) + a s(t - t0)`` the power
+        cepstrum's first rahmonic height is exactly ``a`` -- of either sign
+        -- (the ``n = 1`` term of the ``ln(1 + a e^{-j theta})`` series),
+        so the value estimates the reflection coefficient directly,
+        including its polarity. When the true delay falls between samples
+        the rahmonic is split across neighbouring quefrency bins and the
+        reported coefficient underestimates ``|a|`` (down to roughly 65 %
+        of it for a delay midway between samples); the interpolated
+        :attr:`delay` is unaffected.
     :ivar search_range: The ``(min, max)`` quefrency band searched, s.
     :ivar fs: Sample rate of the analysed record, in Hz.
     :ivar nfft: FFT length used.
@@ -448,16 +480,24 @@ def echo_detection(
     nfft: int | None = None,
 ) -> EchoDetectionResult:
     """
-    Detect an echo as the highest power-cepstrum peak in a quefrency band.
+    Detect an echo as the largest power-cepstrum peak in a quefrency band.
 
-    A reflection ``x(t) = s(t) + a s(t - t0)`` leaves a positive spike of
-    height ``a`` at quefrency ``t0`` in the power cepstrum (module note;
-    the seismic reverberation spike trains of Neelamani Sec. 3.3 are the
-    same signature), regardless of the spectrum of ``s`` itself, which
-    concentrates at low quefrencies. The search band therefore starts
-    above the low-quefrency region occupied by the source's spectral
-    envelope: raise ``min_quefrency`` if the source is very reverberant
-    or narrowband.
+    A reflection ``x(t) = s(t) + a s(t - t0)`` leaves a spike of height
+    ``a`` -- positive or negative with the sign of the reflection -- at
+    quefrency ``t0`` in the power cepstrum (module note; the seismic
+    reverberation spike trains of Neelamani Sec. 3.3 are the same
+    signature), regardless of the spectrum of ``s`` itself, which
+    concentrates at low quefrencies. The peak is therefore picked on
+    ``|cepstrum|``, so an inverting reflection (``a < 0``, e.g. a
+    pressure-release boundary) is found at its true delay, and the
+    *signed* cepstrum value at the peak is returned as the reflection
+    coefficient. The search band starts above the low-quefrency region
+    occupied by the source's spectral envelope: raise ``min_quefrency``
+    if the source is very reverberant or narrowband.
+
+    The delay is refined by quadratic interpolation of ``|cepstrum|``
+    around the peak; see :class:`EchoDetectionResult` for the bin-splitting
+    caveat on the coefficient at off-sample delays.
 
     :param x: Signal (an impulse response, or any record with an in-record
         echo), 1-D.
@@ -486,12 +526,14 @@ def echo_detection(
             f"samples of nfft = {n}."
         )
 
-    band = result.cepstrum[lo : hi + 1]
-    peak = int(np.argmax(band)) + lo
+    # Peak-pick on the magnitude so a negative (inverting) reflection is
+    # found at its true delay; the signed value at the peak is reported.
+    magnitude = np.abs(result.cepstrum)
+    peak = int(np.argmax(magnitude[lo : hi + 1])) + lo
     return EchoDetectionResult(
         quefrencies=result.quefrencies,
         cepstrum=result.cepstrum,
-        delay=peak / fs_v,
+        delay=(peak + _parabolic_offset(magnitude, peak, lo, hi)) / fs_v,
         delay_samples=peak,
         reflection_coefficient=float(result.cepstrum[peak]),
         search_range=(lo / fs_v, hi / fs_v),
