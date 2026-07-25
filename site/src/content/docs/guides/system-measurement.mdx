@@ -95,6 +95,53 @@ print(ir.method, ir.size)                   # golay 16384
 ir.plot()
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/golay_ir.svg" alt="The impulse response of a band-pass system recovered from a Golay pair over the first six milliseconds, drawn on top of the dashed true system response with no visible difference, and a note reading max recovered minus true equals 2.1e-14, noise-free closed-form identity" width="86%" />
+
+*The Golay recovery of a band-pass system's impulse response: the summed
+complementary correlations land on the true response to machine precision
+(max error 2·10⁻¹⁴ here), the closed-form identity the tests pin.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal
+from phonometry import golay_impulse_response, golay_pair
+
+fs = 48000
+pair = golay_pair(14)                       # two 16384-sample codes
+b, a = signal.butter(2, [200.0, 2000.0], btype="bandpass", fs=fs)
+length = pair[0].size
+rec_a = signal.lfilter(b, a, np.tile(pair[0], 3))[2 * length:]
+rec_b = signal.lfilter(b, a, np.tile(pair[1], 3))[2 * length:]
+
+ir = golay_impulse_response(rec_a, rec_b, pair, fs=fs)
+
+# One line — the recovered impulse response:
+ir.plot()
+plt.show()
+
+# By hand, against the true system response:
+impulse = np.zeros(length)
+impulse[0] = 1.0
+true_ir = signal.lfilter(b, a, impulse)
+err = np.max(np.abs(np.asarray(ir) - true_ir))
+
+t_ms = 1e3 * np.arange(length) / fs
+view = t_ms <= 6.0
+fig, ax = plt.subplots()
+ax.plot(t_ms[view], np.asarray(ir)[view], label="Recovered IR")
+ax.plot(t_ms[view], true_ir[view], "r--", label="True system response")
+ax.set(xlabel="Time [ms]", ylabel="Amplitude",
+       title=f"max |recovered - true| = {err:.1e}")
+ax.legend()
+plt.show()
+```
+
+</details>
+
 The result is the same
 [`ImpulseResponseResult`](/phonometry/reference/api/rooms/room-ir/) the sweep
 and MLS front ends return, so everything downstream -
@@ -321,6 +368,7 @@ recorded = signal.lfilter(b, a, excitation)     # play/record in reality
 ir = impulse_response(recorded, excitation, fs)  # any front end works
 inv = regularized_inverse_filter(ir, f_range=(200.0, 10000.0))
 flat_recording = inv.apply(recorded)             # delay already removed
+inv.plot()   # measured, inverse and equalized magnitudes (figure above)
 ```
 
 ### Closing the loop: pre-emphasis from a measured response
@@ -349,6 +397,7 @@ target_db = 20.0 * np.log10(
 )
 sweep = shaped_sweep_signal(int(fs), 200.0, 4000.0, 3.0,
                             target=(inv.frequencies[1:], target_db))
+sweep.plot()   # waveform and spectrum against the inverted-response target
 ```
 
 ## Relation to the other tools
