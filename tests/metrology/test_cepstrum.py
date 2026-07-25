@@ -212,7 +212,7 @@ def test_echo_detection_off_sample_delay_is_interpolated() -> None:
 
     res = ph.echo_detection(x, FS)
     assert res.delay_samples in (DELAY, DELAY + 1)
-    assert res.delay * FS == pytest.approx(true_delay, abs=0.2)
+    assert res.delay * FS == pytest.approx(true_delay, abs=0.15)
     # Bin splitting: the peak-sample coefficient reads low but keeps sign.
     assert 0.15 < res.reflection_coefficient < ALPHA
 

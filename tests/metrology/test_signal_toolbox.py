@@ -120,11 +120,15 @@ def test_tone_burst_incommensurate_frequency_warns() -> None:
     only for commensurate f/fs; otherwise a warning quantifies the
     residual step at the gate edge.
     """
-    with pytest.warns(ph.PhonometryWarning, match="incommensurate"):
+    with pytest.warns(ph.PhonometryWarning, match="incommensurate") as record:
         res = ph.tone_burst(FS, 997.0, 10)
     assert res.burst_samples == 481
-    # The gated waveform does not end at the tone's zero crossing.
-    assert abs(res.signal[res.burst_samples - 1]) > 0.1
+    # The warning quantifies the exact span and the residual step at the
+    # gate edge, sin(2*pi*997*481/48000) ~ -0.058 (a commensurate burst
+    # would close exactly at the zero crossing).
+    message = str(record[0].message)
+    assert "481.444" in message
+    assert "-0.058" in message
 
 
 def test_tone_burst_commensurate_frequency_does_not_warn() -> None:

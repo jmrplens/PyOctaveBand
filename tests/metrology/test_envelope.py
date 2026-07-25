@@ -342,6 +342,9 @@ def test_envelope_spectrum_band_validation() -> None:
     for band in ((0.0, 100.0), (200.0, 100.0), (100.0, FS / 2.0)):
         with pytest.raises(ValueError, match="band"):
             ph.envelope_spectrum(x, FS, band=band)
+    # A record shorter than the zero-phase padding fails informatively.
+    with pytest.raises(ValueError, match="too short"):
+        ph.envelope_spectrum(x[:20], FS, band=(700.0, 1300.0))
 
 
 def test_envelope_spectrum_validates_inputs() -> None:

@@ -87,7 +87,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the reflection coefficient, and the reported delay is refined by
   three-point parabolic interpolation so off-sample delays are estimated
   to a fraction of a sample (with the bin-splitting caveat on the
-  coefficient documented).
+  coefficient documented). Note that `delay_samples` stays the whole
+  peak-sample index, so `delay == delay_samples/fs` no longer holds
+  exactly when the interpolated offset is nonzero.
 - `metrology.EQSection`/`ParametricEQ`: informative `ValueError`s replace
   a raw `OverflowError` (bandwidth-derived alpha overflowing near
   Nyquist), a bare `math domain error` (shelf slope beyond the
@@ -100,15 +102,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   zero crossing (the "integral number of full periods" of IEC 60268-1
   Clause A2.1 is then sample-exact only to the nearest sample) and the
   waveform carries a small residual step at the gate edge.
-
-### Added
-
-- `metrology.envelope_spectrum`: optional `band=(low, high)` zero-phase
-  band-pass pre-filter ahead of the envelope detector -- the band-pass
-  front end of Bendat & Piersol Figure 13.11 and the classical
-  bearing-envelope chain; the band travels with the result. The
-  amplitude-calibration docs now state the on-bin condition and the
-  taper scalloping loss for off-bin modulation lines.
 
 ### Changed
 
@@ -229,6 +222,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   each kind must be fed with for a Directive-conforming assessment: the Part A
   vector total `a_hv` for hand-arm, the Part B dominant-axis value for
   whole-body (not the ISO 2631-1 Eq. (10) vector total `a_v`).
+- `metrology.envelope_spectrum`: optional `band=(low, high)` zero-phase
+  band-pass pre-filter ahead of the envelope detector -- the band-pass
+  front end of Bendat & Piersol Figure 13.11 and the classical
+  bearing-envelope chain; the band travels with the result. The
+  amplitude-calibration docs now state the on-bin condition and the
+  taper scalloping loss for off-bin modulation lines.
 - `materials.diffuser_design`: far-field polar-response and diffusion-coefficient
   prediction of a Schroeder phase-grating diffuser from its surface design,
   complementing the measurement-only `materials.scattering_diffusion`.

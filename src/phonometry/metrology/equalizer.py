@@ -335,10 +335,11 @@ def _check_section_stability(
     raise ValueError(
         f"The designed {section.filter_type!r} section at f0 = "
         f"{section.f0:g} Hz (fs = {fs:g} Hz) is not strictly stable after "
-        f"rounding (a1 = {a1!r}, a2 = {a2!r}): its poles fall on the unit "
-        "circle. This happens when 'bw' (or 1/'q') is very large or f0 "
-        "sits within a few ppm of DC or the Nyquist frequency; bring the "
-        "section parameters back from the extreme."
+        f"rounding (a1 = {a1:.17g}, a2 = {a2:.17g}): its poles do not lie "
+        "strictly inside the unit circle. This happens when 'bw' (or "
+        "1/'q') is very large or f0 sits within a few ppm of DC or the "
+        "Nyquist frequency; bring the section parameters back from the "
+        "extreme."
     )
 
 

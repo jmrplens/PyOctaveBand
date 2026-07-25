@@ -105,7 +105,7 @@ def comb_filter_response(
     :param n_averages: Number of averaged periods ``N`` (at least 1).
     :return: The filter magnitude at each frequency (unitless; bounded by 1,
         though floating-point cancellation immediately beside a tooth can
-        return values above 1 by a few parts in 10⁹).
+        return values above 1 by a few parts in 1e9).
     :raises ValueError: If the parameters are invalid.
     """
     period_v = _positive(period, "period")

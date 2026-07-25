@@ -205,10 +205,17 @@ Section 13.3 (Fig. 13.11) formalizes the structure: an envelope detector, a
 DC remover, and a spectral view of what remains. `envelope_spectrum` runs the
 [Hilbert envelope](correlation-delay.md) (`kind="magnitude"`,
 the practical default) or the book's square-law detector (`kind="squared"`)
-through exactly that chain, scaled so a sinusoidal modulation reads out as a
-line at its exact amplitude.
+through exactly that chain, scaled by the taper's coherent gain so a
+sinusoidal modulation whose frequency falls on an analysis bin reads out as
+a line at its exact amplitude (off-bin lines read low by the taper's
+scalloping loss, up to about 1.4 dB for the default Hann). The optional
+`band=(low, high)` argument reproduces the figure's band-pass front end -
+the classical bearing-envelope chain: isolate the structural-resonance band
+excited by the defect impacts with a zero-phase band-pass, then envelope
+it - so an out-of-band interferer never reaches the detector.
 
-For an AM tone `A0·(1 + m·cos(2πfm·t))·cos(2πfc·t)` the closed forms are:
+For an AM tone `A0·(1 + m·cos(2πfm·t))·cos(2πfc·t)` with `fm` on an
+analysis bin the closed forms are:
 
 | `kind` | mean level | line at `fm` | line at `2fm` |
 |---|---|---|---|

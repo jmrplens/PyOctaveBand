@@ -94,7 +94,7 @@ multiple of `N`.
 | `period` | Repetition period `T`, in seconds. |
 | `n_averages` | Number of averaged periods `N` (at least 1). |
 
-**Returns:** The filter magnitude at each frequency (unitless; bounded by 1, though floating-point cancellation immediately beside a tooth can return values above 1 by a few parts in 10⁹).
+**Returns:** The filter magnitude at each frequency (unitless; bounded by 1, though floating-point cancellation immediately beside a tooth can return values above 1 by a few parts in 1e9).
 
 **Raises**
 

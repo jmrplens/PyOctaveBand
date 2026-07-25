@@ -89,8 +89,17 @@ así que el cepstro lleva un tren de picos en los **rahmónicos** `n·t0` con
 amplitudes `a, -a²/2, a³/3, ...` (su suma es `ln(1+a)`), independientemente
 del espectro de la propia `s`, que se concentra en las quefrencias bajas. En
 el cepstro de potencia la altura del primer pico es exactamente el
-coeficiente de reflexión `a` - una forma cerrada que los tests y la batería
-de conformidad fijan a 1e-10. `echo_detection` automatiza la lectura:
+coeficiente de reflexión `a` - con su signo - una forma cerrada que los
+tests y la batería de conformidad fijan a 1e-10. `echo_detection`
+automatiza la lectura: busca el mayor pico de `|cepstrum|` en la banda de
+búsqueda (así una reflexión inversora, `a < 0`, se encuentra en su retardo
+verdadero en vez de perderse), refina el retardo por interpolación
+cuadrática a través del pico y sus vecinos, y devuelve como coeficiente de
+reflexión el valor del pico con su signo. Cuando el retardo verdadero cae
+entre muestras, el rahmónico se reparte entre bins de quefrencia vecinos:
+el retardo interpolado sigue acertando, pero el coeficiente devuelto
+subestima `|a|` (hasta cerca del 65 % de su valor a mitad de camino entre
+muestras).
 
 ```python
 import numpy as np
@@ -225,11 +234,19 @@ envolvente, un eliminador de continua y una vista espectral de lo que queda.
 `envelope_spectrum` pasa la
 [envolvente de Hilbert](/phonometry/es/guides/correlation-delay/)
 (`kind="magnitude"`, el valor práctico por defecto) o el detector cuadrático
-del libro (`kind="squared"`) por exactamente esa cadena, escalada para que
-una modulación sinusoidal se lea como una línea con su amplitud exacta.
+del libro (`kind="squared"`) por exactamente esa cadena, escalada por la
+ganancia coherente de la ventana para que una modulación sinusoidal cuya
+frecuencia cae en un bin de análisis se lea como una línea con su amplitud
+exacta (las líneas fuera de bin leen de menos por la pérdida de scalloping
+de la ventana, hasta cerca de 1,4 dB con la Hann por defecto). El argumento
+opcional `band=(low, high)` reproduce el filtro paso banda de entrada de la
+figura - la cadena clásica de envolvente para rodamientos: aislar con un
+paso banda de fase cero la banda de resonancia estructural que excitan los
+impactos del defecto y después obtener su envolvente - de modo que un
+interferente fuera de banda nunca llega al detector.
 
-Para un tono AM `A0·(1 + m·cos(2πfm·t))·cos(2πfc·t)` las formas cerradas
-son:
+Para un tono AM `A0·(1 + m·cos(2πfm·t))·cos(2πfc·t)` con `fm` en un bin de
+análisis las formas cerradas son:
 
 | `kind` | nivel medio | línea en `fm` | línea en `2fm` |
 |---|---|---|---|

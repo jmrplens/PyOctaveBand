@@ -267,6 +267,15 @@ def _bandpass_pre_filter(
         )
     sos = sp_signal.butter(4, (low, high), btype="bandpass", fs=fs,
                            output="sos")
+    # sosfiltfilt's default edge padding needs 3*(2*n_sections + 1)
+    # samples; fail with a clear message instead of scipy's padlen error.
+    min_length = 3 * (2 * sos.shape[0] + 1) + 1
+    if xa.size < min_length:
+        raise ValueError(
+            f"'x' is too short ({xa.size} samples) for the zero-phase "
+            f"band-pass pre-filter, which needs at least {min_length} "
+            "samples of padding; lengthen the record or omit 'band'."
+        )
     return np.asarray(sp_signal.sosfiltfilt(sos, xa), dtype=np.float64)
 
 
