@@ -483,7 +483,7 @@ L 441.563437 41.192543
      </g>
     </g>
     <g id="text_21">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="15.198438" y="185.136727" transform="rotate(-90 15.198438 185.136727)">Nivel de presión sonora por banda de octava [dB]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="15.198438" y="185.136727" transform="rotate(-90 15.198438 185.136727)">Nivel de presión acústica por banda de octava [dB]</text>
     </g>
    </g>
    <g id="line2d_59">
@@ -1169,7 +1169,7 @@ L 886.163437 72.484757
      </g>
     </g>
     <g id="text_53">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="459.798437" y="185.136727" transform="rotate(-90 459.798437 185.136727)">Nivel de presión sonora por banda de octava [dB]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="459.798437" y="185.136727" transform="rotate(-90 459.798437 185.136727)">Nivel de presión acústica por banda de octava [dB]</text>
     </g>
    </g>
    <g id="FillBetweenPolyCollection_1">

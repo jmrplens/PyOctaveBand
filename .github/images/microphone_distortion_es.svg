@@ -178,7 +178,7 @@ L 576.74027 22.798125
      </g>
     </g>
     <g id="text_10">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="323.103906" y="384.436562" transform="rotate(-0 323.103906 384.436562)">Nivel de presión sonora [dB]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="323.103906" y="384.436562" transform="rotate(-0 323.103906 384.436562)">Nivel de presión acústica [dB]</text>
     </g>
    </g>
    <g id="matplotlib.axis_2">

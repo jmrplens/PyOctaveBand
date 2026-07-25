@@ -285,7 +285,7 @@ L 602.503906 55.491458
      </g>
     </g>
     <g id="text_13">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="15.198438" y="208.978125" transform="rotate(-90 15.198438 208.978125)">Coeficiente de absorción sonora</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="15.198438" y="208.978125" transform="rotate(-90 15.198438 208.978125)">Coeficiente de absorción acústica</text>
     </g>
    </g>
    <g id="line2d_30">
@@ -358,7 +358,7 @@ L 203.318941 190.499365
     <text style="font-size: 9.5px; font-family: sans-serif; text-anchor: start" x="61.243906" y="339.099041" transform="rotate(-0 61.243906 339.099041)">Clase de absorción C  (indicador de forma: M)</text>
    </g>
    <g id="text_18">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="323.503906" y="16.798125" transform="rotate(-0 323.503906 16.798125)">Coeficiente de absorción sonora ponderado ISO 11654 (ejemplo del Anexo A.2)</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="323.503906" y="16.798125" transform="rotate(-0 323.503906 16.798125)">Coeficiente de absorción acústica ponderado ISO 11654 (ejemplo del Anexo A.2)</text>
    </g>
    <g id="line2d_32">
     <path d="M 67.966638 272.374792 

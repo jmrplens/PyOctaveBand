@@ -494,7 +494,7 @@ L 705.981562 76.016391
      </g>
     </g>
     <g id="text_28">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="15.198438" y="209.801478" transform="rotate(-90 15.198438 209.801478)">Coeficiente de absorción sonora</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="15.198438" y="209.801478" transform="rotate(-90 15.198438 209.801478)">Coeficiente de absorción acústica</text>
     </g>
    </g>
    <g id="patch_3">
@@ -535,7 +535,7 @@ z
     <text style="font-size: 11px; font-family: sans-serif" transform="translate(571.376116 376.200978)">U = k u,  k = 2  (95 %)</text>
    </g>
    <g id="text_30">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="375.242734" y="16.798125" transform="rotate(-0 375.242734 16.798125)">Incertidumbre del coeficiente de absorción sonora (ISO 12999-2)</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="375.242734" y="16.798125" transform="rotate(-0 375.242734 16.798125)">Incertidumbre del coeficiente de absorción acústica (ISO 12999-2)</text>
    </g>
    <g id="line2d_53">
     <path d="M 74.571072 286.924646 

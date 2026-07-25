@@ -278,7 +278,7 @@ L 602.503906 35.864007
      </g>
     </g>
     <g id="text_17">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="15.198438" y="208.978125" transform="rotate(-90 15.198438 208.978125)">Coeficiente de absorción sonora alpha</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="15.198438" y="208.978125" transform="rotate(-90 15.198438 208.978125)">Coeficiente de absorción acústica alpha</text>
     </g>
    </g>
    <g id="patch_3">

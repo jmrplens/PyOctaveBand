@@ -20,10 +20,10 @@
  </defs>
  <g id="figure_1">
   <g id="patch_1">
-   <path d="M -0 424.635 
+   <path d="M 0 424.635 
 L 712.824062 424.635 
 L 712.824062 0 
-L -0 0 
+L 0 0 
 z
 " style="fill: #ffffff"/>
   </g>
@@ -333,7 +333,7 @@ L 705.624062 35.020365
      </g>
     </g>
     <g id="text_15">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="15.198438" y="204.615781" transform="rotate(-90 15.198438 204.615781)">Nivel de presión sonora [dB]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="15.198438" y="204.615781" transform="rotate(-90 15.198438 204.615781)">Nivel de presión acústica [dB]</text>
     </g>
    </g>
    <g id="line2d_37">
