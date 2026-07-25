@@ -98,19 +98,23 @@ const breadcrumbList = isHome
 {description && <meta name="twitter:description" content={description} />}
 
 {/* TOC-info experiment (TOC-REDESIGN-NOTES.md): apply the persisted variant
-    attributes before first paint, then mount the floating variant switcher.
-    Prototype-only; remove both scripts when a variant is chosen. */}
+    attributes (`data-page-chips`, `data-toc-style`, `data-api-style`) before
+    first paint, then mount the floating variant switcher. Prototype-only;
+    remove both scripts when a variant is chosen. */}
 <script is:inline>
   (() => {
     const d = document.documentElement;
     let toc = 'focus';
     let api = 'split';
+    let page = 'header';
     try {
       toc = localStorage.getItem('tocStyle') || toc;
       api = localStorage.getItem('apiStyle') || api;
+      page = localStorage.getItem('pageChips') || page;
     } catch {}
     d.dataset.tocStyle = toc;
     d.dataset.apiStyle = api;
+    d.dataset.pageChips = page;
     d.dataset.area = /\/reference\/api(\/|$)/.test(location.pathname) ? 'api' : 'guides';
   })();
 </script>
@@ -119,6 +123,7 @@ const breadcrumbList = isHome
     const d = document.documentElement;
     const TOC = ['focus', 'annotate', 'hover', 'clean', 'none'];
     const API = ['split', 'collapsed', 'inline'];
+    const PAGE = ['header', 'off'];
 
     const radios = (name, values, current) =>
       values
@@ -135,7 +140,8 @@ const breadcrumbList = isHome
     widget.innerHTML =
       '<summary title="TOC experiment switcher">UX</summary>' +
       '<div class="toc-switcher-panel">' +
-      `<fieldset><legend>TOC info</legend>${radios('tocStyle', TOC, d.dataset.tocStyle)}</fieldset>` +
+      `<fieldset><legend>Page chips</legend>${radios('pageChips', PAGE, d.dataset.pageChips)}</fieldset>` +
+      `<fieldset><legend>Sidebar info</legend>${radios('tocStyle', TOC, d.dataset.tocStyle)}</fieldset>` +
       `<fieldset><legend>API sidebar</legend>${radios('apiStyle', API, d.dataset.apiStyle)}</fieldset>` +
       '</div>';
     document.body.appendChild(widget);

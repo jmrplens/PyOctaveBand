@@ -9,10 +9,15 @@
  * and is identical in EN and ES (designations and author names are
  * language-neutral; only the visually-hidden accessibility prefix is
  * localized). It is always rendered and only displayed when
- * `data-toc-style='clean'` is active (toc-info.css).
+ * `data-toc-style='clean'` is active and the page chips run is off
+ * (toc-info.css), since both sit under the H1 and say the same thing.
+ *
+ * PageChips.astro is the successor of this line: the same idea, but derived
+ * from the page's own `references` frontmatter and linked to the bibliography.
  */
 import Default from '@astrojs/starlight/components/PageTitle.astro';
 import type { StarlightRouteData } from '@astrojs/starlight/route-data';
+import PageChips from './PageChips.astro';
 
 type SidebarEntry = StarlightRouteData['sidebar'][number];
 type SidebarLink = Extract<SidebarEntry, { type: 'link' }>;
@@ -51,6 +56,7 @@ const isEs = Astro.currentLocale === 'es';
 ---
 
 <Default><slot /></Default>
+<PageChips />
 {
 	chips.length > 0 && (
 		<p class="page-standards">

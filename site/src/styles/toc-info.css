@@ -367,7 +367,7 @@
   display: none;
 }
 
-:root[data-toc-style='clean'] .page-standards {
+:root[data-toc-style='clean']:not([data-page-chips='header']) .page-standards {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
@@ -467,6 +467,78 @@
   :root[data-toc-style='clean'] .section-standards td:empty {
     display: none;
   }
+}
+
+/* ---------------------------------------------------------------------------
+   PAGE CHIPS (`data-page-chips='header'`), independent of the sidebar
+   variants: one quiet run under the H1 naming the standards that govern the
+   page and the works its methods are attributed to, every item a link into
+   the References section at the bottom. Rendered by PageChips.astro from the
+   page's own frontmatter bibliography.
+
+   Deliberately not pills: at page level a run of tinted text with one leading
+   dot per category reads as a dateline, while filled badges read as tags and
+   compete with the H1.
+   --------------------------------------------------------------------------- */
+
+.page-chips {
+  display: none;
+}
+
+:root[data-page-chips='header'] .page-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem 1.15rem;
+  margin-block-start: 0.55rem;
+  font-size: var(--sl-text-sm);
+  line-height: 1.5;
+}
+
+.page-chips .chip-run {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem 0.7rem;
+}
+
+/* One leading dot per category run: teal for the governing standards, amber
+   for the named references. Two marks per page, no legend needed, and the
+   labels stay language neutral. */
+.page-chips .chip-run::before {
+  content: '';
+  flex: 0 0 auto;
+  align-self: center;
+  inline-size: 0.4rem;
+  block-size: 0.4rem;
+  margin-inline-end: 0.1rem;
+  border-radius: 50%;
+}
+.page-chips .chip-run-standard::before {
+  background: var(--chip-standard-accent);
+}
+.page-chips .chip-run-reference::before {
+  background: var(--chip-theory-accent);
+}
+
+.page-chips .page-chip {
+  font-weight: 500;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.page-chips .page-chip:hover,
+.page-chips .page-chip:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+.page-chips .chip-standard {
+  color: var(--chip-standard-ink);
+}
+.page-chips .chip-theory {
+  color: var(--chip-theory-ink);
+}
+.page-chips .chip-more {
+  color: var(--chip-ink-muted);
 }
 
 /* ---------------------------------------------------------------------------
