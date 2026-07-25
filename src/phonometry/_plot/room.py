@@ -92,7 +92,7 @@ _STRINGS: dict[str, str] = {
     "Reverberant field": "Campo reverberante",
     "Total": "Total",
     "Distance from source [m]": "Distancia a la fuente [m]",
-    "Sound pressure level [dB]": "Nivel de presión sonora [dB]",
+    "Sound pressure level [dB]": "Nivel de presión acústica [dB]",
     "Shaped sweep (group-delay synthesis)":
         "Barrido conformado (síntesis del retardo de grupo)",
     "Welch spectrum of the sweep": "Espectro de Welch del barrido",

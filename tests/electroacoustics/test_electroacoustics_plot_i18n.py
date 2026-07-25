@@ -142,7 +142,7 @@ def test_loudspeaker_characteristics_es() -> None:
         assert ax.get_title() == title
         plt.close("all")
     assert res.plot(quantity="response", language="es").get_ylabel() == (
-        "Nivel de presión sonora [dB]"
+        "Nivel de presión acústica [dB]"
     )
     plt.close("all")
     with pytest.raises(ValueError):
@@ -167,7 +167,7 @@ def test_microphone_characteristics_es() -> None:
         assert ax.get_title() == title
         plt.close("all")
     assert res.plot(quantity="distortion", language="es").get_xlabel() == (
-        "Nivel de presión sonora [dB]"
+        "Nivel de presión acústica [dB]"
     )
     plt.close("all")
     with pytest.raises(ValueError):

@@ -1,6 +1,6 @@
 ---
 title: "Acústica de salas"
-description: "Adquisición de la respuesta al impulso (ISO 18233), parámetros de sala EDT/T20/T30/C50/C80/Ts (ISO 3382-1/2), métricas de habla en oficinas diáfanas (ISO 3382-3) y absorción sonora en cámara reverberante (ISO 354)."
+description: "Adquisición de la respuesta al impulso (ISO 18233), parámetros de sala EDT/T20/T30/C50/C80/Ts (ISO 3382-1/2), métricas de habla en oficinas diáfanas (ISO 3382-3) y absorción acústica en cámara reverberante (ISO 354)."
 references:
   - type: book
     authors: ["Kuttruff, H."]
@@ -77,7 +77,7 @@ tiempo de reverberación, la claridad y la inteligibilidad del habla: todo
 sobre el campo sonoro dentro de un único recinto. Esta página sigue esa cadena
 en orden de medición: adquirir la RI (ISO 18233), convertirla en parámetros de
 sala (ISO 3382-1/2), métricas espaciales del habla para oficinas diáfanas
-(ISO 3382-3) y, cerrando el ciclo, la absorción sonora de un material en una
+(ISO 3382-3) y, cerrando el ciclo, la absorción acústica de un material en una
 cámara reverberante (ISO 354). Para el aislamiento acústico *entre* recintos (la
 misma RI medida a ambos lados de un cerramiento) consulta la guía complementaria
 [Medición del aislamiento en campo e índices](/phonometry/es/guides/insulation-field/).
@@ -240,7 +240,7 @@ system[80], system[1400], system[3100] = 1.0, 0.5, 0.32
 ir = room.impulse_response(fftconvolve(sweep, system), sweep, fs, length=system.size)
 
 # Una línea: forma de onda + log-magnitud / decaimiento de Schroeder
-ir.plot()
+ir.plot(language="es")
 
 # A mano: la envolvente log-magnitud normalizada en dB
 import matplotlib.pyplot as plt
@@ -426,7 +426,7 @@ time, level = room.decay_curve(ir, fs)                    # curva de Schroeder (
 
 # En una línea — la curva de Schroeder con los ajustes rectos EDT/T20/T30:
 decay = room.decay_curve(ir, fs)          # un DecayCurve (se sigue desempaquetando como time, level)
-decay.plot()
+decay.plot(language="es")
 plt.show()
 
 # A mano, el decaimiento es solo la curva de Schroeder; marca los niveles de evaluación:
@@ -483,7 +483,7 @@ for fc, t60 in [(125.0, 1.4), (250.0, 1.25), (500.0, 1.1),
 
 # Una línea: barras EDT/T20/T30 por banda + C50/C80 (requiere matplotlib).
 octaves = room.room_parameters(ir, fs)
-octaves.plot()
+octaves.plot(language="es")
 plt.show()
 
 # A mano: el espectro de T30 desde los campos del resultado.
@@ -701,7 +701,7 @@ m = room.open_plan_metrics(r, lp, sti)
 # En una línea: la regresión D2,S reconstruida con los campos del resultado,
 # con los cruces rD / rP marcados (la figura superior añade además los puntos
 # medidos y el eje de STI):
-m.plot()
+m.plot(language="es")
 plt.show()
 ```
 
@@ -831,9 +831,9 @@ el repositorio; haz clic en la vista previa para abrir el PDF.
 	caption="Ficha de acústica de oficinas diáfanas (OpenPlanResult.report): D2,S, Lp,A,S,4m, rD, rP y la curva de decaimiento espacial."
 />
 
-## 4. Absorción sonora (ISO 354)
+## 4. Absorción acústica (ISO 354)
 
-El área de absorción sonora equivalente `A` que gobierna `R'`, `L'n`, la
+El área de absorción acústica equivalente `A` que gobierna `R'`, `L'n`, la
 corrección ambiental `K2` de ISO 3744 y el término de absorción de ISO 3741 se
 mide a su vez en una cámara reverberante
 (ISO 354). Mide el tiempo de reverberación de la cámara **vacía** ($T_1$) y de
@@ -887,7 +887,7 @@ genera un `AbsorptionWarning` de aviso; el resultado se devuelve igualmente.
 | `speed_of_sound` (`…1`, `…2`) | float, opcional | m/s | > 0 | Sobrescribe la `c` derivada de la temperatura |
 | `m` (`m1`, `m2`) | float o array 1D | 1/m | ≥ 0, por defecto `0` | Coeficiente de atenuación en potencia del aire |
 
-`absorption_area()` devuelve el área de absorción sonora equivalente `A` (m²)
+`absorption_area()` devuelve el área de absorción acústica equivalente `A` (m²)
 con la forma de `t60`; `absorption_coefficient()` devuelve `alpha_s`;
 `attenuation_from_alpha(alpha)` convierte un `alpha` de ISO 9613-1 (dB/m) a `m`.
 

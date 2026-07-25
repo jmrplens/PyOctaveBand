@@ -42,7 +42,7 @@ cerrada para ruido de banda ancha modulado en amplitud (Ec. 10.2) como el modelo
 de señal de Osses et al. (2016), y la utilidad que deriva las cuatro sensaciones
 a partir de una grabación.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/psychoacoustic_annoyance.svg" alt="Molestia psicoacústica PA frente a la sonoridad percentil N5 para tres perfiles de sensación: una base neutra donde PA es igual a N5, un sonido agudo y un sonido áspero y fluctuante ambos elevados sobre la base, con el ejemplo resuelto PA = 30,82 marcado" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/psychoacoustic_annoyance_es.svg" alt="Molestia psicoacústica PA frente a la sonoridad percentil N5 para tres perfiles de sensación: una base neutra donde PA es igual a N5, un sonido agudo y un sonido áspero y fluctuante ambos elevados sobre la base, con el ejemplo resuelto PA = 30,82 marcado" width="82%" loading="eager" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -160,7 +160,7 @@ Fastl y Zwicker; la intensidad de fluctuación normativa del modelo de Sottek
 (cláusula 9 de ECMA-418-2) está en
 [Métricas de calidad sonora](/phonometry/es/guides/sound-quality/).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength.svg" alt="Intensidad de fluctuación frente a la frecuencia de modulación en un eje logarítmico: la curva de forma cerrada para ruido de banda ancha AM y el barrido del modelo de señal para tono AM muestran ambos una característica de paso de banda con máximo a 4 Hz" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength_es.svg" alt="Intensidad de fluctuación frente a la frecuencia de modulación en un eje logarítmico: la curva de forma cerrada para ruido de banda ancha AM y el barrido del modelo de señal para tono AM muestran ambos una característica de paso de banda con máximo a 4 Hz" width="82%" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -262,7 +262,7 @@ res = psychoacoustics.fluctuation_strength(am, float(fs))
 print(round(res.fluctuation_strength, 2))    # 1.09 vacil
 
 # En una línea: la intensidad de fluctuación específica sobre el eje de Bark.
-res.plot()
+res.plot(language="es")
 plt.show()
 
 # O dibuja f'(z) a mano con los arrays que ya lleva el resultado:

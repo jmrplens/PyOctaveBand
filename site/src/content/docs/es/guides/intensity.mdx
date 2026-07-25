@@ -1,6 +1,6 @@
 ---
-title: "Intensidad sonora (p-p)"
-description: "Intensidad sonora con dos micrófonos según IEC 61043 con los indicadores de campo de ISO 9614-1."
+title: "Intensidad acústica (p-p)"
+description: "Intensidad acústica con dos micrófonos según IEC 61043 con los indicadores de campo de ISO 9614-1."
 references:
   - type: book
     authors: ["Fahy, F. J."]
@@ -29,7 +29,7 @@ references:
 import Video from '../../../../components/Video.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
-La *presión* sonora dice cuánto suena un punto; la **intensidad sonora** dice
+La *presión* acústica dice cuánto suena un punto; la **intensidad acústica** dice
 hacia dónde *va* la energía. Es el flujo de potencia acústica (W/m²), una
 magnitud vectorial con signo: por eso las sondas de intensidad pueden
 localizar fuentes, separarlas del ruido de fondo y medir potencia acústica in
@@ -104,7 +104,7 @@ res = emission.sound_intensity(p1, p2, fs, spacing=0.012, fraction=3,
 
 # res es el IntensityResult calculado en el ejemplo anterior.
 # En una línea — Lp frente a LI por banda, con el índice presión-intensidad en un eje gemelo:
-res.plot()
+res.plot(language="es")
 plt.show()
 
 # A mano, con los campos por banda que lleva el resultado — reproduciendo lo que

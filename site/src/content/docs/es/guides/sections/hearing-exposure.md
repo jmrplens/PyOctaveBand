@@ -14,7 +14,7 @@ umbral de audición con la edad para una población otológicamente normal: la
 pérdida lenta, que empieza por las altas frecuencias, de la presbiacusia,
 resuelta por edad, sexo y fractil de población. **ISO 389-7:2005** fija el
 otro extremo de la escala: el umbral de referencia de audición, el nivel de
-presión sonora físico al que corresponde el 0 dB HL audiométrico en escucha
+presión acústica físico al que corresponde el 0 dB HL audiométrico en escucha
 de campo libre y campo difuso.
 
 [Exposición al ruido en el trabajo (ISO 9612)](/phonometry/es/guides/occupational-exposure/)

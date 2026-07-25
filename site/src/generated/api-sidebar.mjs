@@ -169,7 +169,7 @@ export const apiSidebar = {
     },
     {
       label: 'Sound power and intensity',
-      translations: { es: 'Potencia sonora e intensidad' },
+      translations: { es: 'Potencia acústica e intensidad' },
       items: [
         'reference/api/power/sound-power',
         'reference/api/power/sound-power-intensity',

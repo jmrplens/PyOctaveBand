@@ -1,6 +1,6 @@
 ---
 title: "Análisis de señal"
-description: "Diseño de bancos de filtros, ponderaciones frecuenciales, integración temporal, métricas de nivel y exposición, intensidad sonora y el marco de incertidumbre del GUM detrás de phonometry."
+description: "Diseño de bancos de filtros, ponderaciones frecuenciales, integración temporal, métricas de nivel y exposición, intensidad acústica y el marco de incertidumbre del GUM detrás de phonometry."
 references:
   - type: book
     authors: ["Oppenheim, A. V.", "Schafer, R. W."]
@@ -72,7 +72,7 @@ references:
     note: "La propagación de distribuciones mediante Monte Carlo y su construcción del intervalo de cobertura. El PDF enlazado es la descarga gratuita."
 ---
 
-Esta página reúne la teoría de la propia cadena de medición: las bandas fraccionales de octava normalizadas y los bancos de filtros en el dominio temporal que las implementan, las curvas de ponderación frecuencial, la integración temporal, las métricas de nivel, de evento y de exposición, la intensidad sonora y el marco de incertidumbre del GUM que sustenta cada magnitud medida. Forma parte de la [referencia de teoría](/phonometry/es/reference/theory/).
+Esta página reúne la teoría de la propia cadena de medición: las bandas fraccionales de octava normalizadas y los bancos de filtros en el dominio temporal que las implementan, las curvas de ponderación frecuencial, la integración temporal, las métricas de nivel, de evento y de exposición, la intensidad acústica y el marco de incertidumbre del GUM que sustenta cada magnitud medida. Forma parte de la [referencia de teoría](/phonometry/es/reference/theory/).
 
 ## Frecuencias de banda de octava (ANSI S1.11 / IEC 61260)
 
@@ -113,7 +113,7 @@ octava en torno a 1 kHz es aproximadamente:
 
 | Banda nominal | Borde inferior | Centro | Borde superior | Ancho |
 | :--- | ---: | ---: | ---: | ---: |
-| 1 kHz | 891.25 Hz | 1000.00 Hz | 1122.02 Hz | 230.77 Hz |
+| 1 kHz | 891,25 Hz | 1000,00 Hz | 1122,02 Hz | 230,77 Hz |
 
 Puedes inspeccionar las bandas exactas con:
 
@@ -277,6 +277,10 @@ modo `high_accuracy` por defecto diseña y ejecuta el filtro a una frecuencia
 interna sobremuestreada (≥ 144 kHz); consulta
 [Ponderación frecuencial](/phonometry/es/guides/weighting/).
 
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_es.svg" alt="Curvas de ponderación A, B, C, D, AU y Z con zoom de la región positiva de la curva A (+1,27 dB en 2,5 kHz)" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_es_dark.svg" alt="Curvas de ponderación A, B, C, D, AU y Z con zoom de la región positiva de la curva A (+1,27 dB en 2,5 kHz)" style="width:80%" loading="lazy">
+
+*Las curvas de ponderación que aplica la biblioteca, con la pequeña región positiva de la curva A ampliada.*
+
 ## Integración temporal
 
 Implementada como un integrador exponencial IIR de primer orden:
@@ -297,6 +301,10 @@ estado cuadrático medio anterior. Consulta
 [Por qué phonometry](/phonometry/es/reference/why-phonometry/) para la
 verificación de esta implementación con ráfagas de tono de IEC 61672-1.
 
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/time_weighting_analysis_es.svg" alt="Respuestas de las ponderaciones temporales Fast, Slow e Impulse a una ráfaga de ruido" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/time_weighting_analysis_es_dark.svg" alt="Respuestas de las ponderaciones temporales Fast, Slow e Impulse a una ráfaga de ruido" style="width:80%" loading="lazy">
+
+*El integrador exponencial con las tres constantes de tiempo normalizadas: Fast sigue la ráfaga, Slow la suaviza e Impulse retiene su pico.*
+
 ## Ponderación G (ISO 7196)
 
 La curva G extiende la ponderación frecuencial al rango de los infrasonidos. La Tabla 1 de ISO 7196:1995 (p. 2) la define mediante cuatro ceros en el origen y cuatro pares de polos complejos conjugados, dados como coordenadas en Hz (multiplicadas por $2\pi$ para obtener rad/s):
@@ -312,7 +320,7 @@ $$
 k = \left| \frac{\prod_i (j\omega_{10} - p_i)}{\prod_i (j\omega_{10} - z_i)} \right|, \qquad \omega_{10} = 2\pi \cdot 10 \ \text{rad/s}
 $$
 
-Los cuatro ceros frente a ocho polos dan forma a la respuesta característica: una subida de aproximadamente **+12 dB/octava entre 1 Hz y 20 Hz**, con caídas de aproximadamente **24 dB/octava** por debajo de 1 Hz y por encima de 20 Hz. Los infrasonidos necesitan su propia curva porque, cerca del umbral de audición, la sonoridad percibida de los tonos de muy baja frecuencia crece con el nivel de presión sonora mucho más abruptamente que a frecuencias medias (un pequeño incremento en dB sobre el umbral produce un gran salto de sonoridad), de modo que la curva A (anclada en 1 kHz) distorsiona por completo la molestia infrasónica.
+Los cuatro ceros frente a ocho polos dan forma a la respuesta característica: una subida de aproximadamente **+12 dB/octava entre 1 Hz y 20 Hz**, con caídas de aproximadamente **24 dB/octava** por debajo de 1 Hz y por encima de 20 Hz. Los infrasonidos necesitan su propia curva porque, cerca del umbral de audición, la sonoridad percibida de los tonos de muy baja frecuencia crece con el nivel de presión acústica mucho más abruptamente que a frecuencias medias (un pequeño incremento en dB sobre el umbral produce un gran salto de sonoridad), de modo que la curva A (anclada en 1 kHz) distorsiona por completo la molestia infrasónica.
 
 Como G actúa sobre 0,25 Hz – 315 Hz, muy por debajo de la frecuencia de Nyquist a tasas de audio, la deformación en frecuencia de la transformación bilineal simple (aplicada sin precompensación) es despreciable en ese rango: en torno al 0,014 % a 315 Hz con $f_s = 48$ kHz, menos de 0,01 dB en la respuesta. Por eso no se aplica el sobremuestreo interno usado en los diseños A/C (cuya acción se extiende hasta 16 kHz).
 
@@ -326,7 +334,7 @@ $$
 \mathrm{SEL} = L_{eq,T} + 10 \log_{10}\left(\frac{T}{T_0}\right), \qquad T_0 = 1\ \text{s}
 $$
 
-La **exposición sonora** $E$ (IEC 61252, 3.1) es la integral temporal del cuadrado de la presión sonora ponderada A, expresada en pascales al cuadrado por hora:
+La **exposición sonora** $E$ (IEC 61252, 3.1) es la integral temporal del cuadrado de la presión acústica ponderada A, expresada en pascales al cuadrado por hora:
 
 $$
 E = \int_0^T p_A^2(t)\ dt = \overline{p_A^2} \cdot T \quad [\text{Pa}^2\text{h}]
@@ -340,13 +348,13 @@ $$
 
 Es idéntico al $L_{EP,d}$ de la Directiva 86/188/CEE y al $L_{EX,8h}$ de ISO 1999 (IEC 61252, 3.3 NOTAS 5–6). El ancla de IEC 61252 (3.3 NOTA 4): una exposición de **3,2 Pa²h corresponde a un $L_{EX,8h}$ de exactamente 90 dB**.
 
-**LCpeak** (IEC 61672-1:2013, subcláusula 5.13) es el máximo absoluto de la presión sonora ponderada C expresado en dB, $L_{Cpeak} = 20\log_{10}(\max|p_C(t)|/p_0)$, la magnitud detrás de los límites de acción laborales de 135/137/140 dB(C). La implementación se verifica contra las respuestas de referencia de un ciclo y de medio ciclo de la Tabla 5.
+**LCpeak** (IEC 61672-1:2013, subcláusula 5.13) es el máximo absoluto de la presión acústica ponderada C expresado en dB, $L_{Cpeak} = 20\log_{10}(\max|p_C(t)|/p_0)$, la magnitud detrás de los límites de acción laborales de 135/137/140 dB(C). La implementación se verifica contra las respuestas de referencia de un ciclo y de medio ciclo de la Tabla 5.
 
 Consulta la [guía de niveles](/phonometry/es/guides/levels/) para su uso y la [guía de calibración](/phonometry/es/guides/calibration/) para configurar la escala absoluta.
 
-## Intensidad sonora (IEC 61043)
+## Intensidad acústica (IEC 61043)
 
-La intensidad sonora es el flujo de potencia acústica promediado en el tiempo $I = \overline{p u}$. La velocidad de partícula se obtiene de la **ecuación de Euler** (conservación del momento linealizada):
+La intensidad acústica es el flujo de potencia acústica promediado en el tiempo $I = \overline{p u}$. La velocidad de partícula se obtiene de la **ecuación de Euler** (conservación del momento linealizada):
 
 $$
 \rho_0 \frac{\partial u}{\partial t} = -\frac{\partial p}{\partial r}
@@ -374,7 +382,11 @@ La cláusula 7.3 de IEC 61043 especifica la respuesta en intensidad de la sonda 
 
 El **índice presión-intensidad** $\delta_{pI} = L_p - L_I$ mide cuán reactivo es el campo: en una onda plana progresiva libre vale $10 \log_{10}(\rho_0 c / 400) = 0{,}14$ dB, mientras que valores grandes delatan campos reactivos o ruidosos en los que domina el error de fase entre canales. El Anexo A de ISO 9614-1:1993 lo generaliza sobre una superficie de medición como el indicador F2 (con F3 para la potencia parcial negativa y F4 para la no uniformidad del campo), y la **capacidad dinámica** del instrumento $L_d = \delta_{pI0} - K$ (índice presión-intensidad residual menos el factor de error de sesgo: 10 dB para los grados 1/2, 7 dB para el grado 3) debe superar F2 para que la medición sea válida (criterio 1).
 
-Consulta la [guía de intensidad sonora](/phonometry/es/guides/intensity/) para su uso.
+Consulta la [guía de intensidad acústica](/phonometry/es/guides/intensity/) para su uso.
+
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo_es.svg" alt="Niveles de presión e intensidad en tercios de octava para una onda plana progresiva frente a una onda estacionaria" style="width:92%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo_es_dark.svg" alt="Niveles de presión e intensidad en tercios de octava para una onda plana progresiva frente a una onda estacionaria" style="width:92%" loading="lazy">
+
+*El estimador p-p en los dos campos límite: la separación entre Lp y LI es el índice presión-intensidad que delata los campos reactivos.*
 
 ## Incertidumbre de medida (ISO/IEC Guide 98-3: GUM y Suplemento 1)
 

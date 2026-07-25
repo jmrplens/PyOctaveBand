@@ -136,7 +136,7 @@ df = 2.0
 freqs = np.arange(50.0, 400.0 + df, df)
 levels = 42.0 - 6.0 * np.log10(freqs / 100.0)
 levels[int(np.argmin(np.abs(freqs - 200.0)))] += 22.0   # tono estilo paso de pala
-environmental.wind_turbine_tonality(levels, freqs, tone_frequency=200.0).plot()
+environmental.wind_turbine_tonality(levels, freqs, tone_frequency=200.0).plot(language="es")
 ```
 
 </details>

@@ -1,6 +1,6 @@
 ---
 title: "Materiales acústicos"
-description: "Caracterización de absorbentes y particiones en laboratorio: la valoración ponderada de absorción sonora alpha_w de ISO 11654 y su clase, la resistencia y resistividad al flujo de aire de ISO 9053-1/-2, y la impedancia superficial, la absorción y la pérdida por transmisión en tubo de impedancia de ISO 10534-1/-2 y ASTM E2611."
+description: "Caracterización de absorbentes y particiones en laboratorio: la valoración ponderada de absorción acústica alpha_w de ISO 11654 y su clase, la resistencia y resistividad al flujo de aire de ISO 9053-1/-2, y la impedancia superficial, la absorción y la pérdida por transmisión en tubo de impedancia de ISO 10534-1/-2 y ASTM E2611."
 references:
   - type: book
     authors: ["Allard, J. F.", "Atalla, N."]
@@ -52,7 +52,7 @@ references:
     title: "Acoustics — Sound absorbers for use in buildings — Rating of sound absorption"
     designation: "ISO 11654:1997"
     url: "https://www.iso.org/standard/19583.html"
-    note: "La valoración ponderada de absorción sonora de la sección 1: el coeficiente práctico, la curva de referencia desplazada, los indicadores de forma y la clase de absorción, validada frente al ejemplo resuelto del propio Anexo A de la norma."
+    note: "La valoración ponderada de absorción acústica de la sección 1: el coeficiente práctico, la curva de referencia desplazada, los indicadores de forma y la clase de absorción, validada frente al ejemplo resuelto del propio Anexo A de la norma."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2020
@@ -73,7 +73,7 @@ references:
     title: "Acoustics — Determination and application of measurement uncertainties in building acoustics — Part 2: Sound absorption"
     designation: "ISO 12999-2:2020"
     url: "https://www.iso.org/standard/68749.html"
-    note: "La incertidumbre de medida de la absorción sonora de la sección 4, validada frente a los ejemplos resueltos de la propia norma (Tablas 4/5)."
+    note: "La incertidumbre de medida de la absorción acústica de la sección 4, validada frente a los ejemplos resueltos de la propia norma (Tablas 4/5)."
 ---
 
 import Video from '../../../../components/Video.astro';
@@ -82,7 +82,7 @@ import ReportPreview from '../../../../components/ReportPreview.astro';
 
 Caracterizar un absorbente o una partición es un ejercicio de laboratorio con
 tres instrumentos distintos detrás. La **cámara reverberante** entrega un espectro
-de coeficientes de absorción sonora que ISO 11654 condensa en un único número
+de coeficientes de absorción acústica que ISO 11654 condensa en un único número
 valorado $\alpha_w$ con una clase por letra. El **banco de flujo** (estacionario
 u oscilante) mide cuánto cuesta empujar aire a través de una muestra porosa, la
 resistencia al flujo de aire que gobierna su comportamiento a baja frecuencia
@@ -91,9 +91,9 @@ impedancia superficial compleja completa, el factor de reflexión y la absorció
 de una muestra pequeña, y, con cuatro micrófonos, su pérdida por transmisión
 (ISO 10534-1/-2, ASTM E2611). Esta página cubre las tres.
 
-## 1. Valoración de la absorción sonora (ISO 11654)
+## 1. Valoración de la absorción acústica (ISO 11654)
 
-ISO 354 mide el coeficiente de absorción sonora $\alpha_s$ de un material en
+ISO 354 mide el coeficiente de absorción acústica $\alpha_s$ de un material en
 bandas de tercio de octava en una cámara reverberante. ISO 11654:1997 convierte
 ese espectro en una valoración de número único comparable entre productos.
 
@@ -129,7 +129,7 @@ A (0,90–1,00), B (0,80–0,85), C (0,60–0,75), D (0,30–0,55), E (0,15–0,
 clasificado" (0,00–0,10). Como $\alpha_w$ es siempre un múltiplo de $0{,}05$, estos
 rangos particionan la rejilla de forma exacta.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating_es.svg" alt="Valoración ponderada de absorción sonora de ISO 11654: el espectro de absorción práctica trazado frente a la curva de referencia desplazada de 250 Hz a 4000 Hz, con la desviación desfavorable a 250 Hz sombreada y el coeficiente ponderado alpha_w leído a 500 Hz" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating_es.svg" alt="Valoración ponderada de absorción acústica de ISO 11654: el espectro de absorción práctica trazado frente a la curva de referencia desplazada de 250 Hz a 4000 Hz, con la desviación desfavorable a 250 Hz sombreada y el coeficiente ponderado alpha_w leído a 500 Hz" width="80%" />
 
 *El ejemplo resuelto del Anexo A.2: la curva de referencia se desplaza hacia
 abajo 0,40 hasta que las desviaciones desfavorables suman 0,05 (≤ 0,10), dando
@@ -146,7 +146,7 @@ from phonometry import materials
 
 # Coeficientes prácticos del Anexo A.2 de ISO 11654 a 250/500/1000/2000/4000 Hz
 result = materials.weighted_absorption([0.35, 1.00, 0.65, 0.60, 0.55])
-result.plot()   # curva práctica frente a la referencia desplazada
+result.plot(language="es")   # curva práctica frente a la referencia desplazada
 plt.show()
 ```
 
@@ -243,7 +243,7 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 <ReportPreview
 	name="iso11654_absorption_example"
 	title="Informe de ejemplo de absorción ISO 11654 (PDF)"
-	description="Ficha de absorción de una página: una cabecera de metadatos (cliente, muestra, superficie de la probeta, montaje, temperatura, humedad y presión de la cámara reverberante), la tabla completa de alpha_s de tercio de octava con el alpha_p de octava en las filas correspondientes junto a la curva práctica frente a la referencia desplazada, el resultado de un solo número alpha_w = 0.60 (M) en caja con la clase de absorción C y el desplazamiento aplicado, y una fila de veredicto CUMPLE frente al requisito de 0.55."
+	description="Ficha de absorción de una página: una cabecera de metadatos (cliente, muestra, superficie de la probeta, montaje, temperatura, humedad y presión de la cámara reverberante), la tabla completa de alpha_s de tercio de octava con el alpha_p de octava en las filas correspondientes junto a la curva práctica frente a la referencia desplazada, el resultado de un solo número alpha_w = 0,60 (M) en caja con la clase de absorción C y el desplazamiento aplicado, y una fila de veredicto CUMPLE frente al requisito de 0,55."
 	caption="Ficha de absorción ponderada (AbsorptionRatingResult.report), alpha_w con su clase."
 />
 
@@ -313,7 +313,7 @@ m = materials.measure_sound_absorption(
 )
 
 # Una línea: el espectro de alpha_s sobre el eje de bandas de tercio de octava.
-m.plot()
+m.plot(language="es")
 plt.show()
 
 # A mano, desde los campos del resultado:
@@ -507,7 +507,7 @@ r.report(
 
 **Método alterno (ISO 9053-2:2020).** Un pistón que oscila a 1–4 Hz acciona un
 flujo alterno hacia una cavidad terminada por la probeta o por un tapón
-hermético; la resistencia se obtiene de la diferencia de nivel de presión sonora
+hermético; la resistencia se obtiene de la diferencia de nivel de presión acústica
 entre las dos terminaciones (Fórmula (2)):
 
 $$
@@ -725,7 +725,7 @@ result = materials.two_microphone_impedance(
 )
 
 # Una línea: alpha(f) con |r| superpuesto.
-result.plot()
+result.plot(language="es")
 plt.show()
 
 # A mano, desde los campos del resultado:
@@ -870,7 +870,7 @@ tm = materials.TransferMatrix(t11=chain[0, 0], t12=chain[0, 1],
                               t21=chain[1, 0], t22=chain[1, 1])
 
 # Una línea: TL(f) en el eje izquierdo, absorción con respaldo rígido a la derecha.
-tm.plot(f, 407.0)
+tm.plot(f, 407.0, language="es")
 plt.show()
 
 # A mano, desde los métodos de la matriz:
@@ -989,7 +989,7 @@ Un coeficiente de absorción valorado significa poco sin su incertidumbre. La
 ISO 12999-2:2020 da la incertidumbre típica $u$ de las magnitudes que produce una
 medida en cámara reverberante (ISO 354) y sus valoraciones (ISO 11654, EN 1793-1),
 estimada a partir de ensayos interlaboratorio según ISO 5725. Es la compañera,
-en absorción sonora, de la incertidumbre de aislamiento de la ISO 12999-1
+en absorción acústica, de la incertidumbre de aislamiento de la ISO 12999-1
 ([Medición del aislamiento en campo e índices](/phonometry/es/guides/insulation-field/)).
 
 **Bandas de tercio de octava (cláusula 5).** Para el coeficiente de absorción, la
@@ -1013,7 +1013,7 @@ valor ($\sigma_R = 0{,}10\,DL_\alpha$, $\sigma_r = 0{,}02\,DL_\alpha$).
 gaussiano). El $U$ notificado se redondea a dos decimales para los coeficientes de
 absorción y a un decimal para el área equivalente y $DL_{\alpha,\text{NRD}}$.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_uncertainty_es.svg" alt="Incertidumbre del coeficiente de absorción sonora ISO 12999-2: el espectro medido de alpha_s en bandas de tercio de octava de 63 Hz a 5000 Hz con una banda sombreada de más-menos U con factor de cobertura k = 2, reproduciendo el ejemplo resuelto de la Tabla 4 de la norma" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_uncertainty_es.svg" alt="Incertidumbre del coeficiente de absorción acústica ISO 12999-2: el espectro medido de alpha_s en bandas de tercio de octava de 63 Hz a 5000 Hz con una banda sombreada de más-menos U con factor de cobertura k = 2, reproduciendo el ejemplo resuelto de la Tabla 4 de la norma" width="80%" />
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -1028,7 +1028,7 @@ freqs = [63, 80, 100, 125, 160, 200, 250, 315, 400, 500,
 alpha_s = [0.33, 0.35, 0.39, 0.38, 0.37, 0.36, 0.36, 0.36, 0.43, 0.49,
            0.58, 0.63, 0.68, 0.71, 0.73, 0.75, 0.77, 0.79, 0.81, 0.81]
 result = materials.sound_absorption_coefficient_uncertainty(alpha_s, freqs, confidence=0.95)
-result.plot()   # alpha_s con la banda +/-U (k = 2) de reproducibilidad
+result.plot(language="es")   # alpha_s con la banda +/-U (k = 2) de reproducibilidad
 plt.show()
 ```
 </details>

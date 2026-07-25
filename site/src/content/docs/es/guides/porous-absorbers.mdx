@@ -208,7 +208,7 @@ f = np.geomspace(100.0, 5000.0, 260)
 mk = materials.miki(f, 20000.0)          # sigma = 20 kPa s/m^2
 
 # Una línea: componentes normalizadas de Zc y k en una rejilla log-log.
-mk.plot()
+mk.plot(language="es")
 plt.show()
 
 # A mano, desde los campos del resultado:
@@ -394,7 +394,7 @@ res = materials.layered_absorber(
 )
 
 # Una línea: alpha(f) con |R| superpuesto.
-res.plot()
+res.plot(language="es")
 plt.show()
 
 # A mano, desde los campos del resultado:
@@ -477,7 +477,7 @@ normal = materials.layered_absorber(f, layers)
 diffuse = materials.diffuse_field_absorption(f, layers)
 
 # Una línea, y después la superposición de incidencia normal en los mismos ejes:
-ax = diffuse.plot()
+ax = diffuse.plot(language="es")
 ax.plot(f, normal.absorption, "--", label="Incidencia normal alpha(0)")
 ax.legend()
 plt.show()

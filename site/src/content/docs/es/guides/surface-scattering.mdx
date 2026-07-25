@@ -178,7 +178,7 @@ alpha_spec = 0.11 + 0.75 * (np.log10(freqs / 250) / np.log10(4000 / 250))
 result = materials.scattering_coefficient_spectrum(freqs, alpha_spec, alpha_s)
 
 # result es el ScatteringResult calculado arriba. En una línea:
-result.plot()
+result.plot(language="es")
 plt.show()
 
 # A mano, a partir de los campos del resultado, replicando lo que dibuja ScatteringResult.plot():
@@ -332,7 +332,7 @@ print(round(result.coefficient, 2))   # 0.11
 result.plot()   # respuesta polar reflejada, d en el título (requiere matplotlib)
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_polar_es.svg" alt="Un diagrama polar del nivel de presión sonora reflejado predicho de un difusor de residuos cuadráticos N=7 de seis periodos sobre 37 receptores de -90 a 90 grados, con la energía concentrada en un abanico de lóbulos de red discretos, dando un coeficiente de difusión por autocorrelación d de aproximadamente 0,11" width="72%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_polar_es.svg" alt="Un diagrama polar del nivel de presión acústica reflejado predicho de un difusor de residuos cuadráticos N=7 de seis periodos sobre 37 receptores de -90 a 90 grados, con la energía concentrada en un abanico de lóbulos de red discretos, dando un coeficiente de difusión por autocorrelación d de aproximadamente 0,11" width="72%" />
 
 *La matriz periódica de QRD divide la energía reflejada en un abanico de
 lóbulos de red discretos en lugar de un único pico especular, pero seis
@@ -361,7 +361,7 @@ angles = np.arange(-90.0, 90.5, 5.0)
 result = materials.directional_diffusion(angles, qrd.levels)
 
 # result es el DiffusionResult calculado arriba. En una línea:
-result.plot()
+result.plot(language="es")
 plt.show()
 
 # A mano: un diagrama polar de los niveles, con d anotado en el título.
@@ -508,7 +508,7 @@ depths = materials.qrd_well_depths(7, 500.0)
 qrd = materials.predicted_diffusion_spectrum(0.10, freqs, depths=depths, periods=5)
 
 # El DiffusionSpectrum dibuja la d(f) predicha directamente. Una linea:
-qrd.plot()
+qrd.plot(language="es")
 plt.show()
 
 # A mano: d(f) predicha para el QRD frente a la referencia plana.
@@ -577,7 +577,7 @@ sonido") no es ninguno de los dos.
 
 ## 3. Absorción in situ de pavimentos: técnica de sustracción (ISO 13472-1)
 
-En campo no hay cámara reverberante. ISO 13472-1 mide la absorción sonora de un
+En campo no hay cámara reverberante. ISO 13472-1 mide la absorción acústica de un
 pavimento (o de cualquier superficie plana extensa) *in situ* disparando un
 impulso desde un altavoz a la altura $d_s$ hacia la superficie y registrando la
 respuesta al impulso en un micrófono a la altura $d_m$. Las componentes
@@ -701,7 +701,7 @@ hr = kr * 0.85 * np.roll(lfilter(taps, 1.0, hi), shift)
 result = materials.insitu_absorption_spectrum(hi, hr, fs)
 
 # result es el InsituAbsorptionResult calculado arriba. En una línea:
-result.plot()
+result.plot(language="es")
 plt.show()
 
 # A mano: un diagrama de barras de alpha sobre las bandas de tercio de octava.

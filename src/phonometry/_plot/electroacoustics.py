@@ -83,7 +83,7 @@ _STRINGS: dict[str, str] = {
     "Baffled circular piston radiation impedance": "Impedancia de radiación de un pistón circular con pantalla",
     "Baffled circular piston directivity": "Directividad de un pistón circular con pantalla",
     # --- IEC 60268-4/-5 datasheet panels (shared by .report() and .plot()) ---
-    "Sound pressure level [dB]": "Nivel de presión sonora [dB]",
+    "Sound pressure level [dB]": "Nivel de presión acústica [dB]",
     "On-axis response": "Respuesta en el eje",
     "Tolerance ±{tol} dB": "Tolerancia ±{tol} dB",
     "−10 dB reference": "Referencia −10 dB",

@@ -90,6 +90,10 @@ reproduced (E.2.1: 7.4 m/s² for 2.5 h → $A(8) = 4.1$ m/s²; E.3 forestry,
 three tools → 3.6 m/s²), as are the ISO 5349-1 Table C.1 exposure-duration
 rows.
 
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_weighting.svg" alt="The whole-body vertical weighting Wk in decibels over 0.4 to 100 Hz: a plateau near -6 dB below 2 Hz, a small +0.5 dB peak near 6 Hz and a roll-off to about -21 dB at 100 Hz" style="width:88%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_weighting_dark.svg" alt="The whole-body vertical weighting Wk in decibels over 0.4 to 100 Hz: a plateau near -6 dB below 2 Hz, a small +0.5 dB peak near 6 Hz and a roll-off to about -21 dB at 100 Hz" style="width:88%" loading="lazy">
+
+*The Wk whole-body weighting realized from the ISO 8041-1 cascade.*
+
 ### Multiple shocks (ISO 2631-5)
 
 Repeated shocks damage the lumbar spine through peak compression rather than
@@ -143,3 +147,7 @@ transmission path of the
 
 See the [Predicting Panel Sound Insulation guide](/phonometry/guides/panel-sound-insulation/)
 for usage.
+
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mechanical_mobility.svg" alt="Normalized receptance, mobility and accelerance magnitudes of a single-degree-of-freedom resonator on a log-log frequency axis, all peaking at the resonance" style="width:82%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mechanical_mobility_dark.svg" alt="Normalized receptance, mobility and accelerance magnitudes of a single-degree-of-freedom resonator on a log-log frequency axis, all peaking at the resonance" style="width:82%" loading="lazy">
+
+*Receptance, mobility and accelerance of a one-degree-of-freedom resonator: the same resonance seen through the three kinematic quantities.*

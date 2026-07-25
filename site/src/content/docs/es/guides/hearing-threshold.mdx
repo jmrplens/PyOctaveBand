@@ -25,7 +25,7 @@ la **distribución estadística del umbral de audición con la edad** para una
 población otológicamente normal: la pérdida lenta y primero en altas
 frecuencias conocida como presbiacusia. **ISO 389-7:2005** fija el **umbral de
 referencia de la audición**, el cero audiométrico (0 dB HL) expresado como nivel
-de presión sonora en escucha de campo libre y campo difuso. Ambas se definen
+de presión acústica en escucha de campo libre y campo difuso. Ambas se definen
 sobre las frecuencias audiométricas de 125 Hz a 8000 Hz.
 
 <ThemeImage
@@ -119,7 +119,7 @@ print(res.median.round(1))
 print(res.threshold.round(1))     # el fractil 90 %
 
 # En una línea: la mediana, el fractil y la banda 10-90 %.
-res.plot()
+res.plot(language="es")
 plt.show()
 ```
 
@@ -147,7 +147,7 @@ retoma la cadena en ese punto.
 
 ## 2. Umbral de referencia de la audición (ISO 389-7)
 
-El cero audiométrico no es un nivel de presión sonora fijo: depende de cómo
+El cero audiométrico no es un nivel de presión acústica fijo: depende de cómo
 llega el sonido al oyente. La Tabla 1 de ISO 389-7:2005 da el umbral de
 referencia para escucha de **campo libre** (incidencia frontal) y **campo
 difuso**.
@@ -180,7 +180,7 @@ from phonometry import hearing
 from phonometry.hearing import AUDIOMETRIC_FREQUENCIES as f
 
 # En una línea, la distribución por edad:
-hearing.age_threshold(70, "male", 0.5).plot()
+hearing.age_threshold(70, "male", 0.5).plot(language="es")
 plt.show()
 
 # A mano, ambos paneles:

@@ -143,7 +143,7 @@ print(round(res.ratio_db, 1), round(res.criterion_db, 1), res.prominent)
 # 15.1 13.0 True
 
 # En una línea: el tono frente a la curva de criterio de su propio método.
-res.plot()
+res.plot(language="es")
 plt.show()
 
 # A mano, reproduciendo lo que dibuja ToneAssessment.plot():
@@ -212,7 +212,7 @@ objetivo, su entrada y su salida.
 | Norma | ECMA-418-1:2024, apartados 11 y 12 | ISO/PAS 20065:2016, adoptada por el Anexo J de ISO 1996-2:2017 | ECMA-418-2:2025, apartado 6 | IEC 61400-11:2012, apartado 9.5 |
 | Pregunta que responde | ¿Es prominente este tono discreto en la emisión de un equipo? | ¿Es audible el tono por encima del ruido que lo enmascara, y en cuánto? | ¿Cuán tonal se percibe el sonido? | ¿Es audible el tono del aerogenerador en la posición de referencia, bin de viento a bin de viento? |
 | Entrada | Un espectro FFT, sin necesidad de calibración | Espectros de banda estrecha con la separación entre líneas declarada | La señal de presión calibrada, a través del modelo auditivo de Sottek | Espectros de banda estrecha por bin de velocidad de viento, con la distancia de referencia |
-| Salida | Un ratio en dB frente a un criterio dependiente de la frecuencia, más un veredicto prominente / no prominente | Una audibilidad en dB, cuyos valores decisivo y medio alimentan el ajuste tonal `Kt` | Una tonalidad en `tu_HMS`, una magnitud perceptiva sin criterio asociado | Una audibilidad en dB por bin, informada junto a la potencia sonora del aerogenerador |
+| Salida | Un ratio en dB frente a un criterio dependiente de la frecuencia, más un veredicto prominente / no prominente | Una audibilidad en dB, cuyos valores decisivo y medio alimentan el ajuste tonal `Kt` | Una tonalidad en `tu_HMS`, una magnitud perceptiva sin criterio asociado | Una audibilidad en dB por bin, informada junto a la potencia acústica del aerogenerador |
 | Se usa para | Declarar la emisión de equipos TIC (Anexo D de ECMA-74) | Evaluación de ruido ambiental: justificar, o descartar, una penalización tonal | Calidad sonora: comparar diseños, no superar un límite | Ensayos de tipo y aceptación de aerogeneradores |
 
 La tabla se lee como una decisión: la métrica la elige el *objetivo del

@@ -184,7 +184,7 @@ R = [20.4, 16.3, 17.7, 22.6, 22.4, 22.7, 24.8, 26.6,
 w = building.weighted_rating(R)
 
 # En una línea — la curva medida frente a la referencia ISO 717-1 desplazada:
-w.plot()
+w.plot(language="es")
 plt.show()
 
 # A mano, con los campos de la curva por banda que ahora lleva el resultado:
@@ -319,7 +319,7 @@ plt.show()
 El ruido de pisadas se califica al revés. En lugar de cuánto *bloquea* un
 forjado, el aislamiento a impactos mide cuánto introduce en la sala inferior
 una **máquina de impactos normalizada** situada en el forjado superior, así que
-un número *mayor* es *peor*. El nivel de presión de ruido de impactos $L_i$
+un número *mayor* es *peor*. El nivel de presión acústica de impactos $L_i$
 promediado en energía en la sala receptora se normaliza igual que el caso
 aéreo, pero con un cambio de signo en el término de reverberación:
 
@@ -351,7 +351,7 @@ $C_{I,50\text{–}2500}$ (NOTA de A.2.1) y, con `one_decimal=True`, el índice e
 pasos de 0,1 dB usado en las declaraciones de incertidumbre (reproduce los
 valores impresos $L_{n,r,0,w} = 77,6$ dB y $C_{I,r,0} = -10,3$ dB de A.2.2).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_rating_es.svg" alt="Nivel de presión de ruido de impactos normalizado medido en tercios de octava con la curva de referencia de ISO 717-2 desplazada y el índice ponderado resultante leído a 500 Hz" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_rating_es.svg" alt="Nivel de presión acústica de impactos normalizado medido en tercios de octava con la curva de referencia de ISO 717-2 desplazada y el índice ponderado resultante leído a 500 Hz" width="80%" />
 
 ```python
 import numpy as np
@@ -396,7 +396,7 @@ imp = building.impact_insulation(li, t2, volume=50.0)
 res_imp = building.weighted_impact_rating(imp.l_n_t)
 
 # En una línea — L'nT medido frente a la referencia ISO 717-2 desplazada (exceso sombreado):
-res_imp.plot()
+res_imp.plot(language="es")
 plt.show()
 
 # A mano, con la curva por banda que ahora lleva el resultado (signo opuesto: la
@@ -409,7 +409,7 @@ ax.fill_between(res_imp.band_centers, res_imp.shifted_reference, res_imp.measure
                 where=res_imp.measured > res_imp.shifted_reference, interpolate=True,
                 alpha=0.3, label="Desviaciones desfavorables")
 ax.set_xlabel("Frecuencia [Hz]")
-ax.set_ylabel("Nivel de presión sonora de impacto [dB]")
+ax.set_ylabel("Nivel de presión acústica de impactos [dB]")
 ax.set_title(f"L'nT,w = {res_imp.rating} dB  (CI={res_imp.ci:+d})")
 ax.legend()
 plt.show()
@@ -520,7 +520,7 @@ renderizadas en el repositorio; pulsa cualquier vista previa para abrir el PDF.
 <ReportPreview
 	name="iso717_impact_example"
 	title="Informe de ejemplo de impactos ISO 717-2 (PDF)"
-	description="Ficha de aislamiento a ruido de impactos con el mismo formato acreditado para el nivel de presión de ruido de impactos normalizado Ln: la cabecera de metadatos, la tabla de Ln en tercios de octava junto a la curva medida frente a la referencia desplazada con la lectura a 500 Hz, el resultado de un solo número Ln,w (CI) en caja y una fila de veredicto NO CUMPLE frente al requisito de 53 dB (un nivel de impacto más bajo es mejor)."
+	description="Ficha de aislamiento a ruido de impactos con el mismo formato acreditado para el nivel de presión acústica de impactos normalizado Ln: la cabecera de metadatos, la tabla de Ln en tercios de octava junto a la curva medida frente a la referencia desplazada con la lectura a 500 Hz, el resultado de un solo número Ln,w (CI) en caja y una fila de veredicto NO CUMPLE frente al requisito de 53 dB (un nivel de impacto más bajo es mejor)."
 	caption="Ficha de índice de impactos (ImpactRatingResult.report), Ln,w (CI)."
 />
 
@@ -1081,7 +1081,7 @@ k = building.reverberation_index([0.70, 0.60, 0.50, 0.45, 0.40])
 impact = building.survey_impact_insulation(li, k, volume=50.0)
 
 # Una línea: L'nT frente a la referencia ISO 717-2 desplazada:
-impact.plot()
+impact.plot(language="es")
 plt.show()
 
 # A mano, mostrando el cambio de signo de la corrección:
@@ -1092,7 +1092,7 @@ ax.plot(x, impact.l_i, "--o", label="Li (nivel de impactos)")
 ax.plot(x, impact.l_nt, "-s", label="L'nT (estandarizado)")
 ax.set_xticks(x, [str(b) for b in bands])
 ax.set(xlabel="Frecuencia [Hz]",
-       ylabel="Nivel de presión de ruido de impactos [dB]",
+       ylabel="Nivel de presión acústica de impactos [dB]",
        title=f"Método de control ISO 10052: L'nT,w = {impact.rating.rating} dB")
 ax.legend()
 plt.show()
@@ -1129,7 +1129,7 @@ plt.show()
 - [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/):
   el comportamiento in situ predicho a partir de datos de elemento de laboratorio.
 - [Acústica de salas](/phonometry/es/guides/room-acoustics/): la respuesta al impulso,
-  los parámetros de sala y la absorción sonora sobre los que se apoya la cadena de aislamiento de esta guía.
+  los parámetros de sala y la absorción acústica sobre los que se apoya la cadena de aislamiento de esta guía.
 - [Niveles](/phonometry/es/guides/levels/): el promediado en energía y las métricas de
   nivel que sustentan los niveles de las salas emisora/receptora.
 - [Bancos de filtros](/phonometry/es/guides/filter-banks/): los filtros de octava

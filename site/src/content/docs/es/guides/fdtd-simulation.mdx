@@ -193,8 +193,8 @@ res = simulation.fdtd_simulation(
 
 fig, (ax_f, ax_p) = plt.subplots(
     1, 2, figsize=(12.5, 5.0), gridspec_kw={"width_ratios": [1.25, 1.0]})
-res.plot(kind="snapshot", frame=7, ax=ax_f)
-res.plot(ax=ax_p)
+res.plot(kind="snapshot", frame=7, ax=ax_f, language="es")
+res.plot(ax=ax_p, language="es")
 plt.tight_layout()
 plt.show()
 ```
@@ -254,7 +254,7 @@ res = simulation.fdtd_simulation(
 )
 
 # Una línea: la historia de presión en la sonda de la que sale el espectro.
-res.plot()
+res.plot(language="es")
 plt.show()
 
 # La comprobación modal: espectro en la sonda frente a los modos analíticos.

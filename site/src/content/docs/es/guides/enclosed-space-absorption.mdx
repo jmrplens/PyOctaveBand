@@ -1,6 +1,6 @@
 ---
-title: "Absorción sonora en recintos (EN 12354-6)"
-description: "La predicción de EN 12354-6:2003 del área de absorción sonora equivalente total de una sala y su tiempo de reverberación a partir de la absorción de sus superficies y objetos (el modelo normativo de la cláusula 4): el área de absorción de la Fórmula 1, los términos de objetos y aire, y el tiempo de reverberación de la Fórmula 5."
+title: "Absorción acústica en recintos (EN 12354-6)"
+description: "La predicción de EN 12354-6:2003 del área de absorción acústica equivalente total de una sala y su tiempo de reverberación a partir de la absorción de sus superficies y objetos (el modelo normativo de la cláusula 4): el área de absorción de la Fórmula 1, los términos de objetos y aire, y el tiempo de reverberación de la Fórmula 5."
 references:
   - type: standard
     organization: "European Committee for Standardization"
@@ -29,7 +29,7 @@ references:
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
 
-**EN 12354-6:2003** predice el **área de absorción sonora equivalente total** de
+**EN 12354-6:2003** predice el **área de absorción acústica equivalente total** de
 una sala y su **tiempo de reverberación** a partir de la absorción de sus
 superficies y objetos, la contraparte de diseño del tiempo de reverberación
 medido. Es el miembro de absorción de la familia de acústica de la edificación
@@ -132,7 +132,7 @@ walls_floor = [(54.0, plaster), (20.0, plaster)]
 for ceiling in (plaster, tile):
     room.enclosed_space_reverberation(
         [*walls_floor, (20.0, ceiling)], 60.0, air_condition="20C_50-70",
-    ).plot()
+    ).plot(language="es")
 plt.show()
 ```
 

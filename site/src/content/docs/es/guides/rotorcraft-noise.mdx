@@ -52,7 +52,7 @@ import ThemeImage from '../../../../components/ThemeImage.astro';
 
 El ruido de los helicópteros es muy directivo, así que el método de **ECAC
 Doc 32** describe la fuente con un **hemisferio de ruido**: niveles de presión
-sonora en bandas de 1/3 de octava sobre una malla esférica de azimut `φ` y ángulo
+acústica en bandas de 1/3 de octava sobre una malla esférica de azimut `φ` y ángulo
 polar `θ`, definidos a una distancia de referencia fija de **60 m** en condiciones
 atmosféricas de referencia de la ICAO. Situar esa fuente en un receptor añade el
 ajuste de propagación `ΔLp = ΔLs + ΔLa + ΔLg`.
@@ -171,7 +171,7 @@ diferencias finitas centradas, todo lo que necesita el evento (Ec. 16-21 /
 Doc 32 Ec. 8-10): velocidad respecto al suelo, velocidad aerodinámica (sin
 viento), rumbo, curvatura, ángulo de alabeo `Φ = atan(K·Vg²/g)` y ángulo de
 trayectoria `γ = atan(ΔZ/ΔS)`. La guía recomienda suavizar las trazas radar
-(p. ej. remuestreo con splines a cadencia de 0.5 s) antes de derivar.
+(p. ej. remuestreo con splines a cadencia de 0,5 s) antes de derivar.
 
 ```python
 kin = aircraft.flight_path_kinematics(times, positions)   # posiciones (N, 3), m
@@ -227,7 +227,7 @@ track = np.column_stack([np.zeros_like(t), speed * (t - 65.0),
                          np.full_like(t, 150.0)])
 event = aircraft.rotorcraft_event_level(
     [h], [speed], [0.0], t, track, (120.0, 0.0), flow_resistivity="D")
-event.plot()
+event.plot(language="es")
 plt.show()
 ```
 
@@ -270,7 +270,7 @@ emplazamientos reales. Una sección vertical variable se representa por su
 de la polilínea del terreno calculada en forma cerrada; la fuente y el
 receptor entran en las ecuaciones de suelo plano con sus **alturas
 equivalentes**, medidas ortogonalmente a ese plano y con suelo mínimo de
-0.1 m. El suelo que cambia de tipo a lo largo del camino promedia su
+0,1 m. El suelo que cambia de tipo a lo largo del camino promedia su
 resistividad de flujo por el logaritmo, ponderada por la longitud de cada
 segmento (Ec. 41).
 
@@ -322,7 +322,7 @@ flat = aircraft.ground_effect_adjustment(freqs, 90.0, 1.2, 600.0,
                                          flow_resistivity="D")
 
 fig, (ax, ax2) = plt.subplots(2, 1, figsize=(9, 7))
-res.plot(ax=ax)
+res.plot(ax=ax, language="es")
 ax2.axhline(0.0, color="0.5", linewidth=1.0)
 ax2.semilogx(freqs, flat, ls="--", marker="s", markersize=3,
              label="Suelo plano (sin colina)")
@@ -359,15 +359,15 @@ rasante del efecto de suelo, consultas bilineales fuera de nodo sobre los
 hemisferios de referencia de los once tipos de helicóptero, símplices de
 interpolación comprobados a mano, cinemática de forma cerrada y la integral
 lorentziana `SEL − LASmax` del sobrevuelo, y de extremo a extremo contra los
-casos ARP de verificación del prototipo NORAH2: ángulos de emisión a 0.01°,
-tiempos retardados a 0.02 s, cada nivel por paso de los eventos sobre suelo
-duro a 0.08 dB(A) hasta 18 km, `LASmax` a 0.03 dB, `SEL` a 0.05 dB sobre suelo
-duro (0.4 dB sobre suelo blando), la malla de contorno de 187 micrófonos a
-0.7 dB en el peor caso, `PNLTM` a 0.1 dB y `EPNL` a aproximadamente 1.3 dB (la
+casos ARP de verificación del prototipo NORAH2: ángulos de emisión a 0,01°,
+tiempos retardados a 0,02 s, cada nivel por paso de los eventos sobre suelo
+duro a 0,08 dB(A) hasta 18 km, `LASmax` a 0,03 dB, `SEL` a 0,05 dB sobre suelo
+duro (0,4 dB sobre suelo blando), la malla de contorno de 187 micrófonos a
+0,7 dB en el peor caso, `PNLTM` a 0,1 dB y `EPNL` a aproximadamente 1,3 dB (la
 política de noys del prototipo por debajo del suelo de la tabla difiere de la
 ley publicada del Anexo 16). Queda una divergencia documentada: a gran distancia sobre suelo
 blando el prototipo amortigua la interferencia coherente de dos rayos de la
-Ec. 30 de la guía hacia la suma incoherente (hasta 4.9 dB en pasos individuales
+Ec. 30 de la guía hacia la suma incoherente (hasta 4,9 dB en pasos individuales
 de bajo nivel más allá de 7 km); ni Doc 32 ni la guía contienen tal término, y
 esta implementación sigue las ecuaciones publicadas.
 
@@ -379,8 +379,8 @@ la media geométrica, la difracción rasante da el clásico `10·log10(3)`, y
 una colina comprobada a mano fija la diferencia de camino de la banda
 elástica. El tratamiento del suelo por receptor valida de extremo a extremo
 contra el Case 3 ARP del prototipo (187 micrófonos, cada uno sobre su propia
-elevación: cada nivel por paso a 0.08 dB(A), `SEL`/`LASmax` a 0.05 dB, la
-malla de contorno a 0.15 dB) y la malla de suelo mixto del Case 2 se
+elevación: cada nivel por paso a 0,08 dB(A), `SEL`/`LASmax` a 0,05 dB, la
+malla de contorno a 0,15 dB) y la malla de suelo mixto del Case 2 se
 reproduce en una sola llamada con resistividad por receptor. La versión
 pública del prototipo no incluye un caso de apantallamiento reconstruible
 (el marco de su modelo de terreno no pudo fijarse a las salidas publicadas),

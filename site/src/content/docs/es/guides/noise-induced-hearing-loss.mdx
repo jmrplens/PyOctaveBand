@@ -107,7 +107,7 @@ print(res.median.round(1))    # la mediana N50
 print(res.value.round(1))     # el fractil 90 %
 
 # En una línea: la mediana, el fractil y la banda 10-90 %.
-res.plot()
+res.plot(language="es")
 plt.show()
 ```
 
@@ -163,7 +163,7 @@ from phonometry import hearing
 from phonometry.hearing.noise_induced_hearing_loss import NIPTS_FREQUENCIES as f
 
 # En una línea, el espectro NIPTS con su banda de fractiles:
-hearing.nipts(95.0, 40.0, 0.9).plot()
+hearing.nipts(95.0, 40.0, 0.9).plot(language="es")
 plt.show()
 
 # A mano, ambos paneles:

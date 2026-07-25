@@ -278,7 +278,7 @@ x = np.concatenate(trozos)
 # Normalizar el programa al objetivo de R 128 y medirlo.
 ganancia = -23.0 - broadcast.integrated_loudness(np.vstack([x, x]), fs)
 x *= 10 ** (ganancia / 20)
-broadcast.program_loudness(np.vstack([x, x]), fs).plot()
+broadcast.program_loudness(np.vstack([x, x]), fs).plot(language="es")
 plt.show()
 ```
 

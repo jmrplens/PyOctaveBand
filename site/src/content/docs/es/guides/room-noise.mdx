@@ -49,7 +49,7 @@ Evaluating Room Noise*, define dos calificaciones a partir de un espectro que
 phonometry implementa: la calificación **Noise Criteria (NC)** (la designación
 NC-(SIL) de la cláusula 5.2.2, con el método de tangencia cuando el espectro la
 supera), y la calificación **Room Criteria Mark II (RC)** con su etiqueta
-espectral de retumbo/siseo. Ambas trabajan sobre niveles de presión sonora por
+espectral de retumbo/siseo. Ambas trabajan sobre niveles de presión acústica por
 banda de octava en las diez bandas de 16 Hz a 8000 Hz.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_noise_es.svg" alt="Los dos métodos de calificación de ANSI S12.2 a partir de un espectro por bandas de octava: a la izquierda el método de tangencia NC (de las curvas de la Tabla 1, el valor NC en cada banda, después NC es la curva más alta tocada, dando NC-NN con una banda determinante); a la derecha el método RC Mark II (la media de frecuencias medias LMF de los niveles de 500, 1000 y 2000 Hz redondeada para dar RC-NN, después la etiqueta espectral R de retumbo, H de siseo o N de neutro por las reglas de desviación de la cláusula D.3)" width="94%" loading="eager" />
@@ -150,8 +150,8 @@ from phonometry import room
 spl = np.array([62.0, 62.0, 59.0, 57.0, 52.0, 42.0, 35.0, 29.0, 24.0, 19.0])
 
 # En una línea cada uno:
-room.noise_criterion(spl).plot()
-room.room_criterion(spl).plot()
+room.noise_criterion(spl).plot(language="es")
+room.room_criterion(spl).plot(language="es")
 plt.show()
 
 # A mano, reproduciendo lo que dibujan NCResult.plot() / RCResult.plot():

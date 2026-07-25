@@ -162,7 +162,7 @@ noise = np.array([38.0, 37.0, 36.0, 34.0, 32.0, 30.0, 28.0, 26.0, 24.0,
 result = hearing.speech_intelligibility_index(speech, noise)
 
 # En una línea:
-result.plot()
+result.plot(language="es")
 plt.show()
 
 # A mano, replicando lo que dibuja SIIResult.plot():
@@ -217,7 +217,7 @@ res = hearing.speech_intelligibility_index(speech, noise, threshold=threshold)
 print(round(res.sii, 3))       # 0.358  (0.458 con audición normal)
 
 # En una línea: las mismas barras de audibilidad, ahora limitadas por el umbral.
-res.plot()
+res.plot(language="es")
 plt.show()
 ```
 

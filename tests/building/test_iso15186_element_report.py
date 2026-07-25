@@ -169,7 +169,7 @@ def test_spanish_fiche_renders_translated(tmp_path) -> None:
     _assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "CUMPLE" in text
-    assert "intensidad sonora" in " ".join(text.split())
+    assert "intensidad acústica" in " ".join(text.split())
     assert re.search(r"\d+,\d", text)  # comma decimal separator
 
 

@@ -30,7 +30,7 @@ semiplano izquierdo ($s = -1/\tau$).
 | | phonometry | python-acoustics |
 | :--- | :--- | :--- |
 | Salida | Envolvente continua con ponderación temporal (un valor por muestra) | Salida escalonada (un valor cada τ segundos) |
-| Unidades de entrada | Presión sonora cruda (Pa); se eleva al cuadrado internamente | Se espera la magnitud energética (Pa²) como entrada |
+| Unidades de entrada | Presión acústica cruda (Pa); se eleva al cuadrado internamente | Se espera la magnitud energética (Pa²) como entrada |
 | Filtro | Promediado exponencial estable (polo en $s=-1/\tau$) | Diseño teóricamente inestable (polo en el semiplano derecho) estabilizado reiniciando el estado cada τ segundos |
 | Comportamiento | Ponderación temporal IEC verdadera | Más cercano a un integrador por bloques ($L_{eq,\tau}$) |
 

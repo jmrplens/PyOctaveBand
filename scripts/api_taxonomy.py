@@ -221,7 +221,7 @@ _SECTION_LIST: tuple[Section, ...] = (
     Section(
         key="power",
         label_en="Sound power and intensity",
-        label_es="Potencia sonora e intensidad",
+        label_es="Potencia acústica e intensidad",
         modules=(
             "phonometry.emission.sound_power",
             "phonometry.emission.sound_power_intensity",

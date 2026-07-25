@@ -61,7 +61,7 @@ import Video from '../../../../components/Video.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
 
-Las métricas de nivel dicen cuánta *presión sonora* hay; la sonoridad dice
+Las métricas de nivel dicen cuánta *presión acústica* hay; la sonoridad dice
 cuán fuerte la *percibe* realmente quien escucha. Esta página cubre las tres
 familias de modelos de sonoridad que incluye phonometry: el método de
 Zwicker (ISO 532-1), los métodos de Moore-Glasberg (ISO 532-2/3) y la
@@ -144,7 +144,7 @@ levels_28 = np.full(28, 60.0)                             # 28 niveles de tercio
 res = psychoacoustics.loudness_zwicker_from_spectrum(levels_28, field="diffuse")
 
 # En una línea — el patrón de sonoridad específica N'(z) desde el resultado:
-res.plot()
+res.plot(language="es")
 plt.show()
 
 # O reproduce la figura a mano — dos patrones con el mismo nivel de banda (60 dB),
@@ -229,7 +229,7 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 <ReportPreview
 	name="iso532_loudness_example"
 	title="Informe de ejemplo de sonoridad ISO 532-1 (PDF)"
-	description="Ficha de sonoridad de una página: una cabecera de metadatos, una tabla de métricas con la sonoridad total N y el nivel de sonoridad LN, el patrón de sonoridad específica sobre la tasa de banda crítica, el resultado de un solo número N = 8.2 sono (LN = 70.4 fonio) en caja y una fila de veredicto CUMPLE frente a un límite de 12 sonos."
+	description="Ficha de sonoridad de una página: una cabecera de metadatos, una tabla de métricas con la sonoridad total N y el nivel de sonoridad LN, el patrón de sonoridad específica sobre la tasa de banda crítica, el resultado de un solo número N = 8,2 sonos (LN = 70,4 fonios) en caja y una fila de veredicto CUMPLE frente a un límite de 12 sonos."
 	caption="Ficha de sonoridad de Zwicker (ZwickerLoudness.report), N en sonos con LN en fonios."
 />
 
@@ -268,7 +268,7 @@ from phonometry import psychoacoustics
 
 # Una línea — la familia de curvas directamente desde el resultado:
 res = psychoacoustics.equal_loudness_contours()
-res.plot()
+res.plot(language="es")
 plt.show()
 
 # O reproduce la figura a mano — Fórmula (1) de ISO 226:2023 en las 29
@@ -280,7 +280,7 @@ for phon in [20, 40, 60, 80, 90]:
     ax.annotate(f"{phon} fonios", xy=(1000, phon + 1), fontsize=9)
 ft, tf = psychoacoustics.hearing_threshold()
 ax.semilogx(ft, tf, "--", color="C1", label="Umbral de audición $T_f$")
-ax.set(xlabel="Frecuencia [Hz]", ylabel="Nivel de presión sonora [dB re 20 µPa]")
+ax.set(xlabel="Frecuencia [Hz]", ylabel="Nivel de presión acústica [dB re 20 µPa]")
 ax.grid(True, which="both", alpha=0.3)
 ax.legend()
 plt.show()
@@ -347,7 +347,7 @@ ax.plot(levels, zw, "o-", label="Zwicker (ISO 532-1)")
 ax.plot(levels, mg, "s--", label="Moore-Glasberg (ISO 532-2)")
 ax.plot(levels, ec, "^-.", label="Sottek (ECMA-418-2)")
 ax.plot(40.0, 1.0, "o", color="k", markerfacecolor="none", markersize=10)   # el ancla compartida
-ax.set(xlabel="Nivel de presión sonora [dB SPL]", ylabel="Sonoridad total N [sonos]")
+ax.set(xlabel="Nivel de presión acústica [dB SPL]", ylabel="Sonoridad total N [sonos]")
 ax.legend()
 plt.show()
 ```
@@ -407,7 +407,7 @@ x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * np.arange(fs
 res = psychoacoustics.loudness_moore_glasberg(x, fs, field="free", presentation="binaural")
 
 # En una línea — el patrón de sonoridad específica N'(i) directo del resultado:
-res.plot()
+res.plot(language="es")
 plt.show()
 
 # O dibújalo a mano desde la rejilla del número ERB que ya lleva el resultado:
@@ -476,7 +476,7 @@ x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * t)
 res = psychoacoustics.loudness_moore_glasberg_time(x, fs, field="free")
 
 # El resultado lleva ambas trazas sobre un eje temporal de 1 ms:
-res.plot()
+res.plot(language="es")
 plt.show()
 
 # O dibújalas directamente para ver la STL rápida frente a la LTL lenta:
@@ -547,7 +547,7 @@ x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * t)
 res = psychoacoustics.loudness_ecma(x, fs, field="free")
 
 # El resultado lleva la sonoridad específica media sobre las 53 bandas Bark_HMS:
-res.plot()
+res.plot(language="es")
 plt.show()
 
 # O dibuja N'(z) a mano frente a la escala de tasa de banda crítica:

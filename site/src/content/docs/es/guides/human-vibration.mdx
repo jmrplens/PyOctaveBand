@@ -136,7 +136,7 @@ from phonometry import vibration
 result = vibration.frequency_weighting("Wk", np.geomspace(0.4, 100.0, 240))
 
 # En una línea:
-result.plot()
+result.plot(language="es")
 plt.show()
 
 # A mano, a partir de los campos del resultado, replicando lo que dibuja WeightingResponse.plot():
@@ -234,7 +234,7 @@ accel = np.array([0.18, 0.24, 0.33, 0.46, 0.52, 0.55, 0.48, 0.39, 0.31, 0.26,
 result = vibration.weighted_acceleration(accel, freqs, "Wk")
 
 # En una línea:
-result.plot()
+result.plot(language="es")
 plt.show()
 
 # A mano, replicando lo que dibuja WeightedSpectrum.plot():
@@ -373,7 +373,7 @@ result = vibration.daily_vibration_exposure(
 )
 
 # En una línea:
-result.plot()
+result.plot(language="es")
 plt.show()
 
 # A mano, replicando lo que dibuja DailyVibrationExposure.plot():

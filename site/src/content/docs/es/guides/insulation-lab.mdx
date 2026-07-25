@@ -109,7 +109,7 @@ flotante, una ventana) se lleva a un laboratorio cualificado, donde la
 transmisión por flancos suprimida hace que la transmisión directa sea toda la
 historia. Esta página cubre la cadena de laboratorio: el índice de reducción
 acústica y el nivel de impactos normalizado de ISO 10140, la alternativa por
-intensidad sonora de ISO 15186, la mejora de revestimientos de suelo en maqueta
+intensidad acústica de ISO 15186, la mejora de revestimientos de suelo en maqueta
 pequeña de ISO 16251-1 y la medición de la transmisión por flancos de
 ISO 10848. La medición en campo y sus índices están en
 [Medición del aislamiento en campo e índices](/phonometry/es/guides/insulation-field/),
@@ -195,7 +195,7 @@ LabInsulationWarning)`. El índice automático se forma solo cuando se suministr
 exactamente 16 valores en tercio de octava o 5 en octava (`rating` es `None` en
 caso contrario).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lab_insulation_result_es.svg" alt="Las dos magnitudes de laboratorio de ISO 10140 lado a lado: el índice de reducción acústica medido R frente a la referencia ISO 717-1 desplazada a la izquierda, y el nivel de presión de ruido de impactos normalizado Ln frente a la referencia ISO 717-2 desplazada a la derecha, cada panel anotado con su índice de un solo número" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lab_insulation_result_es.svg" alt="Las dos magnitudes de laboratorio de ISO 10140 lado a lado: el índice de reducción acústica medido R frente a la referencia ISO 717-1 desplazada a la izquierda, y el nivel de presión acústica de impactos normalizado Ln frente a la referencia ISO 717-2 desplazada a la derecha, cada panel anotado con su índice de un solo número" width="92%" />
 
 *Las dos magnitudes de laboratorio de ISO 10140 con sus índices ISO 717: el
 $R$ aéreo se evalúa donde la referencia queda **por encima** de la medición,
@@ -224,8 +224,8 @@ li = np.array([62.1, 63.2, 63.5, 66.2, 68.5, 70.0, 71.7, 73.1,
 imp = building.lab_impact_insulation(li, t2, volume=50.0)
 
 # Una línea cada uno: R (o Ln) frente a su referencia ISO 717 desplazada:
-lab.plot()
-imp.plot()
+lab.plot(language="es")
+imp.plot(language="es")
 plt.show()
 
 # A mano, ambos paneles desde los campos de los resultados:
@@ -242,7 +242,7 @@ for ax in (ax1, ax2):
     ax.set_xlabel("Frecuencia [Hz]")
     ax.legend()
 ax1.set_ylabel("Índice de reducción acústica R [dB]")
-ax2.set_ylabel("Nivel de presión de ruido de impactos Ln [dB]")
+ax2.set_ylabel("Nivel de presión acústica de impactos Ln [dB]")
 plt.show()
 ```
 
@@ -348,7 +348,7 @@ repositorio. Haz clic en cualquier vista previa para abrir el PDF:
 El método de laboratorio de ISO 10140, más arriba, lee la potencia transmitida de forma
 *indirecta*, a partir del nivel de la sala receptora y de su área de absorción,
 lo que falla cuando los flancos filtran una potencia que la sala integra
-igualmente. El método por **intensidad sonora** (ISO 15186) lo evita: una sonda
+igualmente. El método por **intensidad acústica** (ISO 15186) lo evita: una sonda
 de intensidad barre una superficie de medición que envuelve el espécimen y mide
 la potencia radiada de forma *directa*, así que solo contribuye el elemento
 ensayado. Es la herramienta preferida cuando la transmisión por flancos es alta
@@ -360,7 +360,7 @@ $$
 R_I = L_{p1} - 6 - \left[ L_{In} + 10 \log_{10}\frac{S_m}{S} \right],
 $$
 
-donde los $6$ dB son el desfase de campo difuso entre el nivel de presión sonora
+donde los $6$ dB son el desfase de campo difuso entre el nivel de presión acústica
 y el nivel de intensidad incidente. La misma fórmula da el índice aparente
 $R'_I$ en campo (ISO 15186-2). Como el método por intensidad *subestima*
 ligeramente la potencia radiada a una sala receptora real, un **índice
@@ -575,7 +575,7 @@ res = building.intensity_element_normalized_difference(
 )
 
 # Una línea: DI,n,e frente a la referencia ISO 717-1 desplazada:
-res.plot()
+res.plot(language="es")
 plt.show()
 
 # A mano, desde el índice que porta el resultado:
@@ -658,7 +658,7 @@ covering = bare - np.array([5, 8, 10, 14, 18, 23, 30, 31,
                             39, 49, 53, 57, 60, 67, 68, 71])
 res = building.impact_improvement(bare, covering, freqs)
 print(res.delta_lw)   # mejora ponderada delta-Lw = 29 dB (ISO 717-2)
-res.plot()
+res.plot(language="es")
 plt.show()
 ```
 
@@ -776,7 +776,7 @@ res = building.vibration_reduction_index(
     structural_reverberation_time_i=0.35, structural_reverberation_time_j=0.40,
 )
 print(res.single_number)   # Kij medio entre 200 y 1250 Hz (Anexo A)
-res.plot()
+res.plot(language="es")
 plt.show()
 ```
 
@@ -853,7 +853,7 @@ dnf = building.normalized_flanking_level_difference(
 )
 
 # Una línea: Dn,f frente a la referencia ISO 717-1 desplazada:
-dnf.plot()
+dnf.plot(language="es")
 plt.show()
 
 # A mano, desde el índice que porta el resultado:

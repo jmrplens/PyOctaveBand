@@ -19,6 +19,18 @@ locally reacting real-impedance edge), when a wave-based simulation is worth
 its cost, what a 2D domain can and cannot say about a 3D problem, and how
 numerical dispersion sets the cells-per-wavelength resolution rule.
 
+A good way to read it is alongside the closed-form pages it cross-checks:
+the modal frequencies of [room acoustics](/phonometry/guides/room-acoustics/)
+reappear as peaks in a simulated room spectrum, the barrier insertion loss of
+[ground effect and barriers](/phonometry/guides/ground-barriers/) can be
+re-derived by placing an obstacle in the domain, and the ray bending of
+[atmospheric refraction](/phonometry/guides/atmospheric-refraction/) emerges
+from a height-dependent sound-speed profile. When a geometry is too irregular
+for those models (odd-shaped rooms, multiple barriers, mixed impedance
+ground), the simulation is the fallback that still gives a quantitative
+answer; when a closed form exists, prefer it, and use the solver to verify
+the assumptions it rests on.
+
 ## Pages in this section
 
 - [2D FDTD wave simulation](/phonometry/guides/fdtd-simulation/): the

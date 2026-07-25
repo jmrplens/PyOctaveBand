@@ -22,7 +22,7 @@ references:
     title: "Underwater acoustics — Terminology"
     designation: "ISO 18405:2017"
     url: "https://www.iso.org/standard/62406.html"
-    note: "Las referencias de 1 µPa (presión) y 1 µPa²·s (exposición) y las definiciones de nivel de presión sonora, nivel de exposición sonora y nivel de pico."
+    note: "Las referencias de 1 µPa (presión) y 1 µPa²·s (exposición) y las definiciones de nivel de presión acústica, nivel de exposición sonora y nivel de pico."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2016
@@ -43,7 +43,7 @@ references:
     title: "Underwater acoustics — Measurement of radiated underwater sound from percussive pile driving"
     designation: "ISO 18406:2017"
     url: "https://www.iso.org/standard/62407.html"
-    note: "La exposición sonora por golpe (Fórmulas 3–4), de pico y acumulada (Fórmulas 8–9) de la sección 3, y el nivel de presión sonora cuadrático medio (Fórmula 7) de la sección 1."
+    note: "La exposición sonora por golpe (Fórmulas 3–4), de pico y acumulada (Fórmulas 8–9) de la sección 3, y el nivel de presión acústica cuadrático medio (Fórmula 7) de la sección 1."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -67,7 +67,7 @@ $$
 L_{p,\mathrm{pk}} = 20\lg\frac{\max|p|}{p_0},
 $$
 
-con `p₀ = 1 µPa` y `E₀ = 1 µPa²·s`. El nivel de presión sonora es el nivel
+con `p₀ = 1 µPa` y `E₀ = 1 µPa²·s`. El nivel de presión acústica es el nivel
 cuadrático medio (ISO 18406 Fórmula 7); el nivel de exposición sonora integra la
 presión al cuadrado sobre el registro (Fórmulas 3–4); el nivel de pico es el
 valor de cero a pico.
@@ -124,7 +124,7 @@ freqs = np.array([20, 25, 31.5, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315,
                   4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000.0])
 rnl = 175.0 - 12.0 * np.log10(freqs / 20.0)
 res = underwater.monopole_source_level(rnl, freqs, draught=6.0)
-res.plot()
+res.plot(language="es")
 ```
 
 </details>
@@ -188,7 +188,7 @@ t = np.arange(int(0.3 * fs)) / fs
 envelope = np.where(t < 0.01, t / 0.01, np.exp(-(t - 0.01) / 0.04))
 pressure = 8000.0 * envelope * np.sin(2 * np.pi * 180.0 * t)
 res = underwater.pile_strike_metrics(pressure, fs)
-res.plot()
+res.plot(language="es")
 ```
 
 </details>

@@ -62,7 +62,7 @@ LS = [48.91, 49.22, 50.50, 52.85, 58.29, 59.53, 59.71, 61.98, 54.16]
 
 res = psychoacoustics.assess_tones(fT, LT, LS, 2.7)
 print(round(res.decisive_audibility, 2), res.decisive_frequency)  # 5.01 137.3
-res.plot()   # barras de audibilidad por tono, con el tono decisivo resaltado
+res.plot(language="es")   # barras de audibilidad por tono, con el tono decisivo resaltado
 plt.show()
 ```
 
@@ -184,11 +184,11 @@ LS = [48.91, 49.22, 50.50, 52.85, 58.29, 59.53, 59.71, 61.98, 54.16]
 res = psychoacoustics.assess_tones(fT, LT, LS, 2.7)
 
 # En una línea: la vista de niveles, la misma que incrusta la ficha .report().
-res.plot(view="levels")
+res.plot(view="levels", language="es")
 plt.show()
 
 # La vista por defecto es la audibilidad por tono:
-res.plot()      # o res.plot(view="audibility")
+res.plot(language="es")      # o res.plot(view="audibility")
 plt.show()
 ```
 
@@ -209,7 +209,7 @@ promediado menos de 12 espectros. `assess_tones` la calcula por tono
 (`res.extended_uncertainties`), `audibility_uncertainty` la evalúa
 directamente desde las líneas del espectro y `mean_audibility_uncertainty`
 la propaga a la audibilidad media energética de un conjunto de espectros
-(Anexo E: `U = 2.80 dB` para el tono de 137.3 Hz frente al 2,79 impreso).
+(Anexo E: `U = 2.80 dB` para el tono de 137,3 Hz frente al 2,79 impreso).
 
 **Cómo leer `U`.** Un intervalo *bilateral* al 90 % deja un 5 % en cada cola,
 así que `ΔL − U` es un enunciado unilateral al 95 %: cuando todo el intervalo

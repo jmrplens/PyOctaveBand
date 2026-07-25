@@ -18,7 +18,7 @@ transferencia de ISO 10846 caracteriza los elementos resilientes que
 interrumpen el camino; ISO/TS 7849 estima la potencia aérea que una
 superficie vibrante radia directamente; EN 15657 mide la potencia estructural
 que una máquina inyecta en una placa de recepción; y EN 12354-5 lo ensambla
-todo en el nivel de presión sonora predicho en una sala receptora. Esa
+todo en el nivel de presión acústica predicho en una sala receptora. Esa
 predicción final es también donde esta sección entrega el testigo a los
 modelos de [aislamiento acústico](/phonometry/es/guides/sections/sound-insulation/)
 de la sección de edificación.
@@ -53,11 +53,11 @@ Del vocabulario de FRF al nivel predicho en la sala receptora.
 - [Potencia acústica desde vibración (ISO/TS 7849)](/phonometry/es/guides/vibration-sound-power/):
   potencia aérea radiada a partir de la velocidad superficial y un factor de
   radiación.
-- [Potencia sonora estructural de equipos (EN 15657)](/phonometry/es/guides/structure-borne-power/):
+- [Potencia acústica estructural de equipos (EN 15657)](/phonometry/es/guides/structure-borne-power/):
   el método de la placa de recepción y las magnitudes de fuente
   independientes de la placa.
 - [Ruido estructural instalado (EN 12354-5)](/phonometry/es/guides/installed-structure-borne/):
-  el nivel de presión sonora en la sala receptora predicho desde las
+  el nivel de presión acústica en la sala receptora predicho desde las
   movilidades de fuente y receptor.
 
 ## [Vibración en humanos](/phonometry/es/guides/sections/human-vibration/)

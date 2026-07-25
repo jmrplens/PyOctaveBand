@@ -44,7 +44,7 @@ references:
     title: "Sound system equipment – Part 4: Microphones"
     designation: "IEC 60268-4:2014"
     url: "https://webstore.iec.ch/en/publication/32039"
-    note: "Las características nominales de micrófono de las secciones 5 y 8: la sensibilidad en campo libre y su nivel re 1 V/Pa (11.1/11.3), la respuesta en frecuencia y el rango de frecuencias efectivo (12.1/12.2), el diagrama direccional y el índice de directividad mediante la integral de campo difuso de 11.2.2 a) (13.1/13.2), el nivel de presión sonora de sobrecarga (15.2), el nivel de presión sonora equivalente debido al ruido inherente (17) y las impedancias nominales y la alimentación (9/10). Revisada después como IEC 60268-4:2018 (misma página de catálogo); la edición implementada es la de 2014."
+    note: "Las características nominales de micrófono de las secciones 5 y 8: la sensibilidad en campo libre y su nivel re 1 V/Pa (11.1/11.3), la respuesta en frecuencia y el rango de frecuencias efectivo (12.1/12.2), el diagrama direccional y el índice de directividad mediante la integral de campo difuso de 11.2.2 a) (13.1/13.2), el nivel de presión acústica de sobrecarga (15.2), el nivel de presión acústica equivalente debido al ruido inherente (17) y las impedancias nominales y la alimentación (9/10). Revisada después como IEC 60268-4:2018 (misma página de catálogo); la edición implementada es la de 2014."
   - type: standard
     organization: "International Electrotechnical Commission"
     year: 2003
@@ -141,7 +141,7 @@ sig = sum(a * np.sin(2 * np.pi * k * f0 * t) for k, a in amps.items())
 sig = sig + np.random.default_rng(2026).standard_normal(n) * 1.2e-2
 
 res = electroacoustics.harmonic_analysis(sig, fs, f0, n_harmonics=len(amps))
-res.plot()
+res.plot(language="es")
 plt.show()
 ```
 
@@ -349,7 +349,7 @@ y = sp.lfilter(b, a, x)
 y = y + rng.standard_normal(n) * np.sqrt(np.mean(y ** 2)) * 0.05   # ruido de salida
 
 res = electroacoustics.transfer_function(x, y, fs, estimator="H1")
-res.plot()
+res.plot(language="es")
 plt.show()
 ```
 
@@ -485,7 +485,7 @@ pattern.plot()                       # diagrama de haz polar en dB (necesita mat
 import matplotlib.pyplot as plt
 from phonometry import piston_directivity_pattern
 
-piston_directivity_pattern([3.0, 8.0, 16.0]).plot()
+piston_directivity_pattern([3.0, 8.0, 16.0]).plot(language="es")
 plt.show()
 ```
 
@@ -561,7 +561,7 @@ result.plot(quantity="thd")          # distorsión armónica total vs frecuencia
 result.plot(quantity="directivity")  # respuesta polar sobre el círculo de 25 dB
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_response_es.svg" alt="Respuesta del nivel de presión sonora en el eje con su banda de tolerancia sombreada, la línea de referencia de -10 dB y los marcadores del rango efectivo sobre un eje de frecuencias nominales" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_response_es.svg" alt="Respuesta del nivel de presión acústica en el eje con su banda de tolerancia sombreada, la línea de referencia de -10 dB y los marcadores del rango efectivo sobre un eje de frecuencias nominales" width="82%" />
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -578,7 +578,7 @@ spl -= 10 * np.log10(1 + (freqs / 16000.0) ** 7)    # caída en alta frecuencia
 
 result = loudspeaker_characteristics(freqs, spl, rated_impedance=8.0,
                                      sensitivity_band=(200.0, 4000.0))
-result.plot()   # quantity="response" (por defecto)
+result.plot(language="es")   # quantity="response" (por defecto)
 plt.show()
 ```
 
@@ -602,7 +602,7 @@ result = loudspeaker_characteristics(
     freqs, spl, rated_impedance=8.0, sensitivity_band=(200.0, 4000.0),
     impedance=(fz, 6.6 + 24 * np.exp(-(np.log2(fz / 52.0) ** 2) / 0.12)),
 )
-result.plot(quantity="impedance")
+result.plot(quantity="impedance", language="es")
 plt.show()
 ```
 
@@ -626,7 +626,7 @@ result = loudspeaker_characteristics(
     freqs, spl, rated_impedance=8.0, sensitivity_band=(200.0, 4000.0),
     distortion=(thd_f, 0.3 + 2.6 * np.exp(-(np.log2(thd_f / 70.0) ** 2) / 0.45)),
 )
-result.plot(quantity="thd")
+result.plot(quantity="thd", language="es")
 plt.show()
 ```
 
@@ -651,7 +651,7 @@ result = loudspeaker_characteristics(
                                  angles=np.radians(np.linspace(0, 90, 46))),
     polar_frequency=2000.0,
 )
-result.plot(quantity="directivity")
+result.plot(quantity="directivity", language="es")
 plt.show()
 ```
 
@@ -687,9 +687,9 @@ de solo repetirse:
   sensibilidad de campo difuso de la integral de 11.2.2 a) sobre un diagrama
   con simetría de revolución; el cardioide ideal devuelve $10\lg 3 = 4{,}8$ dB.
 - **Nivel de ruido equivalente** (17.2). La tensión de ruido inherente
-  ponderada sobre la sensibilidad nominal como nivel de presión sonora,
+  ponderada sobre la sensibilidad nominal como nivel de presión acústica,
   $L_N = 20\lg\bigl((U_N/M)/20\,\mu\text{Pa}\bigr)$, con la relación
-  señal-ruido re 1 Pa (94 dB SPL) derivada de él. El nivel de presión sonora de
+  señal-ruido re 1 Pa (94 dB SPL) derivada de él. El nivel de presión acústica de
   sobrecarga (15.2) se lee de una curva de distorsión frente a nivel en el
   límite de THD declarado.
 
@@ -746,7 +746,7 @@ se dibuja sobre ellos:
 result.plot()                        # respuesta de campo libre (por defecto)
 result.plot(quantity="directivity")  # diagrama polar sobre el círculo de 25 dB
 result.plot(quantity="noise")        # espectro de banda del ruido inherente
-result.plot(quantity="distortion")   # THD frente al nivel de presión sonora
+result.plot(quantity="distortion")   # THD frente al nivel de presión acústica
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_response_es.svg" alt="Respuesta relativa de campo libre del micrófono con su banda de tolerancia sombreada, el marcador de la frecuencia de referencia y los marcadores del rango efectivo sobre un eje de frecuencias nominales" width="82%" />
@@ -765,7 +765,7 @@ response -= 10 * np.log10(1 + (freqs / 19000.0) ** 8)   # caída en alta frecuen
 response += 2.0 * np.exp(-(np.log2(freqs / 9000.0) ** 2) / 0.3)  # región de presencia
 
 result = microphone_characteristics(freqs, response, 12.5, tolerance_db=3.0)
-result.plot()   # quantity="response" (por defecto)
+result.plot(language="es")   # quantity="response" (por defecto)
 plt.show()
 ```
 
@@ -790,7 +790,7 @@ result = microphone_characteristics(
     freqs, response, 12.5, tolerance_db=3.0,
     polar=(angles, cardioid), polar_frequency=1000.0,
 )
-result.plot(quantity="directivity")
+result.plot(quantity="directivity", language="es")
 plt.show()
 ```
 
@@ -814,13 +814,13 @@ result = microphone_characteristics(
     freqs, response, 12.5, tolerance_db=3.0, noise_voltage=1.25e-6,
     noise_spectrum=(noise_f, 6.0 + 12.0 * np.log10(1000.0 / noise_f)),
 )
-result.plot(quantity="noise")
+result.plot(quantity="noise", language="es")
 plt.show()
 ```
 
 </details>
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_distortion_es.svg" alt="Distorsión armónica total del micrófono en porcentaje frente al nivel de presión sonora, con el límite de THD y el nivel de presión sonora de sobrecarga marcados" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_distortion_es.svg" alt="Distorsión armónica total del micrófono en porcentaje frente al nivel de presión acústica, con el límite de THD y el nivel de presión acústica de sobrecarga marcados" width="82%" />
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -838,7 +838,7 @@ result = microphone_characteristics(
     freqs, response, 12.5, tolerance_db=3.0, max_spl_thd_percent=0.5,
     distortion=(spl_axis, 0.5 * 10 ** ((spl_axis - 130.0) * 0.08)),
 )
-result.plot(quantity="distortion")
+result.plot(quantity="distortion", language="es")
 plt.show()
 ```
 

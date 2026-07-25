@@ -126,7 +126,7 @@ _ES_EXACT = {
     "Screened by the hill (Eq. 45-47)": "Apantallado por la colina (Ec. 45-47)",
     "Ground and screening adjustment [dB]": "Ajuste de suelo y apantallamiento [dB]",
     "A-weighted sound pressure level [dB(A)]":
-        "Nivel de presión sonora ponderado A [dB(A)]",
+        "Nivel de presión acústica ponderado A [dB(A)]",
     "Received level $L_A(t)$": "Nivel recibido $L_A(t)$",
     "One-third-octave-band centre frequency [Hz]":
         "Frecuencia central de banda de 1/3 de octava [Hz]",
@@ -171,7 +171,7 @@ _ES_EXACT = {
     "Normalized Response": "Respuesta normalizada",
     "Normalized frequency  f / fm": "Frecuencia normalizada  f / fm",
     "Relative attenuation \u0394A [dB]": "Atenuaci\u00f3n relativa \u0394A [dB]",
-    "Sound pressure level [dB re 20 \u00b5Pa]": "Nivel de presi\u00f3n sonora [dB re 20 \u00b5Pa]",
+    "Sound pressure level [dB re 20 \u00b5Pa]": "Nivel de presi\u00f3n ac\u00fastica [dB re 20 \u00b5Pa]",
     "1/3 Octave Band Analysis": "An\u00e1lisis en bandas de octava 1/3",
     "1/3 Octave Spectrogram (Fast windows, 50% overlap)":
         "Espectrograma 1/3 de octava (ventanas Fast, 50 % de solape)",
@@ -291,7 +291,7 @@ _ES_EXACT = {
     "octave bands, T0 = 0.5 s": "bandas de octava, T0 = 0,5 s",
     # absorption_uncertainty figure (ISO 12999-2)
     "ISO 12999-2 Sound Absorption Coefficient Uncertainty":
-        "Incertidumbre del coeficiente de absorción sonora (ISO 12999-2)",
+        "Incertidumbre del coeficiente de absorción acústica (ISO 12999-2)",
     "+/-U (k = 2), reproducibility": "±U (k = 2), reproducibilidad",
     "alpha_s (ISO 354)": "alpha_s (ISO 354)",
     # floor_covering_improvement figure (ISO 16251-1)
@@ -373,7 +373,7 @@ _ES_EXACT = {
         "Parte 2 ingeniería ($\\varepsilon$ medido)",
     # structure_borne_power figure (EN 15657)
     "EN 15657 Reception-Plate Structure-Borne Sound Power":
-        "Potencia sonora estructural en placa receptora EN 15657",
+        "Potencia acústica estructural en placa receptora EN 15657",
     r"Structure-borne power level $L_{Ws}$ [dB re 1 pW]":
         r"Nivel de potencia estructural $L_{Ws}$ [dB re 1 pW]",
     "low-mobility plate": "placa de baja movilidad",
@@ -487,7 +487,7 @@ _ES_EXACT = {
     "Octave-band center frequency [Hz]":
         "Frecuencia central de banda de octava [Hz]",
     "Octave-band sound pressure level [dB]":
-        "Nivel de presi\u00f3n sonora por banda de octava [dB]",
+        "Nivel de presi\u00f3n ac\u00fastica por banda de octava [dB]",
     "Rumble tol. (+5 dB)": "Tol. retumbo (+5 dB)",
     "Hiss tol. (+3 dB)": "Tol. siseo (+3 dB)",
     "ISO 7029 — age-related threshold (male)":
@@ -555,7 +555,7 @@ _ES_EXACT = {
     "Instrument": "Instrumento",
     "Position (Type A)": "Posición (Tipo A)",
     "Sound Intensity with a p-p Probe (IEC 61043)":
-        "Intensidad sonora con sonda p-p (IEC 61043)",
+        "Intensidad acústica con sonda p-p (IEC 61043)",
     "Plane wave: Lp \u2248 LI": "Onda plana: Lp \u2248 LI",
     "Standing wave: reactive field": "Onda estacionaria: campo reactivo",
     "Pressure level Lp": "Nivel de presi\u00f3n Lp",
@@ -587,7 +587,7 @@ _ES_EXACT = {
         "Nivel de ruido de impactos normalizado y ponderado "
         "(ISO 717-2, ejemplo del Anexo C)",
     "Normalized impact sound pressure level Ln [dB]":
-        "Nivel de presión de ruido de impactos normalizado Ln [dB]",
+        "Nivel de presión acústica de impactos normalizado Ln [dB]",
     "Measured Ln (third octave)": "Ln medido (tercios de octava)",
     "Shifted reference curve (ISO 717-2)":
         "Curva de referencia desplazada (ISO 717-2)",
@@ -602,7 +602,7 @@ _ES_EXACT = {
     # --- Advanced psychoacoustics figures (plan-17 block A) ---
     "Loudness Models Compared (1 kHz tone)":
         "Modelos de sonoridad comparados (tono de 1 kHz)",
-    "Sound pressure level [dB SPL]": "Nivel de presión sonora [dB SPL]",
+    "Sound pressure level [dB SPL]": "Nivel de presión acústica [dB SPL]",
     "Total loudness N [sone]": "Sonoridad total N [sonios]",
     "Sottek ECMA-418-2": "Sottek ECMA-418-2",
     "Anchor: 1 kHz / 40 dB = 1 sone":
@@ -1005,8 +1005,8 @@ _ES_EXACT = {
         "Curva de referencia desplazada (ISO 11654)",
     "Practical absorption alpha_p": "Absorción práctica alpha_p",
     "ISO 11654 Weighted Sound Absorption Coefficient (Annex A.2 example)":
-        "Coeficiente de absorción sonora ponderado ISO 11654 (ejemplo del Anexo A.2)",
-    "Sound absorption coefficient": "Coeficiente de absorción sonora",
+        "Coeficiente de absorción acústica ponderado ISO 11654 (ejemplo del Anexo A.2)",
+    "Sound absorption coefficient": "Coeficiente de absorción acústica",
     "Through-origin quadratic fit  dp = a u + b u^2":
         "Ajuste cuadrático por el origen  dp = a u + b u^2",
     "Measured pressure drop": "Caída de presión medida",
@@ -1019,7 +1019,7 @@ _ES_EXACT = {
         "Coeficiente de absorción alpha = 1 - |r|^2",
     "Standing-wave level difference L_max - L_min [dB]":
         "Diferencia de nivel de onda estacionaria L_max - L_min [dB]",
-    "Sound absorption coefficient alpha": "Coeficiente de absorción sonora alpha",
+    "Sound absorption coefficient alpha": "Coeficiente de absorción acústica alpha",
     "Perfect Absorption by Critical Coupling (Slow-Sound Panel)":
         "Absorción perfecta por acoplo crítico (panel de sonido lento)",
     "Critically coupled (perfect)": "Acoplo crítico (perfecto)",
@@ -1251,12 +1251,12 @@ _ES_EXACT = {
     "Li (impact level)": "Li (nivel de impactos)",
     "L'nT (standardized)": "L'nT (estandarizado)",
     "Impact sound pressure level [dB]":
-        "Nivel de presión de ruido de impactos [dB]",
+        "Nivel de presión acústica de impactos [dB]",
     "ISO 10140 Laboratory Insulation (flanking suppressed)":
         "Aislamiento en laboratorio ISO 10140 (flancos suprimidos)",
     "normalized Ln": "Ln normalizado",
     "Impact sound pressure level Ln [dB]":
-        "Nivel de presión de ruido de impactos Ln [dB]",
+        "Nivel de presión acústica de impactos Ln [dB]",
     "ISO 15186-1 Small-Element Insulation by Intensity":
         "Aislamiento de elementos pequeños por intensidad ISO 15186-1",
     "DI,n,e (element)": "DI,n,e (elemento)",
@@ -1271,7 +1271,7 @@ _ES_EXACT = {
         "Predicción de ruido de impactos EN 12354-2 (Anexo E.3)",
     "Level / correction [dB]": "Nivel / corrección [dB]",
     "EN 12354-4 Radiated Sound Power (Annex G)":
-        "Potencia sonora radiada EN 12354-4 (Anexo G)",
+        "Potencia acústica radiada EN 12354-4 (Anexo G)",
     "radiated $L_W$ per octave": "$L_W$ radiada por octava",
     "Radiated sound power level [dB re 1 pW]":
         "Nivel de potencia acústica radiada [dB re 1 pW]",
