@@ -1611,6 +1611,12 @@ class ExtendedWeightedRatingResult:
     :ivar core: The integer-mode :class:`WeightedRatingResult` of the core
         bands (independent of ``one_decimal``), for plotting and the
         unfavourable-deviation sum.
+    :ivar band_centers: Band centre frequencies of the full (enlarged-range)
+        measured curve, in Hz. Defaults to ``None`` for
+        backward-compatible construction.
+    :ivar measured: The measured band quantities over the full enlarged
+        range (after the one-decimal reduction of Clause 4.4), in dB.
+        Defaults to ``None``.
     """
 
     rating: float
@@ -1623,6 +1629,26 @@ class ExtendedWeightedRatingResult:
     ctr_50_5000: float | None
     ctr_100_5000: float | None
     core: WeightedRatingResult
+    band_centers: np.ndarray | None = None
+    measured: np.ndarray | None = None
+
+    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+        """Plot the enlarged-range curve vs the shifted reference (Annex B).
+
+        The measured curve is drawn over the full enlarged range, the
+        ISO 717-1 reference curve (after the final shift) over the 16 core
+        bands 100-3150 Hz, with the unfavourable deviations shaded on the
+        core bands and the bands outside the core range marked as the
+        enlarged range; the title carries ``Rw (C; Ctr)`` and every Annex B
+        adaptation term the input covered. Requires matplotlib
+        (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+        """
+        from .._i18n import check_language
+        from .._plot.building import plot_extended_weighted_rating
+
+        check_language(language)
+        return plot_extended_weighted_rating(self, ax=ax, language=language, **kwargs)
 
 
 @dataclass(frozen=True)
@@ -1638,12 +1664,38 @@ class ExtendedImpactRatingResult:
         when the supplied bands do not cover 50-2500 Hz.
     :ivar core: The integer-mode :class:`ImpactRatingResult` of the core
         bands (independent of ``one_decimal``).
+    :ivar band_centers: Band centre frequencies of the full (enlarged-range)
+        measured curve, in Hz. Defaults to ``None`` for
+        backward-compatible construction.
+    :ivar measured: The measured impact levels over the full enlarged range
+        (after the one-decimal reduction of Clause 4.3), in dB. Defaults to
+        ``None``.
     """
 
     rating: float
     ci: float
     ci_50_2500: float | None
     core: ImpactRatingResult
+    band_centers: np.ndarray | None = None
+    measured: np.ndarray | None = None
+
+    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+        """Plot the enlarged-range curve vs the shifted reference (ISO 717-2).
+
+        The measured curve is drawn over the full enlarged range, the
+        ISO 717-2 reference curve (after the final shift) over the 16 core
+        bands 100-3150 Hz, with the unfavourable deviations (measurement
+        above the reference) shaded on the core bands and the bands outside
+        the core range marked as the enlarged range; the title carries the
+        impact rating with ``CI`` and, when covered, ``CI,50-2500``.
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+        """
+        from .._i18n import check_language
+        from .._plot.building import plot_extended_impact_rating
+
+        check_language(language)
+        return plot_extended_impact_rating(self, ax=ax, language=language, **kwargs)
 
 
 def _reduce(value: float, one_decimal: bool) -> float:
@@ -1770,6 +1822,8 @@ def weighted_rating_extended(
         ctr_50_5000=extended["ctr_50_5000"],
         ctr_100_5000=extended["ctr_100_5000"],
         core=weighted_rating(np.asarray(values_by_band, dtype=np.float64)[core_idx]),
+        band_centers=freqs,
+        measured=measured,
     )
 
 
@@ -1830,4 +1884,6 @@ def weighted_impact_rating_extended(
         core=weighted_impact_rating(
             np.asarray(values_by_band, dtype=np.float64)[core_idx]
         ),
+        band_centers=freqs,
+        measured=measured,
     )

@@ -393,6 +393,74 @@ def test_rating_plot_forwards_kwargs_without_typeerror() -> None:
 
 
 # --------------------------------------------------------------------------
+# ISO 717 enlarged-range ratings (Annex B / A.2.1)
+# --------------------------------------------------------------------------
+_ANNEX_C2_R = [20.4, 16.3, 17.7, 22.6, 22.4, 22.7, 24.8, 26.6,
+               28.0, 30.5, 31.8, 32.5, 33.4, 33.0, 31.0, 25.5]
+_ANNEX_C2_FREQS = [50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500,
+                   630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000]
+
+
+def _extended_rating() -> ph.ExtendedWeightedRatingResult:
+    return ph.weighted_rating_extended(
+        [18.7, 19.2, 20.0, *_ANNEX_C2_R, 26.8, 29.2], _ANNEX_C2_FREQS
+    )
+
+
+def _extended_impact_rating() -> ph.ExtendedImpactRatingResult:
+    li = [55.0, 57.0, 59.0, 62.1, 63.2, 63.5, 66.2, 68.5, 70.0, 71.7, 73.1,
+          73.8, 73.5, 73.8, 73.3, 73.1, 73.0, 72.4, 71.2]
+    freqs = [50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500,
+             630, 800, 1000, 1250, 1600, 2000, 2500, 3150]
+    return ph.weighted_impact_rating_extended(li, freqs)
+
+
+def test_extended_rating_plot_full_range_and_terms_in_title() -> None:
+    res = _extended_rating()
+    ax = res.plot()
+    # The measured curve spans the full enlarged range (21 bands), the
+    # shifted reference only the 16 core bands.
+    assert ax.lines[0].get_xdata().size == 21
+    np.testing.assert_allclose(ax.lines[0].get_ydata(), res.measured)
+    assert ax.lines[1].get_xdata().size == 16
+    np.testing.assert_allclose(
+        ax.lines[1].get_ydata(), res.core.shifted_reference
+    )
+    # Title carries the core rating and the covered Annex B terms.
+    title = ax.get_title()
+    assert str(res.rating) in title
+    assert "C50-5000" in title and "Ctr,50-5000" in title
+    plt.close("all")
+
+
+def test_extended_impact_rating_plot_title_carries_ci_50_2500() -> None:
+    res = _extended_impact_rating()
+    assert res.ci_50_2500 is not None
+    ax = res.plot()
+    title = ax.get_title()
+    assert str(res.rating) in title and "CI,50-2500" in title
+    # Impact shading uses the opposite sign: measurement above reference.
+    assert len(ax.collections) >= 1
+    plt.close("all")
+
+
+def test_extended_rating_plot_forwards_kwargs() -> None:
+    ax = _extended_rating().plot(linewidth=2)
+    assert ax.lines[0].get_linewidth() == 2.0
+    ax2 = _extended_impact_rating().plot(linewidth=2)
+    assert ax2.lines[0].get_linewidth() == 2.0
+    plt.close("all")
+
+
+def test_extended_rating_spanish_labels() -> None:
+    ax = _extended_rating().plot(language="es")
+    labels = [str(ln.get_label()) for ln in ax.lines]
+    assert any("Medido" in lbl for lbl in labels)
+    assert "reducción acústica" in ax.get_ylabel()
+    plt.close("all")
+
+
+# --------------------------------------------------------------------------
 # ISO 717-2 octave-band -5 dB rule: the curve is honest, the rating annotated
 # --------------------------------------------------------------------------
 _ANNEX_C3_LN_OCTAVE = np.array([65.3, 64.5, 58.0, 55.8, 43.0])
@@ -1003,6 +1071,8 @@ def test_single_axes_plots_accept_external_ax() -> None:
         _zwicker_stationary(),
         _sti(),
         _airborne_rating(),
+        _extended_rating(),
+        _extended_impact_rating(),
         _sound_power(),
         _open_plan(),
         _outdoor(),
