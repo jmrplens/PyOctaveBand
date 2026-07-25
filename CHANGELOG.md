@@ -57,6 +57,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   IEC 60268-4 microphone rated-characteristics report sections, and
   `docs/sound-power.md` the measurement-report (`.report()`) and ISO 4871
   noise-emission-declaration sections, matching the site guides.
+- `ResampledSignalResult.plot()`: the anti-alias filter the resampler
+  actually delivered, drawn against its design specification (passband and
+  stopband edges, design attenuation, the rejected band shaded), with
+  English and Spanish labels.
+- Core metrology documentation figures: eleven new deterministic figures
+  across the signal-analysis guides (the resampling anti-alias filter
+  against its spec, real/power/complex cepstrum variants, low-time
+  liftering, correlation normalizations, cross-correlation impulse-response
+  alignment, the Hilbert envelope with instantaneous frequency, the
+  cross-spectral density of a delayed path, the coherent output spectrum
+  with its SNR, Golay exact recovery, the sqrt(N) noise law of synchronous
+  averaging and the reverse-arrangements runs test), each embedded next to
+  its snippet in the English guide, the Spanish mirror and the docs mirror
+  with the dual one-line `.plot()` / hand-written matplotlib code blocks,
+  plus one-line `res.plot()` mentions throughout the metrology guides.
+- Core metrology guide prose: the multichannel guide is rewritten around a
+  concrete array-measurement story with per-channel guarantees and Bendat &
+  Piersol citations; the levels, time-weighting and calibration guides gain
+  real introductions (descriptor families and when to use each, detector
+  history behind Fast/Slow/Impulse, the field versus laboratory calibration
+  workflow); the time-frequency, synchronous-averaging, MISO-coherence,
+  GUM-uncertainty and test-signals guides gain See-also sections, practical
+  guidance (conditioning order, diagnostics tool choice, window choice) and
+  the references behind them.
 
 ### Fixed
 
