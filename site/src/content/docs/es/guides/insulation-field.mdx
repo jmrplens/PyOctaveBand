@@ -409,7 +409,7 @@ ax.fill_between(res_imp.band_centers, res_imp.shifted_reference, res_imp.measure
                 where=res_imp.measured > res_imp.shifted_reference, interpolate=True,
                 alpha=0.3, label="Desviaciones desfavorables")
 ax.set_xlabel("Frecuencia [Hz]")
-ax.set_ylabel("Nivel de presión sonora de impacto [dB]")
+ax.set_ylabel("Nivel de presión acústica de impactos [dB]")
 ax.set_title(f"L'nT,w = {res_imp.rating} dB  (CI={res_imp.ci:+d})")
 ax.legend()
 plt.show()
@@ -1092,7 +1092,7 @@ ax.plot(x, impact.l_i, "--o", label="Li (nivel de impactos)")
 ax.plot(x, impact.l_nt, "-s", label="L'nT (estandarizado)")
 ax.set_xticks(x, [str(b) for b in bands])
 ax.set(xlabel="Frecuencia [Hz]",
-       ylabel="Nivel de presión de ruido de impactos [dB]",
+       ylabel="Nivel de presión acústica de impactos [dB]",
        title=f"Método de control ISO 10052: L'nT,w = {impact.rating.rating} dB")
 ax.legend()
 plt.show()

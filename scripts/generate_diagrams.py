@@ -61,7 +61,7 @@ _ES: dict[str, str] = {
     "Room-noise rating methods (ANSI/ASA S12.2-2019): NC and RC Mark II":
         "Calificación del ruido de salas (S12.2-2019): NC y RC Mark II",
     "Octave-band sound pressure levels  L(f)":
-        "Niveles de presión sonora por banda de octava  L(f)",
+        "Niveles de presión acústica por banda de octava  L(f)",
     "NC — tangency method": "NC — método de tangencia",
     "Table 1 curves": "curvas de la Tabla 1",
     "NC value in each band": "Valor NC en cada banda",
@@ -365,9 +365,9 @@ _ES: dict[str, str] = {
         "Grado 2 / 3 (ingeniería / control)",
     "Grade 1 (precision)": "Grado 1 (precisión)",
     "Sound pressure · enveloping surface":
-        "Presión sonora · superficie envolvente",
-    "Sound pressure · diffuse field": "Presión sonora · campo difuso",
-    "Sound intensity · scanning": "Intensidad sonora · barrido de intensidad",
+        "Presión acústica · superficie envolvente",
+    "Sound pressure · diffuse field": "Presión acústica · campo difuso",
+    "Sound intensity · scanning": "Intensidad acústica · barrido de intensidad",
     "K2A ≤ 4 dB (3744) / ≤ 7 dB (3746)":
         "K2A ≤ 4 dB (3744) / ≤ 7 dB (3746)",
     "V ≥ 200 m³ , qualified room": "V ≥ 200 m³ , sala cualificada",
@@ -532,7 +532,7 @@ _ES: dict[str, str] = {
         "C1, C2, C3: correcciones meteorológicas (ps, θ, a(f))",
     # d20 - ISO 9614-3 precision sound intensity scanning
     "Precision sound intensity scanning (ISO 9614-3)":
-        "Barrido de intensidad sonora de precisión (ISO 9614-3)",
+        "Barrido de intensidad acústica de precisión (ISO 9614-3)",
     "Measurement surface (segments S_i)": "Superficie de medición (segmentos S_i)",
     "p-p probe": "sonda p-p",
     "serpentine scan": "barrido en serpentina",
@@ -577,7 +577,7 @@ _ES: dict[str, str] = {
     "Measurement uncertainty from tables to expanded U (ISO 12999-1)":
         "Incertidumbre de medición: de las tablas a la U expandida (ISO 12999-1)",
     "Single-number sound-absorption rating (ISO 11654)":
-        "Valoración de la absorción sonora en índice único (ISO 11654)",
+        "Valoración de la absorción acústica en índice único (ISO 11654)",
     "Zwicker loudness model chain (ISO 532-1)":
         "Cadena del modelo de sonoridad de Zwicker (ISO 532-1)",
     # equal-loudness -> A-weighting
@@ -695,7 +695,7 @@ _ES: dict[str, str] = {
     "Shape indicators (L, M, H) where  αp − reference ≥ 0.25":
         "Indicadores de forma (L, M, H) donde  αp − referencia ≥ 0,25",
     "Sound absorption class  A to E   (Table B.1, Annex B)":
-        "Clase de absorción sonora  A a E   (Tabla B.1, Anexo B)",
+        "Clase de absorción acústica  A a E   (Tabla B.1, Anexo B)",
     "or “Not classified” when αw falls below the class-E band":
         "o «No clasificado» cuando αw cae por debajo de la banda de clase E",
     # Zwicker

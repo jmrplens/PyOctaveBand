@@ -112,7 +112,7 @@ img = ax.imshow(level, cmap="magma", vmin=level.max() - 55.0,
                 vmax=level.max(), aspect="auto", origin="lower",
                 extent=(res.times[0], res.times[-1], 0.0,
                         res.frequencies[-1]))
-fig.colorbar(img, ax=ax, label="Nivel de presión sonora [dB SPL]")
+fig.colorbar(img, ax=ax, label="Nivel de presión acústica [dB SPL]")
 ax.set_ylim(0.0, 3000.0)
 ax.set_xlabel("Tiempo [s]")
 ax.set_ylabel("Frecuencia [Hz]")

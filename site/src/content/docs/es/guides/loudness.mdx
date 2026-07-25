@@ -280,7 +280,7 @@ for phon in [20, 40, 60, 80, 90]:
     ax.annotate(f"{phon} fonios", xy=(1000, phon + 1), fontsize=9)
 ft, tf = psychoacoustics.hearing_threshold()
 ax.semilogx(ft, tf, "--", color="C1", label="Umbral de audición $T_f$")
-ax.set(xlabel="Frecuencia [Hz]", ylabel="Nivel de presión sonora [dB re 20 µPa]")
+ax.set(xlabel="Frecuencia [Hz]", ylabel="Nivel de presión acústica [dB re 20 µPa]")
 ax.grid(True, which="both", alpha=0.3)
 ax.legend()
 plt.show()
@@ -347,7 +347,7 @@ ax.plot(levels, zw, "o-", label="Zwicker (ISO 532-1)")
 ax.plot(levels, mg, "s--", label="Moore-Glasberg (ISO 532-2)")
 ax.plot(levels, ec, "^-.", label="Sottek (ECMA-418-2)")
 ax.plot(40.0, 1.0, "o", color="k", markerfacecolor="none", markersize=10)   # el ancla compartida
-ax.set(xlabel="Nivel de presión sonora [dB SPL]", ylabel="Sonoridad total N [sonos]")
+ax.set(xlabel="Nivel de presión acústica [dB SPL]", ylabel="Sonoridad total N [sonos]")
 ax.legend()
 plt.show()
 ```

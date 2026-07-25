@@ -45,7 +45,7 @@ _STRINGS: dict[str, str] = {
     "Level [dB]": "Nivel [dB]",
     "Pressure-intensity index δpI [dB]": "Índice presión-intensidad δpI [dB]",
     "Sound power level $L_W$ [dB re 1 pW]": "Nivel de potencia acústica $L_W$ [dB re 1 pW]",
-    "ISO/TS 7849 sound power from surface vibration": "Potencia sonora por vibración superficial ISO/TS 7849",
+    "ISO/TS 7849 sound power from surface vibration": "Potencia acústica por vibración superficial ISO/TS 7849",
     "F2 (surface pressure-intensity)": "F2 (presión-intensidad superficial)",
     "F3 (negative partial power)": "F3 (potencia parcial negativa)",
     "Dynamic capability Ld": "Capacidad dinámica Ld",

@@ -80,7 +80,7 @@ _STRINGS: dict[str, str] = {
     r"tone level $L_\mathrm{pt}$": r"nivel del tono $L_\mathrm{pt}$",
     r"masking noise $L_\mathrm{pn}$ (critical band)": r"ruido enmascarante $L_\mathrm{pn}$ (banda crítica)",
     r"decisive $\Delta L_{{\mathrm{{ta}}}}$ = {da} dB @ {df} Hz": r"decisiva $\Delta L_{{\mathrm{{ta}}}}$ = {da} dB @ {df} Hz",
-    "Sound pressure level [dB]": "Nivel de presión sonora [dB]",
+    "Sound pressure level [dB]": "Nivel de presión acústica [dB]",
     "ISO 1996-2 tone-audibility analysis": "Análisis de audibilidad tonal ISO 1996-2",
     "Tone-to-noise ratio TNR [dB]": "Relación tono/ruido TNR [dB]",
     "Prominence ratio PR [dB]": "Relación de prominencia PR [dB]",
@@ -92,7 +92,7 @@ _STRINGS: dict[str, str] = {
     "ECMA-418-1 {name} = {v} dB at {f} Hz: {verdict}":
         "ECMA-418-1 {name} = {v} dB a {f} Hz: {verdict}",
     "Frequency [Hz]": "Frecuencia [Hz]",
-    "Sound pressure level [dB re 20 µPa]": "Nivel de presión sonora [dB re 20 µPa]",
+    "Sound pressure level [dB re 20 µPa]": "Nivel de presión acústica [dB re 20 µPa]",
     r"Hearing threshold $T_f$": r"Umbral de audición $T_f$",
     "ISO 226:2023 equal-loudness contours": "Curvas isofónicas ISO 226:2023",
     "{p} phon": "{p} fonios",
