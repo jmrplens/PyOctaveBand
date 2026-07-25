@@ -10,6 +10,13 @@ references:
     publisher: "Wiley"
     doi: "10.1002/9781118032428"
     note: "Section 12.6.4.2 (spectrograms and their random errors), Section 11.5.4 (zoom transform procedures, Eqs. 11.122-11.130) and Sections 8.5.1/8.5.4 (resolution bandwidth and the statistical errors of unaveraged estimates). ISBN 978-0-470-24877-5."
+  - type: article
+    authors: ["Harris, F. J."]
+    year: 1978
+    title: "On the use of windows for harmonic analysis with the discrete Fourier transform"
+    journal: "Proceedings of the IEEE 66(1), 51-83"
+    doi: "10.1109/PROC.1978.10837"
+    note: "The taper catalogue behind the segment window: main-lobe width versus sidelobe leakage, the trade-off that sets what a spectrogram column can resolve at a given segment length."
 ---
 
 import ThemeImage from '../../../components/ThemeImage.astro';
@@ -200,3 +207,10 @@ counterpart with sound-level-meter ballistics; and for tracking a single
 component's frequency in time, the
 [Hilbert instantaneous frequency](/phonometry/guides/correlation-delay/) of
 `envelope` complements the STFT ridge.
+
+## See also
+
+- [Spectral analysis](/phonometry/guides/spectral-analysis/): the averaged Welch estimate for the stationary background, and the window figures of merit behind the segment taper.
+- [Levels](/phonometry/guides/levels/): the fractional-octave-band spectrogram with sound-level-meter ballistics.
+- [Correlation and delay](/phonometry/guides/correlation-delay/): the Hilbert instantaneous frequency for tracking one component.
+- API reference: [`metrology.time_frequency`](/phonometry/reference/api/spectra/time-frequency/).
