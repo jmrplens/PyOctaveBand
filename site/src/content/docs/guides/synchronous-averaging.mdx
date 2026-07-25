@@ -46,12 +46,12 @@ periodic = (
     + 0.5 * np.cos(2.0 * np.pi * 3.0 * phase + 0.4)
     - 0.3 * np.cos(2.0 * np.pi * 6.0 * phase)
 )
-signal = periodic + noise_signal(fs, phase.size / fs, rms=0.9, seed=11)
-res = time_synchronous_average(signal, fs, period, n_averages=n_avg)
+recording = periodic + noise_signal(fs, phase.size / fs, rms=0.9, seed=11)
+res = time_synchronous_average(recording, fs, period, n_averages=n_avg)
 
 fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(11, 4.6))
 t_ms = 1e3 * res.times
-ax0.plot(t_ms, signal[:m], color="#cccccc", label="One noisy period")
+ax0.plot(t_ms, recording[:m], color="#cccccc", label="One noisy period")
 ax0.plot(t_ms, res.period_waveform, color="#1f77b4", lw=1.8,
          label=f"Average of N = {n_avg} periods")
 ax0.plot(t_ms, periodic[:m], "--", color="#d62728", label="True waveform")
@@ -123,10 +123,58 @@ That is a power reduction of $10\log_{10} N$ dB, reported as
 `amplitude_snr_gain`:
 
 ```python
-res = time_synchronous_average(signal, fs, period, n_averages=100)
+res = time_synchronous_average(recording, fs, period, n_averages=100)
 res.noise_reduction_db      # 20.0 dB = 10*log10(100)
 res.amplitude_snr_gain      # 10.0   = sqrt(100)
+res.plot()                  # averaged waveform + the comb it applied
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tsa_noise_reduction.svg" alt="Log-log plot of the RMS error of the synchronous average against the number of averages from 1 to 128: the measured error markers fall along the dashed ideal one-over-square-root-of-N line, dropping from about 1 at a single period to below 0.1 at 128 averages" width="82%" />
+
+*The √N law measured end to end: the RMS error of the averaged waveform of
+a three-harmonic gear signature in unit-variance noise falls along the
+ideal σ/√N line as the number of averaged periods grows from 1 to 128.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import time_synchronous_average
+
+fs = 8192.0
+samples = 256
+period = samples / fs
+m = np.arange(samples) / fs
+true = (np.cos(2 * np.pi * m / period)
+        + 0.5 * np.cos(2 * np.pi * 3 * m / period + 0.7)
+        + 0.25 * np.cos(2 * np.pi * 5 * m / period + 1.1))
+rng = np.random.default_rng(5)
+recording = np.tile(true, 128) + rng.standard_normal(128 * samples)
+
+counts = [1, 2, 4, 8, 16, 32, 64, 128]
+errors = []
+for n in counts:
+    res = time_synchronous_average(recording[:n * samples], fs, period,
+                                   n_averages=n)
+    errors.append(np.sqrt(np.mean((res.period_waveform - true) ** 2)))
+
+# One line — the averaged waveform and the comb filter it applied:
+res.plot()
+plt.show()
+
+# The sqrt(N) law by hand: measured error against the ideal line:
+fig, ax = plt.subplots()
+ax.loglog(counts, errors, "o-", label="measured RMS error")
+ax.loglog(counts, 1 / np.sqrt(np.array(counts)), "r--",
+          label="ideal sigma/sqrt(N)")
+ax.set(xlabel="Number of averages N", ylabel="RMS error")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 This law is the ideal one: it holds when the noise is uncorrelated from one
 period to the next, so colored or synchronous noise that is correlated across
@@ -156,10 +204,10 @@ both combs around order 32; the end-to-end average confirms it:
 ```python
 # true 8th-order component plus a strong interferer at 32.05 orders
 phase = np.arange(41 * 256) / 256
-signal = np.cos(2 * np.pi * 8.0 * phase) + 0.7 * np.cos(2 * np.pi * 32.05 * phase)
+recording = np.cos(2 * np.pi * 8.0 * phase) + 0.7 * np.cos(2 * np.pi * 32.05 * phase)
 
-leak_20 = time_synchronous_average(signal, fs, period, n_averages=20)
-leak_32 = time_synchronous_average(signal, fs, period, n_averages=32)
+leak_20 = time_synchronous_average(recording, fs, period, n_averages=20)
+leak_32 = time_synchronous_average(recording, fs, period, n_averages=32)
 # leak_20.period_waveform matches the clean 8th-order tone; leak_32 does not
 ```
 
@@ -181,8 +229,8 @@ recovered within that interpolation error (`interpolated` is `True`):
 fs = 8192.0
 period = 1.0 / 31.7                       # fs * period is not an integer
 t = np.arange(int(40 * period * fs)) / fs
-signal = np.cos(2.0 * np.pi * t / period)  # one cycle per revolution
-res = time_synchronous_average(signal, fs, period)
+recording = np.cos(2.0 * np.pi * t / period)  # one cycle per revolution
+res = time_synchronous_average(recording, fs, period)
 res.interpolated                          # True: fractional-delay alignment
 res.samples_per_period                    # integer samples of one period
 ```
@@ -197,3 +245,32 @@ impulse-response alignment of the
 [test-signals page](/phonometry/guides/test-signals/), and the recovered
 waveform, being exactly one period, can be tiled to reconstruct the
 synchronous part of the signal for subtraction or for order analysis.
+
+## Which diagnostics tool, and when
+
+TSA, the cepstrum and the envelope spectrum answer different questions
+about a rotating machine, and they compose rather than compete:
+
+- **TSA** needs the period (a tacho pulse or a trusted shaft speed) and
+  returns *the waveform itself*, one revolution of it: the tool when you
+  want to see what a specific shaft or gear does per turn, tooth by tooth.
+- **The [cepstrum](/phonometry/guides/cepstrum-echoes/)** needs no
+  reference and detects *any* periodic family in the spectrum (harmonics,
+  sidebands): the tool when the period is unknown or several families
+  overlap and must be separated.
+- **The [envelope spectrum](/phonometry/guides/cepstrum-echoes/#5-the-envelope-spectrum-modulations-as-lines)**
+  finds periodicities of the *amplitude*: the tool for bearing-style
+  faults, whose repetition rate modulates a high-frequency resonance
+  instead of appearing as a low-frequency tone.
+
+The composition is standard practice: average synchronously first, then
+subtract; the `residual` field is the record with the synchronous part
+removed, which is exactly what the envelope spectrum should be run on once
+the strong gear components no longer mask the modulation.
+
+## See also
+
+- [Cepstrum and echoes](/phonometry/guides/cepstrum-echoes/): reference-free detection of harmonic and sideband families, and the envelope spectrum.
+- [Correlation and delay](/phonometry/guides/correlation-delay/): the Hilbert envelope behind envelope analysis.
+- [Test signals](/phonometry/guides/test-signals/): the fractional-delay kernel the non-integer period alignment uses.
+- API reference: [`metrology.synchronous_average`](/phonometry/reference/api/spectra/synchronous-average/).
