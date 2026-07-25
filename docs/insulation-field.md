@@ -708,6 +708,27 @@ assumed already corrected for background noise.
 `d_2m_n` or `None`, `r_prime` or `None`, `frequencies`); feed any 16-band façade
 quantity to `weighted_rating` for its ISO 717-1 single number.
 
+#### ISO 16283-3 field façade report (`.report()`)
+
+`FacadeInsulationResult.report(path)` writes the one-page ISO 16283-3 field
+façade test report: the standard-basis line, an optional metadata header, the
+one-third-octave table beside the measured-versus-shifted-reference curve, the
+boxed field rating `D2m,nT,w (C; Ctr)`, the engineering-method statement, an
+optional requirement verdict (a level difference passes at or above it) and a
+footer. `quantity="d_2m_nt"` (default) reports the standardized level
+difference; `"d_2m_n"` the normalized one; `"r_prime"` the apparent sound
+reduction index `R'45`. `verbose=True`, `metadata`, `language="es"` and the
+`phonometry[report]` extra behave exactly as in the fiches above.
+
+```python
+fac.report("D2mnTw_facade.pdf")                        # D2m,nT,w (C; Ctr)
+fac.report("Rp45_facade.pdf", quantity="r_prime")      # R'45,w (C; Ctr)
+```
+
+[![Field facade ISO 16283-3 example report: metadata header, one-third-octave D2m,nT table beside the measured-versus-shifted-reference curve, boxed D2m,nT,w (C; Ctr), the engineering-method statement and a PASS verdict](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso16283_facade_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso16283_facade_example.pdf)
+
+*Field façade fiche (`FacadeInsulationResult.report`), D2m,nT,w (C; Ctr).*
+
 ## Measurement uncertainty (ISO 12999-1)
 
 A rating without an uncertainty is only half a result. ISO 12999-1 does not

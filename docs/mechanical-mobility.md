@@ -283,6 +283,19 @@ pass/fail verdict; `language="es"` renders the Spanish fiche. The fiche always
 embeds the `|Y(f)|` spectrum, so it needs both the report and plot extras
 (`pip install "phonometry[report,plot]"`).
 
+```python
+from phonometry import ReportMetadata, vibration
+
+res = vibration.sdof_mobility_result(f, mass=2.0, stiffness=8000.0, damping=5.0)
+res.report(
+    "mobility.pdf",
+    metadata=ReportMetadata(
+        specimen="Machine support bracket (driving point)",
+        measurement_standard="ISO 7626-2",
+    ),
+)   # one-page fiche (needs phonometry[report,plot])
+```
+
 [![ISO 7626 mechanical-mobility example report: a metadata header, a table of the FRF characteristic points (type, frequency range, peak frequency, peak mobility and phase) beside the mobility magnitude spectrum, and the boxed peak mobility](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso7626_mobility_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso7626_mobility_example.pdf)
 
 ## References

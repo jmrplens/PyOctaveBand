@@ -222,6 +222,55 @@ w = injected_power(force=10.0, mobility=1.0 / z_plate)
 print(round(float(w) * 1e3, 3), "mW")                 # W = |F|^2 / (16 sqrt(B' m''))
 ```
 
+<details>
+<summary>Show the code for the concept figure</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import (
+    coincidence_frequency, composite_transmission_loss,
+    double_wall_transmission_loss, mass_law_transmission_loss,
+    mass_spring_mass_resonance, plate_bending_stiffness,
+    radiation_efficiency, single_panel_transmission_loss,
+)
+
+bands = np.array([50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
+                  1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000], dtype=float)
+fig, ax = plt.subplots(2, 2, figsize=(12, 9))
+
+bp = plate_bending_stiffness(6.2e10, 0.006, 0.24)
+fc = coincidence_frequency(15.0, bp)
+ml = mass_law_transmission_loss(bands, 15.0, incidence="field")
+sp = single_panel_transmission_loss(bands, 15.0, critical_frequency=fc, loss_factor=0.024)
+ax[0, 0].semilogx(bands, ml, "--", label="field-incidence mass law")
+ax[0, 0].semilogx(bands, sp.transmission_loss, "-o", ms=3, label="single panel R (Sharp)")
+ax[0, 0].axvline(fc, ls=":", color="r"); ax[0, 0].set_title("Single panel")
+
+dw = double_wall_transmission_loss(bands, 12.0, 12.0, 0.075)
+ax[0, 1].semilogx(bands, mass_law_transmission_loss(bands, 24.0), "--", label="single leaf")
+ax[0, 1].semilogx(bands, dw.transmission_loss, "-o", ms=3, label="double wall")
+ax[0, 1].axvline(mass_spring_mass_resonance(12.0, 12.0, 0.075), ls=":", color="r")
+ax[0, 1].set_title("Double wall")
+
+sig = radiation_efficiency(bands, 1.5, 1.25, fc)
+ax[1, 0].loglog(bands, sig.radiation_efficiency, "-o", ms=3, label=r"$\sigma(f)$")
+ax[1, 0].axhline(1.0, ls=":"); ax[1, 0].set_title("Radiation efficiency")
+
+wall = sp.transmission_loss
+comp = [float(composite_transmission_loss([0.99, 0.01], [w, 0.0])) for w in wall]
+ax[1, 1].semilogx(bands, wall, "-o", ms=3, label="solid wall")
+ax[1, 1].semilogx(bands, comp, "-s", ms=3, label="wall + 1 % slit")
+ax[1, 1].axhline(20.0, ls=":"); ax[1, 1].set_title("Composite with aperture")
+
+for a in ax.flat:
+    a.set_xlabel("Frequency [Hz]"); a.legend(fontsize=8); a.grid(alpha=0.3)
+fig.suptitle("Theoretical panel sound insulation")
+fig.tight_layout(); plt.show()
+```
+
+</details>
+
 ## References
 
 - Bies, D. A., Hansen, C. H., & Howard, C. Q. (2017). *Engineering Noise

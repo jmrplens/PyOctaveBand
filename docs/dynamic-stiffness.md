@@ -134,6 +134,24 @@ nearest MN/m³; `language="es"` renders the Spanish fiche. The fiche always
 embeds the $f_0(s')$ design curve, so it needs both the report and plot extras
 (`pip install "phonometry[report,plot]"`).
 
+```python
+from phonometry import ReportMetadata, materials
+
+res = materials.floating_floor_resonance(
+    resonant_frequency=45.0, total_mass_per_area=200.0,
+    floor_mass_per_area=110.0,
+    airflow_resistivity=50.0, thickness=0.020, porosity=0.9,
+)
+res.report(
+    "dynamic_stiffness.pdf",
+    metadata=ReportMetadata(
+        specimen="20 mm mineral-wool resilient layer",
+        mass_per_area=200.0, thickness=0.020,   # thickness d in metres (20 mm)
+        measurement_standard="EN 29052-1",
+    ),
+)   # one-page fiche (needs phonometry[report,plot])
+```
+
 [![EN 29052-1 dynamic-stiffness example report: a metadata header with the total mass per unit area and the loaded thickness, a metrics table of the resonant frequency, the apparent, enclosed-gas and installed dynamic stiffnesses and the natural frequency beside the f0(s') design curve, and the boxed apparent dynamic stiffness s't](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/en29052_dynamic_stiffness_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/en29052_dynamic_stiffness_example.pdf)
 
 ## 3. What the resonance method assumes, and where it bites
