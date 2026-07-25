@@ -1,6 +1,6 @@
 ---
 title: "Potencia acústica"
-description: "Nivel de potencia acústica LW por cinco vías: presión sonora sobre superficie envolvente (ISO 3744/3746), el método de precisión en sala reverberante con las correcciones de Waterhouse y C1/C2 (ISO 3741), el barrido de intensidad con indicadores de campo y grado alcanzado (ISO 9614-2), el método de precisión en sala anecoica (ISO 3745) y el barrido de intensidad de precisión (ISO 9614-3)."
+description: "Nivel de potencia acústica LW por cinco vías: presión acústica sobre superficie envolvente (ISO 3744/3746), el método de precisión en sala reverberante con las correcciones de Waterhouse y C1/C2 (ISO 3741), el barrido de intensidad con indicadores de campo y grado alcanzado (ISO 9614-2), el método de precisión en sala anecoica (ISO 3745) y el barrido de intensidad de precisión (ISO 9614-3)."
 references:
   - type: book
     authors: ["Fahy, F. J."]
@@ -108,10 +108,10 @@ prácticas distintos.
 
 | Método | Norma | Magnitud medida | Entorno | Grado de precisión | Cuándo usarlo |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| Superficie envolvente | **ISO 3744** (ingeniería) / **ISO 3746** (inspección) | Presión sonora sobre una semiesfera o caja | Campo esencialmente libre sobre uno o varios planos reflectantes | Grado 2 (`σR0 ≈ 1,5 dB`) / grado 3 (`≈ 3,0 dB`) | In situ o en una sala grande; sin instalación de ensayo especial disponible |
-| Sala reverberante | **ISO 3741** | Presión sonora en el campo difuso | Sala reverberante cualificada de paredes rígidas | Grado 1 (precisión) | Máxima precisión para fuentes estacionarias de banda ancha en laboratorio |
-| Barrido de intensidad | **ISO 9614-2** | Intensidad sonora normal barrida sobre una superficie | Casi cualquiera, tolerante al ruido extraño estacionario | Grado 2 / 3 (a partir de los indicadores de campo por banda) | In situ con ruido de fondo, o una máquina entre muchas |
-| Sala anecoica | **ISO 3745** | Presión sonora sobre un conjunto fijo de micrófonos | Sala anecoica o semianecoica cualificada | Grado 1 (precisión) | Emisión de grado de referencia en un laboratorio de campo libre |
+| Superficie envolvente | **ISO 3744** (ingeniería) / **ISO 3746** (inspección) | Presión acústica sobre una semiesfera o caja | Campo esencialmente libre sobre uno o varios planos reflectantes | Grado 2 (`σR0 ≈ 1,5 dB`) / grado 3 (`≈ 3,0 dB`) | In situ o en una sala grande; sin instalación de ensayo especial disponible |
+| Sala reverberante | **ISO 3741** | Presión acústica en el campo difuso | Sala reverberante cualificada de paredes rígidas | Grado 1 (precisión) | Máxima precisión para fuentes estacionarias de banda ancha en laboratorio |
+| Barrido de intensidad | **ISO 9614-2** | Intensidad acústica normal barrida sobre una superficie | Casi cualquiera, tolerante al ruido extraño estacionario | Grado 2 / 3 (a partir de los indicadores de campo por banda) | In situ con ruido de fondo, o una máquina entre muchas |
+| Sala anecoica | **ISO 3745** | Presión acústica sobre un conjunto fijo de micrófonos | Sala anecoica o semianecoica cualificada | Grado 1 (precisión) | Emisión de grado de referencia en un laboratorio de campo libre |
 | Barrido de intensidad de precisión | **ISO 9614-3** | Intensidad normal barrida, con criterios más estrictos | Casi cualquiera, tolerante al ruido extraño estacionario | Grado 1 (precisión) | Precisión in situ, con las comprobaciones de indicadores de campo de ISO 9614-3 |
 
 Los métodos de presión corrigen el nivel superficial por la sala (`K2`) y por
@@ -215,12 +215,12 @@ contrastar esa misma fuente con un límite de 93 dB es cara o cruz. Elige el
 grado por la decisión que el número debe sostener, no por la instalación que
 esté libre.
 
-## 1. Superficie envolvente, presión sonora (ISO 3744 / ISO 3746)
+## 1. Superficie envolvente, presión acústica (ISO 3744 / ISO 3746)
 
 Coloca la fuente sobre un plano reflectante e imagina una **superficie de
 medición** de área `S` que la envuelve: una semiesfera para una fuente
 compacta, una caja (paralelepípedo recto) para una grande o alargada.
-Muestrea el nivel de presión sonora en un conjunto de posiciones de micrófono
+Muestrea el nivel de presión acústica en un conjunto de posiciones de micrófono
 sobre esa superficie, promédialas en energía, y la potencia acústica se obtiene
 porque una superficie suficientemente difusa capta toda la energía radiada:
 
@@ -562,12 +562,12 @@ La **intensidad** sonora es el flujo neto de energía, así que distingue la
 energía que *sale* de la fuente de la energía estacionaria que solo atraviesa
 la superficie; por eso el método de intensidad tolera el ruido de fondo que
 derrotaría a los métodos de presión. Una sonda p-p (véase la
-[guía de Intensidad sonora](/phonometry/es/guides/intensity/)) se barre de forma
+[guía de Intensidad acústica](/phonometry/es/guides/intensity/)) se barre de forma
 continua sobre cada uno de los `N` segmentos de una superficie que encierra la
 fuente, informando de la intensidad normal con signo promediada por segmento
 `<In,i>`.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe_es.svg" alt="Una sonda de intensidad sonora p-p de dos micrófonos: dos micrófonos de presión separados por un separador, a partir de los cuales se estima el gradiente de presión y, por tanto, la intensidad normal" width="70%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe_es.svg" alt="Una sonda de intensidad acústica p-p de dos micrófonos: dos micrófonos de presión separados por un separador, a partir de los cuales se estima el gradiente de presión y, por tanto, la intensidad normal" width="70%" />
 
 Las potencias parciales suman el total:
 
@@ -713,7 +713,7 @@ donde `negative_band`), `surface_pressure_intensity_index` (`FpI`),
 
 Cuando se requiere la máxima exactitud, ISO 3745 mide la potencia acústica en una
 **sala anecoica** o **semianecoica** cualificada, donde el campo libre permite que
-un conjunto fijo de micrófonos muestree directamente la presión sonora radiada. Es
+un conjunto fijo de micrófonos muestree directamente la presión acústica radiada. Es
 la contraparte de grado 1 del método de superficie envolvente de la Sección 1, con
 coordenadas de micrófono normalizadas, una corrección por ruido de fondo por
 posición y una corrección meteorológica explícita.
@@ -851,7 +851,7 @@ intensidad normal sobre una superficie que encierra la fuente, pero con un barri
 continuo, criterios de indicadores de campo más estrictos y un presupuesto de
 incertidumbre explícito.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_intensity_scan_es.svg" alt="Barrido de intensidad sonora de precisión de ISO 9614-3: una fuente encerrada por una superficie de medición dividida en segmentos, una sonda de intensidad de dos micrófonos barrida a lo largo de un recorrido en serpentina sobre cada segmento, y la potencia acústica formada sumando la intensidad normal por el área del segmento, sujeta a los criterios de aceptación de los indicadores de campo" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_intensity_scan_es.svg" alt="Barrido de intensidad acústica de precisión de ISO 9614-3: una fuente encerrada por una superficie de medición dividida en segmentos, una sonda de intensidad de dos micrófonos barrida a lo largo de un recorrido en serpentina sobre cada segmento, y la potencia acústica formada sumando la intensidad normal por el área del segmento, sujeta a los criterios de aceptación de los indicadores de campo" width="92%" />
 
 **Potencia y nivel (Cláusula 7).** La potencia parcial de cada segmento es
 $P_i = I_{n,i}\,S_i$; el total $P = \sum_i P_i$ da
@@ -1223,7 +1223,7 @@ el repositorio; pulse la vista previa para abrir el PDF.
 
 ## Véase también
 
-- [Intensidad sonora (p-p)](/phonometry/es/guides/intensity/): la sonda de dos
+- [Intensidad acústica (p-p)](/phonometry/es/guides/intensity/): la sonda de dos
   micrófonos, su sesgo por diferencias finitas y los indicadores de campo de
   ISO 9614-1 que sustentan el método de barrido.
 - [Acústica de salas](/phonometry/es/guides/room-acoustics/): el tiempo

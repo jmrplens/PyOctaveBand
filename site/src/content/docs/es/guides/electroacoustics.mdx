@@ -44,7 +44,7 @@ references:
     title: "Sound system equipment – Part 4: Microphones"
     designation: "IEC 60268-4:2014"
     url: "https://webstore.iec.ch/en/publication/32039"
-    note: "Las características nominales de micrófono de las secciones 5 y 8: la sensibilidad en campo libre y su nivel re 1 V/Pa (11.1/11.3), la respuesta en frecuencia y el rango de frecuencias efectivo (12.1/12.2), el diagrama direccional y el índice de directividad mediante la integral de campo difuso de 11.2.2 a) (13.1/13.2), el nivel de presión sonora de sobrecarga (15.2), el nivel de presión sonora equivalente debido al ruido inherente (17) y las impedancias nominales y la alimentación (9/10). Revisada después como IEC 60268-4:2018 (misma página de catálogo); la edición implementada es la de 2014."
+    note: "Las características nominales de micrófono de las secciones 5 y 8: la sensibilidad en campo libre y su nivel re 1 V/Pa (11.1/11.3), la respuesta en frecuencia y el rango de frecuencias efectivo (12.1/12.2), el diagrama direccional y el índice de directividad mediante la integral de campo difuso de 11.2.2 a) (13.1/13.2), el nivel de presión acústica de sobrecarga (15.2), el nivel de presión acústica equivalente debido al ruido inherente (17) y las impedancias nominales y la alimentación (9/10). Revisada después como IEC 60268-4:2018 (misma página de catálogo); la edición implementada es la de 2014."
   - type: standard
     organization: "International Electrotechnical Commission"
     year: 2003
@@ -561,7 +561,7 @@ result.plot(quantity="thd")          # distorsión armónica total vs frecuencia
 result.plot(quantity="directivity")  # respuesta polar sobre el círculo de 25 dB
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_response_es.svg" alt="Respuesta del nivel de presión sonora en el eje con su banda de tolerancia sombreada, la línea de referencia de -10 dB y los marcadores del rango efectivo sobre un eje de frecuencias nominales" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_response_es.svg" alt="Respuesta del nivel de presión acústica en el eje con su banda de tolerancia sombreada, la línea de referencia de -10 dB y los marcadores del rango efectivo sobre un eje de frecuencias nominales" width="82%" />
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -687,9 +687,9 @@ de solo repetirse:
   sensibilidad de campo difuso de la integral de 11.2.2 a) sobre un diagrama
   con simetría de revolución; el cardioide ideal devuelve $10\lg 3 = 4{,}8$ dB.
 - **Nivel de ruido equivalente** (17.2). La tensión de ruido inherente
-  ponderada sobre la sensibilidad nominal como nivel de presión sonora,
+  ponderada sobre la sensibilidad nominal como nivel de presión acústica,
   $L_N = 20\lg\bigl((U_N/M)/20\,\mu\text{Pa}\bigr)$, con la relación
-  señal-ruido re 1 Pa (94 dB SPL) derivada de él. El nivel de presión sonora de
+  señal-ruido re 1 Pa (94 dB SPL) derivada de él. El nivel de presión acústica de
   sobrecarga (15.2) se lee de una curva de distorsión frente a nivel en el
   límite de THD declarado.
 
@@ -820,7 +820,7 @@ plt.show()
 
 </details>
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_distortion_es.svg" alt="Distorsión armónica total del micrófono en porcentaje frente al nivel de presión sonora, con el límite de THD y el nivel de presión sonora de sobrecarga marcados" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_distortion_es.svg" alt="Distorsión armónica total del micrófono en porcentaje frente al nivel de presión acústica, con el límite de THD y el nivel de presión acústica de sobrecarga marcados" width="82%" />
 
 <details>
 <summary>Ver el código de esta figura</summary>

@@ -319,7 +319,7 @@ plt.show()
 El ruido de pisadas se califica al revés. En lugar de cuánto *bloquea* un
 forjado, el aislamiento a impactos mide cuánto introduce en la sala inferior
 una **máquina de impactos normalizada** situada en el forjado superior, así que
-un número *mayor* es *peor*. El nivel de presión de ruido de impactos $L_i$
+un número *mayor* es *peor*. El nivel de presión acústica de impactos $L_i$
 promediado en energía en la sala receptora se normaliza igual que el caso
 aéreo, pero con un cambio de signo en el término de reverberación:
 
@@ -351,7 +351,7 @@ $C_{I,50\text{–}2500}$ (NOTA de A.2.1) y, con `one_decimal=True`, el índice e
 pasos de 0,1 dB usado en las declaraciones de incertidumbre (reproduce los
 valores impresos $L_{n,r,0,w} = 77,6$ dB y $C_{I,r,0} = -10,3$ dB de A.2.2).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_rating_es.svg" alt="Nivel de presión de ruido de impactos normalizado medido en tercios de octava con la curva de referencia de ISO 717-2 desplazada y el índice ponderado resultante leído a 500 Hz" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_rating_es.svg" alt="Nivel de presión acústica de impactos normalizado medido en tercios de octava con la curva de referencia de ISO 717-2 desplazada y el índice ponderado resultante leído a 500 Hz" width="80%" />
 
 ```python
 import numpy as np
@@ -520,7 +520,7 @@ renderizadas en el repositorio; pulsa cualquier vista previa para abrir el PDF.
 <ReportPreview
 	name="iso717_impact_example"
 	title="Informe de ejemplo de impactos ISO 717-2 (PDF)"
-	description="Ficha de aislamiento a ruido de impactos con el mismo formato acreditado para el nivel de presión de ruido de impactos normalizado Ln: la cabecera de metadatos, la tabla de Ln en tercios de octava junto a la curva medida frente a la referencia desplazada con la lectura a 500 Hz, el resultado de un solo número Ln,w (CI) en caja y una fila de veredicto NO CUMPLE frente al requisito de 53 dB (un nivel de impacto más bajo es mejor)."
+	description="Ficha de aislamiento a ruido de impactos con el mismo formato acreditado para el nivel de presión acústica de impactos normalizado Ln: la cabecera de metadatos, la tabla de Ln en tercios de octava junto a la curva medida frente a la referencia desplazada con la lectura a 500 Hz, el resultado de un solo número Ln,w (CI) en caja y una fila de veredicto NO CUMPLE frente al requisito de 53 dB (un nivel de impacto más bajo es mejor)."
 	caption="Ficha de índice de impactos (ImpactRatingResult.report), Ln,w (CI)."
 />
 

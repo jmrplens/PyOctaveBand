@@ -3,7 +3,7 @@ title: "Audición y percepción"
 description: "Cómo perciben el sonido los oyentes y qué hace el ruido a la audición: sensaciones psicoacústicas (sonoridad, agudeza, aspereza, tonalidad, molestia), inteligibilidad del habla (STI y SII), y la estadística de umbrales, daño auditivo y exposición laboral."
 ---
 
-Un nivel de presión sonora dice cuánto sonido hay; esta sección trata de lo
+Un nivel de presión acústica dice cuánto sonido hay; esta sección trata de lo
 que un **oyente** hace con él. Sus tres subsecciones responden a tres
 preguntas distintas. La **psicoacústica** cuantifica sensaciones: cuán fuerte
 se percibe un sonido, cuán agudo, áspero o tonal resulta, y cómo esas

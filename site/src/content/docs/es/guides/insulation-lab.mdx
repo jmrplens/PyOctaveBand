@@ -109,7 +109,7 @@ flotante, una ventana) se lleva a un laboratorio cualificado, donde la
 transmisión por flancos suprimida hace que la transmisión directa sea toda la
 historia. Esta página cubre la cadena de laboratorio: el índice de reducción
 acústica y el nivel de impactos normalizado de ISO 10140, la alternativa por
-intensidad sonora de ISO 15186, la mejora de revestimientos de suelo en maqueta
+intensidad acústica de ISO 15186, la mejora de revestimientos de suelo en maqueta
 pequeña de ISO 16251-1 y la medición de la transmisión por flancos de
 ISO 10848. La medición en campo y sus índices están en
 [Medición del aislamiento en campo e índices](/phonometry/es/guides/insulation-field/),
@@ -195,7 +195,7 @@ LabInsulationWarning)`. El índice automático se forma solo cuando se suministr
 exactamente 16 valores en tercio de octava o 5 en octava (`rating` es `None` en
 caso contrario).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lab_insulation_result_es.svg" alt="Las dos magnitudes de laboratorio de ISO 10140 lado a lado: el índice de reducción acústica medido R frente a la referencia ISO 717-1 desplazada a la izquierda, y el nivel de presión de ruido de impactos normalizado Ln frente a la referencia ISO 717-2 desplazada a la derecha, cada panel anotado con su índice de un solo número" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lab_insulation_result_es.svg" alt="Las dos magnitudes de laboratorio de ISO 10140 lado a lado: el índice de reducción acústica medido R frente a la referencia ISO 717-1 desplazada a la izquierda, y el nivel de presión acústica de impactos normalizado Ln frente a la referencia ISO 717-2 desplazada a la derecha, cada panel anotado con su índice de un solo número" width="92%" />
 
 *Las dos magnitudes de laboratorio de ISO 10140 con sus índices ISO 717: el
 $R$ aéreo se evalúa donde la referencia queda **por encima** de la medición,
@@ -348,7 +348,7 @@ repositorio. Haz clic en cualquier vista previa para abrir el PDF:
 El método de laboratorio de ISO 10140, más arriba, lee la potencia transmitida de forma
 *indirecta*, a partir del nivel de la sala receptora y de su área de absorción,
 lo que falla cuando los flancos filtran una potencia que la sala integra
-igualmente. El método por **intensidad sonora** (ISO 15186) lo evita: una sonda
+igualmente. El método por **intensidad acústica** (ISO 15186) lo evita: una sonda
 de intensidad barre una superficie de medición que envuelve el espécimen y mide
 la potencia radiada de forma *directa*, así que solo contribuye el elemento
 ensayado. Es la herramienta preferida cuando la transmisión por flancos es alta
@@ -360,7 +360,7 @@ $$
 R_I = L_{p1} - 6 - \left[ L_{In} + 10 \log_{10}\frac{S_m}{S} \right],
 $$
 
-donde los $6$ dB son el desfase de campo difuso entre el nivel de presión sonora
+donde los $6$ dB son el desfase de campo difuso entre el nivel de presión acústica
 y el nivel de intensidad incidente. La misma fórmula da el índice aparente
 $R'_I$ en campo (ISO 15186-2). Como el método por intensidad *subestima*
 ligeramente la potencia radiada a una sala receptora real, un **índice

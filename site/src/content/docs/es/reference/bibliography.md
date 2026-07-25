@@ -114,8 +114,8 @@ que las guías incorporan sus secciones de Referencias.
   Las características nominales del micrófono: sensibilidad en campo libre y su
   nivel re 1 V/Pa, la respuesta en frecuencia y el rango de frecuencias
   efectivo frente a los límites de tolerancia, el diagrama direccional y el
-  índice de directividad, el nivel de presión sonora de sobrecarga, el nivel de
-  presión sonora equivalente debido al ruido inherente, y las impedancias
+  índice de directividad, el nivel de presión acústica de sobrecarga, el nivel de
+  presión acústica equivalente debido al ruido inherente, y las impedancias
   nominales y la alimentación.
   Citado por [Electroacústica](/phonometry/es/guides/electroacoustics/).
 - International Electrotechnical Commission. (2007). *Sound system equipment —
@@ -142,7 +142,7 @@ que las guías incorporan sus secciones de Referencias.
   La monografía sobre el flujo de energía sonora: intensidad activa y
   reactiva, el estimador p-p y su presupuesto de error por desfase.
   Citado por [Potencia acústica](/phonometry/es/guides/sound-power/) e
-  [Intensidad sonora (p-p)](/phonometry/es/guides/intensity/).
+  [Intensidad acústica (p-p)](/phonometry/es/guides/intensity/).
 - International Organization for Standardization. (2019). *Acoustics —
   Determination of sound power levels of noise sources — Guidelines for the
   use of basic standards* (ISO 3740:2019).
@@ -184,7 +184,7 @@ que las guías incorporan sus secciones de Referencias.
   [Catálogo iso.org](https://www.iso.org/standard/17427.html).
   Los indicadores de campo y el criterio de capacidad dinámica de la medida
   de intensidad.
-  Citado por [Intensidad sonora (p-p)](/phonometry/es/guides/intensity/).
+  Citado por [Intensidad acústica (p-p)](/phonometry/es/guides/intensity/).
 - International Electrotechnical Commission. (1993). *Electroacoustics —
   Instruments for the measurement of sound intensity — Measurements with
   pairs of pressure sensing microphones* (IEC 61043:1993; adoptada en Europa
@@ -192,7 +192,7 @@ que las guías incorporan sus secciones de Referencias.
   [Tienda IEC](https://webstore.iec.ch/en/publication/4353).
   La norma de instrumentación p-p: el estimador por espectro cruzado y el
   índice presión-intensidad residual.
-  Citado por [Intensidad sonora (p-p)](/phonometry/es/guides/intensity/).
+  Citado por [Intensidad acústica (p-p)](/phonometry/es/guides/intensity/).
 
 ## Acústica de salas
 
@@ -443,7 +443,7 @@ que las guías incorporan sus secciones de Referencias.
   Citado por [Movilidad mecánica y la familia de FRF](/phonometry/es/guides/mechanical-mobility/),
   [Rigidez dinámica de transferencia](/phonometry/es/guides/transfer-stiffness/),
   [Potencia acústica desde vibración](/phonometry/es/guides/vibration-sound-power/),
-  [Potencia sonora estructural de equipos](/phonometry/es/guides/structure-borne-power/)
+  [Potencia acústica estructural de equipos](/phonometry/es/guides/structure-borne-power/)
   y [Ruido estructural instalado](/phonometry/es/guides/installed-structure-borne/).
 - Cremer, L., Heckl, M., & Ungar, E. E. (1973). *Structure-borne sound:
   Structural vibrations and sound radiation at audio frequencies* (1.ª ed.).
@@ -501,7 +501,7 @@ que las guías incorporan sus secciones de Referencias.
   [Catálogo iso.org](https://www.iso.org/standard/17424.html).
   La caracterización por velocidad libre de fuentes montadas
   resilientemente.
-  Citado por [Potencia sonora estructural de equipos](/phonometry/es/guides/structure-borne-power/).
+  Citado por [Potencia acústica estructural de equipos](/phonometry/es/guides/structure-borne-power/).
 
 ## Sonido en exteriores y ruido ambiental
 
@@ -873,7 +873,7 @@ que las guías incorporan sus secciones de Referencias.
   Reference threshold of hearing under free-field and diffuse-field listening
   conditions* (ISO 389-7:2005).
   [Catálogo iso.org](https://www.iso.org/standard/38976.html).
-  El cero audiométrico como nivel de presión sonora.
+  El cero audiométrico como nivel de presión acústica.
   Citado por [Umbral de audición](/phonometry/es/guides/hearing-threshold/).
 - International Organization for Standardization. (2013). *Acoustics —
   Estimation of noise-induced hearing loss* (ISO 1999:2013).

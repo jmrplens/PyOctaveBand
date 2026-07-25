@@ -348,7 +348,7 @@ no necesita caracterizarse.
 
 ### Barrido de intensidad (ISO 9614-2)
 
-La intensidad sonora es el flujo neto de energía $\vec{I} = \overline{p\ \vec{u}}$,
+La intensidad acústica es el flujo neto de energía $\vec{I} = \overline{p\ \vec{u}}$,
 así que por el teorema de la divergencia la potencia que atraviesa una
 superficie cerrada es $P = \sum_i \langle I_{n,i} \rangle\ S_i$. Una fuente
 estacionaria *fuera* de la superficie aporta flujo neto nulo (su energía entra y

@@ -1,6 +1,6 @@
 ---
 title: "Ruido estructural instalado (EN 12354-5)"
-description: "La predicción según EN 12354-5:2009 del nivel de presión sonora en un recinto receptor por equipos de servicio del edificio que inyectan ruido estructural: el término de acoplamiento D_C a partir de las movilidades de fuente y receptor (Fórmula 19b-e), la potencia instalada L_Ws,inst = L_Ws,c − D_C (Fórmula 18b) y el nivel de presión normalizado por camino con su total energético (Fórmulas 18a/17)."
+description: "La predicción según EN 12354-5:2009 del nivel de presión acústica en un recinto receptor por equipos de servicio del edificio que inyectan ruido estructural: el término de acoplamiento D_C a partir de las movilidades de fuente y receptor (Fórmula 19b-e), la potencia instalada L_Ws,inst = L_Ws,c − D_C (Fórmula 18b) y el nivel de presión normalizado por camino con su total energético (Fórmulas 18a/17)."
 references:
   - type: book
     authors: ["Cremer, L.", "Heckl, M.", "Petersson, B. A. T."]
@@ -23,17 +23,17 @@ references:
     title: "Building acoustics — Estimation of acoustic performance of buildings from the performance of elements — Part 5: Sound levels due to service equipment"
     designation: "EN 12354-5:2009"
     url: "https://knowledge.bsigroup.com/products/building-acoustics-estimation-of-acoustic-performance-of-building-from-the-performance-of-elements-sounds-levels-due-to-the-service-equipment"
-    note: "El término de acoplamiento (cláusula 4.4.3, Fórmulas 19a-19e), el nivel de potencia estructural instalada (Fórmula 18b), el término de ajuste estructura-a-aéreo (cláusula 4.4.4, Fórmulas 20a/20b) y el nivel de presión sonora normalizado por camino y su combinación energética (Fórmulas 18a, 17). La conformidad se ancla en el límite de fuente de fuerza del término de acoplamiento y en los ejemplos resueltos del propio Anexo I de la norma: la bañera de hidromasaje de I.2 (Tabla I.6a: corrección de movilidad y camino 11) y la cisterna de I.3 (Tablas I.8/I.9: conversión de la fuente, los cuatro caminos de transmisión, el total de la Fórmula 17 y su cierre a 29 dB(A)), dentro del redondeo de ±0,15 dB de los intermedios impresos con un decimal. D_sa y R_ij,ref son entradas (de medición / EN 12354-1 / Anexos D y F). La ficha de catálogo enlazada es la página de BSI Knowledge de BS EN 12354-5:2009; revisada después como EN 12354-5:2023 (https://knowledge.bsigroup.com/products/building-acoustics-estimation-of-acoustic-performance-of-buildings-from-the-performance-of-elements-sounds-levels-due-to-the-service-equipment)."
+    note: "El término de acoplamiento (cláusula 4.4.3, Fórmulas 19a-19e), el nivel de potencia estructural instalada (Fórmula 18b), el término de ajuste estructura-a-aéreo (cláusula 4.4.4, Fórmulas 20a/20b) y el nivel de presión acústica normalizado por camino y su combinación energética (Fórmulas 18a, 17). La conformidad se ancla en el límite de fuente de fuerza del término de acoplamiento y en los ejemplos resueltos del propio Anexo I de la norma: la bañera de hidromasaje de I.2 (Tabla I.6a: corrección de movilidad y camino 11) y la cisterna de I.3 (Tablas I.8/I.9: conversión de la fuente, los cuatro caminos de transmisión, el total de la Fórmula 17 y su cierre a 29 dB(A)), dentro del redondeo de ±0,15 dB de los intermedios impresos con un decimal. D_sa y R_ij,ref son entradas (de medición / EN 12354-1 / Anexos D y F). La ficha de catálogo enlazada es la página de BSI Knowledge de BS EN 12354-5:2009; revisada después como EN 12354-5:2023 (https://knowledge.bsigroup.com/products/building-acoustics-estimation-of-acoustic-performance-of-buildings-from-the-performance-of-elements-sounds-levels-due-to-the-service-equipment)."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
 
-La **EN 12354-5:2009** predice el nivel de presión sonora en un recinto receptor
+La **EN 12354-5:2009** predice el nivel de presión acústica en un recinto receptor
 causado por equipos de servicio del edificio (bombas, ventiladores, ascensores,
 instalaciones de agua) que inyectan **ruido estructural** en el edificio. Cierra
 la cadena de vibroacústica estructural: la fuente se describe por su nivel de
-potencia sonora estructural característica `L_Ws,c`, derivado de la medición
+potencia acústica estructural característica `L_Ws,c`, derivado de la medición
 sobre placa receptora de EN 15657 mediante la conversión de las Fórmulas
 (15)/(17) y una corrección de movilidad (**no** el nivel bruto inyectado en la
 placa; véase [EN 15657](/phonometry/es/guides/structure-borne-power/)); las
@@ -45,7 +45,7 @@ placa receptora `L_Ws,n` al receptor real,
 `L_Ws,inst = L_Ws,n + 10 lg(Y_∞,i / Y_∞,rec)` con `Y_∞,rec = 5·10⁻⁶ m/(N·s)`;
 con la movilidad de la fuente en su lugar da `L_Ws,c` (Anexo I.3, Tabla I.8).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/installed_structure_borne_es.svg" alt="La cascada de EN 12354-5 por banda de octava: potencia característica, potencia instalada tras el término de acoplamiento, niveles de presión sonora por camino y su total energético" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/installed_structure_borne_es.svg" alt="La cascada de EN 12354-5 por banda de octava: potencia característica, potencia instalada tras el término de acoplamiento, niveles de presión acústica por camino y su total energético" width="82%" loading="eager" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -127,9 +127,9 @@ que la vibración llega a través de las uniones. Cada par elemento
 excitado/elemento radiante `i→j` es una vía de transmisión con su propio
 término de ajuste y su índice de flancos:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_installed_paths_es.svg" alt="Vías de instalación EN 12354-5: una bomba sobre apoyos resilientes inyecta potencia estructural en el forjado, el forjado excitado radia al recinto receptor de abajo, una segunda vía recorre el forjado hasta la pared de flanco, y la cascada de predicción va de la potencia característica al nivel de presión sonora normalizado" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_installed_paths_es.svg" alt="Vías de instalación EN 12354-5: una bomba sobre apoyos resilientes inyecta potencia estructural en el forjado, el forjado excitado radia al recinto receptor de abajo, una segunda vía recorre el forjado hasta la pared de flanco, y la cascada de predicción va de la potencia característica al nivel de presión acústica normalizado" width="92%" />
 
-Cada camino de transmisión `i→j` da un nivel de presión sonora normalizado a
+Cada camino de transmisión `i→j` da un nivel de presión acústica normalizado a
 partir de la potencia instalada, el término de ajuste estructura-a-aéreo `D_sa`,
 el índice de reducción acústica de flancos `R_ij,ref` (EN 12354-1) y el área del
 elemento (Fórmula 18a):

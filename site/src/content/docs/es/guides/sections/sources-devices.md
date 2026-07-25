@@ -1,6 +1,6 @@
 ---
 title: "Fuentes y dispositivos"
-description: "Caracterizar lo que emite el sonido: determinación de la potencia acústica por métodos de presión, cámara reverberante e intensidad (series ISO 3740 e ISO 9614), intensidad sonora con dos micrófonos (IEC 61043), las métricas de distorsión y respuesta en frecuencia de equipos de audio de IEC 60268, la separación armónica con barridos y THD(f) (Farina / Novak), y la sonoridad de programa y pico verdadero de UIT-R BS.1770-5 / EBU R 128."
+description: "Caracterizar lo que emite el sonido: determinación de la potencia acústica por métodos de presión, cámara reverberante e intensidad (series ISO 3740 e ISO 9614), intensidad acústica con dos micrófonos (IEC 61043), las métricas de distorsión y respuesta en frecuencia de equipos de audio de IEC 60268, la separación armónica con barridos y THD(f) (Farina / Novak), y la sonoridad de programa y pico verdadero de UIT-R BS.1770-5 / EBU R 128."
 ---
 
 Toda predicción del resto de esta documentación parte de un descriptor de
@@ -17,11 +17,11 @@ cubre las cinco rutas normalizadas para obtenerla, desde la superficie
 envolvente de presión de ISO 3744/3746 hasta la cámara reverberante de
 ISO 3741, el barrido de intensidad in situ de ISO 9614-2 y los grados de
 precisión de ISO 3745 e ISO 9614-3. Detrás de las
-rutas por intensidad está la propia **intensidad sonora**: el flujo de
+rutas por intensidad está la propia **intensidad acústica**: el flujo de
 potencia con signo que puede localizar fuentes y separarlas del ruido de
 fondo, medido con una sonda de dos micrófonos según IEC 61043 y cualificado
 por los indicadores de campo de ISO 9614-1, cubierto en
-[Intensidad sonora (p-p)](/phonometry/es/guides/intensity/).
+[Intensidad acústica (p-p)](/phonometry/es/guides/intensity/).
 
 [Electroacústica](/phonometry/es/guides/electroacoustics/) se vuelve hacia
 los dispositivos que *deben* producir sonido: amplificadores, altavoces y
@@ -47,7 +47,7 @@ sobremuestreo en dBTP.
 Si vienes a medir una máquina, empieza por
 [Potencia acústica](/phonometry/es/guides/sound-power/) y deja que su guía de
 decisión elija la ruta; lee
-[Intensidad sonora (p-p)](/phonometry/es/guides/intensity/) cuando esa ruta
+[Intensidad acústica (p-p)](/phonometry/es/guides/intensity/) cuando esa ruta
 implique una sonda de intensidad. Si vienes a caracterizar equipos de audio,
 ve directamente a
 [Electroacústica](/phonometry/es/guides/electroacoustics/); si vienes a
@@ -56,7 +56,7 @@ nivelar un programa, ve a
 
 ## Páginas de esta sección
 
-- [Intensidad sonora (p-p)](/phonometry/es/guides/intensity/): intensidad
+- [Intensidad acústica (p-p)](/phonometry/es/guides/intensity/): intensidad
   sonora con dos micrófonos según IEC 61043 con los indicadores de campo de
   ISO 9614-1.
 - [Potencia acústica](/phonometry/es/guides/sound-power/): el nivel de potencia

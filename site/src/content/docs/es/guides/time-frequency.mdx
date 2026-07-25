@@ -46,7 +46,7 @@ Welch sin eliminación de tendencia, se cumplen tres identidades:
 
 * una señal en pascales da Pa²/Hz (`'density'`) o Pa² (`'spectrum'`) por
   celda, así que `10·lg(power/p₀²)` con escalado `'spectrum'` lee
-  directamente el **nivel de presión sonora** de un tono en cualquier
+  directamente el **nivel de presión acústica** de un tono en cualquier
   columna que abarque;
 * la **media de las columnas en el tiempo reproduce
   `power_spectral_density`** bin a bin, con la misma ventana, solape y
@@ -78,7 +78,7 @@ determinista (tonos, barridos, transitorios), mientras que la
 [estimación de Welch](/phonometry/es/guides/spectral-analysis/) promediada
 es la herramienta de baja varianza para el fondo estacionario.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/calibrated_spectrogram_es.webp" alt="Espectrograma calibrado en dB SPL de una escena exterior sintética de cuatro segundos: una sirena que barre sinusoidalmente entre 600 y 1200 hercios traza una cresta oscilante brillante a 70 decibelios, un impacto de banda ancha a los dos segundos y medio dibuja una franja vertical y un fondo de ruido rosa a 45 decibelios rellena el fondo, con la barra de color leyendo el nivel de presión sonora absoluto" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/calibrated_spectrogram_es.webp" alt="Espectrograma calibrado en dB SPL de una escena exterior sintética de cuatro segundos: una sirena que barre sinusoidalmente entre 600 y 1200 hercios traza una cresta oscilante brillante a 70 decibelios, un impacto de banda ancha a los dos segundos y medio dibuja una franja vertical y un fondo de ruido rosa a 45 decibelios rellena el fondo, con la barra de color leyendo el nivel de presión acústica absoluto" width="82%" loading="eager" />
 
 <details>
 <summary>Ver el código de esta figura</summary>
