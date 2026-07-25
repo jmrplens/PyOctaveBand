@@ -93,9 +93,12 @@ así que el cepstro lleva un tren de picos en los **rahmónicos** `n·t0` con
 amplitudes `a, -a²/2, a³/3, ...` (su suma es `ln(1+a)`), independientemente
 del espectro de la propia `s`, que se concentra en las quefrencias bajas. En
 el cepstro con signo del espectro logarítmico de potencia (`kind='power'`,
-la convención de Milner) la altura del primer pico es exactamente el
-coeficiente de reflexión `a` - con su signo - una forma cerrada que los
-tests y la batería de conformidad fijan a 1e-10. `echo_detection`
+la convención de Milner) la altura del primer pico es el coeficiente de
+reflexión `a` - con su signo - más lo que el cepstro de la fuente aporte en
+esa quefrencia (despreciable para fuentes de banda ancha, cuyo cepstro se
+concentra en las quefrencias bajas); sobre un impulso ideal con eco la
+identidad es una forma cerrada que los tests y la batería de conformidad
+fijan a 1e-10. `echo_detection`
 automatiza la lectura: busca el mayor pico de `|cepstrum|` en la banda de
 búsqueda (así una reflexión inversora, `a < 0`, se encuentra en su retardo
 verdadero en vez de perderse), refina el retardo por interpolación

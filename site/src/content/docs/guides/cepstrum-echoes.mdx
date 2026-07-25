@@ -89,9 +89,11 @@ so the cepstrum carries a spike train at the **rahmonics** `n·t0` with
 amplitudes `a, -a²/2, a³/3, ...` (their sum is `ln(1+a)`), regardless of the
 spectrum of `s` itself, which concentrates at low quefrencies. On the signed
 cepstrum of the log-power spectrum (`kind='power'`, Milner's convention) the
-first spike's height is exactly the reflection coefficient `a` -
-of either sign - a closed form the tests and the conformance suite pin to
-1e-10. `echo_detection` automates the reading: it picks the largest
+first spike's height is the reflection coefficient `a` - of either
+sign - plus whatever the source cepstrum contributes at that quefrency
+(negligible for broadband sources, whose cepstrum concentrates at low
+quefrencies); on an ideal impulse-plus-echo the identity is a closed form
+the tests and the conformance suite pin to 1e-10. `echo_detection` automates the reading: it picks the largest
 `|cepstrum|` peak in the searched band (so an inverting reflection, `a < 0`,
 is found at its true delay rather than missed), refines the delay by
 quadratic interpolation through the peak and its neighbours, and reports the
