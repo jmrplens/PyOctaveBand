@@ -148,11 +148,42 @@ const breadcrumbList = isHome
         localStorage.setItem(input.name, input.value);
       } catch {}
       applyApiFold();
+      syncSectionToc();
     });
+
+    // 'clean' variant: the section standards table is injected after the
+    // markdown pipeline, so its heading cannot reach the server-rendered
+    // "On this page" list. Mirror the entry client-side while the variant is
+    // active (an existing item is cloned to inherit Starlight's scoped
+    // styles). Prototype-only: the cloned entry is not scroll-spied.
+    const sectionHeading = document.querySelector('.section-standards h2');
+    const syncSectionToc = () => {
+      for (const node of document.querySelectorAll('.toc-standards-entry')) node.remove();
+      if (!sectionHeading || d.dataset.tocStyle !== 'clean') return;
+      for (const list of document.querySelectorAll('starlight-toc nav ul, mobile-starlight-toc nav ul')) {
+        const last = list.lastElementChild;
+        if (!last) continue;
+        const item = last.cloneNode(true);
+        item.classList.add('toc-standards-entry');
+        const link = item.querySelector('a');
+        if (!link) continue;
+        link.setAttribute('href', `#${sectionHeading.id}`);
+        link.removeAttribute('aria-current');
+        const label = link.querySelector('span') || link;
+        label.textContent = sectionHeading.textContent;
+        list.append(item);
+      }
+    };
+    syncSectionToc();
 
     // Collapsed API mode: initial fold state and caret wiring.
     const apiGroup = document.querySelector('#starlight__sidebar .api-group');
     const caret = apiGroup?.querySelector('.api-caret');
+    const apiList = apiGroup?.querySelector('ul');
+    if (apiList && caret) {
+      apiList.id = apiList.id || 'sidebar-api-items';
+      caret.setAttribute('aria-controls', apiList.id);
+    }
     const setFolded = (folded) => {
       if (!apiGroup) return;
       apiGroup.classList.toggle('folded', folded);
