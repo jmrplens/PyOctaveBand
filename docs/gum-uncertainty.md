@@ -192,6 +192,36 @@ with the coverage interval marked (the right panel above). The building-acoustic
 of ISO 12999-1, which combines reproducibility terms for a single-number
 rating, is a separate, domain-specific budget.
 
+A budget is only as honest as the record behind it: every averaged input
+assumes stationarity, and [Data qualification](data-qualification.md)
+provides the Bendat & Piersol tests that check it before the propagation
+starts.
+
+## Where the library consumes this machinery
+
+The domain pages carry their own, standard-prescribed uncertainty clauses,
+and each is an instance of the clause-5 sum this page implements in
+general form; use this page whenever your measurement model is not one of
+those standardized cases:
+
+- **Calibration.** The calibrator's class tolerance and the pre/post drift
+  bound of [Calibration](calibration.md) are textbook Type B inputs:
+  propagate them (`Quantity(..., "rectangular")`) through the level model
+  rather than quoting the tolerance alone.
+- **Environmental levels.** The ISO 1996-2 combined uncertainty of the
+  [Levels](levels.md) page is Formula (2) of that standard: the same
+  quadrature sum with the standard's own sensitivity coefficients.
+- **Building acoustics.** The per-band and single-number uncertainties of
+  [field insulation measurements](insulation-field.md) apply the tabulated
+  reproducibility terms of ISO 12999-1, a standardized budget for one
+  specific model.
+- **Absorption.** The [materials page](materials.md) carries the
+  ISO 12999-2 absorption uncertainty, the same construction for the
+  reverberation-room method.
+- **Occupational exposure.** The ISO 9612 uncertainty of
+  [occupational measurements](occupational-exposure.md) budgets sampling,
+  instrument and position contributions in exactly this way.
+
 ## References
 
 - Joint Committee for Guides in Metrology. (2008). *Evaluation of measurement

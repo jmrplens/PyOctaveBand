@@ -232,6 +232,37 @@ promediada supone estacionariedad, y
 [Calificación de datos](/phonometry/es/guides/data-qualification/) trae los
 tests de Bendat y Piersol que lo comprueban antes de empezar la propagación.
 
+## Dónde consume la librería esta maquinaria
+
+Las páginas de dominio llevan sus propias cláusulas de incertidumbre
+prescritas por norma, y cada una es una instancia de la suma de la
+cláusula 5 que esta página implementa en forma general; usa esta página
+siempre que tu modelo de medición no sea uno de esos casos normalizados:
+
+- **Calibración.** La tolerancia de clase del calibrador y la cota de
+  deriva pre/post de [Calibración](/phonometry/es/guides/calibration/) son
+  entradas de tipo B de libro: propágalas
+  (`Quantity(..., "rectangular")`) a través del modelo del nivel en lugar
+  de citar la tolerancia sola.
+- **Niveles ambientales.** La incertidumbre combinada de ISO 1996-2 de la
+  página de [Niveles](/phonometry/es/guides/levels/) es la Fórmula (2) de
+  esa norma: la misma suma en cuadratura con los coeficientes de
+  sensibilidad propios de la norma.
+- **Acústica de la edificación.** Las incertidumbres por banda y de número
+  único de las
+  [mediciones de aislamiento in situ](/phonometry/es/guides/insulation-field/)
+  aplican los términos de reproducibilidad tabulados de ISO 12999-1, un
+  balance normalizado para un modelo concreto.
+- **Absorción.** La [página de materiales](/phonometry/es/guides/materials/)
+  lleva la incertidumbre de absorción de ISO 12999-2, la misma construcción
+  para el método de cámara reverberante.
+- **Exposición laboral.** La incertidumbre de ISO 9612 de las
+  [mediciones laborales](/phonometry/es/guides/occupational-exposure/)
+  presupuesta las contribuciones de muestreo, instrumento y posición
+  exactamente de esta manera.
+
 ## Véase también
 
+- [Calificación de datos](/phonometry/es/guides/data-qualification/): las comprobaciones de estacionariedad que toda entrada promediada asume en silencio.
+- [Calibración](/phonometry/es/guides/calibration/): las entradas de tolerancia y deriva de toda cadena calibrada.
 - Referencia de la API: [`metrology.uncertainty`](/phonometry/es/reference/api/metrology/uncertainty/).
