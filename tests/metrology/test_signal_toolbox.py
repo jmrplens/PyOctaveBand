@@ -113,6 +113,29 @@ def test_table_aiii_repetition_rates_fit(rate: float) -> None:
     assert res.period_samples == round(FS / rate)
 
 
+def test_tone_burst_incommensurate_frequency_warns() -> None:
+    """997 Hz at 48 kHz: 10 periods span 481.44 samples, gated at 481.
+
+    The 'integral number of full periods' of Clause A2.1 is sample-exact
+    only for commensurate f/fs; otherwise a warning quantifies the
+    residual step at the gate edge.
+    """
+    with pytest.warns(ph.PhonometryWarning, match="incommensurate"):
+        res = ph.tone_burst(FS, 997.0, 10)
+    assert res.burst_samples == 481
+    # The gated waveform does not end at the tone's zero crossing.
+    assert abs(res.signal[res.burst_samples - 1]) > 0.1
+
+
+def test_tone_burst_commensurate_frequency_does_not_warn() -> None:
+    import warnings as _warnings
+
+    with _warnings.catch_warnings():
+        _warnings.simplefilter("error", ph.PhonometryWarning)
+        res = ph.tone_burst(FS, 5000.0, 25)  # 240 samples exactly
+    assert res.burst_samples == 240
+
+
 def test_tone_burst_result_is_frozen() -> None:
     res = ph.tone_burst(FS, 5000.0, 25)
     with pytest.raises(dataclasses.FrozenInstanceError):
