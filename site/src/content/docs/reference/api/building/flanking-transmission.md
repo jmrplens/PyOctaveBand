@@ -123,8 +123,9 @@ mutually consistent this equals [`phonometry.coincidence_frequency`](/phonometry
 The printed ISO 10848-1:2006 Formula (20) carries a spurious extra
 `π` in the denominator (`1,8 cL · h · π`), which would misplace
 `fc` by a factor π; the π-free form implemented here is the one
-ISO 12354-1:2017 prints (`fc = c0²/(1,8 cL t)`) and Hopkins
-Eq. 2.201 derives. See `docs/ERRATA.md`.
+ISO 10848-1:2017 restores in its Formula (5), ISO 12354-1:2017
+prints in its symbol definitions (`fc = c0²/(1,8 cL t)`) and
+Hopkins Eq. 2.201 derives. See `docs/ERRATA.md`.
 :::
 
 **Parameters**
