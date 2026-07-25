@@ -33,6 +33,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   term and links the mobility chain. The docs mirrors regain their missing
   ISO 10052 survey-report, ISO 16283-3 facade-report, ISO 10846 fiche and
   panel concept sections.
+- `ModulationDistortionResult.plot()` (IEC 60268-3 14.12.7): the result now
+  carries the measured carrier amplitude and the four modulation-sideband
+  frequencies/amplitudes, and its new `.plot()` draws the carrier (0 dB
+  reference) and the `f2 ± f1` / `f2 ± 2f1` sidebands with the per-order
+  `d2`/`d3` and the SMPTE combined RMS annotated, the modulation counterpart
+  of `HarmonicDistortionResult.plot()`.
+- `field_indicators` (ISO 9614-1:1993 Annex A) now accepts 2D
+  `(positions, bands)` arrays plus band centre `frequencies` and returns the
+  per-band `F2`/`F3`/`F4` arrays; the `FieldIndicators` result gains a
+  `frequency` field and a `.plot(dynamic_capability=...)` that draws `F2` and
+  `F3` per band against the criterion-1 dynamic capability `Ld` with the
+  non-uniformity `F4` on a twin axis. Scalar 1D behaviour is unchanged.
+- Documentation figures for the emission and electroacoustics guides
+  (four variants each, EN/ES x light/dark): modulation sidebands, baffled
+  piston radiation impedance `R1`/`X1`, ISO 9614-1 field indicators vs `Ld`,
+  side-branch silencer transmission loss, ASHRAE duct end reflection loss,
+  machine-enclosure insertion loss `R − C`, minimum-phase/all-pass
+  decomposition, BS.1770 gating and the EBU Tech 3342 loudness range, each
+  embedded with its one-line `.plot()` and by-hand matplotlib snippet in the
+  English guide, the Spanish mirror and the GitHub docs page.
+- `docs/electroacoustics.md` gains the IEC 60268-5 loudspeaker and
+  IEC 60268-4 microphone rated-characteristics report sections, and
+  `docs/sound-power.md` the measurement-report (`.report()`) and ISO 4871
+  noise-emission-declaration sections, matching the site guides.
 
 ### Fixed
 

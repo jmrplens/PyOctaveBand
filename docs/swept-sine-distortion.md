@@ -59,6 +59,43 @@ res.distortion_ratios     # |Hn(n f)| / |H1(f)| per order
 res.plot()                # |Hn| magnitudes + THD(f)
 ```
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/swept_sine_thd_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/swept_sine_thd.svg" alt="Total harmonic distortion and the second and third harmonic ratios of a cubic polynomial followed by a 3 kHz low-pass, against excitation frequency: each order sits exactly on its Chebyshev level at low frequency and rolls off where its own product crosses the filter corner" width="82%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal as sp_signal
+from phonometry import swept_sine_distortion, synchronized_sweep_signal
+
+fs, f1, f2, seconds = 48000, 20.0, 6000.0, 4.0
+a2, a3 = 0.12, 0.08
+x = synchronized_sweep_signal(fs, f1, f2, seconds)
+b, a = sp_signal.butter(2, 3000.0, fs=fs)             # 3 kHz post-filter
+y = sp_signal.lfilter(b, a, x + a2 * x**2 + a3 * x**3)
+res = swept_sine_distortion(y, fs, f1, f2, seconds, n_harmonics=3)
+
+h1 = 1.0 + 3.0 * a3 / 4.0                              # Chebyshev gain
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.loglog(res.thd_frequencies, 100.0 * res.thd, label="Total THD(f)")
+ax.loglog(res.thd_frequencies, 100.0 * res.distortion_ratios[0],
+          ls="--", label="2nd harmonic d2(f)")
+ax.loglog(res.thd_frequencies, 100.0 * res.distortion_ratios[1],
+          ls="--", label="3rd harmonic d3(f)")
+ax.axhline(100.0 * (a2 / 2.0) / h1, ls=":",
+           label="Chebyshev asymptote (a2/2)/H1")
+ax.axhline(100.0 * (a3 / 4.0) / h1, ls=":",
+           label="Chebyshev asymptote (a3/4)/H1")
+ax.set_xlabel("Excitation frequency [Hz]")
+ax.set_ylabel("Distortion re fundamental [%]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
 The oracle behind the implementation is the memoryless polynomial: driving
 `y = x + a2·x² + a3·x³` with a unit sweep must return, by the Chebyshev
 identities, `|H1| = 1 + 3a3/4`, `|H2| = a2/2` (phase `-π/2`), `|H3| = a3/4`
@@ -120,7 +157,13 @@ from phonometry import sweep_signal, swept_sine_distortion
 
 x = sweep_signal(fs, f1, f2, seconds)          # the ISO 18233 ESS
 res = swept_sine_distortion(y, fs, f1, f2, seconds, method="farina")
+res.plot()   # same |Hn| + THD(f) panels as the synchronized method (needs matplotlib)
 ```
+
+The result is the same plottable `SweptSineDistortionResult` as the
+synchronized method, so the `|Hn|` and `THD(f)` panels of the section-1
+figure read identically; only the harmonic phases (and the top of each
+order's band) differ between the two methods.
 
 Sizing rules for both methods: the closest pair of arrivals is spaced
 `L·ln(N/(N-1))` seconds, so the per-order window (`ir_length`, default the
@@ -155,6 +198,40 @@ res = phase_decomposition(H, fs)       # everything on one axis
 res.excess_group_delay                 # the all-pass part, in seconds
 res.plot()                             # magnitude, phases, group delays
 ```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/phase_decomposition_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/phase_decomposition.svg" alt="Three stacked panels of the minimum-phase / all-pass decomposition of a +6 dB peaking equalizer measured through a 2.5 ms latency: the magnitude bump at 1 kHz, the measured phase diving with frequency while the minimum phase stays small and the excess phase carries the linear delay ramp, and the group delays where the excess group delay reads a flat 2.5 ms" width="82%"></picture>
+
+*A +6 dB peaking equalizer measured through a 2.5 ms processing latency: the
+minimum-phase part carries only the small phase wiggle an equalizer could
+invert, the excess phase is the pure `−2πf·t0` ramp of the delay, and the
+excess group delay reads the latency directly as a flat 2.5 ms line.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal as sp_signal
+from phonometry import phase_decomposition
+
+fs = 48000.0
+delay = int(0.0025 * fs)                      # a 2.5 ms processing latency
+gain_a = 10.0 ** (6.0 / 40.0)                 # +6 dB peaking EQ at 1 kHz, Q = 1
+w0 = 2.0 * np.pi * 1000.0 / fs
+alpha = np.sin(w0) / 2.0
+b = np.array([1 + alpha * gain_a, -2 * np.cos(w0), 1 - alpha * gain_a])
+a = np.array([1 + alpha / gain_a, -2 * np.cos(w0), 1 - alpha / gain_a])
+imp = np.zeros(16384)
+imp[delay] = 1.0
+ir = sp_signal.lfilter(b / a[0], a / a[0], imp)
+
+res = phase_decomposition(np.fft.rfft(ir), fs)
+res.plot()   # |H|, the three phases and the group delays
+plt.show()
+```
+
+</details>
 
 The decomposition `H = H_min · H_ap` splits what an equalizer can invert
 (`H_min`, minimum phase, causal and causally invertible) from what it never

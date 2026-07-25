@@ -760,6 +760,12 @@ print(round(mc.c1, 4), round(mc.c2, 4))   # -0.1282 0.0
 print(round(emission.precision_uncertainty(0.5, 2.0, 2.0), 3))   # 4.123
 ```
 
+The `MeteorologicalCorrection` is a pair of scalars (plus the per-band `C3`
+when the attenuation coefficient is supplied per band) rather than a
+plottable spectrum: the corrections fold into the
+`PrecisionSoundPowerResult` as its `c1`/`c2`/`c3` fields, and the `.report()`
+fiche prints them on its measurement-basis strip.
+
 Over several bands `sound_power_anechoic` returns a plottable
 `PrecisionSoundPowerResult` carrying the per-band `LW` and the A-weighted total:
 
@@ -854,7 +860,8 @@ print(round(float(res.sound_power_level[0]), 2))    # 80.0
 ```
 
 Across several bands the result carries the per-band `LW` (`NaN` where the net
-power is non-positive) and flags those bands `not_applicable`:
+power is non-positive), flags those bands `not_applicable`, and draws them
+with the one-line `result.plot()` of the figure below:
 
 ```python
 import numpy as np
@@ -930,7 +937,10 @@ plt.show()
 
 ## 6. The measurement report (`.report()`)
 
-A sound power determination ends as a *document*. Both the enveloping-surface
+A sound power determination ends as a *document*. Every result of this page
+stays plottable while it is being worked on — `res.plot()` draws the same
+`LW` spectrum interactively that the fiche typesets — and the report step
+wraps it into the deliverable. Both the enveloping-surface
 result (`SoundPowerResult`, ISO 3744/3746) and the precision result
 (`PrecisionSoundPowerResult`, ISO 3745) expose a `.report()` method that writes
 a one-page PDF fiche laid out like a sound-power test sheet: the standard-basis

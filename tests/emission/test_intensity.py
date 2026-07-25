@@ -282,12 +282,74 @@ def test_field_indicators_negative_partial_power() -> None:
 
 
 def test_field_indicators_validation() -> None:
-    with pytest.raises(ValueError, match="same length"):
+    with pytest.raises(ValueError, match="same shape"):
         field_indicators([90.0, 91.0], [1e-3])
     with pytest.raises(ValueError, match="two measurement positions"):
         field_indicators([90.0], [1e-3])
     with pytest.raises(ValueError, match="not positive"):
         field_indicators([90.0, 90.0], [1e-3, -2e-3])
+    with pytest.raises(ValueError, match="one entry per band"):
+        field_indicators(
+            np.full((4, 3), 90.0), np.full((4, 3), 1e-3), [125.0, 250.0]
+        )
+
+
+def test_field_indicators_per_band_matches_per_column_scalars() -> None:
+    """2D (positions, bands) input returns per-band arrays, one indicator
+    triple per column, identical to the scalar call on that column."""
+    rng = np.random.default_rng(9614)
+    freqs = np.array([125.0, 250.0, 500.0, 1000.0])
+    lp = 74.0 + rng.normal(0.0, 0.8, (8, 4))
+    i_n = 1.0e-5 * (1.0 + rng.normal(0.0, 0.2, (8, 4)))
+    ind = field_indicators(lp, i_n, freqs)
+    assert isinstance(ind.f2, np.ndarray) and ind.f2.shape == (4,)
+    np.testing.assert_allclose(ind.frequency, freqs)
+    for b in range(4):
+        one = field_indicators(lp[:, b], i_n[:, b])
+        assert ind.f2[b] == pytest.approx(one.f2)
+        assert ind.f3[b] == pytest.approx(one.f3)
+        assert ind.f4[b] == pytest.approx(one.f4)
+    # A single band whose algebraic mean intensity is non-positive fails the
+    # ISO 9614-1 A.2.3 test conditions and raises, exactly as the scalar path.
+    bad = i_n.copy()
+    bad[:, 1] = -1.0e-5
+    with pytest.raises(ValueError, match="not positive"):
+        field_indicators(lp, bad, freqs)
+
+
+def test_field_indicators_plot_draws_indicators_and_ld() -> None:
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    rng = np.random.default_rng(1)
+    freqs = np.array([250.0, 500.0, 1000.0, 2000.0])
+    lp = 76.0 + rng.normal(0.0, 0.5, (10, 4))
+    i_n = 2.0e-5 * (1.0 + rng.normal(0.0, 0.25, (10, 4)))
+    ind = field_indicators(lp, i_n, freqs)
+    ld = dynamic_capability_index(18.0)
+    ax = ind.plot(dynamic_capability=ld)
+    # F2 curve, F3 curve and the Ld criterion line on the main axes.
+    ydata = [np.asarray(line.get_ydata(), dtype=float) for line in ax.lines]
+    assert any(np.allclose(y, np.asarray(ind.f2)) for y in ydata)
+    assert any(np.allclose(y, np.asarray(ind.f3)) for y in ydata)
+    assert any(np.allclose(y, ld) for y in ydata)
+    # F4 rides the twin axis as bars (one patch per band).
+    twin = [a for a in ax.figure.axes if a is not ax]
+    assert twin and len(twin[0].patches) == freqs.size
+    assert ax.get_title() == "ISO 9614-1 field indicators"
+    plt.close("all")
+    ax_es = ind.plot(language="es")
+    assert ax_es.get_ylabel() == "Indicador [dB]"
+    plt.close("all")
+    with pytest.raises(ValueError, match="Unknown language"):
+        ind.plot(language="xx")
+    # The scalar (single-band) result has nothing per band to draw.
+    single = field_indicators(lp[:, 0], i_n[:, 0])
+    with pytest.raises(ValueError, match="per-band"):
+        single.plot()
+    plt.close("all")
 
 
 def test_dynamic_capability_index() -> None:

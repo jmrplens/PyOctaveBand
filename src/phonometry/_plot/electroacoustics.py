@@ -25,7 +25,10 @@ from .common import (
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
-    from ..electroacoustics.distortion import HarmonicDistortionResult
+    from ..electroacoustics.distortion import (
+        HarmonicDistortionResult,
+        ModulationDistortionResult,
+    )
     from ..electroacoustics.frequency_response import FrequencyResponseResult
     from ..electroacoustics.loudspeaker import LoudspeakerCharacteristics
     from ..electroacoustics.microphone import MicrophoneCharacteristics
@@ -99,6 +102,9 @@ _STRINGS: dict[str, str] = {
     "Inherent noise spectrum": "Espectro de ruido inherente",
     "{thd} % limit": "Límite del {thd} %",
     "Max. SPL": "SPL máx.",
+    "Carrier f₂": "Portadora f₂",
+    "Sidebands f₂ ± n·f₁": "Bandas laterales f₂ ± n·f₁",
+    "Level re carrier [dB]": "Nivel respecto a la portadora [dB]",
 }
 
 
@@ -164,6 +170,82 @@ def plot_harmonic_distortion(
     ax.set_axisbelow(True)
     localize_axes(ax, language)
     return ax
+
+def plot_modulation_distortion(
+    result: ModulationDistortionResult, ax: Axes | None = None, *,
+    language: str = "en", **kwargs: Any
+) -> Axes:
+    """Carrier and modulation sidebands with the per-order distortion annotated.
+
+    Draws the output amplitude at the carrier ``f2`` (the 0 dB reference) and
+    the four intermodulation sidebands at ``f2 ± f1`` and ``f2 ± 2f1`` as a
+    stem-style spectrum in dB relative to the carrier, annotated with the
+    IEC 60268-3 per-order values ``d_m,2``/``d_m,3`` and the SMPTE combined
+    RMS — the modulation counterpart of :func:`plot_harmonic_distortion`.
+
+    :param result: A
+        :class:`~phonometry.electroacoustics.distortion.ModulationDistortionResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the sideband marker ``plot`` call.
+    :return: The axes.
+    :raises ValueError: If the result carries no sideband spectrum data.
+    """
+    from .._i18n import decimal_comma, localize_axes
+
+    if (
+        result.sideband_frequencies is None
+        or result.sideband_amplitudes is None
+        or result.carrier_amplitude is None
+        or result.f_high is None
+    ):
+        raise ValueError(
+            "this result carries no sideband spectrum data to plot; obtain it "
+            "from modulation_distortion()."
+        )
+    ax = ax if ax is not None else _new_axes()
+    tiny = np.finfo(np.float64).tiny
+    carrier = float(result.carrier_amplitude)
+    sb_freqs = np.asarray(result.sideband_frequencies, dtype=np.float64)
+    sb_amps = np.asarray(result.sideband_amplitudes, dtype=np.float64)
+    sb_db = 20.0 * np.log10(np.maximum(sb_amps, tiny) / carrier)
+    floor = -120.0
+
+    ax.vlines([result.f_high], floor, [0.0], color=_C_SECONDARY, lw=1.8)
+    ax.plot([result.f_high], [0.0], "s", color=_C_SECONDARY,
+            label=_t("Carrier f₂", language))
+    ax.vlines(sb_freqs, floor, np.maximum(sb_db, floor), color=_C_PRIMARY, lw=1.5)
+    kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault("label", _t("Sidebands f₂ ± n·f₁", language))
+    ax.plot(sb_freqs, np.maximum(sb_db, floor), "o", **kwargs)
+    for order, idx in ((3, 0), (2, 1), (2, 2), (3, 3)):
+        if sb_db[idx] > floor:
+            ax.annotate(
+                f"n = {order}",
+                (sb_freqs[idx], max(sb_db[idx], floor)),
+                textcoords="offset points",
+                xytext=(0, 5),
+                ha="center",
+                fontsize="x-small",
+            )
+    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_ylabel(_t("Level re carrier [dB]", language))
+    ax.set_ylim(bottom=floor, top=10.0)
+    d2 = decimal_comma(f"{result.d2 * 100.0:.3g}", language)
+    d3 = decimal_comma(f"{result.d3 * 100.0:.3g}", language)
+    smpte = decimal_comma(f"{result.smpte * 100.0:.3g}", language)
+    f_low = decimal_comma(_format_freq(float(result.f_low or 0.0)), language)
+    f_high = decimal_comma(_format_freq(float(result.f_high)), language)
+    ax.set_title(
+        f"IEC 60268-3 d₂ = {d2}%, d₃ = {d3}%; SMPTE = {smpte}% "
+        f"(f₁ = {f_low}Hz, f₂ = {f_high}Hz)"
+    )
+    ax.grid(True, alpha=0.3)
+    ax.set_axisbelow(True)
+    ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
+    localize_axes(ax, language)
+    return ax
+
 
 def plot_frequency_response(
     result: FrequencyResponseResult, ax: Axes | None = None, *,

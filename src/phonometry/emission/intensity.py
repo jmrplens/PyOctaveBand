@@ -141,11 +141,50 @@ class FieldIndicators:
     satisfy ``Ld > f2`` (criterion 1, equation (B.1)); the number of
     positions N must satisfy ``N > C * f4**2`` (criterion 2, equation
     (B.2)).
+
+    With per-position *and* per-band input (2D arrays passed to
+    :func:`field_indicators`) the three indicators are per-band arrays and
+    ``frequency`` carries the band centres; with 1D per-position input they
+    are scalars and ``frequency`` is ``None``.
     """
 
-    f2: float
-    f3: float
-    f4: float
+    f2: float | np.ndarray
+    f3: float | np.ndarray
+    f4: float | np.ndarray
+    frequency: np.ndarray | None = None
+
+    def plot(
+        self,
+        ax: Axes | None = None,
+        *,
+        dynamic_capability: float | np.ndarray | None = None,
+        language: str = "en",
+        **kwargs: Any,
+    ) -> Axes:
+        """Plot the per-band indicators F2/F3, the Ld line and F4.
+
+        Requires per-band data (call :func:`field_indicators` with 2D
+        ``(positions, bands)`` arrays and ``frequencies``) and matplotlib
+        (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+
+        :param ax: Existing axes, or ``None`` to create a figure.
+        :param dynamic_capability: Optional instrument dynamic capability
+            index ``Ld`` in dB (scalar or per band), drawn as the
+            criterion-1 reference line (``Ld > F2``, equation (B.1)); see
+            :func:`dynamic_capability_index`.
+        :param language: Label language, ``"en"`` (default) or ``"es"``.
+        :param kwargs: Forwarded to the F2 curve ``plot`` call.
+        :raises ValueError: If the result carries no per-band data.
+        """
+        from .._i18n import check_language
+        from .._plot.emission import plot_field_indicators
+
+        check_language(language)
+        return plot_field_indicators(
+            self, ax=ax, dynamic_capability=dynamic_capability,
+            language=language, **kwargs
+        )
 
 
 def _level(value: float, reference: float) -> float:
@@ -333,9 +372,31 @@ def sound_intensity(
     )
 
 
+def _field_indicators_1d(
+    lp: np.ndarray, i_n: np.ndarray
+) -> tuple[float, float, float]:
+    """F2/F3/F4 of one band from the per-position ``Lpi`` and ``Ini``."""
+    # Equation (A.4): surface pressure level.
+    lp_surface = energy_mean(lp)
+    # Equation (A.5): level of the mean magnitude of the normal intensity.
+    li_abs = _level(float(np.mean(np.abs(i_n))), _I0)
+    mean_i = float(np.mean(i_n))
+    if mean_i <= 0.0:
+        raise ValueError(
+            "The algebraic mean normal intensity is not positive: the test "
+            "conditions do not satisfy ISO 9614-1 (clause A.2.3)."
+        )
+    # Equation (A.7): algebraic surface intensity level.
+    li_alg = _level(mean_i, _I0)
+    # Equation (A.8) with (A.9): normalized non-uniformity of In.
+    f4 = float(np.sqrt(np.sum((i_n - mean_i) ** 2) / (i_n.size - 1)) / mean_i)
+    return lp_surface - li_abs, lp_surface - li_alg, f4
+
+
 def field_indicators(
     pressure_levels: list[float] | np.ndarray,
     normal_intensity: list[float] | np.ndarray,
+    frequencies: list[float] | np.ndarray | None = None,
 ) -> FieldIndicators:
     """
     ISO 9614-1:1993 Annex A field indicators F2, F3 and F4.
@@ -352,43 +413,58 @@ def field_indicators(
     - F4 = (1/|mean In|) * sqrt(sum((Ini - mean In)^2) / (N - 1))
       (equations (A.8)-(A.9)).
 
-    If the algebraic mean intensity is not positive the test conditions
-    do not satisfy ISO 9614-1 in that band (clause A.2.3) and a
-    ``ValueError`` is raised.
+    The inputs are either 1D per-position arrays (one frequency band,
+    scalar indicators) or 2D ``(positions, bands)`` arrays (the
+    indicators are evaluated band by band and returned as per-band
+    arrays; the plottable form). If the algebraic mean intensity of any
+    band is not positive the test conditions do not satisfy ISO 9614-1
+    in that band (clause A.2.3) and a ``ValueError`` is raised.
 
-    :param pressure_levels: Lpi at each position, in decibels.
+    :param pressure_levels: Lpi at each position, in decibels; 1D
+        ``(positions,)`` or 2D ``(positions, bands)``.
     :param normal_intensity: Signed normal intensity Ini at each
-        position, in W/m^2.
+        position, in W/m^2; same shape as ``pressure_levels``.
+    :param frequencies: Band centre frequencies in Hz, one per column of
+        the 2D input (optional for 1D input, where it is ignored beyond
+        a length check).
     :return: :class:`FieldIndicators`.
     """
-    lp = _typesignal(pressure_levels)
-    i_n = _typesignal(normal_intensity)
-    if lp.ndim != 1 or i_n.ndim != 1:
-        raise ValueError("field_indicators expects 1D per-position arrays.")
-    if lp.size != i_n.size:
+    lp = np.atleast_1d(np.asarray(pressure_levels, dtype=np.float64))
+    i_n = np.atleast_1d(np.asarray(normal_intensity, dtype=np.float64))
+    if lp.ndim not in (1, 2) or i_n.ndim not in (1, 2):
+        raise ValueError(
+            "field_indicators expects 1D (positions,) or 2D (positions, bands) "
+            "arrays."
+        )
+    if lp.shape != i_n.shape:
         raise ValueError(
             f"'pressure_levels' and 'normal_intensity' must have the same "
-            f"length, got {lp.size} and {i_n.size}."
+            f"shape, got {lp.shape} and {i_n.shape}."
         )
-    if lp.size < 2:
+    if lp.shape[0] < 2:
         raise ValueError("At least two measurement positions are required.")
 
-    # Equation (A.4): surface pressure level.
-    lp_surface = energy_mean(lp)
-    # Equation (A.5): level of the mean magnitude of the normal intensity.
-    li_abs = _level(float(np.mean(np.abs(i_n))), _I0)
-    mean_i = float(np.mean(i_n))
-    if mean_i <= 0.0:
-        raise ValueError(
-            "The algebraic mean normal intensity is not positive: the test "
-            "conditions do not satisfy ISO 9614-1 (clause A.2.3)."
-        )
-    # Equation (A.7): algebraic surface intensity level.
-    li_alg = _level(mean_i, _I0)
-    # Equation (A.8) with (A.9): normalized non-uniformity of In.
-    f4 = float(np.sqrt(np.sum((i_n - mean_i) ** 2) / (i_n.size - 1)) / mean_i)
+    freqs: np.ndarray | None = None
+    if frequencies is not None:
+        freqs = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
+        n_bands = lp.shape[1] if lp.ndim == 2 else 1
+        if freqs.size != n_bands:
+            raise ValueError(
+                f"'frequencies' must have one entry per band, got {freqs.size} "
+                f"for {n_bands} band(s)."
+            )
 
-    return FieldIndicators(f2=lp_surface - li_abs, f3=lp_surface - li_alg, f4=f4)
+    if lp.ndim == 1:
+        f2, f3, f4 = _field_indicators_1d(lp, i_n)
+        return FieldIndicators(f2=f2, f3=f3, f4=f4, frequency=freqs)
+
+    per_band = [
+        _field_indicators_1d(lp[:, b], i_n[:, b]) for b in range(lp.shape[1])
+    ]
+    values = np.asarray(per_band, dtype=np.float64)
+    return FieldIndicators(
+        f2=values[:, 0], f3=values[:, 1], f4=values[:, 2], frequency=freqs
+    )
 
 
 def dynamic_capability_index(

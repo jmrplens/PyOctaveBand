@@ -107,10 +107,12 @@ print(round(res.transmission_loss.max(), 2))   # máximo 6.55 dB (m = 4)
 print(round(float(res.transmission_loss[np.argmin(res.transmission_loss)]), 6))
 ```
 
-La figura muestra la pérdida de transmisión para cuatro relaciones de áreas: un
-desajuste $m$ mayor eleva todos los máximos, pero las caídas permanecen en 0 dB y
-los máximos permanecen en las mismas frecuencias, fijadas solo por la longitud de
-la cámara.
+La línea única `res.plot()` dibuja la pérdida de transmisión de la cámara (y
+su pérdida de inserción cuando se dan las impedancias de fuente y radiación).
+La figura de abajo barre en cambio la relación de áreas: un desajuste $m$ mayor
+eleva todos los máximos, pero las caídas permanecen en 0 dB y los máximos
+permanecen en las mismas frecuencias, fijadas solo por la longitud de la
+cámara.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_expansion_chamber_es.svg" alt="Pérdida de transmisión de la cámara de expansión frente a la frecuencia para relaciones de áreas m = 2, 4, 8 y 16, con máximos periódicos que crecen con m en los múltiplos impares de la frecuencia de cuarto de onda y caídas que vuelven a 0 dB en cada media longitud de onda de la cámara" width="88%" />
 
@@ -162,6 +164,7 @@ f = np.linspace(20.0, 600.0, 4000)
 hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
                          neck_length=0.02, cavity_volume=1e-3)
 print(round(float(hr.resonances[0]), 1))       # frecuencia de sintonía, Hz
+hr.plot()   # pico de TL en la frecuencia de sintonía (necesita matplotlib)
 
 qw = quarter_wave_resonator(f, duct_area=0.01, length=1.516, branch_area=2e-3,
                             speed_of_sound=343.24)
@@ -171,6 +174,44 @@ print(round(float(qw.resonances[0]), 1))        # 56.6 Hz (Bies Ejemplo 8.1)
 et = extended_tube_chamber(f, length=0.4, chamber_area=0.04, pipe_area=0.01,
                            inlet_extension=0.1)
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_side_branch_es.svg" alt="Pérdida de transmisión de un resonador de Helmholtz y de un tubo de cuarto de onda cerrado sobre el mismo conducto de 10 cm2: cada rama lateral produce un pico agudo en su propia frecuencia de sintonía, cerca de 120 Hz para el volumen de Helmholtz y cerca de 285 Hz para el tubo de 0,3 m, y es transparente en el resto" width="88%" />
+
+*Cada rama lateral cortocircuita el conducto en su propia frecuencia de
+sintonía y es casi transparente en el resto: el pico estrecho es la razón de
+que los resonadores se sintonicen a una frecuencia de encendido o al tono de
+paso de álabes de un ventilador en lugar de usarse en banda ancha.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import helmholtz_resonator, quarter_wave_resonator
+
+f = np.linspace(20.0, 600.0, 4000)
+hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
+                         neck_length=0.02, cavity_volume=1e-3)
+qw = quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
+
+# Una línea para un dispositivo: TL vs frecuencia con la resonancia marcada.
+hr.plot(language="es")
+plt.show()
+
+# A mano: las dos ramas laterales en los mismos ejes.
+fig, ax = plt.subplots()
+ax.plot(f, hr.transmission_loss, label="Resonador de Helmholtz")
+ax.plot(f, qw.transmission_loss, "--", label="Tubo de cuarto de onda")
+for fr in (hr.resonances[0], qw.resonances[0]):
+    ax.axvline(float(fr), ls=":", color="#2ca02c")
+ax.set_xlabel("Frecuencia [Hz]"); ax.set_ylabel("Pérdida de transmisión [dB]")
+ax.set_ylim(0.0, 50.0)
+ax.legend()
+plt.show()
+```
+
+</details>
 
 Cada uno devuelve un `ReactiveSilencerResult` con `transmission_loss`,
 `insertion_loss` (cuando se dan las impedancias), la matriz compuesta
@@ -195,6 +236,7 @@ er = hvac.end_reflection_loss(bands, diameter=0.30, termination="flush")
 
 # Pérdida de inserción de un codo cuadrado a 90 grados con revestimiento (Tabla 8.11).
 el = hvac.elbow_insertion_loss(bands, width=0.3, bend_type="square", lined=True)
+er.plot()   # la atenuación por banda (o la Lw regenerada) en una línea (necesita matplotlib)
 
 # TL de plenum por el método de Wells (forma cerrada).
 tl = hvac.plenum_attenuation(exit_area=0.1, line_of_sight=1.0,
@@ -204,6 +246,44 @@ print(round(tl, 1))                              # dB
 # Ruido autogenerado (de flujo) de un conducto recto (VDI 2081).
 fn = hvac.flow_noise_straight_duct(bands, flow_velocity=10.0, area=0.04)
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hvac_end_reflection_es.svg" alt="Pérdida por reflexión del extremo del conducto por banda de octava para terminaciones enrasadas de 150, 300 y 600 mm de diámetro: la reflexión de vuelta al conducto crece con fuerza hacia baja frecuencia y disminuye con el tamaño del conducto, superando 17 dB en 63 Hz para el conducto de 150 mm y desapareciendo por encima de 1 kHz" width="88%" />
+
+*El extremo abierto de un conducto refleja energía de baja frecuencia de vuelta
+a la instalación — gratis, antes de cualquier silenciador: cuanto más pequeño
+es el conducto frente a la longitud de onda, mayor es la pérdida, lo que
+explica que los cuellos de difusor pequeños domen el retumbe de baja frecuencia
+del ventilador, y por qué la corrección no debe contarse dos veces cuando los
+datos del fabricante del difusor ya la incluyen.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry.noise_control import hvac
+
+bands = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0]
+
+# Una línea para un conducto: el HvacSpectrumResult del extremo enrasado de 300 mm.
+er = hvac.end_reflection_loss(bands, diameter=0.30, termination="flush")
+er.plot(language="es")
+plt.show()
+
+# A mano: la familia sobre diámetros de conducto de la figura de concepto.
+fig, ax = plt.subplots()
+for diameter in (0.15, 0.30, 0.60):
+    er = hvac.end_reflection_loss(bands, diameter=diameter, termination="flush")
+    ax.semilogx(er.frequencies, er.values, "o-",
+                label=f"D = {int(diameter * 1000)} mm")
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("Pérdida por reflexión del extremo [dB]")
+ax.legend(title="Diámetro del conducto")
+plt.show()
+```
+
+</details>
 
 Los métodos de reflexión de extremo y de codos interpolan las tablas ASHRAE
 (pasan exactamente por los nodos tabulados); los métodos de plenum (Wells) y de
@@ -253,6 +333,46 @@ enc = enclosure_insertion_loss(
 print(np.round(enc.insertion_loss, 1))            # IL neta = R - C por banda
 enc.plot()                                         # panel R, corrección C e IL
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosure_insertion_loss_es.svg" alt="Pérdida por inserción de un encapsulado de máquina por banda de octava: el índice de reducción acústica R medido del panel como línea discontinua, la corrección interior C casi plana cerca de 5 dB para un interior revestido, y la pérdida por inserción neta IL igual a R menos C siguiendo la curva del panel unos 5 dB por debajo" width="88%" />
+
+*Lo que entrega el cerramiento es `R − C`, no el `R` del panel: incluso este
+interior revestido (absorción media 0,3) cuesta unos 5 dB del índice del panel
+en cada banda, y un interior duro sin revestir costaría mucho más. Presupuesta
+el revestimiento junto con los paneles, no como un añadido posterior.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import enclosure_insertion_loss
+
+bands = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+panel_R = np.array([18.0, 24.0, 30.0, 36.0, 42.0, 46.0])   # medido, dB
+
+enc = enclosure_insertion_loss(
+    panel_R, external_area=6.0, internal_area=5.0,
+    internal_absorption=0.3, frequencies=bands,
+)
+
+# Una línea — R del panel, corrección interior C y la IL neta = R - C:
+enc.plot(language="es")
+plt.show()
+
+# A mano, con los campos por banda que lleva el resultado:
+fig, ax = plt.subplots()
+ax.plot(bands, enc.panel_transmission_loss, "s--", label="R del panel")
+ax.plot(bands, enc.correction, "^:", label="Corrección interior C")
+ax.plot(bands, enc.insertion_loss, "o-", label="Pérdida por inserción (R - C)")
+ax.set_xlabel("Frecuencia [Hz]"); ax.set_ylabel("Nivel [dB]")
+ax.set_xscale("log")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 `enclosure_insertion_loss` devuelve un `EnclosureResult` con la
 `panel_transmission_loss` del panel, la `correction` interior, la `insertion_loss`

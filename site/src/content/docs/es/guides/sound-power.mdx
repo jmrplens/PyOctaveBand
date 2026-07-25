@@ -108,7 +108,7 @@ prácticas distintos.
 
 | Método | Norma | Magnitud medida | Entorno | Grado de precisión | Cuándo usarlo |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| Superficie envolvente | **ISO 3744** (ingeniería) / **ISO 3746** (inspección) | Presión sonora sobre una semiesfera o caja | Campo esencialmente libre sobre uno o varios planos reflectantes | Grado 2 (`σR0 ≈ 1.5 dB`) / grado 3 (`≈ 3.0 dB`) | In situ o en una sala grande; sin instalación de ensayo especial disponible |
+| Superficie envolvente | **ISO 3744** (ingeniería) / **ISO 3746** (inspección) | Presión sonora sobre una semiesfera o caja | Campo esencialmente libre sobre uno o varios planos reflectantes | Grado 2 (`σR0 ≈ 1,5 dB`) / grado 3 (`≈ 3,0 dB`) | In situ o en una sala grande; sin instalación de ensayo especial disponible |
 | Sala reverberante | **ISO 3741** | Presión sonora en el campo difuso | Sala reverberante cualificada de paredes rígidas | Grado 1 (precisión) | Máxima precisión para fuentes estacionarias de banda ancha en laboratorio |
 | Barrido de intensidad | **ISO 9614-2** | Intensidad sonora normal barrida sobre una superficie | Casi cualquiera, tolerante al ruido extraño estacionario | Grado 2 / 3 (a partir de los indicadores de campo por banda) | In situ con ruido de fondo, o una máquina entre muchas |
 | Sala anecoica | **ISO 3745** | Presión sonora sobre un conjunto fijo de micrófonos | Sala anecoica o semianecoica cualificada | Grado 1 (precisión) | Emisión de grado de referencia en un laboratorio de campo libre |
@@ -199,7 +199,7 @@ primera coincidencia nombra la norma.
 El grado es una afirmación sobre la **reproducibilidad**: `σR0` es la
 desviación típica que verías si laboratorios distintos midieran la misma
 fuente, cada uno siguiendo la norma correctamente. Los valores ponderados A
-típicos son `σR0 ≈ 0.5 dB` para el grado 1 (ISO 3741), `1.5 dB` para el
+típicos son `σR0 ≈ 0,5 dB` para el grado 1 (ISO 3741), `1,5 dB` para el
 grado 2 (ISO 3744, ISO 9614-2) y `3 dB` o más para el grado 3 (aún mayores
 cuando `K2` es grande o el espectro es tonal). Los valores
 por banda son mayores en los extremos del espectro. El campo `uncertainty`
@@ -775,6 +775,12 @@ print(round(mc.c1, 4), round(mc.c2, 4))   # -0.1282 0.0
 print(round(emission.precision_uncertainty(0.5, 2.0, 2.0), 3))   # 4.123
 ```
 
+La `MeteorologicalCorrection` es un par de escalares (más el `C3` por banda
+cuando el coeficiente de atenuación se aporta por banda), no un espectro
+dibujable: las correcciones se pliegan en el `PrecisionSoundPowerResult` como
+sus campos `c1`/`c2`/`c3`, y la ficha `.report()` las imprime en su franja de
+base de medición.
+
 Sobre varias bandas `sound_power_anechoic` devuelve un `PrecisionSoundPowerResult`
 representable que lleva el `LW` por banda y el total ponderado A:
 
@@ -870,7 +876,8 @@ print(round(float(res.sound_power_level[0]), 2))    # 80.0
 ```
 
 A lo largo de varias bandas el resultado lleva el `LW` por banda (`NaN` donde la
-potencia neta es no positiva) y marca esas bandas como `not_applicable`:
+potencia neta es no positiva), marca esas bandas como `not_applicable` y las
+dibuja con la línea única `result.plot()` de la figura de abajo:
 
 ```python
 import numpy as np
@@ -946,7 +953,10 @@ plt.show()
 
 ## 6. El informe de medición (`.report()`)
 
-Una determinación de potencia acústica termina en un *documento*. Tanto el
+Una determinación de potencia acústica termina en un *documento*. Todos los
+resultados de esta página siguen siendo dibujables mientras se trabaja con
+ellos — `res.plot()` traza interactivamente el mismo espectro `LW` que la
+ficha compone — y el paso de informe lo envuelve en el entregable. Tanto el
 resultado de superficie envolvente (`SoundPowerResult`, ISO 3744/3746) como el
 resultado de precisión (`PrecisionSoundPowerResult`, ISO 3745) exponen un método
 `.report()` que escribe una ficha PDF de una página con el formato de una hoja

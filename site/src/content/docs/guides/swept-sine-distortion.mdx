@@ -192,7 +192,13 @@ from phonometry import sweep_signal, swept_sine_distortion
 
 x = sweep_signal(fs, f1, f2, seconds)          # the ISO 18233 ESS
 res = swept_sine_distortion(y, fs, f1, f2, seconds, method="farina")
+res.plot()   # same |Hn| + THD(f) panels as the synchronized method (needs matplotlib)
 ```
+
+The result is the same plottable `SweptSineDistortionResult` as the
+synchronized method, so the `|Hn|` and `THD(f)` panels of the section-1
+figure read identically; only the harmonic phases (and the top of each
+order's band) differ between the two methods.
 
 Sizing rules for both methods: the closest pair of arrivals is spaced
 `L·ln(N/(N-1))` seconds, so the per-order window (`ir_length`, default the
@@ -227,6 +233,40 @@ res = phase_decomposition(H, fs)       # everything on one axis
 res.excess_group_delay                 # the all-pass part, in seconds
 res.plot()                             # magnitude, phases, group delays
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/phase_decomposition.svg" alt="Three stacked panels of the minimum-phase / all-pass decomposition of a +6 dB peaking equalizer measured through a 2.5 ms latency: the magnitude bump at 1 kHz, the measured phase diving with frequency while the minimum phase stays small and the excess phase carries the linear delay ramp, and the group delays where the excess group delay reads a flat 2.5 ms" width="82%" />
+
+*A +6 dB peaking equalizer measured through a 2.5 ms processing latency: the
+minimum-phase part carries only the small phase wiggle an equalizer could
+invert, the excess phase is the pure `−2πf·t₀` ramp of the delay, and the
+excess group delay reads the latency directly as a flat 2.5 ms line.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal as sp_signal
+from phonometry import phase_decomposition
+
+fs = 48000.0
+delay = int(0.0025 * fs)                      # a 2.5 ms processing latency
+gain_a = 10.0 ** (6.0 / 40.0)                 # +6 dB peaking EQ at 1 kHz, Q = 1
+w0 = 2.0 * np.pi * 1000.0 / fs
+alpha = np.sin(w0) / 2.0
+b = np.array([1 + alpha * gain_a, -2 * np.cos(w0), 1 - alpha * gain_a])
+a = np.array([1 + alpha / gain_a, -2 * np.cos(w0), 1 - alpha / gain_a])
+imp = np.zeros(16384)
+imp[delay] = 1.0
+ir = sp_signal.lfilter(b / a[0], a / a[0], imp)
+
+res = phase_decomposition(np.fft.rfft(ir), fs)
+res.plot()   # |H|, the three phases and the group delays
+plt.show()
+```
+
+</details>
 
 The decomposition `H = H_min · H_ap` splits what an equalizer can invert
 (`H_min`, minimum phase, causal and causally invertible) from what it never

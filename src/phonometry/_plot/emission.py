@@ -24,7 +24,7 @@ from .common import (
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
-    from ..emission.intensity import IntensityResult
+    from ..emission.intensity import FieldIndicators, IntensityResult
     from ..emission.sound_power import SoundPowerResult
     from ..emission.sound_power_intensity import SoundPowerIntensityResult
     from ..emission.sound_power_reverberation import ReverberationSoundPowerResult
@@ -46,6 +46,13 @@ _STRINGS: dict[str, str] = {
     "Pressure-intensity index δpI [dB]": "Índice presión-intensidad δpI [dB]",
     "Sound power level $L_W$ [dB re 1 pW]": "Nivel de potencia acústica $L_W$ [dB re 1 pW]",
     "ISO/TS 7849 sound power from surface vibration": "Potencia sonora por vibración superficial ISO/TS 7849",
+    "F2 (surface pressure-intensity)": "F2 (presión-intensidad superficial)",
+    "F3 (negative partial power)": "F3 (potencia parcial negativa)",
+    "Dynamic capability Ld": "Capacidad dinámica Ld",
+    "F4 (non-uniformity)": "F4 (no uniformidad)",
+    "Indicator [dB]": "Indicador [dB]",
+    "Field non-uniformity F4": "No uniformidad del campo F4",
+    "ISO 9614-1 field indicators": "Indicadores de campo ISO 9614-1",
 }
 
 
@@ -186,6 +193,79 @@ def plot_intensity(
         "ISO 9614 Lp vs LI  "
         f"(total δpI = {format_number(result.total_pressure_intensity_index, language, decimals=1)} dB)"
     )
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_field_indicators(
+    result: FieldIndicators,
+    ax: Axes | None = None,
+    *,
+    dynamic_capability: float | np.ndarray | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Per-band ISO 9614-1 field indicators against the dynamic capability.
+
+    Draws F2 (surface pressure-intensity) and F3 (negative partial power)
+    per band, the optional dynamic capability index ``Ld`` as the
+    criterion-1 reference line (the measurement arrangement is adequate
+    where ``Ld > F2``) and, on a twin axis, the dimensionless field
+    non-uniformity F4.
+
+    :param result: A :class:`~phonometry.emission.intensity.FieldIndicators`
+        with per-band data (2D input to
+        :func:`~phonometry.emission.intensity.field_indicators`).
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param dynamic_capability: Optional ``Ld`` in dB (scalar or per band).
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the F2 curve ``plot`` call.
+    :return: The axes.
+    :raises ValueError: If the result carries no per-band data.
+    """
+    from .._i18n import localize_axes
+
+    f2 = np.atleast_1d(np.asarray(result.f2, dtype=np.float64))
+    if result.frequency is None or f2.size < 2:
+        raise ValueError(
+            "plot() needs per-band indicators; call field_indicators(...) with "
+            "2D (positions, bands) arrays and 'frequencies'."
+        )
+    ax = ax if ax is not None else _new_axes()
+    freqs = np.asarray(result.frequency, dtype=np.float64)
+    f3 = np.atleast_1d(np.asarray(result.f3, dtype=np.float64))
+    f4 = np.atleast_1d(np.asarray(result.f4, dtype=np.float64))
+
+    kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault("label", _t("F2 (surface pressure-intensity)", language))
+    ax.plot(freqs, f2, "o-", **kwargs)
+    ax.plot(freqs, f3, "s--", color=_C_REFERENCE,
+            label=_t("F3 (negative partial power)", language))
+    if dynamic_capability is not None:
+        ld = np.broadcast_to(
+            np.asarray(dynamic_capability, dtype=np.float64), freqs.shape
+        )
+        ax.plot(freqs, ld, ls=":", lw=1.8, color=_C_MUTED,
+                drawstyle="steps-mid", label=_t("Dynamic capability Ld", language))
+    _freq_axis(ax, freqs, language=language)
+    ax.set_ylabel(_t("Indicator [dB]", language))
+    ax.grid(True, which="both", alpha=0.3)
+
+    twin = ax.twinx()
+    twin.bar(
+        freqs,
+        f4,
+        width=_bar_width(freqs),
+        color=_C_TERTIARY,
+        alpha=0.25,
+        label=_t("F4 (non-uniformity)", language),
+    )
+    twin.set_ylabel(_t("Field non-uniformity F4", language))
+
+    lines, labels = ax.get_legend_handles_labels()
+    tlines, tlabels = twin.get_legend_handles_labels()
+    ax.legend(lines + tlines, labels + tlabels, loc="best", fontsize="small")
+    ax.set_title(_t("ISO 9614-1 field indicators", language))
     localize_axes(ax, language)
     return ax
 

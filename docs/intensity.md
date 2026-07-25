@@ -148,6 +148,73 @@ ld = emission.dynamic_capability_index(18.0)   # δpI0 = 18 dB → Ld = δpI0 �
 print(ld, ld > fi.f2)                                      # 8.0 True (criterion 1)
 ```
 
+With 2D `(positions, bands)` arrays and the band centres the indicators come
+back **per band**, and the result is plottable in one line, the form in which
+the criteria are actually checked (each band passes or fails on its own):
+
+```python
+fi = emission.field_indicators(lp_bands, in_bands, freqs)   # (positions, bands)
+fi.plot(dynamic_capability=ld)   # F2/F3 per band vs Ld, F4 on a twin axis (needs matplotlib)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/field_indicators_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/field_indicators.svg" alt="ISO 9614-1 field indicators of a ten-position scan over six octave bands: F2 and F3 climb towards low frequency as the field turns reactive, crossing the dashed dynamic-capability line Ld at 125 Hz where F3 also rises above F2, with the field non-uniformity F4 drawn as bars on a twin axis" width="88%"></picture>
+
+*F2 climbs towards low frequency as the field turns reactive, and at 125 Hz it
+crosses the instrument's dynamic capability `Ld = δpI0 − K`: that band fails
+criterion 1, and no averaging will fix it — it calls for a larger spacer, a
+different surface or a quieter room. F3 rising above F2 in the same band
+reveals inward-flowing (negative) partial intensity, and the F4 bars set the
+number of positions the surface needs (criterion 2, `N > C·F4²`).*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import emission
+
+# A 10-position discrete-point scan over six octave bands: the surface
+# pressure is nearly uniform, and the normal intensity per band is set so the
+# field turns reactive towards low frequency, with two inward-flowing
+# positions in the 125 Hz band (rescaled so the band mean keeps its target).
+freqs = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+delta_pi = np.array([10.5, 8.5, 6.0, 4.5, 3.5, 3.0])   # target Lp − L|In|
+rng = np.random.default_rng(9614)
+lp_bands = 78.0 + rng.normal(0.0, 0.4, (10, freqs.size))
+i_mean = 10.0 ** ((78.0 - delta_pi) / 10.0) * 1.0e-12
+in_bands = i_mean[None, :] * (1.0 + rng.normal(0.0, 0.18, (10, freqs.size)))
+in_bands[:2, 0] = -0.35 * i_mean[0]
+in_bands[2:, 0] *= (10.0 * i_mean[0] - in_bands[:2, 0].sum()) / in_bands[2:, 0].sum()
+
+fi = emission.field_indicators(lp_bands, in_bands, freqs)
+ld = emission.dynamic_capability_index(18.0)   # δpI0 = 18 dB, K = 10 dB
+
+# One line — F2/F3 per band against Ld, with F4 on a twin axis:
+fi.plot(dynamic_capability=ld)
+plt.show()
+
+# By hand, from the per-band fields the result carries — mirroring what
+# FieldIndicators.plot() draws (Ld step line, merged twin-axis legend):
+fig, ax = plt.subplots()
+ax.plot(fi.frequency, fi.f2, "o-", label="F2 (surface pressure-intensity)")
+ax.plot(fi.frequency, fi.f3, "s--", label="F3 (negative partial power)")
+ax.plot(fi.frequency, np.full(fi.frequency.size, ld), ":",
+        drawstyle="steps-mid", label="Dynamic capability Ld")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Indicator [dB]")
+twin = ax.twinx()
+twin.bar(fi.frequency, fi.f4, width=fi.frequency * 0.2, alpha=0.25,
+         color="#2ca02c", label="F4 (non-uniformity)")
+twin.set_ylabel("Field non-uniformity F4")
+lines, labels = ax.get_legend_handles_labels()
+tlines, tlabels = twin.get_legend_handles_labels()
+ax.legend(lines + tlines, labels + tlabels)
+plt.show()
+```
+
+</details>
+
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_intensity_scan_power_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_intensity_scan_power.gif" alt="Animation: a p-p probe traces the serpentine scan over the top face of the measurement box while the normal-intensity arrows appear behind it, and the partial powers of the five faces accumulate into the sound power level L_W" width="640" height="360" loading="lazy"></picture>
 
 [Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_intensity_scan_power.webm)

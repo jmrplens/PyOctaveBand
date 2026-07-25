@@ -86,6 +86,65 @@ reduces exactly to the plain chamber. Advanced layouts chain elements directly
 with `duct_matrix`, `shunt_matrix`, `cascade`, `transmission_loss` and
 `insertion_loss`.
 
+```python
+import numpy as np
+from phonometry import (
+    helmholtz_resonator, quarter_wave_resonator, extended_tube_chamber,
+)
+
+f = np.linspace(20.0, 600.0, 4000)
+
+hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
+                         neck_length=0.02, cavity_volume=1e-3)
+print(round(float(hr.resonances[0]), 1))       # tuning frequency, Hz
+hr.plot()   # TL spike at the tuning frequency (needs matplotlib)
+
+qw = quarter_wave_resonator(f, duct_area=0.01, length=1.516, branch_area=2e-3,
+                            speed_of_sound=343.24)
+print(round(float(qw.resonances[0]), 1))        # 56.6 Hz (Bies Example 8.1)
+
+# An inlet extension of L/4 fills the first expansion-chamber trough.
+et = extended_tube_chamber(f, length=0.4, chamber_area=0.04, pipe_area=0.01,
+                           inlet_extension=0.1)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_side_branch_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_side_branch.svg" alt="Transmission loss of a Helmholtz resonator and a closed quarter-wave tube on the same 10 cm2 duct: each side branch produces a sharp spike at its own tuning frequency, near 120 Hz for the Helmholtz volume and near 285 Hz for the 0.3 m tube, and is transparent elsewhere" width="88%"></picture>
+
+*Each side branch shorts the duct at its own tuning frequency and is nearly
+transparent elsewhere: the narrow spike is why resonators are matched to a
+firing frequency or a fan blade-passing tone rather than used broadband.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import helmholtz_resonator, quarter_wave_resonator
+
+f = np.linspace(20.0, 600.0, 4000)
+hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
+                         neck_length=0.02, cavity_volume=1e-3)
+qw = quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
+
+# One line for one device: TL vs frequency with the resonance marked.
+hr.plot()
+plt.show()
+
+# By hand: both side branches on the same axes.
+fig, ax = plt.subplots()
+ax.plot(f, hr.transmission_loss, label="Helmholtz resonator")
+ax.plot(f, qw.transmission_loss, "--", label="Quarter-wave tube")
+for fr in (hr.resonances[0], qw.resonances[0]):
+    ax.axvline(float(fr), ls=":", color="#2ca02c")
+ax.set_xlabel("Frequency [Hz]"); ax.set_ylabel("Transmission loss [dB]")
+ax.set_ylim(0.0, 50.0)
+ax.legend()
+plt.show()
+```
+
+</details>
+
 Each device returns a `ReactiveSilencerResult` with `transmission_loss`,
 `insertion_loss` (when source/radiation impedances are given), the compound
 `transfer_matrix`, the tuning `resonances` and `.plot()`.
@@ -112,9 +171,47 @@ from phonometry.noise_control import hvac
 
 bands = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0]
 er = hvac.end_reflection_loss(bands, diameter=0.30, termination="flush")
+el = hvac.elbow_insertion_loss(bands, width=0.3, bend_type="square", lined=True)
+er.plot()   # the band attenuation (or regenerated Lw) in one line (needs matplotlib)
 tl = hvac.plenum_attenuation(0.1, 1.0, 20.0, 0.2)      # Wells' method, dB
 fn = hvac.flow_noise_straight_duct(bands, flow_velocity=10.0, area=0.04)
 ```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hvac_end_reflection_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hvac_end_reflection.svg" alt="Duct end reflection loss per octave band for flush duct terminations of 150, 300 and 600 mm diameter: the reflection back up the duct grows steeply towards low frequency and shrinks with duct size, exceeding 17 dB at 63 Hz for the 150 mm duct and vanishing above 1 kHz" width="88%"></picture>
+
+*The open end of a duct reflects low-frequency energy back up the run — for
+free, before any silencer: the smaller the duct against the wavelength, the
+larger the loss, which is why small diffuser necks tame low-frequency fan
+rumble and why the correction must not be double-counted when a manufacturer's
+diffuser data already includes it.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry.noise_control import hvac
+
+bands = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0]
+
+# One line for one duct: the HvacSpectrumResult of the 300 mm flush end.
+er = hvac.end_reflection_loss(bands, diameter=0.30, termination="flush")
+er.plot()
+plt.show()
+
+# By hand: the family over duct diameters of the concept figure.
+fig, ax = plt.subplots()
+for diameter in (0.15, 0.30, 0.60):
+    er = hvac.end_reflection_loss(bands, diameter=diameter, termination="flush")
+    ax.semilogx(er.frequencies, er.values, "o-",
+                label=f"D = {int(diameter * 1000)} mm")
+ax.set_xlabel("Frequency [Hz]"); ax.set_ylabel("End reflection loss [dB]")
+ax.legend(title="Duct diameter")
+plt.show()
+```
+
+</details>
 
 Rectangular ducts use the equivalent diameter `D = sqrt(4 S / pi)`. Bies 5th
 ed. gives the duct end reflection only as the ASHRAE table (no closed form in
@@ -151,6 +248,44 @@ enc = enclosure_insertion_loss(panel_R, external_area=6.0, internal_area=5.0,
 print(np.round(enc.insertion_loss, 1))          # net IL = R - C per band
 enc.plot()
 ```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosure_insertion_loss_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosure_insertion_loss.svg" alt="Machine-enclosure insertion loss per octave band: the measured panel sound reduction index R as a dashed line, the flat interior correction C near 5 dB for a lined interior, and the net insertion loss IL equal to R minus C tracking about 5 dB below the panel curve" width="88%"></picture>
+
+*What the enclosure delivers is `R − C`, not the panel `R`: even this lined
+interior (mean absorption 0.3) costs about 5 dB of the panel's rating in every
+band, and a hard, unlined interior would cost far more. Budget the lining
+together with the panels, not as an afterthought.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import enclosure_insertion_loss
+
+bands = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+panel_R = np.array([18.0, 24.0, 30.0, 36.0, 42.0, 46.0])   # measured, dB
+
+enc = enclosure_insertion_loss(panel_R, external_area=6.0, internal_area=5.0,
+                               internal_absorption=0.3, frequencies=bands)
+
+# One line — panel R, interior correction C and the net IL = R - C:
+enc.plot()
+plt.show()
+
+# By hand, from the per-band fields the result carries:
+fig, ax = plt.subplots()
+ax.plot(bands, enc.panel_transmission_loss, "s--", label="Panel R")
+ax.plot(bands, enc.correction, "^:", label="Interior correction C")
+ax.plot(bands, enc.insertion_loss, "o-", label="Insertion loss (R - C)")
+ax.set_xlabel("Frequency [Hz]"); ax.set_ylabel("Level [dB]")
+ax.set_xscale("log")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 `enclosure_insertion_loss` returns an `EnclosureResult` with the panel
 `panel_transmission_loss`, the interior `correction`, the net `insertion_loss`,

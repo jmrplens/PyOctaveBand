@@ -414,7 +414,16 @@ as `smpte`.
 ## ModulationDistortionResult
 
 ```python
-ModulationDistortionResult(d2: float, d3: float, smpte: float)
+ModulationDistortionResult(
+    d2: float,
+    d3: float,
+    smpte: float,
+    f_low: float | None = None,
+    f_high: float | None = None,
+    carrier_amplitude: float | None = None,
+    sideband_frequencies: NDArray[np.float64] | None = None,
+    sideband_amplitudes: NDArray[np.float64] | None = None,
+)
 ```
 
 Modulation (intermodulation) distortion (IEC 60268-3 14.12.7).
@@ -426,6 +435,45 @@ Modulation (intermodulation) distortion (IEC 60268-3 14.12.7).
 | `d2` | Second-order modulation distortion `d_m,2` (14.12.7.2 g): the *arithmetic* sum of the sideband amplitudes at `f2 ± f1` relative to the output amplitude at `f2`. |
 | `d3` | Third-order modulation distortion `d_m,3` (14.12.7.2 h): the arithmetic sum of the sidebands at `f2 ± 2·f1` relative to the output amplitude at `f2`. |
 | `smpte` | Combined-RMS convention of SMPTE-type analyzers (not an IEC 60268-3 quantity): `√(Σ aₛ²) / a_f2` over all four sidebands. |
+| `f_low` | Low modulating tone `f1`, in Hz. |
+| `f_high` | High carrier tone `f2`, in Hz. |
+| `carrier_amplitude` | Measured output amplitude at `f2` (the reference of the per-order ratios). |
+| `sideband_frequencies` | The four intermodulation product frequencies in ascending order: `f2 − 2f1`, `f2 − f1`, `f2 + f1` and `f2 + 2f1`, in Hz. |
+| `sideband_amplitudes` | Measured peak amplitudes at `sideband_frequencies` (zero for a product that falls outside the analysis band or cannot be separated from a primary tone). |
+
+### ModulationDistortionResult.plot()
+
+```python
+ModulationDistortionResult.plot(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Plot the carrier and its modulation sidebands, with d2/d3 annotated.
+
+Draws the output amplitude at `f2` (the 0 dB reference) and the four
+intermodulation sidebands at `f2 ± f1` and `f2 ± 2f1` as a
+stem-style spectrum in dB relative to the carrier, the modulation
+counterpart of [`HarmonicDistortionResult.plot`](/phonometry/reference/api/electroacoustics/distortion/#harmonicdistortionresultplot).
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the marker `plot` call. |
+
+**Returns:** The axes.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the result carries no sideband spectrum data (a result constructed by hand without the spectral fields). |
 
 ## sinad
 

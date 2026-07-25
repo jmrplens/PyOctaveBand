@@ -155,6 +155,7 @@ x = np.concatenate([tono(-23.0, 10.0), tono(-50.0, 30.0)])
 res = broadcast.program_loudness(np.vstack([x, x]), fs)
 print(round(res.integrated, 1))            # -23.1  LUFS (la cola se descarta)
 print(round(res.relative_threshold, 1))    # -39.0  LUFS
+res.plot()   # la traza de sonoridad: la línea integrada ignora la cola (necesita matplotlib)
 ```
 
 Una media sin puertas sobre los mismos 40 s quedaría cerca de −29 LUFS: las
@@ -162,7 +163,55 @@ puertas son lo que hace que los programas de gran rango de sonoridad casen
 en antena. EBU R 128 normaliza este valor integrado a **−23,0 LUFS**; cuando
 el objetivo no es alcanzable en la práctica (programas en directo, por
 ejemplo) se permite una tolerancia de ±1,0 LU, y los flujos de control de
-calidad admiten ±0,2 LU por error de medida.
+calidad admiten ±0,2 LU por error de medida. La figura hace visible la puerta
+sobre un programa de ruido conformado con una cola silenciosa larga:
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_gating_es.svg"
+  alt="Medición EBU R 128 de 20 segundos de programa sobre el objetivo de -23 LUFS seguidos de 40 segundos de ambiente silencioso unos 29 LU más bajo: las trazas momentánea y de corto plazo bajan un escalón a los 20 segundos, la línea integrada discontinua se mantiene en -23,0 LUFS porque la puerta relativa descarta la cola, y una línea de trazo y punto marca la media sin puerta hundiéndose hasta -27,7 LUFS"
+  width="96%"
+/>
+
+*La puerta relativa (10 LU por debajo de los supervivientes) descarta todos
+los bloques de la cola, así que la sonoridad integrada mantiene el primer
+plano en −23,0 LUFS mientras la media energética sin puerta se hunde hacia
+−27,7 LUFS — y seguiría hundiéndose con cada minuto extra de ambiente. Sin la
+puerta, los pasajes silenciosos dejarían al primer plano de una mezcla de cine
+muy por encima del objetivo.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal
+from phonometry import broadcast
+
+fs = 48000
+rng = np.random.default_rng(3341)
+sos = signal.butter(2, 2000.0, fs=fs, output="sos")
+trozos = []
+# 20 s de material de programa y 40 s de ambiente de sala ~29 LU más bajo.
+for nivel, segundos in [(-23.0, 20.0), (-52.0, 40.0)]:
+    ruido = signal.sosfilt(sos, rng.standard_normal(int(segundos * fs)))
+    ruido /= np.sqrt(np.mean(ruido ** 2))
+    trozos.append(10 ** (nivel / 20) * ruido)
+x = np.concatenate(trozos)
+# Normalizar la sonoridad del programa al objetivo de R 128 y medirlo.
+x *= 10 ** ((-23.0 - broadcast.integrated_loudness(np.vstack([x, x]), fs)) / 20)
+res = broadcast.program_loudness(np.vstack([x, x]), fs)
+
+ax = res.plot(language="es")
+finita = res.momentary[np.isfinite(res.momentary)]
+sin_puerta = 10 * np.log10(np.mean(10 ** (finita / 10)))
+ax.axhline(sin_puerta, ls="-.", color="#2ca02c",
+           label=f"Media sin puerta {sin_puerta:.1f} LUFS")
+ax.legend(loc="center right")
+plt.show()
+```
+
+</details>
 
 ## 3. Modo EBU: momentánea, corto plazo, integrada
 
@@ -189,6 +238,7 @@ x = np.concatenate([tono(-36.0, 10.0), tono(-23.0, 60.0), tono(-36.0, 10.0)])
 res = broadcast.program_loudness(np.vstack([x, x]), fs)
 print(round(res.integrated, 1), round(res.max_momentary, 1),
       round(res.max_short_term, 1))         # -23.0 -23.0 -23.0
+res.plot()   # trazas M/S, línea integrada y banda de LRA (necesita matplotlib)
 ```
 
 El `ProgramLoudnessResult` congelado lleva las series M y S con sus ejes de
@@ -258,7 +308,43 @@ def tono(nivel_dbfs, segundos):
 x = np.concatenate([tono(-20.0, 20.0), tono(-30.0, 20.0)])
 res = broadcast.program_loudness(np.vstack([x, x]), fs)
 print(round(res.loudness_range, 1))         # 10.0  LU
+res.plot()   # la banda sombreada de LRA abarca la separación P10-P95 (necesita matplotlib)
 ```
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_range_es.svg"
+  alt="Medición EBU R 128 del caso de referencia de Tech 3342 de 20 segundos a -20 dBFS seguidos de 20 segundos a -30 dBFS: la traza de corto plazo escalona entre dos mesetas separadas 10 LU, la banda sombreada del rango de sonoridad abarca exactamente esas mesetas para un LRA igual a 10,0 LU, y la línea integrada queda entre ambas"
+  width="96%"
+/>
+
+*En el caso de referencia de Tech 3342 la distribución de corto plazo tiene
+dos mesetas separadas 10 LU, y la banda sombreada entre los percentiles 10 y
+95 lee exactamente `LRA = 10,0 LU`; la sonoridad integrada se asienta entre
+las mesetas. En programas reales, la misma banda distingue de un vistazo un
+drama normalizado por diálogo (LRA en torno a 10-20 LU) de un anuncio
+comprimido (unos pocos LU).*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import broadcast
+
+fs = 48000
+def tono(nivel_dbfs, segundos):
+    t = np.arange(int(segundos * fs)) / fs
+    return 10 ** (nivel_dbfs / 20) * np.sin(2 * np.pi * 1000.0 * t)
+
+# Caso de prueba 1 de EBU Tech 3342: 20 s a -20 dBFS y 20 s a -30 dBFS.
+x = np.concatenate([tono(-20.0, 20.0), tono(-30.0, 20.0)])
+res = broadcast.program_loudness(np.vstack([x, x]), fs)
+res.plot(language="es")   # la banda de LRA abarca exactamente los 10 LU entre mesetas
+plt.show()
+```
+
+</details>
 
 `loudness_range()` también está disponible de forma independiente sobre
 cualquier vector de sonoridad de corto plazo, siguiendo la implementación de
@@ -378,7 +464,7 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 <ReportPreview
 	name="ebu_r128_loudness_example"
 	title="Informe de ejemplo de sonoridad de programa EBU R 128 (PDF)"
-	description="Ficha de conformidad de sonoridad de programa de una página: un bloque de metadatos, una tabla de conformidad de cuatro columnas con la sonoridad integrada y el pico verdadero máximo como veredicto y el rango de sonoridad y los máximos momentáneo/corto plazo como filas informativas, la gráfica de sonoridad frente al tiempo a todo lo ancho, el número único enmarcado I = -23.0 LUFS (LRA = 10.0 LU, TP máx = -20.4 dBTP) y un veredicto CUMPLE frente al objetivo de -23.0 LUFS con la tolerancia de control de calidad por defecto de ±0,2 LU del punto i) de EBU R 128."
+	description="Ficha de conformidad de sonoridad de programa de una página: un bloque de metadatos, una tabla de conformidad de cuatro columnas con la sonoridad integrada y el pico verdadero máximo como veredicto y el rango de sonoridad y los máximos momentáneo/corto plazo como filas informativas, la gráfica de sonoridad frente al tiempo a todo lo ancho, el número único enmarcado I = −23,0 LUFS (LRA = 10,0 LU, TP máx = −20,4 dBTP) y un veredicto CUMPLE frente al objetivo de −23,0 LUFS con la tolerancia de control de calidad por defecto de ±0,2 LU del punto i) de EBU R 128."
 	caption="Ficha de conformidad de sonoridad de programa (ProgramLoudnessResult.report), I en LUFS con LRA en LU y pico verdadero en dBTP."
 />
 

@@ -74,9 +74,12 @@ ITU-R 468 weighted THD, and the Bendat & Piersol frequency-response estimators
 `H1`/`H2` with the ordinary coherence `γ²`. Every quantity has an exact analytic
 oracle (synthetic signals with known harmonic and intermodulation amplitudes, a
 clipped-sine Fourier oracle, a full DIM test-signal synthesis, and a known LTI
-path), so the numbers are verifiable rather than tuned. A closing section
-covers the sensitivity conventions of IEC 60268-4 (microphones) and
-IEC 60268-5 (loudspeakers), where most cross-datasheet comparisons go wrong.
+path), so the numbers are verifiable rather than tuned. The closing sections
+cover the sensitivity conventions of IEC 60268-4 (microphones) and
+IEC 60268-5 (loudspeakers), where most cross-datasheet comparisons go wrong,
+the baffled-piston radiation model behind loudspeaker directivity, and the
+IEC 60268-5 loudspeaker and IEC 60268-4 microphone rated-characteristics
+reports that render the standards' data sheets from a measured response.
 
 ## 1. Harmonic distortion (IEC 60268-3 14.12.2–5)
 
@@ -254,10 +257,40 @@ from phonometry import electroacoustics
 
 md = electroacoustics.modulation_distortion(signal, fs, 60.0, 7000.0)
 print(md.d2, md.d3, md.smpte)                                       # 14.12.7
+md.plot()   # carrier and modulation sidebands, d2/d3 annotated (needs matplotlib)
 dfd2 = electroacoustics.difference_frequency_distortion(signal, fs, 13e3, 14e3, order=2)
 tdfd = electroacoustics.total_difference_frequency_distortion(signal, fs)         # 8/11.95 kHz
 dim = electroacoustics.dynamic_intermodulation_distortion(signal, fs)             # DIM (15k/3.15k)
 ```
+
+The `ModulationDistortionResult` is plottable: `.plot()` draws the output
+amplitude at the carrier `f₂` (the 0 dB reference) and the four modulation
+sidebands at `f₂ ± f₁` and `f₂ ± 2f₁`, the modulation counterpart of the
+harmonic spectrum of section 1. The asymmetric ratio between the `n = 2` and
+`n = 3` pairs reads the balance between the quadratic and cubic terms of the
+non-linearity at a glance:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/modulation_distortion.svg" alt="Modulation-distortion spectrum of a 60 Hz plus 7 kHz two-tone test through a weakly non-linear amplifier: the carrier at 7 kHz as the 0 dB reference and the four intermodulation sidebands at 7 kHz plus or minus 60 and 120 Hz marked with their order, annotated with the IEC 60268-3 per-order values d2 and d3 and the SMPTE combined RMS" width="82%" />
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import electroacoustics
+
+fs = 48000
+t = np.arange(fs) / fs                        # 1 s -> tones land on FFT bins
+x = np.sin(2 * np.pi * 60.0 * t) + 0.25 * np.sin(2 * np.pi * 7000.0 * t)
+signal = x + 0.04 * x**2 + 0.012 * x**3       # weakly non-linear device output
+
+md = electroacoustics.modulation_distortion(signal, fs, 60.0, 7000.0)
+md.plot()
+plt.show()
+```
+
+</details>
 
 ## 4. Frequency response and coherence (Bendat & Piersol)
 
@@ -384,6 +417,29 @@ print(round(res.radiation_mass, 4))            # 8 rho a^3 / 3, kg
 print(round(float(res.directivity_index[0]), 2))  # 3.01 dB half-space limit
 res.plot()                                      # R1 and X1 vs ka
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_radiation_impedance.svg" alt="Normalized radiation resistance R1 and reactance X1 of a 75 mm baffled circular piston against ka on a logarithmic axis: R1 rises from ka squared over two through unity with decaying ripples, while the mass-like X1 peaks near ka of 1.4 and decays, with the high-frequency limit R1 equal to 1 marked" width="82%" />
+
+*The `.plot()` of the result is the classic Beranek & Mellow impedance figure
+computed for this piston: below `ka ≈ 1` the load is almost purely mass-like
+(`X₁` dominates and `R₁ ∝ (ka)²`, the regime where a loudspeaker's output is
+stiffness- and mass-limited), and above it the resistance settles on
+`ρcS` with interference ripples while the reactance dies away.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import radiating_piston
+
+res = radiating_piston(radius=0.075, frequencies=np.geomspace(20, 20000, 400))
+res.plot()   # normalized R1 and X1 against ka
+plt.show()
+```
+
+</details>
 
 `radiating_piston` returns a `RadiatingPistonResult` with the normalized
 `resistance`/`reactance`, the mechanical `radiation_resistance`/`radiation_reactance`,
