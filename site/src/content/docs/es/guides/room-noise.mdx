@@ -1,6 +1,6 @@
 ---
 title: "Criterios de ruido de salas (NC / RC Mark II)"
-description: "Las calificaciones de ruido de salas de ANSI/ASA S12.2-2019: el método de tangencia de los criterios de ruido (NC) sobre las curvas de la Tabla 1, y la calificación Room Criteria Mark II (RC) con su etiqueta espectral de retumbo/siseo/neutro (Anexo D)."
+description: "Las calificaciones de ruido de salas de ANSI/ASA S12.2-2019: la calificación de criterios de ruido (NC) sobre las curvas de la Tabla 1 (designación NC-(SIL) con el método de tangencia cuando se supera), y la calificación Room Criteria Mark II (RC) con su etiqueta espectral de retumbo/siseo/neutro (Anexo D)."
 references:
   - type: article
     authors: ["Beranek, L. L."]
@@ -46,22 +46,27 @@ El ruido de fondo estacionario de una sala ocupada (de la ventilación, los
 difusores o el tráfico lejano) se califica frente a una familia de **curvas de
 criterio por bandas de octava**. **ANSI/ASA S12.2-2019**, *Criteria for
 Evaluating Room Noise*, define dos calificaciones a partir de un espectro que
-phonometry implementa: la calificación **Noise Criteria (NC)** por el método de
-tangencia, y la calificación **Room Criteria Mark II (RC)** con su etiqueta
+phonometry implementa: la calificación **Noise Criteria (NC)** (la designación
+NC-(SIL) de la cláusula 5.2.2, con el método de tangencia cuando el espectro la
+supera), y la calificación **Room Criteria Mark II (RC)** con su etiqueta
 espectral de retumbo/siseo. Ambas trabajan sobre niveles de presión sonora por
 banda de octava en las diez bandas de 16 Hz a 8000 Hz.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_noise_es.svg" alt="Los dos métodos de calificación de ANSI S12.2 a partir de un espectro por bandas de octava: a la izquierda el método de tangencia NC (de las curvas de la Tabla 1, el valor NC en cada banda, después NC es la curva más alta tocada, dando NC-NN con una banda determinante); a la derecha el método RC Mark II (la media de frecuencias medias LMF de los niveles de 500, 1000 y 2000 Hz redondeada para dar RC-NN, después la etiqueta espectral R de retumbo, H de siseo o N de neutro por las reglas de desviación de la cláusula D.3)" width="94%" loading="eager" />
 
-## 1. Criterios de ruido: el método de tangencia
+## 1. Criterios de ruido: designación SIL y tangencia
 
 Las **curvas NC** (ANSI/ASA S12.2-2019, Tabla 1) son una familia de límites por
 banda de octava, cada una designada por su valor a 1000 Hz (de NC-15 hasta
-NC-70). El **método de tangencia** califica un espectro medido por el valor de
-la **curva NC más alta que toca**: para cada banda de octava se busca el índice
-NC cuya curva pasa por el nivel medido, y la calificación es el máximo entre
-bandas. La banda en la que se alcanza ese máximo, la que empuja el espectro
-contra las curvas, se reporta como **banda determinante**.
+NC-70). La cláusula 5.2.2 califica un espectro en **dos pasos**. Primero el
+**nivel de interferencia con el habla** $\mathrm{SIL}$ (cláusula 3.2, la media
+de los niveles de 500/1000/2000/4000 Hz) selecciona la curva NC-(SIL): si
+ninguna banda de octava la supera, el espectro se designa simplemente
+**NC-(SIL)**. Solo cuando el espectro asoma por encima de esa curva entra el
+**método de tangencia** (cláusula 5.2.3): para cada banda de octava se busca el
+índice NC cuya curva pasa por el nivel medido, y la calificación es el máximo
+entre bandas. La banda en la que se alcanza ese máximo, la que empuja el
+espectro contra las curvas, se reporta como **banda determinante**.
 
 ```python
 import numpy as np
@@ -71,15 +76,28 @@ from phonometry import room
 spl = np.array([62.0, 62.0, 59.0, 57.0, 52.0, 42.0, 35.0, 29.0, 24.0, 19.0])
 
 nc = room.noise_criterion(spl)
+print(round(nc.sil, 1))           # 32.5   (cláusula 3.2)
+print(nc.method)                  # 'tangency'  (se supera la curva NC-32)
 print(round(nc.rating, 1))        # 42.5
 print(nc.governing_frequency)     # 250.0  (la banda tangente)
+print(nc.label)                   # 'NC-42.5 (250 Hz)'
 ```
 
-Como la calificación interpola entre las curvas tabuladas es un número continuo:
-una calificación NC de $42{,}5$ queda a medio camino entre NC-40 y NC-45. Puede
-suministrarse un subconjunto de las bandas de octava junto con sus frecuencias
-centrales (`room.noise_criterion(levels, frequencies)`), lo que resulta cómodo
-cuando solo se midieron las bandas de interferencia con el habla.
+Como la calificación de tangencia interpola entre las curvas tabuladas es un
+número continuo: una calificación NC de $42{,}5$ queda a medio camino entre
+NC-40 y NC-45 (una designación SIL es siempre un entero). La calificación de
+tangencia se conserva en `tangency_rating` incluso cuando se aplica la
+designación SIL. Puede suministrarse un subconjunto de las bandas de octava
+junto con sus frecuencias centrales
+(`room.noise_criterion(levels, frequencies)`); sin las cuatro bandas del SIL la
+designación la fija solo la calificación de tangencia.
+
+La familia de la Tabla 1 termina en NC-70 y NC-15, y la norma no define ninguna
+calificación más allá. Un espectro por encima de la curva NC-70 (o enteramente
+por debajo de la curva NC-15) recibe por tanto `rating = nan` y una marca
+`out_of_range` de `"above"` / `"below"`, con `nc.label` leyendo
+`'>NC-70 (63 Hz)'` (gobierna la banda con mayor exceso sobre NC-70) o
+`'<NC-15'`; nunca se fabrican números del estilo `NC-71` o `NC-14`.
 
 ## 2. Room Criteria Mark II: calificación y etiqueta espectral
 
@@ -158,15 +176,27 @@ plt.show()
 
 </details>
 
-El `NCResult` lleva la calificación `rating`, la `governing_frequency` y los
-`levels` medidos; el `RCResult` lleva la calificación `rating`, la `lmf`, la
-`classification`, la `reference_curve` y una etiqueta `label` de conveniencia en
-la forma `RC-NN(A)`. Cada uno expone un `.plot()` que dibuja su panel de arriba.
+El `NCResult` lleva la calificación `rating`, el `sil`, la `tangency_rating`,
+el `method` (`'SIL'` o `'tangency'`), la `governing_frequency`, la marca
+`out_of_range` y los `levels` medidos, más una etiqueta `label` de conveniencia
+(`'NC-44'`, `'NC-51 (125 Hz)'`, `'>NC-70 (63 Hz)'`); el `RCResult` lleva la
+calificación `rating`, la `lmf`, la `classification`, la `reference_curve`, una
+marca `out_of_family` (la Tabla D.1 solo tabula de RC-25 a RC-50) y una
+etiqueta `label` de conveniencia en la forma `RC-NN(A)`. La cláusula D.3.5
+admite las etiquetas $N$, $R$, $H$ o $RV$; cuando disparan a la vez las
+desviaciones de retumbo y siseo, la biblioteca informa la combinación `RH` como
+extensión de diagnóstico. Cada resultado expone un `.plot()` que dibuja su
+panel de arriba. La cláusula D.4 espera al menos las bandas de octava de
+31,5 Hz a 4000 Hz: un espectro al que le falte alguna se califica igualmente,
+pero emite un `UserWarning` porque las bandas ausentes se omiten en las pruebas
+de desviación de la etiqueta.
 
 Los criterios de ruido balanceados (NCB), el criterio de ruido de sala para
 ruido de baja frecuencia fluctuante (RNC, que necesita una serie temporal en
-lugar de un único espectro) y el índice numérico de evaluación de calidad (QAI,
-que la norma remite a referencias externas) no forman parte de este módulo.
+lugar de un único espectro), la etiqueta de vibración y traqueteo ($RV$, que
+necesita la prueba de la Tabla 6) y el índice numérico de evaluación de calidad
+(QAI, que la norma remite a referencias externas) no forman parte de este
+módulo.
 
 ## 3. Elegir un criterio: NC, RC Mark II o NR
 
@@ -175,8 +205,10 @@ tercera familia que este módulo deliberadamente no implementa:
 
 - **NC** responde a *"¿cumple la sala su límite, y qué banda lo rompe?"*.
   Es la calificación de conformidad de la práctica norteamericana
-  (especificaciones, códigos, fichas de equipos), y el método de tangencia
-  lo gobierna por completo la única banda determinante. Ese es también su
+  (especificaciones, códigos, fichas de equipos). El paso SIL de la cláusula
+  5.2.2 ancla la designación a la interferencia con el habla, pero en cuanto
+  alguna banda supera la curva NC-(SIL) toma el relevo el método de tangencia,
+  gobernado por completo por la única banda determinante. Ese es también su
   punto ciego: dos salas NC-40 pueden sonar completamente distintas, una
   retumbante y otra siseante, porque la tangencia no dice nada del
   equilibrio espectral. Usa NC cuando una especificación lo cite, e informa
@@ -220,8 +252,10 @@ maquetación: una línea de base normativa, un bloque opcional de metadatos de
 cabecera, los niveles medidos por bandas de octava junto al espectro medido
 representado frente a la familia de curvas NC/RC (el propio `.plot()` del
 resultado), la calificación en un recuadro, una fila opcional de veredicto y un
-pie con el descargo de responsabilidad fijo. El recuadro NC muestra `NC-nn` con
-su banda determinante; el recuadro RC muestra `RC-nn(etiqueta)` con la media de
+pie con el descargo de responsabilidad fijo. El recuadro NC muestra la
+designación `NC-nn` con el SIL y, para una calificación de tangencia, su banda
+determinante (`>NC-70` / `<NC-15` cuando el espectro cae fuera de la familia de
+la Tabla 1); el recuadro RC muestra `RC-nn(etiqueta)` con la media de
 frecuencias medias $L_\text{MF}$ y la calidad espectral. Una calificación más
 baja es más silenciosa, por lo que un `requirement` en los metadatos (leído como
 la calificación NC o RC máxima aceptable) cumple si es igual o inferior al

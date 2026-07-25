@@ -351,9 +351,11 @@ def plot_noise_criterion(
     kwargs.setdefault("label", _t("Measured", language))
     ax.plot(freqs[valid], levels[valid], "o-", zorder=3, **kwargs)
     # Nearest *valid* band rather than float equality against the stored
-    # value; the marker sits on that band so its x and y stay paired.
+    # value; the marker sits on that band so its x and y stay paired. A
+    # SIL-designated or below-family spectrum has no governing band (NaN),
+    # so the marker is omitted.
     candidates = np.flatnonzero(valid)
-    if candidates.size:
+    if candidates.size and np.isfinite(result.governing_frequency):
         governing = int(
             candidates[
                 np.argmin(np.abs(freqs[candidates] - result.governing_frequency))
@@ -368,10 +370,7 @@ def plot_noise_criterion(
         )
     _freq_axis(ax, OCTAVE_BANDS, language=language)
     ax.set_ylabel(_t("Octave-band SPL [dB]", language))
-    ax.set_title(
-        f"ANSI/ASA S12.2 NC-{result.rating:g} "
-        f"({_format_freq(result.governing_frequency)})"
-    )
+    ax.set_title(f"ANSI/ASA S12.2 {result.label}")
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     ax.grid(True, which="both", alpha=0.3)
     localize_axes(ax, language)

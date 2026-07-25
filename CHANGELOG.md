@@ -8,7 +8,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 
+### Fixed
+
+- `room.noise_criterion` no longer fabricates out-of-family NC designations:
+  a spectrum above the NC-70 curve (or entirely below NC-15) used to clamp
+  the interpolation to a nonexistent "NC-71"/"NC-14" with an arbitrary
+  governing band; it now returns `rating = nan` with an `out_of_range` flag
+  (`"above"`/`"below"`), a `label` reading `">NC-70 (band)"`/`"<NC-15"`, and
+  the governing band chosen by the maximum exceedance over the NC-70 curve.
+  The fiche and the plot render the flagged designation (English and
+  Spanish) and the verdict fails above the family and passes below it.
+- The room-acoustics fiche (ISO 3382-1/-2) labels the mid-frequency
+  descriptor honestly for one-third-octave data: only the 500 Hz and 1 kHz
+  one-third-octave bands are averaged, so the box no longer claims the
+  octave "500-1000 Hz" span; a band range without both mid bands names the
+  band the boxed T30/EDT came from, and the "EDT_mid" vs "EDT" label now
+  follows EDT's own band coverage instead of T30's.
+- Room fiche verdicts (ISO 3382-1/-2 and ANSI/ASA S12.2) compare the values
+  rounded exactly as displayed, so a printed `T_mid = 1.15 s` can no longer
+  fail a `1.15 s` requirement on an invisible third decimal.
+- Docstring citations corrected: the 5 % reverberation-time JND is
+  ISO 3382-1:2009 Table A.1 (ISO 3382-2:2008 Table A.1 tabulates the
+  uncertainty constants G and H), and the -20 dB onset trigger of the
+  impulse-response onset detector is ISO 3382-1:2009 A.3.4, not A.2.1.
+- English fiche strings and docstrings for ISO 3382-3 use point decimals
+  ("STI = 0.50"/"0.20"); the Spanish strings keep the comma.
+
 ### Changed
+
+- `room.noise_criterion` now follows the full two-step rating procedure of
+  ANSI/ASA S12.2-2019, 5.2.2: the speech interference level (clause 3.2,
+  average of the 500/1000/2000/4000 Hz bands) selects the NC-(SIL) curve
+  and, when no octave band exceeds it, the spectrum is designated NC-(SIL);
+  the tangency method (5.2.3) applies otherwise. `NCResult` gains `sil`,
+  `tangency_rating`, `method`, `out_of_range` and a `label` property; the
+  tangency rating remains available on every in-family result.
+- `room.room_criterion` warns when the clause D.4 minimum band set
+  (31.5 Hz through 4000 Hz) is incomplete, flags ratings outside the
+  tabulated RC-25 to RC-50 family via `RCResult.out_of_family` (the fiche
+  adds an extrapolation note), and documents the combined "RH" tag as a
+  diagnostic extension beyond the clause D.3.5 letters (N, R, H, RV; the
+  RV vibration/rattle tag needs the Table 6 test and is not implemented).
 
 - Adopt ruff 0.16 and its broadened default rule set: modernize type
   annotations (PEP 585 built-in generics, unquoted annotations), sort imports

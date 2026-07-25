@@ -1,6 +1,6 @@
 ---
 title: "Room-noise criteria (NC / RC Mark II)"
-description: "The ANSI/ASA S12.2-2019 room-noise ratings: the Noise Criteria (NC) tangency method over the Table 1 curves, and the Room Criteria Mark II (RC) rating with its rumble/hiss/neutral spectral tag (Annex D)."
+description: "The ANSI/ASA S12.2-2019 room-noise ratings: the Noise Criteria (NC) rating over the Table 1 curves (NC-(SIL) designation with the tangency method when exceeded), and the Room Criteria Mark II (RC) rating with its rumble/hiss/neutral spectral tag (Annex D)."
 references:
   - type: article
     authors: ["Beranek, L. L."]
@@ -46,21 +46,26 @@ Steady background noise in an occupied room (from ventilation, diffusers or
 distant traffic) is rated against a family of **octave-band criterion curves**.
 **ANSI/ASA S12.2-2019**, *Criteria for Evaluating Room Noise*, defines two
 spectrum-in ratings that phonometry implements: the **Noise Criteria (NC)**
-rating by the tangency method, and the **Room Criteria Mark II (RC)** rating
+rating (the NC-(SIL) designation of clause 5.2.2, with the tangency method
+when the spectrum exceeds it), and the **Room Criteria Mark II (RC)** rating
 with its rumble/hiss spectral tag. Both work on octave-band sound pressure
 levels over the ten bands from 16 Hz to 8000 Hz.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_noise.svg" alt="The two ANSI S12.2 rating methods from one octave-band spectrum: on the left the NC tangency method (from the Table 1 curves, the NC value in each band, then NC equals the highest curve touched, giving NC-NN with a governing band); on the right the RC Mark II method (the mid-frequency average LMF of the 500, 1000 and 2000 Hz levels rounded to give RC-NN, then the spectral tag R for rumble, H for hiss or N for neutral by the clause D.3 deviation rules)" width="94%" loading="eager" />
 
-## 1. Noise Criteria: the tangency method
+## 1. Noise Criteria: SIL designation and tangency
 
 The **NC curves** (ANSI/ASA S12.2-2019 Table 1) are a family of octave-band
-limits, each designated by its value at 1000 Hz (NC-15 up to NC-70). The
-**tangency method** rates a measured spectrum by the value of the **highest NC
-curve it touches**: for each octave band, the NC index whose curve passes
-through the measured level is found, and the rating is the maximum across bands.
-The band where that maximum occurs, the one that pushes the spectrum up against
-the curves, is reported as the **governing band**.
+limits, each designated by its value at 1000 Hz (NC-15 up to NC-70). Clause
+5.2.2 rates a spectrum in **two steps**. First the **speech interference
+level** $\mathrm{SIL}$ (clause 3.2, the average of the 500/1000/2000/4000 Hz
+levels) selects the NC-(SIL) curve: if no octave band exceeds it, the
+spectrum is simply designated **NC-(SIL)**. Only when the spectrum pokes
+above that curve does the **tangency method** (clause 5.2.3) take over: for
+each octave band, the NC index whose curve passes through the measured level
+is found, and the rating is the maximum across bands. The band where that
+maximum occurs, the one that pushes the spectrum up against the curves, is
+reported as the **governing band**.
 
 ```python
 import numpy as np
@@ -70,15 +75,27 @@ from phonometry import room
 spl = np.array([62.0, 62.0, 59.0, 57.0, 52.0, 42.0, 35.0, 29.0, 24.0, 19.0])
 
 nc = room.noise_criterion(spl)
+print(round(nc.sil, 1))           # 32.5   (clause 3.2)
+print(nc.method)                  # 'tangency'  (the NC-32 curve is exceeded)
 print(round(nc.rating, 1))        # 42.5
 print(nc.governing_frequency)     # 250.0  (the tangent band)
+print(nc.label)                   # 'NC-42.5 (250 Hz)'
 ```
 
-Because the rating interpolates between the tabulated curves it is a continuous
-number: an NC rating of $42.5$ sits half-way between NC-40 and NC-45. A subset
-of the octave bands may be supplied together with their centre frequencies
-(`room.noise_criterion(levels, frequencies)`), which is convenient when only the
-speech-interference bands were measured.
+Because a tangency rating interpolates between the tabulated curves it is a
+continuous number: an NC rating of $42.5$ sits half-way between NC-40 and
+NC-45 (a SIL designation is always an integer). The tangency rating is kept
+on `tangency_rating` even when the SIL designation applies. A subset of the
+octave bands may be supplied together with their centre frequencies
+(`room.noise_criterion(levels, frequencies)`); without the four SIL bands the
+tangency rating alone sets the designation.
+
+The Table 1 family ends at NC-70 and NC-15, and the standard defines no
+rating beyond it. A spectrum above the NC-70 curve (or entirely below the
+NC-15 curve) therefore gets `rating = nan` and an `out_of_range` flag of
+`"above"` / `"below"`, with `nc.label` reading `'>NC-70 (63 Hz)'` (the band
+with the largest exceedance over NC-70 governs) or `'<NC-15'`; no `NC-71` or
+`NC-14` style numbers are ever fabricated.
 
 ## 2. Room Criteria Mark II: rating and spectral tag
 
@@ -156,15 +173,25 @@ plt.show()
 
 </details>
 
-The `NCResult` carries the `rating`, the `governing_frequency` and the measured
-`levels`; the `RCResult` carries the `rating`, the `lmf`, the `classification`,
-the `reference_curve` and a convenience `label` in the `RC-NN(A)` form. Each
-exposes a `.plot()` that renders its panel above.
+The `NCResult` carries the `rating`, the `sil`, the `tangency_rating`, the
+`method` (`'SIL'` or `'tangency'`), the `governing_frequency`, the
+`out_of_range` flag and the measured `levels`, plus a convenience `label`
+(`'NC-44'`, `'NC-51 (125 Hz)'`, `'>NC-70 (63 Hz)'`); the `RCResult` carries
+the `rating`, the `lmf`, the `classification`, the `reference_curve`, an
+`out_of_family` flag (Table D.1 tabulates RC-25 through RC-50 only) and a
+convenience `label` in the `RC-NN(A)` form. Clause D.3.5 admits the tags
+$N$, $R$, $H$ or $RV$; when both the rumble and hiss deviations fire, the
+library reports the combined `RH` as a diagnostic extension. Each result
+exposes a `.plot()` that renders its panel above. Clause D.4 expects at
+least the 31.5 Hz to 4000 Hz octave bands: a spectrum missing any of them
+still rates, but emits a `UserWarning` because the absent bands are skipped
+by the tag deviation tests.
 
 The balanced noise criteria (NCB), the room noise criterion for fluctuating
 low-frequency noise (RNC, which needs a time series rather than a single
-spectrum) and the numeric quality-assessment index (QAI, which the standard
-defers to external references) are not part of this module.
+spectrum), the vibration/rattle tag ($RV$, which needs the Table 6 test) and
+the numeric quality-assessment index (QAI, which the standard defers to
+external references) are not part of this module.
 
 ## 3. Choosing a criterion: NC, RC Mark II or NR
 
@@ -173,12 +200,14 @@ this module deliberately does not implement:
 
 - **NC** answers *"does the room meet its limit, and which band breaks
   it?"*. It is the compliance rating of North-American practice
-  (specifications, codes, equipment schedules), and the tangency method is
-  driven entirely by the single governing band. That is also its blind
-  spot: two NC-40 rooms can sound completely different, one rumbly and one
-  hissy, because tangency says nothing about spectral balance. Use NC when
-  a specification cites it, and always report the governing band with the
-  rating, since it names the octave any fix must attack first.
+  (specifications, codes, equipment schedules). The clause 5.2.2 SIL step
+  anchors the designation to speech interference, but the moment any band
+  exceeds the NC-(SIL) curve the tangency method takes over and is driven
+  entirely by the single governing band. That is also its blind spot: two
+  NC-40 rooms can sound completely different, one rumbly and one hissy,
+  because tangency says nothing about spectral balance. Use NC when a
+  specification cites it, and always report the governing band with a
+  tangency rating, since it names the octave any fix must attack first.
 - **RC Mark II** answers *"how does the room sound, and what should be
   fixed?"*. Its rating tracks speech interference through the
   mid-frequency average, and its reference slope of −5 dB per octave is
@@ -213,8 +242,10 @@ Both ratings render a one-page PDF room-noise assessment fiche.
 standard-basis line, an optional metadata header block, the measured
 octave-band levels beside the measured spectrum plotted against the NC/RC curve
 family (the result's own `.plot()`), the boxed rating, an optional verdict row
-and a footer with the fixed disclaimer. The NC box shows `NC-nn` with its
-governing band; the RC box shows `RC-nn(tag)` with the mid-frequency average
+and a footer with the fixed disclaimer. The NC box shows the `NC-nn`
+designation with the SIL and, for a tangency rating, its governing band
+(`>NC-70` / `<NC-15` when the spectrum falls outside the Table 1 family); the
+RC box shows `RC-nn(tag)` with the mid-frequency average
 $L_\text{MF}$ and the spectral quality. A lower rating is quieter, so a
 `requirement` on the metadata (read as the maximum acceptable NC or RC rating)
 passes at or below the target. Setting `verbose=True` adds the per-band NC

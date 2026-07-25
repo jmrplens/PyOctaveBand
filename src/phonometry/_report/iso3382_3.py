@@ -13,7 +13,7 @@ Clause 5.2):
 * a compact metrics table of the four single-number quantities of Clause 4:
   the spatial decay rate of the A-weighted SPL of speech ``D2,S``, the nominal
   A-weighted speech level at 4 m ``Lp,A,S,4m``, the distraction distance ``rD``
-  (STI = 0,50) and the privacy distance ``rP`` (STI = 0,20);
+  (STI = 0.50) and the privacy distance ``rP`` (STI = 0.20);
 * a full-width, landscape spatial-decay plot drawn by the result's own
   ``plot(ax=...)`` (the Clause 6.2 regression of the A-weighted speech level on
   the logarithmic distance axis, with the 4 m read-off marked and the ``rD`` /
@@ -302,8 +302,8 @@ def render_iso3382_3_report(
     flow.append(
         Paragraph(
             t(
-                "Distraction distance r<sub>D</sub> (STI = 0,50) and privacy "
-                "distance r<sub>P</sub> (STI = 0,20) from a linear regression "
+                "Distraction distance r<sub>D</sub> (STI = 0.50) and privacy "
+                "distance r<sub>P</sub> (STI = 0.20) from a linear regression "
                 "of the speech transmission index against distance (full "
                 "IEC 60268-16 method, spatially averaged background noise; "
                 "ISO 3382-3:2012, 6.3, Figure 3 b).",

@@ -214,6 +214,73 @@ def test_verdict_both_ways(tmp_path) -> None:
     assert "FAIL" in _extract_text(str(failing))
 
 
+def test_verdict_uses_display_rounded_values(tmp_path) -> None:
+    """A rating that displays as the target must PASS at the boundary.
+
+    The fiche prints the NC rating to one decimal, so the verdict compares
+    the display-rounded values: a tangency rating of 40.0125 (250 Hz level
+    0.01 dB above the NC-40 curve) prints as 40.0 and must PASS a target of
+    40 rather than failing on the invisible third decimal.
+    """
+    contour = rn.nc_curve(40.0)
+    levels = contour - 5.0
+    levels[4] = contour[4] + 0.01  # 250 Hz a hair above the NC-40 curve.
+    result = rn.noise_criterion(levels)
+    assert 40.0 < result.rating < 40.05
+    out = tmp_path / "boundary.pdf"
+    result.report(str(out), metadata=_full_metadata(requirement=40.0))
+    text = _extract_text(str(out))
+    assert "PASS" in text and "FAIL" not in text
+
+
+def test_nc_sil_designation_renders(tmp_path) -> None:
+    """A SIL-designated spectrum (clause 5.2.2) boxes NC-(SIL), no band."""
+    result = rn.noise_criterion(rn.nc_curve(40.0))
+    assert result.method == "SIL"
+    out = tmp_path / "nc_sil.pdf"
+    result.report(str(out), metadata=_full_metadata())
+    text = _extract_text(str(out))
+    assert "NC-40" in text
+    assert "SIL = 40.5" in text
+    assert "Governing band" not in text
+
+
+def test_nc_out_of_range_above_renders(tmp_path) -> None:
+    """A spectrum above NC-70 renders >NC-70 and fails any in-family target."""
+    import numpy as np
+
+    result = rn.noise_criterion(np.full(10, 110.0))
+    out = tmp_path / "nc_above.pdf"
+    result.report(str(out), metadata=_full_metadata(requirement=70.0), verbose=True)
+    text = _extract_text(str(out))
+    assert ">NC-70" in text
+    assert "NC-71" not in text  # the pre-fix fabricated designation
+    assert ">70" in text  # verbose contour column and verdict value
+    assert "FAIL" in text
+
+
+def test_nc_out_of_range_below_renders(tmp_path) -> None:
+    """A spectrum below NC-15 renders <NC-15 and passes any in-family target."""
+    import numpy as np
+
+    result = rn.noise_criterion(np.full(10, 5.0))
+    out = tmp_path / "nc_below.pdf"
+    result.report(str(out), metadata=_full_metadata(requirement=15.0), verbose=True)
+    text = _extract_text(str(out))
+    assert "<NC-15" in text
+    assert "NC-14" not in text  # the pre-fix fabricated designation
+    assert "PASS" in text
+
+
+def test_rc_out_of_family_note_renders(tmp_path) -> None:
+    """An RC rating outside RC-25 to RC-50 renders the extrapolation note."""
+    result = rn.room_criterion(rn.rc_curve(55.0))
+    assert result.out_of_family
+    out = tmp_path / "rc_oof.pdf"
+    result.report(str(out), metadata=_full_metadata())
+    assert "Outside the tabulated RC-25 to RC-50 family" in _extract_text(str(out))
+
+
 def test_report_without_requirement_has_no_verdict(tmp_path) -> None:
     """With no target rating the assessment fiche omits the verdict row."""
     out = tmp_path / "noverdict.pdf"

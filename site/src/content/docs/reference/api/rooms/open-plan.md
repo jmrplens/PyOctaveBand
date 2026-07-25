@@ -17,8 +17,8 @@ From a line of measurement positions across workstations (ISO 3382-3:2012,
   (Clause 6.2), obtained by a least-squares fit of the A-weighted speech
   level against `lg(r/r0)` (logarithmic distance axis, `r0 = 1 m`)
   using only positions in the 2 m to 16 m range (Equation (5)); and
-- the distraction distance `rD` (STI = 0,50) and privacy distance
-  `rP` (STI = 0,20) (Clause 3.6, 3.7, 6.3), obtained from a linear
+- the distraction distance `rD` (STI = 0.50) and privacy distance
+  `rP` (STI = 0.20) (Clause 3.6, 3.7, 6.3), obtained from a linear
   regression of the speech transmission index against distance on a
   linear axis.
 
@@ -33,7 +33,7 @@ method of Clause 6.3, Figure 3 b). A distance is reported as `nan` when
 the STI does not decrease with distance (non-negative fitted slope) or when
 the crossing would fall at or before the source, realising the standard's
 note that it "can prove impossible to determine the privacy distance if
-STI > 0,20 in all positions" (Clause 6.3).
+STI > 0.20 in all positions" (Clause 6.3).
 
 ## open_plan_metrics
 
@@ -51,8 +51,8 @@ Computes the spatial decay rate `D2,S` and the nominal A-weighted
 speech level at 4 m `Lp,A,S,4m` (Clause 6.2, Equation (5)) from a
 least-squares fit of the A-weighted speech level against `lg(r/r0)`
 (`r0 = 1 m`) restricted to positions in the 2 m to 16 m range, and
-the distraction distance `rD` (STI = 0,50) and privacy distance
-`rP` (STI = 0,20) from a linear regression of STI against distance
+the distraction distance `rD` (STI = 0.50) and privacy distance
+`rP` (STI = 0.20) from a linear regression of STI against distance
 (Clause 3.6, 3.7, 6.3).
 
 **Parameters**
@@ -85,8 +85,8 @@ Single-number open-plan-office quantities (ISO 3382-3:2012, Cl. 4).
 | :--- | :--- |
 | `d2s` | Spatial decay rate of the A-weighted SPL of speech in dB (per distance doubling), from the least-squares fit of Clause 6.2, Equation (5). `nan` when fewer than two positions lie in the 2 m to 16 m range. |
 | `lp_as_4m` | Nominal A-weighted speech level at 4 m in dB, read off the same regression line (Clause 3.3, 6.2). `nan` under the same condition as `d2s`. |
-| `rd` | Distraction distance in m, where the linear STI-vs-distance regression crosses 0,50 (Clause 3.6, 6.3). `nan` when the fitted STI does not decrease with distance or the crossing is non-positive. |
-| `rp` | Privacy distance in m, where the same regression crosses 0,20 (Clause 3.7, 6.3), possibly extrapolated beyond the measured range. `nan` under the same condition as `rd`. |
+| `rd` | Distraction distance in m, where the linear STI-vs-distance regression crosses 0.50 (Clause 3.6, 6.3). `nan` when the fitted STI does not decrease with distance or the crossing is non-positive. |
+| `rp` | Privacy distance in m, where the same regression crosses 0.20 (Clause 3.7, 6.3), possibly extrapolated beyond the measured range. `nan` under the same condition as `rd`. |
 
 ### OpenPlanResult.plot()
 

@@ -31,7 +31,7 @@ integration without tail compensation (C = 0), which under-estimates T;
 because this module compensates the truncated tail (5.3.3, Equation (3),
 C != 0) with a residual positive bias, the T20 and T30 flags add extra
 headroom (46 dB for T20, 54 dB for T30) so that a flagged-valid decay
-time stays within the 5 % just-noticeable difference of ISO 3382-2:2008,
+time stays within the 5 % just-noticeable difference of ISO 3382-1:2009,
 Table A.1. The curvature indicator C = 100*(T30/T20 - 1) follows
 ISO 3382-2:2008, B.3; values above 10 % flag a decay curve that is far
 from a straight line.
@@ -58,7 +58,11 @@ if TYPE_CHECKING:
 _DEFAULT_BANDS = (125.0, 4000.0)
 
 #: Onset threshold: the direct sound starts where the squared IR first
-#: rises to within 20 dB of its maximum (t = 0 per ISO 3382-1, A.2.1).
+#: rises to within 20 dB of its maximum (trigger point per ISO 3382-1:2009,
+#: A.3.4, which places it where the signal first rises significantly above
+#: the background but is more than 20 dB below the maximum; this detector
+#: takes the first sample at/above the -20 dB edge, one sample inside that
+#: bound, which errs early - the safe direction, see :func:`_onset_index`).
 _ONSET_DB = 20.0
 
 #: Fraction of the (onset-trimmed) response used to estimate the
@@ -78,7 +82,7 @@ _NOISE_MARGIN_DB = 15.0
 #: tail (Schroeder Eq. (3), C != 0), whose residual bias is POSITIVE and
 #: larger than the +15 dB budget: at the bare thresholds (35 dB T20, 45 dB
 #: T30) a flagged-valid decay time still carries a bias above the 5 % JND
-#: (ISO 3382-2:2008 Table A.1). The flagged-valid bias only falls below the
+#: (ISO 3382-1:2009 Table A.1). The flagged-valid bias only falls below the
 #: JND at dyn >= 46 dB (T20) and dyn >= 54 dB (T30), i.e. +11 dB / +9 dB of
 #: extra headroom, at the cost of flagging borderline measurements invalid.
 _T20_TAIL_HEADROOM_DB = 11.0
@@ -118,7 +122,7 @@ class RoomAcousticsResult:
     least evaluation range + 15 dB below the maximum: 25 dB for EDT), with
     T20 and T30 tightened to 46 dB and 54 dB to absorb the positive bias of
     the tail compensation (5.3.3, Eq. (3)) and keep a flagged-valid value
-    within the 5 % JND (ISO 3382-2:2008, Table A.1); they are False when the
+    within the 5 % JND (ISO 3382-1:2009, Table A.1); they are False when the
     value could not be evaluated. ``curvature`` is
     C = 100*(T30/T20 - 1) in percent (ISO 3382-2:2008, B.3); values
     above 10 % indicate an unreliable, non-straight decay.
@@ -169,14 +173,17 @@ class RoomAcousticsResult:
         per-band parameter table (T20/T30/EDT and C50/C80/D50/Ts) above the
         result's own per-band decay-time plot (:meth:`plot`), the boxed
         mid-frequency reverberation time T_mid (the mean of the 500 Hz and
-        1000 Hz octave T30), an optional verdict row and a footer with the
-        fixed disclaimer. ISO 3382-1/-2 are characterisation standards with no
-        intrinsic pass/fail, so the verdict row appears only when a target
-        mid-frequency T is supplied through ``metadata.requirement`` (read as
-        the maximum acceptable T_mid). A broadband result (``frequency`` is
-        ``None``) has no 500 Hz and 1000 Hz octave bands to average, so the box
-        and the verdict fall back to the plain broadband T30 instead of a
-        mid-frequency average, with no "500-1000 Hz" label.
+        1000 Hz band T30; a one-third-octave analysis averages the 500 Hz and
+        1 kHz one-third-octave bands and labels them as such), an optional
+        verdict row and a footer with the fixed disclaimer. ISO 3382-1/-2 are
+        characterisation standards with no intrinsic pass/fail, so the verdict
+        row appears only when a target mid-frequency T is supplied through
+        ``metadata.requirement`` (read as the maximum acceptable T_mid). A
+        broadband result (``frequency`` is ``None``) has no 500 Hz and 1000 Hz
+        bands to average, so the box and the verdict fall back to the plain
+        broadband T30 instead of a mid-frequency average, with no
+        "500-1000 Hz" label; a band range without both mid bands boxes its
+        first finite T30 band, named explicitly.
 
         :param path: Destination path of the PDF file.
         :param metadata: Optional
@@ -211,8 +218,12 @@ class RoomAcousticsResult:
 
 def _onset_index(p2: np.ndarray) -> int:
     """Index where the direct sound starts: first sample of the squared
-    IR within ``_ONSET_DB`` of its maximum (t = 0 per ISO 3382-1, A.2.1).
+    IR within ``_ONSET_DB`` of its maximum (trigger per ISO 3382-1, A.3.4).
 
+    A.3.4 places the trigger where the signal first rises significantly
+    above the background but is "more than 20 dB below the maximum"; this
+    detector takes the first sample at or above the -20 dB edge, i.e. one
+    sample inside that bound rather than the last sample outside it.
     Taking the *first* sample within the threshold makes the detector err
     early, which is the safe direction: a late onset that clips the direct
     sound is catastrophic for the early-to-late energy ratios (a +1 ms late
@@ -516,7 +527,7 @@ def room_parameters(
     at least evaluation range + 15 dB below the maximum of the impulse
     response: 25 dB for EDT), with T20 and T30 raised to 46 dB and 54 dB
     to absorb the positive bias of the tail compensation and keep a
-    flagged-valid decay time within the 5 % JND (ISO 3382-2:2008,
+    flagged-valid decay time within the 5 % JND (ISO 3382-1:2009,
     Table A.1).
 
     :param ir: Measured impulse response (1D).

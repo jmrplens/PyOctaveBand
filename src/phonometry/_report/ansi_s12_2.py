@@ -4,8 +4,10 @@
 Renders the two room-noise ratings of ANSI/ASA S12.2-2019 to a one-page PDF
 laid out like a room-noise assessment report:
 
-* a :class:`~phonometry.room.room_noise.NCResult` (Noise Criteria, Table 1,
-  tangency method): the NC rating and the governing octave band; and
+* a :class:`~phonometry.room.room_noise.NCResult` (Noise Criteria, clause
+  5.2.2): the NC designation (NC-(SIL), or the tangency rating with its
+  governing octave band; ``">NC-70"`` / ``"<NC-15"`` outside the Table 1
+  family); and
 * a :class:`~phonometry.room.room_noise.RCResult` (Room Criteria Mark II,
   Annex D): the RC rating and its spectral-quality tag (neutral / rumble /
   hiss).
@@ -51,6 +53,7 @@ from ._layout import (
     _LIGHT_HEX,
     _REPORTLAB_HINT,
     build_document,
+    display_round,
     document_styles,
     escaped_pairs,
     fmt_meta,
@@ -176,8 +179,10 @@ def _nc_contour_column(levels: np.ndarray, language: str) -> list[str]:
 
     For each band the NC index whose Table 1 curve passes through the measured
     level is found by interpolation, exactly as
-    :func:`~phonometry.room.room_noise.noise_criterion` does; the rating is the
-    maximum of these values. A band with no measured level shows an em dash.
+    :func:`~phonometry.room.room_noise.noise_criterion` does; the tangency
+    rating is the maximum of these values. A band with no measured level shows
+    an em dash; a band outside the Table 1 family shows ``"<15"`` / ``">70"``
+    (no NC contour passes through it), never a fabricated number.
     """
     from ..room.room_noise import NC_CURVES, NC_INDICES
 
@@ -185,17 +190,13 @@ def _nc_contour_column(levels: np.ndarray, language: str) -> list[str]:
     for k, level in enumerate(levels):
         if not math.isfinite(level):
             cells.append("—")
-            continue
-        contour = float(
-            np.interp(
-                level,
-                NC_CURVES[:, k],
-                NC_INDICES,
-                left=float(NC_INDICES[0]) - 1.0,
-                right=float(NC_INDICES[-1]) + 1.0,
-            )
-        )
-        cells.append(format_number(contour, language, decimals=1))
+        elif level > NC_CURVES[-1, k]:
+            cells.append(">70")
+        elif level < NC_CURVES[0, k]:
+            cells.append("<15")
+        else:
+            contour = float(np.interp(level, NC_CURVES[:, k], NC_INDICES))
+            cells.append(format_number(contour, language, decimals=1))
     return cells
 
 
@@ -291,15 +292,69 @@ def _rating_label(value: float) -> str:
 
 
 def _nc_statement_terms(result: NCResult, language: str) -> tuple[str, list[str]]:
-    """The boxed ``NC-nn`` statement and the governing-band extended term."""
+    """The boxed NC designation and its extended terms (clause 5.2.2).
+
+    A SIL-designated spectrum boxes ``NC-nn`` with the SIL value; a tangency
+    rating adds the governing band; a spectrum outside the Table 1 family
+    boxes ``>NC-70`` / ``<NC-15`` and states that no NC rating is defined.
+    """
+    extended: list[str] = []
+    if math.isfinite(result.sil):
+        extended.append(
+            t(
+                "Speech interference level SIL = {value} dB", language
+            ).format(value=format_number(result.sil, language, decimals=1))
+        )
+    if result.out_of_range == "above":
+        statement = "&gt;NC-<b>70</b>"
+        extended.append(
+            t("Governing band: {value} Hz", language).format(
+                value=f"{float(result.governing_frequency):g}"
+            )
+        )
+        extended.append(
+            t(
+                "Above the highest tabulated curve NC-70; no NC rating is "
+                "defined (ANSI/ASA S12.2-2019, Table 1).",
+                language,
+            )
+        )
+        return statement, extended
+    if result.out_of_range == "below":
+        statement = "&lt;NC-<b>15</b>"
+        extended.append(
+            t(
+                "Below the lowest tabulated curve NC-15; no NC rating is "
+                "defined (ANSI/ASA S12.2-2019, Table 1).",
+                language,
+            )
+        )
+        return statement, extended
     value = _rating_label(float(result.rating))
     statement = f"NC-<b>{value}</b>"
-    extended = [
-        t("Governing band: {value} Hz", language).format(
-            value=f"{float(result.governing_frequency):g}"
-        ),
-        t("Rated by the tangency method (ANSI/ASA S12.2-2019).", language),
-    ]
+    if result.method == "SIL":
+        extended.append(
+            t(
+                "Designated NC-(SIL): no octave band exceeds the NC-(SIL) "
+                "curve (ANSI/ASA S12.2-2019, 5.2.2).",
+                language,
+            )
+        )
+    else:
+        extended.append(
+            t("Governing band: {value} Hz", language).format(
+                value=f"{float(result.governing_frequency):g}"
+            )
+        )
+        extended.append(
+            t(
+                "Rated by the tangency method: the spectrum exceeds the "
+                "NC-(SIL) curve (ANSI/ASA S12.2-2019, 5.2.2 and 5.2.3).",
+                language,
+            )
+            if math.isfinite(result.sil)
+            else t("Rated by the tangency method (ANSI/ASA S12.2-2019).", language)
+        )
     return statement, extended
 
 
@@ -313,7 +368,12 @@ _RC_QUALITY = {
 
 
 def _rc_statement_terms(result: RCResult, language: str) -> tuple[str, list[str]]:
-    """The boxed ``RC-nn(tag)`` statement and its RC extended terms."""
+    """The boxed ``RC-nn(tag)`` statement and its RC extended terms.
+
+    A rating outside the tabulated RC-25 to RC-50 family (Table D.1) adds a
+    note that the reference curve is an extrapolation; the combined ``RH``
+    tag is labelled as the library's diagnostic extension of clause D.3.
+    """
     statement = f"RC-<b>{result.rating}</b>({result.classification})"
     quality = _RC_QUALITY.get(result.classification, "neutral")
     extended = [
@@ -322,21 +382,54 @@ def _rc_statement_terms(result: RCResult, language: str) -> tuple[str, list[str]
         ),
         t("Spectral quality: {value}", language).format(value=t(quality, language)),
     ]
+    if result.classification == "RH":
+        extended.append(
+            t(
+                "Combined rumble-and-hiss tag: an extension beyond the "
+                "clause D.3.5 letters (N, R, H or RV).",
+                language,
+            )
+        )
+    if result.out_of_family:
+        extended.append(
+            t(
+                "Outside the tabulated RC-25 to RC-50 family; the reference "
+                "curve is extrapolated (ANSI/ASA S12.2-2019, Table D.1).",
+                language,
+            )
+        )
     return statement, extended
 
 
 def _verdict(
-    symbol: str, rating: float, requirement: float, language: str
+    symbol: str,
+    rating: float,
+    requirement: float,
+    language: str,
+    out_of_range: str | None = None,
 ) -> tuple[str, bool]:
     """Verdict text and PASS flag: a room-noise rating passes at or below target.
 
     A lower NC or RC rating is quieter, so the room complies when its rating is
-    at or below the supplied target.
+    at or below the supplied target. The comparison uses the values rounded
+    exactly as the fiche displays them (rating to one decimal, target to the
+    nearest integer), so the printed numbers can never contradict the verdict.
+    An NC spectrum outside the Table 1 family has no rating: above the family
+    it fails any target, below it it passes (quieter than NC-15, the lowest
+    target the family can express).
     """
-    passed = float(rating) <= requirement
+    if out_of_range == "above":
+        passed = False
+        value = "&gt;70"
+    elif out_of_range == "below":
+        passed = True
+        value = "&lt;15"
+    else:
+        passed = display_round(float(rating), 1) <= display_round(requirement, 0)
+        value = _rating_label(float(rating))
     text = t("{symbol} {value}, required &#8804; {req}", language).format(
         symbol=symbol,
-        value=_rating_label(float(rating)),
+        value=value,
         req=format_number(requirement, language, decimals=0),
     )
     return text, passed
@@ -409,8 +502,15 @@ def _render_room_noise(
     flow.append(result_box(statement, styles, accent, extended))
 
     if metadata is not None and metadata.requirement is not None:
+        # Only NCResult carries the textual out_of_range flag; RCResult's
+        # out_of_family annotation does not alter the numeric verdict.
+        oor = getattr(result, "out_of_range", None)
         text, passed = _verdict(
-            symbol, float(result.rating), metadata.requirement, language
+            symbol,
+            float(result.rating),
+            metadata.requirement,
+            language,
+            out_of_range=oor if isinstance(oor, str) else None,
         )
         flow.extend(verdict_flow(text, passed, styles, language))
     flow.extend(footer_flow(metadata, language))
@@ -444,7 +544,9 @@ def render_nc_report(
         result,
         path,
         basis_template=(
-            "Noise Criteria (NC) rating by the tangency method (ANSI/ASA S12.2-2019)."
+            "Noise Criteria (NC) rating: NC-(SIL) designation, or the "
+            "tangency method when the spectrum exceeds the NC-(SIL) curve "
+            "(ANSI/ASA S12.2-2019, 5.2.2)."
         ),
         left_builder=_nc_left_cell,
         statement_builder=_nc_statement_terms,

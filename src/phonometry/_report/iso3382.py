@@ -15,9 +15,11 @@ evaluated by the integrated impulse-response method of ISO 3382-1:2009, 5.3.3):
   reverberation times T20/T30/EDT and the energy parameters C50/C80/D50/Ts)
   above the result's own per-band decay-time plot (drawn by ``plot(ax=...)`` so
   the chart is native to the library);
-* a boxed single-number result, the mid-frequency reverberation time T_mid (the
-  mean of the 500 Hz and 1000 Hz octave T30, the customary room descriptor)
-  with the mid-frequency EDT alongside;
+* a boxed single-number result, the mid-frequency reverberation time T_mid
+  (the mean of the 500 Hz and 1000 Hz band T30, the customary room
+  descriptor; an octave analysis averages the two octaves, a one-third-octave
+  analysis averages the 500 Hz and 1 kHz one-third-octave bands and is
+  labelled as such) with the mid-frequency EDT alongside;
 * an optional verdict row when a target mid-frequency reverberation time is
   supplied (ISO 3382-1/-2 are characterisation standards with no intrinsic
   pass/fail, so the row appears only when a requirement is given);
@@ -47,6 +49,7 @@ from ._layout import (
     _LIGHT_HEX,
     _REPORTLAB_HINT,
     build_document,
+    display_round,
     document_styles,
     escaped_pairs,
     fmt_meta,
@@ -62,8 +65,10 @@ from .metadata import ReportMetadata
 if TYPE_CHECKING:
     from ..room.room_acoustics import RoomAcousticsResult
 
-#: Octave centres whose T30 mean is the mid-frequency reverberation-time
-#: descriptor T_mid quoted for rooms (the 500 Hz and 1000 Hz octave bands).
+#: Band centres whose T30 mean is the mid-frequency reverberation-time
+#: descriptor T_mid quoted for rooms: the 500 Hz and 1000 Hz bands at the
+#: analysed fraction (octaves, or the two one-third-octave bands, labelled
+#: accordingly by the statement).
 _TMID_BANDS = (500.0, 1000.0)
 
 #: Tolerance (Hz, relative) for matching a band centre to a nominal frequency.
@@ -274,18 +279,36 @@ def _band_value(
     return float(values[idx])
 
 
+def _band_fraction(frequency: np.ndarray | None) -> int:
+    """The band fraction of a result: octave (1) or one-third octave (3).
+
+    Uses the shared :func:`.._infer_band_fraction` classifier so the boxed
+    descriptor is labelled with exactly the band structure the table and plot
+    use; a broadband result defaults to octave (the label is unused then).
+    """
+    if frequency is None:
+        return 1
+    from ..metrology.frequencies import _infer_band_fraction
+
+    return _infer_band_fraction(np.asarray(frequency, dtype=np.float64))
+
+
 def _reverberation_descriptor(
     result: RoomAcousticsResult, values: np.ndarray
-) -> tuple[float, bool]:
-    """Return ``(value, is_mid)`` for the boxed reverberation-time descriptor.
+) -> tuple[float, bool, float]:
+    """Return ``(value, is_mid, band)`` for the boxed reverberation descriptor.
 
     When the result carries frequency bands and both the 500 Hz and 1000 Hz
-    octaves are present and finite, the descriptor is the mid-frequency mean of
-    those two bands (T_mid / EDT_mid, the customary ISO 3382 room descriptor)
-    and ``is_mid`` is True. For a broadband result (``frequency is None``) or a
-    band range that does not span both mid octaves, the descriptor is the first
-    finite value with ``is_mid`` False, so the fiche never makes a false
-    "500-1000 Hz" claim about a value that was not averaged over those bands.
+    band centres are present and finite, the descriptor is the mid-frequency
+    mean of those two bands (T_mid / EDT_mid, the customary ISO 3382 room
+    descriptor; for a one-third-octave analysis these are the 500 Hz and
+    1 kHz one-third-octave bands and the fiche labels them as such) and
+    ``is_mid`` is True (``band`` is NaN). For a broadband result
+    (``frequency is None``) or a band range that does not span both mid
+    bands, the descriptor is the first finite value with ``is_mid`` False and
+    ``band`` its exact band centre (NaN for broadband), so the fiche never
+    makes a false mid-frequency claim about a value that was not averaged
+    over those bands and always names the band the fallback value came from.
     """
     freq = result.frequency
     arr = np.asarray(values, dtype=np.float64)
@@ -293,43 +316,91 @@ def _reverberation_descriptor(
         low = _band_value(freq, arr, _TMID_BANDS[0])
         high = _band_value(freq, arr, _TMID_BANDS[1])
         if math.isfinite(low) and math.isfinite(high):
-            return 0.5 * (low + high), True
-    finite = arr[np.isfinite(arr)]
-    value = float(finite[0]) if finite.size else float("nan")
-    return value, False
+            return 0.5 * (low + high), True, float("nan")
+    finite = np.flatnonzero(np.isfinite(arr))
+    if not finite.size:
+        return float("nan"), False, float("nan")
+    idx = int(finite[0])
+    band = (
+        float(np.asarray(freq, dtype=np.float64)[idx])
+        if freq is not None
+        else float("nan")
+    )
+    return float(arr[idx]), False, band
 
 
 def _statement(result: RoomAcousticsResult, language: str = "en") -> tuple[str, list[str]]:
     """The boxed reverberation-time descriptor and its extended EDT term.
 
-    A band result spanning the 500 Hz and 1000 Hz octaves boxes the
-    mid-frequency T_mid; a broadband result (or a range without both mid
-    octaves) boxes the plain reverberation time T30 without a "500-1000 Hz"
-    label, since no such averaging happened.
+    A band result spanning the 500 Hz and 1000 Hz bands boxes the
+    mid-frequency T_mid, labelled "500-1000 Hz" for an octave analysis; a
+    thirds analysis boxes a plain T_mid and adds an extended note naming the
+    500 Hz and 1 kHz one-third-octave bands, since only those two bands are
+    averaged (not the full octaves) and the long label does not fit the
+    box. A broadband result boxes the plain T30; a band range without
+    both mid bands boxes the first finite T30 band, named explicitly. The
+    EDT term picks its "EDT_mid" vs "EDT" form from EDT's own band coverage,
+    which can differ from T30's when a mid band's EDT is not evaluable.
     """
-    t_value, is_mid = _reverberation_descriptor(
+    fraction = _band_fraction(result.frequency)
+    t_value, t_is_mid, t_band = _reverberation_descriptor(
         result, np.asarray(result.t30, dtype=np.float64)
     )
-    edt_value, _ = _reverberation_descriptor(
+    edt_value, edt_is_mid, edt_band = _reverberation_descriptor(
         result, np.asarray(result.edt, dtype=np.float64)
     )
-    if is_mid:
+    if t_is_mid and fraction == 1:
         statement = t(
             "T<sub>mid</sub> (500-1000 Hz) = <b>{value} s</b>", language
         ).format(value=_cell(t_value, 2, language))
-        edt_key = "EDT<sub>mid</sub> = {value} s"
+    elif t_is_mid:
+        # One-third-octave data: only the 500 Hz and 1 kHz one-third-octave
+        # bands are averaged, so the octave "500-1000 Hz" label would be
+        # false; the extended note names the bands (the long label does not
+        # fit the boxed statement).
+        statement = t("T<sub>mid</sub> = <b>{value} s</b>", language).format(
+            value=_cell(t_value, 2, language)
+        )
+    elif math.isfinite(t_band):
+        statement = t(
+            "T<sub>30</sub> ({band} Hz) = <b>{value} s</b>", language
+        ).format(
+            band=_band_label(t_band, fraction),
+            value=_cell(t_value, 2, language),
+        )
     else:
         statement = t("T<sub>30</sub> = <b>{value} s</b>", language).format(
             value=_cell(t_value, 2, language)
         )
-        edt_key = "EDT = {value} s"
     extended: list[str] = []
-    if math.isfinite(edt_value):
+    if (t_is_mid or edt_is_mid) and fraction == 3:
         extended.append(
-            t(edt_key, language).format(
-                value=format_number(edt_value, language, decimals=2)
+            t(
+                "Mid-frequency mean over the 500 Hz and 1 kHz "
+                "one-third-octave bands.",
+                language,
             )
         )
+    if math.isfinite(edt_value):
+        if edt_is_mid:
+            extended.append(
+                t("EDT<sub>mid</sub> = {value} s", language).format(
+                    value=format_number(edt_value, language, decimals=2)
+                )
+            )
+        elif math.isfinite(edt_band):
+            extended.append(
+                t("EDT ({band} Hz) = {value} s", language).format(
+                    band=_band_label(edt_band, fraction),
+                    value=format_number(edt_value, language, decimals=2),
+                )
+            )
+        else:
+            extended.append(
+                t("EDT = {value} s", language).format(
+                    value=format_number(edt_value, language, decimals=2)
+                )
+            )
     return statement, extended
 
 
@@ -343,12 +414,16 @@ def _verdict(
     limit): the room passes when its measured descriptor is at or below it. The
     verdict names T_mid only when the descriptor is the mid-frequency mean; a
     broadband result is checked against its plain T30, with no "500-1000 Hz"
-    claim.
+    claim. The comparison uses both values rounded exactly as the fiche
+    displays them (two decimals, halves away from zero), so the printed
+    numbers can never contradict the verdict at the tolerance boundary.
     """
-    t_value, is_mid = _reverberation_descriptor(
+    t_value, is_mid, _ = _reverberation_descriptor(
         result, np.asarray(result.t30, dtype=np.float64)
     )
-    passed = math.isfinite(t_value) and t_value <= requirement
+    passed = math.isfinite(t_value) and display_round(t_value, 2) <= display_round(
+        requirement, 2
+    )
     key = (
         "T<sub>mid</sub> = {value} s, required &#8804; {req} s"
         if is_mid
@@ -424,8 +499,8 @@ def render_iso3382_report(
     # one A4 page (an octave range keeps the roomier spacing and a taller plot).
     n_bands = np.asarray(result.t30, dtype=np.float64).size
     compact = n_bands > 8
-    gap = 4 if compact else 8
-    fig_height = 2.2 if compact else 3.9
+    gap = 3 if compact else 8
+    fig_height = 2.0 if compact else 3.9
 
     if metadata is not None and not metadata.is_empty():
         header_pairs = _metadata_pairs(metadata, language)

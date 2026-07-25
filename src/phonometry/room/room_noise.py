@@ -5,9 +5,14 @@ Room-noise rating curves per ANSI/ASA S12.2-2019.
 Implements the two spectrum-in rating methods of ANSI/ASA S12.2-2019, *Criteria
 for Evaluating Room Noise*:
 
-* **Noise Criteria (NC)** by the tangency method (Table 1). The NC rating is the
-  value of the highest NC curve touched by the measured octave-band spectrum,
-  reported together with the governing band.
+* **Noise Criteria (NC)** by the two-step procedure of clause 5.2.2. The
+  speech interference level SIL (clause 3.2, the average of the 500, 1000,
+  2000 and 4000 Hz octave-band levels) selects the NC-(SIL) curve; when no
+  octave band exceeds that curve, the spectrum is designated NC-(SIL), and
+  otherwise the rating is determined by the tangency method (clause 5.2.3:
+  the value of the highest NC curve of Table 1 touched by the spectrum,
+  reported together with the governing band). The tangency rating is always
+  evaluated and kept available on the result.
 * **Room Criteria Mark II (RC)** (Annex D, Table D.1). The numerical rating is
   the mid-frequency average ``LMF`` (500/1000/2000 Hz) rounded to the nearest
   decibel (clause D.4); the spectral tag ``N``/``R``/``H`` follows the
@@ -19,13 +24,16 @@ from the -5 dB/octave rule of Annex D (16 Hz equal to 31.5 Hz, with the low
 frequencies not dropping below 55 dB), which reproduces Table D.1 exactly.
 
 The balanced noise criteria (NCB), the room noise criterion for fluctuating
-low-frequency noise (RNC, Annex A) and the numeric quality-assessment index
-(QAI, clause D.5 - deferred by the standard to external references) are not
-implemented here.
+low-frequency noise (RNC, Annex A), the acoustically induced vibration and
+rattle classification (``RV``, clause D.3.4, which needs the Table 6 test)
+and the numeric quality-assessment index (QAI, clause D.5 - deferred by the
+standard to external references) are not implemented here.
 """
 
 from __future__ import annotations
 
+import math
+import warnings
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -82,21 +90,70 @@ _RC_LOW_FREQUENCY_FLOOR = 55.0  # dB, the 31.5 Hz floor (Annex D).
 _N_BANDS = OCTAVE_BANDS.size
 _F1000_INDEX = 6  # index of the 1000 Hz band in OCTAVE_BANDS.
 
+#: Indices of the four speech-interference bands 500/1000/2000/4000 Hz
+#: (clause 3.2: SIL is their arithmetic average).
+_SIL_BANDS = slice(5, 9)
+
+#: Indices of the octave bands clause D.4 requires for an RC Mark II rating
+#: (at least the bands from 31.5 Hz through 4000 Hz).
+_RC_REQUIRED_BANDS = slice(1, 9)
+
 
 @dataclass(frozen=True)
 class NCResult:
-    """Result of a Noise Criteria (NC) rating (ANSI/ASA S12.2-2019, tangency).
+    """Result of a Noise Criteria (NC) rating (ANSI/ASA S12.2-2019, 5.2).
 
-    :ivar rating: The NC rating (value of the highest NC curve touched).
-    :ivar governing_frequency: Band, in hertz, where the touch occurs.
+    :ivar rating: The reported NC designation, following the two-step
+        procedure of clause 5.2.2: when no octave band exceeds the NC-(SIL)
+        curve chosen from the speech interference level, the designation is
+        NC-(SIL); otherwise it is the tangency rating (clause 5.2.3). NaN
+        when the spectrum lies outside the NC-15 to NC-70 family of Table 1
+        (see ``out_of_range``).
+    :ivar governing_frequency: Band, in hertz, where the tangency touch
+        occurs (for a spectrum above the family, the band of maximum
+        exceedance over the NC-70 curve); NaN for a SIL-designated spectrum,
+        which has no governing band.
     :ivar frequencies: Octave-band centre frequencies evaluated, in hertz.
     :ivar levels: Measured octave-band sound pressure levels, in dB.
+    :ivar sil: Speech interference level, in dB: the arithmetic average of
+        the 500, 1000, 2000 and 4000 Hz octave-band levels (clause 3.2);
+        NaN when any of the four bands is missing.
+    :ivar tangency_rating: The tangency-method rating (clause 5.2.3), always
+        evaluated; NaN when the spectrum lies outside the Table 1 family.
+    :ivar method: ``"SIL"`` when the designation is the clause 5.2.2
+        NC-(SIL) value, ``"tangency"`` otherwise.
+    :ivar out_of_range: ``None`` inside the NC-15 to NC-70 family;
+        ``"above"`` when a band exceeds the NC-70 curve (no NC rating is
+        defined, ``label`` reads ``">NC-70"``); ``"below"`` when every
+        measured band lies below the NC-15 curve (``label`` reads
+        ``"<NC-15"``).
     """
 
     rating: float
     governing_frequency: float
     frequencies: np.ndarray
     levels: np.ndarray
+    sil: float = float("nan")
+    tangency_rating: float = float("nan")
+    method: str = "tangency"
+    out_of_range: str | None = None
+
+    @property
+    def label(self) -> str:
+        """The textual NC designation.
+
+        ``"NC-44"`` for a SIL-designated spectrum, ``"NC-51 (125 Hz)"`` for a
+        tangency rating with its governing band (the form of clause 5.2.3),
+        and ``">NC-70 (63 Hz)"`` / ``"<NC-15"`` for a spectrum outside the
+        Table 1 family, for which the standard defines no NC rating.
+        """
+        if self.out_of_range == "above":
+            return f">NC-70 ({self.governing_frequency:g} Hz)"
+        if self.out_of_range == "below":
+            return "<NC-15"
+        if self.method == "SIL":
+            return f"NC-{self.rating:g}"
+        return f"NC-{self.rating:g} ({self.governing_frequency:g} Hz)"
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -127,8 +184,10 @@ class NCResult:
         the standard-basis line, an optional metadata header block, the
         measured octave-band levels beside the measured spectrum plotted
         against the NC curve family (the result's own :meth:`plot`), the boxed
-        ``NC-nn`` rating with its governing band, an optional verdict row and a
-        footer with the fixed disclaimer.
+        NC designation (the clause 5.2.2 NC-(SIL) value, or the tangency
+        rating with its governing band; ``">NC-70"`` / ``"<NC-15"`` outside
+        the Table 1 family), an optional verdict row and a footer with the
+        fixed disclaimer.
 
         :param path: Destination path of the PDF file.
         :param metadata: Optional
@@ -166,8 +225,13 @@ class RCResult:
 
     :ivar rating: Numerical RC designation ``LMF`` rounded to the nearest dB.
     :ivar lmf: Mid-frequency average (500/1000/2000 Hz), in dB (clause D.4).
-    :ivar classification: Spectral tag, ``"N"`` (neutral), ``"R"`` (rumble),
-        ``"H"`` (hiss) or ``"RH"`` (both) (clause D.3).
+    :ivar classification: Spectral tag, ``"N"`` (neutral), ``"R"`` (rumble) or
+        ``"H"`` (hiss) per clause D.3, or ``"RH"`` when both the rumble and
+        the hiss deviation tests fire. Clause D.3.5 admits only the letters
+        N, R, H or the combination RV, so the combined ``"RH"`` tag is a
+        diagnostic extension of this library, not a clause D.3.5 designation.
+        The vibration/rattle tag ``RV`` (clause D.3.4) needs the Table 6
+        criterion test and is not implemented.
     :ivar reference_curve: The RC Mark II curve used for classification, in dB.
     :ivar frequencies: Octave-band centre frequencies evaluated, in hertz.
     :ivar levels: Measured octave-band sound pressure levels, in dB.
@@ -182,8 +246,25 @@ class RCResult:
 
     @property
     def label(self) -> str:
-        """The room-criterion label in the ``RC-NN(A)`` form (clause D.3.5)."""
+        """The room-criterion label in the ``RC-NN(A)`` form of clause D.3.5.
+
+        Clause D.3.5 admits N, R, H or RV as the tag; when both the rumble
+        and hiss deviations fire, this library labels the spectrum with the
+        combined ``RH`` extension (see :attr:`classification`).
+        """
         return f"RC-{self.rating}({self.classification})"
+
+    @property
+    def out_of_family(self) -> bool:
+        """True when the rating falls outside the tabulated RC-25 to RC-50 family.
+
+        Table D.1 tabulates the RC Mark II curves for ratings 25 through 50
+        and clause D.3.5 defines the ``RC-NN(A)`` label for integers in that
+        range. Outside it the reference curve is generated by the same
+        -5 dB/octave rule of Annex D, but the designation extrapolates beyond
+        the standard's tabulated family.
+        """
+        return not 25 <= self.rating <= 50
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -314,40 +395,100 @@ def _align_levels(levels: ArrayLike, frequencies: ArrayLike | None) -> np.ndarra
 def noise_criterion(
     levels: ArrayLike, frequencies: ArrayLike | None = None
 ) -> NCResult:
-    """Noise Criteria (NC) rating by the tangency method (ANSI/ASA S12.2-2019).
+    """Noise Criteria (NC) rating of a spectrum (ANSI/ASA S12.2-2019, 5.2.2).
 
-    The NC rating is the value of the highest NC curve touched by the measured
-    octave-band spectrum. For each band the NC index whose curve passes through
-    the measured level is found by interpolation; the rating is the maximum
-    over bands and the governing band is where that maximum occurs.
+    Follows the standard's two-step rating procedure. First the speech
+    interference level SIL (clause 3.2: the average of the 500, 1000, 2000
+    and 4000 Hz levels) selects the NC-(SIL) curve; when no octave band
+    exceeds that curve, the spectrum is designated NC-(SIL). Otherwise the
+    rating is determined by the tangency method (clause 5.2.3): for each band
+    the NC index whose Table 1 curve passes through the measured level is
+    found by interpolation, the rating is the maximum over bands and the
+    governing band is where that maximum occurs. The tangency rating is
+    always evaluated and kept on ``tangency_rating``; when the four SIL bands
+    are not all supplied, the tangency rating is the designation.
+
+    A spectrum outside the Table 1 family has no NC rating: when a band
+    exceeds the NC-70 curve the result is flagged ``out_of_range="above"``
+    (with the governing band at the maximum exceedance over NC-70), and when
+    every measured band lies below the NC-15 curve it is flagged
+    ``out_of_range="below"``; in both cases ``rating`` is NaN and ``label``
+    reads ``">NC-70"`` / ``"<NC-15"``.
 
     :param levels: Octave-band sound pressure levels, in dB. Without
         ``frequencies`` this must be the 10 bands from 16 Hz to 8000 Hz.
     :param frequencies: Optional band centre frequencies, in hertz, matching
         ``levels``; a subset of the ANSI S12.2 octave bands may be supplied.
-    :return: An :class:`NCResult` with the rating and its ``.plot()``.
+    :return: An :class:`NCResult` with the designation and its ``.plot()``.
     :raises ValueError: for malformed inputs or unknown band frequencies.
     """
     aligned = _align_levels(levels, frequencies)
     valid = ~np.isnan(aligned)
     if not valid.any():
         raise ValueError("no valid octave-band levels were supplied.")
-    per_band = np.full(_N_BANDS, -np.inf)
-    for k in range(_N_BANDS):
-        if valid[k]:
-            per_band[k] = np.interp(
-                aligned[k],
-                NC_CURVES[:, k],
-                NC_INDICES,
-                left=NC_INDICES[0] - 1.0,
-                right=NC_INDICES[-1] + 1.0,
-            )
-    governing = int(np.argmax(per_band))
-    return NCResult(
-        rating=float(per_band[governing]),
-        governing_frequency=float(OCTAVE_BANDS[governing]),
-        frequencies=OCTAVE_BANDS.copy(),
-        levels=aligned,
+
+    sil_levels = aligned[_SIL_BANDS]
+    sil = (
+        float(np.mean(sil_levels))
+        if not np.isnan(sil_levels).any()
+        else float("nan")
+    )
+
+    per_band = np.full(_N_BANDS, np.nan)
+    above = np.zeros(_N_BANDS, dtype=bool)
+    for k in np.flatnonzero(valid):
+        if aligned[k] > NC_CURVES[-1, k]:
+            above[k] = True  # louder than the NC-70 curve in this band.
+        elif aligned[k] >= NC_CURVES[0, k]:
+            per_band[k] = np.interp(aligned[k], NC_CURVES[:, k], NC_INDICES)
+        # A band below the NC-15 curve touches no curve and stays NaN.
+
+    def build(
+        rating: float,
+        governing_frequency: float,
+        tangency_rating: float,
+        method: str,
+        out_of_range: str | None,
+    ) -> NCResult:
+        return NCResult(
+            rating=rating,
+            governing_frequency=governing_frequency,
+            frequencies=OCTAVE_BANDS.copy(),
+            levels=aligned,
+            sil=sil,
+            tangency_rating=tangency_rating,
+            method=method,
+            out_of_range=out_of_range,
+        )
+
+    if above.any():
+        # Above the family: no NC rating exists; the governing band is the
+        # one with the maximum exceedance over the NC-70 curve.
+        exceedance = np.where(above, aligned - NC_CURVES[-1], -np.inf)
+        governing = int(np.argmax(exceedance))
+        return build(
+            float("nan"), float(OCTAVE_BANDS[governing]), float("nan"),
+            "tangency", "above",
+        )
+    if not np.isfinite(per_band).any():
+        # Every measured band lies below the NC-15 curve.
+        return build(
+            float("nan"), float("nan"), float("nan"), "tangency", "below"
+        )
+
+    governing = int(np.nanargmax(per_band))
+    tangency = float(per_band[governing])
+
+    if math.isfinite(sil):
+        nc_sil = float(np.rint(sil))
+        if NC_INDICES[0] <= nc_sil <= NC_INDICES[-1]:
+            curve = nc_curve(nc_sil)
+            if not np.any(aligned[valid] > curve[valid]):
+                # Clause 5.2.2: no band exceeds the NC-(SIL) curve, so the
+                # spectrum is designated NC-(SIL) with no governing band.
+                return build(nc_sil, float("nan"), tangency, "SIL", None)
+    return build(
+        tangency, float(OCTAVE_BANDS[governing]), tangency, "tangency", None
     )
 
 
@@ -360,7 +501,16 @@ def room_criterion(levels: ArrayLike, frequencies: ArrayLike | None = None) -> R
     not exceed the reference RC curve by more than 5 dB and the levels at and
     above 1000 Hz do not exceed it by more than 3 dB; rumble (``"R"``) when a
     low band exceeds by more than 5 dB; hiss (``"H"``) when a high band
-    exceeds by more than 3 dB (clause D.3).
+    exceeds by more than 3 dB (clause D.3). When both deviations fire, the
+    library tags the spectrum ``"RH"``, a diagnostic extension beyond the
+    clause D.3.5 letters (see :class:`RCResult`).
+
+    Clause D.4 evaluates a spectrum that includes at least the octave bands
+    from 31.5 Hz through 4000 Hz; when any of those bands is missing a
+    :class:`UserWarning` is emitted, since the absent bands are silently
+    skipped by the spectral-tag deviation tests. A rating outside the
+    tabulated RC-25 to RC-50 family is flagged by
+    :attr:`RCResult.out_of_family`.
 
     :param levels: Octave-band sound pressure levels, in dB. Without
         ``frequencies`` this must be the 10 bands from 16 Hz to 8000 Hz.
@@ -375,6 +525,16 @@ def room_criterion(levels: ArrayLike, frequencies: ArrayLike | None = None) -> R
         raise ValueError(
             "the 500, 1000 and 2000 Hz octave bands are required to compute "
             "the mid-frequency average (RC rating)."
+        )
+    required = aligned[_RC_REQUIRED_BANDS]
+    if np.isnan(required).any():
+        missing = OCTAVE_BANDS[_RC_REQUIRED_BANDS][np.isnan(required)]
+        warnings.warn(
+            "ANSI/ASA S12.2-2019, clause D.4 rates a spectrum that includes "
+            "at least the 31.5 Hz to 4000 Hz octave bands; the missing bands "
+            f"({', '.join(f'{f:g}' for f in missing)} Hz) are skipped by the "
+            "spectral-tag deviation tests.",
+            stacklevel=2,
         )
     lmf = float(np.mean(mid))
     rating = int(np.rint(lmf))

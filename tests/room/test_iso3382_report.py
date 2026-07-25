@@ -199,15 +199,94 @@ def test_report_without_requirement_has_no_verdict(tmp_path) -> None:
     assert "PASS" not in text and "FAIL" not in text
 
 
+def _synthetic_result(
+    frequency: np.ndarray | None,
+    t30: np.ndarray,
+    edt: np.ndarray,
+) -> RoomAcousticsResult:
+    """A hand-built result: T30/EDT as given, other parameters mirrored."""
+    t30 = np.asarray(t30, dtype=np.float64)
+    edt = np.asarray(edt, dtype=np.float64)
+    n = t30.size
+    finite_t30 = np.isfinite(t30)
+    finite_edt = np.isfinite(edt)
+    return RoomAcousticsResult(
+        frequency=frequency,
+        edt=edt,
+        t20=t30.copy(),
+        t30=t30,
+        c50=np.zeros(n),
+        c80=np.zeros(n),
+        d50=np.full(n, 0.5),
+        ts=np.full(n, 0.1),
+        dynamic_range=np.full(n, 60.0),
+        edt_valid=finite_edt,
+        t20_valid=finite_t30,
+        t30_valid=finite_t30,
+        curvature=np.zeros(n),
+    )
+
+
 # --------------------------------------------------------------------------
 # Band-set variants
 # --------------------------------------------------------------------------
 def test_third_octave_report_renders(tmp_path) -> None:
-    """A one-third-octave analysis renders a one-page fiche."""
+    """A one-third-octave analysis renders and labels T_mid honestly.
+
+    With one-third-octave data only the 500 Hz and 1 kHz one-third-octave
+    bands are averaged (not the two full octaves), so the boxed descriptor
+    must say so instead of the octave "500-1000 Hz" label.
+    """
     res = room_parameters(_synthetic_ir(), _FS, limits=(100.0, 5000.0), fraction=3)
     out = tmp_path / "thirds.pdf"
     res.report(str(out), metadata=_full_metadata())
     _assert_one_page(str(out))
+    text = _extract_text(str(out))
+    assert "500 Hz and 1 kHz one-third-octave bands" in text
+    assert "500-1000 Hz" not in text
+
+
+def test_band_range_without_mid_octaves_names_the_band(tmp_path) -> None:
+    """A range missing the mid bands boxes the first finite T30 band by name."""
+    res = room_parameters(_synthetic_ir(), _FS, limits=(2000.0, 4000.0))
+    assert res.frequency is not None and len(res.frequency) == 2
+    out = tmp_path / "high_bands.pdf"
+    res.report(str(out), metadata=_full_metadata())
+    text = _extract_text(str(out))
+    assert "(2000 Hz)" in text  # the boxed T30 names its band explicitly
+    assert "Tmid" not in text and "T_mid" not in text
+
+
+def test_edt_label_follows_edts_own_band_coverage(tmp_path) -> None:
+    """EDT_mid vs EDT is chosen from EDT's own bands, not T30's.
+
+    Here T30 is finite in both mid octaves (T_mid = 1.15 s) but the 500 Hz
+    EDT is not evaluable, so the extended term must be the plain EDT of its
+    1000 Hz band, never a false "EDT_mid".
+    """
+    freq = np.array([500.0, 1000.0])
+    res = _synthetic_result(
+        freq, t30=np.array([1.2, 1.1]), edt=np.array([np.nan, 1.0])
+    )
+    out = tmp_path / "edt_divergent.pdf"
+    res.report(str(out), metadata=_full_metadata())
+    text = _extract_text(str(out))
+    assert "1.15" in text  # T_mid from the two finite T30 bands
+    assert "EDTmid" not in text and "EDT_mid" not in text
+    assert "EDT (1000 Hz) = 1.00 s" in text
+
+
+def test_verdict_uses_display_rounded_values(tmp_path) -> None:
+    """T_mid = 1.1502 s prints as 1.15 s and must PASS a 1.15 s target."""
+    freq = np.array([500.0, 1000.0])
+    res = _synthetic_result(
+        freq, t30=np.array([1.2004, 1.1]), edt=np.array([1.2, 1.1])
+    )
+    out = tmp_path / "boundary.pdf"
+    res.report(str(out), metadata=_full_metadata(requirement=1.15))
+    text = _extract_text(str(out))
+    assert "1.15" in text
+    assert "PASS" in text and "FAIL" not in text
 
 
 def test_single_band_is_not_labeled_broadband(tmp_path) -> None:
