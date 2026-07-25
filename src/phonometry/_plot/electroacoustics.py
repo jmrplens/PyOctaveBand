@@ -359,7 +359,9 @@ def plot_piston_directivity(
         :class:`~phonometry.electroacoustics.piston.PistonDirectivity`.
     :param ax: Existing polar axes, or ``None`` to create a polar figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
-    :param kwargs: Forwarded to the per-``ka`` ``Axes.plot`` calls.
+    :param kwargs: Forwarded to the ``Axes.plot`` call when the result holds a
+        single ``ka``; ignored for a multi-``ka`` family so one user color or
+        label cannot collapse the per-curve styling.
     :return: The (polar) axes.
     """
     from .._i18n import decimal_comma, localize_axes
@@ -383,7 +385,10 @@ def plot_piston_directivity(
         line_kwargs: dict[str, Any] = {
             "color": colors[i % len(colors)], "lw": 1.6, "label": label,
         }
-        line_kwargs.update(kwargs)
+        if ka.size == 1:
+            # User overrides (color, label, ...) apply only to a single-curve
+            # plot; with several ka they would collapse the family styling.
+            line_kwargs.update(kwargs)
         ax.plot(theta, levels[i], **line_kwargs)
     ax.set_ylim(-_POLAR_SPAN_PISTON_DB, 0.0)
     ax.set_yticks([-40.0, -30.0, -20.0, -10.0, 0.0])

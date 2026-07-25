@@ -192,7 +192,9 @@ class PistonDirectivity:
 
         :param ax: Existing (polar) axes, or ``None`` to create a figure.
         :param language: Label language, ``"en"`` (default) or ``"es"``.
-        :param kwargs: Forwarded to the per-``ka`` ``Axes.plot`` calls.
+        :param kwargs: Forwarded to the ``Axes.plot`` call when the result
+            holds a single ``ka``; ignored for a multi-``ka`` family so one
+            user color or label cannot collapse the per-curve styling.
         :return: The axes.
         """
         from .._i18n import check_language

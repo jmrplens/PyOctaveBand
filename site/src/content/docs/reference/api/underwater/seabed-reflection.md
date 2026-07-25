@@ -44,6 +44,10 @@ bottom_reflection_loss(
 
 Bottom reflection loss `BL = −20·lg|R|` versus grazing angle (dB).
 
+At an angle of intromission `R = 0` and the loss is `inf` (total
+transmission into the sediment); that is a legitimate bottom-loss value,
+returned without warning.
+
 **Parameters**
 
 | Name | Description |
@@ -176,7 +180,8 @@ fluid-fluid interface and bundles the complex `R`, its magnitude `|R|`,
 the bottom loss `BL = −20·lg|R|` and the interface parameters into a
 [`SeabedReflection`](/phonometry/reference/api/underwater/seabed-reflection/#seabedreflection) that exposes `.plot()`. The maths is unchanged;
 this is a thin, plottable wrapper around the existing function (the same
-`ValueError` cases apply).
+`ValueError` cases apply). At an angle of intromission `R = 0` and the
+bottom loss is `inf` (total transmission), returned without warning.
 
 **Parameters**
 

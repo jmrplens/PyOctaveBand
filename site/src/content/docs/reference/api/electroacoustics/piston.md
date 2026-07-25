@@ -202,7 +202,7 @@ matplotlib (`pip install phonometry[plot]`).
 | :--- | :--- |
 | `ax` | Existing (polar) axes, or `None` to create a figure. |
 | `language` | Label language, `"en"` (default) or `"es"`. |
-| `kwargs` | Forwarded to the per-`ka` `Axes.plot` calls. |
+| `kwargs` | Forwarded to the `Axes.plot` call when the result holds a single `ka`; ignored for a multi-`ka` family so one user color or label cannot collapse the per-curve styling. |
 
 **Returns:** The axes.
 
