@@ -754,8 +754,9 @@ def plot_equal_loudness_contours(
     """Normal equal-loudness-level contour family (ISO 226:2023).
 
     Draws sound pressure level in dB against a logarithmic frequency axis: one
-    line per loudness level in ``result.phons`` (each annotated near 1 kHz) and
-    the threshold of hearing T_f. This is the iconic ISO 226 chart.
+    line per loudness level in ``result.phons`` (each annotated near 1 kHz when
+    the frequency range includes 1 kHz) and the threshold of hearing T_f. This
+    is the iconic ISO 226 chart.
 
     :param result: An
         :class:`~phonometry.loudness_contours.EqualLoudnessContours`.
@@ -772,21 +773,27 @@ def plot_equal_loudness_contours(
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("linewidth", 1.5)
 
+    fmin, fmax = float(freqs.min()), float(freqs.max())
+    # The per-contour labels sit at the 1 kHz crossing (SPL = phon by
+    # definition); when a frequency subset excludes 1 kHz they would land
+    # outside the axes, so they are skipped.
+    annotate_phons = fmin <= 1000.0 <= fmax
     for phon, spl in zip(result.phons, contours, strict=True):
         ax.plot(freqs, spl, **kwargs)
-        # Annotate the contour where it crosses 1 kHz (SPL = phon by definition).
-        ax.annotate(
-            _t("{p} phon", language).format(p=format_number(phon, language, decimals=0, trim=True)),
-            xy=(1000.0, phon), xytext=(1180.0, phon + 1.0),
-            fontsize=9, color=kwargs["color"],
-        )
+        if annotate_phons:
+            ax.annotate(
+                _t("{p} phon", language).format(
+                    p=format_number(phon, language, decimals=0, trim=True)
+                ),
+                xy=(1000.0, phon), xytext=(1180.0, phon + 1.0),
+                fontsize=9, color=kwargs["color"],
+            )
     ax.plot(
         freqs, np.asarray(result.threshold, dtype=np.float64),
         color=_C_SECONDARY, linestyle="--",
         label=_t(r"Hearing threshold $T_f$", language),
     )
 
-    fmin, fmax = float(freqs.min()), float(freqs.max())
     ax.set_xlim(fmin, fmax)
     format_frequency_axis(ax, fmin, fmax)
     ax.set_xlabel(_t("Frequency [Hz]", language))

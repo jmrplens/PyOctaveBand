@@ -175,6 +175,28 @@ def test_contours_plot_returns_axes() -> None:
     assert "isofónicas" in ax_es.get_title()
 
 
+def test_contours_plot_phon_labels_skipped_without_1khz() -> None:
+    # The per-contour phon labels sit at the 1 kHz crossing; on a frequency
+    # subset that excludes 1 kHz they must be skipped (they would render
+    # outside the axes), while a range including 1 kHz keeps them.
+    pytest.importorskip("matplotlib")
+    import matplotlib
+
+    matplotlib.use("Agg")
+    from matplotlib.text import Annotation
+
+    subset = equal_loudness_contours(
+        phons=(20.0, 40.0), frequencies=(63.0, 125.0, 250.0, 500.0)
+    )
+    ax = subset.plot()
+    assert not [t for t in ax.texts if isinstance(t, Annotation)]
+
+    full = equal_loudness_contours(phons=(20.0, 40.0))
+    ax_full = full.plot()
+    labels = [t for t in ax_full.texts if isinstance(t, Annotation)]
+    assert [t.get_text() for t in labels] == ["20 phon", "40 phon"]
+
+
 def test_contours_plot_rejects_unknown_language() -> None:
     pytest.importorskip("matplotlib")
     import matplotlib
