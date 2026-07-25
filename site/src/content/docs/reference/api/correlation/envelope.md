@@ -37,12 +37,16 @@ matching the ECMA-internal convention when the input is already
 narrowband.
 
 The **envelope spectrum** ([`envelope_spectrum`](/phonometry/reference/api/correlation/envelope/#envelope_spectrum)) transforms the
-detected envelope itself: Section 13.3 of the book runs a square-law
-envelope detector into a DC remover before correlating (Figure 13.11),
-because the spectral content of the envelope - not of the signal - is
-where amplitude modulations show as discrete lines. An AM tone with
-modulation frequency `f_m` and depth `m` puts a line of closed-form
-amplitude at exactly `f_m`, the anchor the tests pin.
+detected envelope itself: Section 13.3 of the book runs a band-pass
+filter and a square-law envelope detector into a DC remover before
+correlating (Figure 13.11), because the spectral content of the envelope
+- not of the signal - is where amplitude modulations show as discrete
+lines. The optional `band` argument reproduces the figure's band-pass
+front end (the classical bearing-envelope chain: isolate the resonance
+band, then envelope it). An AM tone with modulation frequency `f_m`
+(on an analysis bin) and depth `m` puts a line of closed-form
+amplitude at exactly `f_m`, the anchor the tests pin; off-bin
+modulation lines read low by the taper's scalloping loss.
 
 ## envelope
 
@@ -104,22 +108,28 @@ envelope_spectrum(
     window: str = 'hann',
     nfft: int | None = None,
     remove_dc: bool = True,
+    band: tuple[float, float] | None = None,
 ) -> EnvelopeSpectrumResult
 ```
 
 Amplitude spectrum of the envelope: where modulations become lines.
 
 Follows the structure of Bendat & Piersol Section 13.3 (Figure 13.11):
-an envelope detector, a DC remover, and a spectral view of what is
-left. The detector is the Hilbert envelope `A(t) = |z(t)|`
-(`kind="magnitude"`, the practical default) or the book's square-law
-detector `A^2(t) = x^2 + x_hat^2` (`kind="squared"`); its mean is
-removed (kept in [`EnvelopeSpectrumResult.mean_level`](/phonometry/reference/api/correlation/envelope/#envelopespectrumresult)) and the
-remainder is tapered and transformed once, scaled so a sinusoidal
-modulation reads out as a line at its exact amplitude.
+a band-pass filter (optional here), an envelope detector, a DC
+remover, and a spectral view of what is left. The detector is the
+Hilbert envelope `A(t) = |z(t)|` (`kind="magnitude"`, the
+practical default) or the book's square-law detector
+`A^2(t) = x^2 + x_hat^2` (`kind="squared"`); its mean is removed
+(kept in [`EnvelopeSpectrumResult.mean_level`](/phonometry/reference/api/correlation/envelope/#envelopespectrumresult)) and the remainder
+is tapered and transformed once, scaled by the taper's coherent gain
+so a sinusoidal modulation whose frequency falls on an analysis bin
+reads out as a line at its exact amplitude. An off-bin modulation
+frequency reads low by the taper's scalloping loss -- up to about
+1.4 dB (~15 %) for the default Hann midway between bins -- like any
+single-record amplitude spectrum.
 
 Closed forms for an AM tone `A0 (1 + m cos(2 pi f_m t)) cos(2 pi f_c t)`
-with `0 <= m < 1`:
+with `0 <= m < 1` and `f_m` on an analysis bin:
 
 * `kind="magnitude"`: a line of amplitude `A0 m` at `f_m`;
   mean level `A0`.
@@ -129,7 +139,11 @@ with `0 <= m < 1`:
 Amplitude modulation of rotating machinery (bearing and gear defect
 frequencies), mains hum and wind-turbine amplitude modulation appear
 the same way: lines at the modulation frequency and its harmonics,
-separated from the carrier's own spectrum.
+separated from the carrier's own spectrum. For the classical bearing
+chain -- isolate a structural-resonance band excited by the defect
+impacts, then envelope it -- pass the resonance band as `band`: the
+record is band-pass filtered (zero-phase, so the modulation phase is
+untouched) before the detector, the Figure 13.11 front end.
 
 **Parameters**
 
@@ -141,6 +155,7 @@ separated from the carrier's own spectrum.
 | `window` | Taper (any scipy window name; default Hann). The amplitude is corrected for the taper's coherent gain. |
 | `nfft` | FFT length, at least `x.size` (default: the record length). |
 | `remove_dc` | Remove the envelope mean before the transform (default `True`, the Figure 13.11 DC remover); the mean is reported either way. |
+| `band` | Optional `(low, high)` band-pass edges, in Hz (`0 < low < high < fs/2`), applied to the record before envelope detection as a zero-phase 4th-order Butterworth (`scipy.signal.sosfiltfilt`, giving an 8th-order magnitude roll-off). Default `None`: detect on the record as given. |
 
 **Returns:** An [`EnvelopeSpectrumResult`](/phonometry/reference/api/correlation/envelope/#envelopespectrumresult).
 
@@ -218,6 +233,7 @@ EnvelopeSpectrumResult(
     remove_dc: bool,
     fs: float,
     nfft: int,
+    band: tuple[float, float] | None = None,
 )
 ```
 
@@ -228,7 +244,7 @@ Amplitude spectrum of a signal's envelope (B&P Section 13.3).
 | Name | Description |
 | :--- | :--- |
 | `frequencies` | Frequency axis of the spectrum, in Hz. |
-| `amplitude` | One-sided amplitude spectrum of the (mean-removed) envelope: the height of a discrete modulation line in the units of the envelope itself. The zero-frequency bin is not doubled. |
+| `amplitude` | One-sided amplitude spectrum of the (mean-removed) envelope: the height of a discrete modulation line in the units of the envelope itself, exact when the modulation frequency falls on an analysis bin (off-bin lines read low by the taper's scalloping loss; see [`envelope_spectrum`](/phonometry/reference/api/correlation/envelope/#envelope_spectrum)). The zero-frequency bin is not doubled. |
 | `mean_level` | Mean of the detected envelope (the DC the remover of Figure 13.11 takes out): the carrier amplitude for `kind="magnitude"`, its mean square for `kind="squared"`. |
 | `kind` | `"magnitude"` (Hilbert envelope `A(t)`) or `"squared"` (the book's square-law detector, `A^2(t)`). |
 | `times` | Time axis of [`envelope`](/phonometry/reference/api/correlation/envelope/#envelope), in seconds. |
@@ -237,6 +253,7 @@ Amplitude spectrum of a signal's envelope (B&P Section 13.3).
 | `remove_dc` | Whether the envelope mean was removed first. |
 | `fs` | Sample rate of the analysed record, in Hz. |
 | `nfft` | FFT length used. |
+| `band` | `(low, high)` edges of the zero-phase band-pass pre-filter applied before envelope detection, in Hz, or `None` (no pre-filter). |
 
 ### EnvelopeSpectrumResult.plot()
 

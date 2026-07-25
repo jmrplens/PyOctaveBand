@@ -66,6 +66,11 @@ it; the list grows as guides gain their References sections.
   Cited by [Calibrated Spectral Analysis](spectral-analysis.md),
   [Correlation, Time Delay and Envelope](correlation-delay.md) and
   [Swept-sine distortion and phase utilities](swept-sine-distortion.md).
+- Harris, F. J. (1978). On the use of windows for harmonic analysis with the
+  discrete Fourier transform. *Proceedings of the IEEE*, 66(1), 51-83.
+  [doi:10.1109/PROC.1978.10837](https://doi.org/10.1109/PROC.1978.10837).
+  The window figures of merit (Table 1) computed by `window_metrics`.
+  Cited by [Calibrated Spectral Analysis](spectral-analysis.md).
 - Thomson, D. J. (1982). Spectrum estimation and harmonic analysis.
   *Proceedings of the IEEE*, 70(9), 1055-1096.
   [doi:10.1109/PROC.1982.12433](https://doi.org/10.1109/PROC.1982.12433).
@@ -138,6 +143,13 @@ it; the list grows as guides gain their References sections.
   The calibrator classes, level tolerances and the short-term stability
   criterion applied to calibration recordings.
   Cited by [Calibration and dBFS](calibration.md).
+- International Electrotechnical Commission. (1985). *Sound system
+  equipment — Part 1: General* (IEC 60268-1:1985).
+  [IEC webstore](https://webstore.iec.ch/en/publication/1204).
+  Annex A, Clause A2: tone bursts starting at the zero crossing of the tone
+  with an integral number of full periods, repetitive burst trains at a
+  stated repetition rate, and the Table AII burst durations.
+  Cited by [Test signals and sample-rate tools](test-signals.md).
 
 ## Broadcast programme loudness
 

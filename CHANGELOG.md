@@ -74,6 +74,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   impulse-response onset detector is ISO 3382-1:2009 A.3.4, not A.2.1.
 - English fiche strings and docstrings for ISO 3382-3 use point decimals
   ("STI = 0.50"/"0.20"); the Spanish strings keep the comma.
+- `metrology.time_synchronous_average`: the result's `times` axis now
+  reports the true `1/fs` sampling grid the averaged samples sit on,
+  instead of a `T/M` spacing that drifted across the period when
+  `fs*period` is not an integer (noiseless recovery read against the old
+  axis was wrong by up to ~9e-2 for a 100.37-sample period; on the true
+  grid the error is the fractional-delay interpolation level, ~3e-6).
+- `metrology.echo_detection`: the peak is now picked on `|cepstrum|`, so
+  an inverting reflection (negative reflection coefficient), whose first
+  rahmonic is negative, is detected at its true delay instead of being
+  silently missed; the signed cepstrum value at the peak is returned as
+  the reflection coefficient, and the reported delay is refined by
+  three-point parabolic interpolation so off-sample delays are estimated
+  to a fraction of a sample (with the bin-splitting caveat on the
+  coefficient documented).
+- `metrology.EQSection`/`ParametricEQ`: informative `ValueError`s replace
+  a raw `OverflowError` (bandwidth-derived alpha overflowing near
+  Nyquist), a bare `math domain error` (shelf slope beyond the
+  gain-dependent bound `(A + 1/A)/(A + 1/A - 2)`) and two silent
+  failures (sections whose rounded poles land exactly on the unit
+  circle, and non-finite `f0`/`gain_db`/`q`/`bw`/`slope` values passing
+  validation).
+- `metrology.tone_burst`: warns when `frequency` is incommensurate with
+  `fs`, in which case the gate cannot close exactly at the tone's final
+  zero crossing (the "integral number of full periods" of IEC 60268-1
+  Clause A2.1 is then sample-exact only to the nearest sample) and the
+  waveform carries a small residual step at the gate edge.
+
+### Added
+
+- `metrology.envelope_spectrum`: optional `band=(low, high)` zero-phase
+  band-pass pre-filter ahead of the envelope detector -- the band-pass
+  front end of Bendat & Piersol Figure 13.11 and the classical
+  bearing-envelope chain; the band travels with the result. The
+  amplitude-calibration docs now state the on-bin condition and the
+  taper scalloping loss for off-bin modulation lines.
 
 ### Changed
 

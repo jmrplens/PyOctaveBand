@@ -218,6 +218,15 @@ _STRINGS: dict[str, str] = {
     "Cascade": "Cascada",
     "Parametric EQ response (Audio EQ Cookbook)":
         "Respuesta del EQ paramétrico (Audio EQ Cookbook)",
+    # RBJ biquad type names (per-section legend labels); "lowpass" and
+    # "highpass" are already translated above for the lifter plot.
+    "peaking": "campana",
+    "lowshelf": "shelf de graves",
+    "highshelf": "shelf de agudos",
+    "bandpass": "paso banda",
+    "bandpass_skirt": "paso banda (faldón)",
+    "notch": "muesca",
+    "allpass": "paso todo",
     "Time synchronous average (McFadden 1987)":
         "Promediado síncrono en el tiempo (McFadden 1987)",
     "Averaged periodic waveform (N = {n})":
@@ -1831,7 +1840,9 @@ def plot_parametric_eq(
         if show_sections and result.section_magnitude_db.shape[0] > 1:
             for idx, section in enumerate(result.sections):
                 label = decimal_comma(
-                    f"{section.filter_type} {section.f0:g} Hz", language
+                    f"{_t(section.filter_type, language)} "
+                    f"{section.f0:g} Hz",
+                    language,
                 )
                 axm.semilogx(
                     freqs, result.section_magnitude_db[idx],

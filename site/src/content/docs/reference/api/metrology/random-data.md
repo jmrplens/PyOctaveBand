@@ -520,7 +520,7 @@ two-sided tail probability of the observed count.
 | `n` | Number of observations used. |
 | `mean` | Null mean of the statistic (B&P Eq. (4.54) for `A`). |
 | `std` | Null standard deviation (B&P Eq. (4.55) for `A`). |
-| `bounds` | Acceptance region `(lower, upper)`: percentage points such that the no-trend hypothesis is accepted when `lower < statistic <= upper`. |
+| `bounds` | Acceptance region `(lower, upper)`: percentage points such that the no-trend hypothesis is accepted when `lower < statistic <= upper`. For reverse arrangements these follow B&P Table A.6's own convention (normal approximation with continuity correction, which reproduces the book's tabulated `alpha = 0.05` entries exactly; the table is not derivable from the exact Mahonian distribution), so at an acceptance boundary the verdict and the exact `p_value` can disagree by one count. |
 | `p_value` | Two-sided p-value from the exact null distribution (normal approximation above `n = 100` for reverse arrangements). |
 | `trend_free` | `True` when the statistic falls inside the acceptance region. |
 | `alpha` | Significance level of the region (default 0.05). |
