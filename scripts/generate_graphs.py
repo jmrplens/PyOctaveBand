@@ -1422,7 +1422,6 @@ _ES_EXACT = {
     "$\\pm 1$ s.d. band (Eq. 9.52)": "banda $\\pm 1$ d.e. (Ec. 9.52)",
     "slope $-2\\pi f\\tau$ ($\\tau$ = 2 ms)":
         "pendiente $-2\\pi f\\tau$ ($\\tau$ = 2 ms)",
-    "Phase [rad]": "Fase [rad]",
     "Coherent Output Spectrum and Spectral SNR (Bendat & Piersol 9.2.2)":
         "Espectro de salida coherente y SNR espectral (Bendat y Piersol 9.2.2)",
     "$\\hat{G}_{yy}$ (measured output)": "$\\hat{G}_{yy}$ (salida medida)",
