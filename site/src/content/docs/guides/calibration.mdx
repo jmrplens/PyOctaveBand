@@ -16,12 +16,42 @@ references:
     designation: "IEC 61672-3:2013"
     url: "https://webstore.iec.ch/en/publication/5710"
     note: "The laboratory verification procedure behind the recommended periodic checks."
+  - type: book
+    authors: ["Bies, D. A.", "Hansen, C. H.", "Howard, C. Q."]
+    year: 2017
+    title: "Engineering noise control"
+    edition: "5th ed."
+    publisher: "CRC Press"
+    doi: "10.1201/9781351228152"
+    note: "Sections 3.1.5 and 3.4 (microphone field effects and sound level meter calibration: the electrical and acoustic calibration practice this page's workflow follows). ISBN 978-1-4987-2405-0."
 ---
 
 import ThemeImage from '../../../components/ThemeImage.astro';
 
-phonometry can return results in physical **Sound Pressure Level (dB SPL)** or
-digital **decibels relative to Full Scale (dBFS)**.
+Every level this library reports is only as trustworthy as the one number
+this page produces: the sensitivity factor that converts digital units into
+pascals. The page covers both reference frames a recording can be analyzed
+in: physical **dB SPL**, obtained by calibrating the chain against an
+IEC 60942 acoustic calibrator, and digital **dBFS**, levels relative to
+full scale with no physical claim attached.
+
+Choosing between them is a question about your measurement chain, not
+about preference. Work in dB SPL whenever the result faces a physical
+criterion (a noise limit, an exposure threshold, any acoustics standard);
+that requires a calibrator recording made through the *same, untouched*
+chain as the measurement. Work in dBFS when the signal never had a
+calibrated analog front end (loudness normalization, codec and interface
+tests, file-only analysis) or when no calibration tone exists, in which
+case absolute SPL statements are simply out of reach.
+
+The workflow around the factor matters as much as the formula: derive it
+before and re-check it after each session, verify meter and calibrator
+periodically in the laboratory (IEC 61672-3 and IEC 60942; Bies, Hansen &
+Howard 2017, §3.4), and treat the pre/post difference as your drift bound.
+The [field, laboratory and drift section](#field-checks-laboratory-verification-and-drift)
+below turns that into concrete rules, and the
+[Build a sound level meter](/phonometry/guides/sound-level-meter/)
+walkthrough starts from exactly this step before any level is computed.
 
 ## Why calibrate? The theory
 
@@ -262,4 +292,8 @@ identical whether you pass the raw integer array or a float conversion.
 
 ## See also
 
+- [Build a sound level meter](/phonometry/guides/sound-level-meter/): the walkthrough that starts from this calibration step and ends at a class-checked instrument.
+- [Levels](/phonometry/guides/levels/): every metric that consumes the `calibration_factor` derived here.
+- [Multichannel and Performance](/phonometry/guides/multichannel/): one sensitivity per channel when the channels differ.
+- [GUM uncertainty](/phonometry/guides/gum-uncertainty/): propagating the calibrator tolerance and drift bound into a level's uncertainty.
 - API reference: [`metrology.calibration`](/phonometry/reference/api/levels/calibration/) and [`phonometry`](/phonometry/reference/api/filters/phonometry/).

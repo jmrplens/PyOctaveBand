@@ -16,12 +16,44 @@ references:
     designation: "IEC 61672-3:2013"
     url: "https://webstore.iec.ch/en/publication/5710"
     note: "El procedimiento de verificación de laboratorio que sustenta las comprobaciones periódicas recomendadas."
+  - type: book
+    authors: ["Bies, D. A.", "Hansen, C. H.", "Howard, C. Q."]
+    year: 2017
+    title: "Engineering noise control"
+    edition: "5th ed."
+    publisher: "CRC Press"
+    doi: "10.1201/9781351228152"
+    note: "Las secciones 3.1.5 y 3.4 (efectos de campo del micrófono y calibración del sonómetro: la práctica de calibración eléctrica y acústica que sigue el flujo de esta página). ISBN 978-1-4987-2405-0."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
-phonometry puede devolver resultados en **nivel de presión sonora físico
-(dB SPL)** o en **decibelios relativos a fondo de escala digital (dBFS)**.
+Cada nivel que devuelve esta librería es tan fiable como el número que
+produce esta página: el factor de sensibilidad que convierte unidades
+digitales en pascales. La página cubre los dos marcos de referencia en los
+que se puede analizar una grabación: el **dB SPL** físico, obtenido
+calibrando la cadena contra un calibrador acústico IEC 60942, y el **dBFS**
+digital, niveles relativos al fondo de escala sin pretensión física alguna.
+
+Elegir entre ellos es una pregunta sobre tu cadena de medición, no una
+preferencia. Trabaja en dB SPL siempre que el resultado se enfrente a un
+criterio físico (un límite de ruido, un umbral de exposición, cualquier
+norma de acústica); eso exige una grabación del calibrador hecha con la
+*misma cadena, sin tocar*, que la medición. Trabaja en dBFS cuando la señal
+nunca tuvo un frontal analógico calibrado (normalización de sonoridad,
+pruebas de códecs e interfaces, análisis de solo archivo) o cuando no
+existe tono de calibración, en cuyo caso las afirmaciones absolutas de SPL
+quedan sencillamente fuera de alcance.
+
+El flujo alrededor del factor importa tanto como la fórmula: derívalo antes
+y vuelve a comprobarlo después de cada sesión, verifica sonómetro y
+calibrador periódicamente en laboratorio (IEC 61672-3 e IEC 60942; Bies,
+Hansen y Howard 2017, §3.4) y trata la diferencia pre/post como tu cota de
+deriva. La sección de
+[campo, laboratorio y deriva](#comprobaciones-de-campo-verificación-de-laboratorio-y-deriva)
+de más abajo convierte eso en reglas concretas, y el recorrido
+[Construye un sonómetro](/phonometry/es/guides/sound-level-meter/) empieza
+exactamente en este paso antes de calcular ningún nivel.
 
 ## ¿Por qué calibrar? La teoría
 
@@ -266,4 +298,8 @@ como una conversión a float.
 
 ## Véase también
 
+- [Construye un sonómetro](/phonometry/es/guides/sound-level-meter/): el recorrido que empieza en este paso de calibración y termina en un instrumento verificado por clase.
+- [Niveles](/phonometry/es/guides/levels/): todas las métricas que consumen el `calibration_factor` derivado aquí.
+- [Multicanal y rendimiento](/phonometry/es/guides/multichannel/): una sensibilidad por canal cuando los canales difieren.
+- [Incertidumbre de medida (GUM y Monte Carlo)](/phonometry/es/guides/gum-uncertainty/): propagar la tolerancia del calibrador y la cota de deriva a la incertidumbre de un nivel.
 - Referencia de la API: [`metrology.calibration`](/phonometry/es/reference/api/levels/calibration/) y [`phonometry`](/phonometry/es/reference/api/filters/phonometry/).
