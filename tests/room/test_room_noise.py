@@ -2,10 +2,13 @@
 """Tests for :mod:`phonometry.room.room_noise` (ANSI/ASA S12.2-2019 NC and RC Mark II).
 
 The methods are validated against the standard's own tabulated curves: feeding
-an NC curve of Table 1 back through the tangency method returns its NC value,
-and the generated RC Mark II curves reproduce Table D.1 digit for digit. The
-spectral tags (neutral / rumble / hiss) are checked against the deviation
-rules of clause D.3.
+an NC curve of Table 1 back through the rating returns its NC value (the
+tangency rating is exact and the SIL two-step designation of clause 5.2.2
+lands on the curve's own speech interference level), and the generated RC
+Mark II curves reproduce Table D.1 digit for digit. The spectral tags
+(neutral / rumble / hiss) are checked against the deviation rules of clause
+D.3, and spectra outside the NC-15 to NC-70 family must be flagged out of
+range rather than clamped to a fabricated rating.
 """
 
 from __future__ import annotations
@@ -36,20 +39,88 @@ def test_nc_table_row_matches_standard() -> None:
 
 
 @pytest.mark.parametrize("index", [15.0, 25.0, ANSIS12_2_NC40_SELF, 50.0, 70.0])
-def test_nc_curve_returns_its_own_rating(index: float) -> None:
+def test_nc_curve_returns_its_own_tangency_rating(index: float) -> None:
     # Feeding an NC curve back through the tangency method returns its value.
     result = rn.noise_criterion(rn.nc_curve(index))
-    assert result.rating == pytest.approx(index, abs=1e-9)
+    assert result.tangency_rating == pytest.approx(index, abs=1e-9)
+
+
+def test_nc_curve_sil_designation_matches_its_own_sil() -> None:
+    # Clause 5.2.2: a spectrum lying on a Table 1 curve exceeds no band of
+    # the NC-(SIL) curve chosen from its SIL, so the designation is NC-(SIL).
+    # The NC-40 contour has SIL = (44 + 41 + 39 + 38)/4 = 40.5 dB, which
+    # rounds to the curve's own designating number.
+    result = rn.noise_criterion(rn.nc_curve(40.0))
+    assert result.sil == pytest.approx(40.5)
+    assert result.method == "SIL"
+    assert result.rating == pytest.approx(40.0)
+    assert result.label == "NC-40"
+    # A SIL-designated spectrum has no governing band.
+    assert np.isnan(result.governing_frequency)
+    assert result.out_of_range is None
 
 
 def test_nc_governing_band_and_monotonicity() -> None:
     # Raising one band above the NC-50 curve lifts the rating and makes that
-    # band the governing one.
+    # band the governing one (the SIL curve is exceeded there, so the
+    # tangency method sets the designation, clause 5.2.3).
     levels = rn.nc_curve(50.0).copy()
     levels[3] += 3.0  # 125 Hz band.
     result = rn.noise_criterion(levels)
+    assert result.method == "tangency"
     assert result.rating > 50.0
+    assert result.rating == result.tangency_rating
     assert result.governing_frequency == 125.0
+    assert result.label == f"NC-{result.rating:g} (125 Hz)"
+
+
+def test_nc_sil_average_matches_clause_3_2() -> None:
+    # SIL = (1/4)(L500 + L1000 + L2000 + L4000), clause 3.2.
+    levels = rn.nc_curve(30.0)
+    result = rn.noise_criterion(levels)
+    expected = float(np.mean(levels[5:9]))
+    assert result.sil == pytest.approx(expected)
+
+
+def test_nc_flat_110db_spectrum_is_above_the_family() -> None:
+    # A 110 dB flat spectrum exceeds NC-70 in every band: the standard
+    # defines no rating above NC-70, so no number may be fabricated. The
+    # governing band is the maximum exceedance over the NC-70 curve
+    # (110 - 68 = 42 dB at 4000 Hz, the first of the two tied top bands).
+    result = rn.noise_criterion(np.full(10, 110.0))
+    assert result.out_of_range == "above"
+    assert np.isnan(result.rating)
+    assert np.isnan(result.tangency_rating)
+    assert result.governing_frequency == 4000.0
+    assert result.label == ">NC-70 (4000 Hz)"
+
+
+def test_nc_sub_nc15_spectrum_is_below_the_family() -> None:
+    # A spectrum below the NC-15 curve everywhere touches no curve: the
+    # rating is flagged below the family, never clamped to a number.
+    result = rn.noise_criterion(np.full(10, 5.0))
+    assert result.out_of_range == "below"
+    assert np.isnan(result.rating)
+    assert np.isnan(result.governing_frequency)
+    assert result.label == "<NC-15"
+
+
+def test_nc_marginal_cases_on_the_family_edges() -> None:
+    # Exactly on the NC-70 curve: still inside the family (rating 70).
+    on_top = rn.noise_criterion(rn.NC_CURVES[-1].copy())
+    assert on_top.out_of_range is None
+    assert on_top.rating == pytest.approx(70.0)
+    # 1 dB above the NC-70 curve in one band: above the family, and that
+    # band governs even though other bands would interpolate higher values.
+    over = rn.NC_CURVES[-1].copy()
+    over[2] += 1.0  # 63 Hz
+    result = rn.noise_criterion(over)
+    assert result.out_of_range == "above"
+    assert result.governing_frequency == 63.0
+    # Exactly on the NC-15 curve: inside the family (tangency 15).
+    on_bottom = rn.noise_criterion(rn.NC_CURVES[0].copy())
+    assert on_bottom.out_of_range is None
+    assert on_bottom.tangency_rating == pytest.approx(15.0)
 
 
 def test_nc_out_of_range_curve_raises() -> None:
@@ -107,6 +178,31 @@ def test_rc_combined_rumble_and_hiss() -> None:
     levels[4] += 8.0
     levels[8] += 5.0
     assert rn.room_criterion(levels).classification == "RH"
+
+
+def test_rc_missing_d4_bands_warn() -> None:
+    # Clause D.4 rates a spectrum with at least the 31.5 Hz to 4000 Hz
+    # octave bands; a subset missing any of them warns that the absent bands
+    # are skipped by the spectral-tag deviation tests.
+    with pytest.warns(UserWarning, match="31.5 Hz to 4000 Hz"):
+        rn.room_criterion([40.0, 35.0, 30.0], [500.0, 1000.0, 2000.0])
+
+
+def test_rc_complete_spectrum_does_not_warn() -> None:
+    import warnings
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        rn.room_criterion(rn.rc_curve(35.0))
+
+
+def test_rc_out_of_family_annotation() -> None:
+    # Table D.1 tabulates RC-25 through RC-50; ratings outside that family
+    # are flagged (the reference curve is an extrapolation of the Annex D
+    # rule), while in-family ratings are not.
+    assert rn.room_criterion(rn.rc_curve(35.0)).out_of_family is False
+    assert rn.room_criterion(rn.rc_curve(55.0)).out_of_family is True
+    assert rn.room_criterion(rn.rc_curve(20.0)).out_of_family is True
 
 
 def test_rc_within_tolerance_stays_neutral() -> None:

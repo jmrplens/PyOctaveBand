@@ -3592,7 +3592,7 @@ _RN = "Room noise (ANSI S12.2-2019)"
 
 @register(_RN, "ANSI S12.2-2019 Table 1", "NC-40 curve, tangency self-consistency")
 def _chk_rn_nc_self() -> Outcome:
-    rating = ph.noise_criterion(ph.nc_curve(40.0)).rating
+    rating = ph.noise_criterion(ph.nc_curve(40.0)).tangency_rating
     return numeric(ref.ANSIS12_2_NC40_SELF, rating, 1e-9, places=3)
 
 

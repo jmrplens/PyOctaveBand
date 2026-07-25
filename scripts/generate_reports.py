@@ -1712,9 +1712,10 @@ def _noise_criteria_example() -> tuple[object, ReportMetadata, str]:
     The spectrum is built from the ANSI/ASA S12.2-2019 Table 1 NC-40 contour so
     the tangency rating is exact and independently verifiable. Every band is
     depressed 5 dB below its NC-40 contour except the 250 Hz octave, which is
-    left on the NC-40 curve (50 dB, the Table 1 value): that band alone touches
-    the highest NC curve, so the tangency method returns NC-40 with the 250 Hz
-    band governing.
+    left on the NC-40 curve (50 dB, the Table 1 value). The SIL is 35.5 dB and
+    the 250 Hz band exceeds the NC-36 curve, so per clause 5.2.2 the rating
+    falls to the tangency method, which returns NC-40 with the 250 Hz band
+    governing.
     """
     contour = ph.nc_curve(40.0)
     levels = contour - 5.0
