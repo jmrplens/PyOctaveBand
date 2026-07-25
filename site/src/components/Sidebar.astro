@@ -23,7 +23,7 @@ const { sidebar } = Astro.locals.starlightRoute;
 
 const isEs = Astro.currentLocale === 'es';
 const base = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
-const guidesHref = `${base}/${isEs ? 'es/' : ''}guides/getting-started/`;
+const guidesHref = `${base}/${isEs ? 'es/' : ''}getting-started/`;
 const guidesLabel = isEs ? 'Guías' : 'Guides';
 ---
 

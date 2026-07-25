@@ -196,20 +196,31 @@
   position: relative;
 }
 
+/* The resting tree carries NO marker. Nearly every page in this library is
+   governed by something, so an always-on underline would mark almost every
+   row: that is texture, not information, and it fights the labels. The
+   hairline dotted marker fades in only once the pointer (or the keyboard
+   focus) is inside the sidebar, which is exactly when the reader is looking
+   for a way in. `--sl-color-gray-5` is the hairline value in dark and a
+   comparably quiet step in light, so one declaration covers both themes. */
 :root[data-toc-style='hover']
   #starlight__sidebar
   a:has(> .sidebar-chips)
   > .sidebar-item-label {
-  text-decoration: underline dotted 1px;
-  text-decoration-color: var(--sl-color-gray-5);
+  text-decoration: underline dotted 1px transparent;
   text-underline-offset: 0.3em;
+  transition: text-decoration-color 0.15s ease;
 }
 
-:root[data-theme='light'][data-toc-style='hover']
-  #starlight__sidebar
+:root[data-toc-style='hover']
+  #starlight__sidebar:hover
+  a:has(> .sidebar-chips)
+  > .sidebar-item-label,
+:root[data-toc-style='hover']
+  #starlight__sidebar:focus-within
   a:has(> .sidebar-chips)
   > .sidebar-item-label {
-  text-decoration-color: var(--sl-color-gray-4);
+  text-decoration-color: var(--sl-color-gray-5);
 }
 
 /* No marker on the active accent pill (inverted colours). */
@@ -227,9 +238,12 @@
   gap: 0.15rem 0.55rem;
   position: absolute;
   z-index: 6;
-  inset-inline-start: 0.75rem;
+  /* Anchored to the link's trailing edge, so the card grows leftwards over
+     the tree and can never push the sidebar into horizontal scroll, whatever
+     the nesting depth of the item. */
+  inset-inline-end: 0;
   inset-block-start: calc(100% - 0.1rem);
-  max-inline-size: min(15rem, calc(100vw - 3rem));
+  max-inline-size: min(15rem, 100%, calc(100vw - 3rem));
   inline-size: max-content;
   padding: 0.35rem 0.6rem;
   border: 1px solid var(--sl-color-hairline-light);
@@ -276,6 +290,50 @@
 :root[data-toc-style='hover'] .sidebar-chips .chip-theory:first-child::before,
 :root[data-toc-style='hover'] .sidebar-chips .chip-standard + .chip-theory::before {
   background: var(--chip-theory-accent);
+}
+
+/* WCAG 2.2 1.4.13 (content on hover or focus) wants the card dismissible
+   without moving the pointer or the focus. Escape stamps `data-card-dismissed`
+   on the focused link (see Head.astro) and this rule wins over the reveal
+   rules above by source order. */
+:root[data-toc-style='hover'] #starlight__sidebar a[data-card-dismissed] > .sidebar-chips {
+  visibility: hidden;
+  opacity: 0;
+  transition-delay: 0s;
+}
+
+/* Touch devices have no hover, so on a phone the card would be unreachable:
+   the same data degrades to the always-on annotation line of the 'annotate'
+   variant. Keeps the variant usable on the device the docs are most read on. */
+@media (hover: none) {
+  :root[data-toc-style='hover'] #starlight__sidebar .sidebar-chips {
+    position: static;
+    inline-size: auto;
+    max-inline-size: 100%;
+    margin-block-start: 0.15rem;
+    margin-inline-start: 0.9rem;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    visibility: visible;
+    opacity: 1;
+  }
+  :root[data-toc-style='hover'] .sidebar-chips .chip-standard,
+  :root[data-toc-style='hover'] .sidebar-chips .chip-theory {
+    color: var(--sl-color-gray-2);
+  }
+  :root[data-toc-style='hover'] [aria-current='page'] .sidebar-chips .sl-badge {
+    color: var(--sl-color-text-invert);
+    opacity: 0.85;
+  }
+  :root[data-toc-style='hover']
+    #starlight__sidebar
+    a:has(> .sidebar-chips)
+    > .sidebar-item-label {
+    text-decoration: none;
+  }
 }
 
 /* ---------------------------------------------------------------------------

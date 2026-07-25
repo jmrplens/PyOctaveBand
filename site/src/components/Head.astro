@@ -171,6 +171,27 @@ const breadcrumbList = isHome
       const folded = stored != null ? stored === 'true' : d.dataset.area !== 'api';
       setFolded(folded);
     };
+    // Hover variant: Escape dismisses the floating card without moving the
+    // keyboard focus (WCAG 2.2 1.4.13); any other key, or leaving the link,
+    // brings it back.
+    let dismissed = null;
+    const restore = () => {
+      if (!dismissed) return;
+      delete dismissed.dataset.cardDismissed;
+      dismissed = null;
+    };
+    document.addEventListener('keydown', (event) => {
+      const active = document.activeElement;
+      const link = active?.closest?.('#starlight__sidebar a');
+      if (event.key === 'Escape' && link?.querySelector('.sidebar-chips')) {
+        link.dataset.cardDismissed = '';
+        dismissed = link;
+        return;
+      }
+      restore();
+    });
+    document.addEventListener('focusout', restore);
+
     caret?.addEventListener('click', () => {
       const folded = !apiGroup.classList.contains('folded');
       setFolded(folded);
