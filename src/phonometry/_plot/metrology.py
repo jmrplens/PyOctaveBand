@@ -1283,14 +1283,22 @@ def plot_resampled_signal(
 
     ax = ax if ax is not None else _new_axes()
     fs_up = result.original_fs * result.up
-    freqs, h = sp_signal.freqz(result.filter_taps, worN=1 << 14, fs=fs_up)
+    # The interesting region is around the band edges; for large ``up`` the
+    # intermediate Nyquist frequency sits decades above them, so the view is
+    # capped at four times the stopband edge (the response beyond is just
+    # more stopband floor).
+    f_hi = min(fs_up / 2.0, 4.0 * result.stopband_edge_hz)
+    f_lo = result.stopband_edge_hz / 8.0
+    freqs, h = sp_signal.freqz(
+        result.filter_taps, worN=1 << 16, fs=fs_up
+    )
     tiny = np.finfo(np.float64).tiny
     mag_db = 20.0 * np.log10(np.maximum(np.abs(h), tiny))
-    pos = freqs > 0.0
+    view = (freqs > 0.0) & (freqs <= f_hi)
     kwargs.setdefault("color", _C_PRIMARY)
     if "lw" not in kwargs and "linewidth" not in kwargs:
         kwargs["lw"] = 1.2
-    ax.semilogx(freqs[pos], mag_db[pos],
+    ax.semilogx(freqs[view], mag_db[view],
                 label=_t("Anti-alias filter $|H(f)|$", language), **kwargs)
     ax.axvline(result.passband_edge_hz, color=_C_TERTIARY, linestyle="--",
                lw=1.2, label=_t("Passband edge", language))
@@ -1301,7 +1309,7 @@ def plot_resampled_signal(
     ax.axhline(-result.stopband_attenuation_db, color=_C_MUTED,
                linestyle=":", lw=1.2,
                label=_t("Design attenuation −{a} dB", language, a=atten))
-    ax.axvspan(result.stopband_edge_hz, fs_up / 2.0, color=_C_SECONDARY,
+    ax.axvspan(result.stopband_edge_hz, f_hi, color=_C_SECONDARY,
                alpha=0.08,
                label=_t("Rejected band (would fold back as aliases)",
                         language))
@@ -1318,9 +1326,8 @@ def plot_resampled_signal(
     ))
     ax.grid(True, which="both", alpha=0.3)
     ax.legend(loc="lower left", fontsize="small")
-    format_frequency_axis(
-        ax, result.stopband_edge_hz / 8.0, fs_up / 2.0, minor=None
-    )
+    ax.set_xlim(f_lo, f_hi)
+    format_frequency_axis(ax, f_lo, f_hi, minor=None)
     localize_axes(ax, language)
     return ax
 

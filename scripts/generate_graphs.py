@@ -1360,6 +1360,101 @@ _ES_EXACT = {
     "Momentary (400 ms)": "Momentánea (400 ms)",
     "Short-term (3 s)": "Corto plazo (3 s)",
     "Programme loudness (EBU R 128)": "Sonoridad de programa (EBU R 128)",
+    # Core-metrology figures: resampling, cepstrum, correlation, spectra,
+    # system measurement, synchronous averaging, data qualification.
+    "Polyphase Resampling 44.1 kHz → 48 kHz: the Delivered Anti-Alias Filter":
+        "Remuestreo polifásico 44,1 kHz → 48 kHz: "
+        "el filtro antisolapamiento entregado",
+    "Anti-alias filter $|H(f)|$": "Filtro antisolapamiento $|H(f)|$",
+    "Passband edge": "Borde de la banda de paso",
+    "Stopband edge (alias fold)":
+        "Borde de la banda atenuada (pliegue de alias)",
+    "Design attenuation -120 dB": "Atenuación de diseño -120 dB",
+    "Rejected band (would fold back as aliases)":
+        "Banda rechazada (se plegaría como alias)",
+    "The Three Cepstrum Variants of One Echo-Carrying Record":
+        "Las tres variantes del cepstro de un registro con eco",
+    "Real cepstrum (exactly half the power)":
+        "Cepstro real (exactamente la mitad del de potencia)",
+    "Complex cepstrum": "Cepstro complejo",
+    "first rahmonic at 8 ms:\nheight ≈ a on the power cepstrum":
+        "primer rahmónico en 8 ms:\naltura ≈ a en el cepstro de potencia",
+    "second rahmonic: $-a^2/2$": "segundo rahmónico: $-a^2/2$",
+    "Liftering at 4 ms: Envelope Versus Echo Ripple":
+        "Liftering a 4 ms: envolvente frente a rizado del eco",
+    "Log spectrum of the record": "Espectro logarítmico del registro",
+    "Lowpass lifter: spectral envelope":
+        "Lifter paso bajo: envolvente espectral",
+    "Highpass lifter: the echo ripple alone":
+        "Lifter paso alto: solo el rizado del eco",
+    "closed-form ripple bounds $20\\lg(1\\pm a)$":
+        "cotas del rizado en forma cerrada $20\\lg(1\\pm a)$",
+    "Correlation Normalizations of a Two-Sensor Delay Model":
+        "Normalizaciones de la correlación de un modelo "
+        "de dos sensores con retardo",
+    "Coefficient $\\rho_{xy}(\\tau)$ (bounded by $\\pm 1$)":
+        "Coeficiente $\\rho_{xy}(\\tau)$ (acotado por $\\pm 1$)",
+    "true delay +12.5 ms": "retardo verdadero +12,5 ms",
+    "Biased $1/N$ (tapers toward the ends)":
+        "Sesgada $1/N$ (se atenúa hacia los extremos)",
+    "Unbiased $1/(N-|r|)$ (variance grows at the ends)":
+        "Insesgada $1/(N-|r|)$ (la varianza crece en los extremos)",
+    "Lag [s]": "Retardo [s]",
+    "Correlation": "Correlación",
+    "Sub-Sample Impulse-Response Alignment":
+        "Alineación submuestra de respuestas al impulso",
+    "Reference IR": "RI de referencia",
+    "Measured IR (delayed 7.37 samples)":
+        "RI medida (retardada 7,37 muestras)",
+    "Aligned IR (delay removed)": "RI alineada (retardo eliminado)",
+    "Hilbert Envelope and Instantaneous Frequency":
+        "Envolvente de Hilbert y frecuencia instantánea",
+    "Signal": "Señal",
+    "Envelope $A(t)$": "Envolvente $A(t)$",
+    "Instantaneous frequency $f(t)$": "Frecuencia instantánea $f(t)$",
+    "Instantaneous frequency [Hz]": "Frecuencia instantánea [Hz]",
+    "carrier 250 Hz": "portadora de 250 Hz",
+    "Cross-Spectral Density of a 2 ms Delay Path":
+        "Densidad espectral cruzada de un camino con retardo de 2 ms",
+    "$|\\hat{G}_{xy}|$ (Welch estimate)":
+        "$|\\hat{G}_{xy}|$ (estimación de Welch)",
+    "Unwrapped phase": "Fase desenrollada",
+    "$\\pm 1$ s.d. band (Eq. 9.52)": "banda $\\pm 1$ d.e. (Ec. 9.52)",
+    "slope $-2\\pi f\\tau$ ($\\tau$ = 2 ms)":
+        "pendiente $-2\\pi f\\tau$ ($\\tau$ = 2 ms)",
+    "Phase [rad]": "Fase [rad]",
+    "Coherent Output Spectrum and Spectral SNR (Bendat & Piersol 9.2.2)":
+        "Espectro de salida coherente y SNR espectral (Bendat y Piersol 9.2.2)",
+    "$\\hat{G}_{yy}$ (measured output)": "$\\hat{G}_{yy}$ (salida medida)",
+    "$\\hat{G}_{vv} = \\gamma^2\\hat{G}_{yy}$ (coherent part)":
+        "$\\hat{G}_{vv} = \\gamma^2\\hat{G}_{yy}$ (parte coherente)",
+    "$\\hat{G}_{nn}$ (uncorrelated noise)":
+        "$\\hat{G}_{nn}$ (ruido no correlado)",
+    "Spectral density [dB re 1/Hz]": "Densidad espectral [dB re 1/Hz]",
+    "Spectral SNR [dB]": "SNR espectral [dB]",
+    "closed form $10\\lg(2.56)$ = 4.1 dB":
+        "forma cerrada $10\\lg(2{,}56)$ = 4,1 dB",
+    "Golay-Pair Impulse Response: Exact Complementary Recovery":
+        "Respuesta al impulso con par de Golay: "
+        "recuperación complementaria exacta",
+    "Recovered IR (golay_impulse_response)":
+        "RI recuperada (golay_impulse_response)",
+    "True system response": "Respuesta verdadera del sistema",
+    "noise-free closed-form identity": "identidad exacta sin ruido",
+    "TSA Noise Reduction: the $\\sqrt{N}$ Law (McFadden 1987)":
+        "Reducción de ruido del promediado síncrono: "
+        "la ley $\\sqrt{N}$ (McFadden 1987)",
+    "Measured RMS error of the average":
+        "Error RMS medido del promedio",
+    "Ideal $\\sigma/\\sqrt{N}$": "$\\sigma/\\sqrt{N}$ ideal",
+    "Number of averages N": "Número de promedios N",
+    "RMS error of the averaged waveform":
+        "Error RMS de la forma de onda promediada",
+    "Runs Test About the Median (Wald & Wolfowitz)":
+        "Test de rachas respecto a la mediana (Wald y Wolfowitz)",
+    "Above the median": "Por encima de la mediana",
+    "Below the median": "Por debajo de la mediana",
+    "Sequence median": "Mediana de la secuencia",
 }
 
 _ES_PATTERNS = [
@@ -1561,6 +1656,15 @@ _ES_PATTERNS = [
     # Programme-loudness .plot() legend lines (loudness_gating/loudness_range).
     (r"^Integrated (.+) LUFS$", r"Integrada \1 LUFS"),
     (r"^Ungated mean (.+) LUFS$", r"Media sin puerta \1 LUFS"),
+    # Core-metrology figures: dynamic verdict / error strings
+    (r"^r = (\d+) runs, accept \((\d+), (\d+)\]: trend-free$",
+     r"r = \1 rachas, aceptación (\2, \3]: sin tendencia"),
+    (r"^r = (\d+) runs, accept \((\d+), (\d+)\]: rejected$",
+     r"r = \1 rachas, aceptación (\2, \3]: rechazada"),
+    (r"^max \|recovered - true\| = (.+)$",
+     r"máx |recuperada - verdadera| = \1"),
+    (r"^estimated delay removed: (.+) samples$",
+     r"retardo estimado eliminado: \1 muestras"),
 ]
 
 
@@ -1725,6 +1829,10 @@ _RASTER_FIGURES = frozenset(
         # Dense reflectogram: hundreds of image-source stems/markers make the
         # SVG far heavier than the raster (as for schroeder_decay above).
         "image_source_reflectogram",
+        # Dense time series (tens of thousands of vertices), as for
+        # calibration_stability above: the noise-floor traces of the
+        # correlation normalizations make the SVG several times the raster.
+        "correlation_normalizations",
     }
 )
 
@@ -10630,6 +10738,519 @@ def generate_loudness_range(output_dir: str) -> None:
     res.plot(ax=ax)
     plt.tight_layout()
     save_figure(output_dir, "loudness_range.svg")
+def generate_resampling_antialias(output_dir: str) -> None:
+    """Polyphase resampling: the delivered anti-alias filter vs its spec."""
+    print("Generating resampling_antialias...")
+    from phonometry import noise_signal, resample_signal
+
+    x = noise_signal(44100, 5.0, color="pink", seed=1)
+    res = resample_signal(x, 44100, 48000)      # 120 dB alias rejection
+
+    fs_up = res.original_fs * res.up
+    freqs, h = scipy_signal.freqz(res.filter_taps, worN=1 << 18, fs=fs_up)
+    tiny = np.finfo(np.float64).tiny
+    mag_db = 20.0 * np.log10(np.maximum(np.abs(h), tiny))
+    f_lo, f_hi = res.stopband_edge_hz / 8.0, 4.0 * res.stopband_edge_hz
+    view = (freqs > 0.0) & (freqs <= f_hi)
+
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    ax.semilogx(freqs[view], mag_db[view], color=COLOR_PRIMARY, linewidth=1.2,
+                label="Anti-alias filter $|H(f)|$")
+    ax.axvline(res.passband_edge_hz, color=COLOR_TERTIARY, linestyle="--",
+               linewidth=1.4, label="Passband edge")
+    ax.axvline(res.stopband_edge_hz, color=COLOR_SECONDARY, linestyle="--",
+               linewidth=1.4, label="Stopband edge (alias fold)")
+    ax.axhline(-res.stopband_attenuation_db, color=COLOR_FG, linestyle=":",
+               linewidth=1.2, alpha=0.7, label="Design attenuation -120 dB")
+    ax.axvspan(res.stopband_edge_hz, f_hi, color=COLOR_SECONDARY, alpha=0.08,
+               label="Rejected band (would fold back as aliases)")
+    ax.set_xlim(f_lo, f_hi)
+    ax.set_ylim(-170.0, 10.0)
+    format_frequency_axis(ax, f_lo, f_hi)
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Magnitude [dB]")
+    ax.set_title("Polyphase Resampling 44.1 kHz → 48 kHz: "
+                 "the Delivered Anti-Alias Filter", fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower left", fontsize=9)
+    plt.tight_layout()
+    save_figure(output_dir, "resampling_antialias.svg")
+    plt.close()
+
+
+def generate_cepstrum_variants(output_dir: str) -> None:
+    """Power, real and complex cepstra of one echo-carrying record."""
+    print("Generating cepstrum_variants...")
+    from phonometry import cepstrum
+
+    fs = 48000.0
+    # A band-limited source wavelet (its cepstrum concentrates below 1 ms)
+    # plus one reflection at 8 ms with reflection coefficient a = 0.5.
+    b, a_coef = scipy_signal.butter(2, 0.3)
+    s = np.zeros(4096)
+    s[37: 37 + 256] = scipy_signal.lfilter(
+        b, a_coef, np.r_[1.0, np.zeros(255)]
+    )
+    x = s + 0.5 * np.roll(s, 384)                # echo: 8 ms, a = 0.5
+
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    axins = ax.inset_axes((0.60, 0.28, 0.26, 0.42))
+    variants = (
+        ("power", COLOR_PRIMARY, "-", "Power cepstrum"),
+        ("real", COLOR_TERTIARY, "--", "Real cepstrum (exactly half the power)"),
+        ("complex", COLOR_SECONDARY, ":", "Complex cepstrum"),
+    )
+    for kind, colour, style, label in variants:
+        res = cepstrum(x, fs, kind=kind)
+        q_ms = 1e3 * res.quefrencies
+        mask = (q_ms > 0.5) & (q_ms <= 20.0)
+        ax.plot(q_ms[mask], res.cepstrum[mask], color=colour, linestyle=style,
+                linewidth=1.1, label=label)
+        zoom = (q_ms > 7.8) & (q_ms <= 8.2)
+        axins.plot(q_ms[zoom], res.cepstrum[zoom], color=colour,
+                   linestyle=style, linewidth=1.3, marker="o", markersize=3)
+    axins.set_xlim(7.85, 8.15)
+    axins.set_ylim(-0.05, 0.55)
+    axins.tick_params(labelsize=7)
+    axins.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.indicate_inset_zoom(axins, edgecolor=COLOR_FG, alpha=0.5)
+    ax.annotate("first rahmonic at 8 ms:\nheight ≈ a on the power cepstrum",
+                xy=(8.0, 0.5), xytext=(2.5, 0.42), fontsize=9,
+                color=COLOR_FG,
+                arrowprops={"arrowstyle": "->", "lw": 0.9, "color": COLOR_FG})
+    ax.annotate("second rahmonic: $-a^2/2$",
+                xy=(16.0, -0.125), xytext=(12.0, -0.22), fontsize=9,
+                color=COLOR_FG,
+                arrowprops={"arrowstyle": "->", "lw": 0.9, "color": COLOR_FG})
+    ax.set_xlabel("Quefrency [ms]")
+    ax.set_ylabel("Cepstrum")
+    ax.set_xlim(0.5, 20.0)
+    ax.set_ylim(-0.3, 0.6)
+    ax.set_title("The Three Cepstrum Variants of One Echo-Carrying Record",
+                 fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper right", fontsize=9)
+    plt.tight_layout()
+    save_figure(output_dir, "cepstrum_variants.svg")
+    plt.close()
+
+
+def generate_lifter_split(output_dir: str) -> None:
+    """Lowpass/highpass liftering of a log spectrum with an 8 ms echo."""
+    print("Generating lifter_split...")
+    from phonometry import lifter
+
+    fs = 48000.0
+    # The same wavelet-plus-echo record as the cepstrum-variants figure:
+    # a smooth source envelope carrying a pure 8 ms echo ripple (a = 0.5),
+    # so the highpass ripple swings exactly between the closed forms.
+    b, a_coef = scipy_signal.butter(2, 0.3)
+    s = np.zeros(4096)
+    s[37: 37 + 256] = scipy_signal.lfilter(
+        b, a_coef, np.r_[1.0, np.zeros(255)]
+    )
+    x = s + 0.5 * np.roll(s, 384)                # the same 8 ms echo
+
+    low = lifter(x, fs, cutoff=0.004, mode="lowpass")
+    high = lifter(x, fs, cutoff=0.004, mode="highpass")
+    band = (low.frequencies >= 500.0) & (low.frequencies <= 2000.0)
+
+    _fig, axes = plt.subplots(2, 1, figsize=(10, 7), sharex=True)
+    axes[0].semilogx(low.frequencies[band], low.spectrum_db[band],
+                     color="#7f7f7f", linewidth=0.7, alpha=0.8,
+                     label="Log spectrum of the record")
+    axes[0].semilogx(low.frequencies[band], low.liftered_db[band],
+                     color=COLOR_PRIMARY, linewidth=2.0,
+                     label="Lowpass lifter: spectral envelope")
+    axes[0].set_ylabel("Magnitude [dB]")
+    axes[0].legend(loc="upper right", fontsize=9)
+
+    axes[1].semilogx(high.frequencies[band], high.liftered_db[band],
+                     color=COLOR_SECONDARY, linewidth=1.1,
+                     label="Highpass lifter: the echo ripple alone")
+    for bound in (20.0 * np.log10(1.5), 20.0 * np.log10(0.5)):
+        axes[1].axhline(bound, color=COLOR_TERTIARY, linestyle="--",
+                        linewidth=1.2,
+                        label=(r"closed-form ripple bounds $20\lg(1\pm a)$"
+                               if bound > 0 else None))
+    axes[1].set_ylabel("Magnitude [dB]")
+    axes[1].set_xlabel(LABEL_FREQ_HZ)
+    axes[1].legend(loc="upper right", fontsize=9)
+
+    for ax in axes:
+        ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
+        ax.set_axisbelow(True)
+        format_frequency_axis(ax, 500.0, 2000.0)
+    axes[0].set_title("Liftering at 4 ms: Envelope Versus Echo Ripple",
+                      fontweight="bold", pad=12)
+    plt.tight_layout()
+    save_figure(output_dir, "lifter_split.svg")
+    plt.close()
+
+
+def generate_correlation_normalizations(output_dir: str) -> None:
+    """The three correlation normalizations of a two-sensor delay model."""
+    print("Generating correlation_normalizations...")
+    from phonometry import correlation, noise_signal
+
+    fs = 8192.0
+    delay = 102                                   # 12.45 ms
+    x = noise_signal(fs, 2.0, seed=4)
+    interference = noise_signal(fs, 2.0, rms=0.5, seed=5)
+    y = 0.8 * np.concatenate([np.zeros(delay), x[:-delay]]) + interference
+
+    coeff = correlation(x, y, fs, normalization="coefficient", max_lag=0.05)
+    biased = correlation(x, y, fs, normalization="biased")
+    unbiased = correlation(x, y, fs, normalization="unbiased")
+
+    _fig, (ax_c, ax_n) = plt.subplots(2, 1, figsize=(10, 7))
+    ax_c.plot(1e3 * coeff.lags, coeff.values, color=COLOR_PRIMARY,
+              linewidth=1.1,
+              label=r"Coefficient $\rho_{xy}(\tau)$ (bounded by $\pm 1$)")
+    ax_c.axvline(1e3 * delay / fs, color=COLOR_SECONDARY, linestyle="--",
+                 linewidth=1.2, label="true delay +12.5 ms")
+    ax_c.set_xlabel("Lag [ms]")
+    ax_c.set_ylabel("Correlation")
+    ax_c.set_ylim(-1.05, 1.05)
+    ax_c.legend(loc="upper left", fontsize=9)
+
+    ax_n.plot(unbiased.lags, unbiased.values, color=COLOR_SECONDARY,
+              linewidth=0.5, alpha=0.9,
+              label=r"Unbiased $1/(N-|r|)$ (variance grows at the ends)")
+    ax_n.plot(biased.lags, biased.values, color=COLOR_PRIMARY,
+              linewidth=0.5,
+              label=r"Biased $1/N$ (tapers toward the ends)")
+    ax_n.set_xlabel("Lag [s]")
+    ax_n.set_ylabel("Correlation")
+    ax_n.legend(loc="upper left", fontsize=9)
+
+    for ax in (ax_c, ax_n):
+        ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+        ax.set_axisbelow(True)
+    ax_c.set_title("Correlation Normalizations of a Two-Sensor Delay Model",
+                   fontweight="bold", pad=12)
+    plt.tight_layout()
+    save_figure(output_dir, "correlation_normalizations.svg")
+    plt.close()
+
+
+def generate_ir_alignment(output_dir: str) -> None:
+    """Sub-sample alignment of an impulse response onto a reference."""
+    print("Generating ir_alignment...")
+    from phonometry import align_impulse_responses, fractional_delay
+
+    fs = 48000.0
+    t = np.arange(int(0.03 * fs)) / fs
+    rng = np.random.default_rng(6)
+    # Band-limited reference pulse: a 2 kHz Gaussian tone burst at 5 ms.
+    ir_a = scipy_signal.gausspulse(t - 0.005, fc=2000.0, bw=0.5)
+    ir_b = fractional_delay(ir_a, 7.37)[: ir_a.size]
+    ir_b += 0.005 * rng.standard_normal(ir_a.size)
+
+    res = align_impulse_responses(ir_b, ir_a, fs)
+    t_ms = 1e3 * t
+
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    ax.plot(t_ms, res.reference, color=COLOR_PRIMARY, linewidth=1.6,
+            label="Reference IR")
+    ax.plot(t_ms, ir_b, color="#7f7f7f", linewidth=1.0, linestyle="--",
+            alpha=0.8, label="Measured IR (delayed 7.37 samples)")
+    ax.plot(t_ms, res.aligned[: t.size], color=COLOR_SECONDARY,
+            linewidth=1.0, linestyle=":", label="Aligned IR (delay removed)")
+    ax.text(0.985, 0.05,
+            f"estimated delay removed: {res.delay_samples:.2f} samples",
+            transform=ax.transAxes, va="bottom", ha="right", fontsize=9,
+            color=COLOR_FG)
+    ax.set_xlim(2.0, 9.0)
+    ax.set_xlabel("Time [ms]")
+    ax.set_ylabel("Amplitude")
+    ax.set_title("Sub-Sample Impulse-Response Alignment",
+                 fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper right", fontsize=9)
+    plt.tight_layout()
+    save_figure(output_dir, "ir_alignment.svg")
+    plt.close()
+
+
+def generate_hilbert_envelope(output_dir: str) -> None:
+    """Hilbert envelope and instantaneous frequency of a decaying mode."""
+    print("Generating hilbert_envelope...")
+    from phonometry import envelope
+
+    fs = 8192.0
+    t = np.arange(int(0.4 * fs)) / fs
+    rng = np.random.default_rng(7)
+    decay = np.exp(-t / 0.1)                     # a struck 250 Hz mode
+    x = decay * np.sin(2.0 * np.pi * 250.0 * t)
+    x += 0.001 * rng.standard_normal(t.size)
+
+    # The envelope of a narrowband signal is low-frequency: the anti-aliased
+    # x8 decimation keeps the outputs compact without losing the decay.
+    res = envelope(x, fs, decimation_factor=8)
+
+    _fig, (ax_e, ax_f) = plt.subplots(2, 1, figsize=(10, 7), sharex=True)
+    ax_e.plot(t, res.signal, color=COLOR_PRIMARY, linewidth=0.6,
+              label="Signal")
+    ax_e.plot(res.times, res.envelope, color=COLOR_SECONDARY, linewidth=1.8,
+              label="Envelope $A(t)$")
+    ax_e.plot(res.times, -res.envelope, color=COLOR_SECONDARY, linewidth=1.8)
+    ax_e.set_ylabel("Amplitude")
+    ax_e.legend(loc="upper right", fontsize=9)
+
+    ax_f.plot(res.times, res.instantaneous_frequency, color=COLOR_PRIMARY,
+              linewidth=0.9, label="Instantaneous frequency $f(t)$")
+    ax_f.axhline(250.0, color=COLOR_TERTIARY, linestyle="--", linewidth=1.4,
+                 label="carrier 250 Hz")
+    ax_f.set_ylim(230.0, 270.0)
+    ax_f.set_ylabel("Instantaneous frequency [Hz]")
+    ax_f.set_xlabel("Time [s]")
+    ax_f.legend(loc="upper right", fontsize=9)
+
+    for ax in (ax_e, ax_f):
+        ax.set_xlim(0.0, 0.3)
+        ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+        ax.set_axisbelow(True)
+    ax_e.set_title("Hilbert Envelope and Instantaneous Frequency",
+                   fontweight="bold", pad=12)
+    plt.tight_layout()
+    save_figure(output_dir, "hilbert_envelope.svg")
+    plt.close()
+
+
+def generate_cross_spectral_density_delay(output_dir: str) -> None:
+    """Cross-spectral density of a delay path: magnitude and linear phase."""
+    print("Generating cross_spectral_density...")
+    from phonometry import cross_spectral_density, noise_signal
+
+    fs = 8000.0
+    tau = 0.002                                   # 2 ms = 16 samples
+    delay = int(tau * fs)
+    x = noise_signal(fs, 8.0, seed=8)
+    noise = noise_signal(fs, 8.0, rms=0.3, seed=9)
+    y = 0.9 * np.concatenate([np.zeros(delay), x[:-delay]]) + noise
+
+    res = cross_spectral_density(x, y, fs)
+    tiny = np.finfo(np.float64).tiny
+    band = (res.frequencies >= 20.0) & (res.frequencies <= 3500.0)
+    freqs = res.frequencies[band]
+
+    _fig, (ax_m, ax_p) = plt.subplots(2, 1, figsize=(10, 7), sharex=True)
+    ax_m.semilogx(freqs, 10.0 * np.log10(np.maximum(res.magnitude[band], tiny)),
+                  color=COLOR_PRIMARY, linewidth=1.1,
+                  label=r"$|\hat{G}_{xy}|$ (Welch estimate)")
+    ax_m.set_ylabel("Magnitude [dB]")
+    ax_m.legend(loc="lower left", fontsize=9)
+
+    ax_p.semilogx(freqs, res.phase[band], color=COLOR_PRIMARY, linewidth=1.1,
+                  label="Unwrapped phase")
+    ax_p.fill_between(freqs, res.phase[band] - res.phase_std[band],
+                      res.phase[band] + res.phase_std[band],
+                      color=COLOR_PRIMARY, alpha=0.25,
+                      label=r"$\pm 1$ s.d. band (Eq. 9.52)")
+    ax_p.semilogx(freqs, -2.0 * np.pi * freqs * tau, color=COLOR_SECONDARY,
+                  linestyle="--", linewidth=1.4,
+                  label=r"slope $-2\pi f\tau$ ($\tau$ = 2 ms)")
+    ax_p.set_ylabel("Phase [rad]")
+    ax_p.set_xlabel(LABEL_FREQ_HZ)
+    ax_p.legend(loc="lower left", fontsize=9)
+
+    for ax in (ax_m, ax_p):
+        ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
+        ax.set_axisbelow(True)
+        format_frequency_axis(ax, 20.0, 3500.0)
+    ax_m.set_title("Cross-Spectral Density of a 2 ms Delay Path",
+                   fontweight="bold", pad=12)
+    plt.tight_layout()
+    save_figure(output_dir, "cross_spectral_density.svg")
+    plt.close()
+
+
+def generate_coherent_output_snr(output_dir: str) -> None:
+    """Coherent output spectrum split and the spectral SNR."""
+    print("Generating coherent_output_snr...")
+    from phonometry import coherent_output_spectrum, noise_signal
+
+    fs = 48000.0
+    x = noise_signal(fs, 8.0, color="white", seed=1)
+    noise = noise_signal(fs, 8.0, color="white", rms=0.5, seed=2)
+    y = 0.8 * x + noise                      # SNR = 0.64/0.25 per band
+
+    res = coherent_output_spectrum(x, y, fs, nperseg=2048)
+    tiny = np.finfo(np.float64).tiny
+    band = np.flatnonzero(
+        (res.frequencies >= 20.0) & (res.frequencies <= 20000.0)
+    )
+    # Thin the flat spectra to ~1000 log-spaced bins: on a log axis the
+    # linear Welch grid bunches thousands of vertices at the right edge
+    # without adding visual information (and bloats the SVG).
+    band = band[np.unique(np.geomspace(1, band.size, 1000).astype(int) - 1)]
+    freqs = res.frequencies[band]
+
+    _fig, (ax_g, ax_s) = plt.subplots(2, 1, figsize=(10, 7), sharex=True)
+    for values, colour, style, label in (
+        (res.output_psd, COLOR_PRIMARY, "-",
+         r"$\hat{G}_{yy}$ (measured output)"),
+        (res.coherent_psd, COLOR_TERTIARY, "--",
+         r"$\hat{G}_{vv} = \gamma^2\hat{G}_{yy}$ (coherent part)"),
+        (res.noise_psd, COLOR_SECONDARY, ":",
+         r"$\hat{G}_{nn}$ (uncorrelated noise)"),
+    ):
+        ax_g.semilogx(freqs,
+                      10.0 * np.log10(np.maximum(values[band], tiny)),
+                      color=colour, linestyle=style, linewidth=1.1,
+                      label=label)
+    ax_g.set_ylabel("Spectral density [dB re 1/Hz]")
+    ax_g.legend(loc="lower left", fontsize=9)
+
+    ax_s.semilogx(freqs, res.snr_db[band], color=COLOR_PRIMARY,
+                  linewidth=1.1, label="Spectral SNR [dB]")
+    ax_s.axhline(10.0 * np.log10(0.64 / 0.25), color=COLOR_SECONDARY,
+                 linestyle="--", linewidth=1.4,
+                 label=r"closed form $10\lg(2.56)$ = 4.1 dB")
+    ax_s.set_ylabel("Spectral SNR [dB]")
+    ax_s.set_xlabel(LABEL_FREQ_HZ)
+    ax_s.legend(loc="lower left", fontsize=9)
+
+    for ax in (ax_g, ax_s):
+        ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
+        ax.set_axisbelow(True)
+        format_frequency_axis(ax, 20.0, 20000.0)
+    ax_g.set_title(
+        "Coherent Output Spectrum and Spectral SNR (Bendat & Piersol 9.2.2)",
+        fontweight="bold", pad=12)
+    plt.tight_layout()
+    save_figure(output_dir, "coherent_output_snr.svg")
+    plt.close()
+
+
+def generate_golay_ir(output_dir: str) -> None:
+    """Golay-pair impulse response: exact complementary recovery."""
+    print("Generating golay_ir...")
+    from phonometry import golay_impulse_response, golay_pair
+
+    fs = 48000
+    pair = golay_pair(14)                        # two 16384-sample codes
+    b, a = scipy_signal.butter(2, [200.0, 2000.0], btype="bandpass", fs=fs)
+    length = pair[0].size
+    rec_a = scipy_signal.lfilter(b, a, np.tile(pair[0], 3))[2 * length:]
+    rec_b = scipy_signal.lfilter(b, a, np.tile(pair[1], 3))[2 * length:]
+
+    ir = np.asarray(golay_impulse_response(rec_a, rec_b, pair, fs=fs))
+    impulse = np.zeros(length)
+    impulse[0] = 1.0
+    true_ir = scipy_signal.lfilter(b, a, impulse)
+    err = float(np.max(np.abs(ir - true_ir)))
+
+    t_ms = 1e3 * np.arange(length) / fs
+    view = t_ms <= 6.0
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    ax.plot(t_ms[view], ir[view], color=COLOR_PRIMARY, linewidth=1.6,
+            label="Recovered IR (golay_impulse_response)")
+    ax.plot(t_ms[view], true_ir[view], color=COLOR_SECONDARY, linewidth=1.2,
+            linestyle="--", label="True system response")
+    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
+    ax.text(0.985, 0.05,
+            f"max |recovered - true| = {err:.1e}\n"
+            "noise-free closed-form identity",
+            transform=ax.transAxes, va="bottom", ha="right", fontsize=9,
+            color=COLOR_FG,
+            bbox={"boxstyle": "round,pad=0.4", "facecolor": panel,
+                  "edgecolor": COLOR_GRID})
+    ax.set_xlabel("Time [ms]")
+    ax.set_ylabel("Amplitude")
+    ax.set_title("Golay-Pair Impulse Response: Exact Complementary Recovery",
+                 fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper right", fontsize=9)
+    plt.tight_layout()
+    save_figure(output_dir, "golay_ir.svg")
+    plt.close()
+
+
+def generate_tsa_noise_reduction(output_dir: str) -> None:
+    """TSA: measured error of the average against the ideal 1/sqrt(N)."""
+    print("Generating tsa_noise_reduction...")
+    from phonometry import time_synchronous_average
+
+    fs = 8192.0
+    samples = 256
+    period = samples / fs
+    m = np.arange(samples) / fs
+    true = (np.cos(2.0 * np.pi * m / period)
+            + 0.5 * np.cos(2.0 * np.pi * 3.0 * m / period + 0.7)
+            + 0.25 * np.cos(2.0 * np.pi * 5.0 * m / period + 1.1))
+    rng = np.random.default_rng(5)
+    n_max = 128
+    x = np.tile(true, n_max) + rng.standard_normal(n_max * samples)
+
+    counts = [1, 2, 4, 8, 16, 32, 64, 128]
+    errors = []
+    for n in counts:
+        res = time_synchronous_average(x[: n * samples], fs, period,
+                                       n_averages=n)
+        errors.append(float(np.sqrt(np.mean(
+            (res.period_waveform - true) ** 2))))
+
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    ax.loglog(counts, errors, "o-", color=COLOR_PRIMARY, linewidth=1.6,
+              markersize=6, label="Measured RMS error of the average")
+    ax.loglog(counts, 1.0 / np.sqrt(np.asarray(counts, dtype=np.float64)),
+              color=COLOR_SECONDARY, linestyle="--", linewidth=1.4,
+              label=r"Ideal $\sigma/\sqrt{N}$")
+    ax.set_xticks(counts)
+    ax.set_xticklabels([str(n) for n in counts])
+    ax.set_xlabel("Number of averages N")
+    ax.set_ylabel("RMS error of the averaged waveform")
+    ax.set_title(r"TSA Noise Reduction: the $\sqrt{N}$ Law (McFadden 1987)",
+                 fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper right", fontsize=9)
+    plt.tight_layout()
+    save_figure(output_dir, "tsa_noise_reduction.svg")
+    plt.close()
+
+
+def generate_runs_test(output_dir: str) -> None:
+    """Runs test about the median: accepted noise vs rejected alternation."""
+    print("Generating runs_test...")
+    from phonometry import trend_test
+
+    rng = np.random.default_rng(3)
+    sequences = [rng.standard_normal(40), np.tile([1.0, -1.0], 10)]
+
+    _fig, axes = plt.subplots(1, 2, figsize=(12.5, 5.4))
+    for ax, seq in zip(axes, sequences):
+        res = trend_test(seq, method="runs")
+        idx = np.arange(1, seq.size + 1)
+        median = float(np.median(seq))
+        above = seq > median
+        ax.plot(idx, seq, color="#7f7f7f", linewidth=0.7, alpha=0.7,
+                zorder=1)
+        ax.scatter(idx[above], seq[above], color=COLOR_PRIMARY, s=28,
+                   zorder=3, label="Above the median")
+        ax.scatter(idx[~above], seq[~above], color=COLOR_SECONDARY, s=28,
+                   zorder=3, label="Below the median")
+        ax.axhline(median, color=COLOR_FG, linestyle="--", linewidth=1.1,
+                   alpha=0.7, label="Sequence median")
+        verdict = "trend-free" if res.trend_free else "rejected"
+        ax.set_title(f"r = {res.statistic} runs, accept "
+                     f"({res.bounds[0]}, {res.bounds[1]}]: {verdict}",
+                     fontweight="bold", pad=10)
+        ax.set_xlabel("Sample index")
+        ax.set_ylabel("Sequence value")
+        ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+        ax.set_axisbelow(True)
+        ax.legend(loc="lower left", fontsize=8.5)
+    plt.suptitle("Runs Test About the Median (Wald & Wolfowitz)",
+                 fontweight="bold")
+    plt.tight_layout()
+    save_figure(output_dir, "runs_test.svg")
     plt.close()
 
 
@@ -10924,6 +11545,19 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_phase_decomposition,
     generate_loudness_gating,
     generate_loudness_range,
+    # Core-metrology figures (resampling, cepstral analysis, correlation,
+    # cross-spectra, Golay recovery, synchronous averaging, runs test).
+    generate_resampling_antialias,
+    generate_cepstrum_variants,
+    generate_lifter_split,
+    generate_correlation_normalizations,
+    generate_ir_alignment,
+    generate_hilbert_envelope,
+    generate_cross_spectral_density_delay,
+    generate_coherent_output_snr,
+    generate_golay_ir,
+    generate_tsa_noise_reduction,
+    generate_runs_test,
 )
 
 
