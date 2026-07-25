@@ -260,7 +260,49 @@ f = np.logspace(np.log10(0.5), np.log10(200.0), 400)
 res = vibration.sdof_mobility_result(f, mass=2.0, stiffness=8000.0, damping=5.0)
 z = res.to("impedance")                        # impedancia = 1/Y por frecuencia
 print(res.frequencies[int(np.argmax(res.magnitude))].round(1))   # ~10.1 Hz
+
+res.plot()   # |Y(f)| con la resonancia marcada (requiere matplotlib)
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mobility_result_lines_es.svg" alt="Magnitud de la movilidad en el punto de excitación de un resonador de un grado de libertad en ejes log-log, subiendo por la línea de rigidez por debajo de la resonancia, bajando por la línea de masa por encima y con el pico en uno partido por el coeficiente de amortiguamiento en la resonancia" width="82%" />
+
+*Leer una movilidad en el punto de excitación es un diagnóstico estructural:
+por debajo de la resonancia la magnitud sube por la **línea de rigidez**
+$\omega/k$, por encima baja por la **línea de masa** $1/(\omega m)$, y la
+altura del pico entre ambas es $1/c$, una lectura directa del
+amortiguamiento (Sección 1).*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import vibration
+
+m, k, c = 2.0, 8000.0, 5.0
+f = np.logspace(np.log10(0.5), np.log10(200.0), 400)
+res = vibration.sdof_mobility_result(f, mass=m, stiffness=k, damping=c)
+
+# Una línea: |Y(f)| con la resonancia marcada:
+res.plot(language="es")
+plt.show()
+
+# A mano, añadiendo las asíntotas de rigidez y de masa que describe la prosa:
+w = 2.0 * np.pi * f
+fig, ax = plt.subplots()
+ax.loglog(f, res.magnitude, label="|Y(f)| en el punto de excitación")
+ax.loglog(f, w / k, ":", label="línea de rigidez ω/k")
+ax.loglog(f, 1.0 / (w * m), ":", label="línea de masa 1/(ωm)")
+ax.axhline(1.0 / c, ls="--", color="0.6", label="pico |Y| = 1/c")
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("Movilidad |Y| [m/(N·s)]")
+ax.set_title("Lectura de una movilidad en el punto de excitación (ISO 7626-1)")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 ### Ficha de informe
 
