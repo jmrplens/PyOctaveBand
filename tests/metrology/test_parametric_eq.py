@@ -460,6 +460,79 @@ def test_rejects_conflicting_or_misplaced_parameters() -> None:
         ph.ParametricEQ(FS, [])
 
 
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"f0": float("nan"), "gain_db": 3.0},
+        {"f0": float("inf"), "gain_db": 3.0},
+        {"f0": 1000.0, "gain_db": float("nan")},
+        {"f0": 1000.0, "gain_db": float("inf")},
+        {"f0": 1000.0, "gain_db": 3.0, "q": float("nan")},
+        {"f0": 1000.0, "gain_db": 3.0, "bw": float("inf")},
+    ],
+)
+def test_rejects_non_finite_parameters(kwargs: dict) -> None:
+    with pytest.raises(ValueError, match="finite"):
+        ph.EQSection("peaking", **kwargs)
+
+
+@pytest.mark.parametrize("gain_db", [1e308, -1e308])
+@pytest.mark.parametrize(
+    ("filter_type", "kwargs"),
+    [("peaking", {}), ("lowshelf", {"slope": 1.0})],
+)
+def test_extreme_finite_gain_raises_value_error(
+    gain_db: float, filter_type: str, kwargs: dict
+) -> None:
+    # 10^(gain_db/40) overflows for huge positive gains and underflows to
+    # zero (then divides by zero in the designers) for huge negative ones;
+    # both used to leak raw OverflowError/ZeroDivisionError.
+    with pytest.raises(ValueError, match="representable"):
+        ph.EQSection(filter_type, 1000.0, gain_db=gain_db, **kwargs)
+
+
+def test_shelf_slope_beyond_gain_bound_raises_informatively() -> None:
+    # A = 10^(9/40): the alpha recipe is real only below
+    # (A + 1/A)/(A + 1/A - 2) = 8.2869...; beyond it the raw math would
+    # fail with a bare "math domain error".
+    with pytest.raises(ValueError, match="too steep"):
+        ph.EQSection("lowshelf", 1000.0, gain_db=9.0, slope=12.0)
+    # Just below the bound the design succeeds and is strictly stable.
+    section = ph.EQSection("lowshelf", 1000.0, gain_db=9.0, slope=8.0)
+    sos = ph.ParametricEQ(FS, section).sos
+    assert np.max(np.abs(np.roots(sos[0, 3:]))) < 1.0
+    # Gain 0 dB (A = 1): every positive slope is admissible.
+    ph.EQSection("lowshelf", 1000.0, gain_db=0.0, slope=50.0)
+
+
+def test_bw_overflow_near_nyquist_raises_value_error() -> None:
+    # The w0/sin(w0) warping factor diverges towards Nyquist: this bw/f0
+    # pair used to escape as a raw OverflowError from math.sinh.
+    section = ph.EQSection("notch", 23999.0, bw=1.0)
+    with pytest.raises(ValueError, match="too wide"):
+        ph.ParametricEQ(FS, section)
+
+
+def test_bw_marginally_unstable_section_raises_value_error() -> None:
+    # Large but finite alpha: the rounded a2 lands exactly at -1.0 (poles
+    # on the unit circle) with no arithmetic error to flag it.
+    for f0, bw in ((23800.0, 1.0), (23900.0, 6.0)):
+        with pytest.raises(ValueError, match="not strictly stable"):
+            ph.ParametricEQ(FS, ph.EQSection("notch", f0, bw=bw))
+
+
+def test_extreme_but_valid_sections_still_design_stably() -> None:
+    for filter_type, f0, kwargs in (
+        ("peaking", 23990.0, {"gain_db": 40.0, "q": 100.0}),
+        ("lowpass", 23999.0, {"q": 100.0}),
+        ("highpass", 0.01, {"q": 0.001}),
+        ("allpass", 12000.0, {"q": 1e-6}),
+    ):
+        sos = ph.ParametricEQ(FS, ph.EQSection(filter_type, f0, **kwargs)).sos
+        assert np.all(np.isfinite(sos))
+        assert np.max(np.abs(np.roots(sos[0, 3:]))) < 1.0
+
+
 def test_response_grid_validation() -> None:
     eq = ph.ParametricEQ(FS, ph.EQSection("peaking", 1000.0, gain_db=3.0))
     with pytest.raises(ValueError, match="n_points"):

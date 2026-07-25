@@ -50,10 +50,11 @@ interfering tone at a *non-harmonic* order `q = f·T` is only attenuated,
 not removed, its rejection is optimised by choosing `N` so that a comb
 node lands exactly on it, i.e. the smallest `N` with `N·q` an integer.
 McFadden's own example, a tone at 32.05 orders, is suppressed by more than
-100 dB with `N = 20` (since `20·32.05 = 641`) yet only ~14 dB with the
-common power-of-two choice `N = 32` (`32·32.05 = 1025.6`). Thus the
-habit of taking a power-of-two number of averages is not, in general,
-optimal.
+100 dB with `N = 20` (since `20·32.05 = 641`) yet -- evaluating Eq. 8
+at that order -- by only about 14 dB with the common power-of-two choice
+`N = 32` (`32·32.05 = 1025.6`; the paper makes the comparison but does
+not print this figure). Thus the habit of taking a power-of-two number of
+averages is not, in general, optimal.
 
 **Non-integer samples per period.** When `fs·T` is not an integer the
 period boundaries fall between samples. Each block is then aligned to a
@@ -61,7 +62,12 @@ common integer grid by the band-limited fractional delay of
 [`phonometry.metrology.signals.fractional_delay`](/phonometry/reference/api/spectra/signals/#fractional_delay) before averaging, so
 the periodic waveform is recovered within the interpolation error of that
 band-limited shift. An integer `fs·T` needs no interpolation and the
-waveform is recovered to machine precision.
+waveform is recovered to machine precision. The averaged samples stay on
+the `1/fs` sampling grid throughout: output sample `m` is the average
+of the input at the times `n·T + m/fs`, so the returned time axis is
+`m/fs` and the `M = round(fs·T)` samples cover one period exactly when
+`fs·T` is an integer and to within half a sample otherwise. No
+resampling onto an `M`-point angular grid is performed.
 
 ## comb_filter_response
 
@@ -88,7 +94,7 @@ multiple of `N`.
 | `period` | Repetition period `T`, in seconds. |
 | `n_averages` | Number of averaged periods `N` (at least 1). |
 
-**Returns:** The filter magnitude at each frequency (unitless, in [0, 1]).
+**Returns:** The filter magnitude at each frequency (unitless; bounded by 1, though floating-point cancellation immediately beside a tooth can return values above 1 by a few parts in 1e9).
 
 **Raises**
 
@@ -122,7 +128,7 @@ Time synchronous average of a periodic waveform in noise.
 | Name | Description |
 | :--- | :--- |
 | `period_waveform` | The averaged periodic waveform, one period of `samples_per_period` samples. |
-| `times` | Time axis of `period_waveform`, in seconds, spanning one period `[0, T)`. |
+| `times` | Time axis of `period_waveform`, in seconds: the sampling grid `m/fs`, `m = 0 .. M-1` (the averaged samples stay on the `1/fs` grid; see the module note). The axis spans one period exactly when `fs·T` is an integer, and to within half a sample otherwise. |
 | `residual` | Input minus the periodic reconstruction, over the analysed span (`n_averages·samples_per_period` samples, aligned to the integer period grid): what is left after the synchronous component is removed. |
 | `n_averages` | Number of periods averaged, `N`. |
 | `samples_per_period` | Integer samples per period `M` after any alignment. |

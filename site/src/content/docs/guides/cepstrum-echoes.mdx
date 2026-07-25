@@ -41,7 +41,10 @@ computes the three standard variants over the quefrency axis:
 
 - `'power'` (default): the inverse DFT of `ln|X|²` (Milner's Fig. 21). Real,
   even and phase-blind - the workhorse for echo and harmonic-family
-  detection;
+  detection. This is Milner's *signed* cepstrum of the log-power spectrum;
+  Bogert's original 1963 "power cepstrum" squares once more and is
+  non-negative - the library follows Milner throughout, so negative
+  rahmonics keep their sign;
 - `'real'`: the inverse DFT of `ln|X|` - exactly half the power cepstrum,
   and the quantity whose causal folding is the minimum-phase reconstruction
   (below);
@@ -84,10 +87,20 @@ $$
 
 so the cepstrum carries a spike train at the **rahmonics** `n·t0` with
 amplitudes `a, -a²/2, a³/3, ...` (their sum is `ln(1+a)`), regardless of the
-spectrum of `s` itself, which concentrates at low quefrencies. On the power
-cepstrum the first spike's height is exactly the reflection coefficient `a` -
-a closed form the tests and the conformance suite pin to 1e-10.
-`echo_detection` automates the reading:
+spectrum of `s` itself, which concentrates at low quefrencies. On the signed
+cepstrum of the log-power spectrum (`kind='power'`, Milner's convention) the
+first spike's height is the reflection coefficient `a` - of either
+sign - plus whatever the source cepstrum contributes at that quefrency
+(negligible for broadband sources, whose cepstrum concentrates at low
+quefrencies); on an ideal impulse-plus-echo the identity is a closed form
+the tests and the conformance suite pin to 1e-10. `echo_detection` automates the reading: it picks the largest
+`|cepstrum|` peak in the searched band (so an inverting reflection, `a < 0`,
+is found at its true delay rather than missed), refines the delay by
+quadratic interpolation through the peak and its neighbours, and reports the
+signed peak value as the reflection coefficient. When the true delay falls
+between samples the rahmonic splits across quefrency bins: the interpolated
+delay still lands on it, but the reported coefficient underestimates `|a|`
+(down to about 65 % of it midway between samples).
 
 ```python
 import numpy as np
@@ -217,10 +230,20 @@ Section 13.3 (Fig. 13.11) formalizes the structure: an envelope detector, a
 DC remover, and a spectral view of what remains. `envelope_spectrum` runs the
 [Hilbert envelope](/phonometry/guides/correlation-delay/) (`kind="magnitude"`,
 the practical default) or the book's square-law detector (`kind="squared"`)
-through exactly that chain, scaled so a sinusoidal modulation reads out as a
-line at its exact amplitude.
+through exactly that chain, scaled by the taper's coherent gain so a
+sinusoidal modulation whose frequency falls on an analysis bin reads out as
+a line at its exact amplitude (off-bin lines read low by the taper's
+scalloping loss, up to about 1.4 dB for the default Hann). The optional
+`band=(low, high)` argument reproduces the figure's band-pass front end -
+the classical bearing-envelope chain: isolate the structural-resonance band
+excited by the defect impacts with a zero-phase band-pass, then envelope
+it - so an out-of-band interferer is strongly attenuated before the
+detector (the roll-off of a fourth-order Butterworth applied forward and
+backward; the rejection is finite, and the zero-phase pass leaves small
+transients at the record edges).
 
-For an AM tone `A0·(1 + m·cos(2πfm·t))·cos(2πfc·t)` the closed forms are:
+For an AM tone `A0·(1 + m·cos(2πfm·t))·cos(2πfc·t)` with `fm` on an
+analysis bin the closed forms are:
 
 | `kind` | mean level | line at `fm` | line at `2fm` |
 |---|---|---|---|

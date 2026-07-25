@@ -147,12 +147,13 @@ def test_exact_recovery_integer_period() -> None:
     assert result.residual_rms < 1e-12
 
 
-def test_times_span_one_period() -> None:
+def test_times_are_the_sampling_grid() -> None:
     one = _periodic(PERIOD, M, (2.0,))
     result = ph.time_synchronous_average(_repeat(one, 10), FS, PERIOD)
     assert result.times.size == M
     assert result.times[0] == pytest.approx(0.0, abs=1e-15)
     assert result.times[-1] < PERIOD
+    assert np.allclose(result.times, np.arange(M) / FS, atol=0.0)
 
 
 # ---------------------------------------------------------------------------
@@ -161,7 +162,12 @@ def test_times_span_one_period() -> None:
 
 
 def test_noninteger_period_recovered_within_bound() -> None:
-    """A non-integer M is aligned by band-limited fractional delay."""
+    """A non-integer M is aligned by band-limited fractional delay.
+
+    The averaged samples stay on the ``1/fs`` sampling grid, so the
+    reference is the true waveform evaluated at ``m/fs`` -- exactly the
+    grid :attr:`times` reports.
+    """
     period = 1.0 / 31.7  # FS * period is not an integer
     m_int = round(FS * period)
     phase = np.arange(30 * m_int) / FS / period
@@ -171,12 +177,52 @@ def test_noninteger_period_recovered_within_bound() -> None:
     result = ph.time_synchronous_average(signal, FS, period)
 
     assert result.interpolated is True
-    reference = np.cos(
-        2.0 * np.pi * np.arange(m_int) * (period / m_int) / period
-    ) + 0.4 * np.cos(
-        2.0 * np.pi * 2.0 * np.arange(m_int) * (period / m_int) / period + 0.3
+    assert np.allclose(result.times, np.arange(m_int) / FS, atol=0.0)
+    ref_phase = result.times / period
+    reference = np.cos(2.0 * np.pi * ref_phase) + 0.4 * np.cos(
+        2.0 * np.pi * 2.0 * ref_phase + 0.3
     )
-    assert np.max(np.abs(result.period_waveform - reference)) < 0.05
+    assert np.max(np.abs(result.period_waveform - reference)) < 1e-5
+
+
+def test_noninteger_period_samples_on_fs_grid_not_angular_grid() -> None:
+    """Regression: 100.37 samples per period, noiseless, 12 harmonics.
+
+    Each output sample ``m`` averages the input at the times
+    ``n·T + m/fs``: evaluated on the ``m/fs`` grid the noiseless recovery
+    error is at the fractional-delay interpolation level (~3e-6 here),
+    while evaluating the same samples on an ``m·T/M`` angular grid --
+    the axis reported before the fix -- misreads them by ~9e-2.
+    """
+    fs = 1000.0
+    period = 100.37 / fs
+    m_int = round(fs * period)
+    n_avg = 50
+    n_samples = int(np.ceil((n_avg + 1) * fs * period))
+    t = np.arange(n_samples) / fs
+
+    orders = np.arange(1, 13)
+    amps = 1.0 / orders
+    phases = 0.821 * orders**2
+
+    def wave(tv: np.ndarray) -> np.ndarray:
+        return sum(
+            a * np.cos(2.0 * np.pi * k / period * tv + p)
+            for k, a, p in zip(orders, amps, phases)
+        )
+
+    result = ph.time_synchronous_average(wave(t), fs, period, n_averages=n_avg)
+
+    assert result.interpolated is True
+    assert result.samples_per_period == m_int
+    assert np.allclose(result.times, np.arange(m_int) / fs, atol=0.0)
+
+    err_fs_grid = np.max(np.abs(result.period_waveform - wave(result.times)))
+    assert err_fs_grid < 1e-4  # measured ~2.8e-6
+
+    angular_grid = np.arange(m_int) * (period / m_int)
+    err_angular = np.max(np.abs(result.period_waveform - wave(angular_grid)))
+    assert err_angular > 0.05  # the angular grid is the wrong axis
 
 
 # ---------------------------------------------------------------------------
@@ -257,6 +303,15 @@ def test_comb_filter_response_validation() -> None:
         comb_filter_response(one, PERIOD, 0)
     with pytest.raises(ValueError, match="positive"):
         comb_filter_response(one, -1.0, 2)
+
+
+def test_comb_filter_response_rejects_overflowing_order() -> None:
+    # Finite f and T whose product overflows would give sin(inf) = NaN
+    # instead of the documented bounded response.
+    with pytest.raises(ValueError, match="overflows"):
+        comb_filter_response(np.array([1e308]), 1e308, 3)
+    with pytest.raises(ValueError, match="overflows"):
+        comb_filter_response(np.array([1e307]), 100.0, 2**40)
 
 
 def test_plot_returns_axes() -> None:

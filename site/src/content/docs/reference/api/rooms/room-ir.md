@@ -475,7 +475,7 @@ the result, together with the achieved crest factor.
 | `magnitude` | Band-limited magnitude imposed on the synthesis spectrum, normalised to a peak of 1 (linear). |
 | `group_delay` | Synthesized group delay `tau_G(f)` on `frequencies`, in seconds: the time at which each frequency is swept through. |
 | `f_range` | `(f1, f2)` band covered by the sweep, in Hz. |
-| `crest_factor_db` | Peak-to-RMS ratio over the sweep's central (constant-envelope) interval, in dB. A time-domain swept sine has the ideal 3.02 dB; the frequency-domain synthesis stays close to it (Mueller & Massarani 2001, Sec. 4.3: normally below 4 dB). |
+| `crest_factor_db` | Peak-to-RMS ratio over the sweep's central (constant-envelope) interval, in dB. A time-domain swept sine has the ideal 3.02 dB; the frequency-domain synthesis stays close to it (Mueller & Massarani 2001, Sec. 4.3: normally below 4 dB). Their figure assumes the slight magnitude smoothing the paper applies before synthesis, which this module does not implement: typical shaped sweeps here measure about 4.2-4.3 dB. |
 
 ### ShapedSweepResult.plot()
 

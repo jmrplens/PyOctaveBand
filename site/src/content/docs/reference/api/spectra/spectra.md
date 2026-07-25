@@ -369,10 +369,12 @@ Thomson's frequency-dependent weights (P&W Eqs. 368a/370a, iterated to
 convergence): wherever the local spectrum is weak relative to the
 broad-band leakage each taper could carry, the leakier high-order
 tapers are downweighted, trading degrees of freedom (Eq. 370b) for
-leakage protection in high-dynamic-range spectra. For a locally white
-spectrum the weights converge to uniform and nothing is lost. With
-`adaptive=False` the eigenvalue-weighted average of P&W Eq. 369a is
-returned.
+leakage protection in high-dynamic-range spectra. The broadband
+`σ²` driving the weights is `mean(x²)` with no mean removal,
+consistent with the no-detrending calibration below. For a locally
+white spectrum the weights converge to uniform and nothing is lost.
+With `adaptive=False` the eigenvalue-weighted average of P&W
+Eq. 369a is returned.
 
 Calibration matches the Welch estimators of this module exactly: no
 detrending, `'density'` scaling integrates to the signal power

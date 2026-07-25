@@ -223,7 +223,7 @@ can be verified against the filter itself.
 | `filter_taps` | Anti-alias FIR taps (unit passband gain; the polyphase engine applies the `up` interpolation gain), designed at the intermediate rate `original_fs·up`. A single `1.0` tap when the ratio is 1 (no filtering). |
 | `passband_edge_hz` | Passband edge of the design, in Hz. |
 | `stopband_edge_hz` | Stopband edge of the design (the smaller of the two Nyquist frequencies), in Hz. |
-| `stopband_attenuation_db` | Designed stopband attenuation, in dB (also the passband ripple bound: the Kaiser method is equiripple-bounded by the same `δ = 10^(-A/20)` in both bands). |
+| `stopband_attenuation_db` | Designed stopband attenuation, in dB (also the passband ripple bound: the Kaiser window method holds the ripple of both bands within the same `δ = 10^(-A/20)`, though -- unlike a true equiripple design -- its ripple decays away from the band edges rather than staying at the bound). |
 | `transition_width` | Transition-band width as a fraction of the smaller Nyquist frequency. |
 
 ### ResampledSignalResult.n_taps
@@ -257,6 +257,16 @@ periods gated by a rectangular envelope; with `repetition_rate` a
 train of `repetitions` identical bursts is produced, one per
 repetition period, as in the repetitive-burst test of Clause A2.2
 (there: 5 ms bursts of 5 kHz tone at 2, 10 or 100 bursts per second).
+
+The gate closes after `round(fs·cycles/frequency)` samples, so the
+"integral number of full periods" is sample-exact only when `fs`
+and `frequency` are commensurate (`fs·cycles/frequency` an
+integer). Otherwise the gate closes up to half a sample away from
+the tone's final zero crossing and the gated waveform carries a
+residual step of up to `amplitude·sin(π·frequency/fs)` there
+(e.g. 10 cycles of 997 Hz at 48 kHz span 481.44 samples, gated at
+481); a [`PhonometryWarning`](/phonometry/reference/api/filters/phonometry/#phonometrywarning) quantifies the
+realized residual.
 
 **Parameters**
 

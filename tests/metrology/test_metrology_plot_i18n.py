@@ -331,6 +331,8 @@ def test_parametric_eq_es_and_bad_language() -> None:
     axes = res.plot(language="es")
     assert "Respuesta del EQ paramétrico (Audio EQ Cookbook)" in _titles(axes)
     assert "Cascada" in _labels(axes)
+    assert "shelf de graves 100 Hz" in _labels(axes)
+    assert "campana 1000 Hz" in _labels(axes)
     assert "Fase [grados]" in _labels(axes)
     plt.close("all")
     with pytest.raises(ValueError):

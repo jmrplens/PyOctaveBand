@@ -114,7 +114,11 @@ class EQSection:
     :ivar bw: Bandwidth in octaves (peaking: between the midpoint-gain
         frequencies; band-pass/notch: between the -3 dB frequencies).
     :ivar slope: Shelf-slope parameter ``S`` (shelves only; ``S = 1`` is the
-        steepest monotonic slope).
+        steepest monotonic slope, and ``S`` must stay below the
+        gain-dependent bound ``(A + 1/A)/(A + 1/A - 2)`` with
+        ``A = 10^(gain_db/40)``, beyond which the cookbook's alpha turns
+        complex; at 0 dB gain ``A = 1``, the bound is unbounded and every
+        positive slope is admissible).
     """
 
     filter_type: EQFilterType
@@ -135,9 +139,62 @@ def _validate_section(section: EQSection) -> None:
             f"Unknown filter_type {section.filter_type!r}; expected one of "
             f"{sorted(_DESIGNERS)}."
         )
+    for name, value in (
+        ("f0", section.f0),
+        ("gain_db", section.gain_db),
+        ("q", section.q),
+        ("bw", section.bw),
+        ("slope", section.slope),
+    ):
+        if value is not None and not math.isfinite(value):
+            raise ValueError(f"'{name}' must be finite, got {value!r}.")
     if section.f0 <= 0:
         raise ValueError("Centre frequency 'f0' must be positive.")
+    _gain_amplitude(section.gain_db)
     _validate_section_parameterization(section)
+
+
+def _gain_amplitude(gain_db: float) -> float:
+    """The cookbook's amplitude ``A = 10^(gain_db/40)``, representable.
+
+    A finite but extreme ``gain_db`` overflows the power (about
+    +12320 dB) or underflows it to zero (about -12320 dB), where the
+    designers would divide by zero; both are rejected with the documented
+    :class:`ValueError` instead of leaking raw arithmetic errors.
+    """
+    try:
+        big_a = float(10.0 ** (gain_db / 40.0))
+    except OverflowError:
+        big_a = math.inf
+    if not (big_a > 0.0 and math.isfinite(big_a)):
+        raise ValueError(
+            f"'gain_db' = {gain_db:g} dB is outside the representable "
+            "range: 10^(gain_db/40) must be a positive finite number."
+        )
+    return big_a
+
+
+def _validate_shelf_slope(section: EQSection) -> None:
+    """Bound the shelf slope so the cookbook's alpha stays real.
+
+    The alpha recipe takes ``sqrt((A + 1/A)·(1/S - 1) + 2)``, which is
+    real only for ``S < (A + 1/A)/(A + 1/A - 2)`` (any ``S`` when the
+    gain is 0 dB, i.e. ``A = 1``); at the bound itself alpha is 0 and the
+    poles land on the unit circle.
+    """
+    if section.slope is None:
+        return
+    big_a = _gain_amplitude(section.gain_db)
+    a_sum = big_a + 1.0 / big_a
+    if a_sum <= 2.0:  # A = 1 (gain 0 dB): every positive slope is fine
+        return
+    bound = a_sum / (a_sum - 2.0)
+    if section.slope >= bound:
+        raise ValueError(
+            f"Shelf slope 'slope' = {section.slope:g} is too steep for "
+            f"gain_db = {section.gain_db:g}: the cookbook's alpha is real "
+            f"only for slopes below (A + 1/A)/(A + 1/A - 2) = {bound:.6g}."
+        )
 
 
 def _validate_section_parameterization(section: EQSection) -> None:
@@ -165,6 +222,7 @@ def _validate_section_parameterization(section: EQSection) -> None:
         raise ValueError(
             "'gain_db' applies to 'peaking', 'lowshelf' and 'highshelf' only."
         )
+    _validate_shelf_slope(section)
 
 
 # ---------------------------------------------------------------------------
@@ -259,14 +317,52 @@ def _section_alpha(section: EQSection, w0: float, big_a: float) -> float:
     sin_w0 = math.sin(w0)
     if section.bw is not None:
         # Digital-domain bandwidth relation: the w0/sin(w0) factor
-        # compensates the bilinear-transform frequency warping.
-        return sin_w0 * math.sinh(math.log(2.0) / 2 * section.bw * w0 / sin_w0)
+        # compensates the bilinear-transform frequency warping. Near the
+        # Nyquist frequency that factor diverges, so a wide 'bw' can push
+        # the sinh argument past the floating-point range.
+        try:
+            return sin_w0 * math.sinh(
+                math.log(2.0) / 2 * section.bw * w0 / sin_w0
+            )
+        except OverflowError:
+            raise ValueError(
+                f"Bandwidth 'bw' = {section.bw:g} octaves is too wide for "
+                f"f0 = {section.f0:g} Hz this close to the Nyquist "
+                "frequency: the cookbook's bandwidth-to-alpha relation "
+                "overflows. Reduce 'bw', lower 'f0' or parameterize the "
+                "section with 'q' instead."
+            ) from None
     if section.slope is not None:
         return (sin_w0 / 2) * math.sqrt(
             (big_a + 1 / big_a) * (1 / section.slope - 1) + 2
         )
     q = section.q if section.q is not None else _DEFAULT_Q
     return sin_w0 / (2 * q)
+
+
+def _check_section_stability(
+    fs: float, section: EQSection, a1: float, a2: float
+) -> None:
+    """Require the realized poles strictly inside the unit circle.
+
+    In exact arithmetic every cookbook section with ``alpha > 0`` is
+    stable, but at the extremes (a very wide ``bw`` or ``f0`` within a few
+    ppm of DC or the Nyquist frequency) the rounded coefficients can land
+    exactly on the stability-triangle boundary -- e.g. ``a2 == -1.0``, a
+    pole pair on the unit circle -- and the filter would ring forever
+    without any arithmetic error to flag it.
+    """
+    if abs(a2) < 1.0 and abs(a1) < 1.0 + a2:
+        return
+    raise ValueError(
+        f"The designed {section.filter_type!r} section at f0 = "
+        f"{section.f0:g} Hz (fs = {fs:g} Hz) is not strictly stable after "
+        f"rounding (a1 = {a1:.17g}, a2 = {a2:.17g}): its poles do not lie "
+        "strictly inside the unit circle. This happens when 'bw' (or "
+        "1/'q') is very large or f0 sits within a few ppm of DC or the "
+        "Nyquist frequency; bring the section parameters back from the "
+        "extreme."
+    )
 
 
 def _section_sos(fs: float, section: EQSection) -> NDArray[np.float64]:
@@ -277,12 +373,14 @@ def _section_sos(fs: float, section: EQSection) -> NDArray[np.float64]:
             f"Nyquist frequency {fs / 2} Hz."
         )
     w0 = 2 * math.pi * section.f0 / fs
-    big_a = 10.0 ** (section.gain_db / 40.0)
+    big_a = _gain_amplitude(section.gain_db)
     alpha = _section_alpha(section, w0, big_a)
     b, a = _DESIGNERS[section.filter_type](math.cos(w0), math.sin(w0), alpha, big_a)
     a0 = a[0]
+    a1, a2 = a[1] / a0, a[2] / a0
+    _check_section_stability(fs, section, a1, a2)
     return np.array(
-        [b[0] / a0, b[1] / a0, b[2] / a0, 1.0, a[1] / a0, a[2] / a0],
+        [b[0] / a0, b[1] / a0, b[2] / a0, 1.0, a1, a2],
         dtype=np.float64,
     )
 

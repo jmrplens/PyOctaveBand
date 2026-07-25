@@ -153,6 +153,20 @@ def _reverse_arrangement_bounds(n: int, alpha: float) -> tuple[int, int]:
     correction. This reproduces every ``alpha = 0.05`` entry of B&P
     Table A.6 (``N`` = 10 to 100), e.g. ``(64, 125)`` for ``N = 20`` --
     the book's Examples 4.4 and 10.3.
+
+    The normal approximation is kept *deliberately*, for all ``N``: the
+    book's table itself follows it. No percentage-point convention on the
+    exact Mahonian null distribution reproduces every tabulated entry
+    (checked digit by digit: e.g. at ``N = 40``, ``a = 0.975`` the exact
+    tail jumps from ``P(A > 304) = 0.9771`` to ``P(A > 305) = 0.9758``,
+    neither equal to 0.975, and the nearest-tail point would be 306, yet
+    the table prints 305 -- exactly where the continuity-corrected normal
+    point 305.39 rounds to; ``N = 100``, ``a = 0.975`` behaves the same
+    way). Exact-distribution bounds would therefore *disagree* with the
+    published Table A.6 that users check against. The p-value, which has
+    no tabulated convention to honour, does use the exact distribution
+    (:func:`_reverse_arrangement_p_value`), so verdict and p-value can
+    disagree by at most one count right at an acceptance boundary.
     """
     mean, std = _reverse_arrangement_moments(n)
     spread = float(special.ndtri(1.0 - alpha / 2.0)) * std
@@ -290,7 +304,13 @@ class TrendTestResult:
     :ivar std: Null standard deviation (B&P Eq. (4.55) for ``A``).
     :ivar bounds: Acceptance region ``(lower, upper)``: percentage points
         such that the no-trend hypothesis is accepted when
-        ``lower < statistic <= upper``.
+        ``lower < statistic <= upper``. For reverse arrangements these
+        follow B&P Table A.6's own convention (normal approximation with
+        continuity correction, which reproduces the book's tabulated
+        ``alpha = 0.05`` entries exactly; the table is not derivable from
+        the exact Mahonian distribution), so at an acceptance boundary
+        the verdict and the exact :attr:`p_value` can disagree by one
+        count.
     :ivar p_value: Two-sided p-value from the exact null distribution
         (normal approximation above ``n = 100`` for reverse arrangements).
     :ivar trend_free: ``True`` when the statistic falls inside the

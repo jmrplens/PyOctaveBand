@@ -139,6 +139,7 @@ smearing them.
 
 - International Electrotechnical Commission. (1985). *Sound system
   equipment — Part 1: General* (IEC 60268-1:1985).
+  [IEC webstore](https://webstore.iec.ch/en/publication/1204).
   Annex A, Clause A2: tone bursts starting at the zero crossing of the tone
   with an integral number of full periods (A2.1), repetitive burst trains
   at a stated repetition rate (A2.2), and the Table AII burst durations the

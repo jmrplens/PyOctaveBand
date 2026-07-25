@@ -137,7 +137,7 @@ One biquad of the RBJ Audio EQ Cookbook.
 | `gain_db` | Gain `G` in dB - peaking and shelving types only. |
 | `q` | Quality factor. Exactly one of `q`, `bw` and `slope` may be given; with none, `q = 1/sqrt(2)` (Butterworth alignment). |
 | `bw` | Bandwidth in octaves (peaking: between the midpoint-gain frequencies; band-pass/notch: between the -3 dB frequencies). |
-| `slope` | Shelf-slope parameter `S` (shelves only; `S = 1` is the steepest monotonic slope). |
+| `slope` | Shelf-slope parameter `S` (shelves only; `S = 1` is the steepest monotonic slope, and `S` must stay below the gain-dependent bound `(A + 1/A)/(A + 1/A - 2)` with `A = 10^(gain_db/40)`, beyond which the cookbook's alpha turns complex; at 0 dB gain `A = 1`, the bound is unbounded and every positive slope is admissible). |
 
 ## parametric_eq
 

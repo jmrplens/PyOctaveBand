@@ -30,12 +30,16 @@ matching the ECMA-internal convention when the input is already
 narrowband.
 
 The **envelope spectrum** (:func:`envelope_spectrum`) transforms the
-detected envelope itself: Section 13.3 of the book runs a square-law
-envelope detector into a DC remover before correlating (Figure 13.11),
-because the spectral content of the envelope - not of the signal - is
-where amplitude modulations show as discrete lines. An AM tone with
-modulation frequency ``f_m`` and depth ``m`` puts a line of closed-form
-amplitude at exactly ``f_m``, the anchor the tests pin.
+detected envelope itself: Section 13.3 of the book runs a band-pass
+filter and a square-law envelope detector into a DC remover before
+correlating (Figure 13.11), because the spectral content of the envelope
+- not of the signal - is where amplitude modulations show as discrete
+lines. The optional ``band`` argument reproduces the figure's band-pass
+front end (the classical bearing-envelope chain: isolate the resonance
+band, then envelope it). An AM tone with modulation frequency ``f_m``
+(on an analysis bin) and depth ``m`` puts a line of closed-form
+amplitude at exactly ``f_m``, the anchor the tests pin; off-bin
+modulation lines read low by the taper's scalloping loss.
 """
 
 from __future__ import annotations
@@ -200,7 +204,10 @@ class EnvelopeSpectrumResult:
     :ivar frequencies: Frequency axis of the spectrum, in Hz.
     :ivar amplitude: One-sided amplitude spectrum of the (mean-removed)
         envelope: the height of a discrete modulation line in the units of
-        the envelope itself. The zero-frequency bin is not doubled.
+        the envelope itself, exact when the modulation frequency falls on
+        an analysis bin (off-bin lines read low by the taper's scalloping
+        loss; see :func:`envelope_spectrum`). The zero-frequency bin is
+        not doubled.
     :ivar mean_level: Mean of the detected envelope (the DC the remover of
         Figure 13.11 takes out): the carrier amplitude for
         ``kind="magnitude"``, its mean square for ``kind="squared"``.
@@ -213,6 +220,9 @@ class EnvelopeSpectrumResult:
     :ivar remove_dc: Whether the envelope mean was removed first.
     :ivar fs: Sample rate of the analysed record, in Hz.
     :ivar nfft: FFT length used.
+    :ivar band: ``(low, high)`` edges of the zero-phase band-pass
+        pre-filter applied before envelope detection, in Hz, or ``None``
+        (no pre-filter).
     """
 
     frequencies: NDArray[np.float64]
@@ -225,6 +235,7 @@ class EnvelopeSpectrumResult:
     remove_dc: bool
     fs: float
     nfft: int
+    band: tuple[float, float] | None = None
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -242,6 +253,42 @@ class EnvelopeSpectrumResult:
         return plot_envelope_spectrum(self, ax=ax, language=language, **kwargs)
 
 
+def _bandpass_pre_filter(
+    xa: NDArray[np.float64], fs: float, band: tuple[float, float]
+) -> tuple[NDArray[np.float64], tuple[float, float]]:
+    """Zero-phase 4th-order Butterworth band-pass ahead of the detector.
+
+    Returns the filtered record and the validated ``(low, high)`` edges.
+    """
+    from scipy import signal as sp_signal
+
+    try:
+        low, high = (float(edge) for edge in band)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(
+            "'band' must be a pair of numeric (low, high) edges in Hz, "
+            f"got {band!r}."
+        ) from exc
+    if not 0.0 < low < high < fs / 2.0:
+        raise ValueError(
+            "'band' must satisfy 0 < low < high < fs/2; got "
+            f"({low:g}, {high:g}) at fs = {fs:g} Hz."
+        )
+    sos = sp_signal.butter(4, (low, high), btype="bandpass", fs=fs,
+                           output="sos")
+    # sosfiltfilt's default edge padding needs 3*(2*n_sections + 1)
+    # samples; fail with a clear message instead of scipy's padlen error.
+    min_length = 3 * (2 * sos.shape[0] + 1) + 1
+    if xa.size < min_length:
+        raise ValueError(
+            f"'x' is too short ({xa.size} samples) for the zero-phase "
+            f"band-pass pre-filter, which needs at least {min_length} "
+            "samples of padding; lengthen the record or omit 'band'."
+        )
+    filtered = np.asarray(sp_signal.sosfiltfilt(sos, xa), dtype=np.float64)
+    return filtered, (low, high)
+
+
 def envelope_spectrum(
     x: NDArray[np.float64] | list[float],
     fs: float,
@@ -250,20 +297,26 @@ def envelope_spectrum(
     window: str = "hann",
     nfft: int | None = None,
     remove_dc: bool = True,
+    band: tuple[float, float] | None = None,
 ) -> EnvelopeSpectrumResult:
     """Amplitude spectrum of the envelope: where modulations become lines.
 
     Follows the structure of Bendat & Piersol Section 13.3 (Figure 13.11):
-    an envelope detector, a DC remover, and a spectral view of what is
-    left. The detector is the Hilbert envelope ``A(t) = |z(t)|``
-    (``kind="magnitude"``, the practical default) or the book's square-law
-    detector ``A^2(t) = x^2 + x_hat^2`` (``kind="squared"``); its mean is
-    removed (kept in :attr:`EnvelopeSpectrumResult.mean_level`) and the
-    remainder is tapered and transformed once, scaled so a sinusoidal
-    modulation reads out as a line at its exact amplitude.
+    a band-pass filter (optional here), an envelope detector, a DC
+    remover, and a spectral view of what is left. The detector is the
+    Hilbert envelope ``A(t) = |z(t)|`` (``kind="magnitude"``, the
+    practical default) or the book's square-law detector
+    ``A^2(t) = x^2 + x_hat^2`` (``kind="squared"``); its mean is removed
+    (kept in :attr:`EnvelopeSpectrumResult.mean_level`) and the remainder
+    is tapered and transformed once, scaled by the taper's coherent gain
+    so a sinusoidal modulation whose frequency falls on an analysis bin
+    reads out as a line at its exact amplitude. An off-bin modulation
+    frequency reads low by the taper's scalloping loss -- up to about
+    1.4 dB (~15 %) for the default Hann midway between bins -- like any
+    single-record amplitude spectrum.
 
     Closed forms for an AM tone ``A0 (1 + m cos(2 pi f_m t)) cos(2 pi f_c t)``
-    with ``0 <= m < 1``:
+    with ``0 <= m < 1`` and ``f_m`` on an analysis bin:
 
     * ``kind="magnitude"``: a line of amplitude ``A0 m`` at ``f_m``;
       mean level ``A0``.
@@ -273,7 +326,11 @@ def envelope_spectrum(
     Amplitude modulation of rotating machinery (bearing and gear defect
     frequencies), mains hum and wind-turbine amplitude modulation appear
     the same way: lines at the modulation frequency and its harmonics,
-    separated from the carrier's own spectrum.
+    separated from the carrier's own spectrum. For the classical bearing
+    chain -- isolate a structural-resonance band excited by the defect
+    impacts, then envelope it -- pass the resonance band as ``band``: the
+    record is band-pass filtered (zero-phase, so the modulation phase is
+    untouched) before the detector, the Figure 13.11 front end.
 
     :param x: Signal, 1-D.
     :param fs: Sample rate, in Hz.
@@ -285,6 +342,11 @@ def envelope_spectrum(
     :param remove_dc: Remove the envelope mean before the transform
         (default ``True``, the Figure 13.11 DC remover); the mean is
         reported either way.
+    :param band: Optional ``(low, high)`` band-pass edges, in Hz
+        (``0 < low < high < fs/2``), applied to the record before
+        envelope detection as a zero-phase 4th-order Butterworth
+        (:func:`scipy.signal.sosfiltfilt`, giving an 8th-order magnitude
+        roll-off). Default ``None``: detect on the record as given.
     :return: An :class:`EnvelopeSpectrumResult`.
     :raises ValueError: If the inputs or parameters are invalid.
     """
@@ -302,6 +364,10 @@ def envelope_spectrum(
         raise ValueError(
             f"'nfft' must be at least the record length ({n} samples)."
         )
+
+    band_v: tuple[float, float] | None = None
+    if band is not None:
+        xa, band_v = _bandpass_pre_filter(xa, fs_v, band)
 
     env = np.asarray(np.abs(sp_signal.hilbert(xa)), dtype=np.float64)
     detector = env**2 if kind == "squared" else env
@@ -326,4 +392,5 @@ def envelope_spectrum(
         remove_dc=bool(remove_dc),
         fs=fs_v,
         nfft=nfft_v,
+        band=band_v,
     )

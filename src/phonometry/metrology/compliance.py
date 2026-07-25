@@ -614,6 +614,11 @@ _ANSI_S14_TABLE4_B: list[tuple[float, float]] = [
 # column lives in tests/reference_data.py and is pinned by the CI
 # conformance report.) Row = (nominal Hz, type1 upper, type1 lower,
 # type2 upper, type2 lower); a -inf lower limit means upper-only.
+# Transcription note, 20 Hz Type 2: the standard prints a bare "+3" there,
+# read here as +3/upper-only (matching the surrounding upper-only rows); a
+# plausible alternative reading is +/-3. The B-weighting response at 20 Hz
+# sits only 0.05 dB below nominal, so either reading yields the same
+# verdict.
 _ANSI_S14_TABLE5_12: list[tuple[float, float, float, float, float]] = [
     (10.0, 4.0, -4.0, 5.0, -_INF),
     (12.5, 3.5, -3.5, 5.0, -_INF),

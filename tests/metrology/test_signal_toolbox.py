@@ -113,6 +113,47 @@ def test_table_aiii_repetition_rates_fit(rate: float) -> None:
     assert res.period_samples == round(FS / rate)
 
 
+def test_tone_burst_incommensurate_frequency_warns() -> None:
+    """997 Hz at 48 kHz: 10 periods span 481.44 samples, gated at 481.
+
+    The 'integral number of full periods' of Clause A2.1 is sample-exact
+    only for commensurate f/fs; otherwise a warning quantifies the
+    residual step at the gate edge.
+    """
+    with pytest.warns(ph.PhonometryWarning, match="incommensurate") as record:
+        res = ph.tone_burst(FS, 997.0, 10)
+    assert res.burst_samples == 481
+    # The warning quantifies the exact span and the residual step at the
+    # gate edge, sin(2*pi*997*481/48000) ~ -0.058 (a commensurate burst
+    # would close exactly at the zero crossing).
+    message = str(record[0].message)
+    assert "481.444" in message
+    assert "-0.058" in message
+
+
+def test_tone_burst_invalid_config_raises_before_warning() -> None:
+    """An invalid repetition setup raises even for incommensurate bursts.
+
+    Under a warnings-as-errors filter the incommensurate warning must not
+    pre-empt the configuration ValueError.
+    """
+    import warnings as _warnings
+
+    with _warnings.catch_warnings():
+        _warnings.simplefilter("error", ph.PhonometryWarning)
+        with pytest.raises(ValueError, match="repetition_rate"):
+            ph.tone_burst(FS, 997.0, 10, repetitions=2)
+
+
+def test_tone_burst_commensurate_frequency_does_not_warn() -> None:
+    import warnings as _warnings
+
+    with _warnings.catch_warnings():
+        _warnings.simplefilter("error", ph.PhonometryWarning)
+        res = ph.tone_burst(FS, 5000.0, 25)  # 240 samples exactly
+    assert res.burst_samples == 240
+
+
 def test_tone_burst_result_is_frozen() -> None:
     res = ph.tone_burst(FS, 5000.0, 25)
     with pytest.raises(dataclasses.FrozenInstanceError):

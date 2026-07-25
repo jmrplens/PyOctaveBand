@@ -157,6 +157,10 @@ ANSIS14_TABLE4_B: list[tuple[float, float]] = [
 # response levels for Type 0 (laboratory), Type 1 (precision) and Type 2
 # (general purpose) instruments; they apply to every weighting. A lower
 # limit of -inf means only the upper limit applies.
+# Transcription note, 20 Hz Type 2: the standard prints a bare "+3"; read
+# as +3/upper-only (like the surrounding upper-only rows), with +/-3 a
+# plausible alternative. The realized B response there is only 0.05 dB
+# below nominal, so the reading cannot change any verdict.
 # Row = (freq_Hz, t0_up, t0_lo, t1_up, t1_lo, t2_up, t2_lo).
 ANSIS14_TABLE5: list[tuple[float, float, float, float, float, float, float]] = [
     (10, 2.0, -5.0, 4.0, -4.0, 5.0, -INF),

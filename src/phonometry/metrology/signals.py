@@ -49,11 +49,14 @@ with their accuracy stated instead of implied.
 
 from __future__ import annotations
 
+import math
+import warnings
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
+from .._internal.warnings import PhonometryWarning
 from .spectra import _positive
 
 if TYPE_CHECKING:
@@ -295,6 +298,16 @@ def tone_burst(
     repetition period, as in the repetitive-burst test of Clause A2.2
     (there: 5 ms bursts of 5 kHz tone at 2, 10 or 100 bursts per second).
 
+    The gate closes after ``round(fs·cycles/frequency)`` samples, so the
+    "integral number of full periods" is sample-exact only when ``fs``
+    and ``frequency`` are commensurate (``fs·cycles/frequency`` an
+    integer). Otherwise the gate closes up to half a sample away from
+    the tone's final zero crossing and the gated waveform carries a
+    residual step of up to ``amplitude·sin(π·frequency/fs)`` there
+    (e.g. 10 cycles of 997 Hz at 48 kHz span 481.44 samples, gated at
+    481); a :class:`~phonometry.PhonometryWarning` quantifies the
+    realized residual.
+
     :param fs: Sample rate, in Hz.
     :param frequency: Tone frequency, in Hz (below the Nyquist rate).
     :param cycles: Full tone periods per burst (positive integer).
@@ -316,15 +329,32 @@ def tone_burst(
     )
 
     burst_seconds = cycles_v / f_v
-    n_on = round(fs_v * burst_seconds)
+    exact_samples = fs_v * burst_seconds
+    n_on = round(exact_samples)
     if n_on < 2:
         raise ValueError(
             "The burst is shorter than 2 samples; increase 'cycles' or 'fs'."
         )
-
     rate_v, period, duty = _tone_burst_period(
         fs_v, n_on, repetitions_v, repetition_rate
     )
+
+    # Warn only once every configuration check has passed, so an invalid
+    # repetition setup raises instead of warning first (which would mask
+    # the error under a warnings-as-errors filter).
+    delta = n_on - exact_samples  # gate-close offset from the zero crossing
+    if abs(delta) > 1e-9:
+        residual = amplitude_v * math.sin(2.0 * math.pi * f_v * delta / fs_v)
+        warnings.warn(
+            f"'frequency' = {f_v:g} Hz is incommensurate with fs = "
+            f"{fs_v:g} Hz: {cycles_v} full periods span {exact_samples:.6g} "
+            f"samples, gated at {n_on}. The gate closes {abs(delta):.3g} "
+            "samples away from the tone's final zero crossing, leaving a "
+            f"residual step of {residual:.3g} (peak amplitude "
+            f"{amplitude_v:g}).",
+            PhonometryWarning,
+            stacklevel=2,
+        )
 
     n_pre = round(float(pre_silence) * fs_v)
     n_post = round(float(post_silence) * fs_v)
@@ -388,8 +418,10 @@ class ResampledSignalResult:
     :ivar stopband_edge_hz: Stopband edge of the design (the smaller of
         the two Nyquist frequencies), in Hz.
     :ivar stopband_attenuation_db: Designed stopband attenuation, in dB
-        (also the passband ripple bound: the Kaiser method is
-        equiripple-bounded by the same ``δ = 10^(-A/20)`` in both bands).
+        (also the passband ripple bound: the Kaiser window method holds
+        the ripple of both bands within the same ``δ = 10^(-A/20)``,
+        though -- unlike a true equiripple design -- its ripple decays
+        away from the band edges rather than staying at the bound).
     :ivar transition_width: Transition-band width as a fraction of the
         smaller Nyquist frequency.
     """

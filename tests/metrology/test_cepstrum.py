@@ -173,6 +173,50 @@ def test_echo_detection_on_noise_source() -> None:
     assert res.reflection_coefficient == pytest.approx(0.25, abs=0.02)
 
 
+def test_echo_detection_negative_reflection_exact() -> None:
+    """An inverting echo (a < 0) is a *negative* rahmonic of height a.
+
+    The Mercator series holds for either sign of ``a``: the first rahmonic
+    of ``delta[n] - 0.4*delta[n-d]`` is exactly ``-0.4`` at quefrency
+    ``d``. Peak-picking on ``|cepstrum|`` must find the true delay and
+    report the signed coefficient.
+    """
+    res = ph.echo_detection(_impulse_echo(a=-ALPHA), FS)
+    assert res.delay_samples == DELAY
+    assert res.delay == pytest.approx(DELAY / FS)
+    assert res.reflection_coefficient == pytest.approx(-ALPHA, abs=1e-12)
+
+
+def test_echo_detection_negative_reflection_on_noise_source() -> None:
+    s = ph.noise_signal(FS, N / FS, color="white", seed=42)
+    x = s - 0.25 * np.roll(s, 200)
+    res = ph.echo_detection(x, FS, min_quefrency=0.005)
+    assert res.delay_samples == 200
+    assert res.reflection_coefficient == pytest.approx(-0.25, abs=0.02)
+
+
+def test_echo_detection_off_sample_delay_is_interpolated() -> None:
+    """A delay midway between samples: quadratic interpolation locates it.
+
+    The echo is synthesised circularly by an exact half-sample phase ramp,
+    so the true delay is 313.5 samples. The rahmonic splits across the
+    neighbouring bins: the interpolated ``delay`` recovers the fraction,
+    while the coefficient at the peak sample underestimates ``a`` (the
+    documented bin-splitting caveat).
+    """
+    rng = np.random.default_rng(7)
+    s = rng.standard_normal(N)
+    true_delay = DELAY + 0.5
+    ramp = np.exp(-2j * np.pi * np.fft.rfftfreq(N) * true_delay)
+    x = s + ALPHA * np.fft.irfft(np.fft.rfft(s) * ramp, N)
+
+    res = ph.echo_detection(x, FS)
+    assert res.delay_samples in (DELAY, DELAY + 1)
+    assert res.delay * FS == pytest.approx(true_delay, abs=0.15)
+    # Bin splitting: the peak-sample coefficient reads low but keeps sign.
+    assert 0.15 < res.reflection_coefficient < ALPHA
+
+
 def test_echo_detection_search_band_is_respected() -> None:
     # Restrict the band away from the true echo: the peak reported must
     # come from inside the band.
