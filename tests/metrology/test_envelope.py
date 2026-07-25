@@ -291,6 +291,59 @@ def test_envelope_spectrum_zero_padding() -> None:
     )
 
 
+def test_envelope_spectrum_off_bin_line_shows_hann_scalloping() -> None:
+    """An off-bin modulation frequency reads low by the scalloping loss.
+
+    Midway between bins the Hann taper's scalloping loss is about
+    1.42 dB (a factor ~0.85): the documented limit of the on-bin 'exact
+    amplitude' calibration.
+    """
+    df = FS / ES_N
+    fm = (round(ES_FM / df) + 0.5) * df  # exactly midway between bins
+    t = np.arange(ES_N) / FS
+    x = (
+        ES_A0 * (1.0 + ES_M * np.cos(2.0 * np.pi * fm * t))
+        * np.cos(2.0 * np.pi * 1000.0 * t)
+    )
+    res = ph.envelope_spectrum(x, FS)
+    peak = float(np.max(res.amplitude[1:]))
+    # Hann scalloping at the bin midpoint: |W(1/2)| / |W(0)| ~ 0.8488.
+    assert peak == pytest.approx(0.8488 * ES_A0 * ES_M, rel=0.02)
+    assert peak < 0.9 * ES_A0 * ES_M
+
+
+def test_envelope_spectrum_bandpass_prefilter_isolates_the_carrier() -> None:
+    """The optional band isolates the modulated carrier before detection.
+
+    With a strong out-of-band interfering tone the raw Hilbert envelope is
+    dominated by the two-tone beat; band-passing around the carrier first
+    (the classical bearing-envelope chain) recovers the clean modulation
+    line at its exact amplitude.
+    """
+    t = np.arange(ES_N) / FS
+    x = _am_signal() + 3.0 * np.cos(2.0 * np.pi * 3000.0 * t)
+
+    raw = ph.envelope_spectrum(x, FS)
+    filtered = ph.envelope_spectrum(x, FS, band=(700.0, 1300.0))
+
+    assert filtered.band == (700.0, 1300.0)
+    assert raw.band is None
+    assert filtered.amplitude[_bin(ES_FM)] == pytest.approx(
+        ES_A0 * ES_M, rel=1e-2
+    )
+    assert filtered.mean_level == pytest.approx(ES_A0, rel=1e-2)
+    # Without the pre-filter the beat envelope swamps the modulation line.
+    beat_error = abs(raw.amplitude[_bin(ES_FM)] - ES_A0 * ES_M)
+    assert beat_error > 0.05 * ES_A0 * ES_M
+
+
+def test_envelope_spectrum_band_validation() -> None:
+    x = _am_signal()
+    for band in ((0.0, 100.0), (200.0, 100.0), (100.0, FS / 2.0)):
+        with pytest.raises(ValueError, match="band"):
+            ph.envelope_spectrum(x, FS, band=band)
+
+
 def test_envelope_spectrum_validates_inputs() -> None:
     x = _am_signal()
     with pytest.raises(ValueError, match="kind"):
