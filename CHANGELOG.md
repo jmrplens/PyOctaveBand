@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Restore the `phonometry._plotting` compatibility re-exports that were lost
+  during the lint modernization: the module is again a silent re-export of
+  every plot renderer moved to `phonometry._plot` (kept for one deprecation
+  cycle, removed in 4.0), now with an explicit `__all__` so the lint fixers
+  keep it, and the deprecation test suite asserts the full re-export surface.
 
 ### Changed
 

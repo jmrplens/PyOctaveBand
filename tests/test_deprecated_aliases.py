@@ -384,6 +384,112 @@ def test_pre_move_module_path_still_imports(path: str) -> None:
         warnings.simplefilter("error", DeprecationWarning)
         module = importlib.import_module(path)  # import itself must be silent
     assert module is sys.modules[path]
+    # A shim that imports but exposes nothing is as broken as an ImportError:
+    # every pre-move path must still surface its public names. ``dir()`` is
+    # silent on the PEP 562 shims, so this stays warning-free.
+    public = [name for name in dir(module) if not name.startswith("_")]
+    assert public, f"{path} imports but exposes no public names"
+
+
+# Frozen snapshot of the ``phonometry._plotting`` re-export surface (the
+# renderers as of the 3.2 move); do NOT regenerate from the live tree.
+_PLOTTING_RENDERERS = [
+    "plot_absorption_uncertainty",
+    "plot_age_threshold",
+    "plot_airborne_insulation",
+    "plot_airborne_prediction",
+    "plot_aircraft_band_attenuation",
+    "plot_ambient_noise",
+    "plot_band_uncertainty",
+    "plot_bottom_loss",
+    "plot_daily_exposure",
+    "plot_decay_curve",
+    "plot_diffusion_polar",
+    "plot_dynamic_stiffness",
+    "plot_ecma_loudness",
+    "plot_ecma_roughness",
+    "plot_ecma_tonality",
+    "plot_enclosed_space_absorption",
+    "plot_epnl",
+    "plot_excitation",
+    "plot_facade_insulation",
+    "plot_facade_prediction",
+    "plot_fdtd_probes",
+    "plot_fdtd_snapshot",
+    "plot_floor_covering_improvement",
+    "plot_fluctuation_strength",
+    "plot_flyover",
+    "plot_frequency_response",
+    "plot_harmonic_distortion",
+    "plot_htlan",
+    "plot_impact_insulation",
+    "plot_impact_prediction",
+    "plot_impact_rating",
+    "plot_impedance_tube",
+    "plot_impulse_prominence",
+    "plot_impulse_response",
+    "plot_insitu_absorption",
+    "plot_installed_structure_borne",
+    "plot_intensity",
+    "plot_mobility",
+    "plot_monte_carlo",
+    "plot_moore_glasberg_loudness",
+    "plot_moore_glasberg_time_loudness",
+    "plot_multiple_shock",
+    "plot_nipts",
+    "plot_noise_contour",
+    "plot_noise_criterion",
+    "plot_normal_modes",
+    "plot_npd_level",
+    "plot_occupational_exposure",
+    "plot_open_plan",
+    "plot_outdoor_attenuation",
+    "plot_parabolic_equation",
+    "plot_pile_strike",
+    "plot_psychoacoustic_annoyance",
+    "plot_radiated_power",
+    "plot_ray_trace",
+    "plot_reverberation_models",
+    "plot_room_acoustics",
+    "plot_room_criterion",
+    "plot_rotorcraft_hemisphere",
+    "plot_scattering_coefficient",
+    "plot_ship_source_level",
+    "plot_ship_traffic_spectrum",
+    "plot_sii",
+    "plot_sonar_equation",
+    "plot_sound_power",
+    "plot_sound_speed_profile",
+    "plot_static_airflow",
+    "plot_sti",
+    "plot_structure_borne_power",
+    "plot_tonal_adjustment",
+    "plot_tone_audibility",
+    "plot_transfer_stiffness",
+    "plot_transmission_loss",
+    "plot_uncertainty_budget",
+    "plot_vibration_reduction",
+    "plot_vibration_sound_power",
+    "plot_vibration_weighting",
+    "plot_weighted_absorption",
+    "plot_weighted_rating",
+    "plot_weighted_spectrum",
+    "plot_wind_turbine_tonality",
+    "plot_zwicker_loudness",
+]
+
+
+def test_plotting_shim_re_exports_every_renderer() -> None:
+    """``phonometry._plotting`` silently re-exports the full renderer set."""
+    import importlib
+    import warnings
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", DeprecationWarning)
+        module = importlib.import_module("phonometry._plotting")
+        assert sorted(module.__all__) == _PLOTTING_RENDERERS
+        for name in _PLOTTING_RENDERERS:
+            assert callable(getattr(module, name)), name
 
 
 def test_moved_module_shims_warn_and_delegate() -> None:
