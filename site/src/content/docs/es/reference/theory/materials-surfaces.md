@@ -119,6 +119,10 @@ oráculo es una cadena sintética de extremo a extremo ($V = 200$ m³,
 $S = 10$ m², $T = 8{,}0/6{,}0/7{,}5/5{,}0$ s → $s = 0{,}093$) más el valor a
 mano de la Fórmula A.5, $u_s = 0{,}0297$.
 
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/scattering_coefficient_es.svg" alt="El coeficiente de dispersión de incidencia aleatoria s de una superficie difusora sobre las 13 bandas de tercio de octava de 250 a 4000 Hz, creciendo suavemente desde casi cero a baja frecuencia hasta 0,84 a 4 kHz" style="width:88%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/scattering_coefficient_es_dark.svg" alt="El coeficiente de dispersión de incidencia aleatoria s de una superficie difusora sobre las 13 bandas de tercio de octava de 250 a 4000 Hz, creciendo suavemente desde casi cero a baja frecuencia hasta 0,84 a 4 kHz" style="width:88%" loading="lazy">
+
+*Un coeficiente de dispersión de incidencia aleatoria que crece con la frecuencia a medida que la rugosidad se hace comparable con la longitud de onda.*
+
 ### Coeficiente de difusión direccional (ISO 17497-2)
 
 ISO 17497-2:2012 mide, en campo libre, cuán uniformemente reparte una
@@ -202,6 +206,10 @@ exactas y a salvo del punto flotante. Los dos ejemplos resueltos del Anexo A
 se reproducen: $\alpha_p = (0{,}35, 0{,}70, 0{,}65, 0{,}60, 0{,}55)$ →
 $\alpha_w = 0{,}60$, clase C; y subir 500 Hz a 1,00 mantiene
 $\alpha_w = 0{,}60$ pero añade el indicador, "0,60(M)".
+
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating_es.svg" alt="Valoración ponderada de absorción acústica de ISO 11654: el espectro de absorción práctica trazado frente a la curva de referencia desplazada de 250 Hz a 4000 Hz, con la desviación desfavorable a 250 Hz sombreada y el coeficiente ponderado alpha_w leído a 500 Hz" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating_es_dark.svg" alt="Valoración ponderada de absorción acústica de ISO 11654: el espectro de absorción práctica trazado frente a la curva de referencia desplazada de 250 Hz a 4000 Hz, con la desviación desfavorable a 250 Hz sombreada y el coeficiente ponderado alpha_w leído a 500 Hz" style="width:80%" loading="lazy">
+
+*La valoración de ISO 11654: absorción práctica frente a la referencia desplazada, con la desviación desfavorable sombreada y el coeficiente ponderado leído a 500 Hz.*
 
 ### Resistencia al flujo de aire (ISO 9053-1/2)
 

@@ -113,6 +113,10 @@ La norma **no especifica interpolación** entre las frecuencias tabuladas. La F�
 
 Consulta la [guía de sonoridad](/phonometry/es/guides/loudness/) para su uso.
 
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/equal_loudness_contours_es.svg" alt="Curvas isofónicas normales de ISO 226:2023 de 20 a 90 fonios con la curva del umbral de audición" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/equal_loudness_contours_es_dark.svg" alt="Curvas isofónicas normales de ISO 226:2023 de 20 a 90 fonios con la curva del umbral de audición" style="width:80%" loading="lazy">
+
+*Las isófonas de ISO 226:2023 según la Fórmula (1), de 20 a 90 fonios, con el umbral de audición.*
+
 ## Prominencia tonal: TNR y PR (ECMA-418-1)
 
 Ambos métodos operan sobre un espectro de potencia con ventana de Hann promediado en RMS (cláusulas 11.1 / 12.1) y usan el modelo de bandas críticas de la cláusula 10. El ancho de banda crítico centrado en un tono a $f$ es (Fórmula 2):
@@ -165,6 +169,10 @@ $$
 por debajo de 1 sono el programa de referencia usa $L_N = 40 (N + 0{,}0005)^{0{,}35}$, con suelo en 3 fonios.
 
 Consulta la [guía de sonoridad](/phonometry/es/guides/loudness/) para su uso.
+
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_pattern_es.svg" alt="Patrones de sonoridad específica sobre la escala Bark para un sonido de banda estrecha de 1 kHz y un sonido de banda ancha con el mismo nivel de banda" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_pattern_es_dark.svg" alt="Patrones de sonoridad específica sobre la escala Bark para un sonido de banda estrecha de 1 kHz y un sonido de banda ancha con el mismo nivel de banda" style="width:80%" loading="lazy">
+
+*Sonoridad específica N′(z) sobre el eje de Bark: la energía repartida entre muchas bandas críticas suma más sonos que el mismo nivel de banda concentrado en una sola.*
 
 ## Modelos avanzados de sonoridad y calidad sonora
 
@@ -302,6 +310,10 @@ $$
 y cualquier fractil sigue un modelo gaussiano bilateral (cláusula 4.4), $\Delta H_Q = \Delta H_{md} + z(Q)\ s$, usando la dispersión superior $s_u$ para $z \ge 0$ (peor que la mediana) y la inferior $s_l$ en caso contrario, cada una un polinomio de grado 5 en $Y - 18$ por sexo y frecuencia (cláusula 4.3, Tablas 2–5). A los 18 años toda desviación es cero por construcción. Las fórmulas están establecidas hasta los 80 años a 2 kHz y por debajo, y hasta los 70 años por encima; más allá la evaluación es una extrapolación. Anclajes: a los 60 años las medianas evalúan a 7,85 dB (hombre, 1 kHz), 20,21 dB (hombre, 4 kHz) y 15,32 dB (mujer, 4 kHz), reproduciendo la fórmula de la Tabla 1 a $10^{-3}$.
 
 Consulta la [guía de umbral de audición](/phonometry/es/guides/hearing-threshold/) para su uso.
+
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hearing_threshold_es.svg" alt="Dos paneles. Izquierda: la desviación mediana del umbral de audición de ISO 7029 para hombres a los 20, 40, 60 y 80 años en un eje de audiograma invertido, con la banda del 10 al 90 por ciento en torno a la curva de 70 años; la pérdida se acentúa hacia las altas frecuencias y con la edad. Derecha: el umbral de referencia de campo libre y campo difuso de ISO 389-7, que coinciden por debajo de 1 kHz y divergen por encima, con un mínimo cerca de 3 a 4 kHz" style="width:96%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hearing_threshold_es_dark.svg" alt="Dos paneles. Izquierda: la desviación mediana del umbral de audición de ISO 7029 para hombres a los 20, 40, 60 y 80 años en un eje de audiograma invertido, con la banda del 10 al 90 por ciento en torno a la curva de 70 años; la pérdida se acentúa hacia las altas frecuencias y con la edad. Derecha: el umbral de referencia de campo libre y campo difuso de ISO 389-7, que coinciden por debajo de 1 kHz y divergen por encima, con un mínimo cerca de 3 a 4 kHz" style="width:96%" loading="lazy">
+
+*La desviación mediana con la edad de ISO 7029 con su banda de fractiles (izquierda) y los umbrales de referencia de campo libre y difuso de ISO 389-7 (derecha).*
 
 ## Pérdida auditiva inducida por ruido (ISO 1999)
 

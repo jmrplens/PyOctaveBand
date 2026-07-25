@@ -133,6 +133,10 @@ Los ajustes $K_i$ cubren las penalizaciones horarias (ISO 1996-1 Tabla A.1: tard
 
 Consulta la [guía de niveles](/phonometry/es/guides/levels/) para su uso.
 
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile_es.svg" alt="Perfil LAeq urbano sintético de 24 horas con las bandas de día, tarde y noche, los niveles por periodo ponderados con +5 y +10 dB y el Lden resultante" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile_es_dark.svg" alt="Perfil LAeq urbano sintético de 24 horas con las bandas de día, tarde y noche, los niveles por periodo ponderados con +5 y +10 dB y el Lden resultante" style="width:80%" loading="lazy">
+
+*Un perfil LAeq de 24 horas dividido en día, tarde y noche, las penalizaciones de +5/+10 dB y el Lden resultante.*
+
 ## Prominencia de sonidos impulsivos (NT ACOU 112)
 
 Un impulso molesta más allá de su energía, por lo que las evaluaciones ambientales según ISO 1996-2 penalizan los periodos con sonidos impulsivos prominentes; NT ACOU 112:2002 hace objetiva esa penalización. A partir del historial de nivel ponderado A con ponderación temporal F de un único evento, la tasa de crecimiento (dB/s) y la diferencia de nivel (dB) del arranque (que cualifica cuando supera los 10 dB/s, cláusulas 4.5–4.7) predicen la prominencia percibida (cláusula 7, Fórmula 1):
@@ -188,6 +192,10 @@ precisión impresa del estándar), muy dentro de su $\pm 10$ % declarado; pasar
 $f_m = 1000 \cdot 10^{k/10}$ (Nota 5) empleados para calcular esa tabla. El mismo
 $\alpha$ es la única vía hacia el coeficiente de atenuación de potencia de la
 ISO 354 $m = \alpha/(10 \lg e)$, expuesto como `air_attenuation_m`.
+
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_attenuation_es.svg" alt="Coeficiente de atenuación atmosférica de tono puro alfa de la ISO 9613-1 en dB/km frente a la frecuencia, con ordenada lineal en decibelios sobre un eje de frecuencia logarítmico, para la atmósfera de referencia de 20 grados Celsius y 50 por ciento de humedad relativa, producido por el método plot del resultado AtmosphericAttenuation" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_attenuation_es_dark.svg" alt="Coeficiente de atenuación atmosférica de tono puro alfa de la ISO 9613-1 en dB/km frente a la frecuencia, con ordenada lineal en decibelios sobre un eje de frecuencia logarítmico, para la atmósfera de referencia de 20 grados Celsius y 50 por ciento de humedad relativa, producido por el método plot del resultado AtmosphericAttenuation" style="width:80%" loading="lazy">
+
+*El coeficiente de ISO 9613-1 para la atmósfera de referencia de 20 °C y 50 % de humedad relativa: la subida en f² abarca dos décadas de 50 Hz a 10 kHz.*
 
 ### Método general de cálculo en exteriores (ISO 9613-2)
 
@@ -281,6 +289,10 @@ y la [guía de exposición al ruido en el trabajo](/phonometry/es/guides/occupat
 El nivel de potencia acústica $L_W = 10 \log_{10}(P/P_0)$ ($P_0 = 1$ pW) es una
 magnitud de *emisión*: a diferencia de un nivel de presión, no depende de la
 distancia al receptor ni de la sala. Tres familias de métodos lo recuperan.
+
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_es.svg" alt="Las tres vías de potencia acústica en paralelo: una superficie envolvente de presión sobre un plano reflectante (ISO 3744/3746), una fuente en una sala reverberante muestreada por micrófonos (ISO 3741) y una sonda de intensidad barriendo una superficie alrededor de la fuente (ISO 9614-2)" style="width:92%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_es_dark.svg" alt="Las tres vías de potencia acústica en paralelo: una superficie envolvente de presión sobre un plano reflectante (ISO 3744/3746), una fuente en una sala reverberante muestreada por micrófonos (ISO 3741) y una sonda de intensidad barriendo una superficie alrededor de la fuente (ISO 9614-2)" style="width:92%" loading="lazy">
+
+*Las tres vías hacia LW: superficie envolvente de presión, sala reverberante y barrido de intensidad.*
 
 ### Presión sobre superficie envolvente (ISO 3744/3746)
 

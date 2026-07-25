@@ -92,6 +92,10 @@ Los ejemplos resueltos de ISO 5349-2 se reproducen (E.2.1: 7,4 m/s² durante
 2,5 h → $A(8) = 4{,}1$ m/s²; E.3 forestal, tres herramientas → 3,6 m/s²),
 igual que las filas de duración de exposición de la Tabla C.1 de ISO 5349-1.
 
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_weighting_es.svg" alt="La ponderación vertical de cuerpo completo Wk en decibelios de 0,4 a 100 Hz: una meseta cerca de -6 dB por debajo de 2 Hz, un pequeño pico de +0,5 dB cerca de 6 Hz y una caída hasta cerca de -21 dB a 100 Hz" style="width:88%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_weighting_es_dark.svg" alt="La ponderación vertical de cuerpo completo Wk en decibelios de 0,4 a 100 Hz: una meseta cerca de -6 dB por debajo de 2 Hz, un pequeño pico de +0,5 dB cerca de 6 Hz y una caída hasta cerca de -21 dB a 100 Hz" style="width:88%" loading="lazy">
+
+*La ponderación de cuerpo completo Wk obtenida de la cascada de ISO 8041-1.*
+
 ### Choques múltiples (ISO 2631-5)
 
 Los choques repetidos dañan la columna lumbar por la compresión de pico y no
@@ -148,3 +152,7 @@ transmisión resonante de la
 
 Consulta la guía [Predicción del aislamiento de paneles](/phonometry/es/guides/panel-sound-insulation/)
 para su uso.
+
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mechanical_mobility_es.svg" alt="Magnitudes normalizadas de receptancia, movilidad y acelerancia de un resonador de un grado de libertad en un eje de frecuencia log-log, todas con máximo en la resonancia" style="width:82%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mechanical_mobility_es_dark.svg" alt="Magnitudes normalizadas de receptancia, movilidad y acelerancia de un resonador de un grado de libertad en un eje de frecuencia log-log, todas con máximo en la resonancia" style="width:82%" loading="lazy">
+
+*Receptancia, movilidad y acelerancia de un resonador de un grado de libertad: la misma resonancia vista a través de las tres magnitudes cinemáticas.*

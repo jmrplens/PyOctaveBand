@@ -144,6 +144,10 @@ ANSI/ASA S12.2-2019 valora el ruido de fondo estacionario de una sala frente a f
 
 Consulta la [guía de criterios de ruido de salas](/phonometry/es/guides/room-noise/) para su uso.
 
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_noise_criteria_es.svg" alt="Dos paneles para el mismo espectro de sala dominado por la ventilación. Izquierda: los niveles medidos por banda de octava sobre la familia de curvas NC, con un rombo rojo que marca el punto de tangencia a 250 Hz que fija la calificación NC-42,5. Derecha: el mismo espectro sobre la curva de referencia RC-35, con las bandas de baja frecuencia atravesando la tolerancia de retumbo sombreada (más 5 dB por debajo de 500 Hz) de modo que el ruido se clasifica como RC-35(R), y la tolerancia de siseo (más 3 dB a 1000 Hz y por encima) sombreada para comparar" style="width:96%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_noise_criteria_es_dark.svg" alt="Dos paneles para el mismo espectro de sala dominado por la ventilación. Izquierda: los niveles medidos por banda de octava sobre la familia de curvas NC, con un rombo rojo que marca el punto de tangencia a 250 Hz que fija la calificación NC-42,5. Derecha: el mismo espectro sobre la curva de referencia RC-35, con las bandas de baja frecuencia atravesando la tolerancia de retumbo sombreada (más 5 dB por debajo de 500 Hz) de modo que el ruido se clasifica como RC-35(R), y la tolerancia de siseo (más 3 dB a 1000 Hz y por encima) sombreada para comparar" style="width:96%" loading="lazy">
+
+*El mismo espectro valorado por las dos vías: tangencia NC en la banda dominante (izquierda) y la referencia RC Mark II con el exceso de retumbo (derecha).*
+
 ## Acústica de salas y edificación (ISO 18233, ISO 3382, ISO 16283, ISO 10140, EN 12354, ISO 12999, ISO 717, ISO 354)
 
 ### Respuesta al impulso por excitación determinista (ISO 18233)
@@ -165,6 +169,10 @@ E(t) = \int_t^{\infty} p^2(\tau)\ d\tau = \int_0^{\infty} p^2\ d\tau - \int_0^t 
 $$
 
 es decir, una suma acumulada invertida en tiempo discreto. La integración hacia atrás cancela la fluctuación aleatoria de una única respuesta al impulso al cuadrado: para un decaimiento de energía puramente exponencial $p^2(t) = e^{-a t}$ da $E(t) = e^{-a t}/a$, una recta exactamente $L(t) = -(10 a / \ln 10)\ t$. El ruido de fondo aplana $E(t)$, así que la integración se trunca en el cruce $t_1$ de la recta de decaimiento ajustada con el nivel de ruido y la cola que falta se compensa con una exponencial de la pendiente ajustada; sin ese término la integral finita **subestima** sistemáticamente $T$.
+
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/schroeder_decay_es.webp" alt="Respuesta al impulso al cuadrado con su curva de decaimiento integrada hacia atrás de Schroeder, y las ventanas de regresión EDT, T20 y T30 marcadas" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/schroeder_decay_es_dark.webp" alt="Respuesta al impulso al cuadrado con su curva de decaimiento integrada hacia atrás de Schroeder, y las ventanas de regresión EDT, T20 y T30 marcadas" style="width:80%" loading="lazy">
+
+*Una respuesta al impulso al cuadrado, su integral inversa de Schroeder y las ventanas de regresión EDT/T20/T30 del siguiente apartado.*
 
 ### Ventanas de regresión y validez (ISO 3382-2, Cláusula 6, Anexo B/C)
 
@@ -195,6 +203,10 @@ La distancia de distracción rD y la distancia de privacidad rP son las distanci
 Por banda de tercio de octava, la diferencia de niveles $D = L_1 - L_2$ (promediada en energía sobre las posiciones de micrófono, $L = 10 \log_{10}[(1/n) \sum_i 10^{L_i/10}]$) se normaliza de dos formas: la diferencia de niveles estandarizada $D_{nT} = D + 10 \log_{10}(T/T_0)$ con $T_0 = 0{,}5$ s (de modo que $D_{nT} = D$ cuando $T = T_0$), y el índice de reducción acústica aparente $R' = D + 10 \log_{10}(S/A)$ con el área de absorción de Sabine $A = 0{,}16\ V / T$, por tanto $R' = D + 10 \log_{10}[S T / (0{,}16\ V)]$.
 
 El índice de un solo número (ISO 717-1, Cláusula 4.4) desplaza la **curva de referencia** de la Tabla 3 en pasos de 1 dB hacia la curva medida hasta que la suma de desviaciones *desfavorables* $\sum_i \max(0, \text{ref}_i + k - \text{meas}_i)$ es máxima pero $\le$ 32,0 dB (16 tercios) o 10,0 dB (5 octavas); el índice $R_w$ es la referencia desplazada a 500 Hz. Los **términos de adaptación espectral** son $C = X_{A1} - X_w$ y $C_{tr} = X_{A2} - X_w$ con $X_{Aj} = -10 \log_{10} \sum_i 10^{(L_{ij} - X_i)/10}$ (espectros de la Tabla 4: n.º 1 ruido rosa, n.º 2 tráfico urbano), cada uno redondeado a un entero. El ejemplo resuelto del Anexo C de ISO 717-1 ($R_w = 30$, $C = -2$, $C_{tr} = -3$, suma desfavorable 31,8 dB) se reproduce exactamente.
+
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_rating_es.svg" alt="Índice de reducción acústica medido en tercios de octava con la curva de referencia de ISO 717-1 desplazada y el índice ponderado resultante a 500 Hz" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_rating_es_dark.svg" alt="Índice de reducción acústica medido en tercios de octava con la curva de referencia de ISO 717-1 desplazada y el índice ponderado resultante a 500 Hz" style="width:80%" loading="lazy">
+
+*Un espectro R medido frente a la referencia de ISO 717-1 desplazada: el índice es la referencia desplazada leída a 500 Hz.*
 
 ### Aislamiento a impactos y absorción (ISO 16283-2, ISO 717-2, ISO 354)
 

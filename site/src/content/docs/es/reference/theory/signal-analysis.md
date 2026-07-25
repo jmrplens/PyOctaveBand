@@ -277,6 +277,10 @@ modo `high_accuracy` por defecto diseña y ejecuta el filtro a una frecuencia
 interna sobremuestreada (≥ 144 kHz); consulta
 [Ponderación frecuencial](/phonometry/es/guides/weighting/).
 
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_es.svg" alt="Curvas de ponderación A, B, C, D, AU y Z con zoom de la región positiva de la curva A (+1,27 dB en 2,5 kHz)" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_es_dark.svg" alt="Curvas de ponderación A, B, C, D, AU y Z con zoom de la región positiva de la curva A (+1,27 dB en 2,5 kHz)" style="width:80%" loading="lazy">
+
+*Las curvas de ponderación que aplica la biblioteca, con la pequeña región positiva de la curva A ampliada.*
+
 ## Integración temporal
 
 Implementada como un integrador exponencial IIR de primer orden:
@@ -296,6 +300,10 @@ para partir de la energía de la primera muestra, o pasa un escalar/array con el
 estado cuadrático medio anterior. Consulta
 [Por qué phonometry](/phonometry/es/reference/why-phonometry/) para la
 verificación de esta implementación con ráfagas de tono de IEC 61672-1.
+
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/time_weighting_analysis_es.svg" alt="Respuestas de las ponderaciones temporales Fast, Slow e Impulse a una ráfaga de ruido" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/time_weighting_analysis_es_dark.svg" alt="Respuestas de las ponderaciones temporales Fast, Slow e Impulse a una ráfaga de ruido" style="width:80%" loading="lazy">
+
+*El integrador exponencial con las tres constantes de tiempo normalizadas: Fast sigue la ráfaga, Slow la suaviza e Impulse retiene su pico.*
 
 ## Ponderación G (ISO 7196)
 
@@ -375,6 +383,10 @@ La cláusula 7.3 de IEC 61043 especifica la respuesta en intensidad de la sonda 
 El **índice presión-intensidad** $\delta_{pI} = L_p - L_I$ mide cuán reactivo es el campo: en una onda plana progresiva libre vale $10 \log_{10}(\rho_0 c / 400) = 0{,}14$ dB, mientras que valores grandes delatan campos reactivos o ruidosos en los que domina el error de fase entre canales. El Anexo A de ISO 9614-1:1993 lo generaliza sobre una superficie de medición como el indicador F2 (con F3 para la potencia parcial negativa y F4 para la no uniformidad del campo), y la **capacidad dinámica** del instrumento $L_d = \delta_{pI0} - K$ (índice presión-intensidad residual menos el factor de error de sesgo: 10 dB para los grados 1/2, 7 dB para el grado 3) debe superar F2 para que la medición sea válida (criterio 1).
 
 Consulta la [guía de intensidad acústica](/phonometry/es/guides/intensity/) para su uso.
+
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo_es.svg" alt="Niveles de presión e intensidad en tercios de octava para una onda plana progresiva frente a una onda estacionaria" style="width:92%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo_es_dark.svg" alt="Niveles de presión e intensidad en tercios de octava para una onda plana progresiva frente a una onda estacionaria" style="width:92%" loading="lazy">
+
+*El estimador p-p en los dos campos límite: la separación entre Lp y LI es el índice presión-intensidad que delata los campos reactivos.*
 
 ## Incertidumbre de medida (ISO/IEC Guide 98-3: GUM y Suplemento 1)
 

@@ -113,6 +113,10 @@ The standard specifies **no interpolation** between the tabulated frequencies. F
 
 See the [Loudness guide](/phonometry/guides/loudness/) for usage.
 
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/equal_loudness_contours.svg" alt="ISO 226:2023 normal equal-loudness-level contours from 20 to 90 phon with the hearing threshold curve" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/equal_loudness_contours_dark.svg" alt="ISO 226:2023 normal equal-loudness-level contours from 20 to 90 phon with the hearing threshold curve" style="width:80%" loading="lazy">
+
+*The ISO 226:2023 contours from Formula (1), 20 to 90 phon, with the hearing threshold.*
+
 ## Tone prominence: TNR and PR (ECMA-418-1)
 
 Both methods operate on a Hann-windowed, RMS-averaged power spectrum (clauses 11.1 / 12.1) and use the clause 10 critical-band model. The critical bandwidth centred on a tone at $f$ is (Formula 2):
@@ -165,6 +169,10 @@ $$
 below 1 sone the reference program uses $L_N = 40 (N + 0.0005)^{0.35}$, floored at 3 phon.
 
 See the [Loudness guide](/phonometry/guides/loudness/) for usage.
+
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_pattern.svg" alt="Specific loudness patterns over the Bark scale for a 1 kHz narrowband sound and a broadband sound of equal band level" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_pattern_dark.svg" alt="Specific loudness patterns over the Bark scale for a 1 kHz narrowband sound and a broadband sound of equal band level" style="width:80%" loading="lazy">
+
+*Specific loudness N′(z) over the Bark axis: energy spread over many critical bands sums to more sones than the same band level in a single band.*
 
 ## Advanced loudness models & sound quality
 
@@ -302,6 +310,10 @@ $$
 and any fractile follows a two-sided Gaussian model (clause 4.4), $\Delta H_Q = \Delta H_{md} + z(Q)\ s$, using the upper spread $s_u$ for $z \ge 0$ (worse than median) and the lower spread $s_l$ otherwise, each a degree-5 polynomial in $Y - 18$ per sex and frequency (clause 4.3, Tables 2–5). At age 18 every deviation is zero by construction. The formulae are established to 80 years at and below 2 kHz and to 70 years above; beyond that the evaluation is an extrapolation. Anchors: at 60 years the medians evaluate to 7.85 dB (male, 1 kHz), 20.21 dB (male, 4 kHz) and 15.32 dB (female, 4 kHz), matching the Table 1 formula to $10^{-3}$.
 
 See the [Hearing Threshold guide](/phonometry/guides/hearing-threshold/) for usage.
+
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hearing_threshold.svg" alt="Two panels. Left: the ISO 7029 median hearing-threshold deviation for men at ages 20, 40, 60 and 80 on an inverted audiogram axis, with the 10 to 90 percent fractile band around the 70-year curve; the loss deepens toward high frequencies and with age. Right: the ISO 389-7 free-field and diffuse-field reference threshold, coinciding below 1 kHz and diverging above, dipping to a minimum near 3 to 4 kHz" style="width:96%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hearing_threshold_dark.svg" alt="Two panels. Left: the ISO 7029 median hearing-threshold deviation for men at ages 20, 40, 60 and 80 on an inverted audiogram axis, with the 10 to 90 percent fractile band around the 70-year curve; the loss deepens toward high frequencies and with age. Right: the ISO 389-7 free-field and diffuse-field reference threshold, coinciding below 1 kHz and diverging above, dipping to a minimum near 3 to 4 kHz" style="width:96%" loading="lazy">
+
+*The ISO 7029 median age shift with its fractile band (left) and the ISO 389-7 free- and diffuse-field reference thresholds (right).*
 
 ## Noise-induced hearing loss (ISO 1999)
 

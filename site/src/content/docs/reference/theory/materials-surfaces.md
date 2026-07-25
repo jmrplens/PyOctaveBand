@@ -118,6 +118,10 @@ worked example, the oracle is a synthetic end-to-end chain
 ($V = 200$ m³, $S = 10$ m², $T = 8.0/6.0/7.5/5.0$ s → $s = 0.093$) plus the
 Formula A.5 hand value $u_s = 0.0297$.
 
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/scattering_coefficient.svg" alt="The random-incidence scattering coefficient s of a diffusing surface over the 13 one-third-octave bands from 250 to 4000 Hz, rising smoothly from near zero at low frequency towards 0.84 at 4 kHz" style="width:88%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/scattering_coefficient_dark.svg" alt="The random-incidence scattering coefficient s of a diffusing surface over the 13 one-third-octave bands from 250 to 4000 Hz, rising smoothly from near zero at low frequency towards 0.84 at 4 kHz" style="width:88%" loading="lazy">
+
+*A random-incidence scattering coefficient rising with frequency as the surface roughness becomes comparable with the wavelength.*
+
 ### Directional diffusion coefficient (ISO 17497-2)
 
 ISO 17497-2:2012 measures, in the free field, how uniformly a surface spreads
@@ -195,6 +199,10 @@ twentieths, making the shift search and class boundaries exact and
 float-safe. The two Annex A worked examples are reproduced:
 $\alpha_p = (0.35, 0.70, 0.65, 0.60, 0.55)$ → $\alpha_w = 0.60$, class C; and
 raising 500 Hz to 1.00 keeps $\alpha_w = 0.60$ but adds the indicator, "0.60(M)".
+
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating.svg" alt="ISO 11654 weighted sound absorption rating: the practical absorption spectrum plotted against the shifted reference curve over 250 Hz to 4000 Hz, with the unfavourable deviation at 250 Hz shaded and the weighted coefficient alpha_w read at 500 Hz" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating_dark.svg" alt="ISO 11654 weighted sound absorption rating: the practical absorption spectrum plotted against the shifted reference curve over 250 Hz to 4000 Hz, with the unfavourable deviation at 250 Hz shaded and the weighted coefficient alpha_w read at 500 Hz" style="width:80%" loading="lazy">
+
+*The ISO 11654 rating: practical absorption against the shifted reference, with the unfavourable deviation shaded and the weighted coefficient read at 500 Hz.*
 
 ### Airflow resistance (ISO 9053-1/2)
 

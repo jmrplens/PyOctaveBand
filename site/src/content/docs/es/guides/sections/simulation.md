@@ -21,6 +21,20 @@ ondulatoria merece su coste, qué puede y qué no puede decir un dominio 2D
 sobre un problema 3D, y cómo la dispersión numérica fija la regla de
 resolución de celdas por longitud de onda.
 
+Una buena forma de leerla es junto a las páginas de forma cerrada que
+contrasta: las frecuencias modales de
+[acústica de salas](/phonometry/es/guides/room-acoustics/) reaparecen como
+picos en el espectro simulado de una sala, la pérdida por inserción de
+[efecto del suelo y barreras](/phonometry/es/guides/ground-barriers/) puede
+rederivarse colocando un obstáculo en el dominio, y la curvatura de rayos de
+[refracción atmosférica](/phonometry/es/guides/atmospheric-refraction/)
+emerge de un perfil de velocidad del sonido dependiente de la altura. Cuando
+una geometría es demasiado irregular para esos modelos (salas de forma
+extraña, barreras múltiples, suelo de impedancia mixta), la simulación es el
+recurso que aún da una respuesta cuantitativa; cuando existe una forma
+cerrada, prefiérela, y usa el solucionador para verificar las hipótesis en
+las que se apoya.
+
 ## Páginas de esta sección
 
 - [Simulación de ondas FDTD 2D](/phonometry/es/guides/fdtd-simulation/): el

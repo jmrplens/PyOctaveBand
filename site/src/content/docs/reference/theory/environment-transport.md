@@ -133,6 +133,10 @@ The adjustments $K_i$ cover time-of-day penalties (ISO 1996-1 Table A.1: evening
 
 See the [Levels guide](/phonometry/guides/levels/) for usage.
 
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile.svg" alt="Synthetic 24-hour urban LAeq profile with day, evening and night bands, the +5 and +10 dB weighted period levels and the resulting Lden" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile_dark.svg" alt="Synthetic 24-hour urban LAeq profile with day, evening and night bands, the +5 and +10 dB weighted period levels and the resulting Lden" style="width:80%" loading="lazy">
+
+*A 24-hour LAeq profile split into day, evening and night, the +5/+10 dB penalties and the resulting Lden.*
+
 ## Impulsive-sound prominence (NT ACOU 112)
 
 An impulse annoys beyond its energy, so environmental surveys after ISO 1996-2 penalize periods containing prominent impulsive sounds; NT ACOU 112:2002 makes that penalty objective. From the A-weighted, time-weighting-F level history of a single event, the onset rate (dB/s) and the level difference (dB) of the onset (which qualifies when steeper than 10 dB/s, clauses 4.5–4.7) predict the perceived prominence (clause 7, Formula 1):
@@ -186,6 +190,10 @@ own printed precision), well inside its stated $\pm 10$ %; passing
 $f_m = 1000 \cdot 10^{k/10}$ (Note 5) used to compute that table. The same
 $\alpha$ is the only route to the ISO 354 power attenuation coefficient
 $m = \alpha/(10 \lg e)$, exposed as `air_attenuation_m`.
+
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_attenuation.svg" alt="ISO 9613-1 pure-tone atmospheric attenuation coefficient alpha in dB/km against frequency, on a linear decibel ordinate over a logarithmic frequency axis, for the reference 20 degrees Celsius and 50 percent relative humidity atmosphere, produced by the AtmosphericAttenuation result plot method" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_attenuation_dark.svg" alt="ISO 9613-1 pure-tone atmospheric attenuation coefficient alpha in dB/km against frequency, on a linear decibel ordinate over a logarithmic frequency axis, for the reference 20 degrees Celsius and 50 percent relative humidity atmosphere, produced by the AtmosphericAttenuation result plot method" style="width:80%" loading="lazy">
+
+*The ISO 9613-1 coefficient for the 20 °C, 50 % relative-humidity reference atmosphere: the f² rise spans two decades from 50 Hz to 10 kHz.*
 
 ### Outdoor propagation, general method (ISO 9613-2)
 
@@ -272,6 +280,10 @@ See the [Outdoor Propagation guide](/phonometry/guides/outdoor-propagation/) and
 The sound power level $L_W = 10 \log_{10}(P/P_0)$ ($P_0 = 1$ pW) is an
 *emission* quantity: unlike a pressure level it does not depend on the receiver
 distance or the room. Three families of methods recover it.
+
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods.svg" alt="The three sound power routes side by side: an enveloping pressure surface over a reflecting plane (ISO 3744/3746), a source in a reverberation room sampled by microphones (ISO 3741) and an intensity probe scanning a surface around the source (ISO 9614-2)" style="width:92%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_dark.svg" alt="The three sound power routes side by side: an enveloping pressure surface over a reflecting plane (ISO 3744/3746), a source in a reverberation room sampled by microphones (ISO 3741) and an intensity probe scanning a surface around the source (ISO 9614-2)" style="width:92%" loading="lazy">
+
+*The three routes to LW: enveloping pressure surface, reverberation room and intensity scan.*
 
 ### Enveloping-surface pressure (ISO 3744/3746)
 

@@ -273,6 +273,10 @@ transform. Because the bilinear transform compresses frequencies near Nyquist,
 the default `high_accuracy` mode designs and runs the filter at an internally
 oversampled rate (≥ 144 kHz); see [Frequency Weighting](/phonometry/guides/weighting/).
 
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses.svg" alt="A, B, C, D, AU and Z frequency weighting curves with a zoom showing the positive region of the A curve (+1.27 dB at 2.5 kHz)" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_dark.svg" alt="A, B, C, D, AU and Z frequency weighting curves with a zoom showing the positive region of the A curve (+1.27 dB at 2.5 kHz)" style="width:80%" loading="lazy">
+
+*The weighting curves realized by the library, with the small positive region of the A curve magnified.*
+
 ## Time Integration
 
 Implemented as a first-order IIR exponential integrator:
@@ -291,6 +295,10 @@ The default initial condition is `y[-1] = 0`. Use `initial_state='first'` to
 start from the first input energy, or pass a scalar/array with the previous
 mean-square output state. See [Why phonometry](/phonometry/reference/why-phonometry/) for the
 IEC 61672-1 tone-burst verification of this implementation.
+
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/time_weighting_analysis.svg" alt="Fast, Slow and Impulse time weighting responses to a noise burst" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/time_weighting_analysis_dark.svg" alt="Fast, Slow and Impulse time weighting responses to a noise burst" style="width:80%" loading="lazy">
+
+*The exponential integrator at the three standard time constants: Fast follows a burst, Slow smooths it and Impulse holds its peak.*
 
 ## G-weighting (ISO 7196)
 
@@ -370,6 +378,10 @@ IEC 61043 clause 7.3 specifies the probe intensity response with exactly this ar
 The **pressure-intensity index** $\delta_{pI} = L_p - L_I$ measures how reactive the field is: in a free plane progressive wave it equals $10 \log_{10}(\rho_0 c / 400) = 0.14$ dB, while large values flag reactive or noisy fields in which the inter-channel phase error dominates. ISO 9614-1:1993 Annex A generalizes it over a measurement surface as the indicator F2 (with F3 for negative partial power and F4 for field non-uniformity), and the instrument's **dynamic capability** $L_d = \delta_{pI0} - K$ (pressure-residual intensity index minus the bias error factor: 10 dB for grades 1/2, 7 dB for grade 3) must exceed F2 for the measurement to be valid (criterion 1).
 
 See the [Sound Intensity guide](/phonometry/guides/intensity/) for usage.
+
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo.svg" alt="Third-octave pressure and intensity levels for a plane progressive wave versus a standing wave" style="width:92%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo_dark.svg" alt="Third-octave pressure and intensity levels for a plane progressive wave versus a standing wave" style="width:92%" loading="lazy">
+
+*The p-p estimator in the two limiting fields: the gap between Lp and LI is the pressure-intensity index that flags reactive fields.*
 
 ## Measurement uncertainty (ISO/IEC Guide 98-3: GUM and Supplement 1)
 
