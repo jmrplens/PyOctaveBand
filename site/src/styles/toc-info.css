@@ -1,0 +1,481 @@
+/* TOC standard/reference info: switchable presentation variants.
+
+   Every sidebar item can carry the standard(s) it implements (teal category)
+   and/or the notable reference(s) the method is attributed to (amber
+   category). The data travels as `attrs['data-chips']` JSON (see
+   astro.config.mjs and scripts/generate_api_docs.py) and is rendered by
+   SidebarSublist.astro as a `.sidebar-chips` run inside each link. THIS file
+   decides what that run looks like, or whether it shows at all.
+
+   The active variant is a `data-toc-style` attribute on <html>, set before
+   first paint by the switcher script in Head.astro (persisted in
+   localStorage). Variants:
+
+     data-toc-style='focus'    (recommended default) the muted annotation
+                               line shows ONLY for the items of the section
+                               the reader is currently in; the rest of the
+                               tree stays perfectly clean.
+     data-toc-style='annotate' the same annotation line, always visible on
+                               every item (whole-tree comparison baseline).
+     data-toc-style='hover'    no annotation lines; items with info carry a
+                               subtle dotted underline and the info appears
+                               in a small floating card on hover / keyboard
+                               focus.
+     data-toc-style='clean'    nothing in the sidebar at all; the info lives
+                               in the page subtitle under the H1 and in the
+                               section landing tables (see PageTitle.astro
+                               and SectionStandards.astro).
+     data-toc-style='none'     nothing anywhere (the pre-experiment look).
+
+   The API sidebar treatment is independent, under `data-api-style`:
+
+     data-api-style='inline'    the API reference group renders fully
+                                expanded in place (status quo).
+     data-api-style='collapsed' the API group gets a caret and folds; it
+                                starts folded on guide pages and unfolded on
+                                API pages.
+     data-api-style='split'     topic-style split: on guide pages the API
+                                group collapses to its single label link; on
+                                API pages only the Reference group is shown
+                                plus a "Guides" back link.
+
+   `data-area` ('guides' | 'api') is stamped on <html> from the URL by the
+   same early script. All selectors are unlayered so they win over
+   Starlight's layered styles without specificity games. Both themes are
+   covered (dark values on :root, light overrides on [data-theme='light']). */
+
+:root {
+  /* Category colours, dark theme. `*-accent` is the small leading dot,
+     `*-ink` the tinted text used in the hover card / page subtitle. */
+  --chip-standard-accent: #6fdcc8;
+  --chip-standard-ink: #7ee8d5;
+  --chip-theory-accent: #e6b84e;
+  --chip-theory-ink: #f4c04e;
+}
+
+:root[data-theme='light'] {
+  --chip-standard-accent: #128273;
+  --chip-standard-ink: #0c5c52;
+  --chip-theory-accent: #a8760a;
+  --chip-theory-ink: #855107;
+}
+
+/* ---------------------------------------------------------------------------
+   BASE: hidden unless a variant opts in; quiet sans metadata when shown.
+   --------------------------------------------------------------------------- */
+
+.sidebar-chips {
+  display: none;
+}
+
+.sidebar-chips .sl-badge {
+  /* Strip Starlight's badge fill / border / padding / mono font down to
+     plain muted sans text. Absolute font size so every chip is identical
+     regardless of the item's own size. */
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  color: var(--sl-color-gray-2);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------------------
+   ANNOTATION LINE (shared by 'annotate' and 'focus').
+
+   One quiet line below the label: chips in the site sans at ~11px, gray-2,
+   separated by whitespace; ONE small colour dot leads each category run
+   (teal for the standards run, amber for the references run), so a line has
+   at most two marks, and EN/ES need no extra text.
+   --------------------------------------------------------------------------- */
+
+:root[data-toc-style='annotate'] .sidebar-chips,
+:root[data-toc-style='focus'] .sidebar-chips {
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.1rem 0.55rem;
+  margin-block-start: 0.15rem;
+  margin-inline-start: 0.9rem;
+  line-height: 1.3;
+  max-width: 100%;
+  /* display stays `none`; the visibility rules below flip it to flex. */
+}
+
+/* 'annotate': every item shows its line. */
+:root[data-toc-style='annotate'] .sidebar-chips {
+  display: flex;
+}
+
+/* 'focus': only the current section's items show their line, i.e. the
+   siblings of the current page in its immediate list... */
+:root[data-toc-style='focus']
+  #starlight__sidebar
+  ul:has(> li > a[aria-current='page'])
+  > li
+  > a
+  > .sidebar-chips {
+  display: flex;
+}
+
+/* ...and, when the current page is a section landing, the direct children
+   of that section (both the plain group markup and the API label row). */
+:root[data-toc-style='focus']
+  #starlight__sidebar
+  li:has(> a.group-label[aria-current='page'])
+  > ul
+  > li
+  > a
+  > .sidebar-chips,
+:root[data-toc-style='focus']
+  #starlight__sidebar
+  li:has(> .group-label-row > a.group-label[aria-current='page'])
+  > ul
+  > li
+  > a
+  > .sidebar-chips {
+  display: flex;
+}
+
+/* Leading colour dot at the start of each category run (a run starts at the
+   first chip or wherever the category changes; standards precede references
+   in the data, but both boundary directions are handled). */
+:root[data-toc-style='annotate'] .sidebar-chips .chip-standard:first-child::before,
+:root[data-toc-style='annotate'] .sidebar-chips .chip-theory + .chip-standard::before,
+:root[data-toc-style='annotate'] .sidebar-chips .chip-theory:first-child::before,
+:root[data-toc-style='annotate'] .sidebar-chips .chip-standard + .chip-theory::before,
+:root[data-toc-style='focus'] .sidebar-chips .chip-standard:first-child::before,
+:root[data-toc-style='focus'] .sidebar-chips .chip-theory + .chip-standard::before,
+:root[data-toc-style='focus'] .sidebar-chips .chip-theory:first-child::before,
+:root[data-toc-style='focus'] .sidebar-chips .chip-standard + .chip-theory::before {
+  content: '';
+  display: inline-block;
+  vertical-align: 0.08em;
+  inline-size: 0.3rem;
+  block-size: 0.3rem;
+  margin-inline-end: 0.3rem;
+  border-radius: 50%;
+  background: var(--run-dot);
+}
+
+:root[data-toc-style='annotate'] .sidebar-chips .chip-standard,
+:root[data-toc-style='focus'] .sidebar-chips .chip-standard {
+  --run-dot: var(--chip-standard-accent);
+}
+:root[data-toc-style='annotate'] .sidebar-chips .chip-theory,
+:root[data-toc-style='focus'] .sidebar-chips .chip-theory {
+  --run-dot: var(--chip-theory-accent);
+}
+
+/* Extra breathing space where one category run hands over to the next. */
+:root[data-toc-style='annotate'] .sidebar-chips .chip-standard + .chip-theory,
+:root[data-toc-style='annotate'] .sidebar-chips .chip-theory + .chip-standard,
+:root[data-toc-style='focus'] .sidebar-chips .chip-standard + .chip-theory,
+:root[data-toc-style='focus'] .sidebar-chips .chip-theory + .chip-standard {
+  margin-inline-start: 0.35rem;
+}
+
+/* On the active accent pill the chip text inverts; the dots keep colour. */
+:root[data-toc-style='annotate'] [aria-current='page'] .sidebar-chips .sl-badge,
+:root[data-toc-style='focus'] [aria-current='page'] .sidebar-chips .sl-badge {
+  color: var(--sl-color-text-invert);
+  opacity: 0.85;
+}
+
+/* ---------------------------------------------------------------------------
+   VARIANT 'hover': resting tree is clean; items with info carry a subtle
+   dotted underline; the info appears in a small floating card on hover or
+   keyboard focus (250 ms intent delay so casual mouse travel stays calm).
+   --------------------------------------------------------------------------- */
+
+:root[data-toc-style='hover'] #starlight__sidebar a:has(> .sidebar-chips) {
+  position: relative;
+}
+
+:root[data-toc-style='hover']
+  #starlight__sidebar
+  a:has(> .sidebar-chips)
+  > .sidebar-item-label {
+  text-decoration: underline dotted 1px;
+  text-decoration-color: var(--sl-color-gray-5);
+  text-underline-offset: 0.3em;
+}
+
+:root[data-theme='light'][data-toc-style='hover']
+  #starlight__sidebar
+  a:has(> .sidebar-chips)
+  > .sidebar-item-label {
+  text-decoration-color: var(--sl-color-gray-4);
+}
+
+/* No marker on the active accent pill (inverted colours). */
+:root[data-toc-style='hover']
+  #starlight__sidebar
+  a[aria-current='page']
+  > .sidebar-item-label {
+  text-decoration: none;
+}
+
+:root[data-toc-style='hover'] #starlight__sidebar .sidebar-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem 0.55rem;
+  position: absolute;
+  z-index: 6;
+  inset-inline-start: 0.75rem;
+  inset-block-start: calc(100% - 0.1rem);
+  max-inline-size: min(15rem, calc(100vw - 3rem));
+  inline-size: max-content;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--sl-color-hairline-light);
+  border-radius: 0.375rem;
+  background: var(--sl-color-bg-nav);
+  box-shadow: var(--sl-shadow-md);
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    opacity 0.12s ease,
+    visibility 0s linear 0.12s;
+}
+
+:root[data-toc-style='hover'] #starlight__sidebar a:hover > .sidebar-chips,
+:root[data-toc-style='hover'] #starlight__sidebar a:focus-visible > .sidebar-chips {
+  visibility: visible;
+  opacity: 1;
+  transition-delay: 0.25s;
+}
+
+/* Card text: tinted per category, one leading dot per category run. */
+:root[data-toc-style='hover'] .sidebar-chips .chip-standard {
+  color: var(--chip-standard-ink);
+}
+:root[data-toc-style='hover'] .sidebar-chips .chip-theory {
+  color: var(--chip-theory-ink);
+}
+:root[data-toc-style='hover'] .sidebar-chips .chip-standard:first-child::before,
+:root[data-toc-style='hover'] .sidebar-chips .chip-theory + .chip-standard::before,
+:root[data-toc-style='hover'] .sidebar-chips .chip-theory:first-child::before,
+:root[data-toc-style='hover'] .sidebar-chips .chip-standard + .chip-theory::before {
+  content: '';
+  display: inline-block;
+  vertical-align: 0.08em;
+  inline-size: 0.3rem;
+  block-size: 0.3rem;
+  margin-inline-end: 0.3rem;
+  border-radius: 50%;
+}
+:root[data-toc-style='hover'] .sidebar-chips .chip-standard:first-child::before,
+:root[data-toc-style='hover'] .sidebar-chips .chip-theory + .chip-standard::before {
+  background: var(--chip-standard-accent);
+}
+:root[data-toc-style='hover'] .sidebar-chips .chip-theory:first-child::before,
+:root[data-toc-style='hover'] .sidebar-chips .chip-standard + .chip-theory::before {
+  background: var(--chip-theory-accent);
+}
+
+/* ---------------------------------------------------------------------------
+   VARIANT 'clean': page-level presentation. The subtitle under the H1 and
+   the section landing tables are always in the DOM (PageTitle.astro /
+   SectionStandards.astro) and only display in this variant.
+   --------------------------------------------------------------------------- */
+
+.page-standards,
+.section-standards {
+  display: none;
+}
+
+:root[data-toc-style='clean'] .page-standards {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.75rem;
+  margin-block-start: 0.5rem;
+  font-size: var(--sl-text-sm);
+  color: var(--sl-color-gray-2);
+}
+
+:root[data-toc-style='clean'] .section-standards {
+  display: block;
+}
+
+.page-standards .page-chip {
+  white-space: nowrap;
+  font-weight: 500;
+}
+.page-standards .chip-standard {
+  color: var(--chip-standard-ink);
+}
+.page-standards .chip-theory {
+  color: var(--chip-theory-ink);
+}
+/* The first visible chip follows the visually-hidden accessibility prefix,
+   so the run-start selectors pair `:first-child` with `.sr-only + *`. */
+.page-standards .chip-standard:first-child::before,
+.page-standards .sr-only + .chip-standard::before,
+.page-standards .chip-theory + .chip-standard::before,
+.page-standards .chip-theory:first-child::before,
+.page-standards .sr-only + .chip-theory::before,
+.page-standards .chip-standard + .chip-theory::before {
+  content: '';
+  display: inline-block;
+  vertical-align: 0.1em;
+  inline-size: 0.35rem;
+  block-size: 0.35rem;
+  margin-inline-end: 0.35rem;
+  border-radius: 50%;
+}
+.page-standards .chip-standard:first-child::before,
+.page-standards .sr-only + .chip-standard::before,
+.page-standards .chip-theory + .chip-standard::before {
+  background: var(--chip-standard-accent);
+}
+.page-standards .chip-theory:first-child::before,
+.page-standards .sr-only + .chip-theory::before,
+.page-standards .chip-standard + .chip-theory::before {
+  background: var(--chip-theory-accent);
+}
+
+/* Section landing table: quiet, small, standards teal / references amber. */
+.section-standards table {
+  font-size: var(--sl-text-sm);
+}
+.section-standards td .chip-standard {
+  color: var(--chip-standard-ink);
+  white-space: nowrap;
+}
+.section-standards td .chip-theory {
+  color: var(--chip-theory-ink);
+  white-space: nowrap;
+}
+.section-standards .subgroup-row td {
+  font-weight: 600;
+  color: var(--sl-color-white);
+}
+
+/* ---------------------------------------------------------------------------
+   API SIDEBAR MODES.
+   --------------------------------------------------------------------------- */
+
+/* 'collapsed': the caret shows and the group's children fold. The switcher
+   script stamps `.folded` (initial state: folded on guide pages, open on API
+   pages) and keeps `aria-expanded` in sync. */
+:root[data-api-style='collapsed'] .api-group .api-caret {
+  display: inline-flex;
+}
+:root[data-api-style='collapsed'] .api-group.folded > ul {
+  display: none;
+}
+
+/* 'split': topic-style separation. On guide pages the API group reduces to
+   its single label link with a forward arrow... */
+:root[data-api-style='split'][data-area='guides'] .api-group > ul {
+  display: none;
+}
+:root[data-api-style='split'][data-area='guides'] .api-group .group-label .large::after {
+  content: ' \2192';
+  color: var(--sl-color-gray-3);
+}
+
+/* ...and on API pages only the top-level group that contains the API
+   reference (the Reference group) remains, plus the back link. */
+:root[data-api-style='split'][data-area='api']
+  #starlight__sidebar
+  .top-level
+  > li:not(:has(.api-group)) {
+  display: none;
+}
+
+.topic-back {
+  display: none;
+}
+:root[data-api-style='split'][data-area='api'] .topic-back {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-block-end: 0.75rem;
+  padding: 0.3em 0.5rem;
+  border-radius: 0.25rem;
+  font-size: var(--sl-text-sm);
+  font-weight: 600;
+  color: var(--sl-color-gray-2);
+  text-decoration: none;
+}
+:root[data-api-style='split'][data-area='api'] .topic-back:hover,
+:root[data-api-style='split'][data-area='api'] .topic-back:focus-visible {
+  color: var(--sl-color-white);
+  background: var(--sl-color-gray-6);
+}
+
+/* ---------------------------------------------------------------------------
+   VARIANT SWITCHER WIDGET (prototype-only UI, injected by Head.astro).
+   --------------------------------------------------------------------------- */
+
+.toc-switcher {
+  position: fixed;
+  inset-block-end: 1rem;
+  inset-inline-end: 1rem;
+  z-index: 100;
+  font-family: var(--sl-font-system, sans-serif);
+  font-size: 0.75rem;
+  color: var(--sl-color-gray-2);
+}
+
+.toc-switcher summary {
+  list-style: none;
+  cursor: pointer;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-inline-start: auto;
+  border: 1px solid var(--sl-color-hairline-light);
+  border-radius: 50%;
+  background: var(--sl-color-bg-nav);
+  box-shadow: var(--sl-shadow-md);
+  font-weight: 700;
+  color: var(--sl-color-gray-1);
+}
+.toc-switcher summary::-webkit-details-marker {
+  display: none;
+}
+
+.toc-switcher .toc-switcher-panel {
+  margin-block-start: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--sl-color-hairline-light);
+  border-radius: 0.5rem;
+  background: var(--sl-color-bg-nav);
+  box-shadow: var(--sl-shadow-lg);
+  min-inline-size: 13rem;
+}
+
+.toc-switcher fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.toc-switcher fieldset + fieldset {
+  margin-block-start: 0.6rem;
+}
+.toc-switcher legend {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.65rem;
+  color: var(--sl-color-gray-3);
+  padding: 0;
+  margin-block-end: 0.25rem;
+}
+.toc-switcher label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.1rem 0;
+  cursor: pointer;
+}

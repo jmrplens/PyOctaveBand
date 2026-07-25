@@ -12,6 +12,18 @@
     Groups without a marked landing page render as a static heading.
   - `aria-current="page"` moves to the label link when the landing page is
     the current page, so highlighting keeps working.
+
+  TOC-info experiment (see TOC-REDESIGN-NOTES.md):
+
+  - Per-item standard/reference info travels through `attrs['data-chips']`
+    (JSON), is rendered as a `.sidebar-chips` run inside each link, and is
+    styled per-variant by `src/styles/toc-info.css` (annotation line, hover
+    card, or hidden entirely).
+  - The API reference group (landing `reference/api`) gets an `api-group`
+    class plus a caret toggle button so the collapsed / split prototypes can
+    fold it away without re-rendering. The caret is hidden unless the
+    "collapsed" API mode is active (see toc-info.css and the switcher in
+    Head.astro).
 */
 import type { StarlightRouteData } from '@astrojs/starlight/route-data';
 import { Badge } from '@astrojs/starlight/components';
@@ -43,21 +55,64 @@ function toModel(entry: SidebarGroup): GroupModel {
 		? { group: entry, landing: first, children: rest }
 		: { group: entry, landing: undefined, children: entry.entries };
 }
+
+/*
+  Multiple reference chips per item. Starlight's native `badge` slot is a
+  single badge, so a list of chips is threaded through the sanctioned `attrs`
+  passthrough as a JSON string under `data-chips` (built by the `chips()`
+  helper in astro.config.mjs and by the API generator). Each chip is
+  `{ text, class }` where the class is `chip-standard` (teal) or `chip-theory`
+  (amber). We parse that here and render one Badge per chip, then drop the
+  raw attribute so it is not echoed onto the <a> element.
+*/
+interface Chip {
+	text: string;
+	class: string;
+}
+function parseChips(attrs: Record<string, unknown> | undefined): Chip[] {
+	const raw = attrs?.['data-chips'];
+	if (typeof raw !== 'string') return [];
+	try {
+		const list = JSON.parse(raw);
+		return Array.isArray(list) ? (list as Chip[]) : [];
+	} catch {
+		return [];
+	}
+}
+function withoutChips(attrs: Record<string, unknown> | undefined): Record<string, unknown> {
+	const { 'data-chips': _drop, ...rest } = attrs ?? {};
+	return rest;
+}
+
+/** True for the API reference group (landing page `reference/api`). */
+function isApiGroup(landing: SidebarLink | undefined): boolean {
+	if (!landing) return false;
+	return /\/reference\/api\/?$/.test(landing.href);
+}
 ---
 
 <ul class:list={{ 'top-level': !nested }}>
 	{
 		sublist.map((entry) => {
 			if (entry.type === 'link') {
+				const linkChips = parseChips(entry.attrs);
+				const linkAttrs = withoutChips(entry.attrs);
 				return (
 					<li>
 						<a
 							href={entry.href}
 							aria-current={entry.isCurrent ? 'page' : undefined}
 							class:list={[{ large: !nested }, entry.attrs.class]}
-							{...entry.attrs}
+							{...linkAttrs}
 						>
-							<span>{entry.label}</span>
+							<span class="sidebar-item-label">{entry.label}</span>
+							{linkChips.length > 0 && (
+								<span class="sidebar-chips">
+									{linkChips.map((chip) => (
+										<Badge class={chip.class} text={chip.text} />
+									))}
+								</span>
+							)}
 							{entry.badge && (
 								<Badge
 									variant={entry.badge.variant}
@@ -70,31 +125,70 @@ function toModel(entry: SidebarGroup): GroupModel {
 				);
 			}
 			const { group, landing, children } = toModel(entry);
+			const apiGroup = isApiGroup(landing);
 			// Forward any custom link attributes from the consumed landing entry,
 			// except the internal `data-group-link` marker itself.
 			const {
 				'data-group-link': _marker,
+				'data-chips': _landingChipsRaw,
 				class: landingClass,
 				...landingAttrs
 			} = landing?.attrs ?? {};
+			const groupChips = parseChips(landing?.attrs);
+			const labelLink = landing ? (
+				<a
+					class:list={['group-label', landingClass]}
+					href={landing.href}
+					aria-current={landing.isCurrent ? 'page' : undefined}
+					{...landingAttrs}
+				>
+					<span class="large">{group.label}</span>
+					{groupChips.length > 0 && (
+						<span class="sidebar-chips">
+							{groupChips.map((chip) => (
+								<Badge class={chip.class} text={chip.text} />
+							))}
+						</span>
+					)}
+					{group.badge && (
+						<Badge
+							variant={group.badge.variant}
+							class={group.badge.class}
+							text={group.badge.text}
+						/>
+					)}
+				</a>
+			) : undefined;
 			return (
-				<li>
+				<li class:list={[{ 'api-group': apiGroup }]}>
 					{landing ? (
-						<a
-							class:list={['group-label', landingClass]}
-							href={landing.href}
-							aria-current={landing.isCurrent ? 'page' : undefined}
-							{...landingAttrs}
-						>
-							<span class="large">{group.label}</span>
-							{group.badge && (
-								<Badge
-									variant={group.badge.variant}
-									class={group.badge.class}
-									text={group.badge.text}
-								/>
-							)}
-						</a>
+						apiGroup ? (
+							<span class="group-label-row">
+								{labelLink}
+								<button
+									type="button"
+									class="api-caret"
+									aria-expanded="true"
+									aria-label={`${group.label} (toggle)`}
+								>
+									<svg
+										aria-hidden="true"
+										width="14"
+										height="14"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<polyline points="6 9 12 15 18 9" />
+									</svg>
+								</button>
+							</span>
+						) : (
+							labelLink
+						)
 					) : (
 						<span class="group-label">
 							<span class="large">{group.label}</span>
@@ -146,6 +240,47 @@ function toModel(entry: SidebarGroup): GroupModel {
 			display: block;
 			padding: 0.2em var(--sl-sidebar-item-padding-inline);
 			line-height: 1.4;
+		}
+
+		.group-label-row {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 0.25rem;
+		}
+
+		.group-label-row > .group-label {
+			flex: 1 1 auto;
+			min-width: 0;
+		}
+
+		.api-caret {
+			display: none;
+			flex: 0 0 auto;
+			align-items: center;
+			justify-content: center;
+			inline-size: 1.5rem;
+			block-size: 1.5rem;
+			padding: 0;
+			border: 0;
+			border-radius: 0.25rem;
+			background: transparent;
+			color: var(--sl-color-gray-2);
+			cursor: pointer;
+		}
+
+		.api-caret:hover,
+		.api-caret:focus-visible {
+			color: var(--sl-color-white);
+			background: var(--sl-color-gray-6);
+		}
+
+		.api-caret svg {
+			transition: transform 0.15s ease;
+		}
+
+		.api-caret[aria-expanded='false'] svg {
+			transform: rotate(-90deg);
 		}
 
 		a {
