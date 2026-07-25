@@ -41,19 +41,30 @@ to the issuing body, with date and reference).
   "ISO 717-2 Annex C, Table C.1").
 - **Status:** unreported.
 
-## ISO 717-2:2020, Annex C, example C.2 (covered floor, 800 Hz value)
+## ISO 717-2:2020, Annex C, example C.2 (covered floor: 800 Hz value and CI chain)
 
-- **Location:** Annex C, Table C.2.
-- **The print:** the 800 Hz value of the reference floor with covering is
-  printed as 71,0 dB.
-- **The problem:** the normative Table 4 reference floor minus the printed
-  improvement at 800 Hz gives 71,5 dB; the 71,0 dB misprint propagates into
-  the example's CI chain (yielding −8 where the normative-table chain gives
-  −9).
-- **Evidence:** independent recomputation from Table 4 and the printed
-  improvement spectrum.
-- **Library behaviour:** derives the covered floor from the normative Table 4
-  values; the conformance check notes the provenance explicitly.
+- **Location:** Annex C, Table C.2 (ΔLw / ΔLlin worked example).
+- **The print:** (a) the 800 Hz reference-floor value is printed as 71,0 dB;
+  (b) the CI line prints "Ln,sum = 75,252 7… = 75 dB" and "CI = 75 − 15 −
+  63 = −3 dB", feeding "ΔLlin = 78 − 11 − (63 − 3) = 7 dB".
+- **The problem:** two independent defects. (a) The normative Table 4
+  reference floor is 71,5 dB at 800 Hz; the 71,0 dB row is a misprint,
+  though after rounding it does not change the example's CI (the correct
+  energy sum rounds to 76 dB with either value). (b) The printed
+  75,2527 dB is exactly the energy sum of the *wrong column over the wrong
+  range*: the measured floor "with covering" over all sixteen bands
+  100 Hz to 3150 Hz. A.2.1 defines CI from the reference floor with
+  covering (the "Ln,r,0 − ΔL" column) over 100 Hz to 2500 Hz (15 bands),
+  which gives 75,674 dB (printed chain) or 75,710 dB (Table 4 values) —
+  both round to 76 dB, so CI,r = 76 − 15 − 63 = −2 either way, giving
+  CI,Δ = −11 − (−2) = −9 and ΔLlin = 6 dB, not the printed −3 / −8 / 7 dB
+  chain.
+- **Evidence:** independent recomputation of every candidate sum from the
+  printed per-band values; the printed 75,2527 reproduces to all printed
+  digits only as the 16-band sum of the with-covering column.
+- **Library behaviour:** derives the covered reference floor from the
+  normative Table 4 values and sums per A.2.1, pinning ΔLw = 15 dB and
+  CI,Δ = −9; the conformance check notes the provenance explicitly.
 - **Status:** unreported.
 
 ## ISO 2631-5:2018, Annex C, NOTE 5 (female worked example)

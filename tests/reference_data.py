@@ -1340,8 +1340,11 @@ ISO717_2_ANNEX_C1_COVERED_EXPECTED = {
 # of a floor covering on the standard reference floor. The worked example
 # gives ΔLw = 15 dB (Ln,r,w = 63 dB). The module additionally derives
 # CI,Δ = CI,r,0 - CI,r = -11 - (-2) = -9 dB from the normative Table 4
-# reference floor (the printed C.2 chain uses a misprinted 800 Hz reference
-# value 71,0 instead of Table 4's 71,5 and reaches CI,r = -3).
+# reference floor. The printed C.2 chain reaches CI,r = -3 because its
+# "Ln,sum = 75,2527" is the energy sum of the wrong column over the wrong
+# range (the measured floor with covering, 16 bands 100-3150 Hz); the A.2.1
+# sum of the covered reference floor over 100-2500 Hz rounds to 76 dB with
+# either the misprinted 71,0 or Table 4's 71,5 at 800 Hz (see docs/ERRATA.md).
 # ---------------------------------------------------------------------------
 ISO717_2_ANNEX_C2_DELTA_L: list[float] = [
     3.0, 3.7, 1.9, 3.0, 3.2, 3.5, 4.0, 6.1,

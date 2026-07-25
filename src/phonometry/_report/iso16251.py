@@ -213,6 +213,11 @@ def _basis_line(metadata: ReportMetadata | None, language: str = "en") -> str:
     )
 
 
+def _is_background_limited(result: FloorCoveringImprovementResult) -> bool:
+    """``True`` when any band sits at the 1,3 dB limit of measurement."""
+    return bool(np.any(np.asarray(result.limited, dtype=bool)))
+
+
 def _box_statement(
     result: FloorCoveringImprovementResult, language: str = "en"
 ) -> str:
@@ -221,12 +226,18 @@ def _box_statement(
     With the 16 rating bands present the box carries the ISO 16251-1 Clause 8 e)
     statement of results ``delta-Lw (CI,delta)``; otherwise (a spectrum missing
     the rating bands) it names the reported quantity and its frequency range.
+    A result with background-limited bands (Formula (2), the 1,3 dB limit of
+    measurement) is a lower bound, printed with a ``>=`` qualifier; a manually
+    built result without ``ci_delta`` prints the bare ``delta-Lw`` rather than
+    fabricating a ``(+0)`` adaptation term.
     """
     if result.delta_lw is not None:
-        ci = result.ci_delta if result.ci_delta is not None else 0
+        prefix = "&#8805; " if _is_background_limited(result) else ""
+        if result.ci_delta is None:
+            return f"&#916;L<sub>w</sub> = <b>{prefix}{result.delta_lw} dB</b>"
         return (
             f"&#916;L<sub>w</sub> (C<sub>I,&#916;</sub>) = "
-            f"<b>{result.delta_lw} ({ci:+d}) dB</b>"
+            f"<b>{prefix}{result.delta_lw} ({result.ci_delta:+d}) dB</b>"
         )
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     lo = round(float(freqs.min())) if freqs.size else 0
@@ -367,6 +378,18 @@ def render_iso16251_report(
             statement_style,
         )
     )
+    if _is_background_limited(result):
+        flow.append(
+            Paragraph(
+                t(
+                    "One or more bands are at the 1,3 dB limit of measurement "
+                    "(ISO 16251-1:2014 Formula (2), reported as &gt; &#916;L); "
+                    "the reported &#916;L<sub>w</sub> is a lower bound.",
+                    language,
+                ),
+                statement_style,
+            )
+        )
     if (
         metadata is not None
         and metadata.requirement is not None
