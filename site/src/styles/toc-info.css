@@ -51,6 +51,16 @@
   --chip-standard-ink: #7ee8d5;
   --chip-theory-accent: #e6b84e;
   --chip-theory-ink: #f4c04e;
+  /* Neutral ink for the annotation line. Starlight's `--sl-color-gray-2` is
+     the sidebar LINK colour, so reusing it gave the metadata exactly the
+     tonal weight of the navigation labels. This is one step quieter in both
+     themes and still clears WCAG AA for small text (5.3:1 dark, 5.6:1
+     light). */
+  --chip-ink-muted: hsl(224, 8%, 62%);
+  /* Dotted marker of the 'hover' variant. Starlight's hairline value is far
+     too dark to be seen on the dark sidebar, so each theme gets a value at a
+     comparable distance from its own background. */
+  --chip-marker: hsl(224, 7%, 38%);
 }
 
 :root[data-theme='light'] {
@@ -58,6 +68,8 @@
   --chip-standard-ink: #0c5c52;
   --chip-theory-accent: #a8760a;
   --chip-theory-ink: #855107;
+  --chip-ink-muted: hsl(224, 7%, 42%);
+  --chip-marker: hsl(224, 6%, 74%);
 }
 
 /* ---------------------------------------------------------------------------
@@ -77,7 +89,7 @@
   border: 0;
   background: transparent;
   font-family: inherit;
-  color: var(--sl-color-gray-2);
+  color: var(--chip-ink-muted);
   font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.01em;
@@ -179,11 +191,17 @@
   margin-inline-start: 0.35rem;
 }
 
-/* On the active accent pill the chip text inverts; the dots keep colour. */
+/* On the active accent pill both the chip text and the run dots invert: the
+   teal dot is all but invisible against the accent fill, and the category
+   split is not worth reading on the page you are already on. */
 :root[data-toc-style='annotate'] [aria-current='page'] .sidebar-chips .sl-badge,
 :root[data-toc-style='focus'] [aria-current='page'] .sidebar-chips .sl-badge {
   color: var(--sl-color-text-invert);
   opacity: 0.85;
+}
+:root[data-toc-style='annotate'] [aria-current='page'] .sidebar-chips .sl-badge::before,
+:root[data-toc-style='focus'] [aria-current='page'] .sidebar-chips .sl-badge::before {
+  background: currentColor;
 }
 
 /* ---------------------------------------------------------------------------
@@ -201,8 +219,7 @@
    row: that is texture, not information, and it fights the labels. The
    hairline dotted marker fades in only once the pointer (or the keyboard
    focus) is inside the sidebar, which is exactly when the reader is looking
-   for a way in. `--sl-color-gray-5` is the hairline value in dark and a
-   comparably quiet step in light, so one declaration covers both themes. */
+   for a way in. */
 :root[data-toc-style='hover']
   #starlight__sidebar
   a:has(> .sidebar-chips)
@@ -220,7 +237,7 @@
   #starlight__sidebar:focus-within
   a:has(> .sidebar-chips)
   > .sidebar-item-label {
-  text-decoration-color: var(--sl-color-gray-5);
+  text-decoration-color: var(--chip-marker);
 }
 
 /* No marker on the active accent pill (inverted colours). */
@@ -246,7 +263,10 @@
   max-inline-size: min(15rem, 100%, calc(100vw - 3rem));
   inline-size: max-content;
   padding: 0.35rem 0.6rem;
-  border: 1px solid var(--sl-color-hairline-light);
+  /* gray-5 rather than the hairline: in light theme the card surface is the
+     same white as the sidebar, so a hairline border left it floating without
+     an edge. */
+  border: 1px solid var(--sl-color-gray-5);
   border-radius: 0.375rem;
   background: var(--sl-color-bg-nav);
   box-shadow: var(--sl-shadow-md);
@@ -322,7 +342,7 @@
   }
   :root[data-toc-style='hover'] .sidebar-chips .chip-standard,
   :root[data-toc-style='hover'] .sidebar-chips .chip-theory {
-    color: var(--sl-color-gray-2);
+    color: var(--chip-ink-muted);
   }
   :root[data-toc-style='hover'] [aria-current='page'] .sidebar-chips .sl-badge {
     color: var(--sl-color-text-invert);
@@ -413,6 +433,40 @@
 .section-standards .subgroup-row td {
   font-weight: 600;
   color: var(--sl-color-white);
+}
+
+/* Three columns do not survive a phone: the page names wrap to four lines
+   each and the references column falls off the right edge. Below 30rem the
+   table becomes a stacked list, one page per block with its standards and
+   references underneath, which is what the sidebar annotation line does
+   anyway. */
+@media (max-width: 30rem) {
+  :root[data-toc-style='clean'] .section-standards table,
+  :root[data-toc-style='clean'] .section-standards tbody,
+  :root[data-toc-style='clean'] .section-standards tr,
+  :root[data-toc-style='clean'] .section-standards td {
+    display: block;
+    inline-size: auto;
+  }
+  :root[data-toc-style='clean'] .section-standards thead {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  :root[data-toc-style='clean'] .section-standards tr {
+    padding-block: 0.4rem;
+    border-block-end: 1px solid var(--sl-color-hairline-light);
+  }
+  :root[data-toc-style='clean'] .section-standards td {
+    padding: 0.1rem 0;
+    border: 0;
+  }
+  :root[data-toc-style='clean'] .section-standards td:empty {
+    display: none;
+  }
 }
 
 /* ---------------------------------------------------------------------------

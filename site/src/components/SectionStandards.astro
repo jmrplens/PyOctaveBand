@@ -93,7 +93,11 @@ const colReferences = isEs ? 'Referencias clave' : 'Key references';
 	group && hasChips && (
 		<section class="section-standards">
 			<h2 id="standards-by-page">{heading}</h2>
-			<table>
+			{/* Starlight renders tables as scrollable blocks and the page names
+			    push this one past a phone viewport, so the scroll container needs
+			    an explicit tabindex for WCAG 2.1.1, exactly like the markdown
+			    table transform in astro.config.mjs. */}
+			<table tabindex="0">
 				<thead>
 					<tr>
 						<th>{colPage}</th>
