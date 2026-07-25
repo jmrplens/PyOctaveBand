@@ -446,13 +446,94 @@ def _nonlinear_decay(core: np.ndarray, sample_rate: float) -> None:
 # ---------------------------------------------------------------------------
 
 
+def _rns_index_of(core_l: float) -> int:
+    """Specific-loudness range index of a core loudness value (Table A.9)."""
+    idx_rns = 0
+    while idx_rns < _N_RNS and _RNS[idx_rns] >= core_l:
+        idx_rns += 1
+    return idx_rns
+
+
+def _next_rns_index(idx_rns: int, n2: float) -> int:
+    """Advance to the specific-loudness range of the segment end ``n2``."""
+    while idx_rns < _N_RNS - 1 and n2 <= _RNS[idx_rns]:
+        idx_rns += 1
+    return min(idx_rns, _N_RNS - 1)
+
+
+def _masked_segment(
+    ns: list[float],
+    state: tuple[float, float, float, int],
+    core_l: float,
+    zup: float,
+    usl: float,
+    idx_rns: int,
+) -> tuple[float, float, float, float, int, bool]:
+    """Extend the masking slope of the previous band by one segment.
+
+    The slope from the previous band still masks this band: extend it with
+    steepness ``usl`` until it meets the core loudness, a range limit RNS or
+    the band edge ZUP, return its trapezoidal ``area`` contribution and write
+    its 0.1-Bark samples into ``ns``.
+
+    :param ns: Specific-loudness samples, written in place.
+    :param state: Current ``(n1, z, z1, idx_ns)`` sampling state.
+    :return: ``(n2, z2, area, z, idx_ns, next_band)``.
+    """
+    n1, z, z1, idx_ns = state
+    n2 = max(_RNS[idx_rns], core_l)
+    dz = (n1 - n2) / usl
+    z2 = z1 + dz
+    next_band = False
+    if z2 > zup:
+        next_band = True
+        z2 = zup
+        dz = z2 - z1
+        n2 = n1 - dz * usl
+    area = dz * (n1 + n2) / 2.0
+    zk = z
+    while zk <= z2:
+        ns[idx_ns] = n1 - (zk - z1) * usl
+        idx_ns += 1
+        zk += 0.1
+    return n2, z2, area, zk, idx_ns, next_band
+
+
+def _flat_segment(
+    ns: list[float],
+    state: tuple[float, float, float, int],
+    core_l: float,
+    zup: float,
+) -> tuple[float, float, float, float, int]:
+    """Take the unmasked core loudness flat up to the band edge ``zup``.
+
+    Returns the rectangular ``area`` contribution and writes the 0.1-Bark
+    samples into ``ns``.
+
+    :param ns: Specific-loudness samples, written in place.
+    :param state: Current ``(n1, z, z1, idx_ns)`` sampling state.
+    :return: ``(n2, z2, area, z, idx_ns)``.
+    """
+    _, z, z1, idx_ns = state
+    z2 = zup
+    n2 = core_l
+    area = n2 * (z2 - z1)
+    zk = z
+    while zk <= z2:
+        ns[idx_ns] = n2
+        idx_ns += 1
+        zk += 0.1
+    return n2, z2, area, zk, idx_ns
+
+
 def _calc_slopes(core: list[float]) -> tuple[float, list[float]]:
     """Specific loudness pattern with upper slopes for one time step.
 
     Attaches the masking slopes towards higher frequencies to the core
     loudness values (steepness USL per specific-loudness range RNS,
     Table A.9; critical-band limits ZUP, Table A.8), integrates the total
-    loudness and samples the pattern at 0.1-Bark steps.
+    loudness and samples the pattern at 0.1-Bark steps.  The two segment
+    kinds live in :func:`_masked_segment` and :func:`_flat_segment`.
 
     :param core: 21 core loudness values.
     :return: Total loudness in sone and 240 specific loudness values.
@@ -460,10 +541,8 @@ def _calc_slopes(core: list[float]) -> tuple[float, list[float]]:
     ns = [0.0] * _N_BARK
     total = 0.0
     n1 = 0.0  # specific loudness at the current lower band edge
-    n2 = 0.0
     z = 0.1  # next 0.1-Bark sampling position
     z1 = 0.0  # Bark position of the current lower band edge
-    z2 = 0.0
     idx_rns = 0
     idx_ns = 0
 
@@ -473,49 +552,21 @@ def _calc_slopes(core: list[float]) -> tuple[float, list[float]]:
         idx_cbn = min(idx_cl - 1, _N_CBR - 1)  # never used while negative
         while True:
             if n1 > core_l:
-                # The slope from the previous band still masks this band:
-                # extend it with steepness USL until it meets the core
-                # loudness, a range limit RNS or the band edge ZUP.
                 usl = _USL[idx_rns][idx_cbn]
-                n2 = max(_RNS[idx_rns], core_l)
-                dz = (n1 - n2) / usl
-                z2 = z1 + dz
-                next_band = False
-                if z2 > zup:
-                    next_band = True
-                    z2 = zup
-                    dz = z2 - z1
-                    n2 = n1 - dz * usl
-                # Trapezoidal contribution of the slope segment and its
-                # 0.1-Bark samples.
-                total += dz * (n1 + n2) / 2.0
-                zk = z
-                while zk <= z2:
-                    ns[idx_ns] = n1 - (zk - z1) * usl
-                    idx_ns += 1
-                    zk += 0.1
-                z = zk
+                n2, z2, area, z, idx_ns, next_band = _masked_segment(
+                    ns, (n1, z, z1, idx_ns), core_l, zup, usl, idx_rns
+                )
             else:
                 # Unmasked band: find the specific-loudness range of the
                 # core value, then take it flat up to the band edge.
                 if n1 < core_l:
-                    idx_rns = 0
-                    while idx_rns < _N_RNS and _RNS[idx_rns] >= core_l:
-                        idx_rns += 1
+                    idx_rns = _rns_index_of(core_l)
                 next_band = True
-                z2 = zup
-                n2 = core_l
-                total += n2 * (z2 - z1)
-                zk = z
-                while zk <= z2:
-                    ns[idx_ns] = n2
-                    idx_ns += 1
-                    zk += 0.1
-                z = zk
-            # Advance to the specific-loudness range of the segment end.
-            while idx_rns < _N_RNS - 1 and n2 <= _RNS[idx_rns]:
-                idx_rns += 1
-            idx_rns = min(idx_rns, _N_RNS - 1)
+                n2, z2, area, z, idx_ns = _flat_segment(
+                    ns, (n1, z, z1, idx_ns), core_l, zup
+                )
+            total += area
+            idx_rns = _next_rns_index(idx_rns, n2)
             z1 = z2
             n1 = n2
             if next_band:
