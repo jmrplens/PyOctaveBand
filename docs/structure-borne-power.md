@@ -34,6 +34,11 @@ low = building.reception_plate_power(lv_low, bands, mass_per_area=600.0,
 high = building.reception_plate_power(lv_low + 6.0, bands, mass_per_area=150.0,
                                       area=2.0, reverberation_time=0.5)
 
+# One line — the L_Ws(f) bars of one determination with its band-summed total:
+low.plot()
+plt.show()
+
+# By hand, comparing the two plates from the results' fields:
 x = np.arange(bands.size)
 fig, ax = plt.subplots()
 ax.bar(x - 0.2, low.power_level, width=0.4, label="low-mobility plate")
@@ -94,6 +99,8 @@ res = building.reception_plate_power(
 )
 print(np.round(res.power_level, 1))     # per-band L_Ws
 print(round(res.total_level, 1))        # band-summed level [dB re 1 pW]
+
+res.plot()   # the L_Ws(f) bars with the band-summed total, as in the figure above (needs matplotlib)
 ```
 
 ## 2. Low- and high-mobility plates

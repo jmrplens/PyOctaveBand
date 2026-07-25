@@ -10,6 +10,13 @@ references:
     publisher: "Springer"
     doi: "10.1007/b137728"
     note: "The source-receiver mobility coupling and the structure-borne transmission across junctions behind the coupling term and the path model. ISBN 978-3-540-22696-3."
+  - type: book
+    authors: ["Hopkins, C."]
+    year: 2007
+    title: "Sound insulation"
+    publisher: "Butterworth-Heinemann"
+    doi: "10.4324/9780080550473"
+    note: "Section 2.8 (driving-point impedance and mobility): the power a mechanical source injects into a plate through the source and receiver mobilities, the building-acoustics reading of the clause 4.4.3 coupling term. ISBN 978-0-7506-6526-1."
   - type: standard
     organization: "European Committee for Standardization"
     year: 2009
@@ -85,6 +92,18 @@ mobility, Formula 19c) and to `−10 lg(|Y_s|·Re{Z_i})` for a **velocity source
 mobility `Y_k` inside the modulus (Formula 19e). The **installed** power level is
 then (Formula 18b) `L_Ws,inst = L_Ws,c − D_C`.
 
+The physics behind `D_C` is the classical power input of a point-excited
+plate: only the real part of the receiver's driving-point mobility absorbs
+power, and the mismatch between `Y_s` and `Y_i` decides how much of the
+source's capability ever enters the structure (Hopkins 2007, Section 2.8).
+The mobilities themselves come from the
+[mechanical-mobility chain](/phonometry/guides/mechanical-mobility/): measured
+per ISO 7626, or from the infinite-plate closed forms of
+[panel theory](/phonometry/guides/panel-sound-insulation/) when no measurement
+exists. A pump on a concrete slab is the textbook force source: its casing
+mobility is orders of magnitude above the slab's, so `D_C` collapses to
+Formula 19c and the injected power no longer depends on the receiver at all.
+
 ```python
 from phonometry import building
 
@@ -136,6 +155,8 @@ res = building.installed_source_prediction(
 )
 print(np.round(res.total_level, 1))      # total L_n,s per band
 print(round(res.overall_level, 1))       # band-summed level [dB]
+
+res.plot()   # the per-path and total L_n,s cascade, as in the figure above (needs matplotlib)
 ```
 
 The `InstalledSourceResult` carries the per-path levels, the total per band, the
@@ -206,4 +227,14 @@ repository; click the preview to open the PDF.
 
 ## See also
 
+- [Structure-borne sound power of equipment (EN 15657)](/phonometry/guides/structure-borne-power/):
+  the reception-plate characterisation that supplies `L_Ws,c` and the source
+  mobility this prediction consumes.
+- [Mechanical mobility and the FRF family (ISO 7626-1)](/phonometry/guides/mechanical-mobility/):
+  the measured `Y_s` and `Y_i` behind the coupling term.
+- [Bending-wave transmission at plate junctions](/phonometry/guides/junction-transmission/):
+  the junction physics that carries the installed power to the flanking
+  radiators.
+- [Predicting Sound Insulation (EN 12354)](/phonometry/guides/insulation-prediction/):
+  the airborne and impact members of the same prediction family.
 - API reference: [`building.installed_structure_borne`](/phonometry/reference/api/building/installed-structure-borne/).
