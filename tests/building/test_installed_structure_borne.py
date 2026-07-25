@@ -146,6 +146,34 @@ def test_prediction_band_count_mismatch() -> None:
         )
 
 
+def test_prediction_scalar_source_broadcasts_over_path_bands() -> None:
+    # A single-number L_Ws,c / D_C with per-band path data broadcasts to the
+    # path band count; installed_power_level then matches the band axis
+    # (regression: the fiche table indexed it per band and crashed).
+    res = installed_source_prediction(
+        80.0, 10.0,
+        [{"adjustment_term": 0.0,
+          "flanking_reduction_index": np.array([40.0, 50.0, 60.0]),
+          "element_area": 10.0}],
+    )
+    assert res.installed_power_level.shape == (3,)
+    np.testing.assert_allclose(res.installed_power_level, 70.0)
+    assert res.path_levels.shape == (1, 3)
+    # L_n,s,ij = 70 - 0 - Rij - 10 lg(10/10) - 10 lg(10/4)
+    expected = 70.0 - np.array([40.0, 50.0, 60.0]) - 10.0 * np.log10(2.5)
+    np.testing.assert_allclose(res.path_levels[0], expected)
+
+
+def test_prediction_scalar_source_band_mismatch_across_paths() -> None:
+    with pytest.raises(ValueError, match="adjustment_term"):
+        installed_source_prediction(
+            80.0, 10.0,
+            [{"adjustment_term": np.zeros(2),
+              "flanking_reduction_index": np.zeros(3),
+              "element_area": 10.0}],
+        )
+
+
 def test_overall_level_numeric() -> None:
     res = installed_source_prediction(
         np.array([80.0, 82.0]), np.array([10.0, 10.0]),
