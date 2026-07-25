@@ -56,8 +56,10 @@ background_noise_correction(
 Background-noise correction `K1` per band (ISO 3744:2010 Eq. 16).
 
 `K1 = -10*lg(1 - 10^(-0,1*dLp))` with `dLp = source - background`. For
-`dLp` above the upper criterion (15 dB engineering, 10 dB survey) the
-background is negligible and `K1 = 0`. For `dLp` below the lower
+`dLp` strictly above the upper criterion (15 dB engineering, 10 dB
+survey) the background is negligible and `K1 = 0`; at the criterion
+itself Eq. (16) still applies (ISO 3744:2010, 8.2.3: 6 dB \<= dLp \<= 15 dB;
+ISO 3746:2010, 8.3.3: 3 dB \<= dLp \<= 10 dB). For `dLp` below the lower
 criterion (6 dB engineering, 3 dB survey) the accuracy is reduced: `K1`
 is clamped to its value at that criterion and a [`SoundPowerWarning`](/phonometry/reference/api/power/sound-power/#soundpowerwarning)
 is emitted, the result then being an upper bound (clause 8.2.3).
@@ -391,8 +393,10 @@ adequacy `Ld >= F_pIn(signed)` (Eq. C.2); `criterion_3`
 `F_pIn(signed) - F_pIn(unsigned) <= 3 dB` (Eq. C.3); `criterion_4`
 `FS <= 2` (Eq. C.4); `criterion_5` scan-density convergence
 `0,83 <= FS(1)/FS(2) <= 1,2` (Eq. C.5). `qualified` is the conjunction
-of criteria 1-4 (the initial determination is final), `None` unless both
-criterion 1 and criterion 2 are evaluable.
+of criteria 1-3 with the field non-uniformity accepted through criterion 4
+or, where evaluated, criterion 5 (C.1.6.2: a band satisfying criterion 5
+is qualified as a final result even if `FS(2) >= 2`); `None` unless
+both criterion 1 and criterion 2 are evaluable.
 
 ## PrecisionFieldIndicators
 
@@ -744,7 +748,7 @@ are supplied; for a single band it equals `LW`, and for several bands
 without `frequencies` it is `NaN` (A-weighting needs the band centres).
 `directivity_index` is the apparent directivity index `DIi*` per
 microphone position and frequency band, shape `(NM, NB)` (Eq. 7,
-evaluated per band per clause 8.6). `uncertainty` is the expanded
+evaluated per band per clause 8.4). `uncertainty` is the expanded
 uncertainty
 `U = 2*sqrt(sigma_R0^2 + sigma_omc^2)` (95 %, ISO 3744 clause 9.5).
 

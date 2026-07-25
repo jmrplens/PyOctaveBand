@@ -157,7 +157,7 @@ class SoundPowerResult:
     without ``frequencies`` it is ``NaN`` (A-weighting needs the band centres).
     ``directivity_index`` is the apparent directivity index ``DIi*`` per
     microphone position and frequency band, shape ``(NM, NB)`` (Eq. 7,
-    evaluated per band per clause 8.6). ``uncertainty`` is the expanded
+    evaluated per band per clause 8.4). ``uncertainty`` is the expanded
     uncertainty
     ``U = 2*sqrt(sigma_R0^2 + sigma_omc^2)`` (95 %, ISO 3744 clause 9.5)."""
 
@@ -318,8 +318,10 @@ def background_noise_correction(
     """Background-noise correction ``K1`` per band (ISO 3744:2010 Eq. 16).
 
     ``K1 = -10*lg(1 - 10^(-0,1*dLp))`` with ``dLp = source - background``. For
-    ``dLp`` above the upper criterion (15 dB engineering, 10 dB survey) the
-    background is negligible and ``K1 = 0``. For ``dLp`` below the lower
+    ``dLp`` strictly above the upper criterion (15 dB engineering, 10 dB
+    survey) the background is negligible and ``K1 = 0``; at the criterion
+    itself Eq. (16) still applies (ISO 3744:2010, 8.2.3: 6 dB <= dLp <= 15 dB;
+    ISO 3746:2010, 8.3.3: 3 dB <= dLp <= 10 dB). For ``dLp`` below the lower
     criterion (6 dB engineering, 3 dB survey) the accuracy is reduced: ``K1``
     is clamped to its value at that criterion and a :class:`SoundPowerWarning`
     is emitted, the result then being an upper bound (clause 8.2.3).
@@ -335,7 +337,7 @@ def background_noise_correction(
     delta = src - bg
     clamped = np.maximum(delta, low)
     k1 = -10.0 * np.log10(1.0 - 10.0 ** (-0.1 * clamped))
-    k1 = np.where(delta >= high, 0.0, k1)
+    k1 = np.where(delta > high, 0.0, k1)
     if np.any(delta < low):
         warnings.warn(
             f"Background margin below {low:g} dB in one or more bands; K1 "
@@ -680,9 +682,10 @@ def sound_power_pressure(
     if np.any(k2_arr > _K2_LIMIT[grade]):
         warnings.warn(
             f"K2 up to {float(np.max(k2_arr)):.1f} dB exceeds the {grade} "
-            f"validity limit of {_K2_LIMIT[grade]:g} dB; the acoustic "
-            "environment does not qualify for this method (ISO 3744:2010 "
-            "clause 4.3.2).",
+            f"validity limit of {_K2_LIMIT[grade]:g} dB. ISO 3744:2010 clause "
+            "4.3.2 states this limit for the A-weighted K2A, so this per-band "
+            "check is conservative; the acoustic environment may not qualify "
+            "for this method.",
             SoundPowerWarning,
             stacklevel=2,
         )
@@ -706,8 +709,10 @@ def sound_power_pressure(
         lwa = float(lw[0]) if n_bands == 1 else float("nan")
 
     # --- apparent directivity index per position AND band (Eq. 7) ---------
-    # ISO 3744:2010 clause 8.6 requires the directivity index to be evaluated
-    # per frequency band, so DIi* is a (NM, NB) array. Per Eq. 7
+    # ISO 3744:2010 clause 8.4 requires the apparent directivity indices to be
+    # calculated on the actual measurement surface (to validate the number of
+    # measurement positions), per frequency band, so DIi* is a (NM, NB) array.
+    # Per Eq. 7
     # DIi*(k) = Lpi(k) - (Lp'(k) - K1(k)): BOTH the per-position level Lpi(k)
     # and the surface energy mean Lp'(k) carry the same per-band background
     # correction K1(k), which cancels in the difference (3.24 DI definition).
@@ -1260,8 +1265,16 @@ def sound_power_anechoic(
 
     # --- A-weighted total LWA (Eq. C.1) -----------------------------------
     if freqs is not None:
-        ck = _a_weighting_corrections(freqs)
-        lwa = energy_sum(lw + ck)
+        try:
+            ck = _a_weighting_corrections(freqs)
+        except ValueError:
+            # Bands outside the ISO 3744 Annex E table (e.g. the 12,5 kHz to
+            # 20 kHz one-third octaves that ISO 3745 covers, Tables 2/3): the
+            # per-band determination stands, only the A-weighted total is
+            # undefined.
+            lwa = float("nan")
+        else:
+            lwa = energy_sum(lw + ck)
     else:
         lwa = float(lw[0]) if n_bands == 1 else float("nan")
 
@@ -1355,8 +1368,10 @@ class PrecisionCriteria:
     ``F_pIn(signed) - F_pIn(unsigned) <= 3 dB`` (Eq. C.3); ``criterion_4``
     ``FS <= 2`` (Eq. C.4); ``criterion_5`` scan-density convergence
     ``0,83 <= FS(1)/FS(2) <= 1,2`` (Eq. C.5). ``qualified`` is the conjunction
-    of criteria 1-4 (the initial determination is final), ``None`` unless both
-    criterion 1 and criterion 2 are evaluable."""
+    of criteria 1-3 with the field non-uniformity accepted through criterion 4
+    or, where evaluated, criterion 5 (C.1.6.2: a band satisfying criterion 5
+    is qualified as a final result even if ``FS(2) >= 2``); ``None`` unless
+    both criterion 1 and criterion 2 are evaluable."""
 
     criterion_1: np.ndarray | None
     criterion_2: np.ndarray | None
@@ -1569,7 +1584,12 @@ def precision_qualification(
 
     qualified: np.ndarray | None = None
     if criterion_1 is not None and criterion_2 is not None:
-        qualified = criterion_1 & criterion_2 & criterion_3 & criterion_4
+        # C.1.6.2: where the doubled-density scan satisfies criterion 5, the
+        # band qualifies as a final result even if FS(2) >= 2 fails criterion 4.
+        non_uniformity_ok = (
+            criterion_4 if criterion_5 is None else (criterion_4 | criterion_5)
+        )
+        qualified = criterion_1 & criterion_2 & criterion_3 & non_uniformity_ok
 
     return PrecisionCriteria(
         criterion_1=criterion_1,

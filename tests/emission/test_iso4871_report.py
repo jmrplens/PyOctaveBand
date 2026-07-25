@@ -129,6 +129,30 @@ def test_no_verification_measurement_yields_none() -> None:
     """Without a verification measurement the verdict is undefined (None)."""
     mode1, _ = _annex_b_modes()
     assert mode1.verified is None
+    assert mode1.verified_dual is None
+
+
+def test_dual_number_verification_uses_separately_rounded_values() -> None:
+    """Clause 6.2 verifies the dual-number form against (L + K), the sum of
+    the separately rounded declared values (clause 3.16), not round(L + K).
+
+    L_WA = 93,4, K_WA = 2,4: the dual declaration states 93 dB and 2 dB, so
+    the verification limit is 95 dB, while the single-number L_WAd is
+    round(95,8) = 96 dB.
+    """
+    verified = OperatingModeDeclaration("m", 93.4, 2.4, verification_level=95.0)
+    rejected = OperatingModeDeclaration("m", 93.4, 2.4, verification_level=95.5)
+    assert verified.dual_number_verification_limit == 95
+    assert verified.declared_sound_power_level == 96
+    assert verified.verified_dual is True
+    assert rejected.verified_dual is False
+    # The combined (single-number) form still verifies against L_WAd = 96.
+    assert rejected.verified is True
+    at_single_boundary = OperatingModeDeclaration(
+        "m", 93.4, 2.4, verification_level=96.0
+    )
+    assert at_single_boundary.verified is True
+    assert at_single_boundary.verified_dual is False
 
 
 # --- model validation --------------------------------------------------------
@@ -231,6 +255,46 @@ def test_single_number_report_renders_one_page(tmp_path) -> None:
     decl.report(str(out))
     _assert_one_page(str(out))
     assert "DECLARED SINGLE-NUMBER" in _extract_text(str(out))
+
+
+def test_dual_number_report_follows_annex_b2_layout(tmp_path) -> None:
+    """The dual-number table states only L and K (Annex B.2): no derived
+    L_WAd row, whose mix of separately rounded addends and a once-rounded sum
+    is not part of the dual layout."""
+    pytest.importorskip("reportlab")
+    decl = _annex_b_declaration()
+    out = tmp_path / "iso4871_dual_layout.pdf"
+    decl.report(str(out))
+    text = _extract_text(str(out))
+    assert "Measured A-weighted sound power level" in text
+    assert "Uncertainty" in text
+    assert "Declared A-weighted sound power level" not in text
+
+
+def test_dual_number_verification_row_uses_rounded_sum(tmp_path) -> None:
+    """A dual-number fiche verifies against L_WA + K_WA of the separately
+    rounded declared values (93 + 2 = 95 for 93,4/2,4), not round(95,8) = 96."""
+    pytest.importorskip("reportlab")
+    mode = OperatingModeDeclaration(
+        "Operating mode 1", 93.4, 2.4, verification_level=95.0
+    )
+    decl = NoiseEmissionDeclaration((mode,), basic_standards="ISO 3744")
+    out = tmp_path / "iso4871_dual_verify.pdf"
+    decl.report(str(out))
+    text = _extract_text(str(out))
+    assert "Verification" in text
+    assert "95 dB" in text
+    assert "96 dB" not in text
+    assert "PASS" in text
+    # The same declaration in single-number form verifies against L_WAd = 96.
+    single = NoiseEmissionDeclaration(
+        (mode,), basic_standards="ISO 3744", form="single-number"
+    )
+    out2 = tmp_path / "iso4871_single_verify.pdf"
+    single.report(str(out2))
+    text2 = _extract_text(str(out2))
+    assert "96 dB" in text2
+    assert "PASS" in text2
 
 
 def test_verification_verdict_renders_both_ways(tmp_path) -> None:

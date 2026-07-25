@@ -11,15 +11,18 @@ declaration format of ISO 4871:1996 Annex B:
 * the machine identification and operating conditions (clause 5 a / 5 c),
   printed as the declaration-table header row exactly as ISO 4871 Annex B lays
   it out;
-* the declared dual- or single-number table across the operating-mode columns:
-  the measured A-weighted sound power level ``L_WA`` and its uncertainty
-  ``K_WA`` and the derived declared value ``L_WAd = L_WA + K_WA`` (the resulting
-  upper value, clause 3.15), plus the emission sound pressure level ``L_pA`` at
-  a work station when it is declared;
+* the declared dual- or single-number table across the operating-mode columns
+  following the Annex B layouts: the measured A-weighted sound power level
+  ``L_WA`` and its uncertainty ``K_WA`` for the dual-number form (Annex B.2),
+  or the derived declared value ``L_WAd = L_WA + K_WA`` (the resulting upper
+  value, clause 3.15) for the single-number form (Annex B.1), plus the
+  emission sound pressure level ``L_pA`` at a work station when it is declared;
 * the noise-test-code and basic-standards footnote (clause 5 b) and the ISO 4871
   upper-boundary note;
 * a verification verdict table when a verification measurement is supplied
-  (clause 6.2: verified when ``L_1 <= L_WAd``); and
+  (clause 6.2: verified when ``L_1 <= L_WAd`` for the single-number form, or
+  ``L_1 <= L_WA + K_WA`` -- the separately rounded declared values -- for the
+  dual-number form); and
 * a footer identity/disclaimer block.
 
 Like :mod:`.broadcast` and :mod:`.annex16_epnl` this uses a stacked table layout
@@ -151,17 +154,9 @@ def _dual_rows(
                 ],
             )
         )
-    rows.append(
-        (
-            t(
-                "Declared A-weighted sound power level, "
-                "L<sub>WAd</sub> = L<sub>WA</sub> + K<sub>WA</sub>, in decibels",
-                language,
-            ),
-            [format_number(m.declared_sound_power_level, language, decimals=0)
-             for m in modes],
-        )
-    )
+    # The ISO 4871 Annex B.2 dual-number layout states only L and K, each
+    # rounded to the nearest decibel (clause 3.16); no derived L_WAd row (the
+    # NOTE below the table already explains that the sum is an upper boundary).
     return rows
 
 
@@ -372,13 +367,29 @@ def _note(declaration: NoiseEmissionDeclaration, language: str = "en") -> str:
 def _verification_rows(
     declaration: NoiseEmissionDeclaration, language: str = "en"
 ) -> list[tuple[str, str, str, str]]:
-    """Verification rows (clause 6.2): L_1 vs the declared L_WAd, per mode."""
+    """Verification rows (clause 6.2): L_1 against the declared form, per mode.
+
+    The single-number form verifies against the combined ``L_WAd``; the
+    dual-number form against the sum of the separately rounded declared values
+    ``L_WA + K_WA`` (clauses 3.16 and 6.2).
+    """
+    dual = declaration.form == "dual-number"
     rows: list[tuple[str, str, str, str]] = []
     for mode in declaration.modes:
         if mode.verification_level is None:
             continue
-        ld = mode.declared_sound_power_level
-        status = "pass" if mode.verified else "fail"
+        if dual:
+            limit = mode.dual_number_verification_limit
+            verdict = mode.verified_dual
+            criterion = t(
+                "&#8804; L<sub>WA</sub> + K<sub>WA</sub> = {ld} dB", language
+            ).format(ld=format_number(limit, language, decimals=0))
+        else:
+            limit = mode.declared_sound_power_level
+            verdict = mode.verified
+            criterion = t("&#8804; L<sub>WAd</sub> = {ld} dB", language).format(
+                ld=format_number(limit, language, decimals=0)
+            )
         rows.append(
             (
                 t("A-weighted sound power level, {mode}", language).format(
@@ -387,10 +398,8 @@ def _verification_rows(
                 t("L<sub>1</sub> = {l1} dB", language).format(
                     l1=fmt_num(float(mode.verification_level), language)
                 ),
-                t("&#8804; L<sub>WAd</sub> = {ld} dB", language).format(
-                    ld=format_number(ld, language, decimals=0)
-                ),
-                status,
+                criterion,
+                "pass" if verdict else "fail",
             )
         )
     return rows

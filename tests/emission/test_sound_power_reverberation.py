@@ -206,6 +206,97 @@ def test_background_correction_reduces_level_and_warns_below_criterion() -> None
     assert res.background_correction[0] > 0.0
 
 
+def test_background_correction_is_per_position_eq14_to_16() -> None:
+    """K1i is computed at each microphone position (Eq. 14), the position
+    levels are corrected first (Eq. 15) and only then energy-averaged
+    (Eq. 16) -- ISO 3741:2010, 9.1.2/9.1.3.
+
+    Hand oracle at 1 kHz (lower criterion 10 dB): source positions
+    70/68/66/72/71/69 dB over backgrounds 58/60/59/60/62/58 dB give margins
+    12/8/7/12/9/11 dB, so three positions sit below the criterion and clamp
+    to K1i = 0,4576 dB while the others follow Eq. (14). The corrected mean
+    is 69,38872 dB (effective K1 = 0,36347 dB). A single K1 from the
+    position-averaged spectra (margin 10,02 dB -> K1 = 0,45536 dB) would
+    land 0,09 dB low at 69,29683 dB.
+    """
+    freqs = np.array([1000.0])
+    t60 = np.array([1.5])
+    levels = np.array([[70.0], [68.0], [66.0], [72.0], [71.0], [69.0]])
+    background = np.array([[58.0], [60.0], [59.0], [60.0], [62.0], [58.0]])
+    with pytest.warns(SoundPowerWarning, match="9.1.2"):
+        res = sound_power_reverberation(
+            levels, t60, 200.0, 210.0, freqs, background_levels=background,
+        )
+    assert res.mean_pressure_level[0] == pytest.approx(69.3887156232, abs=1e-9)
+    assert res.background_correction[0] == pytest.approx(0.3634659689, abs=1e-9)
+    # Regression: the position-averaged shortcut (K1 = 0,45536 dB) is not used.
+    assert res.mean_pressure_level[0] != pytest.approx(69.2968263631, abs=1e-3)
+
+
+def test_background_single_spectrum_broadcasts_to_positions() -> None:
+    """A 1D background spectrum applies at every position (Eq. 14 per i)."""
+    freqs = np.array([1000.0])
+    t60 = np.array([1.5])
+    levels = np.array([[70.0], [68.0], [66.0], [72.0], [71.0], [69.0]])
+    with pytest.warns(SoundPowerWarning):
+        res_1d = sound_power_reverberation(
+            levels, t60, 200.0, 210.0, freqs,
+            background_levels=np.array([60.0]),
+        )
+    with pytest.warns(SoundPowerWarning):
+        res_2d = sound_power_reverberation(
+            levels, t60, 200.0, 210.0, freqs,
+            background_levels=np.full((6, 1), 60.0),
+        )
+    assert res_1d.mean_pressure_level[0] == pytest.approx(
+        res_2d.mean_pressure_level[0], abs=1e-12
+    )
+
+
+def test_background_shape_mismatch_raises() -> None:
+    """A 2D background that does not match the per-position levels raises."""
+    freqs = np.array([1000.0])
+    t60 = np.array([1.5])
+    levels = np.full((6, 1), 80.0)
+    with pytest.raises(ValueError, match="background_levels"):
+        sound_power_reverberation(
+            levels, t60, 200.0, 210.0, freqs,
+            background_levels=np.full((3, 1), 60.0),
+        )
+
+
+def test_preaveraged_1d_levels_keep_single_k1_path() -> None:
+    """1D pre-averaged spectra carry no per-position data: a single K1 from
+    the averaged spectra applies (documented approximation of 9.1.2)."""
+    freqs = np.array([1000.0])
+    t60 = np.array([1.5])
+    res = sound_power_reverberation(
+        np.array([80.0]), t60, 200.0, 210.0, freqs,
+        background_levels=np.array([70.0]),  # margin 10 dB, no clamp
+    )
+    k1 = -10.0 * np.log10(1.0 - 10.0 ** (-0.1 * 10.0))
+    assert res.background_correction[0] == pytest.approx(k1, abs=1e-9)
+    assert res.mean_pressure_level[0] == pytest.approx(80.0 - k1, abs=1e-9)
+
+
+def test_comparison_method_corrects_test_source_per_position() -> None:
+    """The comparison method applies the same per-position Eq. 14/15/16 chain
+    to the source under test before Eq. (21)."""
+    freqs = np.array([1000.0])
+    levels = np.array([[70.0], [68.0], [66.0], [72.0], [71.0], [69.0]])
+    background = np.array([[58.0], [60.0], [59.0], [60.0], [62.0], [58.0]])
+    lp_rss = np.array([70.0])
+    lw_ref = np.array([90.0])
+    with pytest.warns(SoundPowerWarning):
+        res = sound_power_comparison(
+            levels, lp_rss, lw_ref, frequencies=freqs,
+            background_levels=background,
+        )
+    assert res.mean_pressure_level[0] == pytest.approx(69.3887156232, abs=1e-9)
+    expected_lw = 90.0 + (69.3887156232 - 70.0 + res.c2)
+    assert res.sound_power_level[0] == pytest.approx(expected_lw, abs=1e-9)
+
+
 def test_a_weighted_total_from_bands() -> None:
     """LWA combines bands with Annex F A-weighting (Eq. F.2)."""
     freqs = np.array([500.0, 1000.0, 2000.0])
