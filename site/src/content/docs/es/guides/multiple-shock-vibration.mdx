@@ -142,6 +142,8 @@ result = vibration.multiple_shock_assessment(
 print(round(result.acceleration_dose, 2))  # 20.94  m/s2
 print(round(result.risk, 2))               # 0.46
 print(round(result.probability, 2))        # 0.03
+
+result.plot()   # la curva de probabilidad de lesión con la R de esta evaluación marcada (requiere matplotlib)
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/multiple_shock_es.svg" alt="Izquierda: la transmisibilidad asiento-columna sube hasta cerca de 1,6 en una resonancia de 5 Hz y luego cae casi a cero en 80 Hz. Derecha: la probabilidad de lesión lumbar de Weibull frente a la variable de tensión R para hombre y mujer, con los niveles de riesgo del 10, 50 y 90 por ciento y el ejemplo masculino del Anexo C en R = 1,22, en torno al 37 por ciento" width="96%" />

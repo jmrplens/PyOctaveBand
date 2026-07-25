@@ -115,6 +115,8 @@ from phonometry import vibration
 resp = vibration.frequency_weighting("Wk", [1.0, 6.3096, 20.0])
 print(resp.magnitude.round(3))      # [0.482 1.054 0.636]  (factores)
 print(resp.magnitude_db.round(2))   # [-6.33  0.46 -3.93]  (dB)
+
+resp.plot()   # la respuesta de la ponderación en dB, como en la figura de abajo (requiere matplotlib)
 ```
 
 Los factores reproducen las tablas de objetivo de diseño del Anexo B de
@@ -211,6 +213,8 @@ accel = np.array([0.20, 0.45, 0.42, 0.25, 0.12, 0.05, 0.02])
 result = vibration.weighted_acceleration(accel, freqs, "Wk")
 print(round(result.overall, 3))          # 0.555  m/s^2 (a_w)
 print(result.weighted.round(3))          # W_i * a_i por banda
+
+result.plot()   # bandas sin ponderar frente a ponderadas, como en la figura de abajo (requiere matplotlib)
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighted_acceleration_es.svg" alt="Un espectro de aceleración de asiento de vehículo medido (gris) y su contribución ponderada por Wk (azul) sobre los tercios de octava de 1 a 80 Hz: la ponderación atenúa las bandas bajas y altas pero deja el rango de 4 a 8 Hz casi inalterado, dando un valor eficaz ponderado a_w de aproximadamente 1,03 m/s^2" width="90%" />
@@ -349,6 +353,8 @@ result = vibration.daily_vibration_exposure(
 print(result.partials.round(2))            # [2.3  2.12 1.8 ]  A_i(8)
 print(round(result.a8, 2))                 # 3.61  m/s^2
 print(result.assessment.zone)             # 'action'  (2.5 <= A(8) < 5.0)
+
+result.plot()   # exposiciones parciales y A(8) frente a los valores EAV/ELV, como en la figura de abajo (requiere matplotlib)
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/daily_vibration_exposure_es.svg" alt="Un diagrama de barras de las tres exposiciones parciales de mano-brazo (cerca de 2,3, 2,1 y 1,8 m/s^2) y la A(8) combinada de 3,61 m/s^2, con el valor de acción de exposición de la Directiva 2002/44/CE en 2,5 y el valor límite de exposición en 5,0 m/s^2 marcados como líneas horizontales; la exposición diaria se sitúa en la zona de acción entre ambos" width="82%" />

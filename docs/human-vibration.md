@@ -43,6 +43,8 @@ from phonometry import vibration
 resp = vibration.frequency_weighting("Wk", [1.0, 6.3096, 20.0])
 print(resp.magnitude.round(3))      # [0.482 1.054 0.636]  (factors)
 print(resp.magnitude_db.round(2))   # [-6.33  0.46 -3.93]  (dB)
+
+resp.plot()   # the weighting response in dB, as in the figure below (needs matplotlib)
 ```
 
 The factors reproduce the ISO 8041-1 Annex B design-goal tables to their four
@@ -138,6 +140,8 @@ accel = np.array([0.20, 0.45, 0.42, 0.25, 0.12, 0.05, 0.02])
 result = vibration.weighted_acceleration(accel, freqs, "Wk")
 print(round(result.overall, 3))          # 0.555  m/s^2 (a_w)
 print(result.weighted.round(3))          # W_i * a_i per band
+
+result.plot()   # unweighted vs weighted bands, as in the figure below (needs matplotlib)
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighted_acceleration_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighted_acceleration.svg" alt="A measured vehicle-seat acceleration spectrum (grey) and its Wk-weighted contribution (blue) over the one-third octaves from 1 to 80 Hz: the weighting attenuates the low and high bands but leaves the 4 to 8 Hz range nearly unchanged, giving a weighted r.m.s. a_w of about 1.03 m/s^2" width="90%"></picture>
@@ -272,6 +276,8 @@ result = vibration.daily_vibration_exposure(
 print(result.partials.round(2))            # [2.3  2.12 1.8 ]  A_i(8)
 print(round(result.a8, 2))                 # 3.61  m/s^2
 print(result.assessment.zone)             # 'action'  (2.5 <= A(8) < 5.0)
+
+result.plot()   # partial exposures and A(8) against the EAV/ELV, as in the figure below (needs matplotlib)
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/daily_vibration_exposure_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/daily_vibration_exposure.svg" alt="A bar chart of the three partial hand-arm exposures (about 2.3, 2.1 and 1.8 m/s^2) and the combined A(8) of 3.61 m/s^2, with the Directive 2002/44/EC exposure action value at 2.5 and exposure limit value at 5.0 m/s^2 marked as horizontal lines; the daily exposure sits in the action zone between them" width="82%"></picture>
