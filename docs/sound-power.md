@@ -440,7 +440,7 @@ result still returns.
 | `volume` | float | m³ | > 0 | Room volume `V` |
 | `surface_area` | float | m² | > 0 | Total room surface `S` (Waterhouse, `A/S`) |
 | `frequencies` | 1D array | Hz | one per band | Required (Waterhouse needs `f`); enables `LWA` |
-| `background_levels` | 1D or 2D array | dB | matches `levels` | Per-band `K1` (frequency-dependent criterion) |
+| `background_levels` | 1D or 2D array | dB | matches `levels` | `K1i` per microphone position (Eq. 14/15, before the Eq. 16 average; frequency-dependent criterion) |
 | `temperature` | float | °C | default `23.0` | Sets `c`, `C1`, `C2` |
 | `static_pressure` | float | kPa | default `101.325` | Sets `C1`, `C2` |
 
@@ -505,6 +505,8 @@ grade 3) must exceed `FpI` (criterion 1); `F+/- ≤ 3 dB` is criterion 2
 (mandatory for grade 2); and the two repeated sweeps must agree within the
 Table 2 limit `s` per segment (criterion 3). A band is **engineering** grade
 when criteria 1, 2 and 3 hold, **survey** when 1 and 3 hold, else `none`.
+An A-weighted total additionally omits the bands failing criteria 1 and/or 2
+(clause 10.6 b); the result flags them in `a_weighting_omitted_bands`.
 
 ```python
 import numpy as np
@@ -525,7 +527,7 @@ res = emission.sound_power_intensity(
     band_type="octave", grade="engineering",
 )
 print(np.round(res.sound_power_level, 1))               # per-band LW
-print(round(res.sound_power_level_a, 1))                # LWA over determinable bands
+print(round(res.sound_power_level_a, 1))                # LWA, determinable + qualified bands
 print(round(float(res.dynamic_capability_index[0]), 1)) # Ld = 12 - 10 = 2.0 dB
 print(round(float(res.surface_pressure_intensity_index[0]), 2))   # FpI
 print(list(res.achieved_grade))                         # per-band grade

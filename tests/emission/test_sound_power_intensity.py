@@ -366,6 +366,98 @@ def test_single_band_a_weighted_equals_lw() -> None:
 
 
 # --------------------------------------------------------------------------
+# A-weighted total omits bands failing criteria 1 and/or 2 (clause 10.6 b)
+# --------------------------------------------------------------------------
+def test_a_weighted_total_omits_band_failing_criterion_1() -> None:
+    """Clause 10.6 b: a band with Ld <= FpI (criterion 1 fails) is omitted
+    from the A-weighted determination.
+
+    Hand oracle: four 1 m^2 segments (S = 4 m^2), uniform In = 1e-3 W/m^2 at
+    500 Hz (P = 4e-3 W, LW = 96,0206 dB) and 5e-4 W/m^2 at 1 kHz
+    (LW = 93,0103 dB). With dpI0 = 16 dB (Ld = 6 dB) and surface SPLs of
+    92 dB / 95 dB, FpI = 2,00 dB at 500 Hz (passes) and 8,01 dB at 1 kHz
+    (fails). LWA keeps only 500 Hz: 96,0206 - 3,2 = 92,8206 dB, not the
+    two-band 95,9268 dB.
+    """
+    areas = np.ones(4)
+    intensity = np.column_stack([np.full(4, 1.0e-3), np.full(4, 5.0e-4)])
+    res = sound_power_intensity(
+        intensity,
+        areas,
+        pressure_levels=np.column_stack([np.full(4, 92.0), np.full(4, 95.0)]),
+        pressure_residual_index=16.0,
+        frequencies=np.array([500.0, 1000.0]),
+    )
+    assert res.a_weighting_omitted_bands is not None
+    assert res.a_weighting_omitted_bands.tolist() == [False, True]
+    assert res.sound_power_level_a == pytest.approx(92.8206, abs=1e-4)
+    # The per-band levels themselves stay reported (only LWA omits the band).
+    assert res.sound_power_level[1] == pytest.approx(93.0103, abs=1e-4)
+
+
+def test_a_weighted_total_omits_band_failing_criterion_2_engineering() -> None:
+    """Clause 10.6 b: for an engineering determination a band with
+    F+/- > 3 dB (criterion 2 fails) is omitted from LWA.
+
+    Hand oracle: band 2 partial powers 5/-1/1/-1 mW give P = 4 mW
+    (LW = 96,0206 dB) with F+/- = 10*lg(8/4) = 3,0103 dB > 3 dB; band 1 is
+    uniform 1 mW per segment (same LW, F+/- = 0). LWA keeps only band 1:
+    96,0206 - 3,2 = 92,8206 dB.
+    """
+    areas = np.ones(4)
+    intensity = np.column_stack(
+        [np.full(4, 1.0e-3), np.array([5.0e-3, -1.0e-3, 1.0e-3, -1.0e-3])]
+    )
+    lp = np.full((4, 2), 92.0)  # FpI ~ 2 dB in both bands: criterion 1 passes
+    with pytest.warns(SoundPowerWarning, match="criterion 2"):
+        res = sound_power_intensity(
+            intensity,
+            areas,
+            pressure_levels=lp,
+            pressure_residual_index=16.0,
+            frequencies=np.array([500.0, 1000.0]),
+        )
+    assert res.a_weighting_omitted_bands is not None
+    assert res.a_weighting_omitted_bands.tolist() == [False, True]
+    assert res.sound_power_level_a == pytest.approx(92.8206, abs=1e-4)
+
+
+def test_survey_grade_does_not_omit_on_criterion_2() -> None:
+    """Criterion 2 is optional for grade 3 (Note 16), so a survey
+    determination keeps a band with F+/- > 3 dB in LWA:
+    10*lg(10^9,28206 + 10^9,60206) = 97,7192 dB."""
+    areas = np.ones(4)
+    intensity = np.column_stack(
+        [np.full(4, 1.0e-3), np.array([5.0e-3, -1.0e-3, 1.0e-3, -1.0e-3])]
+    )
+    lp = np.full((4, 2), 92.0)
+    res = sound_power_intensity(
+        intensity,
+        areas,
+        pressure_levels=lp,
+        pressure_residual_index=16.0,
+        frequencies=np.array([500.0, 1000.0]),
+        grade="survey",
+    )
+    assert res.a_weighting_omitted_bands is not None
+    assert res.a_weighting_omitted_bands.tolist() == [False, False]
+    assert res.sound_power_level_a == pytest.approx(97.719195, abs=1e-4)
+
+
+def test_a_weighting_screening_unavailable_warns_and_sums_all() -> None:
+    """Without FpI/Ld the clause 10.6 b screening cannot run: every
+    determinable band is summed and a warning notes the missing screening."""
+    areas = np.ones(4)
+    intensity = np.column_stack([np.full(4, 1.0e-3), np.full(4, 5.0e-4)])
+    with pytest.warns(SoundPowerWarning, match="10.6 b"):
+        res = sound_power_intensity(
+            intensity, areas, frequencies=np.array([500.0, 1000.0])
+        )
+    assert res.a_weighting_omitted_bands is None
+    assert res.sound_power_level_a == pytest.approx(95.9268, abs=1e-4)
+
+
+# --------------------------------------------------------------------------
 # Input validation
 # --------------------------------------------------------------------------
 def test_area_length_mismatch_raises() -> None:

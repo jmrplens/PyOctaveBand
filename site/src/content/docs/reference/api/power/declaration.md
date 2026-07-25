@@ -31,8 +31,10 @@ of two forms selected by the relevant noise test code (clause 4):
 `K` combines the measurement uncertainty (reproducibility) and, for a batch,
 the production spread (clauses 3.20 to 3.24; `K = 1,645 sigma_R` for a single
 machine, Annex A.2.2). Verification (clause 6) compares a verification
-measurement `L_1` against the declared value: for a single machine it is
-verified when `L_1 <= L_d` (clause 6.2).
+measurement `L_1` against the declared form: for a single machine the
+combined form is verified when `L_1 <= L_d` and the dual-number form when
+`L_1 <= (L + K)`, the sum of the separately rounded declared values
+(clause 6.2).
 
 This module models a declaration as [`NoiseEmissionDeclaration`](/phonometry/reference/api/power/declaration/#noiseemissiondeclaration), a set of
 [`OperatingModeDeclaration`](/phonometry/reference/api/power/declaration/#operatingmodedeclaration) values (one per operating mode, clause 4), and
@@ -97,11 +99,15 @@ Render an ISO 4871 noise-emission declaration fiche to a PDF.
 Writes a one-page declaration data sheet: the standard-basis line
 (ISO 4871:1996 and the cited basic emission standard), the machine
 identification and operating conditions, the declared dual- or
-single-number table across the operating-mode columns (`L_WA`,
-`K_WA` and the derived `L_WAd = L_WA + K_WA`, and the emission sound
-pressure level when declared), the noise-test-code and basic-standards
-footnote, a verification verdict table when a verification measurement
-is supplied (clause 6.2), and the footer identity/disclaimer block.
+single-number table across the operating-mode columns following the
+ISO 4871 Annex B layouts (`L_WA` and `K_WA` for the dual-number
+form, the derived `L_WAd = L_WA + K_WA` for the single-number form,
+plus the emission sound pressure level when declared), the
+noise-test-code and basic-standards footnote, a verification verdict
+table when a verification measurement is supplied (clause 6.2, against
+`L_WAd` for the single-number form or the separately rounded
+`L_WA + K_WA` for the dual-number form), and the footer
+identity/disclaimer block.
 
 **Parameters**
 
@@ -144,7 +150,9 @@ pressure level `L_pA` at a work station with its uncertainty `K_pA`
 `L_d = L + K` (clause 3.15), the sum rounded to the nearest decibel. When a
 verification measurement `L_1` (an A-weighted sound power level determined
 for verification, clause 6) is supplied, `verified` applies the
-single-machine criterion of clause 6.2 (verified when `L_1 <= L_WAd`).
+single-machine criterion of clause 6.2 for the combined form (verified when
+`L_1 <= L_WAd`) and `verified_dual` the dual-number one (verified
+when `L_1 <= round(L_WA) + round(K_WA)`).
 
 **Attributes**
 
@@ -184,12 +192,38 @@ value and its uncertainty, rounded to the nearest decibel: the sum is
 formed from the unrounded quantities (clause 3.12) and rounded once,
 not assembled from the separately rounded dual-number values (3.16).
 
+### OperatingModeDeclaration.dual_number_verification_limit
+
+*property*
+
+Dual-number verification reference `(L + K)` (clauses 3.16, 6.2).
+
+The dual-number form declares `L` and `K` each rounded to the
+nearest decibel (clause 3.16), and clause 6.2 verifies that form
+against their sum `(L + K)`; the limit is therefore
+`round(L_WA) + round(K_WA)` -- not the single-number `L_WAd`
+(the unrounded sum rounded once), which can differ by one decibel.
+
 ### OperatingModeDeclaration.verified
 
 *property*
 
-Single-machine verification verdict (ISO 4871 clause 6.2).
+Single-machine verification verdict, combined form (clause 6.2).
 
 `True` when the verification measurement `L_1` does not exceed the
-declared value `L_WAd` (`L_1 <= L_WAd`), `False` otherwise, and
-`None` when no verification measurement is supplied.
+combined (single-number) declared value `L_WAd` (`L_1 <= L_WAd`),
+`False` otherwise, and `None` when no verification measurement is
+supplied. For a dual-number declaration use `verified_dual`,
+which compares against the separately rounded `L + K`.
+
+### OperatingModeDeclaration.verified_dual
+
+*property*
+
+Single-machine verification verdict, dual-number form (clause 6.2).
+
+`True` when the verification measurement `L_1` does not exceed the
+sum of the separately rounded declared values
+(`L_1 <= round(L_WA) + round(K_WA)`, clauses 3.16 and 6.2),
+`False` otherwise, and `None` when no verification measurement is
+supplied.

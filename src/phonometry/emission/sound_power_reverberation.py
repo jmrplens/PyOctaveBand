@@ -71,7 +71,10 @@ class ReverberationSoundPowerResult:
     equivalent absorption area ``A`` per band and ``waterhouse_correction`` the
     boundary term ``10*lg(1 + S*c/(8*V*f))``; both are ``NaN`` for the
     comparison method. ``background_correction`` is the effective per-band
-    background correction ``K1`` (Eq. 14; zero when no background is supplied).
+    background correction ``K1``: with per-position input each position is
+    corrected by its own ``K1i`` (Eq. 14/15) before the energy average
+    (Eq. 16), and the reported value is the resulting per-band shift of the
+    mean level (zero when no background is supplied).
     ``c1`` and ``c2`` are the reference-quantity and radiation-impedance
     corrections (``c1`` is ``NaN`` for the comparison method, which uses only
     ``c2``). ``speed_of_sound`` is ``c`` at the test temperature.
@@ -210,27 +213,60 @@ def _mean_level(levels: np.ndarray) -> np.ndarray:
     raise ValueError("'levels' must be a 1D spectrum or a 2D (positions, bands) array.")
 
 
-def _background_correction(
-    levels: np.ndarray,
-    background_levels: np.ndarray,
-    frequencies: np.ndarray,
-) -> np.ndarray:
-    """Per-band background-noise correction ``K1`` (ISO 3741:2010 Eq. 14).
+def _k1_eq14(delta: np.ndarray, frequencies: np.ndarray) -> tuple[np.ndarray, bool]:
+    """Background-noise correction ``K1`` from ``dLp`` (ISO 3741:2010 Eq. 14).
 
-    ``K1 = -10*lg(1 - 10^(-0,1*dLp))`` with ``dLp = Lp(ST) - Lp(B)`` (identical
-    formula to ISO 3744 Eq. 16). The precision-grade qualification is frequency
-    dependent (clause 9.1.2): ``dLp >= 15 dB`` -> ``K1 = 0``; below the lower
-    criterion (6 dB for bands <= 200 Hz and >= 6 300 Hz, 10 dB for 250 Hz to
-    5 000 Hz) ``K1`` is clamped to the criterion value (1,26 dB / 0,46 dB) and
-    the levels become upper bounds."""
-    src = _mean_level(levels)
-    bg = _mean_level(background_levels)
-    delta = src - bg
+    ``K1 = -10*lg(1 - 10^(-0,1*dLp))``. The precision-grade qualification is
+    frequency dependent (clause 9.1.2): ``dLp >= 15 dB`` -> ``K1 = 0``; below
+    the lower criterion (6 dB for bands <= 200 Hz and >= 6 300 Hz, 10 dB for
+    250 Hz to 5 000 Hz) ``K1`` is clamped to the criterion value (1,26 dB /
+    0,46 dB) and the levels become upper bounds. ``delta`` may be per band
+    ``(NB,)`` or per position and band ``(NM, NB)``; the second returned value
+    flags whether any element fell below the lower criterion."""
     low = np.where((frequencies <= 200.0) | (frequencies >= 6300.0), 6.0, 10.0)
     clamped = np.maximum(delta, low)
     k1 = -10.0 * np.log10(1.0 - 10.0 ** (-0.1 * clamped))
     k1 = np.where(delta >= 15.0, 0.0, k1)
-    if np.any(delta < low):
+    return np.asarray(k1, dtype=np.float64), bool(np.any(delta < low))
+
+
+def _background_corrected_mean(
+    levels: np.ndarray,
+    background_levels: np.ndarray,
+    frequencies: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Background-corrected mean room level and effective per-band ``K1``.
+
+    With per-position 2D ``levels`` the correction follows ISO 3741:2010
+    clauses 9.1.2/9.1.3 exactly: the correction ``K1i`` is computed at each
+    microphone position (Eq. 14), each position level is corrected first
+    (``Lpi(ST) = L'pi(ST) - K1i``, Eq. 15) and the corrected levels are then
+    energy-averaged (Eq. 16). ``background_levels`` may be per position
+    (matching shape) or a single ``(NB,)`` spectrum used at every position.
+    The returned per-band ``K1`` is the effective correction (uncorrected mean
+    minus corrected mean).
+
+    With 1D pre-averaged ``levels`` the per-position information is gone, so a
+    single ``K1`` is computed from the averaged spectra -- an approximation of
+    the per-position procedure that is exact only when every position has the
+    same source-to-background margin. Prefer per-position input."""
+    arr = np.asarray(levels, dtype=np.float64)
+    raw_mean = _mean_level(levels)
+    if arr.ndim == 2:
+        bg = np.asarray(background_levels, dtype=np.float64)
+        if bg.ndim == 1:
+            bg = np.broadcast_to(bg, arr.shape)
+        if bg.shape != arr.shape:
+            raise ValueError(
+                "'background_levels' must match the per-position 'levels' "
+                "shape or be a single (bands,) spectrum."
+            )
+        k1i, clamped = _k1_eq14(arr - bg, frequencies)
+        corrected = energy_mean(arr - k1i, axis=0)
+    else:
+        k1, clamped = _k1_eq14(raw_mean - _mean_level(background_levels), frequencies)
+        corrected = raw_mean - k1
+    if clamped:
         warnings.warn(
             "Background margin below the ISO 3741 criterion (6 dB / 10 dB) in "
             "one or more bands; K1 clamped to the criterion value and the "
@@ -238,7 +274,9 @@ def _background_correction(
             SoundPowerWarning,
             stacklevel=3,
         )
-    return np.asarray(k1, dtype=np.float64)
+    return np.asarray(corrected, dtype=np.float64), np.asarray(
+        raw_mean - corrected, dtype=np.float64
+    )
 
 
 #: Minimum room volume vs lowest 1/3-oct band of interest (ISO 3741 Table 1).
@@ -382,7 +420,12 @@ def sound_power_reverberation(
     :param volume: Reverberation-room volume ``V``, in cubic metres.
     :param surface_area: Total room surface area ``S``, in square metres.
     :param frequencies: One-third-octave (or octave) band mid-frequencies, Hz.
-    :param background_levels: Background levels matching ``levels`` for ``K1``.
+    :param background_levels: Background levels for the ``K1`` correction:
+        per-position ``(NM, NB)`` (or a single ``(NB,)`` spectrum used at every
+        position) with per-position ``levels``, applied per position (Eq. 14/15)
+        before the energy average (Eq. 16). With 1D pre-averaged ``levels`` a
+        single ``K1`` from the averaged spectra approximates the per-position
+        procedure of clause 9.1.2.
     :param temperature: Air temperature ``theta`` in the room, in degrees Celsius.
     :param static_pressure: Static pressure ``ps`` in the room, in kilopascals.
     :return: :class:`ReverberationSoundPowerResult`.
@@ -404,8 +447,7 @@ def sound_power_reverberation(
     _room_qualification_warnings(levels, t60_arr, volume, surface_area, freqs)
 
     if background_levels is not None:
-        k1 = _background_correction(levels, background_levels, freqs)
-        mean_level = mean_level - k1
+        mean_level, k1 = _background_corrected_mean(levels, background_levels, freqs)
     else:
         k1 = np.zeros(n_bands, dtype=np.float64)
 
@@ -470,7 +512,9 @@ def sound_power_comparison(
     :param levels_ref: Same, for the reference sound source, in decibels.
     :param lw_ref: Known sound power level ``LW(RSS)`` per band, in decibels.
     :param frequencies: Band mid-frequencies (Hz) for the A-weighted total.
-    :param background_levels: Background levels matching ``levels`` for ``K1``.
+    :param background_levels: Background levels for the ``K1`` correction of
+        ``levels`` (per position, or a single spectrum; applied per position
+        per Eq. 14/15 before the Eq. 16 average when ``levels`` is 2D).
     :param background_levels_ref: Background levels matching ``levels_ref``.
     :param temperature: Air temperature ``theta`` in the room, in degrees Celsius.
     :param static_pressure: Static pressure ``ps`` in the room, in kilopascals.
@@ -500,14 +544,15 @@ def sound_power_comparison(
     if background_levels is not None:
         if freqs is None:
             raise ValueError("'frequencies' are required to apply 'background_levels'.")
-        k1_st = _background_correction(levels, background_levels, freqs)
-        lp_st = lp_st - k1_st
+        lp_st, k1_st = _background_corrected_mean(levels, background_levels, freqs)
     if background_levels_ref is not None:
         if freqs is None:
             raise ValueError(
                 "'frequencies' are required to apply 'background_levels_ref'."
             )
-        lp_rss = lp_rss - _background_correction(levels_ref, background_levels_ref, freqs)
+        lp_rss, _ = _background_corrected_mean(
+            levels_ref, background_levels_ref, freqs
+        )
 
     c2 = _c2_correction(temperature, static_pressure)
     lw = np.asarray(lw_rss + (lp_st - lp_rss + c2), dtype=np.float64)

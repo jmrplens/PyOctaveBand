@@ -167,6 +167,38 @@ def test_verbose_adds_indicator_columns(tmp_path) -> None:
     assert "Grade" in _extract_text(str(out))
 
 
+# --- clause 10.6 b omission surfaced in the basis strip ------------------------
+
+
+def test_omitted_bands_listed_in_basis_strip(tmp_path) -> None:
+    """A band omitted from LWA per clause 10.6 b is named in the basis strip."""
+    pytest.importorskip("reportlab")
+    pytest.importorskip("svglib")
+    pytest.importorskip("matplotlib")
+    scan = np.tile(_INTENSITY, (_N_SEG, 1))
+    # A 125 Hz surface SPL far above the band LW drives FpI past Ld = 5 dB,
+    # failing criterion 1 there; the other bands keep the uniform 80 dB.
+    lp = np.full((_N_SEG, len(_FREQS)), 80.0)
+    lp[:, 0] = 95.0
+    res = sound_power_intensity(
+        scan,
+        np.full(_N_SEG, _SEG_AREA),
+        normal_intensity_2=scan.copy(),
+        pressure_levels=lp,
+        pressure_residual_index=15.0,
+        frequencies=_FREQS,
+        band_type="octave",
+    )
+    assert res.a_weighting_omitted_bands is not None
+    assert res.a_weighting_omitted_bands.tolist() == [True] + [False] * 5
+    out = tmp_path / "omitted.pdf"
+    res.report(str(out))
+    _assert_one_page(str(out))
+    text = _extract_text(str(out))
+    assert "10.6 b" in text
+    assert "125 Hz" in text
+
+
 # --- verdict against a declared limit -----------------------------------------
 
 

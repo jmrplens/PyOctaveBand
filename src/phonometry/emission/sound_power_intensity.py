@@ -40,6 +40,9 @@ Qualification criteria per band (Annex B)::
 
 A band achieves the **engineering** grade when criteria 1, 2 and 3 hold, the
 **survey** grade when criteria 1 and 3 hold (clause 8.4), otherwise none.
+An A-weighted sound power level omits, besides the non-determinable ``P <= 0``
+bands, the bands in which criteria 1 and/or 2 are not satisfied (clause
+10.6 b).
 """
 
 from __future__ import annotations
@@ -124,7 +127,12 @@ class SoundPowerIntensityResult:
     ``'survey'``/``'none'`` (clause 8.4), ``None`` when the qualifying inputs
     (``delta_pI0`` and a second scan) are absent. ``sound_power_level_a`` is the
     A-weighted total over determinable bands (``NaN`` without ``frequencies``
-    and more than one band).
+    and more than one band), which omits the bands failing criteria 1 and/or 2
+    (clause 10.6 b) whenever those criteria are evaluable.
+    ``a_weighting_omitted_bands`` flags the bands so omitted (per band,
+    ``True`` = omitted); it is ``None`` when the criteria inputs
+    (``pressure_levels`` and ``pressure_residual_index``) are absent, in which
+    case every determinable band is summed and a warning is emitted.
     """
 
     frequencies: np.ndarray | None
@@ -140,6 +148,7 @@ class SoundPowerIntensityResult:
     achieved_grade: np.ndarray | None
     surface_area: float
     sound_power_level_a: float
+    a_weighting_omitted_bands: np.ndarray | None
     grade: str
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
@@ -256,7 +265,12 @@ def sound_power_intensity(
     ``pressure_levels`` (``Lpi``) evaluates ``FpI`` (Eq. A.1) and, with
     ``pressure_residual_index`` (``delta_pI0``), criterion 1. The per-band
     achieved grade (clause 8.4) is returned when both a second sweep and
-    ``delta_pI0`` are available.
+    ``delta_pI0`` are available. When criteria 1 and 2 are evaluable
+    (``pressure_levels`` and ``pressure_residual_index`` supplied), the bands
+    failing them are omitted from the A-weighted total and flagged in
+    ``a_weighting_omitted_bands`` (clause 10.6 b); otherwise every determinable
+    band is summed and a :class:`SoundPowerWarning` notes the missing
+    screening.
 
     :param normal_intensity: ``(N_seg, N_bands)`` signed normal intensity, W/m^2.
     :param areas: ``(N_seg,)`` segment areas ``Si``, m^2.
@@ -409,8 +423,11 @@ def sound_power_intensity(
             repeatability_limit,
         )
 
-    # --- A-weighted total over determinable bands ----------------------------
-    lwa = _a_weighted_total(sound_power_level, negative_band, frequencies, n_bands)
+    # --- A-weighted total over determinable, qualified bands (10.6 b) --------
+    omitted = _a_weighting_omission(fpi, ld, f_plus_minus, grade, negative_band)
+    lwa = _a_weighted_total(
+        sound_power_level, negative_band, omitted, frequencies, n_bands
+    )
 
     freqs = None if frequencies is None else np.asarray(frequencies, dtype=np.float64)
     return SoundPowerIntensityResult(
@@ -427,6 +444,7 @@ def sound_power_intensity(
         achieved_grade=achieved_grade,
         surface_area=s_total,
         sound_power_level_a=lwa,
+        a_weighting_omitted_bands=omitted,
         grade=grade,
     )
 
@@ -479,18 +497,63 @@ def _classify(
     return result
 
 
+def _a_weighting_omission(
+    fpi: np.ndarray | None,
+    ld: np.ndarray | None,
+    f_plus_minus: np.ndarray,
+    grade: str,
+    negative_band: np.ndarray,
+) -> np.ndarray | None:
+    """Bands to omit from the A-weighted total (ISO 9614-2:1996 clause 10.6 b).
+
+    Clause 10.6 b requires the contribution of the bands in which criteria 1
+    and/or 2 are not satisfied to be omitted from an A-weighted sound power
+    level determination (unless negligible per 4.3), and the omission to be
+    stated. Criterion 1 (``Ld > FpI``, B.1.1) needs the surface
+    pressure-intensity indicator and the dynamic capability index; without them
+    the screening cannot be evaluated and ``None`` is returned. Criterion 2
+    (``F+/- <= 3 dB``, B.1.2) binds engineering-grade determinations only
+    (optional for grade 3, Note 16). Net-negative bands are excluded already
+    as non-determinable (clause 9.2), so they are not flagged here."""
+    if fpi is None or ld is None:
+        return None
+    fails = ~(ld > fpi)
+    if grade == "engineering":
+        fails = fails | (f_plus_minus > _F_PLUS_MINUS_LIMIT)
+    return np.asarray(fails & ~negative_band, dtype=bool)
+
+
 def _a_weighted_total(
     sound_power_level: np.ndarray,
     negative_band: np.ndarray,
+    omitted: np.ndarray | None,
     frequencies: np.ndarray | None,
     n_bands: int,
 ) -> float:
-    """A-weighted band sum over determinable bands (ISO 9614-2 clause 10.6 b)."""
+    """A-weighted band sum over determinable, qualified bands (clause 10.6 b).
+
+    Sums the determinable bands (net power ``P > 0``, clause 9.2) minus the
+    bands omitted per clause 10.6 b (criteria 1 and/or 2 failed). When the
+    screening could not be evaluated (``omitted`` is ``None``) every
+    determinable band is summed and a :class:`SoundPowerWarning` is emitted."""
     determinable = ~negative_band
     if frequencies is not None:
         freqs = np.asarray(frequencies, dtype=np.float64)
         if freqs.shape[0] != n_bands:
             raise ValueError("'frequencies' length must match the number of bands.")
+        if omitted is None:
+            if n_bands > 1:
+                warnings.warn(
+                    "The A-weighted total sums every determinable band without "
+                    "the ISO 9614-2:1996 clause 10.6 b screening (bands failing "
+                    "criteria 1 and/or 2 must be omitted); supply "
+                    "'pressure_levels' and 'pressure_residual_index' to "
+                    "evaluate the criteria.",
+                    SoundPowerWarning,
+                    stacklevel=3,
+                )
+        else:
+            determinable = determinable & ~omitted
         ck = _a_weighting_corrections(freqs)
         contrib = 10.0 ** (0.1 * (sound_power_level + ck))
         total = float(np.sum(contrib[determinable]))

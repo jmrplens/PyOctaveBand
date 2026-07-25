@@ -84,11 +84,25 @@ def test_k1_zero_above_15db() -> None:
     assert k1[0] == 0.0
 
 
-def test_k1_zero_at_exactly_15db() -> None:
-    """dL == 15 dB (upper criterion) -> K1 = 0 (>= knee, matches the ISO 3744
-    'dLp >= 15 -> no correction' clause and the ISO 3741 reverberation form)."""
+def test_k1_applies_equation_16_at_exactly_15db() -> None:
+    """dL == 15 dB stays inside '6 dB <= dLp <= 15 dB' (ISO 3744:2010, 8.2.3),
+    so Eq. (16) applies: K1 = -10*lg(1-10^-1,5) = 0,1395... dB; K1 = 0 only
+    for dLp strictly above 15 dB."""
     k1 = background_noise_correction(np.array([75.0]), np.array([60.0]))
-    assert k1[0] == 0.0
+    assert k1[0] == pytest.approx(-10.0 * np.log10(1.0 - 10.0**-1.5), abs=1e-9)
+    assert k1[0] == pytest.approx(0.13955, abs=1e-4)
+
+
+def test_k1_survey_applies_equation_at_exactly_10db() -> None:
+    """Survey: dL == 10 dB stays inside '3 dB <= dLp <= 10 dB' (ISO 3746:2010,
+    8.3.3), so the correction applies: K1 = -10*lg(1-10^-1) = 0,4576 dB."""
+    k1 = background_noise_correction(
+        np.array([70.0]), np.array([60.0]), grade="survey"
+    )
+    assert k1[0] == pytest.approx(0.45757, abs=1e-4)
+    assert background_noise_correction(
+        np.array([70.1]), np.array([60.0]), grade="survey"
+    )[0] == 0.0
 
 
 def test_k1_below_criterion_clamps_and_warns() -> None:

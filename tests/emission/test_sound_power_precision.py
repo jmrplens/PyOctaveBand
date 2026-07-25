@@ -336,6 +336,20 @@ def test_anechoic_full_chain_with_k1() -> None:
     assert np.allclose(res.background_correction, k1)
 
 
+def test_anechoic_bands_above_10khz_survive_without_lwa() -> None:
+    """ISO 3745 covers one-third octaves up to 20 kHz (sigma_R0 Tables 2/3),
+    but the ISO 3744 Annex E A-weighting table stops at 10 kHz: a 12,5 kHz
+    band must not abort the determination -- the per-band LW and uncertainty
+    stay defined and only the A-weighted total is NaN."""
+    freqs = np.array([10000.0, 12500.0])
+    res = sound_power_anechoic(
+        np.full((40, freqs.size), 70.0), "sphere", radius=1.0, frequencies=freqs
+    )
+    assert np.all(np.isfinite(res.sound_power_level))
+    assert np.all(np.isfinite(res.uncertainty_bands))
+    assert np.isnan(res.sound_power_level_a)
+
+
 def test_anechoic_invalid_surface_raises() -> None:
     with pytest.raises(
         ValueError, match="'surface' must be 'sphere' or 'hemisphere'"
@@ -584,6 +598,47 @@ def test_qualified_combines_criteria_1_to_4() -> None:
     )
     assert crit.qualified is not None
     assert bool(crit.qualified[0]) is True
+
+
+def test_criterion_5_qualifies_band_despite_failed_criterion_4() -> None:
+    """C.1.6.2: if criterion 5 holds, the band is qualified as a final result
+    even if FS(2) >= 2 (criterion 4 fails)."""
+    # A strongly non-uniform positive field: FS > 2 (criterion 4 fails).
+    i_n = np.array([[1.0e-8], [1.0e-8], [1.0e-8], [1.0e-8], [1.0e-8], [1.0e-4]])
+    li = 10.0 * np.log10(np.mean(i_n) / _P0)
+    lp = np.full((6, 1), li + 1.0)  # small F_pIn(signed): criteria 2/3 pass
+    ind = precision_field_indicators(i_n, lp)
+    common: dict = {
+        "scan_intensity_level_1": np.array([70.0]),
+        "scan_intensity_level_2": np.array([70.2]),
+        "pressure_residual_index": 14.0,
+        "frequencies": np.array([1000.0]),
+    }
+    # Doubled scan density converges (ratio 1,0): criterion 5 rescues the band.
+    crit = precision_qualification(
+        ind,
+        field_nonuniformity_1=ind.fs.copy(),
+        field_nonuniformity_2=ind.fs.copy(),
+        **common,
+    )
+    assert bool(crit.criterion_4[0]) is False
+    assert crit.criterion_5 is not None
+    assert bool(crit.criterion_5[0]) is True
+    assert crit.qualified is not None
+    assert bool(crit.qualified[0]) is True
+    # Without criterion 5 the failed criterion 4 still disqualifies the band.
+    crit_no5 = precision_qualification(ind, **common)
+    assert crit_no5.qualified is not None
+    assert bool(crit_no5.qualified[0]) is False
+    # A non-converged density (ratio 0,5) does not rescue it either.
+    crit_bad5 = precision_qualification(
+        ind,
+        field_nonuniformity_1=ind.fs.copy(),
+        field_nonuniformity_2=2.0 * ind.fs,
+        **common,
+    )
+    assert crit_bad5.qualified is not None
+    assert bool(crit_bad5.qualified[0]) is False
 
 
 def test_criterion_1_without_limit_raises() -> None:

@@ -74,7 +74,10 @@ comparison method). `mean_pressure_level` is the mean corrected room level
 equivalent absorption area `A` per band and `waterhouse_correction` the
 boundary term `10*lg(1 + S*c/(8*V*f))`; both are `NaN` for the
 comparison method. `background_correction` is the effective per-band
-background correction `K1` (Eq. 14; zero when no background is supplied).
+background correction `K1`: with per-position input each position is
+corrected by its own `K1i` (Eq. 14/15) before the energy average
+(Eq. 16), and the reported value is the resulting per-band shift of the
+mean level (zero when no background is supplied).
 `c1` and `c2` are the reference-quantity and radiation-impedance
 corrections (`c1` is `NaN` for the comparison method, which uses only
 `c2`). `speed_of_sound` is `c` at the test temperature.
@@ -187,7 +190,7 @@ the two sources, so the room absorption need not be known.
 | `levels_ref` | Same, for the reference sound source, in decibels. |
 | `lw_ref` | Known sound power level `LW(RSS)` per band, in decibels. |
 | `frequencies` | Band mid-frequencies (Hz) for the A-weighted total. |
-| `background_levels` | Background levels matching `levels` for `K1`. |
+| `background_levels` | Background levels for the `K1` correction of `levels` (per position, or a single spectrum; applied per position per Eq. 14/15 before the Eq. 16 average when `levels` is 2D). |
 | `background_levels_ref` | Background levels matching `levels_ref`. |
 | `temperature` | Air temperature `theta` in the room, in degrees Celsius. |
 | `static_pressure` | Static pressure `ps` in the room, in kilopascals. |
@@ -237,7 +240,7 @@ meteorological conditions (clause 4).
 | `volume` | Reverberation-room volume `V`, in cubic metres. |
 | `surface_area` | Total room surface area `S`, in square metres. |
 | `frequencies` | One-third-octave (or octave) band mid-frequencies, Hz. |
-| `background_levels` | Background levels matching `levels` for `K1`. |
+| `background_levels` | Background levels for the `K1` correction: per-position `(NM, NB)` (or a single `(NB,)` spectrum used at every position) with per-position `levels`, applied per position (Eq. 14/15) before the energy average (Eq. 16). With 1D pre-averaged `levels` a single `K1` from the averaged spectra approximates the per-position procedure of clause 9.1.2. |
 | `temperature` | Air temperature `theta` in the room, in degrees Celsius. |
 | `static_pressure` | Static pressure `ps` in the room, in kilopascals. |
 

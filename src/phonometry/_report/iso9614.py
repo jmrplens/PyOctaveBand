@@ -183,18 +183,32 @@ def _indicator_strip(result: Any, language: str = "en") -> str:
     )
 
 
-def _criteria_strip(language: str = "en") -> str:
+def _criteria_strip(result: Any, language: str = "en") -> str:
     """The Annex B qualification / A-weighting line for the basis strip."""
-    return t(
+    text = t(
         "A band reaches engineering grade when L<sub>d</sub> &gt; F<sub>pI</sub>"
         ", F<sub>+/&#8722;</sub> &#8804; 3 dB and the two sweeps repeat within "
         "the ISO 9614-2:1996 Table 2 limit s per segment; survey grade drops "
         "the F<sub>+/&#8722;</sub> criterion (Annex B). The A-weighted L"
-        "<sub>WA</sub> sums the determinable bands only; a band with net "
-        "power P &#8804; 0 is not determinable (clause 9.2) and omitted. Levels "
+        "<sub>WA</sub> sums the determinable bands only: a band with net "
+        "power P &#8804; 0 is not determinable (clause 9.2), and a band "
+        "failing criterion 1 and/or 2 is omitted (clause 10.6 b). Levels "
         "are referenced to the reference sound power 1 pW.",
         language,
     )
+    omitted = getattr(result, "a_weighting_omitted_bands", None)
+    if omitted is not None and bool(np.any(omitted)):
+        mask = np.asarray(omitted, dtype=bool)
+        frequencies = getattr(result, "frequencies", None)
+        labels, _fraction = band_labels(frequencies, mask.size)
+        bands = ", ".join(str(labels[i]) for i in range(mask.size) if mask[i])
+        if frequencies is not None:
+            bands += " Hz"
+        text += " " + t(
+            "Bands omitted from L<sub>WA</sub> per clause 10.6 b: {bands}.",
+            language,
+        ).format(bands=bands)
+    return text
 
 
 def _indicator_range(values: np.ndarray | None, language: str = "en") -> str:
@@ -241,7 +255,7 @@ def render_intensity_power_report(
         extended=extended,
         basis_strips=[
             _indicator_strip(result, language),
-            _criteria_strip(language),
+            _criteria_strip(result, language),
         ],
         metadata=metadata,
         language=language,

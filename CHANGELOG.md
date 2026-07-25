@@ -14,6 +14,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   every plot renderer moved to `phonometry._plot` (kept for one deprecation
   cycle, removed in 4.0), now with an explicit `__all__` so the lint fixers
   keep it, and the deprecation test suite asserts the full re-export surface.
+- `sound_power_reverberation` / `sound_power_comparison` (ISO 3741:2010): with
+  per-position levels the background correction is now applied at each
+  microphone position, as clauses 9.1.2/9.1.3 prescribe: `K1i` per position
+  (Eq. 14), position levels corrected first (Eq. 15), then energy-averaged
+  (Eq. 16). The previous single `K1` from the position-averaged spectra could
+  sit up to ~0.2 dB off when positions had spread margins around the 6/10 dB
+  criteria, and missed per-position clamps. Pre-averaged 1D spectra keep the
+  single-`K1` path, now documented as an approximation.
+- `sound_power_intensity` (ISO 9614-2:1996): the A-weighted total now omits
+  the bands in which criteria 1 and/or 2 are not satisfied, as clause 10.6 b
+  requires, whenever the criteria are evaluable (`pressure_levels` and
+  `pressure_residual_index` supplied); the omitted bands are flagged in the
+  new `a_weighting_omitted_bands` result field and named in the `.report()`
+  basis strip (English and Spanish). Without the criteria inputs the previous
+  behavior is kept and a `SoundPowerWarning` notes the missing screening.
+- `precision_qualification` (ISO 9614-3:2002): a band whose doubled-density
+  scan satisfies criterion 5 now qualifies as a final result even where
+  `FS(2) >= 2` fails criterion 4 (C.1.6.2).
+- `sound_power_anechoic` (ISO 3745:2012): one-third-octave bands above 10 kHz
+  (which the sigma_R0 tables cover up to 20 kHz) no longer abort the whole
+  determination because the ISO 3744 Annex E A-weighting table stops at
+  10 kHz; the per-band levels and uncertainties stay defined and only the
+  A-weighted total is `NaN`.
+- `background_noise_correction` (ISO 3744:2010 / ISO 3746:2010): `K1 = 0` only
+  strictly above the upper criterion; at exactly `dLp = 15 dB` (engineering,
+  8.2.3) or `10 dB` (survey, 8.3.3) Equation (16) still applies, restoring the
+  0,14 dB / 0,46 dB correction at the boundary.
+- `OperatingModeDeclaration` (ISO 4871:1996): dual-number verification per
+  clause 6.2 now compares `L_1` against the sum of the separately rounded
+  declared values (`round(L_WA) + round(K_WA)`, clause 3.16) through the new
+  `verified_dual` / `dual_number_verification_limit` members, and the
+  dual-number `.report()` fiche follows the Annex B.2 layout exactly (the
+  derived `L_WAd` row, which mixed the two rounding rules, is dropped and the
+  verification row states the dual-number limit).
 
 ### Fixed
 

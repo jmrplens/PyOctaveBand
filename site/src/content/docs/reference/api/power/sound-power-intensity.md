@@ -53,6 +53,9 @@ criterion 3:  |LWi(1) - LWi(2)| <= s   per segment  (s from Table 2)
 
 A band achieves the **engineering** grade when criteria 1, 2 and 3 hold, the
 **survey** grade when criteria 1 and 3 hold (clause 8.4), otherwise none.
+An A-weighted sound power level omits, besides the non-determinable `P <= 0`
+bands, the bands in which criteria 1 and/or 2 are not satisfied (clause
+10.6 b).
 
 ## sound_power_intensity
 
@@ -87,7 +90,12 @@ Supplying `normal_intensity_2` (the second grade-2 sweep) makes
 `pressure_levels` (`Lpi`) evaluates `FpI` (Eq. A.1) and, with
 `pressure_residual_index` (`delta_pI0`), criterion 1. The per-band
 achieved grade (clause 8.4) is returned when both a second sweep and
-`delta_pI0` are available.
+`delta_pI0` are available. When criteria 1 and 2 are evaluable
+(`pressure_levels` and `pressure_residual_index` supplied), the bands
+failing them are omitted from the A-weighted total and flagged in
+`a_weighting_omitted_bands` (clause 10.6 b); otherwise every determinable
+band is summed and a [`SoundPowerWarning`](/phonometry/reference/api/power/sound-power/#soundpowerwarning) notes the missing
+screening.
 
 **Parameters**
 
@@ -122,6 +130,7 @@ SoundPowerIntensityResult(
     achieved_grade: np.ndarray | None,
     surface_area: float,
     sound_power_level_a: float,
+    a_weighting_omitted_bands: np.ndarray | None,
     grade: str,
 )
 ```
@@ -145,7 +154,12 @@ grade. `achieved_grade` is the per-band class `'engineering'`/
 `'survey'`/`'none'` (clause 8.4), `None` when the qualifying inputs
 (`delta_pI0` and a second scan) are absent. `sound_power_level_a` is the
 A-weighted total over determinable bands (`NaN` without `frequencies`
-and more than one band).
+and more than one band), which omits the bands failing criteria 1 and/or 2
+(clause 10.6 b) whenever those criteria are evaluable.
+`a_weighting_omitted_bands` flags the bands so omitted (per band,
+`True` = omitted); it is `None` when the criteria inputs
+(`pressure_levels` and `pressure_residual_index`) are absent, in which
+case every determinable band is summed and a warning is emitted.
 
 ### SoundPowerIntensityResult.plot()
 

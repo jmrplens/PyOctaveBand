@@ -9211,7 +9211,7 @@ result still returns.
 | `volume` | float | m³ | > 0 | Room volume `V` |
 | `surface_area` | float | m² | > 0 | Total room surface `S` (Waterhouse, `A/S`) |
 | `frequencies` | 1D array | Hz | one per band | Required (Waterhouse needs `f`); enables `LWA` |
-| `background_levels` | 1D or 2D array | dB | matches `levels` | Per-band `K1` (frequency-dependent criterion) |
+| `background_levels` | 1D or 2D array | dB | matches `levels` | `K1i` per microphone position (Eq. 14/15, before the Eq. 16 average; frequency-dependent criterion) |
 | `temperature` | float | °C | default `23.0` | Sets `c`, `C1`, `C2` |
 | `static_pressure` | float | kPa | default `101.325` | Sets `C1`, `C2` |
 
@@ -9276,6 +9276,8 @@ grade 3) must exceed `FpI` (criterion 1); `F+/- ≤ 3 dB` is criterion 2
 (mandatory for grade 2); and the two repeated sweeps must agree within the
 Table 2 limit `s` per segment (criterion 3). A band is **engineering** grade
 when criteria 1, 2 and 3 hold, **survey** when 1 and 3 hold, else `none`.
+An A-weighted total additionally omits the bands failing criteria 1 and/or 2
+(clause 10.6 b); the result flags them in `a_weighting_omitted_bands`.
 
 ```python
 import numpy as np
@@ -9296,7 +9298,7 @@ res = emission.sound_power_intensity(
     band_type="octave", grade="engineering",
 )
 print(np.round(res.sound_power_level, 1))               # per-band LW
-print(round(res.sound_power_level_a, 1))                # LWA over determinable bands
+print(round(res.sound_power_level_a, 1))                # LWA, determinable + qualified bands
 print(round(float(res.dynamic_capability_index[0]), 1)) # Ld = 12 - 10 = 2.0 dB
 print(round(float(res.surface_pressure_intensity_index[0]), 2))   # FpI
 print(list(res.achieved_grade))                         # per-band grade
@@ -12744,7 +12746,7 @@ cycle and warn on use; they are removed in 4.0.
 | `background_noise_correction` | `function` | **Background correction K1 (ISO 3744 Eq. 16).**<br>• `source_levels` [dB]<br>• `background_levels` [dB]<br>• `grade`: 'engineering'/'survey' | `k1 = background_noise_correction(src, bg)`<br><br>• K1 per band [dB] |
 | `environmental_correction` | `function` | **Environmental correction K2 (ISO 3744 Eq. A.2).**<br>• `surface_area` S [m²]<br>• `absorption_area` A, or `reverberation_time`+`volume`, or `mean_absorption_coefficient`+`room_surface` | `k2 = environmental_correction(14.1, reverberation_time=0.6, volume=300)`<br><br>• K2 [dB] |
 | `SoundPowerResult` | `dataclass` | **Surface-pressure sound power.**<br>• `sound_power_level` [dB]<br>• `surface_pressure_level`, `mean_pressure_level` [dB]<br>• `background_correction`, `environmental_correction` [dB]<br>• `directivity_index` [dB] `(NM, NB)`<br>• `surface_area` [m²]<br>• `sound_power_level_a` [dB]<br>• `uncertainty` [dB]<br>• `grade`<br>• `declare(...)` → `NoiseEmissionDeclaration` | `res.sound_power_level, res.sound_power_level_a` |
-| `OperatingModeDeclaration` | `dataclass` | **ISO 4871 dual-number values for one operating mode.**<br>• `mode`: column label<br>• `sound_power_level` L_WA [dB re 1 pW]<br>• `sound_power_uncertainty` K_WA [dB]<br>• `emission_pressure_level` L_pA, `emission_pressure_uncertainty` K_pA [dB] (optional)<br>• `verification_level` L_1 [dB] (optional)<br>• `declared_sound_power_level`: L_WAd = L_WA + K_WA (3.15)<br>• `verified`: L_1 ≤ L_WAd (6.2) | `OperatingModeDeclaration('Mode 1', 88.0, 2.0)` |
+| `OperatingModeDeclaration` | `dataclass` | **ISO 4871 dual-number values for one operating mode.**<br>• `mode`: column label<br>• `sound_power_level` L_WA [dB re 1 pW]<br>• `sound_power_uncertainty` K_WA [dB]<br>• `emission_pressure_level` L_pA, `emission_pressure_uncertainty` K_pA [dB] (optional)<br>• `verification_level` L_1 [dB] (optional)<br>• `declared_sound_power_level`: L_WAd = L_WA + K_WA (3.15)<br>• `verified`: L_1 ≤ L_WAd (6.2, combined form)<br>• `verified_dual`: L_1 ≤ round(L_WA) + round(K_WA) (6.2, dual-number form) | `OperatingModeDeclaration('Mode 1', 88.0, 2.0)` |
 | `NoiseEmissionDeclaration` | `dataclass` | **ISO 4871:1996 noise emission declaration (machinery).**<br>• `modes`: `OperatingModeDeclaration` per mode<br>• `machine`, `operating_conditions` (clause 5)<br>• `noise_test_code`, `basic_standards` (clause 5 b)<br>• `form`: 'dual-number' (Default) / 'single-number'<br>• `.report(path, ...)`: ISO 4871 fiche → PDF | `NoiseEmissionDeclaration((m1, m2), machine='...').report('iso4871.pdf')` |
 | `sound_power_reverberation` | `function` | **Reverberation-room LW, direct (ISO 3741).**<br>• `levels`: mean room SPL [dB] (1D or (NM, NB))<br>• `t60` [s]<br>• `volume` V [m³]<br>• `surface_area` S [m²]<br>• `frequencies` [Hz] (required)<br>• `background_levels`: for K1<br>• `temperature` [°C] (Default: 23)<br>• `static_pressure` [kPa] (Default: 101.325) | `rev = sound_power_reverberation(lp, t60, 200, 220, f)`<br><br>• `ReverberationSoundPowerResult` |
 | `sound_power_comparison` | `function` | **Reverberation-room LW, comparison (ISO 3741).**<br>• `levels`, `levels_ref`: room SPL [dB]<br>• `lw_ref`: reference-source LW [dB]<br>• `frequencies` [Hz]<br>• `background_levels`, `background_levels_ref`<br>• `temperature`, `static_pressure` | `cmp = sound_power_comparison(lp, lp_ref, lw_ref)`<br><br>• `ReverberationSoundPowerResult` (method='comparison') |

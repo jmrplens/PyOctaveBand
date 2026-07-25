@@ -1270,10 +1270,11 @@ def _iso4871_declaration_example() -> tuple[object, ReportMetadata, str]:
 
     Reproduces the ISO 4871:1996 Annex B.2 example (Type 990, Model 11-TC): two
     operating modes with a measured A-weighted sound power level and an
-    uncertainty of 2 dB, giving declared values L_WAd = 90 and 97 dB (Annex B.1),
-    plus emission sound pressure levels at the work station. A verification
-    measurement is added per mode: mode 1 passes (89 <= 90) and mode 2 fails
-    (98 > 97), exercising the clause 6.2 verdict both ways.
+    uncertainty of 2 dB, stated separately per the dual-number layout, plus
+    emission sound pressure levels at the work station. A verification
+    measurement is added per mode against the dual-number limit L_WA + K_WA
+    (clause 6.2): mode 1 passes (89 <= 90) and mode 2 fails (98 > 97),
+    exercising the verdict both ways.
     """
     mode1 = ph.OperatingModeDeclaration(
         mode="Operating mode 1",
