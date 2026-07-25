@@ -267,6 +267,22 @@ _FACADE_SPECS: dict[str, dict[str, str]] = {
         "ylabel": "$R'_{45}$ [dB]",
         "statement": _FIELD_STATEMENT,
     },
+    # The apparent index of the road-traffic method (ISO 16283-3:2016 Clause
+    # 3.13) is a different quantity, R'tr,s, with its own -3 dB all-angle
+    # correction; the fiche labels it by the result's ``method`` so a
+    # road-traffic measurement is never mislabelled R'45.
+    "r_prime_tr": {
+        "title": _FACADE_TITLE,
+        "basis": (
+            "Apparent sound reduction index R&#8242;<sub>tr,s</sub> measured "
+            "in accordance with ISO 16283-3:2016 (field measurement, road "
+            "traffic method). Rating per ISO 717-1:2020."
+        ),
+        "symbol": "R&#8242;<sub>tr,s</sub>",
+        "rating_symbol": "R&#8242;<sub>tr,s,w</sub>",
+        "ylabel": "$R'_{\\mathrm{tr,s}}$ [dB]",
+        "statement": _FIELD_STATEMENT,
+    },
 }
 
 
@@ -290,7 +306,8 @@ def render_iso16283_facade_report(
     :param path: Destination path of the PDF file.
     :param quantity: ``"d_2m_nt"`` (the standardized facade level difference),
         ``"d_2m_n"`` (the normalized facade level difference) or ``"r_prime"``
-        (the apparent sound reduction index ``R'45``); validated by the caller.
+        (the apparent sound reduction index, labelled ``R'45`` or ``R'tr,s``
+        following the result's ``method``); validated by the caller.
     :param metadata: Optional :class:`ReportMetadata`; ``None`` produces a
         lightweight fiche (body, rating, statement and disclaimer).
     :param verbose: When ``True``, the left table shows the ISO 717 evaluation
@@ -300,7 +317,12 @@ def render_iso16283_facade_report(
     :raises ImportError: If reportlab (or, for the figure, matplotlib) is not
         installed.
     """
-    spec = _FACADE_SPECS[quantity]
+    spec_key = quantity
+    if quantity == "r_prime" and getattr(result, "method", "loudspeaker") == (
+        "road_traffic"
+    ):
+        spec_key = "r_prime_tr"
+    spec = _FACADE_SPECS[spec_key]
     return render_insulation_fiche(
         result, rating, path,
         spec=spec,

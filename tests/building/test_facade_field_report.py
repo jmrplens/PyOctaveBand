@@ -100,12 +100,35 @@ def test_r_prime_fiche(tmp_path) -> None:
     """``quantity='r_prime'`` reports the apparent sound reduction index R'45."""
     result = _facade_r_prime()
     assert result.r_prime is not None
+    assert result.method == "loudspeaker"
     np.testing.assert_allclose(result.r_prime, _ANNEX_C_R, atol=1e-9)
     out = tmp_path / "rprime.pdf"
     result.report(str(out), quantity="r_prime")
     _assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Apparent sound reduction index" in text
+    assert "loudspeaker method" in text
+    assert "30 (-2; -3) dB" in text
+
+
+def test_r_prime_road_traffic_fiche_labelled_rtrs(tmp_path) -> None:
+    """A road-traffic result is labelled R'tr,s (Clause 3.13), never R'45."""
+    # A = 0,16 x 62,5 / 1 = 10 = S, so 10 lg(S/A) = 0 and R'tr,s = L1,s - L2 - 3.
+    surf = _ANNEX_C_R + 3.0
+    result = facade_insulation(
+        np.full(16, 50.0), np.full(16, 0.0), np.full(16, 1.0),
+        area=10.0, volume=62.5, surface_level=surf, method="road_traffic",
+    )
+    assert result.method == "road_traffic"
+    assert result.r_prime is not None
+    np.testing.assert_allclose(result.r_prime, _ANNEX_C_R, atol=1e-9)
+    out = tmp_path / "rtrs.pdf"
+    result.report(str(out), quantity="r_prime")
+    _assert_one_page(str(out))
+    text = _extract_text(str(out))
+    assert "road traffic method" in text
+    assert "tr,s" in text
+    assert "loudspeaker" not in text  # the R'45 basis line is absent
     assert "30 (-2; -3) dB" in text
 
 
