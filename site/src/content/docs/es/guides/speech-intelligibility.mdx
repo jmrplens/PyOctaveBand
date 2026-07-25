@@ -66,6 +66,8 @@ from phonometry import hearing
 result = hearing.speech_intelligibility_index("normal")
 print(round(result.sii, 3))          # 0.996  (casi todo audible)
 print(round(hearing.sii.BAND_IMPORTANCE.sum(), 6))   # 1.0
+
+result.plot()   # audibilidad por banda y su contribución ponderada (necesita matplotlib)
 ```
 
 Sin ruido y con un umbral de audición normal, el espectro de habla estándar es casi
@@ -136,6 +138,8 @@ noise = np.array([38.0, 37.0, 36.0, 34.0, 32.0, 30.0, 28.0, 26.0, 24.0,
 result = hearing.speech_intelligibility_index(speech, noise)
 print(round(result.sii, 2))                # 0.46
 print(result.band_audibility.round(2))     # Ai por banda
+
+result.plot()   # la figura de abajo: Ai y la contribución ponderada por banda
 ```
 
 <ThemeImage
@@ -184,6 +188,49 @@ reduce el índice, igual que lo hace añadir ruido de enmascaramiento. El
 `SIIResult` también lleva el enmascaramiento por banda $Z_i$, la perturbación
 $D_i$, la audibilidad $A_i$ y la importancia $I_i$, y su `.plot()` dibuja la
 figura de arriba.
+
+Los mismos habla y ruido escuchados por una persona con pérdida auditiva en
+agudos muestran lo que eso cuesta, banda a banda:
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_hearing_loss_es.svg"
+  alt="Audibilidad de banda del espectro de habla estándar de esfuerzo normal en el mismo ruido de banda ancha, para un oyente con pérdida auditiva descendente en agudos: las bandas hasta 800 Hz conservan buena parte de su audibilidad, las bandas desde 4000 Hz caen a cero y el SII resultante es 0,36 frente al 0,46 de una audición normal"
+  width="90%"
+/>
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import hearing
+
+# Los mismos habla y ruido de oficina de arriba, escuchados a través de una
+# pérdida descendente en agudos (umbrales en las 18 frecuencias centrales).
+speech = hearing.standard_speech_spectrum("normal")
+noise = np.array([38.0, 37.0, 36.0, 34.0, 32.0, 30.0, 28.0, 26.0, 24.0,
+                  22.0, 20.0, 18.0, 16.0, 14.0, 12.0, 10.0, 8.0, 6.0])
+threshold = np.array([5.0, 5.0, 5.0, 5.0, 8.0, 10.0, 12.0, 15.0, 18.0,
+                      22.0, 28.0, 35.0, 42.0, 48.0, 55.0, 60.0, 65.0, 70.0])
+res = hearing.speech_intelligibility_index(speech, noise, threshold=threshold)
+print(round(res.sii, 3))       # 0.358  (0.458 con audición normal)
+
+# En una línea: las mismas barras de audibilidad, ahora limitadas por el umbral.
+res.plot()
+plt.show()
+```
+
+</details>
+
+La pérdida elimina las bandas que llevan las claves consonánticas, y por eso el
+índice baja una quinta parte sin que el *nivel* del habla haya cambiado. Este
+es el uso práctico del SII en audiología y en control de ruido de espacios
+ocupados: un índice objetivo se puede alcanzar bajando el ruido o devolviendo
+audibilidad (amplificando), y el perfil por bandas dice en qué bandas hay que
+poner el esfuerzo. Los umbrales por edad de ISO 7029 son una entrada
+poblacional cómoda, véase la
+[guía del umbral de audición](/phonometry/es/guides/hearing-threshold/).
 
 ## 4. Esfuerzo vocal
 

@@ -120,7 +120,46 @@ print(round(res.decisive_audibility, 2), res.decisive_frequency)  # 5.01 137.3
 
 # Mean audibility of the five measured spectra (Table E.3 decisive values):
 print(round(psychoacoustics.mean_audibility([9.18, 6.04, 7.46, 2.67, 7.17]), 2))  # 6.98 dB
+
+res.plot(view="levels")   # tone levels above their critical-band masking noise
 ```
+
+The same assessment reads two ways. The audibility bars at the top of this
+page answer "how far above the masking threshold is each tone"; the levels
+view answers "what did the analyser see", which is the view an assessment
+report has to defend:
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_audibility_levels_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_audibility_levels.svg" alt="Tone levels and critical-band masking noise of the ISO/PAS 20065 Annex E combustion-engine spectrum on a logarithmic frequency axis from about 96 Hz to 1.8 kHz: each tone is a stem from its critical-band masking level up to its tone level, and the decisive 137.3 Hz tone is highlighted with its critical band shaded" width="88%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import psychoacoustics
+
+# The Annex E combustion-engine spectrum of the snippet above.
+fT = [118.4, 137.3, 158.8, 314.9, 433.4, 592.2, 629.8, 643.3, 1582.7]
+LT = [64.56, 67.96, 68.63, 68.50, 73.17, 78.31, 75.00, 79.75, 71.07]
+LS = [48.91, 49.22, 50.50, 52.85, 58.29, 59.53, 59.71, 61.98, 54.16]
+res = psychoacoustics.assess_tones(fT, LT, LS, 2.7)
+
+# One line: the levels view, the same one the .report() fiche embeds.
+res.plot(view="levels")
+plt.show()
+
+# The default view is the per-tone audibility instead:
+res.plot()      # or res.plot(view="audibility")
+plt.show()
+```
+
+</details>
+
+Reading it left to right: each horizontal segment is the critical-band
+masking-noise level `LG` drawn across the band it applies to, each marker is
+the tone level `LT`, and the gap between them, less the masking index, is the
+audibility. A tone whose marker sits *below* its segment is masked, and no
+amount of level justifies a penalty for it.
 
 ### 3.1 Extended uncertainty of the audibility
 
@@ -216,6 +255,8 @@ print(int(res.group_sizes[fg][0]), round(float(res.tone_levels[fg][0]), 2))  # 3
 lt_fg = psychoacoustics.combined_tone_level(levels, freqs, [118.4, 137.3, 158.8],
                                [48.91, 49.22, 50.50])
 print(round(lt_fg, 2))                                # 72.15
+
+res.plot()   # the detected entries, FG groups included, as audibility bars
 ```
 
 Reproducing a *decisive* audibility exactly needs the **complete** narrow-band

@@ -269,6 +269,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   prediction report fiche and the Schroeder-diffuser prediction section
   (with its figure) are now documented in `docs/` too, and the image-source
   guide gains the Validation summary in both site languages.
+- `ToneAssessment.plot()` (ECMA-418-1 tone-to-noise and prominence ratios):
+  the assessed tone drawn against the frequency-dependent prominence criterion
+  of its own method over the 89.1 Hz to 11.2 kHz range of interest, with the
+  margin that decides the verdict marked. The criterion family is recovered
+  from `criterion_db`, so the same result object plots correctly whether it
+  came from `tone_to_noise_ratio()` or `prominence_ratio()`.
+- `ToneAudibilityResult.plot(view="levels")` exposes the level-versus-frequency
+  view of an ISO/PAS 20065 assessment (tone levels above their critical-band
+  masking noise) that until now only the `.report()` fiche could draw; the
+  default `view="audibility"` keeps the per-tone bars.
+- Eleven documentation figures for the perception, hearing and speech guides,
+  each a single-concept result drawn by its own `.plot()`: the ECMA-418-1 tone
+  prominence verdict, the ISO/PAS 20065 tone levels, the ISO/PAS 1996-3 onset
+  detection on a level history, the ISO 532-2 specific loudness, the
+  ECMA-418-2 specific tonality, the specific fluctuation strength, the SII
+  band audibility with a hearing loss, the ISO 7029 fractile band, the
+  ISO 1999 NIPTS audiogram, the STOI per-band correlation and the IEC 60268-16
+  per-band MTI.
 - ISO 1999 `combine_age_and_noise()` applies Formula (1)
   (`H' = H + N - H*N/120`) to an age component the caller supplies, which
   clause 6.2 explicitly allows (a database B of the country under
@@ -287,6 +305,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Perception, hearing and speech guides (EN, ES and the `docs/` mirrors): the
+  new result figures are embedded next to the snippets that produce them with
+  the usual dual-snippet block, every plottable snippet on those pages names
+  its `.plot()`, the tone-prominence guide gains a "which tonality metric, and
+  when" comparison of the four tonality assessments the library implements
+  (ECMA-418-1, ISO/PAS 20065 via ISO 1996-2 Annex J, ECMA-418-2 and
+  IEC 61400-11), the hearing-threshold guide explains how the ISO 7029
+  fractiles feed the ISO 1999 age component and gains a See-also section, and
+  the objective-intelligibility guide gains the "which measure, and when"
+  section that until now existed only in the `docs/` mirror, extended with the
+  STOI/ESTOI against STI against SII choice.
+- The STOI band-score plot labels the one-third-octave band centres at
+  whole-hertz resolution (150, 189, 238 Hz) instead of printing the generating
+  floats, and the ISO/PAS 20065 levels plot shades the decisive critical band
+  in a lightness that follows the figure background, so it reads on both the
+  white report page and a dark-theme figure.
 - The machine-enclosure, reactive-silencer and HVAC duct-noise fiches now read
   as the model predictions they are, following the EN/ISO 12354 prediction
   exemplar: a prediction-basis line, a prediction statement naming what the

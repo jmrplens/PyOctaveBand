@@ -129,6 +129,49 @@ print(f"f_ton = {res.tonal_frequencies[peak]:.0f} Hz")     # 999 Hz
 res.plot()   # tonalidad específica media T'(z) + T(l) dependiente del tiempo
 ```
 
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sottek_specific_tonality_es.svg"
+  alt="Tonalidad específica media de ECMA-418-2 sobre las 53 bandas Bark_HMS para un tono de 1 kHz a 40 dB SPL: la tonalidad se concentra en un único pico en la banda crítica del tono, hacia 9 Bark_HMS, y cae casi a cero en el resto, integrando T = 1,00 tu_HMS"
+  width="80%"
+/>
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import psychoacoustics
+
+# El ancla de calibración: un tono de 1 kHz a 40 dB SPL vale cerca de 1 tu_HMS.
+fs = 48000
+t = np.arange(int(1.2 * fs)) / fs
+x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * t)
+res = psychoacoustics.tonality_ecma(x, fs, field="free")
+
+# En una línea: al pasar unos ejes se dibuja solo el panel de tonalidad específica.
+fig, ax = plt.subplots()
+res.plot(ax=ax)
+plt.show()
+
+# O dibuja T'(z) a mano frente a la escala de razón de banda crítica:
+fig, ax = plt.subplots()
+ax.fill_between(res.bark, res.specific_tonality, alpha=0.3, color="#d62728")
+ax.plot(res.bark, res.specific_tonality, color="#d62728")
+ax.set_xlabel("Razón de banda crítica z [Bark_HMS]")
+ax.set_ylabel("Tonalidad específica T' [tu_HMS]")
+plt.show()
+```
+
+</details>
+
+Esa concentración es lo que distingue un sonido tonal de uno de banda ancha
+con la misma sonoridad: la etapa de autocorrelación encuentra una componente
+periódica en una banda y casi nada en las demás. Un ventilador con tono de paso
+de pala y su serie armónica muestra varios picos así; un siseo muestra un
+patrón plano y bajo. Llamar a `.plot()` sin ejes añade el panel de `T(l)`
+dependiente del tiempo, que es donde aparece un tono intermitente.
+
 ### Parámetros de `tonality_ecma()`
 
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |

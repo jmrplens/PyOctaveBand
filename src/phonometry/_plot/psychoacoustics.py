@@ -35,6 +35,7 @@ if TYPE_CHECKING:
     from ..psychoacoustics.loudness_zwicker import ZwickerLoudness
     from ..psychoacoustics.psychoacoustic_annoyance import PsychoacousticAnnoyanceResult
     from ..psychoacoustics.roughness_ecma import EcmaRoughness
+    from ..psychoacoustics.tonality import ToneAssessment
     from ..psychoacoustics.tonality_ecma import EcmaTonality
     from ..psychoacoustics.tone_audibility import ToneAudibilityResult
 
@@ -81,6 +82,15 @@ _STRINGS: dict[str, str] = {
     r"decisive $\Delta L_{{\mathrm{{ta}}}}$ = {da} dB @ {df} Hz": r"decisiva $\Delta L_{{\mathrm{{ta}}}}$ = {da} dB @ {df} Hz",
     "Sound pressure level [dB]": "Nivel de presión sonora [dB]",
     "ISO 1996-2 tone-audibility analysis": "Análisis de audibilidad tonal ISO 1996-2",
+    "Tone-to-noise ratio TNR [dB]": "Relación tono/ruido TNR [dB]",
+    "Prominence ratio PR [dB]": "Relación de prominencia PR [dB]",
+    "prominence criterion": "criterio de prominencia",
+    "assessed tone": "tono evaluado",
+    "prominent": "prominente",
+    "not prominent": "no prominente",
+    "margin {m} dB": "margen {m} dB",
+    "ECMA-418-1 {name} = {v} dB at {f} Hz: {verdict}":
+        "ECMA-418-1 {name} = {v} dB a {f} Hz: {verdict}",
     "Frequency [Hz]": "Frecuencia [Hz]",
     "Sound pressure level [dB re 20 µPa]": "Nivel de presión sonora [dB re 20 µPa]",
     r"Hearing threshold $T_f$": r"Umbral de audición $T_f$",
@@ -614,6 +624,88 @@ def plot_psychoacoustic_annoyance(
     return ax
 
 
+#: Range of interest for discrete tones (ECMA-418-1 clauses 11.5 / 12.6).
+_TONE_RANGE_HZ: tuple[float, float] = (89.1, 11200.0)
+
+
+def plot_tone_assessment(
+    result: ToneAssessment, ax: Axes | None = None, *, language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Assessed tone against the ECMA-418-1 prominence criterion.
+
+    Draws the frequency-dependent prominence criterion over the 89.1 Hz -
+    11.2 kHz range of interest with the assessed tone plotted at its own
+    frequency, and the margin between the measured ratio and the criterion
+    marked; a tone on or above the curve is prominent.
+
+    The producing method (tone-to-noise ratio, clause 11, or prominence
+    ratio, clause 12) is recovered from ``criterion_db``: the two criteria
+    differ everywhere in the range of interest (8 dB against 9 dB from 1 kHz
+    up, and different low-frequency slopes below), so the closer of the two
+    identifies the curve to draw and the quantity to label.
+
+    :param result: A :class:`~phonometry.psychoacoustics.tonality.ToneAssessment`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the assessed-tone marker ``plot`` call.
+    :return: The axes.
+    """
+    from .._i18n import decimal_comma, format_number, localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    ft = float(result.frequency)
+    ratio = float(result.ratio_db)
+    criterion = float(result.criterion_db)
+
+    def _tnr(f: np.ndarray) -> np.ndarray:
+        return np.where(f < 1000.0, 8.0 + 8.33 * np.log10(1000.0 / f), 8.0)
+
+    def _pr(f: np.ndarray) -> np.ndarray:
+        return np.where(f < 1000.0, 9.0 + 10.0 * np.log10(1000.0 / f), 9.0)
+
+    ft_arr = np.array([max(ft, _TONE_RANGE_HZ[0])])
+    is_tnr = abs(criterion - float(_tnr(ft_arr)[0])) <= abs(
+        criterion - float(_pr(ft_arr)[0])
+    )
+    name = "TNR" if is_tnr else "PR"
+    ylabel = ("Tone-to-noise ratio TNR [dB]" if is_tnr
+              else "Prominence ratio PR [dB]")
+
+    grid = np.logspace(np.log10(_TONE_RANGE_HZ[0]), np.log10(_TONE_RANGE_HZ[1]), 400)
+    curve = _tnr(grid) if is_tnr else _pr(grid)
+    ax.plot(grid, curve, color=_C_REFERENCE, lw=1.8,
+            label=_t("prominence criterion", language))
+    ax.plot([ft, ft], [criterion, ratio], color=_C_MUTED, ls=":", lw=1.2)
+    kwargs.setdefault("marker", "o")
+    kwargs.setdefault("linestyle", "none")
+    kwargs.setdefault("markersize", 9)
+    kwargs.setdefault("color", _C_PRIMARY)
+    ax.plot([ft], [ratio], markeredgecolor=_C_EDGE, zorder=4,
+            label=_t("assessed tone", language), **kwargs)
+    ax.annotate(
+        _t("margin {m} dB", language).format(
+            m=format_number(ratio - criterion, language, decimals=1),
+        ),
+        xy=(ft, 0.5 * (ratio + criterion)), xytext=(6, 0),
+        textcoords="offset points", va="center", fontsize="small",
+    )
+
+    verdict = _t("prominent" if result.prominent else "not prominent", language)
+    ax.set_title(_t("ECMA-418-1 {name} = {v} dB at {f} Hz: {verdict}", language).format(
+        name=name, v=format_number(ratio, language, decimals=1),
+        f=decimal_comma(f"{ft:g}", language), verdict=verdict,
+    ))
+    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_ylabel(_t(ylabel, language))
+    format_frequency_axis(ax, *_TONE_RANGE_HZ)
+    ax.legend(loc="best", fontsize="small")
+    ax.grid(True, which="major", alpha=0.3)
+    ax.set_axisbelow(True)
+    localize_axes(ax, language)
+    return ax
+
+
 def plot_tone_audibility(
     result: ToneAudibilityResult, ax: Axes | None = None, *, language: str = "en",
     **kwargs: Any,
@@ -694,10 +786,18 @@ def plot_tone_audibility_levels(
     ymin = float(min(lg.min(), lt.min())) - 4.0
     # Shade the decisive tone's critical band below its masking-noise level so
     # the audible gap reads at a glance. svglib drops alpha, so the fill is a
-    # pale *opaque* colour with no edge and a low zorder (below the curves).
+    # pale *opaque* colour with no edge and a low zorder (below the curves);
+    # its lightness follows the figure background, so the same fill reads on
+    # the white report page and on a dark-theme documentation figure.
+    from matplotlib.colors import to_rgb
+
+    figure = ax.get_figure()
+    face = to_rgb(figure.get_facecolor()) if figure is not None else (1.0, 1.0, 1.0)
+    light_background = (0.299 * face[0] + 0.587 * face[1] + 0.114 * face[2]) > 0.5
     ax.fill_between(
         [f1[decisive], f2[decisive]], ymin, lg[decisive],
-        color="#eaf0f8", edgecolor="none", zorder=0,
+        color="#eaf0f8" if light_background else "#22303f",
+        edgecolor="none", zorder=0,
     )
 
     # Critical-band masking-noise level Lpn: one horizontal segment per tone

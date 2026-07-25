@@ -112,6 +112,8 @@ from phonometry import psychoacoustics
 res = psychoacoustics.psychoacoustic_annoyance(30.0, 2.0, 0.5, 0.3)   # N5, S, F, R
 print(round(res.annoyance, 4))   # 37.0478
 print(round(res.w_s, 4), round(res.w_fr, 4))   # 0.1001 0.2125
+
+res.plot()   # PA junto a sus ponderaciones wS y wFR (necesita matplotlib)
 ```
 
 La figura de arriba barre `PA` frente a `N5` para tres perfiles: una base neutra
@@ -132,6 +134,8 @@ from phonometry import psychoacoustics
 
 res = psychoacoustics.psychoacoustic_annoyance_from_signal(x, fs, field="free")
 print(res.annoyance, res.n5, res.sharpness, res.roughness, res.fluctuation_strength)
+
+res.plot()   # la misma vista PA / wS / wFR, ahora con las cuatro sensaciones derivadas
 ```
 
 :::caution
@@ -233,6 +237,50 @@ res = psychoacoustics.fluctuation_strength(x, fs)
 print(res.fluctuation_strength)   # vacil
 res.plot()   # intensidad de fluctuación específica F′(z) sobre el eje de Bark (requiere matplotlib)
 ```
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength_specific_es.svg"
+  alt="Intensidad de fluctuación específica sobre el eje de Bark para un tono de 1 kHz a 70 dB SPL modulado en amplitud al 100 % a 4 Hz: la sensación se concentra en las bandas críticas en torno a la portadora, cerca de 8 Bark, e integra unos 1,1 vacil"
+  width="82%"
+/>
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import psychoacoustics
+
+# El estímulo tipo referencia: un tono de 1 kHz a 70 dB SPL, modulado en
+# amplitud al 100 % a 4 Hz, donde la sensación es máxima.
+fs = 48000
+t = np.arange(int(2.0 * fs)) / fs
+am = (1.0 + np.sin(2 * np.pi * 4.0 * t)) * np.sin(2 * np.pi * 1000 * t)
+am = am / np.sqrt(np.mean(am ** 2)) * 2e-5 * 10 ** (70 / 20)
+res = psychoacoustics.fluctuation_strength(am, float(fs))
+print(round(res.fluctuation_strength, 2))    # 1.09 vacil
+
+# En una línea: la intensidad de fluctuación específica sobre el eje de Bark.
+res.plot()
+plt.show()
+
+# O dibuja f'(z) a mano con los arrays que ya lleva el resultado:
+fig, ax = plt.subplots()
+ax.fill_between(res.bark_axis, res.specific, alpha=0.3)
+ax.plot(res.bark_axis, res.specific)
+ax.set_xlabel("Razón de banda crítica z [Bark]")
+ax.set_ylabel("Intensidad de fluctuación específica [vacil/Bark]")
+plt.show()
+```
+
+</details>
+
+La sensación se queda donde está la energía modulada, en las bandas críticas
+en torno a la portadora, y por eso la forma cerrada de §3.1 y el modelo de
+señal divergen para ruido de **banda ancha** modulado: allí la modulación se
+reparte por todo el eje de Bark y el modelo banda a banda acumula más de la
+que admite la forma cerrada única.
 
 :::note
 **Sin norma numérica.** La intensidad de fluctuación no tiene norma ISO/IEC. Esta

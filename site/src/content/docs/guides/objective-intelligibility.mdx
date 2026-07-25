@@ -112,7 +112,62 @@ for snr_db in (-10, 0, 10, 20):
 
 The `STOIResult` carries the per-band mean correlation (`band_scores`) and the
 per-segment scores (`segment_scores`) that average to `value`, and its
-`.plot()` draws the per-band intermediate correlation.
+`.plot()` draws the per-band intermediate correlation. That per-band view is
+worth looking at before quoting the index: it shows *where* the degradation
+bites, which the single number cannot.
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/stoi_band_scores.svg"
+  alt="Mean intermediate correlation per one-third-octave band from 150 Hz to 3810 Hz for speech-like material in a flat masker at 0 dB signal-to-noise ratio: the lowest band keeps only about 0.27 of the envelope correlation and the value climbs steadily to about 0.9 in the consonant bands above 1.9 kHz, averaging to a STOI of 0.727"
+  width="88%"
+/>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.signal import butter, lfilter
+from phonometry import stoi
+
+# Speech-like material: band-limited noise with a 3.5 Hz syllabic envelope,
+# in a flat masker at 0 dB SNR.
+fs = 10000
+rng = np.random.default_rng(11)
+t = np.arange(4 * fs) / fs
+b, a = butter(2, [200 / (fs / 2), 4000 / (fs / 2)], btype="band")
+carrier = lfilter(b, a, rng.standard_normal(t.size))
+clean = carrier * (0.15 + 0.85 * np.abs(np.sin(2 * np.pi * 3.5 * t)) ** 2)
+masker = rng.standard_normal(clean.size)
+gain = np.sqrt(np.mean(clean ** 2)) / np.sqrt(np.mean(masker ** 2))
+res = stoi(clean, clean + gain * masker, fs)
+print(round(res.value, 3))    # 0.727
+
+# One line: the per-band intermediate correlation behind the index.
+res.plot()
+plt.show()
+
+# By hand, mirroring what STOIResult.plot() draws:
+pos = np.arange(res.band_scores.size)
+fig, ax = plt.subplots()
+ax.bar(pos, res.band_scores)
+ax.set_xticks(pos)
+ax.set_xticklabels([f"{f:.0f}" for f in res.band_frequencies], rotation=45, ha="right")
+ax.set_xlabel("One-third-octave band [Hz]")
+ax.set_ylabel("Mean intermediate correlation")
+ax.set_title(f"STOI = {res.value:.3f}")
+plt.show()
+```
+
+</details>
+
+The flat masker costs the low bands most, because the speech spectrum falls
+there while the masker does not, and the correlation recovers in the
+consonant-bearing bands above 1 kHz. A band profile that is flat, or that
+collapses only in one band, points at something other than broadband noise:
+a notch filter, a resonance, or a processing artefact of the enhancement
+under test.
 
 ## 3. ESTOI: spectral correlation for modulated maskers
 
@@ -170,10 +225,33 @@ plt.show()
 
 </details>
 
+## 4. Which measure, and when
+
+| | STOI | ESTOI |
+| :--- | :--- | :--- |
+| Intermediate quantity | Per-band envelope correlation, clipped | Row- and column-normalised spectral correlation |
+| Level invariance | Yes (per-segment normalisation) | Yes (per-row and per-column normalisation) |
+| Stationary maskers | Well validated | Well validated |
+| Modulated maskers, competing talkers | Underrates the glimpsing benefit | Tracks it |
+| Cost | Lower | A little higher |
+
 For additive stationary noise the two measures are interchangeable and STOI is
 the lighter default; when the interference fluctuates in time, or when
 comparing processors that reshape the speech in time and frequency, prefer
 ESTOI.
+
+Both answer a narrower question than the two standardised speech metrics of
+the library, and the choice between the three families is really a choice of
+what you can measure. STOI and ESTOI need a *clean reference* and the
+degraded signal, so they belong to processing work: noise reduction, source
+separation, codecs, hearing-aid algorithms. The
+[STI](/phonometry/guides/speech-transmission/) (IEC 60268-16) needs no clean
+reference, only the channel, so it is what rates a room or a public-address
+system. The [SII](/phonometry/guides/speech-intelligibility/)
+(ANSI S3.5-1997) needs neither signal, only spectra, so it is what predicts
+audibility for a listener with a given hearing threshold. When more than one
+is available, they answer different questions rather than confirming each
+other: a processor can raise STOI while the room keeps the STI poor.
 
 ## See also
 

@@ -42,6 +42,8 @@ x = np.sin(2 * np.pi * 1000 * t) + 0.05 * rng.standard_normal(fs)  # tono de 1 k
 tnr = psychoacoustics.tone_to_noise_ratio(x, fs)            # pico más alto, o tone_freq=...
 pr = psychoacoustics.prominence_ratio(x, fs, tone_freq=1000.0)
 print(tnr.ratio_db, tnr.criterion_db, tnr.prominent)
+
+tnr.plot()   # el tono frente a su criterio de prominencia (necesita matplotlib)
 ```
 
 Los métodos se apoyan en la **banda crítica**, el ancho de banda de análisis
@@ -111,6 +113,54 @@ de 1 kHz y 9 dB a partir de ahí, aplicado igualmente con $\ge$. Las
 frecuencias bajas reciben umbrales más altos porque unas bandas relativamente
 más anchas enmascaran más.
 
+`ToneAssessment.plot()` sitúa el veredicto en su contexto: dibuja el criterio
+del método que lo ha producido en todo el rango de interés de 89,1 Hz a
+11,2 kHz y marca el tono evaluado en su propia frecuencia, de modo que el
+margen que decide el veredicto se ve en lugar de deducirse.
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_prominence_assessment_es.svg"
+  alt="Relación tono-ruido de un tono de ventilador de 250 Hz frente al criterio de prominencia de ECMA-418-1: el criterio baja desde unos 17 dB a 89 Hz hasta 8 dB constantes por encima de 1 kHz, y el tono evaluado se sitúa en 15,1 dB, 2,1 dB por encima del criterio de 13,0 dB a 250 Hz, luego es prominente"
+  width="88%"
+/>
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import psychoacoustics
+
+# Un tono de ventilador de 250 Hz en ruido de maquinaria, 10 s a 48 kHz.
+fs = 48000
+rng = np.random.default_rng(4)
+t = np.arange(10 * fs) / fs
+x = (np.sqrt(2) * 0.011 * np.sin(2 * np.pi * 250.0 * t)
+     + 0.03 * rng.standard_normal(t.size))
+res = psychoacoustics.tone_to_noise_ratio(x, fs)
+print(round(res.ratio_db, 1), round(res.criterion_db, 1), res.prominent)
+# 15.1 13.0 True
+
+# En una línea: el tono frente a la curva de criterio de su propio método.
+res.plot()
+plt.show()
+
+# A mano, reproduciendo lo que dibuja ToneAssessment.plot():
+f = np.logspace(np.log10(89.1), np.log10(11200.0), 400)
+criterio = np.where(f < 1000.0, 8.0 + 8.33 * np.log10(1000.0 / f), 8.0)
+fig, ax = plt.subplots()
+ax.semilogx(f, criterio, color="#d62728", label="criterio de prominencia")
+ax.plot([res.frequency], [res.ratio_db], "o", label="tono evaluado")
+ax.plot([res.frequency] * 2, [res.criterion_db, res.ratio_db], ":", color="0.6")
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("Relación tono-ruido TNR [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
 **Cuando los dos ratios discrepan.** Cerca de los criterios los veredictos
 pueden diferir, porque cada ratio es frágil en una situación distinta. El TNR
 tiene que *separar* primero las líneas de la banda crítica en tonales y de
@@ -151,6 +201,43 @@ necesitan calibración absoluta (los ratios son diferencias de nivel).
 
 Ambos devuelven un `ToneAssessment(frequency, ratio_db, criterion_db, prominent)`.
 
+## 3. Qué métrica de tonalidad usar y cuándo
+
+La biblioteca implementa cuatro evaluaciones de tonalidad, y no son
+intercambiables: cada una pertenece a una norma distinta, con su propio
+objetivo, su entrada y su salida.
+
+| | TNR / PR | Audibilidad tonal `ΔL` | Tonalidad psicoacústica `T` | Audibilidad tonal de aerogeneradores |
+| :--- | :--- | :--- | :--- | :--- |
+| Norma | ECMA-418-1:2024, apartados 11 y 12 | ISO/PAS 20065:2016, adoptada por el Anexo J de ISO 1996-2:2017 | ECMA-418-2:2025, apartado 6 | IEC 61400-11:2012, apartado 9.5 |
+| Pregunta que responde | ¿Es prominente este tono discreto en la emisión de un equipo? | ¿Es audible el tono por encima del ruido que lo enmascara, y en cuánto? | ¿Cuán tonal se percibe el sonido? | ¿Es audible el tono del aerogenerador en la posición de referencia, bin de viento a bin de viento? |
+| Entrada | Un espectro FFT, sin necesidad de calibración | Espectros de banda estrecha con la separación entre líneas declarada | La señal de presión calibrada, a través del modelo auditivo de Sottek | Espectros de banda estrecha por bin de velocidad de viento, con la distancia de referencia |
+| Salida | Un ratio en dB frente a un criterio dependiente de la frecuencia, más un veredicto prominente / no prominente | Una audibilidad en dB, cuyos valores decisivo y medio alimentan el ajuste tonal `Kt` | Una tonalidad en `tu_HMS`, una magnitud perceptiva sin criterio asociado | Una audibilidad en dB por bin, informada junto a la potencia sonora del aerogenerador |
+| Se usa para | Declarar la emisión de equipos TIC (Anexo D de ECMA-74) | Evaluación de ruido ambiental: justificar, o descartar, una penalización tonal | Calidad sonora: comparar diseños, no superar un límite | Ensayos de tipo y aceptación de aerogeneradores |
+
+La tabla se lee como una decisión: la métrica la elige el *objetivo del
+informe*, no la comodidad de la entrada. La declaración de emisión de un
+equipo es un veredicto de prominencia de ECMA-418-1; una queja por un tono de
+una instalación es una evaluación según ISO 1996-2, así que necesita la
+audibilidad `ΔL` que se traduce en `Kt`
+(la [guía de audibilidad tonal](/phonometry/es/guides/tone-audibility/)); una
+comparación de productos en la que nadie va a ser sancionado es donde la
+tonalidad de ECMA-418-2 se gana su sitio, porque es una magnitud y no un
+ensayo de umbral (la [guía de calidad sonora](/phonometry/es/guides/sound-quality/));
+y un aerogenerador es un régimen propio, con un procedimiento de medida en
+IEC 61400-11 que fija la geometría y los bins de viento (la
+[guía de aerogeneradores](/phonometry/es/guides/wind-turbine-noise/)).
+
+Dos consecuencias que conviene tener presentes. Primera, los números no se
+convierten: un TNR de 12 dB no es una audibilidad de 12 dB, porque el modelo
+de enmascaramiento, la definición de banda y la referencia son distintos.
+Segunda, las métricas pueden discrepar sobre el mismo sonido, y con razón. Un
+tono puede ser prominente según ECMA-418-1 en el campo próximo de la máquina y
+resultar inaudible en la vivienda donde se hace la evaluación de ISO 1996-2,
+mientras la tonalidad del modelo auditivo se mantiene moderada en ambos casos
+porque valora el sonido completo y no una línea espectral. Informa la métrica
+que exija la evaluación y cita cualquier otra solo como evidencia de apoyo.
+
 ## Véase también
 
 - [Niveles](/phonometry/es/guides/levels/): los niveles de evaluación de
@@ -159,6 +246,10 @@ Ambos devuelven un `ToneAssessment(frequency, ratio_db, criterion_db, prominent)
 - [Métricas de calidad sonora](/phonometry/es/guides/sound-quality/): la tonalidad
   psicoacústica T en tu_HMS de ECMA-418-2, la contraparte de modelo auditivo de
   estos ratios FFT.
+- [Audibilidad objetiva de tonos en ruido](/phonometry/es/guides/tone-audibility/): la
+  audibilidad ΔL de ISO/PAS 20065 de la que se lee el ajuste tonal Kt de ISO 1996-2.
+- [Ruido de aerogeneradores](/phonometry/es/guides/wind-turbine-noise/): la audibilidad
+  tonal de IEC 61400-11, la misma pregunta planteada por bin de velocidad de viento.
 - [Prominencia de sonidos impulsivos](/phonometry/es/guides/impulse-prominence/):
   la contraparte NT ACOU 112 para el carácter impulsivo (en lugar de tonal).
 - [Teoría](/phonometry/es/reference/theory/perception/): el modelo de banda crítica y la

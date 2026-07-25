@@ -146,7 +146,10 @@ def plot_stoi(
         kwargs.setdefault("color", _C_PRIMARY)
         ax.bar(positions, scores, **kwargs)
         ax.set_xticks(positions)
-        ax.set_xticklabels([decimal_comma(f"{f:g}", language) for f in freqs],
+        # The STOI band centres are exact one-third-octave ratios from 150 Hz
+        # (188.988..., 377.976...), so they are labelled at whole-hertz
+        # resolution: the nominal band, not the generating float.
+        ax.set_xticklabels([decimal_comma(f"{f:.0f}", language) for f in freqs],
                            rotation=45, ha="right")
         ax.set_xlabel(_t("One-third-octave band [Hz]", language))
         ax.set_ylabel(_t("Mean intermediate correlation", language))

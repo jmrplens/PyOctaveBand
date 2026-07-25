@@ -81,6 +81,8 @@ print(r.median.round(1))          # [ 0.   0.1  4.1 10.2 12.9  8.5]
 # The most-susceptible tenth of the population (90th percentile):
 print(hearing.nipts(90.0, 20.0, fractile=0.9).value.round(1))
 # [ 0.   0.1  7.7 16.2 17.8 13.6]
+
+r.plot()   # the NIPTS spectrum with its fractile band (needs matplotlib)
 ```
 
 The shift peaks near 4 kHz and deepens with both level and duration. Below the
@@ -88,6 +90,40 @@ cut-off (here 500 Hz, $L_0 = 93$ dB, and 1000 Hz, $L_0 = 89$ dB, at 90 dB)
 the noise causes no permanent shift. For durations under 10 years the median is
 extrapolated from the 10-year value (Formula 3); a subset of the frequencies
 can be requested with `frequencies=`.
+
+A longer, louder career makes the shape unmistakable:
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/nipts_audiogram.svg"
+  alt="ISO 1999 noise-induced permanent threshold shift after 40 years at an 8 h-normalised 95 dB(A), on an inverted audiogram axis from 500 Hz to 6000 Hz: the median is near zero at 500 Hz and deepens to about 26 dB at 4000 Hz before recovering at 6000 Hz, and the 10 to 90 percent fractile band around it reaches nearly 37 dB for the most susceptible tenth"
+  width="88%"
+/>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import hearing
+
+# 40 years at an 8 h-normalised 95 dB(A), most-susceptible tenth.
+res = hearing.nipts(95.0, 40.0, fractile=0.9)
+print(res.median.round(1))    # the median N50
+print(res.value.round(1))     # the 90 % fractile
+
+# One line: the median, the fractile and the 10-90 % band.
+res.plot()
+plt.show()
+```
+
+</details>
+
+The notch at 3 kHz to 4 kHz, with partial recovery at 6 kHz, is the signature
+of noise damage and the reason audiometric surveillance tests those
+frequencies. It comes out of the model rather than being imposed on it: the
+cut-off level $L_0$ and the coefficients $u$, $v$ of Table 1 are lowest where
+the ear is most vulnerable, so the same $L_{EX,8h}$ buys far more shift at
+4 kHz than at 500 Hz.
 
 ## 2. Age and noise combined: HTLAN (clause 6.1)
 
@@ -110,6 +146,8 @@ h = hearing.htlan(60, "male", 95.0, 30.0, fractile=0.5)
 print(h.htla.round(1))       # [ 6.   7.8 12.5 16.6 20.2 25.9]  age alone
 print(h.nipts.round(1))      # [ 0.5  3.  11.8 21.6 24.8 17.6]  noise alone
 print(h.threshold.round(1))  # [ 6.5 10.7 23.  35.2 40.8 39.8]  age + noise
+
+h.plot()   # the three curves of the figure below: HTLA, NIPTS and HTLAN
 ```
 
 At 4 kHz the age component (20.2 dB) and the noise component (24.8 dB) combine

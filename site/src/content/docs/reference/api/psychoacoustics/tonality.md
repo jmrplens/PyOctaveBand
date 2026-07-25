@@ -108,3 +108,35 @@ prominence limit at `frequency` and `prominent` the verdict.
 audibility requirements (aural examination per clauses 11.8/12.8 and
 the clause 8/9 lower-threshold-of-hearing screen, which needs
 calibrated absolute levels) are the caller's responsibility.
+
+### ToneAssessment.plot()
+
+```python
+ToneAssessment.plot(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Plot the assessed tone against the ECMA-418-1 prominence criterion.
+
+Draws the frequency-dependent criterion curve over the 89.1 Hz -
+11.2 kHz range of interest with this tone at its own frequency and
+the margin to the criterion marked; a tone on or above the curve is
+prominent. The criterion family (tone-to-noise ratio, clause 11, or
+prominence ratio, clause 12) is recovered from `criterion_db`.
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `ax` | Existing axes to draw on, or `None` to create a figure. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the assessed-tone marker `plot` call. |
+
+**Returns:** The axes.

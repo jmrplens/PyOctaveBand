@@ -38,6 +38,8 @@ print(result.median[8].round(1))  # 26.2 dB at 4000 Hz
 
 # The worst-hearing decile (90th percentile) at 4000 Hz:
 print(hearing.age_threshold(65, "male", fractile=0.9).threshold[8].round(1))  # 50.3
+
+result.plot()   # the median with the 10-90 % fractile band (needs matplotlib)
 ```
 
 The loss is largest at the high frequencies and grows with age: the classic
@@ -66,6 +68,49 @@ stays bunched near the median, so the far percentiles on the bad side move
 much faster with age than the good side ever improves. An individual
 audiogram can sit anywhere in that fan; the model tells you how *surprising*
 it is, not what it should be.
+
+`AgeThresholdResult.plot()` draws that fan directly: the median, the requested
+fractile and the 10 % to 90 % band between them, on an audiogram axis.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/age_threshold_fractiles_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/age_threshold_fractiles.svg" alt="ISO 7029 hearing-threshold deviation of a 70-year-old man on an inverted audiogram axis from 125 Hz to 8000 Hz: the median deepens from about 10 dB at 125 Hz to 50 dB at 8000 Hz, the requested 90 % fractile from about 22 dB to 74 dB, and the shaded 10 to 90 percent band between them widens steadily toward the high frequencies" width="88%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import hearing
+
+# A 70-year-old man, worst-hearing decile: the median presbycusis slope with
+# the population spread around it.
+res = hearing.age_threshold(70, "male", fractile=0.9)
+print(res.median.round(1))
+print(res.threshold.round(1))     # the 90 % fractile
+
+# One line: the median, the fractile and the 10-90 % band.
+res.plot()
+plt.show()
+```
+
+</details>
+
+The band is the whole point of the model. At 500 Hz the fractiles of a
+70-year-old span a handful of decibels, so an individual audiogram there is
+informative; at 8 kHz they span tens of decibels, so a single measured value
+says little about whether that ear is unusual. Any statement of the form
+"this person has lost more hearing than their age explains" is a statement
+about where they sit in this fan, and it needs the fractile, not the median.
+
+**Where the age component goes next.** ISO 7029 is not only an audiology
+reference: it is the *age* input of the noise-induced-hearing-loss model.
+ISO 1999:2013 calls it database A and its clause 6.1 Formula (1) combines the
+age threshold `H` with the noise-induced shift `N` into the threshold a real
+audiogram would show, `H' = H + N - HN/120`, at the same fractile. In
+practice that means the two guides chain: pick the population and fractile
+here, add the exposure there, and compare the result, never the noise
+component alone, against a measured audiogram.
+[Noise-induced hearing loss](noise-induced-hearing-loss.md) picks the chain up
+at that point.
 
 ## 2. Reference threshold of hearing (ISO 389-7)
 
@@ -121,6 +166,17 @@ The `AgeThresholdResult` carries the `median`, the `spread_upper` and
 threshold shift of ISO 1999, which adds a noise component on top of this age
 component, is the subject of the
 [noise-induced hearing loss](noise-induced-hearing-loss.md) guide.
+
+## See also
+
+- [Noise-induced hearing loss](noise-induced-hearing-loss.md): the ISO 1999 model
+  that adds the noise component on top of this age component.
+- [Speech Intelligibility Index](speech-intelligibility.md): a raised threshold as
+  an input, and what it costs in speech audibility.
+- [Loudness](loudness.md): the ISO 226:2023 threshold of hearing, the free-field
+  pure-tone counterpart of the audiometric zero of section 2.
+- [Occupational noise exposure](occupational-exposure.md): the ISO 9612 daily
+  exposure level that drives the noise component.
 
 ## References
 

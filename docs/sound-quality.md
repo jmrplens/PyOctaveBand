@@ -94,6 +94,45 @@ print(f"f_ton = {res.tonal_frequencies[peak]:.0f} Hz")     # 999 Hz
 res.plot()   # average specific tonality T'(z) + time-dependent T(l)
 ```
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sottek_specific_tonality_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sottek_specific_tonality.svg" alt="ECMA-418-2 average specific tonality over the 53 Bark_HMS bands for a 1 kHz tone at 40 dB SPL: the tonality is concentrated in a single peak at the tone's critical band around 9 Bark_HMS and falls to nearly zero elsewhere, integrating to T = 1.00 tu_HMS" width="80%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import psychoacoustics
+
+# The calibration anchor: a 1 kHz tone at 40 dB SPL is about 1 tu_HMS.
+fs = 48000
+t = np.arange(int(1.2 * fs)) / fs
+x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * t)
+res = psychoacoustics.tonality_ecma(x, fs, field="free")
+
+# One line: passing an axes draws the specific-tonality panel alone.
+fig, ax = plt.subplots()
+res.plot(ax=ax)
+plt.show()
+
+# Or draw T'(z) by hand against the critical-band-rate scale:
+fig, ax = plt.subplots()
+ax.fill_between(res.bark, res.specific_tonality, alpha=0.3, color="#d62728")
+ax.plot(res.bark, res.specific_tonality, color="#d62728")
+ax.set_xlabel("Critical-band rate z [Bark_HMS]")
+ax.set_ylabel("Specific tonality T' [tu_HMS]")
+plt.show()
+```
+
+</details>
+
+The concentration is what distinguishes a tonal sound from a broadband one of
+the same loudness: the autocorrelation stage finds a periodic component in one
+band and almost nothing in the others. A fan with a blade-passing tone and a
+harmonic series shows several such peaks; a hiss shows a flat, low pattern.
+Calling `.plot()` without an axes adds the time-dependent `T(l)` panel, which
+is where an intermittent tone shows up.
+
 ### `tonality_ecma()` parameters
 
 | Parameter | Type | Units | Range / default | Notes |

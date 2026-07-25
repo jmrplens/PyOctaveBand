@@ -132,6 +132,61 @@ res = hearing.stipa(recording, fs)
 res.plot()   # barras del índice de transferencia de modulación (MTI) por banda; STI y valoración en el título
 ```
 
+Venga de donde venga, conviene leer el resultado banda a banda antes de citar
+el número único: el STI es una combinación ponderada de siete índices de
+transferencia de modulación por banda de octava, y una sala suele fallar en una
+parte concreta del espectro, no de forma uniforme.
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_band_mti_es.svg"
+  alt="Índice de transferencia de modulación por banda de octava de 125 Hz a 8 kHz para una sala con tiempo de reverberación de 0,9 s y relación señal-ruido de habla de 15 dB: las siete barras quedan juntas entre 0,54 y 0,60 aproximadamente, con STI = 0,58 y valoración E del Anexo F"
+  width="88%"
+/>
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import hearing
+
+# Una sala reverberante (T60 = 0,9 s) medida con una relación señal-ruido de
+# habla de 15 dB: una caída exponencial sintetizada hace de RI medida.
+fs = 48000
+rng = np.random.default_rng(0)
+n = np.arange(fs)
+ir = rng.standard_normal(fs) * np.exp(-6.9078 * n / fs / 0.9)
+res = hearing.sti_from_impulse_response(ir, fs, snr=15.0)
+print(round(res.sti, 3), res.rating)      # 0.583 E
+
+# En una línea: las barras de MTI por banda con el STI y su valoración.
+res.plot()
+plt.show()
+
+# A mano, reproduciendo lo que dibuja STIResult.plot():
+bandas = [125, 250, 500, 1000, 2000, 4000, 8000]
+fig, ax = plt.subplots()
+ax.bar(np.arange(len(bandas)), res.mti)
+ax.set_xticks(np.arange(len(bandas)))
+ax.set_xticklabels([f"{b}" for b in bandas])
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("Índice de transferencia de modulación MTI")
+ax.set_ylim(0.0, 1.0)
+ax.set_title(f"STI = {res.sti:.2f} (valoración {res.rating})")
+plt.show()
+```
+
+</details>
+
+En esta sala los siete índices quedan dentro de 0,06 entre sí, la firma de una
+caída uniforme en todo el espectro más un suelo de ruido de banda ancha. Un
+perfil que se hunde en 125 Hz y 250 Hz apunta a reverberación en graves
+(poca absorción a baja frecuencia), mientras que uno que cae solo en 4 kHz y
+8 kHz suele significar que el altavoz no cubre con sonido directo la posición
+del oyente, porque el aire y la directividad se llevan primero las bandas
+agudas. Son remedios distintos, y solo la vista por bandas los distingue.
+
 La medición directa envía la señal STIPA por toda la cadena dibujada abajo,
 desde la fuente a través de la sala hasta el micrófono y hasta el análisis de
 modulación por banda que produce el índice.

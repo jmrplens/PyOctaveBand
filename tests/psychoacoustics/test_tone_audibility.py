@@ -495,6 +495,24 @@ def test_plot_smoke() -> None:
     plt.close("all")
 
 
+def test_plot_levels_view_draws_tone_levels_over_frequency() -> None:
+    """view='levels' draws Lpt above the critical-band masking noise Lpn."""
+    import matplotlib.pyplot as plt
+
+    result = _annex_e_result()
+    ax = result.plot(view="levels")
+    assert ax.get_xscale() == "log"          # continuous frequency axis
+    assert "level" in ax.get_ylabel().lower()
+    labels = [t.get_text() for t in ax.get_legend().get_texts()]
+    assert any("L_\\mathrm{pt}" in label for label in labels)
+    plt.close("all")
+
+
+def test_plot_rejects_unknown_view() -> None:
+    with pytest.raises(ValueError, match="Unknown view"):
+        _annex_e_result().plot(view="spectrum")
+
+
 # ---------------------------------------------------------------------------
 # Validation
 # ---------------------------------------------------------------------------

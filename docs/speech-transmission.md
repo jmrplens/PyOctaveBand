@@ -101,6 +101,57 @@ res = hearing.stipa(recording, fs)
 res.plot()   # per-band modulation transfer index (MTI) bars, STI + rating in the title
 ```
 
+Whichever route produced it, the result is worth reading band by band before
+the single number is quoted: the STI is a weighted combination of seven
+octave-band modulation transfer indices, and a room usually fails in a
+particular part of the spectrum rather than uniformly.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_band_mti_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_band_mti.svg" alt="Modulation transfer index per octave band from 125 Hz to 8 kHz for a hall with a 0.9 s reverberation time and a 15 dB speech-to-noise ratio: the seven bars sit close together between about 0.54 and 0.60, giving STI = 0.58 with the Annex F rating E" width="88%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import hearing
+
+# A reverberant hall (T60 = 0.9 s) measured with a 15 dB speech-to-noise
+# ratio: a synthesized exponential decay stands in for the measured IR.
+fs = 48000
+rng = np.random.default_rng(0)
+n = np.arange(fs)
+ir = rng.standard_normal(fs) * np.exp(-6.9078 * n / fs / 0.9)
+res = hearing.sti_from_impulse_response(ir, fs, snr=15.0)
+print(round(res.sti, 3), res.rating)      # 0.583 E
+
+# One line: the per-band MTI bars with the STI and its rating in the title.
+res.plot()
+plt.show()
+
+# By hand, mirroring what STIResult.plot() draws:
+bands = [125, 250, 500, 1000, 2000, 4000, 8000]
+fig, ax = plt.subplots()
+ax.bar(np.arange(len(bands)), res.mti)
+ax.set_xticks(np.arange(len(bands)))
+ax.set_xticklabels([f"{b}" for b in bands])
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Modulation transfer index MTI")
+ax.set_ylim(0.0, 1.0)
+ax.set_title(f"STI = {res.sti:.2f} (rating {res.rating})")
+plt.show()
+```
+
+</details>
+
+In this hall the seven indices sit within 0.06 of each other, the signature of
+a decay that is uniform across the spectrum plus a broadband noise floor. A
+profile that sags at 125 Hz and 250 Hz instead points at low-frequency
+reverberation (too little bass absorption), while one that falls only at
+4 kHz and 8 kHz usually means the loudspeaker is out of the listener's
+direct-sound coverage, since air and directivity strip the top bands first.
+Those are different remedies, and only the per-band view distinguishes them.
+
 The direct measurement sends the STIPA signal along the full chain drawn below,
 from the source through the room to the microphone and into the per-band
 modulation analysis that yields the index.

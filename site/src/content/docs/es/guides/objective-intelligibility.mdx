@@ -114,7 +114,62 @@ for snr_db in (-10, 0, 10, 20):
 
 El `STOIResult` incluye la correlación media por banda (`band_scores`) y las
 puntuaciones por segmento (`segment_scores`) que promedian a `value`, y su
-`.plot()` dibuja la correlación intermedia por banda.
+`.plot()` dibuja la correlación intermedia por banda. Merece la pena mirar esa
+vista por bandas antes de citar el índice: muestra *dónde* muerde la
+degradación, algo que el número único no puede indicar.
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/stoi_band_scores_es.svg"
+  alt="Correlación intermedia media por banda de tercio de octava de 150 Hz a 3810 Hz para material tipo habla en un enmascarador plano con relación señal-ruido de 0 dB: la banda más grave conserva solo unos 0,27 de la correlación de envolvente y el valor sube de forma sostenida hasta unos 0,9 en las bandas consonánticas por encima de 1,9 kHz, promediando un STOI de 0,727"
+  width="88%"
+/>
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.signal import butter, lfilter
+from phonometry import stoi
+
+# Material tipo habla: ruido limitado en banda con envolvente silábica de
+# 3,5 Hz, en un enmascarador plano con SNR de 0 dB.
+fs = 10000
+rng = np.random.default_rng(11)
+t = np.arange(4 * fs) / fs
+b, a = butter(2, [200 / (fs / 2), 4000 / (fs / 2)], btype="band")
+carrier = lfilter(b, a, rng.standard_normal(t.size))
+clean = carrier * (0.15 + 0.85 * np.abs(np.sin(2 * np.pi * 3.5 * t)) ** 2)
+masker = rng.standard_normal(clean.size)
+gain = np.sqrt(np.mean(clean ** 2)) / np.sqrt(np.mean(masker ** 2))
+res = stoi(clean, clean + gain * masker, fs)
+print(round(res.value, 3))    # 0.727
+
+# En una línea: la correlación intermedia por banda que hay tras el índice.
+res.plot()
+plt.show()
+
+# A mano, reproduciendo lo que dibuja STOIResult.plot():
+pos = np.arange(res.band_scores.size)
+fig, ax = plt.subplots()
+ax.bar(pos, res.band_scores)
+ax.set_xticks(pos)
+ax.set_xticklabels([f"{f:.0f}" for f in res.band_frequencies], rotation=45, ha="right")
+ax.set_xlabel("Banda de tercio de octava [Hz]")
+ax.set_ylabel("Correlación intermedia media")
+ax.set_title(f"STOI = {res.value:.3f}")
+plt.show()
+```
+
+</details>
+
+El enmascarador plano castiga sobre todo a las bandas graves, porque ahí el
+espectro del habla cae y el del enmascarador no, y la correlación se recupera
+en las bandas consonánticas por encima de 1 kHz. Un perfil por bandas plano, o
+que se hunde solo en una banda, apunta a algo distinto del ruido de banda
+ancha: un filtro de rechazo, una resonancia o un artefacto de procesado del
+realce que se está evaluando.
 
 ## 3. ESTOI: correlación espectral para enmascaradores modulados
 
@@ -172,10 +227,33 @@ plt.show()
 
 </details>
 
+## 4. Qué medida usar y cuándo
+
+| | STOI | ESTOI |
+| :--- | :--- | :--- |
+| Magnitud intermedia | Correlación de envolventes por banda, con recorte | Correlación espectral normalizada por filas y por columnas |
+| Invariancia al nivel | Sí (normalización por segmento) | Sí (normalización por fila y por columna) |
+| Enmascaradores estacionarios | Bien validada | Bien validada |
+| Enmascaradores modulados, hablantes competidores | Infravalora el beneficio de los vistazos | Lo sigue |
+| Coste | Menor | Algo mayor |
+
 Para ruido aditivo estacionario las dos medidas son intercambiables y STOI es la
 opción ligera por defecto; cuando la interferencia fluctúa en el tiempo, o al
 comparar procesadores que remodelan el habla en tiempo y frecuencia, prefiere
 ESTOI.
+
+Ambas responden a una pregunta más estrecha que las dos métricas normalizadas
+de habla de la biblioteca, y la elección entre las tres familias es en realidad
+una elección de qué se puede medir. STOI y ESTOI necesitan una *referencia
+limpia* y la señal degradada, así que pertenecen al trabajo de procesado:
+reducción de ruido, separación de fuentes, códecs, algoritmos de audífonos. El
+[STI](/phonometry/es/guides/speech-transmission/) (IEC 60268-16) no necesita
+referencia limpia, solo el canal, y es lo que valora una sala o un sistema de
+megafonía. El [SII](/phonometry/es/guides/speech-intelligibility/)
+(ANSI S3.5-1997) no necesita ninguna señal, solo espectros, y es lo que predice
+la audibilidad para un oyente con un umbral de audición dado. Cuando hay más de
+una disponible, responden a preguntas distintas en lugar de confirmarse entre
+sí: un procesador puede subir el STOI mientras la sala mantiene un STI pobre.
 
 ## Véase también
 
