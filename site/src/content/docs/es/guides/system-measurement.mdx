@@ -99,6 +99,55 @@ print(ir.method, ir.size)                   # golay 16384
 ir.plot(language="es")
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/golay_ir_es.svg" alt="La respuesta al impulso de un sistema paso banda recuperada con un par de Golay durante los primeros seis milisegundos, dibujada encima de la respuesta verdadera discontinua sin diferencia visible, y una nota que dice máximo de recuperada menos verdadera igual a 2,1e-14, identidad exacta sin ruido" width="86%" />
+
+*La recuperación de Golay de la respuesta al impulso de un sistema paso
+banda: la suma de las correlaciones complementarias cae sobre la respuesta
+verdadera con precisión de máquina (error máximo 2·10⁻¹⁴ aquí), la
+identidad de forma cerrada que fijan los tests.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal
+from phonometry import golay_impulse_response, golay_pair
+
+fs = 48000
+pair = golay_pair(14)                       # dos códigos de 16384 muestras
+b, a = signal.butter(2, [200.0, 2000.0], btype="bandpass", fs=fs)
+length = pair[0].size
+rec_a = signal.lfilter(b, a, np.tile(pair[0], 3))[2 * length:]
+rec_b = signal.lfilter(b, a, np.tile(pair[1], 3))[2 * length:]
+
+ir = golay_impulse_response(rec_a, rec_b, pair, fs=fs)
+
+# Una línea: la respuesta al impulso recuperada:
+ir.plot(language="es")
+plt.show()
+
+# A mano, contra la respuesta verdadera del sistema:
+impulse = np.zeros(length)
+impulse[0] = 1.0
+true_ir = signal.lfilter(b, a, impulse)
+err = np.max(np.abs(np.asarray(ir) - true_ir))
+
+t_ms = 1e3 * np.arange(length) / fs
+view = t_ms <= 6.0
+fig, ax = plt.subplots()
+ax.plot(t_ms[view], np.asarray(ir)[view], label="RI recuperada")
+ax.plot(t_ms[view], true_ir[view], "r--",
+        label="Respuesta verdadera del sistema")
+ax.set(xlabel="Tiempo [ms]", ylabel="Amplitud",
+       title=f"máx |recuperada - verdadera| = {err:.1e}")
+ax.legend()
+plt.show()
+```
+
+</details>
+
 El resultado es el mismo `ImpulseResponseResult` que devuelven los frontales
 de barrido y MLS, así que todo lo que viene después -
 [parámetros de sala](/phonometry/es/guides/room-acoustics/), curvas de
@@ -331,6 +380,7 @@ recorded = signal.lfilter(b, a, excitation)     # en la práctica: emitir/grabar
 ir = impulse_response(recorded, excitation, fs)  # vale cualquier frontal
 inv = regularized_inverse_filter(ir, f_range=(200.0, 10000.0))
 flat_recording = inv.apply(recorded)             # retardo ya eliminado
+inv.plot(language="es")   # magnitudes medida, inversa y ecualizada (figura de arriba)
 ```
 
 ### Cerrando el círculo: preénfasis desde una respuesta medida
@@ -359,6 +409,7 @@ target_db = 20.0 * np.log10(
 )
 sweep = shaped_sweep_signal(int(fs), 200.0, 4000.0, 3.0,
                             target=(inv.frequencies[1:], target_db))
+sweep.plot(language="es")   # forma de onda y espectro contra el objetivo invertido
 ```
 
 ## Relación con las demás herramientas

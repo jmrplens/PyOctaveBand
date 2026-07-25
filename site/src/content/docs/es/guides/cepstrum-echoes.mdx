@@ -69,6 +69,48 @@ print(res.quefrencies[:3], res.cepstrum.shape)   # eje de quefrencia, en s
 res.plot(language="es")
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cepstrum_variants_es.svg" alt="Los cepstros de potencia, real y complejo de una ondícula con un eco de 8 milisegundos superpuestos frente a la quefrencia hasta 20 milisegundos: los tres llevan un pico positivo nítido en 8 milisegundos y uno negativo pequeño en 16 milisegundos, la ondícula fuente llena la región por debajo de unos 2 milisegundos, y un recuadro ampliado sobre el primer rahmónico muestra los picos de potencia y complejo llegando a 0,5 mientras el cepstro real llega exactamente a la mitad" width="86%" />
+
+*Las tres variantes de un mismo registro con eco (una ondícula de banda
+limitada más una reflexión en 8 ms, a = 0,5). Las tres llevan los
+rahmónicos en 8 y 16 ms con alturas a y −a²/2 (convención con signo de
+Milner); el recuadro muestra el cepstro real exactamente a la mitad del de
+potencia, y la ondícula fuente se concentra por debajo de 2 ms.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal as sp_signal
+from phonometry import cepstrum
+
+fs = 48000.0
+# Una ondícula fuente de banda limitada más una reflexión en 8 ms (a = 0,5)
+b, a = sp_signal.butter(2, 0.3)
+s = np.zeros(4096)
+s[37:37 + 256] = sp_signal.lfilter(b, a, np.r_[1.0, np.zeros(255)])
+x = s + 0.5 * np.roll(s, 384)
+
+# Una línea por variante: cada CepstrumResult se dibuja solo:
+cepstrum(x, fs, kind="power").plot(language="es")
+plt.show()
+
+# Las tres variantes superpuestas a mano en un mismo eje de quefrencia:
+fig, ax = plt.subplots()
+for kind, style in (("power", "-"), ("real", "--"), ("complex", ":")):
+    res = cepstrum(x, fs, kind=kind)
+    q_ms = 1e3 * res.quefrencies
+    mask = (q_ms > 0.5) & (q_ms <= 20.0)
+    ax.plot(q_ms[mask], res.cepstrum[mask], style, label=f"cepstro {kind}")
+ax.set(xlabel="Quefrencia [ms]", ylabel="Cepstro")
+ax.legend()
+plt.show()
+```
+
+</details>
+
 El resultado lleva el eje de quefrencia periódico completo
 (`0 .. (nfft-1)/fs`); las quefrencias por encima de `nfft/(2·fs)` son las
 quefrencias negativas especulares, donde los cepstros de potencia y real (que
@@ -193,6 +235,57 @@ print(np.allclose(low.liftered_db + high.liftered_db, low.spectrum_db))
 low.plot(language="es")
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lifter_split_es.svg" alt="Dos paneles entre 500 y 2000 hercios para una ondícula que lleva un eco puro de 8 milisegundos: el espectro logarítmico oscila con un rizado de 125 hercios alrededor de la envolvente plana del lifter paso bajo, y debajo el rizado aislado por el lifter paso alto oscila exactamente entre las cotas discontinuas de forma cerrada en más 3,5 y menos 6 decibelios" width="86%" />
+
+*El reparto del lifter de 4 ms sobre un registro de eco puro: el lado paso
+bajo devuelve la envolvente espectral suave, el lado paso alto aísla el
+rizado de 125 Hz del eco, oscilando exactamente entre las formas cerradas
+20·lg(1±a) = +3,5 y −6,0 dB.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal as sp_signal
+from phonometry import lifter
+
+fs = 48000.0
+# Una ondícula de banda limitada con un eco puro de 8 ms (a = 0,5), de modo
+# que el rizado del paso alto tiene las cotas exactas de forma cerrada.
+b, a = sp_signal.butter(2, 0.3)
+s = np.zeros(4096)
+s[37:37 + 256] = sp_signal.lfilter(b, a, np.r_[1.0, np.zeros(255)])
+x = s + 0.5 * np.roll(s, 384)
+
+low = lifter(x, fs, cutoff=0.004, mode="lowpass")
+high = lifter(x, fs, cutoff=0.004, mode="highpass")
+
+# Una línea: el cepstro con el corte y los dos espectros logarítmicos:
+low.plot(language="es")
+plt.show()
+
+# El reparto envolvente/rizado a mano, ampliado a 500-2000 Hz:
+band = (low.frequencies >= 500) & (low.frequencies <= 2000)
+fig, axes = plt.subplots(2, 1, sharex=True)
+axes[0].semilogx(low.frequencies[band], low.spectrum_db[band], "0.6",
+                 lw=0.7, label="Espectro logarítmico")
+axes[0].semilogx(low.frequencies[band], low.liftered_db[band], lw=2,
+                 label="Lifter paso bajo: envolvente")
+axes[1].semilogx(high.frequencies[band], high.liftered_db[band], "r",
+                 label="Lifter paso alto: rizado")
+for bound in (20 * np.log10(1.5), 20 * np.log10(0.5)):
+    axes[1].axhline(bound, color="g", linestyle="--")
+axes[1].set_xlabel("Frecuencia [Hz]")
+for ax in axes:
+    ax.set_ylabel("Magnitud [dB]")
+    ax.legend()
+plt.show()
+```
+
+</details>
+
 Para la señal de eco puro el rizado del paso alto oscila entre las formas
 cerradas `20·log10(1+a)` y `20·log10(1-a)` dB, otro oráculo que fijan los
 tests. En análisis de voz la misma operación separa la envolvente del tracto
@@ -220,6 +313,7 @@ x[37:293] = sp_signal.lfilter(b, a, np.r_[1.0, np.zeros(255)])
 res = cepstrum(x, fs, kind="complex")
 print(res.linear_phase_samples)              # negativo: retardo eliminado
 print(np.max(np.abs(res.invert() - x)))      # ~1e-14
+res.plot(language="es")   # el cepstro complejo frente a la quefrencia
 ```
 
 Entre el logaritmo y la transformada inversa se puede editar lo que se

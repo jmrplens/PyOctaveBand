@@ -40,6 +40,53 @@ print(res.lags[peak], res.values[peak])   # delay and its coefficient
 res.plot()
 ```
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/correlation_normalizations_dark.webp"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/correlation_normalizations.webp" alt="Two panels for a two-sensor delay model. Top: the correlation coefficient function over plus and minus 50 milliseconds of lag, a flat noise floor near zero with one sharp peak of about 0.85 exactly on the dashed true-delay line at plus 12.5 milliseconds. Bottom: the biased and unbiased estimates over the full plus and minus 2 seconds of lag; the biased noise floor tapers toward the record ends while the unbiased one fans out with growing variance there" width="86%"></picture>
+
+*The two-sensor delay model `y(t) = 0.8·x(t−τ0) + n(t)` under the three
+normalizations: the coefficient function is bounded and peaks at +τ0 (top);
+over the full lag range the biased estimate tapers toward the ends while
+the unbiased one pays for its unbiasedness with variance that grows there
+(bottom).*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import correlation, noise_signal
+
+fs = 8192.0
+delay = 102                                  # 12.45 ms
+x = noise_signal(fs, 2.0, seed=4)
+interference = noise_signal(fs, 2.0, rms=0.5, seed=5)
+y = 0.8 * np.concatenate([np.zeros(delay), x[:-delay]]) + interference
+
+res = correlation(x, y, fs, normalization="coefficient", max_lag=0.05)
+
+# One line — the correlation estimate against the lag in seconds:
+res.plot()
+plt.show()
+
+# The three normalizations by hand, from the same records:
+biased = correlation(x, y, fs, normalization="biased")
+unbiased = correlation(x, y, fs, normalization="unbiased")
+
+fig, (ax_c, ax_n) = plt.subplots(2, 1)
+ax_c.plot(1e3 * res.lags, res.values, label="coefficient")
+ax_c.axvline(1e3 * delay / fs, color="r", linestyle="--",
+             label="true delay")
+ax_c.set(xlabel="Lag [ms]", ylabel="Correlation")
+ax_n.plot(unbiased.lags, unbiased.values, "r", lw=0.5, label="unbiased")
+ax_n.plot(biased.lags, biased.values, lw=0.5, label="biased")
+ax_n.set(xlabel="Lag [s]", ylabel="Correlation")
+for ax in (ax_c, ax_n):
+    ax.legend()
+plt.show()
+```
+
+</details>
+
 The result always carries the coefficient function alongside the requested
 normalization, because the coefficient is what the error formulas need. For
 bandwidth-limited Gaussian data of bandwidth `B` observed for `T` seconds
@@ -178,6 +225,49 @@ res = align_impulse_responses(ir_b, ir_a, fs)  # remove the estimated delay
 res.plot()                                     # reference vs aligned overlay
 ```
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ir_alignment_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ir_alignment.svg" alt="A band-limited reference pulse at 5 milliseconds, a measured copy delayed by 7.37 samples drawn dashed and visibly shifted right, and the aligned response drawn dotted lying exactly on top of the reference, with a note reading estimated delay removed 7.36 samples" width="86%"></picture>
+
+*A measured IR delayed by a fractional 7.37 samples (dashed) is aligned
+back onto its reference: the band-limited shift removes the estimated
+7.36 samples and the aligned trace (dotted) lands on the reference.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal as sp_signal
+from phonometry import align_impulse_responses, fractional_delay
+
+fs = 48000.0
+t = np.arange(int(0.03 * fs)) / fs
+rng = np.random.default_rng(6)
+# Band-limited reference pulse: a 2 kHz Gaussian tone burst at 5 ms.
+ir_a = sp_signal.gausspulse(t - 0.005, fc=2000.0, bw=0.5)
+ir_b = fractional_delay(ir_a, 7.37)[: ir_a.size]
+ir_b += 0.005 * rng.standard_normal(ir_a.size)
+
+res = align_impulse_responses(ir_b, ir_a, fs)
+
+# One line — reference and aligned IR overlaid:
+res.plot()
+plt.show()
+
+# By hand, from the fields the result carries:
+t_ms = 1e3 * t
+fig, ax = plt.subplots()
+ax.plot(t_ms, res.reference, lw=1.6, label="Reference IR")
+ax.plot(t_ms, ir_b, "0.5", lw=1.0, linestyle="--", label="Measured IR")
+ax.plot(t_ms, res.aligned[: t.size], "r:", label="Aligned IR")
+ax.set(xlabel="Time [ms]", ylabel="Amplitude",
+       title=f"delay removed: {res.delay_samples:.2f} samples")
+ax.legend()
+plt.show()
+```
+
+</details>
+
 `align_impulse_responses` removes the estimated delay with an exact
 band-limited fractional shift (a frequency-domain phase ramp over a
 zero-padded record, so nothing wraps around): the tool for averaging IR
@@ -212,6 +302,49 @@ res.plot()               # signal + envelope, instantaneous frequency
 
 slow = envelope(x, fs, decimation_factor=32)   # anti-aliased, fs/32
 ```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hilbert_envelope_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hilbert_envelope.svg" alt="Two panels for a decaying 250 hertz mode in light noise. Top: the oscillating signal with the smooth exponential Hilbert envelope tracing its decay above and below. Bottom: the instantaneous frequency staying on the dashed 250 hertz carrier line while the mode is strong and jittering increasingly as the signal decays into the noise floor" width="86%"></picture>
+
+*The Hilbert quantities of a struck 250 Hz mode: the envelope traces the
+exponential decay (top), and the instantaneous frequency sits on the
+carrier while the mode dominates, jittering as the signal sinks into the
+noise floor (bottom, ×8 anti-aliased decimation).*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import envelope
+
+fs = 8192.0
+t = np.arange(int(0.4 * fs)) / fs
+rng = np.random.default_rng(7)
+x = np.exp(-t / 0.1) * np.sin(2 * np.pi * 250.0 * t)   # a struck mode
+x += 0.001 * rng.standard_normal(t.size)
+
+res = envelope(x, fs, decimation_factor=8)
+
+# One line — signal + envelope and the instantaneous frequency:
+res.plot()
+plt.show()
+
+# By hand, from the fields the result carries:
+fig, (ax_e, ax_f) = plt.subplots(2, 1, sharex=True)
+ax_e.plot(t, res.signal, lw=0.6, label="Signal")
+ax_e.plot(res.times, res.envelope, "r", lw=1.8, label="Envelope A(t)")
+ax_e.plot(res.times, -res.envelope, "r", lw=1.8)
+ax_e.legend()
+ax_f.plot(res.times, res.instantaneous_frequency, lw=0.9,
+          label="Instantaneous frequency f(t)")
+ax_f.axhline(250.0, color="g", linestyle="--", label="carrier 250 Hz")
+ax_f.set(xlabel="Time [s]", ylabel="Frequency [Hz]", ylim=(230, 270))
+ax_f.legend()
+plt.show()
+```
+
+</details>
 
 The envelope of a band-limited signal is itself low-frequency, so the result
 offers optional **decimation**: a zero-phase FIR anti-alias filter by

@@ -31,11 +31,64 @@ references:
     publisher: "Wiley"
     url: "https://www.wiley.com/en-us/Fundamentals+of+Acoustics%2C+4th+Edition-p-9780471847892"
     note: "The sound-pressure, energy and level definitions underneath Leq, SEL and the dose measures (ISBN 978-0-471-84789-2)."
+  - type: standard
+    organization: "British Standards Institution"
+    year: 2003
+    title: "Description and measurement of environmental noise — Guide to quantities and procedures"
+    designation: "BS 7445-1:2003"
+    url: "https://knowledge.bsigroup.com/products/description-and-measurement-of-environmental-noise-guide-to-quantities-and-procedures"
+    note: "The survey-practice companion of ISO 1996-1: which descriptor family fits which assessment question, and the measurement procedures around them (BS 7445-2:1991 covers the land-use data acquisition)."
+  - type: book
+    authors: ["Bies, D. A.", "Hansen, C. H.", "Howard, C. Q."]
+    year: 2017
+    title: "Engineering noise control"
+    edition: "5th ed."
+    publisher: "CRC Press"
+    doi: "10.1201/9781351228152"
+    note: "Section 2.5 (the noise measures: Leq, Ldn, L10/L90 and their intended uses) and Section 2.15 (environmental noise surveys). ISBN 978-1-4987-2405-0."
 ---
 
 import ThemeImage from '../../../components/ThemeImage.astro';
 
-Environmental noise metrics computed directly from the raw (calibrated) signal.
+A noise measurement rarely ends with a waveform: it ends with a handful of
+single numbers that a limit, a regulation or a report can be checked
+against. This page is that reduction chain, computed directly from the
+calibrated signal in pascals rather than from meter readouts: the
+equivalent continuous level $L_{eq}$/$L_{Aeq}$, the percentile levels
+$L_N$, the event and peak measures ($L_{AE}$/SEL, $L_{Cpeak}$), the noise
+dose of IEC 61252 and the whole-day descriptors $L_{den}$/$L_{dn}$ with
+the ISO 1996-1 rating levels. Working from the signal means each
+definition (an integral, a percentile, an energy sum) is applied exactly,
+with no detector or display approximation in between.
+
+Which descriptor fits which question follows the ISO 1996-1 quantity
+families (BS 7445-1 is the survey-practice guide to the same choice, and
+Bies, Hansen & Howard 2017, §2.5 surveys them side by side):
+
+- **Accumulated exposure over an interval**: $L_{eq}$/$L_{Aeq}$, the
+  energy mean. It answers "how much sound arrived in total", regardless of
+  how it was distributed in time.
+- **How the fluctuating level was distributed**: the percentiles $L_N$:
+  $L_{90}$ as the background level, $L_{10}$ as the intrusive traffic
+  indicator, $L_{50}$ as the median. Two signals with the same $L_{Aeq}$
+  can have very different $L_{10} - L_{90}$ spreads.
+- **Single events of different durations, compared fairly**: SEL, the
+  event's whole energy normalized to one second.
+- **Hearing-risk screening**: $L_{Cpeak}$ and the dose measures, which
+  feed the occupational workflow of
+  [Occupational exposure (ISO 9612)](/phonometry/guides/occupational-exposure/).
+- **Long-term community annoyance**: $L_{den}$/$L_{dn}$ and the ISO
+  1996-1 rating levels, which weight evening and night energy before
+  averaging the day.
+
+Two boundaries with the sibling pages are worth keeping sharp. The
+integrated metrics here deliberately bypass the exponential detector:
+$L_{eq}$ and SEL have no time constant, and Fast/Slow ballistics enter
+only through the percentile levels, which are defined on the time-weighted
+level track (see [Time Weighting](/phonometry/guides/time-weighting/)).
+And everything on this page assumes the signal is already in pascals: the
+sensitivity factor that gets it there is the subject of
+[Calibration](/phonometry/guides/calibration/).
 
 ## Leq and LAeq
 
@@ -465,7 +518,9 @@ spread beyond 3 dB, where the substitute grossly inflates.
 ```python
 from phonometry import environmental
 
-kt = environmental.assess_tonal_audibility(54.1, 45.2, 430.0).adjustment      # 6 dB
+tonal = environmental.assess_tonal_audibility(54.1, 45.2, 430.0)  # TonalAssessmentResult
+kt = tonal.adjustment                                             # 6 dB
+tonal.plot()   # this audibility on the Kt curve, as in the figure above
 corr = environmental.residual_sound_correction(measured_level=58.0, residual_level=50.0)
 u = environmental.combined_standard_uncertainty([0.59, 0.3, 2.0, 0.40, 0.38])  # 2.18 dB (G.2)
 environmental.expanded_uncertainty(u)                            # 4.36 dB (k = 2)
@@ -555,4 +610,8 @@ objectively from segment mean squares.
 
 ## See also
 
+- [Time Weighting](/phonometry/guides/time-weighting/): the Fast/Slow/Impulse detector the percentile levels are defined on.
+- [Calibration](/phonometry/guides/calibration/): the sensitivity factor that turns digital units into the pascals every level here assumes.
+- [Occupational exposure (ISO 9612)](/phonometry/guides/occupational-exposure/): the workplace measurement strategies the dose measures feed.
+- [Multichannel and Performance](/phonometry/guides/multichannel/): per-channel levels and how to combine them energetically.
 - API reference: [`metrology.levels`](/phonometry/reference/api/levels/levels/), [`environmental.measurement`](/phonometry/reference/api/environment/measurement/) and [`environmental.rating`](/phonometry/reference/api/environment/rating/).

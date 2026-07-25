@@ -47,6 +47,48 @@ print(res.quefrencies[:3], res.cepstrum.shape)   # quefrency axis, in s
 res.plot()
 ```
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cepstrum_variants_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cepstrum_variants.svg" alt="The power, real and complex cepstra of a wavelet with one 8 millisecond echo overlaid against quefrency up to 20 milliseconds: all three carry a sharp positive spike at 8 milliseconds and a small negative one at 16 milliseconds, the source wavelet fills the region below about 2 milliseconds, and an inset zoom on the first rahmonic shows the power and complex spikes reaching 0.5 while the real cepstrum reaches exactly half of that" width="86%"></picture>
+
+*The three variants of one echo-carrying record (a band-limited wavelet
+plus a reflection at 8 ms, a = 0.5). All three carry the rahmonics at 8 and
+16 ms with heights a and −a²/2 (Milner's signed convention); the inset
+shows the real cepstrum at exactly half the power cepstrum, and the source
+wavelet concentrates below 2 ms.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal as sp_signal
+from phonometry import cepstrum
+
+fs = 48000.0
+# A band-limited source wavelet plus one reflection at 8 ms (a = 0.5)
+b, a = sp_signal.butter(2, 0.3)
+s = np.zeros(4096)
+s[37:37 + 256] = sp_signal.lfilter(b, a, np.r_[1.0, np.zeros(255)])
+x = s + 0.5 * np.roll(s, 384)
+
+# One line per variant — each CepstrumResult draws itself:
+cepstrum(x, fs, kind="power").plot()
+plt.show()
+
+# The three variants overlaid by hand on one quefrency axis:
+fig, ax = plt.subplots()
+for kind, style in (("power", "-"), ("real", "--"), ("complex", ":")):
+    res = cepstrum(x, fs, kind=kind)
+    q_ms = 1e3 * res.quefrencies
+    mask = (q_ms > 0.5) & (q_ms <= 20.0)
+    ax.plot(q_ms[mask], res.cepstrum[mask], style, label=f"{kind} cepstrum")
+ax.set(xlabel="Quefrency [ms]", ylabel="Cepstrum")
+ax.legend()
+plt.show()
+```
+
+</details>
+
 The result carries the full periodic quefrency axis (`0 .. (nfft-1)/fs`);
 quefrencies above `nfft/(2·fs)` are the mirrored negative quefrencies, where
 the even power and real cepstra repeat and the complex cepstrum keeps its
@@ -165,6 +207,57 @@ print(np.allclose(low.liftered_db + high.liftered_db, low.spectrum_db))
 low.plot()
 ```
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lifter_split_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lifter_split.svg" alt="Two panels over 500 to 2000 hertz for a wavelet carrying a pure 8 millisecond echo: the log spectrum oscillates with a 125 hertz ripple around the flat lowpass-liftered envelope, and below it the highpass-liftered ripple alone swings exactly between the dashed closed-form bounds at plus 3.5 and minus 6 decibels" width="86%"></picture>
+
+*The 4 ms lifter split on a pure-echo record: the lowpass side returns the
+smooth spectral envelope, the highpass side isolates the echo's 125 Hz
+ripple, swinging exactly between the closed forms 20·lg(1±a) = +3.5 and
+−6.0 dB.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal as sp_signal
+from phonometry import lifter
+
+fs = 48000.0
+# A band-limited wavelet carrying a pure 8 ms echo (a = 0.5), so the
+# highpass ripple has the exact closed-form bounds.
+b, a = sp_signal.butter(2, 0.3)
+s = np.zeros(4096)
+s[37:37 + 256] = sp_signal.lfilter(b, a, np.r_[1.0, np.zeros(255)])
+x = s + 0.5 * np.roll(s, 384)
+
+low = lifter(x, fs, cutoff=0.004, mode="lowpass")
+high = lifter(x, fs, cutoff=0.004, mode="highpass")
+
+# One line — the cepstrum with the cutoff and the two log spectra:
+low.plot()
+plt.show()
+
+# The envelope/ripple split by hand, zoomed on 500-2000 Hz:
+band = (low.frequencies >= 500) & (low.frequencies <= 2000)
+fig, axes = plt.subplots(2, 1, sharex=True)
+axes[0].semilogx(low.frequencies[band], low.spectrum_db[band], "0.6",
+                 lw=0.7, label="Log spectrum")
+axes[0].semilogx(low.frequencies[band], low.liftered_db[band], lw=2,
+                 label="Lowpass lifter: envelope")
+axes[1].semilogx(high.frequencies[band], high.liftered_db[band], "r",
+                 label="Highpass lifter: ripple")
+for bound in (20 * np.log10(1.5), 20 * np.log10(0.5)):
+    axes[1].axhline(bound, color="g", linestyle="--")
+axes[1].set_xlabel("Frequency [Hz]")
+for ax in axes:
+    ax.set_ylabel("Magnitude [dB]")
+    ax.legend()
+plt.show()
+```
+
+</details>
+
 For the pure-echo signal the highpass ripple swings between the closed forms
 `20·log10(1+a)` and `20·log10(1-a)` dB, another oracle the tests pin. In
 speech analysis the identical operation separates the vocal-tract envelope
@@ -191,6 +284,7 @@ x[37:293] = sp_signal.lfilter(b, a, np.r_[1.0, np.zeros(255)])
 res = cepstrum(x, fs, kind="complex")
 print(res.linear_phase_samples)              # negative: a bulk delay removed
 print(np.max(np.abs(res.invert() - x)))      # ~1e-14
+res.plot()   # the complex cepstrum against quefrency (as in the figure above)
 ```
 
 Between the log and the inverse transform anything can be edited - that is

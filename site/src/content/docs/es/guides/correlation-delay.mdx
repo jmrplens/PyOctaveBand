@@ -64,6 +64,53 @@ print(res.lags[peak], res.values[peak])   # retardo y su coeficiente
 res.plot()
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/correlation_normalizations_es.webp" alt="Dos paneles para un modelo de dos sensores con retardo. Arriba: la función coeficiente de correlación sobre más y menos 50 milisegundos de retardo, un suelo de ruido plano cercano a cero con un pico nítido de aproximadamente 0,85 exactamente sobre la línea discontinua del retardo verdadero en más 12,5 milisegundos. Abajo: las estimaciones sesgada e insesgada sobre los más y menos 2 segundos completos de retardo; el suelo de ruido de la sesgada se atenúa hacia los extremos del registro mientras que el de la insesgada se abre en abanico con varianza creciente allí" width="86%" />
+
+*El modelo de dos sensores `y(t) = 0,8·x(t−τ0) + n(t)` bajo las tres
+normalizaciones: la función coeficiente está acotada y tiene su pico en +τ0
+(arriba); sobre el rango completo de retardos la estimación sesgada se
+atenúa hacia los extremos mientras que la insesgada paga su insesgadez con
+una varianza que crece allí (abajo).*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import correlation, noise_signal
+
+fs = 8192.0
+delay = 102                                  # 12,45 ms
+x = noise_signal(fs, 2.0, seed=4)
+interference = noise_signal(fs, 2.0, rms=0.5, seed=5)
+y = 0.8 * np.concatenate([np.zeros(delay), x[:-delay]]) + interference
+
+res = correlation(x, y, fs, normalization="coefficient", max_lag=0.05)
+
+# Una línea: la estimación de correlación frente al retardo en segundos:
+res.plot(language="es")
+plt.show()
+
+# Las tres normalizaciones a mano, con los mismos registros:
+biased = correlation(x, y, fs, normalization="biased")
+unbiased = correlation(x, y, fs, normalization="unbiased")
+
+fig, (ax_c, ax_n) = plt.subplots(2, 1)
+ax_c.plot(1e3 * res.lags, res.values, label="coeficiente")
+ax_c.axvline(1e3 * delay / fs, color="r", linestyle="--",
+             label="retardo verdadero")
+ax_c.set(xlabel="Retardo [ms]", ylabel="Correlación")
+ax_n.plot(unbiased.lags, unbiased.values, "r", lw=0.5, label="insesgada")
+ax_n.plot(biased.lags, biased.values, lw=0.5, label="sesgada")
+ax_n.set(xlabel="Retardo [s]", ylabel="Correlación")
+for ax in (ax_c, ax_n):
+    ax.legend()
+plt.show()
+```
+
+</details>
+
 El resultado siempre lleva la función coeficiente junto a la normalización
 solicitada, porque el coeficiente es lo que necesitan las fórmulas de error.
 Para datos gaussianos limitados en banda de ancho `B` observados durante `T`
@@ -208,6 +255,50 @@ res = align_impulse_responses(ir_b, ir_a, fs)  # elimina el retardo estimado
 res.plot()                       # superposición referencia frente a alineada
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ir_alignment_es.svg" alt="Un pulso de referencia de banda limitada en 5 milisegundos, una copia medida retardada 7,37 muestras dibujada a trazos y visiblemente desplazada a la derecha, y la respuesta alineada dibujada con puntos exactamente encima de la referencia, con una nota que dice retardo estimado eliminado 7,36 muestras" width="86%" />
+
+*Una RI medida con un retardo fraccionario de 7,37 muestras (trazos) se
+alinea de vuelta sobre su referencia: el desplazamiento de banda limitada
+elimina las 7,36 muestras estimadas y la traza alineada (puntos) cae sobre
+la referencia.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal as sp_signal
+from phonometry import align_impulse_responses, fractional_delay
+
+fs = 48000.0
+t = np.arange(int(0.03 * fs)) / fs
+rng = np.random.default_rng(6)
+# Pulso de referencia de banda limitada: salva gaussiana de 2 kHz en 5 ms.
+ir_a = sp_signal.gausspulse(t - 0.005, fc=2000.0, bw=0.5)
+ir_b = fractional_delay(ir_a, 7.37)[: ir_a.size]
+ir_b += 0.005 * rng.standard_normal(ir_a.size)
+
+res = align_impulse_responses(ir_b, ir_a, fs)
+
+# Una línea: referencia y RI alineada superpuestas:
+res.plot(language="es")
+plt.show()
+
+# A mano, desde los campos que lleva el resultado:
+t_ms = 1e3 * t
+fig, ax = plt.subplots()
+ax.plot(t_ms, res.reference, lw=1.6, label="RI de referencia")
+ax.plot(t_ms, ir_b, "0.5", lw=1.0, linestyle="--", label="RI medida")
+ax.plot(t_ms, res.aligned[: t.size], "r:", label="RI alineada")
+ax.set(xlabel="Tiempo [ms]", ylabel="Amplitud",
+       title=f"retardo eliminado: {res.delay_samples:.2f} muestras")
+ax.legend()
+plt.show()
+```
+
+</details>
+
 `align_impulse_responses` elimina el retardo estimado con un desplazamiento
 fraccionario exacto limitado en banda (una rampa de fase en el dominio de la
 frecuencia sobre un registro con relleno de ceros, así que nada se enrolla):
@@ -244,6 +335,49 @@ res.plot()               # señal + envolvente, frecuencia instantánea
 
 slow = envelope(x, fs, decimation_factor=32)   # con antialias, fs/32
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hilbert_envelope_es.svg" alt="Dos paneles para un modo de 250 hercios en decaimiento con ruido ligero. Arriba: la señal oscilante con la envolvente de Hilbert exponencial y suave trazando su decaimiento por arriba y por abajo. Abajo: la frecuencia instantánea manteniéndose sobre la línea discontinua de la portadora de 250 hercios mientras el modo es fuerte y con un temblor creciente a medida que la señal se hunde en el suelo de ruido" width="86%" />
+
+*Las magnitudes de Hilbert de un modo de 250 Hz golpeado: la envolvente
+traza el decaimiento exponencial (arriba), y la frecuencia instantánea se
+asienta sobre la portadora mientras el modo domina, temblando a medida que
+la señal se hunde en el suelo de ruido (abajo, diezmado ×8 con antialias).*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import envelope
+
+fs = 8192.0
+t = np.arange(int(0.4 * fs)) / fs
+rng = np.random.default_rng(7)
+x = np.exp(-t / 0.1) * np.sin(2 * np.pi * 250.0 * t)   # un modo golpeado
+x += 0.001 * rng.standard_normal(t.size)
+
+res = envelope(x, fs, decimation_factor=8)
+
+# Una línea: señal + envolvente y la frecuencia instantánea:
+res.plot(language="es")
+plt.show()
+
+# A mano, desde los campos que lleva el resultado:
+fig, (ax_e, ax_f) = plt.subplots(2, 1, sharex=True)
+ax_e.plot(t, res.signal, lw=0.6, label="Señal")
+ax_e.plot(res.times, res.envelope, "r", lw=1.8, label="Envolvente A(t)")
+ax_e.plot(res.times, -res.envelope, "r", lw=1.8)
+ax_e.legend()
+ax_f.plot(res.times, res.instantaneous_frequency, lw=0.9,
+          label="Frecuencia instantánea f(t)")
+ax_f.axhline(250.0, color="g", linestyle="--", label="portadora de 250 Hz")
+ax_f.set(xlabel="Tiempo [s]", ylabel="Frecuencia [Hz]", ylim=(230, 270))
+ax_f.legend()
+plt.show()
+```
+
+</details>
 
 La envolvente de una señal limitada en banda es a su vez de baja frecuencia,
 así que el resultado ofrece **decimación** opcional: un filtro antialias FIR

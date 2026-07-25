@@ -9,14 +9,53 @@ references:
     designation: "IEC 61672-1:2013"
     url: "https://webstore.iec.ch/en/publication/5708"
     note: "El detector exponencial de ponderación temporal (cláusula 3.8) con las constantes de tiempo F y S (cláusula 5.7), y las respuestas de referencia a ráfagas de tono de 4 kHz de la Tabla 4 (límites de aceptación de clase 1) contra las que se verifica la balística en CI."
+  - type: standard
+    organization: "American National Standards Institute"
+    year: 1983
+    title: "Specification for sound level meters"
+    designation: "ANSI S1.4-1983"
+    url: "https://webstore.ansi.org/standards/asa/ansiasas11983"
+    note: "La especificación clásica del sonómetro analógico: las características dinámicas FAST/SLOW de las que descienden las constantes F y S, y la característica IMPULSE (subida de 35 ms, caída lenta) que IEC 61672-1 ya no especifica."
+  - type: book
+    authors: ["Bies, D. A.", "Hansen, C. H.", "Howard, C. Q."]
+    year: 2017
+    title: "Engineering noise control"
+    edition: "5th ed."
+    publisher: "CRC Press"
+    doi: "10.1201/9781351228152"
+    note: "Las secciones 3.2 y 3.6 (sonómetros y medición de sonido variable en el tiempo: qué significan las lecturas F/S/I en la práctica instrumental). ISBN 978-1-4987-2405-0."
 ---
 
 import Video from '../../../../components/Video.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
-La medición precisa de SPL requiere capturar la energía en ventanas temporales
-específicas. phonometry implementa las constantes de tiempo exactas de la norma
-**IEC 61672-1:2013**.
+Un nivel sonoro mostrado en pantalla es siempre un nivel con *ponderación
+temporal*: antes de llegar a la lectura, la presión cuadrática ponderada en
+frecuencia pasa por un detector exponencial cuya constante de tiempo fija
+la rapidez con la que el nivel sigue a la señal. Esta página es ese
+detector, implementado como un filtro recursivo exacto por muestra: las
+características Fast y Slow de IEC 61672-1:2013 (cláusula 5.7), la
+balística asimétrica heredada Impulse, estado en streaming para el
+procesado por bloques y la verificación con ráfagas de tono contra la
+Tabla 4 de la norma.
+
+Los nombres son más antiguos que las matemáticas. FAST y SLOW eran
+descripciones literales del movimiento de una aguja, normalizadas para los
+sonómetros analógicos en ANSI S1.4-1983 e IEC 60651 y trasladadas a
+IEC 61672-1 como las constantes exponenciales F y S; IMPULSE se añadió en
+esa misma época para el ruido de impactos y desde entonces ha desaparecido
+de los requisitos, sobreviviendo en los instrumentos solo por
+procedimientos heredados (la [guía de elección](#elegir-f-s-o-i) de más
+abajo dice cuándo es defendible cada una; Bies, Hansen y Howard 2017, §3.6
+cubre la práctica instrumental).
+
+Dos páginas hermanas completan la cadena. La salida del detector es la
+traza de nivel sobre la que se definen los niveles percentiles $L_N$ de
+[Niveles](/phonometry/es/guides/levels/), mientras que las métricas
+integradas ($L_{eq}$, SEL) se saltan el detector por completo; y la cadena
+completa de instrumento IEC 61672-1 que envuelve este detector
+(ponderación, rangos, verificaciones periódicas) es el asunto de
+[Construye un sonómetro](/phonometry/es/guides/sound-level-meter/).
 
 ## 1. El detector exponencial
 
@@ -263,4 +302,9 @@ verificación con ráfagas de tono de IEC 61672-1.
 
 ## Véase también
 
+- [Niveles](/phonometry/es/guides/levels/): los niveles percentiles definidos sobre la salida del detector, y las métricas integradas que lo evitan.
+- [Construye un sonómetro](/phonometry/es/guides/sound-level-meter/): la cadena completa de instrumento IEC 61672-1 alrededor de este detector.
+- [Ponderación frecuencial](/phonometry/es/guides/weighting/): los filtros A/C/Z aplicados antes del detector.
+- [Procesado por bloques](/phonometry/es/guides/block-processing/): el detector en streaming sobre tramas sin discontinuidades de estado.
+- [Prominencia de sonidos impulsivos](/phonometry/es/guides/impulse-prominence/): la valoración moderna de impulsos por análisis de inicio que sustituyó a la ponderación I.
 - Referencia de la API: [`metrology.parametric_filters`](/phonometry/es/reference/api/filters/parametric-filters/).

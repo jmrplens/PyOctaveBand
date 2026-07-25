@@ -207,10 +207,55 @@ from phonometry import trend_test
 rng = np.random.default_rng(3)
 res = trend_test(rng.standard_normal(40), method="runs")
 print(res.statistic, res.bounds, res.trend_free)
+res.plot()   # the sequence about its median with the runs verdict
 
 alternating = np.tile([1.0, -1.0], 10)   # 20 runs: rejected the other way
 print(trend_test(alternating, method="runs").trend_free)   # False
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/runs_test.svg" alt="Two panels of sequences classified about their median, points above in blue and below in red. Left: forty Gaussian observations with twenty runs inside the acceptance region from fourteen to twenty-seven, verdict trend-free. Right: a strictly alternating twenty-value sequence also giving twenty runs, but against the acceptance region from six to fifteen for twenty values, verdict rejected for too-rapid alternation" width="92%" />
+
+*The two-sided verdict of the runs test: 20 runs is unremarkable for 40
+Gaussian observations (left, accepted), but the same count from a strictly
+alternating 20-value sequence exceeds its upper bound (right, rejected):
+too *many* runs is as non-random as too few.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import trend_test
+
+rng = np.random.default_rng(3)
+sequences = [rng.standard_normal(40), np.tile([1.0, -1.0], 10)]
+
+# One line per sequence — the tested values with the verdict:
+trend_test(sequences[0], method="runs").plot()
+plt.show()
+
+# Both verdicts side by side, classified about the median:
+fig, axes = plt.subplots(1, 2, figsize=(11, 4.5))
+for ax, seq in zip(axes, sequences):
+    res = trend_test(seq, method="runs")
+    idx = np.arange(1, seq.size + 1)
+    median = np.median(seq)
+    above = seq > median
+    ax.plot(idx, seq, "0.7", lw=0.7)
+    ax.scatter(idx[above], seq[above], label="above the median")
+    ax.scatter(idx[~above], seq[~above], color="r",
+               label="below the median")
+    ax.axhline(median, color="k", linestyle="--")
+    lo, hi = res.bounds
+    verdict = "trend-free" if res.trend_free else "rejected"
+    ax.set_title(f"r = {res.statistic} runs, accept ({lo}, {hi}]: {verdict}")
+    ax.set(xlabel="Sample index", ylabel="Sequence value")
+    ax.legend()
+plt.show()
+```
+
+</details>
 
 The reverse arrangement test is the more powerful of the two against the
 monotonic trends that dominate practice (B&P Sec. 4.5.2), which is why it
@@ -323,6 +368,7 @@ x = np.sin(2 * np.pi * 60.0 * t)          # narrowband: r is essentially 1
 res = peak_statistics(x, fs)
 print(round(res.irregularity_factor, 3))       # 0.997
 print(res.peak_exceedance(4.0))                # exp(-8): about 1 in 3000
+res.plot()   # empirical exceedance against the Rice mixture (figure below)
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rice_peak_distribution.svg" alt="Peak-height exceedance probability of low-pass Gaussian noise on a logarithmic axis against the standardized peak height from minus two point five to four point five: the empirical staircase from half a million samples follows the Rice mixture curve for irregularity factor zero point seven four six, clearly below the dashed Rayleigh limit and above the dotted Gaussian limit, with a visible fraction of negative maxima" width="82%" loading="eager" />

@@ -46,12 +46,12 @@ periodic = (
     + 0.5 * np.cos(2.0 * np.pi * 3.0 * phase + 0.4)
     - 0.3 * np.cos(2.0 * np.pi * 6.0 * phase)
 )
-signal = periodic + noise_signal(fs, phase.size / fs, rms=0.9, seed=11)
-res = time_synchronous_average(signal, fs, period, n_averages=n_avg)
+recording = periodic + noise_signal(fs, phase.size / fs, rms=0.9, seed=11)
+res = time_synchronous_average(recording, fs, period, n_averages=n_avg)
 
 fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(11, 4.6))
 t_ms = 1e3 * res.times
-ax0.plot(t_ms, signal[:m], color="#cccccc", label="Un período ruidoso")
+ax0.plot(t_ms, recording[:m], color="#cccccc", label="Un período ruidoso")
 ax0.plot(t_ms, res.period_waveform, color="#1f77b4", lw=1.8,
          label=f"Promedio de N = {n_avg} períodos")
 ax0.plot(t_ms, periodic[:m], "--", color="#d62728", label="Forma verdadera")
@@ -124,10 +124,59 @@ es una reducción de potencia de $10\log_{10} N$ dB, reportada como
 `amplitude_snr_gain`:
 
 ```python
-res = time_synchronous_average(signal, fs, period, n_averages=100)
+res = time_synchronous_average(recording, fs, period, n_averages=100)
 res.noise_reduction_db      # 20.0 dB = 10*log10(100)
 res.amplitude_snr_gain      # 10.0   = sqrt(100)
+res.plot(language="es")     # forma de onda promediada + el peine aplicado
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tsa_noise_reduction_es.svg" alt="Gráfica log-log del error RMS del promedio síncrono frente al número de promedios de 1 a 128: los marcadores del error medido caen a lo largo de la línea discontinua ideal de uno entre raíz de N, bajando desde aproximadamente 1 con un solo período hasta menos de 0,1 con 128 promedios" width="82%" />
+
+*La ley √N medida de principio a fin: el error RMS de la forma de onda
+promediada de una firma de engranaje de tres armónicos en ruido de varianza
+unidad cae a lo largo de la línea ideal σ/√N a medida que el número de
+períodos promediados crece de 1 a 128.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import time_synchronous_average
+
+fs = 8192.0
+samples = 256
+period = samples / fs
+m = np.arange(samples) / fs
+true = (np.cos(2 * np.pi * m / period)
+        + 0.5 * np.cos(2 * np.pi * 3 * m / period + 0.7)
+        + 0.25 * np.cos(2 * np.pi * 5 * m / period + 1.1))
+rng = np.random.default_rng(5)
+recording = np.tile(true, 128) + rng.standard_normal(128 * samples)
+
+counts = [1, 2, 4, 8, 16, 32, 64, 128]
+errors = []
+for n in counts:
+    res = time_synchronous_average(recording[:n * samples], fs, period,
+                                   n_averages=n)
+    errors.append(np.sqrt(np.mean((res.period_waveform - true) ** 2)))
+
+# Una línea: la forma de onda promediada y el peine que aplicó:
+res.plot(language="es")
+plt.show()
+
+# La ley sqrt(N) a mano: error medido contra la línea ideal:
+fig, ax = plt.subplots()
+ax.loglog(counts, errors, "o-", label="error RMS medido")
+ax.loglog(counts, 1 / np.sqrt(np.array(counts)), "r--",
+          label="sigma/sqrt(N) ideal")
+ax.set(xlabel="Número de promedios N", ylabel="Error RMS")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 Esta ley es la ideal: se cumple cuando el ruido no está correlado de un período
 al siguiente, de modo que el ruido de color o síncrono correlado entre períodos
@@ -158,10 +207,10 @@ promedio de extremo a extremo lo confirma:
 ```python
 # 8.o orden verdadero más un interferente fuerte en 32,05 órdenes
 phase = np.arange(41 * 256) / 256
-signal = np.cos(2 * np.pi * 8.0 * phase) + 0.7 * np.cos(2 * np.pi * 32.05 * phase)
+recording = np.cos(2 * np.pi * 8.0 * phase) + 0.7 * np.cos(2 * np.pi * 32.05 * phase)
 
-leak_20 = time_synchronous_average(signal, fs, period, n_averages=20)
-leak_32 = time_synchronous_average(signal, fs, period, n_averages=32)
+leak_20 = time_synchronous_average(recording, fs, period, n_averages=20)
+leak_32 = time_synchronous_average(recording, fs, period, n_averages=32)
 # leak_20.period_waveform coincide con el 8.o orden limpio; leak_32 no
 ```
 
@@ -183,8 +232,8 @@ se recupera dentro de ese error de interpolación (`interpolated` es `True`):
 fs = 8192.0
 period = 1.0 / 31.7                       # fs * period no es entero
 t = np.arange(int(40 * period * fs)) / fs
-signal = np.cos(2.0 * np.pi * t / period)  # un ciclo por revolución
-res = time_synchronous_average(signal, fs, period)
+recording = np.cos(2.0 * np.pi * t / period)  # un ciclo por revolución
+res = time_synchronous_average(recording, fs, period)
 res.interpolated                          # True: alineación por retardo fraccionario
 res.samples_per_period                    # muestras enteras de un período
 ```
@@ -200,3 +249,35 @@ submuestral de respuestas al impulso de la
 de onda recuperada, al ser exactamente un período, puede repetirse para
 reconstruir la parte síncrona de la señal, para restarla o para análisis de
 órdenes.
+
+## Qué herramienta de diagnóstico, y cuándo
+
+El promediado síncrono, el cepstro y el espectro de la envolvente responden
+preguntas distintas sobre una máquina rotativa, y se componen en lugar de
+competir:
+
+- **El promediado síncrono** necesita el período (un pulso de tacómetro o
+  una velocidad de eje fiable) y devuelve *la forma de onda misma*, una
+  revolución completa: la herramienta cuando quieres ver qué hace un eje o
+  un engranaje concreto por vuelta, diente a diente.
+- **El [cepstro](/phonometry/es/guides/cepstrum-echoes/)** no necesita
+  referencia y detecta *cualquier* familia periódica del espectro
+  (armónicos, bandas laterales): la herramienta cuando el período es
+  desconocido o varias familias se solapan y hay que separarlas.
+- **El [espectro de la envolvente](/phonometry/es/guides/cepstrum-echoes/#5-el-espectro-de-la-envolvente-modulaciones-como-líneas)**
+  encuentra periodicidades de la *amplitud*: la herramienta para los fallos
+  de rodamiento, cuya tasa de repetición modula una resonancia de alta
+  frecuencia en lugar de aparecer como un tono grave.
+
+La composición es práctica habitual: promedia síncronamente primero y
+resta después; el campo `residual` es el registro con la parte síncrona
+eliminada, exactamente sobre lo que conviene ejecutar el espectro de la
+envolvente cuando las componentes fuertes del engranaje ya no enmascaran la
+modulación.
+
+## Véase también
+
+- [Cepstro y ecos](/phonometry/es/guides/cepstrum-echoes/): detección sin referencia de familias de armónicos y bandas laterales, y el espectro de la envolvente.
+- [Correlación y retardo](/phonometry/es/guides/correlation-delay/): la envolvente de Hilbert que sustenta el análisis de envolvente.
+- [Señales de prueba](/phonometry/es/guides/test-signals/): el núcleo de retardo fraccionario que usa la alineación de período no entero.
+- Referencia de la API: [`metrology.synchronous_average`](/phonometry/es/reference/api/spectra/synchronous-average/).

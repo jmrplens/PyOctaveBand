@@ -2,8 +2,30 @@
 
 # Time Weighting and Integration
 
-Accurate SPL measurement requires capturing energy over specific time windows.
-phonometry implements exact time constants per **IEC 61672-1:2013**.
+A displayed sound level is always a *time-weighted* level: before anything
+reaches the readout, the squared, frequency-weighted pressure passes
+through an exponential detector whose time constant sets how quickly the
+level follows the signal. This page is that detector, implemented as a
+sample-exact recursive filter: the Fast and Slow characteristics of
+IEC 61672-1:2013 (clause 5.7), the legacy asymmetric Impulse ballistics,
+streaming state for block processing, and the toneburst verification
+against the standard's Table 4.
+
+The names are older than the mathematics. FAST and SLOW were literal
+descriptions of a needle movement, standardized for analog meters in
+ANSI S1.4-1983 and IEC 60651 and carried into IEC 61672-1 as the F and S
+exponential constants; IMPULSE was added in the same era for impact noise
+and has since been dropped from the requirements, surviving in instruments
+only for legacy procedures (the "Choosing F, S or I" guidance below says
+when each is defensible; Bies, Hansen & Howard 2017, §3.6 covers the
+instrument practice).
+
+Two sibling pages complete the chain. The detector output is the level
+track that the percentile levels $L_N$ of [Levels](levels.md) are defined
+on, while the integrated metrics ($L_{eq}$, SEL) bypass the detector
+entirely; and the full IEC 61672-1 instrument chain that wraps this
+detector (weighting, ranges, periodic tests) is the subject of
+[Build a sound level meter](sound-level-meter.md).
 
 ## 1. The exponential detector
 
@@ -239,6 +261,19 @@ these envelopes, and [Why phonometry](why-phonometry.md) for the IEC
   [IEC webstore](https://webstore.iec.ch/en/publication/5708).
   The exponential-detector definition, the F and S time constants and the
   Table 4 toneburst responses the ballistics are verified against in CI.
+- American National Standards Institute. (1983). *Specification for sound
+  level meters* (ANSI S1.4-1983).
+  [ANSI webstore](https://webstore.ansi.org/standards/asa/ansiasas11983).
+  The classic analog meter specification: the FAST/SLOW dynamic
+  characteristics the F and S constants descend from, and the IMPULSE
+  characteristic (35 ms rise, slow decay) that IEC 61672-1 no longer
+  specifies.
+- Bies, D. A., Hansen, C. H., & Howard, C. Q. (2017). *Engineering noise
+  control* (5th ed.). CRC Press.
+  [doi:10.1201/9781351228152](https://doi.org/10.1201/9781351228152).
+  Sections 3.2 and 3.6 (sound level meters and the measurement of
+  time-varying sound: what the F/S/I readouts mean in instrument
+  practice). ISBN 978-1-4987-2405-0.
 
 ## Standards
 

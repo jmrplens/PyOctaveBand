@@ -1,6 +1,6 @@
 ---
 title: "Multicanal y rendimiento"
-description: "Análisis multicanal vectorizado y notas de rendimiento."
+description: "Procesado por canal de grabaciones multicanal, la convención (canales, muestras) y la vectorización que lo sustenta."
 references:
   - type: standard
     organization: "International Electrotechnical Commission"
@@ -16,16 +16,45 @@ references:
     designation: "IEC 61672-1:2013"
     url: "https://webstore.iec.ch/en/publication/5708"
     note: "La semántica de ponderación e integración temporal aplicada por canal, exactamente como prescribe la norma monocanal."
+  - type: book
+    authors: ["Bendat, J. S.", "Piersol, A. G."]
+    year: 2010
+    title: "Random data: Analysis and measurement procedures"
+    edition: "4th ed."
+    publisher: "Wiley"
+    doi: "10.1002/9781118032428"
+    note: "La sección 10.4.2 (el procedimiento para analizar múltiples registros de datos: primero el análisis individual por registro y, como paso aparte y deliberado, el análisis cruzado conjunto) y el capítulo 7 (los modelos de múltiples entradas/salidas a los que conduce ese paso conjunto). ISBN 978-0-470-24877-5."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
-## Soporte multicanal
+La mayoría de las sesiones de medición reales producen más de un canal: los
+dos oídos de una cabeza binaural, la pareja de micrófonos de una sonda de
+intensidad, las varias posiciones de un muestreo de sala, las cápsulas de un
+array de conformación de haz. La convención para todos ellos es un único
+array con forma `(canales, muestras)` procesado en una sola llamada: cada
+función actúa sobre el último eje (el tiempo) y conserva el eje inicial de
+canales, de modo que cada fila se analiza exactamente como si fuera la única.
 
-phonometry soporta de forma nativa señales multicanal (estéreo, 5.1, arrays de
-micrófonos…) mediante **operaciones totalmente vectorizadas**. Los arrays de
-entrada con forma `(N_channels, N_samples)` se procesan en paralelo, con
-ganancias de rendimiento significativas frente a bucles iterativos.
+Esa garantía por canal es normativa, no solo cómoda. Los filtros de banda
+aplicados a cada fila son los diseños de IEC 61260-1 y las ponderaciones y
+balísticas del detector son las de IEC 61672-1, sin cambios respecto a la
+ruta monocanal; la vectorización agrupa la aritmética entre filas (un diseño
+de filtro, una llamada a SciPy) y nunca las mezcla. Es el procedimiento de
+libro de texto para múltiples registros de datos (Bendat y Piersol 2010,
+§10.4.2): analizar primero cada registro por separado y calcular lo conjunto
+como un paso aparte y explícito.
+
+Usa esta página cuando tus canales sean grabaciones paralelas con el mismo
+reloj y quieras espectros o niveles por canal. Cuando la pregunta sea *entre*
+canales (cuál es el retardo de A a B, cuánta parte de B se explica por A),
+eso es análisis cruzado: consulta
+[Correlación y retardo](/phonometry/es/guides/correlation-delay/) y
+[Coherencia múltiple y parcial](/phonometry/es/guides/miso-coherence/), las
+implementaciones de la correlación cruzada y de los modelos de múltiples
+entradas de Bendat y Piersol.
+
+## Un análisis estéreo en una llamada
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_multichannel_es.svg" alt="Análisis estéreo: ruido rosa y barrido logarítmico resueltos por canal en tercios de octava" width="80%" loading="eager" />
 
@@ -125,9 +154,10 @@ explicitar:
 
 ## Rendimiento: vectorización y caché
 
-La clase `OctaveFilterBank` está muy optimizada para procesado en tiempo real y
-por lotes. Usa vectorización NumPy para manejar arrays de audio multicanal
-(p. ej. arrays de micrófonos de 64 canales) sin bucles Python explícitos.
+`OctaveFilterBank` es la herramienta para el análisis repetido o en
+streaming: un banco diseña sus filtros una vez y los aplica a cada trama, y
+el broadcasting de NumPy cubre todos los canales de una trama en una sola
+llamada de filtrado por banda, sin bucle Python sobre canales.
 
 ```python
 import numpy as np
@@ -166,4 +196,8 @@ Notas adicionales de rendimiento:
 
 ## Véase también
 
+- [Correlación y retardo](/phonometry/es/guides/correlation-delay/): las preguntas cruzadas en el dominio del tiempo (retardo, alineación) que la ruta por canal deja deliberadamente en tus manos.
+- [Coherencia múltiple y parcial](/phonometry/es/guides/miso-coherence/): cuál de varios canales correlados excita realmente una respuesta (Bendat y Piersol, cap. 7).
+- [Procesado por bloques](/phonometry/es/guides/block-processing/): la contrapartida en streaming, con un estado de filtro por canal.
+- [Niveles](/phonometry/es/guides/levels/): las métricas de nivel por canal, y por qué los dB se combinan energéticamente.
 - Referencia de la API: [`phonometry`](/phonometry/es/reference/api/filters/phonometry/) y [`metrology.core`](/phonometry/es/reference/api/filters/core/).

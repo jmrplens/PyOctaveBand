@@ -2,8 +2,29 @@
 
 # Calibration and dBFS
 
-phonometry can return results in physical **Sound Pressure Level (dB SPL)** or
-digital **decibels relative to Full Scale (dBFS)**.
+Every level this library reports is only as trustworthy as the one number
+this page produces: the sensitivity factor that converts digital units into
+pascals. The page covers both reference frames a recording can be analyzed
+in: physical **dB SPL**, obtained by calibrating the chain against an
+IEC 60942 acoustic calibrator, and digital **dBFS**, levels relative to
+full scale with no physical claim attached.
+
+Choosing between them is a question about your measurement chain, not
+about preference. Work in dB SPL whenever the result faces a physical
+criterion (a noise limit, an exposure threshold, any acoustics standard);
+that requires a calibrator recording made through the *same, untouched*
+chain as the measurement. Work in dBFS when the signal never had a
+calibrated analog front end (loudness normalization, codec and interface
+tests, file-only analysis) or when no calibration tone exists, in which
+case absolute SPL statements are simply out of reach.
+
+The workflow around the factor matters as much as the formula: derive it
+before and re-check it after each session, verify meter and calibrator
+periodically in the laboratory (IEC 61672-3 and IEC 60942; Bies, Hansen &
+Howard 2017, §3.4), and treat the pre/post difference as your drift bound.
+The field, laboratory and drift section below turns that into concrete
+rules, and the [Build a sound level meter](sound-level-meter.md)
+walkthrough starts from exactly this step before any level is computed.
 
 ## Why calibrate? The theory
 
@@ -253,6 +274,12 @@ identical whether you pass the raw integer array or a float conversion.
   [IEC webstore](https://webstore.iec.ch/en/publication/5710).
   The laboratory verification procedure behind the periodic checks
   recommended above.
+- Bies, D. A., Hansen, C. H., & Howard, C. Q. (2017). *Engineering noise
+  control* (5th ed.). CRC Press.
+  [doi:10.1201/9781351228152](https://doi.org/10.1201/9781351228152).
+  Sections 3.1.5 and 3.4 (microphone field effects and sound level meter
+  calibration: the electrical and acoustic calibration practice this
+  page's workflow follows). ISBN 978-1-4987-2405-0.
 
 ## Standards
 

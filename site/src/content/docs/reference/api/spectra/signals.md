@@ -232,6 +232,33 @@ can be verified against the filter itself.
 
 Length of the designed anti-alias FIR.
 
+### ResampledSignalResult.plot()
+
+```python
+ResampledSignalResult.plot(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Plot the delivered anti-alias filter against its design spec.
+
+The magnitude response of `filter_taps` with the passband
+edge, the stopband edge at the alias fold, the designed stopband
+attenuation and the rejected band shaded.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the magnitude `plot` call. |
+
+**Returns:** The axes.
+
 ## tone_burst
 
 ```python

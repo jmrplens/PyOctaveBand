@@ -425,14 +425,13 @@ perfectamente plana y sin diferencia de fase entre bandas en el cruce.
 import numpy as np
 from phonometry import metrology
 
-# Una señal calibrada en Pa para que la guía funcione por sí sola
+# recording: una captura calibrada en Pa para que la guía funcione por sí sola
 fs = 48000
-x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
-signal = x
-# Dividir la señal en bandas grave y aguda a 1000 Hz
-low, high = metrology.linkwitz_riley(signal, fs, freq=1000, order=4)
-# Reconstrucción: low + high == signal (respuesta plana)
+# Dividir la grabación en bandas grave y aguda a 1000 Hz
+low, high = metrology.linkwitz_riley(recording, fs, freq=1000, order=4)
+# Reconstrucción: low + high == recording (respuesta plana)
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/crossover_lr4_es.svg" alt="Crossover Linkwitz-Riley de 4.º orden: paso-bajo, paso-alto y su suma plana" width="60%" />
@@ -750,6 +749,7 @@ from phonometry import (
 
 bank = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[125, 4000])
 result = filter_class_compliance(bank)   # overall_class == 1
+result.plot(language="es")   # la banda de peor margen sobre su corredor de clase
 
 result.report(
     "iec61260.pdf",
@@ -778,6 +778,7 @@ eliminó, de modo que un banco de orden 6 puede certificarse a clase 0:
 ```python
 bank = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[250, 4000])
 result = filter_class_compliance(bank, edition="1995")   # overall_class == 0
+result.plot(language="es")   # el corredor de clase 0 de la edición de 1995
 result.report("iec61260_1995.pdf",
               metadata=ReportMetadata(measurement_standard="IEC 61260:1995",
                                       required_class=0))   # -> Class 0 - COMPLIES
