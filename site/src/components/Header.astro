@@ -21,7 +21,8 @@ const shouldRenderSearch =
 	<div class="sl-flex print:hidden">
 		{shouldRenderSearch && <Search />}
 	</div>
-	<div class="sl-flex md:sl-hidden print:hidden mobile-lang">
+	<div class="sl-flex md:sl-hidden print:hidden mobile-controls">
+		<ThemeSelect />
 		<LanguageSelect />
 	</div>
 	<div class="sl-hidden md:sl-flex print:hidden right-group">
@@ -61,18 +62,30 @@ const shouldRenderSearch =
 			border-inline-end: 1px solid var(--sl-color-gray-5);
 		}
 
-		.mobile-lang {
+		/* Below the md breakpoint Starlight hides the whole right group behind
+		   the hamburger, which buries both the language picker and the theme
+		   control. Both are surfaced here instead, in the desktop order
+		   (theme, then language), as icon-and-caret stubs: the wordy label is
+		   hidden so the narrow bar (logo · search · theme · language · menu)
+		   still fits on a 360 px phone. The accessible name is unaffected,
+		   since it comes from the visually-hidden <span> inside each label,
+		   and the theme icon itself still reports the current state. */
+		.mobile-controls {
 			align-items: center;
-			/* Keep the compact icon + caret, drop the wordy label so the
-			   narrow bar (logo · search · language · menu) still fits. */
+			gap: 0.25rem;
 		}
-		.mobile-lang :global(select) {
+		.mobile-controls :global(select) {
 			width: 3.25rem;
 			padding-inline: 0.25rem;
 			color: transparent; /* hide the selected-label text, keep icon/caret */
 		}
-		.mobile-lang :global(option) {
+		.mobile-controls :global(option) {
 			color: var(--sl-color-text);
+		}
+		/* The theme stub is a hair narrower: its caret and icon are the same
+		   size but it never has to hint at a longer word behind them. */
+		.mobile-controls :global(starlight-theme-select select) {
+			width: 2.75rem;
 		}
 
 		@media (min-width: 50rem) {

@@ -263,6 +263,7 @@ export default defineConfig({
         './src/styles/theme-images.css',
         './src/styles/theme-tables.css',
         './src/styles/splash-menu.css',
+        './src/styles/home.css',
         './src/styles/sidebar.css',
       ],
       social: [

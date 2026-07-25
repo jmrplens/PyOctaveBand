@@ -1,0 +1,481 @@
+---
+/**
+ * Landing-page body.
+ *
+ * Replaces the ten dense description cards the splash page used to carry with
+ * six blocks that each answer one question a first-time visitor actually has:
+ * how big is this, what is it, who is it for, what is it not, what does it
+ * look like in use, what does it cover, and where do I start.
+ *
+ * All the text comes from `src/data/home.ts`, one object per locale, so the
+ * English and Spanish landings cannot drift apart structurally. The figure and
+ * the PDF fiche are the ones already committed for the guides; nothing here is
+ * a mock-up.
+ */
+import { Code } from '@astrojs/starlight/components';
+import ThemeImage from '../ThemeImage.astro';
+import ReportPreview from '../ReportPreview.astro';
+import type { HomeContent } from '../../data/home';
+
+interface Props {
+	content: HomeContent;
+	lang: 'en' | 'es';
+}
+
+const { content, lang } = Astro.props;
+const IMAGES = 'https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images';
+// The Spanish build points at the localized figure variant, exactly as the
+// guides do; ThemeImage derives the dark file from whichever it is given.
+const spectrum = lang === 'es'
+	? `${IMAGES}/signal_response_fraction_3_es.svg`
+	: `${IMAGES}/signal_response_fraction_3.svg`;
+---
+
+<div class="home">
+	<section class="readout" aria-label={content.statsLabel}>
+		{
+			content.stats.map((s) => (
+				<div class="readout-cell">
+					<span class="readout-value">{s.value}</span>
+					<span class="readout-label">
+						{s.href ? <a href={s.href}>{s.label}</a> : s.label}
+					</span>
+				</div>
+			))
+		}
+	</section>
+
+	<section class="block">
+		<h2>{content.what.title}</h2>
+		<div class="prose">
+			{content.what.body.map((p) => <p set:html={p} />)}
+		</div>
+
+		<div class="two-up">
+			<div class="panel">
+				<h3>{content.who.title}</h3>
+				<ul class="tick">
+					{content.who.items.map((i) => <li>{i}</li>)}
+				</ul>
+			</div>
+			<div class="panel panel-quiet">
+				<h3>{content.honest.title}</h3>
+				<ul class="tick tick-minus">
+					{content.honest.items.map((i) => <li>{i}</li>)}
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<section class="block">
+		<h2>{content.proof.title}</h2>
+		<p class="lead">{content.proof.lead}</p>
+
+		<div class="demo">
+			<h3>{content.proof.spectrum.title}</h3>
+			<p class="note">{content.proof.spectrum.note}</p>
+			<Code code={content.proof.spectrum.code} lang="python" />
+			<figure class="demo-figure">
+				<ThemeImage
+					src={spectrum}
+					alt={content.proof.spectrum.alt}
+					width="100%"
+					loading="eager"
+				/>
+				<figcaption>{content.proof.spectrum.caption}</figcaption>
+			</figure>
+		</div>
+
+		<div class="demo demo-split">
+			<div>
+				<h3>{content.proof.fiche.title}</h3>
+				<p class="note">{content.proof.fiche.note}</p>
+				<Code code={content.proof.fiche.code} lang="python" />
+			</div>
+			<div class="demo-fiche">
+				<ReportPreview
+					name="iso717_airborne_example"
+					title={content.proof.fiche.linkTitle}
+					description={content.proof.fiche.description}
+					displayWidth="100%"
+					caption={content.proof.fiche.caption}
+					id="home-iso717"
+				/>
+			</div>
+		</div>
+	</section>
+
+	<section class="block">
+		<h2>{content.coverage.title}</h2>
+		<p class="lead">{content.coverage.lead}</p>
+		<table class="coverage">
+			<thead>
+				<tr>
+					<th scope="col">{content.coverage.headers[0]}</th>
+					<th scope="col">{content.coverage.headers[1]}</th>
+				</tr>
+			</thead>
+			<tbody>
+				{
+					content.coverage.areas.map((a) => (
+						<tr>
+							<th scope="row">
+								<a href={a.href}>{a.name}</a>
+								<span class="area-summary">{a.summary}</span>
+							</th>
+							<td>
+								<span class="chips">
+									{a.standards.map((s) => (
+										<span class="chip">{s}</span>
+									))}
+								</span>
+							</td>
+						</tr>
+					))
+				}
+			</tbody>
+		</table>
+	</section>
+
+	<section class="block">
+		<h2>{content.start.title}</h2>
+		<p class="lead">{content.start.lead}</p>
+		<ol class="steps">
+			{
+				content.start.steps.map((s, i) => (
+					<li>
+						<span class="step-n" aria-hidden="true">
+							{String(i + 1).padStart(2, '0')}
+						</span>
+						<h3>{s.title}</h3>
+						<p>{s.body}</p>
+						{s.code && <Code code={s.code} lang="bash" frame="none" />}
+						<a class="step-link" href={s.href}>
+							{s.linkText}
+						</a>
+					</li>
+				))
+			}
+		</ol>
+	</section>
+</div>
+
+<style>
+	.home {
+		--home-gap: clamp(2.5rem, 6vw, 4rem);
+		display: flex;
+		flex-direction: column;
+		gap: var(--home-gap);
+		margin-top: 1rem;
+	}
+
+	/* Sections are numbered and ruled, like the clauses of the documents this
+	   library implements. The counter is decorative and hidden from the
+	   accessibility tree; the heading text carries the meaning. */
+	.home {
+		counter-reset: home-block;
+	}
+	.block {
+		counter-increment: home-block;
+		border-block-start: 1px solid var(--ph-border);
+		padding-block-start: 1.4rem;
+		position: relative;
+	}
+	.block::before {
+		content: counter(home-block, decimal-leading-zero);
+		position: absolute;
+		inset-block-start: 1.5rem;
+		inset-inline-start: 0;
+		font-family: var(--__sl-font-mono);
+		font-size: var(--sl-text-2xs);
+		letter-spacing: 0.12em;
+		color: var(--ph-mark);
+	}
+	@media (min-width: 62rem) {
+		.block {
+			padding-inline-start: 3.5rem;
+		}
+	}
+	.block > h2 {
+		font-size: var(--sl-text-2xl);
+		line-height: 1.2;
+		margin-bottom: 0.5rem;
+		letter-spacing: -0.01em;
+	}
+	@media (min-width: 50rem) {
+		.block > h2 {
+			font-size: var(--sl-text-3xl);
+		}
+	}
+	.block h3 {
+		font-size: var(--sl-text-lg);
+		margin-bottom: 0.35rem;
+	}
+	.lead {
+		color: var(--sl-color-gray-3);
+		max-width: 62ch;
+		margin-bottom: 1.25rem;
+	}
+
+	/* ---- Instrument readout: the numbers, stated once, up top ---- */
+	.readout {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+		gap: 1px;
+		background: var(--ph-border);
+		border: 1px solid var(--ph-border);
+		border-radius: var(--ph-radius, 4px);
+		overflow: hidden;
+	}
+	.readout-cell {
+		background: var(--ph-surface);
+		padding: 1rem 1.1rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.3rem;
+	}
+	.readout-value {
+		font-family: var(--__sl-font-mono);
+		font-size: var(--sl-text-2xl);
+		font-variant-numeric: tabular-nums;
+		color: var(--ph-accent-ink);
+		line-height: 1.1;
+	}
+	.readout-label {
+		font-size: var(--sl-text-xs);
+		color: var(--sl-color-gray-3);
+		line-height: 1.4;
+	}
+
+	/* ---- Prose ---- */
+	.prose {
+		max-width: 68ch;
+	}
+	.prose p {
+		margin-bottom: 0.9rem;
+	}
+	.prose :global(code) {
+		font-size: var(--sl-text-code-sm);
+		background: var(--sl-color-bg-inline-code);
+		padding: 0.1em 0.35em;
+		border-radius: 3px;
+	}
+
+	/* ---- Who it is for / what it is not ---- */
+	.two-up {
+		display: grid;
+		gap: 1.25rem;
+		margin-top: 1.75rem;
+	}
+	@media (min-width: 55rem) {
+		.two-up {
+			grid-template-columns: 1fr 1fr;
+			align-items: start;
+		}
+	}
+	.panel {
+		border: 1px solid var(--ph-border);
+		border-radius: var(--ph-radius, 4px);
+		background: var(--ph-surface);
+		padding: 1.25rem 1.4rem;
+	}
+	.panel > h3 {
+		font-size: var(--sl-text-lg);
+		margin-bottom: 0.75rem;
+	}
+	.panel-quiet {
+		background: transparent;
+		border-style: dashed;
+	}
+	ul.tick {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.7rem;
+	}
+	ul.tick li {
+		position: relative;
+		padding-inline-start: 1.4rem;
+		font-size: var(--sl-text-sm);
+		line-height: 1.6;
+	}
+	ul.tick li::before {
+		content: '+';
+		position: absolute;
+		inset-inline-start: 0;
+		font-family: var(--__sl-font-mono);
+		color: var(--ph-mark);
+	}
+	ul.tick-minus li::before {
+		content: '-';
+		color: var(--sl-color-gray-4);
+	}
+
+	/* ---- Shows rather than tells ---- */
+	.demo {
+		border: 1px solid var(--ph-border);
+		border-radius: var(--ph-radius, 4px);
+		padding: 1.25rem 1.4rem 1.4rem;
+		margin-bottom: 1.25rem;
+		background: var(--ph-surface);
+	}
+	.demo:last-child {
+		margin-bottom: 0;
+	}
+	.note {
+		font-size: var(--sl-text-sm);
+		color: var(--sl-color-gray-3);
+		max-width: 68ch;
+		margin-bottom: 1rem;
+	}
+	.demo-figure {
+		margin: 1.1rem 0 0;
+	}
+	.demo-figure img {
+		width: 100%;
+		height: auto;
+		display: block;
+	}
+	.demo-figure figcaption,
+	.demo :global(figcaption) {
+		font-size: var(--sl-text-xs);
+		color: var(--sl-color-gray-3);
+		margin-top: 0.5rem;
+	}
+	.demo-split {
+		display: grid;
+		gap: 1.5rem;
+	}
+	/* Grid and flex items default to min-width: auto, so a code block's
+	   intrinsic width would widen the column and scroll the whole document
+	   sideways on a phone. Let the columns shrink and the code scroll. */
+	.demo-split > *,
+	.two-up > *,
+	ol.steps > li,
+	.readout-cell {
+		min-width: 0;
+	}
+	@media (min-width: 55rem) {
+		.demo-split {
+			grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+			align-items: start;
+		}
+	}
+	.demo-fiche :global(.report-figure) {
+		margin: 0;
+	}
+
+	/* ---- Coverage table ---- */
+	table.coverage {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: var(--sl-text-sm);
+	}
+	table.coverage th,
+	table.coverage td {
+		text-align: start;
+		vertical-align: top;
+		padding: 0.7rem 0.75rem;
+		border-block-end: 1px solid var(--ph-border);
+	}
+	table.coverage thead th {
+		font-size: var(--sl-text-2xs);
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--sl-color-gray-3);
+		font-weight: 600;
+		border-block-end: 1px solid var(--ph-border-strong);
+	}
+	table.coverage tbody th {
+		font-weight: 600;
+		width: 40%;
+		padding-inline-start: 0;
+	}
+	.area-summary {
+		display: block;
+		font-weight: 400;
+		font-size: var(--sl-text-xs);
+		color: var(--sl-color-gray-3);
+		margin-top: 0.2rem;
+		max-width: 34ch;
+	}
+	.chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.3rem;
+	}
+	.chip {
+		font-family: var(--__sl-font-mono);
+		font-size: var(--sl-text-2xs);
+		line-height: 1.6;
+		padding: 0.1rem 0.4rem;
+		border: 1px solid var(--ph-border);
+		border-radius: 3px;
+		background: var(--ph-accent-soft);
+		color: var(--ph-accent-ink);
+		white-space: nowrap;
+	}
+	@media (max-width: 45rem) {
+		table.coverage,
+		table.coverage tbody,
+		table.coverage tr,
+		table.coverage th,
+		table.coverage td {
+			display: block;
+			width: auto;
+		}
+		table.coverage thead {
+			display: none;
+		}
+		table.coverage tr {
+			border-block-end: 1px solid var(--ph-border);
+			padding-block: 0.75rem;
+		}
+		table.coverage th,
+		table.coverage td {
+			border: 0;
+			padding-inline: 0;
+		}
+	}
+
+	/* ---- Start path ---- */
+	ol.steps {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: grid;
+		gap: 1.25rem;
+	}
+	@media (min-width: 55rem) {
+		ol.steps {
+			grid-template-columns: repeat(3, 1fr);
+		}
+	}
+	ol.steps li {
+		border-block-start: 2px solid var(--ph-mark);
+		padding-top: 0.9rem;
+		display: flex;
+		flex-direction: column;
+	}
+	.step-n {
+		font-family: var(--__sl-font-mono);
+		font-size: var(--sl-text-xs);
+		color: var(--ph-mark);
+		letter-spacing: 0.1em;
+	}
+	ol.steps p {
+		font-size: var(--sl-text-sm);
+		color: var(--sl-color-gray-2);
+		margin-bottom: 0.9rem;
+	}
+	.step-link {
+		margin-top: auto;
+		font-size: var(--sl-text-sm);
+		align-self: flex-start;
+	}
+	ol.steps :global(.expressive-code) {
+		margin-bottom: 0.9rem;
+	}
+</style>

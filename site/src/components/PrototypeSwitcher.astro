@@ -1,24 +1,36 @@
 ---
 /**
- * Experimental colour-direction switcher.
+ * Experimental switcher for the two things this branch wants a decision on.
  *
- * Three complete palettes live in src/styles/theme-directions.css, keyed on a
- * `data-accent` attribute on <html>. The attribute is stamped before first
- * paint by the inline script in Head.astro (so there is no flash) and read
- * back from localStorage under `phonometry:accent`; this control only writes
- * it. It is a prototype affordance for choosing a direction, not a feature
- * meant to ship: once a direction is picked, the winning block becomes the
- * unconditional `:root` rule and this component goes away.
+ * Colour: three complete palettes live in src/styles/theme-directions.css,
+ * keyed on a `data-accent` attribute on <html>. The attribute is stamped
+ * before first paint by the inline script in Head.astro (so there is no
+ * flash) and read back from localStorage under `phonometry:accent`; this
+ * control only writes it.
+ *
+ * Language: the mode used by src/components/LangSuggest.astro, stored under
+ * `phonometry:lang-mode`. Changing it reloads the page, because the decision
+ * is taken once at load.
+ *
+ * Neither is meant to ship. Once a direction and a mode are picked, the
+ * winning colour block becomes the unconditional `:root` rule, the mode
+ * becomes the component's `DEFAULT_MODE`, and this component goes away.
  *
  * Rendered from Footer.astro so it exists on every page, splash included, and
- * positioned fixed. The buttons are real <button>s in a labelled group with
+ * positioned fixed. The buttons are real <button>s in labelled groups with
  * `aria-pressed`, so the control is reachable and announced; the panel starts
- * collapsed on narrow viewports to stay out of the reading column.
+ * collapsed to stay out of the reading column.
  */
 const DIRECTIONS = [
 	{ id: 'instrument', label: 'Instrument' },
 	{ id: 'blueprint', label: 'Blueprint' },
 	{ id: 'graphite', label: 'Graphite' },
+] as const;
+
+const LANG_MODES = [
+	{ id: 'banner', label: 'Banner' },
+	{ id: 'redirect', label: 'Redirect' },
+	{ id: 'off', label: 'Off' },
 ] as const;
 ---
 
@@ -31,17 +43,30 @@ const DIRECTIONS = [
 		data-accent-toggle
 	>
 		<span class="accent-toggle-dot" aria-hidden="true"></span>
-		<span class="accent-toggle-label">Colour</span>
+		<span class="accent-toggle-label">Prototype</span>
 	</button>
-	<div class="accent-options" id="accent-options" role="group" aria-label="Colour direction" hidden>
-		{
-			DIRECTIONS.map((d) => (
-				<button type="button" class="accent-option" data-accent-set={d.id} aria-pressed="false">
-					<span class={`accent-swatch accent-swatch-${d.id}`} aria-hidden="true" />
-					{d.label}
-				</button>
-			))
-		}
+	<div class="accent-options" id="accent-options" hidden>
+		<div class="accent-group" role="group" aria-label="Colour direction">
+			<span class="accent-group-label" aria-hidden="true">Colour</span>
+			{
+				DIRECTIONS.map((d) => (
+					<button type="button" class="accent-option" data-accent-set={d.id} aria-pressed="false">
+						<span class={`accent-swatch accent-swatch-${d.id}`} aria-hidden="true" />
+						{d.label}
+					</button>
+				))
+			}
+		</div>
+		<div class="accent-group" role="group" aria-label="Language detection mode">
+			<span class="accent-group-label" aria-hidden="true">Language</span>
+			{
+				LANG_MODES.map((m) => (
+					<button type="button" class="accent-option" data-lang-mode={m.id} aria-pressed="false">
+						{m.label}
+					</button>
+				))
+			}
+		</div>
 	</div>
 </div>
 
@@ -54,12 +79,42 @@ const DIRECTIONS = [
 		const options = panel.querySelector('#accent-options');
 		const toggle = panel.querySelector('[data-accent-toggle]');
 
+		const LANG_MODE_KEY = 'phonometry:lang-mode';
+		const read = (key, fallback) => {
+			try {
+				return localStorage.getItem(key) || fallback;
+			} catch {
+				return fallback;
+			}
+		};
+
 		const sync = () => {
 			const active = root.dataset.accent || 'instrument';
 			for (const btn of panel.querySelectorAll('[data-accent-set]')) {
 				btn.setAttribute('aria-pressed', String(btn.dataset.accentSet === active));
 			}
+			const banner = document.getElementById('lang-suggest');
+			const mode = read(LANG_MODE_KEY, banner?.dataset.defaultMode || 'banner');
+			for (const btn of panel.querySelectorAll('[data-lang-mode]')) {
+				btn.setAttribute('aria-pressed', String(btn.dataset.langMode === mode));
+			}
 		};
+
+		for (const btn of panel.querySelectorAll('[data-lang-mode]')) {
+			btn.addEventListener('click', () => {
+				try {
+					localStorage.setItem(LANG_MODE_KEY, btn.dataset.langMode);
+					// The suggestion is decided once at load, and the redirect
+					// guard is per session, so both have to be reset to see the
+					// new mode behave as it would on a first visit.
+					localStorage.removeItem('phonometry:lang-dismissed');
+					sessionStorage.removeItem('phonometry:lang-redirected');
+				} catch {
+					/* private mode */
+				}
+				location.reload();
+			});
+		}
 
 		for (const btn of panel.querySelectorAll('[data-accent-set]')) {
 			btn.addEventListener('click', () => {
@@ -131,7 +186,19 @@ const DIRECTIONS = [
 		display: flex;
 		flex-direction: column;
 		align-items: stretch;
+		gap: 0.6rem;
+	}
+	.accent-group {
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
 		gap: 0.25rem;
+	}
+	.accent-group-label {
+		color: var(--sl-color-gray-3);
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		padding-inline-start: 0.1rem;
 	}
 	/* `display: flex` would otherwise beat the user-agent [hidden] rule. */
 	.accent-options[hidden] {
@@ -159,6 +226,13 @@ const DIRECTIONS = [
 	}
 	.accent-swatch-graphite {
 		background: linear-gradient(135deg, #8a4b06 50%, #e0a33e 50%);
+	}
+
+	/* The language suggestion is a full-width bar pinned to the same edge and
+	   is rendered just before this component, so lift the panel clear of it
+	   while it is showing. */
+	:global(#lang-suggest:not([hidden])) ~ .accent-switcher {
+		inset-block-end: calc(var(--ph-lang-bar-height, 3rem) + 0.75rem);
 	}
 
 	@media print {

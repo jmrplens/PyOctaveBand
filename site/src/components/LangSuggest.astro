@@ -1,0 +1,279 @@
+---
+/**
+ * First-visit language handling, client side only.
+ *
+ * The site is a static export on GitHub Pages: there is no server, no
+ * middleware and no Vary: Accept-Language, so anything that reacts to the
+ * visitor's language has to happen in the browser. Two behaviours are
+ * implemented here and one of them is chosen at runtime:
+ *
+ *   banner    (default) a quiet, dismissible one-line bar offering the other
+ *             language. Nothing navigates on its own.
+ *   redirect  a single `location.replace` to the counterpart page, and only
+ *             on a genuine first visit with no stored preference.
+ *   off       nothing at all.
+ *
+ * The mode is `DEFAULT_MODE` below, overridable at runtime with
+ * `localStorage['phonometry:lang-mode']` (the prototype switcher writes it),
+ * so it can be turned off or flipped without a rebuild.
+ *
+ * Rules that hold in every mode:
+ *
+ *   - An explicit locale in the URL always wins. `?lang=en` or `?lang=es`
+ *     is recorded as the visitor's choice and suppresses any suggestion.
+ *   - Using the language picker records the choice, so a manual decision
+ *     beats the browser's Accept-Language list from then on.
+ *   - Once a choice is stored, the page NEVER navigates on its own again.
+ *     Someone who deliberately opens an English URL after choosing Spanish
+ *     stays on the English URL and is at most offered a link. This is what
+ *     keeps the feature from trapping anyone.
+ *   - Redirection is guarded three ways: only when nothing is stored, only
+ *     once per session (sessionStorage), and only when the target path
+ *     differs from the current one, so it cannot loop.
+ *   - Known crawler user agents are skipped, and nothing here touches the
+ *     canonical or hreflang links, which is what search engines actually
+ *     use to pick a locale.
+ *   - The API reference is generated in English only and served under /es/
+ *     by Starlight's locale fallback, so the whole subtree is excluded:
+ *     sending a Spanish speaker to an English page with a fallback notice
+ *     would be worse than leaving them where they are.
+ *
+ * The banner is rendered in the language it offers, since that is the
+ * language the reader is assumed to understand.
+ */
+
+/** 'banner' | 'redirect' | 'off' */
+const DEFAULT_MODE = 'banner';
+
+const BASE = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
+const pathname = Astro.url.pathname;
+const rel = pathname.startsWith(BASE) ? pathname.slice(BASE.length) : pathname;
+const isEs = rel === '/es' || rel.startsWith('/es/');
+const current: 'en' | 'es' = isEs ? 'es' : 'en';
+
+// English-only generated subtree: no useful counterpart exists.
+const bare = isEs ? rel.replace(/^\/es/, '') || '/' : rel;
+const isApiReference = bare.startsWith('/reference/api');
+
+// Counterpart URL under this site's scheme: ES mirrors EN under /es/.
+const counterpart = isEs ? `${BASE}${bare}` : `${BASE}/es${bare === '/' ? '/' : bare}`;
+
+const COPY = {
+	// Shown on an English page, in Spanish, offering Spanish.
+	es: {
+		text: 'Esta página también está disponible en español.',
+		action: 'Ver en español',
+		dismiss: 'Cerrar',
+		region: 'Sugerencia de idioma',
+	},
+	// Shown on a Spanish page, in English, offering English.
+	en: {
+		text: 'This page is also available in English.',
+		action: 'View in English',
+		dismiss: 'Dismiss',
+		region: 'Language suggestion',
+	},
+} as const;
+
+const other: 'en' | 'es' = current === 'en' ? 'es' : 'en';
+const copy = COPY[other];
+---
+
+{
+	!isApiReference && (
+		<div
+			id="lang-suggest"
+			class="lang-suggest"
+			role="region"
+			aria-label={copy.region}
+			data-current={current}
+			data-other={other}
+			data-target={counterpart}
+			data-default-mode={DEFAULT_MODE}
+			hidden
+		>
+			<p lang={other}>{copy.text}</p>
+			<a class="lang-suggest-go" href={counterpart} hreflang={other} lang={other}>
+				{copy.action}
+			</a>
+			<button type="button" class="lang-suggest-close" lang={other} data-lang-dismiss>
+				{copy.dismiss}
+			</button>
+		</div>
+	)
+}
+
+<script is:inline>
+	(() => {
+		var LANG_KEY = 'phonometry:lang';
+		var DISMISS_KEY = 'phonometry:lang-dismissed';
+		var MODE_KEY = 'phonometry:lang-mode';
+		var SESSION_KEY = 'phonometry:lang-redirected';
+		var BOTS =
+			/bot|crawl|spider|slurp|mediapartners|facebookexternalhit|embedly|quora link preview|whatsapp|telegram|preview|scanner|lighthouse|pagespeed/i;
+
+		function get(store, key) {
+			try {
+				return store.getItem(key);
+			} catch (e) {
+				return null;
+			}
+		}
+		function set(store, key, value) {
+			try {
+				store.setItem(key, value);
+			} catch (e) {
+				/* private mode: the choice just does not survive the tab */
+			}
+		}
+
+		// Record the choice whenever the language picker is used, in either
+		// header instance. The select's value is the localized pathname.
+		document.addEventListener(
+			'change',
+			function (event) {
+				var el = event.target;
+				if (!el || el.tagName !== 'SELECT') return;
+				if (!el.closest('starlight-lang-select')) return;
+				var value = String(el.value || '');
+				set(localStorage, LANG_KEY, /\/es(\/|$)/.test(value) ? 'es' : 'en');
+				// A fresh explicit choice re-arms the suggestion for the other
+				// direction; it is the dismissal that has to be forgotten, not
+				// the choice.
+				try {
+					localStorage.removeItem(DISMISS_KEY);
+				} catch (e) {}
+			},
+			true,
+		);
+
+		var banner = document.getElementById('lang-suggest');
+		if (!banner) return;
+
+		var current = banner.dataset.current;
+		var other = banner.dataset.other;
+		var target = banner.dataset.target;
+		var mode = get(localStorage, MODE_KEY) || banner.dataset.defaultMode;
+
+		var dismiss = banner.querySelector('[data-lang-dismiss]');
+		if (dismiss) {
+			dismiss.addEventListener('click', function () {
+				banner.hidden = true;
+				set(localStorage, DISMISS_KEY, '1');
+				// Dismissing is itself a decision: the reader wants this page's
+				// language, so record it and stop guessing.
+				set(localStorage, LANG_KEY, current);
+			});
+		}
+		var go = banner.querySelector('.lang-suggest-go');
+		if (go) {
+			go.addEventListener('click', function () {
+				set(localStorage, LANG_KEY, other);
+			});
+		}
+
+		if (mode === 'off') return;
+		if (BOTS.test(navigator.userAgent || '')) return;
+
+		// An explicit ?lang= in the URL is a decision, not a hint.
+		var explicit = new URLSearchParams(location.search).get('lang');
+		if (explicit === 'en' || explicit === 'es') {
+			set(localStorage, LANG_KEY, explicit);
+			if (explicit === current) return;
+		}
+
+		var stored = get(localStorage, LANG_KEY);
+		var preferred = stored;
+		if (!preferred) {
+			var list = navigator.languages && navigator.languages.length
+				? navigator.languages
+				: [navigator.language || ''];
+			for (var i = 0; i < list.length; i++) {
+				var base = String(list[i]).toLowerCase().split('-')[0];
+				if (base === 'es' || base === 'en') {
+					preferred = base;
+					break;
+				}
+			}
+		}
+
+		// No opinion, or the page is already in the preferred language.
+		if (!preferred || preferred === current) return;
+
+		if (
+			mode === 'redirect' &&
+			!stored && // never navigate away once a choice exists
+			!get(sessionStorage, SESSION_KEY) &&
+			target &&
+			target !== location.pathname
+		) {
+			set(sessionStorage, SESSION_KEY, '1');
+			location.replace(target + location.search + location.hash);
+			return;
+		}
+
+		if (get(localStorage, DISMISS_KEY)) return;
+		banner.hidden = false;
+		// Publish the bar's height so anything else pinned to the bottom edge
+		// (the prototype switcher) can sit clear of it at any width.
+		var publish = function () {
+			document.documentElement.style.setProperty(
+				'--ph-lang-bar-height',
+				(banner.hidden ? 0 : banner.offsetHeight) + 'px',
+			);
+		};
+		publish();
+		if (typeof ResizeObserver === 'function') new ResizeObserver(publish).observe(banner);
+		if (dismiss) dismiss.addEventListener('click', publish);
+	})();
+</script>
+
+<style>
+	.lang-suggest {
+		position: fixed;
+		inset-block-end: 0;
+		inset-inline: 0;
+		/* Above the header and the sidebar pane (navbar is 10, skip link 20),
+		   so the bar is never clipped by the sidebar on desktop. */
+		z-index: 15;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.5rem 1rem;
+		padding: 0.6rem clamp(0.75rem, 3vw, 2rem);
+		background: var(--ph-surface-raised, var(--sl-color-bg-nav));
+		border-block-start: 1px solid var(--ph-border, var(--sl-color-hairline));
+		box-shadow: var(--sl-shadow-md);
+		font-size: var(--sl-text-sm);
+	}
+	.lang-suggest[hidden] {
+		display: none;
+	}
+	.lang-suggest p {
+		margin: 0;
+		color: var(--sl-color-gray-2);
+	}
+	.lang-suggest-go {
+		color: var(--sl-color-text-accent);
+		font-weight: 600;
+	}
+	.lang-suggest-close {
+		margin-inline-start: auto;
+		background: none;
+		border: 1px solid var(--ph-border, var(--sl-color-hairline));
+		border-radius: var(--ph-radius, 4px);
+		color: var(--sl-color-gray-3);
+		padding: 0.25rem 0.6rem;
+		font-size: var(--sl-text-xs);
+		cursor: pointer;
+	}
+	.lang-suggest-close:hover {
+		color: var(--sl-color-white);
+		border-color: var(--ph-border-strong, var(--sl-color-gray-4));
+	}
+	@media print {
+		.lang-suggest {
+			display: none;
+		}
+	}
+</style>

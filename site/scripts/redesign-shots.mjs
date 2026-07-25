@@ -63,6 +63,37 @@ const SHOTS = [
 	['34-header-phone-dark', '/es/getting-started/', PHONE, 'blueprint', 'dark', 0],
 ];
 
+/**
+ * Shots that need something more than a viewport and a palette: a faked
+ * Accept-Language list, or a click before the capture.
+ */
+const EXTRA = [
+	{
+		name: '40-lang-banner-on-en-page',
+		path: '/guides/levels/',
+		viewport: DESKTOP,
+		accent: 'instrument',
+		theme: 'light',
+		languages: ['es-ES', 'es'],
+	},
+	{
+		name: '41-lang-banner-on-es-page-phone',
+		path: '/es/guides/levels/',
+		viewport: PHONE,
+		accent: 'blueprint',
+		theme: 'dark',
+		languages: ['en-US', 'en'],
+	},
+	{
+		name: '42-prototype-switcher-open',
+		path: '/',
+		viewport: DESKTOP,
+		accent: 'graphite',
+		theme: 'dark',
+		click: '[data-accent-toggle]',
+	},
+];
+
 await mkdir(OUT, { recursive: true });
 
 const browser = await puppeteer.launch({
@@ -89,6 +120,21 @@ for (const [name, path, viewport, accent, theme, scrollY = 0, fullPage = false] 
 	await page.evaluate((t) => {
 		document.documentElement.dataset.theme = t;
 	}, theme);
+	// The dev server injects the Astro toolbar; it is not part of the design.
+	await page.addStyleTag({ content: 'astro-dev-toolbar{display:none !important}' });
+	if (fullPage) {
+		// Walk the page so lazily-loaded figures and fiche previews are decoded
+		// before the full-page capture, then go back to the top.
+		await page.evaluate(async () => {
+			const step = window.innerHeight * 0.8;
+			for (let y = 0; y < document.body.scrollHeight; y += step) {
+				window.scrollTo(0, y);
+				await new Promise((r) => setTimeout(r, 120));
+			}
+			window.scrollTo(0, 0);
+		});
+		await new Promise((r) => setTimeout(r, 1200));
+	}
 	if (scrollY) {
 		await page.evaluate((y) => window.scrollTo(0, y), scrollY);
 		await new Promise((r) => setTimeout(r, 400));
@@ -96,6 +142,43 @@ for (const [name, path, viewport, accent, theme, scrollY = 0, fullPage = false] 
 	await page.screenshot({ path: join(OUT, `${name}.png`), fullPage });
 	await page.close();
 	console.log(`captured ${name}`);
+}
+
+for (const shot of EXTRA) {
+	if (filters.length && !filters.some((f) => shot.name.includes(f))) continue;
+	// A fresh context per shot, so a previous scenario's localStorage cannot
+	// change what this one shows.
+	const context = await browser.createBrowserContext();
+	const page = await context.newPage();
+	await page.setViewport({ ...shot.viewport, deviceScaleFactor: 1 });
+	await page.evaluateOnNewDocument(
+		(a, t, langs) => {
+			try {
+				localStorage.setItem('phonometry:accent', a);
+				localStorage.setItem('starlight-theme', t);
+			} catch {}
+			if (langs) {
+				Object.defineProperty(navigator, 'languages', { get: () => langs });
+				Object.defineProperty(navigator, 'language', { get: () => langs[0] });
+			}
+		},
+		shot.accent,
+		shot.theme,
+		shot.languages ?? null,
+	);
+	await page.goto(`${BASE}/phonometry${shot.path}`, { waitUntil: 'networkidle0', timeout: 90000 });
+	await page.evaluate((t) => {
+		document.documentElement.dataset.theme = t;
+	}, shot.theme);
+	await page.addStyleTag({ content: 'astro-dev-toolbar{display:none !important}' });
+	if (shot.click) {
+		await page.click(shot.click);
+		await new Promise((r) => setTimeout(r, 300));
+	}
+	await new Promise((r) => setTimeout(r, 500));
+	await page.screenshot({ path: join(OUT, `${shot.name}.png`) });
+	await context.close();
+	console.log(`captured ${shot.name}`);
 }
 
 await browser.close();
