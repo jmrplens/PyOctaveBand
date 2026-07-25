@@ -42,13 +42,17 @@ use the speed of sound `c = 340 m/s` so that (B.1) with the reference room
 `Sb2 = 117 m²`, `V2 = 81 m³` reduces to (B.2).
 
 **Intensity element normalized level difference (Clause 3.9, Formula (8)).**
-For small building elements, `DI,n,e = Lp1 - 6 - (LIn + 10 lg(Sm / A0) +
-10 lg N)` dB with the reference absorption area `A0 = 10 m²` and the number
-`N` of element units in the measurement surface.
+For small building elements, `DI,n,e = Lp1 - 6 - (LIn + 10 lg(Sm / A0)) +
+10 lg N` dB with the reference absorption area `A0 = 10 m²` and the number
+`N` of element units in the measurement surface. The printed Formula (8)
+subtracts its `10 lg(N)` term instead of adding it, which is physically
+inconsistent with ISO 10140-2:2010 Formula (6) and ISO 15186-2:2010
+Formula (12); the corrected per-unit form is implemented (see
+`docs/ERRATA.md`).
 
 **Surface pressure-intensity indicator (Clause 3.6 / 6.4.2, Formula (10)).**
-`FpI = Lp - LIn` qualifies the measurement surface: it must stay below
-10 dB for a sound-reflecting specimen (below 6 dB when the receiving side is
+`FpI = Lp - LIn` qualifies the measurement surface: it must not exceed
+10 dB for a sound-reflecting specimen (6 dB when the receiving side is
 sound absorbing), and the probe's pressure-residual intensity index must
 exceed `FpI + 10` dB (Clause 4.1) for the dynamic capability to be adequate.
 
@@ -156,9 +160,9 @@ intensity_element_normalized_difference(
 Intensity element normalized level difference per ISO 15186-1 (Formula (8)).
 
 Computes, per frequency band, the intensity element normalized level
-difference for small building elements
+difference of a single element unit
 
-`DI,n,e = Lp1 - 6 - (LIn + 10 lg(Sm / A0) + 10 lg N)` dB
+`DI,n,e = Lp1 - 6 - (LIn + 10 lg(Sm / A0)) + 10 lg N` dB
 
 from the average source-room sound pressure level `Lp1`, the average
 normal sound intensity level `LIn` over the measurement surface of area
@@ -167,6 +171,18 @@ m²` and the number `N` of element units installed within the surface.
 The weighted rating `DI,n,e,w` is computed via
 [`phonometry.weighted_rating`](/phonometry/reference/api/building/insulation/#weighted_rating) (ISO 717-1) when exactly 16 or 5 values
 are supplied.
+
+:::note
+The printed Formula (8) *subtracts* its `10 lg(N)` term. That sign
+cannot be derived: measuring `N` identical units together raises
+the transmitted power by `10 lg N`, so recovering the per-unit
+`DI,n,e` requires *adding* `10 lg N`, exactly as the
+pressure-based ISO 10140-2:2010 Formula (6) does with its
+`10 lg(nA0/A)` term (and consistently with ISO 15186-2:2010
+Formula (12), which is Formula (8) without an `N` term). This
+function implements the corrected per-unit form and warns when
+`n > 1` deviates from the print (see `docs/ERRATA.md`).
+:::
 
 **Parameters**
 
@@ -244,6 +260,8 @@ with [`combine_subareas`](/phonometry/reference/api/building/intensity-insulatio
 IntensityElementNormalizedResult(
     d_i_n_e: np.ndarray,
     rating: WeightedRatingResult | None,
+    measurement_area: float | None = None,
+    n: int = 1,
 )
 ```
 
@@ -253,8 +271,10 @@ Per-band intensity element normalized level difference (ISO 15186-1).
 
 | Name | Description |
 | :--- | :--- |
-| `d_i_n_e` | Intensity element normalized level difference `DI,n,e = Lp1 - 6 - (LIn + 10 lg(Sm/A0) + 10 lg N)` per band, in dB (Clause 3.9, Formula (8)). |
+| `d_i_n_e` | Intensity element normalized level difference `DI,n,e = Lp1 - 6 - (LIn + 10 lg(Sm/A0)) + 10 lg N` per band, in dB (Clause 3.9, Formula (8) with the corrected sign of its `10 lg N` term; see `docs/ERRATA.md`). |
 | `rating` | Single-number weighted rating `DI,n,e,w` with `C` / `Ctr` (ISO 717-1), or `None` when the band count is neither 16 (one-third octave) nor 5 (octave). |
+| `measurement_area` | Measurement-surface area `Sm`, in m², or `None` on a manually built result (Clause 8 g). |
+| `n` | Number `N` of element units within the measurement surface. |
 
 ### IntensityElementNormalizedResult.plot()
 
@@ -282,34 +302,39 @@ IntensityElementNormalizedResult.report(
     engine: str = 'reportlab',
     verbose: bool = False,
     language: str = 'en',
+    fpi: Sequence[float] | np.ndarray | None = None,
+    residual_index: Sequence[float] | np.ndarray | None = None,
 ) -> str
 ```
 
 Render an ISO 15186-1 element-normalized insulation report to a PDF.
 
-Writes the one-page laboratory test report of ISO 15186-1:2000 for the
-element-normalized level difference `DI,n,e` of a small building
-element measured with sound intensity: the standard-basis line, an
-optional metadata header block, the band table (16 one-third-octave or
-5 octave bands) beside the measured-versus-shifted-reference curve, the
-boxed rating `DI,n,e,w (C; Ctr)` (the element-normalized level
-difference `DI,n,e` rated per ISO 717-1), the intensity-method
-statement, an optional verdict row and a footer with the identity block
-and disclaimer. The report requires the single-number `rating` to be
-present on the result; it is formed automatically only for exactly 16
-one-third-octave (100 Hz to 3150 Hz) or 5 octave (125 Hz to 2000 Hz)
-bands, and a result carrying no rating (any other band count) is
-rejected.
+Writes the one-page laboratory test report of ISO 15186-1:2000
+Clause 8 for the element-normalized level difference `DI,n,e` of a
+small building element measured with sound intensity: the
+standard-basis line, an optional metadata header block, the band table
+(16 one-third-octave or 5 octave bands) beside the
+measured-versus-shifted-reference curve, the boxed rating `DI,n,e,w
+(C; Ctr)` (the element-normalized level difference `DI,n,e` rated
+per ISO 717-1), the intensity-method statement with the
+measurement-surface area `Sm` and unit count `N` when the result
+carries them (Clause 8 g), an optional verdict row and a footer with
+the identity block and disclaimer. The report requires the
+single-number `rating` to be present on the result; it is formed
+automatically only for exactly 16 one-third-octave (100 Hz to 3150 Hz)
+or 5 octave (125 Hz to 2000 Hz) bands, and a result carrying no rating
+(any other band count) is rejected.
 
 The applicable [`ReportMetadata`](/phonometry/reference/api/building/insulation/#reportmetadata) fields describe the
-intensity measurement: `specimen` (the tested element), `area`
-(the element area), `client`, `manufacturer`, `test_room` (the
-laboratory / facility), `laboratory`, `operator`, `report_id` and
+intensity measurement: `specimen` (the tested element and its
+mounting and sealing, Clause 8 e), `area` (the element area),
+`client`, `manufacturer`, `test_room` (the laboratory /
+facility), `laboratory`, `operator`, `report_id` and
 `test_date`, plus the room/climate fields shared with the other
-insulation fiches. The measurement-surface geometry, the number `N`
-of element units and the scanning-versus-discrete-point acquisition
-method are not dedicated metadata fields; record them in `notes`
-(free text) and name the measurement standard in
+insulation fiches. The measurement-surface shape, the measurement
+distance and the scanning-versus-discrete-point acquisition method
+(Clause 8 j-l) are not dedicated metadata fields; record them in
+`notes` (free text) and name the measurement standard in
 `measurement_standard` (`"ISO 15186-1"`). A `requirement` adds a
 PASS/FAIL verdict; the element insulation passes at or above the target.
 
@@ -322,6 +347,8 @@ PASS/FAIL verdict; the element insulation passes at or above the target.
 | `engine` | Rendering back end; only `"reportlab"` is supported. |
 | `verbose` | When `True`, the left table shows the ISO 717 evaluation per band (the `DI,n,e` value, the shifted reference and the unfavourable deviation) instead of the two-column form. |
 | `language` | Fiche language: `"en"` (default, English) or `"es"` (Spanish, with a comma decimal separator). |
+| `fpi` | Optional per-band surface pressure-intensity indicator `FpI` (Clause 8 i requires it as a function of frequency); annexed as a table column when supplied. |
+| `residual_index` | Optional per-band pressure-residual intensity index `δpI0` of the probe and analyser (Clause 8 i); annexed as a table column when supplied. |
 
 **Returns:** The written `path` as a `str`.
 
@@ -329,7 +356,7 @@ PASS/FAIL verdict; the element insulation passes at or above the target.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If `engine` is unknown, `language` is not one of the supported values, or the result carries no single-number rating (its band count is neither 16 one-third-octave nor 5 octave, so the ISO 717-1 rating the fiche needs was not formed). |
+| ValueError | If `engine` is unknown, `language` is not one of the supported values, the result carries no single-number rating (its band count is neither 16 one-third-octave nor 5 octave, so the ISO 717-1 rating the fiche needs was not formed), or `fpi` / `residual_index` do not match the band count. |
 | ImportError | If reportlab is not installed (`pip install phonometry[report]`), or matplotlib is missing for the embedded rating figure (`pip install phonometry[plot]`). |
 
 ## IntensityReductionResult
@@ -340,6 +367,8 @@ IntensityReductionResult(
     r_i_modified: np.ndarray | None,
     rating: WeightedRatingResult | None,
     rating_modified: WeightedRatingResult | None,
+    area: float | None = None,
+    measurement_area: float | None = None,
 )
 ```
 
@@ -353,6 +382,8 @@ Per-band intensity sound reduction index (ISO 15186-1:2000).
 | `r_i_modified` | Modified index `RI,M = RI + Kc` per band, in dB (Clause 3.10, Formula (9)), or `None` when no adaptation term was supplied. |
 | `rating` | Single-number weighted rating `RI,w` with `C` / `Ctr` (ISO 717-1), or `None` when the band count is neither 16 (one-third octave) nor 5 (octave). |
 | `rating_modified` | Weighted rating `RI,M,w` of the modified index, or `None` when unavailable. |
+| `area` | Test-object area `S`, in m², or `None` on a manually built result. Carried so the report can state it (Clause 8 g). |
+| `measurement_area` | Measurement-surface area `Sm`, in m², or `None` on a manually built result (Clause 8 g). |
 
 ### IntensityReductionResult.plot()
 
@@ -378,33 +409,39 @@ IntensityReductionResult.report(
     engine: str = 'reportlab',
     verbose: bool = False,
     language: str = 'en',
+    fpi: Sequence[float] | np.ndarray | None = None,
+    residual_index: Sequence[float] | np.ndarray | None = None,
 ) -> str
 ```
 
 Render an ISO 15186-1 intensity sound-insulation report to a PDF.
 
-Writes the one-page laboratory test report of ISO 15186-1:2000 for
-sound insulation measured with sound intensity: the standard-basis
-line, an optional metadata header block, the band table (16
-one-third-octave or 5 octave bands) beside the
+Writes the one-page laboratory test report of ISO 15186-1:2000
+Clause 8 for sound insulation measured with sound intensity: the
+standard-basis line, an optional metadata header block, the band table
+(16 one-third-octave or 5 octave bands) beside the
 measured-versus-shifted-reference curve, the boxed rating `RI,w
 (C; Ctr)` (the intensity sound reduction index `RI` rated per
-ISO 717-1), the intensity-method statement, an optional verdict row and
-a footer with the identity block and disclaimer. The report requires
-the single-number `rating` to be present on the result; it is formed
-automatically only for exactly 16 one-third-octave (100 Hz to 3150 Hz)
-or 5 octave (125 Hz to 2000 Hz) bands, and a result carrying no rating
-(any other band count) is rejected.
+ISO 717-1), the intensity-method statement with the test-object and
+measurement-surface areas `S` / `Sm` when the result carries them
+(Clause 8 g), an optional verdict row and a footer with the identity
+block and disclaimer. The report requires the single-number `rating`
+to be present on the result; it is formed automatically only for
+exactly 16 one-third-octave (100 Hz to 3150 Hz) or 5 octave (125 Hz
+to 2000 Hz) bands, and a result carrying no rating (any other band
+count) is rejected.
 
 The applicable [`ReportMetadata`](/phonometry/reference/api/building/insulation/#reportmetadata) fields describe the
-intensity measurement: `specimen` (the tested element), `area`
-(specimen area `S`), `client`, `manufacturer`, `test_room` (the
-laboratory / facility), `laboratory`, `operator`, `report_id` and
-`test_date`, plus the room/climate fields shared with the other
-insulation fiches. The measurement-surface geometry and the
-scanning-versus-discrete-point acquisition method are not dedicated
-metadata fields; record them in `notes` (free text) and name the
-measurement standard in `measurement_standard` (`"ISO 15186-1"`).
+intensity measurement: `specimen` (the tested element and its
+mounting, sealing and mass per unit area, Clause 8 e), `client`,
+`manufacturer`, `test_room` (the laboratory / facility),
+`laboratory`, `operator`, `report_id` and `test_date`, plus
+the room/climate fields shared with the other insulation fiches. The
+measurement-surface shape, the measurement distance and the
+scanning-versus-discrete-point acquisition method (Clause 8 j-l) are
+not dedicated metadata fields; record them in `notes` (free text)
+and name the measurement standard in `measurement_standard`
+(`"ISO 15186-1"`).
 
 **Parameters**
 
@@ -415,6 +452,8 @@ measurement standard in `measurement_standard` (`"ISO 15186-1"`).
 | `engine` | Rendering back end; only `"reportlab"` is supported. |
 | `verbose` | When `True` and the Kc-modified index `RI,M` is available, the table annexes `RI,M` beside the reported `RI`. |
 | `language` | Fiche language: `"en"` (default, English) or `"es"` (Spanish, with a comma decimal separator). |
+| `fpi` | Optional per-band surface pressure-intensity indicator `FpI` (Clause 8 i requires it as a function of frequency); annexed as a table column when supplied. |
+| `residual_index` | Optional per-band pressure-residual intensity index `δpI0` of the probe and analyser (Clause 8 i); annexed as a table column when supplied. |
 
 **Returns:** The written `path` as a `str`.
 
@@ -422,7 +461,7 @@ measurement standard in `measurement_standard` (`"ISO 15186-1"`).
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If `engine` is unknown, `language` is not one of the supported values, or the result carries no single-number rating (its band count is neither 16 one-third-octave nor 5 octave, so the ISO 717-1 rating the fiche needs was not formed). |
+| ValueError | If `engine` is unknown, `language` is not one of the supported values, the result carries no single-number rating (its band count is neither 16 one-third-octave nor 5 octave, so the ISO 717-1 rating the fiche needs was not formed), or `fpi` / `residual_index` do not match the band count. |
 | ImportError | If reportlab is not installed (`pip install phonometry[report]`), or matplotlib is missing for the embedded rating figure (`pip install phonometry[plot]`). |
 
 ## surface_pressure_intensity_indicator
@@ -439,10 +478,11 @@ Surface pressure-intensity indicator `FpI` (ISO 15186-1, Formula (10)).
 Returns `FpI = Lp - LIn` per band from the surface- and time-averaged
 sound pressure level `Lp` and normal sound intensity level `LIn` on
 the measurement surface (Clause 3.6 / 6.4.2). The measurement surface is
-adequately qualified when `FpI` stays below 10 dB for a sound-reflecting
-specimen, or below 6 dB when the receiving side is sound absorbing; in
-addition the probe's pressure-residual intensity index must exceed
-`FpI + 10` dB (Clause 4.1).
+adequately qualified when `FpI` does not exceed 10 dB for a
+sound-reflecting specimen, or 6 dB when the receiving side is sound
+absorbing (Clause 6.4.2 flags `FpI > 10 dB` / `FpI > 6 dB` as not
+satisfactory); in addition the probe's pressure-residual intensity index
+must exceed `FpI + 10` dB (Clause 4.1).
 
 **Parameters**
 

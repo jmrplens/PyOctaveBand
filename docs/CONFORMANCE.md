@@ -181,7 +181,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ISO 10140-5:2010+A1 Annex B, Table B.1 | Reference elements end-to-end: printed Rw (C; Ctr) of all three | Rw(C;Ctr) = 53(-1;-5) / 52(-1;-5) / 33(-1;-2) | 53(-1;-5) / 52(-1;-5) / 33(-1;-2) | exact | &#9989; |
 | ISO 10140-5:2010+A1 Annex C, Table C.1 | Reference floors end-to-end: printed Ln,t,r,0,w (CI) of both | Ln,t,r,0,w(CI) = 72(0) / 75(-3) | 72(0) / 75(-3) | exact | &#9989; |
 | ISO 15186-1:2000 Formula (7) | Intensity RI on the ISO 717-1 reference shape -> RI,w = 30 | RI,w 30 dB (scalar anchor RI = 34 dB) | RI,w 30 dB (RI = 34 dB) | +0 dB | &#9989; |
-| ISO 15186-1:2000 Annex B, Table B.1 | Adaptation term Kc: all 18 printed rows; (B.1) reduces to (B.2) | max abs(Kc - Table B.1) <= 0,05 dB (1 dp print) | 0.046 dB (B.1 vs B.2: 4.33e-04 dB) | 0.046 dB | &#9989; |
+| ISO 15186-1:2000 Annex B, Table B.1 | Adaptation term Kc: all 21 printed rows; (B.1) reduces to (B.2) | max abs(Kc - Table B.1) <= 0,05 dB (1 dp print) | 0.047 dB (B.1 vs B.2: 4.33e-04 dB) | 0.047 dB | &#9989; |
 | ISO 10052:2021 Clause 3.6 | Survey R' applies the V/7,5 minimum-area rule | 26.197888 dB (+/-0 dB) | 26.197888 dB | 0 dB | &#9989; |
 | ISO 10052:2021 Clause 3.16 | Service-equipment LXY is the 3-position energy average | 32.823329 dB (+/-0 dB) | 32.823329 dB | 0 dB | &#9989; |
 | ISO 10052:2021 Table 4 | Reverberation-index estimate (35 <= V < 60, type g) | k = [4.5, 5.0, 5.5, 5.5, 5.5] dB | k = [4.5, 5.0, 5.5, 5.5, 5.5] dB | exact | &#9989; |

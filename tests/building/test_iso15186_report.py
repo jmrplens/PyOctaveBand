@@ -285,7 +285,7 @@ def test_clause8_areas_stated_in_statement(tmp_path) -> None:
     out = tmp_path / "areas.pdf"
     _intensity_result().report(str(out))
     text = " ".join(_extract_text(str(out)).split())
-    assert "Test object area S = 10" in text
+    assert "S = 10" in text
     assert "= 12" in text  # Sm = 12 m2
     assert "Clause 8" in text
 

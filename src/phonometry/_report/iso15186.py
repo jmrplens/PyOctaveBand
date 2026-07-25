@@ -132,16 +132,15 @@ def _areas_sentence(
     """
     if area is not None and measurement_area is not None:
         key = (
-            "Test object area S = {s} m<super>2</super>; measurement surface "
-            "area S<sub>m</sub> = {sm} m<super>2</super> (ISO 15186-1:2000 "
-            "Clause 8)."
+            "S = {s} m<super>2</super>; S<sub>m</sub> = {sm} "
+            "m<super>2</super> (ISO 15186-1:2000 Clause 8)."
         )
     elif area is not None:
-        key = "Test object area S = {s} m<super>2</super> (ISO 15186-1:2000 Clause 8)."
+        key = "S = {s} m<super>2</super> (ISO 15186-1:2000 Clause 8)."
     elif measurement_area is not None:
         key = (
-            "Measurement surface area S<sub>m</sub> = {sm} m<super>2</super> "
-            "(ISO 15186-1:2000 Clause 8)."
+            "S<sub>m</sub> = {sm} m<super>2</super> (ISO 15186-1:2000 "
+            "Clause 8)."
         )
     else:
         return ""
