@@ -677,6 +677,12 @@ print(round(mc.c1, 4), round(mc.c2, 4))   # -0.1282 0.0
 print(round(emission.precision_uncertainty(0.5, 2.0, 2.0), 3))   # 4.123
 ```
 
+The `MeteorologicalCorrection` is a pair of scalars (plus the per-band `C3`
+when the attenuation coefficient is supplied per band) rather than a
+plottable spectrum: the corrections fold into the
+`PrecisionSoundPowerResult` as its `c1`/`c2`/`c3` fields, and the `.report()`
+fiche prints them on its measurement-basis strip.
+
 Over several bands `sound_power_anechoic` returns a plottable
 `PrecisionSoundPowerResult` carrying the per-band `LW` and the A-weighted total:
 
@@ -771,7 +777,8 @@ print(round(float(res.sound_power_level[0]), 2))    # 80.0
 ```
 
 Across several bands the result carries the per-band `LW` (`NaN` where the net
-power is non-positive) and flags those bands `not_applicable`:
+power is non-positive), flags those bands `not_applicable`, and draws them
+with the one-line `result.plot()` of the figure below:
 
 ```python
 import numpy as np
@@ -845,6 +852,258 @@ plt.show()
 
 </details>
 
+## 6. The measurement report (`.report()`)
+
+A sound power determination ends as a *document*. Every result of this page
+stays plottable while it is being worked on — `res.plot()` draws the same
+`LW` spectrum interactively that the fiche typesets — and the report step
+wraps it into the deliverable. Both the enveloping-surface result
+(`SoundPowerResult`, ISO 3744/3746) and the precision result
+(`PrecisionSoundPowerResult`, ISO 3745) expose a `.report()` method that writes
+a one-page PDF fiche laid out like a sound-power test sheet: the standard-basis
+line naming the applied method and accuracy grade, an optional metadata header
+(client, noise source, test environment, instrumentation, climate, date), a
+per-band table (nominal octave/one-third-octave frequency, the surface
+sound-pressure level `Lp` and the band sound-power level `LW`), the
+sound-power spectrum `LW(f)` with a nominal band axis, and a boxed A-weighted
+sound power level `LWA` (dB re 1 pW) with the total `LW`, the expanded
+uncertainty `U` and the measurement surface area `S` alongside.
+
+The metadata is supplied through a `ReportMetadata`, whose applicable fields
+here are the **source description** (`specimen`), the **test environment**
+(`test_room`), the **client**, the **instrumentation**, the **temperature**,
+**relative humidity** and **ambient pressure**, the **date of test**
+(`test_date`) and the footer identity (`laboratory`, `operator`, `report_id`,
+`notes`); the measurement surface area `S` comes from the result itself and is
+printed in the result box and the basis strip, together with the applied
+corrections (the background `K1` and environmental `K2` for the ISO 3744/3746
+surface method, or the meteorological `C1`/`C2`/`C3` for the ISO 3745
+precision method). Supplying `requirement` adds a PASS/FAIL verdict against a
+declared A-weighted sound-power limit (a sound-power emission is a quantity where
+less is better, so the source passes at or below the limit). `verbose=True`
+adds the energy-averaged level `Lp'` to the table, and for the ISO 3744/3746
+surface result it also adds the `K1`/`K2` correction columns (the ISO 3745
+precision result carries no `K1`/`K2`; its `C1`/`C2`/`C3` appear in the
+basis strip). `language="es"` renders the Spanish fiche with comma decimals.
+
+```python
+import numpy as np
+from phonometry import ReportMetadata, emission
+
+freqs = np.array([63, 125, 250, 500, 1000, 2000, 4000, 8000], float)
+# Ten identical position spectra over a hemisphere of radius 4 m; background a
+# uniform 10 dB below and an equivalent absorption area A = 1500 m^2 (so K1, K2
+# are meaningful and within the engineering validity limit).
+surface = np.array([72.0, 76, 80, 82, 81, 78, 73, 66])
+res = emission.sound_power_pressure(
+    np.tile(surface, (10, 1)), "hemisphere", radius=4.0,
+    background_levels=np.tile(surface - 10.0, (10, 1)),
+    frequencies=freqs, absorption_area=1500.0, grade="engineering",
+)
+
+res.report(
+    "sound_power.pdf",
+    metadata=ReportMetadata(
+        client="Example manufacturing plant",
+        specimen="Hydraulic power pack (floor-standing)",
+        test_room="Hemi-anechoic room over a reflecting floor",
+        instrumentation="Class 1 sound level meter (IEC 61672-1), s/n 0042",
+        laboratory="Phonometry reference example",
+        report_id="EXAMPLE-3744",
+        requirement=105.0,
+    ),
+)   # LWA = 103.7 dB(A) re 1 pW -> declared limit 105 dB(A): PASS
+```
+
+The example fiche, regenerated with `make reports`, is kept rendered in the
+repository. Click the preview to open the PDF:
+
+[![ISO 3744 sound power determination example report: a header with the client, the noise source, the hemi-anechoic test environment and the instrumentation and climate, the octave-band table (63 Hz to 8 kHz) of surface sound-pressure levels Lp and band sound-power levels LW, the sound-power spectrum LW(f) with a nominal band axis, the boxed A-weighted sound power level LWA = 103.7 dB(A) re 1 pW with the total LW = 105.8 dB, the expanded uncertainty U = 3.0 dB and the measurement surface S = 100.53 m2, and a PASS verdict against the declared 105 dB(A) limit, closed by a basis strip stating the applied K1 = 0.5 dB and K2 = 1.0 dB corrections](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso3744_sound_power_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso3744_sound_power_example.pdf)
+
+*Sound power determination fiche (`SoundPowerResult.report`), an ISO 3744
+engineering-grade hemisphere measurement with the K1/K2 corrections and the
+boxed LWA.*
+
+### The intensity determination (ISO 9614-2)
+
+The intensity-scanning result (`SoundPowerIntensityResult`, ISO 9614-2) writes
+the same one-page fiche through its own `.report()`. The standard-basis line
+names ISO 9614-2:1996 and the measurement grade, the per-band table lists the
+intensity-derived band sound-power level `LW`, and the boxed `LWA` carries
+the total `LW`, the measurement surface `S` and the determination grade
+(the intensity result has no expanded uncertainty `U`). `verbose=True` adds the
+field indicators `FpI` (surface pressure-intensity) and `F+/-`
+(negative partial power) and the per-band achieved grade; the basis strip
+states the partial-power model (the segment partial powers `Pi = In,i·Si`
+summing to `P`) and the Annex B qualification criteria. A band whose net power
+is non-positive is not determinable (clause 9.2) and prints an em dash.
+
+```python
+import numpy as np
+from phonometry import ReportMetadata, emission
+
+freqs = np.array([125, 250, 500, 1000, 2000, 4000], float)
+# Six equal 0.5 m^2 segments (S = 3.0 m^2); one uniform normal-intensity
+# spectrum scanned twice, with the surface SPL and the instrument residual
+# index that qualify every band at engineering grade.
+intensity = np.array([0.6e-4, 1.0e-4, 1.5e-4, 1.4e-4, 0.9e-4, 0.5e-4])
+scan = np.tile(intensity, (6, 1))
+res = emission.sound_power_intensity(
+    scan, np.full(6, 0.5), normal_intensity_2=scan.copy(),
+    pressure_levels=np.full((6, 6), 80.0), pressure_residual_index=15.0,
+    frequencies=freqs, band_type="octave", grade="engineering",
+)
+
+res.report(
+    "sound_power_intensity.pdf",
+    metadata=ReportMetadata(
+        client="Example manufacturing plant",
+        specimen="Hydraulic power pack (floor-standing)",
+        test_room="Machine hall with steady background noise",
+        instrumentation="Class 1 p-p intensity probe (IEC 61043), s/n 0042",
+        laboratory="Phonometry reference example",
+        report_id="EXAMPLE-9614",
+        requirement=93.0,
+    ),
+)   # LWA = 90.9 dB(A) re 1 pW -> declared limit 93 dB(A): PASS
+```
+
+The example fiche, regenerated with `make reports`, is kept rendered in the
+repository. Click the preview to open the PDF:
+
+[![ISO 9614-2 sound power by intensity example report: a header with the client, the noise source, the machine-hall test environment and the intensity probe and climate, the octave-band table (125 Hz to 4 kHz) of intensity-derived band sound-power levels LW, the sound-power spectrum LW(f) with a nominal band axis, the boxed A-weighted sound power level LWA = 90.9 dB(A) re 1 pW with the total LW = 92.5 dB, the measurement surface S = 3.00 m2 and the engineering grade, and a PASS verdict against the declared 93 dB(A) limit, closed by a basis strip stating the partial-power model, the field indicators FpI and F+/- and the Annex B qualification criteria](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso9614_sound_power_intensity_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso9614_sound_power_intensity_example.pdf)
+
+*Sound power by intensity fiche (`SoundPowerIntensityResult.report`), an
+ISO 9614-2 engineering-grade scan with the field indicators and the boxed
+LWA.*
+
+### The reverberation-room determination (ISO 3741)
+
+The reverberation-room result (`ReverberationSoundPowerResult`, ISO 3741) writes
+the same one-page fiche through its own `.report()`. The standard-basis line
+names ISO 3741:2010 and the precision accuracy grade (grade 1) and states which
+method was used, the direct method using the room equivalent absorption area
+(Eq. 20) or the comparison method using a reference sound source (Eq. 21). The
+per-band table lists the mean room sound-pressure level `Lp` and the band
+sound-power level `LW`, and the boxed `LWA` carries the total `LW` and the
+determination method (the reverberation result has no expanded uncertainty `U`).
+`verbose=True` adds the background correction `K1` and, for the direct method,
+the equivalent absorption area `A` and the Waterhouse boundary correction `Cw`;
+the basis strip states the correction model (Eq. 20 or Eq. 21), the applied
+meteorological corrections `C1`/`C2` and the speed of sound, and cites the
+Annex F A-weighting.
+
+```python
+import numpy as np
+from phonometry import ReportMetadata, emission
+
+freqs = np.array([125, 250, 500, 1000, 2000, 4000, 8000], float)
+# Octave-band mean room sound-pressure levels in a qualified
+# reverberation room of V = 200 m3, S = 240 m2, with a uniform T60 = 2.0 s.
+lp = np.array([80.0, 83.0, 85.0, 84.0, 80.0, 75.0, 68.0])
+res = emission.sound_power_reverberation(
+    lp, 2.0, volume=200.0, surface_area=240.0, frequencies=freqs,
+    temperature=20.0, static_pressure=101.325,
+)
+
+res.report(
+    "sound_power_reverberation.pdf",
+    metadata=ReportMetadata(
+        client="Example manufacturing plant",
+        specimen="Hydraulic power pack (floor-standing)",
+        test_room="Qualified reverberation room, V = 200 m3, T60 = 2.0 s",
+        instrumentation="Class 1 sound level meter (IEC 61672-1), s/n 0042",
+        laboratory="Phonometry reference example",
+        report_id="EXAMPLE-3741",
+        requirement=96.0,
+    ),
+)   # LWA = 94.3 dB(A) re 1 pW -> declared limit 96 dB(A): PASS
+```
+
+The example fiche, regenerated with `make reports`, is kept rendered in the
+repository. Click the preview to open the PDF:
+
+[![ISO 3741 reverberation-room sound power example report: a header with the client, the noise source, the qualified reverberation test room and the instrumentation and climate, the octave-band table (125 Hz to 8 kHz) of mean room sound-pressure levels Lp and band sound-power levels LW, the sound-power spectrum LW(f) with a nominal band axis, the boxed A-weighted sound power level LWA = 94.3 dB(A) re 1 pW with the total LW = 96.7 dB and the direct determination method, and a PASS verdict against the declared 96 dB(A) limit, closed by a basis strip stating the Eq. 20 correction model with the Sabine absorption area, the Waterhouse boundary term and the meteorological corrections C1 and C2, and the Annex F A-weighting](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso3741_reverberation_power_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso3741_reverberation_power_example.pdf)
+
+*Reverberation-room sound power fiche (`ReverberationSoundPowerResult.report`),
+an ISO 3741 precision-grade direct-method determination with the Waterhouse and
+C1/C2 corrections and the boxed LWA.*
+
+## 7. Declaring the noise emission (ISO 4871)
+
+A measured sound power level is not yet a *declaration*. ISO 4871:1996 is the
+standard for the noise-emission declaration a manufacturer prints in technical
+documents: which quantities are stated, in which form, and how a declared value
+is verified. The preferred quantity is the A-weighted sound power level
+`L_WA`, optionally accompanied by the A-weighted emission sound pressure level
+`L_pA` at a work station.
+
+A declaration takes one of two alternative forms (clause 4):
+
+- the **dual-number** form (clause 3.16): the measured value `L_WA` and its
+  uncertainty `K_WA` stated together but separately; and
+- the **single-number** form (clause 3.15): the derived declared value
+  `L_WAd = L_WA + K_WA`, an upper limit that repeated measurements are unlikely
+  to exceed at the stated confidence level.
+
+`K_WA` combines the measurement (reproducibility) and, for a batch, the
+production spread; for a single machine `K = 1.645 sigma_R` (Annex A.2.2). A
+`NoiseEmissionDeclaration` holds one or more per-operating-mode declarations
+and renders the ISO 4871 fiche through `.report()`. The quickest route is to
+`declare()` straight from a measured sound power:
+
+```python
+import numpy as np
+import phonometry as ph
+from phonometry import ReportMetadata
+
+# ... a measured LWA from ISO 3744 ...
+result = ph.sound_power_pressure(levels, "hemisphere", radius=1.0,
+                                 frequencies=freqs)
+
+declaration = result.declare(
+    uncertainty=2.0,                 # K_WA in dB (defaults to the expanded U)
+    machine="Type 990, Model 11-TC",
+    operating_conditions="50 Hz, 230 V, rated load",
+    basic_standards="ISO 3744",
+    verification_level=result.sound_power_level_a,  # L_1 for clause 6.2
+)
+declaration.report(
+    "iso4871.pdf",
+    metadata=ReportMetadata(measurement_standard="ISO 3744"),
+)   # -> L_WAd = L_WA + K_WA, verified when L_1 <= L_WAd
+```
+
+Or build the declaration directly, reproducing the ISO 4871 Annex B example
+(two operating modes, `L_WA = 88` and `95` dB with `K_WA = 2` dB, giving
+declared `L_WAd = 90` and `97` dB):
+
+```python
+mode1 = ph.OperatingModeDeclaration(
+    "Operating mode 1", sound_power_level=88.0, sound_power_uncertainty=2.0,
+    emission_pressure_level=78.0, emission_pressure_uncertainty=2.0,
+    verification_level=89.0,          # passes: 89 <= 90
+)
+mode2 = ph.OperatingModeDeclaration(
+    "Operating mode 2", sound_power_level=95.0, sound_power_uncertainty=2.0,
+    emission_pressure_level=86.0, emission_pressure_uncertainty=2.0,
+    verification_level=98.0,          # fails: 98 > 97
+)
+ph.NoiseEmissionDeclaration(
+    (mode1, mode2), machine="Type 990, Model 11-TC",
+    basic_standards=("ISO 3744", "ISO 11202"), form="dual-number",
+).report("iso4871.pdf")
+```
+
+The example fiche, regenerated with `make reports`, is kept rendered in the
+repository. Click the preview to open the PDF:
+
+[![ISO 4871 noise emission declaration example report: a header with the machine identification and operating conditions, the declared dual-number table across two operating-mode columns listing the measured A-weighted sound power level L_WA, its uncertainty K_WA, the emission sound pressure level L_pA and the derived declared value L_WAd = L_WA + K_WA (90 and 97 dB), the noise-test-code and basic-standards footnote, and a clause 6.2 verification table where mode 1 passes and mode 2 fails](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso4871_declaration_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso4871_declaration_example.pdf)
+
+*Noise emission declaration fiche (`NoiseEmissionDeclaration.report`), the
+ISO 4871 Annex B dual-number table with the declared `L_WAd = L_WA + K_WA` and
+the clause 6.2 verification verdict.*
+
 ## See also
 
 - [Sound Intensity (p-p)](intensity.md): the two-microphone probe, its
@@ -895,6 +1154,12 @@ plt.show()
   hemi-anechoic rooms* (ISO 3745:2012).
   [iso.org catalogue](https://www.iso.org/standard/45362.html).
   The precision anechoic-room method of section 4.
+- International Organization for Standardization. (1996). *Acoustics —
+  Declaration and verification of noise emission values of machinery and
+  equipment* (ISO 4871:1996).
+  [iso.org catalogue](https://www.iso.org/standard/10868.html).
+  The declaration behind section 7: the dual/single-number forms,
+  `L_WAd = L_WA + K_WA` (clause 3.15) and the clause 6.2 verification.
 
 ## Standards
 
@@ -916,4 +1181,7 @@ noise sources using sound intensity — Part 2: Measurement by scanning* — the
 partial powers, the `FpI` and `F+/-` field indicators and the grade criteria.
 ISO 9614-3:2002, *… Part 3: Precision method for measurement by scanning*:
 the grade-1 scanning method, its field indicators and the clause 9.2
-not-applicable flagging.
+not-applicable flagging. ISO 4871:1996, *Acoustics — Declaration and
+verification of noise emission values of machinery and equipment*: the
+dual-number and single-number declaration forms, the declared value
+`L_WAd = L_WA + K_WA` and the clause 6.2 verification of section 7.
