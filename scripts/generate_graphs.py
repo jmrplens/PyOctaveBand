@@ -13,7 +13,7 @@ for _threads_var in (
 ):
     os.environ.setdefault(_threads_var, "1")
 
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from functools import cache, lru_cache
 from typing import Any, Literal
 
@@ -1467,32 +1467,32 @@ _ES_PATTERNS = [
     (r"^\$L_\{WA\}\$ = (\d+)\.(\d+) dB\(A\)$", r"$L_{WA}$ = \1,\2 dB(A)"),
     # Their multi-line info boxes are single Text artists, so the whole
     # joined string is matched at once (values stay as capture groups).
-    (r"^Rw\(C;Ctr\) = (.+)\nC50-5000 = (.+)\n"
-     r"rating on the core bands, terms on the full range$",
-     "Rw(C;Ctr) = \\1\nC50-5000 = \\2\n"
-     "índice en las bandas básicas, términos en el rango completo"),
-    (r"^Dls,2m,nT,w\(C;Ctr\) = (.+) dB\n45° loudspeaker method "
-     r"\(-1\.5 dB on R'\)$",
+    ((r"^Rw\(C;Ctr\) = (.+)\nC50-5000 = (.+)\n"
+      r"rating on the core bands, terms on the full range$"),
+     ("Rw(C;Ctr) = \\1\nC50-5000 = \\2\n"
+      "índice en las bandas básicas, términos en el rango completo")),
+    ((r"^Dls,2m,nT,w\(C;Ctr\) = (.+) dB\n45° loudspeaker method "
+      r"\(-1\.5 dB on R'\)$"),
      "Dls,2m,nT,w(C;Ctr) = \\1 dB\nmétodo del altavoz a 45° (-1,5 dB en R')"),
-    (r"^L'nT,w\(CI\) = (.+) dB\nnote the minus sign: a live room lowers "
-     r"L'nT$",
+    ((r"^L'nT,w\(CI\) = (.+) dB\nnote the minus sign: a live room lowers "
+      r"L'nT$"),
      "L'nT,w(CI) = \\1 dB\natención al signo menos: una sala viva reduce L'nT"),
-    (r"^LW = Lp,in \+ Cd - R' \+ 10 lg\(S/S0\)\nwall 176 m² \+ industrial "
-     r"door 24 m², Cd = -5 dB$",
-     "LW = Lp,in + Cd - R' + 10 lg(S/S0)\n"
-     "muro de 176 m² + puerta industrial de 24 m², Cd = -5 dB"),
-    (r"^Rw\(C;Ctr\) = (.+) dB\n6 mm float glass, m'' = 15 kg/m², "
-     r"η = 0\.024$",
+    ((r"^LW = Lp,in \+ Cd - R' \+ 10 lg\(S/S0\)\nwall 176 m² \+ industrial "
+      r"door 24 m², Cd = -5 dB$"),
+     ("LW = Lp,in + Cd - R' + 10 lg(S/S0)\n"
+      "muro de 176 m² + puerta industrial de 24 m², Cd = -5 dB")),
+    ((r"^Rw\(C;Ctr\) = (.+) dB\n6 mm float glass, m'' = 15 kg/m², "
+      r"η = 0\.024$"),
      "Rw(C;Ctr) = \\1 dB\nvidrio flotado de 6 mm, m'' = 15 kg/m², η = 0,024"),
-    (r"^Kij = 10 lg\(1/τ̄\) \+ 5 lg\(fc2/1000\)\nconcrete, plate 1 fixed "
-     r"at 100 mm$",
+    ((r"^Kij = 10 lg\(1/τ̄\) \+ 5 lg\(fc2/1000\)\nconcrete, plate 1 fixed "
+      r"at 100 mm$"),
      "Kij = 10 lg(1/τ̄) + 5 lg(fc2/1000)\nhormigón, placa 1 fija en 100 mm"),
-    (r"^below f0: stiffness-controlled, \|Y\| ~ ω/k\n"
-     r"above f0: mass-controlled, \|Y\| ~ 1/\(ωm\)\n"
-     r"f0 = (.+) Hz,  1/c = (.+) m/\(N·s\)$",
-     "por debajo de f0: dominio de la rigidez, |Y| ~ ω/k\n"
-     "por encima de f0: dominio de la masa, |Y| ~ 1/(ωm)\n"
-     "f0 = \\1 Hz,  1/c = \\2 m/(N·s)"),
+    ((r"^below f0: stiffness-controlled, \|Y\| ~ ω/k\n"
+      r"above f0: mass-controlled, \|Y\| ~ 1/\(ωm\)\n"
+      r"f0 = (.+) Hz,  1/c = (.+) m/\(N·s\)$"),
+     ("por debajo de f0: dominio de la rigidez, |Y| ~ ω/k\n"
+      "por encima de f0: dominio de la masa, |Y| ~ 1/(ωm)\n"
+      "f0 = \\1 Hz,  1/c = \\2 m/(N·s)")),
 ]
 
 
@@ -9298,7 +9298,7 @@ _THIRD_OCTAVE_16 = [100, 125, 160, 200, 250, 315, 400, 500,
                     630, 800, 1000, 1250, 1600, 2000, 2500, 3150]
 
 
-def _band_index_axis(ax: Any, freqs: list[float] | np.ndarray,
+def _band_index_axis(ax: Any, freqs: Sequence[float] | np.ndarray,
                      fontsize: int = 8) -> np.ndarray:
     """Rotated nominal band labels on an index axis (band-data figures)."""
     x = np.arange(len(freqs))
@@ -9594,8 +9594,8 @@ def generate_intensity_element_insulation(output_dir: str) -> None:
 
     panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
-        f"DI,n,e,w(C;Ctr) = {res.rating.rating}"
-        f"({res.rating.c};{res.rating.ctr}) dB",
+        (f"DI,n,e,w(C;Ctr) = {res.rating.rating}"
+         f"({res.rating.c};{res.rating.ctr}) dB"),
         "DI,n,e = Lp1 - 6 - [LIn + 10 lg(Sm/A0)] + 10 lg N",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
@@ -9645,8 +9645,8 @@ def generate_flanking_level_difference(output_dir: str) -> None:
 
     panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
-        f"Dn,f,w(C;Ctr) = {res.rating.rating}"
-        f"({res.rating.c};{res.rating.ctr}) dB",
+        (f"Dn,f,w(C;Ctr) = {res.rating.rating}"
+         f"({res.rating.c};{res.rating.ctr}) dB"),
         "Dn,f = L1 - L2 - 10 lg(A/A0)",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
