@@ -734,6 +734,9 @@ class ShapedSweepResult:
         (constant-envelope) interval, in dB. A time-domain swept sine has
         the ideal 3.02 dB; the frequency-domain synthesis stays close to
         it (Mueller & Massarani 2001, Sec. 4.3: normally below 4 dB).
+        Their figure assumes the slight magnitude smoothing the paper
+        applies before synthesis, which this module does not implement:
+        typical shaped sweeps here measure about 4.2-4.3 dB.
     """
 
     signal: np.ndarray

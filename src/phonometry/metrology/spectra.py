@@ -1318,10 +1318,12 @@ def multitaper_psd(
     convergence): wherever the local spectrum is weak relative to the
     broad-band leakage each taper could carry, the leakier high-order
     tapers are downweighted, trading degrees of freedom (Eq. 370b) for
-    leakage protection in high-dynamic-range spectra. For a locally white
-    spectrum the weights converge to uniform and nothing is lost. With
-    ``adaptive=False`` the eigenvalue-weighted average of P&W Eq. 369a is
-    returned.
+    leakage protection in high-dynamic-range spectra. The broadband
+    ``σ²`` driving the weights is ``mean(x²)`` with no mean removal,
+    consistent with the no-detrending calibration below. For a locally
+    white spectrum the weights converge to uniform and nothing is lost.
+    With ``adaptive=False`` the eigenvalue-weighted average of P&W
+    Eq. 369a is returned.
 
     Calibration matches the Welch estimators of this module exactly: no
     detrending, ``'density'`` scaling integrates to the signal power
@@ -1353,6 +1355,9 @@ def multitaper_psd(
     scaling_v = _validate_scaling(scaling)
     conf = _validate_confidence(confidence)
     nw, k = _validate_multitaper_params(xa.size, time_half_bandwidth, n_tapers)
+    # Broadband power sigma^2 for the adaptive weights: mean(x^2) without
+    # mean removal, consistent with the module-wide no-detrending
+    # calibration (a DC offset counts as signal power here too).
     power = float(np.mean(xa * xa))
     if power <= 0.0:
         raise ValueError("'x' must not be identically zero.")
@@ -1361,6 +1366,10 @@ def multitaper_psd(
     if adaptive:
         d = _adaptive_multitaper_weights(sk, eigenvalues, power / fs_v)
     else:
+        # Eigenvalue-weighted average, cited in the docstring as P&W
+        # Eq. 369a; the equation number is pending verification against
+        # the book (source copy not yet acquired). The formula itself is
+        # Thomson's standard lambda_k-weighted eigenspectrum average.
         d = eigenvalues[:, np.newaxis] * np.ones_like(sk)
     weights = d / np.sum(d, axis=0)
     psd = np.sum(weights * sk, axis=0)

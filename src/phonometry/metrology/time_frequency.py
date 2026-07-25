@@ -94,10 +94,13 @@ class SpectrogramResult:
         exact calibration of
         :func:`~phonometry.metrology.spectra.power_spectral_density`:
         the column mean over time reproduces the Welch spectrum bin by
-        bin, and integrating ``'density'`` columns over frequency and
-        summing over time recovers the record energy exactly when the
-        squared taper overlap-adds to a constant (e.g. Hann at 75 %
-        overlap).
+        bin. Integrating a ``'density'`` column over frequency gives that
+        segment's taper-weighted mean square ``Σ(x·w)²/Σw²``; summing
+        those over time *and multiplying by the hop duration* ``hop/fs``
+        recovers the record energy ``Σx²/fs`` when the squared taper
+        overlap-adds to a constant (e.g. Hann at 75 % overlap), up to the
+        taper roll-off at the record edges (the first and last segments
+        are under-weighted: about 1-2 % low for typical records).
     :ivar time_resolution: Segment duration ``T_B = nperseg/fs``, in
         seconds - the time resolution of the display.
     :ivar resolution_bandwidth: Effective noise bandwidth ``Bₑ`` of the
