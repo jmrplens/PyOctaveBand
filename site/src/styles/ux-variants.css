@@ -1,0 +1,332 @@
+/* Page header chips and API sidebar treatments: switchable prototypes.
+
+   The sidebar carries no standards information at all. That decision is
+   final: the tree stays exactly as it is and everything about "what governs
+   this page" lives in the page header, one row per page, derived from the
+   page's own `references` frontmatter (PageChips.astro plus
+   src/lib/reference-chips.ts).
+
+   Two independent attributes on <html>, applied before first paint by the
+   switcher script in Head.astro and persisted in localStorage:
+
+     data-page-chips='header'  the quiet run: tinted text, one small colour
+                               dot leading each category.
+     data-page-chips='pills'   the same content as outlined pills, so the
+                               chips read as the links they are.
+     data-page-chips='filled'  outlined pills with a faint category tint.
+     data-page-chips='off'     no run at all.
+
+     data-api-style='inline'    the API reference group renders fully
+                                expanded in place (status quo).
+     data-api-style='collapsed' the API group gets a caret and folds; it
+                                starts folded on guide pages and unfolded on
+                                API pages.
+     data-api-style='split'     topic-style split: on guide pages the API
+                                group collapses to its single label link; on
+                                API pages only the Reference group is shown
+                                plus a "Guides" back link.
+
+   `data-area` ('guides' | 'api') is stamped on <html> from the URL by the
+   same script. All selectors are unlayered so they win over Starlight's
+   layered styles without specificity games. Both themes are covered (dark
+   values on :root, light overrides on [data-theme='light']). */
+
+:root {
+  /* Category colours, dark theme. `*-accent` is the leading dot and the pill
+     border, `*-ink` the text, `*-tint` the filled pill background. */
+  --chip-standard-accent: #6fdcc8;
+  --chip-standard-ink: #7ee8d5;
+  --chip-standard-tint: rgb(111 220 200 / 18%);
+  --chip-standard-tint-strong: rgb(111 220 200 / 32%);
+  --chip-standard-line: rgb(111 220 200 / 38%);
+  --chip-theory-accent: #e6b84e;
+  --chip-theory-ink: #f4c04e;
+  --chip-theory-tint: rgb(230 184 78 / 18%);
+  --chip-theory-tint-strong: rgb(230 184 78 / 32%);
+  --chip-theory-line: rgb(230 184 78 / 38%);
+  --chip-ink-muted: hsl(224, 8%, 62%);
+}
+
+:root[data-theme='light'] {
+  --chip-standard-accent: #128273;
+  --chip-standard-ink: #0c5c52;
+  --chip-standard-tint: rgb(18 130 115 / 12%);
+  --chip-standard-tint-strong: rgb(18 130 115 / 22%);
+  --chip-standard-line: rgb(18 130 115 / 35%);
+  --chip-theory-accent: #a8760a;
+  --chip-theory-ink: #855107;
+  --chip-theory-tint: rgb(168 118 10 / 13%);
+  --chip-theory-tint-strong: rgb(168 118 10 / 24%);
+  --chip-theory-line: rgb(168 118 10 / 35%);
+  --chip-ink-muted: hsl(224, 7%, 42%);
+}
+
+/* ---------------------------------------------------------------------------
+   PAGE CHIPS, shared structure. One run per category under the H1: the
+   standards that govern the page, then the works its methods are attributed
+   to. Every chip links to its full entry in the page bibliography.
+   --------------------------------------------------------------------------- */
+
+.page-chips {
+  display: none;
+}
+
+:root[data-page-chips='header'] .page-chips,
+:root[data-page-chips='pills'] .page-chips,
+:root[data-page-chips='filled'] .page-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  margin-block-start: 0.55rem;
+  font-size: var(--sl-text-sm);
+  line-height: 1.5;
+}
+
+.page-chips .chip-run {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+
+.page-chips .page-chip {
+  font-weight: 500;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.page-chips .chip-standard {
+  color: var(--chip-standard-ink);
+}
+.page-chips .chip-theory {
+  color: var(--chip-theory-ink);
+}
+.page-chips .chip-more {
+  color: var(--chip-ink-muted);
+}
+
+/* ---------------------------------------------------------------------------
+   STYLE 'header': a run of tinted text. One leading dot per category run
+   carries the whole legend, so nothing needs a box and the line reads as the
+   dateline of a standard rather than as a row of tags.
+   --------------------------------------------------------------------------- */
+
+:root[data-page-chips='header'] .page-chips {
+  gap: 0.15rem 1.15rem;
+}
+:root[data-page-chips='header'] .chip-run {
+  gap: 0.15rem 0.7rem;
+}
+
+:root[data-page-chips='header'] .chip-run::before {
+  content: '';
+  flex: 0 0 auto;
+  align-self: center;
+  inline-size: 0.4rem;
+  block-size: 0.4rem;
+  margin-inline-end: 0.1rem;
+  border-radius: 50%;
+}
+:root[data-page-chips='header'] .chip-run-standard::before {
+  background: var(--chip-standard-accent);
+}
+:root[data-page-chips='header'] .chip-run-reference::before {
+  background: var(--chip-theory-accent);
+}
+
+:root[data-page-chips='header'] .page-chip:hover,
+:root[data-page-chips='header'] .page-chip:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+/* ---------------------------------------------------------------------------
+   STYLES 'pills' and 'filled': the same content inside a bordered chip, so
+   the clickability is visible without hovering. The border colour carries
+   the category, which lets the pill stay small, low contrast and unfilled
+   (or barely filled) instead of turning into the badge that was rejected in
+   the sidebar experiment.
+   --------------------------------------------------------------------------- */
+
+:root[data-page-chips='pills'] .page-chips,
+:root[data-page-chips='filled'] .page-chips {
+  align-items: center;
+  /* The gap between the two category runs is wider than the gap inside one,
+     so the standards and the named works still read as two groups without a
+     dot to mark the boundary. */
+  gap: 0.3rem 1.1rem;
+}
+:root[data-page-chips='pills'] .chip-run,
+:root[data-page-chips='filled'] .chip-run {
+  align-items: center;
+  gap: 0.3rem 0.35rem;
+}
+
+:root[data-page-chips='pills'] .page-chip,
+:root[data-page-chips='filled'] .page-chip {
+  padding: 0.1rem 0.5rem;
+  border: 1px solid var(--chip-line, var(--sl-color-gray-5));
+  border-radius: 999px;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  transition:
+    background-color 0.12s ease,
+    border-color 0.12s ease;
+}
+
+:root[data-page-chips='pills'] .chip-standard,
+:root[data-page-chips='filled'] .chip-standard {
+  --chip-line: var(--chip-standard-line);
+  --chip-fill: var(--chip-standard-tint);
+  --chip-fill-strong: var(--chip-standard-tint-strong);
+}
+:root[data-page-chips='pills'] .chip-theory,
+:root[data-page-chips='filled'] .chip-theory {
+  --chip-line: var(--chip-theory-line);
+  --chip-fill: var(--chip-theory-tint);
+  --chip-fill-strong: var(--chip-theory-tint-strong);
+}
+
+:root[data-page-chips='filled'] .page-chip {
+  background: var(--chip-fill, transparent);
+}
+
+/* Hover and focus: the tint appears (outlined) or deepens (filled) and the
+   border firms up, so the state is legible in both themes without moving
+   anything. */
+:root[data-page-chips='pills'] .page-chip:hover,
+:root[data-page-chips='pills'] .page-chip:focus-visible,
+:root[data-page-chips='filled'] .page-chip:hover,
+:root[data-page-chips='filled'] .page-chip:focus-visible {
+  background: var(--chip-fill-strong, var(--sl-color-gray-6));
+  border-color: currentColor;
+}
+
+:root[data-page-chips='pills'] .chip-more,
+:root[data-page-chips='filled'] .chip-more {
+  --chip-line: var(--sl-color-gray-5);
+  --chip-fill: transparent;
+  --chip-fill-strong: var(--sl-color-gray-6);
+}
+
+/* ---------------------------------------------------------------------------
+   API SIDEBAR TREATMENTS.
+   --------------------------------------------------------------------------- */
+
+/* 'collapsed': the caret shows and the group's children fold. The switcher
+   script stamps `.folded` (initial state: folded on guide pages, open on API
+   pages) and keeps `aria-expanded` in sync. */
+:root[data-api-style='collapsed'] .api-group .api-caret {
+  display: inline-flex;
+}
+:root[data-api-style='collapsed'] .api-group.folded > ul {
+  display: none;
+}
+
+/* 'split': topic-style separation. On guide pages the API group reduces to
+   its single label link with a forward arrow... */
+:root[data-api-style='split'][data-area='guides'] .api-group > ul {
+  display: none;
+}
+:root[data-api-style='split'][data-area='guides'] .api-group .group-label .large::after {
+  content: ' \2192';
+  color: var(--sl-color-gray-3);
+}
+
+/* ...and on API pages only the top-level group that contains the API
+   reference (the Reference group) remains, plus the back link. */
+:root[data-api-style='split'][data-area='api']
+  #starlight__sidebar
+  .top-level
+  > li:not(:has(.api-group)) {
+  display: none;
+}
+
+.topic-back {
+  display: none;
+}
+:root[data-api-style='split'][data-area='api'] .topic-back {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-block-end: 0.75rem;
+  padding: 0.3em 0.5rem;
+  border-radius: 0.25rem;
+  font-size: var(--sl-text-sm);
+  font-weight: 600;
+  color: var(--sl-color-gray-2);
+  text-decoration: none;
+}
+:root[data-api-style='split'][data-area='api'] .topic-back:hover,
+:root[data-api-style='split'][data-area='api'] .topic-back:focus-visible {
+  color: var(--sl-color-white);
+  background: var(--sl-color-gray-6);
+}
+
+/* ---------------------------------------------------------------------------
+   VARIANT SWITCHER WIDGET (prototype-only UI, injected by Head.astro).
+   --------------------------------------------------------------------------- */
+
+.toc-switcher {
+  position: fixed;
+  inset-block-end: 1rem;
+  inset-inline-end: 1rem;
+  z-index: 100;
+  font-family: var(--sl-font-system, sans-serif);
+  font-size: 0.75rem;
+  color: var(--sl-color-gray-2);
+}
+
+.toc-switcher summary {
+  list-style: none;
+  cursor: pointer;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-inline-start: auto;
+  border: 1px solid var(--sl-color-hairline-light);
+  border-radius: 50%;
+  background: var(--sl-color-bg-nav);
+  box-shadow: var(--sl-shadow-md);
+  font-weight: 700;
+  color: var(--sl-color-gray-1);
+}
+.toc-switcher summary::-webkit-details-marker {
+  display: none;
+}
+
+.toc-switcher .toc-switcher-panel {
+  margin-block-start: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--sl-color-hairline-light);
+  border-radius: 0.5rem;
+  background: var(--sl-color-bg-nav);
+  box-shadow: var(--sl-shadow-lg);
+  min-inline-size: 13rem;
+}
+
+.toc-switcher fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.toc-switcher fieldset + fieldset {
+  margin-block-start: 0.6rem;
+}
+.toc-switcher legend {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.65rem;
+  color: var(--sl-color-gray-3);
+  padding: 0;
+  margin-block-end: 0.25rem;
+}
+.toc-switcher label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.1rem 0;
+  cursor: pointer;
+}

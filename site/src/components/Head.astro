@@ -97,22 +97,19 @@ const breadcrumbList = isHome
 <meta name="twitter:title" content={title} />
 {description && <meta name="twitter:description" content={description} />}
 
-{/* TOC-info experiment (TOC-REDESIGN-NOTES.md): apply the persisted variant
-    attributes (`data-page-chips`, `data-toc-style`, `data-api-style`) before
-    first paint, then mount the floating variant switcher. Prototype-only;
-    remove both scripts when a variant is chosen. */}
+{/* Docs UX experiment (TOC-REDESIGN-NOTES.md): apply the persisted variant
+    attributes (`data-page-chips`, `data-api-style`) before first paint, then
+    mount the floating switcher. Prototype-only; both scripts come out when a
+    variant is chosen. */}
 <script is:inline>
   (() => {
     const d = document.documentElement;
-    let toc = 'focus';
     let api = 'split';
     let page = 'header';
     try {
-      toc = localStorage.getItem('tocStyle') || toc;
       api = localStorage.getItem('apiStyle') || api;
       page = localStorage.getItem('pageChips') || page;
     } catch {}
-    d.dataset.tocStyle = toc;
     d.dataset.apiStyle = api;
     d.dataset.pageChips = page;
     d.dataset.area = /\/reference\/api(\/|$)/.test(location.pathname) ? 'api' : 'guides';
@@ -121,9 +118,8 @@ const breadcrumbList = isHome
 <script is:inline>
   document.addEventListener('DOMContentLoaded', () => {
     const d = document.documentElement;
-    const TOC = ['focus', 'annotate', 'hover', 'clean', 'none'];
+    const PAGE = ['header', 'pills', 'filled', 'off'];
     const API = ['split', 'collapsed', 'inline'];
-    const PAGE = ['header', 'off'];
 
     const radios = (name, values, current) =>
       values
@@ -138,10 +134,9 @@ const breadcrumbList = isHome
     const widget = document.createElement('details');
     widget.className = 'toc-switcher';
     widget.innerHTML =
-      '<summary title="TOC experiment switcher">UX</summary>' +
+      '<summary title="Docs UX switcher">UX</summary>' +
       '<div class="toc-switcher-panel">' +
       `<fieldset><legend>Page chips</legend>${radios('pageChips', PAGE, d.dataset.pageChips)}</fieldset>` +
-      `<fieldset><legend>Sidebar info</legend>${radios('tocStyle', TOC, d.dataset.tocStyle)}</fieldset>` +
       `<fieldset><legend>API sidebar</legend>${radios('apiStyle', API, d.dataset.apiStyle)}</fieldset>` +
       '</div>';
     document.body.appendChild(widget);
@@ -154,35 +149,9 @@ const breadcrumbList = isHome
         localStorage.setItem(input.name, input.value);
       } catch {}
       applyApiFold();
-      syncSectionToc();
     });
 
-    // 'clean' variant: the section standards table is injected after the
-    // markdown pipeline, so its heading cannot reach the server-rendered
-    // "On this page" list. Mirror the entry client-side while the variant is
-    // active (an existing item is cloned to inherit Starlight's scoped
-    // styles). Prototype-only: the cloned entry is not scroll-spied.
-    const sectionHeading = document.querySelector('.section-standards h2');
-    const syncSectionToc = () => {
-      for (const node of document.querySelectorAll('.toc-standards-entry')) node.remove();
-      if (!sectionHeading || d.dataset.tocStyle !== 'clean') return;
-      for (const list of document.querySelectorAll('starlight-toc nav ul, mobile-starlight-toc nav ul')) {
-        const last = list.lastElementChild;
-        if (!last) continue;
-        const item = last.cloneNode(true);
-        item.classList.add('toc-standards-entry');
-        const link = item.querySelector('a');
-        if (!link) continue;
-        link.setAttribute('href', `#${sectionHeading.id}`);
-        link.removeAttribute('aria-current');
-        const label = link.querySelector('span') || link;
-        label.textContent = sectionHeading.textContent;
-        list.append(item);
-      }
-    };
-    syncSectionToc();
-
-    // Collapsed API mode: initial fold state and caret wiring.
+    // Collapsed API treatment: initial fold state and caret wiring.
     const apiGroup = document.querySelector('#starlight__sidebar .api-group');
     const caret = apiGroup?.querySelector('.api-caret');
     const apiList = apiGroup?.querySelector('ul');
@@ -208,27 +177,6 @@ const breadcrumbList = isHome
       const folded = stored != null ? stored === 'true' : d.dataset.area !== 'api';
       setFolded(folded);
     };
-    // Hover variant: Escape dismisses the floating card without moving the
-    // keyboard focus (WCAG 2.2 1.4.13); any other key, or leaving the link,
-    // brings it back.
-    let dismissed = null;
-    const restore = () => {
-      if (!dismissed) return;
-      delete dismissed.dataset.cardDismissed;
-      dismissed = null;
-    };
-    document.addEventListener('keydown', (event) => {
-      const active = document.activeElement;
-      const link = active?.closest?.('#starlight__sidebar a');
-      if (event.key === 'Escape' && link?.querySelector('.sidebar-chips')) {
-        link.dataset.cardDismissed = '';
-        dismissed = link;
-        return;
-      }
-      restore();
-    });
-    document.addEventListener('focusout', restore);
-
     caret?.addEventListener('click', () => {
       const folded = !apiGroup.classList.contains('folded');
       setFolded(folded);

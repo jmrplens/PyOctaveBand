@@ -1096,152 +1096,11 @@ def render_index(
     return "\n".join(out).strip("\n") + "\n"
 
 
-# Reference chips for the API sidebar. Each public module maps to either a
-# published standard (teal "chip-standard") or, when no standard governs it,
-# its single most notable reference (amber "chip-theory"). The attribution is
-# taken from the module's own docstring: its cited standard designation, or
-# the author it names. A handful of modules whose docstring names no source
-# carry a minimal, correct canonical reference instead (marked "+" below).
-# Value is (chip text, "s" for standard | "t" for theory).
-_API_CHIPS: dict[str, tuple[tuple[str, str], ...]] = {
-    "phonometry.metrology.core": (("IEC 61260", "s"),),
-    "phonometry.metrology.parametric_filters": (("IEC 61672", "s"),),
-    "phonometry.metrology.equalizer": (("RBJ Cookbook", "t"),),
-    "phonometry.metrology.frequencies": (("ISO 266", "s"),),
-    "phonometry.metrology.compliance": (("IEC 61260", "s"), ("IEC 61672", "s")),
-    "phonometry.metrology.levels": (("IEC 61672", "s"),),
-    "phonometry.metrology.calibration": (("IEC 60942", "s"),),
-    "phonometry.psychoacoustics.loudness_zwicker": (("ISO 532-1", "s"), ("Zwicker", "t")),
-    "phonometry.psychoacoustics.loudness_moore_glasberg": (("ISO 532-2", "s"), ("Moore & Glasberg", "t")),
-    "phonometry.psychoacoustics.loudness_moore_glasberg_time": (("ISO 532-3", "s"), ("Moore & Glasberg", "t")),
-    "phonometry.psychoacoustics.loudness_ecma": (("ECMA-418-2", "s"),),
-    "phonometry.psychoacoustics.loudness_contours": (("ISO 226", "s"),),
-    "phonometry.psychoacoustics.sharpness": (("DIN 45692", "s"),),
-    "phonometry.psychoacoustics.roughness_ecma": (("ECMA-418-2", "s"),),
-    "phonometry.psychoacoustics.tonality": (("ECMA-418-1", "s"),),
-    "phonometry.psychoacoustics.tonality_ecma": (("ECMA-418-2", "s"),),
-    "phonometry.psychoacoustics.tone_audibility": (("ISO/PAS 20065", "s"),),
-    "phonometry.psychoacoustics.fluctuation_strength": (("Fastl & Zwicker", "t"),),
-    "phonometry.psychoacoustics.fluctuation_strength_ecma": (("ECMA-418-2", "s"),),
-    "phonometry.psychoacoustics.psychoacoustic_annoyance": (("Fastl & Zwicker", "t"),),
-    "phonometry.hearing.sti": (("IEC 60268-16", "s"), ("Houtgast & Steeneken", "t")),
-    "phonometry.hearing.sii": (("ANSI S3.5", "s"), ("French & Steinberg", "t")),
-    "phonometry.hearing.objective_intelligibility": (("Taal et al. 2011", "t"), ("Jensen et al. 2016", "t")),
-    "phonometry.hearing.threshold": (("ISO 7029", "s"), ("ISO 389-7", "s")),
-    "phonometry.hearing.noise_induced_hearing_loss": (("ISO 1999", "s"),),
-    "phonometry.hearing.occupational_exposure": (("ISO 9612", "s"),),
-    "phonometry.room.room_acoustics": (("ISO 3382", "s"), ("ISO 18233", "s"), ("Schroeder 1965", "t")),
-    "phonometry.room.room_ir": (("ISO 18233", "s"),),
-    "phonometry.room.room_noise": (("ANSI S12.2", "s"), ("Beranek 1957", "t"), ("Blazier 1997", "t")),
-    "phonometry.room.open_plan": (("ISO 3382-3", "s"),),
-    "phonometry.room.reverberation_prediction": (("Sabine", "t"), ("Eyring", "t"), ("Arau", "t")),
-    "phonometry.room.enclosed_space_absorption": (("EN 12354-6", "s"),),
-    "phonometry.room.image_source": (("Allen & Berkley", "t"),),
-    "phonometry.room.steady_field": (("Kuttruff", "t"),),
-    "phonometry.building.insulation": (("ISO 16283", "s"), ("ISO 717", "s")),
-    "phonometry.building.panel_transmission": (("EN 12354-1", "s"),),
-    "phonometry.building.aperture_transmission": (("Hopkins 2007", "t"),),
-    "phonometry.building.lab_insulation": (("ISO 10140", "s"),),
-    "phonometry.building.survey_insulation": (("ISO 10052", "s"),),
-    "phonometry.building.intensity_insulation": (("ISO 15186", "s"),),
-    "phonometry.building.flanking_transmission": (("ISO 10848", "s"),),
-    "phonometry.building.facade_prediction": (("EN 12354-3", "s"),),
-    "phonometry.building.building_prediction": (("EN 12354", "s"),),
-    "phonometry.building.building_uncertainty": (("ISO 12999-1", "s"),),
-    "phonometry.building.floor_covering_improvement": (("ISO 16251-1", "s"),),
-    "phonometry.building.structure_borne_power": (("EN 15657", "s"),),
-    "phonometry.building.installed_structure_borne": (("EN 12354-5", "s"),),
-    "phonometry.materials.sound_absorption": (("ISO 354", "s"),),
-    "phonometry.materials.absorption_rating": (("ISO 11654", "s"),),
-    "phonometry.materials.absorption_uncertainty": (("ISO 12999-2", "s"),),
-    "phonometry.materials.airflow_resistance": (("ISO 9053", "s"),),
-    "phonometry.materials.dynamic_stiffness": (("EN 29052-1", "s"),),
-    "phonometry.materials.impedance_tube": (("ISO 10534", "s"), ("ASTM E2611", "s")),
-    "phonometry.materials.porous_absorber": (("Delany & Bazley", "t"), ("Miki", "t"), ("Johnson et al.", "t")),
-    "phonometry.materials.slow_sound_absorber": (("Jiménez et al.", "t"),),
-    "phonometry.materials.diffuser_design": (("Cox & D'Antonio", "t"),),
-    "phonometry.materials.scattering_diffusion": (("ISO 17497", "s"), ("Cox & D'Antonio", "t")),
-    "phonometry.materials.road_absorption": (("ISO 13472", "s"),),
-    "phonometry.vibration.mechanical_mobility": (("ISO 7626", "s"),),
-    "phonometry.vibration.point_mobility": (("ISO 7626", "s"),),
-    "phonometry.vibration.radiation_efficiency": (("ISO/TS 7849", "s"), ("Cremer & Heckl", "t")),
-    "phonometry.vibration.junction_transmission": (("Cremer & Heckl", "t"),),
-    "phonometry.vibration.transfer_stiffness": (("ISO 10846", "s"),),
-    "phonometry.vibration.human_vibration": (("ISO 2631", "s"), ("ISO 5349", "s"), ("ISO 8041", "s")),
-    "phonometry.vibration.multiple_shock_vibration": (("ISO 2631-5", "s"),),
-    "phonometry.environmental.outdoor_propagation": (("ISO 9613", "s"), ("Maekawa 1968", "t")),
-    "phonometry.environmental.ground_barriers": (("ISO 9613-2", "s"), ("Kurze & Anderson", "t")),
-    "phonometry.environmental.atmospheric_refraction": (("Salomons", "t"),),
-    "phonometry.environmental.air_absorption": (("ISO 9613-1", "s"),),
-    "phonometry.environmental.impulse_prominence": (("NT ACOU 112", "s"),),
-    "phonometry.environmental.impulsive_sound": (("ISO/PAS 1996-3", "s"),),
-    "phonometry.environmental.rating": (("ISO 1996-1", "s"),),
-    "phonometry.environmental.measurement": (("ISO 1996-2", "s"),),
-    "phonometry.aircraft.aircraft_noise": (("ICAO Annex 16", "s"), ("IEC 61265", "s")),
-    "phonometry.aircraft.atmospheric_absorption": (("SAE ARP 5534", "s"),),
-    "phonometry.aircraft.airport_noise": (("ECAC Doc 29", "s"),),
-    "phonometry.aircraft.anp_fleet": (("ECAC Doc 29", "s"),),
-    "phonometry.aircraft.rotorcraft_noise": (("Olsen et al. 2024", "t"),),
-    "phonometry.environmental.wind_turbine_noise": (("IEC 61400-11", "s"), ("ISO 1996-2", "s")),
-    "phonometry.underwater.acoustics": (("ISO 18405", "s"),),
-    "phonometry.underwater.propagation": (("Francois & Garrison", "t"),),
-    "phonometry.underwater.sound_speed": (("Mackenzie 1981", "t"),),
-    "phonometry.underwater.sonar_equation": (("Urick", "t"),),
-    "phonometry.underwater.ocean_ambient_noise": (("Wenz 1962", "t"),),
-    "phonometry.underwater.seabed_reflection": (("Jensen et al.", "t"),),
-    "phonometry.underwater.ship_radiated_noise": (("ISO 17208", "s"),),
-    "phonometry.underwater.ship_traffic_noise": (("JOMOPANS-ECHO", "t"),),
-    "phonometry.underwater.pile_driving_noise": (("ISO 18406", "s"),),
-    "phonometry.underwater.numerical_propagation": (("Jensen et al.", "t"),),
-    "phonometry.emission.sound_power": (("ISO 3744", "s"), ("ISO 3741", "s")),
-    "phonometry.emission.sound_power_intensity": (("ISO 9614", "s"),),
-    "phonometry.emission.sound_power_reverberation": (("ISO 3741", "s"),),
-    "phonometry.emission.intensity": (("IEC 61043", "s"), ("ISO 9614", "s")),
-    "phonometry.emission.vibration_sound_power": (("ISO/TS 7849", "s"),),
-    "phonometry.emission.declaration": (("ISO 4871", "s"),),
-    "phonometry.electroacoustics.distortion": (("IEC 60268-3", "s"), ("AES17", "s")),
-    "phonometry.electroacoustics.frequency_response": (("Bendat & Piersol", "t"),),
-    "phonometry.electroacoustics.swept_sine": (("Farina 2000", "t"), ("Novak et al. 2015", "t")),
-    "phonometry.electroacoustics.piston": (("Beranek & Mellow", "t"),),
-    "phonometry.electroacoustics.loudspeaker": (("IEC 60268-5", "s"),),
-    "phonometry.electroacoustics.microphone": (("IEC 60268-4", "s"),),
-    "phonometry.noise_control.silencers": (("Munjal", "t"), ("Bies & Hansen", "t")),
-    "phonometry.noise_control.hvac": (("Bies & Hansen", "t"),),
-    "phonometry.noise_control.enclosures": (("Bies & Hansen", "t"),),
-    "phonometry.broadcast.program_loudness": (("ITU-R BS.1770", "s"), ("EBU R 128", "s")),
-    "phonometry.metrology.uncertainty": (("JCGM 100", "s"),),
-    "phonometry.metrology.random_data": (("Rice 1945", "t"), ("Bendat & Piersol", "t")),
-    "phonometry.metrology.spectra": (("Welch 1967", "t"), ("Thomson 1982", "t")),
-    "phonometry.metrology.miso": (("Bendat & Piersol", "t"),),
-    "phonometry.metrology.time_frequency": (("Bendat & Piersol", "t"),),
-    "phonometry.metrology.signals": (("Bendat & Piersol", "t"),),
-    "phonometry.metrology.phase": (("Farina 2000", "t"),),
-    "phonometry.metrology.cepstrum": (("Havelock et al.", "t"), ("Bendat & Piersol", "t")),
-    "phonometry.metrology.synchronous_average": (("McFadden 1987", "t"),),
-    "phonometry.metrology.inversion": (("Kirkeby & Nelson", "t"),),
-    "phonometry.simulation.fdtd": (("Botteldooren 1995", "t"),),
-    "phonometry.metrology.correlation": (("Knapp & Carter", "t"), ("Bendat & Piersol", "t")),
-    "phonometry.metrology.envelope": (("Bendat & Piersol", "t"),),
-}
-
-
 def render_sidebar(pages: list[ModuleDoc]) -> str:
     """Render the Starlight sidebar fragment (ESM, imported by astro.config)."""
 
     def js(text: str) -> str:
         return "'" + text.replace("\\", "\\\\").replace("'", "\\'") + "'"
-
-    def item(page: ModuleDoc) -> str:
-        slug = f"reference/api/{page.section.key}/{page.slug}"
-        chip_list = _API_CHIPS.get(page.module)
-        if not chip_list:
-            return f"        {js(slug)},"
-        parsed = [
-            {"text": text, "class": "chip-standard" if kind == "s" else "chip-theory"}
-            for text, kind in chip_list
-        ]
-        data = json.dumps(parsed, ensure_ascii=False)
-        return f"        {{ slug: {js(slug)}, attrs: {{ 'data-chips': {js(data)} }} }},"
 
     lines = [
         "// Auto-generated by scripts/generate_api_docs.py (make api-docs).",
@@ -1264,7 +1123,10 @@ def render_sidebar(pages: list[ModuleDoc]) -> str:
                 "      items: [",
             ]
         )
-        lines.extend(item(page) for page in by_section[section.key])
+        lines.extend(
+            f"        {js(f'reference/api/{section.key}/{page.slug}')},"
+            for page in by_section[section.key]
+        )
         lines.extend(["      ],", "    },"])
     lines.extend(["  ],", "};", ""])
     return "\n".join(lines)

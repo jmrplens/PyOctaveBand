@@ -1,85 +1,15 @@
 ---
 /**
- * Default Starlight page title plus an optional standards/references
- * subtitle line (TOC-info variant "clean"; see TOC-REDESIGN-NOTES.md).
+ * Default Starlight page title plus the page header chips run.
  *
- * The line reuses the sidebar classification: the current page's sidebar
- * entry carries its governing standards / named references as
- * `attrs['data-chips']` JSON, so the subtitle needs no per-page frontmatter
- * and is identical in EN and ES (designations and author names are
- * language-neutral; only the visually-hidden accessibility prefix is
- * localized). It is always rendered and only displayed when
- * `data-toc-style='clean'` is active and the page chips run is off
- * (toc-info.css), since both sit under the H1 and say the same thing.
- *
- * PageChips.astro is the successor of this line: the same idea, but derived
- * from the page's own `references` frontmatter and linked to the bibliography.
+ * The override exists only to give PageChips.astro a mount point directly
+ * under the H1, inside the page header band and above the content divider.
+ * Everything the run shows comes from the page's own `references` frontmatter;
+ * see PageChips.astro and src/lib/reference-chips.ts.
  */
 import Default from '@astrojs/starlight/components/PageTitle.astro';
-import type { StarlightRouteData } from '@astrojs/starlight/route-data';
 import PageChips from './PageChips.astro';
-
-type SidebarEntry = StarlightRouteData['sidebar'][number];
-type SidebarLink = Extract<SidebarEntry, { type: 'link' }>;
-
-interface Chip {
-	text: string;
-	class: string;
-}
-
-function findCurrent(entries: SidebarEntry[]): SidebarLink | undefined {
-	for (const entry of entries) {
-		if (entry.type === 'link') {
-			if (entry.isCurrent) return entry;
-		} else {
-			const found = findCurrent(entry.entries);
-			if (found) return found;
-		}
-	}
-	return undefined;
-}
-
-function parseChips(attrs: Record<string, unknown> | undefined): Chip[] {
-	const raw = attrs?.['data-chips'];
-	if (typeof raw !== 'string') return [];
-	try {
-		const list = JSON.parse(raw);
-		return Array.isArray(list) ? (list as Chip[]) : [];
-	} catch {
-		return [];
-	}
-}
-
-const current = findCurrent(Astro.locals.starlightRoute.sidebar);
-const chips = parseChips(current?.attrs);
-const isEs = Astro.currentLocale === 'es';
 ---
 
 <Default><slot /></Default>
 <PageChips />
-{
-	chips.length > 0 && (
-		<p class="page-standards">
-			<span class="sr-only">
-				{isEs ? 'Normas y referencias: ' : 'Standards and references: '}
-			</span>
-			{chips.map((chip) => (
-				<span class:list={['page-chip', chip.class]}>{chip.text}</span>
-			))}
-		</p>
-	)
-}
-
-<style>
-	.sr-only {
-		position: absolute;
-		width: 1px;
-		height: 1px;
-		padding: 0;
-		margin: -1px;
-		overflow: hidden;
-		clip: rect(0, 0, 0, 0);
-		white-space: nowrap;
-		border: 0;
-	}
-</style>

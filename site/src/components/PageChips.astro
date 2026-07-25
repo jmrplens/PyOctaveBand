@@ -1,8 +1,7 @@
 ---
 /**
- * Page header chips: one quiet horizontal run under the H1 stating which
- * standards govern the page and which named works the methods are attributed
- * to (TOC-info experiment, `data-page-chips='header'`; see
+ * Page header chips: one run under the H1 stating which standards govern the
+ * page and which named works its methods are attributed to (see
  * TOC-REDESIGN-NOTES.md).
  *
  * Everything comes from the page's own `references` frontmatter through
@@ -10,8 +9,9 @@
  * References section at the bottom, and every chip links to its full entry
  * there. Pages without references render nothing.
  *
- * Always in the DOM, displayed only while the variant is active
- * (src/styles/toc-info.css), so switching costs no rebuild.
+ * The markup is the same for every presentation; `data-page-chips` on <html>
+ * picks between the quiet text run, the outlined pills, the filled pills and
+ * nothing at all (src/styles/ux-variants.css), so switching costs no rebuild.
  */
 import { pageChips } from '../lib/reference-chips';
 

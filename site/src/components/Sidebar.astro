@@ -10,10 +10,11 @@
   instead of upstream's `virtual:starlight/*` modules, so a future component
   override of `MobileMenuFooter` would not be picked up here.
 
-  TOC-info experiment (see TOC-REDESIGN-NOTES.md): a "Guides" back link is
-  always rendered and only displayed in the split API mode on API pages
-  (`data-api-style='split'` + `data-area='api'`, toc-info.css), where the
-  guide groups are hidden from the tree.
+  API sidebar experiment (see TOC-REDESIGN-NOTES.md): a "Guides" back link is
+  always rendered and only displayed in the split API treatment on API pages
+  (`data-api-style='split'` plus `data-area='api'`, ux-variants.css), where
+  the guide groups are hidden from the tree. It comes out if the split is
+  ever done with `starlight-sidebar-topics`, which brings its own switcher.
 */
 import MobileMenuFooter from '@astrojs/starlight/components/MobileMenuFooter.astro';
 import SidebarPersister from '@astrojs/starlight/components/SidebarPersister.astro';
