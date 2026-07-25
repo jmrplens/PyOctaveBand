@@ -742,6 +742,45 @@ Propagation wavenumber inside the material (ASTM E2611-19, Eq. (29)).
 
 **Returns:** Complex material wavenumber `k'`, in reciprocal metres.
 
+### TransferMatrix.plot()
+
+```python
+TransferMatrix.plot(
+    frequency: ArrayLike,
+    characteristic_impedance: float,
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Plot the transmission loss with the hard-backed absorption overlaid.
+
+Reads the four-pole entries out as the two ASTM E2611-19 spectra a
+laboratory quotes: the normal-incidence transmission loss `TLn(f)`
+(Eq. (26), the primary curve, left axis) and the hard-backed
+absorption coefficient `alpha(f)` (Eq. (28), a muted companion on a
+0..1 right axis). The matrix itself carries no frequency axis, so the
+`frequency` vector of the measurement (matching the shape of the
+entries) and the air characteristic impedance `rho c` must be
+supplied.
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes` of the transmission-loss curve.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `frequency` | Frequency vector `f`, in hertz, matching the shape of the matrix entries. |
+| `characteristic_impedance` | Characteristic impedance `rho c` of the air in the tube, in rayls. |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `language` | Plot language: `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the transmission-loss `plot` call. |
+
+**Returns:** The axes.
+
 ### TransferMatrix.reflection_hard_backed()
 
 ```python

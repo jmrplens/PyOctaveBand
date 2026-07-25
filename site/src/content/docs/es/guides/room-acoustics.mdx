@@ -145,6 +145,7 @@ system = np.zeros(fs); system[100] = 1.0; system[2000] = 0.4   # directo + refle
 recorded = fftconvolve(sweep, system)
 ir = room.impulse_response(recorded, sweep, fs, method="spectral")
 print(int(np.argmax(np.abs(ir))))                    # 100: sonido directo recuperado
+ir.plot()                # forma de onda + envolvente de Schroeder (figura de abajo)
 
 # Variante de filtro inverso de Farina (necesita la banda del barrido)
 ir_f = room.impulse_response(recorded, sweep, fs, method="farina", f_range=(20.0, 20000.0))
@@ -447,6 +448,56 @@ Para este decaimiento de pendiente única, EDT, T20 y T30 devuelven todos
 (C80 = 3,05 dB, D50 = 0,499, Ts = 72 ms). Una sala real tiene una pendiente
 inicial más pronunciada, así que EDT < T30.
 
+Sobre un decaimiento real, dependiente de la frecuencia, el `.plot()` por
+bandas es el resumen de trabajo de toda la medición: los tiempos de caída
+como barras agrupadas por octava (bandas no válidas rayadas) sobre un
+segundo panel con C50 y C80.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_parameters_bands_es.svg" alt="Parámetros por banda ISO 3382 de una respuesta al impulso sintética de sala: barras agrupadas de EDT, T20 y T30 por banda de octava que caen de unos 1,4 s a 125 Hz a 0,7 s a 4 kHz, sobre un segundo panel donde C50 y C80 suben con la frecuencia" width="92%" />
+
+*Una sala cuyo tiempo de reverberación cae de 1,4 s a 125 Hz a 0,7 s a
+4 kHz, la firma típica de una sala amueblada cuya absorción crece con la
+frecuencia; la claridad sube a medida que el decaimiento se acorta.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal
+from phonometry import room
+
+# Una RIR sintética con decaimiento dependiente de la frecuencia: portadoras
+# de ruido por banda de octava cuyo T60 cae de 1,4 s a 125 Hz a 0,7 s a 4 kHz.
+fs = 48000
+rng = np.random.default_rng(3382)
+t = np.arange(int(1.6 * fs)) / fs
+ir = np.zeros_like(t)
+for fc, t60 in [(125.0, 1.4), (250.0, 1.25), (500.0, 1.1),
+                (1000.0, 1.0), (2000.0, 0.85), (4000.0, 0.7)]:
+    sos = signal.butter(4, [fc / np.sqrt(2), fc * np.sqrt(2)],
+                        btype="bandpass", fs=fs, output="sos")
+    carrier = signal.sosfilt(sos, rng.standard_normal(t.size))
+    ir += carrier * np.exp(-3.0 * np.log(10.0) / t60 * t)
+
+# Una línea: barras EDT/T20/T30 por banda + C50/C80 (requiere matplotlib).
+octaves = room.room_parameters(ir, fs)
+octaves.plot()
+plt.show()
+
+# A mano: el espectro de T30 desde los campos del resultado.
+fig, ax = plt.subplots()
+ax.bar(np.arange(octaves.t30.size), octaves.t30)
+ax.set_xticks(np.arange(octaves.t30.size))
+ax.set_xticklabels([f"{f:g}" for f in octaves.frequency])
+ax.set_xlabel("Frecuencia central de banda de octava [Hz]")
+ax.set_ylabel("T30 [s]")
+plt.show()
+```
+
+</details>
+
 **Leer EDT, T20 y T30 unos contra otros.** Los tres tiempos extrapolan el
 mismo decaimiento de 60 dB desde ventanas distintas, así que su desacuerdo
 lleva información:
@@ -629,6 +680,7 @@ sti = 0.70 - 0.03 * r                                 # STI por posición
 m = room.open_plan_metrics(r, lp, sti)
 print(round(m.d2s, 1), round(m.lp_as_4m, 1))         # 7.0 dB, 51.0 dB
 print(round(m.rd, 1), round(m.rp, 1))                # 6.7 m, 16.7 m
+m.plot()   # la regresión de decaimiento espacial de la figura de abajo
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_decay_es.svg" alt="Decaimiento espacial en oficina abierta: nivel de habla ponderado A y STI frente a la distancia a la fuente en eje logarítmico, con la regresión D2,S, el marcador Lp,A,S,4m a 4 m y los cruces de distancia rD y rP" width="80%" />

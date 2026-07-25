@@ -98,6 +98,8 @@ print(res.ir.shape)                          # (n_muestras,) RIR de banda ancha
 print(round(res.direct_time * 1000, 2))      # llegada del sonido directo, ms
 print(res.times.size == room.audible_image_count(12) + 1)   # imágenes + fuente
 
+res.plot()   # el reflectograma de la figura de abajo
+
 # La RIR sintética entra directa en el análisis de decaimiento de ISO 3382.
 params = room.room_parameters(res.ir, res.fs, limits=None)
 print(bool(params.t30_valid[0]))             # True: la ventana de decaimiento es usable
@@ -239,7 +241,49 @@ field.plot()                                    # directo / reverberante / total
 El `SteadyFieldResult.plot()` dibuja los niveles directo, reverberante y total
 frente a la distancia con la distancia crítica marcada: la curva total sigue el
 campo directo $1/r^2$ cerca de la fuente y se aplana en la meseta reverberante
-más allá de $r_c$. Los bloques se exponen por separado, de modo que una medición
+más allá de $r_c$.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/steady_state_field_es.svg" alt="Campo estacionario de sala de una fuente de 90 dB en un taller con constante de sala de 62 metros cuadrados: el nivel de presión acústica total sigue el campo directo de 6 dB por duplicación cerca de la fuente, cruza la meseta reverberante constante en la distancia crítica de 1,11 m y se aplana sobre ella más allá" width="80%" />
+
+*Una fuente de 90 dB re 1 pW en un taller de 12 x 8 x 4 m con absorción
+media de 0,15: dentro de $r_c = 1{,}11$ m alejarse baja el nivel 6 dB por
+duplicación; más allá manda la meseta reverberante y solo la absorción, no
+la distancia, baja el nivel (Bies 5.ª ed., §6.4).*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import room
+
+field = room.steady_state_field(
+    sound_power_level=90.0,     # Lw, dB re 1 pW
+    surface_area=352.0,          # un taller de 12 x 8 x 4 m
+    mean_absorption=0.15,
+)
+
+# Una línea: niveles directo, reverberante y total con rc marcada.
+field.plot()
+plt.show()
+
+# A mano, desde los campos del resultado:
+fig, ax = plt.subplots()
+ax.semilogx(field.distances, field.direct, "--", label="Campo directo")
+ax.semilogx(field.distances, field.reverberant, ":", label="Campo reverberante")
+ax.semilogx(field.distances, field.total, label="Total")
+ax.axvline(field.critical_distance, ls="-.",
+           label=f"rc = {field.critical_distance:.2f} m")
+ax.set_xlabel("Distancia a la fuente [m]")
+ax.set_ylabel("Nivel de presión acústica [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+Los bloques se exponen por separado, de modo que una medición
 de emisión fluye directa a una predicción de nivel:
 
 ```python
@@ -284,6 +328,25 @@ Devuelve un `SteadyFieldResult` (`distances`, `direct`, `reverberant`, `total`,
 `critical_distance`, `room_constant`) con `.plot()`. Las piezas `room_constant`,
 `critical_distance`, `schroeder_frequency` y `steady_state_spl` también son
 invocables directamente (cada una acepta arrays por banda).
+
+## Validación
+
+Las implementaciones se comprueban contra las formas cerradas y los anclajes
+numéricos de los propios textos fuente (ver el
+[informe de conformidad](/phonometry/es/reference/conformance/)):
+
+- la amplitud del sonido directo $1/(4\pi r)$ y su retardo $r/c$ (geometría
+  exacta), el recuento de imágenes audibles (Kuttruff 6.ª ed., ec. (9.23)) y
+  la densidad de reflexiones (ec. (4.6));
+- el tiempo de reverberación de Eyring recuperado del decaimiento de la RIR
+  sintética en el límite casi cúbico (tolerancia documentada ≈ 10 %), y un
+  [solucionador 2D FDTD](/phonometry/es/guides/fdtd-simulation/)
+  independiente que reproduce el retardo del eco de pared rígida y el
+  $T_{60}$ con amortiguamiento uniforme;
+- la constante de sala, la distancia crítica como cruce exacto
+  directo/reverberante, la frecuencia de Schroeder (el ejemplo de aula de
+  Kuttruff, $V = 200$ m³, $T = 1$ s → 141 Hz) y el nivel estacionario
+  (Bies 5.ª ed., ec. (6.43)).
 
 ## Véase también
 

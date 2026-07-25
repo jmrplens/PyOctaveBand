@@ -296,6 +296,8 @@ qrd = materials.predict_diffuser_polar_response(
 flat = materials.predict_diffuser_polar_response(
     3.6 / 42, 1000.0, depths=[0.0] * 7, periods=6)
 
+qrd.plot()   # respuesta polar predicha, d en el título (requiere matplotlib)
+
 d = materials.directional_diffusion_coefficient(qrd.levels)    # fórmula (5)
 print(round(float(d), 4))            # 0.1099
 d_ref = materials.directional_diffusion_coefficient(flat.levels)
@@ -402,6 +404,7 @@ from phonometry import materials
 freqs = np.array([250, 500, 1000, 2000, 4000], float)
 d = np.array([0.30, 0.45, 0.60, 0.75, 0.88])
 spectrum = materials.diffusion_spectrum(freqs, d)
+spectrum.plot()    # d(f) en el eje de bandas (requiere matplotlib)
 spectrum.report("difusion.pdf")   # ficha de una página (requiere phonometry[report])
 ```
 

@@ -9088,7 +9088,7 @@ def generate_diffuse_field_absorption(output_dir: str) -> None:
     # coefficient exceeds the normal-incidence one at low frequency because
     # the oblique waves travel a longer path inside the layer.
     f = np.geomspace(125.0, 4000.0, 200)
-    layers = [materials.PorousLayer(0.05, materials.miki(f, 20000.0))]
+    layers: list[Any] = [materials.PorousLayer(0.05, materials.miki(f, 20000.0))]
     normal = materials.layered_absorber(f, layers)
     diffuse = materials.diffuse_field_absorption(f, layers)
     ax = diffuse.plot(language=_LANG)
