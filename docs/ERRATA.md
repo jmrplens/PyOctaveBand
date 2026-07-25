@@ -87,21 +87,34 @@ to the issuing body, with date and reference).
   note in the docstring.
 - **Status:** unreported.
 
-## ISO 12354-1:2017, E.3.5 (double-leaf junction K24 sign)
+## EN 12354-1:2000, Figure E.9 (E.7) (K24 stated in the figure-axis mass ratio)
 
-- **Location:** E.3.5, Figure E.7 (junction of lightweight double leaf wall
-  and homogeneous elements), K24 formula.
-- **The print:** K24 = 3,0 + 14,1 M + 5,7 M² dB (for m2/m1 > 3).
-- **The problem:** EN 12354-1:2000 prints the same relation as
-  K24 = 3,0 − 14,1 M + 5,7 M² (Figure E.9, Formula (E.7)), and the 2000
-  edition's own K24 curve in that figure decreases with m2/m1, corroborating
-  the minus sign; the 2017 edition prints no corresponding curve. The two
-  editions contradict each other and the internally consistent
-  formula-plus-figure pair is the 2000 one.
-- **Evidence:** page renders of both editions (ISO 12354-1:2017 printed
-  p. 47; EN 12354-1:2000 printed p. 48).
-- **Library behaviour:** implements the 2000 edition it cites (minus sign),
-  with a code note recording the 2017 contradiction.
+- **Location:** Annex E, Figure E.9 / Formula (E.7) (junction of lightweight
+  double leaf wall and homogeneous elements), the K24 line.
+- **The print:** K24 = 3,0 − 14,1 M + 5,7 M² dB (for m2/m1 > 3), under a
+  figure whose x-axis is m2/m1.
+- **The problem:** Annex E defines M per transmission path as
+  M = lg(m'⊥,i/m'i) (perpendicular element over the element carrying the
+  path). The K24 path 2→4 is carried by the homogeneous element (m2 = m4)
+  with the leaf (m1) perpendicular, so the per-path M is lg(m1/m2) — but the
+  printed K24 line only matches its own figure's curve when M is read as the
+  x-axis variable lg(m2/m1) (e.g. −2,4 dB at m2/m1 = 3, −5,4 dB at 10). Read
+  with the annex's declared M, the line contradicts the figure by
+  28,2·|lg(m2/m1)| dB. The same edition's other K24 line (Figure E.5,
+  Formula (E.5)) *does* follow the declared per-path M, so the two K24
+  prints of the 2000 edition silently use different conventions.
+  ISO 12354-1:2017 E.3.5 prints the relation consistently in the per-path
+  convention of its Formula (E.3), K24 = 3,0 + 14,1 M + 5,7 M²; the two
+  editions agree numerically (an earlier revision of this entry read the
+  2017 print as a sign misprint — re-derivation against both editions'
+  figures shows it is a convention recast, not a defect of the 2017 text).
+- **Evidence:** page renders of both editions (EN 12354-1:2000 printed
+  pp. 43, 46, 48; ISO 12354-1:2017 printed pp. 43, 46-47); numerical
+  evaluation of both forms against the Figure E.9 curve.
+- **Library behaviour:** implements the per-path convention uniformly
+  (`junction_vibration_reduction`, mass_ratio = m'⊥,i/m'i for every branch),
+  so the E.7 double-leaf branch takes leaf-over-homogeneous ratios below 1/3
+  and evaluates 3,0 + 14,1 M + 5,7 M².
 - **Status:** unreported.
 
 ## EN 12354-2:2000, Formula (3) vs Annex E.3 (standardized impact level)

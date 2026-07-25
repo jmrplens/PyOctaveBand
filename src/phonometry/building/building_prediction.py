@@ -387,8 +387,16 @@ def junction_vibration_reduction(
       joined to homogeneous elements): through
       ``max(10 + 20 M − 3,3 lg(f/fk), 10)``; corner
       ``10 + 10 |M| + 3,3 lg(f/fk)``; double-leaf
-      ``K24 = 3,0 − 14,1 M + 5,7 M²`` (given only for ``m2/m1 > 3``); with
-      ``fk = 500 Hz``.
+      ``K24 = 3,0 + 14,1 M + 5,7 M²`` with ``fk = 500 Hz``. The K24 path is
+      carried by the homogeneous element crossing the double leaf, so its
+      per-path ``mass_ratio = m'⊥,i/m'i`` is leaf-over-homogeneous and the
+      validity condition (homogeneous over three times heavier than a leaf)
+      reads ``mass_ratio < 1/3``. (The 2000 print states this line as
+      ``3,0 − 14,1 M + 5,7 M²`` in the *figure-axis* variable
+      ``M = lg(m2/m1)`` of Figure E.9, contradicting the annex's own
+      per-path definition of M; both forms are numerically identical, and
+      ISO 12354-1:2017 E.3.5 prints the per-path form implemented here. See
+      ``docs/ERRATA.md``.)
     - ``"lightweight_double_coupled"`` (E.8, junction of lightweight coupled
       double-leaf walls): through ``max(10 + 20 M − 3,3 lg(f/fk), 10)``;
       corner ``10 + 10 |M| − 3,3 lg(f/fk)``; with ``fk = 500 Hz``.
@@ -401,7 +409,10 @@ def junction_vibration_reduction(
     :param path: ``"through"`` (K13; also the single K12 path of a thickness
         change), ``"corner"`` (K12 = K23; also the single path of a corner) or
         ``"double_leaf"`` (K24).
-    :param mass_ratio: ``m'⊥,i / m'i`` (must be positive).
+    :param mass_ratio: ``m'⊥,i / m'i``, the mass per unit area of the
+        perpendicular element over that of the element carrying the path
+        (must be positive). The same per-path convention applies to every
+        branch, including both ``double_leaf`` (K24) branches.
     :param frequency: Frequency at which ``Kij`` is evaluated, in Hz; only the
         ``"flexible_t"`` (through/corner) and the E.7/E.8 lightweight
         double-leaf junctions are frequency dependent. Defaults to 500 Hz, the
@@ -457,16 +468,22 @@ def junction_vibration_reduction(
             return max(10.0 + 20.0 * m - 3.3 * lg_f_fk, 10.0)
         if path == "corner":
             return 10.0 + 10.0 * abs(m) + 3.3 * lg_f_fk
-        # (E.7) K24 is given only for m2/m1 > 3.
-        if ratio <= 3.0:
+        # (E.7) K24 is given only where the homogeneous elements carrying
+        # the 2-4 path are more than three times heavier than a leaf
+        # (m2/m1 > 3), i.e. for a per-path mass_ratio = m'⊥,i/m'i < 1/3.
+        if ratio >= 1.0 / 3.0:
             raise ValueError(
                 "The E.7 double-leaf branch (K24) is given only for "
-                "mass ratios m2/m1 > 3."
+                "mass_ratio = m'⊥,i/m'i < 1/3 (the homogeneous element "
+                "carries the 2-4 path, so the ratio is leaf mass over "
+                "homogeneous-element mass and the printed condition "
+                "m2/m1 > 3 reads mass_ratio < 1/3)."
             )
-        # Sign per EN 12354-1:2000 (E.7), whose Figure E.9 curve corroborates
-        # it; ISO 12354-1:2017 E.3.5 prints +14,1 M with no supporting figure
-        # (see docs/ERRATA.md).
-        return 3.0 - 14.1 * m + 5.7 * m * m
+        # Per-path form (ISO 12354-1:2017 E.3.5); the 2000 print recasts the
+        # same relation as 3,0 - 14,1 M + 5,7 M^2 in the Figure E.9 x-axis
+        # variable lg(m2/m1), against its own Annex E definition of M (see
+        # docs/ERRATA.md).
+        return 3.0 + 14.1 * m + 5.7 * m * m
     if junction_type == "lightweight_double_coupled":
         if path == "through":
             return max(10.0 + 20.0 * m - 3.3 * lg_f_fk, 10.0)
@@ -507,7 +524,7 @@ def junction_min_vibration_reduction(
 ) -> float:
     """Minimum vibration reduction index ``Kij,min`` (EN 12354-1 Clause 4.4.2).
 
-    Printed as Eq. (23) in the BS EN 12354-1:2000 edition.
+    Printed as Formula (29) in the EN 12354-1:2000 edition.
 
     ``Kij,min = 10 lg[ lf · l0 · (1/Si + 1/Sj) ]`` with the reference coupling
     length ``l0 = 1 m``. When the tabulated ``Kij`` is below this value, the
@@ -533,6 +550,14 @@ def combine_linings(delta_a: float, delta_b: float) -> float:
     For two linings the total improvement is the larger value plus half the
     smaller: ``ΔR = max(a, b) + min(a, b)/2``. For a single lining pass the
     other as ``0``.
+
+    .. note::
+        ISO 12354-1:2017 (Formulas (22)/(23)) adds a special case the 2000
+        edition implemented here does not have: when *both* linings are
+        negative (each lining worsens the insulation), half is taken of the
+        *higher* value instead, ``ΔR = min(a, b) + max(a, b)/2``, so two
+        degrading linings degrade further (e.g. −2 and −4 dB combine to
+        −5 dB under the 2017 rule, −4 dB under the 2000 rule used here).
 
     :param delta_a: Improvement of the first lining, in dB.
     :param delta_b: Improvement of the second lining, in dB.

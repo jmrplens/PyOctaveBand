@@ -122,7 +122,9 @@ def test_kij_flexible_t_double_leaf_clamped() -> None:
 
 def test_kij_lightweight_double_homogeneous_e7() -> None:
     # (E.7): K13 = 10 + 20 M - 3.3 lg(f/fk), min 10; K12 = 10 + 10|M|
-    # + 3.3 lg(f/fk); K24 = 3.0 - 14.1 M + 5.7 M^2 for m2/m1 > 3; fk = 500 Hz.
+    # + 3.3 lg(f/fk); K24 = 3.0 + 14.1 M + 5.7 M^2 in the per-path
+    # convention M = lg(m'perp,i/m'i) (leaf over homogeneous element for the
+    # 2-4 path), valid only for mass_ratio < 1/3 (m2/m1 > 3); fk = 500 Hz.
     m = math.log10(5.0)
     assert junction_vibration_reduction(
         "lightweight_double_homogeneous", "through", 5.0
@@ -137,12 +139,26 @@ def test_kij_lightweight_double_homogeneous_e7() -> None:
     assert junction_vibration_reduction(
         "lightweight_double_homogeneous", "corner", 5.0, frequency=1000.0
     ) == pytest.approx(10.0 + 10.0 * m + 3.3 * math.log10(2.0))
+    m24 = math.log10(0.2)  # mass_ratio = m1/m2 = 1/5 (m2/m1 = 5 > 3)
+    k24 = junction_vibration_reduction(
+        "lightweight_double_homogeneous", "double_leaf", 0.2
+    )
+    assert k24 == pytest.approx(3.0 + 14.1 * m24 + 5.7 * m24 * m24)
+    # The per-path form equals the 2000 print's figure-axis recast
+    # 3,0 - 14,1 lg(m2/m1) + 5,7 lg(m2/m1)^2 (same relation, see ERRATA).
+    assert k24 == pytest.approx(3.0 - 14.1 * m + 5.7 * m * m)
+    # The Figure E.9 curve anchors: about -2,4 dB at m2/m1 = 3 and
+    # -5,4 dB at m2/m1 = 10.
     assert junction_vibration_reduction(
-        "lightweight_double_homogeneous", "double_leaf", 5.0
-    ) == pytest.approx(3.0 - 14.1 * m + 5.7 * m * m)
-    with pytest.raises(ValueError, match="m2/m1 > 3"):
+        "lightweight_double_homogeneous", "double_leaf", 0.1
+    ) == pytest.approx(-5.4)
+    with pytest.raises(ValueError, match="mass_ratio = m'⊥,i/m'i < 1/3"):
         junction_vibration_reduction(
-            "lightweight_double_homogeneous", "double_leaf", 2.0
+            "lightweight_double_homogeneous", "double_leaf", 0.5
+        )
+    with pytest.raises(ValueError, match="< 1/3"):
+        junction_vibration_reduction(
+            "lightweight_double_homogeneous", "double_leaf", 5.0
         )
 
 
