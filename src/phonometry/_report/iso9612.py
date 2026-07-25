@@ -170,7 +170,8 @@ def _task_table(
     """
     from reportlab.lib import colors
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph
+
+    from ._layout import fiche_paragraph as Paragraph
 
     header_style, label_style, value_style = analysis_cell_styles("iso9612")
 
@@ -228,7 +229,8 @@ def _task_table(
 def _sampling_table(result: ExposureResult, language: str = "en") -> Any:
     """The sampling summary of a job-based/full-day result (Formula (C.9) budget)."""
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph
+
+    from ._layout import fiche_paragraph as Paragraph
 
     header_style, label_style, value_style = analysis_cell_styles("iso9612")
 
@@ -315,7 +317,8 @@ def _assessment_rows(
 def _assessment_table(result: ExposureResult, language: str = "en") -> Any:
     """The Directive 2003/10/EC assessment table (exceeded / not exceeded)."""
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph
+
+    from ._layout import fiche_paragraph as Paragraph
 
     header_style, label_style, value_style = analysis_cell_styles("iso9612")
 
@@ -412,7 +415,9 @@ def render_iso9612_report(
         from reportlab.lib import colors
         from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
         from reportlab.lib.units import mm
-        from reportlab.platypus import Paragraph, Spacer
+        from reportlab.platypus import Spacer
+
+        from ._layout import fiche_paragraph as Paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)

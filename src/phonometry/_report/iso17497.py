@@ -174,7 +174,9 @@ def _header_flow(
     basis_style: Any,
 ) -> list[Any]:
     """The shared title/basis/metadata-grid opening of an ISO 17497 fiche."""
-    from reportlab.platypus import Paragraph, Spacer
+    from reportlab.platypus import Spacer
+
+    from ._layout import fiche_paragraph as Paragraph
 
     flow: list[Any] = [
         Paragraph(title, title_style),
@@ -195,7 +197,8 @@ def _scattering_table(
 ) -> Any:
     """Build the per-band ``f | alpha_s | s`` table (``alpha_spec`` if verbose)."""
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph
+
+    from ._layout import fiche_paragraph as Paragraph
 
     head_style = band_table_header_style()
     freqs = np.asarray(result.frequencies, dtype=np.float64)
@@ -261,7 +264,9 @@ def render_scattering_report(
     try:
         from reportlab.lib import colors
         from reportlab.lib.units import mm
-        from reportlab.platypus import Paragraph, Spacer
+        from reportlab.platypus import Spacer
+
+        from ._layout import fiche_paragraph as Paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -338,7 +343,8 @@ def _diffusion_table(
 ) -> Any:
     """Build the per-band ``f | d`` table (adds ``d_n`` when requested)."""
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph
+
+    from ._layout import fiche_paragraph as Paragraph
 
     head_style = band_table_header_style()
     freqs = np.asarray(result.frequencies, dtype=np.float64)
@@ -396,7 +402,9 @@ def render_diffusion_spectrum_report(
     try:
         from reportlab.lib import colors
         from reportlab.lib.units import mm
-        from reportlab.platypus import Paragraph, Spacer
+        from reportlab.platypus import Spacer
+
+        from ._layout import fiche_paragraph as Paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
@@ -461,7 +469,8 @@ def render_diffusion_spectrum_report(
 def _polar_table(result: DiffusionResult, language: str = "en") -> Any:
     """Build the corrected ``angle | reflected level`` polar-response table."""
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph
+
+    from ._layout import fiche_paragraph as Paragraph
 
     head_style = band_table_header_style()
     angles = np.asarray(result.angles, dtype=np.float64)
@@ -503,7 +512,9 @@ def render_diffusion_polar_report(
     try:
         from reportlab.lib import colors
         from reportlab.lib.units import mm
-        from reportlab.platypus import Paragraph, Spacer
+        from reportlab.platypus import Spacer
+
+        from ._layout import fiche_paragraph as Paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)

@@ -191,7 +191,8 @@ def _analysis_table(result: MultipleShockResult, language: str = "en") -> Any:
     injury ``P`` (Formula C.5).
     """
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph
+
+    from ._layout import fiche_paragraph as Paragraph
 
     header_style, label_style, value_style = analysis_cell_styles("iso26315")
     ms2 = _unit_ms2()
@@ -268,7 +269,8 @@ def _classification_table(
     """
     from reportlab.lib import colors
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph
+
+    from ._layout import fiche_paragraph as Paragraph
 
     header_style, label_style, value_style = analysis_cell_styles("iso26315cls")
     r10, r50, r90 = (
@@ -349,7 +351,8 @@ def _statement(result: MultipleShockResult, language: str = "en") -> str:
 def _zone_row(result: MultipleShockResult, language: str = "en") -> Any:
     """The classification zone row stating the Annex C risk band for ``R``."""
     from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
-    from reportlab.platypus import Paragraph
+
+    from ._layout import fiche_paragraph as Paragraph
 
     band = t(_BAND_LABELS[_band_index(result)], language)
     zone_style = ParagraphStyle(
@@ -395,7 +398,9 @@ def render_iso2631_5_report(
         from reportlab.lib import colors
         from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
         from reportlab.lib.units import mm
-        from reportlab.platypus import Paragraph, Spacer
+        from reportlab.platypus import Spacer
+
+        from ._layout import fiche_paragraph as Paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)

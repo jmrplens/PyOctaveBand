@@ -127,7 +127,8 @@ def _alpha_table(
 ) -> Any:
     """Build the compact two-column ``f | alpha_s`` table (accredited default)."""
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph
+
+    from ._layout import fiche_paragraph as Paragraph
 
     head_style = band_table_header_style()
     header = [
@@ -145,7 +146,8 @@ def _detail_table(
 ) -> Any:
     """Build the verbose table ``f | T1 | T2 | A1 | A2 | alpha_s`` (~102 mm wide)."""
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph
+
+    from ._layout import fiche_paragraph as Paragraph
 
     head_style = band_table_header_style()
     header = [
@@ -218,7 +220,9 @@ def render_iso354_report(
     """
     try:
         from reportlab.lib import colors
-        from reportlab.platypus import Paragraph, Spacer
+        from reportlab.platypus import Spacer
+
+        from ._layout import fiche_paragraph as Paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)

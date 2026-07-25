@@ -172,7 +172,8 @@ def _operations_table(
     """
     from reportlab.lib import colors
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph
+
+    from ._layout import fiche_paragraph as Paragraph
 
     header_style, label_style, value_style = analysis_cell_styles("humanvib")
     kind = str(result.assessment.kind)
@@ -271,7 +272,8 @@ def _assessment_rows(
 def _assessment_table(result: DailyVibrationExposure, language: str = "en") -> Any:
     """The Directive 2002/44/EC assessment table (exceeded / not exceeded)."""
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph
+
+    from ._layout import fiche_paragraph as Paragraph
 
     header_style, label_style, value_style = analysis_cell_styles("humanvib")
 
@@ -395,7 +397,9 @@ def render_human_vibration_report(
         from reportlab.lib import colors
         from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
         from reportlab.lib.units import mm
-        from reportlab.platypus import Paragraph, Spacer
+        from reportlab.platypus import Spacer
+
+        from ._layout import fiche_paragraph as Paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)

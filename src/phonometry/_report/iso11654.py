@@ -155,7 +155,9 @@ def _value_table(
     """
     from reportlab.lib import colors
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph, Table, TableStyle
+    from reportlab.platypus import Table, TableStyle
+
+    from ._layout import fiche_paragraph as Paragraph
 
     accent = colors.HexColor(_ACCENT_HEX)
     light = colors.HexColor(_LIGHT_HEX)
@@ -223,7 +225,9 @@ def _third_octave_table(
     """
     from reportlab.lib import colors
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph, Table, TableStyle
+    from reportlab.platypus import Table, TableStyle
+
+    from ._layout import fiche_paragraph as Paragraph
 
     accent = colors.HexColor(_ACCENT_HEX)
     light = colors.HexColor(_LIGHT_HEX)
@@ -324,7 +328,9 @@ def render_iso11654_report(
     try:
         from reportlab.lib import colors
         from reportlab.lib.units import mm
-        from reportlab.platypus import Paragraph, Spacer
+        from reportlab.platypus import Spacer
+
+        from ._layout import fiche_paragraph as Paragraph
     except ImportError as exc:
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)

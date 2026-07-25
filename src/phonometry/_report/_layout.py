@@ -20,6 +20,7 @@ from __future__ import annotations
 import html
 import math
 import os
+import re
 import tempfile
 from collections.abc import Callable
 from typing import Any
@@ -50,6 +51,39 @@ _LIGHT_HEX = "#eef2f7"
 _MUTED_HEX = "#555555"
 _VERDICT_OK_HEX = "#1b6e2f"
 _VERDICT_BAD_HEX = "#a11a1a"
+
+#: Baseline shift of a fiche ``<sub>``/``<super>`` fragment, as a percentage
+#: of the enclosing font size. reportlab shifts a script by half the font
+#: size by default, yet spaces the lines of a paragraph by the style's fixed
+#: ``leading`` alone (its ``autoLeading`` modes only look at per-fragment
+#: font sizes, never at the script ``rise``), so a wrapped line ending in
+#: deep subscripts collided with the ascenders of the next line. A
+#: quarter-em shift is the typographic norm and bounds the worst-case line
+#: extent (a deepest-subscript line directly above a tallest-superscript
+#: line) at 1.24x the font size, which fits inside the fixed leading of
+#: every fiche prose style.
+_SCRIPT_RISE = "25%"
+
+#: Bare script openers; the fiche markup never writes explicit rise/size
+#: attributes, so only the attribute-less tags need rewriting.
+_SCRIPT_TAG_RE = re.compile(r"<(sub|sup|super)>")
+
+
+def fiche_paragraph(text: str, style: Any, **kwargs: Any) -> Any:
+    """Build a reportlab ``Paragraph`` whose sub/superscripts cannot collide.
+
+    Every fiche paragraph is created through this factory (the renderers
+    import it as ``Paragraph``): it rewrites the bare ``<sub>``/``<sup>``/
+    ``<super>`` openers to carry ``rise="25%"`` so the scripts stay within
+    the fixed line leading of the fiche styles (see :data:`_SCRIPT_RISE`).
+    The script font-size reduction keeps reportlab's default. Called only
+    after the renderer has imported reportlab.
+    """
+    from reportlab.platypus import Paragraph as _Paragraph
+
+    return _Paragraph(
+        _SCRIPT_TAG_RE.sub(rf'<\1 rise="{_SCRIPT_RISE}">', text), style, **kwargs
+    )
 
 
 def escaped_pairs(
@@ -250,7 +284,7 @@ def grid_table(pairs: list[tuple[str, str]]) -> Any:
     from reportlab.lib import colors
     from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph, Table, TableStyle
+    from reportlab.platypus import Table, TableStyle
 
     styles = getSampleStyleSheet()
     accent = colors.HexColor(_ACCENT_HEX)
@@ -269,10 +303,10 @@ def grid_table(pairs: list[tuple[str, str]]) -> Any:
         right = pairs[i + 1] if i + 1 < len(pairs) else ("", "")
         rows.append(
             [
-                Paragraph(f"{left[0]}:", label_style) if left[0] else "",
-                Paragraph(left[1], value_style),
-                Paragraph(f"{right[0]}:", label_style) if right[0] else "",
-                Paragraph(right[1], value_style) if right[0] else "",
+                fiche_paragraph(f"{left[0]}:", label_style) if left[0] else "",
+                fiche_paragraph(left[1], value_style),
+                fiche_paragraph(f"{right[0]}:", label_style) if right[0] else "",
+                fiche_paragraph(right[1], value_style) if right[0] else "",
             ]
         )
     table = Table(rows, colWidths=[36 * mm, 51 * mm, 36 * mm, 51 * mm])
@@ -431,7 +465,7 @@ def metrics_table(rows: list[tuple[str, str]], *, col_widths: Any = None) -> Any
     from reportlab.lib import colors
     from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph, Table, TableStyle
+    from reportlab.platypus import Table, TableStyle
 
     styles = getSampleStyleSheet()
     accent = colors.HexColor(_ACCENT_HEX)
@@ -444,7 +478,7 @@ def metrics_table(rows: list[tuple[str, str]], *, col_widths: Any = None) -> Any
         alignment=2,
     )
     data = [
-        [Paragraph(label, label_style), Paragraph(value, value_style)]
+        [fiche_paragraph(label, label_style), fiche_paragraph(value, value_style)]
         for label, value in rows
     ]
     table = Table(data, colWidths=col_widths or [34 * mm, 22 * mm])
@@ -492,7 +526,7 @@ def compliance_table(
     from reportlab.lib import colors
     from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph, Table, TableStyle
+    from reportlab.platypus import Table, TableStyle
 
     styles = getSampleStyleSheet()
     accent = colors.HexColor(_ACCENT_HEX)
@@ -525,19 +559,19 @@ def compliance_table(
 
     data: list[list[Any]] = [
         [
-            Paragraph(t("Metric", language), header_style),
-            Paragraph(t("Measured", language), header_style),
-            Paragraph(t("Target / Limit", language), header_style),
-            Paragraph(t("Result", language), header_style),
+            fiche_paragraph(t("Metric", language), header_style),
+            fiche_paragraph(t("Measured", language), header_style),
+            fiche_paragraph(t("Target / Limit", language), header_style),
+            fiche_paragraph(t("Result", language), header_style),
         ]
     ]
     for metric, measured, limit, status in rows:
         data.append(
             [
-                Paragraph(metric, cell_style),
-                Paragraph(measured, cell_style),
-                Paragraph(limit, cell_style),
-                Paragraph(_result_markup(status), result_style),
+                fiche_paragraph(metric, cell_style),
+                fiche_paragraph(measured, cell_style),
+                fiche_paragraph(limit, cell_style),
+                fiche_paragraph(_result_markup(status), result_style),
             ]
         )
     table = Table(data, colWidths=col_widths or [64 * mm, 36 * mm, 50 * mm, 24 * mm])
@@ -655,21 +689,21 @@ def result_box(
     from reportlab.lib import colors
     from reportlab.lib.styles import ParagraphStyle
     from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph, Table, TableStyle
+    from reportlab.platypus import Table, TableStyle
 
     result_style = ParagraphStyle(
         "fiche_result", parent=styles["Normal"], fontSize=13, leading=17,
         textColor=accent,
     )
-    box_cells: list[Any] = [Paragraph(statement, result_style)]
+    box_cells: list[Any] = [fiche_paragraph(statement, result_style)]
     box_widths = [174 * mm]
     if extended:
         ext_style = ParagraphStyle(
             "fiche_ext", parent=styles["Normal"], fontSize=8.5, leading=12,
         )
         box_cells = [
-            Paragraph(statement, result_style),
-            Paragraph("<br/>".join(extended), ext_style),
+            fiche_paragraph(statement, result_style),
+            fiche_paragraph("<br/>".join(extended), ext_style),
         ]
         box_widths = [104 * mm, 70 * mm]
     box = Table([box_cells], colWidths=box_widths)
@@ -699,7 +733,6 @@ def verdict_flow(
     Called only after the renderer has imported reportlab.
     """
     from reportlab.lib.styles import ParagraphStyle
-    from reportlab.platypus import Paragraph
 
     badge = t("PASS", language) if passed else t("FAIL", language)
     badge_hex = _VERDICT_OK_HEX if passed else _VERDICT_BAD_HEX
@@ -709,7 +742,7 @@ def verdict_flow(
     )
     lead = t("Result vs requirement", language)
     return [
-        Paragraph(
+        fiche_paragraph(
             f"{lead}: {text} &#8594; "
             f"<b><font color='{badge_hex}'>{badge}</font></b>",
             verdict_style,
@@ -734,7 +767,7 @@ def footer_flow(
     """
     from reportlab.lib import colors
     from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
-    from reportlab.platypus import Paragraph, Spacer
+    from reportlab.platypus import Spacer
 
     styles = getSampleStyleSheet()
     muted = colors.HexColor(_MUTED_HEX)
@@ -777,32 +810,32 @@ def footer_flow(
                 f"{html.escape(metadata.notes)}"
             )
     for line in lines:
-        flow.append(Paragraph(line, ident_style))
+        flow.append(fiche_paragraph(line, ident_style))
 
     operator = metadata.operator if metadata is not None else None
     if operator:
         flow.append(
-            Paragraph(
+            fiche_paragraph(
                 f"{t('Operator', language)}: {html.escape(operator)} "
                 f"&nbsp;&nbsp; {sign_blank}",
                 sign_style,
             )
         )
     elif lines:
-        flow.append(Paragraph(sign_blank, sign_style))
+        flow.append(fiche_paragraph(sign_blank, sign_style))
 
     if disclaimer is None:
         disclaimer = "The results relate only to the tested specimen."
     flow.append(Spacer(1, 4))
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             f"<font color='{_ACCENT_HEX}'>&#9632;</font> "
             f"{t(disclaimer, language)}",
             disclaimer_style,
         )
     )
     flow.append(
-        Paragraph(
+        fiche_paragraph(
             f"<font size=7 color='#888888'>"
             f"{t('Generated by phonometry.', language)}</font>",
             disclaimer_style,
