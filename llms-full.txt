@@ -9760,7 +9760,7 @@ res.plot()                        # excess attenuation vs frequency
 
 The ground impedance is either derived from an effective `flow_resistivity`
 (via the `delany_bazley` or `miki` model of
-[`phonometry.materials`](porous-absorber.md), which model a semi-infinite porous
+[`phonometry.materials`](porous-absorbers.md), which model a semi-infinite porous
 ground) or supplied directly as a normalized complex `impedance` (a scalar,
 per-band array, or a `PorousMediumResult`). A plain `impedance` value is taken
 in the `e^{-iωt}` convention of Salomons, in which a passive ground has
