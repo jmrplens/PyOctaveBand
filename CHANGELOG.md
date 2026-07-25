@@ -75,6 +75,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - English fiche strings and docstrings for ISO 3382-3 use point decimals
   ("STI = 0.50"/"0.20"); the Spanish strings keep the comma.
 
+### Fixed
+
+- `intensity_element_normalized_difference()` (ISO 15186-1): return the
+  derivable per-unit value with `+10 lg N` for `N` element units measured
+  together. The printed Formula (8) subtracts its `10 lg(N)` term, which
+  contradicts ISO 10140-2:2010 Formula (6) and ISO 15186-2:2010 Formula (12)
+  (registered in `docs/ERRATA.md`); `n > 1` now warns about the deviation
+  from the print.
+- ISO 16283-3 façade fiche: a road-traffic measurement is now labelled with
+  its own quantity `R'tr,s` (Clause 3.13) instead of the loudspeaker `R'45`
+  basis line; `FacadeInsulationResult` carries the measurement `method`.
+- ISO 10848 `Dn,f` / `Ln,f` fiches: the basis line names the ISO 10848 part
+  governing the tested construction via the new `part` argument (2, 3 or 4)
+  instead of hardcoding ISO 10848-2:2006.
+- `junction_vibration_reduction()` (EN 12354-1 Annex E): the E.7 double-leaf
+  branch (K24) now uses the same per-path `mass_ratio = m'⊥,i/m'i` as every
+  other branch (validity `m2/m1 > 3` reads `mass_ratio < 1/3`), evaluating
+  `3,0 + 14,1 M + 5,7 M²` as ISO 12354-1:2017 E.3.5 prints it; the 2000
+  edition's `−14,1 M` line is the same relation recast in its figure's
+  x-axis variable (the K24 errata entry is rewritten accordingly — the
+  earlier reading of the 2017 print as a sign misprint was wrong).
+- `installed_source_prediction()` (EN 12354-5): a single-number
+  characteristic power level with per-band path data now broadcasts across
+  the path bands instead of raising or producing a one-element
+  `installed_power_level` that crashed the fiche table.
+- EN 12354-1/-2/-3/-5 prediction fiches: the footer disclaimer now reads
+  "Predicted result: the values relate only to the modelled configuration,
+  not to a tested specimen." instead of the measurement wording, and the
+  2000 editions are cited as `EN 12354-x:2000` (not `EN/ISO`).
+- ISO 10052 survey fiches: the basis line declares the band set the
+  reported curve actually carries (octave or one-third-octave) instead of
+  hardcoding "octave bands".
+- ISO 16251-1 fiche: a result with bands at the 1,3 dB limit of measurement
+  is qualified as a lower bound (`≥` on the boxed `ΔLw` plus a note), and a
+  hand-built result without `CI,Δ` no longer prints a fabricated `(+0)`.
+- ISO 15186-1 intensity fiches: the method statement states the test-object
+  and measurement-surface areas `S` / `Sm` (Clause 8 g) and `report()`
+  accepts optional per-band `FpI` / `δpI0` spectra (Clause 8 i); the
+  Table B.1 `Kc` oracle now pins all 21 printed rows (3150/4000/5000 Hz
+  added), and the 6.4.2 qualification wording is "must not exceed 10 dB".
+- Spanish impact terminology aligned with the UNE editions: the
+  ISO 16283-2 / ISO 10052 basis lines use "nivel de presión acústica
+  estandarizado/normalizado de ruido de impactos" (UNE-EN ISO 16283-2:2016,
+  3.13/3.14).
+- Citation and docstring corrections: `Kij,min` is Formula (29)
+  (Clause 4.4.2), the ISO 10140 test report is Clause 9, the ISO 717-1:2020
+  band-set statement is Clause 5.3, the ISO 12354-1:2017 both-negative
+  lining rule is documented next to `combine_linings()`, and the EN 12354-5
+  coupling term `D_C` is documented as not guaranteed non-negative (mounting
+  resonance counterexample). New errata entries: ISO 15186-1:2000
+  Formula (8), ISO 10848-1:2006 Formula (20) (spurious π), and the extended
+  ISO 717-2:2020 Annex C.2 chain (the printed `Ln,sum = 75,2527` is the
+  energy sum of the wrong column over the wrong range).
+
 ### Changed
 
 - `room.noise_criterion` now follows the full two-step rating procedure of

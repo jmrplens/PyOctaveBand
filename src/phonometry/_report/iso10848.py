@@ -14,12 +14,17 @@ ISO 10848-4:2010) to one-page PDF fiches:
   with a mean, not a shifted-reference insulation curve).
 * :class:`~phonometry.building.flanking_transmission.FlankingLevelDifferenceResult`
   to a **measurement** report of the normalized flanking level difference
-  ``Dn,f`` (airborne, ISO 10848-2:2006), with the ISO 717-1 single number
-  ``Dn,f,w (C; Ctr)``.
+  ``Dn,f`` (airborne, ISO 10848-1:2006 Formula (4)), with the ISO 717-1 single
+  number ``Dn,f,w (C; Ctr)``.
 * :class:`~phonometry.building.flanking_transmission.FlankingImpactLevelResult`
   to a **measurement** report of the normalized flanking impact level ``Ln,f``
-  (tapping machine, ISO 10848-2:2006), with the ISO 717-2 single number
-  ``Ln,f,w (CI)``.
+  (tapping machine, ISO 10848-1:2006 Formula (5)), with the ISO 717-2 single
+  number ``Ln,f,w (CI)``.
+
+The ``Dn,f`` / ``Ln,f`` basis line names the ISO 10848 part governing the
+tested construction, selected by the ``part`` argument: Part 2 (lightweight
+elements, default), Part 3 (lightweight elements with a junction of
+substantial influence) or Part 4 (heavy, Type A elements).
 
 The two overall flanking descriptors are shaped like a sound-insulation
 quantity (a per-band curve rated by ISO 717 against a shifted reference), so
@@ -67,41 +72,76 @@ if TYPE_CHECKING:
     )
     from ..building.insulation import ImpactRatingResult, WeightedRatingResult
 
-#: Fixed labels of the two overall flanking descriptors, consumed by the shared
-#: insulation skeleton: title, standard-basis line, the quantity symbol used in
-#: the table header, the rating symbol of the boxed result, the plot y-axis
-#: label (mathtext) and the measurement statement.
-_DNF_SPEC: dict[str, str] = {
-    "title": "Flanking sound insulation between rooms",
-    "basis": (
-        "Normalized flanking level difference D<sub>n,f</sub> measured in "
-        "accordance with ISO 10848-2:2006 (airborne excitation of the "
-        "source-room element). Rating per ISO 717-1:2020."
-    ),
-    "symbol": "D<sub>n,f</sub>",
-    "rating_symbol": "D<sub>n,f,w</sub>",
-    "ylabel": "$D_{n,f}$ [dB]",
-    "statement": (
-        "Evaluation based on laboratory measurement of the normalized flanking "
-        "level difference (ISO 10848-2:2006, airborne excitation)."
-    ),
+#: Designation of each applicable ISO 10848 part. The overall flanking
+#: descriptors ``Dn,f`` / ``Ln,f`` are defined in the Part 1 frame document
+#: (Formulas (4)/(5)); which part governs the measurement depends on the
+#: construction under test: Part 2 (lightweight elements, junction of light
+#: components), Part 3 (lightweight elements when the junction has a
+#: substantial influence) or Part 4 (heavy, Type A elements).
+_PART_DESIGNATIONS: dict[int, str] = {
+    2: "ISO 10848-2:2006",
+    3: "ISO 10848-3:2006",
+    4: "ISO 10848-4:2010",
 }
-_LNF_SPEC: dict[str, str] = {
-    "title": "Flanking impact sound insulation of floors",
-    "basis": (
-        "Normalized flanking impact sound pressure level L<sub>n,f</sub> "
-        "measured in accordance with ISO 10848-2:2006 using the tapping "
-        "machine on the source-room floor. Rating per ISO 717-2:2020."
-    ),
-    "symbol": "L<sub>n,f</sub>",
-    "rating_symbol": "L<sub>n,f,w</sub>",
-    "ylabel": "$L_{n,f}$ [dB]",
-    "statement": (
-        "Evaluation based on laboratory measurement of the normalized flanking "
-        "impact level (ISO 10848-2:2006, tapping machine on the source-room "
-        "floor)."
-    ),
-}
+
+
+def _part_designation(part: int) -> str:
+    """The designation of ISO 10848 part ``part``, or raise."""
+    try:
+        return _PART_DESIGNATIONS[int(part)]
+    except (KeyError, ValueError) as exc:
+        raise ValueError(
+            "'part' must be 2, 3 or 4 (the ISO 10848 part governing the "
+            f"tested construction); got {part!r}."
+        ) from exc
+
+
+def _dnf_spec(standard: str, language: str) -> dict[str, str]:
+    """Fixed labels of the ``Dn,f`` fiche for the governing ``standard``.
+
+    The natural-language strings are pre-translated here (with the standard
+    designation filled in), so the shared skeleton's re-translation of the
+    composed text is a no-op.
+    """
+    return {
+        "title": "Flanking sound insulation between rooms",
+        "basis": t(
+            "Normalized flanking level difference D<sub>n,f</sub> measured "
+            "in accordance with {standard} (airborne excitation of the "
+            "source-room element). Rating per ISO 717-1:2020.",
+            language,
+        ).format(standard=standard),
+        "symbol": "D<sub>n,f</sub>",
+        "rating_symbol": "D<sub>n,f,w</sub>",
+        "ylabel": "$D_{n,f}$ [dB]",
+        "statement": t(
+            "Evaluation based on laboratory measurement of the normalized "
+            "flanking level difference ({standard}, airborne excitation).",
+            language,
+        ).format(standard=standard),
+    }
+
+
+def _lnf_spec(standard: str, language: str) -> dict[str, str]:
+    """Fixed labels of the ``Ln,f`` fiche for the governing ``standard``."""
+    return {
+        "title": "Flanking impact sound insulation of floors",
+        "basis": t(
+            "Normalized flanking impact sound pressure level L<sub>n,f</sub> "
+            "measured in accordance with {standard} using the tapping "
+            "machine on the source-room floor. Rating per ISO 717-2:2020.",
+            language,
+        ).format(standard=standard),
+        "symbol": "L<sub>n,f</sub>",
+        "rating_symbol": "L<sub>n,f,w</sub>",
+        "ylabel": "$L_{n,f}$ [dB]",
+        "statement": t(
+            "Evaluation based on laboratory measurement of the normalized "
+            "flanking impact level ({standard}, tapping machine on the "
+            "source-room floor).",
+            language,
+        ).format(standard=standard),
+    }
 
 
 def _require_rating(
@@ -129,8 +169,9 @@ def render_flanking_level_difference_report(
     metadata: ReportMetadata | None = None,
     verbose: bool = False,
     language: str = "en",
+    part: int = 2,
 ) -> str:
-    """Render a normalized flanking level difference ``Dn,f`` fiche (ISO 10848-2).
+    """Render a normalized flanking level difference ``Dn,f`` fiche (ISO 10848).
 
     :param result: The
         :class:`~phonometry.building.flanking_transmission.FlankingLevelDifferenceResult`;
@@ -142,19 +183,23 @@ def render_flanking_level_difference_report(
         per band (the ``Dn,f`` value, the shifted reference and the unfavourable
         deviation) instead of the two-column form.
     :param language: ``"en"`` (default) or ``"es"``.
+    :param part: The ISO 10848 part governing the tested construction: ``2``
+        (default), ``3`` or ``4``; it selects the basis-line designation.
     :return: The written ``path`` as a :class:`str`.
+    :raises ValueError: If ``part`` is not 2, 3 or 4.
     :raises ImportError: If reportlab (or, for the figure, matplotlib) is not
         installed.
     """
     rating = _require_rating(result.rating)
+    spec = _dnf_spec(_part_designation(part), language)
     return render_insulation_fiche(
         result,
         rating,
         path,
-        spec=_DNF_SPEC,
+        spec=spec,
         is_impact=False,
         curve_attr="d_n_f",
-        build_columns=iso717_columns_builder(rating, False, _DNF_SPEC["symbol"]),
+        build_columns=iso717_columns_builder(rating, False, spec["symbol"]),
         metadata=metadata,
         verbose=verbose,
         language=language,
@@ -168,8 +213,9 @@ def render_flanking_impact_level_report(
     metadata: ReportMetadata | None = None,
     verbose: bool = False,
     language: str = "en",
+    part: int = 2,
 ) -> str:
-    """Render a normalized flanking impact level ``Ln,f`` fiche (ISO 10848-2).
+    """Render a normalized flanking impact level ``Ln,f`` fiche (ISO 10848).
 
     :param result: The
         :class:`~phonometry.building.flanking_transmission.FlankingImpactLevelResult`;
@@ -181,19 +227,23 @@ def render_flanking_impact_level_report(
         per band (the ``Ln,f`` value, the shifted reference and the unfavourable
         deviation) instead of the two-column form.
     :param language: ``"en"`` (default) or ``"es"``.
+    :param part: The ISO 10848 part governing the tested construction: ``2``
+        (default), ``3`` or ``4``; it selects the basis-line designation.
     :return: The written ``path`` as a :class:`str`.
+    :raises ValueError: If ``part`` is not 2, 3 or 4.
     :raises ImportError: If reportlab (or, for the figure, matplotlib) is not
         installed.
     """
     rating = _require_rating(result.rating)
+    spec = _lnf_spec(_part_designation(part), language)
     return render_insulation_fiche(
         result,
         rating,
         path,
-        spec=_LNF_SPEC,
+        spec=spec,
         is_impact=True,
         curve_attr="l_n_f",
-        build_columns=iso717_columns_builder(rating, True, _LNF_SPEC["symbol"]),
+        build_columns=iso717_columns_builder(rating, True, spec["symbol"]),
         metadata=metadata,
         verbose=verbose,
         language=language,

@@ -37,12 +37,12 @@ _A0 = 10.0
 
 
 def _levels_for_target_dine(dine, lp1, sm, n):
-    """Receiving-side LIn that make Formula (8) return exactly ``dine``."""
+    """Receiving-side LIn that make the corrected Formula (8) return ``dine``."""
     return (
         lp1
         - 6.0
         - 10.0 * np.log10(sm / _A0)
-        - 10.0 * np.log10(float(n))
+        + 10.0 * np.log10(float(n))
         - np.asarray(dine, dtype=np.float64)
     )
 

@@ -1340,8 +1340,11 @@ ISO717_2_ANNEX_C1_COVERED_EXPECTED = {
 # of a floor covering on the standard reference floor. The worked example
 # gives ΔLw = 15 dB (Ln,r,w = 63 dB). The module additionally derives
 # CI,Δ = CI,r,0 - CI,r = -11 - (-2) = -9 dB from the normative Table 4
-# reference floor (the printed C.2 chain uses a misprinted 800 Hz reference
-# value 71,0 instead of Table 4's 71,5 and reaches CI,r = -3).
+# reference floor. The printed C.2 chain reaches CI,r = -3 because its
+# "Ln,sum = 75,2527" is the energy sum of the wrong column over the wrong
+# range (the measured floor with covering, 16 bands 100-3150 Hz); the A.2.1
+# sum of the covered reference floor over 100-2500 Hz rounds to 76 dB with
+# either the misprinted 71,0 or Table 4's 71,5 at 800 Hz (see docs/ERRATA.md).
 # ---------------------------------------------------------------------------
 ISO717_2_ANNEX_C2_DELTA_L: list[float] = [
     3.0, 3.7, 1.9, 3.0, 3.2, 3.5, 4.0, 6.1,
@@ -1358,7 +1361,7 @@ ISO717_2_ANNEX_C2_CI_DELTA = -9
 # that RI reproduces the ISO 717-1 Annex C airborne curve above, the ISO 717-1
 # engine returns the same Rw = 30 dB through the intensity path. The
 # adaptation term Kc (Annex B) oracle is the standard's own printed
-# Table B.1 (18 one-third-octave rows, 50-2500 Hz, one decimal): the
+# Table B.1 (21 one-third-octave rows, 50-5000 Hz, one decimal): the
 # Formula (B.2) approximation Kc = 10 lg(1 + 61,4/f) reproduces every row at
 # 1 dp, and Formula (B.1) with the reference room (Sb2 = 117 m², V2 = 81 m³,
 # c = 340 m/s) reduces to (B.2) within 0,001 dB.
@@ -1373,7 +1376,8 @@ ISO15186_1_KC_TABLE_B1: list[tuple[float, float]] = [
     (50.0, 3.5), (63.0, 3.0), (80.0, 2.5), (100.0, 2.1), (125.0, 1.7),
     (160.0, 1.4), (200.0, 1.2), (250.0, 1.0), (315.0, 0.8), (400.0, 0.6),
     (500.0, 0.5), (630.0, 0.4), (800.0, 0.3), (1000.0, 0.3), (1250.0, 0.2),
-    (1600.0, 0.2), (2000.0, 0.1), (2500.0, 0.1),
+    (1600.0, 0.2), (2000.0, 0.1), (2500.0, 0.1), (3150.0, 0.1), (4000.0, 0.1),
+    (5000.0, 0.1),
 ]
 ISO15186_1_KC_BANDS = tuple(f for f, _ in ISO15186_1_KC_TABLE_B1)
 ISO15186_1_KC_B1_PRINTED = [kc for _, kc in ISO15186_1_KC_TABLE_B1]

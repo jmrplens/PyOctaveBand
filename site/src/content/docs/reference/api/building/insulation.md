@@ -402,6 +402,7 @@ FacadeInsulationResult(
     d_2m_n: np.ndarray | None,
     r_prime: np.ndarray | None,
     frequencies: np.ndarray | None = None,
+    method: str = 'loudspeaker',
 )
 ```
 
@@ -416,6 +417,7 @@ Per-band field façade sound insulation (ISO 16283-3).
 | `d_2m_n` | Normalized level difference `D2m,n = D2m - 10 lg(A/A0)` per band, in dB (Clause 3.16), or `None` when the receiving-room volume was not supplied. |
 | `r_prime` | Apparent sound reduction index `R'45°` (loudspeaker, Clause 3.12) or `R'tr,s` (road traffic, Clause 3.13) per band, in dB, or `None` unless a surface level together with the element area and receiving-room volume were supplied. |
 | `frequencies` | Band centre frequencies, in Hz, or `None`. |
+| `method` | The sound source of the measurement: `"loudspeaker"` (45° incidence) or `"road_traffic"`. It selects which apparent index `r_prime` is (`R'45` or `R'tr,s`) and how the report labels it. |
 
 ### FacadeInsulationResult.plot()
 
@@ -455,17 +457,18 @@ Writes the one-page field facade test report of ISO 16283-3:2016: the
 standard-basis line, an optional metadata header block, the
 one-third-octave table beside the measured-versus-shifted-reference
 curve, the boxed ISO 717-1 field rating of the reported `quantity`
-(`D2m,nT,w` for `d_2m_nt`, `D2m,n,w` for `d_2m_n` or
-`R'45,w` for `r_prime`, each with `C; Ctr` and evaluated over the
-16 core bands), the mandatory field-method statement, an optional
-verdict row and a footer with the identity block and disclaimer.
+(`D2m,nT,w` for `d_2m_nt`, `D2m,n,w` for `d_2m_n` or, for
+`r_prime`, `R'45,w` / `R'tr,s,w` following the result's
+`method`, each with `C; Ctr` and evaluated over the 16 core
+bands), the mandatory field-method statement, an optional verdict row
+and a footer with the identity block and disclaimer.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
 | `path` | Destination path of the PDF file. |
-| `quantity` | The reported facade quantity: `"d_2m_nt"` (default, the standardized facade level difference `D2m,nT`), `"d_2m_n"` (the normalized facade level difference `D2m,n`; requires the result to carry `d_2m_n`) or `"r_prime"` (the apparent sound reduction index `R'45`; requires the result to carry `r_prime`). |
+| `quantity` | The reported facade quantity: `"d_2m_nt"` (default, the standardized facade level difference `D2m,nT`), `"d_2m_n"` (the normalized facade level difference `D2m,n`; requires the result to carry `d_2m_n`) or `"r_prime"` (the apparent sound reduction index; requires the result to carry `r_prime`). The `r_prime` fiche is labelled `R'45` (Clause 3.12, loudspeaker method) or `R'tr,s` (Clause 3.13, road traffic method) according to the result's `method`. |
 | `metadata` | Optional [`ReportMetadata`](/phonometry/reference/api/building/insulation/#reportmetadata); `None` produces a lightweight fiche (body, rating and disclaimer only). |
 | `engine` | Rendering back end; only `"reportlab"` is supported. |
 | `verbose` | When `True`, the table shows the ISO 717 evaluation per band (the reported quantity, the shifted reference and the unfavourable deviation) instead of the two-column `f \| value` form. |

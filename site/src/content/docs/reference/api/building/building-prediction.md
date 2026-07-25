@@ -158,6 +158,15 @@ For two linings the total improvement is the larger value plus half the
 smaller: `ΔR = max(a, b) + min(a, b)/2`. For a single lining pass the
 other as `0`.
 
+:::note
+ISO 12354-1:2017 (Formulas (22)/(23)) adds a special case the 2000
+edition implemented here does not have: when *both* linings are
+negative (each lining worsens the insulation), half is taken of the
+*higher* value instead, `ΔR = min(a, b) + max(a, b)/2`, so two
+degrading linings degrade further (e.g. −2 and −4 dB combine to
+−5 dB under the 2017 rule, −4 dB under the 2000 rule used here).
+:::
+
 **Parameters**
 
 | Name | Description |
@@ -465,7 +474,7 @@ junction_min_vibration_reduction(
 
 Minimum vibration reduction index `Kij,min` (EN 12354-1 Clause 4.4.2).
 
-Printed as Eq. (23) in the BS EN 12354-1:2000 edition.
+Printed as Formula (29) in the EN 12354-1:2000 edition.
 
 `Kij,min = 10 lg[ lf · l0 · (1/Si + 1/Sj) ]` with the reference coupling
 length `l0 = 1 m`. When the tabulated `Kij` is below this value, the
@@ -529,8 +538,16 @@ Supported `junction_type` values and their formulas:
   joined to homogeneous elements): through
   `max(10 + 20 M − 3,3 lg(f/fk), 10)`; corner
   `10 + 10 |M| + 3,3 lg(f/fk)`; double-leaf
-  `K24 = 3,0 − 14,1 M + 5,7 M²` (given only for `m2/m1 > 3`); with
-  `fk = 500 Hz`.
+  `K24 = 3,0 + 14,1 M + 5,7 M²` with `fk = 500 Hz`. The K24 path is
+  carried by the homogeneous element crossing the double leaf, so its
+  per-path `mass_ratio = m'⊥,i/m'i` is leaf-over-homogeneous and the
+  validity condition (homogeneous over three times heavier than a leaf)
+  reads `mass_ratio < 1/3`. (The 2000 print states this line as
+  `3,0 − 14,1 M + 5,7 M²` in the *figure-axis* variable
+  `M = lg(m2/m1)` of Figure E.9, contradicting the annex's own
+  per-path definition of M; both forms are numerically identical, and
+  ISO 12354-1:2017 E.3.5 prints the per-path form implemented here. See
+  `docs/ERRATA.md`.)
 - `"lightweight_double_coupled"` (E.8, junction of lightweight coupled
   double-leaf walls): through `max(10 + 20 M − 3,3 lg(f/fk), 10)`;
   corner `10 + 10 |M| − 3,3 lg(f/fk)`; with `fk = 500 Hz`.
@@ -545,7 +562,7 @@ Supported `junction_type` values and their formulas:
 | :--- | :--- |
 | `junction_type` | Junction geometry (see above). |
 | `path` | `"through"` (K13; also the single K12 path of a thickness change), `"corner"` (K12 = K23; also the single path of a corner) or `"double_leaf"` (K24). |
-| `mass_ratio` | `m'⊥,i / m'i` (must be positive). |
+| `mass_ratio` | `m'⊥,i / m'i`, the mass per unit area of the perpendicular element over that of the element carrying the path (must be positive). The same per-path convention applies to every branch, including both `double_leaf` (K24) branches. |
 | `frequency` | Frequency at which `Kij` is evaluated, in Hz; only the `"flexible_t"` (through/corner) and the E.7/E.8 lightweight double-leaf junctions are frequency dependent. Defaults to 500 Hz, the value used by the simplified model (Clause 4.4.2), at which the E.7/E.8 `lg(f/fk)` terms vanish. |
 | `f1` | Interlayer characteristic frequency for `"flexible_t"`, in Hz. |
 

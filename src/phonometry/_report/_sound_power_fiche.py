@@ -310,6 +310,7 @@ def render_sound_power_fiche(
     metadata: ReportMetadata | None,
     language: str,
     verdict: tuple[str, bool] | None = None,
+    disclaimer: str | None = None,
 ) -> str:
     """Assemble the shared sound-power fiche flow and build the PDF at ``path``.
 
@@ -337,6 +338,9 @@ def render_sound_power_fiche(
         comparison, so a caller with a different quantity symbol (the
         structure-borne fiches) can state its own. ``None`` uses the
         :func:`power_verdict` fallback when a ``requirement`` is supplied.
+    :param disclaimer: Footer scope sentence override (an English key
+        translated for display); a prediction fiche passes its
+        modelled-configuration wording (see :func:`._layout.footer_flow`).
     :return: The written ``path`` as a :class:`str`.
     :raises ImportError: If reportlab (or, for the figure, matplotlib) is not
         installed.
@@ -391,6 +395,6 @@ def render_sound_power_fiche(
     basis_style_strip = measurement_basis_style()
     for strip in basis_strips:
         flow.append(Paragraph(strip, basis_style_strip))
-    flow.extend(footer_flow(metadata, language))
+    flow.extend(footer_flow(metadata, language, disclaimer=disclaimer))
 
     return build_document(path, flow, title)

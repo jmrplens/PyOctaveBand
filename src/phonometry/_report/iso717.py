@@ -475,8 +475,9 @@ def render_iso717_report(
     value_table = _value_table(
         centers, measured, shifted, deviations, value_header, verbose, language
     )
-    # ISO 717-1/-2 clause 4.4 requires stating whether the rating came from
-    # one-third-octave or octave bands; the caption declares the actual set.
+    # ISO 717-1:2020 Clause 5.3 / ISO 717-2:2020 Clause 4.4 require stating
+    # whether the rating came from one-third-octave or octave bands; the
+    # caption declares the actual set.
     caption_key = (
         "Octave-band {vh} [dB]"
         if centers.size == 5

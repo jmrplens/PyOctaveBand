@@ -25,8 +25,10 @@ building. The chain closes the structural-vibroacoustics series:
    characteristic level `L_Ws,c = L_Ws,n + 10 lg(Y_s / Y_inf,rec)` with the
    source mobility (Annex I.3, Table I.8), from which `D_C` is subtracted.
 2. Only part of that power is actually injected into the supporting element; the
-   loss is the **coupling term** `D_C` (clause 4.4.3), always positive, set by
-   the source mobility `Y_s` and the receiver mobility `Y_i` (Formula 19b):
+   loss is the **coupling term** `D_C` (clause 4.4.3), positive in the usual
+   mobility-mismatched cases (see [`coupling_term`](/phonometry/reference/api/building/installed-structure-borne/#coupling_term) for the exception),
+   set by the source mobility `Y_s` and the receiver mobility `Y_i`
+   (Formula 19b):
    `D_C,i = 10 lg( |Y_s + Y_i|**2 / (|Y_s| Re{Y_i}) )`, which reduces to
    `10 lg(|Y_s|/Re{Y_i})` for a force source (high source mobility,
    Formula 19c) and to `-10 lg(|Y_s| Re{Z_i})` for a velocity source (low
@@ -70,7 +72,7 @@ connection, Formula 19b).
 | `receiver_mobility` | Receiver point mobility `Y_i` (complex, positive real part). |
 | `transfer_mobility` | Elastic-support transfer mobility `Y_k` (Default: 0.0). |
 
-**Returns:** The coupling term `D_C`, in dB (>= 0 for passive systems).
+**Returns:** The coupling term `D_C`, in dB. Positive whenever the source and receiver mobilities are well mismatched (the usual installed case), but **not** guaranteed non-negative: near a mounting resonance where `Y_s` and `Y_i` are of comparable magnitude and opposite phase the numerator `|Y_s + Y_i|²` collapses and `D_C` goes negative (the installed power then exceeds the characteristic level; e.g. `Y_s = j·1e-4`, `Y_i = 1e-5 − j·1e-4` m/(N·s) gives `D_C ≈ −10 dB`).
 
 **Raises**
 
@@ -187,12 +189,20 @@ installed_source_prediction(
 
 Predict the installed structure-borne SPL over several paths (EN 12354-5).
 
+The band count is set by the widest per-band input (the characteristic
+power level, the `coupling_term` or any path's `adjustment_term` /
+`flanking_reduction_index`); every
+per-band input must carry one value or that count, and single values
+broadcast across the bands (a single-number source level with per-band
+path data is valid, and the result's `installed_power_level` is
+broadcast to the band count).
+
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `characteristic_power_level` | Characteristic level `L_Ws,c` (per band), in dB. |
-| `coupling_term` | Coupling term `D_C` (per band), in dB. |
+| `characteristic_power_level` | Characteristic level `L_Ws,c` (per band or a single value), in dB. |
+| `coupling_term` | Coupling term `D_C` (per band or a single value), in dB. |
 | `paths` | One dict per transmission path with keys `adjustment_term` (`D_sa`), `flanking_reduction_index` (`R_ij,ref`) and `element_area` (`S_i`), each per band where applicable. |
 | `frequencies` | Band centre frequencies, in hertz, or `None`. |
 
@@ -202,7 +212,7 @@ Predict the installed structure-borne SPL over several paths (EN 12354-5).
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | if `paths` is empty. |
+| ValueError | if `paths` is empty, a path is missing a required key, or a per-band input matches neither one value nor the band count. |
 
 ## installed_structure_borne_power_level
 

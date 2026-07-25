@@ -207,6 +207,19 @@ def test_invalid_method_raises() -> None:
         )
 
 
+def test_invalid_method_on_result_raises() -> None:
+    # Direct construction must not bypass the method validation: an unknown
+    # method would otherwise be rendered as the loudspeaker quantity R'45.
+    with pytest.raises(ValueError, match="'method' must be"):
+        FacadeInsulationResult(
+            d_2m=np.array([30.0]),
+            d_2m_nt=np.array([31.0]),
+            d_2m_n=None,
+            r_prime=None,
+            method="typo",
+        )
+
+
 def test_nonfinite_raises() -> None:
     with pytest.raises(ValueError):
         facade_insulation(

@@ -56,13 +56,14 @@ _SURVEY_STATEMENT = (
 )
 
 #: Per-quantity fixed labels consumed by the shared insulation skeleton: title,
-#: standard-basis line, the quantity symbol used in the table header, the rating
+#: standard-basis line (a ``{bands}`` template naming the band set the curve
+#: actually carries), the quantity symbol used in the table header, the rating
 #: symbol of the boxed result and the plot y-axis label (mathtext).
 _DNT_SPEC: dict[str, str] = {
     "title": "Field airborne sound insulation between rooms",
     "basis": (
         "Standardized level difference D<sub>nT</sub> measured in accordance "
-        "with ISO 10052:2021 (survey method, octave bands). Rating per "
+        "with ISO 10052:2021 (survey method, {bands}). Rating per "
         "ISO 717-1:2020."
     ),
     "symbol": "D<sub>nT</sub>",
@@ -74,7 +75,7 @@ _R_PRIME_SPEC: dict[str, str] = {
     "title": "Field airborne sound insulation between rooms",
     "basis": (
         "Apparent sound reduction index R&#8242; measured in accordance with "
-        "ISO 10052:2021 (survey method, octave bands). Rating per "
+        "ISO 10052:2021 (survey method, {bands}). Rating per "
         "ISO 717-1:2020."
     ),
     "symbol": "R&#8242;",
@@ -86,8 +87,8 @@ _L_NT_SPEC: dict[str, str] = {
     "title": "Field impact sound insulation of floors",
     "basis": (
         "Standardized impact sound pressure level L&#8242;<sub>nT</sub> "
-        "measured in accordance with ISO 10052:2021 (survey method, octave "
-        "bands) using the tapping machine. Rating per ISO 717-2:2020."
+        "measured in accordance with ISO 10052:2021 (survey method, {bands}) "
+        "using the tapping machine. Rating per ISO 717-2:2020."
     ),
     "symbol": "L&#8242;<sub>nT</sub>",
     "rating_symbol": "L&#8242;<sub>nT,w</sub>",
@@ -98,7 +99,7 @@ _D_2M_NT_SPEC: dict[str, str] = {
     "title": "Field facade sound insulation",
     "basis": (
         "Standardized facade level difference D<sub>2m,nT</sub> measured in "
-        "accordance with ISO 10052:2021 (survey method, octave bands). Rating "
+        "accordance with ISO 10052:2021 (survey method, {bands}). Rating "
         "per ISO 717-1:2020."
     ),
     "symbol": "D<sub>2m,nT</sub>",
@@ -130,11 +131,23 @@ def _render_survey(
     """Drive the shared insulation skeleton with the survey band table.
 
     The survey method may be run in octave bands (5 values, 125 Hz to 2000 Hz)
-    or one-third-octave bands (16 values, 100 Hz to 3150 Hz); the table caption
-    follows the band set the reported curve actually carries.
+    or one-third-octave bands (16 values, 100 Hz to 3150 Hz); the table
+    caption *and* the standard-basis line follow the band set the reported
+    curve actually carries (ISO 717-1:2020 Clause 5.3 / ISO 717-2:2020
+    Clause 4.4 require stating it).
     """
+    from ._i18n import t
+
     curve = np.atleast_1d(np.asarray(getattr(result, curve_attr), dtype=np.float64))
-    band_set = "Octave-band" if curve.size <= 5 else "One-third-octave"
+    is_octave = curve.size <= 5
+    band_set = "Octave-band" if is_octave else "One-third-octave"
+    bands_wording = t(
+        "octave bands" if is_octave else "one-third-octave bands", language
+    )
+    # Pre-translate the {bands} basis template so the skeleton's
+    # re-translation of the composed line is a no-op.
+    spec = dict(spec)
+    spec["basis"] = t(spec["basis"], language).format(bands=bands_wording)
     return render_insulation_fiche(
         result,
         rating,

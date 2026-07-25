@@ -128,6 +128,9 @@ def test_report_reads_as_prediction(tmp_path) -> None:
     assert "Predicted" in text
     assert "not a measurement" in text
     assert "EN 12354-5:2009" in text
+    # The footer disclaimer is the prediction variant (no tested specimen).
+    assert "modelled configuration" in text
+    assert "tested specimen" not in text.replace("not to a tested specimen", "")
 
 
 def test_report_renders_oracle_values(tmp_path) -> None:
@@ -240,3 +243,18 @@ def test_unknown_language_rejected(tmp_path) -> None:
     out = str(tmp_path / "bad.pdf")
     with pytest.raises(ValueError, match="language"):
         res.report(out, language="xx")
+
+
+def test_scalar_source_level_fiche_renders(tmp_path) -> None:
+    """A single-number L_Ws,c with per-band paths renders (regression).
+
+    The table prints L_Ws,inst per band, so a scalar source level used to
+    crash the fiche with an IndexError once the paths carried band axes.
+    """
+    result = installed_source_prediction(80.0, 10.0, _paths(), frequencies=_BANDS)
+    assert result.installed_power_level.shape == _BANDS.shape
+    out = tmp_path / "scalar.pdf"
+    result.report(str(out), verbose=True)
+    _assert_one_page(str(out))
+    text = _extract_text(str(out))
+    assert "70.0" in text  # the broadcast installed power level

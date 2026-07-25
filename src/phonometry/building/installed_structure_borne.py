@@ -18,8 +18,10 @@ building. The chain closes the structural-vibroacoustics series:
    characteristic level ``L_Ws,c = L_Ws,n + 10 lg(Y_s / Y_inf,rec)`` with the
    source mobility (Annex I.3, Table I.8), from which ``D_C`` is subtracted.
 2. Only part of that power is actually injected into the supporting element; the
-   loss is the **coupling term** ``D_C`` (clause 4.4.3), always positive, set by
-   the source mobility ``Y_s`` and the receiver mobility ``Y_i`` (Formula 19b):
+   loss is the **coupling term** ``D_C`` (clause 4.4.3), positive in the usual
+   mobility-mismatched cases (see :func:`coupling_term` for the exception),
+   set by the source mobility ``Y_s`` and the receiver mobility ``Y_i``
+   (Formula 19b):
    ``D_C,i = 10 lg( |Y_s + Y_i|**2 / (|Y_s| Re{Y_i}) )``, which reduces to
    ``10 lg(|Y_s|/Re{Y_i})`` for a force source (high source mobility,
    Formula 19c) and to ``-10 lg(|Y_s| Re{Z_i})`` for a velocity source (low
@@ -103,7 +105,14 @@ def coupling_term(
         positive real part).
     :param transfer_mobility: Elastic-support transfer mobility ``Y_k``
         (Default: 0.0).
-    :return: The coupling term ``D_C``, in dB (>= 0 for passive systems).
+    :return: The coupling term ``D_C``, in dB. Positive whenever the source
+        and receiver mobilities are well mismatched (the usual installed
+        case), but **not** guaranteed non-negative: near a mounting
+        resonance where ``Y_s`` and ``Y_i`` are of comparable magnitude and
+        opposite phase the numerator ``|Y_s + Y_i|²`` collapses and ``D_C``
+        goes negative (the installed power then exceeds the characteristic
+        level; e.g. ``Y_s = j·1e-4``, ``Y_i = 1e-5 − j·1e-4`` m/(N·s) gives
+        ``D_C ≈ −10 dB``).
     :raises ValueError: if ``Y_s`` is zero/non-finite or ``Re{Y_i}`` is not
         positive and finite.
     """
@@ -363,48 +372,92 @@ def installed_source_prediction(
 ) -> InstalledSourceResult:
     """Predict the installed structure-borne SPL over several paths (EN 12354-5).
 
+    The band count is set by the widest per-band input (the characteristic
+    power level, the ``coupling_term`` or any path's ``adjustment_term`` /
+    ``flanking_reduction_index``); every
+    per-band input must carry one value or that count, and single values
+    broadcast across the bands (a single-number source level with per-band
+    path data is valid, and the result's ``installed_power_level`` is
+    broadcast to the band count).
+
     :param characteristic_power_level: Characteristic level ``L_Ws,c`` (per
-        band), in dB.
-    :param coupling_term: Coupling term ``D_C`` (per band), in dB.
+        band or a single value), in dB.
+    :param coupling_term: Coupling term ``D_C`` (per band or a single
+        value), in dB.
     :param paths: One dict per transmission path with keys ``adjustment_term``
         (``D_sa``), ``flanking_reduction_index`` (``R_ij,ref``) and
         ``element_area`` (``S_i``), each per band where applicable.
     :param frequencies: Band centre frequencies, in hertz, or ``None``.
     :return: The :class:`InstalledSourceResult`.
-    :raises ValueError: if ``paths`` is empty.
+    :raises ValueError: if ``paths`` is empty, a path is missing a required
+        key, or a per-band input matches neither one value nor the band
+        count.
     """
     if not paths:
         raise ValueError("'paths' must contain at least one transmission path.")
-    lw_inst = installed_structure_borne_power_level(
-        characteristic_power_level, coupling_term
+    lw_inst = np.atleast_1d(
+        np.asarray(
+            installed_structure_borne_power_level(
+                characteristic_power_level, coupling_term
+            ),
+            dtype=np.float64,
+        )
     )
     required = ("adjustment_term", "flanking_reduction_index", "element_area")
-    n_bands = np.atleast_1d(np.asarray(lw_inst, dtype=np.float64)).size
-    rows = []
+    # The band count is set by the widest per-band input (the characteristic
+    # level, the coupling term or any path's per-band terms); every other
+    # per-band input must carry one value or that count, and single values
+    # broadcast across the bands.
+    per_band_keys = ("adjustment_term", "flanking_reduction_index")
+    n_bands = lw_inst.size
     for k, p in enumerate(paths):
         missing = [key for key in required if key not in p]
         if missing:
             raise ValueError(
                 f"path {k} is missing required key(s): {', '.join(missing)}."
             )
-        rij = np.atleast_1d(np.asarray(p["flanking_reduction_index"], dtype=np.float64))
-        if rij.size not in (1, n_bands):
-            raise ValueError(
-                f"path {k}: 'flanking_reduction_index' has {rij.size} bands, "
-                f"expected {n_bands} to match the source levels."
+        for key in per_band_keys:
+            n_bands = max(
+                n_bands, np.atleast_1d(np.asarray(p[key], dtype=np.float64)).size
             )
+    if lw_inst.size not in (1, n_bands):
+        raise ValueError(
+            f"the source levels carry {lw_inst.size} bands, expected 1 or "
+            f"{n_bands} to match the transmission paths."
+        )
+    rows = []
+    for k, p in enumerate(paths):
+        for key in per_band_keys:
+            values = np.atleast_1d(np.asarray(p[key], dtype=np.float64))
+            if values.size not in (1, n_bands):
+                raise ValueError(
+                    f"path {k}: {key!r} has {values.size} bands, expected 1 "
+                    f"or {n_bands} to match the other per-band inputs."
+                )
         rows.append(
-            structure_borne_pressure_level_path(
-                lw_inst, p["adjustment_term"],
-                p["flanking_reduction_index"], p["element_area"],
+            np.broadcast_to(
+                structure_borne_pressure_level_path(
+                    lw_inst, p["adjustment_term"],
+                    p["flanking_reduction_index"], p["element_area"],
+                ),
+                (n_bands,),
             )
         )
     path_levels = np.asarray(rows, dtype=np.float64)
     total = total_structure_borne_pressure_level(path_levels)
-    freq = None if frequencies is None else np.asarray(frequencies, dtype=np.float64)
+    freq = (
+        None
+        if frequencies is None
+        else np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
+    )
+    if freq is not None and freq.size != n_bands:
+        raise ValueError(
+            f"frequencies carries {freq.size} values, expected {n_bands} to "
+            "match the per-band inputs."
+        )
     return InstalledSourceResult(
         path_levels=path_levels,
         total_level=np.asarray(total, dtype=np.float64),
-        installed_power_level=np.atleast_1d(np.asarray(lw_inst, dtype=np.float64)),
+        installed_power_level=np.broadcast_to(lw_inst, (n_bands,)).copy(),
         frequencies=freq,
     )

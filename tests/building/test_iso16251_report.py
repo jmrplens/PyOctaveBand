@@ -172,6 +172,39 @@ def test_limited_band_uses_literal_greater_than(tmp_path) -> None:
     text = _text(str(out))
     assert "&gt;" not in text  # the XML entity must not leak into a plain cell
     assert ">" in text
+    # The single number is qualified as a lower bound (Formula (2) limit).
+    assert "lower bound" in text
+    assert "≥" in text  # the >= prefix on the boxed delta-Lw
+
+
+def test_unlimited_result_not_qualified_as_lower_bound(tmp_path) -> None:
+    """A result with no background-limited band prints a plain delta-Lw."""
+    out = tmp_path / "iso16251_plain.pdf"
+    _result().report(str(out))
+    text = _text(str(out))
+    assert "lower bound" not in text
+    assert "≥" not in text
+
+
+def test_manual_result_without_ci_delta_omits_adaptation_term(tmp_path) -> None:
+    """A hand-built result lacking CI,delta must not print a fabricated (+0)."""
+    from phonometry.building.floor_covering_improvement import (
+        FloorCoveringImprovementResult,
+    )
+
+    result = FloorCoveringImprovementResult(
+        frequencies=_FREQS,
+        improvement=_DELTA_L,
+        limited=np.zeros(16, dtype=bool),
+        delta_lw=15,
+        ci_delta=None,
+    )
+    out = tmp_path / "iso16251_noci.pdf"
+    result.report(str(out))
+    _assert_one_page(str(out))
+    text = _text(str(out))
+    assert "(+0)" not in text
+    assert "15 dB" in text
 
 
 def test_metadata_xml_specials_do_not_break(tmp_path) -> None:

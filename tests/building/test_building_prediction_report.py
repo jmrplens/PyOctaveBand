@@ -112,11 +112,14 @@ def test_airborne_prediction_rating_pinned_to_annex_h3(tmp_path) -> None:
     _assert_one_page(str(out))
     text = _extract_text(str(out))
     assert f"{ref.EN12354_1_ANNEX_H3_RPRIME_W} dB" in text  # boxed R'w = 52 dB
-    assert "EN/ISO 12354-1:2000" in text
+    assert "EN 12354-1:2000" in text
     assert "ISO 717-1" in text
-    # Explicitly a prediction, not a measurement.
+    # Explicitly a prediction, not a measurement, down to the footer
+    # disclaimer (no tested specimen on a prediction sheet).
     assert "prediction" in text
     assert "not a measurement" in text
+    assert "modelled configuration" in text
+    assert "tested specimen" not in text.replace("not to a tested specimen", "")
     # The direct path and a couple of flanking-path indices from the table.
     assert "Dd" in text
     assert "65.5" in text  # floor-Ff Rij,w
@@ -130,7 +133,7 @@ def test_impact_prediction_rating_pinned_to_annex_e3(tmp_path) -> None:
     _assert_one_page(str(out))
     text = _extract_text(str(out))
     assert f"{ref.EN12354_2_ANNEX_E3_LPRIME_N_W} dB" in text  # boxed L'n,w = 45
-    assert "EN/ISO 12354-2:2000" in text
+    assert "EN 12354-2:2000" in text
     assert "ISO 717-2" in text
     assert "prediction" in text
     assert "not a measurement" in text
@@ -242,7 +245,7 @@ def test_facade_prediction_rating_pinned_to_annex_f(tmp_path) -> None:
     text = _extract_text(str(out))
     assert f"{ref.EN12354_3_ANNEX_F_D2MNT_W} dB" in text  # boxed D2m,nT,w = 33 dB
     assert "D2m,nT,w" in text
-    assert "EN/ISO 12354-3:2000" in text
+    assert "EN 12354-3:2000" in text
     assert "ISO 717-1" in text
     # Explicitly a prediction, not a measurement.
     assert "prediction" in text

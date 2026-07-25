@@ -41,19 +41,30 @@ to the issuing body, with date and reference).
   "ISO 717-2 Annex C, Table C.1").
 - **Status:** unreported.
 
-## ISO 717-2:2020, Annex C, example C.2 (covered floor, 800 Hz value)
+## ISO 717-2:2020, Annex C, example C.2 (covered floor: 800 Hz value and CI chain)
 
-- **Location:** Annex C, Table C.2.
-- **The print:** the 800 Hz value of the reference floor with covering is
-  printed as 71,0 dB.
-- **The problem:** the normative Table 4 reference floor minus the printed
-  improvement at 800 Hz gives 71,5 dB; the 71,0 dB misprint propagates into
-  the example's CI chain (yielding −8 where the normative-table chain gives
-  −9).
-- **Evidence:** independent recomputation from Table 4 and the printed
-  improvement spectrum.
-- **Library behaviour:** derives the covered floor from the normative Table 4
-  values; the conformance check notes the provenance explicitly.
+- **Location:** Annex C, Table C.2 (ΔLw / ΔLlin worked example).
+- **The print:** (a) the 800 Hz reference-floor value is printed as 71,0 dB;
+  (b) the CI line prints "Ln,sum = 75,252 7… = 75 dB" and "CI = 75 − 15 −
+  63 = −3 dB", feeding "ΔLlin = 78 − 11 − (63 − 3) = 7 dB".
+- **The problem:** two independent defects. (a) The normative Table 4
+  reference floor is 71,5 dB at 800 Hz; the 71,0 dB row is a misprint,
+  though after rounding it does not change the example's CI (the correct
+  energy sum rounds to 76 dB with either value). (b) The printed
+  75,2527 dB is exactly the energy sum of the *wrong column over the wrong
+  range*: the measured floor "with covering" over all sixteen bands
+  100 Hz to 3150 Hz. A.2.1 defines CI from the reference floor with
+  covering (the "Ln,r,0 − ΔL" column) over 100 Hz to 2500 Hz (15 bands),
+  which gives 75,674 dB (printed chain) or 75,710 dB (Table 4 values) —
+  both round to 76 dB, so CI,r = 76 − 15 − 63 = −2 either way, giving
+  CI,Δ = −11 − (−2) = −9 and ΔLlin = 6 dB, not the printed −3 / −8 / 7 dB
+  chain.
+- **Evidence:** independent recomputation of every candidate sum from the
+  printed per-band values; the printed 75,2527 reproduces to all printed
+  digits only as the 16-band sum of the with-covering column.
+- **Library behaviour:** derives the covered reference floor from the
+  normative Table 4 values and sums per A.2.1, pinning ΔLw = 15 dB and
+  CI,Δ = −9; the conformance check notes the provenance explicitly.
 - **Status:** unreported.
 
 ## ISO 2631-5:2018, Annex C, NOTE 5 (female worked example)
@@ -87,21 +98,34 @@ to the issuing body, with date and reference).
   note in the docstring.
 - **Status:** unreported.
 
-## ISO 12354-1:2017, E.3.5 (double-leaf junction K24 sign)
+## EN 12354-1:2000, Figure E.9 (E.7) (K24 stated in the figure-axis mass ratio)
 
-- **Location:** E.3.5, Figure E.7 (junction of lightweight double leaf wall
-  and homogeneous elements), K24 formula.
-- **The print:** K24 = 3,0 + 14,1 M + 5,7 M² dB (for m2/m1 > 3).
-- **The problem:** EN 12354-1:2000 prints the same relation as
-  K24 = 3,0 − 14,1 M + 5,7 M² (Figure E.9, Formula (E.7)), and the 2000
-  edition's own K24 curve in that figure decreases with m2/m1, corroborating
-  the minus sign; the 2017 edition prints no corresponding curve. The two
-  editions contradict each other and the internally consistent
-  formula-plus-figure pair is the 2000 one.
-- **Evidence:** page renders of both editions (ISO 12354-1:2017 printed
-  p. 47; EN 12354-1:2000 printed p. 48).
-- **Library behaviour:** implements the 2000 edition it cites (minus sign),
-  with a code note recording the 2017 contradiction.
+- **Location:** Annex E, Figure E.9 / Formula (E.7) (junction of lightweight
+  double leaf wall and homogeneous elements), the K24 line.
+- **The print:** K24 = 3,0 − 14,1 M + 5,7 M² dB (for m2/m1 > 3), under a
+  figure whose x-axis is m2/m1.
+- **The problem:** Annex E defines M per transmission path as
+  M = lg(m'⊥,i/m'i) (perpendicular element over the element carrying the
+  path). The K24 path 2→4 is carried by the homogeneous element (m2 = m4)
+  with the leaf (m1) perpendicular, so the per-path M is lg(m1/m2) — but the
+  printed K24 line only matches its own figure's curve when M is read as the
+  x-axis variable lg(m2/m1) (e.g. −2,4 dB at m2/m1 = 3, −5,4 dB at 10). Read
+  with the annex's declared M, the line contradicts the figure by
+  28,2·|lg(m2/m1)| dB. The same edition's other K24 line (Figure E.5,
+  Formula (E.5)) *does* follow the declared per-path M, so the two K24
+  prints of the 2000 edition silently use different conventions.
+  ISO 12354-1:2017 E.3.5 prints the relation consistently in the per-path
+  convention of its Formula (E.3), K24 = 3,0 + 14,1 M + 5,7 M²; the two
+  editions agree numerically (an earlier revision of this entry read the
+  2017 print as a sign misprint — re-derivation against both editions'
+  figures shows it is a convention recast, not a defect of the 2017 text).
+- **Evidence:** page renders of both editions (EN 12354-1:2000 printed
+  pp. 43, 46, 48; ISO 12354-1:2017 printed pp. 43, 46-47); numerical
+  evaluation of both forms against the Figure E.9 curve.
+- **Library behaviour:** implements the per-path convention uniformly
+  (`junction_vibration_reduction`, mass_ratio = m'⊥,i/m'i for every branch),
+  so the E.7 double-leaf branch takes leaf-over-homogeneous ratios below 1/3
+  and evaluates 3,0 + 14,1 M + 5,7 M².
 - **Status:** unreported.
 
 ## EN 12354-2:2000, Formula (3) vs Annex E.3 (standardized impact level)
@@ -133,6 +157,49 @@ to the issuing body, with date and reference).
   and still reproduces.
 - **Library behaviour:** implements Formula (13); the test data notes both
   inconsistencies next to the affected anchors.
+- **Status:** unreported.
+
+## ISO 15186-1:2000, Clause 3.9, Formula (8) (sign of the 10 lg N term)
+
+- **Location:** Clause 3.9, Formula (8), the intensity element normalized
+  level difference for N small building elements measured together.
+- **The print:** DI,n,e = Lp1 − 6 − (LIn + 10 lg(Sm/A0) + 10 lg(N)), i.e. the
+  10 lg N term is subtracted.
+- **The problem:** the subtracted sign cannot be derived. Measuring N
+  identical units within one measurement surface raises the transmitted
+  power (and hence LIn + 10 lg Sm) by 10 lg N, so recovering the per-unit
+  DI,n,e requires *adding* 10 lg N. The pressure-based equivalent,
+  ISO 10140-2:2010 Formula (6), prints exactly that correction
+  (Dn,e = L1 − L2 + 10 lg(nA0/A)), and ISO 15186-2:2010 Formula (12) prints
+  Formula (8) without any N term (the N = 1 case, with which both signs
+  agree). As printed, installing more units would *lower* the per-unit
+  rating by 20 lg N relative to the derivable value.
+- **Evidence:** page render of the printed formula; derivation from the
+  diffuse-field receiving-room relation L2 = LW + 10 lg(4/A) against
+  ISO 10140-2:2010 Formula (6); cross-check against ISO 15186-2:2010
+  Formula (12) and Hopkins, *Sound Insulation* (2007), Eq. 3.45.
+- **Library behaviour:** implements the derivable per-unit form
+  (`intensity_element_normalized_difference`, +10 lg N) and emits a warning
+  whenever n > 1, where the result deviates from the print.
+- **Status:** unreported.
+
+## ISO 10848-1:2006, Clause 8.1.1, Formula (20) (spurious π in the critical frequency)
+
+- **Location:** Clause 8.1.1, Formula (20), the thin-plate critical frequency
+  used by the test-facility flanking criterion of Formula (19).
+- **The print:** fc = c0² / (1,8 cL · h · π).
+- **The problem:** the constant 1,8 is itself the rounded 2π/√12 ≈ 1,814 of
+  the thin-plate dispersion relation, so the extra π double-counts it and
+  would misplace fc by a factor π (e.g. a 100 mm concrete element with
+  cL = 3500 m/s: 187 Hz without the π, 59 Hz with it, far from any measured
+  coincidence dip).
+- **Evidence:** derivation from the thin-plate dispersion relation (Hopkins,
+  *Sound Insulation* (2007), Eq. 2.201, fc = c0²/(1,8 cL h)); ISO
+  12354-1:2017 prints the same π-free form in its symbol definitions
+  (fc = c0²/(1,8 cL t)).
+- **Library behaviour:** implements the π-free form
+  (`phonometry.building.flanking_transmission.critical_frequency`), with a
+  misprint note in the docstring.
 - **Status:** unreported.
 
 ## ISO 12999-1:2020, Table 4 (missing 500 Hz row)

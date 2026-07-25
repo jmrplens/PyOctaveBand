@@ -234,4 +234,8 @@ def render_installed_structure_borne_report(
         metadata=metadata,
         language=language,
         verdict=verdict,
+        disclaimer=(
+            "Predicted result: the values relate only to the modelled "
+            "configuration, not to a tested specimen."
+        ),
     )

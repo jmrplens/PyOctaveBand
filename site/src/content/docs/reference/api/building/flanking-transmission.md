@@ -119,6 +119,14 @@ dispersion relation, so for a plate whose bending stiffness and mass are
 mutually consistent this equals [`phonometry.coincidence_frequency`](/phonometry/reference/api/vibration/radiation-efficiency/#coincidence_frequency)
 (Hopkins Eq. 2.201) to within the rounding of the constant.
 
+:::note
+The printed ISO 10848-1:2006 Formula (20) carries a spurious extra
+`π` in the denominator (`1,8 cL · h · π`), which would misplace
+`fc` by a factor π; the π-free form implemented here is the one
+ISO 12354-1:2017 prints (`fc = c0²/(1,8 cL t)`) and Hopkins
+Eq. 2.201 derives. See `docs/ERRATA.md`.
+:::
+
 **Parameters**
 
 | Name | Description |
@@ -240,14 +248,16 @@ FlankingImpactLevelResult.report(
     engine: str = 'reportlab',
     verbose: bool = False,
     language: str = 'en',
+    part: int = 2,
 ) -> str
 ```
 
 Render a normalized flanking impact level `Ln,f` fiche to a PDF.
 
-Writes the one-page ISO 10848-2:2006 impact flanking-transmission
-report: the standard-basis line, an optional metadata header, the
-per-band `Ln,f` table beside the measured-versus-shifted-ISO 717-2
+Writes the one-page impact flanking-transmission report of the
+ISO 10848 series: the standard-basis line naming the part governing
+the tested construction, an optional metadata header, the per-band
+`Ln,f` table beside the measured-versus-shifted-ISO 717-2
 reference curve, the boxed single-number `Ln,f,w (CI)`, the
 measurement statement, an optional requirement verdict and a footer.
 
@@ -260,6 +270,7 @@ measurement statement, an optional requirement verdict and a footer.
 | `engine` | Rendering back end; only `"reportlab"` is supported. |
 | `verbose` | When `True`, the left table shows the ISO 717 evaluation per band (the `Ln,f` value, the shifted reference and the unfavourable deviation) instead of the two-column form. |
 | `language` | Fiche language: `"en"` (default, English) or `"es"` (Spanish, with a comma decimal separator). |
+| `part` | The ISO 10848 part governing the tested construction and named in the basis line: `2` (lightweight elements, default, ISO 10848-2:2006), `3` (lightweight elements with a junction of substantial influence, ISO 10848-3:2006) or `4` (heavy, Type A elements, ISO 10848-4:2010). |
 
 **Returns:** The written `path` as a `str`.
 
@@ -267,7 +278,7 @@ measurement statement, an optional requirement verdict and a footer.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If `engine` is unknown or the result has no single-number rating (the band count is neither 16 nor 5). |
+| ValueError | If `engine` is unknown, `part` is not 2, 3 or 4, or the result has no single-number rating (the band count is neither 16 nor 5). |
 | ImportError | If reportlab is not installed (`pip install phonometry[report]`). |
 
 ## FlankingLevelDifferenceResult
@@ -311,14 +322,16 @@ FlankingLevelDifferenceResult.report(
     engine: str = 'reportlab',
     verbose: bool = False,
     language: str = 'en',
+    part: int = 2,
 ) -> str
 ```
 
 Render a normalized flanking level difference `Dn,f` fiche to a PDF.
 
-Writes the one-page ISO 10848-2:2006 airborne flanking-transmission
-report: the standard-basis line, an optional metadata header, the
-per-band `Dn,f` table beside the measured-versus-shifted-ISO 717-1
+Writes the one-page airborne flanking-transmission report of the
+ISO 10848 series: the standard-basis line naming the part governing
+the tested construction, an optional metadata header, the per-band
+`Dn,f` table beside the measured-versus-shifted-ISO 717-1
 reference curve, the boxed single-number `Dn,f,w (C; Ctr)`, the
 measurement statement, an optional requirement verdict and a footer.
 
@@ -331,6 +344,7 @@ measurement statement, an optional requirement verdict and a footer.
 | `engine` | Rendering back end; only `"reportlab"` is supported. |
 | `verbose` | When `True`, the left table shows the ISO 717 evaluation per band (the `Dn,f` value, the shifted reference and the unfavourable deviation) instead of the two-column form. |
 | `language` | Fiche language: `"en"` (default, English) or `"es"` (Spanish, with a comma decimal separator). |
+| `part` | The ISO 10848 part governing the tested construction and named in the basis line: `2` (lightweight elements, default, ISO 10848-2:2006), `3` (lightweight elements with a junction of substantial influence, ISO 10848-3:2006) or `4` (heavy, Type A elements, ISO 10848-4:2010). |
 
 **Returns:** The written `path` as a `str`.
 
@@ -338,7 +352,7 @@ measurement statement, an optional requirement verdict and a footer.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If `engine` is unknown or the result has no single-number rating (the band count is neither 16 nor 5). |
+| ValueError | If `engine` is unknown, `part` is not 2, 3 or 4, or the result has no single-number rating (the band count is neither 16 nor 5). |
 | ImportError | If reportlab is not installed (`pip install phonometry[report]`). |
 
 ## modal_density
