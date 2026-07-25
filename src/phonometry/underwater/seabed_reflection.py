@@ -134,6 +134,10 @@ def bottom_reflection_loss(
 ) -> BottomLossResult:
     """Bottom reflection loss ``BL = −20·lg|R|`` versus grazing angle (dB).
 
+    At an angle of intromission ``R = 0`` and the loss is ``inf`` (total
+    transmission into the sediment); that is a legitimate bottom-loss value,
+    returned without warning.
+
     :param grazing_angle: Grazing angle(s) ``φ`` from the interface, in degrees.
     :param rho1: Water density ``ρ1`` (default 1000 kg/m³).
     :param c1: Sound speed in the water ``c1``, in m/s (default 1500).
@@ -144,7 +148,10 @@ def bottom_reflection_loss(
     """
     phi = np.atleast_1d(np.asarray(grazing_angle, dtype=np.float64))
     r = reflection_coefficient(phi, rho1=rho1, c1=c1, rho2=rho2, c2=c2)
-    loss = -20.0 * np.log10(np.abs(r))
+    # At an intromission angle |R| = 0 and the bottom loss is legitimately
+    # infinite (total transmission); silence the log10(0) warning.
+    with np.errstate(divide="ignore"):
+        loss = -20.0 * np.log10(np.abs(r))
     phi_c = critical_angle(c1, c2) if float(c2) > float(c1) else None
     return BottomLossResult(
         grazing_angle=phi,
@@ -223,7 +230,8 @@ def seabed_reflection(
     the bottom loss ``BL = −20·lg|R|`` and the interface parameters into a
     :class:`SeabedReflection` that exposes ``.plot()``. The maths is unchanged;
     this is a thin, plottable wrapper around the existing function (the same
-    ``ValueError`` cases apply).
+    ``ValueError`` cases apply). At an angle of intromission ``R = 0`` and the
+    bottom loss is ``inf`` (total transmission), returned without warning.
 
     :param grazing_angle: Grazing angle(s) ``φ`` from the interface, in degrees
         (``0`` grazing to ``90`` normal incidence).
@@ -237,7 +245,10 @@ def seabed_reflection(
     phi = np.atleast_1d(np.asarray(grazing_angle, dtype=np.float64))
     r = reflection_coefficient(phi, rho1=rho1, c1=c1, rho2=rho2, c2=c2)
     magnitude = np.abs(r)
-    loss = -20.0 * np.log10(magnitude)
+    # At an intromission angle |R| = 0 and the bottom loss is legitimately
+    # infinite (total transmission); silence the log10(0) warning.
+    with np.errstate(divide="ignore"):
+        loss = -20.0 * np.log10(magnitude)
     phi_c = critical_angle(c1, c2) if float(c2) > float(c1) else None
     return SeabedReflection(
         grazing_angle=phi,

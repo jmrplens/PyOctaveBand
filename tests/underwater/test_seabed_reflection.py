@@ -8,6 +8,8 @@ angle ``arccos(c1/c2)``; and total reflection (``|R| = 1``) below it.
 
 from __future__ import annotations
 
+import warnings
+
 import matplotlib
 
 matplotlib.use("Agg")
@@ -84,6 +86,37 @@ def test_zero_grazing_equal_speeds_no_nan() -> None:
     assert float(res.reflection_loss[0]) == pytest.approx(
         -20.0 * np.log10(abs(expected_r)), abs=1e-9
     )
+
+
+def test_intromission_angle_slow_bottom_closed_form() -> None:
+    # Slow mud bottom (rho2 = 1300, c2 = 1400): R = 0 at the angle of
+    # intromission. Closed form from R's numerator = 0 with Snell's law:
+    # sin(phi_I) = sqrt((z1^2 - (rho1 c2)^2) / (z2^2 - (rho1 c2)^2)),
+    # which gives phi_I = 27.585 deg for this pair. |R| vanishes there and the
+    # bottom loss blows up; no warning may leak.
+    rho1, c1, rho2, c2 = 1000.0, 1500.0, 1300.0, 1400.0
+    z1, z2, z12 = rho1 * c1, rho2 * c2, rho1 * c2
+    phi_i = float(np.degrees(np.arcsin(np.sqrt((z1**2 - z12**2) / (z2**2 - z12**2)))))
+    assert phi_i == pytest.approx(27.585, abs=1e-3)
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        res = bottom_reflection_loss(phi_i, rho1=rho1, c1=c1, rho2=rho2, c2=c2)
+    assert float(np.abs(res.reflection_coefficient[0])) == pytest.approx(0.0, abs=1e-12)
+    assert float(res.reflection_loss[0]) > 100.0  # inf at the exact zero of R
+    assert res.critical_angle is None
+
+
+def test_exact_intromission_zero_gives_inf_loss_without_warning() -> None:
+    # When |R| underflows to exactly 0 the loss is legitimately +inf; the
+    # log10(0) RuntimeWarning must be silenced (identical media force R = 0
+    # exactly at every angle).
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        res = bottom_reflection_loss(30.0, rho1=1000.0, c1=1500.0, rho2=1000.0, c2=1500.0)
+        wrapped = seabed_reflection(30.0, rho1=1000.0, c1=1500.0, rho2=1000.0, c2=1500.0)
+    assert res.reflection_loss[0] == np.inf
+    assert wrapped.magnitude[0] == 0.0
+    assert wrapped.bottom_loss[0] == np.inf
 
 
 def test_grazing_angle_out_of_range_rejected() -> None:
