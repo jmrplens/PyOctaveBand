@@ -1229,6 +1229,72 @@ _ES_EXACT = {
     "Rigid-box FDTD probe spectrum vs analytic modes":
         "Espectro FDTD en la sonda de una caja rígida frente a los modos analíticos",
     "Probe spectrum [dB re max]": "Espectro en la sonda [dB re máx]",
+    # Building & structure-borne result figures (guide figure coverage).
+    "ISO 717-1 Enlarged-Range Rating (Annex B)":
+        "Índice ponderado con rango ampliado ISO 717-1 (Anexo B)",
+    "enlarged range (Annex B)": "rango ampliado (Anexo B)",
+    "measured R": "R medido",
+    "shifted reference (100-3150 Hz)": "referencia desplazada (100-3150 Hz)",
+    "shifted reference": "referencia desplazada",
+    "unfavourable deviations": "desviaciones desfavorables",
+    "ISO 16283-1 Field Airborne Insulation":
+        "Aislamiento a ruido aéreo in situ ISO 16283-1",
+    "ISO 16283-3 Field Facade Insulation":
+        "Aislamiento de fachada in situ ISO 16283-3",
+    "D2m,nT (standardized)": "D2m,nT (estandarizada)",
+    "D2m,n (normalized)": "D2m,n (normalizada)",
+    "R'45° (element)": "R'45° (elemento)",
+    "Level difference / reduction index [dB]":
+        "Diferencia de nivel / índice de reducción [dB]",
+    "ISO 10052 Survey Method: Impact Sound":
+        "Método de control ISO 10052: ruido de impactos",
+    "Li (impact level)": "Li (nivel de impactos)",
+    "L'nT (standardized)": "L'nT (estandarizado)",
+    "Impact sound pressure level [dB]":
+        "Nivel de presión de ruido de impactos [dB]",
+    "ISO 10140 Laboratory Insulation (flanking suppressed)":
+        "Aislamiento en laboratorio ISO 10140 (flancos suprimidos)",
+    "normalized Ln": "Ln normalizado",
+    "Impact sound pressure level Ln [dB]":
+        "Nivel de presión de ruido de impactos Ln [dB]",
+    "ISO 15186-1 Small-Element Insulation by Intensity":
+        "Aislamiento de elementos pequeños por intensidad ISO 15186-1",
+    "DI,n,e (element)": "DI,n,e (elemento)",
+    "Element normalized level difference [dB]":
+        "Diferencia de niveles normalizada de elemento [dB]",
+    "ISO 10848 Airborne Flanking Transmission":
+        "Transmisión aérea por flancos ISO 10848",
+    "Dn,f (flanking)": "Dn,f (flancos)",
+    "Normalized flanking level difference [dB]":
+        "Diferencia de niveles normalizada de flancos [dB]",
+    "EN 12354-2 Impact Sound Prediction (Annex E.3)":
+        "Predicción de ruido de impactos EN 12354-2 (Anexo E.3)",
+    "Level / correction [dB]": "Nivel / corrección [dB]",
+    "EN 12354-4 Radiated Sound Power (Annex G)":
+        "Potencia sonora radiada EN 12354-4 (Anexo G)",
+    "radiated $L_W$ per octave": "$L_W$ radiada por octava",
+    "Radiated sound power level [dB re 1 pW]":
+        "Nivel de potencia acústica radiada [dB re 1 pW]",
+    "Predicted Single-Panel Insulation Rated per ISO 717-1":
+        "Aislamiento previsto de panel simple evaluado según ISO 717-1",
+    "predicted R (Sharp)": "R previsto (Sharp)",
+    "Wave-Approach Junction $K_{ij}$ (Hopkins Eq. 5.116)":
+        "$K_{ij}$ de unión por el enfoque ondulatorio (Hopkins Ec. 5.116)",
+    "X corner": "X esquina",
+    "X straight": "X recta",
+    "T-junction (1) corner": "unión en T (1) esquina",
+    "L corner": "L esquina",
+    "identical plates (τ = 1/12)": "placas idénticas (τ = 1/12)",
+    "Thickness ratio h2/h1": "Relación de espesores h2/h1",
+    "Vibration reduction index $K_{ij}$ [dB]":
+        "Índice de reducción de vibraciones $K_{ij}$ [dB]",
+    "Reading a Driving-Point Mobility (ISO 7626-1)":
+        "Lectura de una movilidad en el punto de excitación (ISO 7626-1)",
+    "driving-point $|Y(f)|$": "$|Y(f)|$ en el punto de excitación",
+    r"stiffness line $\omega/k$": r"línea de rigidez $\omega/k$",
+    r"mass line $1/(\omega m)$": r"línea de masa $1/(\omega m)$",
+    "peak $|Y| = 1/c$ (damping)": "pico $|Y| = 1/c$ (amortiguamiento)",
+    "Mobility $|Y|$ [m/(N·s)]": "Movilidad $|Y|$ [m/(N·s)]",
 }
 
 _ES_PATTERNS = [
@@ -1394,6 +1460,39 @@ _ES_PATTERNS = [
     (r"^FDTD pressure field at t = (.+) ms$",
      r"Campo de presión FDTD en t = \1 ms"),
     (r"^probe \((.+)\) m$", r"sonda (\1) m"),
+    # Building & structure-borne result figures (dynamic values baked in).
+    (r"^Airborne: Rw\(C;Ctr\) = (.+) dB$", r"Aéreo: Rw(C;Ctr) = \1 dB"),
+    (r"^Impact: Ln,w\(CI\) = (.+) dB$", r"Impacto: Ln,w(CI) = \1 dB"),
+    (r"^coincidence fc = (\d+) Hz$", r"coincidencia fc = \1 Hz"),
+    (r"^\$L_\{WA\}\$ = (\d+)\.(\d+) dB\(A\)$", r"$L_{WA}$ = \1,\2 dB(A)"),
+    # Their multi-line info boxes are single Text artists, so the whole
+    # joined string is matched at once (values stay as capture groups).
+    (r"^Rw\(C;Ctr\) = (.+)\nC50-5000 = (.+)\n"
+     r"rating on the core bands, terms on the full range$",
+     "Rw(C;Ctr) = \\1\nC50-5000 = \\2\n"
+     "índice en las bandas básicas, términos en el rango completo"),
+    (r"^Dls,2m,nT,w\(C;Ctr\) = (.+) dB\n45° loudspeaker method "
+     r"\(-1\.5 dB on R'\)$",
+     "Dls,2m,nT,w(C;Ctr) = \\1 dB\nmétodo del altavoz a 45° (-1,5 dB en R')"),
+    (r"^L'nT,w\(CI\) = (.+) dB\nnote the minus sign: a live room lowers "
+     r"L'nT$",
+     "L'nT,w(CI) = \\1 dB\natención al signo menos: una sala viva reduce L'nT"),
+    (r"^LW = Lp,in \+ Cd - R' \+ 10 lg\(S/S0\)\nwall 176 m² \+ industrial "
+     r"door 24 m², Cd = -5 dB$",
+     "LW = Lp,in + Cd - R' + 10 lg(S/S0)\n"
+     "muro de 176 m² + puerta industrial de 24 m², Cd = -5 dB"),
+    (r"^Rw\(C;Ctr\) = (.+) dB\n6 mm float glass, m'' = 15 kg/m², "
+     r"η = 0\.024$",
+     "Rw(C;Ctr) = \\1 dB\nvidrio flotado de 6 mm, m'' = 15 kg/m², η = 0,024"),
+    (r"^Kij = 10 lg\(1/τ̄\) \+ 5 lg\(fc2/1000\)\nconcrete, plate 1 fixed "
+     r"at 100 mm$",
+     "Kij = 10 lg(1/τ̄) + 5 lg(fc2/1000)\nhormigón, placa 1 fija en 100 mm"),
+    (r"^below f0: stiffness-controlled, \|Y\| ~ ω/k\n"
+     r"above f0: mass-controlled, \|Y\| ~ 1/\(ωm\)\n"
+     r"f0 = (.+) Hz,  1/c = (.+) m/\(N·s\)$",
+     "por debajo de f0: dominio de la rigidez, |Y| ~ ω/k\n"
+     "por encima de f0: dominio de la masa, |Y| ~ 1/(ωm)\n"
+     "f0 = \\1 Hz,  1/c = \\2 m/(N·s)"),
 ]
 
 
@@ -9190,6 +9289,634 @@ def generate_fdtd_room_modes(output_dir: str) -> None:
     ax.legend(loc="lower right", fontsize=9)
     plt.tight_layout()
     save_figure(output_dir, "fdtd_room_modes.svg")
+# ---------------------------------------------------------------------------
+# Building & structure-borne result figures (WP: guide figure coverage).
+# Each figure is a realistic user result: example data -> real function ->
+# result object, drawn the way the result's own .plot() presents it.
+# ---------------------------------------------------------------------------
+_THIRD_OCTAVE_16 = [100, 125, 160, 200, 250, 315, 400, 500,
+                    630, 800, 1000, 1250, 1600, 2000, 2500, 3150]
+
+
+def _band_index_axis(ax: Any, freqs: list[float] | np.ndarray,
+                     fontsize: int = 8) -> np.ndarray:
+    """Rotated nominal band labels on an index axis (band-data figures)."""
+    x = np.arange(len(freqs))
+    ax.set_xticks(x)
+    ax.set_xticklabels([f"{b:g}" for b in np.asarray(freqs)],
+                       rotation=45, fontsize=fontsize)
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    return x
+
+
+def generate_extended_insulation_rating(output_dir: str) -> None:
+    """ISO 717-1 Annex B enlarged-range rating of the Annex C Table C.2 wall."""
+    print("Generating extended_insulation_rating...")
+    from phonometry import weighted_rating_extended
+
+    # ISO 717-1 Annex C: the 16-band R spectrum (Table C.1) enlarged to
+    # 50 Hz - 5 kHz with the Table C.2 values.
+    r_core = [20.4, 16.3, 17.7, 22.6, 22.4, 22.7, 24.8, 26.6,
+              28.0, 30.5, 31.8, 32.5, 33.4, 33.0, 31.0, 25.5]
+    freqs = [50, 63, 80, *(_THIRD_OCTAVE_16), 4000, 5000]
+    ext = weighted_rating_extended([18.7, 19.2, 20.0, *r_core, 26.8, 29.2],
+                                   freqs)
+    assert ext.measured is not None and ext.core.shifted_reference is not None
+    assert ext.core.measured is not None
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    x = _band_index_axis(ax, freqs)
+    core = slice(3, 19)                     # the 16 core bands 100-3150 Hz
+    ax.axvspan(-0.5, 2.5, color=COLOR_GRID, alpha=0.35, zorder=0,
+               label="enlarged range (Annex B)")
+    ax.axvspan(18.5, 20.5, color=COLOR_GRID, alpha=0.35, zorder=0)
+    ax.plot(x, ext.measured, "-o", color=COLOR_PRIMARY, linewidth=2.2,
+            markersize=5, zorder=5, label="measured R")
+    ax.plot(x[core], ext.core.shifted_reference, "--s", color=COLOR_FG,
+            linewidth=1.8, markersize=5, zorder=5,
+            label="shifted reference (100-3150 Hz)")
+    unfav = ext.core.measured < ext.core.shifted_reference
+    ax.fill_between(x[core], ext.core.measured, ext.core.shifted_reference,
+                    where=unfav.tolist(), color=COLOR_SECONDARY, alpha=0.25,
+                    interpolate=True, zorder=1,
+                    label="unfavourable deviations")
+
+    ax.set_ylabel("Sound reduction index R [dB]")
+    ax.set_title("ISO 717-1 Enlarged-Range Rating (Annex B)",
+                 fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", fontsize=9)
+
+    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
+    info = [
+        f"Rw(C;Ctr) = {ext.rating:g}({ext.c:g};{ext.ctr:g})",
+        f"C50-5000 = {ext.c_50_5000:g},  Ctr,50-5000 = {ext.ctr_50_5000:g}",
+        "rating on the core bands, terms on the full range",
+    ]
+    ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
+            va="bottom", ha="right", fontsize=10, color=COLOR_FG,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+                  "edgecolor": COLOR_GRID})
+    plt.tight_layout()
+    save_figure(output_dir, "extended_insulation_rating.svg")
+    plt.close()
+
+
+def generate_field_airborne_insulation(output_dir: str) -> None:
+    """ISO 16283-1 field airborne chain: D and DnT with the T correction."""
+    print("Generating field_airborne_insulation...")
+    from phonometry import airborne_insulation, weighted_rating
+
+    # A separating wall between dwellings: source/receiving levels and the
+    # measured receiving-room T per one-third-octave band.
+    l1 = np.array([92.3, 93.1, 94.0, 94.4, 94.8, 95.0, 95.2, 95.4,
+                   95.3, 95.1, 94.8, 94.4, 93.9, 93.3, 92.5, 91.6])
+    d = np.array([38.2, 40.1, 42.6, 45.2, 47.8, 50.1, 52.3, 54.0,
+                  55.6, 57.1, 58.2, 59.0, 59.6, 60.1, 60.3, 59.8])
+    t2 = np.array([0.62, 0.58, 0.55, 0.53, 0.52, 0.50, 0.49, 0.48,
+                   0.47, 0.46, 0.45, 0.45, 0.44, 0.43, 0.43, 0.42])
+    field = airborne_insulation(l1, l1 - d, t2, area=12.5, volume=30.4)
+    assert field.r_prime is not None
+    w = weighted_rating(field.dnt)
+    w_rp = weighted_rating(field.r_prime)
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    x = _band_index_axis(ax, _THIRD_OCTAVE_16)
+    ax.fill_between(x, field.d, field.dnt, color=COLOR_TERTIARY, alpha=0.18,
+                    zorder=0, label="10 lg(T/T0)")
+    ax.plot(x, field.d, "--o", color=COLOR_PRIMARY, linewidth=1.8,
+            markersize=5, zorder=5, label="D (level difference)")
+    ax.plot(x, field.dnt, "-s", color=COLOR_FG, linewidth=2.4, markersize=5,
+            zorder=5, label="DnT (standardized)")
+
+    ax.set_ylabel("Level difference [dB]")
+    ax.set_title("ISO 16283-1 Field Airborne Insulation",
+                 fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", fontsize=9)
+
+    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
+    info = [
+        f"DnT,w(C;Ctr) = {w.rating}({w.c};{w.ctr}) dB",
+        f"R'w = {w_rp.rating} dB   (S = 12.5 m², V = 30.4 m³)",
+    ]
+    ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
+            va="bottom", ha="right", fontsize=10, color=COLOR_FG,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+                  "edgecolor": COLOR_GRID})
+    plt.tight_layout()
+    save_figure(output_dir, "field_airborne_insulation.svg")
+    plt.close()
+
+
+def generate_facade_field_insulation(output_dir: str) -> None:
+    """ISO 16283-3 façade quantities D2m, D2m,nT, D2m,n and R'45 per band."""
+    print("Generating facade_field_insulation...")
+    from phonometry import facade_insulation, weighted_rating
+
+    # A dwelling façade under the 45-degree loudspeaker method: the outdoor
+    # level 2 m in front, the receiving-room level and T per band.
+    l1_2m = np.array([76.0, 77.0, 78.0, 78.5, 79.0, 79.0, 79.0, 79.0,
+                      78.5, 78.0, 77.5, 77.0, 76.5, 76.0, 75.0, 74.0])
+    d2m = np.array([24.0, 25.5, 27.0, 28.5, 30.0, 31.5, 33.0, 34.5,
+                    36.0, 37.0, 38.0, 38.5, 39.0, 39.0, 38.5, 38.0])
+    t2 = np.array([0.65, 0.62, 0.58, 0.55, 0.52, 0.50, 0.49, 0.48,
+                   0.47, 0.46, 0.45, 0.44, 0.43, 0.43, 0.42, 0.42])
+    fac = facade_insulation(l1_2m, l1_2m - d2m, t2, volume=32.0, area=10.8,
+                            surface_level=l1_2m + 3.0, method="loudspeaker",
+                            frequencies=np.asarray(_THIRD_OCTAVE_16, float))
+    assert fac.d_2m_n is not None and fac.r_prime is not None
+    w = weighted_rating(fac.d_2m_nt)
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    x = _band_index_axis(ax, _THIRD_OCTAVE_16)
+    ax.plot(x, fac.d_2m_nt, "-s", color=COLOR_FG, linewidth=2.4, markersize=5,
+            zorder=6, label="D2m,nT (standardized)")
+    ax.plot(x, fac.d_2m, "--o", color=COLOR_PRIMARY, linewidth=1.8,
+            markersize=5, zorder=5, label="D2m = L1,2m - L2")
+    ax.plot(x, fac.d_2m_n, ":", color=COLOR_SECONDARY, linewidth=1.8,
+            marker=".", zorder=5, label="D2m,n (normalized)")
+    ax.plot(x, fac.r_prime, "-.", color=COLOR_TERTIARY, linewidth=1.8,
+            marker="^", markersize=5, zorder=5, label="R'45° (element)")
+
+    ax.set_ylabel("Level difference / reduction index [dB]")
+    ax.set_title("ISO 16283-3 Field Facade Insulation",
+                 fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", fontsize=9)
+
+    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
+    info = [
+        f"Dls,2m,nT,w(C;Ctr) = {w.rating}({w.c};{w.ctr}) dB",
+        "45° loudspeaker method (-1.5 dB on R')",
+    ]
+    ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
+            va="bottom", ha="right", fontsize=10, color=COLOR_FG,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+                  "edgecolor": COLOR_GRID})
+    plt.tight_layout()
+    save_figure(output_dir, "facade_field_insulation.svg")
+    plt.close()
+
+
+def generate_survey_impact_insulation(output_dir: str) -> None:
+    """ISO 10052 survey impact method: Li -> L'nT with the k correction."""
+    print("Generating survey_impact_insulation...")
+    from phonometry import reverberation_index, survey_impact_insulation
+
+    bands = [125.0, 250.0, 500.0, 1000.0, 2000.0]
+    # Tapping machine on the floor above: octave-band receiving-room levels
+    # and the measured receiving-room reverberation time.
+    li = np.array([66.0, 64.0, 62.0, 60.0, 55.0])
+    k = reverberation_index([0.70, 0.60, 0.50, 0.45, 0.40])
+    res = survey_impact_insulation(li, k, volume=50.0)
+    assert res.rating is not None
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    x = _band_index_axis(ax, bands, fontsize=10)
+    ax.fill_between(x, res.l_i, res.l_nt, color=COLOR_TERTIARY, alpha=0.18,
+                    zorder=0, label="-k = -10 lg(T/T0)")
+    ax.plot(x, res.l_i, "--o", color=COLOR_PRIMARY, linewidth=1.8,
+            markersize=6, zorder=5, label="Li (impact level)")
+    ax.plot(x, res.l_nt, "-s", color=COLOR_FG, linewidth=2.4, markersize=6,
+            zorder=5, label="L'nT (standardized)")
+
+    ax.set_ylabel("Impact sound pressure level [dB]")
+    ax.set_title("ISO 10052 Survey Method: Impact Sound",
+                 fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower left", fontsize=9)
+
+    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
+    info = [
+        f"L'nT,w(CI) = {res.rating.rating}({res.rating.ci}) dB",
+        "note the minus sign: a live room lowers L'nT",
+    ]
+    ax.text(0.985, 0.97, "\n".join(info), transform=ax.transAxes,
+            va="top", ha="right", fontsize=10, color=COLOR_FG,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+                  "edgecolor": COLOR_GRID})
+    plt.tight_layout()
+    save_figure(output_dir, "survey_impact_insulation.svg")
+    plt.close()
+
+
+def generate_lab_insulation_result(output_dir: str) -> None:
+    """ISO 10140 laboratory quantities: the airborne R and the impact Ln."""
+    print("Generating lab_insulation_result...")
+    from phonometry import lab_airborne_insulation, lab_impact_insulation
+
+    # ISO 717-1 Annex C wall measured in an ISO 10140 suite (S = 10 m2,
+    # V = 50 m3, T = 0.8 s) and the ISO 717-2 Annex C floor tapping levels.
+    r = np.array([20.4, 16.3, 17.7, 22.6, 22.4, 22.7, 24.8, 26.6,
+                  28.0, 30.5, 31.8, 32.5, 33.4, 33.0, 31.0, 25.5])
+    l1 = np.full(16, 90.0)
+    t2 = np.full(16, 0.8)
+    lab = lab_airborne_insulation(l1, l1 - r, t2, area=10.0, volume=50.0)
+    li = np.array([62.1, 63.2, 63.5, 66.2, 68.5, 70.0, 71.7, 73.1,
+                   73.8, 73.5, 73.8, 73.3, 73.1, 73.0, 72.4, 71.2])
+    imp = lab_impact_insulation(li, t2, volume=50.0)
+    assert lab.rating is not None and imp.rating is not None
+
+    _fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5.6))
+    for ax in (ax1, ax2):
+        _band_index_axis(ax, _THIRD_OCTAVE_16, fontsize=7)
+        ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+        ax.set_axisbelow(True)
+    x = np.arange(16)
+
+    ax1.plot(x, lab.r, "-o", color=COLOR_PRIMARY, linewidth=2.2,
+             markersize=5, zorder=5, label="measured R")
+    assert lab.rating.shifted_reference is not None
+    ax1.plot(x, lab.rating.shifted_reference, "--s", color=COLOR_FG,
+             linewidth=1.6, markersize=4, zorder=5, label="shifted reference")
+    ax1.set_ylabel("Sound reduction index R [dB]")
+    ax1.set_title(f"Airborne: Rw(C;Ctr) = {lab.rating.rating}"
+                  f"({lab.rating.c};{lab.rating.ctr}) dB", fontsize=11)
+    ax1.legend(loc="upper left", fontsize=9)
+
+    ax2.plot(x, imp.l_n, "-o", color=COLOR_SECONDARY, linewidth=2.2,
+             markersize=5, zorder=5, label="normalized Ln")
+    assert imp.rating.shifted_reference is not None
+    ax2.plot(x, imp.rating.shifted_reference, "--s", color=COLOR_FG,
+             linewidth=1.6, markersize=4, zorder=5, label="shifted reference")
+    ax2.set_ylabel("Impact sound pressure level Ln [dB]")
+    ax2.set_title(f"Impact: Ln,w(CI) = {imp.rating.rating}"
+                  f"({imp.rating.ci}) dB", fontsize=11)
+    ax2.legend(loc="upper right", fontsize=9)
+
+    plt.suptitle("ISO 10140 Laboratory Insulation (flanking suppressed)",
+                 fontweight="bold")
+    plt.tight_layout()
+    save_figure(output_dir, "lab_insulation_result.svg")
+    plt.close()
+
+
+def generate_intensity_element_insulation(output_dir: str) -> None:
+    """ISO 15186-1 element-normalized level difference of a small element."""
+    print("Generating intensity_element_insulation...")
+    from phonometry import intensity_element_normalized_difference
+
+    # A trickle ventilator in a masonry wall: source-room SPL 85 dB and the
+    # normal intensity level over the Sm = 12 m2 measurement surface.
+    l_in = np.array([57.9, 62.0, 60.6, 55.7, 55.9, 55.6, 53.5, 51.7,
+                     50.3, 47.8, 46.5, 45.8, 44.9, 45.3, 47.3, 52.8])
+    res = intensity_element_normalized_difference(
+        np.full(16, 85.0), l_in, measurement_area=12.0, n=1
+    )
+    assert res.rating is not None
+    assert res.rating.shifted_reference is not None
+    assert res.rating.measured is not None
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    x = _band_index_axis(ax, _THIRD_OCTAVE_16)
+    ax.plot(x, res.d_i_n_e, "-o", color=COLOR_PRIMARY, linewidth=2.2,
+            markersize=5, zorder=5, label="DI,n,e (element)")
+    ax.plot(x, res.rating.shifted_reference, "--s", color=COLOR_FG,
+            linewidth=1.8, markersize=5, zorder=5, label="shifted reference")
+    unfav = res.rating.measured < res.rating.shifted_reference
+    ax.fill_between(x, res.rating.measured, res.rating.shifted_reference,
+                    where=unfav.tolist(), color=COLOR_SECONDARY, alpha=0.25,
+                    interpolate=True, zorder=1,
+                    label="unfavourable deviations")
+
+    ax.set_ylabel("Element normalized level difference [dB]")
+    ax.set_title("ISO 15186-1 Small-Element Insulation by Intensity",
+                 fontweight="bold", pad=12)
+    ax.margins(y=0.1)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", fontsize=9)
+
+    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
+    info = [
+        f"DI,n,e,w(C;Ctr) = {res.rating.rating}"
+        f"({res.rating.c};{res.rating.ctr}) dB",
+        "DI,n,e = Lp1 - 6 - [LIn + 10 lg(Sm/A0)] + 10 lg N",
+    ]
+    ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
+            va="bottom", ha="right", fontsize=10, color=COLOR_FG,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+                  "edgecolor": COLOR_GRID})
+    plt.tight_layout()
+    save_figure(output_dir, "intensity_element_insulation.svg")
+    plt.close()
+
+
+def generate_flanking_level_difference(output_dir: str) -> None:
+    """ISO 10848 overall flanking descriptor Dn,f with its Dn,f,w rating."""
+    print("Generating flanking_level_difference...")
+    from phonometry import normalized_flanking_level_difference
+
+    # A lightweight junction measured in the laboratory: source-room level,
+    # receiving-room level over the flanking path and the absorption area.
+    l1 = np.full(16, 80.0)
+    dnf_target = np.array([48, 49, 50, 51, 52, 54, 55, 57,
+                           58, 59, 60, 61, 62, 63, 64, 65], dtype=float)
+    res = normalized_flanking_level_difference(
+        l1, l1 - dnf_target, absorption_area=np.full(16, 10.0)
+    )
+    assert res.rating is not None
+    assert res.rating.shifted_reference is not None
+    assert res.rating.measured is not None
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    x = _band_index_axis(ax, _THIRD_OCTAVE_16)
+    ax.plot(x, res.d_n_f, "-o", color=COLOR_PRIMARY, linewidth=2.2,
+            markersize=5, zorder=5, label="Dn,f (flanking)")
+    ax.plot(x, res.rating.shifted_reference, "--s", color=COLOR_FG,
+            linewidth=1.8, markersize=5, zorder=5, label="shifted reference")
+    unfav = res.rating.measured < res.rating.shifted_reference
+    ax.fill_between(x, res.rating.measured, res.rating.shifted_reference,
+                    where=unfav.tolist(), color=COLOR_SECONDARY, alpha=0.25,
+                    interpolate=True, zorder=1,
+                    label="unfavourable deviations")
+
+    ax.set_ylabel("Normalized flanking level difference [dB]")
+    ax.set_title("ISO 10848 Airborne Flanking Transmission",
+                 fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", fontsize=9)
+
+    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
+    info = [
+        f"Dn,f,w(C;Ctr) = {res.rating.rating}"
+        f"({res.rating.c};{res.rating.ctr}) dB",
+        "Dn,f = L1 - L2 - 10 lg(A/A0)",
+    ]
+    ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
+            va="bottom", ha="right", fontsize=10, color=COLOR_FG,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+                  "edgecolor": COLOR_GRID})
+    plt.tight_layout()
+    save_figure(output_dir, "flanking_level_difference.svg")
+    plt.close()
+
+
+def generate_impact_prediction_terms(output_dir: str) -> None:
+    """EN 12354-2 Annex E.3 impact prediction as its Formula (21) terms."""
+    print("Generating impact_prediction_terms...")
+    from phonometry import (
+        equivalent_impact_level,
+        impact_flanking_correction,
+        predicted_impact_insulation,
+    )
+
+    # EN 12354-2 Annex E.3: a 0.14 m concrete floor (m' = 322 kg/m2) with a
+    # floating floor (delta-Lw = 33 dB), mean flanking mass 145 kg/m2.
+    ln_eq = float(equivalent_impact_level(322.0))
+    k = float(impact_flanking_correction(322.0, 145.0))
+    imp = predicted_impact_insulation(ln_w_eq=ln_eq, delta_l_w=33.0,
+                                      k_correction=k)
+
+    labels = ["$L_{n,w,eq}$", r"$-\Delta L_w$", "$+K$", "$L'_{n,w}$"]
+    values = [imp.ln_w_eq, -imp.delta_l_w, imp.k_correction, imp.l_prime_n_w]
+    colors = [COLOR_GRID, COLOR_TERTIARY, COLOR_SECONDARY, COLOR_PRIMARY]
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    bars = ax.bar(np.arange(4), values, color=colors, zorder=5)
+    ax.axhline(0.0, color=COLOR_FG, linewidth=0.8)
+    ax.set_xticks(np.arange(4))
+    ax.set_xticklabels(labels, fontsize=12)
+    for bar, value in zip(bars, values):
+        ax.annotate(f"{value:+.1f}",
+                    xy=(bar.get_x() + bar.get_width() / 2.0, value),
+                    xytext=(0, 5 if value >= 0 else -14),
+                    textcoords="offset points", ha="center", fontsize=10,
+                    color=COLOR_FG)
+    ax.set_ylim(min(values) - 9.0, max(values) + 9.0)
+
+    ax.set_ylabel("Level / correction [dB]")
+    ax.set_title("EN 12354-2 Impact Sound Prediction (Annex E.3)",
+                 fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, axis="y", zorder=0)
+    ax.set_axisbelow(True)
+
+    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
+    info = [
+        "L'n,w = Ln,w,eq - ΔLw + K",
+        f"Ln,w,eq = 164 - 35 lg(m'/m'0) = {ln_eq:.1f} dB",
+        f"L'n,w = {imp.l_prime_n_w:.1f} dB → 45 dB",
+    ]
+    ax.text(0.985, 0.97, "\n".join(info), transform=ax.transAxes,
+            va="top", ha="right", fontsize=10, color=COLOR_FG,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+                  "edgecolor": COLOR_GRID})
+    plt.tight_layout()
+    save_figure(output_dir, "impact_prediction_terms.svg")
+    plt.close()
+
+
+def generate_radiated_power_outdoor(output_dir: str) -> None:
+    """EN 12354-4 Annex G radiated sound power of a wall with a door."""
+    print("Generating radiated_power_outdoor...")
+    from phonometry import FacadeElement, radiated_sound_power
+
+    # EN 12354-4 Annex G, side 1: a 10 x 20 m concrete wall segment with a
+    # 6 x 4 m industrial door, inside level Lp,in and Cd = -5 dB.
+    bands = [63, 125, 250, 500, 1000, 2000, 4000, 8000]
+    seg = radiated_sound_power(
+        [FacadeElement("wall", area=176.0, r=[32, 36, 36, 33, 39, 49, 57, 63]),
+         FacadeElement("door", area=24.0, r=[21, 23, 28, 30, 30, 30, 30, 30])],
+        lp_in=[70, 74, 76, 72, 70, 67, 62, 57], area=200.0, c_d=-5.0,
+        r_prime_cap=40.0, octave_bands=bands)
+    assert seg.l_w_dba is not None
+
+    x = np.arange(len(bands))
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    ax.bar(x, seg.l_w, color=COLOR_PRIMARY, alpha=0.85, zorder=5,
+           label="radiated $L_W$ per octave")
+    ax.axhline(seg.l_w_dba, color=COLOR_SECONDARY, linestyle="--",
+               linewidth=1.6, zorder=6,
+               label=f"$L_{{WA}}$ = {seg.l_w_dba:.1f} dB(A)")
+    ax.set_xticks(x)
+    ax.set_xticklabels([f"{b:g}" for b in bands])
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Radiated sound power level [dB re 1 pW]")
+    ax.set_ylim(0.0, float(np.max(seg.l_w)) * 1.35)
+    ax.set_title("EN 12354-4 Radiated Sound Power (Annex G)",
+                 fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, axis="y", zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper right", fontsize=9)
+
+    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
+    info = [
+        "LW = Lp,in + Cd - R' + 10 lg(S/S0)",
+        "wall 176 m² + industrial door 24 m², Cd = -5 dB",
+    ]
+    ax.text(0.015, 0.97, "\n".join(info), transform=ax.transAxes,
+            va="top", ha="left", fontsize=10, color=COLOR_FG, zorder=10,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+                  "edgecolor": COLOR_GRID})
+    plt.tight_layout()
+    save_figure(output_dir, "radiated_power_outdoor.svg")
+    plt.close()
+
+
+def generate_single_panel_rating(output_dir: str) -> None:
+    """Sharp single-panel R(f) prediction rated per ISO 717-1 (6 mm glass)."""
+    print("Generating single_panel_rating...")
+    from phonometry import (
+        coincidence_frequency,
+        plate_bending_stiffness,
+        single_panel_transmission_loss,
+    )
+
+    # 6 mm float glass: E = 62 GPa, rho = 2500 kg/m3, nu = 0.24, eta = 0.024.
+    bands = np.asarray(_THIRD_OCTAVE_16, dtype=float)
+    mass = 2500.0 * 0.006
+    bp = plate_bending_stiffness(6.2e10, 0.006, 0.24)
+    fc = float(coincidence_frequency(mass, bp))
+    res = single_panel_transmission_loss(bands, mass, critical_frequency=fc,
+                                         loss_factor=0.024)
+    w = res.rating()
+    assert w.shifted_reference is not None and w.measured is not None
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    x = _band_index_axis(ax, _THIRD_OCTAVE_16)
+    ax.plot(x, res.transmission_loss, "-o", color=COLOR_PRIMARY,
+            linewidth=2.2, markersize=5, zorder=5, label="predicted R (Sharp)")
+    ax.plot(x, w.shifted_reference, "--s", color=COLOR_FG, linewidth=1.8,
+            markersize=5, zorder=5, label="shifted reference")
+    unfav = w.measured < w.shifted_reference
+    ax.fill_between(x, w.measured, w.shifted_reference, where=unfav.tolist(),
+                    color=COLOR_SECONDARY, alpha=0.25, interpolate=True,
+                    zorder=1, label="unfavourable deviations")
+    idx_fc = float(np.interp(np.log10(fc), np.log10(bands), x))
+    ax.axvline(idx_fc, color=COLOR_TERTIARY, linestyle=":", linewidth=1.6,
+               zorder=4, label=f"coincidence fc = {fc:.0f} Hz")
+
+    ax.set_ylabel("Sound reduction index R [dB]")
+    ax.set_title("Predicted Single-Panel Insulation Rated per ISO 717-1",
+                 fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", fontsize=9)
+
+    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
+    info = [
+        f"Rw(C;Ctr) = {w.rating}({w.c};{w.ctr}) dB",
+        "6 mm float glass, m'' = 15 kg/m², η = 0.024",
+    ]
+    ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
+            va="bottom", ha="right", fontsize=10, color=COLOR_FG,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+                  "edgecolor": COLOR_GRID})
+    plt.tight_layout()
+    save_figure(output_dir, "single_panel_rating.svg")
+    plt.close()
+
+
+def generate_junction_kij_thickness(output_dir: str) -> None:
+    """Wave-approach Kij versus the plate thickness ratio (Hopkins Eq. 5.116)."""
+    print("Generating junction_kij_thickness...")
+    from phonometry import junction_transmission, wave_vibration_reduction_index
+
+    # Concrete plates (cL = 3200 m/s, rho = 2400 kg/m3): plate 1 fixed at
+    # 100 mm, plate 2 swept from 50 mm to 400 mm.
+    h1, cl, rho = 0.1, 3200.0, 2400.0
+    ratios = np.linspace(0.5, 4.0, 36)
+    curves: dict[str, list[float]] = {
+        "X corner": [], "X straight": [], "T-junction (1) corner": [],
+        "L corner": [],
+    }
+    for ratio in ratios:
+        h2 = h1 * float(ratio)
+        res_x = junction_transmission("X", h1, cl, rho * h1, h2, cl, rho * h2)
+        assert res_x.straight_average is not None
+        curves["X corner"].append(res_x.corner_reduction_index)
+        curves["X straight"].append(float(wave_vibration_reduction_index(
+            res_x.straight_average, res_x.critical_frequency2)))
+        res_t = junction_transmission("T1", h1, cl, rho * h1, h2, cl, rho * h2)
+        curves["T-junction (1) corner"].append(res_t.corner_reduction_index)
+        res_l = junction_transmission("L", h1, cl, rho * h1, h2, cl, rho * h2)
+        curves["L corner"].append(res_l.corner_reduction_index)
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    styles = [("-", COLOR_PRIMARY), ("--", COLOR_PRIMARY),
+              ("-", COLOR_SECONDARY), ("-", COLOR_TERTIARY)]
+    for (label, values), (ls, color) in zip(curves.items(), styles):
+        ax.plot(ratios, values, ls, color=color, linewidth=2.0, label=label)
+    # The identical-plate X-junction: Kij = 10 lg 12 + 5 lg(fc2/1000).
+    res_eq = junction_transmission("X", h1, cl, rho * h1, h1, cl, rho * h1)
+    ax.scatter([1.0], [res_eq.corner_reduction_index], color=COLOR_FG, s=70,
+               zorder=6, label="identical plates (τ = 1/12)")
+
+    ax.set_xticks(np.arange(0.5, 4.01, 0.5))
+    ax.set_xticklabels([f"{v:.1f}" for v in np.arange(0.5, 4.01, 0.5)])
+    ax.set_xlabel("Thickness ratio h2/h1")
+    ax.set_ylabel("Vibration reduction index $K_{ij}$ [dB]")
+    ax.set_title("Wave-Approach Junction $K_{ij}$ (Hopkins Eq. 5.116)",
+                 fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", fontsize=9)
+
+    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
+    info = [
+        "Kij = 10 lg(1/τ̄) + 5 lg(fc2/1000)",
+        "concrete, plate 1 fixed at 100 mm",
+    ]
+    ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
+            va="bottom", ha="right", fontsize=10, color=COLOR_FG,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+                  "edgecolor": COLOR_GRID})
+    plt.tight_layout()
+    save_figure(output_dir, "junction_kij_thickness.svg")
+    plt.close()
+
+
+def generate_mobility_result_lines(output_dir: str) -> None:
+    """ISO 7626 driving-point mobility with its stiffness and mass lines."""
+    print("Generating mobility_result_lines...")
+    from phonometry import sdof_mobility_result
+
+    m, k, c = 2.0, 8000.0, 5.0
+    f = np.logspace(np.log10(0.5), np.log10(200.0), 400)
+    res = sdof_mobility_result(f, mass=m, stiffness=k, damping=c)
+    w = 2.0 * np.pi * f
+    f0 = float(res.frequencies[int(np.argmax(res.magnitude))])
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    ax.loglog(f, res.magnitude, color=COLOR_PRIMARY, linewidth=2.2,
+              label="driving-point $|Y(f)|$")
+    ax.loglog(f, w / k, ":", color=COLOR_SECONDARY, linewidth=1.6,
+              label=r"stiffness line $\omega/k$")
+    ax.loglog(f, 1.0 / (w * m), ":", color=COLOR_TERTIARY, linewidth=1.6,
+              label=r"mass line $1/(\omega m)$")
+    ax.axhline(1.0 / c, color=COLOR_GRID, linestyle="--", linewidth=1.2)
+    ax.scatter([f0], [1.0 / c], color=COLOR_FG, s=60, zorder=6,
+               label="peak $|Y| = 1/c$ (damping)")
+
+    ax.set_xlim(float(f[0]), float(f[-1]))
+    ax.set_ylim(1e-5, 1.0)
+    format_frequency_axis(ax, float(f[0]), float(f[-1]))
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Mobility $|Y|$ [m/(N·s)]")
+    ax.set_title("Reading a Driving-Point Mobility (ISO 7626-1)",
+                 fontweight="bold", pad=12)
+    ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower center", fontsize=9, ncol=2)
+
+    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
+    info = [
+        "below f0: stiffness-controlled, |Y| ~ ω/k",
+        "above f0: mass-controlled, |Y| ~ 1/(ωm)",
+        f"f0 = {f0:.1f} Hz,  1/c = {1.0 / c:.2f} m/(N·s)",
+    ]
+    ax.text(0.015, 0.97, "\n".join(info), transform=ax.transAxes,
+            va="top", ha="left", fontsize=10, color=COLOR_FG,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+                  "edgecolor": COLOR_GRID})
+    plt.tight_layout()
+    save_figure(output_dir, "mobility_result_lines.svg")
     plt.close()
 
 
@@ -9433,6 +10160,23 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_steady_state_field,
     generate_room_parameters_bands,
     generate_fdtd_room_modes,
+    # Building & structure-borne result figures (guide figure coverage):
+    # ISO 717 enlarged range, ISO 16283 field chains, ISO 10052 survey impact,
+    # ISO 10140 laboratory quantities, ISO 15186-1 small elements, ISO 10848
+    # flanking descriptors, EN 12354-2/-4 predictions, the rated Sharp panel,
+    # the wave-approach junction Kij and the ISO 7626 mobility lines.
+    generate_extended_insulation_rating,
+    generate_field_airborne_insulation,
+    generate_facade_field_insulation,
+    generate_survey_impact_insulation,
+    generate_lab_insulation_result,
+    generate_intensity_element_insulation,
+    generate_flanking_level_difference,
+    generate_impact_prediction_terms,
+    generate_radiated_power_outdoor,
+    generate_single_panel_rating,
+    generate_junction_kij_thickness,
+    generate_mobility_result_lines,
 )
 
 
@@ -9456,8 +10200,7 @@ def generate_all(img_dir: str) -> None:
 # outside the figure pipeline. Kept out of generate_all()/`make graphs` so
 # ordinary figure regeneration stays fast; produced by `make animations` (or `make posters` to re-extract the
 # stills from the committed WebMs without re-rendering).
-# ====================================================================
-_ANIM_FPS = 20
+# =============================================================_ANIM_FPS = 20
 _ANIM_SECONDS = 12
 _ANIM_FRAMES = _ANIM_FPS * _ANIM_SECONDS
 # Closing hold appended to each schematic timeline: the settled verdict frame
@@ -12519,8 +13262,7 @@ def generate_animations(output_dir: str,
 # tasks are distributed over a process pool. Language and theme are applied
 # inside the worker before each figure runs, exactly as the sequential loop
 # did, so the output bytes are identical either way.
-# ====================================================================
-_VARIANTS: tuple[tuple[str, bool], ...] = (
+# =============================================================_VARIANTS: tuple[tuple[str, bool], ...] = (
     ("en", False),
     ("en", True),
     ("es", False),

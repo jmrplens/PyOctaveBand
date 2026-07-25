@@ -189,7 +189,55 @@ print(ext.rating, ext.c, ext.ctr, ext.c_50_5000, ext.ctr_50_5000)
 
 one_dp = building.weighted_rating_extended(r_ext, freqs, one_decimal=True)
 print(one_dp.rating)   # 30.0, the 0.1 dB-step rating for uncertainty statements
+
+ext.plot()   # enlarged-range curve vs the shifted core reference, Annex B terms in the title (needs matplotlib)
 ```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/extended_insulation_rating_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/extended_insulation_rating.svg" alt="Measured sound reduction index over the enlarged 50 Hz to 5 kHz range with the shifted ISO 717-1 reference curve on the 16 core bands, the unfavourable deviations shaded and the enlarged-range bands marked at both ends" width="80%"></picture>
+
+*The rating itself is still evaluated on the 16 core bands (100–3150 Hz);
+the enlarged bands only enter the Annex B adaptation terms, so the shifted
+reference curve stops at the core-range edges while the measured curve
+continues into the shaded enlarged range.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import building
+
+# Single-number rating from a measured 16-band R spectrum (ISO 717-1 Annex C)
+R = [20.4, 16.3, 17.7, 22.6, 22.4, 22.7, 24.8, 26.6,
+     28.0, 30.5, 31.8, 32.5, 33.4, 33.0, 31.0, 25.5]
+freqs = [50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500,
+         630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000]
+r_ext = [18.7, 19.2, 20.0, *R, 26.8, 29.2]     # ISO 717-1 Annex C, Table C.2
+ext = building.weighted_rating_extended(r_ext, freqs)
+
+# One line — the enlarged-range curve vs the shifted core reference:
+ext.plot()
+plt.show()
+
+# By hand, from the band curves the result carries (the full enlarged-range
+# curve on ext, the core-band reference on ext.core):
+fig, ax = plt.subplots()
+ax.semilogx(ext.band_centers, ext.measured, "o-", label="Measured R")
+ax.semilogx(ext.core.band_centers, ext.core.shifted_reference, "s--",
+            label="Shifted reference (core bands)")
+ax.fill_between(ext.core.band_centers, ext.core.measured,
+                ext.core.shifted_reference,
+                where=ext.core.measured < ext.core.shifted_reference,
+                interpolate=True, alpha=0.3, label="Unfavourable deviations")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Sound reduction index [dB]")
+ax.set_title(f"Rw = {ext.rating} dB  (C50-5000={ext.c_50_5000:+g}; "
+             f"Ctr,50-5000={ext.ctr_50_5000:+g})")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 ### Impact sound (ISO 16283-2, ISO 717-2)
 
@@ -448,6 +496,7 @@ l2 = l1 - np.array([38.2, 40.1, 42.6, 45.2, 47.8, 50.1, 52.3, 54.0,
 t2 = np.array([0.62, 0.58, 0.55, 0.53, 0.52, 0.50, 0.49, 0.48,
                0.47, 0.46, 0.45, 0.45, 0.44, 0.43, 0.43, 0.42])
 field = building.airborne_insulation(l1, l2, t2, area=12.5, volume=30.4)
+field.plot()   # per-band DnT (and R') of the measured chain (needs matplotlib)
 metadata = ReportMetadata(
     specimen="Separating wall, 240 mm brick with independent lining",
     client="Example client",
@@ -471,6 +520,52 @@ imp = building.impact_insulation(li, t2, volume=30.4)
 imp.report("LnTw_field.pdf",
            metadata=ReportMetadata(requirement=58.0))  # L'nT,w (CI)
 ```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/field_airborne_insulation_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/field_airborne_insulation.svg" alt="Field airborne measurement chain: the raw level difference D and the standardized DnT across the sixteen one-third-octave bands, with the reverberation correction shaded between them and the resulting DnT,w and R'w ratings annotated" width="80%"></picture>
+
+*The receiving-room reverberation time turns the raw level difference `D`
+into the standardized `DnT` band by band; with `T` above `T0 = 0.5 s`
+across the range, the correction lifts the curve slightly. The rating box
+carries both single numbers of this measurement, `DnT,w` and `R'w`.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+# Field airborne: source/receiving levels and T per one-third-octave band
+l1 = np.array([92.3, 93.1, 94.0, 94.4, 94.8, 95.0, 95.2, 95.4,
+               95.3, 95.1, 94.8, 94.4, 93.9, 93.3, 92.5, 91.6])
+l2 = l1 - np.array([38.2, 40.1, 42.6, 45.2, 47.8, 50.1, 52.3, 54.0,
+                    55.6, 57.1, 58.2, 59.0, 59.6, 60.1, 60.3, 59.8])
+t2 = np.array([0.62, 0.58, 0.55, 0.53, 0.52, 0.50, 0.49, 0.48,
+               0.47, 0.46, 0.45, 0.45, 0.44, 0.43, 0.43, 0.42])
+field = building.airborne_insulation(l1, l2, t2, area=12.5, volume=30.4)
+
+# One line — the per-band DnT (and R') of the measured chain:
+field.plot()
+plt.show()
+
+# By hand, from the result's fields:
+bands = [100, 125, 160, 200, 250, 315, 400, 500,
+         630, 800, 1000, 1250, 1600, 2000, 2500, 3150]
+x = np.arange(len(bands))
+w = building.weighted_rating(field.dnt)
+fig, ax = plt.subplots()
+ax.fill_between(x, field.d, field.dnt, alpha=0.2, label="10 lg(T/T0)")
+ax.plot(x, field.d, "--o", label="D (level difference)")
+ax.plot(x, field.dnt, "-s", label="DnT (standardized)")
+ax.set_xticks(x, [str(b) for b in bands], rotation=45)
+ax.set(xlabel="Frequency [Hz]", ylabel="Level difference [dB]",
+       title=f"DnT,w = {w.rating} dB  (C={w.c:+d}; Ctr={w.ctr:+d})")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 Rendered examples of both field fiches, regenerated with `make reports`, are
 kept in the repository. Click either preview to open the PDF:
@@ -540,6 +635,55 @@ print(building.weighted_rating(fac.d_2m_nt).rating)             # 42  Dls,2m,nT,
 fac.plot()   # per-band D2m,nT with D2m, D2m,n and R' overlaid (needs matplotlib)
 ```
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_field_insulation_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_field_insulation.svg" alt="Field facade insulation of a dwelling under the 45-degree loudspeaker method: the standardized D2m,nT, the raw D2m, the normalized D2m,n and the apparent reduction index R'45 per one-third-octave band, with the Dls,2m,nT,w rating annotated" width="80%"></picture>
+
+*The four façade quantities of one measurement: the raw `D2m`, its
+standardized and normalized forms, and the element `R'45°` carrying the
+−1.5 dB angle-of-incidence correction. The rating box reads the single
+number `Dls,2m,nT,w` obtained by feeding `D2m,nT` to the ISO 717-1 engine.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+# A dwelling façade, 45° loudspeaker method: outdoor level 2 m in front,
+# receiving-room level and T per one-third-octave band.
+bands = np.array([100, 125, 160, 200, 250, 315, 400, 500,
+                  630, 800, 1000, 1250, 1600, 2000, 2500, 3150], float)
+l1_2m = np.array([76.0, 77.0, 78.0, 78.5, 79.0, 79.0, 79.0, 79.0,
+                  78.5, 78.0, 77.5, 77.0, 76.5, 76.0, 75.0, 74.0])
+d2m = np.array([24.0, 25.5, 27.0, 28.5, 30.0, 31.5, 33.0, 34.5,
+                36.0, 37.0, 38.0, 38.5, 39.0, 39.0, 38.5, 38.0])
+t2 = np.array([0.65, 0.62, 0.58, 0.55, 0.52, 0.50, 0.49, 0.48,
+               0.47, 0.46, 0.45, 0.44, 0.43, 0.43, 0.42, 0.42])
+fac = building.facade_insulation(l1_2m, l1_2m - d2m, t2, volume=32.0,
+                                 area=10.8, surface_level=l1_2m + 3.0,
+                                 method="loudspeaker", frequencies=bands)
+
+# One line — D2m,nT with D2m, D2m,n and R' overlaid per band:
+fac.plot()
+plt.show()
+
+# By hand, from the result's fields:
+w = building.weighted_rating(fac.d_2m_nt)
+fig, ax = plt.subplots()
+ax.semilogx(bands, fac.d_2m_nt, "-s", label="D2m,nT (standardized)")
+ax.semilogx(bands, fac.d_2m, "--o", label="D2m")
+ax.semilogx(bands, fac.d_2m_n, ":", label="D2m,n (normalized)")
+ax.semilogx(bands, fac.r_prime, "-.", label="R'45°")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Level difference / reduction index [dB]")
+ax.set_title(f"Dls,2m,nT,w = {w.rating} dB  (C={w.c:+d}; Ctr={w.ctr:+d})")
+ax.legend()
+plt.show()
+```
+
+</details>
+
 `surface_level`, `area` and `volume` are all optional: with only `l1_2m`, `l2`
 and `t2` the function returns `d_2m` and `d_2m_nt`; add `volume` for `d_2m_n`;
 add `surface_level` **and** `area` **and** `volume` for `r_prime`. Positions are
@@ -592,6 +736,7 @@ from phonometry import building
 print(building.single_number_uncertainty("r_w", "B"))       # 0.9  dB  (Table 3)
 u = building.band_uncertainty("airborne", "B")              # per-band u (Table 2)
 print(len(u.frequencies), u.uncertainties[10])     # 21 1.1  (the 500 Hz band)
+u.plot()   # the per-band u(f) spectrum of Table 2 (needs matplotlib)
 
 # Report R'w = 52 dB with a two-sided 95 % interval (k = 1.96, Table 8):
 uv = building.uncertain_value(52.0, "rprime_w", "B")        # aliases resolve to r_w
@@ -758,6 +903,91 @@ plt.show()
 `survey_facade_insulation()` a `SurveyFacadeResult`;
 `survey_service_equipment_level()` a `SurveyServiceEquipmentResult` (`l_xy`,
 `l_xy_nt`, `l_xy_n`).
+
+### ISO 10052 survey reports (`.report()`)
+
+The airborne, impact and façade survey results each carry a `.report(path)` that
+writes the one-page ISO 10052 survey (control) method field report: the
+standard-basis line naming ISO 10052 (octave bands), an optional metadata
+header, the octave-band table beside the measured-versus-shifted-reference
+curve, the boxed field rating (`DnT,w`/`R'w`, `L'nT,w` or `D2m,nT,w`), the
+survey-method statement, an optional requirement verdict (level differences pass
+at or above it, the impact level at or below it) and a footer. The airborne
+result reports `quantity="dnt"` (default) or `"r_prime"`; `verbose=True`,
+`metadata` and `language="es"` behave as in the fiches above.
+
+```python
+import numpy as np
+
+res.report("DnTw_survey.pdf",
+           metadata=ReportMetadata(requirement=40.0))   # DnT,w (C; Ctr)
+
+# Impact and façade surveys reuse the same k; li is the tapping-machine level
+# in the room below, l1_2m the level 2 m in front of the façade.
+li = np.array([66.0, 64.0, 62.0, 60.0, 55.0])
+impact = building.survey_impact_insulation(li, k, volume=50.0)
+impact.plot()   # L'nT vs the shifted ISO 717-2 reference (needs matplotlib)
+impact.report("LnTw_survey.pdf")                         # L'nT,w (CI)
+
+l1_2m = np.array([76.0, 78.0, 79.0, 79.0, 77.0])
+facade = building.survey_facade_insulation(l1_2m, l2, k, volume=40.0)
+facade.report("D2mnTw_survey.pdf")                       # D2m,nT,w (C; Ctr)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_impact_insulation_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_impact_insulation.svg" alt="Survey-method impact insulation: the measured octave-band impact level Li and the standardized L'nT with the reverberation-index correction shaded between them, the L'nT,w rating annotated and a note that a live room lowers the standardized impact level" width="80%"></picture>
+
+*The impact survey applies the reverberation index with the opposite sign,
+`L'nT = Li − k`: a live receiving room (`T > T0`) *lowers* the standardized
+impact level. As in the airborne case, the automatic rating appears for
+exactly 5 octave (or 16 one-third-octave) values.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+# Octave-band tapping-machine levels below the floor, and the measured T.
+bands = [125, 250, 500, 1000, 2000]
+li = np.array([66.0, 64.0, 62.0, 60.0, 55.0])
+k = building.reverberation_index([0.70, 0.60, 0.50, 0.45, 0.40])
+impact = building.survey_impact_insulation(li, k, volume=50.0)
+
+# One line — L'nT vs the shifted ISO 717-2 reference:
+impact.plot()
+plt.show()
+
+# By hand, showing the sign flip of the correction:
+x = np.arange(len(bands))
+fig, ax = plt.subplots()
+ax.fill_between(x, impact.l_i, impact.l_nt, alpha=0.2, label="-k = -10 lg(T/T0)")
+ax.plot(x, impact.l_i, "--o", label="Li (impact level)")
+ax.plot(x, impact.l_nt, "-s", label="L'nT (standardized)")
+ax.set_xticks(x, [str(b) for b in bands])
+ax.set(xlabel="Frequency [Hz]", ylabel="Impact sound pressure level [dB]",
+       title=f"ISO 10052 survey method: L'nT,w = {impact.rating.rating} dB")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+Rendered examples of the survey fiches, regenerated with `make reports`, are
+kept in the repository. Click a preview to open the PDF:
+
+[![Survey airborne ISO 10052 example report: metadata header, octave-band DnT table beside the measured-versus-shifted-reference curve, boxed DnT,w (C; Ctr), the survey-method statement and a PASS verdict](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10052_airborne_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10052_airborne_example.pdf)
+
+*Survey airborne fiche (`SurveyAirborneResult.report`), DnT,w (C; Ctr).*
+
+[![Survey impact ISO 10052 example report: the same survey layout for the standardized impact level L'nT with the 500 Hz read-off, boxed L'nT,w (CI), the survey-method statement and a PASS verdict](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10052_impact_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10052_impact_example.pdf)
+
+*Survey impact fiche (`SurveyImpactResult.report`), L'nT,w (CI).*
+
+[![Survey facade ISO 10052 example report: metadata header, octave-band D2m,nT table beside the measured-versus-shifted-reference curve, boxed D2m,nT,w (C; Ctr), the survey-method statement and a PASS verdict](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10052_facade_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10052_facade_example.pdf)
+
+*Survey façade fiche (`SurveyFacadeResult.report`), D2m,nT,w (C; Ctr).*
 
 ## References
 
