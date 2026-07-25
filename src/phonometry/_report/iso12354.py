@@ -200,7 +200,14 @@ def _render_prediction_fiche(
         )
         flow.extend(verdict_flow(text, passed, styles, language))
 
-    flow.extend(footer_flow(metadata, language))
+    flow.extend(footer_flow(
+        metadata,
+        language,
+        disclaimer=(
+            "Predicted result: the values relate only to the modelled "
+            "configuration, not to a tested specimen."
+        ),
+    ))
 
     return build_document(path, flow, title_text)
 
@@ -253,7 +260,7 @@ def render_iso12354_airborne_report(
         basis_key=(
             "Predicted apparent sound reduction index R&#8242; "
             "(direct and flanking transmission) estimated in accordance with "
-            "EN/ISO 12354-1:2000 (simplified single-number model, Clause 4.4). "
+            "EN 12354-1:2000 (simplified single-number model, Clause 4.4). "
             "This is a prediction from element data, not a measurement. "
             "R&#8242;<sub>w</sub> per ISO 717-1."
         ),
@@ -314,7 +321,7 @@ def render_iso12354_impact_report(
         basis_key=(
             "Predicted apparent normalized impact sound pressure level "
             "L&#8242;<sub>n</sub> (bare floor, covering and flanking) estimated "
-            "in accordance with EN/ISO 12354-2:2000 (simplified single-number "
+            "in accordance with EN 12354-2:2000 (simplified single-number "
             "model, Clause 4.3). This is a prediction from element data, not a "
             "measurement. L&#8242;<sub>n,w</sub> per ISO 717-2."
         ),
@@ -405,7 +412,7 @@ def render_iso12354_facade_report(
             "Predicted standardized level difference of a facade "
             "D<sub>2m,nT</sub> (the envelope elements' apparent sound reduction "
             "index R&#8242; combined energetically with the room geometry) "
-            "estimated in accordance with EN/ISO 12354-3:2000 (simplified "
+            "estimated in accordance with EN 12354-3:2000 (simplified "
             "model, Formula 13). This is a prediction from element data, not a "
             "measurement. D<sub>2m,nT,w</sub> (with apparent index "
             "R&#8242;<sub>tr,s,w</sub> = {rtrs} dB and C<sub>tr</sub> = {ctr} "

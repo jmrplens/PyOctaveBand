@@ -128,6 +128,9 @@ def test_report_reads_as_prediction(tmp_path) -> None:
     assert "Predicted" in text
     assert "not a measurement" in text
     assert "EN 12354-5:2009" in text
+    # The footer disclaimer is the prediction variant (no tested specimen).
+    assert "modelled configuration" in text
+    assert "tested specimen" not in text.replace("not to a tested specimen", "")
 
 
 def test_report_renders_oracle_values(tmp_path) -> None:
