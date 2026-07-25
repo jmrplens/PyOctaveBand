@@ -52,12 +52,25 @@ if TYPE_CHECKING:
 
 
 def _basis(language: str = "en") -> str:
-    """The method-basis line naming the Bies enclosure insertion-loss model."""
+    """The prediction-basis line naming the Bies enclosure insertion-loss model."""
     return t(
-        "Determination of the insertion loss of a machine enclosure from the "
+        "Predicted insertion loss of a machine enclosure, estimated from the "
         "panel transmission loss and the interior build-up correction (Bies, "
         "Hansen &amp; Howard, Engineering Noise Control 5th ed., section 7.4.2, "
-        "Eqs. (7.103) and (7.111)).",
+        "Eqs. (7.103) and (7.111)). This is a prediction from the declared "
+        "data, not a measurement of the enclosed machine.",
+        language,
+    )
+
+
+def _prediction_statement(language: str = "en") -> str:
+    """The prediction statement printed under the boxed insertion loss."""
+    return t(
+        "Predicted (estimated) result computed from the declared enclosure "
+        "geometry, its panel transmission loss and the interior absorption; it "
+        "is not a measurement. The realised insertion loss also depends on "
+        "leaks, structural flanking and machine-to-enclosure contact, which "
+        "this model does not represent.",
         language,
     )
 
@@ -202,5 +215,6 @@ def render_enclosure_report(
         basis_strips=[_basis_strip(language)],
         metadata=metadata,
         language=language,
+        prediction_statement=_prediction_statement(language),
         verdict=verdict,
     )

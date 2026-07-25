@@ -25,6 +25,34 @@ Formulae 4/5, Table 2), clamped at zero. The HTLAN combines the age component
 `H` (HTLA, database A = ISO 7029) with the noise component `N` by
 `H' = H + N - H*N/120` (clause 6.1, Formula 1).
 
+## combine_age_and_noise
+
+```python
+combine_age_and_noise(htla: ArrayLike, nipts_value: ArrayLike) -> np.ndarray
+```
+
+Combine the age and noise components by Formula (1) (clause 6.1).
+
+`H' = H + N - H*N/120`, the hearing threshold level associated with age
+and noise. The formula "is applicable only to corresponding percentage
+values of H', H and N", so both components must be taken at the same
+population percentage.
+
+Exposed separately from [`htlan`](/phonometry/reference/api/hearing/noise-induced-hearing-loss/#htlan) because clause 6.2 lets the user
+supply their own HTLA database: 6.2.3 recommends a database B collected on
+a control population of the country under consideration, and 6.2.4 makes
+the choice between databases A and B depend on the question being answered.
+Feeding such a database here combines it with the library's NIPTS.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `htla` | Age-associated hearing threshold level `H`, in dB. |
+| `nipts_value` | Noise-induced permanent threshold shift `N`, in dB. |
+
+**Returns:** The combined threshold `H'`, in dB.
+
 ## htlan
 
 ```python
@@ -40,7 +68,8 @@ htlan(
 
 Hearing threshold level associated with age and noise (clause 6.1).
 
-Combines the age component `H` (HTLA from database A, i.e. ISO 7029, at
+Combines the age component `H` (HTLA from database A, evaluated from
+ISO 7029:2017 - the edition ISO 1999:2013 references undated in 6.2.2 - at
 the same population fractile) with the noise component `N` (the NIPTS at
 that fractile) by Formula (1): `H' = H + N - H*N/120`. The formula applies
 to corresponding percentage values, so the same `fractile` drives both
@@ -64,6 +93,11 @@ components.
 | Exception | When |
 | :--- | :--- |
 | ValueError | for an age below 18, an unknown sex, a non-positive duration, a fractile outside (0, 1), or an unknown frequency. |
+
+The noise component inherits the validated-domain checks of [`nipts`](/phonometry/reference/api/hearing/noise-induced-hearing-loss/#nipts),
+so exposure conditions outside the standard's stated ranges raise a
+[`NoiseInducedHearingLossWarning`](/phonometry/reference/api/hearing/noise-induced-hearing-loss/#noiseinducedhearinglosswarning) and the `.report()` fiche prints
+the extrapolation caveat.
 
 ## HtlanResult
 
@@ -95,7 +129,7 @@ All arrays are in dB and aligned with `NIPTS_FREQUENCIES`.
 | `years` | Exposure duration, in years. |
 | `fractile` | Population fractile (0-1) applied to both components. |
 | `frequencies` | Audiometric frequencies, in hertz. |
-| `htla` | Age component `H` (HTLA, database A = ISO 7029). |
+| `htla` | Age component `H` (HTLA, database A, evaluated from ISO 7029:2017, the edition ISO 1999:2013 references undated in 6.2.2). |
 | `nipts` | Noise component `N` (NIPTS at `fractile`). |
 | `threshold` | Combined HTLAN `H' = H + N - H*N/120`. |
 
@@ -198,6 +232,12 @@ zero.
 | :--- | :--- |
 | ValueError | for a non-positive duration, a fractile outside (0, 1), or an unknown frequency. |
 
+Outside the standard's validated domain (durations of
+`VALIDATED_YEARS`, fractiles of `VALIDATED_FRACTILES`,
+exposure levels up to `VALIDATED_L_EX_MAX`) the computation still
+runs but a [`NoiseInducedHearingLossWarning`](/phonometry/reference/api/hearing/noise-induced-hearing-loss/#noiseinducedhearinglosswarning) marks the result as an
+extrapolation, and the `.report()` fiche prints the matching caveat.
+
 ## NiptsResult
 
 ```python
@@ -290,3 +330,7 @@ clinical diagnosis of any individual.
 | :--- | :--- |
 | ValueError | If `engine` is not `"reportlab"` or `language` is unknown. |
 | ImportError | If reportlab, matplotlib or svglib is not installed (`pip install "phonometry[report,plot]"`). |
+
+## NoiseInducedHearingLossWarning
+
+Warns when an ISO 1999 prediction leaves the standard's validated domain.

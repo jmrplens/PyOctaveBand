@@ -1178,6 +1178,33 @@ ISO1999_N10_4K_90_20 = 18.0  # worst-10 % NIPTS, 4 kHz, 90 dB, 20 yr
 ISO1999_N10_3K_100_40 = 60.0  # worst-10 % NIPTS, 3 kHz, 100 dB, 40 yr
 
 # ---------------------------------------------------------------------------
+# Noise-induced hearing loss - ISO 1999:2013, Annex C worked example (risk of
+# noise-induced hearing loss and disability). A highly screened male
+# population aged 50 exposed to L_EX,8h = 90 dB for 30 years, assessed on the
+# 1/2/4 kHz frequency combination, at the percentage Q = 10 % (the
+# most-susceptible tenth; the library fractile 0.9).
+#
+# The annex's own printed inputs are the Table A.3 age-associated thresholds
+# H = 14, 21 and 36 dB and the Table D.2 shifts N = 0, 9 and 19 dB. The
+# quantities pinned here are the results the annex derives from them:
+#   C.5   the 4 kHz shift after the Formula (1) compression,
+#         19 - 36 x 19 / 120 = 13,3 dB;
+#   C.8   the 1/2/4 kHz mean shift, (0 + 9 + 13,3) / 3 = 7,4 dB;
+#   C.3   the 1/2/4 kHz mean age threshold, (14 + 21 + 36) / 3 = 23,7 dB;
+#   C.11  the combined threshold, 23,7 + 7,4 = 31,1 dB.
+# The annex applies the compression only where it matters: "when (H + N) <
+# 40 dB, the NIPTS can be taken directly from Table D.2", so of these three
+# bands only 4 kHz (36 + 19 dB) is compressed.
+# ---------------------------------------------------------------------------
+ISO1999_ANNEX_C_H = (14.0, 21.0, 36.0)  # Table A.3 H, male 50 yr, Q = 10 %
+ISO1999_ANNEX_C_N = (0.0, 9.0, 19.0)  # Table D.2 NIPTS, 90 dB, 30 yr, Q = 10 %
+ISO1999_ANNEX_C_N_4K_COMPRESSED = 13.3  # C.5, dB
+ISO1999_ANNEX_C_COMPRESSION_FENCE = 40.0  # H + N above which the annex compresses
+ISO1999_ANNEX_C_N_MEAN = 7.4  # C.8, dB
+ISO1999_ANNEX_C_H_MEAN = 23.7  # C.3, dB
+ISO1999_ANNEX_C_HTLAN = 31.1  # C.11, dB
+
+# ---------------------------------------------------------------------------
 # Multiple-shock whole-body vibration - ISO 2631-5:2018, Annex C worked
 # example: five 40 m/s2 response peaks per day, 82 kg male, exposure from age
 # b = 20 for n = 20 years at N = 120 days/year. Daily acceleration dose
@@ -1974,3 +2001,36 @@ MAA_FIG5_DIAMETER = 0.2e-3
 MAA_FIG5_THICKNESS = 0.2e-3
 MAA_FIG5_SEPARATION = 2.5e-3
 MAA_FIG5_CAVITY = 0.06
+
+# ---------------------------------------------------------------------------
+# Speech transmission index - IEC 60268-16 Annex M worked example (the "full
+# STI" calculation of a public-address system in a reverberant space). The
+# annex prints the adjusted MTF matrix without noise, masking and threshold
+# (step 2; rows are the 14 modulation frequencies 0,63 Hz to 12,5 Hz, columns
+# the 7 octave bands 125 Hz to 8 kHz), the operational speech and ambient
+# noise spectra it is combined with, and the resulting per-band modulation
+# transfer indices (step 4c) and STI. Reproducing the printed MTI row and STI
+# from the printed MTF exercises the whole clause A.5.3 to A.5.6 chain
+# (auditory masking, reception threshold, the SNR clamp, the MTI average and
+# the alpha/beta weighting).
+# ---------------------------------------------------------------------------
+IEC60268_16_ANNEX_M_MTF = (
+    (0.983, 0.960, 0.978, 0.990, 0.990, 0.986, 0.997),
+    (0.968, 0.936, 0.959, 0.974, 0.980, 0.979, 0.995),
+    (0.947, 0.904, 0.931, 0.953, 0.966, 0.968, 0.992),
+    (0.920, 0.869, 0.898, 0.927, 0.949, 0.955, 0.987),
+    (0.886, 0.826, 0.852, 0.892, 0.925, 0.935, 0.981),
+    (0.851, 0.791, 0.808, 0.856, 0.900, 0.914, 0.974),
+    (0.816, 0.756, 0.764, 0.816, 0.871, 0.891, 0.964),
+    (0.773, 0.721, 0.730, 0.776, 0.841, 0.866, 0.953),
+    (0.741, 0.684, 0.705, 0.745, 0.809, 0.838, 0.941),
+    (0.726, 0.628, 0.678, 0.736, 0.780, 0.812, 0.929),
+    (0.714, 0.557, 0.656, 0.723, 0.753, 0.786, 0.916),
+    (0.670, 0.520, 0.623, 0.678, 0.728, 0.765, 0.904),
+    (0.591, 0.483, 0.556, 0.615, 0.701, 0.749, 0.893),
+    (0.554, 0.446, 0.523, 0.614, 0.685, 0.737, 0.884),
+)
+IEC60268_16_ANNEX_M_LEVEL = (82.9, 82.9, 79.2, 73.2, 67.2, 61.2, 55.2)
+IEC60268_16_ANNEX_M_AMBIENT = (55.5, 47.5, 41.5, 37.5, 34.5, 32.5, 30.5)
+IEC60268_16_ANNEX_M_MTI = (0.73, 0.66, 0.67, 0.71, 0.77, 0.80, 0.92)
+IEC60268_16_ANNEX_M_STI = 0.76

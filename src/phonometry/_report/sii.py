@@ -42,7 +42,6 @@ from ._layout import (
     build_document,
     display_round,
     document_styles,
-    fmt_num,
     footer_flow,
     grid_table,
     render_figure_drawing,
@@ -164,14 +163,18 @@ def _verdict(
 
     Speech intelligibility is a "higher is better" quantity (the opposite of
     the emission fiches), so a result passes when it reaches or exceeds the
-    minimum required SII. The comparison is evaluated on the SII rounded to the
-    displayed three decimals, so the printed value can never contradict its own
-    verdict at the boundary.
+    minimum required SII. Both the SII and the requirement are compared *and*
+    printed at the same three decimals, so the printed pair can never
+    contradict its own verdict: a required 0.75 prints as 0.750 rather than as
+    a one-decimal 0.8, and a requirement of 0.85104 is decided on the 0.851 it
+    prints rather than on a digit the reader cannot see.
     """
-    passed = display_round(float(result.sii), 3) >= requirement - 1e-9
+    value = display_round(float(result.sii), 3)
+    required = display_round(float(requirement), 3)
+    passed = value >= required
     text = t("SII = {value}, required &#8805; {req}", language).format(
-        value=format_number(display_round(float(result.sii), 3), language, decimals=3),
-        req=fmt_num(requirement, language),
+        value=format_number(value, language, decimals=3),
+        req=format_number(required, language, decimals=3),
     )
     return text, passed
 

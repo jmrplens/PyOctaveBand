@@ -425,6 +425,8 @@ from .environmental.wind_turbine_noise import (
 from .hearing.noise_induced_hearing_loss import (
     HtlanResult,
     NiptsResult,
+    NoiseInducedHearingLossWarning,
+    combine_age_and_noise,
     htlan,
     nipts,
 )
@@ -1272,6 +1274,7 @@ __all__ = [
     "NoiseContourResult",
     # ISO 4871 noise emission declaration
     "NoiseEmissionDeclaration",
+    "NoiseInducedHearingLossWarning",
     "NormalModeResult",
     "NpdLevelResult",
     "OccupationalExposureWarning",
@@ -1452,6 +1455,7 @@ __all__ = [
     "coherent_output_spectrum",
     "coincidence_frequency",
     "comb_filter_response",
+    "combine_age_and_noise",
     "combine_linings",
     "combine_partial_exposures",
     "combine_subareas",

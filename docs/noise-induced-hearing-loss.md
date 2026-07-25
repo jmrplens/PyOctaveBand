@@ -27,8 +27,14 @@ $$
 with $t$ the exposure in years and $t_0 = 1$ year; below $L_0$ the effect is
 zero. A population **fractile** follows from two half-Gaussians whose spreads
 $d_u$ (worse than the median) and $d_l$ (better) are given by Formulae 6/7 and
-Table 3: $N_Q = N_{50} + z\,d$ with $z$ the standard-normal quantile, clamped at
+Table 3: $N_{50} + z\,d$ with $z$ the standard-normal quantile, clamped at
 zero (clause 6.3.2).
+
+The `fractile` argument is the fraction of the population *below* the returned
+value, so `fractile=0.9` is the most-susceptible tenth. Note that ISO 1999
+writes its own percentage $Q$ the other way round: in Formulae (4)/(5) $Q$ is
+the percentage with *worse* hearing, so that same tenth is $Q = 10\;\%$, which
+is how the `.report()` fiche prints it and how the Annex D columns are headed.
 
 ```python
 from phonometry import hearing

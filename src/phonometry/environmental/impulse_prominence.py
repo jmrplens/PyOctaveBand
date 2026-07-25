@@ -24,6 +24,7 @@ than 10 dB/s").
 
 from __future__ import annotations
 
+import math
 import warnings
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
@@ -59,6 +60,12 @@ ADJUSTMENT_THRESHOLD: float = 5.0
 #: Minimum onset rate, in dB/s, for a level rise to count as an impulse (4.5).
 ONSET_RATE_LIMIT: float = 10.0
 
+#: Default assessment time interval, in minutes, over which the governing
+#: impulse is taken: "The default assessment time interval is 30 min"
+#: (ISO/PAS 1996-3:2022, Clause 5). Another interval may be assessed, so it is
+#: a default rather than a fixed value.
+DEFAULT_ASSESSMENT_PERIOD_MIN: float = 30.0
+
 
 @dataclass(frozen=True)
 class ImpulseProminenceResult:
@@ -75,6 +82,8 @@ class ImpulseProminenceResult:
         when none qualifies.
     :ivar adjustment: The LAeq adjustment ``KI``, in dB, of the governing
         qualifying impulse (Formula 2); 0 dB when no event qualifies.
+    :ivar assessment_period_min: The assessment time interval the impulses were
+        selected over, in minutes (Clause 5; 30 min by default).
     """
 
     onset_rates: np.ndarray
@@ -83,6 +92,7 @@ class ImpulseProminenceResult:
     qualifies: np.ndarray
     prominence: float
     adjustment: float
+    assessment_period_min: float = DEFAULT_ASSESSMENT_PERIOD_MIN
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the adjustment curve ``KI(P)`` with the impulses marked.
@@ -109,7 +119,7 @@ class ImpulseProminenceResult:
         Writes a one-page assessment report following NT ACOU 112:2002 (carried
         into ISO/PAS 1996-3:2022): the standard-basis line, an optional metadata
         header (source/situation, client, measurement position, instrumentation
-        and date, with the 30-minute assessment period always shown), a
+        and date, always followed by this result's ``assessment_period_min``), a
         full-width per-impulse table (onset rate, level difference, predicted
         prominence ``P`` and whether the onset qualifies as an impulse) above the
         adjustment-curve plot ``KI(P)`` with the candidate impulses marked, the
@@ -194,7 +204,10 @@ def impulse_adjustment(prominence: ArrayLike) -> np.ndarray:
 
 
 def impulse_prominence(
-    onset_rates: ArrayLike, level_differences: ArrayLike
+    onset_rates: ArrayLike,
+    level_differences: ArrayLike,
+    *,
+    assessment_period_min: float = DEFAULT_ASSESSMENT_PERIOD_MIN,
 ) -> ImpulseProminenceResult:
     """Governing prominence and adjustment of a set of impulses (clauses 7-8).
 
@@ -209,11 +222,20 @@ def impulse_prominence(
 
     :param onset_rates: Onset rate of each impulse, in dB/s (> 0).
     :param level_differences: Level difference of each impulse, in dB (> 0).
+    :param assessment_period_min: The assessment time interval the impulses
+        were selected over, in minutes; the standard's default is 30 min
+        (Clause 5), and the value is carried through to the fiche.
     :return: An :class:`ImpulseProminenceResult` with the per-impulse and governing
         values and ``.plot()``.
-    :raises ValueError: for empty input, mismatched lengths, or a non-positive
-        onset rate or level difference.
+    :raises ValueError: for empty input, mismatched lengths, a non-positive
+        onset rate or level difference, or an assessment period that is not
+        positive and finite.
     """
+    if not math.isfinite(assessment_period_min) or assessment_period_min <= 0.0:
+        raise ValueError(
+            f"assessment_period_min must be positive and finite; got "
+            f"{assessment_period_min}."
+        )
     orate = np.asarray(onset_rates, dtype=np.float64).ravel()
     ld = np.asarray(level_differences, dtype=np.float64).ravel()
     if orate.size == 0:
@@ -246,6 +268,7 @@ def impulse_prominence(
         qualifies=qualifies,
         prominence=governing,
         adjustment=adjustment,
+        assessment_period_min=float(assessment_period_min),
     )
 
 

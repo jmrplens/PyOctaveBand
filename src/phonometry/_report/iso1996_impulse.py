@@ -12,10 +12,11 @@ the measured ``LAeq``:
 
 * a title and the standard-basis line (measurement standard + the NT ACOU 112 /
   ISO PAS 1996-3 prominence and adjustment method);
-* an optional metadata header grid, rendered only for the fields supplied on
-  the :class:`ReportMetadata`: the source/situation (``specimen``), the client,
-  the measurement position (``test_room``), the instrumentation and the date,
-  with the 30-minute assessment period always shown;
+* a metadata header grid carrying whichever fields the :class:`ReportMetadata`
+  supplies (the source/situation ``specimen``, the client, the measurement
+  position ``test_room``, the instrumentation and the date) always followed by
+  the assessment period the result was evaluated over, so the grid is present
+  even without metadata;
 * a full-width per-impulse table (onset rate, level difference, predicted
   prominence ``P`` and whether the onset qualifies as an impulse), above the
   adjustment-curve plot ``KI(P)`` with the candidate impulses marked (the
@@ -141,15 +142,18 @@ def _qualifies_markup(qualifies: bool, language: str = "en") -> str:
 
 
 def _metadata_pairs(
-    metadata: ReportMetadata | None, language: str = "en"
+    result: ImpulseProminenceResult,
+    metadata: ReportMetadata | None,
+    language: str = "en",
 ) -> list[tuple[str, str]]:
     """Build the ordered (label, value) pairs of the assessment header grid.
 
     An impulsive-sound assessment identifies the source/situation whose noise was
     analysed (``specimen``), the client, the measurement position (``test_room``)
-    and the instrumentation; only supplied fields are returned. The 30-minute
-    assessment period (over which the governing prominence is taken, clause 8) is
-    always shown, as it is fixed by the standard rather than by the metadata.
+    and the instrumentation; only supplied fields are returned. The assessment
+    period over which the governing prominence is taken (clause 8) is always
+    shown, read from the result: the standard's default is 30 min (Clause 5),
+    but another interval may be assessed, so the fiche prints the one analysed.
     """
     specs: list[tuple[str, str | None]] = []
     if metadata is not None:
@@ -160,7 +164,15 @@ def _metadata_pairs(
             (t("Instrumentation", language), _esc(metadata.instrumentation)),
             (t("Date of test", language), _esc(metadata.test_date)),
         ]
-    specs.append((t("Assessment period", language), t("30 min", language)))
+    period = format_number(
+        float(result.assessment_period_min), language, decimals=1, trim=True
+    )
+    specs.append(
+        (
+            t("Assessment period", language),
+            t("{minutes} min", language).format(minutes=period),
+        )
+    )
     return [(label, value) for label, value in specs if value]
 
 
@@ -305,7 +317,16 @@ def _basis_line(measurement_standard: str | None, language: str = "en") -> str:
 def _prominence_note(
     result: ImpulseProminenceResult, language: str = "en"
 ) -> str:
-    """The prominence-category note: whether a prominent impulse is present."""
+    """The prominence-category note: whether a prominent impulse is present.
+
+    Two independent gates can withhold the adjustment, so the note states the
+    one that actually governs. No level rise qualifying as an impulse (every
+    onset rate at or below 10 dB/s, clauses 4.5/8) rules out an adjustment
+    whatever the arithmetic prominence of the events is; only when an impulse
+    does qualify does the ``P <= 5`` threshold of Formula 2 decide. Printing
+    the ``P <= 5`` justification for a non-qualifying set would contradict the
+    fiche's own governing P, which is then informational.
+    """
     p = _fmt(result.prominence, language, decimals=2)
     if result.adjustment > 0.0:
         return t(
@@ -314,6 +335,14 @@ def _prominence_note(
             "112:2002 Formula 2) applies.",
             language,
         ).format(p=p, ki=_fmt(result.adjustment, language))
+    if not bool(np.any(np.asarray(result.qualifies, dtype=bool))):
+        return t(
+            "No level rise qualifies as an impulse (no onset rate above "
+            "10 dB/s, NT ACOU 112:2002 clauses 4.5/8), so no adjustment "
+            "applies (K<sub>I</sub> = 0 dB); the highest P = {p} is "
+            "informational only.",
+            language,
+        ).format(p=p)
     return t(
         "No prominent impulse is present (governing P = {p} &#8804; 5); no "
         "adjustment applies (K<sub>I</sub> = 0 dB).",
@@ -367,7 +396,7 @@ def render_impulse_prominence_report(
         Paragraph(_basis_line(measurement_standard, language), basis_style),
     ]
 
-    header_pairs = _metadata_pairs(metadata, language)
+    header_pairs = _metadata_pairs(result, metadata, language)
     if header_pairs:
         flow.append(Spacer(1, 3))
         flow.append(grid_table(header_pairs))
@@ -402,8 +431,8 @@ def render_impulse_prominence_report(
                 "The predicted prominence P = 3 lg(OR) + 2 lg(LD) combines the "
                 "onset rate OR (dB/s) and the level difference LD (dB) of each "
                 "impulse (NT ACOU 112:2002, clause 7, Formula 1); the governing "
-                "value is the highest P over a 30-minute period among impulses "
-                "with an onset rate above 10 dB/s (clauses 4.5/8).",
+                "value is the highest P over the assessment period among "
+                "impulses with an onset rate above 10 dB/s (clauses 4.5/8).",
                 language,
             ),
             basis_strip_style,
@@ -413,9 +442,10 @@ def render_impulse_prominence_report(
         Paragraph(
             t(
                 "The L<sub>Aeq</sub> adjustment K<sub>I</sub> = 1.8 (P &#8722; "
-                "5) dB for P &gt; 5, else 0 dB, is applied to L<sub>Aeq,30min</"
-                "sub> on the basis of the single impulse with the highest "
-                "prominence (clause 8, Formula 2).",
+                "5) dB for P &gt; 5, else 0 dB, is applied to the "
+                "L<sub>Aeq</sub> of the assessment period on the basis of the "
+                "single impulse with the highest prominence (clause 8, "
+                "Formula 2).",
                 language,
             ),
             basis_strip_style,

@@ -5,7 +5,26 @@ from __future__ import annotations
 
 import pytest
 
-from phonometry import age_threshold
+from phonometry import age_threshold, nipts
+
+
+def _legend_labels(ax) -> list[str]:
+    handles, labels = ax.get_legend_handles_labels()
+    assert handles
+    return labels
+
+
+def test_fractile_band_legend_follows_the_language() -> None:
+    """The shaded fractile band's legend entry is localised like the rest."""
+    pytest.importorskip("matplotlib")
+    import matplotlib
+
+    matplotlib.use("Agg")
+    for result in (age_threshold(60.0, "male", fractile=0.9), nipts(95.0, 20.0, 0.9)):
+        assert "10-90 % fractile band" in _legend_labels(result.plot(language="en"))
+        labels_es = _legend_labels(result.plot(language="es"))
+        assert "Banda de fractiles 10-90 %" in labels_es
+        assert "10-90 % fractile band" not in labels_es
 
 
 def test_spanish_labels() -> None:

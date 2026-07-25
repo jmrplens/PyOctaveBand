@@ -40,7 +40,6 @@ from ._layout import (
     build_document,
     display_round,
     document_styles,
-    fmt_num,
     footer_flow,
     grid_table,
     render_figure_drawing,
@@ -171,14 +170,18 @@ def _verdict(
 
     Speech intelligibility is a "higher is better" quantity (the opposite of
     the emission fiches), so a result passes when it reaches or exceeds the
-    minimum required STI. The comparison is evaluated on the STI rounded to the
-    displayed two decimals, so the printed value can never contradict its own
-    verdict at the boundary.
+    minimum required STI. Both the STI and the requirement are compared *and*
+    printed at the same two decimals, so the printed pair can never contradict
+    its own verdict: an STI of 0.50 against a required 0.52 shows both numbers
+    at full display precision, and a requirement of 0.5049 is decided on the
+    0.50 it prints rather than on a digit the reader cannot see.
     """
-    passed = display_round(float(result.sti), 2) >= requirement - 1e-9
+    value = display_round(float(result.sti), 2)
+    required = display_round(float(requirement), 2)
+    passed = value >= required
     text = t("STI = {value}, required &#8805; {req}", language).format(
-        value=format_number(display_round(float(result.sti), 2), language, decimals=2),
-        req=fmt_num(requirement, language),
+        value=format_number(value, language, decimals=2),
+        req=format_number(required, language, decimals=2),
     )
     return text, passed
 

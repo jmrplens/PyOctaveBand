@@ -3001,6 +3001,10 @@ def _enclosure_example() -> tuple[object, ReportMetadata, str]:
     Engineering Noise Control 5th ed., Eqs. (7.103), (7.111)), giving a mean
     insertion loss of 28.9 dB over the seven octave bands. The requirement is a
     plausible minimum mean insertion loss the example clears (more is better).
+
+    The fiche is a design prediction, so the metadata names the design case and
+    its model rather than a test bench: no instrumentation or climate fields
+    apply.
     """
     freqs = np.array([63, 125, 250, 500, 1000, 2000, 4000], dtype=float)
     panel_r = np.array([18, 22, 28, 33, 38, 42, 45], dtype=float)
@@ -3008,15 +3012,11 @@ def _enclosure_example() -> tuple[object, ReportMetadata, str]:
         panel_r, 24.0, 30.0, 0.30, frequencies=freqs
     )
     metadata = ReportMetadata(
-        specimen="Sheet-steel close-fitting machine enclosure",
+        specimen="Sheet-steel close-fitting machine enclosure (design case)",
         client="Example client",
         manufacturer="Example enclosures",
-        test_room="Machine hall, line 3 (example)",
-        instrumentation="Class 1 SLM (IEC 61672-1), octave bank",
-        measurement_standard="Bies & Hansen 7.4.2",
-        temperature=21.0,
-        relative_humidity=45.0,
-        pressure=101.2,
+        test_room="Machine hall, line 3 (design case)",
+        measurement_standard="Bies & Hansen 7.4.2 prediction model",
         test_date="2026-07-22",
         laboratory="Phonometry reference example",
         operator="phonometry",
@@ -3039,20 +3039,21 @@ def _silencer_example() -> tuple[object, ReportMetadata, str]:
     10 lg[1 + (1/4)(8 - 1/8)^2] = 12.2 dB, with a mean of 8.9 dB over the seven
     bands. The requirement is a plausible minimum mean transmission loss the
     example clears (more is better).
+
+    The fiche is a design prediction, so the metadata names the design case and
+    its model rather than a test bench: no instrumentation or climate fields
+    apply.
     """
     freqs = np.array([63, 125, 250, 500, 1000, 2000, 4000], dtype=float)
     result = ph.noise_control.silencers.expansion_chamber(
         freqs, 0.5, 0.08, 0.01
     )
     metadata = ReportMetadata(
-        specimen="Simple expansion-chamber muffler (m = 8)",
+        specimen="Simple expansion-chamber muffler (m = 8, design case)",
         client="Example client",
         manufacturer="Example silencers",
-        test_room="Duct acoustics rig (example)",
-        instrumentation="Two-microphone transfer-matrix bench",
-        measurement_standard="Munjal Eq. (3.27)",
-        temperature=20.0,
-        pressure=101.3,
+        test_room="Duct system design study",
+        measurement_standard="Munjal Eq. (3.27) four-pole model",
         test_date="2026-07-22",
         laboratory="Phonometry reference example",
         operator="phonometry",
@@ -3074,17 +3075,18 @@ def _hvac_example() -> tuple[object, ReportMetadata, str]:
     L_WA = 38.8 dB(A) re 1 pW (overall unweighted L_W = 47.0 dB). The
     requirement is a plausible maximum A-weighted level the example clears
     (lower is better).
+
+    The fiche is a design prediction, so the metadata names the design case and
+    its model rather than a test bench: no instrumentation or climate fields
+    apply.
     """
     freqs = np.array([63, 125, 250, 500, 1000, 2000, 4000], dtype=float)
     result = ph.noise_control.hvac.flow_noise_straight_duct(freqs, 12.0, 0.04)
     metadata = ReportMetadata(
-        specimen="Straight supply duct, 0.04 m2 cross-section",
+        specimen="Straight supply duct, 0.04 m2 cross-section (design case)",
         client="Example client",
-        test_room="Air-handling plant room (example)",
-        instrumentation="In-duct sound power (ISO 5136 method)",
-        measurement_standard="VDI 2081-1",
-        temperature=21.0,
-        pressure=101.2,
+        test_room="Air-handling plant room (design case)",
+        measurement_standard="VDI 2081-1 prediction model",
         test_date="2026-07-22",
         laboratory="Phonometry reference example",
         operator="phonometry",

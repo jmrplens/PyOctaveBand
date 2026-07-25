@@ -15,6 +15,13 @@ from __future__ import annotations
 import numpy as np
 import pytest
 from reference_data import (
+    ISO1999_ANNEX_C_COMPRESSION_FENCE,
+    ISO1999_ANNEX_C_H,
+    ISO1999_ANNEX_C_H_MEAN,
+    ISO1999_ANNEX_C_HTLAN,
+    ISO1999_ANNEX_C_N,
+    ISO1999_ANNEX_C_N_4K_COMPRESSED,
+    ISO1999_ANNEX_C_N_MEAN,
     ISO1999_N10_3K_100_40,
     ISO1999_N10_4K_90_20,
     ISO1999_N50_4K_90_20,
@@ -100,9 +107,12 @@ def test_short_duration_extrapolation() -> None:
     np.testing.assert_allclose(n50_5, factor * n50_10, rtol=1e-9)
 
 
+@pytest.mark.filterwarnings("ignore::phonometry.hearing.NoiseInducedHearingLossWarning")
 def test_spreads_non_negative_subyear() -> None:
     # Below 1 year the linear spread term can go negative; du/dl are clamped so
     # the fractile ordering never inverts (spreads are standard deviations).
+    # The sub-year duration is a deliberate extrapolation, so its
+    # validated-domain warning is expected here.
     r_low = m.nipts(100.0, 0.02, 0.1)
     r_high = m.nipts(100.0, 0.02, 0.9)
     assert np.all(r_high.value >= r_low.value)
@@ -141,6 +151,64 @@ def test_invalid_inputs_raise() -> None:
         m.nipts(90.0, 20.0, frequencies=[1234.0])
     with pytest.raises(ValueError, match="at least 18"):
         m.htlan(10, "male", 90.0, 20.0)
+
+
+def test_annex_c_worked_example() -> None:
+    """Reproduce the ISO 1999:2013 Annex C risk-assessment chain.
+
+    A male population aged 50 exposed to L_EX,8h = 90 dB for 30 years, assessed
+    on 1/2/4 kHz at Q = 10 % (the most-susceptible tenth, fractile 0.9). The
+    annex's noise input is the Table D.2 row, which the library reproduces; its
+    age input is the Table A.3 selection printed in the annex, fed here into
+    Formula (1). The annex compresses only where "(H + N) > approximately
+    40 dB", which of these bands is 4 kHz alone.
+    """
+    got = m.nipts(90.0, 30.0, 0.9, frequencies=[1000.0, 2000.0, 4000.0]).value
+    np.testing.assert_array_equal(np.round(got), np.array(ISO1999_ANNEX_C_N))
+
+    h = np.array(ISO1999_ANNEX_C_H)
+    n = np.array(ISO1999_ANNEX_C_N)
+    compressed = m.combine_age_and_noise(h, n) - h
+    # C.5: 19 - 36 x 19 / 120 = 13,3 dB at 4 kHz.
+    assert compressed[2] == pytest.approx(ISO1999_ANNEX_C_N_4K_COMPRESSED, abs=1e-9)
+
+    noise = np.where(h + n > ISO1999_ANNEX_C_COMPRESSION_FENCE, compressed, n)
+    # C.8 and C.3, both printed to one decimal by the annex.
+    assert noise.mean() == pytest.approx(ISO1999_ANNEX_C_N_MEAN, abs=0.05)
+    assert h.mean() == pytest.approx(ISO1999_ANNEX_C_H_MEAN, abs=0.05)
+    # C.11: the combined threshold of the noise-exposed population.
+    assert h.mean() + noise.mean() == pytest.approx(ISO1999_ANNEX_C_HTLAN, abs=0.05)
+
+
+def test_combine_age_and_noise_matches_htlan() -> None:
+    """Formula (1) exposed on its own agrees with the ``htlan`` composition."""
+    r = m.htlan(55, "female", 92.0, 25.0, 0.75)
+    np.testing.assert_allclose(
+        m.combine_age_and_noise(r.htla, r.nipts), r.threshold
+    )
+
+
+def test_outside_validated_domain_warns() -> None:
+    """Conditions beyond the standard's stated ranges warn (but still compute)."""
+    with pytest.warns(m.NoiseInducedHearingLossWarning, match="1-40 year"):
+        m.nipts(90.0, 60.0, 0.5)
+    with pytest.warns(m.NoiseInducedHearingLossWarning, match="tails"):
+        m.nipts(90.0, 20.0, 0.99)
+    with pytest.warns(m.NoiseInducedHearingLossWarning, match="exceeds the 100 dB"):
+        m.nipts(130.0, 20.0, 0.5)
+    # The htlan noise component inherits the same guards.
+    with pytest.warns(m.NoiseInducedHearingLossWarning, match="1-40 year"):
+        m.htlan(60, "male", 90.0, 60.0, 0.5)
+
+
+def test_inside_validated_domain_is_silent() -> None:
+    """The domain edges themselves are inside the validated range."""
+    import warnings
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", m.NoiseInducedHearingLossWarning)
+        m.nipts(100.0, 1.0, 0.05)
+        m.nipts(100.0, 40.0, 0.95)
 
 
 def test_plots_return_axes() -> None:

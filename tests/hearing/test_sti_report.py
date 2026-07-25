@@ -114,6 +114,45 @@ def test_verdict_passes_exactly_at_requirement(tmp_path) -> None:
     assert "PASS" in _extract_text(str(out))
 
 
+def test_verdict_prints_the_requirement_at_full_precision(tmp_path) -> None:
+    """The requirement is printed at the STI's own two decimals.
+
+    A one-decimal requirement would round 0.52 to "0.5" and read as a
+    self-contradiction beside a failing STI = 0.50, and would print a plain
+    "0.9" for a 0.90 minimum.
+    """
+    pytest.importorskip("reportlab")
+    pytest.importorskip("matplotlib")
+    res = _uniform_result(0.5)
+    out_fail = tmp_path / "req052.pdf"
+    res.report(str(out_fail), metadata=ReportMetadata(requirement=0.52))
+    text = _extract_text(str(out_fail)).replace("\n", " ")
+    assert "STI = 0.50" in text
+    assert "0.52" in text
+    assert "FAIL" in text
+
+    out_round = tmp_path / "req090.pdf"
+    res.report(str(out_round), metadata=ReportMetadata(requirement=0.90))
+    assert "0.90" in _extract_text(str(out_round))
+
+
+def test_verdict_decides_on_the_requirement_it_prints(tmp_path) -> None:
+    """A requirement with hidden digits is judged on the value shown.
+
+    0.5049 prints as "0.50"; deciding on the unrounded number would fail an
+    STI of 0.50 while printing "STI = 0.50, required >= 0.50".
+    """
+    pytest.importorskip("reportlab")
+    pytest.importorskip("matplotlib")
+    res = _uniform_result(0.5)
+    out = tmp_path / "hidden.pdf"
+    res.report(str(out), metadata=ReportMetadata(requirement=0.5049))
+    text = _extract_text(str(out)).replace("\n", " ")
+    assert "STI = 0.50" in text
+    assert "0.50" in text
+    assert "PASS" in text
+
+
 # --- realistic indirect measurement -------------------------------------------
 
 

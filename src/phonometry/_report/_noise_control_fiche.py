@@ -29,9 +29,10 @@ from typing import Any
 
 import numpy as np
 
-from ._i18n import format_number, t
+from ._i18n import t
 from ._layout import (
     _ACCENT_HEX,
+    _MUTED_HEX,
     _REPORTLAB_HINT,
     build_document,
     display_round,
@@ -48,6 +49,7 @@ from ._sound_power_fiche import band_labels, d1, metadata_pairs, power_value_tab
 from .metadata import ReportMetadata
 
 __all__ = [
+    "PREDICTION_DISCLAIMER",
     "band_labels",
     "d1",
     "mean_finite",
@@ -55,6 +57,19 @@ __all__ = [
     "power_value_table",
     "render_noise_control_fiche",
 ]
+
+#: Footer scope statement of the noise-control fiches. These quantities come
+#: from a model evaluated on the declared inputs, so the measurement fiches'
+#: specimen-scoped sentence does not apply. The wording says "stated inputs"
+#: rather than "design data" because some of those inputs may themselves be
+#: measured (the enclosure fiche takes a panel transmission loss the caller
+#: may have measured); what the fiche reports is still the model's output, not
+#: a measurement of the assembled device. English key, translated via
+#: :func:`t` at render time.
+PREDICTION_DISCLAIMER = (
+    "The results are a prediction computed from the stated inputs; they are "
+    "not a measurement of a specimen."
+)
 
 
 def mean_finite(values: np.ndarray) -> float:
@@ -77,15 +92,18 @@ def performance_verdict(
 ) -> tuple[str, bool]:
     """Verdict text and PASS flag for a performance figure against a requirement.
 
-    ``higher_is_better`` selects the direction: an insertion or transmission
-    loss passes at or above the declared minimum, while a radiated noise level
-    passes at or below the declared maximum. Both the measured value and the
-    requirement are compared at the displayed (one-decimal) precision so the
-    printed numbers cannot contradict the verdict at the boundary. ``symbol`` is
-    markup (e.g. ``IL``, ``L<sub>WA</sub>``) and ``unit`` its unit symbol
-    (``dB`` or ``dB(A)``), neither of which is translated.
+    ``higher_is_better`` selects the direction: a predicted insertion or
+    transmission loss passes at or above the declared minimum, while a radiated
+    noise level passes at or below the declared maximum. Both the value and the
+    requirement are compared *and printed* at the same one-decimal display
+    rounding (half away from zero, :func:`display_round`), so the printed
+    numbers cannot contradict the verdict at the boundary: a value of 0.25
+    prints the 0.3 its verdict was decided on, not the 0.2 that Python's
+    round-half-to-even formatting would show. ``symbol`` is markup (e.g. ``IL``,
+    ``L<sub>WA</sub>``) and ``unit`` its unit symbol (``dB`` or ``dB(A)``),
+    neither of which is translated.
     """
-    rounded = display_round(value)
+    rounded = display_round(value) if math.isfinite(value) else value
     rounded_requirement = display_round(requirement)
     if higher_is_better:
         passed = math.isfinite(value) and rounded >= rounded_requirement
@@ -99,8 +117,8 @@ def performance_verdict(
         )
     text = template.format(
         sym=symbol,
-        value=d1(value, language),
-        req=format_number(requirement, language, decimals=1),
+        value=d1(rounded, language),
+        req=d1(rounded_requirement, language),
         unit=unit,
     )
     return text, passed
@@ -119,6 +137,7 @@ def render_noise_control_fiche(
     basis_strips: list[str],
     metadata: ReportMetadata | None,
     language: str,
+    prediction_statement: str,
     verdict: tuple[str, bool] | None = None,
 ) -> str:
     """Assemble the shared noise-control fiche flow and build the PDF at ``path``.
@@ -141,6 +160,11 @@ def render_noise_control_fiche(
         identity and (via each renderer) the requirement verdict.
     :param language: ``"en"`` (default) or ``"es"``.
     :param verdict: Optional pre-computed ``(text, passed)`` verdict row.
+    :param prediction_statement: The already-translated prediction statement
+        printed under the boxed figure. Every quantity these fiches carry is
+        computed from a design model rather than measured, so the statement
+        (and the prediction-scoped footer) say so, mirroring the EN/ISO 12354
+        prediction fiches.
     :return: The written ``path`` as a :class:`str`.
     :raises ImportError: If reportlab (or, for the figure, matplotlib) is not
         installed.
@@ -150,6 +174,7 @@ def render_noise_control_fiche(
     left_width_mm, plot_width_mm, figure_width_mm = 64.0, 110.0, 108.0
     try:
         from reportlab.lib import colors
+        from reportlab.lib.styles import ParagraphStyle
         from reportlab.lib.units import mm
         from reportlab.platypus import Paragraph, Spacer
     except ImportError as exc:
@@ -185,6 +210,15 @@ def render_noise_control_fiche(
     flow.append(Spacer(1, 8))
 
     flow.append(result_box(statement, styles, accent, extended))
+    flow.append(
+        Paragraph(
+            prediction_statement,
+            ParagraphStyle(
+                "noise_control_prediction", parent=styles["Normal"], fontSize=8.5,
+                textColor=colors.HexColor(_MUTED_HEX), spaceBefore=4,
+            ),
+        )
+    )
     if verdict is not None:
         text, passed = verdict
         flow.extend(verdict_flow(text, passed, styles, language))
@@ -192,6 +226,6 @@ def render_noise_control_fiche(
     basis_style_strip = measurement_basis_style()
     for strip in basis_strips:
         flow.append(Paragraph(strip, basis_style_strip))
-    flow.extend(footer_flow(metadata, language))
+    flow.extend(footer_flow(metadata, language, disclaimer=PREDICTION_DISCLAIMER))
 
     return build_document(path, flow, title)

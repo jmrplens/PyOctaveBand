@@ -52,12 +52,25 @@ if TYPE_CHECKING:
 
 
 def _basis(language: str = "en") -> str:
-    """The method-basis line naming the four-pole transmission-loss method."""
+    """The prediction-basis line naming the four-pole transmission-loss method."""
     return t(
-        "Determination of the transmission loss of a reactive silencer by the "
+        "Predicted transmission loss of a reactive silencer, computed by the "
         "plane-wave four-pole (transfer-matrix) method (Munjal, Acoustics of "
         "Ducts and Mufflers 2nd ed., Eq. (3.27); Bies, Hansen &amp; Howard, "
-        "Engineering Noise Control 5th ed., sections 8.8 to 8.9).",
+        "Engineering Noise Control 5th ed., sections 8.8 to 8.9). This is a "
+        "prediction from design data, not a measurement.",
+        language,
+    )
+
+
+def _prediction_statement(language: str = "en") -> str:
+    """The prediction statement printed under the boxed transmission loss."""
+    return t(
+        "Predicted (estimated) result computed from the declared silencer "
+        "geometry by the plane-wave model without flow; it is not a "
+        "measurement. Above the plane-wave cut-on frequency of the duct, and "
+        "with mean flow or dissipative lining present, the realised "
+        "performance departs from this model.",
         language,
     )
 
@@ -124,7 +137,9 @@ def _statement(result: Any, language: str = "en") -> tuple[float, str, list[str]
         t("Peak transmission loss = {value} dB", language).format(
             value=d1(peak_tl, language)
         ),
-        t("Device: {kind}", language).format(kind=str(result.kind)),
+        t("Device: {kind}", language).format(
+            kind=t(str(result.kind), language)
+        ),
     ]
     if result.insertion_loss is not None:
         mean_il = mean_finite(result.insertion_loss)
@@ -200,5 +215,6 @@ def render_reactive_silencer_report(
         basis_strips=[_basis_strip(language)],
         metadata=metadata,
         language=language,
+        prediction_statement=_prediction_statement(language),
         verdict=verdict,
     )

@@ -49,6 +49,30 @@ def test_elbow_table_bands() -> None:
     assert res0.values[0] == 0.0
 
 
+def test_elbow_bin_edges_belong_to_the_row_they_open() -> None:
+    """Table 8.11 rows read "a <= W/lambda < b", so an edge opens its row.
+
+    Square, no vanes, unlined (0, 1, 5, 8, 4, 3 dB): a ratio exactly on 0.14,
+    0.28, 0.55, 1.11 or 2.22 takes the value of the row starting there. Unit
+    width and speed of sound make ``W f / c`` reproduce each ratio bit for bit,
+    so the test exercises the binning rather than a floating-point round trip.
+    """
+    c = 1.0
+    w = 1.0
+    edges = [0.14, 0.28, 0.55, 1.11, 2.22]
+    expected = [1.0, 5.0, 8.0, 4.0, 3.0]
+    for ratio, value in zip(edges, expected, strict=True):
+        res = hvac.elbow_insertion_loss(
+            [ratio], w, bend_type="square", speed_of_sound=c
+        )
+        assert res.values[0] == pytest.approx(value), ratio
+    # Just below an edge still belongs to the row below it.
+    below = hvac.elbow_insertion_loss(
+        [0.13999], w, bend_type="square", speed_of_sound=c
+    )
+    assert below.values[0] == 0.0
+
+
 def test_elbow_lined_beats_unlined_high_freq() -> None:
     c = 343.0
     f = 1.5 * c / 0.3  # W/lambda = 1.5 (1.11-2.22 band)
