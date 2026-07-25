@@ -220,6 +220,43 @@ il.ground        # True: the four-path coherent ground model was applied
 il.plot()
 ```
 
+The three models side by side on the same geometry tell the whole story: the
+Kurze-Anderson fit and the exact half-plane track each other to within about
+1.5 dB across two decades of Fresnel number, while the coherent ground model
+swings tens of decibels around them, up where the barrier removes the
+ground-effect dip of the unscreened path, down where the four diffracted paths
+interfere destructively.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/barrier_insertion_loss_methods.svg" alt="Barrier insertion loss against frequency on a log axis for a 4 m screen between a 1 m source at 50 m and a 1.5 m receiver at 100 m. The dashed Kurze-Anderson curve and the solid exact rigid half-plane curve rise together from about 6 dB at 50 Hz to 19 dB at 5 kHz, never more than about 1.5 dB apart; the coherent four-path ground curve oscillates around them, peaking above 45 dB near 230 Hz where the unscreened ground dip is removed and falling below minus 10 dB near 550 Hz, with the dotted Kurze-Anderson 5 dB grazing-limit line underneath" width="90%" />
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import barrier_insertion_loss
+
+# The 4 m barrier of the snippets above, on a fine frequency grid.
+freqs = np.geomspace(50.0, 5000.0, 240)
+il_ka = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
+                               method="kurze_anderson")
+il_ex = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
+                               method="exact")
+il_gr = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
+                               method="exact", ground_flow_resistivity=2e5)
+fig, ax = plt.subplots(figsize=(11, 6.4))
+ax.semilogx(freqs, il_ka.insertion_loss, "--", label="Kurze-Anderson (thin screen)")
+ax.semilogx(freqs, il_ex.insertion_loss, label="Exact rigid half-plane")
+ax.semilogx(freqs, il_gr.insertion_loss, label="Exact + coherent ground (four paths)")
+ax.axhline(5.0, color="k", ls=":", label="Kurze-Anderson grazing limit (5 dB)")
+ax.set(xlabel="Frequency [Hz]", ylabel="Insertion loss [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
 ## Relation to ISO 9613-2
 
 The tabulated `Agr` and `Dz` of the

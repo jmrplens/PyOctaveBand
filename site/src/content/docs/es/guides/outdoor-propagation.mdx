@@ -366,6 +366,7 @@ print(np.round(att.a_div, 1))     # [57. 57. 57. 57. 57. 57. 57. 57.]  divergenc
 print(np.round(att.a_gr, 2))      # [-4.65  2.34 13.79  9.76  1.3  -0.   -0.   -0.  ]
 print(np.round(att.a_bar, 2))     # [13.78  8.89  0.    6.69 18.01 20.   20.   20.  ]
 print(np.round(att.a_total, 1))   # [66.2 68.3 71.  73.9 77.1 78.8 82.3 96. ]
+att.plot()                        # el desglose apilado de arriba (necesita matplotlib)
 
 # Nivel predicho en el receptor a partir de una potencia acústica por bandas Lw = 95 dB
 lw = np.full(len(bands), 95.0)
@@ -659,9 +660,12 @@ result.report(
 <ReportPreview
 	name="iso9613_outdoor_attenuation_example"
 	title="Informe de ejemplo de propagación ISO 9613-2 (PDF)"
-	description="Ficha de predicción ISO 9613-2 de una página: un encabezado de metadatos con la distancia de propagación, una tabla por banda del nivel de potencia acústica Lw y de los términos de atenuación por divergencia, atmósfera, suelo y barrera con el total A y el nivel a favor del viento LfT(DW), el gráfico del desglose de la atenuación y el nivel a favor del viento con ponderación A destacado LAT(DW) = 29.9 dB con veredicto CUMPLE frente a un límite de 50 dB."
+	description="Ficha de predicción ISO 9613-2 de una página: un encabezado de metadatos con la distancia de propagación, una tabla por banda del nivel de potencia acústica Lw y de los términos de atenuación por divergencia, atmósfera, suelo y barrera con el total A y el nivel a favor del viento LfT(DW), el gráfico del desglose de la atenuación y el nivel a favor del viento con ponderación A destacado LAT(DW) = 29,9 dB con veredicto CUMPLE frente a un límite de 50 dB."
 	caption="Ficha de propagación al aire libre (OutdoorAttenuation.report), el nivel a favor del viento con ponderación A en el receptor."
 />
+
+Antes de emitir la ficha, `result.plot()` dibuja de forma interactiva el mismo
+desglose de atenuación por banda (la figura apilada de la sección 2).
 
 `BarrierInsertionLoss.report(path)` destaca la pérdida por inserción media sobre
 las bandas de octava; una pérdida por inserción mínima requerida indicada
@@ -687,9 +691,14 @@ result.report(
 <ReportPreview
 	name="iso9613_barrier_insertion_loss_example"
 	title="Informe de ejemplo de pérdida por inserción de barrera (PDF)"
-	description="Ficha de predicción de pérdida por inserción de barrera de una página: un encabezado de metadatos con el modelo de suelo, una tabla por banda de la pérdida por inserción, el gráfico del espectro de pérdida por inserción y la pérdida por inserción media destacada IL = 12.9 dB con veredicto CUMPLE frente a un mínimo de 8 dB. La línea de base nombra el modelo ondulatorio de difracción en pantalla rígida, un complemento del término de apantallamiento de la ISO 9613-2."
+	description="Ficha de predicción de pérdida por inserción de barrera de una página: un encabezado de metadatos con el modelo de suelo, una tabla por banda de la pérdida por inserción, el gráfico del espectro de pérdida por inserción y la pérdida por inserción media destacada IL = 12,9 dB con veredicto CUMPLE frente a un mínimo de 8 dB. La línea de base nombra el modelo ondulatorio de difracción en pantalla rígida, un complemento del término de apantallamiento de la ISO 9613-2."
 	caption="Ficha de pérdida por inserción de barrera (BarrierInsertionLoss.report), la pérdida por inserción media sobre las bandas de octava."
 />
+
+También aquí `result.plot()` previsualiza el espectro de pérdida por inserción
+de la ficha; la [guía de suelo y barreras](/phonometry/es/guides/ground-barriers/)
+dibuja el mismo resultado frente a los modelos de semiplano exacto y suelo
+coherente.
 
 ## Véase también
 
