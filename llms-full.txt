@@ -4970,6 +4970,73 @@ ld = emission.dynamic_capability_index(18.0)   # δpI0 = 18 dB → Ld = δpI0 �
 print(ld, ld > fi.f2)                                      # 8.0 True (criterion 1)
 ```
 
+With 2D `(positions, bands)` arrays and the band centres the indicators come
+back **per band**, and the result is plottable in one line, the form in which
+the criteria are actually checked (each band passes or fails on its own):
+
+```python
+fi = emission.field_indicators(lp_bands, in_bands, freqs)   # (positions, bands)
+fi.plot(dynamic_capability=ld)   # F2/F3 per band vs Ld, F4 on a twin axis (needs matplotlib)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/field_indicators_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/field_indicators.svg" alt="ISO 9614-1 field indicators of a ten-position scan over six octave bands: F2 and F3 climb towards low frequency as the field turns reactive, crossing the dashed dynamic-capability line Ld at 125 Hz where F3 also rises above F2, with the field non-uniformity F4 drawn as bars on a twin axis" width="88%"></picture>
+
+*F2 climbs towards low frequency as the field turns reactive, and at 125 Hz it
+crosses the instrument's dynamic capability `Ld = δpI0 − K`: that band fails
+criterion 1, and no averaging will fix it — it calls for a larger spacer, a
+different surface or a quieter room. F3 rising above F2 in the same band
+reveals inward-flowing (negative) partial intensity, and the F4 bars set the
+number of positions the surface needs (criterion 2, `N > C·F4²`).*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import emission
+
+# A 10-position discrete-point scan over six octave bands: the surface
+# pressure is nearly uniform, and the normal intensity per band is set so the
+# field turns reactive towards low frequency, with two inward-flowing
+# positions in the 125 Hz band (rescaled so the band mean keeps its target).
+freqs = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+delta_pi = np.array([10.5, 8.5, 6.0, 4.5, 3.5, 3.0])   # target Lp − L|In|
+rng = np.random.default_rng(9614)
+lp_bands = 78.0 + rng.normal(0.0, 0.4, (10, freqs.size))
+i_mean = 10.0 ** ((78.0 - delta_pi) / 10.0) * 1.0e-12
+in_bands = i_mean[None, :] * (1.0 + rng.normal(0.0, 0.18, (10, freqs.size)))
+in_bands[:2, 0] = -0.35 * i_mean[0]
+in_bands[2:, 0] *= (10.0 * i_mean[0] - in_bands[:2, 0].sum()) / in_bands[2:, 0].sum()
+
+fi = emission.field_indicators(lp_bands, in_bands, freqs)
+ld = emission.dynamic_capability_index(18.0)   # δpI0 = 18 dB, K = 10 dB
+
+# One line — F2/F3 per band against Ld, with F4 on a twin axis:
+fi.plot(dynamic_capability=ld)
+plt.show()
+
+# By hand, from the per-band fields the result carries — mirroring what
+# FieldIndicators.plot() draws (Ld step line, merged twin-axis legend):
+fig, ax = plt.subplots()
+ax.plot(fi.frequency, fi.f2, "o-", label="F2 (surface pressure-intensity)")
+ax.plot(fi.frequency, fi.f3, "s--", label="F3 (negative partial power)")
+ax.plot(fi.frequency, np.full(fi.frequency.size, ld), ":",
+        drawstyle="steps-mid", label="Dynamic capability Ld")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Indicator [dB]")
+twin = ax.twinx()
+twin.bar(fi.frequency, fi.f4, width=fi.frequency * 0.2, alpha=0.25,
+         color="#2ca02c", label="F4 (non-uniformity)")
+twin.set_ylabel("Field non-uniformity F4")
+lines, labels = ax.get_legend_handles_labels()
+tlines, tlabels = twin.get_legend_handles_labels()
+ax.legend(lines + tlines, labels + tlabels)
+plt.show()
+```
+
+</details>
+
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_intensity_scan_power_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_intensity_scan_power.gif" alt="Animation: a p-p probe traces the serpentine scan over the top face of the measurement box while the normal-intensity arrows appear behind it, and the partial powers of the five faces accumulate into the sound power level L_W" width="640" height="360" loading="lazy"></picture>
 
 [Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_intensity_scan_power.webm)
@@ -10620,6 +10687,12 @@ print(round(mc.c1, 4), round(mc.c2, 4))   # -0.1282 0.0
 print(round(emission.precision_uncertainty(0.5, 2.0, 2.0), 3))   # 4.123
 ```
 
+The `MeteorologicalCorrection` is a pair of scalars (plus the per-band `C3`
+when the attenuation coefficient is supplied per band) rather than a
+plottable spectrum: the corrections fold into the
+`PrecisionSoundPowerResult` as its `c1`/`c2`/`c3` fields, and the `.report()`
+fiche prints them on its measurement-basis strip.
+
 Over several bands `sound_power_anechoic` returns a plottable
 `PrecisionSoundPowerResult` carrying the per-band `LW` and the A-weighted total:
 
@@ -10714,7 +10787,8 @@ print(round(float(res.sound_power_level[0]), 2))    # 80.0
 ```
 
 Across several bands the result carries the per-band `LW` (`NaN` where the net
-power is non-positive) and flags those bands `not_applicable`:
+power is non-positive), flags those bands `not_applicable`, and draws them
+with the one-line `result.plot()` of the figure below:
 
 ```python
 import numpy as np
@@ -10788,6 +10862,258 @@ plt.show()
 
 </details>
 
+## 6. The measurement report (`.report()`)
+
+A sound power determination ends as a *document*. Every result of this page
+stays plottable while it is being worked on — `res.plot()` draws the same
+`LW` spectrum interactively that the fiche typesets — and the report step
+wraps it into the deliverable. Both the enveloping-surface result
+(`SoundPowerResult`, ISO 3744/3746) and the precision result
+(`PrecisionSoundPowerResult`, ISO 3745) expose a `.report()` method that writes
+a one-page PDF fiche laid out like a sound-power test sheet: the standard-basis
+line naming the applied method and accuracy grade, an optional metadata header
+(client, noise source, test environment, instrumentation, climate, date), a
+per-band table (nominal octave/one-third-octave frequency, the surface
+sound-pressure level `Lp` and the band sound-power level `LW`), the
+sound-power spectrum `LW(f)` with a nominal band axis, and a boxed A-weighted
+sound power level `LWA` (dB re 1 pW) with the total `LW`, the expanded
+uncertainty `U` and the measurement surface area `S` alongside.
+
+The metadata is supplied through a `ReportMetadata`, whose applicable fields
+here are the **source description** (`specimen`), the **test environment**
+(`test_room`), the **client**, the **instrumentation**, the **temperature**,
+**relative humidity** and **ambient pressure**, the **date of test**
+(`test_date`) and the footer identity (`laboratory`, `operator`, `report_id`,
+`notes`); the measurement surface area `S` comes from the result itself and is
+printed in the result box and the basis strip, together with the applied
+corrections (the background `K1` and environmental `K2` for the ISO 3744/3746
+surface method, or the meteorological `C1`/`C2`/`C3` for the ISO 3745
+precision method). Supplying `requirement` adds a PASS/FAIL verdict against a
+declared A-weighted sound-power limit (a sound-power emission is a quantity where
+less is better, so the source passes at or below the limit). `verbose=True`
+adds the energy-averaged level `Lp'` to the table, and for the ISO 3744/3746
+surface result it also adds the `K1`/`K2` correction columns (the ISO 3745
+precision result carries no `K1`/`K2`; its `C1`/`C2`/`C3` appear in the
+basis strip). `language="es"` renders the Spanish fiche with comma decimals.
+
+```python
+import numpy as np
+from phonometry import ReportMetadata, emission
+
+freqs = np.array([63, 125, 250, 500, 1000, 2000, 4000, 8000], float)
+# Ten identical position spectra over a hemisphere of radius 4 m; background a
+# uniform 10 dB below and an equivalent absorption area A = 1500 m^2 (so K1, K2
+# are meaningful and within the engineering validity limit).
+surface = np.array([72.0, 76, 80, 82, 81, 78, 73, 66])
+res = emission.sound_power_pressure(
+    np.tile(surface, (10, 1)), "hemisphere", radius=4.0,
+    background_levels=np.tile(surface - 10.0, (10, 1)),
+    frequencies=freqs, absorption_area=1500.0, grade="engineering",
+)
+
+res.report(
+    "sound_power.pdf",
+    metadata=ReportMetadata(
+        client="Example manufacturing plant",
+        specimen="Hydraulic power pack (floor-standing)",
+        test_room="Hemi-anechoic room over a reflecting floor",
+        instrumentation="Class 1 sound level meter (IEC 61672-1), s/n 0042",
+        laboratory="Phonometry reference example",
+        report_id="EXAMPLE-3744",
+        requirement=105.0,
+    ),
+)   # LWA = 103.7 dB(A) re 1 pW -> declared limit 105 dB(A): PASS
+```
+
+The example fiche, regenerated with `make reports`, is kept rendered in the
+repository. Click the preview to open the PDF:
+
+[![ISO 3744 sound power determination example report: a header with the client, the noise source, the hemi-anechoic test environment and the instrumentation and climate, the octave-band table (63 Hz to 8 kHz) of surface sound-pressure levels Lp and band sound-power levels LW, the sound-power spectrum LW(f) with a nominal band axis, the boxed A-weighted sound power level LWA = 103.7 dB(A) re 1 pW with the total LW = 105.8 dB, the expanded uncertainty U = 3.0 dB and the measurement surface S = 100.53 m2, and a PASS verdict against the declared 105 dB(A) limit, closed by a basis strip stating the applied K1 = 0.5 dB and K2 = 1.0 dB corrections](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso3744_sound_power_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso3744_sound_power_example.pdf)
+
+*Sound power determination fiche (`SoundPowerResult.report`), an ISO 3744
+engineering-grade hemisphere measurement with the K1/K2 corrections and the
+boxed LWA.*
+
+### The intensity determination (ISO 9614-2)
+
+The intensity-scanning result (`SoundPowerIntensityResult`, ISO 9614-2) writes
+the same one-page fiche through its own `.report()`. The standard-basis line
+names ISO 9614-2:1996 and the measurement grade, the per-band table lists the
+intensity-derived band sound-power level `LW`, and the boxed `LWA` carries
+the total `LW`, the measurement surface `S` and the determination grade
+(the intensity result has no expanded uncertainty `U`). `verbose=True` adds the
+field indicators `FpI` (surface pressure-intensity) and `F+/-`
+(negative partial power) and the per-band achieved grade; the basis strip
+states the partial-power model (the segment partial powers `Pi = In,i·Si`
+summing to `P`) and the Annex B qualification criteria. A band whose net power
+is non-positive is not determinable (clause 9.2) and prints an em dash.
+
+```python
+import numpy as np
+from phonometry import ReportMetadata, emission
+
+freqs = np.array([125, 250, 500, 1000, 2000, 4000], float)
+# Six equal 0.5 m^2 segments (S = 3.0 m^2); one uniform normal-intensity
+# spectrum scanned twice, with the surface SPL and the instrument residual
+# index that qualify every band at engineering grade.
+intensity = np.array([0.6e-4, 1.0e-4, 1.5e-4, 1.4e-4, 0.9e-4, 0.5e-4])
+scan = np.tile(intensity, (6, 1))
+res = emission.sound_power_intensity(
+    scan, np.full(6, 0.5), normal_intensity_2=scan.copy(),
+    pressure_levels=np.full((6, 6), 80.0), pressure_residual_index=15.0,
+    frequencies=freqs, band_type="octave", grade="engineering",
+)
+
+res.report(
+    "sound_power_intensity.pdf",
+    metadata=ReportMetadata(
+        client="Example manufacturing plant",
+        specimen="Hydraulic power pack (floor-standing)",
+        test_room="Machine hall with steady background noise",
+        instrumentation="Class 1 p-p intensity probe (IEC 61043), s/n 0042",
+        laboratory="Phonometry reference example",
+        report_id="EXAMPLE-9614",
+        requirement=93.0,
+    ),
+)   # LWA = 90.9 dB(A) re 1 pW -> declared limit 93 dB(A): PASS
+```
+
+The example fiche, regenerated with `make reports`, is kept rendered in the
+repository. Click the preview to open the PDF:
+
+[![ISO 9614-2 sound power by intensity example report: a header with the client, the noise source, the machine-hall test environment and the intensity probe and climate, the octave-band table (125 Hz to 4 kHz) of intensity-derived band sound-power levels LW, the sound-power spectrum LW(f) with a nominal band axis, the boxed A-weighted sound power level LWA = 90.9 dB(A) re 1 pW with the total LW = 92.5 dB, the measurement surface S = 3.00 m2 and the engineering grade, and a PASS verdict against the declared 93 dB(A) limit, closed by a basis strip stating the partial-power model, the field indicators FpI and F+/- and the Annex B qualification criteria](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso9614_sound_power_intensity_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso9614_sound_power_intensity_example.pdf)
+
+*Sound power by intensity fiche (`SoundPowerIntensityResult.report`), an
+ISO 9614-2 engineering-grade scan with the field indicators and the boxed
+LWA.*
+
+### The reverberation-room determination (ISO 3741)
+
+The reverberation-room result (`ReverberationSoundPowerResult`, ISO 3741) writes
+the same one-page fiche through its own `.report()`. The standard-basis line
+names ISO 3741:2010 and the precision accuracy grade (grade 1) and states which
+method was used, the direct method using the room equivalent absorption area
+(Eq. 20) or the comparison method using a reference sound source (Eq. 21). The
+per-band table lists the mean room sound-pressure level `Lp` and the band
+sound-power level `LW`, and the boxed `LWA` carries the total `LW` and the
+determination method (the reverberation result has no expanded uncertainty `U`).
+`verbose=True` adds the background correction `K1` and, for the direct method,
+the equivalent absorption area `A` and the Waterhouse boundary correction `Cw`;
+the basis strip states the correction model (Eq. 20 or Eq. 21), the applied
+meteorological corrections `C1`/`C2` and the speed of sound, and cites the
+Annex F A-weighting.
+
+```python
+import numpy as np
+from phonometry import ReportMetadata, emission
+
+freqs = np.array([125, 250, 500, 1000, 2000, 4000, 8000], float)
+# Octave-band mean room sound-pressure levels in a qualified
+# reverberation room of V = 200 m3, S = 240 m2, with a uniform T60 = 2.0 s.
+lp = np.array([80.0, 83.0, 85.0, 84.0, 80.0, 75.0, 68.0])
+res = emission.sound_power_reverberation(
+    lp, 2.0, volume=200.0, surface_area=240.0, frequencies=freqs,
+    temperature=20.0, static_pressure=101.325,
+)
+
+res.report(
+    "sound_power_reverberation.pdf",
+    metadata=ReportMetadata(
+        client="Example manufacturing plant",
+        specimen="Hydraulic power pack (floor-standing)",
+        test_room="Qualified reverberation room, V = 200 m3, T60 = 2.0 s",
+        instrumentation="Class 1 sound level meter (IEC 61672-1), s/n 0042",
+        laboratory="Phonometry reference example",
+        report_id="EXAMPLE-3741",
+        requirement=96.0,
+    ),
+)   # LWA = 94.3 dB(A) re 1 pW -> declared limit 96 dB(A): PASS
+```
+
+The example fiche, regenerated with `make reports`, is kept rendered in the
+repository. Click the preview to open the PDF:
+
+[![ISO 3741 reverberation-room sound power example report: a header with the client, the noise source, the qualified reverberation test room and the instrumentation and climate, the octave-band table (125 Hz to 8 kHz) of mean room sound-pressure levels Lp and band sound-power levels LW, the sound-power spectrum LW(f) with a nominal band axis, the boxed A-weighted sound power level LWA = 94.3 dB(A) re 1 pW with the total LW = 96.7 dB and the direct determination method, and a PASS verdict against the declared 96 dB(A) limit, closed by a basis strip stating the Eq. 20 correction model with the Sabine absorption area, the Waterhouse boundary term and the meteorological corrections C1 and C2, and the Annex F A-weighting](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso3741_reverberation_power_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso3741_reverberation_power_example.pdf)
+
+*Reverberation-room sound power fiche (`ReverberationSoundPowerResult.report`),
+an ISO 3741 precision-grade direct-method determination with the Waterhouse and
+C1/C2 corrections and the boxed LWA.*
+
+## 7. Declaring the noise emission (ISO 4871)
+
+A measured sound power level is not yet a *declaration*. ISO 4871:1996 is the
+standard for the noise-emission declaration a manufacturer prints in technical
+documents: which quantities are stated, in which form, and how a declared value
+is verified. The preferred quantity is the A-weighted sound power level
+`L_WA`, optionally accompanied by the A-weighted emission sound pressure level
+`L_pA` at a work station.
+
+A declaration takes one of two alternative forms (clause 4):
+
+- the **dual-number** form (clause 3.16): the measured value `L_WA` and its
+  uncertainty `K_WA` stated together but separately; and
+- the **single-number** form (clause 3.15): the derived declared value
+  `L_WAd = L_WA + K_WA`, an upper limit that repeated measurements are unlikely
+  to exceed at the stated confidence level.
+
+`K_WA` combines the measurement (reproducibility) and, for a batch, the
+production spread; for a single machine `K = 1.645 sigma_R` (Annex A.2.2). A
+`NoiseEmissionDeclaration` holds one or more per-operating-mode declarations
+and renders the ISO 4871 fiche through `.report()`. The quickest route is to
+`declare()` straight from a measured sound power:
+
+```python
+import numpy as np
+import phonometry as ph
+from phonometry import ReportMetadata
+
+# ... a measured LWA from ISO 3744 ...
+result = ph.sound_power_pressure(levels, "hemisphere", radius=1.0,
+                                 frequencies=freqs)
+
+declaration = result.declare(
+    uncertainty=2.0,                 # K_WA in dB (defaults to the expanded U)
+    machine="Type 990, Model 11-TC",
+    operating_conditions="50 Hz, 230 V, rated load",
+    basic_standards="ISO 3744",
+    verification_level=result.sound_power_level_a,  # L_1 for clause 6.2
+)
+declaration.report(
+    "iso4871.pdf",
+    metadata=ReportMetadata(measurement_standard="ISO 3744"),
+)   # -> L_WAd = L_WA + K_WA, verified when L_1 <= L_WAd
+```
+
+Or build the declaration directly, reproducing the ISO 4871 Annex B example
+(two operating modes, `L_WA = 88` and `95` dB with `K_WA = 2` dB, giving
+declared `L_WAd = 90` and `97` dB):
+
+```python
+mode1 = ph.OperatingModeDeclaration(
+    "Operating mode 1", sound_power_level=88.0, sound_power_uncertainty=2.0,
+    emission_pressure_level=78.0, emission_pressure_uncertainty=2.0,
+    verification_level=89.0,          # passes: 89 <= 90
+)
+mode2 = ph.OperatingModeDeclaration(
+    "Operating mode 2", sound_power_level=95.0, sound_power_uncertainty=2.0,
+    emission_pressure_level=86.0, emission_pressure_uncertainty=2.0,
+    verification_level=98.0,          # fails: 98 > 97
+)
+ph.NoiseEmissionDeclaration(
+    (mode1, mode2), machine="Type 990, Model 11-TC",
+    basic_standards=("ISO 3744", "ISO 11202"), form="dual-number",
+).report("iso4871.pdf")
+```
+
+The example fiche, regenerated with `make reports`, is kept rendered in the
+repository. Click the preview to open the PDF:
+
+[![ISO 4871 noise emission declaration example report: a header with the machine identification and operating conditions, the declared dual-number table across two operating-mode columns listing the measured A-weighted sound power level L_WA, its uncertainty K_WA, the emission sound pressure level L_pA and the derived declared value L_WAd = L_WA + K_WA (90 and 97 dB), the noise-test-code and basic-standards footnote, and a clause 6.2 verification table where mode 1 passes and mode 2 fails](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso4871_declaration_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso4871_declaration_example.pdf)
+
+*Noise emission declaration fiche (`NoiseEmissionDeclaration.report`), the
+ISO 4871 Annex B dual-number table with the declared `L_WAd = L_WA + K_WA` and
+the clause 6.2 verification verdict.*
+
 ## See also
 
 - [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/guides/intensity/): the two-microphone probe, its
@@ -10838,6 +11164,12 @@ plt.show()
   hemi-anechoic rooms* (ISO 3745:2012).
   [iso.org catalogue](https://www.iso.org/standard/45362.html).
   The precision anechoic-room method of section 4.
+- International Organization for Standardization. (1996). *Acoustics —
+  Declaration and verification of noise emission values of machinery and
+  equipment* (ISO 4871:1996).
+  [iso.org catalogue](https://www.iso.org/standard/10868.html).
+  The declaration behind section 7: the dual/single-number forms,
+  `L_WAd = L_WA + K_WA` (clause 3.15) and the clause 6.2 verification.
 
 ## Standards
 
@@ -10859,7 +11191,10 @@ noise sources using sound intensity — Part 2: Measurement by scanning* — the
 partial powers, the `FpI` and `F+/-` field indicators and the grade criteria.
 ISO 9614-3:2002, *… Part 3: Precision method for measurement by scanning*:
 the grade-1 scanning method, its field indicators and the clause 9.2
-not-applicable flagging.
+not-applicable flagging. ISO 4871:1996, *Acoustics — Declaration and
+verification of noise emission values of machinery and equipment*: the
+dual-number and single-number declaration forms, the declared value
+`L_WAd = L_WA + K_WA` and the clause 6.2 verification of section 7.
 
 ---
 
@@ -13109,6 +13444,43 @@ res.distortion_ratios     # |Hn(n f)| / |H1(f)| per order
 res.plot()                # |Hn| magnitudes + THD(f)
 ```
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/swept_sine_thd_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/swept_sine_thd.svg" alt="Total harmonic distortion and the second and third harmonic ratios of a cubic polynomial followed by a 3 kHz low-pass, against excitation frequency: each order sits exactly on its Chebyshev level at low frequency and rolls off where its own product crosses the filter corner" width="82%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal as sp_signal
+from phonometry import swept_sine_distortion, synchronized_sweep_signal
+
+fs, f1, f2, seconds = 48000, 20.0, 6000.0, 4.0
+a2, a3 = 0.12, 0.08
+x = synchronized_sweep_signal(fs, f1, f2, seconds)
+b, a = sp_signal.butter(2, 3000.0, fs=fs)             # 3 kHz post-filter
+y = sp_signal.lfilter(b, a, x + a2 * x**2 + a3 * x**3)
+res = swept_sine_distortion(y, fs, f1, f2, seconds, n_harmonics=3)
+
+h1 = 1.0 + 3.0 * a3 / 4.0                              # Chebyshev gain
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.loglog(res.thd_frequencies, 100.0 * res.thd, label="Total THD(f)")
+ax.loglog(res.thd_frequencies, 100.0 * res.distortion_ratios[0],
+          ls="--", label="2nd harmonic d2(f)")
+ax.loglog(res.thd_frequencies, 100.0 * res.distortion_ratios[1],
+          ls="--", label="3rd harmonic d3(f)")
+ax.axhline(100.0 * (a2 / 2.0) / h1, ls=":",
+           label="Chebyshev asymptote (a2/2)/H1")
+ax.axhline(100.0 * (a3 / 4.0) / h1, ls=":",
+           label="Chebyshev asymptote (a3/4)/H1")
+ax.set_xlabel("Excitation frequency [Hz]")
+ax.set_ylabel("Distortion re fundamental [%]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
 The oracle behind the implementation is the memoryless polynomial: driving
 `y = x + a2·x² + a3·x³` with a unit sweep must return, by the Chebyshev
 identities, `|H1| = 1 + 3a3/4`, `|H2| = a2/2` (phase `-π/2`), `|H3| = a3/4`
@@ -13170,7 +13542,13 @@ from phonometry import sweep_signal, swept_sine_distortion
 
 x = sweep_signal(fs, f1, f2, seconds)          # the ISO 18233 ESS
 res = swept_sine_distortion(y, fs, f1, f2, seconds, method="farina")
+res.plot()   # same |Hn| + THD(f) panels as the synchronized method (needs matplotlib)
 ```
+
+The result is the same plottable `SweptSineDistortionResult` as the
+synchronized method, so the `|Hn|` and `THD(f)` panels of the section-1
+figure read identically; only the harmonic phases (and the top of each
+order's band) differ between the two methods.
 
 Sizing rules for both methods: the closest pair of arrivals is spaced
 `L·ln(N/(N-1))` seconds, so the per-order window (`ir_length`, default the
@@ -13205,6 +13583,40 @@ res = phase_decomposition(H, fs)       # everything on one axis
 res.excess_group_delay                 # the all-pass part, in seconds
 res.plot()                             # magnitude, phases, group delays
 ```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/phase_decomposition_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/phase_decomposition.svg" alt="Three stacked panels of the minimum-phase / all-pass decomposition of a +6 dB peaking equalizer measured through a 2.5 ms latency: the magnitude bump at 1 kHz, the measured phase diving with frequency while the minimum phase stays small and the excess phase carries the linear delay ramp, and the group delays where the excess group delay reads a flat 2.5 ms" width="82%"></picture>
+
+*A +6 dB peaking equalizer measured through a 2.5 ms processing latency: the
+minimum-phase part carries only the small phase wiggle an equalizer could
+invert, the excess phase is the pure `−2πf·t0` ramp of the delay, and the
+excess group delay reads the latency directly as a flat 2.5 ms line.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal as sp_signal
+from phonometry import phase_decomposition
+
+fs = 48000.0
+delay = int(0.0025 * fs)                      # a 2.5 ms processing latency
+gain_a = 10.0 ** (6.0 / 40.0)                 # +6 dB peaking EQ at 1 kHz, Q = 1
+w0 = 2.0 * np.pi * 1000.0 / fs
+alpha = np.sin(w0) / 2.0
+b = np.array([1 + alpha * gain_a, -2 * np.cos(w0), 1 - alpha * gain_a])
+a = np.array([1 + alpha / gain_a, -2 * np.cos(w0), 1 - alpha / gain_a])
+imp = np.zeros(16384)
+imp[delay] = 1.0
+ir = sp_signal.lfilter(b / a[0], a / a[0], imp)
+
+res = phase_decomposition(np.fft.rfft(ir), fs)
+res.plot()   # |H|, the three phases and the group delays
+plt.show()
+```
+
+</details>
 
 The decomposition `H = H_min · H_ap` splits what an equalizer can invert
 (`H_min`, minimum phase, causal and causally invertible) from what it never

@@ -10462,8 +10462,9 @@ def generate_silencer_side_branch(output_dir: str) -> None:
             label="Helmholtz resonator")
     ax.plot(freqs, qw.transmission_loss, color=COLOR_SECONDARY, lw=1.8,
             ls="--", label="Quarter-wave tube")
-    for res_f in (hr.resonances[0], qw.resonances[0]):
-        ax.axvline(float(res_f), color=COLOR_TERTIARY, ls=":", lw=1.0)
+    for resonances in (hr.resonances, qw.resonances):
+        if resonances is not None:
+            ax.axvline(float(resonances[0]), color=COLOR_TERTIARY, ls=":", lw=1.0)
     ax.set_xlim(20.0, 600.0)
     ax.set_ylim(0.0, 50.0)
     format_frequency_axis(ax, 20.0, 600.0)

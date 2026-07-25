@@ -80,6 +80,7 @@ for survey (grade 3). The measurement arrangement is adequate when
 field_indicators(
     pressure_levels: list[float] | np.ndarray,
     normal_intensity: list[float] | np.ndarray,
+    frequencies: list[float] | np.ndarray | None = None,
 ) -> FieldIndicators
 ```
 
@@ -97,23 +98,32 @@ positions on the measurement surface:
 - F4 = (1/|mean In|) * sqrt(sum((Ini - mean In)^2) / (N - 1))
   (equations (A.8)-(A.9)).
 
-If the algebraic mean intensity is not positive the test conditions
-do not satisfy ISO 9614-1 in that band (clause A.2.3) and a
-`ValueError` is raised.
+The inputs are either 1D per-position arrays (one frequency band,
+scalar indicators) or 2D `(positions, bands)` arrays (the
+indicators are evaluated band by band and returned as per-band
+arrays; the plottable form). If the algebraic mean intensity of any
+band is not positive the test conditions do not satisfy ISO 9614-1
+in that band (clause A.2.3) and a `ValueError` is raised.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `pressure_levels` | Lpi at each position, in decibels. |
-| `normal_intensity` | Signed normal intensity Ini at each position, in W/m^2. |
+| `pressure_levels` | Lpi at each position, in decibels; 1D `(positions,)` or 2D `(positions, bands)`. |
+| `normal_intensity` | Signed normal intensity Ini at each position, in W/m^2; same shape as `pressure_levels`. |
+| `frequencies` | Band centre frequencies in Hz, one per column of the 2D input (optional for 1D input, where it is ignored beyond a length check). |
 
 **Returns:** [`FieldIndicators`](/phonometry/reference/api/power/intensity/#fieldindicators).
 
 ## FieldIndicators
 
 ```python
-FieldIndicators(f2: float, f3: float, f4: float)
+FieldIndicators(
+    f2: float | np.ndarray,
+    f3: float | np.ndarray,
+    f4: float | np.ndarray,
+    frequency: np.ndarray | None = None,
+)
 ```
 
 ISO 9614-1:1993 Annex A field indicators over a measurement surface.
@@ -126,6 +136,45 @@ of the surface. The instrument's dynamic capability index must
 satisfy `Ld > f2` (criterion 1, equation (B.1)); the number of
 positions N must satisfy `N > C * f4**2` (criterion 2, equation
 (B.2)).
+
+With per-position *and* per-band input (2D arrays passed to
+[`field_indicators`](/phonometry/reference/api/power/intensity/#field_indicators)) the three indicators are per-band arrays and
+`frequency` carries the band centres; with 1D per-position input they
+are scalars and `frequency` is `None`.
+
+### FieldIndicators.plot()
+
+```python
+FieldIndicators.plot(
+    ax: Axes | None = None,
+    *,
+    dynamic_capability: float | np.ndarray | None = None,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Plot the per-band indicators F2/F3, the Ld line and F4.
+
+Requires per-band data (call [`field_indicators`](/phonometry/reference/api/power/intensity/#field_indicators) with 2D
+`(positions, bands)` arrays and `frequencies`) and matplotlib
+(`pip install phonometry[plot]`); returns the
+`Axes`.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `dynamic_capability` | Optional instrument dynamic capability index `Ld` in dB (scalar or per band), drawn as the criterion-1 reference line (`Ld > F2`, equation (B.1)); see [`dynamic_capability_index`](/phonometry/reference/api/power/intensity/#dynamic_capability_index). |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the F2 curve `plot` call. |
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the result carries no per-band data. |
 
 ## IntensityResult
 
