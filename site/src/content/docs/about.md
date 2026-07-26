@@ -29,10 +29,20 @@ The same identity is also published on
 [Keyoxide](https://keyoxide.org/0A993B268654DBBA52B7E8D3FCF653391E2C91FC),
 where the OpenPGP key that signs my work is listed.
 
-My background is in acoustics and in signal processing, and the library grew
-out of measurement work: I kept needing octave-band levels and sound level
-meter quantities that I could defend against a tolerance table, so I built
-them once, properly, instead of re-deriving them for each project.
+My background is in acoustics and in signal processing, and it is on the
+record rather than self-described: I trained as a Telecommunications Engineer
+specialised in Sound and Image at the Universidad de Alicante (2011-2018),
+took the MSc in Acoustics Engineering at the Universitat Politècnica de
+València (2018-2019), and worked as an acoustics researcher at the UPV from
+2020 to 2023, publishing there on acoustic metasurfaces, sound diffusers and
+acoustic field prediction; the papers are listed under the Google Scholar and
+ORCID profiles above. Today I work in industrial R&D as a firmware and
+software engineer.
+
+The library grew out of the measurement side of that work: I kept needing
+octave-band levels and sound level meter quantities that I could defend
+against a tolerance table, so I built them once, properly, instead of
+re-deriving them for each project.
 
 ## How I build the library
 
@@ -78,6 +88,10 @@ The most useful report gives me the standard and clause you are checking
 against, the expected value, the value phonometry produced, and a short snippet
 that reproduces it. If you cannot share the signal, the parameters alone are
 usually enough for me to rebuild a case.
+
+If an issue tracker is not an option for you, write to me directly at
+[mail@jmrp.io](mailto:mail@jmrp.io); the issue is still the better channel,
+because the report and the fix stay public next to the code they concern.
 
 That includes errors you find in the standards themselves. Re-deriving formulas
 and recomputing worked examples from the source documents occasionally turns up

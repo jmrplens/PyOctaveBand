@@ -946,3 +946,17 @@ $T_1$/$T_2$ ya medido y emiten un aviso cuando el volumen de la sala o el
 - [Informe de conformidad](https://github.com/jmrplens/phonometry/blob/main/docs/CONFORMANCE.md): los decaimientos en forma cerrada y las
   definiciones de parámetros frente a los que se validan las implementaciones de ISO 18233 / ISO 3382 / ISO 354.
 - Referencia de la API: [`room.room_acoustics`](/phonometry/es/reference/api/rooms/room-acoustics/), [`room.room_ir`](/phonometry/es/reference/api/rooms/room-ir/) y [`room.open_plan`](/phonometry/es/reference/api/rooms/open-plan/).
+
+## Respuestas rápidas
+
+### ¿Cómo se definen EDT, T20 y T30?
+
+Cada banda de la respuesta al impulso se convierte en una curva de decaimiento mediante la integración inversa de Schroeder de la RI al cuadrado, y una recta ajustada por mínimos cuadrados sobre un rango de evaluación se extrapola a una caída completa de 60 dB, $T = -60/\text{slope}$ (ISO 3382-1/2): EDT de 0 a −10 dB (reverberación percibida), T20 de −5 a −25 dB y T30 de −5 a −35 dB.
+
+### ¿Cuánto rango de decaimiento necesito para un T20 o T30 válido?
+
+La ventana de ajuste más un margen de seguridad debe caber dentro de la relación impulso-ruido, la distancia de nivel entre el pico de la RI filtrada en banda y su suelo de ruido: la ISO 3382 exige al menos 35 dB de rango útil de decaimiento para T20 y 45 dB para T30. Un rango escaso sesga el tiempo ajustado hacia arriba, así que `room_parameters` endurece sus indicadores de validez a 46 dB y 54 dB, manteniendo el sesgo dentro de la DAP del 5 %.
+
+### ¿Mido la respuesta al impulso de la sala con un barrido sinusoidal o con una MLS?
+
+Ambos son métodos de deconvolución de ISO 18233 que recuperan la respuesta al impulso con 20–30 dB más de relación señal-ruido efectiva que una fuente impulsiva. Prefiere el barrido sinusoidal exponencial (Anexo B): sitúa la distorsión armónica en tiempos de llegada negativos, donde se descarta. Usa la MLS (Anexo A) cuando la excitación deba ser periódica o el hardware favorezca una señal de dos niveles; es más sensible a la varianza temporal.

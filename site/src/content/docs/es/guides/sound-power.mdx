@@ -1271,3 +1271,34 @@ este módulo no lo calcula a partir de ISO 9613-1.
   C1/C2.
 - Referencia de la API: [`emission.sound_power`](/phonometry/es/reference/api/power/sound-power/), [`emission.sound_power_reverberation`](/phonometry/es/reference/api/power/sound-power-reverberation/) y [`emission.sound_power_intensity`](/phonometry/es/reference/api/power/sound-power-intensity/).
 
+## Respuestas rápidas
+
+### ¿Cuál es la diferencia entre potencia acústica y presión acústica?
+
+La presión acústica depende de dónde te sitúes y de la sala; la potencia
+acústica no. El nivel de potencia acústica `LW` es la energía acústica total
+por segundo que radia una fuente, referida a `P0 = 1 pW`, y es el descriptor
+de emisión independiente del dispositivo que figura en una ficha técnica o
+se contrasta con un límite de emisión de ruido; lo determinan ISO 3744,
+ISO 3741, ISO 9614-2, ISO 3745 e ISO 9614-3.
+
+### ¿Qué significan los grados de precisión en la medición de potencia acústica?
+
+El grado es una afirmación sobre la reproducibilidad: `σR0` es la desviación
+típica que verías si laboratorios distintos midieran la misma fuente, cada
+uno siguiendo la norma correctamente. Los valores ponderados A típicos son
+`σR0 ≈ 0,5 dB` para el grado 1 (ISO 3741), `1,5 dB` para el grado 2
+(ISO 3744, ISO 9614-2) y `3 dB` o más para el grado 3. Un `LWA` de grado 2
+lleva `U ≈ 3 dB`, así que dos resultados de grado 2 separados 2 dB son
+estadísticamente indistinguibles.
+
+### ¿Cómo mido la potencia acústica cuando el ruido de fondo no se puede apagar?
+
+Usa el barrido de intensidad: ISO 9614-2 (grado 2 o 3) o ISO 9614-3
+(grado 1, precisión). Como la intensidad acústica es el flujo neto de
+energía a través de la superficie de medición, se tolera ruido extraño
+estacionario incluso unos 10 dB por encima de la fuente, mientras que el
+método de presión de ISO 3744 necesita el fondo al menos 6 dB por debajo de
+la fuente. Los indicadores de campo por banda deciden después el grado
+realmente alcanzado.
+

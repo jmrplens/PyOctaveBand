@@ -9,6 +9,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Documentation site: a "Quick answers" section (Spanish mirror: "Respuestas
+  rápidas") at the end of ten core guides (levels, filter banks, weighting,
+  calibration, loudness, room acoustics, sound power, field insulation, speech
+  intelligibility, FDTD), three question-formed headings each whose one-
+  paragraph answers are self-contained restatements of the guide's own
+  load-bearing facts. Question-shaped headings are what conversational
+  assistants match against user queries; the site had two across 45 sampled
+  pages.
+- Documentation site: a visible byline under the H1 of every guide and of
+  Getting Started ("By José M. Requena Plens · Published … , updated …",
+  localized on the Spanish pages), surfacing as text what each page already
+  asserted in its JSON-LD, with the author name linking to the About page.
+- Documentation site: the About page states the maintainer's education on the
+  record (Telecommunications Engineer in Sound and Image, Universidad de
+  Alicante, 2011-2018; MSc in Acoustics Engineering, Universitat Politècnica
+  de València, 2018-2019; acoustics researcher at the UPV 2020-2023, the
+  degrees on the public ORCID record) and adds a direct contact address for
+  readers who cannot use the issue tracker.
+- Documentation site: the `#person` entity now carries `alumniOf` and
+  `hasCredential`. The claim lives in the canonical identity document on
+  jmrp.io (published there for every consumer of the entity, not restated
+  per site); this site picks it up through its build-time fetch, and the
+  committed offline snapshot was refreshed to match.
+- Documentation site: a `Content-Security-Policy` meta tag on every page
+  (GitHub Pages cannot send it as a header): everything the site loads is
+  first-party, and the policy pins that fact.
+- Documentation site structured data: the home pages carry a `WebPage` node
+  with a `speakable` pointer (title and tagline), the guides and reference
+  hubs are dual-typed `CollectionPage` (the guides hub linking its existing
+  areas `ItemList` as `mainEntity`), and every article node states
+  `wordCount` and `articleSection`.
 - The documentation site now renders the numerical conformance report itself:
   `/reference/conformance/` and its Spanish mirror carry every conformance
   table, collapsible section by collapsible section, instead of describing the
@@ -157,6 +188,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Documentation site: each KaTeX formula now serialises exactly once for text
+  extractors. The MathML block (whose text a DOM walker emitted alongside the
+  visual layer, so quoted formulas came out doubled and garbled) is removed
+  and the original TeX travels as an `aria-label` on the formula root with
+  `role="math"`, the same pattern GitHub uses for rendered math. Screen
+  readers announce the TeX source; the visual rendering is unchanged.
+- Documentation site: WebP figures now carry intrinsic `width`/`height`
+  attributes like the SVG ones already did (the dimensions are read from the
+  RIFF header at build time), so the browser reserves the right box before
+  the bytes arrive and the page no longer shifts as they load.
+- Documentation site: display formulas and collapsible code sections use CSS
+  `content-visibility: auto`, so the heaviest guides (the two insulation ones
+  run past 10k words) skip layout of what is far below the fold.
+- Documentation site: three guide titles that exceeded 65 characters with the
+  site suffix (atmospheric refraction, data qualification, dynamic stiffness)
+  were shortened so they no longer truncate in search and AI answer snippets.
 - The Zenodo deposition metadata (`.zenodo.json`) describes the library as it
   is. Its title, description and keywords were the octave-band ones: a 323
   character summary and six keywords, none of them naming building acoustics,

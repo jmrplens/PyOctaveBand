@@ -30,11 +30,20 @@ La misma identidad está publicada también en
 [Keyoxide](https://keyoxide.org/0A993B268654DBBA52B7E8D3FCF653391E2C91FC),
 donde figura la clave OpenPGP con la que firmo mi trabajo.
 
-Mi formación es de acústica y de tratamiento de señal, y la librería nació del
-trabajo de medición: necesitaba una y otra vez niveles por bandas de octava y
-magnitudes de sonómetro que pudiera defender frente a una tabla de tolerancias,
-así que los construí bien una sola vez en lugar de volver a deducirlos en cada
-proyecto.
+Mi formación es de acústica y de tratamiento de señal, y está registrada en
+lugar de autodescrita: soy Ingeniero de Telecomunicación especializado en
+Sonido e Imagen por la Universidad de Alicante (2011-2018), cursé el Máster en
+Ingeniería Acústica de la Universitat Politècnica de València (2018-2019) y
+trabajé como investigador en acústica en la UPV de 2020 a 2023, donde publiqué
+sobre metasuperficies acústicas, difusores de sonido y predicción de campos
+acústicos; los artículos están listados en los perfiles de Google Scholar y
+ORCID de arriba. Hoy trabajo en I+D industrial como ingeniero de firmware y
+software.
+
+La librería nació de la parte de medición de ese trabajo: necesitaba una y
+otra vez niveles por bandas de octava y magnitudes de sonómetro que pudiera
+defender frente a una tabla de tolerancias, así que los construí bien una sola
+vez en lugar de volver a deducirlos en cada proyecto.
 
 ## Cómo construyo la librería
 
@@ -83,6 +92,11 @@ El informe más útil me indica la norma y el apartado contra el que estás
 comprobando, el valor esperado, el valor que ha dado phonometry y un fragmento
 de código breve que lo reproduzca. Si no puedes compartir la señal, con los
 parámetros suele bastarme para reconstruir un caso.
+
+Si el gestor de incidencias no es una opción para ti, escríbeme directamente a
+[mail@jmrp.io](mailto:mail@jmrp.io); aun así la incidencia es el mejor
+canal, porque el informe y la corrección quedan públicos junto al código al
+que afectan.
 
 Eso incluye los errores que encuentres en las propias normas. Volver a deducir
 las fórmulas y recalcular los ejemplos resueltos a partir de los documentos

@@ -1236,3 +1236,33 @@ does not compute it from ISO 9613-1 itself.
 - [Theory](/phonometry/reference/theory/environment-transport/): the Waterhouse, K1/K2 and C1/C2 derivations.
 - API reference: [`emission.sound_power`](/phonometry/reference/api/power/sound-power/), [`emission.sound_power_reverberation`](/phonometry/reference/api/power/sound-power-reverberation/) and [`emission.sound_power_intensity`](/phonometry/reference/api/power/sound-power-intensity/).
 
+## Quick answers
+
+### What is the difference between sound power and sound pressure?
+
+Sound pressure depends on where you stand and on the room; sound power does
+not. The sound power level `LW` is the total acoustic energy per second a
+source radiates, referenced to `P0 = 1 pW`, and it is the device-independent
+emission descriptor that goes on a datasheet or is checked against a
+noise-emission limit; ISO 3744, ISO 3741, ISO 9614-2, ISO 3745 and
+ISO 9614-3 all determine it.
+
+### What do the accuracy grades in sound power measurement mean?
+
+The grade is a claim about reproducibility: `σR0` is the standard deviation
+you would see if different laboratories measured the same source, each
+following the standard correctly. Typical A-weighted values are
+`σR0 ≈ 0.5 dB` for grade 1 (ISO 3741), `1.5 dB` for grade 2 (ISO 3744,
+ISO 9614-2) and `3 dB` or more for grade 3. A grade-2 `LWA` carries
+`U ≈ 3 dB`, so two grade-2 results 2 dB apart are statistically
+indistinguishable.
+
+### How do I measure sound power when background noise cannot be switched off?
+
+Use intensity scanning: ISO 9614-2 (grade 2 or 3) or ISO 9614-3 (grade 1,
+precision). Because sound intensity is the net energy flux through the
+measurement surface, steady extraneous noise even some 10 dB above the
+source is tolerated, whereas the ISO 3744 pressure method needs the
+background at least 6 dB below the source. The per-band field indicators
+then decide the grade actually achieved.
+

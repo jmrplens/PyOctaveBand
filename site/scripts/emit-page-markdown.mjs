@@ -4,8 +4,8 @@
 //
 // Why this exists: a page's HTML is roughly 90% chrome. The sidebar alone is
 // ~76 kB on every one of the 442 pages, syntax highlighting adds hundreds of
-// kilobytes of inline attributes to the deepest guides, and KaTeX serialises
-// each formula twice even after the TeX annotation is dropped. The only clean
+// kilobytes of inline attributes to the deepest guides, and each KaTeX formula
+// is still markup-heavy even now that it serialises as text once. The only clean
 // alternative used to be llms-full.txt, which is far too large for a single
 // fetch. Now `/guides/levels/index.md` sits beside `/guides/levels/`, and
 // Head.astro advertises it with <link rel="alternate" type="text/markdown">.

@@ -1156,3 +1156,32 @@ of the
 - [Theory](/phonometry/reference/theory/rooms-buildings/): the reference-curve derivation behind the
   weighted single-number ratings.
 - API reference: [`building.insulation`](/phonometry/reference/api/building/insulation/), [`building.survey_insulation`](/phonometry/reference/api/building/survey-insulation/) and [`building.building_uncertainty`](/phonometry/reference/api/building/building-uncertainty/).
+
+## Quick answers
+
+### What does DnT,w mean?
+
+$D_{nT,w}$ is the weighted standardized level difference. Per
+one-third-octave band, $D_{nT} = D + 10 \log_{10}(T/T_0)$ references the
+receiving-room reverberation time $T$ to $T_0 = 0.5$ s, with
+$D = L_1 - L_2$ the source-to-receiving level difference (ISO 16283-1).
+The ISO 717-1 reference-curve method then collapses the 16 bands from
+100 Hz to 3150 Hz into the single number read at 500 Hz.
+
+### What is the difference between R and R' in sound insulation?
+
+The prime marks where the measurement was made: primed quantities ($R'$,
+$L'_n$, $L'_{nT}$) are measured in the building and include every flanking
+path, while the unprimed $R$ and $L_n$ are laboratory properties of the
+element alone, measured with flanking suppressed. In the field
+(ISO 16283-1), $R' = D + 10 \log_{10}(S/A)$ with partition area $S$ and
+Sabine absorption area $A = 0.16\ V/T$.
+
+### What is the difference between the C and Ctr spectrum adaptation terms?
+
+Both re-rate the same measured curve against the two source spectra of
+ISO 717-1 Annex A: $C$ against A-weighted pink noise (living activities:
+speech, music, radio, television) and $C_{tr}$ against A-weighted urban
+road traffic, whose energy sits at low frequency. $C$ is typically 0 to
+−2 dB, while a lightweight double leaf with a mass-air-mass resonance near
+100 Hz can carry a $C_{tr}$ of −5 to −10 dB.

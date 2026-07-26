@@ -562,6 +562,35 @@ tonal-prominence verdicts in [Prominent Discrete Tones](tone-prominence.md),
 and the ISO 226 equal-loudness contours live with the perception metrics in
 [Loudness](loudness.md).
 
+## Quick answers
+
+### What is the difference between Leq and SEL?
+
+$L_{eq}$ is the equivalent continuous level: the energy mean of the squared
+pressure over the measurement time $T$, referenced to
+$p_0 = 20\ \mu\text{Pa}$. SEL, the sound exposure level ($L_{AE}$ when
+A-weighted), compresses the whole event energy into exactly one second:
+$L_E = L_{eq,T} + 10\log_{10}(T/T_0)$ with $T_0 = 1\ \text{s}$, so events of
+any duration become directly comparable and $N$ identical events sum as
+$+10\log_{10}N$.
+
+### What sound exposure corresponds to 90 dB over an 8-hour working day?
+
+Per IEC 61252:1993, the sound exposure $E$ is the time integral of the
+squared A-weighted pressure, expressed in pascal-squared-hours, and
+$L_{EX,8h}$ (equivalent to $L_{EP,d}$) is the corresponding level normalized
+to 8 h. The anchor worth memorizing: 3.2 Pa²h corresponds to exactly 90 dB
+over 8 h. Half the dose is -3 dB, and double duration at the same level is
++3 dB.
+
+### What penalties does Lden apply to evening and night noise?
+
+$L_{den}$, the day-evening-night level of ISO 1996-1:2016 (3.6.4), adds
++5 dB to the evening level and +10 dB to the night level before
+energy-averaging the whole day, with default periods of 12, 4 and 8 hours,
+adjustable because countries define them differently. The day-night variant
+$L_{dn}$ (3.6.5) keeps only the +10 dB night penalty.
+
 ## References
 
 - International Electrotechnical Commission. (2013). *Electroacoustics —

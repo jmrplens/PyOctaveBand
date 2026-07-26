@@ -359,3 +359,34 @@ de la frecuencia de las Ecs. 4.33-4.35.
 - [Informe de conformidad](/phonometry/es/reference/conformance/): dos de los anclajes
   de validación en forma cerrada del §4 se ejecutan ahí.
 - Referencia de la API: [`simulation.fdtd`](/phonometry/es/reference/api/simulation/fdtd/).
+
+## Respuestas rápidas
+
+### ¿Cómo elijo el paso de malla en FDTD?
+
+Resuelva al menos 10 celdas por longitud de onda más corta,
+``dx <= c_min / (10 f_max)``, con la velocidad de sonido más baja del
+dominio. Con exactamente 10 celdas la cota del error de dispersión sobre el
+eje es alrededor del 1,6 %, reducida a en torno al 1,4 % con el
+``cfl = 0.6`` por defecto, y reducir ``dx`` a la mitad divide el error entre
+cuatro (el esquema es de segundo orden). Con ``dx = 1`` cm el punto de 10
+celdas en aire queda hacia los 3,4 kHz.
+
+### ¿Qué número de Courant mantiene estable una simulación FDTD?
+
+El esquema explícito solo es estable mientras un frente de onda cruce como
+mucho una celda por paso temporal. Con celdas cuadradas el número de Courant
+es $\mathrm{CN} = c\,\Delta t\,\sqrt{2}/\Delta x \le 1$ (Attenborough y Van
+Renterghem, Ec. 4.13). `fdtd_simulation` deriva el paso temporal del
+parámetro `cfl` (el número de Courant, por defecto 0,6) y de la mayor
+velocidad del sonido del mapa, y rechaza los valores fuera de $(0, 1)$.
+
+### ¿Puedo fiarme de los niveles absolutos de una ejecución FDTD 2D?
+
+No. Una fuente puntual 2D es físicamente una fuente lineal infinita: su
+amplitud se expande cilíndricamente como ``1/sqrt(r)``, 3,0 dB por
+duplicación de distancia, en lugar del ``1/r`` esférico (6,0 dB por
+duplicación) de una fuente puntual 3D. Los patrones de interferencia y
+difracción son fieles, pero los niveles absolutos y las tasas de caída no
+son los de una sala 3D; valide cualquier afirmación cuantitativa 3D contra
+una forma cerrada o un solucionador 3D.

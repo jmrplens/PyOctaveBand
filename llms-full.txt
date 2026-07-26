@@ -2546,6 +2546,20 @@ Integer signals (e.g. int16 from `scipy.io.wavfile.read`) are converted to
 float64 internally before any squaring, so calibration and level results are
 identical whether you pass the raw integer array or a float conversion.
 
+## Quick answers
+
+### What calibrator level should I use to calibrate my measurement chain?
+
+The usual choice is 94 dB SPL at 1 kHz (1 Pa RMS), which is what `sensitivity()` assumes with its default `target_spl=94.0`; for a 114 dB calibrator pass `114.0`. IEC 60942 requires the principal level to be at least 90 dB re 20 µPa. Record a few seconds of stable tone, because the standard specifies the generated level as a 20 s average.
+
+### How much drift between the pre and post calibration checks is acceptable?
+
+Derive the sensitivity before each measurement series and check it again at the end: a common criterion invalidates the series when the two differ by more than 0.5 dB. A healthy class 1 chain drifts a few hundredths of a dB over a session, so a half-decibel pre/post difference signals damage rather than weather. Whatever the threshold, carry the difference into the uncertainty budget rather than assuming zero.
+
+### Can I calibrate a class 1 chain with a class 2 calibrator?
+
+You can, but the tolerances chain: a class 1 measurement requires a class 1 (or LS) calibrator per IEC 60942 and a class 1 meter, so a class 2 calibrator silently downgrades every derived level to class 2 accuracy, because its wider level tolerance enters the sensitivity factor $S$ directly. For reference, the class 1 tolerance is ±0.4 dB between 160 Hz and 1.25 kHz (IEC 60942 Table 1).
+
 ## References
 
 - International Electrotechnical Commission. (2017). *Electroacoustics —
@@ -5386,6 +5400,35 @@ the optional field snapshots with their times and the obstacle mask; its
 `.plot()` draws the probe histories, and `.plot(kind="snapshot")` renders
 one recorded field with the geometry overlaid.
 
+## Quick answers
+
+### How do I choose the FDTD grid spacing?
+
+Resolve at least 10 cells per shortest wavelength,
+``dx <= c_min / (10 f_max)``, using the smallest sound speed in the domain.
+At exactly 10 cells the on-axis dispersion error bound is about 1.6 %,
+reduced to about 1.4 % at the default ``cfl = 0.6``, and halving ``dx``
+quarters the error (the scheme is second order). With ``dx = 1`` cm the
+10-cell point in air sits at roughly 3.4 kHz.
+
+### What Courant number keeps an FDTD simulation stable?
+
+The explicit scheme is stable only while a wavefront crosses at most one
+cell per time step. With square cells the Courant number is
+$\mathrm{CN} = c\,\Delta t\,\sqrt{2}/\Delta x \le 1$ (Attenborough & Van
+Renterghem Eq. 4.13). `fdtd_simulation` derives the time step from the
+`cfl` parameter (the Courant number, default 0.6) and the largest sound
+speed in the map, rejecting values outside $(0, 1)$.
+
+### Can I trust the absolute levels from a 2D FDTD run?
+
+No. A 2D point source is physically an infinite line source: its amplitude
+spreads cylindrically as ``1/sqrt(r)``, 3.0 dB per doubling of distance,
+instead of the spherical ``1/r`` (6.0 dB per doubling) of a 3D point source.
+Interference and diffraction patterns are faithful, but absolute levels and
+decay rates are not those of a 3D room; validate any 3D-quantitative claim
+against a closed form or a 3D solver.
+
 ## References
 
 - Attenborough, K., & Van Renterghem, T. (2021). *Predicting outdoor sound*
@@ -6284,6 +6327,34 @@ plt.show()
 ```
 
 </details>
+
+## Quick answers
+
+### How are fractional-octave centre frequencies and band edges defined?
+
+IEC 61260-1:2014 (clauses 5.2-5.5) builds every band from the base-10
+octave ratio $G = 10^{3/10} \approx 1.99526$, so one octave is not exactly
+2. Mid frequencies follow $f_m = 1000 \cdot G^{x/b}$ (for odd $b$) and the
+edges are $f_1 = f_m G^{-1/2b}$ and $f_2 = f_m G^{+1/2b}$; every
+one-third-octave band spans $G^{1/3} \approx 1.2589$, ten bands per decade.
+
+### Which filter architecture meets IEC 61260-1 class 1 with default settings?
+
+With the default order 6, Butterworth meets class 1 of the IEC 61260-1:2014
+Table 1 acceptance limits, and so does Chebyshev II: its default
+`attenuation` of 72 dB clears the 70 dB far-stopband class 1 limit.
+Chebyshev I, Elliptic and Bessel do not: passband ripple (cheby1, ellip)
+and slow roll-off (bessel) violate the mask. `verify_filter_class` reports
+the achieved class per band.
+
+### What is class 0 and which standard defines it?
+
+Class 0 is the tightest filter performance class, defined by IEC 61260:1995
+and its US twin ANSI S1.11-2004 and dropped by IEC 61260-1:2014. Its
+passband corridor allows only ±0.15 dB at mid-band, against ±0.3 dB for
+class 1 in the 1995 masks. It stays available through `edition="1995"`, and
+the default order-6 Butterworth bank meets class 0 in the verified 48 kHz
+configurations.
 
 ## References
 
@@ -9196,6 +9267,35 @@ kept in the repository. Click a preview to open the PDF:
 
 *Survey façade fiche (`SurveyFacadeResult.report`), D2m,nT,w (C; Ctr).*
 
+## Quick answers
+
+### What does DnT,w mean?
+
+$D_{nT,w}$ is the weighted standardized level difference. Per
+one-third-octave band, $D_{nT} = D + 10 \log_{10}(T/T_0)$ references the
+receiving-room reverberation time $T$ to $T_0 = 0.5$ s, with
+$D = L_1 - L_2$ the source-to-receiving level difference (ISO 16283-1).
+The ISO 717-1 reference-curve method then collapses the 16 bands from
+100 Hz to 3150 Hz into the single number read at 500 Hz.
+
+### What is the difference between R and R' in sound insulation?
+
+The prime marks where the measurement was made: primed quantities ($R'$,
+$L'_n$, $L'_{nT}$) are measured in the building and include every flanking
+path, while the unprimed $R$ and $L_n$ are laboratory properties of the
+element alone, measured with flanking suppressed. In the field
+(ISO 16283-1), $R' = D + 10 \log_{10}(S/A)$ with partition area $S$ and
+Sabine absorption area $A = 0.16\ V/T$.
+
+### What is the difference between the C and Ctr spectrum adaptation terms?
+
+Both re-rate the same measured curve against the two source spectra of
+ISO 717-1 Annex A: $C$ against A-weighted pink noise (living activities:
+speech, music, radio, television) and $C_{tr}$ against A-weighted urban
+road traffic, whose energy sits at low frequency. $C$ is typically 0 to
+−2 dB, while a lightweight double leaf with a mass-air-mass resonance near
+100 Hz can carry a $C_{tr}$ of −5 to −10 dB.
+
 ## References
 
 - Hopkins, C. (2007). *Sound insulation*. Butterworth-Heinemann.
@@ -11843,6 +11943,35 @@ tonal-prominence verdicts in [Prominent Discrete Tones](https://jmrplens.github.
 and the ISO 226 equal-loudness contours live with the perception metrics in
 [Loudness](https://jmrplens.github.io/phonometry/guides/loudness/).
 
+## Quick answers
+
+### What is the difference between Leq and SEL?
+
+$L_{eq}$ is the equivalent continuous level: the energy mean of the squared
+pressure over the measurement time $T$, referenced to
+$p_0 = 20\ \mu\text{Pa}$. SEL, the sound exposure level ($L_{AE}$ when
+A-weighted), compresses the whole event energy into exactly one second:
+$L_E = L_{eq,T} + 10\log_{10}(T/T_0)$ with $T_0 = 1\ \text{s}$, so events of
+any duration become directly comparable and $N$ identical events sum as
+$+10\log_{10}N$.
+
+### What sound exposure corresponds to 90 dB over an 8-hour working day?
+
+Per IEC 61252:1993, the sound exposure $E$ is the time integral of the
+squared A-weighted pressure, expressed in pascal-squared-hours, and
+$L_{EX,8h}$ (equivalent to $L_{EP,d}$) is the corresponding level normalized
+to 8 h. The anchor worth memorizing: 3.2 Pa²h corresponds to exactly 90 dB
+over 8 h. Half the dose is -3 dB, and double duration at the same level is
++3 dB.
+
+### What penalties does Lden apply to evening and night noise?
+
+$L_{den}$, the day-evening-night level of ISO 1996-1:2016 (3.6.4), adds
++5 dB to the evening level and +10 dB to the night level before
+energy-averaging the whole day, with default periods of 12, 4 and 8 hours,
+adjustable because countries define them differently. The day-night variant
+$L_{dn}$ (3.6.5) keeps only the +10 dB night penalty.
+
 ## References
 
 - International Electrotechnical Commission. (2013). *Electroacoustics —
@@ -12383,6 +12512,20 @@ plt.show()
 Returns an `EcmaLoudness`: `loudness` (N, sone_HMS), `specific_loudness`
 (N′(z), 53 bands), `bark`, `centre_frequencies`, `time`, `loudness_vs_time`
 (N(l) at 187.5 Hz), `field`.
+
+## Quick answers
+
+### What is the difference between loudness in sones and loudness level in phons?
+
+Loudness N in sones (ISO 532-1) is a ratio scale of perceived loudness: 4 sones is twice as loud as 2 sones, and by definition a 1 kHz tone at 40 dB SPL is 1 sone. Loudness level in phons (ISO 226) is the SPL of an equally loud 1 kHz pure tone, and every +10 phon doubles the sone value.
+
+### Which loudness model should I choose: Zwicker, Moore-Glasberg or Sottek?
+
+The Zwicker method (ISO 532-1:2017) is the reference: stationary and time-varying, one-third-octave input, fast and widely cited. Moore-Glasberg (ISO 532-2:2017) is stationary, builds roex excitation patterns and models binaural summation explicitly; ISO 532-3:2023 adds time-varying short- and long-term loudness with the peak N_max. The Sottek model (ECMA-418-2:2025) reports sone_HMS and shares its auditory front-end with the ECMA tonality and roughness metrics.
+
+### Over what range are the ISO 226:2023 equal-loudness contours valid?
+
+ISO 226:2023 clause 4.1 defines the normal equal-loudness-level contours from 20 to 90 phon, evaluated at the 29 preferred third-octave frequencies of Table 1; above 80 phon the formula is valid only up to 4 kHz, so the 90 phon contour stops there and no higher contours are defined. The contours describe pure tones, not arbitrary signals.
 
 ## References
 
@@ -19931,6 +20074,20 @@ shape of `t60`; `absorption_coefficient()` returns `alpha_s`;
   reference-curve derivation.
 - API reference: [`room.room_acoustics`](https://jmrplens.github.io/phonometry/reference/api/rooms/room-acoustics/), [`room.room_ir`](https://jmrplens.github.io/phonometry/reference/api/rooms/room-ir/) and [`room.open_plan`](https://jmrplens.github.io/phonometry/reference/api/rooms/open-plan/).
 
+## Quick answers
+
+### How are EDT, T20 and T30 defined?
+
+Each band of the impulse response is turned into a decay curve by Schroeder backward integration of the squared IR, and a least-squares line fitted over an evaluation range is extrapolated to a full 60 dB drop, $T = -60/\text{slope}$ (ISO 3382-1/2): EDT over 0 to −10 dB (perceived reverberance), T20 over −5 to −25 dB and T30 over −5 to −35 dB.
+
+### How much decay range do I need for a valid T20 or T30?
+
+The fit window plus a safety margin must fit inside the impulse-to-noise ratio, the level distance between the band-filtered IR peak and its noise floor: ISO 3382 requires at least 35 dB of usable decay range for T20 and 45 dB for T30. An undersized range biases the fitted time upward, so `room_parameters` tightens its validity flags to 46 dB and 54 dB, keeping the bias inside the 5 % JND.
+
+### Should I measure the room impulse response with a sine sweep or an MLS?
+
+Both are ISO 18233 deconvolution methods that recover the impulse response with 20–30 dB more effective signal-to-noise ratio than an impulsive source. Prefer the exponential sine sweep (Annex B): it places harmonic distortion at negative arrival times, where it is discarded. Use MLS (Annex A) when the excitation must be periodic or the hardware favours a two-level signal; it is more sensitive to time variance.
+
 ## References
 
 - Kuttruff, H. (2016). *Room acoustics* (6th ed.). CRC Press.
@@ -22330,6 +22487,36 @@ the clause 6.2 verification verdict.*
 - [Theory](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/): the Waterhouse, K1/K2 and C1/C2 derivations.
 - API reference: [`emission.sound_power`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power/), [`emission.sound_power_reverberation`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-reverberation/) and [`emission.sound_power_intensity`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-intensity/).
 
+## Quick answers
+
+### What is the difference between sound power and sound pressure?
+
+Sound pressure depends on where you stand and on the room; sound power does
+not. The sound power level `LW` is the total acoustic energy per second a
+source radiates, referenced to `P0 = 1 pW`, and it is the device-independent
+emission descriptor that goes on a datasheet or is checked against a
+noise-emission limit; ISO 3744, ISO 3741, ISO 9614-2, ISO 3745 and
+ISO 9614-3 all determine it.
+
+### What do the accuracy grades in sound power measurement mean?
+
+The grade is a claim about reproducibility: `σR0` is the standard deviation
+you would see if different laboratories measured the same source, each
+following the standard correctly. Typical A-weighted values are
+`σR0 ≈ 0.5 dB` for grade 1 (ISO 3741), `1.5 dB` for grade 2 (ISO 3744,
+ISO 9614-2) and `3 dB` or more for grade 3. A grade-2 `LWA` carries
+`U ≈ 3 dB`, so two grade-2 results 2 dB apart are statistically
+indistinguishable.
+
+### How do I measure sound power when background noise cannot be switched off?
+
+Use intensity scanning: ISO 9614-2 (grade 2 or 3) or ISO 9614-3 (grade 1,
+precision). Because sound intensity is the net energy flux through the
+measurement surface, steady extraneous noise even some 10 dB above the
+source is tolerated, whereas the ISO 3744 pressure method needs the
+background at least 6 dB below the source. The per-band field indicators
+then decide the grade actually achieved.
+
 ## References
 
 - Fahy, F. J. (1995). *Sound intensity* (2nd ed.). E&FN Spon.
@@ -23648,6 +23835,31 @@ repository. Click the preview to open the PDF:
 [![ANSI S3.5-1997 SII example report: a metadata header, a one-third-octave-band table of the equivalent speech spectrum, band importance and band audibility, the audibility bars, the boxed SII = 0.851 single number and a PASS verdict against a 0.75 minimum](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/ansi_s3_5_sii_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/ansi_s3_5_sii_example.pdf)
 
 *Speech intelligibility index fiche (`SIIResult.report`), the SII with its per-band audibility.*
+
+## Quick answers
+
+### Which frequency bands matter most for speech intelligibility?
+
+In the one-third-octave-band method of ANSI S3.5-1997, the band-importance function $I_i$ (Table 3, average speech material) sums to one across 18 bands from 160 Hz to 8000 Hz. The five bands from 1250 Hz to 3150 Hz carry about 43 % of intelligibility (the consonant cues), while the five lowest bands, 160 Hz to 400 Hz, carry about 11 % despite holding nearly half of the speech power.
+
+### How is the Speech Intelligibility Index calculated?
+
+The SII of ANSI S3.5-1997 clause 6 is the band-importance-weighted sum of the
+band audibilities, $\text{SII} = \sum_i I_i A_i$, over 18 one-third-octave
+bands. Each band audibility is
+$A_i = \operatorname{clip}\!\left((E_i' - D_i + 15)/30,\; 0,\; 1\right)$
+(clause 5.8), where $E_i'$ is the equivalent speech spectrum level and $D_i$
+the equivalent disturbance combining external noise, upward spread of masking
+and the equivalent internal noise. The index lies in $[0, 1]$.
+
+### When should I use the SII instead of the STI?
+
+Use the SII (ANSI S3.5) when the question is whether enough of the speech
+spectrum is audible at the listener's ear: it captures steady noise, upward
+spread of masking, hearing loss and vocal effort, but it is blind to
+reverberation. The STI (IEC 60268-16) rates a transmission channel, how much
+of the speech modulation a room or sound system preserves. When both
+mechanisms are in play, compute both.
 
 ## References
 
@@ -30998,6 +31210,20 @@ plt.show()
 ```
 
 </details>
+
+## Quick answers
+
+### When should I use C-weighting instead of A-weighting?
+
+Use C-weighting for peak sound pressure and high-level noise, and use the difference $L_{Ceq} - L_{Aeq}$ as a low-frequency indicator: below about 10 dB the A-weighted level rates the spectrum fairly, while around 15 to 20 dB or more the energy is concentrated at low frequencies and the A-weighted level understates the problem. The HML method of ISO 4869-2 keys on exactly this C minus A difference for hearing-protector selection.
+
+### Which weighting should I use for infrasound below 20 Hz?
+
+Use the G frequency weighting of ISO 7196:1995, which rates infrasound the way A-weighting rates audible noise. It has 0 dB gain at 10 Hz, rises at 12 dB/octave from 1 Hz to 20 Hz and falls off at 24 dB/octave outside that band. Apply it to sources such as wind turbines, HVAC and blasting, and report levels as $L_{pG}$ (or $L_{Geq}$ for the equivalent level over time).
+
+### Is A-weighting accurate near 16 kHz at a 48 kHz sample rate?
+
+Not with a plain bilinear design: at fs = 48 kHz the A-curve error reaches −2.7 dB at 12.5 kHz, outside the IEC 61672-1 class 1 tolerance (+2.0/−2.5 dB). The default `high_accuracy=True` oversamples internally (up to 8×, reaching 144 kHz or more at common audio rates) and keeps the response within class 1 tolerances up to 16 kHz, with an error of about −0.5 dB at 12.5 kHz.
 
 ## References
 
