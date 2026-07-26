@@ -119,6 +119,13 @@ function holdsCurrent(entries: SidebarEntry[]): boolean {
 				class: landingClass,
 				...landingAttrs
 			} = landing?.attrs ?? {};
+			const badge = group.badge && (
+				<Badge
+					variant={group.badge.variant}
+					class={group.badge.class}
+					text={group.badge.text}
+				/>
+			);
 			const labelLink = landing ? (
 				<a
 					class:list={['group-label', landingClass]}
@@ -127,13 +134,7 @@ function holdsCurrent(entries: SidebarEntry[]): boolean {
 					{...landingAttrs}
 				>
 					<span class="large">{group.label}</span>
-					{group.badge && (
-						<Badge
-							variant={group.badge.variant}
-							class={group.badge.class}
-							text={group.badge.text}
-						/>
-					)}
+					{badge}
 				</a>
 			) : undefined;
 			const caret = (
@@ -150,13 +151,6 @@ function holdsCurrent(entries: SidebarEntry[]): boolean {
 				>
 					<polyline points="6 9 12 15 18 9" />
 				</svg>
-			);
-			const badge = group.badge && (
-				<Badge
-					variant={group.badge.variant}
-					class={group.badge.class}
-					text={group.badge.text}
-				/>
 			);
 			let header;
 			if (collapsible && landing) {
