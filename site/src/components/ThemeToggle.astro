@@ -1,0 +1,130 @@
+---
+/**
+ * Mobile theme control: a toggle button, not a menu.
+ *
+ * One tap flips light and dark. "Auto" is implicit and stays out of the
+ * cycle: with nothing stored the site follows the system preference and keeps
+ * following it live, and the first tap is what turns an inferred theme into a
+ * stored choice. Starlight's own select, which does carry an explicit Auto
+ * option, is still in the mobile menu for anyone who wants to hand the
+ * decision back to the system.
+ *
+ * No theme state is forked. The button never writes the theme itself: it sets
+ * the value on Starlight's own `<select>` and fires its `change` event, so
+ * the site ends up in exactly the state it would have been in had the reader
+ * picked that option from the menu (`StarlightThemeProvider.updatePickers()`,
+ * `document.documentElement.dataset.theme`, and the `starlight-theme` key in
+ * localStorage, all written by Starlight's handler). The button then reads
+ * its own state back from `data-theme` on <html>, which is the output of that
+ * same path, so the toggle, the desktop select and the before-paint script
+ * cannot disagree.
+ *
+ * The icon shows the mode the tap would GIVE you, not the mode you are in,
+ * and the accessible name says the same thing in words ("Switch to dark
+ * theme"). Both are driven by `data-theme`: the icon by CSS, the name by the
+ * observer below, so they cannot drift out of step with each other or with
+ * the page.
+ */
+import { Icon } from '@astrojs/starlight/components';
+
+const { lang } = Astro.locals.starlightRoute;
+const isEs = lang.startsWith('es');
+const copy = isEs
+	? { toDark: 'Cambiar al tema oscuro', toLight: 'Cambiar al tema claro' }
+	: { toDark: 'Switch to dark theme', toLight: 'Switch to light theme' };
+---
+
+<button
+	type="button"
+	class="theme-toggle"
+	data-theme-toggle
+	data-to-dark={copy.toDark}
+	data-to-light={copy.toLight}
+	aria-label={copy.toDark}
+>
+	{/* Rendered for both directions; CSS shows the one that matches the tap. */}
+	<Icon name="moon" class="to-dark" size="1.25rem" />
+	<Icon name="sun" class="to-light" size="1.25rem" />
+</button>
+
+{/* Inlined next to the button so the label is right from the first paint,
+    the same reason Starlight inlines its own picker sync. */}
+<script is:inline>
+	(() => {
+		const root = document.documentElement;
+		const buttons = document.querySelectorAll('[data-theme-toggle]');
+		if (!buttons.length) return;
+
+		/** What the page is showing right now, per Starlight's own attribute. */
+		const current = () => (root.dataset.theme === 'light' ? 'light' : 'dark');
+		/** What a tap would give you. */
+		const next = () => (current() === 'dark' ? 'light' : 'dark');
+
+		const sync = () => {
+			const to = next();
+			for (const button of buttons) {
+				button.setAttribute(
+					'aria-label',
+					to === 'dark' ? button.dataset.toDark : button.dataset.toLight,
+				);
+			}
+		};
+		sync();
+		// The attribute is written by Starlight: on first paint, on a pick from
+		// either select, and on a system change while nothing is stored. Reading
+		// it back is what keeps this button honest in all three cases.
+		new MutationObserver(sync).observe(root, { attributeFilter: ['data-theme'] });
+
+		for (const button of buttons) {
+			button.addEventListener('click', () => {
+				const to = next();
+				const select = document.querySelector('starlight-theme-select select');
+				if (select) {
+					select.value = to;
+					select.dispatchEvent(new Event('change', { bubbles: true }));
+				}
+				// Only if Starlight's custom element has not upgraded yet, which
+				// can only happen in the moment before its module runs. Same key,
+				// same picker sync, so it lands in the same state.
+				if (root.dataset.theme !== to) {
+					root.dataset.theme = to;
+					try {
+						localStorage.setItem('starlight-theme', to);
+					} catch {}
+					window.StarlightThemeProvider?.updatePickers(to);
+					sync();
+				}
+			});
+		}
+	})();
+</script>
+
+<style>
+	.theme-toggle {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		inline-size: 2.75rem;
+		block-size: 2.5rem;
+		padding: 0;
+		border: 0;
+		border-radius: var(--ph-radius, 4px);
+		background: none;
+		color: var(--sl-color-gray-1);
+		cursor: pointer;
+	}
+	.theme-toggle:hover {
+		color: var(--sl-color-white);
+		background: var(--sl-color-gray-6);
+	}
+	/* The icon is the mode the tap would give you: the moon while the page is
+	   light, the sun while it is dark. */
+	.theme-toggle :global(.to-dark),
+	.theme-toggle :global(.to-light) {
+		display: none;
+	}
+	:global(:root[data-theme='light']) .theme-toggle :global(.to-dark),
+	:global(:root[data-theme='dark']) .theme-toggle :global(.to-light) {
+		display: block;
+	}
+</style>

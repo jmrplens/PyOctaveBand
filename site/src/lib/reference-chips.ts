@@ -33,20 +33,26 @@ export interface Chip {
 }
 
 /**
- * Caps for the header run. Five standards plus three named works is the most
- * that still fits on one line at a desktop reading width, and one line is
- * what makes the run read as a dateline instead of a block. Anything past the
- * caps folds into a single "+N more" link to the References section, which is
- * the honest answer for a literature-heavy page: the bibliography is right
- * there.
+ * Cap for the header run: nine chips, whatever they are, and a tenth slot for
+ * the "+N more" link to the References section when the page has more. The
+ * budget is the run as a whole rather than one cap per category, so a page
+ * governed by nine standards shows nine of them and a page built on nine
+ * papers shows nine of those.
+ *
+ * The one thing the whole-run budget must not do is starve a category: a page
+ * with twelve standards and two papers would otherwise show no papers at all,
+ * and the second category is exactly what the run exists to state. So the
+ * named works keep a reservation of up to `RESERVED_REFERENCES` slots when
+ * the page has any, the standards take the rest, and anything the standards
+ * leave unused goes back to the works.
  *
  * Which entries survive the cap is deterministic: entries flagged
  * `primary: true` in the frontmatter come first, everything else keeps
- * frontmatter order. A page whose bibliography is longer than the caps should
+ * frontmatter order. A page whose bibliography is longer than the cap should
  * flag the sources it actually leans on.
  */
-export const MAX_STANDARDS = 5;
-export const MAX_REFERENCES = 3;
+export const MAX_CHIPS = 9;
+export const RESERVED_REFERENCES = 3;
 
 function slug(value: string): string {
 	return value
@@ -175,8 +181,12 @@ export function pageChips(references: readonly Reference[] | undefined, isEs: bo
 		(chip.kind === 'standard' ? standards : named).push({ ...chip, anchor: anchors[index]! });
 	}
 
-	const shownStandards = Math.min(standards.length, MAX_STANDARDS);
-	const shownReferences = Math.min(named.length, MAX_REFERENCES);
+	// Standards first, out of a budget for the whole run, with the named works
+	// holding a reservation so a standards-heavy page still states what its
+	// methods are attributed to. Whatever the standards do not use goes back.
+	const reserved = Math.min(named.length, RESERVED_REFERENCES);
+	const shownStandards = Math.min(standards.length, MAX_CHIPS - reserved);
+	const shownReferences = Math.min(named.length, MAX_CHIPS - shownStandards);
 	return {
 		standards: standards.slice(0, shownStandards),
 		references: named.slice(0, shownReferences),

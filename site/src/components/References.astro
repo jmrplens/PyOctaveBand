@@ -225,11 +225,25 @@ const sorted = [...references.entries()].sort(([, a], [, b]) =>
 	.page-references li + li {
 		margin-top: 0.75rem;
 	}
-	/* Landing spot for the page header chips: clear the sticky header, and
-	   mark the entry that was jumped to so the reader sees which of a long
-	   list answered the click. */
+	/* Landing spot for the page header chips, declared once for every target
+	   they can point at: the entries, and the section heading that the
+	   "+N more" chip jumps to. Starlight's own `scroll-padding-top` on the
+	   scroll container already clears the sticky chrome (the header, plus the
+	   mobile table of contents bar, which is why a phone needs more than a
+	   desktop); this is the breathing room on top of it. The heading used to
+	   have none of it, so the same click that put an entry a comfortable way
+	   down the viewport left the heading jammed against the sticky bar. One
+	   custom property, one rule, both targets: they cannot drift apart again.
+
+	   Also mark the entry that was jumped to, so the reader sees which of a
+	   long list answered the click. */
+	.page-references {
+		--ph-ref-landing: calc(var(--sl-nav-height) + 1rem);
+	}
+	.page-references .sl-heading-wrapper,
+	.page-references h2,
 	.page-references li {
-		scroll-margin-top: calc(var(--sl-nav-height) + 1rem);
+		scroll-margin-top: var(--ph-ref-landing);
 	}
 	.page-references li:target {
 		background: var(--sl-color-gray-6);

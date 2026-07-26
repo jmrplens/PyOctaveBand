@@ -1,8 +1,9 @@
 ---
 // Custom header: identical to Starlight's default, plus a mobile-visible
-// language selector (the default hides the whole right group behind the
-// hamburger menu below the md breakpoint).
+// theme toggle and language selector (the default hides the whole right
+// group behind the hamburger menu below the md breakpoint).
 import config from 'virtual:starlight/user-config';
+import ThemeToggle from './ThemeToggle.astro';
 
 import LanguageSelect from 'virtual:starlight/components/LanguageSelect';
 import Search from 'virtual:starlight/components/Search';
@@ -22,7 +23,7 @@ const shouldRenderSearch =
 		{shouldRenderSearch && <Search />}
 	</div>
 	<div class="sl-flex md:sl-hidden print:hidden mobile-controls">
-		<ThemeSelect />
+		<ThemeToggle />
 		<LanguageSelect />
 	</div>
 	<div class="sl-hidden md:sl-flex print:hidden right-group">
@@ -65,11 +66,12 @@ const shouldRenderSearch =
 		/* Below the md breakpoint Starlight hides the whole right group behind
 		   the hamburger, which buries both the language picker and the theme
 		   control. Both are surfaced here instead, in the desktop order
-		   (theme, then language), as icon-and-caret stubs: the wordy label is
-		   hidden so the narrow bar (logo · search · theme · language · menu)
-		   still fits on a 360 px phone. The accessible name is unaffected,
-		   since it comes from the visually-hidden <span> inside each label,
-		   and the theme icon itself still reports the current state. */
+		   (theme, then language). The language picker is still a select,
+		   reduced to an icon-and-caret stub so the narrow bar (logo · search ·
+		   theme · language · menu) still fits on a 360 px phone; its
+		   accessible name is unaffected, since it comes from the
+		   visually-hidden <span> inside the label. The theme control is not a
+		   select at all here but a one-tap toggle: see ThemeToggle.astro. */
 		.mobile-controls {
 			align-items: center;
 			gap: 0.25rem;
@@ -81,11 +83,6 @@ const shouldRenderSearch =
 		}
 		.mobile-controls :global(option) {
 			color: var(--sl-color-text);
-		}
-		/* The theme stub is a hair narrower: its caret and icon are the same
-		   size but it never has to hint at a longer word behind them. */
-		.mobile-controls :global(starlight-theme-select select) {
-			width: 2.75rem;
 		}
 
 		@media (min-width: 50rem) {
