@@ -5,8 +5,6 @@ sidebar:
   label: "fdtd"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 2D acoustic finite-difference time-domain (FDTD) simulation.
 
 A staggered-grid (Yee-style) pressure-velocity leapfrog solver for the
@@ -42,6 +40,8 @@ free-field pulse arrival times and cylindrical `1/sqrt(r)` amplitude
 decay, the image-source echo of a rigid wall, the normal-incidence
 reflection coefficient `(Z - rho c)/(Z + rho c)` of an impedance edge,
 and second-order convergence under grid refinement.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## CWSource
 

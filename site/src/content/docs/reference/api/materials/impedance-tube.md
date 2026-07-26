@@ -5,8 +5,6 @@ sidebar:
   label: "impedance_tube"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Impedance-tube material characterisation.
 
 Three complementary standardised methods are implemented, each kept in its
@@ -41,6 +39,8 @@ own sign convention (they are **not** interchangeable):
 The two standards adopt different sign ansaetze and different temperature
 units on purpose; the helpers are named per standard so the two are never
 mixed.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## absorption_from_reflection
 

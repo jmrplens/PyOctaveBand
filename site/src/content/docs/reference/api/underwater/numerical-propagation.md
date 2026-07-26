@@ -5,8 +5,6 @@ sidebar:
   label: "numerical_propagation"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Numerical models of underwater sound propagation (range-independent ocean).
 
 Three complementary numerical solvers for the acoustic field in a
@@ -31,6 +29,8 @@ transmission loss for a range-independent waveguide.
 
 Densities are in kg/m3, sound speeds in m/s, depths and ranges in metres,
 frequencies in Hz. The water column has a pressure-release surface at z = 0.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## normal_modes
 

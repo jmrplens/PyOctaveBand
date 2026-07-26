@@ -5,8 +5,6 @@ sidebar:
   label: "porous_absorber"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Porous-material models and multilayer absorber prediction.
 
 Three complementary building blocks, all in the `e^{+j w t}` time
@@ -67,6 +65,8 @@ medium has `Im(k) < 0`):
   with the closed form for locally reacting surfaces implemented in
   [`statistical_absorption`](/phonometry/reference/api/materials/porous-absorber/#statistical_absorption) (its maximum over passive impedances is the
   published 0.951).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## AirLayer
 

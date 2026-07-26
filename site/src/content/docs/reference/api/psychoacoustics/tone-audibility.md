@@ -5,8 +5,6 @@ sidebar:
   label: "tone_audibility"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Objective audibility of tones in noise -- engineering method (ISO/PAS 20065:2016).
 
 ISO/PAS 20065 is the detailed engineering method that ISO 1996-2:2017 defers to
@@ -91,6 +89,8 @@ edge-steepness test follows the DIN 45681 `fT/sqrt(2)`-on-both-edges
 reading, matching its executable Annex J reference program; the ISO/PAS
 20065 print shows asymmetric formulas that contradict it (see
 `_is_distinct` and docs/ERRATA.md).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## analyze_spectrum
 

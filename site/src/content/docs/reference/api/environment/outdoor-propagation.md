@@ -5,8 +5,6 @@ sidebar:
   label: "outdoor_propagation"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Outdoor sound propagation: ISO 9613-2:1996 general method of calculation.
 
 This part of ISO 9613 predicts octave-band attenuation of sound propagating
@@ -45,6 +43,8 @@ The long-term average level follows from the meteorological correction `Cmet`
 annex A) and reflections from vertical obstacles (clause 7.5) are informative and
 left to the caller. Accuracy of the method is stated in Table 5 (clause 9): within
 +/-1 dB to +/-3 dB for broadband noise up to 1000 m.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## atmospheric_absorption
 

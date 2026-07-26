@@ -5,8 +5,6 @@ sidebar:
   label: "inversion"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Regularized spectral inversion with frequency-dependent regularization.
 
 Inverting a measured transfer function -- to equalize a measurement
@@ -38,6 +36,8 @@ The closed forms above are the module's oracles: in-band the equalized
 magnitude `|H*H_inv|` deviates from unity by exactly
 `epsilon/( |H|**2 + epsilon )`, and out-of-band the filter gain never
 exceeds the `1/(2*sqrt(epsilon))` bound.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## InverseFilterResult
 

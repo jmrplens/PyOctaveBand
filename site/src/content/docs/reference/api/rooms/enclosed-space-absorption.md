@@ -5,8 +5,6 @@ sidebar:
   label: "enclosed_space_absorption"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Sound absorption in enclosed spaces (EN 12354-6:2003).
 
 Estimates the total equivalent sound absorption area of a room and the
@@ -29,6 +27,8 @@ standard's `c0 = 345.6 m/s` the factor `55.3/c0` is the familiar `0.16`.
 
 The informative Annex D method for irregular spaces / uneven absorption
 distribution is out of scope.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## air_absorption_area
 

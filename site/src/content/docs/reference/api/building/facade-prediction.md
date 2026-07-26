@@ -5,8 +5,6 @@ sidebar:
   label: "facade_prediction"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Façade sound insulation and outdoor radiation prediction (EN 12354-3/-4:2000).
 
 Two companion prediction models for the building envelope, both built on the
@@ -57,6 +55,8 @@ Single-number ratings reuse EN ISO 717-1 via [`phonometry.weighted_rating`](/pho
 (exact for `R'w + Ctr`, a good approximation for `R'w`, Part 3 NOTE 7).
 
 Clause/formula citations refer to EN 12354-3:2000 or EN 12354-4:2000.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## facade_shape_level_difference
 

@@ -5,8 +5,6 @@ sidebar:
   label: "tonality_ecma"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Psychoacoustic tonality per ECMA-418-2:2025 (4th ed., Sottek Hearing Model).
 
 Clean-room implementation of the tonality signal chain of ECMA-418-2:2025
@@ -30,6 +28,8 @@ that a 1 kHz sinusoid at 40 dB SPL yields 1 tu_HMS.
 The API is monaural; analyse each channel separately. (Unlike its
 roughness and loudness, ECMA-418-2 defines no binaural combination for
 tonality.)
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## EcmaTonality
 

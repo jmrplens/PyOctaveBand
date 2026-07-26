@@ -5,8 +5,6 @@ sidebar:
   label: "roughness_ecma"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Psychoacoustic roughness per ECMA-418-2:2025 (4th ed., Sottek Hearing Model).
 
 Clean-room implementation of the roughness signal chain of ECMA-418-2:2025
@@ -50,6 +48,8 @@ the defined 1 asper. Note the level convention: Clause 7 states the *sound
 pressure level of the signal* (its overall RMS level), not the level of the
 unmodulated carrier -- a fully modulated signal whose carrier alone sits at
 60 dB is +1.76 dB hot overall and reads ~4 % high.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## EcmaRoughness
 

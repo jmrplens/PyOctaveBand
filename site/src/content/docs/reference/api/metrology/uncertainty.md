@@ -5,8 +5,6 @@ sidebar:
   label: "uncertainty"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Measurement uncertainty by the GUM and its Monte Carlo supplement.
 
 Implements the two propagation methods of the *Guide to the Expression of
@@ -33,6 +31,8 @@ Supplement 1 clause 7.9 and the shortest coverage interval of 5.3.4 are not
 implemented; its inputs are sampled independently (the multivariate-Gaussian
 path of 6.4.8 for non-independent quantities is not implemented -- use
 [`combine_uncertainty`](/phonometry/reference/api/metrology/uncertainty/#combine_uncertainty) with `correlation` for correlated budgets).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## combine_uncertainty
 

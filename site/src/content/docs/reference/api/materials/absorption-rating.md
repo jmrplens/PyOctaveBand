@@ -5,8 +5,6 @@ sidebar:
   label: "absorption_rating"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Single-number rating of sound absorption (ISO 11654:1997).
 
 From one-third-octave sound absorption coefficients `alpha_s` measured in
@@ -51,6 +49,8 @@ of 0,05 these ranges partition the grid exactly.
 The rating is defined only over the whole reference range 250 Hz to
 4000 Hz (Clause 1); the 125 Hz octave that is customarily plotted is not
 part of the shift and is not produced here.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## absorption_class
 

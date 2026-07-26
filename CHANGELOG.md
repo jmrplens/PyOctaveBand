@@ -202,6 +202,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   every entry, `isBasedOn` and `about` for the standards the page implements,
   with one stable `@id` per work minted on the bibliography page so a standard
   is a single entity cited by many pages rather than a repeated string.
+- The generated API reference pages lead with what the module does. All 120
+  opened with the "auto-generated, do not edit by hand" provenance note, so a
+  maintenance instruction was the search snippet and the `speakable` target on
+  every one of them; the note now follows the module summary.
+- The conformance report page carries `Dataset` structured data, with its
+  column schema, its download URL and the DOI. It is the most citable object
+  the project has and it was typed as an article about a report rather than as
+  the report.
 - The generated API reference pages describe themselves with the module's own
   docstring summary. They previously all read "Public API of
   phonometry.<module> (auto-generated)", which restates the URL, while the page

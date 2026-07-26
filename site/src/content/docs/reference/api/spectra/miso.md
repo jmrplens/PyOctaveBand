@@ -5,8 +5,6 @@ sidebar:
   label: "miso"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Multiple and partial coherence of a multiple-input/single-output system.
 
 When several partially correlated sources drive one response, the ordinary
@@ -48,6 +46,8 @@ The random errors follow Bendat & Piersol Section 9.3: conditioning on the
 `i-1` preceding inputs costs `i-1` degrees of freedom, so the `i`-th
 ordered input carries `nd-(i-1)` effective averages (Eqs. 9.100/9.101) and
 the `q`-input multiple coherence carries `nd-(q-1)` (Eqs. 9.98/9.99).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## miso_coherence
 

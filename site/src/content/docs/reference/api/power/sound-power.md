@@ -5,8 +5,6 @@ sidebar:
   label: "sound_power"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Sound power level of a noise source from sound pressure measurements over an
 enveloping measurement surface: ISO 3744:2010 (engineering, accuracy grade 2)
 and ISO 3746:2010 (survey, accuracy grade 3).
@@ -42,6 +40,8 @@ ISO 3746:2010 shares the surfaces, the energy average and the LW/K1/K2 forms
 but is coarser: fewer microphone positions (clause 8.2.1), a background
 criterion of 3 dB instead of 6 dB (clause 8.4.1) and validity up to
 `K2A <= 7 dB` instead of `4 dB` (clause 4.3).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## background_noise_correction
 

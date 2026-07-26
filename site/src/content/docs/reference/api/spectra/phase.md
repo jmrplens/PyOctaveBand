@@ -5,8 +5,6 @@ sidebar:
   label: "phase"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Phase utilities: minimum phase, group delay and excess phase.
 
 For a causal, stable, minimum-phase system the log-magnitude and the phase
@@ -42,6 +40,8 @@ and zeros inside the unit circle) sampled on an adequate grid the
 reconstruction matches the true phase to better than `1e-12` rad -- the
 tolerance the biquad oracle pins in the tests; near-circle zeros on
 coarse grids degrade it and are what `oversample` mitigates.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## excess_phase
 

@@ -5,8 +5,6 @@ sidebar:
   label: "piston"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Radiation of a rigid circular piston set in an infinite baffle.
 
 The baffled circular piston is the canonical acoustic radiator: a flat rigid
@@ -61,6 +59,8 @@ the **directivity index** `DI = 10 log10 Q` follow from integrating
 
 which tends to `Q = 2` (`DI = 3.01 dB`, the half-space baffle gain) at low
 `ka` and to `Q ~ (ka)^2` (`DI ~ 20 log10 ka`) at high `ka`.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## piston_directivity
 

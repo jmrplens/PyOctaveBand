@@ -5,8 +5,6 @@ sidebar:
   label: "junction_transmission"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Bending-wave transmission coefficients for rigid plate junctions
 (Hopkins 2007, *Sound Insulation*, Section 5.2.1.3; Cremer et al. 1973;
 Craik 1981, 1996).
@@ -133,6 +131,8 @@ tau_bar_21` with `chi = sqrt(fc_2 / fc_1)`) this form is symmetric,
 averages of the two directions are linked by
 `tau_bar_ij = tau_bar_ji sqrt(h_i cL_i / (h_j cL_j)) = tau_bar_ji sqrt(fc_j /
 fc_i)`, i.e. `tau_bar_12 = chi tau_bar_21`.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## angular_average_transmission_coefficient
 

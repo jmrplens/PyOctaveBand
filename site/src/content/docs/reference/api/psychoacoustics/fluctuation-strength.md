@@ -5,8 +5,6 @@ sidebar:
   label: "fluctuation_strength"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Fluctuation strength after Fastl & Zwicker / Osses et al.
 
 Fluctuation strength `F` (unit: vacil) rates the slow loudness fluctuations of
@@ -48,6 +46,8 @@ noise itself).
 ECMA-418-2:2025 (4th ed.) introduced a normative hearing-model fluctuation
 strength (its Clause 9, block size 65536); this module implements the
 Osses/Fastl & Zwicker model, not that method.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## fluctuation_strength
 

@@ -5,8 +5,6 @@ sidebar:
   label: "pile_driving_noise"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Radiated underwater sound from percussive pile driving (ISO 18406:2017).
 
 Percussive pile driving radiates a train of impulsive acoustic pulses, one per
@@ -20,6 +18,8 @@ hammer strike. ISO 18406 characterises them with:
 * [`pile_strike_metrics`](/phonometry/reference/api/underwater/pile-driving-noise/#pile_strike_metrics) -- a [`PileStrikeResult`](/phonometry/reference/api/underwater/pile-driving-noise/#pilestrikeresult) bundling the
   single-strike SEL, the peak sound pressure level, the SPL/Leq and the
   90 %-energy pulse duration for one recorded strike, with a `.plot()`.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## cumulative_sel
 

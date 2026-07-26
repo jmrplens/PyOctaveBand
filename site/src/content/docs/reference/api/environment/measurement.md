@@ -5,8 +5,6 @@ sidebar:
   label: "measurement"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Determination of environmental-noise sound pressure levels (ISO 1996-2:2017).
 
 The measurement companion of the ISO 1996-1 descriptors in
@@ -46,6 +44,8 @@ residual from percentile levels (Annex I, Formulae (I.1)/(I.2)).
 (Formula (2)) expanded by `k = 2` (95 %) or `k = 1.3` (80 %). The
 residual-correction sensitivity coefficients (Formulae (F.7)/(F.8)) and the
 repeated-measurement standard uncertainty (Formulae (17)–(20)) are provided.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## assess_tonal_audibility
 

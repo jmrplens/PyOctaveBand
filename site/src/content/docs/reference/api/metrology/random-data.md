@@ -5,8 +5,6 @@ sidebar:
   label: "random_data"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Random-data qualification: stationarity tests and Rice crossing statistics.
 
 Before a record is averaged into a PSD, condensed into a Leq or fed to a GUM
@@ -67,6 +65,8 @@ the geometric moments
 [`level_crossing_rate`](/phonometry/reference/api/metrology/random-data/#level_crossing_rate) and [`peak_statistics`](/phonometry/reference/api/metrology/random-data/#peak_statistics) the second, each
 comparing the counts measured on the record with the closed-form
 expectations.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## level_crossing_rate
 

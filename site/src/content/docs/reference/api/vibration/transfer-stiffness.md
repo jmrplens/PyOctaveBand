@@ -5,8 +5,6 @@ sidebar:
   label: "transfer_stiffness"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Dynamic transfer stiffness of resilient elements (ISO 10846-1/-2/-3).
 
 The vibro-acoustic transfer property of a resilient element (a vibration
@@ -57,6 +55,8 @@ so it converts to mechanical impedance and effective mass through
 [`phonometry.convert_frf`](/phonometry/reference/api/vibration/mechanical-mobility/#convert_frf) (`"dynamic_stiffness"` \<-> `"impedance"` \<->
 `"apparent_mass"`). This module feeds the structure-borne source and building
 prediction standards (ISO 9611, EN 15657, EN 12354-5).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## base_transmissibility
 

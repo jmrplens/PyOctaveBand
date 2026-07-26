@@ -5,8 +5,6 @@ sidebar:
   label: "ship_traffic_noise"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Predicted source-level spectrum of shipping traffic (semi-empirical models).
 
 When no measured spectrum is available, the underwater radiated-noise source
@@ -34,6 +32,8 @@ de Jong, C. (2021), "A Reference Spectrum Model for Estimating Source Levels of
 Marine Shipping Based on Automated Identification System Data", J. Mar. Sci.
 Eng. 9(4), 369, https://doi.org/10.3390/jmse9040369 (CC-BY) -- which also
 reproduces RANDI 3.1 [Breeding et al.] and Wales & Heitmeyer (2002).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## ship_source_spectrum
 

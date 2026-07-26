@@ -5,8 +5,6 @@ sidebar:
   label: "sharpness"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Sharpness per DIN 45692:2009-08.
 
 Sharpness rates the high-frequency emphasis of a sound in acum, computed
@@ -18,6 +16,8 @@ the reference sound - critical-band-wide narrowband noise at 1 kHz
 provided as alternative methods with the literal factor 0.11 printed in
 Formulas (B.1)/(B.2); with it the reference sound lands near, not exactly
 at, 1.00 acum (~0.96 Aures / ~1.02 von Bismarck through this front-end).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## sharpness_din
 

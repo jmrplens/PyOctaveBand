@@ -5,8 +5,6 @@ sidebar:
   label: "hvac"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 HVAC duct acoustics: end reflection, bends, plenums and flow-generated noise.
 
 A ventilation duct network attenuates fan noise through several mechanisms
@@ -28,6 +26,8 @@ look-up (there is no closed form in this edition); this module reproduces
 that table and interpolates it. Rectangular ducts use the equivalent
 diameter `D = sqrt(4 S / pi)`.
 :::
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## elbow_insertion_loss
 

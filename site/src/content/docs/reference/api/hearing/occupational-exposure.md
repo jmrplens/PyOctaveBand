@@ -5,8 +5,6 @@ sidebar:
   label: "occupational_exposure"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Occupational noise exposure: measurement strategies and uncertainty (ISO 9612:2009).
 
 ISO 9612:2009 is the engineering method (accuracy grade 2) for determining a
@@ -44,6 +42,8 @@ reproduced to the standard's printed precision in the test suite (Annex E rounds
 its effective-day level to 88.4 dB before Eq 12 and prints 88.1; the library
 keeps intermediates unrounded and yields 88.2). Clause/equation/table numbers
 refer to ISO 9612:2009(E).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## COVERAGE_FACTOR
 

@@ -5,8 +5,6 @@ sidebar:
   label: "compliance"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 IEC 61260-1:2014 filter and IEC 61672-1:2013 weighting class verification.
 
 **Filters.** Acceptance limits on relative attenuation transcribed from the
@@ -47,6 +45,8 @@ subclause 2.2 explicit AU values at 25/31.5/40 kHz), checked against the
 Table 1 tolerances for the filter as a separate unit, the tighter of the two
 tolerance readings the standard offers. IEC 61012 publishes a single
 tolerance set, so both verdict slots carry the same margin for AU.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## class_limits
 

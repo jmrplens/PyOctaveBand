@@ -5,8 +5,6 @@ sidebar:
   label: "room_ir"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Impulse-response acquisition per BS EN ISO 18233:2006.
 
 This module provides the deterministic-excitation front end for the "new
@@ -66,6 +64,8 @@ complete the family:
 The recovered IR is broadband; ISO 18233 6.3.2 requires subsequent
 fractional-octave-band weighting (IEC 61260) before computing levels or
 decay curves -- that step belongs to downstream room-acoustics modules.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## golay_impulse_response
 

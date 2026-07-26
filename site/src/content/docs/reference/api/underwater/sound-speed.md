@@ -5,8 +5,6 @@ sidebar:
   label: "sound_speed"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Speed of sound in sea water (empirical equations).
 
 Three coexisting equations for the sound speed `c` as a function of
@@ -28,6 +26,8 @@ agreement and the canonical Mackenzie check value 1550.744 m/s at 25 °C, 35 ppt
 1000 m): NPL Technical Guide "Speed of Sound in Sea-Water" (Wong & Zhu 1995
 coefficient tables), Mackenzie (1981) JASA 70, Del Grosso (1974) JASA 56,
 Leroy & Parthiot (1998) JASA 103.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## depth_to_pressure
 

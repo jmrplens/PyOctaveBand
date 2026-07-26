@@ -5,8 +5,6 @@ sidebar:
   label: "sound_power_intensity"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Sound power level of a noise source by sound-intensity **scanning**:
 ISO 9614-2:1996 (engineering, grade 2; survey/control, grade 3).
 
@@ -56,6 +54,8 @@ A band achieves the **engineering** grade when criteria 1, 2 and 3 hold, the
 An A-weighted sound power level omits, besides the non-determinable `P <= 0`
 bands, the bands in which criteria 1 and/or 2 are not satisfied (clause
 10.6 b).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## sound_power_intensity
 

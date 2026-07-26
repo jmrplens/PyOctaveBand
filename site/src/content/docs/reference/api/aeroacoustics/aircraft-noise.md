@@ -5,8 +5,6 @@ sidebar:
   label: "aircraft_noise"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Aircraft noise certification: Effective Perceived Noise Level (ICAO Annex 16).
 
 The EPNL is the noise-certification metric for transport-category aircraft. It
@@ -23,6 +21,8 @@ is built from a half-second spectral time history (24 one-third-octave bands,
 * [`effective_perceived_noise_level`](/phonometry/reference/api/aeroacoustics/aircraft-noise/#effective_perceived_noise_level) -- the end-to-end metric: per-record
   `PNLT = PNL + C`, the maximum `PNLTM`, the 10 dB-down integration limits
   and the duration correction, giving `EPNL = PNLTM + D`.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## effective_perceived_noise_level
 

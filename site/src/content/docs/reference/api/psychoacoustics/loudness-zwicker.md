@@ -5,8 +5,6 @@ sidebar:
   label: "loudness_zwicker"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Zwicker loudness for stationary and time-varying sounds per ISO 532-1:2017.
 
 Clean-room Python port of the normative reference implementation given in
@@ -23,6 +21,8 @@ points are provided:
 
 All numeric tables live in `phonometry._zwicker_data` and reproduce
 Tables A.1 to A.9 of the standard digit for digit.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## loudness_zwicker
 

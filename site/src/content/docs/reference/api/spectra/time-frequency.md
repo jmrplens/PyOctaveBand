@@ -5,8 +5,6 @@ sidebar:
   label: "time_frequency"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Calibrated time-frequency analysis: STFT spectrogram and zoom FFT.
 
 Fine-band time-frequency views of a record, following Bendat & Piersol,
@@ -47,6 +45,8 @@ Fine-band time-frequency views of a record, following Bendat & Piersol,
 Amplitudes are calibrated so that a sine of peak amplitude `A` on an
 analysis frequency reads `|spectrum| = A`, `power = A²/2` (its mean
 square) - consistent with the `'spectrum'` scaling of the Welch module.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## spectrogram
 

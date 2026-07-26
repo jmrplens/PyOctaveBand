@@ -5,9 +5,9 @@ sidebar:
   label: "phonometry"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Package-level names defined in `phonometry/__init__.py` itself. Every public name in the library can also be imported directly from `phonometry`; this page documents the few objects that live at the top level.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## \_\_version\_\_
 

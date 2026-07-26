@@ -5,8 +5,6 @@ sidebar:
   label: "ocean_ambient_noise"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Ocean ambient-noise spectrum levels (Wenz framework).
 
 Deep-water ambient-noise **spectrum levels** (dB re 1 µPa²/Hz) from the two
@@ -29,6 +27,8 @@ and shipping-dependent, with no single fixed analytic parametrisation; a shippin
 spectrum may be supplied by the caller. Source: Carey & Evans, *Ocean Ambient
 Noise* (2011) -- the rule of fives (p. 2) and the thermal-noise derivation
 (Appendix F).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## AmbientNoiseResult
 

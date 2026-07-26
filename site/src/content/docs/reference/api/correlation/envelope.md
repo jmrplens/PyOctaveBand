@@ -5,8 +5,6 @@ sidebar:
   label: "envelope"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Envelope and instantaneous phase via the Hilbert transform.
 
 Signal-envelope analysis following Bendat & Piersol, *Random Data:
@@ -47,6 +45,8 @@ band, then envelope it). An AM tone with modulation frequency `f_m`
 (on an analysis bin) and depth `m` puts a line of closed-form
 amplitude at exactly `f_m`, the anchor the tests pin; off-bin
 modulation lines read low by the taper's scalloping loss.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## envelope
 

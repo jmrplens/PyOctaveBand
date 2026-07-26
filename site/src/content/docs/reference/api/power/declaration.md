@@ -5,8 +5,6 @@ sidebar:
   label: "declaration"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 ISO 4871:1996 declaration of noise emission values of machinery and equipment.
 
 ISO 4871 is the standardised *noise-emission declaration*: the information a
@@ -41,6 +39,8 @@ This module models a declaration as [`NoiseEmissionDeclaration`](/phonometry/ref
 renders it as an ISO 4871 declaration fiche through `.report`. A
 declaration is most often built from a measured sound power via
 [`declare`](/phonometry/reference/api/power/sound-power/).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## NoiseEmissionDeclaration
 

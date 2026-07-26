@@ -5,8 +5,6 @@ sidebar:
   label: "lab_insulation"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Laboratory sound insulation of building elements (ISO 10140).
 
 This is the **laboratory** counterpart of the field ISO 16283 family in
@@ -49,6 +47,8 @@ to 50 Hz). The single-number rating uses the core 100 Hz to 3150 Hz (16
 one-third-octave bands) / 125 Hz to 2000 Hz (5 octave bands) range of
 ISO 717-1/2, so the automatic rating is formed only when exactly 16 or 5
 per-band values are supplied.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## background_correction
 

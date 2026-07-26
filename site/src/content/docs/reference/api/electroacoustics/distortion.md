@@ -5,8 +5,6 @@ sidebar:
   label: "distortion"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Distortion metrics for electroacoustic equipment (IEC 60268-3 / AES17).
 
 Harmonic and intermodulation distortion of amplifiers and audio equipment, from
@@ -34,6 +32,8 @@ harmonic or intermodulation amplitudes reproduces the closed-form ratio. The
 functions assume the tones fall on (or very near) FFT bins -- use coherent
 sampling (an integer number of periods) or supply a low-leakage window, as audio
 analysers do.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## difference_frequency_distortion
 

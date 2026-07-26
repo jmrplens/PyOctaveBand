@@ -5,8 +5,6 @@ sidebar:
   label: "frequency_response"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Frequency-response and coherence estimators (Bendat & Piersol).
 
 Two-channel (input/output) system identification from measured signals, using
@@ -24,6 +22,8 @@ For a noiseless linear time-invariant path both estimators recover the true
 transfer function and the coherence is unity; additive output noise biases H2
 but not H1 and pulls the coherence down to `SNR / (1 + SNR)`, which is the
 analytic oracle used to verify the implementation.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## coherence
 

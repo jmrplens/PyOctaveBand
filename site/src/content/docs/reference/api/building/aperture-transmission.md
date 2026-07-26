@@ -5,8 +5,6 @@ sidebar:
   label: "aperture_transmission"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Sound transmission through slits, holes and apertures (Hopkins 2007, Sound
 Insulation, Section 4.3.10; Gomperts 1964; Wilson & Soroka 1965).
 
@@ -52,6 +50,8 @@ R = -10 lg( (1 / sum S_n) sum S_n 10^(-R_n/10) )
 so a bare opening (`R = 0`, `tau = 1`) of relative area `S_a/S` caps the
 composite at `10 lg(S / S_a)`. This is the same energetic combination used by
 the EN 12354-3/-4 facade model of [`phonometry.building.facade_prediction`](/phonometry/reference/api/building/facade-prediction/).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## ApertureTransmissionResult
 

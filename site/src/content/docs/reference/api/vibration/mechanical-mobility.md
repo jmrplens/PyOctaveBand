@@ -5,8 +5,6 @@ sidebar:
   label: "mechanical_mobility"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Mechanical mobility and the frequency-response-function family (ISO 7626-1:2011).
 
 Mechanical **mobility** is the complex ratio of a velocity response to the
@@ -63,6 +61,8 @@ exported at the package top level. This module adds the ISO 7626-2 acceptance
 criteria on top of them: the operational rigid-mass calibration of 7.5.2
 ([`rigid_mass_calibration_check`](/phonometry/reference/api/vibration/mechanical-mobility/#rigid_mass_calibration_check), +/- 5 %) and the Annex A normalized
 random error with its \< 5 % averaging criterion ([`random_error_percent`](/phonometry/reference/api/vibration/mechanical-mobility/#random_error_percent)).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## convert_frf
 

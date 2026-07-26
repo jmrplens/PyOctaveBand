@@ -5,8 +5,6 @@ sidebar:
   label: "diffuser_design"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Far-field polar response and diffusion coefficient predicted from a diffuser design.
 
 Where [`phonometry.materials.scattering_diffusion`](/phonometry/reference/api/materials/scattering-diffusion/) evaluates the *measured*
@@ -62,6 +60,8 @@ ISO 17497-2 measurement. A resonator-loaded "metadiffuser" slit surface is not
 modelled here: only its per-well reflection coefficient would change, so such a
 surface can be predicted by supplying the complex `reflection` sequence
 directly.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## DEFAULT_POLAR_ANGLES
 

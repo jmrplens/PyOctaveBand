@@ -5,8 +5,6 @@ sidebar:
   label: "dynamic_stiffness"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Dynamic stiffness of resilient materials under floating floors (EN 29052-1:1992).
 
 A floating floor is a heavy floating slab resting on a resilient layer; the
@@ -61,6 +59,8 @@ term of the EN 12354-2 impact model
 ISO 16251-1 ([`phonometry.building.floor_covering_improvement`](/phonometry/reference/api/building/floor-covering-improvement/)), whose
 scope is limited to soft, locally-reacting floor coverings; floating floors
 are explicitly excluded there.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## apparent_dynamic_stiffness
 

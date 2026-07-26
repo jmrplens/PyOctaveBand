@@ -5,9 +5,9 @@ sidebar:
   label: "core"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Core processing logic and FilterBank class for phonometry.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## FilterBankWarning
 

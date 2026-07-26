@@ -5,8 +5,6 @@ sidebar:
   label: "enclosures"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Insertion loss of a close or free-standing machine enclosure.
 
 Wrapping a machine in a sealed enclosure reduces the radiated noise by the
@@ -37,6 +35,8 @@ or [`phonometry.building.ApertureTransmissionResult`](/phonometry/reference/api/
 so no dependency on `building` is introduced). This module never predicts
 `R` itself; it combines a given `R` with the interior absorption. The
 interior room constant reuses [`phonometry.room.room_constant`](/phonometry/reference/api/rooms/steady-field/#room_constant).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## enclosure_insertion_loss
 

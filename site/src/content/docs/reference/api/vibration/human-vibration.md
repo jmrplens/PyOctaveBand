@@ -5,8 +5,6 @@ sidebar:
   label: "human_vibration"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Human exposure to whole-body and hand-transmitted vibration.
 
 The measurement chain of the ISO human-vibration family is implemented from the
@@ -54,6 +52,8 @@ The band (spectrum) method and the exposure arithmetic carry the standards'
 worked-example oracles; the time-domain metrics operate on a weighted
 acceleration signal, which [`apply_weighting`](/phonometry/reference/api/vibration/human-vibration/#apply_weighting) produces from a raw record
 by applying the exact analog response of ISO 8041-1 in the frequency domain.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## apply_weighting
 

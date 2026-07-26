@@ -5,8 +5,6 @@ sidebar:
   label: "airport_noise"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Noise-Power-Distance (NPD) event-level interpolation (ECAC Doc 29).
 
 The ECAC Doc 29 airport-noise method describes an aircraft's noise emission with
@@ -35,6 +33,8 @@ evaluates it over a ground grid.
 Source (clean-room, implemented from the standard text): ECAC Doc 29, 4th ed.,
 Vol 2 (2016), §4.2-4.5. Validated per-term and end-to-end against the ECAC
 Doc 29 5th ed. Vol 3 Part 1 reference workbook.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## duration_correction
 

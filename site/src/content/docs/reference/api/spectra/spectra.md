@@ -5,8 +5,6 @@ sidebar:
   label: "spectra"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Calibrated spectral-density estimation with statistical error analysis.
 
 Welch-averaged auto- and cross-spectral density estimators that report,
@@ -64,6 +62,8 @@ time-half-bandwidth `NW` produce `K` nearly uncorrelated eigenspectra
 whose (adaptively weighted) average carries about `2K` chi-square
 degrees of freedom without splitting the record - the estimator of choice
 for short records where Welch would leave too few segments.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## coherent_output_spectrum
 

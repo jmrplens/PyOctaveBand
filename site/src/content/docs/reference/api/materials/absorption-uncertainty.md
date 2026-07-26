@@ -5,8 +5,6 @@ sidebar:
   label: "absorption_uncertainty"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Measurement uncertainty for sound absorption (ISO 12999-2:2020).
 
 Companion of the sound-insulation uncertainty of [`phonometry.building_uncertainty`](/phonometry/reference/api/building/building-uncertainty/)
@@ -43,6 +41,8 @@ with the coverage factor `k` of Table 3 (Gaussian assumption). The reported
 `U` is rounded to two decimal digits for absorption coefficients and one decimal
 digit for the equivalent area and `DLα,NRD`; the code keeps the exact `U` and
 exposes the rounded view through [`AbsorptionUncertaintyResult.reported_expanded_uncertainty`](/phonometry/reference/api/materials/absorption-uncertainty/#absorptionuncertaintyresultreported_expanded_uncertainty).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## absorption_coverage_factor
 

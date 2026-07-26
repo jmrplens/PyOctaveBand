@@ -5,8 +5,6 @@ sidebar:
   label: "image_source"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Synthetic room impulse response by the image-source method (rectangular room).
 
 A rigid-walled (or absorbing) rectangular room -- a *shoebox* -- reflects a
@@ -58,6 +56,8 @@ whose reflection factor is real and angle-independent (Kuttruff 4.1: exact for
 a specific wall impedance of +-1, a good approximation when the source stands a
 few wavelengths from every wall); it captures specular reflections only, with
 no diffraction or diffuse scattering.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## audible_image_count
 

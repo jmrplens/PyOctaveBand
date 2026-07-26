@@ -5,8 +5,6 @@ sidebar:
   label: "ship_radiated_noise"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Ship radiated noise and equivalent monopole source level (ISO 17208-1/-2).
 
 A surface ship measured in deep water is characterised by its **radiated noise
@@ -25,6 +23,8 @@ Supporting helpers give the ISO 17208-1 three-hydrophone measurement depths
 uncertainty ([`source_level_uncertainty`](/phonometry/reference/api/underwater/ship-radiated-noise/#source_level_uncertainty)). The conversion assumes an ideal
 pressure-release sea surface and ignores wind; the reported source level is an
 *equivalent monopole broadside* value and must be quoted with its source depth.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## hydrophone_depths
 

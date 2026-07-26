@@ -5,8 +5,6 @@ sidebar:
   label: "microphone"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Rated microphone characteristics (IEC 60268-4).
 
 A microphone measurement/rating report gathers the *rated characteristics*
@@ -59,6 +57,8 @@ so the report never merely repeats a manufacturer number:
   oracle. The overload sound pressure level (15.2.2) is read from a measured
   distortion-against-level curve as the interpolated sound pressure level
   where the distortion reaches the specified limit.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## microphone_characteristics
 

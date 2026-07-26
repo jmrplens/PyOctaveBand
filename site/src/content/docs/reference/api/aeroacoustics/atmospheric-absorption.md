@@ -5,8 +5,6 @@ sidebar:
   label: "atmospheric_absorption"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 One-third-octave-band atmospheric absorption for aircraft noise (SAE ARP 5534).
 
 Aircraft noise certification (14 CFR Part 36, ICAO Annex 16 Vol. I) works with
@@ -25,6 +23,8 @@ attenuation and stays consistent with the ISO/ANSI Exact Method well beyond the
 Source (clean-room, implemented from the standard text): SAE ARP 5534 (2021),
 *Application of Pure-Tone Atmospheric Absorption Losses to One-Third-Octave-Band
 Data*, Eqs. 7-10; the pure-tone coefficient is ISO 9613-1:1993.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## AircraftBandAttenuation
 

@@ -5,8 +5,6 @@ sidebar:
   label: "open_plan"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Open-plan-office spatial metrics per ISO 3382-3:2012.
 
 From a line of measurement positions across workstations (ISO 3382-3:2012,
@@ -34,6 +32,8 @@ the STI does not decrease with distance (non-negative fitted slope) or when
 the crossing would fall at or before the source, realising the standard's
 note that it "can prove impossible to determine the privacy distance if
 STI > 0.20 in all positions" (Clause 6.3).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## open_plan_metrics
 

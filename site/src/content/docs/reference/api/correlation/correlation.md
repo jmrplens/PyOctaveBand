@@ -5,8 +5,6 @@ sidebar:
   label: "correlation"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Correlation analysis and time-delay estimation.
 
 Auto- and cross-correlation estimators with the three standard
@@ -46,6 +44,8 @@ The GCC estimators run on the same Welch core (segmentation, tapering,
 overlap policy) as [`phonometry.metrology.spectra`](/phonometry/reference/api/spectra/spectra/), so a GCC and a
 cross-spectral density computed with the same segment length are mutually
 consistent bin by bin.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## align_impulse_responses
 

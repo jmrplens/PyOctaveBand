@@ -5,8 +5,6 @@ sidebar:
   label: "noise_induced_hearing_loss"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Estimation of noise-induced hearing loss (ISO 1999:2013).
 
 Implements the noise-induced permanent threshold shift (NIPTS) of a
@@ -24,6 +22,8 @@ with the coefficients of Table 3; a population fractile is
 Formulae 4/5, Table 2), clamped at zero. The HTLAN combines the age component
 `H` (HTLA, database A = ISO 7029) with the noise component `N` by
 `H' = H + N - H*N/120` (clause 6.1, Formula 1).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## combine_age_and_noise
 

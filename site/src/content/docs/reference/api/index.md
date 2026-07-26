@@ -3,9 +3,9 @@ title: "API Reference"
 description: "Every public function, class and constant in phonometry, generated from the source docstrings."
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 The complete public API, one page per module. Import the domain subpackage and call through it:
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ```python
 from phonometry import metrology, underwater

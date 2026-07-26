@@ -5,8 +5,6 @@ sidebar:
   label: "swept_sine"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Harmonic-distortion separation with exponential sweeps (Farina / Novak).
 
 A single exponential sine sweep characterises the linear response and
@@ -54,6 +52,8 @@ Chebyshev identities, `|H1| = 1 + 3*a3/4`, `|H2| = a2/2` (phase
 `-pi/2`) and `|H3| = a3/4` (phase `pi`), and a THD(f) equal to the
 closed form `sqrt((a2/2)**2 + (a3/4)**2) / (1 + 3*a3/4)` -- which also
 matches [`phonometry.thd`](/phonometry/reference/api/electroacoustics/distortion/#thd) measured tone by tone on the same system.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## swept_sine_distortion
 

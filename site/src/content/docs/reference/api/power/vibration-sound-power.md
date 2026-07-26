@@ -5,8 +5,6 @@ sidebar:
   label: "vibration_sound_power"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Airborne sound power from surface vibration (ISO/TS 7849-1/-2:2009).
 
 The airborne sound power a machine radiates through the structure-borne
@@ -47,6 +45,8 @@ The two parts differ only in `epsilon`:
 
 This module feeds the structure-borne source characterisation standards
 (ISO 9611, EN 15657, EN 12354-5).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## extraneous_velocity_correction
 

@@ -5,8 +5,6 @@ sidebar:
   label: "structure_borne_power"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Structure-borne sound power of building equipment (EN 15657:2018; ISO 9611).
 
 Building service equipment (pumps, fans, boilers, sanitary appliances) injects
@@ -74,6 +72,8 @@ The source-side free velocity of ISO 9611:1996 is the direct-measurement
 counterpart: velocity levels re `v0 = 5e-8 m/s` (clause 7), averaged over
 positions with the energy mean of its equation (9), implemented by
 [`mean_free_velocity_level`](/phonometry/reference/api/building/structure-borne-power/#mean_free_velocity_level).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## characteristic_reception_plate_power
 
