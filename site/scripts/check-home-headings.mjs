@@ -23,7 +23,11 @@
 //
 // Usage:
 //   node scripts/check-home-headings.mjs [--base http://localhost:4322]
-//                                        [--shots <dir>]
+//                                        [--shots <dir>] [filter...]
+//
+// A filter is matched against "<locale> <case>", so `--shots dir 390 1440`
+// writes crops for those two widths only. Filters never narrow the audit
+// itself: every case is always measured.
 import { readdirSync } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
 import { createRequire } from 'node:module';
@@ -44,6 +48,8 @@ const arg = (name, fallback) => {
 };
 const BASE = arg('--base', 'http://localhost:4322');
 const SHOTS = arg('--shots', null);
+const values = new Set([BASE, SHOTS].filter(Boolean));
+const FILTERS = argv.filter((a) => !a.startsWith('--') && !values.has(a));
 
 // Width sweep, plus the two zoom levels and the enlarged-text cases. A zoom
 // level is a viewport: 200 % zoom of a 1440x900 window is a 720x450 CSS
@@ -181,7 +187,9 @@ for (const c of CASES) {
 	);
 	for (const p of problems) console.log(`       ${p}`);
 
-	if (SHOTS) {
+	const wanted =
+		SHOTS && (!FILTERS.length || FILTERS.some((f) => `${c.lang} ${c.tag}`.includes(f)));
+	if (wanted) {
 		const clip = await page.evaluate(() => {
 			const b = document.querySelector('.home .block');
 			if (!b) return null;

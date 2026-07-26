@@ -2,9 +2,9 @@
 //
 // Runs the scenarios that decide whether the feature is safe: a first visit
 // with a Spanish browser, a visitor who deliberately opened an English URL
-// after choosing Spanish, an explicit ?lang=, a dismissal, a crawler, the
-// English-only API subtree, and both redirect guards (once per session, never
-// after a stored choice).
+// after choosing Spanish, an explicit ?lang=, a dismissal, a crawler and the
+// English-only API subtree. The bar offers and never navigates, so every
+// scenario also asserts that the URL is the one that was asked for.
 //
 // Usage: node scripts/check-lang-suggest.mjs [--base http://localhost:4322]
 import { readdirSync } from 'node:fs';
@@ -37,24 +37,22 @@ const expect = (name, actual, wanted) => {
  * Load `path` with a fake language list, an optional pre-seeded localStorage
  * and an optional user agent, and report what the page decided.
  */
-async function visit(path, { languages = ['es-ES', 'es'], seed = {}, ua, mode } = {}) {
+async function visit(path, { languages = ['es-ES', 'es'], seed = {}, ua } = {}) {
 	// Every scenario gets its own browser context, otherwise localStorage
 	// written by one of them leaks into the next and the results are garbage.
 	const context = await browser.createBrowserContext();
 	const page = await context.newPage();
 	if (ua) await page.setUserAgent(ua);
 	await page.evaluateOnNewDocument(
-		(langs, seeded, m) => {
+		(langs, seeded) => {
 			Object.defineProperty(navigator, 'languages', { get: () => langs });
 			Object.defineProperty(navigator, 'language', { get: () => langs[0] });
 			try {
 				for (const [k, v] of Object.entries(seeded)) localStorage.setItem(k, v);
-				if (m) localStorage.setItem('phonometry:lang-mode', m);
 			} catch {}
 		},
 		languages,
 		seed,
-		mode,
 	);
 	await page.goto(`${BASE}/phonometry${path}`, { waitUntil: 'networkidle0', timeout: 60000 });
 	await new Promise((r) => setTimeout(r, 400));
@@ -131,26 +129,12 @@ expect(
 	{ url: '/phonometry/reference/api/levels/levels/', banner: 'absent', stored: null },
 );
 
-// 9. Redirect mode, first visit with nothing stored: one hop to /es/.
+// 9. Nothing ever navigates on its own: the same first visit that a redirect
+//    would have moved stays exactly where it was asked to be.
 expect(
-	'redirect: first visit hops once',
-	await visit('/guides/levels/', { mode: 'redirect' }),
-	{ url: '/phonometry/es/guides/levels/', banner: false, stored: null },
-);
-
-// 10. Redirect mode with a stored choice: degrades to the banner, no hop.
-expect(
-	'redirect: a stored choice never navigates',
-	await visit('/guides/levels/', { mode: 'redirect', seed: { 'phonometry:lang': 'es' } }),
-	{ url: '/phonometry/guides/levels/', banner: true, stored: 'es' },
-);
-
-// 11. Redirect mode on the page it would redirect to: nothing to do, and the
-//     session guard means a second load cannot bounce back.
-expect(
-	'redirect: no loop on the target page',
-	await visit('/es/guides/levels/', { mode: 'redirect' }),
-	{ url: '/phonometry/es/guides/levels/', banner: false, stored: null },
+	'nothing navigates: the ES-preferring first visit stays on the EN url',
+	await visit('/getting-started/'),
+	{ url: '/phonometry/getting-started/', banner: true, stored: null },
 );
 
 await browser.close();

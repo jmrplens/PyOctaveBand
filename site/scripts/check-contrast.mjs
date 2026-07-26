@@ -1,9 +1,9 @@
-// Contrast audit for the experimental colour directions.
+// Contrast audit for the site palette.
 //
-// Parses src/styles/theme-directions.css, resolves the six palettes
-// (3 directions x light/dark) and reports the WCAG 2.1 contrast ratio of
-// every pair the site actually renders, plus the seam between the page
-// ground and the opaque plate every committed figure carries.
+// Parses src/styles/theme.css, resolves the light and the dark theme and
+// reports the WCAG 2.1 contrast ratio of every pair the site actually
+// renders, plus the seam between the page ground and the opaque plate every
+// committed figure carries.
 //
 // Pairs are either enforced (text 4.5:1, meaningful non-text 3:1, per WCAG
 // 1.4.3 / 1.4.11) or informational (purely decorative hairlines, and the
@@ -13,7 +13,7 @@
 // Run: node scripts/check-contrast.mjs [--json]
 import { readFileSync } from 'node:fs';
 
-const css = readFileSync(new URL('../src/styles/theme-directions.css', import.meta.url), 'utf8');
+const css = readFileSync(new URL('../src/styles/theme.css', import.meta.url), 'utf8');
 
 /** All `--token: #hex;` declarations of the rule whose selector list is exactly `selector`. */
 function block(selector) {
@@ -47,18 +47,14 @@ function resolve(palette) {
 	return palette;
 }
 
-const instrumentDark = block(":root, :root[data-accent='instrument']");
-const instrumentLight = block(":root[data-theme='light'], :root[data-accent='instrument'][data-theme='light']");
+// The dark theme is the root scope; the light theme overrides it, so it is
+// resolved on top of the dark one exactly as the cascade does it.
+const dark = block(':root');
+const light = block(":root[data-theme='light']");
 const PALETTES = {
-	'instrument / dark': resolve({ ...instrumentDark }),
-	'instrument / light': resolve({ ...instrumentDark, ...instrumentLight }),
+	'instrument / dark': resolve({ ...dark }),
+	'instrument / light': resolve({ ...dark, ...light }),
 };
-for (const name of ['blueprint', 'graphite']) {
-	const dark = block(`:root[data-accent='${name}']`);
-	const light = block(`:root[data-accent='${name}'][data-theme='light']`);
-	PALETTES[`${name} / dark`] = resolve({ ...dark });
-	PALETTES[`${name} / light`] = resolve({ ...dark, ...light });
-}
 
 for (const [name, p] of Object.entries(PALETTES)) {
 	if (!p['--sl-color-black']) throw new Error(`palette "${name}" did not parse`);

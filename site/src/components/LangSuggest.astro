@@ -4,32 +4,29 @@
  *
  * The site is a static export on GitHub Pages: there is no server, no
  * middleware and no Vary: Accept-Language, so anything that reacts to the
- * visitor's language has to happen in the browser. Two behaviours are
- * implemented here and one of them is chosen at runtime:
+ * visitor's language has to happen in the browser. What it does is offer,
+ * never decide: a quiet, dismissible one-line bar pinned to the bottom edge
+ * that names the other language and links to the counterpart page. The page
+ * never navigates on its own, in any circumstance.
  *
- *   banner    (default) a quiet, dismissible one-line bar offering the other
- *             language. Nothing navigates on its own.
- *   redirect  a single `location.replace` to the counterpart page, and only
- *             on a genuine first visit with no stored preference.
- *   off       nothing at all.
+ * That is deliberate. English is the root locale here, so an English URL is a
+ * real canonical address: it is what the README, PyPI, Zenodo and every
+ * English search result point at, and a visitor who followed one of those
+ * made a choice about the page and not just about a language. A client-side
+ * redirect would override them, and it would be worst exactly where the
+ * content is thinnest, in the English-only API reference. The bar costs one
+ * click, tells the reader that the other language exists, and ends forever on
+ * one dismissal.
  *
- * The mode is `DEFAULT_MODE` below, overridable at runtime with
- * `localStorage['phonometry:lang-mode']` (the prototype switcher writes it),
- * so it can be turned off or flipped without a rebuild.
- *
- * Rules that hold in every mode:
+ * Rules:
  *
  *   - An explicit locale in the URL always wins. `?lang=en` or `?lang=es`
  *     is recorded as the visitor's choice and suppresses any suggestion.
  *   - Using the language picker records the choice, so a manual decision
- *     beats the browser's Accept-Language list from then on.
- *   - Once a choice is stored, the page NEVER navigates on its own again.
- *     Someone who deliberately opens an English URL after choosing Spanish
- *     stays on the English URL and is at most offered a link. This is what
- *     keeps the feature from trapping anyone.
- *   - Redirection is guarded three ways: only when nothing is stored, only
- *     once per session (sessionStorage), and only when the target path
- *     differs from the current one, so it cannot loop.
+ *     beats the browser's Accept-Language list from then on. Dismissing the
+ *     bar is a decision too, and records the current page's language.
+ *   - Nothing is inferred from a language the visitor does not have: if
+ *     neither `es` nor `en` is in navigator.languages, nothing happens.
  *   - Known crawler user agents are skipped, and nothing here touches the
  *     canonical or hreflang links, which is what search engines actually
  *     use to pick a locale.
@@ -42,8 +39,13 @@
  * language the reader is assumed to understand.
  */
 
-/** 'banner' | 'redirect' | 'off' */
-const DEFAULT_MODE = 'banner';
+/**
+ * Kill switch, build time. Set it to false and the site ships with no
+ * language handling at all: no markup, no script, nothing stored. It is a
+ * constant on purpose, not a control: there is nothing on the page, and
+ * nothing in storage, that can turn the feature on or off behind my back.
+ */
+const ENABLED = true;
 
 const BASE = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
 const pathname = Astro.url.pathname;
@@ -80,7 +82,7 @@ const copy = COPY[other];
 ---
 
 {
-	!isApiReference && (
+	ENABLED && !isApiReference && (
 		<div
 			id="lang-suggest"
 			class="lang-suggest"
@@ -89,7 +91,6 @@ const copy = COPY[other];
 			data-current={current}
 			data-other={other}
 			data-target={counterpart}
-			data-default-mode={DEFAULT_MODE}
 			hidden
 		>
 			<p lang={other}>{copy.text}</p>
@@ -103,12 +104,11 @@ const copy = COPY[other];
 	)
 }
 
+{ENABLED && (
 <script is:inline>
 	(() => {
 		var LANG_KEY = 'phonometry:lang';
 		var DISMISS_KEY = 'phonometry:lang-dismissed';
-		var MODE_KEY = 'phonometry:lang-mode';
-		var SESSION_KEY = 'phonometry:lang-redirected';
 		var BOTS =
 			/bot|crawl|spider|slurp|mediapartners|facebookexternalhit|embedly|quora link preview|whatsapp|telegram|preview|scanner|lighthouse|pagespeed/i;
 
@@ -152,8 +152,6 @@ const copy = COPY[other];
 
 		var current = banner.dataset.current;
 		var other = banner.dataset.other;
-		var target = banner.dataset.target;
-		var mode = get(localStorage, MODE_KEY) || banner.dataset.defaultMode;
 
 		var dismiss = banner.querySelector('[data-lang-dismiss]');
 		if (dismiss) {
@@ -172,7 +170,6 @@ const copy = COPY[other];
 			});
 		}
 
-		if (mode === 'off') return;
 		if (BOTS.test(navigator.userAgent || '')) return;
 
 		// An explicit ?lang= in the URL is a decision, not a hint.
@@ -182,8 +179,7 @@ const copy = COPY[other];
 			if (explicit === current) return;
 		}
 
-		var stored = get(localStorage, LANG_KEY);
-		var preferred = stored;
+		var preferred = get(localStorage, LANG_KEY);
 		if (!preferred) {
 			var list = navigator.languages && navigator.languages.length
 				? navigator.languages
@@ -200,33 +196,11 @@ const copy = COPY[other];
 		// No opinion, or the page is already in the preferred language.
 		if (!preferred || preferred === current) return;
 
-		if (
-			mode === 'redirect' &&
-			!stored && // never navigate away once a choice exists
-			!get(sessionStorage, SESSION_KEY) &&
-			target &&
-			target !== location.pathname
-		) {
-			set(sessionStorage, SESSION_KEY, '1');
-			location.replace(target + location.search + location.hash);
-			return;
-		}
-
 		if (get(localStorage, DISMISS_KEY)) return;
 		banner.hidden = false;
-		// Publish the bar's height so anything else pinned to the bottom edge
-		// (the prototype switcher) can sit clear of it at any width.
-		var publish = function () {
-			document.documentElement.style.setProperty(
-				'--ph-lang-bar-height',
-				(banner.hidden ? 0 : banner.offsetHeight) + 'px',
-			);
-		};
-		publish();
-		if (typeof ResizeObserver === 'function') new ResizeObserver(publish).observe(banner);
-		if (dismiss) dismiss.addEventListener('click', publish);
 	})();
 </script>
+)}
 
 <style>
 	.lang-suggest {

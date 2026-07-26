@@ -1,13 +1,13 @@
-// Screenshot matrix for the experimental redesign.
+// Screenshot matrix for the redesign.
 //
 // Drives its own headless Chrome so the captures are reproducible and do not
 // depend on an interactive browser session: every shot states its viewport,
-// locale, colour direction and theme up front.
+// locale and theme up front.
 //
 // Puppeteer is not a declared dependency of the site; it is already in the
 // tree because pa11y-ci pulls it in, so the script resolves it out of the
-// pnpm store rather than adding a heavyweight devDependency for a throwaway
-// branch.
+// pnpm store rather than adding a heavyweight devDependency for a branch that
+// is only here to be looked at.
 //
 // Usage: node scripts/redesign-shots.mjs [--base http://localhost:4322] [filter...]
 import { readdirSync } from 'node:fs';
@@ -34,46 +34,37 @@ const filters = args.filter((a, i) => !a.startsWith('--') && !(baseIdx !== -1 &&
 const DESKTOP = { width: 1440, height: 900 };
 const PHONE = { width: 390, height: 844 };
 
-/** name, path, viewport, accent, theme, and how far down the page to sit. */
+/** name, path, viewport, theme, and how far down the page to sit. */
 const SHOTS = [
-	// Colour directions on a figure-heavy guide.
-	['10-guide-instrument-dark', '/guides/filter-banks/', DESKTOP, 'instrument', 'dark', 900],
-	['11-guide-instrument-light', '/guides/filter-banks/', DESKTOP, 'instrument', 'light', 900],
-	['12-guide-blueprint-dark', '/guides/filter-banks/', DESKTOP, 'blueprint', 'dark', 900],
-	['13-guide-blueprint-light', '/guides/filter-banks/', DESKTOP, 'blueprint', 'light', 900],
-	['14-guide-graphite-dark', '/guides/filter-banks/', DESKTOP, 'graphite', 'dark', 900],
-	['15-guide-graphite-light', '/guides/filter-banks/', DESKTOP, 'graphite', 'light', 900],
-	// A transparent matplotlib plot rather than a hand-drawn diagram: this is
-	// the case where the page ground shows through the figure.
-	['16-plot-instrument-dark', '/getting-started/', DESKTOP, 'instrument', 'dark', 1750],
-	['17-plot-blueprint-dark', '/getting-started/', DESKTOP, 'blueprint', 'dark', 1750],
-	['18-plot-graphite-dark', '/getting-started/', DESKTOP, 'graphite', 'dark', 1750],
-	['19-plot-instrument-light', '/getting-started/', DESKTOP, 'instrument', 'light', 1750],
+	// The palette on a figure-heavy guide: the hand-authored diagram case,
+	// whose plate is #0d1117.
+	['10-guide-dark', '/guides/filter-banks/', DESKTOP, 'dark', 900],
+	['11-guide-light', '/guides/filter-banks/', DESKTOP, 'light', 900],
+	// A matplotlib plot rather than a hand-drawn diagram: the plate is black.
+	['16-plot-dark', '/getting-started/', DESKTOP, 'dark', 1750],
+	['19-plot-light', '/getting-started/', DESKTOP, 'light', 1750],
 	// Front page, both locales, both themes, full page.
-	['20-home-instrument-dark', '/', DESKTOP, 'instrument', 'dark', 0, true],
-	['21-home-instrument-light', '/', DESKTOP, 'instrument', 'light', 0, true],
-	['22-home-blueprint-dark', '/', DESKTOP, 'blueprint', 'dark', 0, true],
-	['23-home-graphite-light', '/', DESKTOP, 'graphite', 'light', 0, true],
-	['24-home-es-instrument-light', '/es/', DESKTOP, 'instrument', 'light', 0, true],
-	['25-home-es-blueprint-dark', '/es/', DESKTOP, 'blueprint', 'dark', 0, true],
+	['20-home-dark', '/', DESKTOP, 'dark', 0, true],
+	['21-home-light', '/', DESKTOP, 'light', 0, true],
+	['24-home-es-light', '/es/', DESKTOP, 'light', 0, true],
+	['25-home-es-dark', '/es/', DESKTOP, 'dark', 0, true],
 	// Narrow widths.
-	['30-home-phone-instrument-dark', '/', PHONE, 'instrument', 'dark', 0, true],
-	['31-home-phone-graphite-light', '/', PHONE, 'graphite', 'light', 0, true],
-	['32-guide-phone-instrument-dark', '/guides/filter-banks/', PHONE, 'instrument', 'dark', 700],
-	['33-header-phone-light', '/getting-started/', PHONE, 'instrument', 'light', 0],
-	['34-header-phone-dark', '/es/getting-started/', PHONE, 'blueprint', 'dark', 0],
+	['30-home-phone-dark', '/', PHONE, 'dark', 0, true],
+	['31-home-phone-light', '/', PHONE, 'light', 0, true],
+	['32-guide-phone-dark', '/guides/filter-banks/', PHONE, 'dark', 700],
+	['33-header-phone-light', '/getting-started/', PHONE, 'light', 0],
+	['34-header-phone-dark', '/es/getting-started/', PHONE, 'dark', 0],
 ];
 
 /**
- * Shots that need something more than a viewport and a palette: a faked
- * Accept-Language list, or a click before the capture.
+ * Shots that need something more than a viewport and a theme: a faked
+ * Accept-Language list.
  */
 const EXTRA = [
 	{
 		name: '40-lang-banner-on-en-page',
 		path: '/guides/levels/',
 		viewport: DESKTOP,
-		accent: 'instrument',
 		theme: 'light',
 		languages: ['es-ES', 'es'],
 	},
@@ -81,17 +72,8 @@ const EXTRA = [
 		name: '41-lang-banner-on-es-page-phone',
 		path: '/es/guides/levels/',
 		viewport: PHONE,
-		accent: 'blueprint',
 		theme: 'dark',
 		languages: ['en-US', 'en'],
-	},
-	{
-		name: '42-prototype-switcher-open',
-		path: '/',
-		viewport: DESKTOP,
-		accent: 'graphite',
-		theme: 'dark',
-		click: '[data-accent-toggle]',
 	},
 ];
 
@@ -102,21 +84,16 @@ const browser = await puppeteer.launch({
 	args: ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage', '--font-render-hinting=none'],
 });
 
-for (const [name, path, viewport, accent, theme, scrollY = 0, fullPage = false] of SHOTS) {
+for (const [name, path, viewport, theme, scrollY = 0, fullPage = false] of SHOTS) {
 	if (filters.length && !filters.some((f) => name.includes(f))) continue;
 	const page = await browser.newPage();
 	await page.setViewport({ ...viewport, deviceScaleFactor: 1 });
-	// Seed the preferences before the document runs its before-paint script.
-	await page.evaluateOnNewDocument(
-		(a, t) => {
-			try {
-				localStorage.setItem('phonometry:accent', a);
-				localStorage.setItem('starlight-theme', t);
-			} catch {}
-		},
-		accent,
-		theme,
-	);
+	// Seed the theme before the document runs its before-paint script.
+	await page.evaluateOnNewDocument((t) => {
+		try {
+			localStorage.setItem('starlight-theme', t);
+		} catch {}
+	}, theme);
 	await page.goto(`${BASE}/phonometry${path}`, { waitUntil: 'networkidle0', timeout: 90000 });
 	await page.evaluate((t) => {
 		document.documentElement.dataset.theme = t;
@@ -153,9 +130,8 @@ for (const shot of EXTRA) {
 	const page = await context.newPage();
 	await page.setViewport({ ...shot.viewport, deviceScaleFactor: 1 });
 	await page.evaluateOnNewDocument(
-		(a, t, langs) => {
+		(t, langs) => {
 			try {
-				localStorage.setItem('phonometry:accent', a);
 				localStorage.setItem('starlight-theme', t);
 			} catch {}
 			if (langs) {
@@ -163,7 +139,6 @@ for (const shot of EXTRA) {
 				Object.defineProperty(navigator, 'language', { get: () => langs[0] });
 			}
 		},
-		shot.accent,
 		shot.theme,
 		shot.languages ?? null,
 	);
@@ -172,10 +147,6 @@ for (const shot of EXTRA) {
 		document.documentElement.dataset.theme = t;
 	}, shot.theme);
 	await page.addStyleTag({ content: 'astro-dev-toolbar{display:none !important}' });
-	if (shot.click) {
-		await page.click(shot.click);
-		await new Promise((r) => setTimeout(r, 300));
-	}
 	await new Promise((r) => setTimeout(r, 500));
 	await page.screenshot({ path: join(OUT, `${shot.name}.png`) });
 	await context.close();

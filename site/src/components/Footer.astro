@@ -3,11 +3,9 @@
 // human-visible maintainer block that corroborates the Person node in the
 // site-wide JSON-LD @graph (GEO: entity corroboration).
 import Default from '@astrojs/starlight/components/Footer.astro';
-// Experimental: the floating prototype switcher (colour direction, language
-// detection mode) and the first-visit language suggestion. Both are mounted
-// here because the footer is the one custom component rendered on every page,
-// splash included; both position themselves fixed.
-import PrototypeSwitcher from './PrototypeSwitcher.astro';
+// The first-visit language suggestion. Mounted here because the footer is the
+// one custom component rendered on every page, splash included; it positions
+// itself fixed to the bottom edge.
 import LangSuggest from './LangSuggest.astro';
 
 const path = Astro.url.pathname;
@@ -26,7 +24,6 @@ const text =
   · <a href="https://pypi.org/project/phonometry/">PyPI</a>
 </div>
 <LangSuggest />
-<PrototypeSwitcher />
 
 <style>
   .maintainer {
