@@ -44,13 +44,17 @@ const expect = (name, actual, wanted) => {
 	);
 };
 
-/** Desktop viewport: the sidebar is a drawer below 50rem and is not the target. */
-async function open(path) {
+/** Desktop by default; `phone` swaps in the drawer, which is opened first. */
+async function open(path, { phone = false } = {}) {
 	const context = await browser.createBrowserContext();
 	const page = await context.newPage();
-	await page.setViewport({ width: 1440, height: 900 });
+	await page.setViewport(phone ? { width: 390, height: 844 } : { width: 1440, height: 900 });
 	await page.goto(`${BASE}/phonometry${path}`, { waitUntil: 'networkidle0', timeout: 90000 });
 	await page.addStyleTag({ content: 'astro-dev-toolbar{display:none !important}' });
+	if (phone) {
+		await page.evaluate(() => document.querySelector('starlight-menu-button button')?.click());
+		await new Promise((r) => setTimeout(r, 300));
+	}
 	return { context, page };
 }
 
@@ -82,6 +86,93 @@ const readState = () => {
 		overviewRows: links.filter((a) => /^(Overview|Resumen)$/.test(a.textContent.trim())).length,
 	};
 };
+
+/**
+ * The type treatment of every visible row, reduced per depth.
+ *
+ * A group label is a `<summary>` and a page is an `<a>`, and stock Starlight
+ * gives them different weight, ink and (below 50rem) size, which made a nested
+ * group look like it was set in another typeface than the page beside it. What
+ * a reader depends on is that rows at the same depth read as one list, so this
+ * counts the distinct treatments seen at each depth: one is the whole point.
+ * The current page is excluded, because it is deliberately louder (a filled
+ * accent pill), and closed branches are excluded because they are not on
+ * screen.
+ */
+const readTypography = () => {
+	const sidebar = document.getElementById('starlight__sidebar');
+	const visible = (el) =>
+		el.checkVisibility({ contentVisibilityAuto: true, visibilityProperty: true });
+	const byDepth = {};
+	const walk = (ul, depth) => {
+		for (const li of ul.children) {
+			const link = li.querySelector(':scope > a');
+			const details = li.querySelector(':scope > details');
+			const row = link ?? details?.querySelector(':scope > summary > .group-label > .large');
+			if (!row) continue;
+			if (visible(row) && row.getAttribute('aria-current') !== 'page') {
+				const s = getComputedStyle(row);
+				const seen = (byDepth[depth] ??= { treatments: new Set(), kinds: new Set() });
+				seen.treatments.add(
+					[s.fontWeight, s.fontSize, s.fontFamily, s.letterSpacing, s.textTransform, s.color].join(
+						' | ',
+					),
+				);
+				seen.kinds.add(link ? 'page' : 'group');
+			}
+			const sub = details?.querySelector(':scope > ul');
+			if (sub) walk(sub, depth + 1);
+		}
+	};
+	walk(sidebar.querySelector('ul.top-level'), 1);
+	return Object.fromEntries(
+		Object.entries(byDepth).map(([depth, v]) => [
+			depth,
+			{ treatments: v.treatments.size, kinds: [...v.kinds].sort().join('+') },
+		]),
+	);
+};
+
+// --- One type treatment per depth, on the phone and on the desktop ---------
+for (const phone of [true, false]) {
+	const where = phone ? 'drawer' : 'column';
+	// The open branch here is Hearing and perception, which holds an Overview
+	// page and three nested groups, so the second level has both kinds of row.
+	const { context, page } = await open(DEEP_GUIDE, { phone });
+	const type = await page.evaluate(readTypography);
+	expect(`${where}: the top-level headings are one treatment`, type[1], {
+		treatments: 1,
+		kinds: 'group',
+	});
+	expect(`${where}: second-level groups and pages read the same`, type[2], {
+		treatments: 1,
+		kinds: 'group+page',
+	});
+	expect(`${where}: third-level pages read the same`, type[3], {
+		treatments: 1,
+		kinds: 'page',
+	});
+	await page.close();
+	await context.close();
+}
+
+// --- The same inside the API reference, which is the deepest branch --------
+{
+	const { context, page } = await open(API_PAGE);
+	const type = await page.evaluate(readTypography);
+	// Second level here is the API's own Overview row next to its twenty
+	// category groups; third level is the module pages of the open category.
+	expect('API branch: its Overview row reads like its category groups', type[2], {
+		treatments: 1,
+		kinds: 'group+page',
+	});
+	expect('API branch: the module rows read the same', type[3], {
+		treatments: 1,
+		kinds: 'page',
+	});
+	await page.close();
+	await context.close();
+}
 
 // --- A guide page: only the reader's own branch is open --------------------
 {
