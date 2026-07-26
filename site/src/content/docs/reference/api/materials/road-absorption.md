@@ -5,8 +5,6 @@ sidebar:
   label: "road_absorption"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 In-situ sound absorption of road surfaces (ISO 13472-1 / ISO 13472-2).
 
 Two complementary standardised in-situ methods are supported here. They target
@@ -59,6 +57,8 @@ cosine-squared or Blackman-Harris trailing edge, with the shape and lengths
 to a short leading edge, a 5 ms flat top and a Blackman-Harris trailing edge
 (the Annex E example report); the historical fixed edge timings are **not**
 hard-coded as if normative.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## absorption_reference_corrected
 

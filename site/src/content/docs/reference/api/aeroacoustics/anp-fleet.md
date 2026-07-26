@@ -5,8 +5,6 @@ sidebar:
   label: "anp_fleet"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 EASA ANP fleet database bridge for the ECAC Doc 29 airport-noise chain.
 
 The ECAC Doc 29 method in [`phonometry.aircraft.airport_noise`](/phonometry/reference/api/aeroacoustics/airport-noise/) places an
@@ -39,6 +37,8 @@ every aircraft regardless.
 
 Source (clean-room, implemented from the published table format): EASA ANP
 database v2.3 (2020) and the ECAC Doc 29 4th ed. Vol 2 NPD/profile conventions.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## AnpAircraft
 

@@ -5,8 +5,6 @@ sidebar:
   label: "building_prediction"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Building acoustic performance prediction (EN 12354-1/-2:2000).
 
 This is the **prediction** counterpart of the measurement modules
@@ -52,6 +50,8 @@ equivalent level `Ln,w,eq` (Annex B `164 − 35 lg(m'/m'0)`), the covering
 improvement `ΔLw` (ISO 717-2) and the flanking correction `K` from Table 1.
 
 Clause citations refer to EN 12354-1:2000 (airborne) or EN 12354-2:2000 (impact).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## AirbornePredictionResult
 

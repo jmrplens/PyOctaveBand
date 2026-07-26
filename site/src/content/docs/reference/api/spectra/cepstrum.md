@@ -5,8 +5,6 @@ sidebar:
   label: "cepstrum"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Cepstral analysis: real/power/complex cepstrum, liftering and echo detection.
 
 The **cepstrum** is the inverse Fourier transform of the logarithm of a
@@ -60,6 +58,8 @@ features sharper than the grid resolves; zero-padding `nfft` is the
 remedy, exactly like the `oversample` padding of
 [`phonometry.minimum_phase`](/phonometry/reference/api/spectra/phase/#minimum_phase), whose cepstral folding core
 (`_fold_causal`) this module shares.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## cepstrum
 

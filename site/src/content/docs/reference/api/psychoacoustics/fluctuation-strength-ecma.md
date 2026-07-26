@@ -5,8 +5,6 @@ sidebar:
   label: "fluctuation_strength_ecma"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Psychoacoustic fluctuation strength per ECMA-418-2:2025 (4th ed., Clause 9).
 
 Clean-room implementation of the fluctuation-strength signal chain of
@@ -90,6 +88,8 @@ pinned by the calibration signal; the confirmed defects are recorded in
   50 Hz), the Clause 9.1.12/9.1.14 discard of l50 = 0..35 would leave no
   frames; the aggregation then falls back to all frames instead of
   reporting an empty (zero) result.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## EcmaFluctuationStrength
 

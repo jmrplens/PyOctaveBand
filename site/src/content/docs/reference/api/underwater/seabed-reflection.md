@@ -5,8 +5,6 @@ sidebar:
   label: "seabed_reflection"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Plane-wave reflection at the seabed (fluid-fluid Rayleigh model).
 
 A plane wave in the water column (density `ρ1`, sound speed `c1`) striking a
@@ -28,6 +26,8 @@ reflection coefficient (Medwin & Clay, Eq. 2.6.11a). Using the grazing angle
 Lossless fluid-fluid model (real `ρ`/`c`); sediment attenuation is out of
 scope. Densities enter only through the impedance ratio, so any consistent unit
 works (kg/m³ by convention).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## bottom_reflection_loss
 

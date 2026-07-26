@@ -5,13 +5,13 @@ sidebar:
   label: "loudness_contours"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Normal equal-loudness-level contours per ISO 226:2023.
 
 Implements Formula (1) (clause 4.1: SPL of a pure tone from its loudness
 level) and Formula (2) (clause 4.2: the inverse) with the Table 1 (p. 4)
 parameters at the 29 preferred third-octave frequencies of ISO 266.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## equal_loudness_contour
 

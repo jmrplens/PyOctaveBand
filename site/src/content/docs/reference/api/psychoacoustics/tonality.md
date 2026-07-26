@@ -5,8 +5,6 @@ sidebar:
   label: "tonality"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Prominent discrete tone assessment per ECMA-418-1:2024 (3rd edition).
 
 Implements the tone-to-noise ratio (TNR, clause 11) and prominence ratio
@@ -19,6 +17,8 @@ tones to be confirmed by aural examination (clauses 11.8/12.8) and to pass
 the clause 8/9 lower-threshold-of-hearing screen (its Formula (1), which
 needs calibrated absolute levels); both audibility requirements are the
 caller's responsibility.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## prominence_ratio
 

@@ -5,8 +5,6 @@ sidebar:
   label: "multiple_shock_vibration"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Whole-body vibration containing multiple shocks (ISO 2631-5:2018).
 
 Implements the normative Clause 5 spinal-response model and the Annex C
@@ -42,6 +40,8 @@ and the Weibull probability of lumbar injury `P = 1 - exp(-(R/alpha)**beta)`
 The Annex A / Annex E model (intervertebral compressive forces via a
 finite-element model distributed by ISO) is not reproducible from the standard
 text and is out of scope.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## acceleration_dose
 

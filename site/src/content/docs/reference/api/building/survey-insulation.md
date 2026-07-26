@@ -5,8 +5,6 @@ sidebar:
   label: "survey_insulation"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Field survey method for sound insulation and service-equipment noise
 (ISO 10052:2021).
 
@@ -62,6 +60,8 @@ ratings reuse the verified [`phonometry.weighted_rating`](/phonometry/reference/
 [`phonometry.weighted_impact_rating`](/phonometry/reference/api/building/insulation/#weighted_impact_rating) (ISO 717-2) engines, formed only when
 exactly 5 octave (or 16 one-third-octave) values are supplied. No background
 correction is applied (Clause 6.2).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## estimate_reverberation_index
 

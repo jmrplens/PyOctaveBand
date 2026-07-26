@@ -5,8 +5,6 @@ sidebar:
   label: "sti"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Speech Transmission Index (STI) per IEC 60268-16:2020 (Edition 5).
 
 Implements the full-STI indirect method from impulse responses (Schroeder
@@ -20,6 +18,8 @@ threshold correction -> effective SNR clipped to +/-15 dB -> transmission
 indices -> band MTI -> weighted STI) is numerically identical between
 Ed.4 (2011) clauses A.5.2-A.5.6 and Ed.5; the only Ed.5 numeric change is
 the male test-signal spectrum (A.6.1).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## sti_from_impulse_response
 

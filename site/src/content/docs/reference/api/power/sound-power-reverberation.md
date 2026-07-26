@@ -5,8 +5,6 @@ sidebar:
   label: "sound_power_reverberation"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Sound power level of a noise source measured in a reverberation test room:
 ISO 3741:2010 (precision method, accuracy grade 1).
 
@@ -47,6 +45,8 @@ LW = LW(RSS) + ( Lp(ST) - Lp(RSS) + C2 )                         (Eq. 21)
 Both methods cover the one-third-octave bands from 100 Hz to 10 kHz (clause
 8.1). Octave-band, A-weighted and total levels follow ISO 3741 Annex F, which
 reuses the ISO 3744 Annex E A-weighting band corrections.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## ReverberationSoundPowerResult
 

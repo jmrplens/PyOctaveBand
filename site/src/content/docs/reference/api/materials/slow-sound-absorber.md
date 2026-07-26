@@ -5,8 +5,6 @@ sidebar:
   label: "slow_sound_absorber"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Slow-sound slit panels loaded with Helmholtz resonators (perfect absorbers).
 
 A rigid panel perforated by a periodic array of thin closed slits, whose upper
@@ -64,6 +62,8 @@ phonometry (a passive medium has `Im(k) < 0`):
   absorption (critical coupling) is reached when the reflection zero sits on
   the real-frequency axis, i.e. `Re(Z) cos(theta) = Z0` and `Im(Z) = 0`
   with `Z = T11 / T21` the acoustic surface impedance (Eq. (9)).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## critical_coupling_design
 

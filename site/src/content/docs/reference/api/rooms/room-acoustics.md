@@ -5,8 +5,6 @@ sidebar:
   label: "room_acoustics"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Room acoustic parameters from impulse responses per ISO 3382-1:2009
 (performance spaces) and ISO 3382-2:2008 (ordinary rooms).
 
@@ -42,6 +40,8 @@ time stays within the 5 % just-noticeable difference of ISO 3382-1:2009,
 Table A.1. The curvature indicator C = 100*(T30/T20 - 1) follows
 ISO 3382-2:2008, B.3; values above 10 % flag a decay curve that is far
 from a straight line.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## decay_curve
 

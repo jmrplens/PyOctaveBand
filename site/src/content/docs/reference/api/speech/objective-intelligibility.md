@@ -5,8 +5,6 @@ sidebar:
   label: "objective_intelligibility"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Short-Time Objective Intelligibility (STOI and ESTOI).
 
 Implements the two correlation-based objective intelligibility measures that
@@ -43,6 +41,8 @@ the analysis window is MATLAB's `hanning` (`numpy.hanning` of length
 implementation of the authors; `pystoi` reproduces the same conventions and
 is used as an external cross-check in the test suite (it is not a runtime
 dependency).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## stoi
 

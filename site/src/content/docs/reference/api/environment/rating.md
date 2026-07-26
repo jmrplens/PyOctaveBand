@@ -5,12 +5,12 @@ sidebar:
   label: "rating"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Environmental noise descriptors per ISO 1996-1:2016.
 
 Day-evening-night (Lden, 3.6.4) and day-night (Ldn, 3.6.5) sound levels,
 and composite whole-day rating levels (6.5, Formulae 5-6).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## composite_rating_level
 

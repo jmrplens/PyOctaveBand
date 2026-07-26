@@ -5,8 +5,6 @@ sidebar:
   label: "equalizer"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Parametric equalizer biquads per the RBJ Audio EQ Cookbook.
 
 Second-order (biquad) IIR sections designed from the closed-form recipes of
@@ -58,6 +56,8 @@ definition.
 Reference: Bristow-Johnson, R. *Audio EQ Cookbook*. Republished as a W3C
 Working Group Note (ed. R. Toy), 8 June 2021.
 https://www.w3.org/TR/audio-eq-cookbook/
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## EQResponseResult
 

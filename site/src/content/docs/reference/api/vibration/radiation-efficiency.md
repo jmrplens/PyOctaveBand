@@ -5,8 +5,6 @@ sidebar:
   label: "radiation_efficiency"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Radiation efficiency of a plate in bending (Hopkins 2007, Sound Insulation,
 Section 2.9; Leppington et al. 1982; Maidanik 1962).
 
@@ -59,6 +57,8 @@ with ``k = 2 pi f / c0`` the acoustic wavenumber;
 * in the band that contains `fc` (Eq. 2.230):
   `sigma ~= (0.5 - 0.15 L1/L2) sqrt(k fc L1)` with `k fc = 2 pi fc / c0`,
   `L1` the smaller and `L2` the larger plate dimension.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## coincidence_frequency
 

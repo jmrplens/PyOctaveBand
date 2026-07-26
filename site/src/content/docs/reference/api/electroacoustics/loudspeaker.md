@@ -5,8 +5,6 @@ sidebar:
   label: "loudspeaker"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Rated loudspeaker characteristics (IEC 60268-5).
 
 A loudspeaker measurement/rating report gathers the *rated characteristics*
@@ -46,6 +44,8 @@ the report never merely repeats a manufacturer number:
   threshold on either side of the peak, which is the second clean-room oracle:
   a response crossing the threshold at chosen frequencies returns exactly
   those frequencies.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## loudspeaker_characteristics
 

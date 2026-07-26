@@ -5,8 +5,6 @@ sidebar:
   label: "flanking_transmission"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Laboratory measurement of flanking sound transmission (ISO 10848:2006/2010).
 
 This is the **measurement** counterpart of the flanking-transmission
@@ -64,6 +62,8 @@ the corresponding band set is present in the supplied frequencies. For heavy
 junctions (Part 4, Clause 9) bands whose modal overlap factor is below 0,25
 are bracketed and excluded from the single-number mean when the per-band
 `modal_overlap` is supplied.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## band_mode_count
 

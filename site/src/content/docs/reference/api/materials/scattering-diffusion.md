@@ -5,8 +5,6 @@ sidebar:
   label: "scattering_diffusion"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Random-incidence scattering and directional diffusion coefficients.
 
 Two complementary free-field / reverberation-room surface descriptors are
@@ -44,6 +42,8 @@ panels such as the metadiffusers of Jiménez, Cox, Romero-García & Groby
 (2017, *Scientific Reports* 7, 5389, doi:10.1038/s41598-017-05710-5), whose
 slow-sound resonant slots reach the diffusion of a Schroeder or
 quadratic-residue diffuser in a fraction of the depth.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## absorption_coefficient_uncertainty
 

@@ -5,8 +5,6 @@ sidebar:
   label: "air_absorption"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Atmospheric absorption of sound: ISO 9613-1:1993.
 
 The attenuation of a pure tone propagating through the atmosphere is governed by
@@ -61,6 +59,8 @@ This module closes the loop with [`phonometry.sound_absorption`](/phonometry/ref
 whose air power-attenuation coefficient `m` (1/m) is defined only through the
 ISO 9613-1 `alpha` via `m = alpha / (10 * lg e)`. [`air_attenuation_m`](/phonometry/reference/api/environment/air-absorption/#air_attenuation_m)
 returns that `m` directly.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## air_attenuation
 

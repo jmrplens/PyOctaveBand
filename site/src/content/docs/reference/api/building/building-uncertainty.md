@@ -5,8 +5,6 @@ sidebar:
   label: "building_uncertainty"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Measurement uncertainty in building acoustics (ISO 12999-1:2020).
 
 This module supplies the **measurement uncertainty** of the sound-insulation
@@ -46,6 +44,8 @@ reduction by `m` independent measurements `u/sqrt(m)` (Formula A.7); and the
 uncorrelated single-number combination of Annex B (Formula B.2).
 
 Clause/table numbers refer to ISO 12999-1:2020(E).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## band_uncertainty
 

@@ -5,8 +5,6 @@ sidebar:
   label: "silencers"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Reactive silencers by the four-pole (transmission-matrix) method.
 
 A reactive silencer controls noise by *reflecting* it back to the source with
@@ -67,6 +65,8 @@ peaking at `10 log10[1 + (1/4)(m - 1/m)^2]` when `kL = pi/2, 3pi/2, ...` and
 dropping to `0` at `kL = n pi` (no dissipation). The four-pole product
 reproduces this exactly, and the machinery extends to side-branch (Helmholtz,
 quarter-wave) and extended-tube resonators that the closed form cannot cover.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## expansion_chamber
 

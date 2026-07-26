@@ -5,8 +5,6 @@ sidebar:
   label: "steady_field"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Steady-state sound field in a room: room constant, critical distance, level.
 
 When a source of constant sound power runs in a room, the sound pressure level
@@ -53,6 +51,8 @@ exactly the crossover of its own [`steady_state_spl`](/phonometry/reference/api/
 modal low-frequency regime -- where discrete room modes rule and the diffuse
 assumption of `R` and `rc` fails -- and the high-frequency regime of
 overlapping modes where the statistical field of this module applies.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## critical_distance
 

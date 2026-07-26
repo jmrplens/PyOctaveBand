@@ -5,9 +5,9 @@ sidebar:
   label: "frequencies"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Frequency calculation logic according to ANSI/IEC standards.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## getansifrequencies
 

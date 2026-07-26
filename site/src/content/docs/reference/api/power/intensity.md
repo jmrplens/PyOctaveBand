@@ -5,8 +5,6 @@ sidebar:
   label: "intensity"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Two-microphone (p-p) sound intensity per IEC 61043:1994 and the
 ISO 9614-1:1993 field indicators.
 
@@ -45,6 +43,8 @@ power) and F4 (field non-uniformity) follow ISO 9614-1:1993 Annex A
 `Ld = delta_pI0 - K` (ISO 9614-1 clause 3.12, equation (10)); the
 instrument is adequate for a measurement when `Ld > F2` (criterion 1,
 Annex B equation (B.1)).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## dynamic_capability_index
 

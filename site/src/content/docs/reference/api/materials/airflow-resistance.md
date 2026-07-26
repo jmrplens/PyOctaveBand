@@ -5,8 +5,6 @@ sidebar:
   label: "airflow_resistance"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Airflow resistance of porous materials: ISO 9053-1 and ISO 9053-2.
 
 Two standardised measurement methods share the same three quantities and units
@@ -66,6 +64,8 @@ value `kappa = 1.4` (Formula (A.1)); for a conforming result compute `kappa'`
 per Annex A and pass it explicitly.
 
 Neither part defines a temperature/atmospheric normalisation of the result.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## airflow_resistance
 

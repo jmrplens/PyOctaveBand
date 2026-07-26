@@ -5,8 +5,6 @@ sidebar:
   label: "impulsive_sound"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Objective prominence of impulsive sounds and the `LAeq` adjustment
 (ISO/PAS 1996-3:2022).
 
@@ -42,6 +40,8 @@ from Pedersen's method) and are reused from
 (Clause 8): onset rate and level difference are level *differences*, so the
 adjustment is unchanged by a constant offset. Only the reported `LAeq` and the
 adjusted `LAeq` depend on calibration.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## detect_onsets
 

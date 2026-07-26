@@ -5,8 +5,6 @@ sidebar:
   label: "propagation"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Underwater sound propagation: transmission loss (closed-form).
 
 Transmission loss `TL` (dB) is the sum of geometrical spreading and volume
@@ -28,6 +26,8 @@ Francois-Garrison and Ainslie-McColm (~10 % as the latter's paper states;
 marginally exceeded at the extreme corners of the stated domain, e.g. 10.4 % at
 T = −6 °C / 1 MHz and 12.3 % at z = 7 km, a property of the published
 simplification, both transcriptions verified digit-for-digit).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## seawater_absorption
 

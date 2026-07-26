@@ -5,8 +5,6 @@ sidebar:
   label: "rotorcraft_noise"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Rotorcraft noise by the hemisphere method (ECAC Doc 32 / NORAH2).
 
 The ECAC Doc 32 rotorcraft-noise method describes a helicopter's highly directive
@@ -49,6 +47,8 @@ against the guidance Table 4 (one-third-octave attenuation per km at ICAO
 reference conditions); the event chain is validated end to end against the NORAH2
 reference implementation outputs for the ARP verification cases (angles, retarded
 times, hemisphere selection, per-step levels and event metrics).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## atmospheric_adjustment
 

@@ -5,9 +5,9 @@ sidebar:
   label: "calibration"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Calibration utilities for mapping digital signals to physical SPL levels.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## calculate_sensitivity
 

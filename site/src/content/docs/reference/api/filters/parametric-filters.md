@@ -5,8 +5,6 @@ sidebar:
   label: "parametric_filters"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Weighting filters (A, B, C, D, G, AU, Z) and time weighting utilities.
 
 A/C/Z per IEC 61672-1:2013; G (infrasound) per ISO 7196:1995.
@@ -40,6 +38,8 @@ curve republished in the NASA Handbook of Aircraft Noise Metrics
 (NASA CR-3406, 1981, Table SLD-I) within 0.1 dB at every one-third-octave
 frequency from 50 Hz to 10 kHz except 1600 Hz (0.15 dB) and 2500 Hz
 (0.28 dB), where that table appears to round a different source curve.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## linkwitz_riley
 

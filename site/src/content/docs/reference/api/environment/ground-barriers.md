@@ -5,8 +5,6 @@ sidebar:
   label: "ground_barriers"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Spherical-wave ground effect and advanced barrier diffraction.
 
 This module extends the tabulated ground and barrier terms of ISO 9613-2 (see
@@ -92,6 +90,8 @@ Delta = 5 + 20 lg( sqrt(2 pi N) / tanh(sqrt(2 pi N)) )
 
 Thick barriers (or two parallel thin screens) are handled by the double-edge
 Fresnel number `N = (2/lambda)(A + B + e - d)` (Bies Eq. (5.157)).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## barrier_insertion_loss
 

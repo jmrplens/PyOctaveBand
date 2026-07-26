@@ -5,8 +5,6 @@ sidebar:
   label: "room_noise"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Room-noise rating curves per ANSI/ASA S12.2-2019.
 
 Implements the two spectrum-in rating methods of ANSI/ASA S12.2-2019, *Criteria
@@ -35,6 +33,8 @@ low-frequency noise (RNC, Annex A), the acoustically induced vibration and
 rattle classification (`RV`, clause D.3.4, which needs the Table 6 test)
 and the numeric quality-assessment index (QAI, clause D.5 - deferred by the
 standard to external references) are not implemented here.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## nc_curve
 

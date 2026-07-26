@@ -5,8 +5,6 @@ sidebar:
   label: "signals"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Test signals and sample-rate utilities.
 
 The signal toolbox of the metrology domain: deterministic test signals and
@@ -52,6 +50,8 @@ with their accuracy stated instead of implied.
   kernel [`align_impulse_responses`](/phonometry/reference/api/correlation/correlation/#align_impulse_responses)
   uses) or `circular` (for periodic records, exact to machine precision
   on bin-centered tones).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## fractional_delay
 

@@ -5,8 +5,6 @@ sidebar:
   label: "floor_covering_improvement"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Impact-sound improvement of floor coverings on a small mock-up (ISO 16251-1:2014).
 
 Laboratory method for the **improvement of impact sound insulation** `ΔL` of a
@@ -47,6 +45,8 @@ optionally extended to 50 Hz) is rated on that sub-range. The statement of
 results (Clause 8 e)) also carries the spectrum adaptation term `CI,Δ`
 (ISO 717-2:2020 Formula (A.4)) via
 [`phonometry.impact_improvement_adaptation_term`](/phonometry/reference/api/building/insulation/#impact_improvement_adaptation_term).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## acceleration_level
 

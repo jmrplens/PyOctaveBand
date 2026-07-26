@@ -994,14 +994,18 @@ def render_module_page(
 ) -> str:
     """Render one module page to Markdown."""
     description = _page_description(page)
+    # The module's own summary leads, and the provenance note follows it.
+    # The note used to be the first paragraph on all 120 of these pages, which
+    # made "Do not edit by hand" both the search snippet and the target of the
+    # `speakable` selector: a maintenance instruction standing in for what the
+    # module actually does.
     out = [
         _frontmatter(page.title, description, page.label),
-        "",
-        BANNER,
         "",
     ]
     if page.intro:
         out.extend([render_prose(page.intro, xref, stats), ""])
+    out.extend([BANNER, ""])
 
     for member in page.members:
         out.extend([f"## {_heading_text(member.name)}", ""])
@@ -1070,10 +1074,10 @@ def render_index(
         'phonometry, generated from the source docstrings."'),
         "---",
         "",
-        BANNER,
-        "",
         ("The complete public API, one page per module. Import the domain "
         "subpackage and call through it:"),
+        "",
+        BANNER,
         "",
         "```python",
         "from phonometry import metrology, underwater",

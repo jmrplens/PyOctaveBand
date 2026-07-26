@@ -5,8 +5,6 @@ sidebar:
   label: "wind_turbine_noise"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Wind-turbine acoustic noise (IEC 61400-11:2012+A1:2018).
 
 Two closed-form quantities of the standard:
@@ -27,6 +25,8 @@ determined from the narrowband spectrum. The rating adjustment `K_T` is the
 ISO 1996-2 [`tonal_adjustment`](/phonometry/reference/api/environment/measurement/#tonal_adjustment). The
 full measurement pipeline (binning, regression to standardised wind speeds,
 uncertainty budgets) is out of scope; these are the underlying closed forms.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## apparent_sound_power_level
 

@@ -5,8 +5,6 @@ sidebar:
   label: "sii"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Speech Intelligibility Index (SII) per ANSI S3.5-1997 (R2017).
 
 Implements the one-third-octave-band method (18 bands, 160 Hz - 8000 Hz) of
@@ -22,6 +20,8 @@ The band-importance function (Table 3, average speech material), the standard
 speech spectrum levels by vocal effort (Table 3) and the reference internal
 noise spectrum level (Table 3) are the standard's own tabulated constants.
 Spectrum levels are as defined in clauses 3.11 and 3.55.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## SIIResult
 

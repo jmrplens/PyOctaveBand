@@ -5,8 +5,6 @@ sidebar:
   label: "reverberation_prediction"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Reverberation-time prediction from room geometry and absorption.
 
 Predicts the reverberation time `T` of an enclosed space from its volume,
@@ -55,6 +53,8 @@ three wall pairs. All five reduce to Eyring for a uniform absorption
 distribution, and Eyring reduces to Sabine as the absorption tends to zero --
 the identities the conformance suite anchors on, absent a machine-readable
 worked example in the source texts.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## arau_puchades_reverberation_time
 

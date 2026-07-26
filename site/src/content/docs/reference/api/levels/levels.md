@@ -5,9 +5,9 @@ sidebar:
   label: "levels"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Integrated and statistical sound levels (Leq, LAeq, LN percentiles).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## laeq
 

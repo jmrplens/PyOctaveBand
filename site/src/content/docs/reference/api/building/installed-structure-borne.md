@@ -5,8 +5,6 @@ sidebar:
   label: "installed_structure_borne"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Installed structure-borne sound from service equipment (EN 12354-5:2009).
 
 EN 12354-5 predicts the sound pressure level in a receiving room caused by
@@ -45,6 +43,8 @@ building. The chain closes the structural-vibroacoustics series:
 
 The source and receiver mobilities/impedances are those of
 [`phonometry.mechanical_mobility`](/phonometry/reference/api/vibration/mechanical-mobility/) and [`phonometry.transfer_stiffness`](/phonometry/reference/api/vibration/transfer-stiffness/).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## coupling_term
 

@@ -5,8 +5,6 @@ sidebar:
   label: "synchronous_average"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Time synchronous averaging (TSA) of a periodic waveform in noise.
 
 Time domain averaging extracts a repetitive signal of known period `T`
@@ -68,6 +66,8 @@ of the input at the times `n·T + m/fs`, so the returned time axis is
 `m/fs` and the `M = round(fs·T)` samples cover one period exactly when
 `fs·T` is an integer and to within half a sample otherwise. No
 resampling onto an `M`-point angular grid is performed.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## comb_filter_response
 

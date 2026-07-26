@@ -5,8 +5,6 @@ sidebar:
   label: "loudness_ecma"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Psychoacoustic loudness per ECMA-418-2:2025 (4th ed., Sottek Hearing Model).
 
 Clean-room implementation of the loudness signal chain of ECMA-418-2:2025:
@@ -48,6 +46,8 @@ transient contribute \< 0.01 % (the value is signal-length invariant).
 The API is monaural: the quadratic-mean binaural combination of
 Formula (118) (Clause 8.1.5) is not implemented -- analyse each channel
 separately.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## EcmaLoudness
 

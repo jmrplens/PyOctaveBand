@@ -5,8 +5,6 @@ sidebar:
   label: "threshold"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Age-related hearing threshold (ISO 7029:2017) and audiometric reference zero
 (ISO 389-7:2005).
 
@@ -26,6 +24,8 @@ median by the standard-normal quantile times the appropriate spread
 
 The noise-induced permanent threshold shift of ISO 1999 (which combines a noise
 component with this age component) is not part of this module.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## age_threshold
 

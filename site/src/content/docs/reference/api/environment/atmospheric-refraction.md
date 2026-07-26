@@ -5,8 +5,6 @@ sidebar:
   label: "atmospheric_refraction"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Atmospheric refraction: ray tracing and the parabolic equation (PE).
 
 Sound propagation outdoors is bent by vertical gradients of the effective sound
@@ -50,6 +48,8 @@ The ground impedance is taken in the `e^{-i omega t}` convention of Salomons
 `PorousMediumResult`) is conjugated internally before entering the PE ground
 condition. Heights and ranges are in metres, sound speeds in m/s and
 frequencies in Hz.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## atmospheric_parabolic_equation
 

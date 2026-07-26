@@ -5,8 +5,6 @@ sidebar:
   label: "insulation"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Field airborne sound insulation (ISO 16283-1:2014) and impact sound
 insulation (ISO 16283-2), with single-number weighted ratings and
 spectrum adaptation terms (ISO 717-1 airborne, ISO 717-2 impact).
@@ -99,6 +97,8 @@ rounded to an integer (Clause A.2.1, Formulae (A.1) to (A.3)). The Table 3
 reference values, the shifting rule and CI are identical in the 2013 and
 2020 editions of ISO 717-2 (the 2020 edition only adds Annex D for the
 rubber-ball heavy/soft impactor, out of scope here).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## airborne_insulation
 

@@ -5,8 +5,6 @@ sidebar:
   label: "impulse_prominence"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Prominence of impulsive sounds and the LAeq adjustment (NT ACOU 112:2002).
 
 Noise with prominent impulses is more annoying than a steady sound of the same
@@ -27,6 +25,8 @@ sub-interval levels (clause 8, Note 1). An impulse qualifies when its onset
 rate exceeds 10 dB/s (clauses 4.5-4.7); non-qualifying level rises receive
 no adjustment (clause 8 applies only "for sounds with onset rates larger
 than 10 dB/s").
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## impulse_adjustment
 

@@ -5,8 +5,6 @@ sidebar:
   label: "panel_transmission"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Predicted airborne sound reduction index of panels (Bies, Hansen & Howard
 2017, Engineering Noise Control 5e, Section 7.2; Sharp 1973).
 
@@ -62,6 +60,8 @@ gap; a porous fill (a [`PorousMediumResult`](/phonometry/reference/api/materials
 [`phonometry.materials.porous_absorber`](/phonometry/reference/api/materials/porous-absorber/)) lowers the resonance through its
 softer, near-isothermal effective bulk modulus and damps the cavity so the
 mid-band slope is realised without standing-wave dips.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## double_wall_transmission_loss
 

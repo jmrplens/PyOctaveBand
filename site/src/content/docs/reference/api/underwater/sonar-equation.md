@@ -5,8 +5,6 @@ sidebar:
   label: "sonar_equation"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 The sonar equation (passive and active), in decibels.
 
 Combines the sonar performance terms -- source level `SL`, transmission loss
@@ -23,6 +21,8 @@ transmission loss at the detection limit `SE = 0`):
 All quantities are in dB (levels re a plane wave of 1 µPa rms; the terms are
 spectrum levels, i.e. referred to a 1 Hz band). Source: Urick, *Principles of
 Underwater Sound*, via Etter (2003), Table 10.2.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## active_sonar_equation
 

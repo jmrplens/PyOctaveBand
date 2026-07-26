@@ -5,8 +5,6 @@ sidebar:
   label: "program_loudness"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Programme loudness and true-peak level (ITU-R BS.1770-5, EBU R 128).
 
 Implements the objective multichannel loudness measurement algorithm of
@@ -43,6 +41,8 @@ channel reads -3.01 LKFS).
 
 Loudness values are returned in LUFS (the EBU name; identical to the LKFS of
 ITU-R BS.1770). 1 LU is equivalent to 1 dB.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## channel_weight
 

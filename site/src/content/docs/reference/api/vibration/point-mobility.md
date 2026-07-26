@@ -5,8 +5,6 @@ sidebar:
   label: "point_mobility"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Point mobilities and impedances of infinite structures (Cremer, Heckl &
 Petersson 2005, Chapter 5, Table 5.1).
 
@@ -52,6 +50,8 @@ mobility falls as `omega**(-1/2)`; the `(1 - j)` factor means half the
 input goes into a reactive near field. A moment excitation of the beam has the
 mobility (Cremer Eq. 5.75) `Y_M = omega (1 + j) / (4 B kB)` with
 `kB = omega / cB` the bending wavenumber.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## infinite_beam_mobility
 

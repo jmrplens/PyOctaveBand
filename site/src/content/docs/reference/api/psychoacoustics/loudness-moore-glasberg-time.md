@@ -5,8 +5,6 @@ sidebar:
   label: "loudness_moore_glasberg_time"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Time-varying loudness per ISO 532-3:2023 (Moore-Glasberg-Schlittenlacher).
 
 Clean-room implementation of the time-varying loudness model of ISO 532-3:2023,
@@ -60,6 +58,8 @@ other rates the Annex C.1 anchor reproduces with a 0.3 % cross-rate spread
 standard's 2.8 phon expanded uncertainty.  These values are pinned by the
 test suite; resample to 32 kHz first if letter-of-standard processing is
 required.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## loudness_moore_glasberg_time
 

@@ -5,8 +5,6 @@ sidebar:
   label: "psychoacoustic_annoyance"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Psychoacoustic annoyance (PA) after Fastl & Zwicker.
 
 Psychoacoustic annoyance combines four hearing sensations -- loudness,
@@ -42,6 +40,8 @@ ECMA-418-2 roughness and F from [`fluctuation_strength`](/phonometry/reference/a
 Sottek R, Osses F); the original PA model was calibrated with Zwicker-family
 sensations, so the signal convenience is an engineering estimate, while
 [`psychoacoustic_annoyance`](/phonometry/reference/api/psychoacoustics/psychoacoustic-annoyance/#psychoacoustic_annoyance) is the exact model.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## psychoacoustic_annoyance
 

@@ -5,8 +5,6 @@ sidebar:
   label: "loudness_moore_glasberg"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Stationary loudness per ISO 532-2:2017 (Moore-Glasberg method).
 
 Clean-room implementation of the spectral loudness model of ISO 532-2:2017,
@@ -40,6 +38,8 @@ takes the exact sinusoidal-component representation of clauses 5.2/5.4,
 band levels of clause 5.5, and [`loudness_moore_glasberg`](/phonometry/reference/api/psychoacoustics/loudness-moore-glasberg/#loudness_moore_glasberg) forms the
 narrowband (FFT) line spectrum of a calibrated pressure signal and feeds it to
 the exact sinusoidal-component method.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## loudness_moore_glasberg
 

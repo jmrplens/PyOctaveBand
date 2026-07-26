@@ -5,8 +5,6 @@ sidebar:
   label: "sound_absorption"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Sound absorption in a reverberation room: BS EN ISO 354:2003.
 
 The mean reverberation time of a reverberation room is measured empty and with
@@ -53,6 +51,8 @@ ISO 354 otherwise defers the calculation of `alpha` entirely to ISO 9613-1.
 `m` is therefore a user-supplied per-band parameter here (default 0, i.e. no air
 correction); a caller holding ISO 9613-1 `alpha` values can convert them with
 [`attenuation_from_alpha`](/phonometry/reference/api/materials/sound-absorption/#attenuation_from_alpha).
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## absorption_area
 

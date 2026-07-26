@@ -5,8 +5,6 @@ sidebar:
   label: "acoustics"
 ---
 
-> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
-
 Underwater-acoustics reference levels (ISO 18405:2017).
 
 Underwater sound levels use a reference pressure of **1 µPa** (not the 20 µPa of
@@ -26,6 +24,8 @@ level between the two reference pressures (a `20·lg(20) ≈ 26.02` dB reference
 change, **not** an energy/intensity equivalence, which would additionally
 involve the media impedances). For background-noise subtraction of a measured
 level, reuse the ISO 3744 `background_noise_correction` (`K1`) helper.
+
+> Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## in_air_to_underwater_spl
 
