@@ -66,6 +66,22 @@
   --ph-accent-ink: #b3e6f4;
   --ph-mark: #35b8d8;
   --ph-grid: rgba(53, 184, 216, 0.14);
+
+  /* Page-chip categories (rendered in src/styles/ux-variants.css). The
+     governing standards take the palette accent itself: they are what the
+     page is about, the chips are links, and the accent is the one colour
+     this palette lets mean something. The named works take its warm
+     counterpart, mirrored in OKLCH lightness and chroma at hue 74 so the
+     second category reads as a category rather than as a second accent. */
+  --ph-chip-standard-ink: var(--ph-accent-ink); /* L .894 C .056 h 216 */
+  --ph-chip-standard-line: #2f7688; /* L .530 C .075 h 216 */
+  --ph-chip-standard-fill: var(--ph-accent-soft);
+  --ph-chip-named-ink: #f8d6a9; /* L .894 C .070 h  74 */
+  --ph-chip-named-line: #856537; /* L .530 C .075 h  74 */
+  --ph-chip-named-fill: #3b2a10;
+  --ph-chip-muted-ink: var(--sl-color-gray-3);
+  --ph-chip-muted-line: var(--sl-color-gray-4);
+  --ph-chip-muted-fill: var(--sl-color-gray-6);
 }
 
 /* -------------------------------------------------------------- *
@@ -103,6 +119,19 @@
   --ph-accent-ink: #064a5e;
   --ph-mark: #0a6f8c;
   --ph-grid: rgba(10, 111, 140, 0.12);
+
+  /* Same construction on the light theme: the standards chip is the link
+     colour, the named-work chip is its warm mirror at the same OKLCH
+     lightness and chroma. */
+  --ph-chip-standard-ink: var(--sl-color-accent); /* L .504 C .093 h 225 */
+  --ph-chip-standard-line: #4994b0; /* L .630 C .085 h 225 */
+  --ph-chip-standard-fill: var(--ph-accent-soft);
+  --ph-chip-named-ink: #865a1f; /* L .504 C .093 h  70 */
+  --ph-chip-named-line: #aa804e; /* L .630 C .085 h  70 */
+  --ph-chip-named-fill: #f7eee4;
+  --ph-chip-muted-ink: var(--sl-color-gray-3);
+  --ph-chip-muted-line: var(--sl-color-gray-4);
+  --ph-chip-muted-fill: var(--sl-color-gray-6);
 }
 
 /* ------------------------------------------------------------------ *

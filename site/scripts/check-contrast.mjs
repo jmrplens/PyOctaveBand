@@ -120,6 +120,22 @@ for (const [name, p] of Object.entries(PALETTES)) {
 		4.5,
 	);
 	check(name, 'focus ring / accent mark on page', p['--ph-mark'], bg, 3);
+
+	// Page header chips. Each pill is a link, so its text is enforced at 4.5:1
+	// and its border at 3:1 (the border is what carries the category, so it is
+	// meaningful non-text). The hover state fills the pill, so the text is
+	// checked against that ground too.
+	for (const [label, kind] of [
+		['standards chip', 'standard'],
+		['named-work chip', 'named'],
+		['"+N more" chip', 'muted'],
+	]) {
+		const ink = p[`--ph-chip-${kind}-ink`];
+		check(name, `${label} text on page`, ink, bg, 4.5);
+		check(name, `${label} text on its hover fill`, ink, p[`--ph-chip-${kind}-fill`], 4.5);
+		check(name, `${label} border on page`, p[`--ph-chip-${kind}-line`], bg, 3);
+	}
+
 	check(name, 'inline code text on its ground', p['--sl-color-gray-2'], p['--sl-color-bg-inline-code'], isLight ? 4.5 : 0);
 	check(name, 'decorative hairline on page', p['--ph-border-strong'], bg, 0);
 

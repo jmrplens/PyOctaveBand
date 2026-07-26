@@ -22,32 +22,6 @@
    layered styles without specificity games. Both themes are covered (dark
    values on :root, light overrides on [data-theme='light']). */
 
-:root {
-  /* Category colours, dark theme. `*-ink` is the pill text, `*-line` its
-     border, `*-tint` the hover fill. The border alphas are the lowest that
-     clear 3:1 against the page background (WCAG 1.4.11 non-text contrast),
-     measured on the composited colour rather than assumed. */
-  --chip-standard-ink: #7ee8d5;
-  --chip-standard-line: rgb(111 220 200 / 50%);
-  --chip-standard-tint: rgb(111 220 200 / 18%);
-  --chip-theory-ink: #f4c04e;
-  --chip-theory-line: rgb(230 184 78 / 50%);
-  --chip-theory-tint: rgb(230 184 78 / 18%);
-  --chip-ink-muted: hsl(224, 8%, 62%);
-  --chip-more-line: hsl(224, 8%, 45%);
-}
-
-:root[data-theme='light'] {
-  --chip-standard-ink: #0c5c52;
-  --chip-standard-line: rgb(18 130 115 / 80%);
-  --chip-standard-tint: rgb(18 130 115 / 12%);
-  --chip-theory-ink: #855107;
-  --chip-theory-line: rgb(168 118 10 / 90%);
-  --chip-theory-tint: rgb(168 118 10 / 13%);
-  --chip-ink-muted: hsl(224, 7%, 42%);
-  --chip-more-line: hsl(224, 7%, 55%);
-}
-
 /* ---------------------------------------------------------------------------
    PAGE CHIPS. One run per category under the H1: the standards that govern
    the page, then the works its methods are attributed to. Every chip is a
@@ -58,6 +32,11 @@
 
    Rendered by PageChips.astro from the page's own `references` frontmatter;
    a page without references renders no markup at all.
+
+   The two category colours are palette tokens (--ph-chip-* in
+   src/styles/theme.css), not values of this file's own: the standards chip is
+   the palette accent, the named-work chip its warm mirror, and both are
+   audited by scripts/check-contrast.mjs together with the rest of the palette.
    --------------------------------------------------------------------------- */
 
 .page-chips {
@@ -94,19 +73,19 @@
 }
 
 .page-chips .chip-standard {
-  --chip-line: var(--chip-standard-line);
-  --chip-fill: var(--chip-standard-tint);
-  color: var(--chip-standard-ink);
+  --chip-line: var(--ph-chip-standard-line);
+  --chip-fill: var(--ph-chip-standard-fill);
+  color: var(--ph-chip-standard-ink);
 }
 .page-chips .chip-theory {
-  --chip-line: var(--chip-theory-line);
-  --chip-fill: var(--chip-theory-tint);
-  color: var(--chip-theory-ink);
+  --chip-line: var(--ph-chip-named-line);
+  --chip-fill: var(--ph-chip-named-fill);
+  color: var(--ph-chip-named-ink);
 }
 .page-chips .chip-more {
-  --chip-line: var(--chip-more-line);
-  --chip-fill: var(--sl-color-gray-6);
-  color: var(--chip-ink-muted);
+  --chip-line: var(--ph-chip-muted-line);
+  --chip-fill: var(--ph-chip-muted-fill);
+  color: var(--ph-chip-muted-ink);
 }
 
 /* Hover and focus fill the pill with a faint category tint and firm up the
