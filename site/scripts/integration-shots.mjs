@@ -106,6 +106,18 @@ const SIDEBAR = [
 	['47-drawer-phone-en-light', '/guides/loudness/', 'light', [], { phone: true, anchor: null }],
 	['48-drawer-phone-en-dark', '/guides/loudness/', 'dark', [], { phone: true, anchor: null }],
 	['49-drawer-phone-es-dark', '/es/guides/loudness/', 'dark', [], { phone: true, anchor: null }],
+	// The mixed case, which is the one that showed the type mismatch: a group
+	// whose children are nested groups (Rooms and buildings) directly above a
+	// group whose children are pages (Materials and surfaces, open on arrival
+	// because the current page is in it). Every row at the second level reads
+	// the same; the caret and the indent rule are what separate them.
+	[
+		'50-drawer-mixed-levels-dark',
+		'/guides/porous-absorbers/',
+		'dark',
+		['Rooms and buildings'],
+		{ phone: true, anchor: null },
+	],
 	// Arriving on a guide page: the API group is closed.
 	['30-api-closed-light', '/guides/levels/', 'light', []],
 	['31-api-closed-dark', '/guides/levels/', 'dark', []],
