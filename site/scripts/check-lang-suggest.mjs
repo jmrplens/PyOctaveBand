@@ -7,31 +7,13 @@
 // scenario also asserts that the URL is the one that was asked for.
 //
 // Usage: node scripts/check-lang-suggest.mjs [--base http://localhost:4321]
-import { readdirSync } from 'node:fs';
-import { createRequire } from 'node:module';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { BASE_PATH, baseFrom, createExpect, launchBrowser } from './shared/audit.mjs';
 
-const siteDir = join(dirname(fileURLToPath(import.meta.url)), '..');
-const require = createRequire(import.meta.url);
-const store = join(siteDir, 'node_modules', '.pnpm');
-const pkg = readdirSync(store).find((d) => /^puppeteer@/.test(d));
-const puppeteer = require(join(store, pkg, 'node_modules', 'puppeteer'));
+const BASE = baseFrom();
 
-const baseIdx = process.argv.indexOf('--base');
-const BASE = baseIdx === -1 ? 'http://localhost:4321' : process.argv[baseIdx + 1];
+const browser = await launchBrowser();
 
-const browser = await puppeteer.launch({
-	headless: true,
-	args: ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage'],
-});
-
-let failures = 0;
-const expect = (name, actual, wanted) => {
-	const ok = JSON.stringify(actual) === JSON.stringify(wanted);
-	if (!ok) failures++;
-	console.log(`${ok ? 'ok  ' : 'FAIL'} ${name}\n       got ${JSON.stringify(actual)}, want ${JSON.stringify(wanted)}`);
-};
+const { expect, failures } = createExpect();
 
 /**
  * Load `path` with a fake language list, an optional pre-seeded localStorage
@@ -54,7 +36,7 @@ async function visit(path, { languages = ['es-ES', 'es'], seed = {}, ua } = {}) 
 		languages,
 		seed,
 	);
-	await page.goto(`${BASE}/phonometry${path}`, { waitUntil: 'networkidle0', timeout: 60000 });
+	await page.goto(`${BASE}${BASE_PATH}${path}`, { waitUntil: 'networkidle0', timeout: 60000 });
 	await new Promise((r) => setTimeout(r, 400));
 	const result = await page.evaluate(() => {
 		const b = document.getElementById('lang-suggest');
@@ -72,7 +54,7 @@ async function visit(path, { languages = ['es-ES', 'es'], seed = {}, ua } = {}) 
 // 1. First visit, Spanish browser, English page: the banner offers Spanish
 //    and nothing navigates.
 expect('banner: first visit, es browser on an EN page', await visit('/guides/levels/'), {
-	url: '/phonometry/guides/levels/',
+	url: `${BASE_PATH}/guides/levels/`,
 	banner: true,
 	stored: null,
 });
@@ -81,14 +63,14 @@ expect('banner: first visit, es browser on an EN page', await visit('/guides/lev
 expect(
 	'banner: en browser on an EN page stays silent',
 	await visit('/guides/levels/', { languages: ['en-GB', 'en'] }),
-	{ url: '/phonometry/guides/levels/', banner: false, stored: null },
+	{ url: `${BASE_PATH}/guides/levels/`, banner: false, stored: null },
 );
 
 // 3. Spanish page, English browser: the banner offers English.
 expect(
 	'banner: en browser on an ES page',
 	await visit('/es/guides/levels/', { languages: ['en-US', 'en'] }),
-	{ url: '/phonometry/es/guides/levels/', banner: true, stored: null },
+	{ url: `${BASE_PATH}/es/guides/levels/`, banner: true, stored: null },
 );
 
 // 4. A stored Spanish choice does not fire on an English URL the visitor
@@ -96,21 +78,21 @@ expect(
 expect(
 	'no trap: stored es choice on an EN url only offers',
 	await visit('/guides/levels/', { seed: { 'phonometry:lang': 'es' } }),
-	{ url: '/phonometry/guides/levels/', banner: true, stored: 'es' },
+	{ url: `${BASE_PATH}/guides/levels/`, banner: true, stored: 'es' },
 );
 
 // 5. An explicit ?lang=en is a decision: recorded, and silent.
 expect(
 	'explicit ?lang=en wins over the browser list',
 	await visit('/guides/levels/?lang=en'),
-	{ url: '/phonometry/guides/levels/', banner: false, stored: 'en' },
+	{ url: `${BASE_PATH}/guides/levels/`, banner: false, stored: 'en' },
 );
 
 // 6. A previous dismissal keeps it quiet.
 expect(
 	'dismissed stays dismissed',
 	await visit('/guides/levels/', { seed: { 'phonometry:lang-dismissed': '1' } }),
-	{ url: '/phonometry/guides/levels/', banner: false, stored: null },
+	{ url: `${BASE_PATH}/guides/levels/`, banner: false, stored: null },
 );
 
 // 7. Crawlers see nothing.
@@ -119,14 +101,14 @@ expect(
 	await visit('/guides/levels/', {
 		ua: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
 	}),
-	{ url: '/phonometry/guides/levels/', banner: false, stored: null },
+	{ url: `${BASE_PATH}/guides/levels/`, banner: false, stored: null },
 );
 
 // 8. The English-only API subtree opts out entirely.
 expect(
 	'API reference renders no banner at all',
 	await visit('/reference/api/levels/levels/'),
-	{ url: '/phonometry/reference/api/levels/levels/', banner: 'absent', stored: null },
+	{ url: `${BASE_PATH}/reference/api/levels/levels/`, banner: 'absent', stored: null },
 );
 
 // 9. Nothing ever navigates on its own: the same first visit that a redirect
@@ -134,7 +116,7 @@ expect(
 expect(
 	'nothing navigates: the ES-preferring first visit stays on the EN url',
 	await visit('/getting-started/'),
-	{ url: '/phonometry/getting-started/', banner: true, stored: null },
+	{ url: `${BASE_PATH}/getting-started/`, banner: true, stored: null },
 );
 
 // 10. The bar is on top of everything it overlaps. It is fixed across the
@@ -150,7 +132,7 @@ expect(
 		Object.defineProperty(navigator, 'languages', { get: () => ['es-ES', 'es'] });
 		Object.defineProperty(navigator, 'language', { get: () => 'es-ES' });
 	});
-	await page.goto(`${BASE}/phonometry/guides/levels/`, {
+	await page.goto(`${BASE}${BASE_PATH}/guides/levels/`, {
 		waitUntil: 'networkidle0',
 		timeout: 60000,
 	});
@@ -159,19 +141,26 @@ expect(
 	// it hit-tests. It is not part of the site.
 	await page.addStyleTag({ content: 'astro-dev-toolbar{display:none !important}' });
 	const hits = await page.evaluate(() => {
+		// A regression that keeps the bar off screen is exactly what this check
+		// is for, so report it as a failed hit test rather than throwing a raw
+		// TypeError that would abort the run and print nothing.
 		const bar = document.getElementById('lang-suggest');
+		if (!bar || bar.hidden) return { error: 'the bar did not come up' };
+		const dismiss = bar.querySelector('[data-lang-dismiss]');
+		if (!dismiss) return { error: 'the bar has no [data-lang-dismiss] control' };
 		const box = bar.getBoundingClientRect();
 		const mid = box.top + box.height / 2;
 		const owns = (x, y) => {
 			const el = document.elementFromPoint(x, y);
 			return !!el && (el === bar || bar.contains(el));
 		};
-		const close = bar.querySelector('[data-lang-dismiss]').getBoundingClientRect();
+		const close = dismiss.getBoundingClientRect();
 		return {
 			// Over the sidebar pane, over the content, over the table of contents.
-			overSidebar: owns(40, mid),
-			overContent: owns(box.width / 2, mid),
-			overToc: owns(box.width - 40, mid),
+			// Taken off the bar's own box rather than assuming it starts at x=0.
+			overSidebar: owns(box.left + 40, mid),
+			overContent: owns(box.left + box.width / 2, mid),
+			overToc: owns(box.right - 40, mid),
 			// The dismiss button itself.
 			dismissClickable: owns(close.left + close.width / 2, close.top + close.height / 2),
 		};
@@ -187,5 +176,5 @@ expect(
 }
 
 await browser.close();
-console.log(`\n${failures} failing scenario(s).`);
-process.exit(failures ? 1 : 0);
+console.log(`\n${failures()} failing scenario(s).`);
+process.exit(failures() ? 1 : 0);

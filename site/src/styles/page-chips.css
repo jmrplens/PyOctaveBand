@@ -65,16 +65,21 @@
 .page-chips .chip-standard {
   --chip-line: var(--ph-chip-standard-line);
   --chip-fill: var(--ph-chip-standard-fill);
+
   color: var(--ph-chip-standard-ink);
 }
+
 .page-chips .chip-theory {
   --chip-line: var(--ph-chip-named-line);
   --chip-fill: var(--ph-chip-named-fill);
+
   color: var(--ph-chip-named-ink);
 }
+
 .page-chips .chip-more {
   --chip-line: var(--ph-chip-muted-line);
   --chip-fill: var(--ph-chip-muted-fill);
+
   color: var(--ph-chip-muted-ink);
 }
 
@@ -83,5 +88,5 @@
 .page-chips .page-chip:hover,
 .page-chips .page-chip:focus-visible {
   background: var(--chip-fill);
-  border-color: currentColor;
+  border-color: currentcolor;
 }

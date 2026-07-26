@@ -54,6 +54,12 @@
   --sl-color-bg-sidebar: #141b20;
   --sl-color-bg-inline-code: var(--sl-color-gray-5);
   --sl-color-hairline-light: var(--sl-color-gray-5);
+  /* The plain hairline is the faintest rule in the palette (1.24:1 against the
+     page ground): it separates the content panels and the table of contents
+     without drawing a line the eye stops at. The light theme sets its own
+     counterpart at the same weight below; leaving it to inherit this one would
+     paint a near-black rule on white, because this sheet is unlayered and so
+     wins over Starlight's own light-theme value. */
   --sl-color-hairline: #1e262c;
   --sl-color-hairline-shade: var(--sl-color-black);
 
@@ -109,6 +115,9 @@
   --sl-color-bg-sidebar: var(--sl-color-bg);
   --sl-color-bg-inline-code: var(--sl-color-gray-6);
   --sl-color-hairline-light: var(--sl-color-gray-6);
+  /* Same weight as the dark hairline, mirrored: 1.29:1 against white against
+     the dark theme's 1.24:1, so a panel rule reads the same in both themes. */
+  --sl-color-hairline: var(--ph-border);
   --sl-color-hairline-shade: var(--sl-color-gray-6);
 
   --ph-surface: #f4f8fa;

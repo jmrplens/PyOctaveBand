@@ -116,22 +116,36 @@ const spectrum = lang === 'es'
 		<div class="block-body">
 			<h2>{content.coverage.title}</h2>
 			<p class="lead">{content.coverage.lead}</p>
-			<table class="coverage">
-				<thead>
-					<tr>
-						<th scope="col">{content.coverage.headers[0]}</th>
-						<th scope="col">{content.coverage.headers[1]}</th>
+			{/*
+				The explicit roles are the ones the elements already have
+				implicitly, and they are here for the stacked layout below
+				45rem: `display: block` on a table element drops its role, so
+				a narrow reader would otherwise lose the row-header link
+				between an area and its standards exactly where the column
+				headers are hidden too. Restating the roles is the documented
+				remedy for that CSS side effect, and it keeps one markup for
+				both widths.
+			*/}
+			<table class="coverage" role="table">
+				<thead role="rowgroup">
+					<tr role="row">
+						<th scope="col" role="columnheader">
+							{content.coverage.headers[0]}
+						</th>
+						<th scope="col" role="columnheader">
+							{content.coverage.headers[1]}
+						</th>
 					</tr>
 				</thead>
-				<tbody>
+				<tbody role="rowgroup">
 					{
 						content.coverage.areas.map((a) => (
-							<tr>
-								<th scope="row">
+							<tr role="row">
+								<th scope="row" role="rowheader">
 									<a href={a.href}>{a.name}</a>
 									<span class="area-summary">{a.summary}</span>
 								</th>
-								<td>
+								<td role="cell">
 									<span class="chips">
 										{a.standards.map((s) => (
 											<span class="chip">{s}</span>
@@ -368,7 +382,13 @@ const spectrum = lang === 'es'
 	.demo-figure {
 		margin: 1.1rem 0 0;
 	}
-	.demo-figure img {
+	/* The <img> pair belongs to ThemeImage, so it carries that component's
+	   scope and not this one's: without :global() the rule compiles to
+	   `.demo-figure[cid] img[cid]` and never matches. It looked right anyway
+	   only because Starlight's .sl-markdown-content reset happens to set the
+	   same three declarations; state the intent here instead of inheriting it
+	   from an internal we do not own. */
+	.demo-figure :global(img) {
 		width: 100%;
 		height: auto;
 		display: block;

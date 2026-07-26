@@ -68,6 +68,13 @@ const FICHE_CODE = `from phonometry import building, ReportMetadata
 R = [20.4, 16.3, 17.7, 22.6, 22.4, 22.7, 24.8, 26.6,
      28.0, 30.5, 31.8, 32.5, 33.4, 33.0, 31.0, 25.5]
 
+meta = ReportMetadata(
+    specimen="200 mm reinforced-concrete wall",
+    laboratory="Phonometry Reference Laboratory",
+    report_id="PHN-2026-0042",
+    requirement=42.0,  # adds the verdict row
+)
+
 building.weighted_rating(R).report("Rw_fiche.pdf", metadata=meta)`;
 
 export const en: HomeContent = {
@@ -345,7 +352,7 @@ export const es: HomeContent = {
 			{
 				title: 'Ve a tu dominio',
 				body: 'Cada guía empieza por la norma que implementa, las magnitudes que define y las hipótesis, y sigue con el código y la figura. Cuando necesites la firma exacta, la referencia de la API tiene una página por módulo.',
-				href: '/phonometry/reference/api/',
+				href: '/phonometry/es/reference/api/',
 				linkText: 'Referencia de la API',
 			},
 		],

@@ -12,36 +12,27 @@
 //     both have to come to rest at the same offset, clear of that chrome.
 //
 // Usage: node scripts/check-page-chips.mjs [--base http://localhost:4321]
-import { readdirSync } from 'node:fs';
-import { createRequire } from 'node:module';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { readFileSync } from 'node:fs';
 
-const siteDir = join(dirname(fileURLToPath(import.meta.url)), '..');
-const require = createRequire(import.meta.url);
-const store = join(siteDir, 'node_modules', '.pnpm');
-const pkg = readdirSync(store).find((d) => /^puppeteer@/.test(d));
-const puppeteer = require(join(store, pkg, 'node_modules', 'puppeteer'));
+import { BASE_PATH, baseFrom, createExpect, launchBrowser } from './shared/audit.mjs';
 
-const baseIdx = process.argv.indexOf('--base');
-const BASE = baseIdx === -1 ? 'http://localhost:4321' : process.argv[baseIdx + 1];
+const BASE = baseFrom();
 
-/** Kept in step with MAX_CHIPS in src/lib/reference-chips.ts. */
-const MAX_CHIPS = 9;
+/**
+ * The cap, read out of the module that enforces it rather than restated here:
+ * a copy would let the two drift and the check would then be measuring its own
+ * stale idea of the budget.
+ */
+const chipSource = readFileSync(new URL('../src/lib/reference-chips.ts', import.meta.url), 'utf8');
+const capDeclaration = /export const MAX_CHIPS\s*=\s*(\d+)\s*;/.exec(chipSource);
+if (!capDeclaration) {
+	throw new Error('no `export const MAX_CHIPS = <n>;` in src/lib/reference-chips.ts');
+}
+const MAX_CHIPS = Number(capDeclaration[1]);
 
-const browser = await puppeteer.launch({
-	headless: true,
-	args: ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage'],
-});
+const browser = await launchBrowser();
 
-let failures = 0;
-const expect = (name, actual, wanted) => {
-	const ok = JSON.stringify(actual) === JSON.stringify(wanted);
-	if (!ok) failures++;
-	console.log(
-		`${ok ? 'ok  ' : 'FAIL'} ${name}${ok ? '' : `\n       got ${JSON.stringify(actual)}, want ${JSON.stringify(wanted)}`}`,
-	);
-};
+const { expect, failures } = createExpect({ quiet: true });
 
 // Pages picked for their bibliographies: past the cap, exactly at it, and
 // comfortably under it, in both locales.
@@ -58,21 +49,40 @@ const CAP_PAGES = [
 {
 	const page = await browser.newPage();
 	await page.setViewport({ width: 1440, height: 900 });
+	// How many of the pages under test landed on each side of the cap.
+	const sides = { overflowing: 0, under: 0 };
 	for (const path of CAP_PAGES) {
-		await page.goto(`${BASE}/phonometry${path}`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+		await page.goto(`${BASE}${BASE_PATH}${path}`, { waitUntil: 'domcontentloaded', timeout: 60000 });
 		const run = await page.evaluate(() => {
 			const chips = [...document.querySelectorAll('.page-chips .page-chip')];
 			const more = chips.filter((c) => c.classList.contains('chip-more'));
 			return { real: chips.length - more.length, more: more.length };
 		});
-		const wanted = run.more
-			? { real: MAX_CHIPS, more: 1, withinCap: true }
-			: { real: run.real, more: 0, withinCap: run.real <= MAX_CHIPS };
-		expect(`cap: ${path} shows ${run.real} chips and ${run.more} more link`, {
-			...run,
-			withinCap: run.real <= MAX_CHIPS,
-		}, wanted);
+		// Three promises, none of them derived from the run itself:
+		//   - the budget is never exceeded,
+		//   - there is at most one "+N more" link,
+		//   - and that link only appears on a page whose run is full, so a page
+		//     under the cap cannot show one and a page over it cannot hide one.
+		expect(
+			`cap: ${path} shows ${run.real} chips and ${run.more} more link`,
+			{
+				withinCap: run.real <= MAX_CHIPS,
+				atMostOneMore: run.more <= 1,
+				moreOnlyWhenFull: run.more === 0 || run.real === MAX_CHIPS,
+			},
+			{ withinCap: true, atMostOneMore: true, moreOnlyWhenFull: true },
+		);
+		if (run.more) sides.overflowing++;
+		else sides.under++;
 	}
+	// The pages above were picked to sit on both sides of the cap. If they ever
+	// stop doing that the three assertions still pass and mean nothing, so the
+	// run has to prove it saw both cases.
+	expect(
+		`cap: the ${CAP_PAGES.length} pages under test cover both sides of the cap`,
+		{ overflowing: sides.overflowing > 0, under: sides.under > 0 },
+		{ overflowing: true, under: true },
+	);
 	await page.close();
 }
 
@@ -102,7 +112,7 @@ async function landing({ path, viewport, theme, banner }) {
 		// A language the page is not written in brings the bar up.
 		banner ? (path.startsWith('/es/') ? ['en-US', 'en'] : ['es-ES', 'es']) : null,
 	);
-	await page.goto(`${BASE}/phonometry${path}`, { waitUntil: 'networkidle0', timeout: 90000 });
+	await page.goto(`${BASE}${BASE_PATH}${path}`, { waitUntil: 'networkidle0', timeout: 90000 });
 	await page.addStyleTag({ content: 'astro-dev-toolbar{display:none !important}' });
 	const out = await page.evaluate(async (wantBanner) => {
 		const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -116,13 +126,18 @@ async function landing({ path, viewport, theme, banner }) {
 		);
 		const chips = [...document.querySelectorAll('.page-chips .page-chip')];
 		const more = chips.find((c) => c.classList.contains('chip-more'));
+		// This measurement needs a page that overflows the cap. Say so instead
+		// of throwing on `undefined.click()` and losing the whole run.
+		if (!chips[0] || !more) return { error: 'no entry chip and "+N more" chip to click' };
 		const tops = [];
 		for (const chip of [chips[0], more]) {
 			window.scrollTo(0, 0);
 			await wait(120);
 			chip.click();
 			await wait(600);
-			const target = document.getElementById(decodeURIComponent(chip.getAttribute('href').slice(1)));
+			const href = chip.getAttribute('href') || '';
+			const target = document.getElementById(decodeURIComponent(href.slice(1)));
+			if (!target) return { error: `the chip pointing at ${href} has no target on the page` };
 			const r = target.getBoundingClientRect();
 			tops.push({ top: Math.round(r.top), clears: r.top >= chrome - 1, hidden: r.bottom < chrome });
 		}
@@ -173,5 +188,5 @@ for (const c of LANDINGS) {
 }
 
 await browser.close();
-console.log(`\n${failures} failing check(s).`);
-process.exit(failures ? 1 : 0);
+console.log(`\n${failures()} failing check(s).`);
+process.exit(failures() ? 1 : 0);

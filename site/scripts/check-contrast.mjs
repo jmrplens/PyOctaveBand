@@ -60,6 +60,16 @@ for (const [name, p] of Object.entries(PALETTES)) {
 	if (!p['--sl-color-black']) throw new Error(`palette "${name}" did not parse`);
 }
 
+// Both themes have to be written, not half-inherited. The light block sits on
+// top of the dark one in the cascade, and this sheet is deliberately unlayered,
+// so a colour token the light theme forgets keeps its dark value everywhere and
+// beats Starlight's own light-theme default. That is how the plain
+// `--sl-color-hairline` once painted a near-black rule on a white page. The
+// converse is allowed: the light theme may add tokens of its own.
+const inheritedFromDark = Object.keys(resolve({ ...dark })).filter(
+	(token) => !(token in resolve({ ...light })),
+);
+
 const srgb = (hex) => {
 	const n = parseInt(hex.slice(1), 16);
 	return [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((c) => {
@@ -136,7 +146,16 @@ for (const [name, p] of Object.entries(PALETTES)) {
 		check(name, `${label} border on page`, p[`--ph-chip-${kind}-line`], bg, 3);
 	}
 
-	check(name, 'inline code text on its ground', p['--sl-color-gray-2'], p['--sl-color-bg-inline-code'], isLight ? 4.5 : 0);
+	// Inline code is body text on a tinted plate, so it carries the same 4.5:1
+	// floor in both themes: the pair is enforced everywhere else in this loop
+	// and an exemption on one theme would let a dark-palette regression through.
+	check(
+		name,
+		'inline code text on its ground',
+		p['--sl-color-gray-2'],
+		p['--sl-color-bg-inline-code'],
+		4.5,
+	);
 	check(name, 'decorative hairline on page', p['--ph-border-strong'], bg, 0);
 
 	if (isLight) {
@@ -159,8 +178,10 @@ for (const [name, p] of Object.entries(PALETTES)) {
 	}
 }
 
+if (inheritedFromDark.length) failures += inheritedFromDark.length;
+
 if (process.argv.includes('--json')) {
-	console.log(JSON.stringify(rows, null, 2));
+	console.log(JSON.stringify({ rows, inheritedFromDark }, null, 2));
 } else {
 	let current = '';
 	for (const r of rows) {
@@ -174,7 +195,18 @@ if (process.argv.includes('--json')) {
 			`  ${flag} ${r.ratio.toFixed(2).padStart(6)}:1  (${min})  ${r.label}  ${r.fg} on ${r.bg}`,
 		);
 	}
-	console.log(`\n${rows.length} pairs measured, ${failures} enforced pair(s) below threshold.`);
+	console.log('\n### both themes are written, not half-inherited');
+	if (inheritedFromDark.length) {
+		for (const token of inheritedFromDark) {
+			console.log(`  FAIL ${token} has no light-theme value, so it keeps the dark one`);
+		}
+	} else {
+		console.log('  ok   every colour token of the dark theme has a light-theme value');
+	}
+	console.log(
+		`\n${rows.length} pairs measured, ${failures} enforced pair(s) below threshold` +
+			` or token(s) missing from the light theme.`,
+	);
 }
 
 process.exit(failures ? 1 : 0);

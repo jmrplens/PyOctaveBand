@@ -28,25 +28,17 @@
 // A filter is matched against "<locale> <case>", so `--shots dir 390 1440`
 // writes crops for those two widths only. Filters never narrow the audit
 // itself: every case is always measured.
-import { readdirSync } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
-import { createRequire } from 'node:module';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 
-const siteDir = join(dirname(fileURLToPath(import.meta.url)), '..');
-const require = createRequire(import.meta.url);
-const store = join(siteDir, 'node_modules', '.pnpm');
-const pkg = readdirSync(store).find((d) => /^puppeteer@/.test(d));
-if (!pkg) throw new Error('puppeteer not found in the pnpm store; run pnpm install');
-const puppeteer = require(join(store, pkg, 'node_modules', 'puppeteer'));
+import { BASE_PATH, DEFAULT_BASE, baseFrom, launchBrowser } from './shared/audit.mjs';
 
 const argv = process.argv.slice(2);
 const arg = (name, fallback) => {
 	const i = argv.indexOf(name);
 	return i === -1 ? fallback : argv[i + 1];
 };
-const BASE = arg('--base', 'http://localhost:4321');
+const BASE = baseFrom(argv, DEFAULT_BASE);
 const SHOTS = arg('--shots', null);
 const values = new Set([BASE, SHOTS].filter(Boolean));
 const FILTERS = argv.filter((a) => !a.startsWith('--') && !values.has(a));
@@ -130,7 +122,18 @@ function audit() {
 		const cs = getComputedStyle(li, '::before');
 		const probe = document.createElement('span');
 		probe.textContent = (cs.content || '').replace(/^"|"$/g, '') || '+';
-		probe.style.cssText = `position:absolute;visibility:hidden;white-space:pre;font:${cs.font};letter-spacing:${cs.letterSpacing};`;
+		// The `font` shorthand is not always readable back off a pseudo-element,
+		// and an empty one would silently measure the glyph in the body font,
+		// i.e. measure nothing. Copy the longhands, and say so if even those
+		// come back empty rather than reporting a pass on a wrong measurement.
+		if (!cs.fontSize || !cs.fontFamily) {
+			problems.push('tick marker: the ::before font could not be read, so it was not measured');
+			break;
+		}
+		probe.style.cssText =
+			`position:absolute;visibility:hidden;white-space:pre;` +
+			`font-style:${cs.fontStyle};font-variant:${cs.fontVariant};font-weight:${cs.fontWeight};` +
+			`font-size:${cs.fontSize};font-family:${cs.fontFamily};letter-spacing:${cs.letterSpacing};`;
 		document.body.appendChild(probe);
 		const glyph = probe.getBoundingClientRect().width;
 		probe.remove();
@@ -162,10 +165,7 @@ function audit() {
 
 if (SHOTS) await mkdir(SHOTS, { recursive: true });
 
-const browser = await puppeteer.launch({
-	headless: true,
-	args: ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage', '--font-render-hinting=none'],
-});
+const browser = await launchBrowser({ args: ['--font-render-hinting=none'] });
 
 let failures = 0;
 for (const c of CASES) {
@@ -175,7 +175,7 @@ for (const c of CASES) {
 		await cdp.send('Page.setFontSizes', { fontSizes: { standard: c.font, fixed: c.font } });
 	}
 	await page.setViewport({ width: c.width, height: c.height, deviceScaleFactor: SHOTS ? 2 : 1 });
-	await page.goto(`${BASE}/phonometry${c.path}`, { waitUntil: 'domcontentloaded', timeout: 90000 });
+	await page.goto(`${BASE}${BASE_PATH}${c.path}`, { waitUntil: 'domcontentloaded', timeout: 90000 });
 	await page.addStyleTag({ content: 'astro-dev-toolbar{display:none !important}' });
 	await new Promise((r) => setTimeout(r, 500));
 
