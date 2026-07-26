@@ -246,6 +246,9 @@ export default defineConfig({
         Head: './src/components/Head.astro',
         // Human-visible maintainer block corroborating the Person node.
         Footer: './src/components/Footer.astro',
+        // Default frame plus the first-visit language bar, mounted outside
+        // the panes so the sidebar cannot paint over it.
+        PageFrame: './src/components/PageFrame.astro',
         // Default header plus a mobile-visible language selector.
         Header: './src/components/Header.astro',
         // Linked group labels + non-collapsible sidebar.

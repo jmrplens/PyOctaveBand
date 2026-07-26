@@ -137,6 +137,55 @@ expect(
 	{ url: '/phonometry/getting-started/', banner: true, stored: null },
 );
 
+// 10. The bar is on top of everything it overlaps. It is fixed across the
+//     full width, so on a desktop layout it crosses the sidebar pane and the
+//     table of contents, and the prototype treatment switcher is pinned to
+//     the same corner as its dismiss button. Hit-testing the three points is
+//     what catches a stacking regression; the markup alone cannot.
+{
+	const context = await browser.createBrowserContext();
+	const page = await context.newPage();
+	await page.setViewport({ width: 1440, height: 900 });
+	await page.evaluateOnNewDocument(() => {
+		Object.defineProperty(navigator, 'languages', { get: () => ['es-ES', 'es'] });
+		Object.defineProperty(navigator, 'language', { get: () => 'es-ES' });
+	});
+	await page.goto(`${BASE}/phonometry/guides/levels/`, {
+		waitUntil: 'networkidle0',
+		timeout: 60000,
+	});
+	await new Promise((r) => setTimeout(r, 400));
+	// The dev server parks its toolbar in the middle of the bottom edge, and
+	// it hit-tests. It is not part of the site.
+	await page.addStyleTag({ content: 'astro-dev-toolbar{display:none !important}' });
+	const hits = await page.evaluate(() => {
+		const bar = document.getElementById('lang-suggest');
+		const box = bar.getBoundingClientRect();
+		const mid = box.top + box.height / 2;
+		const owns = (x, y) => {
+			const el = document.elementFromPoint(x, y);
+			return !!el && (el === bar || bar.contains(el));
+		};
+		const close = bar.querySelector('[data-lang-dismiss]').getBoundingClientRect();
+		return {
+			// Over the sidebar pane, over the content, over the table of contents.
+			overSidebar: owns(40, mid),
+			overContent: owns(box.width / 2, mid),
+			overToc: owns(box.width - 40, mid),
+			// The dismiss button itself, which the floating switcher sits next to.
+			dismissClickable: owns(close.left + close.width / 2, close.top + close.height / 2),
+		};
+	});
+	expect('the bar is on top of the sidebar, the content and the toc', hits, {
+		overSidebar: true,
+		overContent: true,
+		overToc: true,
+		dismissClickable: true,
+	});
+	await page.close();
+	await context.close();
+}
+
 await browser.close();
 console.log(`\n${failures} failing scenario(s).`);
 process.exit(failures ? 1 : 0);

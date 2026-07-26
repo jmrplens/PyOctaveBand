@@ -156,7 +156,11 @@
 
 .toc-switcher {
   position: fixed;
-  inset-block-end: 1rem;
+  /* Clears the first-visit language bar when it is on screen: the bar
+     publishes its own height on <html> (see LangSuggest.astro), and it is
+     0 the rest of the time. Without this the button lands on the bar's
+     dismiss control. */
+  inset-block-end: calc(1rem + var(--ph-lang-banner, 0px));
   inset-inline-end: 1rem;
   z-index: 100;
   font-family: var(--sl-font-system, sans-serif);

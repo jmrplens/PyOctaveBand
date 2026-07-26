@@ -1,0 +1,25 @@
+---
+/**
+ * Default Starlight page frame plus the first-visit language bar.
+ *
+ * The bar is mounted here, outside the frame's panes, because it is fixed to
+ * the bottom edge across the full width. Starlight's `.main-pane` sets
+ * `isolation: isolate`, so anything rendered inside the content column (where
+ * the bar used to live, in the Footer override) gets its own stacking context
+ * and paints UNDER the sidebar pane whatever its z-index says. Mounted here it
+ * is a sibling of `.page`, in the root stacking context, and its z-index
+ * finally means what it reads.
+ *
+ * The frame renders on every route, splash included, so the coverage is the
+ * same as before.
+ */
+import Default from '@astrojs/starlight/components/PageFrame.astro';
+import LangSuggest from './LangSuggest.astro';
+---
+
+<Default>
+	<slot />
+	<slot name="header" slot="header" />
+	<slot name="sidebar" slot="sidebar" />
+</Default>
+<LangSuggest />
