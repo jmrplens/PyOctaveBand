@@ -77,7 +77,11 @@ function holdsCurrent(entries: SidebarEntry[]): boolean {
 }
 ---
 
-<ul id={listId} hidden={listHidden} class:list={{ 'top-level': !nested }}>
+<ul
+	id={listId}
+	hidden={listHidden ? 'until-found' : undefined}
+	class:list={{ 'top-level': !nested }}
+>
 	{
 		sublist.map((entry, index) => {
 			if (entry.type === 'link') {
@@ -248,12 +252,12 @@ function holdsCurrent(entries: SidebarEntry[]): boolean {
 			line-height: 1.4;
 		}
 
-		/* API subtree only: the disclosures. A collapsed list stays in the
-		   document, so the links are still there for crawlers and for
-		   in-page search; the reader reveals them one level at a time. */
-		ul[hidden] {
-			display: none;
-		}
+		/* API subtree only: the disclosures. A collapsed list carries
+		   `hidden="until-found"`, so the browser hides it with
+		   `content-visibility` and still matches it with find-in-page,
+		   revealing the branch when a match lands inside. No author rule may
+		   set `display: none` on it: that would win over the user agent
+		   sheet and put the links back out of reach. */
 
 		/* The API reference group has a landing page, so its label stays a
 		   link and the disclosure sits next to it. */
