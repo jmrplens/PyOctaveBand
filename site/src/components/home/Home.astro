@@ -46,117 +46,129 @@ const spectrum = lang === 'es'
 	</section>
 
 	<section class="block">
-		<h2>{content.what.title}</h2>
-		<div class="prose">
-			{content.what.body.map((p) => <p set:html={p} />)}
-		</div>
-
-		<div class="two-up">
-			<div class="panel">
-				<h3>{content.who.title}</h3>
-				<ul class="tick">
-					{content.who.items.map((i) => <li>{i}</li>)}
-				</ul>
+		<span class="block-n" aria-hidden="true"></span>
+		<div class="block-body">
+			<h2>{content.what.title}</h2>
+			<div class="prose">
+				{content.what.body.map((p) => <p set:html={p} />)}
 			</div>
-			<div class="panel panel-quiet">
-				<h3>{content.honest.title}</h3>
-				<ul class="tick tick-minus">
-					{content.honest.items.map((i) => <li>{i}</li>)}
-				</ul>
-			</div>
-		</div>
-	</section>
 
-	<section class="block">
-		<h2>{content.proof.title}</h2>
-		<p class="lead">{content.proof.lead}</p>
-
-		<div class="demo">
-			<h3>{content.proof.spectrum.title}</h3>
-			<p class="note">{content.proof.spectrum.note}</p>
-			<Code code={content.proof.spectrum.code} lang="python" />
-			<figure class="demo-figure">
-				<ThemeImage
-					src={spectrum}
-					alt={content.proof.spectrum.alt}
-					width="100%"
-					loading="eager"
-				/>
-				<figcaption>{content.proof.spectrum.caption}</figcaption>
-			</figure>
-		</div>
-
-		<div class="demo demo-split">
-			<div>
-				<h3>{content.proof.fiche.title}</h3>
-				<p class="note">{content.proof.fiche.note}</p>
-				<Code code={content.proof.fiche.code} lang="python" />
-			</div>
-			<div class="demo-fiche">
-				<ReportPreview
-					name="iso717_airborne_example"
-					title={content.proof.fiche.linkTitle}
-					description={content.proof.fiche.description}
-					displayWidth="100%"
-					caption={content.proof.fiche.caption}
-					id="home-iso717"
-				/>
+			<div class="two-up">
+				<div class="panel">
+					<h3>{content.who.title}</h3>
+					<ul class="tick">
+						{content.who.items.map((i) => <li>{i}</li>)}
+					</ul>
+				</div>
+				<div class="panel panel-quiet">
+					<h3>{content.honest.title}</h3>
+					<ul class="tick tick-minus">
+						{content.honest.items.map((i) => <li>{i}</li>)}
+					</ul>
+				</div>
 			</div>
 		</div>
 	</section>
 
 	<section class="block">
-		<h2>{content.coverage.title}</h2>
-		<p class="lead">{content.coverage.lead}</p>
-		<table class="coverage">
-			<thead>
-				<tr>
-					<th scope="col">{content.coverage.headers[0]}</th>
-					<th scope="col">{content.coverage.headers[1]}</th>
-				</tr>
-			</thead>
-			<tbody>
+		<span class="block-n" aria-hidden="true"></span>
+		<div class="block-body">
+			<h2>{content.proof.title}</h2>
+			<p class="lead">{content.proof.lead}</p>
+
+			<div class="demo">
+				<h3>{content.proof.spectrum.title}</h3>
+				<p class="note">{content.proof.spectrum.note}</p>
+				<Code code={content.proof.spectrum.code} lang="python" />
+				<figure class="demo-figure">
+					<ThemeImage
+						src={spectrum}
+						alt={content.proof.spectrum.alt}
+						width="100%"
+						loading="eager"
+					/>
+					<figcaption>{content.proof.spectrum.caption}</figcaption>
+				</figure>
+			</div>
+
+			<div class="demo demo-split">
+				<div>
+					<h3>{content.proof.fiche.title}</h3>
+					<p class="note">{content.proof.fiche.note}</p>
+					<Code code={content.proof.fiche.code} lang="python" />
+				</div>
+				<div class="demo-fiche">
+					<ReportPreview
+						name="iso717_airborne_example"
+						title={content.proof.fiche.linkTitle}
+						description={content.proof.fiche.description}
+						displayWidth="100%"
+						caption={content.proof.fiche.caption}
+						id="home-iso717"
+					/>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="block">
+		<span class="block-n" aria-hidden="true"></span>
+		<div class="block-body">
+			<h2>{content.coverage.title}</h2>
+			<p class="lead">{content.coverage.lead}</p>
+			<table class="coverage">
+				<thead>
+					<tr>
+						<th scope="col">{content.coverage.headers[0]}</th>
+						<th scope="col">{content.coverage.headers[1]}</th>
+					</tr>
+				</thead>
+				<tbody>
+					{
+						content.coverage.areas.map((a) => (
+							<tr>
+								<th scope="row">
+									<a href={a.href}>{a.name}</a>
+									<span class="area-summary">{a.summary}</span>
+								</th>
+								<td>
+									<span class="chips">
+										{a.standards.map((s) => (
+											<span class="chip">{s}</span>
+										))}
+									</span>
+								</td>
+							</tr>
+						))
+					}
+				</tbody>
+			</table>
+		</div>
+	</section>
+
+	<section class="block">
+		<span class="block-n" aria-hidden="true"></span>
+		<div class="block-body">
+			<h2>{content.start.title}</h2>
+			<p class="lead">{content.start.lead}</p>
+			<ol class="steps">
 				{
-					content.coverage.areas.map((a) => (
-						<tr>
-							<th scope="row">
-								<a href={a.href}>{a.name}</a>
-								<span class="area-summary">{a.summary}</span>
-							</th>
-							<td>
-								<span class="chips">
-									{a.standards.map((s) => (
-										<span class="chip">{s}</span>
-									))}
-								</span>
-							</td>
-						</tr>
+					content.start.steps.map((s, i) => (
+						<li>
+							<span class="step-n" aria-hidden="true">
+								{String(i + 1).padStart(2, '0')}
+							</span>
+							<h3>{s.title}</h3>
+							<p>{s.body}</p>
+							{s.code && <Code code={s.code} lang="bash" frame="none" />}
+							<a class="step-link" href={s.href}>
+								{s.linkText}
+							</a>
+						</li>
 					))
 				}
-			</tbody>
-		</table>
-	</section>
-
-	<section class="block">
-		<h2>{content.start.title}</h2>
-		<p class="lead">{content.start.lead}</p>
-		<ol class="steps">
-			{
-				content.start.steps.map((s, i) => (
-					<li>
-						<span class="step-n" aria-hidden="true">
-							{String(i + 1).padStart(2, '0')}
-						</span>
-						<h3>{s.title}</h3>
-						<p>{s.body}</p>
-						{s.code && <Code code={s.code} lang="bash" frame="none" />}
-						<a class="step-link" href={s.href}>
-							{s.linkText}
-						</a>
-					</li>
-				))
-			}
-		</ol>
+			</ol>
+		</div>
 	</section>
 </div>
 
@@ -171,7 +183,22 @@ const spectrum = lang === 'es'
 
 	/* Sections are numbered and ruled, like the clauses of the documents this
 	   library implements. The counter is decorative and hidden from the
-	   accessibility tree; the heading text carries the meaning. */
+	   accessibility tree; the heading text carries the meaning.
+
+	   It is a real box in the layout, never an absolutely positioned one: the
+	   number and the block body are the two items of a wrapping flex line, so
+	   the space the number occupies is always reserved by the layout itself.
+	   When the line has room the number sits in the gutter beside the heading;
+	   when it does not, the body wraps onto the next line and the number ends
+	   up on its own line above the heading. Both states are reached from the
+	   same rule, at whatever width, browser zoom or default text size the
+	   reader has, so the number can never be painted over the title. An
+	   earlier version reserved the gutter with a padding inside a
+	   `min-width: 62rem` query, which left the counter on top of the first
+	   letter of every heading below that width, at 200 % zoom, and at any
+	   width once the default text size was enlarged (the query is evaluated
+	   in the reader's font size, so 62rem stops matching a 1440px window as
+	   soon as the default size goes past 23px). */
 	.home {
 		counter-reset: home-block;
 	}
@@ -179,31 +206,39 @@ const spectrum = lang === 'es'
 		counter-increment: home-block;
 		border-block-start: 1px solid var(--ph-border);
 		padding-block-start: 1.4rem;
-		position: relative;
+		display: flex;
+		flex-wrap: wrap;
+		/* The number's baseline sits on the heading's, at every text size. */
+		align-items: baseline;
+		/* Only applies between wrapped lines, i.e. only when the number has
+		   dropped onto its own line above the heading. */
+		row-gap: 0.4rem;
 	}
-	.block::before {
-		content: counter(home-block, decimal-leading-zero);
-		position: absolute;
-		inset-block-start: 1.5rem;
-		inset-inline-start: 0;
+	.block-n {
+		/* The gutter, reserved: fixed width, no growth, no shrink. */
+		flex: 0 0 3.5rem;
 		font-family: var(--__sl-font-mono);
 		font-size: var(--sl-text-2xs);
+		line-height: 1.4;
 		letter-spacing: 0.12em;
 		color: var(--ph-mark);
 	}
-	@media (min-width: 62rem) {
-		.block {
-			padding-inline-start: 3.5rem;
-		}
+	.block-n::before {
+		content: counter(home-block, decimal-leading-zero);
 	}
-	.block > h2 {
+	.block-body {
+		/* Wraps under the number as soon as the line cannot hold both. */
+		flex: 1 1 26rem;
+		min-width: 0;
+	}
+	.block-body > h2 {
 		font-size: var(--sl-text-2xl);
 		line-height: 1.2;
 		margin-bottom: 0.5rem;
 		letter-spacing: -0.01em;
 	}
 	@media (min-width: 50rem) {
-		.block > h2 {
+		.block-body > h2 {
 			font-size: var(--sl-text-3xl);
 		}
 	}
