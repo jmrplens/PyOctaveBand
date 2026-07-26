@@ -153,21 +153,10 @@ const copy = COPY[other];
 		var current = banner.dataset.current;
 		var other = banner.dataset.other;
 
-		// How tall the bar currently is, published on <html> so anything else
-		// pinned to the bottom edge (the prototype treatment switcher) can step
-		// over it instead of landing on the dismiss button. It is 0 whenever
-		// the bar is not on screen, which is the usual case.
-		function measure() {
-			var h = banner.hidden ? 0 : banner.offsetHeight;
-			document.documentElement.style.setProperty('--ph-lang-banner', h + 'px');
-		}
-		addEventListener('resize', measure);
-
 		var dismiss = banner.querySelector('[data-lang-dismiss]');
 		if (dismiss) {
 			dismiss.addEventListener('click', function () {
 				banner.hidden = true;
-				measure();
 				set(localStorage, DISMISS_KEY, '1');
 				// Dismissing is itself a decision: the reader wants this page's
 				// language, so record it and stop guessing.
@@ -209,7 +198,6 @@ const copy = COPY[other];
 
 		if (get(localStorage, DISMISS_KEY)) return;
 		banner.hidden = false;
-		measure();
 	})();
 </script>
 )}

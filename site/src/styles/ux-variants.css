@@ -1,26 +1,16 @@
-/* Page header chips and API sidebar treatments.
+/* Page header chips.
 
    The sidebar carries no standards information at all, and the page chips
    have one presentation: an outlined pill per source. Both decisions are
-   final, so neither is switchable any more. What is left of the prototype is
-   the API sidebar treatment, still under `data-api-style` on <html>, applied
-   before first paint by the switcher script in Head.astro and persisted in
-   localStorage:
+   final, so neither is switchable. Nothing here is behind an attribute any
+   more: the prototype switcher, the `data-api-style` and `data-area`
+   dimensions and the two API sidebar treatments that lost are gone, and the
+   API sidebar disclosures that shipped live with the tree that renders them
+   (src/components/SidebarSublist.astro).
 
-     data-api-style='inline'    the API reference group renders fully
-                                expanded in place (status quo).
-     data-api-style='collapsed' the API group gets a caret and folds; it
-                                starts folded on guide pages and unfolded on
-                                API pages.
-     data-api-style='split'     topic-style split: on guide pages the API
-                                group collapses to its single label link; on
-                                API pages only the Reference group is shown
-                                plus a "Guides" back link.
-
-   `data-area` ('guides' | 'api') is stamped on <html> from the URL by the
-   same script. All selectors are unlayered so they win over Starlight's
-   layered styles without specificity games. Both themes are covered (dark
-   values on :root, light overrides on [data-theme='light']). */
+   All selectors are unlayered so they win over Starlight's layered styles
+   without specificity games. Both themes are covered by the palette tokens
+   these rules reference (src/styles/theme.css). */
 
 /* ---------------------------------------------------------------------------
    PAGE CHIPS. One run per category under the H1: the standards that govern
@@ -94,131 +84,4 @@
 .page-chips .page-chip:focus-visible {
   background: var(--chip-fill);
   border-color: currentColor;
-}
-
-/* ---------------------------------------------------------------------------
-   API SIDEBAR TREATMENTS.
-   --------------------------------------------------------------------------- */
-
-/* 'collapsed': the caret shows and the group's children fold. The switcher
-   script stamps `.folded` (initial state: folded on guide pages, open on API
-   pages) and keeps `aria-expanded` in sync. */
-:root[data-api-style='collapsed'] .api-group .api-caret {
-  display: inline-flex;
-}
-:root[data-api-style='collapsed'] .api-group.folded > ul {
-  display: none;
-}
-
-/* 'split': topic-style separation. On guide pages the API group reduces to
-   its single label link with a forward arrow... */
-:root[data-api-style='split'][data-area='guides'] .api-group > ul {
-  display: none;
-}
-:root[data-api-style='split'][data-area='guides'] .api-group .group-label .large::after {
-  content: ' \2192';
-  color: var(--sl-color-gray-3);
-}
-
-/* ...and on API pages only the top-level group that contains the API
-   reference (the Reference group) remains, plus the back link. */
-:root[data-api-style='split'][data-area='api']
-  #starlight__sidebar
-  .top-level
-  > li:not(:has(.api-group)) {
-  display: none;
-}
-
-.topic-back {
-  display: none;
-}
-:root[data-api-style='split'][data-area='api'] .topic-back {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-block-end: 0.75rem;
-  padding: 0.3em 0.5rem;
-  border-radius: 0.25rem;
-  font-size: var(--sl-text-sm);
-  font-weight: 600;
-  color: var(--sl-color-gray-2);
-  text-decoration: none;
-}
-:root[data-api-style='split'][data-area='api'] .topic-back:hover,
-:root[data-api-style='split'][data-area='api'] .topic-back:focus-visible {
-  color: var(--sl-color-white);
-  background: var(--sl-color-gray-6);
-}
-
-/* ---------------------------------------------------------------------------
-   VARIANT SWITCHER WIDGET (prototype-only UI, injected by Head.astro).
-   --------------------------------------------------------------------------- */
-
-.toc-switcher {
-  position: fixed;
-  /* Clears the first-visit language bar when it is on screen: the bar
-     publishes its own height on <html> (see LangSuggest.astro), and it is
-     0 the rest of the time. Without this the button lands on the bar's
-     dismiss control. */
-  inset-block-end: calc(1rem + var(--ph-lang-banner, 0px));
-  inset-inline-end: 1rem;
-  z-index: 100;
-  font-family: var(--sl-font-system, sans-serif);
-  font-size: 0.75rem;
-  color: var(--sl-color-gray-2);
-}
-
-.toc-switcher summary {
-  list-style: none;
-  cursor: pointer;
-  inline-size: 2.25rem;
-  block-size: 2.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-inline-start: auto;
-  border: 1px solid var(--sl-color-hairline-light);
-  border-radius: 50%;
-  background: var(--sl-color-bg-nav);
-  box-shadow: var(--sl-shadow-md);
-  font-weight: 700;
-  color: var(--sl-color-gray-1);
-}
-.toc-switcher summary::-webkit-details-marker {
-  display: none;
-}
-
-.toc-switcher .toc-switcher-panel {
-  margin-block-start: 0.5rem;
-  padding: 0.75rem;
-  border: 1px solid var(--sl-color-hairline-light);
-  border-radius: 0.5rem;
-  background: var(--sl-color-bg-nav);
-  box-shadow: var(--sl-shadow-lg);
-  min-inline-size: 13rem;
-}
-
-.toc-switcher fieldset {
-  border: 0;
-  margin: 0;
-  padding: 0;
-}
-.toc-switcher fieldset + fieldset {
-  margin-block-start: 0.6rem;
-}
-.toc-switcher legend {
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-size: 0.65rem;
-  color: var(--sl-color-gray-3);
-  padding: 0;
-  margin-block-end: 0.25rem;
-}
-.toc-switcher label {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.1rem 0;
-  cursor: pointer;
 }

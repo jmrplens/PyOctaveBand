@@ -4,8 +4,9 @@
 
   Differences from upstream (0.41.3):
 
-  - Groups are not collapsible: no <details>/<summary>, no caret. Children
-    are always visible, matching the fully-expanded design in sidebar.css.
+  - Guide groups are not collapsible: no <details>/<summary>, no caret.
+    Children are always visible, matching the fully-expanded design in
+    sidebar.css.
   - Overview-first convention: when a group's first entry is a link whose
     sidebar-config `attrs` carry `data-group-link`, that entry is consumed
     and the group label itself becomes the link (no separate Overview row).
@@ -13,13 +14,14 @@
   - `aria-current="page"` moves to the label link when the landing page is
     the current page, so highlighting keeps working.
   - The API reference group (the one whose landing page is `reference/api`)
-    is marked with an `api-group` class and gets a caret toggle button, so
-    the API sidebar treatments can fold it away without re-rendering. The
-    caret is hidden unless the "collapsed" treatment is active; see
-    `src/styles/ux-variants.css` and the switcher in `Head.astro`. This is
-    the only part of the file that is not upstream behaviour plus the
-    overview-first convention, and it comes out if the API split is ever done
-    with `starlight-sidebar-topics` instead.
+    and every group inside it are disclosures: a button with `aria-expanded`
+    and `aria-controls` over a list that is hidden while it is collapsed.
+    The open state is rendered on the server from the current route, so the
+    ancestor chain of an API page is open on arrival and everything else is
+    closed with no client-side correction and no flash. The click handler
+    lives in `Sidebar.astro`. Upstream's collapsible groups are driven by
+    `<details open>` and Starlight's `SidebarPersister`; this is the same
+    behaviour under an explicit disclosure widget, scoped to the API.
 */
 import type { StarlightRouteData } from '@astrojs/starlight/route-data';
 import { Badge } from '@astrojs/starlight/components';
@@ -31,9 +33,19 @@ type SidebarGroup = Extract<SidebarEntry, { type: 'group' }>;
 interface Props {
 	sublist: SidebarEntry[];
 	nested?: boolean;
+	/** True when this list is rendered inside the API reference subtree. */
+	inApi?: boolean;
+	/** Prefix for the ids this list hands to its collapsible children. */
+	idPrefix?: string;
+	/** id of this list, set when a disclosure button controls it. */
+	listId?: string;
+	/** Render this list collapsed: it stays in the DOM, hidden. */
+	listHidden?: boolean;
 }
 
-const { sublist, nested } = Astro.props;
+const { sublist, nested, inApi, idPrefix = 'sidebar-api', listId, listHidden } = Astro.props;
+
+const isEs = Astro.currentLocale === 'es';
 
 interface GroupModel {
 	group: SidebarGroup;
@@ -56,11 +68,18 @@ function toModel(entry: SidebarGroup): GroupModel {
 function isApiGroup(landing: SidebarLink | undefined): boolean {
 	return landing ? /\/reference\/api\/?$/.test(landing.href) : false;
 }
+
+/** True when the current page is this entry or sits anywhere below it. */
+function holdsCurrent(entries: SidebarEntry[]): boolean {
+	return entries.some((entry) =>
+		entry.type === 'link' ? entry.isCurrent : holdsCurrent(entry.entries),
+	);
+}
 ---
 
-<ul class:list={{ 'top-level': !nested }}>
+<ul id={listId} hidden={listHidden} class:list={{ 'top-level': !nested }}>
 	{
-		sublist.map((entry) => {
+		sublist.map((entry, index) => {
 			if (entry.type === 'link') {
 				return (
 					<li>
@@ -83,7 +102,16 @@ function isApiGroup(landing: SidebarLink | undefined): boolean {
 				);
 			}
 			const { group, landing, children } = toModel(entry);
-			const apiGroup = isApiGroup(landing);
+			const apiRoot = isApiGroup(landing);
+			// Every group from the API reference group downwards is a
+			// disclosure; the guide tree is not.
+			const collapsible = apiRoot || inApi === true;
+			const open = collapsible ? holdsCurrent(entry.entries) : true;
+			// Ids are derived from the position in the tree, so they are stable
+			// for a page and unique within it without depending on the labels,
+			// which are translated.
+			const groupId = apiRoot ? 'sidebar-api' : `${idPrefix}-${index}`;
+			const childListId = collapsible ? `${groupId}-items` : undefined;
 			// Forward any custom link attributes from the consumed landing entry,
 			// except the internal `data-group-link` marker itself.
 			const {
@@ -108,49 +136,84 @@ function isApiGroup(landing: SidebarLink | undefined): boolean {
 					)}
 				</a>
 			) : undefined;
+			const caret = (
+				<svg
+					aria-hidden="true"
+					width="14"
+					height="14"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2.5"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<polyline points="6 9 12 15 18 9" />
+				</svg>
+			);
+			const badge = group.badge && (
+				<Badge
+					variant={group.badge.variant}
+					class={group.badge.class}
+					text={group.badge.text}
+				/>
+			);
+			let header;
+			if (collapsible && landing) {
+				// The group has a landing page, so the label stays a link to it
+				// and the disclosure gets its own control next to it.
+				header = (
+					<span class="group-label-row">
+						{labelLink}
+						<button
+							type="button"
+							class="api-caret"
+							data-api-toggle
+							aria-expanded={String(open)}
+							aria-controls={childListId}
+							aria-label={isEs ? `Submenú de ${group.label}` : `${group.label} submenu`}
+						>
+							{caret}
+						</button>
+					</span>
+				);
+			} else if (collapsible) {
+				// No landing page: the whole row is the disclosure control, so
+				// the label itself is what the reader clicks to drill in.
+				header = (
+					<button
+						type="button"
+						class="group-label group-label-toggle"
+						data-api-toggle
+						aria-expanded={String(open)}
+						aria-controls={childListId}
+					>
+						<span class="large">{group.label}</span>
+						{badge}
+						{caret}
+					</button>
+				);
+			} else if (landing) {
+				header = labelLink;
+			} else {
+				header = (
+					<span class="group-label">
+						<span class="large">{group.label}</span>
+						{badge}
+					</span>
+				);
+			}
 			return (
-				<li class:list={[{ 'api-group': apiGroup }]}>
-					{landing ? (
-						apiGroup ? (
-							<span class="group-label-row">
-								{labelLink}
-								<button
-									type="button"
-									class="api-caret"
-									aria-expanded="true"
-									aria-label={`${group.label} (toggle)`}
-								>
-									<svg
-										aria-hidden="true"
-										width="14"
-										height="14"
-										viewBox="0 0 24 24"
-										fill="none"
-										stroke="currentColor"
-										stroke-width="2.5"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-									>
-										<polyline points="6 9 12 15 18 9" />
-									</svg>
-								</button>
-							</span>
-						) : (
-							labelLink
-						)
-					) : (
-						<span class="group-label">
-							<span class="large">{group.label}</span>
-							{group.badge && (
-								<Badge
-									variant={group.badge.variant}
-									class={group.badge.class}
-									text={group.badge.text}
-								/>
-							)}
-						</span>
-					)}
-					<Astro.self sublist={children} nested />
+				<li class:list={[{ 'api-group': apiRoot, 'api-branch': collapsible }]}>
+					{header}
+					<Astro.self
+						sublist={children}
+						nested
+						inApi={collapsible}
+						idPrefix={groupId}
+						listId={childListId}
+						listHidden={collapsible && !open}
+					/>
 				</li>
 			);
 		})
@@ -191,7 +254,15 @@ function isApiGroup(landing: SidebarLink | undefined): boolean {
 			line-height: 1.4;
 		}
 
-		/* API reference group only: label plus its fold toggle. */
+		/* API subtree only: the disclosures. A collapsed list stays in the
+		   document, so the links are still there for crawlers and for
+		   in-page search; the reader reveals them one level at a time. */
+		ul[hidden] {
+			display: none;
+		}
+
+		/* The API reference group has a landing page, so its label stays a
+		   link and the disclosure sits next to it. */
 		.group-label-row {
 			display: flex;
 			align-items: center;
@@ -204,8 +275,34 @@ function isApiGroup(landing: SidebarLink | undefined): boolean {
 			min-width: 0;
 		}
 
+		/* A group with no landing page: the whole row is the control. */
+		.group-label-toggle {
+			display: flex;
+			align-items: center;
+			gap: 0.25em;
+			inline-size: 100%;
+			border: 0;
+			border-radius: 0.25rem;
+			background: transparent;
+			font: inherit;
+			color: inherit;
+			text-align: start;
+			cursor: pointer;
+		}
+
+		.group-label-toggle > svg {
+			flex: 0 0 auto;
+			margin-inline-start: auto;
+			color: var(--sl-color-gray-3);
+		}
+
+		.group-label-toggle:hover .large,
+		.group-label-toggle:focus-visible .large {
+			color: var(--sl-color-accent-high);
+		}
+
 		.api-caret {
-			display: none;
+			display: inline-flex;
 			flex: 0 0 auto;
 			align-items: center;
 			justify-content: center;
@@ -225,11 +322,12 @@ function isApiGroup(landing: SidebarLink | undefined): boolean {
 			background: var(--sl-color-gray-6);
 		}
 
-		.api-caret svg {
+		.api-caret svg,
+		.group-label-toggle svg {
 			transition: transform 0.15s ease;
 		}
 
-		.api-caret[aria-expanded='false'] svg {
+		[aria-expanded='false'] svg {
 			transform: rotate(-90deg);
 		}
 
