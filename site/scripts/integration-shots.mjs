@@ -68,13 +68,44 @@ const SHOTS = [
 ];
 
 /**
- * The API sidebar group, which only exists as states a reader clicks into, so
- * each shot names the group labels to press before the capture. They are stock
- * Starlight `<summary>` rows, matched by their text rather than by a class of
- * ours, so nothing here depends on markup we own. The viewport is cropped to
- * the sidebar, because that is the whole subject.
+ * The sidebar, which is stock Starlight with every group `collapsed: true`.
+ * Some of these states exist on arrival and some only after a reader clicks,
+ * so each shot names the group labels to press first. They are matched by
+ * their text on the `<summary>` row rather than by a class, because there is
+ * no markup of ours left in the tree to match.
+ *
+ * `anchor` names the group to bring to the top of the sidebar's own scroller
+ * before the capture (null keeps the tree at its top); `phone` swaps the
+ * desktop pane for the mobile drawer, which is opened first and captured
+ * whole, because there the tree covers the page.
  */
 const SIDEBAR = [
+	// The whole tree as it arrives on a guide page: twelve groups, folded,
+	// except the chain holding the current page.
+	['38-tree-en-light', '/guides/loudness/', 'light', [], { anchor: null }],
+	['39-tree-en-dark', '/guides/loudness/', 'dark', [], { anchor: null }],
+	['40-tree-es-light', '/es/guides/loudness/', 'light', [], { anchor: null }],
+	['41-tree-es-dark', '/es/guides/loudness/', 'dark', [], { anchor: null }],
+	// A section landing page: the Overview row is the marked entry, which is
+	// where the Overview-first convention is now visible.
+	['42-section-landing-light', '/guides/sections/psychoacoustics/', 'light', [], { anchor: null }],
+	[
+		'43-section-landing-es-light',
+		'/es/guides/sections/psychoacoustics/',
+		'light',
+		[],
+		{ anchor: null },
+	],
+	// Reference opened from a guide page: its own Overview row above Theory,
+	// Conformance report and Bibliography.
+	['44-reference-open-light', '/guides/levels/', 'light', ['Reference'], { anchor: 'Reference' }],
+	['45-reference-open-dark', '/guides/levels/', 'dark', ['Reference'], { anchor: 'Reference' }],
+	// The Reference overview page itself, arriving with its row marked.
+	['46-reference-page-light', '/reference/', 'light', [], { anchor: 'Reference' }],
+	// The phone drawer: the same tree in a 788 px drawer, both languages.
+	['47-drawer-phone-en-light', '/guides/loudness/', 'light', [], { phone: true, anchor: null }],
+	['48-drawer-phone-en-dark', '/guides/loudness/', 'dark', [], { phone: true, anchor: null }],
+	['49-drawer-phone-es-dark', '/es/guides/loudness/', 'dark', [], { phone: true, anchor: null }],
 	// Arriving on a guide page: the API group is closed.
 	['30-api-closed-light', '/guides/levels/', 'light', []],
 	['31-api-closed-dark', '/guides/levels/', 'dark', []],
@@ -157,10 +188,17 @@ for (const [name, path, viewport, theme, scrollY = 0, fullPage = false, hash] of
 	console.log(`captured ${name}`);
 }
 
-for (const [name, path, theme, clicks] of SIDEBAR) {
+/** Group labels, per locale, that a shot can be anchored on. */
+const ANCHORS = {
+	'API reference': /^(API reference|Referencia de la API)/,
+	Reference: /^(Reference|Referencia)$/,
+};
+
+for (const [name, path, theme, clicks, opts = {}] of SIDEBAR) {
 	if (filters.length && !filters.some((f) => name.includes(f))) continue;
+	const { phone = false, anchor = 'API reference' } = opts;
 	const page = await browser.newPage();
-	await page.setViewport({ ...DESKTOP, deviceScaleFactor: 1 });
+	await page.setViewport({ ...(phone ? PHONE : DESKTOP), deviceScaleFactor: 1 });
 	await page.evaluateOnNewDocument((t) => {
 		try {
 			localStorage.setItem('starlight-theme', t);
@@ -171,6 +209,13 @@ for (const [name, path, theme, clicks] of SIDEBAR) {
 		document.documentElement.dataset.theme = t;
 	}, theme);
 	await page.addStyleTag({ content: 'astro-dev-toolbar{display:none !important}' });
+	// Below 50rem the sidebar lives behind the menu button, so open it first.
+	if (phone) {
+		await page.evaluate(() => {
+			document.querySelector('starlight-menu-button button')?.click();
+		});
+		await new Promise((r) => setTimeout(r, 400));
+	}
 	for (const label of clicks) {
 		await page.evaluate((text) => {
 			[...document.querySelectorAll('#starlight__sidebar summary')]
@@ -179,23 +224,30 @@ for (const [name, path, theme, clicks] of SIDEBAR) {
 		}, label);
 		await new Promise((r) => setTimeout(r, 250));
 	}
-	// Bring the API group to the top of the sidebar's own scroller, then frame
-	// the sidebar pane rather than the whole page.
-	const clip = await page.evaluate(() => {
-		const scroller = document.getElementById('starlight__sidebar');
-		const group = [...document.querySelectorAll('#starlight__sidebar summary')]
-			.find((s) => /^(API reference|Referencia de la API)/.test(s.textContent.trim()))
-			.closest('li');
-		scroller.scrollTop +=
-			group.getBoundingClientRect().top - scroller.getBoundingClientRect().top - 16;
-		const r = scroller.getBoundingClientRect();
-		return {
-			x: 0,
-			y: Math.max(0, Math.floor(r.y)),
-			width: Math.ceil(r.right + 8),
-			height: Math.ceil(Math.min(r.height, window.innerHeight - Math.max(0, r.y))),
-		};
-	});
+	// The drawer covers the page, so it is the whole viewport that is the
+	// subject there; on desktop the sidebar pane is framed on its own.
+	let clip;
+	if (!phone) {
+		clip = await page.evaluate((pattern) => {
+			const scroller = document.getElementById('starlight__sidebar');
+			if (pattern) {
+				const group = [...document.querySelectorAll('#starlight__sidebar summary')]
+					.find((s) => new RegExp(pattern).test(s.textContent.trim()))
+					.closest('li');
+				scroller.scrollTop +=
+					group.getBoundingClientRect().top - scroller.getBoundingClientRect().top - 16;
+			} else {
+				scroller.scrollTop = 0;
+			}
+			const r = scroller.getBoundingClientRect();
+			return {
+				x: 0,
+				y: Math.max(0, Math.floor(r.y)),
+				width: Math.ceil(r.right + 8),
+				height: Math.ceil(Math.min(r.height, window.innerHeight - Math.max(0, r.y))),
+			};
+		}, anchor ? ANCHORS[anchor].source : null);
+	}
 	await new Promise((r) => setTimeout(r, 300));
 	// `captureBeyondViewport` would resize the viewport to fit the clip, which
 	// changes how far the sidebar can scroll and frames the wrong rows.
