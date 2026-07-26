@@ -1,6 +1,6 @@
 ---
 title: "building.floor_covering_improvement"
-description: "Public API of phonometry.building.floor_covering_improvement (auto-generated)."
+description: "Impact-sound improvement of floor coverings on a small mock-up (ISO 16251-1:2014)."
 sidebar:
   label: "floor_covering_improvement"
 ---

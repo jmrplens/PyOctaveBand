@@ -225,6 +225,23 @@ repository; click the preview to open the PDF.
 	caption="Installed structure-borne prediction fiche (InstalledSourceResult.report), an EN 12354-5 estimate of the normalised structure-borne SPL in the receiving room."
 />
 
+## What this guide covers
+
+**Covered.** EN 12354-5:2009: the coupling term `D_C` (clause 4.4.3,
+Formulae 19b-e, with its force-source and velocity-source limits) via
+`coupling_term`, the installed power level `L_Ws,inst = L_Ws,c − D_C`
+(Formula 18b) via `installed_structure_borne_power_level`, and the per-path
+normalised sound pressure level and its energetic total (Formulae 18a, 17)
+via `installed_source_prediction`. Validated against the standard's own
+Annex I worked examples, the whirlpool bath (I.2) and the flushing cistern
+(I.3), within the ±0.15 dB rounding of the printed intermediates.
+
+**Not covered.** The Annex D and F default-value tables for the structure-
+to-airborne adjustment term `D_sa` and the flanking reduction index
+`R_ij,ref` are not implemented; both are inputs you supply from measurement,
+EN 12354-1 or the standard's own annexes. Only the 2009 edition is
+implemented, not the 2023 revision.
+
 ## See also
 
 - [Structure-borne sound power of equipment (EN 15657)](/phonometry/guides/structure-borne-power/):

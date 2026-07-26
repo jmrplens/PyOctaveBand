@@ -1,6 +1,6 @@
 ---
 title: "vibration.human_vibration"
-description: "Public API of phonometry.vibration.human_vibration (auto-generated)."
+description: "Human exposure to whole-body and hand-transmitted vibration."
 sidebar:
   label: "human_vibration"
 ---

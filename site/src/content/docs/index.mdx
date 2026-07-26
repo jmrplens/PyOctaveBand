@@ -1,6 +1,18 @@
 ---
 title: phonometry
 description: Acoustic measurement toolkit for Python covering sound level metrology, psychoacoustics, rooms and buildings, vibration, environment and transport, underwater acoustics, electroacoustics and wave simulation, with 427 conformance checks against 278 IEC, ISO, EN, ANSI, ECMA, DIN, ITU, EBU, SAE, ICAO and ECAC standards.
+# Starlight titles a page "<frontmatter title> | <site title>", which on this
+# one page produces "phonometry | phonometry" and spends the most weighted
+# element on the entry page saying nothing. The override also disambiguates
+# against the generic noun: "phonometry" on its own is a term in linguistics.
+head:
+  - tag: title
+    content: "phonometry: standards-conformant acoustic measurement for Python"
+  # Starlight types every page as an article. This one is the site itself.
+  - tag: meta
+    attrs:
+      property: og:type
+      content: website
 template: splash
 hero:
   tagline: Acoustic measurement, analysis and prediction in Python. Every metric is implemented from the text of its standard, and CI checks it against that standard's own tolerance tables and worked examples on every pull request.

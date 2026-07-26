@@ -41,6 +41,17 @@ documentó una vez. Léelo cuando necesites demostrar que un número es
 defendible, o para ver exactamente qué partes de una norma están implementadas
 y cuáles no.
 
+## [Erratas de las fuentes publicadas](/phonometry/es/reference/errata/)
+
+La otra cara de la misma moneda. Volver a deducir cada fórmula y cada ejemplo
+resuelto a partir del documento fuente demuestra de vez en cuando que quien se
+equivoca es el *documento*: un ejemplo que contradice su propio articulado,
+una constante mal impresa, una referencia cruzada que apunta a la ecuación
+equivocada. Cada caso confirmado queda registrado con la edición impresa, la
+evidencia, la lectura que implementa la librería y el test que la fija. Léelo
+cuando un valor esperado impreso y la librería no coincidan, antes de dar por
+hecho que el error es de la librería.
+
 ## [Bibliografía](/phonometry/es/reference/bibliography/)
 
 Todos los libros y artículos que citan las guías, en una sola lista agrupada

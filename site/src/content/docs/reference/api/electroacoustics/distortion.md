@@ -1,6 +1,6 @@
 ---
 title: "electroacoustics.distortion"
-description: "Public API of phonometry.electroacoustics.distortion (auto-generated)."
+description: "Distortion metrics for electroacoustic equipment (IEC 60268-3 / AES17)."
 sidebar:
   label: "distortion"
 ---

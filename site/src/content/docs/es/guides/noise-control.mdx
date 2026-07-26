@@ -388,6 +388,27 @@ que en la caída transparente ($kL = \pi$), y la razón de amplitudes medida
 reproduce la pérdida de transmisión máxima en forma cerrada con una fracción de
 decibelio.
 
+## Qué cubre esta guía
+
+**Cubierto.** Los silenciadores reactivos por el método de matriz de
+transferencia de cuatro polos (Bies §8.8-8.9, Munjal Ec. (3.27)): la forma
+cerrada `expansion_chamber` (Ec. (8.111)), `helmholtz_resonator` y
+`quarter_wave_resonator` (Ecs. (8.46), (8.44)), `extended_tube_chamber`, y
+los bloques `duct_matrix`/`shunt_matrix`/`cascade`, contrastados contra el
+solucionador FDTD independiente. Los métodos HVAC de Bies §8.11-8.17 /
+ASHRAE: `hvac.end_reflection_loss` y `hvac.elbow_insertion_loss` (tablas
+interpoladas), `hvac.plenum_attenuation` (forma cerrada de Wells) y
+`hvac.flow_noise_straight_duct`/`flow_noise_bend` (VDI 2081). La pérdida de
+inserción de cerramientos de máquina de Bies §7.4 (Ecs. (7.103), (7.111)),
+`enclosure_insertion_loss`, que combina una pérdida de transmisión de panel
+aportada con la corrección por la constante de sala interior.
+
+**No cubierto.** Solo están implementados los elementos reactivos: los
+silenciadores disipativos (absorbentes, con revestimiento interior) no están
+modelados. `enclosure_insertion_loss` nunca predice la pérdida de
+transmisión de panel `R`; se aporta medida o de otro modelo, y el módulo
+solo la combina con la corrección interior.
+
 ## Véase también
 
 - [Electroacústica](/phonometry/es/guides/electroacoustics/): el pistón radiante

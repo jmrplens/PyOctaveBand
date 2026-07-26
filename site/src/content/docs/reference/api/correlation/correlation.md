@@ -1,6 +1,6 @@
 ---
 title: "metrology.correlation"
-description: "Public API of phonometry.metrology.correlation (auto-generated)."
+description: "Correlation analysis and time-delay estimation."
 sidebar:
   label: "correlation"
 ---

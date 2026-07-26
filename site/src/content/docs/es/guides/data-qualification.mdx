@@ -447,6 +447,26 @@ estacionariedad. Y cuando pasa, la
 aleatorio *restante* de cada estimación promediada con la conciencia
 tranquila.
 
+## Qué cubre esta guía
+
+**Cubierto.** La sección 4.5.2 con la Tabla A.6 de Bendat y Piersol (el
+test de tendencia por inversiones de orden, `trend_test`, su valor p exacto
+y por aproximación normal, y el Ejemplo 4.4), el test de rachas de Wald y
+Wolfowitz (1940) (`trend_test(method="runs")`), el procedimiento de
+estacionariedad por medias cuadráticas de segmento de la sección 10.3.1.1
+con el Ejemplo 10.3 (`stationarity_test`), y las estadísticas de cruces por
+nivel y de picos de Rice (1945) de la sección 5.5 (`level_crossing_rate`,
+`peak_statistics`, el factor de irregularidad y sus límites Rayleigh y
+gaussiano para la altura de pico).
+
+**No cubierto.** La sección 10.3 del libro se titula "calificación de
+datos" en un sentido más amplio y también cubre la clasificación, la
+validación y la edición de registros; `phonometry.metrology` implementa
+solo su núcleo cuantitativo, el test de estacionariedad por medias
+cuadráticas. Clasificar el tipo de un registro, validarlo frente a límites
+físicos o editar transitorios espurios siguen siendo pasos manuales tal
+como los describe el libro, fuera de este módulo.
+
 ## Véase también
 
 - Referencia de la API: [`metrology.random_data`](/phonometry/es/reference/api/metrology/random-data/).

@@ -1,6 +1,6 @@
 ---
 title: "emission.vibration_sound_power"
-description: "Public API of phonometry.emission.vibration_sound_power (auto-generated)."
+description: "Airborne sound power from surface vibration (ISO/TS 7849-1/-2:2009)."
 sidebar:
   label: "vibration_sound_power"
 ---

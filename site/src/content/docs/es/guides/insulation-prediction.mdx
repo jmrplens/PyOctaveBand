@@ -54,6 +54,15 @@ comprueba el modelo están en
 los datos de laboratorio vienen de
 [Medición del aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/).
 
+## ¿Cómo predigo el aislamiento acústico con EN 12354 en Python?
+
+Construye los tres caminos de flanco de cada unión con
+`building.flanking_element()` y combínalos con
+`building.predicted_airborne_insulation(r_direct=57.0, flanking_paths=paths)`.
+Para el ejemplo del anexo H.3 de EN 12354-1 que se usa abajo devuelve
+`r_prime_w` = 52,2 dB, es decir $R'_w$ = 52 dB, y nombra el camino dominante.
+El aislamiento a impactos pasa por `predicted_impact_insulation()`.
+
 ## Predicción del comportamiento (EN 12354)
 
 Un índice de laboratorio describe un elemento de forma aislada, pero el sonido

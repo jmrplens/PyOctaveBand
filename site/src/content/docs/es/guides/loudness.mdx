@@ -72,6 +72,15 @@ métricas de habla en el
 [índice de transmisión del habla](/phonometry/es/guides/speech-transmission/) y
 el [índice de inteligibilidad del habla](/phonometry/es/guides/speech-intelligibility/).
 
+## ¿Cómo calculo la sonoridad de Zwicker de ISO 532-1 con Python?
+
+Llama a `psychoacoustics.loudness_zwicker(x, fs, calibration_factor=sens)`
+sobre una grabación calibrada. Si solo tienes el espectro, usa
+`loudness_zwicker_from_spectrum(levels_28)` con los 28 niveles de banda de
+tercio de octava de 25 Hz a 12,5 kHz. Cualquiera de los dos resultados lleva
+`loudness` en sonos, `loudness_level` en fonios y, para señales variables en el
+tiempo, los percentiles `n5` y `n10`.
+
 ## Sonoridad en sonos (ISO 532-1, Zwicker)
 
 Los decibelios comprimen la percepción: 10 dB más se leen como *el doble de
@@ -572,6 +581,33 @@ plt.show()
 Devuelve un `EcmaLoudness`: `loudness` (N, sone_HMS), `specific_loudness`
 (N′(z), 53 bandas), `bark`, `centre_frequencies`, `time`, `loudness_vs_time`
 (N(l) a 187,5 Hz), `field`.
+
+## Qué cubre esta guía
+
+**Cubierto.** ISO 532-1:2017 (método de Zwicker): el método estacionario del
+apartado 5 y el método variable en el tiempo del apartado 6, portado del
+programa de referencia normativo del Anexo A.4 y validado frente al Anexo B,
+con los percentiles `n5`/`n10`, mediante `loudness_zwicker()` y
+`loudness_zwicker_from_spectrum()`. ISO 532-2:2017 (Moore-Glasberg): el
+patrón de excitación roex del apartado 7 y la inhibición binaural del
+apartado 8, mediante `loudness_moore_glasberg()` y sus variantes
+`_from_spectrum`/`_from_third_octave`. ISO 532-3:2023
+(Moore-Glasberg-Schlittenlacher): la sonoridad de corto plazo del apartado
+7.8, la de largo plazo del apartado 7.9 y su pico N_max, mediante
+`loudness_moore_glasberg_time()`. ECMA-418-2:2025 (modelo de Sottek): el
+ensamblaje de sonoridad del apartado 8, mediante `loudness_ecma()`. ISO
+226:2023: la Fórmula (1), la Fórmula (2) y los parámetros de curva de la
+Tabla 1, mediante `equal_loudness_contour()`, `loudness_level()`,
+`hearing_threshold()` y `equal_loudness_contours()`.
+
+**No cubierto.** La combinación binaural de ECMA-418-2 (Fórmula 118, apartado
+8.1.5) no está implementada: `loudness_ecma()` es monaural, así que analiza
+cada canal por separado. El apartado 5 de ISO 532-3 exige remuestrear la
+entrada a 32 kHz antes del análisis FFT deslizante. Esta implementación
+procesa en cambio a la frecuencia de muestreo nativa, una desviación
+documentada que se mantiene dentro de la incertidumbre expandida de la norma.
+Remuestrea a 32 kHz primero si te importa la conformidad estricta apartado a
+apartado.
 
 ## Véase también
 

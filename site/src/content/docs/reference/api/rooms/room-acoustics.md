@@ -1,6 +1,6 @@
 ---
 title: "room.room_acoustics"
-description: "Public API of phonometry.room.room_acoustics (auto-generated)."
+description: "Room acoustic parameters from impulse responses per ISO 3382-1:2009 (performance spaces) and ISO 3382-2:2008 (ordinary rooms)."
 sidebar:
   label: "room_acoustics"
 ---

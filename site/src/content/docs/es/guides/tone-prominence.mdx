@@ -238,6 +238,26 @@ mientras la tonalidad del modelo auditivo se mantiene moderada en ambos casos
 porque valora el sonido completo y no una línea espectral. Informa la métrica
 que exija la evaluación y cita cualquier otra solo como evidencia de apoyo.
 
+## Qué cubre esta guía
+
+**Cubierto.** ECMA-418-1:2024 (3.ª edición): los métodos de relación
+tono-ruido (apartado 11, Fórmulas 9 a 12) y relación de prominencia
+(apartado 12, Fórmulas 23 a 26) sobre espectros promediados RMS con ventana
+Hann, el modelo de banda crítica del apartado 10, los criterios de
+prominencia dependientes de la frecuencia y la combinación de tonos
+secundarios que comparten banda del apartado 11.6, todo a través de
+`tone_to_noise_ratio()` y `prominence_ratio()`.
+
+**No cubierto.** El veredicto `prominent` que devuelven estas funciones es
+solo el criterio numérico. La norma exige además que un tono prominente se
+confirme por examen auditivo (apartados 11.8/12.8) y que supere el filtro
+del umbral inferior de audición de los apartados 8/9, que necesita niveles
+absolutos calibrados: ambas comprobaciones quedan a cargo de quien llama.
+ECMA-74:2025 está cubierta solo como la norma que delega su evaluación
+tonal en ECMA-418-1; su propio procedimiento de medida del Anexo D y las
+posiciones de operador/observador (mostradas arriba solo como contexto) no
+están implementados aquí.
+
 ## Véase también
 
 - [Niveles](/phonometry/es/guides/levels/): los niveles de evaluación de

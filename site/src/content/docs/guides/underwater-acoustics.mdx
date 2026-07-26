@@ -218,6 +218,31 @@ cumulative SEL and on the peak level at a stated range, which is why
 `pile_strike_metrics` reports them together and `cumulative_sel` follows the
 strike-by-strike energy sum of Formulae 8–9.
 
+## What this guide covers
+
+**Covered.** ISO 18405:2017 for the reference levels re 1 µPa and 1 µPa²·s:
+`sound_pressure_level`, `sound_exposure_level` and `peak_sound_pressure_level`.
+ISO 17208-1:2016 and ISO 17208-2:2019 for the ship radiated noise level and the
+equivalent monopole source level: `radiated_noise_level` and
+`monopole_source_level`, with the Lloyd's-mirror surface correction
+(Formula 3) and the 0.7·draught source depth (Formula 1), the
+three-hydrophone geometry (`hydrophone_depths`) and the tabulated
+source-level uncertainty (`source_level_uncertainty`). ISO 18406:2017 for the
+pile-driving metrics of section 3: the single-strike SEL (Formulae 3-4), the
+mean-square SPL (Formula 7) and the cumulative SEL (Formulae 8-9), which
+`single_strike_sel`, `cumulative_sel`, `cumulative_sel_identical` and
+`pile_strike_metrics` compute.
+
+**Not covered.** ISO 17208-1's measurement discipline itself is not
+implemented: the four-run, three-hydrophone power and arithmetic averaging
+(Formulae 8-9), the CPA and water-depth geometry checks, the ±30° data-window
+scoring and the ISO 3744-style background-noise correction described in
+section 2 above are left to the reader; the library only supplies the
+closed-form `radiated_noise_level` and `monopole_source_level` formulae. ISO
+18406 itself excludes vibro- and sheet-piling from its scope (Clause 1), so
+continuous pile-driving noise has no closed form here or elsewhere in
+phonometry.
+
 ## See also
 
 - API reference: [`underwater.acoustics`](/phonometry/reference/api/underwater/acoustics/), [`underwater.pile_driving_noise`](/phonometry/reference/api/underwater/pile-driving-noise/) and [`underwater.ship_radiated_noise`](/phonometry/reference/api/underwater/ship-radiated-noise/).

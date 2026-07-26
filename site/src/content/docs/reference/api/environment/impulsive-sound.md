@@ -1,6 +1,6 @@
 ---
 title: "environmental.impulsive_sound"
-description: "Public API of phonometry.environmental.impulsive_sound (auto-generated)."
+description: "Objective prominence of impulsive sounds and the LAeq adjustment (ISO/PAS 1996-3:2022)."
 sidebar:
   label: "impulsive_sound"
 ---

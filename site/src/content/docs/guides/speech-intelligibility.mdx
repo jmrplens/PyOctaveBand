@@ -406,6 +406,28 @@ repository; click the preview to open the PDF.
 	caption="Speech intelligibility index fiche (SIIResult.report), the SII with its per-band audibility."
 />
 
+## What this guide covers
+
+**Covered.** ANSI S3.5-1997 (R2017)'s one-third-octave-band method (18 bands,
+160 Hz to 8000 Hz): the equivalent speech, noise and hearing-threshold
+spectrum levels, the Table 3 band-importance function and standard speech
+spectra by vocal effort, the self-speech masking, upward spread of masking,
+level-distortion factor and band-audibility function of clause 5, and the
+index of clause 6. `speech_intelligibility_index`, `standard_speech_spectrum`
+and `standard_speech_spectra` implement these, and `SIIResult.report(path)`
+renders the ANSI S3.5-1997 fiche.
+
+**Not covered.** The standard's own title is plural ("Methods for the
+Calculation of the Speech Intelligibility Index"): phonometry implements only
+the one-third-octave-band procedure, not the standard's other band-resolution
+methods. The band-importance function used is always Table 3's
+average-speech compromise; Annex B's alternative importance functions for
+specific test materials (nonsense syllables, monosyllabic word lists, short
+passages) are not implemented. The Speech Transmission Index, a different
+metric for a transmission channel rather than listener audibility, is covered
+separately in the
+[Speech Transmission Index guide](/phonometry/guides/speech-transmission/).
+
 ## See also
 
 - [Speech Transmission Index](/phonometry/guides/speech-transmission/): the STI/STIPA

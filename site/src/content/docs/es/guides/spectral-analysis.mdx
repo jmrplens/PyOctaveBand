@@ -604,3 +604,27 @@ son mutuamente consistentes bin a bin. La misma matriz de espectros cruzados
 sustenta la [coherencia múltiple y parcial](/phonometry/es/guides/miso-coherence/),
 que extiende la coherencia ordinaria a varias entradas correladas y una
 salida.
+
+## Qué cubre esta guía
+
+**Cubierto.** Los estimadores de Welch de Bendat y Piersol (*Random
+Data*, 4.ª ed., 2010, secciones 5.2, 8.5, 9.1-9.2 y 11.5):
+`power_spectral_density` y `cross_spectral_density` con el número efectivo
+de promedios, los intervalos de confianza chi-cuadrado y el error de sesgo
+por resolución; el espectro de salida coherente y la relación
+señal-ruido espectral; las figuras de mérito de las ventanas de Harris
+(1978) de `window_metrics`; y el estimador multitaper de Thomson (1982) de
+`multitaper_psd`, siguiendo los capítulos 7 y 8 de Percival y Walden.
+`fractional_octave_smoothing` y `noise_signal` completan la caja de
+herramientas.
+
+**No cubierto.** Los estimadores de respuesta en frecuencia
+`transfer_function` y `coherence`, y la sonda de intensidad acústica,
+comparten el núcleo de Welch de esta página pero se documentan en las
+páginas de [electroacústica](/phonometry/es/guides/electroacoustics/) y
+[intensidad acústica](/phonometry/es/guides/intensity/), no aquí. Lo mismo
+ocurre con la coherencia múltiple y parcial, en la página de
+[coherencia MISO](/phonometry/es/guides/miso-coherence/). Esta página
+implementa los estimadores del libro de Bendat y Piersol, no una norma de
+certificación, así que no lleva números de apartado ni límites de
+cumplimiento que comprobar.

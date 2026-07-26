@@ -1,6 +1,6 @@
 ---
 title: "hearing.sii"
-description: "Public API of phonometry.hearing.sii (auto-generated)."
+description: "Speech Intelligibility Index (SII) per ANSI S3.5-1997 (R2017)."
 sidebar:
   label: "sii"
 ---

@@ -341,6 +341,30 @@ res.report(
 	caption="Ficha de movilidad mecánica (MobilityResult.report): los puntos característicos de la FRF y el espectro de magnitud de la movilidad."
 />
 
+## Qué cubre esta guía
+
+**Cubierto.** La familia de FRF de la ISO 7626-1:2011 (Tabla 1): receptancia,
+movilidad y acelerancia, con sus recíprocas fuerza-por-movimiento, que se
+convierten entre sí con `convert_frf`. También se cubren la distinción entre
+punto de excitación y transferencia, y el resonador SDOF en forma cerrada
+usado como referencia (`sdof_receptance`, `sdof_mobility`,
+`sdof_accelerance`, `resonance_frequency`, `sdof_mobility_result`). En el
+lado de medición también se cubre el procesado H1 de excitación aleatoria de
+la ISO 7626-2:2015 (`transfer_function`, `coherence`, compartidos con la
+guía de electroacústica), junto con dos criterios de aceptación: la
+calibración operacional con masa rígida del 7.5.2
+(`rigid_mass_calibration_check`) y el criterio de error aleatorio del
+Anexo A (`random_error_percent`).
+
+**No cubierto.** La ISO 7626-5 cubre la excitación por martillo de impacto
+como alternativa al excitador acoplado. Se nombra aquí solo como contexto:
+ninguna función sintetiza ni procesa un espectro de excitación por impacto.
+Las magnitudes matriciales *bloqueadas* de la Tabla 1, necesarias para
+sistemas de varias coordenadas, tampoco están implementadas. `convert_frf`
+devuelve solo las recíprocas *libres* elemento a elemento de la ISO 7626-1,
+3.1.4, correctas para el punto de excitación o para una sola vía, pero no
+para una matriz de FRF completa.
+
 ## Véase también
 
 - Referencia de la API: [`vibration.mechanical_mobility`](/phonometry/es/reference/api/vibration/mechanical-mobility/).

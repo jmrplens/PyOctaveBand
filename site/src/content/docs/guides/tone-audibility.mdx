@@ -383,6 +383,30 @@ repository; click the preview to open the PDF.
 	caption="Tonal audibility fiche (ToneAudibilityResult.report), decisive ΔL_ta in dB with the tonal adjustment K."
 />
 
+## What this guide covers
+
+**Covered.** The ISO/PAS 20065:2016 engineering method in full: the critical
+bandwidth `Δfc` and corner frequencies (Formulae 2 to 5), the mean
+narrow-band level `LS` and tone level `LT` (Formulae 6 and 8, Annex D),
+the critical-band masking level `LG`, the masking index `av` and the
+audibility `ΔL` (Formulae 12 to 14), peak detection and the distinctness
+test (clauses 5.3.8 and 5.3.4), the multi-tone FG combination (Formula 17)
+and the two-tones-below-1000-Hz exception (Formulae 18/19), the decisive and
+energy-mean audibility (Formula 20) and the clause 5.4/6 extended
+uncertainty `U`, all through `psychoacoustics.analyze_spectrum` and
+`assess_tones`. ISO 1996-2:2017 Annex J is covered as far as it maps the
+mean audibility to the tonal adjustment `Kt` (Table J.1).
+
+**Not covered.** Clause 5.3.2 requires the narrow-band spectrum to be
+A-weighted per IEC 61672-1 before analysis; this module is weighting
+agnostic and does not apply that weighting, so a caller must A-weight the
+spectrum first. The distinctness edge-steepness test follows the DIN
+45681:2005-03 reading (its executable reference program), not the
+asymmetric formulas printed in the ISO/PAS 20065 text, which contradict it
+(see `docs/ERRATA.md`). Building the narrow-band FFT spectrum itself from a
+raw time-domain recording is not part of this module: every function here
+takes an already-computed spectrum (levels and frequencies).
+
 ## See also
 
 - API reference: [`psychoacoustics.tone_audibility`](/phonometry/reference/api/psychoacoustics/tone-audibility/).

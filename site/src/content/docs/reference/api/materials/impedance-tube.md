@@ -1,6 +1,6 @@
 ---
 title: "materials.impedance_tube"
-description: "Public API of phonometry.materials.impedance_tube (auto-generated)."
+description: "Impedance-tube material characterisation."
 sidebar:
   label: "impedance_tube"
 ---

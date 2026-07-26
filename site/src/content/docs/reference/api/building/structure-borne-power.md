@@ -1,6 +1,6 @@
 ---
 title: "building.structure_borne_power"
-description: "Public API of phonometry.building.structure_borne_power (auto-generated)."
+description: "Structure-borne sound power of building equipment (EN 15657:2018; ISO 9611)."
 sidebar:
   label: "structure_borne_power"
 ---

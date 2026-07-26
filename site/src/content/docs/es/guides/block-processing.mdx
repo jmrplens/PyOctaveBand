@@ -214,6 +214,33 @@ for x in audio_stream(block):            # tu callback de captura
 | `high_accuracy` (ponderación) | por defecto se resuelve a `False` (el diseño bilineal clásico, consulta [Ponderación frecuencial](/phonometry/es/guides/weighting/)); pasar `True` explícito lanza `ValueError` | El remuestreo polifásico interno es incompatible con bloques |
 | `steady_ic` | opcional | Arranca los filtros en el régimen permanente de la respuesta al escalón |
 
+## Qué cubre esta guía
+
+**Cubierto.** La IEC 61260-1:2014 y la IEC 61672-1:2013 exactamente en la
+medida en que ya las implementan [Bancos de
+filtros](/phonometry/es/guides/filter-banks/), [Ponderación
+frecuencial](/phonometry/es/guides/weighting/) y [Ponderación
+temporal](/phonometry/es/guides/time-weighting/): `stateful=True` en
+`OctaveFilterBank`, `WeightingFilter` y `TimeWeighting` conserva el estado
+de sección en forma directa II transpuesta (`z1`, `z2`), o el último valor
+de la envolvente en `TimeWeighting`, entre fronteras de bloque, de modo que
+la salida en streaming concatenada es exactamente igual, bit a bit, a una
+sola pasada sobre la señal completa. Esta página no añade contenido
+normativo propio; solo demuestra y documenta esa equivalencia.
+
+**No cubierto.** El filtrado bidireccional `zero_phase` necesita la señal
+completa, así que no está soportado en modo con estado; usa la vía offline
+de [Bancos de filtros](/phonometry/es/guides/filter-banks/) en su lugar. El
+diseño `high_accuracy` de ponderación se resuelve al filtro bilineal
+clásico en modo con estado (pasar `True` explícitamente lanza
+`ValueError`), porque su etapa de remuestreo polifásico no es compatible
+con bloques; consulta [Ponderación
+frecuencial](/phonometry/es/guides/weighting/) para el diseño de alta
+precisión offline. Los estadísticos de rango como L90 tampoco admiten
+streaming: transmite la envolvente y calcula los percentiles una vez sobre
+el resultado conjunto, como describe [Niveles integrados y
+estadísticos](/phonometry/es/guides/levels/).
+
 ## Véase también
 
 - Referencia de la API: [`metrology.parametric_filters`](/phonometry/es/reference/api/filters/parametric-filters/) y [`metrology.core`](/phonometry/es/reference/api/filters/core/).

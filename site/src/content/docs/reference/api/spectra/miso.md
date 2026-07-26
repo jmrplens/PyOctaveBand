@@ -1,6 +1,6 @@
 ---
 title: "metrology.miso"
-description: "Public API of phonometry.metrology.miso (auto-generated)."
+description: "Multiple and partial coherence of a multiple-input/single-output system."
 sidebar:
   label: "miso"
 ---

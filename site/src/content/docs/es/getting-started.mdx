@@ -4,6 +4,15 @@ description: "Instala phonometry y ejecuta tu primer análisis de octava fraccio
 ---
 
 import ThemeImage from '../../../components/ThemeImage.astro';
+import { totalChecks } from '../../../data/conformance-stats.mjs';
+
+phonometry es una biblioteca de Python para la medida acústica, desde los
+bancos de filtros de octava fraccional y la ponderación frecuencial hasta los
+niveles sonoros y las métricas normalizadas. Cada métrica se verifica frente a
+la norma que la rige, {totalChecks} comprobaciones numéricas en total.
+Instálala con `pip install phonometry`; el primer ejemplo de abajo filtra una
+señal en tercios de octava y devuelve el nivel de presión acústica de cada
+banda.
 
 ## Instalación
 
@@ -142,6 +151,6 @@ de informe, un método `.report()` que genera la ficha PDF normativa.
 - [Bancos de filtros](/phonometry/es/guides/filter-banks/): elige una arquitectura e inspecciona sus respuestas
 - [Calibración y dBFS](/phonometry/es/guides/calibration/): obtén valores SPL reales
 - [Por qué phonometry](/phonometry/es/reference/why-phonometry/): la filosofía de diseño basada en conformidad
-- [Informe de conformidad](/phonometry/es/reference/conformance/): el valor esperado y el calculado de las 371 comprobaciones
+- [Informe de conformidad](/phonometry/es/reference/conformance/): el valor esperado y el calculado de las {totalChecks} comprobaciones
 - [Referencia de la API](/phonometry/es/reference/api/): todos los parámetros de cada función
 - [Bibliografía](/phonometry/es/reference/bibliography/): los libros y artículos que sustentan cada guía, cada uno con un enlace verificado

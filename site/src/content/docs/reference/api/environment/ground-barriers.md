@@ -1,6 +1,6 @@
 ---
 title: "environmental.ground_barriers"
-description: "Public API of phonometry.environmental.ground_barriers (auto-generated)."
+description: "Spherical-wave ground effect and advanced barrier diffraction."
 sidebar:
   label: "ground_barriers"
 ---

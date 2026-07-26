@@ -11,6 +11,60 @@ authors = [
 description = "Acoustic measurement toolkit: fractional octave-band filters, A/C/Z and time weighting, and sound level metrology per IEC 61260-1 and IEC 61672-1."
 readme = "README.md"
 requires-python = ">=3.13"
+# Search terms for PyPI: the domains the library actually covers, plus the
+# designations of the standards its metrics are implemented from, so a search
+# for a standard number finds the package.
+keywords = [
+    "acoustics",
+    "sound level meter",
+    "sound level",
+    "octave band",
+    "fractional octave band",
+    "octave filter bank",
+    "frequency weighting",
+    "signal processing",
+    "psychoacoustics",
+    "loudness",
+    "sharpness",
+    "roughness",
+    "room acoustics",
+    "reverberation time",
+    "sound absorption",
+    "sound insulation",
+    "building acoustics",
+    "sound power",
+    "vibration",
+    "human vibration exposure",
+    "environmental noise",
+    "aircraft noise",
+    "underwater acoustics",
+    "electroacoustics",
+    "loudspeaker measurement",
+    "broadcast loudness",
+    "noise control",
+    "acoustic metrology",
+    "standards conformance",
+    "ANSI S1.11",
+    "IEC 61260-1",
+    "IEC 61672-1",
+    "IEC 60942",
+    "IEC 60268-3",
+    "ISO 226",
+    "ISO 532-1",
+    "ISO 354",
+    "ISO 3382-1",
+    "ISO 717-1",
+    "ISO 16283-1",
+    "EN 12354",
+    "ISO 1996-1",
+    "ISO 9613-2",
+    "ISO 2631-1",
+    "ISO 7196",
+    "ECMA-418-1",
+    "EBU R 128",
+    "ITU-R BS.1770",
+    "ICAO Annex 16",
+]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.13",
@@ -35,7 +89,11 @@ full = ["numba>=0.66.0", "matplotlib>=3.11.1", "reportlab>=5.0.0", "svglib>=2.0.
 
 [project.urls]
 "Homepage" = "https://github.com/jmrplens/phonometry"
+"Documentation" = "https://jmrplens.github.io/phonometry/"
+"Source" = "https://github.com/jmrplens/phonometry"
+"Changelog" = "https://github.com/jmrplens/phonometry/blob/main/CHANGELOG.md"
 "Bug Tracker" = "https://github.com/jmrplens/phonometry/issues"
+"DOI" = "https://doi.org/10.5281/zenodo.21215280"
 
 [tool.setuptools.packages.find]
 where = ["src"]

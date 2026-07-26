@@ -1,6 +1,6 @@
 ---
 title: "metrology.uncertainty"
-description: "Public API of phonometry.metrology.uncertainty (auto-generated)."
+description: "Measurement uncertainty by the GUM and its Monte Carlo supplement."
 sidebar:
   label: "uncertainty"
 ---

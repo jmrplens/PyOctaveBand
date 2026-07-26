@@ -71,6 +71,15 @@ Sharpness, tonality and roughness live in
 [Speech Transmission Index](/phonometry/guides/speech-transmission/) and
 [Speech Intelligibility Index](/phonometry/guides/speech-intelligibility/).
 
+## How do I compute ISO 532-1 Zwicker loudness in Python?
+
+Call `psychoacoustics.loudness_zwicker(x, fs, calibration_factor=sens)` on a
+calibrated recording. If you only have a spectrum, use
+`loudness_zwicker_from_spectrum(levels_28)` with the 28 one-third-octave band
+levels from 25 Hz to 12.5 kHz. Either result carries `loudness` in sones,
+`loudness_level` in phons and, for time-varying input, the percentiles `n5`
+and `n10`.
+
 ## Loudness in sones (ISO 532-1, Zwicker)
 
 Decibels compress perception: 10 dB more reads as *twice as loud*, and two
@@ -561,6 +570,31 @@ plt.show()
 Returns an `EcmaLoudness`: `loudness` (N, sone_HMS), `specific_loudness`
 (N′(z), 53 bands), `bark`, `centre_frequencies`, `time`, `loudness_vs_time`
 (N(l) at 187.5 Hz), `field`.
+
+## What this guide covers
+
+**Covered.** ISO 532-1:2017 (Zwicker method): the stationary method of
+clause 5 and the time-varying method of clause 6, ported from the normative
+Annex A.4 reference program and validated against Annex B, with the
+`n5`/`n10` percentiles, via `loudness_zwicker()` and
+`loudness_zwicker_from_spectrum()`. ISO 532-2:2017 (Moore-Glasberg): the roex
+excitation pattern of clause 7 and the binaural inhibition of clause 8, via
+`loudness_moore_glasberg()` and its `_from_spectrum`/`_from_third_octave`
+variants. ISO 532-3:2023 (Moore-Glasberg-Schlittenlacher): the short-term
+loudness of clause 7.8, the long-term loudness of clause 7.9 and its peak
+N_max, via `loudness_moore_glasberg_time()`. ECMA-418-2:2025 (Sottek Hearing
+Model): the loudness assembly of Clause 8, via `loudness_ecma()`. ISO
+226:2023: Formula (1), Formula (2) and the Table 1 contour parameters, via
+`equal_loudness_contour()`, `loudness_level()`, `hearing_threshold()` and
+`equal_loudness_contours()`.
+
+**Not covered.** ECMA-418-2's binaural combination (Formula 118, Clause
+8.1.5) is not implemented: `loudness_ecma()` is monaural, so analyse each ear
+channel separately. ISO 532-3 Clause 5 prescribes resampling the input to
+32 kHz before the running FFT analysis. This implementation processes at the
+native sampling rate instead, a documented deviation that stays inside the
+standard's expanded uncertainty. Resample to 32 kHz first if strict
+clause-by-clause conformance matters.
 
 ## See also
 

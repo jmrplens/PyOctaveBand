@@ -952,6 +952,40 @@ def _with_type(
     return rendered
 
 
+#: Longest meta description worth emitting. Past roughly this length search
+#: engines and AI summarizers truncate anyway, and the tail is wasted.
+_MAX_DESCRIPTION = 300
+
+
+def _page_description(page: ModuleDoc) -> str:
+    """The page's meta description, taken from the module docstring.
+
+    These pages used to describe themselves as "Public API of
+    phonometry.building.insulation (auto-generated)", which says nothing a URL
+    does not already say. The same page's body opens with a precise summary of
+    what the module implements and which standards govern it, so that is what
+    the description should be: it is what a search result shows and what an AI
+    system reads when deciding whether the page answers a question.
+    """
+    lead = page.intro.strip().split("\n\n", 1)[0].replace("\n", " ").strip()
+    # Drop reStructuredText roles and markdown emphasis so the description is
+    # plain prose: `:func:`x`` and ``**x**`` render as noise in a meta tag.
+    lead = re.sub(r":[a-z]+:`~?([^`]+)`", r"\1", lead)
+    lead = re.sub(r"[*`]", "", lead).strip()
+
+    if not lead:
+        if page.module == "phonometry":
+            return "Top-level convenience API of the phonometry package."
+        return f"Public API of {page.module}."
+
+    if len(lead) > _MAX_DESCRIPTION:
+        # Cut on a sentence boundary where there is one in range, so the
+        # description never ends mid-clause.
+        cut = lead.rfind(". ", 0, _MAX_DESCRIPTION)
+        lead = lead[: cut + 1] if cut > 80 else lead[:_MAX_DESCRIPTION].rstrip() + "..."
+    return lead
+
+
 def render_module_page(
     page: ModuleDoc,
     xref: dict[str, str],
@@ -959,13 +993,7 @@ def render_module_page(
     failures: list[str],
 ) -> str:
     """Render one module page to Markdown."""
-    if page.module == "phonometry":
-        description = (
-            "Top-level convenience API of the phonometry package "
-            "(auto-generated)."
-        )
-    else:
-        description = f"Public API of {page.module} (auto-generated)."
+    description = _page_description(page)
     out = [
         _frontmatter(page.title, description, page.label),
         "",

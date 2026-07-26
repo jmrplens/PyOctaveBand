@@ -485,3 +485,24 @@ gating y LRA de estos casos se ejecutan también en todas partes sin el
 audio. El medidor independiente
 [pyloudnorm](https://github.com/csteinmetz1/pyloudnorm) es un contraste útil
 con grabaciones reales; no se usó como fuente de esta implementación.
+
+## Qué cubre esta guía
+
+**Cubierto.** La Rec. UIT-R BS.1770-5, Anexo 1: el prefiltro de ponderación K
+de las Tablas 1-2, y la sonoridad integrada ponderada por canal con su puerta
+en dos etapas (Fórmulas 1-7, Tabla 3). `k_weighting`, `k_weighting_coefficients`
+y `program_loudness` los implementan. El nivel de pico verdadero
+sobremuestreado del Anexo 2 se ejecuta mediante `true_peak_level`. Las
+ponderaciones de canal dependientes de la posición del Anexo 3 para sistemas
+de sonido avanzados se ejecutan mediante `channel_weight`. El objetivo de
+−23,0 LUFS y el techo de −1 dBTP de EBU R 128 se apoyan en lo anterior. El
+medidor momentánea/corto plazo/integrada de EBU Tech 3341 y el rango de
+sonoridad de EBU Tech 3342 provienen del mismo resultado `program_loudness`,
+con `loudness_range()` también disponible de forma independiente.
+
+**No cubierto.** El Anexo 4 de BS.1770-5, el audio basado en objetos, queda
+fuera de alcance. La guía señala que el renderizado a una disposición de
+altavoces debe ocurrir antes, y phonometry no implementa ningún renderizador
+de audio espacial para ese paso. EBU Tech 3343 se cita solo como práctica de
+producción alrededor de estos números: es orientación, no un algoritmo, y
+nada aquí lo ejecuta.

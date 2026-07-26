@@ -348,6 +348,28 @@ Consulta [Teoría](/phonometry/es/reference/theory/signal-analysis/) para las de
 [Calibración](/phonometry/es/guides/calibration/) para el escalado absoluto de
 los dos canales.
 
+## Qué cubre esta guía
+
+**Cubierto.** IEC 61043:1993 (EN 61043:1994) para el estimador de
+intensidad por espectro cruzado de dos micrófonos de `sound_intensity`, la
+corrección de sesgo por diferencias finitas y su límite de ancho de banda
+útil (apartado 7.3, Tabla 3), y el índice residual de presión-intensidad
+`δpI0` como el suelo de error de fase del instrumento. ISO 9614-1:1993 para
+los indicadores de campo del Anexo A F2, F3 y F4 (`field_indicators`) y el
+criterio de capacidad dinámica del Anexo B (`dynamic_capability_index`).
+
+**No cubierto.** La propia determinación de potencia sonora de ISO 9614-1,
+apartados 8 y 9, que suma las potencias parciales `Ii·Si` de los puntos de
+medida discretos hasta `LW`, no está implementada como función aquí:
+`sound_intensity` y `field_indicators` informan de la intensidad y la
+calidad de campo, no de una potencia sumada. Las vías de barrido que sí
+calculan `LW` a partir de la intensidad (ISO 9614-2 e ISO 9614-3) están en
+la [guía de potencia sonora](/phonometry/es/guides/sound-power/). Los
+límites de aceptación del índice residual de clase 1 / clase 2 de
+IEC 61043 tampoco se verifican en la biblioteca: `δpI0` es un valor que
+quien mide aporta desde su propia cadena sonda-analizador, no algo que
+phonometry clasifique.
+
 ## Véase también
 
 - Referencia de la API: [`emission.intensity`](/phonometry/es/reference/api/power/intensity/).

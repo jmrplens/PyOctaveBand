@@ -1047,6 +1047,42 @@ print(float(materials.weighted_coefficient_uncertainty(0.70).reported_expanded_u
 print(float(materials.single_number_rating_uncertainty(8.1).reported_expanded_uncertainty[0]))   # 1.6
 ```
 
+## Qué cubre esta guía
+
+**Cubierto.** La valoración ponderada de absorción de ISO 11654:1997: el
+coeficiente práctico de la cláusula 4.1, el desplazamiento de la curva de
+referencia de la cláusula 4.2, los indicadores de forma de la cláusula 4.3 y
+la clase de absorción de la Tabla B.1. Los construyen `weighted_absorption` y
+`weighted_absorption_from_third_octave`. La inversión de Sabine de ISO
+354:2003 (Ecs. (5)-(9)) en `measure_sound_absorption`. Las dos partes de ISO
+9053: el método estático de la cláusula 7.5 (`static_airflow_resistance`) y
+el método alterno con la relación efectiva de calores específicos del Anexo A
+(`effective_kappa`, `alternating_airflow_resistance`). El trío del tubo de
+impedancia: el método de la razón de onda estacionaria de ISO 10534-1
+(`standing_wave_ratio_from_level` y sus acompañantes), el método de la
+función de transferencia de ISO 10534-2 con su comprobación de rango de
+frecuencias de la cláusula 4 (`two_microphone_impedance`,
+`plane_wave_frequency_range`), y el método de matriz de transferencia de
+cuatro micrófonos de ASTM E2611 (`transfer_matrix_two_load`,
+`transfer_matrix_one_load`, `TransferMatrix`). Las fórmulas de incertidumbre
+de medida de ISO 12999-2:2020 (cláusulas 5-8) para los coeficientes de
+tercio de octava y prácticos y para las valoraciones de número único, en
+`sound_absorption_coefficient_uncertainty`,
+`weighted_coefficient_uncertainty` y `single_number_rating_uncertainty`.
+
+**No cubierto.** El coeficiente de absorción estadístico (a incidencia
+aleatoria) $\alpha_{st}$ del promedio angular de Paris se describe pero no se
+calcula: necesita el $\alpha(\theta)$ dependiente del ángulo a partir de la
+impedancia superficial, que nada aquí deriva. Dos ediciones citadas solo como
+revisiones posteriores no están implementadas: ISO 10534-2:2023 (el código
+sigue el método de la función de transferencia de 1998/2001) y ASTM E2611-24
+(el código sigue E2611-19). ISO 10534-1:1996 está implementada como su
+adopción europea BS EN ISO 10534-1:2001, no leída directamente del texto ISO
+de 1996. La fórmula de incertidumbre de ISO 12999-2 para la valoración de
+número único de EN 1793-1 $DL_{\alpha,\text{NRD}}$ está implementada, pero el
+propio método de medida in situ de EN 1793-1 (dispositivos reductores de
+ruido de tráfico rodado) no lo está.
+
 ## Véase también
 
 - Referencia de la API: [`materials.impedance_tube`](/phonometry/es/reference/api/materials/impedance-tube/), [`materials.airflow_resistance`](/phonometry/es/reference/api/materials/airflow-resistance/) y [`materials.absorption_uncertainty`](/phonometry/es/reference/api/materials/absorption-uncertainty/).

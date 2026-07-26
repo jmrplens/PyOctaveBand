@@ -110,6 +110,14 @@ plt.show()
 * **D-Weighting (`D`):** Aircraft-noise weighting of the withdrawn IEC 537 (section 4).
 * **AU-Weighting (`AU`):** A-weighting with the IEC 61012 ultrasound cutoff (section 4).
 
+## How do I apply A-weighting to a signal in Python?
+
+Call `metrology.weighting_filter(recording, fs, curve='A')` on a calibrated
+signal. It returns the A-weighted time signal, filtered with the pole-zero
+design of IEC 61672-1:2013 within class 1 tolerances, so
+`metrology.leq()` on the output is the $L_{Aeq}$. The same function applies C,
+Z, B, D, AU and the infrasound G weighting through `curve`.
+
 ## 1. Where the curves come from
 
 The A and C curves are inverted equal-loudness contours, frozen into filters:
@@ -543,6 +551,29 @@ plt.show()
 ```
 
 </details>
+
+## What this guide covers
+
+**Covered.** IEC 61672-1:2013 for the A, C and Z curves: the Annex E
+analytic definition from four corner frequencies, the `high_accuracy` design
+that keeps class 1 tolerances up to 16 kHz, and the Table 3 class 1/class 2
+acceptance limits checked by `verify_weighting_class`. ISO 7196:1995 for the
+G curve (Table 1 pole/zero values, verified against every Table 2 nominal
+response). ANSI S1.4-1983 for the historical B curve (Appendix C definition,
+Table IV design goals, Table V tolerance limits). IEC 61012:1990 for AU (the
+U low-pass of Table 2 cascaded with A, verified against Table 1). IEC
+537:1976 for the withdrawn aircraft-noise D curve, implemented from its
+published transfer function and cross-checked against two independent
+implementations.
+
+**Not covered.** `verify_weighting_class` does not produce a class verdict
+for G or D: ISO 7196 defines a single ±1 dB tolerance with no class
+structure, and the withdrawn IEC 537 left no tolerance table behind. Both
+curves are pinned numerically against their published tables in the CI
+conformance report instead, not through this public verifier. B and D are
+provided for historical data and older national codes only; neither is
+current practice (IEC 61672-1 replaced B, and aircraft-noise certification
+now reports EPNL or plain A-weighted levels instead of D).
 
 ## See also
 

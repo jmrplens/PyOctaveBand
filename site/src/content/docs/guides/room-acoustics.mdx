@@ -859,6 +859,34 @@ still returns.
 shape of `t60`; `absorption_coefficient()` returns `alpha_s`;
 `attenuation_from_alpha(alpha)` converts an ISO 9613-1 `alpha` (dB/m) to `m`.
 
+## What this guide covers
+
+**Covered.** ISO 18233:2006 Annexes A and B, the MLS and exponential-sweep
+impulse-response acquisition of `room.mls_signal`/`room.sweep_signal` and
+`room.impulse_response`/`room.mls_impulse_response`; ISO 3382-1:2009
+(clause 5.3.3 backward integration, the Annex A parameter formulae and
+position/spacing requirements) and ISO 3382-2:2008 (Clause 6, the
+accuracy-grade position counts and the 5.3.3 dynamic-range criterion),
+computed by `room.room_parameters`/`room.decay_curve`: EDT, T20, T30, C50,
+C80, D50, Ts and the per-band validity and curvature flags; ISO 3382-3:2012
+Clause 4 and Clause 6.2/6.3 open-plan quantities ($D_{2,S}$, $L_{p,A,S,4m}$,
+$r_D$, $r_P$) from `room.open_plan_metrics`; and ISO 354:2003 Clauses 4 and
+8.1 reverberation-room absorption from `materials.absorption_area` and
+`materials.absorption_coefficient`.
+
+**Not covered.** ISO 3382-1 Annex A also defines the sound-strength $G$ and
+the binaural parameters LF/LFC and IACC; phonometry implements only the
+reverberance and clarity family named above (EDT, T20, T30, C50, C80, D50,
+Ts). ISO 3382-3's per-position STI is taken as an input to
+`open_plan_metrics` rather than computed inside it: measure it with the
+STIPA tools of the
+[Speech Transmission Index guide](/phonometry/guides/speech-transmission/).
+ISO 354's room-qualification requirements (Annex A: the number of
+loudspeaker and microphone positions, the diffusing elements) are not
+checked; `absorption_area`/`absorption_coefficient` only convert an
+already-measured $T_1$/$T_2$ pair and raise an advisory warning when the
+room volume or sample area falls outside the Clause 6 limits.
+
 ## See also
 
 - [Field](/phonometry/guides/insulation-field/),

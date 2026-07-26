@@ -4,7 +4,8 @@
 # Regenerates the committed numerical conformance report
 # (docs/CONFORMANCE.md) and stages it, but ONLY when the library source, the
 # report generator, or the shared reference tables are part of the commit -
-# so unrelated commits pay nothing (a full run is ~12 s).
+# so unrelated commits pay nothing (a full run is ~12 s). The report body is
+# also transplanted into its Starlight pages, which have their own CI gate.
 #
 # This is a convenience only. The real enforcement is the CI staleness check
 # (the `conformance` job in .github/workflows/python-app.yml). Install with:
@@ -18,8 +19,12 @@
 if git diff --cached --name-only \
 	| grep -Eq '^(src/phonometry/|scripts/conformance_report\.py|tests/reference_data\.py)'; then
 	echo "[pre-commit] source changed - regenerating docs/CONFORMANCE.md ..."
-	if make conformance && git add docs/CONFORMANCE.md; then
-		echo "[pre-commit] docs/CONFORMANCE.md regenerated and staged."
+	if make conformance && make site-reports \
+		&& git add docs/CONFORMANCE.md \
+			site/src/content/docs/reference/conformance.md \
+			site/src/content/docs/es/reference/conformance.md; then
+		echo "[pre-commit] docs/CONFORMANCE.md and its site pages regenerated" \
+			"and staged."
 	else
 		echo "[pre-commit] WARNING: conformance regen failed; committing anyway" \
 			"(CI staleness check remains the gate)." >&2

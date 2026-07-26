@@ -1,6 +1,6 @@
 ---
 title: "underwater.acoustics"
-description: "Public API of phonometry.underwater.acoustics (auto-generated)."
+description: "Underwater-acoustics reference levels (ISO 18405:2017)."
 sidebar:
   label: "acoustics"
 ---

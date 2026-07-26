@@ -292,6 +292,29 @@ level (it spreads the modulated energy across bands); quote the closed form
 `fluctuation_strength_am_noise` (§3.1) for that stimulus.
 :::
 
+## What this guide covers
+
+**Covered.** Fastl & Zwicker's *Psychoacoustics: Facts and Models* gives the
+exact `PA` model, Eqs 16.2-16.4 (origin Widmann 1992), run by
+`psychoacoustic_annoyance`. It also gives the closed form for AM broadband
+noise, Eq. 10.2, run by `fluctuation_strength_am_noise`. The Osses et al.
+(2016) signal model for fluctuation strength runs as `fluctuation_strength`,
+cross-checked against its Table 1 literature values and the SQAT reference.
+`psychoacoustic_annoyance_from_signal` derives the four inputs from a signal
+(ISO 532-1 Zwicker `N5`, DIN 45692 `S`, ECMA-418-2 `R`) and combines them
+with the exact model.
+
+**Not covered.** The Osses 2016 model's accuracy for FM tones is explicitly
+not pursued. Only AM stimuli are validated here. The front-end also departs
+from the paper's exact framing (2 s frames, 90 % overlap, absolute-threshold
+gating). As a result, a steady 1 kHz tone reads about 0.09 vacil instead of
+0, and steady broadband noise reads about 0.4 vacil. For AM broadband noise,
+quote `fluctuation_strength_am_noise` (§3.1) instead of
+`fluctuation_strength`, which overshoots that stimulus. The normative
+Sottek-model fluctuation strength of ECMA-418-2 Clause 9 is not implemented
+on this page: it lives in
+[Sound Quality Metrics](/phonometry/guides/sound-quality/).
+
 ## See also
 
 - API reference: [`psychoacoustics.psychoacoustic_annoyance`](/phonometry/reference/api/psychoacoustics/psychoacoustic-annoyance/) and [`psychoacoustics.fluctuation_strength`](/phonometry/reference/api/psychoacoustics/fluctuation-strength/).

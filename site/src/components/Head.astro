@@ -1,19 +1,52 @@
 ---
 // Custom Starlight <Head> override.
-// Renders Starlight's default head, then layers per-page structured data
-// (TechArticle + BreadcrumbList) and per-page Twitter card tags on top.
-// The site-wide @graph (Person / WebSite / SoftwareApplication) lives in
-// astro.config.mjs; these IDs link the per-page nodes back into that graph.
+//
+// Renders Starlight's default head, then layers the per-page structured data
+// and the per-page Twitter card tags on top. The site-wide @graph (Person /
+// WebSite / SoftwareApplication / SoftwareSourceCode) lives in
+// astro.config.mjs; the nodes here join it by `@id`.
+//
+// Everything per-page goes into ONE `@graph` rather than a script per node.
+// Google merges every ld+json block on a page before evaluating, so the old
+// split worked there, but a plain JSON-LD processor expands each <script> as
+// its own document, and in that reading the `@id`s below pointed at nodes with
+// no properties. The naive parsers are exactly the consumers this markup is
+// for, so the graph is assembled here instead of hoping it is reassembled
+// downstream.
 import Default from '@astrojs/starlight/components/Head.astro';
+import { getCollection } from 'astro:content';
+import { breadcrumbsFor } from '../lib/breadcrumbs.mjs';
+import { firstPublished } from '../lib/page-dates.mjs';
+import { citationsFor, referenceId, referenceNode } from '../lib/citations.mjs';
 
 const SITE = import.meta.env.SITE ?? 'https://jmrplens.github.io';
 const BASE = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
 const PERSON_ID = 'https://jmrp.io/#person';
 const WEBSITE_ID = `${SITE}${BASE}/#website`;
 const SOFTWARE_ID = 'https://github.com/jmrplens/phonometry#software';
+const SOCIAL_IMAGE = `${SITE}${BASE}/og-image.png`;
 
+interface ReferenceEntry {
+  type: string;
+  title: string;
+  designation?: string;
+  organization?: string;
+  publisher?: string;
+  institution?: string;
+  authors?: string[];
+  year?: number | string;
+  url?: string;
+  doi?: string;
+  note?: string;
+  primary?: boolean;
+  [key: string]: unknown;
+}
 interface RouteData {
-  entry?: { data?: { title?: string; description?: string } };
+  entry?: {
+    id?: string;
+    filePath?: string;
+    data?: { title?: string; description?: string; references?: ReferenceEntry[] };
+  };
   lastUpdated?: Date;
 }
 const route = (Astro.locals as { starlightRoute?: RouteData }).starlightRoute;
@@ -27,72 +60,146 @@ const rel = pathname.startsWith(BASE) ? pathname.slice(BASE.length) : pathname;
 const lang = rel.startsWith('/es/') || rel === '/es' ? 'es' : 'en';
 const isHome = rel === '/' || rel === '' || rel === '/es/' || rel === '/es';
 
-// Git-derived last-updated date (Starlight `lastUpdated: true`).
-const updated =
-  route?.lastUpdated instanceof Date ? route.lastUpdated.toISOString() : undefined;
+// The 404 page is a real route with a real entry, so it used to emit a
+// TechArticle headlined "404" carrying the site description. An error page is
+// not an article and should not be indexed as one.
+const is404 = route?.entry?.id === '404' || rel.replace(/\/$/, '').endsWith('/404');
 
-// TechArticle for every content page (not the splash home).
-const techArticle = isHome
-  ? null
-  : {
-      '@context': 'https://schema.org',
-      '@type': 'TechArticle',
-      headline: title,
-      ...(description ? { description } : {}),
-      inLanguage: lang,
-      url: canonical,
-      mainEntityOfPage: canonical,
-      // Point voice/AI assistants at the page title and lead paragraph.
-      speakable: {
-        '@type': 'SpeakableSpecification',
-        cssSelector: ['h1', '.sl-markdown-content > p:first-of-type'],
-      },
-      ...(updated ? { datePublished: updated, dateModified: updated } : {}),
-      author: { '@id': PERSON_ID },
-      publisher: { '@id': PERSON_ID },
-      isPartOf: { '@id': WEBSITE_ID },
-      about: { '@id': SOFTWARE_ID },
-    };
+// Slug without the locale prefix: `guides/levels` for both languages. This is
+// the key the navigation tree and the translation pairing both use.
+const slug = rel.replace(/^\/(es\/)?/, '').replace(/\/$/, '');
 
-// BreadcrumbList for every non-home page, with locale-aware section labels.
-function titleCase(seg: string) {
-  return seg.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+// The generated API tree documents modules, and schema.org has an exact type
+// for that. APIReference is a subclass of TechArticle, so nothing is lost.
+const isApiPage = slug.startsWith('reference/api/');
+// Guides teach a method as well as document it; the dual type is free and adds
+// the learning-resource properties.
+const isGuide = slug.startsWith('guides/');
+const isBibliography = slug === 'reference/bibliography';
+
+const bibliographyUrl = `${SITE}${BASE}${lang === 'es' ? '/es' : ''}/reference/bibliography/`;
+
+// Dates: `dateModified` is the last commit that touched the page, which is what
+// Starlight already computes. `datePublished` is the commit that ADDED it. They
+// used to be the same value, which claimed every page was published on the day
+// it was last edited.
+const modified =
+  route?.lastUpdated instanceof Date ? route.lastUpdated.toISOString().slice(0, 10) : undefined;
+const published = firstPublished(route?.entry?.filePath ?? '') ?? modified;
+
+const articleType = isApiPage
+  ? 'APIReference'
+  : isGuide
+    ? ['TechArticle', 'LearningResource']
+    : 'TechArticle';
+
+const article =
+  isHome || is404
+    ? null
+    : {
+        '@type': articleType,
+        '@id': `${canonical}#article`,
+        headline: title,
+        ...(description ? { description } : {}),
+        inLanguage: lang,
+        url: canonical,
+        mainEntityOfPage: canonical,
+        image: SOCIAL_IMAGE,
+        // Point voice/AI assistants at the page title and lead paragraph.
+        speakable: {
+          '@type': 'SpeakableSpecification',
+          cssSelector: ['h1', '.sl-markdown-content > p:first-of-type'],
+        },
+        ...(published ? { datePublished: published } : {}),
+        ...(modified ? { dateModified: modified } : {}),
+        ...(isGuide ? { learningResourceType: 'Guide' } : {}),
+        ...(isApiPage
+          ? {
+              programmingModel: 'Library API',
+              executableLibraryName: 'phonometry',
+              programmingLanguage: { '@type': 'ComputerLanguage', name: 'Python' },
+              codeRepository: 'https://github.com/jmrplens/phonometry',
+            }
+          : {}),
+        // The two language versions are one work, not two pages competing for
+        // the same query.
+        [lang === 'en' ? 'workTranslation' : 'translationOfWork']: {
+          '@id': `${SITE}${BASE}${lang === 'en' ? '/es' : ''}/${slug}/#article`,
+        },
+        author: { '@id': PERSON_ID },
+        publisher: { '@id': PERSON_ID },
+        isPartOf: { '@id': WEBSITE_ID },
+        about: { '@id': SOFTWARE_ID },
+        ...citationsFor({ references: data.references, bibliographyUrl }),
+      };
+
+// `citationsFor` returns `governingWorks` as a convenience name; schema.org has
+// no such property, so fold it away and keep `about` pointing at the software
+// plus the standards the page actually implements.
+if (article && 'governingWorks' in article) {
+  const governing = (article as Record<string, unknown>).governingWorks as unknown[];
+  delete (article as Record<string, unknown>).governingWorks;
+  (article as Record<string, unknown>).about = [{ '@id': SOFTWARE_ID }, ...governing];
 }
-const SECTION_LABELS: Record<string, { en: string; es: string }> = {
-  guides: { en: 'Guides', es: 'Guías' },
-  sections: { en: 'Sections', es: 'Secciones' },
-  reference: { en: 'Reference', es: 'Referencia' },
-};
-const segments = rel.split('/').filter(Boolean).filter((s) => s !== 'es');
-const crumbs = [
-  { name: 'phonometry', item: `${SITE}${BASE}/${lang === 'es' ? 'es/' : ''}` },
-];
-let acc = `${SITE}${BASE}${lang === 'es' ? '/es' : ''}`;
-for (const seg of segments) {
-  acc += `/${seg}`;
-  const label = SECTION_LABELS[seg]?.[lang] ?? (seg === segments[segments.length - 1] ? title : titleCase(seg));
-  crumbs.push({ name: label, item: `${acc}/` });
+
+// The bibliography page is where every cited work is defined. Other pages
+// reference those `@id`s; here the full nodes are emitted once, so the
+// references resolve to something instead of dangling.
+let bibliographyNodes: unknown[] = [];
+if (isBibliography) {
+  const seen = new Map<string, unknown>();
+  const docs = await getCollection('docs');
+  for (const entry of docs) {
+    // Harvest only this locale's pages. The `@id`s are per-locale (they hang
+    // off this page's URL), and the `note` that becomes each node's
+    // `description` is written in the page's own language, so mixing the two
+    // locales puts Spanish prose on the English entities.
+    const isSpanish = entry.id === 'es' || entry.id.startsWith('es/');
+    if (isSpanish !== (lang === 'es')) continue;
+    const refs = (entry.data as { references?: ReferenceEntry[] }).references ?? [];
+    for (const ref of refs) {
+      const id = referenceId(ref, bibliographyUrl);
+      if (!seen.has(id)) seen.set(id, referenceNode(ref, bibliographyUrl));
+    }
+  }
+  bibliographyNodes = [...seen.values()];
 }
-const breadcrumbList = isHome
-  ? null
-  : {
-      '@context': 'https://schema.org',
+
+const crumbs =
+  isHome || is404
+    ? null
+    : breadcrumbsFor({ slug, title, lang, origin: SITE, base: BASE });
+
+const breadcrumbList = crumbs
+  ? {
       '@type': 'BreadcrumbList',
-      itemListElement: crumbs.map((c, i) => ({
+      '@id': `${canonical}#breadcrumbs`,
+      itemListElement: crumbs.map((crumb, i) => ({
         '@type': 'ListItem',
         position: i + 1,
-        name: c.name,
-        item: c.item,
+        name: crumb.name,
+        item: crumb.item,
       })),
-    };
+    }
+  : null;
+
+const graph = [article, breadcrumbList, ...bibliographyNodes].filter(Boolean);
+const jsonLd = graph.length
+  ? JSON.stringify({ '@context': 'https://schema.org', '@graph': graph })
+  : null;
 ---
 
 <Default><slot /></Default>
-{techArticle && (
-  <script type="application/ld+json" set:html={JSON.stringify(techArticle)} />
-)}
-{breadcrumbList && (
-  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbList)} />
-)}
+{jsonLd && <script type="application/ld+json" set:html={jsonLd} />}
+{/* og:type is set per page in frontmatter, not here: appending a second
+    og:type would leave both in the document, and Open Graph parsers take the
+    first occurrence, so the override would silently lose. Starlight's head
+    merge deduplicates by property, which the frontmatter route goes through. */}
+{/* A clean markdown copy of this page sits beside it (postbuild step
+    scripts/emit-page-markdown.mjs). Advertising it lets an agent fetch the
+    prose without parsing ~90% chrome out of the HTML. */}
+{!isHome && <link rel="alternate" type="text/markdown" href={`${pathname}index.md`} />}
+<meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_US'} />
+<meta property="og:locale:alternate" content={lang === 'es' ? 'en_US' : 'es_ES'} />
 <meta name="twitter:title" content={title} />
 {description && <meta name="twitter:description" content={description} />}

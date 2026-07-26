@@ -290,6 +290,22 @@ Integer signals (e.g. int16 from `scipy.io.wavfile.read`) are converted to
 float64 internally before any squaring, so calibration and level results are
 identical whether you pass the raw integer array or a float conversion.
 
+## What this guide covers
+
+**Covered.** IEC 60942:2017 as far as it constrains the *sensitivity factor*:
+the principal calibrator level that `target_spl` assumes, the Table 1 class
+tolerances quoted in the uncertainty discussion above, and the short-term
+level-fluctuation check of clause 5.3.3 against the class 1 limits of Table 2,
+which `sensitivity(ref, fs=fs)` runs on the reference recording.
+
+**Not covered.** The conformance tests of the calibrator itself (generated
+level, frequency, distortion, and the environmental corrections for static
+pressure and temperature) are not implemented, so pass an already corrected
+`target_spl` when the calibrator's manual asks for one. The IEC 61672-3
+periodic tests are cited as laboratory practice, not run: nothing here verifies
+a sound level meter or assigns it a class. The dBFS half of the page sits
+outside any standard and makes no physical claim.
+
 ## See also
 
 - [Build a sound level meter](/phonometry/guides/sound-level-meter/): the walkthrough that starts from this calibration step and ends at a class-checked instrument.

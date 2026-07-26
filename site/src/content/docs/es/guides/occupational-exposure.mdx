@@ -50,6 +50,15 @@ en energía.
   loading="eager"
 />
 
+## ¿Cómo calculo el nivel de exposición diario LEX,8h de ISO 9612 con Python?
+
+Describe cada actividad como una `hearing.Task` con sus muestras y su duración
+y llama a `hearing.task_based_exposure(tasks)`. Para la jornada del soldador
+del anexo D que se usa abajo devuelve `lex_8h` = 84,3 dB con una incertidumbre
+expandida $U$ = 2,7 dB, así que el `upper_limit` unilateral al 95 % es 87,0 dB.
+Las jornadas sin estructura usan `job_based_exposure()` o `full_day_exposure()`
+sobre muestras aleatorias.
+
 ## 1. Las tres estrategias de medición (apartados 9-11)
 
 La estrategia *basada en tareas* (apartado 9) divide la jornada nominal en

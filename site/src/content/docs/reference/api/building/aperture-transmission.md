@@ -1,6 +1,6 @@
 ---
 title: "building.aperture_transmission"
-description: "Public API of phonometry.building.aperture_transmission (auto-generated)."
+description: "Sound transmission through slits, holes and apertures (Hopkins 2007, Sound Insulation, Section 4.3.10; Gomperts 1964; Wilson & Soroka 1965)."
 sidebar:
   label: "aperture_transmission"
 ---

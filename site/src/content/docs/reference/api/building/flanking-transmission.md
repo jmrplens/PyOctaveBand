@@ -1,6 +1,6 @@
 ---
 title: "building.flanking_transmission"
-description: "Public API of phonometry.building.flanking_transmission (auto-generated)."
+description: "Laboratory measurement of flanking sound transmission (ISO 10848:2006/2010)."
 sidebar:
   label: "flanking_transmission"
 ---

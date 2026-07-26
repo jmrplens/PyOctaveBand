@@ -1,6 +1,6 @@
 ---
 title: "phonometry"
-description: "Top-level convenience API of the phonometry package (auto-generated)."
+description: "Package-level names defined in phonometry/__init__.py itself. Every public name in the library can also be imported directly from phonometry; this page documents the few objects that live at the top level."
 sidebar:
   label: "phonometry"
 ---

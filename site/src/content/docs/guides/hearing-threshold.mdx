@@ -198,6 +198,23 @@ threshold shift of ISO 1999, which adds a noise component on top of this age
 component, is the subject of the
 [noise-induced hearing loss](/phonometry/guides/noise-induced-hearing-loss/) guide.
 
+## What this guide covers
+
+**Covered.** ISO 7029:2017's age model: the median power-law deviation from
+age 18 (clause 4.2, Table 1), the asymmetric half-Gaussian spreads $s_u$ and
+$s_l$ (clause 4.3, Tables 2–5), and the population-fractile calculation of
+clause 4.4, all implemented by `age_threshold(age, sex, fractile)`. ISO
+389-7:2005 Table 1's free-field and diffuse-field reference threshold of
+hearing, returned by `reference_threshold(field)`.
+
+**Not covered.** ISO 1999:2013 clause 6.1 Formula (1) combines this age
+threshold with a noise-induced shift into a real audiogram. That noise
+component is not implemented here: it is the subject of the
+[noise-induced hearing loss](/phonometry/guides/noise-induced-hearing-loss/)
+guide. Of ISO 389-7:2005, this module implements only the Table 1 reference
+values; the rest of the standard, including how those values were
+established, is not implemented.
+
 ## See also
 
 - [Noise-induced hearing loss](/phonometry/guides/noise-induced-hearing-loss/): the

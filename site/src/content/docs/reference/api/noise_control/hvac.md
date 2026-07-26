@@ -1,6 +1,6 @@
 ---
 title: "noise_control.hvac"
-description: "Public API of phonometry.noise_control.hvac (auto-generated)."
+description: "HVAC duct acoustics: end reflection, bends, plenums and flow-generated noise."
 sidebar:
   label: "hvac"
 ---

@@ -426,6 +426,24 @@ geometry behind takeoff roll, the Eq. 4-13b average runway-segment speed and
 the recommended 30 m floor on NPD lookups. Seven branch-covering receptor
 events of the reference workbook are reproduced end-to-end in the test suite.
 
+## What this guide covers
+
+**Covered.** ICAO Annex 16, Vol. I, Appendix 2: perceived noisiness and PNL
+from Table A2-3 (`perceived_noisiness`, `perceived_noise_level`), the slope-
+method tone correction (`tone_correction`, matching the ETM Vol. I Table 3-7
+turbofan example) and the full EPNL chain (`effective_perceived_noise_level`,
+matching the ETM Vol. I Table 4-4 example). IEC 61265:1995 measurement-system
+tolerances via `verify_aircraft_noise_system`. SAE ARP 5534 band atmospheric
+absorption via `sae_band_attenuation`. The ECAC Doc 29 single-event
+airport-noise chain (`npd_curve`, `event_level`, `noise_contour`), validated
+to under 0.01 dB against the Doc 29 5th ed. Vol. 3 Part 1 reference workbook.
+
+**Not covered.** `verify_aircraft_noise_system` checks the IEC 61265:1995
+tolerances, not the superseding 2018 edition. The airport-noise chain builds
+single-event contours only: it does not assemble the cumulative multi-event
+indices (an Lden-style sum over a full flight schedule) that a full Doc 29
+noise-contour study needs on top of these single-event levels.
+
 ## See also
 
 - API reference: [`aircraft.aircraft_noise`](/phonometry/reference/api/aeroacoustics/aircraft-noise/), [`aircraft.airport_noise`](/phonometry/reference/api/aeroacoustics/airport-noise/) and [`aircraft.atmospheric_absorption`](/phonometry/reference/api/aeroacoustics/atmospheric-absorption/).

@@ -1,6 +1,6 @@
 ---
 title: "materials.scattering_diffusion"
-description: "Public API of phonometry.materials.scattering_diffusion (auto-generated)."
+description: "Random-incidence scattering and directional diffusion coefficients."
 sidebar:
   label: "scattering_diffusion"
 ---

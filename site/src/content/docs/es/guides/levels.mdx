@@ -622,6 +622,27 @@ estacionariedad: los tests de
 [calificación de datos](/phonometry/es/guides/data-qualification/) la
 responden objetivamente a partir de medias cuadráticas por segmento.
 
+## Qué cubre esta guía
+
+**Cubierto.** La balística de envolvente Fast/Slow/Impulse de la IEC
+61672-1:2013 que hay tras los niveles percentiles, el pico ponderado C del
+apartado 5.13 (`lc_peak`, verificado frente a la Tabla 5) y el nivel de
+exposición sonora (`sel`, verificado frente a la columna LAE de la Tabla
+4); la exposición sonora y el LEX,8h de la IEC 61252:1993
+(`sound_exposure`, `lex_8h`); el Lden, el Ldn y el nivel de valoración
+compuesto de la ISO 1996-1:2016 (apartado 6.5,
+`environmental.lden`/`ldn`/`composite_rating_level`); y el ajuste tonal
+(anexo C), la corrección de ruido residual (apartado 10.4) y el balance de
+incertidumbre de medida (apartado 4, anexo F) de la ISO 1996-2:2017.
+
+**No cubierto.** La IEC 61252 se revisó en 2025; aquí solo están las
+fórmulas de la primera edición implementada (1993), no las de la más
+reciente. La ISO 1996-2 fija las posiciones del receptor y las
+correcciones de fachada que convierten una medida en bruto en el nivel que
+esperan las funciones de esta página: esos procedimientos de posición y
+corrección no están implementados, solo la aritmética que sigue una vez
+aplicados.
+
 ## Véase también
 
 - [Ponderación temporal](/phonometry/es/guides/time-weighting/): el detector Fast/Slow/Impulse sobre el que se definen los niveles percentiles.

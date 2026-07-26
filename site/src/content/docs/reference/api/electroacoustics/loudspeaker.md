@@ -1,6 +1,6 @@
 ---
 title: "electroacoustics.loudspeaker"
-description: "Public API of phonometry.electroacoustics.loudspeaker (auto-generated)."
+description: "Rated loudspeaker characteristics (IEC 60268-5)."
 sidebar:
   label: "loudspeaker"
 ---

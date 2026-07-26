@@ -396,6 +396,23 @@ DC step is kept in `mean_level` (the carrier amplitude for the magnitude
 detector), and `remove_dc=False` skips the remover when the absolute DC line
 matters.
 
+## What this guide covers
+
+**Covered.** The three cepstrum variants and liftering of Havelock, Kuwano
+and Vorländer's *Handbook of Signal Processing in Acoustics* (`cepstrum`,
+`lifter`, Chapters 27 and 87), the single-echo delay and reflection
+coefficient read off the power cepstrum (`echo_detection`), the invertible
+complex cepstrum and its homomorphic round trip (`CepstrumResult.invert`),
+and the Bendat & Piersol Chapter 13 envelope spectrum (`envelope_spectrum`)
+with its closed-form AM tone lines.
+
+**Not covered.** `echo_detection` picks only the single largest cepstral
+peak in the searched band, so a response with several overlapping echoes
+needs manual peak-picking or repeated calls on narrowed bands; it is not a
+multi-echo separator. The module also has no mel-warped or MFCC-style
+cepstrum for perceptual audio features: `lifter` and `cepstrum` work on the
+plain linear-frequency log spectrum only.
+
 ## Relation to the other estimators
 
 The cepstrum starts from the same one-record FFT conventions as the

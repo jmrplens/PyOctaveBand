@@ -89,6 +89,13 @@ llms:
 api-docs:
 	$(PYTHON) scripts/generate_api_docs.py
 
+# Transplant the bodies of docs/CONFORMANCE.md and docs/ERRATA.md into their
+# Starlight pages (site/src/content/docs/{,es/}reference/{conformance,errata}.md),
+# below the hand-written introduction each page keeps. CI fails if this drifts
+# (see the `site-reports` job in python-app.yml).
+site-reports:
+	$(PYTHON) scripts/generate_site_reports.py
+
 # Regenerate the committed example .report() fiches under .github/reports/,
 # which the documentation links to as rendered normative-report examples.
 # Not byte-checked in CI (the embedded vector plot differs by ~1 ULP across
@@ -102,6 +109,7 @@ reports:
 # `conformance` job in python-app.yml).
 conformance:
 	$(PYTHON) scripts/conformance_report.py --file-header > docs/CONFORMANCE.md
+	$(PYTHON) scripts/check_conformance_claims.py
 
 # Optional convenience: install a git pre-commit hook that regenerates
 # docs/CONFORMANCE.md when the library source or the report generator changes.
@@ -132,4 +140,4 @@ coverage:
 check: lint security test
 
 .PHONY: install lint format security snyk sonar graphs reports animations posters og \
-	llms api-docs conformance install-hooks test coverage check
+	llms api-docs site-reports conformance install-hooks test coverage check

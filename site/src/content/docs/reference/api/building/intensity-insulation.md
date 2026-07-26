@@ -1,6 +1,6 @@
 ---
 title: "building.intensity_insulation"
-description: "Public API of phonometry.building.intensity_insulation (auto-generated)."
+description: "Sound insulation measured with sound intensity (ISO 15186)."
 sidebar:
   label: "intensity_insulation"
 ---

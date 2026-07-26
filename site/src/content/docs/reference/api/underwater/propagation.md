@@ -1,6 +1,6 @@
 ---
 title: "underwater.propagation"
-description: "Public API of phonometry.underwater.propagation (auto-generated)."
+description: "Underwater sound propagation: transmission loss (closed-form)."
 sidebar:
   label: "propagation"
 ---

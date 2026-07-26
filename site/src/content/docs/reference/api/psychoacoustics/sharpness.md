@@ -1,6 +1,6 @@
 ---
 title: "psychoacoustics.sharpness"
-description: "Public API of phonometry.psychoacoustics.sharpness (auto-generated)."
+description: "Sharpness per DIN 45692:2009-08."
 sidebar:
   label: "sharpness"
 ---

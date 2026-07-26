@@ -832,6 +832,30 @@ repository; click the preview to open the PDF.
 	caption="Microphone characteristics fiche (MicrophoneCharacteristics.report), the IEC 60268-4 rated-characteristics table beside the free-field response, with the cardioid directional pattern, inherent-noise and THD-against-level panels drawn to the IEC 60263 25 dB-per-decade and 25 dB reference-circle conventions."
 />
 
+## What this guide covers
+
+**Covered.** The IEC 60268-3 distortion set (clauses 14.12.2-14.12.11): THD_F
+and THD_R (`thd`), nth-order harmonic distortion (`harmonic_distortion`),
+THD+N and SINAD through the AES17-2015 measurement bandwidth
+(`harmonic_analysis`, AES17 clauses 5.2.5/5.2.8/6.3.1), modulation and
+difference-frequency intermodulation, dynamic intermodulation (DIM) and the
+ITU-R BS.468-4 weighted THD, plus the AES17-2015 dynamic range and idle
+channel noise. The Bendat & Piersol `H1`/`H2` frequency-response estimators
+and ordinary coherence. The IEC 60268-4:2014 microphone rated
+characteristics (sensitivity, frequency response and range, directivity
+index, overload SPL, equivalent noise level, impedances and power) via
+`microphone_characteristics` and its `.report()`. The IEC 60268-5:2003+A1:2007
+loudspeaker rated characteristics (sensitivity, frequency range, directivity
+index, THD against frequency) via `loudspeaker_characteristics` and its
+`.report()`, both drawn to the IEC 60263 scale conventions. The baffled-piston
+radiation model (`radiating_piston`, Beranek & Mellow §4.19/§13.7).
+
+**Not covered.** Other parts of the IEC 60268 series sit outside this page:
+Part 16 (objective speech intelligibility, the speech transmission index) is
+not implemented. The implemented editions are frozen at IEC 60268-4:2014,
+IEC 60268-5:2003+A1:2007 and AES17-2015; the superseding IEC 60268-4:2018 and
+AES17-2020 revisions are not the ones checked.
+
 ## See also
 
 - [Industrial noise control](/phonometry/guides/noise-control/): reactive

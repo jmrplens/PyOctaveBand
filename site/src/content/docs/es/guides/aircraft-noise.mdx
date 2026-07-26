@@ -436,6 +436,28 @@ del rodaje de despegue, la velocidad media Ec. 4-13b en segmentos de pista y el
 suelo recomendado de 30 m en las consultas NPD. Siete eventos de receptor del
 workbook de referencia se reproducen end-to-end en la suite de tests.
 
+## Qué cubre esta guía
+
+**Cubierto.** El Anexo 16 de la ICAO, Vol. I, Apéndice 2: la molestia
+percibida y el PNL de la Tabla A2-3 (`perceived_noisiness`,
+`perceived_noise_level`), la corrección tonal por el método de pendientes
+(`tone_correction`, que reproduce el ejemplo del turbofán de la Tabla 3-7 del
+ETM Vol. I) y la cadena EPNL completa (`effective_perceived_noise_level`, que
+reproduce el ejemplo de la Tabla 4-4 del ETM Vol. I). Las tolerancias del
+sistema de medida de la IEC 61265:1995 mediante `verify_aircraft_noise_system`.
+La absorción atmosférica en banda de la SAE ARP 5534 mediante
+`sae_band_attenuation`. La cadena de ruido de aeropuerto de evento único de
+ECAC Doc 29 (`npd_curve`, `event_level`, `noise_contour`), validada con menos
+de 0,01 dB de diferencia frente al workbook de referencia de la Doc 29 5.ª ed.
+Vol. 3 Parte 1.
+
+**No cubierto.** `verify_aircraft_noise_system` comprueba las tolerancias de
+la IEC 61265:1995, no la edición sucesora de 2018. La cadena de ruido de
+aeropuerto solo construye contornos de evento único: no ensambla los índices
+acumulados multievento (una suma al estilo Lden sobre un calendario de vuelos
+completo) que un estudio completo de contornos de ruido de la Doc 29 necesita
+además de estos niveles de evento único.
+
 ## Véase también
 
 - Referencia de la API: [`aircraft.aircraft_noise`](/phonometry/es/reference/api/aeroacoustics/aircraft-noise/), [`aircraft.airport_noise`](/phonometry/es/reference/api/aeroacoustics/airport-noise/) y [`aircraft.atmospheric_absorption`](/phonometry/es/reference/api/aeroacoustics/atmospheric-absorption/).

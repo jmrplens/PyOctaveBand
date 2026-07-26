@@ -348,6 +348,32 @@ numéricos de los propios textos fuente (ver el
   Kuttruff, $V = 200$ m³, $T = 1$ s → 141 Hz) y el nivel estacionario
   (Bies 5.ª ed., ec. (6.43)).
 
+## Qué cubre esta guía
+
+**Cubierto.** El libro *Room Acoustics* de Kuttruff (la construcción de
+fuentes imagen del apartado 4.1, la fórmula de reverberación de Eyring
+usada en la comprobación casi cúbica y la frecuencia de Schroeder del
+apartado 3.6), *Auralization* de Vorländer (el modelo de fuentes espejo
+del capítulo 11, sus expresiones de factor de reflexión y retardo) y la
+descomposición por orden de reflexión de Allen y Berkley, todo
+implementado por `room.image_source_rir`; y el campo estacionario de sala
+de Bies, Hansen y Howard del apartado 6.4 (constante de sala, directividad
+$Q$, distancia crítica) implementado por `room.steady_state_field`,
+`room.room_constant`, `room.critical_distance`, `room.steady_state_spl` y
+`room.schroeder_frequency`.
+
+**No cubierto.** El modelo de fuentes imagen solo capta reflexiones
+especulares: sin difracción y sin dispersión difusa, de modo que el
+decaimiento real de una sala alargada es más lento que la estimación de
+Eyring de campo difuso frente a la que se comprueba (la anisotropía que
+los modelos de Fitzroy y Arau-Puchades de la
+[guía de predicción del tiempo de reverberación](/phonometry/es/guides/reverberation-prediction/)
+se diseñaron para corregir). La distancia de reverberación alternativa de
+Kuttruff (que usa el área de absorción de Sabine en lugar de la constante
+de sala) se cita como comparación pero no está implementada:
+`steady_state_field` y `critical_distance` usan siempre la formulación de
+Bies con la constante de sala.
+
 ## Véase también
 
 - [Acústica de salas](/phonometry/es/guides/room-acoustics/): la respuesta al

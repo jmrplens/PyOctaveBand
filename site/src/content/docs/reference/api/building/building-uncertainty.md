@@ -1,6 +1,6 @@
 ---
 title: "building.building_uncertainty"
-description: "Public API of phonometry.building.building_uncertainty (auto-generated)."
+description: "Measurement uncertainty in building acoustics (ISO 12999-1:2020)."
 sidebar:
   label: "building_uncertainty"
 ---

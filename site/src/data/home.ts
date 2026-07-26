@@ -8,13 +8,19 @@
  *
  * Every number in `stats` and every claim in `honest` is taken from the
  * repository, not written by hand from memory:
- *   427 / 53 / 278   docs/CONFORMANCE.md header line
+ *   checks/domains/standards   conformance-stats.mjs, parsed from
+ *                              docs/CONFORMANCE.md at build time
  *   66 guides        site/src/content/docs/guides/*.md*
  *   120 API pages    site/src/content/docs/reference/api/**
  *   506 figures      distinct basenames in .github/images (x2 themes x2 langs)
  *   32 PDF fiches    .github/reports/*.pdf
  *   3.2.0            VERSION
+ *
+ * The three conformance integers used to be typed out here and in the prose of
+ * two other pages, and those copies fell a release behind. They are imported
+ * now, so there is exactly one place that can be wrong.
  */
+import { checksRatio, domains, standards } from './conformance-stats.mjs';
 
 export interface Stat {
 	value: string;
@@ -80,8 +86,8 @@ building.weighted_rating(R).report("Rw_fiche.pdf", metadata=meta)`;
 export const en: HomeContent = {
 	statsLabel: 'The library in four numbers',
 	stats: [
-		{ value: '427 / 427', label: 'conformance checks passing', href: '/phonometry/reference/conformance/' },
-		{ value: '278', label: 'standards referenced, across 53 domains' },
+		{ value: checksRatio, label: 'conformance checks passing', href: '/phonometry/reference/conformance/' },
+		{ value: String(standards), label: `standards referenced, across ${domains} domains` },
 		{ value: '506', label: 'figures, each in light and dark, English and Spanish' },
 		{ value: '32', label: 'normative PDF fiches rendered by .report()' },
 	],
@@ -221,8 +227,8 @@ export const en: HomeContent = {
 export const es: HomeContent = {
 	statsLabel: 'La biblioteca en cuatro cifras',
 	stats: [
-		{ value: '427 / 427', label: 'comprobaciones de conformidad superadas', href: '/phonometry/es/reference/conformance/' },
-		{ value: '278', label: 'normas implementadas, en 53 dominios' },
+		{ value: checksRatio, label: 'comprobaciones de conformidad superadas', href: '/phonometry/es/reference/conformance/' },
+		{ value: String(standards), label: `normas implementadas, en ${domains} dominios` },
 		{ value: '506', label: 'figuras, cada una en claro y oscuro, en inglés y español' },
 		{ value: '32', label: 'fichas PDF normativas que genera .report()' },
 	],

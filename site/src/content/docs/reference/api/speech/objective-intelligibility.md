@@ -1,6 +1,6 @@
 ---
 title: "hearing.objective_intelligibility"
-description: "Public API of phonometry.hearing.objective_intelligibility (auto-generated)."
+description: "Short-Time Objective Intelligibility (STOI and ESTOI)."
 sidebar:
   label: "objective_intelligibility"
 ---

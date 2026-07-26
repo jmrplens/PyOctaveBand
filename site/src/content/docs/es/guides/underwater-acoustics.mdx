@@ -224,6 +224,33 @@ golpe o acumulado y al nivel de pico a una distancia declarada, y por eso
 `pile_strike_metrics` los reporta juntos y `cumulative_sel` sigue la suma
 energética golpe a golpe de las fórmulas 8-9.
 
+## Qué cubre esta guía
+
+**Cubierto.** La ISO 18405:2017 para los niveles de referencia re 1 µPa y
+1 µPa²·s: `sound_pressure_level`, `sound_exposure_level` y
+`peak_sound_pressure_level`. Las ISO 17208-1:2016 e ISO 17208-2:2019 para el
+nivel de ruido radiado del buque y el nivel de fuente monopolar equivalente:
+`radiated_noise_level` y `monopole_source_level`, con la corrección de
+superficie de Lloyd's mirror (fórmula 3) y la profundidad de fuente de
+0,7·calado (fórmula 1), la geometría de tres hidrófonos
+(`hydrophone_depths`) y la incertidumbre tabulada del nivel de fuente
+(`source_level_uncertainty`). La ISO 18406:2017 para las métricas de hincado
+de pilotes de la sección 3: la exposición sonora por golpe (fórmulas 3-4), el
+SPL cuadrático medio (fórmula 7) y la exposición sonora acumulada (fórmulas
+8-9), que calculan `single_strike_sel`, `cumulative_sel`,
+`cumulative_sel_identical` y `pile_strike_metrics`.
+
+**No cubierto.** La disciplina de medida de la ISO 17208-1 en sí no está
+implementada: el promediado en potencia y aritmético de cuatro pasadas y tres
+hidrófonos (fórmulas 8-9), las comprobaciones de geometría de CPA y
+profundidad de agua, el puntuado de la ventana de datos de ±30° y la
+corrección de ruido de fondo al estilo ISO 3744 descrita en la sección 2
+anterior quedan a cargo del lector; la biblioteca solo aporta las fórmulas
+cerradas `radiated_noise_level` y `monopole_source_level`. La propia ISO
+18406 excluye el vibrohincado y las tablestacas de su alcance (apartado 1),
+así que el ruido del hincado continuo no tiene forma cerrada aquí ni en
+ningún otro lugar de phonometry.
+
 ## Véase también
 
 - Referencia de la API: [`underwater.acoustics`](/phonometry/es/reference/api/underwater/acoustics/), [`underwater.pile_driving_noise`](/phonometry/es/reference/api/underwater/pile-driving-noise/) y [`underwater.ship_radiated_noise`](/phonometry/es/reference/api/underwater/ship-radiated-noise/).

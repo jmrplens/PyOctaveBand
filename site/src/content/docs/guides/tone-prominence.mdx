@@ -233,6 +233,24 @@ stays moderate throughout because it rates the whole sound and not one
 spectral line. Report the metric the assessment calls for, and quote any
 other only as supporting evidence.
 
+## What this guide covers
+
+**Covered.** ECMA-418-1:2024 (3rd edition): the tone-to-noise ratio (clause
+11, Formulae 9 to 12) and prominence ratio (clause 12, Formulae 23 to 26)
+methods on Hann-windowed, RMS-averaged spectra, the clause 10 critical-band
+model, the frequency-dependent prominence criteria, and the clause 11.6
+combination of secondary tones sharing a band, all through
+`tone_to_noise_ratio()` and `prominence_ratio()`.
+
+**Not covered.** The `prominent` verdict these functions return is the
+numeric criterion only. The standard also requires a prominent tone to be
+confirmed by aural examination (clauses 11.8/12.8) and to pass the clause
+8/9 lower-threshold-of-hearing screen, which needs calibrated absolute
+levels: both checks are left to the caller. ECMA-74:2025 is covered only as
+the standard that delegates its tone assessments to ECMA-418-1; its own
+Annex D measurement procedure and operator/bystander positions (shown above
+for context) are not implemented here.
+
 ## See also
 
 - [Levels](/phonometry/guides/levels/): the ISO 1996-1 rating levels whose tonal adjustments

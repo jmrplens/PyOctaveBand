@@ -614,6 +614,27 @@ desvanecerse las capas límite. Cinco erratas encontradas en las fuentes
 durante este trabajo están registradas en el
 [registro de erratas](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.md).
 
+## Qué cubre esta guía
+
+**Cubierto.** Ningún estándar rige estos modelos de predicción: son métodos
+de libro y de revista implementados en sala limpia desde Mechel, Bies, Cox y
+D'Antonio, Miki (1990), Maa (1998), Johnson, Koplik y Dashen (1987) y
+Jiménez et al. (2016/2017), las fuentes listadas arriba. Esto cubre los
+modelos de fluido equivalente porosos (`delany_bazley`, `miki`,
+`johnson_champoux_allard`), el solucionador multicapa por matrices de
+transferencia (`layered_absorber` con `PorousLayer`, `PerforatedPlateLayer`,
+`MicroperforatedPlateLayer` y `MembraneLayer`), los coeficientes de
+incidencia aleatoria por la integral de Paris (`diffuse_field_absorption`,
+`statistical_absorption`) y el absorbente de ranura con resonador de
+Helmholtz de acoplamiento crítico (`slit_helmholtz_absorber`,
+`critical_coupling_design`).
+
+**No cubierto.** El libro de Cox y D'Antonio trata tanto difusores como
+absorbentes, pero esta guía solo implementa la mitad de absorbentes. La
+predicción del difusor de gradiente de fase de Schroeder vive en un módulo
+aparte (`materials.diffuser_design`), documentada en
+[Dispersión superficial, difusión y absorción in situ](/phonometry/es/guides/surface-scattering/).
+
 ## Véase también
 
 - [Materiales acústicos](/phonometry/es/guides/materials/): las normas de

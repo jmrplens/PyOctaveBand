@@ -1,6 +1,6 @@
 ---
 title: "hearing.threshold"
-description: "Public API of phonometry.hearing.threshold (auto-generated)."
+description: "Age-related hearing threshold (ISO 7029:2017) and audiometric reference zero (ISO 389-7:2005)."
 sidebar:
   label: "threshold"
 ---

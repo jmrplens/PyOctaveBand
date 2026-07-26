@@ -1,6 +1,6 @@
 ---
 title: "electroacoustics.microphone"
-description: "Public API of phonometry.electroacoustics.microphone (auto-generated)."
+description: "Rated microphone characteristics (IEC 60268-4)."
 sidebar:
   label: "microphone"
 ---

@@ -1,6 +1,6 @@
 ---
 title: "vibration.junction_transmission"
-description: "Public API of phonometry.vibration.junction_transmission (auto-generated)."
+description: "Bending-wave transmission coefficients for rigid plate junctions (Hopkins 2007, Sound Insulation, Section 5.2.1.3; Cremer et al. 1973; Craik 1981, 1996)."
 sidebar:
   label: "junction_transmission"
 ---

@@ -1,6 +1,6 @@
 ---
 title: "emission.sound_power_reverberation"
-description: "Public API of phonometry.emission.sound_power_reverberation (auto-generated)."
+description: "Sound power level of a noise source measured in a reverberation test room: ISO 3741:2010 (precision method, accuracy grade 1)."
 sidebar:
   label: "sound_power_reverberation"
 ---

@@ -228,6 +228,25 @@ and the `value` at the requested fractile; the `HtlanResult` carries `htla`,
 alone is the subject of the
 [hearing-threshold](/phonometry/guides/hearing-threshold/) guide.
 
+## What this guide covers
+
+**Covered.** ISO 1999:2013 as implemented by `nipts` and `htlan`: the median
+NIPTS of clause 6.3.1 (Formula 2, extrapolated below 10 years by Formula 3,
+Table 1) and its population fractile of clause 6.3.2 (Formulae 4-7, Tables
+2-3), together with the HTLAN combination of clause 6.1 (Formula 1) run by
+`combine_age_and_noise`, all validated against the Annex D worked examples.
+The age component is database A, evaluated from ISO 7029:2017, the edition
+clause 6.2.2 references undated.
+
+**Not covered.** Clauses 6.2.3 and 6.2.4 let the user substitute a database B
+for database A: an age threshold measured on a control population of the
+country under consideration. Only database A is implemented, so `htlan`
+always draws its age component from ISO 7029:2017. `combine_age_and_noise`
+accepts an external HTLA array for that case, but computing database B itself
+is not phonometry's job. ISO 1999 does not define a "hearing handicap" or a
+compensable fence: that line is set by national regulation, and nothing here
+applies one, so you must supply and check it yourself.
+
 ## See also
 
 - API reference: [`hearing.noise_induced_hearing_loss`](/phonometry/reference/api/hearing/noise-induced-hearing-loss/).

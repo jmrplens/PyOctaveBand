@@ -1,6 +1,6 @@
 ---
 title: "environmental.measurement"
-description: "Public API of phonometry.environmental.measurement (auto-generated)."
+description: "Determination of environmental-noise sound pressure levels (ISO 1996-2:2017)."
 sidebar:
   label: "measurement"
 ---

@@ -26,6 +26,9 @@ interface Props {
 	loading?: 'lazy' | 'eager';
 }
 
+import { figureSize } from '../lib/figure-size.mjs';
+import { mediaUrl } from '../lib/media.mjs';
+
 const { src, alt, width, loading = 'lazy' } = Astro.props;
 
 if (!alt?.trim()) {
@@ -36,13 +39,48 @@ if (darkSrc === src) {
 	throw new Error(`ThemeImage could not derive the dark variant of "${src}"`);
 }
 const style = width ? `width:${width}` : undefined;
+
+// Serve this site's own copy rather than hotlinking the repository. The
+// authored URL stays absolute so the docs/ mirror keeps working on GitHub.
+const lightUrl = mediaUrl(src);
+const darkUrl = mediaUrl(darkSrc);
+
+// Intrinsic size, so the browser can reserve the right box before the bytes
+// arrive. Both variants are the same figure in two palettes and so share a
+// ratio; the light one is measured. Undefined when the figure is not a local
+// SVG, in which case no attributes are emitted and nothing changes.
+const size = figureSize(src);
+
+// `display:none` stops a LAZY fetch but not an EAGER one, so an eager pair
+// downloads both palettes and throws one away, about 37 kB on the landing page,
+// and it does so whichever theme the reader is in.
+//
+// Both variants are lazy instead, which lets `display:none` suppress the one
+// that is not shown. A lazy image inside the viewport is still fetched right
+// away (lazy only defers what is offscreen), so the visible variant is not
+// delayed, and `fetchpriority="high"` restores the head start that `eager`
+// was there to give it.
+const priority = loading === 'eager' ? 'high' : undefined;
+const effectiveLoading = 'lazy';
 ---
 
 {/* Same-line pair, matching the hand-authored markup this replaces. */}
-<img class="light-only" src={src} alt={alt} style={style} loading={loading} /><img
-	class="dark-only"
-	src={darkSrc}
+<img
+	class="light-only"
+	src={lightUrl}
 	alt={alt}
 	style={style}
-	loading={loading}
+	loading={effectiveLoading}
+	fetchpriority={priority}
+	width={size?.width}
+	height={size?.height}
+/><img
+	class="dark-only"
+	src={darkUrl}
+	alt={alt}
+	style={style}
+	loading={effectiveLoading}
+	fetchpriority={priority}
+	width={size?.width}
+	height={size?.height}
 />

@@ -3,7 +3,14 @@ name: Deploy Docs
 on:
   push:
     branches: ["main"]
-    paths: ["site/**", ".github/workflows/docs.yml"]
+    # The build regenerates llms.txt from the markdown mirror before running
+    # Astro, so a change to docs/ or to the generator has to redeploy the site
+    # too: otherwise the published llms.txt silently falls behind the docs.
+    paths:
+      - "site/**"
+      - "docs/**"
+      - "scripts/generate_llms.py"
+      - ".github/workflows/docs.yml"
   workflow_dispatch:
 
 permissions:

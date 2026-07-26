@@ -1,6 +1,6 @@
 ---
 title: "materials.sound_absorption"
-description: "Public API of phonometry.materials.sound_absorption (auto-generated)."
+description: "Sound absorption in a reverberation room: BS EN ISO 354:2003."
 sidebar:
   label: "sound_absorption"
 ---

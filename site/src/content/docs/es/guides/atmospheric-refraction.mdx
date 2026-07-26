@@ -327,3 +327,25 @@ el [informe de conformidad](/phonometry/es/reference/conformance/) (sección
   nivel de la PE.
 - **Zona de sombra.** Sobre un perfil con refracción hacia arriba el nivel de la
   PE se desploma bien dentro de la distancia de sombra en forma cerrada.
+
+## Qué cubre esta guía
+
+**Cubierto.** El modelo de rayos (integración de la ley de Snell por
+Runge-Kutta, `atmospheric_ray_paths`) con la geometría en forma cerrada del
+perfil lineal (`ray_curvature_radius`, `shadow_zone_distance`, Salomons
+Sec. 4.4), y la ecuación parabólica de la función de Green
+(`atmospheric_parabolic_equation`, Salomons apéndices G y H): el arranque
+gaussiano, la reflexión de impedancia finita en el suelo, la pantalla de fase
+de refracción y la capa absorbente superior. Validado por el límite
+homogéneo frente al efecto suelo esférico exacto (a unas décimas de dB, y al
+refuerzo de +6 dB sobre suelo rígido), la geometría de rayo exacta a
+precisión de máquina, la reciprocidad y el desplome del nivel en la zona de
+sombra.
+
+**No cubierto.** Ambos modelos toman un único perfil de velocidad efectiva
+del sonido que varía solo con la altura, no con la distancia: una atmósfera
+horizontalmente no homogénea (un gradiente que cambia a lo largo de la
+trayectoria) queda fuera de esta formulación independiente de la distancia,
+descrita en el módulo como la contrapartida de los "solvers oceánicos
+independientes del alcance" a los que refleja. Ambos asumen además un suelo
+plano en `z = 0`; ninguno admite un perfil de elevación del terreno.

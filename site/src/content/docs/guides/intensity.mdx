@@ -337,6 +337,26 @@ the microphones alone.
 See [Theory](/phonometry/reference/theory/signal-analysis/) for the derivations and [Calibration](/phonometry/guides/calibration/)
 for absolute scaling of the two channels.
 
+## What this guide covers
+
+**Covered.** IEC 61043:1993 (EN 61043:1994) for the two-microphone
+cross-spectral intensity estimator of `sound_intensity`, the finite-difference
+bias correction and its usable-bandwidth bound (clause 7.3, Table 3), and the
+residual pressure-intensity index `δpI0` as the instrument's phase-error
+floor. ISO 9614-1:1993 for the Annex A field indicators F2, F3 and F4
+(`field_indicators`) and the Annex B dynamic-capability criterion
+(`dynamic_capability_index`).
+
+**Not covered.** ISO 9614-1's own sound-power determination, clauses 8 and
+9, which sums the partial powers `Ii·Si` of the discrete measurement points
+into `LW`, is not implemented as a function here: `sound_intensity` and
+`field_indicators` report intensity and field quality, not a summed power.
+The scanning routes that do compute `LW` from intensity (ISO 9614-2 and
+ISO 9614-3) live in the [sound power guide](/phonometry/guides/sound-power/).
+IEC 61043's class 1 / class 2 residual-index acceptance limits are not
+verified by the library either: `δpI0` is a value the caller measures on
+their probe-analyzer chain and supplies, not one phonometry classifies.
+
 ## See also
 
 - API reference: [`emission.intensity`](/phonometry/reference/api/power/intensity/).

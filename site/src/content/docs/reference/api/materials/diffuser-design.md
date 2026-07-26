@@ -1,6 +1,6 @@
 ---
 title: "materials.diffuser_design"
-description: "Public API of phonometry.materials.diffuser_design (auto-generated)."
+description: "Far-field polar response and diffusion coefficient predicted from a diffuser design."
 sidebar:
   label: "diffuser_design"
 ---

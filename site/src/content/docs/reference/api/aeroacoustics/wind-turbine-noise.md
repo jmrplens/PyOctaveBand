@@ -1,6 +1,6 @@
 ---
 title: "environmental.wind_turbine_noise"
-description: "Public API of phonometry.environmental.wind_turbine_noise (auto-generated)."
+description: "Wind-turbine acoustic noise (IEC 61400-11:2012+A1:2018)."
 sidebar:
   label: "wind_turbine_noise"
 ---

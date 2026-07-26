@@ -1,6 +1,6 @@
 ---
 title: "aircraft.aircraft_noise"
-description: "Public API of phonometry.aircraft.aircraft_noise (auto-generated)."
+description: "Aircraft noise certification: Effective Perceived Noise Level (ICAO Annex 16)."
 sidebar:
   label: "aircraft_noise"
 ---

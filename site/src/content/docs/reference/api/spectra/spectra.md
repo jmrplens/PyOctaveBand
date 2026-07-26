@@ -1,6 +1,6 @@
 ---
 title: "metrology.spectra"
-description: "Public API of phonometry.metrology.spectra (auto-generated)."
+description: "Calibrated spectral-density estimation with statistical error analysis."
 sidebar:
   label: "spectra"
 ---

@@ -193,6 +193,25 @@ Additional performance notes:
 - **Optional numba**: the `impulse` time weighting kernel is JIT-compiled when
   numba is installed (`pip install phonometry[perf]`).
 
+## What this guide covers
+
+**Covered.** IEC 61260-1:2014 and IEC 61672-1:2013 as far as they
+constrain each row of a `(channels, samples)` array: the band filters,
+weightings and detector ballistics applied per channel are the unchanged
+single-channel designs, and multichannel support adds no normative content
+of its own. The convention itself follows Bendat & Piersol's procedure for
+multiple data records (Section 10.4.2): analyze each record individually
+first, and treat anything joint as a separate, explicit step.
+
+**Not covered.** Cross-channel questions, such as the delay between two
+channels or how much of one channel a second one explains, are
+deliberately left out: `octave_filter`, `weighting_filter` and
+`time_weighting` never mix or combine rows. See
+[Correlation and delay](/phonometry/guides/correlation-delay/) and
+[Multiple and partial coherence](/phonometry/guides/miso-coherence/) for
+the cross-channel tools built on Bendat & Piersol's cross-correlation and
+multiple-input models.
+
 ## See also
 
 - [Correlation and delay](/phonometry/guides/correlation-delay/): the cross-channel time-domain questions (delay, alignment) the per-channel path deliberately leaves to you.

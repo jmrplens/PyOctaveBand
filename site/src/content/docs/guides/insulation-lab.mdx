@@ -925,6 +925,41 @@ repository. Click a preview to open the PDF:
 	caption="Flanking impact level fiche (FlankingImpactLevelResult.report), Ln,f,w (CI)."
 />
 
+## What this guide covers
+
+**Covered.** ISO 10140-2:2010 (the laboratory sound reduction index $R$
+with the Clause 4.3 background-noise correction) and ISO 10140-3:2010 (the
+laboratory normalized impact level $L_n$), via
+`building.lab_airborne_insulation`, `building.lab_impact_insulation` and
+`building.background_correction`; ISO 15186-1:2000's intensity sound
+reduction index $R_I$ (Clause 3.8), its $K_c$-modified $R_{I,M}$ (Annex B)
+and the element-normalized $D_{I,n,e}$ (Clause 3.9), via
+`building.intensity_sound_reduction`, `building.adaptation_term_kc` and
+`building.intensity_element_normalized_difference`; ISO 16251-1:2014's
+floor-covering impact improvement $\Delta L$ and its weighted $\Delta L_w$
+against the ISO 717-2 Table 4 reference floor, via
+`building.impact_improvement` and `building.weighted_impact_improvement`;
+and ISO 10848-1:2006 (the frame document's vibration reduction index
+$K_{ij}$, Formula (13), the equivalent absorption length and the Part 4
+modal-density/modal-overlap validity checks of Clause 9), with the overall
+$D_{n,f}$/$L_{n,f}$ descriptors, via `building.vibration_reduction_index`,
+`building.normalized_flanking_level_difference` and
+`building.normalized_flanking_impact_level`.
+
+**Not covered.** ISO 10140-1's general test-facility and mounting-type
+requirements are not implemented; the guide only cites them as a label
+string in report metadata (`"Type A mounting, mortar-bedded perimeter
+(ISO 10140-1)"`). The sound-intensity measurement itself (the scanning
+probe, the two-microphone acquisition and phase-mismatch calibration
+behind $L_{p1}$ and $L_{In}$) is not implemented: both levels are taken as
+already-measured inputs, and the ISO 15186-1 report fiche states
+explicitly that it has no field for the measurement-surface geometry or
+the scanning-versus-discrete-point acquisition method. ISO 10848 Parts 2,
+3 and 4 differ in which junction and specimen types they apply to;
+phonometry implements only the Part 1 $K_{ij}$/$D_{n,f}$/$L_{n,f}$
+formulae generically, plus the Part 4 modal-overlap validity check, not
+the facility-specific test setups the other parts describe.
+
 ## See also
 
 - [Field Insulation Measurement and Ratings](/phonometry/guides/insulation-field/):

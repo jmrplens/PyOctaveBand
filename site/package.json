@@ -4,8 +4,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "prebuild": "node scripts/copy-llms.mjs",
-    "postbuild": "node scripts/add-sitemap-lastmod.mjs && node scripts/fix-redirect-doctype.mjs && node scripts/optimize-images.mjs",
+    "prebuild": "node scripts/stage-media.mjs && node scripts/copy-llms.mjs",
+    "postbuild": "node scripts/add-sitemap-lastmod.mjs && node scripts/fix-redirect-doctype.mjs && node scripts/optimize-images.mjs && node scripts/emit-page-markdown.mjs",
     "check:i18n": "node scripts/check-i18n-parity.mjs",
     "dev": "astro dev",
     "build": "astro build",

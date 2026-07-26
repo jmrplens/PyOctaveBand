@@ -582,3 +582,25 @@ length are mutually consistent bin by bin. The same cross-spectral matrix
 underlies [multiple and partial coherence](/phonometry/guides/miso-coherence/),
 which extends the ordinary coherence to several correlated inputs and one
 output.
+
+## What this guide covers
+
+**Covered.** Bendat & Piersol's Welch estimators (*Random Data*, 4th ed.,
+2010, Sections 5.2, 8.5, 9.1-9.2 and 11.5): `power_spectral_density` and
+`cross_spectral_density` with the effective number of averages, chi-square
+confidence intervals and the resolution-bias error; the coherent output
+spectrum and spectral SNR; the Harris (1978) window figures of merit of
+`window_metrics`; and the Thomson (1982) multitaper estimator of
+`multitaper_psd`, following Percival & Walden's Chapters 7-8.
+`fractional_octave_smoothing` and `noise_signal` complete the toolbox.
+
+**Not covered.** The frequency-response estimators `transfer_function` and
+`coherence`, and the sound-intensity probe, share this page's Welch core
+but are documented on the
+[electroacoustics](/phonometry/guides/electroacoustics/) and
+[sound intensity](/phonometry/guides/intensity/) pages, not here. So is
+multiple and partial coherence, on the
+[MISO coherence](/phonometry/guides/miso-coherence/) page. This page
+implements Bendat & Piersol's textbook estimators, not a certification
+standard, so it carries no clause numbers or compliance limits to check
+against.

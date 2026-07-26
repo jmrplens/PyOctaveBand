@@ -81,6 +81,15 @@ ISO 10052. La caracterización en laboratorio de un elemento está en
 y la predicción del comportamiento in situ en
 [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/).
 
+## ¿Cómo calculo Rw a partir de datos de reducción acústica en tercios de octava con Python?
+
+Pasa los 16 valores en tercios de octava de 100 Hz a 3150 Hz a
+`building.weighted_rating(R)`. Desplaza la curva de referencia de ISO 717-1 y
+devuelve el índice leído a 500 Hz, junto con los términos de adaptación
+espectral C y $C_{tr}$. Para el espectro medido que se usa abajo,
+`w.rating, w.c, w.ctr` imprime `30 -2 -3`: $R_w(C;C_{tr}) = 30(-2;-3)$. La
+misma llamada califica $R'$, $D_n$ y $D_{nT}$.
+
 ## Aislamiento en campo e índices de un solo número (ISO 16283-1, ISO 717-1)
 
 Para calificar una pared o un forjado, mide el nivel promediado en energía en
@@ -1120,6 +1129,42 @@ plt.show()
 	description="Informe de campo de aislamiento acústico de fachada por el método de control de una página: la cabecera de metadatos, la tabla D2m,nT en bandas de octava junto a la curva medida frente a la referencia desplazada, el índice D2m,nT,w (C; Ctr) en su recuadro, la declaración del método de control y un veredicto CUMPLE."
 	caption="Ficha de fachada de control (SurveyFacadeResult.report), D2m,nT,w (C; Ctr)."
 />
+
+## Qué cubre esta guía
+
+**Cubierto.** La ISO 16283-1:2014 (aislamiento aéreo de campo: la
+diferencia de niveles, la $D_{nT}$ estandarizada y el $R'$ aparente de los
+apartados 3.12 a 3.15 y el promediado de posiciones del apartado 7.8), la
+ISO 16283-2:2015 (aislamiento a ruido de impacto de campo, las mismas
+normalizaciones con el signo invertido) y la ISO 16283-3:2016 (aislamiento
+de fachada, las magnitudes
+$D_{2m}$/$D_{2m,nT}$/$D_{2m,n}$/$R'_{45°}$/$R'_{tr,s}$ de los métodos de
+elemento con altavoz y con tráfico rodado), cada una calificada por el
+método de curva de referencia de la ISO 717-1/ISO 717-2 (con los términos
+de rango ampliado del anexo B/A.2.1) mediante `building.airborne_insulation`,
+`building.impact_insulation`, `building.facade_insulation` y
+`building.weighted_rating`/`weighted_impact_rating`(`_extended`); las
+incertidumbres estándar tabuladas de la ISO 12999-1:2020 (las situaciones
+de medición A/B/C del apartado 5.2 y los factores de cobertura de la Tabla
+8, uni- y bilaterales) mediante `building.band_uncertainty`,
+`building.single_number_uncertainty` y `building.uncertain_value`; y el
+método de control de la ISO 10052:2021 (el índice de reverberación $k$, su
+estimación por clase de sala de la Tabla 4 y las cuatro magnitudes de
+control) mediante `building.survey_airborne_insulation` y sus funciones
+hermanas.
+
+**No cubierto.** Todas las funciones de campo de aquí toman niveles que el
+usuario ya ha corregido por ruido de fondo (apartado 9.2 de la ISO
+16283-1); la medición y corrección del ruido de fondo en sí no está
+implementada. Los propios requisitos de posición y procedimiento de la
+ISO 16283-1/-2/-3 (el número mínimo de posiciones de fuente y micrófono,
+los procedimientos de baja frecuencia con altavoz móvil o barrido de
+micrófono) no se comprueban: el promediado en energía ocurre una vez que
+se proporcionan las posiciones, pero nada aquí verifica cuántas se
+tomaron ni dónde. La vía de intensidad acústica hacia las mismas
+magnitudes de campo (ISO 15186-1/-2) tampoco está en este módulo: es
+`intensity_insulation`, de la
+[guía de Medición del aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/).
 
 ## Véase también
 

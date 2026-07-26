@@ -1,6 +1,6 @@
 ---
 title: "psychoacoustics.tone_audibility"
-description: "Public API of phonometry.psychoacoustics.tone_audibility (auto-generated)."
+description: "Objective audibility of tones in noise -- engineering method (ISO/PAS 20065:2016)."
 sidebar:
   label: "tone_audibility"
 ---

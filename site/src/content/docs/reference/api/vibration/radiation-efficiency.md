@@ -1,6 +1,6 @@
 ---
 title: "vibration.radiation_efficiency"
-description: "Public API of phonometry.vibration.radiation_efficiency (auto-generated)."
+description: "Radiation efficiency of a plate in bending (Hopkins 2007, Sound Insulation, Section 2.9; Leppington et al. 1982; Maidanik 1962)."
 sidebar:
   label: "radiation_efficiency"
 ---

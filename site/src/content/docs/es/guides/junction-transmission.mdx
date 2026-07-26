@@ -233,6 +233,32 @@ niveles de velocidad promediada en dirección) es el `vibration_reduction_index`
 separado de la transmisión por flancos; esta página es el valor *predicho* en
 forma cerrada del enfoque ondulatorio.
 
+## Qué cubre esta guía
+
+**Cubierto.** Los coeficientes de transmisión de unión rígida,
+independientes de la frecuencia, de Cremer, Heckl y Ungar (1973),
+tabulados por Craik (1981/1996) y recogidos en Hopkins (2007, apartado
+5.2.1.3), para las uniones X, T, L y en línea de placas delgadas,
+homogéneas e isótropas: los parámetros de onda $\chi$/$\psi$, los
+coeficientes de esquina y de tramo recto
+$\tau_{12}(\theta)$/$\tau_{13}(\theta)$, su media angular en campo difuso,
+el factor de pérdidas por acoplamiento SEA y el índice de reducción
+vibracional $K_{ij}$ del enfoque ondulatorio, mediante
+`junction_wave_parameters`, `corner_transmission_coefficient`,
+`straight_transmission_coefficient`,
+`angular_average_transmission_coefficient`, `coupling_loss_factor`,
+`wave_vibration_reduction_index` y `junction_transmission`.
+
+**No cubierto.** Este $K_{ij}$ predicho es una idealización en forma
+cerrada para una unión rígida y simplemente apoyada, no una medición: el
+$K_{ij}$ medido y empírico a partir de una diferencia de niveles de
+velocidad promediada en dirección (ISO 10848) es el
+`vibration_reduction_index` separado de la
+[guía de Medición del aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/).
+El coeficiente de tramo recto $\tau_{13}$ no está definido para las
+geometrías de unión T (2) y L, que no tienen una tercera placa colineal,
+así que ahí solo se aplica el camino de esquina.
+
 ## Véase también
 
 - [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/):

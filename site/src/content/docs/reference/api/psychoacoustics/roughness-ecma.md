@@ -1,6 +1,6 @@
 ---
 title: "psychoacoustics.roughness_ecma"
-description: "Public API of phonometry.psychoacoustics.roughness_ecma (auto-generated)."
+description: "Psychoacoustic roughness per ECMA-418-2:2025 (4th ed., Sottek Hearing Model)."
 sidebar:
   label: "roughness_ecma"
 ---

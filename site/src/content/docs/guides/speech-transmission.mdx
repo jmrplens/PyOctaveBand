@@ -41,6 +41,15 @@ clears the noise and the hearing threshold at the listener's ear. For the
 latter, see the [Speech Intelligibility Index guide](/phonometry/guides/speech-intelligibility/).
 :::
 
+## How do I compute the IEC 60268-16 Speech Transmission Index in Python?
+
+From a measured room impulse response, call
+`hearing.sti_from_impulse_response(ir, fs, snr=25.0)`. The result gives `sti`
+on the 0 to 1 scale, its Annex F `rating` letter and the seven octave-band
+modulation transfer indices. For a direct measurement, play
+`hearing.stipa_signal(fs)` in the room and pass the recording to
+`hearing.stipa(recording, fs)`.
+
 ## 1. The modulation transfer function
 
 Reverberation and noise do not muffle speech uniformly; they blur its
@@ -303,6 +312,25 @@ repository; click the preview to open the PDF.
 	description="One-page speech-transmission-index fiche: a metadata header, an octave-band modulation transfer index table, the per-band MTI bars, the boxed STI = 0.64 single-number result with the Annex F qualification band and a PASS verdict against a 0.5 minimum."
 	caption="Speech transmission index fiche (STIResult.report), STI with the Annex F band."
 />
+
+## What this guide covers
+
+**Covered.** IEC 60268-16:2020 (Edition 5) for the male speech option, the
+only one Edition 5 keeps: the modulation transfer function and the m to STI
+mapping (clauses A.5.2 to A.5.6), the full-STI indirect method from a measured
+impulse response via `hearing.sti_from_impulse_response()`, the direct STIPA
+method of Annex B via `hearing.stipa_signal()` and `hearing.stipa()`, the
+Ed.5 male test-signal spectrum of clause A.6.1, the level-dependent auditory
+masking and reception threshold corrections of Tables A.2 and A.3 (`level=`
+and `ambient=`), and the Annex F rating letters returned as `STIResult.rating`.
+
+**Not covered.** The direct full-STI measurement (the 14-modulation-frequency
+test signal played and recorded through the real chain, per clause 6.3 and
+Table 3, recommended above when distortion is severe) is not implemented:
+only the STIPA direct signal (`stipa_signal`/`stipa`) and the indirect
+full-STI computation from an impulse response are available. The female
+speech option is not missing from the library: Edition 5 itself removed it
+(foreword, item d), so there is nothing left to implement.
 
 ## See also
 

@@ -270,3 +270,27 @@ suelo de barrera rasante de `5 dB`, pero solo los modelos ondulatorios resuelven
 las caídas de interferencia que se mueven con la geometría, la frecuencia y la
 impedancia del suelo, lo que los hace la infraestructura natural de los esquemas
 meteorológicos de Nord2000 y CNOSSOS.
+
+## Qué cubre esta guía
+
+**Cubierto.** El coeficiente de reflexión de onda esférica de Weyl-Van der
+Pol para el suelo (`ground_effect`, Attenborough Ec. 2.40a/c, Salomons
+Ec. 3.2/D.58, el factor de pérdida por frontera mediante la función de
+Faddeeva), con sus límites de suelo rígido (`+6 dB`), incidencia rasante y
+reciprocidad anclados como tests. La difracción de barrera por teoría
+ondulatoria (`barrier_insertion_loss`): la forma cerrada de Kurze-Anderson
+(`kurze_anderson_attenuation`, Bies Ec. 5.138), el semiplano rígido exacto
+(MacDonald / Hadden y Pierce, Attenborough Ecs. 9.19-9.20), las barreras
+gruesas mediante el número de Fresnel de doble arista (Bies Ec. 5.157), y el
+modelo coherente de barrera sobre suelo de cuatro caminos ponderado por el
+coeficiente de reflexión de `ground_effect`.
+
+**No cubierto.** Ambos modelos asumen una atmósfera homogénea, sin
+refracción ni turbulencia; un gradiente vertical de velocidad del sonido es
+el objeto de la guía separada de
+[refracción atmosférica](/phonometry/es/guides/atmospheric-refraction/).
+El modelo coherente de barrera sobre suelo pondera los cuatro caminos
+difractados con un único coeficiente de reflexión `Q` calculado sobre la
+geometría global fuente-receptor, en lugar de un coeficiente distinto por
+camino imagen, así que es coherente y recíproco pero no una solución
+completa por elementos de contorno.

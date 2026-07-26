@@ -1,6 +1,6 @@
 ---
 title: "hearing.occupational_exposure"
-description: "Public API of phonometry.hearing.occupational_exposure (auto-generated)."
+description: "Occupational noise exposure: measurement strategies and uncertainty (ISO 9612:2009)."
 sidebar:
   label: "occupational_exposure"
 ---

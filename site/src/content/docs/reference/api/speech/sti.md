@@ -1,6 +1,6 @@
 ---
 title: "hearing.sti"
-description: "Public API of phonometry.hearing.sti (auto-generated)."
+description: "Speech Transmission Index (STI) per IEC 60268-16:2020 (Edition 5)."
 sidebar:
   label: "sti"
 ---

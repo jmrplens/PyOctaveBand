@@ -205,6 +205,25 @@ inducido por ruido de ISO 1999, que añade una componente de ruido sobre esta
 componente de edad, es el tema de la guía de
 [pérdida auditiva inducida por ruido](/phonometry/es/guides/noise-induced-hearing-loss/).
 
+## Qué cubre esta guía
+
+**Cubierto.** El modelo de edad de ISO 7029:2017: la desviación mediana en
+ley de potencias desde los 18 años (cláusula 4.2, Tabla 1), las dispersiones
+asimétricas semi-gaussianas $s_u$ y $s_l$ (cláusula 4.3, Tablas 2–5), y el
+cálculo del fractil poblacional de la cláusula 4.4, todo implementado por
+`age_threshold(age, sex, fractile)`. El umbral de referencia de la audición
+en campo libre y campo difuso de la Tabla 1 de ISO 389-7:2005, devuelto por
+`reference_threshold(field)`.
+
+**No cubierto.** La Fórmula (1) del apartado 6.1 de ISO 1999:2013 combina
+este umbral por edad con un desplazamiento inducido por ruido en un
+audiograma real. Esa componente de ruido no está implementada aquí: es el
+tema de la guía de
+[pérdida auditiva inducida por ruido](/phonometry/es/guides/noise-induced-hearing-loss/).
+De ISO 389-7:2005 este módulo implementa solo los valores de la Tabla 1; el
+resto de la norma, incluyendo cómo se establecieron esos valores, no está
+implementado.
+
 ## Véase también
 
 - [Pérdida auditiva inducida por ruido](/phonometry/es/guides/noise-induced-hearing-loss/):

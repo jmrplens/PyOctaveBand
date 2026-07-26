@@ -26,6 +26,10 @@ const encoders = {
 	'.png': (image) =>
 		image.png({ palette: true, quality: 90, compressionLevel: 9, effort: 10 }),
 	'.jpg': (image) => image.jpeg({ mozjpeg: true, quality: 82 }),
+	// The staged figure previews and animation stills (see
+	// scripts/stage-media.mjs). Re-encoded at the same effort the generators
+	// do not spend, since they optimise for regeneration speed.
+	'.webp': (image) => image.webp({ quality: 82, effort: 6 }),
 	'.jpeg': (image) => image.jpeg({ mozjpeg: true, quality: 82 }),
 };
 

@@ -1,6 +1,6 @@
 ---
 title: "metrology.parametric_filters"
-description: "Public API of phonometry.metrology.parametric_filters (auto-generated)."
+description: "Weighting filters (A, B, C, D, G, AU, Z) and time weighting utilities."
 sidebar:
   label: "parametric_filters"
 ---

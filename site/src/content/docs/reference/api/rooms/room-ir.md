@@ -1,6 +1,6 @@
 ---
 title: "room.room_ir"
-description: "Public API of phonometry.room.room_ir (auto-generated)."
+description: "Impulse-response acquisition per BS EN ISO 18233:2006."
 sidebar:
   label: "room_ir"
 ---

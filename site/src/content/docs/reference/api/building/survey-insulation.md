@@ -1,6 +1,6 @@
 ---
 title: "building.survey_insulation"
-description: "Public API of phonometry.building.survey_insulation (auto-generated)."
+description: "Field survey method for sound insulation and service-equipment noise (ISO 10052:2021)."
 sidebar:
   label: "survey_insulation"
 ---

@@ -1,6 +1,6 @@
 ---
 title: "underwater.pile_driving_noise"
-description: "Public API of phonometry.underwater.pile_driving_noise (auto-generated)."
+description: "Radiated underwater sound from percussive pile driving (ISO 18406:2017)."
 sidebar:
   label: "pile_driving_noise"
 ---

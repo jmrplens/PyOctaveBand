@@ -1,6 +1,6 @@
 ---
 title: "building.panel_transmission"
-description: "Public API of phonometry.building.panel_transmission (auto-generated)."
+description: "Predicted airborne sound reduction index of panels (Bies, Hansen & Howard 2017, Engineering Noise Control 5e, Section 7.2; Sharp 1973)."
 sidebar:
   label: "panel_transmission"
 ---

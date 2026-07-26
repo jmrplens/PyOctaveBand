@@ -1,6 +1,6 @@
 ---
 title: "environmental.rating"
-description: "Public API of phonometry.environmental.rating (auto-generated)."
+description: "Environmental noise descriptors per ISO 1996-1:2016."
 sidebar:
   label: "rating"
 ---

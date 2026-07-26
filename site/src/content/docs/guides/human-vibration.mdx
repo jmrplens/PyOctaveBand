@@ -470,6 +470,32 @@ repository; click the preview to open the PDF.
 	caption="Daily vibration exposure fiche (DailyVibrationExposure.report), the ISO 5349-2 Annex E.3 hand-arm day with the exposure analysis and the Directive 2002/44/EC assessment."
 />
 
+## What this guide covers
+
+**Covered.** ISO 8041-1:2017 as far as it defines the frequency weightings:
+the Table 3 cascade of analog stages (Formulae (1)-(5)) that
+`frequency_weighting` and `apply_weighting` realise for all nine weightings,
+reproducing the Annex B design-goal tables. ISO 2631-1:1997 for whole-body
+vibration, covering the weighted r.m.s. `a_w` and vibration total value `a_v`
+(`weighted_acceleration`, `vibration_total_value`), the MTVV, VDV, MSDV and
+crest-factor dose measures, and the Annex B energy-equivalent magnitude
+(`energy_equivalent_acceleration`). ISO 2631-2:2003 (`Wm`), ISO 2631-4:2001
+(`Wb`) and ISO 5349-1/-2:2001 for hand-transmitted vibration, whose vector
+total, daily exposure `A(8)` (`daily_vibration_exposure`,
+`wbv_exposure_basis`) and Annex C vibration-white-finger dose relation
+(`hav_vwf_lifetime_years`) are implemented too. The Directive 2002/44/EC
+action and limit values close the assessment, written up by
+`DailyVibrationExposure.report()`.
+
+**Not covered.** ISO 8041-1's own subject, the design and type-testing of
+general purpose vibration meters, is not implemented: only the
+frequency-weighting definitions are taken from it. ISO 2631-5:2018, the
+multiple-shock spinal-response and injury-risk model for whole-body
+vibration, is a separate standard with its own module: see
+[Multiple Shock Vibration](/phonometry/guides/multiple-shock-vibration/) for
+records containing repeated shocks, which the r.m.s. and VDV measures on
+this page do not substitute for.
+
 ## See also
 
 - API reference: [`vibration.human_vibration`](/phonometry/reference/api/vibration/human-vibration/).

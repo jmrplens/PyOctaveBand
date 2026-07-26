@@ -1,6 +1,6 @@
 ---
 title: "underwater.sound_speed"
-description: "Public API of phonometry.underwater.sound_speed (auto-generated)."
+description: "Speed of sound in sea water (empirical equations)."
 sidebar:
   label: "sound_speed"
 ---

@@ -40,6 +40,16 @@ so it describes the code as it is now rather than as it was documented once.
 Read it when you need to show that a number is defensible, or to see exactly
 which parts of a standard are implemented and which are not.
 
+## [Errata in published sources](/phonometry/reference/errata/)
+
+The other side of the same coin. Re-deriving every formula and worked example
+from the source document occasionally shows that the *document* is wrong: an
+example that contradicts its own normative clause, a misprinted constant, a
+cross-reference pointing at the wrong equation. Each confirmed case is
+recorded with the printed edition, the evidence, the reading the library
+implements and the test that pins it. Read it when a printed expected value
+and the library disagree, before assuming the library is at fault.
+
 ## [Bibliography](/phonometry/reference/bibliography/)
 
 Every book and paper cited by the guides, in one list grouped by domain, each

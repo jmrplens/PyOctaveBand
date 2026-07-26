@@ -219,6 +219,24 @@ The estimators share the Welch core of the
 coherence and a `power_spectral_density` computed with the same segment
 length are consistent bin by bin.
 
+## What this guide covers
+
+**Covered.** Bendat & Piersol Chapter 7's ordinary, multiple and partial
+coherence functions (Eqs. 7.109, 7.35, 7.87), the Gaussian-elimination
+conditioning recursion (Eq. 7.94), the partial coherent output spectra and
+their exact decomposition of the output (Eqs. 7.86/7.116/7.121), and the
+Section 9.3 random errors of the multiple and conditioned estimates
+(Eqs. 9.98-9.101), all exposed by `miso_coherence` and
+`MISOCoherenceResult`.
+
+**Not covered.** The chapter's multiple-input frequency-response (gain
+factor `Liy`) estimates, the linear model that predicts the output from
+the conditioned inputs, are computed internally to build the coherent
+output spectra but are not returned: `MISOCoherenceResult` exposes the
+coherence and spectral-decomposition side only, not a fitted multi-input
+transfer function. The method is also single-output (MISO); a system with
+several correlated outputs needs one `miso_coherence` call per output.
+
 ## See also
 
 - [Spectral analysis](/phonometry/guides/spectral-analysis/): the single-input coherent output spectrum this page generalizes, and the shared Welch core.

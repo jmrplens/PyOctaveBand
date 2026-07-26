@@ -387,6 +387,29 @@ pública del prototipo no incluye un caso de apantallamiento reconstruible
 así que la cadena de difracción se ancla en las formas cerradas y en su
 filiación CNOSSOS-EU.
 
+## Qué cubre esta guía
+
+**Cubierto.** El método del hemisferio de ECAC Doc 32 y la guía a nivel de
+ecuación NORAH2 de EASA (§A.3-A.5): el hemisferio de ruido y su consulta
+bilineal (`RotorcraftHemisphere`, `hemisphere_source_level`), los tres
+ajustes de propagación (`spherical_spreading_adjustment`,
+`atmospheric_adjustment`, `ground_effect_adjustment`, el modelo de
+Chien-Soroka con la impedancia de Delany-Bazley y las clases de resistividad
+de flujo CNOSSOS), la interpolación entre condiciones de vuelo
+(`flight_condition_weights`, `interpolated_source_level`), la cinemática de
+la trayectoria (`flight_path_kinematics`), el SEL, LASmax y EPNL de evento
+único (`rotorcraft_event_level`), los contornos en malla de tierra
+(`rotorcraft_noise_contour`) y la cadena de plano medio del suelo y
+apantallamiento por terreno (`mean_ground_plane`, `mean_flow_resistivity`,
+`diffraction_attenuation`, `terrain_screening_adjustment`). Validado contra
+la Tabla 4 de la guía NORAH2, límites geométricos y rasantes en forma cerrada,
+y de extremo a extremo contra los casos de verificación ARP del prototipo
+NORAH2.
+
+**No cubierto.** El tratamiento de fuente en hover, ralentí y rodaje (guía
+§A.3.5) queda fuera de la implementación: el modelo de fuente por hemisferio
+asume un sobrevuelo, no un helicóptero estacionario o en ralentí en tierra.
+
 ## Véase también
 
 - Referencia de la API: [`aircraft.rotorcraft_noise`](/phonometry/es/reference/api/aeroacoustics/rotorcraft-noise/).

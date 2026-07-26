@@ -1,6 +1,6 @@
 ---
 title: "room.room_noise"
-description: "Public API of phonometry.room.room_noise (auto-generated)."
+description: "Room-noise rating curves per ANSI/ASA S12.2-2019."
 sidebar:
   label: "room_noise"
 ---

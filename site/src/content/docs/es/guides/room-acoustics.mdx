@@ -891,6 +891,37 @@ genera un `AbsorptionWarning` de aviso; el resultado se devuelve igualmente.
 con la forma de `t60`; `absorption_coefficient()` devuelve `alpha_s`;
 `attenuation_from_alpha(alpha)` convierte un `alpha` de ISO 9613-1 (dB/m) a `m`.
 
+## Qué cubre esta guía
+
+**Cubierto.** Los anexos A y B de la ISO 18233:2006, la adquisición de la
+respuesta al impulso por MLS y por barrido exponencial de
+`room.mls_signal`/`room.sweep_signal` y
+`room.impulse_response`/`room.mls_impulse_response`; la ISO 3382-1:2009
+(apartado 5.3.3 de integración regresiva, las fórmulas de parámetros del
+anexo A y los requisitos de posición/separación) y la ISO 3382-2:2008
+(apartado 6, los recuentos de posiciones por grado de precisión y el
+criterio de rango dinámico del apartado 5.3.3), calculados por
+`room.room_parameters`/`room.decay_curve`: EDT, T20, T30, C50, C80, D50, Ts
+y las marcas de validez y curvatura por banda; las magnitudes de oficina
+diáfana del apartado 4 y los apartados 6.2/6.3 de la ISO 3382-3:2012
+($D_{2,S}$, $L_{p,A,S,4m}$, $r_D$, $r_P$) de `room.open_plan_metrics`; y la
+absorción en cámara reverberante de los apartados 4 y 8.1 de la
+ISO 354:2003 mediante `materials.absorption_area` y
+`materials.absorption_coefficient`.
+
+**No cubierto.** El anexo A de la ISO 3382-1 también define la fuerza
+acústica $G$ y los parámetros binaurales LF/LFC e IACC; phonometry
+implementa solo la familia de reverberancia y claridad citada arriba (EDT,
+T20, T30, C50, C80, D50, Ts). La STI por posición de la ISO 3382-3 se toma
+como entrada de `open_plan_metrics` en lugar de calcularse dentro de la
+función: mídela con las herramientas STIPA de la
+[guía del Índice de Transmisión de la Palabra](/phonometry/es/guides/speech-transmission/).
+Los requisitos de calificación de la sala de la ISO 354 (anexo A: número de
+posiciones de altavoz y micrófono, elementos difusores) no se comprueban;
+`absorption_area`/`absorption_coefficient` solo convierten un par
+$T_1$/$T_2$ ya medido y emiten un aviso cuando el volumen de la sala o el
+área de la muestra caen fuera de los límites del apartado 6.
+
 ## Véase también
 
 - Aislamiento acústico [en campo](/phonometry/es/guides/insulation-field/),

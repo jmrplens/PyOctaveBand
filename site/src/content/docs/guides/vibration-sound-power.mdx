@@ -228,6 +228,33 @@ repository; click the preview to open the PDF.
 	caption="Sound power from vibration fiche (VibrationSoundPowerResult.report), an ISO/TS 7849-2 engineering-method determination with the measured radiation factor and the boxed LWA."
 />
 
+## What this guide covers
+
+**Covered.** ISO/TS 7849-1:2009 and ISO/TS 7849-2:2009 as far as they define
+the calculation of sound power from vibration: the radiated power
+`P = Z_c⟨v²⟩Sε` (Formula 6), the velocity level and its calibration
+conversion (Formulae 3, 8) run by `velocity_level` and
+`velocity_level_from_acceleration`, the surface mean (Formulae 10/11) run by
+`mean_velocity_level`, the extraneous-vibration correction of Table 2 run by
+`extraneous_velocity_correction`, and the sound power level with the fixed
+impedance term (Formula 12, Part 1) or a measured per-band radiation factor
+(Formula 15, Part 2) run by `radiated_sound_power_level` and
+`sound_power_from_vibration`. `radiation_factor` implements Part 2's
+single-machine Formula 8, converting an independently measured sound power
+into `ε`.
+
+**Not covered.** The measurement clauses of both parts (instrumentation,
+source installation, the number and mounting of measurement positions,
+environmental conditions: clauses 5 to 7) and their measurement-uncertainty
+clauses and informative annexes are not implemented: they are laboratory
+practice this guide assumes. Part 2's clause 8 also asks for the radiation
+factor of a machine batch or family, averaging `εⱼ` over several machines and
+its standard deviation (Formulae 9, 10); only the single-machine Formula 8 is
+implemented, so pass an already-averaged `ε` for a family determination. The
+sound power that feeds `radiation_factor` must come from an ISO 9614
+intensity measurement, covered separately in the
+[sound intensity guide](/phonometry/guides/intensity/).
+
 ## See also
 
 - API reference: [`emission.vibration_sound_power`](/phonometry/reference/api/power/vibration-sound-power/).

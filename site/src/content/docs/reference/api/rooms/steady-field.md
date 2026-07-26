@@ -1,6 +1,6 @@
 ---
 title: "room.steady_field"
-description: "Public API of phonometry.room.steady_field (auto-generated)."
+description: "Steady-state sound field in a room: room constant, critical distance, level."
 sidebar:
   label: "steady_field"
 ---

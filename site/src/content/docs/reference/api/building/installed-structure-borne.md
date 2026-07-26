@@ -1,6 +1,6 @@
 ---
 title: "building.installed_structure_borne"
-description: "Public API of phonometry.building.installed_structure_borne (auto-generated)."
+description: "Installed structure-borne sound from service equipment (EN 12354-5:2009)."
 sidebar:
   label: "installed_structure_borne"
 ---

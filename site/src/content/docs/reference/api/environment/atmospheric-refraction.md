@@ -1,6 +1,6 @@
 ---
 title: "environmental.atmospheric_refraction"
-description: "Public API of phonometry.environmental.atmospheric_refraction (auto-generated)."
+description: "Atmospheric refraction: ray tracing and the parabolic equation (PE)."
 sidebar:
   label: "atmospheric_refraction"
 ---

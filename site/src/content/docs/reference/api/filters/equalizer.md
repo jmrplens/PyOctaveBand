@@ -1,6 +1,6 @@
 ---
 title: "metrology.equalizer"
-description: "Public API of phonometry.metrology.equalizer (auto-generated)."
+description: "Parametric equalizer biquads per the RBJ Audio EQ Cookbook."
 sidebar:
   label: "equalizer"
 ---

@@ -1,6 +1,6 @@
 ---
 title: "metrology.inversion"
-description: "Public API of phonometry.metrology.inversion (auto-generated)."
+description: "Regularized spectral inversion with frequency-dependent regularization."
 sidebar:
   label: "inversion"
 ---

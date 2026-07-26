@@ -1,6 +1,6 @@
 ---
 title: "electroacoustics.swept_sine"
-description: "Public API of phonometry.electroacoustics.swept_sine (auto-generated)."
+description: "Harmonic-distortion separation with exponential sweeps (Farina / Novak)."
 sidebar:
   label: "swept_sine"
 ---

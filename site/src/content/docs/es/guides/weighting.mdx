@@ -110,6 +110,14 @@ plt.show()
 * **Ponderación D (`D`):** ponderación de ruido de aeronaves de la retirada IEC 537 (sección 4).
 * **Ponderación AU (`AU`):** ponderación A con el corte de ultrasonidos de IEC 61012 (sección 4).
 
+## ¿Cómo aplico la ponderación A a una señal con Python?
+
+Llama a `metrology.weighting_filter(recording, fs, curve='A')` sobre una señal
+calibrada. Devuelve la señal temporal ponderada A, filtrada con el diseño de
+polos y ceros de IEC 61672-1:2013 dentro de las tolerancias de clase 1, así que
+`metrology.leq()` sobre la salida es el $L_{Aeq}$. La misma función aplica las
+ponderaciones C, Z, B, D, AU y la G de infrasonido mediante `curve`.
+
 ## 1. De dónde vienen las curvas
 
 Las curvas A y C son líneas isofónicas invertidas, congeladas en filtros:
@@ -556,6 +564,31 @@ plt.show()
 ```
 
 </details>
+
+## Qué cubre esta guía
+
+**Cubierto.** IEC 61672-1:2013 para las curvas A, C y Z: la definición
+analítica del Anexo E a partir de cuatro frecuencias de esquina, el diseño
+`high_accuracy` que mantiene las tolerancias de clase 1 hasta 16 kHz, y los
+límites de aceptación de clase 1/clase 2 de la Tabla 3 que comprueba
+`verify_weighting_class`. ISO 7196:1995 para la curva G (valores de
+polo/cero de la Tabla 1, verificados frente a todos los valores nominales de
+la Tabla 2). ANSI S1.4-1983 para la curva histórica B (definición del Anexo
+C, objetivos de diseño de la Tabla IV, límites de tolerancia de la
+Tabla V). IEC 61012:1990 para AU (el paso bajo U de la Tabla 2 en cascada
+con A, verificado frente a la Tabla 1). IEC 537:1976 para la curva D de
+ruido de aeronaves, retirada, implementada desde su función de transferencia
+publicada y contrastada con dos implementaciones independientes.
+
+**No cubierto.** `verify_weighting_class` no produce un veredicto de clase
+para G ni para D: ISO 7196 define una única tolerancia de ±1 dB sin
+estructura de clases, y la retirada IEC 537 no dejó tabla de tolerancias.
+Ambas curvas se fijan numéricamente frente a sus tablas publicadas en el
+informe de conformidad de CI en su lugar, no a través de este verificador
+público. B y D se ofrecen solo para datos históricos y códigos nacionales
+antiguos; ninguna es práctica actual (IEC 61672-1 sustituyó a B, y la
+certificación de ruido de aeronaves informa hoy el EPNL o niveles con
+ponderación A simples en lugar de D).
 
 ## Véase también
 

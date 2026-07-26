@@ -9,6 +9,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- The documentation site now renders the numerical conformance report itself:
+  `/reference/conformance/` and its Spanish mirror carry every conformance
+  table, collapsible section by collapsible section, instead of describing the
+  report and linking out to GitHub.
+- New page `/reference/errata/` (and `/es/reference/errata/`) publishing the
+  registry of defects found in the published sources the library implements
+  from: misprints, worked examples that contradict their own normative
+  clauses, broken cross-references, each with its evidence, the reading the
+  library implements and the test pinning it. Linked from the conformance page
+  and from the reference index.
+- `make site-reports` (`scripts/generate_site_reports.py`) transplants the
+  bodies of `docs/CONFORMANCE.md` and `docs/ERRATA.md` into those four pages,
+  below the hand-written introduction each one keeps, rewriting the
+  repository-relative links to their GitHub targets. Nothing is hand-copied,
+  and a CI job fails the build if a page drifts from its source document.
+- Documentation site: an **About** page (English and Spanish) naming who
+  maintains the library, with the ORCID, Google Scholar, ResearchGate, GitHub
+  and personal-site identities as visible links, how each metric is built from
+  the text of its governing standard and checked in CI, how to report an error
+  (including the errata registry for defects found in published standards), a
+  "Cite this software" block with the Zenodo DOI plus APA and BibTeX entries
+  derived from `CITATION.cff`, and the MIT licence.
+- Packaging metadata: `Documentation`, `Source`, `Changelog` and `DOI` entries
+  in `[project.urls]`, and a `keywords` list covering the domains the library
+  spans and the designations of the standards it implements, so a PyPI search
+  for a standard number finds the package.
+- A conventional `/sitemap.xml` entry point alongside the generated
+  `sitemap-index.xml`, for crawlers that probe the default path.
+- A clean markdown copy of every page, published next to its HTML as
+  `index.md` and advertised with `<link rel="alternate" type="text/markdown">`.
+  A rendered page is roughly 90% chrome (the sidebar alone is about 76 kB on
+  every page), and the only clean alternative was a single file far too large
+  to fetch; `/guides/levels/index.md` is 31 kB against 388 kB of HTML.
+- `scripts/check_conformance_claims.py`, run by `make conformance` and by CI:
+  it fails the build if any page states a conformance count that disagrees with
+  the generated report. The counts had been typed out in several places and two
+  of them were a release behind, so the landing page and the page arguing for
+  the library's verifiability gave different numbers.
 - `ExtendedWeightedRatingResult.plot()` and `ExtendedImpactRatingResult.plot()`
   (ISO 717-1 Annex B / ISO 717-2 A.2.1): the enlarged-range results now carry
   the full measured band curve (`band_centers`, `measured`) and draw it
@@ -81,9 +119,130 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   GUM-uncertainty and test-signals guides gain See-also sections, practical
   guidance (conditioning order, diagnostics tool choice, window choice) and
   the references behind them.
+- Per-guide scope disclosure: 58 English guides and their Spanish mirrors gain
+  a "Covered / Not covered" section naming the clauses, formulae, tables and
+  annexes of the governing standard that are implemented, and the ones that
+  are not, pointing at the page where a missing piece lives when the library
+  provides it elsewhere. The eight guides that already stated their negative
+  scope in prose keep it as written, so the whole guide set now backs the
+  landing-page claim that each guide says what it does not do.
+- Query-shaped openers on six guides (field insulation ratings, loudness,
+  frequency weighting, occupational exposure, the speech transmission index
+  and EN 12354 prediction): a question heading followed by a direct answer
+  with the function call and the worked value from the example below it, in
+  English and Spanish, with the existing narrative left untouched.
+- Getting Started opens with a lead paragraph saying what phonometry is and
+  what the first minute of use produces, in English and Spanish, so the page
+  no longer starts on an installation tab label.
+- New page `/guides/` (and `/es/guides/`), the landing page for the largest
+  cluster on the site. It groups the 66 guides into the nine documented areas,
+  each with what the area is for, the standards implemented in it and a
+  one-line summary of every guide, linking both to the area overview and to
+  the guides themselves. The URL was cited as a breadcrumb ancestor and
+  referenced from the navigation while returning 404 and staying out of the
+  sitemap; it is now a real page, carrying `ItemList` structured data for the
+  nine areas.
+- New page `/reference/glossary/` (and `/es/reference/glossary/`): a reference
+  glossary of every acoustic quantity the guides compute, one row per symbol
+  with a one-sentence definition, the unit, the standard and clause that
+  defines it and the guide that implements it, across levels, environmental
+  and occupational descriptors, weighting, room acoustics, speech, sound
+  insulation, materials, vibration, psychoacoustics, electroacoustics,
+  aircraft, underwater acoustics and measurement uncertainty. Marked up as a
+  `DefinedTermSet` with one `DefinedTerm` per quantity, each carrying its
+  symbol as `termCode` and pointing at the implementing guide, so the
+  vocabulary is dereferenceable rather than prose. Definitions and clause
+  citations are taken from the standards the guides implement; where the
+  defining clause is not established, the entry names the standard only.
+
+### Changed
+
+- The documentation site serves its own figures, animations and example
+  fiches instead of hotlinking `raw.githubusercontent.com`. That host is not a
+  CDN, caches for half as long as the Pages origin, is rate limited, is one
+  GitHub explicitly asks people not to use as an asset host, and the URLs were
+  pinned to `main`, so renaming a figure silently broke every published page
+  showing it. A prebuild step stages the media from `.github/images` and
+  `.github/reports`: SVG is copied verbatim, the rasters are recompressed with
+  the existing image step (36 MB down to 21.7 MB), the WebM animations are
+  copied as they are, and the GIFs are skipped since they exist only for the
+  markdown mirror, which cannot play WebM. The mirror under `docs/` and the
+  README keep their absolute URLs, since GitHub renders those with no build
+  step.
+- Every page now carries one JSON-LD `@graph` instead of a script per node.
+  Google merged the separate blocks before evaluating them, but a plain
+  JSON-LD processor expands each `<script>` as its own document, and in that
+  reading the `@id` references to the site-wide Person, WebSite and
+  SoftwareApplication nodes pointed at nodes with no properties.
+- Breadcrumbs are derived from the navigation tree rather than from URL path
+  segments. The segment-based trails named grouping prefixes that are not
+  routes (`/guides/`, `/guides/sections/`, `/reference/api/<domain>/`), so 414
+  of 442 pages advertised a hierarchy that did not resolve, and the labels were
+  machine-titlecased in both locales ("Api", "Building"). Labels now come from
+  the sidebar, translations included, and a crumb is emitted only where a page
+  exists.
+- `datePublished` in the per-page structured data is the commit that added the
+  page, not the commit that last touched it. The two were the same value, so
+  every page claimed it had been published on the day it was last edited, and a
+  typo fix moved a guide's publication date forward.
+- The `SoftwareApplication` and `WebSite` nodes describe what the library
+  covers now. Their description, `featureList` and `keywords` still described
+  the fractional octave filter bank the project began as, contradicting the
+  visible meta description on the same page; all three are derived from the
+  nine documented areas in `src/data/home.ts`, so they follow the landing page.
+  The node also declares `alternateName: PyOctaveBand`.
+- The `Person` node matches its canonical definition at jmrp.io: the ORCID is
+  present as an `identifier`, `knowsAbout` entries are Wikidata-grounded rather
+  than free text, and the Bluesky profile is included.
+- Guides are typed `TechArticle` + `LearningResource`, and the generated API
+  pages use `APIReference`, which is the exact schema.org type for what they
+  document. Each page also links its counterpart in the other language through
+  `workTranslation` / `translationOfWork`.
+- Each page's typed bibliography reaches the structured data: `citation` for
+  every entry, `isBasedOn` and `about` for the standards the page implements,
+  with one stable `@id` per work minted on the bibliography page so a standard
+  is a single entity cited by many pages rather than a repeated string.
+- The generated API reference pages describe themselves with the module's own
+  docstring summary. They previously all read "Public API of
+  phonometry.<module> (auto-generated)", which restates the URL, while the page
+  body already opened with a precise summary naming the standards implemented.
+- `llms.txt` is generated from the documentation tree instead of a hand-kept
+  list. The list had been written for the original filter-bank library and
+  never extended, so it named 42 of 221 English pages and left whole domains
+  (aircraft noise, underwater propagation, FDTD simulation, the entire API
+  reference) invisible, under a summary that still described a filter bank.
+  The generator now fails if a page cannot be placed. The full text is also
+  published as one file per area, each small enough to fetch whole, since
+  `llms-full.txt` is far past the size most clients will read.
+- The documentation `robots.txt` served under the site subpath now declares the
+  same four `Content-Signal` keys as the authoritative file at the domain root
+  (`search`, `ai-train`, `ai-input`, `ai-retrieval`), and says in a comment
+  which of the two is authoritative.
+- The docs deploy workflow also triggers on `docs/` and on the llms.txt
+  generator, so a change to the markdown mirror republishes the site instead of
+  leaving the published `llms.txt` behind the docs.
 
 ### Fixed
 
+- Formulas no longer serialize twice into the page text. KaTeX emits the
+  original TeX in an `<annotation>` inside the MathML, which is not
+  `aria-hidden`, so a text extractor read `L_eq` as `LeqL_{eq}Leq`. The
+  annotation is dropped and the MathML kept, on the standards formulas that
+  carry most of the documentation's value.
+- Figures declare their intrinsic size, read from the SVG at build time, so the
+  browser reserves the right box instead of reflowing the page as each lazy
+  image arrives. Almost none carried dimensions before (0 of 12 on one sampled
+  guide, 2 of 50 on another).
+- A figure pair no longer downloads the palette the reader will not see.
+  `display: none` suppresses a lazy fetch but not an eager one, so an
+  above-the-fold figure fetched both variants and discarded one, about 37 kB on
+  the landing page and in either theme. Both variants are lazy now, with
+  `fetchpriority="high"` preserving the head start.
+- The landing page has a title of its own. Both locales rendered
+  "phonometry | phonometry", spending the highest-weighted element on the entry
+  page on nothing, and the two splash pages are typed `og:type: website` rather
+  than `article`.
+- The 404 page no longer emits article structured data headlined "404".
 - `.report()` fiches: consecutive lines of wrapped prose no longer collide
   vertically when the text carries `<sub>`/`<super>` markup (e.g. the
   EN 12354-5 formula strip, where the subscripts of `L_n,s,ij` overprinted

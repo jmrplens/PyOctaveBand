@@ -1,6 +1,6 @@
 ---
 title: "aircraft.atmospheric_absorption"
-description: "Public API of phonometry.aircraft.atmospheric_absorption (auto-generated)."
+description: "One-third-octave-band atmospheric absorption for aircraft noise (SAE ARP 5534)."
 sidebar:
   label: "atmospheric_absorption"
 ---

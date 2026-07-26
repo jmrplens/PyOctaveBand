@@ -1,6 +1,6 @@
 ---
 title: "vibration.mechanical_mobility"
-description: "Public API of phonometry.vibration.mechanical_mobility (auto-generated)."
+description: "Mechanical mobility and the frequency-response-function family (ISO 7626-1:2011)."
 sidebar:
   label: "mechanical_mobility"
 ---

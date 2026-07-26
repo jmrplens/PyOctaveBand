@@ -237,6 +237,35 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 	caption="Ficha de potencia acústica por vibración (VibrationSoundPowerResult.report), una determinación por el método de ingeniería ISO/TS 7849-2 con el factor de radiación medido y el LWA recuadrado."
 />
 
+## Qué cubre esta guía
+
+**Cubierto.** La ISO/TS 7849-1:2009 y la ISO/TS 7849-2:2009 en lo que
+definen el cálculo de la potencia acústica a partir de la vibración: la
+potencia radiada `P = Z_c⟨v²⟩Sε` (Fórmula 6), el nivel de velocidad y su
+conversión de calibración (Fórmulas 3, 8) que ejecutan `velocity_level` y
+`velocity_level_from_acceleration`, la media sobre la superficie (Fórmulas
+10/11) que ejecuta `mean_velocity_level`, la corrección por vibración
+extraña de la Tabla 2 que ejecuta `extraneous_velocity_correction`, y el
+nivel de potencia acústica con el término fijo de impedancia (Fórmula 12,
+Parte 1) o con un factor de radiación medido por banda (Fórmula 15, Parte 2)
+que ejecutan `radiated_sound_power_level` y `sound_power_from_vibration`.
+`radiation_factor` implementa la Fórmula 8 de la Parte 2 para una sola
+máquina, que convierte una potencia acústica medida de forma independiente
+en `ε`.
+
+**No cubierto.** Los apartados de procedimiento de medición de ambas partes
+(instrumentación, instalación de la fuente, el número y montaje de las
+posiciones de medición, las condiciones ambientales: apartados 5 a 7) y sus
+apartados de incertidumbre de medida y anexos informativos no están
+implementados: son práctica de laboratorio que esta guía asume. El apartado
+8 de la Parte 2 pide además el factor de radiación de un lote o familia de
+máquinas, promediando `εⱼ` sobre varias máquinas y su desviación estándar
+(Fórmulas 9, 10); solo está implementada la Fórmula 8 de una sola máquina,
+así que pasa un `ε` ya promediado para una determinación de familia. La
+potencia acústica que alimenta a `radiation_factor` debe proceder de una
+medición de intensidad según la ISO 9614, cubierta aparte en la
+[guía de intensidad acústica](/phonometry/es/guides/intensity/).
+
 ## Véase también
 
 - Referencia de la API: [`emission.vibration_sound_power`](/phonometry/es/reference/api/power/vibration-sound-power/).

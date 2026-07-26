@@ -81,6 +81,15 @@ laboratory characterisation of an element lives in
 prediction of in-situ performance in
 [Predicting Sound Insulation (EN 12354)](/phonometry/guides/insulation-prediction/).
 
+## How do I compute Rw from third-octave sound reduction data in Python?
+
+Pass the 16 one-third-octave values from 100 Hz to 3150 Hz to
+`building.weighted_rating(R)`. It shifts the ISO 717-1 reference curve and
+returns the rating read at 500 Hz, plus the spectrum adaptation terms C and
+$C_{tr}$. For the measured spectrum used below, `w.rating, w.c, w.ctr` prints
+`30 -2 -3`: $R_w(C;C_{tr}) = 30(-2;-3)$. The same call rates $R'$, $D_n$ and
+$D_{nT}$.
+
 ## Field insulation and single-number ratings (ISO 16283-1, ISO 717-1)
 
 To rate a wall or floor, measure the energy-average level in the **source**
@@ -1100,6 +1109,37 @@ plt.show()
 	description="One-page survey-method façade sound insulation field report: the metadata header, the octave-band D2m,nT table beside the measured-versus-shifted-reference curve, the boxed D2m,nT,w (C; Ctr) rating, the survey-method statement and a PASS verdict."
 	caption="Survey façade fiche (SurveyFacadeResult.report), D2m,nT,w (C; Ctr)."
 />
+
+## What this guide covers
+
+**Covered.** ISO 16283-1:2014 (airborne field insulation: the level
+difference, standardized $D_{nT}$ and apparent $R'$ of Clause 3.12-3.15 and
+the Clause 7.8 position averaging), ISO 16283-2:2015 (impact field
+insulation, the same normalisations with the sign flip) and ISO 16283-3:2016
+(façade insulation, the $D_{2m}$/$D_{2m,nT}$/$D_{2m,n}$/$R'_{45°}$/$R'_{tr,s}$
+quantities of the loudspeaker and road-traffic element methods), each rated
+by the ISO 717-1/ISO 717-2 reference-curve method (with the Annex B/A.2.1
+enlarged-range terms) through `building.airborne_insulation`,
+`building.impact_insulation`, `building.facade_insulation` and
+`building.weighted_rating`/`weighted_impact_rating`(`_extended`);
+ISO 12999-1:2020's tabulated standard uncertainties (the Clause 5.2
+measurement situations A/B/C and the Table 8 coverage factors, one- and
+two-sided) via `building.band_uncertainty`, `building.single_number_uncertainty`
+and `building.uncertain_value`; and the ISO 10052:2021 survey method (the
+reverberation index $k$, its Table 4 room-class estimate and the four survey
+quantities) via `building.survey_airborne_insulation` and its siblings.
+
+**Not covered.** Every field function here takes levels that the caller has
+already corrected for background noise (Clause 9.2 of ISO 16283-1); the
+background-noise measurement and correction itself is not implemented.
+ISO 16283-1/-2/-3's own position and procedure requirements (the minimum
+number of source and microphone positions, the low-frequency loudspeaker or
+microphone-sweep procedures) are not checked: energy-averaging happens once
+positions are supplied, but nothing here verifies how many were taken or
+where. The sound-intensity route to the same field quantities
+(ISO 15186-1/-2) is not in this module either: it is `intensity_insulation`
+of the
+[Laboratory Insulation Measurement guide](/phonometry/guides/insulation-lab/).
 
 ## See also
 

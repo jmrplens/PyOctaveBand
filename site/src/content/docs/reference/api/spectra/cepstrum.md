@@ -1,6 +1,6 @@
 ---
 title: "metrology.cepstrum"
-description: "Public API of phonometry.metrology.cepstrum (auto-generated)."
+description: "Cepstral analysis: real/power/complex cepstrum, liftering and echo detection."
 sidebar:
   label: "cepstrum"
 ---

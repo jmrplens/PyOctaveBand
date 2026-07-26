@@ -763,6 +763,39 @@ s_min, s_max = materials.spot_microphone_spacing_bounds(
 print(round(s_min, 3), round(s_max, 3))    # 0.078 0.086  (metros)
 ```
 
+## Qué cubre esta guía
+
+**Cubierto.** El coeficiente de dispersión de incidencia aleatoria de la
+ISO 17497-1:2004+A1:2014 (las relaciones de absorción a partir del tiempo
+de reverberación del apartado 6 y la Fórmula (5)) con los límites de placa
+base de la Tabla 1, mediante `materials.random_incidence_absorption`,
+`materials.specular_absorption_coefficient`, `materials.scattering_coefficient`,
+`materials.scattering_coefficient_spectrum` y
+`materials.check_base_plate_scattering`; el coeficiente de difusión
+direccional y de incidencia aleatoria de la ISO 17497-2:2012 (Fórmulas (5) a
+(8)) mediante `materials.directional_diffusion` y
+`materials.random_incidence_diffusion`, más el modelo de predicción de
+difusor de Fraunhofer de Cox y D'Antonio; la técnica de sustracción de la
+ISO 13472-1:2002 (la propagación geométrica del apartado 4.1, la ventana
+temporal Adrienne del apartado 6.4 y el radio de área muestreada del anexo
+A) mediante `materials.insitu_absorption_spectrum` y sus piezas; y el
+límite de frecuencia de onda plana y la geometría de separación de
+micrófonos del método puntual de la ISO 13472-2:2010.
+
+**No cubierto.** Ambas normas de absorción in situ de pavimentos se han
+revisado desde entonces (ISO 13472-1:2022, ISO 13472-2:2025); aquí solo
+están implementadas las ediciones anteriores de 2002 y 2010, como indican
+las notas de referencia de arriba. El procesado de función de transferencia
+propio de la ISO 13472-2 tampoco está implementado en este módulo: solo se
+proporcionan la geometría y las funciones de validación, y el DSP de dos
+micrófonos real es la rutina ISO 10534-2 de la
+[guía de Materiales Acústicos](/phonometry/es/guides/materials/). El modelo
+de predicción de difusor de Fraunhofer es una estimación de diseño, no
+forma parte de la ISO 17497-2 en sí, y sus propios límites declarados
+(pierde precisión a baja frecuencia, en ángulos rasantes y para superficies
+muy absorbentes, e ignora la difracción de borde) hacen que no sustituya a
+una medición real del coeficiente de difusión.
+
 ## Véase también
 
 - [Propagación en exteriores](/phonometry/es/guides/outdoor-propagation/): el

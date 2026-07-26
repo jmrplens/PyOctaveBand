@@ -330,6 +330,28 @@ res.report(
 	caption="Mechanical-mobility fiche (MobilityResult.report): the FRF characteristic points and the mobility magnitude spectrum."
 />
 
+## What this guide covers
+
+**Covered.** ISO 7626-1:2011's FRF family (Table 1): receptance, mobility
+and accelerance, with their force-per-motion reciprocals, moved between
+through `convert_frf`. Also covered are the driving-point/transfer
+distinction and the closed-form SDOF resonator used as their reference
+(`sdof_receptance`, `sdof_mobility`, `sdof_accelerance`,
+`resonance_frequency`, `sdof_mobility_result`). On the measurement side,
+ISO 7626-2:2015's H1 processing of random excitation is covered too
+(`transfer_function`, `coherence`, shared with the electroacoustics guide),
+along with two acceptance criteria: the 7.5.2 rigid-mass operational
+calibration (`rigid_mass_calibration_check`) and the Annex A random-error
+criterion (`random_error_percent`).
+
+**Not covered.** ISO 7626-5 covers impact-hammer excitation as an
+alternative to the attached exciter. It is named here for context only: no
+function synthesizes or processes an impact-excitation spectrum. The
+*blocked* matrix quantities of Table 1, needed for multi-coordinate
+systems, are not built either. `convert_frf` returns only the element-wise
+*free* reciprocals of ISO 7626-1, 3.1.4, correct for driving-point or
+single-path use but not for a full FRF matrix.
+
 ## See also
 
 - API reference: [`vibration.mechanical_mobility`](/phonometry/reference/api/vibration/mechanical-mobility/).

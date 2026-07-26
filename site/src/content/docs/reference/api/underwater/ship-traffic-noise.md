@@ -1,6 +1,6 @@
 ---
 title: "underwater.ship_traffic_noise"
-description: "Public API of phonometry.underwater.ship_traffic_noise (auto-generated)."
+description: "Predicted source-level spectrum of shipping traffic (semi-empirical models)."
 sidebar:
   label: "ship_traffic_noise"
 ---

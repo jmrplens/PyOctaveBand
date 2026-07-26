@@ -24,15 +24,19 @@ import { apiSidebar } from '../generated/api-sidebar.mjs';
 // that is a one-word edit, `collapsed: false` on the groups concerned.
 export const sidebar = [
   {
-    // The only group without an Overview row, on purpose: it is two
-    // rows long and "Getting started" is already its front door, so an
-    // overview page here would only restate the row below it.
+    // The only group without an Overview row, on purpose: "Getting started"
+    // is already its front door, so an overview page here would only restate
+    // the row below it.
     label: 'Start',
     translations: { es: 'Inicio' },
     collapsed: true,
     items: [
       'getting-started',
+      // The map of the nine areas. A sibling entry point rather than a parent:
+      // the area overviews stay the breadcrumb ancestors of their own guides.
+      { slug: 'guides', label: 'All guides', translations: { es: 'Todas las guías' } },
       'reference/why-phonometry',
+      'about',
     ],
   },
   {
@@ -298,7 +302,17 @@ export const sidebar = [
         ],
       },
       'reference/conformance',
+      // Next to the conformance report on purpose: the two pages are the same
+      // evidence story seen from both sides, what the library computes against
+      // the standard, and where the printed standard is the thing that is
+      // wrong. They cross-link each other.
+      {
+        slug: 'reference/errata',
+        label: 'Errata in published sources',
+        translations: { es: 'Erratas de las fuentes publicadas' },
+      },
       'reference/bibliography',
+      'reference/glossary',
     ],
   },
   // The generated API tree, kept as its own top-level group so the

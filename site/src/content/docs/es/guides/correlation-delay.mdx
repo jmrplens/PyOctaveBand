@@ -404,3 +404,27 @@ La envolvente de Hilbert de aquí es la compañera en el tiempo del
 las mismas modulaciones como líneas discretas en frecuencia; y la alineación
 submuestral comparte su núcleo de banda limitada con las
 [herramientas públicas de retardo fraccionario y remuestreo](/phonometry/es/guides/test-signals/).
+
+## Qué cubre esta guía
+
+**Cubierto.** El capítulo 5, la sección 8.4 y el capítulo 13 de Bendat y
+Piersol: `correlation` con las normalizaciones sesgada, insesgada y
+coeficiente y sus fórmulas de error aleatorio (ecuaciones 8.109/8.112);
+`time_delay` con los métodos directo, de pendiente de fase y la correlación
+cruzada generalizada de Knapp y Carter (1976), incluidas las ponderaciones
+Roth, SCOT, PHAT y de máxima verosimilitud de su Tabla I; la incertidumbre
+de localización del pico de la ecuación 8.129; `impulse_response_delay` y
+`align_impulse_responses`; y la `envelope` de Hilbert con fase y frecuencia
+instantáneas (capítulo 13).
+
+**No cubierto.** `correlation` y `time_delay` modelan un único retardo de
+camino común entre exactamente dos sensores (el modelo
+`y(t) = α·x(t-τ0) + n(t)` de la ecuación 5.21). Un registro con varias
+llegadas (multitrayecto, un camino directo más reflexiones) no se separa
+automáticamente: `time_delay` y el correlador directo solo informan el
+mayor pico, la misma limitación que `echo_detection` señala en el cepstro
+dentro de [Cepstro, ecos y espectro de la
+envolvente](/phonometry/es/guides/cepstrum-echoes/). Estimar retardos entre
+más de dos sensores, como haría una matriz o un beamformer, implica llamar
+tú mismo a estas funciones por pares: no hay un solucionador TDOA
+multisensor incorporado.

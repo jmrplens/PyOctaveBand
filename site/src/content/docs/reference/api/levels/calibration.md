@@ -1,6 +1,6 @@
 ---
 title: "metrology.calibration"
-description: "Public API of phonometry.metrology.calibration (auto-generated)."
+description: "Calibration utilities for mapping digital signals to physical SPL levels."
 sidebar:
   label: "calibration"
 ---

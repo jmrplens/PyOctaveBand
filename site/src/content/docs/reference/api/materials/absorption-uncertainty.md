@@ -1,6 +1,6 @@
 ---
 title: "materials.absorption_uncertainty"
-description: "Public API of phonometry.materials.absorption_uncertainty (auto-generated)."
+description: "Measurement uncertainty for sound absorption (ISO 12999-2:2020)."
 sidebar:
   label: "absorption_uncertainty"
 ---

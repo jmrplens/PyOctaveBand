@@ -1,9 +1,10 @@
 ---
 title: "Por qué phonometry"
-description: "La filosofía de diseño basada en conformidad: un caso de estudio de ponderación temporal IEC 61672-1, 371 comprobaciones frente a 235 normas y comparación con otras librerías."
+description: "La filosofía de diseño basada en conformidad: un caso de estudio de ponderación temporal IEC 61672-1, la batería numérica de conformidad y comparación con otras librerías."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
+import { totalChecks, domains, standards } from '../../../../data/conformance-stats.mjs';
 
 phonometry es un conjunto de herramientas de medición acústica basado en
 normas. Su elemento diferenciador no es la lista de funcionalidades, sino cómo
@@ -110,8 +111,8 @@ metrología:
 | IEC 60942:2017 Tabla 2 | Límites de estabilidad a corto plazo del calibrador (dependientes de la frecuencia, clase 1) en `sensitivity()` | `tests/test_calibration_validation.py` |
 
 La misma disciplina se aplica mucho más allá del núcleo de metrología: hoy la
-batería ejecuta 371 comprobaciones numéricas de conformidad en 46 dominios y
-235 normas, que abarcan la psicoacústica, la acústica de salas y edificación,
+batería ejecuta {totalChecks} comprobaciones numéricas de conformidad en {domains} dominios y
+{standards} normas, que abarcan la psicoacústica, la acústica de salas y edificación,
 la vibración, el ruido ambiental, aeronáutico y submarino, la electroacústica
 y la sonoridad de radiodifusión. El informe numérico completo (el valor
 esperado y el valor que calcula la librería para cada comprobación, regenerado

@@ -1,6 +1,6 @@
 ---
 title: "broadcast.program_loudness"
-description: "Public API of phonometry.broadcast.program_loudness (auto-generated)."
+description: "Programme loudness and true-peak level (ITU-R BS.1770-5, EBU R 128)."
 sidebar:
   label: "program_loudness"
 ---

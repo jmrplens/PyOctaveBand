@@ -1,6 +1,6 @@
 ---
 title: "aircraft.rotorcraft_noise"
-description: "Public API of phonometry.aircraft.rotorcraft_noise (auto-generated)."
+description: "Rotorcraft noise by the hemisphere method (ECAC Doc 32 / NORAH2)."
 sidebar:
   label: "rotorcraft_noise"
 ---

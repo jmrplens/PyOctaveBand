@@ -61,9 +61,11 @@ if (!description?.trim()) {
 	throw new Error(`ReportPreview requires a non-empty description (name: ${name})`);
 }
 
+import { mediaUrl } from '../lib/media.mjs';
+
 const t = Astro.locals.t;
-const pdf = `${REPORTS}/${name}.pdf`;
-const webp = `${REPORTS}/${name}.webp`;
+const pdf = mediaUrl(`${REPORTS}/${name}.pdf`);
+const webp = mediaUrl(`${REPORTS}/${name}.webp`);
 const descId = `${(id ?? name).replaceAll('_', '-')}-desc`;
 ---
 
