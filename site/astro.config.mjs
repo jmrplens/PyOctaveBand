@@ -271,12 +271,25 @@ const topicName = (topic) =>
  */
 const personNode = (() => {
   const canonical = canonicalPerson.knowsAbout ?? [];
-  const seen = new Set(canonical.map((t) => topicName(t).toLowerCase()));
+  const seenNames = new Set(canonical.map((t) => topicName(t).toLowerCase()));
+  // De-duplicating on the label alone is not enough. This project lists
+  // "Embedded system" where the canonical says "Embedded Systems", and both
+  // carry Wikidata Q193040 — so a name comparison let both through and emitted
+  // two Thing nodes under one @id with conflicting names. That is the exact
+  // contradiction this change exists to remove, reintroduced one level down.
+  // The @id is the identity; the label is only how a document spells it.
+  const seenIds = new Set(
+    canonical
+      .map((t) => (typeof t === 'object' ? t['@id'] : undefined))
+      .filter(Boolean),
+  );
   return {
     ...canonicalPerson,
     knowsAbout: [
       ...canonical,
-      ...projectTopics.filter((t) => !seen.has(topicName(t).toLowerCase())),
+      ...projectTopics.filter(
+        (t) => !seenNames.has(topicName(t).toLowerCase()) && !seenIds.has(t['@id']),
+      ),
     ],
   };
 })();
