@@ -78,8 +78,13 @@ right line of a fourteen-entry list.
 ### Presentation: one outlined pill per source
 
 Settled. Each chip is a 12 px label in a fully rounded 1 px outline, tinted by
-category (standards teal, named works amber), with a faint category fill on
-hover and focus. Nothing is filled at rest.
+category (standards in the palette accent, named works in its warm mirror),
+with a faint category fill on hover and focus. Nothing is filled at rest.
+
+The category colours were retuned when this branch met the `instrument`
+palette; see INTEGRATION-NOTES.md for the numbers. They now live with the
+rest of the palette in `src/styles/theme.css` as the `--ph-chip-*` tokens,
+and `ux-variants.css` only references them.
 
 The reasoning: the chips are links, and as plain text they looked exactly like
 prose, so their clickability was undiscoverable. An outline is the smallest
@@ -104,25 +109,11 @@ key `apiStyle`:
 
 The pill outline is a decoration in the sense that the link is identified by
 its text, but it is the only thing that draws the pill, so it is held to the
-3:1 of WCAG 1.4.11 rather than left as a hairline. The alphas are the lowest
-that clear it, measured on the composited colour against the page background:
-
-| | dark | light |
-| --- | --- | --- |
-| standards border | 50 % alpha, 3.60:1 | 80 % alpha, 3.33:1 |
-| works border | 50 % alpha, 3.32:1 | 90 % alpha, 3.40:1 |
-| standards text | 12.16:1 | 7.87:1 |
-| works text | 10.56:1 | 6.61:1 |
-
-Dark was already close and cost nothing. Light had to go from 35 % to 80 and
-90 %, which is a visible change: the outlines go from a whisper to a defined
-thin stroke. I judged that as the pills gaining an edge rather than gaining
-weight, since the text size, the padding, the radius and the spacing are all
-untouched from the version that was approved, and the light amber cannot
-reach 3:1 at all below 85 % because solid `#a8760a` on white is only 3.99:1.
-If it reads too crisp on the real screen, the two `--chip-*-line` values in
-`src/styles/ux-variants.css` are the single place to soften it, at the cost
-of the criterion.
+3:1 of WCAG 1.4.11 rather than left as a hairline. The borders are opaque
+colours now rather than alphas over the ground, which is what let them move
+into the palette; `scripts/check-contrast.mjs` measures all of them on every
+run, text and border, on the page and on the hover fill. The current numbers
+are in INTEGRATION-NOTES.md.
 
 ### Which sources survive the cap
 
@@ -232,10 +223,11 @@ an API page:
   eight chips and with one. The caps produce `+12 more` on the heaviest page.
   Pages without a `references` block render no markup at all.
 - The run stays on one line at 1440 px on the densest page.
-- Contrast, measured on the composited colours (see the table above): borders
-  3.60:1 and 3.32:1 dark, 3.33:1 and 3.40:1 light, all clearing 3:1; text
-  12.16:1 and 10.56:1 dark, 7.87:1 and 6.61:1 light, all clearing the 4.5:1
-  that 12 px text needs. Measure these after the theme transition settles: the
+- Contrast: every border clears 3:1 and every label clears the 4.5:1 that
+  12 px text needs, in both themes. The colours have since been retuned into
+  the `instrument` palette and the numbers are now produced by
+  `scripts/check-contrast.mjs` rather than written down here; see
+  INTEGRATION-NOTES.md. Measure these after the theme transition settles: the
   0.12 s border transition makes a synchronous read return the previous
   theme's colour, which is how I first mis-measured them.
 - The `primary: true` flag was exercised end to end by flagging one entry on
