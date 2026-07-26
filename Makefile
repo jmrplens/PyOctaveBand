@@ -96,6 +96,13 @@ api-docs:
 site-reports:
 	$(PYTHON) scripts/generate_site_reports.py
 
+# Lighthouse over a fixed sample of built pages, against a local preview
+# server (BASE_URL overrides for the live site; `-- --desktop` for desktop
+# throttling). Needs `pnpm build` in site/ first; summary on stdout, JSON
+# reports in site/lighthouse-results/ (gitignored).
+lighthouse:
+	cd site && pnpm run lighthouse
+
 # Regenerate the committed example .report() fiches under .github/reports/,
 # which the documentation links to as rendered normative-report examples.
 # Not byte-checked in CI (the embedded vector plot differs by ~1 ULP across
@@ -139,5 +146,5 @@ coverage:
 
 check: lint security test
 
-.PHONY: install lint format security snyk sonar graphs reports animations posters og \
+.PHONY: install lint format security snyk sonar graphs reports animations posters og lighthouse \
 	llms api-docs site-reports conformance install-hooks test coverage check
