@@ -253,6 +253,9 @@ export default defineConfig({
         // Default article body plus the unified APA-7 references section
         // rendered from the typed frontmatter bibliography.
         MarkdownContent: './src/components/MarkdownContent.astro',
+        // Default H1 plus the page header chips run derived from the page's
+        // own `references` frontmatter (see TOC-REDESIGN-NOTES.md).
+        PageTitle: './src/components/PageTitle.astro',
       },
       customCss: [
         // The site palette. Unlayered, so its `:root` blocks win over
@@ -265,6 +268,7 @@ export default defineConfig({
         './src/styles/splash-menu.css',
         './src/styles/home.css',
         './src/styles/sidebar.css',
+        './src/styles/ux-variants.css',
       ],
       social: [
         { icon: 'github', label: 'GitHub', href: 'https://github.com/jmrplens/phonometry' },

@@ -22,6 +22,15 @@ const referenceBase = {
     .optional(),
   /** One or two sentences tying the work to this page (what it anchors here). */
   note: z.string().optional(),
+  /**
+   * Marks a load-bearing entry: the standard the page actually implements, or
+   * the work its method is named after. The page header chips run
+   * (src/components/PageChips.astro) shows a capped number of entries, and
+   * marked ones are shown first, so a page with a long bibliography still
+   * advertises the right sources. Everything else keeps frontmatter order.
+   * Optional: a page that marks nothing simply falls back to that order.
+   */
+  primary: z.boolean().optional(),
 };
 
 /** Pre-formatted APA names, one per author: "Surname, I. I.". */

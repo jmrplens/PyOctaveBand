@@ -1,0 +1,15 @@
+---
+/**
+ * Default Starlight page title plus the page header chips run.
+ *
+ * The override exists only to give PageChips.astro a mount point directly
+ * under the H1, inside the page header band and above the content divider.
+ * Everything the run shows comes from the page's own `references` frontmatter;
+ * see PageChips.astro and src/lib/reference-chips.ts.
+ */
+import Default from '@astrojs/starlight/components/PageTitle.astro';
+import PageChips from './PageChips.astro';
+---
+
+<Default><slot /></Default>
+<PageChips />

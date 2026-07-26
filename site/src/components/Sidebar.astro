@@ -9,13 +9,42 @@
   imports below use the public `@astrojs/starlight/components/*` paths
   instead of upstream's `virtual:starlight/*` modules, so a future component
   override of `MobileMenuFooter` would not be picked up here.
+
+  API sidebar experiment (see TOC-REDESIGN-NOTES.md): a "Guides" back link is
+  always rendered and only displayed in the split API treatment on API pages
+  (`data-api-style='split'` plus `data-area='api'`, ux-variants.css), where
+  the guide groups are hidden from the tree. It comes out if the split is
+  ever done with `starlight-sidebar-topics`, which brings its own switcher.
 */
 import MobileMenuFooter from '@astrojs/starlight/components/MobileMenuFooter.astro';
 import SidebarPersister from '@astrojs/starlight/components/SidebarPersister.astro';
 import SidebarSublist from './SidebarSublist.astro';
 
 const { sidebar } = Astro.locals.starlightRoute;
+
+const isEs = Astro.currentLocale === 'es';
+const base = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
+const guidesHref = `${base}/${isEs ? 'es/' : ''}getting-started/`;
+const guidesLabel = isEs ? 'Guías' : 'Guides';
 ---
+
+<a class="topic-back" href={guidesHref}>
+	<svg
+		aria-hidden="true"
+		width="14"
+		height="14"
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		stroke-width="2.5"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+	>
+		<line x1="19" y1="12" x2="5" y2="12" />
+		<polyline points="12 19 5 12 12 5" />
+	</svg>
+	{guidesLabel}
+</a>
 
 <SidebarPersister>
 	<SidebarSublist sublist={sidebar} />

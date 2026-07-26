@@ -12,6 +12,14 @@
     Groups without a marked landing page render as a static heading.
   - `aria-current="page"` moves to the label link when the landing page is
     the current page, so highlighting keeps working.
+  - The API reference group (the one whose landing page is `reference/api`)
+    is marked with an `api-group` class and gets a caret toggle button, so
+    the API sidebar treatments can fold it away without re-rendering. The
+    caret is hidden unless the "collapsed" treatment is active; see
+    `src/styles/ux-variants.css` and the switcher in `Head.astro`. This is
+    the only part of the file that is not upstream behaviour plus the
+    overview-first convention, and it comes out if the API split is ever done
+    with `starlight-sidebar-topics` instead.
 */
 import type { StarlightRouteData } from '@astrojs/starlight/route-data';
 import { Badge } from '@astrojs/starlight/components';
@@ -43,6 +51,11 @@ function toModel(entry: SidebarGroup): GroupModel {
 		? { group: entry, landing: first, children: rest }
 		: { group: entry, landing: undefined, children: entry.entries };
 }
+
+/** True for the API reference group (landing page `reference/api`). */
+function isApiGroup(landing: SidebarLink | undefined): boolean {
+	return landing ? /\/reference\/api\/?$/.test(landing.href) : false;
+}
 ---
 
 <ul class:list={{ 'top-level': !nested }}>
@@ -70,6 +83,7 @@ function toModel(entry: SidebarGroup): GroupModel {
 				);
 			}
 			const { group, landing, children } = toModel(entry);
+			const apiGroup = isApiGroup(landing);
 			// Forward any custom link attributes from the consumed landing entry,
 			// except the internal `data-group-link` marker itself.
 			const {
@@ -77,24 +91,53 @@ function toModel(entry: SidebarGroup): GroupModel {
 				class: landingClass,
 				...landingAttrs
 			} = landing?.attrs ?? {};
+			const labelLink = landing ? (
+				<a
+					class:list={['group-label', landingClass]}
+					href={landing.href}
+					aria-current={landing.isCurrent ? 'page' : undefined}
+					{...landingAttrs}
+				>
+					<span class="large">{group.label}</span>
+					{group.badge && (
+						<Badge
+							variant={group.badge.variant}
+							class={group.badge.class}
+							text={group.badge.text}
+						/>
+					)}
+				</a>
+			) : undefined;
 			return (
-				<li>
+				<li class:list={[{ 'api-group': apiGroup }]}>
 					{landing ? (
-						<a
-							class:list={['group-label', landingClass]}
-							href={landing.href}
-							aria-current={landing.isCurrent ? 'page' : undefined}
-							{...landingAttrs}
-						>
-							<span class="large">{group.label}</span>
-							{group.badge && (
-								<Badge
-									variant={group.badge.variant}
-									class={group.badge.class}
-									text={group.badge.text}
-								/>
-							)}
-						</a>
+						apiGroup ? (
+							<span class="group-label-row">
+								{labelLink}
+								<button
+									type="button"
+									class="api-caret"
+									aria-expanded="true"
+									aria-label={`${group.label} (toggle)`}
+								>
+									<svg
+										aria-hidden="true"
+										width="14"
+										height="14"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<polyline points="6 9 12 15 18 9" />
+									</svg>
+								</button>
+							</span>
+						) : (
+							labelLink
+						)
 					) : (
 						<span class="group-label">
 							<span class="large">{group.label}</span>
@@ -146,6 +189,48 @@ function toModel(entry: SidebarGroup): GroupModel {
 			display: block;
 			padding: 0.2em var(--sl-sidebar-item-padding-inline);
 			line-height: 1.4;
+		}
+
+		/* API reference group only: label plus its fold toggle. */
+		.group-label-row {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 0.25rem;
+		}
+
+		.group-label-row > .group-label {
+			flex: 1 1 auto;
+			min-width: 0;
+		}
+
+		.api-caret {
+			display: none;
+			flex: 0 0 auto;
+			align-items: center;
+			justify-content: center;
+			inline-size: 1.5rem;
+			block-size: 1.5rem;
+			padding: 0;
+			border: 0;
+			border-radius: 0.25rem;
+			background: transparent;
+			color: var(--sl-color-gray-2);
+			cursor: pointer;
+		}
+
+		.api-caret:hover,
+		.api-caret:focus-visible {
+			color: var(--sl-color-white);
+			background: var(--sl-color-gray-6);
+		}
+
+		.api-caret svg {
+			transition: transform 0.15s ease;
+		}
+
+		.api-caret[aria-expanded='false'] svg {
+			transform: rotate(-90deg);
 		}
 
 		a {
