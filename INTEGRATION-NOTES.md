@@ -320,6 +320,80 @@ the section is for (defending a result rather than producing one), what each
 of the three does, and the note that a function signature is in the API
 reference next door. It is not a table of contents with sentences around it.
 
+### One type treatment per depth
+
+On the phone, in dark mode, some rows of the drawer looked bold and set in a
+different typeface from the rows above and below them. There is no second
+typeface: the site has one, `--__sl-font`, and `getComputedStyle` returns the
+same `-apple-system` stack for every row in the tree. What differed was three
+declarations at once, all of them upstream's, in `SidebarSublist.astro`:
+
+| At the second level | nested group (`<summary>` `.large`) | page (`<a>`) |
+| --- | --- | --- |
+| `font-weight` | **600** | none, so 400 |
+| `color` | **`--sl-color-white`** | `--sl-color-gray-2` |
+| `font-size` below 50rem | 14px (mine, `ul ul summary .large`) | none, so the body's **16px** |
+| `font-size` at 50rem and up | 14px | 14px (`a { font-size: var(--sl-text-sm) }`) |
+| `font-family`, `letter-spacing` | identical | identical |
+
+Upstream only ever styles a group label; a page link is left at the body's
+weight and size and at the dimmer ink. In the drawer that produced an
+inversion: the page row was **bigger** than the group row above it and yet
+read as less important, being lighter in both senses. Three signals
+disagreeing is what reads as a different face, and it is why Psychoacoustics
+and Speech looked like one kind of thing and Acoustic Materials and Surface
+Scattering like another, when they sit at the same level of the same tree.
+
+**Now every row from the second level down shares size, weight and ink, and
+the shared weight is 600.** Three declarations do it:
+
+```css
+#starlight__sidebar ul ul summary .large,
+#starlight__sidebar ul ul a {
+  font-size: var(--sl-text-sm);
+  font-weight: 600;
+}
+#starlight__sidebar ul ul summary .large {
+  color: var(--sl-color-gray-2);
+}
+```
+
+The links are bolded up and the group labels are brought down from white to
+the row ink, which is the direction that matters: it leaves `[aria-current]`
+completely untouched, so the current page keeps upstream's filled accent pill
+and stays the only strong colour in a tree of 269 rows. Group versus page is
+now carried by the caret and by the indent rule, which is where a disclosure
+belongs. The top-level headings keep their own step above all of it, on case,
+tracking, size and the brighter `--sl-color-gray-1`, and they no longer have
+to compete on weight with the rows beneath them.
+
+The hover on a group label was accent-high while a link's hover is white; the
+two rows are now the same kind of row, so they hover the same way.
+
+**The `Overview` rows match, deliberately.** The argument for keeping them
+quieter is that an overview is a different kind of row, a group's front door
+rather than one of its pages. The argument against it is the bug itself: in
+`Materials and surfaces` the Overview row sits in a list of four ordinary
+pages, and in the API reference it sits above twenty category groups, so
+setting it apart re-creates exactly the mismatch this section is about. It is
+a page with a URL like any other, it is identifiable by its label and by
+always being first, and on a section landing page it is the row that carries
+the marker. It reads like its siblings.
+
+**On bold everywhere, with 269 rows.** My own reservation before doing it was
+that bolding a tree this long flattens it and reads heavy. Captured both ways
+and compared, it does not, and the reason is the ink: the shared weight came
+with a step **down** in colour for the group labels, not a step up for the
+pages, so nothing glows. Hierarchy survives on the cues that were doing the
+work anyway, size (13px uppercase / 14px / 13px), the indent rules, the
+carets, the hairline separators and the accent pill. On a phone in dark mode
+600 at 13px is also the more legible of the two: thin small type on a dark
+ground is where this sidebar was weakest. The alternative, one consistent
+*regular* weight with bold kept for the current page and the top-level
+headings, is calmer and equally consistent, and it is two tokens away
+(`font-weight: 600` off the shared rule, kept on `[aria-current]`) if the
+quieter tree turns out to be the one I want to live with.
+
 ### The API reference
 
 It is its own top-level group now, last in the tree, after all eleven guide
@@ -365,17 +439,18 @@ on this branch. If I ever want the desktop tree expanded again it is
 | --- | --- | --- |
 | `site/src/components/Sidebar.astro` | 44 | **0** |
 | `site/src/components/SidebarSublist.astro` | 382 | **0** |
-| `site/src/styles/sidebar.css` | 68 | 57 |
-| Sidebar behaviour check | 201 | 202 |
-| **Total** | **695** | **259** |
+| `site/src/styles/sidebar.css` | 68 | 68 |
+| Sidebar behaviour check | 201 | 293 |
+| **Total** | **695** | **361** |
 
-**436 lines removed**, along with 21 hand-built `<button>` disclosures, the
+**334 lines removed**, along with 21 hand-built `<button>` disclosures, the
 `aria-expanded` / `aria-controls` / `aria-label` triple on each of them, the
 server-rendered open state, the `hidden="until-found"` fix from `5dba000e`,
 the caret markup and its CSS, and the sidebar's only client-side script. What
-is left of the sidebar that is mine: 57 lines of CSS, all of it depth cues
-(uppercase eyebrow headers, smaller nested labels, compact deep links) and
-none of it behaviour.
+is left of the sidebar that is mine: 68 lines of CSS, all of it depth cues
+(uppercase eyebrow headers, one type treatment per depth, compact deep links)
+and none of it behaviour. The check grew instead of the code: 91 of those
+lines are the type-treatment gate added with the fix above.
 
 `site/astro.config.mjs` grows from 586 lines to 624: `collapsed: true` on 26
 groups, 24 `Overview` rows written out, the API group moved to the end of the
@@ -390,8 +465,9 @@ tempting, but the behaviour it guarded is still worth a gate, so it becomes
 only the branch holding the current page open on arrival, 25 Overview rows,
 the Overview row marked on a landing page, the API group shut on a guide page
 and open down to the page on an API page in both languages, Enter on a focused
-group label, the open state surviving a navigation, and the browser's own find
-reaching a folded entry.
+group label, the open state surviving a navigation, the browser's own find
+reaching a folded entry, and one type treatment per depth in the drawer, in
+the desktop column and inside the API branch.
 
 ### Verified in a browser
 
@@ -427,7 +503,7 @@ default port is 4321.
 | `pnpm --dir site build` (with the Starlight link validator) | pass: 443 pages, all internal links valid |
 | `pnpm --dir site html-validate` | pass: no findings |
 | pa11y-ci, WCAG2AA | pass: 48 of 48 URLs, 0 errors |
-| `node site/scripts/check-sidebar.mjs` | pass: 21 checks, 0 failing |
+| `node site/scripts/check-sidebar.mjs` | pass: 29 checks, 0 failing |
 | `node site/scripts/check-i18n-parity.mjs` | pass: 101 EN pages each have an ES translation |
 | `node site/scripts/check-contrast.mjs` | pass: 43 pairs, 0 below threshold |
 | `node site/scripts/check-lang-suggest.mjs` | pass: 10 scenarios, 0 failing |
@@ -436,6 +512,18 @@ default port is 4321.
 | `ruff check .` | pass |
 | `mypy src scripts` | pass: 231 source files |
 | `pytest tests/test_api_docs_generator.py` | pass: 20 tests |
+
+Contrast was re-run attentively, because the type fix moved the nested group
+labels off `--sl-color-white` and onto `--sl-color-gray-2`. In the dark theme
+`--sl-color-bg-sidebar` is `#141b20`, the same hex as `--sl-color-bg-nav`, so
+the enforced "body text on nav / sidebar" pair measures the sidebar ground
+exactly: **10.66:1** against a 4.5:1 floor. In the light theme
+`--sl-color-bg-sidebar` resolves to the page ground, where the same ink
+measures 10.95:1. Both are far above the floor, and weight only ever helps a
+ratio, so bolding the rows cannot cost anything here. The row that lost
+contrast is the group label, from 17.39:1 down to 10.66:1 in the dark theme
+and from 17.90:1 down to 10.95:1 in the light one, and it is still more than
+twice the requirement.
 
 443 pages and 101 EN pages, not 441 and 100, because the Reference overview
 exists now in both languages. 48 URLs, not 46, because both of them joined the
@@ -483,10 +571,19 @@ drives its own headless Chrome out of the pnpm store the way
 | `44`, `45` | Reference opened from a guide page: its own Overview row above Theory, Conformance report and Bibliography, with the API reference below it as the last group. |
 | `46` | The Reference overview page itself, arriving with its row marked. |
 | `47`, `48`, `49` | The phone drawer at 390 px, English light and dark and Spanish dark: the whole map in one screen with the reader's branch already open. |
+| `50` | The drawer with a group of nested groups (`Rooms and buildings`) directly above a group of pages (`Materials and surfaces`), which is the pairing that showed the type mismatch. Eight second-level rows, one treatment, carets on the two that open. |
 
 Shots `30` to `46` are cropped to the sidebar pane, which is the whole
-subject; `47` to `49` are the full viewport, because there the drawer covers
+subject; `47` to `50` are the full viewport, because there the drawer covers
 the page; `08` and `09` are the same tree in the context of a full page.
+
+The whole matrix was recaptured after the type fix, not only the tree shots:
+every desktop shot carries the sidebar column, so all of them showed the old
+treatment. Two side effects worth knowing about, both unrelated to the
+sidebar. A round `API` bubble that the dev server floated in the bottom-right
+corner is gone from the new phone and front-page captures. And `10`, `11`,
+`14` to `17` and `21` differ from their committed versions only in that 40x46
+corner, which is how I know the bubble was the only thing that changed there.
 
 Nothing in `integration-shots/` shows a treatment that does not ship any
 more. The eight API shots were recaptured against the stock tree, and the
