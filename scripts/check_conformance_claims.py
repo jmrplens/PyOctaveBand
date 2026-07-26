@@ -53,6 +53,8 @@ CLAIMS: tuple[tuple[re.Pattern[str], str], ...] = (
     # is the only thing keeping them honest.
     (re.compile(r"conformance checks against\s+(\d+)\b"), "standards"),
     (re.compile(r"comprobaciones de conformidad frente a\s+(\d+)\b"), "standards"),
+    (re.compile(r"across\s+(\d+)\s+domains\s+against\s+\d+\s+"), "domains"),
+    (re.compile(r"across\s+\d+\s+domains\s+against\s+(\d+)\s+"), "standards"),
 )
 
 #: Files whose counts are generated or quoted from a fixed historical context.
@@ -80,7 +82,12 @@ def _expected() -> dict[str, int]:
 
 
 def _sources() -> list[pathlib.Path]:
-    """Every prose file that could quote a count."""
+    """Every prose file that could quote a count.
+
+    ``.zenodo.json`` is in here because its description is prose too: it is the
+    text the archived record shows, it states the counts, and it has no build
+    step to interpolate them through.
+    """
     roots = (ROOT / "docs", ROOT / "site" / "src" / "content" / "docs")
     found: list[pathlib.Path] = []
     for root in roots:
@@ -88,11 +95,15 @@ def _sources() -> list[pathlib.Path]:
             continue
         for pattern in ("*.md", "*.mdx"):
             found += sorted(root.rglob(pattern))
-    return [
+    kept = [
         path
         for path in found
         if path not in EXCLUDED and EXCLUDED_DIRS.isdisjoint(path.parts)
     ]
+    zenodo = ROOT / ".zenodo.json"
+    if zenodo.is_file():
+        kept.append(zenodo)
+    return kept
 
 
 def main() -> int:
