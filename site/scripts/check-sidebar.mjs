@@ -96,7 +96,9 @@ const readState = () => {
 	]);
 	expect('the current page is marked', state.current, 'Loudness');
 	expect('and it is on screen without scrolling', state.currentVisible, true);
-	expect('every group with a landing page offers an Overview row', state.overviewRows, 24);
+	// 22 guide sections, plus Theory, Reference and the API reference. Start is
+	// the one group without an Overview row, on purpose.
+	expect('every group with a landing page offers an Overview row', state.overviewRows, 25);
 	expect('no API page link is visible', state.apiLinksVisible, 0);
 	expect('while every one of them stays in the document', state.apiLinksInDom > 100, true);
 
