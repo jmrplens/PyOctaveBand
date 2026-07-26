@@ -1,6 +1,6 @@
 ---
 title: "aircraft.anp_fleet"
-description: "Public API of phonometry.aircraft.anp_fleet (auto-generated)."
+description: "EASA ANP fleet database bridge for the ECAC Doc 29 airport-noise chain."
 sidebar:
   label: "anp_fleet"
 ---

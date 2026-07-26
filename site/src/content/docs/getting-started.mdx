@@ -4,6 +4,14 @@ description: "Install phonometry and run your first fractional octave analysis."
 ---
 
 import ThemeImage from '../../components/ThemeImage.astro';
+import { totalChecks } from '../../data/conformance-stats.mjs';
+
+phonometry is a Python toolkit for acoustic measurement, from fractional
+octave filter banks and frequency weighting to sound levels and standardized
+metrics. Every metric is verified against its governing standard, {totalChecks}
+numerical checks in all. Install it with `pip install phonometry`; the first
+example below filters a signal into one-third octave bands and returns the
+sound pressure level of each band.
 
 ## Installation
 
@@ -142,6 +150,6 @@ normative PDF fiche.
 - [Filter Banks](/phonometry/guides/filter-banks/): choose an architecture and inspect responses
 - [Calibration and dBFS](/phonometry/guides/calibration/): get real-world SPL values
 - [Why phonometry](/phonometry/reference/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](/phonometry/reference/conformance/): the expected and computed value of all 371 checks
+- [Conformance report](/phonometry/reference/conformance/): the expected and computed value of all {totalChecks} checks
 - [API Reference](/phonometry/reference/api/): every parameter of every function
 - [Bibliography](/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link

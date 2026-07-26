@@ -1,6 +1,6 @@
 ---
 title: "building.building_prediction"
-description: "Public API of phonometry.building.building_prediction (auto-generated)."
+description: "Building acoustic performance prediction (EN 12354-1/-2:2000)."
 sidebar:
   label: "building_prediction"
 ---

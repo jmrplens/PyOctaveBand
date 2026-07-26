@@ -1,6 +1,6 @@
 ---
 title: "simulation.fdtd"
-description: "Public API of phonometry.simulation.fdtd (auto-generated)."
+description: "2D acoustic finite-difference time-domain (FDTD) simulation."
 sidebar:
   label: "fdtd"
 ---

@@ -1,6 +1,6 @@
 ---
 title: "materials.road_absorption"
-description: "Public API of phonometry.materials.road_absorption (auto-generated)."
+description: "In-situ sound absorption of road surfaces (ISO 13472-1 / ISO 13472-2)."
 sidebar:
   label: "road_absorption"
 ---

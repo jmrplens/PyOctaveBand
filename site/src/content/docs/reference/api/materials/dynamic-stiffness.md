@@ -1,6 +1,6 @@
 ---
 title: "materials.dynamic_stiffness"
-description: "Public API of phonometry.materials.dynamic_stiffness (auto-generated)."
+description: "Dynamic stiffness of resilient materials under floating floors (EN 29052-1:1992)."
 sidebar:
   label: "dynamic_stiffness"
 ---

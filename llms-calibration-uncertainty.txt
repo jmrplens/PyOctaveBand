@@ -1,0 +1,995 @@
+# phonometry: calibration uncertainty
+
+Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages in this area.
+
+---
+
+<!-- source: docs/calibration.md | canonical: https://jmrplens.github.io/phonometry/guides/calibration/ -->
+Source: https://jmrplens.github.io/phonometry/guides/calibration/
+
+# Calibration and dBFS
+
+Every level this library reports is only as trustworthy as the one number
+this page produces: the sensitivity factor that converts digital units into
+pascals. The page covers both reference frames a recording can be analyzed
+in: physical **dB SPL**, obtained by calibrating the chain against an
+IEC 60942 acoustic calibrator, and digital **dBFS**, levels relative to
+full scale with no physical claim attached.
+
+Choosing between them is a question about your measurement chain, not
+about preference. Work in dB SPL whenever the result faces a physical
+criterion (a noise limit, an exposure threshold, any acoustics standard);
+that requires a calibrator recording made through the *same, untouched*
+chain as the measurement. Work in dBFS when the signal never had a
+calibrated analog front end (loudness normalization, codec and interface
+tests, file-only analysis) or when no calibration tone exists, in which
+case absolute SPL statements are simply out of reach.
+
+The workflow around the factor matters as much as the formula: derive it
+before and re-check it after each session, verify meter and calibrator
+periodically in the laboratory (IEC 61672-3 and IEC 60942; Bies, Hansen &
+Howard 2017, §3.4), and treat the pre/post difference as your drift bound.
+The field, laboratory and drift section below turns that into concrete
+rules, and the [Build a sound level meter](https://jmrplens.github.io/phonometry/guides/sound-level-meter/)
+walkthrough starts from exactly this step before any level is computed.
+
+## Why calibrate? The theory
+
+A digital recording only knows *numbers*: a full-scale sine wave is ±1.0
+regardless of whether it was a whisper or a jet engine. To report physical
+sound pressure levels the chain microphone → preamplifier → ADC must be
+characterized by a single number, the **sensitivity factor** $S$, that
+converts digital units into pascals:
+
+$$
+p(t) = S\ x(t) \qquad S = \frac{p_\text{ref}\cdot 10^{L_\text{cal}/20}}{\tilde{x}_\text{ref}}
+$$
+
+where $L_\text{cal}$ is the calibrator's level (typically 94 dB, i.e. 1 Pa),
+$p_\text{ref} = 20\ \mu\text{Pa}$ and $\tilde{x}_\text{ref}$ is the RMS of
+the recorded calibration tone in digital units. `sensitivity()` is
+exactly that equation. The factor is valid as long as nothing in the chain
+changes: touch the gain knob and you must recalibrate.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_calibration_setup_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_calibration_setup.svg" alt="Calibration chain: sound calibrator coupled on the microphone, preamplifier, ADC and sensitivity producing pascals per digital unit" width="92%"></picture>
+
+## Physical Calibration (Sound Level Meter)
+
+To get accurate SPL measurements from a digital recording, you must first
+calculate the sensitivity of your measurement chain using a reference tone
+(e.g., 94 dB @ 1 kHz).
+
+```mermaid
+flowchart LR
+    A["Calibrator tone\n94 dB @ 1 kHz\n(IEC 60942)"] --> B["Recording\ncalibrator_recording"]
+    B --> C["sensitivity()"]
+    C --> D["calibration_factor\n(digital units → Pa)"]
+    D --> E["octave_filter / leq / laeq / ln_levels"]
+    F["Measurement\nrecording"] --> E
+    E --> G["Levels in dB SPL\n(re 20 µPa)"]
+```
+
+```python
+import numpy as np
+from phonometry import metrology
+
+# 1. Record your 94 dB calibrator signal (1 kHz, 1 Pa RMS = 94 dB SPL)
+fs = 48000
+# calibrator_recording: your recorded 1 kHz calibrator tone (1 Pa RMS = 94 dB SPL).
+#   Synthesized here so the guide runs; in a real measurement, record your calibrator.
+calibrator_recording = np.sqrt(2) * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+# recording: the mic capture you want to calibrate, same input chain (Pa after calibration).
+#   Synthesized here; in a real measurement this is your recorded signal.
+recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+
+# 2. Calculate the sensitivity factor
+calibration_factor = metrology.sensitivity(calibrator_recording, target_spl=94.0, fs=fs)
+
+# 3. Apply calibration to your measurements
+spl, freq = metrology.octave_filter(recording, fs, calibration_factor=calibration_factor)
+# Now 'spl' values are in real-world dB SPL!
+```
+
+The same `calibration_factor` works across the whole library: `octave_filter`,
+`OctaveFilterBank`, `leq`, `laeq` and `ln_levels`.
+
+## Calibrator assumptions (IEC 60942)
+
+`sensitivity` assumes the reference recording comes from an acoustic
+calibrator as specified by **IEC 60942** (classes LS, 1 and 2):
+
+- The default `target_spl=94.0` matches the common 94 dB @ 1 kHz calibrator
+  output (the standard requires the principal level to be at least 90 dB re
+  20 µPa; 94 dB and 114 dB are the usual choices).
+- The resulting sensitivity inherits the calibrator's class tolerance (e.g.
+  ±0.4 dB for a class 1 calibrator between 160 Hz and 1.25 kHz, IEC 60942
+  Table 1) plus the RMS estimation error of your recording.
+- IEC 60942 specifies the generated level as a 20 s average: record a few
+  seconds of *stable* tone (excluding handling noise at the start/end) for the
+  RMS estimate to converge.
+
+### Automatic stability validation
+
+When you pass the sample rate (and `validate=True`, the default),
+`sensitivity(ref, fs=fs)` checks the recording the way
+IEC 60942:2017 checks the calibrator itself (5.3.3): the *short-term level
+fluctuation*, the absolute difference between each of the maximum and minimum
+F-time-weighted levels and the mean level, must not exceed the Table 2 class 1
+limit for the calibrator's nominal frequency (0.07 dB at and above 160 Hz, relaxed
+to 0.10 dB below 160 Hz and 0.20 dB at or below 63 Hz, where the F
+time-weighting itself ripples). Pass `frequency=` to select the right row for non-1 kHz
+calibrators. A `CalibrationWarning` flags badly coupled microphones or handling
+noise before they silently corrupt every calibrated level. The recording must
+be at least 2 s long (1 s for the F-integrator to settle plus 1 s of settled
+envelope); shorter recordings get a warning instead of an unreliable verdict.
+Without `fs` the check is skipped. Override the limit with
+`max_fluctuation_db` or disable with `validate=False`.
+
+The check catches exactly what ruins field calibrations (a loose coupler,
+wind, handling noise):
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/calibration_stability_dark.webp"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/calibration_stability.webp" alt="F-weighted level of a stable calibration tone versus a 3 percent amplitude-modulated one against the plus-minus 0.07 dB IEC 60942 class 1 limit" width="80%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import metrology
+
+fs = 48000
+t = np.arange(int(fs * 6.0)) / fs
+stable = 0.5 * np.sin(2 * np.pi * 1000 * t)
+# 3 % amplitude modulation at 2 Hz: ~0.14 dB of wobble, clearly over
+unstable = stable * (1 + 0.03 * np.sin(2 * np.pi * 2.0 * t))
+
+plt.figure(figsize=(9, 5))
+skip = fs                     # discard the F-integrator attack (~8 tau)
+for x, label in ((stable, "Stable tone (good coupling)"),
+                 (unstable, "3% AM tone (loose coupling)")):
+    env = metrology.time_weighting(x, fs, mode="fast")[skip:]
+    level = 10 * np.log10(np.maximum(env, np.finfo(float).eps))
+    plt.plot(t[skip:], level - level.mean(), label=label)
+for lim in (0.07, -0.07):
+    plt.axhline(lim, linestyle="--", color="gray")
+plt.xlabel("Time [s]")
+plt.ylabel("F-weighted level re mean [dB]")
+plt.legend()
+plt.show()
+```
+
+</details>
+
+### `sensitivity()` parameters
+
+| Parameter | Type / shape | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `ref_signal` | 1D/2D array | digital units | non-empty, non-silent | Recording of the calibration tone only (trim handling noise) |
+| `target_spl` | float | dB re 20 µPa | default `94.0` | The calibrator's nominal level (114 dB calibrators: pass `114.0`) |
+| `ref_pressure` | float | Pa | default `2e-5` | Reference pressure p₀; rarely changed |
+| `fs` | int, optional | Hz | > 0; default `None` | Required for the stability validation; omit to skip it |
+| `validate` | bool | — | default `True` | Emit `CalibrationWarning` on unstable/short recordings |
+| `max_fluctuation_db` | float, optional | dB | default `None` → Table 2 class 1 | Explicit override of the stability limit |
+| `frequency` | float | Hz | default `1000.0` | Calibrator's nominal frequency; selects the IEC 60942 Table 2 row |
+| `narrowband` | bool | — | default `False` | Estimate the tone with a coherent Goertzel detector near `frequency` (needs `fs`) instead of full-band RMS; rejects broadband hum/noise that otherwise inflates the RMS and shrinks every later level (~−0.44 dB at 20 dB SNR). Enable for noisy coupler recordings |
+
+Returns the sensitivity factor (float) to pass as `calibration_factor=` to
+`octave_filter`, `leq`, `laeq`, `ln_levels`, `lc_peak`, `sel` and the dose
+functions.
+
+## Field checks, laboratory verification and drift
+
+Calibration lives at three time scales:
+
+- **Every session: the field check.** Couple the calibrator and derive the
+  sensitivity before each measurement series, and check it again at the end.
+  Normative methods make the second check mandatory and use the pre/post
+  difference as a validity gate (a common criterion invalidates the series
+  when the two differ by more than 0.5 dB). Whatever the threshold, the
+  difference is your drift bound for everything captured in between; carry
+  it into the uncertainty budget rather than assuming zero.
+- **Periodically: laboratory verification.** A field check only compares the
+  chain against the calibrator; it cannot see an error the calibrator and
+  meter share, and it says nothing about the response away from 1 kHz.
+  IEC 61672-3 defines the periodic tests for the meter (weightings,
+  level linearity and ballistics spot-checked against the class limits),
+  and IEC 60942 the corresponding tests for the calibrator itself; typical
+  laboratory intervals are one to two years.
+- **Between checks: drift.** Microphone sensitivity moves with temperature,
+  humidity and capsule aging; electronics with battery voltage. A healthy
+  class 1 chain drifts a few hundredths of a dB over a session, which is
+  why a pre/post difference of half a decibel signals damage rather than
+  weather. The largest "drift" of all is a touched gain knob: the factor S
+  is valid only while the chain stays exactly as calibrated.
+
+One more class subtlety: tolerances chain. A class 1 measurement requires a
+class 1 (or LS) calibrator *and* a class 1 meter; calibrating a class 1
+chain with a class 2 calibrator silently downgrades every derived level to
+class 2 accuracy, because the calibrator's wider level tolerance enters S
+directly.
+
+## Digital Analysis (dBFS)
+
+If you are working with digital audio files (e.g., WAV, FLAC) and want to
+analyze levels relative to Full Scale rather than physical pressure, you can use
+the `dbfs=True` parameter.
+
+In this mode:
+
+* **0 dBFS** corresponds to a numeric signal level of 1.0 (RMS or Peak).
+* `calibration_factor` does not apply (dBFS is relative to digital full scale).
+* Useful for analyzing headroom, digital mastering, or normalized signals.
+
+```python
+import numpy as np
+from phonometry import metrology
+
+fs = 48000
+# recording: the mic capture you want to calibrate, same input chain (Pa after calibration).
+#   Synthesized here; in a real measurement this is your recorded signal.
+recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+
+# Assume 'recording' is normalized between -1.0 and 1.0
+spl_dbfs, freq = metrology.octave_filter(recording, fs, dbfs=True)
+# Results will be negative (e.g., -20 dBFS)
+```
+
+## RMS vs Peak Levels
+
+phonometry supports two measurement modes to align with professional software
+like BK:
+
+- **RMS (`mode='rms'`)**: Energy-based level (standard).
+- **Peak (`mode='peak'`)**: Absolute maximum value reached in the frame
+  (Peak-holding).
+
+```python
+import numpy as np
+from phonometry import metrology
+
+fs = 48000
+# recording: the mic capture you want to calibrate, same input chain (Pa after calibration).
+#   Synthesized here; in a real measurement this is your recorded signal.
+recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+
+# Measure peak-holding levels for impact analysis
+spl_peak, freq = metrology.octave_filter(recording, fs, mode='peak')
+```
+
+> [!NOTE]
+> `mode='peak'` measures the absolute maximum of the **filtered** band signal,
+> which includes the filter's onset transient (overshoot). Signals that start
+> abruptly may read up to ~1 dB high. This is inherent to IIR band filters
+> (an analog SLM behaves the same way), not a processing artifact.
+
+## Integer audio input
+
+Integer signals (e.g. int16 from `scipy.io.wavfile.read`) are converted to
+float64 internally before any squaring, so calibration and level results are
+identical whether you pass the raw integer array or a float conversion.
+
+## References
+
+- International Electrotechnical Commission. (2017). *Electroacoustics —
+  Sound calibrators* (IEC 60942:2017).
+  [IEC webstore](https://webstore.iec.ch/en/publication/30045).
+  The calibrator classes, level tolerances and the short-term stability
+  criterion `sensitivity()` applies to the reference recording.
+- International Electrotechnical Commission. (2013). *Electroacoustics —
+  Sound level meters — Part 3: Periodic tests* (IEC 61672-3:2013).
+  [IEC webstore](https://webstore.iec.ch/en/publication/5710).
+  The laboratory verification procedure behind the periodic checks
+  recommended above.
+- Bies, D. A., Hansen, C. H., & Howard, C. Q. (2017). *Engineering noise
+  control* (5th ed.). CRC Press.
+  [doi:10.1201/9781351228152](https://doi.org/10.1201/9781351228152).
+  Sections 3.1.5 and 3.4 (microphone field effects and sound level meter
+  calibration: the electrical and acoustic calibration practice this
+  page's workflow follows). ISBN 978-1-4987-2405-0.
+
+## Standards
+
+IEC 60942:2017, *Electroacoustics — Sound calibrators* — the
+calibrator level and class assumptions behind `sensitivity()` (the 94 dB
+principal level and the Table 1 class tolerances) and the short-term
+level-fluctuation stability check of the reference recording (5.3.3, Table 2
+class 1 limits per nominal frequency).
+
+---
+
+
+<!-- source: docs/gum-uncertainty.md | canonical: https://jmrplens.github.io/phonometry/guides/gum-uncertainty/ -->
+Source: https://jmrplens.github.io/phonometry/guides/gum-uncertainty/
+
+# Measurement uncertainty (GUM and Monte Carlo)
+
+Every measurement result is incomplete without a statement of its uncertainty.
+The *Guide to the Expression of Uncertainty in Measurement* gives two ways to
+propagate the uncertainties of the inputs of a measurement model
+$y = f(x_1, \dots, x_N)$ to the output: the **law of propagation of
+uncertainty** (**ISO/IEC Guide 98-3:2008**, the GUM, clause 5) and the
+**Monte Carlo method** (**ISO/IEC Guide 98-3-1:2008**, Supplement 1, clause 7).
+The first combines standard uncertainties analytically through the sensitivity
+coefficients; the second propagates the whole probability distributions
+numerically. They agree for linear models and diverge, informatively, when the
+model is non-linear or the inputs are far from Gaussian.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_uncertainty_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_uncertainty.svg" alt="From a shared measurement model y equals f of x1 to xN with its input estimates and standard uncertainties, two parallel lanes. Left, the GUM law of propagation: sensitivity coefficients c_i equal the partial derivative of f with respect to x_i, combined in quadrature so uc squared is the sum of c_i squared times u squared of x_i plus correlation terms, then the Welch-Satterthwaite effective degrees of freedom, giving the expanded uncertainty U equals k times uc with k the t-distribution coverage factor. Right, the Monte Carlo method: draw each x_i from its probability density, propagate M trials of y equals f of the sampled inputs, then sort the outputs and take the probabilistically symmetric 95 percent coverage interval from low to high fractiles" width="88%"></picture>
+
+## 1. The law of propagation of uncertainty (GUM clause 5)
+
+For a model $y = f(x_1, \dots, x_N)$ with uncorrelated inputs, the combined
+standard uncertainty is the quadrature sum of the input contributions
+$u_i(y) = |c_i|\,u(x_i)$ weighted by the sensitivity coefficients
+$c_i = \partial f / \partial x_i$:
+
+$$
+u_c^2(y) = \sum_{i=1}^{N} \left(\frac{\partial f}{\partial x_i}\right)^2 u^2(x_i).
+$$
+
+`combine_uncertainty` evaluates the sensitivities by central differences, so any
+callable model works, with no hand-derived partials. Input quantities are described
+by a `Quantity` (best estimate, standard uncertainty, PDF, degrees of freedom).
+Type B evaluations from a half-width $a$ are built by `rectangular`
+($a/\sqrt{3}$), `triangular` ($a/\sqrt{6}$) and `u_shaped` ($a/\sqrt{2}$)
+(GUM clause 4.3).
+
+```python
+from phonometry import metrology
+
+# A-weighted level: a reading plus zero-mean calibration, instrument and
+# positional corrections. The model is their sum.
+quantities = [
+    metrology.Quantity(74.0, 0.0, name="Reading"),
+    metrology.rectangular(0.0, 0.20, name="Calibration"),
+    metrology.rectangular(0.0, 0.30, name="Instrument"),
+    metrology.Quantity(0.0, 0.35, dof=9, name="Position (Type A)"),
+]
+result = metrology.combine_uncertainty(lambda a, b, c, d: a + b + c + d, quantities)
+
+print(round(result.value, 2))                 # 74.0
+print(round(result.combined_uncertainty, 3))  # 0.407 dB
+print(result.contributions.round(3))          # [0.    0.115 0.173 0.35 ]
+print(round(result.effective_dof, 1))         # 16.5
+
+k, U = result.expanded(0.95)
+print(round(k, 2), round(U, 2))               # 2.11 0.86  ->  Y = 74.0 ± 0.9 dB
+```
+
+The **expanded uncertainty** $U = k\,u_c$ scales the combined uncertainty by a
+coverage factor $k = t_p(\nu_\text{eff})$ from the $t$-distribution at the
+**effective degrees of freedom** given by the Welch–Satterthwaite formula
+(Annex G.4). Here the single Type A input (9 degrees of freedom) pulls
+$\nu_\text{eff}$ down to about 16, so $k = 2.11$ rather than the large-sample
+1.96. Correlated inputs are handled by passing a correlation matrix; a fully
+correlated sum then adds linearly instead of in quadrature. Correlation is the
+classic silent error in a budget: two corrections traceable to the *same*
+calibrator, or two channels sharing one instrument, do not average away the
+way independent terms would, and combining them in quadrature as if they were
+uncorrelated typically understates $u_c$ (with sensitivities of opposite sign
+the bias can point the other way). Because the GUM defines Welch–Satterthwaite
+for *independent* inputs only, a correlated budget with finite input degrees
+of freedom carries no effective degrees of freedom at all: `effective_dof` is
+NaN, a warning is issued, and `expanded()` requires an explicit
+`coverage_factor_override` (e.g. $k = 2$) rather than inventing one. Only when
+every input is Type B with infinite degrees of freedom does a correlated
+budget keep $\nu_\text{eff} = \infty$ and use the normal-distribution coverage
+factor. This chain reproduces the GUM's
+own worked examples end to end: the Annex H.1 end-gauge budget
+($u_c = 31.7$ nm, $U_{99} = 92$ nm against the printed 32/93) and the Annex
+H.2 correlated resistance measurement ($u_c(R) = 0.071\ \Omega$,
+$u_c(X) = 0.295\ \Omega$, $u_c(Z) = 0.236\ \Omega$ from Table H.3).
+
+## 2. The Monte Carlo method (Supplement 1)
+
+When the model is non-linear or the inputs are markedly non-Gaussian, the GUM
+Gaussian assumption for the output can be inaccurate. `monte_carlo` instead
+draws samples of each input from its PDF, evaluates the model over all trials
+and reports the mean, the standard deviation and the **probabilistically
+symmetric coverage interval** (equal probability in each tail, clause 7.7).
+The inputs are sampled independently; the Supplement's multivariate-Gaussian
+path for non-independent quantities (6.4.8) is not implemented, so correlated
+budgets belong to `combine_uncertainty`. The number of trials is fixed (no
+adaptive 7.9 procedure, at least 2 trials) and the interval is the symmetric
+one, not the 5.3.4 shortest interval.
+
+```python
+from phonometry import metrology
+
+quantities = [
+    metrology.Quantity(74.0, 0.0, name="Reading"),
+    metrology.rectangular(0.0, 0.20, name="Calibration"),
+    metrology.rectangular(0.0, 0.30, name="Instrument"),
+    metrology.Quantity(0.0, 0.35, dof=9, name="Position (Type A)"),
+]
+mc = metrology.monte_carlo(lambda a, b, c, d: a + b + c + d, quantities,
+                    trials=1_000_000, coverage=0.95, seed=1)
+
+print(round(mc.value, 2))                 # 74.0
+print(round(mc.standard_uncertainty, 3))  # 0.407 dB  (matches uc above)
+print([round(x, 2) for x in mc.interval]) # [73.2, 74.8]
+```
+
+For this near-linear model the Monte Carlo standard uncertainty reproduces the
+GUM $u_c$ to three digits and the 95 % interval matches $Y \pm U$. The two
+methods are validated against the Guides' own worked examples: the additive
+model of four unit inputs gives $u_c = 2.0$ (Supplement 1 clause 9.2), and four
+rectangular inputs give a Monte Carlo interval of $[-3.88,\, 3.88]$
+(Supplement 1 clause 9.2.3).
+
+When does the Monte Carlo method earn its extra cost? Whenever either of the
+GUM's two simplifications fails: the model is replaced by its first-order
+expansion, and the output distribution by a Gaussian (or a $t$). Both hold
+well for the additive level model above, which is why the two methods agree
+to three digits. They stop holding when the model is strongly non-linear over
+the span of the input uncertainties (energy-to-level conversions with wide
+inputs, products and quotients with large relative uncertainties), when a
+single non-Gaussian input dominates the budget (one large rectangular term
+makes the output nearly rectangular, and a Gaussian $\pm\,2u_c$ interval
+overcovers it), or when the output sits near a physical bound (an absorption
+coefficient near 0 or 1, a level correction that cannot cross zero), where
+the true coverage interval is asymmetric and no $Y \pm U$ statement can
+represent it. In those regimes the Monte Carlo interval is the reference:
+Supplement 1 (clause 8) treats the GUM framework as validated precisely when
+it agrees with the Monte Carlo result, and as superseded by it when it does
+not.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_budget_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_budget.svg" alt="Two panels for the A-weighted level example. Left, the GUM uncertainty budget: a horizontal bar chart of the contribution of each input to the combined uncertainty (Reading contributes nothing, Calibration and Instrument the rectangular corrections, and the Position Type A term the most), with a dashed line marking the combined uncertainty uc of 0.407 dB. Right, the Monte Carlo output distribution as a histogram, overlaid with the GUM Gaussian of the same mean and standard deviation, and the shaded 95 percent coverage interval; the title reads Y equals 74.00 dB, U equals 0.86 dB, k equals 2.11" width="96%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import metrology
+
+quantities = [
+    metrology.Quantity(74.0, 0.0, name="Reading"),
+    metrology.rectangular(0.0, 0.20, name="Calibration"),
+    metrology.rectangular(0.0, 0.30, name="Instrument"),
+    metrology.Quantity(0.0, 0.35, dof=9, name="Position (Type A)"),
+]
+model = lambda a, b, c, d: a + b + c + d
+result = metrology.combine_uncertainty(model, quantities)
+mc = metrology.monte_carlo(model, quantities, trials=1_000_000, coverage=0.95, seed=1,
+                    keep_samples=True)
+k, U = result.expanded(0.95)
+
+# One line per panel — the budget bars, and the Monte Carlo histogram with
+# its coverage interval (the committed figure also overlays the GUM Gaussian):
+result.plot()
+mc.plot()
+plt.show()
+
+# By hand, both panels — budget bars and the Monte Carlo output distribution:
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.5, 5.4))
+ax1.barh(result.names, result.contributions)
+ax1.axvline(result.combined_uncertainty, ls="--",
+            label=f"$u_c$ = {result.combined_uncertainty:.3f} dB")
+ax1.invert_yaxis(); ax1.legend()
+
+rng = np.random.default_rng(1)
+samples = model(np.full(200_000, 74.0),
+                rng.uniform(-0.20, 0.20, 200_000),
+                rng.uniform(-0.30, 0.30, 200_000),
+                rng.normal(0.0, 0.35, 200_000))
+ax2.hist(samples, bins=120, density=True, alpha=0.35, label="Monte Carlo")
+ax2.axvspan(*mc.interval, alpha=0.12, label="95 % coverage interval")
+ax2.set_title(f"Y = {result.value:.2f} dB,  U = {U:.2f} dB (k = {k:.2f})")
+ax2.legend()
+plt.show()
+```
+
+</details>
+
+The `UncertaintyResult` carries the `value`, `combined_uncertainty`, the
+`sensitivities`, the per-input `contributions` and the `effective_dof`; its
+`.plot()` draws the budget and `.expanded(coverage)` returns the pair
+$(k, U)$. The `MonteCarloResult` carries the `value`, `standard_uncertainty`,
+the coverage `interval` and its `coverage`; with `keep_samples=True` it also
+retains the output `samples`, and its `.plot()` draws the output histogram
+with the coverage interval marked (the right panel above). The building-acoustics uncertainty
+of ISO 12999-1, which combines reproducibility terms for a single-number
+rating, is a separate, domain-specific budget.
+
+A budget is only as honest as the record behind it: every averaged input
+assumes stationarity, and [Data qualification](https://jmrplens.github.io/phonometry/guides/data-qualification/)
+provides the Bendat & Piersol tests that check it before the propagation
+starts.
+
+## Where the library consumes this machinery
+
+The domain pages carry their own, standard-prescribed uncertainty clauses,
+and each is an instance of the clause-5 sum this page implements in
+general form; use this page whenever your measurement model is not one of
+those standardized cases:
+
+- **Calibration.** The calibrator's class tolerance and the pre/post drift
+  bound of [Calibration](https://jmrplens.github.io/phonometry/guides/calibration/) are textbook Type B inputs:
+  propagate them (`Quantity(..., "rectangular")`) through the level model
+  rather than quoting the tolerance alone.
+- **Environmental levels.** The ISO 1996-2 combined uncertainty of the
+  [Levels](https://jmrplens.github.io/phonometry/guides/levels/) page is Formula (2) of that standard: the same
+  quadrature sum with the standard's own sensitivity coefficients.
+- **Building acoustics.** The per-band and single-number uncertainties of
+  [field insulation measurements](https://jmrplens.github.io/phonometry/guides/insulation-field/) apply the tabulated
+  reproducibility terms of ISO 12999-1, a standardized budget for one
+  specific model.
+- **Absorption.** The [materials page](https://jmrplens.github.io/phonometry/guides/materials/) carries the
+  ISO 12999-2 absorption uncertainty, the same construction for the
+  reverberation-room method.
+- **Occupational exposure.** The ISO 9612 uncertainty of
+  [occupational measurements](https://jmrplens.github.io/phonometry/guides/occupational-exposure/) budgets sampling,
+  instrument and position contributions in exactly this way.
+
+## References
+
+- Joint Committee for Guides in Metrology. (2008). *Evaluation of measurement
+  data — Guide to the expression of uncertainty in measurement* (JCGM
+  100:2008, the GUM). BIPM.
+  [doi:10.59161/JCGM100-2008E](https://doi.org/10.59161/JCGM100-2008E),
+  [free PDF](https://www.bipm.org/documents/20126/2071204/JCGM_100_2008_E.pdf).
+  The law of propagation, the Type B evaluations and the Annex H worked
+  examples that section 1 implements and reproduces.
+- Joint Committee for Guides in Metrology. (2008). *Evaluation of measurement
+  data — Supplement 1 to the "Guide to the expression of uncertainty in
+  measurement" — Propagation of distributions using a Monte Carlo method*
+  (JCGM 101:2008). BIPM.
+  [doi:10.59161/JCGM101-2008](https://doi.org/10.59161/JCGM101-2008),
+  [free PDF](https://www.bipm.org/documents/20126/2071204/JCGM_101_2008_E.pdf).
+  The Monte Carlo propagation of section 2, its probabilistically symmetric
+  coverage interval and the clause 8 validation of the GUM framework against
+  the Monte Carlo result.
+- International Organization for Standardization. (2020). *Acoustics —
+  Determination and application of measurement uncertainties in building
+  acoustics — Part 1: Sound insulation* (ISO 12999-1:2020).
+  [iso.org catalogue](https://www.iso.org/standard/73930.html).
+  The domain-specific reproducibility budget for building-acoustics
+  single-number ratings, mentioned above as a separate companion to the
+  general GUM machinery.
+
+## Standards
+
+ISO/IEC Guide 98-3:2008, *Uncertainty of measurement — Part 3:
+Guide to the expression of uncertainty in measurement (GUM:1995)*: the law of
+propagation of uncertainty (clause 5), Type B evaluation (clause 4.3), the
+expanded uncertainty and coverage factor (clause 6, Annex G) and the
+Welch–Satterthwaite effective degrees of freedom (Annex G.4). ISO/IEC
+Guide 98-3-1:2008, *Supplement 1 — Propagation of distributions using a Monte
+Carlo method*: the numerical propagation and the probabilistically symmetric
+coverage interval (clause 7).
+
+---
+
+
+<!-- source: docs/data-qualification.md | canonical: https://jmrplens.github.io/phonometry/guides/data-qualification/ -->
+Source: https://jmrplens.github.io/phonometry/guides/data-qualification/
+
+# Data qualification: stationarity, level crossings and peaks (Bendat & Piersol)
+
+Every average in this documentation - a [PSD](https://jmrplens.github.io/phonometry/guides/spectral-analysis/), a
+[Leq](https://jmrplens.github.io/phonometry/guides/levels/), a
+[GUM budget](https://jmrplens.github.io/phonometry/guides/gum-uncertainty/) - assumes the record is
+**stationary**: that the process generating it did not drift while it was
+being measured. Bendat & Piersol devote Section 10.3 of *Random Data* to
+qualifying records before analysis, and `phonometry.metrology` implements its
+quantitative core: distribution-free **trend and stationarity tests** with
+the book's own acceptance regions, and the **Rice statistics** - level
+crossings, apparent frequency, peak rates and heights - that summarize what
+a qualified Gaussian record looks like and flag one that is not.
+
+## 1. The reverse arrangement test
+
+Given a sequence of $N$ observations $x_1, \dots, x_N$ - parameter estimates,
+segment levels, anything - count the pairs $i < j$ with $x_i > x_j$. Each
+such pair is a **reverse arrangement**, and for independent observations of
+one random variable their total $A$ has (B&P Eqs. (4.54)-(4.55))
+
+$$
+\mu_A = \frac{N(N-1)}{4}, \qquad
+\sigma_A^2 = \frac{N(2N+5)(N-1)}{72},
+$$
+
+with no assumption about the distribution of the $x_i$. A monotonic trend
+pushes $A$ to an extreme (0 for a rising sequence, $N(N-1)/2$ for a falling
+one), so the hypothesis of *no trend* is accepted at significance $\alpha$
+when $A$ falls inside a two-sided region - B&P Table A.6, whose
+$\alpha = 0.05$ rows `trend_test` reproduces exactly and the conformance
+suite pins. The book's Example 4.4 (twenty observations, $A = 86$, accepted
+between 64 and 125) runs verbatim:
+
+```python
+from phonometry import trend_test
+
+values = [5.2, 6.2, 3.7, 6.4, 3.9, 4.0, 3.9, 5.3, 4.0, 4.6,
+          5.9, 6.5, 4.3, 5.7, 3.1, 5.6, 5.2, 3.9, 6.2, 5.0]
+
+res = trend_test(values)                  # B&P Example 4.4
+print(res.statistic, res.bounds)          # 86, (64, 125)
+print(res.trend_free, round(res.p_value, 3))   # True, 0.586
+res.plot()
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/trend_test_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/trend_test.svg" alt="Two sequences of twenty observations plotted against the sample index: Bendat and Piersol Example 4.4, which fluctuates around five with eighty-six reverse arrangements and is accepted as trend free, and the same fluctuations with an added rising drift climbing from about five to nine, whose thirty-eight reverse arrangements fall below the lower acceptance bound of sixty-four and are rejected as trended at the five percent level" width="82%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import trend_test
+
+example = np.array([5.2, 6.2, 3.7, 6.4, 3.9, 4.0, 3.9, 5.3, 4.0, 4.6,
+                    5.9, 6.5, 4.3, 5.7, 3.1, 5.6, 5.2, 3.9, 6.2, 5.0])
+drifting = example + np.linspace(0.0, 4.0, example.size)   # rising drift
+
+res_flat = trend_test(example)
+res_drift = trend_test(drifting)
+
+fig, ax = plt.subplots(figsize=(10, 6))
+index = np.arange(1, example.size + 1)
+ax.plot(index, res_flat.values, "o-",
+        label=f"Example 4.4: A = {res_flat.statistic}, accepted")
+ax.plot(index, res_drift.values, "s-",
+        label=f"Rising drift: A = {res_drift.statistic}, rejected")
+ax.set_xlabel("Sample index")
+ax.set_ylabel("Sequence value")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+The p-value comes from the exact null distribution of $A$ (the inversion
+counts of a random permutation), computed up to $N = 100$ - the range of
+Table A.6 - and from the book's normal approximation beyond; the verdict
+follows the book's tabulated region. `.plot()` draws the tested sequence
+against its sample index with the count, the acceptance region and the
+verdict in the legend (for `method="runs"` it also marks the sequence
+median that classifies each value).
+
+## 2. Stationarity of a record
+
+The B&P Sec. 10.3.1.1 procedure turns the trend test into a stationarity
+test for a single time history: divide the record into $N$ equal intervals
+long enough to be independent, compute a **mean square value per interval**,
+and test that sequence. Nothing needs to be known about the record's
+bandwidth, averaging distribution or units, and the test works on mean
+values, rms values or variances just as well (`statistic=`). A running
+20 % gain drift - the book's Example 10.3 scenario - is caught immediately,
+while the same noise without the drift passes:
+
+```python
+import numpy as np
+from phonometry import stationarity_test
+
+fs = 8192.0
+n = 1 << 16
+noise = np.random.default_rng(42).standard_normal(n)
+
+res = stationarity_test(noise, fs)        # 20 segments, mean squares
+print(res.stationary, res.count, res.bounds)   # True, 91, (64, 125)
+
+drifting = noise * np.linspace(1.0, 1.2, n)    # +20 % gain ramp
+res = stationarity_test(drifting, fs)
+print(res.stationary, res.count)          # False, 7  (upward trend -> low A)
+res.plot()
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/stationarity_test_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/stationarity_test.svg" alt="Twenty segment mean square values for two noise records: a steady record whose values fluctuate around one with a reverse arrangement count of ninety-one, accepted as stationary, and the same noise with a twenty percent gain ramp whose segment mean squares climb steadily to one point five, giving only seven reverse arrangements, rejected as nonstationary at the five percent level" width="82%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import stationarity_test
+
+fs = 8192.0
+n = 1 << 16
+steady = np.random.default_rng(42).standard_normal(n)
+ramp = np.random.default_rng(42).standard_normal(n) * np.linspace(1.0, 1.2, n)
+
+res_steady = stationarity_test(steady, fs)
+res_ramp = stationarity_test(ramp, fs)
+
+fig, ax = plt.subplots(figsize=(10, 6))
+index = np.arange(1, res_steady.n_segments + 1)
+ax.plot(index, res_steady.segment_values, "o-",
+        label=f"Steady noise: A = {res_steady.count}, accepted")
+ax.plot(index, res_ramp.segment_values, "s-",
+        label=f"+20 % gain ramp: A = {res_ramp.count}, rejected")
+ax.set_xlabel("Segment index")
+ax.set_ylabel("Segment mean square")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+The result records the per-segment sequence (`segment_values`,
+`segment_times`), the count, the Table A.6 `bounds`, the exact `p_value`
+and the `stationary` verdict; `.plot()` draws the sequence with the verdict
+in the legend. The default of 20 segments matches the book's worked
+examples - more segments resolve faster drifts but each interval must stay
+long against the record's lowest frequencies for the values to be
+independent.
+
+Two caveats from the book are worth repeating. A record can be
+nonstationary with a stationary mean square (a frequency glide, for
+instance), so pass `statistic="mean"` or test band-filtered versions when
+that matters; and the test needs the *trend* to be slow against the segment
+length, or it dissolves into the random fluctuation of the segment values.
+
+## 3. The runs test
+
+The classical companion (tabulated in the third edition of *Random Data*;
+the exact distribution is Wald & Wolfowitz 1940) classifies each value as
+above or below the sequence median and counts **runs** of like
+classification. A trend or slow drift produces few long runs; rapid
+alternation produces too many. `method="runs"` applies it with the exact
+conditional distribution at any $N$ - for twenty values split 10/10 the
+acceptance region at $\alpha = 0.05$ is the classical $(6, 15]$:
+
+```python
+import numpy as np
+from phonometry import trend_test
+
+rng = np.random.default_rng(3)
+res = trend_test(rng.standard_normal(40), method="runs")
+print(res.statistic, res.bounds, res.trend_free)
+res.plot()   # the sequence about its median with the runs verdict
+
+alternating = np.tile([1.0, -1.0], 10)   # 20 runs: rejected the other way
+print(trend_test(alternating, method="runs").trend_free)   # False
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/runs_test_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/runs_test.svg" alt="Two panels of sequences classified about their median, points above in blue and below in red. Left: forty Gaussian observations with twenty runs inside the acceptance region from fourteen to twenty-seven, verdict trend-free. Right: a strictly alternating twenty-value sequence also giving twenty runs, but against the acceptance region from six to fifteen for twenty values, verdict rejected for too-rapid alternation" width="92%"></picture>
+
+*The two-sided verdict of the runs test: 20 runs is unremarkable for 40
+Gaussian observations (left, accepted), but the same count from a strictly
+alternating 20-value sequence exceeds its upper bound (right, rejected):
+too *many* runs is as non-random as too few.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import trend_test
+
+rng = np.random.default_rng(3)
+sequences = [rng.standard_normal(40), np.tile([1.0, -1.0], 10)]
+
+# One line per sequence — the tested values with the verdict:
+trend_test(sequences[0], method="runs").plot()
+plt.show()
+
+# Both verdicts side by side, classified about the median:
+fig, axes = plt.subplots(1, 2, figsize=(11, 4.5))
+for ax, seq in zip(axes, sequences):
+    res = trend_test(seq, method="runs")
+    idx = np.arange(1, seq.size + 1)
+    median = np.median(seq)
+    above = seq > median
+    ax.plot(idx, seq, "0.7", lw=0.7)
+    ax.scatter(idx[above], seq[above], label="above the median")
+    ax.scatter(idx[~above], seq[~above], color="r",
+               label="below the median")
+    ax.axhline(median, color="k", linestyle="--")
+    lo, hi = res.bounds
+    verdict = "trend-free" if res.trend_free else "rejected"
+    ax.set_title(f"r = {res.statistic} runs, accept ({lo}, {hi}]: {verdict}")
+    ax.set(xlabel="Sample index", ylabel="Sequence value")
+    ax.legend()
+plt.show()
+```
+
+</details>
+
+The reverse arrangement test is the more powerful of the two against the
+monotonic trends that dominate practice (B&P Sec. 4.5.2), which is why it
+is the default everywhere; the runs test adds sensitivity to non-monotonic
+clustering.
+
+## 4. Level crossings and the apparent frequency
+
+For a zero-mean Gaussian record with one-sided autospectrum $G(f)$, Rice's
+classical results give the expected rate of zero crossings (both slopes,
+B&P Eq. (5.195)) from the plain frequency moments
+$m_k = \int f^k\,G(f)\,\mathrm{d}f$:
+
+$$
+N_0 = \frac{1}{\pi}\frac{\sigma_v}{\sigma_x} = 2\sqrt{\frac{m_2}{m_0}},
+\qquad
+N_a = N_0\, e^{-a^2/2\sigma_x^2},
+$$
+
+where $N_a$ is the crossing rate of level $a$ (Eq. (5.196)). $N_0/2$ is the
+record's **apparent frequency**: a 60 Hz sine crosses zero 120 times per
+second, low-pass noise of bandwidth $B$ gives $N_0 = 2B/\sqrt{3}$ (an
+apparent frequency of $0.58B$, Example 5.12) and a band centred on $f_c$
+gives $N_0 = 2\sqrt{f_c^2 + B^2/12}$ (Example 5.13).
+`level_crossing_rate` counts the actual crossings of each level and puts
+the Rice curve next to them, taking the moments from the record's own
+[Welch autospectrum](https://jmrplens.github.io/phonometry/guides/spectral-analysis/):
+
+```python
+import numpy as np
+from phonometry import level_crossing_rate
+
+fs = 8192.0
+t = np.arange(1 << 16) / fs
+x = np.sin(2 * np.pi * 60.0 * t)          # a 60 Hz sine ...
+
+res = level_crossing_rate(x, fs)
+print(round(res.zero_crossing_rate, 1))   # ... has 120 zeros per second
+print(round(res.apparent_frequency, 1))   # 60.0
+res.plot()
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rice_level_crossings_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rice_level_crossings.svg" alt="Measured level-crossing rates of a bandlimited Gaussian noise record between eight hundred and twelve hundred hertz, plotted as dots against the crossing level from minus three point five to plus three point five signal units on a logarithmic rate axis, falling from about two thousand crossings per second at level zero to a few per second at three sigma, with the Rice exponential curve passing through every measured point" width="82%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import level_crossing_rate
+
+fs = 20480.0
+n = 1 << 19
+rng = np.random.default_rng(0)
+freqs = np.fft.rfftfreq(n, 1 / fs)        # bandlimited Gaussian noise:
+spec = rng.standard_normal(freqs.size) + 1j * rng.standard_normal(freqs.size)
+spec[(freqs < 800.0) | (freqs > 1200.0)] = 0.0
+x = np.fft.irfft(spec, n)
+
+res = level_crossing_rate(x, fs, levels=np.linspace(-3.5, 3.5, 29) * np.std(x))
+
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.plot(res.levels, res.rice_rates, label="Rice (Eq. 5.196)")
+ax.plot(res.levels, res.rates, "o", label="Measured")
+ax.set_yscale("log")
+ax.set_xlabel("Level a [signal units]")
+ax.set_ylabel("Crossings per second [1/s]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+The Rice curve holds for Gaussian records, and that is precisely its second
+use: measured rates that fall systematically off the curve are a quick
+non-Gaussianity screen (B&P Sec. 5.5.1.1) - clipping shows up as missing
+high-level crossings, impulsive contamination as an excess. Count-based
+rates need the record comfortably oversampled: a crossing between two
+samples of the same sign goes uncounted.
+
+## 5. Peaks: rates, the irregularity factor and heights
+
+The same moments fix the expected rate of local maxima
+$M = (1/2\pi)(\sigma_a/\sigma_v) = \sqrt{m_4/m_2}$ (Eq. (5.211)) and with
+it the dimensionless **irregularity factor**
+
+$$
+r = \frac{N_0}{2M} = \frac{m_2}{\sqrt{m_0\, m_4}} \in (0, 1],
+$$
+
+the single number that fixes the distribution of peak heights
+(B&P Sec. 5.5.4). At $r = 1$ - narrow bandwidth data, one maximum per
+zero-crossing cycle - peaks are **Rayleigh** distributed:
+$\mathrm{Prob}[\text{peak} > a] = e^{-a^2/2\sigma_x^2}$ (Eq. (5.206)), which
+is the one-in-3000 chance of a peak beyond $4\sigma$ of B&P Example 5.14.
+As $r \to 0$ ever more ripples ride on each cycle, negative maxima appear,
+and the peak heights approach the plain **Gaussian** amplitude distribution.
+In between, Rice's mixture (Eqs. (5.217)/(5.223)) interpolates the two,
+available as `peak_exceedance()` / `peak_density()` on the result:
+
+```python
+import numpy as np
+from phonometry import peak_statistics
+
+fs = 8192.0
+t = np.arange(1 << 16) / fs
+x = np.sin(2 * np.pi * 60.0 * t)          # narrowband: r is essentially 1
+
+res = peak_statistics(x, fs)
+print(round(res.irregularity_factor, 3))       # 0.997
+print(res.peak_exceedance(4.0))                # exp(-8): about 1 in 3000
+res.plot()   # empirical exceedance against the Rice mixture (figure below)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rice_peak_distribution_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rice_peak_distribution.svg" alt="Peak-height exceedance probability of low-pass Gaussian noise on a logarithmic axis against the standardized peak height from minus two point five to four point five: the empirical staircase from half a million samples follows the Rice mixture curve for irregularity factor zero point seven four six, clearly below the dashed Rayleigh limit and above the dotted Gaussian limit, with a visible fraction of negative maxima" width="82%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import peak_statistics
+from phonometry.metrology.random_data import _rice_peak_exceedance
+
+fs = 20480.0
+n = 1 << 19
+rng = np.random.default_rng(3)
+freqs = np.fft.rfftfreq(n, 1 / fs)        # low-pass noise: r = sqrt(5)/3
+spec = rng.standard_normal(freqs.size) + 1j * rng.standard_normal(freqs.size)
+spec[freqs > 2000.0] = 0.0
+x = np.fft.irfft(spec, n)
+
+res = peak_statistics(x, fs)
+peaks = res.peak_values
+empirical = 1.0 - np.arange(1, peaks.size + 1) / peaks.size
+z = np.linspace(-2.5, 4.5, 400)
+
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.plot(z, _rice_peak_exceedance(z, 1.0), "--", label="Rayleigh (r = 1)")
+ax.plot(z, _rice_peak_exceedance(z, 0.0), ":", label="Gaussian (r = 0)")
+ax.plot(z, res.peak_exceedance(z),
+        label=f"Rice (r = {res.irregularity_factor:.3f})")
+ax.plot(peaks, empirical, drawstyle="steps-post", label="Empirical")
+ax.set_yscale("log")
+ax.set_ylim(1e-5, 1.5)
+ax.set_xlabel(r"Standardized peak height $z = a/\sigma_x$")
+ax.set_ylabel("Prob[peak > z]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+For an ideal low-pass band the closed forms give $r = \sqrt{5}/3 = 0.745$,
+and the measured value lands on it. The irregularity factor is the standard
+bridge to fatigue and vibro-acoustic damage estimation, where it selects
+the cycle-counting correction between the narrow-band Rayleigh assumption
+and broad-band rainflow corrections. One practical warning: $m_4$ weights
+the spectrum by $f^4$, so wideband instrumentation noise far above the
+physical band silently inflates $M$ and deflates $r$ - band-limit the
+record to the physically meaningful range first.
+
+## Where this fits
+
+Qualification comes *before* the statistics this section's other pages
+compute: the chi-square confidence interval of a
+[Welch PSD](https://jmrplens.github.io/phonometry/guides/spectral-analysis/) and the random-error
+formulas of the [correlation estimators](https://jmrplens.github.io/phonometry/guides/correlation-delay/)
+all assume the record is stationary, as does the very idea of *the* Leq of
+a measurement in [Levels](https://jmrplens.github.io/phonometry/guides/levels/). When a record fails
+the test, split it at the change (the `segment_values` sequence shows
+where), analyse the pieces, or move to the short-time views - the
+[calibrated spectrogram](https://jmrplens.github.io/phonometry/guides/time-frequency/) - that do not
+assume stationarity. And when it passes, the
+[GUM machinery](https://jmrplens.github.io/phonometry/guides/gum-uncertainty/) can propagate the
+*remaining* random error of every averaged estimate with a clean
+conscience.
+
+## References
+
+- Bendat, J. S., & Piersol, A. G. (2010). *Random Data: Analysis and
+  Measurement Procedures* (4th ed.). Wiley. ISBN 978-0-470-24877-5.
+  [doi:10.1002/9781118032428](https://doi.org/10.1002/9781118032428).
+  Section 4.5.2 with Table A.6 (the nonparametric reverse arrangement trend
+  test, its mean and variance, the tabulated percentage points and
+  Example 4.4), Section 10.3 (data qualification; the segment mean-square
+  stationarity procedure of 10.3.1.1 and Example 10.3) and Section 5.5
+  (level crossings and peak values, Examples 5.12-5.15). The runs companion
+  appeared in the third edition's percentage points of the run distribution.
+- Wald, A., & Wolfowitz, J. (1940). On a test whether two samples are from
+  the same population. *The Annals of Mathematical Statistics*, 11(2),
+  147-162. [doi:10.1214/aoms/1177731909](https://doi.org/10.1214/aoms/1177731909).
+  The exact conditional distribution of the number of runs.
+- Rice, S. O. (1945). Mathematical analysis of random noise. *The Bell
+  System Technical Journal*, 24(1), 46-156.
+  [doi:10.1002/j.1538-7305.1945.tb00453.x](https://doi.org/10.1002/j.1538-7305.1945.tb00453.x).
+  The original level-crossing and peak derivations (Parts I-II are in
+  volume 23, 1944).
+
+---

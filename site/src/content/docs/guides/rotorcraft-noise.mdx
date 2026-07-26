@@ -374,6 +374,27 @@ include a reconstructible screening case (the frame of its terrain model
 could not be pinned to the published outputs), so the diffraction chain
 itself rests on the closed-form anchors and its CNOSSOS-EU lineage.
 
+## What this guide covers
+
+**Covered.** The ECAC Doc 32 hemisphere method and the EASA NORAH2 equation-
+level guidance (§A.3-A.5): the noise hemisphere and its bilinear lookup
+(`RotorcraftHemisphere`, `hemisphere_source_level`), the three propagation
+adjustments (`spherical_spreading_adjustment`, `atmospheric_adjustment`,
+`ground_effect_adjustment`, the Chien-Soroka model with Delany-Bazley
+impedance and the CNOSSOS flow-resistivity classes), the flight-condition
+interpolation (`flight_condition_weights`, `interpolated_source_level`), the
+flight-path kinematics (`flight_path_kinematics`), the single-event SEL,
+LASmax and EPNL (`rotorcraft_event_level`), ground-grid contours
+(`rotorcraft_noise_contour`) and the terrain mean-ground-plane and
+diffraction-screening chain (`mean_ground_plane`, `mean_flow_resistivity`,
+`diffraction_attenuation`, `terrain_screening_adjustment`). Validated against
+the NORAH2 guidance Table 4, closed-form geometric and grazing limits, and
+end to end against the NORAH2 prototype's ARP verification cases.
+
+**Not covered.** Hover, idle and taxi source handling (guidance §A.3.5)
+remains outside the implementation: the hemisphere source model assumes a
+flyover, not a stationary or ground-idling rotorcraft.
+
 ## See also
 
 - API reference: [`aircraft.rotorcraft_noise`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/).

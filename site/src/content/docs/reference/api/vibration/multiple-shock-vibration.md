@@ -1,6 +1,6 @@
 ---
 title: "vibration.multiple_shock_vibration"
-description: "Public API of phonometry.vibration.multiple_shock_vibration (auto-generated)."
+description: "Whole-body vibration containing multiple shocks (ISO 2631-5:2018)."
 sidebar:
   label: "multiple_shock_vibration"
 ---

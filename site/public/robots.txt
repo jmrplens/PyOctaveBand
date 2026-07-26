@@ -1,13 +1,24 @@
 # phonometry documentation — robots.txt
 # All crawlers are welcome, including AI / generative-engine crawlers.
+#
+# NOTE: this is the subpath copy, served at /phonometry/robots.txt. Crawlers
+# only read the file at the domain root, so the authoritative one is
+# https://jmrplens.github.io/robots.txt; this copy exists so anything that does
+# fetch it reads the same policy, and it is kept in step with the root file by
+# hand.
+#
 # Structured context for LLMs:
 #   https://jmrplens.github.io/phonometry/llms.txt
 #   https://jmrplens.github.io/phonometry/llms-full.txt
 
 User-agent: *
 Allow: /
-# Explicit opt-in for AI training, search indexing, and AI retrieval/citation.
-Content-Signal: ai-train=yes, search=yes, ai-input=yes
+# Explicit machine-readable intent (IETF draft-romm-aipref-contentsignals).
+# `ai-input` and `ai-retrieval` name the same grounding/RAG use: the IETF draft
+# uses one token and contentsignals.org publishes the other, so both are
+# declared rather than betting on which vocabulary a given parser implements.
+# Mirrors the four keys declared in the root file.
+Content-Signal: search=yes, ai-train=yes, ai-input=yes, ai-retrieval=yes
 
 # AI / generative-engine crawlers (explicitly welcomed for GEO).
 User-agent: GPTBot

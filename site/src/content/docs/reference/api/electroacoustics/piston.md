@@ -1,6 +1,6 @@
 ---
 title: "electroacoustics.piston"
-description: "Public API of phonometry.electroacoustics.piston (auto-generated)."
+description: "Radiation of a rigid circular piston set in an infinite baffle."
 sidebar:
   label: "piston"
 ---

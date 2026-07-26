@@ -396,6 +396,32 @@ el repositorio; pulse la vista previa para abrir el PDF.
 	caption="Ficha de audibilidad tonal (ToneAudibilityResult.report), ΔL_ta decisiva en dB con el ajuste tonal K."
 />
 
+## Qué cubre esta guía
+
+**Cubierto.** El método de ingeniería de ISO/PAS 20065:2016 completo: el
+ancho de banda crítico `Δfc` y las frecuencias de esquina (Fórmulas 2 a 5),
+el nivel medio de banda estrecha `LS` y el nivel del tono `LT` (Fórmulas 6 y
+8, Anexo D), el nivel de banda crítica del enmascaramiento `LG`, el índice de
+enmascaramiento `av` y la audibilidad `ΔL` (Fórmulas 12 a 14), la detección de
+picos y el criterio de distinción (apartados 5.3.8 y 5.3.4), la combinación
+multitono FG (Fórmula 17) y la excepción de dos tonos por debajo de 1000 Hz
+(Fórmulas 18/19), la audibilidad decisiva y media energética (Fórmula 20) y la
+incertidumbre extendida `U` de los apartados 5.4/6, todo a través de
+`psychoacoustics.analyze_spectrum` y `assess_tones`. El Anexo J de la
+ISO 1996-2:2017 está cubierto en lo que convierte la audibilidad media en el
+ajuste tonal `Kt` (Tabla J.1).
+
+**No cubierto.** El apartado 5.3.2 exige que el espectro de banda estrecha
+esté ponderado A según IEC 61672-1 antes del análisis; este módulo es
+agnóstico a la ponderación y no la aplica, así que quien llama debe ponderar
+A el espectro antes. El criterio de distinción de pendiente de flanco sigue
+la lectura de DIN 45681:2005-03 (su programa de referencia ejecutable), no
+las fórmulas asimétricas impresas en el texto de ISO/PAS 20065, que la
+contradicen (ver `docs/ERRATA.md`). Construir el propio espectro FFT de
+banda estrecha a partir de una grabación en el dominio temporal no forma
+parte de este módulo: todas las funciones aquí parten de un espectro ya
+calculado (niveles y frecuencias).
+
 ## Véase también
 
 - Referencia de la API: [`psychoacoustics.tone_audibility`](/phonometry/es/reference/api/psychoacoustics/tone-audibility/).

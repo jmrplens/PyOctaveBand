@@ -1,6 +1,6 @@
 ---
 title: "aircraft.airport_noise"
-description: "Public API of phonometry.aircraft.airport_noise (auto-generated)."
+description: "Noise-Power-Distance (NPD) event-level interpolation (ECAC Doc 29)."
 sidebar:
   label: "airport_noise"
 ---

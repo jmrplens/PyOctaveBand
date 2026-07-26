@@ -1,6 +1,6 @@
 ---
 title: "metrology.core"
-description: "Public API of phonometry.metrology.core (auto-generated)."
+description: "Core processing logic and FilterBank class for phonometry."
 sidebar:
   label: "core"
 ---

@@ -12,11 +12,18 @@ de pasa/no pasa.
 
 El informe es un documento autogenerado que la CI regenera en **cada pull
 request** (la build falla si se desincroniza del código), de modo que siempre
-está en sincronía con la librería publicada:
+está en sincronía con la librería publicada. Aquí abajo se reproduce entero,
+trasplantado tal cual en tiempo de compilación desde
+[`docs/CONFORMANCE.md`](https://github.com/jmrplens/phonometry/blob/main/docs/CONFORMANCE.md).
 
-**[Lee el informe de conformidad completo (CONFORMANCE.md en GitHub)](https://github.com/jmrplens/phonometry/blob/main/docs/CONFORMANCE.md)**
+:::note
+El cuerpo del informe que aparece más abajo lo genera la propia librería y
+está en inglés: las designaciones de norma, las magnitudes y los veredictos
+salen del registro de comprobaciones tal cual se ejecuta. Esta introducción y
+los encabezados sí están traducidos.
+:::
 
-## Qué contiene
+## Cómo leerlo
 
 - **Clases de filtro**: el veredicto de clase IEC 61260-1:2014 por
   arquitectura de filtro, con la atenuación relativa medida en la banda
@@ -31,14 +38,913 @@ está en sincronía con la librería publicada:
   las propias normas o de expresiones en forma cerrada sintetizadas a un resultado
   conocido.
 
+Cada sección de dominio es plegable y permanece plegada mientras todas sus
+filas pasan; una sección con alguna fila fallida se abre sola. En pantallas
+estrechas las tablas anchas se desplazan lateralmente dentro de su propia caja.
+
 ## Cómo se genera
 
 El registro de comprobaciones vive en
 [`scripts/conformance_report.py`](https://github.com/jmrplens/phonometry/blob/main/scripts/conformance_report.py)
 y se ejecuta en local con `make conformance`. Los valores esperados se toman
 de las mismas tablas de referencia que exige la batería de tests, de modo que
-el informe y los tests no pueden discrepar en silencio.
+el informe y los tests no pueden discrepar en silencio. Esta página se rellena
+desde ese mismo documento con `make site-reports`, y la CI falla si el informe
+o esta copia suya se desincronizan.
 
 Para la filosofía de diseño detrás de este enfoque, junto con un caso de estudio
 sobre la ponderación temporal de IEC 61672-1, consulta
 [Por qué phonometry](/phonometry/es/reference/why-phonometry/).
+
+Volver a deducir las normas con este detalle también saca a la luz defectos de
+los propios documentos publicados: ejemplos resueltos que contradicen su
+articulado, constantes mal impresas, referencias cruzadas rotas. Cada caso
+confirmado, con su evidencia y lo que hace la librería al respecto, está en el
+[registro de erratas](/phonometry/es/reference/errata/).
+
+<!-- BEGIN GENERATED BODY - transplanted from docs/CONFORMANCE.md by scripts/generate_site_reports.py (`make site-reports`). Edit the source document, never the text below. -->
+
+## Informe numérico de conformidad
+
+&#9989; **427/427 conformance checks pass** across 53 domains and 278 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+
+<sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
+
+<details>
+<summary>&#9989; <b>Numerical validation - filters &amp; weightings</b>: class showcase (IEC 61260-1 · IEC 61672-1 · ISO 7196)</summary>
+
+**IEC 61260-1:2014 class per filter architecture** (order 6, one-third-octave, 100 Hz-10 kHz, fs = 48 kHz). For each architecture the table shows, at its *binding* band, the measured relative attenuation and the class-1 limit it must clear, so the number and the range it must sit in are both visible. A positive margin means the acceptance limits are met with that much room.
+
+| Architecture | Class verdict | Binding band | Measured rel. atten. | Class-1 limit | Margin cl.1 | Margin cl.2 |
+|:---|:---:|:---:|:---:|:---:|:---:|:---:|
+| butter | Class 1 (default) | 100 Hz | +0.00 dB | &ge; -0.40 dB | +0.400 dB | +0.600 dB |
+| cheby1 | By design (passband ripple) | 6310 Hz | +0.19 dB | &ge; +1.44 dB | -1.246 dB | -0.837 dB |
+| cheby2 | Class 1 | 100 Hz | +0.00 dB | &ge; -0.40 dB | +0.400 dB | +0.600 dB |
+| ellip | By design (passband ripple) | 10000 Hz | +0.10 dB | &ge; +1.32 dB | -1.218 dB | -0.813 dB |
+| bessel | By design (soft rolloff) | 100 Hz | +12.46 dB | &ge; +16.60 dB | -4.133 dB | -3.133 dB |
+
+Only **Butterworth** (the library default) and **Chebyshev-II** are class-compliant architectures. Chebyshev-I and elliptic trade the mask for passband ripple, and Bessel for a maximally-flat group delay (soft rolloff); they cannot satisfy the IEC 61260-1 Class 1/2 attenuation mask by construction, so they are labelled *By design* - this is expected, not a failure or regression.
+
+**Frequency-weighting conformance** (A/C: IEC 61672-1 Table 3; G: ISO 7196 A.3). The *max deviation from nominal* is informational (it falls at a frequency extreme where the tolerance is widest and asymmetric); compliance is judged at the *binding* frequency - the one with the least headroom - where the deviation, the applicable tolerance band and the headroom are shown together.
+
+| Curve | fs | Max dev. from nominal (info) | Binding freq | Deviation there | Tolerance band | Headroom |
+|:---|:---:|:---:|:---:|:---:|:---:|:---:|
+| A | 48 kHz | -0.867 dB @ 19953 Hz | 1000 Hz | +0.000 dB | [-0.70, +0.70] dB | +0.700 dB |
+| A | 96 kHz | -0.482 dB @ 19953 Hz | 1000 Hz | +0.000 dB | [-0.70, +0.70] dB | +0.700 dB |
+| C | 48 kHz | -0.900 dB @ 19953 Hz | 1000 Hz | +0.000 dB | [-0.70, +0.70] dB | +0.700 dB |
+| G | 48 kHz | +0.047 dB @ 1 Hz | 1 Hz | +0.047 dB | [-1.00, +1.00] dB | +0.953 dB |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Filters &amp; weightings</b>: 100% (10/10)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| IEC 61260-1:2014 Table 1 | Octave-band filter class (butterworth, fs=48 kHz) | class 1 | class 1 (margin +0.400 dB) | +0.400 dB | &#9989; |
+| IEC 61260-1:2014 Table 1 | One-third-octave filter class (butterworth, fs=48 kHz) | class 1 | class 1 (margin +0.400 dB) | +0.400 dB | &#9989; |
+| IEC 61260:1995 / ANSI S1.11-2004 Table 1 | Class 0 (strictest) octave-band filter (butterworth, fs=48 kHz) | class 0 | class 0 (margin +0.150 dB) | +0.150 dB | &#9989; |
+| IEC 61260-1:2014 Table F.1 | Formula (9) breakpoint mapping, b=3, Omega at G**(1/2) | 1.12202 (+/-0.00001) | 1.12202 | 0 | &#9989; |
+| IEC 61672-1:2013 Table 3 | A-weighting deviation vs class-1 limits (fs=48 kHz) | deviation within limits @ 1000 Hz | +0.000 dB in [-0.70, +0.70] dB | headroom +0.700 dB | &#9989; |
+| IEC 61672-1:2013 Table 3 | C-weighting deviation vs class-1 limits (fs=48 kHz) | deviation within limits @ 1000 Hz | +0.000 dB in [-0.70, +0.70] dB | headroom +0.700 dB | &#9989; |
+| ISO 7196:1995 Table 2 / A.3 | G-weighting deviation vs +/-1 dB tolerance (fs=48 kHz) | deviation within limits @ 1 Hz | +0.047 dB in [-1.00, +1.00] dB | headroom +0.953 dB | &#9989; |
+| ANSI S1.4-1983 Tables IV/V | B-weighting (historical) deviation vs Type 0 limits (fs=48 kHz) | deviation within limits @ 200 Hz | -0.049 dB in [-0.70, +0.70] dB | headroom +0.651 dB | &#9989; |
+| IEC 61012:1990 Table 1 / 2.2 | AU-weighting deviation vs separate-unit tolerances (fs=96 kHz) | deviation within limits @ 10000 Hz | -0.072 dB in [-1.00, +1.00] dB | headroom +0.928 dB | &#9989; |
+| IEC 537:1976 (withdrawn) via NASA CR-3406 Table SLD-I | D-weighting response vs the published tabulated curve (fs=48 kHz) | abs(response - table) <= 0.2 dB (0.45 dB at 1600/2500 Hz) | -0.131 dB @ 8000 Hz (bound 0.20 dB) | headroom +0.069 dB | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Levels &amp; dosimetry</b>: 100% (6/6)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| IEC 61672-1:2013 (Leq) | Leq of a 1 Pa 1 kHz sine | 90.97 dB (+/-0.05 dB) | 90.969 dB | -0.001 dB | &#9989; |
+| IEC 61252:1995 (LEX,8h) | 8 h exposure to 90 dB(A) noise | 90 dB (+/-0.05 dB) | 90.008 dB | 0.008 dB | &#9989; |
+| ISO 1996-1:2016 3.6.4 | Lden, constant 60 dB in day/evening/night | 66.3952 dB (+/-0 dB) | 66.3952 dB | 0 dB | &#9989; |
+| ISO 1996-2:2007 Annex C.5 Example 1 | Tonal audibility ΔLta (Formula C.3), 4 kHz tone | 13.7 dB (+/-0.05 dB) | 13.66 dB | -0.044 dB | &#9989; |
+| ISO 1996-2:2007 Annex C.5 Example 1 | Tonal adjustment Kt (Formulae C.4-C.6) | 6 dB (+/-0 dB) | 6 dB | 0 dB | &#9989; |
+| ISO 1996-2:2017 Annex G.2 | Combined measurement uncertainty u = √(Σ(cj·uj)²) | 2.18 dB (+/-0.01 dB) | 2.18 dB | -0.002 dB | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Room acoustics</b>: 100% (12/12)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| Sabine (W. C. Sabine, 1922) | Reverberation time T = k·V/A  (V=120 m³, S=158 m², α=0.2) | 0.611825 s (+/-0.000001 s) | 0.611825 s | 0 s | &#9989; |
+| Everest, Master Handbook of Acoustics 4th ed, Fig. 7-22 | Sabine RT, worked Example 1 @ 1 kHz (untreated 23.3×16×10 ft room, SI) | 3.39 s (+/-0.02 s) | 3.402 s | 0.012 s | &#9989; |
+| Eyring (Norris-Eyring, 1930) | Reverberation time T = k·V/(-S·ln(1-ᾱ))  (α=0.2) | 0.548369 s (+/-0.000001 s) | 0.548369 s | 0 s | &#9989; |
+| Arau-Puchades (Acustica 65, 1988, Formula 18) | T (α=0.5/0.1/0.1 per wall pair, dims 8×5×3 m) | 0.812147 s (+/-0.000001 s) | 0.812147 s | 0 s | &#9989; |
+| Model identity (uniform absorption) | Arau-Puchades ≡ Eyring when ᾱ is uniform | 0.548369 s (= Eyring) | 0.548369 s | 0 s | &#9989; |
+| Vorlander Auralization 2e, Eq. (11.38)-(11.39) | Image-source direct-sound amplitude 1/(4πr) and delay r/c (r = 4 m) | 0.0198944 (+/-0) | 0.0198944 | 0 | &#9989; |
+| Kuttruff Room Acoustics 6e, Eq. (9.23) | Audible shoebox image count up to order 10 (= 1560) | 156 (+/-0) | 156 | 0 | &#9989; |
+| Kuttruff Room Acoustics 6e, Eq. (4.6) | Temporal reflection density dN/dt = 4πc³t²/V (t = 0.1 s, V = 120 m³) | 42258.2 1/s (+/-0 1/s) | 42258.2 1/s | 0 1/s | &#9989; |
+| Bies Engineering Noise Control 5e, Eq. (6.44) | Room constant R = Sᾱ/(1-ᾱ)  (S = 100 m², ᾱ = 0.2 → 25 m²) | 25 m² (+/-0 m²) | 25 m² | 0 m² | &#9989; |
+| Bies Engineering Noise Control 5e, Eq. (6.43) | Critical distance rc: direct field = reverberant field (R = 25, Q = 1) | 0.160000 (= reverberant term) | 0.16 | 0 | &#9989; |
+| Kuttruff Room Acoustics 6e, Eq. (3.44) | Schroeder frequency f_s = 2000√(T/V)  (V = 200 m³, T = 1 s) | 141.421 Hz (+/-0 Hz) | 141.421 Hz | 0 Hz | &#9989; |
+| Bies Engineering Noise Control 5e, Eq. (6.43) | Steady-state SPL Lp = Lw + 10lg(Q/4πr² + 4/R)  (Lw=90, r=1, R=25, Q=1) | 83.7945 dB (+/-0 dB) | 83.7945 dB | 0 dB | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Psychoacoustics</b>: 100% (12/12)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| ISO 532-1:2017 Annex B.2 | Zwicker loudness N, stationary test signal 1 | 83.2957 sone (+/-0.1%) | 83.2957 sone | 0 sone | &#9989; |
+| ISO 532-1:2017 Annex B.5 | Time-varying loudness Nmax, technical signal 14 (aircraft, free field) | 22.6399 sone (+/-0.1%) | 22.6399 sone | 0 sone | &#9989; |
+| ISO 532-1:2017 Annex B.5 | Time-varying loudness Nmax, technical signal 15 (vehicle interior, diffuse field) | 9.6059 sone (+/-0.1%) | 9.6059 sone | 0 sone | &#9989; |
+| DIN 45692:2009 Clause 6 | Sharpness of the standard 1 kHz reference signal | 1 acum (+/-0 acum) | 1 acum | 0 acum | &#9989; |
+| DIN 45692:2009 Table A.2 | Sharpness of critical-band noise at 2.5 kHz (2320-2700 Hz, 4 sone) | 1.78 acum (+/-0.089 acum) | 1.747 acum | -0.033 acum | &#9989; |
+| ISO 226:2023 Table B.1 | Equal-loudness contour, 60 phon @ 100 Hz | 78.5 dB SPL (+/-0.05 dB SPL) | 78.504 dB SPL | 0.004 dB SPL | &#9989; |
+| ECMA-418-2:2025 Clause 5.1.8 | HMS loudness of a 1 kHz / 40 dB tone (c_N=0.0211964) | 1 sone_HMS (+/-0.03 sone_HMS) | 0.9843 sone_HMS | -0.016 sone_HMS | &#9989; |
+| ECMA-418-2:2025 Clause 6.2.8 | HMS tonality of a 1 kHz / 40 dB tone (c_T=2.8758615) | 1 tu_HMS (+/-0.03 tu_HMS) | 0.9998 tu_HMS | 0 tu_HMS | &#9989; |
+| ECMA-418-2:2025 Clause 7 | HMS roughness of a 1 kHz / 70 Hz / m=1 / overall 60 dB tone (c_R=0.0180685) | 1 asper (+/-0.01 asper) | 0.9999 asper | 0 asper | &#9989; |
+| ISO 532-2:2017 Clause 3.17 / Annex B.1 | Moore-Glasberg loudness of a 1 kHz / 40 dB tone (C=0.0617) | 1 sone (+/-0.01 sone) | 1.0001 sone | 0 sone | &#9989; |
+| ISO 532-3:2023 Annex C.1 | Moore-Glasberg-Schlittenlacher peak LTL, steady 1 kHz / 40 dB | 1 sone (+/-0.02 sone) | 0.9996 sone | 0 sone | &#9989; |
+| ECMA-418-2:2025 Clause 9 | HMS fluctuation strength of a 1 kHz / 4 Hz / m=1 / overall 60 dB tone (c_F=0.003840572) | 1 vacil_HMS (+/-0.01 vacil_HMS) | 0.9931 vacil_HMS | -0.007 vacil_HMS | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Speech transmission (IEC 60268-16)</b>: 100% (10/10)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| IEC 60268-16:2020 A.2.2 | STI weighting-factor pair (500 Hz + 1 kHz bands) | 0.398 (+/-0.001) | 0.398 | 0 | &#9989; |
+| IEC 60268-16:2020 A.3.1.2 | Uniform MTF m=0.5 maps to STI=0.5 | 0.5 (+/-0.01) | 0.5 | 0 | &#9989; |
+| IEC 60268-16 Annex M | Full-STI worked example: printed MTF + speech/noise spectra -> STI | STI 0.76 (MTI row of step 4c) | STI 0.758 (max MTI dev 0.00) | -0.002 | &#9989; |
+| IEC 60268-16:2020 C.3.2 | STIPA direct method, Formula (C.1) signal at m=0.2 | 0.3 (+/-0.01) | 0.2992 | -0.001 | &#9989; |
+| IEC 60268-16:2020 C.3.2 | STIPA direct method, Formula (C.1) signal at m=0.5 | 0.5 (+/-0.01) | 0.4998 | 0 | &#9989; |
+| IEC 60268-16:2020 C.3.2 | STIPA direct method, Formula (C.1) signal at m=0.8 | 0.7 (+/-0.01) | 0.7002 | 0 | &#9989; |
+| IEC 60268-16:2020 C.3.3 | Indirect method: exponential decay RT60=1 s vs Schroeder MTF | 0.5885 (+/-0.005) | 0.5885 | 0 | &#9989; |
+| IEC 60268-16:2020 C.4.2 | Filter-bank slope: +41 dB unmodulated tone one octave below 125 Hz | m >= 0.5 (C.4.2 pass criterion) | 0.9812 | 0.481 | &#9989; |
+| IEC 60268-16:2020 A.2.2 (audio path) | Weighting factors: modulated 500 Hz + 1 kHz pair through stipa() | 0.398 (+/-0.005) | 0.398 | 0 | &#9989; |
+| IEC 60268-16:2020 A.3.1.2 (audio path) | Filter-bank phase: half-octave edge carriers at TI=0.9 | 0.9 (+/-0.01) | 0.8975 | -0.003 | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>System measurement (Golay / Kirkeby / Mueller-Massarani)</b>: 100% (5/5)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| Havelock 2008 Part I Ch. 6 (Xiang), Eq. (2) | Golay pair: sum of periodic autocorrelations = 2L*delta (L = 4096) | 0 (algebraic identity, +/-1e-10) | 0 | 0 | &#9989; |
+| Havelock 2008 Part I Ch. 6 (Xiang), Eq. (4) | Golay chain recovers a delay+gain system IR (noiseless, exact) | 0 (machine precision, +/-1e-13) | 0 | 0 | &#9989; |
+| Kirkeby & Nelson 1999 Eq. (17) / Mueller-Massarani 2001 Sec. 3.1 | In-band equalization residue equals eps/(|H|^2 + eps) bin by bin | 0 (closed form, +/-1e-12) | 0 | 0 | &#9989; |
+| Kirkeby & Nelson 1999 (max of x/(x^2+eps) = 1/(2*sqrt(eps))) | Out-of-band inverse-filter gain within the regularization cap | <= -6.021 dB (analytic cap) | -6.034 dB | headroom +0.013 dB | &#9989; |
+| Mueller-Massarani 2001 Secs. 4.2-4.3 (group-delay synthesis) | Shaped sweep's Welch spectrum follows the pink target, in-band | 0 dB in-band deviation (+/-0.5 dB) | 0.0652 dB | 0.065 dB | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Intensity &amp; sound power</b>: 100% (6/6)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| IEC 61043:1994 Clause 5 | Plane-wave intensity I = p^2 / (rho c) | 0.00238 W/m^2 (+/-1.5%) | 0.00239 W/m^2 | 0 W/m^2 | &#9989; |
+| ISO 3744:2010 Eq. 18 | Monopole hemisphere recovers LW (r=4 m) | 95 dB (+/-0 dB) | 95 dB | 0 dB | &#9989; |
+| ISO 9614-2:1996 Eq. 12 | Intensity scan recovers LW of an enclosed source | 90 dB (+/-0.000001 dB) | 90 dB | 0 dB | &#9989; |
+| ISO 4871:1996 clause 3.15 / Annex B | Declared L_WAd = L_WA + K_WA (Annex B, L_WA=88, K_WA=2) | 90 dB (+/-0 dB) | 90 dB | 0 dB | &#9989; |
+| ISO 4871:1996 clause 6.2 | Single-machine verification boundary L_1 <= L_WAd | L_1=90 verified, L_1=91 rejected (L_WAd=90) | 90->True, 91->False | boundary L_1 = L_WAd | &#9989; |
+| ISO 3741:2010 Eq. 20 | Reverberation-room method inverts to a known LW | 0 dB error | 0 dB | 0 dB | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Room &amp; building acoustics</b>: 100% (52/52)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| ISO 3382-2:2008 5.3.3 | T30 from a synthetic exponential decay (T=1.0 s) | 1 s (+/-1%) | 1 s | 0 s | &#9989; |
+| ISO 18233:2006 (swept-sine method) | Sweep deconvolution recovers a known IIR response | 0 dB in-band error (+/-0.1 dB) | 0.0006 dB | 0.001 dB | &#9989; |
+| ISO 717-1 Annex C, Table C.1 | Weighted sound reduction index Rw (C;Ctr) | Rw 30 (C -2; Ctr -3) | Rw 30 (C -2; Ctr -3) | sum 31.8 dB | &#9989; |
+| ISO 717-1:2020 Annex C, Table C.2 | Enlarged range 50-5000 Hz: Rw (C; Ctr; C50-5000; Ctr,50-5000) | Rw 30 (C -2; Ctr -3; C50-5000 -2; Ctr,50-5000 -4) | Rw 30 (C -2; Ctr -3; C50-5000 -2; Ctr,50-5000 -4) | exact | &#9989; |
+| ISO 717-2 Annex C, Table C.1 | Weighted impact sound pressure level Ln,w (CI) | Ln,w 79 (CI -11; sum 28.0 dB) | Ln,w 79 (CI -11; sum 28.0 dB) | +0 dB | &#9989; |
+| ISO 717-2 Annex C, Table C.1 (covered) | Weighted impact level of the floor WITH covering Ln,w (CI) | Ln,w 64 (CI -3; sum 30.0 dB) | Ln,w 64 (CI -3; sum 30.0 dB) | +0 dB | &#9989; |
+| ISO 717-2 Annex C, Table C.2 | Floor-covering improvement ΔLw and CI,Δ (Formulae (2)/(A.4); CI,Δ from the normative Table 4 floor, not the 2020 print's misprinted C.2 chain) | ΔLw 15 dB; CI,Δ -9 dB (Table 4 reference floor) | ΔLw 15 dB; CI,Δ -9 dB | +0 dB | &#9989; |
+| ISO 354:2003 Eq. 5/8 | Sabine inversion recovers absorption area | 9.212828 m^2 (+/-0 m^2) | 9.212828 m^2 | 0 m^2 | &#9989; |
+| ISO 3382-3:2012 Clause 6.2 | Open-plan spatial decay rate D2,S (-6 dB/doubling) | 6 dB (+/-0 dB) | 6 dB | 0 dB | &#9989; |
+| ISO 16283-3:2016 Clause 3.12 | Facade R'45 isolates the -1.5 dB incidence correction (S=A) | 38.5 dB (+/-0 dB) | 38.5 dB | 0 dB | &#9989; |
+| ISO 10140-2:2010 Formula (2) | Lab airborne R on the ISO 717-1 reference shape -> Rw = 54 | Rw 54 dB | Rw 54 dB | +0 dB | &#9989; |
+| ISO 10140-5:2010+A1 Annex B, Table B.1 | Reference elements end-to-end: printed Rw (C; Ctr) of all three | Rw(C;Ctr) = 53(-1;-5) / 52(-1;-5) / 33(-1;-2) | 53(-1;-5) / 52(-1;-5) / 33(-1;-2) | exact | &#9989; |
+| ISO 10140-5:2010+A1 Annex C, Table C.1 | Reference floors end-to-end: printed Ln,t,r,0,w (CI) of both | Ln,t,r,0,w(CI) = 72(0) / 75(-3) | 72(0) / 75(-3) | exact | &#9989; |
+| ISO 15186-1:2000 Formula (7) | Intensity RI on the ISO 717-1 reference shape -> RI,w = 30 | RI,w 30 dB (scalar anchor RI = 34 dB) | RI,w 30 dB (RI = 34 dB) | +0 dB | &#9989; |
+| ISO 15186-1:2000 Annex B, Table B.1 | Adaptation term Kc: all 21 printed rows; (B.1) reduces to (B.2) | max abs(Kc - Table B.1) <= 0,05 dB (1 dp print) | 0.047 dB (B.1 vs B.2: 4.33e-04 dB) | 0.047 dB | &#9989; |
+| ISO 10052:2021 Clause 3.6 | Survey R' applies the V/7,5 minimum-area rule | 26.197888 dB (+/-0 dB) | 26.197888 dB | 0 dB | &#9989; |
+| ISO 10052:2021 Clause 3.16 | Service-equipment LXY is the 3-position energy average | 32.823329 dB (+/-0 dB) | 32.823329 dB | 0 dB | &#9989; |
+| ISO 10052:2021 Table 4 | Reverberation-index estimate (35 <= V < 60, type g) | k = [4.5, 5.0, 5.5, 5.5, 5.5] dB | k = [4.5, 5.0, 5.5, 5.5, 5.5] dB | exact | &#9989; |
+| ISO 717-2:2020 Table 4 / Clause 5.2 | Reference-floor weighted level Ln,r,0,w and CI (ISO 16251-1 ΔLw anchor) | Ln,r,0,w = 78 dB, CI = -11 dB | Ln,r,0,w = 78 dB, CI = -11 dB | exact | &#9989; |
+| ISO 16251-1:2014 / ISO 717-2 Formula (2) | Floor-covering ΔLw: zero improvement gives ΔLw = 0 | ΔLw = 0 dB (ΔL = 0 -> Ln,r = Ln,r,0) | ΔLw = 0 dB | exact | &#9989; |
+| ISO 16251-1 / ISO 717-2 (Foret et al. 2011, carpet) | Measured textile-carpet improvement rates to ΔLw = 29 dB | ΔLw = 29 dB (paper, ISO 16251-1) | ΔLw = 29 dB | +0 dB | &#9989; |
+| ISO 10848-1:2006 Formula (14) | Flanking Kij (simplified) matches closed form | Kij = 1.9897 dB | Kij = 1.9897 dB | exact | &#9989; |
+| ISO 10848-1:2006 Formula (12) | Flanking equivalent absorption length aj at f_ref | aj = 1.2661 m | aj = 1.2661 m | exact | &#9989; |
+| ISO 10848-1:2006 Clause 7.3.1 | Flanking total loss factor η = 2,2/(f·Ts) | η = 0.0044 | η = 0.0044 | exact | &#9989; |
+| ISO 12354-1:2017 Formula (20) vs Hopkins Eq. 2.201 (6 mm glass) | Flanking critical frequency (c0²/1,8·cL·h) vs plate coincidence (c0²/2π · sqrt(m''/B')) | 2107.4 Hz (+/-1%) | 2123.5 Hz | 16.156 Hz | &#9989; |
+| EN 29052-1:1992 Formula 4 | Apparent dynamic stiffness s't = 4π²·m't·fr²  (m't=200 kg/m², fr=25 Hz) | 4.934802 MN/m³ (+/-0.000001 MN/m³) | 4.934802 MN/m³ | 0 MN/m³ | &#9989; |
+| EN 29052-1:1992 clause 8.2 NOTE | Enclosed-gas stiffness s'a·d = 111 MN·mm/m³ (p₀=0,1 MPa, ε=0,9) | 5.55556 MN/m³ (+/-0.0001 MN/m³) | 5.55556 MN/m³ | 0 MN/m³ | &#9989; |
+| EN 29052-1:1992 Formula 2 | Floating-floor natural frequency f0 = (1/2π)√(s'/m')  (s'=10 MN/m³, m'=100 kg/m²) | 50.32921 Hz (+/-0 Hz) | 50.32921 Hz | 0 Hz | &#9989; |
+| ISO 7626-1:2011 Table 1 / 3.1.2 | Closed-form SDOF driving-point mobility peak mag(Y(f0)) = 1/c  (c=5 N·s/m) | 0.2 m/(N·s) (+/-0.000001 m/(N·s)) | 0.2 m/(N·s) | 0 m/(N·s) | &#9989; |
+| ISO 7626-1:2011 Table 1 / 3.1.2 | Closed-form SDOF static receptance H(0) = 1/k  (k=8000 N/m) | 0.000125 m/N (+/-0.0001%) | 0.000125 m/N | 0 m/N | &#9989; |
+| ISO 7626-1:2011 Table 1 | FRF reciprocity: impedance × mobility = 1  (at 37 Hz) | 1 (= Z·Y) | 1 | 0 | &#9989; |
+| ISO 10846-2:2008 3.17 | Transfer-stiffness level Lk = 20 lg(|k|/k0), k0 = 1 N/m  (|k| = 1 MN/m) | 120 dB (+/-0 dB) | 120 dB | 0 dB | &#9989; |
+| ISO 10846-3:2002 Formula (1) | Indirect method k2,1 = -(2πf)²·m2·T  (f=500 Hz, m2=10 kg, T=0,01) | -986960.4 N/m (+/-0.1%) | -986960.4 N/m | 0 N/m | &#9989; |
+| ISO 10846-1:2008 Table A.2 | FRF relation k = jω·Z at 250 Hz  (|k| recovered from impedance) | 1001249.2 N/m (+/-0.0001%) | 1001249.2 N/m | 0 N/m | &#9989; |
+| ISO 7626-2:2015 7.5.2 | Rigid-mass calibration: accelerance mag(A) = 1/m  (m=10 kg) | 0.1 1/kg (+/-0 1/kg) | 0.1 1/kg | 0 1/kg | &#9989; |
+| ISO 7626-2:2015 7.5.2 | Rigid-mass calibration: mobility mag(Y) = 1/(2πf·m) at 100 Hz  (m=10 kg) | 0.0001592 m/(N·s) (+/-0.001%) | 0.0001592 m/(N·s) | 0 m/(N·s) | &#9989; |
+| ISO 7626-2:2015 Annex A | Normalized random error ε = √((1−γ²)/(2nγ²)): γ²=0,8, n=75 → 4,08 % (< 5 %) | 4.08 % (+/-0.01 %) | 4.08 % | 0.002 % | &#9989; |
+| ISO 7626-1:2011 Table 1 | Rigid 1 kg mass at ω = 1000 rad/s: mobility 1e-3, compliance 1e-6 (decades) | 0.001 m/(N·s) (+/-1e-07%) | 0.001 m/(N·s) | 0 m/(N·s) | &#9989; |
+| ISO 10846-3:2002 6.1 Inequality (2) | Indirect-method validity limit mag(T) = 0,1 ↔ ΔL1,2 = 20 dB | 20 dB (+/-0 dB) | 20 dB | 0 dB | &#9989; |
+| ISO 10846-3:2002 6.1 | Model bias at the validity limit: k_ind/k = 1,1 (0,83 dB ≤ 1 dB, 10 % ≤ 12 %) | 1.1 (+/-1e-07%) | 1.1 | 0 | &#9989; |
+| ISO 10846-1:2008 Equation (6) | Delivered/blocking force F2/F2,b = 1/1,1 at mag(k2,2/kt) = 0,1 (within 10 %) | 0.9091 (+/-0) | 0.9091 | 0 | &#9989; |
+| ISO 10846-2:2008 / -3:2002 7.6 | Linearity: ΔLk ≤ 1,5 dB for input spectra 10 dB apart (linear element: 0) | ΔLk ≤ 1,5 dB (7.6 c) | 0 dB | 0 dB | &#9989; |
+| ISO/TS 7849-1:2009 Formula (8) | Calibration L_v from â = 9,81 m/s² at 100 Hz  (standard's EXAMPLE) | 106.9 dB (+/-0.1 dB) | 106.9 dB | -0.02 dB | &#9989; |
+| ISO/TS 7849-2:2009 Formula (15) | L_W from L_v via measured radiation factor = 10 lg(P/P0)  (round-trip) | 84.771 dB (+/-0 dB) | 84.771 dB | 0 dB | &#9989; |
+| ISO/TS 7849-1:2009 Formula (12) | Impedance term: L_W − L_v = 10 lg(411/400) at ε = 1, S = S0 | 0.1178 dB (+/-0 dB) | 0.1178 dB | 0 dB | &#9989; |
+| EN 15657:2018 Formula (14) | Reception-plate L_Ws = resonant-plate power P = ωη(mS)⟨v²⟩  (round-trip) | 55.545 dB (+/-0 dB) | 55.545 dB | 0 dB | &#9989; |
+| EN 15657:2018 Formula (13) | Plate loss factor η = 2,2/(f·Ts) at 1 kHz, Ts = 0,3 s | 0.0073 (+/-0) | 0.0073 | 0 | &#9989; |
+| EN 15657:2018 Formulae (15)/(17) + EN 12354-5 Annex I.3 | Source conversion chain reproduces Table I.8 (wall, installed) | max abs(L_Ws,inst - Table I.8) <= 0,15 dB | 0.055 dB | 0.055 dB | &#9989; |
+| ISO 9611:1996 eq. (9) | Mean free velocity level (energy mean, v0 = 5e-8 m/s) | 72.3017 dB (+/-0 dB) | 72.3017 dB | 0 dB | &#9989; |
+| EN 12354-5:2009 Formula (19b/19c) | Coupling term → force-source limit 10 lg(mag(Ys)/Re{Yi}) as mag(Ys) ≫ mag(Yi) | 40 dB (+/-0.01 dB) | 40.001 dB | 0.001 dB | &#9989; |
+| EN 12354-5:2009 Annex I.3, Table I.9 | Flushing cistern: four paths + Formula (17) total -> 29 dB(A) | max path/total dev <= 0.15 dB; total 29 dB(A) | 0.055 dB; 29.3 dB(A) | 0.055 dB | &#9989; |
+| EN 12354-5:2009 Annex I.2, Table I.6a | Whirlpool floor component: mobility correction + path 11 | max abs(dev vs Table I.6a) <= 0,15 dB | 0.1 dB | 0.1 dB | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Building prediction &amp; uncertainty</b>: 100% (15/15)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| EN 12354-1:2000 Annex H.3 | Airborne prediction R'w (direct + 12 flanking paths) | R'w 52 dB (13 paths) | R'w 52 dB (13 paths, 52.17) | +0.17 dB | &#9989; |
+| EN 12354-1:2000 Annex H.3 (paths) | All 12 printed flanking-path values Rij,w | max abs(Rij,w - printed) <= 0,05 dB | 0.042 dB | 0.042 dB | &#9989; |
+| EN 12354-1:2000 Formula (5b) / Annex H.3 | DnT,w closure from R'w (both H.3 examples -> 54 dB) | DnT,w 54 dB (printed 53,8/54,3) | DnT,w 53.63 / 54.13 dB | -0.17 dB vs printed | &#9989; |
+| EN 12354-2:2000 Annex E.3 | Impact prediction L'n,w = Ln,w,eq - dLw + K | 45 dB (+/-0 dB) | 45 dB | 0 dB | &#9989; |
+| EN 12354-2:2000 Formula (3) / Annex E.3 | Standardized impact level L'nT,w (exact 0,032 V form -> 43 dB) | L'nT,w 43 dB (exact 42,96; E.3 prints 42,8) | L'nT,w 42.96 dB | -0.001 dB | &#9989; |
+| EN 12354-3:2000 Annex F | Facade airborne prediction (R'tr,s,w / D2m,nT,w single numbers) | R'tr,s,w 31 (Ctr -3); D2m,nT,w 33 dB | R'tr,s,w 31 (Ctr -3); D2m,nT,w 33 dB | 0 | &#9989; |
+| EN 12354-4:2000 Annex G / Formula (2) | Radiated LW of a wall+door segment (side 1, low bands) | LW 63/125 Hz [59.8, 61.2] dB (+/-0.1) | LW [59.8, 61.2] dB | 0.038 dB | &#9989; |
+| EN 12354-4:2000 Annex E / Table G.9 | Exterior level of all four Table G.9 reception cells | Lp 36,6 / 28,5 / 44,6 / 37,3 dB (+/-0,05) | Lp 36.6 / 28.5 / 44.6 / 37.3 dB | 0.046 dB | &#9989; |
+| ISO 12999-1:2020 Table 2 | Airborne band uncertainty, situation A @ 1 kHz | 1.8 dB (+/-0 dB) | 1.8 dB | 0 dB | &#9989; |
+| ISO 12999-1:2020 Annex B, Table B.2 | One-decimal single numbers Rw / Rw+C50-5000 / Rw+Ctr,50-5000 | 57.4 / 56.4 / 51.1 dB | 57.4 / 56.4 / 51.1 dB | +0.00 dB | &#9989; |
+| ISO 12999-1:2020 Annex B, Formulae (B.2)/(B.6) | Single-number uncertainties (uncorrelated 0,6/0,8; correlated u(Rw) 1,9) | u_uncorr 0.6 / 0.8 dB; u_corr(Rw) 1.9 dB | 0.60 / 0.79 dB; 1.90 dB | -0.00 dB | &#9989; |
+| ISO 12999-1:2020 Clause 8 / Table 8 | Expanded uncertainty U = 1.96 u (95 % two-sided, Rw sit. A) | 2.352 dB (+/-0 dB) | 2.352 dB | 0 dB | &#9989; |
+| ISO 12999-2:2020 Table 4 / Formula (1) | Absorption coefficient +/-U (k=2), reproducibility, 20 x 1/3-oct bands | U(k=2) = [0.33, 0.26, 0.22, 0.17, 0.13, 0.11, 0.09, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.09, 0.09, 0.09, 0.1, 0.11, 0.13, 0.16] | U(k=2) = [0.33, 0.26, 0.22, 0.17, 0.13, 0.11, 0.09, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.09, 0.09, 0.09, 0.1, 0.11, 0.13, 0.16] | exact | &#9989; |
+| ISO 12999-2:2020 Table 5 / Formula (4) | Practical coefficient +/-U (k=2), reproducibility, 5 octave bands | U(k=2) = [0.09, 0.08, 0.08, 0.08, 0.1] | U(k=2) = [0.09, 0.08, 0.08, 0.08, 0.1] | exact | &#9989; |
+| ISO 12999-2:2020 Clause 7, Examples 1/2 | Single-number U (k=2): alpha_w and DLalpha,NRD | alpha_w +/-0.07, DLalpha +/-1.6 dB | alpha_w +/-0.07, DLalpha +/-1.6 dB | exact | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Outdoor propagation &amp; occupational exposure</b>: 100% (10/10)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| ISO 9613-1:1993 Table 1 | Air attenuation @ 10 degC, 70 %, 1 kHz | 3.66 dB/km (+/-0.01 dB/km) | 3.658 dB/km | -0.002 dB/km | &#9989; |
+| ISO 9613-1:1993 Table 1 | Air attenuation @ 0 degC, 20 %, 2 kHz | 34.6 dB/km (+/-0.1 dB/km) | 34.64 dB/km | 0.04 dB/km | &#9989; |
+| ISO 9613-2:1996 Table 2 | Atmospheric attenuation grid, 6 conditions x 8 octave bands, dB/km | all 48 cells within half a printed digit | worst residual 0.939 x tolerance | 0.939 x | &#9989; |
+| ISO 9613-2:1996 Eq. (7) | Geometrical divergence Adiv = 20 lg(d/d0) + 11 at 100 m | 51 dB (+/-0 dB) | 51 dB | 0 dB | &#9989; |
+| ISO 9613-2:1996 Table 3 | Ground b'(0) porous limit -> Agr(250 Hz) = 2(-1.5 + 10.1) | 17.2 dB (+/-0 dB) | 17.2 dB | 0 dB | &#9989; |
+| ISO 9613-2:1996 clause 7.4 | Single-edge diffraction saturates at the 20 dB cap | 20 dB (+/-0 dB) | 20 dB | 0 dB | &#9989; |
+| ISO 9613-2:1996 clause 7.4 | Double-edge diffraction saturates at the 25 dB cap | 25 dB (+/-0 dB) | 25 dB | 0 dB | &#9989; |
+| ISO 9612:2009 Annex D | Task-based LEX,8h + U (welder day, case a) | LEX,8h 84.3; U 2.7 dB | LEX,8h 84.3; U 2.7 dB | -0.01; +0.02 dB | &#9989; |
+| ISO 9612:2009 Annex E | Job-based LEX,8h + U (production line, 18 workers) | LEX,8h 88.1; U 3.8 dB | LEX,8h 88.2; U 3.8 dB | +0.06; -0.03 dB | &#9989; |
+| ISO 9612:2009 Annex F | Full-day LEX,8h + U (forklift drivers) | LEX,8h 90.1; U 3.4 dB | LEX,8h 90.1; U 3.4 dB | +0.02; +0.03 dB | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Materials: absorption, airflow &amp; impedance</b>: 100% (6/6)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| ISO 11654:1997 Annex A.1 | Weighted absorption alpha_w (no indicator) | 0.60 (class C, no indic.) | 0.60 (class C, '') | 0 | &#9989; |
+| ISO 11654:1997 Annex A.2 | Weighted absorption alpha_w with M indicator | 0.60(M) | 0.60(M) | 0 | &#9989; |
+| ISO 9053-2:2020 Annex A.3 | Thermal boundary-layer thickness b | 0.00183 m (+/-0.00001 m) | 0.00183 m | 0 m | &#9989; |
+| ISO 9053-2:2020 Annex A.3 | Effective ratio of specific heats kappa' | 1.37 (+/-0.001) | 1.37 | 0 | &#9989; |
+| ISO 10534-1:1996 Eqs (9)/(13)/(14) | Absorption from standing-wave ratio s=3 | alpha 0.75 (+/-0), \|r\| 0.5 | alpha 0.75, \|r\| 0.5000 | 0 | &#9989; |
+| ISO 10534-2 Eq. (17) / Annex D | Two-microphone round trip recovers a known reflection factor | abs(r - (0.3-0.4j)) = 0 (identity, +/-1e-9) | 0 | 0 | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Scattering &amp; diffusion (ISO 17497)</b>: 100% (14/14)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| ISO 17497-1:2004 Eq (2) | Reference speed of sound at 20 C | 343.2 m/s (+/-0 m/s) | 343.2 m/s | 0 m/s | &#9989; |
+| ISO 17497-1:2004 Eqs (1)/(4)/(5) | Scattering coefficient (synthetic chain) | 0.0931 (+/-0) | 0.0931 | 0 | &#9989; |
+| ISO 17497-1:2004 Annex A.5 | Expanded uncertainty of scattering coefficient | 0.02971 (+/-0) | 0.02971 | 0 | &#9989; |
+| ISO 17497-2:2012 Formula (5) | Directional diffusion coefficient (QRD, model arc) | 0.1099 (+/-0) | 0.1099 | 0 | &#9989; |
+| ISO 17497-2:2012 Formula (5) | Directional diffusion coefficient (flat reference) | 0.0049 (+/-0) | 0.0049 | 0 | &#9989; |
+| ISO 17497-2:2012 Formula (7) | Normalised diffusion coefficient (QRD, model arc) | 0.1055 (+/-0) | 0.1055 | 0 | &#9989; |
+| Cox & D'Antonio 3e App. B (2D BEM) | Normalised diffusion d_n, N=7 QRD x 6 periods, 200 Hz band (low-band anchor) | 0 (+/-0.015) | 0 | 0 | &#9989; |
+| Cox & D'Antonio 3e App. B (2D BEM) | Normalised diffusion d_n, N=7 QRD x 6 periods, 250 Hz band (low-band anchor) | 0.01 (+/-0.015) | 0.001 | -0.009 | &#9989; |
+| Cox & D'Antonio 3e App. B (2D BEM) | Normalised diffusion d_n, N=7 QRD x 6 periods, 315 Hz band (low-band anchor) | 0.01 (+/-0.015) | 0.002 | -0.008 | &#9989; |
+| Cox & D'Antonio 3e App. B (2D BEM) | Normalised diffusion d_n, N=7 QRD x 6 periods, 400 Hz band (low-band anchor) | 0.01 (+/-0.015) | 0.008 | -0.002 | &#9989; |
+| ISO 17497-2:2012 Formula (8) | Zenith area factor (radians convention) | 1.57105 (+/-0) | 1.57105 | 0 | &#9989; |
+| Cox & D'Antonio Eq (10.3) | QRD deepest well depth (N=7, f0=500 Hz) | 0.196 m (+/-0 m) | 0.196 m | 0 m | &#9989; |
+| Cox & D'Antonio Eq (5.8) + ISO 17497-2 Formula (7) | Flat-panel predicted normalised diffusion (self-reference zero) | 0 (+/-0) | 0 | 0 | &#9989; |
+| Cox & D'Antonio Eq (5.8) + ISO 17497-2 Formula (7) | QRD predicted normalised diffusion at 2 kHz (above flat panel) | 0.208 (+/-0) | 0.208 | 0 | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>In-situ road absorption (ISO 13472)</b>: 100% (3/3)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| ISO 13472-1:2002 Clause 4.2 | Geometrical-spreading factor Kr | 0.6667 (+/-0) | 0.6667 | 0 | &#9989; |
+| ISO 13472-1:2002 Annex A | Maximum-sampled-area radius | 1.3425 m (+/-0 m) | 1.3425 m | 0 m | &#9989; |
+| ISO 13472-2:2010 Clause 5.4.1 | Spot-tube upper usable frequency f_u | 1989.4 Hz (+/-0.1 Hz) | 1989.4 Hz | 0 Hz | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Precision sound power (ISO 3745 / 9614-3)</b>: 100% (4/4)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| ISO 3745:2012 Clause 10.5 EXAMPLE | Expanded uncertainty U (k=2) | 4.123 dB (+/-0.001 dB) | 4.123 dB | 0 dB | &#9989; |
+| ISO 3745:2012 Eq (11) | K1 background floor (6 dB edge band) | 1.2563 dB (+/-0.0001 dB) | 1.2563 dB | 0 dB | &#9989; |
+| ISO 3745:2012 Eq (16) | Meteorological C1 at 23 C reference | -0.1282 dB (+/-0.0001 dB) | -0.1282 dB | 0 dB | &#9989; |
+| ISO 9614-3:2002 Eqs (5)/(8)/(9) | Uniform-intensity LW recovery | 80 dB (+/-0 dB) | 80 dB | 0 dB | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Human vibration (ISO 8041 / 2631 / 5349)</b>: 100% (15/15)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| ISO 8041-1:2017 Table B.8 | Wk design-goal factor at 6,31 Hz | 1.054 (+/-0.1%) | 1.0544 | 0 | &#9989; |
+| ISO 8041-1:2017 Table B.9 | Wm design-goal factor at 1,585 Hz | 0.9342 (+/-0.1%) | 0.9342 | 0 | &#9989; |
+| ISO 8041-1:2017 Table 1 | Wh factor at the 500 rad/s reference | 0.202 (+/-0.15%) | 0.202 | 0 | &#9989; |
+| ISO 8041-1:2017 Table B.1 | Wb design-goal factor at 6,31 Hz | 1.054 (+/-0.1%) | 1.0545 | 0 | &#9989; |
+| ISO 8041-1:2017 Table B.1 | Wb design-goal factors at 1 / 100 Hz | max rel dev ≤ 0,1 % | 0.000267 | 0 | &#9989; |
+| ISO 8041-1:2017 Table 1 | Wc factor at the 100 rad/s reference | 0.5145 (+/-0.1%) | 0.5145 | 0 | &#9989; |
+| ISO 8041-1:2017 Table 1 + Table B.3 | Wd factors at the 100 rad/s reference and 1 Hz | max rel dev ≤ 0,1 % | 0.000162 | 0 | &#9989; |
+| ISO 8041-1:2017 Table B.4 | We design-goal factor at 8 Hz | 0.1263 (+/-0.1%) | 0.1263 | 0 | &#9989; |
+| ISO 8041-1:2017 Table B.5 | Wf design-goal factors at 0,1585 / 0,1 Hz | max rel dev ≤ 0,1 % | 0.000098 | 0 | &#9989; |
+| ISO 8041-1:2017 Table B.7 | Wj design-goal factors at 6,31 / 8 Hz | max rel dev ≤ 0,1 % | 0.00001 | 0 | &#9989; |
+| ISO 8041-1:2017 Table 5 + Annex B | All nine weightings inside the tolerance envelope (318 printed bands) | 0 bands outside the Table 5 tolerances | 0 | 0 | &#9989; |
+| ISO 5349-2:2001 Example E.2.1 | Single-tool daily exposure A(8) | 4.1 m/s^2 (+/-0.05 m/s^2) | 4.14 m/s^2 | 0.037 m/s^2 | &#9989; |
+| ISO 5349-2:2001 Example E.3 | Forestry three-task A(8) | 3.6 m/s^2 (+/-0.05 m/s^2) | 3.61 m/s^2 | 0.01 m/s^2 | &#9989; |
+| ISO 5349-1:2001 Eq. (C.1) | VWF 10 % lifetime Dy at A(8)=7 | 4 yr (+/-0.1 yr) | 4.04 yr | 0.042 yr | &#9989; |
+| Directive 2002/44/EC Art. 3 | HAV/WBV action & limit values | HAV 2.5/5.0, WBV 0.5/1.15 m/s^2 | HAV 2.5/5.0, WBV 0.5/1.15 m/s^2 | 0 | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Speech intelligibility (ANSI S3.5-1997)</b>: 100% (7/7)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| ANSI S3.5-1997 Table 3 | Band-importance function normalisation | 1 (+/-0) | 1 | 0 | &#9989; |
+| ANSI S3.5-1997 clause 5.4 | Equivalent masking spectrum level at 200 Hz | -1.665 (+/-0.001) | -1.665 | 0 | &#9989; |
+| ANSI S3.5-1997 clause 5.6 | Equivalent disturbance in quiet at 5000 Hz | -23.6 dB (+/-0.01 dB) | -23.6 dB | 0 dB | &#9989; |
+| ANSI S3.5-1997 clause 6 | SII, noise 30 dB plus hearing loss 40 dB | 0.2185 (+/-0.0001) | 0.2185 | 0 | &#9989; |
+| R CRAN 'SII' Example C.2 | One-third-octave method, independent oracle | 0.851375 (+/-0.0001) | 0.851375 | 0 | &#9989; |
+| ANSI S3.5-1997 clause 6 | SII, standard speech in quiet, normal hearing | 0.99582517 (+/-0.000001) | 0.99582517 | 0 | &#9989; |
+| ANSI S3.5-1997 Table 3 | Loud-effort speech spectrum level at 1 kHz | 42.16 dB (+/-0 dB) | 42.16 dB | 0 dB | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Objective intelligibility (STOI / ESTOI)</b>: 100% (3/3)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| Taal et al. 2011 (Eq. 6, degenerate) | STOI of a signal against itself = 1 (perfect correlation) | 1 (+/-0.000001) | 1 | 0 | &#9989; |
+| Jensen & Taal 2016 (Eq. 8, degenerate) | ESTOI of a signal against itself = 1 (perfect spectral correlation) | 1 (+/-0.000001) | 1 | 0 | &#9989; |
+| Taal et al. 2011 (monotonicity with SNR) | STOI rises from -15 dB to +25 dB SNR speech-shaped noise | STOI(+25 dB) - STOI(-15 dB) > 0.2 | 0.462 (0.389 -> 0.851) | 0 | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Impulsive-sound prominence (NT ACOU 112)</b>: 100% (2/2)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| NT ACOU 112:2002 Formula 1 | Predicted prominence, OR=1000 dB/s, LD=30 dB | 11.9542 (+/-0.0001) | 11.9542 | 0 | &#9989; |
+| NT ACOU 112:2002 Formula 2 | Adjustment KI to LAeq at prominence P=10 | 9 dB (+/-0 dB) | 9 dB | 0 dB | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Impulsive-sound prominence (ISO/PAS 1996-3)</b>: 100% (2/2)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| ISO/PAS 1996-3:2022 3.5 | Onset rate of a 30 dB ramp over 0.30 s | 100 dB/s (+/-0 dB/s) | 100 dB/s | 0 dB/s | &#9989; |
+| ISO/PAS 1996-3:2022 Formula 3 | Adjustment KI of the ramp onset | 7.1176 dB (+/-0 dB) | 7.1176 dB | 0 dB | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Room noise (ANSI S12.2-2019)</b>: 100% (3/3)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| ANSI S12.2-2019 Table 1 | NC-40 curve, tangency self-consistency | 40 (+/-0) | 40 | 0 | &#9989; |
+| ANSI S12.2-2019 Table D.1 | RC-31 Mark II curve, 63 Hz level | 51 (+/-0) | 51 | 0 | &#9989; |
+| ANSI S12.2-2019 clause D.4 | RC-35 curve, mid-frequency average LMF | 35 (+/-0) | 35 | 0 | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Hearing threshold (ISO 7029 / ISO 389-7)</b>: 100% (3/3)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| ISO 7029:2017 Table 1 | Median threshold, male age 60 at 4 kHz | 20.209 dB (+/-0.001 dB) | 20.208 dB | 0 dB | &#9989; |
+| ISO 7029:2017 Table 2 | Upper spread su, male age 60 at 1 kHz | 10.153 dB (+/-0.001 dB) | 10.153 dB | 0 dB | &#9989; |
+| ISO 389-7:2005 Table 1 | Free-field reference threshold at 1 kHz | 2.4 dB (+/-0 dB) | 2.4 dB | 0 dB | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Measurement uncertainty (GUM / Supplement 1)</b>: 100% (7/7)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| ISO/IEC Guide 98-3-1 clause 9.2 | Combined uncertainty, additive model | 2 (+/-0) | 2 | 0 | &#9989; |
+| ISO/IEC Guide 98-3 Table G.2 | Coverage factor, p=0.99, v=16 | 2.92 (+/-0.005) | 2.921 | 0.001 | &#9989; |
+| ISO/IEC Guide 98-3 Annex G.4 | Welch-Satterthwaite effective dof | 40 (+/-0) | 40 | 0 | &#9989; |
+| ISO/IEC Guide 98-3 Annex H.1 | End-gauge combined uncertainty uc, nm | 31.71 nm (+/-0.01 nm) | 31.71 nm | 0.001 nm | &#9989; |
+| ISO/IEC Guide 98-3 Annex H.1 | End-gauge expanded uncertainty U99, nm | 92.1 nm (+/-0.1 nm) | 92.1 nm | 0.04 nm | &#9989; |
+| ISO/IEC Guide 98-3 Annex H.2 (Table H.3) | Correlated V/I/phi budget: uc(R), ohm | 0.071 ohm (+/-0.001 ohm) | 0.071 ohm | 0 ohm | &#9989; |
+| ISO/IEC Guide 98-3-1 Table 3 (clause 9.2.3) | Seeded Monte Carlo, rectangular sum: 95 % interval endpoint | +/-3.88 (u = 2.0) | +/-3.886 (u = 2.002) | 0.006 | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Noise-induced hearing loss (ISO 1999)</b>: 100% (6/6)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| ISO 1999:2013 Table D.2 | Median NIPTS, 4 kHz, 90 dB, 20 yr | 13 dB (+/-0.5 dB) | 12.9 dB | -0.057 dB | &#9989; |
+| ISO 1999:2013 Table D.2 | Worst-10 % NIPTS, 4 kHz, 90 dB, 20 yr | 18 dB (+/-0.5 dB) | 17.8 dB | -0.239 dB | &#9989; |
+| ISO 1999:2013 Table D.4 | Worst-10 % NIPTS, 3 kHz, 100 dB, 40 yr | 60 dB (+/-0.5 dB) | 59.8 dB | -0.172 dB | &#9989; |
+| ISO 1999:2013 Annex C, Formulae (C.6) to (C.8) | NIPTS at 1/2/4 kHz, 90 dB, 30 yr, Q = 10 % (annex inputs) | 0, 9, 19 dB | 0, 9, 19 dB | 0 dB | &#9989; |
+| ISO 1999:2013 Annex C, Formula (C.5) | Compressed 4 kHz shift, Formula (1) with the annex's H = 36 dB | 13.3 dB (+/-0.1 dB) | 13.3 dB | 0 dB | &#9989; |
+| ISO 1999:2013 Annex C, Formula (C.11) | Hearing threshold level with age and noise, 1/2/4 kHz mean, Q = 10 % | 31.1 dB (+/-0.1 dB) | 31.1 dB | 0 dB | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Multiple-shock whole-body vibration (ISO 2631-5)</b>: 100% (6/6)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| ISO 2631-5:2018 Formula 3 | Daily acceleration dose, 5 x 40 m/s2 peaks | 55.97 m/s2 (+/-0.01 m/s2) | 55.97 m/s2 | -0.002 m/s2 | &#9989; |
+| ISO 2631-5:2018 Formula C.3 | Stress variable R, Annex C male example | 1.22 (+/-0.01) | 1.22 | 0 | &#9989; |
+| ISO 2631-5:2018 Formula C.5 | Injury probability, Annex C male example | 0.37 (+/-0.01) | 0.37 | -0.003 | &#9989; |
+| ISO 2631-5:2018 Annex C NOTE 5 | Compressive stress Sd, female example | 1.4 MPa (+/-0.01 MPa) | 1.4 MPa | -0.001 MPa | &#9989; |
+| ISO 2631-5:2018 Annex C NOTE 5 | Stress variable R, female example | 0.97 (+/-0.01) | 0.96 | -0.008 | &#9989; |
+| ISO 2631-5:2018 Formula 1 vs Annex D Table D.1 | Seat-to-spine transfer vs the 256 Hz digital filter (0,5-80 Hz) | max abs(Formula 1 - filter) ≤ 0,04 | 0.001 | 0.001 | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Sound absorption in enclosed spaces (EN 12354-6)</b>: 100% (2/2)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| EN 12354-6:2003 Formula 1 | Equivalent absorption area, Annex E bare room | 2.26 m2 (+/-0.01 m2) | 2.26 m2 | 0.003 m2 | &#9989; |
+| EN 12354-6:2003 Formula 5 | Reverberation time, Annex E bare room | 2.1 s (+/-0.1 s) | 2.1 s | 0.003 s | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Prominent discrete tones (ECMA-418-1)</b>: 100% (2/2)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| ECMA-418-1:2024 Clause 10 Formula (2) | Critical band at 1 kHz (f1,c / f2,c / dfc) | dfc 162.2 Hz (+/-0.05 Hz); edges 922.2-1084.4 Hz | dfc 162.22 Hz; edges 922.2-1084.4 Hz | 0.017 Hz | &#9989; |
+| ECMA-418-1:2024 Clause 11.6 Formula (14) | Proximity spacing dfprox at 150 / 850 Hz | 23 Hz @ 150 Hz; 63.8 Hz @ 850 Hz (+/-0.5 Hz) | 23.0 Hz; 63.8 Hz | +0.004; +0.044 Hz | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Tonal audibility (ISO/PAS 20065)</b>: 100% (11/11)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| ISO/PAS 20065:2016 Formulae (12)-(14) | Audibility at 137.3 Hz, Annex E spectrum 1 | 4.99 dB (+/-0.05 dB) | 5.01 dB | 0.022 dB | &#9989; |
+| ISO/PAS 20065:2016 Formula (13) | Masking index av at 137.3 / 592.2 Hz | -2.02 dB @ 137.3 Hz; -2.4 dB @ 592.2 Hz (+/-0.005 dB) | -2.017 dB; -2.400 dB | +0.003; +0.000 dB | &#9989; |
+| ISO/PAS 20065:2016 Formula (20) | Mean audibility of the five spectra, Annex E | 6.96 dB (+/-0.05 dB) | 6.98 dB | 0.018 dB | &#9989; |
+| ISO/PAS 20065:2016 Formula (6) | Mean narrow-band level LS from spectrum, Table E.1 | 49.22 dB (+/-0.02 dB) | 49.22 dB | -0.001 dB | &#9989; |
+| ISO/PAS 20065:2016 Clause 6 | Extended uncertainty U of the 137.3 Hz tone, Table E.2 | 2.79 dB (+/-0.02 dB) | 2.8 dB | 0.006 dB | &#9989; |
+| ISO/PAS 20065:2016 Formulae (28)-(29) | Extended uncertainty of the mean audibility, Annex E Step 4 | 1.38 dB (+/-0.01 dB) | 1.38 dB | -0.003 dB | &#9989; |
+| ISO/PAS 20065:2016 Formula (8) | Tone level LT from spectrum, Table E.1 | 67.96 dB (+/-0.02 dB) | 67.96 dB | -0.005 dB | &#9989; |
+| ISO/PAS 20065:2016 Clause 5.3.8 | Tone detection over the spectrum, Table E.1 | tones at [118.4, 137.3, 158.8] Hz | tones at [118.4, 137.3, 158.8] Hz | exact | &#9989; |
+| ISO/PAS 20065:2016 Clause 5.3.8 Step 3 | Same-band FG combination inside analyze_spectrum, Table E.2 row 2 FG | 72.15 dB (+/-0.02 dB) | 72.15 dB | -0.002 dB | &#9989; |
+| ISO/PAS 20065:2016 Formula (17) | Multi-tone FG combination, Table E.1 | 72.15 dB (+/-0.02 dB) | 72.15 dB | -0.002 dB | &#9989; |
+| ISO/PAS 20065:2016 Formulae (18)/(19) | Two-tone separation fD (DIN 45681 Annex J), 137.3 / 212 Hz | fD(137.3)=24.09, fD(212)=21.0 Hz; Annex E pair combined | fD(137.3)=24.09, fD(212)=21.00 Hz; Annex E pair combined | exact | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Psychoacoustic annoyance &amp; fluctuation strength (Fastl &amp; Zwicker)</b>: 100% (3/3)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| Fastl & Zwicker Eqs (16.2)-(16.4) | Psychoacoustic annoyance, worked (N5,S,F,R) tuple | 37.0478 (+/-0.001) | 37.0477 | 0 | &#9989; |
+| Fastl & Zwicker Eq (10.2) | Fluctuation strength of AM broadband noise (60 dB, m=1, 4 Hz) | 3.6943 vacil (+/-0.001 vacil) | 3.6943 vacil | 0 vacil | &#9989; |
+| Fastl & Zwicker Ch. 10 / Osses et al. 2016 | Fluctuation-strength calibration: 1 kHz / 60 dB / m=1 / 4 Hz AM tone | 1 vacil (+/-0.05 vacil) | 1 vacil | 0 vacil | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Electroacoustics: distortion &amp; frequency response</b>: 100% (20/20)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| IEC 60268-3:2013 (14.12.3.2) | THD (rel. total RMS, the R convention the clause defines) | 0.112853 (+/-0.0001) | 0.112853 | 0 | &#9989; |
+| Closed-form harmonic synthesis (THD_F convention) | THD (rel. fundamental, the widespread datasheet convention) | 0.113578 (+/-0.0001) | 0.113578 | 0 | &#9989; |
+| IEC 60268-5:2003 (20.3/20.4) | Characteristic sensitivity level, 1 W into 8 ohm at 1 m (flat 90 dB) | 90 dB (+/-0.000001 dB) | 90 dB | 0 dB | &#9989; |
+| IEC 60268-5:2003 (21.2) | Effective frequency range = -10 dB crossings (50 Hz / 18 kHz) | 50 Hz / 18000 Hz (ref -10 dB crossings) | 50.000 Hz / 18000.0 Hz | -0.000 / -0.000 Hz | &#9989; |
+| IEC 60268-3:2013 (14.12.5) | 2nd-order harmonic distortion d2 (rel. total) | 0.099361 (+/-0.0001) | 0.099361 | 0 | &#9989; |
+| IEC 60268-4:2014 (11.1/11.3) | Microphone sensitivity level, 12.5 mV/Pa -> 20 lg 0.0125 dB re 1 V/Pa | -38.0618 dB (+/-0.00001 dB) | -38.0618 dB | 0 dB | &#9989; |
+| IEC 60268-4:2014 (12.2) | Effective frequency range = +/-3 dB tolerance crossings (40 Hz / 18 kHz) | 40 Hz / 18000 Hz (+/-3 dB tolerance crossings) | 40.000 Hz / 18000.0 Hz | 0.000 / -0.000 Hz | &#9989; |
+| IEC 60268-4:2014 (13.2.2) | Directivity index of the ideal cardioid, 10 lg 3 dB (11.2.2 a integral) | 4.771213 dB (+/-0.005 dB) | 4.771214 dB | 0 dB | &#9989; |
+| IEC 60268-4:2014 (17.2) | Equivalent noise level, 2.5 uV over 12.5 mV/Pa -> 200 uPa = 20 dB SPL | 20 dB SPL (+/-0 dB SPL) | 20 dB SPL | 0 dB SPL | &#9989; |
+| IEC 60268-3:2013 (14.12.7.2 g) | Modulation distortion d_m,2 (arithmetic sideband sum over U_2,f2) | 0.16 (+/-0.0001) | 0.16 | 0 | &#9989; |
+| IEC 60268-3:2013 (14.12.7.2 h) | Modulation distortion d_m,3 (arithmetic sideband sum over U_2,f2) | 0.08 (+/-0.0001) | 0.08 | 0 | &#9989; |
+| IEC 60268-3:2013 (14.12.8.1 a) | Difference-frequency distortion d_d,2 (over U_2,ref = 2 U_2,f2) | 0.03 (+/-0.0001) | 0.03 | 0 | &#9989; |
+| IEC 60268-3:2013 (14.12.8.1 b) | Difference-frequency distortion d_d,3 (arithmetic product sum) | 0.04 (+/-0.0001) | 0.04 | 0 | &#9989; |
+| IEC 60268-3:2013 (14.12.10) | Total difference-frequency distortion (8 kHz / 11.95 kHz tones) | 0.03605551 (+/-0.0001) | 0.03605551 | 0 | &#9989; |
+| ITU-R BS.468-4 Table 1 | Weighting network response at the 6.3 kHz peak (14.12.11 network) | 12.2 dB (+/-0 dB) | 12.2 dB | 0 dB | &#9989; |
+| IEC 60268-3:2013 (14.12.9) | DIM of the 15 kHz / 3.15 kHz signal (Table 2, 9 products) | 0.168819 (+/-0.0001) | 0.168819 | 0 | &#9989; |
+| Bendat & Piersol, Random Data 4e | H1 recovers a known first-order IIR gain at 1 kHz | 0.8954 (+/-2%) | 0.8954 | 0 | &#9989; |
+| Bendat & Piersol, Random Data 4e | Ordinary coherence = 1 for a noiseless LTI path | 1 (+/-0.001) | 1 | 0 | &#9989; |
+| AES17-2015 (6.4.2 / 5.2.7) | Idle channel noise, 1 kHz -20 dBFS tone (CCIR-RMS -5.63 dB offset) | -25.63 dB (+/-0.01 dB) | -25.63 dB | 0 dB | &#9989; |
+| AES17-2015 (6.4.1) | Dynamic range, full-scale reference over a -40 dBFS residual at 2 kHz | 40 dB (+/-0.6 dB) | 40.41 dB | 0.414 dB | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Calibrated spectral analysis (Bendat &amp; Piersol)</b>: 100% (12/12)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| Bendat & Piersol, Random Data 4e Eq. (5.67) | White-noise autospectral density = sigma^2/(fs/2) | 0.000977 (+/-3%) | 0.000982 | 0 | &#9989; |
+| Bendat & Piersol, Random Data 4e Eq. (8.158) | PSD random error = 1/sqrt(nd) (Monte Carlo, 100 seeded records) | 0.1768 (+/-6%) | 0.1764 | 0 | &#9989; |
+| Bendat & Piersol, Random Data 4e Eq. (8.163) | 95% chi-square confidence interval coverage (Monte Carlo) | 0.95 (+/-0.025) | 0.94 | -0.01 | &#9989; |
+| Bendat & Piersol, Random Data 4e Eqs. (9.55)/(6.39) | Coherent output spectrum of a known-SNR path: gamma^2 = SNR/(1+SNR) | 0.7191 (+/-0.03) | 0.7255 | 0.006 | &#9989; |
+| Closed-form power-law slope (10*lg(2) dB/octave per unit exponent) | Pink-noise PSD slope over 20 Hz - 20 kHz, dB/octave | -3.0103 dB/oct (+/-0.05 dB/oct) | -3.0116 dB/oct | -0.001 dB/oct | &#9989; |
+| IEC 60268-1:1985 Clause A2.1 / Table AII | 5 ms burst of 5 kHz tone at 48 kHz: gate RMS = A/sqrt(2) (integral periods) | 0.707107 (+/-0) | 0.707107 | 0 | &#9989; |
+| Harris 1978 closed form (DFT-even Hann) | Hann window ENBW = n*sum(w^2)/sum(w)^2 = 3/2 exactly | 1.5 (+/-0) | 1.5 | 0 | &#9989; |
+| Constant-power 1/n-octave kernel (closed form) | 1/3-octave smoothed line level = P*df/(f0*(2^(1/6)-2^(-1/6))) | 0.021592 (+/-1e-07%) | 0.021592 | 0 | &#9989; |
+| Percival & Walden 1993, Table 382 | Slepian taper concentration lambda_14(31, 8/31), quadruple-precision table | 0.92943822082 (+/-0.000000000001) | 0.92943822082 | 0 | &#9989; |
+| Percival & Walden 1993, Section 7.2 / Eq. (333) | Multitaper white-noise density = sigma^2/(fs/2), NW=4, K=7 tapers | 0.000977 (+/-3%) | 0.000963 | 0 | &#9989; |
+| Percival & Walden 1993, Eq. (369a) tone calibration | Multitaper 'spectrum' scaling reads a sinusoid peak at A^2/2 | 4.5 (+/-0.01%) | 4.500003 | 0 | &#9989; |
+| Percival & Walden 1993, Eq. (370b) | Adaptive multitaper dof -> 2K on white noise (weights -> uniform) | 14 (+/-2%) | 13.9847 | -0.015 | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Multiple-input coherence (Bendat &amp; Piersol)</b>: 100% (5/5)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| Bendat & Piersol, Random Data 4e Problem 7.2 / Eqs. (7.86)/(7.94) | Conditioned coherent output of the 2nd input abs(G2y.1)^2/G22.1 = 4/3 exactly | 1.333333333 (+/-0) | 1.333333333 | 0 | &#9989; |
+| Bendat & Piersol, Random Data 4e Problem 7.2 / Eqs. (7.87)/(7.116) | Partial coherence gamma^2_2y.1 = 2/15 and multiple coherence = 0.7 | 0.7 (+/-0) | 0.7 | 0 | &#9989; |
+| Bendat & Piersol, Random Data 4e Eq. (7.35) with Eqs. (6.40)/(6.41) | Multiple coherence of a known-SNR system: gamma^2_{y:x} = SNR/(1+SNR) | 0.8889 (+/-0.03) | 0.8913 | 0.002 | &#9989; |
+| Bendat & Piersol, Random Data 4e Eq. (7.117) | Uncorrelated inputs: multiple coherence = sum of ordinary coherences | 0 (+/-0.02) | -0.0098 | -0.01 | &#9989; |
+| Bendat & Piersol, Random Data 4e Eqs. (7.88)/(7.121) | Output-power decomposition Gyy = sum of Gvi + Gnn (exact) | 0 (+/-0.000000000001) | 0 | 0 | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Time-frequency analysis (Bendat &amp; Piersol)</b>: 100% (3/3)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| Bendat & Piersol, Random Data 4e Eq. (12.173) | Spectrogram of an on-bin tone reads its mean square A^2/2 in every column | 2 (+/-1e-07%) | 2 | 0 | &#9989; |
+| Parseval + COLA identity (Hann taper, 75% overlap) | Time-integrated STFT power = time-domain energy of an interior burst | 0.236151 (+/-1e-10%) | 0.236151 | 0 | &#9989; |
+| Bendat & Piersol, Random Data 4e Eqs. (11.128)-(11.130) | Zoom FFT tone amplitude = demodulate-decimate-DFT chain, machine precision | 0.7 (+/-1e-10%) | 0.7 | 0 | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Correlation, time delay and envelope (B&amp;P / Knapp &amp; Carter)</b>: 100% (7/7)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| Bendat & Piersol, Random Data 4e Eq. (5.21) | Cross-correlation peak of a 16-sample pure delay, samples | 16 (+/-0.001) | 16 | 0 | &#9989; |
+| Knapp & Carter 1976, Table I (PHAT) + sub-sample interpolation | GCC-PHAT estimate of an exact 12.25-sample fractional delay, samples | 12.25 (+/-0.005) | 12.2483 | -0.002 | &#9989; |
+| Bendat & Piersol, Random Data 4e Eq. (5.101) | Cross-spectrum phase-slope estimate of the same fractional delay | 12.25 (+/-0.001) | 12.2498 | 0 | &#9989; |
+| Bendat & Piersol, Random Data 4e Eq. (8.120) | BLWN autocorrelation coefficient at 3 samples vs sin(2piBt)/(2piBt) | -0.1559 (+/-0.02) | -0.1666 | -0.011 | &#9989; |
+| Bendat & Piersol, Random Data 4e Example 8.5 | Random error of the correlation peak: B=100 Hz, T=5 s, M/S=N/S=10 | 0.35 (+/-0.001) | 0.3493 | -0.001 | &#9989; |
+| Bendat & Piersol, Random Data 4e Table 13.1 | Hilbert transform of cos recovers sin: max interior error | 0 (+/-0) | 0 | 0 | &#9989; |
+| Bendat & Piersol, Random Data 4e Eq. (13.27) | Envelope of an AM waveform recovers 1 + m*cos(2pi*fm*t) exactly | 0 (+/-0) | 0 | 0 | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Cepstrum, liftering and envelope spectrum (Havelock / B&amp;P)</b>: 100% (3/3)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| Havelock 2008 Ch. 27 Fig. 21 + Mercator series of ln(1+a*e^{-j*theta}) | Power-cepstrum height at the echo delay = reflection coefficient a | 0.4 (+/-0) | 0.4 | 0 | &#9989; |
+| Havelock 2008 Ch. 87 Eq. (14): complex cepstrum, series term n = 2 | Second rahmonic of a reflection a = 0.4 equals -a^2/2 | -0.08 (+/-0) | -0.08 | 0 | &#9989; |
+| Bendat & Piersol, Random Data 4e Sec. 13.3 (Fig. 13.11) | Envelope-spectrum line of an AM tone (A0 = 2, m = 0.35) at fm | 0.7 (+/-0.002) | 0.7 | 0 | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Time synchronous averaging (McFadden 1987)</b>: 100% (5/5)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| McFadden 1987 Eq. 8 / Eq. 9: comb filter \|C(f)\| at a harmonic k/T | Comb-filter tooth height at a harmonic equals unity (any N) | 1 (+/-0) | 1 | 0 | &#9989; |
+| McFadden 1987 Eq. 8: comb filter one quarter-order from a tooth, N = 2 | Comb-filter magnitude = 1/sqrt(2) at order 0.25 | 0.70710678 (+/-0) | 0.70710678 | 0 | &#9989; |
+| McFadden 1987 Sec. 4 (Fig. 5): node selection, tone at 32.05 orders | N = 20 places a comb node on 32.05 orders (\|C\| = 0), not the power-of-2 N = 32 | 0 (+/-0.0000000001) | 0 | 0 | &#9989; |
+| McFadden 1987 Eq. 5: exact recovery, integer samples per period | Noiseless periodic waveform (M = 256) recovered to machine precision | 0 (+/-0.0000000001) | 0 | 0 | &#9989; |
+| McFadden 1987 Sec. 1: asynchronous-noise variance reduced by 1/N | Residual noise std of the average falls as sigma/sqrt(N), N = 64 | 0.125 (+/-15%) | 0.12414 | -0.001 | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Data qualification and Rice statistics (Bendat &amp; Piersol)</b>: 100% (8/8)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| Bendat & Piersol, Random Data 4e Example 4.4 | Reverse arrangements of the 20-observation sequence | 86 (+/-0) | 86 | 0 | &#9989; |
+| Bendat & Piersol, Random Data 4e Table A.6 | Lower percentage point A(20; 0.975) at alpha = 0.05 | 64 (+/-0) | 64 | 0 | &#9989; |
+| Bendat & Piersol, Random Data 4e Table A.6 | Upper percentage point A(20; 0.025) at alpha = 0.05 | 125 (+/-0) | 125 | 0 | &#9989; |
+| Wald & Wolfowitz 1940 exact run distribution | Runs acceptance region for n1 = n2 = 10, alpha = 0.05: lower point | 6 (+/-0) | 6 | 0 | &#9989; |
+| Wald & Wolfowitz 1940 exact run distribution | Runs acceptance region for n1 = n2 = 10, alpha = 0.05: upper point | 15 (+/-0) | 15 | 0 | &#9989; |
+| Bendat & Piersol, Random Data 4e Example 5.13 / Eq. (5.195) | Zero-crossing rate of bandlimited noise (fc = 1 kHz, B = 400 Hz) | 2013 (+/-1%) | 2013 | -0.551 | &#9989; |
+| Bendat & Piersol, Random Data 4e Example 5.12 | Apparent frequency of low-pass noise (B = 2 kHz) = 0.577 B | 1155 (+/-1%) | 1159 | 3.911 | &#9989; |
+| Bendat & Piersol, Random Data 4e Example 5.14 / Eq. (5.206) | Prob[positive peak > 4 sigma] of a narrow bandwidth record | 0.000335 (+/-0.00001) | 0.000334 | 0 | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Underwater acoustics (ISO 18405/17208/18406)</b>: 100% (6/6)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| ISO 18405:2017 / ISO 18406 Formula 7 | Sound pressure level of a synthetic tone, dB re 1 µPa | 123.0103 (+/-0.0001) | 123.0103 | 0 | &#9989; |
+| ISO 18405:2017 / ISO 18406 Formulae 3-4 | Sound exposure level of a 2 s tone, dB re 1 µPa²·s | 120 (+/-0.001) | 120 | 0 | &#9989; |
+| ISO 18406:2017 (6.4.2.1.3) | Peak sound pressure level of a known waveform, dB re 1 µPa | 129.5424 (+/-0.0001) | 129.5424 | 0 | &#9989; |
+| ISO 17208-1:2016 | Radiated noise level from RMS pressure and distance, dB re 1 µPa·m | 46.0206 (+/-0.0001) | 46.0206 | 0 | &#9989; |
+| ISO 17208-2:2019 (Formula 3) | Lloyd's-mirror surface correction ΔL at a known k·d_s | -3.5211 (+/-0.0001) | -3.5211 | 0 | &#9989; |
+| ISO 18406:2017 (Formulae 8-9) | Cumulative SEL of N identical strikes = SEL_ss + 10·lg(N) | 196.9897 (+/-0) | 196.9897 | 0 | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Underwater sound propagation (transmission loss)</b>: 100% (15/15)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| Mackenzie (1981) nine-term equation | Speed of sound at 25 °C, 35 ‰, 1000 m (canonical check value), m/s | 1550.744 m/s (+/-0.01 m/s) | 1550.744 m/s | 0 m/s | &#9989; |
+| UNESCO/Chen-Millero vs Mackenzie | Sound-speed agreement at 10 °C, 35 ‰, 1000 m (cross-model), m/s | 1506.264 m/s (+/-1 m/s) | 1506.524 m/s | 0.261 m/s | &#9989; |
+| Del Grosso (1974) vs Mackenzie | Sound-speed agreement at 10 °C, 35 ‰, 1000 m (cross-model), m/s | 1506.264 m/s (+/-1 m/s) | 1506.313 m/s | 0.049 m/s | &#9989; |
+| Spherical spreading 20·lg(R) | Geometrical spreading loss at R = 1000 m, dB | 60 dB (+/-0 dB) | 60 dB | 0 dB | &#9989; |
+| Thorp (1967) absorption | Volume absorption α at 10 kHz (cold deep water), dB/km | 1.1498 dB/km (+/-0 dB/km) | 1.1498 dB/km | 0 dB/km | &#9989; |
+| Ainslie-McColm (1998) vs Francois-Garrison (1982) | Absorption agreement at 10 kHz, 10 °C, 35 ‰, 0 m, pH 8, dB/km | 0.9626 dB/km (+/-0.0963 dB/km) | 0.9866 dB/km | 0.024 dB/km | &#9989; |
+| Francois-Garrison (1982) Part II Table IV | Absorption α at 100 kHz, 10 °C, 35 ‰, 0 m, pH 8 (printed value), dB/km | 33.6 dB/km (+/-0.05 dB/km) | 33.63 dB/km | 0.03 dB/km | &#9989; |
+| Del Grosso refit (Wong-Zhu 1995 Table IV) | c(t90 = 20 °C, S = 35, P = 500 bar) vs the printed check table, m/s | 1603.679 m/s (+/-0.001 m/s) | 1603.679 m/s | 0 m/s | &#9989; |
+| Wales-Heitmeyer (2002) ensemble spectrum | Merchant-ship source PSD at 100 Hz (printed equation), dB re 1 µPa²/Hz | 158.45 dB (+/-0.001 dB) | 158.45 dB | 0 dB | &#9989; |
+| Passive sonar equation (Urick/Etter) | Figure of merit SL − (NL − DI) − DT, dB | 85 dB (+/-0 dB) | 85 dB | 0 dB | &#9989; |
+| Seabed reflection (Rayleigh, normal incidence) | Bottom loss at 90° grazing, sand ρ=1900 c=1650 over water, dB | 9.0506 dB (+/-0 dB) | 9.0506 dB | 0 dB | &#9989; |
+| Wenz wind noise (rule of fives) | Wind spectrum level at 1 kHz, 5 kn (canonical anchor), dB re 1 µPa²/Hz | 51.0206 dB (+/-0.0001 dB) | 51.0206 dB | 0 dB | &#9989; |
+| Mellen thermal noise | Thermal spectrum level at 50 kHz, 16.85 °C (physical), dB re 1 µPa²/Hz | 19.3426 dB (+/-0 dB) | 19.3426 dB | 0 dB | &#9989; |
+| JOMOPANS-ECHO ship source level | Bulker V=13.5 kn L=211 m band level at 1 kHz (File S1 oracle), dB re 1 µPa m | 161.394 dB (+/-0.01 dB) | 161.394 dB | 0 dB | &#9989; |
+| UNESCO sound speed (EOS-80 canonical value) | SVEL(S = 40, T68 = 40 °C, P = 1000 bar) vs Fofonoff & Millard 1983, m/s | 1731.995 m/s (+/-0.02 m/s) | 1732.004 m/s | 0.009 m/s | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Underwater numerical propagation (modes / rays / PE)</b>: 100% (4/4)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| Normal modes vs ideal waveguide | Fundamental horizontal wavenumber kr1 at 20 Hz, 100 m (analytic), rad/m | 0.077662 rad/m (+/-0.0001 rad/m) | 0.077662 rad/m | 0 rad/m | &#9989; |
+| Normal modes vs image-source oracle | Absolute TL at 1 km in the ideal waveguide (converged image sum), dB | 48.238 dB (+/-0.02 dB) | 48.239 dB | 0.001 dB | &#9989; |
+| Ray tracing vs linear gradient | Turning depth of a 10° ray, c = 1500 + 0.05z (circular arc), m | 462.8 m (+/-1 m) | 462.8 m | 0 m | &#9989; |
+| Parabolic equation vs free field | PE transmission loss at 2 km, homogeneous medium (spherical spreading), dB | 66.021 dB (+/-0.1 dB) | 66.021 dB | 0 dB | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Aircraft noise (ICAO Annex 16 / IEC 61265)</b>: 100% (15/15)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| ECAC Doc 29 noise fraction (half path) | Finite-segment correction ΔF for a perpendicular foot at the segment start, dB | -3.0103 dB (+/-0.001 dB) | -3.0103 dB | 0 dB | &#9989; |
+| ECAC Doc 29 single-event chain | SEL of a long level flyover vs the infinite-path limit LE∞ + ΔI − Λ, dB | 83.444 dB (+/-0.01 dB) | 83.444 dB | 0 dB | &#9989; |
+| ECAC Doc 29 impedance adjustment (standard atmosphere) | Acoustic-impedance adjustment of NPD data at 15 °C / 101.325 kPa (Eq. 4-6/4-7), dB | 0.074 dB (+/-0.0005 dB) | 0.0741 dB | 0 dB | &#9989; |
+| ECAC Doc 29 reference workbook (segment Λ) | Lateral attenuation of a climbing segment vs the ECAC Vol 3 Part 1 workbook, dB | 6.3769 dB (+/-0.01 dB) | 6.3769 dB | 0 dB | &#9989; |
+| ECAC Doc 29 start-of-roll directivity (jet) | ΔSOR behind a takeoff ground-roll segment vs the Vol 3 Part 1 workbook, dB | 0.3196 dB (+/-0.01 dB) | 0.3196 dB | 0 dB | &#9989; |
+| ECAC Doc 29 start-of-roll directivity (turboprop) | ΔSOR behind a takeoff ground-roll segment (turboprop, Eq. 4-24b), dB | 1.0943 dB (+/-0.01 dB) | 1.0944 dB | 0 dB | &#9989; |
+| ECAC Doc 29 workbook event assembly (JETFDS/R03, behind SOR) | Energy sum of the reference per-segment SELs vs the B-1 event total, dB | 74.73 dB (+/-0.01 dB) | 74.733 dB | 0.003 dB | &#9989; |
+| SAE ARP 5534 band-attenuation continuity | SAE-Method δ_B at the 150 dB branch split (Eq. 7 vs Eq. 8), dB | 123.95 dB (+/-0.01 dB) | 123.953 dB | 0.003 dB | &#9989; |
+| EASA ANP database round-trip | Interpolated NPD level at a tabulated node vs the published ANP value, dB | 98.8 dB (+/-0 dB) | 98.8 dB | 0 dB | &#9989; |
+| ECAC Doc 29 NPD interpolation | Log-linear NPD level at the log-midpoint distance (Eq. 4-4), dB | 97 dB (+/-0 dB) | 97 dB | 0 dB | &#9989; |
+| SAE ARP 5534 pure-tone coefficient (ISO 9613-1) | Mid-band α at 1 kHz, 25 °C, 70 % RH, 101.325 kPa, dB/m | 0.006186 dB/m (+/-0 dB/m) | 0.006186 dB/m | 0 dB/m | &#9989; |
+| ICAO Annex 16 Vol. I App. 2 Table A2-3 | Perceived noisiness at SPL(b), 1 kHz band, in noys | 1 (+/-0) | 1 | 0 | &#9989; |
+| ICAO Doc 9501 ETM Vol. I Table 3-7 | Tone correction of the turbofan example, dB | 2 (+/-0) | 2 | 0 | &#9989; |
+| ICAO Doc 9501 ETM Vol. I Table 4-4 | Integrated-method reference EPNL, EPNdB | 92.619 EPNdB (+/-0.01 EPNdB) | 92.619 EPNdB | 0 EPNdB | &#9989; |
+| IEC 61265:1995 Table 1 | Directional-response tolerance at 4 kHz / 90°, dB | 2 dB (+/-0 dB) | 2 dB | 0 dB | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Rotorcraft noise (ECAC Doc 32 / NORAH2)</b>: 100% (12/12)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| ECAC Doc 32 atmospheric attenuation (Table 4) | ΔLa over a 1 km excess path at 1 kHz vs the NORAH2 guidance Table 4, dB | 6.3 dB (+/-0.2 dB) | 6.186 dB | -0.114 dB | &#9989; |
+| ECAC Doc 32 spherical spreading | ΔLs at ten times the 60 m hemisphere reference distance (Eq. 24), dB | -20 dB (+/-0 dB) | -20 dB | 0 dB | &#9989; |
+| ECAC Doc 32 ground effect (rigid limit) | ΔLg over a rigid surface at grazing incidence tends to +6 dB (Eq. 29), dB | 6 dB (+/-1 dB) | 6 dB | 0.002 dB | &#9989; |
+| ECAC Doc 32 propagation chain (NORAH2 prototype) | LA of a single-hemisphere emission vs the NORAH2 prototype single-event history (R22 approach, 223.66 m slant), dB(A) | 55.87 dB(A) (+/-0.1 dB(A)) | 55.886 dB(A) | 0.016 dB(A) | &#9989; |
+| ECAC Doc 32 flight-condition interpolation (NORAH2 Eq. 8) | Distance-scaled triangle blend of three uniform hemispheres, hand-checked, dB | 97.0367 dB (+/-0.001 dB) | 97.0364 dB | 0 dB | &#9989; |
+| ECAC Doc 32 flight-path kinematics (Eq. 17) | Airspeed of a straight climbing track, 40 m/s ground speed at a 5° path angle, m/s | 40.15279 m/s (+/-0.0001 m/s) | 40.15279 m/s | 0 m/s | &#9989; |
+| ECAC Doc 32 retarded time (Eq. 22) | Recorded-time delay at 100 m slant distance, r/c with c = 346.1 m/s, s | 0.288934 s (+/-0.00001 s) | 0.288934 s | 0 s | &#9989; |
+| ECAC Doc 32 single event (Eq. 27) | SEL − LASmax of a constant-speed level flyover, 10·lg(π·d/V) closed form, dB | 7.982 dB (+/-0.1 dB) | 7.942 dB | -0.04 dB | &#9989; |
+| NORAH2 guidance mean ground plane (Eq. 36-40) | Intercept of the plane fitted to a symmetric 20 m roofline, hand-checked, m | 10 m (+/-0 m) | 10 m | 0 m | &#9989; |
+| NORAH2 guidance mean flow resistivity (Eq. 41) | Log-average of equal 1e4 and 1e6 Pa·s/m2 halves, hand-checked, Pa·s/m2 | 100000 Pa·s/m² (+/-0 Pa·s/m²) | 100000 Pa·s/m² | 0 Pa·s/m² | &#9989; |
+| NORAH2 guidance diffraction at grazing (Eq. 42) | Pure diffraction with the edge on the line of sight, 10·lg 3, dB | 4.7712 dB (+/-0.0001 dB) | 4.7712 dB | 0 dB | &#9989; |
+| NORAH2 guidance screening path difference (§A.4.5) | Rubber-band delta over a 40 m hill, hand-checked geometry, m | 4.2848 m (+/-0 m) | 4.2848 m | 0 m | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Wind-turbine noise (IEC 61400-11)</b>: 100% (3/3)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| IEC 61400-11:2012 Formula 30 | Critical bandwidth about a 500 Hz tone, Hz | 117.255 Hz (+/-0 Hz) | 117.255 Hz | 0 Hz | &#9989; |
+| IEC 61400-11:2012 Formula 26 | Apparent sound power level of a single band, dB re 1 pW | 148.5139 dB (+/-0.0001 dB) | 148.5139 dB | 0 dB | &#9989; |
+| IEC 61400-11:2012 Formulae 31-34 | Tonal audibility of a synthetic clean tone, dB | 16.38 dB (+/-0.06 dB) | 16.38 dB | -0.001 dB | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Porous &amp; multilayer absorbers (Mechel / Bies / Cox &amp; D'Antonio)</b>: 100% (10/10)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| Bies 5e App. D Table D.1 / Mechel 2e G.11 (2) | Delany-Bazley normalised Zc at X = 0.1, real part | 1.3241 (+/-0) | 1.3241 | 0 | &#9989; |
+| Bies 5e App. D Table D.1 / Mechel 2e G.11 (2) | Delany-Bazley normalised Zc at X = 0.1, imaginary part | -0.4694 (+/-0) | -0.4694 | 0 | &#9989; |
+| Miki 1990 Eqs. (30)-(34) | Miki normalised wavenumber at f/sigma = 0.1, real part | 1.4523 (+/-0) | 1.4523 | 0 | &#9989; |
+| Johnson et al. 1987 / Cox & D'Antonio 3e Eq. (6.19) | JCA static viscous limit j w rho_e -> sigma, Pa s/m2 | 20000 Pa s/m2 (+/-0.01%) | 20000 Pa s/m2 | 0 Pa s/m2 | &#9989; |
+| Mechel 2e Sect. D.3 Eq. (1) | Hard-backed layer: TMM vs -j Zc cot(kd), max rel deviation | 0 (+/-0) | 0 | 0 | &#9989; |
+| Lossless-layer limit (Mechel 2e Sect. D.3-D.4) | Air cavity over a rigid wall at lambda/4: alpha | 0 (+/-0) | 0 | 0 | &#9989; |
+| Mechel 2e Sect. D.5 | Maximum statistical absorption of a locally reacting plane | 0.951 (+/-0.001) | 0.951 | 0 | &#9989; |
+| Cox & D'Antonio 3e Eq. (7.9) | Membrane resonance 60/sqrt(m d), m = 5 kg/m2, d = 5 cm, Hz | 120 Hz (+/-2%) | 119.85 Hz | -0.15 Hz | &#9989; |
+| Maa 1998 Fig. 5 / Cox & D'Antonio 3e Fig. 7.28 | Microperforated panel (d=t=0.2 mm, b=2.5 mm, D=6 cm): peak alpha | 0.95 (+/-0.05) | 0.956 | 0.006 | &#9989; |
+| Maa 1998 Eqs. (5a)/(10) | MPP peak absorption vs 4r/(1+r)^2 with Maa's printed resistance | 4r/(1+r)^2 = 0.949 | 0.956 | 0.007 | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Slow-sound perfect absorbers (Jimenez et al. Appl. Sci. 2017)</b>: 100% (3/3)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| Jimenez et al. Appl. Sci. 2017 Eq. (9) | Critical coupling: alpha at the design frequency (300 Hz, normal) | 1 (+/-0.001) | 1 | 0 | &#9989; |
+| Poiseuille limit (Stinson 1991) | Slit: j w rho_s -> 12 eta / h^2 as w -> 0 (h = 1.2 mm) | 153.3 Pa s/m2 (+/-0.1%) | 153.3 Pa s/m2 | 0 Pa s/m2 | &#9989; |
+| Poiseuille limit (Stinson 1991) | Square duct: j w rho -> 28.454 eta / w^2 as w -> 0 (w = 3 mm) | 58.2 Pa s/m2 (+/-0.2%) | 58.2 Pa s/m2 | 0 Pa s/m2 | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Program loudness (ITU-R BS.1770 / EBU R 128)</b>: 100% (8/8)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| ITU-R BS.1770-5 Annex 1 | 997 Hz sine at 0 dB FS on the left channel, LKFS | -3.01 LKFS (+/-0.01 LKFS) | -3.01 LKFS | 0 LKFS | &#9989; |
+| EBU Tech 3341:2023 Table 1 case 1 | Integrated loudness of the -23 dBFS stereo sine, LUFS | -23 LUFS (+/-0.1 LUFS) | -22.99 LUFS | 0.007 LUFS | &#9989; |
+| EBU Tech 3341:2023 Table 1 case 5 | Gated integrated loudness of the -26/-20/-26 dBFS steps, LUFS | -23 LUFS (+/-0.1 LUFS) | -22.98 LUFS | 0.021 LUFS | &#9989; |
+| EBU Tech 3341:2023 Table 1 case 6 | Integrated loudness of the 5.0-channel sine (Table 3 weights), LUFS | -23 LUFS (+/-0.1 LUFS) | -23.02 LUFS | -0.016 LUFS | &#9989; |
+| EBU Tech 3341:2023 Table 1 case 15 | True-peak level of the fs/4 sine at 0.5 FFS, dBTP | -6 dBTP (+0.2/-0.4 dB) | -6.02 dBTP | -0.015 dBTP | &#9989; |
+| EBU Tech 3341:2023 Table 1 case 19 | True-peak level of the fs/4 sine at 1.41 FFS, dBTP | 3 dBTP (+0.2/-0.4 dB) | 3 dBTP | 0.001 dBTP | &#9989; |
+| EBU Tech 3342:2023 Table 1 case 1 | Loudness range of the -20/-30 dBFS tone steps, LU | 10 LU (+/-1 LU) | 10 LU | 0 LU | &#9989; |
+| EBU Tech 3342:2023 Table 1 case 3 | Loudness range of the -40/-20 dBFS tone steps, LU | 20 LU (+/-1 LU) | 20 LU | 0 LU | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>2D FDTD wave simulation (Attenborough &amp; Van Renterghem 2021, Ch. 4)</b>: 100% (2/2)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| Rigid rectangular box eigenfrequency | Mode (1,1) of a 1.0 x 0.7 m rigid box, f = (c/2)*sqrt(1/lx^2 + 1/ly^2), Hz | 299.06 Hz (+/-1.5 Hz) | 298.91 Hz | -0.153 Hz | &#9989; |
+| Free-field pulse arrival delay | Probe-to-probe delay of a pulse over 0.6 m of air, (r2 - r1)/c, ms | 1.749 ms (+/-0.05 ms) | 1.756 ms | 0.007 ms | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Swept-sine distortion &amp; phase utilities (Farina / Novak)</b>: 100% (7/7)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| Farina 2000 / Novak et al. 2015 (Chebyshev identity) | 3rd-harmonic response H3 magnitude of a cubic polynomial, re a3/4 | 0.05 (+/-0.0005) | 0.05001 | 0 | &#9989; |
+| Novak et al. 2015, JAES 63(10), Eqs. 18/49 | Synchronized-sweep phase of H3 (Chebyshev: -sin(3wt)), rad | 3.1416 rad (+/-0.005 rad) | 3.1411 rad | 0 rad | &#9989; |
+| Farina 2000, AES 108th Conv. (THD from one sweep) | THD(1 kHz) of the polynomial vs sqrt((a2/2)^2+(a3/4)^2)/(1+3a3/4) | 0.06149 (+/-0.001) | 0.06159 | 0 | &#9989; |
+| Farina 2000 (distortion rejected from the linear IR) | THD floor of a purely linear path (gain 0.5), max over 100-2000 Hz | 0 (+/-0.001) | 0.00033 | 0 | &#9989; |
+| Bendat & Piersol, Random Data 4e Sec. 13.1.4 (Hilbert relation) | Min-phase reconstruction of a strictly min-phase biquad, max err, rad | 0 rad (+/-0 rad) | 0 rad | 0 rad | &#9989; |
+| First-order allpass closed form (1-a^2)/(1+2a cos w+a^2) | Group delay of the a = 0.5 allpass at w = pi/2, samples | 0.6 (+/-0.00001) | 0.6 | 0 | &#9989; |
+| All-pass decomposition of a pure latency (B&P Sec. 13.1.4) | Excess group delay of a biquad delayed 7.25 samples, samples | 7.25 (+/-0) | 7.25 | 0 | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Spherical ground &amp; barriers (Attenborough / Salomons / Bies)</b>: 100% (7/7)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| Attenborough 2e Eq. (2.40c) (spherical Q, hard-ground limit) | abs(Q) as Z grows large (Rp -> 1 so (1 - Rp) -> 0 and Q -> 1) | 1 (+/-0.000001) | 1 | 0 | &#9989; |
+| Salomons 2001 Sec. 3.4 (two-ray field over a rigid ground) | dL enhancement at small path difference (constructive, +6 dB) | 6.0206 dB (+/-0.1 dB) | 6.0205 dB | 0 dB | &#9989; |
+| Salomons 2001 Eq. (D.59) (plane-wave Rp, grazing incidence) | Re(Rp) at grazing (hs, hr -> 0, cos(theta) -> 0 so Rp -> -1) | -1 (+/-0.001) | -1 | 0 | &#9989; |
+| Salomons 2001 Fig. D.3 (grassland ground dip, sigma = 200 kPa s/m2) | Minimum dL for hs = hr = 2 m, r = 100 m (dip near 395 Hz), dB | -12.7 dB (+/-0.3 dB) | -12.72 dB | -0.022 dB | &#9989; |
+| Bies 5e Eq. (5.138) (Kurze-Anderson, N -> 0) | Barrier attenuation at the shadow boundary N = 0 | 5 dB (+/-0 dB) | 5 dB | 0 dB | &#9989; |
+| Bies 5e Eq. (5.138) (Kurze-Anderson, large-N slope) | Delta(N=10) - Delta(N=1) vs the 10 lg(10) = 10 dB decade growth | 10 dB (+/-0.5 dB) | 9.8845 dB | -0.116 dB | &#9989; |
+| Attenborough 2e Eqs. (9.19)-(9.20) (rigid half-plane, shadow boundary) | Exact thin-screen insertion loss at grazing (field halved, 6 dB) | 6.0206 dB (+/-0.6 dB) | 5.7932 dB | -0.227 dB | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Panel &amp; aperture sound insulation (Bies / Hopkins / Cremer)</b>: 100% (11/11)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| Bies 5e Eq. 7.40 (mass law) | 6 dB per octave (500 -> 1000 Hz) | 6.0206 dB (+/-0.01 dB) | 6.02 dB | -0.001 dB | &#9989; |
+| Bies 5e Eq. 7.40 (mass law) | 6 dB per doubling of mass | 6.0206 dB (+/-0.01 dB) | 6.02 dB | -0.001 dB | &#9989; |
+| Bies 5e Eq. 7.42 (field incidence) | One-third-octave correction 5.5 dB | 5.5 dB (+/-0.001 dB) | 5.5 dB | 0 dB | &#9989; |
+| Hopkins Eq. 2.201 / Bies Eq. 7.3 | Coincidence frequency, 6 mm glass | 2079 Hz (+/-3%) | 2107.3639 Hz | 28.364 Hz | &#9989; |
+| Cremer Table 5.1 | Thin-plate point impedance Z = 8 sqrt(B' m'') | 2529.8221 N.s/m (+/-0 N.s/m) | 2529.8221 N.s/m | 0 N.s/m | &#9989; |
+| Cremer Table 5.1 | Infinite-beam mobility phase -45 deg | -45 deg (+/-0 deg) | -45 deg | 0 deg | &#9989; |
+| Hopkins Eq. 2.229 (Leppington/Maidanik) | Radiation efficiency at f = 2 fc | 1.4142 (+/-0) | 1.4142 | 0 | &#9989; |
+| Bies Eq. 7.62 / Hopkins Eq. 4.73 | Mass-air-mass resonance f0, empty cavity | 76.9484 Hz (+/-0.5%) | 76.8521 Hz | -0.096 Hz | &#9989; |
+| Bies Eq. 7.64 (double wall) | Below f0 = mass law of the combined mass | 11.6144 dB (+/-0 dB) | 11.6144 dB | 0 dB | &#9989; |
+| Hopkins Eq. 4.92 (composite) | 1 % open area caps R at 10 lg(S/Sa) | 20 dB (+/-0.05 dB) | 19.9996 dB | 0 dB | &#9989; |
+| Hopkins Eq. 4.99/4.101 (Gomperts slit) | Transmission maximum at first resonance | 1544.9615 Hz (+/-15 Hz) | 1542.9615 Hz | -2 Hz | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Bending-wave plate-junction transmission (Cremer / Craik / Hopkins)</b>: 100% (6/6)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| Hopkins Eq. 5.12 (identical plates) | X-junction corner tau12(0 deg) = 1/8 | 0.125 (+/-0) | 0.125 | 0 | &#9989; |
+| Hopkins Eqs 5.12 + 5.6 (identical plates) | X-junction corner angular average = 1/12 | 0.0833 (+/-0) | 0.0833 | 0 | &#9989; |
+| Hopkins Eqs 5.12 + 5.6 (identical plates) | L-junction corner angular average = 1/3 | 0.3333 (+/-0) | 0.3333 | 0 | &#9989; |
+| Hopkins Eq. 5.14 (identical plates) | In-line junction tau12(0 deg) = 1 | 1 (+/-0) | 1 | 0 | &#9989; |
+| Hopkins Eq. 5.7 (SEA consistency) | X-junction reciprocity tau_bar_12 / tau_bar_21 = chi | 1.5 (+/-0) | 1.5 | 0 | &#9989; |
+| Hopkins Eq. 5.116 (identical plates, fc_j = f_ref) | X-junction vibration reduction index = 10 lg(12) | 10.7918 dB (+/-0 dB) | 10.7918 dB | 0 dB | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Atmospheric refraction (Salomons rays / GFPE)</b>: 100% (3/3)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| Salomons Sec. 4.4 (ray turning height, linear profile) | Turning height of a 10 deg ray vs Rc(1 - cos theta0) (circular arc), m | 26.457 m (+/-0.1 m) | 26.457 m | 0 m | &#9989; |
+| Salomons Eq. (3.4) (GFPE vs spherical-wave ground effect, homogeneous) | PE relative level at 500 m over grassland vs Weyl-Van der Pol, dB | -16.368 dB (+/-0.5 dB) | -16.402 dB | -0.035 dB | &#9989; |
+| Salomons Eq. (3.4) (GFPE hard ground vs two-ray, homogeneous) | PE relative level at 500 m over a rigid ground vs the coherent two-ray, dB | 5.997 dB (+/-0.6 dB) | 5.593 dB | -0.405 dB | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Electroacoustics</b>: 100% (6/6)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| Beranek & Mellow 2e Eq. (13.117) | Piston resistance R1(x) = 1 - 2 J1(x)/x at x = 2ka = 2 | 0.423275 (+/-0.00001) | 0.423275 | 0 | &#9989; |
+| Beranek & Mellow 2e Eq. (13.118) | Piston reactance X1(x) = 2 H1(x)/x at x = 2ka = 2 | 0.646764 (+/-0.00001) | 0.646764 | 0 | &#9989; |
+| Beranek & Mellow 2e Eq. (13.117) (low-frequency limit) | R1 -> (ka)^2/2 as ka -> 0 (x = 0.02, ka = 0.01) | 0.00005 (+/-0.01%) | 0.00005 | 0 | &#9989; |
+| Beranek & Mellow 2e Eq. (4.151) | Radiation mass M = 8 rho a^3 / 3  (a = 0.1 m, rho = 1.206) | 0.003216 kg (+/-0 kg) | 0.003216 kg | 0 kg | &#9989; |
+| Beranek & Mellow 2e Eq. (13.102), Table 14.1 | First directivity null at ka sin(theta) = 3.8317 (first zero of J1) | 0 (+/-0.000001) | 0 | 0 | &#9989; |
+| Beranek & Mellow 2e §4.19 (half-space baffle) | Directivity index DI -> 10 lg 2 = 3.01 dB as ka -> 0 | 3.0103 dB (+/-0.001 dB) | 3.0103 dB | 0 dB | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Industrial noise control</b>: 100% (9/9)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| Bies 5e Eq. (8.111) | Expansion-chamber peak TL = 10 lg[1 + (1/4)(m - 1/m)^2], m = 4 at kL = pi/2 | 6.5472 dB (+/-0 dB) | 6.5472 dB | 0 dB | &#9989; |
+| Bies 5e Eq. (8.111) | Expansion-chamber trough TL = 0 at kL = pi (chamber transparent) | 0 dB (+/-0 dB) | 0 dB | 0 dB | &#9989; |
+| Bies 5e Eq. (8.44) / Example 8.1 | Quarter-wave tube tuning f = c/(4 l_e), l_e = 1.516 m -> 56.6 Hz | 56.6 Hz (+/-0.1 Hz) | 56.6 Hz | 0.003 Hz | &#9989; |
+| Bies 5e Eq. (8.46) | Helmholtz resonance f0 = (c/2pi) sqrt(S/(l_e V))  (S=1e-4, l_e=0.02, V=1e-3) | 122.067 Hz (+/-0 Hz) | 122.067 Hz | 0 Hz | &#9989; |
+| Bies 5e Eq. (8.73) | Side-branch TL = 20 lg abs(1 + rho c/(2 Sd Zb)) (QWT branch, closed form) | 0.1638 dB (+/-0 dB) | 0.1638 dB | 0 dB | &#9989; |
+| Bies 5e Eqs. (8.141)/(8.148) (four-pole insertion loss) | Insertion loss = transmission loss for the anechoic reference Zs=Zr=rho c/S | 6.2498 dB (= TL) | 6.2498 dB | 0 dB | &#9989; |
+| Bies 5e Eq. (8.275) (Wells' plenum method) | Plenum TL = -10 lg[S_out(cos0/pi r^2 + (1-a)/(Sw a))] (S_out=.1,r=1,Sw=20,a=.2) | 12.8541 dB (+/-0 dB) | 12.8541 dB | 0 dB | &#9989; |
+| Bies 5e Table 8.14 (ASHRAE end reflection, flush) | Duct end reflection D = 200 mm at 125 Hz = 10 dB (table node) | 10 dB (+/-0 dB) | 10 dB | 0 dB | &#9989; |
+| Bies 5e Eqs. (7.103), (7.111) (enclosure, fully absorbing limit) | Enclosure correction C -> 10 lg 0.3 = -5.23 dB as alpha_i -> 1 | -5.2288 dB (+/-0.001 dB) | -5.2288 dB | 0 dB | &#9989; |
+
+</details>
+
+<!-- END GENERATED BODY -->

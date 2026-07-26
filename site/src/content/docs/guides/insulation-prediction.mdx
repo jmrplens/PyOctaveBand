@@ -53,6 +53,15 @@ EN 12354-3/4. The measured quantities the model is checked against live in
 the laboratory inputs come from
 [Laboratory Insulation Measurement](/phonometry/guides/insulation-lab/).
 
+## How do I predict sound insulation with EN 12354 in Python?
+
+Build the three flanking paths of each junction with
+`building.flanking_element()`, then combine them with
+`building.predicted_airborne_insulation(r_direct=57.0, flanking_paths=paths)`.
+For the EN 12354-1 Annex H.3 example below it returns `r_prime_w` = 52.2 dB,
+that is $R'_w$ = 52 dB, and names the dominant path. Impact insulation goes
+through `predicted_impact_insulation()`.
+
 ## Predicting performance (EN 12354)
 
 A laboratory rating describes an element in isolation, yet the sound a building

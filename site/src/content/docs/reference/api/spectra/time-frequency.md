@@ -1,6 +1,6 @@
 ---
 title: "metrology.time_frequency"
-description: "Public API of phonometry.metrology.time_frequency (auto-generated)."
+description: "Calibrated time-frequency analysis: STFT spectrogram and zoom FFT."
 sidebar:
   label: "time_frequency"
 ---

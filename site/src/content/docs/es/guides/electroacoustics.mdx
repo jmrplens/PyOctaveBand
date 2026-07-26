@@ -854,6 +854,33 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 	caption="Ficha de características del micrófono (MicrophoneCharacteristics.report), la tabla de características nominales IEC 60268-4 junto a la respuesta de campo libre, con el diagrama direccional cardioide y los paneles de ruido inherente y THD frente a nivel trazados según las convenciones de 25 dB por década y de círculo de referencia de 25 dB de IEC 60263."
 />
 
+## Qué cubre esta guía
+
+**Cubierto.** El conjunto de distorsión de IEC 60268-3 (cláusulas
+14.12.2-14.12.11): THD_F y THD_R (`thd`), la distorsión armónica de orden n
+(`harmonic_distortion`), THD+N y SINAD a través del ancho de banda de
+medición de AES17-2015 (`harmonic_analysis`, cláusulas 5.2.5/5.2.8/6.3.1 de
+AES17), la intermodulación por modulación y por frecuencia diferencia, la
+intermodulación dinámica (DIM) y la THD ponderada ITU-R BS.468-4, además del
+margen dinámico y el ruido de canal en reposo de AES17-2015. Los
+estimadores de respuesta en frecuencia `H1`/`H2` de Bendat y Piersol y la
+coherencia ordinaria. Las características nominales de micrófono de la
+IEC 60268-4:2014 (sensibilidad, respuesta y rango de frecuencias, índice de
+directividad, nivel de sobrecarga, nivel de ruido equivalente, impedancias y
+alimentación) mediante `microphone_characteristics` y su `.report()`. Las
+características nominales de altavoz de la IEC 60268-5:2003+A1:2007
+(sensibilidad, rango de frecuencias, índice de directividad, THD frente a
+frecuencia) mediante `loudspeaker_characteristics` y su `.report()`, ambas
+trazadas según las convenciones de escala de la IEC 60263. El modelo de
+radiación de pistón con bafle (`radiating_piston`, Beranek y Mellow
+§4.19/§13.7).
+
+**No cubierto.** Otras partes de la serie IEC 60268 quedan fuera de esta
+página: la Parte 16 (inteligibilidad objetiva del habla, el índice de
+transmisión del habla) no está implementada. Las ediciones implementadas
+están fijadas en IEC 60268-4:2014, IEC 60268-5:2003+A1:2007 y AES17-2015; las
+revisiones sucesoras IEC 60268-4:2018 y AES17-2020 no son las comprobadas.
+
 ## Véase también
 
 - [Control de ruido industrial](/phonometry/es/guides/noise-control/):

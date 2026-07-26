@@ -1,6 +1,6 @@
 ---
 title: "metrology.frequencies"
-description: "Public API of phonometry.metrology.frequencies (auto-generated)."
+description: "Frequency calculation logic according to ANSI/IEC standards."
 sidebar:
   label: "frequencies"
 ---

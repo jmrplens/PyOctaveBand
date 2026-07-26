@@ -1,6 +1,6 @@
 ---
 title: "metrology.levels"
-description: "Public API of phonometry.metrology.levels (auto-generated)."
+description: "Integrated and statistical sound levels (Leq, LAeq, LN percentiles)."
 sidebar:
   label: "levels"
 ---

@@ -1,6 +1,6 @@
 ---
 title: "room.reverberation_prediction"
-description: "Public API of phonometry.room.reverberation_prediction (auto-generated)."
+description: "Reverberation-time prediction from room geometry and absorption."
 sidebar:
   label: "reverberation_prediction"
 ---

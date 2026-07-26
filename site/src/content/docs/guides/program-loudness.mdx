@@ -472,3 +472,22 @@ independent [pyloudnorm](https://github.com/csteinmetz1/pyloudnorm) meter is
 a useful cross-check for real recordings; it was not used as a source for
 this implementation.
 
+## What this guide covers
+
+**Covered.** ITU-R BS.1770-5 Annex 1: the K-weighting pre-filter of Tables
+1-2, and the channel-weighted integrated loudness with its two-stage gate
+(Formulae 1-7, Table 3). `k_weighting`, `k_weighting_coefficients` and
+`program_loudness` implement these. Annex 2's oversampled true-peak level
+runs through `true_peak_level`. Annex 3's position-dependent channel weights
+for advanced sound systems run through `channel_weight`. EBU R 128's
+−23.0 LUFS target and −1 dBTP ceiling sit on top of that. EBU Tech 3341's
+momentary/short-term/integrated meter and EBU Tech 3342's loudness range
+come from the same `program_loudness` result, with `loudness_range()` also
+standalone.
+
+**Not covered.** BS.1770-5 Annex 4, object-based audio, is out of scope. The
+guide notes that rendering to a loudspeaker layout has to happen first, and
+phonometry implements no spatial-audio renderer for that step. EBU Tech 3343
+is cited only as production practice around these numbers: guidance, not an
+algorithm, and nothing here runs it.
+

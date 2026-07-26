@@ -380,6 +380,27 @@ peak ($kL = \pi/2$) than at the transparent trough ($kL = \pi$), and the
 measured amplitude ratio reproduces the closed-form peak transmission loss to a
 fraction of a decibel.
 
+## What this guide covers
+
+**Covered.** Reactive silencers by the four-pole transfer-matrix method
+(Bies §8.8-8.9, Munjal Eq. (3.27)): the closed-form `expansion_chamber`
+(Eq. (8.111)), `helmholtz_resonator` and `quarter_wave_resonator`
+(Eqs. (8.46), (8.44)), `extended_tube_chamber`, and the `duct_matrix`/
+`shunt_matrix`/`cascade` building blocks, cross-checked against the
+independent FDTD solver. The Bies §8.11-8.17 / ASHRAE HVAC methods:
+`hvac.end_reflection_loss` and `hvac.elbow_insertion_loss` (interpolated
+tables), `hvac.plenum_attenuation` (Wells closed form) and
+`hvac.flow_noise_straight_duct`/`flow_noise_bend` (VDI 2081). The machine-
+enclosure insertion loss of Bies §7.4 (Eqs. (7.103), (7.111)),
+`enclosure_insertion_loss`, combining a supplied panel transmission loss
+with the interior room-constant correction.
+
+**Not covered.** Only reactive elements are implemented: dissipative
+(absorptive, duct-lining) silencers are not modelled. `enclosure_insertion_loss`
+never predicts the panel transmission loss `R` itself; you supply it
+measured or from another model, and the module only combines it with the
+interior correction.
+
 ## See also
 
 - [Electroacoustics](/phonometry/guides/electroacoustics/): the radiating

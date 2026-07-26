@@ -1,6 +1,6 @@
 ---
 title: "psychoacoustics.loudness_contours"
-description: "Public API of phonometry.psychoacoustics.loudness_contours (auto-generated)."
+description: "Normal equal-loudness-level contours per ISO 226:2023."
 sidebar:
   label: "loudness_contours"
 ---

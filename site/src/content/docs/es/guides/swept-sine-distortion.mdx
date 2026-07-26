@@ -309,3 +309,26 @@ gruesas.
   [`transfer_function`](/phonometry/es/guides/electroacoustics/) sobre una
   malla uniforme. Solo `minimum_phase` acepta además un array de magnitud
   a secas, p. ej. una magnitud objetivo de diseño para ecualización.
+
+## Qué cubre esta guía
+
+**Cubierto.** La deconvolución de barrido exponencial de Farina (preprint
+AES 5093, 2000) y el barrido sincronizado coherente en fase de Novak,
+Lotton y Simon (2015): la separación armónica, el espectro en forma
+cerrada del filtro inverso y la corrección de sesgo sub-muestra,
+implementadas por `swept_sine_distortion` y `synchronized_sweep_signal`.
+Las utilidades de fase `minimum_phase`, `group_delay`, `excess_phase` y
+`phase_decomposition` implementan la relación de transformada de Hilbert
+de la sección 13.1.4 de Bendat y Piersol mediante el cepstrum real.
+
+**No cubierto.** La distorsión de intermodulación y la intermodulación
+dinámica (IEC 60268-3, cláusulas 14.12.7-10) se miden a partir de tonos
+estacionarios en la página de
+[electroacústica](/phonometry/es/guides/electroacoustics/), no con un
+barrido; esta página separa solo los órdenes armónicos. La monografía de
+medición con barridos de Müller y Massarani se cita como contexto de
+práctica (fundidos, técnica del filtro inverso), no como una fórmula
+concreta implementada. Con `method="farina"`, las fases armónicas de
+`H2..HN` se devuelven pero deben ignorarse: el barrido exponencial simple
+rompe la equivalencia desplazamiento-armónico de la que depende el método
+sincronizado.

@@ -364,6 +364,27 @@ ECMA-418-1 TNR/PR prominence verdicts,
 [Speech Transmission Index](/phonometry/guides/speech-transmission/) for
 STI/STIPA, and [Theory](/phonometry/reference/theory/perception/) for the underlying math.
 
+## What this guide covers
+
+**Covered.** DIN 45692:2009 through `sharpness_din()`: the clause 6 weighting
+over the ISO 532-1 specific-loudness pattern, plus the informative Annex B
+von Bismarck and Aures variants, with the Table A.2 targets checked in CI.
+ECMA-418-2:2025 on the shared clause 5 auditory front-end: the clause 6.2
+tonality output stages (`tonality_ecma()`), the clause 7 roughness chain
+(`roughness_ecma()`) and the clause 9 HSA fluctuation strength
+(`fluctuation_strength_ecma()`). Each uses the standard's tabulated
+calibration constant, not a reverse fit to the reference sound.
+
+**Not covered.** The three ECMA-418-2 entry points are monaural: the binaural
+quadratic-mean combinations of Formula 112 (clause 7.1.11) and Formula 170
+(clause 9.1.15) are not implemented, so analyse each channel separately. The
+optional entropy weighting of clause 7.1.6 needs an external rotational-speed
+signal and is left out, as is the ±0.25 % adjustment of $c_F$ that footnote 47
+permits. The ECMA-418-2 loudness that shares this front-end lives in
+[Loudness](/phonometry/guides/loudness/), and the Fastl and Zwicker
+fluctuation-strength models in
+[Psychoacoustic Annoyance](/phonometry/guides/psychoacoustic-annoyance/).
+
 ## See also
 
 - API reference: [`psychoacoustics.sharpness`](/phonometry/reference/api/psychoacoustics/sharpness/), [`psychoacoustics.tonality_ecma`](/phonometry/reference/api/psychoacoustics/tonality-ecma/), [`psychoacoustics.roughness_ecma`](/phonometry/reference/api/psychoacoustics/roughness-ecma/) and [`psychoacoustics.fluctuation_strength_ecma`](/phonometry/reference/api/psychoacoustics/fluctuation-strength-ecma/).

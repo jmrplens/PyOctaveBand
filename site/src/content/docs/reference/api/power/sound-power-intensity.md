@@ -1,6 +1,6 @@
 ---
 title: "emission.sound_power_intensity"
-description: "Public API of phonometry.emission.sound_power_intensity (auto-generated)."
+description: "Sound power level of a noise source by sound-intensity scanning: ISO 9614-2:1996 (engineering, grade 2; survey/control, grade 3)."
 sidebar:
   label: "sound_power_intensity"
 ---

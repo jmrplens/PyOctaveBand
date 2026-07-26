@@ -1,6 +1,6 @@
 ---
 title: "psychoacoustics.loudness_moore_glasberg_time"
-description: "Public API of phonometry.psychoacoustics.loudness_moore_glasberg_time (auto-generated)."
+description: "Time-varying loudness per ISO 532-3:2023 (Moore-Glasberg-Schlittenlacher)."
 sidebar:
   label: "loudness_moore_glasberg_time"
 ---

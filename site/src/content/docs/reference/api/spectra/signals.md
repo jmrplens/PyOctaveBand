@@ -1,6 +1,6 @@
 ---
 title: "metrology.signals"
-description: "Public API of phonometry.metrology.signals (auto-generated)."
+description: "Test signals and sample-rate utilities."
 sidebar:
   label: "signals"
 ---

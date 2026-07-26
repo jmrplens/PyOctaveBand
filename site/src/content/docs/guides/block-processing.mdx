@@ -209,6 +209,30 @@ for x in audio_stream(block):            # your capture callback
 | `high_accuracy` (weighting) | resolves to `False` by default (the legacy bilinear design, see [Frequency Weighting](/phonometry/guides/weighting/)); explicitly passing `True` raises `ValueError` | The polyphase resampling inside is block-incompatible |
 | `steady_ic` | optional | Starts the filters in step-response steady state |
 
+## What this guide covers
+
+**Covered.** IEC 61260-1:2014 and IEC 61672-1:2013 exactly as far as
+[Filter Banks](/phonometry/guides/filter-banks/), [Frequency
+Weighting](/phonometry/guides/weighting/) and [Time
+Weighting](/phonometry/guides/time-weighting/) already implement them:
+`stateful=True` on `OctaveFilterBank`, `WeightingFilter` and `TimeWeighting`
+carries the direct-form-II-transposed section state (`z1`, `z2`), or the
+envelope's last value for `TimeWeighting`, across block boundaries, so the
+concatenated streamed output is bit-exact with a single full-signal pass.
+This page adds no normative content of its own; it only proves and
+documents that equivalence.
+
+**Not covered.** `zero_phase` forward-backward filtering needs the whole
+signal, so it is unsupported in stateful mode; use the offline path of
+[Filter Banks](/phonometry/guides/filter-banks/) instead. `high_accuracy`
+weighting design resolves to the legacy bilinear filter in stateful mode
+(passing `True` explicitly raises `ValueError`), because its polyphase
+resampling stage is not block-compatible; see [Frequency
+Weighting](/phonometry/guides/weighting/) for the offline high-accuracy
+design. Rank statistics such as L90 do not stream either: stream the
+envelope and compute percentiles once on the pooled result, as
+[Integrated and Statistical Levels](/phonometry/guides/levels/) describes.
+
 ## See also
 
 - API reference: [`metrology.parametric_filters`](/phonometry/reference/api/filters/parametric-filters/) and [`metrology.core`](/phonometry/reference/api/filters/core/).

@@ -1,6 +1,6 @@
 ---
 title: "noise_control.enclosures"
-description: "Public API of phonometry.noise_control.enclosures (auto-generated)."
+description: "Insertion loss of a close or free-standing machine enclosure."
 sidebar:
   label: "enclosures"
 ---

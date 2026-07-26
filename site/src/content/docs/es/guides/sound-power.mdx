@@ -1221,6 +1221,39 @@ el repositorio; pulse la vista previa para abrir el PDF.
 	caption="Ficha de declaración de emisión sonora (NoiseEmissionDeclaration.report), la tabla de doble número del anexo B de ISO 4871 con el valor declarado L_WAd = L_WA + K_WA y el veredicto de verificación de la cláusula 6.2."
 />
 
+## Qué cubre esta guía
+
+**Cubierto.** Las cinco vías hasta `LW`: la presión sonora en superficie
+envolvente de ISO 3744/3746 (áreas de superficie, K1/K2, las posiciones de
+micrófono del Anexo B y las correcciones de ponderación A por banda del
+Anexo E); los métodos directo y de comparación de sala reverberante de
+ISO 3741 (Fórmulas 20/21, las correcciones de Waterhouse y meteorológicas
+C1/C2, los criterios de calificación de la Tabla 1); el barrido de
+intensidad de ISO 9614-2 (potencias parciales, los indicadores de campo FpI
+y F+/- y el marcado de no aplicable del apartado 9.2 para bandas con
+P < 0); el método de precisión en cámara anecoica/hemianecoica de ISO 3745
+(las mallas fijas de los Anexos D/E, la corrección de fondo por posición K1i
+y C1/C2/C3); el barrido de intensidad de precisión de ISO 9614-3 (sus
+propios indicadores de campo y los criterios de calificación de grado 1); y
+la declaración de ISO 4871 (las formas de número doble y de número único,
+`L_WAd = L_WA + K_WA` y la verificación del apartado 6.2).
+
+**No cubierto.** Ninguno de los métodos implementa el propio ensayo de
+calificación de la sala o el recinto: la calificación de la sala
+reverberante de ISO 3741 (Anexo C/D, recuento de frecuencias propias o
+comparación con una fuente de referencia) y la calificación de campo libre
+del recinto anecoico o hemianecoico de ISO 3745 se dan por supuestas, no se
+ejecutan; la biblioteca solo avisa de los criterios orientativos que
+ISO 3741 declara explícitamente (el volumen mínimo de la Tabla 1 y el suelo
+de tiempo de reverberación V/S). La ISO 9614-1, el método de intensidad de
+puntos fijos discretos, no es una de las cinco vías de aquí: solo se
+reutilizan sus indicadores de campo, y la determinación de potencia por
+puntos discretos en sí pertenece a la
+[guía de intensidad acústica](/phonometry/es/guides/intensity/). La
+corrección meteorológica C3 de ISO 3745 necesita un coeficiente de
+absorción del aire que aporta quien llama (`air_absorption_coefficient=`);
+este módulo no lo calcula a partir de ISO 9613-1.
+
 ## Véase también
 
 - [Intensidad acústica (p-p)](/phonometry/es/guides/intensity/): la sonda de dos

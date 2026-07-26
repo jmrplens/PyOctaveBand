@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Conventional /sitemap.xml entry point.
+
+  @astrojs/sitemap (bundled with Starlight) writes the real index as
+  sitemap-index.xml plus the sitemap-0.xml shard, and robots.txt points at
+  sitemap-index.xml. Bing and several AI crawlers still probe /sitemap.xml by
+  convention, and without this file that path served the 404 page. This static
+  copy is a valid sitemap index pointing at the same shard, so every entry
+  point resolves to one set of URLs.
+
+  It is a hand-written file in public/, copied verbatim into dist/. The
+  generator never emits this name, so it is not overwritten, and
+  scripts/add-sitemap-lastmod.mjs only rewrites <url> blocks (there are none
+  here), so it leaves this file alone.
+-->
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>https://jmrplens.github.io/phonometry/sitemap-0.xml</loc>
+  </sitemap>
+</sitemapindex>

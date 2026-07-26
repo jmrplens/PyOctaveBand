@@ -1,6 +1,6 @@
 ---
 title: "psychoacoustics.fluctuation_strength"
-description: "Public API of phonometry.psychoacoustics.fluctuation_strength (auto-generated)."
+description: "Fluctuation strength after Fastl & Zwicker / Osses et al."
 sidebar:
   label: "fluctuation_strength"
 ---

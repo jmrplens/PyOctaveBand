@@ -935,6 +935,27 @@ plt.show()
 
 </details>
 
+## What this guide covers
+
+**Covered.** IEC 61260-1:2014's band-edge mathematics (clauses 5.2-5.5) and
+Table 1 class 1/2 acceptance limits, verified by `verify_filter_class` and
+reported by `filter_class_compliance().report()`; the withdrawn IEC
+61260:1995 / ANSI S1.11-2004 class 0 mask, reachable with `edition="1995"`;
+and the ISO 266:1997 preferred-frequency series behind
+`nominal_frequencies`. The library designs each band as an SOS cascade
+across five architectures (Butterworth, Chebyshev I/II, Elliptic, Bessel),
+plus the Linkwitz-Riley crossover and the RBJ Audio EQ Cookbook's
+`ParametricEQ`.
+
+**Not covered.** IEC 61260-1's conformance tests for the physical filter
+itself (overload recovery, filter linearity, environmental influences)
+apply to hardware analog and digital filters and are not implemented:
+`verify_filter_class` checks the designed digital response against Table 1,
+not an instrument. Near Nyquist, the bilinear transform warps the frequency
+axis and the bank has no correction for it (unlike `WeightingFilter`'s
+`high_accuracy` option): keep the top band edge comfortably below Nyquist
+or raise `fs`, and confirm the margin with `verify_filter_class`.
+
 ## See also
 
 - API reference: [`phonometry`](/phonometry/reference/api/filters/phonometry/), [`metrology.core`](/phonometry/reference/api/filters/core/) and [`metrology.parametric_filters`](/phonometry/reference/api/filters/parametric-filters/).

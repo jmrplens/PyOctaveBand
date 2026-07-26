@@ -1,6 +1,6 @@
 ---
 title: "environmental.air_absorption"
-description: "Public API of phonometry.environmental.air_absorption (auto-generated)."
+description: "Atmospheric absorption of sound: ISO 9613-1:1993."
 sidebar:
   label: "air_absorption"
 ---

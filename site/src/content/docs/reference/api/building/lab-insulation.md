@@ -1,6 +1,6 @@
 ---
 title: "building.lab_insulation"
-description: "Public API of phonometry.building.lab_insulation (auto-generated)."
+description: "Laboratory sound insulation of building elements (ISO 10140)."
 sidebar:
   label: "lab_insulation"
 ---

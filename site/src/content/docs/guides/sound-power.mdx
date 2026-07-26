@@ -1192,6 +1192,35 @@ repository; click the preview to open the PDF.
 	caption="Noise emission declaration fiche (NoiseEmissionDeclaration.report), the ISO 4871 Annex B dual-number table with the declared L_WAd = L_WA + K_WA and the clause 6.2 verification verdict."
 />
 
+## What this guide covers
+
+**Covered.** The five routes to `LW`: ISO 3744/3746 enveloping-surface
+sound pressure (surface areas, K1/K2, the Annex B microphone positions and
+the Annex E A-weighting band corrections); ISO 3741 reverberation-room
+direct and comparison methods (Eq. 20/21, the Waterhouse and C1/C2
+meteorological corrections, the Table 1 qualification criteria); ISO 9614-2
+intensity scanning (partial powers, the FpI and F+/- field indicators and
+the clause 9.2 not-applicable flagging for P < 0 bands); ISO 3745
+precision anechoic/hemi-anechoic (the Annex D/E fixed arrays, the
+per-position K1i background correction and C1/C2/C3); ISO 9614-3 precision
+intensity scanning (its own field indicators and grade-1 qualification
+criteria); and ISO 4871 declaration (the dual- and single-number forms,
+`L_WAd = L_WA + K_WA` and the clause 6.2 verification).
+
+**Not covered.** None of the methods implement the underlying room or
+facility qualification test: ISO 3741's reverberation-room qualification
+(Annex C/D, eigenfrequency counting or a reference-source comparison) and
+ISO 3745's free-field qualification of the anechoic or hemi-anechoic
+environment are both assumed, not performed; the library only warns on the
+coarse advisory criteria ISO 3741 states explicitly (the Table 1 minimum
+volume and the V/S reverberation-time floor). ISO 9614-1, the discrete
+fixed-point intensity method, is not one of the five routes here: only its
+field indicators are reused, and the discrete-point power determination
+itself belongs to the [sound intensity guide](/phonometry/guides/intensity/).
+The C3 meteorological correction of ISO 3745 needs an air-absorption
+coefficient the caller supplies (`air_absorption_coefficient=`); this module
+does not compute it from ISO 9613-1 itself.
+
 ## See also
 
 - [Sound Intensity (p-p)](/phonometry/guides/intensity/): the two-microphone probe, its

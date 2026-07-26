@@ -1,6 +1,6 @@
 ---
 title: "room.enclosed_space_absorption"
-description: "Public API of phonometry.room.enclosed_space_absorption (auto-generated)."
+description: "Sound absorption in enclosed spaces (EN 12354-6:2003)."
 sidebar:
   label: "enclosed_space_absorption"
 ---

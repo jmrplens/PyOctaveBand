@@ -194,6 +194,26 @@ Notas adicionales de rendimiento:
 - **numba opcional**: el kernel del modo `impulse` de la ponderación temporal se
   compila JIT cuando numba está instalado (`pip install phonometry[perf]`).
 
+## Qué cubre esta guía
+
+**Cubierto.** La IEC 61260-1:2014 y la IEC 61672-1:2013 en lo que
+condicionan cada fila de un array `(canales, muestras)`: los filtros de
+banda, las ponderaciones y la balística del detector aplicados por canal
+son los mismos diseños monocanal sin cambios, y el soporte multicanal no
+añade contenido normativo propio. La convención misma sigue el
+procedimiento de Bendat y Piersol para registros de datos múltiples
+(apartado 10.4.2): analizar cada registro individualmente primero, y
+tratar lo conjunto como un paso aparte y explícito.
+
+**No cubierto.** Las preguntas entre canales, como el retardo entre dos
+canales o cuánto de uno explica el otro, quedan deliberadamente fuera:
+`octave_filter`, `weighting_filter` y `time_weighting` nunca mezclan ni
+combinan filas. Consulta
+[Correlación y retardo](/phonometry/es/guides/correlation-delay/) y
+[Coherencia múltiple y parcial](/phonometry/es/guides/miso-coherence/)
+para las herramientas entre canales construidas sobre la correlación
+cruzada y los modelos de entrada múltiple de Bendat y Piersol.
+
 ## Véase también
 
 - [Correlación y retardo](/phonometry/es/guides/correlation-delay/): las preguntas cruzadas en el dominio del tiempo (retardo, alineación) que la ruta por canal deja deliberadamente en tus manos.

@@ -1,6 +1,6 @@
 ---
 title: "noise_control.silencers"
-description: "Public API of phonometry.noise_control.silencers (auto-generated)."
+description: "Reactive silencers by the four-pole (transmission-matrix) method."
 sidebar:
   label: "silencers"
 ---

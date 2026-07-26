@@ -210,6 +210,28 @@ El sonómetro construido aquí es el tronco; el resto del núcleo crece de él.
   el sonómetro fuera de línea de esta página en uno en streaming con estado
   de filtro arrastrado.
 
+## Qué cubre esta guía
+
+**Cubierto.** Esta página compone etapas ya implementadas en otras guías en
+la cadena que describe IEC 61672-1:2013: la ponderación frecuencial A y la
+ponderación temporal exponencial Fast, el LAeq, los niveles percentiles, el
+nivel de exposición sonora y el pico con ponderación C, los filtros de banda
+de octava de IEC 61260-1:2014 de `octave_filter`, y los límites de
+aceptación de clase de la Tabla 3 (ponderación) y la Tabla 1 (filtro) que
+comprueban `verify_weighting_class` y `verify_filter_class`. Cada guía de
+fondo indica su propia cobertura en detalle.
+
+**No cubierto.** `verify_weighting_class` y `verify_filter_class` comprueban
+el diseño de respuesta en frecuencia de los filtros digitales frente a las
+tablas de las normas; no realizan los ensayos de evaluación de patrón de
+IEC 61672-3 que necesita un instrumento físico para su aprobación de tipo,
+como el ruido autogenerado, el rango de linealidad, la indicación de
+sobrecarga o la respuesta direccional. Un veredicto de clase de esta página
+describe el algoritmo, no un aparato construido. Los ensayos de conformidad
+del calibrador de IEC 60942:2017 tampoco se ejecutan aquí; consulta la
+[guía de calibración](/phonometry/es/guides/calibration/) para lo que
+`sensitivity()` comprueba y lo que no.
+
 ## Véase también
 
 - Referencia de la API: [`metrology.calibration`](/phonometry/es/reference/api/levels/calibration/),

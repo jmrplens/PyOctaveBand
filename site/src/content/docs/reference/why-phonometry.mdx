@@ -1,9 +1,10 @@
 ---
 title: "Why phonometry"
-description: "The conformance-first design philosophy: an IEC 61672-1 time-weighting case study, 371 checks against 235 standards, and comparison with other libraries."
+description: "The conformance-first design philosophy: an IEC 61672-1 time-weighting case study, the numerical conformance suite, and comparison with other libraries."
 ---
 
 import ThemeImage from '../../../components/ThemeImage.astro';
+import { totalChecks, domains, standards } from '../../../data/conformance-stats.mjs';
 
 phonometry is a standards-based acoustic measurement toolkit. Its
 differentiator is not the list of features but how they are built: every
@@ -106,7 +107,7 @@ sample from the metrology core:
 | IEC 60942:2017 Table 2 | Calibrator short-term stability limits (frequency-dependent, class 1) in `sensitivity()` | `tests/test_calibration_validation.py` |
 
 The same discipline applies far beyond the metrology core: today the suite
-runs 371 numerical conformance checks across 46 domains and 235 standards,
+runs {totalChecks} numerical conformance checks across {domains} domains and {standards} standards,
 covering psychoacoustics, room and building acoustics, vibration,
 environmental, aircraft and underwater noise, electroacoustics and broadcast
 loudness. The full numerical report (the expected value and the value the

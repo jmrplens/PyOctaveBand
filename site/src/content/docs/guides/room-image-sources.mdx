@@ -344,6 +344,30 @@ texts' own numeric anchors (see the
   $V = 200$ m³, $T = 1$ s → 141 Hz) and the steady-state level (Bies 5e,
   Eq. (6.43)).
 
+## What this guide covers
+
+**Covered.** Kuttruff's *Room Acoustics* (the image-source construction of
+§4.1, the Eyring reverberation formula used for the near-cubic check and
+the Schroeder frequency of §3.6), Vorländer's *Auralization* (the
+mirror-source model of Chapter 11, its reflection-factor and delay
+expressions) and Allen & Berkley's reflection-order decomposition, all
+implemented by `room.image_source_rir`; and the Bies, Hansen & Howard
+steady-state room field of §6.4 (room constant, directivity $Q$, critical
+distance) implemented by `room.steady_state_field`,
+`room.room_constant`, `room.critical_distance`, `room.steady_state_spl`
+and `room.schroeder_frequency`.
+
+**Not covered.** The image-source model captures specular reflections
+only: no diffraction and no diffuse scattering, so an elongated room's
+true decay runs slower than the diffuse-field Eyring estimate it is
+checked against (the anisotropy the Fitzroy and Arau-Puchades models of
+the
+[reverberation-prediction guide](/phonometry/guides/reverberation-prediction/)
+were built to correct). Kuttruff's alternative reverberation distance
+(using the Sabine absorption area in place of the room constant) is cited
+for comparison but not implemented: `steady_state_field` and
+`critical_distance` always use the Bies room-constant formulation.
+
 ## See also
 
 - [Room Acoustics](/phonometry/guides/room-acoustics/): the *measured* impulse

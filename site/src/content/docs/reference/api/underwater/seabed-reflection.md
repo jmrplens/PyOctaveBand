@@ -1,6 +1,6 @@
 ---
 title: "underwater.seabed_reflection"
-description: "Public API of phonometry.underwater.seabed_reflection (auto-generated)."
+description: "Plane-wave reflection at the seabed (fluid-fluid Rayleigh model)."
 sidebar:
   label: "seabed_reflection"
 ---

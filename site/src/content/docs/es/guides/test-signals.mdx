@@ -248,6 +248,25 @@ mitad de muestreo del
 donde la alineación submuestra es la diferencia entre promediar respuestas
 al impulso y emborronarlas.
 
+## Qué cubre esta guía
+
+**Cubierto.** El anexo A, cláusula A2, de la IEC 60268-1:1985: la salva de
+tono que "debe comenzar en el paso por cero del tono y constar de un
+número entero de períodos completos" (A2.1) y el tren repetitivo de salvas
+de A2.2, implementados por `tone_burst` y comprobados a mano contra las
+duraciones de la tabla AII. El requisito antialias de la sección 10.2 de
+Bendat y Piersol, convertido en una especificación explícita y verificable
+por el rechazo de banda eliminada y la anchura de transición de
+`resample_signal`.
+
+**No cubierto.** La IEC 60268-1:1985 es una norma general para equipos de
+sistemas de sonido. Aquí solo se implementan las cláusulas de salvas de
+tono del anexo A; el resto de sus partes (amplificadores, altavoces,
+conectores, etc.) quedan sin tocar. `fractional_delay` y los generadores
+de ruido de colores de `noise_signal` son herramientas de DSP de
+propósito general sin norma que las gobierne; sus afirmaciones de
+exactitud son formas cerradas, no normativas.
+
 ## Véase también
 
 - [Ponderación temporal](/phonometry/es/guides/time-weighting/): la balística de detector que ejercitan las salvas de tono (IEC 61672-1, Tabla 4).

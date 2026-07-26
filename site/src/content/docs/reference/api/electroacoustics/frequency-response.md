@@ -1,6 +1,6 @@
 ---
 title: "electroacoustics.frequency_response"
-description: "Public API of phonometry.electroacoustics.frequency_response (auto-generated)."
+description: "Frequency-response and coherence estimators (Bendat & Piersol)."
 sidebar:
   label: "frequency_response"
 ---

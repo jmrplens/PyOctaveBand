@@ -954,6 +954,46 @@ repositorio. Pulsa una vista previa para abrir el PDF:
 	caption="Ficha del nivel de impactos por flancos (FlankingImpactLevelResult.report), Ln,f,w (CI)."
 />
 
+## Qué cubre esta guía
+
+**Cubierto.** La ISO 10140-2:2010 (el índice de reducción acústica de
+laboratorio $R$ con la corrección de ruido de fondo del apartado 4.3) y la
+ISO 10140-3:2010 (el nivel de impactos normalizado de laboratorio $L_n$),
+mediante `building.lab_airborne_insulation`,
+`building.lab_impact_insulation` y `building.background_correction`; el
+índice de reducción acústica por intensidad $R_I$ de la ISO 15186-1:2000
+(apartado 3.8), su versión modificada por $K_c$, $R_{I,M}$ (anexo B), y la
+diferencia normalizada de elemento $D_{I,n,e}$ (apartado 3.9), mediante
+`building.intensity_sound_reduction`, `building.adaptation_term_kc` y
+`building.intensity_element_normalized_difference`; la mejora de
+aislamiento a impactos de revestimientos de suelo $\Delta L$ de la
+ISO 16251-1:2014 y su $\Delta L_w$ ponderado frente al suelo de referencia
+de la Tabla 4 de la ISO 717-2, mediante `building.impact_improvement` y
+`building.weighted_impact_improvement`; y el documento marco de la ISO
+10848-1:2006 (el índice de reducción de vibraciones $K_{ij}$, Fórmula
+(13), la longitud de absorción equivalente y las comprobaciones de validez
+de densidad modal/solape modal del apartado 9 de la Parte 4), con los
+descriptores globales $D_{n,f}$/$L_{n,f}$, mediante
+`building.vibration_reduction_index`,
+`building.normalized_flanking_level_difference` y
+`building.normalized_flanking_impact_level`.
+
+**No cubierto.** Los requisitos generales de instalación de ensayo y de
+tipo de montaje de la ISO 10140-1 no están implementados; la guía solo los
+cita como una cadena de texto en los metadatos del informe (`"Type A
+mounting, mortar-bedded perimeter (ISO 10140-1)"`). La propia medición por
+intensidad acústica (la sonda de barrido, la adquisición con dos
+micrófonos y la calibración de desajuste de fase detrás de $L_{p1}$ y
+$L_{In}$) no está implementada: ambos niveles se toman como entradas ya
+medidas, y la ficha de informe de la ISO 15186-1 declara explícitamente
+que no tiene campo para la geometría de la superficie de medición ni para
+el método de barrido frente a puntos discretos. Las Partes 2, 3 y 4 de la
+ISO 10848 difieren en los tipos de unión y de muestra a los que se
+aplican; phonometry implementa solo las fórmulas de $K_{ij}$/$D_{n,f}$/
+$L_{n,f}$ de la Parte 1 de forma genérica, más la comprobación de validez
+de solape modal de la Parte 4, no las configuraciones de ensayo
+específicas de instalación que describen las demás partes.
+
 ## Véase también
 
 - [Medición del aislamiento en campo e índices](/phonometry/es/guides/insulation-field/):

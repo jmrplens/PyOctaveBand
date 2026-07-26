@@ -312,6 +312,29 @@ the optional field snapshots with their times and the obstacle mask; its
 `.plot()` draws the probe histories, and `.plot(kind="snapshot")` renders
 one recorded field with the geometry overlaid.
 
+## What this guide covers
+
+**Covered.** The staggered pressure-velocity FDTD scheme of Attenborough &
+Van Renterghem, chapter 4: the governing equations (Eqs. 4.3-4.4), the
+leapfrog update (Eqs. 4.11-4.12), the Courant stability condition
+(Eqs. 4.13-4.14), the rigid boundary (Eq. 4.32) and the frequency-independent
+real-impedance boundary (Eqs. 4.33-4.35), exposed through `fdtd_simulation`/
+`FDTD2D` with `GaussianPulse`, `CWSource` and `SignalSource` sources,
+pressure probes and a rasterised `obstacle_mask`. Validated against
+closed-form oracles: the rigid-room normal modes (Kuttruff §3), free-field
+arrival times and cylindrical 2D decay, the rigid-wall image echo, the
+impedance reflection coefficient and the dispersion relation of §4, with the
+measured convergence order matching the scheme's second-order design.
+
+**Not covered.** The solver is two-dimensional only: it models a line source
+in cross-section (cylindrical `1/sqrt(r)` spreading), not the spherical
+`1/r` spreading of a 3D point source, so absolute levels and decay rates are
+not those of a 3D room. The open boundary is the quadratic-ramp absorbing
+layer described as "the simple precursor" of a true perfectly matched layer,
+not a PML itself. The governing equations assume a non-moving medium, so
+wind or flow advection is not modelled, and the only impedance boundary is
+the frequency-independent real one of Eqs. 4.33-4.35.
+
 ## See also
 
 - [Conformance report](/phonometry/reference/conformance/): two of the closed-form

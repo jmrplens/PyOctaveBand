@@ -215,6 +215,28 @@ $f_0$ del suelo instalado según la Fórmula 2: el suelo flotante solo mejora
 el aislamiento bastante por encima de $f_0$, y por eso una `s'` baja (una
 capa blanda bajo una losa pesada) es el objetivo de diseño.
 
+## Qué cubre esta guía
+
+**Cubierto.** La EN 29052-1:1992 (idéntica a la ISO 9052-1:1989) para
+materiales bajo suelos flotantes: la rigidez dinámica por unidad de área de
+la Fórmula 1, las relaciones de resonancia de las Fórmulas 2-4
+(`apparent_dynamic_stiffness`, `natural_frequency`), el término del gas
+encerrado de la Fórmula 7 (`enclosed_gas_stiffness`) y los regímenes por
+resistividad al flujo de la cláusula 8.2, Fórmulas 5-6
+(`installed_dynamic_stiffness`), encadenados de principio a fin por
+`floating_floor_resonance`. `DynamicStiffnessResult.report` genera la ficha
+de informe de ensayo de la cláusula 9.
+
+**No cubierto.** El procedimiento de medición de la cláusula 7, que extrae
+la frecuencia de resonancia `fr` de la señal bruta de excitación-respuesta
+por métodos sinusoidal, de ruido blanco o de impulso y la extrapola a
+amplitud de fuerza nula, no está implementado: pasa una `fr` ya extrapolada.
+La resistividad al flujo lateral `r` de la cláusula 8.2 también se toma como
+entrada en lugar de medirse; los métodos estático y alterno de la ISO 9053
+están implementados aparte, en `materials.airflow_resistance`. El requisito
+de selección de probetas de la cláusula 6 (al menos tres probetas de
+200 mm × 200 mm) no se aplica.
+
 ## Véase también
 
 - Referencia de la API: [`materials.dynamic_stiffness`](/phonometry/es/reference/api/materials/dynamic-stiffness/).

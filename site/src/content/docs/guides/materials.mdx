@@ -1021,6 +1021,40 @@ print(float(materials.weighted_coefficient_uncertainty(0.70).reported_expanded_u
 print(float(materials.single_number_rating_uncertainty(8.1).reported_expanded_uncertainty[0]))   # 1.6
 ```
 
+## What this guide covers
+
+**Covered.** ISO 11654:1997's weighted absorption rating: the practical
+coefficient of Clause 4.1, the reference-curve shift of Clause 4.2, the shape
+indicators of Clause 4.3, and the Table B.1 absorption class. These are built
+by `weighted_absorption` and `weighted_absorption_from_third_octave`. The
+ISO 354:2003 Sabine inversion (Eqs. (5)-(9)) in `measure_sound_absorption`.
+Both parts of ISO 9053: the static method of Clause 7.5
+(`static_airflow_resistance`) and the alternating method with the Annex A
+effective ratio of specific heats (`effective_kappa`,
+`alternating_airflow_resistance`). The impedance-tube trio: the ISO 10534-1
+standing-wave-ratio method (`standing_wave_ratio_from_level` and its
+companions), the ISO 10534-2 transfer-function method with its Clause 4
+frequency-range check (`two_microphone_impedance`,
+`plane_wave_frequency_range`), and the ASTM E2611 four-microphone
+transfer-matrix method (`transfer_matrix_two_load`,
+`transfer_matrix_one_load`, `TransferMatrix`). ISO 12999-2:2020's
+measurement-uncertainty formulae (Clauses 5-8) for the one-third-octave and
+practical coefficients and for the single-number ratings, in
+`sound_absorption_coefficient_uncertainty`, `weighted_coefficient_uncertainty`
+and `single_number_rating_uncertainty`.
+
+**Not covered.** The statistical (random-incidence) absorption coefficient
+$\alpha_{st}$ of Paris' angular average is described but not computed: it
+needs the angle-dependent $\alpha(\theta)$ from the surface impedance, which
+nothing here derives. Two editions cited only as later revisions are not
+implemented: ISO 10534-2:2023 (the code follows the 1998/2001
+transfer-function method) and ASTM E2611-24 (the code follows E2611-19). ISO
+10534-1:1996 is implemented as its European adoption BS EN ISO 10534-1:2001,
+not read directly from the 1996 ISO text. ISO 12999-2's uncertainty formula
+for the EN 1793-1 single-number rating $DL_{\alpha,\text{NRD}}$ is
+implemented, but EN 1793-1's own in-situ measurement method (road-traffic
+noise-reducing devices) is not.
+
 ## See also
 
 - API reference: [`materials.impedance_tube`](/phonometry/reference/api/materials/impedance-tube/), [`materials.airflow_resistance`](/phonometry/reference/api/materials/airflow-resistance/) and [`materials.absorption_uncertainty`](/phonometry/reference/api/materials/absorption-uncertainty/).

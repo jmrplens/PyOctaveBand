@@ -620,6 +620,35 @@ pulling the crossing sharply inward. This coupling between the absorption
 model, the spreading law and the sonar equation is why the three live in one
 module.
 
+## What this guide covers
+
+**Covered.** ISO 18405:2017 terminology (propagation loss, source level,
+levels re 1 µPa) underlies every quantity on this page. `transmission_loss`
+and `seawater_absorption` implement geometrical spreading plus the
+Francois-Garrison (1982, default), Ainslie-McColm (1998) or Thorp (1967)
+absorption models. `sea_water_sound_speed` and `sound_speed_profile`
+implement the UNESCO/Chen-Millero (Wong & Zhu 1995 ITS-90 form, default), Del
+Grosso (1974) and Mackenzie (1981) sound-speed equations, with the Leroy &
+Parthiot (1998) depth-to-pressure conversion. `passive_sonar_equation` and
+`active_sonar_equation` implement the passive and monostatic active sonar
+equations (Urick, via Etter 2003). `seabed_reflection` and
+`bottom_reflection_loss` implement the fluid-fluid Rayleigh reflection
+coefficient and critical angle (Medwin & Clay). `ocean_ambient_noise` sums
+the Wenz wind "rule of fives" and Mellen thermal-noise components.
+`ship_source_spectrum` implements the JOMOPANS-ECHO (default), RANDI 3.1 and
+Wales & Heitmeyer (2002) source-level models. `normal_modes`, `ray_trace` and
+`parabolic_equation` implement the Jensen et al. (2011) numerical solvers.
+
+**Not covered.** The seabed model is lossless fluid-fluid Rayleigh reflection
+only, so sediment attenuation is out of scope. `normal_modes`, `ray_trace`
+and `parabolic_equation` assume a range-independent water column with a
+pressure-release or rigid boundary only, not an absorbing or elastic bottom,
+so real bathymetry is not modelled. `active_sonar_equation` is monostatic
+only: there is no bistatic geometry. `ocean_ambient_noise` leaves out the
+low-frequency turbulence band and any built-in distant-shipping model;
+supply a shipping spectrum yourself, for instance from `ship_source_spectrum`
+above.
+
 ## See also
 
 - API reference: [`underwater.propagation`](/phonometry/reference/api/underwater/propagation/), [`underwater.numerical_propagation`](/phonometry/reference/api/underwater/numerical-propagation/) and [`underwater.sound_speed`](/phonometry/reference/api/underwater/sound-speed/).

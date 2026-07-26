@@ -1,6 +1,6 @@
 ---
 title: "emission.sound_power"
-description: "Public API of phonometry.emission.sound_power (auto-generated)."
+description: "Sound power level of a noise source from sound pressure measurements over an enveloping measurement surface: ISO 3744:2010 (engineering, accuracy grade 2) and ISO 3746:2010 (survey, accuracy grade 3)."
 sidebar:
   label: "sound_power"
 ---

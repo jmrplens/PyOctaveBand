@@ -1,6 +1,6 @@
 ---
 title: "underwater.ocean_ambient_noise"
-description: "Public API of phonometry.underwater.ocean_ambient_noise (auto-generated)."
+description: "Ocean ambient-noise spectrum levels (Wenz framework)."
 sidebar:
   label: "ocean_ambient_noise"
 ---

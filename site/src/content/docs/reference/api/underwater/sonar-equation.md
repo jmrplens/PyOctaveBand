@@ -1,6 +1,6 @@
 ---
 title: "underwater.sonar_equation"
-description: "Public API of phonometry.underwater.sonar_equation (auto-generated)."
+description: "The sonar equation (passive and active), in decibels."
 sidebar:
   label: "sonar_equation"
 ---

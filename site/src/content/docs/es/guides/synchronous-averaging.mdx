@@ -275,6 +275,28 @@ eliminada, exactamente sobre lo que conviene ejecutar el espectro de la
 envolvente cuando las componentes fuertes del engranaje ya no enmascaran la
 modulación.
 
+## Qué cubre esta guía
+
+**Cubierto.** El modelo revisado de McFadden para el promediado en el
+dominio del tiempo (*Mechanical Systems and Signal Processing*, 1987): la
+descripción por filtro peine del promedio (Ec. 8, magnitud Ec. 9)
+implementada por `comb_filter_response`, la ley de reducción de ruido en
+raíz cuadrada expuesta como `noise_reduction_db` y `amplitude_snr_gain`, y
+la elección de `N` que sitúa un nodo del peine sobre un orden interferente,
+siguiendo el propio ejemplo del artículo con el orden 32,05.
+`time_synchronous_average` también implementa la alineación de banda
+limitada por retardo fraccionario usada cuando `fs·T` no es entero.
+
+**No cubierto.** El TSA necesita un período conocido; encontrar ese
+período, o detectar familias periódicas sin conocerlo, es tarea del
+[cepstro](/phonometry/es/guides/cepstrum-echoes/), no de esta página.
+Localizar periodicidades de modulación de amplitud, como los fallos de
+rodamiento, es el
+[espectro de la envolvente](/phonometry/es/guides/cepstrum-echoes/#5-el-espectro-de-la-envolvente-modulaciones-como-líneas),
+también fuera de esta página. El artículo de McFadden no es una norma de
+certificación, así que no hay ninguna cláusula de cumplimiento contra la
+que comprobar la implementación.
+
 ## Véase también
 
 - [Cepstro y ecos](/phonometry/es/guides/cepstrum-echoes/): detección sin referencia de familias de armónicos y bandas laterales, y el espectro de la envolvente.

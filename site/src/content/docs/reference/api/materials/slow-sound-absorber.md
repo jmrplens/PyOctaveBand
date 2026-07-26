@@ -1,6 +1,6 @@
 ---
 title: "materials.slow_sound_absorber"
-description: "Public API of phonometry.materials.slow_sound_absorber (auto-generated)."
+description: "Slow-sound slit panels loaded with Helmholtz resonators (perfect absorbers)."
 sidebar:
   label: "slow_sound_absorber"
 ---

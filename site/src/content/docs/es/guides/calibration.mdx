@@ -296,6 +296,23 @@ internamente a float64 antes de cualquier elevación al cuadrado, así que la
 calibración y los niveles son idénticos tanto si pasas el array entero crudo
 como una conversión a float.
 
+## Qué cubre esta guía
+
+**Cubierto.** La IEC 60942:2017 en lo que condiciona el *factor de
+sensibilidad*: el nivel principal del calibrador que asume `target_spl`, las
+tolerancias de clase de la Tabla 1 citadas arriba en la discusión de
+incertidumbre y la comprobación de fluctuación de nivel a corto plazo del
+apartado 5.3.3 frente a los límites de clase 1 de la Tabla 2, que
+`sensitivity(ref, fs=fs)` ejecuta sobre la grabación de referencia.
+
+**No cubierto.** Los ensayos de conformidad del propio calibrador (nivel
+generado, frecuencia, distorsión y las correcciones ambientales por presión
+estática y temperatura) no están implementados, así que pasa un `target_spl` ya
+corregido cuando el manual del calibrador lo pida. Los ensayos periódicos de la
+IEC 61672-3 se citan como práctica de laboratorio, no se ejecutan: aquí nada
+verifica un sonómetro ni le asigna una clase. La parte de dBFS de esta página
+queda fuera de cualquier norma y no hace ninguna afirmación física.
+
 ## Véase también
 
 - [Construye un sonómetro](/phonometry/es/guides/sound-level-meter/): el recorrido que empieza en este paso de calibración y termina en un instrumento verificado por clase.

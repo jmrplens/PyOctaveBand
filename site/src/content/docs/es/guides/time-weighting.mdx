@@ -300,6 +300,28 @@ para las métricas Leq/LN construidas sobre estas envolventes, y
 [Por qué phonometry](/phonometry/es/reference/why-phonometry/) para la
 verificación con ráfagas de tono de IEC 61672-1.
 
+## Qué cubre esta guía
+
+**Cubierto.** El detector exponencial de ponderación temporal de la
+IEC 61672-1:2013 (cláusula 3.8) con las constantes de tiempo Fast y Slow
+(cláusula 5.7), implementado como el filtro recursivo de `time_weighting`
+y la clase `TimeWeighting` para streaming, verificado en CI contra las
+referencias de ráfaga de tono de clase 1 de la tabla 4. La balística
+asimétrica heredada Impulse (35 ms de ataque, 1,5 s de caída), trasladada
+a las normas internacionales desde las características FAST/SLOW/IMPULSE
+de ANSI S1.4-1983.
+
+**No cubierto.** La cadena de instrumento más amplia de la IEC 61672-1
+(ponderación en frecuencia, rangos de nivel, verificaciones periódicas) no
+está en esta página; es el asunto de
+[Construye un sonómetro](/phonometry/es/guides/sound-level-meter/). La
+ANSI S1.4-1983 se cita solo por el origen histórico de las constantes F y
+S, no se implementa como especificación de instrumento propia. La
+valoración moderna de impulsividad ($L_{Aeq}$ más un ajuste, o el análisis
+de inicio) está en la página de
+[Prominencia de sonidos impulsivos](/phonometry/es/guides/impulse-prominence/),
+no construida sobre la ponderación Impulse de aquí.
+
 ## Véase también
 
 - [Niveles](/phonometry/es/guides/levels/): los niveles percentiles definidos sobre la salida del detector, y las métricas integradas que lo evitan.

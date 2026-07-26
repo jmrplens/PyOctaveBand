@@ -255,6 +255,25 @@ la audibilidad para un oyente con un umbral de audición dado. Cuando hay más d
 una disponible, responden a preguntas distintas en lugar de confirmarse entre
 sí: un procesador puede subir el STOI mientras la sala mantiene un STI pobre.
 
+## Qué cubre esta guía
+
+**Cubierto.** Taal et al. 2011 (STOI) y Jensen y Taal 2016 (ESTOI), las dos
+medidas basadas en correlación que implementa `stoi()`: el procesado inicial
+común de remuestreo a 10 kHz, tramas Hann de 256 muestras, 15 bandas de tercio
+de octava, segmentos de 384 ms y la eliminación de tramas silenciosas a 40 dB
+(Taal et al. 2011, Ecs. 1-4); la correlación de envolventes por banda y el
+índice promediado (Ecs. 5-6); y, con `extended=True`, la normalización por
+filas y columnas del espectrograma y el índice de correlación espectral
+(Jensen y Taal 2016, Ecs. 4-8).
+
+**No cubierto.** Taal et al. 2011 también ajusta una función logística que
+convierte el índice $d$ en un porcentaje de palabras entendidas previsto,
+calibrada sobre corpus concretos de pruebas de escucha. `stoi()` devuelve
+solo $d$, como `STOIResult.value`, no ese porcentaje: la API no tiene salida
+de porcentaje ni coeficientes ajustados. El artículo de ICASSP de 2010 se
+cita solo como la versión corta de congreso del mismo algoritmo, sin añadir
+nada implementado más allá de las ecuaciones de 2011/2016 anteriores.
+
 ## Véase también
 
 - [Índice de transmisión del habla](/phonometry/es/guides/speech-transmission/):

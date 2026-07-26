@@ -1,6 +1,6 @@
 ---
 title: "psychoacoustics.loudness_zwicker"
-description: "Public API of phonometry.psychoacoustics.loudness_zwicker (auto-generated)."
+description: "Zwicker loudness for stationary and time-varying sounds per ISO 532-1:2017."
 sidebar:
   label: "loudness_zwicker"
 ---

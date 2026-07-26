@@ -1,6 +1,6 @@
 ---
 title: "room.open_plan"
-description: "Public API of phonometry.room.open_plan (auto-generated)."
+description: "Open-plan-office spatial metrics per ISO 3382-3:2012."
 sidebar:
   label: "open_plan"
 ---

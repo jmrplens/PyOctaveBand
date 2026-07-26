@@ -1,6 +1,6 @@
 ---
 title: "metrology.synchronous_average"
-description: "Public API of phonometry.metrology.synchronous_average (auto-generated)."
+description: "Time synchronous averaging (TSA) of a periodic waveform in noise."
 sidebar:
   label: "synchronous_average"
 ---

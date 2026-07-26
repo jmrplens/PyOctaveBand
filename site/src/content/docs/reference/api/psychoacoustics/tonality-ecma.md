@@ -1,6 +1,6 @@
 ---
 title: "psychoacoustics.tonality_ecma"
-description: "Public API of phonometry.psychoacoustics.tonality_ecma (auto-generated)."
+description: "Psychoacoustic tonality per ECMA-418-2:2025 (4th ed., Sottek Hearing Model)."
 sidebar:
   label: "tonality_ecma"
 ---

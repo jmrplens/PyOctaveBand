@@ -1,6 +1,6 @@
 ---
 title: "psychoacoustics.fluctuation_strength_ecma"
-description: "Public API of phonometry.psychoacoustics.fluctuation_strength_ecma (auto-generated)."
+description: "Psychoacoustic fluctuation strength per ECMA-418-2:2025 (4th ed., Clause 9)."
 sidebar:
   label: "fluctuation_strength_ecma"
 ---

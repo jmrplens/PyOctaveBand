@@ -304,3 +304,24 @@ grids.
   [`transfer_function`](/phonometry/guides/electroacoustics/) estimate on a
   uniform grid. `minimum_phase` alone also accepts a plain magnitude
   array, e.g. a design target for equalization.
+
+## What this guide covers
+
+**Covered.** Farina's exponential-sweep deconvolution (AES preprint 5093,
+2000) and the phase-coherent synchronized swept-sine of Novak, Lotton &
+Simon (2015): the harmonic separation, the closed-form inverse-filter
+spectrum and the fractional-sample de-skewing, implemented by
+`swept_sine_distortion` and `synchronized_sweep_signal`. The phase
+utilities `minimum_phase`, `group_delay`, `excess_phase` and
+`phase_decomposition` implement the Hilbert-transform relation of Bendat &
+Piersol Section 13.1.4 through the real cepstrum.
+
+**Not covered.** Intermodulation and dynamic intermodulation distortion
+(IEC 60268-3, clauses 14.12.7-10) are measured from steady tones on the
+[electroacoustics](/phonometry/guides/electroacoustics/) page, not from a
+sweep; this page separates harmonic orders only. Müller & Massarani's
+sweep monograph is cited for background practice (fades, inverse-filter
+technique), not for a specific implemented formula. With
+`method="farina"`, the harmonic phases of `H2..HN` are returned but should
+be ignored: the plain exponential sweep breaks the time-shift/harmonic
+equivalence the synchronized method relies on.

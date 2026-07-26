@@ -1,6 +1,6 @@
 ---
 title: "metrology.phase"
-description: "Public API of phonometry.metrology.phase (auto-generated)."
+description: "Phase utilities: minimum phase, group delay and excess phase."
 sidebar:
   label: "phase"
 ---

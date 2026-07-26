@@ -267,3 +267,25 @@ their narrowband wave-acoustic counterparts. Over hard ground both agree on the
 models resolve the interference dips that move with geometry, frequency and
 ground impedance, which is why they are the natural infrastructure for the
 meteorological schemes of Nord2000 and CNOSSOS.
+
+## What this guide covers
+
+**Covered.** The Weyl-Van der Pol spherical-wave ground reflection
+coefficient (`ground_effect`, Attenborough Eq. 2.40a/c, Salomons Eq. 3.2/D.58,
+the Faddeeva-function boundary-loss factor), with its hard-ground `+6 dB`,
+grazing-incidence and reciprocity limits pinned as tests. Wave-theoretic
+barrier diffraction (`barrier_insertion_loss`): the Kurze-Anderson closed
+form (`kurze_anderson_attenuation`, Bies Eq. 5.138), the exact rigid
+half-plane (MacDonald / Hadden & Pierce, Attenborough Eqs. 9.19-9.20), thick
+barriers through the double-edge Fresnel number (Bies Eq. 5.157), and the
+coherent four-path barrier-on-ground model weighted by the `ground_effect`
+reflection coefficient.
+
+**Not covered.** Both models assume a homogeneous, non-refracting,
+non-turbulent atmosphere; a vertical sound-speed gradient is the subject of
+the separate [atmospheric refraction](/phonometry/guides/atmospheric-refraction/)
+guide instead. The coherent barrier-on-ground model weights all four
+diffracted paths with a single reflection coefficient `Q` computed over the
+overall source-receiver geometry rather than a separate coefficient per
+image path, so it is coherent and reciprocal but not a full boundary-element
+solution.

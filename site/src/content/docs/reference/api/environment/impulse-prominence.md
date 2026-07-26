@@ -1,6 +1,6 @@
 ---
 title: "environmental.impulse_prominence"
-description: "Public API of phonometry.environmental.impulse_prominence (auto-generated)."
+description: "Prominence of impulsive sounds and the LAeq adjustment (NT ACOU 112:2002)."
 sidebar:
   label: "impulse_prominence"
 ---

@@ -1,6 +1,6 @@
 ---
 title: "room.image_source"
-description: "Public API of phonometry.room.image_source (auto-generated)."
+description: "Synthetic room impulse response by the image-source method (rectangular room)."
 sidebar:
   label: "image_source"
 ---

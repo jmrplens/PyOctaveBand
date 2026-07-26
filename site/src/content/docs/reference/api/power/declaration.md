@@ -1,6 +1,6 @@
 ---
 title: "emission.declaration"
-description: "Public API of phonometry.emission.declaration (auto-generated)."
+description: "ISO 4871:1996 declaration of noise emission values of machinery and equipment."
 sidebar:
   label: "declaration"
 ---

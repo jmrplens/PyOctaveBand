@@ -1,6 +1,6 @@
 ---
 title: "environmental.outdoor_propagation"
-description: "Public API of phonometry.environmental.outdoor_propagation (auto-generated)."
+description: "Outdoor sound propagation: ISO 9613-2:1996 general method of calculation."
 sidebar:
   label: "outdoor_propagation"
 ---

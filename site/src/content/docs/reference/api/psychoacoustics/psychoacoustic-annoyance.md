@@ -1,6 +1,6 @@
 ---
 title: "psychoacoustics.psychoacoustic_annoyance"
-description: "Public API of phonometry.psychoacoustics.psychoacoustic_annoyance (auto-generated)."
+description: "Psychoacoustic annoyance (PA) after Fastl & Zwicker."
 sidebar:
   label: "psychoacoustic_annoyance"
 ---

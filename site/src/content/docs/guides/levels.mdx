@@ -608,6 +608,25 @@ summary of a measurement at all is a stationarity question - the
 [data qualification](/phonometry/guides/data-qualification/) tests answer it
 objectively from segment mean squares.
 
+## What this guide covers
+
+**Covered.** IEC 61672-1:2013's Fast/Slow/Impulse envelope ballistics
+behind the percentile levels, the C-weighted peak of clause 5.13
+(`lc_peak`, verified against Table 5) and the sound exposure level (`sel`,
+verified against the Table 4 LAE column); IEC 61252:1993's sound exposure
+and LEX,8h (`sound_exposure`, `lex_8h`); ISO 1996-1:2016's Lden, Ldn and
+composite rating level (clause 6.5, `environmental.lden`/`ldn`/
+`composite_rating_level`); and ISO 1996-2:2017's tonal adjustment (Annex
+C), residual-noise correction (Clause 10.4) and measurement uncertainty
+budget (Clause 4, Annex F).
+
+**Not covered.** IEC 61252 was revised in 2025; only the formulae of the
+implemented first edition (1993) are here, not the newer one. ISO 1996-2
+fixes the receiver positions and the façade corrections that turn a raw
+measurement into the level this page's functions expect: those position
+and correction procedures are not implemented, only the arithmetic that
+follows once you have applied them.
+
 ## See also
 
 - [Time Weighting](/phonometry/guides/time-weighting/): the Fast/Slow/Impulse detector the percentile levels are defined on.

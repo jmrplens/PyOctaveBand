@@ -47,6 +47,14 @@ to attach the normative uncertainty every occupational-hygiene report needs. The
   loading="eager"
 />
 
+## How do I compute ISO 9612 daily noise exposure LEX,8h in Python?
+
+Describe each activity as a `hearing.Task` with its samples and duration, then
+call `hearing.task_based_exposure(tasks)`. For the Annex D welder's day below
+it returns `lex_8h` = 84.3 dB with an expanded uncertainty $U$ = 2.7 dB, so the
+one-sided 95 % `upper_limit` is 87.0 dB. Unstructured days use
+`job_based_exposure()` or `full_day_exposure()` on random samples instead.
+
 ## 1. The three measurement strategies (Clauses 9-11)
 
 The *task-based* strategy (Clause 9) splits the nominal day into tasks, takes

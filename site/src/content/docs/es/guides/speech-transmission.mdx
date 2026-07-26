@@ -42,6 +42,15 @@ escucha. Para esto último, consulta la
 [guía del índice de inteligibilidad del habla](/phonometry/es/guides/speech-intelligibility/).
 :::
 
+## ¿Cómo calculo el índice de transmisión del habla de IEC 60268-16 con Python?
+
+A partir de una respuesta al impulso medida en la sala, llama a
+`hearing.sti_from_impulse_response(ir, fs, snr=25.0)`. El resultado da `sti` en
+la escala de 0 a 1, su letra de valoración `rating` del Anexo F y los siete
+índices de transferencia de modulación por banda de octava. Para la medición
+directa, reproduce `hearing.stipa_signal(fs)` en la sala y pasa la grabación a
+`hearing.stipa(recording, fs)`.
+
 ## 1. La función de transferencia de modulación
 
 La reverberación y el ruido no amortiguan el habla de manera uniforme;
@@ -314,6 +323,28 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 	description="Ficha de índice de transmisión del habla de una página: cabecera de metadatos, tabla del índice de transferencia de modulación por bandas de octava, barras de MTI por banda, el número único enmarcado STI = 0,64 con la banda de calificación del Anexo F y un veredicto CUMPLE frente a un mínimo de 0,5."
 	caption="Ficha de índice de transmisión del habla (STIResult.report), STI con la banda del Anexo F."
 />
+
+## Qué cubre esta guía
+
+**Cubierto.** La IEC 60268-16:2020 (Edición 5) para la opción de habla
+masculina, la única que conserva la Edición 5: la función de transferencia de
+modulación y la correspondencia m a STI (apartados A.5.2 a A.5.6), el método
+indirecto de STI completo desde una respuesta al impulso medida mediante
+`hearing.sti_from_impulse_response()`, el método directo STIPA del Anexo B
+mediante `hearing.stipa_signal()` y `hearing.stipa()`, el espectro de la señal
+de ensayo masculina de la Ed. 5 del apartado A.6.1, las correcciones de
+enmascaramiento auditivo dependiente del nivel y de umbral de recepción de las
+Tablas A.2 y A.3 (`level=` y `ambient=`), y las letras de valoración del
+Anexo F devueltas como `STIResult.rating`.
+
+**No cubierto.** La medición directa de STI completo (la señal de ensayo de
+14 frecuencias de modulación reproducida y grabada a través de la cadena
+real, según el apartado 6.3 y la Tabla 3, recomendada arriba cuando la
+distorsión es severa) no está implementada: solo están disponibles la señal
+directa STIPA (`stipa_signal`/`stipa`) y el cálculo indirecto de STI completo
+desde una respuesta al impulso. La opción de habla femenina no falta en la
+biblioteca: la propia Edición 5 la eliminó (preámbulo, punto d), así que no
+queda nada por implementar.
 
 ## Véase también
 

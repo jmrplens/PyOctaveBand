@@ -345,6 +345,30 @@ and hole functions return an `ApertureTransmissionResult`
 their sources (Sharp's method above $1.5\times$ the first panel resonance;
 Gomperts' inviscid slit valid for $w < 0.3\lambda$; Leppington "method no. 1").
 
+## What this guide covers
+
+**Covered.** The source formulae themselves: Bies' §7.2 mass law and
+Sharp's coincidence method (Eqs 7.40/7.42/7.44) for a single panel, the
+double-wall mass-spring-mass resonance and its saturating cavity boost
+(Eqs 7.62-7.64), Hopkins' Gomperts slit and Wilson & Soroka circular-hole
+transmission coefficients with the area-weighted composite sum (Eq. 4.92),
+the Leppington/Maidanik plate radiation efficiency (Eqs 2.227-2.230), and
+the Cremer Table 5.1 point impedances and mobilities of infinite plates
+and beams with the injected-power relation, via
+`single_panel_transmission_loss`, `double_wall_transmission_loss`,
+`slit_transmission_coefficient`, `composite_transmission_loss`,
+`radiation_efficiency`, `infinite_plate_impedance`,
+`infinite_beam_mobility` and `injected_power`.
+
+**Not covered.** Each prediction stays inside the validity range its
+source states, which the guide flags but does not extend past: Sharp's
+method (and so `single_panel_transmission_loss`) is not valid below about
+$1.5\times$ the panel's first resonance, where the panel's own low-frequency
+modal behaviour, not the mass law, governs; Gomperts' slit model holds
+only for a narrow slit, $w < 0.3\lambda$, so a wide aperture falls outside
+it; and only Leppington's "method no. 1" for radiation efficiency is
+implemented, not his other published formulations.
+
 ## See also
 
 - [Predicting Sound Insulation (EN 12354)](/phonometry/guides/insulation-prediction/):

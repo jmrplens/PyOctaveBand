@@ -1,0 +1,1433 @@
+# phonometry: psychoacoustics
+
+Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages in this area.
+
+---
+
+<!-- source: docs/loudness.md | canonical: https://jmrplens.github.io/phonometry/guides/loudness/ -->
+Source: https://jmrplens.github.io/phonometry/guides/loudness/
+
+# Loudness
+
+Level metrics tell you how much *sound pressure* there is; loudness tells you
+how loud a listener actually *perceives* it. This page covers the three
+loudness model families phonometry ships: the Zwicker method (ISO 532-1), the
+Moore-Glasberg methods (ISO 532-2/3) and the Sottek Hearing Model loudness
+(ECMA-418-2), plus the equal-loudness contours of pure tones (ISO 226).
+Sharpness, tonality and roughness live in
+[Sound Quality Metrics](https://jmrplens.github.io/phonometry/guides/sound-quality/); speech metrics in
+[Speech Transmission Index](https://jmrplens.github.io/phonometry/guides/speech-transmission/) and
+[Speech Intelligibility Index](https://jmrplens.github.io/phonometry/guides/speech-intelligibility/).
+
+## Loudness in sones (ISO 532-1, Zwicker)
+
+Decibels compress perception: 10 dB more reads as *twice as loud*, and two
+sounds with the same dB(A) can differ audibly depending on how their energy
+spreads over the ear's **critical bands**. The Zwicker method models the
+hearing chain explicitly (outer/middle-ear transmission, critical-band
+analysis on the 24 Bark scale, level-dependent masking slopes) and outputs
+**loudness N in sones**, a ratio scale: 4 sones is twice as loud as 2 sones.
+By definition a 1 kHz tone at 40 dB SPL is 1 sone, and every +10 phon
+doubles the sone value.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_zwicker_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_zwicker.svg" alt="ISO 532-1 Zwicker loudness chain: 28 one-third-octave band levels, transmission and lower-critical-band grouping, core loudness of the 20 critical bands, specific loudness over Bark, integrated into total loudness N in sones and loudness level in phons" width="78%"></picture>
+
+The animation below shows that integration at work: as the band level of a
+1 kHz narrowband sound steps up, the specific-loudness pattern N'(z) grows
+along the Bark axis and the area under it is the total loudness in sones.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_specific_loudness_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_specific_loudness.gif" alt="Animation: the specific-loudness pattern of a 1 kHz narrowband sound builds along the Bark axis as the band level steps from 45 to 85 dB, and the area under the pattern integrates to the total loudness in sones" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_specific_loudness.webm)
+
+```python
+import numpy as np
+from phonometry import psychoacoustics
+
+# A raw recording plus its calibration so the guide runs standalone
+fs = 48000
+x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)   # any recording (digital units)
+sens = 1.0                                                # calibration_factor to pascals
+levels_28 = np.full(28, 60.0)                             # 28 one-third-octave band levels (dB)
+
+# From a raw recording: calibration_factor scales digital units to Pa
+res = psychoacoustics.loudness_zwicker(x, fs, field="free", calibration_factor=sens)
+print(f"N = {res.loudness:.1f} sone  ({res.loudness_level:.0f} phon)")   # 13.1 sone (77 phon)
+
+# Time-varying signals: percentile loudness N5 is the reporting standard
+res = psychoacoustics.loudness_zwicker(x, fs)          # stationary=False (default)
+print(f"{res.n5:.1f} {res.n10:.1f} {res.loudness:.1f}")   # 13.1 13.1 13.1 — N5, N10, Nmax
+
+# From 28 one-third-octave band levels (25 Hz .. 12.5 kHz)
+res = psychoacoustics.loudness_zwicker_from_spectrum(levels_28, field="diffuse")
+
+res.plot()   # N'(z) over the Bark scale — the specific-loudness pattern (needs matplotlib)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_pattern_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_pattern.svg" alt="Specific loudness patterns over the Bark scale for a 1 kHz narrowband sound and a broadband sound of equal band level" width="80%"></picture>
+
+*Same band level, very different loudness: energy spread over many critical
+bands (red) sums to far more sones than the same level concentrated in one
+band (blue). The area under N'(z) is the total loudness.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import psychoacoustics
+
+levels_28 = np.full(28, 60.0)                             # 28 one-third-octave band levels (dB)
+# From 28 one-third-octave band levels (25 Hz .. 12.5 kHz)
+res = psychoacoustics.loudness_zwicker_from_spectrum(levels_28, field="diffuse")
+
+# One line — the specific-loudness pattern N'(z) straight from the result:
+res.plot()
+plt.show()
+
+# Or reproduce the figure by hand — two patterns of equal band level (60 dB),
+# energy spread over many critical bands vs concentrated in the 1 kHz band:
+narrow = psychoacoustics.loudness_zwicker_from_spectrum(np.r_[np.full(16, -60.0), 60.0, np.full(11, -60.0)])
+broad = psychoacoustics.loudness_zwicker_from_spectrum(np.full(28, 60.0))
+z = np.arange(1, narrow.specific.size + 1) * 0.1          # Bark axis
+fig, ax = plt.subplots()
+for r, color, label in [
+    (broad, "#ff7f0e", f"Broadband  N = {broad.loudness:.1f} sone"),
+    (narrow, "#1f77b4", f"1 kHz narrowband  N = {narrow.loudness:.1f} sone"),
+]:
+    ax.fill_between(z, r.specific, color=color, alpha=0.3)
+    ax.plot(z, r.specific, color=color, label=label)
+ax.set_xlabel("Critical-band rate z [Bark]")
+ax.set_ylabel("Specific loudness N' [sone/Bark]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+The implementation is a clean-room port of the standard's **normative
+reference program** (Annex A.4): all twelve data tables are digit-exact and
+the full Annex B validation set runs in CI: the stationary test case
+reproduces the published value to every printed digit, and the tone-pulse
+N(t) traces stay inside the standard's per-sample 5 % tolerance band.
+
+### `loudness_zwicker()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `x` | 1D array | Pa (after calibration) | ≥ 8 ms at 48 kHz | Resampled internally to 48 kHz if needed |
+| `fs` | int | Hz | > 0 | |
+| `field` | str | — | `'free'` (default) / `'diffuse'` | Sound-field correction (Table A.5) |
+| `stationary` | bool | — | default `False` | `True`: single N from the averaged spectrum |
+| `calibration_factor` | float | Pa per digital unit | default `1.0` | From `sensitivity()` |
+
+Returns a `ZwickerLoudness` dataclass: `loudness` (N, sones), `loudness_level`
+(phon), `specific` (N′(z), 240 bins of 0.1 Bark), and for time-varying runs
+`n5`, `n10`, `time`, `loudness_vs_time` (500 Hz trace).
+
+### ISO 532-1 report (`.report()`)
+
+`ZwickerLoudness.report(path)` renders a one-page PDF fiche laid out like an
+accredited loudness report: a standard-basis line, an optional metadata header
+block, a compact metrics table (total loudness *N*, loudness level *L*<sub>N</sub>,
+and the *N*<sub>5</sub>/*N*<sub>10</sub> percentiles for a time-varying result)
+beside the specific-loudness pattern *N*′(z) (the result's own `.plot()`), the
+boxed `N = X sone (LN = Y phon)` single number, an optional verdict row and a
+footer with the fixed disclaimer. It uses the same `ReportMetadata` container
+(documented under [Field insulation](https://jmrplens.github.io/phonometry/guides/insulation-field/#report-metadata-reportmetadata))
+and rendering engine as the ISO 717 insulation fiche; a supplied `requirement`
+is read as the maximum permitted loudness in sone (a lower loudness passes).
+Rendering needs reportlab (`pip install phonometry[report]`); only
+`engine="reportlab"` is supported. The fiche renders in English by default;
+pass `language="es"` for a Spanish fiche (translated fixed strings and a comma
+decimal separator), e.g. `res.report("loudness_fiche_es.pdf", language="es")`.
+
+```python
+from phonometry import psychoacoustics, ReportMetadata
+
+res = psychoacoustics.loudness_zwicker_from_spectrum(levels_28, field="free")
+res.report(
+    "loudness_fiche.pdf",
+    metadata=ReportMetadata(
+        specimen="Household appliance, steady operating noise",
+        measurement_standard="ISO 532-1 method 1",
+        laboratory="Phonometry Reference Laboratory",
+        requirement=12.0,             # maximum permitted loudness (sone)
+    ),
+)                                     # N (sone) and LN (phon)
+```
+
+The example fiche, regenerated with `make reports`, is kept rendered in the
+repository. Click the preview to open the PDF:
+
+[![ISO 532-1 loudness example report: metadata header, a metrics table with total loudness N and loudness level LN, the specific-loudness pattern over Bark, the boxed N = 8.2 sone (LN = 70.4 phon) single number and a PASS verdict against a 12 sone limit](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso532_loudness_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso532_loudness_example.pdf)
+
+*Zwicker loudness fiche (`ZwickerLoudness.report`), N in sone with LN in phon.*
+
+## Loudness level of pure tones (ISO 226:2023)
+
+The normal equal-loudness-level contours relate the SPL of a pure tone to its
+perceived *loudness level* in phons (the SPL of an equally loud 1 kHz tone).
+`equal_loudness_contour(phon)` evaluates ISO 226:2023 Formula (1) at the 29
+preferred third-octave frequencies of Table 1, `loudness_level(spl, frequency)`
+is the exact inverse (Formula 2), and `hearing_threshold()` returns the
+threshold-of-hearing column. `equal_loudness_contours(phons)` bundles a whole
+family of contours with the threshold into a plottable `EqualLoudnessContours`
+result:
+
+```python
+from phonometry import psychoacoustics
+
+freqs, spl = psychoacoustics.equal_loudness_contour(40.0)   # the classic 40-phon contour
+phon = psychoacoustics.loudness_level(73.0, 63.0)           # 73 dB @ 63 Hz -> 40 phon
+
+# The whole family (20-90 phon by default) plus the hearing threshold:
+res = psychoacoustics.equal_loudness_contours()
+res.plot()   # the iconic ISO 226 chart (needs matplotlib)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/equal_loudness_contours_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/equal_loudness_contours.svg" alt="ISO 226:2023 normal equal-loudness-level contours from 20 to 90 phon with the hearing threshold curve" width="80%"></picture>
+
+ISO 226:2023 defines the contours from 20 to 90 phon; above 80 phon the formula is valid only up to 4 kHz, so the 90 phon contour stops there and no higher contours are defined.
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import psychoacoustics
+
+# One line — the contour family straight from the result:
+res = psychoacoustics.equal_loudness_contours()
+res.plot()
+plt.show()
+
+# Or reproduce the figure by hand — ISO 226:2023 Formula (1) at the 29
+# preferred frequencies of Table 1, one contour per loudness level:
+fig, ax = plt.subplots()
+for phon in [20, 40, 60, 80, 90]:
+    freqs, spl = psychoacoustics.equal_loudness_contour(float(phon))
+    ax.semilogx(freqs, spl, color="C0")
+    ax.annotate(f"{phon} phon", xy=(1000, phon + 1), fontsize=9)
+ft, tf = psychoacoustics.hearing_threshold()
+ax.semilogx(ft, tf, "--", color="C1", label="Hearing threshold $T_f$")
+ax.set(xlabel="Frequency [Hz]", ylabel="Sound pressure level [dB re 20 µPa]")
+ax.grid(True, which="both", alpha=0.3)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+Validity per clause 4.1: 20-90 phon (80 phon above 4 kHz); the implementation
+is verified against the Annex B tables in CI. Note this is the loudness of
+*pure tones*; the loudness of arbitrary signals in sones is what the ISO 532
+models on this page compute.
+
+## Advanced loudness models
+
+ISO 532-1 above is one of the **three** loudness model families phonometry
+ships (four methods in the table below). This
+section adds the **Moore-Glasberg** loudness of ISO 532-2/532-3 and the
+**Sottek Hearing Model** loudness of ECMA-418-2:2025, whose shared auditory
+front-end also powers the tonality and roughness metrics of
+[Sound Quality Metrics](https://jmrplens.github.io/phonometry/guides/sound-quality/).
+
+### Choosing a loudness model
+
+| Model | Standard | Stationary / time-varying | Output | When to use |
+| :--- | :--- | :--- | :--- | :--- |
+| Zwicker | ISO 532-1:2017 | both | sone | Reference method; one-third-octave input; fast and widely cited |
+| Moore-Glasberg | ISO 532-2:2017 | stationary | sone | roex excitation pattern; better for tones and explicit binaural summation |
+| Moore-Glasberg-Schlittenlacher | ISO 532-3:2023 | time-varying | sone (STL/LTL) | Time-varying loudness with short-/long-term traces and the peak N_max |
+| Sottek (Hearing Model) | ECMA-418-2:2025 | time-varying | sone_HMS | Shares one auditory front-end with the ECMA tonality and roughness metrics |
+
+All four methods are anchored so a **1 kHz tone at 40 dB SPL is ≈ 1 sone**; the values
+are not interchangeable digit-for-digit because the models differ in their
+auditory filters and their loudness summation.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison.svg" alt="Loudness of a 1 kHz tone as a function of level for the Zwicker, Moore-Glasberg and Sottek models, all passing through 1 sone at 40 dB SPL" width="80%"></picture>
+
+*The three models agree at the 1 sone / 40 dB anchor and diverge with level:
+Zwicker doubles the sone value every +10 phon, while the Sottek model grows
+more slowly (about 1.65× per 10 dB), an intrinsic difference between the
+auditory summations, not a calibration error.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import psychoacoustics
+
+# 1 kHz tone, 20..80 dB SPL: all three models pass through 1 sone at 40 dB
+fs = 48000
+t = np.arange(fs) / fs
+levels = np.arange(20.0, 81.0, 10.0)
+zw, mg, ec = [], [], []
+for spl in levels:
+    x = np.sqrt(2) * 2e-5 * 10 ** (spl / 20) * np.sin(2 * np.pi * 1000 * t)
+    zw.append(psychoacoustics.loudness_zwicker(x, fs, stationary=True).loudness)
+    mg.append(
+        psychoacoustics.loudness_moore_glasberg_from_spectrum([(1000.0, float(spl))]).loudness
+    )
+    ec.append(psychoacoustics.loudness_ecma(x, fs).loudness)
+
+fig, ax = plt.subplots()
+ax.plot(levels, zw, "o-", label="Zwicker (ISO 532-1)")
+ax.plot(levels, mg, "s--", label="Moore-Glasberg (ISO 532-2)")
+ax.plot(levels, ec, "^-.", label="Sottek (ECMA-418-2)")
+ax.plot(40.0, 1.0, "o", color="k", markerfacecolor="none", markersize=10)   # the shared anchor
+ax.set(xlabel="Sound pressure level [dB SPL]", ylabel="Total loudness N [sone]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+### Moore-Glasberg loudness (ISO 532-2)
+
+Where Zwicker uses fixed critical bands on the Bark scale, Moore-Glasberg builds
+an **excitation pattern** with level-dependent rounded-exponential (roex)
+auditory filters on the ERB-number ("Cam") scale, then applies a compressive
+excitation → specific-loudness transform with C = 0.0617 sone/Cam
+(ISO 532-2:2017, Formula 7) and a binaural-inhibition stage. It reproduces the
+tone and broadband cases of Annex B to a percent or two and, unlike ISO 532-1,
+models binaural summation explicitly.
+
+```python
+import numpy as np
+from phonometry import psychoacoustics
+
+# The definitional anchor: one 1 kHz sinusoidal component at 40 dB SPL,
+# free field, binaural -> 1 sone / 40 phon by construction of the sone.
+res = psychoacoustics.loudness_moore_glasberg_from_spectrum([(1000.0, 40.0)], field="free")
+print(f"N = {res.loudness:.3f} sone  ({res.loudness_level:.1f} phon)")   # 1.000 sone (40.0 phon)
+
+# From a calibrated recording: the narrowband (FFT) line spectrum is formed
+# (power-preserving normalization) and fed to the exact sinusoidal-component
+# method (ISO 532-2 clauses 5.2/5.4).
+fs = 48000
+x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+res = psychoacoustics.loudness_moore_glasberg(x, fs, field="free", presentation="binaural")
+
+res.plot()   # specific loudness N'(i) over the ERB-number (Cam) scale
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/moore_glasberg_specific_loudness_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/moore_glasberg_specific_loudness.svg" alt="ISO 532-2 specific loudness over the ERB-number scale for a 1 kHz tone at 40 dB SPL: a single rounded peak near 15 Cam whose area is the total loudness of 1 sone" width="80%"></picture>
+
+*The ISO 532-2 pattern of the definitional 1 sone anchor. The peak is not a
+spectral line but the excitation the roex filters produce around the tone, so
+its width is the auditory filter, not the analysis resolution.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import psychoacoustics
+
+# From a calibrated recording: the narrowband (FFT) line spectrum is formed
+# (power-preserving normalization) and fed to the exact sinusoidal-component
+# method (ISO 532-2 clauses 5.2/5.4).
+fs = 48000
+x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+res = psychoacoustics.loudness_moore_glasberg(x, fs, field="free", presentation="binaural")
+
+# One line — the specific-loudness pattern N'(i) straight from the result:
+res.plot()
+plt.show()
+
+# Or draw it by hand from the ERB-number grid the result already carries:
+fig, ax = plt.subplots()
+ax.fill_between(res.erb_number, res.specific, alpha=0.3)
+ax.plot(res.erb_number, res.specific)
+ax.set_xlabel("ERB number [Cam]")
+ax.set_ylabel("Specific loudness N' [sone/Cam]")
+plt.show()
+```
+
+</details>
+
+#### `loudness_moore_glasberg()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `x` | 1D array | Pa | non-empty | Calibrated pressure signal (signal wrapper) |
+| `components` | list of `(f, L)` | Hz, dB SPL | — | `_from_spectrum`: discrete sinusoidal components |
+| `band_levels` | 29-vector | dB SPL | 25 Hz .. 16 kHz | `_from_third_octave` input (IEC 61260-1 bands) |
+| `fs` | int | Hz | > 0 | Signal wrapper only |
+| `field` | str | — | `'free'` (default) / `'diffuse'` / `'eardrum'` | Outer-ear transfer |
+| `presentation` | str | — | `'binaural'` (default) / `'diotic'` / `'monaural'` | Binaural summation |
+
+Returns a `MooreGlasbergLoudness`: `loudness` (N, sone), `loudness_level`
+(phon), `specific` (N′(i), 372 bins of 0.1 Cam), `erb_number`,
+`centre_frequencies`, `field`, `presentation`.
+
+### Time-varying loudness (ISO 532-3)
+
+ISO 532-3 wraps the same excitation / specific-loudness model in a running
+multi-resolution spectral analysis (six parallel FFTs, updated every 1 ms) and
+two cascaded temporal integrators: the fast **short-term loudness** S′(t) and
+the slower **long-term loudness** S″(t). The peak long-term loudness N_max
+predicts the loudness of sounds up to about 5 s.
+
+```python
+import numpy as np
+from phonometry import psychoacoustics
+
+fs = 32000
+t = np.arange(int(1.3 * fs)) / fs
+x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * t)
+
+res = psychoacoustics.loudness_moore_glasberg_time(x, fs, field="free")
+print(f"N_max = {res.n_max:.3f} sone  ({res.loudness_level_max:.0f} phon)")   # 1.000 sone (40 phon)
+print(f"long-term loudness exceeded 5% of the time: {res.percentiles[5.0]:.3f} sone")   # 0.999 sone
+
+res.plot()   # short-term S'(t) and long-term S''(t) loudness vs time
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/moore_glasberg_time_loudness_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/moore_glasberg_time_loudness.svg" alt="Short-term and long-term Moore-Glasberg loudness traces for a tone burst, showing the fast attack of the short-term loudness and the slower release of the long-term loudness" width="80%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import psychoacoustics
+
+fs = 32000
+t = np.arange(int(1.3 * fs)) / fs
+x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * t)
+res = psychoacoustics.loudness_moore_glasberg_time(x, fs, field="free")
+
+# The result carries both traces on a 1 ms time axis:
+res.plot()
+plt.show()
+
+# Or plot them directly to see the fast STL vs the slow LTL:
+fig, ax = plt.subplots()
+ax.plot(res.time, res.short_term_loudness, label="Short-term S'(t)")
+ax.plot(res.time, res.long_term_loudness, label="Long-term S''(t)")
+ax.set_xlabel("Time [s]")
+ax.set_ylabel("Loudness [sone]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+#### `loudness_moore_glasberg_time()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `signal` | 1D or `(n, 2)` array | Pa | non-empty | Mono = diotic; two columns = left/right ears |
+| `fs` | int | Hz | > 0 | |
+| `field` | str | — | `'free'` (default) / `'diffuse'` / `'eardrum'` | Outer-ear transfer |
+| `presentation` | str | — | `'binaural'` (default) / `'diotic'` / `'monaural'` | Binaural summation |
+| `percentiles` | sequence | percent | default `(1, 5, 10, 50, 90, 95)` | Exceeded long-term loudness levels |
+
+Returns a `MooreGlasbergTimeVaryingLoudness`: `time` (1 ms grid),
+`short_term_loudness` / `long_term_loudness` (sone), their `_level` in phon,
+`n_max`, `loudness_level_max`, a `percentiles` dict, `field`, `presentation`.
+
+### Sottek Hearing Model loudness (ECMA-418-2)
+
+ECMA-418-2:2025 specifies a single auditory front-end (outer/middle-ear
+filtering, a 53-band gammatone-like filter bank on the Bark_HMS scale
+with z = 0.5 .. 26.5, half-wave rectification, block RMS and a compressive
+nonlinearity, Formula 23) that is **shared** by its loudness, tonality and
+roughness metrics. The loudness N is reported in **sone_HMS**, and the same
+1 kHz/40 dB anchor calibrates the front-end (our clean-room value 0.984,
+with the full Clause 6.2.3 band averaging; the residual's origin is
+documented in the module docstring).
+
+```python
+import numpy as np
+from phonometry import psychoacoustics
+
+fs = 48000
+t = np.arange(int(1.2 * fs)) / fs
+x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * t)
+
+res = psychoacoustics.loudness_ecma(x, fs, field="free")
+print(f"N = {res.loudness:.3f} sone_HMS")   # 0.984 sone_HMS
+print(res.specific_loudness.shape)          # (53,) average specific loudness N'(z)
+
+res.plot()   # average specific loudness N'(z) + time-dependent N(l) at 187.5 Hz
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sottek_specific_loudness_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sottek_specific_loudness.svg" alt="Sottek Hearing Model average specific loudness N'(z) over the 53 Bark_HMS bands for a 1 kHz tone, peaking at the tone's critical band" width="80%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import psychoacoustics
+
+fs = 48000
+t = np.arange(int(1.2 * fs)) / fs
+x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * t)
+res = psychoacoustics.loudness_ecma(x, fs, field="free")
+
+# The result carries the average specific loudness over the 53 Bark_HMS bands:
+res.plot()
+plt.show()
+
+# Or draw N'(z) by hand against the critical-band-rate scale:
+fig, ax = plt.subplots()
+ax.fill_between(res.bark, res.specific_loudness, alpha=0.3)
+ax.plot(res.bark, res.specific_loudness)
+ax.set_xlabel("Critical-band rate z [Bark_HMS]")
+ax.set_ylabel("Specific loudness N' [sone_HMS/Bark_HMS]")
+plt.show()
+```
+
+</details>
+
+#### `loudness_ecma()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `signal_in` | 1D array | Pa | non-empty | Calibrated pressure signal |
+| `fs` | float | Hz | > 0 | Resampled to 48 kHz internally if needed (Clause 5.1.1) |
+| `field` | str | — | `'free'` (default) / `'diffuse'` | Outer/middle-ear filter (Clause 5.1.3) |
+
+Returns an `EcmaLoudness`: `loudness` (N, sone_HMS), `specific_loudness`
+(N′(z), 53 bands), `bark`, `centre_frequencies`, `time`, `loudness_vs_time`
+(N(l) at 187.5 Hz), `field`.
+
+## References
+
+- Fastl, H., & Zwicker, E. (2007). *Psychoacoustics: Facts and models*
+  (3rd ed.). Springer.
+  [doi:10.1007/978-3-540-68888-4](https://doi.org/10.1007/978-3-540-68888-4).
+  The critical-band and masking psychoacoustics behind the Zwicker model and
+  the loudness sensation the newer models refine.
+- Fletcher, H., & Munson, W. A. (1933). Loudness, its definition, measurement
+  and calculation. *The Journal of the Acoustical Society of America*, 5(2),
+  82-108. [doi:10.1121/1.1915637](https://doi.org/10.1121/1.1915637).
+  The original equal-loudness measurements behind the loudness-level concept
+  of the pure-tone section.
+- International Organization for Standardization. (2023). *Acoustics —
+  Normal equal-loudness-level contours* (ISO 226:2023).
+  [iso.org catalogue](https://www.iso.org/standard/83117.html).
+  The contour model and Table 1 parameters behind the pure-tone loudness
+  levels.
+
+## Standards
+
+ISO 532-1:2017, *Acoustics — Methods for calculating
+loudness — Part 1: Zwicker method* — stationary and time-varying loudness in
+sones from the normative Annex A.4 reference program, with the N5/N10
+percentile loudness, validated against the Annex B set. ISO 532-2:2017,
+*... Part 2: Moore-Glasberg method*: stationary loudness from roex excitation
+patterns on the ERB-number scale, with explicit binaural summation.
+ISO 532-3:2023, *... Part 3: Moore-Glasberg-Schlittenlacher method*:
+time-varying short-term and long-term loudness and the peak N_max.
+ISO 226:2023, *Acoustics — Normal equal-loudness-level contours* — the
+contours (Formula 1), the loudness level of pure tones (Formula 2) and the
+hearing threshold. ECMA-418-2:2025, *Psychoacoustic metrics for ITT
+equipment — Part 2 (methods for describing human perception based on the
+Sottek Hearing Model)*: the Sottek Hearing Model loudness (sone_HMS).
+
+## See also
+
+- [Sound Quality Metrics](https://jmrplens.github.io/phonometry/guides/sound-quality/): sharpness,
+  tonality and roughness, the other half of the sound-quality story.
+- [Psychoacoustic annoyance and fluctuation strength](https://jmrplens.github.io/phonometry/guides/psychoacoustic-annoyance/):
+  the Zwicker and Fastl model that consumes the percentile loudness N5.
+- [Theory](https://jmrplens.github.io/phonometry/reference/theory/perception/): the equations behind the loudness models.
+- API reference: [`psychoacoustics.loudness_zwicker`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-zwicker/), [`psychoacoustics.loudness_moore_glasberg`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-moore-glasberg/) and [`psychoacoustics.loudness_contours`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-contours/).
+
+---
+
+
+<!-- source: docs/sound-quality.md | canonical: https://jmrplens.github.io/phonometry/guides/sound-quality/ -->
+Source: https://jmrplens.github.io/phonometry/guides/sound-quality/
+
+# Sound Quality Metrics
+
+Two sounds of equal loudness can still differ in how *sharp*, how *tonal*,
+how *rough* or how strongly *fluctuating* they are. This page covers the
+sound-quality metrics that complement loudness: sharpness (DIN 45692) and the
+ECMA-418-2 tonality, roughness and fluctuation strength of the Sottek Hearing
+Model. Loudness itself, including the ECMA-418-2 loudness that shares the
+same auditory front-end, lives in [Loudness](https://jmrplens.github.io/phonometry/guides/loudness/).
+
+## Sharpness in acum (DIN 45692)
+
+Two sounds can be equally loud yet one feels "sharper" (hissy, metallic)
+because its loudness sits higher on the Bark scale. Sharpness is the
+g(z)-weighted first moment of the specific loudness pattern:
+
+$$
+S = k\ \frac{\int_0^{24} N'(z)\ g(z)\ z\ dz}{\int_0^{24} N'(z)\ dz}\ \text{acum}
+$$
+
+with $g(z) = 1$ up to 15.8 Bark and rising exponentially beyond, and $k$
+normalized so the reference sound (critical-band-wide noise at 1 kHz,
+60 dB) is exactly **1.00 acum** (DIN 45692 clause 6; the derived
+$k = 0.108$ sits inside the normative window 0.105–0.115).
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sharpness_weighting_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sharpness_weighting.svg" alt="DIN 45692 sharpness weighting g(z) against critical-band rate on a log axis, comparing the DIN, von Bismarck and Aures curves with the 15.8 and 15 Bark knees marked" width="80%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# DIN 45692 sharpness weighting g(z): Eq. (1) plus the informative Annex B variants
+z = np.arange(1, 241) * 0.1                     # Bark bins, 0.1 .. 24.0
+g_din = np.where(z > 15.8, 0.15 * np.exp(0.42 * (z - 15.8)) + 0.85, 1.0)
+g_bis = np.where(z > 15.0, 0.2 * np.exp(0.308 * (z - 15.0)) + 0.8, 1.0)
+n = 4.0                                         # Aures depends on the total loudness (sone)
+g_aures = 0.078 * np.exp(0.171 * z) / z * (n / np.log(n * 0.05 + 1.0))
+
+fig, ax = plt.subplots()
+ax.semilogy(z, g_din, label="DIN 45692 g(z)")
+ax.semilogy(z, g_bis, "--", label="von Bismarck (Annex B)")
+ax.semilogy(z, g_aures, "-.", label="Aures (Annex B, N = 4 sone)")
+ax.axvline(15.8, linestyle=":", color="0.5")    # DIN knee: g rises beyond 15.8 Bark
+ax.set(xlabel="Critical-band rate z [Bark]", ylabel="Weighting g(z)")
+ax.grid(True, which="both", alpha=0.3)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+```python
+import numpy as np
+from phonometry import psychoacoustics
+
+# A raw recording plus its calibration so the guide runs standalone
+fs = 48000
+x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)   # any recording (digital units)
+sens = 1.0                                                # calibration_factor to pascals
+
+s = psychoacoustics.sharpness_din(x, fs, calibration_factor=sens)      # acum
+s_aures = psychoacoustics.sharpness_din(x, fs, method="aures")          # Annex B variant
+```
+
+CI verifies the Table A.2 target values (0.38 acum at 250 Hz up to
+2.82 acum at 4 kHz) within the standard's 5 % / 0.05 acum tolerance.
+
+## Tonality (ECMA-418-2)
+
+A tonal component (a whistle, a fan's blade-passing tone) stands out even at
+low level. ECMA-418-2 quantifies it from the **autocorrelation function** (ACF)
+of each band's rectified signal: a periodic (tonal) component keeps a high ACF
+at nonzero lag, and the tonal-to-noise loudness ratio drives the specific
+tonality T′(z). The single value T is in **tu_HMS**, calibrated so a 1 kHz/40 dB
+tone is ≈ 1 tu_HMS; the result also tracks the tonal frequency f_ton per band.
+
+```python
+import numpy as np
+from phonometry import psychoacoustics
+
+fs = 48000
+t = np.arange(int(1.2 * fs)) / fs
+x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * t)
+
+res = psychoacoustics.tonality_ecma(x, fs, field="free")
+peak = int(np.argmax(res.specific_tonality))
+print(f"T = {res.tonality:.3f} tu_HMS")                    # 1.000 tu_HMS
+print(f"f_ton = {res.tonal_frequencies[peak]:.0f} Hz")     # 999 Hz
+
+res.plot()   # average specific tonality T'(z) + time-dependent T(l)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sottek_specific_tonality_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sottek_specific_tonality.svg" alt="ECMA-418-2 average specific tonality over the 53 Bark_HMS bands for a 1 kHz tone at 40 dB SPL: the tonality is concentrated in a single peak at the tone's critical band around 9 Bark_HMS and falls to nearly zero elsewhere, integrating to T = 1.00 tu_HMS" width="80%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import psychoacoustics
+
+# The calibration anchor: a 1 kHz tone at 40 dB SPL is about 1 tu_HMS.
+fs = 48000
+t = np.arange(int(1.2 * fs)) / fs
+x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * t)
+res = psychoacoustics.tonality_ecma(x, fs, field="free")
+
+# One line: passing an axes draws the specific-tonality panel alone.
+fig, ax = plt.subplots()
+res.plot(ax=ax)
+plt.show()
+
+# Or draw T'(z) by hand against the critical-band-rate scale:
+fig, ax = plt.subplots()
+ax.fill_between(res.bark, res.specific_tonality, alpha=0.3, color="#d62728")
+ax.plot(res.bark, res.specific_tonality, color="#d62728")
+ax.set_xlabel("Critical-band rate z [Bark_HMS]")
+ax.set_ylabel("Specific tonality T' [tu_HMS]")
+plt.show()
+```
+
+</details>
+
+The concentration is what distinguishes a tonal sound from a broadband one of
+the same loudness: the autocorrelation stage finds a periodic component in one
+band and almost nothing in the others. A fan with a blade-passing tone and a
+harmonic series shows several such peaks; a hiss shows a flat, low pattern.
+Calling `.plot()` without an axes adds the time-dependent `T(l)` panel, which
+is where an intermittent tone shows up.
+
+### `tonality_ecma()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `signal_in` | 1D array | Pa | non-empty | Calibrated pressure signal |
+| `fs` | float | Hz | > 0 | Resampled to 48 kHz internally if needed |
+| `field` | str | — | `'free'` (default) / `'diffuse'` | Outer/middle-ear filter |
+| `f_low` | float, optional | Hz | default `None` | Lower edge of a user band for the T(l) search |
+| `f_high` | float, optional | Hz | default `None` | Upper edge of the user band |
+
+Returns an `EcmaTonality`: `tonality` (T, tu_HMS), `specific_tonality`
+(T′(z), 53 bands), `bark`, `centre_frequencies`, `tonal_frequencies`
+(f_ton,z), `time`, `tonality_vs_time` (T(l)), `tonal_frequency_vs_time`,
+`field`.
+
+## Roughness (ECMA-418-2): new capability
+
+Roughness is the harsh, buzzing sensation of fast amplitude modulation
+(roughly 20–300 Hz, peaking near 70 Hz): the quality of a diesel idle or a
+distorted loudspeaker. It is a **new metric** for phonometry. ECMA-418-2
+extracts each band's envelope, weights its modulation spectrum by modulation
+rate and depth, and correlates the modulation across bands; the result R is in
+**asper**. The reference sound (1 kHz carrier, 100 % amplitude-modulated at
+70 Hz, overall level 60 dB SPL) is defined as 1 asper; this clean-room
+implementation returns 0.9999 asper with the tabulated calibration constant
+c_R (Formula 104) used **without** reverse-fitting to the target.
+
+```python
+import numpy as np
+from phonometry import psychoacoustics
+
+fs = 48000
+t = np.arange(int(2.0 * fs)) / fs
+x = (1.0 + np.cos(2 * np.pi * 70 * t)) * np.sin(2 * np.pi * 1000 * t)
+x *= 2e-5 * 10 ** (60 / 20) / np.sqrt(np.mean(x**2))   # overall 60 dB SPL
+
+res = psychoacoustics.roughness_ecma(x, fs, field="free")
+print(f"R = {res.roughness:.4f} asper")   # 0.9999 asper (reference: 1 asper)
+
+res.plot()   # time-dependent roughness R(l50) + specific-roughness heatmap
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tonality_roughness_demo_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tonality_roughness_demo.svg" alt="ECMA-418-2 sound-quality demo: a tonal sound scores high tonality and near-zero roughness, while a 70 Hz amplitude-modulated sound scores high roughness and low tonality" width="80%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import psychoacoustics
+
+fs = 48000
+t = np.arange(int(2.0 * fs)) / fs
+amp = np.sqrt(2) * 2e-5 * 10 ** (60 / 20)
+
+# A pure tone (tonal, smooth) vs a 70 Hz amplitude-modulated tone (rough),
+# both normalized to an overall level of 60 dB SPL:
+tone = amp * np.sin(2 * np.pi * 1000 * t)
+rough = (1.0 + np.cos(2 * np.pi * 70 * t)) * np.sin(2 * np.pi * 1000 * t)
+rough *= 2e-5 * 10 ** (60 / 20) / np.sqrt(np.mean(rough**2))
+
+scores = {
+    "Pure tone": (psychoacoustics.tonality_ecma(tone, fs).tonality, psychoacoustics.roughness_ecma(tone, fs).roughness),
+    "70 Hz AM tone": (psychoacoustics.tonality_ecma(rough, fs).tonality, psychoacoustics.roughness_ecma(rough, fs).roughness),
+}
+labels = list(scores)
+tonal = [scores[k][0] for k in labels]
+rough_v = [scores[k][1] for k in labels]
+xpos = np.arange(len(labels))
+fig, ax = plt.subplots()
+ax.bar(xpos - 0.2, tonal, 0.4, label="Tonality [tu_HMS]")
+ax.bar(xpos + 0.2, rough_v, 0.4, label="Roughness [asper]")
+ax.set_xticks(xpos)
+ax.set_xticklabels(labels)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+### `roughness_ecma()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `signal_in` | 1D array | Pa | non-empty | Calibrated pressure signal |
+| `fs` | float | Hz | > 0 | Resampled to 48 kHz internally if needed |
+| `field` | str | — | `'free'` (default) / `'diffuse'` | Outer/middle-ear filter |
+
+Returns an `EcmaRoughness`: `roughness` (R, asper, the 90th percentile of
+R(l50)), `specific_roughness` (R′(z), 53 bands), `bark`, `centre_frequencies`,
+`time`, `roughness_vs_time` (R(l50)), `specific_roughness_vs_time`
+((n_times, 53) array), `field`.
+
+## Fluctuation strength (ECMA-418-2): new capability
+
+Fluctuation strength is the slow, wobbling sensation of amplitude or
+frequency modulation below about 20 Hz: a siren, beating tones, speech at
+syllable rate. It is the slow counterpart of roughness: the same hearing
+model splits envelope modulation into a slow band-pass peaking near 4 Hz
+(fluctuation strength, in **vacil_HMS**) and a fast one peaking near 70 Hz
+(roughness). ECMA-418-2 Clause 9 analyses each band's envelope with
+High-resolution Spectral Analysis (HSA), a least-squares fit of
+window-kernel spectral line pairs that resolves modulation rates far below
+the DFT bin width, using envelope-dependent analysis windows that skip
+quieter periods, then weights the dominant harmonic complex and scales it
+with an HSA-based specific loudness. The reference sound (1 kHz carrier,
+100 % amplitude-modulated at 4 Hz, overall level 60 dB SPL) is defined as
+1 vacil_HMS; this clean-room implementation converges to 0.9958 vacil_HMS
+by 12 s with the tabulated calibration constant c_F (Formula 163) used
+**without** reverse-fitting to the target (the 8 s example below prints
+0.9957). A signal whose single value F exceeds 0.2 vacil_HMS has a
+*prominent* fluctuation strength (Clause 9.2).
+
+```python
+import numpy as np
+from phonometry import psychoacoustics
+
+fs = 48000
+t = np.arange(int(8.0 * fs)) / fs
+x = (1.0 + np.cos(2 * np.pi * 4 * t)) * np.sin(2 * np.pi * 1000 * t)
+x *= 2e-5 * 10 ** (60 / 20) / np.sqrt(np.mean(x**2))   # overall 60 dB SPL
+
+res = psychoacoustics.fluctuation_strength_ecma(x, fs, field="free")
+print(f"F = {res.fluctuation_strength:.4f} vacil_HMS")   # 0.9957 vacil_HMS (reference: 1 vacil_HMS)
+
+res.plot()   # time-dependent F(l50) + specific-fluctuation-strength heatmap
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hms_modulation_bandpass_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hms_modulation_bandpass.svg" alt="ECMA-418-2 slow vs fast modulation perception: fluctuation strength forms a band-pass over modulation frequency peaking near 4 to 6 Hz while roughness of the same 1 kHz amplitude-modulated tones peaks near 70 Hz" width="80%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import psychoacoustics
+
+fs = 48000
+t = np.arange(int(3.0 * fs)) / fs
+carrier = np.sin(2 * np.pi * 1000 * t)
+
+def am_tone(fmod):
+    # 100 % AM at an overall level of 60 dB SPL (the Clause 7/9 convention)
+    x = (1.0 + np.sin(2 * np.pi * fmod * t)) * carrier
+    return x * 2e-5 * 10 ** (60 / 20) / np.sqrt(np.mean(x**2))
+
+fm_slow = [0.5, 1, 2, 4, 8, 16, 32]
+fm_fast = [20, 40, 70, 100, 150, 200]
+f_vals = [psychoacoustics.fluctuation_strength_ecma(am_tone(fm), fs).fluctuation_strength
+          for fm in fm_slow]
+r_vals = [psychoacoustics.roughness_ecma(am_tone(fm), fs).roughness for fm in fm_fast]
+
+fig, ax = plt.subplots()
+ax.semilogx(fm_slow, f_vals, "o-", label="Fluctuation strength F [vacil_HMS]")
+ax.semilogx(fm_fast, r_vals, "s-", label="Roughness R [asper]")
+ax.set(xlabel="Modulation frequency [Hz]", ylabel="F [vacil_HMS] / R [asper]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+### `fluctuation_strength_ecma()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `signal_in` | 1D array | Pa | non-empty | Calibrated pressure signal |
+| `fs` | float | Hz | > 0 | Resampled to 48 kHz internally if needed |
+| `field` | str | — | `'free'` (default) / `'diffuse'` | Outer/middle-ear filter |
+
+Returns an `EcmaFluctuationStrength`: `fluctuation_strength` (F, vacil_HMS, the
+90th percentile of F(l50)), `specific_fluctuation_strength` (F′(z), 53
+bands), `bark`, `centre_frequencies`, `time`, `fluctuation_strength_vs_time`
+(F(l50)), `specific_fluctuation_strength_vs_time` ((n_times, 53) array),
+`field`.
+
+The Fastl & Zwicker fluctuation-strength models (closed form for AM
+broadband noise and the Osses 2016 signal model) live in
+[Psychoacoustic Annoyance](https://jmrplens.github.io/phonometry/guides/psychoacoustic-annoyance/); this Clause 9
+metric is the normative Sottek-model counterpart.
+
+See [Prominent Discrete Tones](https://jmrplens.github.io/phonometry/guides/tone-prominence/) for the ECMA-418-1 TNR/PR
+prominence verdicts, [Speech Transmission Index](https://jmrplens.github.io/phonometry/guides/speech-transmission/) for
+STI/STIPA, and [Theory](https://jmrplens.github.io/phonometry/reference/theory/perception/) for the underlying math.
+
+## References
+
+- Fastl, H., & Zwicker, E. (2007). *Psychoacoustics: Facts and models*
+  (3rd ed.). Springer.
+  [doi:10.1007/978-3-540-68888-4](https://doi.org/10.1007/978-3-540-68888-4).
+  The psychoacoustics of the sensations quantified on this page: the
+  high-frequency emphasis behind sharpness and the fast-modulation percept
+  behind roughness.
+
+## Standards
+
+DIN 45692:2009, *Messtechnische Simulation der Hörempfindung
+Schärfe*: sharpness in acum (clause 6 weighting, Annex B von Bismarck and
+Aures variants, Table A.2 targets). ECMA-418-2:2025, *Psychoacoustic metrics
+for ITT equipment — Part 2 (methods for describing human perception based on
+the Sottek Hearing Model)*: the Sottek Hearing Model tonality (tu_HMS,
+clause 6), roughness (asper, clause 7) and fluctuation strength (vacil_HMS,
+clause 9, the HSA-based envelope analysis).
+
+---
+
+
+<!-- source: docs/tone-prominence.md | canonical: https://jmrplens.github.io/phonometry/guides/tone-prominence/ -->
+Source: https://jmrplens.github.io/phonometry/guides/tone-prominence/
+
+# Prominent Discrete Tones (ECMA-418-1)
+
+Tonal components in machinery noise are far more annoying than their level
+suggests. ECMA-418-1:2024 (referenced by ECMA-74 Annex D) gives two FFT-based
+methods to decide whether a discrete tone is *prominent*:
+`tone_to_noise_ratio()` compares the tone level with the masking noise in its
+critical band (clause 11), and `prominence_ratio()` compares the critical band
+centred on the tone with the two contiguous bands (clause 12). Both return a
+structured verdict against the frequency-dependent prominence criteria.
+
+## 1. Tone-to-noise ratio and prominence ratio
+
+```python
+import numpy as np
+from phonometry import psychoacoustics
+
+fs = 48000
+rng = np.random.default_rng(0)
+t = np.arange(fs) / fs
+x = np.sin(2 * np.pi * 1000 * t) + 0.05 * rng.standard_normal(fs)  # 1 kHz tone in noise
+tnr = psychoacoustics.tone_to_noise_ratio(x, fs)            # highest peak, or tone_freq=...
+pr = psychoacoustics.prominence_ratio(x, fs, tone_freq=1000.0)
+print(tnr.ratio_db, tnr.criterion_db, tnr.prominent)
+
+tnr.plot()   # the tone against its prominence criterion (needs matplotlib)
+```
+
+The methods hinge on the **critical band**, the ear's analysis bandwidth,
+$\Delta f_c = 25 + 75\ [1 + 1.4(f/1000)^2]^{0.69}$ Hz (162 Hz at 1 kHz): a
+tone is masked only by the noise *inside* its critical band, so both methods
+focus on that band rather than the whole spectrum, but they use it
+differently. The tone-to-noise ratio works within the band, separating its
+spectral lines into tone and noise and subtracting their levels (clause 11,
+Formulae 9–11); the prominence ratio instead compares the *whole* band centred
+on the tone with the mean of its two contiguous critical bands (clause 12,
+Formula 23):
+
+$$
+\mathrm{TNR} = L_t - L_n, \qquad
+\mathrm{PR} = 10\,\lg\!\frac{W_M}{\tfrac{1}{2}(W_L + W_U)}\ \text{dB},
+$$
+
+where $L_t$ is the tone level (the energy sum of the tonal lines above the
+band-edge baseline, Formula 9), $L_n$ the level of the masking noise that
+remains in the critical band, rescaled to the full critical bandwidth
+(Formulae 10–11), and $W_M$, $W_L$, $W_U$ the powers in the middle, lower and
+upper critical bands (below $f_t = 171.4$ Hz the truncated lower band is
+rescaled to a 100 Hz bandwidth, Formula 24).
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tonality_spectrum_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tonality_spectrum.svg" alt="Averaged spectrum of a tone in noise with the critical band shaded and the tone-to-noise ratio annotated against its prominence criterion" width="80%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.signal import welch
+from phonometry import psychoacoustics
+
+fs = 48000
+rng = np.random.default_rng(21)
+t = np.arange(30 * fs) / fs
+x = (np.sqrt(2) * 0.1 * np.sin(2 * np.pi * 1000 * t)
+     + 0.05 * rng.standard_normal(t.size))
+res = psychoacoustics.tone_to_noise_ratio(x, fs)
+
+# Averaged 1 Hz Hann spectrum (the clause 11.1 front end) and the
+# critical band about the detected tone (edges approximated as +/- dfc/2):
+f, p = welch(x, fs, window="hann", nperseg=fs, scaling="spectrum")
+dfc = 25 + 75 * (1 + 1.4 * (res.frequency / 1000) ** 2) ** 0.69
+sel = (f > 700) & (f < 1400)
+plt.plot(f[sel], 10 * np.log10(p[sel]))
+plt.axvspan(res.frequency - dfc / 2, res.frequency + dfc / 2, alpha=0.15)
+plt.title(f"TNR = {res.ratio_db:.1f} dB (criterion {res.criterion_db:.1f} dB)")
+plt.xlabel("Frequency [Hz]"); plt.ylabel("Bin power [dB]")
+plt.show()
+```
+
+</details>
+
+A TNR at or above $8 + 8.33\log_{10}(1000/f_t)$ dB below 1 kHz (a flat 8 dB for
+$f_t \ge 1$ kHz) classifies the tone as *prominent*; the PR criterion is
+$9 + 10\log_{10}(1000/f_t)$ dB below 1 kHz and 9 dB from there up, likewise
+applied with $\ge$. Low frequencies get higher thresholds because wider
+relative bands mask more.
+
+`ToneAssessment.plot()` puts the verdict in its context: it draws the
+criterion of the producing method over the whole 89.1 Hz to 11.2 kHz range of
+interest and marks the assessed tone at its own frequency, so the margin that
+decides the verdict is visible rather than implied.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_prominence_assessment_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_prominence_assessment.svg" alt="Tone-to-noise ratio of a 250 Hz fan tone plotted against the ECMA-418-1 prominence criterion: the criterion falls from about 17 dB at 89 Hz to a flat 8 dB above 1 kHz, and the assessed tone sits at 15.1 dB, 2.1 dB above the 13.0 dB criterion at 250 Hz, so it is prominent" width="88%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import psychoacoustics
+
+# A 250 Hz fan tone recorded in broadband machinery noise, 10 s at 48 kHz.
+fs = 48000
+rng = np.random.default_rng(4)
+t = np.arange(10 * fs) / fs
+x = (np.sqrt(2) * 0.011 * np.sin(2 * np.pi * 250.0 * t)
+     + 0.03 * rng.standard_normal(t.size))
+res = psychoacoustics.tone_to_noise_ratio(x, fs)
+print(round(res.ratio_db, 1), round(res.criterion_db, 1), res.prominent)
+# 15.1 13.0 True
+
+# One line: the tone against the criterion curve of its own method.
+res.plot()
+plt.show()
+
+# By hand, mirroring what ToneAssessment.plot() draws:
+f = np.logspace(np.log10(89.1), np.log10(11200.0), 400)
+criterion = np.where(f < 1000.0, 8.0 + 8.33 * np.log10(1000.0 / f), 8.0)
+fig, ax = plt.subplots()
+ax.semilogx(f, criterion, color="#d62728", label="prominence criterion")
+ax.plot([res.frequency], [res.ratio_db], "o", label="assessed tone")
+ax.plot([res.frequency] * 2, [res.criterion_db, res.ratio_db], ":", color="0.6")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Tone-to-noise ratio TNR [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+**When the two ratios disagree.** Near the criteria the verdicts can differ,
+because each ratio is fragile in a different situation. TNR has to *split*
+the critical band into tonal and noise lines first, so it degrades when that
+separation is ambiguous: a tone riding a steep noise slope, or closely
+spaced components whose skirts overlap. PR needs no separation, which makes
+it the robust, automatable choice when **several tones share the critical
+band** (they all land in $W_M$); in exchange it reads low when a
+*neighbouring* band also carries a tone (the flanking bands are then not
+noise) and is biased on sharply sloping spectra, where the two flanking
+bands no longer estimate the masking at the tone. In practice: prefer TNR
+for a clean, isolated tone, prefer PR for multi-tone complexes sharing a
+band, and report both when they straddle their criteria.
+
+## 2. Where to measure (ECMA-74) and practice
+
+ECMA-74 (which delegates its tone assessments to ECMA-418-1) also fixes where to measure around a device (context only): phonometry implements the ECMA-418-1 assessments, not the ECMA-74 Annex D measurement procedure:
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_tonality_positions_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_tonality_positions.svg" alt="ECMA-74 emission measurement positions: seated operator microphone at 0.25 m and 1.20 m, and the four bystander positions at 1 m" width="92%"></picture>
+
+Proximate secondary tones in the same critical band are combined per
+clause 11.6; for harmonic complexes assess each component (`tone_freq=`).
+Both methods work on Hann-windowed, RMS-averaged spectra and need no absolute
+calibration (the ratios are level differences).
+
+### `tone_to_noise_ratio()` / `prominence_ratio()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `x` | 1D array | any (uncalibrated OK) | ≥ `fs/resolution_hz` samples | Ratios are level differences: calibration cancels out |
+| `fs` | int | Hz | > 0 | |
+| `tone_freq` | float, optional | Hz | 89.1–11 200; default `None` | `None` assesses the highest peak in the range of interest |
+| `resolution_hz` | float | Hz | > 0; default `1.0` | Tone band must stay within 15 % of the critical band (clause 11.2) |
+
+Both return a `ToneAssessment(frequency, ratio_db, criterion_db, prominent)`.
+
+## 3. Which tonality metric, and when
+
+The library implements four tonality assessments, and they are not
+interchangeable: each belongs to a different standard with its own purpose,
+input and output.
+
+| | TNR / PR | Tone audibility `ΔL` | Psychoacoustic tonality `T` | Wind-turbine tonal audibility |
+| :--- | :--- | :--- | :--- | :--- |
+| Standard | ECMA-418-1:2024, clauses 11 and 12 | ISO/PAS 20065:2016, adopted by ISO 1996-2:2017 Annex J | ECMA-418-2:2025, clause 6 | IEC 61400-11:2012, clause 9.5 |
+| Question answered | Is this discrete tone prominent in the emission of a device? | Is the tone audible above the noise that masks it, and by how much? | How tonal does the sound feel? | Is a turbine tone audible at the reference position, wind bin by wind bin? |
+| Input | One FFT spectrum, no calibration needed | Narrow-band spectra with the line spacing declared | The calibrated pressure signal, through the Sottek hearing model | Narrow-band spectra per wind-speed bin, with the reference distance |
+| Output | A ratio in dB against a frequency-dependent criterion, plus a prominent / not prominent verdict | An audibility in dB, whose decisive and mean values feed the tonal adjustment `Kt` | A tonality in `tu_HMS`, a perceptual magnitude with no criterion | An audibility in dB per bin, reported with the turbine's sound power |
+| Use it for | Declaring ITT equipment emission (ECMA-74 Annex D) | Environmental-noise rating: justifying, or refusing, a tonal penalty | Sound-quality work: comparing designs, not passing a limit | Type testing and acceptance of wind turbines |
+
+Read the table as a decision: the *purpose of the report* picks the metric,
+not the convenience of the input. A device emission declaration is an
+ECMA-418-1 prominence verdict; a complaint about a tone from an installation
+is an ISO 1996-2 rating, so it needs the audibility `ΔL` that maps to `Kt`
+([tone audibility](https://jmrplens.github.io/phonometry/guides/tone-audibility/)); a product comparison where nobody is
+being fined is where the ECMA-418-2 tonality earns its place, because it is a
+magnitude rather than a threshold test ([sound quality](https://jmrplens.github.io/phonometry/guides/sound-quality/));
+and a turbine is its own regime, with a measurement procedure in
+IEC 61400-11 that fixes the geometry and the wind bins
+([wind-turbine noise](https://jmrplens.github.io/phonometry/guides/wind-turbine-noise/)).
+
+Two consequences worth keeping in mind. First, the numbers do not convert:
+a TNR of 12 dB is not an audibility of 12 dB, because the masking model, the
+band definition and the reference differ. Second, the metrics can disagree
+about the same sound, and legitimately so. A tone can be prominent by
+ECMA-418-1 in the near field of the machine and inaudible at the dwelling
+where the ISO 1996-2 assessment is made, while a hearing-model tonality
+stays moderate throughout because it rates the whole sound and not one
+spectral line. Report the metric the assessment calls for, and quote any
+other only as supporting evidence.
+
+## See also
+
+- [Levels](https://jmrplens.github.io/phonometry/guides/levels/): the ISO 1996-1 rating levels whose tonal adjustments
+  (Table A.1) these prominence verdicts justify objectively.
+- [Sound Quality Metrics](https://jmrplens.github.io/phonometry/guides/sound-quality/): the ECMA-418-2 psychoacoustic
+  tonality T in tu_HMS, the hearing-model counterpart of these FFT ratios.
+- [Objective audibility of tones in noise](https://jmrplens.github.io/phonometry/guides/tone-audibility/): the ISO/PAS 20065
+  audibility ΔL that the ISO 1996-2 tonal adjustment Kt is read from.
+- [Wind-turbine noise](https://jmrplens.github.io/phonometry/guides/wind-turbine-noise/): the IEC 61400-11 tonal audibility,
+  the same question asked per wind-speed bin.
+- [Impulsive-sound prominence](https://jmrplens.github.io/phonometry/guides/impulse-prominence/): the NT ACOU 112
+  counterpart for impulsive (rather than tonal) character.
+- [Theory](https://jmrplens.github.io/phonometry/reference/theory/perception/): the critical-band model and criteria derivation.
+- API reference: [`psychoacoustics.tonality`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/tonality/).
+
+## References
+
+- Ecma International. (2024). *ECMA-418-1: Psychoacoustic metrics for ITT
+  equipment — Part 1: Prominent discrete tones* (3rd ed.).
+  [Free PDF](https://ecma-international.org/wp-content/uploads/ECMA-418-1_3rd_edition_december_2024.pdf).
+  The implemented standard, freely downloadable: the TNR (clause 11) and PR
+  (clause 12) methods, the critical-band model and the prominence criteria of
+  section 1.
+- Ecma International. (2025). *ECMA-74: Measurement of airborne noise emitted
+  by information technology and telecommunications equipment* (22nd ed.).
+  [Free PDF](https://ecma-international.org/wp-content/uploads/ECMA-74_22nd_edition_december_2025.pdf).
+  The parent emission standard, freely downloadable: the operator/bystander
+  measurement positions of section 2, with Annex D delegating the tone
+  assessments to ECMA-418-1.
+
+## Standards
+
+ECMA-418-1:2024 (3rd edition), *Psychoacoustic metrics for ITT
+equipment — Part 1: Prominent discrete tones* — the tone-to-noise ratio
+(clause 11), the prominence ratio (clause 12), the critical-band model and the
+frequency-dependent prominence criteria.
+
+---
+
+
+<!-- source: docs/psychoacoustic-annoyance.md | canonical: https://jmrplens.github.io/phonometry/guides/psychoacoustic-annoyance/ -->
+Source: https://jmrplens.github.io/phonometry/guides/psychoacoustic-annoyance/
+
+# Psychoacoustic annoyance and fluctuation strength (Fastl & Zwicker)
+
+How *annoying* a sound is depends on more than how loud it is. Fastl & Zwicker,
+*Psychoacoustics: Facts and Models*, combine four psychoacoustic sensations
+(**loudness**, **sharpness**, **roughness** and **fluctuation strength**) into a
+single **psychoacoustic annoyance** `PA`, a scalar that grows with loudness and
+is lifted further when the sound is sharp, rough or slowly fluctuating. This page
+covers the exact `PA` model (Eqs 16.2–16.4), the **fluctuation strength** it
+consumes, both the closed form for amplitude-modulated broadband noise
+(Eq. 10.2) and the Osses et al. (2016) signal model, and the signal
+convenience that derives all four sensations from a recording.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/psychoacoustic_annoyance_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/psychoacoustic_annoyance.svg" alt="Psychoacoustic annoyance PA against percentile loudness N5 for three sensation profiles: a neutral baseline where PA equals N5, a sharp sound and a rough-and-fluctuating sound both lifted above the baseline, with the worked example PA = 30.82 marked" width="82%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import psychoacoustics
+
+n5 = np.linspace(4.0, 60.0, 200)
+profiles = [
+    ("Baseline: S = 1.75 acum, F = R = 0", 1.75, 0.0, 0.0),
+    ("Sharp: S = 3.5 acum", 3.5, 0.0, 0.0),
+    ("Rough + fluctuating: F = 1.2 vacil, R = 0.7 asper", 2.0, 1.2, 0.7),
+]
+fig, ax = plt.subplots()
+for label, s, f, r in profiles:
+    pa = [psychoacoustics.psychoacoustic_annoyance(v, s, f, r).annoyance for v in n5]
+    ax.plot(n5, pa, label=label)
+
+ex = psychoacoustics.psychoacoustic_annoyance(30.0, 2.0, 0.5, 0.3)
+ax.plot([30.0], [ex.annoyance], "o", label=f"Worked example (PA = {ex.annoyance:.2f})")
+ax.set_xlabel("Percentile loudness N5 [sone]")
+ax.set_ylabel("Psychoacoustic annoyance PA")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+## 1. The four sensations
+
+Psychoacoustic annoyance rests on four hearing sensations, each with its own
+model and unit in the library:
+
+- **Loudness**: the percentile loudness `N5` (the loudness exceeded 5 % of the
+  time), in **sone**, from the ISO 532-1 Zwicker time-varying model
+  (`loudness_zwicker`, see [Loudness](https://jmrplens.github.io/phonometry/guides/loudness/)).
+- **Sharpness** `S`, in **acum**: the spectral balance towards high
+  frequencies, DIN 45692 (`sharpness_din`).
+- **Roughness** `R`, in **asper**: the harshness of fast (~70 Hz) amplitude
+  modulation, ECMA-418-2 Sottek model (`roughness_ecma`).
+- **Fluctuation strength** `F`, in **vacil**: the sensation of slow (~4 Hz)
+  loudness fluctuation (§3 below).
+
+## 2. Psychoacoustic annoyance (Eqs 16.2–16.4)
+
+The exact model (Fastl & Zwicker Eq. 16.2; origin Widmann 1992) scales `N5` by a
+factor that grows with the sharpness weighting `wS` and the combined
+roughness/fluctuation weighting `wFR`:
+
+$$
+PA = N_5\left(1 + \sqrt{w_S^2 + w_{FR}^2}\right), \qquad
+w_S = (S - 1.75)\,0.25\,\lg(N_5 + 10)\ \ (S > 1.75\ \mathrm{acum}), \qquad
+w_{FR} = \frac{2.18}{N_5^{0.4}}\,(0.4\,F + 0.6\,R).
+$$
+
+`wS` is zero for `S ≤ 1.75 acum` (sharpness only adds annoyance above that
+threshold); `wFR` weights roughness more heavily than fluctuation strength
+(0.6 vs 0.4). `psychoacoustic_annoyance` takes the four quantities directly and
+returns the annoyance together with the two intermediate weightings:
+
+```python
+from phonometry import psychoacoustics
+
+res = psychoacoustics.psychoacoustic_annoyance(30.0, 2.0, 0.5, 0.3)   # N5, S, F, R
+print(round(res.annoyance, 4))   # 37.0478
+print(round(res.w_s, 4), round(res.w_fr, 4))   # 0.1001 0.2125
+
+res.plot()   # PA beside its wS and wFR weightings (needs matplotlib)
+```
+
+The figure above sweeps `PA` against `N5` for three profiles: a neutral baseline
+(`S = 1.75 acum`, `F = R = 0`, so `PA = N5`), a sharp sound and a
+rough-and-fluctuating sound, both lifted above the baseline, with the worked
+example marked.
+
+### 2.1 From a signal (engineering estimate)
+
+`psychoacoustic_annoyance_from_signal` is a convenience that derives all four
+sensations from a calibrated pressure signal and combines them: `N5` from the
+ISO 532-1 Zwicker time-varying loudness, `S` from DIN 45692 sharpness, `R` from
+the ECMA-418-2 Sottek roughness and `F` from the fluctuation-strength signal
+model.
+
+```python
+from phonometry import psychoacoustics
+
+res = psychoacoustics.psychoacoustic_annoyance_from_signal(x, fs, field="free")
+print(res.annoyance, res.n5, res.sharpness, res.roughness, res.fluctuation_strength)
+
+res.plot()   # the same PA / wS / wFR view, now from the four derived sensations
+```
+
+> **Model-mixing caveat.** This composite mixes model families: Zwicker-family
+> `N5` and `S`, Sottek `R` and Osses `F`. The `PA` model was calibrated with
+> Zwicker-family sensations, so treat the signal convenience as an *engineering
+> estimate*. For exact, reproducible results, compute the four quantities with
+> whichever models you trust and pass them to `psychoacoustic_annoyance`
+> directly (the four-argument function is the exact model).
+
+## 3. Fluctuation strength
+
+**Fluctuation strength** `F` (vacil) quantifies the perception of *slow* loudness
+fluctuation. Like roughness it is a band-pass sensation of the modulation
+frequency, but it peaks about an order of magnitude lower, at `fmod ≈ 4 Hz`
+rather than the ~70 Hz roughness peak. By definition, a 1 kHz tone at 60 dB,
+100 % amplitude-modulated at 4 Hz, produces `1 vacil`. This page covers the
+Fastl & Zwicker models; the normative Sottek-model fluctuation strength of
+ECMA-418-2 Clause 9 lives in [Sound Quality Metrics](https://jmrplens.github.io/phonometry/guides/sound-quality/).
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength.svg" alt="Fluctuation strength versus modulation frequency on a log axis: the closed-form AM broadband-noise curve and the AM-tone signal-model sweep both show a band-pass characteristic peaking at 4 Hz" width="82%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import psychoacoustics
+
+# Exact closed form (Eq. 10.2), AM broadband noise at 60 dB, 100 % modulation:
+fmod = np.logspace(np.log10(0.5), np.log10(32.0), 240)
+f_bbn = [psychoacoustics.fluctuation_strength_am_noise(60.0, 1.0, fm) for fm in fmod]
+
+# Osses 2016 signal model on a 1 kHz / 70 dB AM tone over the same sweep:
+fs = 48000
+t = np.arange(int(2.0 * fs)) / fs
+carrier = np.sin(2 * np.pi * 1000 * t)
+fm_tone = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0]
+f_tone = []
+for fm in fm_tone:
+    am = (1.0 + np.sin(2 * np.pi * fm * t)) * carrier
+    am = am / np.sqrt(np.mean(am ** 2)) * 2e-5 * 10 ** (70 / 20)
+    f_tone.append(psychoacoustics.fluctuation_strength(am, float(fs)).fluctuation_strength)
+
+fig, ax = plt.subplots()
+ax.semilogx(fmod, f_bbn, label="AM broadband noise (closed form)")
+ax2 = ax.twinx()
+ax2.plot(fm_tone, f_tone, "s--", color="tab:green", label="AM tone (signal model)")
+ax.axvline(4.0, ls="--", color="0.4")
+ax.set_xlabel("Modulation frequency f_mod [Hz]")
+ax.set_ylabel("Fluctuation strength F [vacil]")
+h1, l1 = ax.get_legend_handles_labels()
+h2, l2 = ax2.get_legend_handles_labels()
+ax.legend(h1 + h2, l1 + l2, loc="upper right")
+plt.show()
+```
+
+</details>
+
+### 3.1 Closed form for AM broadband noise (Eq. 10.2)
+
+For sinusoidally amplitude-modulated broadband noise, Fastl & Zwicker give a
+closed form (Eq. 10.2) in modulation factor `m`, level `L` and modulation
+frequency `fmod`:
+
+$$
+F = \frac{5.8\,(1.25\,m - 0.25)\,[0.05\,(L/\mathrm{dB}) - 1]}
+{(f_{mod}/5\,\mathrm{Hz})^2 + (4\,\mathrm{Hz}/f_{mod}) + 1.5}\ \ \mathrm{vacil}.
+$$
+
+The denominator is the `4 Hz` band-pass: it bottoms out near `fmod ≈ 3.7 Hz` and
+rises on either side. The result is clamped at `0` (the sensation vanishes below
+~20 dB or `m < 0.2`). This exact form is the value to quote for AM broadband
+noise.
+
+```python
+from phonometry import psychoacoustics
+
+print(round(psychoacoustics.fluctuation_strength_am_noise(60.0, 1.0, 4.0), 4))   # 3.6943 vacil
+```
+
+### 3.2 The Osses 2016 signal model
+
+`fluctuation_strength` implements the Osses et al. (2016) signal model: it builds
+an excitation pattern over 47 auditory filters, extracts the `~4 Hz` envelope
+modulation per band, weights and combines it, and returns the overall `F` (vacil)
+plus the specific fluctuation strength over the Bark axis and the time-dependent
+trace.
+
+```python
+from phonometry import psychoacoustics
+
+res = psychoacoustics.fluctuation_strength(x, fs)
+print(res.fluctuation_strength)   # vacil
+res.plot()   # specific fluctuation strength F′(z) over the Bark axis (needs matplotlib)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength_specific_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fluctuation_strength_specific.svg" alt="Specific fluctuation strength over the Bark axis for a 1 kHz tone at 70 dB SPL fully amplitude-modulated at 4 Hz: the sensation is concentrated in the critical bands around the carrier near 8 Bark and integrates to about 1.1 vacil" width="82%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import psychoacoustics
+
+# The reference-like stimulus: a 1 kHz tone at 70 dB SPL, 100 % amplitude
+# modulated at 4 Hz, where the sensation peaks.
+fs = 48000
+t = np.arange(int(2.0 * fs)) / fs
+am = (1.0 + np.sin(2 * np.pi * 4.0 * t)) * np.sin(2 * np.pi * 1000 * t)
+am = am / np.sqrt(np.mean(am ** 2)) * 2e-5 * 10 ** (70 / 20)
+res = psychoacoustics.fluctuation_strength(am, float(fs))
+print(round(res.fluctuation_strength, 2))    # 1.09 vacil
+
+# One line: the specific fluctuation strength over the Bark axis.
+res.plot()
+plt.show()
+
+# Or draw f'(z) by hand from the arrays the result carries:
+fig, ax = plt.subplots()
+ax.fill_between(res.bark_axis, res.specific, alpha=0.3)
+ax.plot(res.bark_axis, res.specific)
+ax.set_xlabel("Critical-band rate z [Bark]")
+ax.set_ylabel("Specific fluctuation strength [vacil/Bark]")
+plt.show()
+```
+
+</details>
+
+The sensation stays where the modulated energy is, in the critical bands
+around the carrier, which is exactly why the closed form of section 3.1 and
+the signal model diverge for **broadband** modulated noise: there the
+modulation is spread over the whole Bark axis and the band-by-band model
+accumulates more of it than the single closed form allows.
+
+> **No numeric standard.** Fluctuation strength has no ISO/IEC standard. This is
+> a clean-room implementation from the Osses 2016 paper, calibrated so that the
+> `1 kHz / 60 dB / m = 1 / 4 Hz` AM tone reads `1.00 vacil` by construction, and
+> cross-checked against the Osses 2016 Table 1 literature values and the open
+> SQAT reference (used only as a numeric oracle). Over the `70 dB` AM-tone sweep
+> `fmod ∈ {1, 2, 4, 8, 16, 32} Hz` it gives `[0.40, 0.79, 1.09, 1.05, 0.17,
+> 0.09]` vacil against the literature `[0.39, 0.84, 1.25, 1.30, 0.36, 0.06]`
+> (Pearson `r = 0.98`, correct `4 Hz` peak, within ~2.1×). FM-tone accuracy is
+> explicitly not pursued. For **AM broadband noise** the signal model overshoots
+> the absolute level (it spreads the modulated energy across bands); quote the
+> closed form `fluctuation_strength_am_noise` (§3.1) for that stimulus.
+
+## References
+
+- Fastl, H., & Zwicker, E. (2007). *Psychoacoustics: Facts and models*
+  (3rd ed.). Springer.
+  [doi:10.1007/978-3-540-68888-4](https://doi.org/10.1007/978-3-540-68888-4).
+  The source of the psychoacoustic-annoyance model of section 2
+  (Eqs 16.2–16.4, chapter 16) and of the closed-form fluctuation strength for
+  AM broadband noise of §3.1 (Eq. 10.2, chapter 10).
+- Osses Vecchi, A., García León, R., & Kohlrausch, A. (2016). Modelling the
+  sensation of fluctuation strength. *Proceedings of Meetings on Acoustics*,
+  28, 050005. [doi:10.1121/2.0000410](https://doi.org/10.1121/2.0000410).
+  The fluctuation-strength signal model implemented in §3.2, including the
+  Table 1 literature values used as its cross-check.
+- Felix Greco, G., Merino-Martínez, R., Osses, A., & Lotinga, M. J. B.
+  (2025). *SQAT: a sound quality analysis toolbox for MATLAB* (open-source
+  software). [github.com/ggrecow/SQAT](https://github.com/ggrecow/SQAT),
+  [doi:10.5281/zenodo.7934709](https://doi.org/10.5281/zenodo.7934709).
+  The open MATLAB reference used as the numeric oracle for the
+  fluctuation-strength cross-checks on this page.
+
+## Standards
+
+Fastl & Zwicker (2007, 3rd ed.), *Psychoacoustics: Facts and Models*
+(Springer): psychoacoustic annoyance `PA = N5·(1 + √(wS² + wFR²))` with the
+sharpness weighting `wS` and roughness/fluctuation weighting `wFR`
+(Eqs 16.2–16.4; origin Widmann 1992), and the closed form for the fluctuation
+strength of amplitude-modulated broadband noise (Eq. 10.2). The fluctuation-
+strength signal model follows Osses García & Kohlrausch (2016), *Modelling the
+sensation of fluctuation strength* (ICA 2016), clean-room and with no numeric
+standard: calibrated to `1 vacil` at the reference AM tone and cross-checked
+against the paper's Table 1 literature trends and the open SQAT reference oracle.
+The four sensations reuse the library's ISO 532-1 loudness, DIN 45692 sharpness
+and ECMA-418-2 roughness (see [Loudness](https://jmrplens.github.io/phonometry/guides/loudness/) and
+[Sound Quality Metrics](https://jmrplens.github.io/phonometry/guides/sound-quality/)).
+
+---

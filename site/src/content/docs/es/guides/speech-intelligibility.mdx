@@ -418,6 +418,30 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 	caption="Ficha de índice de inteligibilidad del habla (SIIResult.report), el SII con su audibilidad por banda."
 />
 
+## Qué cubre esta guía
+
+**Cubierto.** El método por bandas de tercio de octava de ANSI S3.5-1997
+(R2017) (18 bandas, 160 Hz a 8000 Hz): los niveles espectrales equivalentes de
+habla, ruido y umbral de audición, la función de importancia de banda de la
+Tabla 3 y los espectros de voz estándar por esfuerzo vocal, la automáscara del
+habla, la propagación ascendente de la máscara, el factor de distorsión de
+nivel y la función de audibilidad de banda de la cláusula 5, y el índice de la
+cláusula 6. `speech_intelligibility_index`, `standard_speech_spectrum` y
+`standard_speech_spectra` implementan esto, y `SIIResult.report(path)` genera
+la ficha de ANSI S3.5-1997.
+
+**No cubierto.** El título de la norma está en plural ("Methods for the
+Calculation of the Speech Intelligibility Index"): phonometry implementa solo
+el procedimiento por bandas de tercio de octava, no los demás métodos de
+resolución de banda de la norma. La función de importancia de banda usada es
+siempre el compromiso de habla promedio de la Tabla 3; las funciones de
+importancia alternativas del Anexo B para materiales de ensayo concretos
+(sílabas sin sentido, listas de palabras monosílabas, pasajes cortos) no están
+implementadas. El índice de transmisión del habla, una métrica distinta para
+un canal de transmisión en vez de la audibilidad de quien escucha, se cubre
+aparte en la
+[guía del índice de transmisión del habla](/phonometry/es/guides/speech-transmission/).
+
 ## Véase también
 
 - [Índice de transmisión del habla](/phonometry/es/guides/speech-transmission/): el

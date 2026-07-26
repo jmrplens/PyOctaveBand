@@ -1,6 +1,6 @@
 ---
 title: "metrology.compliance"
-description: "Public API of phonometry.metrology.compliance (auto-generated)."
+description: "IEC 61260-1:2014 filter and IEC 61672-1:2013 weighting class verification."
 sidebar:
   label: "compliance"
 ---

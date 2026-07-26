@@ -1,6 +1,6 @@
 ---
 title: "psychoacoustics.loudness_ecma"
-description: "Public API of phonometry.psychoacoustics.loudness_ecma (auto-generated)."
+description: "Psychoacoustic loudness per ECMA-418-2:2025 (4th ed., Sottek Hearing Model)."
 sidebar:
   label: "loudness_ecma"
 ---

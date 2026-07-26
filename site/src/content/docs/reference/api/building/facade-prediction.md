@@ -1,6 +1,6 @@
 ---
 title: "building.facade_prediction"
-description: "Public API of phonometry.building.facade_prediction (auto-generated)."
+description: "Fa\u00e7ade sound insulation and outdoor radiation prediction (EN 12354-3/-4:2000)."
 sidebar:
   label: "facade_prediction"
 ---

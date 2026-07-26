@@ -1,6 +1,6 @@
 ---
 title: "metrology.envelope"
-description: "Public API of phonometry.metrology.envelope (auto-generated)."
+description: "Envelope and instantaneous phase via the Hilbert transform."
 sidebar:
   label: "envelope"
 ---

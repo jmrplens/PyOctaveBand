@@ -1,6 +1,6 @@
 ---
 title: "vibration.transfer_stiffness"
-description: "Public API of phonometry.vibration.transfer_stiffness (auto-generated)."
+description: "Dynamic transfer stiffness of resilient elements (ISO 10846-1/-2/-3)."
 sidebar:
   label: "transfer_stiffness"
 ---

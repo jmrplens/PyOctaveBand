@@ -1,6 +1,6 @@
 ---
 title: "materials.absorption_rating"
-description: "Public API of phonometry.materials.absorption_rating (auto-generated)."
+description: "Single-number rating of sound absorption (ISO 11654:1997)."
 sidebar:
   label: "absorption_rating"
 ---

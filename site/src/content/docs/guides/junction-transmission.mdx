@@ -230,6 +230,29 @@ velocity level difference) is the separate flanking-transmission
 `vibration_reduction_index`; this page is the closed-form *predicted* value from
 the wave approach.
 
+## What this guide covers
+
+**Covered.** The frequency-independent, rigid-junction transmission
+coefficients of Cremer, Heckl & Ungar (1973), tabulated by Craik
+(1981/1996) and collected in Hopkins (2007, Section 5.2.1.3), for the X,
+T, L and in-line junctions of thin, homogeneous, isotropic plates: the
+wave parameters $\chi$/$\psi$, the corner and straight-section
+coefficients $\tau_{12}(\theta)$/$\tau_{13}(\theta)$, their diffuse-field
+angular average, the SEA coupling loss factor and the wave-approach
+vibration reduction index $K_{ij}$, via `junction_wave_parameters`,
+`corner_transmission_coefficient`, `straight_transmission_coefficient`,
+`angular_average_transmission_coefficient`, `coupling_loss_factor`,
+`wave_vibration_reduction_index` and `junction_transmission`.
+
+**Not covered.** This predicted $K_{ij}$ is a closed-form idealisation for a
+rigid, simply supported junction, not a measurement: the measured,
+empirical $K_{ij}$ from a direction-averaged velocity level difference
+(ISO 10848) is the separate `vibration_reduction_index` of the
+[Laboratory Insulation Measurement guide](/phonometry/guides/insulation-lab/).
+The straight-section coefficient $\tau_{13}$ is undefined for the
+T-junction (2) and L-junction geometries, which have no collinear third
+plate, so only the corner path applies there.
+
 ## See also
 
 - [Predicting Sound Insulation (EN 12354)](/phonometry/guides/insulation-prediction/):

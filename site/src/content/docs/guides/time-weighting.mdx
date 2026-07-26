@@ -286,6 +286,27 @@ See [Integrated & Statistical Levels](/phonometry/guides/levels/) for Leq/LN met
 these envelopes, and [Why phonometry](/phonometry/reference/why-phonometry/) for the IEC
 61672-1 tone-burst verification.
 
+## What this guide covers
+
+**Covered.** IEC 61672-1:2013's exponential time-weighting detector
+(clause 3.8) with the Fast and Slow time constants (clause 5.7),
+implemented as the recursive filter of `time_weighting` and the streaming
+`TimeWeighting` class, verified in CI against the class 1 tone-burst
+references of Table 4. The legacy asymmetric Impulse ballistics (35 ms
+attack, 1.5 s decay), carried into the international standards from the
+FAST/SLOW/IMPULSE characteristics of ANSI S1.4-1983.
+
+**Not covered.** IEC 61672-1's wider instrument chain (frequency
+weighting, level ranges, periodic tests) is not on this page; it is the
+subject of
+[Build a sound level meter](/phonometry/guides/sound-level-meter/). ANSI
+S1.4-1983 is cited only for the historical origin of the F and S
+constants, not implemented as its own instrument specification. Modern
+impulsiveness rating ($L_{Aeq}$ plus an adjustment, or onset analysis) is
+on the
+[Impulsive-sound prominence](/phonometry/guides/impulse-prominence/) page,
+not built on the Impulse weighting here.
+
 ## See also
 
 - [Levels](/phonometry/guides/levels/): the percentile levels defined on the detector's output, and the integrated metrics that bypass it.

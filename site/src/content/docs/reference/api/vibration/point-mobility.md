@@ -1,6 +1,6 @@
 ---
 title: "vibration.point_mobility"
-description: "Public API of phonometry.vibration.point_mobility (auto-generated)."
+description: "Point mobilities and impedances of infinite structures (Cremer, Heckl & Petersson 2005, Chapter 5, Table 5.1)."
 sidebar:
   label: "point_mobility"
 ---

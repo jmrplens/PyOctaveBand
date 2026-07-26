@@ -425,3 +425,23 @@ La maquinaria de Welch usada para verificar el barrido conformado es la
 página de [análisis espectral calibrado](/phonometry/es/guides/spectral-analysis/),
 y las respuestas ecualizadas alimentan la misma cadena posterior que
 cualquier [respuesta al impulso](/phonometry/es/guides/room-acoustics/).
+
+## Qué cubre esta guía
+
+**Cubierto.** El par complementario de Golay (Golay 1961; Havelock, Kuwano
+y Vorländer eds., 2008, parte I, cap. 6 de Xiang): la recursión de
+adjunción, la identidad exacta de autocorrelaciones complementarias y la
+recuperación por suma de correlaciones, implementadas por `golay_pair` y
+`golay_impulse_response`. La síntesis de barridos por retardo de grupo de
+Müller y Massarani (2001, secs. 4.2-4.3), implementada por
+`shaped_sweep_signal`. La regularización de Tikhonov dependiente de la
+frecuencia de Kirkeby y Nelson (1999, Ec. 17 y sec. 2.4), implementada por
+`regularized_inverse_filter`.
+
+**No cubierto.** Son métodos de ingeniería de medición tomados de la
+literatura de funciones de transferencia, no de una norma de
+certificación, así que no hay ninguna cláusula de cumplimiento contra la
+que comprobar. La inversión original de Kirkeby y Nelson apunta a la
+reproducción sonora multialtavoz, con una regularización matricial para la
+cancelación de diafonía entre varios canales. `regularized_inverse_filter`
+implementa solo el caso escalar de un único canal de su Ec. 17.

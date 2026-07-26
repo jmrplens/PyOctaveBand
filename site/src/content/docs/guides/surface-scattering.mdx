@@ -739,6 +739,36 @@ s_min, s_max = materials.spot_microphone_spacing_bounds(
 print(round(s_min, 3), round(s_max, 3))    # 0.078 0.086  (metres)
 ```
 
+## What this guide covers
+
+**Covered.** ISO 17497-1:2004+A1:2014's random-incidence scattering
+coefficient (the Clause 6 absorption-from-reverberation-time relations and
+Eq. (5)) with the Table 1 base-plate ceilings, via
+`materials.random_incidence_absorption`,
+`materials.specular_absorption_coefficient`, `materials.scattering_coefficient`,
+`materials.scattering_coefficient_spectrum` and
+`materials.check_base_plate_scattering`; ISO 17497-2:2012's directional and
+random-incidence diffusion coefficient (Formulas (5) to (8)) via
+`materials.directional_diffusion` and `materials.random_incidence_diffusion`,
+plus the Cox & D'Antonio Fraunhofer diffuser-prediction model;
+ISO 13472-1:2002's subtraction technique (the Clause 4.1 geometrical
+spreading, the Clause 6.4 Adrienne time window and the Annex A sampled-area
+radius) via `materials.insitu_absorption_spectrum` and its building blocks;
+and ISO 13472-2:2010's spot-method plane-wave frequency limit and
+microphone-spacing geometry.
+
+**Not covered.** Both in-situ road standards have since been revised
+(ISO 13472-1:2022, ISO 13472-2:2025); only the earlier 2002 and 2010
+editions are implemented here, as the reference notes above flag.
+ISO 13472-2's own transfer-function processing is not implemented in this
+module either: only the geometry and validity helpers are provided, and the
+actual two-microphone DSP is the ISO 10534-2 routine of the
+[Acoustic Materials guide](/phonometry/guides/materials/). The Fraunhofer
+diffuser-prediction model is a design estimate, not part of ISO 17497-2
+itself, and its own stated limits (it loses accuracy at low frequency, at
+grazing angles and for strongly absorbing surfaces, and it ignores edge
+diffraction) mean it is no substitute for a measured diffusion coefficient.
+
 ## See also
 
 - [Outdoor Sound Propagation](/phonometry/guides/outdoor-propagation/): the

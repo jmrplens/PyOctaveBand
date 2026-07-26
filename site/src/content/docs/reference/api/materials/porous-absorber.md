@@ -1,6 +1,6 @@
 ---
 title: "materials.porous_absorber"
-description: "Public API of phonometry.materials.porous_absorber (auto-generated)."
+description: "Porous-material models and multilayer absorber prediction."
 sidebar:
   label: "porous_absorber"
 ---

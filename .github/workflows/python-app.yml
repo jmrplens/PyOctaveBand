@@ -62,6 +62,10 @@ jobs:
           echo "::error file=docs/CONFORMANCE.md::docs/CONFORMANCE.md is out of date - run 'make conformance' and commit the result."
           exit 1
         fi
+    # The report can be current while the prose quoting it is not: the counts
+    # were typed out in three places and two of them fell a release behind.
+    - name: Fail if any page quotes a stale conformance count
+      run: python scripts/check_conformance_claims.py
 
   # Drift gate for the generated Starlight API reference: the committed pages
   # under site/src/content/docs/reference/api and the sidebar fragment must
@@ -99,6 +103,27 @@ jobs:
           echo "$untracked"
           exit 1
         fi
+
+  # Drift gate for the evidence pages the site renders from docs/: the bodies
+  # of docs/CONFORMANCE.md and docs/ERRATA.md are transplanted into the four
+  # reference/{conformance,errata} pages (EN + ES), so the site can never show
+  # a hand-copied or stale version of either document.
+  site-reports:
+    name: Generated evidence pages up to date
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v7
+      with:
+        python-version: "3.13"
+    # Stdlib-only generator: no project install needed, it only reshapes text.
+    - name: Check the transplanted conformance and errata pages
+      run: python scripts/generate_site_reports.py --check
 
   # Coverage gate for the curated quick table in docs/api-reference.md: every
   # phonometry.__all__ name must have a table row (extra rows such as methods

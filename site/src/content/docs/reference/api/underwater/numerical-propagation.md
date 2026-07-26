@@ -1,6 +1,6 @@
 ---
 title: "underwater.numerical_propagation"
-description: "Public API of phonometry.underwater.numerical_propagation (auto-generated)."
+description: "Numerical models of underwater sound propagation (range-independent ocean)."
 sidebar:
   label: "numerical_propagation"
 ---

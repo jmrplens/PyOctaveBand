@@ -1,6 +1,6 @@
 ---
 title: "psychoacoustics.loudness_moore_glasberg"
-description: "Public API of phonometry.psychoacoustics.loudness_moore_glasberg (auto-generated)."
+description: "Stationary loudness per ISO 532-2:2017 (Moore-Glasberg method)."
 sidebar:
   label: "loudness_moore_glasberg"
 ---

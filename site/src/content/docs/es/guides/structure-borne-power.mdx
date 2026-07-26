@@ -253,6 +253,30 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 	caption="Ficha de potencia acústica estructural (StructureBornePowerResult.report), una caracterización por placa de recepción EN 15657 con el total L_Ws recuadrado."
 />
 
+## Qué cubre esta guía
+
+**Cubierto.** El método de la placa receptora de la EN 15657:2018: el nivel
+de velocidad medio espacial (`spatial_mean_velocity_level`, Fórmula 12), el
+factor de pérdida de la placa (`plate_loss_factor`, Fórmula 13) y el nivel de
+potencia inyectada en la placa (`reception_plate_power`,
+`structure_borne_power_level`, Fórmula 14). También la cadena de magnitudes
+de fuente independientes de la placa: el nivel de fuerza bloqueada
+equivalente (`equivalent_blocked_force_level`, Fórmula 15), el nivel de
+potencia característico de placa receptora
+(`characteristic_reception_plate_power`, Fórmula 17), el nivel de velocidad
+libre equivalente (`equivalent_free_velocity_level`, Fórmula 18) y la
+movilidad de la fuente (`source_mobility_from_levels`, Fórmula 19). También
+se cubre el nivel de velocidad libre promediado por posiciones de la
+ISO 9611:1996, ecuación (9) (`mean_free_velocity_level`).
+
+**No cubierto.** La Fórmula 16, la movilidad puntual equivalente de una
+placa como media aritmética de $\operatorname{Re}(Y)$ en sus puntos de contacto, no está
+implementada: las funciones anteriores toman una `plate_mobility` ya
+conocida como entrada, en lugar de derivarla de medidas punto a punto. De la
+ISO 9611:1996 solo está implementada la media por posiciones de la ecuación
+(9); el resto de la norma se cita como el homólogo del lado de la fuente,
+sin implementar.
+
 ## Véase también
 
 - Referencia de la API: [`building.structure_borne_power`](/phonometry/es/reference/api/building/structure-borne-power/).

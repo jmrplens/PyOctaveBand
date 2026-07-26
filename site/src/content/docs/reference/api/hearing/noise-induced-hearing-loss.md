@@ -1,6 +1,6 @@
 ---
 title: "hearing.noise_induced_hearing_loss"
-description: "Public API of phonometry.hearing.noise_induced_hearing_loss (auto-generated)."
+description: "Estimation of noise-induced hearing loss (ISO 1999:2013)."
 sidebar:
   label: "noise_induced_hearing_loss"
 ---

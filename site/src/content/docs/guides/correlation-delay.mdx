@@ -391,3 +391,24 @@ The Hilbert envelope here is the time-domain companion of the
 modulations off as discrete lines in frequency; and the sub-sample alignment
 shares its band-limited kernel with the public
 [fractional-delay and resampling tools](/phonometry/guides/test-signals/).
+
+## What this guide covers
+
+**Covered.** Bendat & Piersol Chapter 5, Section 8.4 and Chapter 13:
+`correlation` with the biased, unbiased and coefficient normalizations and
+their random-error formulas (Eqs. 8.109/8.112); `time_delay` with the
+direct, phase-slope and Knapp & Carter (1976) generalized cross-correlation
+methods, including the Roth, SCOT, PHAT and maximum-likelihood weightings
+of their Table I; the peak-location uncertainty of Eq. 8.129;
+`impulse_response_delay` and `align_impulse_responses`; and the Hilbert
+`envelope` with instantaneous phase and frequency (Chapter 13).
+
+**Not covered.** `correlation` and `time_delay` model a single common-path
+delay between exactly two sensors (the `y(t) = α·x(t-τ0) + n(t)` model of
+Eq. 5.21). A record with several arrivals (multipath, a direct path plus
+reflections) is not separated automatically: `time_delay` and the direct
+correlator report only the single largest peak, the same limitation
+`echo_detection` names on the cepstrum in [Cepstrum, echoes and the envelope
+spectrum](/phonometry/guides/cepstrum-echoes/). Estimating delays across
+more than two sensors, as an array or beamformer would, means calling these
+pairwise functions yourself; there is no built-in multi-sensor TDOA solver.

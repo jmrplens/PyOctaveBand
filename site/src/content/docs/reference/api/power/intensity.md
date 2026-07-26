@@ -1,6 +1,6 @@
 ---
 title: "emission.intensity"
-description: "Public API of phonometry.emission.intensity (auto-generated)."
+description: "Two-microphone (p-p) sound intensity per IEC 61043:1994 and the ISO 9614-1:1993 field indicators."
 sidebar:
   label: "intensity"
 ---

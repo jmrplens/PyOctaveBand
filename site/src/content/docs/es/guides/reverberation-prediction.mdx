@@ -418,6 +418,30 @@ el repositorio; haz clic en la vista previa para abrir el PDF.
 	caption="Ficha de predicción del tiempo de reverberación (ReverberationModelResult.report), la tabla de los cinco modelos y el T_mid destacado."
 />
 
+## Qué cubre esta guía
+
+**Cubierto.** Las fórmulas clásicas del tiempo de reverberación de la
+acústica estadística de Sabine (1922), Eyring (1930), Millington-Sette
+(1932), Fitzroy (1959) y Arau-Puchades (1988), cada una con su propia
+comprobación de dominio de validez y el término de absorción del aire
+derivado de la ISO 9613-1, mediante `room.sabine_reverberation_time`,
+`room.eyring_reverberation_time`, `room.millington_sette_reverberation_time`,
+`room.fitzroy_reverberation_time`, `room.arau_puchades_reverberation_time`
+y la función combinada `room.reverberation_time_models`.
+
+**No cubierto.** El propio modelo del apartado 4 de la EN 12354-6 (un
+cálculo de Sabine con un término de objetos añadido y el término de aire de
+la ISO 9613-1) es un cálculo distinto, definido por esa norma, que vive en
+la
+[guía de absorción acústica en recintos](/phonometry/es/guides/enclosed-space-absorption/),
+no aquí. Ninguna de las cinco fórmulas modela volúmenes acoplados, salas
+desproporcionadas o geometrías focalizadoras: sus decaimientos de doble
+pendiente o dependientes de la posición quedan fuera de toda hipótesis de
+campo difuso (apartado 4). Para un decaimiento medido que muestre esos
+síntomas, usa el diagnóstico de curvatura T20/T30 de la
+[guía de Acústica de salas](/phonometry/es/guides/room-acoustics/) en lugar
+de una predicción estadística.
+
 ## Véase también
 
 - Referencia de la API: [`room.reverberation_prediction`](/phonometry/es/reference/api/rooms/reverberation-prediction/) y [`environmental.air_absorption`](/phonometry/es/reference/api/environment/air-absorption/).

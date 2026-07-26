@@ -1,6 +1,6 @@
 ---
 title: "metrology.random_data"
-description: "Public API of phonometry.metrology.random_data (auto-generated)."
+description: "Random-data qualification: stationarity tests and Rice crossing statistics."
 sidebar:
   label: "random_data"
 ---

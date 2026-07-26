@@ -239,6 +239,23 @@ resampler and fractional delay are the sample-rate half of
 sub-sample alignment is the difference between averaging impulse responses
 and smearing them.
 
+## What this guide covers
+
+**Covered.** IEC 60268-1:1985 Annex A, Clause A2: the tone burst that
+"should start at the zero-crossing of the tone and should consist of an
+integral number of full periods" (A2.1) and the repetitive burst train of
+A2.2, implemented by `tone_burst` and hand-checked against the Table AII
+durations. Bendat & Piersol Section 10.2's anti-alias requirement, turned
+into an explicit, checkable specification by `resample_signal`'s stopband
+attenuation and transition width.
+
+**Not covered.** IEC 60268-1:1985 is a general standard for sound system
+equipment. Only the Annex A tone-burst clauses are implemented here; its
+other parts (amplifiers, loudspeakers, connectors, and so on) are
+untouched. `fractional_delay` and the colored-noise generators of
+`noise_signal` are general-purpose DSP tools with no governing standard of
+their own; their accuracy claims are closed-form, not normative.
+
 ## See also
 
 - [Time Weighting](/phonometry/guides/time-weighting/): the detector ballistics the tone bursts exercise (IEC 61672-1 Table 4).

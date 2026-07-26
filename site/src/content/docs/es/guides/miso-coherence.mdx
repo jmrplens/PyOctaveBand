@@ -226,6 +226,26 @@ Los estimadores comparten el núcleo de Welch de la página de
 tendencia), de modo que una coherencia MISO y un `power_spectral_density`
 calculados con la misma longitud de segmento son consistentes bin a bin.
 
+## Qué cubre esta guía
+
+**Cubierto.** Las funciones de coherencia ordinaria, múltiple y parcial del
+capítulo 7 de Bendat y Piersol (ecuaciones 7.109, 7.35, 7.87), la
+recursión de condicionamiento por eliminación de Gauss (ecuación 7.94),
+los espectros de salida coherente parciales y su descomposición exacta de
+la salida (ecuaciones 7.86/7.116/7.121), y los errores aleatorios de la
+sección 9.3 para las estimaciones múltiples y condicionadas (ecuaciones
+9.98-9.101), todo expuesto por `miso_coherence` y `MISOCoherenceResult`.
+
+**No cubierto.** Las estimaciones de respuesta en frecuencia de entradas
+múltiples del capítulo (los factores de ganancia `Liy`), el modelo lineal
+que predice la salida a partir de las entradas condicionadas, se calculan
+internamente para construir los espectros de salida coherente pero no se
+devuelven: `MISOCoherenceResult` solo expone el lado de la coherencia y la
+descomposición espectral, no una función de transferencia multientrada
+ajustada. El método también es de salida única (MISO); un sistema con
+varias salidas correladas necesita una llamada a `miso_coherence` por cada
+salida.
+
 ## Véase también
 
 - [Análisis espectral](/phonometry/es/guides/spectral-analysis/): el espectro de salida coherente de una entrada que esta página generaliza, y el núcleo de Welch compartido.

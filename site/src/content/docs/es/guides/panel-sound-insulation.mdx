@@ -350,6 +350,32 @@ fuentes (el método de Sharp por encima de $1{,}5\times$ la primera resonancia d
 panel; la rendija sin viscosidad de Gomperts válida para $w < 0{,}3\lambda$;
 "método n.º 1" de Leppington).
 
+## Qué cubre esta guía
+
+**Cubierto.** Las propias fórmulas fuente: la ley de masas del apartado
+7.2 de Bies y el método de coincidencia de Sharp (Ec. 7.40/7.42/7.44) para
+un panel simple, la resonancia masa-muelle-masa de la pared doble y su
+aumento de cámara que satura (Ec. 7.62-7.64), los coeficientes de
+transmisión de rendija de Gomperts y de orificio circular de Wilson y
+Soroka de Hopkins con la suma compuesta ponderada por área (Ec. 4.92), la
+eficiencia de radiación de placa de Leppington/Maidanik
+(Ec. 2.227-2.230), y las impedancias y movilidades puntuales de placas y
+vigas infinitas de la Tabla 5.1 de Cremer con la relación de potencia
+inyectada, mediante `single_panel_transmission_loss`,
+`double_wall_transmission_loss`, `slit_transmission_coefficient`,
+`composite_transmission_loss`, `radiation_efficiency`,
+`infinite_plate_impedance`, `infinite_beam_mobility` e `injected_power`.
+
+**No cubierto.** Cada predicción se mantiene dentro del rango de validez
+que declara su fuente, que la guía señala pero no extiende: el método de
+Sharp (y por tanto `single_panel_transmission_loss`) no es válido por
+debajo de aproximadamente $1{,}5\times$ la primera resonancia del panel,
+donde manda el propio comportamiento modal de baja frecuencia del panel,
+no la ley de masas; el modelo de rendija de Gomperts solo es válido para
+una rendija estrecha, $w < 0{,}3\lambda$, así que una abertura ancha queda
+fuera de él; y solo está implementado el "método n.º 1" de Leppington
+para la eficiencia de radiación, no sus otras formulaciones publicadas.
+
 ## Véase también
 
 - [Predicción del aislamiento (EN 12354)](/phonometry/es/guides/insulation-prediction/):

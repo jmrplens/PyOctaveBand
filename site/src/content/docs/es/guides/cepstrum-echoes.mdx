@@ -413,6 +413,23 @@ continua se conserva en `mean_level` (la amplitud de la portadora para el
 detector de magnitud), y `remove_dc=False` omite el eliminador cuando
 importa la línea de continua absoluta.
 
+## Qué cubre esta guía
+
+**Cubierto.** Las tres variantes del cepstro y el liftering del *Handbook of
+Signal Processing in Acoustics* de Havelock, Kuwano y Vorländer (`cepstrum`,
+`lifter`, capítulos 27 y 87), el retardo de un único eco y el coeficiente de
+reflexión leídos en el cepstro de potencia (`echo_detection`), el cepstro
+complejo invertible y su ida y vuelta homomórfica (`CepstrumResult.invert`),
+y el espectro de la envolvente del capítulo 13 de Bendat y Piersol
+(`envelope_spectrum`) con sus líneas de forma cerrada para un tono AM.
+
+**No cubierto.** `echo_detection` solo elige el mayor pico cepstral de la
+banda de búsqueda, así que una respuesta con varios ecos solapados necesita
+localización manual de picos o llamadas repetidas sobre bandas más
+estrechas: no es un separador multi-eco. El módulo tampoco tiene un cepstro
+en escala mel ni de tipo MFCC para rasgos de audio perceptual: `lifter` y
+`cepstrum` trabajan solo sobre el espectro logarítmico en frecuencia lineal.
+
 ## Relación con los demás estimadores
 
 El cepstro parte de las mismas convenciones FFT de registro único que los

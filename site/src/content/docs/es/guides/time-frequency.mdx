@@ -216,6 +216,29 @@ tiempo la frecuencia de una sola componente, la
 [frecuencia instantánea de Hilbert](/phonometry/es/guides/correlation-delay/)
 de `envelope` complementa la cresta de la STFT.
 
+## Qué cubre esta guía
+
+**Cubierto.** El espectrograma calibrado de Bendat y Piersol (sección
+12.6.4.2): segmentos STFT enventanados y solapados conservados como
+columnas de tiempo separadas en lugar de promediados, implementado por
+`spectrogram` con el escalado exacto del módulo de Welch y el error
+aleatorio de la Ec. 8.158 de una celda sin promediar. La FFT con zoom de
+la sección 11.5.4 (ecs. 11.122-11.130): espectros de banda limitada en una
+malla arbitrariamente fina, calculados como el equivalente chirp-Z de la
+cadena demodulación-diezmado-DFT del libro, implementada por `zoom_fft`.
+Ambas comparten el catálogo de ventanas de Harris (1978) tras el
+enventanado del segmento.
+
+**No cubierto.** Esta es solo la familia de ancho de banda constante
+basada en STFT. El equivalente de porcentaje constante con balística de
+sonómetro es `OctaveFilterBank.spectrogram`, en la página de
+[Niveles](/phonometry/es/guides/levels/). Seguir en el tiempo la
+frecuencia instantánea de una sola componente es la envolvente de Hilbert
+de `envelope`, en la página de
+[Correlación y retardo](/phonometry/es/guides/correlation-delay/), no en
+esta. Como la página de análisis espectral, esta implementa los
+estimadores de Bendat y Piersol, no una norma de certificación.
+
 ## Véase también
 
 - [Análisis espectral](/phonometry/es/guides/spectral-analysis/): la estimación de Welch promediada para el fondo estacionario, y las figuras de mérito de las ventanas tras el enventanado del segmento.
