@@ -67,6 +67,48 @@ const SHOTS = [
 	['17-cap-overflow-phone-light', '/guides/porous-absorbers/', PHONE, 'light', 0],
 ];
 
+/**
+ * The API sidebar disclosures, which only exist as states a reader clicks
+ * into, so each shot names the controls to press before the capture. The
+ * viewport is cropped to the sidebar, because that is the whole subject.
+ */
+const SIDEBAR = [
+	// Arriving on a guide page: the API group is closed.
+	['30-api-closed-light', '/guides/levels/', 'light', []],
+	['31-api-closed-dark', '/guides/levels/', 'dark', []],
+	// One click: the branches appear and nothing below them unfolds.
+	[
+		'32-api-open-light',
+		'/guides/levels/',
+		'light',
+		['.api-group > .group-label-row > .api-caret'],
+	],
+	['33-api-open-dark', '/guides/levels/', 'dark', ['.api-group > .group-label-row > .api-caret']],
+	// A second click on one branch: its pages, and only its pages.
+	[
+		'34-api-nested-light',
+		'/guides/levels/',
+		'light',
+		[
+			'.api-group > .group-label-row > .api-caret',
+			'#sidebar-api-items > li:nth-child(3) > button[data-api-toggle]',
+		],
+	],
+	[
+		'35-api-nested-dark',
+		'/guides/levels/',
+		'dark',
+		[
+			'.api-group > .group-label-row > .api-caret',
+			'#sidebar-api-items > li:nth-child(3) > button[data-api-toggle]',
+		],
+	],
+	// On an API page the chain down to the current page is already open and
+	// the page is marked, with no click at all.
+	['36-api-page-light', '/reference/api/psychoacoustics/sharpness/', 'light', []],
+	['37-api-page-dark', '/reference/api/psychoacoustics/sharpness/', 'dark', []],
+];
+
 /** Shots that also need a faked Accept-Language list, for the banner. */
 const EXTRA = [
 	{
@@ -130,6 +172,47 @@ for (const [name, path, viewport, theme, scrollY = 0, fullPage = false, hash] of
 		await new Promise((r) => setTimeout(r, 400));
 	}
 	await page.screenshot({ path: join(OUT, `${name}.png`), fullPage });
+	await page.close();
+	console.log(`captured ${name}`);
+}
+
+for (const [name, path, theme, clicks] of SIDEBAR) {
+	if (filters.length && !filters.some((f) => name.includes(f))) continue;
+	const page = await browser.newPage();
+	await page.setViewport({ ...DESKTOP, deviceScaleFactor: 1 });
+	await page.evaluateOnNewDocument((t) => {
+		try {
+			localStorage.setItem('starlight-theme', t);
+		} catch {}
+	}, theme);
+	await page.goto(`${BASE}/phonometry${path}`, { waitUntil: 'networkidle0', timeout: 90000 });
+	await page.evaluate((t) => {
+		document.documentElement.dataset.theme = t;
+	}, theme);
+	await page.addStyleTag({ content: 'astro-dev-toolbar{display:none !important}' });
+	for (const selector of clicks) {
+		await page.click(selector);
+		await new Promise((r) => setTimeout(r, 250));
+	}
+	// Bring the API group to the top of the sidebar's own scroller, then frame
+	// the sidebar pane rather than the whole page.
+	const clip = await page.evaluate(() => {
+		const scroller = document.getElementById('starlight__sidebar');
+		const group = document.querySelector('.api-group');
+		scroller.scrollTop +=
+			group.getBoundingClientRect().top - scroller.getBoundingClientRect().top - 16;
+		const r = scroller.getBoundingClientRect();
+		return {
+			x: 0,
+			y: Math.max(0, Math.floor(r.y)),
+			width: Math.ceil(r.right + 8),
+			height: Math.ceil(Math.min(r.height, window.innerHeight - Math.max(0, r.y))),
+		};
+	});
+	await new Promise((r) => setTimeout(r, 300));
+	// `captureBeyondViewport` would resize the viewport to fit the clip, which
+	// changes how far the sidebar can scroll and frames the wrong rows.
+	await page.screenshot({ path: join(OUT, `${name}.png`), clip, captureBeyondViewport: false });
 	await page.close();
 	console.log(`captured ${name}`);
 }
