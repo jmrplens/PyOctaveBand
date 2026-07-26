@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- `make lighthouse` (`site/scripts/lighthouse-audit.mjs`): Lighthouse over a
+  fixed sample of built pages against a local preview server, with JSON
+  reports under `site/lighthouse-results/` and a console summary listing the
+  scores and every remaining opportunity. `BASE_URL` audits the live site
+  instead; `-- --desktop` switches the throttling profile.
+
+### Changed
+
+- The home page meta description now fits the ~160-character window search
+  engines display (Bing flagged the old 318-character one): the one-sentence
+  definition plus the conformance-check claim, in both languages. The full
+  scope enumeration stays in the visible page text and in the
+  `SoftwareApplication` description.
+
 ## [3.3.0] - 2026-07-27
 
 ### Added
