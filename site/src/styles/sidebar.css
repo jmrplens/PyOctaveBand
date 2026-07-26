@@ -11,8 +11,9 @@
      small uppercase "eyebrow" headers with a hairline separator above each
      group, the pattern large Starlight sites (e.g. the Astro docs) use for
      long navigation lists;
-   - nested group labels (the domain subgroups and the API sections) step down
-     to the small text size, keeping their 600 weight;
+   - every row below the top level, nested group label or page link, shares one
+     type treatment: the small text size, weight 600 and the gray-2 ink, so
+     rows at the same depth read as one list instead of two;
    - links two levels deep and beyond tighten up so the API reference's ~120
      module entries stay compact when a section is opened.
 
@@ -34,19 +35,29 @@
   padding-top: 0.75rem;
 }
 
-/* Nested group labels (domain subgroups, API sections, Theory): one step
-   smaller than Starlight's default so they sit between the eyebrow headers
-   and the links. */
-#starlight__sidebar ul ul summary .large {
+/* Second level and below, groups and pages alike: one type treatment. Stock
+   Starlight only bolds the `<summary>` label (`.large` carries weight 600 and
+   the white ink) and leaves a leaf `<a>` at 400 in gray-2, and below 50rem it
+   sizes the link from the body (16px) while the label is 14px, so a nested
+   group read bigger-and-bolder-and-brighter than the page next to it and the
+   difference passed for a different typeface. The two now share weight, size
+   and ink; what tells a group from a page is the caret and the indent rule.
+   Nothing here touches `[aria-current]`, so the current page keeps its stock
+   accent pill, which is the only strong colour left in the tree. */
+#starlight__sidebar ul ul summary .large,
+#starlight__sidebar ul ul a {
   font-size: var(--sl-text-sm);
-  color: var(--sl-color-white);
+  font-weight: 600;
+}
+#starlight__sidebar ul ul summary .large {
+  color: var(--sl-color-gray-2);
 }
 
-/* The whole summary row is the toggle, so give it the hover and focus
-   feedback the links already have. */
+/* The whole summary row is the toggle, so give it the same hover and focus
+   feedback the links already have (Starlight lifts a link to white). */
 #starlight__sidebar summary:hover .large,
 #starlight__sidebar summary:focus-visible .large {
-  color: var(--sl-color-accent-high);
+  color: var(--sl-color-white);
 }
 
 /* Deep links (inside a nested group): compact rows for the long lists. */
