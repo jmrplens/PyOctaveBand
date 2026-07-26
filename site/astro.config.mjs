@@ -161,56 +161,147 @@ const dateModified = (() => {
 
 const softwareRequirements = 'Python >= 3.13 with NumPy and SciPy (matplotlib and numba optional).';
 
+// --- Canonical identity --------------------------------------------------
+// The `#person` entity is no longer restated here; it is fetched from its
+// single source of truth on jmrp.io and spliced into the graph verbatim. Every
+// property this site used to hand-copy (jobTitle, description, image, sameAs,
+// alternateName) had to be kept in sync by hand across five project sites, and
+// it drifted: two ended up publishing values that contradicted the canonical
+// node, one an avatar URL that had started returning 404.
+//
+// Fetched from raw.githubusercontent.com rather than https://jmrp.io on
+// purpose: this build runs on a CI runner, and jmrp.io sits behind Cloudflare,
+// CrowdSec and a MikroTik bouncer, where a blocked runner IP would silently
+// degrade this site to a stale snapshot. GitHub serves the same bytes and is
+// already a hard dependency of the build — the checkout comes from it.
+const CANONICAL_IDENTITY_URL =
+  'https://raw.githubusercontent.com/jmrplens/jmrp.io/main/public/identity/person.jsonld';
+
+// Committed fallback, only reached if the fetch fails — which, given the URL is
+// on the same host as the checkout, effectively means GitHub is down and there
+// is no build anyway. The warning is deliberately loud so a stale identity
+// never ships unnoticed. Refresh with `pnpm run identity:sync`.
+const identitySnapshot = JSON.parse(
+  readFileSync(new URL('./identity/person.snapshot.json', import.meta.url), 'utf8'),
+);
+
+// `@context` is stripped: the document is standalone, but here it becomes one
+// node of a graph that already declares the context once.
+const { '@context': _identityContext, ...canonicalPerson } = await fetch(
+  CANONICAL_IDENTITY_URL,
+  { signal: AbortSignal.timeout(10_000) },
+)
+  .then((response) =>
+    response.ok
+      ? response.json()
+      : Promise.reject(new Error(`HTTP ${response.status}`)),
+  )
+  .catch((error) => {
+    console.warn(
+      `\n⚠ [identity] Could not fetch the canonical Person entity (${error.message}).\n` +
+        `  Falling back to the committed snapshot — this build may ship a stale identity.\n`,
+    );
+    return identitySnapshot;
+  });
+
+/**
+ * Topics specific to this project, kept alongside the canonical expertise list
+ * rather than replacing it. `knowsAbout` is multi-valued, so the two sets merge
+ * instead of conflicting — which is why these may stay local while the
+ * single-valued properties above may not. The full original set is listed, not
+ * just the entries the canonical lacks, so this site keeps asserting its own
+ * topics even if the canonical list changes.
+ */
+const projectTopics = [
+  {
+    '@type': 'Thing',
+    name: 'Acoustics',
+    '@id': 'http://www.wikidata.org/entity/Q82811',
+  },
+  {
+    '@type': 'Thing',
+    name: 'Signal processing',
+    '@id': 'http://www.wikidata.org/entity/Q208163',
+  },
+  {
+    '@type': 'Thing',
+    name: 'Psychoacoustics',
+    '@id': 'http://www.wikidata.org/entity/Q557399',
+  },
+  {
+    '@type': 'Thing',
+    name: 'Architectural acoustics',
+    '@id': 'http://www.wikidata.org/entity/Q2305951',
+  },
+  {
+    '@type': 'Thing',
+    name: 'Noise control',
+    '@id': 'http://www.wikidata.org/entity/Q1879301',
+  },
+  {
+    '@type': 'Thing',
+    name: 'Vibration',
+    '@id': 'http://www.wikidata.org/entity/Q3695508',
+  },
+  {
+    '@type': 'Thing',
+    name: 'Underwater acoustics',
+    '@id': 'http://www.wikidata.org/entity/Q1292425',
+  },
+  {
+    '@type': 'Thing',
+    name: 'Python',
+    '@id': 'http://www.wikidata.org/entity/Q28865',
+  },
+  {
+    '@type': 'Thing',
+    name: 'Embedded system',
+    '@id': 'http://www.wikidata.org/entity/Q193040',
+  },
+];
+
+/** Reads a `knowsAbout` entry's label, which may be a string or a Thing. */
+const topicName = (topic) =>
+  typeof topic === 'string' ? topic : (topic.name ?? '');
+
+/**
+ * Canonical topics first, then this project's own, de-duplicated by label
+ * (case-insensitively). Canonical entries win a collision because they carry a
+ * verified Wikidata `@id`.
+ */
+const personNode = (() => {
+  const canonical = canonicalPerson.knowsAbout ?? [];
+  const seenNames = new Set(canonical.map((t) => topicName(t).toLowerCase()));
+  // De-duplicating on the label alone is not enough. This project lists
+  // "Embedded system" where the canonical says "Embedded Systems", and both
+  // carry Wikidata Q193040 — so a name comparison let both through and emitted
+  // two Thing nodes under one @id with conflicting names. That is the exact
+  // contradiction this change exists to remove, reintroduced one level down.
+  // The @id is the identity; the label is only how a document spells it.
+  const seenIds = new Set(
+    canonical
+      .map((t) => (typeof t === 'object' ? t['@id'] : undefined))
+      .filter(Boolean),
+  );
+  return {
+    ...canonicalPerson,
+    knowsAbout: [
+      ...canonical,
+      ...projectTopics.filter(
+        (t) => !seenNames.has(topicName(t).toLowerCase()) && !seenIds.has(t['@id']),
+      ),
+    ],
+  };
+})();
+
 const jsonLd = JSON.stringify({
   '@context': 'https://schema.org',
   '@graph': [
-    {
-      '@type': 'Person',
-      '@id': authorId,
-      name: 'José Manuel Requena Plens',
-      alternateName: 'jmrplens',
-      // Matches the canonical node published at jmrp.io. Both sites claim the
-      // same `@id`, so where they disagreed a consumer merging them got two
-      // conflicting descriptions of one person; this side used to be the
-      // weaker of the two, missing the ORCID entirely.
-      jobTitle: 'R&D · Firmware & Software Engineer',
-      description:
-        'Firmware and software engineer in Valencia, Spain: industrial embedded systems, open-source tooling, and self-hosted infrastructure.',
-      url: authorUrl,
-      image: 'https://github.com/jmrplens.png',
-      identifier: {
-        '@type': 'PropertyValue',
-        propertyID: 'ORCID',
-        value: '0000-0003-1250-6212',
-        url: 'https://orcid.org/0000-0003-1250-6212',
-      },
-      // Wikidata-grounded rather than free text: a bare string leaves a model
-      // to guess which "Acoustics" is meant, an entity URI does not. Every QID
-      // below was checked against the Wikidata API.
-      knowsAbout: [
-        { '@type': 'Thing', name: 'Acoustics', '@id': 'http://www.wikidata.org/entity/Q82811' },
-        { '@type': 'Thing', name: 'Signal processing', '@id': 'http://www.wikidata.org/entity/Q208163' },
-        { '@type': 'Thing', name: 'Psychoacoustics', '@id': 'http://www.wikidata.org/entity/Q557399' },
-        { '@type': 'Thing', name: 'Architectural acoustics', '@id': 'http://www.wikidata.org/entity/Q2305951' },
-        { '@type': 'Thing', name: 'Noise control', '@id': 'http://www.wikidata.org/entity/Q1879301' },
-        { '@type': 'Thing', name: 'Vibration', '@id': 'http://www.wikidata.org/entity/Q3695508' },
-        { '@type': 'Thing', name: 'Underwater acoustics', '@id': 'http://www.wikidata.org/entity/Q1292425' },
-        { '@type': 'Thing', name: 'Python', '@id': 'http://www.wikidata.org/entity/Q28865' },
-        { '@type': 'Thing', name: 'Embedded system', '@id': 'http://www.wikidata.org/entity/Q193040' },
-      ],
-      sameAs: [
-        'https://github.com/jmrplens',
-        'https://www.linkedin.com/in/jmrplens',
-        'https://mstdn.jmrp.io/@jmrplens',
-        'https://bsky.app/profile/jmrp.io',
-        'https://matrix.to/#/@jmrplens:matrix.jmrp.io',
-        'https://keyoxide.org/0A993B268654DBBA52B7E8D3FCF653391E2C91FC',
-        'https://scholar.google.com/citations?user=9b0kPaUAAAAJ',
-        'https://orcid.org/0000-0003-1250-6212',
-        'https://www.researchgate.net/profile/Jose-Requena-Plens-2',
-        'https://www.mathworks.com/matlabcentral/profile/authors/5890853',
-      ],
-    },
+    // The canonical Person entity, fetched at build time — see the
+    // "Canonical identity" block above. Spliced verbatim so this document
+    // and jmrp.io describe the same node with the same values, instead of
+    // two hand-maintained copies that drift.
+    personNode,
     {
       '@type': 'WebSite',
       '@id': websiteId,
@@ -263,6 +354,10 @@ const jsonLd = JSON.stringify({
         priceCurrency: 'USD',
       },
       author: { '@id': authorId },
+      // Same three agents jmrp.io/projects/ emits for this @id, so the merged
+      // node states one consistent set instead of a partial one per document.
+      creator: { '@id': authorId },
+      maintainer: { '@id': authorId },
       sameAs: [
         'https://pypi.org/project/phonometry/',
         'https://doi.org/10.5281/zenodo.21215280',
@@ -279,6 +374,10 @@ const jsonLd = JSON.stringify({
       license: 'https://opensource.org/licenses/MIT',
       isPartOf: { '@id': softwareId },
       author: { '@id': authorId },
+      // Same three agents jmrp.io/projects/ emits for this @id, so the merged
+      // node states one consistent set instead of a partial one per document.
+      creator: { '@id': authorId },
+      maintainer: { '@id': authorId },
     },
   ],
 });

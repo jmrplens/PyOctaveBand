@@ -9,6 +9,7 @@
     "check:i18n": "node scripts/check-i18n-parity.mjs",
     "dev": "astro dev",
     "build": "astro build",
+    "identity:sync": "node scripts/sync-identity.mjs",
     "preview": "astro preview",
     "html-validate": "html-validate 'dist/**/*.html'",
     "pa11y": "astro preview & PREVIEW_PID=$!; sleep 3 && pa11y-ci; EXIT=$?; kill $PREVIEW_PID 2>/dev/null; exit $EXIT"

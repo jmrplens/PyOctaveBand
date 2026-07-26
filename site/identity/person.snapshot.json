@@ -1,0 +1,179 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "@id": "https://jmrp.io/#person",
+  "name": "José Manuel Requena Plens",
+  "alternateName": [
+    "jmrplens",
+    "José M. Requena-Plens",
+    "Jose M. Requena-Plens",
+    "José M. Requena Plens",
+    "Jose M. Requena Plens",
+    "José Manuel Requena-Plens",
+    "Jose Manuel Requena-Plens",
+    "Jose Manuel Requena Plens"
+  ],
+  "jobTitle": "R&D · Firmware & Software Engineer",
+  "description": "Firmware and software engineer in Valencia, Spain — industrial embedded systems, open-source tooling, and self-hosted infrastructure.",
+  "url": "https://jmrp.io/",
+  "image": {
+    "@type": "ImageObject",
+    "url": "https://github.com/jmrplens.png",
+    "width": "460",
+    "height": "460"
+  },
+  "knowsAbout": [
+    {
+      "@type": "Thing",
+      "name": "Embedded Systems",
+      "@id": "http://www.wikidata.org/entity/Q193040"
+    },
+    {
+      "@type": "Thing",
+      "name": "Firmware",
+      "@id": "http://www.wikidata.org/entity/Q104851"
+    },
+    {
+      "@type": "Thing",
+      "name": "STM32",
+      "@id": "http://www.wikidata.org/entity/Q7394773"
+    },
+    {
+      "@type": "Thing",
+      "name": "FreeRTOS",
+      "@id": "http://www.wikidata.org/entity/Q1186761"
+    },
+    {
+      "@type": "Thing",
+      "name": "Modbus",
+      "@id": "http://www.wikidata.org/entity/Q1135322"
+    },
+    {
+      "@type": "Thing",
+      "name": "Cryptography",
+      "@id": "http://www.wikidata.org/entity/Q8789"
+    },
+    {
+      "@type": "Thing",
+      "name": "Network Security",
+      "@id": "http://www.wikidata.org/entity/Q989632"
+    },
+    {
+      "@type": "Thing",
+      "name": "Nginx",
+      "@id": "http://www.wikidata.org/entity/Q306144"
+    },
+    {
+      "@type": "Thing",
+      "name": "MikroTik RouterOS",
+      "@id": "http://www.wikidata.org/entity/Q12036888"
+    },
+    {
+      "@type": "Thing",
+      "name": "WireGuard",
+      "@id": "http://www.wikidata.org/entity/Q28975568"
+    },
+    {
+      "@type": "Thing",
+      "name": "IPv6",
+      "@id": "http://www.wikidata.org/entity/Q2551624"
+    },
+    {
+      "@type": "Thing",
+      "name": "Acoustics",
+      "@id": "http://www.wikidata.org/entity/Q82811"
+    },
+    {
+      "@type": "Thing",
+      "name": "Signal Processing",
+      "@id": "http://www.wikidata.org/entity/Q208163"
+    },
+    {
+      "@type": "Thing",
+      "name": "Go",
+      "@id": "http://www.wikidata.org/entity/Q37227"
+    },
+    {
+      "@type": "Thing",
+      "name": "Model Context Protocol",
+      "@id": "http://www.wikidata.org/entity/Q133436854"
+    },
+    {
+      "@type": "Thing",
+      "name": "CI/CD",
+      "@id": "http://www.wikidata.org/entity/Q28136854"
+    },
+    {
+      "@type": "Thing",
+      "name": "DevSecOps",
+      "@id": "http://www.wikidata.org/entity/Q108525696"
+    },
+    {
+      "@type": "Thing",
+      "name": "Software Testing",
+      "@id": "http://www.wikidata.org/entity/Q188522"
+    },
+    {
+      "@type": "Thing",
+      "name": "ESP32",
+      "@id": "http://www.wikidata.org/entity/Q27921668"
+    }
+  ],
+  "owns": [
+    {
+      "@id": "https://github.com/jmrplens/gitlab-mcp-server#software"
+    },
+    {
+      "@id": "https://github.com/jmrplens/phonometry#software"
+    },
+    {
+      "@id": "https://github.com/jmrplens/cs-routeros-bouncer#software"
+    },
+    {
+      "@id": "https://github.com/jmrplens/Cloudflare-DNS-Updater#software"
+    },
+    {
+      "@id": "https://github.com/jmrplens/libgen-mcp#software"
+    },
+    {
+      "@id": "https://github.com/jmrplens/TFG-TFM_EPS#software"
+    },
+    {
+      "@id": "https://github.com/jmrplens/A-Lab#software"
+    },
+    {
+      "@id": "https://github.com/jmrplens/mastodon_official_profiles#software"
+    },
+    {
+      "@id": "https://github.com/jmrplens/SetFigPaper#software"
+    },
+    {
+      "@id": "https://github.com/jmrplens/LoVE-BASS#software"
+    },
+    {
+      "@id": "https://github.com/jmrplens/FDTDexamples#software"
+    }
+  ],
+  "identifier": {
+    "@type": "PropertyValue",
+    "propertyID": "ORCID",
+    "value": "0000-0003-1250-6212",
+    "url": "https://orcid.org/0000-0003-1250-6212"
+  },
+  "sameAs": [
+    "https://github.com/jmrplens",
+    "https://www.linkedin.com/in/jmrplens",
+    "https://mstdn.jmrp.io/@jmrplens",
+    "https://bsky.app/profile/jmrp.io",
+    "https://matrix.to/#/@jmrplens:matrix.jmrp.io",
+    "https://keyoxide.org/0A993B268654DBBA52B7E8D3FCF653391E2C91FC",
+    "https://scholar.google.com/citations?user=9b0kPaUAAAAJ",
+    "https://orcid.org/0000-0003-1250-6212",
+    "https://www.researchgate.net/profile/Jose-Requena-Plens-2",
+    "https://www.mathworks.com/matlabcentral/profile/authors/5890853",
+    "https://codeberg.org/jmrplens",
+    "https://gitlab.com/jmrp",
+    "https://pypi.org/user/jmrplens/",
+    "https://hub.docker.com/u/jmrplens"
+  ]
+}
