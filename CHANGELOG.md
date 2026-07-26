@@ -157,6 +157,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- The documentation site serves its own figures, animations and example
+  fiches instead of hotlinking `raw.githubusercontent.com`. That host is not a
+  CDN, caches for half as long as the Pages origin, is rate limited, is one
+  GitHub explicitly asks people not to use as an asset host, and the URLs were
+  pinned to `main`, so renaming a figure silently broke every published page
+  showing it. A prebuild step stages the media from `.github/images` and
+  `.github/reports`: SVG is copied verbatim, the rasters are recompressed with
+  the existing image step (36 MB down to 21.7 MB), the WebM animations are
+  copied as they are, and the GIFs are skipped since they exist only for the
+  markdown mirror, which cannot play WebM. The mirror under `docs/` and the
+  README keep their absolute URLs, since GitHub renders those with no build
+  step.
 - Every page now carries one JSON-LD `@graph` instead of a script per node.
   Google merged the separate blocks before evaluating them, but a plain
   JSON-LD processor expands each `<script>` as its own document, and in that

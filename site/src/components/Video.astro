@@ -39,6 +39,10 @@ interface Props {
 	id?: string;
 }
 
+import { mediaUrl } from '../lib/media.mjs';
+
+// Authored absolute so the docs/ mirror resolves on GitHub; mediaUrl swaps in
+// this site's own copy at build time.
 const IMAGES = 'https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images';
 
 const { name, title, description, width, height, displayWidth = '88%', caption, id } = Astro.props;
@@ -52,8 +56,8 @@ const variants = (['light', 'dark'] as const).map((theme) => {
 	return {
 		theme,
 		className: `${theme}-only`,
-		src: `${IMAGES}/${base}.webm`,
-		poster: `${IMAGES}/${base}_poster.jpg`,
+		src: mediaUrl(`${IMAGES}/${base}.webm`),
+		poster: mediaUrl(`${IMAGES}/${base}_poster.jpg`),
 		descriptionId: `${idBase}-${theme}-desc`,
 	};
 });

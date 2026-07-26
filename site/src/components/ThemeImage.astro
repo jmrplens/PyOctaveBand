@@ -27,6 +27,7 @@ interface Props {
 }
 
 import { figureSize } from '../lib/figure-size.mjs';
+import { mediaUrl } from '../lib/media.mjs';
 
 const { src, alt, width, loading = 'lazy' } = Astro.props;
 
@@ -38,6 +39,11 @@ if (darkSrc === src) {
 	throw new Error(`ThemeImage could not derive the dark variant of "${src}"`);
 }
 const style = width ? `width:${width}` : undefined;
+
+// Serve this site's own copy rather than hotlinking the repository. The
+// authored URL stays absolute so the docs/ mirror keeps working on GitHub.
+const lightUrl = mediaUrl(src);
+const darkUrl = mediaUrl(darkSrc);
 
 // Intrinsic size, so the browser can reserve the right box before the bytes
 // arrive. Both variants are the same figure in two palettes and so share a
@@ -61,7 +67,7 @@ const effectiveLoading = 'lazy';
 {/* Same-line pair, matching the hand-authored markup this replaces. */}
 <img
 	class="light-only"
-	src={src}
+	src={lightUrl}
 	alt={alt}
 	style={style}
 	loading={effectiveLoading}
@@ -70,7 +76,7 @@ const effectiveLoading = 'lazy';
 	height={size?.height}
 /><img
 	class="dark-only"
-	src={darkSrc}
+	src={darkUrl}
 	alt={alt}
 	style={style}
 	loading={effectiveLoading}

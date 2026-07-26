@@ -8,6 +8,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { sidebar } from './src/data/sidebar.mjs';
 import { basePath, siteUrl } from './src/data/site.mjs';
+import { isOurMedia, mediaUrl, REMOTE_PREFIXES } from './src/lib/media.mjs';
 import {
   featureList,
   keywords,
@@ -16,15 +17,50 @@ import {
   softwareDescription,
 } from './src/data/scope.mjs';
 
-// Converts deprecated HTML align attributes (emitted by markdown table
-// alignment) to CSS text-align, for WCAG2AA compliance (pa11y), and makes
-// wide tables keyboard-scrollable: Starlight renders markdown tables as
-// scrollable blocks (display:block + overflow:auto) and theme-tables.css
-// gives 4+ column tables readable minimum cell widths on phones, so they
-// scroll horizontally there. Chrome (127+) and Firefox focus scrollable
-// regions without focusable children by default, but Safari/WebKit does
-// not, so the scroll container needs an explicit tabindex for WCAG 2.1.1
-// (theme-tables.css adds the matching :focus-visible outline).
+// Rewrites documentation media to this site's own copy.
+//
+// The components (ThemeImage, Video, ReportPreview) call mediaUrl themselves,
+// but around a hundred references are hand-written <img> pairs inside the
+// markdown, mostly on the theory pages, and those never pass through a
+// component. This catches them, plus any <a href> or <video src> pointing at
+// the same files, so nothing is left hotlinking raw.githubusercontent.com
+// whichever way it was authored.
+//
+// The markdown mirror under docs/ is deliberately untouched: GitHub renders it
+// with no build step, so its URLs have to stay absolute.
+function rehypeLocalMedia() {
+  const attrs = { img: 'src', video: 'src', source: 'src', a: 'href' };
+  // Literal HTML written inside markdown (the theory pages author their
+  // light/dark <img> pairs by hand) never becomes hast elements: remark keeps
+  // it as an unparsed `raw` node. Those are rewritten as text, which is why
+  // the URL scheme has to be a plain deterministic string and not a hash.
+  const rewriteRaw = (value) =>
+    REMOTE_PREFIXES.reduce(
+      (acc, prefix) => acc.split(prefix).join(`${basePath}/media/`),
+      value,
+    );
+  return (tree) => {
+    (function visit(node) {
+      if ((node.type === 'raw' || node.type === 'html') && typeof node.value === 'string') {
+        node.value = rewriteRaw(node.value);
+      }
+      if (node.type === 'element') {
+        const attr = attrs[node.tagName];
+        const value = attr && node.properties?.[attr];
+        if (typeof value === 'string' && isOurMedia(value)) {
+          node.properties[attr] = mediaUrl(value, basePath);
+        }
+        // Poster stills sit on their own attribute.
+        const poster = node.properties?.poster;
+        if (typeof poster === 'string' && isOurMedia(poster)) {
+          node.properties.poster = mediaUrl(poster, basePath);
+        }
+      }
+      node.children?.forEach(visit);
+    })(tree);
+  };
+}
+
 // KaTeX renders each formula three ways in one element: the styled HTML a
 // reader sees, a MathML tree for assistive technology, and, inside that MathML,
 // an <annotation encoding="application/x-tex"> holding the original TeX. The
@@ -45,6 +81,15 @@ function rehypeDropTexAnnotation() {
   };
 }
 
+// Converts deprecated HTML align attributes (emitted by markdown table
+// alignment) to CSS text-align, for WCAG2AA compliance (pa11y), and makes
+// wide tables keyboard-scrollable: Starlight renders markdown tables as
+// scrollable blocks (display:block + overflow:auto) and theme-tables.css
+// gives 4+ column tables readable minimum cell widths on phones, so they
+// scroll horizontally there. Chrome (127+) and Firefox focus scrollable
+// regions without focusable children by default, but Safari/WebKit does
+// not, so the scroll container needs an explicit tabindex for WCAG 2.1.1
+// (theme-tables.css adds the matching :focus-visible outline).
 function rehypeTableAlign() {
   const firstRow = (node) => {
     if (node.type === 'element' && node.tagName === 'tr') return node;
@@ -262,7 +307,7 @@ export default defineConfig({
     remarkPlugins: [remarkMath],
     // rehypeDropTexAnnotation must run after rehypeKatex: it prunes a node
     // KaTeX has just produced.
-    rehypePlugins: [rehypeKatex, rehypeDropTexAnnotation, rehypeTableAlign],
+    rehypePlugins: [rehypeKatex, rehypeDropTexAnnotation, rehypeLocalMedia, rehypeTableAlign],
   },
   integrations: [
     mermaid({
@@ -322,24 +367,9 @@ export default defineConfig({
         es: { label: 'Español', lang: 'es' },
       },
       head: [
-        // Every figure is served from raw.githubusercontent.com, so the first
-        // one on a page pays a full DNS + TLS handshake to a third origin
-        // before a byte of image arrives. Warming the connection in the head
-        // takes that off the critical path.
-        {
-          tag: 'link',
-          // `crossorigin` is an enumerated attribute: a bare boolean serializes
-          // to crossorigin="true", which is invalid and fails html-validate.
-          attrs: {
-            rel: 'preconnect',
-            href: 'https://raw.githubusercontent.com',
-            crossorigin: 'anonymous',
-          },
-        },
-        {
-          tag: 'link',
-          attrs: { rel: 'dns-prefetch', href: 'https://raw.githubusercontent.com' },
-        },
+        // No preconnect to raw.githubusercontent.com: every figure, animation
+        // and fiche is served from this origin now (scripts/stage-media.mjs),
+        // so there is no third-party handshake left to warm.
         // GitHub Pages serves no custom response headers, so the referrer
         // policy has to travel as a document-level tag.
         { tag: 'meta', attrs: { name: 'referrer', content: 'strict-origin-when-cross-origin' } },

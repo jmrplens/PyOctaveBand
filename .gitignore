@@ -84,3 +84,7 @@ site/public/llms*.txt
 stub/dist/
 stub/src/*.egg-info/
 .playwright-mcp/
+
+# Documentation media staged into the site by scripts/stage-media.mjs from
+# .github/images and .github/reports, which are the committed originals.
+site/public/media/
