@@ -55,10 +55,16 @@ const SHOTS = [
 	['12-guide-es-light', '/es/guides/insulation-lab/', DESKTOP, 'light', 0],
 	['13-guide-es-dark', '/es/guides/insulation-lab/', DESKTOP, 'dark', 0],
 	// Narrow width: the chip run wraps under the H1 and the mobile theme
-	// toggle sits in the header.
-	['14-guide-phone-light', '/guides/insulation-lab/', PHONE, 'light', 0],
+	// toggle sits in the header. 14 and 15 are the same page in the two
+	// themes, so they are also the two states of the toggle: the button shows
+	// the mode a tap would give you, so it is a moon on the light shot and a
+	// sun on the dark one.
+	['14-guide-phone-light', '/guides/underwater-propagation/', PHONE, 'light', 0],
 	['15-guide-phone-dark', '/guides/underwater-propagation/', PHONE, 'dark', 0],
 	['16-home-phone-dark', '/', PHONE, 'dark', 0, true],
+	// A page past the raised cap of nine, where the run wraps to several rows
+	// and ends on the "+N more" chip.
+	['17-cap-overflow-phone-light', '/guides/porous-absorbers/', PHONE, 'light', 0],
 ];
 
 /** Shots that also need a faked Accept-Language list, for the banner. */
