@@ -454,3 +454,30 @@ aparte en la
 - [Niveles](/phonometry/es/guides/levels/): los niveles espectrales y de banda que sustentan las
   entradas de nivel espectral equivalente.
 - Referencia de la API: [`hearing.sii`](/phonometry/es/reference/api/speech/sii/).
+
+## Respuestas rápidas
+
+### ¿Qué bandas de frecuencia importan más para la inteligibilidad del habla?
+
+En el método por bandas de tercio de octava de ANSI S3.5-1997, la función de importancia de banda $I_i$ (Tabla 3, material de habla promedio) suma uno sobre las 18 bandas de 160 Hz a 8000 Hz. Las cinco bandas de 1250 Hz a 3150 Hz transportan en torno al 43 % de la inteligibilidad (las claves consonánticas), mientras que las cinco bandas más bajas, de 160 Hz a 400 Hz, transportan en torno al 11 % aunque contienen casi la mitad de la potencia del habla.
+
+### ¿Cómo se calcula el índice de inteligibilidad del habla?
+
+El SII de la cláusula 6 de ANSI S3.5-1997 es la suma de las audibilidades de
+banda ponderada por la importancia de banda,
+$\text{SII} = \sum_i I_i A_i$, sobre las 18 bandas de tercio de octava. Cada
+audibilidad de banda es
+$A_i = \operatorname{clip}\!\left((E_i' - D_i + 15)/30,\; 0,\; 1\right)$
+(cláusula 5.8), donde $E_i'$ es el nivel espectral del habla equivalente y
+$D_i$ la perturbación equivalente, que combina el ruido externo, la
+propagación ascendente del enmascaramiento y el ruido interno equivalente. El
+índice queda en $[0, 1]$.
+
+### ¿Cuándo debo usar el SII en vez del STI?
+
+Usa el SII (ANSI S3.5) cuando la pregunta es si suficiente espectro del habla
+es audible en el oído de quien escucha: captura el ruido estacionario, la
+propagación ascendente del enmascaramiento, la pérdida auditiva y el esfuerzo
+vocal, pero es ciego a la reverberación. El STI (IEC 60268-16) califica un
+canal de transmisión, cuánta de la modulación del habla conserva una sala o
+un sistema de sonido. Cuando ambos mecanismos están en juego, calcula ambos.

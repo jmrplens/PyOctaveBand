@@ -959,3 +959,31 @@ or raise `fs`, and confirm the margin with `verify_filter_class`.
 ## See also
 
 - API reference: [`phonometry`](/phonometry/reference/api/filters/phonometry/), [`metrology.core`](/phonometry/reference/api/filters/core/) and [`metrology.parametric_filters`](/phonometry/reference/api/filters/parametric-filters/).
+
+## Quick answers
+
+### How are fractional-octave centre frequencies and band edges defined?
+
+IEC 61260-1:2014 (clauses 5.2-5.5) builds every band from the base-10
+octave ratio $G = 10^{3/10} \approx 1.99526$, so one octave is not exactly
+2. Mid frequencies follow $f_m = 1000 \cdot G^{x/b}$ (for odd $b$) and the
+edges are $f_1 = f_m G^{-1/2b}$ and $f_2 = f_m G^{+1/2b}$; every
+one-third-octave band spans $G^{1/3} \approx 1.2589$, ten bands per decade.
+
+### Which filter architecture meets IEC 61260-1 class 1 with default settings?
+
+With the default order 6, Butterworth meets class 1 of the IEC 61260-1:2014
+Table 1 acceptance limits, and so does Chebyshev II: its default
+`attenuation` of 72 dB clears the 70 dB far-stopband class 1 limit.
+Chebyshev I, Elliptic and Bessel do not: passband ripple (cheby1, ellip)
+and slow roll-off (bessel) violate the mask. `verify_filter_class` reports
+the achieved class per band.
+
+### What is class 0 and which standard defines it?
+
+Class 0 is the tightest filter performance class, defined by IEC 61260:1995
+and its US twin ANSI S1.11-2004 and dropped by IEC 61260-1:2014. Its
+passband corridor allows only ±0.15 dB at mid-band, against ±0.3 dB for
+class 1 in the 1995 masks. It stays available through `edition="1995"`, and
+the default order-6 Butterworth bank meets class 0 in the verified 48 kHz
+configurations.

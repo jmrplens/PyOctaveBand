@@ -987,3 +987,32 @@ respecto a Nyquist, o sube `fs`, y confirma el margen con
 ## Véase también
 
 - Referencia de la API: [`phonometry`](/phonometry/es/reference/api/filters/phonometry/), [`metrology.core`](/phonometry/es/reference/api/filters/core/) y [`metrology.parametric_filters`](/phonometry/es/reference/api/filters/parametric-filters/).
+
+## Respuestas rápidas
+
+### ¿Cómo se definen las frecuencias centrales y los bordes de banda de octava fraccionaria?
+
+IEC 61260-1:2014 (apartados 5.2-5.5) construye cada banda a partir de la
+razón de octava en base 10 $G = 10^{3/10} \approx 1{,}99526$, de modo que
+una octava no es exactamente 2. Las frecuencias centrales siguen
+$f_m = 1000 \cdot G^{x/b}$ (para $b$ impar) y los bordes son
+$f_1 = f_m G^{-1/2b}$ y $f_2 = f_m G^{+1/2b}$; cada banda de tercio de
+octava abarca $G^{1/3} \approx 1{,}2589$, diez bandas por década.
+
+### ¿Qué arquitectura de filtro cumple la clase 1 de IEC 61260-1 con los ajustes por defecto?
+
+Con el orden 6 por defecto, Butterworth cumple la clase 1 de los límites de
+aceptación de la Tabla 1 de IEC 61260-1:2014, y también Chebyshev II: su
+`attenuation` por defecto de 72 dB supera el límite de clase 1 de 70 dB en
+el stopband lejano. Chebyshev I, elíptico y Bessel no la cumplen: el rizado
+de banda de paso (cheby1, ellip) y la caída lenta (bessel) violan la
+máscara. `verify_filter_class` informa de la clase alcanzada por banda.
+
+### ¿Qué es la clase 0 y qué norma la define?
+
+La clase 0 es la clase de prestaciones más estricta, definida por IEC
+61260:1995 y su gemela estadounidense ANSI S1.11-2004 y eliminada por IEC
+61260-1:2014. Su corredor de banda de paso admite solo ±0,15 dB en el
+centro de banda, frente a ±0,3 dB para la clase 1 en las máscaras de 1995.
+Sigue accesible con `edition="1995"`, y el banco Butterworth de orden 6 por
+defecto cumple la clase 0 en las configuraciones verificadas a 48 kHz.

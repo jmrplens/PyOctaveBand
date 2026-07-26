@@ -63,20 +63,49 @@ function rehypeLocalMedia() {
 
 // KaTeX renders each formula three ways in one element: the styled HTML a
 // reader sees, a MathML tree for assistive technology, and, inside that MathML,
-// an <annotation encoding="application/x-tex"> holding the original TeX. The
-// annotation is not aria-hidden, so a text extractor that walks the DOM emits
-// the formula two or three times over: "L_eq" comes out as "LeqL_{eq}Leq", and
-// on these pages the affected passages are the standards formulas, which are
-// exactly the ones worth quoting. Dropping the annotation keeps the MathML
-// (and the accessibility it provides) while leaving one readable copy.
-function rehypeDropTexAnnotation() {
+// an <annotation encoding="application/x-tex"> holding the original TeX. Only
+// the styled HTML is aria-hidden, so a text extractor that walks the DOM used
+// to emit the formula two or three times over, concatenated: "L_eq" came out
+// as "LeqL_{eq}Leq". On these pages the affected passages are the standards
+// formulas, which are exactly the ones worth quoting. An earlier pass dropped
+// just the annotation, but that still left MathML text plus visual text, and
+// the doubled serialization is what AI crawlers actually quoted.
+//
+// So each formula is reduced to ONE textual representation: the MathML block
+// is removed and the TeX it carried becomes an aria-label on the .katex root
+// (with role="math"), the same pattern GitHub uses for rendered math. Text
+// extractors now see the visual layer once; screen readers announce the TeX
+// source, which trades MathML navigation for an unambiguous single reading.
+function rehypeSingleTextMath() {
+  const hasClass = (node, name) =>
+    node.type === 'element' &&
+    Array.isArray(node.properties?.className) &&
+    node.properties.className.includes(name);
+
+  const findTex = (node) => {
+    if (node.type === 'element' && node.tagName === 'annotation') {
+      return node.children?.map((c) => c.value ?? '').join('') || undefined;
+    }
+    for (const child of node.children ?? []) {
+      const found = findTex(child);
+      if (found) return found;
+    }
+    return undefined;
+  };
+
   return (tree) => {
     (function visit(node) {
-      if (!node.children) return;
-      node.children = node.children.filter(
-        (child) => !(child.type === 'element' && child.tagName === 'annotation'),
-      );
-      node.children.forEach(visit);
+      if (hasClass(node, 'katex')) {
+        const mathml = node.children?.find((c) => hasClass(c, 'katex-mathml'));
+        if (mathml) {
+          const tex = findTex(mathml);
+          node.children = node.children.filter((c) => c !== mathml);
+          node.properties.role = 'math';
+          if (tex) node.properties.ariaLabel = tex.trim();
+        }
+        return; // Nothing below a formula root needs visiting.
+      }
+      node.children?.forEach(visit);
     })(tree);
   };
 }
@@ -404,9 +433,9 @@ export default defineConfig({
   },
   markdown: {
     remarkPlugins: [remarkMath],
-    // rehypeDropTexAnnotation must run after rehypeKatex: it prunes a node
-    // KaTeX has just produced.
-    rehypePlugins: [rehypeKatex, rehypeDropTexAnnotation, rehypeLocalMedia, rehypeTableAlign],
+    // rehypeSingleTextMath must run after rehypeKatex: it rewrites the
+    // elements KaTeX has just produced.
+    rehypePlugins: [rehypeKatex, rehypeSingleTextMath, rehypeLocalMedia, rehypeTableAlign],
   },
   integrations: [
     mermaid({
@@ -448,6 +477,7 @@ export default defineConfig({
         // later sheets can still reference the tokens it defines.
         './src/styles/theme.css',
         './src/styles/katex.css',
+        './src/styles/containment.css',
         './src/styles/theme-images.css',
         './src/styles/theme-tables.css',
         './src/styles/splash-menu.css',
@@ -466,6 +496,32 @@ export default defineConfig({
         es: { label: 'Español', lang: 'es' },
       },
       head: [
+        // GitHub Pages cannot send a Content-Security-Policy header, so the
+        // policy travels as a meta tag: everything the site loads is
+        // first-party, and this pins that fact. Meta delivery cannot carry
+        // frame-ancestors or report-uri (ignored there by spec), and inline
+        // scripts/styles stay allowed because a static build cannot mint
+        // per-response nonces: Starlight's theme bootstrap and Astro's island
+        // hydration are inline by design. 'wasm-unsafe-eval' is for Pagefind,
+        // whose search index is compiled WebAssembly fetched from this origin.
+        {
+          tag: 'meta',
+          attrs: {
+            'http-equiv': 'Content-Security-Policy',
+            content: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data:",
+              "font-src 'self' data:",
+              "connect-src 'self'",
+              "media-src 'self'",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+            ].join('; '),
+          },
+        },
         // No preconnect to raw.githubusercontent.com: every figure, animation
         // and fiche is served from this origin now (scripts/stage-media.mjs),
         // so there is no third-party handshake left to warm.

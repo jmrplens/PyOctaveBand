@@ -348,7 +348,7 @@ IEC 61400-11.
 - [Spherical ground effect and advanced barriers](/phonometry/guides/ground-barriers/):
   the Weyl-Van der Pol reflection coefficient over finite-impedance ground, and
   wave-theoretic barrier diffraction.
-- [Atmospheric refraction: rays and the parabolic equation](/phonometry/guides/atmospheric-refraction/):
+- [Atmospheric refraction: rays and the GFPE](/phonometry/guides/atmospheric-refraction/):
   effective sound-speed profiles, curved rays with a closed-form shadow-zone
   distance, and the GFPE relative-level field.
 - [Impulsive-sound prominence (NT ACOU 112)](/phonometry/guides/impulse-prominence/):

@@ -340,3 +340,32 @@ the frequency-independent real one of Eqs. 4.33-4.35.
 - [Conformance report](/phonometry/reference/conformance/): two of the closed-form
   validation anchors of §4 run there.
 - API reference: [`simulation.fdtd`](/phonometry/reference/api/simulation/fdtd/).
+
+## Quick answers
+
+### How do I choose the FDTD grid spacing?
+
+Resolve at least 10 cells per shortest wavelength,
+``dx <= c_min / (10 f_max)``, using the smallest sound speed in the domain.
+At exactly 10 cells the on-axis dispersion error bound is about 1.6 %,
+reduced to about 1.4 % at the default ``cfl = 0.6``, and halving ``dx``
+quarters the error (the scheme is second order). With ``dx = 1`` cm the
+10-cell point in air sits at roughly 3.4 kHz.
+
+### What Courant number keeps an FDTD simulation stable?
+
+The explicit scheme is stable only while a wavefront crosses at most one
+cell per time step. With square cells the Courant number is
+$\mathrm{CN} = c\,\Delta t\,\sqrt{2}/\Delta x \le 1$ (Attenborough & Van
+Renterghem Eq. 4.13). `fdtd_simulation` derives the time step from the
+`cfl` parameter (the Courant number, default 0.6) and the largest sound
+speed in the map, rejecting values outside $(0, 1)$.
+
+### Can I trust the absolute levels from a 2D FDTD run?
+
+No. A 2D point source is physically an infinite line source: its amplitude
+spreads cylindrically as ``1/sqrt(r)``, 3.0 dB per doubling of distance,
+instead of the spherical ``1/r`` (6.0 dB per doubling) of a 3D point source.
+Interference and diffraction patterns are faithful, but absolute levels and
+decay rates are not those of a 3D room; validate any 3D-quantitative claim
+against a closed form or a 3D solver.

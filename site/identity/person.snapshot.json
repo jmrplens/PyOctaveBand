@@ -22,6 +22,40 @@
     "width": "460",
     "height": "460"
   },
+  "alumniOf": [
+    {
+      "@type": "EducationalOrganization",
+      "name": "University of Alicante",
+      "sameAs": "https://www.wikidata.org/wiki/Q2037040"
+    },
+    {
+      "@type": "EducationalOrganization",
+      "name": "Universitat Politècnica de València",
+      "sameAs": "https://www.wikidata.org/wiki/Q2003976"
+    }
+  ],
+  "hasCredential": [
+    {
+      "@type": "EducationalOccupationalCredential",
+      "name": "Telecommunications Engineer in Sound and Image",
+      "credentialCategory": "degree",
+      "recognizedBy": {
+        "@type": "EducationalOrganization",
+        "name": "University of Alicante",
+        "sameAs": "https://www.wikidata.org/wiki/Q2037040"
+      }
+    },
+    {
+      "@type": "EducationalOccupationalCredential",
+      "name": "MSc in Acoustics Engineering",
+      "credentialCategory": "degree",
+      "recognizedBy": {
+        "@type": "EducationalOrganization",
+        "name": "Universitat Politècnica de València",
+        "sameAs": "https://www.wikidata.org/wiki/Q2003976"
+      }
+    }
+  ],
   "knowsAbout": [
     {
       "@type": "Thing",

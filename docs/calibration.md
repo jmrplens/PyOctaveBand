@@ -262,6 +262,20 @@ Integer signals (e.g. int16 from `scipy.io.wavfile.read`) are converted to
 float64 internally before any squaring, so calibration and level results are
 identical whether you pass the raw integer array or a float conversion.
 
+## Quick answers
+
+### What calibrator level should I use to calibrate my measurement chain?
+
+The usual choice is 94 dB SPL at 1 kHz (1 Pa RMS), which is what `sensitivity()` assumes with its default `target_spl=94.0`; for a 114 dB calibrator pass `114.0`. IEC 60942 requires the principal level to be at least 90 dB re 20 µPa. Record a few seconds of stable tone, because the standard specifies the generated level as a 20 s average.
+
+### How much drift between the pre and post calibration checks is acceptable?
+
+Derive the sensitivity before each measurement series and check it again at the end: a common criterion invalidates the series when the two differ by more than 0.5 dB. A healthy class 1 chain drifts a few hundredths of a dB over a session, so a half-decibel pre/post difference signals damage rather than weather. Whatever the threshold, carry the difference into the uncertainty budget rather than assuming zero.
+
+### Can I calibrate a class 1 chain with a class 2 calibrator?
+
+You can, but the tolerances chain: a class 1 measurement requires a class 1 (or LS) calibrator per IEC 60942 and a class 1 meter, so a class 2 calibrator silently downgrades every derived level to class 2 accuracy, because its wider level tolerance enters the sensitivity factor $S$ directly. For reference, the class 1 tolerance is ±0.4 dB between 160 Hz and 1.25 kHz (IEC 60942 Table 1).
+
 ## References
 
 - International Electrotechnical Commission. (2017). *Electroacoustics —

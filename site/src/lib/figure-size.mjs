@@ -57,9 +57,49 @@ const cache = new Map();
 function localPath(src) {
   if (!IMAGES_DIR) return undefined;
   const name = src.split('/').pop();
-  if (!name || !name.endsWith('.svg')) return undefined;
+  if (!name || !(name.endsWith('.svg') || name.endsWith('.webp'))) return undefined;
   const candidate = join(IMAGES_DIR, name);
   return existsSync(candidate) ? candidate : undefined;
+}
+
+/**
+ * Pixel size of a WebP file, from the RIFF container header.
+ *
+ * The raster figures (`*.webp`) declare no size anywhere a stylesheet can see,
+ * so unlike the SVGs they have to be measured from the encoded bitstream. All
+ * three layouts WebP can use are covered: extended (VP8X carries the canvas
+ * size), lossy (VP8 frame header) and lossless (VP8L dimension bits).
+ *
+ * @param {Buffer} buf First bytes of the file; 30 are enough for any variant.
+ * @returns {{width: number, height: number}|undefined}
+ */
+function webpSize(buf) {
+  if (buf.length < 30) return undefined;
+  if (buf.toString('latin1', 0, 4) !== 'RIFF') return undefined;
+  if (buf.toString('latin1', 8, 12) !== 'WEBP') return undefined;
+  const chunk = buf.toString('latin1', 12, 16);
+  if (chunk === 'VP8X') {
+    return {
+      width: 1 + buf.readUIntLE(24, 3),
+      height: 1 + buf.readUIntLE(27, 3),
+    };
+  }
+  if (chunk === 'VP8 ') {
+    // Keyframe start code 9D 01 2A, then 14-bit width and height.
+    if (buf[23] !== 0x9d || buf[24] !== 0x01 || buf[25] !== 0x2a) return undefined;
+    return {
+      width: buf.readUInt16LE(26) & 0x3fff,
+      height: buf.readUInt16LE(28) & 0x3fff,
+    };
+  }
+  if (chunk === 'VP8L') {
+    if (buf[20] !== 0x2f) return undefined;
+    return {
+      width: 1 + (((buf[22] & 0x3f) << 8) | buf[21]),
+      height: 1 + (((buf[24] & 0x0f) << 10) | (buf[23] << 2) | ((buf[22] & 0xc0) >> 6)),
+    };
+  }
+  return undefined;
 }
 
 function parseLength(value) {
@@ -84,7 +124,9 @@ export function figureSize(src) {
 
   let size;
   const path = localPath(src);
-  if (path) {
+  if (path && path.endsWith('.webp')) {
+    size = webpSize(readFileSync(path));
+  } else if (path) {
     // The declaration is in the opening <svg> tag; no need to read further.
     const head = readFileSync(path, 'utf8').slice(0, 2000);
     const open = /<svg\b[^>]*>/.exec(head)?.[0];

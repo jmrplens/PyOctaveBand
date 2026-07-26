@@ -1,0 +1,23 @@
+/* Rendering containment for the heaviest guides.
+ *
+ * The insulation guides run past 10k words with dozens of formulas and code
+ * blocks; parsing is unavoidable, but layout of what is far below the fold is
+ * not. `content-visibility: auto` lets the browser skip layout and paint for
+ * offscreen blocks until they approach the viewport, which is the difference
+ * between one long main-thread task and several short ones on mobile.
+ *
+ * Only self-contained blocks are marked: display formulas (each already an
+ * isolated scroll box) and the collapsible code sections. Prose is left
+ * alone so find-in-page and anchor navigation behave exactly as before.
+ * `contain-intrinsic-size` reserves an estimate so the scrollbar does not
+ * jump as blocks materialise.
+ */
+.sl-markdown-content .katex-display {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 3rem;
+}
+
+.sl-markdown-content details {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 2.5rem;
+}

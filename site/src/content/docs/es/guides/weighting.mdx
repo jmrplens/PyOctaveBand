@@ -593,3 +593,17 @@ ponderación A simples en lugar de D).
 ## Véase también
 
 - Referencia de la API: [`metrology.parametric_filters`](/phonometry/es/reference/api/filters/parametric-filters/) y [`metrology.compliance`](/phonometry/es/reference/api/filters/compliance/).
+
+## Respuestas rápidas
+
+### ¿Cuándo debo usar la ponderación C en lugar de la ponderación A?
+
+Usa la ponderación C para presión acústica de pico y ruido de alto nivel, y usa la diferencia $L_{Ceq} - L_{Aeq}$ como indicador del contenido en baja frecuencia: por debajo de unos 10 dB el nivel ponderado A califica el espectro con justicia, mientras que en torno a 15 a 20 dB o más la energía se concentra en las bajas frecuencias y el nivel ponderado A subestima el problema. El método HML de ISO 4869-2 se apoya exactamente en esta diferencia C menos A para la selección de protectores auditivos.
+
+### ¿Qué ponderación debo usar para infrasonido por debajo de 20 Hz?
+
+Usa la ponderación frecuencial G de ISO 7196:1995, que valora el infrasonido igual que la ponderación A valora el ruido audible. Tiene ganancia de 0 dB en 10 Hz, sube a 12 dB/octava entre 1 Hz y 20 Hz y cae a 24 dB/octava fuera de esa banda. Aplícala a fuentes como aerogeneradores, climatización y voladuras, y expresa los niveles como $L_{pG}$ (o $L_{Geq}$ para el nivel equivalente).
+
+### ¿Es precisa la ponderación A cerca de 16 kHz con una frecuencia de muestreo de 48 kHz?
+
+No con un diseño bilineal simple: a fs = 48 kHz el error de la curva A alcanza −2,7 dB a 12,5 kHz, fuera de la tolerancia de clase 1 de IEC 61672-1 (+2,0/−2,5 dB). El `high_accuracy=True` por defecto sobremuestrea internamente (hasta 8×, alcanzando 144 kHz o más a frecuencias de audio habituales) y mantiene la respuesta dentro de las tolerancias de clase 1 hasta 16 kHz, con un error de aproximadamente −0,5 dB a 12,5 kHz.

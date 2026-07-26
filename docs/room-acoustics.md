@@ -781,6 +781,20 @@ shape of `t60`; `absorption_coefficient()` returns `alpha_s`;
   reference-curve derivation.
 - API reference: [`room.room_acoustics`](https://jmrplens.github.io/phonometry/reference/api/rooms/room-acoustics/), [`room.room_ir`](https://jmrplens.github.io/phonometry/reference/api/rooms/room-ir/) and [`room.open_plan`](https://jmrplens.github.io/phonometry/reference/api/rooms/open-plan/).
 
+## Quick answers
+
+### How are EDT, T20 and T30 defined?
+
+Each band of the impulse response is turned into a decay curve by Schroeder backward integration of the squared IR, and a least-squares line fitted over an evaluation range is extrapolated to a full 60 dB drop, $T = -60/\text{slope}$ (ISO 3382-1/2): EDT over 0 to −10 dB (perceived reverberance), T20 over −5 to −25 dB and T30 over −5 to −35 dB.
+
+### How much decay range do I need for a valid T20 or T30?
+
+The fit window plus a safety margin must fit inside the impulse-to-noise ratio, the level distance between the band-filtered IR peak and its noise floor: ISO 3382 requires at least 35 dB of usable decay range for T20 and 45 dB for T30. An undersized range biases the fitted time upward, so `room_parameters` tightens its validity flags to 46 dB and 54 dB, keeping the bias inside the 5 % JND.
+
+### Should I measure the room impulse response with a sine sweep or an MLS?
+
+Both are ISO 18233 deconvolution methods that recover the impulse response with 20–30 dB more effective signal-to-noise ratio than an impulsive source. Prefer the exponential sine sweep (Annex B): it places harmonic distortion at negative arrival times, where it is discarded. Use MLS (Annex A) when the excitation must be periodic or the hardware favours a two-level signal; it is more sensitive to time variance.
+
 ## References
 
 - Kuttruff, H. (2016). *Room acoustics* (6th ed.). CRC Press.

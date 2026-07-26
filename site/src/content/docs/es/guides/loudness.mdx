@@ -617,3 +617,17 @@ apartado.
   el modelo de Zwicker y Fastl que consume la sonoridad percentil N5.
 - [Teoría](/phonometry/es/reference/theory/perception/): las ecuaciones que sustentan los modelos de sonoridad.
 - Referencia de la API: [`psychoacoustics.loudness_zwicker`](/phonometry/es/reference/api/psychoacoustics/loudness-zwicker/), [`psychoacoustics.loudness_moore_glasberg`](/phonometry/es/reference/api/psychoacoustics/loudness-moore-glasberg/) y [`psychoacoustics.loudness_contours`](/phonometry/es/reference/api/psychoacoustics/loudness-contours/).
+
+## Respuestas rápidas
+
+### ¿Cuál es la diferencia entre la sonoridad en sonos y el nivel de sonoridad en fonios?
+
+La sonoridad N en sonos (ISO 532-1) es una escala de razón de la sonoridad percibida: 4 sonos es el doble de sonoro que 2 sonos y, por definición, un tono de 1 kHz a 40 dB SPL es 1 sono. El nivel de sonoridad en fonios (ISO 226) es el SPL de un tono puro de 1 kHz igual de fuerte, y cada +10 fonios duplica el valor en sonos.
+
+### ¿Qué modelo de sonoridad elijo: Zwicker, Moore-Glasberg o Sottek?
+
+El método de Zwicker (ISO 532-1:2017) es el de referencia: estacionario y variable en el tiempo, entrada en tercios de octava, rápido y muy citado. Moore-Glasberg (ISO 532-2:2017) es estacionario, construye patrones de excitación roex y modela la suma binaural explícitamente; ISO 532-3:2023 añade la sonoridad variable en el tiempo de corto y largo plazo con el pico N_max. El modelo de Sottek (ECMA-418-2:2025) se expresa en sone_HMS y comparte su front-end auditivo con las métricas de tonalidad y aspereza de ECMA.
+
+### ¿En qué rango son válidas las curvas isofónicas de ISO 226:2023?
+
+El apartado 4.1 de ISO 226:2023 define las curvas isofónicas normales de 20 a 90 fonios, evaluadas en las 29 frecuencias preferentes de tercio de octava de la Tabla 1; por encima de 80 fonios la fórmula solo es válida hasta 4 kHz, por lo que la curva de 90 fonios se detiene ahí y no se define ninguna curva superior. Las curvas describen tonos puros, no señales arbitrarias.

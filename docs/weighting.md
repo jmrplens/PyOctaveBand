@@ -482,6 +482,20 @@ plt.show()
 
 </details>
 
+## Quick answers
+
+### When should I use C-weighting instead of A-weighting?
+
+Use C-weighting for peak sound pressure and high-level noise, and use the difference $L_{Ceq} - L_{Aeq}$ as a low-frequency indicator: below about 10 dB the A-weighted level rates the spectrum fairly, while around 15 to 20 dB or more the energy is concentrated at low frequencies and the A-weighted level understates the problem. The HML method of ISO 4869-2 keys on exactly this C minus A difference for hearing-protector selection.
+
+### Which weighting should I use for infrasound below 20 Hz?
+
+Use the G frequency weighting of ISO 7196:1995, which rates infrasound the way A-weighting rates audible noise. It has 0 dB gain at 10 Hz, rises at 12 dB/octave from 1 Hz to 20 Hz and falls off at 24 dB/octave outside that band. Apply it to sources such as wind turbines, HVAC and blasting, and report levels as $L_{pG}$ (or $L_{Geq}$ for the equivalent level over time).
+
+### Is A-weighting accurate near 16 kHz at a 48 kHz sample rate?
+
+Not with a plain bilinear design: at fs = 48 kHz the A-curve error reaches −2.7 dB at 12.5 kHz, outside the IEC 61672-1 class 1 tolerance (+2.0/−2.5 dB). The default `high_accuracy=True` oversamples internally (up to 8×, reaching 144 kHz or more at common audio rates) and keeps the response within class 1 tolerances up to 16 kHz, with an error of about −0.5 dB at 12.5 kHz.
+
 ## References
 
 - Fletcher, H., & Munson, W. A. (1933). Loudness, its definition, measurement

@@ -366,7 +366,7 @@ SAE ARP 5534, Doc 29/32 CEAC e IEC 61400-11.
 - [Efecto suelo esférico y barreras avanzadas](/phonometry/es/guides/ground-barriers/):
   el coeficiente de reflexión de Weyl-Van der Pol sobre suelo de impedancia
   finita y la difracción en barreras desde la teoría ondulatoria.
-- [Refracción atmosférica: rayos y ecuación parabólica](/phonometry/es/guides/atmospheric-refraction/):
+- [Refracción atmosférica: rayos y GFPE](/phonometry/es/guides/atmospheric-refraction/):
   los perfiles de velocidad efectiva del sonido, los rayos curvos con distancia
   de zona de sombra en forma cerrada y el campo de nivel relativo por GFPE.
 - [Prominencia de sonidos impulsivos (NT ACOU 112)](/phonometry/es/guides/impulse-prominence/):

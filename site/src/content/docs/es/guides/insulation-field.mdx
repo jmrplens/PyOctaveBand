@@ -1182,3 +1182,34 @@ magnitudes de campo (ISO 15186-1/-2) tampoco está en este módulo: es
 - [Teoría](/phonometry/es/reference/theory/rooms-buildings/): la derivación de la curva de referencia que sustenta
   los índices ponderados de un solo número.
 - Referencia de la API: [`building.insulation`](/phonometry/es/reference/api/building/insulation/), [`building.survey_insulation`](/phonometry/es/reference/api/building/survey-insulation/) y [`building.building_uncertainty`](/phonometry/es/reference/api/building/building-uncertainty/).
+
+## Respuestas rápidas
+
+### ¿Qué significa DnT,w?
+
+$D_{nT,w}$ es la diferencia de niveles estandarizada ponderada. Por banda
+de tercio de octava, $D_{nT} = D + 10 \log_{10}(T/T_0)$ refiere el tiempo
+de reverberación de la sala receptora $T$ a $T_0 = 0{,}5$ s, con
+$D = L_1 - L_2$ la diferencia de niveles entre la sala emisora y la
+receptora (ISO 16283-1). El método de la curva de referencia de ISO 717-1
+reduce después las 16 bandas de 100 Hz a 3150 Hz al número único leído a
+500 Hz.
+
+### ¿Cuál es la diferencia entre R y R' en el aislamiento acústico?
+
+La prima indica dónde se hizo la medición: las magnitudes con prima ($R'$,
+$L'_n$, $L'_{nT}$) se miden en el edificio e incluyen todas las vías de
+flancos, mientras que las $R$ y $L_n$ sin prima son propiedades de
+laboratorio del elemento solo, medidas con los flancos suprimidos. En campo
+(ISO 16283-1), $R' = D + 10 \log_{10}(S/A)$ con la superficie del
+cerramiento $S$ y el área de absorción de Sabine $A = 0{,}16\ V/T$.
+
+### ¿Cuál es la diferencia entre los términos de adaptación espectral C y Ctr?
+
+Ambos recalifican la misma curva medida frente a los dos espectros de
+fuente del Anexo A de ISO 717-1: $C$ frente a ruido rosa ponderado A
+(actividades domésticas: habla, música, radio, televisión) y $C_{tr}$
+frente a tráfico rodado urbano ponderado A, cuya energía se concentra en
+baja frecuencia. $C$ suele estar entre 0 y −2 dB, mientras que una doble
+hoja ligera con resonancia masa-aire-masa cerca de 100 Hz puede llevar un
+$C_{tr}$ de −5 a −10 dB.

@@ -604,3 +604,17 @@ clause-by-clause conformance matters.
   the Zwicker and Fastl model that consumes the percentile loudness N5.
 - [Theory](/phonometry/reference/theory/perception/): the equations behind the loudness models.
 - API reference: [`psychoacoustics.loudness_zwicker`](/phonometry/reference/api/psychoacoustics/loudness-zwicker/), [`psychoacoustics.loudness_moore_glasberg`](/phonometry/reference/api/psychoacoustics/loudness-moore-glasberg/) and [`psychoacoustics.loudness_contours`](/phonometry/reference/api/psychoacoustics/loudness-contours/).
+
+## Quick answers
+
+### What is the difference between loudness in sones and loudness level in phons?
+
+Loudness N in sones (ISO 532-1) is a ratio scale of perceived loudness: 4 sones is twice as loud as 2 sones, and by definition a 1 kHz tone at 40 dB SPL is 1 sone. Loudness level in phons (ISO 226) is the SPL of an equally loud 1 kHz pure tone, and every +10 phon doubles the sone value.
+
+### Which loudness model should I choose: Zwicker, Moore-Glasberg or Sottek?
+
+The Zwicker method (ISO 532-1:2017) is the reference: stationary and time-varying, one-third-octave input, fast and widely cited. Moore-Glasberg (ISO 532-2:2017) is stationary, builds roex excitation patterns and models binaural summation explicitly; ISO 532-3:2023 adds time-varying short- and long-term loudness with the peak N_max. The Sottek model (ECMA-418-2:2025) reports sone_HMS and shares its auditory front-end with the ECMA tonality and roughness metrics.
+
+### Over what range are the ISO 226:2023 equal-loudness contours valid?
+
+ISO 226:2023 clause 4.1 defines the normal equal-loudness-level contours from 20 to 90 phon, evaluated at the 29 preferred third-octave frequencies of Table 1; above 80 phon the formula is valid only up to 4 kHz, so the 90 phon contour stops there and no higher contours are defined. The contours describe pure tones, not arbitrary signals.

@@ -1,15 +1,90 @@
 ---
 /**
- * Default Starlight page title plus the page header chips run.
+ * Default Starlight page title plus the page header chips run and, on the
+ * teaching pages, a visible byline.
  *
- * The override exists only to give PageChips.astro a mount point directly
- * under the H1, inside the page header band and above the content divider.
- * Everything the run shows comes from the page's own `references` frontmatter;
- * see PageChips.astro and src/lib/reference-chips.ts.
+ * The override originally existed only to give PageChips.astro a mount point
+ * directly under the H1, inside the page header band and above the content
+ * divider. Everything the chips run shows comes from the page's own
+ * `references` frontmatter; see PageChips.astro and src/lib/reference-chips.ts.
+ *
+ * The byline surfaces, as text, what every page already asserts in its
+ * JSON-LD (author, datePublished, dateModified): the machine-readable claim
+ * existed, but a reader, or an extractor quoting the page, had to reach the
+ * footer to learn who wrote it and when. Guides and Getting Started carry it;
+ * the API reference does not, where a byline between the H1 and a module
+ * synopsis would only be noise.
  */
 import Default from '@astrojs/starlight/components/PageTitle.astro';
 import PageChips from './PageChips.astro';
+import { firstPublished } from '../lib/page-dates.mjs';
+
+interface RouteData {
+  entry?: { id?: string; filePath?: string };
+  lastUpdated?: Date;
+}
+const route = (Astro.locals as { starlightRoute?: RouteData }).starlightRoute;
+const id = route?.entry?.id ?? '';
+const lang = id === 'es' || id.startsWith('es/') ? 'es' : 'en';
+const slug = id.replace(/^es\/?/, '');
+
+const showByline = slug.startsWith('guides/') || slug === 'getting-started';
+
+const BASE = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
+const aboutHref = `${BASE}${lang === 'es' ? '/es' : ''}/about/`;
+
+const fmt = new Intl.DateTimeFormat(lang === 'es' ? 'es' : 'en', {
+  dateStyle: 'medium',
+});
+const published = firstPublished(route?.entry?.filePath ?? '');
+const modified = route?.lastUpdated instanceof Date ? route.lastUpdated : undefined;
+
+const publishedText = published ? fmt.format(new Date(published)) : undefined;
+const modifiedText = modified ? fmt.format(modified) : undefined;
+// A page published and last touched the same day has one date, not two.
+const showModified = modifiedText && modifiedText !== publishedText;
+
+const t =
+  lang === 'es'
+    ? { by: 'Por', published: 'Publicado el', updated: 'actualizado el' }
+    : { by: 'By', published: 'Published', updated: 'updated' };
 ---
 
 <Default><slot /></Default>
+{
+  showByline && (publishedText || modifiedText) && (
+    <p class="page-byline">
+      {t.by} <a href={aboutHref}>José M. Requena Plens</a>
+      {publishedText && (
+        <>
+          {' · '}
+          {t.published} <time datetime={published}>{publishedText}</time>
+        </>
+      )}
+      {showModified && (
+        <>
+          {', '}
+          {t.updated}{' '}
+          <time datetime={modified?.toISOString().slice(0, 10)}>{modifiedText}</time>
+        </>
+      )}
+    </p>
+  )
+}
 <PageChips />
+
+<style>
+  .page-byline {
+    margin: 0.35rem 0 0;
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-3);
+  }
+  .page-byline a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .page-byline a:hover {
+    color: var(--sl-color-text-accent);
+  }
+</style>

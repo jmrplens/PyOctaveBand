@@ -650,3 +650,32 @@ aplicados.
 - [Exposición laboral (ISO 9612)](/phonometry/es/guides/occupational-exposure/): las estrategias de medición en el puesto de trabajo que alimentan las medidas de dosis.
 - [Multicanal y rendimiento](/phonometry/es/guides/multichannel/): niveles por canal y cómo combinarlos energéticamente.
 - Referencia de la API: [`metrology.levels`](/phonometry/es/reference/api/levels/levels/), [`environmental.measurement`](/phonometry/es/reference/api/environment/measurement/) y [`environmental.rating`](/phonometry/es/reference/api/environment/rating/).
+
+## Respuestas rápidas
+
+### ¿Cuál es la diferencia entre Leq y SEL?
+
+$L_{eq}$ es el nivel continuo equivalente: la media energética de la presión
+al cuadrado durante el tiempo de medición $T$, referida a
+$p_0 = 20\ \mu\text{Pa}$. El SEL, el nivel de exposición sonora ($L_{AE}$ si
+está ponderado A), comprime la energía del evento completo en exactamente un
+segundo: $L_E = L_{eq,T} + 10\log_{10}(T/T_0)$ con $T_0 = 1\ \text{s}$, de
+modo que los eventos de cualquier duración resultan directamente comparables
+y $N$ eventos idénticos se suman como $+10\log_{10}N$.
+
+### ¿Qué exposición sonora corresponde a 90 dB en una jornada de 8 horas?
+
+Según IEC 61252:1993, la exposición sonora $E$ es la integral temporal de la
+presión ponderada A al cuadrado, expresada en pascales al cuadrado por hora,
+y $L_{EX,8h}$ (equivalente a $L_{EP,d}$) es el nivel correspondiente
+normalizado a 8 h. El ancla que conviene memorizar: 3,2 Pa²h corresponde a
+exactamente 90 dB durante 8 h. La mitad de dosis son -3 dB, y el doble de
+duración al mismo nivel son +3 dB.
+
+### ¿Qué penalizaciones aplica Lden a la tarde y a la noche?
+
+$L_{den}$, el nivel día-tarde-noche de ISO 1996-1:2016 (3.6.4), suma +5 dB
+al nivel de tarde y +10 dB al de noche antes de promediar energéticamente el
+día completo, con periodos por defecto de 12, 4 y 8 horas, ajustables porque
+cada país los define distinto. La variante día-noche $L_{dn}$ (3.6.5)
+conserva solo la penalización de +10 dB de noche.

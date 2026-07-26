@@ -320,3 +320,17 @@ queda fuera de cualquier norma y no hace ninguna afirmación física.
 - [Multicanal y rendimiento](/phonometry/es/guides/multichannel/): una sensibilidad por canal cuando los canales difieren.
 - [Incertidumbre de medida (GUM y Monte Carlo)](/phonometry/es/guides/gum-uncertainty/): propagar la tolerancia del calibrador y la cota de deriva a la incertidumbre de un nivel.
 - Referencia de la API: [`metrology.calibration`](/phonometry/es/reference/api/levels/calibration/) y [`phonometry`](/phonometry/es/reference/api/filters/phonometry/).
+
+## Respuestas rápidas
+
+### ¿Qué nivel de calibrador debo usar para calibrar mi cadena de medición?
+
+La elección habitual es 94 dB SPL a 1 kHz (1 Pa RMS), que es lo que `sensitivity()` asume con su `target_spl=94.0` por defecto; para un calibrador de 114 dB pasa `114.0`. IEC 60942 exige que el nivel principal sea al menos 90 dB re 20 µPa. Graba unos segundos de tono estable, porque la norma especifica el nivel generado como promedio de 20 s.
+
+### ¿Cuánta deriva entre las comprobaciones de calibración previa y posterior es aceptable?
+
+Deriva la sensibilidad antes de cada serie de mediciones y compruébala de nuevo al terminar: un criterio habitual invalida la serie cuando ambas difieren en más de 0,5 dB. Una cadena de clase 1 sana deriva unas centésimas de dB en una sesión, así que una diferencia antes/después de medio decibelio señala un daño y no el clima. Sea cual sea el umbral, lleva la diferencia al presupuesto de incertidumbre en lugar de suponerla cero.
+
+### ¿Puedo calibrar una cadena de clase 1 con un calibrador de clase 2?
+
+Puedes, pero las tolerancias se encadenan: una medición de clase 1 exige un calibrador de clase 1 (o LS) según IEC 60942 y un sonómetro de clase 1, así que un calibrador de clase 2 degrada en silencio todos los niveles derivados a exactitud de clase 2, porque su tolerancia de nivel más ancha entra directamente en el factor de sensibilidad $S$. Como referencia, la tolerancia de clase 1 es de ±0,4 dB entre 160 Hz y 1,25 kHz (IEC 60942, Tabla 1).

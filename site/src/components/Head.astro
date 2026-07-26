@@ -87,11 +87,46 @@ const modified =
   route?.lastUpdated instanceof Date ? route.lastUpdated.toISOString().slice(0, 10) : undefined;
 const published = firstPublished(route?.entry?.filePath ?? '') ?? modified;
 
+// The hub pages exist to enumerate their children, and schema.org has a type
+// for exactly that. Dual-typed so nothing consuming the TechArticle reading
+// loses properties it already relied on.
+const isHub = slug === 'guides' || slug === 'reference' || slug === 'reference/api';
+
 const articleType = isApiPage
   ? 'APIReference'
   : isGuide
     ? ['TechArticle', 'LearningResource']
-    : 'TechArticle';
+    : isHub
+      ? ['CollectionPage', 'TechArticle']
+      : 'TechArticle';
+
+// The guides hub already publishes its areas as a hand-authored ItemList in
+// the page frontmatter; CollectionPage.mainEntity is the hook that ties the
+// page node to that list instead of leaving two disconnected nodes.
+const hubMainEntity = slug === 'guides' ? { '@id': `${canonical}#areas` } : undefined;
+
+// Word count of the page source, with the machinery that is not prose (MDX
+// imports, component tags, fenced code) stripped first. An approximation, but
+// an honest one: it moves with the text, not with the markup around it.
+const rawBody = (route?.entry as { body?: string } | undefined)?.body ?? '';
+const proseBody = rawBody
+  .replace(/```[\s\S]*?```/g, ' ')
+  .replace(/^import\s.+$/gm, ' ')
+  .replace(/<\/?[A-Za-z][^>]*>/g, ' ');
+const wordCount = proseBody.split(/\s+/).filter(Boolean).length;
+
+// Human-readable section for articleSection, in the page's own language.
+const sectionNames: Record<string, [string, string]> = {
+  'reference/api': ['API reference', 'Referencia de la API'],
+  reference: ['Reference', 'Referencia'],
+  guides: ['Guides', 'Guías'],
+};
+const sectionKey = Object.keys(sectionNames).find(
+  (k) => slug === k || slug.startsWith(`${k}/`),
+);
+const articleSection = sectionKey
+  ? sectionNames[sectionKey][lang === 'es' ? 1 : 0]
+  : undefined;
 
 const article =
   isHome || is404
@@ -112,6 +147,9 @@ const article =
         },
         ...(published ? { datePublished: published } : {}),
         ...(modified ? { dateModified: modified } : {}),
+        ...(wordCount ? { wordCount } : {}),
+        ...(articleSection ? { articleSection } : {}),
+        ...(hubMainEntity ? { mainEntity: hubMainEntity } : {}),
         ...(isGuide ? { learningResourceType: 'Guide' } : {}),
         ...(isApiPage
           ? {
@@ -165,6 +203,29 @@ if (isBibliography) {
   bibliographyNodes = [...seen.values()];
 }
 
+// The home page is the one route with no article node, which left it as the
+// only page without a speakable target. A WebPage node carries the same
+// pointer the article pages already give voice/AI assistants; the tagline is
+// the home page's one-sentence definition of the library.
+const homePage =
+  isHome && !is404
+    ? {
+        '@type': 'WebPage',
+        '@id': `${canonical}#webpage`,
+        url: canonical,
+        name: title,
+        ...(description ? { description } : {}),
+        inLanguage: lang,
+        speakable: {
+          '@type': 'SpeakableSpecification',
+          cssSelector: ['h1', '.hero .tagline'],
+        },
+        ...(modified ? { dateModified: modified } : {}),
+        isPartOf: { '@id': WEBSITE_ID },
+        about: { '@id': SOFTWARE_ID },
+      }
+    : null;
+
 const crumbs =
   isHome || is404
     ? null
@@ -183,7 +244,7 @@ const breadcrumbList = crumbs
     }
   : null;
 
-const graph = [article, breadcrumbList, ...bibliographyNodes].filter(Boolean);
+const graph = [article, homePage, breadcrumbList, ...bibliographyNodes].filter(Boolean);
 const jsonLd = graph.length
   ? JSON.stringify({ '@context': 'https://schema.org', '@graph': graph })
   : null;

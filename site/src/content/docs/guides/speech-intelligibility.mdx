@@ -440,3 +440,28 @@ separately in the
 - [Levels](/phonometry/guides/levels/): the spectrum and band levels behind the equivalent
   spectrum-level inputs.
 - API reference: [`hearing.sii`](/phonometry/reference/api/speech/sii/).
+
+## Quick answers
+
+### Which frequency bands matter most for speech intelligibility?
+
+In the one-third-octave-band method of ANSI S3.5-1997, the band-importance function $I_i$ (Table 3, average speech material) sums to one across 18 bands from 160 Hz to 8000 Hz. The five bands from 1250 Hz to 3150 Hz carry about 43 % of intelligibility (the consonant cues), while the five lowest bands, 160 Hz to 400 Hz, carry about 11 % despite holding nearly half of the speech power.
+
+### How is the Speech Intelligibility Index calculated?
+
+The SII of ANSI S3.5-1997 clause 6 is the band-importance-weighted sum of the
+band audibilities, $\text{SII} = \sum_i I_i A_i$, over 18 one-third-octave
+bands. Each band audibility is
+$A_i = \operatorname{clip}\!\left((E_i' - D_i + 15)/30,\; 0,\; 1\right)$
+(clause 5.8), where $E_i'$ is the equivalent speech spectrum level and $D_i$
+the equivalent disturbance combining external noise, upward spread of masking
+and the equivalent internal noise. The index lies in $[0, 1]$.
+
+### When should I use the SII instead of the STI?
+
+Use the SII (ANSI S3.5) when the question is whether enough of the speech
+spectrum is audible at the listener's ear: it captures steady noise, upward
+spread of masking, hearing loss and vocal effort, but it is blind to
+reverberation. The STI (IEC 60268-16) rates a transmission channel, how much
+of the speech modulation a room or sound system preserves. When both
+mechanisms are in play, compute both.
