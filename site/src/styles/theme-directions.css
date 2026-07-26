@@ -11,16 +11,20 @@
  *   graphite    warm neutral greys, amber accent
  *
  * The palettes are constrained by the committed figures, which are NOT
- * touched by any of this:
+ * touched by any of this. Every one of them is an opaque plate, so the only
+ * thing the page ground can do is make the plate edge disappear:
  *
- *   - Light figures carry an opaque #ffffff background rectangle, so the
- *     light page background has to stay white. Every direction tints its
- *     surfaces (nav, sidebar, cards, code) instead, never the page ground,
- *     otherwise every plot would sit in a visible white box.
- *   - Dark figures have a transparent background and draw in #ffffff plus
- *     the matplotlib tab10 palette, whose darkest regular ink is
- *     #1f77b4 (relative luminance 0.1666). The dark grounds are therefore
- *     all kept at or below L* ~ 12 so that ink clears 3:1 against them.
+ *   - Light figures carry an opaque #ffffff rectangle, so the light page
+ *     ground has to stay white. Every direction tints its surfaces (nav,
+ *     sidebar, cards, code) instead, never the page ground, otherwise all
+ *     1220 figures would sit in a visible white box.
+ *   - Dark matplotlib figures (404 of 506) emit their figure patch as a
+ *     <path> with no fill at all, which SVG paints opaque BLACK. They are
+ *     not transparent, whatever the intent was.
+ *   - The remaining 102 dark figures are the hand-authored diagrams, whose
+ *     plate is #0d1117.
+ *     So the dark grounds sit between #000000 and #0d1117 in lightness,
+ *     which is the only place where both plate edges stay under ~1.1:1.
  *   - No direction uses a hue near #1f77b4 or #d62728 for its accent: the
  *     chrome must never read as part of a plot.
  *
@@ -41,24 +45,24 @@
   --sl-color-gray-3: #8c979f;
   --sl-color-gray-4: #58626a;
   --sl-color-gray-5: #363f46;
-  --sl-color-gray-6: #1f262b;
-  --sl-color-black: #12181c;
+  --sl-color-gray-6: #1a2126;
+  --sl-color-black: #0d1114;
 
   --sl-color-accent-low: #10394a;
   --sl-color-accent: #35b8d8;
   --sl-color-accent-high: #b3e6f4;
 
   --sl-color-bg: var(--sl-color-black);
-  --sl-color-bg-nav: #171e23;
-  --sl-color-bg-sidebar: #171e23;
+  --sl-color-bg-nav: #141b20;
+  --sl-color-bg-sidebar: #141b20;
   --sl-color-bg-inline-code: var(--sl-color-gray-5);
   --sl-color-hairline-light: var(--sl-color-gray-5);
-  --sl-color-hairline: #232b31;
+  --sl-color-hairline: #1e262c;
   --sl-color-hairline-shade: var(--sl-color-black);
 
   /* Landing-page and component tokens, one set per direction/theme. */
-  --ph-surface: #171e23;
-  --ph-surface-raised: #1c242a;
+  --ph-surface: #141b20;
+  --ph-surface-raised: #192228;
   --ph-border: #2c353c;
   --ph-border-strong: #3c474f;
   --ph-accent-soft: #0d323f;
@@ -116,23 +120,23 @@
   --sl-color-gray-3: #8891a8;
   --sl-color-gray-4: #555e75;
   --sl-color-gray-5: #333c52;
-  --sl-color-gray-6: #1c2333;
-  --sl-color-black: #0f1421;
+  --sl-color-gray-6: #171d2b;
+  --sl-color-black: #0b0f1a;
 
   --sl-color-accent-low: #1b2b52;
   --sl-color-accent: #78a2f0;
   --sl-color-accent-high: #cbdcfb;
 
   --sl-color-bg: var(--sl-color-black);
-  --sl-color-bg-nav: #151b2b;
-  --sl-color-bg-sidebar: #151b2b;
+  --sl-color-bg-nav: #121827;
+  --sl-color-bg-sidebar: #121827;
   --sl-color-bg-inline-code: var(--sl-color-gray-5);
   --sl-color-hairline-light: var(--sl-color-gray-5);
-  --sl-color-hairline: #212938;
+  --sl-color-hairline: #1c2334;
   --sl-color-hairline-shade: var(--sl-color-black);
 
-  --ph-surface: #151b2b;
-  --ph-surface-raised: #1a2133;
+  --ph-surface: #121827;
+  --ph-surface-raised: #171e30;
   --ph-border: #2a3348;
   --ph-border-strong: #3c4763;
   --ph-accent-soft: #17233f;
@@ -189,23 +193,23 @@
   --sl-color-gray-3: #969086;
   --sl-color-gray-4: #605b53;
   --sl-color-gray-5: #3c3833;
-  --sl-color-gray-6: #24211d;
-  --sl-color-black: #17150f;
+  --sl-color-gray-6: #201d18;
+  --sl-color-black: #100e0a;
 
   --sl-color-accent-low: #46320c;
   --sl-color-accent: #e0a33e;
   --sl-color-accent-high: #f7dcab;
 
   --sl-color-bg: var(--sl-color-black);
-  --sl-color-bg-nav: #1d1a15;
-  --sl-color-bg-sidebar: #1d1a15;
+  --sl-color-bg-nav: #191611;
+  --sl-color-bg-sidebar: #191611;
   --sl-color-bg-inline-code: var(--sl-color-gray-5);
   --sl-color-hairline-light: var(--sl-color-gray-5);
-  --sl-color-hairline: #292520;
+  --sl-color-hairline: #241f19;
   --sl-color-hairline-shade: var(--sl-color-black);
 
-  --ph-surface: #1d1a15;
-  --ph-surface-raised: #232019;
+  --ph-surface: #191611;
+  --ph-surface-raised: #1f1c16;
   --ph-border: #35302a;
   --ph-border-strong: #47413a;
   --ph-accent-soft: #3a2a0b;

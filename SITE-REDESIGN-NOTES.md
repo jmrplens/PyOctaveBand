@@ -7,7 +7,7 @@ phones and for Spanish-speaking visitors.
 
 Everything here is switchable and reversible. Nothing about the 1220 committed
 figures changes: the palettes are chosen *around* the figures, not the other
-way round.
+way round, and section 1 records what the figures turned out to actually be.
 
 ## 1. Colour directions
 
@@ -18,35 +18,54 @@ whose output is calibration numbers. Three complete directions now live in
 
 | Direction | Idea | Light accent | Dark accent | Dark ground |
 | :-- | :-- | :-- | :-- | :-- |
-| `instrument` (default) | Cool steel greys, deep cyan. The front panel of a measuring instrument: neutral metal, one saturated indicator colour. | `#0a6f8c` | `#35b8d8` (text `#b3e6f4`) | `#12181c` |
-| `blueprint` | Drafting blue-greys, prussian ink. Reads like a drawing sheet; the dark theme is a navy ground rather than a neutral one. | `#23479a` | `#78a2f0` (text `#cbdcfb`) | `#0f1421` |
-| `graphite` | Warm neutral greys, amber. Lab hardware and amber CRT: the only direction that is not blue, so the page never competes with the plots. | `#8a4b06` | `#e0a33e` (text `#f7dcab`) | `#17150f` |
+| `instrument` (default) | Cool steel greys, deep cyan. The front panel of a measuring instrument: neutral metal, one saturated indicator colour. | `#0a6f8c` | `#35b8d8` (text `#b3e6f4`) | `#0d1114` |
+| `blueprint` | Drafting blue-greys, prussian ink. Reads like a drawing sheet; the dark theme is a navy ground rather than a neutral one. | `#23479a` | `#78a2f0` (text `#cbdcfb`) | `#0b0f1a` |
+| `graphite` | Warm neutral greys, amber. Lab hardware and amber CRT: the only direction that is not blue, so the page never competes with the plots. | `#8a4b06` | `#e0a33e` (text `#f7dcab`) | `#100e0a` |
 
 ### What the figures dictate
 
 The palettes are not free choices. I measured what the committed figures
-actually contain before picking anything:
+actually contain before picking anything, and the first measurement corrected
+an assumption I had made:
 
-- **404 of the 506 dark figures are matplotlib plots with a transparent
-  background**, drawing in `#ffffff` plus the tab10 palette, whose darkest
-  regular ink is `#1f77b4`. The page ground has to stay dark enough for that
-  ink to clear 3:1. All three dark grounds do: 3.71:1, 3.81:1 and 3.79:1
-  respectively. A mid-slate dark theme would have failed here.
-- **The other 102 dark figures are the hand-authored diagrams**
-  (`scripts/generate_diagrams.py`), which carry an *opaque* `#0d1117` ground
-  and therefore sit on the page as a plate. The closer the page ground is to
-  `#0d1117`, the less the plate edge reads. Starlight's current dark ground
-  `#17181c` gives 1.10:1; the three directions give **1.06, 1.03 and 1.04**,
-  so every one of them is an improvement, `blueprint` most of all.
-- **Every light figure carries an opaque `#ffffff` ground.** That single fact
-  rules out the tinted "paper" light theme I would otherwise have picked: any
-  off-white page would frame all 1220 figures in a white box. So all three
-  directions keep the light page ground at `#ffffff` and put their tint into
-  the *surfaces* instead: nav, sidebar, cards, code blocks, the landing-page
-  panels. Measured seam: 1.00:1 in all three.
+- **Every committed figure is an opaque plate.** The light ones carry a
+  `#ffffff` rectangle, which is expected. The dark matplotlib ones (404 of
+  506) emit their figure patch as `<path d="..."/>` with *no fill attribute
+  at all*, and an SVG path with no fill is painted **black**. They are not
+  transparent, whatever the intent was when they were generated. I confirmed
+  it by sampling the rendered page: inside a dark figure the pixels are
+  `#000000`, not the page ground.
+- The remaining 102 dark figures are the hand-authored diagrams
+  (`scripts/generate_diagrams.py`), whose plate is `#0d1117`.
+- So the page ground cannot show through a figure, and the only thing it can
+  do is make the plate **edge** disappear. That fixes the dark grounds to the
+  narrow band between `#000000` and `#0d1117`:
+
+  | Direction | vs the `#000000` plate | vs the `#0d1117` plate |
+  | :-- | :-- | :-- |
+  | Starlight today (`#17181c`) | 1.22:1 | 1.10:1 |
+  | `instrument` (`#0d1114`) | **1.11:1** | **1.00:1** |
+  | `blueprint` (`#0b0f1a`) | **1.10:1** | **1.01:1** |
+  | `graphite` (`#100e0a`) | **1.09:1** | **1.02:1** |
+
+  All three roughly halve the visible edge compared with the current theme,
+  and make the diagram plate disappear outright.
+- **The light page ground has to stay `#ffffff`.** That single fact rules out
+  the tinted "paper" light theme I would otherwise have picked: any off-white
+  page would frame all 1220 figures in a white box. All three directions
+  therefore keep the light ground white and put their tint into the
+  *surfaces*: nav, sidebar, cards, code blocks, the landing panels. Measured
+  seam: 1.00:1 in all three.
 - **No direction uses a hue near `#1f77b4` or `#d62728`.** The chrome must
-  never read as part of a plot, which is exactly what Starlight's blue accent
-  does today next to a blue trace.
+  never read as part of a plot, which is exactly what Starlight's blue-violet
+  accent does today next to a blue trace.
+
+Worth a separate change on `main`, outside this branch: if the figure
+generator saved with `transparent=True` (or an explicit `facecolor`), the
+dark plates would go away entirely and the page ground would show through
+every plot, which is both better looking and would free the dark theme from
+this constraint completely. It costs a regeneration of all 1220 files, so it
+is a decision, not a tweak.
 
 ### Contrast
 
@@ -58,19 +77,19 @@ fail the run.
 
 ```
 $ node scripts/check-contrast.mjs
-87 pairs measured, 0 enforced pair(s) below threshold.
+75 pairs measured, 0 enforced pair(s) below threshold.
 ```
 
 Worst enforced pair per direction (all comfortably over AA):
 
 | Pair | instrument | blueprint | graphite |
 | :-- | :-- | :-- | :-- |
-| body text on page (dark / light) | 10.97 / 10.95 | 10.85 / 11.00 | 10.74 / 11.66 |
-| muted text on page (dark / light) | 6.00 / 6.36 | 5.83 / 6.47 | 5.76 / 7.07 |
-| link colour on page (dark / light) | 13.25 / 5.73 | 13.28 / 8.61 | 13.71 / 6.80 |
-| link colour on a card (dark / light) | 12.47 / 5.36 | 12.40 / 7.88 | 13.03 / 6.30 |
+| body text on page (dark / light) | 11.62 / 10.95 | 11.30 / 11.00 | 11.34 / 11.66 |
+| muted text on page (dark / light) | 6.36 / 6.36 | 6.07 / 6.47 | 6.09 / 7.07 |
+| link colour on page (dark / light) | 14.03 / 5.73 | 13.82 / 8.61 | 14.49 / 6.80 |
+| link colour on a card (dark / light) | 12.87 / 5.36 | 12.79 / 7.88 | 13.55 / 6.30 |
 | primary button label (dark / light) | 9.11 / 5.73 | 10.02 / 8.61 | 9.16 / 6.80 |
-| accent mark, non-text (dark / light) | 7.67 / 5.73 | 7.20 / 8.61 | 8.24 / 6.80 |
+| accent mark, non-text (dark / light) | 8.13 / 5.73 | 7.49 / 8.61 | 8.70 / 6.80 |
 
 The full table, including the informational rows, is the script's own output.
 
@@ -100,23 +119,24 @@ the switcher and the other two blocks go away.
 **`instrument`.** It is the one that behaves best next to the thing the site is
 mostly made of, which is 1220 figure files I am not going to redraw:
 
-- Its dark ground is the compromise that suits both figure families at once:
-  dark enough for the transparent plots (tab10 blue at 3.71:1) and neutral
-  enough that the 102 diagram plates with their `#0d1117` ground do not read
-  as a different material. `blueprint` is marginally better on the plate seam
-  (1.03 against 1.06) but its navy ground is a strong colour opinion that a
-  blue-heavy plot then has to compete with.
+- The three are within 0.02 of each other on both plate seams, so the figures
+  do not decide it. What decides it is what sits *around* the plate: a
+  near-neutral cool grey lets a black-grounded plot read as an inset panel
+  rather than as a hole in a coloured page. `blueprint`'s navy and
+  `graphite`'s warm brown-black are both stronger opinions than a page full
+  of plots wants.
 - Cyan is far enough from `#1f77b4` and `#d62728` that a link never looks like
   a trace, which is exactly what the current Starlight blue-violet gets wrong.
 - Its greys are close to neutral, so the pages that are mostly tables and
   numbers read as paper rather than as a themed surface.
 
-`graphite` is the one I would keep as the runner-up, and the one to pick if
-the site should look unlike every other Starlight site at a glance: amber is
-the only accent here that is not blue, so nothing on the page competes with a
-plot at all. Its cost is the 102 dark diagrams, whose cool `#0d1117` plate is
-faintly visible against a warm ground; it is subtle, and only in dark mode,
-but it is there.
+`graphite` is the runner-up, and the one to pick if the site should look
+unlike every other Starlight site at a glance: amber is the only accent here
+that is not blue, so nothing on the page competes with a plot at all, and it
+measures marginally best on the `#000000` seam. Its cost is that a warm page
+around a cold plate is a slightly odder pairing than a cool page around one,
+and that every screenshot of the site then reads as a deliberate style
+statement, which is a thing to want on purpose.
 
 `blueprint` is the weakest of the three for this site, not because it looks
 bad (it is arguably the handsomest in dark mode) but because it commits the
@@ -306,7 +326,7 @@ Run against this branch, all green:
 | HTML validation | `pnpm --dir site html-validate` | clean |
 | Accessibility | `pa11y-ci` (WCAG2AA, 46 URLs) | 46/46 passed |
 | EN/ES parity | `node site/scripts/check-i18n-parity.mjs` | 100 EN pages each have an ES translation |
-| Contrast | `node site/scripts/check-contrast.mjs` | 87 pairs, 0 enforced pair below threshold |
+| Contrast | `node site/scripts/check-contrast.mjs` | 75 pairs, 0 enforced pair below threshold |
 | Language handling | `node site/scripts/check-lang-suggest.mjs` | 11 scenarios, 0 failing |
 
 The pa11y run used a copy of `.pa11yci.json` on port 4323, because 4321 was

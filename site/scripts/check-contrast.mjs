@@ -2,13 +2,12 @@
 //
 // Parses src/styles/theme-directions.css, resolves the six palettes
 // (3 directions x light/dark) and reports the WCAG 2.1 contrast ratio of
-// every pair the site actually renders, plus the matplotlib ink used by the
-// committed dark figures (transparent background, so it lands straight on
-// the page ground).
+// every pair the site actually renders, plus the seam between the page
+// ground and the opaque plate every committed figure carries.
 //
 // Pairs are either enforced (text 4.5:1, meaningful non-text 3:1, per WCAG
-// 1.4.3 / 1.4.11) or informational (purely decorative hairlines and the
-// figures' own gridlines, which carry no information on their own). Only
+// 1.4.3 / 1.4.11) or informational (purely decorative hairlines, and the
+// figure plate seams, where the goal is 1.00 rather than a floor). Only
 // enforced pairs can fail the run.
 //
 // Run: node scripts/check-contrast.mjs [--json]
@@ -81,14 +80,15 @@ const ratio = (a, b) => {
 	return (l1 + 0.05) / (l2 + 0.05);
 };
 
-// matplotlib tab10 ink used by the committed dark figures, which are
-// transparent and therefore composited straight onto the page ground.
-const FIGURE_INK = [
-	['figure white ink (axes, labels)', '#ffffff', 3],
-	['figure tab10 blue #1f77b4', '#1f77b4', 3],
-	['figure tab10 red #d62728', '#d62728', 3],
-	['figure tab10 green #2ca02c', '#2ca02c', 3],
-	['figure gridline #555555 (decorative)', '#555555', 0],
+// Every committed figure is an opaque plate, so the page ground never shows
+// through one: what it has to do is keep the plate EDGE from reading. The two
+// dark plate colours are #000000 (404 matplotlib figures, whose figure patch
+// is a <path> with no fill, which SVG paints black) and #0d1117 (the 102
+// hand-authored diagrams). Both seams are informational: an invisible edge is
+// the goal, and a contrast threshold cannot express that.
+const DARK_PLATES = [
+	['matplotlib plate #000000 seam (want 1.00)', '#000000'],
+	['diagram plate #0d1117 seam (want 1.00)', '#0d1117'],
 ];
 
 const rows = [];
@@ -143,12 +143,7 @@ for (const [name, p] of Object.entries(PALETTES)) {
 		});
 		if (seam > 1.02) failures++;
 	} else {
-		for (const [label, ink, min] of FIGURE_INK) check(name, label, ink, bg, min);
-		// 102 of the 506 dark figures are hand-authored diagrams that carry an
-		// opaque #0d1117 ground instead of a transparent one, so they show as a
-		// plate on the page. The closer this ratio is to 1.00 the less the
-		// plate edge reads; it is informational, never a failure.
-		check(name, 'dark diagram plate #0d1117 seam (want 1.00)', '#0d1117', bg, 0);
+		for (const [label, plate] of DARK_PLATES) check(name, label, plate, bg, 0);
 	}
 }
 

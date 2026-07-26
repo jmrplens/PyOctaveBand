@@ -43,11 +43,12 @@ const SHOTS = [
 	['13-guide-blueprint-light', '/guides/filter-banks/', DESKTOP, 'blueprint', 'light', 900],
 	['14-guide-graphite-dark', '/guides/filter-banks/', DESKTOP, 'graphite', 'dark', 900],
 	['15-guide-graphite-light', '/guides/filter-banks/', DESKTOP, 'graphite', 'light', 900],
-	// A matplotlib plot rather than a hand-drawn diagram.
-	['16-plot-instrument-dark', '/guides/weighting/', DESKTOP, 'instrument', 'dark', 1500],
-	['17-plot-blueprint-dark', '/guides/weighting/', DESKTOP, 'blueprint', 'dark', 1500],
-	['18-plot-graphite-dark', '/guides/weighting/', DESKTOP, 'graphite', 'dark', 1500],
-	['19-plot-instrument-light', '/guides/weighting/', DESKTOP, 'instrument', 'light', 1500],
+	// A transparent matplotlib plot rather than a hand-drawn diagram: this is
+	// the case where the page ground shows through the figure.
+	['16-plot-instrument-dark', '/getting-started/', DESKTOP, 'instrument', 'dark', 1750],
+	['17-plot-blueprint-dark', '/getting-started/', DESKTOP, 'blueprint', 'dark', 1750],
+	['18-plot-graphite-dark', '/getting-started/', DESKTOP, 'graphite', 'dark', 1750],
+	['19-plot-instrument-light', '/getting-started/', DESKTOP, 'instrument', 'light', 1750],
 	// Front page, both locales, both themes, full page.
 	['20-home-instrument-dark', '/', DESKTOP, 'instrument', 'dark', 0, true],
 	['21-home-instrument-light', '/', DESKTOP, 'instrument', 'light', 0, true],
