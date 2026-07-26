@@ -44,8 +44,12 @@ export function loadPuppeteer() {
 	} catch {
 		/* no virtual store: report it below rather than throwing ENOENT here */
 	}
-	// Newest first, so a tree that still carries an old copy uses the current one.
-	const packages = entries.filter((d) => /^puppeteer@/.test(d)).sort();
+	// Newest last, by version rather than by string, so a tree that still
+	// carries an old copy uses the current one (a plain sort would put
+	// puppeteer@9 after puppeteer@24).
+	const packages = entries
+		.filter((d) => /^puppeteer@/.test(d))
+		.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 	const pkg = packages[packages.length - 1];
 	if (pkg) {
 		try {

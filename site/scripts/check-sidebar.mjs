@@ -176,8 +176,10 @@ const readTree = () => {
 		}
 		return out;
 	};
+	const top = sidebarEl.querySelector('ul.top-level');
+	if (!top) return { error: 'no ul.top-level inside #starlight__sidebar' };
 	return {
-		tree: walk(sidebarEl.querySelector('ul.top-level')),
+		tree: walk(top),
 		// Nothing here is a custom widget: every disclosure is a summary inside
 		// a details, which makes the keyboard and screen reader behaviour the
 		// user agent's problem rather than ours.
@@ -334,6 +336,14 @@ for (const phone of [true, false]) {
 	const folded = foldedGroups(expectedTree('en', `${BASE_PATH}${DEEP_GUIDE}`));
 	const target = folded[0]?.label;
 	const elsewhere = linkHrefs(folded[1]?.items ?? [])[0];
+	// Both come out of the configured tree, so a restructuring that leaves this
+	// page with fewer than two folded siblings has to say so here rather than
+	// navigating to ".../undefined" and failing with something unreadable.
+	const havePair = expect(
+		`${DEEP_GUIDE} has two folded sibling groups to exercise`,
+		{ keyboardGroup: typeof target === 'string', pageElsewhere: typeof elsewhere === 'string' },
+		{ keyboardGroup: true, pageElsewhere: true },
+	);
 
 	// A folded entry sits inside a closed `<details>`, which the browser's own
 	// text finder still matches. The previous hand-built disclosure had to be
@@ -360,35 +370,37 @@ for (const phone of [true, false]) {
 	});
 	expect(`find-in-page still reaches a folded entry ("${found.term ?? found.error}")`, found.found, true);
 
-	// Keyboard: a summary is focusable and Enter operates it.
-	const opened = await page.evaluate((label) => {
-		const summary = [...document.querySelectorAll('#starlight__sidebar summary')].find((s) =>
-			s.textContent.includes(label),
+	if (havePair) {
+		// Keyboard: a summary is focusable and Enter operates it.
+		const opened = await page.evaluate((label) => {
+			const summary = [...document.querySelectorAll('#starlight__sidebar summary')].find((s) =>
+				s.textContent.includes(label),
+			);
+			if (!summary) return false;
+			summary.focus();
+			return document.activeElement === summary;
+		}, target);
+		expect(`a closed group label ("${target}") takes focus`, opened, true);
+		await page.keyboard.press('Enter');
+		await new Promise((r) => setTimeout(r, 200));
+		const afterEnter = await page.evaluate(readTree);
+		expect(
+			'Enter on a focused group label opens it',
+			openLabels(afterEnter.tree).includes(target),
+			true,
 		);
-		if (!summary) return false;
-		summary.focus();
-		return document.activeElement === summary;
-	}, target);
-	expect(`a closed group label ("${target}") takes focus`, opened, true);
-	await page.keyboard.press('Enter');
-	await new Promise((r) => setTimeout(r, 200));
-	const afterEnter = await page.evaluate(readTree);
-	expect(
-		'Enter on a focused group label opens it',
-		openLabels(afterEnter.tree).includes(target),
-		true,
-	);
 
-	// The open state is remembered for the session on desktop, by Starlight's
-	// own SidebarPersister, so the group the reader opened is still open on the
-	// next page.
-	await page.goto(`${BASE}${elsewhere}`, { waitUntil: 'networkidle0', timeout: 90000 });
-	const nextGuide = await page.evaluate(readTree);
-	expect(
-		'and it is still open after a navigation',
-		openLabels(nextGuide.tree).includes(target),
-		true,
-	);
+		// The open state is remembered for the session on desktop, by Starlight's
+		// own SidebarPersister, so the group the reader opened is still open on
+		// the next page.
+		await page.goto(`${BASE}${elsewhere}`, { waitUntil: 'networkidle0', timeout: 90000 });
+		const nextGuide = await page.evaluate(readTree);
+		expect(
+			'and it is still open after a navigation',
+			openLabels(nextGuide.tree).includes(target),
+			true,
+		);
+	}
 	await page.close();
 	await context.close();
 }

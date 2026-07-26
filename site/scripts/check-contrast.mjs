@@ -66,8 +66,9 @@ for (const [name, p] of Object.entries(PALETTES)) {
 // beats Starlight's own light-theme default. That is how the plain
 // `--sl-color-hairline` once painted a near-black rule on a white page. The
 // converse is allowed: the light theme may add tokens of its own.
+const resolvedLight = resolve({ ...light });
 const inheritedFromDark = Object.keys(resolve({ ...dark })).filter(
-	(token) => !(token in resolve({ ...light })),
+	(token) => !(token in resolvedLight),
 );
 
 const srgb = (hex) => {
