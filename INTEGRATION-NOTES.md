@@ -25,7 +25,8 @@ From `feat/toc-sidebar-info`:
 - The `primary: true` frontmatter flag that decides which sources survive the
   caps of five standards and three named works.
 - The API sidebar treatment, then still switchable from a small floating
-  panel. It is decided now and the panel is gone; see "The API sidebar"
+  panel. It is decided now, the panel is gone, and so is the sidebar override
+  the whole question was asked inside; see "The sidebar is Starlight's now"
   below.
 
 From `feat/site-redesign`:
@@ -251,139 +252,201 @@ places and keep the select only in the mobile menu, where Auto lives; that
 would cost the desktop reader the visible Auto option, which is why I did not
 do it unasked.
 
-## The API sidebar: one behaviour, and it is progressive disclosure
+## The sidebar is Starlight's now
 
-Decided: the API reference sits collapsed in the sidebar, and clicking it
-opens the tree. `split` and `inline` are deleted, with the `data-api-style`
-and `data-area` dimensions, the floating switcher and both of its inline
-scripts in `Head.astro`, the `.toc-switcher` rules, and the "Guides" back
-link in `Sidebar.astro` that only `split` ever displayed. The last commit
-that still carries all three treatments and the switcher is `8eb915a7`; that
-is where to look if any of it is ever wanted again.
+Decided, after the four-way comparison in `STOCK-SIDEBAR-STUDY.md` on
+`study/stock-sidebar`: the sidebar is stock Starlight. Both component
+overrides are deleted and the tree is configured natively in
+`astro.config.mjs`, with every group carrying `collapsed: true`.
 
-### What the prototype did, and what ships instead
+The study recommended the hybrid, stock plus 99 lines that keep a group label
+a link. I took pure stock instead. The hybrid buys one thing, a landing page
+inside a folded group being one click away instead of two, and it buys it by
+keeping a rewritten copy of a file upstream owns, which is the cost that
+started the whole question. Two clicks for a page I am not currently reading
+is a price I am happy to pay to own none of the sidebar. The study measured
+the trade honestly and I am taking the side it did not recommend, knowingly.
 
-The prototype was one fold of one group, bolted on from a script. What ships
-is a disclosure per level, rendered by the tree itself. The differences are
-not cosmetic:
+### What stock gives, that I do not have to write
 
-| | prototype | now |
+- **The folding itself.** `<details open={holdsCurrent || !collapsed}>`, one
+  line of upstream, server-rendered from the current route. The reader lands
+  with their own branch open and everything else closed, with no flash and no
+  client correction. That was the property I was proud of at `198febbb` and it
+  is now a config key.
+- **The keyboard and the ARIA.** `<summary>` is focusable and answers Enter
+  and Space because the user agent says so. There is no `aria-expanded` to
+  maintain, no `aria-controls` to leave dangling, and no accessible name of
+  mine to forget to translate.
+- **Find in page.** A closed `<details>` is still matched by the browser's own
+  find, which reveals the row it landed on. I only got that on the hand-built
+  disclosure at `5dba000e`, by switching to `hidden="until-found"`; here
+  nobody has to remember it.
+- **Session memory.** `SidebarRestorePoint` and `SidebarPersister` store which
+  groups the reader opened, and the scroll position, in `sessionStorage` under
+  `sl-sidebar-state`. My tree never had this, and could not have grown it by
+  standing still: upstream added the mechanism between 0.38 and 0.41 and my
+  rewrite simply did not call it.
+
+### What stock cannot do, and what I did about it
+
+A group has `label`, `translations`, `badge`, `collapsed` and `items`. It has
+no `slug` and no `link`, and `schemas/sidebar.ts` declares `attrs: z.never()`
+on groups on purpose. **A group label is plain text inside a `<summary>` and
+no configuration makes it a link.** So the Overview-first convention becomes
+an explicit `Overview` row, first in the group, which is the upstream idiom.
+
+Every section landing page keeps its URL and its content; what changes is that
+it is now a row of its own rather than the group label. Twenty-five groups
+carry one: the 22 guide sections, Theory, Reference and the API reference. In
+Spanish the row is `Resumen`, which is the word the Spanish build already uses
+for a section overview.
+
+**`Start` is the one group without an Overview row, and that is a decision,
+not an omission.** It is two rows long, and the first of them, Getting
+started, is already the section's front door. A page there could only say
+"this section tells you how to install phonometry and why it exists", which is
+the two rows below it restated. There is no such page and there should not be
+one.
+
+**`Reference` got a real page**, `site/src/content/docs/reference/index.md`
+and its Spanish twin, because the opposite argument applies. Once the API tree
+moves out to its own top-level group, Reference holds three unlike things: the
+theory pages, the conformance report and the bibliography. A reader who wants
+to know which clause a result implements, or where the evidence that it is
+correct lives, or what the source of a model is, had no page that told them
+which of the three answers which question. The page is written to that: what
+the section is for (defending a result rather than producing one), what each
+of the three does, and the note that a function signature is in the API
+reference next door. It is not a table of contents with sentences around it.
+
+### The API reference
+
+It is its own top-level group now, last in the tree, after all eleven guide
+domains and Reference. It behaves exactly like a guide group, which is the
+point: collapsed on arrival, one click to its twenty category groups, a second
+click to a category's pages, and on an API page the chain down to the current
+page is open with its siblings closed.
+
+`scripts/generate_api_docs.py` emits it in stock shape. The
+`data-group-link` marker is gone, `reference/api` is an `Overview` entry, and
+the group and its twenty sections carry `collapsed: true`. It regenerates
+byte-identically, which the api-docs CI gate requires, and
+`tests/test_api_docs_generator.py` now asserts the stock shape rather than the
+marker.
+
+The plain separation idea stops there. `starlight-sidebar-topics` is the only
+thing that would put an API page's own entry on screen without scrolling
+(384 px into the pane instead of 978 px down it), and it is not installed:
+that is a separate decision about splitting the site in two, and the reader
+loses sight of the API from every guide page when it is taken. Adopting it
+later is easy on top of stock, and easier than it was before: the plugin
+overrides `Sidebar` itself and silently wins or loses against any override of
+ours, and there is no override of ours left for it to collide with.
+
+### Expanded on desktop, folded on mobile: superseded
+
+An earlier study recommended that split and I approved it. Choosing stock
+overrides it. `collapsed` is a server-rendered boolean; the `open` attribute
+it produces is in the HTML before any media query has been evaluated, so a
+breakpoint-aware version means a script that reopens the tree above 50rem,
+which is a client-side correction on first paint and exactly the class of
+thing this change deletes. I have seen the desktop screenshots and I prefer
+the folded tree there too: 12 of 12 domains in view instead of 3, and my own
+page on screen instead of 864 px below the fold.
+
+No breakpoint script ships, and nothing from the guides-folding prototype is
+on this branch. If I ever want the desktop tree expanded again it is
+`collapsed: false` on the groups concerned, one word per group, and no code.
+
+### What was deleted, in lines
+
+| | before (`5dba000e`) | now |
 | --- | --- | --- |
-| How many things fold | the API group only; every category under it was always fully expanded, so one click dumped 150 rows | every group from the API reference down, so the reader drills in one level at a time |
-| Where the state comes from | a `DOMContentLoaded` script that read `sessionStorage` and then folded what the server had already painted open | the server, from the current route: `holdsCurrent()` opens exactly the chain down to the current page |
-| On an API page | the whole API tree unfolded at once | the chain down to the page is open, its siblings are closed, the page is marked as Starlight marks it |
-| Memory | one `apiFolded` flag for the whole site, applied on guide pages too, so a fold made on one page silently governed another | none, deliberately; see below |
-| Control | a caret with `aria-expanded`, `aria-controls` assigned by script after load | a button per group with both attributes server-rendered, the whole label row being the control where the group has no landing page |
-| First paint | the group painted open and folded shut a moment later | the tree paints in its final state; there is nothing for the browser to correct |
+| `site/src/components/Sidebar.astro` | 44 | **0** |
+| `site/src/components/SidebarSublist.astro` | 382 | **0** |
+| `site/src/styles/sidebar.css` | 68 | 57 |
+| Sidebar behaviour check | 201 | 202 |
+| **Total** | **695** | **259** |
 
-The one thing the prototype did that survives unchanged is the caret next to
-the API reference label: that group has a landing page, the overview-first
-convention says the label is a link to it, and a link cannot also be a
-disclosure. So the API row has two targets, and both of them end up showing
-the tree: the caret opens it in place, the label navigates to the API
-overview, which is an API page, which arrives with the tree open. The
-category groups below have no landing page, so there the whole row is the
-button and the thing the reader clicks is the label itself.
+**436 lines removed**, along with 21 hand-built `<button>` disclosures, the
+`aria-expanded` / `aria-controls` / `aria-label` triple on each of them, the
+server-rendered open state, the `hidden="until-found"` fix from `5dba000e`,
+the caret markup and its CSS, and the sidebar's only client-side script. What
+is left of the sidebar that is mine: 57 lines of CSS, all of it depth cues
+(uppercase eyebrow headers, smaller nested labels, compact deep links) and
+none of it behaviour.
 
-### Whether an opened state survives navigation: no, and why
+`site/astro.config.mjs` grows from 586 lines to 624: `collapsed: true` on 26
+groups, 24 `Overview` rows written out, the API group moved to the end of the
+tree, and the comment that says why a group label is not a link.
 
-The open state is a function of the route and nothing else. No
-`sessionStorage`, no cookie, nothing carried across a page load.
+`check-api-sidebar.mjs` was written entirely against markup that no longer
+exists: it asserted `.api-group`, `.group-label-row`, `.api-caret`,
+`#sidebar-api-items` and `[data-api-toggle]`. Deleting it outright was
+tempting, but the behaviour it guarded is still worth a gate, so it becomes
+`check-sidebar.mjs` at the same size and asserts what a reader gets instead:
+46 native `<details>`, twelve top-level groups, **zero** hand-built toggles,
+only the branch holding the current page open on arrival, 25 Overview rows,
+the Overview row marked on a landing page, the API group shut on a guide page
+and open down to the page on an API page in both languages, Enter on a focused
+group label, the open state surviving a navigation, and the browser's own find
+reaching a folded entry.
 
-The case for persisting is the reader who opens the API on a guide page and
-wants it still open on the next guide page. The case against is that the
-state worth restoring, the path to where the reader is, is already
-reconstructed on every render, and the rest is guesswork about intent:
+### Verified in a browser
 
-- Within the API, persistence buys almost nothing. Arriving on any API page
-  already opens the chain down to it. A remembered branch could only add
-  groups the reader is not in.
-- Outside the API, a remembered open state is the prototype's actual bug in
-  a new coat: a fold made on one page governing a different page, with no
-  visible cause and no way to reason about it.
-- Persistence costs either a flash (restore after paint, which is what the
-  prototype did) or a blocking inline script that runs before the sidebar
-  markup exists. The first is the layout shift this design set out to remove
-  and the second is a script in the critical path for a convenience.
+Beyond the check script, driven at 1440x900 and 390x844 in both languages:
 
-If it is ever wanted, the scope is fixed by the same argument: an API-only
-key, written only while the reader is on an API page, read only into the API
-subtree, never allowed to close the chain the route asked for.
+| | result |
+| --- | --- |
+| Groups arrive collapsed | 12 top-level groups, 1 open: the one holding the current page |
+| The current page is marked | `Loudness` / `Sonoridad`, on screen without scrolling |
+| Clicking a group opens it | yes, desktop and phone drawer, both languages |
+| Session memory, desktop | opened `Wave simulation` on `/guides/loudness/`, still open after two navigations; a fresh context does not restore it |
+| Session memory, phone | not restored, by upstream's own design: the persister returns early below 50rem |
+| Find in page, folded group | `window.find` matches and the row is revealed (measured: row height goes from 0 to non-zero), EN and ES, guides tree and API tree |
+| Overview rows | `Underwater acoustics` to `/guides/sections/underwater/`, `Reference` to `/reference/`, `API reference` to `/reference/api/`, and the Spanish `Resumen` rows to the `/es/` twins |
+| Phone drawer | 957 px of tree in English, 940 px in Spanish, against 3277 px before, with the reader's branch already open |
 
-### Accessibility
-
-Each control is a real `<button type="button">` with `aria-expanded` and
-`aria-controls` naming the `<ul>` it governs, so it is in the tab order, it
-answers Enter and Space by being a button rather than by a key handler, and
-its state is announced. The control with no visible text of its own (the
-caret beside the API reference link) carries an `aria-label`, in Spanish on
-the Spanish build. A collapsed list keeps its `<li>`s and `<a>`s in the
-document under a `hidden` attribute, so the links are there for crawlers and
-for the browser's own find-in-page, and the reader reaches them with one
-activation rather than never. Opening moves nothing outside the sidebar,
-which is its own scroll container; the check below asserts that against the
-main frame's box rather than trusting it.
-
-The guides side of the tree is untouched. It carries no disclosure at all:
-those groups are non-collapsible by the overview-first convention, which is
-the whole reason this override exists.
-
-### The upstream delta
-
-`Sidebar.astro` is down to 44 lines against upstream's 15, and what is left
-is the two import paths, the local `SidebarSublist`, and the six-line click
-handler. Dropping `split` took the back link, its label translation and its
-base-URL arithmetic out, which is the shrink the decision was expected to
-produce.
-
-`SidebarSublist.astro` moved the other way, from 286 lines to 384, because
-the behaviour that used to live in a prototype script now lives in the
-component that renders the tree. That is the trade I want: upstream's own
-collapsible groups are `<details open>` plus `SidebarPersister`, so a
-disclosure in this file is a variation on upstream behaviour rather than a
-foreign mechanism, and the site as a whole carries 327 lines less than it
-did.
-
-Choosing `collapsed` over `split` also settles the plugin question the chip
-branch raised: `starlight-sidebar-topics` was the better way to do a topic
-split, and there is no topic split. The site keeps that dependency off, and
-keeps `Sidebar.astro` free for the overview-first convention that would have
-collided with the plugin's own override.
+The page chips are unaffected, which the study predicted and the gate
+confirms: they live in `PageTitle.astro` and `ux-variants.css`, the sidebar
+never carried standards information, and nothing deleted here was load-bearing
+for them.
 
 ## Gates
 
-All run from this worktree against the integrated branch.
+All run from this worktree, against `astro preview` on port 4327, because
+4321 and 4322 belong to other servers. Every puppeteer check takes an
+explicit `--base`; their built-in default is another branch's dev server on
+this machine, which reported on the wrong build once. `pa11y-ci` was given a
+copy of `.pa11yci.json` rewritten to 4327, because the npm script's own
+default port is 4321.
 
 | Gate | Result |
 | --- | --- |
-| `pnpm --dir site build` (with the Starlight link validator) | pass: 441 pages, all internal links valid |
-| `pnpm --dir site html-validate` | pass: no findings on 445 files |
-| pa11y-ci, WCAG2AA | pass: 46 of 46 URLs, 0 errors |
-| `node site/scripts/check-i18n-parity.mjs` | pass: 100 EN pages each have an ES translation |
+| `pnpm --dir site build` (with the Starlight link validator) | pass: 443 pages, all internal links valid |
+| `pnpm --dir site html-validate` | pass: no findings |
+| pa11y-ci, WCAG2AA | pass: 48 of 48 URLs, 0 errors |
+| `node site/scripts/check-sidebar.mjs` | pass: 21 checks, 0 failing |
+| `node site/scripts/check-i18n-parity.mjs` | pass: 101 EN pages each have an ES translation |
 | `node site/scripts/check-contrast.mjs` | pass: 43 pairs, 0 below threshold |
 | `node site/scripts/check-lang-suggest.mjs` | pass: 10 scenarios, 0 failing |
 | `node site/scripts/check-home-headings.mjs` | pass: 40 layout cases, 0 failing |
 | `node site/scripts/check-page-chips.mjs` | pass: 7 cap checks and 8 landing checks, 0 failing |
-| `node site/scripts/check-api-sidebar.mjs` | pass: 30 checks, 0 failing |
+| `ruff check .` | pass |
+| `mypy src scripts` | pass: 231 source files |
+| `pytest tests/test_api_docs_generator.py` | pass: 20 tests |
 
-pa11y was run against `astro preview` on port 4390, with a copy of
-`.pa11yci.json` rewritten to that port, because the branch's dev server holds
-4321 and another branch holds 4322. The npm script's own default port is
-4321, so it cannot be used while the dev server is up. The whole table above
-was run against that same built preview rather than against the dev server,
-so the numbers are the built site's.
+443 pages and 101 EN pages, not 441 and 100, because the Reference overview
+exists now in both languages. 48 URLs, not 46, because both of them joined the
+accessibility run.
 
-The puppeteer checks default to `--base http://localhost:4322`, which is
-another branch's dev server on this machine. Pass `--base` explicitly or they
-will report on the wrong build, which they did to me once.
-
-`check-api-sidebar.mjs` drives the disclosures rather than reading the
-markup: it clicks the control, clicks a branch inside it, presses Enter and
-Space on the focused control, navigates to an API page and back to a guide,
-and asserts what the reader would see at each step, in both locales. It is
-also where the two decisions above are pinned down: that a second guide page
-starts closed again (no memory), and that the guides tree carries no
-disclosure at all.
+`check-sidebar.mjs` replaces `check-api-sidebar.mjs`. The old one drove a
+widget of ours and asserted its markup; there is no widget any more, so the
+new one asserts the guarantees a reader depends on, and each check is either
+server-rendered state or the result of a real click, key press or navigation.
+It is deliberately not smaller: what is worth gating did not shrink when the
+code did.
 
 One dev-server note, for whoever repeats this: the managed `astro dev` process
 did not pick up frontmatter edits (a changed title did not appear either), so
@@ -410,15 +473,26 @@ drives its own headless Chrome out of the pnpm store the way
 | `16` | The front page at 390 px. |
 | `17` | A page past the raised cap at 390 px, where the run wraps to five rows and ends on the more chip. |
 | `20`, `21` | The language bar on desktop and on a phone, after the stacking fix. |
-| `30`, `31` | Arriving on a guide page, both themes: the API group closed, its caret pointing at the rows it is holding back, everything around it unchanged. |
-| `32`, `33` | After one click: the twenty category groups, each closed. This is the shot that says the tree does not unfold all at once. |
+| `30`, `31` | Arriving on a guide page, both themes: the API group closed as the last row of the tree. |
+| `32`, `33` | After one click on it: the twenty category groups, each closed. This is the shot that says the tree does not unfold all at once. |
 | `34`, `35` | After a second click, on Psychoacoustics: its thirteen pages, and only its pages. |
 | `36`, `37` | An API page with no click at all: the chain down to `sharpness` open, the page marked, the sibling categories closed. |
+| `38`, `39` | The whole tree as it arrives on `/guides/loudness/`, light and dark: twelve groups, one of them open, the current page marked and on screen. |
+| `40`, `41` | The same in Spanish, where the Overview rows read `Resumen`. |
+| `42`, `43` | A section landing page, EN and ES: the Overview row is the marked entry. This is where the Overview-first convention is now visible. |
+| `44`, `45` | Reference opened from a guide page: its own Overview row above Theory, Conformance report and Bibliography, with the API reference below it as the last group. |
+| `46` | The Reference overview page itself, arriving with its row marked. |
+| `47`, `48`, `49` | The phone drawer at 390 px, English light and dark and Spanish dark: the whole map in one screen with the reader's branch already open. |
 
-Shots `30` to `37` are cropped to the sidebar pane, which is the whole
-subject; `08` and `09` are the same tree in the context of a full page.
+Shots `30` to `46` are cropped to the sidebar pane, which is the whole
+subject; `47` to `49` are the full viewport, because there the drawer covers
+the page; `08` and `09` are the same tree in the context of a full page.
 
 Nothing in `integration-shots/` shows a treatment that does not ship any
-more, and the `api-inline-*`, `api-split-*`, `api-collapsed-*` and switcher
-captures in `ux-variants2/` are deleted. They are in the history at
-`8eb915a7` with the code they documented.
+more. The eight API shots were recaptured against the stock tree, and the
+`api-inline-*`, `api-split-*`, `api-collapsed-*` and switcher captures in
+`ux-variants2/` are deleted. They are in the history at `8eb915a7` with the
+code they documented.
+
+The four-way comparison that led here, with its own forty screenshots and its
+raw measurements, is on `study/stock-sidebar` in `STOCK-SIDEBAR-STUDY.md`.
