@@ -6,7 +6,7 @@
 // English-only API subtree. The bar offers and never navigates, so every
 // scenario also asserts that the URL is the one that was asked for.
 //
-// Usage: node scripts/check-lang-suggest.mjs [--base http://localhost:4322]
+// Usage: node scripts/check-lang-suggest.mjs [--base http://localhost:4321]
 import { readdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
@@ -19,7 +19,7 @@ const pkg = readdirSync(store).find((d) => /^puppeteer@/.test(d));
 const puppeteer = require(join(store, pkg, 'node_modules', 'puppeteer'));
 
 const baseIdx = process.argv.indexOf('--base');
-const BASE = baseIdx === -1 ? 'http://localhost:4322' : process.argv[baseIdx + 1];
+const BASE = baseIdx === -1 ? 'http://localhost:4321' : process.argv[baseIdx + 1];
 
 const browser = await puppeteer.launch({
 	headless: true,

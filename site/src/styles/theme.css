@@ -67,7 +67,7 @@
   --ph-mark: #35b8d8;
   --ph-grid: rgba(53, 184, 216, 0.14);
 
-  /* Page-chip categories (rendered in src/styles/ux-variants.css). The
+  /* Page-chip categories (rendered in src/styles/page-chips.css). The
      governing standards take the palette accent itself: they are what the
      page is about, the chips are links, and the accent is the one colour
      this palette lets mean something. The named works take its warm

@@ -269,7 +269,7 @@ export default defineConfig({
         './src/styles/splash-menu.css',
         './src/styles/home.css',
         './src/styles/sidebar.css',
-        './src/styles/ux-variants.css',
+        './src/styles/page-chips.css',
       ],
       social: [
         { icon: 'github', label: 'GitHub', href: 'https://github.com/jmrplens/phonometry' },

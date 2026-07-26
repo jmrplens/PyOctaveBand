@@ -22,7 +22,7 @@
 // pa11y-ci depends on it) against a running dev server or preview.
 //
 // Usage:
-//   node scripts/check-home-headings.mjs [--base http://localhost:4322]
+//   node scripts/check-home-headings.mjs [--base http://localhost:4321]
 //                                        [--shots <dir>] [filter...]
 //
 // A filter is matched against "<locale> <case>", so `--shots dir 390 1440`
@@ -46,7 +46,7 @@ const arg = (name, fallback) => {
 	const i = argv.indexOf(name);
 	return i === -1 ? fallback : argv[i + 1];
 };
-const BASE = arg('--base', 'http://localhost:4322');
+const BASE = arg('--base', 'http://localhost:4321');
 const SHOTS = arg('--shots', null);
 const values = new Set([BASE, SHOTS].filter(Boolean));
 const FILTERS = argv.filter((a) => !a.startsWith('--') && !values.has(a));
