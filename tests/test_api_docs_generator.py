@@ -232,7 +232,11 @@ def test_xref_anchors_point_to_emitted_headings(
 def test_sidebar_fragment_lists_every_page(generated: pathlib.Path) -> None:
     sidebar = (generated / "api-sidebar.mjs").read_text(encoding="utf-8")
     pages, _, _ = gad.build_model()
-    assert "{ slug: 'reference/api', attrs: { 'data-group-link': true } }" in sidebar
+    assert (
+        "{ slug: 'reference/api', label: 'Overview', translations: { es: 'Resumen' } }"
+        in sidebar
+    )
+    assert sidebar.count("collapsed: true") == len(gad.SECTIONS) + 1
     for page in pages:
         assert f"'reference/api/{page.section.key}/{page.slug}'" in sidebar
 

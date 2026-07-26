@@ -17,6 +17,8 @@
     "http://localhost:4321/phonometry/guides/filter-banks/",
     "http://localhost:4321/phonometry/guides/levels/",
     "http://localhost:4321/phonometry/guides/calibration/",
+    "http://localhost:4321/phonometry/reference/",
+    "http://localhost:4321/phonometry/es/reference/",
     "http://localhost:4321/phonometry/reference/api/",
     "http://localhost:4321/phonometry/reference/theory/",
     "http://localhost:4321/phonometry/reference/theory/signal-analysis/",

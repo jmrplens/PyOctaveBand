@@ -1,0 +1,54 @@
+/* Landing-page layout.
+   The splash page hides the sidebar on desktop (splash-menu.css), so the
+   reading column can be wider than the 45rem the guides use: the landing has
+   a four-column readout, a two-column table and a three-column start path,
+   none of which work at guide width. Scoped to [data-has-hero] so no other
+   page is affected. */
+:root[data-has-hero] {
+  --sl-content-width: 62rem;
+}
+
+/* Starlight reserves the sidebar gutter on every page that reports a sidebar,
+   and the route middleware reports one on splash pages so the mobile menu
+   button exists. With the sidebar pane hidden on desktop that gutter is dead
+   space, and at 62rem it pushed the whole landing off-centre. */
+@media (min-width: 50rem) {
+  :root[data-has-hero] {
+    --sl-content-inline-start: 0rem;
+  }
+
+  /* The hero grid is 7fr 4fr even when there is no hero image, which caps the
+     copy at 62 % of a column that is now wide. There is no image here. */
+  [data-has-hero] .hero {
+    grid-template-columns: 100%;
+  }
+}
+
+/* Starlight's prose flow gives every following sibling inside
+   .sl-markdown-content a 1rem top margin. The landing page is a layout, not
+   prose, and sets its own spacing: without this the four readout cells drift
+   apart and the grid's hairline shows through. Zero specificity, so every
+   rule in Home.astro still wins, and unlayered, so it beats the layered
+   Starlight default it is switching off. */
+:where(.sl-markdown-content .home *) {
+  margin-top: 0;
+}
+
+/* The hero itself: keep the measure of the tagline readable even though the
+   column around it is now wide, and let the wordmark carry the page. */
+[data-has-hero] .hero > .stack {
+  gap: 1.25rem;
+}
+[data-has-hero] .hero h1 {
+  letter-spacing: -0.02em;
+}
+[data-has-hero] .hero .tagline {
+  max-width: 58ch;
+  color: var(--sl-color-gray-2);
+}
+
+/* Starlight gives splash actions a pill; square them off to match the rest of
+   the chrome, which is hairlines and 4px radii rather than rounded buttons. */
+[data-has-hero] .sl-link-button {
+  border-radius: var(--ph-radius, 4px);
+}

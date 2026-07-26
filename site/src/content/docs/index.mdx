@@ -1,50 +1,25 @@
 ---
 title: phonometry
-description: Acoustic measurement toolkit for Python covering sound level metrology, psychoacoustics, rooms and buildings, vibration, environment and transport, underwater acoustics, electroacoustics and wave simulation, conformance-tested against 235 IEC, ISO, EN, ANSI, ECMA, DIN, ITU, EBU, SAE, ICAO and ECAC standards.
+description: Acoustic measurement toolkit for Python covering sound level metrology, psychoacoustics, rooms and buildings, vibration, environment and transport, underwater acoustics, electroacoustics and wave simulation, with 427 conformance checks against 278 IEC, ISO, EN, ANSI, ECMA, DIN, ITU, EBU, SAE, ICAO and ECAC standards.
 template: splash
 hero:
-  tagline: Acoustic measurement in Python, from octave-band metrology and Zwicker loudness to building insulation, aircraft EPNL and underwater propagation. 371 conformance checks against 235 standards, and every result renders its figure and, where a standard defines one, a normative PDF fiche.
+  tagline: Acoustic measurement, analysis and prediction in Python. Every metric is implemented from the text of its standard, and CI checks it against that standard's own tolerance tables and worked examples on every pull request.
   actions:
-    - text: Get started
+    - text: Install and first analysis
       link: /phonometry/getting-started/
       icon: right-arrow
       variant: primary
+    - text: Conformance report
+      link: /phonometry/reference/conformance/
+      icon: approve-check
+      variant: minimal
     - text: View on GitHub
       link: https://github.com/jmrplens/phonometry
       icon: github
+      variant: minimal
 ---
 
-import { CardGrid, Card } from '@astrojs/starlight/components';
+import Home from '../../components/home/Home.astro';
+import { en } from '../../data/home';
 
-<CardGrid>
-  <Card title="Conformance-tested" icon="approve-check">
-    Every metric is verified in CI against its standard's own tolerance tables, test vectors and worked examples: 371 numerical checks across 46 domains and 235 standards, from IEC 61672-1 weightings and IEC 61260-1 filters to ISO 532 loudness, ISO 717 ratings, ICAO Annex 16 EPNL and EBU R 128, regenerated on every pull request and published as the conformance report.
-  </Card>
-  <Card title="Core signal analysis" icon="magnifier">
-    Fractional octave banks (five SOS architectures), A/C/G/Z weighting, Fast/Slow/Impulse ballistics, Leq/LAeq, percentiles, LCpeak, SEL, noise dose, Lden and octave spectrograms, plus calibrated PSD/CSD spectral analysis, correlation and time-delay estimation, physical SPL calibration with IEC 60942 stability checks, GUM and Monte Carlo uncertainty, stateful real-time block processing and vectorized multichannel.
-  </Card>
-  <Card title="Hearing and perception" icon="comment">
-    Loudness in sones three ways (ISO 532-1/2/3 and the Sottek Hearing Model of ECMA-418-2), DIN 45692 sharpness, ECMA-418-2 tonality, roughness and fluctuation strength, psychoacoustic annoyance, equal-loudness contours (ISO 226), tone prominence (TNR/PR) and audibility, STI/STIPA per IEC 60268-16 Ed. 5 and SII per ANSI S3.5, plus hearing thresholds by age (ISO 7029), noise-induced hearing loss (ISO 1999) and occupational exposure LEX,8h (ISO 9612).
-  </Card>
-  <Card title="Rooms and buildings" icon="open-book">
-    Swept-sine and MLS impulse responses (ISO 18233), room parameters EDT/T20/T30/C50/C80/Ts and open-plan metrics (ISO 3382-1/2/3), room-noise criterion curves (ANSI/ASA S12.2), reverberation prediction (EN 12354-6), field and laboratory insulation with weighted ratings (ISO 16283-1/2/3, ISO 10140, ISO 717-1/2), flanking, façade and outdoor-radiation prediction (EN 12354-1/2/3/4), measurement uncertainty (ISO 12999-1) and material data from absorption (ISO 354, ISO 11654) to impedance-tube measurement (ISO 10534-2), porous-absorber models and scattering/diffusion (ISO 17497).
-  </Card>
-  <Card title="Vibration and structure-borne sound" icon="rocket">
-    The FRF vocabulary of ISO 7626 (receptance, mobility, accelerance), isolator transfer stiffness (ISO 10846), sound power radiated by vibrating surfaces (ISO/TS 7849), reception-plate structure-borne power (EN 15657), installed-source prediction in buildings (EN 12354-5) and junction transmission, plus whole-body, multiple-shock and hand-arm human vibration (ISO 2631-1/-5, ISO 5349).
-  </Card>
-  <Card title="Environment and transport" icon="open-book">
-    Atmospheric absorption α(f) (ISO 9613-1), the ISO 9613-2 general method with a per-term octave-band breakdown, ground effect, barriers and atmospheric refraction, impulsive-sound adjustments (NT ACOU 112), rating levels and Lden (ISO 1996), the aircraft EPNL certification chain (ICAO Annex 16, IEC 61265, SAE ARP 5534), ECAC Doc 29 airport contours on the EASA ANP fleet database, the ECAC Doc 32 rotorcraft hemisphere method and IEC 61400-11 wind-turbine emission and tonal audibility.
-  </Card>
-  <Card title="Underwater acoustics" icon="magnifier">
-    Levels re 1 µPa (ISO 18405), ship radiated noise and equivalent monopole source level (ISO 17208-1/2), pile-driving exposure (ISO 18406), sound speed in sea water, seabed reflection, Wenz and JOMOPANS-ECHO ambient noise, the passive and active sonar equations, and transmission loss from spreading-plus-absorption closed forms to normal-mode, ray-tracing and parabolic-equation solvers.
-  </Card>
-  <Card title="Sources and devices" icon="rocket">
-    Sound power by five standardised routes (ISO 3744/3746, ISO 3741, ISO 9614-2, ISO 3745, ISO 9614-3), p-p sound intensity (IEC 61043) with ISO 9614-1 field indicators, ISO 4871 noise-emission declarations, audio-equipment distortion and frequency response (IEC 60268-3), swept-sine THD(f) (Farina, Novak), loudspeaker and microphone rated characteristics (IEC 60268-5/-4), silencers, enclosures and HVAC noise, and programme loudness with true peak (ITU-R BS.1770-5, EBU R 128).
-  </Card>
-  <Card title="Wave simulation" icon="comment">
-    A deterministic 2D acoustic FDTD solver on a staggered pressure-velocity grid, with CW and pulse sources, pressure probes, rasterised obstacles and per-side rigid, impedance or absorbing boundaries, validated against analytic oracles and usable as a cross-check engine for the closed-form models.
-  </Card>
-  <Card title="Results you can hand over" icon="approve-check">
-    Every analysis returns a typed, frozen dataclass whose one-line <code>.plot()</code> renders the canonical figure in English or Spanish (<code>language="en"|"es"</code>), and where a standard defines a reporting format a <code>.report()</code> method renders the normative PDF fiche: ISO 717, ISO 11654, ISO 532-1, EBU R 128, ICAO EPNL, IEC 61260-1, ISO 4871 and IEC 60268-5/-4. The documentation is fully bilingual.
-  </Card>
-</CardGrid>
+<Home content={en} lang="en" />

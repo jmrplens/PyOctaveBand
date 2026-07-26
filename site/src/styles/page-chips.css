@@ -1,0 +1,92 @@
+/* Page header chips.
+
+   The sidebar carries no standards information at all, and the page chips
+   have one presentation: an outlined pill per source. Both decisions are
+   final, so neither is switchable. Nothing here is behind an attribute any
+   more: the prototype switcher, the `data-api-style` and `data-area`
+   dimensions and the two API sidebar treatments that lost are gone, and the
+   sidebar itself is now stock Starlight, so its folding lives in
+   astro.config.mjs rather than in a component of ours.
+
+   All selectors are unlayered so they win over Starlight's layered styles
+   without specificity games. Both themes are covered by the palette tokens
+   these rules reference (src/styles/theme.css). */
+
+/* ---------------------------------------------------------------------------
+   PAGE CHIPS. One run per category under the H1: the standards that govern
+   the page, then the works its methods are attributed to. Every chip is a
+   link into the page bibliography and looks like one, because an outlined
+   pill is the smallest affordance that says "clickable" without filling
+   anything in. The border colour carries the category, so nothing else has
+   to.
+
+   Rendered by PageChips.astro from the page's own `references` frontmatter;
+   a page without references renders no markup at all.
+
+   The two category colours are palette tokens (--ph-chip-* in
+   src/styles/theme.css), not values of this file's own: the standards chip is
+   the palette accent, the named-work chip its warm mirror, and both are
+   audited by scripts/check-contrast.mjs together with the rest of the palette.
+   --------------------------------------------------------------------------- */
+
+.page-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  /* Wider between the two category runs than inside one, so the standards and
+     the named works read as two groups without needing a separator. */
+  gap: 0.3rem 1.1rem;
+  margin-block-start: 0.55rem;
+  font-size: var(--sl-text-sm);
+  line-height: 1.5;
+}
+
+.page-chips .chip-run {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.35rem;
+}
+
+.page-chips .page-chip {
+  padding: 0.1rem 0.5rem;
+  border: 1px solid var(--chip-line, var(--sl-color-gray-5));
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: nowrap;
+  text-decoration: none;
+  transition:
+    background-color 0.12s ease,
+    border-color 0.12s ease;
+}
+
+.page-chips .chip-standard {
+  --chip-line: var(--ph-chip-standard-line);
+  --chip-fill: var(--ph-chip-standard-fill);
+
+  color: var(--ph-chip-standard-ink);
+}
+
+.page-chips .chip-theory {
+  --chip-line: var(--ph-chip-named-line);
+  --chip-fill: var(--ph-chip-named-fill);
+
+  color: var(--ph-chip-named-ink);
+}
+
+.page-chips .chip-more {
+  --chip-line: var(--ph-chip-muted-line);
+  --chip-fill: var(--ph-chip-muted-fill);
+
+  color: var(--ph-chip-muted-ink);
+}
+
+/* Hover and focus fill the pill with a faint category tint and firm up the
+   border, so the state is legible in both themes without moving anything. */
+.page-chips .page-chip:hover,
+.page-chips .page-chip:focus-visible {
+  background: var(--chip-fill);
+  border-color: currentcolor;
+}

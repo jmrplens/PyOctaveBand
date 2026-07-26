@@ -6,7 +6,8 @@ import starlightLinksValidator from 'starlight-links-validator';
 import mermaid from 'astro-mermaid';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
-import { apiSidebar } from './src/generated/api-sidebar.mjs';
+import { sidebar } from './src/data/sidebar.mjs';
+import { basePath, siteUrl } from './src/data/site.mjs';
 
 // Converts deprecated HTML align attributes (emitted by markdown table
 // alignment) to CSS text-align, for WCAG2AA compliance (pa11y), and makes
@@ -52,8 +53,6 @@ function rehypeTableAlign() {
   };
 }
 
-const siteUrl = 'https://jmrplens.github.io';
-const basePath = '/phonometry';
 const fullUrl = `${siteUrl}${basePath}`;
 const repositoryUrl = 'https://github.com/jmrplens/phonometry';
 const authorUrl = 'https://jmrp.io';
@@ -246,20 +245,30 @@ export default defineConfig({
         Head: './src/components/Head.astro',
         // Human-visible maintainer block corroborating the Person node.
         Footer: './src/components/Footer.astro',
+        // Default frame plus the first-visit language bar, mounted outside
+        // the panes so the sidebar cannot paint over it.
+        PageFrame: './src/components/PageFrame.astro',
         // Default header plus a mobile-visible language selector.
         Header: './src/components/Header.astro',
-        // Linked group labels + non-collapsible sidebar.
-        Sidebar: './src/components/Sidebar.astro',
         // Default article body plus the unified APA-7 references section
         // rendered from the typed frontmatter bibliography.
         MarkdownContent: './src/components/MarkdownContent.astro',
+        // Default H1 plus the page header chips run derived from the page's
+        // own `references` frontmatter (see TOC-REDESIGN-NOTES.md).
+        PageTitle: './src/components/PageTitle.astro',
       },
       customCss: [
+        // The site palette. Unlayered, so its `:root` blocks win over
+        // Starlight's `@layer starlight.base` defaults; loaded first so the
+        // later sheets can still reference the tokens it defines.
+        './src/styles/theme.css',
         './src/styles/katex.css',
         './src/styles/theme-images.css',
         './src/styles/theme-tables.css',
         './src/styles/splash-menu.css',
+        './src/styles/home.css',
         './src/styles/sidebar.css',
+        './src/styles/page-chips.css',
       ],
       social: [
         { icon: 'github', label: 'GitHub', href: 'https://github.com/jmrplens/phonometry' },
@@ -312,263 +321,7 @@ export default defineConfig({
         // JSON-LD structured data
         { tag: 'script', attrs: { type: 'application/ld+json' }, content: jsonLd },
       ],
-      // Overview-first convention: when a group's first item is a link with
-      // `attrs: { 'data-group-link': true }`, the custom Sidebar override
-      // consumes it and renders the group label itself as a link to that page
-      // instead of a separate Overview row. Groups are never collapsible, so
-      // `collapsed` has no effect.
-      sidebar: [
-        {
-          label: 'Start',
-          translations: { es: 'Inicio' },
-          items: [
-            'getting-started',
-            'reference/why-phonometry',
-          ],
-        },
-        {
-          label: 'Core signal analysis',
-          translations: { es: 'Análisis de señal' },
-          items: [
-            { slug: 'guides/sections/core-signal-analysis', attrs: { 'data-group-link': true } },
-            'guides/sound-level-meter',
-            {
-              label: 'Octave filtering',
-              translations: { es: 'Filtrado en octavas' },
-              items: [
-                { slug: 'guides/sections/octave-filtering', attrs: { 'data-group-link': true } },
-                'guides/filter-banks',
-                'guides/block-processing',
-                'guides/multichannel',
-              ],
-            },
-            {
-              label: 'Levels and weighting',
-              translations: { es: 'Niveles y ponderación' },
-              items: [
-                { slug: 'guides/sections/levels-weighting', attrs: { 'data-group-link': true } },
-                'guides/weighting',
-                'guides/time-weighting',
-                'guides/levels',
-              ],
-            },
-            {
-              label: 'Signals and spectra',
-              translations: { es: 'Señales y espectros' },
-              items: [
-                { slug: 'guides/sections/signals-spectra', attrs: { 'data-group-link': true } },
-                'guides/spectral-analysis',
-                'guides/miso-coherence',
-                'guides/time-frequency',
-                'guides/cepstrum-echoes',
-                'guides/synchronous-averaging',
-                'guides/correlation-delay',
-                'guides/test-signals',
-                'guides/system-measurement',
-              ],
-            },
-            {
-              label: 'Calibration and uncertainty',
-              translations: { es: 'Calibración e incertidumbre' },
-              items: [
-                { slug: 'guides/sections/calibration-uncertainty', attrs: { 'data-group-link': true } },
-                'guides/calibration',
-                'guides/gum-uncertainty',
-                'guides/data-qualification',
-              ],
-            },
-          ],
-        },
-        {
-          label: 'Hearing and perception',
-          translations: { es: 'Audición y percepción' },
-          items: [
-            { slug: 'guides/sections/hearing-perception', attrs: { 'data-group-link': true } },
-            {
-              label: 'Psychoacoustics',
-              translations: { es: 'Psicoacústica' },
-              items: [
-                { slug: 'guides/sections/psychoacoustics', attrs: { 'data-group-link': true } },
-                'guides/loudness',
-                'guides/sound-quality',
-                'guides/tone-prominence',
-                'guides/tone-audibility',
-                'guides/psychoacoustic-annoyance',
-              ],
-            },
-            {
-              label: 'Speech',
-              translations: { es: 'Habla' },
-              items: [
-                { slug: 'guides/sections/speech', attrs: { 'data-group-link': true } },
-                'guides/speech-transmission',
-                'guides/speech-intelligibility',
-                'guides/objective-intelligibility',
-              ],
-            },
-            {
-              label: 'Hearing and exposure',
-              translations: { es: 'Audición y exposición' },
-              items: [
-                { slug: 'guides/sections/hearing-exposure', attrs: { 'data-group-link': true } },
-                'guides/hearing-threshold',
-                'guides/noise-induced-hearing-loss',
-                'guides/occupational-exposure',
-              ],
-            },
-          ],
-        },
-        {
-          label: 'Rooms and buildings',
-          translations: { es: 'Salas y edificación' },
-          items: [
-            { slug: 'guides/sections/rooms-buildings', attrs: { 'data-group-link': true } },
-            {
-              label: 'Room acoustics',
-              translations: { es: 'Acústica de salas' },
-              items: [
-                { slug: 'guides/sections/room-acoustics', attrs: { 'data-group-link': true } },
-                'guides/room-acoustics',
-                'guides/room-image-sources',
-                'guides/room-noise',
-                'guides/reverberation-prediction',
-                'guides/enclosed-space-absorption',
-              ],
-            },
-            {
-              label: 'Sound insulation',
-              translations: { es: 'Aislamiento acústico' },
-              items: [
-                { slug: 'guides/sections/sound-insulation', attrs: { 'data-group-link': true } },
-                'guides/insulation-field',
-                'guides/insulation-lab',
-                'guides/insulation-prediction',
-                'guides/panel-sound-insulation',
-                'guides/dynamic-stiffness',
-              ],
-            },
-          ],
-        },
-        {
-          label: 'Materials and surfaces',
-          translations: { es: 'Materiales y superficies' },
-          items: [
-            { slug: 'guides/sections/materials-surfaces', attrs: { 'data-group-link': true } },
-            'guides/materials',
-            'guides/porous-absorbers',
-            'guides/surface-scattering',
-          ],
-        },
-        {
-          label: 'Vibration and structure-borne sound',
-          translations: { es: 'Vibración y ruido estructural' },
-          items: [
-            { slug: 'guides/sections/vibration', attrs: { 'data-group-link': true } },
-            {
-              label: 'Structure-borne sources',
-              translations: { es: 'Fuentes de ruido estructural' },
-              items: [
-                { slug: 'guides/sections/structure-borne', attrs: { 'data-group-link': true } },
-                'guides/mechanical-mobility',
-                'guides/junction-transmission',
-                'guides/transfer-stiffness',
-                'guides/vibration-sound-power',
-                'guides/structure-borne-power',
-                'guides/installed-structure-borne',
-              ],
-            },
-            {
-              label: 'Human vibration',
-              translations: { es: 'Vibración en humanos' },
-              items: [
-                { slug: 'guides/sections/human-vibration', attrs: { 'data-group-link': true } },
-                'guides/human-vibration',
-                'guides/multiple-shock-vibration',
-              ],
-            },
-          ],
-        },
-        {
-          label: 'Environment and transport',
-          translations: { es: 'Medio ambiente y transporte' },
-          items: [
-            { slug: 'guides/sections/environment-transport', attrs: { 'data-group-link': true } },
-            {
-              label: 'Outdoor sound',
-              translations: { es: 'Sonido en exteriores' },
-              items: [
-                { slug: 'guides/sections/outdoor-sound', attrs: { 'data-group-link': true } },
-                'guides/outdoor-propagation',
-                'guides/ground-barriers',
-                'guides/atmospheric-refraction',
-                'guides/impulse-prominence',
-              ],
-            },
-            {
-              label: 'Aircraft and wind energy',
-              translations: { es: 'Aeronaves y energía eólica' },
-              items: [
-                { slug: 'guides/sections/aircraft-wind', attrs: { 'data-group-link': true } },
-                'guides/aircraft-noise',
-                'guides/rotorcraft-noise',
-                'guides/wind-turbine-noise',
-              ],
-            },
-          ],
-        },
-        {
-          label: 'Underwater acoustics',
-          translations: { es: 'Acústica submarina' },
-          items: [
-            { slug: 'guides/sections/underwater', attrs: { 'data-group-link': true } },
-            'guides/underwater-acoustics',
-            'guides/underwater-propagation',
-          ],
-        },
-        {
-          label: 'Sources and devices',
-          translations: { es: 'Fuentes y dispositivos' },
-          items: [
-            { slug: 'guides/sections/sources-devices', attrs: { 'data-group-link': true } },
-            'guides/intensity',
-            'guides/sound-power',
-            'guides/electroacoustics',
-            'guides/swept-sine-distortion',
-            'guides/noise-control',
-            'guides/program-loudness',
-          ],
-        },
-        {
-          label: 'Wave simulation',
-          translations: { es: 'Simulación de ondas' },
-          items: [
-            { slug: 'guides/sections/simulation', attrs: { 'data-group-link': true } },
-            'guides/fdtd-simulation',
-          ],
-        },
-        {
-          label: 'Reference',
-          translations: { es: 'Referencia' },
-          items: [
-            apiSidebar,
-            {
-              label: 'Theory',
-              translations: { es: 'Teoría' },
-              items: [
-                { slug: 'reference/theory', attrs: { 'data-group-link': true } },
-                'reference/theory/signal-analysis',
-                'reference/theory/perception',
-                'reference/theory/rooms-buildings',
-                'reference/theory/materials-surfaces',
-                'reference/theory/environment-transport',
-                'reference/theory/vibration',
-              ],
-            },
-            'reference/conformance',
-            'reference/bibliography',
-          ],
-        },
-      ],
+      sidebar,
     }),
   ],
 });

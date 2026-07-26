@@ -11,9 +11,7 @@
  * its own https://doi.org link with nothing after it, and the optional note
  * follows as an annotation line, annotated-bibliography style.
  */
-import type { CollectionEntry } from 'astro:content';
-
-type Reference = NonNullable<CollectionEntry<'docs'>['data']['references']>[number];
+import { referenceAnchors, type Reference } from '../lib/reference-chips';
 
 /** One rendered fragment of a citation: plain, italicized or linked text. */
 interface Part {
@@ -143,7 +141,14 @@ function sortKey(ref: Reference): string {
 	return `${who(ref)} ${year} ${ref.title}`.toLowerCase();
 }
 
-const sorted = [...references].sort((a, b) =>
+/*
+  Each entry carries a stable fragment id so the page header chips
+  (PageChips.astro) can link straight to it. The ids are derived from the
+  frontmatter order by the shared helper, so sorting for display here does not
+  change them.
+*/
+const anchors = referenceAnchors(references);
+const sorted = [...references.entries()].sort(([, a], [, b]) =>
 	sortKey(a).localeCompare(sortKey(b), lang, { sensitivity: 'base' }),
 );
 ---
@@ -167,8 +172,8 @@ const sorted = [...references].sort((a, b) =>
 				</a>
 			</div>
 			<ul role="list">
-				{sorted.map((ref) => (
-					<li>
+				{sorted.map(([index, ref]) => (
+					<li id={anchors[index]}>
 						{citationParts(ref).map((part) => {
 							const inner =
 								part.italic === 'cite' ? (
@@ -219,6 +224,31 @@ const sorted = [...references].sort((a, b) =>
 	}
 	.page-references li + li {
 		margin-top: 0.75rem;
+	}
+	/* Landing spot for the page header chips, declared once for every target
+	   they can point at: the entries, and the section heading that the
+	   "+N more" chip jumps to. Starlight's own `scroll-padding-top` on the
+	   scroll container already clears the sticky chrome (the header, plus the
+	   mobile table of contents bar, which is why a phone needs more than a
+	   desktop); this is the breathing room on top of it. The heading used to
+	   have none of it, so the same click that put an entry a comfortable way
+	   down the viewport left the heading jammed against the sticky bar. One
+	   custom property, one rule, both targets: they cannot drift apart again.
+
+	   Also mark the entry that was jumped to, so the reader sees which of a
+	   long list answered the click. */
+	.page-references {
+		--ph-ref-landing: calc(var(--sl-nav-height) + 1rem);
+	}
+	.page-references .sl-heading-wrapper,
+	.page-references h2,
+	.page-references li {
+		scroll-margin-top: var(--ph-ref-landing);
+	}
+	.page-references li:target {
+		background: var(--sl-color-gray-6);
+		border-radius: 0.25rem;
+		box-shadow: 0 0 0 0.4rem var(--sl-color-gray-6);
 	}
 	/* <cite> carries the APA italics; keep the surrounding size and colour. */
 	.page-references cite,
