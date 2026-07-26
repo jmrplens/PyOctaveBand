@@ -24,8 +24,9 @@ From `feat/toc-sidebar-info`:
   the bibliography cannot drift apart.
 - The `primary: true` frontmatter flag that decides which sources survive the
   caps of five standards and three named works.
-- The API sidebar treatment, still switchable from the small floating panel
-  (`split`, `collapsed`, `inline`). Undecided, see the end of this file.
+- The API sidebar treatment, then still switchable from a small floating
+  panel. It is decided now and the panel is gone; see "The API sidebar"
+  below.
 
 From `feat/site-redesign`:
 
@@ -190,8 +191,10 @@ English-only API subtree still opts out.
 
 The second one is the merge's own: both branches pinned something to the
 bottom edge, so the prototype treatment switcher landed on the bar's dismiss
-button. The bar now publishes its height on `<html>` while it is on screen
-and the switcher steps over it.
+button. The bar answered by publishing its height on `<html>` so the switcher
+could step over it. The switcher is gone now and nothing else is pinned to
+that corner, so the measurement went with it: no `--ph-lang-banner`, no
+resize listener, one fewer layout read per dismissal.
 
 It never collides with the chips or the H1, on any layout: it is pinned to the
 bottom edge and the chips are in the page header band.
@@ -248,6 +251,105 @@ places and keep the select only in the mobile menu, where Auto lives; that
 would cost the desktop reader the visible Auto option, which is why I did not
 do it unasked.
 
+## The API sidebar: one behaviour, and it is progressive disclosure
+
+Decided: the API reference sits collapsed in the sidebar, and clicking it
+opens the tree. `split` and `inline` are deleted, with the `data-api-style`
+and `data-area` dimensions, the floating switcher and both of its inline
+scripts in `Head.astro`, the `.toc-switcher` rules, and the "Guides" back
+link in `Sidebar.astro` that only `split` ever displayed. The last commit
+that still carries all three treatments and the switcher is `8eb915a7`; that
+is where to look if any of it is ever wanted again.
+
+### What the prototype did, and what ships instead
+
+The prototype was one fold of one group, bolted on from a script. What ships
+is a disclosure per level, rendered by the tree itself. The differences are
+not cosmetic:
+
+| | prototype | now |
+| --- | --- | --- |
+| How many things fold | the API group only; every category under it was always fully expanded, so one click dumped 150 rows | every group from the API reference down, so the reader drills in one level at a time |
+| Where the state comes from | a `DOMContentLoaded` script that read `sessionStorage` and then folded what the server had already painted open | the server, from the current route: `holdsCurrent()` opens exactly the chain down to the current page |
+| On an API page | the whole API tree unfolded at once | the chain down to the page is open, its siblings are closed, the page is marked as Starlight marks it |
+| Memory | one `apiFolded` flag for the whole site, applied on guide pages too, so a fold made on one page silently governed another | none, deliberately; see below |
+| Control | a caret with `aria-expanded`, `aria-controls` assigned by script after load | a button per group with both attributes server-rendered, the whole label row being the control where the group has no landing page |
+| First paint | the group painted open and folded shut a moment later | the tree paints in its final state; there is nothing for the browser to correct |
+
+The one thing the prototype did that survives unchanged is the caret next to
+the API reference label: that group has a landing page, the overview-first
+convention says the label is a link to it, and a link cannot also be a
+disclosure. So the API row has two targets, and both of them end up showing
+the tree: the caret opens it in place, the label navigates to the API
+overview, which is an API page, which arrives with the tree open. The
+category groups below have no landing page, so there the whole row is the
+button and the thing the reader clicks is the label itself.
+
+### Whether an opened state survives navigation: no, and why
+
+The open state is a function of the route and nothing else. No
+`sessionStorage`, no cookie, nothing carried across a page load.
+
+The case for persisting is the reader who opens the API on a guide page and
+wants it still open on the next guide page. The case against is that the
+state worth restoring, the path to where the reader is, is already
+reconstructed on every render, and the rest is guesswork about intent:
+
+- Within the API, persistence buys almost nothing. Arriving on any API page
+  already opens the chain down to it. A remembered branch could only add
+  groups the reader is not in.
+- Outside the API, a remembered open state is the prototype's actual bug in
+  a new coat: a fold made on one page governing a different page, with no
+  visible cause and no way to reason about it.
+- Persistence costs either a flash (restore after paint, which is what the
+  prototype did) or a blocking inline script that runs before the sidebar
+  markup exists. The first is the layout shift this design set out to remove
+  and the second is a script in the critical path for a convenience.
+
+If it is ever wanted, the scope is fixed by the same argument: an API-only
+key, written only while the reader is on an API page, read only into the API
+subtree, never allowed to close the chain the route asked for.
+
+### Accessibility
+
+Each control is a real `<button type="button">` with `aria-expanded` and
+`aria-controls` naming the `<ul>` it governs, so it is in the tab order, it
+answers Enter and Space by being a button rather than by a key handler, and
+its state is announced. The control with no visible text of its own (the
+caret beside the API reference link) carries an `aria-label`, in Spanish on
+the Spanish build. A collapsed list keeps its `<li>`s and `<a>`s in the
+document under a `hidden` attribute, so the links are there for crawlers and
+for the browser's own find-in-page, and the reader reaches them with one
+activation rather than never. Opening moves nothing outside the sidebar,
+which is its own scroll container; the check below asserts that against the
+main frame's box rather than trusting it.
+
+The guides side of the tree is untouched. It carries no disclosure at all:
+those groups are non-collapsible by the overview-first convention, which is
+the whole reason this override exists.
+
+### The upstream delta
+
+`Sidebar.astro` is down to 44 lines against upstream's 15, and what is left
+is the two import paths, the local `SidebarSublist`, and the six-line click
+handler. Dropping `split` took the back link, its label translation and its
+base-URL arithmetic out, which is the shrink the decision was expected to
+produce.
+
+`SidebarSublist.astro` moved the other way, from 286 lines to 384, because
+the behaviour that used to live in a prototype script now lives in the
+component that renders the tree. That is the trade I want: upstream's own
+collapsible groups are `<details open>` plus `SidebarPersister`, so a
+disclosure in this file is a variation on upstream behaviour rather than a
+foreign mechanism, and the site as a whole carries 327 lines less than it
+did.
+
+Choosing `collapsed` over `split` also settles the plugin question the chip
+branch raised: `starlight-sidebar-topics` was the better way to do a topic
+split, and there is no topic split. The site keeps that dependency off, and
+keeps `Sidebar.astro` free for the overview-first convention that would have
+collided with the plugin's own override.
+
 ## Gates
 
 All run from this worktree against the integrated branch.
@@ -262,15 +364,26 @@ All run from this worktree against the integrated branch.
 | `node site/scripts/check-lang-suggest.mjs` | pass: 10 scenarios, 0 failing |
 | `node site/scripts/check-home-headings.mjs` | pass: 40 layout cases, 0 failing |
 | `node site/scripts/check-page-chips.mjs` | pass: 7 cap checks and 8 landing checks, 0 failing |
+| `node site/scripts/check-api-sidebar.mjs` | pass: 30 checks, 0 failing |
 
 pa11y was run against `astro preview` on port 4390, with a copy of
 `.pa11yci.json` rewritten to that port, because the branch's dev server holds
 4321 and another branch holds 4322. The npm script's own default port is
-4321, so it cannot be used while the dev server is up.
+4321, so it cannot be used while the dev server is up. The whole table above
+was run against that same built preview rather than against the dev server,
+so the numbers are the built site's.
 
 The puppeteer checks default to `--base http://localhost:4322`, which is
 another branch's dev server on this machine. Pass `--base` explicitly or they
 will report on the wrong build, which they did to me once.
+
+`check-api-sidebar.mjs` drives the disclosures rather than reading the
+markup: it clicks the control, clicks a branch inside it, presses Enter and
+Space on the focused control, navigates to an API page and back to a guide,
+and asserts what the reader would see at each step, in both locales. It is
+also where the two decisions above are pinned down: that a second guide page
+starts closed again (no memory), and that the guides tree carries no
+disclosure at all.
 
 One dev-server note, for whoever repeats this: the managed `astro dev` process
 did not pick up frontmatter edits (a changed title did not appear either), so
@@ -290,21 +403,22 @@ drives its own headless Chrome out of the pnpm store the way
 | `03`, `04` | A bibliography past the cap: nine chips and `+7 more`, four rows at 1440 px. |
 | `05`, `06` | Body links and code further down the same page, unchanged by any of it. |
 | `07` | The References section the chips point into. |
-| `08`, `09` | An API page: no chips, and the current API sidebar treatment. |
+| `08`, `09` | An API page: no chips, and the full guides tree still in the sidebar. |
 | `10`, `11` | The front page, full height, both themes. |
 | `12`, `13` | A Spanish guide, both themes. |
 | `14`, `15` | The same guide at 390 px in the two themes, which is also the theme toggle in its two states: a moon on the light shot, a sun on the dark one, no caret on either. |
 | `16` | The front page at 390 px. |
 | `17` | A page past the raised cap at 390 px, where the run wraps to five rows and ends on the more chip. |
 | `20`, `21` | The language bar on desktop and on a phone, after the stacking fix. |
+| `30`, `31` | Arriving on a guide page, both themes: the API group closed, its caret pointing at the rows it is holding back, everything around it unchanged. |
+| `32`, `33` | After one click: the twenty category groups, each closed. This is the shot that says the tree does not unfold all at once. |
+| `34`, `35` | After a second click, on Psychoacoustics: its thirteen pages, and only its pages. |
+| `36`, `37` | An API page with no click at all: the chain down to `sharpness` open, the page marked, the sibling categories closed. |
 
-## Still undecided
+Shots `30` to `37` are cropped to the sidebar pane, which is the whole
+subject; `08` and `09` are the same tree in the context of a full page.
 
-The API sidebar treatment. `data-api-style` still defaults to `split` and the
-floating panel still offers `collapsed` and `inline`; the switcher and its two
-inline scripts in `Head.astro` come out when a treatment is chosen, along with
-the `.toc-switcher` rules in `ux-variants.css` and the `--ph-lang-banner`
-offset that exists only to keep the switcher off the language bar.
-
-Until then, every screenshot in `integration-shots/` and every pa11y run
-exercises `split`, the default, and only that one.
+Nothing in `integration-shots/` shows a treatment that does not ship any
+more, and the `api-inline-*`, `api-split-*`, `api-collapsed-*` and switcher
+captures in `ux-variants2/` are deleted. They are in the history at
+`8eb915a7` with the code they documented.

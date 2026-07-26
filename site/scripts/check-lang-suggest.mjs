@@ -139,9 +139,9 @@ expect(
 
 // 10. The bar is on top of everything it overlaps. It is fixed across the
 //     full width, so on a desktop layout it crosses the sidebar pane and the
-//     table of contents, and the prototype treatment switcher is pinned to
-//     the same corner as its dismiss button. Hit-testing the three points is
-//     what catches a stacking regression; the markup alone cannot.
+//     table of contents. Hit-testing the three points, plus the dismiss
+//     button itself, is what catches a stacking regression; the markup alone
+//     cannot.
 {
 	const context = await browser.createBrowserContext();
 	const page = await context.newPage();
@@ -172,7 +172,7 @@ expect(
 			overSidebar: owns(40, mid),
 			overContent: owns(box.width / 2, mid),
 			overToc: owns(box.width - 40, mid),
-			// The dismiss button itself, which the floating switcher sits next to.
+			// The dismiss button itself.
 			dismissClickable: owns(close.left + close.width / 2, close.top + close.height / 2),
 		};
 	});

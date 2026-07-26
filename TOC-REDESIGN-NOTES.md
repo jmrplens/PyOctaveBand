@@ -1,10 +1,12 @@
 # Standards in the docs: page header chips and the API sidebar
 
 Experimental branch `feat/toc-sidebar-info`. It does not merge and has no PR.
-Both design questions it was opened for are now settled: the sidebar carries
-no standards information, and the page header carries it as one outlined pill
-per source. Neither is switchable any more. What is still a prototype is the
-API sidebar treatment, which keeps its switcher.
+Every design question it was opened for is settled: the sidebar carries no
+standards information, the page header carries it as one outlined pill per
+source, and the API sidebar is collapsed by default and opens level by level.
+Nothing here is switchable any more, and the switcher itself is gone. The API
+decision and everything it deleted are written up in INTEGRATION-NOTES.md,
+which is the branch that ships.
 
 The target is the desktop reader; a design only has to survive a phone, it is
 not judged there.
@@ -36,12 +38,10 @@ switched off:
 `SidebarSublist.astro` and `Sidebar.astro` are back to the smallest diff
 against upstream Starlight 0.41.3 that still implements this repo's
 conventions. What differs from upstream, and why, is documented in each file
-header: groups are never collapsible, a group's marked landing entry is
+header: guide groups are never collapsible, a group's marked landing entry is
 consumed so the group label itself becomes the link (the overview-first
-convention), and the API reference group carries a class plus a fold toggle
-for the API treatments below. That last one is the only piece of this
-experiment left in the sidebar, and it comes out if the API split is ever
-done with a plugin.
+convention), and the API reference subtree is a chain of disclosures whose
+open state is rendered from the current route.
 
 ## Page chips
 
@@ -96,14 +96,11 @@ otherwise empty. The two presentations that lost, a plain tinted text run and
 the same pills with a permanent fill, are deleted along with their CSS and the
 `data-page-chips` attribute that switched between them.
 
-The only remaining API prototype dimension is `data-api-style`, localStorage
-key `apiStyle`:
-
-| Value | What the reader sees |
-| --- | --- |
-| `split` (default) | Topic style. On guide pages the API group shrinks to its label with a forward arrow; on API pages the guide groups disappear and a "Guides" back link takes their place. |
-| `collapsed` | The API group gets a caret and folds. Folded on guide pages, open on API pages, and the reader's choice is kept for the session. |
-| `inline` | Status quo: the whole API tree always expanded in place. |
+The three API treatments this branch prototyped (`split`, `collapsed`,
+`inline`, switched by `data-api-style`) are down to one. `collapsed` won and
+shipped, rebuilt as a real disclosure per level; the other two and the
+switcher are deleted. INTEGRATION-NOTES.md has the behaviour, the
+accessibility and the reasoning.
 
 ### Border contrast
 
@@ -131,16 +128,6 @@ deterministic and under the page author's control:
 - The field is optional on every reference type and documented in the schema
   (`src/content.config.ts`).
 
-### How to switch
-
-- The round "API" button at the bottom right opens the switcher, which now
-  holds the API treatment and nothing else. The choice is remembered across
-  pages and reloads.
-- From the console: `document.documentElement.dataset.apiStyle = 'collapsed'`.
-  To make it stick, `localStorage.setItem('apiStyle', 'collapsed')`.
-- The default for a fresh browser is `split`. The page chips have no switch:
-  they render whenever the page has a `references` block.
-
 ## Screenshots
 
 In `ux-variants2/`, all desktop at 1440 x 1000 unless the name says otherwise.
@@ -159,14 +146,10 @@ history if they are ever wanted again.
 | `chips-anchorjump-light-desktop-en.png` | After clicking the `ISO 10140` pill: the matching bibliography entry, highlighted and clear of the header. |
 | `chips-anchorjump-dark-desktop-es.png` | The same jump on the Spanish build. |
 | `sidebar-final-dark-desktop-en.png` | The tree as it stays: no chips, no annotations. |
-| `api-inline-guidepage-dark-desktop-en.png` | API tree expanded in place on a guide page. |
-| `api-collapsed-guidepage-dark-desktop-en.png` | API group folded behind a caret. |
-| `api-split-guidepage-dark-desktop-en.png` | API group reduced to a label with an arrow. |
-| `api-inline-apipage-dark-desktop-en.png` | Status quo on an API page, scrolled to the reference group. |
-| `api-collapsed-apipage-dark-desktop-en.png` | Collapsed treatment on an API page: it opens the group by itself and adds the caret. |
-| `api-split-apipage-dark-desktop-en.png` | Split on an API page: back link plus reference only. |
-| `api-split-apipage-dark-mobile-en.png` | The same at 390 px. |
-| `switcher-widget-dark-desktop-en.png` | The switcher, down to the API treatment alone. |
+
+The captures of the three API treatments and of the switcher went with the
+code, like the rejected sidebar and chip variants before them. The states the
+API sidebar actually has are shot in `integration-shots/30` to `37`.
 
 ## Why the pill, and what it cost
 
@@ -187,7 +170,12 @@ is the light-theme outline going to 80 and 90 % alpha to clear 3:1, which is
 the one visible change from the version that was approved at 35 %. Numbers and
 the single place to soften it are in the border contrast section above.
 
-## `split` versus `starlight-sidebar-topics`
+## `split` versus `starlight-sidebar-topics`, and why it is moot
+
+Kept for the record, because it is the reason the site does not take that
+dependency: `split` lost to `collapsed`, so there is no topic split to
+implement and the plugin has nothing to do here. The comparison below was
+written while `split` was still a candidate.
 
 My `split` prototype and the plugin solve the same problem, and the plugin
 solves it better in the ways that matter long term.
@@ -213,8 +201,7 @@ Checked in Chrome at 1440 x 1000, both themes, EN and ES, on a guide page and
 an API page:
 
 - The chips render unconditionally wherever a page has references, in the one
-  settled style, and all three `data-api-style` values still work including
-  the caret toggle and its session memory.
+  settled style.
 - The sidebar renders no chips, no annotation line and no hover card in any
   state, and no `data-toc-style`, `data-page-chips`, `.sidebar-chips`,
   `.page-standards` or `.section-standards` remains anywhere in `site/src` or
@@ -243,8 +230,6 @@ an API page:
 
 Known limits:
 
-- pa11y exercises the chips, since they are no longer behind a switch, but
-  only the default API treatment.
 - The same aircraft-noise page has a second cryptic designation,
   `Doc 9501, 3rd ed.`, which yields a `Doc 9501` chip with no issuing body in
   it. Prefixing it `ICAO Doc 9501` would read better; I left it alone because
@@ -258,11 +243,8 @@ The page chips are not a prototype any more: `src/lib/reference-chips.ts`,
 `References.astro` are all keepers, as is the `primary` field in the content
 schema.
 
-What still comes out when the API treatment is chosen:
-
-- both inline scripts at the bottom of `Head.astro` and the `.toc-switcher`
-  rules in `src/styles/ux-variants.css`;
-- the two treatments not chosen;
-- the `api-caret` button in `SidebarSublist.astro` and the `topic-back` link
-  in `Sidebar.astro`, if the split is done with `starlight-sidebar-topics`
-  instead.
+Nothing else is scaffolding any more. Both inline scripts at the bottom of
+`Head.astro`, the `.toc-switcher` rules in `src/styles/ux-variants.css`, the
+two treatments that lost and the `topic-back` link in `Sidebar.astro` are
+deleted; the caret in `SidebarSublist.astro` is now part of the disclosure
+that ships.
