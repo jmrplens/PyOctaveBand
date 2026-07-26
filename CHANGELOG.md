@@ -157,6 +157,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- The Zenodo deposition metadata (`.zenodo.json`) describes the library as it
+  is. Its title, description and keywords were the octave-band ones: a 323
+  character summary and six keywords, none of them naming building acoustics,
+  psychoacoustics, vibration, environmental, aircraft or underwater noise. The
+  record is a top-tier source for scholarly grounding and it was advertising a
+  fraction of the package. `scripts/check_conformance_claims.py` now covers
+  this file too, since its description states the conformance counts and, like
+  the landing page, has no build step to interpolate them through.
+
 - The documentation site serves its own figures, animations and example
   fiches instead of hotlinking `raw.githubusercontent.com`. That host is not a
   CDN, caches for half as long as the Pages origin, is rate limited, is one
