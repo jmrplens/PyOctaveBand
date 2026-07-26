@@ -1108,8 +1108,9 @@ def render_sidebar(pages: list[ModuleDoc]) -> str:
         "export const apiSidebar = {",
         "  label: 'API reference',",
         "  translations: { es: 'Referencia de la API' },",
+        "  collapsed: true,",
         "  items: [",
-        "    { slug: 'reference/api', attrs: { 'data-group-link': true } },",
+        "    { slug: 'reference/api', label: 'Overview', translations: { es: 'Resumen' } },",
     ]
     by_section: dict[str, list[ModuleDoc]] = {}
     for page in pages:
@@ -1120,6 +1121,7 @@ def render_sidebar(pages: list[ModuleDoc]) -> str:
                 "    {",
                 f"      label: {js(section.label_en)},",
                 f"      translations: {{ es: {js(section.label_es)} }},",
+                "      collapsed: true,",
                 "      items: [",
             ]
         )

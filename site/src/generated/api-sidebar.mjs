@@ -3,11 +3,13 @@
 export const apiSidebar = {
   label: 'API reference',
   translations: { es: 'Referencia de la API' },
+  collapsed: true,
   items: [
-    { slug: 'reference/api', attrs: { 'data-group-link': true } },
+    { slug: 'reference/api', label: 'Overview', translations: { es: 'Resumen' } },
     {
       label: 'Filters and frequencies',
       translations: { es: 'Filtros y frecuencias' },
+      collapsed: true,
       items: [
         'reference/api/filters/phonometry',
         'reference/api/filters/core',
@@ -20,6 +22,7 @@ export const apiSidebar = {
     {
       label: 'Levels and calibration',
       translations: { es: 'Niveles y calibración' },
+      collapsed: true,
       items: [
         'reference/api/levels/levels',
         'reference/api/levels/calibration',
@@ -28,6 +31,7 @@ export const apiSidebar = {
     {
       label: 'Psychoacoustics',
       translations: { es: 'Psicoacústica' },
+      collapsed: true,
       items: [
         'reference/api/psychoacoustics/loudness-zwicker',
         'reference/api/psychoacoustics/loudness-moore-glasberg',
@@ -47,6 +51,7 @@ export const apiSidebar = {
     {
       label: 'Speech',
       translations: { es: 'Habla' },
+      collapsed: true,
       items: [
         'reference/api/speech/sti',
         'reference/api/speech/sii',
@@ -56,6 +61,7 @@ export const apiSidebar = {
     {
       label: 'Hearing and exposure',
       translations: { es: 'Audición y exposición' },
+      collapsed: true,
       items: [
         'reference/api/hearing/threshold',
         'reference/api/hearing/noise-induced-hearing-loss',
@@ -65,6 +71,7 @@ export const apiSidebar = {
     {
       label: 'Room acoustics',
       translations: { es: 'Acústica de salas' },
+      collapsed: true,
       items: [
         'reference/api/rooms/room-acoustics',
         'reference/api/rooms/room-ir',
@@ -79,6 +86,7 @@ export const apiSidebar = {
     {
       label: 'Building acoustics',
       translations: { es: 'Acústica de la edificación' },
+      collapsed: true,
       items: [
         'reference/api/building/insulation',
         'reference/api/building/panel-transmission',
@@ -98,6 +106,7 @@ export const apiSidebar = {
     {
       label: 'Materials and surfaces',
       translations: { es: 'Materiales y superficies' },
+      collapsed: true,
       items: [
         'reference/api/materials/sound-absorption',
         'reference/api/materials/absorption-rating',
@@ -115,6 +124,7 @@ export const apiSidebar = {
     {
       label: 'Vibration and structure-borne',
       translations: { es: 'Vibración y ruido estructural' },
+      collapsed: true,
       items: [
         'reference/api/vibration/mechanical-mobility',
         'reference/api/vibration/point-mobility',
@@ -128,6 +138,7 @@ export const apiSidebar = {
     {
       label: 'Environmental acoustics',
       translations: { es: 'Acústica ambiental' },
+      collapsed: true,
       items: [
         'reference/api/environment/outdoor-propagation',
         'reference/api/environment/ground-barriers',
@@ -142,6 +153,7 @@ export const apiSidebar = {
     {
       label: 'Aircraft and wind energy',
       translations: { es: 'Aeronaves y energía eólica' },
+      collapsed: true,
       items: [
         'reference/api/aeroacoustics/aircraft-noise',
         'reference/api/aeroacoustics/atmospheric-absorption',
@@ -154,6 +166,7 @@ export const apiSidebar = {
     {
       label: 'Underwater acoustics',
       translations: { es: 'Acústica submarina' },
+      collapsed: true,
       items: [
         'reference/api/underwater/acoustics',
         'reference/api/underwater/propagation',
@@ -170,6 +183,7 @@ export const apiSidebar = {
     {
       label: 'Sound power and intensity',
       translations: { es: 'Potencia acústica e intensidad' },
+      collapsed: true,
       items: [
         'reference/api/power/sound-power',
         'reference/api/power/sound-power-intensity',
@@ -182,6 +196,7 @@ export const apiSidebar = {
     {
       label: 'Electroacoustics',
       translations: { es: 'Electroacústica' },
+      collapsed: true,
       items: [
         'reference/api/electroacoustics/distortion',
         'reference/api/electroacoustics/frequency-response',
@@ -194,6 +209,7 @@ export const apiSidebar = {
     {
       label: 'Industrial noise control',
       translations: { es: 'Control de ruido industrial' },
+      collapsed: true,
       items: [
         'reference/api/noise_control/silencers',
         'reference/api/noise_control/hvac',
@@ -203,6 +219,7 @@ export const apiSidebar = {
     {
       label: 'Program loudness',
       translations: { es: 'Sonoridad de programa' },
+      collapsed: true,
       items: [
         'reference/api/broadcast/program-loudness',
       ],
@@ -210,6 +227,7 @@ export const apiSidebar = {
     {
       label: 'Uncertainty and data quality',
       translations: { es: 'Incertidumbre y calidad de datos' },
+      collapsed: true,
       items: [
         'reference/api/metrology/uncertainty',
         'reference/api/metrology/random-data',
@@ -218,6 +236,7 @@ export const apiSidebar = {
     {
       label: 'Spectral analysis',
       translations: { es: 'Análisis espectral' },
+      collapsed: true,
       items: [
         'reference/api/spectra/spectra',
         'reference/api/spectra/miso',
@@ -232,6 +251,7 @@ export const apiSidebar = {
     {
       label: 'Wave simulation',
       translations: { es: 'Simulación de ondas' },
+      collapsed: true,
       items: [
         'reference/api/simulation/fdtd',
       ],
@@ -239,6 +259,7 @@ export const apiSidebar = {
     {
       label: 'Correlation & envelope',
       translations: { es: 'Correlación y envolvente' },
+      collapsed: true,
       items: [
         'reference/api/correlation/correlation',
         'reference/api/correlation/envelope',

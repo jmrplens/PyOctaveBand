@@ -68,41 +68,22 @@ const SHOTS = [
 ];
 
 /**
- * The API sidebar disclosures, which only exist as states a reader clicks
- * into, so each shot names the controls to press before the capture. The
- * viewport is cropped to the sidebar, because that is the whole subject.
+ * The API sidebar group, which only exists as states a reader clicks into, so
+ * each shot names the group labels to press before the capture. They are stock
+ * Starlight `<summary>` rows, matched by their text rather than by a class of
+ * ours, so nothing here depends on markup we own. The viewport is cropped to
+ * the sidebar, because that is the whole subject.
  */
 const SIDEBAR = [
 	// Arriving on a guide page: the API group is closed.
 	['30-api-closed-light', '/guides/levels/', 'light', []],
 	['31-api-closed-dark', '/guides/levels/', 'dark', []],
-	// One click: the branches appear and nothing below them unfolds.
-	[
-		'32-api-open-light',
-		'/guides/levels/',
-		'light',
-		['.api-group > .group-label-row > .api-caret'],
-	],
-	['33-api-open-dark', '/guides/levels/', 'dark', ['.api-group > .group-label-row > .api-caret']],
-	// A second click on one branch: its pages, and only its pages.
-	[
-		'34-api-nested-light',
-		'/guides/levels/',
-		'light',
-		[
-			'.api-group > .group-label-row > .api-caret',
-			'#sidebar-api-items > li:nth-child(3) > button[data-api-toggle]',
-		],
-	],
-	[
-		'35-api-nested-dark',
-		'/guides/levels/',
-		'dark',
-		[
-			'.api-group > .group-label-row > .api-caret',
-			'#sidebar-api-items > li:nth-child(3) > button[data-api-toggle]',
-		],
-	],
+	// One click: the sections appear and nothing below them unfolds.
+	['32-api-open-light', '/guides/levels/', 'light', ['API reference']],
+	['33-api-open-dark', '/guides/levels/', 'dark', ['API reference']],
+	// A second click on one section: its pages, and only its pages.
+	['34-api-nested-light', '/guides/levels/', 'light', ['API reference', 'Psychoacoustics']],
+	['35-api-nested-dark', '/guides/levels/', 'dark', ['API reference', 'Psychoacoustics']],
 	// On an API page the chain down to the current page is already open and
 	// the page is marked, with no click at all.
 	['36-api-page-light', '/reference/api/psychoacoustics/sharpness/', 'light', []],
@@ -190,15 +171,21 @@ for (const [name, path, theme, clicks] of SIDEBAR) {
 		document.documentElement.dataset.theme = t;
 	}, theme);
 	await page.addStyleTag({ content: 'astro-dev-toolbar{display:none !important}' });
-	for (const selector of clicks) {
-		await page.click(selector);
+	for (const label of clicks) {
+		await page.evaluate((text) => {
+			[...document.querySelectorAll('#starlight__sidebar summary')]
+				.find((s) => s.textContent.trim().startsWith(text))
+				?.click();
+		}, label);
 		await new Promise((r) => setTimeout(r, 250));
 	}
 	// Bring the API group to the top of the sidebar's own scroller, then frame
 	// the sidebar pane rather than the whole page.
 	const clip = await page.evaluate(() => {
 		const scroller = document.getElementById('starlight__sidebar');
-		const group = document.querySelector('.api-group');
+		const group = [...document.querySelectorAll('#starlight__sidebar summary')]
+			.find((s) => /^(API reference|Referencia de la API)/.test(s.textContent.trim()))
+			.closest('li');
 		scroller.scrollTop +=
 			group.getBoundingClientRect().top - scroller.getBoundingClientRect().top - 16;
 		const r = scroller.getBoundingClientRect();

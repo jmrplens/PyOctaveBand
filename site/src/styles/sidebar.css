@@ -1,37 +1,29 @@
-/* Fully-expanded sidebar hierarchy.
+/* Visual hierarchy for the stock Starlight sidebar.
 
-   The custom Sidebar override (src/components/Sidebar.astro plus
-   SidebarSublist.astro) renders every group permanently expanded, with no
-   <details>/<summary> toggles or carets, so the whole map of the docs --
-   about 150 entries -- is visible at once, including on the mobile drawer.
-   Group labels whose group carries a landing page (the Overview-first
-   convention in astro.config.mjs) are links and can carry
-   `aria-current="page"`; the rest are static headings. Starlight styles
-   every group label with the same `.large` token regardless of depth, which
-   reads as a wall of equally-heavy rows once nothing is folded. These rules
-   restore the visual hierarchy:
+   The tree is Starlight's own: every group is a `<details>` with a
+   `<summary>` label and a caret, `collapsed: true` in astro.config.mjs, and
+   Starlight forces open the chain of groups that holds the current page. This
+   file adds no behaviour at all; it only restores the depth cues a
+   three-level tree needs, because Starlight styles every group label with the
+   same `.large` token regardless of depth:
 
-   - top-level groups (Start, Core signal analysis, ..., Reference) become
+   - top-level groups (Start, Core signal analysis, ..., API reference) become
      small uppercase "eyebrow" headers with a hairline separator above each
      group, the pattern large Starlight sites (e.g. the Astro docs) use for
      long navigation lists;
-   - nested group labels (the domain subgroups and the API sections) step
-     down to the small text size, keeping their 600 weight;
-   - links two levels deep and beyond tighten up (13px, reduced padding and
-     line-height) so the API reference's ~100 module entries stay compact.
+   - nested group labels (the domain subgroups and the API sections) step down
+     to the small text size, keeping their 600 weight;
+   - links two levels deep and beyond tighten up so the API reference's ~120
+     module entries stay compact when a section is opened.
 
    Only Starlight custom properties are used for color, so light and dark
-   themes are both covered. Color rules guard on
-   `:not([aria-current='page'])` so the accent pill on an active label link
-   keeps its inverted text, and nothing here touches focus styles. */
+   themes are both covered, and nothing here touches focus styles. */
 
 /* Top-level group labels: uppercase eyebrow headers. */
-#starlight__sidebar .top-level > li > .group-label > .large {
+#starlight__sidebar .top-level > li > details > summary .large {
   font-size: var(--sl-text-xs);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-}
-#starlight__sidebar .top-level > li > .group-label:not([aria-current='page']) > .large {
   color: var(--sl-color-gray-1);
 }
 
@@ -45,18 +37,15 @@
 /* Nested group labels (domain subgroups, API sections, Theory): one step
    smaller than Starlight's default so they sit between the eyebrow headers
    and the links. */
-#starlight__sidebar ul ul .group-label > .large {
+#starlight__sidebar ul ul summary .large {
   font-size: var(--sl-text-sm);
-}
-#starlight__sidebar ul ul .group-label:not([aria-current='page']) > .large {
   color: var(--sl-color-white);
 }
 
-/* Linked group labels: hover/focus feedback. The color rules above are
-   unlayered, so they beat the component's layered `a:hover .large` rule;
-   restore the same accent highlight here for label links only (static
-   heading labels are <span>s and keep their fixed color). */
-#starlight__sidebar a.group-label:not([aria-current='page']):is(:hover, :focus) > .large {
+/* The whole summary row is the toggle, so give it the hover and focus
+   feedback the links already have. */
+#starlight__sidebar summary:hover .large,
+#starlight__sidebar summary:focus-visible .large {
   color: var(--sl-color-accent-high);
 }
 

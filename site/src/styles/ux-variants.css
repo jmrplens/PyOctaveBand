@@ -5,8 +5,8 @@
    final, so neither is switchable. Nothing here is behind an attribute any
    more: the prototype switcher, the `data-api-style` and `data-area`
    dimensions and the two API sidebar treatments that lost are gone, and the
-   API sidebar disclosures that shipped live with the tree that renders them
-   (src/components/SidebarSublist.astro).
+   sidebar itself is now stock Starlight, so its folding lives in
+   astro.config.mjs rather than in a component of ours.
 
    All selectors are unlayered so they win over Starlight's layered styles
    without specificity games. Both themes are covered by the palette tokens
