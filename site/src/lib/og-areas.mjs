@@ -64,6 +64,23 @@ const areaBySlug = (() => {
   return map;
 })();
 
+// Renaming a group label is a legitimate edit, and check-sidebar.mjs accepts
+// it: it compares the rendered tree against sidebar.mjs and knows nothing about
+// this file. Without this check the lookup above would simply stop matching and
+// every page in that group would quietly lose its area and fall back to the
+// generic card, with nothing failing. Adding an area already fails loudly, on
+// the missing artwork file.
+const matched = sidebar.filter((group) => AREA_SLUG.has(group?.label)).length;
+if (matched !== AREA_SLUG.size) {
+  const missing = [...AREA_SLUG.keys()].filter(
+    (label) => !sidebar.some((group) => group?.label === label),
+  );
+  throw new Error(
+    `og-areas: ${missing.length} sidebar group label(s) in AREA_SLUG no longer ` +
+      `exist: ${missing.join(', ')}. Update the map in src/lib/og-areas.mjs.`,
+  );
+}
+
 /** Human-readable area label, keyed the same way, for the card's kicker. */
 const areaLabel = (() => {
   /** @type {Map<string, {en: string, es: string}>} */

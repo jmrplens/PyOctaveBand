@@ -21,9 +21,16 @@ import path from 'node:path';
 import satori from 'satori';
 import sharp from 'sharp';
 
-/** Repository root: the site builds from `site/`, the brand assets live above it. */
-const REPO = path.join(process.cwd(), '..');
-const BRAND = path.join(REPO, '.github', 'brand');
+/**
+ * Where the brand assets live, relative to the working directory.
+ *
+ * `process.cwd()` and not `import.meta.url`: during the static build this
+ * module is bundled into `dist/.prerender/chunks/`, so a URL-relative path
+ * resolves against that directory and the fonts are not there. The build fails
+ * with ENOENT on the first card. The working directory is the site root for
+ * every entry point that exists, `pnpm build` and `astro build` alike.
+ */
+const BRAND = path.join(process.cwd(), '..', '.github', 'brand');
 
 const OG_WIDTH = 1200;
 const OG_HEIGHT = 630;
@@ -71,9 +78,11 @@ async function getMark(): Promise<string> {
  * The artwork for one documentation area, as a data URI.
  *
  * Transcoded to JPEG on the way in. The committed masters are WebP, which is
- * the right format to store them in, but satori silently drops an image whose
- * header it cannot read and WebP is not among the ones it parses: the card
- * came out as a flat background with no artwork at all.
+ * the right format to store them in, but satori only lays the card out: it
+ * emits the artwork as an <image> in an SVG, and sharp's SVG rasteriser does
+ * not decode WebP there. It does not fail, it draws nothing, so the first
+ * cards came out as a flat background. Rendering the same tree with a JPEG
+ * source and measuring the result is what separated the two.
  * @param key - Area slug, or "generic" for everything outside the nine areas.
  */
 async function getArt(key: string): Promise<string> {

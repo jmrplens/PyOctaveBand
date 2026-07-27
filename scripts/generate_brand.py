@@ -148,7 +148,15 @@ def _catmull(points: list[Point], alpha: float = 0.5) -> list[Segment]:
 
 
 def ribbon_outline(ribbon: Ribbon) -> tuple[Point, list[Segment]]:
-    """The closed outline of one ribbon: up the top edge, back along the bottom."""
+    """The closed outline of one ribbon: up the top edge, back along the bottom.
+
+    The two halves meet without a joining segment only because the tip has zero
+    width, which puts the last point of both edges on the centreline. A ribbon
+    ending wide would emit a curve from the top edge's tip to the second-to-last
+    point of the bottom one, and the malformed tip would show in both emitters.
+    """
+    if ribbon.width[-1] != 0.0:
+        raise ValueError("a ribbon has to taper to zero width at its tip")
     spine, width = ribbon.spine, ribbon.width
     nrm = _normals(spine)
     upper = [
@@ -302,8 +310,10 @@ def render_png(
 
     dest.parent.mkdir(parents=True, exist_ok=True)
     with plt.rc_context({"savefig.bbox": None, "savefig.pad_inches": 0.0}):
+        # Software=None keeps matplotlib's version out of the PNG's tEXt
+        # chunk, so a version bump does not rewrite every icon byte for byte.
         fig.savefig(dest, dpi=size, transparent=background is None,
-                    facecolor=fig.get_facecolor())
+                    facecolor=fig.get_facecolor(), metadata={"Software": None})
     plt.close(fig)
     _report(dest)
 
@@ -327,8 +337,8 @@ STRAPLINE = "Conformance-tested against the standards it implements"
 
 def text_svg_path(
     text: str, font: Path, size: float, origin: Point, colour: str,
-) -> tuple[str, float]:
-    """One ``<path>`` holding the text as outlines, plus its advance width.
+) -> str:
+    """One ``<path>`` holding the text as outlines.
 
     Outlines rather than a ``<text>`` element: GitHub renders README SVGs with
     no guarantee about available fonts, so live text falls back to whatever the
@@ -358,8 +368,7 @@ def text_svg_path(
                          f" {_fmt(verts[4])} {_fmt(verts[5])}")
         elif code == MplPath.CLOSEPOLY:
             parts.append("Z")
-    width = float(tp.get_extents().x1)
-    return f'<path fill="{colour}" d="{"".join(parts)}"/>', width
+    return f'<path fill="{colour}" d="{"".join(parts)}"/>' 
 
 
 def _mark_group(x: float, y: float, scale: float, ink: str, grid_ink: str) -> str:
@@ -481,7 +490,7 @@ def card_svg(card: Card, art: Path) -> str:
     dark ground, so it reads the same under either GitHub theme.
     """
     text = "\n  ".join(
-        text_svg_path(line.text, line.font, line.size, line.at, line.colour)[0]
+        text_svg_path(line.text, line.font, line.size, line.at, line.colour)
         for line in card.lines
     )
     return (
@@ -507,6 +516,7 @@ def card_png(dest: Path, card: Card, art: Path, *, scale: int = 1) -> None:
     emitters agree because both read the geometry above.
     """
     from matplotlib.font_manager import FontProperties
+    from matplotlib.transforms import Affine2D
     from PIL import Image
 
     width, height = round(card.width * scale), round(card.height * scale)
@@ -531,8 +541,7 @@ def card_png(dest: Path, card: Card, art: Path, *, scale: int = 1) -> None:
                   extent=(0, card.width, card.height, 0), zorder=0)
 
     unit = card.mark_px / VB
-    trans = (matplotlib.transforms.Affine2D()
-             .scale(unit).translate(*card.mark_at) + ax.transData)
+    trans = Affine2D().scale(unit).translate(*card.mark_at) + ax.transData
     lw = GRID_STROKE * unit * 72.0 / dpi * scale
     ax.add_patch(Rectangle((GX, GY), GRID_W, GRID_W, fill=False, zorder=2,
                            edgecolor=ICON_GRID, linewidth=lw, transform=trans,

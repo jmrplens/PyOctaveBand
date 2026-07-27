@@ -9,6 +9,13 @@ on:
     paths:
       - "site/**"
       - "docs/**"
+      # The Open Graph cards are composed at build time from the brand fonts
+      # and the per-area artwork, which live outside site/. Without this a new
+      # artwork or a font change would not redeploy and the published cards
+      # would silently fall behind, the same gap the note above guards for
+      # llms.txt. (The icons are written into site/public and are covered by
+      # the first entry already.)
+      - ".github/brand/**"
       - "scripts/generate_llms.py"
       - ".github/workflows/docs.yml"
   workflow_dispatch:
