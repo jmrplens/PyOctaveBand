@@ -74,6 +74,39 @@ print(round(res.transmission_loss.max(), 2))   # 6.55 dB peak (m = 4)
 res.plot()                                      # TL (and IL) vs frequency
 ```
 
+The numbers passed to `expansion_chamber` describe a real device, and
+`.plot_geometry()` draws it: the same 0.3 m chamber with its 4:1 area ratio,
+to scale and fully dimensioned.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/expansion_chamber_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/expansion_chamber_geometry.svg" alt="To-scale cross-section of the expansion-chamber silencer of the transmission-loss example: a 300 mm long chamber of 225.7 mm equivalent diameter inserted between inlet and outlet pipes of 112.8 mm equivalent diameter, with the chamber length and both diameters dimensioned" width="88%"></picture>
+
+*The chamber behind the curves above, to scale: the areas enter the four-pole
+method only through the ratio `m`, and the drawing uses the equivalent
+circular diameters `d = 2 sqrt(S / pi)` of the 0.04 and 0.01 m² cross-sections.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import expansion_chamber, plot_silencer_geometry
+
+freqs = np.linspace(20.0, 2000.0, 2000)
+res = expansion_chamber(freqs, length=0.3, chamber_area=0.04, pipe_area=0.01)
+
+# One line: the dimensioned cross-section of the chamber just computed.
+res.plot_geometry()
+plt.show()
+
+# The same drawing without a result, from the free function:
+plot_silencer_geometry("expansion chamber", length=0.3,
+                       chamber_area=0.04, pipe_area=0.01)
+plt.show()
+```
+
+</details>
+
 ### Side-branch and extended-tube resonators
 
 A **Helmholtz resonator** (`helmholtz_resonator`) and a closed **quarter-wave
@@ -145,6 +178,63 @@ plt.show()
 
 </details>
 
+Both branches are small hardware, and `.plot_geometry()` shows just how
+small: the resonator of the 120 Hz spike is a 1 L cavity fed by a 1 cm²
+neck only 2 cm long.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/helmholtz_branch_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/helmholtz_branch_geometry.svg" alt="To-scale cross-section of the side-branch Helmholtz resonator: a duct of 112.8 mm equivalent diameter with a narrow 11.3 mm neck, 20 mm long, opening into a 1 litre cavity drawn as its equal-volume cube on top of the duct, with the neck diameter, neck length and duct diameter dimensioned" width="88%"></picture>
+
+*The whole 120 Hz notch hangs on a 1 L box and a 2 cm neck: the cavity is
+drawn as its equal-volume cube, and the tuning moves as `sqrt(S_n / (l_e V))`,
+so small errors in these dimensions shift the spike off its target.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import helmholtz_resonator
+
+f = np.linspace(20.0, 600.0, 4000)
+hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
+                         neck_length=0.02, cavity_volume=1e-3)
+
+# One line: the side branch drawn to scale, cavity as its equal-volume cube.
+hr.plot_geometry()
+plt.show()
+```
+
+</details>
+
+The quarter-wave tube needs no cavity at all: the 285 Hz spike of the figure
+above comes from a plain closed tube of the right length standing on the
+same duct.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/quarter_wave_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/quarter_wave_geometry.svg" alt="To-scale cross-section of the quarter-wave side branch: a closed tube 300 mm long and 50.5 mm in equivalent diameter standing on a duct of 112.8 mm equivalent diameter, with the tube length, tube diameter and duct diameter dimensioned" width="88%"></picture>
+
+*A quarter-wave stub is just a closed tube of the right length: 0.3 m of
+pipe puts the spike at `c / 4 l_e ≈ 285 Hz`, and the 20 cm² branch area only
+sets how strongly the stub loads the duct.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import quarter_wave_resonator
+
+f = np.linspace(20.0, 600.0, 4000)
+qw = quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
+
+# One line: the closed 0.3 m tube on its duct, to scale.
+qw.plot_geometry()
+plt.show()
+```
+
+</details>
+
 Each device returns a `ReactiveSilencerResult` with `transmission_loss`,
 `insertion_loss` (when source/radiation impedances are given), the compound
 `transfer_matrix`, the tuning `resonances` and `.plot()`.
@@ -208,6 +298,31 @@ for diameter in (0.15, 0.30, 0.60):
                 label=f"D = {int(diameter * 1000)} mm")
 ax.set_xlabel("Frequency [Hz]"); ax.set_ylabel("End reflection loss [dB]")
 ax.legend(title="Duct diameter")
+plt.show()
+```
+
+</details>
+
+Wells' plenum formula takes only two truly geometric inputs, the
+inlet-to-outlet line of sight `r` and the outlet area, plus the lined wall
+area; `plot_plenum_geometry` draws exactly those, honouring `r` and its
+angle off the inlet axis.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/plenum_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/plenum_geometry.svg" alt="Section of a plenum chamber: the inlet duct enters low on the left, the outlet mouth is marked on the right wall, the 1.2 m inlet-to-outlet line of sight is drawn as a dashed diagonal at 0.35 rad off the inlet axis, and the wall area of 6 square metres and outlet area of 0.09 square metres are annotated below" width="88%"></picture>
+
+*Only `r` and its angle off the inlet axis fix the drawn box; `S_out` and
+`S_w` enter Wells' method as bare areas, so any plenum sharing these four
+numbers has the same predicted attenuation.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import plot_plenum_geometry
+
+# The r, S_out and S_w that Wells' formula actually uses, drawn exactly.
+plot_plenum_geometry(0.09, 1.2, 6.0, angle=0.35)
 plt.show()
 ```
 

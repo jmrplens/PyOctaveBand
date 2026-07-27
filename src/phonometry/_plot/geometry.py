@@ -20,21 +20,28 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import ArrayLike
+from numpy.typing import ArrayLike, NDArray
 
 from .common import (
     _C_EDGE,
     _C_MUTED,
     _C_PRIMARY,
     _C_PRIMARY_LIGHT,
+    _C_QUATERNARY,
+    _C_REFERENCE,
     _C_SECONDARY,
     _C_SECONDARY_LIGHT,
+    _C_TERTIARY,
+    _import_pyplot,
     _new_axes,
 )
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
+    from ..building.aperture_transmission import ApertureTransmissionResult
+    from ..electroacoustics.piston import RadiatingPistonResult
+    from ..environmental.ground_barriers import BarrierInsertionLoss
     from ..materials.diffuser_design import DiffuserPolarResponse
     from ..materials.impedance_tube import ImpedanceTubeResult, TransferMatrix
     from ..materials.porous_absorber import Layer, LayeredAbsorberResult
@@ -42,6 +49,9 @@ if TYPE_CHECKING:
         HelmholtzResonator,
         SlitResonatorAbsorberResult,
     )
+    from ..noise_control.silencers import ReactiveSilencerResult
+    from ..room.image_source import ImageSourceResult
+    from ..simulation.fdtd import FDTD2D
 
 #: Spanish translations of the fixed strings rendered here, keyed by their
 #: verbatim English text. ``_t`` returns the English key unchanged for any
@@ -71,6 +81,41 @@ _STRINGS: dict[str, str] = {
     "depth sequence {seq}": "secuencia de profundidades {seq}",
     "Slit": "Rendija",
     "mm": "mm",
+    "m": "m",
+    "Reactive silencer cross-section": "Sección del silenciador reactivo",
+    "expansion chamber": "cámara de expansión",
+    "Helmholtz resonator": "resonador de Helmholtz",
+    "quarter-wave resonator": "resonador de cuarto de onda",
+    "extended-tube chamber": "cámara con tubos extendidos",
+    "V = {volume} L": "V = {volume} L",
+    "Image-source room plan (z of the source plane)":
+        "Planta de fuentes imagen (plano z de la fuente)",
+    "Source": "Fuente",
+    "Receiver": "Receptor",
+    "order {n}": "orden {n}",
+    "x [m]": "x [m]",
+    "y [m]": "y [m]",
+    "z [m]": "z [m]",
+    "Barrier section": "Sección de la barrera",
+    "Ground": "Suelo",
+    "Direct path": "Camino directo",
+    "Diffracted path": "Camino difractado",
+    "Path difference {delta} m": "Diferencia de camino {delta} m",
+    "Microphone positions": "Posiciones de micrófono",
+    "Reflecting plane": "Plano reflectante",
+    "Wall aperture cross-section": "Sección de la abertura en el muro",
+    "Wall": "Muro",
+    "Baffled piston": "Pistón en pantalla infinita",
+    "Baffle": "Pantalla",
+    "Normalised directivity": "Directividad normalizada",
+    "Plenum chamber section": "Sección de la cámara plenum",
+    "Inlet": "Entrada",
+    "Outlet": "Salida",
+    "FDTD domain": "Dominio FDTD",
+    "Sponge layer": "Capa esponja",
+    "Impedance edge": "Borde de impedancia",
+    "Rigid edge": "Borde rígido",
+    "Probe": "Sonda",
 }
 
 
@@ -96,6 +141,16 @@ def _mm(value: float, language: str) -> str:
     )
 
 
+def _metres(value: float, language: str) -> str:
+    """A length in metres, localised, trimmed (1.5 -> ``"1.5 m"``)."""
+    from .._i18n import format_number
+
+    return (
+        format_number(value, language, decimals=2, trim=True)
+        + " " + _t("m", language)
+    )
+
+
 # ---------------------------------------------------------------------------
 # Drafting primitives (matplotlib patches, imported lazily).
 # ---------------------------------------------------------------------------
@@ -116,6 +171,8 @@ def _dim(
     extension lines back to the measured points. ``tight`` switches to bar
     ends for spans too short for two arrowheads.
     """
+    if not label:
+        return
     a = np.asarray(p1, dtype=np.float64)
     b = np.asarray(p2, dtype=np.float64)
     direction = b - a
@@ -137,8 +194,6 @@ def _dim(
         arrowprops={"arrowstyle": style, "color": _C_EDGE, "linewidth": 0.9},
         zorder=5,
     )
-    if not label:
-        return
     mid = (ao + bo) / 2.0
     angle = float(np.degrees(np.arctan2(direction[1], direction[0])))
     if angle > 90.0 or angle <= -90.0:
@@ -1047,3 +1102,1052 @@ def plot_transfer_matrix_geometry(
         thickness=result.thickness, diameter=result.diameter,
         shape=result.shape, language=language, **kwargs,
     )
+
+
+# ---------------------------------------------------------------------------
+# Reactive silencers (four-pole elements).
+# ---------------------------------------------------------------------------
+#: Recognised silencer kinds (the ``ReactiveSilencerResult.kind`` strings).
+_SILENCER_KINDS = (
+    "expansion chamber",
+    "extended-tube chamber",
+    "Helmholtz resonator",
+    "quarter-wave resonator",
+)
+
+
+def _duct_diameter(area: float) -> float:
+    """Equivalent circular diameter of a duct cross-section."""
+    if area <= 0.0:
+        raise ValueError("Cross-section areas must be positive.")
+    return float(2.0 * np.sqrt(area / np.pi))
+
+
+def _draw_duct(ax: Axes, x0: float, x1: float, d: float, **kwargs: Any) -> Any:
+    """A straight duct run: bore centred on y = 0, walls just outside."""
+    from matplotlib.patches import Rectangle
+
+    wall = max(0.05 * d, 0.002)
+    kwargs.setdefault("facecolor", "none")
+    kwargs.setdefault("edgecolor", _C_EDGE)
+    kwargs.setdefault("linewidth", 1.2)
+    bore = Rectangle((x0, -0.5 * d), x1 - x0, d, **kwargs)
+    ax.add_patch(bore)
+    for y in (-0.5 * d - wall, 0.5 * d):
+        _material_rect(ax, x0, y, x1 - x0, wall, "plate", linewidth=0.5)
+    return bore
+
+
+def _draw_chamber(
+    ax: Axes,
+    length: float,
+    chamber_area: float,
+    pipe_area: float,
+    language: str,
+    *,
+    inlet_extension: float = 0.0,
+    outlet_extension: float = 0.0,
+    **kwargs: Any,
+) -> None:
+    """Expansion chamber (optionally with extended inlet/outlet tubes)."""
+    d_p = _duct_diameter(pipe_area)
+    d_c = _duct_diameter(chamber_area)
+    if chamber_area <= pipe_area:
+        raise ValueError("'chamber_area' must exceed 'pipe_area'.")
+    if inlet_extension + outlet_extension > length:
+        raise ValueError(
+            "'inlet_extension' + 'outlet_extension' must not exceed 'length'."
+        )
+    stub = max(0.5 * length, 1.5 * d_c)
+    # Chamber shell.
+    from matplotlib.patches import Rectangle
+
+    wall = max(0.03 * d_c, 0.003)
+    kwargs.setdefault("facecolor", "none")
+    kwargs.setdefault("edgecolor", _C_EDGE)
+    kwargs.setdefault("linewidth", 1.4)
+    ax.add_patch(Rectangle((0.0, -0.5 * d_c), length, d_c, **kwargs))
+    for y in (-0.5 * d_c - wall, 0.5 * d_c):
+        _material_rect(ax, 0.0, y, length, wall, "plate", linewidth=0.5)
+    # End plates (leave the pipe openings free).
+    for x in (0.0, length):
+        for y0, y1 in ((0.5 * d_p, 0.5 * d_c), (-0.5 * d_c, -0.5 * d_p)):
+            ax.plot([x, x], [y0, y1], color=_C_EDGE, linewidth=1.4)
+    _draw_duct(ax, -stub, 0.0, d_p)
+    _draw_duct(ax, length, length + stub, d_p)
+    # Extended tubes protrude into the chamber as thin-walled pipes.
+    for ext, x0, x1 in (
+        (inlet_extension, 0.0, inlet_extension),
+        (outlet_extension, length - outlet_extension, length),
+    ):
+        if ext > 0.0:
+            for y in (-0.5 * d_p, 0.5 * d_p):
+                ax.plot([x0, x1], [y, y], color=_C_EDGE, linewidth=1.2)
+    off = 0.18 * d_c
+    _dim(ax, (0.0, -0.5 * d_c - 2.0 * off), (length, -0.5 * d_c - 2.0 * off),
+         "L = " + _mm(length, language))
+    _dim(ax, (-stub, -0.5 * d_p), (-stub, 0.5 * d_p),
+         _mm(d_p, language), offset=2.0 * off, tight=True)
+    x_dim = inlet_extension + 0.5 * (
+        length - inlet_extension - outlet_extension
+    )
+    _dim(ax, (x_dim, -0.5 * d_c), (x_dim, 0.5 * d_c),
+         _mm(d_c, language), offset=0.0)
+    if inlet_extension > 0.0:
+        _dim(ax, (0.0, 0.5 * d_p), (inlet_extension, 0.5 * d_p),
+             _mm(inlet_extension, language), offset=-2.0 * off, tight=True)
+    if outlet_extension > 0.0:
+        _dim(ax, (length - outlet_extension, 0.5 * d_p), (length, 0.5 * d_p),
+             _mm(outlet_extension, language), offset=-2.0 * off, tight=True)
+
+
+def _draw_branch_silencer(
+    ax: Axes,
+    kind: str,
+    duct_area: float,
+    language: str,
+    *,
+    neck_area: float | None = None,
+    neck_length: float | None = None,
+    cavity_volume: float | None = None,
+    length: float | None = None,
+    branch_area: float | None = None,
+    **kwargs: Any,
+) -> None:
+    """Side-branch silencer: Helmholtz resonator or quarter-wave tube."""
+    d_d = _duct_diameter(duct_area)
+    if kind == "Helmholtz resonator":
+        if neck_area is None or neck_length is None or cavity_volume is None:
+            raise ValueError(
+                "A Helmholtz resonator drawing needs 'neck_area', "
+                "'neck_length' and 'cavity_volume'."
+            )
+        if cavity_volume <= 0.0 or neck_length <= 0.0:
+            raise ValueError(
+                "'cavity_volume' and 'neck_length' must be positive."
+            )
+        d_b = _duct_diameter(neck_area)
+        branch_len = neck_length
+        cavity_side = float(cavity_volume ** (1.0 / 3.0))
+    else:
+        if length is None or branch_area is None:
+            raise ValueError(
+                "A quarter-wave drawing needs 'length' and 'branch_area'."
+            )
+        if length <= 0.0:
+            raise ValueError("'length' must be positive.")
+        d_b = _duct_diameter(branch_area)
+        branch_len = length
+        cavity_side = 0.0
+    run = max(4.0 * d_d, 2.0 * d_b + 2.0 * d_d, 2.0 * cavity_side)
+    _draw_duct(ax, -0.5 * run, 0.5 * run, d_d, **kwargs)
+    # Branch mouth opens through the upper duct wall at x = 0.
+    from matplotlib.patches import Rectangle
+
+    y0 = 0.5 * d_d
+    ax.add_patch(Rectangle((-0.5 * d_b, y0), d_b, branch_len,
+                           facecolor="none", edgecolor=_C_EDGE,
+                           linewidth=1.2))
+    off = 0.25 * d_d
+    if kind == "Helmholtz resonator" and cavity_volume is not None:
+        # Cavity drawn as the equivalent cube (V^(1/3) on each side).
+        from .._i18n import format_number
+
+        _material_rect(
+            ax, -0.5 * cavity_side, y0 + branch_len, cavity_side,
+            cavity_side, "cavity",
+        )
+        ax.text(
+            0.0, y0 + branch_len + 0.5 * cavity_side,
+            _t("V = {volume} L", language).format(
+                volume=format_number(
+                    cavity_volume * 1e3, language, decimals=1, trim=True
+                )
+            ),
+            fontsize=8, ha="center", va="center",
+        )
+        _dim(ax, (0.5 * d_b, y0), (0.5 * d_b, y0 + branch_len),
+             _mm(branch_len, language), offset=-2.0 * off, tight=True)
+    else:
+        # Closed end of the quarter-wave tube.
+        ax.plot([-0.5 * d_b, 0.5 * d_b],
+                [y0 + branch_len, y0 + branch_len],
+                color=_C_EDGE, linewidth=2.2)
+        _dim(ax, (0.5 * d_b, y0), (0.5 * d_b, y0 + branch_len),
+             _mm(branch_len, language), offset=-2.0 * off)
+    _dim(ax, (-0.5 * d_b, y0), (0.5 * d_b, y0), _mm(d_b, language),
+         offset=-1.5 * off, tight=True)
+    _dim(ax, (-0.5 * run, -0.5 * d_d), (-0.5 * run, 0.5 * d_d),
+         _mm(d_d, language), offset=2.0 * off, tight=True)
+
+
+def plot_silencer_geometry(
+    kind: str,
+    ax: Axes | None = None,
+    *,
+    length: float | None = None,
+    chamber_area: float | None = None,
+    pipe_area: float | None = None,
+    inlet_extension: float = 0.0,
+    outlet_extension: float = 0.0,
+    duct_area: float | None = None,
+    neck_area: float | None = None,
+    neck_length: float | None = None,
+    cavity_volume: float | None = None,
+    branch_area: float | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Draw a reactive silencer cross-section to scale.
+
+    Side cut through the duct axis with equivalent circular diameters
+    (``d = 2 sqrt(S / pi)``) for every cross-section area, matching the
+    parameters of the four :mod:`~phonometry.noise_control` silencer
+    constructors. A Helmholtz cavity is drawn as the cube of equal volume
+    with its volume annotated.
+
+    :param kind: One of ``"expansion chamber"``, ``"extended-tube chamber"``,
+        ``"Helmholtz resonator"``, ``"quarter-wave resonator"`` (the
+        ``ReactiveSilencerResult.kind`` strings).
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param length: Chamber length or quarter-wave tube length, in metres.
+    :param chamber_area: Chamber cross-section, in m2 (chambers).
+    :param pipe_area: Inlet/outlet pipe cross-section, in m2 (chambers).
+    :param inlet_extension: Inlet tube extension into the chamber, in metres.
+    :param outlet_extension: Outlet tube extension, in metres.
+    :param duct_area: Main duct cross-section, in m2 (side branches).
+    :param neck_area: Neck cross-section, in m2 (Helmholtz).
+    :param neck_length: Neck length, in metres (Helmholtz).
+    :param cavity_volume: Cavity volume, in m3 (Helmholtz).
+    :param branch_area: Branch tube cross-section, in m2 (quarter-wave).
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the main bore rectangle.
+    :return: The axes.
+    """
+    _check_language(language)
+    if kind not in _SILENCER_KINDS:
+        raise ValueError(
+            f"Unknown silencer kind {kind!r}; expected one of "
+            f"{_SILENCER_KINDS}."
+        )
+    if kind in ("expansion chamber", "extended-tube chamber"):
+        if length is None or chamber_area is None or pipe_area is None:
+            raise ValueError(
+                "A chamber drawing needs 'length', 'chamber_area' and "
+                "'pipe_area'."
+            )
+        if length <= 0.0:
+            raise ValueError("'length' must be positive.")
+        # Validate before any figure exists.
+        _duct_diameter(pipe_area)
+        _duct_diameter(chamber_area)
+        if chamber_area <= pipe_area:
+            raise ValueError("'chamber_area' must exceed 'pipe_area'.")
+        if inlet_extension + outlet_extension > length:
+            raise ValueError(
+                "'inlet_extension' + 'outlet_extension' must not exceed "
+                "'length'."
+            )
+        if ax is None:
+            ax = _new_axes()
+        _draw_chamber(
+            ax, length, chamber_area, pipe_area, language,
+            inlet_extension=inlet_extension,
+            outlet_extension=outlet_extension, **kwargs,
+        )
+    else:
+        if duct_area is None:
+            raise ValueError("A side-branch drawing needs 'duct_area'.")
+        _duct_diameter(duct_area)
+        if kind == "Helmholtz resonator":
+            if (
+                neck_area is None or neck_length is None
+                or cavity_volume is None
+            ):
+                raise ValueError(
+                    "A Helmholtz resonator drawing needs 'neck_area', "
+                    "'neck_length' and 'cavity_volume'."
+                )
+            if neck_length <= 0.0 or cavity_volume <= 0.0:
+                raise ValueError(
+                    "'cavity_volume' and 'neck_length' must be positive."
+                )
+            _duct_diameter(neck_area)
+        else:
+            if length is None or branch_area is None:
+                raise ValueError(
+                    "A quarter-wave drawing needs 'length' and "
+                    "'branch_area'."
+                )
+            if length <= 0.0:
+                raise ValueError("'length' must be positive.")
+            _duct_diameter(branch_area)
+        if ax is None:
+            ax = _new_axes()
+        _draw_branch_silencer(
+            ax, kind, duct_area, language,
+            neck_area=neck_area, neck_length=neck_length,
+            cavity_volume=cavity_volume, length=length,
+            branch_area=branch_area, **kwargs,
+        )
+    _finish_geometry_axes(
+        ax,
+        _t("Reactive silencer cross-section", language)
+        + f" ({_t(kind, language)})",
+    )
+    return ax
+
+
+def plot_silencer_result_geometry(
+    result: ReactiveSilencerResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Silencer drawing for a result that retained its ``geometry``."""
+    if result.geometry is None:
+        raise ValueError(
+            "This result does not retain its geometry; call "
+            "plot_silencer_geometry(kind, ...) with the original arguments."
+        )
+    return plot_silencer_geometry(
+        result.kind, ax=ax, language=language,
+        **dict(result.geometry), **kwargs,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Image-source room plan.
+# ---------------------------------------------------------------------------
+#: Colour cycle for image orders 1, 2, 3, ... (order 0 is the source).
+_ORDER_COLOURS = (_C_SECONDARY, _C_TERTIARY, _C_QUATERNARY, _C_MUTED)
+
+
+def plot_image_source_geometry(
+    result: ImageSourceResult,
+    ax: Axes | None = None,
+    *,
+    max_order: int | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Draw the image-source lattice in plan view (x-y), to scale.
+
+    The real room sits at the origin with the source and receiver marked;
+    every image source up to ``max_order`` is projected onto the plan and
+    coloured by reflection order, with the mirror-room grid dotted behind.
+
+    :param result: An :class:`~phonometry.room.image_source.ImageSourceResult`
+        (it retains the room, the positions and the image lattice).
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param max_order: Highest reflection order drawn; ``None`` draws
+        ``min(result.max_order, 3)`` to keep the plan readable.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the room-outline rectangle.
+    :return: The axes.
+    """
+    from matplotlib.patches import Rectangle
+
+    _check_language(language)
+    from .._i18n import localize_axes
+
+    order_cap = (
+        min(int(result.max_order), 3) if max_order is None else int(max_order)
+    )
+    if order_cap < 1:
+        raise ValueError("'max_order' must be >= 1.")
+    if ax is None:
+        ax = _new_axes()
+    lx, ly = float(result.dimensions[0]), float(result.dimensions[1])
+    orders = np.asarray(result.orders)
+    keep = orders <= order_cap
+    pos = np.asarray(result.image_positions)[keep]
+    ords = orders[keep]
+    x_min = float(min(pos[:, 0].min(), 0.0)) - 0.2 * lx
+    x_max = float(max(pos[:, 0].max(), lx)) + 0.2 * lx
+    y_min = float(min(pos[:, 1].min(), 0.0)) - 0.2 * ly
+    y_max = float(max(pos[:, 1].max(), ly)) + 0.2 * ly
+    # Mirror-room grid.
+    for x in np.arange(np.floor(x_min / lx) * lx, x_max + lx, lx):
+        ax.plot([x, x], [y_min, y_max], linestyle=":", linewidth=0.6,
+                color=_C_MUTED, zorder=1)
+    for y in np.arange(np.floor(y_min / ly) * ly, y_max + ly, ly):
+        ax.plot([x_min, x_max], [y, y], linestyle=":", linewidth=0.6,
+                color=_C_MUTED, zorder=1)
+    kwargs.setdefault("facecolor", "none")
+    kwargs.setdefault("edgecolor", _C_EDGE)
+    kwargs.setdefault("linewidth", 2.0)
+    ax.add_patch(Rectangle((0.0, 0.0), lx, ly, zorder=3, **kwargs))
+    for order in range(order_cap, 0, -1):
+        sel = ords == order
+        if not np.any(sel):
+            continue
+        colour = _ORDER_COLOURS[(order - 1) % len(_ORDER_COLOURS)]
+        ax.plot(
+            pos[sel, 0], pos[sel, 1], "o", markersize=4, color=colour,
+            linestyle="none", zorder=4,
+            label=_t("order {n}", language).format(n=order),
+        )
+    ax.plot(
+        [result.source[0]], [result.source[1]], marker="*", markersize=13,
+        color=_C_REFERENCE, linestyle="none", zorder=5,
+        label=_t("Source", language),
+    )
+    ax.plot(
+        [result.receiver[0]], [result.receiver[1]], marker="^",
+        markersize=8, color=_C_PRIMARY, linestyle="none", zorder=5,
+        label=_t("Receiver", language),
+    )
+    ax.set_aspect("equal", adjustable="datalim")
+    ax.set_xlabel(_t("x [m]", language))
+    ax.set_ylabel(_t("y [m]", language))
+    ax.set_title(
+        _t("Image-source room plan (z of the source plane)", language),
+        fontweight="bold",
+    )
+    ax.legend(loc="upper right", fontsize=8)
+    localize_axes(ax, language)
+    return ax
+
+
+# ---------------------------------------------------------------------------
+# Barrier section (source, screen, receiver over ground).
+# ---------------------------------------------------------------------------
+def plot_barrier_geometry(
+    ax: Axes | None = None,
+    *,
+    source_height: float,
+    barrier_distance: float,
+    barrier_height: float,
+    receiver_distance: float,
+    receiver_height: float,
+    thickness: float | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Draw the source-barrier-receiver section to scale.
+
+    Ground line, thin (or thick) screen, the direct path cut by the screen
+    and the diffracted path over the top edge(s), with the path-length
+    difference annotated. Distances follow
+    :func:`~phonometry.environmental.barrier_insertion_loss`:
+    ``receiver_distance`` is horizontal from the source.
+
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param source_height: Source height above ground, in metres.
+    :param barrier_distance: Source-to-barrier horizontal distance, in metres.
+    :param barrier_height: Barrier height, in metres.
+    :param receiver_distance: Source-to-receiver horizontal distance, in
+        metres (> ``barrier_distance``).
+    :param receiver_height: Receiver height above ground, in metres.
+    :param thickness: Barrier top width, in metres; ``None`` draws a thin
+        screen.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the barrier rectangle.
+    :return: The axes.
+    """
+    _check_language(language)
+    if min(source_height, barrier_height, receiver_height) < 0.0:
+        raise ValueError("Heights must be non-negative.")
+    if barrier_distance <= 0.0 or receiver_distance <= barrier_distance:
+        raise ValueError(
+            "'barrier_distance' must be positive and 'receiver_distance' "
+            "greater than it."
+        )
+    if thickness is not None and thickness <= 0.0:
+        raise ValueError("'thickness' must be positive when given.")
+    if ax is None:
+        ax = _new_axes()
+    e = 0.0 if thickness is None else float(thickness)
+    drawn_e = e if e > 0.0 else 0.012 * receiver_distance
+    top = barrier_height
+    src = (0.0, source_height)
+    rcv = (receiver_distance, receiver_height)
+    near = (barrier_distance, top)
+    far = (barrier_distance + e, top)
+    # Ground.
+    _material_rect(
+        ax, -0.08 * receiver_distance, -0.04 * receiver_distance,
+        1.2 * receiver_distance, 0.04 * receiver_distance, "rigid",
+    )
+    ax.text(
+        1.06 * receiver_distance, -0.02 * receiver_distance,
+        _t("Ground", language), fontsize=8, ha="left", va="center",
+    )
+    _material_rect(
+        ax, barrier_distance, 0.0, drawn_e, top, "plate", **kwargs
+    )
+    # Paths.
+    ax.plot(
+        [src[0], rcv[0]], [src[1], rcv[1]], linestyle="--", linewidth=1.1,
+        color=_C_MUTED, label=_t("Direct path", language), zorder=4,
+    )
+    diff_x = [src[0], near[0]]
+    diff_y = [src[1], near[1]]
+    if e > 0.0:
+        diff_x.append(far[0])
+        diff_y.append(far[1])
+    diff_x.append(rcv[0])
+    diff_y.append(rcv[1])
+    ax.plot(
+        diff_x, diff_y, linewidth=1.6, color=_C_PRIMARY,
+        label=_t("Diffracted path", language), zorder=5,
+    )
+    ax.plot([src[0]], [src[1]], marker="*", markersize=13,
+            color=_C_REFERENCE, linestyle="none", zorder=6,
+            label=_t("Source", language))
+    ax.plot([rcv[0]], [rcv[1]], marker="^", markersize=8, color=_C_PRIMARY,
+            linestyle="none", zorder=6, label=_t("Receiver", language))
+    # Path difference over the top (delta = A + B (+ e) - d).
+    a_len = float(np.hypot(near[0] - src[0], near[1] - src[1]))
+    b_len = float(np.hypot(rcv[0] - far[0], rcv[1] - far[1]))
+    d_len = float(np.hypot(rcv[0] - src[0], rcv[1] - src[1]))
+    delta = a_len + e + b_len - d_len
+    from .._i18n import format_number
+
+    ax.text(
+        barrier_distance, top + 0.06 * receiver_distance,
+        _t("Path difference {delta} m", language).format(
+            delta=format_number(delta, language, decimals=2, trim=True)
+        ),
+        fontsize=8, ha="center", va="bottom",
+    )
+    y_dim = -0.10 * receiver_distance
+    _dim(ax, (0.0, y_dim), (barrier_distance, y_dim),
+         _metres(barrier_distance, language))
+    _dim(ax, (0.0, y_dim - 0.06 * receiver_distance),
+         (receiver_distance, y_dim - 0.06 * receiver_distance),
+         _metres(receiver_distance, language))
+    _dim(ax, (barrier_distance - 0.04 * receiver_distance, 0.0),
+         (barrier_distance - 0.04 * receiver_distance, top),
+         _metres(top, language))
+    _finish_geometry_axes(ax, _t("Barrier section", language))
+    ax.legend(loc="upper right", fontsize=8)
+    return ax
+
+
+def plot_barrier_result_geometry(
+    result: BarrierInsertionLoss,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Barrier section for a result that retained its geometry."""
+    if (
+        result.source_height is None
+        or result.barrier_distance is None
+        or result.barrier_height is None
+        or result.receiver_distance is None
+        or result.receiver_height is None
+    ):
+        raise ValueError(
+            "This result does not retain its geometry; call "
+            "plot_barrier_geometry(...) with the original arguments."
+        )
+    return plot_barrier_geometry(
+        ax=ax, source_height=result.source_height,
+        barrier_distance=result.barrier_distance,
+        barrier_height=result.barrier_height,
+        receiver_distance=result.receiver_distance,
+        receiver_height=result.receiver_height,
+        thickness=result.thickness, language=language, **kwargs,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Microphone position arrays (ISO 3744/3745/3746), 3-D.
+# ---------------------------------------------------------------------------
+def plot_microphone_positions(
+    positions: ArrayLike,
+    ax: Any | None = None,
+    *,
+    radius: float | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Any:
+    """Draw a microphone position array on its measurement surface, in 3-D.
+
+    Numbered microphone points with a wireframe of the hemisphere (or full
+    sphere when positions dip below the reflecting plane) of the given
+    ``radius``; pairs with
+    :func:`~phonometry.emission.measurement_positions` and
+    :func:`~phonometry.emission.precision_positions`, whose ``(N, 3)``
+    arrays it accepts directly.
+
+    :param positions: Cartesian microphone positions, shape ``(N, 3)``, in
+        metres.
+    :param ax: Existing 3-D axes (``projection="3d"``), or ``None`` to
+        create a figure.
+    :param radius: Surface radius for the wireframe, in metres; ``None``
+        uses the largest position norm.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the microphone ``scatter``.
+    :return: The 3-D axes.
+    """
+    _check_language(language)
+    pts = np.asarray(positions, dtype=np.float64)
+    if pts.ndim != 2 or pts.shape[1] != 3 or pts.shape[0] == 0:
+        raise ValueError("'positions' must have shape (N, 3) with N >= 1.")
+    if radius is not None and radius <= 0.0:
+        raise ValueError("'radius' must be positive when given.")
+    r = float(radius) if radius is not None else float(
+        np.linalg.norm(pts, axis=1).max()
+    )
+    if ax is None:
+        plt = _import_pyplot()
+        _fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+    full_sphere = bool(np.any(pts[:, 2] < -1e-9))
+    theta_max = np.pi if full_sphere else 0.5 * np.pi
+    theta = np.linspace(0.0, theta_max, 13)
+    phi = np.linspace(0.0, 2.0 * np.pi, 25)
+    t_grid, p_grid = np.meshgrid(theta, phi)
+    ax.plot_wireframe(
+        r * np.sin(t_grid) * np.cos(p_grid),
+        r * np.sin(t_grid) * np.sin(p_grid),
+        r * np.cos(t_grid),
+        color=_C_MUTED, linewidth=0.4, alpha=0.5,
+    )
+    if not full_sphere:
+        # Reflecting plane disc at z = 0.
+        disc_r = np.linspace(0.0, 1.15 * r, 2)
+        d_grid, a_grid = np.meshgrid(disc_r, phi)
+        ax.plot_surface(
+            d_grid * np.cos(a_grid), d_grid * np.sin(a_grid),
+            np.zeros_like(d_grid), color=_C_SECONDARY_LIGHT, alpha=0.15,
+            linewidth=0.0,
+        )
+        ax.text(
+            1.1 * r, 0.0, 0.0, _t("Reflecting plane", language), fontsize=8,
+        )
+    kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault("s", 30)
+    kwargs.setdefault("depthshade", False)
+    ax.scatter(pts[:, 0], pts[:, 1], pts[:, 2], **kwargs)
+    for index, (x, y, z) in enumerate(pts, start=1):
+        ax.text(x, y, z, f" {index}", fontsize=7)
+    ax.set_xlabel(_t("x [m]", language))
+    ax.set_ylabel(_t("y [m]", language))
+    ax.set_zlabel(_t("z [m]", language))
+    ax.set_title(_t("Microphone positions", language), fontweight="bold")
+    ax.set_box_aspect((1.0, 1.0, 0.55 if not full_sphere else 1.0))
+    return ax
+
+
+# ---------------------------------------------------------------------------
+# Wall aperture (slit or circular hole) cross-section.
+# ---------------------------------------------------------------------------
+def plot_aperture_geometry(
+    depth: float,
+    ax: Axes | None = None,
+    *,
+    width: float | None = None,
+    radius: float | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Draw the section through a wall aperture to scale.
+
+    Wall of thickness ``depth`` with a slit of the given ``width`` (or the
+    diametral section of a circular hole of the given ``radius``), incident
+    sound on the left and the transmitted wavefronts sketched on the right.
+    Give exactly one of ``width``/``radius``, matching
+    :func:`~phonometry.building.slit_transmission_coefficient` /
+    :func:`~phonometry.building.circular_aperture_transmission_coefficient`.
+
+    :param depth: Wall thickness ``d``, in metres.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param width: Slit width ``w``, in metres.
+    :param radius: Circular-hole radius, in metres.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the wall rectangles.
+    :return: The axes.
+    """
+    from matplotlib.patches import Arc
+
+    _check_language(language)
+    if depth <= 0.0:
+        raise ValueError("'depth' must be positive.")
+    if (width is None) == (radius is None):
+        raise ValueError("Give exactly one of 'width' or 'radius'.")
+    opening = (
+        float(width) if width is not None
+        else 2.0 * float(radius if radius is not None else 0.0)
+    )
+    if opening <= 0.0:
+        raise ValueError("The aperture size must be positive.")
+    if ax is None:
+        ax = _new_axes()
+    wall_h = max(4.0 * opening, 1.1 * depth)
+    for y0 in (0.5 * opening, -0.5 * opening - wall_h):
+        _material_rect(ax, 0.0, y0, depth, wall_h, "rigid", **kwargs)
+    ax.text(
+        0.5 * depth, 0.5 * opening + wall_h * 1.03, _t("Wall", language),
+        fontsize=8, ha="center", va="bottom",
+    )
+    reach = max(2.5 * opening, 0.45 * depth)
+    _incidence_arrow(ax, -2.1 * reach, 0.0, 1.2 * reach, language)
+    for k in (0.45, 0.72, 1.0):
+        ax.add_patch(Arc(
+            (depth, 0.0), 2.0 * k * reach, 2.0 * k * reach,
+            theta1=-80.0, theta2=80.0, color=_C_PRIMARY, linewidth=1.0,
+        ))
+    off = max(opening, 0.12 * depth)
+    _dim(ax, (0.0, -0.5 * opening), (0.0, 0.5 * opening),
+         _mm(opening, language), offset=1.5 * off, tight=True)
+    _dim(ax, (0.0, 0.5 * opening + 0.55 * wall_h),
+         (depth, 0.5 * opening + 0.55 * wall_h),
+         _mm(depth, language), tight=depth < 3.0 * opening)
+    _finish_geometry_axes(
+        ax, _t("Wall aperture cross-section", language)
+    )
+    return ax
+
+
+def plot_aperture_result_geometry(
+    result: ApertureTransmissionResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Aperture section for a result that retained its geometry."""
+    if result.depth is None or (
+        result.width is None and result.radius is None
+    ):
+        raise ValueError(
+            "This result does not retain its geometry; call "
+            "plot_aperture_geometry(depth, ...) with the original arguments."
+        )
+    return plot_aperture_geometry(
+        result.depth, ax=ax, width=result.width, radius=result.radius,
+        language=language, **kwargs,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Baffled piston with its directivity lobe.
+# ---------------------------------------------------------------------------
+def plot_piston_geometry(
+    radius: float,
+    ax: Axes | None = None,
+    *,
+    angles: ArrayLike | None = None,
+    directivity: ArrayLike | None = None,
+    lobe_label: str | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Draw a baffled piston to scale, optionally with a directivity lobe.
+
+    The rigid baffle is the vertical wall, the piston the plate of radius
+    ``a`` set into it; when ``angles``/``directivity`` are given the
+    normalised far-field lobe is overlaid on the radiation side.
+
+    :param radius: Piston radius ``a``, in metres.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param angles: Far-field angles, in radians (0 on axis), matching
+        ``directivity``.
+    :param directivity: Linear directivity values in ``[0, 1]``.
+    :param lobe_label: Optional legend label for the lobe (e.g. the ``ka``).
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the piston rectangle.
+    :return: The axes.
+    """
+    _check_language(language)
+    if radius <= 0.0:
+        raise ValueError("'radius' must be positive.")
+    if (angles is None) != (directivity is None):
+        raise ValueError("Give 'angles' and 'directivity' together.")
+    if ax is None:
+        ax = _new_axes()
+    a = float(radius)
+    baffle_h = 3.0 * a
+    wall = 0.35 * a
+    for y0 in (a, -a - baffle_h):
+        _material_rect(ax, -wall, y0, wall, baffle_h, "rigid")
+    ax.text(
+        -0.5 * wall, a + baffle_h * 1.03, _t("Baffle", language),
+        fontsize=8, ha="center", va="bottom",
+    )
+    kwargs.setdefault("facecolor", _C_SECONDARY_LIGHT)
+    kwargs.setdefault("edgecolor", _C_EDGE)
+    from matplotlib.patches import Rectangle
+
+    piston = Rectangle((-wall, -a), 0.6 * wall, 2.0 * a, **kwargs)
+    ax.add_patch(piston)
+    ax.plot([0.0, 3.2 * a], [0.0, 0.0], linestyle=":", linewidth=0.8,
+            color=_C_MUTED)
+    if angles is not None and directivity is not None:
+        ang = np.asarray(angles, dtype=np.float64)
+        d_lin = np.abs(np.asarray(directivity, dtype=np.float64))
+        if ang.shape != d_lin.shape:
+            raise ValueError("'angles' and 'directivity' must match.")
+        peak = float(d_lin.max())
+        if peak > 0.0:
+            scale = 2.8 * a / peak
+            ax.plot(
+                d_lin * scale * np.cos(ang), d_lin * scale * np.sin(ang),
+                linewidth=1.6, color=_C_PRIMARY,
+                label=lobe_label or _t("Normalised directivity", language),
+            )
+            ax.legend(loc="upper right", fontsize=8)
+    _dim(ax, (-1.4 * wall, -a), (-1.4 * wall, a),
+         "2a = " + _mm(2.0 * a, language))
+    _finish_geometry_axes(ax, _t("Baffled piston", language))
+    return ax
+
+
+def plot_piston_result_geometry(
+    result: RadiatingPistonResult,
+    ax: Axes | None = None,
+    *,
+    frequency_index: int = -1,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Baffled-piston drawing for a radiating-piston result.
+
+    The result always retains ``radius``; when it also carries a computed
+    directivity, the lobe of the selected frequency is overlaid with its
+    ``ka`` in the legend.
+    """
+    angles = None
+    lobe = None
+    label = None
+    if result.angles is not None and result.directivity is not None:
+        directivity = np.asarray(result.directivity, dtype=np.float64)
+        ka = np.atleast_1d(np.asarray(result.ka, dtype=np.float64))
+        row = directivity[frequency_index]
+        angles = np.asarray(result.angles, dtype=np.float64)
+        lobe = row
+        from .._i18n import format_number
+
+        label = "ka = " + format_number(
+            float(ka[frequency_index]), language, decimals=1, trim=True
+        )
+    return plot_piston_geometry(
+        result.radius, ax=ax, angles=angles, directivity=lobe,
+        lobe_label=label, language=language, **kwargs,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Plenum chamber section.
+# ---------------------------------------------------------------------------
+def plot_plenum_geometry(
+    exit_area: float,
+    line_of_sight: float,
+    wall_area: float,
+    ax: Axes | None = None,
+    *,
+    angle: float = 0.0,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Draw the plenum-chamber section honouring the acoustic geometry.
+
+    The two truly geometric parameters of
+    :func:`~phonometry.noise_control.plenum_attenuation` are drawn exactly:
+    the inlet-to-outlet line of sight ``r`` and its ``angle`` off the inlet
+    axis fix the box; the exit area sets the drawn outlet mouth (square-duct
+    side ``sqrt(S_out)``) and the wall area is annotated.
+
+    :param exit_area: Outlet area ``S_out``, in m2.
+    :param line_of_sight: Inlet-to-outlet distance ``r``, in metres.
+    :param wall_area: Total internal wall area ``S_w``, in m2 (annotation).
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param angle: Angle between the inlet axis and the line of sight, in
+        radians (0 <= angle < pi/2).
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the box rectangle.
+    :return: The axes.
+    """
+    from matplotlib.patches import Rectangle
+
+    _check_language(language)
+    if exit_area <= 0.0 or line_of_sight <= 0.0 or wall_area <= 0.0:
+        raise ValueError(
+            "'exit_area', 'line_of_sight' and 'wall_area' must be positive."
+        )
+    if not 0.0 <= angle < 0.5 * np.pi:
+        raise ValueError("'angle' must be in [0, pi/2).")
+    if ax is None:
+        ax = _new_axes()
+    r = float(line_of_sight)
+    mouth = float(np.sqrt(exit_area))
+    duct = max(mouth, 0.18 * r)
+    margin = max(0.5 * duct, 0.12 * r)
+    width = r * float(np.cos(angle))
+    rise = r * float(np.sin(angle))
+    box_w = width
+    box_h = rise + 2.0 * margin
+    y_in = margin
+    y_out = margin + rise
+    lw = kwargs.pop("linewidth", 1.6)
+    colour = kwargs.pop("color", _C_EDGE)
+    # Walls drawn as segments so the inlet and outlet mouths stay open.
+    walls = [
+        ((0.0, box_w), (0.0, 0.0)),
+        ((0.0, box_w), (box_h, box_h)),
+        ((0.0, 0.0), (0.0, y_in - 0.5 * duct)),
+        ((0.0, 0.0), (y_in + 0.5 * duct, box_h)),
+        ((box_w, box_w), (0.0, y_out - 0.5 * mouth)),
+        ((box_w, box_w), (y_out + 0.5 * mouth, box_h)),
+    ]
+    for (x_pair, y_pair) in walls:
+        ax.plot(x_pair, y_pair, color=colour, linewidth=lw, **kwargs)
+    stub = 0.35 * r
+    wall_t = max(0.05 * duct, 0.002)
+    ax.add_patch(Rectangle((-stub, y_in - 0.5 * duct), stub, duct,
+                           facecolor="none", edgecolor=_C_EDGE,
+                           linewidth=1.2))
+    for y_wall in (y_in - 0.5 * duct - wall_t, y_in + 0.5 * duct):
+        _material_rect(ax, -stub, y_wall, stub, wall_t, "plate",
+                       linewidth=0.5)
+    ax.text(-0.5 * stub, y_in + 0.85 * duct, _t("Inlet", language),
+            fontsize=8, ha="center", va="bottom")
+    # Outlet mouth on the right wall.
+    ax.plot([box_w, box_w], [y_out - 0.5 * mouth, y_out + 0.5 * mouth],
+            color=_C_PRIMARY, linewidth=3.0)
+    ax.text(box_w * 1.02, y_out + 0.7 * mouth, _t("Outlet", language),
+            fontsize=8, ha="left", va="bottom")
+    # Line of sight, labelled along its own slope.
+    ax.plot([0.0, box_w], [y_in, y_out], linestyle="--", linewidth=1.2,
+            color=_C_SECONDARY)
+    slope = float(np.degrees(angle))
+    ax.text(
+        0.5 * box_w, 0.5 * (y_in + y_out) + 0.03 * r,
+        "r = " + _metres(r, language), fontsize=8, ha="center",
+        va="bottom", rotation=slope, rotation_mode="anchor",
+        color=_C_SECONDARY,
+    )
+    from .._i18n import format_number
+
+    ax.text(
+        0.5 * box_w, -0.08 * r,
+        "S_w = " + format_number(wall_area, language, decimals=1, trim=True)
+        + " m$^2$, S_out = "
+        + format_number(exit_area, language, decimals=2, trim=True)
+        + " m$^2$",
+        fontsize=8, ha="center", va="top",
+    )
+    _finish_geometry_axes(ax, _t("Plenum chamber section", language))
+    return ax
+
+
+# ---------------------------------------------------------------------------
+# FDTD domain (drawn without running the simulation).
+# ---------------------------------------------------------------------------
+def plot_fdtd_domain(
+    sim: FDTD2D,
+    ax: Axes | None = None,
+    *,
+    probes: ArrayLike | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Draw an FDTD2D domain before running it: what will be simulated.
+
+    Domain extent in metres (same orientation as the snapshot renderer),
+    obstacles in grey, sponge layers shaded on their sides, impedance edges
+    and rigid edges marked, sources starred and optional probe positions
+    dotted.
+
+    :param sim: A :class:`~phonometry.simulation.FDTD2D` instance (fresh or
+        already stepped; only its static configuration is drawn).
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param probes: Optional probe positions to preview, shape ``(N, 2)`` as
+        ``(x, y)`` in metres (the ``fdtd_simulation`` convention).
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the domain ``imshow`` of the obstacle layer.
+    :return: The axes.
+    """
+    _check_language(language)
+    from .._i18n import localize_axes
+
+    pts: NDArray[np.float64] | None = None
+    if probes is not None:
+        pts = np.asarray(probes, dtype=np.float64)
+        if pts.ndim != 2 or pts.shape[1] != 2:
+            raise ValueError("'probes' must have shape (N, 2).")
+    if ax is None:
+        ax = _new_axes()
+    ny, nx = sim.p.shape
+    lx, ly = nx * sim.dx, ny * sim.dx
+    extent = (0.0, lx, ly, 0.0)
+    handles: dict[str, Any] = {}
+    mask = getattr(sim, "_obstacle", None)
+    if mask is not None:
+        overlay = np.ma.masked_where(~mask, np.ones_like(mask, dtype=float))
+        kwargs.setdefault("cmap", "gray")
+        kwargs.setdefault("vmin", 0.0)
+        kwargs.setdefault("vmax", 2.0)
+        ax.imshow(overlay, extent=extent, origin="upper",
+                  interpolation="nearest", **kwargs)
+    # Sponge bands.
+    depth = sim.sponge_width * sim.dx
+    if depth > 0.0:
+        for side in sim.sponge_sides:
+            if side == "left":
+                rect = (0.0, 0.0, depth, ly)
+            elif side == "right":
+                rect = (lx - depth, 0.0, depth, ly)
+            elif side == "top":
+                rect = (0.0, 0.0, lx, depth)
+            else:
+                rect = (0.0, ly - depth, lx, ly - (ly - depth))
+            handles["sponge"] = _material_rect(
+                ax, rect[0], rect[1], rect[2], rect[3], "cavity",
+                edgecolor="none",
+            )
+    # Edges: impedance in secondary, rigid in edge colour.
+    for side in ("left", "right", "top", "bottom"):
+        if side in sim.edge_impedance:
+            colour, key = _C_SECONDARY, "impedance"
+        elif side in sim.sponge_sides:
+            continue
+        else:
+            colour, key = _C_EDGE, "rigid"
+        seg = {
+            "left": ((0.0, 0.0), (0.0, ly)),
+            "right": ((lx, 0.0), (lx, ly)),
+            "top": ((0.0, 0.0), (lx, 0.0)),
+            "bottom": ((0.0, ly), (lx, ly)),
+        }[side]
+        (line,) = ax.plot(
+            [seg[0][0], seg[1][0]], [seg[0][1], seg[1][1]],
+            color=colour, linewidth=2.6,
+        )
+        handles[key] = line
+    for src in getattr(sim, "_sources", ()):  # star per source
+        (marker,) = ax.plot(
+            [(src.ix + 0.5) * sim.dx], [(src.iy + 0.5) * sim.dx],
+            marker="*", markersize=11, color=_C_REFERENCE, linestyle="none",
+        )
+        handles["source"] = marker
+    if pts is not None:
+        (dots,) = ax.plot(
+            pts[:, 0], pts[:, 1], marker="o", markersize=5, color=_C_MUTED,
+            markeredgecolor="black", linestyle="none",
+        )
+        handles["probe"] = dots
+    ax.set_xlim(0.0, lx)
+    ax.set_ylim(ly, 0.0)
+    ax.set_aspect("equal")
+    ax.set_xlabel(_t("x [m]", language))
+    ax.set_ylabel(_t("y [m]", language))
+    ax.set_title(_t("FDTD domain", language), fontweight="bold")
+    label_keys = {
+        "sponge": "Sponge layer", "impedance": "Impedance edge",
+        "rigid": "Rigid edge", "source": "Source", "probe": "Probe",
+    }
+    if handles:
+        ax.legend(
+            handles.values(),
+            [_t(label_keys[k], language) for k in handles],
+            loc="upper right", fontsize=8,
+        )
+    localize_axes(ax, language)
+    return ax

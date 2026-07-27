@@ -3,6 +3,9 @@
 
 from __future__ import annotations
 
+from .._plot.geometry import (
+    plot_barrier_geometry,
+)
 from .air_absorption import (
     AtmosphericAbsorptionWarning,
     AtmosphericAttenuation,
@@ -147,6 +150,7 @@ __all__ = [
     "log_linear_sound_speed_profile",
     "meteorological_correction",
     "outdoor_propagation_attenuation",
+    "plot_barrier_geometry",
     "predicted_prominence",
     "predicted_receiver_level",
     "rating_level",

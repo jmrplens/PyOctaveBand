@@ -3,6 +3,10 @@
 
 from __future__ import annotations
 
+from .._plot.geometry import (
+    plot_plenum_geometry,
+    plot_silencer_geometry,
+)
 from .enclosures import EnclosureResult, enclosure_insertion_loss
 from .hvac import (
     HvacSpectrumResult,
@@ -44,6 +48,8 @@ __all__ = [
     "helmholtz_resonator",
     "insertion_loss",
     "plenum_attenuation",
+    "plot_plenum_geometry",
+    "plot_silencer_geometry",
     "quarter_wave_impedance",
     "quarter_wave_resonator",
     "shunt_matrix",

@@ -259,6 +259,36 @@ plt.show()
 
 </details>
 
+Las tres curvas comparten una única geometría, y `.plot_geometry()` la
+dibuja a escala: a estas distancias de tráfico rodado la pantalla de 4 m es
+una lámina, y toda la pérdida por inserción descansa sobre una diferencia de
+caminos de solo 0,15 m.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/barrier_geometry_es.svg" alt="Sección a escala de la geometría de barrera de las curvas de pérdida por inserción: una estrella de fuente a 1 m sobre el suelo rayado, una pantalla delgada de 4 m a 50 m, y un triángulo de receptor a 1,5 m de altura a 100 m, con el camino directo a trazos cortado por la pantalla, el camino difractado continuo doblado sobre su borde superior, la diferencia de caminos de 0,15 m anotada y las distancias de 50 m y 100 m acotadas" width="90%" />
+
+*Dibujada a escala, la pantalla casi desaparece: el camino difractado sobre
+el borde es solo 0,15 m más largo que el directo bloqueado, y esa diferencia
+es toda la entrada del número de Fresnel `N = (2/λ)(A + B − d)` del que
+dependen todos los métodos de arriba.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import barrier_insertion_loss
+
+freqs = np.geomspace(50.0, 5000.0, 240)
+il = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5)
+
+# Una línea: la sección a escala, con la diferencia de caminos anotada.
+il.plot_geometry(language="es")
+plt.show()
+```
+
+</details>
+
 ## Relación con ISO 9613-2
 
 Los términos tabulados `Agr` y `Dz` del

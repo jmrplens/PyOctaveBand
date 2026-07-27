@@ -413,6 +413,36 @@ plt.show()
 
 </details>
 
+Behind both curves sits the same physical object, and `.plot_geometry()` on
+the piston result draws it: the plate in its rigid baffle to scale, with the
+far-field lobe of the highest computed frequency overlaid on the radiation
+side.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_baffle_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_baffle_geometry.svg" alt="A 10 cm radius rigid piston drawn to scale as a plate of 200 mm diameter set into a hatched vertical baffle, with the piston diameter dimensioned and the normalised far-field directivity lobe at ka of 7.3 overlaid on the radiation side: a long forward main lobe hugging the dotted axis with small side lobes folding back near the plate" width="82%"></picture>
+
+*The piston the impedance and directivity curves describe, to scale: at
+4 kHz this 10 cm radius plate has `ka ≈ 7.3`, so the overlaid lobe is
+already several times narrower than the low-frequency hemisphere and the
+first side lobes have appeared.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import radiating_piston
+
+res = radiating_piston(0.1, np.array([500.0, 2000.0, 4000.0]),
+                       angles=np.linspace(-np.pi / 2, np.pi / 2, 181))
+
+# One line: the piston in its baffle with the lobe of the highest frequency.
+res.plot_geometry()
+plt.show()
+```
+
+</details>
+
 ## 7. Loudspeaker characteristics report (IEC 60268-5)
 
 The rated characteristics IEC 60268-5 defines around a measured on-axis

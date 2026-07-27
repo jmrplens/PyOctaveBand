@@ -3,6 +3,9 @@
 
 from __future__ import annotations
 
+from .._plot.geometry import (
+    plot_microphone_positions,
+)
 from .declaration import (
     DeclarationForm,
     NoiseEmissionDeclaration,
@@ -81,6 +84,7 @@ __all__ = [
     "mean_velocity_level",
     "measurement_positions",
     "meteorological_corrections",
+    "plot_microphone_positions",
     "precision_background_correction",
     "precision_field_indicators",
     "precision_positions",

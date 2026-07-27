@@ -3,6 +3,9 @@
 
 from __future__ import annotations
 
+from .._plot.geometry import (
+    plot_piston_geometry,
+)
 from .distortion import (
     HarmonicDistortionResult,
     ModulationDistortionResult,
@@ -62,6 +65,7 @@ __all__ = [
     "piston_directivity_pattern",
     "piston_reactance",
     "piston_resistance",
+    "plot_piston_geometry",
     "radiating_piston",
     "sinad",
     "swept_sine_distortion",

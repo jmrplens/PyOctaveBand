@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="712.8pt" height="439.198125pt" viewBox="0 0 712.8 439.198125" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.1, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 439.198125 
+L 712.8 439.198125 
+L 712.8 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 74.787097 354.163264 
+L 227.674645 354.163264 
+L 227.674645 244.957873 
+L 74.787097 244.957873 
+L 74.787097 354.163264 
+z
+" clip-path="url(#p8df9ac546a)" style="fill: none; stroke: #555555; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 74.787097 359.623534 
+L 227.674645 359.623534 
+L 227.674645 354.163264 
+L 74.787097 354.163264 
+z
+" clip-path="url(#p8df9ac546a)" style="fill: #9e9e9e; opacity: 0.85; stroke: #555555; stroke-width: 0.5; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 74.787097 244.957873 
+L 227.674645 244.957873 
+L 227.674645 239.497603 
+L 74.787097 239.497603 
+z
+" clip-path="url(#p8df9ac546a)" style="fill: #9e9e9e; opacity: 0.85; stroke: #555555; stroke-width: 0.5; stroke-linejoin: miter"/>
+   </g>
+   <g id="line2d_1">
+    <path d="M 227.674645 354.163264 
+L 638.012903 354.163264 
+" clip-path="url(#p8df9ac546a)" style="fill: none; stroke: #555555; stroke-width: 1.6; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_2">
+    <path d="M 227.674645 95.172716 
+L 638.012903 95.172716 
+" clip-path="url(#p8df9ac546a)" style="fill: none; stroke: #555555; stroke-width: 1.6; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_3">
+    <path d="M 227.674645 354.163264 
+L 227.674645 354.163264 
+" clip-path="url(#p8df9ac546a)" style="fill: none; stroke: #555555; stroke-width: 1.6; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_4">
+    <path d="M 227.674645 244.957873 
+L 227.674645 95.172716 
+" clip-path="url(#p8df9ac546a)" style="fill: none; stroke: #555555; stroke-width: 1.6; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_5">
+    <path d="M 638.012903 354.163264 
+L 638.012903 204.378107 
+" clip-path="url(#p8df9ac546a)" style="fill: none; stroke: #555555; stroke-width: 1.6; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_6">
+    <path d="M 638.012903 95.172716 
+L 638.012903 95.172716 
+" clip-path="url(#p8df9ac546a)" style="fill: none; stroke: #555555; stroke-width: 1.6; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_7">
+    <path d="M 638.012903 204.378107 
+L 638.012903 95.172716 
+" clip-path="url(#p8df9ac546a)" style="fill: none; stroke: #1f77b4; stroke-width: 3; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_8">
+    <path d="M 227.674645 299.560569 
+L 638.012903 149.775412 
+" clip-path="url(#p8df9ac546a)" style="fill: none; stroke-dasharray: 4.44,1.92; stroke-dashoffset: 0; stroke: #ff7f0e; stroke-width: 1.2"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle" x="151.230871" y="204.814111" transform="rotate(-0 151.230871 204.814111)">Entrada</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="646.219668" y="71.409763" transform="rotate(-0 646.219668 71.409763)">Salida</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #ff7f0e" x="432.184767" y="209.757986" transform="rotate(-20.053523 432.184767 209.757986)">r = 1,2 m</text>
+   </g>
+   <g id="text_4">
+    <!-- S_w = 6 m$^2$, S_out = 0,09 m$^2$ -->
+    <g transform="translate(373.963774 396.62899)">
+     <text>
+      <tspan x="0" y="-0.53975" style="font-size: 8px; font-family: sans-serif">S</tspan>
+      <tspan x="5.078125" y="-0.53975" style="font-size: 8px; font-family: sans-serif">_</tspan>
+      <tspan x="9.078125" y="-0.53975" style="font-size: 8px; font-family: sans-serif">w</tspan>
+      <tspan x="15.621094" y="-0.53975" style="font-size: 8px; font-family: sans-serif"> </tspan>
+      <tspan x="18.164062" y="-0.53975" style="font-size: 8px; font-family: sans-serif">=</tspan>
+      <tspan x="24.867188" y="-0.53975" style="font-size: 8px; font-family: sans-serif"> </tspan>
+      <tspan x="27.410156" y="-0.53975" style="font-size: 8px; font-family: sans-serif">6</tspan>
+      <tspan x="32.5" y="-0.53975" style="font-size: 8px; font-family: sans-serif"> </tspan>
+      <tspan x="35.042969" y="-0.53975" style="font-size: 8px; font-family: sans-serif">m</tspan>
+      <tspan x="46.694141" y="-0.53975" style="font-size: 8px; font-family: sans-serif">,</tspan>
+      <tspan x="49.237109" y="-0.53975" style="font-size: 8px; font-family: sans-serif"> </tspan>
+      <tspan x="51.780078" y="-0.53975" style="font-size: 8px; font-family: sans-serif">S</tspan>
+      <tspan x="56.858203" y="-0.53975" style="font-size: 8px; font-family: sans-serif">_</tspan>
+      <tspan x="60.858203" y="-0.53975" style="font-size: 8px; font-family: sans-serif">o</tspan>
+      <tspan x="65.752734" y="-0.53975" style="font-size: 8px; font-family: sans-serif">u</tspan>
+      <tspan x="70.823047" y="-0.53975" style="font-size: 8px; font-family: sans-serif">t</tspan>
+      <tspan x="73.959766" y="-0.53975" style="font-size: 8px; font-family: sans-serif"> </tspan>
+      <tspan x="76.502734" y="-0.53975" style="font-size: 8px; font-family: sans-serif">=</tspan>
+      <tspan x="83.205859" y="-0.53975" style="font-size: 8px; font-family: sans-serif"> </tspan>
+      <tspan x="85.748828" y="-0.53975" style="font-size: 8px; font-family: sans-serif">0</tspan>
+      <tspan x="90.838672" y="-0.53975" style="font-size: 8px; font-family: sans-serif">,</tspan>
+      <tspan x="93.381641" y="-0.53975" style="font-size: 8px; font-family: sans-serif">0</tspan>
+      <tspan x="98.471484" y="-0.53975" style="font-size: 8px; font-family: sans-serif">9</tspan>
+      <tspan x="103.561328" y="-0.53975" style="font-size: 8px; font-family: sans-serif"> </tspan>
+      <tspan x="106.104297" y="-0.53975" style="font-size: 8px; font-family: sans-serif">m</tspan>
+      <tspan x="42.9125" y="-3.84375" style="font-size: 5.6px; font-family: sans-serif">2</tspan>
+      <tspan x="113.973828" y="-3.84375" style="font-size: 5.6px; font-family: sans-serif">2</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_5">
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="356.4" y="16.798125" transform="rotate(-0 356.4 16.798125)">Sección de la cámara plenum</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p8df9ac546a">
+   <rect x="7.2" y="22.798125" width="698.4" height="409.2"/>
+  </clipPath>
+ </defs>
+</svg>

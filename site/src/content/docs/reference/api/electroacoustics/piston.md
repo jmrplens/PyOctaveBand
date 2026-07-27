@@ -206,6 +206,41 @@ matplotlib (`pip install phonometry[plot]`).
 
 **Returns:** The axes.
 
+## plot_piston_geometry
+
+```python
+plot_piston_geometry(
+    radius: float,
+    ax: Axes | None = None,
+    *,
+    angles: ArrayLike | None = None,
+    directivity: ArrayLike | None = None,
+    lobe_label: str | None = None,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw a baffled piston to scale, optionally with a directivity lobe.
+
+The rigid baffle is the vertical wall, the piston the plate of radius
+`a` set into it; when `angles`/`directivity` are given the
+normalised far-field lobe is overlaid on the radiation side.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `radius` | Piston radius `a`, in metres. |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `angles` | Far-field angles, in radians (0 on axis), matching `directivity`. |
+| `directivity` | Linear directivity values in `[0, 1]`. |
+| `lobe_label` | Optional legend label for the lobe (e.g. the `ka`). |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the piston rectangle. |
+
+**Returns:** The axes.
+
 ## radiating_piston
 
 ```python
@@ -301,3 +336,29 @@ Requires matplotlib (`pip install phonometry[plot]`).
 | Name | Description |
 | :--- | :--- |
 | `language` | Label language, `"en"` (default) or `"es"`. |
+
+### RadiatingPistonResult.plot_geometry()
+
+```python
+RadiatingPistonResult.plot_geometry(
+    ax: Axes | None = None,
+    *,
+    frequency_index: int = -1,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the baffled piston to scale, with its directivity lobe.
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `frequency_index` | Index of the frequency whose far-field lobe is overlaid (default: the highest); ignored when the result carries no directivity. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the piston rectangle. |

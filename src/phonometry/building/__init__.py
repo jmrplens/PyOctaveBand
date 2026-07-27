@@ -3,6 +3,9 @@
 
 from __future__ import annotations
 
+from .._plot.geometry import (
+    plot_aperture_geometry,
+)
 from .aperture_transmission import (
     ApertureTransmissionResult,
     circular_aperture_transmission_coefficient,
@@ -259,6 +262,7 @@ __all__ = [
     "outdoor_attenuation",
     "outdoor_level",
     "plate_loss_factor",
+    "plot_aperture_geometry",
     "predicted_airborne_insulation",
     "predicted_impact_insulation",
     "prediction_input_uncertainty",

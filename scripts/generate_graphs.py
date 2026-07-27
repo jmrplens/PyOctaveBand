@@ -8013,6 +8013,213 @@ def generate_helmholtz_resonator_geometry(output_dir: str) -> None:
     plt.close()
 
 
+def generate_expansion_chamber_geometry(output_dir: str) -> None:
+    """To-scale cross-section of the 4:1 expansion chamber of the TL figure.
+
+    The 0,3 m chamber with 0,04 m2 over a 0,01 m2 pipe, drawn with the
+    equivalent circular diameters. One concept: the geometry behind the
+    expansion-chamber transmission-loss curve.
+    """
+    print("Generating expansion_chamber_geometry...")
+    from phonometry import plot_silencer_geometry
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    plot_silencer_geometry(
+        "expansion chamber", ax=ax, length=0.3, chamber_area=0.04,
+        pipe_area=0.01, language=_LANG,
+    )
+    plt.tight_layout()
+    save_figure(output_dir, "expansion_chamber_geometry.svg")
+    plt.close()
+
+
+def generate_helmholtz_branch_geometry(output_dir: str) -> None:
+    """To-scale cross-section of the side-branch Helmholtz resonator.
+
+    The resonator of the side-branch TL figure (1 cm2 neck of 2 cm on a
+    1 L cavity over a 0,01 m2 duct), cavity drawn as its equal-volume cube.
+    One concept: the branch geometry that shorts the duct at its tuning.
+    """
+    print("Generating helmholtz_branch_geometry...")
+    from phonometry import plot_silencer_geometry
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    plot_silencer_geometry(
+        "Helmholtz resonator", ax=ax, duct_area=0.01, neck_area=1e-4,
+        neck_length=0.02, cavity_volume=1e-3, language=_LANG,
+    )
+    plt.tight_layout()
+    save_figure(output_dir, "helmholtz_branch_geometry.svg")
+    plt.close()
+
+
+def generate_quarter_wave_geometry(output_dir: str) -> None:
+    """To-scale cross-section of the quarter-wave side branch.
+
+    The 0,3 m closed tube (20 cm2) of the side-branch TL figure on the same
+    0,01 m2 duct. One concept: a quarter-wave stub is just a closed tube of
+    the right length.
+    """
+    print("Generating quarter_wave_geometry...")
+    from phonometry import plot_silencer_geometry
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    plot_silencer_geometry(
+        "quarter-wave resonator", ax=ax, duct_area=0.01, length=0.3,
+        branch_area=2e-3, language=_LANG,
+    )
+    plt.tight_layout()
+    save_figure(output_dir, "quarter_wave_geometry.svg")
+    plt.close()
+
+
+def generate_image_source_plan(output_dir: str) -> None:
+    """Plan view of the image-source lattice of the reflectogram example.
+
+    The 7 x 5 x 3 m room with its source and receiver, and every image up
+    to third order coloured by reflection order over the mirror-room grid.
+    One concept: where the reflections of the reflectogram actually come
+    from.
+    """
+    print("Generating image_source_plan...")
+    from phonometry import image_source_rir
+
+    res = image_source_rir(
+        (7.0, 5.0, 3.0), (2.0, 1.6, 1.5), (5.2, 3.4, 1.7), 0.3,
+        fs=16000, max_order=3,
+    )
+    _fig, ax = plt.subplots(figsize=(10, 6.6))
+    res.plot_geometry(ax=ax, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "image_source_plan.svg")
+    plt.close()
+
+
+def generate_barrier_geometry(output_dir: str) -> None:
+    """To-scale section of the barrier of the insertion-loss figure.
+
+    The 4 m screen 50 m from a 1 m source with the receiver 1,5 m high at
+    100 m: direct and diffracted paths and the path-length difference that
+    drives the Fresnel number. One concept: the geometry the insertion-loss
+    methods share.
+    """
+    print("Generating barrier_geometry...")
+    from phonometry import plot_barrier_geometry
+
+    _fig, ax = plt.subplots(figsize=(10, 5.4))
+    plot_barrier_geometry(
+        ax=ax, source_height=1.0, barrier_distance=50.0,
+        barrier_height=4.0, receiver_distance=100.0, receiver_height=1.5,
+        language=_LANG,
+    )
+    plt.tight_layout()
+    save_figure(output_dir, "barrier_geometry.svg")
+    plt.close()
+
+
+def generate_microphone_positions_hemisphere(output_dir: str) -> None:
+    """The ISO 3744 engineering hemisphere microphone array in 3-D.
+
+    The tabulated 10-microphone array on a 2 m hemisphere over one
+    reflecting plane, numbered as in the standard. One concept: where the
+    sound-power microphones actually sit.
+    """
+    print("Generating microphone_positions_hemisphere...")
+    from phonometry import measurement_positions, plot_microphone_positions
+
+    positions = measurement_positions("hemisphere", radius=2.0)
+    plt.figure(figsize=(9.0, 7.0))
+    ax = plt.subplot(projection="3d")
+    plot_microphone_positions(positions, ax=ax, radius=2.0, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "microphone_positions_hemisphere.svg")
+    plt.close()
+
+
+def generate_aperture_slit_geometry(output_dir: str) -> None:
+    """To-scale section of a 2 mm slit through a 100 mm wall.
+
+    The slit of the aperture transmission-loss example: a deep, narrow gap
+    whose depth resonances puncture the wall's insulation. One concept: the
+    tiny geometry behind a large leak.
+    """
+    print("Generating aperture_slit_geometry...")
+    from phonometry import plot_aperture_geometry
+
+    _fig, ax = plt.subplots(figsize=(9.0, 6.2))
+    plot_aperture_geometry(0.1, ax=ax, width=0.002, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "aperture_slit_geometry.svg")
+    plt.close()
+
+
+def generate_piston_baffle_geometry(output_dir: str) -> None:
+    """The baffled piston to scale with its high-frequency lobe.
+
+    A 10 cm piston in an infinite baffle with the normalised far-field
+    directivity overlaid at ka about 7 (where the main lobe has narrowed).
+    One concept: the piston the radiation-impedance and directivity curves
+    describe.
+    """
+    print("Generating piston_baffle_geometry...")
+    from phonometry import radiating_piston
+
+    result = radiating_piston(
+        0.1, np.array([500.0, 2000.0, 4000.0]),
+        angles=np.linspace(-np.pi / 2.0, np.pi / 2.0, 181),
+    )
+    _fig, ax = plt.subplots(figsize=(9.0, 6.2))
+    result.plot_geometry(ax=ax, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "piston_baffle_geometry.svg")
+    plt.close()
+
+
+def generate_plenum_geometry(output_dir: str) -> None:
+    """Plenum chamber section honouring the acoustic geometry exactly.
+
+    A 1,2 m line of sight at 20 degrees off the inlet axis, a 0,09 m2
+    outlet and 6 m2 of lined walls: the two geometric parameters of the
+    attenuation formula are drawn exactly and the areas annotated. One
+    concept: what the plenum formula actually measures.
+    """
+    print("Generating plenum_geometry...")
+    from phonometry import plot_plenum_geometry
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    plot_plenum_geometry(0.09, 1.2, 6.0, ax=ax, angle=0.35, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "plenum_geometry.svg")
+    plt.close()
+
+
+def generate_fdtd_domain_geometry(output_dir: str) -> None:
+    """The configured FDTD domain drawn before any time stepping.
+
+    A 4,5 x 3 m domain with sponge layers left and right, an impedance top
+    edge, a rigid floor, a thin obstacle, one source and two probes: the
+    setup drawing that precedes every simulation. One concept: check the
+    domain before you run it.
+    """
+    print("Generating fdtd_domain_geometry...")
+    from phonometry.simulation import FDTD2D, GaussianPulse
+
+    mask = np.zeros((60, 90), dtype=bool)
+    mask[25:35, 40:44] = True
+    sim = FDTD2D(
+        343.0, 0.05, shape=(60, 90), sponge_width=8,
+        sponge_sides=("left", "right"), edge_impedance={"top": 413.0},
+        obstacle_mask=mask,
+    )
+    sim.add_source(GaussianPulse(10, 30, width=1e-3))
+    _fig, ax = plt.subplots(figsize=(10, 6.6))
+    sim.plot_geometry(ax=ax, probes=[(3.0, 1.5), (4.0, 2.0)],
+                      language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "fdtd_domain_geometry.svg")
+    plt.close()
+
+
 def generate_scattering_coefficient(output_dir: str) -> None:
     """ISO 17497-1: scattering coefficient s(f) from a per-band measurement."""
     print("Generating scattering_coefficient.png...")
@@ -11595,6 +11802,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     # Room acoustics: the synthetic image-source room impulse response as a
     # reflectogram of mirror-image reflections by order (Kuttruff 4.1).
     generate_image_source_reflectogram,
+    generate_image_source_plan,
     # Underwater acoustics: ship radiated noise / monopole source
     # level (ISO 17208) and pile-driving sound exposure (ISO 18406).
     generate_ship_source_level,
@@ -11630,6 +11838,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     # Theoretical panel sound insulation (single/double wall, radiation, slit).
     generate_panel_insulation_concept,
     generate_silencer_expansion_chamber,
+    generate_expansion_chamber_geometry,
     # Rooms & materials result plots: ISO 354 measurement, ISO 10534-2 tube
     # result, ASTM E2611 transfer matrix, porous models, MPP peak, Paris
     # integral, Bies steady-state field, ISO 3382 per-band parameters and the
@@ -11682,13 +11891,21 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_atmospheric_ray_fan,
     generate_atmospheric_pe_range,
     generate_barrier_insertion_loss_methods,
+    generate_barrier_geometry,
     # Emission & electroacoustics: modulation sidebands, piston radiation
     # impedance, ISO 9614-1 field indicators, side-branch silencers, HVAC end
     # reflection, machine enclosures, phase decomposition and R 128 loudness.
     generate_modulation_distortion,
     generate_piston_radiation_impedance,
+    generate_piston_baffle_geometry,
+    generate_microphone_positions_hemisphere,
+    generate_aperture_slit_geometry,
+    generate_fdtd_domain_geometry,
     generate_field_indicators,
     generate_silencer_side_branch,
+    generate_helmholtz_branch_geometry,
+    generate_quarter_wave_geometry,
+    generate_plenum_geometry,
     generate_hvac_end_reflection,
     generate_enclosure_insertion_loss,
     generate_phase_decomposition,

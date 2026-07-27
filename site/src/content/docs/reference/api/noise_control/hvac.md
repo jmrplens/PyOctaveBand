@@ -269,3 +269,40 @@ with the wavelength; it underpredicts the low-frequency loss by 5-10 dB.
 | `angle` | Angle `theta` between the inlet axis and the line to the outlet, rad (default 0). |
 
 **Returns:** The transmission loss, dB (float for scalar absorption, else a per-band array).
+
+## plot_plenum_geometry
+
+```python
+plot_plenum_geometry(
+    exit_area: float,
+    line_of_sight: float,
+    wall_area: float,
+    ax: Axes | None = None,
+    *,
+    angle: float = 0.0,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the plenum-chamber section honouring the acoustic geometry.
+
+The two truly geometric parameters of
+[`plenum_attenuation`](/phonometry/reference/api/noise_control/hvac/#plenum_attenuation) are drawn exactly:
+the inlet-to-outlet line of sight `r` and its `angle` off the inlet
+axis fix the box; the exit area sets the drawn outlet mouth (square-duct
+side `sqrt(S_out)`) and the wall area is annotated.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `exit_area` | Outlet area `S_out`, in m2. |
+| `line_of_sight` | Inlet-to-outlet distance `r`, in metres. |
+| `wall_area` | Total internal wall area `S_w`, in m2 (annotation). |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `angle` | Angle between the inlet axis and the line of sight, in radians (0 \<= angle \< pi/2). |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the box rectangle. |
+
+**Returns:** The axes.

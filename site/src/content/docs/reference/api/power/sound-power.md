@@ -209,6 +209,40 @@ air-absorption correction (scalar, or per band when the attenuation
 coefficient `a(f)` is supplied per band). All three are added to
 `Lp_bar + 10*lg(S/S0)` to obtain `LW`.
 
+## plot_microphone_positions
+
+```python
+plot_microphone_positions(
+    positions: ArrayLike,
+    ax: Axes | None = None,
+    *,
+    radius: float | None = None,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Any
+```
+
+Draw a microphone position array on its measurement surface, in 3-D.
+
+Numbered microphone points with a wireframe of the hemisphere (or full
+sphere when positions dip below the reflecting plane) of the given
+`radius`; pairs with
+[`measurement_positions`](/phonometry/reference/api/power/sound-power/#measurement_positions) and
+[`precision_positions`](/phonometry/reference/api/power/sound-power/#precision_positions), whose `(N, 3)`
+arrays it accepts directly.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `positions` | Cartesian microphone positions, shape `(N, 3)`, in metres. |
+| `ax` | Existing 3-D axes, or `None` to create a figure. |
+| `radius` | Surface radius for the wireframe, in metres; `None` uses the largest position norm. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the microphone `scatter`. |
+
+**Returns:** The 3-D axes.
+
 ## precision_background_correction
 
 ```python

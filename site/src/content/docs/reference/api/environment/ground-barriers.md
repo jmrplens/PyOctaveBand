@@ -175,6 +175,12 @@ BarrierInsertionLoss(
     fresnel_number: Real,
     method: str,
     ground: bool,
+    source_height: float | None = None,
+    barrier_distance: float | None = None,
+    barrier_height: float | None = None,
+    receiver_distance: float | None = None,
+    receiver_height: float | None = None,
+    thickness: float | None = None,
 )
 ```
 
@@ -189,6 +195,12 @@ Per-frequency barrier insertion loss (IL vs frequency).
 | `fresnel_number` | Fresnel number `N` per frequency (single-edge geometry; the double-edge `N` for a thick barrier). |
 | `method` | Diffraction model used (`"kurze_anderson"` or `"exact"`). |
 | `ground` | Whether the coherent four-path ground model was applied. |
+| `source_height` | Source height the loss was computed for, in metres, retained (with the other five geometry fields) so `plot_geometry` can draw the section; appended after the original fields and `None` for hand-built results. |
+| `barrier_distance` | Source-to-barrier horizontal distance, in metres. |
+| `barrier_height` | Barrier height, in metres. |
+| `receiver_distance` | Source-to-receiver horizontal distance, in metres. |
+| `receiver_height` | Receiver height, in metres. |
+| `thickness` | Thick-barrier top width, in metres, or `None`. |
 
 ### BarrierInsertionLoss.plot()
 
@@ -205,6 +217,28 @@ Plot the insertion loss versus frequency.
 
 Requires matplotlib (`pip install phonometry[plot]`); returns the
 `Axes`.
+
+### BarrierInsertionLoss.plot_geometry()
+
+```python
+BarrierInsertionLoss.plot_geometry(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the source-barrier-receiver section to scale.
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the result does not retain its geometry. |
 
 ### BarrierInsertionLoss.report()
 
@@ -371,6 +405,47 @@ for all `N` (a very good fit for `N > 0.5`). The result is clamped at
 | `fresnel_number` | Fresnel number `N` (scalar or array). |
 
 **Returns:** Attenuation `Delta`, in decibels (>= 0), matching the input shape.
+
+## plot_barrier_geometry
+
+```python
+plot_barrier_geometry(
+    ax: Axes | None = None,
+    *,
+    source_height: float,
+    barrier_distance: float,
+    barrier_height: float,
+    receiver_distance: float,
+    receiver_height: float,
+    thickness: float | None = None,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the source-barrier-receiver section to scale.
+
+Ground line, thin (or thick) screen, the direct path cut by the screen
+and the diffracted path over the top edge(s), with the path-length
+difference annotated. Distances follow
+[`barrier_insertion_loss`](/phonometry/reference/api/environment/ground-barriers/#barrier_insertion_loss):
+`receiver_distance` is horizontal from the source.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `source_height` | Source height above ground, in metres. |
+| `barrier_distance` | Source-to-barrier horizontal distance, in metres. |
+| `barrier_height` | Barrier height, in metres. |
+| `receiver_distance` | Source-to-receiver horizontal distance, in metres (> `barrier_distance`). |
+| `receiver_height` | Receiver height above ground, in metres. |
+| `thickness` | Barrier top width, in metres; `None` draws a thin screen. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the barrier rectangle. |
+
+**Returns:** The axes.
 
 ## spherical_reflection_coefficient
 

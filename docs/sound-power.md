@@ -316,7 +316,31 @@ band, shape `(NM, NB)`; ISO 3744 clause 8.6), `surface_area`,
 `sound_power_level_a` (`LWA`), `uncertainty` (expanded, 95 %) and `grade`.
 `measurement_positions('hemisphere', radius=…, reflecting_planes=…, tones=…,
 grade=…)` returns the normative `(N, 3)` microphone coordinates (Table B.1 for
-tonal sources, B.2 for broadband).
+tonal sources, B.2 for broadband). Those coordinates plot directly with
+`plot_microphone_positions`, which draws the array on its measurement
+surface in 3-D, numbered as in the standard.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_positions_hemisphere_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_positions_hemisphere.svg" alt="Three-dimensional view of the ISO 3744 microphone array: ten numbered microphones on a 2 m wireframe hemisphere standing on a shaded circular reflecting plane, with positions 1 and 2 close to the plane, the others staggered in height up to positions 9 and 10 near the top, and the x, y and z axes graduated in metres" width="88%"></picture>
+
+*Where the ten Annex B microphones actually sit on the 2 m hemisphere: the
+heights are staggered so the array samples the whole surface evenly, which
+is what lets the plain energy average of the ten levels stand in for the
+surface integral.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import measurement_positions, plot_microphone_positions
+
+# The 10 ISO 3744 Annex B microphones on a 2 m hemisphere.
+plot_microphone_positions(measurement_positions("hemisphere", radius=2.0),
+                          radius=2.0)
+plt.show()
+```
+
+</details>
 
 ## 2. Reverberation room, precision grade (ISO 3741)
 

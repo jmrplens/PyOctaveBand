@@ -179,6 +179,34 @@ print(slit_resonance_frequencies(0.1, 0.002, orders=2).round().tolist())   # [~1
 print(round(float(composite_transmission_loss([0.99, 0.01], [50.0, 0.0])), 1))   # 20.0
 ```
 
+The leak that undoes a heavy wall is almost invisible, and `.plot_geometry()`
+makes the point by drawing it to scale: a 2 mm gap through 100 mm of
+masonry.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/aperture_slit_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/aperture_slit_geometry.svg" alt="To-scale cross-section of a 2 mm slit through a 100 mm wall: the hatched wall drawn in section with the narrow horizontal air gap at mid-height, an incident-sound arrow pointing at the gap from the left, the 100 mm wall depth and 2 mm slit width dimensioned, and circular transmitted wavefronts sketched spreading from the slit exit on the right" width="80%"></picture>
+
+*The tiny geometry behind a large leak: the gap is 50 times deeper than it
+is wide, which is why it behaves as a short tube with half-wavelength depth
+resonances near 1.5 and 3.1 kHz rather than as a simple open area.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import slit_transmission_coefficient
+
+f = np.geomspace(100.0, 5000.0, 200)
+result = slit_transmission_coefficient(f, 0.002, 0.1)
+
+# One line: the wall section with the slit to scale.
+result.plot_geometry()
+plt.show()
+```
+
+</details>
+
 ## Radiation efficiency of a bending plate (Hopkins 2.9)
 
 How much airborne power a vibrating plate radiates per unit mean-square velocity

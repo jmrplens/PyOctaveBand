@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="712.8pt" height="381.598125pt" viewBox="0 0 712.8 381.598125" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.1, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 381.598125 
+L 712.8 381.598125 
+L 712.8 0 
+L 0 0 
+z
+"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 74.787097 217.372319 
+L 638.012903 217.372319 
+L 638.012903 198.598125 
+L 74.787097 198.598125 
+z
+" clip-path="url(#p501719fabd)" style="fill: url(#h32e9a0c4a8); opacity: 0.5; stroke: #555555; stroke-width: 0.9; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 347.012903 198.598125 
+L 352.645161 198.598125 
+L 352.645161 179.823931 
+L 347.012903 179.823931 
+z
+" clip-path="url(#p501719fabd)" style="fill: #9e9e9e; opacity: 0.85; stroke: #555555; stroke-width: 0.9; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="609.851613" y="210.063659" transform="rotate(-0 609.851613 210.063659)">Suelo</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="347.012903" y="149.740766" transform="rotate(-0 347.012903 149.740766)">Diferencia de camino 0,15 m</text>
+   </g>
+   <g id="text_3">
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="356.4" y="16.798125" transform="rotate(-0 356.4 16.798125)">Sección de la barrera</text>
+   </g>
+   <g id="line2d_1">
+    <path d="M 112.335484 193.904577 
+L 581.690323 191.557802 
+" clip-path="url(#p501719fabd)" style="fill: none; stroke-dasharray: 4.07,1.76; stroke-dashoffset: 0; stroke: #9e9e9e; stroke-width: 1.1"/>
+   </g>
+   <g id="line2d_2">
+    <path d="M 112.335484 193.904577 
+L 347.012903 179.823931 
+L 581.690323 191.557802 
+" clip-path="url(#p501719fabd)" style="fill: none; stroke: #1f77b4; stroke-width: 1.6; stroke-linecap: square"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 115.343434 245.533609 
+Q 229.67563 245.533609 344.007826 245.533609 
+" style="fill: none; stroke: #555555; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 119.343434 247.533609 
+L 115.343434 245.533609 
+L 119.343434 243.533609 
+" style="fill: none; stroke: #555555; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 340.007826 243.533609 
+L 344.007826 245.533609 
+L 340.007826 247.533609 
+" style="fill: none; stroke: #555555; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 115.343434 273.694899 
+Q 347.013606 273.694899 578.683778 273.694899 
+" style="fill: none; stroke: #555555; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 119.343434 275.694899 
+L 115.343434 273.694899 
+L 119.343434 271.694899 
+" style="fill: none; stroke: #555555; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 574.683778 271.694899 
+L 578.683778 273.694899 
+L 574.683778 275.694899 
+" style="fill: none; stroke: #555555; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 328.23871 195.588886 
+Q 328.23871 189.210636 328.23871 182.832386 
+" style="fill: none; stroke: #555555; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 330.23871 191.588886 
+L 328.23871 195.588886 
+L 326.23871 191.588886 
+" style="fill: none; stroke: #555555; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 326.23871 186.832386 
+L 328.23871 182.832386 
+L 330.23871 186.832386 
+" style="fill: none; stroke: #555555; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="legend_1">
+    <g id="patch_7">
+     <path d="M 600.66875 77.200625 
+L 700 77.200625 
+Q 701.6 77.200625 701.6 75.600625 
+L 701.6 28.398125 
+Q 701.6 26.798125 700 26.798125 
+L 600.66875 26.798125 
+Q 599.06875 26.798125 599.06875 28.398125 
+L 599.06875 75.600625 
+Q 599.06875 77.200625 600.66875 77.200625 
+z
+" style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
+    </g>
+    <g id="line2d_3">
+     <path d="M 602.26875 33.276875 
+L 610.26875 33.276875 
+L 618.26875 33.276875 
+" style="fill: none; stroke-dasharray: 4.07,1.76; stroke-dashoffset: 0; stroke: #9e9e9e; stroke-width: 1.1"/>
+    </g>
+    <g id="text_4">
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="624.66875" y="36.076875" transform="rotate(-0 624.66875 36.076875)">Camino directo</text>
+    </g>
+    <g id="line2d_4">
+     <path d="M 602.26875 45.2775 
+L 610.26875 45.2775 
+L 618.26875 45.2775 
+" style="fill: none; stroke: #1f77b4; stroke-width: 1.6; stroke-linecap: square"/>
+    </g>
+    <g id="text_5">
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="624.66875" y="48.0775" transform="rotate(-0 624.66875 48.0775)">Camino difractado</text>
+    </g>
+    <g id="line2d_5">
+     <defs>
+      <path id="m3089753afe" d="M 0 -6.5 
+L -1.459341 -2.00861 
+L -6.181867 -2.00861 
+L -2.361263 0.767221 
+L -3.820604 5.25861 
+L -0 2.482779 
+L 3.820604 5.25861 
+L 2.361263 0.767221 
+L 6.181867 -2.00861 
+L 1.459341 -2.00861 
+z
+" style="stroke: #d62728; stroke-linejoin: bevel"/>
+     </defs>
+     <g>
+      <use xlink:href="#m3089753afe" x="610.26875" y="57.278125" style="fill: #d62728; stroke: #d62728; stroke-linejoin: bevel"/>
+     </g>
+    </g>
+    <g id="text_6">
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="624.66875" y="60.078125" transform="rotate(-0 624.66875 60.078125)">Fuente</text>
+    </g>
+    <g id="line2d_6">
+     <defs>
+      <path id="m41d12e1f01" d="M 0 -4 
+L -4 4 
+L 4 4 
+z
+" style="stroke: #1f77b4; stroke-linejoin: miter"/>
+     </defs>
+     <g>
+      <use xlink:href="#m41d12e1f01" x="610.26875" y="69.27875" style="fill: #1f77b4; stroke: #1f77b4; stroke-linejoin: miter"/>
+     </g>
+    </g>
+    <g id="text_7">
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="624.66875" y="72.07875" transform="rotate(-0 624.66875 72.07875)">Receptor</text>
+    </g>
+   </g>
+   <g id="line2d_7">
+    <g clip-path="url(#p501719fabd)">
+     <use xlink:href="#m3089753afe" x="112.335484" y="193.904577" style="fill: #d62728; stroke: #d62728; stroke-linejoin: bevel"/>
+    </g>
+   </g>
+   <g id="line2d_8">
+    <g clip-path="url(#p501719fabd)">
+     <use xlink:href="#m41d12e1f01" x="581.690323" y="191.557802" style="fill: #1f77b4; stroke: #1f77b4; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="229.674194" y="238.611734" transform="rotate(-0 229.674194 238.611734)">50 m</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="347.012903" y="266.773024" transform="rotate(-0 347.012903 266.773024)">100 m</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="321.316835" y="189.211028" transform="rotate(-90 321.316835 189.211028)">4 m</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p501719fabd">
+   <rect x="7.2" y="22.798125" width="698.4" height="351.6"/>
+  </clipPath>
+ </defs>
+ <defs>
+  <pattern id="h32e9a0c4a8" patternUnits="userSpaceOnUse" x="0" y="0" width="72" height="72">
+   <rect x="0" y="0" width="73" height="73" fill="#9e9e9e"/>
+   <path d="M -36 36 
+L 36 -36 
+M -30 42 
+L 42 -30 
+M -24 48 
+L 48 -24 
+M -18 54 
+L 54 -18 
+M -12 60 
+L 60 -12 
+M -6 66 
+L 66 -6 
+M 0 72 
+L 72 0 
+M 6 78 
+L 78 6 
+M 12 84 
+L 84 12 
+M 18 90 
+L 90 18 
+M 24 96 
+L 96 24 
+M 30 102 
+L 102 30 
+M 36 108 
+L 108 36 
+" style="fill: #555555; stroke: #555555; stroke-width: 1.0; stroke-linecap: butt; stroke-linejoin: miter; stroke-opacity: 0.5"/>
+  </pattern>
+ </defs>
+</svg>

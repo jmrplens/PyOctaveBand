@@ -210,6 +210,35 @@ plt.show()
 
 </details>
 
+All three curves share one geometry, and `.plot_geometry()` draws it to
+scale: at these road-traffic distances the 4 m screen is a sliver, and the
+whole insertion loss rides on a path-length difference of just 0.15 m.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/barrier_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/barrier_geometry.svg" alt="To-scale section of the barrier geometry of the insertion-loss curves: a source star 1 m above the hatched ground, a thin 4 m screen at 50 m, and a receiver triangle 1.5 m high at 100 m, with the dashed direct path cut by the screen, the solid diffracted path bent over its top edge, the path difference of 0.15 m annotated and the 50 m and 100 m distances dimensioned" width="90%"></picture>
+
+*Drawn to scale the screen almost vanishes: the diffracted path over the top
+is only 0.15 m longer than the blocked direct path, and that difference is
+the whole input of the Fresnel number `N = (2/λ)(A + B − d)` that every
+method above keys on.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import barrier_insertion_loss
+
+freqs = np.geomspace(50.0, 5000.0, 240)
+il = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5)
+
+# One line: the section to scale, with the path-length difference annotated.
+il.plot_geometry()
+plt.show()
+```
+
+</details>
+
 ## Relation to ISO 9613-2
 
 The tabulated `Agr` and `Dz` of the [ISO 9613-2 method](outdoor-propagation.md)

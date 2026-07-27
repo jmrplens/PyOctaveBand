@@ -211,6 +211,32 @@ reflection order, with the `1 / r` free-field envelope overlaid.
 Requires matplotlib (`pip install phonometry[plot]`); returns the
 `Axes`.
 
+### ImageSourceResult.plot_geometry()
+
+```python
+ImageSourceResult.plot_geometry(
+    ax: Axes | None = None,
+    *,
+    max_order: int | None = None,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the image-source lattice in plan view (x-y), to scale.
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `max_order` | Highest reflection order drawn; `None` draws up to order 3 (or the result's own maximum if lower). |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the room-outline rectangle. |
+
 ## reflection_density
 
 ```python
