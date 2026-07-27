@@ -2282,19 +2282,22 @@ def plot_facade_elements(
         :class:`~phonometry.building.FacadeElement` sequence.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
-    :param kwargs: Forwarded to the element rectangles.
+    :param kwargs: Forwarded to the first element rectangle.
     :return: The axes.
     """
     _check_language(language)
     tiles = list(elements)
     if not tiles:
         raise ValueError("'elements' must contain at least one element.")
-    areas = [
-        float(area) if (area := getattr(e, "area", None)) else 0.1
-        for e in tiles
-    ]
-    if any(a <= 0.0 for a in areas):
-        raise ValueError("Element areas must be positive.")
+    areas: list[float] = []
+    for element in tiles:
+        area = getattr(element, "area", None)
+        if area is None:
+            areas.append(0.1)          # nominal tile for dn_e-rated elements
+        elif float(area) <= 0.0:
+            raise ValueError("Element areas must be positive.")
+        else:
+            areas.append(float(area))
     if ax is None:
         ax = _new_axes()
     total = sum(areas)
@@ -2711,7 +2714,7 @@ def plot_goniometer_geometry(
 
     Receiver semicircle at its radius with one microphone per angular step,
     the source on the normal at its distance and the sample at the centre;
-    defaults are the standard 10 m source, 5 m receiver arc and 5 degree
+    defaults are the standard 10 m source, 5 m receiver arc and 5-degree
     resolution (37 microphones).
 
     :param ax: Existing axes, or ``None`` to create a figure.
@@ -2730,6 +2733,8 @@ def plot_goniometer_geometry(
         )
     if not 0.0 < angular_step <= 90.0:
         raise ValueError("'angular_step' must be in (0, 90] degrees.")
+    if sample_width <= 0.0:
+        raise ValueError("'sample_width' must be positive.")
     if ax is None:
         ax = _new_axes()
     angles = np.radians(np.arange(-90.0, 90.0 + 0.5 * angular_step,

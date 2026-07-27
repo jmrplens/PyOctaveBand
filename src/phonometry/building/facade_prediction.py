@@ -160,6 +160,9 @@ class FacadePredictionResult:
     :ivar c_tr: Spectrum adaptation term ``Ctr`` of ``R'`` (ISO 717-1).
     :ivar frequencies: Band centre frequencies (Hz) for plotting; ``None`` labels
         the axis by band index.
+    :ivar elements: The element sequence the prediction was run with,
+        retained so :meth:`plot_geometry` can draw the elevation; appended
+        after the original fields and ``None`` for hand-built results.
     """
 
     r_prime: np.ndarray

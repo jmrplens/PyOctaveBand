@@ -210,6 +210,10 @@ factor `(k*dr)/sin(k*dr)` compensating the finite-difference
 underestimation at each band centre (IEC 61043:1994, 7.3); it is NaN
 at and beyond the first null `k*dr >= pi`. `max_valid_frequency`
 is the usable-bandwidth bound `0,1*c/spacing` (bias \< ~0,3 dB).
+`spacing` retains the microphone separation the measurement was
+reduced with so `plot_geometry` can draw the probe; it is
+appended after the original fields and `None` for hand-built
+results.
 
 ### IntensityResult.plot()
 

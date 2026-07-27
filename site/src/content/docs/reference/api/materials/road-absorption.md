@@ -426,6 +426,8 @@ An in-situ one-third-octave absorption spectrum (ISO 13472-1).
 | :--- | :--- |
 | `frequencies` | One-third-octave band centre frequencies, in hertz. |
 | `absorption` | Sound-absorption coefficient `alpha` per band (a band with no contributing narrow-band samples is `nan`). |
+| `source_height` | Source height the spectrum was reduced with, in metres, retained (with `mic_height`) so `plot_geometry` can draw the set-up; `None` for hand-built results. |
+| `mic_height` | Microphone height, in metres, or `None`. |
 
 ### InsituAbsorptionResult.plot()
 

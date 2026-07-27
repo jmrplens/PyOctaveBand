@@ -93,6 +93,7 @@ Single-number open-plan-office quantities (ISO 3382-3:2012, Cl. 4).
 | `lp_as_4m` | Nominal A-weighted speech level at 4 m in dB, read off the same regression line (Clause 3.3, 6.2). `nan` under the same condition as `d2s`. |
 | `rd` | Distraction distance in m, where the linear STI-vs-distance regression crosses 0.50 (Clause 3.6, 6.3). `nan` when the fitted STI does not decrease with distance or the crossing is non-positive. |
 | `rp` | Privacy distance in m, where the same regression crosses 0.20 (Clause 3.7, 6.3), possibly extrapolated beyond the measured range. `nan` under the same condition as `rd`. |
+| `positions_m` | The microphone distances the metrics were fitted on, in metres, retained so `plot_geometry` can draw the line; `None` for hand-built results. |
 
 ### OpenPlanResult.plot()
 

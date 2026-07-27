@@ -79,6 +79,9 @@ class OpenPlanResult:
     :ivar rp: Privacy distance in m, where the same regression crosses 0.20
         (Clause 3.7, 6.3), possibly extrapolated beyond the measured range.
         ``nan`` under the same condition as ``rd``.
+    :ivar positions_m: The microphone distances the metrics were fitted
+        on, in metres, retained so :meth:`plot_geometry` can draw the
+        line; ``None`` for hand-built results.
     """
 
     d2s: float

@@ -318,6 +318,9 @@ Predicted airborne sound reduction index `R(f)` of a construction.
 | `model` | Prediction model (e.g. `"sharp-single"`, `"double-wall"`). |
 | `critical_frequency` | Coincidence frequency `fc`, in hertz, or `None` (double wall reports the mass-spring-mass resonance instead). |
 | `resonance_frequency` | Mass-spring-mass resonance `f0`, in hertz, or `None` (single panel). |
+| `mass1` | First-leaf surface density, in kg/m2, retained (with `mass2` and `gap`) by the double-wall constructor so `plot_geometry` can draw the section; `None` otherwise. |
+| `mass2` | Second-leaf surface density, in kg/m2, or `None`. |
+| `gap` | Cavity depth, in metres, or `None`. |
 
 ### SoundReductionResult.plot()
 

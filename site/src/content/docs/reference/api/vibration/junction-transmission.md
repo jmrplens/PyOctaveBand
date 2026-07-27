@@ -384,6 +384,8 @@ Bending-wave transmission across a rigid plate junction (Hopkins 5.2.1.3).
 | `straight` | Straight-section coefficient `tau13(theta)` on the grid, or `None` when the junction has no straight section. |
 | `corner_average` | Diffuse-field angular average `tau_bar_12` (Eq. 5.6). |
 | `straight_average` | Angular average `tau_bar_13`, or `None`. |
+| `thickness1` | Plate 1 thickness, in metres, retained (with `thickness2`) so `plot_geometry` can draw the junction; appended after the original fields and `None` for hand-built results. |
+| `thickness2` | Plate 2 thickness, in metres, or `None`. |
 
 ### JunctionTransmissionResult.corner_reduction_index
 

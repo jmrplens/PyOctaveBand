@@ -148,6 +148,11 @@ class SoundReductionResult:
         ``None`` (double wall reports the mass-spring-mass resonance instead).
     :ivar resonance_frequency: Mass-spring-mass resonance ``f0``, in hertz, or
         ``None`` (single panel).
+    :ivar mass1: First-leaf surface density, in kg/m2, retained (with
+        ``mass2`` and ``gap``) by the double-wall constructor so
+        :meth:`plot_geometry` can draw the section; ``None`` otherwise.
+    :ivar mass2: Second-leaf surface density, in kg/m2, or ``None``.
+    :ivar gap: Cavity depth, in metres, or ``None``.
     """
 
     frequencies: np.ndarray

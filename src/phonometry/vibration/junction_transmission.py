@@ -446,6 +446,11 @@ class JunctionTransmissionResult:
         or ``None`` when the junction has no straight section.
     :ivar corner_average: Diffuse-field angular average ``tau_bar_12`` (Eq. 5.6).
     :ivar straight_average: Angular average ``tau_bar_13``, or ``None``.
+    :ivar thickness1: Plate 1 thickness, in metres, retained (with
+        ``thickness2``) so :meth:`plot_geometry` can draw the junction;
+        appended after the original fields and ``None`` for hand-built
+        results.
+    :ivar thickness2: Plate 2 thickness, in metres, or ``None``.
     """
 
     junction: str

@@ -584,7 +584,7 @@ Draw the free-field diffusion goniometer in plan, to scale.
 
 Receiver semicircle at its radius with one microphone per angular step,
 the source on the normal at its distance and the sample at the centre;
-defaults are the standard 10 m source, 5 m receiver arc and 5 degree
+defaults are the standard 10 m source, 5 m receiver arc and 5-degree
 resolution (37 microphones).
 
 **Parameters**

@@ -582,6 +582,10 @@ class InsituAbsorptionResult:
     :ivar frequencies: One-third-octave band centre frequencies, in hertz.
     :ivar absorption: Sound-absorption coefficient ``alpha`` per band (a band
         with no contributing narrow-band samples is ``nan``).
+    :ivar source_height: Source height the spectrum was reduced with, in
+        metres, retained (with ``mic_height``) so :meth:`plot_geometry`
+        can draw the set-up; ``None`` for hand-built results.
+    :ivar mic_height: Microphone height, in metres, or ``None``.
     """
 
     frequencies: Real

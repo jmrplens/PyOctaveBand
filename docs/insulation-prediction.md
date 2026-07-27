@@ -400,7 +400,7 @@ fig.tight_layout(); plt.show()
 The composite is easier to reason about drawn as areas. `plot_facade_elements`
 tiles the elevation with every element's drawn area equal to its real area
 (here a 6 m² masonry wall, a 1.5 m² window and its 0.3 m² roller shutter box),
-and a prediction that retained its `elements` redraws its own facade with
+and a prediction that retained its `elements` redraws its own façade with
 `fac.plot_geometry()`.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_elevation_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_elevation_geometry.svg" alt="To-scale elevation of a composite facade: a hatched 6 m2 masonry wall, a 1.5 m2 window and a narrow 0.3 m2 roller shutter box drawn as tiles of a 3.95 m by 1.97 m facade whose drawn areas equal their real areas, each tile labelled with its area and the overall width and height dimensioned" width="88%"></picture>
