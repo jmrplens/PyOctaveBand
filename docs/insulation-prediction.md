@@ -397,6 +397,42 @@ fig.tight_layout(); plt.show()
 
 </details>
 
+The composite is easier to reason about drawn as areas. `plot_facade_elements`
+tiles the elevation with every element's drawn area equal to its real area
+(here a 6 m² masonry wall, a 1.5 m² window and its 0.3 m² roller shutter box),
+and a prediction that retained its `elements` redraws its own façade with
+`fac.plot_geometry()`.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_elevation_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_elevation_geometry.svg" alt="To-scale elevation of a composite facade: a hatched 6 m2 masonry wall, a 1.5 m2 window and a narrow 0.3 m2 roller shutter box drawn as tiles of a 3.95 m by 1.97 m facade whose drawn areas equal their real areas, each tile labelled with its area and the overall width and height dimensioned" width="88%"></picture>
+
+*The areas the energy sum weighs, to scale: the window holds a quarter of the
+wall's area but each square metre of it transmits a hundred times more, so the
+small tiles decide `R'`.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import building
+
+# The prediction's composite drawn as areas: 6 m2 of wall, a 1.5 m2 window
+# and its 0.3 m2 roller shutter box.
+elements = [
+    building.FacadeElement("Masonry wall", area=6.0, r=[50.0] * 5),
+    building.FacadeElement("Window", area=1.5, r=[30.0] * 5),
+    building.FacadeElement("Roller shutter box", area=0.3, r=[22.0] * 5),
+]
+building.plot_facade_elements(elements)
+plt.show()
+
+# A prediction retains its elements, so it redraws its own elevation:
+#   fac = building.facade_sound_reduction(elements, area=7.8, volume=50.0)
+#   fac.plot_geometry()
+```
+
+</details>
+
 The façade prediction also writes a one-page **prediction** report through a
 `report(path)` method, the same layout as the airborne and impact prediction
 fiches. `FacadePredictionResult.report()` renders the façade-element table (each

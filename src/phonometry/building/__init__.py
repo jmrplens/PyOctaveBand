@@ -5,6 +5,9 @@ from __future__ import annotations
 
 from .._plot.geometry import (
     plot_aperture_geometry,
+    plot_double_wall_geometry,
+    plot_facade_elements,
+    plot_junction_geometry,
 )
 from .aperture_transmission import (
     ApertureTransmissionResult,
@@ -263,6 +266,9 @@ __all__ = [
     "outdoor_level",
     "plate_loss_factor",
     "plot_aperture_geometry",
+    "plot_double_wall_geometry",
+    "plot_facade_elements",
+    "plot_junction_geometry",
     "predicted_airborne_insulation",
     "predicted_impact_insulation",
     "prediction_input_uncertainty",

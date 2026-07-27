@@ -52,7 +52,36 @@ reference `Z_{c,0} = 400 N·s/m³` give the fixed `10 lg(411/400) = 0.118 dB`
 term. This module feeds the structure-borne source and building prediction
 standards (ISO 9611, EN 15657, EN 12354-5).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_sound_power.svg" alt="Radiated sound power level per octave band, comparing the ISO/TS 7849-1 upper limit (radiation factor of one) with the ISO/TS 7849-2 engineering value (measured radiation factor)" width="82%" loading="eager" />
+Before any levels, the radiator itself. The `radiation_efficiency` plate model
+that supplies a predicted radiation factor retains its geometry, and
+`sigma.plot_geometry()` draws the plate in its baffle to scale, here 1.5 m by
+1.25 m and simply supported.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/radiation_plate_geometry.svg" alt="To-scale front view of the plate of the radiation model: a grey 1.5 m by 1.25 m simply supported plate inside its hatched rigid baffle, both side lengths dimensioned and the boundary condition named in the title" width="82%" loading="eager" />
+
+*The radiator behind the radiation factor, to scale: the 1.5 m by 1.25 m
+simply supported plate in its rigid baffle, whose area $S$ enters $L_W$
+directly while its size decides how far $\varepsilon$ falls below one under
+coincidence.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import vibration
+
+# The simply supported 1.5 x 1.25 m plate of the radiation model.
+f = np.geomspace(50.0, 5000.0, 200)
+sigma = vibration.radiation_efficiency(f, 1.5, 1.25, 2100.0)
+sigma.plot_geometry()
+plt.show()
+```
+
+</details>
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_sound_power.svg" alt="Radiated sound power level per octave band, comparing the ISO/TS 7849-1 upper limit (radiation factor of one) with the ISO/TS 7849-2 engineering value (measured radiation factor)" width="82%" />
 
 <details>
 <summary>Show the code for this figure</summary>

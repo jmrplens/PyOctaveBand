@@ -565,6 +565,42 @@ to 0 and `d_theta = 1` to 1.
 | :--- | :--- |
 | ValueError | if any reference coefficient equals 1 (undefined ratio). |
 
+## plot_goniometer_geometry
+
+```python
+plot_goniometer_geometry(
+    ax: Axes | None = None,
+    *,
+    source_distance: float = 10.0,
+    receiver_radius: float = 5.0,
+    angular_step: float = 5.0,
+    sample_width: float = 0.6,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the free-field diffusion goniometer in plan, to scale.
+
+Receiver semicircle at its radius with one microphone per angular step,
+the source on the normal at its distance and the sample at the centre;
+defaults are the standard 10 m source, 5 m receiver arc and 5-degree
+resolution (37 microphones).
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `source_distance` | Source distance from the sample, in metres. |
+| `receiver_radius` | Receiver-arc radius, in metres. |
+| `angular_step` | Angular spacing of the receivers, in degrees. |
+| `sample_width` | Drawn sample width, in metres. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the receiver scatter. |
+
+**Returns:** The axes.
+
 ## random_incidence_absorption
 
 ```python

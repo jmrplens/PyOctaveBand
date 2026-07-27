@@ -104,6 +104,30 @@ print(round(s_t / 1e6, 3))                              # 4.935  MN/m3
 print(round(materials.natural_frequency(10e6, 120.0), 1))      # 45.9  Hz
 ```
 
+Ese pequeño oscilador es lo bastante pequeño para dibujarlo a escala real.
+`plot_dynamic_stiffness_rig` coloca la probeta estándar de 200 mm bajo la
+placa de carga de 8 kg con el excitador y el acelerómetro en su sitio.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dynamic_stiffness_rig_geometry_es.svg" alt="Sección a escala del banco de rigidez dinámica: la probeta resiliente punteada de 200 mm y 20 mm de espesor sobre la base rígida rayada, la placa de carga gris de 8 kg encima con el acelerómetro en su borde, y el bloque del excitador arriba atacando la placa con una flecha vertical roja, con el lado y el espesor de la probeta acotados" width="92%" />
+
+*El sistema masa-muelle detrás de $s'$ a escala real: 20 mm de capa
+resiliente bajo la placa de 8 kg bastan para reproducir la precarga de 2 kPa
+de un suelo flotante.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import materials
+
+# El banco estándar: probeta cuadrada de 200 mm bajo la placa de 8 kg.
+materials.plot_dynamic_stiffness_rig(language="es")
+plt.show()
+```
+
+</details>
+
 ## 2. El término del gas encerrado y la resistividad al flujo
 
 En un material permeable al aire, el aire de los poros añade una rigidez en

@@ -211,6 +211,41 @@ softer `s'' = Re(K_e) / d`, lowering `f0`.
 | :--- | :--- |
 | ValueError | for a non-positive input. |
 
+## plot_double_wall_geometry
+
+```python
+plot_double_wall_geometry(
+    mass1: float,
+    mass2: float,
+    gap: float,
+    ax: Axes | None = None,
+    *,
+    resonance_frequency: float | None = None,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the mass-spring-mass double wall to scale.
+
+Two leaves separated by the `gap`; leaf thicknesses are drawn from the
+surface densities at a nominal board density, and the mass-spring-mass
+resonance is annotated when given.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `mass1` | Surface density of the first leaf, in kg/m2. |
+| `mass2` | Surface density of the second leaf, in kg/m2. |
+| `gap` | Cavity depth, in metres. |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `resonance_frequency` | Optional `f0` to annotate, in Hz. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the leaf rectangles. |
+
+**Returns:** The axes.
+
 ## single_panel_transmission_loss
 
 ```python
@@ -266,6 +301,9 @@ SoundReductionResult(
     model: str,
     critical_frequency: float | None = None,
     resonance_frequency: float | None = None,
+    mass1: float | None = None,
+    mass2: float | None = None,
+    gap: float | None = None,
 )
 ```
 
@@ -280,6 +318,9 @@ Predicted airborne sound reduction index `R(f)` of a construction.
 | `model` | Prediction model (e.g. `"sharp-single"`, `"double-wall"`). |
 | `critical_frequency` | Coincidence frequency `fc`, in hertz, or `None` (double wall reports the mass-spring-mass resonance instead). |
 | `resonance_frequency` | Mass-spring-mass resonance `f0`, in hertz, or `None` (single panel). |
+| `mass1` | First-leaf surface density, in kg/m2, retained (with `mass2` and `gap`) by the double-wall constructor so `plot_geometry` can draw the section; `None` otherwise. |
+| `mass2` | Second-leaf surface density, in kg/m2, or `None`. |
+| `gap` | Cavity depth, in metres, or `None`. |
 
 ### SoundReductionResult.plot()
 
@@ -296,6 +337,28 @@ Plot the predicted sound reduction index `R(f)`.
 
 Requires matplotlib (`pip install phonometry[plot]`); returns the
 `Axes`.
+
+### SoundReductionResult.plot_geometry()
+
+```python
+SoundReductionResult.plot_geometry(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the mass-spring-mass cross-section to scale.
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the result does not retain its geometry. |
 
 ### SoundReductionResult.rating()
 

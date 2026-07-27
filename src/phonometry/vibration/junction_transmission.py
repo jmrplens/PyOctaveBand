@@ -446,6 +446,11 @@ class JunctionTransmissionResult:
         or ``None`` when the junction has no straight section.
     :ivar corner_average: Diffuse-field angular average ``tau_bar_12`` (Eq. 5.6).
     :ivar straight_average: Angular average ``tau_bar_13``, or ``None``.
+    :ivar thickness1: Plate 1 thickness, in metres, retained (with
+        ``thickness2``) so :meth:`plot_geometry` can draw the junction;
+        appended after the original fields and ``None`` for hand-built
+        results.
+    :ivar thickness2: Plate 2 thickness, in metres, or ``None``.
     """
 
     junction: str
@@ -458,6 +463,8 @@ class JunctionTransmissionResult:
     straight: np.ndarray | None
     corner_average: float
     straight_average: float | None
+    thickness1: float | None = None
+    thickness2: float | None = None
 
     @property
     def corner_reduction_index(self) -> float:
@@ -485,6 +492,22 @@ class JunctionTransmissionResult:
         return plot_junction_transmission(
             self, ax=ax, language=check_language(language), **kwargs
         )
+
+    def plot_geometry(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
+        """Draw the plate-junction cross-section to scale.
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+
+        :raises ValueError: If the result does not retain its geometry.
+        """
+        from .._i18n import check_language
+        from .._plot.geometry import plot_junction_result_geometry
+
+        check_language(language)
+        return plot_junction_result_geometry(self, ax=ax, language=language, **kwargs)
 
 
 def junction_transmission(
@@ -562,4 +585,6 @@ def junction_transmission(
         straight=straight,
         corner_average=corner_avg,
         straight_average=straight_avg,
+        thickness1=float(thickness1),
+        thickness2=float(thickness2),
     )

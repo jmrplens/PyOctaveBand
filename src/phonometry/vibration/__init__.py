@@ -3,6 +3,9 @@
 
 from __future__ import annotations
 
+from .._plot.geometry import (
+    plot_plate_geometry,
+)
 from .human_vibration import (
     HAV_EAV_A8,
     HAV_ELV_A8,
@@ -181,6 +184,7 @@ __all__ = [
     "partial_exposure",
     "plate_bending_stiffness",
     "plate_bending_wave_speed",
+    "plot_plate_geometry",
     "radiation_efficiency",
     "random_error_percent",
     "resonance_frequency",

@@ -74,7 +74,13 @@ the distraction distance `rD` (STI = 0.50) and privacy distance
 ## OpenPlanResult
 
 ```python
-OpenPlanResult(d2s: float, lp_as_4m: float, rd: float, rp: float)
+OpenPlanResult(
+    d2s: float,
+    lp_as_4m: float,
+    rd: float,
+    rp: float,
+    positions_m: np.ndarray | None = None,
+)
 ```
 
 Single-number open-plan-office quantities (ISO 3382-3:2012, Cl. 4).
@@ -87,6 +93,7 @@ Single-number open-plan-office quantities (ISO 3382-3:2012, Cl. 4).
 | `lp_as_4m` | Nominal A-weighted speech level at 4 m in dB, read off the same regression line (Clause 3.3, 6.2). `nan` under the same condition as `d2s`. |
 | `rd` | Distraction distance in m, where the linear STI-vs-distance regression crosses 0.50 (Clause 3.6, 6.3). `nan` when the fitted STI does not decrease with distance or the crossing is non-positive. |
 | `rp` | Privacy distance in m, where the same regression crosses 0.20 (Clause 3.7, 6.3), possibly extrapolated beyond the measured range. `nan` under the same condition as `rd`. |
+| `positions_m` | The microphone distances the metrics were fitted on, in metres, retained so `plot_geometry` can draw the line; `None` for hand-built results. |
 
 ### OpenPlanResult.plot()
 
@@ -105,6 +112,28 @@ Redraws the Clause 6.2 regression line from `d2s` and
 `lp_as_4m` and marks the distraction and privacy distances.
 Requires matplotlib (`pip install phonometry[plot]`); returns the
 `Axes`.
+
+### OpenPlanResult.plot_geometry()
+
+```python
+OpenPlanResult.plot_geometry(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the measurement line to scale, rD and rP marked.
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the result does not retain its geometry. |
 
 ### OpenPlanResult.report()
 
@@ -158,3 +187,35 @@ above it).
 | :--- | :--- |
 | ValueError | If `engine` is not `"reportlab"`. |
 | ImportError | If reportlab or, for the embedded spatial-decay chart, matplotlib is not installed. The fiche embeds the result's own plot whenever the regression is defined, so both are required (`pip install "phonometry[report,plot]"`). |
+
+## plot_open_plan_geometry
+
+```python
+plot_open_plan_geometry(
+    positions: ArrayLike,
+    ax: Axes | None = None,
+    *,
+    rd: float | None = None,
+    rp: float | None = None,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the open-plan measurement line to scale.
+
+Source at the origin, the microphone line across the workstations, and
+the distraction and privacy distances marked on the axis when given.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `positions` | Microphone distances from the source, in metres (1-D). |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `rd` | Distraction distance, in metres, or `None`. |
+| `rp` | Privacy distance, in metres, or `None`. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the microphone scatter. |
+
+**Returns:** The axes.

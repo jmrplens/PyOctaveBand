@@ -25,6 +25,35 @@ reference `Z_{c,0} = 400 N·s/m³` give the fixed `10 lg(411/400) = 0.118 dB`
 term. This module feeds the structure-borne source and building prediction
 standards (ISO 9611, EN 15657, EN 12354-5).
 
+Before any levels, the radiator itself. The `radiation_efficiency` plate model
+that supplies a predicted radiation factor retains its geometry, and
+`sigma.plot_geometry()` draws the plate in its baffle to scale, here 1.5 m by
+1.25 m and simply supported.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/radiation_plate_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/radiation_plate_geometry.svg" alt="To-scale front view of the plate of the radiation model: a grey 1.5 m by 1.25 m simply supported plate inside its hatched rigid baffle, both side lengths dimensioned and the boundary condition named in the title" width="82%"></picture>
+
+*The radiator behind the radiation factor, to scale: the 1.5 m by 1.25 m
+simply supported plate in its rigid baffle, whose area `S` enters `L_W`
+directly while its size decides how far `ε` falls below one under
+coincidence.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import vibration
+
+# The simply supported 1.5 x 1.25 m plate of the radiation model.
+f = np.geomspace(50.0, 5000.0, 200)
+sigma = vibration.radiation_efficiency(f, 1.5, 1.25, 2100.0)
+sigma.plot_geometry()
+plt.show()
+```
+
+</details>
+
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_sound_power_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_sound_power.svg" alt="Radiated sound power level per octave band of a vibrating surface, comparing the ISO/TS 7849-1 upper limit with a fixed radiation factor of one against the ISO/TS 7849-2 engineering value with a measured radiation factor, with the band-summed totals marked" width="82%"></picture>
 
 <details>

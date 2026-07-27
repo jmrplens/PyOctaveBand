@@ -79,12 +79,16 @@ class OpenPlanResult:
     :ivar rp: Privacy distance in m, where the same regression crosses 0.20
         (Clause 3.7, 6.3), possibly extrapolated beyond the measured range.
         ``nan`` under the same condition as ``rd``.
+    :ivar positions_m: The microphone distances the metrics were fitted
+        on, in metres, retained so :meth:`plot_geometry` can draw the
+        line; ``None`` for hand-built results.
     """
 
     d2s: float
     lp_as_4m: float
     rd: float
     rp: float
+    positions_m: np.ndarray | None = None
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the spatial decay of speech with ``rD``/``rP`` marked.
@@ -99,6 +103,22 @@ class OpenPlanResult:
 
         check_language(language)
         return plot_open_plan(self, ax=ax, language=language, **kwargs)
+
+    def plot_geometry(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
+        """Draw the measurement line to scale, rD and rP marked.
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+
+        :raises ValueError: If the result does not retain its geometry.
+        """
+        from .._i18n import check_language
+        from .._plot.geometry import plot_open_plan_result_geometry
+
+        check_language(language)
+        return plot_open_plan_result_geometry(self, ax=ax, language=language, **kwargs)
 
     def report(
         self,
@@ -268,4 +288,8 @@ def open_plan_metrics(
     rd = _sti_crossing(sti_slope, sti_intercept, _STI_DISTRACTION)
     rp = _sti_crossing(sti_slope, sti_intercept, _STI_PRIVACY)
 
-    return OpenPlanResult(d2s=d2s, lp_as_4m=lp_as_4m, rd=rd, rp=rp)
+    return OpenPlanResult(
+        d2s=d2s, lp_as_4m=lp_as_4m, rd=rd, rp=rp,
+        positions_m=np.asarray(positions_m, dtype=np.float64),
+    )
+

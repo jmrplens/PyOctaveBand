@@ -54,7 +54,36 @@ referencia `Z_{c,0} = 400 N·s/m³` dan el término fijo `10 lg(411/400) =
 0,118 dB`. Este módulo alimenta las normas de fuente estructural y de predicción
 en edificación (ISO 9611, EN 15657, EN 12354-5).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_sound_power_es.svg" alt="Nivel de potencia acústica radiada por banda de octava, comparando el límite superior de la ISO/TS 7849-1 (factor de radiación igual a uno) con el valor de ingeniería de la ISO/TS 7849-2 (factor de radiación medido)" width="82%" loading="eager" />
+Antes que los niveles, el propio radiador. El modelo de placa de
+`radiation_efficiency` que aporta un factor de radiación predicho retiene su
+geometría, y `sigma.plot_geometry()` dibuja la placa en su pantalla a escala,
+aquí de 1,5 m por 1,25 m y simplemente apoyada.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/radiation_plate_geometry_es.svg" alt="Vista frontal a escala de la placa del modelo de radiación: una placa gris de 1,5 m por 1,25 m simplemente apoyada dentro de su pantalla rígida rayada, con ambos lados acotados y la condición de contorno en el título" width="82%" loading="eager" />
+
+*El radiador detrás del factor de radiación, a escala: la placa de 1,5 m por
+1,25 m simplemente apoyada en su pantalla rígida, cuya área $S$ entra directa
+en $L_W$ mientras su tamaño decide cuánto cae $\varepsilon$ por debajo de uno
+bajo la coincidencia.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import vibration
+
+# La placa de 1.5 x 1.25 m simplemente apoyada del modelo de radiación.
+f = np.geomspace(50.0, 5000.0, 200)
+sigma = vibration.radiation_efficiency(f, 1.5, 1.25, 2100.0)
+sigma.plot_geometry(language="es")
+plt.show()
+```
+
+</details>
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_sound_power_es.svg" alt="Nivel de potencia acústica radiada por banda de octava, comparando el límite superior de la ISO/TS 7849-1 (factor de radiación igual a uno) con el valor de ingeniería de la ISO/TS 7849-2 (factor de radiación medido)" width="82%" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>

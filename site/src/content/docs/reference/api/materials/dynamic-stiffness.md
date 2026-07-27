@@ -308,3 +308,37 @@ Natural frequency `f0` of the resiliently supported floor (Formula 2).
 | `mass_per_area` | Mass per unit area of the supported floor `m'`, in kg/m2. |
 
 **Returns:** The natural frequency `f0`, in hertz.
+
+## plot_dynamic_stiffness_rig
+
+```python
+plot_dynamic_stiffness_rig(
+    ax: Axes | None = None,
+    *,
+    specimen_side: float = 0.2,
+    specimen_thickness: float = 0.02,
+    load_mass: float = 8.0,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the dynamic-stiffness resonance rig to scale.
+
+Resilient specimen on the rigid base, the standard square load plate on
+top (its mass annotated), the exciter above and an accelerometer on the
+plate; defaults are the standard 200 mm square specimen under the 8 kg
+plate.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `specimen_side` | Specimen side length, in metres. |
+| `specimen_thickness` | Specimen thickness, in metres. |
+| `load_mass` | Load-plate mass, in kilograms (annotation). |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the specimen rectangle. |
+
+**Returns:** The axes.

@@ -410,7 +410,12 @@ Annex C; the frequency-dependent form of Annex G).
 ## InsituAbsorptionResult
 
 ```python
-InsituAbsorptionResult(frequencies: Real, absorption: Real)
+InsituAbsorptionResult(
+    frequencies: Real,
+    absorption: Real,
+    source_height: float | None = None,
+    mic_height: float | None = None,
+)
 ```
 
 An in-situ one-third-octave absorption spectrum (ISO 13472-1).
@@ -421,6 +426,8 @@ An in-situ one-third-octave absorption spectrum (ISO 13472-1).
 | :--- | :--- |
 | `frequencies` | One-third-octave band centre frequencies, in hertz. |
 | `absorption` | Sound-absorption coefficient `alpha` per band (a band with no contributing narrow-band samples is `nan`). |
+| `source_height` | Source height the spectrum was reduced with, in metres, retained (with `mic_height`) so `plot_geometry` can draw the set-up; `None` for hand-built results. |
+| `mic_height` | Microphone height, in metres, or `None`. |
 
 ### InsituAbsorptionResult.plot()
 
@@ -437,6 +444,28 @@ Plot the in-situ absorption spectrum `alpha(f)`.
 
 Requires matplotlib (`pip install phonometry[plot]`); returns the
 `Axes` and never calls `plt.show`.
+
+### InsituAbsorptionResult.plot_geometry()
+
+```python
+InsituAbsorptionResult.plot_geometry(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the measurement set-up to scale.
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the result does not retain its geometry. |
 
 ## max_sampled_area_radius
 
@@ -565,6 +594,40 @@ Clause 6.6 step 5); Part 1 does not mandate clipping, so pass
 ```python
 PART1_FREQUENCY_RANGE = (250.0, 4000.0)
 ```
+
+## plot_insitu_geometry
+
+```python
+plot_insitu_geometry(
+    ax: Axes | None = None,
+    *,
+    source_height: float = 1.25,
+    mic_height: float = 0.25,
+    sampled_radius: float | None = 1.34,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the in-situ surface-absorption set-up to scale.
+
+Loudspeaker on its mast above the surface, microphone below it, direct
+and surface-reflected paths, and the sampled-area radius on the ground.
+Defaults are the standard heights (1,25 m source, 0,25 m microphone)
+with the sampled radius of the standard 5 ms window.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `source_height` | Source height above the surface, in metres. |
+| `mic_height` | Microphone height, in metres (\< `source_height`). |
+| `sampled_radius` | Sampled-area radius drawn on the ground, in metres; `None` omits it. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the surface rectangle. |
+
+**Returns:** The axes.
 
 ## power_reflection_coefficient
 

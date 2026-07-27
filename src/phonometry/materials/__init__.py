@@ -5,8 +5,11 @@ from __future__ import annotations
 
 from .._plot.geometry import (
     plot_absorber_stack,
+    plot_dynamic_stiffness_rig,
+    plot_goniometer_geometry,
     plot_helmholtz_resonator_geometry,
     plot_impedance_tube_geometry,
+    plot_insitu_geometry,
     plot_qrd_geometry,
     plot_slit_absorber_geometry,
     plot_transmission_tube_geometry,
@@ -308,8 +311,11 @@ __all__ = [
     "plane_wave_frequency_range",
     "plane_wave_frequency_range_astm",
     "plot_absorber_stack",
+    "plot_dynamic_stiffness_rig",
+    "plot_goniometer_geometry",
     "plot_helmholtz_resonator_geometry",
     "plot_impedance_tube_geometry",
+    "plot_insitu_geometry",
     "plot_qrd_geometry",
     "plot_slit_absorber_geometry",
     "plot_transmission_tube_geometry",

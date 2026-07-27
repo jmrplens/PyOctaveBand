@@ -252,6 +252,32 @@ sólidos desiguales, la fórmula (6) pondera por área cada energía con $N_i$ d
 fórmula (8), y esos factores de área se evalúan en **radianes**, razón por la que
 un espaciado de 5° en el cenit produce un peso cercano a 1,57, no a 51,9.
 
+El montaje que asumen esas fórmulas merece dibujarse a escala.
+`plot_goniometer_geometry` traza la disposición estándar en planta: el
+semicírculo de 37 micrófonos cada 5 grados a 5 m alrededor de la muestra, con
+la fuente a 10 m sobre la normal.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_goniometer_geometry_es.svg" alt="Planta a escala del goniómetro de difusión en campo libre: un semicírculo de 37 micrófonos cada 5 grados a 5 m de radio alrededor de la pequeña muestra en el centro, la estrella roja de la fuente a 10 m sobre la normal encima, y las distancias de 10 m y 5 m acotadas" width="88%" />
+
+*El arco polar detrás de cada $L_i$ de la fórmula (5), a escala: 37 receptores
+cada 5 grados a 5 m, la fuente al doble de distancia sobre la normal y la
+muestra como una lámina en el centro.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import materials
+
+# La disposición estándar: 37 micrófonos cada 5 grados a 5 m, con la
+# fuente a 10 m sobre la normal.
+materials.plot_goniometer_geometry(language="es")
+plt.show()
+```
+
+</details>
+
 La animación siguiente ejecuta ese experimento de goniómetro numéricamente: el
 mismo frente de onda plano incide sobre un panel rígido plano y sobre un
 difusor de Schroeder (un perfil de residuos cuadráticos con N = 7), y la
@@ -763,6 +789,36 @@ $c = 340$ m/s, ventana plana de 5 ms) da unos 1,34 m.
 from phonometry import materials
 print(round(materials.max_sampled_area_radius(5.0e-3), 3))   # 1.343  (metros)
 ```
+
+Todo el montaje cabe en un dibujo a escala. `plot_insitu_geometry` dibuja la
+disposición estándar con ese radio muestreado sobre la superficie, y un
+`InsituAbsorptionResult` medido que retuvo sus alturas redibuja el suyo con
+`result.plot_geometry()`.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_setup_geometry_es.svg" alt="Vista lateral a escala del montaje de absorción in situ: el altavoz en su mástil a 1,25 m sobre la superficie rayada de la calzada, el micrófono en la misma vertical a 0,25 m, el trayecto reflejado en la superficie a trazos bajo él y el radio de 1,34 m de la zona muestreada acotado sobre la superficie" width="88%" />
+
+*La geometría estándar a escala: fuente a 1,25 m, micrófono a 0,25 m en la
+misma vertical, y la ventana de 5 ms convertida en los 1,34 m de radio de
+calzada que de verdad contribuyen a la reflexión.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import materials
+
+# La geometría estándar: fuente a 1.25 m, micrófono a 0.25 m y el radio
+# muestreado de 1.34 m de la ventana de 5 ms.
+materials.plot_insitu_geometry(language="es")
+plt.show()
+
+# Un espectro medido retiene sus alturas y redibuja su propio montaje:
+#   result = materials.insitu_absorption_spectrum(hi, hr, fs)
+#   result.plot_geometry(language="es")
+```
+
+</details>
 
 ## 4. Absorción in situ de pavimentos: método puntual (ISO 13472-2)
 

@@ -193,6 +193,7 @@ IntensityResult(
     total_pressure_intensity_index: float,
     total_direction: int,
     max_valid_frequency: float,
+    spacing: float | None = None,
 )
 ```
 
@@ -209,6 +210,10 @@ factor `(k*dr)/sin(k*dr)` compensating the finite-difference
 underestimation at each band centre (IEC 61043:1994, 7.3); it is NaN
 at and beyond the first null `k*dr >= pi`. `max_valid_frequency`
 is the usable-bandwidth bound `0,1*c/spacing` (bias \< ~0,3 dB).
+`spacing` retains the microphone separation the measurement was
+reduced with so `plot_geometry` can draw the probe; it is
+appended after the original fields and `None` for hand-built
+results.
 
 ### IntensityResult.plot()
 
@@ -226,6 +231,56 @@ Plot Lp vs LI per band with the pressure-intensity index.
 Requires per-band data (call `sound_intensity(..., fraction=...)`)
 and matplotlib (`pip install phonometry[plot]`); returns the
 `Axes`.
+
+### IntensityResult.plot_geometry()
+
+```python
+IntensityResult.plot_geometry(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the p-p probe with its spacer to scale.
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the result does not retain its geometry. |
+
+## plot_pp_probe_geometry
+
+```python
+plot_pp_probe_geometry(
+    spacing: float = 0.012,
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the face-to-face p-p intensity probe to scale.
+
+Two phase-matched microphones separated by the solid spacer, with the
+intensity axis through both; default is the classic 12 mm spacer.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `spacing` | Microphone separation `dr`, in metres. |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the spacer rectangle. |
+
+**Returns:** The axes.
 
 ## sound_intensity
 

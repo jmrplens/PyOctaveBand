@@ -8220,6 +8220,172 @@ def generate_fdtd_domain_geometry(output_dir: str) -> None:
     plt.close()
 
 
+def generate_facade_elevation_geometry(output_dir: str) -> None:
+    """Composite facade elevation with the element areas to scale.
+
+    A masonry wall of 6 m2 with a 1,5 m2 window and its 0,3 m2 roller
+    shutter box, the classic composite of the facade prediction. One
+    concept: the areas the composite sound reduction index weighs.
+    """
+    print("Generating facade_elevation_geometry...")
+    from phonometry import FacadeElement, plot_facade_elements
+
+    elements = [
+        FacadeElement("Masonry wall", area=6.0, r=[50.0] * 5),
+        FacadeElement("Window", area=1.5, r=[30.0] * 5),
+        FacadeElement("Roller shutter box", area=0.3, r=[22.0] * 5),
+    ]
+    _fig, ax = plt.subplots(figsize=(9.0, 6.0))
+    plot_facade_elements(elements, ax=ax, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "facade_elevation_geometry.svg")
+    plt.close()
+
+
+def generate_double_wall_geometry(output_dir: str) -> None:
+    """Mass-spring-mass double wall to scale.
+
+    Two 12,5 mm plasterboard leaves (8,8 kg/m2 each) on a 100 mm stud
+    cavity, the classic lightweight double wall, with its mass-air-mass
+    resonance annotated. One concept: the geometry behind the double-wall
+    resonance dip.
+    """
+    print("Generating double_wall_geometry...")
+    from phonometry import mass_spring_mass_resonance, plot_double_wall_geometry
+
+    f0 = mass_spring_mass_resonance(8.8, 8.8, 0.1)
+    _fig, ax = plt.subplots(figsize=(9.0, 6.0))
+    plot_double_wall_geometry(
+        8.8, 8.8, 0.1, ax=ax, resonance_frequency=f0, language=_LANG,
+    )
+    plt.tight_layout()
+    save_figure(output_dir, "double_wall_geometry.svg")
+    plt.close()
+
+
+def generate_junction_plate_geometry(output_dir: str) -> None:
+    """A T-junction of heavyweight plates to scale.
+
+    A 140 mm concrete floor ending against a continuous 200 mm wall (the
+    T-junction whose perpendicular plates are the identical pair), the
+    incident bending wave marked. One concept: the junction the
+    transmission coefficients describe.
+    """
+    print("Generating junction_plate_geometry...")
+    from phonometry import plot_junction_geometry
+
+    _fig, ax = plt.subplots(figsize=(9.0, 6.2))
+    plot_junction_geometry("T2", 0.14, 0.2, ax=ax, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "junction_plate_geometry.svg")
+    plt.close()
+
+
+def generate_insitu_setup_geometry(output_dir: str) -> None:
+    """The in-situ road absorption set-up to scale.
+
+    Loudspeaker at 1,25 m, microphone at 0,25 m on the same vertical, and
+    the 1,34 m sampled-area radius of the standard 5 ms window on the
+    surface. One concept: what the subtraction technique actually samples.
+    """
+    print("Generating insitu_setup_geometry...")
+    from phonometry import plot_insitu_geometry
+
+    _fig, ax = plt.subplots(figsize=(9.0, 6.0))
+    plot_insitu_geometry(ax=ax, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "insitu_setup_geometry.svg")
+    plt.close()
+
+
+def generate_dynamic_stiffness_rig_geometry(output_dir: str) -> None:
+    """The dynamic-stiffness resonance rig to scale.
+
+    The standard 200 mm square resilient specimen under the 8 kg load
+    plate, exciter above and accelerometer on the plate. One concept: the
+    little mass-spring oscillator behind s' and the floating-floor f0.
+    """
+    print("Generating dynamic_stiffness_rig_geometry...")
+    from phonometry import plot_dynamic_stiffness_rig
+
+    _fig, ax = plt.subplots(figsize=(9.0, 6.2))
+    plot_dynamic_stiffness_rig(ax=ax, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "dynamic_stiffness_rig_geometry.svg")
+    plt.close()
+
+
+def generate_diffusion_goniometer_geometry(output_dir: str) -> None:
+    """The free-field diffusion goniometer in plan, to scale.
+
+    The 37-microphone semicircle at 5 m, the source at 10 m on the normal
+    and the sample at the centre. One concept: where the polar responses
+    of the diffusion coefficient are measured.
+    """
+    print("Generating diffusion_goniometer_geometry...")
+    from phonometry import plot_goniometer_geometry
+
+    _fig, ax = plt.subplots(figsize=(9.0, 6.6))
+    plot_goniometer_geometry(ax=ax, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "diffusion_goniometer_geometry.svg")
+    plt.close()
+
+
+def generate_radiation_plate_geometry(output_dir: str) -> None:
+    """The baffled plate of the radiation-efficiency model, to scale.
+
+    The 1,5 x 1,25 m simply supported plate in its rigid baffle, the
+    geometry the sigma(f) curves describe. One concept: the radiator
+    behind the radiation-efficiency plateau and coincidence peak.
+    """
+    print("Generating radiation_plate_geometry...")
+    from phonometry import plot_plate_geometry
+
+    _fig, ax = plt.subplots(figsize=(9.0, 6.2))
+    plot_plate_geometry(1.5, 1.25, ax=ax, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "radiation_plate_geometry.svg")
+    plt.close()
+
+
+def generate_open_plan_line_geometry(output_dir: str) -> None:
+    """The open-plan measurement line to scale.
+
+    Six microphones from 2 m to 16 m across the workstations with the
+    distraction and privacy distances marked. One concept: the single
+    line every ISO 3382-3 quantity comes from.
+    """
+    print("Generating open_plan_line_geometry...")
+    from phonometry import plot_open_plan_geometry
+
+    _fig, ax = plt.subplots(figsize=(10, 4.6))
+    plot_open_plan_geometry(
+        [2.0, 4.0, 6.0, 8.0, 12.0, 16.0], ax=ax, rd=6.5, rp=13.0,
+        language=_LANG,
+    )
+    plt.tight_layout()
+    save_figure(output_dir, "open_plan_line_geometry.svg")
+    plt.close()
+
+
+def generate_pp_probe_geometry(output_dir: str) -> None:
+    """The face-to-face p-p intensity probe to scale.
+
+    Two phase-matched half-inch microphones on the classic 12 mm solid
+    spacer, the intensity axis through both. One concept: the finite
+    difference the p-p method is built on.
+    """
+    print("Generating pp_probe_geometry...")
+    from phonometry import plot_pp_probe_geometry
+
+    _fig, ax = plt.subplots(figsize=(9.0, 5.4))
+    plot_pp_probe_geometry(ax=ax, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "pp_probe_geometry.svg")
+    plt.close()
+
+
 def generate_scattering_coefficient(output_dir: str) -> None:
     """ISO 17497-1: scattering coefficient s(f) from a per-band measurement."""
     print("Generating scattering_coefficient.png...")
@@ -11803,6 +11969,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     # reflectogram of mirror-image reflections by order (Kuttruff 4.1).
     generate_image_source_reflectogram,
     generate_image_source_plan,
+    generate_open_plan_line_geometry,
     # Underwater acoustics: ship radiated noise / monopole source
     # level (ISO 17208) and pile-driving sound exposure (ISO 18406).
     generate_ship_source_level,
@@ -11892,6 +12059,14 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_atmospheric_pe_range,
     generate_barrier_insertion_loss_methods,
     generate_barrier_geometry,
+    generate_facade_elevation_geometry,
+    generate_double_wall_geometry,
+    generate_junction_plate_geometry,
+    generate_insitu_setup_geometry,
+    generate_dynamic_stiffness_rig_geometry,
+    generate_diffusion_goniometer_geometry,
+    generate_radiation_plate_geometry,
+    generate_pp_probe_geometry,
     # Emission & electroacoustics: modulation sidebands, piston radiation
     # impedance, ISO 9614-1 field indicators, side-branch silencers, HVAC end
     # reflection, machine enclosures, phase decomposition and R 128 loudness.

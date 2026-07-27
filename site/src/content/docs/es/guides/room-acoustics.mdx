@@ -747,6 +747,36 @@ plt.show()
 
 </details>
 
+La propia línea merece una planta a escala. `plot_open_plan_geometry` dibuja
+la fuente, la línea de micrófonos entre los puestos de trabajo y las dos
+distancias sobre el eje, y un resultado que retuvo sus posiciones redibuja su
+propia línea con `m.plot_geometry()`.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_line_geometry_es.svg" alt="Planta a escala de la línea de medida en oficina diáfana: la estrella roja de la fuente en el origen, seis micrófonos azules de 2 m a 16 m sobre una línea punteada entre los bloques grises de los puestos de trabajo, la distancia de distracción rD = 6,5 m y la de privacidad rP = 13 m marcadas a trazos sobre la línea y los 16 m de recorrido acotados" width="86%" />
+
+*Todas las magnitudes de ISO 3382-3 salen de esta única línea: seis
+micrófonos de 2 m a 16 m entre los puestos de trabajo, con $r_D$ y $r_P$
+cayendo entre ellos.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import room
+
+# La línea de 2-16 m del ejemplo, con las distancias de distracción y
+# de privacidad marcadas sobre el eje.
+room.plot_open_plan_geometry([2.0, 4.0, 6.0, 8.0, 12.0, 16.0],
+                             rd=6.5, rp=13.0, language="es")
+plt.show()
+
+# Un resultado retiene sus posiciones, así que m.plot_geometry() dibuja
+# su propia línea con los rD y rP de la regresión.
+```
+
+</details>
+
 ### Parámetros de `open_plan_metrics()`
 
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
