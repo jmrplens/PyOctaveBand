@@ -194,6 +194,63 @@ plt.show()
 
 </details>
 
+## 2b. Virtual measurement tubes: the solver measured by the standards
+
+A three-row rigid-walled domain is a plane-wave tube, and with the per-cell
+`damping` map a porous sample becomes an equivalent fluid (density, speed
+and loss maps). That closes a remarkable loop: the FDTD probe histories can
+be reduced through the library's own ISO 10534-2 and ASTM E2611 chains as
+if they were measurements, and the recovered spectra agree with the exact
+analytic answer for the same lossy layer to within 0.035 in absorption and
+0.1 dB in transmission loss (the `tests/simulation` cross-checks run this
+on every commit).
+
+```python
+import numpy as np
+from phonometry.materials import two_microphone_impedance
+from phonometry.simulation import FDTD2D
+
+c0, rho0, dx = 343.0, 1.2, 0.005
+nx, d_cells = 280, 20                     # 1.4 m tube, 10 cm sample
+c = np.full((3, nx), c0); rho = np.full((3, nx), rho0)
+sigma = np.zeros((3, nx))
+c[:, -d_cells:] = 0.6 * c0                # the sample: slower,
+rho[:, -d_cells:] = 3.0 * rho0            # denser and lossy
+sigma[:, -d_cells:] = 600.0
+sim = FDTD2D(c, dx, rho=rho, damping=sigma,
+             edge_impedance={"left": rho0 * c0})   # anechoic source end
+sim.add_plane_wave("right", center=0.35, width=0.05)
+mics = (219, 229)                         # the ISO microphone pair
+records = np.zeros((2, 9000))
+for n in range(records.shape[1]):
+    sim.step()
+    records[:, n] = sim.p[1, mics]
+spec = np.fft.rfft(records, axis=1)
+freqs = np.fft.rfftfreq(records.shape[1], sim.dt)
+band = (freqs > 300.0) & (freqs < 1200.0)
+result = two_microphone_impedance(
+    spec[1, band] / spec[0, band], frequency=freqs[band],
+    spacing=0.05, x1=(nx - d_cells) * dx - (mics[0] + 0.5) * dx,
+    speed_of_sound=c0, characteristic_impedance=rho0 * c0)
+result.plot()   # the absorption the virtual tube "measured"
+```
+
+The two clips below run exactly this experiment. In the impedance tube a
+sustained plane tone builds the standing wave the two microphones read:
+against the rigid end the minima are deep, in front of the sample they stay
+shallow. In the transmission tube a carrier packet crosses an anechoic
+duct: the empty tube passes it unchanged, the lossy layer splits it into a
+reflection and an attenuated transmission that the four ASTM microphones
+resolve.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_impedance_tube_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_impedance_tube.gif" alt="Animation: a loudspeaker drives a sustained 850 Hz plane tone into a rigid-walled virtual impedance tube drawn as the real instrument; deep envelope minima against the rigid plug, shallow minima in front of the 10 cm lossy sample, the ISO 10534-2 microphone pair and the recovered absorption of 0.54 annotated" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_impedance_tube.webm)
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_transmission_tube_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_transmission_tube.gif" alt="Animation: the loudspeaker end fires a carrier packet down a rigid-walled virtual transmission tube drawn as the real instrument with its anechoic termination; the empty tube passes it unchanged while a 10 cm lossy layer splits it into a reflection and an attenuated transmission, the four ASTM E2611 microphones and the 3.1 dB transmission loss annotated" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_transmission_tube.webm)
+
 ## 3. When to use it, and the 2D limits
 
 FDTD earns its cost when the **geometry drives the physics**: diffraction
