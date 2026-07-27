@@ -1242,6 +1242,39 @@ def _draw_hr_cavity(
     )
 
 
+def _branch_dimensions(
+    kind: str,
+    *,
+    neck_area: float | None,
+    neck_length: float | None,
+    cavity_volume: float | None,
+    length: float | None,
+    branch_area: float | None,
+) -> tuple[float, float, float]:
+    """Resolve (branch diameter, branch length, cavity side) per kind."""
+    if kind == _KIND_HELMHOLTZ:
+        if neck_area is None or neck_length is None or cavity_volume is None:
+            raise ValueError(
+                "A Helmholtz resonator drawing needs 'neck_area', "
+                "'neck_length' and 'cavity_volume'."
+            )
+        if cavity_volume <= 0.0 or neck_length <= 0.0:
+            raise ValueError(
+                "'cavity_volume' and 'neck_length' must be positive."
+            )
+        return (
+            _duct_diameter(neck_area), neck_length,
+            float(cavity_volume ** (1.0 / 3.0)),
+        )
+    if length is None or branch_area is None:
+        raise ValueError(
+            "A quarter-wave drawing needs 'length' and 'branch_area'."
+        )
+    if length <= 0.0:
+        raise ValueError(_LENGTH_POSITIVE)
+    return _duct_diameter(branch_area), length, 0.0
+
+
 def _draw_branch_silencer(
     ax: Axes,
     kind: str,
@@ -1255,31 +1288,15 @@ def _draw_branch_silencer(
     branch_area: float | None = None,
     **kwargs: Any,
 ) -> None:
-    """Side-branch silencer: Helmholtz resonator or quarter-wave tube."""
+    """Side-branch silencer: Helmholtz resonator or quarter-wave tube.
+
+    Parameters are already validated by :func:`_validate_branch_geometry`.
+    """
     d_d = _duct_diameter(duct_area)
-    if kind == _KIND_HELMHOLTZ:
-        if neck_area is None or neck_length is None or cavity_volume is None:
-            raise ValueError(
-                "A Helmholtz resonator drawing needs 'neck_area', "
-                "'neck_length' and 'cavity_volume'."
-            )
-        if cavity_volume <= 0.0 or neck_length <= 0.0:
-            raise ValueError(
-                "'cavity_volume' and 'neck_length' must be positive."
-            )
-        d_b = _duct_diameter(neck_area)
-        branch_len = neck_length
-        cavity_side = float(cavity_volume ** (1.0 / 3.0))
-    else:
-        if length is None or branch_area is None:
-            raise ValueError(
-                "A quarter-wave drawing needs 'length' and 'branch_area'."
-            )
-        if length <= 0.0:
-            raise ValueError(_LENGTH_POSITIVE)
-        d_b = _duct_diameter(branch_area)
-        branch_len = length
-        cavity_side = 0.0
+    d_b, branch_len, cavity_side = _branch_dimensions(
+        kind, neck_area=neck_area, neck_length=neck_length,
+        cavity_volume=cavity_volume, length=length, branch_area=branch_area,
+    )
     run = max(4.0 * d_d, 2.0 * d_b + 2.0 * d_d, 2.0 * cavity_side)
     _draw_duct(ax, -0.5 * run, 0.5 * run, d_d, **kwargs)
     # Branch mouth opens through the upper duct wall at x = 0.
