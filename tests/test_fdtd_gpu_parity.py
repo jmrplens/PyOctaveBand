@@ -18,6 +18,7 @@ engine only through that path.
 
 from __future__ import annotations
 
+import os
 import pathlib
 import sys
 from typing import Any
@@ -298,6 +299,29 @@ def test_build_job_validation() -> None:
     """build_job rejects inconsistent sampling and non-integer widths."""
     ok: dict[str, Any] = {"shape": (_NY, _NX), "steps": 100,
                           "sample_steps": [50]}
+    with pytest.raises(ValueError, match="cfl"):
+        fdtd_gpu_remote.build_job(343.0, _DX, cfl=1.5, **ok)
+    with pytest.raises(ValueError, match="damping"):
+        fdtd_gpu_remote.build_job(343.0, _DX, damping=-1.0, **ok)
+    with pytest.raises(ValueError, match="damping"):
+        fdtd_gpu_remote.build_job(343.0, _DX,
+                                  damping=np.zeros((_NY + 1, _NX)), **ok)
+    with pytest.raises(ValueError, match="impedance sides"):
+        fdtd_gpu_remote.build_job(343.0, _DX,
+                                  edge_impedance={"front": 413.0}, **ok)
+    with pytest.raises(ValueError, match="absorbing"):
+        fdtd_gpu_remote.build_job(343.0, _DX, sponge_width=10,
+                                  edge_impedance={"top": 413.0}, **ok)
+    with pytest.raises(ValueError, match="impedance"):
+        fdtd_gpu_remote.build_job(
+            343.0, _DX, edge_impedance={"top": np.ones(_NX + 2)}, **ok)
+    with pytest.raises(ValueError, match="obstacle_mask"):
+        fdtd_gpu_remote.build_job(
+            343.0, _DX, obstacle_mask=np.zeros((_NY + 1, _NX), np.bool_),
+            **ok)
+    with pytest.raises(ValueError, match="obstacle_mask"):
+        fdtd_gpu_remote.build_job(
+            343.0, _DX, obstacle_mask=np.zeros((_NY, _NX), np.int64), **ok)
     with pytest.raises(ValueError, match="sample_steps"):
         fdtd_gpu_remote.build_job(343.0, _DX, shape=(_NY, _NX), steps=100,
                                   sample_steps=[50, 150])
@@ -322,3 +346,69 @@ def test_build_job_validation() -> None:
     with pytest.raises(ValueError, match="init_scale_x"):
         fdtd_gpu_remote.build_job(343.0, _DX,
                                   init_scale_x=np.full(_NX, np.nan), **ok)
+
+
+def test_sample_steps_deduplicated_local_and_remote_contract() -> None:
+    """Repeated sample_steps collapse to one frame per unique step.
+
+    build_job stores the unique ascending schedule and run_job dedups on
+    its own too, so a hand-built archive with duplicates yields the same
+    frames/sample_steps contract as the packed job.
+    """
+    job = fdtd_gpu_remote.build_job(
+        343.0, _DX, shape=(_NY, _NX), steps=100,
+        sample_steps=[100, 0, 50, 50, 0, 100])
+    np.testing.assert_array_equal(job["sample_steps"], [0, 50, 100])
+    job["sample_steps"] = np.asarray([100, 0, 50, 50, 0, 100],
+                                     dtype=np.int64)
+    result = job_runner.run_job(job)
+    np.testing.assert_array_equal(result["sample_steps"], [0, 50, 100])
+    assert np.asarray(result["frames"]).shape[0] == 3
+
+
+def test_submit_falls_back_to_local_numpy_run(
+        monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture[str]) -> None:
+    """A reachable remote whose run fails degrades to a local NumPy run."""
+    config = fdtd_gpu_remote.RemoteConfig(
+        host="203.0.113.9", user="gpuuser", name="test GPU",
+        image="cupy/cupy:v13.6.0", workdir="/tmp/phonometry-gpu")
+    monkeypatch.setattr(fdtd_gpu_remote, "remote_available",
+                        lambda config: True)
+
+    def _boom(job: dict[str, Any], config: Any,
+              timeout: float = 0.0) -> dict[str, Any]:
+        raise fdtd_gpu_remote.RemoteRunError("docker run failed")
+
+    monkeypatch.setattr(fdtd_gpu_remote, "run_remote", _boom)
+    monkeypatch.setattr(job_runner, "_pick_backend",
+                        lambda: (np, "numpy"))
+    job = fdtd_gpu_remote.build_job(
+        343.0, _DX, shape=(20, 24), steps=10, sample_steps=[0, 10])
+    result = fdtd_gpu_remote.submit(job, config)
+    assert result["backend"] == "numpy"
+    assert int(result["steps"]) == 10
+    assert np.asarray(result["frames"]).shape == (2, 20, 24)
+    err = capsys.readouterr().err
+    assert "docker run failed" in err
+    assert "falling back to a local NumPy run" in err
+
+
+def test_load_env_real_environment_wins(
+        monkeypatch: pytest.MonkeyPatch, tmp_path: pathlib.Path) -> None:
+    """An exported variable beats the .env file; missing ones are loaded."""
+    env_file = tmp_path / ".env"
+    env_file.write_text(
+        "# comment line\n"
+        "PHONO_GPU_HOST=file-host\n"
+        'PHONO_GPU_NAME="lab GPU"\n',
+        encoding="utf-8")
+    monkeypatch.setenv("PHONO_GPU_HOST", "env-host")
+    # Guarantee the variable is absent and restored either way.
+    monkeypatch.setenv("PHONO_GPU_NAME", "sentinel")
+    monkeypatch.delenv("PHONO_GPU_NAME")
+    values = fdtd_gpu_remote.load_env(env_file)
+    assert values == {"PHONO_GPU_HOST": "file-host",
+                      "PHONO_GPU_NAME": "lab GPU"}
+    assert os.environ["PHONO_GPU_HOST"] == "env-host"    # real env wins
+    assert os.environ["PHONO_GPU_NAME"] == "lab GPU"     # quotes stripped

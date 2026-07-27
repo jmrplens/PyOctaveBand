@@ -20,8 +20,10 @@ Job archive keys (all produced by ``fdtd_gpu_remote.build_job``):
 * ``plane_waves``: JSON string, list of ``add_plane_wave`` keyword dicts.
 * ``init_scale_x`` (optional): 1D window of length ``nx``, multiplied into
   ``p`` and ``vy`` column-wise after the plane waves (``vx`` untouched).
-* ``steps``: total leapfrog steps; ``sample_steps``: sorted step counts at
-  which the pressure field is recorded (0 records the initial state).
+* ``steps``: total leapfrog steps; ``sample_steps``: step counts at which
+  the pressure field is recorded (0 records the initial state). The runner
+  sorts them and drops duplicates, so the result carries one frame per
+  unique step.
 * ``sample_stride``: spatial subsampling of the recorded frames
   (``frame[::stride, ::stride]``); ``sample_dtype``: dtype of the returned
   frames (``"float64"`` or ``"float32"``). Both are applied on the compute
@@ -123,7 +125,11 @@ def run_job(job: Any) -> dict[str, Any]:
         raise ValueError("sample_stride must be >= 1")
     dtype = np.dtype(str(job["sample_dtype"]) if "sample_dtype" in job
                      else "float64")
-    sample_steps = sorted(int(s) for s in np.asarray(job["sample_steps"]))
+    # Deduplicate defensively (build_job already stores unique steps, but
+    # the archive may come from elsewhere): ascending order, one recorded
+    # frame per reported step, so frames[i] always belongs to
+    # sample_steps[i].
+    sample_steps = sorted({int(s) for s in np.asarray(job["sample_steps"])})
     wanted = set(sample_steps)
     frames: list[np.ndarray] = []
     if 0 in wanted:

@@ -157,7 +157,12 @@ def build_job(
     ``add_plane_wave`` (``direction``, ``center``, ``width`` and optional
     ``amplitude``/``wavelength``). ``sample_steps`` lists the step counts
     at which a pressure frame is recorded (0 = the initial state); every
-    entry must lie in ``[0, steps]``. ``init_scale_x`` is an optional 1D
+    entry must lie in ``[0, steps]`` and duplicates are dropped, so the
+    stored schedule is strictly increasing with one frame per entry.
+    ``cfl``, ``damping``, ``edge_impedance`` and ``obstacle_mask`` are
+    validated here with the same helpers :class:`fdtd_gpu.GpuFDTD2D` uses,
+    so a malformed job fails eagerly at packing time instead of on the
+    remote machine. ``init_scale_x`` is an optional 1D
     window of length ``nx`` applied after the plane waves are laid down
     (``p *= w`` and ``vy *= w`` column-wise, ``vx`` untouched), giving the
     initial front a lateral taper that leaves the sponges alone.
@@ -170,6 +175,7 @@ def build_job(
     c_map = fdtd_gpu._resolve_c_map(c, shape)
     ny, nx = c_map.shape
     rho_map = fdtd_gpu._resolve_rho_map(rho, ny, nx)
+    cfl = fdtd_gpu._resolve_cfl(cfl)
     steps = fdtd_gpu._integer("steps", steps)
     sponge_width = fdtd_gpu._integer("sponge_width", sponge_width)
     sample_stride = fdtd_gpu._integer("sample_stride", sample_stride)
@@ -177,7 +183,7 @@ def build_job(
         raise ValueError("sample_stride must be >= 1")
     if sample_dtype not in ("float64", "float32"):
         raise ValueError("sample_dtype must be 'float64' or 'float32'")
-    sample_arr = np.asarray(sample_steps, dtype=np.int64)
+    sample_arr = np.unique(np.asarray(sample_steps, dtype=np.int64))
     if sample_arr.size and (int(sample_arr.min()) < 0
                             or int(sample_arr.max()) > steps):
         raise ValueError("sample_steps must lie within [0, steps]")
@@ -189,9 +195,11 @@ def build_job(
                                   if sponge_width > 0 else ())
     else:
         sides = fdtd_gpu._resolve_sponge_sides(sponge_sides)
-    edge_impedance = edge_impedance or {}
-    obstacle = (np.zeros((ny, nx), dtype=np.bool_) if obstacle_mask is None
-                else np.asarray(obstacle_mask, dtype=np.bool_))
+    damping_map = fdtd_gpu._resolve_damping(damping, ny, nx)
+    edge_profiles = fdtd_gpu._resolve_edge_impedance(
+        edge_impedance, sponge_width, sides, ny, nx)
+    mask = fdtd_gpu._resolve_obstacle_mask(obstacle_mask, ny, nx)
+    obstacle = np.zeros((ny, nx), dtype=np.bool_) if mask is None else mask
     job: dict[str, Any] = {
         "c": c_map,
         "rho": rho_map,
@@ -200,8 +208,8 @@ def build_job(
         "sponge_width": np.int64(sponge_width),
         "sponge_sides": np.asarray(sides, dtype=np.str_),
         "sponge_reflection": np.float64(sponge_reflection),
-        "damping": np.asarray(damping, dtype=np.float64),
-        "edge_sides": np.asarray(sorted(edge_impedance), dtype=np.str_),
+        "damping": damping_map,
+        "edge_sides": np.asarray(sorted(edge_profiles), dtype=np.str_),
         "obstacle": obstacle,
         "plane_waves": np.str_(json.dumps(plane_waves or [])),
         "steps": np.int64(steps),
@@ -209,8 +217,8 @@ def build_job(
         "sample_stride": np.int64(sample_stride),
         "sample_dtype": np.str_(sample_dtype),
     }
-    for side, z in edge_impedance.items():
-        job[f"edge_z_{side}"] = np.asarray(z, dtype=np.float64)
+    for side, z in edge_profiles.items():
+        job[f"edge_z_{side}"] = z
     if init_scale_x is not None:
         w = np.asarray(init_scale_x, dtype=np.float64)
         if w.ndim != 1 or w.shape[0] != nx:

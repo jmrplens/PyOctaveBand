@@ -58,6 +58,14 @@ def _integer(name: str, value: int) -> int:
     return int(value)
 
 
+def _resolve_cfl(cfl: float) -> float:
+    """Validate the Courant number into a float strictly inside (0, 1)."""
+    out = float(cfl)
+    if not np.isfinite(out) or not 0.0 < out < 1.0:
+        raise ValueError("cfl must lie in (0, 1)")
+    return out
+
+
 def _positive_map(name: str, field: Field2D) -> None:
     """Validate that every cell of *field* is strictly positive and finite."""
     if not np.all(np.isfinite(field)) or bool(np.any(field <= 0.0)):
@@ -109,6 +117,21 @@ def _resolve_rho_map(rho: float | Field2D, ny: int, nx: int) -> Field2D:
     return rho_map
 
 
+def _resolve_damping(damping: float | NDArray[np.float64],
+                     ny: int, nx: int) -> NDArray[np.float64]:
+    """Validate the damping spec into a non-negative 0D or ``(ny, nx)`` array."""
+    damping_map = np.asarray(damping, dtype=np.float64)
+    if damping_map.ndim not in (0, 2):
+        raise ValueError("damping must be a scalar or an (ny, nx) map")
+    if not np.all(np.isfinite(damping_map)) or np.any(damping_map < 0.0):
+        raise ValueError("damping must be non-negative and finite")
+    if damping_map.ndim == 2 and damping_map.shape != (ny, nx):
+        raise ValueError(
+            f"damping map shape {damping_map.shape} does not match the "
+            f"grid {(ny, nx)}")
+    return damping_map
+
+
 def _resolve_sponge_sides(sponge_sides: Any) -> tuple[str, ...]:
     """Normalise the sponge-side spec into a validated tuple of side names."""
     if sponge_sides is None:
@@ -137,6 +160,53 @@ def _edge_impedance_profile(side: str, value: float | NDArray[np.float64],
         raise ValueError(f"impedance for side {side!r} must be "
                          "strictly positive and finite")
     return z
+
+
+def _resolve_edge_impedance(
+    edge_impedance: dict[str, float | NDArray[np.float64]] | None,
+    sponge_width: int,
+    sponge_sides: tuple[str, ...],
+    ny: int,
+    nx: int,
+) -> dict[str, Field2D]:
+    """Validate the per-side impedance spec into 1D per-edge-cell profiles.
+
+    Rejects unknown side names and sides that are absorbing (sponge) at the
+    same time; scalars are broadcast to the edge length. The returned dict
+    iterates in the deterministic ``_SIDES`` order.
+    """
+    if not edge_impedance:
+        return {}
+    unknown = set(edge_impedance) - set(_SIDES)
+    if unknown:
+        raise ValueError(f"unknown impedance sides: {sorted(unknown)}")
+    absorbing = set(sponge_sides) if sponge_width > 0 else set()
+    profiles: dict[str, Field2D] = {}
+    for side in _SIDES:                          # deterministic order
+        if side not in edge_impedance:
+            continue
+        if side in absorbing:
+            raise ValueError(f"side {side!r} cannot be both absorbing "
+                             "and an impedance boundary")
+        n_edge = ny if side in ("left", "right") else nx
+        profiles[side] = _edge_impedance_profile(side, edge_impedance[side],
+                                                 n_edge)
+    return profiles
+
+
+def _resolve_obstacle_mask(obstacle_mask: NDArray[np.bool_] | None,
+                           ny: int, nx: int) -> NDArray[np.bool_] | None:
+    """Validate the obstacle spec into a boolean ``(ny, nx)`` map (or None)."""
+    if obstacle_mask is None:
+        return None
+    mask = np.asarray(obstacle_mask)
+    if mask.shape != (ny, nx):
+        raise ValueError("obstacle_mask must match the grid shape")
+    if mask.dtype != np.bool_:
+        raise ValueError("obstacle_mask must be a boolean array")
+    if bool(mask.all()):
+        raise ValueError("obstacle_mask must leave open cells")
+    return mask
 
 
 class _ImpedanceEdge:
@@ -224,8 +294,7 @@ class GpuFDTD2D:
         obstacle_mask: NDArray[np.bool_] | None = None,
     ) -> None:
         c_map = _resolve_c_map(c, shape)
-        if not np.isfinite(cfl) or not 0.0 < cfl < 1.0:
-            raise ValueError("cfl must lie in (0, 1)")
+        cfl = _resolve_cfl(cfl)
         ny, nx = c_map.shape
         rho_map = _resolve_rho_map(rho, ny, nx)
         sponge_width = _integer("sponge_width", sponge_width)
@@ -237,15 +306,7 @@ class GpuFDTD2D:
         if not 0.0 < sponge_reflection < 1.0:
             raise ValueError("sponge_reflection must lie strictly between "
                              "0 and 1")
-        damping_map = np.asarray(damping, dtype=np.float64)
-        if damping_map.ndim not in (0, 2):
-            raise ValueError("damping must be a scalar or an (ny, nx) map")
-        if not np.all(np.isfinite(damping_map)) or np.any(damping_map < 0.0):
-            raise ValueError("damping must be non-negative and finite")
-        if damping_map.ndim == 2 and damping_map.shape != (ny, nx):
-            raise ValueError(
-                f"damping map shape {damping_map.shape} does not match the "
-                f"grid {(ny, nx)}")
+        damping_map = _resolve_damping(damping, ny, nx)
 
         self._xp = xp
         self.dx = _positive_finite("dx", dx)
@@ -298,42 +359,21 @@ class GpuFDTD2D:
         nx: int,
     ) -> list[_ImpedanceEdge]:
         """Validate the per-side impedance spec into edge updaters."""
-        edges: list[_ImpedanceEdge] = []
-        if not edge_impedance:
-            return edges
-        unknown = set(edge_impedance) - set(_SIDES)
-        if unknown:
-            raise ValueError(f"unknown impedance sides: {sorted(unknown)}")
-        absorbing = set(sponge_sides) if sponge_width > 0 else set()
+        profiles = _resolve_edge_impedance(edge_impedance, sponge_width,
+                                           sponge_sides, ny, nx)
         rho_edges = {"left": rho_map[:, 0], "right": rho_map[:, -1],
                      "top": rho_map[0, :], "bottom": rho_map[-1, :]}
-        for side in _SIDES:                      # deterministic order
-            if side not in edge_impedance:
-                continue
-            if side in absorbing:
-                raise ValueError(f"side {side!r} cannot be both absorbing "
-                                 "and an impedance boundary")
-            n_edge = ny if side in ("left", "right") else nx
-            z = _edge_impedance_profile(side, edge_impedance[side], n_edge)
-            edges.append(_ImpedanceEdge(self._xp, side, z, rho_edges[side],
-                                        self.dt, self.dx))
-        return edges
+        return [_ImpedanceEdge(self._xp, side, z, rho_edges[side],
+                               self.dt, self.dx)
+                for side, z in profiles.items()]
 
     def _init_obstacle(self, obstacle_mask: NDArray[np.bool_] | None,
                        ny: int, nx: int) -> None:
         """Validate the obstacle mask into closed-face velocity factors."""
         self._vx_open: XPArray | None = None
         self._vy_open: XPArray | None = None
-        if obstacle_mask is None:
-            return
-        mask = np.asarray(obstacle_mask)
-        if mask.shape != (ny, nx):
-            raise ValueError("obstacle_mask must match the grid shape")
-        if mask.dtype != np.bool_:
-            raise ValueError("obstacle_mask must be a boolean array")
-        if bool(mask.all()):
-            raise ValueError("obstacle_mask must leave open cells")
-        if bool(mask.any()):
+        mask = _resolve_obstacle_mask(obstacle_mask, ny, nx)
+        if mask is not None and bool(mask.any()):
             xp = self._xp
             self._vx_open = xp.asarray(
                 (~(mask[:, 1:] | mask[:, :-1])).astype(np.float64))
