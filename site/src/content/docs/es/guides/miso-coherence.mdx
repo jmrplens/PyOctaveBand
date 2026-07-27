@@ -90,6 +90,13 @@ Para un sistema con `q` entradas `x1..xq` y salida `y`, `miso_coherence`
 estima todos los autoespectros y espectros cruzados por el método de Welch y
 reporta tres funciones de coherencia.
 
+La historia del condicionamiento cabe en un diagrama de bloques: dos
+entradas correladas excitan sus propios caminos hacia una única salida
+medida, y la matriz de espectros cruzados de Welch es la que convierte la
+maraña en números por fuente.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_miso_coherence_es.svg" alt="Diagrama de bloques de un sistema MISO de dos entradas: la entrada x1 es ruido blanco y la entrada x2 es 0,7 veces x1 más ruido independiente, x1 excita un camino paso bajo de 400 hercios y x2 uno paso alto de 1,5 kilohercios, y ambos se suman con ruido aditivo en la salida y; la salida alimenta la matriz de espectros cruzados de Welch Gxx y Gxy con nperseg 2048, condicionada por pasos de Schur en orden de coherencia ordinaria descendente, que da por un lado las coherencias múltiple y parciales, donde la entrada 2 en la banda de 100 a 300 hercios cae de una coherencia ordinaria de 0,32 a una parcial de 0,00, y por otro las contribuciones por fuente Gvi que con el ruido residual reconstruyen Gyy exactamente; una nota final registra que cada paso de condicionamiento gasta uno de los 242 promedios efectivos" width="92%" />
+
 La **coherencia ordinaria** de la entrada `i` con la salida, por sí sola
 (Ec. 7.109), es la magnitud clásica de una sola entrada:
 

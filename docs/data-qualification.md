@@ -13,6 +13,12 @@ the book's own acceptance regions, and the **Rice statistics** - level
 crossings, apparent frequency, peak rates and heights - that summarize what
 a qualified Gaussian record looks like and flag one that is not.
 
+Qualification is a decision, not a statistic, so it reads best as a flow:
+segment the record, count reverse arrangements, and let the Table A.6 region
+say whether averaging is allowed.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_data_qualification_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_data_qualification.svg" alt="Decision flow diagram of data qualification: a time record, before trusting any PSD, Leq or GUM average, is split into 20 equal segments whose mean square values form a sequence, the reverse arrangement count A with trend-free mean 95 is compared against the Table A.6 acceptance region, above 64 and at most 125, at the 5 percent level, and the diamond branches to a green stationary box, steady noise with A equal to 91 accepted so the chi-square intervals and error formulas hold, or to a red nonstationary box, a 20 percent gain ramp with A equal to 7 rejected, advising to split at the change or move to short-time analysis; footnotes name the runs test companion and the mean-square blind spot for frequency glides" width="92%"></picture>
+
 ## 1. The reverse arrangement test
 
 Given a sequence of $N$ observations $x_1, \dots, x_N$ - parameter estimates,

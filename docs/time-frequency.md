@@ -16,6 +16,12 @@ closer than a practical full-band FFT bin. Where the
 spectrogram of a sound level meter, this one is its fine-band,
 constant-bandwidth counterpart.
 
+One number rules everything on this page: the segment length, which carves
+the time-frequency plane into cells of fixed area. The diagram shows the
+same record tiled by a short and a long window.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_time_frequency_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_time_frequency.svg" alt="Two time-frequency plane tilings of the same record at 16 kilohertz side by side: with a short 256 sample window the cells are 16 milliseconds wide and 62.5 hertz tall, so a click stays a sharp narrow column while a steady tone smears into a tall band; with a long 1024 sample window the cells are 64 milliseconds wide and 15.6 hertz tall, so the tone sharpens into a thin band while the click smears into a wide column; captions note that each cell is a single unaveraged estimate with unit random error and that the product of time and frequency resolution stays about one" width="92%"></picture>
+
 ## 1. The calibrated spectrogram
 
 `spectrogram` splits the record into tapered (Hann by default), overlapped

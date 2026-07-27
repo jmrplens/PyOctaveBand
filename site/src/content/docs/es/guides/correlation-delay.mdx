@@ -150,6 +150,12 @@ sensores `y(t) = α·x(t-τ0) + n(t)` (B&P, sección 5.1.4) por tres vías:
   transformada inversa, afilando el pico que la autocorrelación de la propia
   señal ensancharía (su ecuación 9).
 
+La imagen física son dos micrófonos y un frente de onda: el camino extra
+hasta el micrófono lejano es c por el retardo, y todo el problema de
+estimación es localizar un pico en el eje de retardos.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_correlation_delay_es.svg" alt="Diagrama de la estimación de retardo por correlación: una fuente de altavoz radia hacia dos micrófonos en pie, el micrófono 1 captura x de t y el micrófono 2 captura y de t igual a alfa por x retardada tau 0 más ruido, con el frente de onda que pasa por el micrófono 1 dejando un camino extra de c por tau 0, unos 0,84 metros a 343 metros por segundo, y seno de theta igual a c tau 0 entre la separación d; debajo, un panel de correlograma muestra el correlador directo como una joroba ancha y GCC-PHAT con ponderación 1 entre el módulo de Gxy como un pico estrecho, ambos en tau 0 igual a 20 muestras entre 8192 hercios, 2,44 milisegundos; el pie anota el refinado a fracción de muestra por interpolación parabólica del pico con sobremuestreo local de 16 veces hasta por debajo de 0,002 muestras" width="92%" />
+
 Las ponderaciones de la Tabla I de Knapp y Carter, con las condiciones que
 el artículo asocia a cada una:
 

@@ -13,6 +13,12 @@ windowing - **liftering** - in the quefrency domain. The same machinery
 extends the [Hilbert envelope](correlation-delay.md) with an
 **envelope spectrum** in which amplitude modulations become discrete lines.
 
+The whole trick is a chain of four steps: the logarithm turns a
+multiplicative echo into additive spectral ripple, and the inverse FFT
+collapses that ripple onto a single quefrency spike.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_cepstrum_echoes_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_cepstrum_echoes.svg" alt="Block diagram of the cepstrum chain: a signal made of a source wavelet plus an echo with reflection coefficient 0.5 at 8 milliseconds produces a spectrum rippled with a 125 hertz period, taking the log of the squared magnitude turns the multiplicative echo into an additive ripple, and the inverse FFT lands on the quefrency axis, drawn below with the source wavelet concentrated under 2 milliseconds, a spike of height 0.5 at exactly 8 milliseconds, a negative second rahmonic of minus 0.125 at twice the delay, and a dashed lifter cutoff at 4 milliseconds separating the lowpass envelope side from the highpass ripple side; captions give the rahmonic height series and the plus 3.5 and minus 6.0 decibel ripple bounds" width="92%"></picture>
+
 ## 1. The cepstrum and its three variants
 
 Because the log turns the convolution `x = h * u` into the sum

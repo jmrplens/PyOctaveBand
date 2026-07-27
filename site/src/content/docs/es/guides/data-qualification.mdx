@@ -46,6 +46,12 @@ distribución con las regiones de aceptación del propio libro, y las
 alturas de pico - que resumen el aspecto de un registro gaussiano calificado
 y delatan al que no lo es.
 
+La calificación es una decisión, no un estadístico, así que se lee mejor
+como un flujo: segmentar el registro, contar inversiones, y dejar que la
+región de la Tabla A.6 diga si se puede promediar.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_data_qualification_es.svg" alt="Diagrama de flujo de decisión de la calificación de datos: un registro temporal, antes de confiar en cualquier promedio PSD, Leq o GUM, se divide en 20 segmentos iguales cuyas medias cuadráticas forman una secuencia, el recuento de inversiones A con media sin tendencia 95 se compara con la región de aceptación de la Tabla A.6, mayor que 64 y como máximo 125, al nivel del 5 por ciento, y el rombo se bifurca hacia una caja verde de estacionario, ruido estable con A igual a 91 aceptado de modo que valen los intervalos chi-cuadrado y las fórmulas de error, o hacia una caja roja de no estacionario, una rampa de ganancia del 20 por ciento con A igual a 7 rechazada, aconsejando dividir en el cambio o pasar a análisis de corto plazo; las notas al pie nombran el test de rachas como compañero y el punto ciego de la media cuadrática ante deslizamientos de frecuencia" width="92%" />
+
 ## 1. El test de inversiones de orden
 
 Dada una secuencia de $N$ observaciones $x_1, \dots, x_N$ - estimaciones de

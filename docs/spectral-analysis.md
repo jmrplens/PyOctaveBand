@@ -28,6 +28,12 @@ pascals yields `Pa²/Hz`. Two scalings are available: `'density'` (units²/Hz,
 integrates to the signal power) and `'spectrum'` (units², reads the power of
 discrete tones directly).
 
+The estimator is a fixed pipeline, and every quality figure it reports falls
+out of one design choice, the segment length. The diagram traces it with the
+numbers of this page's example.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spectral_analysis_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spectral_analysis.svg" alt="Block diagram of the Welch PSD pipeline: a 20 second pink noise record at 48 kilohertz is split into 50 percent overlapped segments of 4096 samples giving 467 segments and an 11.7 hertz bin spacing, each segment is Hann tapered for a resolution bandwidth of 17.6 hertz, the one-sided squared FFT periodograms are averaged into 442 effective averages, and the result is Gxx of f with a chi-square confidence interval, a random error of 1 over the square root of n d equal to 4.8 percent and about 885 degrees of freedom; a final note states the trade-off that longer segments buy resolution but spend averages" width="92%"></picture>
+
 Averaging `nd` independent segments gives the estimate `2·nd` chi-square
 degrees of freedom (Eq. 8.162), from which everything else follows:
 
