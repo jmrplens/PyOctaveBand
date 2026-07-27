@@ -98,6 +98,9 @@ _ASTM_KU_SPACING = 0.40
 #: (ASTM E2611-19, 6.2.3), i.e. ``f_l = c / (100 s)``.
 _ASTM_LOWER_WAVELENGTH_FRACTION = 100.0
 
+#: Shared validation message for the tube diameter arguments.
+_DIAMETER_POSITIVE = "'diameter' must be positive."
+
 #: Aliases accepted for the tube cross-section ``shape`` arguments. A square
 #: tube is the rectangular case with equal sides (ISO 10534-2, 4.1;
 #: ASTM E2611-19, 6.2.5).
@@ -274,7 +277,7 @@ def tube_attenuation_constant(
     if speed_of_sound <= 0.0:
         raise ValueError("'speed_of_sound' must be positive.")
     if diameter <= 0.0:
-        raise ValueError("'diameter' must be positive.")
+        raise ValueError(_DIAMETER_POSITIVE)
     f = np.asarray(frequency, dtype=np.float64)
     if np.any(f < 0.0):
         raise ValueError("'frequency' must be non-negative.")
@@ -546,7 +549,7 @@ def _frequency_range(
     f_upper = ku_spacing * speed_of_sound / spacing
     if diameter is not None:
         if diameter <= 0.0:
-            raise ValueError("'diameter' must be positive.")
+            raise ValueError(_DIAMETER_POSITIVE)
         factor = ku_circular if canonical == "circular" else ku_rectangular
         f_upper = min(f_upper, factor * speed_of_sound / diameter)
     f_lower = speed_of_sound / (lower_fraction * spacing)
@@ -851,8 +854,10 @@ def _warn_astm_plane_wave(
     spacing bound to ``k s > 0,02 pi`` (6.2.3). The upper spacing bound binds
     every microphone pair (largest spacing), the lower one the smallest.
     """
+    if s1 <= 0.0 or s2 <= 0.0:
+        raise ValueError("'s1' and 's2' must be positive.")
     if diameter <= 0.0:
-        raise ValueError("'diameter' must be positive.")
+        raise ValueError(_DIAMETER_POSITIVE)
     k = np.real(np.asarray(wavenumber, dtype=np.complex128))
     ku = _ASTM_KU_CIRCULAR if shape == "circular" else _ASTM_KU_RECTANGULAR
     two_pi = 2.0 * np.pi
@@ -1114,12 +1119,13 @@ class TransferMatrix:
         laboratory quotes: the normal-incidence transmission loss ``TLn(f)``
         (Eq. (26), the primary curve, left axis) and the hard-backed
         absorption coefficient ``alpha(f)`` (Eq. (28), a muted companion on a
-        0..1 right axis). The matrix itself carries no frequency axis, so the
-        ``frequency`` vector of the measurement (matching the shape of the
-        entries) and the air characteristic impedance ``rho c`` are needed:
-        both default to the values retained from the solver call
-        (``self.frequency`` / ``self.air_characteristic_impedance``) and only
-        have to be supplied for a hand-built matrix.
+        0..1 right axis). The four-pole entries carry no frequency axis of
+        their own, so the plot needs the measurement's ``frequency`` vector
+        (matching the shape of the entries) and the air characteristic
+        impedance ``rho c``. A matrix built by the solvers retains both
+        (``self.frequency`` / ``self.air_characteristic_impedance``), so
+        ``plot()`` takes no arguments there; only a hand-built matrix (for
+        example :func:`air_layer_transfer_matrix`) must supply them.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
         :class:`~matplotlib.axes.Axes` of the transmission-loss curve.

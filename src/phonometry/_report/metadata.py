@@ -143,7 +143,6 @@ class ReportMetadata:
     pressure: float | None = None
     tube_diameter: float | None = None
     mic_spacing: float | None = None
-    tube_shape: str | None = None
     thickness: float | None = None
     test_room: str | None = None
     instrumentation: str | None = None
@@ -157,6 +156,9 @@ class ReportMetadata:
     requirement: float | None = None
     required_class: int | None = None
     notes: str | None = None
+    # Appended after the original fields so the positional constructor order
+    # of this public dataclass is preserved.
+    tube_shape: str | None = None
 
     #: Numeric fields that must be finite and strictly positive.
     _POSITIVE_FIELDS = (

@@ -867,12 +867,13 @@ Reads the four-pole entries out as the two ASTM E2611-19 spectra a
 laboratory quotes: the normal-incidence transmission loss `TLn(f)`
 (Eq. (26), the primary curve, left axis) and the hard-backed
 absorption coefficient `alpha(f)` (Eq. (28), a muted companion on a
-0..1 right axis). The matrix itself carries no frequency axis, so the
-`frequency` vector of the measurement (matching the shape of the
-entries) and the air characteristic impedance `rho c` are needed:
-both default to the values retained from the solver call
-(`self.frequency` / `self.air_characteristic_impedance`) and only
-have to be supplied for a hand-built matrix.
+0..1 right axis). The four-pole entries carry no frequency axis of
+their own, so the plot needs the measurement's `frequency` vector
+(matching the shape of the entries) and the air characteristic
+impedance `rho c`. A matrix built by the solvers retains both
+(`self.frequency` / `self.air_characteristic_impedance`), so
+`plot()` takes no arguments there; only a hand-built matrix (for
+example [`air_layer_transfer_matrix`](/phonometry/reference/api/materials/impedance-tube/#air_layer_transfer_matrix)) must supply them.
 
 Requires matplotlib (`pip install phonometry[plot]`); returns the
 `Axes` of the transmission-loss curve.

@@ -807,7 +807,6 @@ ReportMetadata(
     pressure: float | None = None,
     tube_diameter: float | None = None,
     mic_spacing: float | None = None,
-    tube_shape: str | None = None,
     thickness: float | None = None,
     test_room: str | None = None,
     instrumentation: str | None = None,
@@ -821,6 +820,7 @@ ReportMetadata(
     requirement: float | None = None,
     required_class: int | None = None,
     notes: str | None = None,
+    tube_shape: str | None = None,
 )
 ```
 
