@@ -85,6 +85,28 @@ _ISO_KU_SPACING = 0.45
 #: i.e. ``f_l = c0 / (20 s)``.
 _ISO_LOWER_WAVELENGTH_FRACTION = 20.0
 
+#: Upper-frequency plane-wave factor ``K``, circular tube (ASTM E2611-19,
+#: 6.2.4.1, Eq. (2)).
+_ASTM_KU_CIRCULAR = 0.586
+#: Upper-frequency plane-wave factor ``K``, rectangular tube with ``d`` the
+#: largest section dimension (ASTM E2611-19, 6.2.5).
+_ASTM_KU_RECTANGULAR = 0.500
+#: Microphone-spacing factor for the upper limit: ``s`` no larger than 80 % of
+#: ``c / (2 f_u)``, i.e. ``f_u s < 0,40 c`` (ASTM E2611-19, 6.5.4).
+_ASTM_KU_SPACING = 0.40
+#: Lower-limit factor: spacing shall be greater than 1 % of the wavelength
+#: (ASTM E2611-19, 6.2.3), i.e. ``f_l = c / (100 s)``.
+_ASTM_LOWER_WAVELENGTH_FRACTION = 100.0
+
+#: Aliases accepted for the tube cross-section ``shape`` arguments. A square
+#: tube is the rectangular case with equal sides (ISO 10534-2, 4.1;
+#: ASTM E2611-19, 6.2.5).
+_SHAPE_ALIASES = {
+    "circular": "circular",
+    "rectangular": "rectangular",
+    "square": "rectangular",
+}
+
 __all__ = [
     "ImpedanceTubeResult",
     "ImpedanceTubeWarning",
@@ -96,10 +118,12 @@ __all__ = [
     "apply_mic_calibration",
     "characteristic_impedance",
     "face_quantities",
+    "hydraulic_diameter",
     "mic_calibration_factor",
     "normalized_surface_admittance",
     "normalized_surface_impedance",
     "plane_wave_frequency_range",
+    "plane_wave_frequency_range_astm",
     "reflection_factor",
     "speed_of_sound_astm",
     "speed_of_sound_iso",
@@ -202,8 +226,36 @@ def air_density_astm(
 
 
 # ---------------------------------------------------------------------------
-# Wavenumber and tube attenuation (ISO 10534-2).
+# Cross-section helpers, wavenumber and tube attenuation (ISO 10534-2).
 # ---------------------------------------------------------------------------
+def _canonical_shape(shape: str) -> str:
+    """Normalise a cross-section name to ``"circular"``/``"rectangular"``."""
+    try:
+        return _SHAPE_ALIASES[shape]
+    except KeyError:
+        raise ValueError(
+            "'shape' must be 'circular', 'rectangular' or 'square'."
+        ) from None
+
+
+def hydraulic_diameter(width: float, height: float) -> float:
+    """Hydraulic diameter of a rectangular tube, ``4 A / P`` (ISO 10534-2, A.2.1.5).
+
+    For a rectangular cross-section of side lengths ``w`` and ``h`` the ratio
+    of four times the area to the perimeter reduces to
+    ``d_h = 2 w h / (w + h)``; a square tube gives ``d_h`` equal to the side
+    length. This is the ``d`` the Eq. (A.18) attenuation estimate expects for
+    rectangular tubes (see :func:`tube_attenuation_constant`).
+
+    :param width: Inner side length ``w``, in metres.
+    :param height: Inner side length ``h``, in metres.
+    :return: Hydraulic diameter ``d_h = 4 A / P``, in metres.
+    """
+    if width <= 0.0 or height <= 0.0:
+        raise ValueError("'width' and 'height' must be positive.")
+    return float(2.0 * width * height / (width + height))
+
+
 def tube_attenuation_constant(
     frequency: ArrayLike, speed_of_sound: float, diameter: float
 ) -> Real:
@@ -215,7 +267,8 @@ def tube_attenuation_constant(
     :param frequency: Frequency ``f``, in hertz (scalar or per band).
     :param speed_of_sound: Speed of sound ``c0``, in metres per second.
     :param diameter: Circular-tube diameter ``d``, in metres, or the hydraulic
-        diameter ``4 * area / perimeter`` for a rectangular tube.
+        diameter ``4 * area / perimeter`` for a rectangular tube (see
+        :func:`hydraulic_diameter`).
     :return: Attenuation constant ``k0''``, in nepers per metre.
     """
     if speed_of_sound <= 0.0:
@@ -414,25 +467,89 @@ def plane_wave_frequency_range(
     :param spacing: Microphone spacing ``s``, in metres.
     :param speed_of_sound: Speed of sound ``c0``, in metres per second.
     :param diameter: Tube diameter (circular) or maximum lateral dimension
-        (rectangular) ``d``, in metres; ``None`` applies only the spacing bound.
-    :param shape: ``"circular"`` or ``"rectangular"``.
+        (rectangular/square) ``d``, in metres; ``None`` applies only the
+        spacing bound.
+    :param shape: ``"circular"``, ``"rectangular"`` or ``"square"`` (a square
+        tube is the rectangular bound with ``d`` the side length).
     :return: Tuple ``(f_l, f_u)`` of the lower and upper frequency limits, in Hz.
     """
+    return _frequency_range(
+        spacing,
+        speed_of_sound,
+        diameter=diameter,
+        shape=shape,
+        ku_circular=_ISO_KU_CIRCULAR,
+        ku_rectangular=_ISO_KU_RECTANGULAR,
+        ku_spacing=_ISO_KU_SPACING,
+        lower_fraction=_ISO_LOWER_WAVELENGTH_FRACTION,
+    )
+
+
+def plane_wave_frequency_range_astm(
+    spacing: float,
+    speed_of_sound: float,
+    *,
+    diameter: float | None = None,
+    shape: str = "circular",
+) -> tuple[float, float]:
+    """Working plane-wave frequency range ``(f_l, f_u)`` (ASTM E2611-19).
+
+    The upper limit is the smaller of the microphone-spacing bound
+    ``s <= 0,8 c / (2 f_u)``, i.e. ``f_u s < 0,40 c`` (6.5.4), and, when the
+    tube ``diameter`` is given, the cut-on bound ``f_u < K c / d`` with
+    ``K = 0,586`` for a circular tube (6.2.4.1, Eq. (2)) or ``K = 0,500`` for
+    a rectangular tube with ``d`` the largest section dimension (6.2.5). The
+    lower limit follows 6.2.3: the spacing shall be greater than 1 % of the
+    wavelength, i.e. ``f_l = c / (100 s)``.
+
+    With two different spacings ``s1``/``s2``, call with the larger one for
+    the upper bound and the smaller one for the lower bound (each bound is
+    binding for every microphone pair).
+
+    :param spacing: Microphone spacing ``s``, in metres.
+    :param speed_of_sound: Speed of sound ``c``, in metres per second.
+    :param diameter: Tube diameter (circular) or largest section dimension
+        (rectangular/square) ``d``, in metres; ``None`` applies only the
+        spacing bound.
+    :param shape: ``"circular"``, ``"rectangular"`` or ``"square"``.
+    :return: Tuple ``(f_l, f_u)`` of the lower and upper frequency limits, in Hz.
+    """
+    return _frequency_range(
+        spacing,
+        speed_of_sound,
+        diameter=diameter,
+        shape=shape,
+        ku_circular=_ASTM_KU_CIRCULAR,
+        ku_rectangular=_ASTM_KU_RECTANGULAR,
+        ku_spacing=_ASTM_KU_SPACING,
+        lower_fraction=_ASTM_LOWER_WAVELENGTH_FRACTION,
+    )
+
+
+def _frequency_range(
+    spacing: float,
+    speed_of_sound: float,
+    *,
+    diameter: float | None,
+    shape: str,
+    ku_circular: float,
+    ku_rectangular: float,
+    ku_spacing: float,
+    lower_fraction: float,
+) -> tuple[float, float]:
+    """Shared ISO/ASTM plane-wave frequency-range arithmetic."""
     if spacing <= 0.0:
         raise ValueError("'spacing' must be positive.")
     if speed_of_sound <= 0.0:
         raise ValueError("'speed_of_sound' must be positive.")
-    if shape not in ("circular", "rectangular"):
-        raise ValueError("'shape' must be 'circular' or 'rectangular'.")
-    f_upper = _ISO_KU_SPACING * speed_of_sound / spacing
+    canonical = _canonical_shape(shape)
+    f_upper = ku_spacing * speed_of_sound / spacing
     if diameter is not None:
         if diameter <= 0.0:
             raise ValueError("'diameter' must be positive.")
-        factor = (
-            _ISO_KU_CIRCULAR if shape == "circular" else _ISO_KU_RECTANGULAR
-        )
+        factor = ku_circular if canonical == "circular" else ku_rectangular
         f_upper = min(f_upper, factor * speed_of_sound / diameter)
-    f_lower = speed_of_sound / (_ISO_LOWER_WAVELENGTH_FRACTION * spacing)
+    f_lower = speed_of_sound / (lower_fraction * spacing)
     return f_lower, f_upper
 
 
@@ -464,6 +581,13 @@ class ImpedanceTubeResult:
     (Eq. (19)), ``normalized_impedance`` the ratio ``Z / (rho c0)`` (Eq. (19))
     and ``absorption`` the normal-incidence coefficient ``alpha = 1 - |r|^2``
     (Eq. (18)).
+
+    The trailing fields retain the tube geometry the reduction was run with
+    (microphone ``spacing`` ``s``, distance ``x1`` from the sample to the
+    farther microphone, tube ``diameter`` and cross-section ``shape``, stored
+    canonically as ``"circular"``/``"rectangular"`` - a ``"square"`` input is
+    kept as ``"rectangular"``); they default to ``None`` when not supplied to
+    :func:`two_microphone_impedance`.
     """
 
     frequency: Real
@@ -471,6 +595,10 @@ class ImpedanceTubeResult:
     surface_impedance: Complex
     normalized_impedance: Complex
     absorption: Real
+    spacing: float | None = None
+    x1: float | None = None
+    diameter: float | None = None
+    shape: str | None = None
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the absorption spectrum ``alpha(f)`` with ``|r|`` overlaid.
@@ -513,7 +641,8 @@ class ImpedanceTubeResult:
             produces a body-and-disclaimer fiche whose header shows only the
             measured frequency range. The applicable descriptive/geometric
             fields are ``client``, ``manufacturer``, ``specimen``,
-            ``tube_diameter``, ``mic_spacing``, ``mounting``, ``test_room``,
+            ``tube_diameter``, ``tube_shape``, ``mic_spacing``, ``mounting``,
+            ``test_room``,
             ``test_date``, ``temperature``, ``pressure``,
             ``measurement_standard``, ``laboratory``, ``operator``,
             ``report_id`` and ``notes``. The ``requirement`` field is ignored
@@ -574,15 +703,18 @@ def two_microphone_impedance(
         nepers/m (see :func:`tube_attenuation_constant`).
     :param diameter: Optional tube diameter/lateral dimension, in metres, that
         activates the plane-wave range check.
-    :param shape: Tube cross-section, ``"circular"`` or ``"rectangular"``.
-    :return: An :class:`ImpedanceTubeResult`.
+    :param shape: Tube cross-section, ``"circular"``, ``"rectangular"`` or
+        ``"square"``.
+    :return: An :class:`ImpedanceTubeResult` (the tube geometry is retained on
+        the result).
     """
     f = np.asarray(frequency, dtype=np.float64)
     k0 = tube_wavenumber(f, speed_of_sound, attenuation=attenuation)
     r = reflection_factor(h12, spacing=spacing, x1=x1, wavenumber=k0)
+    canonical = _canonical_shape(shape)
     if diameter is not None:
         f_lower, f_upper = plane_wave_frequency_range(
-            spacing, speed_of_sound, diameter=diameter, shape=shape
+            spacing, speed_of_sound, diameter=diameter, shape=canonical
         )
         _warn_frequency_range(f, f_lower, f_upper, stacklevel=2)
     return ImpedanceTubeResult(
@@ -591,6 +723,10 @@ def two_microphone_impedance(
         surface_impedance=surface_impedance(r, characteristic_impedance),
         normalized_impedance=normalized_surface_impedance(r),
         absorption=absorption_from_reflection(r),
+        spacing=spacing,
+        x1=x1,
+        diameter=diameter,
+        shape=canonical if diameter is not None else None,
     )
 
 
@@ -698,6 +834,44 @@ def standing_wave_normalized_impedance(
 # ---------------------------------------------------------------------------
 # ASTM E2611-19: four-microphone transfer-matrix method.
 # ---------------------------------------------------------------------------
+def _warn_astm_plane_wave(
+    wavenumber: ArrayLike,
+    *,
+    s1: float,
+    s2: float,
+    diameter: float,
+    shape: str,
+    stacklevel: int,
+) -> None:
+    """Advise when wavenumbers leave the ASTM E2611-19 plane-wave range.
+
+    The check runs on the real part of ``k`` so no speed of sound is needed:
+    ``f s < 0,40 c`` maps to ``k s < 0,80 pi`` (6.5.4), ``f d < K c`` to
+    ``k d < 2 pi K`` (6.2.4.1/6.2.5) and the greater-than-1 %-of-wavelength
+    spacing bound to ``k s > 0,02 pi`` (6.2.3). The upper spacing bound binds
+    every microphone pair (largest spacing), the lower one the smallest.
+    """
+    if diameter <= 0.0:
+        raise ValueError("'diameter' must be positive.")
+    k = np.real(np.asarray(wavenumber, dtype=np.complex128))
+    ku = _ASTM_KU_CIRCULAR if shape == "circular" else _ASTM_KU_RECTANGULAR
+    two_pi = 2.0 * np.pi
+    k_upper = min(
+        two_pi * _ASTM_KU_SPACING / max(s1, s2),
+        two_pi * ku / diameter,
+    )
+    k_lower = two_pi / (_ASTM_LOWER_WAVELENGTH_FRACTION * min(s1, s2))
+    if np.any(k < k_lower) or np.any(k > k_upper):
+        warnings.warn(
+            "Wavenumbers outside the ASTM E2611-19 plane-wave working range "
+            "(6.2.3-6.2.5, 6.5.4) for the given microphone spacings and tube "
+            "cross-section; results there are advisory. See "
+            "plane_wave_frequency_range_astm() for the limits in hertz.",
+            ImpedanceTubeWarning,
+            stacklevel=stacklevel + 1,
+        )
+
+
 def wave_decomposition(
     h1: ArrayLike,
     h2: ArrayLike,
@@ -709,6 +883,8 @@ def wave_decomposition(
     l2: float,
     s2: float,
     wavenumber: ArrayLike,
+    diameter: float | None = None,
+    shape: str = "circular",
 ) -> tuple[Complex, Complex, Complex, Complex]:
     """Decompose the wave field into ``(A, B, C, D)`` (ASTM E2611-19, Eqs. (17)-(20)).
 
@@ -738,10 +914,21 @@ def wave_decomposition(
     :param l2: Distance ``l2`` from the front reference plane, in metres.
     :param s2: Downstream microphone spacing ``s2``, in metres.
     :param wavenumber: Air wavenumber ``k`` (real or complex), scalar or per band.
+    :param diameter: Optional tube diameter (circular) or largest section
+        dimension (rectangular/square), in metres, that activates the
+        plane-wave working-range check (6.2.3-6.2.5, 6.5.4).
+    :param shape: Tube cross-section, ``"circular"``, ``"rectangular"`` or
+        ``"square"``.
     :return: Tuple ``(A, B, C, D)`` of complex amplitudes.
     """
     if s1 <= 0.0 or s2 <= 0.0:
         raise ValueError("'s1' and 's2' must be positive.")
+    canonical = _canonical_shape(shape)
+    if diameter is not None:
+        _warn_astm_plane_wave(
+            wavenumber, s1=s1, s2=s2, diameter=diameter, shape=canonical,
+            stacklevel=2,
+        )
     ha = np.asarray(h1, dtype=np.complex128)
     hb = np.asarray(h2, dtype=np.complex128)
     hc = np.asarray(h3, dtype=np.complex128)
@@ -813,12 +1000,30 @@ class TransferMatrix:
     Relates the pressure and normal particle velocity across a specimen,
     ``[p; u]_{x=0} = T [p; u]_{x=d}`` (Eq. (16)). Each entry is complex and
     may be scalar or a per-frequency array of matching shape.
+
+    The trailing fields retain the measurement context when the matrix comes
+    out of :func:`transfer_matrix_two_load` / :func:`transfer_matrix_one_load`
+    (tube geometry ``l1``/``s1``/``l2``/``s2``, specimen ``thickness``, tube
+    ``diameter`` and canonical cross-section ``shape``, the ``frequency``
+    vector when supplied to the solver, and the air
+    ``air_characteristic_impedance`` ``rho c``); all default to ``None`` so a
+    hand-built matrix (for example :func:`air_layer_transfer_matrix`) is
+    unchanged.
     """
 
     t11: Complex
     t12: Complex
     t21: Complex
     t22: Complex
+    l1: float | None = None
+    s1: float | None = None
+    l2: float | None = None
+    s2: float | None = None
+    thickness: float | None = None
+    diameter: float | None = None
+    shape: str | None = None
+    frequency: Real | None = None
+    air_characteristic_impedance: float | None = None
 
     def determinant(self) -> Complex:
         """Determinant ``T11 T22 - T12 T21`` (unity for a reciprocal specimen)."""
@@ -896,8 +1101,8 @@ class TransferMatrix:
 
     def plot(
         self,
-        frequency: ArrayLike,
-        characteristic_impedance: float,
+        frequency: ArrayLike | None = None,
+        characteristic_impedance: float | None = None,
         ax: Axes | None = None,
         *,
         language: str = "en",
@@ -911,21 +1116,35 @@ class TransferMatrix:
         absorption coefficient ``alpha(f)`` (Eq. (28), a muted companion on a
         0..1 right axis). The matrix itself carries no frequency axis, so the
         ``frequency`` vector of the measurement (matching the shape of the
-        entries) and the air characteristic impedance ``rho c`` must be
-        supplied.
+        entries) and the air characteristic impedance ``rho c`` are needed:
+        both default to the values retained from the solver call
+        (``self.frequency`` / ``self.air_characteristic_impedance``) and only
+        have to be supplied for a hand-built matrix.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
         :class:`~matplotlib.axes.Axes` of the transmission-loss curve.
 
         :param frequency: Frequency vector ``f``, in hertz, matching the shape
-            of the matrix entries.
+            of the matrix entries; ``None`` uses the stored ``frequency``.
         :param characteristic_impedance: Characteristic impedance ``rho c`` of
-            the air in the tube, in rayls.
+            the air in the tube, in rayls; ``None`` uses the stored
+            ``air_characteristic_impedance``.
         :param ax: Existing axes, or ``None`` to create a figure.
         :param language: Plot language: ``"en"`` (default) or ``"es"``.
         :param kwargs: Forwarded to the transmission-loss ``plot`` call.
         :return: The axes.
+        :raises ValueError: If ``frequency`` or ``characteristic_impedance``
+            is neither supplied nor stored on the matrix.
         """
+        if frequency is None:
+            frequency = self.frequency
+        if characteristic_impedance is None:
+            characteristic_impedance = self.air_characteristic_impedance
+        if frequency is None or characteristic_impedance is None:
+            raise ValueError(
+                "'frequency' and 'characteristic_impedance' must be supplied "
+                "when the matrix does not retain them (hand-built matrices)."
+            )
         from .._i18n import check_language
         from .._plot.materials import plot_transfer_matrix
 
@@ -1017,6 +1236,35 @@ def _warn_ill_conditioned(
         )
 
 
+def _measurement_context(
+    *,
+    l1: float,
+    s1: float,
+    l2: float,
+    s2: float,
+    thickness: float,
+    diameter: float | None,
+    shape: str,
+    frequency: ArrayLike | None,
+    characteristic_impedance: float,
+) -> dict[str, Any]:
+    """Context fields a solver retains on the :class:`TransferMatrix`."""
+    return {
+        "l1": l1,
+        "s1": s1,
+        "l2": l2,
+        "s2": s2,
+        "thickness": thickness,
+        "diameter": diameter,
+        "shape": shape if diameter is not None else None,
+        "frequency": (
+            np.asarray(frequency, dtype=np.float64)
+            if frequency is not None else None
+        ),
+        "air_characteristic_impedance": characteristic_impedance,
+    }
+
+
 def transfer_matrix_two_load(
     load_a: tuple[ArrayLike, ArrayLike, ArrayLike, ArrayLike],
     load_b: tuple[ArrayLike, ArrayLike, ArrayLike, ArrayLike],
@@ -1028,6 +1276,9 @@ def transfer_matrix_two_load(
     thickness: float,
     wavenumber: ArrayLike,
     characteristic_impedance: float,
+    frequency: ArrayLike | None = None,
+    diameter: float | None = None,
+    shape: str = "circular",
 ) -> TransferMatrix:
     """Two-load transfer matrix (ASTM E2611-19, Eqs. (17)-(22)).
 
@@ -1050,8 +1301,22 @@ def transfer_matrix_two_load(
     :param thickness: Specimen thickness ``d``, in metres.
     :param wavenumber: Air wavenumber ``k``.
     :param characteristic_impedance: Characteristic impedance ``rho c``.
-    :return: The specimen :class:`TransferMatrix`.
+    :param frequency: Optional frequency vector ``f``, in hertz, retained on
+        the result so :meth:`TransferMatrix.plot` needs no arguments.
+    :param diameter: Optional tube diameter (circular) or largest section
+        dimension (rectangular/square), in metres, that activates the
+        plane-wave working-range check (6.2.3-6.2.5, 6.5.4).
+    :param shape: Tube cross-section, ``"circular"``, ``"rectangular"`` or
+        ``"square"``.
+    :return: The specimen :class:`TransferMatrix` (measurement context
+        retained on the result).
     """
+    canonical = _canonical_shape(shape)
+    if diameter is not None:
+        _warn_astm_plane_wave(
+            wavenumber, s1=s1, s2=s2, diameter=diameter, shape=canonical,
+            stacklevel=2,
+        )
     p0a, pda, u0a, uda = _face_from_loads(
         load_a, l1=l1, s1=s1, l2=l2, s2=s2, thickness=thickness,
         wavenumber=wavenumber, characteristic_impedance=characteristic_impedance,
@@ -1071,6 +1336,11 @@ def transfer_matrix_two_load(
         t12=np.asarray((p0b * pda - p0a * pdb) / den, dtype=np.complex128),
         t21=np.asarray((u0a * udb - u0b * uda) / den, dtype=np.complex128),
         t22=np.asarray((pda * u0b - pdb * u0a) / den, dtype=np.complex128),
+        **_measurement_context(
+            l1=l1, s1=s1, l2=l2, s2=s2, thickness=thickness,
+            diameter=diameter, shape=canonical, frequency=frequency,
+            characteristic_impedance=characteristic_impedance,
+        ),
     )
 
 
@@ -1084,6 +1354,9 @@ def transfer_matrix_one_load(
     thickness: float,
     wavenumber: ArrayLike,
     characteristic_impedance: float,
+    frequency: ArrayLike | None = None,
+    diameter: float | None = None,
+    shape: str = "circular",
 ) -> TransferMatrix:
     """One-load transfer matrix, symmetric specimen (ASTM E2611-19, Eqs. (23)-(24)).
 
@@ -1103,8 +1376,22 @@ def transfer_matrix_one_load(
     :param thickness: Specimen thickness ``d``, in metres.
     :param wavenumber: Air wavenumber ``k``.
     :param characteristic_impedance: Characteristic impedance ``rho c``.
-    :return: The specimen :class:`TransferMatrix`.
+    :param frequency: Optional frequency vector ``f``, in hertz, retained on
+        the result so :meth:`TransferMatrix.plot` needs no arguments.
+    :param diameter: Optional tube diameter (circular) or largest section
+        dimension (rectangular/square), in metres, that activates the
+        plane-wave working-range check (6.2.3-6.2.5, 6.5.4).
+    :param shape: Tube cross-section, ``"circular"``, ``"rectangular"`` or
+        ``"square"``.
+    :return: The specimen :class:`TransferMatrix` (measurement context
+        retained on the result).
     """
+    canonical = _canonical_shape(shape)
+    if diameter is not None:
+        _warn_astm_plane_wave(
+            wavenumber, s1=s1, s2=s2, diameter=diameter, shape=canonical,
+            stacklevel=2,
+        )
     p0, pd, u0, ud = _face_from_loads(
         load, l1=l1, s1=s1, l2=l2, s2=s2, thickness=thickness,
         wavenumber=wavenumber, characteristic_impedance=characteristic_impedance,
@@ -1121,6 +1408,11 @@ def transfer_matrix_one_load(
         t12=np.asarray((p0**2 - pd**2) / den, dtype=np.complex128),
         t21=np.asarray((u0**2 - ud**2) / den, dtype=np.complex128),
         t22=t_diag,
+        **_measurement_context(
+            l1=l1, s1=s1, l2=l2, s2=s2, thickness=thickness,
+            diameter=diameter, shape=canonical, frequency=frequency,
+            characteristic_impedance=characteristic_impedance,
+        ),
     )
 
 

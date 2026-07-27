@@ -501,6 +501,19 @@ f_l, f_u = materials.plane_wave_frequency_range(0.020, 343.2, diameter=0.029)
 print(round(f_l, 1), round(f_u, 1))     # 858.0 6864.0
 ```
 
+The same helper covers square and rectangular tubes: pass `shape="square"` or
+`shape="rectangular"` and the Eq. (3) factor replaces the circular one, with
+$d$ the maximum side length. The four-microphone branch keeps its own limits
+in `plane_wave_frequency_range_astm`: ASTM E2611 retains the unrounded
+circular constant ($f\,d < 0.586\,c$, 6.2.4.1), the same rectangular
+$f\,d < 0.500\,c$ (6.2.5), a slightly stricter spacing bound
+$f\,s < 0.40\,c$ (6.5.4) and a laxer low end at 1 % of the wavelength
+(6.2.3). Passing `diameter=` (and `shape=`) to `two_microphone_impedance`,
+`wave_decomposition` or the `transfer_matrix_*` solvers turns the matching
+check into an advisory warning, and for the Annex A attenuation estimate of a
+rectangular tube `hydraulic_diameter(width, height)` supplies the $4A/P$
+diameter that `tube_attenuation_constant` expects.
+
 **Standing-wave-ratio method (ISO 10534-1).** A probe traverses the standing wave
 and reads the level difference $\Delta L = L_\text{max} - L_\text{min}$ between a
 pressure maximum and the adjacent minimum. The standing-wave ratio, reflection
@@ -654,7 +667,7 @@ random-incidence $\alpha_s$/$\alpha_w$ of ISO 354 / ISO 11654. Setting
 It uses the same `ReportMetadata` container and rendering engine as the other
 fiches. The measured frequency range is taken from the result; the applicable
 descriptive and geometric `ReportMetadata` fields are `client`, `manufacturer`,
-`specimen`, `tube_diameter`, `mic_spacing`, `mounting`, `test_room`,
+`specimen`, `tube_diameter`, `tube_shape`, `mic_spacing`, `mounting`, `test_room`,
 `test_date`, `temperature`, `pressure`, `measurement_standard`, `laboratory`,
 `operator`, `report_id` and `notes` (`tube_diameter` and `mic_spacing` are given
 in metres and printed in millimetres). The `requirement` field is ignored
@@ -719,8 +732,10 @@ print(np.round(tm.transmission_loss(rho_c), 6))   # [0. 0. 0.]
 `(H1, H2, H3, H4)` of each load; its methods
 (`transmission_loss`, `reflection_hard_backed`, `absorption_hard_backed`,
 `characteristic_impedance_material`, `material_wavenumber`) then read off the
-ASTM E2611 quantities, and its `.plot(frequency, rho_c)` draws the
-transmission loss with the hard-backed absorption overlaid. The matrix does
+ASTM E2611 quantities, and its `.plot()` draws the transmission loss with
+the hard-backed absorption overlaid (a matrix built by the solvers retains
+$\rho c$ and, when supplied, the frequency vector, so only a hand-built
+matrix needs them as arguments). The matrix does
 not have to come from a measurement: the
 [multilayer solver](porous-absorbers.md) exposes the chain matrix of any
 modelled stack in the same convention, so a predicted specimen can be read
