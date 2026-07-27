@@ -127,7 +127,7 @@ returning arrays.
 in the layout of an accredited laboratory report, stating the measured curve,
 the shifted reference curve, the weighted rating and spectrum adaptation
 terms, and the ISO 717-1 clauses each value comes
-from.\label{fig:fiche}](iso717-report-fiche.png){ width=78% }
+from.\label{fig:fiche}](iso717-report-fiche.png){ width=55% }
 
 Second, the implementation is pure Python on NumPy and SciPy, with optional
 Numba acceleration for the heaviest kernels and block-processing entry points
