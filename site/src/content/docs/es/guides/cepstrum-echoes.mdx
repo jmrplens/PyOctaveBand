@@ -34,6 +34,12 @@ la [envolvente de Hilbert](/phonometry/es/guides/correlation-delay/) con un
 **espectro de la envolvente** en el que las modulaciones de amplitud se
 vuelven líneas discretas.
 
+Todo el truco es una cadena de cuatro pasos: el logaritmo convierte un eco
+multiplicativo en ondulación espectral aditiva, y la FFT inversa colapsa esa
+ondulación en un único pico de quefrencia.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_cepstrum_echoes_es.svg" alt="Diagrama de bloques de la cadena del cepstro: una señal formada por una ondícula fuente más un eco con coeficiente de reflexión 0,5 a 8 milisegundos produce un espectro ondulado con periodo de 125 hercios, tomar el logaritmo del módulo al cuadrado convierte el eco multiplicativo en ondulación aditiva, y la FFT inversa aterriza en el eje de quefrencia, dibujado debajo con la ondícula fuente concentrada bajo 2 milisegundos, un pico de altura 0,5 exactamente en 8 milisegundos, un segundo rahmónico negativo de menos 0,125 al doble del retardo, y un corte de lifter discontinuo en 4 milisegundos que separa el lado paso bajo de la envolvente del lado paso alto de la ondulación; los pies dan la serie de alturas de los rahmónicos y las cotas de la ondulación de más 3,5 y menos 6,0 decibelios" width="92%" />
+
 ## 1. El cepstro y sus tres variantes
 
 Como el logaritmo convierte la convolución `x = h * u` en la suma

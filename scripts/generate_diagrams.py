@@ -1153,6 +1153,202 @@ _ES: dict[str, str] = {
     "sweeps separate harmonic distortion, MLS smears it across the period, bursts probe dynamics":
         "los barridos separan la distorsión armónica, la MLS la reparte por "
         "el periodo y las salvas sondean la dinámica",
+    # Welch PSD pipeline (Bendat & Piersol)
+    "The Welch PSD pipeline: segment, taper, average (Bendat & Piersol)":
+        "PSD de Welch: segmentar, enventanar, promediar (Bendat & Piersol)",
+    "Record x(t) — fs = 48 kHz, 20 s of pink noise":
+        "Registro x(t) — fs = 48 kHz, 20 s de ruido rosa",
+    "960 000 samples, calibrated end to end: pascals in, Pa²/Hz out":
+        "960 000 muestras, calibrado de extremo a extremo: pascales dentro, "
+        "Pa²/Hz fuera",
+    "Split into 50 %-overlapped segments — nperseg = 4096":
+        "División en segmentos con 50 % de solape — nperseg = 4096",
+    "467 segments of 85.3 ms; bin spacing Δf = fs/4096 = 11.7 Hz":
+        "467 segmentos de 85,3 ms; separación de bins Δf = fs/4096 = "
+        "11,7 Hz",
+    "Hann taper on every segment": "Ventana de Hann en cada segmento",
+    "ENBW = 1.5 bins → resolution bandwidth Be = 1.5·Δf = 17.6 Hz":
+        "ENBW = 1,5 bins → ancho de banda de resolución Be = 1,5·Δf = "
+        "17,6 Hz",
+    "One-sided |FFT|² periodogram of each segment, then average":
+        "Periodograma unilateral |FFT|² de cada segmento, y promedio",
+    "overlap correlation (Welch 1967): 467 segments → n_d = 442 effective averages":
+        "correlación por solape (Welch 1967): 467 segmentos → n_d = 442 "
+        "promedios efectivos",
+    "Gxx(f) with its chi-square confidence interval":
+        "Gxx(f) con su intervalo de confianza chi-cuadrado",
+    "random error εr = 1/√n_d = 4.8 %;  2·n_d ≈ 885 degrees of freedom":
+        "error aleatorio εr = 1/√n_d = 4,8 %;  2·n_d ≈ 885 grados de "
+        "libertad",
+    "The trade-off: segment length buys resolution or stability, never both":
+        "El compromiso: el segmento compra resolución o estabilidad, "
+        "nunca ambas",
+    "longer segments → finer Be but fewer averages (larger εr); shorter → the reverse":
+        "segmentos más largos → Be más fino pero menos promedios (mayor "
+        "εr); más cortos → lo contrario",
+    # MISO coherence (Bendat & Piersol Chapter 7)
+    "MISO coherence: from correlated sources to per-source contributions":
+        "Coherencia MISO: de fuentes correladas a contribuciones por fuente",
+    "Input x1": "Entrada x1",
+    "white noise": "ruido blanco",
+    "Input x2 = 0.7·x1 + noise": "Entrada x2 = 0,7·x1 + ruido",
+    "correlated with x1": "correlada con x1",
+    "Path H1(f)": "Camino H1(f)",
+    "low-pass, 400 Hz": "paso bajo, 400 Hz",
+    "Path H2(f)": "Camino H2(f)",
+    "high-pass, 1.5 kHz": "paso alto, 1,5 kHz",
+    "noise n(t)": "ruido n(t)",
+    "Output y(t)": "Salida y(t)",
+    "Welch cross-spectral matrix — Gxx (2×2) and Gxy, nperseg = 2048":
+        "Matriz de espectros cruzados de Welch — Gxx (2×2) y Gxy, "
+        "nperseg = 2048",
+    "conditioning: Schur steps Gij·r! (Eq. 7.94), inputs ordered by descending ordinary coherence":
+        "condicionamiento: pasos de Schur Gij·r! (Ec. 7.94), entradas "
+        "ordenadas por coherencia ordinaria descendente",
+    "Multiple and partial coherence": "Coherencia múltiple y parcial",
+    "input 2 in the 100-300 Hz band: ordinary 0.32 → partial 0.00":
+        "entrada 2 en la banda de 100-300 Hz: ordinaria 0,32 → parcial "
+        "0,00",
+    "multiple γ²y:x = 1 − Gnn/Gyy ≈ 1.00 (100-300 Hz)":
+        "múltiple γ²y:x = 1 − Gnn/Gyy ≈ 1,00 (100-300 Hz)",
+    "Contribution of each source": "Contribución de cada fuente",
+    "Gvi = γ²iy·(i−1)!·Gyy per input": "Gvi = γ²iy·(i−1)!·Gyy por entrada",
+    "ΣGvi + Gnn = Gyy, band by band": "ΣGvi + Gnn = Gyy, banda a banda",
+    "each conditioning step spends one average: the i-th ordered input carries n_d − (i − 1); here n_d = 242":
+        "cada paso de condicionamiento gasta un promedio: la entrada "
+        "i-ésima ordenada lleva n_d − (i − 1); aquí n_d = 242",
+    "average generously before reading a small partial coherence as zero":
+        "promedia con generosidad antes de leer como cero una coherencia "
+        "parcial pequeña",
+    # Time-frequency tiling trade-off
+    "The time-frequency trade-off: two tilings of the same record":
+        "El compromiso tiempo-frecuencia: dos teselados del mismo registro",
+    "Short window — nperseg = 256": "Ventana corta — nperseg = 256",
+    "Long window — nperseg = 1024": "Ventana larga — nperseg = 1024",
+    "T_B = 16 ms,  Be ≈ 1/T_B = 62.5 Hz":
+        "T_B = 16 ms,  Be ≈ 1/T_B = 62,5 Hz",
+    "T_B = 64 ms,  Be ≈ 15.6 Hz": "T_B = 64 ms,  Be ≈ 15,6 Hz",
+    "sharp click, smeared tone": "clic nítido, tono emborronado",
+    "sharp tone, smeared click": "tono nítido, clic emborronado",
+    "tone": "tono",
+    "click": "clic",
+    "each cell is one unaveraged estimate: Be·T_B ≈ 1 and εr = 1 (n_d = 1)":
+        "cada celda es una estimación sin promediar: Be·T_B ≈ 1 y εr = 1 "
+        "(n_d = 1)",
+    "the record fixes the product; nperseg only chooses how to spend it (fs = 16 kHz here)":
+        "el registro fija el producto; nperseg solo elige cómo gastarlo "
+        "(aquí fs = 16 kHz)",
+    # Cepstrum chain (Havelock Ch. 27)
+    "The cepstrum chain: an echo becomes a quefrency spike":
+        "La cadena del cepstro: un eco se vuelve un pico en quefrencia",
+    "Signal with one echo": "Señal con un eco",
+    "Ripply spectrum |X(f)|": "Espectro ondulado |X(f)|",
+    "cosine ripple of period": "ondulación coseno de periodo",
+    "Take the log: ln |X|²": "Logaritmo: ln |X|²",
+    "the multiplicative echo": "el eco multiplicativo",
+    "becomes an additive ripple": "se vuelve ondulación aditiva",
+    "Inverse FFT": "FFT inversa",
+    "quefrency axis, in seconds": "eje de quefrencia, en segundos",
+    "the cepstrum": "el cepstro",
+    "quefrency": "quefrencia",
+    "source wavelet,": "ondícula de la fuente,",
+    "below 2 ms": "bajo 2 ms",
+    "a = 0.5,  t0 = 8 ms": "a = 0,5;  t0 = 8 ms",
+    "a = 0.5 at t0 = 8 ms": "a = 0,5 en t0 = 8 ms",
+    "−a²/2 = −0.125": "−a²/2 = −0,125",
+    "lifter cutoff 4 ms": "corte del lifter en 4 ms",
+    "lowpass: envelope": "paso bajo: envolvente",
+    "highpass: the echo ripple alone":
+        "paso alto: solo la ondulación del eco",
+    "rahmonics at n·t0 with heights a, −a²/2, a³/3, …, whatever the source spectrum does":
+        "rahmónicos en n·t0 con alturas a, −a²/2, a³/3, …, haga lo que "
+        "haga el espectro de la fuente",
+    "the highpass ripple swings between 20·lg(1 ± a) = +3.5 and −6.0 dB; echo_detection reads t0 and a off the peak":
+        "la ondulación paso alto oscila entre 20·lg(1 ± a) = +3,5 y "
+        "−6,0 dB; echo_detection lee t0 y a del pico",
+    # Time synchronous averaging (McFadden 1987)
+    "Time synchronous averaging: trigger, slice, average":
+        "Promediado síncrono temporal: disparo, troceado, promedio",
+    "Tachometer: one trigger pulse per revolution":
+        "Tacómetro: un pulso de disparo por revolución",
+    "T = 1/32 s = 256 samples": "T = 1/32 s = 256 muestras",
+    "Recording y(t) at fs = 8192 Hz: the synchronous signature buried in noise":
+        "Registro y(t) a fs = 8192 Hz: la firma síncrona sepultada en ruido",
+    "slice at every trigger": "trocear en cada disparo",
+    "N aligned blocks": "N bloques alineados",
+    "one period T each": "de un periodo T cada uno",
+    "Coherent average": "Promedio coherente",
+    "N = 40 here": "aquí N = 40",
+    "The periodic part survives": "La parte periódica sobrevive",
+    "comb teeth of unit gain": "dientes del peine de ganancia uno",
+    "at every order k/T": "en cada orden k/T",
+    "Asynchronous noise falls as 1/√N":
+        "El ruido asíncrono cae como 1/√N",
+    "power −10·lg N = −16 dB for N = 40;  amplitude gain √N = 6.3":
+        "potencia −10·lg N = −16 dB con N = 40;  ganancia en amplitud "
+        "√N = 6,3",
+    "Residual": "Residual",
+    "record − tiled average:": "registro − promedio repetido:",
+    "everything not synchronous": "todo lo no síncrono",
+    "a tone on a non-integer order is only attenuated: choose N so a comb node lands on it":
+        "un tono en un orden no entero solo se atenúa: elige N para que un "
+        "nodo del peine caiga sobre él",
+    "McFadden's example: N = 20 nulls the 32.05-order tone (20·32.05 = 641); the habitual N = 32 does not":
+        "el ejemplo de McFadden: N = 20 anula el tono de orden 32,05 "
+        "(20·32,05 = 641); el habitual N = 32 no",
+    # Correlation-based time-delay estimation (Knapp & Carter)
+    "Time-delay estimation: two microphones and one correlation peak":
+        "Estimación del retardo: dos micrófonos y un pico de correlación",
+    "Δr = c·τ0 ≈ 0.84 m  (c = 343 m/s)":
+        "Δr = c·τ0 ≈ 0,84 m  (c = 343 m/s)",
+    "mic 1 — x(t)": "micro 1 — x(t)",
+    "mic 2 — y(t)": "micro 2 — y(t)",
+    "spacing d": "separación d",
+    "cross-correlation against lag — y(t) = α·x(t − τ0) + n(t)":
+        "correlación cruzada frente al retardo — y(t) = α·x(t − τ0) + n(t)",
+    "direct correlator: broad peak": "correlador directo: pico ancho",
+    "GCC-PHAT: sharp spike": "GCC-PHAT: pico estrecho",
+    "τ0 = 20 samples / 8192 Hz = 2.44 ms":
+        "τ0 = 20 muestras / 8192 Hz = 2,44 ms",
+    "parabolic peak interpolation + ×16 local upsampling → error below 0.002 samples":
+        "interpolación parabólica del pico + sobremuestreo local ×16 → "
+        "error por debajo de 0,002 muestras",
+    "the 'phase' route reads the same τ0 from the slope of the unwrapped cross-spectrum phase":
+        "la vía 'phase' lee el mismo τ0 de la pendiente de la fase "
+        "desenrollada del espectro cruzado",
+    # Data qualification decision flow (Bendat & Piersol 10.3)
+    "Data qualification: the stationarity decision (Bendat & Piersol 10.3)":
+        "Calificación de datos: decisión de estacionariedad (B&P 10.3)",
+    "Time record x(t)": "Registro temporal x(t)",
+    "before trusting any PSD, Leq or GUM average":
+        "antes de confiar en cualquier promedio PSD, Leq o GUM",
+    "Mean square per interval — N = 20 equal segments":
+        "Media cuadrática por intervalo — N = 20 segmentos iguales",
+    "each interval long against the record's lowest frequencies; also rms, mean or variance":
+        "cada intervalo largo frente a las frecuencias más bajas del "
+        "registro; también rms, media o varianza",
+    "Reverse arrangement count A": "Recuento de inversiones A",
+    "pairs i < j with x_i > x_j; trend-free mean μ_A = N(N−1)/4 = 95":
+        "pares i < j con x_i > x_j; media sin tendencia μ_A = N(N−1)/4 = 95",
+    "(Table A.6, α = 0.05)": "(Tabla A.6, α = 0,05)",
+    "yes": "sí",
+    "Nonstationary: do not average": "No estacionario: no promediar",
+    "+20 % gain ramp: A = 7 → rejected":
+        "rampa de ganancia del +20 %: A = 7 → rechazado",
+    "split at the change, or go short-time (spectrogram)":
+        "divide en el cambio, o pasa a corto plazo (espectrograma)",
+    "Stationary: analyse": "Estacionario: analizar",
+    "steady noise: A = 91 → accepted":
+        "ruido estable: A = 91 → aceptado",
+    "the chi-square CIs and error formulas hold":
+        "los IC chi-cuadrado y las fórmulas de error valen",
+    "the runs test (method=\"runs\") is the two-sided companion: too many runs is as suspect as too few":
+        "el test de rachas (method=\"runs\") es el compañero bilateral: "
+        "demasiadas rachas son tan sospechosas como muy pocas",
+    "a frequency glide can hide from the mean square: test statistic=\"mean\" or band-filtered copies too":
+        "un deslizamiento en frecuencia puede esconderse de la media "
+        "cuadrática: prueba statistic=\"mean\" o copias filtradas por "
+        "bandas",
 }
 
 
@@ -1304,12 +1500,14 @@ class SVG:
 
     def render(self, title: str) -> str:
         th = self.th
+        t = (self.tr(title).replace("&", "&amp;").replace("<", "&lt;")
+             .replace(">", "&gt;"))
         head = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{self.w}" '
                 f'height="{self.h}" viewBox="0 0 {self.w} {self.h}">'
                 f'<rect width="{self.w}" height="{self.h}" fill="{th.bg}"/>'
                 f'<text x="{self.w / 2}" y="30" font-family="{_FONT}" '
                 f'font-size="26" font-weight="600" fill="{th.fg}" '
-                f'text-anchor="middle">{self.tr(title)}</text>')
+                f'text-anchor="middle">{t}</text>')
         return head + "".join(self.parts) + "</svg>"
 
 
@@ -5396,6 +5594,421 @@ def _d_test_signals(s: SVG, th: Theme) -> None:
            16, th.muted, anchor="start")
 
 
+# ---------------------------------------------------------------------------
+# Welch PSD pipeline (Bendat & Piersol)
+# ---------------------------------------------------------------------------
+
+def _d_spectral_analysis(s: SVG, th: Theme) -> None:
+    """The Welch estimator as a chain, with the numbers of the guide's own
+    example (fs = 48 kHz, 20 s of pink noise, nperseg = 4096): 467 raw
+    segments, 442 effective averages, eps_r = 4.8 %."""
+    cx, bw = 450.0, 680.0
+    x0 = cx - bw / 2
+
+    def step(y: float, l1: str, l2: str, color: str, h: float = 58.0) -> None:
+        s.rect(x0, y, bw, h, th.panel, color, rx=10, sw=2)
+        s.text(cx, y + 25, l1, 17, th.fg, bold=True)
+        s.text(cx, y + 45, l2, 13, th.muted)
+
+    step(52, "Record x(t) — fs = 48 kHz, 20 s of pink noise",
+         "960 000 samples, calibrated end to end: pascals in, Pa²/Hz out",
+         th.fg)
+    step(138, "Split into 50 %-overlapped segments — nperseg = 4096",
+         "467 segments of 85.3 ms; bin spacing Δf = fs/4096 = 11.7 Hz",
+         th.primary)
+    step(224, "Hann taper on every segment",
+         "ENBW = 1.5 bins → resolution bandwidth Be = 1.5·Δf = 17.6 Hz",
+         th.primary)
+    step(310, "One-sided |FFT|² periodogram of each segment, then average",
+         "overlap correlation (Welch 1967): 467 segments → n_d = 442 "
+         "effective averages", th.fg)
+    s.rect(x0, 396, bw, 60, "none", th.accent, rx=10, sw=2.4)
+    s.text(cx, 421, "Gxx(f) with its chi-square confidence interval", 17,
+           th.fg, bold=True)
+    s.text(cx, 443, "random error εr = 1/√n_d = 4.8 %;  2·n_d ≈ 885 degrees "
+           "of freedom", 13, th.muted)
+    for y0, y1 in ((110, 134), (196, 220), (282, 306), (368, 392),
+                   (456, 484)):
+        s.arrow(cx, y0, cx, y1, th.fg, 1.8)
+
+    s.rect(130, 488, 640, 72, "none", th.secondary, rx=10, sw=1.6, dash="6,5")
+    s.text(cx, 517, "The trade-off: segment length buys resolution or "
+           "stability, never both", 16, th.secondary, bold=True)
+    s.text(cx, 543, "longer segments → finer Be but fewer averages (larger "
+           "εr); shorter → the reverse", 13, th.fg)
+
+
+# ---------------------------------------------------------------------------
+# MISO coherence conditioning (Bendat & Piersol Chapter 7)
+# ---------------------------------------------------------------------------
+
+def _d_miso_coherence(s: SVG, th: Theme) -> None:
+    """Two correlated inputs through their paths into one output, then the
+    Welch cross-spectral matrix, the conditioning and the per-source split,
+    with the guide's measured numbers (ordinary 0.32 vs partial 0.00)."""
+    def box(x0: float, x1: float, y0: float, h: float, l1: str, l2: str,
+            color: str, s1: int = 16, s2: int = 12) -> None:
+        s.rect(x0, y0, x1 - x0, h, th.panel, color, rx=10, sw=2)
+        s.text((x0 + x1) / 2, y0 + 24.0, l1, s1, th.fg, bold=True)
+        s.text((x0 + x1) / 2, y0 + 44.0, l2, s2, th.muted)
+
+    box(60, 280, 64, 56, "Input x1", "white noise", th.primary)
+    box(60, 280, 168, 56, "Input x2 = 0.7·x1 + noise", "correlated with x1",
+        th.primary, s1=14)
+    s.line(110, 120, 110, 168, th.muted, 1.4, dash="5,4")
+
+    box(340, 540, 64, 56, "Path H1(f)", "low-pass, 400 Hz", th.fg)
+    box(340, 540, 168, 56, "Path H2(f)", "high-pass, 1.5 kHz", th.fg)
+    s.arrow(280, 92, 336, 92, th.fg, 1.8)
+    s.arrow(280, 196, 336, 196, th.fg, 1.8)
+
+    s.circle(600, 144, 16, th.panel, th.fg, 2)
+    s.text(600, 151, "+", 22, th.fg, bold=True)
+    s.arrow(540, 92, 588, 134, th.fg, 1.8)
+    s.arrow(540, 196, 588, 154, th.fg, 1.8)
+    s.text(600, 74, "noise n(t)", 13, th.muted)
+    s.arrow(600, 82, 600, 124, th.muted, 1.4)
+
+    box(660, 850, 116, 56, "Output y(t)", "Gyy(f)", th.secondary)
+    s.arrow(616, 144, 656, 144, th.fg, 1.8)
+
+    s.arrow(755, 172, 755, 236, th.fg, 1.8)
+    s.rect(90, 240, 720, 64, th.panel, th.fg, rx=10, sw=2)
+    s.text(450, 265, "Welch cross-spectral matrix — Gxx (2×2) and Gxy, "
+           "nperseg = 2048", 16, th.fg, bold=True)
+    s.text(450, 287, "conditioning: Schur steps Gij·r! (Eq. 7.94), inputs "
+           "ordered by descending ordinary coherence", 13, th.muted)
+
+    s.arrow(270, 304, 270, 340, th.fg, 1.8)
+    s.arrow(630, 304, 630, 340, th.fg, 1.8)
+
+    s.rect(70, 344, 370, 88, th.panel, th.primary, rx=10, sw=2)
+    s.text(255, 370, "Multiple and partial coherence", 15, th.fg, bold=True)
+    s.text(255, 392, "input 2 in the 100-300 Hz band: ordinary 0.32 → "
+           "partial 0.00", 12, th.muted)
+    s.text(255, 412, "multiple γ²y:x = 1 − Gnn/Gyy ≈ 1.00 (100-300 Hz)", 12,
+           th.muted)
+
+    s.rect(460, 344, 370, 88, th.panel, th.accent, rx=10, sw=2)
+    s.text(645, 370, "Contribution of each source", 15, th.fg, bold=True)
+    s.text(645, 392, "Gvi = γ²iy·(i−1)!·Gyy per input", 12, th.muted)
+    s.text(645, 412, "ΣGvi + Gnn = Gyy, band by band", 12, th.muted)
+
+    s.text(450, 482, "each conditioning step spends one average: the i-th "
+           "ordered input carries n_d − (i − 1); here n_d = 242", 14, th.fg)
+    s.text(450, 506, "average generously before reading a small partial "
+           "coherence as zero", 13, th.muted)
+
+
+# ---------------------------------------------------------------------------
+# Time-frequency tiling trade-off (Bendat & Piersol 12.6.4.2)
+# ---------------------------------------------------------------------------
+
+def _d_time_frequency(s: SVG, th: Theme) -> None:
+    """The same record tiled by a short and a long STFT window at
+    fs = 16 kHz: nperseg = 256 (16 ms x 62.5 Hz cells) against 1024
+    (64 ms x 15.6 Hz), with a tone and a click smeared to cell size."""
+    panels = (
+        (100.0, 24.0, 70.0, "Short window — nperseg = 256",
+         "T_B = 16 ms,  Be ≈ 1/T_B = 62.5 Hz", "sharp click, smeared tone",
+         180.0, 70.0, 244.0, 24.0),
+        (512.0, 96.0, 17.5, "Long window — nperseg = 1024",
+         "T_B = 64 ms,  Be ≈ 15.6 Hz", "sharp tone, smeared click",
+         215.0, 17.5, 608.0, 96.0),
+    )
+    top, bot, w = 112.0, 392.0, 288.0
+    for x0, cw, rh, header, res, verdict, ty, tth, cxx, cw2 in panels:
+        s.text(x0 + w / 2, 74, header, 17, th.fg, bold=True)
+        # tone band (frequency stripe) and click band (time stripe)
+        s.rect(x0, ty, w, tth, th.primary)
+        s.rect(cxx, top, cw2, bot - top, th.secondary)
+        # grid over the highlighted cells
+        x = x0
+        while x <= x0 + w + 0.1:
+            s.line(x, top, x, bot, th.muted, 0.7)
+            x += cw
+        y = top
+        while y <= bot + 0.1:
+            s.line(x0, y, x0 + w, y, th.muted, 0.7)
+            y += rh
+        # axes
+        s.arrow(x0, bot, x0 + w + 24, bot, th.fg, 1.6)
+        s.arrow(x0, bot, x0, top - 16, th.fg, 1.6)
+        s.text(x0 + w + 30, bot + 16, "t", 14, th.muted, italic=True)
+        s.text(x0 - 14, top - 8, "f", 14, th.muted, italic=True)
+        s.text(x0 - 8, ty + tth / 2 + 5, "tone", 12, th.fg, anchor="end")
+        s.text(cxx + cw2 / 2, 104, "click", 12, th.fg)
+        s.text(x0 + w / 2, 426, res, 14, th.fg)
+        s.text(x0 + w / 2, 450, verdict, 13, th.muted, italic=True)
+
+    s.text(450, 498, "each cell is one unaveraged estimate: Be·T_B ≈ 1 and "
+           "εr = 1 (n_d = 1)", 15, th.fg, bold=True)
+    s.text(450, 524, "the record fixes the product; nperseg only chooses how "
+           "to spend it (fs = 16 kHz here)", 14, th.muted)
+
+
+# ---------------------------------------------------------------------------
+# Cepstrum chain: echo to quefrency spike (Havelock Ch. 27)
+# ---------------------------------------------------------------------------
+
+def _d_cepstrum_echoes(s: SVG, th: Theme) -> None:
+    """Signal with an 8 ms echo, rippled spectrum, log, inverse FFT, and the
+    quefrency axis with the rahmonic spikes and the lifter split, using the
+    guide's exact numbers (a = 0.5, 1/t0 = 125 Hz, +3.5/−6.0 dB)."""
+    def box(x0: float, x1: float, l1: str, l2: str, l3: str,
+            color: str) -> None:
+        s.rect(x0, 64, x1 - x0, 86, th.panel, color, rx=10, sw=2)
+        s.text((x0 + x1) / 2, 90, l1, 15, th.fg, bold=True)
+        s.text((x0 + x1) / 2, 112, l2, 12, th.muted)
+        s.text((x0 + x1) / 2, 132, l3, 12, th.muted)
+
+    box(48, 238, "Signal with one echo", "x = s(t) + a·s(t − t0)",
+        "a = 0.5,  t0 = 8 ms", th.fg)
+    box(262, 442, "Ripply spectrum |X(f)|", "cosine ripple of period",
+        "1/t0 = 125 Hz", th.primary)
+    box(466, 646, "Take the log: ln |X|²", "the multiplicative echo",
+        "becomes an additive ripple", th.primary)
+    box(670, 860, "Inverse FFT", "quefrency axis, in seconds",
+        "the cepstrum", th.secondary)
+    for xa in (238.0, 442.0, 646.0):
+        s.arrow(xa + 2, 107, xa + 22, 107, th.fg, 1.8)
+    s.arrow(765, 152, 765, 196, th.fg, 1.8)
+
+    # Quefrency panel: source envelope, rahmonics, lifter split.
+    s.rect(70, 200, 760, 240, th.panel, th.fg, rx=10, sw=1.8)
+    base = 370.0
+    px_ms = 34.0  # horizontal scale
+    x_of = 110.0
+    s.line(x_of, base, 790, base, th.fg, 1.6)
+    s.arrow(790, base, 806, base, th.fg, 1.6)
+    s.text(800, 390, "quefrency", 13, th.muted, anchor="end")
+    # source wavelet envelope below 2 ms
+    s.path(f"M {x_of:.0f} {base - 76:.0f} "
+           f"Q {x_of + 22:.0f} {base - 10:.0f} {x_of + 68:.0f} {base:.0f}",
+           stroke=th.muted, sw=2.0)
+    s.text(170, 244, "source wavelet,", 12, th.muted)
+    s.text(170, 262, "below 2 ms", 12, th.muted)
+    # first rahmonic at t0 = 8 ms, height a = 0.5 (scale 220 px per unit)
+    x1 = x_of + 8 * px_ms
+    s.line(x1, base, x1, base - 110, th.primary, 2.6)
+    s.circle(x1, base - 110, 3.5, th.primary)
+    s.text(x1, 246, "a = 0.5 at t0 = 8 ms", 14, th.primary, bold=True)
+    # second rahmonic at 2 t0, height -a^2/2 = -0.125
+    x2 = x_of + 16 * px_ms
+    s.line(x2, base, x2, base + 27, th.secondary, 2.2)
+    s.circle(x2, base + 27, 3.0, th.secondary)
+    s.text(x2 + 14, base + 34, "−a²/2 = −0.125", 12, th.secondary,
+           anchor="start")
+    # lifter cutoff
+    xc = x_of + 4 * px_ms
+    s.line(xc, 224, xc, 414, th.accent, 1.6, dash="6,5")
+    s.text(xc, 432, "lifter cutoff 4 ms", 12, th.accent)
+    s.text(176, 218, "lowpass: envelope", 12, th.fg)
+    s.text(450, 218, "highpass: the echo ripple alone", 12, th.fg)
+    # the 16 ms label sits lower to clear the downward second rahmonic
+    for ms, lbl, dy in ((0.0, "0", 22.0), (8.0, "8 ms", 22.0),
+                        (16.0, "16 ms", 50.0)):
+        xt = x_of + ms * px_ms
+        s.line(xt, base, xt, base + 6, th.fg, 1.4)
+        s.text(xt, base + dy, lbl, 12, th.muted)
+
+    s.text(450, 478, "rahmonics at n·t0 with heights a, −a²/2, a³/3, …, "
+           "whatever the source spectrum does", 15, th.fg, bold=True)
+    s.text(450, 504, "the highpass ripple swings between 20·lg(1 ± a) = +3.5 "
+           "and −6.0 dB; echo_detection reads t0 and a off the peak", 13,
+           th.muted)
+
+
+# ---------------------------------------------------------------------------
+# Time synchronous averaging (McFadden 1987)
+# ---------------------------------------------------------------------------
+
+def _d_synchronous_averaging(s: SVG, th: Theme) -> None:
+    """Trigger train, sliced recording, coherent average and residual, with
+    the guide's numbers: T = 1/32 s at 8192 Hz, N = 40 averages, 16 dB of
+    noise reduction, and McFadden's 32.05-order node example."""
+    import math
+
+    s.text(450, 64, "Tachometer: one trigger pulse per revolution", 16,
+           th.fg, bold=True)
+    s.line(80, 112, 840, 112, th.muted, 1.4)
+    pulses = [120.0, 280.0, 440.0, 600.0, 760.0]
+    for px_ in pulses:
+        s.rect(px_ - 3, 86, 6, 26, th.accent, rx=1.5)
+    s.dim(280, 133, 440, 133, "T = 1/32 s = 256 samples", size=14)
+
+    s.text(450, 152, "Recording y(t) at fs = 8192 Hz: the synchronous "
+           "signature buried in noise", 14, th.fg)
+    d = "M 80 196"
+    for i in range(1, 191):
+        x = 80 + i * 4
+        v = (14.0 * math.sin(2 * math.pi * (x - 120.0) / 160.0)
+             + 5.0 * math.sin(1.7 * i) + 3.5 * math.sin(4.3 * i + 1.2))
+        d += f" L {x:.0f} {196 - v:.1f}"
+    s.path(d, stroke=th.primary, sw=1.2)
+    for px_ in pulses:
+        s.line(px_, 168, px_, 224, th.fg, 1.1, dash="4,4")
+    s.text(450, 246, "slice at every trigger", 13, th.muted)
+
+    # Stack of aligned one-period blocks
+    for i in (2, 1, 0):
+        s.rect(100 + 10 * i, 280 + 10 * i, 190, 54, th.panel, th.muted,
+               rx=8, sw=1.4)
+    s.text(205, 302, "N aligned blocks", 14, th.fg, bold=True)
+    s.text(205, 322, "one period T each", 12, th.muted)
+    s.arrow(190, 254, 195, 276, th.fg, 1.8)
+
+    s.rect(360, 288, 220, 78, th.panel, th.primary, rx=10, sw=2)
+    s.text(470, 312, "Coherent average", 16, th.fg, bold=True)
+    s.text(470, 334, "a(t) = (1/N) Σ y(t + nT)", 13, th.primary, mono=True)
+    s.text(470, 354, "N = 40 here", 12, th.muted)
+    s.arrow(310, 322, 356, 322, th.fg, 1.8)
+
+    s.rect(640, 288, 220, 78, th.panel, th.accent, rx=10, sw=2)
+    s.text(750, 312, "The periodic part survives", 14, th.fg, bold=True)
+    s.text(750, 334, "comb teeth of unit gain", 12, th.muted)
+    s.text(750, 354, "at every order k/T", 12, th.muted)
+    s.arrow(580, 327, 636, 327, th.fg, 1.8)
+
+    s.rect(100, 420, 460, 64, "none", th.accent, rx=10, sw=1.6, dash="6,5")
+    s.text(330, 446, "Asynchronous noise falls as 1/√N", 15, th.accent,
+           bold=True)
+    s.text(330, 470, "power −10·lg N = −16 dB for N = 40;  amplitude gain "
+           "√N = 6.3", 13, th.fg)
+    s.arrow(470, 366, 470, 416, th.fg, 1.6)
+
+    s.rect(640, 420, 220, 64, th.panel, th.secondary, rx=10, sw=2)
+    s.text(750, 442, "Residual", 14, th.fg, bold=True)
+    s.text(750, 460, "record − tiled average:", 12, th.muted)
+    s.text(750, 476, "everything not synchronous", 12, th.muted)
+    s.arrow(750, 366, 750, 416, th.fg, 1.6)
+
+    s.text(450, 526, "a tone on a non-integer order is only attenuated: "
+           "choose N so a comb node lands on it", 14, th.fg)
+    s.text(450, 550, "McFadden's example: N = 20 nulls the 32.05-order tone "
+           "(20·32.05 = 641); the habitual N = 32 does not", 13, th.muted)
+
+
+# ---------------------------------------------------------------------------
+# Correlation-based time-delay estimation (Knapp & Carter)
+# ---------------------------------------------------------------------------
+
+def _d_correlation_delay(s: SVG, th: Theme) -> None:
+    """Two microphones, the extra path c*tau, and the correlogram where the
+    direct correlator smears while GCC-PHAT spikes at the guide's delay of
+    20 samples at 8192 Hz (2.44 ms, 0.84 m at 343 m/s)."""
+    gy = 300.0
+    s.ground(gy, 60, 840)
+
+    # Source loudspeaker, top left
+    s.rect(80, 64, 36, 44, th.panel, th.primary, rx=5, sw=2)
+    s.circle(98, 80, 8, th.primary)
+    s.circle(98, 80, 3, th.bg)
+    s.circle(98, 98, 4.5, th.primary)
+    s.text(98, 52, "source", 13, th.fg, bold=True)
+    for r in (18, 30):
+        s.path(f"M {120 + r * 0.30:.0f} {86 - r * 0.55:.0f} "
+               f"A {r} {r} 0 0 1 {120 + r * 0.55:.0f} {86 + r * 0.30:.0f}",
+               stroke=th.accent, sw=1.5)
+
+    # Rays to the two microphones (drawn first, mics overlay them)
+    s.line(120, 90, 330, 188, th.muted, 1.2, dash="6,5")
+    s.line(120, 90, 570, 188, th.muted, 1.2, dash="6,5")
+    # Wavefront arc through mic 1 crossing the second ray at P
+    s.path("M 330 188 A 232 232 0 0 0 346 139", stroke=th.fg, sw=1.6)
+    s.line(346.4, 139.3, 570, 188, th.secondary, 2.6)
+    s.text(470, 120, "Δr = c·τ0 ≈ 0.84 m  (c = 343 m/s)", 14, th.secondary,
+           bold=True)
+
+    s.mic(330, 190, gy, 1.0)
+    s.mic(570, 190, gy, 1.0)
+    s.text(314, 258, "mic 1 — x(t)", 13, th.fg, bold=True, anchor="end")
+    s.text(586, 258, "mic 2 — y(t)", 13, th.fg, bold=True, anchor="start")
+    s.dim(330, 272, 570, 272, "spacing d", size=14)
+    s.text(450, 242, "sin θ = c·τ0 / d", 14, th.fg)
+
+    # Correlogram panel
+    s.rect(70, 340, 760, 210, th.panel, th.fg, rx=10, sw=1.8)
+    s.text(450, 366, "cross-correlation against lag — y(t) = α·x(t − τ0) + "
+           "n(t)", 15, th.fg, bold=True)
+    base = 505.0
+    s.line(110, base, 770, base, th.fg, 1.6)
+    s.arrow(770, base, 790, base, th.fg, 1.6)
+    x_tau = 518.0
+    s.path(f"M 388 {base:.0f} Q {x_tau:.0f} 415 648 {base:.0f}",
+           stroke=th.muted, sw=2.0)
+    s.text(688, 432, "direct correlator: broad peak", 13, th.muted)
+    s.line(x_tau, base, x_tau, 400, th.primary, 2.6)
+    s.circle(x_tau, 400, 3.5, th.primary)
+    s.text(x_tau, 388, "GCC-PHAT: sharp spike", 13, th.primary, bold=True)
+    s.text(150, 400, "ψ(f) = 1/|Gxy|", 13, th.fg, anchor="start", mono=True)
+    s.line(250, base - 5, 250, base + 5, th.fg, 1.4)
+    s.text(250, base + 21, "0", 12, th.muted)
+    s.text(x_tau, base + 21, "τ0 = 20 samples / 8192 Hz = 2.44 ms", 13,
+           th.fg)
+
+    s.text(450, 580, "parabolic peak interpolation + ×16 local upsampling → "
+           "error below 0.002 samples", 14, th.fg)
+    s.text(450, 604, "the 'phase' route reads the same τ0 from the slope of "
+           "the unwrapped cross-spectrum phase", 13, th.muted)
+
+
+# ---------------------------------------------------------------------------
+# Data qualification decision flow (Bendat & Piersol 10.3)
+# ---------------------------------------------------------------------------
+
+def _d_data_qualification(s: SVG, th: Theme) -> None:
+    """Record to segment mean squares to the reverse arrangement count and
+    the Table A.6 verdict, with the guide's numbers: N = 20 segments,
+    acceptance (64, 125), A = 91 accepted and A = 7 rejected."""
+    cx = 450.0
+    x0, bw = 170.0, 560.0
+
+    def step(y: float, l1: str, l2: str, color: str) -> None:
+        s.rect(x0, y, bw, 54, th.panel, color, rx=10, sw=2)
+        s.text(cx, y + 23, l1, 16, th.fg, bold=True)
+        s.text(cx, y + 43, l2, 12, th.muted)
+
+    step(52, "Time record x(t)",
+         "before trusting any PSD, Leq or GUM average", th.fg)
+    step(134, "Mean square per interval — N = 20 equal segments",
+         "each interval long against the record's lowest frequencies; also "
+         "rms, mean or variance", th.primary)
+    step(216, "Reverse arrangement count A",
+         "pairs i < j with x_i > x_j; trend-free mean μ_A = N(N−1)/4 = 95",
+         th.primary)
+    for y0, y1 in ((106, 130), (188, 212), (270, 294)):
+        s.arrow(cx, y0, cx, y1, th.fg, 1.8)
+
+    # Decision diamond
+    s.path(f"M 240 340 L {cx:.0f} 296 L 660 340 L {cx:.0f} 384 Z",
+           fill=th.panel, stroke=th.fg, sw=2)
+    s.text(cx, 336, "64 < A ≤ 125 ?", 17, th.fg, bold=True)
+    s.text(cx, 358, "(Table A.6, α = 0.05)", 12, th.muted)
+
+    s.arrow(390, 380, 250, 426, th.secondary, 1.8)
+    s.text(298, 392, "no", 14, th.secondary, bold=True)
+    s.arrow(510, 380, 650, 426, th.accent, 1.8)
+    s.text(602, 392, "yes", 14, th.accent, bold=True)
+
+    s.rect(60, 430, 360, 96, th.panel, th.secondary, rx=10, sw=2.2)
+    s.text(240, 458, "Nonstationary: do not average", 15, th.fg, bold=True)
+    s.text(240, 482, "+20 % gain ramp: A = 7 → rejected", 13, th.secondary)
+    s.text(240, 504, "split at the change, or go short-time (spectrogram)",
+           12, th.muted)
+
+    s.rect(480, 430, 360, 96, th.panel, th.accent, rx=10, sw=2.2)
+    s.text(660, 458, "Stationary: analyse", 15, th.fg, bold=True)
+    s.text(660, 482, "steady noise: A = 91 → accepted", 13, th.accent)
+    s.text(660, 504, "the chi-square CIs and error formulas hold", 12,
+           th.muted)
+
+    s.text(cx, 566, "the runs test (method=\"runs\") is the two-sided "
+           "companion: too many runs is as suspect as too few", 14, th.fg)
+    s.text(cx, 590, "a frequency glide can hide from the mean square: test "
+           "statistic=\"mean\" or band-filtered copies too", 13, th.muted)
+
+
 DIAGRAMS = {
     "diagram_calibration_setup": (_d1, "Calibration chain — from calibrator to physical units", 560),
     "diagram_env_measurement": (_d2, "Environmental noise measurement positions (ISO 1996-2)", 560),
@@ -5567,6 +6180,31 @@ DIAGRAMS = {
     "diagram_test_signals": (
         _d_test_signals,
         "The test-signal family at a glance", 640),
+    "diagram_spectral_analysis": (
+        _d_spectral_analysis,
+        "The Welch PSD pipeline: segment, taper, average (Bendat & Piersol)",
+        600),
+    "diagram_miso_coherence": (
+        _d_miso_coherence,
+        "MISO coherence: from correlated sources to per-source contributions",
+        540),
+    "diagram_time_frequency": (
+        _d_time_frequency,
+        "The time-frequency trade-off: two tilings of the same record", 560),
+    "diagram_cepstrum_echoes": (
+        _d_cepstrum_echoes,
+        "The cepstrum chain: an echo becomes a quefrency spike", 560),
+    "diagram_synchronous_averaging": (
+        _d_synchronous_averaging,
+        "Time synchronous averaging: trigger, slice, average", 580),
+    "diagram_correlation_delay": (
+        _d_correlation_delay,
+        "Time-delay estimation: two microphones and one correlation peak",
+        640),
+    "diagram_data_qualification": (
+        _d_data_qualification,
+        ("Data qualification: the stationarity decision "
+         "(Bendat & Piersol 10.3)"), 620),
 }
 
 

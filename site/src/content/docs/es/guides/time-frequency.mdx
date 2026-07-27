@@ -35,6 +35,12 @@ completa. Donde la [página de niveles](/phonometry/es/guides/levels/)
 ofrece el espectrograma en bandas fraccionales de octava de un sonómetro,
 esta es su equivalente de banda fina y ancho de banda constante.
 
+Un solo número gobierna todo en esta página: la longitud del segmento, que
+trocea el plano tiempo-frecuencia en celdas de área fija. El diagrama
+muestra el mismo registro teselado por una ventana corta y una larga.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_time_frequency_es.svg" alt="Dos teselados del plano tiempo-frecuencia del mismo registro a 16 kilohercios lado a lado: con una ventana corta de 256 muestras las celdas miden 16 milisegundos de ancho y 62,5 hercios de alto, así que un clic queda como una columna estrecha y nítida mientras un tono estable se emborrona en una banda alta; con una ventana larga de 1024 muestras las celdas miden 64 milisegundos de ancho y 15,6 hercios de alto, así que el tono se afila en una banda fina mientras el clic se emborrona en una columna ancha; los pies anotan que cada celda es una única estimación sin promediar con error aleatorio unidad y que el producto de resoluciones temporal y frecuencial se mantiene en torno a uno" width="92%" />
+
 ## 1. El espectrograma calibrado
 
 `spectrogram` divide el registro en segmentos con ventana (Hann por

@@ -147,6 +147,12 @@ model `y(t) = α·x(t-τ0) + n(t)` (B&P Section 5.1.4) by three routes:
   transform, sharpening the peak that the signal's own autocorrelation would
   otherwise smear (their Eq. 9).
 
+The physical picture is two microphones and one wavefront: the extra path to
+the far microphone is c times the delay, and the whole estimation problem is
+locating one peak on the lag axis.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_correlation_delay.svg" alt="Diagram of correlation-based time-delay estimation: a loudspeaker source radiates toward two microphones on stands, microphone 1 capturing x of t and microphone 2 capturing y of t equal to alpha times x delayed by tau 0 plus noise, with the wavefront through microphone 1 leaving an extra path of c times tau 0, about 0.84 meters at 343 meters per second, and sine theta equal to c tau 0 over the spacing d; below, a correlogram panel shows the direct correlator as a broad hump and GCC-PHAT with weighting 1 over the magnitude of Gxy as a sharp spike, both at tau 0 equal to 20 samples over 8192 hertz, 2.44 milliseconds; the caption notes sub-sample refinement by parabolic peak interpolation with 16 times local upsampling to below 0.002 samples" width="92%" />
+
 The weightings of Knapp & Carter's Table I, with the conditions the paper
 attaches to each:
 

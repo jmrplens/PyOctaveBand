@@ -73,6 +73,12 @@ For a system with `q` inputs `x1..xq` and output `y`, `miso_coherence`
 estimates every auto- and cross-spectrum by Welch's method and reports three
 coherence functions.
 
+The conditioning story fits in one block diagram: two correlated inputs
+drive their own paths into one measured output, and the Welch cross-spectral
+matrix is what turns the tangle into per-source numbers.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_miso_coherence_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_miso_coherence.svg" alt="Block diagram of a two-input MISO system: input x1 is white noise and input x2 equals 0.7 times x1 plus independent noise, x1 drives a 400 hertz low-pass path and x2 a 1.5 kilohertz high-pass path, and both sum with additive noise into the output y; the output feeds the Welch cross-spectral matrix Gxx and Gxy at nperseg 2048, conditioned by Schur steps in descending ordinary coherence order, which yields on one side the multiple and partial coherences, where input 2 in the 100 to 300 hertz band drops from an ordinary coherence of 0.32 to a partial coherence of 0.00, and on the other the per-source contributions Gvi that with the residual noise reconstruct Gyy exactly; a footnote records that each conditioning step spends one of the 242 effective averages" width="92%"></picture>
+
 The **ordinary coherence** of input `i` with the output, on its own
 (Eq. 7.109), is the familiar single-input quantity
 `γ²iy = |Giy|²/(Gii·Gyy)`.
