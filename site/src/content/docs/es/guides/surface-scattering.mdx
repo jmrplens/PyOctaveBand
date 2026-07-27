@@ -288,7 +288,7 @@ pozos a escala de abajo, y una `DiffuserPolarResponse` predicha retiene su
 geometría, así que `qrd.plot_geometry()` dibuja la superficie para la que se
 calculó.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/qrd_geometry_es.svg" alt="Perfil de pozos a escala de dos periodos del difusor comercial de residuos cuadráticos N = 7: pozos de 85,7 mm de ancho separados por aletas finas sobre una base rígida, siguiendo la secuencia de profundidades 0, 50, 200, 100, 100, 200, 50 mm con los pozos más profundos a 200 mm, y el sonido incidente llegando desde arriba" width="88%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/qrd_geometry_es.svg" alt="Perfil de pozos a escala de dos periodos del difusor comercial de residuos cuadráticos N = 7: pozos de 80,7 mm de ancho con paso de 85,7 mm, separados por aletas finas sobre una base rígida, siguiendo la secuencia de profundidades 0, 50, 200, 100, 100, 200, 50 mm con los pozos más profundos a 200 mm, y el sonido incidente llegando desde arriba" width="88%" />
 
 *Dos de los seis periodos, a escala: los residuos cuadráticos $n^2 \bmod 7$
 convertidos en una superficie construible. La frecuencia de diseño de
@@ -303,7 +303,10 @@ from phonometry import materials
 
 # El QRD N = 7 publicado: ancho de pozo 3,6 m / 42, pozo más profundo 0,2 m.
 depths = materials.qrd_well_depths(7, 490.0, speed_of_sound=343.0)
-materials.plot_qrd_geometry(depths, 3.6 / 42, periods=2, language="es")
+pitch = 3.6 / 42                  # 42 pozos a lo ancho del panel de 3,6 m
+fin = 0.005                       # aletas finas, incluidas en el paso
+materials.plot_qrd_geometry(depths, pitch - fin, fin_width=fin, periods=2,
+                            language="es")
 plt.show()
 
 # Una DiffuserPolarResponse predicha retiene su geometría, así que

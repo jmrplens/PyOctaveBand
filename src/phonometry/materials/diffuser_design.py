@@ -246,11 +246,12 @@ class DiffuserPolarResponse:
         predicted response (ISO 17497-2, Formula (5)).
     :ivar source_angle: Angle of incidence ``psi`` of the source, in degrees.
     :ivar well_width: Well width ``w`` of the predicted surface, in metres,
-        retained (with ``depths`` and ``periods``) so :meth:`plot_geometry`
-        can draw the well profile; appended after the original fields and
-        ``None`` for hand-built responses or explicit-reflection surfaces.
+        always retained by the predictor (with ``periods``) so
+        :meth:`plot_geometry` can draw the well profile; appended after the
+        original fields and ``None`` only for hand-built responses.
     :ivar depths: Well depths ``d_n`` of one period, in metres, when the
-        response was predicted from depths; ``None`` otherwise.
+        response was predicted from depths; ``None`` otherwise (explicit
+        ``reflection`` surfaces have no drawable well profile).
     :ivar periods: Number of repeated periods of the prediction.
     """
 

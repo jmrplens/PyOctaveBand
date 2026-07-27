@@ -79,6 +79,13 @@ def _t(text: str, language: str = "en") -> str:
     return _STRINGS.get(text, text) if language == "es" else text
 
 
+def _check_language(language: str) -> None:
+    """Reject unknown languages with the shared package error."""
+    from .._i18n import check_language
+
+    check_language(language)
+
+
 def _mm(value: float, language: str) -> str:
     """A length in millimetres, localised, trimmed (0.05 -> ``"50 mm"``)."""
     from .._i18n import format_number
@@ -404,19 +411,23 @@ def plot_absorber_stack(
     :param kwargs: Forwarded to the front-layer rectangle.
     :return: The axes.
     """
-    stack = list(layers) if isinstance(layers, (list, tuple)) else [layers]
+    _check_language(language)
+    stack = list(layers) if isinstance(layers, Sequence) else [layers]
     if not stack:
         raise ValueError("'layers' must contain at least one layer.")
-    if ax is None:
-        ax = _new_axes()
     total = _stack_total_depth(stack)
     if total <= 0.0:
         total = 0.05
+    # Dispatching every layer up front also validates the types before any
+    # figure is created.
+    kinds = [_layer_kind_and_thickness(layer, total) for layer in stack]
+    if ax is None:
+        ax = _new_axes()
     height = 0.9 * total
     thin = 0.14 * total
     x = 0.0
-    for index, layer in enumerate(stack):
-        kind, drawn, label_key = _layer_kind_and_thickness(layer, total)
+    for index, (layer, dispatched) in enumerate(zip(stack, kinds)):
+        kind, drawn, label_key = dispatched
         extra = dict(kwargs) if index == 0 else {}
         _material_rect(ax, x, 0.0, drawn, height, kind, **extra)
         if kind == "plate":
@@ -510,6 +521,7 @@ def plot_helmholtz_resonator_geometry(
     :param kwargs: Forwarded to the cavity rectangle.
     :return: The axes.
     """
+    _check_language(language)
     if ax is None:
         ax = _new_axes()
     w_n = float(resonator.neck_side)
@@ -565,13 +577,14 @@ def plot_slit_absorber_geometry(
     :param kwargs: Forwarded to the slit rectangle.
     :return: The axes.
     """
+    _check_language(language)
     if slit_height <= 0.0 or lattice_step <= 0.0 or period <= 0.0:
         raise ValueError(
             "'slit_height', 'lattice_step' and 'period' must be positive."
         )
     chain = (
         list(resonators)
-        if isinstance(resonators, (list, tuple))
+        if isinstance(resonators, Sequence)
         else [resonators]
     )
     if not chain:
@@ -653,6 +666,7 @@ def plot_qrd_geometry(
     :param kwargs: Forwarded to the base-slab rectangle.
     :return: The axes.
     """
+    _check_language(language)
     d = np.asarray(depths, dtype=np.float64)
     if d.ndim != 1 or d.size == 0:
         raise ValueError("'depths' must be a non-empty 1-D sequence.")
@@ -769,8 +783,13 @@ def plot_impedance_tube_geometry(
     """
     from ..materials.impedance_tube import plane_wave_frequency_range
 
+    _check_language(language)
     if spacing <= 0.0 or x1 <= spacing:
         raise ValueError("'spacing' must be positive and 'x1' > 'spacing'.")
+    if diameter is not None and diameter <= 0.0:
+        raise ValueError("'diameter' must be positive when given.")
+    if sample_thickness is not None and sample_thickness <= 0.0:
+        raise ValueError("'sample_thickness' must be positive when given.")
     if ax is None:
         ax = _new_axes()
     bore = _nominal_bore(diameter, 1.5 * spacing)
@@ -858,10 +877,13 @@ def plot_transmission_tube_geometry(
     """
     from ..materials.impedance_tube import plane_wave_frequency_range_astm
 
+    _check_language(language)
     if min(l1, s1, l2, s2, thickness) <= 0.0:
         raise ValueError(
             "'l1', 's1', 'l2', 's2' and 'thickness' must be positive."
         )
+    if diameter is not None and diameter <= 0.0:
+        raise ValueError("'diameter' must be positive when given.")
     if l2 <= thickness:
         raise ValueError(
             "'l2' is measured from the front face and must exceed "

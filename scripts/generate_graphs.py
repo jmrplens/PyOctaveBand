@@ -7929,18 +7929,21 @@ def generate_slit_absorber_geometry(output_dir: str) -> None:
 def generate_qrd_geometry(output_dir: str) -> None:
     """To-scale well profile of the N = 7 QRD of the polar-response figure.
 
-    Two periods of the commercial N = 7 quadratic-residue diffuser (well
-    width 8,6 cm, deepest well 0,2 m, design frequency 490 Hz) drawn as the
-    physical profile the Fraunhofer prediction models. One concept: the
+    Two periods of the commercial N = 7 quadratic-residue diffuser (42 wells
+    across 3,6 m, so an 85,7 mm pitch split into an 80,7 mm well plus a 5 mm
+    fin; deepest well 0,2 m, design frequency 490 Hz) drawn as the physical
+    profile the Fraunhofer prediction models. One concept: the
     quadratic-residue depth sequence as a real, buildable surface.
     """
     print("Generating qrd_geometry...")
     from phonometry import materials
 
     depths = materials.qrd_well_depths(7, 490.0, speed_of_sound=343.0)
+    pitch = 3.6 / 42
+    fin = 0.005
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     materials.plot_qrd_geometry(
-        depths, 3.6 / 42, ax=ax, periods=2, language=_LANG,
+        depths, pitch - fin, ax=ax, periods=2, fin_width=fin, language=_LANG,
     )
     plt.tight_layout()
     save_figure(output_dir, "qrd_geometry.svg")

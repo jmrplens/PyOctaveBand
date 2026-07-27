@@ -204,11 +204,23 @@ def test_transmission_tube_validation() -> None:
         m.plot_transmission_tube_geometry(
             l1=0.1, s1=0.0, l2=0.15, s2=0.03, thickness=0.05
         )
+    with pytest.raises(ValueError, match="diameter"):
+        m.plot_transmission_tube_geometry(
+            l1=0.1, s1=0.03, l2=0.15, s2=0.03, thickness=0.05, diameter=-1.0
+        )
 
 
 def test_impedance_tube_validation() -> None:
     with pytest.raises(ValueError, match="spacing"):
         m.plot_impedance_tube_geometry(spacing=0.05, x1=0.04)
+    with pytest.raises(ValueError, match="diameter"):
+        m.plot_impedance_tube_geometry(spacing=0.05, x1=0.15, diameter=-0.1)
+    with pytest.raises(ValueError, match="sample_thickness"):
+        m.plot_impedance_tube_geometry(
+            spacing=0.05, x1=0.15, sample_thickness=0.0
+        )
+    with pytest.raises(ValueError, match="Unknown language"):
+        m.plot_impedance_tube_geometry(spacing=0.05, x1=0.15, language="de")
 
 
 def test_slit_geometry_validation() -> None:
