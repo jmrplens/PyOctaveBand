@@ -589,6 +589,15 @@ ax.legend(loc="lower center")
 
 </details>
 
+The far-field overlay above is the frequency-domain summary; the FDTD
+animation below meshes both panels for real (the metadiffuser at 0.25 mm, slits,
+necks and cavities included) and lets the same 2 kHz wavefront hit them: the
+27 cm QRD and the 2 cm panel throw out nearly the same scattered fan.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_metadiffuser_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_metadiffuser.gif" alt="Animation: a 2 kHz plane wavefront hits a Schroeder diffuser with wells down to 27 centimetres and, beside it, the 2 centimetre metadiffuser whose real slits and resonators are meshed at 0.25 millimetres; the total field and the persistent scattered envelope show both panels spraying nearly identical fans, with the arc diffusion coefficients annotated" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_metadiffuser.webm)
+
 ## Scattering or diffusion? Two coefficients, two jobs
 
 The two coefficients above are routinely treated as interchangeable, in
