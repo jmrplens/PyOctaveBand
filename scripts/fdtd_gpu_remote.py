@@ -177,7 +177,8 @@ def build_job(
     rho_map = fdtd_gpu._resolve_rho_map(rho, ny, nx)
     cfl = fdtd_gpu._resolve_cfl(cfl)
     steps = fdtd_gpu._integer("steps", steps)
-    sponge_width = fdtd_gpu._integer("sponge_width", sponge_width)
+    sponge_width, sponge_reflection = fdtd_gpu._resolve_sponge(
+        sponge_width, sponge_reflection, ny, nx)
     sample_stride = fdtd_gpu._integer("sample_stride", sample_stride)
     if sample_stride < 1:
         raise ValueError("sample_stride must be >= 1")

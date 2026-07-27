@@ -117,6 +117,21 @@ def _resolve_rho_map(rho: float | Field2D, ny: int, nx: int) -> Field2D:
     return rho_map
 
 
+def _resolve_sponge(sponge_width: Any, sponge_reflection: float,
+                    ny: int, nx: int) -> tuple[int, float]:
+    """Validate the sponge configuration exactly as the library does."""
+    width = _integer("sponge_width", sponge_width)
+    if width < 0:
+        raise ValueError("sponge_width must be non-negative")
+    if width >= min(nx, ny):
+        raise ValueError("sponge_width must be narrower than the "
+                         "smallest grid side")
+    if not 0.0 < sponge_reflection < 1.0:
+        raise ValueError("sponge_reflection must lie strictly between "
+                         "0 and 1")
+    return width, float(sponge_reflection)
+
+
 def _resolve_damping(damping: float | NDArray[np.float64],
                      ny: int, nx: int) -> NDArray[np.float64]:
     """Validate the damping spec into a non-negative 0D or ``(ny, nx)`` array."""
@@ -297,15 +312,8 @@ class GpuFDTD2D:
         cfl = _resolve_cfl(cfl)
         ny, nx = c_map.shape
         rho_map = _resolve_rho_map(rho, ny, nx)
-        sponge_width = _integer("sponge_width", sponge_width)
-        if sponge_width < 0:
-            raise ValueError("sponge_width must be non-negative")
-        if sponge_width >= min(nx, ny):
-            raise ValueError("sponge_width must be narrower than the "
-                             "smallest grid side")
-        if not 0.0 < sponge_reflection < 1.0:
-            raise ValueError("sponge_reflection must lie strictly between "
-                             "0 and 1")
+        sponge_width, sponge_reflection = _resolve_sponge(
+            sponge_width, sponge_reflection, ny, nx)
         damping_map = _resolve_damping(damping, ny, nx)
 
         self._xp = xp

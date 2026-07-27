@@ -303,25 +303,27 @@ def test_build_job_validation() -> None:
         fdtd_gpu_remote.build_job(343.0, _DX, cfl=1.5, **ok)
     with pytest.raises(ValueError, match="damping"):
         fdtd_gpu_remote.build_job(343.0, _DX, damping=-1.0, **ok)
+    bad_damping = np.zeros((_NY + 1, _NX))
     with pytest.raises(ValueError, match="damping"):
-        fdtd_gpu_remote.build_job(343.0, _DX,
-                                  damping=np.zeros((_NY + 1, _NX)), **ok)
+        fdtd_gpu_remote.build_job(343.0, _DX, damping=bad_damping, **ok)
     with pytest.raises(ValueError, match="impedance sides"):
         fdtd_gpu_remote.build_job(343.0, _DX,
                                   edge_impedance={"front": 413.0}, **ok)
     with pytest.raises(ValueError, match="absorbing"):
         fdtd_gpu_remote.build_job(343.0, _DX, sponge_width=10,
                                   edge_impedance={"top": 413.0}, **ok)
+    bad_profile = {"top": np.ones(_NX + 2)}
     with pytest.raises(ValueError, match="impedance"):
-        fdtd_gpu_remote.build_job(
-            343.0, _DX, edge_impedance={"top": np.ones(_NX + 2)}, **ok)
+        fdtd_gpu_remote.build_job(343.0, _DX, edge_impedance=bad_profile,
+                                  **ok)
+    bad_mask_shape = np.zeros((_NY + 1, _NX), np.bool_)
     with pytest.raises(ValueError, match="obstacle_mask"):
-        fdtd_gpu_remote.build_job(
-            343.0, _DX, obstacle_mask=np.zeros((_NY + 1, _NX), np.bool_),
-            **ok)
+        fdtd_gpu_remote.build_job(343.0, _DX, obstacle_mask=bad_mask_shape,
+                                  **ok)
+    bad_mask_dtype = np.zeros((_NY, _NX), np.int64)
     with pytest.raises(ValueError, match="obstacle_mask"):
-        fdtd_gpu_remote.build_job(
-            343.0, _DX, obstacle_mask=np.zeros((_NY, _NX), np.int64), **ok)
+        fdtd_gpu_remote.build_job(343.0, _DX, obstacle_mask=bad_mask_dtype,
+                                  **ok)
     with pytest.raises(ValueError, match="sample_steps"):
         fdtd_gpu_remote.build_job(343.0, _DX, shape=(_NY, _NX), steps=100,
                                   sample_steps=[50, 150])
@@ -340,12 +342,20 @@ def test_build_job_validation() -> None:
         fdtd_gpu_remote.build_job(343.0, _DX, sponge_width=3.5, **ok)
     with pytest.raises(ValueError, match="sponge_width"):
         fdtd_gpu.GpuFDTD2D(343.0, _DX, shape=(_NY, _NX), sponge_width=2.5)
+    with pytest.raises(ValueError, match="smallest grid side"):
+        fdtd_gpu_remote.build_job(343.0, _DX, sponge_width=min(_NY, _NX),
+                                  **ok)
+    with pytest.raises(ValueError, match="sponge_reflection"):
+        fdtd_gpu_remote.build_job(343.0, _DX, sponge_width=4,
+                                  sponge_reflection=1.5, **ok)
+    bad_scale_length = np.ones(_NX + 1)
     with pytest.raises(ValueError, match="init_scale_x"):
-        fdtd_gpu_remote.build_job(343.0, _DX,
-                                  init_scale_x=np.ones(_NX + 1), **ok)
+        fdtd_gpu_remote.build_job(343.0, _DX, init_scale_x=bad_scale_length,
+                                  **ok)
+    bad_scale_nan = np.full(_NX, np.nan)
     with pytest.raises(ValueError, match="init_scale_x"):
-        fdtd_gpu_remote.build_job(343.0, _DX,
-                                  init_scale_x=np.full(_NX, np.nan), **ok)
+        fdtd_gpu_remote.build_job(343.0, _DX, init_scale_x=bad_scale_nan,
+                                  **ok)
 
 
 def test_sample_steps_deduplicated_local_and_remote_contract() -> None:
