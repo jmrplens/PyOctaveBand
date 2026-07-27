@@ -1,0 +1,75 @@
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Questions about **how to use the library** belong here: which function fits your
+        measurement, what a parameter means, units, or an unexpected result.
+
+        Two things that are handled elsewhere:
+
+        - Anything with a standard in it goes to
+          [Standards & conformance](https://github.com/jmrplens/phonometry/discussions/categories/standards-conformance):
+          whether a clause or edition is implemented, and any value that disagrees with
+          the standard or with a reference implementation. That holds even when you can
+          reproduce the discrepancy reliably, because deciding it means reading the
+          clause first.
+        - [Issues](https://github.com/jmrplens/phonometry/issues) is for reproducible
+          failures with no standard in play: a crash, a result that contradicts the
+          library's own documentation, or a broken installation.
+
+        The [documentation](https://jmrplens.github.io/phonometry/) is available in
+        English and Spanish, and you are welcome to write in either language.
+
+  - type: textarea
+    id: goal
+    attributes:
+      label: What are you trying to compute or measure?
+      description: Describe the acoustic quantity and the context, not only the code.
+      placeholder: |
+        I have a 30 s recording from a calibrated Class 1 sound level meter and I need
+        the A-weighted equivalent level in third-octave bands.
+    validations:
+      required: true
+
+  - type: textarea
+    id: code
+    attributes:
+      label: What you have tried
+      description: A minimal snippet, if you already have one. It is formatted as Python automatically.
+      render: python
+    validations:
+      required: false
+
+  - type: textarea
+    id: outcome
+    attributes:
+      label: What happened, and what you expected instead
+      description: Paste the output, the traceback or the values you got, and say what you expected.
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: phonometry version
+      description: 'Run: python -c "import phonometry; print(phonometry.__version__)"'
+      placeholder: "3.3.0"
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Python version and operating system
+      placeholder: "Python 3.13 on Ubuntu 24.04"
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before posting
+      options:
+        - label: I searched the existing discussions and the documentation site.
+          required: false

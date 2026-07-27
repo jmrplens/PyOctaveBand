@@ -1,0 +1,54 @@
+labels: ["documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The documentation is meant to teach the acoustics, not only to list the API. If an
+        explanation did not land, a figure was hard to read, or a guide you needed is
+        missing, that is worth saying here.
+
+        The site is published in English and Spanish. Write in whichever you prefer.
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What is this about?
+      options:
+        - An explanation that is unclear or incomplete
+        - A missing or unhelpful example
+        - A figure, plot or animation
+        - A guide that does not exist yet
+        - An error in the text, a formula or a value
+        - Translation between English and Spanish
+    validations:
+      required: true
+
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      description: Link to the page on the documentation site, or the file under docs/.
+      placeholder: "https://jmrplens.github.io/phonometry/guides/filter-banks/"
+    validations:
+      required: false
+
+  - type: textarea
+    id: detail
+    attributes:
+      label: What was confusing, and what would have helped
+      description: >
+        Saying where you got lost is more useful than proposing wording. If you already
+        know what you expected to find, say that too.
+    validations:
+      required: true
+
+  - type: input
+    id: background
+    attributes:
+      label: Your background with the topic
+      description: >
+        Optional, and only to calibrate the level of the explanation. There is no wrong
+        answer here.
+      placeholder: "Acoustics student, field technician, developer new to acoustics"
+    validations:
+      required: false

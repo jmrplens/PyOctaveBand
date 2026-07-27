@@ -1,0 +1,58 @@
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Proposals for a standard, a method or a feature to implement next.
+
+        A proposal is much easier to act on when it names the document that defines the
+        method and points at reference data to validate it against. Nothing here is
+        implemented from a textbook summary alone, so the validation source is the part
+        that usually decides whether it can be done.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: The measurement, calculation or workflow you cannot carry out today.
+    validations:
+      required: true
+
+  - type: input
+    id: standard
+    attributes:
+      label: Standard, method or reference that defines it
+      description: Full designation with edition and year, or the paper or book if there is no standard.
+      placeholder: "ISO 3382-2:2008, or Fastl & Zwicker (2007), chapter 8"
+    validations:
+      required: false
+
+  - type: textarea
+    id: oracle
+    attributes:
+      label: Reference data available for validation
+      description: >
+        Worked examples in the standard, published tables, a reference implementation,
+        a dataset, or measurements you could share. Say if you know of none, that is
+        useful information in itself.
+    validations:
+      required: false
+
+  - type: textarea
+    id: usage
+    attributes:
+      label: How you imagine using it
+      description: A sketch of the call you would like to write. Optional.
+      render: python
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Taking part
+      options:
+        - label: I would be willing to help implement or review this.
+          required: false
+        - label: I can provide reference data or measurements for validation.
+          required: false
