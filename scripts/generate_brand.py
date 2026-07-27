@@ -95,6 +95,15 @@ Point = tuple[float, float]
 Segment = tuple[Point, Point, Point]  # two control points and an end point
 
 
+def _report(dest: Path) -> None:
+    """Log a written file, repo-relative when it sits inside the repo."""
+    try:
+        shown = dest.resolve().relative_to(REPO)
+    except ValueError:
+        shown = dest
+    print(f"  {shown}")
+
+
 def _fmt(value: float) -> str:
     """Two decimals, trailing zeros stripped, so the path data stays readable."""
     text = f"{value:.2f}".rstrip("0").rstrip(".")
@@ -296,7 +305,277 @@ def render_png(
         fig.savefig(dest, dpi=size, transparent=background is None,
                     facecolor=fig.get_facecolor())
     plt.close(fig)
-    print(f"  {dest.relative_to(REPO)}")
+    _report(dest)
+
+
+# --- wordmark and cards ------------------------------------------------------
+# IBM Plex Sans, committed under .github/brand/fonts (SIL OFL 1.1). A grotesque
+# drawn for technical documentation suits a metrology library, and pinning the
+# file means the wordmark cannot shift when a machine's font set changes.
+FONT_DIR = REPO / ".github" / "brand" / "fonts"
+# Familjen Grotesk carries the wordmark and IBM Plex Sans the supporting copy.
+# A display face distinct from the text face is what makes the wordmark read as
+# a mark rather than as a caption; both are committed here (SIL OFL 1.1) so the
+# lockup cannot shift when a machine's font set changes.
+FONT_DISPLAY = FONT_DIR / "FamiljenGrotesk-Bold.ttf"
+FONT_REGULAR = FONT_DIR / "IBMPlexSans-Regular.ttf"
+
+WORDMARK = "phonometry"
+TAGLINE = "Acoustic measurement toolkit for Python"
+STRAPLINE = "Conformance-tested against the standards it implements"
+
+
+def text_svg_path(
+    text: str, font: Path, size: float, origin: Point, colour: str,
+) -> tuple[str, float]:
+    """One ``<path>`` holding the text as outlines, plus its advance width.
+
+    Outlines rather than a ``<text>`` element: GitHub renders README SVGs with
+    no guarantee about available fonts, so live text falls back to whatever the
+    viewer has, or to a serif. Converted glyphs look the same everywhere and
+    need no font embedded.
+    """
+    from matplotlib.font_manager import FontProperties
+    from matplotlib.textpath import TextPath
+    from matplotlib.transforms import Affine2D
+
+    tp = TextPath((0, 0), text, size=size, prop=FontProperties(fname=str(font)))
+    # matplotlib's y axis points up and SVG's points down.
+    flipped = Affine2D().scale(1, -1).translate(*origin).transform_path(tp)
+
+    parts: list[str] = []
+    for verts, code in flipped.iter_segments():
+        if code == MplPath.MOVETO:
+            parts.append(f"M{_fmt(verts[0])} {_fmt(verts[1])}")
+        elif code == MplPath.LINETO:
+            parts.append(f"L{_fmt(verts[0])} {_fmt(verts[1])}")
+        elif code == MplPath.CURVE3:
+            parts.append(f"Q{_fmt(verts[0])} {_fmt(verts[1])}"
+                         f" {_fmt(verts[2])} {_fmt(verts[3])}")
+        elif code == MplPath.CURVE4:
+            parts.append(f"C{_fmt(verts[0])} {_fmt(verts[1])}"
+                         f" {_fmt(verts[2])} {_fmt(verts[3])}"
+                         f" {_fmt(verts[4])} {_fmt(verts[5])}")
+        elif code == MplPath.CLOSEPOLY:
+            parts.append("Z")
+    width = float(tp.get_extents().x1)
+    return f'<path fill="{colour}" d="{"".join(parts)}"/>', width
+
+
+def _mark_group(x: float, y: float, scale: float, ink: str, grid_ink: str) -> str:
+    """The mark, translated and scaled into a larger composition."""
+    return (
+        f'<g transform="translate({_fmt(x)} {_fmt(y)}) scale({scale:.4f})">'
+        f'<g fill="none" stroke="{grid_ink}" stroke-width="{_fmt(GRID_STROKE)}">'
+        f'<rect x="{_fmt(GX)}" y="{_fmt(GY)}"'
+        f' width="{_fmt(GRID_W)}" height="{_fmt(GRID_W)}"/>'
+        f'<path d="{_grid_d()}"/></g>'
+        f'<g fill="{ink}">{_wave_shapes()}</g></g>'
+    )
+
+
+# Artwork the cards are composed over. Generated once and committed, then the
+# mark and the type are drawn on top from the geometry above, so the wording can
+# be revised without touching the art. Each is dark on the left, where the type
+# sits, and carries its detail on the right.
+ART_DIR = REPO / ".github" / "brand" / "art"
+
+
+ART_QUALITY = 90  # see optimise_art for how this was chosen
+
+
+def optimise_art(staging: Path, quality: int = ART_QUALITY) -> None:
+    """Convert freshly generated artwork into the committed WebP masters.
+
+    An authoring step, not part of ``make brand``: the art is regenerated only
+    when the look changes, and the WebP is then the master. Measured against the
+    1.3 MB source PNGs at 1920x640, WebP at this quality lands at 4.8 % of the
+    original with a global SSIM of 0.983 and at most five levels of deviation in
+    the flat dark areas where banding would show. It beat every alternative
+    tried: JPEG needed 23 % more bytes for the same SSIM, palette quantisation
+    stalled at 13 %, and the TinyPNG service returned either a PNG five times
+    larger or a WebP visibly more aggressive than this one.
+    """
+    from PIL import Image
+
+    ART_DIR.mkdir(parents=True, exist_ok=True)
+    for source in sorted(staging.glob("*.png")):
+        dest = ART_DIR / f"{source.stem}.webp"
+        with Image.open(source) as img:
+            img.convert("RGB").save(dest, "WEBP", quality=quality, method=6)
+        _report(dest)
+
+
+def _background_uri(source: Path) -> str:
+    """The committed artwork inlined verbatim as a data URI.
+
+    Inlined rather than referenced: an SVG rendered by GitHub cannot fetch a
+    second file, so a linked background would simply not appear. The bytes are
+    passed through untouched rather than re-encoded, which would otherwise add a
+    second generation of lossy compression on top of the master.
+    """
+    import base64
+
+    encoded = base64.b64encode(source.read_bytes()).decode("ascii")
+    return f"data:image/webp;base64,{encoded}"
+
+
+HEADING = "#f2f8fa"
+SUPPORT = "#a8d8e6"
+SUPPORT_DIM = "#84bccf"
+
+
+@dataclass(frozen=True)
+class Line:
+    """One line of copy in a card, positioned by its own baseline."""
+
+    text: str
+    font: Path
+    size: float
+    colour: str
+    at: Point
+
+
+@dataclass(frozen=True)
+class Card:
+    """A card's layout, shared by the SVG and the raster emitter."""
+
+    width: float
+    height: float
+    mark_px: float
+    mark_at: Point
+    lines: tuple[Line, ...]
+
+
+def banner_layout() -> Card:
+    """The README lockup: mark on the left, wordmark and tagline beside it."""
+    height = 320.0
+    mark_px = 168.0
+    text_x = 72.0 + mark_px + 48.0
+    return Card(
+        width=1200.0, height=height, mark_px=mark_px,
+        mark_at=(72.0, (height - mark_px) / 2),
+        lines=(
+            Line(WORDMARK, FONT_DISPLAY, 68.0, HEADING, (text_x, height / 2 + 2)),
+            Line(TAGLINE, FONT_REGULAR, 26.0, SUPPORT, (text_x + 2, height / 2 + 46)),
+        ),
+    )
+
+
+def social_layout() -> Card:
+    """The repository card: mark high on the left, three lines stacked below."""
+    return Card(
+        width=1280.0, height=640.0, mark_px=148.0, mark_at=(88.0, 96.0),
+        lines=(
+            Line(WORDMARK, FONT_DISPLAY, 74.0, HEADING, (88.0, 372.0)),
+            Line(TAGLINE, FONT_REGULAR, 27.0, SUPPORT, (90.0, 424.0)),
+            Line(STRAPLINE, FONT_REGULAR, 21.0, SUPPORT_DIM, (90.0, 468.0)),
+        ),
+    )
+
+
+def card_svg(card: Card, art: Path) -> str:
+    """A card as SVG: artwork inlined, then the mark and the type over it.
+
+    One card rather than a light and a dark variant: the artwork brings its own
+    dark ground, so it reads the same under either GitHub theme.
+    """
+    text = "\n  ".join(
+        text_svg_path(line.text, line.font, line.size, line.at, line.colour)[0]
+        for line in card.lines
+    )
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {_fmt(card.width)}'
+        f' {_fmt(card.height)}" width="{_fmt(card.width)}"'
+        f' height="{_fmt(card.height)}" role="img"'
+        ' aria-label="phonometry, acoustic measurement toolkit for Python">\n'
+        "  <title>phonometry</title>\n"
+        f'  <image x="0" y="0" width="{_fmt(card.width)}"'
+        f' height="{_fmt(card.height)}" preserveAspectRatio="xMidYMid slice"'
+        f' href="{_background_uri(art)}"/>\n'
+        f"  {_mark_group(*card.mark_at, card.mark_px / VB, ICON_INK, ICON_GRID)}\n"
+        f"  {text}\n"
+        "</svg>\n"
+    )
+
+
+def card_png(dest: Path, card: Card, art: Path, *, scale: int = 1) -> None:
+    """The same card as a raster, composed from the same layout and geometry.
+
+    Rasterised here rather than by converting the SVG: that would need an SVG
+    renderer as a system dependency, and the icons already prove the two
+    emitters agree because both read the geometry above.
+    """
+    from matplotlib.font_manager import FontProperties
+    from PIL import Image
+
+    width, height = round(card.width * scale), round(card.height * scale)
+    dpi = 100.0
+    fig = plt.figure(figsize=(width / dpi, height / dpi), dpi=dpi)
+    ax = fig.add_axes((0.0, 0.0, 1.0, 1.0))
+    ax.set_axis_off()
+    ax.set_xlim(0, card.width)
+    ax.set_ylim(card.height, 0)
+
+    with Image.open(art) as img:
+        # Cover, not stretch: crop the overhang so the artwork keeps its shapes.
+        src = img.convert("RGB")
+        target = card.width / card.height
+        if src.width / src.height > target:
+            keep = round(src.height * target)
+            box = ((src.width - keep) // 2, 0, (src.width + keep) // 2, src.height)
+        else:
+            keep = round(src.width / target)
+            box = (0, (src.height - keep) // 2, src.width, (src.height + keep) // 2)
+        ax.imshow(src.resize((width, height), Image.Resampling.LANCZOS, box=box),
+                  extent=(0, card.width, card.height, 0), zorder=0)
+
+    unit = card.mark_px / VB
+    trans = (matplotlib.transforms.Affine2D()
+             .scale(unit).translate(*card.mark_at) + ax.transData)
+    lw = GRID_STROKE * unit * 72.0 / dpi * scale
+    ax.add_patch(Rectangle((GX, GY), GRID_W, GRID_W, fill=False, zorder=2,
+                           edgecolor=ICON_GRID, linewidth=lw, transform=trans,
+                           joinstyle="miter"))
+    pitch = GRID_W / COLS
+    for i in range(1, COLS):
+        ax.plot([GX + i * pitch] * 2, [GY, GY + GRID_W], color=ICON_GRID,
+                linewidth=lw, transform=trans, solid_capstyle="butt", zorder=2)
+        ax.plot([GX, GX + GRID_W], [GY + i * pitch] * 2, color=ICON_GRID,
+                linewidth=lw, transform=trans, solid_capstyle="butt", zorder=2)
+    for ribbon in RIBBONS:
+        ax.add_patch(PathPatch(_mpl_path(*ribbon_outline(ribbon)), zorder=3,
+                               facecolor=ICON_INK, edgecolor="none",
+                               transform=trans))
+    ax.add_patch(Circle(SRC_C, SRC_R, facecolor=ICON_INK, edgecolor="none",
+                        transform=trans, zorder=3))
+
+    for line in card.lines:
+        ax.text(line.at[0], line.at[1], line.text, color=line.colour, zorder=3,
+                fontsize=line.size * 72.0 / dpi * scale,
+                fontproperties=FontProperties(fname=str(line.font)),
+                va="baseline")
+
+    import io
+
+    with plt.rc_context({"savefig.bbox": None, "savefig.pad_inches": 0.0}):
+        buf = io.BytesIO()
+        fig.savefig(buf, format="png", dpi=dpi)
+    plt.close(fig)
+
+    # Re-encoded rather than written straight out: matplotlib's PNG of a
+    # photographic card runs to hundreds of kilobytes, and these end up in a
+    # README and in a social scraper's fetch.
+    buf.seek(0)
+    with Image.open(buf) as rendered:
+        flat = rendered.convert("RGB")
+        if dest.suffix == ".webp":
+            flat.save(dest, "WEBP", quality=ART_QUALITY, method=6)
+        elif dest.suffix in (".jpg", ".jpeg"):
+            flat.save(dest, "JPEG", quality=92, optimize=True, progressive=True)
+        else:
+            flat.save(dest, "PNG", optimize=True)
+    _report(dest)
 
 
 def write_ico(dest: Path, source: Path) -> None:
@@ -305,7 +584,7 @@ def write_ico(dest: Path, source: Path) -> None:
 
     with Image.open(source) as img:
         img.save(dest, sizes=[(16, 16), (32, 32), (48, 48)])
-    print(f"  {dest.relative_to(REPO)}")
+    _report(dest)
 
 
 def generate_all() -> None:
@@ -324,7 +603,7 @@ def generate_all() -> None:
         (public / "favicon.svg", mark_svg(theme_aware=True)),
     ):
         path.write_text(svg, encoding="utf-8")
-        print(f"  {path.relative_to(REPO)}")
+        _report(path)
 
     print("Generating app icons...")
     # Home-screen icons sit on the brand's darkest teal: a transparent or white
@@ -337,11 +616,35 @@ def generate_all() -> None:
     # the middle 80 %, so this one keeps well clear of the edges.
     render_png(public / "icon-maskable-512.png", 512, margin=0.20, **icon)
     render_png(brand / "logo-1024.png", 1024, margin=0.04)
+    # The mark reversed out for the cards: the site's Open Graph generator
+    # composes it over the dark artwork and cannot recolour an SVG.
+    render_png(brand / "logo-on-dark-512.png", 512, margin=0.02,
+               ink=ICON_INK, grid_ink=ICON_GRID)
 
     print("Generating favicon fallback...")
     render_png(brand / "_favicon-48.png", 48, ink=INK, grid_ink=GRID_INK)
     write_ico(public / "favicon.ico", brand / "_favicon-48.png")
     (brand / "_favicon-48.png").unlink()
+
+    print("Generating cards...")
+    banner, social = banner_layout(), social_layout()
+    banner_art, social_art = ART_DIR / "banner.webp", ART_DIR / "generic.webp"
+
+    # The SVG is the editable master; the README points at the raster instead,
+    # because GitHub serves README images through its own proxy and an SVG with
+    # an embedded raster is not worth the risk on the page everybody sees first.
+    for path, svg in ((brand / "banner.svg", card_svg(banner, banner_art)),):
+        path.write_text(svg, encoding="utf-8")
+        _report(path)
+    card_png(brand / "banner.webp", banner, banner_art, scale=2)
+    # The site-wide fallback, for the docstring-generated API pages that get no
+    # card of their own. Same layout as the repository card, 1200x630.
+    site_card = Card(width=1200.0, height=630.0, mark_px=148.0, mark_at=(88.0, 92.0),
+                     lines=social.lines)
+    card_png(public / "og-image.png", site_card, social_art)
+    # GitHub's social-preview uploader takes PNG, JPG or GIF, so this one cannot
+    # be WebP however much smaller that would be.
+    card_png(brand / "social-preview.jpg", social, social_art)
 
 
 if __name__ == "__main__":

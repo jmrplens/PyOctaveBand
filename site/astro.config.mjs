@@ -539,15 +539,18 @@ export default defineConfig({
             title: 'llms.txt',
           },
         },
-        // Open Graph image
-        { tag: 'meta', attrs: { property: 'og:image', content: socialImageUrl } },
+        // Open Graph image. Only the invariant parts are set here: the image
+        // itself is per page and comes from src/components/Head.astro, which
+        // has the route. Emitting a site-wide og:image here too would leave two
+        // in the document, and an Open Graph parser takes the first, so the
+        // per-page card would silently lose to this one. No og:image:type
+        // either: the per-page cards are JPEG and the fallback is PNG, and one
+        // site-wide tag cannot describe both.
         { tag: 'meta', attrs: { property: 'og:image:alt', content: socialImageAlt } },
-        { tag: 'meta', attrs: { property: 'og:image:type', content: 'image/png' } },
         { tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
         { tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
         // Twitter card
         { tag: 'meta', attrs: { name: 'twitter:card', content: 'summary_large_image' } },
-        { tag: 'meta', attrs: { name: 'twitter:image', content: socialImageUrl } },
         { tag: 'meta', attrs: { name: 'twitter:image:alt', content: socialImageAlt } },
         // Author
         { tag: 'meta', attrs: { name: 'author', content: 'José Manuel Requena Plens' } },

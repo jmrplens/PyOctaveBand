@@ -60,6 +60,16 @@ const rel = pathname.startsWith(BASE) ? pathname.slice(BASE.length) : pathname;
 const lang = rel.startsWith('/es/') || rel === '/es' ? 'es' : 'en';
 const isHome = rel === '/' || rel === '' || rel === '/es/' || rel === '/es';
 
+// Per-page Open Graph card, generated at build time by src/pages/og. Every
+// documentation page has one carrying its own title and its area's artwork;
+// the docstring-generated API tree does not, and falls back to the site-wide
+// card. The path mirrors the page's own, so no lookup table is needed.
+const entryId = route?.entry?.id ?? '';
+const hasOwnCard = entryId !== '' && !/^(es\/)?reference\/api\//.test(entryId);
+const ogImage = hasOwnCard
+  ? `${SITE}${BASE}/og/${entryId.replace(/\/index$/, '') || 'index'}.jpg`
+  : SOCIAL_IMAGE;
+
 // The 404 page is a real route with a real entry, so it used to emit a
 // TechArticle headlined "404" carrying the site description. An error page is
 // not an article and should not be indexed as one.
@@ -139,7 +149,7 @@ const article =
         inLanguage: lang,
         url: canonical,
         mainEntityOfPage: canonical,
-        image: SOCIAL_IMAGE,
+        image: ogImage,
         // Point voice/AI assistants at the page title and lead paragraph.
         speakable: {
           '@type': 'SpeakableSpecification',
@@ -262,5 +272,9 @@ const jsonLd = graph.length
 {!isHome && <link rel="alternate" type="text/markdown" href={`${pathname}index.md`} />}
 <meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_US'} />
 <meta property="og:locale:alternate" content={lang === 'es' ? 'en_US' : 'es_ES'} />
+{/* Starlight merges head entries by property, so these override the
+    site-wide pair set in astro.config.mjs rather than duplicating them. */}
+<meta property="og:image" content={ogImage} />
+<meta name="twitter:image" content={ogImage} />
 <meta name="twitter:title" content={title} />
 {description && <meta name="twitter:description" content={description} />}

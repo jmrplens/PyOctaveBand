@@ -2933,45 +2933,6 @@ def generate_weighting_class_mask(output_dir: str) -> None:
     plt.close()
 
 
-def generate_og_image(output_path: str = "site/public/og-image.png") -> None:
-    """FALLBACK social preview card (1200x630) for the docs site.
-
-    Not wired into generate_all(): the committed site/public/og-image.png is
-    a designed asset (AI-generated card chosen by the maintainer). Run this
-    only if that asset is lost and a quick replacement is needed.
-    """
-    print("Generating og-image.png...")
-    fs = 48000
-
-    fig = plt.figure(figsize=(12, 6.3), dpi=100)
-    fig.patch.set_facecolor("#0f1216")
-
-    # Background: 1/3-octave bank response, dimmed.
-    ax_bg = fig.add_axes((0.0, 0.0, 1.0, 0.52))
-    ax_bg.set_facecolor("none")
-    bank = OctaveFilterBank(fs=fs, fraction=3, order=6, limits=[20.0, 20000.0])
-    for idx in range(bank.num_bands):
-        fsd = fs / bank.factor[idx]
-        w, h = scipy_signal.sosfreqz(bank.sos[idx], worN=2048, fs=fsd)
-        mag = 20 * np.log10(np.abs(h) + 1e-9)
-        ax_bg.semilogx(w, mag, color="#1f77b4", alpha=0.55, linewidth=1.4)
-    ax_bg.set_xlim(20, 20000)
-    ax_bg.set_ylim(-40, 2)
-    ax_bg.axis("off")
-
-    fig.text(0.055, 0.82, "phonometry", color="white", fontsize=46, fontweight="bold")
-    fig.text(0.057, 0.70, "Fractional octave analysis for Python", color="#a6d0ee", fontsize=22)
-    fig.text(
-        0.057, 0.60,
-        "ANSI S1.11 / IEC 61260-1 filter banks  ·  IEC 61672-1 A/C/Z & Fast/Slow/Impulse  ·  Leq, LN, spectrograms",
-        color="#8ea4b8", fontsize=13.5,
-    )
-    # Exact 1200x630: bypass the global savefig.bbox="tight" rcParam.
-    with plt.rc_context({"savefig.bbox": None}):
-        fig.savefig(output_path, dpi=100, facecolor=fig.get_facecolor())
-    plt.close(fig)
-
-
 def generate_calibration_stability(output_dir: str) -> None:
     """Stable vs unstable calibration tone against the IEC 60942 limit."""
     print("Generating calibration_stability.png...")
