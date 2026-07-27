@@ -552,7 +552,7 @@ export default defineConfig({
         // Author
         { tag: 'meta', attrs: { name: 'author', content: 'José Manuel Requena Plens' } },
         // Theme color
-        { tag: 'meta', attrs: { name: 'theme-color', content: '#1f77b4' } },
+        { tag: 'meta', attrs: { name: 'theme-color', content: '#0a6f8c' } },
         // rel="me" identity links (canonical list from jmrp.io)
         { tag: 'link', attrs: { rel: 'me', href: 'https://github.com/jmrplens' } },
         { tag: 'link', attrs: { rel: 'me', href: 'https://www.linkedin.com/in/jmrplens' } },
@@ -573,6 +573,19 @@ export default defineConfig({
         },
         // Web app manifest
         { tag: 'link', attrs: { rel: 'manifest', href: `${basePath}/manifest.json` } },
+        // Icons. The SVG favicon carries its own prefers-color-scheme rule, so
+        // the mark lightens itself against a dark browser chrome; the .ico is
+        // there for the clients that still request /favicon.ico by name, and
+        // the touch icon for an iOS home screen, which ignores both.
+        {
+          tag: 'link',
+          attrs: { rel: 'icon', type: 'image/svg+xml', href: `${basePath}/favicon.svg` },
+        },
+        { tag: 'link', attrs: { rel: 'icon', sizes: '48x48', href: `${basePath}/favicon.ico` } },
+        {
+          tag: 'link',
+          attrs: { rel: 'apple-touch-icon', href: `${basePath}/apple-touch-icon.png` },
+        },
         // Bing Webmaster Tools site verification (Google Search Console is
         // already verified for this property; no meta needed).
         { tag: 'meta', attrs: { name: 'msvalidate.01', content: '7574EB3B44624C239F14920DBC34EE25' } },

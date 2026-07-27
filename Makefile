@@ -80,6 +80,13 @@ posters:
 og:
 	$(PYTHON) -c "import sys; sys.path.insert(0, 'scripts'); import generate_graphs as g; g.generate_og_image()"
 
+# Regenerate the brand mark and every icon derived from it (.github/brand and
+# the site's favicon, touch icon and PWA icons). Deliberately outside `graphs`:
+# that target wipes .github/images first, and these are design assets rather
+# than computed figures, so they are refreshed only when the mark changes.
+brand:
+	$(PYTHON) scripts/generate_brand.py
+
 llms:
 	$(PYTHON) scripts/generate_llms.py
 
