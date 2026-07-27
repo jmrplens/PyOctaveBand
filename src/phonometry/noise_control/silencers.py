@@ -335,6 +335,11 @@ class ReactiveSilencerResult:
     :ivar kind: A short label of the device (e.g. ``"expansion chamber"``).
     :ivar resonances: Notable resonance frequencies, Hz (e.g. the resonator
         tuning frequency), or ``None``.
+    :ivar geometry: The defining geometry the constructor was called with
+        (keys matching its keyword names, e.g. ``length``/``chamber_area``/
+        ``pipe_area`` for a chamber), retained so :meth:`plot_geometry` can
+        draw the device; appended after the original fields and ``None`` for
+        hand-built results.
     """
 
     frequencies: np.ndarray
@@ -343,6 +348,7 @@ class ReactiveSilencerResult:
     transfer_matrix: np.ndarray
     kind: str
     resonances: np.ndarray | None = None
+    geometry: dict[str, float] | None = None
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the transmission (and insertion) loss against frequency.
@@ -355,6 +361,22 @@ class ReactiveSilencerResult:
 
         check_language(language)
         return plot_reactive_silencer(self, ax=ax, language=language, **kwargs)
+
+    def plot_geometry(
+        self, ax: Axes | None = None, *, language: str = "en"
+    ) -> Axes:
+        """Draw the silencer cross-section to scale (dimensioned side cut).
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+
+        :raises ValueError: If the result does not retain its ``geometry``.
+        """
+        from .._i18n import check_language
+        from .._plot.geometry import plot_silencer_result_geometry
+
+        check_language(language)
+        return plot_silencer_result_geometry(self, ax=ax, language=language)
 
     def report(
         self,
@@ -425,6 +447,7 @@ def _result(
     radiation_impedance: ArrayLike | None,
     kind: str,
     resonances: NDArray[np.float64] | None = None,
+    geometry: dict[str, float] | None = None,
 ) -> ReactiveSilencerResult:
     """Assemble a :class:`ReactiveSilencerResult` from a compound matrix."""
     tl = transmission_loss(
@@ -444,6 +467,7 @@ def _result(
         transfer_matrix=t,
         kind=kind,
         resonances=resonances,
+        geometry=geometry,
     )
 
 
@@ -483,6 +507,10 @@ def expansion_chamber(
         f, t, inlet_area=pipe_area, outlet_area=pipe_area, c=c, rho=rho,
         source_impedance=source_impedance,
         radiation_impedance=radiation_impedance, kind="expansion chamber",
+        geometry={
+            "length": float(length), "chamber_area": float(chamber_area),
+            "pipe_area": float(pipe_area),
+        },
     )
 
 
@@ -530,6 +558,11 @@ def helmholtz_resonator(
         radiation_impedance=radiation_impedance,
         kind="Helmholtz resonator",
         resonances=np.array([f0], dtype=np.float64),
+        geometry={
+            "duct_area": float(s_d), "neck_area": float(neck_area),
+            "neck_length": float(neck_length),
+            "cavity_volume": float(cavity_volume),
+        },
     )
 
 
@@ -578,6 +611,10 @@ def quarter_wave_resonator(
         radiation_impedance=radiation_impedance,
         kind="quarter-wave resonator",
         resonances=res,
+        geometry={
+            "duct_area": float(s_d), "length": float(length),
+            "branch_area": float(branch_area),
+        },
     )
 
 
@@ -651,4 +688,10 @@ def extended_tube_chamber(
         source_impedance=source_impedance,
         radiation_impedance=radiation_impedance,
         kind="extended-tube chamber", resonances=res,
+        geometry={
+            "length": float(length), "chamber_area": float(chamber_area),
+            "pipe_area": float(pipe_area),
+            "inlet_extension": float(inlet_extension),
+            "outlet_extension": float(outlet_extension),
+        },
     )

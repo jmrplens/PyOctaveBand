@@ -406,6 +406,31 @@ micrófono **y** banda de frecuencia, forma `(NM, NB)`; ISO 3744 cláusula 8.6),
 (expandida, 95 %) y `grade`. `measurement_positions('hemisphere', radius=…,
 reflecting_planes=…, tones=…, grade=…)` devuelve las coordenadas normativas
 `(N, 3)` de micrófono (Tabla B.1 para fuentes tonales, B.2 para banda ancha).
+Esas coordenadas se dibujan directamente con `plot_microphone_positions`, que
+representa el array sobre su superficie de medición en 3-D, numerado como en
+la norma.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_positions_hemisphere_es.svg" alt="Vista tridimensional del array de micrófonos de ISO 3744: diez micrófonos numerados sobre un hemisferio de alambre de 2 m apoyado en un plano reflectante circular sombreado, con las posiciones 1 y 2 cerca del plano, las demás escalonadas en altura hasta las posiciones 9 y 10 cerca de la cúspide, y los ejes x, y y z graduados en metros" width="88%" />
+
+*Dónde se colocan de verdad los diez micrófonos del Anexo B sobre el
+hemisferio de 2 m: las alturas se escalonan para que el array muestree toda
+la superficie por igual, que es lo que permite que la media energética de
+los diez niveles sustituya a la integral de superficie.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import measurement_positions, plot_microphone_positions
+
+# Los 10 micrófonos del Anexo B de ISO 3744 sobre un hemisferio de 2 m.
+plot_microphone_positions(measurement_positions("hemisphere", radius=2.0),
+                          radius=2.0, language="es")
+plt.show()
+```
+
+</details>
 
 ## 2. Sala reverberante, grado de precisión (ISO 3741)
 

@@ -156,6 +156,35 @@ plt.show()
 
 </details>
 
+Cada punto del reflectograma es una imagen especular en un lugar concreto, y
+`.plot_geometry()` enseña dónde: la vista en planta de abajo dibuja la sala,
+la fuente, el receptor y todas las imágenes hasta tercer orden sobre la
+retícula de salas espejo, coloreadas por orden de reflexión.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/image_source_plan_es.svg" alt="Vista en planta de la retícula de fuentes imagen de una sala de 7 por 5 metros perfilada en el centro, con la fuente como estrella roja en (2, 1.6), el receptor como triángulo azul en (5.2, 3.4), y las fuentes imagen en el plano de la fuente coloreadas por orden de reflexión, primer orden naranja, segundo orden verde y tercer orden morado, extendiéndose en una retícula regular de salas espejo hasta unos 26 metros" width="88%" />
+
+*La retícula de la que sale el reflectograma, a escala: cada imagen vive en
+una sala espejo en el plano de altura de la fuente, y solo su distancia al
+receptor fija el tiempo de llegada y la divergencia `1/(4πr)` de esa
+reflexión.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import room
+
+res = room.image_source_rir((7.0, 5.0, 3.0), (2.0, 1.6, 1.5),
+                            (5.2, 3.4, 1.7), 0.3, fs=16000, max_order=3)
+
+# Una línea: la retícula de imágenes en planta, coloreada por orden.
+res.plot_geometry(language="es")
+plt.show()
+```
+
+</details>
+
 **Por banda, por pared y con aire.** Pasa coeficientes por banda (un array por
 pared `(6, n_bandas)`, un vector por banda o una lista `frequencies`) para
 sintetizar un decaimiento por banda de octava; un vector de longitud 6 fija cada

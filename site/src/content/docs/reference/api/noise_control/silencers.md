@@ -182,6 +182,55 @@ Side-branch Helmholtz resonator on a duct (Bies Eqs. (8.144), (8.152)).
 
 **Returns:** A [`ReactiveSilencerResult`](/phonometry/reference/api/noise_control/silencers/#reactivesilencerresult); `resonances` holds `f_0 = (c / 2 pi) sqrt(S_neck / (l_e V))`.
 
+## plot_silencer_geometry
+
+```python
+plot_silencer_geometry(
+    kind: str,
+    ax: Axes | None = None,
+    *,
+    length: float | None = None,
+    chamber_area: float | None = None,
+    pipe_area: float | None = None,
+    inlet_extension: float = 0.0,
+    outlet_extension: float = 0.0,
+    duct_area: float | None = None,
+    neck_area: float | None = None,
+    neck_length: float | None = None,
+    cavity_volume: float | None = None,
+    branch_area: float | None = None,
+    language: str = 'en',
+) -> Axes
+```
+
+Draw a reactive silencer cross-section to scale.
+
+Side cut through the duct axis with equivalent circular diameters
+(`d = 2 sqrt(S / pi)`) for every cross-section area, matching the
+parameters of the four `noise_control` silencer
+constructors. A Helmholtz cavity is drawn as the cube of equal volume
+with its volume annotated.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `kind` | One of `"expansion chamber"`, `"extended-tube chamber"`, `"Helmholtz resonator"`, `"quarter-wave resonator"` (the `ReactiveSilencerResult.kind` strings). |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `length` | Chamber length or quarter-wave tube length, in metres. |
+| `chamber_area` | Chamber cross-section, in m2 (chambers). |
+| `pipe_area` | Inlet/outlet pipe cross-section, in m2 (chambers). |
+| `inlet_extension` | Inlet tube extension into the chamber, in metres. |
+| `outlet_extension` | Outlet tube extension, in metres. |
+| `duct_area` | Main duct cross-section, in m2 (side branches). |
+| `neck_area` | Neck cross-section, in m2 (Helmholtz). |
+| `neck_length` | Neck length, in metres (Helmholtz). |
+| `cavity_volume` | Cavity volume, in m3 (Helmholtz). |
+| `branch_area` | Branch tube cross-section, in m2 (quarter-wave). |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+
+**Returns:** The axes.
+
 ## quarter_wave_resonator
 
 ```python
@@ -225,6 +274,7 @@ ReactiveSilencerResult(
     transfer_matrix: np.ndarray,
     kind: str,
     resonances: np.ndarray | None = None,
+    geometry: dict[str, float] | None = None,
 )
 ```
 
@@ -240,6 +290,7 @@ Transmission and insertion loss of a reactive silencer over frequency.
 | `transfer_matrix` | The compound `(n_freq, 2, 2)` four-pole matrix. |
 | `kind` | A short label of the device (e.g. `"expansion chamber"`). |
 | `resonances` | Notable resonance frequencies, Hz (e.g. the resonator tuning frequency), or `None`. |
+| `geometry` | The defining geometry the constructor was called with (keys matching its keyword names, e.g. `length`/`chamber_area`/ `pipe_area` for a chamber), retained so `plot_geometry` can draw the device; appended after the original fields and `None` for hand-built results. |
 
 ### ReactiveSilencerResult.plot()
 
@@ -256,6 +307,27 @@ Plot the transmission (and insertion) loss against frequency.
 
 Requires matplotlib (`pip install phonometry[plot]`); returns the
 `Axes`.
+
+### ReactiveSilencerResult.plot_geometry()
+
+```python
+ReactiveSilencerResult.plot_geometry(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+) -> Axes
+```
+
+Draw the silencer cross-section to scale (dimensioned side cut).
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the result does not retain its `geometry`. |
 
 ### ReactiveSilencerResult.report()
 

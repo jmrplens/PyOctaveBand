@@ -41,10 +41,11 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
+from types import MappingProxyType
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import NDArray
+from numpy.typing import ArrayLike, NDArray
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -431,6 +432,16 @@ class FDTD2D:
         self.n = 0                                # completed steps
 
         sides = _resolve_sponge_sides(sponge_sides)
+        #: Sponge-layer width in cells (read-only configuration record).
+        self.sponge_width = int(sponge_width)
+        #: Sides carrying a sponge layer when ``sponge_width > 0``.
+        self.sponge_sides: tuple[str, ...] = (
+            sides if sponge_width > 0 else ()
+        )
+        #: Per-side impedance boundaries as supplied (immutable record).
+        self.edge_impedance: Mapping[str, float | NDArray[np.float64]] = (
+            MappingProxyType(dict(edge_impedance) if edge_impedance else {})
+        )
         self._init_decay(sides, sponge_width, sponge_reflection, damping,
                          c_max)
         self._edges = self._build_edges(edge_impedance, sponge_width, sides,
@@ -517,6 +528,36 @@ class FDTD2D:
     def time(self) -> float:
         """Elapsed simulated time [s]."""
         return self.n * self.dt
+
+    def plot_geometry(
+        self,
+        ax: Axes | None = None,
+        *,
+        probes: ArrayLike | None = None,
+        language: str = "en",
+        **kwargs: Any,
+    ) -> Axes:
+        """Draw the configured domain before running it.
+
+        Domain extent, obstacles, sponge layers, impedance and rigid edges
+        and the added sources, with optional probe positions previewed; no
+        time stepping happens. Requires matplotlib
+        (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+
+        :param ax: Existing axes, or ``None`` to create a figure.
+        :param probes: Optional probe positions ``(x, y)`` in metres, shape
+            ``(N, 2)`` (the :func:`fdtd_simulation` convention).
+        :param language: Label language, ``"en"`` (default) or ``"es"``.
+        :param kwargs: Forwarded to the obstacle ``imshow``.
+        """
+        from .._i18n import check_language
+        from .._plot.geometry import plot_fdtd_domain
+
+        check_language(language)
+        return plot_fdtd_domain(
+            self, ax=ax, probes=probes, language=language, **kwargs
+        )
 
     def add_source(self, source: Source) -> None:
         """Register a soft pressure source (additive injection at one cell)."""

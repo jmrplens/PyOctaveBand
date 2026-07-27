@@ -327,6 +327,35 @@ class RadiatingPistonResult:
         return plot_piston_impedance(self, ax=ax, language=language, **kwargs)
 
 
+    def plot_geometry(
+        self,
+        ax: Axes | None = None,
+        *,
+        frequency_index: int = -1,
+        language: str = "en",
+        **kwargs: Any,
+    ) -> Axes:
+        """Draw the baffled piston to scale, with its directivity lobe.
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+
+        :param ax: Existing axes, or ``None`` to create a figure.
+        :param frequency_index: Index of the frequency whose far-field lobe
+            is overlaid (default: the highest); ignored when the result
+            carries no directivity.
+        :param language: Label language, ``"en"`` (default) or ``"es"``.
+        :param kwargs: Forwarded to the piston rectangle.
+        """
+        from .._i18n import check_language
+        from .._plot.geometry import plot_piston_result_geometry
+
+        check_language(language)
+        return plot_piston_result_geometry(
+            self, ax=ax, frequency_index=frequency_index,
+            language=language, **kwargs,
+        )
+
 def radiating_piston(
     radius: float,
     frequencies: ArrayLike,

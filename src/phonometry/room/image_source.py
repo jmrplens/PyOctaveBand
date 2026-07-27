@@ -223,6 +223,33 @@ class ImageSourceResult:
         return plot_image_source_reflectogram(self, ax=ax, language=language, **kwargs)
 
 
+    def plot_geometry(
+        self,
+        ax: Axes | None = None,
+        *,
+        max_order: int | None = None,
+        language: str = "en",
+        **kwargs: Any,
+    ) -> Axes:
+        """Draw the image-source lattice in plan view (x-y), to scale.
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+
+        :param ax: Existing axes, or ``None`` to create a figure.
+        :param max_order: Highest reflection order drawn; ``None`` draws up
+            to order 3 (or the result's own maximum if lower).
+        :param language: Label language, ``"en"`` (default) or ``"es"``.
+        :param kwargs: Forwarded to the room-outline rectangle.
+        """
+        from .._i18n import check_language
+        from .._plot.geometry import plot_image_source_geometry
+
+        check_language(language)
+        return plot_image_source_geometry(
+            self, ax=ax, max_order=max_order, language=language, **kwargs
+        )
+
 def _validate_point(
     point: ArrayLike, dimensions: tuple[float, float, float], name: str
 ) -> NDArray[np.float64]:

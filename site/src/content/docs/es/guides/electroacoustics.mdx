@@ -491,6 +491,36 @@ plt.show()
 
 </details>
 
+Detrás de ambas curvas hay un mismo objeto físico, y `.plot_geometry()` del
+resultado del pistón lo dibuja: la placa en su pantalla rígida a escala, con
+el lóbulo de campo lejano de la frecuencia más alta calculada superpuesto en
+el lado de radiación.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_baffle_geometry_es.svg" alt="Un pistón rígido de 10 cm de radio dibujado a escala como una placa de 200 mm de diámetro empotrada en una pantalla vertical rayada, con el diámetro del pistón acotado y el lóbulo de directividad de campo lejano normalizado para ka de 7,3 superpuesto en el lado de radiación: un lóbulo principal largo pegado al eje punteado con pequeños lóbulos secundarios replegándose cerca de la placa" width="82%" />
+
+*El pistón que describen las curvas de impedancia y directividad, a escala:
+a 4 kHz esta placa de 10 cm de radio tiene `ka ≈ 7,3`, así que el lóbulo
+superpuesto ya es varias veces más estrecho que el hemisferio de baja
+frecuencia y han aparecido los primeros lóbulos secundarios.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import radiating_piston
+
+res = radiating_piston(0.1, np.array([500.0, 2000.0, 4000.0]),
+                       angles=np.linspace(-np.pi / 2, np.pi / 2, 181))
+
+# Una línea: el pistón en su pantalla con el lóbulo de la frecuencia más alta.
+res.plot_geometry(language="es")
+plt.show()
+```
+
+</details>
+
 ## 7. Informe de características del altavoz (IEC 60268-5)
 
 Las características nominales que IEC 60268-5 define en torno a una respuesta en

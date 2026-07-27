@@ -60,6 +60,9 @@ ApertureTransmissionResult(
     frequencies: np.ndarray,
     transmission_coefficient: np.ndarray,
     kind: str,
+    width: float | None = None,
+    radius: float | None = None,
+    depth: float | None = None,
 )
 ```
 
@@ -72,6 +75,9 @@ Transmission through a slit or circular aperture (Hopkins 4.3.10).
 | `frequencies` | Band centre frequencies, in hertz. |
 | `transmission_coefficient` | Transmission coefficient `tau` per band. |
 | `kind` | `"slit"` or `"circular"`. |
+| `width` | Slit width, in metres, retained (with `depth`) so `plot_geometry` can draw the section; appended after the original fields and `None` for circular apertures or hand-built results. |
+| `radius` | Circular-aperture radius, in metres, or `None`. |
+| `depth` | Wall thickness, in metres, or `None`. |
 
 ### ApertureTransmissionResult.plot()
 
@@ -88,6 +94,28 @@ Plot the aperture sound reduction index `R(f)`.
 
 Requires matplotlib (`pip install phonometry[plot]`); returns the
 `Axes`.
+
+### ApertureTransmissionResult.plot_geometry()
+
+```python
+ApertureTransmissionResult.plot_geometry(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the wall-aperture cross-section to scale.
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the result does not retain its geometry. |
 
 ### ApertureTransmissionResult.transmission_loss
 
@@ -155,6 +183,42 @@ sharing a partition. A bare opening enters with `R = 0` (`tau = 1`).
 | Exception | When |
 | :--- | :--- |
 | ValueError | for a non-positive area, mismatched shapes, or an empty element set. |
+
+## plot_aperture_geometry
+
+```python
+plot_aperture_geometry(
+    depth: float,
+    ax: Axes | None = None,
+    *,
+    width: float | None = None,
+    radius: float | None = None,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the section through a wall aperture to scale.
+
+Wall of thickness `depth` with a slit of the given `width` (or the
+diametral section of a circular hole of the given `radius`), incident
+sound on the left and the transmitted wavefronts sketched on the right.
+Give exactly one of `width`/`radius`, matching
+[`slit_transmission_coefficient`](/phonometry/reference/api/building/aperture-transmission/#slit_transmission_coefficient) /
+[`circular_aperture_transmission_coefficient`](/phonometry/reference/api/building/aperture-transmission/#circular_aperture_transmission_coefficient).
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `depth` | Wall thickness `d`, in metres. |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `width` | Slit width `w`, in metres. |
+| `radius` | Circular-hole radius, in metres. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the wall rectangles. |
+
+**Returns:** The axes.
 
 ## slit_resonance_frequencies
 

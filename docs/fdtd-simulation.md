@@ -130,6 +130,40 @@ print(round(float(echo[np.abs(echo).argmax()] / incident), 2))  # 0.5
 # (Z - rho c)/(Z + rho c) = (3 - 1)/(3 + 1) = +0.5
 ```
 
+Before spending a single time step, `sim.plot_geometry()` draws the
+configured domain: edges, sponges, obstacles, sources and the probes you
+intend to record. Catching a sponge on the wrong side or a probe in the
+wrong place costs seconds here and a full re-run later.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fdtd_domain_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fdtd_domain_geometry.svg" alt="Setup drawing of a 4.5 by 3 metre FDTD domain before any time stepping: pale blue sponge layers along the left and right edges, an orange impedance edge along the top, a grey rectangular obstacle just left of centre, the source star at (0.5, 1.5) and two probe circles at (3, 1.5) and (4, 2), with a legend naming the sponge layer, impedance edge, rigid edge, source and probe" width="88%"></picture>
+
+*Everything the run will see, before it runs: the sponge layers eat the
+left and right boundaries, the top edge carries the anechoic `ρc` impedance,
+the untreated bottom stays rigid, and both probes sit clear of the obstacle
+and the sponges.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import simulation
+
+mask = np.zeros((60, 90), dtype=bool)
+mask[25:35, 40:44] = True
+sim = simulation.FDTD2D(343.0, 0.05, shape=(60, 90), sponge_width=8,
+                        sponge_sides=("left", "right"),
+                        edge_impedance={"top": 413.0}, obstacle_mask=mask)
+sim.add_source(simulation.GaussianPulse(10, 30, width=1e-3))
+
+# Check the domain before running it: nothing has been stepped yet.
+sim.plot_geometry(probes=[(3.0, 1.5), (4.0, 2.0)])
+plt.show()
+```
+
+</details>
+
 ## 3. When to use it, and the 2D limits
 
 FDTD earns its cost when the **geometry drives the physics**: diffraction

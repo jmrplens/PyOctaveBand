@@ -144,6 +144,40 @@ plt.show()
 
 </details>
 
+Los números que se pasan a `expansion_chamber` describen un dispositivo real,
+y `.plot_geometry()` lo dibuja: la misma cámara de 0,3 m con su relación de
+áreas 4:1, a escala y acotada.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/expansion_chamber_geometry_es.svg" alt="Sección a escala del silenciador de cámara de expansión del ejemplo de pérdida de transmisión: una cámara de 300 mm de longitud y 225,7 mm de diámetro equivalente insertada entre tubos de entrada y salida de 112,8 mm de diámetro equivalente, con la longitud de la cámara y ambos diámetros acotados" width="88%" />
+
+*La cámara detrás de las curvas de arriba, a escala: las áreas entran en el
+método de cuatro polos solo a través de la relación `m`, y el dibujo usa los
+diámetros circulares equivalentes `d = 2√(S/π)` de las secciones de 0,04 y
+0,01 m².*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import expansion_chamber, plot_silencer_geometry
+
+freqs = np.linspace(20.0, 2000.0, 2000)
+res = expansion_chamber(freqs, length=0.3, chamber_area=0.04, pipe_area=0.01)
+
+# Una línea: la sección acotada de la cámara recién calculada.
+res.plot_geometry(language="es")
+plt.show()
+
+# El mismo dibujo sin resultado, con la función libre:
+plot_silencer_geometry("expansion chamber", length=0.3,
+                       chamber_area=0.04, pipe_area=0.01, language="es")
+plt.show()
+```
+
+</details>
+
 ### Resonadores laterales y de tubo extendido
 
 Un **resonador de Helmholtz** (área de cuello $S_n$, longitud efectiva $l_e$,
@@ -208,6 +242,64 @@ for fr in (hr.resonances[0], qw.resonances[0]):
 ax.set_xlabel("Frecuencia [Hz]"); ax.set_ylabel("Pérdida de transmisión [dB]")
 ax.set_ylim(0.0, 50.0)
 ax.legend()
+plt.show()
+```
+
+</details>
+
+Las dos ramas son hardware pequeño, y `.plot_geometry()` enseña cuánto: el
+resonador del pico de 120 Hz es una cavidad de 1 L alimentada por un cuello
+de 1 cm² de solo 2 cm de longitud.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/helmholtz_branch_geometry_es.svg" alt="Sección a escala del resonador de Helmholtz en rama lateral: un conducto de 112,8 mm de diámetro equivalente con un cuello estrecho de 11,3 mm y 20 mm de longitud que se abre a una cavidad de 1 litro dibujada como su cubo de igual volumen sobre el conducto, con el diámetro del cuello, la longitud del cuello y el diámetro del conducto acotados" width="88%" />
+
+*Todo el valle de 120 Hz cuelga de una caja de 1 L y un cuello de 2 cm: la
+cavidad se dibuja como su cubo de igual volumen, y la sintonía se mueve como
+`√(Sₙ/(l_e V))`, así que pequeños errores en estas dimensiones desplazan el
+pico de su objetivo.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import helmholtz_resonator
+
+f = np.linspace(20.0, 600.0, 4000)
+hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
+                         neck_length=0.02, cavity_volume=1e-3)
+
+# Una línea: la rama lateral a escala, cavidad como cubo de igual volumen.
+hr.plot_geometry(language="es")
+plt.show()
+```
+
+</details>
+
+El tubo de cuarto de onda no necesita cavidad alguna: el pico de 285 Hz de
+la figura de arriba sale de un simple tubo cerrado de la longitud correcta
+plantado sobre el mismo conducto.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/quarter_wave_geometry_es.svg" alt="Sección a escala de la rama lateral de cuarto de onda: un tubo cerrado de 300 mm de longitud y 50,5 mm de diámetro equivalente plantado sobre un conducto de 112,8 mm de diámetro equivalente, con la longitud del tubo, el diámetro del tubo y el diámetro del conducto acotados" width="88%" />
+
+*Un tubo de cuarto de onda es solo un tubo cerrado de la longitud correcta:
+0,3 m de tubo colocan el pico en `c/4l_e ≈ 285 Hz`, y el área de rama de
+20 cm² solo fija con cuánta fuerza carga el conducto.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import quarter_wave_resonator
+
+f = np.linspace(20.0, 600.0, 4000)
+qw = quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
+
+# Una línea: el tubo cerrado de 0,3 m sobre su conducto, a escala.
+qw.plot_geometry(language="es")
 plt.show()
 ```
 
@@ -280,6 +372,32 @@ for diameter in (0.15, 0.30, 0.60):
 ax.set_xlabel("Frecuencia [Hz]")
 ax.set_ylabel("Pérdida por reflexión del extremo [dB]")
 ax.legend(title="Diámetro del conducto")
+plt.show()
+```
+
+</details>
+
+La fórmula de plenum de Wells toma solo dos entradas de verdad geométricas,
+la línea de visión entrada-salida `r` y el área de salida, más el área de
+pared revestida; `plot_plenum_geometry` dibuja exactamente esas, respetando
+`r` y su ángulo respecto al eje de entrada.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/plenum_geometry_es.svg" alt="Sección de una cámara plenum: el conducto de entrada entra abajo a la izquierda, la boca de salida está marcada en la pared derecha, la línea de visión entrada-salida de 1,2 m se dibuja como una diagonal discontinua a 0,35 rad del eje de entrada, y el área de pared de 6 metros cuadrados y el área de salida de 0,09 metros cuadrados se anotan debajo" width="88%" />
+
+*Solo `r` y su ángulo respecto al eje de entrada fijan la caja dibujada;
+`S_out` y `S_w` entran en el método de Wells como áreas a secas, así que
+cualquier plenum que comparta estos cuatro números tiene la misma atenuación
+predicha.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import plot_plenum_geometry
+
+# Las r, S_out y S_w que la fórmula de Wells usa de verdad, dibujadas exactas.
+plot_plenum_geometry(0.09, 1.2, 6.0, angle=0.35, language="es")
 plt.show()
 ```
 

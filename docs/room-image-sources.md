@@ -140,6 +140,35 @@ plt.show()
 
 </details>
 
+Every dot of the reflectogram is a mirror image at a definite place, and
+`.plot_geometry()` shows where: the plan view below draws the room, the
+source, the receiver and every image up to third order on the mirror-room
+grid, coloured by reflection order.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/image_source_plan_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/image_source_plan.svg" alt="Plan view of the image-source lattice of a 7 by 5 metre room outlined in the centre, with the source as a red star at (2, 1.6), the receiver as a blue triangle at (5.2, 3.4), and the image sources at the plane of the source coloured by reflection order, first order orange, second order green and third order purple, spreading in a regular grid of mirror rooms out to about 26 metres" width="88%"></picture>
+
+*The lattice the reflectogram comes from, to scale: each image sits in a
+mirror room at the height plane of the source, and its distance to the
+receiver alone fixes the arrival time and the `1/(4 pi r)` spreading of that
+reflection.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import room
+
+res = room.image_source_rir((7.0, 5.0, 3.0), (2.0, 1.6, 1.5),
+                            (5.2, 3.4, 1.7), 0.3, fs=16000, max_order=3)
+
+# One line: the image lattice in plan, coloured by reflection order.
+res.plot_geometry()
+plt.show()
+```
+
+</details>
+
 **Reproducing the statistical decay.** The fitted initial decay slope of the
 reverberant energy density of the synthetic RIR recovers the **Eyring**
 reverberation time `T = −24 V ln 10 / (c S ln(1 − ᾱ))` (Kuttruff Equation

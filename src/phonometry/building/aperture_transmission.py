@@ -96,11 +96,20 @@ class ApertureTransmissionResult:
     :ivar frequencies: Band centre frequencies, in hertz.
     :ivar transmission_coefficient: Transmission coefficient ``tau`` per band.
     :ivar kind: ``"slit"`` or ``"circular"``.
+    :ivar width: Slit width, in metres, retained (with ``depth``) so
+        :meth:`plot_geometry` can draw the section; appended after the
+        original fields and ``None`` for circular apertures or hand-built
+        results.
+    :ivar radius: Circular-aperture radius, in metres, or ``None``.
+    :ivar depth: Wall thickness, in metres, or ``None``.
     """
 
     frequencies: np.ndarray
     transmission_coefficient: np.ndarray
     kind: str
+    width: float | None = None
+    radius: float | None = None
+    depth: float | None = None
 
     @property
     def transmission_loss(self) -> np.ndarray:
@@ -118,6 +127,24 @@ class ApertureTransmissionResult:
 
         check_language(language)
         return plot_aperture_transmission(self, ax=ax, language=language, **kwargs)
+
+    def plot_geometry(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
+        """Draw the wall-aperture cross-section to scale.
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+
+        :raises ValueError: If the result does not retain its geometry.
+        """
+        from .._i18n import check_language
+        from .._plot.geometry import plot_aperture_result_geometry
+
+        check_language(language)
+        return plot_aperture_result_geometry(
+            self, ax=ax, language=language, **kwargs
+        )
 
 
 def _slit_end_correction(k_big: np.ndarray) -> np.ndarray:
@@ -181,6 +208,8 @@ def slit_transmission_coefficient(
         frequencies=f,
         transmission_coefficient=np.asarray(tau, dtype=np.float64),
         kind="slit",
+        width=float(width),
+        depth=float(depth),
     )
 
 
@@ -275,6 +304,8 @@ def circular_aperture_transmission_coefficient(
         frequencies=f,
         transmission_coefficient=np.asarray(tau, dtype=np.float64),
         kind="circular",
+        radius=float(radius),
+        depth=float(depth),
     )
 
 

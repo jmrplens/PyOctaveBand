@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="712.8pt" height="381.598125pt" viewBox="0 0 712.8 381.598125" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.1, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 381.598125 
+L 712.8 381.598125 
+L 712.8 0 
+L 0 0 
+z
+"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 74.787097 217.132319 
+L 638.012903 217.132319 
+L 638.012903 198.358125 
+L 74.787097 198.358125 
+z
+" clip-path="url(#p3689a9a83d)" style="fill: url(#h32e9a0c4a8); opacity: 0.5; stroke: #555555; stroke-width: 0.9; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 347.012903 198.358125 
+L 352.645161 198.358125 
+L 352.645161 179.583931 
+L 347.012903 179.583931 
+z
+" clip-path="url(#p3689a9a83d)" style="fill: #9e9e9e; opacity: 0.85; stroke: #555555; stroke-width: 0.9; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="609.851613" y="209.823659" transform="rotate(-0 609.851613 209.823659)">Ground</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="347.012903" y="149.500766" transform="rotate(-0 347.012903 149.500766)">Path difference 0.15 m</text>
+   </g>
+   <g id="text_3">
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="356.4" y="16.318125" transform="rotate(-0 356.4 16.318125)">Barrier section</text>
+   </g>
+   <g id="line2d_1">
+    <path d="M 112.335484 193.664577 
+L 581.690323 191.317802 
+" clip-path="url(#p3689a9a83d)" style="fill: none; stroke-dasharray: 4.07,1.76; stroke-dashoffset: 0; stroke: #9e9e9e; stroke-width: 1.1"/>
+   </g>
+   <g id="line2d_2">
+    <path d="M 112.335484 193.664577 
+L 347.012903 179.583931 
+L 581.690323 191.317802 
+" clip-path="url(#p3689a9a83d)" style="fill: none; stroke: #1f77b4; stroke-width: 1.6; stroke-linecap: square"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 115.343434 245.293609 
+Q 229.67563 245.293609 344.007826 245.293609 
+" style="fill: none; stroke: #555555; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 119.343434 247.293609 
+L 115.343434 245.293609 
+L 119.343434 243.293609 
+" style="fill: none; stroke: #555555; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 340.007826 243.293609 
+L 344.007826 245.293609 
+L 340.007826 247.293609 
+" style="fill: none; stroke: #555555; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 115.343434 273.454899 
+Q 347.013606 273.454899 578.683778 273.454899 
+" style="fill: none; stroke: #555555; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 119.343434 275.454899 
+L 115.343434 273.454899 
+L 119.343434 271.454899 
+" style="fill: none; stroke: #555555; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 574.683778 271.454899 
+L 578.683778 273.454899 
+L 574.683778 275.454899 
+" style="fill: none; stroke: #555555; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 328.23871 195.348886 
+Q 328.23871 188.970636 328.23871 182.592386 
+" style="fill: none; stroke: #555555; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 330.23871 191.348886 
+L 328.23871 195.348886 
+L 326.23871 191.348886 
+" style="fill: none; stroke: #555555; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 326.23871 186.592386 
+L 328.23871 182.592386 
+L 330.23871 186.592386 
+" style="fill: none; stroke: #555555; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="legend_1">
+    <g id="patch_7">
+     <path d="M 614.04875 76.720625 
+L 700 76.720625 
+Q 701.6 76.720625 701.6 75.120625 
+L 701.6 27.918125 
+Q 701.6 26.318125 700 26.318125 
+L 614.04875 26.318125 
+Q 612.44875 26.318125 612.44875 27.918125 
+L 612.44875 75.120625 
+Q 612.44875 76.720625 614.04875 76.720625 
+z
+" style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
+    </g>
+    <g id="line2d_3">
+     <path d="M 615.64875 32.796875 
+L 623.64875 32.796875 
+L 631.64875 32.796875 
+" style="fill: none; stroke-dasharray: 4.07,1.76; stroke-dashoffset: 0; stroke: #9e9e9e; stroke-width: 1.1"/>
+    </g>
+    <g id="text_4">
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="638.04875" y="35.596875" transform="rotate(-0 638.04875 35.596875)">Direct path</text>
+    </g>
+    <g id="line2d_4">
+     <path d="M 615.64875 44.7975 
+L 623.64875 44.7975 
+L 631.64875 44.7975 
+" style="fill: none; stroke: #1f77b4; stroke-width: 1.6; stroke-linecap: square"/>
+    </g>
+    <g id="text_5">
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="638.04875" y="47.5975" transform="rotate(-0 638.04875 47.5975)">Diffracted path</text>
+    </g>
+    <g id="line2d_5">
+     <defs>
+      <path id="m3089753afe" d="M 0 -6.5 
+L -1.459341 -2.00861 
+L -6.181867 -2.00861 
+L -2.361263 0.767221 
+L -3.820604 5.25861 
+L -0 2.482779 
+L 3.820604 5.25861 
+L 2.361263 0.767221 
+L 6.181867 -2.00861 
+L 1.459341 -2.00861 
+z
+" style="stroke: #d62728; stroke-linejoin: bevel"/>
+     </defs>
+     <g>
+      <use xlink:href="#m3089753afe" x="623.64875" y="56.798125" style="fill: #d62728; stroke: #d62728; stroke-linejoin: bevel"/>
+     </g>
+    </g>
+    <g id="text_6">
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="638.04875" y="59.598125" transform="rotate(-0 638.04875 59.598125)">Source</text>
+    </g>
+    <g id="line2d_6">
+     <defs>
+      <path id="m41d12e1f01" d="M 0 -4 
+L -4 4 
+L 4 4 
+z
+" style="stroke: #1f77b4; stroke-linejoin: miter"/>
+     </defs>
+     <g>
+      <use xlink:href="#m41d12e1f01" x="623.64875" y="68.79875" style="fill: #1f77b4; stroke: #1f77b4; stroke-linejoin: miter"/>
+     </g>
+    </g>
+    <g id="text_7">
+     <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="638.04875" y="71.59875" transform="rotate(-0 638.04875 71.59875)">Receiver</text>
+    </g>
+   </g>
+   <g id="line2d_7">
+    <g clip-path="url(#p3689a9a83d)">
+     <use xlink:href="#m3089753afe" x="112.335484" y="193.664577" style="fill: #d62728; stroke: #d62728; stroke-linejoin: bevel"/>
+    </g>
+   </g>
+   <g id="line2d_8">
+    <g clip-path="url(#p3689a9a83d)">
+     <use xlink:href="#m41d12e1f01" x="581.690323" y="191.317802" style="fill: #1f77b4; stroke: #1f77b4; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="229.674194" y="238.371734" transform="rotate(-0 229.674194 238.371734)">50 m</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="347.012903" y="266.533024" transform="rotate(-0 347.012903 266.533024)">100 m</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="321.316835" y="188.971028" transform="rotate(-90 321.316835 188.971028)">4 m</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p3689a9a83d">
+   <rect x="7.2" y="22.318125" width="698.4" height="352.08"/>
+  </clipPath>
+ </defs>
+ <defs>
+  <pattern id="h32e9a0c4a8" patternUnits="userSpaceOnUse" x="0" y="0" width="72" height="72">
+   <rect x="0" y="0" width="73" height="73" fill="#9e9e9e"/>
+   <path d="M -36 36 
+L 36 -36 
+M -30 42 
+L 42 -30 
+M -24 48 
+L 48 -24 
+M -18 54 
+L 54 -18 
+M -12 60 
+L 60 -12 
+M -6 66 
+L 66 -6 
+M 0 72 
+L 72 0 
+M 6 78 
+L 78 6 
+M 12 84 
+L 84 12 
+M 18 90 
+L 90 18 
+M 24 96 
+L 96 24 
+M 30 102 
+L 102 30 
+M 36 108 
+L 108 36 
+" style="fill: #555555; stroke: #555555; stroke-width: 1.0; stroke-linecap: butt; stroke-linejoin: miter; stroke-opacity: 0.5"/>
+  </pattern>
+ </defs>
+</svg>

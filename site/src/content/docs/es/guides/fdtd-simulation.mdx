@@ -157,6 +157,40 @@ print(round(float(echo[np.abs(echo).argmax()] / incident), 2))  # 0.5
 # (Z - rho c)/(Z + rho c) = (3 - 1)/(3 + 1) = +0.5
 ```
 
+Antes de gastar un solo paso de tiempo, `sim.plot_geometry()` dibuja el
+dominio configurado: bordes, esponjas, obstáculos, fuentes y las sondas que
+piensas registrar. Pillar una esponja en el lado equivocado o una sonda mal
+colocada cuesta segundos aquí y una simulación entera después.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fdtd_domain_geometry_es.svg" alt="Dibujo de configuración de un dominio FDTD de 4,5 por 3 metros antes de cualquier paso de tiempo: capas de esponja azul pálido a lo largo de los bordes izquierdo y derecho, un borde de impedancia naranja a lo largo del borde superior, un obstáculo rectangular gris justo a la izquierda del centro, la estrella de la fuente en (0.5, 1.5) y dos círculos de sonda en (3, 1.5) y (4, 2), con una leyenda que nombra la capa de esponja, el borde de impedancia, el borde rígido, la fuente y la sonda" width="88%" />
+
+*Todo lo que la simulación verá, antes de correrla: las capas de esponja se
+comen los contornos izquierdo y derecho, el borde superior lleva la
+impedancia anecoica `ρc`, el fondo sin tratar queda rígido, y las dos sondas
+quedan libres del obstáculo y de las esponjas.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import simulation
+
+mask = np.zeros((60, 90), dtype=bool)
+mask[25:35, 40:44] = True
+sim = simulation.FDTD2D(343.0, 0.05, shape=(60, 90), sponge_width=8,
+                        sponge_sides=("left", "right"),
+                        edge_impedance={"top": 413.0}, obstacle_mask=mask)
+sim.add_source(simulation.GaussianPulse(10, 30, width=1e-3))
+
+# Comprueba el dominio antes de correrlo: aún no se ha dado ningún paso.
+sim.plot_geometry(probes=[(3.0, 1.5), (4.0, 2.0)], language="es")
+plt.show()
+```
+
+</details>
+
 ## 3. Cuándo usarlo, y los límites del 2D
 
 FDTD amortiza su coste cuando la **geometría gobierna la física**: difracción

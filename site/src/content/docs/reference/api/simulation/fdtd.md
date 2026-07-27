@@ -140,6 +140,35 @@ FDTD2D.energy() -> float
 
 Total acoustic field energy [J per metre of depth].
 
+### FDTD2D.plot_geometry()
+
+```python
+FDTD2D.plot_geometry(
+    ax: Axes | None = None,
+    *,
+    probes: ArrayLike | None = None,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the configured domain before running it.
+
+Domain extent, obstacles, sponge layers, impedance and rigid edges
+and the added sources, with optional probe positions previewed; no
+time stepping happens. Requires matplotlib
+(`pip install phonometry[plot]`); returns the
+`Axes`.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `probes` | Optional probe positions `(x, y)` in metres, shape `(N, 2)` (the [`fdtd_simulation`](/phonometry/reference/api/simulation/fdtd/#fdtd_simulation) convention). |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the obstacle `imshow`. |
+
 ### FDTD2D.run()
 
 ```python

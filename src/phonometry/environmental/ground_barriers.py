@@ -518,6 +518,16 @@ class BarrierInsertionLoss:
         geometry; the double-edge ``N`` for a thick barrier).
     :ivar method: Diffraction model used (``"kurze_anderson"`` or ``"exact"``).
     :ivar ground: Whether the coherent four-path ground model was applied.
+    :ivar source_height: Source height the loss was computed for, in metres,
+        retained (with the other five geometry fields) so
+        :meth:`plot_geometry` can draw the section; appended after the
+        original fields and ``None`` for hand-built results.
+    :ivar barrier_distance: Source-to-barrier horizontal distance, in metres.
+    :ivar barrier_height: Barrier height, in metres.
+    :ivar receiver_distance: Source-to-receiver horizontal distance, in
+        metres.
+    :ivar receiver_height: Receiver height, in metres.
+    :ivar thickness: Thick-barrier top width, in metres, or ``None``.
     """
 
     frequencies: Real
@@ -525,6 +535,12 @@ class BarrierInsertionLoss:
     fresnel_number: Real
     method: str
     ground: bool
+    source_height: float | None = None
+    barrier_distance: float | None = None
+    barrier_height: float | None = None
+    receiver_distance: float | None = None
+    receiver_height: float | None = None
+    thickness: float | None = None
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the insertion loss versus frequency.
@@ -537,6 +553,24 @@ class BarrierInsertionLoss:
 
         return plot_barrier_insertion_loss(self, ax=ax, language=check_language(language), **kwargs)
 
+
+    def plot_geometry(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
+        """Draw the source-barrier-receiver section to scale.
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+
+        :raises ValueError: If the result does not retain its geometry.
+        """
+        from .._i18n import check_language
+        from .._plot.geometry import plot_barrier_result_geometry
+
+        check_language(language)
+        return plot_barrier_result_geometry(
+            self, ax=ax, language=language, **kwargs
+        )
     def report(
         self,
         path: str,
@@ -745,6 +779,12 @@ def barrier_insertion_loss(
         fresnel_number=n,
         method=method,
         ground=has_ground,
+        source_height=float(source_height),
+        barrier_distance=float(barrier_distance),
+        barrier_height=float(barrier_height),
+        receiver_distance=float(receiver_distance),
+        receiver_height=float(receiver_height),
+        thickness=float(thickness) if thickness is not None else None,
     )
 
 
