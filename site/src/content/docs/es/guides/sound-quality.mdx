@@ -36,6 +36,15 @@ ECMA-418-2 del modelo de Sottek. La sonoridad, incluida la de ECMA-418-2 que
 comparte el mismo front-end auditivo, está en
 [Sonoridad](/phonometry/es/guides/loudness/).
 
+Las cuatro métricas forman una familia: una única señal calibrada se reparte
+entre dos etapas auditivas, y cada rama se ancla a un sonido de referencia
+cuyo objetivo normativo es exactamente 1. El diagrama traza la familia con
+los valores que la librería calcula realmente para cada referencia
+(resultados redondeados como 0,9999 asper y 0,9957 vacil_HMS frente a ese
+objetivo de 1).
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sound_quality_es.svg" alt="Diagrama de bloques de la familia de métricas de calidad sonora: una señal calibrada en pascales alimenta dos etapas auditivas, el patrón de sonoridad específica de Zwicker sobre 24 Bark y el modelo de Sottek de ECMA-418-2 con 53 bandas auditivas; la primera lleva al sharpness de DIN 45692, cuya referencia de ruido de una banda crítica a 1 kHz y 60 dB vale 1,00 acum, y la segunda a la tonalidad, la aspereza y la intensidad de fluctuación, cuyas referencias, un tono de 1 kHz a 40 dB y portadoras de 1 kHz totalmente moduladas en amplitud a 70 Hz y a 4 Hz a 60 dB, valen 1,000 tu_HMS, 0,9999 asper y 0,9957 vacil_HMS; una nota final indica que N5, sharpness, aspereza y fluctuación alimentan la molestia psicoacústica de Fastl y Zwicker" width="92%" />
+
 ## Sharpness en acum (DIN 45692)
 
 Dos sonidos pueden ser igual de sonoros y aun así uno se percibe más

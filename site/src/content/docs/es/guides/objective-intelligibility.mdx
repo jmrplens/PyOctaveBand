@@ -81,6 +81,12 @@ print(round(d.value, 3))               # un escalar en torno a [0, 1]
 print(stoi(clean, clean, fs).value)    # 1.0  (una señal contra sí misma)
 ```
 
+Todo hasta los segmentos de 384 ms es común; las dos medidas solo se separan
+en la correlación. El diagrama despliega la cadena con los números del
+ejemplo del enmascarador plano.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_objective_intelligibility_es.svg" alt="Diagrama de bloques de la cadena de procesado de STOI y ESTOI: una referencia limpia y una versión degradada, en el ejemplo de la guía material tipo habla en un enmascarador plano a 0 dB de relación señal-ruido, se remuestrean a 10 kilohercios descartando las tramas silenciosas, pasan por una DFT de corto plazo de tramas Hann de 256 muestras con 50 por ciento de solape agrupada en 15 bandas de tercio de octava desde 150 hercios, y se comparan en segmentos de 384 milisegundos; la cadena se divide después en la correlación de envolventes con recorte de STOI y la correlación espectral normalizada por filas y columnas de ESTOI, y el ejemplo da STOI igual a 0,727, con la banda más baja conservando 0,27 de la correlación y las bandas por encima de 1,9 kilohercios llegando a 0,90" width="92%" />
+
 ## 2. STOI: correlación de envolventes con recorte
 
 Para cada banda y segmento STOI normaliza la envolvente degradada respecto a la

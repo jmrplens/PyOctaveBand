@@ -1349,6 +1349,228 @@ _ES: dict[str, str] = {
         "un deslizamiento en frecuencia puede esconderse de la media "
         "cuadrática: prueba statistic=\"mean\" o copias filtradas por "
         "bandas",
+    # Sound-quality metric family (DIN 45692 + ECMA-418-2)
+    "Sound quality beyond loudness: four calibrated sensations":
+        "Calidad sonora más allá de la sonoridad: cuatro sensaciones",
+    "Calibrated signal x(t) in pascals":
+        "Señal calibrada x(t) en pascales",
+    "any sample rate: each metric resamples to 48 kHz internally":
+        "cualquier fs: cada métrica remuestrea internamente a 48 kHz",
+    "Specific loudness N'(z)": "Sonoridad específica N'(z)",
+    "Zwicker pattern over 24 Bark": "patrón de Zwicker sobre 24 Bark",
+    "Sottek Hearing Model front end (ECMA-418-2)":
+        "Etapa de entrada del modelo de Sottek (ECMA-418-2)",
+    "outer/middle-ear filter + 53 auditory bands (Bark_HMS)":
+        "filtro de oído externo/medio + 53 bandas auditivas (Bark_HMS)",
+    "Sharpness S": "Sharpness S",
+    "g(z)-weighted first moment": "primer momento ponderado",
+    "of N'(z), with k = 0.108": "por g(z) de N'(z), k = 0,108",
+    "critical-band-wide noise": "ruido de una banda crítica",
+    "at 1 kHz, 60 dB": "a 1 kHz, 60 dB",
+    "→ S = 1.00 acum": "→ S = 1,00 acum",
+    "Tonality T": "Tonalidad T",
+    "ECMA-418-2 clause 6": "ECMA-418-2, cláusula 6",
+    "band autocorrelation finds": "la autocorrelación por banda",
+    "periodic components": "detecta componentes periódicas",
+    "1 kHz tone at 40 dB": "tono de 1 kHz a 40 dB",
+    "→ T = 1.000 tu_HMS (999 Hz)": "→ T = 1,000 tu_HMS (999 Hz)",
+    "Roughness R": "Aspereza R",
+    "ECMA-418-2 clause 7": "ECMA-418-2, cláusula 7",
+    "fast envelope modulation,": "modulación rápida de la envolvente,",
+    "band-pass peaking near 70 Hz": "paso banda con pico hacia 70 Hz",
+    "1 kHz, 100 % AM at 70 Hz, 60 dB": "1 kHz, AM 100 % a 70 Hz, 60 dB",
+    "→ R = 0.9999 asper": "→ R = 0,9999 asper",
+    "Fluctuation strength F": "Intensidad de fluctuación F",
+    "ECMA-418-2 clause 9 (HSA)": "ECMA-418-2, cláusula 9 (HSA)",
+    "slow envelope modulation,": "modulación lenta de la envolvente,",
+    "band-pass peaking near 4 Hz": "paso banda con pico hacia 4 Hz",
+    "1 kHz, 100 % AM at 4 Hz, 60 dB": "1 kHz, AM 100 % a 4 Hz, 60 dB",
+    "→ F = 0.9957 vacil_HMS": "→ F = 0,9957 vacil_HMS",
+    "Downstream, the sensations combine into annoyance":
+        "Aguas abajo, las sensaciones se combinan en molestia",
+    "N5, S, R and F feed the Fastl and Zwicker psychoacoustic annoyance PA = N5·(1 + √(wS² + wFR²))":
+        "N5, S, R y F alimentan la molestia psicoacústica de Fastl y "
+        "Zwicker PA = N5·(1 + √(wS² + wFR²))",
+    # Tone audibility (ISO/PAS 20065)
+    "Tone audibility: from spectrum to penalty (ISO/PAS 20065)":
+        "Audibilidad tonal: del espectro al ajuste (ISO/PAS 20065)",
+    "Narrow-band FFT spectrum — line spacing Δf = 2.7 Hz":
+        "Espectro FFT de banda estrecha — resolución Δf = 2,7 Hz",
+    "Annex E engine spectrum; peak detected at fT = 137.3 Hz (not on a slope)":
+        "espectro del motor del Anexo E; pico detectado en fT = 137,3 Hz "
+        "(no en una ladera)",
+    "Critical band about the tone — Δfc = 101.36 Hz":
+        "Banda crítica en torno al tono — Δfc = 101,36 Hz",
+    "geometric placement: corners 95.67 and 197.04 Hz, √(f1·f2) = fT":
+        "colocación geométrica: esquinas en 95,67 y 197,04 Hz, "
+        "√(f1·f2) = fT",
+    "Levels from the spectrum lines in the band":
+        "Niveles desde las líneas del espectro en la banda",
+    "masking noise LS = 49.22 dB (iterative mean); tone LT = 67.96 dB (energy sum)":
+        "ruido enmascarante LS = 49,22 dB (media iterativa); tono "
+        "LT = 67,96 dB (suma energética)",
+    "Masking threshold seen by the ear":
+        "Umbral de enmascaramiento visto por el oído",
+    "LG = LS + 10·lg(Δfc/Δf) = 64.97 dB;  masking index av = −2.02 dB":
+        "LG = LS + 10·lg(Δfc/Δf) = 64,97 dB;  índice de enmascaramiento "
+        "av = −2,02 dB",
+    "Audibility ΔL = LT − LG − av = 5.01 dB":
+        "Audibilidad ΔL = LT − LG − av = 5,01 dB",
+    "the largest ΔL of the nine tones: the decisive audibility of this spectrum":
+        "el mayor ΔL de los nueve tonos: la audibilidad decisiva de este "
+        "espectro",
+    "From audibility to penalty (ISO 1996-2:2017 Annex J)":
+        "De la audibilidad al ajuste (ISO 1996-2:2017, Anexo J)",
+    "energy mean of the five spectra ΔL = 6.98 dB → tonal adjustment Kt = 4 dB (Table J.1)":
+        "media energética de los cinco espectros ΔL = 6,98 dB → ajuste "
+        "tonal Kt = 4 dB (Tabla J.1)",
+    # Psychoacoustic annoyance (Fastl & Zwicker)
+    "Psychoacoustic annoyance: four sensations, one scalar":
+        "Molestia psicoacústica: cuatro sensaciones, un escalar",
+    "S = 2.0 acum": "S = 2,0 acum",
+    "sharpness (DIN 45692)": "sharpness (DIN 45692)",
+    "counts only above 1.75 acum": "solo cuenta sobre 1,75 acum",
+    "N5 = 30 sone": "N5 = 30 sone",
+    "percentile loudness (ISO 532-1)": "sonoridad percentil (ISO 532-1)",
+    "exceeded 5 % of the time": "superada el 5 % del tiempo",
+    "F = 0.5 vacil": "F = 0,5 vacil",
+    "fluctuation strength": "intensidad de fluctuación",
+    "slow modulation, ≈ 4 Hz": "modulación lenta, ≈ 4 Hz",
+    "R = 0.3 asper": "R = 0,3 asper",
+    "roughness": "aspereza",
+    "fast modulation, ≈ 70 Hz": "modulación rápida, ≈ 70 Hz",
+    "Sharpness weighting wS = 0.1001":
+        "Ponderación del sharpness wS = 0,1001",
+    "wS = (S − 1.75) · 0.25 · lg(N5 + 10)":
+        "wS = (S − 1,75) · 0,25 · lg(N5 + 10)",
+    "zero for S ≤ 1.75 acum": "cero para S ≤ 1,75 acum",
+    "Roughness and fluctuation wFR = 0.2125":
+        "Aspereza y fluctuación wFR = 0,2125",
+    "wFR = 2.18 / N5^0.4 · (0.4·F + 0.6·R)":
+        "wFR = 2,18 / N5^0,4 · (0,4·F + 0,6·R)",
+    "roughness weighs more: 0.6 against 0.4":
+        "la aspereza pesa más: 0,6 frente a 0,4",
+    "PA = N5 · (1 + √(wS² + wFR²)) = 37.05":
+        "PA = N5 · (1 + √(wS² + wFR²)) = 37,05",
+    "Fastl and Zwicker Eq. 16.2 (origin Widmann 1992)":
+        "Fastl y Zwicker, Ec. 16.2 (origen Widmann 1992)",
+    "a neutral sound (S ≤ 1.75 acum, F = R = 0) sits on the baseline PA = N5":
+        "un sonido neutro (S ≤ 1,75 acum, F = R = 0) queda en la línea "
+        "base PA = N5",
+    "sharpness, roughness and fluctuation only ever lift the annoyance above the loudness":
+        "el sharpness, la aspereza y la fluctuación solo elevan la "
+        "molestia por encima de la sonoridad",
+    # Objective intelligibility (STOI / ESTOI)
+    "STOI and ESTOI: correlating clean against degraded speech":
+        "STOI y ESTOI: correlación entre habla limpia y degradada",
+    "Clean reference x(t) and degraded version y(t)":
+        "Referencia limpia x(t) y versión degradada y(t)",
+    "the guide's example: speech-like material in a flat masker at 0 dB SNR":
+        "el ejemplo de la guía: material tipo habla en un enmascarador "
+        "plano a 0 dB de SNR",
+    "Resample to 10 kHz and drop the silent frames":
+        "Remuestreo a 10 kHz y descarte de tramas silenciosas",
+    "frames 40 dB below the loudest clean frame carry no intelligibility":
+        "las tramas 40 dB bajo la trama limpia más alta no aportan "
+        "inteligibilidad",
+    "Short-time DFT: 256-sample Hann frames, 50 % overlap":
+        "DFT de corto plazo: tramas Hann de 256 muestras, 50 % de solape",
+    "magnitudes grouped into 15 one-third-octave bands from 150 Hz":
+        "magnitudes agrupadas en 15 bandas de tercio de octava desde "
+        "150 Hz",
+    "384 ms segments — 30 frames, the unit of comparison":
+        "Segmentos de 384 ms — 30 tramas, la unidad de comparación",
+    "long enough to hold the slow modulations that carry speech":
+        "lo bastante largos para las modulaciones lentas que llevan el "
+        "habla",
+    "STOI: envelope correlation": "STOI: correlación de envolventes",
+    "per band and segment; normalise,": "por banda y segmento; normaliza,",
+    "clip at −15 dB, then average": "recorta en −15 dB y promedia",
+    "ESTOI: spectral correlation": "ESTOI: correlación espectral",
+    "row- and column-normalised segments;":
+        "segmentos normalizados por filas y columnas;",
+    "credits glimpses in modulated maskers":
+        "acredita los atisbos en enmascaradores modulados",
+    "STOI = 0.727 for the example": "STOI = 0,727 para el ejemplo",
+    "the lowest band keeps 0.27 of the correlation; above 1.9 kHz it reaches 0.90":
+        "la banda más baja conserva 0,27 de la correlación; sobre "
+        "1,9 kHz llega a 0,90",
+    # Programme loudness (ITU-R BS.1770 / EBU R 128)
+    "Programme loudness: the BS.1770 / R 128 metering chain":
+        "Sonoridad de programa: la cadena de medición BS.1770 / R 128",
+    "Programme x — channel weights Gi: 1.0 front, 1.41 surround":
+        "Programa x — pesos de canal Gi: 1,0 frontales, 1,41 envolventes",
+    "anchor: a 0 dB FS 997 Hz sine on one front channel reads −3.01 LKFS":
+        "ancla: un seno de 997 Hz a 0 dB FS en un canal frontal marca "
+        "−3,01 LKFS",
+    "K-weighting: +4 dB spherical-head shelf + RLB high-pass":
+        "Ponderación K: estante de +4 dB (cabeza esférica) + paso alto RLB",
+    "LK = −0.691 + 10·lg Σ Gi·zi;  LKFS ≡ LUFS, 1 LU = 1 dB":
+        "LK = −0,691 + 10·lg Σ Gi·zi;  LKFS ≡ LUFS, 1 LU = 1 dB",
+    "Mean square in 400 ms blocks, 75 % overlap":
+        "Media cuadrática en bloques de 400 ms, 75 % de solape",
+    "absolute gate: blocks below −70 LUFS are dropped":
+        "puerta absoluta: se descartan los bloques bajo −70 LUFS",
+    "Relative gate: −10 LU below the survivors":
+        "Puerta relativa: −10 LU bajo los supervivientes",
+    "example: 10 s at −23 dBFS + 30 s of quiet → threshold −39.0 LUFS":
+        "ejemplo: 10 s a −23 dBFS + 30 s de silencio → umbral −39,0 LUFS",
+    "Integrated loudness I = −23.1 LUFS: the tail is gated out":
+        "Sonoridad integrada I = −23,1 LUFS: la cola queda fuera",
+    "EBU R 128 target −23.0 LUFS; tolerance ±0.2 LU in QC, ±1.0 LU live":
+        "objetivo EBU R 128 −23,0 LUFS; tolerancia ±0,2 LU en QC, "
+        "±1,0 LU en directo",
+    "Loudness range LRA = P95 − P10": "Rango de sonoridad LRA = P95 − P10",
+    "short-term 3 s windows, deeper −20 LU gate":
+        "ventanas de corto plazo de 3 s, puerta más honda de −20 LU",
+    "10.0 LU on the Tech 3342 two-step case":
+        "10,0 LU en el caso de dos escalones de Tech 3342",
+    "True peak: 4× oversampling, in dBTP":
+        "Pico verdadero: sobremuestreo 4×, en dBTP",
+    "the fs/4 tone: sample peak −3.01 dB, true peak +0.12 dBTP":
+        "el tono a fs/4: pico muestral −3,01 dB, pico verdadero "
+        "+0,12 dBTP",
+    "R 128 production ceiling −1 dBTP":
+        "techo de producción de R 128: −1 dBTP",
+    "K-weighted": "ponderada K",
+    "raw signal": "señal sin filtrar",
+    "the gates keep quiet passages from dragging the foreground down":
+        "las puertas evitan que los pasajes silenciosos arrastren el "
+        "primer plano",
+    "ungated, the same 40 s example would read near −29 LUFS":
+        "sin puertas, el mismo ejemplo de 40 s marcaría cerca de −29 LUFS",
+    # Reverberation-time prediction (Sabine / Eyring)
+    "Predicting the reverberation time: Sabine against Eyring":
+        "Predicción del tiempo de reverberación: Sabine frente a Eyring",
+    "Room 10 × 7 × 3.5 m — V = 245 m³, S = 259 m²":
+        "Sala de 10 × 7 × 3,5 m — V = 245 m³, S = 259 m²",
+    "hard end walls, lightly treated side walls, carpet and acoustic ceiling":
+        "testeros duros, laterales con tratamiento ligero, moqueta y "
+        "techo acústico",
+    "mean absorption ᾱ runs from 0.21 at 125 Hz to 0.51 at 4 kHz":
+        "la absorción media ᾱ va de 0,21 a 125 Hz a 0,51 a 4 kHz",
+    "T = 0.161·V / (Σ Si·αi + 4mV)": "T = 0,161·V / (Σ Si·αi + 4mV)",
+    "low, even absorption (ᾱ up to ≈ 0.2);":
+        "absorción baja y uniforme (ᾱ hasta ≈ 0,2);",
+    "stays finite even at α = 1": "queda finita incluso con α = 1",
+    "T = 0.161·V / (−S·ln(1 − ᾱ) + 4mV)":
+        "T = 0,161·V / (−S·ln(1 − ᾱ) + 4mV)",
+    "strong, even absorption;": "absorción fuerte y uniforme;",
+    "reaches T = 0 at total absorption":
+        "llega a T = 0 con absorción total",
+    "Predicted T60 per octave band": "T60 predicho por banda de octava",
+    "0.74": "0,74", "0.47": "0,47", "0.37": "0,37", "0.31": "0,31",
+    "0.30": "0,30", "0.66": "0,66", "0.39": "0,39", "0.29": "0,29",
+    "0.23": "0,23", "0.21": "0,21", "0.22": "0,22",
+    "Eyring runs 11 to 29 % shorter here: ᾱ is past Sabine's comfort zone":
+        "Eyring sale entre un 11 y un 29 % más corto: ᾱ excede la zona "
+        "cómoda de Sabine",
+    "Domain of validity: a diffuse field that stays diffuse while it decays":
+        "Dominio de validez: un campo difuso que sigue difuso mientras "
+        "decae",
+    "below the Schroeder frequency, in coupled volumes and in corridor-like rooms no single T60 exists":
+        "bajo la frecuencia de Schroeder, en volúmenes acoplados y en "
+        "salas tipo pasillo no existe un T60 único",
 }
 
 
@@ -6009,6 +6231,361 @@ def _d_data_qualification(s: SVG, th: Theme) -> None:
            "statistic=\"mean\" or band-filtered copies too", 13, th.muted)
 
 
+# ---------------------------------------------------------------------------
+# Sound-quality metric family (DIN 45692 + ECMA-418-2)
+# ---------------------------------------------------------------------------
+
+def _d_sound_quality(s: SVG, th: Theme) -> None:
+    """One calibrated signal into the two auditory front ends and the four
+    sound-quality metrics of the guide, each with its reference sound and
+    the value the library returns for it (1.00 acum, 1.000 tu_HMS,
+    0.9999 asper, 0.9957 vacil_HMS)."""
+    # Input signal
+    s.rect(230, 52, 440, 56, th.panel, th.fg, rx=10, sw=2)
+    s.text(450, 76, "Calibrated signal x(t) in pascals", 16, th.fg, bold=True)
+    s.text(450, 97, "any sample rate: each metric resamples to 48 kHz "
+           "internally", 12, th.muted)
+
+    # Two auditory front ends
+    s.rect(60, 148, 270, 56, th.panel, th.primary, rx=10, sw=2)
+    s.text(195, 172, "Specific loudness N'(z)", 15, th.fg, bold=True)
+    s.text(195, 192, "Zwicker pattern over 24 Bark", 12, th.muted)
+    s.rect(390, 148, 450, 56, th.panel, th.primary, rx=10, sw=2)
+    s.text(615, 172, "Sottek Hearing Model front end (ECMA-418-2)", 15,
+           th.fg, bold=True)
+    s.text(615, 192, "outer/middle-ear filter + 53 auditory bands "
+           "(Bark_HMS)", 12, th.muted)
+    s.arrow(350, 108, 210, 144, th.fg, 1.8)
+    s.arrow(550, 108, 605, 144, th.fg, 1.8)
+
+    # The four metric boxes
+    metrics = (
+        (42.0, "Sharpness S", "DIN 45692",
+         "g(z)-weighted first moment", "of N'(z), with k = 0.108",
+         ("critical-band-wide noise", "at 1 kHz, 60 dB"),
+         "→ S = 1.00 acum"),
+        (262.0, "Tonality T", "ECMA-418-2 clause 6",
+         "band autocorrelation finds", "periodic components",
+         ("1 kHz tone at 40 dB",), "→ T = 1.000 tu_HMS (999 Hz)"),
+        (482.0, "Roughness R", "ECMA-418-2 clause 7",
+         "fast envelope modulation,", "band-pass peaking near 70 Hz",
+         ("1 kHz, 100 % AM at 70 Hz, 60 dB",), "→ R = 0.9999 asper"),
+        (702.0, "Fluctuation strength F", "ECMA-418-2 clause 9 (HSA)",
+         "slow envelope modulation,", "band-pass peaking near 4 Hz",
+         ("1 kHz, 100 % AM at 4 Hz, 60 dB",), "→ F = 0.9957 vacil_HMS"),
+    )
+    for x0, name, std, m1, m2, refs, val in metrics:
+        cx = x0 + 98.0
+        s.rect(x0, 248, 196, 128, th.panel, th.secondary, rx=10, sw=2)
+        s.text(cx, 271, name, 13, th.fg, bold=True)
+        s.text(cx, 289, std, 11, th.muted)
+        s.text(cx, 308, m1, 11, th.muted)
+        if len(refs) == 1:
+            s.text(cx, 324, m2, 11, th.muted)
+            s.text(cx, 345, refs[0], 11, th.fg)
+        else:
+            s.text(cx, 322, m2, 11, th.muted)
+            s.text(cx, 337, refs[0], 11, th.fg)
+            s.text(cx, 351, refs[1], 11, th.fg)
+        s.text(cx, 363, val, 12, th.secondary, bold=True)
+    s.arrow(195, 204, 141, 244, th.fg, 1.8)
+    for xt in (360.0, 580.0, 800.0):
+        s.arrow(615, 204, xt, 244, th.fg, 1.8)
+
+    # Downstream combination note
+    s.rect(130, 412, 640, 68, "none", th.accent, rx=10, sw=1.6, dash="6,5")
+    s.text(450, 439, "Downstream, the sensations combine into annoyance",
+           15, th.accent, bold=True)
+    s.text(450, 463, "N5, S, R and F feed the Fastl and Zwicker "
+           "psychoacoustic annoyance PA = N5·(1 + √(wS² + wFR²))", 12,
+           th.fg)
+
+
+# ---------------------------------------------------------------------------
+# Tone audibility (ISO/PAS 20065 -> ISO 1996-2 Annex J)
+# ---------------------------------------------------------------------------
+
+def _d_tone_audibility(s: SVG, th: Theme) -> None:
+    """The engineering-method chain on the Annex E combustion-engine
+    spectrum: critical band, LS/LT, masking threshold and the 5.01 dB
+    decisive audibility, closing on the Kt = 4 dB tonal adjustment."""
+    cx, bw = 450.0, 620.0
+    x0 = cx - bw / 2
+
+    def step(y: float, l1: str, l2: str, color: str) -> None:
+        s.rect(x0, y, bw, 58, th.panel, color, rx=10, sw=2)
+        s.text(cx, y + 25, l1, 16, th.fg, bold=True)
+        s.text(cx, y + 45, l2, 12, th.muted)
+
+    step(52, "Narrow-band FFT spectrum — line spacing Δf = 2.7 Hz",
+         "Annex E engine spectrum; peak detected at fT = 137.3 Hz (not on "
+         "a slope)", th.fg)
+    step(138, "Critical band about the tone — Δfc = 101.36 Hz",
+         "geometric placement: corners 95.67 and 197.04 Hz, √(f1·f2) = fT",
+         th.primary)
+    step(224, "Levels from the spectrum lines in the band",
+         "masking noise LS = 49.22 dB (iterative mean); tone LT = 67.96 dB "
+         "(energy sum)", th.primary)
+    step(310, "Masking threshold seen by the ear",
+         "LG = LS + 10·lg(Δfc/Δf) = 64.97 dB;  masking index av = −2.02 dB",
+         th.primary)
+    s.rect(x0, 396, bw, 60, "none", th.accent, rx=10, sw=2.4)
+    s.text(cx, 421, "Audibility ΔL = LT − LG − av = 5.01 dB", 17, th.fg,
+           bold=True)
+    s.text(cx, 443, "the largest ΔL of the nine tones: the decisive "
+           "audibility of this spectrum", 12, th.muted)
+    for y0, y1 in ((110, 134), (196, 220), (282, 306), (368, 392),
+                   (456, 484)):
+        s.arrow(cx, y0, cx, y1, th.fg, 1.8)
+
+    s.rect(130, 488, 640, 68, "none", th.secondary, rx=10, sw=1.6,
+           dash="6,5")
+    s.text(cx, 515, "From audibility to penalty (ISO 1996-2:2017 Annex J)",
+           15, th.secondary, bold=True)
+    s.text(cx, 539, "energy mean of the five spectra ΔL = 6.98 dB → tonal "
+           "adjustment Kt = 4 dB (Table J.1)", 13, th.fg)
+
+
+# ---------------------------------------------------------------------------
+# Psychoacoustic annoyance (Fastl & Zwicker Eqs 16.2-16.4)
+# ---------------------------------------------------------------------------
+
+def _d_psychoacoustic_annoyance(s: SVG, th: Theme) -> None:
+    """The four sensations of the guide's worked example (N5 = 30 sone,
+    S = 2.0 acum, F = 0.5 vacil, R = 0.3 asper) through the two weightings
+    (wS = 0.1001, wFR = 0.2125) into PA = 37.05."""
+    inputs = (
+        (42.0, "S = 2.0 acum", "sharpness (DIN 45692)",
+         "counts only above 1.75 acum"),
+        (262.0, "N5 = 30 sone", "percentile loudness (ISO 532-1)",
+         "exceeded 5 % of the time"),
+        (482.0, "F = 0.5 vacil", "fluctuation strength",
+         "slow modulation, ≈ 4 Hz"),
+        (702.0, "R = 0.3 asper", "roughness", "fast modulation, ≈ 70 Hz"),
+    )
+    for x0, name, s1, s2 in inputs:
+        cx = x0 + 98.0
+        s.rect(x0, 60, 196, 72, th.panel, th.primary, rx=10, sw=2)
+        s.text(cx, 84, name, 14, th.fg, bold=True)
+        s.text(cx, 103, s1, 11, th.muted)
+        s.text(cx, 120, s2, 11, th.muted)
+
+    # Weighting boxes: wS takes S and N5; wFR takes N5, F and R.
+    s.rect(90, 204, 340, 86, th.panel, th.fg, rx=10, sw=2)
+    s.text(260, 230, "Sharpness weighting wS = 0.1001", 15, th.fg,
+           bold=True)
+    s.text(260, 252, "wS = (S − 1.75) · 0.25 · lg(N5 + 10)", 13,
+           th.primary, mono=True)
+    s.text(260, 274, "zero for S ≤ 1.75 acum", 12, th.muted)
+    s.rect(470, 204, 340, 86, th.panel, th.fg, rx=10, sw=2)
+    s.text(640, 230, "Roughness and fluctuation wFR = 0.2125", 15, th.fg,
+           bold=True)
+    s.text(640, 252, "wFR = 2.18 / N5^0.4 · (0.4·F + 0.6·R)", 13,
+           th.primary, mono=True)
+    s.text(640, 274, "roughness weighs more: 0.6 against 0.4", 12,
+           th.muted)
+    s.arrow(141, 132, 200, 200, th.fg, 1.8)
+    s.arrow(330, 132, 285, 200, th.fg, 1.8)
+    s.arrow(395, 132, 520, 200, th.fg, 1.8)
+    s.arrow(581, 132, 610, 200, th.fg, 1.8)
+    s.arrow(800, 132, 690, 200, th.fg, 1.8)
+
+    # Combination
+    s.rect(200, 344, 500, 72, "none", th.accent, rx=10, sw=2.4)
+    s.text(450, 374, "PA = N5 · (1 + √(wS² + wFR²)) = 37.05", 18, th.fg,
+           bold=True)
+    s.text(450, 399, "Fastl and Zwicker Eq. 16.2 (origin Widmann 1992)",
+           12, th.muted)
+    s.arrow(260, 290, 380, 340, th.fg, 1.8)
+    s.arrow(640, 290, 520, 340, th.fg, 1.8)
+
+    s.text(450, 464, "a neutral sound (S ≤ 1.75 acum, F = R = 0) sits on "
+           "the baseline PA = N5", 14, th.fg)
+    s.text(450, 488, "sharpness, roughness and fluctuation only ever lift "
+           "the annoyance above the loudness", 13, th.muted)
+
+
+# ---------------------------------------------------------------------------
+# Objective intelligibility (STOI / ESTOI)
+# ---------------------------------------------------------------------------
+
+def _d_objective_intelligibility(s: SVG, th: Theme) -> None:
+    """The shared STOI/ESTOI front end, the split into the two intermediate
+    correlations, and the guide's measured example: STOI = 0.727 for
+    speech-like material in a flat masker at 0 dB SNR."""
+    cx, bw = 450.0, 600.0
+    x0 = cx - bw / 2
+
+    def step(y: float, l1: str, l2: str, color: str) -> None:
+        s.rect(x0, y, bw, 58, th.panel, color, rx=10, sw=2)
+        s.text(cx, y + 25, l1, 16, th.fg, bold=True)
+        s.text(cx, y + 45, l2, 12, th.muted)
+
+    step(52, "Clean reference x(t) and degraded version y(t)",
+         "the guide's example: speech-like material in a flat masker at "
+         "0 dB SNR", th.fg)
+    step(138, "Resample to 10 kHz and drop the silent frames",
+         "frames 40 dB below the loudest clean frame carry no "
+         "intelligibility", th.primary)
+    step(224, "Short-time DFT: 256-sample Hann frames, 50 % overlap",
+         "magnitudes grouped into 15 one-third-octave bands from 150 Hz",
+         th.primary)
+    step(310, "384 ms segments — 30 frames, the unit of comparison",
+         "long enough to hold the slow modulations that carry speech",
+         th.primary)
+    for y0, y1 in ((110, 134), (196, 220), (282, 306)):
+        s.arrow(cx, y0, cx, y1, th.fg, 1.8)
+
+    # The two intermediate measures
+    s.rect(150, 404, 285, 76, th.panel, th.secondary, rx=10, sw=2)
+    s.text(292, 428, "STOI: envelope correlation", 13, th.fg, bold=True)
+    s.text(292, 447, "per band and segment; normalise,", 11, th.muted)
+    s.text(292, 464, "clip at −15 dB, then average", 11, th.muted)
+    s.rect(465, 404, 285, 76, th.panel, th.secondary, rx=10, sw=2)
+    s.text(607, 428, "ESTOI: spectral correlation", 13, th.fg, bold=True)
+    s.text(607, 447, "row- and column-normalised segments;", 11, th.muted)
+    s.text(607, 464, "credits glimpses in modulated maskers", 11, th.muted)
+    s.arrow(450, 368, 300, 400, th.fg, 1.8)
+    s.arrow(450, 368, 600, 400, th.fg, 1.8)
+
+    s.rect(x0, 516, bw, 60, "none", th.accent, rx=10, sw=2.4)
+    s.text(cx, 541, "STOI = 0.727 for the example", 17, th.fg, bold=True)
+    s.text(cx, 563, "the lowest band keeps 0.27 of the correlation; above "
+           "1.9 kHz it reaches 0.90", 12, th.muted)
+    s.arrow(292, 480, 390, 512, th.fg, 1.8)
+    s.arrow(607, 480, 510, 512, th.fg, 1.8)
+
+
+# ---------------------------------------------------------------------------
+# Programme loudness (ITU-R BS.1770 / EBU R 128)
+# ---------------------------------------------------------------------------
+
+def _d_program_loudness(s: SVG, th: Theme) -> None:
+    """K-weighting, 400 ms blocks and the two gates into the integrated
+    loudness of the guide's example (I = -23.1 LUFS, relative threshold
+    -39.0 LUFS), with the LRA and true-peak branches beside the chain."""
+    cx, bw = 450.0, 560.0
+    x0 = cx - bw / 2
+
+    def step(y: float, l1: str, l2: str, color: str) -> None:
+        s.rect(x0, y, bw, 58, th.panel, color, rx=10, sw=2)
+        s.text(cx, y + 25, l1, 15, th.fg, bold=True)
+        s.text(cx, y + 45, l2, 12, th.muted)
+
+    step(52, "Programme x — channel weights Gi: 1.0 front, 1.41 surround",
+         "anchor: a 0 dB FS 997 Hz sine on one front channel reads "
+         "−3.01 LKFS", th.fg)
+    step(138, "K-weighting: +4 dB spherical-head shelf + RLB high-pass",
+         "LK = −0.691 + 10·lg Σ Gi·zi;  LKFS ≡ LUFS, 1 LU = 1 dB",
+         th.primary)
+    step(224, "Mean square in 400 ms blocks, 75 % overlap",
+         "absolute gate: blocks below −70 LUFS are dropped", th.primary)
+    step(310, "Relative gate: −10 LU below the survivors",
+         "example: 10 s at −23 dBFS + 30 s of quiet → threshold "
+         "−39.0 LUFS", th.primary)
+    s.rect(x0, 396, bw, 60, "none", th.accent, rx=10, sw=2.4)
+    s.text(cx, 421, "Integrated loudness I = −23.1 LUFS: the tail is "
+           "gated out", 16, th.fg, bold=True)
+    s.text(cx, 443, "EBU R 128 target −23.0 LUFS; tolerance ±0.2 LU in "
+           "QC, ±1.0 LU live", 12, th.muted)
+    for y0, y1 in ((110, 134), (196, 220), (282, 306), (368, 392)):
+        s.arrow(cx, y0, cx, y1, th.fg, 1.8)
+
+    # Side rails: LRA taps the K-weighted signal, true peak the raw one.
+    s.line(170, 167, 120, 167, th.muted, 1.4)
+    s.line(120, 167, 120, 484, th.muted, 1.4)
+    s.arrow(120, 484, 120, 488, th.muted, 1.4)
+    s.text(120, 157, "K-weighted", 11, th.muted)
+    s.line(730, 81, 780, 81, th.muted, 1.4)
+    s.line(780, 81, 780, 484, th.muted, 1.4)
+    s.arrow(780, 484, 780, 488, th.muted, 1.4)
+    s.text(780, 71, "raw signal", 11, th.muted)
+
+    s.rect(70, 492, 360, 82, th.panel, th.secondary, rx=10, sw=2)
+    s.text(250, 517, "Loudness range LRA = P95 − P10", 14, th.fg, bold=True)
+    s.text(250, 538, "short-term 3 s windows, deeper −20 LU gate", 11,
+           th.muted)
+    s.text(250, 558, "10.0 LU on the Tech 3342 two-step case", 11,
+           th.secondary, bold=True)
+    s.rect(470, 492, 360, 82, th.panel, th.secondary, rx=10, sw=2)
+    s.text(650, 517, "True peak: 4× oversampling, in dBTP", 14, th.fg,
+           bold=True)
+    s.text(650, 538, "the fs/4 tone: sample peak −3.01 dB, true peak "
+           "+0.12 dBTP", 11, th.muted)
+    s.text(650, 558, "R 128 production ceiling −1 dBTP", 11,
+           th.secondary, bold=True)
+
+    s.text(450, 618, "the gates keep quiet passages from dragging the "
+           "foreground down", 14, th.fg)
+    s.text(450, 642, "ungated, the same 40 s example would read near "
+           "−29 LUFS", 13, th.muted)
+
+
+# ---------------------------------------------------------------------------
+# Reverberation-time prediction (Sabine / Eyring)
+# ---------------------------------------------------------------------------
+
+def _d_reverberation_prediction(s: SVG, th: Theme) -> None:
+    """The guide's 10 x 7 x 3.5 m room through the Sabine and Eyring
+    absorption terms into the per-band T60 table the library returns,
+    with the diffuse-field validity note."""
+    # Room data
+    s.rect(170, 52, 560, 78, th.panel, th.fg, rx=10, sw=2)
+    s.text(450, 77, "Room 10 × 7 × 3.5 m — V = 245 m³, S = 259 m²", 16,
+           th.fg, bold=True)
+    s.text(450, 97, "hard end walls, lightly treated side walls, carpet "
+           "and acoustic ceiling", 12, th.muted)
+    s.text(450, 117, "mean absorption ᾱ runs from 0.21 at 125 Hz to 0.51 "
+           "at 4 kHz", 12, th.muted)
+
+    # The two models
+    s.rect(60, 178, 380, 96, th.panel, th.primary, rx=10, sw=2)
+    s.text(250, 203, "Sabine", 15, th.fg, bold=True)
+    s.text(250, 224, "T = 0.161·V / (Σ Si·αi + 4mV)", 13, th.primary,
+           mono=True)
+    s.text(250, 245, "low, even absorption (ᾱ up to ≈ 0.2);", 11,
+           th.muted)
+    s.text(250, 262, "stays finite even at α = 1", 11, th.muted)
+    s.rect(460, 178, 380, 96, th.panel, th.secondary, rx=10, sw=2)
+    s.text(650, 203, "Eyring", 15, th.fg, bold=True)
+    s.text(650, 224, "T = 0.161·V / (−S·ln(1 − ᾱ) + 4mV)", 13,
+           th.secondary, mono=True)
+    s.text(650, 245, "strong, even absorption;", 11, th.muted)
+    s.text(650, 262, "reaches T = 0 at total absorption", 11, th.muted)
+    s.arrow(350, 130, 265, 174, th.fg, 1.8)
+    s.arrow(550, 130, 635, 174, th.fg, 1.8)
+
+    # Per-band table
+    s.rect(100, 318, 700, 150, th.panel, th.fg, rx=10, sw=1.8)
+    s.text(450, 344, "Predicted T60 per octave band", 14, th.fg, bold=True)
+    freqs = ("125 Hz", "250", "500", "1k", "2k", "4k")
+    sab = ("0.74", "0.47", "0.37", "0.31", "0.30", "0.30")
+    eyr = ("0.66", "0.39", "0.29", "0.23", "0.21", "0.22")
+    xc = [292.0 + 94.0 * i for i in range(6)]
+    for x, f in zip(xc, freqs):
+        s.text(x, 372, f, 12, th.muted, bold=True)
+    s.line(130, 382, 770, 382, th.muted, 1.0)
+    s.text(130, 404, "Sabine [s]", 12, th.primary, bold=True,
+           anchor="start")
+    for x, v in zip(xc, sab):
+        s.text(x, 404, v, 13, th.fg)
+    s.text(130, 432, "Eyring [s]", 12, th.secondary, bold=True,
+           anchor="start")
+    for x, v in zip(xc, eyr):
+        s.text(x, 432, v, 13, th.fg)
+    s.text(450, 456, "Eyring runs 11 to 29 % shorter here: ᾱ is past "
+           "Sabine's comfort zone", 12, th.muted, italic=True)
+    s.arrow(250, 274, 320, 314, th.fg, 1.8)
+    s.arrow(650, 274, 580, 314, th.fg, 1.8)
+
+    # Validity note
+    s.rect(130, 500, 640, 68, "none", th.accent, rx=10, sw=1.6, dash="6,5")
+    s.text(450, 527, "Domain of validity: a diffuse field that stays "
+           "diffuse while it decays", 14, th.accent, bold=True)
+    s.text(450, 551, "below the Schroeder frequency, in coupled volumes "
+           "and in corridor-like rooms no single T60 exists", 12, th.fg)
+
+
 DIAGRAMS = {
     "diagram_calibration_setup": (_d1, "Calibration chain — from calibrator to physical units", 560),
     "diagram_env_measurement": (_d2, "Environmental noise measurement positions (ISO 1996-2)", 560),
@@ -6205,6 +6782,24 @@ DIAGRAMS = {
         _d_data_qualification,
         ("Data qualification: the stationarity decision "
          "(Bendat & Piersol 10.3)"), 620),
+    "diagram_sound_quality": (
+        _d_sound_quality,
+        "Sound quality beyond loudness: four calibrated sensations", 500),
+    "diagram_tone_audibility": (
+        _d_tone_audibility,
+        "Tone audibility: from spectrum to penalty (ISO/PAS 20065)", 580),
+    "diagram_psychoacoustic_annoyance": (
+        _d_psychoacoustic_annoyance,
+        "Psychoacoustic annoyance: four sensations, one scalar", 520),
+    "diagram_objective_intelligibility": (
+        _d_objective_intelligibility,
+        "STOI and ESTOI: correlating clean against degraded speech", 600),
+    "diagram_program_loudness": (
+        _d_program_loudness,
+        "Programme loudness: the BS.1770 / R 128 metering chain", 670),
+    "diagram_reverberation_prediction": (
+        _d_reverberation_prediction,
+        "Predicting the reverberation time: Sabine against Eyring", 600),
 }
 
 

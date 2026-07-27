@@ -42,7 +42,7 @@ cerrada para ruido de banda ancha modulado en amplitud (Ec. 10.2) como el modelo
 de señal de Osses et al. (2016), y la utilidad que deriva las cuatro sensaciones
 a partir de una grabación.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/psychoacoustic_annoyance_es.svg" alt="Molestia psicoacústica PA frente a la sonoridad percentil N5 para tres perfiles de sensación: una base neutra donde PA es igual a N5, un sonido agudo y un sonido áspero y fluctuante ambos elevados sobre la base, con el ejemplo resuelto PA = 30,82 marcado" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/psychoacoustic_annoyance_es.svg" alt="Molestia psicoacústica PA frente a la sonoridad percentil N5 para tres perfiles de sensación: una base neutra donde PA es igual a N5, un sonido agudo y un sonido áspero y fluctuante ambos elevados sobre la base, con el ejemplo resuelto PA = 37,05 marcado" width="82%" loading="eager" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -120,6 +120,12 @@ La figura de arriba barre `PA` frente a `N5` para tres perfiles: una base neutra
 (`S = 1,75 acum`, `F = R = 0`, de modo que `PA = N5`), un sonido agudo y un
 sonido áspero y fluctuante, ambos elevados sobre la base, con el ejemplo
 resuelto marcado.
+
+El modelo es tan compacto que cabe entero en un dibujo: dos ponderaciones y
+una combinación. El diagrama recorre con él el ejemplo resuelto, sensación a
+sensación.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_psychoacoustic_annoyance_es.svg" alt="Diagrama de bloques del modelo de molestia psicoacústica de Fastl y Zwicker: las cuatro sensaciones del ejemplo resuelto, sharpness de 2,0 acum, sonoridad percentil N5 de 30 sone, intensidad de fluctuación de 0,5 vacil y aspereza de 0,3 asper, alimentan dos ponderaciones, la del sharpness wS de 0,1001, nula por debajo de 1,75 acum, y la de aspereza y fluctuación wFR de 0,2125, que pesa la aspereza 0,6 frente a 0,4, y se combinan en PA igual a N5 por uno más la raíz de wS al cuadrado más wFR al cuadrado, con resultado 37,05; una nota final recuerda que un sonido neutro queda en la línea base PA igual a N5" width="92%" />
 
 ### 2.1 A partir de una señal (estimación de ingeniería)
 

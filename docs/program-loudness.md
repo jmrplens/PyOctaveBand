@@ -12,6 +12,12 @@ and integrated loudness) and the *loudness range* (LRA). phonometry
 implements the full chain in the `broadcast` namespace and validates every
 synthesizable EBU test signal against its official tolerance.
 
+The whole Recommendation is one metering chain, and each section below
+details one of its blocks. The diagram lays it out first, with the numbers
+of the examples on this page.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_program_loudness_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_program_loudness.svg" alt="Block diagram of the BS.1770 and EBU R 128 programme-loudness chain: the channel-weighted programme, anchored so a full-scale 997 hertz sine on one front channel reads minus 3.01 LKFS, passes the K-weighting of a plus 4 decibel spherical-head shelf and the RLB high-pass, is measured in 400 millisecond mean-square blocks at 75 percent overlap, gated absolutely at minus 70 LUFS and relatively 10 loudness units below the survivors, minus 39.0 LUFS in the example of 10 seconds of programme plus 30 seconds of quiet, and yields an integrated loudness of minus 23.1 LUFS against the minus 23.0 target; side branches show the loudness range of 10.0 loudness units on the Tech 3342 two-step case and the true peak of plus 0.12 dBTP where the sample peak reads minus 3.01 decibels, under the minus 1 dBTP production ceiling" width="92%"></picture>
+
 ## 1. K-weighting and the loudness measure (Annex 1)
 
 The signal first passes a two-stage pre-filter: a ~+4 dB high-frequency

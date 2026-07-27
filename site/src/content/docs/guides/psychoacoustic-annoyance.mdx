@@ -41,7 +41,7 @@ consumes, both the closed form for amplitude-modulated broadband noise
 (Eq. 10.2) and the Osses et al. (2016) signal model, and the signal
 convenience that derives all four sensations from a recording.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/psychoacoustic_annoyance.svg" alt="Psychoacoustic annoyance PA against percentile loudness N5 for three sensation profiles: a neutral baseline where PA equals N5, a sharp sound and a rough-and-fluctuating sound both lifted above the baseline, with the worked example PA = 30.82 marked" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/psychoacoustic_annoyance.svg" alt="Psychoacoustic annoyance PA against percentile loudness N5 for three sensation profiles: a neutral baseline where PA equals N5, a sharp sound and a rough-and-fluctuating sound both lifted above the baseline, with the worked example PA = 37.05 marked" width="82%" loading="eager" />
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -118,6 +118,11 @@ The figure above sweeps `PA` against `N5` for three profiles: a neutral baseline
 (`S = 1.75 acum`, `F = R = 0`, so `PA = N5`), a sharp sound and a
 rough-and-fluctuating sound, both lifted above the baseline, with the worked
 example marked.
+
+The model is small enough to draw whole: two weightings and one combination.
+The diagram traces the worked example through it, sensation by sensation.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_psychoacoustic_annoyance.svg" alt="Block diagram of the Fastl and Zwicker psychoacoustic annoyance model: the four sensations of the worked example, sharpness of 2.0 acum, percentile loudness N5 of 30 sone, fluctuation strength of 0.5 vacil and roughness of 0.3 asper, feed two weightings, the sharpness weighting wS of 0.1001 that is zero below 1.75 acum and the roughness-and-fluctuation weighting wFR of 0.2125 that weighs roughness 0.6 against 0.4, and combine into PA equal to N5 times one plus the root of wS squared plus wFR squared, giving 37.05; a closing note recalls that a neutral sound sits on the baseline PA equal to N5" width="92%" />
 
 ### 2.1 From a signal (engineering estimate)
 
