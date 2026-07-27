@@ -342,9 +342,9 @@ def test_build_job_validation() -> None:
         fdtd_gpu_remote.build_job(343.0, _DX, sponge_width=3.5, **ok)
     with pytest.raises(ValueError, match="sponge_width"):
         fdtd_gpu.GpuFDTD2D(343.0, _DX, shape=(_NY, _NX), sponge_width=2.5)
+    too_wide = min(_NY, _NX)
     with pytest.raises(ValueError, match="smallest grid side"):
-        fdtd_gpu_remote.build_job(343.0, _DX, sponge_width=min(_NY, _NX),
-                                  **ok)
+        fdtd_gpu_remote.build_job(343.0, _DX, sponge_width=too_wide, **ok)
     with pytest.raises(ValueError, match="sponge_reflection"):
         fdtd_gpu_remote.build_job(343.0, _DX, sponge_width=4,
                                   sponge_reflection=1.5, **ok)
