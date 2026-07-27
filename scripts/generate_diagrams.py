@@ -1083,7 +1083,8 @@ _ES: dict[str, str] = {
     "Exponential sweep x(t)": "Barrido exponencial x(t)",
     "20 Hz → 6 kHz in T = 4 s": "20 Hz → 6 kHz en T = 4 s",
     "Device under test": "Dispositivo en ensayo",
-    "weakly nonlinear: gain + harmonics": "débilmente no lineal",
+    "weakly nonlinear: gain + harmonics":
+        "débilmente no lineal: ganancia + armónicos",
     "Recording y(t)": "Grabación y(t)",
     "sweep + distortion products": "barrido + productos de distorsión",
     "Deconvolve with the inverse filter":
