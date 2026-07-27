@@ -14,6 +14,12 @@ interpolation across a hemisphere database, the flight-path kinematics, and the
 single-event integration to `SEL`/`LASmax`/`EPNL` and ground-grid contours;
 terrain shielding follows in later work.
 
+The EPNL this page computes is the same quantity certification asks for: ICAO
+Annex 16 Chapter 8 flies the helicopter level at 150 m over a centre
+microphone, with two more 150 m to each side.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_rotorcraft_certification_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_rotorcraft_certification.svg" alt="Helicopter overflight noise certification of ICAO Annex 16 Chapter 8: a side view of a helicopter in level flight at 150 m, 492 ft, directly above a centre microphone on the ground, with the reference speed rule of 0.9 VH, and a plan-view inset where the flight track crosses a line of three microphones, one on the track and two 150 m to each side; notes state at least six overflights split equally between headwind and tailwind, EPNL in EPNdB at the three points, microphones 1.2 m above ground and the 45 degree elevation with about 212 m slant range to the sideline pair at the overhead moment" width="92%"></picture>
+
 ## 1. The noise hemisphere
 
 A `RotorcraftHemisphere` holds the band levels on the azimuth/polar grid (with

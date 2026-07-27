@@ -12,6 +12,13 @@ measured loudspeaker or microphone response into a safe equalizer, and the
 bridge between the two: the inverse of a measured response is the natural
 target spectrum for the next measurement's sweep.
 
+All three tools operate inside the same two-channel frame: the electrical
+drive is the reference, the microphone is the response, and the Welch
+cross-spectra between them give the frequency response plus a coherence that
+polices it.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_system_measurement_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_system_measurement.svg" alt="Two-channel frequency-response measurement chain: a signal generator producing broadband noise or a sweep feeds a power amplifier and the loudspeaker under test, a measurement microphone picks up the acoustic output, channel 1 carries the electrical reference x(t) and channel 2 the microphone response y(t), dual-channel FFT analysis with Welch-averaged Hann segments at 50 percent overlap yields the spectra Gxx, Gyy and Gxy, and two result boxes give the H1 estimator Gxy over Gxx, unbiased with output noise, and the coherence gamma squared equal to the squared magnitude of Gxy over Gxx times Gyy, which is one for a noiseless linear path and drops with noise, distortion or an unresolved delay" width="92%"></picture>
+
 ## 1. Complementary Golay pairs
 
 A Golay pair are two binary sequences `a`, `b` of length `L = 2**n`, built by

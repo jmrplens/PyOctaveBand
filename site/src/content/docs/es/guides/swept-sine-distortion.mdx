@@ -79,6 +79,12 @@ $$
 \frac{\sqrt{\sum_{n\ge 2} |H_n(nf)|^2}}{|H_1(f)|} .
 $$
 
+La cadena es exactamente el esquema siguiente: reproducir el barrido, grabar,
+convolucionar con el filtro inverso, y los armónicos caen por delante de la
+respuesta lineal con sus adelantos fijos.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_swept_sine_es.svg" alt="Cadena de medición de distorsión con barrido senoidal: un barrido exponencial de 20 Hz a 6 kHz en T igual a 4 s excita el dispositivo débilmente no lineal, la grabación se deconvoluciona con el filtro inverso invertido en el tiempo con su pendiente de +6 dB por octava, y en el eje temporal resultante la respuesta al impulso lineal h1 queda en t igual a cero mientras las respuestas de los armónicos segundo, tercero y cuarto aparecen como prellegadas menores en sus propias ventanas discontinuas, adelantadas L por ln n, 0,49 s para h2 y 0,77 s para h3 con L igual a 0,70 s" width="92%" />
+
 ```python
 import numpy as np
 from phonometry import swept_sine_distortion, synchronized_sweep_signal

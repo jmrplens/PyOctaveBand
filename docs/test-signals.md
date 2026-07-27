@@ -11,6 +11,11 @@ bookkeeping. This page covers the signal toolbox of `phonometry.metrology`:
 specification rather than a library default, and **fractional delay** that
 shifts a record by any sub-sample amount with band-limited exactness.
 
+Before the details, the family portrait: what each stimulus looks like in
+time and where its energy sits over frequency.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_test_signals_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_test_signals.svg" alt="Grid of five labelled test-signal miniatures: white noise with a jagged waveform and a flat power spectral density of 0 dB per octave, equal power per hertz; pink noise with a smoother waveform and a minus 3 dB per octave density, equal power per octave; an MLS binary chip stream of period 2 to the m minus 1 samples with a flat line spectrum; a time-frequency sketch where a linear sweep is a straight line while the exponential sweep hugs low frequencies and spends equal time per octave; and an IEC 60268-1 tone burst of whole periods starting at a zero crossing, 25 periods of 5 kHz lasting 5 ms" width="92%"></picture>
+
 ## 1. Tone bursts (IEC 60268-1)
 
 The gated sine burst is the standard stimulus for dynamic behaviour:

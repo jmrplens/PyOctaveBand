@@ -1021,6 +1021,137 @@ _ES: dict[str, str] = {
     "rays launched within about ±12° of the axis stay trapped and can cross entire oceans":
         "los rayos lanzados a menos de unos ±12° del eje quedan atrapados "
         "y pueden cruzar océanos enteros",
+    # Atmospheric refraction (Salomons / Attenborough & Van Renterghem)
+    "Atmospheric refraction: downwind multipath and the upwind shadow":
+        "Refracción atmosférica: multitrayecto y sombra por el viento",
+    "wind u(z)": "viento u(z)",
+    "acoustic shadow": "sombra acústica",
+    "1.5 m": "1,5 m",
+    "Upwind: rays bend up; beyond ≈ 220 m a ground shadow opens and the level collapses by over 20 dB":
+        "Contra el viento: los rayos suben; desde ≈ 220 m se abre una "
+        "sombra y el nivel cae más de 20 dB",
+    "Downwind: rays bend down; the receiver hears the direct and the ground-bounced arrival (multipath)":
+        "A favor del viento: los rayos bajan y llegan la directa y la "
+        "rebotada en el suelo (multitrayecto)",
+    "a ±0.1 (m/s)/m gradient curves rays with radius Rc = c0/|g| ≈ 3.4 km; source hs = 2 m, receiver hr = 1.5 m":
+        "gradiente de ±0,1 (m/s)/m → radio Rc = c0/|g| ≈ 3,4 km; fuente "
+        "hs = 2 m, receptor hr = 1,5 m",
+    # Aircraft noise certification points (ICAO Annex 16, Chapter 3)
+    "Aircraft noise certification points (ICAO Annex 16, Chapter 3)":
+        "Certificación de ruido de aeronaves (Anexo 16 OACI, Capítulo 3)",
+    "Side view": "Vista lateral",
+    "start of roll": "inicio de rodadura",
+    "runway": "pista",
+    "take-off": "despegue",
+    "approach": "aproximación",
+    "Approach reference point": "Punto de referencia de aproximación",
+    "Flyover reference point": "Punto de referencia de sobrevuelo",
+    "Lateral reference line": "Línea lateral de referencia",
+    "where take-off noise is greatest": "donde el ruido de despegue es máximo",
+    "symmetric lateral point (measured on both sides)":
+        "punto lateral simétrico (se mide a ambos lados)",
+    "Microphones 1.2 m above the ground; the certification metric at the three points is EPNL, in EPNdB":
+        "Micrófonos a 1,2 m sobre el suelo; la métrica de certificación en "
+        "los tres puntos es el EPNL, en EPNdB",
+    "Lateral: full take-off power · Flyover: 6.5 km from brake release · Approach: 3° ± 0.5° glide path":
+        "Lateral: máxima potencia de despegue · Sobrevuelo: a 6,5 km de "
+        "soltar frenos · Aproximación: senda de 3° ± 0,5°",
+    "the approach point lies 120 m below the 3° path, which meets the ground 300 m beyond the threshold":
+        "el punto de aproximación queda 120 m bajo la senda de 3°, que corta "
+        "el suelo 300 m más allá del umbral",
+    # Helicopter overflight certification (ICAO Annex 16, Chapter 8)
+    "Helicopter overflight noise certification (ICAO Annex 16, Chapter 8)":
+        "Certificación de ruido de helicópteros (Anexo 16 OACI, Capítulo 8)",
+    "level flight at 0.9 VH": "vuelo nivelado a 0,9 VH",
+    "centre microphone": "micrófono central",
+    "track": "trayectoria",
+    "3 microphones on a line perpendicular to the track":
+        "3 micrófonos en una línea perpendicular a la trayectoria",
+    "Speed: the least of 0.9 VH, 0.9 VNE, 0.45 VH + 120 km/h and 0.45 VNE + 120 km/h":
+        "Velocidad: la menor de 0,9 VH, 0,9 VNE, 0,45 VH + 120 km/h y "
+        "0,45 VNE + 120 km/h",
+    "EPNL in EPNdB at the three points; at least six overflights, headwind and tailwind in equal number":
+        "EPNL en EPNdB en los tres puntos; al menos seis pasadas, con viento "
+        "en cara y en cola a partes iguales",
+    "microphones 1.2 m above ground; the sideline pair sees the overhead helicopter at 45° (slant ≈ 212 m)":
+        "micrófonos a 1,2 m del suelo; el par lateral ve el helicóptero en "
+        "la vertical con 45° (oblicua ≈ 212 m)",
+    # Swept-sine distortion (Farina / Novak)
+    "Swept-sine distortion: deconvolution and harmonic pre-arrivals":
+        "Distorsión por barrido senoidal: deconvolución y prellegadas "
+        "armónicas",
+    "Exponential sweep x(t)": "Barrido exponencial x(t)",
+    "20 Hz → 6 kHz in T = 4 s": "20 Hz → 6 kHz en T = 4 s",
+    "Device under test": "Dispositivo en ensayo",
+    "weakly nonlinear: gain + harmonics": "débilmente no lineal",
+    "Recording y(t)": "Grabación y(t)",
+    "sweep + distortion products": "barrido + productos de distorsión",
+    "Deconvolve with the inverse filter":
+        "Deconvolución con el filtro inverso",
+    "time-reversed sweep with a +6 dB/octave tilt":
+        "barrido invertido en el tiempo, con +6 dB/octava",
+    "h1 (linear), t = 0": "h1 (lineal), t = 0",
+    "harmonic orders arrive early,": "los órdenes armónicos llegan antes,",
+    "each in its own window": "cada uno en su propia ventana",
+    "L·ln 2 = 0.49 s": "L·ln 2 = 0,49 s",
+    "L·ln 3 = 0.77 s": "L·ln 3 = 0,77 s",
+    "time": "tiempo",
+    "L = T / ln(f2/f1) = 0.70 s here; the order-n products compress L·ln n ahead of the linear response":
+        "L = T / ln(f2/f1) = 0,70 s aquí; los productos de orden n se "
+        "comprimen L·ln n antes de la respuesta lineal",
+    "window each arrival  →  H1(f), H2(f), H3(f), …  →  THD(f) = √( Σ |Hn(nf)|² ) / |H1(f)|":
+        "enventanar cada llegada  →  H1(f), H2(f), H3(f), …  →  "
+        "THD(f) = √( Σ |Hn(nf)|² ) / |H1(f)|",
+    # Two-channel FRF measurement (H1 estimator and coherence)
+    "Two-channel FRF measurement: the H1 estimator and coherence":
+        "Medición de FRF a dos canales: el estimador H1 y la coherencia",
+    "Signal generator": "Generador de señal",
+    "broadband noise or a sweep": "ruido de banda ancha o barrido",
+    "Power amplifier": "Amplificador",
+    "Loudspeaker under test": "Altavoz en ensayo",
+    "measurement microphone": "micrófono de medición",
+    "Channel 1: reference x(t)": "Canal 1: referencia x(t)",
+    "the electrical drive signal": "la señal eléctrica de excitación",
+    "Channel 2: response y(t)": "Canal 2: respuesta y(t)",
+    "acoustic output at the microphone": "salida acústica en el micrófono",
+    "Dual-channel FFT analysis (Welch)":
+        "Análisis FFT de dos canales (Welch)",
+    "Hann segments, 50 % overlap  →  Gxx(f), Gyy(f), Gxy(f)":
+        "segmentos Hann, 50 % de solape  →  Gxx(f), Gyy(f), Gxy(f)",
+    "unbiased with output noise; H2 = Gyy/Gyx for input noise":
+        "insesgado ante ruido a la salida (H2 = Gyy/Gyx a la entrada)",
+    "1 for a noiseless linear path; less with output noise":
+        "1 en un camino lineal sin ruido; menor con ruido a la salida",
+    "trust |H1| only where γ² stays near 1: coherence dips flag noise, distortion or an unresolved delay":
+        "fiarse de |H1| solo donde γ² ronda 1: las caídas delatan ruido, "
+        "distorsión o retardo sin resolver",
+    # Test-signal family panel
+    "The test-signal family at a glance":
+        "La familia de señales de ensayo de un vistazo",
+    "White noise": "Ruido blanco",
+    "Pink noise": "Ruido rosa",
+    "Sweeps: linear vs exponential": "Barridos: lineal frente a exponencial",
+    "Tone burst": "Salva de tono",
+    "flat PSD: 0 dB/octave": "DEP plana: 0 dB/octava",
+    "equal power per hertz": "igual potencia por hercio",
+    "−3 dB/octave PSD": "DEP de −3 dB/octava",
+    "equal power per octave": "igual potencia por octava",
+    "flat, line spectrum": "espectro de rayas plano",
+    "binary ±1, period 2^m − 1 samples": "binaria ±1, periodo 2^m − 1 muestras",
+    "linear": "lineal",
+    "exponential": "exponencial",
+    "exponential: equal time (and energy) per octave; linear: equal time per hertz":
+        "exponencial: igual tiempo (y energía) por octava; lineal: igual "
+        "tiempo por hercio",
+    "whole periods, starting at": "periodos completos, empezando en",
+    "a zero crossing (IEC 60268-1)": "un paso por cero (IEC 60268-1)",
+    "25 periods of 5 kHz = 5 ms": "25 periodos de 5 kHz = 5 ms",
+    "every stimulus is deterministic and repeatable; synchronous averaging then lowers uncorrelated noise":
+        "todos los estímulos son deterministas y repetibles; promediar "
+        "pasadas reduce el ruido no correlacionado",
+    "sweeps separate harmonic distortion, MLS smears it across the period, bursts probe dynamics":
+        "los barridos separan la distorsión armónica, la MLS la reparte por "
+        "el periodo y las salvas sondean la dinámica",
 }
 
 
@@ -4762,6 +4893,506 @@ def _d_sofar_channel(s: SVG, th: Theme) -> None:
            17, th.fg, anchor="start")
     s.text(80, 588, "rays launched within about ±12° of the axis stay trapped and can cross entire oceans",
            17, th.fg, anchor="start")
+# Atmospheric refraction: downwind multipath and the upwind shadow zone
+# ---------------------------------------------------------------------------
+
+def _d_atmospheric_refraction(s: SVG, th: Theme) -> None:
+    """Refracting surface layer (Salomons 2001; Attenborough & Van
+    Renterghem 2021, Ch. 11): wind profile arrows, an effective-sound-speed
+    inset, downward-curved rays with a ground bounce on the downwind side
+    and upward-curved rays opening an acoustic shadow on the upwind side.
+    Horizontal scale about 1 px per metre; heights exaggerated."""
+    gy = 452.0
+    sx, sy = 450.0, gy - 56.0            # source, hs = 2 m (schematic)
+    mlx, mrx = 90.0, 795.0               # receivers, 350 m to each side
+
+    # --- upwind side (left): rays curve upward -----------------------------
+    # Limiting ray: grazes the ground at ~220 m upwind, then climbs; the
+    # region under it is the acoustic shadow.
+    s.path(f"M {sx:.0f} {sy:.0f} C 380 430 300 452 232 452", stroke=th.secondary, sw=1.8)
+    shadow = "M 232 452 C 150 452 90 420 60 340 L 60 452 Z"
+    s.path(shadow, fill=th.panel)
+    s.path("M 232 452 C 150 452 90 420 60 340", stroke=th.secondary,
+           sw=1.4, dash="6,5")
+    # Fan of upwind rays, all refracted upward.
+    s.path(f"M {sx:.0f} {sy:.0f} C 380 390 310 372 250 340", stroke=th.secondary, sw=1.8)
+    s.arrow(250.0, 340.0, 214.0, 316.0, th.secondary, 1.8)
+    s.path(f"M {sx:.0f} {sy:.0f} C 400 375 340 330 290 270", stroke=th.secondary, sw=1.8)
+    s.arrow(290.0, 270.0, 264.0, 234.0, th.secondary, 1.8)
+    s.path(f"M {sx:.0f} {sy:.0f} C 415 345 385 270 355 195", stroke=th.secondary, sw=1.8)
+    s.arrow(355.0, 195.0, 340.0, 156.0, th.secondary, 1.8)
+    s.text(188.0, 414.0, "acoustic shadow", 15, th.secondary, italic=True,
+           anchor="start")
+    s.line(184.0, 410.0, 105.0, 395.0, th.muted, 1.0)
+    # Shadow-boundary marker at the grazing point.
+    s.line(232.0, 452.0, 232.0, 386.0, th.muted, 1.1, dash="4,4")
+    s.text(232.0, 370.0, "≈ 220 m", 14, th.muted)
+
+    # --- downwind side (right): rays curve down, ground bounce -------------
+    s.path(f"M {sx:.0f} {sy:.0f} Q 620 366 786 402", stroke=th.primary, sw=2.0)
+    s.arrow(770.0, 399.0, 788.0, 403.0, th.primary, 2.0)
+    s.path(f"M {sx:.0f} {sy:.0f} Q 590 300 726 452", stroke=th.accent, sw=2.0)
+    s.path("M 726 452 Q 758 420 782 408", stroke=th.accent, sw=2.0)
+    s.arrow(766.0, 415.0, 784.0, 407.0, th.accent, 2.0)
+
+    # --- scene: ground, source, receivers ----------------------------------
+    s.ground(gy, 40.0, 860.0)
+    for r in (18, 30, 42):
+        s.path(f"M {sx - r:.0f} {sy:.0f} A {r} {r} 0 0 1 {sx + r:.0f} {sy:.0f}",
+               stroke=th.muted, sw=1.2)
+    s.circle(sx, sy, 7.0, th.fg)
+    s.line(sx, sy + 7, sx, gy, th.fg, 2.0)
+    s.text(sx, sy - 54.0, "Source", 18, th.fg, bold=True)
+    s.dim(sx + 34, gy, sx + 34, sy, "2 m", offset=0, size=15,
+          label_side="right")
+    s.line(sx + 7, sy, sx + 34, sy, th.muted, 0.9, dash="3,3")
+    s.mic(mlx, gy - 42.0, gy, 0.85)
+    s.mic(mrx, gy - 46.0, gy, 1.0)
+    s.text(mrx, gy - 66.0, "Receiver", 17, th.fg, bold=True)
+    s.dim(mrx + 38, gy, mrx + 38, gy - 46.0, "1.5 m", offset=0, size=14,
+          label_side="right")
+    s.line(mrx + 8, gy - 46.0, mrx + 38, gy - 46.0, th.muted, 0.9, dash="3,3")
+    s.dim(mlx, gy, sx, gy, "350 m", offset=36, size=16)
+    s.dim(sx, gy, mrx, gy, "350 m", offset=36, size=16)
+
+    # --- wind profile arrows (blowing left to right) -----------------------
+    for wy, wl in ((84.0, 116.0), (114.0, 82.0), (144.0, 52.0)):
+        s.arrow(500.0, wy, 500.0 + wl, wy, th.accent, 2.2)
+    s.text(548.0, 66.0, "wind u(z)", 16, th.accent, bold=True)
+
+    # --- inset: effective-sound-speed profiles -----------------------------
+    s.text(143.0, 52.0, "c_eff(z) = c(z) + u(z)", 15, th.fg, bold=True)
+    s.rect(58, 64, 170, 170, th.panel, th.fg, rx=8, sw=1.5)
+    s.arrow(76.0, 214.0, 76.0, 88.0, th.muted, 1.3)
+    s.text(76.0, 80.0, "z", 13, th.muted, italic=True)
+    s.line(76.0, 214.0, 214.0, 214.0, th.muted, 1.3)
+    s.path("M 143 214 Q 146 150 192 96", stroke=th.primary, sw=2.2)
+    s.path("M 143 214 Q 140 150 100 96", stroke=th.secondary, sw=2.2)
+    s.text(197.0, 92.0, "+u", 13, th.primary, anchor="start")
+    s.text(96.0, 92.0, "−u", 13, th.secondary, anchor="end")
+    s.text(143.0, 229.0, "340 m/s", 12, th.muted, mono=True)
+
+    # --- physics captions --------------------------------------------------
+    s.text(80.0, 540.0,
+           "Upwind: rays bend up; beyond ≈ 220 m a ground shadow opens and the level collapses by over 20 dB",
+           16, th.fg, anchor="start")
+    s.text(80.0, 566.0,
+           "Downwind: rays bend down; the receiver hears the direct and the ground-bounced arrival (multipath)",
+           16, th.fg, anchor="start")
+    s.text(80.0, 592.0,
+           "a ±0.1 (m/s)/m gradient curves rays with radius Rc = c0/|g| ≈ 3.4 km; source hs = 2 m, receiver hr = 1.5 m",
+           16, th.muted, anchor="start")
+
+
+# ---------------------------------------------------------------------------
+# Aircraft noise certification points (ICAO Annex 16 Vol. I, Chapter 3)
+# ---------------------------------------------------------------------------
+
+def _plane_glyph(s: SVG, x: float, y: float, deg: float,
+                 size: float = 1.0) -> None:
+    """Small side-view jet silhouette pointing along +x, rotated ``deg``."""
+    th = s.th
+    s.add(f'<g transform="translate({x:.1f} {y:.1f}) rotate({deg:.1f}) '
+          f'scale({size:.2f})">'
+          f'<path d="M -24 0 Q -24 -4 -18 -4 L 16 -4 Q 26 -2 26 0 Q 26 2 '
+          f'16 3 L -18 3 Q -24 3 -24 0 Z" fill="{th.fg}"/>'
+          f'<path d="M -22 -3 L -13 -14 L -7 -3 Z" fill="{th.fg}"/>'
+          f'<path d="M 2 0 L -10 9 L -3 0 Z" fill="{th.fg}"/></g>')
+
+
+def _d_aircraft_certification(s: SVG, th: Theme) -> None:
+    """The three ICAO Annex 16 Vol. I Chapter 3 reference points around the
+    runway: lateral (450 m line), flyover (6.5 km from start of roll) and
+    approach (2 000 m from the threshold, 120 m under the 3-degree path).
+    Plan and side views share the same x mapping (0.062 px per metre)."""
+    yc = 185.0                            # plan-view runway centre line
+    x_sor = 330.0                         # start of roll / threshold
+    x_fly = x_sor + 6500.0 * 0.062       # flyover point, 6.5 km
+    x_app = x_sor - 2000.0 * 0.062       # approach point, 2 km out
+
+    # --- plan view ---------------------------------------------------------
+    s.text(75.0, 80.0, "Plan view", 17, th.fg, bold=True, anchor="start")
+    s.line(70.0, yc, x_sor, yc, th.muted, 1.1, dash="7,5")
+    s.line(516.0, yc, 850.0, yc, th.muted, 1.1, dash="7,5")
+    s.rect(x_sor, yc - 9, 186, 18, th.panel, th.fg, sw=1.8)
+    _plane_glyph(s, 366.0, yc, 0.0, 0.75)
+    s.arrow(535.0, 163.0, 605.0, 163.0, th.accent, 2.0)
+    s.text(570.0, 150.0, "take-off", 14, th.accent)
+    s.text(338.0, 168.0, "start of roll", 14, th.muted, anchor="start")
+
+    # Reference distances along the extended centre line.
+    s.dim(x_app, yc, x_sor, yc, "2 000 m", offset=-48, size=16)
+    s.dim(x_sor, yc, x_fly, yc, "6 500 m", offset=-48, size=16)
+
+    # Flyover and approach points.
+    for px_ in (x_fly, x_app):
+        s.circle(px_, yc, 6.0, th.secondary)
+        s.circle(px_, yc, 2.2, th.bg)
+    s.text(x_fly, 218.0, "Flyover reference point", 16, th.fg, bold=True)
+    s.text(x_app, 218.0, "Approach reference point", 16, th.fg, bold=True)
+
+    # Lateral line 450 m from the runway centre line, and its mirror.
+    s.line(340.0, 278.0, 740.0, 278.0, th.muted, 1.3, dash="6,5")
+    for lxp, filled in ((460.0, False), (560.0, True), (660.0, False)):
+        if filled:
+            s.circle(lxp, 278.0, 6.0, th.secondary)
+            s.circle(lxp, 278.0, 2.2, th.bg)
+        else:
+            s.circle(lxp, 278.0, 5.0, th.bg, th.fg, 1.5)
+    s.text(540.0, 306.0, "Lateral reference line", 16, th.fg, bold=True)
+    s.text(540.0, 326.0, "where take-off noise is greatest", 14, th.muted)
+    s.dim(620.0, yc, 620.0, 278.0, "450 m", offset=0, size=15,
+          label_side="right")
+    s.line(340.0, 92.0, 740.0, 92.0, th.muted, 1.0, dash="3,5")
+    s.circle(560.0, 92.0, 5.0, th.bg, th.fg, 1.5)
+    s.text(540.0, 76.0, "symmetric lateral point (measured on both sides)",
+           14, th.muted)
+
+    # --- side view (heights exaggerated; distances to scale) ---------------
+    gy = 488.0
+    s.text(75.0, 434.0, "Side view", 17, th.fg, bold=True, anchor="start")
+    s.ground(gy, 60.0, 850.0)
+    s.rect(x_sor, gy - 4, 186, 5, th.muted)
+    # Approach: 3-degree glide path meeting the ground 300 m past the
+    # threshold; the reference point is 120 m below it.
+    xg = x_sor + 300.0 * 0.062
+    s.line(100.0, gy - (xg - 100.0) * 0.465, xg, gy, th.secondary, 2.2)
+    _plane_glyph(s, 150.0, gy - (xg - 150.0) * 0.465 - 9.0, 25.0, 0.9)
+    s.text(150.0, 348.0, "approach", 15, th.secondary, bold=True)
+    s.path(f"M {xg - 40:.1f} {gy:.1f} A 40 40 0 0 1 "
+           f"{xg - 40 * 0.906:.1f} {gy - 40 * 0.423:.1f}",
+           stroke=th.muted, sw=1.2)
+    s.text(xg - 52.0, gy - 14.0, "3°", 13, th.muted)
+    s.mic(x_app, gy - 24.0, gy, 0.7)
+    s.dim(x_app + 22, gy, x_app + 22, gy - (xg - x_app) * 0.465, "120 m",
+          offset=0, size=14, label_side="right")
+    s.line(x_app, gy - (xg - x_app) * 0.465, x_app + 22,
+           gy - (xg - x_app) * 0.465, th.muted, 0.9, dash="3,3")
+    # Take-off: ground roll, then climb; the flyover microphone sits under
+    # the climb-out at 6.5 km.
+    s.line(410.0, gy, 850.0, gy - 132.0, th.accent, 2.2)
+    _plane_glyph(s, 700.0, gy - 87.0 - 9.0, -16.7, 0.9)
+    s.text(700.0, 352.0, "take-off", 15, th.accent, bold=True)
+    s.mic(x_fly, gy - 24.0, gy, 0.7)
+    s.line(x_fly, gy - 30.0, x_fly, gy - (x_fly - 410.0) * 0.30 + 6.0,
+           th.muted, 1.0, dash="4,4")
+
+    # --- normative context -------------------------------------------------
+    s.text(80.0, 552.0,
+           "Microphones 1.2 m above the ground; the certification metric at the three points is EPNL, in EPNdB",
+           17, th.fg, anchor="start")
+    s.text(80.0, 580.0,
+           "Lateral: full take-off power · Flyover: 6.5 km from brake release · Approach: 3° ± 0.5° glide path",
+           16, th.fg, anchor="start")
+    s.text(80.0, 608.0,
+           "the approach point lies 120 m below the 3° path, which meets the ground 300 m beyond the threshold",
+           16, th.muted, anchor="start")
+
+
+# ---------------------------------------------------------------------------
+# Helicopter overflight certification (ICAO Annex 16 Vol. I, Chapter 8)
+# ---------------------------------------------------------------------------
+
+def _d_rotorcraft_certification(s: SVG, th: Theme) -> None:
+    """Chapter 8 overflight: level flight at 150 m over the central
+    microphone with two sideline microphones 150 m to each side (plan
+    inset). Side view to scale at about 0.47 px per metre vertically."""
+    gy = 470.0
+    hx, hy = 300.0, 150.0                # helicopter on the flight path
+
+    # --- side view ---------------------------------------------------------
+    s.ground(gy, 40.0, 560.0)
+    s.line(70.0, hy, 530.0, hy, th.muted, 1.3, dash="8,6")
+    s.arrow(530.0, hy, 556.0, hy, th.fg, 2.0)
+    s.text(72.0, 112.0, "level flight at 0.9 VH", 16, th.fg, anchor="start")
+
+    # Helicopter silhouette (flying to the right).
+    s.line(240.0, 126.0, 360.0, 126.0, th.fg, 3.0)          # main rotor
+    s.line(hx, 126.0, hx, 140.0, th.fg, 2.2)                # mast
+    s.ellipse(hx, 152.0, 27.0, 14.0, th.panel, th.fg, 2.0)  # cabin
+    s.line(274.0, 149.0, 218.0, 143.0, th.fg, 2.6)          # tail boom
+    s.line(218.0, 132.0, 218.0, 152.0, th.fg, 2.0)          # tail rotor
+    s.line(286.0, 166.0, 286.0, 174.0, th.fg, 1.8)          # skid struts
+    s.line(316.0, 166.0, 316.0, 174.0, th.fg, 1.8)
+    s.line(276.0, 174.0, 328.0, 174.0, th.fg, 2.2)          # skid
+    for r in (30, 52, 74):
+        s.path(f"M {hx - r * 0.95:.1f} {176 + r * 0.30:.1f} A {r} {r} 0 0 0 "
+               f"{hx - r * 0.30:.1f} {176 + r * 0.95:.1f}",
+               stroke=th.muted, sw=1.2)
+        s.path(f"M {hx + r * 0.30:.1f} {176 + r * 0.95:.1f} A {r} {r} 0 0 0 "
+               f"{hx + r * 0.95:.1f} {176 + r * 0.30:.1f}",
+               stroke=th.muted, sw=1.2)
+
+    # Height above the central microphone.
+    s.dim(390.0, gy, 390.0, hy, "150 m (492 ft)", offset=0, size=16,
+          label_side="right")
+    s.mic(hx, gy - 26.0, gy, 0.8)
+    s.text(hx, 508.0, "centre microphone", 15, th.fg)
+
+    # --- plan inset: the three-microphone line -----------------------------
+    s.text(735.0, 96.0, "Plan view", 17, th.fg, bold=True)
+    s.arrow(620.0, 190.0, 860.0, 190.0, th.fg, 2.0)
+    s.text(852.0, 176.0, "track", 14, th.muted, anchor="end")
+    s.ellipse(680.0, 190.0, 15.0, 15.0, "none", th.muted, 1.2)
+    s.circle(680.0, 190.0, 4.5, th.fg)
+    s.line(735.0, 120.0, 735.0, 260.0, th.muted, 1.1, dash="5,4")
+    for my_ in (120.0, 190.0, 260.0):
+        s.circle(735.0, my_, 6.0, th.secondary)
+        s.circle(735.0, my_, 2.2, th.bg)
+    s.dim(772.0, 120.0, 772.0, 190.0, "150 m", offset=0, size=14,
+          label_side="right")
+    s.dim(772.0, 190.0, 772.0, 260.0, "150 m", offset=0, size=14,
+          label_side="right")
+    for wy_ in (120.0, 190.0, 260.0):
+        s.line(741.0, wy_, 772.0, wy_, th.muted, 0.9, dash="3,3")
+    s.text(725.0, 296.0, "3 microphones on a line perpendicular to the track",
+           14, th.muted)
+
+    # --- normative context -------------------------------------------------
+    s.text(80.0, 540.0,
+           "Speed: the least of 0.9 VH, 0.9 VNE, 0.45 VH + 120 km/h and 0.45 VNE + 120 km/h",
+           16, th.fg, anchor="start")
+    s.text(80.0, 566.0,
+           "EPNL in EPNdB at the three points; at least six overflights, headwind and tailwind in equal number",
+           16, th.fg, anchor="start")
+    s.text(80.0, 592.0,
+           "microphones 1.2 m above ground; the sideline pair sees the overhead helicopter at 45° (slant ≈ 212 m)",
+           16, th.muted, anchor="start")
+
+
+# ---------------------------------------------------------------------------
+# Swept-sine distortion: deconvolution and the harmonic pre-arrivals
+# ---------------------------------------------------------------------------
+
+def _d_swept_sine(s: SVG, th: Theme) -> None:
+    """Farina's exponential-sweep method: sweep through the weakly nonlinear
+    DUT, deconvolve with the inverse filter, and the order-n distortion
+    products compress into impulse responses L*ln(n) ahead of the linear
+    one (L = 0.701 s for 20 Hz to 6 kHz in 4 s; 260 px per second)."""
+    def box(x0: float, x1: float, y0: float, l1: str, l2: str,
+            color: str) -> None:
+        s.rect(x0, y0, x1 - x0, 76.0, th.panel, color, rx=10, sw=2)
+        s.text((x0 + x1) / 2, y0 + 32.0, l1, 18, th.fg, bold=True)
+        s.text((x0 + x1) / 2, y0 + 56.0, l2, 14, th.muted)
+
+    box(60, 300, 64, "Exponential sweep x(t)", "20 Hz → 6 kHz in T = 4 s",
+        th.fg)
+    box(340, 560, 64, "Device under test", "weakly nonlinear: gain + harmonics",
+        th.primary)
+    box(600, 840, 64, "Recording y(t)", "sweep + distortion products", th.fg)
+    s.arrow(300.0, 102.0, 336.0, 102.0, th.fg, 2.0)
+    s.arrow(560.0, 102.0, 596.0, 102.0, th.fg, 2.0)
+    box(520, 840, 180, "Deconvolve with the inverse filter",
+        "time-reversed sweep with a +6 dB/octave tilt", th.secondary)
+    s.arrow(720.0, 140.0, 720.0, 176.0, th.fg, 2.0)
+    s.arrow(660.0, 256.0, 648.0, 298.0, th.fg, 2.0)
+
+    # --- impulse-response timeline -----------------------------------------
+    ax_y = 430.0
+    s.line(80.0, ax_y, 830.0, ax_y, th.fg, 1.8)
+    s.arrow(830.0, ax_y, 850.0, ax_y, th.fg, 1.8)
+    s.text(845.0, 452.0, "time", 14, th.muted, anchor="end")
+    s.line(640.0, ax_y - 5, 640.0, ax_y + 6, th.fg, 1.8)
+
+    def ir(x0: float, amp: float, color: str) -> None:
+        d = (f"M {x0:.0f} {ax_y:.0f} L {x0:.0f} {ax_y - amp:.0f} "
+             f"L {x0 + 4:.0f} {ax_y:.0f} L {x0 + 10:.0f} {ax_y - amp * 0.45:.0f} "
+             f"L {x0 + 16:.0f} {ax_y:.0f} L {x0 + 22:.0f} {ax_y - amp * 0.2:.0f} "
+             f"L {x0 + 28:.0f} {ax_y:.0f} L {x0 + 36:.0f} {ax_y - amp * 0.08:.0f} "
+             f"L {x0 + 44:.0f} {ax_y:.0f}")
+        s.path(d, stroke=color, sw=2.0)
+
+    ir(640.0, 94.0, th.primary)
+    ir(514.0, 60.0, th.secondary)
+    ir(440.0, 38.0, th.accent)
+    ir(387.0, 22.0, th.muted)
+    s.rect(630, 322, 66, 108, "none", th.primary, rx=8, sw=1.2, dash="5,4")
+    s.rect(505, 358, 62, 72, "none", th.secondary, rx=8, sw=1.2, dash="5,4")
+    s.rect(432, 382, 60, 48, "none", th.accent, rx=8, sw=1.2, dash="5,4")
+    s.rect(380, 402, 54, 28, "none", th.muted, rx=6, sw=1.0, dash="5,4")
+    s.text(663.0, 310.0, "h1 (linear), t = 0", 15, th.primary, bold=True)
+    s.text(536.0, 346.0, "h2", 15, th.secondary, bold=True)
+    s.text(462.0, 370.0, "h3", 15, th.accent, bold=True)
+    s.text(398.0, 396.0, "h4", 13, th.muted)
+    s.text(210.0, 344.0, "harmonic orders arrive early,", 15, th.muted,
+           italic=True)
+    s.text(210.0, 366.0, "each in its own window", 15, th.muted, italic=True)
+
+    # Pre-arrival advances (260 px per second).
+    s.dim(514.0, ax_y, 640.0, ax_y, "L·ln 2 = 0.49 s", offset=42, size=15)
+    s.dim(440.0, ax_y, 640.0, ax_y, "L·ln 3 = 0.77 s", offset=80, size=15)
+
+    s.text(450.0, 562.0,
+           "L = T / ln(f2/f1) = 0.70 s here; the order-n products compress L·ln n ahead of the linear response",
+           17, th.fg, bold=True)
+    s.text(450.0, 590.0,
+           "window each arrival  →  H1(f), H2(f), H3(f), …  →  THD(f) = √( Σ |Hn(nf)|² ) / |H1(f)|",
+           16, th.primary)
+
+
+# ---------------------------------------------------------------------------
+# Two-channel FRF measurement: H1 estimator and coherence
+# ---------------------------------------------------------------------------
+
+def _d_system_measurement(s: SVG, th: Theme) -> None:
+    """Classic dual-channel frequency-response measurement: generator into
+    amplifier and loudspeaker, microphone back in, the electrical reference
+    on channel 1, and Welch cross-spectra feeding H1 and coherence."""
+    def box(x0: float, x1: float, y0: float, h: float, l1: str, l2: str,
+            color: str, mono: bool = False) -> None:
+        s.rect(x0, y0, x1 - x0, h, th.panel, color, rx=10, sw=2)
+        s.text((x0 + x1) / 2, y0 + 30.0, l1, 18, th.fg, bold=True, mono=mono)
+        s.text((x0 + x1) / 2, y0 + 54.0, l2, 14, th.muted)
+
+    box(60, 250, 68, 72.0, "Signal generator", "broadband noise or a sweep",
+        th.fg)
+    box(310, 460, 68, 72.0, "Power amplifier", "", th.fg)
+    s.arrow(250.0, 104.0, 306.0, 104.0, th.fg, 2.0)
+    s.arrow(460.0, 104.0, 496.0, 104.0, th.fg, 2.0)
+
+    # Loudspeaker under test and the measurement microphone.
+    s.rect(500, 76, 44, 56, th.panel, th.primary, rx=6, sw=2)
+    s.circle(522.0, 96.0, 10.0, th.primary)
+    s.circle(522.0, 96.0, 4.0, th.bg)
+    s.circle(522.0, 119.0, 5.5, th.primary)
+    s.text(522.0, 60.0, "Loudspeaker under test", 15, th.fg, bold=True)
+    for r in (22, 38, 54):
+        s.path(f"M {548 + r * 0.30:.0f} {104 - r * 0.55:.0f} "
+               f"A {r} {r} 0 0 1 {548 + r * 0.55:.0f} {104 + r * 0.30:.0f}",
+               stroke=th.accent, sw=1.5)
+    s.rect(640, 99, 12, 10, th.fg, rx=2.5)                 # capsule
+    s.rect(652, 96, 30, 16, th.primary, rx=5)              # mic body
+    s.text(680.0, 76.0, "measurement microphone", 15, th.fg, bold=True)
+    s.line(682.0, 104.0, 706.0, 104.0, th.fg, 1.8)
+    s.line(706.0, 104.0, 706.0, 176.0, th.fg, 1.8)
+
+    # Reference tap after the generator.
+    s.circle(278.0, 104.0, 3.5, th.fg)
+    s.line(278.0, 104.0, 278.0, 176.0, th.fg, 1.8)
+
+    box(150, 420, 208, 60.0, "Channel 1: reference x(t)",
+        "the electrical drive signal", th.primary)
+    box(470, 750, 208, 60.0, "Channel 2: response y(t)",
+        "acoustic output at the microphone", th.secondary)
+    s.arrow(278.0, 176.0, 278.0, 204.0, th.fg, 1.8)
+    s.arrow(706.0, 176.0, 706.0, 204.0, th.fg, 1.8)
+
+    box(150, 750, 300, 72.0, "Dual-channel FFT analysis (Welch)",
+        "Hann segments, 50 % overlap  →  Gxx(f), Gyy(f), Gxy(f)", th.fg)
+    s.arrow(285.0, 268.0, 285.0, 296.0, th.fg, 1.8)
+    s.arrow(610.0, 268.0, 610.0, 296.0, th.fg, 1.8)
+
+    box(60, 440, 404, 72.0, "H1(f) = Gxy / Gxx",
+        "unbiased with output noise; H2 = Gyy/Gyx for input noise",
+        th.primary, mono=True)
+    box(460, 840, 404, 72.0, "γ²(f) = |Gxy|² / (Gxx·Gyy)",
+        "1 for a noiseless linear path; less with output noise",
+        th.secondary, mono=True)
+    s.arrow(280.0, 372.0, 264.0, 400.0, th.fg, 1.8)
+    s.arrow(620.0, 372.0, 636.0, 400.0, th.fg, 1.8)
+
+    s.text(450.0, 528.0,
+           "trust |H1| only where γ² stays near 1: coherence dips flag noise, distortion or an unresolved delay",
+           17, th.fg, bold=True)
+
+
+# ---------------------------------------------------------------------------
+# Test-signal family panel
+# ---------------------------------------------------------------------------
+
+def _d_test_signals(s: SVG, th: Theme) -> None:
+    """Labelled miniature of each stimulus: white and pink noise with their
+    PSD slopes, an MLS chip stream, linear versus exponential sweeps on a
+    time-frequency sketch and an IEC 60268-1 tone burst."""
+    import math
+
+    def tile(x: float, y: float, w: float, title: str) -> None:
+        s.rect(x, y, w, 240.0, th.panel, th.fg, rx=10, sw=1.8)
+        s.text(x + w / 2, y + 26.0, title, 17, th.fg, bold=True)
+
+    def spectrum_axes(x: float, y: float) -> None:
+        s.line(x, y, x + 190.0, y, th.muted, 1.2)
+        s.line(x, y, x, y - 58.0, th.muted, 1.2)
+        s.text(x + 190.0, y + 15.0, "lg f", 12, th.muted, anchor="end")
+
+    # --- white noise -------------------------------------------------------
+    tile(55, 62, 250, "White noise")
+    d = "M 75 140"
+    for i in range(1, 36):
+        r = math.sin(i * 12.9898) * 43758.5453
+        r -= math.floor(r)
+        d += f" L {75 + i * 6:.0f} {140 - (r - 0.5) * 62:.1f}"
+    s.path(d, stroke=th.primary, sw=1.3)
+    spectrum_axes(85.0, 268.0)
+    s.line(90.0, 226.0, 270.0, 226.0, th.accent, 2.2)
+    s.text(180.0, 250.0, "flat PSD: 0 dB/octave", 14, th.fg)
+    s.text(180.0, 294.0, "equal power per hertz", 13, th.muted)
+
+    # --- pink noise --------------------------------------------------------
+    tile(325, 62, 250, "Pink noise")
+    d = "M 345 146"
+    for i in range(1, 36):
+        v = (20.0 * math.sin(0.31 * i) + 10.0 * math.sin(0.83 * i + 1.7)
+             + 6.0 * math.sin(2.2 * i + 0.5) + 3.0 * math.sin(5.1 * i))
+        d += f" L {345 + i * 6:.0f} {140 - v:.1f}"
+    s.path(d, stroke=th.primary, sw=1.3)
+    spectrum_axes(355.0, 268.0)
+    s.line(360.0, 214.0, 540.0, 248.0, th.accent, 2.2)
+    s.text(422.0, 204.0, "−3 dB/octave PSD", 14, th.fg)
+    s.text(450.0, 294.0, "equal power per octave", 13, th.muted)
+
+    # --- MLS ---------------------------------------------------------------
+    tile(595, 62, 250, "MLS")
+    bits = [0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1]
+    d = ""
+    for i, b in enumerate(bits):
+        xa, xb = 620 + i * 12, 632 + i * 12
+        yl = 140 - 26 if b else 140 + 26
+        d += f"{'M' if i == 0 else 'L'} {xa} {yl} L {xb} {yl} "
+    s.path(d, stroke=th.primary, sw=1.6)
+    spectrum_axes(625.0, 268.0)
+    s.line(630.0, 226.0, 810.0, 226.0, th.accent, 2.2)
+    s.text(720.0, 250.0, "flat, line spectrum", 14, th.fg)
+    s.text(720.0, 294.0, "binary ±1, period 2^m − 1 samples", 13, th.muted)
+
+    # --- sweeps: linear vs exponential (wide tile) -------------------------
+    tile(55, 318, 520, "Sweeps: linear vs exponential")
+    s.line(95.0, 520.0, 545.0, 520.0, th.muted, 1.2)
+    s.arrow(95.0, 520.0, 95.0, 372.0, th.muted, 1.2)
+    s.text(82.0, 372.0, "f", 13, th.muted, italic=True)
+    s.text(548.0, 534.0, "t", 13, th.muted, italic=True)
+    s.line(95.0, 516.0, 540.0, 380.0, th.primary, 2.2)
+    s.text(268.0, 428.0, "linear", 14, th.primary)
+    pts = [(95, 519), (206, 517), (295, 513), (362, 505), (410, 494),
+           (451, 475), (473, 460), (495, 441), (518, 415), (540, 380)]
+    d = "M 95 519"
+    for px_, py_ in pts[1:]:
+        d += f" L {px_} {py_}"
+    s.path(d, stroke=th.secondary, sw=2.2)
+    s.text(438.0, 508.0, "exponential", 14, th.secondary)
+    s.text(315.0, 548.0,
+           "exponential: equal time (and energy) per octave; linear: equal time per hertz",
+           13, th.muted)
+
+    # --- tone burst --------------------------------------------------------
+    tile(595, 318, 250, "Tone burst")
+    s.line(615.0, 440.0, 825.0, 440.0, th.muted, 1.2)
+    d = "M 665 440"
+    for i in range(1, 111):
+        d += f" L {665 + i:.0f} {440 - 42 * math.sin(2 * math.pi * i / 22):.1f}"
+    s.path(d, stroke=th.primary, sw=1.6)
+    s.rect(663, 394, 114, 92, "none", th.secondary, rx=4, sw=1.2, dash="5,4")
+    s.text(720.0, 508.0, "whole periods, starting at", 13, th.muted)
+    s.text(720.0, 526.0, "a zero crossing (IEC 60268-1)", 13, th.muted)
+    s.text(720.0, 548.0, "25 periods of 5 kHz = 5 ms", 12, th.fg, mono=True)
+
+    # --- captions ----------------------------------------------------------
+    s.text(80.0, 590.0,
+           "every stimulus is deterministic and repeatable; synchronous averaging then lowers uncorrelated noise",
+           16, th.fg, anchor="start")
+    s.text(80.0, 616.0,
+           "sweeps separate harmonic distortion, MLS smears it across the period, bursts probe dynamics",
+           16, th.muted, anchor="start")
 
 
 DIAGRAMS = {
@@ -4913,6 +5544,28 @@ DIAGRAMS = {
     "diagram_sofar_channel": (
         _d_sofar_channel,
         "The SOFAR channel: a deep-ocean sound waveguide", 620),
+    "diagram_atmospheric_refraction": (
+        _d_atmospheric_refraction,
+        "Atmospheric refraction: downwind multipath and the upwind shadow",
+        620),
+    "diagram_aircraft_certification": (
+        _d_aircraft_certification,
+        "Aircraft noise certification points (ICAO Annex 16, Chapter 3)",
+        640),
+    "diagram_rotorcraft_certification": (
+        _d_rotorcraft_certification,
+        "Helicopter overflight noise certification (ICAO Annex 16, Chapter 8)",
+        620),
+    "diagram_swept_sine": (
+        _d_swept_sine,
+        "Swept-sine distortion: deconvolution and harmonic pre-arrivals",
+        620),
+    "diagram_system_measurement": (
+        _d_system_measurement,
+        "Two-channel FRF measurement: the H1 estimator and coherence", 560),
+    "diagram_test_signals": (
+        _d_test_signals,
+        "The test-signal family at a glance", 640),
 }
 
 
