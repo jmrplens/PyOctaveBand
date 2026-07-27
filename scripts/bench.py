@@ -287,7 +287,7 @@ def _time_figures() -> None:
             continue
         fn = getattr(gg, name)
         params = list(inspect.signature(fn).parameters)
-        if params[:1] != ["output_dir"]:  # e.g. generate_og_image(output_path)
+        if params[:1] != ["output_dir"]:  # a generator taking something else
             continue
         t0 = time.perf_counter()
         fn(out_dir)

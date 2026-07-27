@@ -1,3 +1,5 @@
+<a href="https://jmrplens.github.io/phonometry/"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/brand/banner.webp" alt="phonometry, acoustic measurement toolkit for Python" width="100%"></a>
+
 <!-- Package -->
 [![PyPI version](https://img.shields.io/pypi/v/phonometry?logo=pypi&logoColor=white)](https://pypi.org/project/phonometry/)
 [![Python versions](https://img.shields.io/pypi/pyversions/phonometry?logo=python&logoColor=white)](https://pypi.org/project/phonometry/)

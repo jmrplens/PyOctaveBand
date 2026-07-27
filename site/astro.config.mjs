@@ -539,20 +539,23 @@ export default defineConfig({
             title: 'llms.txt',
           },
         },
-        // Open Graph image
-        { tag: 'meta', attrs: { property: 'og:image', content: socialImageUrl } },
+        // Open Graph image. Only the invariant parts are set here: the image
+        // itself is per page and comes from src/components/Head.astro, which
+        // has the route. Emitting a site-wide og:image here too would leave two
+        // in the document, and an Open Graph parser takes the first, so the
+        // per-page card would silently lose to this one. No og:image:type
+        // either: the per-page cards are JPEG and the fallback is PNG, and one
+        // site-wide tag cannot describe both.
         { tag: 'meta', attrs: { property: 'og:image:alt', content: socialImageAlt } },
-        { tag: 'meta', attrs: { property: 'og:image:type', content: 'image/png' } },
         { tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
         { tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
         // Twitter card
         { tag: 'meta', attrs: { name: 'twitter:card', content: 'summary_large_image' } },
-        { tag: 'meta', attrs: { name: 'twitter:image', content: socialImageUrl } },
         { tag: 'meta', attrs: { name: 'twitter:image:alt', content: socialImageAlt } },
         // Author
         { tag: 'meta', attrs: { name: 'author', content: 'José Manuel Requena Plens' } },
         // Theme color
-        { tag: 'meta', attrs: { name: 'theme-color', content: '#1f77b4' } },
+        { tag: 'meta', attrs: { name: 'theme-color', content: '#0a6f8c' } },
         // rel="me" identity links (canonical list from jmrp.io)
         { tag: 'link', attrs: { rel: 'me', href: 'https://github.com/jmrplens' } },
         { tag: 'link', attrs: { rel: 'me', href: 'https://www.linkedin.com/in/jmrplens' } },
@@ -573,6 +576,19 @@ export default defineConfig({
         },
         // Web app manifest
         { tag: 'link', attrs: { rel: 'manifest', href: `${basePath}/manifest.json` } },
+        // Icons. The SVG favicon carries its own prefers-color-scheme rule, so
+        // the mark lightens itself against a dark browser chrome; the .ico is
+        // there for the clients that still request /favicon.ico by name, and
+        // the touch icon for an iOS home screen, which ignores both.
+        {
+          tag: 'link',
+          attrs: { rel: 'icon', type: 'image/svg+xml', href: `${basePath}/favicon.svg` },
+        },
+        { tag: 'link', attrs: { rel: 'icon', sizes: '48x48', href: `${basePath}/favicon.ico` } },
+        {
+          tag: 'link',
+          attrs: { rel: 'apple-touch-icon', href: `${basePath}/apple-touch-icon.png` },
+        },
         // Bing Webmaster Tools site verification (Google Search Console is
         // already verified for this property; no meta needed).
         { tag: 'meta', attrs: { name: 'msvalidate.01', content: '7574EB3B44624C239F14920DBC34EE25' } },
