@@ -222,8 +222,8 @@ A three-row rigid-walled domain is a plane-wave tube, and with the per-cell
 and loss maps). That closes a remarkable loop: the FDTD probe histories can
 be reduced through the library's own ISO 10534-2 and ASTM E2611 chains as
 if they were measurements, and the recovered spectra agree with the exact
-analytic answer for the same lossy layer to within 0,035 in absorption and
-0,1 dB in transmission loss (the `tests/simulation` cross-checks run this
+analytic answer for the same lossy layer to within 0.035 in absorption and
+0.1 dB in transmission loss (the `tests/simulation` cross-checks run this
 on every commit).
 
 ```python
@@ -232,7 +232,7 @@ from phonometry.materials import two_microphone_impedance
 from phonometry.simulation import FDTD2D
 
 c0, rho0, dx = 343.0, 1.2, 0.005
-nx, d_cells = 280, 20                     # 1,4 m tube, 10 cm sample
+nx, d_cells = 280, 20                     # 1.4 m tube, 10 cm sample
 c = np.full((3, nx), c0); rho = np.full((3, nx), rho0)
 sigma = np.zeros((3, nx))
 c[:, -d_cells:] = 0.6 * c0                # the sample: slower,

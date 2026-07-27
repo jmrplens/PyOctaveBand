@@ -15691,8 +15691,8 @@ _ANIM_WEIGHTS: dict[str, float] = {
     "anim_onset_detection": 55.0,
     "anim_time_weighting": 55.0,
     "anim_schroeder": 55.0,
-    "anim_fdtd_impedance_tube": 3.0,
-    "anim_fdtd_transmission_tube": 3.0,
+    "anim_fdtd_impedance_tube": 260.0,
+    "anim_fdtd_transmission_tube": 280.0,
 }
 
 # A clip rename must not silently drop its scheduling weight; fail fast.

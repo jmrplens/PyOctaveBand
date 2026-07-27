@@ -21,6 +21,7 @@ the complex ``k2``.
 from __future__ import annotations
 
 import numpy as np
+import pytest
 
 from phonometry.materials.impedance_tube import (
     air_layer_transfer_matrix,
@@ -217,3 +218,10 @@ def test_virtual_astm_empty_tube_tl_is_zero() -> None:
         wavenumber=k_air, characteristic_impedance=RHO0 * C0,
     )
     assert np.max(np.abs(matrix.transmission_loss(RHO0 * C0))) < 0.5
+
+def test_damping_map_validation() -> None:
+    # The per-cell damping map must be 2-D and match the grid.
+    with pytest.raises(ValueError, match="scalar or an"):
+        FDTD2D(C0, DX, shape=(NY, 8), damping=np.zeros(8))
+    with pytest.raises(ValueError, match="does not match the"):
+        FDTD2D(C0, DX, shape=(NY, 8), damping=np.zeros((NY, 9)))
