@@ -38,6 +38,7 @@ reports:
   - changed-files:
       - any-glob-to-any-file:
           - src/phonometry/_report/**
+          - .github/reports/**
           - scripts/generate_reports.py
           - scripts/generate_site_reports.py
 
@@ -57,6 +58,14 @@ validation:
   - changed-files:
       - any-glob-to-any-file:
           - tests/data/**
+          - tests/golden_data.py
+          - tests/reference_data.py
+
+performance:
+  - changed-files:
+      - any-glob-to-any-file:
+          - scripts/bench.py
+          - tests/test_performance.py
 
 api:
   - changed-files:
@@ -80,7 +89,9 @@ ci:
   - changed-files:
       - any-glob-to-any-file:
           - .github/workflows/**
+          - .github/scripts/**
           - .github/labeler.yml
+          - .github/dependabot.yml
           - Makefile
           - hooks/**
           - requirements-dev.txt
@@ -88,7 +99,21 @@ ci:
           - sonar-project.properties
 
 # --- Acoustic domain ----------------------------------------------------------
-# One per package under src/phonometry/. tests/ mirrors the same names.
+# One per package under src/phonometry/. tests/ mirrors the same names, so an
+# implementation and its tests land on the same label. Keep this list in step
+# with the packages: a new one without an entry here goes out unlabelled.
+
+# Shared code that belongs to no single domain, plus the cross-cutting suites at
+# the root of tests/. Without this, a change to code every package depends on
+# would carry no area label at all.
+"area: core":
+  - changed-files:
+      - any-glob-to-any-file:
+          - src/phonometry/_internal/**
+          - src/phonometry/_compat.py
+          - src/phonometry/_version.py
+          - src/phonometry/_i18n.py
+          - tests/*.py
 
 "area: aircraft":
   - changed-files:

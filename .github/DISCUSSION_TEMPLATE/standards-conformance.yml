@@ -53,7 +53,7 @@ body:
     attributes:
       label: Function or module involved
       description: Leave empty if your question is whether it exists at all.
-      placeholder: "phonometry.levels.equivalent_level"
+      placeholder: "phonometry.leq"
     validations:
       required: false
 

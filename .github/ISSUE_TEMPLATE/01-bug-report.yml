@@ -27,7 +27,9 @@ body:
       label: Minimal reproducible example
       description: >
         Self-contained code that fails when run. If it needs a signal, generate it in the
-        snippet rather than attaching a file where you can.
+        snippet rather than attaching a file where you can. For an installation failure
+        there is no snippet: give the install command instead, and put its output in the
+        next field.
       render: python
     validations:
       required: true
@@ -45,7 +47,9 @@ body:
     id: version
     attributes:
       label: phonometry version
-      description: 'Run: python -c "import phonometry; print(phonometry.__version__)"'
+      description: >
+        Run: python -c "import phonometry; print(phonometry.__version__)"
+        If the installation itself failed, give the version you were trying to install.
       placeholder: "3.3.0"
     validations:
       required: true

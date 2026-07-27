@@ -12,6 +12,10 @@ body:
         [Documentation & learning](https://github.com/jmrplens/phonometry/discussions/categories/documentation-learning)
         instead. It is worth raising there, it just does not start as an issue.
 
+        When the code and the documentation disagree and you cannot tell which one is
+        wrong, file it as a bug report. Use this form only when the documentation is
+        clearly the mistaken part.
+
   - type: input
     id: page
     attributes:
@@ -39,7 +43,7 @@ body:
       options:
         - A wrong value, formula or unit
         - An example that does not run
-        - Documented behaviour that does not match the library
+        - Documented behaviour the library never had, so the text is the wrong part
         - A broken link or a missing image
         - A figure that disagrees with the text
         - Something else

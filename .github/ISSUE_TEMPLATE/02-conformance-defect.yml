@@ -46,7 +46,7 @@ body:
     id: api
     attributes:
       label: Function or module affected
-      placeholder: "phonometry.levels.equivalent_level"
+      placeholder: "phonometry.leq"
     validations:
       required: true
 
