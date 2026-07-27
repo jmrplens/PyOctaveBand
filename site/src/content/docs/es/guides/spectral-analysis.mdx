@@ -78,9 +78,11 @@ absoluta se conserva: una señal en pascales da `Pa²/Hz`. Hay dos escalados:
 `'density'` (unidades²/Hz, integra a la potencia de la señal) y `'spectrum'`
 (unidades², lee directamente la potencia de tonos discretos).
 
-El estimador es una cadena fija, y cada cifra de calidad que reporta se
-deriva de una única decisión de diseño, la longitud del segmento. El diagrama
-la recorre con los números del ejemplo de esta página.
+El estimador es una cadena fija: la ventana fija el ancho de banda de
+resolución y el solape los promedios efectivos, y con ellos fijados cada
+cifra de calidad se deriva de la decisión principal de diseño, la longitud
+del segmento. El diagrama la recorre con los números del ejemplo de esta
+página.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spectral_analysis_es.svg" alt="Diagrama de bloques de la cadena de la PSD de Welch: un registro de ruido rosa de 20 segundos a 48 kilohercios se divide en segmentos de 4096 muestras con 50 por ciento de solape dando 467 segmentos y una separación de bins de 11,7 hercios, cada segmento se enventana con Hann para un ancho de banda de resolución de 17,6 hercios, los periodogramas unilaterales del cuadrado de la FFT se promedian en 442 promedios efectivos, y el resultado es Gxx de f con intervalo de confianza chi-cuadrado, un error aleatorio de 1 entre la raíz de n d igual al 4,8 por ciento y unos 885 grados de libertad; una nota final enuncia el compromiso de que los segmentos largos compran resolución pero gastan promedios" width="92%" />
 
