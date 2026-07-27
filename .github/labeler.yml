@@ -1,0 +1,176 @@
+# Path-based labels applied to pull requests by .github/workflows/labeler.yml.
+# Label names must already exist in the repository; the action does not create them.
+
+# --- Kind of change -----------------------------------------------------------
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - docs/**
+          - README.md
+          - CONTRIBUTING.md
+          - CHANGELOG.md
+
+site:
+  - changed-files:
+      - any-glob-to-any-file:
+          - site/**
+
+i18n:
+  - changed-files:
+      - any-glob-to-any-file:
+          - site/src/content/docs/es/**
+          - site/src/content/i18n/**
+          - src/phonometry/_i18n.py
+
+figures:
+  - changed-files:
+      - any-glob-to-any-file:
+          - .github/images/**
+          - scripts/generate_graphs.py
+          - scripts/generate_diagrams.py
+          - scripts/check_figures.py
+          - src/phonometry/_plot/**
+          - src/phonometry/_plotting.py
+          - requirements-figures.txt
+
+reports:
+  - changed-files:
+      - any-glob-to-any-file:
+          - src/phonometry/_report/**
+          - .github/reports/**
+          - scripts/generate_reports.py
+          - scripts/generate_site_reports.py
+
+conformance:
+  - changed-files:
+      - any-glob-to-any-file:
+          - docs/CONFORMANCE.md
+          - scripts/conformance_report.py
+          - scripts/check_conformance_claims.py
+
+errata:
+  - changed-files:
+      - any-glob-to-any-file:
+          - docs/ERRATA.md
+
+validation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - tests/data/**
+          - tests/golden_data.py
+          - tests/reference_data.py
+
+performance:
+  - changed-files:
+      - any-glob-to-any-file:
+          - scripts/bench.py
+          - tests/test_performance.py
+
+api:
+  - changed-files:
+      - any-glob-to-any-file:
+          - src/phonometry/__init__.py
+          - docs/api-reference.md
+          - scripts/api_taxonomy.py
+          - scripts/generate_api_docs.py
+          - scripts/check_api_reference.py
+
+packaging:
+  - changed-files:
+      - any-glob-to-any-file:
+          - pyproject.toml
+          - MANIFEST.in
+          - VERSION
+          - requirements.txt
+          - stub/**
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file:
+          - .github/workflows/**
+          - .github/scripts/**
+          - .github/labeler.yml
+          - .github/dependabot.yml
+          - Makefile
+          - hooks/**
+          - requirements-dev.txt
+          - codecov.yml
+          - sonar-project.properties
+
+# --- Acoustic domain ----------------------------------------------------------
+# One per package under src/phonometry/. tests/ mirrors the same names, so an
+# implementation and its tests land on the same label. Keep this list in step
+# with the packages: a new one without an entry here goes out unlabelled.
+
+# Shared code that belongs to no single domain, plus the cross-cutting suites at
+# the root of tests/. Without this, a change to code every package depends on
+# would carry no area label at all.
+"area: core":
+  - changed-files:
+      - any-glob-to-any-file:
+          - src/phonometry/_internal/**
+          - src/phonometry/_compat.py
+          - src/phonometry/_version.py
+          - src/phonometry/_i18n.py
+          - tests/*.py
+
+"area: aircraft":
+  - changed-files:
+      - any-glob-to-any-file: ["src/phonometry/aircraft/**", "tests/aircraft/**"]
+
+"area: broadcast":
+  - changed-files:
+      - any-glob-to-any-file: ["src/phonometry/broadcast/**", "tests/broadcast/**"]
+
+"area: building":
+  - changed-files:
+      - any-glob-to-any-file: ["src/phonometry/building/**", "tests/building/**"]
+
+"area: electroacoustics":
+  - changed-files:
+      - any-glob-to-any-file: ["src/phonometry/electroacoustics/**", "tests/electroacoustics/**"]
+
+"area: emission":
+  - changed-files:
+      - any-glob-to-any-file: ["src/phonometry/emission/**", "tests/emission/**"]
+
+"area: environmental":
+  - changed-files:
+      - any-glob-to-any-file: ["src/phonometry/environmental/**", "tests/environmental/**"]
+
+"area: hearing":
+  - changed-files:
+      - any-glob-to-any-file: ["src/phonometry/hearing/**", "tests/hearing/**"]
+
+"area: materials":
+  - changed-files:
+      - any-glob-to-any-file: ["src/phonometry/materials/**", "tests/materials/**"]
+
+"area: metrology":
+  - changed-files:
+      - any-glob-to-any-file: ["src/phonometry/metrology/**", "tests/metrology/**"]
+
+"area: noise control":
+  - changed-files:
+      - any-glob-to-any-file: ["src/phonometry/noise_control/**", "tests/noise_control/**"]
+
+"area: psychoacoustics":
+  - changed-files:
+      - any-glob-to-any-file: ["src/phonometry/psychoacoustics/**", "tests/psychoacoustics/**"]
+
+"area: room":
+  - changed-files:
+      - any-glob-to-any-file: ["src/phonometry/room/**", "tests/room/**"]
+
+"area: simulation":
+  - changed-files:
+      - any-glob-to-any-file: ["src/phonometry/simulation/**", "tests/simulation/**", "scripts/fdtd2d.py"]
+
+"area: underwater":
+  - changed-files:
+      - any-glob-to-any-file: ["src/phonometry/underwater/**", "tests/underwater/**"]
+
+"area: vibration":
+  - changed-files:
+      - any-glob-to-any-file: ["src/phonometry/vibration/**", "tests/vibration/**"]

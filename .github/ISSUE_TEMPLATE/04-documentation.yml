@@ -1,0 +1,59 @@
+name: Documentation defect
+description: Something in the documentation is wrong or broken
+labels: ["documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For a concrete defect: a wrong value or formula, an example that no longer runs, a
+        broken link, a figure that does not match the text.
+
+        If an explanation is simply hard to follow, or a guide is missing, that is
+        [Documentation & learning](https://github.com/jmrplens/phonometry/discussions/categories/documentation-learning)
+        instead. It is worth raising there, it just does not start as an issue.
+
+        When the code and the documentation disagree and you cannot tell which one is
+        wrong, file it as a bug report. Use this form only when the documentation is
+        clearly the mistaken part.
+
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      description: The URL on the documentation site, or the file under docs/.
+      placeholder: "https://jmrplens.github.io/phonometry/guides/filter-banks/"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: language
+    attributes:
+      label: Language
+      options:
+        - English
+        - Spanish
+        - Both
+    validations:
+      required: true
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What is wrong?
+      options:
+        - A wrong value, formula or unit
+        - An example that does not run
+        - Documented behaviour the library never had, so the text is the wrong part
+        - A broken link or a missing image
+        - A figure that disagrees with the text
+        - Something else
+    validations:
+      required: true
+
+  - type: textarea
+    id: detail
+    attributes:
+      label: What it says, and what it should say
+      description: Quote the passage. If you know the correction, give it.
+    validations:
+      required: true

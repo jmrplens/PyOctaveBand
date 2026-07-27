@@ -1,0 +1,80 @@
+name: Conformance defect
+description: A confirmed disagreement between the library and a standard
+labels: ["conformance"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For a discrepancy that has already been established: the library computes a value
+        that does not match what the standard requires.
+
+        If it has not been looked at yet, start in
+        [Standards & conformance](https://github.com/jmrplens/phonometry/discussions/categories/standards-conformance)
+        instead. Most reported discrepancies turn out to be a different edition, a
+        different clause, or a difference in the input conditions, and the discussion is
+        where that gets sorted out.
+
+        **Cite clauses and tables by number rather than pasting the text.** Standards are
+        copyrighted.
+
+  - type: input
+    id: discussion
+    attributes:
+      label: Discussion where this was established
+      description: Leave empty only if the defect is self-evident from the numbers below.
+      placeholder: "https://github.com/jmrplens/phonometry/discussions/..."
+    validations:
+      required: false
+
+  - type: input
+    id: standard
+    attributes:
+      label: Standard, edition and year
+      placeholder: "IEC 61672-1:2013"
+    validations:
+      required: true
+
+  - type: input
+    id: clause
+    attributes:
+      label: Clause, table, annex or equation
+      placeholder: "Clause 5.4.11, Table 3, Eq. (12)"
+    validations:
+      required: true
+
+  - type: input
+    id: api
+    attributes:
+      label: Function or module affected
+      placeholder: "phonometry.leq"
+    validations:
+      required: true
+
+  - type: textarea
+    id: numbers
+    attributes:
+      label: Required value against computed value
+      description: >
+        State both, with the input conditions they correspond to, and say where the
+        required value comes from. Tolerances matter: give the one the standard allows.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Code that reproduces it
+      render: python
+    validations:
+      required: true
+
+  - type: dropdown
+    id: origin
+    attributes:
+      label: Where does the defect appear to be?
+      options:
+        - In the library
+        - In the published standard itself, and belongs in docs/ERRATA.md
+        - Not established yet
+    validations:
+      required: false
