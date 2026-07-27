@@ -48,7 +48,7 @@ function collectSlugs(node, out) {
 }
 
 /** Slug (locale-free, no leading or trailing slash) to area key. */
-export const areaBySlug = (() => {
+const areaBySlug = (() => {
   /** @type {Map<string, string>} */
   const map = new Map();
   for (const group of sidebar) {
@@ -65,7 +65,7 @@ export const areaBySlug = (() => {
 })();
 
 /** Human-readable area label, keyed the same way, for the card's kicker. */
-export const areaLabel = (() => {
+const areaLabel = (() => {
   /** @type {Map<string, {en: string, es: string}>} */
   const map = new Map();
   for (const group of sidebar) {

@@ -45,7 +45,7 @@ export async function getStaticPaths() {
       const locale = page.id.startsWith('es/') ? 'es' : 'en';
       const slug = page.id.replace(/\/index$/, '') || 'index';
       return {
-        params: { slug: slug === 'index' ? 'index' : slug },
+        params: { slug },
         props: {
           title: page.data.title,
           kicker: areaLabelFor(page.id, locale),

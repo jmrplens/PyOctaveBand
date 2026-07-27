@@ -25,8 +25,8 @@ import sharp from 'sharp';
 const REPO = path.join(process.cwd(), '..');
 const BRAND = path.join(REPO, '.github', 'brand');
 
-export const OG_WIDTH = 1200;
-export const OG_HEIGHT = 630;
+const OG_WIDTH = 1200;
+const OG_HEIGHT = 630;
 
 const PAD_X = 72;
 const PAD_Y = 60;
