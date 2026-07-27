@@ -343,6 +343,15 @@ OBJECT_MODULE_OVERRIDES: dict[str, str] = {
     # Defined in phonometry._plot.room; documented helper for the ISO 18233
     # excitation signals that live in room_ir.
     "plot_excitation": "phonometry.room.room_ir",
+    # Defined in phonometry._plot.geometry; documented with the materials
+    # module whose devices each drawing depicts.
+    "plot_absorber_stack": "phonometry.materials.porous_absorber",
+    "plot_helmholtz_resonator_geometry":
+        "phonometry.materials.slow_sound_absorber",
+    "plot_slit_absorber_geometry": "phonometry.materials.slow_sound_absorber",
+    "plot_qrd_geometry": "phonometry.materials.diffuser_design",
+    "plot_impedance_tube_geometry": "phonometry.materials.impedance_tube",
+    "plot_transmission_tube_geometry": "phonometry.materials.impedance_tube",
     # Defined in underwater.acoustics, also re-exported by
     # underwater.ship_radiated_noise (identity scan is ambiguous).
     "UNDERWATER_REFERENCE_PRESSURE": "phonometry.underwater.acoustics",

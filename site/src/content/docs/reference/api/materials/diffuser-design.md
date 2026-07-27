@@ -80,6 +80,9 @@ DiffuserPolarResponse(
     levels: Real,
     coefficient: float,
     source_angle: float = 0.0,
+    well_width: float | None = None,
+    depths: Real | None = None,
+    periods: int | None = None,
 )
 ```
 
@@ -94,6 +97,9 @@ A predicted far-field polar response of a diffuser at one frequency.
 | `levels` | Predicted reflected sound-pressure level at each angle, in decibels, referenced to the peak of the response (peak at 0 dB). |
 | `coefficient` | Directional diffusion coefficient `d_theta` of the predicted response (ISO 17497-2, Formula (5)). |
 | `source_angle` | Angle of incidence `psi` of the source, in degrees. |
+| `well_width` | Well width `w` of the predicted surface, in metres, retained (with `depths` and `periods`) so `plot_geometry` can draw the well profile; appended after the original fields and `None` for hand-built responses or explicit-reflection surfaces. |
+| `depths` | Well depths `d_n` of one period, in metres, when the response was predicted from depths; `None` otherwise. |
+| `periods` | Number of repeated periods of the prediction. |
 
 ### DiffuserPolarResponse.plot()
 
@@ -110,6 +116,64 @@ Plot the predicted polar response with the diffusion coefficient annotated.
 
 Requires matplotlib (`pip install phonometry[plot]`); returns the polar
 `Axes` and never calls `plt.show`.
+
+### DiffuserPolarResponse.plot_geometry()
+
+```python
+DiffuserPolarResponse.plot_geometry(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the well profile of the predicted surface to scale.
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the response does not retain its well geometry (hand-built, or predicted from an explicit `reflection` sequence). |
+
+## plot_qrd_geometry
+
+```python
+plot_qrd_geometry(
+    depths: ArrayLike,
+    well_width: float,
+    ax: Axes | None = None,
+    *,
+    periods: int = 1,
+    fin_width: float | None = None,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the well profile of a quadratic-residue diffuser, to scale.
+
+Wells open upward; the profile repeats `periods` times with thin fins
+between wells. Pairs with
+[`qrd_well_depths`](/phonometry/reference/api/materials/diffuser-design/#qrd_well_depths), which supplies the depth
+sequence.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `depths` | Well depths `d_n`, in metres (one period). |
+| `well_width` | Well width `w`, in metres. |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `periods` | Number of repeated periods (>= 1). |
+| `fin_width` | Fin thickness between wells, in metres; `None` draws `w / 12`. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the base-slab rectangle. |
+
+**Returns:** The axes.
 
 ## predict_diffuser_polar_response
 

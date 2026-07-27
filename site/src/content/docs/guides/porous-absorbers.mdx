@@ -306,6 +306,43 @@ plt.show()
 
 </details>
 
+Behind every one of those curves there is a plain layer list, read front to
+back in the order the incident wave meets it. `plot_absorber_stack` draws
+that list to scale before any physics runs, and a solved result retains its
+layers, so `materials.layered_absorber(f, layers).plot_geometry()` draws the
+same cross-section from the result itself.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorber_stack_geometry.svg" alt="To-scale cross-section of a three-layer absorber: a 1 mm microperforated plate at the front, a 30 mm air cavity and a 50 mm porous layer against the rigid backing at the right, each thickness dimensioned, with the incident sound arriving from the left" width="80%" loading="lazy" />
+
+*The layer list as the wave meets it: microperforated plate, air cavity,
+porous layer, rigid backing. Drawing the stack to scale before computing
+anything catches the classic metres-versus-millimetres slip in a thickness
+at a glance.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import materials
+
+f = np.linspace(200.0, 4000.0, 100)
+layers = [
+    materials.MicroperforatedPlateLayer(0.001, 0.0002, 0.01),
+    materials.AirLayer(0.03),
+    materials.PorousLayer(0.05, materials.miki(f, 20000.0)),
+]
+
+# The free function draws any layer list; a solved result retains its
+# layers, so this draws the same cross-section:
+#   materials.layered_absorber(f, layers).plot_geometry()
+materials.plot_absorber_stack(layers)
+plt.show()
+```
+
+</details>
+
 ## 3. Resonant sheets: perforated, microperforated, membrane
 
 **Perforated panel.** The air plugs in the holes are the mass of a
@@ -523,6 +560,67 @@ res = slit_helmholtz_absorber(
 )
 res.plot()   # alpha(f) with |R| overlaid; peak = 1 at 300 Hz
 ```
+
+The solved geometry is worth a look before the absorption curve. The
+resonator draws itself with `.plot()` and the panel result with
+`.plot_geometry()`, both dimensioned and to scale.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/helmholtz_resonator_geometry.svg" alt="To-scale cross-section of the square-section Helmholtz resonator the 300 Hz critical-coupling design starts from: a neck 3 mm wide and 1 mm long opening into a rigid-walled cavity 27 mm wide and 30 mm deep, with the four defining dimensions dimensioned" width="80%" loading="lazy" />
+
+*The four numbers that define the resonator: the neck side and length set
+the moving mass and most of the loss, the cavity side and length set the
+stiffness. `critical_coupling_design` keeps this cross-section and retunes
+the cavity length to place the resonance.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import HelmholtzResonator
+
+resonator = HelmholtzResonator(
+    neck_length=1.0e-3, neck_side=3.0e-3,
+    cavity_length=30.0e-3, cavity_side=27.0e-3,
+)
+resonator.plot()   # dimensioned cross-section, to scale
+plt.show()
+```
+
+</details>
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slit_absorber_geometry.svg" alt="To-scale cross-section of one period of the critically-coupled slit panel: a slit about 1 mm high running the 30 mm depth of the panel, loaded by the tuned Helmholtz resonator cavity that fills the rest of the 50 mm period, with the rigid backing behind and the incident sound arriving from the left" width="80%" loading="lazy" />
+
+*One period of the solved design, to scale: the whole panel is 30 mm deep,
+$\lambda/38$ at 300 Hz, and the sub-millimetre slit that does all the
+absorbing is barely visible. That is exactly the point of the slow-sound
+mechanism.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import HelmholtzResonator, critical_coupling_design, materials
+
+base = HelmholtzResonator(
+    neck_length=1.0e-3, neck_side=3.0e-3,
+    cavity_length=30.0e-3, cavity_side=27.0e-3,
+)
+design = critical_coupling_design(
+    300.0, base, lattice_step=3.0e-2, period=5.0e-2,
+)
+
+# The free function draws any resonator list; a slit_helmholtz_absorber
+# result retains its geometry, so res.plot_geometry() draws the same period.
+materials.plot_slit_absorber_geometry(
+    [design.resonator], slit_height=design.slit_height,
+    lattice_step=3.0e-2, period=5.0e-2,
+)
+plt.show()
+```
+
+</details>
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slow_sound_absorber.svg" alt="Absorption of a slit panel loaded by one Helmholtz resonator: the critically-coupled design reaches alpha = 1 at 300 Hz, while narrowing the slit (more loss) or widening it (less loss) breaks the balance and lowers the peak; the panel depth is lambda/38" width="80%" loading="lazy" />
 

@@ -215,6 +215,86 @@ A square-cross-section Helmholtz resonator loading a slit.
 `cavity_length` `l_c` and `cavity_side` `w_c` the closed cavity;
 all lengths are in metres.
 
+### HelmholtzResonator.plot()
+
+```python
+HelmholtzResonator.plot(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the resonator cross-section to scale (dimensioned).
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
+
+## plot_helmholtz_resonator_geometry
+
+```python
+plot_helmholtz_resonator_geometry(
+    resonator: HelmholtzResonator,
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw a square-section Helmholtz resonator cross-section, to scale.
+
+Neck opening upward into free air, cavity below, with the four defining
+dimensions (neck side and length, cavity side and length) dimensioned.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `resonator` | A [`HelmholtzResonator`](/phonometry/reference/api/materials/slow-sound-absorber/#helmholtzresonator). |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the cavity rectangle. |
+
+**Returns:** The axes.
+
+## plot_slit_absorber_geometry
+
+```python
+plot_slit_absorber_geometry(
+    resonators: Sequence[HelmholtzResonator] | HelmholtzResonator,
+    ax: Axes | None = None,
+    *,
+    slit_height: float,
+    lattice_step: float,
+    period: float,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw one period of the slit metamaterial absorber, to scale.
+
+Side cut of the panel: the slit (height `h`) runs from the mouth at the
+left into the panel; `N` Helmholtz resonators load it from below at the
+lattice step `a` (total depth `L = N a`); the panel repeats vertically
+with `period` `d`; rigid back wall at the right.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `resonators` | The resonator chain of [`slit_helmholtz_absorber`](/phonometry/reference/api/materials/slow-sound-absorber/#slit_helmholtz_absorber) (one per lattice step, or a single resonator reused for all steps). |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `slit_height` | Slit height `h`, in metres. |
+| `lattice_step` | Lattice step `a`, in metres. |
+| `period` | Panel period `d`, in metres. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the slit rectangle. |
+
+**Returns:** The axes.
+
 ## rectangular_duct_properties
 
 ```python
@@ -370,6 +450,10 @@ SlitResonatorAbsorberResult(
     effective_wavenumber: Complex,
     effective_impedance: Complex,
     transfer_matrix: Complex,
+    resonators: tuple[HelmholtzResonator, ...] | None = None,
+    slit_height: float | None = None,
+    lattice_step: float | None = None,
+    period: float | None = None,
 )
 ```
 
@@ -383,6 +467,11 @@ backed panel, `normalized_impedance` its ratio to `Z0 = rho0 c0 / S0`,
 `effective_wavenumber` and `effective_impedance` the retrieved
 `k_eff` and `Z_eff` (Appl. Sci. 2017 Eq. (5)), and `transfer_matrix`
 the total 2x2 chain matrix with shape `(2, 2, len(frequency))`.
+
+The trailing fields retain the panel geometry the prediction was run
+with (`resonators`, `slit_height`, `lattice_step`, `period`) so
+`plot_geometry` can draw the cross-section; they are appended after
+the original fields and default to `None` for hand-built results.
 
 ### SlitResonatorAbsorberResult.plot()
 
@@ -399,6 +488,28 @@ Plot the absorption spectrum `alpha(f)` with `|R|` overlaid.
 
 Requires matplotlib (`pip install phonometry[plot]`); returns the
 `Axes`.
+
+### SlitResonatorAbsorberResult.plot_geometry()
+
+```python
+SlitResonatorAbsorberResult.plot_geometry(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw one period of the panel cross-section to scale (dimensioned).
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the result does not retain its geometry. |
 
 ## SlowSoundAbsorberWarning
 

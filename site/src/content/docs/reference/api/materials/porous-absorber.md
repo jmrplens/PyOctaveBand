@@ -353,6 +353,7 @@ LayeredAbsorberResult(
     reflection: Complex,
     absorption: Real,
     transfer_matrix: Complex,
+    layers: tuple[Layer, ...] | None = None,
 )
 ```
 
@@ -365,6 +366,11 @@ plane-wave reflection factor `R(theta)`, `absorption` the coefficient
 `alpha(theta) = 1 - |R|^2` and `transfer_matrix` the total chain
 matrix with shape `(2, 2, len(frequency))` (unimodular: every layer is
 reciprocal).
+
+`layers` retains the layer sequence the stack was solved with (front
+layer first) so `plot_geometry` can draw the cross-section; it is
+appended after the original fields and defaults to `None` for
+hand-built results.
 
 ### LayeredAbsorberResult.plot()
 
@@ -381,6 +387,28 @@ Plot the absorption spectrum `alpha(f)` with `|R|` overlaid.
 
 Requires matplotlib (`pip install phonometry[plot]`); returns the
 `Axes`.
+
+### LayeredAbsorberResult.plot_geometry()
+
+```python
+LayeredAbsorberResult.plot_geometry(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the solved stack cross-section to scale (dimensioned).
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the result does not retain its `layers`. |
 
 ## membrane_impedance
 
@@ -627,6 +655,35 @@ air-plug length, and `delta -> 0.85` for an isolated hole.
 | `open_area` | Fractional open area `eps` of the sheet (0..1). |
 
 **Returns:** End-correction factor `delta` (dimensionless, per end).
+
+## plot_absorber_stack
+
+```python
+plot_absorber_stack(
+    layers: Sequence[Layer] | Layer,
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw a layered-absorber cross-section to scale, rigid backing at right.
+
+Sound arrives from the left; each layer is drawn with its material fill
+and its thickness dimensioned below the stack. A membrane (no physical
+depth) is drawn as a thin sheet.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `layers` | The layer sequence of [`layered_absorber`](/phonometry/reference/api/materials/porous-absorber/#layered_absorber), front layer first, or a single layer. |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the front-layer rectangle. |
+
+**Returns:** The axes.
 
 ## PorousAbsorberWarning
 

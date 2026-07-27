@@ -204,6 +204,35 @@ in the 200-400 Hz bands (agreement within 0.01; over the full published
 100-5000 Hz range the model-vs-BEM mean absolute deviation is about 0.09,
 because edge diffraction is outside the Fraunhofer model).
 
+The surface itself is worth drawing before predicting anything from it.
+`plot_qrd_geometry` turns the depth sequence into the to-scale well profile
+below, and a predicted `DiffuserPolarResponse` retains its geometry, so
+`qrd.plot_geometry()` draws the surface it was computed for.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/qrd_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/qrd_geometry.svg" alt="To-scale well profile of two periods of the commercial N = 7 quadratic-residue diffuser: wells 85.7 mm wide separated by thin fins on a rigid base, following the depth sequence 0, 50, 200, 100, 100, 200, 50 mm with the deepest wells at 200 mm, and the incident sound arriving from above" width="88%"></picture>
+
+*Two of the six periods, to scale: the quadratic residues $n^2 \bmod 7$
+turned into a buildable surface. The 490 Hz design frequency is what puts
+the deepest well at exactly 200 mm.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import materials
+
+# The published N = 7 QRD: well width 3.6 m / 42, deepest well 0.2 m.
+depths = materials.qrd_well_depths(7, 490.0, speed_of_sound=343.0)
+materials.plot_qrd_geometry(depths, 3.6 / 42, periods=2)
+plt.show()
+
+# A predicted DiffuserPolarResponse retains its geometry, so
+# qrd.plot_geometry() draws the profile it was computed for (all 6 periods).
+```
+
+</details>
+
 ```python
 from phonometry import materials
 

@@ -9,6 +9,14 @@ from __future__ import annotations
 from typing import Any
 
 from ._internal.warnings import PhonometryWarning, _warn_renamed
+from ._plot.geometry import (
+    plot_absorber_stack,
+    plot_helmholtz_resonator_geometry,
+    plot_impedance_tube_geometry,
+    plot_qrd_geometry,
+    plot_slit_absorber_geometry,
+    plot_transmission_tube_geometry,
+)
 from ._plot.room import plot_excitation
 from ._report import ReportMetadata
 from ._version import __version__
@@ -1771,7 +1779,13 @@ __all__ = [
     "plate_bending_stiffness",
     "plate_loss_factor",
     "plenum_attenuation",
+    "plot_absorber_stack",
     "plot_excitation",
+    "plot_helmholtz_resonator_geometry",
+    "plot_impedance_tube_geometry",
+    "plot_qrd_geometry",
+    "plot_slit_absorber_geometry",
+    "plot_transmission_tube_geometry",
     "power_reflection_coefficient",
     "power_spectral_density",
     "practical_absorption_coefficient",
