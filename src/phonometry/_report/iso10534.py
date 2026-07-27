@@ -59,6 +59,13 @@ from .metadata import ReportMetadata
 if TYPE_CHECKING:
     from ..materials.impedance_tube import ImpedanceTubeResult
 
+#: Printable label for each accepted ``ReportMetadata.tube_shape`` value.
+_SHAPE_LABELS = {
+    "circular": "Circular",
+    "rectangular": "Rectangular",
+    "square": "Square",
+}
+
 
 def _a2(value: float, language: str = "en") -> str:
     """Two decimals (``alpha``, ``|r|`` and the normalised impedance parts)."""
@@ -88,6 +95,7 @@ def _metadata_pairs(
     specimen = _md("specimen")
     tube_diameter = _md("tube_diameter")
     mic_spacing = _md("mic_spacing")
+    tube_shape = _md("tube_shape")
     mounting = _md("mounting")
     test_room = _md("test_room")
     test_date = _md("test_date")
@@ -108,6 +116,9 @@ def _metadata_pairs(
         (t("Tube diameter d [mm]", language),
          fmt_meta(tube_diameter * 1e3, language)
          if tube_diameter is not None else None),
+        (t("Tube cross-section", language),
+         t(_SHAPE_LABELS[tube_shape], language)
+         if tube_shape is not None else None),
         (t("Microphone spacing s [mm]", language),
          fmt_meta(mic_spacing * 1e3, language)
          if mic_spacing is not None else None),

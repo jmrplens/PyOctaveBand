@@ -81,6 +81,10 @@ class ReportMetadata:
         positions of the impedance tube, in metres. Printed by the
         impedance-tube fiche (ISO 10534-2), where it bounds the working
         frequency range.
+    :ivar tube_shape: Cross-section of the impedance tube: ``"circular"``,
+        ``"rectangular"`` or ``"square"``. Printed by the impedance-tube fiche
+        (ISO 10534-2) next to the tube diameter, which it qualifies (inner
+        diameter for a circular tube, maximum lateral dimension otherwise).
     :ivar thickness: Specimen thickness under the applied static load, in
         metres. Printed by the dynamic-stiffness fiche (EN 29052-1 /
         ISO 9052-1), where EN 29052-1:1992 Clause 9 b) requires reporting the
@@ -113,9 +117,10 @@ class ReportMetadata:
     :ivar notes: Free-form remarks printed in the footer.
     :raises ValueError: If a supplied dimension/mass/volume/pressure is not
         finite and strictly positive, a temperature or requirement is not
-        finite, a relative humidity is outside 0..100 %, or a required class is
-        not one of 0, 1, 2, or a position count is not a finite, positive
-        integer.
+        finite, a relative humidity is outside 0..100 %, a required class is
+        not one of 0, 1, 2, a position count is not a finite, positive
+        integer, or a tube shape is not one of ``"circular"``,
+        ``"rectangular"``, ``"square"``.
     """
 
     specimen: str | None = None
@@ -151,6 +156,9 @@ class ReportMetadata:
     requirement: float | None = None
     required_class: int | None = None
     notes: str | None = None
+    # Appended after the original fields so the positional constructor order
+    # of this public dataclass is preserved.
+    tube_shape: str | None = None
 
     #: Numeric fields that must be finite and strictly positive.
     _POSITIVE_FIELDS = (
@@ -231,6 +239,13 @@ class ReportMetadata:
             raise ValueError(
                 "ReportMetadata.required_class must be 0, 1 or 2 when given; "
                 f"got {self.required_class!r}."
+            )
+        if self.tube_shape is not None and self.tube_shape not in (
+            "circular", "rectangular", "square"
+        ):
+            raise ValueError(
+                "ReportMetadata.tube_shape must be 'circular', 'rectangular' "
+                f"or 'square' when given; got {self.tube_shape!r}."
             )
 
     def is_empty(self) -> bool:

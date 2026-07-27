@@ -596,6 +596,20 @@ f_l, f_u = materials.plane_wave_frequency_range(0.020, 343.2, diameter=0.029)
 print(round(f_l, 1), round(f_u, 1))     # 858.0 6864.0
 ```
 
+El mismo ayudante cubre tubos cuadrados y rectangulares: con `shape="square"`
+o `shape="rectangular"` el factor de la Ec. (3) sustituye al circular, con
+$d$ el lado mayor. La rama de cuatro micrófonos mantiene sus propios límites
+en `plane_wave_frequency_range_astm`: ASTM E2611 conserva la constante
+circular sin redondear ($f\,d < 0{,}586\,c$, 6.2.4.1), el mismo
+$f\,d < 0{,}500\,c$ rectangular (6.2.5), una cota de separación algo más
+estricta $f\,s < 0{,}40\,c$ (6.5.4) y un extremo bajo más laxo en el 1 % de
+la longitud de onda (6.2.3). Pasar `diameter=` (y `shape=`) a
+`two_microphone_impedance`, `wave_decomposition` o los solucionadores
+`transfer_matrix_*` convierte la comprobación correspondiente en un aviso, y
+para la estimación de atenuación del anexo A en tubo rectangular
+`hydraulic_diameter(width, height)` proporciona el diámetro $4A/P$ que espera
+`tube_attenuation_constant`.
+
 **Método de la razón de onda estacionaria (ISO 10534-1).** Una sonda recorre la
 onda estacionaria y lee la diferencia de nivel $\Delta L = L_\text{max} -
 L_\text{min}$ entre un máximo de presión y el mínimo adyacente. La razón de onda
@@ -758,7 +772,7 @@ se añade la columna del módulo del factor de reflexión $|r|$.
 Usa el mismo contenedor `ReportMetadata` y el mismo motor que las demás fichas.
 El rango de frecuencias medido se toma del resultado; los campos descriptivos y
 geométricos de `ReportMetadata` que aplican aquí son `client`, `manufacturer`,
-`specimen`, `tube_diameter`, `mic_spacing`, `mounting`, `test_room`,
+`specimen`, `tube_diameter`, `tube_shape`, `mic_spacing`, `mounting`, `test_room`,
 `test_date`, `temperature`, `pressure`, `measurement_standard`, `laboratory`,
 `operator`, `report_id` y `notes` (`tube_diameter` y `mic_spacing` se dan en
 metros y se imprimen en milímetros). El campo `requirement` se ignora (la
@@ -824,8 +838,10 @@ micrófonos `(H1, H2, H3, H4)` medidas en cada carga; sus métodos
 (`transmission_loss`, `reflection_hard_backed`,
 `absorption_hard_backed`, `characteristic_impedance_material`,
 `material_wavenumber`) leen entonces las magnitudes de ASTM E2611, y su
-`.plot(frequency, rho_c)` dibuja la pérdida de transmisión con la absorción
-con respaldo rígido superpuesta. La matriz no tiene por qué venir de una
+`.plot()` dibuja la pérdida de transmisión con la absorción con respaldo
+rígido superpuesta (una matriz construida por los solucionadores retiene
+$\rho c$ y, si se aporta, el vector de frecuencias, de modo que solo una
+matriz construida a mano los necesita como argumentos). La matriz no tiene por qué venir de una
 medición: el
 [solucionador multicapa](/phonometry/es/guides/porous-absorbers/) expone la
 matriz de cadena de cualquier apilado modelado en el mismo convenio, de modo

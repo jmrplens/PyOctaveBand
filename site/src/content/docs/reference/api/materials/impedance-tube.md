@@ -208,6 +208,29 @@ Face pressures and particle velocities (ASTM E2611-19, Eq. (21)).
 
 **Returns:** Tuple `(p0, pd, u0, ud)` of face pressures and velocities.
 
+## hydraulic_diameter
+
+```python
+hydraulic_diameter(width: float, height: float) -> float
+```
+
+Hydraulic diameter of a rectangular tube, `4 A / P` (ISO 10534-2, A.2.1.5).
+
+For a rectangular cross-section of side lengths `w` and `h` the ratio
+of four times the area to the perimeter reduces to
+`d_h = 2 w h / (w + h)`; a square tube gives `d_h` equal to the side
+length. This is the `d` the Eq. (A.18) attenuation estimate expects for
+rectangular tubes (see [`tube_attenuation_constant`](/phonometry/reference/api/materials/impedance-tube/#tube_attenuation_constant)).
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `width` | Inner side length `w`, in metres. |
+| `height` | Inner side length `h`, in metres. |
+
+**Returns:** Hydraulic diameter `d_h = 4 A / P`, in metres.
+
 ## ImpedanceTubeResult
 
 ```python
@@ -217,6 +240,10 @@ ImpedanceTubeResult(
     surface_impedance: Complex,
     normalized_impedance: Complex,
     absorption: Real,
+    spacing: float | None = None,
+    x1: float | None = None,
+    diameter: float | None = None,
+    shape: str | None = None,
 )
 ```
 
@@ -228,6 +255,13 @@ reflection factor `r` at the sample surface (Eq. (17)),
 (Eq. (19)), `normalized_impedance` the ratio `Z / (rho c0)` (Eq. (19))
 and `absorption` the normal-incidence coefficient `alpha = 1 - |r|^2`
 (Eq. (18)).
+
+The trailing fields retain the tube geometry the reduction was run with
+(microphone `spacing` `s`, distance `x1` from the sample to the
+farther microphone, tube `diameter` and cross-section `shape`, stored
+canonically as `"circular"`/`"rectangular"` - a `"square"` input is
+kept as `"rectangular"`); they default to `None` when not supplied to
+[`two_microphone_impedance`](/phonometry/reference/api/materials/impedance-tube/#two_microphone_impedance).
 
 ### ImpedanceTubeResult.plot()
 
@@ -278,7 +312,7 @@ to the normal-incidence coefficient reported here).
 | Name | Description |
 | :--- | :--- |
 | `path` | Destination path of the PDF file. |
-| `metadata` | Optional [`ReportMetadata`](/phonometry/reference/api/building/insulation/#reportmetadata); `None` produces a body-and-disclaimer fiche whose header shows only the measured frequency range. The applicable descriptive/geometric fields are `client`, `manufacturer`, `specimen`, `tube_diameter`, `mic_spacing`, `mounting`, `test_room`, `test_date`, `temperature`, `pressure`, `measurement_standard`, `laboratory`, `operator`, `report_id` and `notes`. The `requirement` field is ignored (ISO 10534-2 has no verdict). |
+| `metadata` | Optional [`ReportMetadata`](/phonometry/reference/api/building/insulation/#reportmetadata); `None` produces a body-and-disclaimer fiche whose header shows only the measured frequency range. The applicable descriptive/geometric fields are `client`, `manufacturer`, `specimen`, `tube_diameter`, `tube_shape`, `mic_spacing`, `mounting`, `test_room`, `test_date`, `temperature`, `pressure`, `measurement_standard`, `laboratory`, `operator`, `report_id` and `notes`. The `requirement` field is ignored (ISO 10534-2 has no verdict). |
 | `engine` | Rendering back end; only `"reportlab"` is supported. |
 | `verbose` | When `True`, the value table inserts the reflection-factor magnitude `\|r\|` column. |
 | `language` | Fiche language: `"en"` (default, English, decimal point) or `"es"` (Spanish, decimal comma). |
@@ -384,8 +418,45 @@ Clause 4.2 guideline that the spacing exceed 5 % of the wavelength, i.e.
 | :--- | :--- |
 | `spacing` | Microphone spacing `s`, in metres. |
 | `speed_of_sound` | Speed of sound `c0`, in metres per second. |
-| `diameter` | Tube diameter (circular) or maximum lateral dimension (rectangular) `d`, in metres; `None` applies only the spacing bound. |
-| `shape` | `"circular"` or `"rectangular"`. |
+| `diameter` | Tube diameter (circular) or maximum lateral dimension (rectangular/square) `d`, in metres; `None` applies only the spacing bound. |
+| `shape` | `"circular"`, `"rectangular"` or `"square"` (a square tube is the rectangular bound with `d` the side length). |
+
+**Returns:** Tuple `(f_l, f_u)` of the lower and upper frequency limits, in Hz.
+
+## plane_wave_frequency_range_astm
+
+```python
+plane_wave_frequency_range_astm(
+    spacing: float,
+    speed_of_sound: float,
+    *,
+    diameter: float | None = None,
+    shape: str = 'circular',
+) -> tuple[float, float]
+```
+
+Working plane-wave frequency range `(f_l, f_u)` (ASTM E2611-19).
+
+The upper limit is the smaller of the microphone-spacing bound
+`s <= 0,8 c / (2 f_u)`, i.e. `f_u s < 0,40 c` (6.5.4), and, when the
+tube `diameter` is given, the cut-on bound `f_u < K c / d` with
+`K = 0,586` for a circular tube (6.2.4.1, Eq. (2)) or `K = 0,500` for
+a rectangular tube with `d` the largest section dimension (6.2.5). The
+lower limit follows 6.2.3: the spacing shall be greater than 1 % of the
+wavelength, i.e. `f_l = c / (100 s)`.
+
+With two different spacings `s1`/`s2`, call with the larger one for
+the upper bound and the smaller one for the lower bound (each bound is
+binding for every microphone pair).
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `spacing` | Microphone spacing `s`, in metres. |
+| `speed_of_sound` | Speed of sound `c`, in metres per second. |
+| `diameter` | Tube diameter (circular) or largest section dimension (rectangular/square) `d`, in metres; `None` applies only the spacing bound. |
+| `shape` | `"circular"`, `"rectangular"` or `"square"`. |
 
 **Returns:** Tuple `(f_l, f_u)` of the lower and upper frequency limits, in Hz.
 
@@ -595,6 +666,9 @@ transfer_matrix_one_load(
     thickness: float,
     wavenumber: ArrayLike,
     characteristic_impedance: float,
+    frequency: ArrayLike | None = None,
+    diameter: float | None = None,
+    shape: str = 'circular',
 ) -> TransferMatrix
 ```
 
@@ -622,8 +696,11 @@ T21 = (u0^2 - ud^2) / DEN
 | `thickness` | Specimen thickness `d`, in metres. |
 | `wavenumber` | Air wavenumber `k`. |
 | `characteristic_impedance` | Characteristic impedance `rho c`. |
+| `frequency` | Optional frequency vector `f`, in hertz, retained on the result so [`TransferMatrix.plot`](/phonometry/reference/api/materials/impedance-tube/#transfermatrixplot) needs no arguments. |
+| `diameter` | Optional tube diameter (circular) or largest section dimension (rectangular/square), in metres, that activates the plane-wave working-range check (6.2.3-6.2.5, 6.5.4). |
+| `shape` | Tube cross-section, `"circular"`, `"rectangular"` or `"square"`. |
 
-**Returns:** The specimen [`TransferMatrix`](/phonometry/reference/api/materials/impedance-tube/#transfermatrix).
+**Returns:** The specimen [`TransferMatrix`](/phonometry/reference/api/materials/impedance-tube/#transfermatrix) (measurement context retained on the result).
 
 ## transfer_matrix_two_load
 
@@ -639,6 +716,9 @@ transfer_matrix_two_load(
     thickness: float,
     wavenumber: ArrayLike,
     characteristic_impedance: float,
+    frequency: ArrayLike | None = None,
+    diameter: float | None = None,
+    shape: str = 'circular',
 ) -> TransferMatrix
 ```
 
@@ -669,13 +749,30 @@ T22 = (p_da u0b - p_db u0a) / DEN
 | `thickness` | Specimen thickness `d`, in metres. |
 | `wavenumber` | Air wavenumber `k`. |
 | `characteristic_impedance` | Characteristic impedance `rho c`. |
+| `frequency` | Optional frequency vector `f`, in hertz, retained on the result so [`TransferMatrix.plot`](/phonometry/reference/api/materials/impedance-tube/#transfermatrixplot) needs no arguments. |
+| `diameter` | Optional tube diameter (circular) or largest section dimension (rectangular/square), in metres, that activates the plane-wave working-range check (6.2.3-6.2.5, 6.5.4). |
+| `shape` | Tube cross-section, `"circular"`, `"rectangular"` or `"square"`. |
 
-**Returns:** The specimen [`TransferMatrix`](/phonometry/reference/api/materials/impedance-tube/#transfermatrix).
+**Returns:** The specimen [`TransferMatrix`](/phonometry/reference/api/materials/impedance-tube/#transfermatrix) (measurement context retained on the result).
 
 ## TransferMatrix
 
 ```python
-TransferMatrix(t11: Complex, t12: Complex, t21: Complex, t22: Complex)
+TransferMatrix(
+    t11: Complex,
+    t12: Complex,
+    t21: Complex,
+    t22: Complex,
+    l1: float | None = None,
+    s1: float | None = None,
+    l2: float | None = None,
+    s2: float | None = None,
+    thickness: float | None = None,
+    diameter: float | None = None,
+    shape: str | None = None,
+    frequency: Real | None = None,
+    air_characteristic_impedance: float | None = None,
+)
 ```
 
 Acoustic transfer matrix `[[T11, T12], [T21, T22]]` (ASTM E2611-19).
@@ -683,6 +780,15 @@ Acoustic transfer matrix `[[T11, T12], [T21, T22]]` (ASTM E2611-19).
 Relates the pressure and normal particle velocity across a specimen,
 `[p; u]_{x=0} = T [p; u]_{x=d}` (Eq. (16)). Each entry is complex and
 may be scalar or a per-frequency array of matching shape.
+
+The trailing fields retain the measurement context when the matrix comes
+out of [`transfer_matrix_two_load`](/phonometry/reference/api/materials/impedance-tube/#transfer_matrix_two_load) / [`transfer_matrix_one_load`](/phonometry/reference/api/materials/impedance-tube/#transfer_matrix_one_load)
+(tube geometry `l1`/`s1`/`l2`/`s2`, specimen `thickness`, tube
+`diameter` and canonical cross-section `shape`, the `frequency`
+vector when supplied to the solver, and the air
+`air_characteristic_impedance` `rho c`); all default to `None` so a
+hand-built matrix (for example [`air_layer_transfer_matrix`](/phonometry/reference/api/materials/impedance-tube/#air_layer_transfer_matrix)) is
+unchanged.
 
 ### TransferMatrix.absorption_hard_backed()
 
@@ -746,8 +852,8 @@ Propagation wavenumber inside the material (ASTM E2611-19, Eq. (29)).
 
 ```python
 TransferMatrix.plot(
-    frequency: ArrayLike,
-    characteristic_impedance: float,
+    frequency: ArrayLike | None = None,
+    characteristic_impedance: float | None = None,
     ax: Axes | None = None,
     *,
     language: str = 'en',
@@ -761,10 +867,13 @@ Reads the four-pole entries out as the two ASTM E2611-19 spectra a
 laboratory quotes: the normal-incidence transmission loss `TLn(f)`
 (Eq. (26), the primary curve, left axis) and the hard-backed
 absorption coefficient `alpha(f)` (Eq. (28), a muted companion on a
-0..1 right axis). The matrix itself carries no frequency axis, so the
-`frequency` vector of the measurement (matching the shape of the
-entries) and the air characteristic impedance `rho c` must be
-supplied.
+0..1 right axis). The four-pole entries carry no frequency axis of
+their own, so the plot needs the measurement's `frequency` vector
+(matching the shape of the entries) and the air characteristic
+impedance `rho c`. A matrix built by the solvers retains both
+(`self.frequency` / `self.air_characteristic_impedance`), so
+`plot()` takes no arguments there; only a hand-built matrix (for
+example [`air_layer_transfer_matrix`](/phonometry/reference/api/materials/impedance-tube/#air_layer_transfer_matrix)) must supply them.
 
 Requires matplotlib (`pip install phonometry[plot]`); returns the
 `Axes` of the transmission-loss curve.
@@ -773,13 +882,19 @@ Requires matplotlib (`pip install phonometry[plot]`); returns the
 
 | Name | Description |
 | :--- | :--- |
-| `frequency` | Frequency vector `f`, in hertz, matching the shape of the matrix entries. |
-| `characteristic_impedance` | Characteristic impedance `rho c` of the air in the tube, in rayls. |
+| `frequency` | Frequency vector `f`, in hertz, matching the shape of the matrix entries; `None` uses the stored `frequency`. |
+| `characteristic_impedance` | Characteristic impedance `rho c` of the air in the tube, in rayls; `None` uses the stored `air_characteristic_impedance`. |
 | `ax` | Existing axes, or `None` to create a figure. |
 | `language` | Plot language: `"en"` (default) or `"es"`. |
 | `kwargs` | Forwarded to the transmission-loss `plot` call. |
 
 **Returns:** The axes.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If `frequency` or `characteristic_impedance` is neither supplied nor stored on the matrix. |
 
 ### TransferMatrix.reflection_hard_backed()
 
@@ -843,7 +958,7 @@ porous-wall and object losses and is therefore a lower limit (Clause A.2.1.5).
 | :--- | :--- |
 | `frequency` | Frequency `f`, in hertz (scalar or per band). |
 | `speed_of_sound` | Speed of sound `c0`, in metres per second. |
-| `diameter` | Circular-tube diameter `d`, in metres, or the hydraulic diameter `4 * area / perimeter` for a rectangular tube. |
+| `diameter` | Circular-tube diameter `d`, in metres, or the hydraulic diameter `4 * area / perimeter` for a rectangular tube (see [`hydraulic_diameter`](/phonometry/reference/api/materials/impedance-tube/#hydraulic_diameter)). |
 
 **Returns:** Attenuation constant `k0''`, in nepers per metre.
 
@@ -911,9 +1026,9 @@ supplied, frequencies outside the plane-wave range (Eqs. (1)-(4)) raise an
 | `characteristic_impedance` | Characteristic impedance `rho c0`, in rayls. |
 | `attenuation` | Optional tube attenuation constant `k0''`, in nepers/m (see [`tube_attenuation_constant`](/phonometry/reference/api/materials/impedance-tube/#tube_attenuation_constant)). |
 | `diameter` | Optional tube diameter/lateral dimension, in metres, that activates the plane-wave range check. |
-| `shape` | Tube cross-section, `"circular"` or `"rectangular"`. |
+| `shape` | Tube cross-section, `"circular"`, `"rectangular"` or `"square"`. |
 
-**Returns:** An [`ImpedanceTubeResult`](/phonometry/reference/api/materials/impedance-tube/#impedancetuberesult).
+**Returns:** An [`ImpedanceTubeResult`](/phonometry/reference/api/materials/impedance-tube/#impedancetuberesult) (the tube geometry is retained on the result).
 
 ## wave_decomposition
 
@@ -929,6 +1044,8 @@ wave_decomposition(
     l2: float,
     s2: float,
     wavenumber: ArrayLike,
+    diameter: float | None = None,
+    shape: str = 'circular',
 ) -> tuple[Complex, Complex, Complex, Complex]
 ```
 
@@ -966,5 +1083,7 @@ air-layer transfer matrix (see [`air_layer_transfer_matrix`](/phonometry/referen
 | `l2` | Distance `l2` from the front reference plane, in metres. |
 | `s2` | Downstream microphone spacing `s2`, in metres. |
 | `wavenumber` | Air wavenumber `k` (real or complex), scalar or per band. |
+| `diameter` | Optional tube diameter (circular) or largest section dimension (rectangular/square), in metres, that activates the plane-wave working-range check (6.2.3-6.2.5, 6.5.4). |
+| `shape` | Tube cross-section, `"circular"`, `"rectangular"` or `"square"`. |
 
 **Returns:** Tuple `(A, B, C, D)` of complex amplitudes.
