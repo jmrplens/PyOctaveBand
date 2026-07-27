@@ -87,6 +87,35 @@ not splash a broadband transient) and `SignalSource` (an arbitrary sampled
 waveform, linearly interpolated onto the simulation time steps). Probes
 record the pressure at their cell every time step into the result.
 
+**Plane waves "from infinity".** Point sources in 2D are really line
+sources, so a diffuser or a barrier is often better interrogated with a
+plane wavefront. Two tools cover it, both one-way by construction (the
+leapfrog-consistent velocity is written half a step back, so nothing
+radiates backwards):
+
+- `sim.add_plane_wave(direction, center=..., width=..., wavelength=...)`
+  superimposes a Gaussian packet (optionally carrying a sine) as an
+  initial condition travelling toward `"down"`, `"up"`, `"left"` or
+  `"right"`; behind the front the residual energy is at numerical noise
+  level. This is what the QRD diffusion animation uses.
+- `PlaneWaveSource(direction, waveform, offset=...)` registered through
+  `add_source()` injects a sustained plane wave on a line of cells: the
+  incident pressure and the adjacent face velocity are driven together,
+  so the launched field is transversely plane to machine precision and
+  anything scattered back crosses the line and dies in the sponge behind
+  it (about -38 dB residual for a CW).
+
+```python
+from phonometry.simulation import FDTD2D, CWSource, PlaneWaveSource
+
+sim = FDTD2D(343.0, 0.01, shape=(160, 80), sponge_width=20,
+             sponge_sides=("top", "bottom"))
+tone = CWSource(0, 0, frequency=1000.0)          # reused as a waveform
+sim.add_source(PlaneWaveSource("down", tone.value, offset=22))
+# or, for a single packet: sim.add_plane_wave("down", center=0.4,
+#                                             width=0.08, wavelength=0.34)
+```
+
 Geometry is **rasterised**: `obstacle_mask` marks rigid cells, and every
 face touching a masked cell is closed (Eq. 4.32 again), so walls, barriers
 and scatterers of any shape are just boolean arrays. Each domain side can

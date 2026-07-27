@@ -124,13 +124,61 @@ sides into absorbing or locally reacting boundaries. Sources are soft
 | `edge_impedance` | Locally reacting boundary sides: a mapping from side name to a real specific acoustic impedance [Pa s/m], either a scalar or a per-edge-cell 1D array (length `ny` for `left`/ `right`, `nx` for `top`/`bottom`). Implements Eqs. (4.33)-(4.35); `Z = rho c` is a normal-incidence matched (anechoic) edge. A side cannot be both a sponge and an impedance boundary. |
 | `obstacle_mask` | Boolean map, shape `(ny, nx)`, of rigid cells: every face adjacent to a masked cell is closed (zero normal velocity, Eq. 4.32), rasterising arbitrary interior geometry. |
 
+### FDTD2D.add_plane_wave()
+
+```python
+FDTD2D.add_plane_wave(
+    direction: str,
+    *,
+    center: float,
+    width: float,
+    amplitude: float = 1.0,
+    wavelength: float | None = None,
+) -> None
+```
+
+Superimpose a one-way plane wave packet as an initial condition.
+
+A Gaussian envelope (optionally carrying a sine at `wavelength`)
+is written onto the pressure field, and the leapfrog-consistent
+particle velocity is written a half time step back, so the packet
+propagates only toward `direction` (the axes of
+`plot_geometry`: `"down"`/`"up"` along y,
+`"right"`/`"left"` along x). The packet is uniform across the
+transverse direction and adds to whatever fields are present.
+
+Obstacles are not carved out of the initial condition: place the
+packet in free field (its envelope clear of `obstacle_mask`
+cells), as a physical incident wave would be.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `direction` | Travel direction, one of `"down"`, `"up"`, `"left"`, `"right"`. |
+| `center` | Envelope centre along the travel axis, in metres. |
+| `width` | Gaussian envelope width (the `1/e` half-width), in metres. |
+| `amplitude` | Peak pressure of the envelope, in pascals. |
+| `wavelength` | Optional carrier wavelength, in metres; `None` gives the pure Gaussian pulse. |
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | For an unknown direction or non-positive `width`/`wavelength`. |
+
 ### FDTD2D.add_source()
 
 ```python
-FDTD2D.add_source(source: Source) -> None
+FDTD2D.add_source(source: AnySource) -> None
 ```
 
-Register a soft pressure source (additive injection at one cell).
+Register a source: a point injection or a plane-wave line.
+
+Point sources ([`GaussianPulse`](/phonometry/reference/api/simulation/fdtd/#gaussianpulse), [`CWSource`](/phonometry/reference/api/simulation/fdtd/#cwsource),
+[`SignalSource`](/phonometry/reference/api/simulation/fdtd/#signalsource)) inject additively at one cell. A
+[`PlaneWaveSource`](/phonometry/reference/api/simulation/fdtd/#planewavesource) injects a sustained one-way plane wave on
+a full line of cells near its launch edge.
 
 ### FDTD2D.energy()
 
@@ -374,6 +422,41 @@ GaussianPulse.value(t: float) -> float
 ```
 
 Source waveform at time `t` (seconds).
+
+## PlaneWaveSource
+
+```python
+PlaneWaveSource(
+    direction: str,
+    waveform: Callable[[float], float],
+    offset: int = 0,
+    amplitude: float = 1.0,
+)
+```
+
+A sustained one-way plane wave injected on a line near one edge.
+
+A total-field/scattered-field style injection: each step the incident
+wave is added simultaneously to the pressure on the injection line and
+to the particle velocity on the adjacent face, so the wave launches
+only toward `direction` and anything scattered back crosses the line
+untouched (and can be absorbed by a sponge behind it).
+
+`direction` is the travel direction (`"down"`, `"up"`,
+`"left"`, `"right"` in the [`FDTD2D.plot_geometry`](/phonometry/reference/api/simulation/fdtd/#fdtd2dplot_geometry) axes) and
+the line sits `offset` cells in from the opposite edge (place it just
+inside the sponge layer when one is configured on that side).
+`waveform` maps time in seconds to the incident pressure in pascals
+(any callable, or reuse the `value` method of a point source).
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `direction` | Travel direction of the launched wave. |
+| `waveform` | Callable `t -> p_inc(t)` in pascals. |
+| `offset` | Line position, in cells from the launch edge. |
+| `amplitude` | Extra gain applied to `waveform`. |
 
 ## SignalSource
 

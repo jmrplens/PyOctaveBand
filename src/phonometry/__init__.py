@@ -950,6 +950,7 @@ from .simulation.fdtd import (
     CWSource,
     FDTDResult,
     GaussianPulse,
+    PlaneWaveSource,
     SignalSource,
     fdtd_simulation,
 )
@@ -1316,6 +1317,7 @@ __all__ = [
     "PhonometryWarning",
     "PileStrikeResult",
     "PistonDirectivity",
+    "PlaneWaveSource",
     "PorousAbsorberWarning",
     "PorousLayer",
     "PorousMediumResult",

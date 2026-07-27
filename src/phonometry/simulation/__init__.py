@@ -8,6 +8,7 @@ from .fdtd import (
     CWSource,
     FDTDResult,
     GaussianPulse,
+    PlaneWaveSource,
     SignalSource,
     fdtd_simulation,
 )
@@ -17,6 +18,7 @@ __all__ = [
     "CWSource",
     "FDTDResult",
     "GaussianPulse",
+    "PlaneWaveSource",
     "SignalSource",
     "fdtd_simulation",
 ]

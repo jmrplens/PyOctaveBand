@@ -112,6 +112,36 @@ arranque no salpique el campo con un transitorio de banda ancha) y
 linealmente sobre los pasos temporales de la simulación). Las sondas
 registran la presión en su celda en cada paso temporal dentro del resultado.
 
+**Ondas planas "desde el infinito".** Una fuente puntual en 2D es en
+realidad una fuente lineal, así que un difusor o una barrera se interrogan
+mejor con un frente plano. Dos herramientas lo cubren, ambas
+unidireccionales por construcción (la velocidad consistente con el
+leapfrog se escribe medio paso atrás, así que nada radia hacia atrás):
+
+- `sim.add_plane_wave(direction, center=..., width=..., wavelength=...)`
+  superpone un paquete gaussiano (opcionalmente con portadora senoidal)
+  como condición inicial viajando hacia `"down"`, `"up"`, `"left"` o
+  `"right"`; tras el frente la energía residual queda al nivel del ruido
+  numérico. Es lo que usa la animación de difusión del QRD.
+- `PlaneWaveSource(direction, waveform, offset=...)` registrada con
+  `add_source()` inyecta una onda plana sostenida sobre una línea de
+  celdas: la presión incidente y la velocidad de la cara adyacente se
+  excitan a la vez, de modo que el campo lanzado es plano en la
+  transversal a precisión de máquina y lo que se dispersa hacia atrás
+  cruza la línea y muere en la esponja de detrás (residuo de unos -38 dB
+  para una CW).
+
+```python
+from phonometry.simulation import FDTD2D, CWSource, PlaneWaveSource
+
+sim = FDTD2D(343.0, 0.01, shape=(160, 80), sponge_width=20,
+             sponge_sides=("top", "bottom"))
+tone = CWSource(0, 0, frequency=1000.0)          # reutilizada como forma de onda
+sim.add_source(PlaneWaveSource("down", tone.value, offset=22))
+# o, para un paquete único: sim.add_plane_wave("down", center=0.4,
+#                                              width=0.08, wavelength=0.34)
+```
+
 La geometría se **rasteriza**: `obstacle_mask` marca celdas rígidas, y toda
 cara en contacto con una celda marcada se cierra (de nuevo la Ec. 4.32), así
 que paredes, barreras y difusores de cualquier forma son simples arrays

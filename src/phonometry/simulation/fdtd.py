@@ -39,7 +39,7 @@ and second-order convergence under grid refinement.
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any
@@ -53,6 +53,8 @@ if TYPE_CHECKING:
 Field2D = NDArray[np.float64]
 
 _SIDES = ("left", "right", "top", "bottom")
+#: Plane-wave travel directions accepted by ``FDTD2D.add_plane_wave``.
+_SIDE_TRAVEL = ("down", "up", "left", "right")
 
 #: Boundary-condition names accepted by :func:`fdtd_simulation`.
 _BOUNDARY_NAMES = ("rigid", "absorbing")
@@ -209,7 +211,39 @@ class SignalSource:
                                       + w * self.samples[i + 1])
 
 
+@dataclass(frozen=True)
+class PlaneWaveSource:
+    """A sustained one-way plane wave injected on a line near one edge.
+
+    A total-field/scattered-field style injection: each step the incident
+    wave is added simultaneously to the pressure on the injection line and
+    to the particle velocity on the adjacent face, so the wave launches
+    only toward ``direction`` and anything scattered back crosses the line
+    untouched (and can be absorbed by a sponge behind it).
+
+    ``direction`` is the travel direction (``"down"``, ``"up"``,
+    ``"left"``, ``"right"`` in the :meth:`FDTD2D.plot_geometry` axes) and
+    the line sits ``offset`` cells in from the opposite edge (place it just
+    inside the sponge layer when one is configured on that side).
+    ``waveform`` maps time in seconds to the incident pressure in pascals
+    (any callable, or reuse the ``value`` method of a point source).
+
+    :ivar direction: Travel direction of the launched wave.
+    :ivar waveform: Callable ``t -> p_inc(t)`` in pascals.
+    :ivar offset: Line position, in cells from the launch edge.
+    :ivar amplitude: Extra gain applied to ``waveform``.
+    """
+
+    direction: str
+    waveform: Callable[[float], float]
+    offset: int = 0
+    amplitude: float = 1.0
+
+
 Source = GaussianPulse | CWSource | SignalSource
+
+#: Everything :meth:`FDTD2D.add_source` accepts.
+AnySource = Source | PlaneWaveSource
 
 
 def _sponge_profile(n: int, width: int, sides: tuple[bool, bool],
@@ -429,6 +463,7 @@ class FDTD2D:
         self.vy: Field2D = np.zeros((ny - 1, nx), dtype=np.float64)
         self._div: Field2D = np.zeros((ny, nx), dtype=np.float64)
         self._sources: list[Source] = []
+        self._plane_sources: list[PlaneWaveSource] = []
         self.n = 0                                # completed steps
 
         sides = _resolve_sponge_sides(sponge_sides)
@@ -529,6 +564,78 @@ class FDTD2D:
         """Elapsed simulated time [s]."""
         return self.n * self.dt
 
+    def add_plane_wave(
+        self,
+        direction: str,
+        *,
+        center: float,
+        width: float,
+        amplitude: float = 1.0,
+        wavelength: float | None = None,
+    ) -> None:
+        """Superimpose a one-way plane wave packet as an initial condition.
+
+        A Gaussian envelope (optionally carrying a sine at ``wavelength``)
+        is written onto the pressure field, and the leapfrog-consistent
+        particle velocity is written a half time step back, so the packet
+        propagates only toward ``direction`` (the axes of
+        :meth:`plot_geometry`: ``"down"``/``"up"`` along y,
+        ``"right"``/``"left"`` along x). The packet is uniform across the
+        transverse direction and adds to whatever fields are present.
+
+        Obstacles are not carved out of the initial condition: place the
+        packet in free field (its envelope clear of ``obstacle_mask``
+        cells), as a physical incident wave would be.
+
+        :param direction: Travel direction, one of ``"down"``, ``"up"``,
+            ``"left"``, ``"right"``.
+        :param center: Envelope centre along the travel axis, in metres.
+        :param width: Gaussian envelope width (the ``1/e`` half-width), in
+            metres.
+        :param amplitude: Peak pressure of the envelope, in pascals.
+        :param wavelength: Optional carrier wavelength, in metres; ``None``
+            gives the pure Gaussian pulse.
+        :raises ValueError: For an unknown direction or non-positive
+            ``width``/``wavelength``.
+        """
+        if direction not in _SIDE_TRAVEL:
+            raise ValueError(
+                "'direction' must be 'down', 'up', 'left' or 'right'."
+            )
+        if width <= 0.0:
+            raise ValueError("'width' must be positive.")
+        if wavelength is not None and wavelength <= 0.0:
+            raise ValueError("'wavelength' must be positive.")
+
+        def profile(coord: NDArray[np.floating]) -> NDArray[np.float64]:
+            envelope = amplitude * np.exp(-(((coord - center) / width) ** 2))
+            if wavelength is not None:
+                envelope = envelope * np.sin(
+                    2.0 * np.pi * (coord - center) / wavelength
+                )
+            return np.asarray(envelope, dtype=np.float64)
+
+        ny, nx = self.p.shape
+        axis_y = direction in ("down", "up")
+        sign = 1.0 if direction in ("down", "right") else -1.0
+        c_ref = float(self.c.mean())
+        if axis_y:
+            centres = (np.arange(ny) + 0.5) * self.dx
+            faces = np.arange(1, ny) * self.dx
+            self.p += profile(centres)[:, np.newaxis]
+            # v = sign * p / (rho c) for travel along +/- y, sampled on the
+            # faces a half time step earlier: g(y -/+ c t) at t = -dt/2.
+            v_prof = profile(faces + sign * 0.5 * c_ref * self.dt)
+            rho_face = self._rho_y
+            self.vy += sign * v_prof[:, np.newaxis] / (rho_face * c_ref)
+        else:
+            centres = (np.arange(nx) + 0.5) * self.dx
+            faces = np.arange(1, nx) * self.dx
+            self.p += profile(centres)[np.newaxis, :]
+            v_prof = profile(faces + sign * 0.5 * c_ref * self.dt)
+            rho_face = self._rho_x
+            self.vx += sign * v_prof[np.newaxis, :] / (rho_face * c_ref)
+
     def plot_geometry(
         self,
         ax: Axes | None = None,
@@ -559,8 +666,17 @@ class FDTD2D:
             self, ax=ax, probes=probes, language=language, **kwargs
         )
 
-    def add_source(self, source: Source) -> None:
-        """Register a soft pressure source (additive injection at one cell)."""
+    def add_source(self, source: AnySource) -> None:
+        """Register a source: a point injection or a plane-wave line.
+
+        Point sources (:class:`GaussianPulse`, :class:`CWSource`,
+        :class:`SignalSource`) inject additively at one cell. A
+        :class:`PlaneWaveSource` injects a sustained one-way plane wave on
+        a full line of cells near its launch edge.
+        """
+        if isinstance(source, PlaneWaveSource):
+            self._add_plane_source(source)
+            return
         ny, nx = self.p.shape
         ix = _integer("source ix", source.ix)
         iy = _integer("source iy", source.iy)
@@ -569,6 +685,19 @@ class FDTD2D:
         if self._obstacle is not None and self._obstacle[iy, ix]:
             raise ValueError("source position lies inside an obstacle")
         self._sources.append(source)
+
+    def _add_plane_source(self, source: PlaneWaveSource) -> None:
+        """Validate and register a plane-wave injection line."""
+        if source.direction not in _SIDE_TRAVEL:
+            raise ValueError(
+                "'direction' must be 'down', 'up', 'left' or 'right'."
+            )
+        offset = _integer("plane-wave offset", source.offset)
+        ny, nx = self.p.shape
+        limit = ny if source.direction in ("down", "up") else nx
+        if not 0 <= offset < limit - 1:
+            raise ValueError("plane-wave offset lies outside the grid")
+        self._plane_sources.append(source)
 
     def step(self) -> None:
         """Advance the leapfrog scheme by one time step."""
@@ -597,8 +726,43 @@ class FDTD2D:
         t_next = (self.n + 1) * self.dt
         for src in self._sources:
             self.p[src.iy, src.ix] += src.value(t_next)
+        for plane in self._plane_sources:
+            self._inject_plane(plane, t_next)
         self.p *= self._decay_p
         self.n += 1
+
+    def _inject_plane(self, plane: PlaneWaveSource, t_next: float) -> None:
+        """Add the incident plane wave on the injection line (one-way).
+
+        Simultaneous pressure and adjacent-face velocity increments carry
+        the incident wave into the domain only along the travel direction;
+        the increments are the discrete equivalent of superimposing
+        ``p = s(t - d/c)`` entering through the line each step.
+        """
+        c_ref = float(self.c.mean())
+        gain = plane.amplitude * self.dt / (self.dx / c_ref)
+        value_p = plane.waveform(t_next)
+        value_v = plane.waveform(t_next - 0.5 * self.dt + 0.5 * self.dx / c_ref)
+        direction = plane.direction
+        k = plane.offset
+        if direction == "down":
+            self.p[k, :] += gain * value_p
+            self.vy[k, :] += gain * value_v / (self._rho_y[k, :] * c_ref)
+        elif direction == "up":
+            row = self.p.shape[0] - 1 - k
+            self.p[row, :] += gain * value_p
+            self.vy[row - 1, :] -= gain * value_v / (
+                self._rho_y[row - 1, :] * c_ref
+            )
+        elif direction == "right":
+            self.p[:, k] += gain * value_p
+            self.vx[:, k] += gain * value_v / (self._rho_x[:, k] * c_ref)
+        else:
+            col = self.p.shape[1] - 1 - k
+            self.p[:, col] += gain * value_p
+            self.vx[:, col - 1] -= gain * value_v / (
+                self._rho_x[:, col - 1] * c_ref
+            )
 
     def energy(self) -> float:
         """Total acoustic field energy [J per metre of depth]."""
