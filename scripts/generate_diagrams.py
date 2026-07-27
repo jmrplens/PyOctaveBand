@@ -976,7 +976,7 @@ _ES: dict[str, str] = {
     "Vibrating measurement surface S": "Superficie de medición vibrante S",
     "Machine under test": "Máquina en ensayo",
     "radiated airborne sound": "sonido aéreo radiado",
-    "Number of positions N": "Número de posiciones N",
+    "Initial number of positions N": "Número inicial de posiciones N",
     "one accelerometer per cell of area S/N":
         "un acelerómetro por celda de área S/N",
     "Survey sound power": "Potencia acústica de control",
@@ -4549,23 +4549,25 @@ def _d_vibration_sound_power(s: SVG, th: Theme) -> None:
     fy = gy - ht
     dxo, dyo = dp * 0.72, dp * 0.55
 
-    # Measurement grid: 5 x 2 cells on the top face, a dot per cell centre.
+    # Measurement grid: 5 x 4 cells on the top face (the Table 1 initial
+    # count for a 1-10 m2 surface), a dot per cell centre.
     for i in range(1, 5):
         gx = fx0 + i * (2 * hw) / 5
         s.line(gx, fy, gx + dxo, fy - dyo, th.muted, 1.0)
-    s.line(fx0 + dxo / 2, fy - dyo / 2, fx1 + dxo / 2, fy - dyo / 2,
-           th.muted, 1.0)
+    for f_row in (0.25, 0.5, 0.75):
+        s.line(fx0 + dxo * f_row, fy - dyo * f_row,
+               fx1 + dxo * f_row, fy - dyo * f_row, th.muted, 1.0)
     pts = []
-    for r_ in (0.25, 0.75):
+    for r_ in (0.125, 0.375, 0.625, 0.875):
         for i in range(5):
             u = (i + 0.5) / 5
             pts.append((fx0 + u * 2 * hw + r_ * dxo, fy - r_ * dyo))
     for px_, py_ in pts:
-        s.circle(px_, py_, 5, th.secondary)
-        s.circle(px_, py_, 1.8, th.bg)
+        s.circle(px_, py_, 4, th.secondary)
+        s.circle(px_, py_, 1.5, th.bg)
     # One accelerometer drawn explicitly, with its vibratory motion.
-    _accel(s, pts[5][0], pts[5][1] - 4)
-    _motion_arrows(s, pts[5][0], pts[5][1] - 46, 16, th.secondary)
+    _accel(s, pts[15][0], pts[15][1] - 4)
+    _motion_arrows(s, pts[15][0], pts[15][1] - 46, 16, th.secondary)
     s.text(250, 150, "Vibrating measurement surface S", 19, th.fg, bold=True)
     s.line(310, 160, 340, 228, th.muted, 1.0)
 
@@ -4586,10 +4588,11 @@ def _d_vibration_sound_power(s: SVG, th: Theme) -> None:
 
     # Number of measurement positions and the survey relation.
     lx = 575.0
-    s.text(lx, 110, "Number of positions N", 19, th.fg, bold=True, anchor="start")
-    for y, txt in ((140, "S < 1 m²   →   5"),
-                   (166, "1 m² ≤ S ≤ 10 m²  →  10"),
-                   (192, "S > 10 m²  →  S / S₀")):
+    s.text(lx, 110, "Initial number of positions N", 19, th.fg, bold=True,
+           anchor="start")
+    for y, txt in ((140, "S < 1 m²   →   10"),
+                   (166, "1 m² ≤ S ≤ 10 m²  →  20"),
+                   (192, "S > 10 m²  →  2 S / S₀")):
         s.text(lx, y, txt, 16, th.fg, anchor="start", mono=True)
     s.text(lx, 220, "one accelerometer per cell of area S/N", 15, th.muted,
            anchor="start")
