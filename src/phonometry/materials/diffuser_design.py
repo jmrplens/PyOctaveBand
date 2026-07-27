@@ -245,6 +245,14 @@ class DiffuserPolarResponse:
     :ivar coefficient: Directional diffusion coefficient ``d_theta`` of the
         predicted response (ISO 17497-2, Formula (5)).
     :ivar source_angle: Angle of incidence ``psi`` of the source, in degrees.
+    :ivar well_width: Well width ``w`` of the predicted surface, in metres,
+        always retained by the predictor (with ``periods``) so
+        :meth:`plot_geometry` can draw the well profile; appended after the
+        original fields and ``None`` only for hand-built responses.
+    :ivar depths: Well depths ``d_n`` of one period, in metres, when the
+        response was predicted from depths; ``None`` otherwise (explicit
+        ``reflection`` surfaces have no drawable well profile).
+    :ivar periods: Number of repeated periods of the prediction.
     """
 
     frequency: float
@@ -252,6 +260,9 @@ class DiffuserPolarResponse:
     levels: Real
     coefficient: float
     source_angle: float = 0.0
+    well_width: float | None = None
+    depths: Real | None = None
+    periods: int | None = None
 
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -266,6 +277,24 @@ class DiffuserPolarResponse:
 
         check_language(language)
         return plot_diffuser_polar_response(self, ax=ax, language=language, **kwargs)
+
+    def plot_geometry(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
+        """Draw the well profile of the predicted surface to scale.
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+
+        :raises ValueError: If the response does not retain its well
+            geometry (hand-built, or predicted from an explicit
+            ``reflection`` sequence).
+        """
+        from .._i18n import check_language
+        from .._plot.geometry import plot_diffuser_geometry
+
+        check_language(language)
+        return plot_diffuser_geometry(self, ax=ax, language=language, **kwargs)
 
 
 def _resolve_reflection(
@@ -390,6 +419,12 @@ def predict_diffuser_polar_response(
         levels=levels,
         coefficient=coefficient,
         source_angle=psi,
+        well_width=w,
+        depths=(
+            np.asarray(depths, dtype=np.float64) if depths is not None
+            else None
+        ),
+        periods=n_periods,
     )
 
 

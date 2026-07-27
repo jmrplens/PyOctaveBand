@@ -279,6 +279,28 @@ Plot the absorption spectrum `alpha(f)` with `|r|` overlaid.
 Requires matplotlib (`pip install phonometry[plot]`); returns the
 `Axes`.
 
+### ImpedanceTubeResult.plot_geometry()
+
+```python
+ImpedanceTubeResult.plot_geometry(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the two-microphone tube to scale (dimensioned side view).
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the result does not retain its tube geometry (`spacing`/`x1`). |
+
 ### ImpedanceTubeResult.report()
 
 ```python
@@ -459,6 +481,94 @@ binding for every microphone pair).
 | `shape` | `"circular"`, `"rectangular"` or `"square"`. |
 
 **Returns:** Tuple `(f_l, f_u)` of the lower and upper frequency limits, in Hz.
+
+## plot_impedance_tube_geometry
+
+```python
+plot_impedance_tube_geometry(
+    ax: Axes | None = None,
+    *,
+    spacing: float,
+    x1: float,
+    diameter: float | None = None,
+    shape: str | None = 'circular',
+    sample_thickness: float | None = None,
+    speed_of_sound: float = 343.2,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the ISO 10534-2 two-microphone tube to scale.
+
+Side view: loudspeaker at the left (three tube diameters before the
+farther microphone, the Clause 4.3 margin), the two flush microphones at
+`x1` and `x1 - s` from the sample face, the sample against its rigid
+backing at the right, the cross-section emblem, and the plane-wave
+working range of [`plane_wave_frequency_range`](/phonometry/reference/api/materials/impedance-tube/#plane_wave_frequency_range).
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `spacing` | Microphone spacing `s`, in metres. |
+| `x1` | Distance from the sample face to the farther microphone, in metres. |
+| `diameter` | Inner diameter (circular) or lateral dimension (rectangular/square), in metres; `None` draws a nominal bore and omits the bore dimension and the cut-on bound. |
+| `shape` | `"circular"`, `"rectangular"`, `"square"` or `None`. |
+| `sample_thickness` | Drawn sample thickness, in metres; `None` draws a 50 mm nominal sample. |
+| `speed_of_sound` | Speed of sound for the working range, in m/s. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the tube-bore rectangle. |
+
+**Returns:** The axes.
+
+## plot_transmission_tube_geometry
+
+```python
+plot_transmission_tube_geometry(
+    ax: Axes | None = None,
+    *,
+    l1: float,
+    s1: float,
+    l2: float,
+    s2: float,
+    thickness: float,
+    diameter: float | None = None,
+    shape: str | None = 'circular',
+    speed_of_sound: float = 343.2,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the ASTM E2611 four-microphone transmission tube to scale.
+
+Side view: loudspeaker, the two upstream microphones at `l1` and
+`l1 + s1` from the front face of the specimen, the specimen spanning
+its thickness, the two downstream microphones at `l2` and `l2 + s2`
+(measured from the front face, the module's locked convention), and the
+changeable termination of the two-load method, with the ASTM working
+range of
+[`plane_wave_frequency_range_astm`](/phonometry/reference/api/materials/impedance-tube/#plane_wave_frequency_range_astm).
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `l1` | Front face to the nearer upstream microphone, in metres. |
+| `s1` | Upstream microphone spacing, in metres. |
+| `l2` | Front face to the nearer downstream microphone, in metres. |
+| `s2` | Downstream microphone spacing, in metres. |
+| `thickness` | Specimen thickness, in metres; must be smaller than `l2` (the downstream microphones sit past the back face). |
+| `diameter` | Inner diameter (circular) or largest section dimension (rectangular/square), in metres; `None` draws a nominal bore and omits the bore dimension and the cut-on bound. |
+| `shape` | `"circular"`, `"rectangular"`, `"square"` or `None`. |
+| `speed_of_sound` | Speed of sound for the working range, in m/s. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the tube-bore rectangle. |
+
+**Returns:** The axes.
 
 ## reflection_factor
 
@@ -895,6 +1005,28 @@ Requires matplotlib (`pip install phonometry[plot]`); returns the
 | Exception | When |
 | :--- | :--- |
 | ValueError | If `frequency` or `characteristic_impedance` is neither supplied nor stored on the matrix. |
+
+### TransferMatrix.plot_geometry()
+
+```python
+TransferMatrix.plot_geometry(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the four-microphone tube to scale (dimensioned side view).
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the matrix does not retain its tube geometry (`l1`/`s1`/`l2`/`s2`/`thickness`). |
 
 ### TransferMatrix.reflection_hard_backed()
 

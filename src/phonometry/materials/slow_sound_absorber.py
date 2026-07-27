@@ -118,6 +118,22 @@ class HelmholtzResonator:
     cavity_length: float
     cavity_side: float
 
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
+        """Draw the resonator cross-section to scale (dimensioned).
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+        """
+        from .._i18n import check_language
+        from .._plot.geometry import plot_helmholtz_resonator_geometry
+
+        check_language(language)
+        return plot_helmholtz_resonator_geometry(
+            self, ax=ax, language=language, **kwargs
+        )
+
 
 # ---------------------------------------------------------------------------
 # Visco-thermal effective parameters
@@ -364,6 +380,11 @@ class SlitResonatorAbsorberResult:
     ``effective_wavenumber`` and ``effective_impedance`` the retrieved
     ``k_eff`` and ``Z_eff`` (Appl. Sci. 2017 Eq. (5)), and ``transfer_matrix``
     the total 2x2 chain matrix with shape ``(2, 2, len(frequency))``.
+
+    The trailing fields retain the panel geometry the prediction was run
+    with (``resonators``, ``slit_height``, ``lattice_step``, ``period``) so
+    :meth:`plot_geometry` can draw the cross-section; they are appended after
+    the original fields and default to ``None`` for hand-built results.
     """
 
     frequency: Real
@@ -375,6 +396,10 @@ class SlitResonatorAbsorberResult:
     effective_wavenumber: Complex
     effective_impedance: Complex
     transfer_matrix: Complex
+    resonators: tuple[HelmholtzResonator, ...] | None = None
+    slit_height: float | None = None
+    lattice_step: float | None = None
+    period: float | None = None
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the absorption spectrum ``alpha(f)`` with ``|R|`` overlaid.
@@ -387,6 +412,24 @@ class SlitResonatorAbsorberResult:
 
         check_language(language)
         return plot_slit_resonator_absorber(self, ax=ax, language=language, **kwargs)
+
+    def plot_geometry(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
+        """Draw one period of the panel cross-section to scale (dimensioned).
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+
+        :raises ValueError: If the result does not retain its geometry.
+        """
+        from .._i18n import check_language
+        from .._plot.geometry import plot_slit_absorber_result_geometry
+
+        check_language(language)
+        return plot_slit_absorber_result_geometry(
+            self, ax=ax, language=language, **kwargs
+        )
 
 
 def _slit_radiation_length(slit_height: float, period: float, terms: int = 400) -> float:
@@ -559,6 +602,10 @@ def slit_helmholtz_absorber(
         effective_wavenumber=np.asarray(k_eff, dtype=np.complex128),
         effective_impedance=np.asarray(z_eff, dtype=np.complex128),
         transfer_matrix=np.asarray(tm, dtype=np.complex128),
+        resonators=res,
+        slit_height=slit_height,
+        lattice_step=lattice_step,
+        period=period,
     )
 
 

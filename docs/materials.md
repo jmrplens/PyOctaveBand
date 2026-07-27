@@ -501,6 +501,37 @@ f_l, f_u = materials.plane_wave_frequency_range(0.020, 343.2, diameter=0.029)
 print(round(f_l, 1), round(f_u, 1))     # 858.0 6864.0
 ```
 
+Those limits are easier to see on the hardware itself.
+`plot_impedance_tube_geometry` draws a tube to scale with its plane-wave
+band worked out, and a measured `two_microphone_impedance` result that was
+given its geometry (`spacing`, `x1`, `diameter`) redraws its own setup with
+`result.plot_geometry()`.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impedance_tube_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impedance_tube_geometry.svg" alt="To-scale side view of a 100 mm ISO 10534-2 impedance tube: the loudspeaker at the left end, microphones 1 and 2 flush in the wall at s = 50 mm spacing with microphone 1 at x1 = 150 mm from the specimen face, the specimen against the rigid backing at the right, the circular cross-section beside the tube and the plane-wave working range of 343 to 1991 Hz that this geometry sets" width="92%"></picture>
+
+*Everything the working-range inequalities talk about, in one to-scale side
+view: the 100 mm bore sets the 1991 Hz top end, the 50 mm spacing sets the
+343 Hz bottom end, and the microphones sit at $s$ = 50 mm with the farther
+one $x_1$ = 150 mm from the specimen face.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import materials
+
+materials.plot_impedance_tube_geometry(spacing=0.05, x1=0.15, diameter=0.10)
+plt.show()
+
+# A measured result that retains its geometry draws its own tube:
+#   res = materials.two_microphone_impedance(
+#       h12, frequency=f, spacing=0.05, x1=0.15, diameter=0.10, ...)
+#   res.plot_geometry()
+```
+
+</details>
+
 The same helper covers square and rectangular tubes: pass `shape="square"` or
 `shape="rectangular"` and the Eq. (3) factor replaces the circular one, with
 $d$ the maximum side length. The four-microphone branch keeps its own limits
@@ -713,6 +744,36 @@ $$
 $$
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_astm_tube_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_astm_tube.svg" alt="ASTM E2611 four-microphone transmission-loss tube: a sound source, two microphones upstream and two downstream of the test specimen at spacings s1 and s2 and offsets l1 and l2, an adjustable termination for the two-load method, the upstream A and B and downstream C and D travelling waves, and the transfer matrix and transmission-loss relations" width="92%"></picture>
+
+To scale it looks like this. A `TransferMatrix` recovered by the two-load or
+one-load solvers retains `l1`, `s1`, `l2`, `s2` and the specimen thickness,
+so `tm.plot_geometry()` redraws the tube a measurement was taken in.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/transmission_tube_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/transmission_tube_geometry.svg" alt="To-scale side view of a 100 mm ASTM E2611 transmission tube: the loudspeaker at the left, microphones 1 and 2 upstream at s1 = 50 mm spacing and l1 = 100 mm from the specimen, the 50 mm specimen in the middle of the tube, microphones 3 and 4 downstream at s2 = 50 mm spacing and l2 = 200 mm, the changeable termination of the two-load method at the right, the circular cross-section beside the tube and the plane-wave working range of 69 to 2011 Hz" width="92%"></picture>
+
+*Where the four microphones of the transfer-matrix method actually sit
+around a 50 mm specimen in a 100 mm tube: $s_1 = s_2$ = 50 mm,
+$l_1$ = 100 mm, $l_2$ = 200 mm, and the changeable termination that
+provides the second load. The ASTM working range for this geometry is
+69 to 2011 Hz.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import materials
+
+materials.plot_transmission_tube_geometry(
+    l1=0.10, s1=0.05, l2=0.20, s2=0.05, thickness=0.05, diameter=0.10,
+)
+plt.show()
+
+# A TransferMatrix from transfer_matrix_two_load / _one_load retains its
+# geometry, so tm.plot_geometry() redraws the tube it was measured in.
+```
+
+</details>
 
 ```python
 import numpy as np

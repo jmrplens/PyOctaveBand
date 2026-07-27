@@ -7869,6 +7869,150 @@ def generate_slow_sound_absorber(output_dir: str) -> None:
     plt.close()
 
 
+def generate_absorber_stack_geometry(output_dir: str) -> None:
+    """To-scale cross-section of a three-layer absorber design.
+
+    The microperforated plate + air gap + porous layer stack drawn the way a
+    lab manual would: each layer with its material fill and dimensioned
+    thickness, the rigid backing at the right and the sound arriving from the
+    left. One concept: the geometry behind the multilayer absorption curve.
+    """
+    print("Generating absorber_stack_geometry...")
+    from phonometry import materials
+
+    frequency = np.linspace(200.0, 4000.0, 100)
+    medium = materials.miki(frequency, 20000.0)
+    layers: list[Any] = [
+        materials.MicroperforatedPlateLayer(0.001, 0.0002, 0.01),
+        materials.AirLayer(0.03),
+        materials.PorousLayer(0.05, medium),
+    ]
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    materials.plot_absorber_stack(layers, ax=ax, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "absorber_stack_geometry.svg")
+    plt.close()
+
+
+def generate_slit_absorber_geometry(output_dir: str) -> None:
+    """To-scale cross-section of the critically-coupled slit panel.
+
+    One period of the slow-sound metamaterial absorber of the companion
+    absorption figure: the 300 Hz critical-coupling design (single Helmholtz
+    resonator loading a thin slit, panel depth lambda/38). One concept: what
+    the deep-subwavelength panel actually looks like.
+    """
+    print("Generating slit_absorber_geometry...")
+    from phonometry import (
+        HelmholtzResonator,
+        critical_coupling_design,
+        materials,
+    )
+
+    base = HelmholtzResonator(
+        neck_length=1.0e-3, neck_side=3.0e-3,
+        cavity_length=30.0e-3, cavity_side=27.0e-3,
+    )
+    design = critical_coupling_design(
+        300.0, base, lattice_step=3.0e-2, period=5.0e-2,
+    )
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    materials.plot_slit_absorber_geometry(
+        [design.resonator], ax=ax, slit_height=design.slit_height,
+        lattice_step=3.0e-2, period=5.0e-2, language=_LANG,
+    )
+    plt.tight_layout()
+    save_figure(output_dir, "slit_absorber_geometry.svg")
+    plt.close()
+
+
+def generate_qrd_geometry(output_dir: str) -> None:
+    """To-scale well profile of the N = 7 QRD of the polar-response figure.
+
+    Two periods of the commercial N = 7 quadratic-residue diffuser (42 wells
+    across 3,6 m, so an 85,7 mm pitch split into an 80,7 mm well plus a 5 mm
+    fin; deepest well 0,2 m, design frequency 490 Hz) drawn as the physical
+    profile the Fraunhofer prediction models. One concept: the
+    quadratic-residue depth sequence as a real, buildable surface.
+    """
+    print("Generating qrd_geometry...")
+    from phonometry import materials
+
+    depths = materials.qrd_well_depths(7, 490.0, speed_of_sound=343.0)
+    pitch = 3.6 / 42
+    fin = 0.005
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    materials.plot_qrd_geometry(
+        depths, pitch - fin, ax=ax, periods=2, fin_width=fin, language=_LANG,
+    )
+    plt.tight_layout()
+    save_figure(output_dir, "qrd_geometry.svg")
+    plt.close()
+
+
+def generate_impedance_tube_geometry(output_dir: str) -> None:
+    """To-scale side view of a 100 mm ISO 10534-2 impedance tube.
+
+    Loudspeaker, the two flush microphones (s = 50 mm, x1 = 150 mm), the
+    sample against its rigid backing, the circular cross-section and the
+    plane-wave working range those dimensions buy. One concept: the tube
+    geometry fixes the usable frequency band.
+    """
+    print("Generating impedance_tube_geometry...")
+    from phonometry import materials
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    materials.plot_impedance_tube_geometry(
+        ax=ax, spacing=0.05, x1=0.15, diameter=0.10, shape="circular",
+        language=_LANG,
+    )
+    plt.tight_layout()
+    save_figure(output_dir, "impedance_tube_geometry.svg")
+    plt.close()
+
+
+def generate_transmission_tube_geometry(output_dir: str) -> None:
+    """To-scale side view of a 100 mm ASTM E2611 transmission tube.
+
+    Four flush microphones around the specimen (l1 = 100 mm, s1 = 50 mm,
+    l2 = 200 mm, s2 = 50 mm), the changeable termination of the two-load
+    method and the ASTM working range. One concept: where the four
+    microphones of the transfer-matrix method actually sit.
+    """
+    print("Generating transmission_tube_geometry...")
+    from phonometry import materials
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    materials.plot_transmission_tube_geometry(
+        ax=ax, l1=0.10, s1=0.05, l2=0.20, s2=0.05, thickness=0.05,
+        diameter=0.10, shape="circular", language=_LANG,
+    )
+    plt.tight_layout()
+    save_figure(output_dir, "transmission_tube_geometry.svg")
+    plt.close()
+
+
+def generate_helmholtz_resonator_geometry(output_dir: str) -> None:
+    """To-scale cross-section of the 300 Hz slow-sound Helmholtz resonator.
+
+    The square-section resonator of the critical-coupling design (neck 1 x 3
+    mm, cavity 30 x 27 mm) with its four defining dimensions. One concept:
+    the resonator geometry the slit-panel figures build on.
+    """
+    print("Generating helmholtz_resonator_geometry...")
+    from phonometry import HelmholtzResonator
+
+    resonator = HelmholtzResonator(
+        neck_length=1.0e-3, neck_side=3.0e-3,
+        cavity_length=30.0e-3, cavity_side=27.0e-3,
+    )
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    resonator.plot(ax=ax, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "helmholtz_resonator_geometry.svg")
+    plt.close()
+
+
 def generate_scattering_coefficient(output_dir: str) -> None:
     """ISO 17497-1: scattering coefficient s(f) from a per-band measurement."""
     print("Generating scattering_coefficient.png...")
@@ -11325,13 +11469,19 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_impedance_tube,
     # Porous materials & multilayer absorbers (Mechel / Bies / Cox & D'Antonio)
     generate_porous_absorber_designs,
+    generate_absorber_stack_geometry,
     # Slow-sound slit + Helmholtz-resonator perfect absorbers (Jimenez et al.)
     generate_slow_sound_absorber,
+    generate_slit_absorber_geometry,
+    generate_helmholtz_resonator_geometry,
     # Scattering/diffusion, in-situ road absorption, precision sound power
     # (ISO 17497-1/-2, ISO 13472-1, ISO 3745 / ISO 9614-3)
     generate_scattering_coefficient,
     generate_diffusion_polar,
     generate_diffuser_prediction,
+    generate_qrd_geometry,
+    generate_impedance_tube_geometry,
+    generate_transmission_tube_geometry,
     generate_insitu_absorption,
     generate_precision_anechoic_power,
     generate_intensity_scan_power,

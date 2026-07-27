@@ -67,7 +67,7 @@ from __future__ import annotations
 import warnings
 from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -679,15 +679,41 @@ def membrane_resonance_frequency(
 # ---------------------------------------------------------------------------
 # Declarative layers and the transfer-matrix solver
 # ---------------------------------------------------------------------------
+class _DrawableLayer:
+    """Shared geometry drawing for the layer dataclasses.
+
+    ``plot()`` draws the layer as a one-layer stack cross-section, to scale,
+    against the rigid backing; a full stack is drawn by
+    :func:`~phonometry.materials.plot_absorber_stack` or by
+    :meth:`LayeredAbsorberResult.plot_geometry`.
+    """
+
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
+        """Draw this layer's cross-section to scale (dimensioned).
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+        """
+        from .._i18n import check_language
+        from .._plot.geometry import plot_absorber_stack
+
+        check_language(language)
+        return plot_absorber_stack(
+            [cast("Layer", self)], ax=ax, language=language, **kwargs
+        )
+
+
 @dataclass(frozen=True)
-class AirLayer:
+class AirLayer(_DrawableLayer):
     """A plain air gap of ``thickness`` metres inside the stack."""
 
     thickness: float
 
 
 @dataclass(frozen=True)
-class PorousLayer:
+class PorousLayer(_DrawableLayer):
     """A porous layer of ``thickness`` metres described by *medium*.
 
     ``medium`` is a :class:`PorousMediumResult` (from :func:`delany_bazley`,
@@ -701,7 +727,7 @@ class PorousLayer:
 
 
 @dataclass(frozen=True)
-class PerforatedPlateLayer:
+class PerforatedPlateLayer(_DrawableLayer):
     """A rigid perforated plate (see :func:`perforated_plate_impedance`)."""
 
     thickness: float
@@ -711,7 +737,7 @@ class PerforatedPlateLayer:
 
 
 @dataclass(frozen=True)
-class MicroperforatedPlateLayer:
+class MicroperforatedPlateLayer(_DrawableLayer):
     """A microperforated plate (see :func:`microperforated_plate_impedance`)."""
 
     thickness: float
@@ -721,7 +747,7 @@ class MicroperforatedPlateLayer:
 
 
 @dataclass(frozen=True)
-class MembraneLayer:
+class MembraneLayer(_DrawableLayer):
     """A limp impervious membrane (see :func:`membrane_impedance`)."""
 
     surface_density: float
@@ -748,6 +774,11 @@ class LayeredAbsorberResult:
     ``alpha(theta) = 1 - |R|^2`` and ``transfer_matrix`` the total chain
     matrix with shape ``(2, 2, len(frequency))`` (unimodular: every layer is
     reciprocal).
+
+    ``layers`` retains the layer sequence the stack was solved with (front
+    layer first) so :meth:`plot_geometry` can draw the cross-section; it is
+    appended after the original fields and defaults to ``None`` for
+    hand-built results.
     """
 
     frequency: Real
@@ -757,6 +788,7 @@ class LayeredAbsorberResult:
     reflection: Complex
     absorption: Real
     transfer_matrix: Complex
+    layers: tuple[Layer, ...] | None = None
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the absorption spectrum ``alpha(f)`` with ``|R|`` overlaid.
@@ -769,6 +801,24 @@ class LayeredAbsorberResult:
 
         check_language(language)
         return plot_layered_absorber(self, ax=ax, language=language, **kwargs)
+
+    def plot_geometry(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
+        """Draw the solved stack cross-section to scale (dimensioned).
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+
+        :raises ValueError: If the result does not retain its ``layers``.
+        """
+        from .._i18n import check_language
+        from .._plot.geometry import plot_layered_absorber_geometry
+
+        check_language(language)
+        return plot_layered_absorber_geometry(
+            self, ax=ax, language=language, **kwargs
+        )
 
 
 @dataclass(frozen=True)
@@ -1068,6 +1118,7 @@ def layered_absorber(
         reflection=np.asarray(r, dtype=np.complex128),
         absorption=np.asarray(alpha, dtype=np.float64),
         transfer_matrix=tm,
+        layers=tuple(layers),
     )
 
 

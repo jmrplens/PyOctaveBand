@@ -615,6 +615,25 @@ class ImpedanceTubeResult:
         check_language(language)
         return plot_impedance_tube(self, ax=ax, language=language, **kwargs)
 
+    def plot_geometry(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
+        """Draw the two-microphone tube to scale (dimensioned side view).
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+
+        :raises ValueError: If the result does not retain its tube geometry
+            (``spacing``/``x1``).
+        """
+        from .._i18n import check_language
+        from .._plot.geometry import plot_impedance_tube_result_geometry
+
+        check_language(language)
+        return plot_impedance_tube_result_geometry(
+            self, ax=ax, language=language, **kwargs
+        )
+
     def report(
         self,
         path: str,
@@ -1158,6 +1177,25 @@ class TransferMatrix:
         return plot_transfer_matrix(
             self, frequency, characteristic_impedance, ax=ax,
             language=language, **kwargs,
+        )
+
+    def plot_geometry(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
+        """Draw the four-microphone tube to scale (dimensioned side view).
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+
+        :raises ValueError: If the matrix does not retain its tube geometry
+            (``l1``/``s1``/``l2``/``s2``/``thickness``).
+        """
+        from .._i18n import check_language
+        from .._plot.geometry import plot_transfer_matrix_geometry
+
+        check_language(language)
+        return plot_transfer_matrix_geometry(
+            self, ax=ax, language=language, **kwargs
         )
 
 

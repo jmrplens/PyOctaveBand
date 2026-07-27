@@ -282,6 +282,39 @@ de 200-400 Hz (acuerdo dentro de 0,01; en todo el rango publicado de
 100-5000 Hz la desviación absoluta media modelo-BEM ronda 0,09, porque la
 difracción de borde queda fuera del modelo de Fraunhofer).
 
+La propia superficie merece dibujarse antes de predecir nada con ella.
+`plot_qrd_geometry` convierte la secuencia de profundidades en el perfil de
+pozos a escala de abajo, y una `DiffuserPolarResponse` predicha retiene su
+geometría, así que `qrd.plot_geometry()` dibuja la superficie para la que se
+calculó.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/qrd_geometry_es.svg" alt="Perfil de pozos a escala de dos periodos del difusor comercial de residuos cuadráticos N = 7: pozos de 80,7 mm de ancho con paso de 85,7 mm, separados por aletas finas sobre una base rígida, siguiendo la secuencia de profundidades 0, 50, 200, 100, 100, 200, 50 mm con los pozos más profundos a 200 mm, y el sonido incidente llegando desde arriba" width="88%" />
+
+*Dos de los seis periodos, a escala: los residuos cuadráticos $n^2 \bmod 7$
+convertidos en una superficie construible. La frecuencia de diseño de
+490 Hz es la que deja el pozo más profundo exactamente en 200 mm.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import materials
+
+# El QRD N = 7 publicado: ancho de pozo 3,6 m / 42, pozo más profundo 0,2 m.
+depths = materials.qrd_well_depths(7, 490.0, speed_of_sound=343.0)
+pitch = 3.6 / 42                  # 42 pozos a lo ancho del panel de 3,6 m
+fin = 0.005                       # aletas finas, incluidas en el paso
+materials.plot_qrd_geometry(depths, pitch - fin, fin_width=fin, periods=2,
+                            language="es")
+plt.show()
+
+# Una DiffuserPolarResponse predicha retiene su geometría, así que
+# qrd.plot_geometry() dibuja el perfil para el que se calculó (los 6 periodos).
+```
+
+</details>
+
 ```python
 from phonometry import materials
 

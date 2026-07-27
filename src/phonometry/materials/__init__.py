@@ -3,6 +3,14 @@
 
 from __future__ import annotations
 
+from .._plot.geometry import (
+    plot_absorber_stack,
+    plot_helmholtz_resonator_geometry,
+    plot_impedance_tube_geometry,
+    plot_qrd_geometry,
+    plot_slit_absorber_geometry,
+    plot_transmission_tube_geometry,
+)
 from .absorption_rating import (
     OCTAVE_BANDS,
     REFERENCE_CURVE,
@@ -299,6 +307,12 @@ __all__ = [
     "piston_volume_flow_rate",
     "plane_wave_frequency_range",
     "plane_wave_frequency_range_astm",
+    "plot_absorber_stack",
+    "plot_helmholtz_resonator_geometry",
+    "plot_impedance_tube_geometry",
+    "plot_qrd_geometry",
+    "plot_slit_absorber_geometry",
+    "plot_transmission_tube_geometry",
     "power_reflection_coefficient",
     "practical_absorption_coefficient",
     "practical_coefficient_uncertainty",

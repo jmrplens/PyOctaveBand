@@ -317,6 +317,44 @@ plt.show()
 
 </details>
 
+Detrás de cada una de esas curvas hay una simple lista de capas, leída de
+delante hacia atrás en el orden en que la onda incidente la encuentra.
+`plot_absorber_stack` dibuja esa lista a escala antes de ejecutar ninguna
+física, y un resultado resuelto retiene sus capas, así que
+`materials.layered_absorber(f, layers).plot_geometry()` dibuja la misma
+sección desde el propio resultado.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorber_stack_geometry_es.svg" alt="Sección a escala de un absorbente de tres capas: una placa microperforada de 1 mm al frente, una cámara de aire de 30 mm y una capa porosa de 50 mm contra el respaldo rígido a la derecha, con cada espesor acotado y el sonido incidente llegando desde la izquierda" width="80%" loading="lazy" />
+
+*La lista de capas tal y como la encuentra la onda: placa microperforada,
+cámara de aire, capa porosa, respaldo rígido. Dibujar el apilado a escala
+antes de calcular nada permite cazar de un vistazo el clásico despiste de
+metros frente a milímetros en un espesor.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import materials
+
+f = np.linspace(200.0, 4000.0, 100)
+layers = [
+    materials.MicroperforatedPlateLayer(0.001, 0.0002, 0.01),
+    materials.AirLayer(0.03),
+    materials.PorousLayer(0.05, materials.miki(f, 20000.0)),
+]
+
+# La función libre dibuja cualquier lista de capas; un resultado resuelto
+# retiene sus capas, así que esto dibuja la misma sección:
+#   materials.layered_absorber(f, layers).plot_geometry()
+materials.plot_absorber_stack(layers, language="es")
+plt.show()
+```
+
+</details>
+
 ## 3. Láminas resonantes: perforado, microperforado, membrana
 
 **Panel perforado.** Los tapones de aire de los orificios son la masa de un
@@ -540,6 +578,69 @@ res = slit_helmholtz_absorber(
 )
 res.plot()   # alpha(f) con |R| superpuesto; pico = 1 a 300 Hz
 ```
+
+La geometría resuelta merece un vistazo antes que la curva de absorción. El
+resonador se dibuja con `.plot()` y el resultado del panel con
+`.plot_geometry()`, ambos acotados y a escala.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/helmholtz_resonator_geometry_es.svg" alt="Sección a escala del resonador de Helmholtz de sección cuadrada del que parte el diseño con acoplamiento crítico a 300 Hz: un cuello de 3 mm de ancho y 1 mm de largo que se abre a una cavidad de paredes rígidas de 27 mm de ancho y 30 mm de profundidad, con las cuatro dimensiones que lo definen acotadas" width="80%" loading="lazy" />
+
+*Los cuatro números que definen el resonador: el lado y la longitud del
+cuello fijan la masa móvil y la mayor parte de la pérdida, y el lado y la
+longitud de la cavidad fijan la rigidez. `critical_coupling_design` conserva
+esta sección y reajusta la longitud de la cavidad para colocar la
+resonancia.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import HelmholtzResonator
+
+resonator = HelmholtzResonator(
+    neck_length=1.0e-3, neck_side=3.0e-3,
+    cavity_length=30.0e-3, cavity_side=27.0e-3,
+)
+resonator.plot(language="es")   # sección acotada, a escala
+plt.show()
+```
+
+</details>
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slit_absorber_geometry_es.svg" alt="Sección a escala de un periodo del panel ranurado con acoplamiento crítico: una ranura de aproximadamente 1 mm de altura que recorre los 30 mm de profundidad del panel, cargada por la cavidad del resonador de Helmholtz ajustado que llena el resto del periodo de 50 mm, con el respaldo rígido detrás y el sonido incidente llegando desde la izquierda" width="80%" loading="lazy" />
+
+*Un periodo del diseño resuelto, a escala: el panel entero tiene 30 mm de
+profundidad, $\lambda/38$ a 300 Hz, y la ranura submilimétrica que hace toda
+la absorción apenas se ve. Esa es justamente la gracia del mecanismo de
+sonido lento.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import HelmholtzResonator, critical_coupling_design, materials
+
+base = HelmholtzResonator(
+    neck_length=1.0e-3, neck_side=3.0e-3,
+    cavity_length=30.0e-3, cavity_side=27.0e-3,
+)
+design = critical_coupling_design(
+    300.0, base, lattice_step=3.0e-2, period=5.0e-2,
+)
+
+# La función libre dibuja cualquier lista de resonadores; un resultado de
+# slit_helmholtz_absorber retiene su geometría, así que res.plot_geometry()
+# dibuja el mismo periodo.
+materials.plot_slit_absorber_geometry(
+    [design.resonator], slit_height=design.slit_height,
+    lattice_step=3.0e-2, period=5.0e-2,
+    language="es")
+plt.show()
+```
+
+</details>
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slow_sound_absorber_es.svg" alt="Absorción de un panel ranurado con un resonador de Helmholtz: el diseño con acoplamiento crítico alcanza alpha = 1 a 300 Hz, mientras que estrechar la ranura (más pérdida) o ensancharla (menos pérdida) rompe el equilibrio y baja el pico; la profundidad del panel es lambda/38" width="80%" loading="lazy" />
 
