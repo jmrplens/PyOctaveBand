@@ -82,8 +82,9 @@ def test_renderers_accept_external_ax_and_language() -> None:
 
 
 def test_unknown_language_rejected() -> None:
+    resonator = _resonator()
     with pytest.raises(ValueError, match="Unknown language"):
-        _resonator().plot(language="fr")
+        resonator.plot(language="fr")
 
 
 # ---------------------------------------------------------------------------
@@ -224,9 +225,10 @@ def test_impedance_tube_validation() -> None:
 
 
 def test_slit_geometry_validation() -> None:
+    resonator = _resonator()
     with pytest.raises(ValueError, match="positive"):
         m.plot_slit_absorber_geometry(
-            _resonator(), slit_height=0.0, lattice_step=0.015, period=0.02
+            resonator, slit_height=0.0, lattice_step=0.015, period=0.02
         )
     with pytest.raises(ValueError, match="at least one"):
         m.plot_slit_absorber_geometry(

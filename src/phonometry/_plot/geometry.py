@@ -120,12 +120,12 @@ def _dim(
     b = np.asarray(p2, dtype=np.float64)
     direction = b - a
     length = float(np.hypot(*direction))
-    if length == 0.0:
+    if length < 1e-12:
         return
     normal = np.array([-direction[1], direction[0]]) / length
     ao = a + normal * offset
     bo = b + normal * offset
-    if offset != 0.0:
+    if abs(offset) > 1e-12:
         for point, moved in ((a, ao), (b, bo)):
             ax.plot(
                 [point[0], moved[0]], [point[1], moved[1]],
@@ -195,15 +195,15 @@ def _incidence_arrow(
                     "linewidth": 1.6},
         zorder=5,
     )
+    label = _t("Incident sound", language)
     if downward:
         ax.text(
-            x, y + 0.08 * length, _t("Incident sound", language),
+            x, y + 0.08 * length, label,
             fontsize=8, ha="center", va="bottom", color=_C_PRIMARY,
         )
     else:
         ax.text(
-            x + 0.5 * length, y + 0.06 * length,
-            _t("Incident sound", language),
+            x + 0.5 * length, y + 0.06 * length, label,
             fontsize=8, ha="center", va="bottom", color=_C_PRIMARY,
         )
 
@@ -800,10 +800,9 @@ def plot_impedance_tube_geometry(
     lead_in = _SOURCE_MARGIN_DIAMETERS * bore
     x_left = -(x1 + lead_in)
     x_right = thickness + 0.35 * bore
+    emblem = "circular" if shape in (None, "circular") else "rectangular"
     _tube_bore(
-        ax, x_left, x_right, bore, language,
-        shape="circular" if shape is None else
-        ("circular" if shape == "circular" else "rectangular"),
+        ax, x_left, x_right, bore, language, shape=emblem,
         diameter_known=diameter is not None, **kwargs,
     )
     # Sample against the rigid backing plug: front face at x = 0.
@@ -896,10 +895,9 @@ def plot_transmission_tube_geometry(
     x_left = -(l1 + s1 + lead_in)
     x_term = l2 + s2 + 0.8 * bore
     x_right = x_term + 0.6 * bore
+    emblem = "circular" if shape in (None, "circular") else "rectangular"
     _tube_bore(
-        ax, x_left, x_right, bore, language,
-        shape="circular" if shape is None else
-        ("circular" if shape == "circular" else "rectangular"),
+        ax, x_left, x_right, bore, language, shape=emblem,
         diameter_known=diameter is not None, **kwargs,
     )
     _material_rect(ax, 0.0, 0.0, thickness, bore, "porous")

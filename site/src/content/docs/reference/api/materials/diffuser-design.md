@@ -97,8 +97,8 @@ A predicted far-field polar response of a diffuser at one frequency.
 | `levels` | Predicted reflected sound-pressure level at each angle, in decibels, referenced to the peak of the response (peak at 0 dB). |
 | `coefficient` | Directional diffusion coefficient `d_theta` of the predicted response (ISO 17497-2, Formula (5)). |
 | `source_angle` | Angle of incidence `psi` of the source, in degrees. |
-| `well_width` | Well width `w` of the predicted surface, in metres, retained (with `depths` and `periods`) so `plot_geometry` can draw the well profile; appended after the original fields and `None` for hand-built responses or explicit-reflection surfaces. |
-| `depths` | Well depths `d_n` of one period, in metres, when the response was predicted from depths; `None` otherwise. |
+| `well_width` | Well width `w` of the predicted surface, in metres, always retained by the predictor (with `periods`) so `plot_geometry` can draw the well profile; appended after the original fields and `None` only for hand-built responses. |
+| `depths` | Well depths `d_n` of one period, in metres, when the response was predicted from depths; `None` otherwise (explicit `reflection` surfaces have no drawable well profile). |
 | `periods` | Number of repeated periods of the prediction. |
 
 ### DiffuserPolarResponse.plot()
