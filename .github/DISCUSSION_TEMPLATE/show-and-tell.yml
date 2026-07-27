@@ -1,0 +1,37 @@
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Measurements, studies, teaching material, papers or tools built with phonometry.
+        Work in progress is welcome, it does not have to be finished or published.
+
+        If you use the library in academic work, it can be cited through its Zenodo DOI:
+        [10.5281/zenodo.21215280](https://doi.org/10.5281/zenodo.21215280). The
+        [CITATION.cff](https://github.com/jmrplens/phonometry/blob/main/CITATION.cff) file
+        has the entry for the exact version.
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What did you build or measure?
+      description: Screenshots, plots and links are welcome.
+    validations:
+      required: true
+
+  - type: textarea
+    id: how
+    attributes:
+      label: Which parts of the library did you use?
+      description: >
+        Optional, but it helps to know which modules see real use, and where the rough
+        edges are.
+    validations:
+      required: false
+
+  - type: input
+    id: link
+    attributes:
+      label: Link
+      description: Repository, paper, dataset or site, if any is public.
+    validations:
+      required: false

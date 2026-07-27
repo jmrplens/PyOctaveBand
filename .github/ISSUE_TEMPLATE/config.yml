@@ -1,0 +1,17 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Question about using the library
+    url: https://github.com/jmrplens/phonometry/discussions/categories/q-a
+    about: How to compute a quantity, what a parameter means, units, or an unexpected result. Answers stay searchable for everyone.
+  - name: Standards and conformance
+    url: https://github.com/jmrplens/phonometry/discussions/categories/standards-conformance
+    about: Whether a clause or edition is implemented, a value that disagrees with a reference, or a suspected defect in a published standard.
+  - name: Propose a standard, method or feature
+    url: https://github.com/jmrplens/phonometry/discussions/categories/ideas
+    about: Ideas are discussed first and become issues once the scope and the validation data are clear.
+  - name: Documentation and learning
+    url: https://github.com/jmrplens/phonometry/discussions/categories/documentation-learning
+    about: Feedback on the guides, figures and animations, in English or Spanish.
+  - name: Documentation site
+    url: https://jmrplens.github.io/phonometry/
+    about: Guides, API reference and worked examples.

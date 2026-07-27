@@ -2,6 +2,33 @@
 
 Thank you for your interest in contributing to phonometry! We welcome contributions from the community to help improve this project.
 
+## 💬 Where to Ask
+
+Not every contribution starts with code. [Discussions](https://github.com/jmrplens/phonometry/discussions)
+is the right place for anything that is not yet a defect or a pull request:
+
+| You want to | Go to |
+|---|---|
+| Ask how to compute or measure something with the library | [Q&A](https://github.com/jmrplens/phonometry/discussions/categories/q-a) |
+| Ask whether a clause or edition is implemented, report a value that disagrees with a reference, or flag a defect in a published standard | [Standards & conformance](https://github.com/jmrplens/phonometry/discussions/categories/standards-conformance) |
+| Propose a standard, method or feature | [Ideas](https://github.com/jmrplens/phonometry/discussions/categories/ideas) |
+| Give feedback on the guides, figures or animations | [Documentation & learning](https://github.com/jmrplens/phonometry/discussions/categories/documentation-learning) |
+| Share a measurement, study or tool you built | [Show and tell](https://github.com/jmrplens/phonometry/discussions/categories/show-and-tell) |
+| Report a reproducible bug, or work on an agreed change | [Issues](https://github.com/jmrplens/phonometry/issues) |
+
+The documentation is published in English and Spanish, and both languages are
+welcome in Discussions.
+
+Two conventions worth knowing before posting about a standard:
+
+- Cite clauses, tables and equations by number rather than pasting substantial
+  verbatim text. Standards are copyrighted.
+- A proposal moves faster when it names reference data the implementation can be
+  validated against. Methods here are implemented from the standard and checked
+  against reference values, never from a textbook summary alone.
+
+Participation is governed by our [Code of Conduct](CODE_OF_CONDUCT.md).
+
 ## 🛠️ Development Setup
 
 To set up your development environment:
