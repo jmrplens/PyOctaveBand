@@ -1,0 +1,81 @@
+name: Bug report
+description: A reproducible failure with no standard in play
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for a crash, a result that contradicts the library's own documentation,
+        or a broken installation.
+
+        A value that disagrees with a standard or with a reference implementation is not
+        this, even when it reproduces every time. That goes to
+        [Standards & conformance](https://github.com/jmrplens/phonometry/discussions/categories/standards-conformance),
+        because settling it means reading the clause first.
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens
+      description: What you observed, and what you expected instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Minimal reproducible example
+      description: >
+        Self-contained code that fails when run. If it needs a signal, generate it in the
+        snippet rather than attaching a file where you can.
+      render: python
+    validations:
+      required: true
+
+  - type: textarea
+    id: traceback
+    attributes:
+      label: Traceback or output
+      description: The full traceback if it raises, or the values you got if it does not.
+      render: text
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: phonometry version
+      description: 'Run: python -c "import phonometry; print(phonometry.__version__)"'
+      placeholder: "3.3.0"
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Python version and operating system
+      placeholder: "Python 3.13 on Ubuntu 24.04"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install
+    attributes:
+      label: How did you install it?
+      options:
+        - pip from PyPI
+        - conda or mamba
+        - from source
+        - other
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: This is not a disagreement with a standard or a reference implementation.
+          required: true
+        - label: I am on the latest released version, or I checked that the problem is still present there.
+          required: false

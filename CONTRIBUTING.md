@@ -170,10 +170,19 @@ skipped).
 ## 🚀 How to Contribute
 
 ### Reporting Bugs
-If you find a bug, check the [Issues](https://github.com/jmrplens/phonometry/issues). If not reported, open a new issue with:
-- Steps to reproduce
-- Expected vs Actual behavior
-- Environment details (OS, Python version)
+Search the [Issues](https://github.com/jmrplens/phonometry/issues) first, then open a
+new one. There is a form for each kind:
+
+| Form | For |
+|---|---|
+| Bug report | A crash, a result that contradicts the library's own documentation, or a broken installation |
+| Conformance defect | A disagreement with a standard that has already been established, usually in a discussion |
+| Implement a standard or method | An agreed work item, once the scope and the reference data are settled |
+| Documentation defect | A wrong value or formula, an example that no longer runs, a broken link |
+
+Pull requests are labelled automatically from the paths they touch, through
+`.github/labeler.yml`. Adding a package under `src/phonometry/` means adding its
+`area:` entry there too.
 
 ### Pull Requests
 1. **Fork** the repository.
