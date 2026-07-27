@@ -1,0 +1,30 @@
+name: JOSS draft paper
+
+# Compiles paper/paper.md with the official Open Journals action, the same
+# toolchain JOSS runs at submission, so the PDF can be proofed before
+# submitting. Manual trigger plus any push that touches the paper.
+on:
+  workflow_dispatch:
+  push:
+    paths: ["paper/**", ".github/workflows/joss-paper.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  paper:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build draft PDF
+        uses: openjournals/openjournals-draft-action@master
+        with:
+          journal: joss
+          paper-path: paper/paper.md
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: joss-paper
+          path: paper/paper.pdf
