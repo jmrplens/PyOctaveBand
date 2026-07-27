@@ -200,7 +200,6 @@ plot_silencer_geometry(
     cavity_volume: float | None = None,
     branch_area: float | None = None,
     language: str = 'en',
-    **kwargs: Any,
 ) -> Axes
 ```
 
@@ -229,7 +228,6 @@ with its volume annotated.
 | `cavity_volume` | Cavity volume, in m3 (Helmholtz). |
 | `branch_area` | Branch tube cross-section, in m2 (quarter-wave). |
 | `language` | Label language, `"en"` (default) or `"es"`. |
-| `kwargs` | Forwarded to the main bore rectangle. |
 
 **Returns:** The axes.
 
@@ -317,7 +315,6 @@ ReactiveSilencerResult.plot_geometry(
     ax: Axes | None = None,
     *,
     language: str = 'en',
-    **kwargs: Any,
 ) -> Axes
 ```
 

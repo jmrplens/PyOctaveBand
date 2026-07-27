@@ -214,7 +214,7 @@ coefficient `a(f)` is supplied per band). All three are added to
 ```python
 plot_microphone_positions(
     positions: ArrayLike,
-    ax: Axes | None = None,
+    ax: Any | None = None,
     *,
     radius: float | None = None,
     language: str = 'en',
@@ -236,7 +236,7 @@ arrays it accepts directly.
 | Name | Description |
 | :--- | :--- |
 | `positions` | Cartesian microphone positions, shape `(N, 3)`, in metres. |
-| `ax` | Existing 3-D axes, or `None` to create a figure. |
+| `ax` | Existing 3-D axes (`projection="3d"`), or `None` to create a figure. |
 | `radius` | Surface radius for the wireframe, in metres; `None` uses the largest position norm. |
 | `language` | Label language, `"en"` (default) or `"es"`. |
 | `kwargs` | Forwarded to the microphone `scatter`. |

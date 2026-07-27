@@ -303,6 +303,6 @@ side `sqrt(S_out)`) and the wall area is annotated.
 | `ax` | Existing axes, or `None` to create a figure. |
 | `angle` | Angle between the inlet axis and the line of sight, in radians (0 \<= angle \< pi/2). |
 | `language` | Label language, `"en"` (default) or `"es"`. |
-| `kwargs` | Forwarded to the box rectangle. |
+| `kwargs` | Forwarded to the wall-segment `plot` calls (line properties such as `linewidth` or `color`). |
 
 **Returns:** The axes.

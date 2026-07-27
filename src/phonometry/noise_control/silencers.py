@@ -363,7 +363,7 @@ class ReactiveSilencerResult:
         return plot_reactive_silencer(self, ax=ax, language=language, **kwargs)
 
     def plot_geometry(
-        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+        self, ax: Axes | None = None, *, language: str = "en"
     ) -> Axes:
         """Draw the silencer cross-section to scale (dimensioned side cut).
 
@@ -376,9 +376,7 @@ class ReactiveSilencerResult:
         from .._plot.geometry import plot_silencer_result_geometry
 
         check_language(language)
-        return plot_silencer_result_geometry(
-            self, ax=ax, language=language, **kwargs
-        )
+        return plot_silencer_result_geometry(self, ax=ax, language=language)
 
     def report(
         self,

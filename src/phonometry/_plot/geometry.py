@@ -17,7 +17,7 @@ Layer dataclasses are dispatched by class name at runtime for the same reason.
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Final
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -53,6 +53,22 @@ if TYPE_CHECKING:
     from ..room.image_source import ImageSourceResult
     from ..simulation.fdtd import FDTD2D
 
+#: The ``ReactiveSilencerResult.kind`` strings, shared with the dispatcher.
+_KIND_EXPANSION = "expansion chamber"
+_KIND_EXTENDED = "extended-tube chamber"
+_KIND_HELMHOLTZ = "Helmholtz resonator"
+_KIND_QUARTER = "quarter-wave resonator"
+
+#: Axis labels shared by the plan-view and 3-D renderers.
+_AXIS_X = "x [m]"
+_AXIS_Y = "y [m]"
+_AXIS_Z = "z [m]"
+#: Shared legend placement of the geometry drawings.
+_LEGEND_LOC: Final = "upper right"
+#: Shared validation message for length arguments.
+_LENGTH_POSITIVE = "'length' must be positive."
+
+
 #: Spanish translations of the fixed strings rendered here, keyed by their
 #: verbatim English text. ``_t`` returns the English key unchanged for any
 #: language other than ``"es"``.
@@ -83,19 +99,18 @@ _STRINGS: dict[str, str] = {
     "mm": "mm",
     "m": "m",
     "Reactive silencer cross-section": "Sección del silenciador reactivo",
-    "expansion chamber": "cámara de expansión",
-    "Helmholtz resonator": "resonador de Helmholtz",
-    "quarter-wave resonator": "resonador de cuarto de onda",
-    "extended-tube chamber": "cámara con tubos extendidos",
-    "V = {volume} L": "V = {volume} L",
+    _KIND_EXPANSION: "cámara de expansión",
+    _KIND_HELMHOLTZ: "resonador de Helmholtz",
+    _KIND_QUARTER: "resonador de cuarto de onda",
+    _KIND_EXTENDED: "cámara con tubos extendidos",
     "Image-source room plan (z of the source plane)":
         "Planta de fuentes imagen (plano z de la fuente)",
     "Source": "Fuente",
     "Receiver": "Receptor",
     "order {n}": "orden {n}",
-    "x [m]": "x [m]",
-    "y [m]": "y [m]",
-    "z [m]": "z [m]",
+    _AXIS_X: _AXIS_X,
+    _AXIS_Y: _AXIS_Y,
+    _AXIS_Z: _AXIS_Z,
     "Barrier section": "Sección de la barrera",
     "Ground": "Suelo",
     "Direct path": "Camino directo",
@@ -1109,10 +1124,10 @@ def plot_transfer_matrix_geometry(
 # ---------------------------------------------------------------------------
 #: Recognised silencer kinds (the ``ReactiveSilencerResult.kind`` strings).
 _SILENCER_KINDS = (
-    "expansion chamber",
-    "extended-tube chamber",
-    "Helmholtz resonator",
-    "quarter-wave resonator",
+    _KIND_EXPANSION,
+    _KIND_EXTENDED,
+    _KIND_HELMHOLTZ,
+    _KIND_QUARTER,
 )
 
 
@@ -1201,6 +1216,32 @@ def _draw_chamber(
              _mm(outlet_extension, language), offset=-2.0 * off, tight=True)
 
 
+def _draw_hr_cavity(
+    ax: Axes,
+    y0: float,
+    branch_len: float,
+    cavity_side: float,
+    cavity_volume: float,
+    language: str,
+) -> None:
+    """Cavity drawn as the equivalent cube (V^(1/3) on each side)."""
+    from .._i18n import format_number
+
+    _material_rect(
+        ax, -0.5 * cavity_side, y0 + branch_len, cavity_side,
+        cavity_side, "cavity",
+    )
+    ax.text(
+        0.0, y0 + branch_len + 0.5 * cavity_side,
+        "V = {volume} L".format(
+            volume=format_number(
+                cavity_volume * 1e3, language, decimals=1, trim=True
+            )
+        ),
+        fontsize=8, ha="center", va="center",
+    )
+
+
 def _draw_branch_silencer(
     ax: Axes,
     kind: str,
@@ -1216,7 +1257,7 @@ def _draw_branch_silencer(
 ) -> None:
     """Side-branch silencer: Helmholtz resonator or quarter-wave tube."""
     d_d = _duct_diameter(duct_area)
-    if kind == "Helmholtz resonator":
+    if kind == _KIND_HELMHOLTZ:
         if neck_area is None or neck_length is None or cavity_volume is None:
             raise ValueError(
                 "A Helmholtz resonator drawing needs 'neck_area', "
@@ -1235,7 +1276,7 @@ def _draw_branch_silencer(
                 "A quarter-wave drawing needs 'length' and 'branch_area'."
             )
         if length <= 0.0:
-            raise ValueError("'length' must be positive.")
+            raise ValueError(_LENGTH_POSITIVE)
         d_b = _duct_diameter(branch_area)
         branch_len = length
         cavity_side = 0.0
@@ -1249,22 +1290,9 @@ def _draw_branch_silencer(
                            facecolor="none", edgecolor=_C_EDGE,
                            linewidth=1.2))
     off = 0.25 * d_d
-    if kind == "Helmholtz resonator" and cavity_volume is not None:
-        # Cavity drawn as the equivalent cube (V^(1/3) on each side).
-        from .._i18n import format_number
-
-        _material_rect(
-            ax, -0.5 * cavity_side, y0 + branch_len, cavity_side,
-            cavity_side, "cavity",
-        )
-        ax.text(
-            0.0, y0 + branch_len + 0.5 * cavity_side,
-            _t("V = {volume} L", language).format(
-                volume=format_number(
-                    cavity_volume * 1e3, language, decimals=1, trim=True
-                )
-            ),
-            fontsize=8, ha="center", va="center",
+    if kind == _KIND_HELMHOLTZ and cavity_volume is not None:
+        _draw_hr_cavity(
+            ax, y0, branch_len, cavity_side, cavity_volume, language
         )
         _dim(ax, (0.5 * d_b, y0), (0.5 * d_b, y0 + branch_len),
              _mm(branch_len, language), offset=-2.0 * off, tight=True)
@@ -1279,6 +1307,66 @@ def _draw_branch_silencer(
          offset=-1.5 * off, tight=True)
     _dim(ax, (-0.5 * run, -0.5 * d_d), (-0.5 * run, 0.5 * d_d),
          _mm(d_d, language), offset=2.0 * off, tight=True)
+
+
+def _validate_chamber_geometry(
+    length: float | None,
+    chamber_area: float | None,
+    pipe_area: float | None,
+    inlet_extension: float,
+    outlet_extension: float,
+) -> None:
+    """Chamber parameter validation, before any figure exists."""
+    if length is None or chamber_area is None or pipe_area is None:
+        raise ValueError(
+            "A chamber drawing needs 'length', 'chamber_area' and "
+            "'pipe_area'."
+        )
+    if length <= 0.0:
+        raise ValueError(_LENGTH_POSITIVE)
+    _duct_diameter(pipe_area)
+    _duct_diameter(chamber_area)
+    if chamber_area <= pipe_area:
+        raise ValueError("'chamber_area' must exceed 'pipe_area'.")
+    if inlet_extension + outlet_extension > length:
+        raise ValueError(
+            "'inlet_extension' + 'outlet_extension' must not exceed "
+            "'length'."
+        )
+
+
+def _validate_branch_geometry(
+    kind: str,
+    duct_area: float | None,
+    neck_area: float | None,
+    neck_length: float | None,
+    cavity_volume: float | None,
+    length: float | None,
+    branch_area: float | None,
+) -> None:
+    """Side-branch parameter validation, before any figure exists."""
+    if duct_area is None:
+        raise ValueError("A side-branch drawing needs 'duct_area'.")
+    _duct_diameter(duct_area)
+    if kind == _KIND_HELMHOLTZ:
+        if neck_area is None or neck_length is None or cavity_volume is None:
+            raise ValueError(
+                "A Helmholtz resonator drawing needs 'neck_area', "
+                "'neck_length' and 'cavity_volume'."
+            )
+        if neck_length <= 0.0 or cavity_volume <= 0.0:
+            raise ValueError(
+                "'cavity_volume' and 'neck_length' must be positive."
+            )
+        _duct_diameter(neck_area)
+        return
+    if length is None or branch_area is None:
+        raise ValueError(
+            "A quarter-wave drawing needs 'length' and 'branch_area'."
+        )
+    if length <= 0.0:
+        raise ValueError(_LENGTH_POSITIVE)
+    _duct_diameter(branch_area)
 
 
 def plot_silencer_geometry(
@@ -1296,7 +1384,6 @@ def plot_silencer_geometry(
     cavity_volume: float | None = None,
     branch_area: float | None = None,
     language: str = "en",
-    **kwargs: Any,
 ) -> Axes:
     """Draw a reactive silencer cross-section to scale.
 
@@ -1321,7 +1408,6 @@ def plot_silencer_geometry(
     :param cavity_volume: Cavity volume, in m3 (Helmholtz).
     :param branch_area: Branch tube cross-section, in m2 (quarter-wave).
     :param language: Label language, ``"en"`` (default) or ``"es"``.
-    :param kwargs: Forwarded to the main bore rectangle.
     :return: The axes.
     """
     _check_language(language)
@@ -1330,65 +1416,32 @@ def plot_silencer_geometry(
             f"Unknown silencer kind {kind!r}; expected one of "
             f"{_SILENCER_KINDS}."
         )
-    if kind in ("expansion chamber", "extended-tube chamber"):
-        if length is None or chamber_area is None or pipe_area is None:
-            raise ValueError(
-                "A chamber drawing needs 'length', 'chamber_area' and "
-                "'pipe_area'."
-            )
-        if length <= 0.0:
-            raise ValueError("'length' must be positive.")
-        # Validate before any figure exists.
-        _duct_diameter(pipe_area)
-        _duct_diameter(chamber_area)
-        if chamber_area <= pipe_area:
-            raise ValueError("'chamber_area' must exceed 'pipe_area'.")
-        if inlet_extension + outlet_extension > length:
-            raise ValueError(
-                "'inlet_extension' + 'outlet_extension' must not exceed "
-                "'length'."
-            )
-        if ax is None:
-            ax = _new_axes()
-        _draw_chamber(
-            ax, length, chamber_area, pipe_area, language,
-            inlet_extension=inlet_extension,
-            outlet_extension=outlet_extension, **kwargs,
+    chamber = kind in (_KIND_EXPANSION, _KIND_EXTENDED)
+    if chamber:
+        _validate_chamber_geometry(
+            length, chamber_area, pipe_area, inlet_extension,
+            outlet_extension,
         )
     else:
-        if duct_area is None:
-            raise ValueError("A side-branch drawing needs 'duct_area'.")
-        _duct_diameter(duct_area)
-        if kind == "Helmholtz resonator":
-            if (
-                neck_area is None or neck_length is None
-                or cavity_volume is None
-            ):
-                raise ValueError(
-                    "A Helmholtz resonator drawing needs 'neck_area', "
-                    "'neck_length' and 'cavity_volume'."
-                )
-            if neck_length <= 0.0 or cavity_volume <= 0.0:
-                raise ValueError(
-                    "'cavity_volume' and 'neck_length' must be positive."
-                )
-            _duct_diameter(neck_area)
-        else:
-            if length is None or branch_area is None:
-                raise ValueError(
-                    "A quarter-wave drawing needs 'length' and "
-                    "'branch_area'."
-                )
-            if length <= 0.0:
-                raise ValueError("'length' must be positive.")
-            _duct_diameter(branch_area)
-        if ax is None:
-            ax = _new_axes()
+        _validate_branch_geometry(
+            kind, duct_area, neck_area, neck_length, cavity_volume,
+            length, branch_area,
+        )
+    if ax is None:
+        ax = _new_axes()
+    if chamber:
+        _draw_chamber(
+            ax, length or 0.0, chamber_area or 0.0, pipe_area or 0.0,
+            language,
+            inlet_extension=inlet_extension,
+            outlet_extension=outlet_extension,
+        )
+    else:
         _draw_branch_silencer(
-            ax, kind, duct_area, language,
+            ax, kind, duct_area or 0.0, language,
             neck_area=neck_area, neck_length=neck_length,
             cavity_volume=cavity_volume, length=length,
-            branch_area=branch_area, **kwargs,
+            branch_area=branch_area,
         )
     _finish_geometry_axes(
         ax,
@@ -1403,7 +1456,6 @@ def plot_silencer_result_geometry(
     ax: Axes | None = None,
     *,
     language: str = "en",
-    **kwargs: Any,
 ) -> Axes:
     """Silencer drawing for a result that retained its ``geometry``."""
     if result.geometry is None:
@@ -1412,8 +1464,7 @@ def plot_silencer_result_geometry(
             "plot_silencer_geometry(kind, ...) with the original arguments."
         )
     return plot_silencer_geometry(
-        result.kind, ax=ax, language=language,
-        **dict(result.geometry), **kwargs,
+        result.kind, ax=ax, language=language, **dict(result.geometry),
     )
 
 
@@ -1500,13 +1551,13 @@ def plot_image_source_geometry(
         label=_t("Receiver", language),
     )
     ax.set_aspect("equal", adjustable="datalim")
-    ax.set_xlabel(_t("x [m]", language))
-    ax.set_ylabel(_t("y [m]", language))
+    ax.set_xlabel(_t(_AXIS_X, language))
+    ax.set_ylabel(_t(_AXIS_Y, language))
     ax.set_title(
         _t("Image-source room plan (z of the source plane)", language),
         fontweight="bold",
     )
-    ax.legend(loc="upper right", fontsize=8)
+    ax.legend(loc=_LEGEND_LOC, fontsize=8)
     localize_axes(ax, language)
     return ax
 
@@ -1623,7 +1674,7 @@ def plot_barrier_geometry(
          (barrier_distance - 0.04 * receiver_distance, top),
          _metres(top, language))
     _finish_geometry_axes(ax, _t("Barrier section", language))
-    ax.legend(loc="upper right", fontsize=8)
+    ax.legend(loc=_LEGEND_LOC, fontsize=8)
     return ax
 
 
@@ -1727,9 +1778,9 @@ def plot_microphone_positions(
     ax.scatter(pts[:, 0], pts[:, 1], pts[:, 2], **kwargs)
     for index, (x, y, z) in enumerate(pts, start=1):
         ax.text(x, y, z, f" {index}", fontsize=7)
-    ax.set_xlabel(_t("x [m]", language))
-    ax.set_ylabel(_t("y [m]", language))
-    ax.set_zlabel(_t("z [m]", language))
+    ax.set_xlabel(_t(_AXIS_X, language))
+    ax.set_ylabel(_t(_AXIS_Y, language))
+    ax.set_zlabel(_t(_AXIS_Z, language))
     ax.set_title(_t("Microphone positions", language), fontweight="bold")
     ax.set_box_aspect((1.0, 1.0, 0.55 if not full_sphere else 1.0))
     return ax
@@ -1771,10 +1822,7 @@ def plot_aperture_geometry(
         raise ValueError("'depth' must be positive.")
     if (width is None) == (radius is None):
         raise ValueError("Give exactly one of 'width' or 'radius'.")
-    opening = (
-        float(width) if width is not None
-        else 2.0 * float(radius if radius is not None else 0.0)
-    )
+    opening = float(width) if width is not None else 2.0 * float(radius or 0.0)
     if opening <= 0.0:
         raise ValueError("The aperture size must be positive.")
     if ax is None:
@@ -1892,7 +1940,7 @@ def plot_piston_geometry(
                 linewidth=1.6, color=_C_PRIMARY,
                 label=lobe_label or _t("Normalised directivity", language),
             )
-            ax.legend(loc="upper right", fontsize=8)
+            ax.legend(loc=_LEGEND_LOC, fontsize=8)
     _dim(ax, (-1.4 * wall, -a), (-1.4 * wall, a),
          "2a = " + _mm(2.0 * a, language))
     _finish_geometry_axes(ax, _t("Baffled piston", language))
@@ -2047,6 +2095,50 @@ def plot_plenum_geometry(
 # ---------------------------------------------------------------------------
 # FDTD domain (drawn without running the simulation).
 # ---------------------------------------------------------------------------
+def _fdtd_sponge_bands(
+    ax: Axes, sim: FDTD2D, lx: float, ly: float, handles: dict[str, Any]
+) -> None:
+    """Shade the sponge layers on their configured sides."""
+    depth = sim.sponge_width * sim.dx
+    if depth <= 0.0:
+        return
+    rects = {
+        "left": (0.0, 0.0, depth, ly),
+        "right": (lx - depth, 0.0, depth, ly),
+        "top": (0.0, 0.0, lx, depth),
+        "bottom": (0.0, ly - depth, lx, depth),
+    }
+    for side in sim.sponge_sides:
+        x0, y0, width, height = rects[side]
+        handles["sponge"] = _material_rect(
+            ax, x0, y0, width, height, "cavity", edgecolor="none",
+        )
+
+
+def _fdtd_edges(
+    ax: Axes, sim: FDTD2D, lx: float, ly: float, handles: dict[str, Any]
+) -> None:
+    """Mark impedance edges and rigid edges (sponge sides stay open)."""
+    segments = {
+        "left": ((0.0, 0.0), (0.0, ly)),
+        "right": ((lx, 0.0), (lx, ly)),
+        "top": ((0.0, 0.0), (lx, 0.0)),
+        "bottom": ((0.0, ly), (lx, ly)),
+    }
+    for side, seg in segments.items():
+        if side in sim.edge_impedance:
+            colour, key = _C_SECONDARY, "impedance"
+        elif side in sim.sponge_sides:
+            continue
+        else:
+            colour, key = _C_EDGE, "rigid"
+        (line,) = ax.plot(
+            [seg[0][0], seg[1][0]], [seg[0][1], seg[1][1]],
+            color=colour, linewidth=2.6,
+        )
+        handles[key] = line
+
+
 def plot_fdtd_domain(
     sim: FDTD2D,
     ax: Axes | None = None,
@@ -2093,41 +2185,8 @@ def plot_fdtd_domain(
         kwargs.setdefault("vmax", 2.0)
         ax.imshow(overlay, extent=extent, origin="upper",
                   interpolation="nearest", **kwargs)
-    # Sponge bands.
-    depth = sim.sponge_width * sim.dx
-    if depth > 0.0:
-        for side in sim.sponge_sides:
-            if side == "left":
-                rect = (0.0, 0.0, depth, ly)
-            elif side == "right":
-                rect = (lx - depth, 0.0, depth, ly)
-            elif side == "top":
-                rect = (0.0, 0.0, lx, depth)
-            else:
-                rect = (0.0, ly - depth, lx, ly - (ly - depth))
-            handles["sponge"] = _material_rect(
-                ax, rect[0], rect[1], rect[2], rect[3], "cavity",
-                edgecolor="none",
-            )
-    # Edges: impedance in secondary, rigid in edge colour.
-    for side in ("left", "right", "top", "bottom"):
-        if side in sim.edge_impedance:
-            colour, key = _C_SECONDARY, "impedance"
-        elif side in sim.sponge_sides:
-            continue
-        else:
-            colour, key = _C_EDGE, "rigid"
-        seg = {
-            "left": ((0.0, 0.0), (0.0, ly)),
-            "right": ((lx, 0.0), (lx, ly)),
-            "top": ((0.0, 0.0), (lx, 0.0)),
-            "bottom": ((0.0, ly), (lx, ly)),
-        }[side]
-        (line,) = ax.plot(
-            [seg[0][0], seg[1][0]], [seg[0][1], seg[1][1]],
-            color=colour, linewidth=2.6,
-        )
-        handles[key] = line
+    _fdtd_sponge_bands(ax, sim, lx, ly, handles)
+    _fdtd_edges(ax, sim, lx, ly, handles)
     for src in getattr(sim, "_sources", ()):  # star per source
         (marker,) = ax.plot(
             [(src.ix + 0.5) * sim.dx], [(src.iy + 0.5) * sim.dx],
@@ -2143,8 +2202,8 @@ def plot_fdtd_domain(
     ax.set_xlim(0.0, lx)
     ax.set_ylim(ly, 0.0)
     ax.set_aspect("equal")
-    ax.set_xlabel(_t("x [m]", language))
-    ax.set_ylabel(_t("y [m]", language))
+    ax.set_xlabel(_t(_AXIS_X, language))
+    ax.set_ylabel(_t(_AXIS_Y, language))
     ax.set_title(_t("FDTD domain", language), fontweight="bold")
     label_keys = {
         "sponge": "Sponge layer", "impedance": "Impedance edge",
@@ -2154,7 +2213,7 @@ def plot_fdtd_domain(
         ax.legend(
             handles.values(),
             [_t(label_keys[k], language) for k in handles],
-            loc="upper right", fontsize=8,
+            loc=_LEGEND_LOC, fontsize=8,
         )
     localize_axes(ax, language)
     return ax

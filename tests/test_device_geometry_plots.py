@@ -127,8 +127,9 @@ def test_microphone_positions_hemisphere_and_sphere() -> None:
     sphere = pm.precision_positions("sphere", radius=1.0, count=20)
     ax = pm.plot_microphone_positions(sphere)
     assert ax.name == "3d"
+    bad = np.zeros((3, 2))
     with pytest.raises(ValueError, match="shape"):
-        pm.plot_microphone_positions(np.zeros((3, 2)))
+        pm.plot_microphone_positions(bad)
     with pytest.raises(ValueError, match="radius"):
         pm.plot_microphone_positions(pos, radius=-1.0)
 
@@ -206,8 +207,9 @@ def test_fdtd_domain_preview() -> None:
     ax = sim.plot_geometry(probes=[(2.0, 1.0)])
     labels = [t.get_text() for t in ax.get_legend().get_texts()]
     assert len(labels) == 5
+    bad_probes = np.zeros((2, 3))
     with pytest.raises(ValueError, match="probes"):
-        sim.plot_geometry(probes=np.zeros((2, 3)))
+        sim.plot_geometry(probes=bad_probes)
     # A plain rigid box keeps the record empty and still draws.
     plain = FDTD2D(343.0, 0.05, shape=(10, 10))
     assert plain.sponge_sides == ()
