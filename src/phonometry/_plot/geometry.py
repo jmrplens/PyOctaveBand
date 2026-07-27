@@ -1919,6 +1919,12 @@ def plot_piston_result_geometry(
     if result.angles is not None and result.directivity is not None:
         directivity = np.asarray(result.directivity, dtype=np.float64)
         ka = np.atleast_1d(np.asarray(result.ka, dtype=np.float64))
+        n_rows = int(directivity.shape[0])
+        if not -n_rows <= frequency_index < n_rows or ka.size < n_rows:
+            raise ValueError(
+                f"'frequency_index' must index the {n_rows} computed "
+                "frequencies."
+            )
         row = directivity[frequency_index]
         angles = np.asarray(result.angles, dtype=np.float64)
         lobe = row
@@ -1961,7 +1967,8 @@ def plot_plenum_geometry(
     :param angle: Angle between the inlet axis and the line of sight, in
         radians (0 <= angle < pi/2).
     :param language: Label language, ``"en"`` (default) or ``"es"``.
-    :param kwargs: Forwarded to the box rectangle.
+    :param kwargs: Forwarded to the wall-segment ``plot`` calls
+        (line properties such as ``linewidth`` or ``color``).
     :return: The axes.
     """
     from matplotlib.patches import Rectangle

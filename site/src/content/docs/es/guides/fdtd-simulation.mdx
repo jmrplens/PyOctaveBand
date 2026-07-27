@@ -159,8 +159,8 @@ print(round(float(echo[np.abs(echo).argmax()] / incident), 2))  # 0.5
 
 Antes de gastar un solo paso de tiempo, `sim.plot_geometry()` dibuja el
 dominio configurado: bordes, esponjas, obstáculos, fuentes y las sondas que
-piensas registrar. Pillar una fuente dentro de un obstáculo o una esponja en
-el lado equivocado cuesta segundos aquí y una simulación entera después.
+piensas registrar. Pillar una esponja en el lado equivocado o una sonda mal
+colocada cuesta segundos aquí y una simulación entera después.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fdtd_domain_geometry_es.svg" alt="Dibujo de configuración de un dominio FDTD de 4,5 por 3 metros antes de cualquier paso de tiempo: capas de esponja azul pálido a lo largo de los bordes izquierdo y derecho, un borde de impedancia naranja a lo largo del borde superior, un obstáculo rectangular gris justo a la izquierda del centro, la estrella de la fuente en (0.5, 1.5) y dos círculos de sonda en (3, 1.5) y (4, 2), con una leyenda que nombra la capa de esponja, el borde de impedancia, el borde rígido, la fuente y la sonda" width="88%" />
 

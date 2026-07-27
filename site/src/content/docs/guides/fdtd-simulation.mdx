@@ -152,8 +152,8 @@ print(round(float(echo[np.abs(echo).argmax()] / incident), 2))  # 0.5
 
 Before spending a single time step, `sim.plot_geometry()` draws the
 configured domain: edges, sponges, obstacles, sources and the probes you
-intend to record. Catching a source inside an obstacle or a sponge on the
-wrong side costs seconds here and a full re-run later.
+intend to record. Catching a sponge on the wrong side or a probe in the
+wrong place costs seconds here and a full re-run later.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fdtd_domain_geometry.svg" alt="Setup drawing of a 4.5 by 3 metre FDTD domain before any time stepping: pale blue sponge layers along the left and right edges, an orange impedance edge along the top, a grey rectangular obstacle just left of centre, the source star at (0.5, 1.5) and two probe circles at (3, 1.5) and (4, 2), with a legend naming the sponge layer, impedance edge, rigid edge, source and probe" width="88%" />
 

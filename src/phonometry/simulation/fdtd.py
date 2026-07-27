@@ -41,6 +41,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
+from types import MappingProxyType
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -437,9 +438,9 @@ class FDTD2D:
         self.sponge_sides: tuple[str, ...] = (
             sides if sponge_width > 0 else ()
         )
-        #: Per-side impedance boundaries as supplied (read-only record).
-        self.edge_impedance: dict[str, float | NDArray[np.float64]] = (
-            dict(edge_impedance) if edge_impedance else {}
+        #: Per-side impedance boundaries as supplied (immutable record).
+        self.edge_impedance: Mapping[str, float | NDArray[np.float64]] = (
+            MappingProxyType(dict(edge_impedance) if edge_impedance else {})
         )
         self._init_decay(sides, sponge_width, sponge_reflection, damping,
                          c_max)
