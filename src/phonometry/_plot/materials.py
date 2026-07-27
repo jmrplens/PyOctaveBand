@@ -30,6 +30,7 @@ if TYPE_CHECKING:
     from ..materials.diffuser_design import DiffuserPolarResponse
     from ..materials.dynamic_stiffness import DynamicStiffnessResult
     from ..materials.impedance_tube import ImpedanceTubeResult, TransferMatrix
+    from ..materials.metadiffuser import MetadiffuserResult
     from ..materials.porous_absorber import (
         DiffuseFieldAbsorptionResult,
         LayeredAbsorberResult,
@@ -100,6 +101,9 @@ _STRINGS: dict[str, str] = {
     "Normalised characteristic value": "Valor característico normalizado",
     r"Absorption coefficient $\alpha$": r"Coeficiente de absorción $\alpha$",
     "Reflection factor $|R|$": "Factor de reflexión $|R|$",
+    "Panel average": "Media del panel",
+    "Well {n}": "Pozo {n}",
+    "Metadiffuser per-well absorption": "Absorción por pozo del metadifusor",
     r"Absorption $\alpha(\theta)$": r"Absorción $\alpha(\theta)$",
     r"Absorption $\alpha_{dif}$": r"Absorción $\alpha_{dif}$",
     "Transmission loss $TL_n$": "Pérdida de transmisión $TL_n$",
@@ -902,4 +906,42 @@ def plot_transfer_matrix(
     ax.grid(True, which="both", alpha=0.3)
     localize_axes(ax, language)
     localize_axes(twin, language)
+    return ax
+
+
+def plot_metadiffuser_absorption(
+    result: MetadiffuserResult, ax: Axes | None = None,
+    language: str = "en", **kwargs: Any
+) -> Axes:
+    """Per-well and face-averaged absorption spectra of a metadiffuser.
+
+    Draws the face-averaged ``alpha(f)`` as the primary curve and each
+    well's ``alpha_n(f)`` as a muted companion, labelling only the first
+    well to keep the legend compact.
+
+    :param result: A
+        :class:`~phonometry.materials.metadiffuser.MetadiffuserResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param kwargs: Forwarded to the face-average ``plot`` call.
+    :return: The axes.
+    """
+    freqs = np.asarray(result.frequency, dtype=np.float64)
+    ax = _absorption_spectrum_axes(
+        ax,
+        freqs,
+        np.asarray(result.absorption, dtype=np.float64),
+        title=_t("Metadiffuser per-well absorption", language),
+        label=_t("Panel average", language),
+        language=language,
+        **kwargs,
+    )
+    wells = np.asarray(result.well_absorption, dtype=np.float64)
+    for n, alpha_n in enumerate(wells, start=1):
+        label = (
+            _t("Well {n}", language).format(n=f"1-{wells.shape[0]}")
+            if n == 1 else None
+        )
+        ax.semilogx(freqs, alpha_n, lw=0.9, alpha=0.6, color=_C_MUTED,
+                    label=label)
+    ax.legend(loc="best", fontsize="small")
     return ax

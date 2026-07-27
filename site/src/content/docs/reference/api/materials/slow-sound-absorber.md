@@ -153,6 +153,7 @@ helmholtz_resonator_impedance(
     slit_height: float | None = None,
     lattice_step: float | None = None,
     end_correction: bool = True,
+    geometry: str = 'square',
     air_density: float = 1.205,
     viscosity: float = 1.84e-05,
     prandtl_number: float = 0.71,
@@ -164,7 +165,8 @@ helmholtz_resonator_impedance(
 
 Acoustic impedance of a Helmholtz resonator with visco-thermal losses.
 
-The neck and cavity use the square-duct effective parameters of
+With the default `geometry="square"` the neck and cavity are square
+ducts using the effective parameters of
 [`rectangular_duct_properties`](/phonometry/reference/api/materials/slow-sound-absorber/#rectangular_duct_properties); the impedance is Appl. Phys. Lett. 2016
 Eq. (A23) with the neck-to-cavity radiation correction of Eq. (A24) and,
 when `slit_height` and `lattice_step` are supplied, the neck-to-slit
@@ -180,15 +182,23 @@ correction of Eqs. (A25)-(A26) added to the total neck length correction:
 with `Z_n = sqrt(kappa_n rho_n) / w_n^2`, `k_n = w sqrt(rho_n / kappa_n)`
 (and likewise for the cavity), reducing to Eq. (A22) when `dl = 0`.
 
+With `geometry="slit"` the resonator is two-dimensional (the neck and
+cavity are slit-like ducts spanning the lattice step): the effective
+parameters come from [`slit_effective_properties`](/phonometry/reference/api/materials/slow-sound-absorber/#slit_effective_properties) with the neck and
+cavity widths, the duct sections are `w_n a` and `w_c a`, and the end
+corrections are the 2-D fits of Sci. Rep. 7:5389 Eqs. (11)-(12); both
+`slit_height` and `lattice_step` are then required.
+
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
 | `frequency` | Frequency vector `f`, in hertz. |
 | `resonator` | The [`HelmholtzResonator`](/phonometry/reference/api/materials/slow-sound-absorber/#helmholtzresonator) geometry. |
-| `slit_height` | Slit height `h` for the neck-to-slit correction; if `None` that correction is omitted. |
+| `slit_height` | Slit height `h` for the neck-to-slit correction; if `None` that correction is omitted (`"square"` only). |
 | `lattice_step` | Lattice step `a` for the neck-to-slit correction. |
 | `end_correction` | Include the radiation end corrections (default True). |
+| `geometry` | `"square"` (default) for square-duct necks and cavities, `"slit"` for the two-dimensional resonator model. |
 | `air_density` | Air density `rho0`, in kg/m3. |
 | `viscosity` | Dynamic viscosity `eta` of air, in Pa s. |
 | `prandtl_number` | Prandtl number `Pr` of air. |
@@ -393,6 +403,7 @@ slit_helmholtz_absorber(
     angle: float = 0.0,
     end_correction: bool = True,
     slit_radiation: bool = True,
+    resonator_geometry: str = 'square',
     speed_of_sound: float = 343.0,
     air_density: float = 1.205,
     viscosity: float = 1.84e-05,

@@ -119,6 +119,7 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`materials.slow_sound_absorber`](/phonometry/reference/api/materials/slow-sound-absorber/) | Slow-sound slit panels loaded with Helmholtz resonators (perfect absorbers). |
 | [`materials.scattering_diffusion`](/phonometry/reference/api/materials/scattering-diffusion/) | Random-incidence scattering and directional diffusion coefficients. |
 | [`materials.diffuser_design`](/phonometry/reference/api/materials/diffuser-design/) | Far-field polar response and diffusion coefficient predicted from a diffuser design. |
+| [`materials.metadiffuser`](/phonometry/reference/api/materials/metadiffuser/) | Metadiffusers: deep-subwavelength Schroeder-like sound diffusers. |
 | [`materials.road_absorption`](/phonometry/reference/api/materials/road-absorption/) | In-situ sound absorption of road surfaces (ISO 13472-1 / ISO 13472-2). |
 
 ## Vibration and structure-borne

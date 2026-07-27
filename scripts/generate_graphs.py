@@ -41,6 +41,10 @@ _ES_EXACT = {
     "anechoic termination": "terminación anecoica",
     "rigid plug": "tapón rígido",
     "|p| envelope": "envolvente |p|",
+    "The 2 cm metadiffuser scatters like the 27 cm QRD (2 kHz)":
+        "El metadifusor de 2 cm dispersa como el QRD de 27 cm (2 kHz)",
+    "Metadiffuser, panel 2 cm": "Metadifusor, panel de 2 cm",
+    "QRD, wells up to 27.4 cm": "QRD, pozos de hasta 27,4 cm",
     "The virtual impedance tube: standing waves read the absorption "
     "(2D FDTD)":
         "El tubo de impedancia virtual: las ondas estacionarias leen la "
@@ -7941,6 +7945,96 @@ def generate_qrd_geometry(output_dir: str) -> None:
     plt.close()
 
 
+def _qr_metadiffuser_wells() -> tuple[Any, float, float]:
+    """The published 2 cm quadratic-residue metadiffuser (wells, L, d)."""
+    from phonometry import HelmholtzResonator, MetadiffuserWell
+
+    rows = [
+        (14.7, 13.0, 16.4, 6.2, 9.0),
+        (30.9, 9.1, 4.3, 3.5, 9.0),
+        (30.9, 9.1, 4.3, 3.5, 9.0),
+        (15.7, 13.3, 17.0, 6.3, 9.0),
+        (20.3, 18.0, 20.7, 3.2, 9.0),
+    ]
+    wells = [
+        MetadiffuserWell(
+            h * 1e-3,
+            (HelmholtzResonator(ln * 1e-3, wn * 1e-3, lc * 1e-3, wc * 1e-3),)
+            * 2,
+        )
+        for h, ln, lc, wn, wc in rows
+    ]
+    return wells, 0.02, 0.07
+
+
+def generate_metadiffuser_polar(output_dir: str) -> None:
+    """A 2 cm metadiffuser scatters like the 27 cm QRD it mimics.
+
+    Far-field polar responses at 2 kHz of the five-slit metadiffuser panel
+    and of the quadratic-residue diffuser (design frequency 500 Hz, wells up
+    to 27.4 cm deep) whose reflection-phase profile it reproduces, both with
+    six repetitions. One concept: the deep-subwavelength panel replaces a
+    13.7 times thicker classical diffuser.
+    """
+    print("Generating metadiffuser_polar...")
+    from phonometry import (
+        metadiffuser_polar_response,
+        predict_diffuser_polar_response,
+        quadratic_residue_sequence,
+    )
+
+    wells, depth, period = _qr_metadiffuser_wells()
+    sequence = np.roll(quadratic_residue_sequence(5), -1)
+    qrd_depths = sequence * (343.0 / 500.0) / (2 * 5)
+    meta = metadiffuser_polar_response(
+        2000.0, wells, depth=depth, period=period, periods=6,
+    )
+    qrd = predict_diffuser_polar_response(
+        period, 2000.0, depths=qrd_depths, periods=6,
+        include_obliquity=False,
+    )
+    _fig, ax = plt.subplots(
+        figsize=(10, 6.2), subplot_kw={"projection": "polar"},
+    )
+    meta.plot(
+        ax=ax, color=COLOR_SECONDARY, marker="", linewidth=2.2,
+        label="Metadiffuser, panel 2 cm", language=_LANG,
+    )
+    qrd.plot(
+        ax=ax, color=COLOR_PRIMARY, marker="", linewidth=1.6,
+        linestyle="--", label="QRD, wells up to 27.4 cm", language=_LANG,
+    )
+    ax.set_title(
+        "The 2 cm metadiffuser scatters like the 27 cm QRD (2 kHz)",
+        pad=18, fontweight="bold",
+    )
+    ax.legend(loc="lower center", bbox_to_anchor=(0.5, -0.02), fontsize=9)
+    plt.tight_layout()
+    save_figure(output_dir, "metadiffuser_polar.svg")
+    plt.close()
+
+
+def generate_metadiffuser_geometry(output_dir: str) -> None:
+    """To-scale cross-section of the published 2 cm metadiffuser panel.
+
+    One period of the five-slit quadratic-residue metadiffuser: numbered
+    slits open at the face, each loaded by two Helmholtz resonators
+    shelved sideways into the septum, over a rigid backing. One concept:
+    the whole 35 cm x 2 cm panel that replaces a 27 cm deep diffuser.
+    """
+    print("Generating metadiffuser_geometry...")
+    from phonometry.materials import plot_metadiffuser_panel_geometry
+
+    wells, depth, period = _qr_metadiffuser_wells()
+    _fig, ax = plt.subplots(figsize=(10, 3.4))
+    plot_metadiffuser_panel_geometry(
+        wells, ax=ax, depth=depth, period=period, language=_LANG,
+    )
+    plt.tight_layout()
+    save_figure(output_dir, "metadiffuser_geometry.svg")
+    plt.close()
+
+
 def generate_impedance_tube_geometry(output_dir: str) -> None:
     """To-scale side view of a 100 mm ISO 10534-2 impedance tube.
 
@@ -11892,6 +11986,8 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_porous_absorber_designs,
     generate_absorber_stack_geometry,
     # Slow-sound slit + Helmholtz-resonator perfect absorbers (Jimenez et al.)
+    generate_metadiffuser_geometry,
+    generate_metadiffuser_polar,
     generate_slow_sound_absorber,
     generate_slit_absorber_geometry,
     generate_helmholtz_resonator_geometry,

@@ -118,6 +118,7 @@ export const apiSidebar = {
         'reference/api/materials/slow-sound-absorber',
         'reference/api/materials/scattering-diffusion',
         'reference/api/materials/diffuser-design',
+        'reference/api/materials/metadiffuser',
         'reference/api/materials/road-absorption',
       ],
     },

@@ -480,6 +480,115 @@ plt.show()
 
 </details>
 
+### Metadiffusers: deep-subwavelength Schroeder diffusers
+
+A metadiffuser replaces the deep wells of a Schroeder diffuser with thin
+slits loaded by Helmholtz resonators (Jimenez, Cox, Romero-Garcia and Groby,
+2017). Below their resonance the resonators slow the sound inside each slit,
+so a panel a few centimetres thick reaches the reflection phases that a
+classical phase grating needs tens of centimetres of depth for, and driving
+a slit to critical coupling adds a perfectly absorbing state, the `0` that
+ternary sequences require. `metadiffuser_reflection` runs the slit
+transfer-matrix chain of the [slow-sound absorber](materials.md) once per
+well (two-dimensional resonators, visco-thermal losses and end corrections
+included) and returns the per-well complex reflection $R_n(f)$;
+`metadiffuser_polar_response` and `metadiffuser_diffusion_spectrum` reduce
+that spatial profile through the same Fraunhofer far field and ISO 17497-2
+coefficient used for the classical designs above.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_geometry.svg" alt="To-scale cross-section of the published quadratic-residue metadiffuser: a 350 by 20 millimetre panel over a rigid backing with five numbered slits opening at the face, each loaded by two Helmholtz resonators whose necks and cavities shelve sideways into the septum between slits; dimension lines mark the 350 millimetre width, the 70 millimetre pitch, the 14.7 millimetre first slit and the 20 millimetre depth, with the incident sound arriving from above" width="92%"></picture>
+
+The published quadratic-residue design packs the whole diffuser into a
+35 cm x 2 cm panel. Its first slit reaches critical coupling (the reflection
+zero the ternary `0` state is built from), and at the 2 kHz evaluation
+frequency the panel scatters like the 27.4 cm deep QRD it mimics:
+
+```python
+import numpy as np
+from phonometry import (
+    HelmholtzResonator,
+    MetadiffuserWell,
+    metadiffuser_polar_response,
+    metadiffuser_reflection,
+)
+
+# The published quadratic-residue metadiffuser: five slits with two
+# resonators each in a 35 cm x 2 cm panel (7 cm pitch), tuned to mimic a
+# QRD designed for 500 Hz whose wells would run up to 27.4 cm deep.
+mm = 1e-3
+rows = [  # slit h, neck l_n, cavity l_c, neck w_n, cavity w_c  [mm]
+    (14.7, 13.0, 16.4, 6.2, 9.0),
+    (30.9, 9.1, 4.3, 3.5, 9.0),
+    (30.9, 9.1, 4.3, 3.5, 9.0),
+    (15.7, 13.3, 17.0, 6.3, 9.0),
+    (20.3, 18.0, 20.7, 3.2, 9.0),
+]
+wells = [
+    MetadiffuserWell(
+        h * mm,
+        2 * (HelmholtzResonator(ln * mm, wn * mm, lc * mm, wc * mm),),
+    )
+    for h, ln, lc, wn, wc in rows
+]
+
+f = np.arange(1800.0, 2601.0, 5.0)
+panel = metadiffuser_reflection(f, wells, depth=0.02, period=0.07)
+alpha1 = panel.well_absorption[0]
+print(round(float(alpha1.max()), 2), int(f[alpha1.argmax()]))  # 0.99 2305
+
+polar = metadiffuser_polar_response(2000.0, wells, depth=0.02,
+                                    period=0.07, periods=6)
+print(round(polar.coefficient, 2))                             # 0.32
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_polar_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_polar.svg" alt="Semicircular polar plot at 2 kilohertz comparing the far-field response of the 2 centimetre metadiffuser panel, drawn as a solid line, with the 27.4 centimetre deep quadratic residue diffuser it mimics, drawn dashed: the two grating-lobe patterns overlap almost exactly across the whole minus 90 to plus 90 degree arc" width="92%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import numpy as np
+from phonometry import (
+    HelmholtzResonator,
+    MetadiffuserWell,
+    materials,
+    metadiffuser_polar_response,
+)
+
+mm = 1e-3
+rows = [
+    (14.7, 13.0, 16.4, 6.2, 9.0),
+    (30.9, 9.1, 4.3, 3.5, 9.0),
+    (30.9, 9.1, 4.3, 3.5, 9.0),
+    (15.7, 13.3, 17.0, 6.3, 9.0),
+    (20.3, 18.0, 20.7, 3.2, 9.0),
+]
+wells = [
+    MetadiffuserWell(
+        h * mm,
+        2 * (HelmholtzResonator(ln * mm, wn * mm, lc * mm, wc * mm),),
+    )
+    for h, ln, lc, wn, wc in rows
+]
+
+# The metadiffuser panel and the QRD it was tuned to at 2 kHz, both with
+# six repetitions of the period.
+meta = metadiffuser_polar_response(2000.0, wells, depth=0.02, period=0.07,
+                                   periods=6)
+sequence = np.roll(materials.quadratic_residue_sequence(5), -1)
+depths = sequence * (343.0 / 500.0) / (2 * 5)
+qrd = materials.predict_diffuser_polar_response(
+    0.07, 2000.0, depths=depths, periods=6, include_obliquity=False,
+)
+
+ax = meta.plot(marker="", linewidth=2.2, label="Metadiffuser, panel 2 cm")
+qrd.plot(ax=ax, marker="", linewidth=1.6, linestyle="--",
+         label="QRD, wells up to 27.4 cm")
+ax.legend(loc="lower center")
+```
+
+</details>
+
 ## Scattering or diffusion? Two coefficients, two jobs
 
 The two coefficients above are routinely treated as interchangeable, in
@@ -740,6 +849,14 @@ print(round(s_min, 3), round(s_max, 3))    # 0.078 0.086  (metres)
 ```
 
 ## References
+
+- Jimenez, N., Cox, T. J., Romero-Garcia, V., & Groby, J.-P. (2017).
+  Metadiffusers: Deep-subwavelength sound diffusers. *Scientific Reports*,
+  7, 5389.
+  [doi:10.1038/s41598-017-05710-5](https://doi.org/10.1038/s41598-017-05710-5).
+  The metadiffuser model implemented here: slits loaded by Helmholtz
+  resonators reproduce Schroeder phase profiles and ternary sequences from
+  panels 1/46 to 1/20 of the design wavelength thick.
 
 - Cox, T. J., & D'Antonio, P. (2017). *Acoustic absorbers and diffusers:
   Theory, design and application* (3rd ed.). CRC Press.
