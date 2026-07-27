@@ -139,6 +139,13 @@ mean `mean_velocity_level` (Formula 10) or its area-weighted form (Formula 11),
 and the correction `extraneous_velocity_correction` removes extraneous
 vibration per Table 2.
 
+Those positions are not free: the standard divides the radiating surface `S`
+into `N` equal cells and puts one accelerometer at the centre of each. The
+area table gives the initial `N`; a strongly non-uniform vibration field can
+call for more positions or a redistribution.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_vibration_sound_power_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_vibration_sound_power.svg" alt="ISO/TS 7849 surface-velocity method: a machine under test with its vibrating measurement surface of 2.5 by 1.6 metres divided into twenty equal cells, an accelerometer at each cell centre, the radiated airborne sound leaving the surface, the table for the initial number of measurement positions and the survey relation LWA = LvA + 10 lg(S/S0) + 10 lg epsilon" width="92%"></picture>
+
 ## 3. When the radiation-factor assumption breaks
 
 The whole method stands on one substitution: replacing the acoustic

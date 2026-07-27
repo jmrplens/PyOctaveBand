@@ -25,6 +25,8 @@ references:
     note: "El calibrador acústico que asume la etapa de sensibilidad: el nivel principal de 94 dB y la comprobación de estabilidad a corto plazo aplicada a la grabación de referencia."
 ---
 
+import ThemeImage from '../../../../components/ThemeImage.astro';
+
 Un sonómetro no es un algoritmo, sino una breve cadena de ellos, e
 IEC 61672-1 especifica cada etapa. phonometry implementa cada etapa como una
 función independiente y componible; esta página las ensambla, en orden, en un
@@ -44,6 +46,12 @@ flowchart LR
     F --> H
     G --> H
 ```
+
+Es la misma cadena que IEC 61672-1 dibuja para el instrumento físico: el
+calibrador de clase 1 ancla el micrófono a 94 dB a 1 kHz, y cada etapa
+posterior es una función de esta página.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_slm_chain_es.svg" alt="Cadena del sonómetro según IEC 61672-1: un calibrador acústico de clase 1 a 94 dB y 1 kHz acoplado al micrófono de medición con su pantalla antiviento, seguido de las cuatro etapas del instrumento: micrófono y preamplificador, ponderación frecuencial A, C o Z, cuadrado con la ponderación temporal exponencial F o S de 125 ms o 1 s, y la pantalla con LAF(t) en dB re 20 µPa" width="92%" />
 
 Los fragmentos de esta página se apoyan unos en otros: ejecútalos de arriba
 abajo en una misma sesión (o pega la página entera en un script).

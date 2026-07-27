@@ -126,6 +126,12 @@ can cross entire oceans.
 
 [Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_ducting.webm)
 
+At real ocean scale the channel axis sits near 1200 m, and the trapped
+arrivals are rays cycling about the sound-speed minimum over tens of
+kilometres.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sofar_channel_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sofar_channel.svg" alt="The SOFAR channel: a North Atlantic sound-speed profile with 1524 m/s at the surface, a minimum near 1492 m/s at the 1200 m channel axis and 1527 m/s at the 4800 m bottom, beside ray paths from a source on the axis that oscillate about the sound-speed minimum and stay trapped without touching the surface or the bottom" width="92%"></picture>
+
 ## 3. Sonar equation
 
 The sonar equation combines the performance terms into the **signal excess**
