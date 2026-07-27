@@ -9,6 +9,13 @@ ECMA-418-2 tonality, roughness and fluctuation strength of the Sottek Hearing
 Model. Loudness itself, including the ECMA-418-2 loudness that shares the
 same auditory front-end, lives in [Loudness](loudness.md).
 
+The four metrics form one family: a single calibrated signal splits across
+two auditory front ends, and every branch is anchored to a reference sound
+that reads exactly 1. The diagram maps the family with the values the
+library returns for each reference.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sound_quality_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sound_quality.svg" alt="Block diagram of the sound-quality metric family: a calibrated signal in pascals feeds two auditory front ends, the Zwicker specific loudness pattern over 24 Bark and the ECMA-418-2 Sottek Hearing Model with 53 auditory bands; the first drives the DIN 45692 sharpness whose critical-band-wide noise reference at 1 kHz and 60 dB reads 1.00 acum, the second drives the tonality, roughness and fluctuation strength, whose references, a 1 kHz tone at 40 dB and 1 kHz carriers fully amplitude-modulated at 70 Hz and 4 Hz at 60 dB, read 1.000 tu_HMS, 0.9999 asper and 0.9957 vacil_HMS; a closing note states that N5, sharpness, roughness and fluctuation strength feed the Fastl and Zwicker psychoacoustic annoyance" width="92%"></picture>
+
 ## Sharpness in acum (DIN 45692)
 
 Two sounds can be equally loud yet one feels "sharper" (hissy, metallic)

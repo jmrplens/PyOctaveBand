@@ -88,6 +88,12 @@ print(round(psychoacoustics.tone_audibility(67.96, 49.22, 137.3, 2.7), 2))   # 5
 print(round(psychoacoustics.masking_index(137.3), 2))                        # -2.02 dB
 ```
 
+The whole method is one chain from the spectrum to the penalty, and every
+intermediate quantity above is a stop on it. The diagram walks the Annex E
+tone through that chain, down to the Kt the mean audibility earns.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_tone_audibility_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_tone_audibility.svg" alt="Flow diagram of the ISO/PAS 20065 engineering method on the Annex E combustion-engine spectrum: a narrow-band FFT spectrum with 2.7 hertz line spacing yields a tone at 137.3 hertz, its critical band of 101.36 hertz spans 95.67 to 197.04 hertz, the masking noise level of 49.22 decibels and tone level of 67.96 decibels give a masking threshold of 64.97 decibels with a masking index of minus 2.02 decibels, and the audibility is 5.01 decibels, the decisive value of the spectrum; a closing note maps the 6.98 decibel energy-mean audibility of the five spectra to a tonal adjustment Kt of 4 decibels through ISO 1996-2 Table J.1" width="92%"></picture>
+
 ## 3. Decisive and mean audibility
 
 The **decisive** audibility of one narrow-band spectrum is the largest tone

@@ -181,6 +181,12 @@ plt.show()
 
 </details>
 
+Sabine and Eyring are the two workhorses, and the per-band spread between
+them is itself a diagnostic. The diagram runs the room of this section
+through both, with the validity boundary every statistical formula shares.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_reverberation_prediction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_reverberation_prediction.svg" alt="Block diagram of the reverberation-time prediction: a 10 by 7 by 3.5 metre room with 245 cubic metres, 259 square metres and a mean absorption rising from 0.21 at 125 hertz to 0.51 at 4 kilohertz feeds the Sabine and Eyring formulas, whose per-octave-band table runs from 0.74 to 0.30 seconds for Sabine and 0.66 to 0.22 seconds for Eyring, Eyring reading 11 to 29 percent shorter; a closing note bounds the domain of validity to a diffuse field, excluding bands below the Schroeder frequency, coupled volumes and corridor-like rooms" width="92%"></picture>
+
 ## 4. Choosing a model, and when every model fails
 
 The five formulae are not rivals on a single axis of accuracy; each has a

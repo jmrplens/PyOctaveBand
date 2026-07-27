@@ -66,6 +66,12 @@ print(round(d.value, 3))              # a scalar in roughly [0, 1]
 print(stoi(clean, clean, fs).value)   # 1.0  (a signal against itself)
 ```
 
+Everything up to the 384 ms segments is shared; the two measures only part
+ways at the correlation. The diagram lays the chain out with the numbers of
+the flat-masker example.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_objective_intelligibility_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_objective_intelligibility.svg" alt="Block diagram of the STOI and ESTOI processing chain: a clean reference and a degraded version, in the guide's example speech-like material in a flat masker at 0 dB signal-to-noise ratio, are resampled to 10 kilohertz with silent frames dropped, transformed by a short-time DFT of 256-sample Hann frames at 50 percent overlap grouped into 15 one-third-octave bands from 150 hertz, and compared in 384 millisecond segments; the chain then splits into the STOI clipped envelope correlation and the ESTOI row- and column-normalised spectral correlation, and the example reads STOI equal to 0.727, with the lowest band keeping 0.27 of the correlation and the bands above 1.9 kilohertz reaching 0.90" width="92%"></picture>
+
 ## 2. STOI: envelope correlation with clipping
 
 For every band and segment STOI normalises the degraded envelope to the clean

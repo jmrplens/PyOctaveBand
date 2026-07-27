@@ -122,6 +122,12 @@ print(round(psychoacoustics.tone_audibility(67.96, 49.22, 137.3, 2.7), 2))   # 5
 print(round(psychoacoustics.masking_index(137.3), 2))                        # -2.02 dB
 ```
 
+Todo el método es una cadena del espectro al ajuste, y cada magnitud
+intermedia de arriba es una parada en ella. El diagrama recorre esa cadena
+con el tono del Anexo E, hasta el Kt que gana la audibilidad media.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_tone_audibility_es.svg" alt="Diagrama de flujo del método de ingeniería de ISO/PAS 20065 sobre el espectro del motor de combustión del Anexo E: un espectro FFT de banda estrecha con resolución de 2,7 hercios da un tono a 137,3 hercios, su banda crítica de 101,36 hercios abarca de 95,67 a 197,04 hercios, el nivel de ruido enmascarante de 49,22 decibelios y el nivel del tono de 67,96 decibelios dan un umbral de enmascaramiento de 64,97 decibelios con índice de enmascaramiento de menos 2,02 decibelios, y la audibilidad es de 5,01 decibelios, el valor decisivo del espectro; una nota final convierte la audibilidad media energética de 6,98 decibelios de los cinco espectros en un ajuste tonal Kt de 4 decibelios mediante la Tabla J.1 de ISO 1996-2" width="92%" />
+
 ## 3. Audibilidad decisiva y media
 
 La audibilidad **decisiva** de un espectro de banda estrecha es la mayor
