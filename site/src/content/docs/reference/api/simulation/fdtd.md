@@ -90,7 +90,7 @@ FDTD2D(
     sponge_width: int = 0,
     sponge_sides: str | Iterable[str] | None = None,
     sponge_reflection: float = 0.0001,
-    damping: float = 0.0,
+    damping: float | NDArray[np.float64] = 0.0,
     shape: tuple[int, int] | None = None,
     edge_impedance: Mapping[str, float | NDArray[np.float64]] | None = None,
     obstacle_mask: NDArray[np.bool_] | None = None,
@@ -119,7 +119,7 @@ sides into absorbing or locally reacting boundaries. Sources are soft
 | `sponge_width` | Thickness of the absorbing layer in cells (0 = no absorbing sides). |
 | `sponge_sides` | Which sides absorb: a single side name or an iterable drawn from `{"left", "right", "top", "bottom"}` (default: all four when `sponge_width > 0`). `left`/`right` are the low/high column edges and `top`/`bottom` the low/high row edges (the default `imshow` origin). |
 | `sponge_reflection` | Target round-trip amplitude reflection of the sponge layer; sets the peak absorption rate. |
-| `damping` | Uniform bulk amplitude decay rate [1/s] applied to the whole field (a simple stand-in for air/wall absorption; `6.91 / T60` gives a `T60` seconds reverberant decay). |
+| `damping` | Bulk amplitude decay rate [1/s]: a scalar applied to the whole field (a simple stand-in for air/wall absorption; `6.91 / T60` gives a `T60` seconds reverberant decay) or an `(ny, nx)` map for locally lossy regions, e.g. an equivalent fluid modelling a porous sample (plane waves inside a uniform lossy region follow `k = (omega - j sigma) / c` with the real characteristic impedance `rho c`). |
 | `shape` | Grid shape `(ny, nx)`, required only when `c` is a scalar. |
 | `edge_impedance` | Locally reacting boundary sides: a mapping from side name to a real specific acoustic impedance [Pa s/m], either a scalar or a per-edge-cell 1D array (length `ny` for `left`/ `right`, `nx` for `top`/`bottom`). Implements Eqs. (4.33)-(4.35); `Z = rho c` is a normal-incidence matched (anechoic) edge. A side cannot be both a sponge and an impedance boundary. |
 | `obstacle_mask` | Boolean map, shape `(ny, nx)`, of rigid cells: every face adjacent to a masked cell is closed (zero normal velocity, Eq. 4.32), rasterising arbitrary interior geometry. |

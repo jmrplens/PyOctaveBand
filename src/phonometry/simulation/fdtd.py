@@ -397,9 +397,13 @@ class FDTD2D:
         row edges (the default ``imshow`` origin).
     :param sponge_reflection: Target round-trip amplitude reflection of the
         sponge layer; sets the peak absorption rate.
-    :param damping: Uniform bulk amplitude decay rate [1/s] applied to the
-        whole field (a simple stand-in for air/wall absorption;
-        ``6.91 / T60`` gives a ``T60`` seconds reverberant decay).
+    :param damping: Bulk amplitude decay rate [1/s]: a scalar applied to
+        the whole field (a simple stand-in for air/wall absorption;
+        ``6.91 / T60`` gives a ``T60`` seconds reverberant decay) or an
+        ``(ny, nx)`` map for locally lossy regions, e.g. an equivalent
+        fluid modelling a porous sample (plane waves inside a uniform
+        lossy region follow ``k = (omega - j sigma) / c`` with the real
+        characteristic impedance ``rho c``).
     :param shape: Grid shape ``(ny, nx)``, required only when ``c`` is a
         scalar.
     :param edge_impedance: Locally reacting boundary sides: a mapping from
@@ -424,7 +428,7 @@ class FDTD2D:
         sponge_width: int = 0,
         sponge_sides: str | Iterable[str] | None = None,
         sponge_reflection: float = 1e-4,
-        damping: float = 0.0,
+        damping: float | NDArray[np.float64] = 0.0,
         shape: tuple[int, int] | None = None,
         edge_impedance: Mapping[str, float | NDArray[np.float64]]
         | None = None,
@@ -445,7 +449,10 @@ class FDTD2D:
         if not 0.0 < sponge_reflection < 1.0:
             raise ValueError("sponge_reflection must lie strictly between "
                              "0 and 1")
-        if not np.isfinite(damping) or damping < 0.0:
+        damping_map = np.asarray(damping, dtype=np.float64)
+        if damping_map.ndim not in (0, 2):
+            raise ValueError("damping must be a scalar or an (ny, nx) map")
+        if not np.all(np.isfinite(damping_map)) or np.any(damping_map < 0.0):
             raise ValueError("damping must be non-negative and finite")
 
         self.dx = _positive_finite("dx", dx)
@@ -479,14 +486,20 @@ class FDTD2D:
         self.edge_impedance: Mapping[str, float | NDArray[np.float64]] = (
             MappingProxyType(dict(edge_impedance) if edge_impedance else {})
         )
-        self._init_decay(sides, sponge_width, sponge_reflection, damping,
+        if damping_map.ndim == 2 and damping_map.shape != (ny, nx):
+            raise ValueError(
+                f"damping map shape {damping_map.shape} does not match the "
+                f"grid {(ny, nx)}"
+            )
+        self._init_decay(sides, sponge_width, sponge_reflection, damping_map,
                          c_max)
         self._edges = self._build_edges(edge_impedance, sponge_width, sides,
                                         ny, nx)
         self._init_obstacle(obstacle_mask, ny, nx)
 
     def _init_decay(self, sides: tuple[str, ...], sponge_width: int,
-                    sponge_reflection: float, damping: float,
+                    sponge_reflection: float,
+                    damping: NDArray[np.float64],
                     c_max: float) -> None:
         """Precompute the sponge/damping decay factors of every field."""
         ny, nx = self.p.shape

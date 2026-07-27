@@ -37,6 +37,25 @@ _LANG = "en"
 _LANG_SUFFIX = ""
 
 _ES_EXACT = {
+    "loudspeaker": "altavoz",
+    "anechoic termination": "terminación anecoica",
+    "rigid plug": "tapón rígido",
+    "|p| envelope": "envolvente |p|",
+    "The virtual impedance tube: standing waves read the absorption "
+    "(2D FDTD)":
+        "El tubo de impedancia virtual: las ondas estacionarias leen la "
+        "absorción (FDTD 2D)",
+    "Rigid end: deep minima, |r| ~ 1":
+        "Extremo rígido: mínimos profundos, |r| ~ 1",
+    "10 cm lossy sample: shallow minima":
+        "Muestra disipativa de 10 cm: mínimos poco profundos",
+    "The virtual transmission tube: what gets through (2D FDTD)":
+        "El tubo de transmisión virtual: lo que se transmite (FDTD 2D)",
+    "Empty tube: the packet crosses unchanged":
+        "Tubo vacío: el paquete lo cruza intacto",
+    "10 cm lossy layer: reflected + attenuated transmission":
+        "Capa disipativa de 10 cm: reflexión + transmisión atenuada",
+    "Position along the tube [m]": "Posición a lo largo del tubo [m]",
     "Frequency [Hz]": "Frecuencia [Hz]",
     "Predicted diffusion from design (Cox & D'Antonio Fraunhofer model)":
         "Difusión predicha desde el diseño (modelo de Fraunhofer de Cox y D'Antonio)",
@@ -1469,6 +1488,10 @@ _ES_PATTERNS = [
     # window_functions_tradeoff legend entries (name + baked-in metrics).
     (r"^([a-z]+): ENBW (.+) bins, sidelobe (.+) dB$",
      r"\1: ENBW \2 bins, lóbulo lateral \3 dB"),
+    (r"^alpha = (.+) at (.+) Hz$",
+     r"alfa = \1 a \2 Hz"),
+    (r"^TL = (.+) dB at (.+) Hz$",
+     r"TL = \1 dB a \2 Hz"),
     (r"^Integrated I = (.+) LUFS$", "Integrada I = \\1 LUFS"),
     (r"^LRA = (.+) LU \(P10-P95\)$", "LRA = \\1 LU (P10-P95)"),
     (r"^f = 10 kHz, α = (.+) dB/km\npractical spreading \(R₀ = 1000 m\)$",
@@ -13851,6 +13874,320 @@ def animate_fdtd_ducting(output_dir: str) -> None:
                  frames=int(p_all.shape[1]), gif_fps=8)
 
 
+#: Virtual-tube sample: the equivalent fluid of the solver cross-checks
+#: (slower, denser, lossy; k = (omega - j sigma)/c at the real rho c).
+_VTUBE_C2, _VTUBE_RHO2, _VTUBE_SIGMA = 0.6 * 343.0, 3.6, 600.0
+_VTUBE_DX = 0.0025
+_VTUBE_F = 850.0                          # CW inside the 100 mm plane range
+
+
+def _anim_tube_hardware(ax: Any, length: float, *, bore: float = 0.1,
+                        sample: tuple[float, float] | None = None,
+                        termination: str = "rigid",
+                        mics: tuple[tuple[float, str], ...] = (),
+                        label_speaker: bool = True) -> None:
+    """Draw the tube as hardware around the FDTD bore: walls, loudspeaker,
+    sample block, microphones and the termination, all to scale (metres)."""
+    from matplotlib.patches import Polygon, Rectangle
+
+    wall = 0.014
+    grey = "#9a9a9a"
+    for y0 in (-wall, bore):
+        ax.add_patch(Rectangle((0.0, y0), length, wall, facecolor=grey,
+                               edgecolor=COLOR_FG, linewidth=0.7, zorder=3))
+    # Loudspeaker driving the left end: magnet + cone into the bore.
+    magnet_w, cone_w = 0.05, 0.045
+    ax.add_patch(Rectangle((-magnet_w - cone_w, 0.18 * bore), magnet_w,
+                           0.64 * bore, facecolor=grey,
+                           edgecolor=COLOR_FG, linewidth=0.8, zorder=4))
+    ax.add_patch(Polygon([(-cone_w, 0.30 * bore), (-cone_w, 0.70 * bore),
+                          (0.0, 0.97 * bore), (0.0, 0.03 * bore)],
+                         closed=True, facecolor="#e8b98a",
+                         edgecolor=COLOR_FG, linewidth=0.8, zorder=4))
+    if label_speaker:
+        ax.text(-(magnet_w + cone_w), -0.55 * bore, "loudspeaker",
+                ha="left", va="top", fontsize=7.5)
+    if sample is not None:
+        ax.add_patch(Rectangle((sample[0], 0.0), sample[1] - sample[0],
+                               bore, facecolor=COLOR_SECONDARY, alpha=0.30,
+                               hatch="..", edgecolor=COLOR_SECONDARY,
+                               linewidth=0.0, zorder=2.6))
+    if termination == "rigid":
+        ax.add_patch(Rectangle((length, -wall), 0.030, bore + 2 * wall,
+                               facecolor="#5a5a5a", edgecolor=COLOR_FG,
+                               linewidth=0.8, zorder=3))
+        ax.text(length + 0.030, -0.55 * bore, "rigid plug", ha="right",
+                va="top", fontsize=7.5)
+    else:
+        ax.add_patch(Rectangle((length, -wall), 0.045, bore + 2 * wall,
+                               facecolor=grey, hatch="////",
+                               edgecolor=COLOR_FG, linewidth=0.8, zorder=3))
+        ax.text(length + 0.045, -0.55 * bore, "anechoic termination",
+                ha="right", va="top", fontsize=7.5)
+    for x_m, label in mics:
+        ax.plot([x_m, x_m], [bore + wall, bore + wall + 0.35 * bore],
+                color=COLOR_FG, lw=1.2, zorder=5)
+        ax.plot([x_m], [bore + wall + 0.50 * bore], marker="o", ms=7,
+                markerfacecolor=COLOR_PRIMARY, markeredgecolor=COLOR_FG,
+                markeredgewidth=0.7, zorder=5)
+        ax.text(x_m, bore + wall + 0.78 * bore, label, ha="center",
+                va="bottom", fontsize=7.5, color=COLOR_PRIMARY)
+
+
+@lru_cache(maxsize=1)
+def _impedance_tube_fields(
+    n_frames: int = _FDTD_ANIM_FRAMES,
+) -> tuple[Any, Any, Any, Any]:
+    """CW build-up in the virtual impedance tube, empty vs sample, cached.
+
+    Two 1,2 m x 0,1 m tubes: a rho c edge on the left carries a sustained
+    one-way 850 Hz plane wave in; the right end is rigid. The lower tube
+    ends in a 10 cm equivalent-fluid sample. Returns the frame stacks, the
+    running envelope stacks max|p(x)| over the trailing period, the frame
+    times and the analytic absorption of the sample at the drive frequency.
+    """
+    import fdtd2d
+
+    dx = _VTUBE_DX
+    ny, nx = 40, 480                       # 0.1 m x 1.2 m
+    every = 15                             # 46.4 us/frame: 25 f/period
+    sample_cells = round(0.10 / dx)
+    runs = []
+    for with_sample in (False, True):
+        c_map = np.full((ny, nx), 343.0)
+        rho_map = np.full((ny, nx), 1.2)
+        damping = np.zeros((ny, nx))
+        if with_sample:
+            c_map[:, nx - sample_cells:] = _VTUBE_C2
+            rho_map[:, nx - sample_cells:] = _VTUBE_RHO2
+            damping[:, nx - sample_cells:] = _VTUBE_SIGMA
+        sim = fdtd2d.FDTD2D(c_map, dx, rho=rho_map, damping=damping,
+                            edge_impedance={"left": 1.2 * 343.0})
+        tone = fdtd2d.CWSource(0, 0, frequency=_VTUBE_F)
+        sim.add_source(fdtd2d.PlaneWaveSource("right", tone.value,
+                                              offset=2))
+        period_frames = max(1, round(1.0 / (_VTUBE_F * every * sim.dt)))
+        ps: list[Any] = []
+        env: list[Any] = []
+        ts: list[float] = []
+        recent: list[Any] = []
+        while len(ps) < n_frames:
+            sim.step()
+            if sim.n % every == 0:
+                row = np.abs(sim.p[ny // 2, :]).astype(np.float32)
+                recent.append(row)
+                if len(recent) > period_frames:
+                    recent.pop(0)
+                ps.append(sim.p[::2, ::2].astype(np.float32))
+                env.append(np.max(np.stack(recent), axis=0))
+                ts.append(sim.time)
+        runs.append((np.stack(ps), np.stack(env)))
+    times = np.asarray(ts)
+    # Analytic absorption of the sample at the drive frequency.
+    omega = 2.0 * np.pi * _VTUBE_F
+    k2 = (omega - 1j * _VTUBE_SIGMA) / _VTUBE_C2
+    z2 = _VTUBE_RHO2 * _VTUBE_C2
+    zs = -1j * z2 / np.tan(k2 * 0.10)
+    r = (zs - 1.2 * 343.0) / (zs + 1.2 * 343.0)
+    alpha = float(1.0 - abs(r) ** 2)
+    return runs[0], runs[1], times, alpha
+
+
+def animate_fdtd_impedance_tube(output_dir: str) -> None:
+    """The virtual impedance tube (2D FDTD): a loudspeaker drives a
+    sustained plane tone into a rigid-walled tube; against the rigid plug
+    the standing wave grows deep nulls (|r| ~ 1), while a 10 cm lossy
+    sample in front of the same plug leaves the minima shallow: the ISO
+    10534-2 microphone pair reads exactly that envelope. One concept: the
+    standing-wave ratio IS the absorption measurement."""
+    T = _translate_str
+    (p_e, env_e), (p_s, env_s), times, alpha = _impedance_tube_fields()
+    vmax = float(np.quantile(np.abs(p_e), 0.999))
+    length, bore = 1.2, 0.1
+    env_base, env_h, env_max = 0.24, 0.34, 2.2
+    fig = _anim_figure()
+    fig.suptitle(T("The virtual impedance tube: standing waves read the "
+                   "absorption (2D FDTD)"), fontweight="bold")
+    axes = fig.subplots(2, 1, sharex=True)
+    titles = [T("Rigid end: deep minima, |r| ~ 1"),
+              T("10 cm lossy sample: shallow minima")]
+    mics = ((length - 0.10 - 0.20, "1"), (length - 0.10 - 0.15, "2"))
+    ims: list[Any] = []
+    lines: list[Any] = []
+    x_env = (np.arange(p_e.shape[2] * 2) + 0.5) * _VTUBE_DX
+    env_from = 16                          # hide the injection-line step
+    for ax, title, with_sample in ((axes[0], titles[0], False),
+                                   (axes[1], titles[1], True)):
+        ax.grid(False)
+        im = ax.imshow(np.zeros((20, 240)), origin="lower",
+                       extent=(0.0, length, 0.0, bore),
+                       cmap="RdBu_r", vmin=-vmax, vmax=vmax,
+                       aspect="auto", interpolation="bilinear", zorder=2)
+        _anim_tube_hardware(
+            ax, length, bore=bore,
+            sample=(length - 0.10, length) if with_sample else None,
+            termination="rigid", mics=mics,
+        )
+        # The standing-wave envelope, drawn above the hardware.
+        ax.axhline(env_base, color=COLOR_GRID, lw=0.8, zorder=1)
+        ax.text(0.005, env_base + 0.015, "|p| envelope", fontsize=7.5,
+                ha="left", va="bottom", color=COLOR_FG, alpha=0.8)
+        (line,) = ax.plot([], [], color=COLOR_PRIMARY, lw=1.9, zorder=6)
+        ax.set_aspect(0.42, adjustable="box")
+        ax.set_xlim(-0.125, length + 0.075)
+        ax.set_ylim(-0.150, env_base + env_h + 0.045)
+        ax.set_yticks([])
+        ax.set_title(title, fontsize=10, fontweight="bold")
+        ax.tick_params(labelsize=7)
+        ims.append(im)
+        lines.append(line)
+    axes[1].set_xlabel(T("Position along the tube [m]"), fontsize=9)
+    a_txt = axes[1].text(0.03, env_base + env_h - 0.015, "", ha="left",
+                         va="top", fontsize=9, color="white", zorder=7,
+                         bbox={"boxstyle": "round,pad=0.25",
+                               "facecolor": "black", "alpha": 0.55,
+                               "edgecolor": "none"})
+    t_txt = fig.text(0.988, 0.93, "", ha="right", va="top",
+                     family="monospace", fontsize=10, color=COLOR_FG)
+    reveal = int(0.45 * len(times))
+
+    def update(k: int) -> tuple[Any, ...]:
+        for im, line, (p_all, env) in zip(ims, lines,
+                                          ((p_e, env_e), (p_s, env_s))):
+            im.set_data(p_all[k])
+            env_row = np.repeat(env[k], 2)[: x_env.size]
+            line.set_data(x_env[env_from:],
+                          env_base + env_row[env_from:] / env_max * env_h)
+        a_txt.set_text(
+            T(f"alpha = {alpha:.2f} at {_VTUBE_F:.0f} Hz")
+            if k >= reveal else ""
+        )
+        t_txt.set_text(T(f"t = {times[k] * 1e3:5.1f} ms"))
+        return (*ims, *lines, a_txt, t_txt)
+
+    _render_clip(fig, update, output_dir, "anim_fdtd_impedance_tube",
+                 frames=len(times), gif_fps=8)
+
+
+@lru_cache(maxsize=1)
+def _transmission_tube_fields(
+    n_frames: int = _FDTD_ANIM_FRAMES,
+) -> tuple[Any, Any, Any, Any]:
+    """A carrier packet crossing the virtual transmission tube, cached.
+
+    Two 1,6 m x 0,1 m tubes with anechoic rho c ends: the lower one holds
+    a 10 cm equivalent-fluid layer mid-tube, so the packet splits into a
+    reflected and an attenuated transmitted part. Returns the two frame
+    stacks, the frame times and the analytic transmission loss at the
+    carrier frequency.
+    """
+    import fdtd2d
+
+    dx = _VTUBE_DX
+    ny, nx = 40, 640                       # 0.1 m x 1.6 m
+    every = 4                              # 12.4 us/frame: the ~4 ms transit
+    face = 320
+    sample_cells = round(0.10 / dx)
+    runs = []
+    for with_sample in (False, True):
+        c_map = np.full((ny, nx), 343.0)
+        rho_map = np.full((ny, nx), 1.2)
+        damping = np.zeros((ny, nx))
+        if with_sample:
+            sl = slice(face, face + sample_cells)
+            c_map[:, sl] = _VTUBE_C2
+            rho_map[:, sl] = _VTUBE_RHO2
+            damping[:, sl] = _VTUBE_SIGMA
+        sim = fdtd2d.FDTD2D(c_map, dx, rho=rho_map, damping=damping,
+                            edge_impedance={"left": 1.2 * 343.0,
+                                            "right": 1.2 * 343.0})
+        sim.add_plane_wave("right", center=0.35, width=0.10,
+                           wavelength=343.0 / _VTUBE_F)
+        ps: list[Any] = []
+        ts: list[float] = []
+        active = min(n_frames, 260)        # ~3.2 ms: both fields on screen
+        while len(ps) < active:
+            sim.step()
+            if sim.n % every == 0:
+                ps.append(sim.p[::2, ::2].astype(np.float32))
+                ts.append(sim.time)
+        while len(ps) < n_frames:          # end hold on the verdict frame
+            ps.append(ps[-1])
+            ts.append(ts[-1])
+        runs.append(np.stack(ps))
+    omega = 2.0 * np.pi * _VTUBE_F
+    k2 = (omega - 1j * _VTUBE_SIGMA) / _VTUBE_C2
+    kd = k2 * 0.10
+    z2 = _VTUBE_RHO2 * _VTUBE_C2
+    rc = 1.2 * 343.0
+    combo = (np.cos(kd) + 1j * z2 * np.sin(kd) / rc
+             + rc * 1j * np.sin(kd) / z2 + np.cos(kd))
+    tl = float(20.0 * np.log10(abs(combo) / 2.0))
+    return runs[0], runs[1], np.asarray(ts), tl
+
+
+def animate_fdtd_transmission_tube(output_dir: str) -> None:
+    """The virtual transmission tube (2D FDTD): the loudspeaker end fires a
+    carrier packet down a rigid-walled tube with an anechoic termination.
+    The empty tube passes it unchanged; a 10 cm lossy layer mid-tube splits
+    it into a reflection and a weakened transmission that the four ASTM
+    E2611 microphones resolve. One concept: transmission loss is what fails
+    to come out the other side."""
+    T = _translate_str
+    p_e, p_s, times, tl = _transmission_tube_fields()
+    vmax = float(np.quantile(np.abs(p_e), 0.999))
+    length, bore = 1.6, 0.1
+    fig = _anim_figure()
+    fig.suptitle(T("The virtual transmission tube: what gets through "
+                   "(2D FDTD)"), fontweight="bold")
+    axes = fig.subplots(2, 1, sharex=True)
+    titles = [T("Empty tube: the packet crosses unchanged"),
+              T("10 cm lossy layer: reflected + attenuated transmission")]
+    mics = ((0.60, "1"), (0.65, "2"), (1.05, "3"), (1.10, "4"))
+    ims: list[Any] = []
+    for ax, title, with_sample in ((axes[0], titles[0], False),
+                                   (axes[1], titles[1], True)):
+        ax.grid(False)
+        im = ax.imshow(np.zeros((20, 320)), origin="lower",
+                       extent=(0.0, length, 0.0, bore),
+                       cmap="RdBu_r", vmin=-vmax, vmax=vmax,
+                       aspect="auto", interpolation="bilinear", zorder=2)
+        _anim_tube_hardware(
+            ax, length, bore=bore,
+            sample=(0.80, 0.90) if with_sample else None,
+            termination="anechoic", mics=mics,
+        )
+        ax.set_aspect("equal", adjustable="box")
+        ax.set_xlim(-0.125, length + 0.10)
+        ax.set_ylim(-0.150, 0.255)
+        ax.set_yticks([])
+        ax.set_title(title, fontsize=10, fontweight="bold")
+        ax.tick_params(labelsize=7)
+        ims.append(im)
+    axes[1].set_xlabel(T("Position along the tube [m]"), fontsize=9)
+    tl_txt = axes[1].text(0.02, 0.205, "", ha="left", va="top",
+                          fontsize=9, color="white", zorder=7,
+                          bbox={"boxstyle": "round,pad=0.25",
+                                "facecolor": "black", "alpha": 0.55,
+                                "edgecolor": "none"})
+    t_txt = fig.text(0.988, 0.93, "", ha="right", va="top",
+                     family="monospace", fontsize=10, color=COLOR_FG)
+    reveal = int(0.55 * len(times))
+
+    def update(k: int) -> tuple[Any, ...]:
+        ims[0].set_data(p_e[k])
+        ims[1].set_data(p_s[k])
+        tl_txt.set_text(
+            T(f"TL = {tl:.1f} dB at {_VTUBE_F:.0f} Hz")
+            if k >= reveal else ""
+        )
+        t_txt.set_text(T(f"t = {times[k] * 1e3:5.1f} ms"))
+        return (*ims, tl_txt, t_txt)
+
+    _render_clip(fig, update, output_dir, "anim_fdtd_transmission_tube",
+                 frames=len(times), gif_fps=8)
+
+
 _QRD_DESIGN_F = 343.0 / 0.56             # ~612 Hz: lambda0 = 0.56 m
 _QRD_SLAB = (2.085, 3.915, 0.55, 0.85)   # x0, x1, y0, y1 of the panel slab
 
@@ -15129,6 +15466,8 @@ _ANIMATIONS: dict[str, Callable[[str], None]] = {
     "anim_fdtd_ground_effect": animate_fdtd_ground_effect,
     "anim_fdtd_ducting": animate_fdtd_ducting,
     "anim_fdtd_diffusion": animate_fdtd_diffusion,
+    "anim_fdtd_impedance_tube": animate_fdtd_impedance_tube,
+    "anim_fdtd_transmission_tube": animate_fdtd_transmission_tube,
     "anim_standing_wave_tube": animate_standing_wave_tube,
     "anim_flanking_paths": animate_flanking_paths,
     "anim_intensity_scan_power": animate_intensity_scan_power,
@@ -15352,6 +15691,8 @@ _ANIM_WEIGHTS: dict[str, float] = {
     "anim_onset_detection": 55.0,
     "anim_time_weighting": 55.0,
     "anim_schroeder": 55.0,
+    "anim_fdtd_impedance_tube": 3.0,
+    "anim_fdtd_transmission_tube": 3.0,
 }
 
 # A clip rename must not silently drop its scheduling weight; fail fast.
