@@ -140,7 +140,6 @@ _STRINGS: dict[str, str] = {
     "Composite facade elevation (areas to scale)":
         "Alzado de fachada compuesta (áreas a escala)",
     "Double wall cross-section": "Sección de la doble hoja",
-    "kg/m2": "kg/m2",
     "Plate junction ({junction})": "Unión de placas ({junction})",
     "In-situ absorption set-up": "Montaje de absorción in situ",
     "Road surface": "Superficie de la calzada",
@@ -2399,7 +2398,7 @@ def plot_double_wall_geometry(
         ax.text(
             x + 0.5 * thickness, 0.72 * height,
             format_number(mass, language, decimals=1, trim=True)
-            + " " + _t("kg/m2", language),
+            + " kg/m2",
             fontsize=8, ha="center", va="center", rotation=90,
         )
     _dim(ax, (t1, 0.0), (t1 + gap, 0.0), _mm(gap, language),
