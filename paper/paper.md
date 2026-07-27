@@ -117,10 +117,17 @@ the inputs and parameters it was computed from, exposes a `plot()` method that
 draws the conventional figure for that quantity, and, for metrics whose
 standards define a reporting format (insulation ratings, absorption classes,
 declared noise emission), a `report()` method that renders an
-accredited-laboratory-style fiche citing the governing clauses. The trade-off
-is verbosity against provenance: a frozen result is a self-documenting
-evidence trail, which is what a defensible number needs, at the cost of one
-attribute access compared with returning arrays.
+accredited-laboratory-style fiche citing the governing clauses
+(\autoref{fig:fiche}). The trade-off is verbosity against provenance: a
+frozen result is a self-documenting evidence trail, which is what a
+defensible number needs, at the cost of one attribute access compared with
+returning arrays.
+
+![The `report()` method of an airborne insulation result: a single-page fiche
+in the layout of an accredited laboratory report, stating the measured curve,
+the shifted reference curve, the weighted rating and spectrum adaptation
+terms, and the ISO 717-1 clauses each value comes
+from.\label{fig:fiche}](iso717-report-fiche.png){ width=78% }
 
 Second, the implementation is pure Python on NumPy and SciPy, with optional
 Numba acceleration for the heaviest kernels and block-processing entry points
@@ -183,7 +190,11 @@ approved by the author.
 `phonometry` was first released in 2020 as `PyOctaveBand`, an octave-band
 filtering package; the project was renamed when its scope outgrew the name.
 The author thanks the users who reported numerical discrepancies over the
-years: several of the conformance checks exist because someone asked why two
-implementations disagreed. This work received no external funding.
+years (several of the conformance checks exist because someone asked why two
+implementations disagreed), and the colleagues of his research years at the
+Universitat Politècnica de València, at the Gandia campus (EPSG) and at the
+Institute for Instrumentation in Molecular Imaging (i3M, UPV--CSIC), where
+the measurement practice behind this library was formed. This work received
+no external funding.
 
 # References
