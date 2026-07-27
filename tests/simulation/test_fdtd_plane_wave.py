@@ -111,9 +111,18 @@ def test_plane_source_steady_state_is_plane_and_one_way() -> None:
 
 def test_plane_source_validation_and_geometry_preview() -> None:
     sim = FDTD2D(C0, DX, shape=(40, 40))
+    bad_direction = PlaneWaveSource("sideways", lambda t: 0.0)
     with pytest.raises(ValueError, match="direction"):
-        sim.add_source(PlaneWaveSource("sideways", lambda t: 0.0))
+        sim.add_source(bad_direction)
+    bad_offset = PlaneWaveSource("down", lambda t: 0.0, offset=40)
     with pytest.raises(ValueError, match="offset"):
-        sim.add_source(PlaneWaveSource("down", lambda t: 0.0, offset=40))
+        sim.add_source(bad_offset)
     sim.add_source(PlaneWaveSource("left", lambda t: 0.0, offset=2))
     assert len(sim._plane_sources) == 1
+    # An injection line may not cross an obstacle.
+    mask = np.zeros((40, 40), dtype=bool)
+    mask[5, 10:20] = True
+    blocked = FDTD2D(C0, DX, shape=(40, 40), obstacle_mask=mask)
+    on_obstacle = PlaneWaveSource("down", lambda t: 0.0, offset=5)
+    with pytest.raises(ValueError, match="obstacle"):
+        blocked.add_source(on_obstacle)

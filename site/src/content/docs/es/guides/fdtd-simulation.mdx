@@ -114,22 +114,24 @@ registran la presión en su celda en cada paso temporal dentro del resultado.
 
 **Ondas planas "desde el infinito".** Una fuente puntual en 2D es en
 realidad una fuente lineal, así que un difusor o una barrera se interrogan
-mejor con un frente plano. Dos herramientas lo cubren, ambas
-unidireccionales por construcción (la velocidad consistente con el
-leapfrog se escribe medio paso atrás, así que nada radia hacia atrás):
+mejor con un frente plano. Dos herramientas lo cubren, cada una
+unidireccional por su propio mecanismo:
 
 - `sim.add_plane_wave(direction, center=..., width=..., wavelength=...)`
   superpone un paquete gaussiano (opcionalmente con portadora senoidal)
   como condición inicial viajando hacia `"down"`, `"up"`, `"left"` o
-  `"right"`; tras el frente la energía residual queda al nivel del ruido
-  numérico. Es lo que usa la animación de difusión del QRD.
+  `"right"`; la velocidad consistente con el leapfrog escrita medio paso
+  atrás es lo que la hace unidireccional, y tras el frente la energía
+  residual queda al nivel del ruido numérico. Es lo que usa la animación
+  de difusión del QRD.
 - `PlaneWaveSource(direction, waveform, offset=...)` registrada con
   `add_source()` inyecta una onda plana sostenida sobre una línea de
   celdas: la presión incidente y la velocidad de la cara adyacente se
   excitan a la vez, de modo que el campo lanzado es plano en la
   transversal a precisión de máquina y lo que se dispersa hacia atrás
-  cruza la línea y muere en la esponja de detrás (residuo de unos -38 dB
-  para una CW).
+  cruza la línea intacto; con una esponja configurada detrás queda
+  absorbido (residuo de unos -38 dB para una CW en el montaje de arriba;
+  la cifra depende de la esponja).
 
 ```python
 from phonometry.simulation import FDTD2D, CWSource, PlaneWaveSource

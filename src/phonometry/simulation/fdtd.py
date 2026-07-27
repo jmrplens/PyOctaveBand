@@ -453,6 +453,8 @@ class FDTD2D:
         self.rho = rho_map
         c_max = float(c_map.max())
         self.dt = cfl * self.dx / (c_max * float(np.sqrt(2.0)))
+        #: Mean sound speed, cached for the plane-wave machinery.
+        self._c_ref = float(c_map.mean())
         self.kappa = rho_map * c_map**2          # bulk modulus at centres
         # Density averaged onto the faces where each velocity lives.
         self._rho_x = 0.5 * (rho_map[:, 1:] + rho_map[:, :-1])
@@ -618,7 +620,7 @@ class FDTD2D:
         ny, nx = self.p.shape
         axis_y = direction in ("down", "up")
         sign = 1.0 if direction in ("down", "right") else -1.0
-        c_ref = float(self.c.mean())
+        c_ref = self._c_ref
         if axis_y:
             centres = (np.arange(ny) + 0.5) * self.dx
             faces = np.arange(1, ny) * self.dx
@@ -697,6 +699,19 @@ class FDTD2D:
         limit = ny if source.direction in ("down", "up") else nx
         if not 0 <= offset < limit - 1:
             raise ValueError("plane-wave offset lies outside the grid")
+        if self._obstacle is not None:
+            if source.direction == "down":
+                line = self._obstacle[offset, :]
+            elif source.direction == "up":
+                line = self._obstacle[ny - 1 - offset, :]
+            elif source.direction == "right":
+                line = self._obstacle[:, offset]
+            else:
+                line = self._obstacle[:, nx - 1 - offset]
+            if bool(np.any(line)):
+                raise ValueError(
+                    "plane-wave injection line crosses an obstacle"
+                )
         self._plane_sources.append(source)
 
     def step(self) -> None:
@@ -739,7 +754,7 @@ class FDTD2D:
         the increments are the discrete equivalent of superimposing
         ``p = s(t - d/c)`` entering through the line each step.
         """
-        c_ref = float(self.c.mean())
+        c_ref = self._c_ref
         gain = plane.amplitude * self.dt / (self.dx / c_ref)
         value_p = plane.waveform(t_next)
         value_v = plane.waveform(t_next - 0.5 * self.dt + 0.5 * self.dx / c_ref)

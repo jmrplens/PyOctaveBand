@@ -109,21 +109,22 @@ record the pressure at their cell every time step into the result.
 
 **Plane waves "from infinity".** Point sources in 2D are really line
 sources, so a diffuser or a barrier is often better interrogated with a
-plane wavefront. Two tools cover it, both one-way by construction (the
-leapfrog-consistent velocity is written half a step back, so nothing
-radiates backwards):
+plane wavefront. Two tools cover it, each one-way through its own mechanism:
 
 - `sim.add_plane_wave(direction, center=..., width=..., wavelength=...)`
   superimposes a Gaussian packet (optionally carrying a sine) as an
   initial condition travelling toward `"down"`, `"up"`, `"left"` or
-  `"right"`; behind the front the residual energy is at numerical noise
-  level. This is what the QRD diffusion animation uses.
+  `"right"`; the leapfrog-consistent velocity written half a step back
+  is what makes it one-way, and behind the front the residual energy is
+  at numerical noise level. This is what the QRD diffusion animation
+  uses.
 - `PlaneWaveSource(direction, waveform, offset=...)` registered through
   `add_source()` injects a sustained plane wave on a line of cells: the
   incident pressure and the adjacent face velocity are driven together,
   so the launched field is transversely plane to machine precision and
-  anything scattered back crosses the line and dies in the sponge behind
-  it (about -38 dB residual for a CW).
+  anything scattered back crosses the line untouched; with a sponge
+  configured behind the line it is then absorbed (about -38 dB residual
+  for a CW in the set-up above; the figure depends on the sponge).
 
 ```python
 from phonometry.simulation import FDTD2D, CWSource, PlaneWaveSource
