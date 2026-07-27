@@ -13913,10 +13913,6 @@ def _diffusion_fields(
     # envelope (~10 % spectral amplitude beyond 1.15 kHz).
     y_pkt, sig, lam0 = 3.2, 0.3, 0.56
 
-    def packet(y: Any) -> Any:
-        return (np.sin(2.0 * np.pi * (y - y_pkt) / lam0)
-                * np.exp(-(((y - y_pkt) / sig) ** 2)))
-
     # Receiver arc over the panel, ISO 17497-2 goniometer style.
     theta = np.arange(15.0, 165.5, 1.0)
     rad = np.radians(theta)
@@ -13924,18 +13920,13 @@ def _diffusion_fields(
     iy_arc = np.round((y1 + 2.2 * np.sin(rad)) / dx).astype(int)
 
     every = 5                  # 61.9 us/frame: 12 f/period up to 1.35 kHz
-    y_cell = (np.arange(ny) + 0.5) * dx
     sims = []
     for rho in (rho_flat, rho_qrd, rho_ref):
         sim = fdtd2d.FDTD2D(c0, dx, rho=rho, shape=(ny, nx),
                             sponge_width=40)
-        sim.p[:, :] = packet(y_cell)[:, np.newaxis]
-        # Leapfrog-consistent velocity a half step back for a purely
-        # downgoing wave: p = f(y + c t), vy = -p / (rho c) on the y-faces.
-        y_face = np.arange(1, ny) * dx
-        rho_face = 0.5 * (rho[1:, :] + rho[:-1, :])
-        sim.vy[:, :] = (-packet(y_face - 0.5 * c0 * sim.dt)[:, np.newaxis]
-                        / (rho_face * c0))
+        # One-way carrier-under-Gaussian packet toward the panel, the
+        # leapfrog-consistent initial condition the solver now provides.
+        sim.add_plane_wave("up", center=y_pkt, width=sig, wavelength=lam0)
         sims.append(sim)
     # The three runs advance in lockstep so the scattered field
     # (total - incident, exact by linearity) is available at every step
