@@ -57,6 +57,13 @@ polar `θ`, definidos a una distancia de referencia fija de **60 m** en condicio
 atmosféricas de referencia de la ICAO. Situar esa fuente en un receptor añade el
 ajuste de propagación `ΔLp = ΔLs + ΔLa + ΔLg`.
 
+El EPNL que calcula esta página es la misma magnitud que pide la
+certificación: el Capítulo 8 del Anexo 16 de la OACI hace volar el
+helicóptero nivelado a 150 m sobre un micrófono central, con otros dos a
+150 m a cada lado.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_rotorcraft_certification_es.svg" alt="Certificación de ruido de helicópteros en sobrevuelo del Capítulo 8 del Anexo 16 de la OACI: vista lateral de un helicóptero en vuelo nivelado a 150 m, 492 ft, justo sobre un micrófono central en el suelo, con la regla de velocidad de referencia de 0,9 VH, y un recuadro en planta donde la trayectoria cruza una línea de tres micrófonos, uno en la trayectoria y dos a 150 m a cada lado; las notas indican al menos seis pasadas repartidas por igual entre viento en cara y en cola, EPNL en EPNdB en los tres puntos, micrófonos a 1,2 m del suelo y los 45 grados de elevación con unos 212 m de distancia oblicua al par lateral en el instante de la vertical" width="92%" />
+
 ## El hemisferio de ruido
 
 Un `RotorcraftHemisphere` contiene los niveles de banda sobre la malla

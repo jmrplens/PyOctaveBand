@@ -57,6 +57,14 @@ un ecualizador seguro, y el puente entre las dos anteriores: la inversa de
 una respuesta medida es el objetivo espectral natural para el barrido de la
 siguiente medición.
 
+Las dos herramientas de adquisición operan en el mismo marco de dos
+canales: la excitación eléctrica es la referencia, el micrófono la
+respuesta, y los espectros cruzados de Welch entre ambos dan la respuesta
+en frecuencia más una coherencia que la vigila. La inversión regularizada
+trabaja después sobre la respuesta medida, como post-proceso.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_system_measurement_es.svg" alt="Cadena de medición de respuesta en frecuencia a dos canales: un generador de señal con ruido de banda ancha o un barrido alimenta un amplificador de potencia y el altavoz en ensayo, un micrófono de medición recoge la salida acústica, el canal 1 lleva la referencia eléctrica x(t) y el canal 2 la respuesta del micrófono y(t), el análisis FFT de dos canales con segmentos Hann promediados a la Welch con 50 por ciento de solape produce los espectros Gxx, Gyy y Gxy, y dos cajas de resultado dan el estimador H1 igual a Gxy entre Gxx, insesgado con ruido a la salida, y la coherencia gamma cuadrado igual al módulo al cuadrado de Gxy entre el producto Gxx por Gyy, que vale uno en un camino lineal sin ruido y cae con ruido, distorsión o un retardo que deriva o está desalineado" width="92%" />
+
 ## 1. Pares complementarios de Golay
 
 Un par de Golay son dos secuencias binarias `a`, `b` de longitud `L = 2**n`,
