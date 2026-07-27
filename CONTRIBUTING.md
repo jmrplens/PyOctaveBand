@@ -10,11 +10,16 @@ is the right place for anything that is not yet a defect or a pull request:
 | You want to | Go to |
 |---|---|
 | Ask how to compute or measure something with the library | [Q&A](https://github.com/jmrplens/phonometry/discussions/categories/q-a) |
-| Ask whether a clause or edition is implemented, report a value that disagrees with a reference, or flag a defect in a published standard | [Standards & conformance](https://github.com/jmrplens/phonometry/discussions/categories/standards-conformance) |
+| Ask whether a clause or edition is implemented, report a value that disagrees with the standard or with a reference implementation, or flag a defect in a published standard | [Standards & conformance](https://github.com/jmrplens/phonometry/discussions/categories/standards-conformance) |
 | Propose a standard, method or feature | [Ideas](https://github.com/jmrplens/phonometry/discussions/categories/ideas) |
 | Give feedback on the guides, figures or animations | [Documentation & learning](https://github.com/jmrplens/phonometry/discussions/categories/documentation-learning) |
 | Share a measurement, study or tool you built | [Show and tell](https://github.com/jmrplens/phonometry/discussions/categories/show-and-tell) |
-| Report a reproducible bug, or work on an agreed change | [Issues](https://github.com/jmrplens/phonometry/issues) |
+| Report a reproducible failure with no standard in play, or work on an agreed change | [Issues](https://github.com/jmrplens/phonometry/issues) |
+
+A discrepancy against a standard or a reference implementation belongs in
+Standards & conformance even when it reproduces every time, because settling it
+means reading the clause first. Issues is for crashes, results that contradict
+the library's own documentation, and broken installations.
 
 The documentation is published in English and Spanish, and both languages are
 welcome in Discussions.

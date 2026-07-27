@@ -8,11 +8,15 @@ body:
 
         Two things that are handled elsewhere:
 
-        - Whether a clause or edition of a standard is implemented, or a value that
-          disagrees with a reference implementation, goes to
-          [Standards & conformance](https://github.com/jmrplens/phonometry/discussions/categories/standards-conformance).
-        - A reproducible crash or a wrong result you can pin down goes to
-          [Issues](https://github.com/jmrplens/phonometry/issues).
+        - Anything with a standard in it goes to
+          [Standards & conformance](https://github.com/jmrplens/phonometry/discussions/categories/standards-conformance):
+          whether a clause or edition is implemented, and any value that disagrees with
+          the standard or with a reference implementation. That holds even when you can
+          reproduce the discrepancy reliably, because deciding it means reading the
+          clause first.
+        - [Issues](https://github.com/jmrplens/phonometry/issues) is for reproducible
+          failures with no standard in play: a crash, a result that contradicts the
+          library's own documentation, or a broken installation.
 
         The [documentation](https://jmrplens.github.io/phonometry/) is available in
         English and Spanish, and you are welcome to write in either language.
