@@ -80,6 +80,13 @@ $\tfrac{2}{3}(2 i_0^3 + 3 i_0^2 + 4 i_0)$ imágenes audibles hasta el orden de
 reflexión $i_0$ (1560 en el orden 10), y la densidad de reflexiones crece como
 $\mathrm{d}N/\mathrm{d}t = 4\pi c^3 t^2 / V$.
 
+La construcción en una planta: cada reflexión en pared es el sonido en línea
+recta de una imagen en una sala espejo, así que la geometría sola fija cada
+llegada. En la sala de 7 × 5 m de abajo el sonido directo llega a los 10,7 ms
+y las cuatro imágenes de primer orden le siguen entre 17,3 y 21,6 ms.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_image_sources_es.svg" alt="Planta de una sala de 7 por 5 m en el centro de su retícula de tres por tres salas espejo a trazos: la fuente en (2, 1.6) y el receptor en (5.2, 3.4) unidos por el sonido directo de 10,7 ms, imágenes de primer orden rellenas en las cuatro salas adyacentes con sus tiempos de llegada de 17,3, 20,5 y 21,6 ms, imágenes de segundo orden huecas en las salas de esquina a 24,6 y 25,6 ms, y la primera reflexión en la pared lejana dibujada dos veces, como camino real quebrado en la pared y como línea recta a trazos desde la imagen hasta el receptor" width="92%" />
+
 ```python
 import numpy as np
 from phonometry import room

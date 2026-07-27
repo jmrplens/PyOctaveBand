@@ -1571,6 +1571,119 @@ _ES: dict[str, str] = {
     "below the Schroeder frequency, in coupled volumes and in corridor-like rooms no single T60 exists":
         "bajo la frecuencia de Schroeder, en volúmenes acoplados y en "
         "salas tipo pasillo no existe un T60 único",
+    # Panel between rooms (mass law and coincidence)
+    "Panel between rooms: mass law and the coincidence dip":
+        "Panel entre recintos: ley de masas y valle de coincidencia",
+    "Panel under test: 12.5 mm plasterboard":
+        "Panel en ensayo: yeso laminado de 12,5 mm",
+    "diffuse incidence": "incidencia difusa",
+    "transmitted": "transmitido",
+    "bending wave at fc": "onda de flexión en fc",
+    "12.5 mm": "12,5 mm",
+    "m″ = 8.8 kg/m²": "m″ = 8,8 kg/m²",
+    "fc = 2.6 kHz": "fc = 2,6 kHz",
+    "+6 dB/octave": "+6 dB/octava",
+    "predicted R(f)": "R(f) predicho",
+    "Diffuse-field mass law: R rises 6 dB per octave and 6 dB per doubling of m″":
+        "Ley de masas en campo difuso: R sube 6 dB por octava y 6 dB por "
+        "duplicación de m″",
+    "At fc = (c₀²/2π) √(m″/B′) = 2619 Hz the free bending wave matches the trace wavelength":
+        "En fc = (c₀²/2π) √(m″/B′) = 2619 Hz la onda libre de flexión iguala "
+        "la longitud de onda de traza",
+    "Sharp's prediction rates at Rw = 27 dB; the dip collects the unfavourable deviations":
+        "La predicción de Sharp puntúa Rw = 27 dB; el valle concentra las "
+        "desviaciones desfavorables",
+    # Porous layer on a rigid wall
+    "Porous absorber on a rigid wall: microstructure to absorption":
+        "Absorbente poroso sobre pared rígida: microestructura y absorción",
+    "Porous layer (mineral wool)": "Capa porosa (lana mineral)",
+    "plane wave, normal incidence": "onda plana, incidencia normal",
+    "reflected: |R|² = 1 − α = 0.09": "reflejado: |R|² = 1 − α = 0,09",
+    "microstructure (zoom)": "microestructura (ampliada)",
+    "fibre frame": "esqueleto de fibras",
+    "air in the pores: φ = 0.98": "aire en los poros: φ = 0,98",
+    "σ = 20 kPa·s/m²  (flow resistivity)":
+        "σ = 20 kPa·s/m²  (resistividad al flujo)",
+    "φ = 0.98  (porosity)": "φ = 0,98  (porosidad)",
+    "α∞ = 1.0  (tortuosity)": "α∞ = 1,0  (tortuosidad)",
+    "Λ = Λ′ = 87 µm  (viscous / thermal lengths)":
+        "Λ = Λ′ = 87 µm  (longitudes viscosa y térmica)",
+    "JCA equivalent fluid: the five parameters give Zc and k; a hard-backed layer has Zs = −j Zc cot(kd)":
+        "Fluido equivalente JCA: los cinco parámetros dan Zc y k; con "
+        "respaldo rígido Zs = −j Zc cot(kd)",
+    "α = 1 − |R|² = 0.91 at 1 kHz for this 50 mm layer":
+        "α = 1 − |R|² = 0,91 a 1 kHz para esta capa de 50 mm",
+    "viscous friction in the pores and heat exchange with the frame dissipate the sound energy":
+        "la fricción viscosa en los poros y el intercambio de calor con el "
+        "esqueleto disipan la energía sonora",
+    # Barrier diffraction over ground (Fresnel number)
+    "Barrier diffraction over ground: the Fresnel number at work":
+        "Difracción en barrera sobre el suelo: el número de Fresnel en acción",
+    "A = 50.09 m": "A = 50,09 m",
+    "B = 50.06 m": "B = 50,06 m",
+    "direct d = 100.00 m (blocked)": "directo d = 100,00 m (bloqueado)",
+    "1.0 m": "1,0 m",
+    "4.0 m": "4,0 m",
+    "path difference δ = A + B − d = 0.15 m; Fresnel number N = 2δ/λ = 0.44 at 500 Hz":
+        "diferencia de caminos δ = A + B − d = 0,15 m; número de Fresnel "
+        "N = 2δ/λ = 0,44 a 500 Hz",
+    "Kurze–Anderson: Δbar = 5 + 20 lg( √(2πN) / tanh √(2πN) ) = 10.0 dB at 500 Hz":
+        "Kurze–Anderson: Δbar = 5 + 20 lg( √(2πN) / tanh √(2πN) ) = 10,0 dB "
+        "a 500 Hz",
+    "N grows with frequency: the same screen gives 15.5 dB at 2 kHz (vertical scale exaggerated)":
+        "N crece con la frecuencia: la misma pantalla da 15,5 dB a 2 kHz "
+        "(escala vertical exagerada)",
+    # Image-source lattice in plan
+    "Image-source lattice in plan: first reflections of a 7 × 5 m room":
+        "Fuentes imagen en planta: primeras reflexiones (sala de 7 × 5 m)",
+    "10.7 ms": "10,7 ms",
+    "17.3 ms": "17,3 ms",
+    "20.5 ms": "20,5 ms",
+    "21.6 ms": "21,6 ms",
+    "24.6 ms": "24,6 ms",
+    "25.6 ms": "25,6 ms",
+    "1st order": "1.er orden",
+    "2nd order": "2.º orden",
+    "the image sees": "la imagen ve",
+    "a straight path": "un camino recto",
+    "plan at the source plane z = 1.5 m": "planta en el plano de la fuente z = 1,5 m",
+    "7.0 m": "7,0 m",
+    "every reflection is the free-field arrival of a mirror image: t = r/c, √(1−α) per bounce, 1/(4πr) spreading":
+        "cada reflexión llega como campo libre de su imagen: t = r/c, √(1−α) "
+        "por rebote, esparcimiento 1/(4πr)",
+    "in-plane images up to order 2 shown; the full lattice adds floor, ceiling and outer mirror rooms":
+        "imágenes en planta hasta orden 2; la retícula completa añade suelo, "
+        "techo y salas más lejanas",
+    # Noise control at source, path and receiver
+    "Noise control at the source, along the path and at the receiver":
+        "Control de ruido en la fuente, en el camino y en el receptor",
+    "1 · At the source": "1 · En la fuente",
+    "2 · Along the path": "2 · En el camino",
+    "3 · At the receiver": "3 · En el receptor",
+    "Enclosure": "Encapsulamiento",
+    "Machine": "Máquina",
+    "Operator cabin": "Cabina del operario",
+    "expansion chamber": "cámara de expansión",
+    "lined elbow": "codo revestido",
+    "open end": "extremo abierto",
+    "enclosure IL = R − C": "IL del encapsulamiento = R − C",
+    "25 dB at 500 Hz": "25 dB a 500 Hz",
+    "silencer TL peak 6.5 dB at 286 Hz (m = 4)":
+        "pico de TL del silenciador: 6,5 dB a 286 Hz (m = 4)",
+    "lined elbow 6 dB at 1 kHz; open end 18 dB at 63 Hz":
+        "codo revestido: 6 dB a 1 kHz; extremo abierto: 18 dB a 63 Hz",
+    "cabin IL = R − C": "IL de la cabina = R − C",
+    "31 dB at 1 kHz": "31 dB a 1 kHz",
+    "0.30 m": "0,30 m",
+    "the classic ranking: quiet the source first, treat the path next, shield the receiver last":
+        "la jerarquía clásica: primero la fuente, después el camino y por "
+        "último el receptor",
+    "enclosure and cabin share IL = R − C, with C = 10 lg(0.3 + S_E/R_i) = 4.9 dB for a lined interior (ᾱ = 0.3)":
+        "encapsulado y cabina: IL = R − C, con C = 10 lg(0,3 + S_E/R_i) = "
+        "4,9 dB (interior revestido, ᾱ = 0,3)",
+    "reactive silencer: TL = 10 lg[1 + ¼ (m − 1/m)² sin²(kL)], peaking where the 0.3 m chamber is a quarter wavelength":
+        "silenciador reactivo: TL = 10 lg[1 + ¼ (m − 1/m)² sin²(kL)], "
+        "máximo donde la cámara de 0,3 m mide λ/4",
 }
 
 
@@ -6586,6 +6699,428 @@ def _d_reverberation_prediction(s: SVG, th: Theme) -> None:
            "and in corridor-like rooms no single T60 exists", 12, th.fg)
 
 
+# ---------------------------------------------------------------------------
+# Panel between rooms: mass law and the coincidence dip
+# ---------------------------------------------------------------------------
+
+def _d_panel_insulation(s: SVG, th: Theme) -> None:
+    """A single 12.5 mm plasterboard leaf (m'' = 8.75 kg/m2) mounted in its
+    test opening under diffuse incidence, with the predicted R(f) of
+    ``single_panel_transmission_loss`` inset: the mass-law rise and the
+    coincidence dip at the fc = 2619 Hz of this leaf (Rw = 27 dB)."""
+    # --- test opening: heavy filler above and below, the leaf between ------
+    px_l, px_r = 380.0, 396.0
+    op_t, op_b = 108.0, 332.0
+    s.rect(348, 62, 80, op_t - 62, th.panel, th.fg, sw=2)
+    s.rect(348, op_b, 80, 46, th.panel, th.fg, sw=2)
+    s.rect(px_l, op_t, px_r - px_l, op_b - op_t, th.panel, th.secondary, sw=2)
+    for hy in range(int(op_t) + 10, int(op_b) - 2, 14):
+        s.line(px_l + 1, hy + 8, px_r - 1, hy - 4, th.secondary, 1.0)
+    s.text(388, 52, "Panel under test: 12.5 mm plasterboard", 19, th.fg,
+           bold=True)
+
+    # Thickness callout (witness lines up, arrows pointing inward).
+    s.line(px_l, op_t, px_l, 88, th.muted, 0.9, dash="3,3")
+    s.line(px_r, op_t, px_r, 88, th.muted, 0.9, dash="3,3")
+    s.arrow(352.0, 92.0, px_l - 2, 92.0, th.muted, 1.2)
+    s.arrow(424.0, 92.0, px_r + 2, 92.0, th.muted, 1.2)
+    s.text(434, 97, "12.5 mm", 15, th.fg, anchor="start")
+
+    # --- diffuse incidence on the left, weaker transmitted field right -----
+    s.text(180, 116, "Source room", 20, th.fg, bold=True)
+    s.text(180, 140, "diffuse incidence", 16, th.muted, italic=True)
+    s.arrow(258.0, 152.0, px_l - 6, 196.0, th.accent, 2.2)
+    s.arrow(218.0, 244.0, px_l - 6, 246.0, th.accent, 2.2)
+    s.arrow(252.0, 330.0, px_l - 6, 292.0, th.accent, 2.2)
+    s.text(560, 116, "Receiving room", 20, th.fg, bold=True)
+    s.text(510, 226, "transmitted", 16, th.muted, italic=True)
+    s.arrow(px_r + 4, 196.0, 500.0, 172.0, th.primary, 1.5)
+    s.arrow(px_r + 4, 246.0, 508.0, 246.0, th.primary, 1.5)
+    s.arrow(px_r + 4, 292.0, 498.0, 318.0, th.primary, 1.5)
+
+    # Bending wave travelling along the leaf (the coincidence mechanism).
+    d = f"M 388 {op_t + 8:.0f}"
+    y = op_t + 8
+    sign = 1
+    while y + 24 <= op_b - 8:
+        d += f" Q {388 + sign * 9} {y + 12:.0f} 388 {y + 24:.0f}"
+        y += 24
+        sign = -sign
+    s.path(d, stroke=th.accent, sw=2.0)
+    s.text(300, 366, "bending wave at fc", 15, th.accent, anchor="end")
+    s.line(305.0, 360.0, 382.0, 326.0, th.muted, 1.0)
+    s.text(388, 404, "m″ = 8.8 kg/m²", 16, th.fg, mono=True)
+
+    # --- inset: predicted R(f) with the coincidence dip --------------------
+    ix0, iy0 = 572.0, 390.0            # axes origin (bottom-left)
+    s.line(ix0, iy0, 850.0, iy0, th.muted, 1.3)
+    s.arrow(ix0, iy0, ix0, 128.0, th.muted, 1.3)
+    s.text(ix0 - 8, 140, "R", 14, th.muted, italic=True, anchor="end")
+    s.text(854, iy0 + 16, "f", 14, th.muted, italic=True, anchor="end")
+    s.text(645, 198, "predicted R(f)", 14, th.primary, italic=True)
+    import math
+
+    def fx(f: float) -> float:
+        return ix0 + math.log10(f / 50.0) * 135.0
+
+    def ry(r: float) -> float:
+        return 386.0 - r * 240.0 / 35.0
+
+    for f_t, lab in ((100.0, "100"), (1000.0, "1k")):
+        s.line(fx(f_t), iy0, fx(f_t), iy0 + 5, th.muted, 1.2)
+        s.text(fx(f_t), iy0 + 20, lab, 12, th.muted)
+    # single_panel_transmission_loss(bands, 8.75, fc=2619.3, eta=0.01), dB.
+    curve = [(50, 5.3), (63, 7.2), (80, 9.2), (100, 11.1), (125, 13.0),
+             (160, 15.1), (200, 17.0), (250, 18.9), (315, 20.9), (400, 23.0),
+             (500, 24.9), (630, 26.9), (800, 29.0), (1000, 31.0),
+             (1250, 32.9), (1600, 30.3), (2000, 26.9), (2500, 23.6),
+             (3150, 25.3), (4000, 28.4), (5000, 31.3)]
+    d = ""
+    for i, (f_c, r_c) in enumerate(curve):
+        d += f"{'M' if i == 0 else ' L'} {fx(f_c):.1f} {ry(r_c):.1f}"
+    s.path(d, stroke=th.primary, sw=2.4)
+    fcx = fx(2619.3)
+    s.line(fcx, iy0, fcx, 150.0, th.secondary, 1.3, dash="5,4")
+    s.text(fcx, 142, "fc = 2.6 kHz", 14, th.secondary, bold=True)
+    s.circle(fx(2500.0), ry(23.6), 4.0, th.secondary)
+    s.text(690, 330, "+6 dB/octave", 14, th.primary, italic=True)
+    s.text(628, 170, "Rw = 27 dB", 16, th.fg, bold=True, mono=True)
+
+    # --- captions ----------------------------------------------------------
+    s.text(80, 452,
+           "Diffuse-field mass law: R rises 6 dB per octave and 6 dB per doubling of m″",
+           18, th.fg, anchor="start")
+    s.text(80, 480,
+           "At fc = (c₀²/2π) √(m″/B′) = 2619 Hz the free bending wave matches the trace wavelength",
+           18, th.fg, anchor="start")
+    s.text(80, 508,
+           "Sharp's prediction rates at Rw = 27 dB; the dip collects the unfavourable deviations",
+           18, th.primary, anchor="start", bold=True)
+
+
+# ---------------------------------------------------------------------------
+# Porous absorber on a rigid wall (equivalent fluid, JCA parameters)
+# ---------------------------------------------------------------------------
+
+def _d_porous_layer(s: SVG, th: Theme) -> None:
+    """Section of a 50 mm mineral-wool layer on a rigid backing under a
+    normal-incidence plane wave, with a magnified microstructure detail and
+    the JCA parameter set of the guide's material (sigma = 20 kPa.s/m2,
+    phi = 0.98, alpha_inf = 1, Lambda = Lambda' = 87 um); the layered
+    absorber solves alpha = 0.91 at 1 kHz."""
+    import math
+    lay_l, lay_r = 560.0, 700.0        # 140 px for 50 mm
+    top, bot = 100.0, 430.0
+
+    # Rigid backing and the porous layer with a deterministic fibre texture.
+    s.rect(lay_r, top, 34, bot - top, th.fg)
+    s.text(784, 458, "Rigid backing", 16, th.muted)
+    s.rect(lay_l, top, lay_r - lay_l, bot - top, th.panel, th.secondary, sw=2)
+    for i in range(80):
+        h1 = math.sin(i * 12.9898) * 43758.5453
+        h1 -= math.floor(h1)
+        h2 = math.sin(i * 78.233) * 24634.6345
+        h2 -= math.floor(h2)
+        h3 = math.sin(i * 39.425) * 11369.535
+        h3 -= math.floor(h3)
+        cx = lay_l + 8 + h1 * (lay_r - lay_l - 16)
+        cy = top + 10 + h2 * (bot - top - 20)
+        ang = h3 * math.pi
+        dx, dy = 7.0 * math.cos(ang), 7.0 * math.sin(ang)
+        s.line(cx - dx, cy - dy, cx + dx, cy + dy, th.muted, 1.0)
+    s.text(630, 88, "Porous layer (mineral wool)", 18, th.fg, bold=True)
+    s.dim(lay_l, bot, lay_r, bot, "d = 50 mm", offset=30, size=17)
+
+    # Incident and reflected waves, and the decaying wave inside the layer.
+    s.arrow(300.0, 240.0, lay_l - 8, 240.0, th.accent, 2.4)
+    s.text(420, 268, "plane wave, normal incidence", 16, th.accent)
+    s.arrow(lay_l - 8, 300.0, 445.0, 300.0, th.secondary, 1.6)
+    s.text(438, 348, "reflected: |R|² = 1 − α = 0.09", 15, th.secondary)
+    d = f"M {lay_l + 2:.0f} 240"
+    for i in range(1, 35):
+        x = lay_l + 2 + i * 4.0
+        amp = 26.0 * math.exp(-i / 12.0)
+        d += f" L {x:.1f} {240 - amp * math.sin(i * 0.9):.1f}"
+    s.path(d, stroke=th.primary, sw=1.8)
+
+    # Magnified microstructure: sampled spot on the layer, blown-up circle.
+    s.circle(610.0, 160.0, 16.0, "none", th.fg, 1.6)
+    s.circle(170.0, 185.0, 92.0, th.panel, th.fg, 2.0)
+    s.line(597.0, 150.0, 253.0, 148.0, th.muted, 1.0, dash="4,4")
+    s.line(600.0, 173.0, 246.0, 232.0, th.muted, 1.0, dash="4,4")
+    for i in range(11):
+        h1 = math.sin(i * 21.9898) * 43758.5453
+        h1 -= math.floor(h1)
+        h2 = math.sin(i * 57.233) * 24634.6345
+        h2 -= math.floor(h2)
+        h3 = math.sin(i * 93.719) * 11369.535
+        h3 -= math.floor(h3)
+        ang0 = h3 * math.pi
+        r0 = 12.0 + h2 * 62.0
+        cx = 170.0 + (h1 - 0.5) * 2 * r0 * math.cos(ang0)
+        cy = 185.0 + (h1 - 0.5) * 2 * r0 * math.sin(ang0)
+        dx, dy = 34.0 * math.cos(ang0 + 1.1), 34.0 * math.sin(ang0 + 1.1)
+        # Clip fibre ends into the circle by shortening long excursions.
+        s.line(cx - dx, cy - dy, cx + dx, cy + dy, th.secondary, 3.0)
+    s.text(170, 80, "microstructure (zoom)", 16, th.fg, bold=True)
+    s.text(96, 300, "fibre frame", 15, th.secondary, anchor="start")
+    s.line(120.0, 292.0, 140.0, 252.0, th.muted, 1.0)
+    s.text(190, 322, "air in the pores: φ = 0.98", 15, th.fg, anchor="start")
+    s.line(214.0, 314.0, 200.0, 262.0, th.muted, 1.0)
+
+    # JCA parameter block (the guide's material).
+    for yy, txt in (
+        (368.0, "σ = 20 kPa·s/m²  (flow resistivity)"),
+        (392.0, "φ = 0.98  (porosity)"),
+        (416.0, "α∞ = 1.0  (tortuosity)"),
+        (440.0, "Λ = Λ′ = 87 µm  (viscous / thermal lengths)"),
+    ):
+        s.text(60, yy, txt, 16, th.fg, anchor="start", mono=True)
+
+    # --- captions ----------------------------------------------------------
+    s.text(80, 500,
+           "JCA equivalent fluid: the five parameters give Zc and k; a hard-backed layer has Zs = −j Zc cot(kd)",
+           17, th.fg, anchor="start")
+    s.text(80, 528, "α = 1 − |R|² = 0.91 at 1 kHz for this 50 mm layer",
+           18, th.primary, anchor="start", bold=True)
+    s.text(80, 556,
+           "viscous friction in the pores and heat exchange with the frame dissipate the sound energy",
+           17, th.muted, anchor="start")
+
+
+# ---------------------------------------------------------------------------
+# Barrier diffraction over ground (Fresnel number, Kurze-Anderson)
+# ---------------------------------------------------------------------------
+
+def _d_ground_barrier(s: SVG, th: Theme) -> None:
+    """The guide's barrier geometry: a 1 m source, a 4 m thin screen at
+    50 m and a 1.5 m receiver at 100 m. The diffracted segments A and B,
+    the blocked direct path d and the barrier_insertion_loss values
+    (N = 0.44 and 10.0 dB at 500 Hz, 15.5 dB at 2 kHz)."""
+    gy = 340.0                          # ground; 7 px/m horizontal, 60 px/m vertical
+    sx, sy = 110.0, gy - 60.0           # source, hs = 1 m
+    ex, ey = 460.0, gy - 240.0          # barrier top edge, 4 m
+    rx, ry = 810.0, gy - 90.0           # receiver, hr = 1.5 m
+
+    s.ground(gy, 40.0, 860.0)
+
+    # Source loudspeaker on its mast.
+    for r in (22, 38, 54):
+        s.path(f"M {sx + r * 0.22:.1f} {sy - r:.1f} "
+               f"A {r} {r} 0 0 1 {sx + r:.1f} {sy - r * 0.22:.1f}",
+               stroke=th.muted, sw=1.2)
+    s.rect(sx - 17, sy - 20, 34, 40, th.panel, th.fg, rx=5, sw=2)
+    s.circle(sx, sy - 5, 8, th.fg)
+    s.circle(sx, sy - 5, 3, th.bg)
+    s.circle(sx, sy + 12, 5, th.fg)
+    s.line(sx, sy + 20, sx, gy, th.fg, 2.0)
+    s.text(sx, sy - 66, "Source", 19, th.fg, bold=True)
+
+    # Thin screen with its diffraction edge.
+    s.rect(ex - 8, ey, 16, gy - ey, th.secondary, th.fg, sw=2)
+    s.text(ex + 18, ey + 74, "Barrier", 19, th.secondary, bold=True,
+           anchor="start")
+
+    # Receiver microphone.
+    s.mic(rx, ry, gy, 1.0)
+    s.text(rx, ry - 20, "Receiver", 19, th.fg, bold=True)
+
+    # Blocked direct path and the diffracted path A + B.
+    s.line(sx + 12, sy - 4, rx - 4, ry + 4, th.muted, 1.6, dash="7,6")
+    s.text(268, 308, "direct d = 100.00 m (blocked)", 15, th.muted,
+           italic=True)
+    s.line(sx + 10, sy - 10, ex, ey, th.accent, 2.6)
+    s.arrow(ex, ey, rx - 4, ry - 2, th.accent, 2.6)
+    s.circle(ex, ey, 5.5, th.bg, th.fg, 2.0)
+    s.text(258, 162, "A = 50.09 m", 17, th.accent, bold=True)
+    s.text(660, 152, "B = 50.06 m", 17, th.accent, bold=True)
+
+    # Height and distance dimensions.
+    s.dim(64, gy, 64, sy - 4, "1.0 m", offset=0, size=15, label_side="left")
+    s.line(64, sy - 4, sx - 17, sy - 4, th.muted, 0.9, dash="3,3")
+    s.dim(430, gy, 430, ey, "4.0 m", offset=0, size=15, label_side="left")
+    s.line(430, ey, ex - 8, ey, th.muted, 0.9, dash="3,3")
+    s.dim(846, gy, 846, ry, "1.5 m", offset=0, size=14, label_side="right")
+    s.line(rx + 6, ry, 846, ry, th.muted, 0.9, dash="3,3")
+    s.dim(sx, gy, ex, gy, "50 m", offset=34, size=16)
+    s.dim(ex, gy, rx, gy, "50 m", offset=34, size=16)
+
+    # --- captions ----------------------------------------------------------
+    s.text(80, 420,
+           "path difference δ = A + B − d = 0.15 m; Fresnel number N = 2δ/λ = 0.44 at 500 Hz",
+           18, th.fg, anchor="start")
+    s.text(80, 448,
+           "Kurze–Anderson: Δbar = 5 + 20 lg( √(2πN) / tanh √(2πN) ) = 10.0 dB at 500 Hz",
+           18, th.primary, anchor="start", bold=True)
+    s.text(80, 476,
+           "N grows with frequency: the same screen gives 15.5 dB at 2 kHz (vertical scale exaggerated)",
+           17, th.muted, anchor="start")
+
+
+# ---------------------------------------------------------------------------
+# Image-source lattice in plan (first reflections of a shoebox room)
+# ---------------------------------------------------------------------------
+
+def _d_room_image_sources(s: SVG, th: Theme) -> None:
+    """Plan of the guide's 7 x 5 x 3 m room with the source at (2, 1.6),
+    the receiver at (5.2, 3.4) and the in-plane images of order 1 and 2 on
+    the mirror-room grid, each labelled with its image_source_rir arrival
+    time (direct 10.7 ms, first reflections 17.3 to 21.6 ms)."""
+    sc = 32.0                            # px per metre
+
+    def x(mx: float) -> float:
+        return 98.0 + (mx + 7.5) * sc
+
+    def y(my: float) -> float:
+        return 88.0 + (10.4 - my) * sc
+
+    # Mirror-room grid (3 x 3) around the bold real room.
+    for gx in (-7.0, 0.0, 7.0):
+        for gy_ in (-5.0, 0.0, 5.0):
+            if gx == 0.0 and gy_ == 0.0:
+                continue
+            s.rect(x(gx), y(gy_ + 5.0), 7.0 * sc, 5.0 * sc, "none", th.muted,
+                   sw=1.1, dash="6,5")
+    s.rect(x(0.0), y(5.0), 7.0 * sc, 5.0 * sc, th.panel, th.fg, sw=2.6)
+    s.text(x(3.5), y(0.4), "plan at the source plane z = 1.5 m",
+           11 if s.lang == "es" else 13, th.muted)
+
+    # Room dimensions on the real room's walls.
+    s.dim(x(0.0), y(0.0), x(7.0), y(0.0), "7.0 m", offset=26, size=15)
+    s.dim(x(7.0), y(5.0), x(7.0), y(0.0), "5.0 m", offset=28, size=15,
+          label_side="right")
+
+    # Source, receiver and the direct sound.
+    sx_, sy_ = x(2.0), y(1.6)
+    rx_, ry_ = x(5.2), y(3.4)
+    s.line(sx_, sy_, rx_, ry_, th.fg, 1.5)
+    s.text((sx_ + rx_) / 2 + 4, (sy_ + ry_) / 2 + 18, "10.7 ms", 14, th.fg,
+           mono=True)
+    s.circle(sx_, sy_, 7.0, th.secondary)
+    s.text(sx_ - 12, sy_ + 5, "S", 17, th.secondary, bold=True, anchor="end")
+    s.path(f"M {rx_:.1f} {ry_ - 9:.1f} L {rx_ - 8:.1f} {ry_ + 7:.1f} "
+           f"L {rx_ + 8:.1f} {ry_ + 7:.1f} Z", fill=th.primary)
+    s.text(rx_ + 13, ry_ + 5, "R", 17, th.primary, bold=True, anchor="start")
+
+    # Example first reflection off the y = 5 wall: real specular path and
+    # the equivalent straight line from the image.
+    bx, by = x(4.176), y(5.0)
+    s.line(sx_, sy_, bx, by, th.accent, 2.0)
+    s.arrow(bx, by, rx_, ry_ - 6, th.accent, 2.0)
+    s.line(x(2.0), y(8.4), rx_, ry_ - 6, th.accent, 1.3, dash="5,4")
+    s.text(502, 185, "the image sees", 13, th.accent, italic=True)
+    s.text(502, 204, "a straight path", 13, th.accent, italic=True)
+
+    # Images of order 1 (secondary) and order 2 (accent), with their
+    # image_source_rir arrival times.
+    order1 = [(2.0, -1.6, "17.3 ms", 14, 18), (2.0, 8.4, "17.3 ms", 14, -12),
+              (12.0, 1.6, "20.5 ms", 14, 18), (-2.0, 1.6, "21.6 ms", 14, 18)]
+    for mx, my, lab, _sz, dy_ in order1:
+        s.circle(x(mx), y(my), 6.0, th.secondary)
+        s.text(x(mx), y(my) + dy_ + (4 if dy_ < 0 else 0), lab, 13, th.fg,
+               mono=True)
+    order2 = [(-2.0, -1.6, "25.6 ms"), (-2.0, 8.4, "25.6 ms"),
+              (12.0, -1.6, "24.6 ms"), (12.0, 8.4, "24.6 ms")]
+    for mx, my, lab in order2:
+        s.circle(x(mx), y(my), 6.0, "none", th.accent, 2.2)
+        s.text(x(mx), y(my) + 20, lab, 13, th.muted, mono=True)
+
+    # Legend inside the top-left mirror room.
+    s.circle(x(-6.6), y(9.55), 5.5, th.secondary)
+    s.text(x(-6.3), y(9.4), "1st order", 14, th.fg, anchor="start")
+    s.circle(x(-6.6), y(8.75), 5.5, "none", th.accent, 2.2)
+    s.text(x(-6.3), y(8.6), "2nd order", 14, th.fg, anchor="start")
+
+    # --- captions ----------------------------------------------------------
+    s.text(80, 612,
+           "every reflection is the free-field arrival of a mirror image: t = r/c, √(1−α) per bounce, 1/(4πr) spreading",
+           17, th.fg, anchor="start")
+    s.text(80, 638,
+           "in-plane images up to order 2 shown; the full lattice adds floor, ceiling and outer mirror rooms",
+           17, th.muted, anchor="start")
+
+
+# ---------------------------------------------------------------------------
+# Noise control at the source, along the path and at the receiver
+# ---------------------------------------------------------------------------
+
+def _d_noise_control(s: SVG, th: Theme) -> None:
+    """The source-path-receiver triad with the guide's numbers: a lined
+    machine enclosure (IL = R - C = 25 dB at 500 Hz), a duct run with the
+    m = 4 expansion chamber (TL peak 6.5 dB at 286 Hz), a lined elbow
+    (6 dB at 1 kHz), the open-end reflection (18 dB at 63 Hz) and an
+    operator cabin rated by the same IL = R - C (31 dB at 1 kHz)."""
+    gy = 440.0
+    s.ground(gy, 40.0, 860.0)
+    for zx in (340.0, 660.0):
+        s.line(zx, 80.0, zx, gy - 4, th.muted, 1.0, dash="7,7")
+    s.text(185, 70, "1 · At the source", 19, th.fg, bold=True)
+    s.text(480, 70, "2 · Along the path", 19, th.fg, bold=True)
+    s.text(770, 70, "3 · At the receiver", 19, th.fg, bold=True)
+
+    # --- source: machine inside a lined enclosure --------------------------
+    s.rect(80, 306, 150, gy - 306, "none", th.primary, rx=6, sw=2.6)
+    s.rect(90, 316, 130, gy - 320, "none", th.accent, rx=4, sw=1.3, dash="5,4")
+    s.rect(100, 356, 110, 84, th.panel, th.fg, rx=6, sw=2)
+    s.circle(130, 396, 14, th.primary)
+    s.circle(130, 396, 5, th.bg)
+    for r in (26, 42):
+        s.path(f"M {130 + r * 0.3:.0f} {396 - r:.0f} "
+               f"A {r} {r} 0 0 1 {130 + r:.0f} {396 - r * 0.3:.0f}",
+               stroke=th.muted, sw=1.2)
+    s.text(155, 296, "Enclosure", 17, th.primary, bold=True)
+    s.text(178, 428, "Machine", 15, th.fg)
+    s.text(185, 482, "enclosure IL = R − C", 15, th.primary, bold=True)
+    s.text(185, 504, "25 dB at 500 Hz", 14, th.fg)
+
+    # --- path: duct with expansion chamber, lined elbow and open end -------
+    dt, db = 350.0, 374.0                # duct walls (24 px = 113 mm bore)
+    ch_l, ch_r, ct, cb = 390.0, 480.0, 338.0, 386.0   # 0.30 m chamber
+    s.line(230.0, dt, ch_l, dt, th.fg, 2.0)
+    s.line(230.0, db, ch_l, db, th.fg, 2.0)
+    s.rect(ch_l, ct, ch_r - ch_l, cb - ct, th.panel, th.primary, sw=2)
+    s.line(ch_r, dt, 590.0, dt, th.fg, 2.0)
+    s.line(ch_r, db, 614.0, db, th.fg, 2.0)
+    s.line(590.0, dt, 590.0, 224.0, th.fg, 2.0)          # elbow, inner wall
+    s.line(614.0, db, 614.0, 224.0, th.fg, 2.0)          # elbow, outer wall
+    s.line(592.5, 348.0, 592.5, 240.0, th.accent, 2.0, dash="4,4")  # lining
+    s.line(611.5, 360.0, 611.5, 240.0, th.accent, 2.0, dash="4,4")
+    for r in (16, 28, 40):
+        s.path(f"M {602 - r:.0f} {220:.0f} A {r} {r} 0 0 1 {602 + r:.0f} {220:.0f}",
+               stroke=th.muted, sw=1.3)
+    s.text(300, 338, "Ø 113 mm", 13, th.muted, mono=True)
+    s.text(435, 326, "expansion chamber", 15, th.fg, bold=True)
+    s.text(435, 424, "Ø 226 mm", 13, th.muted, mono=True)
+    s.dim(ch_l, cb, ch_r, cb, "0.30 m", offset=18, size=14)
+    s.text(560, 292, "lined elbow", 14, th.accent, anchor="end")
+    s.line(566.0, 288.0, 590.0, 272.0, th.muted, 1.0)
+    s.text(548, 170, "open end", 14, th.fg, anchor="end")
+    s.line(554.0, 176.0, 572.0, 190.0, th.muted, 1.0)
+    s.text(480, 482, "silencer TL peak 6.5 dB at 286 Hz (m = 4)", 14,
+           th.primary, bold=True)
+    s.text(480, 504, "lined elbow 6 dB at 1 kHz; open end 18 dB at 63 Hz",
+           13, th.fg)
+
+    # --- receiver: operator cabin ------------------------------------------
+    s.rect(700, 300, 150, gy - 300, th.panel, th.fg, rx=4, sw=2.4)
+    s.rect(716, 320, 54, 44, th.bg, th.muted, sw=1.5)
+    s.person(806, gy, 92)
+    s.text(775, 290, "Operator cabin", 17, th.fg, bold=True)
+    s.text(770, 482, "cabin IL = R − C", 15, th.primary, bold=True)
+    s.text(770, 504, "31 dB at 1 kHz", 14, th.fg)
+
+    # --- captions ----------------------------------------------------------
+    s.text(80, 540,
+           "the classic ranking: quiet the source first, treat the path next, shield the receiver last",
+           17, th.fg, anchor="start")
+    s.text(80, 568,
+           "enclosure and cabin share IL = R − C, with C = 10 lg(0.3 + S_E/R_i) = 4.9 dB for a lined interior (ᾱ = 0.3)",
+           16, th.fg, anchor="start")
+    s.text(80, 596,
+           "reactive silencer: TL = 10 lg[1 + ¼ (m − 1/m)² sin²(kL)], peaking where the 0.3 m chamber is a quarter wavelength",
+           16, th.muted, anchor="start")
+
+
 DIAGRAMS = {
     "diagram_calibration_setup": (_d1, "Calibration chain — from calibrator to physical units", 560),
     "diagram_env_measurement": (_d2, "Environmental noise measurement positions (ISO 1996-2)", 560),
@@ -6800,6 +7335,23 @@ DIAGRAMS = {
     "diagram_reverberation_prediction": (
         _d_reverberation_prediction,
         "Predicting the reverberation time: Sabine against Eyring", 600),
+    "diagram_panel_insulation": (
+        _d_panel_insulation,
+        "Panel between rooms: mass law and the coincidence dip", 540),
+    "diagram_porous_layer": (
+        _d_porous_layer,
+        "Porous absorber on a rigid wall: microstructure to absorption", 590),
+    "diagram_ground_barrier": (
+        _d_ground_barrier,
+        "Barrier diffraction over ground: the Fresnel number at work", 510),
+    "diagram_room_image_sources": (
+        _d_room_image_sources,
+        "Image-source lattice in plan: first reflections of a 7 × 5 m room",
+        665),
+    "diagram_noise_control": (
+        _d_noise_control,
+        "Noise control at the source, along the path and at the receiver",
+        625),
 }
 
 

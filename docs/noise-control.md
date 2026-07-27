@@ -11,6 +11,12 @@ insertion loss of a **machine enclosure**. The radiating piston of the
 [electroacoustics](electroacoustics.md) domain is the companion radiator
 model.
 
+The three families of this page in one scene: enclose the source, silence the
+path, shield the receiver. Each measure carries the value the corresponding
+section computes below.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_noise_control_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_noise_control.svg" alt="Noise-control scene split into three zones: at the source a machine inside a lined enclosure rated IL = R − C = 25 dB at 500 Hz, along the path a 113 mm duct with a 0.30 m expansion chamber of area ratio 4 peaking at 6.5 dB of transmission loss at 286 Hz, a lined elbow worth 6 dB at 1 kHz and an open end reflecting 18 dB at 63 Hz, and at the receiver an operator cabin rated by the same formula at 31 dB at 1 kHz, with a person standing inside" width="92%"></picture>
+
 ## 1. Reactive silencers (four-pole method)
 
 A reactive silencer attenuates by *reflecting* sound with impedance

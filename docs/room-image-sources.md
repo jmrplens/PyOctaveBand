@@ -54,6 +54,13 @@ shoebox has exactly `(2/3)(2 i₀³ + 3 i₀² + 4 i₀)` audible images up to o
 density of reflections grows as `dN/dt = 4 π c³ t² / V` (Kuttruff Equation
 (4.6)).
 
+The construction in one plan: every wall reflection is the straight-line sound
+of an image in a mirror room, so the geometry alone fixes each arrival. In the
+7 × 5 m room below the direct sound lands at 10.7 ms and the four first-order
+images follow between 17.3 and 21.6 ms.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_image_sources_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_image_sources.svg" alt="Plan of a 7 by 5 m room in the centre of its three by three grid of dashed mirror rooms: the source at (2, 1.6) and the receiver at (5.2, 3.4) joined by the 10.7 ms direct sound, filled first-order images in the four adjacent rooms labelled with their arrival times of 17.3, 20.5 and 21.6 ms, outlined second-order images in the corner rooms at 24.6 and 25.6 ms, and the first far-wall reflection drawn twice, as the real bent path off the wall and as the straight dashed line from the image to the receiver" width="92%"></picture>
+
 ```python
 import numpy as np
 from phonometry import room
