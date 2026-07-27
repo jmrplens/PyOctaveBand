@@ -137,6 +137,20 @@ class RadiationEfficiencyResult:
 
         return plot_radiation_efficiency(self, ax=ax, language=check_language(language), **kwargs)
 
+    def plot_geometry(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
+        """Draw the baffled plate to scale.
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+        """
+        from .._i18n import check_language
+        from .._plot.geometry import plot_radiation_result_geometry
+
+        check_language(language)
+        return plot_radiation_result_geometry(self, ax=ax, language=language, **kwargs)
+
 
 def _sigma_below(
     freq: NDArray[np.float64], fc: float, c0: float, u: float, s: float, cc: float

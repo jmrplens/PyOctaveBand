@@ -191,6 +191,38 @@ print(round(mass_spring_mass_resonance(12.0, 12.0, 0.075, cavity_medium=fill))) 
 dw.plot()   # R(f) de pared doble con la resonancia masa-muelle-masa marcada (requiere matplotlib)
 ```
 
+El caso ligero clásico merece dibujarse a escala: dos placas de yeso de
+8,8 kg/m² sobre una cámara vacía de 100 mm dejan $f_0$ en 90 Hz.
+`plot_double_wall_geometry` anota la resonancia en la cámara, y un resultado
+de `double_wall_transmission_loss` que retuvo su geometría redibuja su propia
+sección con `dw.plot_geometry()`.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/double_wall_geometry_es.svg" alt="Sección a escala de una doble hoja ligera: dos placas de yeso grises de 8,8 kg/m2 cada una, dibujadas con 12,6 mm de espesor, separadas por la cámara de 100 mm, con la flecha de sonido incidente llegando por la izquierda y la resonancia masa-muelle-masa f0 = 90 Hz anotada en la cámara" width="80%" />
+
+*Todo el modelo en una sección: las dos hojas delgadas son las masas, la
+cámara de aire de 100 mm es el muelle, y $f_0$ = 90 Hz es donde cae el valle
+de toda curva de pared doble.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import mass_spring_mass_resonance, plot_double_wall_geometry
+
+# Dos placas de yeso de 8.8 kg/m² sobre una cámara de 100 mm.
+f0 = mass_spring_mass_resonance(8.8, 8.8, 0.1)
+plot_double_wall_geometry(8.8, 8.8, 0.1, resonance_frequency=f0,
+                          language="es")
+plt.show()
+
+# Una predicción de pared doble retiene su geometría y la redibuja:
+#   dw = double_wall_transmission_loss(bands, 8.8, 8.8, 0.1)
+#   dw.plot_geometry(language="es")
+```
+
+</details>
+
 ## Rendijas, orificios y aberturas (Hopkins 4.3.10)
 
 Un pequeño camino de aire es el límite real de cualquier construcción pesada. El

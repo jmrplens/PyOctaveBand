@@ -155,6 +155,9 @@ class SoundReductionResult:
     model: str
     critical_frequency: float | None = None
     resonance_frequency: float | None = None
+    mass1: float | None = None
+    mass2: float | None = None
+    gap: float | None = None
 
     @property
     def transmission_coefficient(self) -> np.ndarray:
@@ -204,6 +207,22 @@ class SoundReductionResult:
 
         check_language(language)
         return plot_sound_reduction(self, ax=ax, language=language, **kwargs)
+
+    def plot_geometry(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
+        """Draw the mass-spring-mass cross-section to scale.
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+
+        :raises ValueError: If the result does not retain its geometry.
+        """
+        from .._i18n import check_language
+        from .._plot.geometry import plot_double_wall_result_geometry
+
+        check_language(language)
+        return plot_double_wall_result_geometry(self, ax=ax, language=language, **kwargs)
 
 
 def single_panel_transmission_loss(
@@ -415,4 +434,7 @@ def double_wall_transmission_loss(
         transmission_loss=np.asarray(tl, dtype=np.float64),
         model="double-wall",
         resonance_frequency=f0,
+        mass1=float(mass1),
+        mass2=float(mass2),
+        gap=float(gap),
     )

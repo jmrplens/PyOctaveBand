@@ -41,7 +41,33 @@ convenient closed-form inputs for statistical energy analysis (SEA) and for the
 EN 12354 flanking-transmission model, where they feed the coupling loss factor
 `etaij` and the vibration reduction index `Kij`.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/junction_transmission.svg" alt="Transmission coefficient versus incidence angle for a rigid X-junction of a 100 mm and a 200 mm concrete plate, showing the corner coefficient tau12 and the straight-section coefficient tau13 falling from their normal-incidence values to zero at grazing incidence, with their diffuse-field angular averages marked as horizontal lines" width="82%" loading="eager" />
+The object itself first: a T-junction where a 140 mm concrete floor runs into
+a continuous 200 mm wall. A `junction_transmission` result retains its plates,
+so `res.plot_geometry()` draws the junction to scale with the incident bending
+wave marked.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/junction_plate_geometry.svg" alt="To-scale cross-section of a T1 plate junction: a 140 mm concrete floor arrives horizontally from the left with the incident-sound arrow on it and ends against the continuous 200 mm wall drawn vertically, both plate thicknesses dimensioned" width="82%" loading="eager" />
+
+*Drawn to scale: the incident bending wave arrives along the 140 mm floor, and
+everything the closed-form coefficients describe happens where it meets the
+continuous 200 mm wall.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import junction_transmission
+
+# A 140 mm concrete floor meeting a 200 mm wall at a T-junction.
+res = junction_transmission("T2", 0.14, 3500.0, 320.0, 0.2, 3500.0, 460.0)
+res.plot_geometry()
+plt.show()
+```
+
+</details>
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/junction_transmission.svg" alt="Transmission coefficient versus incidence angle for a rigid X-junction of a 100 mm and a 200 mm concrete plate, showing the corner coefficient tau12 and the straight-section coefficient tau13 falling from their normal-incidence values to zero at grazing incidence, with their diffuse-field angular averages marked as horizontal lines" width="82%" />
 
 <details>
 <summary>Show the code for this figure</summary>

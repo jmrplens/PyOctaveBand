@@ -91,6 +91,37 @@ Coincidence (critical) frequency `fc` of a thin plate (Hopkins 2.201).
 | :--- | :--- |
 | ValueError | for a non-positive input. |
 
+## plot_plate_geometry
+
+```python
+plot_plate_geometry(
+    length_x: float,
+    length_y: float,
+    ax: Axes | None = None,
+    *,
+    boundary: str = 'simply_supported',
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the baffled rectangular plate of the radiation model, to scale.
+
+Plate a x b inside its baffle frame, boundary condition in the title.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `length_x` | Plate length `a`, in metres. |
+| `length_y` | Plate width `b`, in metres. |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `boundary` | Boundary-condition label of the model. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the plate rectangle. |
+
+**Returns:** The axes.
+
 ## radiation_efficiency
 
 ```python
@@ -174,6 +205,22 @@ RadiationEfficiencyResult.plot(
 ```
 
 Plot the radiation efficiency `sigma(f)` on log-log axes.
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
+
+### RadiationEfficiencyResult.plot_geometry()
+
+```python
+RadiationEfficiencyResult.plot_geometry(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the baffled plate to scale.
 
 Requires matplotlib (`pip install phonometry[plot]`); returns the
 `Axes`.

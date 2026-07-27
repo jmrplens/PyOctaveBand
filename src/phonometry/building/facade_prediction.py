@@ -171,6 +171,7 @@ class FacadePredictionResult:
     d_2m_nt_w: int | None = None
     c_tr: int | None = None
     frequencies: np.ndarray | None = None
+    elements: tuple[FacadeElement, ...] | None = None
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the per-element partial indices and the façade ``R'`` / ``D2m,nT``."""
@@ -179,6 +180,22 @@ class FacadePredictionResult:
 
         check_language(language)
         return plot_facade_prediction(self, ax=ax, language=language, **kwargs)
+
+    def plot_geometry(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
+        """Draw the composite facade elevation, element areas to scale.
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+
+        :raises ValueError: If the result does not retain its geometry.
+        """
+        from .._i18n import check_language
+        from .._plot.geometry import plot_facade_result_geometry
+
+        check_language(language)
+        return plot_facade_result_geometry(self, ax=ax, language=language, **kwargs)
 
     def report(
         self,
@@ -365,6 +382,7 @@ def facade_sound_reduction(
         d_2m_nt_w=None if d_num is None else d_num[0],
         c_tr=None if r_tr is None else r_tr[1],
         frequencies=None if frequencies is None else np.asarray(frequencies, dtype=np.float64),
+        elements=tuple(elements),
     )
 
 

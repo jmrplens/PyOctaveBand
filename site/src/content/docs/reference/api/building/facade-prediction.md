@@ -187,6 +187,7 @@ FacadePredictionResult(
     d_2m_nt_w: int | None = None,
     c_tr: int | None = None,
     frequencies: np.ndarray | None = None,
+    elements: tuple[FacadeElement, ...] | None = None,
 )
 ```
 
@@ -218,6 +219,28 @@ FacadePredictionResult.plot(
 ```
 
 Plot the per-element partial indices and the façade `R'` / `D2m,nT`.
+
+### FacadePredictionResult.plot_geometry()
+
+```python
+FacadePredictionResult.plot_geometry(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the composite facade elevation, element areas to scale.
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the result does not retain its geometry. |
 
 ### FacadePredictionResult.report()
 
@@ -325,6 +348,35 @@ scalar broadcasts against an array (e.g. several sides, one common `Atot`).
 | `attenuation` | Attenuation(s) `Atot` (dB), scalar or per side. |
 
 **Returns:** Exterior sound pressure level `Lp` in dB.
+
+## plot_facade_elements
+
+```python
+plot_facade_elements(
+    elements: Sequence[FacadeElement],
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw a composite facade elevation with element areas to scale.
+
+Each element of [`facade_sound_reduction`](/phonometry/reference/api/building/facade-prediction/#facade_sound_reduction) is a
+tile whose drawn area equals its real area (small-area elements without
+an area, such as airbriks rated by `dn_e`, get a nominal 0,1 m2 tile).
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `elements` | The [`FacadeElement`](/phonometry/reference/api/building/facade-prediction/#facadeelement) sequence. |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the element rectangles. |
+
+**Returns:** The axes.
 
 ## radiated_sound_power
 

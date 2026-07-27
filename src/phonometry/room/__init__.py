@@ -3,6 +3,9 @@
 
 from __future__ import annotations
 
+from .._plot.geometry import (
+    plot_open_plan_geometry,
+)
 from .enclosed_space_absorption import (
     ReverberationResult,
     air_absorption_area,
@@ -101,6 +104,7 @@ __all__ = [
     "noise_criterion",
     "object_fraction",
     "open_plan_metrics",
+    "plot_open_plan_geometry",
     "rc_curve",
     "reflection_density",
     "reverberation_time",

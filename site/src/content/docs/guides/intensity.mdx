@@ -56,6 +56,35 @@ $$
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe.svg" alt="Two-microphone p-p intensity probe with the spacer distance and the measurement axis" width="92%" loading="eager" />
 
+The probe itself is small enough to draw at true scale.
+`plot_pp_probe_geometry` puts the classic 12 mm solid spacer between the two
+face-to-face capsules, and a computed `IntensityResult` that retained its
+`spacing` redraws its own probe with `res.plot_geometry()`.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/pp_probe_geometry.svg" alt="To-scale side view of the face-to-face p-p intensity probe: two blue half-inch microphone capsules on their grey cylindrical bodies facing each other across the light 12 mm solid spacer, the spacing dimensioned below and the intensity axis Ir drawn as a blue arrow to the right" width="92%" />
+
+*The finite difference at true scale: two half-inch capsules face to face
+across 12 mm of solid spacer, and that $\Delta r$ is both the sensitivity of
+the gradient estimate and the origin of the high-frequency error.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import emission
+
+# The classic 12 mm solid spacer between two half-inch microphones.
+emission.plot_pp_probe_geometry()
+plt.show()
+
+# A computed IntensityResult retains its spacing:
+#   res = emission.sound_intensity(p1, p2, fs, spacing=0.012)
+#   res.plot_geometry()
+```
+
+</details>
+
 ```python
 import numpy as np
 from phonometry import emission

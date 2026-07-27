@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from .._plot.geometry import (
     plot_microphone_positions,
+    plot_pp_probe_geometry,
 )
 from .declaration import (
     DeclarationForm,
@@ -85,6 +86,7 @@ __all__ = [
     "measurement_positions",
     "meteorological_corrections",
     "plot_microphone_positions",
+    "plot_pp_probe_geometry",
     "precision_background_correction",
     "precision_field_indicators",
     "precision_positions",

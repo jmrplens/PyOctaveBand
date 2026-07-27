@@ -57,6 +57,36 @@ $$
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe_es.svg" alt="Sonda de intensidad p-p de dos micrófonos con la distancia del separador y el eje de medición" width="92%" loading="eager" />
 
+La propia sonda es lo bastante pequeña para dibujarla a escala real.
+`plot_pp_probe_geometry` coloca el clásico espaciador macizo de 12 mm entre
+las dos cápsulas enfrentadas, y un `IntensityResult` calculado que retuvo su
+`spacing` redibuja su propia sonda con `res.plot_geometry()`.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/pp_probe_geometry_es.svg" alt="Vista lateral a escala de la sonda de intensidad p-p cara a cara: dos cápsulas azules de media pulgada sobre sus cuerpos cilíndricos grises enfrentadas a través del espaciador macizo claro de 12 mm, con la separación acotada debajo y el eje de intensidad Ir dibujado como flecha azul a la derecha" width="92%" />
+
+*La diferencia finita a escala real: dos cápsulas de media pulgada cara a
+cara a través de 12 mm de espaciador macizo, y ese $\Delta r$ es a la vez la
+sensibilidad de la estimación del gradiente y el origen del error en alta
+frecuencia.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import emission
+
+# El clásico espaciador macizo de 12 mm entre dos micrófonos de media pulgada.
+emission.plot_pp_probe_geometry(language="es")
+plt.show()
+
+# Un IntensityResult calculado retiene su separación:
+#   res = emission.sound_intensity(p1, p2, fs, spacing=0.012)
+#   res.plot_geometry(language="es")
+```
+
+</details>
+
 ```python
 import numpy as np
 from phonometry import emission

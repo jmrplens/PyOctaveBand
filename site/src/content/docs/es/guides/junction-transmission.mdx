@@ -42,7 +42,33 @@ estadístico de energía (SEA) y para el modelo de transmisión por flancos de l
 EN 12354, donde alimentan el factor de pérdidas por acoplamiento `etaij` y el
 índice de reducción vibracional `Kij`.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/junction_transmission_es.svg" alt="Coeficiente de transmisión frente al ángulo de incidencia para una unión rígida en X de una placa de hormigón de 100 mm y otra de 200 mm, mostrando el coeficiente de esquina tau12 y el coeficiente de tramo recto tau13 cayendo desde sus valores a incidencia normal hasta cero en incidencia rasante, con sus medias angulares en campo difuso marcadas como líneas horizontales" width="82%" loading="eager" />
+Primero el objeto en sí: una unión en T donde un forjado de hormigón de 140 mm
+muere contra un muro continuo de 200 mm. Un resultado de `junction_transmission`
+retiene sus placas, así que `res.plot_geometry()` dibuja la unión a escala con
+la onda de flexión incidente marcada.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/junction_plate_geometry_es.svg" alt="Sección a escala de una unión de placas T1: un forjado de hormigón de 140 mm llega horizontal desde la izquierda con la flecha de sonido incidente encima y muere contra el muro continuo de 200 mm dibujado en vertical, con ambos espesores acotados" width="82%" loading="eager" />
+
+*Dibujado a escala: la onda de flexión incidente llega por el forjado de
+140 mm, y todo lo que describen los coeficientes en forma cerrada ocurre donde
+se encuentra con el muro continuo de 200 mm.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import junction_transmission
+
+# Un forjado de hormigón de 140 mm contra un muro de 200 mm en unión en T.
+res = junction_transmission("T2", 0.14, 3500.0, 320.0, 0.2, 3500.0, 460.0)
+res.plot_geometry(language="es")
+plt.show()
+```
+
+</details>
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/junction_transmission_es.svg" alt="Coeficiente de transmisión frente al ángulo de incidencia para una unión rígida en X de una placa de hormigón de 100 mm y otra de 200 mm, mostrando el coeficiente de esquina tau12 y el coeficiente de tramo recto tau13 cayendo desde sus valores a incidencia normal hasta cero en incidencia rasante, con sus medias angulares en campo difuso marcadas como líneas horizontales" width="82%" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>

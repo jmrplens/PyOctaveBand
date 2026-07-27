@@ -358,6 +358,15 @@ OBJECT_MODULE_OVERRIDES: dict[str, str] = {
     "plot_microphone_positions": "phonometry.emission.sound_power",
     "plot_aperture_geometry": "phonometry.building.aperture_transmission",
     "plot_piston_geometry": "phonometry.electroacoustics.piston",
+    "plot_facade_elements": "phonometry.building.facade_prediction",
+    "plot_double_wall_geometry": "phonometry.building.panel_transmission",
+    "plot_junction_geometry": "phonometry.vibration.junction_transmission",
+    "plot_insitu_geometry": "phonometry.materials.road_absorption",
+    "plot_dynamic_stiffness_rig": "phonometry.materials.dynamic_stiffness",
+    "plot_goniometer_geometry": "phonometry.materials.scattering_diffusion",
+    "plot_plate_geometry": "phonometry.vibration.radiation_efficiency",
+    "plot_open_plan_geometry": "phonometry.room.open_plan",
+    "plot_pp_probe_geometry": "phonometry.emission.intensity",
     # Defined in underwater.acoustics, also re-exported by
     # underwater.ship_radiated_noise (identity scan is ambiguous).
     "UNDERWATER_REFERENCE_PRESSURE": "phonometry.underwater.acoustics",

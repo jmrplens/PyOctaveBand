@@ -586,6 +586,8 @@ class InsituAbsorptionResult:
 
     frequencies: Real
     absorption: Real
+    source_height: float | None = None
+    mic_height: float | None = None
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the in-situ absorption spectrum ``alpha(f)``.
@@ -598,6 +600,22 @@ class InsituAbsorptionResult:
 
         check_language(language)
         return plot_insitu_absorption(self, ax=ax, language=language, **kwargs)
+
+    def plot_geometry(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
+        """Draw the measurement set-up to scale.
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+
+        :raises ValueError: If the result does not retain its geometry.
+        """
+        from .._i18n import check_language
+        from .._plot.geometry import plot_insitu_result_geometry
+
+        check_language(language)
+        return plot_insitu_result_geometry(self, ax=ax, language=language, **kwargs)
 
 
 def insitu_absorption_spectrum(
@@ -670,7 +688,12 @@ def insitu_absorption_spectrum(
     centres, band = one_third_octave_absorption(
         freq, alpha, f_min=f_min, f_max=f_max, clip_negative=clip_negative
     )
-    return InsituAbsorptionResult(frequencies=centres, absorption=band)
+    return InsituAbsorptionResult(
+        frequencies=centres,
+        absorption=band,
+        source_height=float(source_height),
+        mic_height=float(mic_height),
+    )
 
 
 # --------------------------------------------------------------------------- #

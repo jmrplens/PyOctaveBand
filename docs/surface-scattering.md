@@ -180,6 +180,32 @@ Formula (6) area-weights each energy by $N_i$ from Formula (8), and those area
 factors are evaluated in **radians**, which is why a 5° spacing at the zenith
 produces a weight near 1.57, not 51.9.
 
+The rig those formulas assume is worth drawing to scale.
+`plot_goniometer_geometry` lays out the standard arrangement in plan: the
+37-microphone semicircle every 5 degrees at 5 m around the sample, the source
+at 10 m on the normal.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_goniometer_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_goniometer_geometry.svg" alt="To-scale plan of the free-field diffusion goniometer: a semicircle of 37 microphone dots every 5 degrees at 5 m radius around the small sample at the centre, the red source star at 10 m on the normal above it, and the 10 m and 5 m distances dimensioned" width="88%"></picture>
+
+*The polar arc behind every `L_i` of Formula (5), to scale: 37 receivers every
+5 degrees at 5 m, the source twice as far out on the normal, and the sample a
+sliver at the centre.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import materials
+
+# The standard arrangement: 37 microphones every 5 degrees at 5 m, the
+# source at 10 m on the normal.
+materials.plot_goniometer_geometry()
+plt.show()
+```
+
+</details>
+
 The animation below runs that goniometer experiment numerically: the same
 plane wavefront hits a flat rigid panel and a Schroeder diffuser (an N = 7
 quadratic-residue profile), and the scattered energy on the receiver arc turns
@@ -652,6 +678,36 @@ about 1.34 m.
 from phonometry import materials
 print(round(materials.max_sampled_area_radius(5.0e-3), 3))   # 1.343  (metres)
 ```
+
+The whole arrangement fits in one to-scale drawing. `plot_insitu_geometry`
+draws the standard set-up with that sampled radius on the surface, and a
+measured `InsituAbsorptionResult` that retained its heights redraws its own
+with `result.plot_geometry()`.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_setup_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_setup_geometry.svg" alt="To-scale side view of the in-situ absorption set-up: the loudspeaker on its mast 1.25 m above the hatched road surface, the microphone on the same vertical at 0.25 m, the dashed surface-reflected path below it and the 1.34 m radius of the sampled area dimensioned on the surface" width="88%"></picture>
+
+*The standard geometry to scale: source at 1.25 m, microphone at 0.25 m on the
+same vertical, and the 5 ms window turned into the 1.34 m radius of road that
+actually contributes to the reflection.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import materials
+
+# The standard geometry: source at 1.25 m, microphone at 0.25 m, and the
+# 1.34 m sampled-area radius of the 5 ms window.
+materials.plot_insitu_geometry()
+plt.show()
+
+# A measured spectrum retains its heights and redraws its own set-up:
+#   result = materials.insitu_absorption_spectrum(hi, hr, fs)
+#   result.plot_geometry()
+```
+
+</details>
 
 ## 4. In-situ road absorption: spot method (ISO 13472-2)
 

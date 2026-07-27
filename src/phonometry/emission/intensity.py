@@ -114,6 +114,7 @@ class IntensityResult:
     total_pressure_intensity_index: float
     total_direction: int
     max_valid_frequency: float
+    spacing: float | None = None
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot Lp vs LI per band with the pressure-intensity index.
@@ -127,6 +128,22 @@ class IntensityResult:
 
         check_language(language)
         return plot_intensity(self, ax=ax, language=language, **kwargs)
+
+    def plot_geometry(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
+        """Draw the p-p probe with its spacer to scale.
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+
+        :raises ValueError: If the result does not retain its geometry.
+        """
+        from .._i18n import check_language
+        from .._plot.geometry import plot_intensity_result_geometry
+
+        check_language(language)
+        return plot_intensity_result_geometry(self, ax=ax, language=language, **kwargs)
 
 
 @dataclass(frozen=True)
@@ -369,6 +386,7 @@ def sound_intensity(
         total_pressure_intensity_index=total_lp - total_li,
         total_direction=1 if total_i >= 0.0 else -1,
         max_valid_frequency=0.1 * c / spacing,
+        spacing=float(spacing),
     )
 
 

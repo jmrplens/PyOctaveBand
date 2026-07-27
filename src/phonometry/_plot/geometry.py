@@ -40,18 +40,25 @@ if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
     from ..building.aperture_transmission import ApertureTransmissionResult
+    from ..building.facade_prediction import FacadeElement
+    from ..building.panel_transmission import SoundReductionResult
     from ..electroacoustics.piston import RadiatingPistonResult
+    from ..emission.intensity import IntensityResult
     from ..environmental.ground_barriers import BarrierInsertionLoss
     from ..materials.diffuser_design import DiffuserPolarResponse
     from ..materials.impedance_tube import ImpedanceTubeResult, TransferMatrix
     from ..materials.porous_absorber import Layer, LayeredAbsorberResult
+    from ..materials.road_absorption import InsituAbsorptionResult
     from ..materials.slow_sound_absorber import (
         HelmholtzResonator,
         SlitResonatorAbsorberResult,
     )
     from ..noise_control.silencers import ReactiveSilencerResult
     from ..room.image_source import ImageSourceResult
+    from ..room.open_plan import OpenPlanResult
     from ..simulation.fdtd import FDTD2D
+    from ..vibration.junction_transmission import JunctionTransmissionResult
+    from ..vibration.radiation_efficiency import RadiationEfficiencyResult
 
 #: The ``ReactiveSilencerResult.kind`` strings, shared with the dispatcher.
 _KIND_EXPANSION = "expansion chamber"
@@ -90,7 +97,6 @@ _STRINGS: dict[str, str] = {
     "Transmission tube (ASTM E2611), to scale":
         "Tubo de transmisión (ASTM E2611), a escala",
     "Loudspeaker": "Altavoz",
-    "Sample": "Muestra",
     "Termination": "Terminación",
     "Cross-section": "Sección transversal",
     "Plane-wave range {fl} to {fu} Hz": "Rango de onda plana {fl} a {fu} Hz",
@@ -131,6 +137,26 @@ _STRINGS: dict[str, str] = {
     "Impedance edge": "Borde de impedancia",
     "Rigid edge": "Borde rígido",
     "Probe": "Sonda",
+    "Composite facade elevation (areas to scale)":
+        "Alzado de fachada compuesta (áreas a escala)",
+    "Double wall cross-section": "Sección de la doble hoja",
+    "kg/m2": "kg/m2",
+    "Plate junction ({junction})": "Unión de placas ({junction})",
+    "In-situ absorption set-up": "Montaje de absorción in situ",
+    "Road surface": "Superficie de la calzada",
+    "Sampled area": "Zona muestreada",
+    "Dynamic stiffness rig": "Banco de rigidez dinámica",
+    "Load plate {mass} kg": "Placa de carga de {mass} kg",
+    "Specimen": "Probeta",
+    "Exciter": "Excitador",
+    "Free-field diffusion goniometer (plan)":
+        "Goniómetro de difusión en campo libre (planta)",
+    "Sample": "Muestra",
+    "Baffled plate ({boundary})": "Placa en pantalla ({boundary})",
+    "Open-plan measurement line": "Línea de medida en oficina diáfana",
+    "Workstations": "Puestos de trabajo",
+    "p-p intensity probe": "Sonda de intensidad p-p",
+    "Spacer": "Espaciador",
 }
 
 
@@ -2234,3 +2260,742 @@ def plot_fdtd_domain(
         )
     localize_axes(ax, language)
     return ax
+
+
+# ---------------------------------------------------------------------------
+# Composite facade elevation.
+# ---------------------------------------------------------------------------
+def plot_facade_elements(
+    elements: Sequence[FacadeElement],
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Draw a composite facade elevation with element areas to scale.
+
+    Each element of :func:`~phonometry.building.facade_sound_reduction` is a
+    tile whose drawn area equals its real area (small-area elements without
+    an area, such as airbriks rated by ``dn_e``, get a nominal 0,1 m2 tile).
+
+    :param elements: The
+        :class:`~phonometry.building.FacadeElement` sequence.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the element rectangles.
+    :return: The axes.
+    """
+    _check_language(language)
+    tiles = list(elements)
+    if not tiles:
+        raise ValueError("'elements' must contain at least one element.")
+    areas = [
+        float(area) if (area := getattr(e, "area", None)) else 0.1
+        for e in tiles
+    ]
+    if any(a <= 0.0 for a in areas):
+        raise ValueError("Element areas must be positive.")
+    if ax is None:
+        ax = _new_axes()
+    total = sum(areas)
+    height = float(np.sqrt(total / 2.0))  # a 2:1 facade footprint
+    from .._i18n import format_number
+
+    x = 0.0
+    fills = ("rigid", "cavity", "plate", "porous")
+    for index, (element, area) in enumerate(zip(tiles, areas)):
+        width = area / height
+        _material_rect(
+            ax, x, 0.0, width, height, fills[index % len(fills)],
+            **(dict(kwargs) if index == 0 else {}),
+        )
+        label = getattr(element, "name", "") or f"#{index + 1}"
+        ax.text(
+            x + 0.5 * width, 0.5 * height, label, fontsize=8, ha="center",
+            va="center", rotation=90 if width < 0.35 * height else 0,
+        )
+        ax.text(
+            x + 0.5 * width, -0.04 * height,
+            format_number(area, language, decimals=1, trim=True) + " m$^2$",
+            fontsize=8, ha="center", va="top",
+        )
+        x += width
+    _dim(ax, (0.0, 1.06 * height), (x, 1.06 * height),
+         _metres(x, language))
+    _dim(ax, (-0.03 * x, 0.0), (-0.03 * x, height), _metres(height, language))
+    _finish_geometry_axes(
+        ax, _t("Composite facade elevation (areas to scale)", language)
+    )
+    return ax
+
+
+def plot_facade_result_geometry(
+    result: Any,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Facade elevation for a prediction that retained its ``elements``."""
+    if getattr(result, "elements", None) is None:
+        raise ValueError(
+            "This result does not retain its elements; call "
+            "plot_facade_elements(elements) with the original sequence."
+        )
+    return plot_facade_elements(
+        result.elements, ax=ax, language=language, **kwargs
+    )
+
+
+# ---------------------------------------------------------------------------
+# Double wall (mass-spring-mass) cross-section.
+# ---------------------------------------------------------------------------
+#: Drawn leaf thickness per unit surface density (gypsum board density
+#: ~700 kg/m3 gives 12,5 mm for the classic 8,8 kg/m2 board).
+_LEAF_DENSITY = 700.0
+
+
+def plot_double_wall_geometry(
+    mass1: float,
+    mass2: float,
+    gap: float,
+    ax: Axes | None = None,
+    *,
+    resonance_frequency: float | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Draw the mass-spring-mass double wall to scale.
+
+    Two leaves separated by the ``gap``; leaf thicknesses are drawn from the
+    surface densities at a nominal board density, and the mass-spring-mass
+    resonance is annotated when given.
+
+    :param mass1: Surface density of the first leaf, in kg/m2.
+    :param mass2: Surface density of the second leaf, in kg/m2.
+    :param gap: Cavity depth, in metres.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param resonance_frequency: Optional ``f0`` to annotate, in Hz.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the leaf rectangles.
+    :return: The axes.
+    """
+    _check_language(language)
+    if mass1 <= 0.0 or mass2 <= 0.0 or gap <= 0.0:
+        raise ValueError("'mass1', 'mass2' and 'gap' must be positive.")
+    if ax is None:
+        ax = _new_axes()
+    t1 = mass1 / _LEAF_DENSITY
+    t2 = mass2 / _LEAF_DENSITY
+    height = 2.6 * (t1 + gap + t2)
+    from .._i18n import format_number
+
+    _material_rect(ax, 0.0, 0.0, t1, height, "plate", **kwargs)
+    _material_rect(ax, t1 + gap, 0.0, t2, height, "plate")
+    for x, mass, thickness in ((0.0, mass1, t1), (t1 + gap, mass2, t2)):
+        ax.text(
+            x + 0.5 * thickness, 0.72 * height,
+            format_number(mass, language, decimals=1, trim=True)
+            + " " + _t("kg/m2", language),
+            fontsize=8, ha="center", va="center", rotation=90,
+        )
+    _dim(ax, (t1, 0.0), (t1 + gap, 0.0), _mm(gap, language),
+         offset=-0.06 * height)
+    _dim(ax, (0.0, 0.0), (t1, 0.0), _mm(t1, language),
+         offset=-0.16 * height, tight=True)
+    _incidence_arrow(
+        ax, -0.5 * height * 0.5, 0.5 * height, 0.2 * height, language
+    )
+    if resonance_frequency is not None:
+        ax.text(
+            t1 + 0.5 * gap, 0.5 * height,
+            "f$_0$ = "
+            + format_number(
+                resonance_frequency, language, decimals=0, trim=True
+            )
+            + " Hz",
+            fontsize=8, ha="center", va="center", rotation=90,
+        )
+    _finish_geometry_axes(ax, _t("Double wall cross-section", language))
+    return ax
+
+
+def plot_double_wall_result_geometry(
+    result: SoundReductionResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Double-wall drawing for a result that retained its geometry."""
+    if result.mass1 is None or result.mass2 is None or result.gap is None:
+        raise ValueError(
+            "This result does not retain its double-wall geometry; call "
+            "plot_double_wall_geometry(mass1, mass2, gap)."
+        )
+    return plot_double_wall_geometry(
+        result.mass1, result.mass2, result.gap, ax=ax,
+        resonance_frequency=result.resonance_frequency, language=language,
+        **kwargs,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Plate junction (L / T / X).
+# ---------------------------------------------------------------------------
+def plot_junction_geometry(
+    junction: str,
+    thickness1: float,
+    thickness2: float,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Draw a plate junction cross-section to scale.
+
+    Plate 1 runs horizontally; the perpendicular plate(s) of thickness 2
+    form the L, T or X. The incident bending wave arrives on plate 1 and
+    the junction type follows
+    :func:`~phonometry.vibration.junction_transmission`.
+
+    :param junction: ``"L"``, ``"T1"``, ``"T2"`` or ``"X"``.
+    :param thickness1: Plate 1 thickness, in metres.
+    :param thickness2: Plate 2 thickness, in metres.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the plate-1 rectangle.
+    :return: The axes.
+    """
+    _check_language(language)
+    if junction not in ("L", "T1", "T2", "X"):
+        raise ValueError("'junction' must be 'L', 'T1', 'T2' or 'X'.")
+    if thickness1 <= 0.0 or thickness2 <= 0.0:
+        raise ValueError("Thicknesses must be positive.")
+    if ax is None:
+        ax = _new_axes()
+    h1, h2 = float(thickness1), float(thickness2)
+    arm = 5.0 * max(h1, h2)
+    # Plate 1 is continuous for T1 and X (its "plates 1 and 3" are the same
+    # panel); it stops against the perpendicular plate for L and T2.
+    x_left = -arm
+    x_right = arm if junction in ("T1", "X") else 0.5 * h2
+    _material_rect(ax, x_left, -0.5 * h1, x_right - x_left, h1, "plate",
+                   **kwargs)
+    # The perpendicular plate is continuous (both branches) for T2 and X.
+    down = junction in ("T2", "X")
+    _material_rect(ax, -0.5 * h2, 0.5 * h1, h2, arm, "plate")
+    if down:
+        _material_rect(ax, -0.5 * h2, -0.5 * h1 - arm, h2, arm, "plate")
+    _incidence_arrow(
+        ax, -arm - 0.5 * arm, 0.0, 0.35 * arm, language
+    )
+    _dim(ax, (-0.85 * arm, -0.5 * h1), (-0.85 * arm, 0.5 * h1),
+         _mm(h1, language), offset=-0.15 * arm, tight=True)
+    y_h2 = 0.5 * h1 + 1.12 * arm
+    _dim(ax, (-0.5 * h2, y_h2), (0.5 * h2, y_h2), _mm(h2, language),
+         tight=True)
+    _finish_geometry_axes(
+        ax, _t("Plate junction ({junction})", language).format(
+            junction=junction
+        )
+    )
+    return ax
+
+
+def plot_junction_result_geometry(
+    result: JunctionTransmissionResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Junction drawing for a result that retained its thicknesses."""
+    if result.thickness1 is None or result.thickness2 is None:
+        raise ValueError(
+            "This result does not retain the plate thicknesses; call "
+            "plot_junction_geometry(junction, thickness1, thickness2)."
+        )
+    return plot_junction_geometry(
+        result.junction, result.thickness1, result.thickness2, ax=ax,
+        language=language, **kwargs,
+    )
+
+
+# ---------------------------------------------------------------------------
+# In-situ absorption set-up (source over the road, microphone below).
+# ---------------------------------------------------------------------------
+def plot_insitu_geometry(
+    ax: Axes | None = None,
+    *,
+    source_height: float = 1.25,
+    mic_height: float = 0.25,
+    sampled_radius: float | None = 1.34,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Draw the in-situ surface-absorption set-up to scale.
+
+    Loudspeaker on its mast above the surface, microphone below it, direct
+    and surface-reflected paths, and the sampled-area radius on the ground.
+    Defaults are the standard heights (1,25 m source, 0,25 m microphone)
+    with the sampled radius of the standard 5 ms window.
+
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param source_height: Source height above the surface, in metres.
+    :param mic_height: Microphone height, in metres (< ``source_height``).
+    :param sampled_radius: Sampled-area radius drawn on the ground, in
+        metres; ``None`` omits it.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the surface rectangle.
+    :return: The axes.
+    """
+    _check_language(language)
+    if mic_height <= 0.0 or source_height <= mic_height:
+        raise ValueError(
+            "'source_height' must exceed 'mic_height' and both be positive."
+        )
+    if sampled_radius is not None and sampled_radius <= 0.0:
+        raise ValueError("'sampled_radius' must be positive when given.")
+    if ax is None:
+        ax = _new_axes()
+    half = max(source_height, sampled_radius or 0.0) * 1.2
+    _material_rect(
+        ax, -half, -0.06 * source_height, 2.0 * half, 0.06 * source_height,
+        "rigid", **kwargs,
+    )
+    ax.text(
+        half * 1.02, -0.03 * source_height, _t("Road surface", language),
+        fontsize=8, ha="left", va="center",
+    )
+    # Mast, source and microphone on the same vertical.
+    ax.plot([0.0, 0.0], [0.0, source_height], color=_C_MUTED,
+            linewidth=1.0, linestyle=":")
+    _loudspeaker(
+        ax, 0.0, source_height, 0.28 * source_height, language
+    )
+    _microphone(ax, 0.0, mic_height, 0.22 * source_height, "")
+    # Direct and reflected paths to the microphone.
+    ax.plot([0.0, 0.0], [source_height, mic_height], color=_C_PRIMARY,
+            linewidth=1.6)
+    ax.plot([0.0, 0.0], [mic_height, 0.0], color=_C_SECONDARY,
+            linewidth=1.4, linestyle="--")
+    if sampled_radius is not None:
+        ax.plot(
+            [-sampled_radius, sampled_radius],
+            [0.012 * source_height] * 2,
+            color=_C_PRIMARY, linewidth=3.0, solid_capstyle="butt",
+        )
+        _dim(ax, (0.0, -0.12 * source_height),
+             (sampled_radius, -0.12 * source_height),
+             _metres(sampled_radius, language))
+        ax.text(
+            -0.5 * sampled_radius, -0.14 * source_height,
+            _t("Sampled area", language), fontsize=8, ha="center", va="top",
+        )
+    off = 0.12 * source_height
+    _dim(ax, (-2.0 * off, 0.0), (-2.0 * off, mic_height),
+         _metres(mic_height, language), tight=True)
+    _dim(ax, (-4.0 * off, 0.0), (-4.0 * off, source_height),
+         _metres(source_height, language))
+    _finish_geometry_axes(ax, _t("In-situ absorption set-up", language))
+    return ax
+
+
+def plot_insitu_result_geometry(
+    result: InsituAbsorptionResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Set-up drawing for a result that retained its geometry."""
+    if result.source_height is None or result.mic_height is None:
+        raise ValueError(
+            "This result does not retain its set-up heights; call "
+            "plot_insitu_geometry(source_height=..., mic_height=...)."
+        )
+    return plot_insitu_geometry(
+        ax=ax, source_height=result.source_height,
+        mic_height=result.mic_height, language=language, **kwargs,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Dynamic stiffness rig (resonance method).
+# ---------------------------------------------------------------------------
+def plot_dynamic_stiffness_rig(
+    ax: Axes | None = None,
+    *,
+    specimen_side: float = 0.2,
+    specimen_thickness: float = 0.02,
+    load_mass: float = 8.0,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Draw the dynamic-stiffness resonance rig to scale.
+
+    Resilient specimen on the rigid base, the standard square load plate on
+    top (its mass annotated), the exciter above and an accelerometer on the
+    plate; defaults are the standard 200 mm square specimen under the 8 kg
+    plate.
+
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param specimen_side: Specimen side length, in metres.
+    :param specimen_thickness: Specimen thickness, in metres.
+    :param load_mass: Load-plate mass, in kilograms (annotation).
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the specimen rectangle.
+    :return: The axes.
+    """
+    _check_language(language)
+    if specimen_side <= 0.0 or specimen_thickness <= 0.0 or load_mass <= 0.0:
+        raise ValueError(
+            "'specimen_side', 'specimen_thickness' and 'load_mass' must be "
+            "positive."
+        )
+    if ax is None:
+        ax = _new_axes()
+    side = float(specimen_side)
+    t = float(specimen_thickness)
+    plate_t = 0.125 * side
+    from .._i18n import format_number
+
+    # Rigid base, specimen, load plate.
+    _material_rect(ax, -0.75 * side, -0.15 * side, 1.5 * side, 0.15 * side,
+                   "rigid")
+    _material_rect(ax, -0.5 * side, 0.0, side, t, "porous", **kwargs)
+    ax.text(0.55 * side, 0.5 * t, _t("Specimen", language), fontsize=8,
+            ha="left", va="center")
+    _material_rect(ax, -0.5 * side, t, side, plate_t, "plate")
+    ax.text(
+        0.0, t + 0.5 * plate_t,
+        _t("Load plate {mass} kg", language).format(
+            mass=format_number(load_mass, language, decimals=0, trim=True)
+        ),
+        fontsize=8, ha="center", va="center",
+    )
+    # Exciter above, accelerometer on the plate.
+    _material_rect(ax, -0.1 * side, t + plate_t + 0.25 * side, 0.2 * side,
+                   0.25 * side, "plate")
+    ax.annotate(
+        "", xy=(0.0, t + plate_t), xytext=(0.0, t + plate_t + 0.25 * side),
+        arrowprops={"arrowstyle": "-|>", "color": _C_REFERENCE,
+                    "linewidth": 1.6},
+    )
+    ax.text(0.14 * side, t + plate_t + 0.32 * side, _t("Exciter", language),
+            fontsize=8, ha="left", va="center")
+    _microphone(ax, 0.35 * side, t + plate_t, 0.18 * side, "")
+    _dim(ax, (-0.5 * side, -0.2 * side), (0.5 * side, -0.2 * side),
+         _mm(side, language))
+    _dim(ax, (-0.62 * side, 0.0), (-0.62 * side, t), _mm(t, language),
+         tight=True)
+    _finish_geometry_axes(ax, _t("Dynamic stiffness rig", language))
+    return ax
+
+
+# ---------------------------------------------------------------------------
+# Free-field diffusion goniometer (plan view).
+# ---------------------------------------------------------------------------
+def plot_goniometer_geometry(
+    ax: Axes | None = None,
+    *,
+    source_distance: float = 10.0,
+    receiver_radius: float = 5.0,
+    angular_step: float = 5.0,
+    sample_width: float = 0.6,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Draw the free-field diffusion goniometer in plan, to scale.
+
+    Receiver semicircle at its radius with one microphone per angular step,
+    the source on the normal at its distance and the sample at the centre;
+    defaults are the standard 10 m source, 5 m receiver arc and 5 degree
+    resolution (37 microphones).
+
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param source_distance: Source distance from the sample, in metres.
+    :param receiver_radius: Receiver-arc radius, in metres.
+    :param angular_step: Angular spacing of the receivers, in degrees.
+    :param sample_width: Drawn sample width, in metres.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the receiver scatter.
+    :return: The axes.
+    """
+    _check_language(language)
+    if source_distance <= 0.0 or receiver_radius <= 0.0:
+        raise ValueError(
+            "'source_distance' and 'receiver_radius' must be positive."
+        )
+    if not 0.0 < angular_step <= 90.0:
+        raise ValueError("'angular_step' must be in (0, 90] degrees.")
+    if ax is None:
+        ax = _new_axes()
+    angles = np.radians(np.arange(-90.0, 90.0 + 0.5 * angular_step,
+                                  angular_step))
+    xs = receiver_radius * np.sin(angles)
+    ys = receiver_radius * np.cos(angles)
+    kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault("s", 14)
+    ax.scatter(xs, ys, zorder=5, **kwargs)
+    ax.plot(xs, ys, color=_C_MUTED, linewidth=0.6, linestyle=":", zorder=2)
+    # Sample slab at the origin on the baseline.
+    _material_rect(
+        ax, -0.5 * sample_width, -0.03 * receiver_radius, sample_width,
+        0.03 * receiver_radius, "porous",
+    )
+    ax.text(-0.6 * sample_width, -0.015 * receiver_radius,
+            _t("Sample", language), fontsize=8, ha="right", va="center")
+    ax.plot([0.0], [source_distance], marker="*", markersize=13,
+            color=_C_REFERENCE, linestyle="none", zorder=6)
+    ax.text(0.0, 1.03 * source_distance, _t("Source", language), fontsize=8,
+            ha="center", va="bottom")
+    ax.plot([0.0, 0.0], [0.0, source_distance], color=_C_MUTED,
+            linewidth=0.8, linestyle="--", zorder=2)
+    _dim(ax, (0.0, 0.0), (receiver_radius, 0.0),
+         _metres(receiver_radius, language), offset=-0.06 * receiver_radius)
+    ax.text(
+        0.02 * source_distance, 0.5 * (receiver_radius + source_distance),
+        _metres(source_distance, language), fontsize=8, ha="left",
+        va="center", rotation=90,
+    )
+    _finish_geometry_axes(
+        ax, _t("Free-field diffusion goniometer (plan)", language)
+    )
+    return ax
+
+
+# ---------------------------------------------------------------------------
+# Baffled rectangular plate (radiation efficiency).
+# ---------------------------------------------------------------------------
+def plot_plate_geometry(
+    length_x: float,
+    length_y: float,
+    ax: Axes | None = None,
+    *,
+    boundary: str = "simply_supported",
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Draw the baffled rectangular plate of the radiation model, to scale.
+
+    Plate a x b inside its baffle frame, boundary condition in the title.
+
+    :param length_x: Plate length ``a``, in metres.
+    :param length_y: Plate width ``b``, in metres.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param boundary: Boundary-condition label of the model.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the plate rectangle.
+    :return: The axes.
+    """
+    _check_language(language)
+    if length_x <= 0.0 or length_y <= 0.0:
+        raise ValueError("'length_x' and 'length_y' must be positive.")
+    if ax is None:
+        ax = _new_axes()
+    a, b = float(length_x), float(length_y)
+    frame = 0.18 * max(a, b)
+    _material_rect(ax, -frame, -frame, a + 2.0 * frame, b + 2.0 * frame,
+                   "rigid")
+    _material_rect(ax, 0.0, 0.0, a, b, "plate", **kwargs)
+    _dim(ax, (0.0, b + 0.5 * frame), (a, b + 0.5 * frame),
+         _metres(a, language))
+    _dim(ax, (a + 0.5 * frame, 0.0), (a + 0.5 * frame, b),
+         _metres(b, language))
+    _finish_geometry_axes(
+        ax, _t("Baffled plate ({boundary})", language).format(
+            boundary=boundary
+        )
+    )
+    return ax
+
+
+def plot_radiation_result_geometry(
+    result: RadiationEfficiencyResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Plate drawing for a radiation-efficiency result (always retained)."""
+    return plot_plate_geometry(
+        result.length_x, result.length_y, ax=ax, boundary=result.boundary,
+        language=language, **kwargs,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Open-plan measurement line (plan view).
+# ---------------------------------------------------------------------------
+def plot_open_plan_geometry(
+    positions: ArrayLike,
+    ax: Axes | None = None,
+    *,
+    rd: float | None = None,
+    rp: float | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Draw the open-plan measurement line to scale.
+
+    Source at the origin, the microphone line across the workstations, and
+    the distraction and privacy distances marked on the axis when given.
+
+    :param positions: Microphone distances from the source, in metres (1-D).
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param rd: Distraction distance, in metres, or ``None``.
+    :param rp: Privacy distance, in metres, or ``None``.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the microphone scatter.
+    :return: The axes.
+    """
+    _check_language(language)
+    pos = np.sort(np.asarray(positions, dtype=np.float64).ravel())
+    if pos.size < 2 or np.any(pos <= 0.0):
+        raise ValueError(
+            "'positions' needs at least two positive distances."
+        )
+    if ax is None:
+        ax = _new_axes()
+    span = float(pos.max())
+    desk = 0.16 * span / max(pos.size - 1, 1)
+    # Workstation blocks midway between consecutive microphones.
+    from itertools import pairwise
+
+    for left, right in pairwise(pos):
+        centre = 0.5 * (left + right)
+        _material_rect(
+            ax, centre - desk, -0.5 * desk, 2.0 * desk, desk, "plate",
+            linewidth=0.6, alpha=0.5,
+        )
+    ax.text(0.12 * span, 3.0 * desk, _t("Workstations", language),
+            fontsize=8, ha="center", va="bottom")
+    ax.plot([0.0], [0.0], marker="*", markersize=13, color=_C_REFERENCE,
+            linestyle="none", zorder=6)
+    ax.text(0.0, -1.4 * desk, _t("Source", language), fontsize=8,
+            ha="center", va="top")
+    kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault("s", 18)
+    ax.scatter(pos, np.zeros_like(pos), zorder=5, **kwargs)
+    ax.plot([0.0, span], [0.0, 0.0], color=_C_MUTED, linewidth=0.8,
+            linestyle=":", zorder=2)
+    from .._i18n import format_number
+
+    for value, key in ((rd, "r$_D$"), (rp, "r$_P$")):
+        if value is not None and np.isfinite(value):
+            ax.plot([value, value], [-2.2 * desk, 2.2 * desk],
+                    color=_C_SECONDARY, linewidth=1.2, linestyle="--")
+            ax.text(
+                value, 2.4 * desk,
+                key + " = "
+                + format_number(value, language, decimals=1, trim=True)
+                + " " + _t("m", language),
+                fontsize=8, ha="center", va="bottom",
+            )
+    _dim(ax, (0.0, -2.6 * desk), (span, -2.6 * desk),
+         _metres(span, language))
+    _finish_geometry_axes(ax, _t("Open-plan measurement line", language))
+    return ax
+
+
+def plot_open_plan_result_geometry(
+    result: OpenPlanResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Measurement-line drawing for a result that retained its positions."""
+    if result.positions_m is None:
+        raise ValueError(
+            "This result does not retain its microphone positions; call "
+            "plot_open_plan_geometry(positions)."
+        )
+    return plot_open_plan_geometry(
+        result.positions_m, ax=ax, rd=result.rd, rp=result.rp,
+        language=language, **kwargs,
+    )
+
+
+# ---------------------------------------------------------------------------
+# p-p intensity probe.
+# ---------------------------------------------------------------------------
+def plot_pp_probe_geometry(
+    spacing: float = 0.012,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Draw the face-to-face p-p intensity probe to scale.
+
+    Two phase-matched microphones separated by the solid spacer, with the
+    intensity axis through both; default is the classic 12 mm spacer.
+
+    :param spacing: Microphone separation ``dr``, in metres.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the spacer rectangle.
+    :return: The axes.
+    """
+    from matplotlib.patches import Circle, Rectangle
+
+    _check_language(language)
+    if spacing <= 0.0:
+        raise ValueError("'spacing' must be positive.")
+    if ax is None:
+        ax = _new_axes()
+    dr = float(spacing)
+    d_mic = 0.55 * dr                       # half-inch capsule vs 12 mm
+    body = 2.2 * dr
+    # Spacer between the two face-to-face capsules.
+    _material_rect(ax, -0.5 * dr + 0.5 * d_mic, -0.18 * dr,
+                   dr - d_mic, 0.36 * dr, "cavity", **kwargs)
+    ax.text(0.0, 0.28 * dr, _t("Spacer", language), fontsize=8,
+            ha="center", va="bottom")
+    for sign in (-1.0, 1.0):
+        centre = sign * 0.5 * dr
+        ax.add_patch(Circle((centre, 0.0), 0.5 * d_mic,
+                            facecolor=_C_PRIMARY, edgecolor=_C_EDGE,
+                            linewidth=0.8, zorder=5))
+        ax.add_patch(Rectangle(
+            (centre + sign * 0.5 * d_mic, -0.30 * dr)
+            if sign > 0 else (centre - body - 0.5 * d_mic, -0.30 * dr),
+            body, 0.60 * dr, facecolor=_C_MUTED, edgecolor=_C_EDGE,
+            linewidth=0.8, alpha=0.6,
+        ))
+    x_arrow = 0.5 * dr + d_mic + body
+    # Annotation arrows do not autoscale: a silent sentinel keeps the tip
+    # inside the axes limits.
+    ax.plot([x_arrow + 1.5 * dr], [0.0], linestyle="none")
+    ax.annotate(
+        "", xy=(x_arrow + 1.3 * dr, 0.0), xytext=(x_arrow + 0.2 * dr, 0.0),
+        arrowprops={"arrowstyle": "-|>", "color": _C_PRIMARY,
+                    "linewidth": 1.6},
+    )
+    ax.text(x_arrow + 0.75 * dr, 0.1 * dr, "I$_r$", fontsize=9,
+            ha="center", va="bottom", color=_C_PRIMARY)
+    _dim(ax, (-0.5 * dr, -0.5 * dr), (0.5 * dr, -0.5 * dr),
+         _mm(dr, language), tight=True)
+    _finish_geometry_axes(ax, _t("p-p intensity probe", language))
+    return ax
+
+
+def plot_intensity_result_geometry(
+    result: IntensityResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Probe drawing for a result that retained its spacer."""
+    if result.spacing is None:
+        raise ValueError(
+            "This result does not retain its microphone spacing; call "
+            "plot_pp_probe_geometry(spacing)."
+        )
+    return plot_pp_probe_geometry(
+        result.spacing, ax=ax, language=language, **kwargs
+    )

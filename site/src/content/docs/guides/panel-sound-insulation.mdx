@@ -189,6 +189,37 @@ print(round(mass_spring_mass_resonance(12.0, 12.0, 0.075, cavity_medium=fill))) 
 dw.plot()   # double-wall R(f) with the mass-spring-mass resonance marked (needs matplotlib)
 ```
 
+The classic lightweight case is worth drawing to scale: two 8.8 kg/m²
+plasterboard leaves on a 100 mm empty cavity put $f_0$ at 90 Hz.
+`plot_double_wall_geometry` annotates the resonance in the cavity, and a
+`double_wall_transmission_loss` result that retained its geometry redraws its
+own cross-section with `dw.plot_geometry()`.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/double_wall_geometry.svg" alt="To-scale cross-section of a lightweight double wall: two grey plasterboard leaves of 8.8 kg/m2 each, drawn 12.6 mm thick, separated by the 100 mm cavity, the incident-sound arrow arriving from the left and the mass-spring-mass resonance f0 = 90 Hz annotated in the cavity" width="80%" />
+
+*The whole model in one section: the two thin leaves are the masses, the
+100 mm air gap is the spring, and $f_0$ = 90 Hz is where the dip of every
+double-wall curve sits.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import mass_spring_mass_resonance, plot_double_wall_geometry
+
+# Two 8.8 kg/m2 plasterboard leaves on a 100 mm cavity.
+f0 = mass_spring_mass_resonance(8.8, 8.8, 0.1)
+plot_double_wall_geometry(8.8, 8.8, 0.1, resonance_frequency=f0)
+plt.show()
+
+# A double-wall prediction retains its geometry and redraws it:
+#   dw = double_wall_transmission_loss(bands, 8.8, 8.8, 0.1)
+#   dw.plot_geometry()
+```
+
+</details>
+
 ## Slits, holes and apertures (Hopkins 4.3.10)
 
 A small air path is the real limit on any heavy construction. The transmission

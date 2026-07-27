@@ -363,6 +363,8 @@ JunctionTransmissionResult(
     straight: np.ndarray | None,
     corner_average: float,
     straight_average: float | None,
+    thickness1: float | None = None,
+    thickness2: float | None = None,
 )
 ```
 
@@ -409,6 +411,62 @@ Plot `tau(theta)` versus incidence angle for this junction.
 
 Requires matplotlib (`pip install phonometry[plot]`); returns the
 `Axes`.
+
+### JunctionTransmissionResult.plot_geometry()
+
+```python
+JunctionTransmissionResult.plot_geometry(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw the plate-junction cross-section to scale.
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the result does not retain its geometry. |
+
+## plot_junction_geometry
+
+```python
+plot_junction_geometry(
+    junction: str,
+    thickness1: float,
+    thickness2: float,
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw a plate junction cross-section to scale.
+
+Plate 1 runs horizontally; the perpendicular plate(s) of thickness 2
+form the L, T or X. The incident bending wave arrives on plate 1 and
+the junction type follows
+[`junction_transmission`](/phonometry/reference/api/vibration/junction-transmission/).
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `junction` | `"L"`, `"T1"`, `"T2"` or `"X"`. |
+| `thickness1` | Plate 1 thickness, in metres. |
+| `thickness2` | Plate 2 thickness, in metres. |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the plate-1 rectangle. |
+
+**Returns:** The axes.
 
 ## straight_transmission_coefficient
 

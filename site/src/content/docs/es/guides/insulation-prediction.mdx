@@ -482,6 +482,42 @@ fig.tight_layout(); plt.show()
 
 </details>
 
+El compuesto se razona mejor dibujado como áreas. `plot_facade_elements`
+tesela el alzado con el área dibujada de cada elemento igual a su área real
+(aquí un muro de fábrica de 6 m², una ventana de 1,5 m² y su cajón de persiana
+de 0,3 m²), y una predicción que retuvo sus `elements` redibuja su propia
+fachada con `fac.plot_geometry()`.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_elevation_geometry_es.svg" alt="Alzado a escala de una fachada compuesta: un muro de fábrica rayado de 6 m2, una ventana de 1,5 m2 y un estrecho cajón de persiana de 0,3 m2 dibujados como piezas de una fachada de 3,95 m por 1,97 m cuyas áreas dibujadas igualan las reales, cada pieza rotulada con su área y el ancho y alto totales acotados" width="88%" />
+
+*Las áreas que pondera la suma energética, a escala: la ventana tiene un
+cuarto del área del muro pero cada metro cuadrado suyo transmite cien veces
+más, así que las piezas pequeñas deciden $R'$.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import building
+
+# El compuesto de la predicción dibujado como áreas: 6 m² de muro, una
+# ventana de 1.5 m² y su cajón de persiana de 0.3 m².
+elements = [
+    building.FacadeElement("Masonry wall", area=6.0, r=[50.0] * 5),
+    building.FacadeElement("Window", area=1.5, r=[30.0] * 5),
+    building.FacadeElement("Roller shutter box", area=0.3, r=[22.0] * 5),
+]
+building.plot_facade_elements(elements, language="es")
+plt.show()
+
+# Una predicción retiene sus elementos y redibuja su propio alzado:
+#   fac = building.facade_sound_reduction(elements, area=7.8, volume=50.0)
+#   fac.plot_geometry(language="es")
+```
+
+</details>
+
 La predicción de fachada también escribe un informe de **predicción** de una
 página mediante un método `report(path)`, con la misma maquetación que las
 fichas de predicción a ruido aéreo y de impactos. `FacadePredictionResult.report()`

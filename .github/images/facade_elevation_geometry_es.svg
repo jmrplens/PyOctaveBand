@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="640.8pt" height="424.798125pt" viewBox="0 0 640.8 424.798125" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.1, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 424.798125 
+L 640.8 424.798125 
+L 640.8 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 67.819355 346.488448 
+L 456.404963 346.488448 
+L 456.404963 93.907802 
+L 67.819355 93.907802 
+z
+" clip-path="url(#p9affbae2dc)" style="fill: url(#h32e9a0c4a8); opacity: 0.5; stroke: #555555; stroke-width: 0.9; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 456.404963 346.488448 
+L 553.551365 346.488448 
+L 553.551365 93.907802 
+L 456.404963 93.907802 
+z
+" clip-path="url(#p9affbae2dc)" style="fill: #aec7e8; opacity: 0.5; stroke: #555555; stroke-width: 0.9; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 553.551365 346.488448 
+L 572.980645 346.488448 
+L 572.980645 93.907802 
+L 553.551365 93.907802 
+z
+" clip-path="url(#p9affbae2dc)" style="fill: #9e9e9e; opacity: 0.85; stroke: #555555; stroke-width: 0.9; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle" x="262.112159" y="222.276563" transform="rotate(-0 262.112159 222.276563)">Masonry wall</text>
+   </g>
+   <g id="text_2">
+    <!-- 6 m$^2$ -->
+    <g transform="translate(252.432159 364.111673)">
+     <text>
+      <tspan x="0" y="-0.53975" style="font-size: 8px; font-family: sans-serif">6</tspan>
+      <tspan x="5.089844" y="-0.53975" style="font-size: 8px; font-family: sans-serif"> </tspan>
+      <tspan x="7.632812" y="-0.53975" style="font-size: 8px; font-family: sans-serif">m</tspan>
+      <tspan x="15.502344" y="-3.84375" style="font-size: 5.6px; font-family: sans-serif">2</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle" x="504.978164" y="222.276563" transform="rotate(-0 504.978164 222.276563)">Window</text>
+   </g>
+   <g id="text_4">
+    <!-- 1,5 m$^2$ -->
+    <g transform="translate(491.498164 364.111673)">
+     <text>
+      <tspan x="0" y="-0.53975" style="font-size: 8px; font-family: sans-serif">1</tspan>
+      <tspan x="5.089844" y="-0.53975" style="font-size: 8px; font-family: sans-serif">,</tspan>
+      <tspan x="7.632812" y="-0.53975" style="font-size: 8px; font-family: sans-serif">5</tspan>
+      <tspan x="12.722656" y="-0.53975" style="font-size: 8px; font-family: sans-serif"> </tspan>
+      <tspan x="15.265625" y="-0.53975" style="font-size: 8px; font-family: sans-serif">m</tspan>
+      <tspan x="23.135156" y="-3.84375" style="font-size: 5.6px; font-family: sans-serif">2</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 8px; font-family: sans-serif" transform="translate(565.344442 255.743125) rotate(-90)">Roller shutter box</text>
+   </g>
+   <g id="text_6">
+    <!-- 0,3 m$^2$ -->
+    <g transform="translate(549.786005 364.111673)">
+     <text>
+      <tspan x="0" y="-0.53975" style="font-size: 8px; font-family: sans-serif">0</tspan>
+      <tspan x="5.089844" y="-0.53975" style="font-size: 8px; font-family: sans-serif">,</tspan>
+      <tspan x="7.632812" y="-0.53975" style="font-size: 8px; font-family: sans-serif">3</tspan>
+      <tspan x="12.722656" y="-0.53975" style="font-size: 8px; font-family: sans-serif"> </tspan>
+      <tspan x="15.265625" y="-0.53975" style="font-size: 8px; font-family: sans-serif">m</tspan>
+      <tspan x="23.135156" y="-3.84375" style="font-size: 5.6px; font-family: sans-serif">2</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_7">
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="320.4" y="16.798125" transform="rotate(-0 320.4 16.798125)">Alzado de fachada compuesta (áreas a escala)</text>
+   </g>
+   <g id="patch_5">
+    <path d="M 70.82585 78.752964 
+Q 320.400121 78.752964 569.974392 78.752964 
+" style="fill: none; stroke: #555555; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 74.82585 80.752964 
+L 70.82585 78.752964 
+L 74.82585 76.752964 
+" style="fill: none; stroke: #555555; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 565.974392 76.752964 
+L 569.974392 78.752964 
+L 565.974392 80.752964 
+" style="fill: none; stroke: #555555; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 52.664516 343.481952 
+Q 52.664516 220.197852 52.664516 96.913751 
+" style="fill: none; stroke: #555555; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 54.664516 339.481952 
+L 52.664516 343.481952 
+L 50.664516 339.481952 
+" style="fill: none; stroke: #555555; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 50.664516 100.913751 
+L 52.664516 96.913751 
+L 54.664516 100.913751 
+" style="fill: none; stroke: #555555; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle" x="320.4" y="71.831089" transform="rotate(-0 320.4 71.831089)">3,95 m</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 8px; font-family: sans-serif; text-anchor: middle" x="45.742641" y="220.198125" transform="rotate(-90 45.742641 220.198125)">1,97 m</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p9affbae2dc">
+   <rect x="7.2" y="22.798125" width="626.4" height="394.8"/>
+  </clipPath>
+ </defs>
+ <defs>
+  <pattern id="h32e9a0c4a8" patternUnits="userSpaceOnUse" x="0" y="0" width="72" height="72">
+   <rect x="0" y="0" width="73" height="73" fill="#9e9e9e"/>
+   <path d="M -36 36 
+L 36 -36 
+M -30 42 
+L 42 -30 
+M -24 48 
+L 48 -24 
+M -18 54 
+L 54 -18 
+M -12 60 
+L 60 -12 
+M -6 66 
+L 66 -6 
+M 0 72 
+L 72 0 
+M 6 78 
+L 78 6 
+M 12 84 
+L 84 12 
+M 18 90 
+L 90 18 
+M 24 96 
+L 96 24 
+M 30 102 
+L 102 30 
+M 36 108 
+L 108 36 
+" style="fill: #555555; stroke: #555555; stroke-width: 1.0; stroke-linecap: butt; stroke-linejoin: miter; stroke-opacity: 0.5"/>
+  </pattern>
+ </defs>
+</svg>
