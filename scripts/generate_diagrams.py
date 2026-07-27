@@ -913,6 +913,114 @@ _ES: dict[str, str] = {
         ".plot()",
     "deterministic: same inputs, bit-identical outputs":
         "determinista: mismas entradas, salidas idénticas bit a bit",
+    # Sound level meter chain (IEC 61672-1)
+    "Sound level meter measurement chain (IEC 61672-1)":
+        "Cadena de medición del sonómetro (IEC 61672-1)",
+    "Sound calibrator (class 1)": "Calibrador acústico (clase 1)",
+    "coupled for": "acoplado para",
+    "the level check": "verificar el nivel",
+    "Windscreen": "Pantalla antiviento",
+    "Microphone + preamplifier": "Micrófono + preamplificador",
+    "free-field capsule, high-impedance stage":
+        "cápsula de campo libre, etapa de alta impedancia",
+    "Frequency weighting  A / C / Z": "Ponderación frecuencial  A / C / Z",
+    "all three are 0 dB at 1 kHz; class 1: ±0.7 dB":
+        "las tres valen 0 dB a 1 kHz; clase 1: ±0,7 dB",
+    "Squaring + time weighting  F / S":
+        "Cuadrado + ponderación temporal  F / S",
+    "exponential detector: τF = 125 ms, τS = 1 s":
+        "detector exponencial: τF = 125 ms, τS = 1 s",
+    "Display": "Pantalla",
+    "LAF(t), LAS(t) in dB re 20 µPa": "LAF(t), LAS(t) en dB re 20 µPa",
+    # Laboratory sound insulation suite (ISO 10140)
+    "Laboratory sound insulation suite (ISO 10140)":
+        "Cámaras de aislamiento acústico de laboratorio (ISO 10140)",
+    "structural break": "junta estructural",
+    "Test element in the test opening":
+        "Elemento de ensayo en la abertura de ensayo",
+    "moving microphone": "micrófono móvil",
+    "sweep radius ≥ 1 m": "radio de barrido ≥ 1 m",
+    "Test opening ≈ 10 m² (3.75 m × 2.7 m); shorter edge ≥ 2.3 m":
+        "Abertura de ensayo ≈ 10 m² (3,75 m × 2,7 m); lado menor ≥ 2,3 m",
+    "Room volumes ≥ 50 m³, differing by at least 10 %":
+        "Volúmenes de sala ≥ 50 m³, con diferencia de al menos el 10 %",
+    "Continuously moving microphone: sweep radius ≥ 1 m, traverse ≥ 15 s":
+        "Micrófono en movimiento continuo: radio de barrido ≥ 1 m, "
+        "recorrido ≥ 15 s",
+    "5.0 m": "5,0 m",
+    "4.6 m": "4,6 m",
+    "4.1 m": "4,1 m",
+    "3.75 m": "3,75 m",
+    # Junction vibration measurement (ISO 10848)
+    "Junction vibration measurement on L- and T-junctions (ISO 10848)":
+        "Medición de vibración en uniones en L y en T (ISO 10848)",
+    "L-junction": "Unión en L",
+    "T-junction": "Unión en T",
+    "Shaker or hammer on element i": "Excitador o martillo sobre el elemento i",
+    "accelerometers on i and j": "acelerómetros en i y j",
+    "lij ≥ 2.3 m": "lij ≥ 2,3 m",
+    "concrete plates 140 mm to 200 mm thick":
+        "placas de hormigón de 140 mm a 200 mm de espesor",
+    "lij ≥ 2.3 m along the junction; element sizes 3.0 m ≤ li < 6.0 m":
+        "lij ≥ 2,3 m a lo largo de la unión; dimensiones de elemento "
+        "3,0 m ≤ li < 6,0 m",
+    "≥ 4 excitation positions on i; accelerometers ≥ 0.25 m from edges, ≥ 0.5 m apart":
+        "≥ 4 posiciones de excitación en i; acelerómetros a ≥ 0,25 m de los "
+        "bordes y ≥ 0,5 m entre sí",
+    "Kij = D̄v,ij + 10 lg( lij / √(ai·aj) ),   ai = equivalent absorption length":
+        "Kij = D̄v,ij + 10 lg( lij / √(ai·aj) ),   ai = long. de "
+        "absorción equiv.",
+    # Sound power from surface vibration (ISO/TS 7849)
+    "Sound power from surface vibration (ISO/TS 7849)":
+        "Potencia acústica a partir de la vibración superficial (ISO/TS 7849)",
+    "Vibrating measurement surface S": "Superficie de medición vibrante S",
+    "Machine under test": "Máquina en ensayo",
+    "radiated airborne sound": "sonido aéreo radiado",
+    "Number of positions N": "Número de posiciones N",
+    "one accelerometer per cell of area S/N":
+        "un acelerómetro por celda de área S/N",
+    "Survey sound power": "Potencia acústica de control",
+    "ε = 1 assumed → upper limit LWA,max":
+        "se asume ε = 1 → límite superior LWA,max",
+    "normal surface velocity, A-weighted r.m.s.":
+        "velocidad normal eficaz, ponderada A",
+    "2.5 m": "2,5 m",
+    "1.6 m": "1,6 m",
+    # Ship radiated-noise measurement geometry (ISO 17208-1)
+    "Ship radiated-noise measurement geometry (ISO 17208-1)":
+        "Geometría de medición del ruido radiado por buques (ISO 17208-1)",
+    "Ship under test": "Buque en ensayo",
+    "Surface buoy": "Boya de superficie",
+    "vertical array of 3 hydrophones": "array vertical de 3 hidrófonos",
+    "ballast": "lastre",
+    "sea floor": "fondo marino",
+    "Plan view": "Vista en planta",
+    "course": "rumbo",
+    "data window": "ventana de datos",
+    "dCPA ≥ 100 m (or 1·L)": "dCPA ≥ 100 m (o 1·L)",
+    "water depth ≥ 150 m (or 1.5·L)": "profundidad ≥ 150 m (o 1,5·L)",
+    "Four runs, two per side; levels averaged while the ship crosses the data window":
+        "Cuatro pasadas, dos por banda; niveles promediados mientras el buque "
+        "cruza la ventana de datos",
+    "Hydrophone depths from the 15°, 30° and 45° depression angles at r = dCPA; L = ship length":
+        "Profundidades de hidrófono según los ángulos de depresión de 15°, "
+        "30° y 45° a r = dCPA; L = eslora",
+    # SOFAR channel (deep sound channel)
+    "The SOFAR channel: a deep-ocean sound waveguide":
+        "El canal SOFAR: una guía de ondas del océano profundo",
+    "Sound-speed profile c(z)": "Perfil de velocidad del sonido c(z)",
+    "Ray paths near the axis": "Trayectorias de rayos cerca del eje",
+    "sea surface": "superficie del mar",
+    "source on the channel axis": "fuente en el eje del canal",
+    "rays that stay in the channel meet no surface or bottom loss":
+        "los rayos que permanecen en el canal no sufren pérdidas en "
+        "superficie ni en fondo",
+    "c rises toward the surface (temperature) and toward the bottom (pressure); the minimum traps sound":
+        "c aumenta hacia la superficie (temperatura) y hacia el fondo "
+        "(presión); el mínimo atrapa el sonido",
+    "rays launched within about ±12° of the axis stay trapped and can cross entire oceans":
+        "los rayos lanzados a menos de unos ±12° del eje quedan atrapados "
+        "y pueden cruzar océanos enteros",
 }
 
 
@@ -4179,6 +4287,480 @@ def _d_fdtd(s: SVG, th: Theme) -> None:
            th.muted, "middle")
 
 
+# ---------------------------------------------------------------------------
+# Sound level meter chain (IEC 61672-1)
+# ---------------------------------------------------------------------------
+
+def _d_slm_chain(s: SVG, th: Theme) -> None:
+    """IEC 61672-1 sound level meter: the acoustic front end on the left
+    (windscreen, microphone, coupled class 1 calibrator) feeding the
+    four-stage level chain on the right."""
+    gy = 508.0
+    s.ground(gy, 40.0, 330.0)
+
+    # --- Acoustic calibrator, coupled onto the capsule for the level check --
+    mx = 165.0
+    s.text(mx, 68.0, "Sound calibrator (class 1)", 20, th.fg, bold=True)
+    s.rect(mx - 62, 82.0, 124, 84, th.panel, th.fg, rx=10, sw=2)
+    s.text(mx, 118.0, "94.0 dB", 26, th.secondary, bold=True, mono=True)
+    s.text(mx, 146.0, "1 kHz", 20, th.muted, mono=True)
+    s.rect(mx - 15, 166.0, 30, 12, th.fg, rx=3)            # coupler cavity
+    s.arrow(mx, 184.0, mx, 236.0, th.secondary, 2.0)
+    s.text(mx - 16, 202.0, "coupled for", 15, th.muted, anchor="end",
+           italic=True)
+    s.text(mx - 16, 222.0, "the level check", 15, th.muted, anchor="end",
+           italic=True)
+
+    # --- Microphone on a stand; the windscreen is fitted for measurement ----
+    cap_top = 248.0
+    s.mic(mx, cap_top, gy, 1.25)
+    s.ellipse(mx, cap_top + 18, 42, 42, "none", th.muted, 1.6, dash="5,4")
+    s.line(mx - 30, cap_top + 49, mx - 65, cap_top + 76, th.muted, 1.0)
+    s.text(mx - 79, cap_top + 94, "Windscreen", 17, th.fg)
+
+    # --- The four-stage level chain (vertical) ------------------------------
+    cx, bw, bh = 610.0, 400.0, 78.0
+    x0 = cx - bw / 2
+    chain = [
+        (96.0, "Microphone + preamplifier",
+         "free-field capsule, high-impedance stage"),
+        (208.0, "Frequency weighting  A / C / Z",
+         "all three are 0 dB at 1 kHz; class 1: ±0.7 dB"),
+        (320.0, "Squaring + time weighting  F / S",
+         "exponential detector: τF = 125 ms, τS = 1 s"),
+    ]
+    for by, l1, l2 in chain:
+        s.rect(x0, by, bw, bh, th.panel, th.primary, rx=12, sw=2)
+        s.text(cx, by + 33, l1, 21, th.fg, bold=True)
+        s.text(cx, by + 59, l2, 17, th.muted)
+    s.rect(x0, 432.0, bw, bh, "none", th.accent, rx=12, sw=2.4)
+    s.text(cx, 465.0, "Display", 21, th.fg, bold=True)
+    s.text(cx, 491.0, "LAF(t), LAS(t) in dB re 20 µPa", 17, th.accent)
+    for y0 in (174.0, 286.0, 398.0):
+        s.arrow(cx, y0, cx, y0 + 32, th.fg, 2.0)
+    # Sound pressure into the front end.
+    s.arrow(226.0, 268.0, x0 - 8, 135.0, th.fg, 2.0)
+
+
+# ---------------------------------------------------------------------------
+# Laboratory sound insulation suite (ISO 10140)
+# ---------------------------------------------------------------------------
+
+def _d_insulation_lab(s: SVG, th: Theme) -> None:
+    """ISO 10140 laboratory transmission suite in plan view: two
+    structurally decoupled reverberant rooms, the test element mounted in
+    the ~10 m2 test opening, a corner loudspeaker in the source room and a
+    continuously moving (rotating) microphone in each room."""
+    top = 92.0
+    sc = 72.0                       # px per metre
+    src_bot = top + 4.4 * sc        # source room 5.0 m x 4.4 m
+    rec_bot = top + 4.1 * sc        # receiving room 4.6 m x 4.1 m
+    rec_r = 470.0 + 4.6 * sc
+
+    # Room shells (separate structures).
+    s.rect(70, top, 360, src_bot - top, th.panel, th.fg, rx=4, sw=3)
+    s.rect(470, top, rec_r - 470, rec_bot - top, th.panel, th.fg, rx=4, sw=3)
+    s.text(90, top + 30, "Source room", 21, th.fg, bold=True, anchor="start")
+    s.text(90, top + 56, "V₁ ≈ 59 m³", 17, th.muted, anchor="start", mono=True)
+    s.text(486, top + 30, "Receiving room", 21, th.fg, bold=True, anchor="start")
+    s.text(486, top + 56, "V₂ ≈ 51 m³", 17, th.muted, anchor="start", mono=True)
+
+    # Test opening (3.75 m in plan) with the specimen mounted; filler stubs
+    # from each shell with an air gap between them (the structural break).
+    op_t, op_b = 110.0, 380.0
+    s.rect(430, top, 14, op_t - top, th.panel, th.fg, sw=1.6)
+    s.rect(430, op_b, 14, src_bot - op_b, th.panel, th.fg, sw=1.6)
+    s.rect(456, top, 14, op_t - top, th.panel, th.fg, sw=1.6)
+    s.rect(456, op_b, 14, rec_bot - op_b, th.panel, th.fg, sw=1.6)
+    s.rect(438, op_t, 24, op_b - op_t, th.panel, th.secondary, sw=2)
+    for hy in range(int(op_t) + 12, int(op_b), 16):
+        s.line(440, hy + 10, 460, hy - 4, th.secondary, 1.0)
+    s.text(450, 66, "structural break", 15, th.muted, italic=True)
+    s.line(450, 72, 450, 102, th.muted, 1.0, dash="3,3")
+    s.text(450, 452, "Test element in the test opening", 17, th.secondary,
+           bold=True)
+    s.line(450, op_b + 4, 450, 436, th.muted, 1.0, dash="3,3")
+
+    # Loudspeaker in a corner of the source room.
+    lsx, lsy = 150.0, 350.0
+    for r in (36, 60, 84):
+        s.path(f"M {lsx + r * 0.22:.1f} {lsy - r:.1f} "
+               f"A {r} {r} 0 0 1 {lsx + r:.1f} {lsy - r * 0.22:.1f}",
+               stroke=th.accent, sw=1.5)
+    s.rect(lsx - 24, lsy - 27, 48, 54, th.panel, th.primary, rx=6, sw=2)
+    s.circle(lsx, lsy - 9, 11, th.primary)
+    s.circle(lsx, lsy - 9, 4.5, th.bg)
+    s.circle(lsx, lsy + 15, 6, th.primary)
+    s.text(lsx + 4, lsy + 48, "Loudspeaker", 17, th.fg, bold=True)
+
+    # Continuously moving (rotating) microphone in each room: the sweep
+    # circle, the boom and the microphone on its tip.
+    for mcx, mcy, a_mic in ((285.0, 200.0, 40.0), (640.0, 215.0, 150.0)):
+        import math
+        s.ellipse(mcx, mcy, sc, sc, "none", th.muted, 1.3, dash="6,5")
+        pxm = mcx + sc * math.cos(math.radians(a_mic))
+        pym = mcy - sc * math.sin(math.radians(a_mic))
+        s.line(mcx, mcy, pxm, pym, th.fg, 2.0)
+        s.circle(mcx, mcy, 4, th.fg)
+        s.circle(pxm, pym, 7.5, th.secondary)
+        s.circle(pxm, pym, 2.6, th.bg)
+        _rot_arrow(s, mcx, mcy, sc + 12, -78, -8, th.accent, 1.8)
+    s.text(285, 298, "moving microphone", 16, th.fg)
+    s.text(285, 320, "sweep radius ≥ 1 m", 15, th.muted)
+    s.text(640, 313, "moving microphone", 16, th.fg)
+
+    # Dimensions (72 px per metre).
+    s.dim(70, src_bot, 430, src_bot, "5.0 m", offset=30, size=18)
+    s.dim(470, rec_bot, rec_r, rec_bot, "4.6 m", offset=30 + src_bot - rec_bot,
+          size=18)
+    s.dim(rec_r, top, rec_r, rec_bot, "4.1 m", offset=32, size=18,
+          label_side="right")
+    s.dim(430, op_t, 430, op_b, "3.75 m", offset=-24, size=17)
+
+    # Normative facility limits.
+    for y, txt in (
+        (508.0, "Test opening ≈ 10 m² (3.75 m × 2.7 m); shorter edge ≥ 2.3 m"),
+        (536.0, "Room volumes ≥ 50 m³, differing by at least 10 %"),
+        (564.0, "Continuously moving microphone: sweep radius ≥ 1 m, traverse ≥ 15 s"),
+    ):
+        s.text(80, y, txt, 18, th.fg, anchor="start")
+
+
+# ---------------------------------------------------------------------------
+# Junction vibration measurement, L- and T-junctions (ISO 10848)
+# ---------------------------------------------------------------------------
+
+def _plate_top(s: SVG, th: Theme, x0: float, y0: float, w: float, dp: float,
+               t: float) -> None:
+    """Horizontal slab in oblique projection: top face, front face and the
+    visible right end face. ``(x0, y0)`` = front-left corner of the top face,
+    ``w`` its width, ``dp`` its oblique depth and ``t`` its thickness."""
+    dxo, dyo = dp * 0.72, dp * 0.55
+    s.path(f"M {x0} {y0} L {x0 + w} {y0} L {x0 + w + dxo} {y0 - dyo} "
+           f"L {x0 + dxo} {y0 - dyo} Z", fill=th.panel, stroke=th.fg, sw=1.8)
+    s.rect(x0, y0, w, t, th.panel, th.fg, sw=1.8)
+    s.path(f"M {x0 + w} {y0} L {x0 + w} {y0 + t} L {x0 + w + dxo} {y0 + t - dyo} "
+           f"L {x0 + w + dxo} {y0 - dyo} Z", fill=th.panel, stroke=th.fg, sw=1.8)
+
+
+def _plate_up(s: SVG, th: Theme, x0: float, y_base: float, t: float,
+              h: float, dp: float) -> None:
+    """Vertical slab in oblique projection standing on ``y_base``: front
+    edge face, top face and the visible right-hand surface."""
+    dxo, dyo = dp * 0.72, dp * 0.55
+    y_top = y_base - h
+    s.rect(x0, y_top, t, h, th.panel, th.fg, sw=1.8)
+    s.path(f"M {x0} {y_top} L {x0 + t} {y_top} L {x0 + t + dxo} {y_top - dyo} "
+           f"L {x0 + dxo} {y_top - dyo} Z", fill=th.panel, stroke=th.fg, sw=1.8)
+    s.path(f"M {x0 + t} {y_top} L {x0 + t} {y_base} "
+           f"L {x0 + t + dxo} {y_base - dyo} L {x0 + t + dxo} {y_top - dyo} Z",
+           fill=th.panel, stroke=th.fg, sw=1.8)
+
+
+def _accel_wall(s: SVG, x: float, y: float, size: float = 13.0) -> None:
+    """Accelerometer block mounted on a wall surface seen in oblique view."""
+    th = s.th
+    s.rect(x - size / 2, y - size / 2, size, size, th.secondary, th.fg,
+           rx=2.5, sw=1.3)
+    s.line(x + size / 2, y, x + size / 2 + 8, y, th.fg, 1.3)
+
+
+def _d_junction_rig(s: SVG, th: Theme) -> None:
+    """ISO 10848 junction rig: an L- and a T-junction of concrete plates,
+    structure-borne excitation on element i, accelerometers on i and j and
+    the junction length l_ij along the corner line."""
+    gy = 430.0
+    dp = 170.0
+    dxo, dyo = dp * 0.72, dp * 0.55
+
+    # ===== Left: L-junction (wall on the left end of the floor plate) =====
+    s.text(280, 86, "L-junction", 21, th.fg, bold=True)
+    _plate_top(s, th, 140, gy, 230, dp, 16)
+    _plate_up(s, th, 140, gy, 16, 180, dp)
+    # Junction line along the corner, highlighted, with its length label.
+    s.line(156, gy, 156 + dxo, gy - dyo, th.accent, 2.6)
+    s.text(58, 474, "lij ≥ 2.3 m", 17, th.fg, anchor="start")
+    s.line(126, 466, 152, 438, th.muted, 1.0)
+
+    # Exciter on the floor (element i), accelerometers on i and j.
+    _exciter(s, 330, 396)
+    _accel(s, 250, 410)
+    _accel(s, 380, 380)
+    _accel_wall(s, 205, 300)
+    _accel_wall(s, 236, 262)
+    s.text(196, 420, "i", 22, th.primary, bold=True, italic=True)
+    s.text(178, 200, "j", 22, th.secondary, bold=True, italic=True)
+    # Transmission path across the corner.
+    s.path("M 300 402 Q 214 400 208 330", stroke=th.accent, sw=2.0)
+    s.arrow(209.0, 344.0, 208.0, 322.0, th.accent, 2.0)
+    s.text(194, 356, "Dv,ij", 16, th.accent, anchor="end", mono=True)
+
+    # ===== Right: T-junction (wall standing mid-way on the floor) =========
+    s.text(690, 86, "T-junction", 21, th.fg, bold=True)
+    _plate_top(s, th, 520, gy, 220, dp, 16)
+    _plate_up(s, th, 620, gy, 16, 180, dp)
+    s.line(636, gy, 636 + dxo, gy - dyo, th.accent, 2.6)
+    _exciter(s, 566, 404)
+    _accel(s, 588, 422)
+    _accel_wall(s, 685, 290)
+    _accel(s, 762, 384)
+    s.text(533, 423, "i", 22, th.primary, bold=True, italic=True)
+    s.text(658, 200, "j", 22, th.secondary, bold=True, italic=True)
+    s.text(806, 400, "j", 22, th.secondary, bold=True, italic=True)
+    s.path("M 612 418 Q 690 434 756 400", stroke=th.accent, sw=2.0)
+    s.arrow(742.0, 407.0, 760.0, 398.0, th.accent, 2.0)
+    s.path("M 606 406 Q 646 394 654 330", stroke=th.accent, sw=2.0)
+    s.arrow(655.0, 344.0, 654.0, 322.0, th.accent, 2.0)
+
+    # Exciter label shared by both panels.
+    s.text(450, 250, "Shaker or hammer on element i", 17, th.fg)
+    s.line(376, 258, 348, 322, th.muted, 1.0)
+    s.line(524, 258, 556, 348, th.muted, 1.0)
+
+    # Plate thickness leader (the lines stop above the caption text).
+    s.text(450, 496, "concrete plates 140 mm to 200 mm thick", 17, th.muted)
+    s.line(322, 477, 300, 442, th.muted, 1.0)
+    s.line(578, 477, 600, 442, th.muted, 1.0)
+
+    # Normative relations.
+    s.text(80, 536, "lij ≥ 2.3 m along the junction; element sizes 3.0 m ≤ li < 6.0 m",
+           18, th.fg, anchor="start")
+    s.text(80, 564, "≥ 4 excitation positions on i; accelerometers ≥ 0.25 m from edges, ≥ 0.5 m apart",
+           18, th.fg, anchor="start")
+    s.text(80, 596, "Kij = D̄v,ij + 10 lg( lij / √(ai·aj) ),   ai = equivalent absorption length",
+           18, th.primary, anchor="start", bold=True, mono=True)
+
+
+# ---------------------------------------------------------------------------
+# Sound power from surface vibration (ISO/TS 7849)
+# ---------------------------------------------------------------------------
+
+def _d_vibration_sound_power(s: SVG, th: Theme) -> None:
+    """ISO/TS 7849 surface-velocity method: the machine's radiating surface
+    divided into N equal cells, one accelerometer per cell centre, and the
+    survey sound power from the mean velocity level over the area S."""
+    gy = 470.0
+    s.ground(gy, 50.0, 560.0)
+
+    # Machine body with the vibrating measurement surface on top.
+    bx, hw, dp, ht = 270.0, 140.0, 115.0, 170.0
+    _box_solid(s, th, bx, gy, hw, dp, ht)
+    fx0, fx1 = bx - hw, bx + hw          # top-face front edge
+    fy = gy - ht
+    dxo, dyo = dp * 0.72, dp * 0.55
+
+    # Measurement grid: 5 x 2 cells on the top face, a dot per cell centre.
+    for i in range(1, 5):
+        gx = fx0 + i * (2 * hw) / 5
+        s.line(gx, fy, gx + dxo, fy - dyo, th.muted, 1.0)
+    s.line(fx0 + dxo / 2, fy - dyo / 2, fx1 + dxo / 2, fy - dyo / 2,
+           th.muted, 1.0)
+    pts = []
+    for r_ in (0.25, 0.75):
+        for i in range(5):
+            u = (i + 0.5) / 5
+            pts.append((fx0 + u * 2 * hw + r_ * dxo, fy - r_ * dyo))
+    for px_, py_ in pts:
+        s.circle(px_, py_, 5, th.secondary)
+        s.circle(px_, py_, 1.8, th.bg)
+    # One accelerometer drawn explicitly, with its vibratory motion.
+    _accel(s, pts[5][0], pts[5][1] - 4)
+    _motion_arrows(s, pts[5][0], pts[5][1] - 46, 16, th.secondary)
+    s.text(250, 150, "Vibrating measurement surface S", 19, th.fg, bold=True)
+    s.line(310, 160, 340, 228, th.muted, 1.0)
+
+    # Radiated sound from the surface.
+    for r in (36, 60, 84):
+        s.path(f"M {475 + r * 0.30:.1f} {370 - r:.1f} "
+               f"A {r} {r} 0 0 1 {475 + r:.1f} {370 - r * 0.30:.1f}",
+               stroke=th.accent, sw=1.6)
+    s.text(672, 432, "radiated airborne sound", 16, th.accent)
+    s.line(618, 424, 570, 372, th.muted, 1.0)
+
+    # Dimensions of the surface (2.5 m x 1.6 m -> S = 4 m2).
+    s.dim(fx0, gy, fx1, gy, "2.5 m", offset=32, size=18)
+    s.arrow(fx1 + 20, gy + 18, fx1 + dxo + 14, gy - dyo + 18, th.muted, 1.2)
+    s.arrow(fx1 + dxo + 14, gy - dyo + 18, fx1 + 20, gy + 18, th.muted, 1.2)
+    s.text(fx1 + dxo - 4, gy - dyo + 46, "1.6 m", 18, th.fg, anchor="start")
+    s.text(bx, 540, "Machine under test", 18, th.fg, bold=True)
+
+    # Number of measurement positions and the survey relation.
+    lx = 575.0
+    s.text(lx, 110, "Number of positions N", 19, th.fg, bold=True, anchor="start")
+    for y, txt in ((140, "S < 1 m²   →   5"),
+                   (166, "1 m² ≤ S ≤ 10 m²  →  10"),
+                   (192, "S > 10 m²  →  S / S₀")):
+        s.text(lx, y, txt, 16, th.fg, anchor="start", mono=True)
+    s.text(lx, 220, "one accelerometer per cell of area S/N", 15, th.muted,
+           anchor="start")
+    s.text(lx, 284, "Survey sound power", 19, th.fg, bold=True, anchor="start")
+    s.text(lx, 314, "LWA = LvA + 10 lg(S/S₀) + 10 lg ε", 15, th.primary,
+           anchor="start", bold=True, mono=True)
+    s.text(lx, 342, "ε = 1 assumed → upper limit LWA,max", 15, th.muted,
+           anchor="start")
+    s.text(lx, 368, "normal surface velocity, A-weighted r.m.s.", 15,
+           th.muted, anchor="start")
+
+
+# ---------------------------------------------------------------------------
+# Ship radiated-noise measurement geometry (ISO 17208-1)
+# ---------------------------------------------------------------------------
+
+def _d_hydrophone_deployment(s: SVG, th: Theme) -> None:
+    """ISO 17208-1 deep-water geometry: ship transiting past a buoy-suspended
+    vertical array of three hydrophones at 15/30/45 degree depression angles,
+    lateral CPA distance of at least 100 m, plus the plan-view data window."""
+    import math
+    surf = 150.0
+    sc = 2.6                              # px per metre
+    shx = 190.0                           # ship reference point at the CPA
+    bx = shx + 100 * sc                   # buoy: dCPA = 100 m away
+
+    # Sea surface as a gentle wave.
+    dsur = f"M 50 {surf}"
+    x = 50.0
+    while x < 590:
+        dsur += f" Q {x + 8:.0f} {surf - 5:.0f} {x + 16:.0f} {surf:.0f}"
+        dsur += f" Q {x + 24:.0f} {surf + 5:.0f} {x + 32:.0f} {surf:.0f}"
+        x += 32
+    s.path(dsur, stroke=th.primary, sw=1.8)
+
+    # Ship (side profile) at the closest point of approach.
+    s.path(f"M 108 132 L 262 132 L 276 {surf} L 254 166 L 130 166 "
+           f"L 108 {surf} Z", fill=th.panel, stroke=th.fg, sw=2)
+    s.rect(122, 104, 44, 28, th.panel, th.fg, rx=3, sw=1.6)
+    s.text(212, 88, "Ship under test", 18, th.fg, bold=True, anchor="end")
+    s.circle(shx, surf, 3.5, th.fg)
+
+    # Surface buoy with the suspended array and its ballast.
+    s.circle(bx, 148, 10, th.panel, th.fg, 2)
+    s.line(bx, 138, bx, 120, th.fg, 1.6)
+    s.path(f"M {bx:.0f} 120 L {bx - 18:.0f} 125 L {bx:.0f} 130 Z",
+           fill=th.secondary)
+    s.text(bx + 18, 122, "Surface buoy", 16, th.fg, anchor="start", bold=True)
+    s.line(bx, 158, bx, 448, th.fg, 2)
+    s.rect(bx - 8, 448, 16, 22, th.fg, rx=2)
+    s.text(bx, 490, "ballast", 14, th.muted)
+
+    # Hydrophones at the depths set by the three depression angles.
+    hyd = [(15, "≈ 27 m"), (30, "≈ 58 m"), (45, "= 100 m")]
+    for ang, dlab in hyd:
+        dy = 100 * math.tan(math.radians(ang)) * sc
+        hy = surf + dy
+        s.line(shx, surf, bx, hy, th.muted, 1.1, dash="5,4")
+        s.circle(bx, hy, 7, th.secondary)
+        s.circle(bx, hy, 2.5, th.bg)
+        s.text(bx + 16, hy + 5, dlab, 15, th.fg, anchor="start", mono=True)
+        lx_ = 305.0
+        ly_ = surf + (lx_ - shx) * math.tan(math.radians(ang))
+        s.text(lx_, ly_ - 7, f"{ang}°", 15, th.muted)
+    s.text(bx + 16, surf + 100 * math.tan(math.radians(30)) * sc + 32,
+           "vertical array of 3 hydrophones", 15, th.muted, anchor="start")
+
+    # Lateral distance at the CPA and the water depth.
+    s.dim(shx, 100, bx, 100, "dCPA ≥ 100 m (or 1·L)", offset=0, size=17)
+    s.line(shx, 130, shx, 106, th.muted, 0.9, dash="3,3")
+    s.line(bx, 116, bx, 106, th.muted, 0.9, dash="3,3")
+    s.ground(540, 50, 600)
+    s.text(90, 570, "sea floor", 14, th.muted, anchor="start")
+    s.dim(70, surf, 70, 540, "water depth ≥ 150 m (or 1.5·L)", offset=0,
+          size=16, label_side="right")
+
+    # Plan view: course, CPA and the +/-30 degree data window.
+    s.text(750, 130, "Plan view", 17, th.fg, bold=True)
+    s.arrow(640, 170, 860, 170, th.fg, 2.0)
+    s.text(852, 156, "course", 14, th.muted, anchor="end")
+    s.rect(676, 162, 28, 14, th.panel, th.fg, rx=3, sw=1.4)
+    s.circle(750, 170, 3.5, th.fg)
+    # dCPA line drawn in two runs so it does not cross the label below.
+    s.line(750, 170, 750, 184, th.muted, 1.1, dash="5,4")
+    s.line(750, 210, 750, 330, th.muted, 1.1, dash="5,4")
+    s.text(758, 256, "dCPA", 14, th.fg, anchor="start", mono=True)
+    s.circle(750, 330, 6, th.secondary)
+    s.circle(750, 330, 2.2, th.bg)
+    win = 160 * math.tan(math.radians(30))
+    s.line(750, 330, 750 - win, 170, th.muted, 1.0, dash="3,4")
+    s.line(750, 330, 750 + win, 170, th.muted, 1.0, dash="3,4")
+    s.text(750, 296, "±30°", 14, th.muted)
+    s.line(750 - win, 178, 750 + win, 178, th.accent, 3.0)
+    s.text(750, 200, "data window", 15, th.accent)
+
+    # Normative context.
+    s.text(80, 594, "Four runs, two per side; levels averaged while the ship crosses the data window",
+           17, th.fg, anchor="start")
+    s.text(80, 620, "Hydrophone depths from the 15°, 30° and 45° depression angles at r = dCPA; L = ship length",
+           17, th.fg, anchor="start")
+
+
+# ---------------------------------------------------------------------------
+# SOFAR channel (deep sound channel)
+# ---------------------------------------------------------------------------
+
+def _d_sofar_channel(s: SVG, th: Theme) -> None:
+    """The deep sound channel: measured North Atlantic values (sound speed
+    1524 m/s at the surface, minimum near 1492 m/s at the 1200 m axis,
+    1527 m/s at 4800 m) and rays oscillating about the channel axis."""
+    import math
+    surf, bot = 100.0, 520.0
+    ax_y = surf + 1200.0 / 4800.0 * (bot - surf)      # channel axis, 1200 m
+
+    # Ocean frame: surface, seabed and the left depth axis.
+    s.line(60, surf, 850, surf, th.fg, 2.2)
+    s.text(845, 88, "sea surface", 14, th.muted, anchor="end")
+    s.ground(bot, 60, 850)
+    s.line(90, surf, 90, bot, th.muted, 1.4)
+    for dy_, ly_, dlab in ((surf, surf - 8, "0 m"), (ax_y, ax_y + 5, "1200 m"),
+                           (bot, bot - 8, "4800 m")):
+        s.line(84, dy_, 90, dy_, th.muted, 1.4)
+        s.text(78, ly_, dlab, 14, th.fg, anchor="end", mono=True)
+
+    # Channel axis (the sound-speed minimum).
+    s.line(90, ax_y, 850, ax_y, th.muted, 1.2, dash="7,5")
+
+    # --- Left: the sound-speed profile c(z) --------------------------------
+    s.text(195, 76, "Sound-speed profile c(z)", 18, th.fg, bold=True)
+    def cx_of(c: float) -> float:                     # 1480..1540 m/s
+        return 90.0 + (c - 1480.0) / 60.0 * 180.0
+    x_s, x_m, x_b = cx_of(1524), cx_of(1492), cx_of(1527)
+    s.path(f"M {x_s:.1f} {surf:.1f} Q {x_m + 24:.1f} {surf + 52:.1f} "
+           f"{x_m:.1f} {ax_y:.1f} Q {x_m + 14:.1f} {ax_y + 160:.1f} "
+           f"{x_b:.1f} {bot:.1f}", stroke=th.primary, sw=2.6)
+    s.circle(x_s, surf, 3.5, th.primary)
+    s.circle(x_m, ax_y, 3.5, th.primary)
+    s.circle(x_b, bot, 3.5, th.primary)
+    s.text(x_s + 10, surf + 22, "1524 m/s", 14, th.fg, anchor="start", mono=True)
+    s.text(x_m + 10, ax_y + 24, "≈ 1492 m/s", 14, th.fg, anchor="start", mono=True)
+    s.text(x_b + 10, bot - 12, "1527 m/s", 14, th.fg, anchor="start", mono=True)
+
+    # --- Right: rays trapped about the axis --------------------------------
+    s.text(600, 76, "Ray paths near the axis", 18, th.fg, bold=True)
+    sx = 315.0
+    s.circle(sx, ax_y, 6, th.secondary)
+    s.circle(sx, ax_y, 2.2, th.bg)
+    s.text(310, 130, "source on the channel axis", 15, th.fg, anchor="start")
+    s.line(322, 136, sx + 1, ax_y - 8, th.muted, 1.0)
+    for amp, lam, col in ((45.0, 260.0, th.accent), (68.0, 310.0, th.primary),
+                          (90.0, 360.0, th.secondary)):
+        d = f"M {sx:.1f} {ax_y:.1f}"
+        xr = sx
+        while xr < 833:
+            xr += 7
+            yr = ax_y + amp * math.sin(2 * math.pi * (xr - sx) / lam)
+            d += f" L {xr:.1f} {yr:.1f}"
+        s.path(d, stroke=col, sw=1.8)
+        y_end = ax_y + amp * math.sin(2 * math.pi * (840 - sx) / lam)
+        y_prev = ax_y + amp * math.sin(2 * math.pi * (833 - sx) / lam)
+        s.arrow(833.0, y_prev, 841.0, y_end, col, 1.8)
+    s.text(575, 420, "rays that stay in the channel meet no surface or bottom loss",
+           16, th.muted, italic=True)
+
+    # Physics of the channel.
+    s.text(80, 560, "c rises toward the surface (temperature) and toward the bottom (pressure); the minimum traps sound",
+           17, th.fg, anchor="start")
+    s.text(80, 588, "rays launched within about ±12° of the axis stay trapped and can cross entire oceans",
+           17, th.fg, anchor="start")
+
+
 DIAGRAMS = {
     "diagram_calibration_setup": (_d1, "Calibration chain — from calibrator to physical units", 560),
     "diagram_env_measurement": (_d2, "Environmental noise measurement positions (ISO 1996-2)", 560),
@@ -4310,6 +4892,24 @@ DIAGRAMS = {
     "diagram_fdtd": (
         _d_fdtd,
         "2D acoustic FDTD wave simulation (staggered leapfrog)", 500),
+    "diagram_slm_chain": (
+        _d_slm_chain,
+        "Sound level meter measurement chain (IEC 61672-1)", 560),
+    "diagram_insulation_lab": (
+        _d_insulation_lab,
+        "Laboratory sound insulation suite (ISO 10140)", 600),
+    "diagram_junction_rig": (
+        _d_junction_rig,
+        "Junction vibration measurement on L- and T-junctions (ISO 10848)", 620),
+    "diagram_vibration_sound_power": (
+        _d_vibration_sound_power,
+        "Sound power from surface vibration (ISO/TS 7849)", 580),
+    "diagram_hydrophone_deployment": (
+        _d_hydrophone_deployment,
+        "Ship radiated-noise measurement geometry (ISO 17208-1)", 640),
+    "diagram_sofar_channel": (
+        _d_sofar_channel,
+        "The SOFAR channel: a deep-ocean sound waveguide", 620),
 }
 
 

@@ -188,6 +188,13 @@ kij = res.corner_reduction_index  # the same, precomputed on the result
 res.plot()   # tau(theta) for this junction's corner and straight paths (needs matplotlib)
 ```
 
+`Kij` is also what ISO 10848 measures on a built junction: excite one
+element, read the velocity level difference on both, and normalize by the
+junction length, so the closed-form value above has a direct experimental
+counterpart.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_junction_rig_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_junction_rig.svg" alt="ISO 10848 junction measurement rigs for an L-junction and a T-junction of 140 to 200 mm concrete plates: a shaker or hammer excites element i, accelerometers on elements i and j read the velocity level difference Dv,ij, and the junction length of at least 2.3 m runs along the highlighted corner line" width="92%"></picture>
+
 The junction descriptor is a *design* quantity: sweeping the receiving
 plate's thickness shows how much a mass change at the junction buys. The
 corner paths stiffen quickly with a heavier receiving plate, while the

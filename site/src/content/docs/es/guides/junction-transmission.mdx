@@ -188,6 +188,13 @@ kij = res.corner_reduction_index  # lo mismo, precalculado en el resultado
 res.plot()   # tau(theta) de los caminos de esquina y recto de esta unión (requiere matplotlib)
 ```
 
+`Kij` es también lo que ISO 10848 mide sobre una unión construida: se excita
+un elemento, se lee la diferencia de nivel de velocidad en ambos y se
+normaliza por la longitud de unión, de modo que el valor en forma cerrada de
+arriba tiene un homólogo experimental directo.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_junction_rig_es.svg" alt="Montajes de medición de uniones ISO 10848 para una unión en L y una en T de placas de hormigón de 140 a 200 mm: un excitador o martillo excita el elemento i, acelerómetros en los elementos i y j leen la diferencia de nivel de velocidad Dv,ij, y la longitud de unión de al menos 2,3 m recorre la línea de esquina resaltada" width="92%" />
+
 El descriptor de unión es una magnitud de *diseño*: barrer el espesor de la
 placa receptora muestra cuánto aporta un cambio de masa en la unión. Los
 caminos de esquina se endurecen deprisa con una placa receptora más pesada,

@@ -22,6 +22,12 @@ flowchart LR
     G --> H
 ```
 
+This is the same chain IEC 61672-1 draws for the physical instrument: the
+class 1 calibrator anchors the microphone to 94 dB at 1 kHz, and every stage
+that follows is one function of this page.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_slm_chain_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_slm_chain.svg" alt="IEC 61672-1 sound level meter chain: a class 1 sound calibrator at 94 dB and 1 kHz coupled onto the measurement microphone with its windscreen, followed by the four instrument stages of microphone plus preamplifier, A, C or Z frequency weighting, squaring with the exponential F or S time weighting of 125 ms or 1 s, and the display of LAF(t) in dB re 20 µPa" width="92%"></picture>
+
 The snippets on this page build on each other: run them top to bottom in one
 session (or paste the whole page into a script).
 

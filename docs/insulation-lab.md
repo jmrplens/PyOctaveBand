@@ -30,6 +30,12 @@ R = L_1 - L_2 + 10 \log_{10}\frac{S}{A}, \qquad
 L_n = L_i + 10 \log_{10}\frac{A}{A_0}, \quad A_0 = 10\ \text{m}^2.
 $$
 
+The facility itself is what suppresses the flanking: two structurally
+decoupled reverberation rooms of at least 50 m³ each, with the element under
+test mounted in a test opening of about 10 m² between them.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insulation_lab_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insulation_lab.svg" alt="Plan view of an ISO 10140 laboratory transmission suite: structurally decoupled source and receiving reverberation rooms of about 59 and 51 cubic metres, the test element mounted in the 10 square metre test opening between them, a corner loudspeaker in the source room and a continuously moving microphone with a sweep radius of at least 1 m in each room" width="92%"></picture>
+
 | | Field (ISO 16283) | Laboratory (ISO 10140) |
 | :--- | :--- | :--- |
 | Airborne element index | $R'$ apparent (with flanking) | $R$ direct (flanking suppressed) |
