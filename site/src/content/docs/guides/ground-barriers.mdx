@@ -180,6 +180,12 @@ $$
 which tends to `5 dB` at the shadow boundary `N → 0` and approximates Maekawa's
 point-source curve within about 1.5 dB.
 
+Every method of this section keys on the same three numbers: the two
+diffracted segments over the edge and the straight path they replace. Drawn on
+the 4 m screen of the snippets, they differ by just 0.15 m.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_ground_barrier.svg" alt="Section of the barrier geometry: a loudspeaker source 1 m above the ground, a thin 4 m screen at 50 m and a microphone receiver 1.5 m high at 100 m, the blocked direct path of 100.00 m drawn dashed through the screen and the diffracted path bent over the edge in two segments A = 50.09 m and B = 50.06 m, with the resulting path difference of 0.15 m giving a Fresnel number of 0.44 and a Kurze-Anderson insertion loss of 10.0 dB at 500 Hz, rising to 15.5 dB at 2 kHz" width="92%" />
+
 ```python
 from phonometry import barrier_insertion_loss, kurze_anderson_attenuation
 

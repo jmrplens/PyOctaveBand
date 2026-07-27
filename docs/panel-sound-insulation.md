@@ -40,6 +40,12 @@ mass law up to $f_c/2$, drops through a straight line in $\log f$, and from $f_c
 upward follows Eq. 7.44 with the loss factor $\eta$; the dip sits at Bies
 design-chart point B, $TL = 20\lg(f_c m'') + 10\lg\eta - 44$.
 
+The whole section in one sketch: a diffuse field drives a single leaf, and the
+predicted $R(f)$ climbs with the mass law until the coincidence dip. A 12.5 mm
+plasterboard leaf puts $f_c$ near 2.6 kHz and rates $R_w = 27$ dB.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_panel_insulation_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_panel_insulation.svg" alt="Section of a sound insulation test: a 12.5 mm plasterboard panel mounted between heavy filler walls, green arrows of diffuse incidence arriving at several angles from the source room, thinner blue transmitted arrows leaving into the receiving room, a bending wave drawn along the leaf, and an inset of the predicted sound reduction index rising 6 dB per octave to a coincidence dip at fc = 2.6 kHz, with the leaf's mass of 8.8 kg per square metre and the Rw = 27 dB rating annotated" width="92%"></picture>
+
 ```python
 import numpy as np
 from phonometry import (
