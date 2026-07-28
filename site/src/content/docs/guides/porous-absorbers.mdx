@@ -113,6 +113,7 @@ references:
 ---
 
 import ThemeImage from '../../../components/ThemeImage.astro';
+import Video from '../../../components/Video.astro';
 
 Given a porous material's **flow resistivity** (the quantity the
 [flow rig](/phonometry/guides/materials/) measures) the classical equivalent-fluid models
@@ -668,6 +669,20 @@ plt.show()
 ```
 
 </details>
+
+The clip below drives this exact cell in a virtual plane-wave tube: the
+sub-millimetre slit and its resonator are meshed on the FDTD grid and filled
+with the model's visco-thermal effective fluids. At the design slit height
+the standing wave collapses and the tone dies inside the panel; at 1.7 times
+the height the loss balance breaks and the reflection rebuilds it.
+
+<Video
+  name="anim_fdtd_slit_absorber"
+  width={2400}
+  height={1350}
+  title="Inside the slow-sound slit absorber in a 2D FDTD simulation"
+  description="A 300 Hz plane tone in a 2D FDTD tube meets the meshed critical-coupling cell, its 0.98 mm slit and Helmholtz resonator resolved on the grid and shown in a zoomed panel. At the design slit height the pressure envelope stays flat and the annotated library absorption is 1.00; the 1.7 times wider slit stands a deep wave in front of the panel and the absorption drops to 0.34."
+/>
 
 ## Practical notes
 

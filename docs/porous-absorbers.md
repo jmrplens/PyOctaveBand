@@ -539,6 +539,16 @@ plt.show()
 
 </details>
 
+The clip below drives this exact cell in a virtual plane-wave tube: the
+sub-millimetre slit and its resonator are meshed on the FDTD grid and filled
+with the model's visco-thermal effective fluids. At the design slit height
+the standing wave collapses and the tone dies inside the panel; at 1.7 times
+the height the loss balance breaks and the reflection rebuilds it.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_slit_absorber_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_slit_absorber.gif" alt="Animation: a 300 Hz plane tone in a 2D FDTD tube meets the meshed critical-coupling cell, its 0.98 mm slit and Helmholtz resonator resolved on the grid and shown in a zoomed panel; at the design slit height the pressure envelope stays flat and the annotated library absorption is 1.00, while the 1.7 times wider slit stands a deep wave in front of the panel and the absorption drops to 0.34" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_slit_absorber.webm)
+
 ## Practical notes
 
 **Fit ranges.** Delany–Bazley warns (and extrapolates) outside

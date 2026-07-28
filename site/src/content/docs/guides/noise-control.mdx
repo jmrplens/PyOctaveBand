@@ -29,6 +29,7 @@ references:
 ---
 
 import ThemeImage from '../../../components/ThemeImage.astro';
+import Video from '../../../components/Video.astro';
 
 Three passive measures dominate applied noise control: **silencers** in a duct,
 the passive attenuations and regenerated noise of an **HVAC** run, and a
@@ -179,6 +180,20 @@ plt.show()
 ```
 
 </details>
+
+The clip below runs an m = 4 chamber of the same 0.30 m length in a 2D FDTD
+duct at its two characteristic frequencies. At kL = π the chamber is a
+half-wave resonator and the tone crosses as if it were not there; at kL = π/2
+the two area jumps reflect in phase and send the wave back up the inlet, the
+6.5 dB peak of the four-pole curve above.
+
+<Video
+  name="anim_fdtd_expansion_chamber"
+  width={2400}
+  height={1350}
+  title="The expansion-chamber silencer in a 2D FDTD simulation"
+  description="A 2D FDTD duct with a 0.30 m expansion chamber of area ratio 4, drawn as hardware between a loudspeaker and an anechoic termination, at two frequencies side by side. At 572 Hz the pressure envelope stays flat and the tone crosses the chamber unchanged with the annotated transmission loss of 0.0 dB; at 286 Hz a standing wave fills the inlet pipe and the outlet is left with less than half the amplitude, matching the annotated 6.5 dB peak."
+/>
 
 ### Side-branch and extended-tube resonators
 
