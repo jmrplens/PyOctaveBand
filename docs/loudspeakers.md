@@ -56,7 +56,7 @@ of any finite vibrating surface (Beranek & Mellow §4.19, §13.7). Its mechanica
 radiation impedance is `Z_r = rho c S (R1 + j X1)` with `S = pi a^2` and the
 dimensionless resistance and reactance functions (Eqs. (13.117), (13.118))
 
-```
+```text
 R1(x) = 1 - 2 J1(x) / x ,   X1(x) = 2 H1(x) / x ,   x = 2ka,
 ```
 
@@ -144,7 +144,7 @@ the piston result draws it: the plate in its rigid baffle to scale, with the
 far-field lobe of the highest computed frequency overlaid on the radiation
 side.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_baffle_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_baffle_geometry.svg" alt="A 10 cm radius rigid piston drawn to scale as a plate of 200 mm diameter set into a hatched vertical baffle, with the piston diameter dimensioned and the normalised far-field directivity lobe at ka of 7.3 overlaid on the radiation side: a long forward main lobe hugging the dotted axis with small side lobes folding back near the plate" width="82%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_baffle_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_baffle_geometry.svg" alt="A 10 cm radius rigid piston drawn to scale as a plate of 200 mm diameter set into a hatched vertical baffle, with the piston diameter dimensioned and the normalized far-field directivity lobe at ka of 7.3 overlaid on the radiation side: a long forward main lobe hugging the dotted axis with small side lobes folding back near the plate" width="82%"></picture>
 
 *The piston the impedance and directivity curves describe, to scale: at
 4 kHz this 10 cm radius plate has `ka ≈ 7.3`, so the overlaid lobe is
@@ -348,8 +348,9 @@ reference-circle conventions.*
   rated-characteristics report for the measuring side of the chain.
 - [Swept-sine distortion](swept-sine-distortion.md): the Farina/Novak
   harmonic separation whose THD(f) feeds the distortion panel.
-- [Sound Power](sound-power.md): the emission descriptor of sources that are
-  not supposed to make sound.
+- [Sound Power](sound-power.md): the radiated-power descriptor, for when the
+  question is how much acoustic power the source emits rather than how it
+  responds on axis.
 - API reference: [`electroacoustics.piston`](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/piston/) and [`electroacoustics.loudspeaker`](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/loudspeaker/).
 
 ## References

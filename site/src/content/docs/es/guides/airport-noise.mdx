@@ -131,8 +131,10 @@ xs = np.linspace(0.0, 18000.0, 40)
 z = np.clip((xs - 1500.0) * 0.11, 0.0, 2500.0)
 power = np.where(xs < 3000.0, 12000.0, 10000.0)
 path = np.column_stack([xs, np.zeros_like(xs), z, power, np.full_like(xs, 82.3)])
+ground_roll = xs[:-1] < 1500.0   # rodaje de despegue: segmentos aún en pista
 
 contour = aircraft.noise_contour(path, powers, distances, sel, lmax,
+                                 ground_roll=ground_roll,
                                  x=np.linspace(-2500.0, 20000.0, 56),
                                  y=np.linspace(-6000.0, 6000.0, 44))
 contour.plot(language="es")   # huella SEL de evento único (requiere matplotlib)
@@ -196,11 +198,13 @@ lmax = [[94.0, 82.0, 70.0, 58.0], [100.0, 88.0, 76.0, 64.0]]
 xs = np.linspace(0.0, 18000.0, 40)
 path = np.column_stack([xs, np.zeros_like(xs), np.clip((xs-1500)*0.11, 0, 2500),
                         np.where(xs < 3000, 12000.0, 10000.0), np.full_like(xs, 82.3)])
-aircraft.noise_contour(path, powers, distances, sel, lmax,
-                 x=np.linspace(-2500, 20000, 60), y=np.linspace(-6000, 6000, 48)).plot()
+ground_roll = xs[:-1] < 1500.0   # rodaje de despegue: segmentos aún en pista
+aircraft.noise_contour(path, powers, distances, sel, lmax, ground_roll=ground_roll,
+                 x=np.linspace(-2500, 20000, 60),
+                 y=np.linspace(-6000, 6000, 48)).plot(language="es")
 ```
 
-Validado contra el workbook de referencia de ECAC Doc 29 5ª ed. Vol 3 Parte 1:
+Validado contra el workbook de referencia de ECAC Doc 29 5.ª ed. Vol. 3 Parte 1:
 la geometría de segmento, la atenuación lateral, la instalación del motor, la
 fracción de ruido y la directividad de inicio de rodaje (turbofán y turbohélice)
 reproducen los valores de referencia con < 0,01 dB, y la suma energética de
@@ -212,8 +216,8 @@ término de directividad), el ángulo de alabeo por segmento (`bank`, positivo
 con el ala de estribor arriba; el ángulo de depresión es φ = β + ε para
 observadores a estribor de la traza y φ = β − ε para observadores a babor,
 §4.5.2), la geometría lateral §4.5.5 al extremo más cercano detrás
-del rodaje de despegue, la velocidad media Ec. 4-13b en segmentos de pista y el
-suelo recomendado de 30 m en las consultas NPD. Siete eventos de receptor del
+del rodaje de despegue, la velocidad media Ec. 4-13b en segmentos de pista y la
+cota inferior recomendada de 30 m en las consultas NPD. Siete eventos de receptor del
 workbook de referencia se reproducen end-to-end en la suite de tests.
 
 ## Qué cubre esta guía

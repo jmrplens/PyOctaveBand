@@ -145,6 +145,31 @@ it; the list grows as guides gain their References sections.
   The calibrator classes, level tolerances and the short-term stability
   criterion applied to calibration recordings.
   Cited by [Calibration and dBFS](calibration.md).
+- International Electrotechnical Commission. (2014). *Sound system equipment —
+  Part 4: Microphones* (IEC 60268-4:2014).
+  [IEC webstore](https://webstore.iec.ch/en/publication/32039).
+  The rated microphone characteristics: free-field sensitivity and its level
+  re 1 V/Pa, the frequency response and the effective frequency range against
+  the tolerance limits, the directional pattern and the directivity index, the
+  overload sound pressure level, the equivalent sound pressure level due to
+  inherent noise, and the rated impedances and power supply.
+  Cited by [Microphone characterisation](microphones.md).
+- International Electrotechnical Commission. (2007). *Sound system equipment —
+  Part 5: Loudspeakers* (IEC 60268-5:2003+A1:2007).
+  [IEC webstore](https://webstore.iec.ch/en/publication/1223).
+  The rated loudspeaker characteristics: rated impedance, rated frequency
+  range, characteristic sensitivity referred to 1 W at 1 m, the effective
+  frequency range against the -10 dB band, the directivity index and the total
+  harmonic distortion against frequency.
+  Cited by [Loudspeaker characterisation](loudspeakers.md).
+- International Electrotechnical Commission. (1982). *Scales and sizes for
+  plotting frequency characteristics and polar diagrams* (IEC 60263:1982).
+  [IEC webstore](https://webstore.iec.ch/en/publication/1218).
+  The scale proportions of the characteristic graphs: one frequency decade
+  equal to 25 dB on the ordinate, and the polar diagram on a 25 dB
+  reference-circle radius.
+  Cited by [Loudspeaker characterisation](loudspeakers.md) and
+  [Microphone characterisation](microphones.md).
 - International Electrotechnical Commission. (1985). *Sound system
   equipment — Part 1: General* (IEC 60268-1:1985).
   [IEC webstore](https://webstore.iec.ch/en/publication/1204).

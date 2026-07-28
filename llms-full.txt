@@ -1608,8 +1608,10 @@ xs = np.linspace(0.0, 18000.0, 40)
 z = np.clip((xs - 1500.0) * 0.11, 0.0, 2500.0)
 power = np.where(xs < 3000.0, 12000.0, 10000.0)
 path = np.column_stack([xs, np.zeros_like(xs), z, power, np.full_like(xs, 82.3)])
+ground_roll = xs[:-1] < 1500.0   # takeoff roll: segments still on the runway
 
 contour = aircraft.noise_contour(path, powers, distances, sel, lmax,
+                                 ground_roll=ground_roll,
                                  x=np.linspace(-2500.0, 20000.0, 56),
                                  y=np.linspace(-6000.0, 6000.0, 44))
 contour.plot()   # single-event SEL footprint (needs matplotlib)
@@ -1681,9 +1683,11 @@ lmax = [[94.0, 82.0, 70.0, 58.0], [100.0, 88.0, 76.0, 64.0]]
 xs = np.linspace(0.0, 18000.0, 40)
 path = np.column_stack([xs, np.zeros_like(xs), np.clip((xs - 1500) * 0.11, 0, 2500),
                         np.where(xs < 3000, 12000.0, 10000.0), np.full_like(xs, 82.3)])
+ground_roll = xs[:-1] < 1500.0   # takeoff roll: segments still on the runway
 
-aircraft.event_level(path, [2000.0, 500.0, 0.0], powers, distances, sel, lmax)  # SEL at a point
-contour = aircraft.noise_contour(path, powers, distances, sel, lmax,
+aircraft.event_level(path, [2000.0, 500.0, 0.0], powers, distances, sel, lmax,
+                     ground_roll=ground_roll)  # SEL at a point
+contour = aircraft.noise_contour(path, powers, distances, sel, lmax, ground_roll=ground_roll,
                            x=np.linspace(-2500, 20000, 60), y=np.linspace(-6000, 6000, 48))
 contour.plot()   # SEL contour over the ground (needs matplotlib)
 ```
@@ -8829,7 +8833,7 @@ the IEC 61260-1:2014 Table 1 corridor.*
 
 Passing `edition="1995"` verifies against the older IEC 61260:1995 /
 ANSI S1.11-2004 mask, which keeps the stricter **class 0** that the 2014 edition
-dropped; a higher-order bank can then be certified to class 0:
+dropped; the default order-6 Butterworth bank can then be certified to class 0:
 
 ```python
 bank = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[250, 4000])
@@ -16053,7 +16057,7 @@ of any finite vibrating surface (Beranek & Mellow §4.19, §13.7). Its mechanica
 radiation impedance is `Z_r = rho c S (R1 + j X1)` with `S = pi a^2` and the
 dimensionless resistance and reactance functions (Eqs. (13.117), (13.118))
 
-```
+```text
 R1(x) = 1 - 2 J1(x) / x ,   X1(x) = 2 H1(x) / x ,   x = 2ka,
 ```
 
@@ -16141,7 +16145,7 @@ the piston result draws it: the plate in its rigid baffle to scale, with the
 far-field lobe of the highest computed frequency overlaid on the radiation
 side.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_baffle_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_baffle_geometry.svg" alt="A 10 cm radius rigid piston drawn to scale as a plate of 200 mm diameter set into a hatched vertical baffle, with the piston diameter dimensioned and the normalised far-field directivity lobe at ka of 7.3 overlaid on the radiation side: a long forward main lobe hugging the dotted axis with small side lobes folding back near the plate" width="82%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_baffle_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_baffle_geometry.svg" alt="A 10 cm radius rigid piston drawn to scale as a plate of 200 mm diameter set into a hatched vertical baffle, with the piston diameter dimensioned and the normalized far-field directivity lobe at ka of 7.3 overlaid on the radiation side: a long forward main lobe hugging the dotted axis with small side lobes folding back near the plate" width="82%"></picture>
 
 *The piston the impedance and directivity curves describe, to scale: at
 4 kHz this 10 cm radius plate has `ka ≈ 7.3`, so the overlaid lobe is
@@ -16345,8 +16349,9 @@ reference-circle conventions.*
   rated-characteristics report for the measuring side of the chain.
 - [Swept-sine distortion](https://jmrplens.github.io/phonometry/guides/swept-sine-distortion/): the Farina/Novak
   harmonic separation whose THD(f) feeds the distortion panel.
-- [Sound Power](https://jmrplens.github.io/phonometry/guides/sound-power/): the emission descriptor of sources that are
-  not supposed to make sound.
+- [Sound Power](https://jmrplens.github.io/phonometry/guides/sound-power/): the radiated-power descriptor, for when the
+  question is how much acoustic power the source emits rather than how it
+  responds on axis.
 - API reference: [`electroacoustics.piston`](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/piston/) and [`electroacoustics.loudspeaker`](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/loudspeaker/).
 
 ## References
@@ -17432,7 +17437,7 @@ pressure) is part of the rating, not a detail.
 ## 2. Directional pattern and the directivity index (clause 13)
 
 The directional response is stated as the pattern of sensitivity against
-the angle of incidence, normalised to the reference axis. The classic
+the angle of incidence, normalized to the reference axis. The classic
 first-order family mixes an omnidirectional (pressure) term and a cosine
 (pressure-gradient) term, `M(θ) ∝ (1 − b) + b·cos θ`: `b = 0` is the
 omnidirectional capsule, `b = 1/2` the cardioid with its null at 180°, and
@@ -17475,7 +17480,7 @@ weights THD.
 
 The microphone companion of the
 [loudspeaker report](https://jmrplens.github.io/phonometry/guides/loudspeakers/): the rated characteristics IEC 60268-4
-defines around a measured free-field frequency response gather into a single
+defines around a measured free-field frequency response are gathered into a single
 **microphone characteristics** result that renders the standard's
 rated-characteristics data sheet. Four of the numbers are computed from the
 standard's own definitions rather than merely repeated:
@@ -22047,6 +22052,31 @@ it; the list grows as guides gain their References sections.
   The calibrator classes, level tolerances and the short-term stability
   criterion applied to calibration recordings.
   Cited by [Calibration and dBFS](https://jmrplens.github.io/phonometry/guides/calibration/).
+- International Electrotechnical Commission. (2014). *Sound system equipment —
+  Part 4: Microphones* (IEC 60268-4:2014).
+  [IEC webstore](https://webstore.iec.ch/en/publication/32039).
+  The rated microphone characteristics: free-field sensitivity and its level
+  re 1 V/Pa, the frequency response and the effective frequency range against
+  the tolerance limits, the directional pattern and the directivity index, the
+  overload sound pressure level, the equivalent sound pressure level due to
+  inherent noise, and the rated impedances and power supply.
+  Cited by [Microphone characterisation](https://jmrplens.github.io/phonometry/guides/microphones/).
+- International Electrotechnical Commission. (2007). *Sound system equipment —
+  Part 5: Loudspeakers* (IEC 60268-5:2003+A1:2007).
+  [IEC webstore](https://webstore.iec.ch/en/publication/1223).
+  The rated loudspeaker characteristics: rated impedance, rated frequency
+  range, characteristic sensitivity referred to 1 W at 1 m, the effective
+  frequency range against the -10 dB band, the directivity index and the total
+  harmonic distortion against frequency.
+  Cited by [Loudspeaker characterisation](https://jmrplens.github.io/phonometry/guides/loudspeakers/).
+- International Electrotechnical Commission. (1982). *Scales and sizes for
+  plotting frequency characteristics and polar diagrams* (IEC 60263:1982).
+  [IEC webstore](https://webstore.iec.ch/en/publication/1218).
+  The scale proportions of the characteristic graphs: one frequency decade
+  equal to 25 dB on the ordinate, and the polar diagram on a 25 dB
+  reference-circle radius.
+  Cited by [Loudspeaker characterisation](https://jmrplens.github.io/phonometry/guides/loudspeakers/) and
+  [Microphone characterisation](https://jmrplens.github.io/phonometry/guides/microphones/).
 - International Electrotechnical Commission. (1985). *Sound system
   equipment — Part 1: General* (IEC 60268-1:1985).
   [IEC webstore](https://webstore.iec.ch/en/publication/1204).

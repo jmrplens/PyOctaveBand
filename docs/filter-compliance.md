@@ -244,7 +244,7 @@ the IEC 61260-1:2014 Table 1 corridor.*
 
 Passing `edition="1995"` verifies against the older IEC 61260:1995 /
 ANSI S1.11-2004 mask, which keeps the stricter **class 0** that the 2014 edition
-dropped; a higher-order bank can then be certified to class 0:
+dropped; the default order-6 Butterworth bank can then be certified to class 0:
 
 ```python
 bank = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[250, 4000])

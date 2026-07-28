@@ -341,7 +341,7 @@ $DI_i = L_{pi} - \bar{L}_p$ (Ec. 21). El ejemplo de incertidumbre de la
 cláusula 10.5, $U = 2\sqrt{0{,}5^2 + 2{,}0^2} = 4{,}12$ dB, se reproduce, junto
 con los valores de $\sigma_{R0}$ por banda de las Tablas 2/3.
 
-### Sala reverberante (ISO 3741)
+### Cámara reverberante (ISO 3741)
 
 En un campo difuso cualificado la densidad de energía estacionaria
 $w = 4P/(A c)$ liga la potencia a la absorción de la sala, dando
