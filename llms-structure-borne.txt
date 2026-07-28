@@ -1528,6 +1528,17 @@ tau12 = corner_transmission_coefficient(theta, chi, psi, "X")
 tau13 = straight_transmission_coefficient(theta, chi, psi, "X")
 ```
 
+The clip below runs this experiment in the time domain with the library's 2D
+elastic FDTD solver: a bending packet on a 10 mm steel plate reaches an
+L-junction with an identical plate, and the corner splits it into the
+reflected and transmitted waves this section prices at `τ12(0°) = 0.5`. The
+fast in-plane precursor racing down the receiving plate is the mode
+conversion the pinned-junction model deliberately leaves out.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_plate_junction_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_plate_junction.gif" alt="Animation: a 4 kHz bending-wave packet travels along a 10 mm steel plate in a 2D elastic FDTD field; on a straight control plate it runs on and nothing returns, while at an L-junction with an identical perpendicular plate it splits into a reflected packet, a transmitted bending wave descending the vertical plate and a faster in-plane precursor, with the closed-form junction transmission coefficient of 0.50 at normal incidence and the diffuse vibration reduction index of 5.2 dB annotated" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_plate_junction.webm)
+
 ## 3. Diffuse-field angular average (Eq. 5.6)
 
 In a diffuse vibration field every angle of incidence is equally probable and

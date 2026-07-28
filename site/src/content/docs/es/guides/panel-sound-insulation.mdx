@@ -161,6 +161,28 @@ plt.show()
 
 </details>
 
+El clip de abajo mira la coincidencia mientras ocurre en un campo FDTD
+elástico 2D: una placa de acero de 10 mm inmersa en aire, excitada por una
+onda plana sostenida a 45 grados, con las dos frecuencias elegidas con la
+`coincidence_frequency` de la librería. A `fc/2` = 603 Hz la transmisión
+medida cae sobre la ley de masas oblicua; a `2 fc` = 2413 Hz la traza a 45
+grados iguala exactamente la longitud de onda de flexión y la placa en
+coincidencia reirradia un haz a 45 grados que crece a lo largo de la placa
+(dibujado con ganancia x20 bajo ella), clavando el nivel transmitido en la
+cifra de `fc/2` aunque la ley de masas exige 12 dB más de bloqueo a
+cuatro veces la frecuencia. El aire excita el pesado acero tan débilmente
+que la onda de flexión resonante necesita decenas de metros de placa
+iluminada para desarrollarse del todo, y por eso las medidas muestran un
+valle de coincidencia real y no una transparencia total.
+
+<Video
+  name="anim_elastic_coincidence"
+  width={2400}
+  height={1350}
+  title="Coincidencia en una placa de acero de 10 mm en una simulación FDTD elástica 2D"
+  description="Dos campos FDTD elásticos lado a lado de la misma placa de acero de 10 mm tendida en aire mientras llega una onda plana sostenida a 45 grados. A 603 Hz, la mitad de la frecuencia de coincidencia, la onda se refleja casi por completo y el débil nivel transmitido coincide con la ley de masas oblicua. A 2413 Hz, el doble de la frecuencia de coincidencia, la traza acústica iguala la longitud de onda de flexión libre y un haz transmitido a 45 grados crece bajo la placa, manteniendo el mismo nivel que el panel de baja frecuencia donde la ley de masas predecía 12 dB más de aislamiento, con la frecuencia de coincidencia de 1206 Hz de la librería y los niveles medidos y de la ley de masas anotados."
+/>
+
 ## Pared doble: la resonancia masa-muelle-masa (Bies 7.2.6)
 
 Dos hojas separadas por una cámara se comportan como un sistema

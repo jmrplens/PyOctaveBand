@@ -26,6 +26,7 @@ references:
 ---
 
 import ThemeImage from '../../../components/ThemeImage.astro';
+import Video from '../../../components/Video.astro';
 
 When a bending wave travelling on a wall or floor reaches a rigid junction with
 another plate, part of its energy is reflected and part is transmitted into the
@@ -136,6 +137,21 @@ theta = np.radians(np.linspace(0.0, 90.0, 91))
 tau12 = corner_transmission_coefficient(theta, chi, psi, "X")
 tau13 = straight_transmission_coefficient(theta, chi, psi, "X")
 ```
+
+The clip below runs this experiment in the time domain with the library's 2D
+elastic FDTD solver: a bending packet on a 10 mm steel plate reaches an
+L-junction with an identical plate, and the corner splits it into the
+reflected and transmitted waves this section prices at `tau12(0 deg) = 0.5`.
+The fast in-plane precursor racing down the receiving plate is the mode
+conversion the pinned-junction model deliberately leaves out.
+
+<Video
+  name="anim_elastic_plate_junction"
+  width={2400}
+  height={1350}
+  title="Bending waves at an L-junction in a 2D elastic FDTD simulation"
+  description="A 4 kHz tone-burst force launches a bending-wave packet along a 10 mm steel plate. On the straight control plate the packet just runs on and nothing returns. At an L-junction with an identical perpendicular plate it splits: part reflects, part turns the corner as a bending wave descending the vertical plate, and a faster in-plane precursor races ahead, with the closed-form transmission coefficient of 0.50 at normal incidence and the diffuse vibration reduction index of 5.2 dB annotated."
+/>
 
 ## 3. Diffuse-field angular average
 
