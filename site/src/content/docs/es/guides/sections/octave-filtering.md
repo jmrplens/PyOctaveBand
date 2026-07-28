@@ -1,6 +1,6 @@
 ---
 title: "Filtrado en octavas"
-description: "El análisis en bandas de octava fraccional en phonometry: los bancos de filtros ANSI S1.11 / IEC 61260-1 y sus arquitecturas, el procesado por bloques con estado para señales en streaming, y el análisis multicanal vectorizado."
+description: "El análisis en bandas de octava fraccional en phonometry: los bancos de filtros ANSI S1.11 / IEC 61260-1 y sus arquitecturas, la verificación de clase de IEC 61260-1, el procesado por bloques con estado para señales en streaming, y el análisis multicanal vectorizado."
 ---
 
 El análisis acústico rara vez quiere una FFT en bruto: las normas, los
@@ -22,6 +22,12 @@ resultado. Por dentro, cada banco es una cascada de secciones de segundo
 orden con diezmado multitasa, que es lo que mantiene numéricamente estables
 las bandas de baja frecuencia.
 
+Demostrar que un banco diseñado cumple esas tolerancias es el trabajo de
+[Verificación de clase de filtros (IEC 61260-1)](/phonometry/es/guides/filter-compliance/):
+la máscara de aceptación de la Tabla 1 banda a banda, la clase 0 más estricta
+de la edición retirada de 1995, qué aporta una clase de prestaciones en una
+medida y la ficha de conformidad acreditada de una página.
+
 Las otras dos páginas escalan esa base por dos ejes independientes.
 [Procesado por bloques](/phonometry/es/guides/block-processing/) la escala en
 *tiempo*: las señales que no caben en memoria (grabaciones de horas,
@@ -42,6 +48,9 @@ páginas producen.
 - [Bancos de filtros](/phonometry/es/guides/filter-banks/): las cinco
   arquitecturas de filtro, respuestas en frecuencia, descomposición en bandas
   y filtrado de fase cero.
+- [Verificación de clase de filtros (IEC 61260-1)](/phonometry/es/guides/filter-compliance/):
+  la máscara de aceptación de la Tabla 1, la clase 0 y la ficha de
+  conformidad.
 - [Procesado por bloques](/phonometry/es/guides/block-processing/): flujos en
   streaming con estado de filtro arrastrado.
 - [Multicanal y rendimiento](/phonometry/es/guides/multichannel/): análisis

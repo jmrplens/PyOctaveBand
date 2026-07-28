@@ -359,7 +359,7 @@ _ES: dict[str, str] = {
     "Sound power methods compared": "Métodos de potencia acústica comparados",
     "Free field over a reflecting plane":
         "Campo libre sobre plano reflectante",
-    "Reverberation test room": "Sala reverberante de ensayo",
+    "Reverberation test room": "Cámara reverberante de ensayo",
     "In situ — any environment": "In situ — cualquier entorno",
     "Grade 2 / 3 (engineering / survey)":
         "Grado 2 / 3 (ingeniería / control)",

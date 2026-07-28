@@ -290,9 +290,9 @@ El nivel de potencia acústica $L_W = 10 \log_{10}(P/P_0)$ ($P_0 = 1$ pW) es una
 magnitud de *emisión*: a diferencia de un nivel de presión, no depende de la
 distancia al receptor ni de la sala. Tres familias de métodos lo recuperan.
 
-<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_es.svg" alt="Las tres vías de potencia acústica en paralelo: una superficie envolvente de presión sobre un plano reflectante (ISO 3744/3746), una fuente en una sala reverberante muestreada por micrófonos (ISO 3741) y una sonda de intensidad barriendo una superficie alrededor de la fuente (ISO 9614-2)" style="width:92%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_es_dark.svg" alt="Las tres vías de potencia acústica en paralelo: una superficie envolvente de presión sobre un plano reflectante (ISO 3744/3746), una fuente en una sala reverberante muestreada por micrófonos (ISO 3741) y una sonda de intensidad barriendo una superficie alrededor de la fuente (ISO 9614-2)" style="width:92%" loading="lazy">
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_es.svg" alt="Las tres vías de potencia acústica en paralelo: una superficie envolvente de presión sobre un plano reflectante (ISO 3744/3746), una fuente en una cámara reverberante muestreada por micrófonos (ISO 3741) y una sonda de intensidad barriendo una superficie alrededor de la fuente (ISO 9614-2)" style="width:92%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_es_dark.svg" alt="Las tres vías de potencia acústica en paralelo: una superficie envolvente de presión sobre un plano reflectante (ISO 3744/3746), una fuente en una cámara reverberante muestreada por micrófonos (ISO 3741) y una sonda de intensidad barriendo una superficie alrededor de la fuente (ISO 9614-2)" style="width:92%" loading="lazy">
 
-*Las tres vías hacia LW: superficie envolvente de presión, sala reverberante y barrido de intensidad.*
+*Las tres vías hacia LW: superficie envolvente de presión, cámara reverberante y barrido de intensidad.*
 
 ### Presión sobre superficie envolvente (ISO 3744/3746)
 
@@ -341,7 +341,7 @@ $DI_i = L_{pi} - \bar{L}_p$ (Ec. 21). El ejemplo de incertidumbre de la
 cláusula 10.5, $U = 2\sqrt{0{,}5^2 + 2{,}0^2} = 4{,}12$ dB, se reproduce, junto
 con los valores de $\sigma_{R0}$ por banda de las Tablas 2/3.
 
-### Sala reverberante (ISO 3741)
+### Cámara reverberante (ISO 3741)
 
 En un campo difuso cualificado la densidad de energía estacionaria
 $w = 4P/(A c)$ liga la potencia a la absorción de la sala, dando
@@ -398,4 +398,9 @@ marcan. Una intensidad normal uniforme recupera la potencia exactamente
 (100 µW sobre 3,75 m² → 80,0 dB re 1 pW), con independencia de cómo se
 segmente la superficie.
 
-Consulta la [guía de potencia acústica](/phonometry/es/guides/sound-power/) para su uso.
+Consulta la [guía de potencia acústica](/phonometry/es/guides/sound-power/)
+para la elección de método, y las guías de
+[métodos de presión](/phonometry/es/guides/sound-power-pressure/),
+[cámara reverberante](/phonometry/es/guides/sound-power-reverberation/) y
+[barrido de intensidad](/phonometry/es/guides/sound-power-intensity/) para su
+uso.

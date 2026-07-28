@@ -1,6 +1,6 @@
 ---
 title: "Guides"
-description: "The 81 guides of phonometry, grouped into the nine areas the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
+description: "The 89 guides of phonometry, grouped into the nine areas the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
 head:
   - tag: script
     attrs:
@@ -89,7 +89,7 @@ makes, then runnable code and the figure it draws. Nothing here is a survey of
 the field; each page is the working documentation of a module, written so that
 a result can be defended clause by clause rather than trusted.
 
-This page is the map. Eighty-one guides sit in nine areas, and each area has its
+This page is the map. Eighty-nine guides sit in nine areas, and each area has its
 own overview page with the longer story of how its pieces fit together. If you
 are arriving without a specific question, read
 [Getting Started](/phonometry/getting-started/) first: it runs one signal
@@ -123,6 +123,9 @@ IEC 61252, ISO 1996-1, IEC 60942, ISO 18233 and the GUM.
 - [Filter Banks](/phonometry/guides/filter-banks/): the five filter
   architectures, their frequency responses, band decomposition and zero-phase
   offline filtering.
+- [Filter Class Verification (IEC 61260-1)](/phonometry/guides/filter-compliance/):
+  the Table 1 acceptance mask band by band, the class 0 of the withdrawn 1995
+  edition and the compliance fiche.
 - [Block Processing](/phonometry/guides/block-processing/): stateful streaming
   analysis that carries filter state across buffers, for signals that never fit
   in memory.
@@ -400,6 +403,9 @@ IEC 61400-11.
 - [Aircraft noise: Effective Perceived Noise Level](/phonometry/guides/aircraft-noise/):
   perceived noisiness and PNL, the tone correction, the duration correction and
   the measurement-system verifier.
+- [Airport Noise (ECAC Doc 29)](/phonometry/guides/airport-noise/): the
+  noise-power-distance engine, the per-segment single-event chain and the
+  ground-grid SEL contour.
 - [Rotorcraft noise: the hemisphere method](/phonometry/guides/rotorcraft-noise/):
   the hemisphere source model with its propagation adjustments, flight-condition
   interpolation, and the single-event contours.
@@ -436,18 +442,31 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 and EBU R 128.
 
 - [Sound Intensity (p-p)](/phonometry/guides/intensity/): two-microphone
   intensity with the field indicators that qualify the measurement.
-- [Sound Power](/phonometry/guides/sound-power/): the sound power level by five
-  routes, enveloping surface, reverberation room, anechoic room and two grades
-  of intensity scanning.
+- [Sound Power](/phonometry/guides/sound-power/): choosing the determination
+  method and declaring the noise emission per ISO 4871.
+- [Sound Power by Pressure Methods](/phonometry/guides/sound-power-pressure/):
+  the enveloping surface of ISO 3744/3746 and the precision anechoic grade of
+  ISO 3745.
+- [Sound Power in the Reverberation Room](/phonometry/guides/sound-power-reverberation/):
+  the direct and comparison methods of ISO 3741.
+- [Sound Power by Intensity Scanning](/phonometry/guides/sound-power-intensity/):
+  the on-site scanning of ISO 9614-2 and the ISO 9614-3 precision grade.
 - [Electroacoustics: distortion and frequency response](/phonometry/guides/electroacoustics/):
-  harmonic and intermodulation distortion, THD+N and SINAD, dynamic range, the
-  H1/H2 frequency-response estimators and the sensitivity conventions.
+  harmonic and intermodulation distortion, THD+N and SINAD, dynamic range and
+  the H1/H2 frequency-response estimators.
+- [Loudspeaker Characterisation (IEC 60268-5)](/phonometry/guides/loudspeakers/):
+  the sensitivity conventions, the radiating piston and the characteristics
+  fiche.
+- [Microphone Characterisation (IEC 60268-4)](/phonometry/guides/microphones/):
+  the sensitivity references, the directional patterns and the inherent noise.
 - [Swept-sine distortion and phase utilities](/phonometry/guides/swept-sine-distortion/):
   harmonic separation from one exponential sweep, THD against excitation
   frequency, and minimum phase, group delay and excess phase.
-- [Industrial Noise Control: Silencers, HVAC and Enclosures](/phonometry/guides/noise-control/):
-  reactive silencers by the transmission-matrix method, duct attenuation and
-  flow noise, and enclosure insertion loss.
+- [Silencers](/phonometry/guides/silencers/): reactive silencers by the
+  four-pole transmission-matrix method and the reactive-versus-dissipative
+  choice.
+- [Industrial Noise Control: HVAC and Enclosures](/phonometry/guides/noise-control/):
+  duct attenuation and flow noise, and enclosure insertion loss.
 - [Programme loudness and true peak](/phonometry/guides/program-loudness/):
   K-weighting and gated integrated loudness in LUFS, the momentary and
   short-term meters, the loudness range and the true-peak level.

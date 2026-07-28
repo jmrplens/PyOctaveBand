@@ -6109,7 +6109,8 @@ def generate_airport_contour(output_dir: str) -> None:
     z = np.clip((xs - 1500.0) * 0.11, 0.0, 2500.0)
     power = np.where(xs < 3000.0, 12000.0, 10000.0)
     path = np.column_stack([xs, np.zeros_like(xs), z, power, np.full_like(xs, vref)])
-    res = noise_contour(path, powers, distances, sel, lmax,
+    ground_roll = xs[:-1] < 1500.0  # takeoff roll: segments still on the runway
+    res = noise_contour(path, powers, distances, sel, lmax, ground_roll=ground_roll,
                         x=np.linspace(-2500.0, 20000.0, 56), y=np.linspace(-6000.0, 6000.0, 44))
     ax = res.plot()
     plt.gcf().set_size_inches(10, 5.5)

@@ -31,7 +31,8 @@ it; the list grows as guides gain their References sections.
   [doi:10.1016/C2011-0-05897-0](https://doi.org/10.1016/C2011-0-05897-0).
   Sound fields, radiation and electroacoustic transducers; supports the
   electroacoustics and sound-power material.
-  Cited by [Electroacoustics](electroacoustics.md) and
+  Cited by [Electroacoustics](electroacoustics.md),
+  [Loudspeaker characterisation](loudspeakers.md) and
   [Sound Power](sound-power.md).
 
 ## Signal processing
@@ -120,7 +121,8 @@ it; the list grows as guides gain their References sections.
   [IEC webstore](https://webstore.iec.ch/en/publication/5063).
   The base-10 band edges and the class acceptance masks of the fractional
   octave banks.
-  Cited by [Filter Banks](filter-banks.md) and
+  Cited by [Filter Banks](filter-banks.md),
+  [Filter class verification](filter-compliance.md) and
   [Multichannel and Performance](multichannel.md).
 - International Electrotechnical Commission. (2013). *Electroacoustics —
   Sound level meters — Part 1: Specifications* (IEC 61672-1:2013).
@@ -143,6 +145,31 @@ it; the list grows as guides gain their References sections.
   The calibrator classes, level tolerances and the short-term stability
   criterion applied to calibration recordings.
   Cited by [Calibration and dBFS](calibration.md).
+- International Electrotechnical Commission. (2014). *Sound system equipment —
+  Part 4: Microphones* (IEC 60268-4:2014).
+  [IEC webstore](https://webstore.iec.ch/en/publication/32039).
+  The rated microphone characteristics: free-field sensitivity and its level
+  re 1 V/Pa, the frequency response and the effective frequency range against
+  the tolerance limits, the directional pattern and the directivity index, the
+  overload sound pressure level, the equivalent sound pressure level due to
+  inherent noise, and the rated impedances and power supply.
+  Cited by [Microphone characterisation](microphones.md).
+- International Electrotechnical Commission. (2007). *Sound system equipment —
+  Part 5: Loudspeakers* (IEC 60268-5:2003+A1:2007).
+  [IEC webstore](https://webstore.iec.ch/en/publication/1223).
+  The rated loudspeaker characteristics: rated impedance, rated frequency
+  range, characteristic sensitivity referred to 1 W at 1 m, the effective
+  frequency range against the -10 dB band, the directivity index and the total
+  harmonic distortion against frequency.
+  Cited by [Loudspeaker characterisation](loudspeakers.md).
+- International Electrotechnical Commission. (1982). *Scales and sizes for
+  plotting frequency characteristics and polar diagrams* (IEC 60263:1982).
+  [IEC webstore](https://webstore.iec.ch/en/publication/1218).
+  The scale proportions of the characteristic graphs: one frequency decade
+  equal to 25 dB on the ordinate, and the polar diagram on a 25 dB
+  reference-circle radius.
+  Cited by [Loudspeaker characterisation](loudspeakers.md) and
+  [Microphone characterisation](microphones.md).
 - International Electrotechnical Commission. (1985). *Sound system
   equipment — Part 1: General* (IEC 60268-1:1985).
   [IEC webstore](https://webstore.iec.ch/en/publication/1204).
@@ -192,7 +219,7 @@ it; the list grows as guides gain their References sections.
   [doi:10.4324/9780203475386](https://doi.org/10.4324/9780203475386).
   The monograph on sound energy flux: active and reactive intensity, the
   p-p estimator and its phase-mismatch error budget.
-  Cited by [Sound Power](sound-power.md) and
+  Cited by [Sound power by intensity scanning](sound-power-intensity.md) and
   [Sound Intensity (p-p)](intensity.md).
 - International Organization for Standardization. (2019). *Acoustics —
   Determination of sound power levels of noise sources — Guidelines for the
@@ -207,21 +234,21 @@ it; the list grows as guides gain their References sections.
   rooms* (ISO 3741:2010).
   [iso.org catalogue](https://www.iso.org/standard/52053.html).
   The precision reverberation-room method.
-  Cited by [Sound Power](sound-power.md).
+  Cited by [Sound power in the reverberation room](sound-power-reverberation.md).
 - International Organization for Standardization. (2010). *Acoustics —
   Determination of sound power levels and sound energy levels of noise
   sources using sound pressure — Engineering methods for an essentially free
   field over a reflecting plane* (ISO 3744:2010).
   [iso.org catalogue](https://www.iso.org/standard/52055.html).
   The enveloping-surface engineering method.
-  Cited by [Sound Power](sound-power.md).
+  Cited by [Sound power by pressure methods](sound-power-pressure.md).
 - International Organization for Standardization. (2012). *Acoustics —
   Determination of sound power levels and sound energy levels of noise
   sources using sound pressure — Precision methods for anechoic rooms and
   hemi-anechoic rooms* (ISO 3745:2012).
   [iso.org catalogue](https://www.iso.org/standard/45362.html).
   The precision anechoic-room method.
-  Cited by [Sound Power](sound-power.md).
+  Cited by [Sound power by pressure methods](sound-power-pressure.md).
 - International Organization for Standardization. (1993). *Acoustics —
   Determination of sound power levels of noise sources using sound
   intensity — Part 1: Measurement at discrete points* (ISO 9614-1:1993).
@@ -832,7 +859,7 @@ it; the list grows as guides gain their References sections.
   airplane noise* (SAE AIR 5662).
   [sae.org](https://www.sae.org/standards/content/air5662/).
   The soft-ground lateral-attenuation model adopted by ECAC Doc 29.
-  Cited by [Aircraft noise](aircraft-noise.md).
+  Cited by [Airport noise](airport-noise.md).
 - European Civil Aviation Conference. (2016). *Report on standard method of
   computing noise contours around civil airports* (ECAC.CEAC Doc 29, 4th ed.),
   Volume 2: Technical guide.
@@ -840,14 +867,14 @@ it; the list grows as guides gain their References sections.
   [free PDF](https://www.ecac-ceac.org/images/documents/ECAC-Doc_29_4th_edition_Dec_2016_Volume_2.pdf).
   The European airport noise-contour method: NPD interpolation and the
   single-event segment calculation.
-  Cited by [Aircraft noise](aircraft-noise.md).
+  Cited by [Airport noise](airport-noise.md).
 - European Civil Aviation Conference. (2026). *Report on standard method of
   computing noise contours around civil airports* (ECAC.CEAC Doc 29, 5th ed.),
   Volume 3: Reference cases and verification framework.
   [ECAC documents page](https://www.ecac-ceac.org/documents/ecac-documents-and-international-agreements),
   [free PDF](https://www.ecac-ceac.org/images/documents/ECAC-CEAC-DOC_29_5th_Edition-REPORT_ON_STANDARD_METHOD_OF_COMPUTING_NOISE_CONTOURS_AROUND_CIVIL_AIRPORTS-Volume_3-REFERENCE_CASES_AND_VERIFICATION_FRAMEWORK.pdf).
   The reference cases and workbook used to validate the single-event chain.
-  Cited by [Aircraft noise](aircraft-noise.md).
+  Cited by [Airport noise](airport-noise.md).
 - European Civil Aviation Conference. (2026). *Report on standard method of
   computing rotorcraft noise contours* (ECAC.CEAC Doc 32, 1st ed.).
   [ECAC documents page](https://www.ecac-ceac.org/documents/ecac-documents-and-international-agreements),

@@ -44,8 +44,11 @@ arrives.
 Transport and energy sources with their own certification metrics.
 
 - [Aircraft noise: Effective Perceived Noise Level](/phonometry/guides/aircraft-noise/):
-  the ICAO Annex 16 EPNL, the IEC 61265 measurement-system verifier, SAE
-  ARP 5534 atmospheric absorption and ECAC Doc 29 NPD interpolation.
+  the ICAO Annex 16 EPNL, the IEC 61265 measurement-system verifier and the
+  SAE ARP 5534 atmospheric absorption.
+- [Airport Noise (ECAC Doc 29)](/phonometry/guides/airport-noise/): the
+  noise-power-distance engine, the single-event segment chain and the
+  ground-grid SEL contour.
 - [Rotorcraft noise: the hemisphere method](/phonometry/guides/rotorcraft-noise/):
   the ECAC Doc 32 noise-hemisphere source model with its propagation
   adjustments.

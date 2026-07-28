@@ -382,4 +382,9 @@ net power is negative are not determinable (clause 9.2) and are flagged. A
 uniform normal intensity recovers the power exactly (100 µW over 3.75 m² →
 80.0 dB re 1 pW), independent of how the surface is segmented.
 
-See the [Sound Power guide](/phonometry/guides/sound-power/) for usage.
+See the [Sound Power guide](/phonometry/guides/sound-power/) for the choice
+of method, and the
+[pressure](/phonometry/guides/sound-power-pressure/),
+[reverberation-room](/phonometry/guides/sound-power-reverberation/) and
+[intensity-scanning](/phonometry/guides/sound-power-intensity/) guides for
+usage.

@@ -37,30 +37,8 @@ references:
     designation: "SAE ARP 866B, estabilizada en 2012"
     url: "https://www.sae.org/standards/content/arp866b/"
     note: "La práctica SAE de absorción atmosférica predecesora, origen del método aproximado limitado a 50 dB con el que se contrasta el método SAE."
-  - type: standard
-    organization: "SAE International"
-    year: 2006
-    title: "Method for predicting lateral attenuation of airplane noise"
-    designation: "SAE AIR 5662"
-    url: "https://www.sae.org/standards/content/air5662/"
-    note: "El modelo de atenuación lateral sobre suelo blando que la Doc 29 adopta (sección 4.5.4) en la sección de contornos de evento único."
-  - type: report
-    organization: "European Civil Aviation Conference"
-    year: 2016
-    title: "Report on standard method of computing noise contours around civil airports, Volume 2: Technical guide"
-    number: "ECAC.CEAC Doc 29, 4.ª ed."
-    url: "https://www.ecac-ceac.org/images/documents/ECAC-Doc_29_4th_edition_Dec_2016_Volume_2.pdf"
-    note: "La interpolación NPD del nivel de evento (sección 4.2) y el cálculo de evento único por segmentos (ajuste de impedancia, duración, instalación del motor, atenuación lateral, fracción de ruido, directividad de inicio de rodaje, suma) de las secciones de ruido de aeropuerto, hasta los contornos en malla de tierra. El PDF enlazado es la descarga gratuita; los volúmenes están catalogados en la página de documentos de ECAC (https://www.ecac-ceac.org/documents/ecac-documents-and-international-agreements)."
-  - type: report
-    organization: "European Civil Aviation Conference"
-    year: 2026
-    title: "Report on standard method of computing noise contours around civil airports, Volume 3: Reference cases and verification framework"
-    number: "ECAC.CEAC Doc 29, 5.ª ed."
-    url: "https://www.ecac-ceac.org/images/documents/ECAC-CEAC-DOC_29_5th_Edition-REPORT_ON_STANDARD_METHOD_OF_COMPUTING_NOISE_CONTOURS_AROUND_CIVIL_AIRPORTS-Volume_3-REFERENCE_CASES_AND_VERIFICATION_FRAMEWORK.pdf"
-    note: "El workbook de referencia de la Parte 1 contra el que se valida la cadena de evento único. El PDF enlazado es la descarga gratuita; los volúmenes están catalogados en la página de documentos de ECAC (https://www.ecac-ceac.org/documents/ecac-documents-and-international-agreements)."
 ---
 
-import Video from '../../../../components/Video.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
 
@@ -273,174 +251,11 @@ att.plot()   # banda frente a tono puro medio de banda (requiere matplotlib)
 
 Válido ~6–32 °C, 20–95 % HR (ventana 14 CFR Part 36), hasta 7620 m, recíproco.
 
-## Ruido de aeropuerto: el motor NPD (ECAC Doc 29)
-
-El método de ruido de aeropuerto de ECAC Doc 29 describe la aeronave con tablas
-**nivel-potencia-distancia (NPD)**. `npd_level` lee el nivel de evento
-(`LAmax`/`SEL`) para una potencia y distancia arbitrarias, interpolando
-linealmente en potencia (Ec. 4-3) y log-linealmente en distancia oblicua
-(Ec. 4-4).
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airport_noise_es.svg" alt="Curvas nivel-potencia-distancia para dos ajustes de potencia; el nivel de evento cae log-linealmente con la distancia oblicua entre los nodos tabulados" width="82%" />
-
-<details>
-<summary>Mostrar el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import aircraft
-
-# Una tabla NPD esquemática: SEL frente a distancia oblicua para dos empujes.
-powers = [12000.0, 20000.0]
-distances = [200.0, 400.0, 630.0, 1000.0, 2000.0, 4000.0, 6300.0, 10000.0]
-levels = [[98.5, 92.0, 88.2, 83.6, 76.8, 69.4, 63.9, 56.8],
-          [107.2, 100.9, 97.2, 92.7, 86.0, 78.5, 72.9, 65.6]]
-
-fig, ax = plt.subplots()
-for p in (20000.0, 12000.0):
-    curve = aircraft.npd_curve(powers, distances, levels, power=p)
-    line, = ax.semilogx(curve.distance, curve.level, label=f"P = {p:.0f} N")
-    ax.semilogx(curve.table_distances, curve.table_levels, "o", markersize=4,
-                color=line.get_color())
-ax.set(xlabel="Distancia oblicua [m]", ylabel="Nivel de evento [dB]",
-       title="Curvas nivel-potencia-distancia (ECAC Doc 29)")
-ax.grid(True, which="both", alpha=0.3)
-ax.legend()
-plt.show()
-```
-
-</details>
-
-```python
-from phonometry import aircraft
-
-powers = [12000.0, 20000.0]
-distances = [200.0, 400.0, 1000.0, 2000.0, 6300.0, 10000.0]
-levels = [[98.5, 92.0, 83.6, 76.8, 63.9, 56.8],
-          [107.2, 100.9, 92.7, 86.0, 72.9, 65.6]]
-aircraft.npd_curve(powers, distances, levels, power=20000.0).plot()
-```
-
-Es el motor NPD que sustenta el método.
-
-## Contornos de ruido de aeropuerto (evento único)
-
-El cálculo de evento único trocea la trayectoria en segmentos y corrige el nivel
-base NPD por segmento (§4.3-4.5): `impedance_adjustment` (T, p),
-`lateral_attenuation` (β,ℓ), `engine_installation_correction` (φ, montaje),
-`duration_correction`, la fracción de segmento finito `noise_fraction` y, detrás
-de los segmentos de rodaje de despegue, `start_of_roll_directivity` (ΔSOR).
-`event_level` los ensambla y suma en `SEL`/`LAmax`, y `noise_contour` lo evalúa
-sobre una malla en tierra (marca los segmentos de rodaje con una máscara
-`ground_roll`).
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airport_contour_es.webp" alt="Contorno SEL de un despegue: huella alargada a lo largo de la trayectoria, más intensa cerca del rodaje" width="90%" />
-
-<details>
-<summary>Mostrar el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import aircraft
-
-# Tablas NPD (SEL y LAmax) de una aeronave, dos ajustes de potencia.
-powers = [8000.0, 12000.0]
-distances = [60.0, 120.0, 240.0, 480.0, 960.0, 1920.0, 3840.0, 7680.0]
-sel = [[98.0, 92.0, 86.0, 80.0, 74.0, 68.0, 62.0, 56.0],
-       [104.0, 98.0, 92.0, 86.0, 80.0, 74.0, 68.0, 62.0]]
-lmax = [[94.0, 88.0, 82.0, 76.0, 70.0, 64.0, 58.0, 52.0],
-        [100.0, 94.0, 88.0, 82.0, 76.0, 70.0, 64.0, 58.0]]
-
-# Despegue: rodaje a lo largo de +x y después un ascenso constante.
-xs = np.linspace(0.0, 18000.0, 40)
-z = np.clip((xs - 1500.0) * 0.11, 0.0, 2500.0)
-power = np.where(xs < 3000.0, 12000.0, 10000.0)
-path = np.column_stack([xs, np.zeros_like(xs), z, power, np.full_like(xs, 82.3)])
-
-contour = aircraft.noise_contour(path, powers, distances, sel, lmax,
-                                 x=np.linspace(-2500.0, 20000.0, 56),
-                                 y=np.linspace(-6000.0, 6000.0, 44))
-contour.plot(language="es")   # huella SEL de evento único (requiere matplotlib)
-plt.show()
-```
-
-</details>
-
-El mecanismo que explica estas correcciones de suelo es la interferencia de dos
-caminos: la onda directa y su reflexión en el suelo. Abajo, una fuente de
-400 Hz a 1,5 m sobre un plano rígido forma el patrón de lóbulos, con la fuente
-imagen dibujada como fantasma bajo el suelo y un receptor situado en un mínimo
-de interferencia.
-
-<Video
-  name="anim_fdtd_ground_effect"
-  width={2400}
-  height={1350}
-  title="Interferencia por efecto del suelo sobre suelo rígido (FDTD 2D)"
-  description="Simulación FDTD 2D de una fuente puntual de 400 Hz a 1,5 metros sobre suelo rígido. Los frentes de onda directo y reflejado en el suelo interfieren y se forma un patrón de lóbulos, la fuente imagen fantasma bajo el suelo explica la geometría y el nivel muestreado sobre un arco de 8 metros converge al modelo de fuente imagen de dos caminos con sus mínimos previstos."
-/>
-
-La directividad de inicio de rodaje es la radiación trasera lobulada del ruido
-de chorro: máxima hacia un acimut ψ ≈ 120° respecto al morro, y decreciente al
-través (ψ = 90°) y directamente detrás (ψ = 180°).
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airport_sor_es.svg" alt="Diagrama polar de la directividad de inicio de rodaje ΔSOR sobre el semicírculo trasero para reactor turbofán y turbohélice, con un lóbulo cerca de 120° respecto al morro" width="75%" />
-
-<details>
-<summary>Mostrar el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import aircraft
-
-az = np.linspace(90.0, 270.0, 361)              # semicírculo trasero
-psi = np.where(az <= 180.0, az, 360.0 - az)     # ΔSOR es simétrico izquierda/derecha
-jet = [aircraft.start_of_roll_directivity(p, 300.0, "jet") for p in psi]
-prop = [aircraft.start_of_roll_directivity(p, 300.0, "turboprop") for p in psi]
-
-ax = plt.subplot(projection="polar")
-ax.set_theta_zero_location("N")                 # morro arriba, acimut horario
-ax.set_theta_direction(-1)
-ax.plot(np.radians(az), jet, label="Reactor turbofán")
-ax.plot(np.radians(az), prop, label="Turbohélice")
-ax.set_rlim(-16.0, 0.0)                         # eje radial: dB respecto al través
-ax.legend(loc="lower center")
-plt.show()
-```
-
-</details>
-
-```python
-import numpy as np
-from phonometry import aircraft
-
-powers = [8000.0, 12000.0]; distances = [60.0, 240.0, 960.0, 3840.0]
-sel = [[98.0, 86.0, 74.0, 62.0], [104.0, 92.0, 80.0, 68.0]]
-lmax = [[94.0, 82.0, 70.0, 58.0], [100.0, 88.0, 76.0, 64.0]]
-xs = np.linspace(0.0, 18000.0, 40)
-path = np.column_stack([xs, np.zeros_like(xs), np.clip((xs-1500)*0.11, 0, 2500),
-                        np.where(xs < 3000, 12000.0, 10000.0), np.full_like(xs, 82.3)])
-aircraft.noise_contour(path, powers, distances, sel, lmax,
-                 x=np.linspace(-2500, 20000, 60), y=np.linspace(-6000, 6000, 48)).plot()
-```
-
-Validado contra el workbook de referencia de ECAC Doc 29 5ª ed. Vol 3 Parte 1:
-la geometría de segmento, la atenuación lateral, la instalación del motor, la
-fracción de ruido y la directividad de inicio de rodaje (turbofán y turbohélice)
-reproducen los valores de referencia con < 0,01 dB, y la suma energética de
-segmentos coincide con el `SEL` de referencia.
-
-El modelo cubre también el rodaje de aterrizaje (máscara `landing_roll`:
-fracción de ruido reducida Ec. 4-21b, geometría al extremo más cercano, sin
-término de directividad), el ángulo de alabeo por segmento (`bank`, positivo
-con el ala de estribor arriba; el ángulo de depresión es φ = β + ε para
-observadores a estribor de la traza y φ = β − ε para observadores a babor,
-§4.5.2), la geometría lateral §4.5.5 al extremo más cercano detrás
-del rodaje de despegue, la velocidad media Ec. 4-13b en segmentos de pista y el
-suelo recomendado de 30 m en las consultas NPD. Siete eventos de receptor del
-workbook de referencia se reproducen end-to-end en la suite de tests.
+La cadena de certificación termina aquí. Convertir estos aviones en ruido
+alrededor de un aeropuerto, las tablas nivel-potencia-distancia, las
+correcciones por segmento de una trayectoria y el contorno en tierra de un
+evento único, es el método de ECAC Doc 29 de
+[Ruido de aeropuertos](/phonometry/es/guides/airport-noise/).
 
 ## Qué cubre esta guía
 
@@ -452,18 +267,16 @@ ETM Vol. I) y la cadena EPNL completa (`effective_perceived_noise_level`, que
 reproduce el ejemplo de la Tabla 4-4 del ETM Vol. I). Las tolerancias del
 sistema de medida de la IEC 61265:1995 mediante `verify_aircraft_noise_system`.
 La absorción atmosférica en banda de la SAE ARP 5534 mediante
-`sae_band_attenuation`. La cadena de ruido de aeropuerto de evento único de
-ECAC Doc 29 (`npd_curve`, `event_level`, `noise_contour`), validada con menos
-de 0,01 dB de diferencia frente al workbook de referencia de la Doc 29 5.ª ed.
-Vol. 3 Parte 1.
+`sae_band_attenuation`.
 
 **No cubierto.** `verify_aircraft_noise_system` comprueba las tolerancias de
 la IEC 61265:1995, no la edición sucesora de 2018. La cadena de ruido de
-aeropuerto solo construye contornos de evento único: no ensambla los índices
-acumulados multievento (una suma al estilo Lden sobre un calendario de vuelos
-completo) que un estudio completo de contornos de ruido de la Doc 29 necesita
-además de estos niveles de evento único.
+aeropuerto de ECAC Doc 29 se ha trasladado a
+[Ruido de aeropuertos](/phonometry/es/guides/airport-noise/).
 
 ## Véase también
 
-- Referencia de la API: [`aircraft.aircraft_noise`](/phonometry/es/reference/api/aeroacoustics/aircraft-noise/), [`aircraft.airport_noise`](/phonometry/es/reference/api/aeroacoustics/airport-noise/) y [`aircraft.atmospheric_absorption`](/phonometry/es/reference/api/aeroacoustics/atmospheric-absorption/).
+- [Ruido de aeropuertos (ECAC Doc 29)](/phonometry/es/guides/airport-noise/):
+  el motor NPD y la cadena de contornos de evento único alrededor de un
+  aeropuerto.
+- Referencia de la API: [`aircraft.aircraft_noise`](/phonometry/es/reference/api/aeroacoustics/aircraft-noise/) y [`aircraft.atmospheric_absorption`](/phonometry/es/reference/api/aeroacoustics/atmospheric-absorption/).

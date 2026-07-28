@@ -15,10 +15,14 @@ fuente en un receptor.
 cubre la certificación de ala fija. El **EPNL** del Anexo 16 de la ICAO
 condensa una historia temporal en tercios de octava de un sobrevuelo en un
 único valor en EPNdB a través de la molestia percibida, una corrección tonal
-y una corrección de duración; la página añade el verificador de sistemas de medida IEC 61265, la
-absorción atmosférica SAE ARP 5534 usada en la cadena de certificación, y la
-interpolación ruido-potencia-distancia de ECAC Doc 29 que convierte niveles
-certificados en entradas para contornos de aeropuerto.
+y una corrección de duración; la página añade el verificador de sistemas de
+medida IEC 61265 y la absorción atmosférica SAE ARP 5534 usada en la cadena
+de certificación.
+[Ruido de aeropuertos (ECAC Doc 29)](/phonometry/es/guides/airport-noise/)
+recoge el avión desde ahí: las tablas nivel-potencia-distancia, las
+correcciones por segmento de una trayectoria (impedancia, atenuación lateral,
+instalación del motor, duración, fracción de ruido y directividad de inicio
+de rodaje) y el contorno de evento único sobre una malla de tierra.
 
 [Ruido de rotorcraft: el método del hemisferio](/phonometry/es/guides/rotorcraft-noise/)
 cubre los helicópteros, cuya fuerte directividad derrota a un nivel de fuente
@@ -47,8 +51,11 @@ audibilidad tonal de
 ## Páginas de esta sección
 
 - [Ruido de aeronaves: nivel efectivo de ruido percibido](/phonometry/es/guides/aircraft-noise/):
-  la cadena EPNL del Anexo 16 de la ICAO, el verificador IEC 61265, la absorción
-  SAE ARP 5534 y la interpolación NPD de ECAC Doc 29.
+  la cadena EPNL del Anexo 16 de la ICAO, el verificador IEC 61265 y la
+  absorción SAE ARP 5534.
+- [Ruido de aeropuertos (ECAC Doc 29)](/phonometry/es/guides/airport-noise/):
+  el motor NPD, la cadena de segmentos de evento único y el contorno de SEL
+  en malla de tierra.
 - [Ruido de rotorcraft: el método del hemisferio](/phonometry/es/guides/rotorcraft-noise/):
   el modelo de fuente de hemisferio de ruido de ECAC Doc 32, sus ajustes de
   propagación y las métricas y contornos de evento único.

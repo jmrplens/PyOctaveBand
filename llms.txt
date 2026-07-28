@@ -45,6 +45,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Filter Banks](https://jmrplens.github.io/phonometry/guides/filter-banks/)
 - [Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/guides/levels/)
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/guides/calibration/)
+- [Filter class verification (IEC 61260-1)](https://jmrplens.github.io/phonometry/guides/filter-compliance/)
 - [Block Processing](https://jmrplens.github.io/phonometry/guides/block-processing/)
 - [Multichannel and Performance](https://jmrplens.github.io/phonometry/guides/multichannel/)
 - [Frequency Weighting (A, B, C, D, G, AU, Z)](https://jmrplens.github.io/phonometry/guides/weighting/)
@@ -126,6 +127,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/guides/outdoor-propagation/)
 - [Impulsive-sound prominence (NT ACOU 112)](https://jmrplens.github.io/phonometry/guides/impulse-prominence/)
 - [Aircraft noise: Effective Perceived Noise Level (ICAO Annex 16 / IEC 61265)](https://jmrplens.github.io/phonometry/guides/aircraft-noise/)
+- [Airport noise (ECAC Doc 29)](https://jmrplens.github.io/phonometry/guides/airport-noise/)
 - [Rotorcraft noise: the hemisphere method (ECAC Doc 32 / NORAH2)](https://jmrplens.github.io/phonometry/guides/rotorcraft-noise/)
 - [Wind-turbine noise: apparent sound power and tonal audibility (IEC 61400-11)](https://jmrplens.github.io/phonometry/guides/wind-turbine-noise/)
 
@@ -140,9 +142,16 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 
 - [Overview](https://jmrplens.github.io/phonometry/guides/sections/sources-devices/)
 - [Sound Power](https://jmrplens.github.io/phonometry/guides/sound-power/)
+- [Sound Power by Pressure Methods (ISO 3744 / ISO 3746 / ISO 3745)](https://jmrplens.github.io/phonometry/guides/sound-power-pressure/)
+- [Sound Power in the Reverberation Room (ISO 3741)](https://jmrplens.github.io/phonometry/guides/sound-power-reverberation/)
+- [Sound Power by Intensity Scanning (ISO 9614-2 / ISO 9614-3)](https://jmrplens.github.io/phonometry/guides/sound-power-intensity/)
 - [Sound Intensity (p-p method)](https://jmrplens.github.io/phonometry/guides/intensity/)
 - [Electroacoustics: distortion and frequency response (IEC 60268-3 / Bendat & Piersol)](https://jmrplens.github.io/phonometry/guides/electroacoustics/)
+- [Loudspeaker Characterisation (IEC 60268-5)](https://jmrplens.github.io/phonometry/guides/loudspeakers/)
+- [Microphone Characterisation (IEC 60268-4)](https://jmrplens.github.io/phonometry/guides/microphones/)
 - [Swept-sine distortion and phase utilities (Farina / Novak)](https://jmrplens.github.io/phonometry/guides/swept-sine-distortion/)
+- [Silencers](https://jmrplens.github.io/phonometry/guides/silencers/)
+- [Industrial noise control: HVAC and enclosures](https://jmrplens.github.io/phonometry/guides/noise-control/)
 - [Programme loudness and true peak (ITU-R BS.1770 / EBU R 128)](https://jmrplens.github.io/phonometry/guides/program-loudness/)
 
 ## Wave simulation
@@ -155,7 +164,6 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 
 ## Other guides
 
-- [Industrial noise control: silencers, HVAC and enclosures](https://jmrplens.github.io/phonometry/guides/noise-control/)
 - [Objective intelligibility (STOI & ESTOI)](https://jmrplens.github.io/phonometry/guides/objective-intelligibility/)
 
 ## Theory and reference

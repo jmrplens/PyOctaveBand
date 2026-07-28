@@ -14,10 +14,13 @@ adjustments** that place the source at a receiver.
 covers fixed-wing certification. The **EPNL** of ICAO Annex 16 condenses a
 one-third-octave time history of a flyover into a single EPNdB value through
 perceived noisiness, a tone correction and a duration correction; the page
-adds the IEC 61265 measurement-system verifier, the SAE ARP 5534 atmospheric
-absorption used in the certification chain, and the ECAC Doc 29
-noise-power-distance interpolation that turns certified levels into airport
-contour inputs.
+adds the IEC 61265 measurement-system verifier and the SAE ARP 5534
+atmospheric absorption used in the certification chain.
+[Airport Noise (ECAC Doc 29)](/phonometry/guides/airport-noise/) picks the
+aeroplane up from there: the noise-power-distance tables, the per-segment
+corrections of a flight path (impedance, lateral attenuation, engine
+installation, duration, noise fraction and start-of-roll directivity) and the
+single-event contour over a ground grid.
 
 [Rotorcraft noise: the hemisphere method](/phonometry/guides/rotorcraft-noise/)
 covers helicopters, whose strong directivity defeats a single-number source
@@ -43,8 +46,10 @@ wind-turbine tonality test is a cousin of the tonal-audibility methods in
 ## Pages in this section
 
 - [Aircraft noise: Effective Perceived Noise Level](/phonometry/guides/aircraft-noise/):
-  the ICAO Annex 16 EPNL chain, IEC 61265 verifier, SAE ARP 5534 absorption
-  and ECAC Doc 29 NPD interpolation.
+  the ICAO Annex 16 EPNL chain, the IEC 61265 verifier and the SAE ARP 5534
+  absorption.
+- [Airport Noise (ECAC Doc 29)](/phonometry/guides/airport-noise/): the NPD
+  engine, the single-event segment chain and the ground-grid SEL contour.
 - [Rotorcraft noise: the hemisphere method](/phonometry/guides/rotorcraft-noise/):
   the ECAC Doc 32 noise-hemisphere source model, its propagation adjustments
   and the single-event metrics and contours.

@@ -47,6 +47,9 @@ escalarla: bloques en streaming y arrays multicanal.
 - [Bancos de filtros](/phonometry/es/guides/filter-banks/): las cinco
   arquitecturas de filtro, sus respuestas en frecuencia, la descomposición en
   bandas y el filtrado de fase cero fuera de línea.
+- [Verificación de clase de filtros (IEC 61260-1)](/phonometry/es/guides/filter-compliance/):
+  la máscara de aceptación de la Tabla 1 banda a banda, la clase 0 de la
+  edición retirada de 1995 y la ficha de conformidad.
 - [Procesado por bloques](/phonometry/es/guides/block-processing/): análisis
   en streaming con estado, que arrastra el estado de los filtros entre
   búferes, para señales que no caben en memoria.
