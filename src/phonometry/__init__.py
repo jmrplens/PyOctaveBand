@@ -945,6 +945,13 @@ from .room.steady_field import (
     steady_state_field,
     steady_state_spl,
 )
+from .simulation.elastic_fdtd import (
+    ElasticFDTD2D,
+    ElasticFDTDResult,
+    ExplosionSource,
+    ForceSource,
+    elastic_fdtd_simulation,
+)
 from .simulation.fdtd import (
     FDTD2D,
     CWSource,
@@ -1222,10 +1229,13 @@ __all__ = [
     "EcmaRoughness",
     "EcmaTonality",
     "EffectiveSoundSpeedProfile",
+    "ElasticFDTD2D",
+    "ElasticFDTDResult",
     "EnclosureResult",
     "EnvelopeResult",
     "EnvelopeSpectrumResult",
     "EqualLoudnessContours",
+    "ExplosionSource",
     "ExposureAssessment",
     "ExposureResult",
     "ExtendedImpactRatingResult",
@@ -1245,6 +1255,7 @@ __all__ = [
     "FloorCoveringImprovementResult",
     "FluctuationStrengthResult",
     "FlyoverResult",
+    "ForceSource",
     "FrequencyResponseResult",
     "GaussianPulse",
     "HarmonicDistortionResult",
@@ -1539,6 +1550,7 @@ __all__ = [
     "echo_detection",
     "effective_kappa",
     "effective_perceived_noise_level",
+    "elastic_fdtd_simulation",
     "elbow_insertion_loss",
     "enclosed_gas_stiffness",
     "enclosed_space_reverberation",

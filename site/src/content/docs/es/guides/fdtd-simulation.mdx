@@ -1,6 +1,6 @@
 ---
 title: "Simulación de ondas FDTD 2D"
-description: "Un solucionador acústico 2D determinista por diferencias finitas en el dominio del tiempo sobre una malla escalonada presión-velocidad: fuentes gaussianas, tonales y de señal arbitraria, sondas de presión, obstáculos rasterizados, contornos rígidos, de impedancia y absorbentes, y un resultado congelado con historias de sonda, instantáneas del campo y un método plot, siguiendo el capítulo 4 de Attenborough y Van Renterghem (2021)."
+description: "Un solucionador acústico 2D determinista por diferencias finitas en el dominio del tiempo sobre una malla escalonada presión-velocidad: fuentes gaussianas, tonales y de señal arbitraria, sondas de presión, obstáculos rasterizados, contornos rígidos, de impedancia y absorbentes, y un resultado congelado con historias de sonda, instantáneas del campo y un método plot, siguiendo el capítulo 4 de Attenborough y Van Renterghem (2021), más el solucionador elástico P-SV compañero (Virieux 1986) con superficies libres por imagen de esfuerzos, ondas de Rayleigh e interfaces fluido-sólido."
 references:
   - type: book
     authors: ["Attenborough, K.", "Van Renterghem, T."]
@@ -18,6 +18,33 @@ references:
     publisher: "CRC Press"
     doi: "10.1201/9781315372150"
     note: "La sección 3.5 sitúa los métodos ondulatorios en el dominio del tiempo entre las aproximaciones numéricas a la ecuación de onda en recintos, y el capítulo 3 da los modos normales de sala rígida usados como oráculo analítico."
+  - type: article
+    authors: ["Virieux, J."]
+    year: 1986
+    title: "P-SV wave propagation in heterogeneous media: velocity-stress finite-difference method"
+    journal: "Geophysics"
+    volume: "51"
+    issue: "4"
+    pages: "889-901"
+    doi: "10.1190/1.1442147"
+    note: "El solucionador elástico: el sistema velocidad-esfuerzo (Ec. 2), la celda totalmente escalonada y su actualización (Fig. 1, Ec. 5), la cota de Courant solo con P (Ecs. 6-7), las relaciones de dispersión (Ecs. 13-14) y el líquido como límite sin cizalla."
+  - type: article
+    authors: ["Moczo, P.", "Kristek, J.", "Galis, M.", "Pazak, P.", "Balazovjech, M."]
+    year: 2007
+    title: "The finite-difference and finite-element modeling of seismic wave propagation and earthquake motion"
+    journal: "Acta Physica Slovaca"
+    volume: "57"
+    issue: "2"
+    pages: "177-406"
+    note: "Los parámetros efectivos de malla en medio heterogéneo del solucionador elástico (módulo de cizalla armónico, densidad aritmética; Ecs. 7.37-7.39) y la superficie libre por imagen de esfuerzos (Ec. 9.9)."
+  - type: book
+    authors: ["Cremer, L.", "Heckl, M.", "Petersson, B. A. T."]
+    year: 2005
+    title: "Structure-borne sound"
+    edition: "3.ª ed."
+    publisher: "Springer"
+    doi: "10.1007/b137728"
+    note: "Los oráculos analíticos del solucionador elástico: la ecuación característica exacta de Rayleigh (Ec. 3.149) y la dispersión de flexión de Kirchhoff con su corrección de espesor (Ecs. 3.83-3.89, 3.196b)."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -461,6 +488,124 @@ de obstáculos; su `.plot()` dibuja las historias de las sondas, y
 `.plot(kind="snapshot")` representa un campo registrado con la geometría
 superpuesta.
 
+## 5. Ondas elásticas: P, S y Rayleigh
+
+Un sólido transporta más de una onda. Junto a la **onda P** de compresión
+a $c_P = \sqrt{(\lambda + 2\mu)/\rho}$ se propaga una **onda S** de
+cizalla a $c_S = \sqrt{\mu/\rho}$, y toda superficie libre de tracción
+guía una **onda de Rayleigh** justo por debajo de $c_S$.
+`elastic_fdtd_simulation` integra el sistema velocidad-esfuerzo 2D en
+deformación plana de Virieux (1986, Ec. 2),
+
+$$
+\rho\,\frac{\partial \mathbf{v}}{\partial t}
+  = \nabla\!\cdot\!\boldsymbol{\tau},
+\qquad
+\frac{\partial \boldsymbol{\tau}}{\partial t}
+  = \lambda\,(\nabla\!\cdot\!\mathbf{v})\,\mathbf{I}
+  + \mu\left(\nabla\mathbf{v} + \nabla\mathbf{v}^{\mathsf T}\right),
+$$
+
+sobre la misma disposición escalonada que el solucionador acústico: los
+esfuerzos normales ``txx``/``tyy`` comparten los centros de celda donde
+vive la presión acústica, las velocidades ocupan las caras y el esfuerzo
+de cizalla ``txy`` las esquinas (la celda totalmente escalonada de
+Virieux, desplazada media celda). La API espeja `fdtd_simulation` pieza a
+pieza: mapas de velocidades `c_p` y `c_s` (más `rho`) en lugar de `c`,
+`ExplosionSource` (una inyección isótropa de esfuerzo) y `ForceSource`
+(una fuerza de cuerpo direccional) como fuentes, sondas que registran
+``p``, ``vx`` o ``vy``, la misma maquinaria de esponjas y obstáculos, y un
+`ElasticFDTDResult` congelado con el mismo `.plot()`. La cota de Courant
+depende solo de la ``c_P`` más rápida del mapa (Virieux, Ecs. 6-7),
+mientras que la regla de resolución usa la ``c_S`` no nula más lenta de
+las celdas sólidas, porque la longitud de onda S es siempre la más corta:
+``dx <= c_s_min / (10 f)`` (un mapa completamente fluido recae en la regla
+acústica sobre la ``c_P`` más lenta).
+
+```python
+import numpy as np
+from phonometry import simulation
+
+# Un bloque de aluminio golpeado por una pequeña explosión: el frente P
+# alcanza dos sondas a 100 y 220 celdas; c_P sale del retardo diferencial.
+w = 8e-6
+res = simulation.elastic_fdtd_simulation(
+    6320.0, 3130.0, 0.002, 1.1e-4, rho=2700.0, shape=(501, 501),
+    sources=[simulation.ExplosionSource(
+        ix=250, iy=250,
+        waveform=simulation.GaussianPulse(0, 0, width=w).value)],
+    probes=[(350, 250), (470, 250)], probe_fields=("p",),
+)
+t = res.times[1:]
+t1, t2 = (t[np.abs(res.signals[k, 0, 1:]).argmax()] for k in range(2))
+print(round(0.24 / (t2 - t1)))    # 6316  c_P = sqrt((lambda+2mu)/rho) = 6320
+```
+
+Poner ``c_s = 0`` marca una celda de **fluido**: el módulo de cizalla se
+anula, el sistema degenera en las ecuaciones acústicas y, con un mapa
+uniforme de ``c_s = 0``, el solucionador elástico reproduce el acústico
+**bit a bit** (la batería de regresión afirma la igualdad exacta). Una
+columna de agua sobre un semiespacio de acero son, por tanto, solo dos
+bandas de los mapas de material: con la densidad promediada
+aritméticamente a las caras y el módulo de cizalla armónicamente a las
+esquinas (Moczo et al. 2007, Ecs. 7.37-7.39), la continuidad de tracción
+de toda interfaz interna, contactos fluido-sólido incluidos, emerge de los
+mapas sin más. La batería de validación mide la reflexión a incidencia
+normal de una interfaz agua-acero con un error inferior al 2 %
+(típicamente una fracción de porcentaje) respecto a
+``(Z2 - Z1)/(Z2 + Z1)`` y recupera la ley de masas a incidencia normal de
+una chapa de acero de 3 mm sumergida con un error inferior a 0,3 dB
+respecto a `mass_law_transmission_loss`.
+
+Un lado declarado ``"free"`` se convierte en superficie libre de tracción
+mediante la **imagen de esfuerzos** (Moczo et al., Ec. 9.9): el esfuerzo
+normal se fija a cero en el plano de la superficie y el esfuerzo de
+cizalla por encima es su imagen antisimétrica. Esa única condición de
+contorno es la que hace a las superficies portadoras de ondas: golpee
+verticalmente la superficie libre de un bloque de aluminio (el problema de
+Lamb) y, además de los frentes de cuerpo P y S, una **onda de Rayleigh**
+rueda por la superficie a $c_R \approx 0.93\,c_S$, la raíz de la ecuación
+característica exacta de Rayleigh (Cremer, Heckl y Petersson, Ec. 3.149).
+Los tests fijan la velocidad de Rayleigh medida a esa raíz dentro del 2 %
+y la onda de flexión de una franja delgada libre-libre a la dispersión de
+placa de Kirchhoff $c_B \propto \sqrt{\omega}$ en su dominio de placa
+delgada. Las superficies libres siguen la regla de muestreo de Rayleigh:
+reserve 15-20 celdas por longitud de onda ahí, pues la superficie de
+imagen de segundo orden es la parte más dispersiva del esquema.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/elastic_halfspace_waves_es.webp" alt="Instantánea de la velocidad de partícula vertical en un bloque de aluminio de 0,6 por 0,3 metros unas centésimas de milisegundo después de un golpe vertical sobre su superficie libre superior: el frente P de compresión es el arco exterior, el frente S de cizalla el arco interior a aproximadamente la mitad de su radio, y los lóbulos más intensos se pegan a la superficie justo detrás del frente S, etiquetados como la onda de Rayleigh; arcos punteados marcan los radios exactos de P y S" width="96%" />
+
+*Una instantánea, tres velocidades: el frente P ha recorrido el doble de
+distancia que el frente S (arcos punteados en los radios exactos $c_P t$ y
+$c_S t$), y el movimiento más intenso viaja a lo largo de la superficie
+libre como la onda de Rayleigh, un pelo más lenta que S.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import simulation
+
+# Un bloque de aluminio de 0,6 x 0,3 m, golpeado en su superficie libre.
+dx, w = 0.001, 8e-6
+dt = 0.6 * dx / (6320.0 * np.sqrt(2.0))
+steps = round(7.3e-5 / dt)
+res = simulation.elastic_fdtd_simulation(
+    6320.0, 3130.0, dx, 7.3e-5, rho=2700.0, shape=(300, 600),
+    sources=[simulation.ForceSource(
+        ix=300, iy=0, direction="y", amplitude=1e6,
+        waveform=simulation.GaussianPulse(0, 0, width=w).value)],
+    boundaries={"top": "free"},
+    snapshot_every=steps, snapshot_field="vy",
+)
+res.plot(kind="snapshot", language="es")
+plt.show()
+```
+
+</details>
+
 ## Qué cubre esta guía
 
 **Cubierto.** El esquema FDTD presión-velocidad escalonado de Attenborough y
@@ -475,7 +620,14 @@ sala rígida (Kuttruff cap. 3), los tiempos de llegada en campo libre y el
 decaimiento cilíndrico en 2D, el eco de imagen de pared rígida, el
 coeficiente de reflexión de impedancia y la relación de dispersión del §4,
 con el orden de convergencia medido coincidiendo con el diseño de segundo
-orden del esquema.
+orden del esquema. El compañero elástico P-SV del §5: el esquema
+velocidad-esfuerzo de Virieux (1986) con los parámetros efectivos y la
+superficie libre por imagen de esfuerzos de Moczo et al. (2007), expuesto a
+través de `elastic_fdtd_simulation`/`ElasticFDTD2D` con `ExplosionSource` y
+`ForceSource`, validado contra las velocidades de las ondas de cuerpo, la
+raíz exacta de Rayleigh, la dispersión de flexión de Kirchhoff, la
+reflexión fluido-sólido, la ley de masas del panel sumergido y el límite
+acústico bit a bit.
 
 **No cubierto.** El solver es solo bidimensional: modela una fuente lineal en
 sección transversal (propagación cilíndrica `1/sqrt(r)`), no la propagación
@@ -485,13 +637,18 @@ capa absorbente de rampa cuadrática descrita como «el precursor sencillo» de
 una verdadera capa perfectamente adaptada, no una PML en sí. Las ecuaciones
 de gobierno asumen un medio en reposo, así que no se modela la advección por
 viento o flujo, y el único contorno de impedancia es el real independiente
-de la frecuencia de las Ecs. 4.33-4.35.
+de la frecuencia de las Ecs. 4.33-4.35. El solucionador elástico es
+isótropo y puramente elástico (sin anisotropía ni amortiguamiento
+viscoelástico más allá de la tasa de decaimiento volumétrica) y no tiene
+PML elástica: la esponja absorbe las ondas de Rayleigh rasantes peor que
+las ondas de cuerpo.
 
 ## Véase también
 
 - [Informe de conformidad](/phonometry/es/reference/conformance/): dos de los anclajes
   de validación en forma cerrada del §4 se ejecutan ahí.
-- Referencia de la API: [`simulation.fdtd`](/phonometry/es/reference/api/simulation/fdtd/).
+- Referencia de la API: [`simulation.fdtd`](/phonometry/es/reference/api/simulation/fdtd/),
+  [`simulation.elastic-fdtd`](/phonometry/es/reference/api/simulation/elastic-fdtd/).
 
 ## Respuestas rápidas
 
