@@ -288,7 +288,10 @@ _SECTION_LIST: tuple[Section, ...] = (
         key="simulation",
         label_en="Wave simulation",
         label_es="Simulación de ondas",
-        modules=("phonometry.simulation.fdtd",),
+        modules=(
+            "phonometry.simulation.fdtd",
+            "phonometry.simulation.elastic_fdtd",
+        ),
     ),
     Section(
         key="correlation",

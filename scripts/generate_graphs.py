@@ -57,6 +57,12 @@ _ES_EXACT = {
         "Capa disipativa de 10 cm: reflexión + transmisión atenuada",
     "Position along the tube [m]": "Posición a lo largo del tubo [m]",
     "Frequency [Hz]": "Frecuencia [Hz]",
+    "Rayleigh wave along a free aluminium surface (elastic FDTD)":
+        "Onda de Rayleigh en una superficie libre de aluminio (FDTD elástico)",
+    "P wave front": "Frente de onda P",
+    "S wave front": "Frente de onda S",
+    "Rayleigh wave": "Onda de Rayleigh",
+    "Particle velocity [m/s]": "Velocidad de partícula [m/s]",
     "Predicted diffusion from design (Cox & D'Antonio Fraunhofer model)":
         "Difusión predicha desde el diseño (modelo de Fraunhofer de Cox y D'Antonio)",
     "Predicted diffusion coefficient d":
@@ -1848,6 +1854,7 @@ _RASTER_FIGURES = frozenset(
         "atmospheric_refraction",
         "airport_contour",
         "fdtd_simulation",
+        "elastic_halfspace_waves",
         # Dense reflectogram: hundreds of image-source stems/markers make the
         # SVG far heavier than the raster (as for schroeder_decay above).
         "image_source_reflectogram",
@@ -9477,6 +9484,62 @@ def generate_fdtd_simulation(output_dir: str) -> None:
     plt.close()
 
 
+def generate_elastic_halfspace_waves(output_dir: str) -> None:
+    """Elastic FDTD: P, S and Rayleigh waves in an aluminium half-space."""
+    print("Generating elastic_halfspace_waves...")
+    from phonometry import ForceSource, GaussianPulse, elastic_fdtd_simulation
+
+    # A 0.6 x 0.3 m aluminium block with a free upper surface, struck by a
+    # short vertical force at the middle of that surface (Lamb's problem):
+    # one snapshot shows the three wave types at their own speeds, the
+    # Rayleigh wave hugging the surface just behind the S front.
+    c_p, c_s, rho, dx = 6320.0, 3130.0, 2700.0, 0.001
+    width = 8e-6
+    duration = 7.3e-5
+    dt = 0.6 * dx / (c_p * np.sqrt(2.0))
+    steps = round(duration / dt)
+    res = elastic_fdtd_simulation(
+        c_p, c_s, dx, duration, rho=rho, shape=(300, 600),
+        sources=[ForceSource(ix=300, iy=0, direction="y", amplitude=1e6,
+                             waveform=GaussianPulse(0, 0, width=width).value)],
+        boundaries={"top": "free"},
+        snapshot_every=steps, snapshot_field="vy",
+    )
+
+    _fig, ax = plt.subplots(figsize=(9.5, 5.4))
+    assert res.snapshots is not None and res.snapshot_times is not None
+    vmax = 0.18 * float(np.abs(res.snapshots[-1]).max())
+    res.plot(kind="snapshot", frame=-1, ax=ax, vmin=-vmax, vmax=vmax)
+
+    # Wavefront radii from the pulse centre time (t0 = 4 * width).
+    t_eff = float(res.snapshot_times[-1]) - 4.0 * width
+    x0 = (300 + 0.5) * dx
+    theta = np.linspace(0.0, np.pi, 181)
+    for radius in (c_p * t_eff, c_s * t_eff):
+        ax.plot(x0 + radius * np.cos(theta), radius * np.sin(theta),
+                linestyle=":", linewidth=1.0, color=COLOR_FG, alpha=0.65)
+    ann: dict[str, Any] = {
+        "fontsize": 9, "color": COLOR_FG,
+        "arrowprops": {"arrowstyle": "->", "color": COLOR_FG, "lw": 0.9}}
+    r_p, r_s = c_p * t_eff, c_s * t_eff
+    ax.annotate("P wave front",
+                xy=(x0 + r_p * np.cos(np.radians(55)),
+                    r_p * np.sin(np.radians(55))),
+                xytext=(0.585, 0.15), ha="right", **ann)
+    ax.annotate("S wave front",
+                xy=(x0 + r_s * np.cos(np.radians(35)),
+                    r_s * np.sin(np.radians(35))),
+                xytext=(0.525, 0.038), ha="right", **ann)
+    ax.annotate("Rayleigh wave",
+                xy=(x0 - 0.92 * r_s, 0.004), xytext=(0.045, 0.06), **ann)
+    ax.set_title("Rayleigh wave along a free aluminium surface "
+                 "(elastic FDTD)", fontweight="bold", pad=10)
+
+    plt.tight_layout()
+    save_figure(output_dir, "elastic_halfspace_waves.png")
+    plt.close()
+
+
 def generate_panel_insulation_concept(output_dir: str) -> None:
     """Theoretical panel sound insulation: the four PR-I predictions."""
     print("Generating panel_insulation_concept.png...")
@@ -11986,6 +12049,8 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_rotorcraft_terrain_screening,
     # 2D FDTD wave simulation (public API concept figure).
     generate_fdtd_simulation,
+    # Elastic P-SV FDTD: half-space snapshot with P/S/Rayleigh fronts.
+    generate_elastic_halfspace_waves,
     # Theoretical panel sound insulation (single/double wall, radiation, slit).
     generate_panel_insulation_concept,
     generate_silencer_expansion_chamber,

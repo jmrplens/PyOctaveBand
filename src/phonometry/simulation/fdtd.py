@@ -42,7 +42,7 @@ from __future__ import annotations
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Protocol
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -264,6 +264,110 @@ def _sponge_profile(n: int, width: int, sides: tuple[bool, bool],
     return sigma
 
 
+def _sigma_map(shape: tuple[int, int], sides: tuple[str, ...],
+               sponge_width: int, sponge_reflection: float,
+               damping: NDArray[np.float64], c_max: float,
+               dx: float) -> Field2D:
+    """Absorption-rate map sigma(x, y) [1/s]: sponge ramps plus damping."""
+    ny, nx = shape
+    sigma_max = 0.0
+    if sponge_width > 0:
+        # Quadratic-profile PML-style rate for a target reflection R:
+        # exp(-2 * sigma_max * (w dx) / (3 c)) = R  (two-way transit).
+        sigma_max = (-3.0 * c_max * float(np.log(sponge_reflection))
+                     / (2.0 * sponge_width * dx))
+    sig_x = _sponge_profile(nx, sponge_width,
+                            ("left" in sides, "right" in sides), sigma_max)
+    sig_y = _sponge_profile(ny, sponge_width,
+                            ("top" in sides, "bottom" in sides), sigma_max)
+    return sig_x[np.newaxis, :] + sig_y[:, np.newaxis] + damping
+
+
+def _validate_sponge_damping(
+    sponge_width: int,
+    sponge_reflection: float,
+    damping: float | NDArray[np.float64],
+    ny: int,
+    nx: int,
+) -> tuple[int, NDArray[np.float64]]:
+    """Validate the sponge/damping spec into ``(width, damping map)``."""
+    sponge_width = _integer("sponge_width", sponge_width)
+    if sponge_width < 0:
+        raise ValueError("sponge_width must be non-negative")
+    if sponge_width >= min(nx, ny):
+        raise ValueError("sponge_width must be narrower than the "
+                         "smallest grid side")
+    if not 0.0 < sponge_reflection < 1.0:
+        raise ValueError("sponge_reflection must lie strictly between "
+                         "0 and 1")
+    damping_map = np.asarray(damping, dtype=np.float64)
+    if damping_map.ndim not in (0, 2):
+        raise ValueError("damping must be a scalar or an (ny, nx) map")
+    if not np.all(np.isfinite(damping_map)) or np.any(damping_map < 0.0):
+        raise ValueError("damping must be non-negative and finite")
+    if damping_map.ndim == 2 and damping_map.shape != (ny, nx):
+        raise ValueError(
+            f"damping map shape {damping_map.shape} does not match the "
+            f"grid {(ny, nx)}"
+        )
+    return sponge_width, damping_map
+
+
+class _PressureEngine(Protocol):
+    """The stepping interface the shared ``run()`` driver relies on."""
+
+    def step(self) -> None:
+        """Advance the leapfrog scheme by one time step."""
+
+    @property
+    def p(self) -> Field2D:
+        """Pressure at the cell centres, shape ``(ny, nx)``."""
+
+
+def _run_recording(
+    engine: _PressureEngine,
+    steps: int,
+    record_every: int | None,
+    decimate: int,
+) -> NDArray[np.float64]:
+    """Validate the ``run()`` arguments and march, stacking pressure frames."""
+    steps = _integer("steps", steps)
+    if steps < 0:
+        raise ValueError("steps must be non-negative")
+    if record_every is not None:
+        record_every = _integer("record_every", record_every)
+        if record_every < 1:
+            raise ValueError("record_every must be >= 1")
+    decimate = _integer("decimate", decimate)
+    if decimate < 1:
+        raise ValueError("decimate must be >= 1")
+    frames: list[Field2D] = []
+    if record_every is not None:
+        frames.append(engine.p[::decimate, ::decimate].copy())
+    for i in range(steps):
+        engine.step()
+        if record_every is not None and (i + 1) % record_every == 0:
+            frames.append(engine.p[::decimate, ::decimate].copy())
+    if not frames:
+        return np.zeros((0, 0, 0), dtype=np.float64)
+    return np.stack(frames)
+
+
+def _validated_obstacle(obstacle_mask: NDArray[np.bool_] | None,
+                        ny: int, nx: int) -> NDArray[np.bool_] | None:
+    """Validate the obstacle mask; ``None`` when absent or all open."""
+    if obstacle_mask is None:
+        return None
+    mask = np.asarray(obstacle_mask)
+    if mask.shape != (ny, nx):
+        raise ValueError("obstacle_mask must match the grid shape")
+    if mask.dtype != np.bool_:
+        raise ValueError("obstacle_mask must be a boolean array")
+    if bool(mask.all()):
+        raise ValueError("obstacle_mask must leave open cells")
+    return mask.copy() if bool(mask.any()) else None
+
+
 def _resolve_c_map(c: float | Field2D,
                    shape: tuple[int, int] | None) -> Field2D:
     """Broadcast/validate the sound-speed spec into a positive 2D map."""
@@ -440,20 +544,8 @@ class FDTD2D:
                              "is unstable beyond the Courant bound CN = 1")
         ny, nx = c_map.shape
         rho_map = _resolve_rho_map(rho, ny, nx)
-        sponge_width = _integer("sponge_width", sponge_width)
-        if sponge_width < 0:
-            raise ValueError("sponge_width must be non-negative")
-        if sponge_width >= min(nx, ny):
-            raise ValueError("sponge_width must be narrower than the "
-                             "smallest grid side")
-        if not 0.0 < sponge_reflection < 1.0:
-            raise ValueError("sponge_reflection must lie strictly between "
-                             "0 and 1")
-        damping_map = np.asarray(damping, dtype=np.float64)
-        if damping_map.ndim not in (0, 2):
-            raise ValueError("damping must be a scalar or an (ny, nx) map")
-        if not np.all(np.isfinite(damping_map)) or np.any(damping_map < 0.0):
-            raise ValueError("damping must be non-negative and finite")
+        sponge_width, damping_map = _validate_sponge_damping(
+            sponge_width, sponge_reflection, damping, ny, nx)
 
         self.dx = _positive_finite("dx", dx)
         self.c = c_map
@@ -486,11 +578,6 @@ class FDTD2D:
         self.edge_impedance: Mapping[str, float | NDArray[np.float64]] = (
             MappingProxyType(dict(edge_impedance) if edge_impedance else {})
         )
-        if damping_map.ndim == 2 and damping_map.shape != (ny, nx):
-            raise ValueError(
-                f"damping map shape {damping_map.shape} does not match the "
-                f"grid {(ny, nx)}"
-            )
         self._init_decay(sides, sponge_width, sponge_reflection, damping_map,
                          c_max)
         self._edges = self._build_edges(edge_impedance, sponge_width, sides,
@@ -502,18 +589,8 @@ class FDTD2D:
                     damping: NDArray[np.float64],
                     c_max: float) -> None:
         """Precompute the sponge/damping decay factors of every field."""
-        ny, nx = self.p.shape
-        sigma_max = 0.0
-        if sponge_width > 0:
-            # Quadratic-profile PML-style rate for a target reflection R:
-            # exp(-2 * sigma_max * (w dx) / (3 c)) = R  (two-way transit).
-            sigma_max = (-3.0 * c_max * float(np.log(sponge_reflection))
-                         / (2.0 * sponge_width * self.dx))
-        sig_x = _sponge_profile(nx, sponge_width,
-                                ("left" in sides, "right" in sides), sigma_max)
-        sig_y = _sponge_profile(ny, sponge_width,
-                                ("top" in sides, "bottom" in sides), sigma_max)
-        sigma = sig_x[np.newaxis, :] + sig_y[:, np.newaxis] + damping
+        sigma = _sigma_map(self.p.shape, sides, sponge_width,
+                           sponge_reflection, damping, c_max, self.dx)
         self._decay_p: Field2D = np.exp(-sigma * self.dt)
         self._decay_vx: Field2D = np.exp(
             -(0.5 * (sigma[:, 1:] + sigma[:, :-1])) * self.dt)
@@ -523,20 +600,12 @@ class FDTD2D:
     def _init_obstacle(self, obstacle_mask: NDArray[np.bool_] | None,
                        ny: int, nx: int) -> None:
         """Validate the obstacle mask into closed-face velocity factors."""
-        self._obstacle: NDArray[np.bool_] | None = None
+        self._obstacle: NDArray[np.bool_] | None = _validated_obstacle(
+            obstacle_mask, ny, nx)
         self._vx_open: Field2D | None = None
         self._vy_open: Field2D | None = None
-        if obstacle_mask is None:
-            return
-        mask = np.asarray(obstacle_mask)
-        if mask.shape != (ny, nx):
-            raise ValueError("obstacle_mask must match the grid shape")
-        if mask.dtype != np.bool_:
-            raise ValueError("obstacle_mask must be a boolean array")
-        if bool(mask.all()):
-            raise ValueError("obstacle_mask must leave open cells")
-        if bool(mask.any()):
-            self._obstacle = mask.copy()
+        if self._obstacle is not None:
+            mask = self._obstacle
             # A face between two cells is open only when both are open
             # (rigid obstacle boundary: zero normal velocity, Eq. 4.32).
             self._vx_open = (
@@ -814,26 +883,7 @@ class FDTD2D:
         ``record_every`` an empty array is returned and only the final state
         is kept (read it from ``self.p``).
         """
-        steps = _integer("steps", steps)
-        if steps < 0:
-            raise ValueError("steps must be non-negative")
-        if record_every is not None:
-            record_every = _integer("record_every", record_every)
-            if record_every < 1:
-                raise ValueError("record_every must be >= 1")
-        decimate = _integer("decimate", decimate)
-        if decimate < 1:
-            raise ValueError("decimate must be >= 1")
-        frames: list[Field2D] = []
-        if record_every is not None:
-            frames.append(self.p[::decimate, ::decimate].copy())
-        for i in range(steps):
-            self.step()
-            if record_every is not None and (i + 1) % record_every == 0:
-                frames.append(self.p[::decimate, ::decimate].copy())
-        if not frames:
-            return np.zeros((0, 0, 0), dtype=np.float64)
-        return np.stack(frames)
+        return _run_recording(self, steps, record_every, decimate)
 
 
 @dataclass(frozen=True)

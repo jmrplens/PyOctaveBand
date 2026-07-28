@@ -414,6 +414,116 @@ the optional field snapshots with their times and the obstacle mask; its
 `.plot()` draws the probe histories, and `.plot(kind="snapshot")` renders
 one recorded field with the geometry overlaid.
 
+## 5. Elastic waves: P, S and Rayleigh
+
+A solid carries more than one wave. Alongside the compressional **P wave**
+at $c_P = \sqrt{(\lambda + 2\mu)/\rho}$ a shear **S wave** propagates at
+$c_S = \sqrt{\mu/\rho}$, and every traction-free surface guides a
+**Rayleigh wave** just below $c_S$. `elastic_fdtd_simulation` integrates
+the 2D plane-strain velocity-stress system of Virieux (1986, Eq. 2),
+
+$$
+\rho\,\frac{\partial \mathbf{v}}{\partial t}
+  = \nabla\!\cdot\!\boldsymbol{\tau},
+\qquad
+\frac{\partial \boldsymbol{\tau}}{\partial t}
+  = \lambda\,(\nabla\!\cdot\!\mathbf{v})\,\mathbf{I}
+  + \mu\left(\nabla\mathbf{v} + \nabla\mathbf{v}^{\mathsf T}\right),
+$$
+
+on the same staggered layout as the acoustic solver: the normal stresses
+``txx``/``tyy`` share the cell centres where the acoustic pressure lives,
+the velocities sit on the faces and the shear stress ``txy`` on the
+corners (Virieux's fully staggered cell, shifted half a cell). The API
+mirrors `fdtd_simulation` piece by piece: wave-speed maps `c_p` and `c_s`
+(plus `rho`) instead of `c`, `ExplosionSource` (an isotropic stress
+injection) and `ForceSource` (a directional body force) as sources, probes
+that record ``p``, ``vx`` or ``vy``, the same sponge and obstacle
+machinery, and a frozen `ElasticFDTDResult` with the same `.plot()`. The
+Courant bound depends only on the fastest ``c_P`` in the map (Virieux
+Eqs. 6-7), while the resolution rule uses the slowest ``c_S``, because the
+S wavelength is always the shortest: ``dx <= c_s_min / (10 f)``.
+
+```python
+import numpy as np
+from phonometry import simulation
+
+# An aluminium block hit by a tiny explosion: the P front reaches two
+# probes 100 and 220 cells away; c_P falls out of the differential delay.
+w = 8e-6
+res = simulation.elastic_fdtd_simulation(
+    6320.0, 3130.0, 0.002, 1.1e-4, rho=2700.0, shape=(501, 501),
+    sources=[simulation.ExplosionSource(
+        ix=250, iy=250,
+        waveform=simulation.GaussianPulse(0, 0, width=w).value)],
+    probes=[(350, 250), (470, 250)], probe_fields=("p",),
+)
+t = res.times[1:]
+t1, t2 = (t[np.abs(res.signals[k, 0, 1:]).argmax()] for k in range(2))
+print(round(0.24 / (t2 - t1)))    # 6316  c_P = sqrt((lambda+2mu)/rho) = 6320
+```
+
+Setting ``c_s = 0`` marks a **fluid** cell: the shear modulus vanishes,
+the system degenerates to the acoustic equations, and with a uniform
+``c_s = 0`` map the elastic solver reproduces the acoustic one **bit for
+bit** (the regression suite asserts exact equality). A water column over a
+steel half-space is therefore just two bands of the material maps: with
+the density averaged arithmetically onto the faces and the shear modulus
+harmonically onto the corners (Moczo et al. 2007, Eqs. 7.37-7.39), the
+traction continuity of every internal interface, fluid-solid contacts
+included, emerges from the maps alone. The validation suite measures the
+normal-incidence reflection of a water-steel interface within 2 % of
+``(Z2 - Z1)/(Z2 + Z1)`` (typically a fraction of a percent) and recovers
+the normal-incidence mass law of a 3 mm immersed steel plate within
+0.3 dB of `mass_law_transmission_loss`.
+
+A side declared ``"free"`` becomes a traction-free surface through
+**stress imaging** (Moczo et al. Eq. 9.9): the normal stress is pinned to
+zero on the surface plane and the shear stress above it is its
+antisymmetric image. That single boundary condition is what makes surfaces
+wave-bearing: strike the free surface of an aluminium block vertically
+(Lamb's problem) and, besides the P and S body fronts, a **Rayleigh wave**
+rolls along the surface at $c_R \approx 0.93\,c_S$, the root of the exact
+Rayleigh characteristic equation (Cremer, Heckl & Petersson Eq. 3.149).
+The tests pin the measured Rayleigh speed to that root within 2 % and the
+flexural wave of a thin free-free strip to the Kirchhoff plate dispersion
+$c_B \propto \sqrt{\omega}$ in its thin-plate domain. Free surfaces ride
+the Rayleigh sampling rule: allow 15-20 cells per wavelength there, the
+second-order imaging surface being the most dispersive part of the scheme.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/elastic_halfspace_waves_dark.webp"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/elastic_halfspace_waves.webp" alt="Snapshot of the vertical particle velocity in a 0.6 by 0.3 metre aluminium block a few hundredths of a millisecond after a vertical hit on its free upper surface: the compressional P front is the outer arc, the shear S front the inner arc at about half its radius, and the strongest lobes hug the surface just behind the S front, labelled as the Rayleigh wave; dotted arcs mark the exact P and S radii" width="96%"></picture>
+
+*One snapshot, three speeds: the P front has covered twice the distance of
+the S front (dotted arcs at the exact $c_P t$ and $c_S t$ radii), and the
+strongest motion travels along the free surface as the Rayleigh wave, a
+whisker slower than S.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import simulation
+
+# A 0.6 x 0.3 m aluminium block, struck vertically at its free surface.
+dx, w = 0.001, 8e-6
+dt = 0.6 * dx / (6320.0 * np.sqrt(2.0))
+steps = round(7.3e-5 / dt)
+res = simulation.elastic_fdtd_simulation(
+    6320.0, 3130.0, dx, 7.3e-5, rho=2700.0, shape=(300, 600),
+    sources=[simulation.ForceSource(
+        ix=300, iy=0, direction="y", amplitude=1e6,
+        waveform=simulation.GaussianPulse(0, 0, width=w).value)],
+    boundaries={"top": "free"},
+    snapshot_every=steps, snapshot_field="vy",
+)
+res.plot(kind="snapshot")
+plt.show()
+```
+
+</details>
+
 ## Quick answers
 
 ### How do I choose the FDTD grid spacing?
@@ -458,13 +568,36 @@ against a closed form or a 3D solver.
   Section 3.5 places time-domain wave-based methods among the numerical
   approaches to the wave equation in enclosures, and chapter 3 gives the
   rigid-room normal modes used as the analytic oracle.
+- Virieux, J. (1986). P-SV wave propagation in heterogeneous media:
+  velocity-stress finite-difference method. *Geophysics*, 51(4), 889-901.
+  [doi:10.1190/1.1442147](https://doi.org/10.1190/1.1442147). The elastic
+  solver of §5: the velocity-stress system (Eq. 2), the fully staggered
+  cell and update (Fig. 1, Eq. 5), the P-only Courant bound (Eqs. 6-7),
+  the dispersion relations (Eqs. 13-14) and the liquid as the shear-free
+  limit.
+- Moczo, P., Kristek, J., Galis, M., Pazak, P., & Balazovjech, M. (2007).
+  The finite-difference and finite-element modeling of seismic wave
+  propagation and earthquake motion. *Acta Physica Slovaca*, 57(2),
+  177-406. The heterogeneous effective parameters of §5 (harmonic shear
+  modulus, arithmetic density; Eqs. 7.37-7.39) and the stress-imaging free
+  surface (Eq. 9.9).
+- Cremer, L., Heckl, M., & Petersson, B. A. T. (2005). *Structure-borne
+  sound* (3rd ed.). Springer.
+  [doi:10.1007/b137728](https://doi.org/10.1007/b137728). The analytic
+  oracles of the elastic solver: the exact Rayleigh characteristic
+  equation (Eq. 3.149) and the Kirchhoff flexural dispersion with its
+  thickness correction (Eqs. 3.83-3.89, 3.196b).
 
 ## Standards and sources
 
 The module implements a textbook numerical method rather than a measurement
 standard: the discretisation, stability bound and boundary conditions follow
 Attenborough & Van Renterghem (2021) chapter 4 as the citable reference
-formulation. Validation is anchored to closed forms (rigid-box
-eigenfrequencies, cylindrical spreading, image sources, the normal-incidence
-reflection coefficient and the scheme's dispersion relation); two of those
-anchors run in the [conformance report](CONFORMANCE.md).
+formulation, and the elastic solver follows Virieux (1986) with the
+heterogeneous-medium and free-surface treatments of Moczo et al. (2007).
+Validation is anchored to closed forms (rigid-box eigenfrequencies,
+cylindrical spreading, image sources, the normal-incidence reflection
+coefficient, the scheme's dispersion relation, and for the elastic solver
+the body-wave speeds, the exact Rayleigh root, the Kirchhoff flexural
+dispersion, the fluid-solid reflection and the immersed-panel mass law);
+two of those anchors run in the [conformance report](CONFORMANCE.md).
