@@ -36,7 +36,7 @@ to the values the library computes, and CI regenerates it on every pull
 request. Filters are class 1 per **IEC 61260-1:2014 / ANSI S1.11-2004** and
 weightings and levels class 1 per **IEC 61672-1:2013**.
 
-<img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_pillar_hall_poster.jpg" alt="an 800 Hz plane wavefront sweeps through a hall of rigid columns in a 2D FDTD simulation; every column diffracts the front and the scattered wavelets interfere until the whole hall is filled" width="100%">
+<img src="https://raw.githubusercontent.com/jmrplens/phonometry/readme-overhaul/.github/images/anim_fdtd_pillar_hall_poster.jpg" alt="An 800 Hz plane wavefront sweeps through a hall of rigid columns in a 2D FDTD simulation; every column diffracts the front and the scattered wavelets interfere until the whole hall is filled" width="100%">
 
 *An 800 Hz wavefront threading a hall of columns, computed with the library's
 own [2D FDTD engine](https://github.com/jmrplens/phonometry/blob/main/docs/fdtd-simulation.md)
