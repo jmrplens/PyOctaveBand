@@ -849,7 +849,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | Rigid rectangular box eigenfrequency | Mode (1,1) of a 1.0 x 0.7 m rigid box, f = (c/2)*sqrt(1/lx^2 + 1/ly^2), Hz | 299.06 Hz (+/-1.5 Hz) | 298.91 Hz | -0.153 Hz | &#9989; |
 | Free-field pulse arrival delay | Probe-to-probe delay of a pulse over 0.6 m of air, (r2 - r1)/c, ms | 1.749 ms (+/-0.05 ms) | 1.756 ms | 0.007 ms | &#9989; |
 | 2D Kirchhoff-Helmholtz NTFF: monopole directivity | Far-field pattern ripple of an enclosed line source, dB | 0 dB (+/-0.2 dB) | 0.044 dB | 0.044 dB | &#9989; |
-| 2D Kirchhoff-Helmholtz NTFF: monopole level | NTFF far-field level vs the 2D Green function A sqrt(2/(pi k)), dB | 0 dB (+/-0.3 dB) | -0.104 dB | -0.104 dB | &#9989; |
+| 2D Kirchhoff-Helmholtz NTFF: monopole level | NTFF far-field level vs the 2D Green function A sqrt(2/(pi k)), dB | 0 dB (+/-0.3 dB) | 0.106 dB | 0.106 dB | &#9989; |
 
 </details>
 

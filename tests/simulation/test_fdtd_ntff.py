@@ -470,8 +470,9 @@ def test_far_field_input_validation() -> None:
     probe = sim.add_contour_probe(5, 10, 20, 25, frequencies=[F0])
     sim.run(4)
     phasors = probe.phasors(F0)
+    not_phasors = np.zeros(4)
     with pytest.raises(TypeError, match="ContourPhasors"):
-        far_field_from_contour(np.zeros(4), [0.0])  # type: ignore[arg-type]
+        far_field_from_contour(not_phasors, [0.0])  # type: ignore[arg-type]
     with pytest.raises(ValueError, match="angles"):
         far_field_from_contour(phasors, [])
     with pytest.raises(ValueError, match="does not clear"):
@@ -487,7 +488,10 @@ def test_contour_phasors_subtract_mismatch() -> None:
     p1 = sim.add_contour_probe(5, 10, 20, 25, frequencies=[F0, 2.0 * F0])
     p2 = sim.add_contour_probe(5, 11, 20, 25, frequencies=[F0])
     sim.run(4)
+    base = p1.phasors(F0)
+    harmonic = p1.phasors(2.0 * F0)
+    shifted = p2.phasors(F0)
     with pytest.raises(ValueError, match="different frequencies"):
-        p1.phasors(F0).subtract(p1.phasors(2.0 * F0))
+        base.subtract(harmonic)
     with pytest.raises(ValueError, match="different contours"):
-        p1.phasors(F0).subtract(p2.phasors(F0))
+        base.subtract(shifted)

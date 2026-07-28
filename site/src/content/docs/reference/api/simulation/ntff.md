@@ -142,9 +142,13 @@ Hankel kernels are used instead and the return value is the complex
 pressure [Pa] on the circle of that radius around `origin` (which must
 lie outside the contour samples).
 
-The contour must enclose every source of the field being transformed;
-for scattering runs, subtract a no-scatterer reference first
-([`ContourPhasors.subtract`](/phonometry/reference/api/simulation/ntff/#contourphasorssubtract)).
+For radiating problems the contour must enclose every source of the
+field being transformed. For scattering runs (scatterer enclosed,
+incident source outside) the incident field integrates to nothing, so
+total-field phasors transform directly into the scattered far field;
+subtracting a no-scatterer reference ([`ContourPhasors.subtract`](/phonometry/reference/api/simulation/ntff/#contourphasorssubtract))
+is optional numerical cleanup of the grid-dispersion residual of that
+cancellation (below 0.01 dB on the validation scenes).
 
 **Parameters**
 

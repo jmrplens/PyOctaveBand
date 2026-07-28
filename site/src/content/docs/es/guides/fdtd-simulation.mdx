@@ -310,7 +310,10 @@ sostienen el esquema: la malla escalonada ya guarda `v_n` exactamente en
 las caras del contorno, y todo campo cuyas fuentes queden *fuera* del
 contorno integra a nada (extinción), de modo que los fasores del campo
 total de una dispersión con onda plana se transforman directamente en el
-campo lejano *dispersado*, sin necesidad de una pasada de referencia.
+campo lejano *dispersado*. En el solucionador discreto esa cancelación deja
+un residuo de dispersión numérica de malla (por debajo de 0,01 dB en las
+escenas validadas aquí); `ContourPhasors.subtract()` lo elimina con una
+pasada de referencia sin dispersor cuando esa última fracción importa.
 
 ```python
 import numpy as np
@@ -321,7 +324,7 @@ sim = simulation.FDTD2D(c0, dx, shape=(300, 300), sponge_width=40)
 sim.add_source(simulation.CWSource(ix=150, iy=150, frequency=f0))
 probe = sim.add_contour_probe(90, 210, 90, 210, frequencies=[f0])
 sim.run(round(4.5e-3 / sim.dt))            # agotar el transitorio
-probe.reset()                              # e integrar periodos completos
+probe.reset()                              # e integrar la ventana DFT
 sim.run(round(10.0 / f0 / sim.dt))
 pattern = simulation.far_field_from_contour(
     probe.phasors(f0), np.arange(0.0, 360.0, 5.0),
@@ -414,7 +417,7 @@ probe = sim.add_contour_probe(lat - marg, lat + face + marg - 1,
                               frequencies=[f0])
 sim.run(round(8e-3 / sim.dt))             # agotar transitorio y resonadores
 probe.reset()
-sim.run(round(10.0 / f0 / sim.dt))        # diez periodos completos de DFT
+sim.run(round(10.0 / f0 / sim.dt))        # ventana DFT de 10 periodos (en pasos)
 angles = np.arange(-90.0, 90.1, 5.0)      # desde la normal del panel
 pattern = simulation.far_field_from_contour(
     probe.phasors(f0), angles - 90.0,     # la normal apunta según -y

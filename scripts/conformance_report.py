@@ -6604,9 +6604,10 @@ def _ntff_monopole() -> tuple[Any, complex, float]:
 
     One steady-state 2 kHz run: a contour probe around the source feeds
     the Kirchhoff-Helmholtz far-field integral, and an independent probe
-    cell 0.55 m away fits the amplitude ``A`` of the analytic line-source
-    field ``p = A H0(2)(k r)``, whose exact far-field pattern is the
-    omnidirectional ``A sqrt(2 / (pi k)) exp(j pi / 4)``.
+    cell 0.5 m away (open air, clear of the sponge ramp) fits the
+    amplitude ``A`` of the analytic line-source field ``p = A H0(2)(k r)``,
+    whose exact far-field pattern is the omnidirectional
+    ``A sqrt(2 / (pi k)) exp(j pi / 4)``.
     """
     if "monopole" in _NTFF_CACHE:
         out = _NTFF_CACHE["monopole"]
@@ -6620,11 +6621,14 @@ def _ntff_monopole() -> tuple[Any, complex, float]:
     probe = sim.add_contour_probe(90, 210, 90, 210, frequencies=[f])
     sim.run(round(4.5e-3 / sim.dt))
     probe.reset()
+    probe_col = 250          # open air: the sponge ramp starts at 260
     acc = 0.0 + 0.0j
     for _ in range(round(10.0 / f / sim.dt)):
         sim.step()
-        acc += sim.p[150, 260] * np.exp(-2j * np.pi * f * sim.n * sim.dt)
-    amplitude = (2.0 * acc / probe.samples) / hankel2(0, k * 110 * dx)
+        acc += sim.p[150, probe_col] * np.exp(
+            -2j * np.pi * f * sim.n * sim.dt)
+    amplitude = (2.0 * acc / probe.samples) / hankel2(
+        0, k * (probe_col - 150) * dx)
     pattern = ph.far_field_from_contour(
         probe.phasors(f), np.arange(0.0, 360.0, 5.0),
         origin=(150.5 * dx, 150.5 * dx))

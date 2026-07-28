@@ -6303,8 +6303,10 @@ report scattering patterns from near-field data. Two properties carry the
 scheme: the staggered grid already holds `v_n` exactly on the contour
 faces, and any field whose sources lie *outside* the contour integrates to
 nothing (extinction), so the total-field phasors of a plane-wave scattering
-run transform directly into the *scattered* far field, no reference run
-needed.
+run transform directly into the *scattered* far field. In the discrete
+solver that cancellation leaves a grid-dispersion residual (below 0.01 dB
+on the scenes validated here); `ContourPhasors.subtract()` removes it with
+a no-scatterer reference run when that last fraction matters.
 
 ```python
 import numpy as np
@@ -6315,7 +6317,7 @@ sim = simulation.FDTD2D(c0, dx, shape=(300, 300), sponge_width=40)
 sim.add_source(simulation.CWSource(ix=150, iy=150, frequency=f0))
 probe = sim.add_contour_probe(90, 210, 90, 210, frequencies=[f0])
 sim.run(round(4.5e-3 / sim.dt))            # run the transient out
-probe.reset()                              # then integrate whole periods
+probe.reset()                              # then integrate the DFT window
 sim.run(round(10.0 / f0 / sim.dt))
 pattern = simulation.far_field_from_contour(
     probe.phasors(f0), np.arange(0.0, 360.0, 5.0),
@@ -6404,7 +6406,7 @@ probe = sim.add_contour_probe(lat - marg, lat + face + marg - 1,
                               frequencies=[f0])
 sim.run(round(8e-3 / sim.dt))             # transient (ramp + ring-up) out
 probe.reset()
-sim.run(round(10.0 / f0 / sim.dt))        # ten whole periods of DFT
+sim.run(round(10.0 / f0 / sim.dt))        # a 10-period DFT window (in steps)
 angles = np.arange(-90.0, 90.1, 5.0)      # from the panel normal
 pattern = simulation.far_field_from_contour(
     probe.phasors(f0), angles - 90.0,     # the normal points along -y
