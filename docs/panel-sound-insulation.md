@@ -122,6 +122,22 @@ plt.show()
 
 </details>
 
+The clip below watches coincidence happen in a 2D elastic FDTD field: a 10 mm
+steel plate immersed in air, driven by a sustained plane wave at 45 degrees,
+with both frequencies picked from the library's `coincidence_frequency`. At
+`fc/2` = 603 Hz the measured transmission lands on the oblique mass law; at
+`2 fc` = 2413 Hz the 45 degree trace equals `λB` exactly and the trace-matched
+plate re-radiates a 45 degree beam that grows along the plate (drawn with a
+x20 gain below it), pinning the transmitted level at the `fc/2` figure even
+though the mass law demands 12 dB more blocking at four times the frequency.
+The air drives the heavy steel so weakly that the resonant bending wave needs
+tens of metres of illuminated plate to build up fully, which is why a real
+coincidence dip, not total transparency, is what measurements show.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_coincidence_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_coincidence.gif" alt="Animation: two side-by-side 2D elastic FDTD fields of the same 10 mm steel plate lying in air while a sustained plane wave arrives at 45 degrees; at 603 Hz, half the coincidence frequency, the wave reflects almost totally and the faint transmitted level matches the oblique mass law, while at 2413 Hz, twice the coincidence frequency, the trace wavelength matches the free bending wavelength and a 45 degree transmitted beam grows below the plate, holding the same level as the low-frequency panel where the mass law predicted 12 dB more insulation, with the 1206 Hz coincidence frequency of the library and both measured and mass-law levels annotated" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_coincidence.webm)
+
 ## Double wall: the mass-spring-mass resonance (Bies 7.2.6)
 
 Two leaves separated by a cavity behave as a mass-spring-mass system. Below its
