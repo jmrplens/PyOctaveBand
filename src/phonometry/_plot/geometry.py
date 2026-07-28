@@ -47,6 +47,7 @@ if TYPE_CHECKING:
     from ..environmental.ground_barriers import BarrierInsertionLoss
     from ..materials.diffuser_design import DiffuserPolarResponse
     from ..materials.impedance_tube import ImpedanceTubeResult, TransferMatrix
+    from ..materials.metadiffuser import MetadiffuserResult
     from ..materials.porous_absorber import Layer, LayeredAbsorberResult
     from ..materials.road_absorption import InsituAbsorptionResult
     from ..materials.slow_sound_absorber import (
@@ -80,6 +81,8 @@ _LENGTH_POSITIVE = "'length' must be positive."
 #: verbatim English text. ``_t`` returns the English key unchanged for any
 #: language other than ``"es"``.
 _STRINGS: dict[str, str] = {
+    "Metadiffuser cross-section (one period)":
+        "Sección del metadifusor (un periodo)",
     "Air": "Aire",
     "Porous": "Poroso",
     "Perforated plate": "Placa perforada",
@@ -1076,6 +1079,143 @@ def plot_slit_absorber_result_geometry(
     return plot_slit_absorber_geometry(
         result.resonators, ax=ax, slit_height=result.slit_height,
         lattice_step=result.lattice_step, period=result.period,
+        language=language, **kwargs,
+    )
+
+
+def _draw_metadiffuser_well(ax: Axes, well: Any, x_slit: float,
+                            depth: float, kwargs: dict[str, Any]) -> None:
+    """One slit with its sideways resonator shelves, panel coordinates."""
+    h = float(well.slit_height)
+    _material_rect(ax, x_slit, 0.0, h, depth, "cavity", **kwargs)
+    chain = list(well.resonators)
+    step = depth / len(chain)
+    for m, resonator in enumerate(chain):
+        w_n = float(resonator.neck_side)
+        l_n = float(resonator.neck_length)
+        w_c = float(resonator.cavity_side)
+        l_c = float(resonator.cavity_length)
+        y_m = depth - (m + 0.5) * step
+        x_neck = x_slit + h
+        _material_rect(
+            ax, x_neck, y_m - 0.5 * w_n, l_n, w_n, "cavity",
+            edgecolor=_C_EDGE, linewidth=0.5,
+        )
+        _material_rect(
+            ax, x_neck + l_n, y_m - 0.5 * w_c, l_c, w_c, "cavity",
+            edgecolor=_C_EDGE, linewidth=0.5,
+        )
+
+
+def plot_metadiffuser_panel_geometry(
+    wells: Sequence[Any],
+    ax: Axes | None = None,
+    *,
+    depth: float,
+    period: float,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Draw one period of a metadiffuser panel, to scale.
+
+    Side cut of the slotted panel (Sci. Rep. 7:5389 Fig. 1(b)): the face
+    runs along the top with the sound arriving from above, the wells
+    repeat horizontally at the pitch ``d``, and each well is a slit of
+    height ``h_n`` descending the panel depth, loaded by its resonators
+    at the lattice step ``a = L / M`` shelved sideways into the septum;
+    ``None`` wells are flat rigid strips; rigid back wall underneath.
+
+    :param wells: The well sequence of
+        :func:`~phonometry.materials.metadiffuser.metadiffuser_reflection`
+        (:class:`~phonometry.materials.metadiffuser.MetadiffuserWell` or
+        ``None`` per well).
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param depth: Panel depth ``L``, in metres.
+    :param period: Well pitch ``d``, in metres.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the slit rectangles.
+    :return: The axes.
+    """
+    _check_language(language)
+    if depth <= 0.0 or period <= 0.0:
+        raise ValueError("'depth' and 'period' must be positive.")
+    cells = list(wells)
+    if len(cells) < 2:
+        raise ValueError("'wells' must contain at least two wells.")
+    for well in cells:
+        if well is not None and well.slit_height >= period:
+            raise ValueError(
+                "every slit height must be smaller than the period."
+            )
+    if ax is None:
+        ax = _new_axes()
+    n_wells = len(cells)
+    d = period
+    total = n_wells * d
+    # Face along x with the sound arriving from above; the thin panel depth
+    # runs downward (Fig. 1(b) of the paper). Each cell carries its slit at
+    # the left, with the resonator necks and cavities branching sideways
+    # into the solid septum between slits.
+    _material_rect(
+        ax, 0.0, 0.0, total, depth, "plate", linewidth=0.7, alpha=0.45,
+    )
+    back = 0.4 * depth
+    _material_rect(ax, -0.01 * total, -back, 1.02 * total, back, "rigid")
+    kwargs.setdefault("linewidth", 0.5)
+    for index, well in enumerate(cells):
+        if well is not None:
+            _draw_metadiffuser_well(ax, well, index * d + 0.12 * d, depth,
+                                    kwargs)
+    for index, well in enumerate(cells):
+        if well is None:
+            continue
+        x_mark = index * d + 0.12 * d + 0.5 * float(well.slit_height)
+        ax.text(
+            x_mark, depth - 0.012 * total, str(index + 1),
+            fontsize=6, ha="center", va="top", color=_C_EDGE,
+        )
+    _incidence_arrow(
+        ax, 1.5 * d, depth + 0.5 * total * 0.16, 0.4 * total * 0.16,
+        language, downward=True,
+    )
+    off = 0.045 * total
+    _dim(ax, (0.0, -back), (total, -back), _mm(total, language),
+         offset=-off)
+    _dim(ax, (total, 0.0), (total, depth), _mm(depth, language),
+         offset=-1.3 * off, tight=True)
+    _dim(ax, ((n_wells - 1) * d, depth), (total, depth),
+         _mm(d, language), offset=0.6 * off)
+    first = next(
+        (well for well in cells if well is not None), None,
+    )
+    if first is not None:
+        index = cells.index(first)
+        x_slit = index * d + 0.12 * d
+        h = float(first.slit_height)
+        _dim(ax, (x_slit, depth), (x_slit + h, depth), _mm(h, language),
+             offset=0.6 * off, tight=True)
+    _finish_geometry_axes(
+        ax, _t("Metadiffuser cross-section (one period)", language)
+    )
+    return ax
+
+
+def plot_metadiffuser_geometry(
+    result: MetadiffuserResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Panel drawing for a metadiffuser result that retained its geometry."""
+    if result.wells is None or result.depth is None or result.period is None:
+        raise ValueError(
+            "This result does not retain its geometry; call "
+            "plot_metadiffuser_panel_geometry(...) with the original "
+            "arguments."
+        )
+    return plot_metadiffuser_panel_geometry(
+        result.wells, ax=ax, depth=result.depth, period=result.period,
         language=language, **kwargs,
     )
 

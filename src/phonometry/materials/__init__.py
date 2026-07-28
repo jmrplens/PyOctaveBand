@@ -10,6 +10,7 @@ from .._plot.geometry import (
     plot_helmholtz_resonator_geometry,
     plot_impedance_tube_geometry,
     plot_insitu_geometry,
+    plot_metadiffuser_panel_geometry,
     plot_qrd_geometry,
     plot_slit_absorber_geometry,
     plot_transmission_tube_geometry,
@@ -95,6 +96,13 @@ from .impedance_tube import (
     tube_wavenumber,
     two_microphone_impedance,
     wave_decomposition,
+)
+from .metadiffuser import (
+    MetadiffuserResult,
+    MetadiffuserWell,
+    metadiffuser_diffusion_spectrum,
+    metadiffuser_polar_response,
+    metadiffuser_reflection,
 )
 from .porous_absorber import (
     DELANY_BAZLEY_COEFFICIENTS,
@@ -231,6 +239,8 @@ __all__ = [
     "InsituAbsorptionResult",
     "LayeredAbsorberResult",
     "MembraneLayer",
+    "MetadiffuserResult",
+    "MetadiffuserWell",
     "MicroperforatedPlateLayer",
     "PerforatedPlateLayer",
     "PorousAbsorberWarning",
@@ -296,6 +306,9 @@ __all__ = [
     "measure_sound_absorption",
     "membrane_impedance",
     "membrane_resonance_frequency",
+    "metadiffuser_diffusion_spectrum",
+    "metadiffuser_polar_response",
+    "metadiffuser_reflection",
     "mic_calibration_factor",
     "microperforated_plate_impedance",
     "miki",
@@ -316,6 +329,7 @@ __all__ = [
     "plot_helmholtz_resonator_geometry",
     "plot_impedance_tube_geometry",
     "plot_insitu_geometry",
+    "plot_metadiffuser_panel_geometry",
     "plot_qrd_geometry",
     "plot_slit_absorber_geometry",
     "plot_transmission_tube_geometry",

@@ -568,6 +568,13 @@ from .materials.impedance_tube import (
     two_microphone_impedance,
     wave_decomposition,
 )
+from .materials.metadiffuser import (
+    MetadiffuserResult,
+    MetadiffuserWell,
+    metadiffuser_diffusion_spectrum,
+    metadiffuser_polar_response,
+    metadiffuser_reflection,
+)
 from .materials.porous_absorber import (
     DELANY_BAZLEY_COEFFICIENTS,
     DELANY_BAZLEY_VALIDITY,
@@ -1296,6 +1303,8 @@ __all__ = [
     "MISOCoherenceResult",
     "MeanGroundPlaneResult",
     "MembraneLayer",
+    "MetadiffuserResult",
+    "MetadiffuserWell",
     "MeteorologicalCorrection",
     "MicroperforatedPlateLayer",
     "MicrophoneCharacteristics",
@@ -1736,6 +1745,9 @@ __all__ = [
     "measurement_positions",
     "membrane_impedance",
     "membrane_resonance_frequency",
+    "metadiffuser_diffusion_spectrum",
+    "metadiffuser_polar_response",
+    "metadiffuser_reflection",
     "meteorological_correction",
     "meteorological_corrections",
     "mic_calibration_factor",
