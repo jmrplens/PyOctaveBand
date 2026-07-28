@@ -221,17 +221,29 @@ def test_flexural_dispersion_of_thin_plate_strip() -> None:
 # --- Fluid-solid interface: normal-incidence R and T -----------------------
 
 
-def test_fluid_solid_normal_incidence_reflection_transmission() -> None:
-    # A plane pulse in water over a steel half-space. With Z = rho c_P,
+@pytest.mark.parametrize(
+    ("cp2", "cs2", "rho2"),
+    [
+        pytest.param(CP_ST, CS_ST, RHO_ST, id="water-steel"),
+        pytest.param(CP_AL, CS_AL, RHO_AL, id="water-aluminium"),
+    ],
+)
+def test_fluid_solid_normal_incidence_reflection_transmission(
+    cp2: float, cs2: float, rho2: float,
+) -> None:
+    # A plane pulse in water over a solid half-space. With Z = rho c_P,
     # R = (Z2 - Z1)/(Z2 + Z1) and the transmitted normal-stress amplitude
     # is 2 Z2/(Z1 + Z2) times the incident pressure (no S conversion at
-    # normal incidence). Measured: R -0.002 %, T -0.03 %.
+    # normal incidence; the solid behaves as a liquid of rho1, c_l1,
+    # Brekhovskikh & Godin 1990 Eq. 4.2.27). R = 0.938069 for steel and
+    # 0.840380 for aluminium; measured: R -0.002 % / +0.001 %,
+    # T -0.03 % / -0.03 %.
     dx = 0.005
     ny, nx = 2400, 3
     c_p = np.full((ny, nx), CP_W)
     c_s = np.zeros((ny, nx))
     rho = np.full((ny, nx), RHO_W)
-    c_p[1200:], c_s[1200:], rho[1200:] = CP_ST, CS_ST, RHO_ST
+    c_p[1200:], c_s[1200:], rho[1200:] = cp2, cs2, rho2
     sim = ElasticFDTD2D(c_p, c_s, dx, rho=rho)
     y = (np.arange(ny) + 0.5) * dx
     p0 = np.exp(-(((y - 3.0) / 0.15) ** 2))
@@ -249,7 +261,7 @@ def test_fluid_solid_normal_incidence_reflection_transmission() -> None:
         p_water[i] = -0.5 * (sim.txx[900, 1] + sim.tyy[900, 1])
         s_solid[i] = sim.tyy[1600, 1]
     times = (np.arange(n_steps) + 1) * sim.dt
-    z1, z2 = RHO_W * CP_W, RHO_ST * CP_ST
+    z1, z2 = RHO_W * CP_W, rho2 * cp2
     r_exact = (z2 - z1) / (z2 + z1)
     t_exact = 2.0 * z2 / (z1 + z2)
     t_inc = 1.5 / CP_W                      # probe 1.5 m below the pulse

@@ -55,9 +55,29 @@ Petersson 2005, Eq. 3.149), the Kirchhoff thin-plate flexural dispersion
 (Eqs. 3.83-3.89), the normal-incidence fluid-solid reflection coefficient
 `(Z2 - Z1)/(Z2 + Z1)`, the normal-incidence mass law of a thin immersed
 panel, and the exact reduction to the acoustic solver when `c_s = 0`
-everywhere.
+everywhere. The fluid-solid coupling is further pinned to the oblique
+plane-wave reflection coefficient of Brekhovskikh & Godin, *Acoustics of
+Layered Media I* (Springer 1990), Eqs. 4.2.22-4.2.26 (with the shear-wave
+mode conversion active), to the Scholte interface-wave speed from the exact
+characteristic equation of Eq. 4.4.20 (see [`scholte_speed`](/phonometry/reference/api/simulation/elastic-fdtd/#scholte_speed)), and to
+the exact three-media transmission of an immersed plate (B&G Eqs. 2.4.10,
+2.4.14) including its first thickness resonance `f_1 = c_P / (2 h)`
+(Eq. 2.4.19), following the fluid-solid finite-difference benchmark of
+van Vossen, Robertsson & Chapman, *Geophysics* 67(2), 618-624 (2002).
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
+
+## AIR
+
+*Constant* (`phonometry.simulation.elastic_fdtd.Material`).
+
+## ALUMINIUM
+
+*Constant* (`phonometry.simulation.elastic_fdtd.Material`).
+
+## CONCRETE
+
+*Constant* (`phonometry.simulation.elastic_fdtd.Material`).
 
 ## elastic_fdtd_simulation
 
@@ -228,6 +248,57 @@ stresses by inverting the 2D stiffness (determinant
 `4 mu (lambda + mu)`); fluid cells (`mu = 0`) degenerate to the
 acoustic `p**2 / (2 lambda)` and shear-free corners contribute
 nothing.
+
+### ElasticFDTD2D.from_regions()
+
+*classmethod*
+
+```python
+ElasticFDTD2D.from_regions(
+    shape: tuple[int, int],
+    dx: float,
+    *,
+    background: Material | tuple[float, float, float],
+    regions: Iterable[tuple[Any, Material | tuple[float, float, float]]] = (),
+    **kwargs: Any,
+) -> ElasticFDTD2D
+```
+
+Build the engine from named materials painted over a background.
+
+Thin sugar over the map constructor for the common layered set-ups
+(fluid over a solid half-space, an immersed plate, an inclusion):
+the `(ny, nx)` maps of `c_p`, `c_s` and `rho` start uniform
+at `background` and each `(where, material)` entry of
+`regions` is painted over them in order (later entries overwrite
+earlier ones), then everything is delegated to the normal
+constructor. No new physics: a fluid-solid contact still needs no
+explicit interface treatment, because the constructor's effective
+parameters (Moczo et al. 2007, Eqs. 7.37-7.39) handle it from the
+maps alone.
+
+`where` selects the painted cells: a boolean `(ny, nx)` mask,
+or any basic numpy index expression over the `(row, column)`
+maps, e.g. `(slice(120, None), slice(None))` for the lower half
+or `numpy.s_[120:, :]` for the same thing spelled as a slice.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `shape` | Grid shape `(ny, nx)`. |
+| `dx` | Grid spacing [m] (square cells). |
+| `background` | The material filling the whole grid first: a [`Material`](/phonometry/reference/api/simulation/elastic-fdtd/#material) or a `(c_p, c_s, rho)` triple, e.g. [`WATER`](/phonometry/reference/api/simulation/elastic-fdtd/#water). |
+| `regions` | `(where, material)` pairs painted in order. |
+| `kwargs` | Forwarded to [`ElasticFDTD2D`](/phonometry/reference/api/simulation/elastic-fdtd/#elasticfdtd2d) (`cfl`, `sponge_width`, `sponge_sides`, `sponge_reflection`, `damping`, `free_sides`, `obstacle_mask`). |
+
+**Returns:** The configured stepping engine.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If a mask does not match `shape` or a material spec is invalid. |
 
 ### ElasticFDTD2D.p
 
@@ -420,3 +491,94 @@ wave (Virieux 1986, Fig. 5).
 | `direction` | `"x"` (horizontal) or `"y"` (vertical, positive downward in the `imshow` axes). |
 | `waveform` | Callable `t -> f(t)` in newtons per metre of depth. |
 | `amplitude` | Extra gain applied to `waveform`. |
+
+## Material
+
+```python
+Material(c_p: float, c_s: float, rho: float)
+```
+
+An isotropic elastic medium as measurable wave speeds and density.
+
+The three numbers the solver's material maps are built from: the
+compressional speed `c_p = sqrt((lambda + 2 mu) / rho)`, the shear
+speed `c_s = sqrt(mu / rho)` and the density `rho`. `c_s = 0`
+marks a fluid (the acoustic `mu = 0` limit of the elastic scheme,
+Virieux 1986), so the same dataclass names both fluids and solids.
+Every material must satisfy `c_p**2 >= 2 c_s**2` (non-negative first
+Lame parameter), the constructor bound of [`ElasticFDTD2D`](/phonometry/reference/api/simulation/elastic-fdtd/#elasticfdtd2d).
+
+The module constants [`AIR`](/phonometry/reference/api/simulation/elastic-fdtd/#air), [`WATER`](/phonometry/reference/api/simulation/elastic-fdtd/#water), [`STEEL`](/phonometry/reference/api/simulation/elastic-fdtd/#steel),
+[`ALUMINIUM`](/phonometry/reference/api/simulation/elastic-fdtd/#aluminium) and [`CONCRETE`](/phonometry/reference/api/simulation/elastic-fdtd/#concrete) carry the nominal round-number
+properties used throughout the documentation and the validation suite,
+mirroring the documented default media of the acoustic solver.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `c_p` | Compressional (P) wave speed [m/s], strictly positive. |
+| `c_s` | Shear (S) wave speed [m/s], non-negative; 0 marks a fluid. |
+| `rho` | Density [kg/m3], strictly positive. |
+
+### Material.is_fluid
+
+*property*
+
+`True` when the material carries no shear (`c_s = 0`).
+
+## scholte_speed
+
+```python
+scholte_speed(
+    fluid: Material | tuple[float, float, float],
+    solid: Material | tuple[float, float, float],
+) -> float
+```
+
+Exact Scholte-wave speed of a fluid over an elastic half-space [m/s].
+
+The Scholte wave is the true interface wave of a fluid-solid contact:
+evanescent on both sides, elliptical particle motion, no low-frequency
+cut-off, and non-dispersive over homogeneous half-spaces (Jensen,
+Kuperman, Porter & Schmidt, *Computational Ocean Acoustics* 2e,
+Sections 4.5.2 and 8.5.4). Its speed `v` lies below both the fluid
+sound speed and the solid shear speed, and solves the exact
+characteristic equation of Brekhovskikh & Godin, *Acoustics of Layered
+Media I* (1990), Eq. 4.4.20, written in the notation of Eq. 4.4.18
+(`q = c_S**2/c_P**2`, `r = c_S**2/c**2`, `s = v**2/c_S**2`,
+`m = rho_solid/rho_fluid`):
+
+```text
+4 sqrt(1-s) sqrt(1-qs) - (2-s)**2 = (s**2/m) sqrt((1-sq)/(1-sr))
+```
+
+A root always exists (B&G Section 4.4.3); the `m -> inf` limit of the
+left side is the Rayleigh equation. For stiff beds the root hugs the
+fluid speed (water over steel: 1479.6 m/s, 0.027 % below `c`) while
+for soft sediments it drops well below it, which is why measured
+seabed interface waves probe the sediment shear speed
+(`v approx 0.85 c_S` rule, Jensen et al. Section 5.10.5).
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `fluid` | Fluid half-space: a [`Material`](/phonometry/reference/api/simulation/elastic-fdtd/#material) with `c_s = 0` (or a `(c_p, 0.0, rho)` triple). |
+| `solid` | Elastic half-space: a [`Material`](/phonometry/reference/api/simulation/elastic-fdtd/#material) with `c_s > 0`. |
+
+**Returns:** The Scholte-wave phase speed [m/s].
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If `fluid` carries shear or `solid` does not. |
+
+## STEEL
+
+*Constant* (`phonometry.simulation.elastic_fdtd.Material`).
+
+## WATER
+
+*Constant* (`phonometry.simulation.elastic_fdtd.Material`).

@@ -4,11 +4,18 @@
 from __future__ import annotations
 
 from .elastic_fdtd import (
+    AIR,
+    ALUMINIUM,
+    CONCRETE,
+    STEEL,
+    WATER,
     ElasticFDTD2D,
     ElasticFDTDResult,
     ExplosionSource,
     ForceSource,
+    Material,
     elastic_fdtd_simulation,
+    scholte_speed,
 )
 from .fdtd import (
     FDTD2D,
@@ -21,7 +28,12 @@ from .fdtd import (
 )
 
 __all__ = [
+    "AIR",
+    "ALUMINIUM",
+    "CONCRETE",
     "FDTD2D",
+    "STEEL",
+    "WATER",
     "CWSource",
     "ElasticFDTD2D",
     "ElasticFDTDResult",
@@ -29,8 +41,10 @@ __all__ = [
     "FDTDResult",
     "ForceSource",
     "GaussianPulse",
+    "Material",
     "PlaneWaveSource",
     "SignalSource",
     "elastic_fdtd_simulation",
     "fdtd_simulation",
+    "scholte_speed",
 ]
