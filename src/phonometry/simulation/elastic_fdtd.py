@@ -201,19 +201,22 @@ class Material:
     rho: float
 
     def __post_init__(self) -> None:
-        _positive_finite("c_p", self.c_p)
-        _finite("c_s", self.c_s)
-        if self.c_s < 0.0:
+        c_p = _positive_finite("c_p", self.c_p)
+        c_s = _finite("c_s", self.c_s)
+        if c_s < 0.0:
             raise ValueError("c_s must be non-negative (0 marks a fluid)")
-        _positive_finite("rho", self.rho)
-        if self.c_p**2 < 2.0 * self.c_s**2 * (1.0 - 1e-9):
+        rho = _positive_finite("rho", self.rho)
+        if c_p**2 < 2.0 * c_s**2 * (1.0 - 1e-9):
             raise ValueError("c_p**2 must be at least 2 * c_s**2 "
                              "(non-negative lambda)")
+        object.__setattr__(self, "c_p", c_p)
+        object.__setattr__(self, "c_s", c_s)
+        object.__setattr__(self, "rho", rho)
 
     @property
     def is_fluid(self) -> bool:
         """``True`` when the material carries no shear (``c_s = 0``)."""
-        return self.c_s == 0.0
+        return self.c_s <= 0.0
 
 
 #: Air at room conditions (fluid), the acoustic solver's default medium.

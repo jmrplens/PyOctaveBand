@@ -494,10 +494,11 @@ def test_from_regions_paints_in_order_and_accepts_masks() -> None:
 
 
 def test_from_regions_and_material_validation() -> None:
+    wrong_shape_mask = np.zeros((3, 3), dtype=bool)
     with pytest.raises(ValueError, match="mask must be a boolean"):
         ElasticFDTD2D.from_regions(
             (10, 10), 0.01, background=WATER,
-            regions=[(np.zeros((3, 3), dtype=bool), STEEL)])
+            regions=[(wrong_shape_mask, STEEL)])
     with pytest.raises(ValueError, match="background must be a Material"):
         ElasticFDTD2D.from_regions((10, 10), 0.01, background="water")
     with pytest.raises(ValueError, match=r"regions\[0\] must be a Material"):
@@ -517,3 +518,6 @@ def test_from_regions_and_material_validation() -> None:
         Material(c_p=1480.0, c_s=0.0, rho=0.0)
     assert WATER.is_fluid and AIR.is_fluid
     assert not STEEL.is_fluid and not ALUMINIUM.is_fluid
+    coerced = Material(c_p=1480, c_s=0, rho=1000)
+    assert all(isinstance(v, float)
+               for v in (coerced.c_p, coerced.c_s, coerced.rho))
