@@ -34,7 +34,8 @@ que las guías incorporan sus secciones de Referencias.
   [doi:10.1016/C2011-0-05897-0](https://doi.org/10.1016/C2011-0-05897-0).
   Campos sonoros, radiación y transductores electroacústicos; sustenta el
   material de electroacústica y potencia acústica.
-  Citado por [Electroacústica](/phonometry/es/guides/electroacoustics/) y
+  Citado por [Electroacústica](/phonometry/es/guides/electroacoustics/),
+  [Caracterización de altavoces](/phonometry/es/guides/loudspeakers/) y
   [Potencia acústica](/phonometry/es/guides/sound-power/).
 
 ## Procesado de señal
@@ -85,7 +86,8 @@ que las guías incorporan sus secciones de Referencias.
   [Catálogo IEC](https://webstore.iec.ch/en/publication/5063).
   Los bordes de banda en base 10 y las máscaras de aceptación de clase de
   los bancos de octava fraccionaria.
-  Citado por [Bancos de filtros](/phonometry/es/guides/filter-banks/) y
+  Citado por [Bancos de filtros](/phonometry/es/guides/filter-banks/),
+  [Verificación de clase de filtros](/phonometry/es/guides/filter-compliance/) y
   [Multicanal y rendimiento](/phonometry/es/guides/multichannel/).
 - International Electrotechnical Commission. (2013). *Electroacoustics —
   Sound level meters — Part 1: Specifications* (IEC 61672-1:2013).
@@ -117,7 +119,7 @@ que las guías incorporan sus secciones de Referencias.
   índice de directividad, el nivel de presión acústica de sobrecarga, el nivel de
   presión acústica equivalente debido al ruido inherente, y las impedancias
   nominales y la alimentación.
-  Citado por [Electroacústica](/phonometry/es/guides/electroacoustics/).
+  Citado por [Caracterización de micrófonos](/phonometry/es/guides/microphones/).
 - International Electrotechnical Commission. (2007). *Sound system equipment —
   Part 5: Loudspeakers* (IEC 60268-5:2003+A1:2007).
   [Catálogo IEC](https://webstore.iec.ch/en/publication/1223).
@@ -125,14 +127,15 @@ que las guías incorporan sus secciones de Referencias.
   frecuencias nominal, sensibilidad característica referida a 1 W a 1 m, rango
   de frecuencias efectivo frente a la banda de -10 dB, índice de directividad y
   distorsión armónica total frente a la frecuencia.
-  Citado por [Electroacústica](/phonometry/es/guides/electroacoustics/).
+  Citado por [Caracterización de altavoces](/phonometry/es/guides/loudspeakers/).
 - International Electrotechnical Commission. (1982). *Scales and sizes for
   plotting frequency characteristics and polar diagrams* (IEC 60263:1982).
   [Catálogo IEC](https://webstore.iec.ch/en/publication/1218).
   Las proporciones de escala de las gráficas características: una década de
   frecuencia igual a 25 dB en la ordenada, y el diagrama polar sobre un radio
   de círculo de referencia de 25 dB.
-  Citado por [Electroacústica](/phonometry/es/guides/electroacoustics/).
+  Citado por [Caracterización de altavoces](/phonometry/es/guides/loudspeakers/) y
+  [Caracterización de micrófonos](/phonometry/es/guides/microphones/).
 
 ## Potencia acústica e intensidad
 
@@ -141,8 +144,8 @@ que las guías incorporan sus secciones de Referencias.
   [doi:10.4324/9780203475386](https://doi.org/10.4324/9780203475386).
   La monografía sobre el flujo de energía sonora: intensidad activa y
   reactiva, el estimador p-p y su presupuesto de error por desfase.
-  Citado por [Potencia acústica](/phonometry/es/guides/sound-power/) e
-  [Intensidad acústica (p-p)](/phonometry/es/guides/intensity/).
+  Citado por [Potencia acústica por barrido de intensidad](/phonometry/es/guides/sound-power-intensity/)
+  e [Intensidad acústica (p-p)](/phonometry/es/guides/intensity/).
 - International Organization for Standardization. (2019). *Acoustics —
   Determination of sound power levels of noise sources — Guidelines for the
   use of basic standards* (ISO 3740:2019).
@@ -155,22 +158,22 @@ que las guías incorporan sus secciones de Referencias.
   sources using sound pressure — Precision methods for reverberation test
   rooms* (ISO 3741:2010).
   [Catálogo iso.org](https://www.iso.org/standard/52053.html).
-  El método de precisión en sala reverberante.
-  Citado por [Potencia acústica](/phonometry/es/guides/sound-power/).
+  El método de precisión en cámara reverberante.
+  Citado por [Potencia acústica en cámara reverberante](/phonometry/es/guides/sound-power-reverberation/).
 - International Organization for Standardization. (2010). *Acoustics —
   Determination of sound power levels and sound energy levels of noise
   sources using sound pressure — Engineering methods for an essentially free
   field over a reflecting plane* (ISO 3744:2010).
   [Catálogo iso.org](https://www.iso.org/standard/52055.html).
   El método de ingeniería por superficie envolvente.
-  Citado por [Potencia acústica](/phonometry/es/guides/sound-power/).
+  Citado por [Potencia acústica por métodos de presión](/phonometry/es/guides/sound-power-pressure/).
 - International Organization for Standardization. (2012). *Acoustics —
   Determination of sound power levels and sound energy levels of noise
   sources using sound pressure — Precision methods for anechoic rooms and
   hemi-anechoic rooms* (ISO 3745:2012).
   [Catálogo iso.org](https://www.iso.org/standard/45362.html).
   El método de precisión en sala anecoica.
-  Citado por [Potencia acústica](/phonometry/es/guides/sound-power/).
+  Citado por [Potencia acústica por métodos de presión](/phonometry/es/guides/sound-power-pressure/).
 - International Organization for Standardization. (1996). *Acoustics —
   Declaration and verification of noise emission values of machinery and
   equipment* (ISO 4871:1996).
@@ -738,7 +741,7 @@ que las guías incorporan sus secciones de Referencias.
   [sae.org](https://www.sae.org/standards/content/air5662/).
   El modelo de atenuación lateral sobre suelo blando que adopta la ECAC
   Doc 29.
-  Citado por [Ruido de aeronaves](/phonometry/es/guides/aircraft-noise/).
+  Citado por [Ruido de aeropuertos](/phonometry/es/guides/airport-noise/).
 - European Civil Aviation Conference. (2016). *Report on standard method of
   computing noise contours around civil airports* (ECAC.CEAC Doc 29, 4.ª ed.),
   Volumen 2: Guía técnica.
@@ -746,7 +749,7 @@ que las guías incorporan sus secciones de Referencias.
   [PDF gratuito](https://www.ecac-ceac.org/images/documents/ECAC-Doc_29_4th_edition_Dec_2016_Volume_2.pdf).
   El método europeo de contornos de ruido de aeropuerto: interpolación NPD y
   cálculo de evento único por segmentos.
-  Citado por [Ruido de aeronaves](/phonometry/es/guides/aircraft-noise/).
+  Citado por [Ruido de aeropuertos](/phonometry/es/guides/airport-noise/).
 - European Civil Aviation Conference. (2026). *Report on standard method of
   computing noise contours around civil airports* (ECAC.CEAC Doc 29, 5.ª ed.),
   Volumen 3: Casos de referencia y marco de verificación.
@@ -754,7 +757,7 @@ que las guías incorporan sus secciones de Referencias.
   [PDF gratuito](https://www.ecac-ceac.org/images/documents/ECAC-CEAC-DOC_29_5th_Edition-REPORT_ON_STANDARD_METHOD_OF_COMPUTING_NOISE_CONTOURS_AROUND_CIVIL_AIRPORTS-Volume_3-REFERENCE_CASES_AND_VERIFICATION_FRAMEWORK.pdf).
   Los casos de referencia y el workbook con los que se valida la cadena de
   evento único.
-  Citado por [Ruido de aeronaves](/phonometry/es/guides/aircraft-noise/).
+  Citado por [Ruido de aeropuertos](/phonometry/es/guides/airport-noise/).
 - European Civil Aviation Conference. (2026). *Report on standard method of
   computing rotorcraft noise contours* (ECAC.CEAC Doc 32, 1.ª ed.).
   [Página de documentos de ECAC](https://www.ecac-ceac.org/documents/ecac-documents-and-international-agreements),

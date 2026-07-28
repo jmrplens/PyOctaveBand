@@ -1,0 +1,427 @@
+---
+title: "Silenciadores"
+description: "Silenciadores reactivos por el método de matrices de cuatro polos: la cámara de expansión en forma cerrada, los resonadores de Helmholtz, de cuarto de onda y de tubo extendido con pérdida de transmisión e inserción, el contraste independiente con FDTD y el compromiso de diseño frente a los silenciadores disipativos con revestimiento."
+references:
+  - type: book
+    authors: ["Bies, D. A.", "Hansen, C. H.", "Howard, C. Q."]
+    year: 2017
+    title: "Engineering noise control"
+    edition: "5th ed."
+    publisher: "CRC Press"
+    doi: "10.1201/9781351228152"
+    note: "El método de cuatro polos de silenciadores, la TL de la cámara de expansión y las fórmulas de sintonía de los resonadores (§8.8-8.9) de esta guía."
+  - type: book
+    authors: ["Munjal, M. L."]
+    year: 2014
+    title: "Acoustics of ducts and mufflers"
+    edition: "2nd ed."
+    publisher: "Wiley"
+    doi: "10.1002/9781118443767"
+    note: "La formulación por matrices de transferencia, las matrices de los elementos y la pérdida de transmisión de la matriz compuesta (Ec. (3.27)), y el tratamiento de referencia de los silenciadores disipativos y combinados."
+  - type: book
+    authors: ["Vér, I. L.", "Beranek, L. L."]
+    year: 2006
+    title: "Noise and vibration control engineering: Principles and applications"
+    edition: "2nd ed."
+    publisher: "Wiley"
+    doi: "10.1002/9780470172568"
+    note: "El tratamiento complementario de silenciadores reactivos y disipativos."
+---
+
+import ThemeImage from '../../../../components/ThemeImage.astro';
+import Video from '../../../../components/Video.astro';
+
+Un silenciador se gana el sueldo dentro de un conducto: entre un motor y su
+escape, entre un ventilador y la sala a la que sirve. Dos principios de
+funcionamiento reparten el campo. Un silenciador **reactivo** atenúa
+*reflejando* el sonido con discontinuidades de impedancia (cámaras, ramas
+laterales) y domina en baja frecuencia, donde puede apuntarse con precisión
+al tono de encendido de un motor o al paso de álabes de un ventilador; un
+silenciador **disipativo** *absorbe* el sonido en un revestimiento poroso y
+domina en banda ancha, en media y alta frecuencia. Esta guía cubre la familia
+reactiva que implementa phonometry con la teoría de ingeniería de Bies,
+Hansen y Howard y la formulación por matrices de transferencia de Munjal: el
+método de cuatro polos, la cámara de expansión en forma cerrada, los
+resonadores de Helmholtz, de cuarto de onda y de tubo extendido, el contraste
+independiente con FDTD y los compromisos de diseño frente a los
+revestimientos disipativos. El resto de la instalación, la atenuación en
+conductos HVAC, el ruido de flujo y los cerramientos de máquina, vive en
+[Control de ruido industrial](/phonometry/es/guides/noise-control/).
+
+## 1. Silenciadores reactivos (método de cuatro polos)
+
+Un silenciador reactivo atenúa *reflejando* el sonido con discontinuidades de
+impedancia. Cada elemento acústico es una matriz de transferencia 2x2 que
+relaciona la presión `p` y la velocidad de volumen `Su` en sus dos extremos, y un
+silenciador compuesto es el producto ordenado de las matrices de sus elementos
+(Bies §8.9). Un conducto recto de longitud `L` y área `S` es
+
+$$
+\begin{bmatrix} \cos kL & j\,\tfrac{\rho c}{S}\sin kL \\[2pt]
+j\,\tfrac{S}{\rho c}\sin kL & \cos kL \end{bmatrix},
+\qquad k = \omega/c,
+$$
+
+y una rama lateral de impedancia $Z_b$ es la derivación
+$\left[\begin{smallmatrix} 1 & 0 \\ 1/Z_b & 1 \end{smallmatrix}\right]$. La
+**pérdida de transmisión** se obtiene de la matriz compuesta $T$ con las
+impedancias de los puertos $Z_1 = \rho c/S_\text{in}$ y $Z_n = \rho c/S_\text{out}$
+(Munjal Ec. (3.27); Bies Ec. (8.141) imprime invertidos los pesos de impedancia
+de $T_{11}$ y $T_{22}$ de esta fórmula y no cumple el límite de expansión
+brusca, véase el
+[registro de erratas](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.md))
+
+$$
+\mathrm{TL} = 10\log_{10}\!\left[\frac{Z_n}{Z_1}\,\tfrac{1}{4}\left|\,T_{11}
++ \tfrac{T_{12}}{Z_n} + Z_1\,T_{21} + \tfrac{Z_1}{Z_n}\,T_{22}\right|^2\right],
+$$
+
+que para áreas de entrada y salida iguales $S$ se reduce a (Bies Ec. (8.148))
+
+$$
+\mathrm{TL} = 20\log_{10}\!\left(\tfrac{1}{2}\left|\,T_{11}
++ \tfrac{T_{12}}{Z_c} + Z_c\,T_{21} + T_{22}\right|\right),
+\qquad Z_c = \frac{\rho c}{S},
+$$
+
+y la **pérdida de inserción** para una impedancia de fuente $Z_s$ y una de
+radiación $Z_r$ es la atenuación adicional frente a una conexión directa.
+
+### Cámara de expansión
+
+El silenciador más simple, una cámara de área $S_\text{exp}$ y longitud $L$ entre
+tubos de área $S_\text{duct}$, tiene la pérdida de transmisión en forma cerrada
+(Bies Ec. (8.111)) con la relación de áreas $m = S_\text{exp}/S_\text{duct}$
+
+$$
+\mathrm{TL} = 10\log_{10}\!\left[1 + \tfrac{1}{4}\left(m - \tfrac{1}{m}\right)^2
+\sin^2 kL\right],
+$$
+
+con máximos en $10\log_{10}[1 + \tfrac14(m-1/m)^2]$ cuando $kL = \pi/2, 3\pi/2, \dots$
+y caídas a $0$ en $kL = n\pi$, donde la cámara mide media longitud de onda y es
+transparente. El producto de cuatro polos lo reproduce exactamente.
+
+```python
+import numpy as np
+from phonometry import expansion_chamber
+
+freqs = np.linspace(20.0, 2000.0, 2000)
+res = expansion_chamber(freqs, length=0.3, chamber_area=0.04, pipe_area=0.01)
+print(round(res.transmission_loss.max(), 2))   # máximo 6.55 dB (m = 4)
+# Las caídas en f = n c / 2L son exactamente 0 dB (sin disipación).
+print(round(float(res.transmission_loss[np.argmin(res.transmission_loss)]), 6))
+```
+
+La línea única `res.plot()` dibuja la pérdida de transmisión de la cámara (y
+su pérdida de inserción cuando se dan las impedancias de fuente y radiación).
+La figura de abajo barre en cambio la relación de áreas: un desajuste $m$ mayor
+eleva todos los máximos, pero las caídas permanecen en 0 dB y los máximos
+permanecen en las mismas frecuencias, fijadas solo por la longitud de la
+cámara.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_expansion_chamber_es.svg" alt="Pérdida de transmisión de la cámara de expansión frente a la frecuencia para relaciones de áreas m = 2, 4, 8 y 16, con máximos periódicos que crecen con m en los múltiplos impares de la frecuencia de cuarto de onda y caídas que vuelven a 0 dB en cada media longitud de onda de la cámara" width="88%" />
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import expansion_chamber
+
+freqs = np.linspace(20.0, 2000.0, 2000)
+
+# Una línea para una cámara: TL vs frecuencia (con la pérdida de inserción si
+# se dan las impedancias de fuente y radiación).
+expansion_chamber(freqs, 0.3, 0.04, 0.01,
+                  source_impedance=4e4, radiation_impedance=5e3).plot(language="es")
+plt.show()
+
+# A mano: la familia de relaciones de áreas de la figura de concepto.
+fig, ax = plt.subplots()
+for m in (2.0, 4.0, 8.0, 16.0):
+    res = expansion_chamber(freqs, 0.3, m * 0.01, 0.01)
+    ax.plot(freqs, res.transmission_loss, label=f"m = {int(m)}")
+ax.set_xlabel("Frecuencia [Hz]"); ax.set_ylabel("Pérdida de transmisión [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+Los números que se pasan a `expansion_chamber` describen un dispositivo real,
+y `.plot_geometry()` lo dibuja: la misma cámara de 0,3 m con su relación de
+áreas 4:1, a escala y acotada.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/expansion_chamber_geometry_es.svg" alt="Sección a escala del silenciador de cámara de expansión del ejemplo de pérdida de transmisión: una cámara de 300 mm de longitud y 225,7 mm de diámetro equivalente insertada entre tubos de entrada y salida de 112,8 mm de diámetro equivalente, con la longitud de la cámara y ambos diámetros acotados" width="88%" />
+
+*La cámara detrás de las curvas de arriba, a escala: las áreas entran en el
+método de cuatro polos solo a través de la relación `m`, y el dibujo usa los
+diámetros circulares equivalentes `d = 2√(S/π)` de las secciones de 0,04 y
+0,01 m².*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import expansion_chamber, plot_silencer_geometry
+
+freqs = np.linspace(20.0, 2000.0, 2000)
+res = expansion_chamber(freqs, length=0.3, chamber_area=0.04, pipe_area=0.01)
+
+# Una línea: la sección acotada de la cámara recién calculada.
+res.plot_geometry(language="es")
+plt.show()
+
+# El mismo dibujo sin resultado, con la función libre:
+plot_silencer_geometry("expansion chamber", length=0.3,
+                       chamber_area=0.04, pipe_area=0.01, language="es")
+plt.show()
+```
+
+</details>
+
+El clip de abajo ejecuta una cámara con m = 4 y la misma longitud de 0,30 m
+en un conducto FDTD 2D a sus dos frecuencias características. En kL = π la
+cámara es un resonador de media onda y el tono la cruza como si no
+existiera; en kL = π/2 los dos saltos de área reflejan en fase y devuelven
+la onda por el conducto de entrada, el pico de 6,5 dB de la curva de cuatro
+polos de arriba.
+
+<Video
+  name="anim_fdtd_expansion_chamber"
+  width={2400}
+  height={1350}
+  title="El silenciador de cámara de expansión en una simulación FDTD 2D"
+  description="Un conducto FDTD 2D con una cámara de expansión de 0,30 m y relación de áreas 4, dibujada como hardware entre un altavoz y una terminación anecoica, a dos frecuencias en paralelo. A 572 Hz la envolvente de presión queda plana y el tono cruza la cámara sin cambios con la pérdida de transmisión anotada de 0,0 dB; a 286 Hz una onda estacionaria llena el conducto de entrada y la salida queda con menos de la mitad de la amplitud, en línea con el pico anotado de 6,5 dB."
+/>
+
+### Resonadores laterales y de tubo extendido
+
+Un **resonador de Helmholtz** (área de cuello $S_n$, longitud efectiva $l_e$,
+volumen de cavidad $V$) y un **tubo de cuarto de onda** cerrado (longitud $l_e$)
+cortocircuitan el conducto en su frecuencia de sintonía, dando un pico agudo de
+pérdida de transmisión: $f_0 = \tfrac{c}{2\pi}\sqrt{S_n/(l_e V)}$ (Bies Ec. (8.46))
+y $f = c/4l_e$ (Ec. (8.44)). Una **cámara de tubo extendido** aloja ramas de
+cuarto de onda dentro de una cámara de expansión para rellenar sus caídas.
+
+```python
+import numpy as np
+from phonometry import (
+    helmholtz_resonator, quarter_wave_resonator, extended_tube_chamber,
+)
+
+f = np.linspace(20.0, 600.0, 4000)
+
+hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
+                         neck_length=0.02, cavity_volume=1e-3)
+print(round(float(hr.resonances[0]), 1))       # frecuencia de sintonía, Hz
+hr.plot()   # pico de TL en la frecuencia de sintonía (necesita matplotlib)
+
+qw = quarter_wave_resonator(f, duct_area=0.01, length=1.516, branch_area=2e-3,
+                            speed_of_sound=343.24)
+print(round(float(qw.resonances[0]), 1))        # 56.6 Hz (Bies Ejemplo 8.1)
+
+# Una extensión de entrada de L/4 rellena la primera caída de la cámara.
+et = extended_tube_chamber(f, length=0.4, chamber_area=0.04, pipe_area=0.01,
+                           inlet_extension=0.1)
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_side_branch_es.svg" alt="Pérdida de transmisión de un resonador de Helmholtz y de un tubo de cuarto de onda cerrado sobre el mismo conducto de 10 cm2: cada rama lateral produce un pico agudo en su propia frecuencia de sintonía, cerca de 120 Hz para el volumen de Helmholtz y cerca de 285 Hz para el tubo de 0,3 m, y es transparente en el resto" width="88%" />
+
+*Cada rama lateral cortocircuita el conducto en su propia frecuencia de
+sintonía y es casi transparente en el resto: el pico estrecho es la razón de
+que los resonadores se sintonicen a una frecuencia de encendido o al tono de
+paso de álabes de un ventilador en lugar de usarse en banda ancha.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import helmholtz_resonator, quarter_wave_resonator
+
+f = np.linspace(20.0, 600.0, 4000)
+hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
+                         neck_length=0.02, cavity_volume=1e-3)
+qw = quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
+
+# Una línea para un dispositivo: TL vs frecuencia con la resonancia marcada.
+hr.plot(language="es")
+plt.show()
+
+# A mano: las dos ramas laterales en los mismos ejes.
+fig, ax = plt.subplots()
+ax.plot(f, hr.transmission_loss, label="Resonador de Helmholtz")
+ax.plot(f, qw.transmission_loss, "--", label="Tubo de cuarto de onda")
+for fr in (hr.resonances[0], qw.resonances[0]):
+    ax.axvline(float(fr), ls=":", color="#2ca02c")
+ax.set_xlabel("Frecuencia [Hz]"); ax.set_ylabel("Pérdida de transmisión [dB]")
+ax.set_ylim(0.0, 50.0)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+Las dos ramas son hardware pequeño, y `.plot_geometry()` enseña cuánto: el
+resonador del pico de 120 Hz es una cavidad de 1 L alimentada por un cuello
+de 1 cm² de solo 2 cm de longitud.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/helmholtz_branch_geometry_es.svg" alt="Sección a escala del resonador de Helmholtz en rama lateral: un conducto de 112,8 mm de diámetro equivalente con un cuello estrecho de 11,3 mm y 20 mm de longitud que se abre a una cavidad de 1 litro dibujada como su cubo de igual volumen sobre el conducto, con el diámetro del cuello, la longitud del cuello y el diámetro del conducto acotados" width="88%" />
+
+*Todo el valle de 120 Hz cuelga de una caja de 1 L y un cuello de 2 cm: la
+cavidad se dibuja como su cubo de igual volumen, y la sintonía se mueve como
+`√(Sₙ/(l_e V))`, así que pequeños errores en estas dimensiones desplazan el
+pico de su objetivo.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import helmholtz_resonator
+
+f = np.linspace(20.0, 600.0, 4000)
+hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
+                         neck_length=0.02, cavity_volume=1e-3)
+
+# Una línea: la rama lateral a escala, cavidad como cubo de igual volumen.
+hr.plot_geometry(language="es")
+plt.show()
+```
+
+</details>
+
+El tubo de cuarto de onda no necesita cavidad alguna: el pico de 285 Hz de
+la figura de arriba sale de un simple tubo cerrado de la longitud correcta
+plantado sobre el mismo conducto.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/quarter_wave_geometry_es.svg" alt="Sección a escala de la rama lateral de cuarto de onda: un tubo cerrado de 300 mm de longitud y 50,5 mm de diámetro equivalente plantado sobre un conducto de 112,8 mm de diámetro equivalente, con la longitud del tubo, el diámetro del tubo y el diámetro del conducto acotados" width="88%" />
+
+*Un tubo de cuarto de onda es solo un tubo cerrado de la longitud correcta:
+0,3 m de tubo colocan el pico en `c/4l_e ≈ 285 Hz`, y el área de rama de
+20 cm² solo fija con cuánta fuerza carga el conducto.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import quarter_wave_resonator
+
+f = np.linspace(20.0, 600.0, 4000)
+qw = quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
+
+# Una línea: el tubo cerrado de 0,3 m sobre su conducto, a escala.
+qw.plot_geometry(language="es")
+plt.show()
+```
+
+</details>
+
+Cada uno devuelve un `ReactiveSilencerResult` con `transmission_loss`,
+`insertion_loss` (cuando se dan las impedancias), la matriz compuesta
+`transfer_matrix` y `.plot()`. Las configuraciones avanzadas encadenan elementos
+directamente con `duct_matrix`, `shunt_matrix`, `cascade`, `transmission_loss` e
+`insertion_loss`.
+
+## 2. ¿Reactivo o disipativo?
+
+Todo lo anterior funciona por reflexión, y la reflexión tiene una forma:
+aguda, periódica, selectiva en frecuencia. La familia complementaria, los
+silenciadores **disipativos**, sustituye las discontinuidades de impedancia
+por un tramo de conducto cuyas paredes están revestidas de material poroso
+(a menudo protegido por una chapa perforada), de modo que la onda rasante
+pierde energía por fricción viscosa en el revestimiento en lugar de ser
+devuelta hacia la fuente. Los comportamientos difieren justo donde importa
+para elegir:
+
+- **Alcance en frecuencia.** Una cámara o un resonador reactivo es más fuerte
+  exactamente donde está sintonizado y transparente en el resto; un conducto
+  revestido atenúa en una banda ancha cuyo máximo cae donde el espesor del
+  revestimiento es comparable a un cuarto de longitud de onda. En baja
+  frecuencia un revestimiento realista es acústicamente delgado y hace poco,
+  que es el régimen donde gana la cámara reactiva; en alta frecuencia el
+  sonido se colima por el conducto libre y pasa de largo sobre el
+  revestimiento, así que la atenuación de las dos familias se desploma y solo
+  las geometrías de bafles (pasos estrechos, más perímetro revestido por
+  unidad de área) siguen funcionando.
+- **Tipo de espectro.** Una fuente tonal, un orden de encendido de un motor o
+  una frecuencia de paso de álabes, es la presa natural de un resonador; el
+  ruido de ventilador o de flujo, de banda ancha, pide la banda disipativa.
+  Los silenciadores de escape de serie combinan de forma rutinaria ambas
+  cosas, rellenando de fibra una cámara de expansión para que las caídas
+  por reflexión de la cámara se cubran por absorción.
+- **El medio.** Un revestimiento poroso en un escape caliente, con hollín o
+  pulsante se colmata y se degrada, una de las razones de que los escapes de
+  vehículo sean predominantemente reactivos; el aire limpio de una
+  instalación HVAC es donde los atenuadores disipativos y los plenums
+  revestidos son la opción por defecto. En cualquier caso el flujo añade su
+  propio suelo: un silenciador regenera ruido de flujo en su propia salida, y
+  pasada cierta pérdida de carga el silenciador se convierte en la fuente de
+  ruido.
+
+phonometry modela la familia reactiva en forma cerrada en esta página. El
+lado disipativo entra por los datos de instalación de los
+[métodos HVAC](/phonometry/es/guides/noise-control/): la pérdida de inserción
+del codo revestido y la atenuación del plenum revestido del método de Wells,
+ambas a partir de datos ASHRAE interpolados y no de un modelo de
+revestimiento. La física porosa que necesitaría un cálculo de revestimiento
+desde primeros principios, los modelos de fluido equivalente alimentados por
+la resistividad al flujo de aire, es la misma teoría de materiales que
+[Absorbentes porosos y multicapa](/phonometry/es/guides/porous-absorbers/).
+
+## Contraste con el solucionador FDTD
+
+La cámara de expansión de cuatro polos se contrasta con el
+[solucionador de ondas FDTD 2D](/phonometry/es/guides/fdtd-simulation/)
+independiente: un conducto de onda plana que se ensancha en una cámara y vuelve a
+estrecharse transmite mucho menos en el máximo de TL de cuatro polos ($kL = \pi/2$)
+que en la caída transparente ($kL = \pi$), y la razón de amplitudes medida
+reproduce la pérdida de transmisión máxima en forma cerrada con una fracción de
+decibelio.
+
+## Qué cubre esta guía
+
+**Cubierto.** Los silenciadores reactivos por el método de matriz de
+transferencia de cuatro polos (Bies §8.8-8.9, Munjal Ec. (3.27)): la forma
+cerrada `expansion_chamber` (Ec. (8.111)), `helmholtz_resonator` y
+`quarter_wave_resonator` (Ecs. (8.46), (8.44)), `extended_tube_chamber`, y
+los bloques `duct_matrix`/`shunt_matrix`/`cascade`/`transmission_loss`/
+`insertion_loss` para encadenar elementos arbitrarios, cada uno con su
+dibujo a escala `.plot_geometry()`, contrastados contra el solucionador FDTD
+independiente.
+
+**No cubierto.** Solo se calculan elementos reactivos: los silenciadores
+disipativos (absorbentes, con revestimiento interior) se discuten para la
+selección pero no se modelan a partir de las propiedades del revestimiento, y
+los datos de codo revestido y plenum de los
+[métodos HVAC](/phonometry/es/guides/noise-control/) son tablas de
+instalación interpoladas, no un modelo de revestimiento. Los efectos del
+flujo medio (convección, gradientes de temperatura, impedancia de los
+perforados dependiente del flujo) quedan fuera de las matrices de elemento
+sin flujo que se usan aquí.
+
+## Véase también
+
+- [Control de ruido industrial](/phonometry/es/guides/noise-control/): el
+  resto de la instalación: atenuación y ruido de flujo en conductos HVAC,
+  plenums, reflexión de extremo y cerramientos de máquina.
+- [Simulación de ondas FDTD 2D](/phonometry/es/guides/fdtd-simulation/): el
+  solucionador independiente que respalda el contraste de la cámara de
+  expansión.
+- [Absorbentes porosos y multicapa](/phonometry/es/guides/porous-absorbers/):
+  la teoría de materiales de fluido equivalente detrás de los revestimientos
+  disipativos.
+- [Caracterización de altavoces (IEC 60268-5)](/phonometry/es/guides/loudspeakers/):
+  el pistón radiante, el modelo de radiador complementario del extremo
+  abierto de un conducto.
+- Referencia de la API:
+  [`noise_control.silencers`](/phonometry/es/reference/api/noise_control/silencers/).

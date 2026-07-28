@@ -167,8 +167,8 @@ print(metrology.verify_filter_class(bank)["overall_class"])    # 1
 The verdicts also come per band, so you can see exactly where a design would
 leave its class corridor. Deep guides:
 [Frequency Weighting](weighting.md) (section on class
-verification) and [Filter Banks](filter-banks.md) (class
-compliance).
+verification) and [Filter class verification](filter-compliance.md) (the
+Table 1 mask, class 0 and the compliance fiche).
 
 ## Where to go next
 

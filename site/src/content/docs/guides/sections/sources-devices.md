@@ -1,6 +1,6 @@
 ---
 title: "Sources and devices"
-description: "Characterising what emits the sound: sound power determination by pressure, reverberation-room and intensity methods (ISO 3740 and ISO 9614 series), two-microphone sound intensity (IEC 61043), the IEC 60268 distortion and frequency-response metrics of audio equipment, swept-sine harmonic separation with THD(f) (Farina / Novak), and the ITU-R BS.1770-5 / EBU R 128 programme loudness and true peak."
+description: "Characterising what emits the sound: sound power determination by pressure, reverberation-room and intensity methods (ISO 3740 and ISO 9614 series), two-microphone sound intensity (IEC 61043), the IEC 60268 distortion, loudspeaker and microphone metrics of audio equipment, swept-sine harmonic separation with THD(f) (Farina / Novak), reactive silencers and industrial noise control, and the ITU-R BS.1770-5 / EBU R 128 programme loudness and true peak."
 ---
 
 Every prediction elsewhere in this documentation starts from a source
@@ -12,10 +12,17 @@ The central quantity is the **sound power**: the total acoustic energy per
 second a source radiates. Expressed in decibels as the sound power level, it
 is the figure that goes on a datasheet, feeds a room or outdoor prediction
 and is checked against noise-emission limits.
-[Sound Power](/phonometry/guides/sound-power/) covers the five standardised
-routes to it, from the enveloping pressure surface of ISO 3744/3746 to the
-reverberation room of ISO 3741, the on-site intensity scanning of ISO 9614-2
-and the precision grades of ISO 3745 and ISO 9614-3. Behind the intensity-based routes sits **sound intensity** itself:
+[Sound Power](/phonometry/guides/sound-power/) chooses between the
+standardised routes and closes the job with the ISO 4871 emission
+declaration, and each route has its own page:
+[Sound Power by Pressure Methods](/phonometry/guides/sound-power-pressure/)
+for the enveloping surface of ISO 3744/3746 and the precision anechoic grade
+of ISO 3745,
+[Sound Power in the Reverberation Room](/phonometry/guides/sound-power-reverberation/)
+for the direct and comparison methods of ISO 3741, and
+[Sound Power by Intensity Scanning](/phonometry/guides/sound-power-intensity/)
+for the on-site scanning of ISO 9614-2 and its ISO 9614-3 precision grade.
+Behind the intensity-based routes sits **sound intensity** itself:
 the signed power flux that can localise sources and separate them from
 background noise, measured with a two-microphone probe per IEC 61043 and
 qualified by the ISO 9614-1 field indicators, covered in
@@ -24,15 +31,28 @@ qualified by the ISO 9614-1 field indicators, covered in
 [Electroacoustics](/phonometry/guides/electroacoustics/) turns to devices that
 are *supposed* to make sound: amplifiers, loudspeakers and microphones. It
 covers the IEC 60268-3 distortion set (THD, THD+N and SINAD, intermodulation
-and DIM), the H1/H2 frequency-response estimators with coherence, and the
-sensitivity conventions of IEC 60268-4/-5 where datasheet comparisons usually
-go wrong.
+and DIM) and the H1/H2 frequency-response estimators with coherence. The two
+device families have their own type-test pages:
+[Loudspeaker Characterisation (IEC 60268-5)](/phonometry/guides/loudspeakers/)
+with the radiating-piston model behind a loudspeaker's directivity, and
+[Microphone Characterisation (IEC 60268-4)](/phonometry/guides/microphones/)
+with the polar patterns and the inherent-noise conventions, both ending in a
+one-page accredited fiche.
 [Swept-sine distortion and phase utilities](/phonometry/guides/swept-sine-distortion/)
 extends the bench with the one-sweep alternative: the Farina / Novak
 harmonic separation that turns a single exponential sweep into the full set
 of harmonic frequency responses and a THD measured as a function of the
 excitation frequency, plus the minimum-phase, group-delay and excess-phase
 utilities that dissect what the measured response's phase is made of.
+
+Machinery is the other half of the section. **Industrial noise control**
+attacks the source, the path and the receiver in turn:
+[Silencers](/phonometry/guides/silencers/) is the path measure, the reactive
+four-pole elements (expansion chambers, Helmholtz, quarter-wave and
+extended-tube resonators) and the choice between reflection and dissipation,
+while [Industrial Noise Control](/phonometry/guides/noise-control/) keeps
+the HVAC duct attenuation and flow noise of an installation and the
+insertion loss of a machine enclosure.
 
 [Programme loudness](/phonometry/guides/program-loudness/) covers the signal
 the devices carry: the ITU-R BS.1770-5 loudness of a broadcast or streaming
@@ -53,12 +73,28 @@ level a programme, go to
 
 - [Sound Intensity (p-p)](/phonometry/guides/intensity/): two-microphone
   sound intensity per IEC 61043 with the ISO 9614-1 field indicators.
-- [Sound Power](/phonometry/guides/sound-power/): the sound power level by
-  enveloping surface, reverberation room, intensity scanning and the
-  precision anechoic and intensity methods.
+- [Sound Power](/phonometry/guides/sound-power/): choosing the determination
+  method and declaring the noise emission per ISO 4871.
+- [Sound Power by Pressure Methods](/phonometry/guides/sound-power-pressure/):
+  the enveloping surface of ISO 3744/3746 and the precision anechoic grade of
+  ISO 3745.
+- [Sound Power in the Reverberation Room](/phonometry/guides/sound-power-reverberation/):
+  the direct and comparison methods of ISO 3741.
+- [Sound Power by Intensity Scanning](/phonometry/guides/sound-power-intensity/):
+  the on-site scanning of ISO 9614-2 and the ISO 9614-3 precision grade.
 - [Electroacoustics: distortion and frequency response](/phonometry/guides/electroacoustics/):
-  the IEC 60268-3 distortion metrics, frequency-response estimation with
-  coherence, and microphone and loudspeaker sensitivity conventions.
+  the IEC 60268-3 distortion metrics and frequency-response estimation with
+  coherence.
+- [Loudspeaker Characterisation (IEC 60268-5)](/phonometry/guides/loudspeakers/):
+  the sensitivity conventions, the radiating piston and the IEC 60268-5
+  characteristics fiche.
+- [Microphone Characterisation (IEC 60268-4)](/phonometry/guides/microphones/):
+  the sensitivity references, directional patterns and inherent noise of the
+  IEC 60268-4 fiche.
+- [Silencers](/phonometry/guides/silencers/): reactive silencers by the
+  four-pole method and the reactive-versus-dissipative choice.
+- [Industrial Noise Control: HVAC and Enclosures](/phonometry/guides/noise-control/):
+  duct attenuation, flow noise and machine-enclosure insertion loss.
 - [Swept-sine distortion and phase utilities](/phonometry/guides/swept-sine-distortion/):
   harmonic separation and THD(f) from one exponential sweep (Farina /
   Novak synchronized swept-sine), and minimum phase, group delay and

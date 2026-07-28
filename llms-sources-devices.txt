@@ -4,6 +4,1147 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
+<!-- source: docs/sound-power-pressure.md | canonical: https://jmrplens.github.io/phonometry/guides/sound-power-pressure/ -->
+Source: https://jmrplens.github.io/phonometry/guides/sound-power-pressure/
+
+# Sound Power by Pressure Methods (ISO 3744 / ISO 3746 / ISO 3745)
+
+Of the standardised routes to the sound power level `LW`, the pressure
+methods are the ones that need nothing more exotic than a sound level meter:
+sample the sound pressure on a surface that envelops the source, energy-average
+it, correct it, and add the surface term. This guide covers the three of
+them. The **enveloping-surface** methods of ISO 3744 (engineering grade) and
+ISO 3746 (survey grade) work in situ, over one or more reflecting planes,
+and clean the surface level with the background-noise correction `K1` and
+the environmental correction `K2`. The **precision method** of ISO 3745
+moves the same idea into a qualified anechoic or hemi-anechoic room, where a
+fixed microphone array samples the free field directly and the grade-1
+corrections are meteorological rather than environmental. The closing
+section renders the determination as the accredited-style test fiche. Which
+route fits which job, and the reverberation-room and intensity alternatives,
+are weighed in [Sound Power](https://jmrplens.github.io/phonometry/guides/sound-power/).
+
+## 1. Enveloping surface, sound pressure (ISO 3744 / ISO 3746)
+
+Place the source on a reflecting plane and imagine a **measurement surface**
+of area `S` wrapping it: a hemisphere for a compact source, a box (right
+parallelepiped) for a large or elongated one. Sample the sound pressure
+level at an array of microphone positions on that surface, energy-average
+them, and the sound power follows because a diffuse-enough surface captures
+all the radiated energy:
+
+$$
+\bar{L}_p = 10 \log_{10}\left( \frac{1}{N_M} \sum_i 10^{L_{pi}/10} \right), \qquad
+L_W = \bar{L}_p - K_1 - K_2 + 10 \log_{10}\frac{S}{S_0},\quad S_0 = 1\ \text{m}^2 .
+$$
+
+Two corrections clean up the surface level. The **background-noise
+correction** removes the energy that would have been there with the source
+switched off, from the margin `ΔLp` between source-on and background levels,
+
+$$
+K_1 = -10 \log_{10}\left( 1 - 10^{-\Delta L_p/10} \right),
+$$
+
+and the **environmental correction** removes the reverberant build-up of the
+test room from its equivalent absorption area `A`,
+
+$$
+K_2 = 10 \log_{10}\left( 1 + \frac{4 S}{A} \right).
+$$
+
+The surface area is a closed form of the geometry: a hemisphere is
+`S = 2πr²` over one reflecting plane (halved and quartered for two and three
+planes), and a one-plane box is `S = 4(ab + bc + ca)` with
+`a = 0.5·l1 + d`, `b = 0.5·l2 + d`, `c = l3 + d` for measurement distance
+`d`. ISO 3746 (survey) shares every formula but is coarser: fewer
+microphone positions, a 3 dB background criterion instead of 6 dB, and
+validity up to `K2 ≤ 7 dB` instead of 4 dB.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sound_power_surfaces_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sound_power_surfaces.svg" alt="Measurement surfaces of ISO 3744: a hemisphere of radius r enveloping a compact source on a reflecting plane, and a right parallelepiped (box) at measurement distance d around a large source, both with microphone positions marked" width="88%"></picture>
+
+```python
+import numpy as np
+from phonometry import emission
+
+# Octave-band SPL (dB) at the 10 hemisphere positions of ISO 3744 (Annex B),
+# with the source running, plus the background spectrum with it switched off.
+freqs = np.array([63, 125, 250, 500, 1000, 2000, 4000, 8000])
+base = np.array([70.0, 74.0, 78.0, 80.0, 79.0, 76.0, 72.0, 66.0])
+rng = np.random.default_rng(0)
+levels = base + rng.normal(0.0, 0.5, size=(10, 8))     # (positions, bands)
+background = np.full((10, 8), 55.0)
+
+# ISO 3744 Annex B microphone coordinates on a radius-1.5 m hemisphere.
+mic_xyz = emission.measurement_positions("hemisphere", radius=1.5, reflecting_planes=1)
+print(mic_xyz.shape)                                    # (10, 3)
+
+res = emission.sound_power_pressure(
+    levels, "hemisphere", radius=1.5, reflecting_planes=1,
+    background_levels=background, frequencies=freqs,
+    reverberation_time=0.6, volume=300.0,          # room data -> K2
+)
+print(round(res.surface_area, 2))                       # 14.14 m^2 (= 2*pi*1.5^2)
+print(round(float(res.environmental_correction[0]), 2)) # K2 = 2.32 dB
+print(round(res.sound_power_level_a, 1))                # LWA = 92.4 dB
+print(round(res.uncertainty, 1))                        # U = 3.0 dB (2*sigma_R0)
+print(np.round(res.sound_power_level, 1))               # per-band LW
+
+res.plot()   # sound power level bars per band, LWA in the title (needs matplotlib)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_pressure_result_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_pressure_result.svg" alt="The enveloping-surface sound power level spectrum of the ISO 3744 hemisphere example, one bar per octave band from 63 Hz to 8 kHz peaking near 500 Hz, with the A-weighted total of 92.4 dB(A) in the title" width="88%"></picture>
+
+*One bar per band: the energy-averaged surface pressure minus the background
+(`K1`) and environmental (`K2`) corrections plus the surface term
+`10 lg(S/S0)` gives `LW(f)`, and the A-weighted energy sum across bands gives
+the single-number `LWA` in the title.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import emission
+
+# Octave-band SPL (dB) at the 10 hemisphere positions of ISO 3744 (Annex B),
+# with the source running, plus the background spectrum with it switched off.
+freqs = np.array([63, 125, 250, 500, 1000, 2000, 4000, 8000])
+base = np.array([70.0, 74.0, 78.0, 80.0, 79.0, 76.0, 72.0, 66.0])
+rng = np.random.default_rng(0)
+levels = base + rng.normal(0.0, 0.5, size=(10, 8))     # (positions, bands)
+background = np.full((10, 8), 55.0)
+res = emission.sound_power_pressure(
+    levels, "hemisphere", radius=1.5, reflecting_planes=1,
+    background_levels=background, frequencies=freqs,
+    reverberation_time=0.6, volume=300.0,          # room data -> K2
+)
+
+# res is the SoundPowerResult computed above. One line:
+res.plot()
+plt.show()
+
+# By hand: a bar spectrum of LW with the A-weighted total in the title.
+freqs = res.frequencies
+positions = np.arange(freqs.size)
+fig, ax = plt.subplots()
+ax.bar(positions, res.sound_power_level, width=0.7, color="#1f77b4")
+ax.set_xticks(positions)
+ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Sound power level LW [dB]")
+ax.set_title(
+    f"Enveloping-surface sound power (ISO 3744)  "
+    f"LWA = {res.sound_power_level_a:.1f} dB(A)")
+plt.show()
+```
+
+</details>
+
+The A-weighted total `LWA` is combined from the band powers with the ISO 3744
+Annex E A-weighting corrections, so it needs `frequencies`. Passing the room
+data (`reverberation_time` + `volume`, or `absorption_area`, or
+`mean_absorption_coefficient` + `room_surface`) enables `K2`; omit it and the
+field is treated as free (`K2 = 0`). If the background margin drops below the
+grade criterion or `K2` exceeds the validity limit, a `SoundPowerWarning`
+flags that the levels are upper bounds; the determination still returns.
+
+### K1 and K2 pitfalls
+
+Both corrections subtract energy from the surface level, so overestimating
+either one understates the emission. That is why the standards cap them, and
+why most disputes over an enveloping-surface result trace back to one of
+these habits:
+
+- **K1 has a cliff, not a slope.** At a 15 dB margin the correction is a
+  negligible 0.14 dB; at the 6 dB engineering criterion it is already
+  1.26 dB, the largest value the grade accepts. Below the criterion the
+  standard does not let the formula run on: `K1` is capped and the result is
+  reported as an upper bound. Never extrapolate the subtraction into a
+  smaller margin; raise the margin (quieter site, closer surface) or switch
+  to the intensity method.
+- **K1 assumes a stationary background.** The source-off reading must be
+  taken at the same positions with the room in the same state, and the
+  background energy must be the same during both readings. A ventilation
+  system that cycles or a vehicle passing during either reading invalidates
+  the pair; the energy subtraction also assumes source and background are
+  incoherent, which holds for unrelated noise but not for the source's own
+  reflections.
+- **K2 removes the average room build-up, not discrete reflections.** A
+  nearby wall, a trolley or another machine just outside the surface adds a
+  specular contribution concentrated at a few microphones. That imbalance
+  shows up in the apparent directivity index `DIi*`, and no room-average
+  correction can remove it: move the surface, remove the reflector or treat
+  it with absorption.
+- **K2 is only as good as `A`.** With `A` from Sabine (`0.16·V/T`), errors
+  in the reverberation time or the volume propagate directly. At the
+  `K2 = 4 dB` validity limit about 60 % of the measured energy is room, not
+  source, and a 20 % error in `A` still moves `LW` by about 0.5 dB. Prefer a
+  measured `T60` over a guessed absorption coefficient, and keep the
+  measurement distance small enough that `K2` stays well under the limit.
+
+### `sound_power_pressure()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `levels_positions` | 2D array | dB | `(NM, NB)` | One row per position, one column per band (or a single A-weighted column) |
+| `surface` | str | — | `'hemisphere'` / `'box'` | Measurement-surface shape |
+| `radius` | float | m | > 0 (hemisphere) | Hemisphere radius `r` |
+| `dimensions` | (float, float, float) | m | > 0 (box) | Reference-box `(l1, l2, l3)` |
+| `distance` | float | m | > 0 (box) | Measurement distance `d` |
+| `reflecting_planes` | int | — | `1` / `2` / `3`, default `1` | Halves/quarters the hemisphere area |
+| `background_levels` | 2D array or spectrum | dB | `(NM, NB)`, or `(NB,)` / `(1, NB)` | Enables `K1`; a single spectrum broadcasts to every position |
+| `frequencies` | 1D array | Hz | nominal band centres | Enables `LWA` (Annex E) |
+| `absorption_area` | float or 1D array | m² | > 0 | `A` for `K2` (direct); per-band array → per-band `K2` |
+| `reverberation_time`, `volume` | float/array, float | s, m³ | > 0 | `A = 0.16 V/T` for `K2`; per-band `T` → per-band `K2` |
+| `mean_absorption_coefficient`, `room_surface` | float/array, float | —, m² | `(0,1]`, > 0 | `A = α·Sv` (Eq. A.7); per-band `α` → per-band `K2` |
+| `grade` | str | — | `'engineering'` (default) / `'survey'` | ISO 3744 vs ISO 3746 |
+| `omc_uncertainty` | float | dB | default `0.0` | `σomc`, operating/mounting instability, folded into `U` |
+
+Returns a `SoundPowerResult`: `sound_power_level` (per-band `LW`),
+`surface_pressure_level` (`Lp` after K1/K2), `mean_pressure_level`,
+`background_correction`/`environmental_correction` (`K1`/`K2`),
+`directivity_index` (apparent `DIi*` per microphone position **and** frequency
+band, shape `(NM, NB)`; ISO 3744 clause 8.6), `surface_area`,
+`sound_power_level_a` (`LWA`), `uncertainty` (expanded, 95 %) and `grade`.
+`measurement_positions('hemisphere', radius=…, reflecting_planes=…, tones=…,
+grade=…)` returns the normative `(N, 3)` microphone coordinates (Table B.1 for
+tonal sources, B.2 for broadband). Those coordinates plot directly with
+`plot_microphone_positions`, which draws the array on its measurement
+surface in 3-D, numbered as in the standard.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_positions_hemisphere_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_positions_hemisphere.svg" alt="Three-dimensional view of the ISO 3744 microphone array: ten numbered microphones on a 2 m wireframe hemisphere standing on a shaded circular reflecting plane, with positions 1 and 2 close to the plane, the others staggered in height up to positions 9 and 10 near the top, and the x, y and z axes graduated in metres" width="88%"></picture>
+
+*Where the ten Annex B microphones actually sit on the 2 m hemisphere: the
+heights are staggered so the array samples the whole surface evenly, which
+is what lets the plain energy average of the ten levels stand in for the
+surface integral.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import measurement_positions, plot_microphone_positions
+
+# The 10 ISO 3744 Annex B microphones on a 2 m hemisphere.
+plot_microphone_positions(measurement_positions("hemisphere", radius=2.0),
+                          radius=2.0)
+plt.show()
+```
+
+</details>
+
+## 2. Precision grade, anechoic room (ISO 3745)
+
+When the highest accuracy is required, ISO 3745 measures sound power in a
+qualified **anechoic** or **hemi-anechoic** room, where the free field lets a
+fixed array of microphones sample the radiated sound pressure directly. It is the
+grade-1 counterpart to the enveloping-surface method of Section 1, with
+standardized microphone coordinates, a per-position background correction and an
+explicit meteorological correction.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_precision_anechoic_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_precision_anechoic.svg" alt="ISO 3745 precision sound power in an anechoic room: wedge-lined walls, the device under test at the centre and a hemispherical array of microphones at a fixed radius, with the sound power level formed from the surface-averaged pressure plus the area, background and meteorological corrections" width="92%"></picture>
+
+**Sound power level (Clause 8).** The band sound power level is the
+surface-averaged pressure level plus the surface term and the corrections:
+
+$$
+L_W = \overline{L_p} + 10\lg\frac{S}{S_0} + C_1 + C_2 + C_3,
+$$
+
+with $S = 4\pi r^2$ over the sphere or $S = 2\pi r^2$ over the hemisphere,
+$S_0 = 1\ \text{m}^2$. $C_1$ and $C_2$ are the meteorological corrections
+(reference and radiation-impedance terms); $C_3$ accounts for air absorption over
+the measurement radius. The microphone positions are the standardized
+unit-vector arrays of Tables D.1 (sphere), E.1 (hemisphere) and E.2 (hemisphere,
+broadband).
+
+```python
+import numpy as np
+from phonometry import emission
+
+# The 40 standardized hemisphere positions (unit vectors scaled by the radius).
+pos = emission.precision_positions("hemisphere", radius=1.0, count=40)
+print(pos.shape)                      # (40, 3)
+
+# Octave/third-octave band SPL (dB) at each of the 40 positions; here a uniform
+# 74 dB in one band. The result carries S = 2*pi*r^2 and LW with C1+C2+C3.
+levels = np.full((40, 1), 74.0)
+res = emission.sound_power_anechoic(levels, "hemisphere", radius=1.0)
+print(round(res.surface_area, 3))                 # 6.283  (2*pi*1^2)
+print(np.round(res.sound_power_level, 2))         # [81.85]
+```
+
+**Background and meteorological corrections.** The $K_1$ background correction is
+applied **per position** and floored where the signal-to-background difference is
+small (Eq. 11); the meteorological correction is evaluated from the measured
+temperature and static pressure.
+
+```python
+import numpy as np
+from phonometry import emission
+
+# K1 for a 6 dB signal-to-background difference in a <=200 Hz edge band: the
+# floor is 1.26 dB (Eq. 11). Source and background levels are [positions, bands].
+k1 = emission.precision_background_correction(
+    np.array([[56.0]]), np.array([[50.0]]), np.array([200.0]))
+print(round(float(k1[0, 0]), 4))      # 1.2563
+
+# Meteorological corrections at the 23 C, 101.325 kPa reference (Eq. 16):
+mc = emission.meteorological_corrections(23.0, 101.325)
+print(round(mc.c1, 4), round(mc.c2, 4))   # -0.1282 0.0
+
+# Expanded uncertainty (Clause 10.5 EXAMPLE): sigma_R0 = 0.5, sigma_omc = 2.0,
+# k = 2 -> U = 4.1 dB.
+print(round(emission.precision_uncertainty(0.5, 2.0, 2.0), 3))   # 4.123
+```
+
+The `MeteorologicalCorrection` is a pair of scalars (plus the per-band `C3`
+when the attenuation coefficient is supplied per band) rather than a
+plottable spectrum: the corrections fold into the
+`PrecisionSoundPowerResult` as its `c1`/`c2`/`c3` fields, and the `.report()`
+fiche prints them on its measurement-basis strip.
+
+Over several bands `sound_power_anechoic` returns a plottable
+`PrecisionSoundPowerResult` carrying the per-band `LW` and the A-weighted total:
+
+```python
+import numpy as np
+from phonometry import emission
+
+# A mid-frequency-peaked machine measured over the 40-position hemisphere array
+# (Annex E). levels_positions is the (40, NB) surface pressure spectrum: a base
+# spectrum peaked near 1 kHz plus a small per-position spatial spread.
+freqs = np.array([125, 250, 500, 1000, 2000, 4000, 8000], float)
+base = 70.0 + 8.0 * np.exp(-(np.log2(freqs / 1000.0) ** 2) / 2.0)
+rng = np.random.default_rng(7)
+levels = base[None, :] + rng.normal(0.0, 1.0, (40, freqs.size))
+
+result = emission.sound_power_anechoic(levels, "hemisphere", radius=1.0, frequencies=freqs)
+print(round(result.sound_power_level_a, 1))   # 89.3
+result.plot()   # LW spectrum, LWA in the title (needs matplotlib)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/precision_anechoic_power_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/precision_anechoic_power.svg" alt="The precision sound power level spectrum of a mid-frequency-peaked machine measured over the ISO 3745 hemisphere array, one bar per band peaking near 1 kHz, with the A-weighted total of 89.3 dB(A) in the title" width="88%"></picture>
+
+*One bar per band: the surface-averaged pressure plus the area, background and
+meteorological corrections give `LW(f)`, and the A-weighted energy sum across
+bands gives the single-number `LWA` in the title.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import emission
+
+# A mid-frequency-peaked machine measured over the 40-position hemisphere array
+# (Annex E). levels_positions is the (40, NB) surface pressure spectrum: a base
+# spectrum peaked near 1 kHz plus a small per-position spatial spread.
+freqs = np.array([125, 250, 500, 1000, 2000, 4000, 8000], float)
+base = 70.0 + 8.0 * np.exp(-(np.log2(freqs / 1000.0) ** 2) / 2.0)
+rng = np.random.default_rng(7)
+levels = base[None, :] + rng.normal(0.0, 1.0, (40, freqs.size))
+result = emission.sound_power_anechoic(levels, "hemisphere", radius=1.0, frequencies=freqs)
+
+# result is the PrecisionSoundPowerResult computed above. One line:
+result.plot()
+plt.show()
+
+# By hand: a bar spectrum of LW with the A-weighted total in the title.
+freqs = result.frequencies
+positions = np.arange(freqs.size)
+fig, ax = plt.subplots()
+ax.bar(positions, result.sound_power_level, width=0.7, color="#1f77b4")
+ax.set_xticks(positions)
+ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Sound power level LW [dB]")
+ax.set_title(
+    f"Precision sound power (ISO 3745)  LWA = {result.sound_power_level_a:.1f} dB(A)")
+plt.show()
+```
+
+</details>
+
+## 3. The measurement report (`.report()`)
+
+A sound power determination ends as a *document*. Every result of this page
+stays plottable while it is being worked on (`res.plot()` draws the same
+`LW` spectrum interactively that the fiche typesets), and the report step
+wraps it into the deliverable. Both the enveloping-surface result
+(`SoundPowerResult`, ISO 3744/3746) and the precision result
+(`PrecisionSoundPowerResult`, ISO 3745) expose a `.report()` method that writes
+a one-page PDF fiche laid out like a sound-power test sheet: the standard-basis
+line naming the applied method and accuracy grade, an optional metadata header
+(client, noise source, test environment, instrumentation, climate, date), a
+per-band table (nominal octave/one-third-octave frequency, the surface
+sound-pressure level `Lp` and the band sound-power level `LW`), the
+sound-power spectrum `LW(f)` with a nominal band axis, and a boxed A-weighted
+sound power level `LWA` (dB re 1 pW) with the total `LW`, the expanded
+uncertainty `U` and the measurement surface area `S` alongside.
+
+The metadata is supplied through a `ReportMetadata`, whose applicable fields
+here are the **source description** (`specimen`), the **test environment**
+(`test_room`), the **client**, the **instrumentation**, the **temperature**,
+**relative humidity** and **ambient pressure**, the **date of test**
+(`test_date`) and the footer identity (`laboratory`, `operator`, `report_id`,
+`notes`); the measurement surface area `S` comes from the result itself and is
+printed in the result box and the basis strip, together with the applied
+corrections (the background `K1` and environmental `K2` for the ISO 3744/3746
+surface method, or the meteorological `C1`/`C2`/`C3` for the ISO 3745
+precision method). Supplying `requirement` adds a PASS/FAIL verdict against a
+declared A-weighted sound-power limit (a sound-power emission is a quantity where
+less is better, so the source passes at or below the limit). `verbose=True`
+adds the energy-averaged level `Lp'` to the table, and for the ISO 3744/3746
+surface result it also adds the `K1`/`K2` correction columns (the ISO 3745
+precision result carries no `K1`/`K2`; its `C1`/`C2`/`C3` appear in the
+basis strip). `language="es"` renders the Spanish fiche with comma decimals.
+
+```python
+import numpy as np
+from phonometry import ReportMetadata, emission
+
+freqs = np.array([63, 125, 250, 500, 1000, 2000, 4000, 8000], float)
+# Ten identical position spectra over a hemisphere of radius 4 m; background a
+# uniform 10 dB below and an equivalent absorption area A = 1500 m^2 (so K1, K2
+# are meaningful and within the engineering validity limit).
+surface = np.array([72.0, 76, 80, 82, 81, 78, 73, 66])
+res = emission.sound_power_pressure(
+    np.tile(surface, (10, 1)), "hemisphere", radius=4.0,
+    background_levels=np.tile(surface - 10.0, (10, 1)),
+    frequencies=freqs, absorption_area=1500.0, grade="engineering",
+)
+
+res.report(
+    "sound_power.pdf",
+    metadata=ReportMetadata(
+        client="Example manufacturing plant",
+        specimen="Hydraulic power pack (floor-standing)",
+        test_room="Hemi-anechoic room over a reflecting floor",
+        instrumentation="Class 1 sound level meter (IEC 61672-1), s/n 0042",
+        laboratory="Phonometry reference example",
+        report_id="EXAMPLE-3744",
+        requirement=105.0,
+    ),
+)   # LWA = 103.7 dB(A) re 1 pW -> declared limit 105 dB(A): PASS
+```
+
+The example fiche, regenerated with `make reports`, is kept rendered in the
+repository. Click the preview to open the PDF:
+
+[![ISO 3744 sound power determination example report: a header with the client, the noise source, the hemi-anechoic test environment and the instrumentation and climate, the octave-band table (63 Hz to 8 kHz) of surface sound-pressure levels Lp and band sound-power levels LW, the sound-power spectrum LW(f) with a nominal band axis, the boxed A-weighted sound power level LWA = 103.7 dB(A) re 1 pW with the total LW = 105.8 dB, the expanded uncertainty U = 3.0 dB and the measurement surface S = 100.53 m2, and a PASS verdict against the declared 105 dB(A) limit, closed by a basis strip stating the applied K1 = 0.5 dB and K2 = 1.0 dB corrections](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso3744_sound_power_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso3744_sound_power_example.pdf)
+
+*Sound power determination fiche (`SoundPowerResult.report`), an ISO 3744
+engineering-grade hemisphere measurement with the K1/K2 corrections and the
+boxed LWA.*
+
+
+## See also
+
+- [Sound Power](https://jmrplens.github.io/phonometry/guides/sound-power/): choosing among the five determination
+  routes, what the accuracy grades promise, and the ISO 4871 noise-emission
+  declaration a measured `LWA` feeds.
+- [Sound Power in the Reverberation Room (ISO 3741)](https://jmrplens.github.io/phonometry/guides/sound-power-reverberation/):
+  the precision-grade diffuse-field alternative when the source can travel
+  to a qualified room.
+- [Sound Power by Intensity Scanning (ISO 9614)](https://jmrplens.github.io/phonometry/guides/sound-power-intensity/):
+  the routes that tolerate the steady background noise a pressure method
+  cannot subtract.
+- [Room Acoustics](https://jmrplens.github.io/phonometry/guides/room-acoustics/): the reverberation time and equivalent
+  absorption area that feed `K2`.
+- [Levels](https://jmrplens.github.io/phonometry/guides/levels/): energy averaging and the A-weighting behind `LWA`.
+- [Theory](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/): the K1/K2 and C1/C2 derivations.
+- API reference: [`emission.sound_power`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power/).
+
+## References
+
+- Beranek, L. L., & Mellow, T. J. (2012). *Acoustics: Sound fields and
+  transducers*. Academic Press. ISBN 978-0-12-391421-7.
+  [doi:10.1016/C2011-0-05897-0](https://doi.org/10.1016/C2011-0-05897-0).
+  Radiation and sound fields: the free-field relations between pressure and
+  power that the enveloping-surface and anechoic methods rest on.
+- International Organization for Standardization. (2010). *Acoustics —
+  Determination of sound power levels and sound energy levels of noise
+  sources using sound pressure — Engineering methods for an essentially free
+  field over a reflecting plane* (ISO 3744:2010).
+  [iso.org catalogue](https://www.iso.org/standard/52055.html).
+  The enveloping-surface method of section 1.
+- International Organization for Standardization. (2012). *Acoustics —
+  Determination of sound power levels and sound energy levels of noise
+  sources using sound pressure — Precision methods for anechoic rooms and
+  hemi-anechoic rooms* (ISO 3745:2012).
+  [iso.org catalogue](https://www.iso.org/standard/45362.html).
+  The precision anechoic-room method of section 2.
+- International Organization for Standardization. (2010). *Acoustics —
+  Determination of sound power levels and sound energy levels of noise
+  sources using sound pressure — Survey method using an enveloping
+  measurement surface over a reflecting plane* (ISO 3746:2010).
+  [iso.org catalogue](https://www.iso.org/standard/52056.html).
+  The survey grade of section 1, sharing the enveloping-surface formulae
+  with coarser criteria.
+
+## Standards
+
+ISO 3744:2010, *Acoustics — Determination of sound power levels
+and sound energy levels of noise sources using sound pressure — Engineering
+methods for an essentially free field over a reflecting plane*: the
+enveloping-surface method: hemisphere and box surface areas, the `K1`/`K2`
+corrections, the Annex B microphone positions and the Annex E A-weighting.
+ISO 3746:2010, *… Survey method using an enveloping measurement surface over a
+reflecting plane*: the survey grade sharing the same formulae with coarser
+criteria. ISO 3745:2012, *… Precision methods for anechoic rooms and
+hemi-anechoic rooms*: the Clause 8 power level, the per-position background
+correction (Eq. 11), the meteorological corrections and the standardized
+microphone arrays of section 2.
+
+---
+
+
+<!-- source: docs/sound-power-reverberation.md | canonical: https://jmrplens.github.io/phonometry/guides/sound-power-reverberation/ -->
+Source: https://jmrplens.github.io/phonometry/guides/sound-power-reverberation/
+
+# Sound Power in the Reverberation Room (ISO 3741)
+
+A reverberation room turns its main defect as a listening space into a
+measuring instrument: because the field is diffuse, a handful of microphone
+positions sample the whole radiated energy, and the sound power follows from
+the mean room level and the room's absorption with no enveloping surface to
+build. That is why ISO 3741 is a grade-1 (precision) method, and why it is
+the laboratory route of choice for steady, broadband sources small enough to
+travel to a qualified room. This guide covers the direct method through the
+Sabine absorption area, the Waterhouse and meteorological corrections, the
+comparison method against a reference sound source, the qualification
+warnings and the accredited-style test fiche. Which route fits which job,
+and the pressure and intensity alternatives, are weighed in
+[Sound Power](https://jmrplens.github.io/phonometry/guides/sound-power/).
+
+## 1. Reverberation room, precision grade (ISO 3741)
+
+In a qualified hard-walled **reverberation room** the field is diffuse, so a
+handful of microphones sample the whole radiated energy and the method
+reaches grade 1. The sound power comes from the mean room level `Lp(ST)`,
+the Sabine absorption area `A = (55.26/c)·(V/T60)` and a chain of small
+corrections (ISO 3741 Eq. 20):
+
+$$
+L_W = \bar{L}_p + 10 \log_{10}\frac{A}{A_0} + 4.34\ \frac{A}{S}
+      + 10 \log_{10}\left( 1 + \frac{S c}{8 V f} \right) + C_1 + C_2 - 6 .
+$$
+
+The bracketed term is the **Waterhouse correction**: near the room
+boundaries the sound energy density is higher than in the interior, and
+this term (which vanishes as frequency grows) restores the energy the
+interior microphones miss. `C1` (reference-quantity) and `C2`
+(radiation-impedance) carry the result to the reference meteorological
+conditions of 23 °C and 101.325 kPa,
+
+$$
+C_1 = -10 \log_{10}\frac{p_s}{p_{s0}} + 5 \log_{10}\frac{273.15 + \theta}{314}, \qquad
+C_2 = -10 \log_{10}\frac{p_s}{p_{s0}} + 15 \log_{10}\frac{273.15 + \theta}{296},
+$$
+
+with the speed of sound `c = 20.05·√(273 + θ)`. The **comparison method**
+replaces the absorption-area, Waterhouse and `C1` terms by a reference sound
+source of known power `LW(RSS)` measured in the same room, so the room need
+not be characterised: `LW = LW(RSS) + (Lp(ST) − Lp(RSS) + C2)`.
+
+```python
+import numpy as np
+from phonometry import emission
+
+# One-third-octave mean room SPL (dB), 100 Hz - 10 kHz, and the room's T60.
+freqs = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000,
+                  1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000],
+                 dtype=float)
+lp = np.linspace(80.0, 70.0, freqs.size)
+t60 = np.full(freqs.size, 2.0)
+
+rev = emission.sound_power_reverberation(
+    lp, t60, volume=200.0, surface_area=220.0, frequencies=freqs,
+    temperature=20.0, static_pressure=101.0,
+)
+print(round(rev.speed_of_sound, 1))                     # c = 343.2 m/s
+print(round(float(rev.absorption_area[0]), 1))          # A = 16.1 m^2 at 100 Hz
+print(round(float(rev.waterhouse_correction[0]), 2))    # 1.68 dB at 100 Hz
+print(round(float(rev.sound_power_level[0]), 1))        # LW = 87.9 dB
+print(round(rev.sound_power_level_a, 1))                # LWA = 92.1 dB
+
+# Comparison method: a reference source of known LW measured at the same spots.
+lw_rss = np.full(freqs.size, 85.0)
+lp_rss = np.linspace(78.0, 69.0, freqs.size)
+cmp = emission.sound_power_comparison(lp, lp_rss, lw_rss, frequencies=freqs, temperature=20.0)
+print(round(float(cmp.sound_power_level[0]), 1), cmp.method)   # 86.9 comparison
+
+rev.plot()   # reverberation-room LW spectrum, LWA in the title (needs matplotlib)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_reverberation_result_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_reverberation_result.svg" alt="The reverberation-room sound power level spectrum of the ISO 3741 example, one bar per one-third-octave band from 100 Hz to 10 kHz falling gently with frequency, with the A-weighted total of 92.1 dB(A) in the title" width="88%"></picture>
+
+*The mean room level carried through the absorption-area, Waterhouse and
+meteorological terms of Eq. 20 gives the one-third-octave `LW(f)`, and the
+A-weighted energy sum across the 21 bands gives the `LWA` in the title.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import emission
+
+# One-third-octave mean room SPL (dB), 100 Hz - 10 kHz, and the room's T60.
+freqs = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000,
+                  1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000],
+                 dtype=float)
+lp = np.linspace(80.0, 70.0, freqs.size)
+t60 = np.full(freqs.size, 2.0)
+rev = emission.sound_power_reverberation(
+    lp, t60, volume=200.0, surface_area=220.0, frequencies=freqs,
+    temperature=20.0, static_pressure=101.0,
+)
+
+# rev is the ReverberationSoundPowerResult computed above. One line:
+rev.plot()
+plt.show()
+
+# By hand: a bar spectrum of LW with the A-weighted total in the title.
+freqs = rev.frequencies
+positions = np.arange(freqs.size)
+fig, ax = plt.subplots()
+ax.bar(positions, rev.sound_power_level, width=0.7, color="#1f77b4")
+ax.set_xticks(positions)
+ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Sound power level LW [dB]")
+ax.set_title(
+    f"Reverberation-room sound power (ISO 3741)  "
+    f"LWA = {rev.sound_power_level_a:.1f} dB(A)")
+plt.show()
+```
+
+</details>
+
+`levels` may be a 1D mean spectrum or a 2D `(NM, NB)` array averaged over
+positions. When the room volume, its reverberation time or the microphone
+count fail an ISO 3741 qualification criterion (Table 1 minimum volume, the
+`V/S` reverberation floor, fewer than 6 positions, or an inter-position
+spread above 1.5 dB), an advisory `SoundPowerWarning` is emitted and the
+result still returns.
+
+### `sound_power_reverberation()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `levels` | 1D or 2D array | dB | per band, or `(NM, NB)` | Mean room SPL; 2D is energy-averaged over positions |
+| `t60` | float or 1D array | s | > 0 | Room reverberation time (scalar broadcasts) |
+| `volume` | float | m³ | > 0 | Room volume `V` |
+| `surface_area` | float | m² | > 0 | Total room surface `S` (Waterhouse, `A/S`) |
+| `frequencies` | 1D array | Hz | one per band | Required (Waterhouse needs `f`); enables `LWA` |
+| `background_levels` | 1D or 2D array | dB | matches `levels` | `K1i` per microphone position (Eq. 14/15, before the Eq. 16 average; frequency-dependent criterion) |
+| `temperature` | float | °C | default `23.0` | Sets `c`, `C1`, `C2` |
+| `static_pressure` | float | kPa | default `101.325` | Sets `C1`, `C2` |
+
+`sound_power_comparison(levels, levels_ref, lw_ref, *, frequencies=None,
+background_levels=…, background_levels_ref=…, temperature=23.0,
+static_pressure=101.325)` takes the same room levels plus the reference
+source's levels and known power.
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `levels_ref` | 1D or 2D array | dB | matches `levels` | Mean room SPL with the reference source (RSS) running |
+| `lw_ref` | 1D array | dB | per band | Known sound power `LW(RSS)` of the reference source |
+| `background_levels` | 1D or 2D array | dB | matches `levels` | Background for the test source; per-band `K1` on `Lp(ST)` |
+| `background_levels_ref` | 1D or 2D array | dB | matches `levels_ref` | Background for the **reference** source; per-band `K1` on `Lp(RSS)` |
+
+`background_levels_ref` background-corrects the reference-source room level
+`Lp(RSS)` exactly as `background_levels` does for the test source; both need
+`frequencies` (the ISO 3741 criterion is frequency-dependent). Both return a
+`ReverberationSoundPowerResult`
+(`sound_power_level`, `mean_pressure_level`, `absorption_area`,
+`waterhouse_correction`, `background_correction`, `c1`, `c2`,
+`speed_of_sound`, `sound_power_level_a`, `method`; the absorption/Waterhouse/`c1`
+fields are `NaN` for the comparison method).
+
+## 2. The measurement report (`.report()`)
+
+The reverberation-room result (`ReverberationSoundPowerResult`, ISO 3741)
+writes a one-page PDF fiche laid out like a sound-power test sheet through
+its own `.report()`, sharing the layout and the `ReportMetadata` container of
+the [pressure-method fiche](https://jmrplens.github.io/phonometry/guides/sound-power-pressure/#3-the-measurement-report-report).
+The standard-basis line
+names ISO 3741:2010 and the precision accuracy grade (grade 1) and states which
+method was used, the direct method using the room equivalent absorption area
+(Eq. 20) or the comparison method using a reference sound source (Eq. 21). The
+per-band table lists the mean room sound-pressure level `Lp` and the band
+sound-power level `LW`, and the boxed `LWA` carries the total `LW` and the
+determination method (the reverberation result has no expanded uncertainty `U`).
+`verbose=True` adds the background correction `K1` and, for the direct method,
+the equivalent absorption area `A` and the Waterhouse boundary correction `Cw`;
+the basis strip states the correction model (Eq. 20 or Eq. 21), the applied
+meteorological corrections `C1`/`C2` and the speed of sound, and cites the
+Annex F A-weighting.
+
+```python
+import numpy as np
+from phonometry import ReportMetadata, emission
+
+freqs = np.array([125, 250, 500, 1000, 2000, 4000, 8000], float)
+# Octave-band mean room sound-pressure levels in a qualified
+# reverberation room of V = 200 m3, S = 240 m2, with a uniform T60 = 2.0 s.
+lp = np.array([80.0, 83.0, 85.0, 84.0, 80.0, 75.0, 68.0])
+res = emission.sound_power_reverberation(
+    lp, 2.0, volume=200.0, surface_area=240.0, frequencies=freqs,
+    temperature=20.0, static_pressure=101.325,
+)
+
+res.report(
+    "sound_power_reverberation.pdf",
+    metadata=ReportMetadata(
+        client="Example manufacturing plant",
+        specimen="Hydraulic power pack (floor-standing)",
+        test_room="Qualified reverberation room, V = 200 m3, T60 = 2.0 s",
+        instrumentation="Class 1 sound level meter (IEC 61672-1), s/n 0042",
+        laboratory="Phonometry reference example",
+        report_id="EXAMPLE-3741",
+        requirement=96.0,
+    ),
+)   # LWA = 94.3 dB(A) re 1 pW -> declared limit 96 dB(A): PASS
+```
+
+The example fiche, regenerated with `make reports`, is kept rendered in the
+repository. Click the preview to open the PDF:
+
+[![ISO 3741 reverberation-room sound power example report: a header with the client, the noise source, the qualified reverberation test room and the instrumentation and climate, the octave-band table (125 Hz to 8 kHz) of mean room sound-pressure levels Lp and band sound-power levels LW, the sound-power spectrum LW(f) with a nominal band axis, the boxed A-weighted sound power level LWA = 94.3 dB(A) re 1 pW with the total LW = 96.7 dB and the direct determination method, and a PASS verdict against the declared 96 dB(A) limit, closed by a basis strip stating the Eq. 20 correction model with the Sabine absorption area, the Waterhouse boundary term and the meteorological corrections C1 and C2, and the Annex F A-weighting](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso3741_reverberation_power_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso3741_reverberation_power_example.pdf)
+
+*Reverberation-room sound power fiche (`ReverberationSoundPowerResult.report`),
+an ISO 3741 precision-grade direct-method determination with the Waterhouse and
+C1/C2 corrections and the boxed LWA.*
+
+
+## See also
+
+- [Sound Power](https://jmrplens.github.io/phonometry/guides/sound-power/): choosing among the five determination
+  routes, what the accuracy grades promise, and the ISO 4871 noise-emission
+  declaration a measured `LWA` feeds.
+- [Sound Power by Pressure Methods (ISO 3744 / ISO 3746 / ISO 3745)](https://jmrplens.github.io/phonometry/guides/sound-power-pressure/):
+  the in-situ enveloping surface and the precision anechoic array.
+- [Sound Power by Intensity Scanning (ISO 9614)](https://jmrplens.github.io/phonometry/guides/sound-power-intensity/):
+  the routes that tolerate steady background noise.
+- [Room Acoustics](https://jmrplens.github.io/phonometry/guides/room-acoustics/): measuring the reverberation time
+  `T60` that sets the Sabine absorption area.
+- [Levels](https://jmrplens.github.io/phonometry/guides/levels/): energy averaging and the A-weighting behind `LWA`.
+- [Theory](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/): the Waterhouse and C1/C2
+  derivations.
+- API reference: [`emission.sound_power_reverberation`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-reverberation/).
+
+## References
+
+- Beranek, L. L., & Mellow, T. J. (2012). *Acoustics: Sound fields and
+  transducers*. Academic Press. ISBN 978-0-12-391421-7.
+  [doi:10.1016/C2011-0-05897-0](https://doi.org/10.1016/C2011-0-05897-0).
+  Radiation and sound fields: the diffuse-field relation between pressure
+  and power that the reverberation-room method rests on.
+- International Organization for Standardization. (2010). *Acoustics —
+  Determination of sound power levels and sound energy levels of noise
+  sources using sound pressure — Precision methods for reverberation test
+  rooms* (ISO 3741:2010).
+  [iso.org catalogue](https://www.iso.org/standard/52053.html).
+  The direct (Eq. 20) and comparison (Eq. 21) methods of this guide, with
+  the Waterhouse and meteorological corrections and the Table 1
+  qualification criteria.
+
+## Standards
+
+ISO 3741:2010, *Acoustics — Determination of sound power levels and sound
+energy levels of noise sources using sound pressure — Precision methods for
+reverberation test rooms*: the direct (Eq. 20) and comparison methods with
+the Waterhouse and meteorological corrections, the Table 1 qualification
+criteria and the Annex F A-weighting.
+
+---
+
+
+<!-- source: docs/sound-power-intensity.md | canonical: https://jmrplens.github.io/phonometry/guides/sound-power-intensity/ -->
+Source: https://jmrplens.github.io/phonometry/guides/sound-power-intensity/
+
+# Sound Power by Intensity Scanning (ISO 9614-2 / ISO 9614-3)
+
+The pressure routes to the sound power level fail exactly where machines
+live: on a factory floor where the neighbouring lines cannot be switched
+off. Sound **intensity** is the net energy flux, so it distinguishes energy
+*leaving* the source from steady energy merely passing through the
+measurement surface, and the scanning methods built on it tolerate
+extraneous noise that would defeat any pressure method. This guide covers
+the two of them: the ISO 9614-2 engineering/survey determination with its
+field indicators and per-band achieved grade, the ISO 9614-3 precision
+(grade 1) scan with its tighter criteria, and the accredited-style test
+fiche. The probe itself, its finite-difference bias and the ISO 9614-1
+discrete-point method live in [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/guides/intensity/); which
+route fits which job is weighed in [Sound Power](https://jmrplens.github.io/phonometry/guides/sound-power/).
+
+## 1. Intensity scanning (ISO 9614-2)
+
+Sound **intensity** is the net energy flux, so it distinguishes energy
+*leaving* the source from steady energy merely passing through the surface,
+which is why the intensity method tolerates background noise that would
+defeat the pressure methods. A p-p probe (see the
+[Sound Intensity guide](https://jmrplens.github.io/phonometry/guides/intensity/)) is swept continuously over each of
+`N` segments of a surface enclosing the source, reporting the segment-averaged
+signed normal intensity `<In,i>`.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe.svg" alt="A two-microphone p-p sound intensity probe: two pressure microphones separated by a spacer, from which the pressure gradient and hence the normal intensity are estimated" width="70%"></picture>
+
+The partial powers sum to the total:
+
+$$
+P_i = \langle I_{n,i} \rangle\ S_i, \qquad P = \sum_i P_i, \qquad
+L_W = 10 \log_{10}\frac{P}{P_0},\quad P_0 = 1\ \text{pW} .
+$$
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_intensity_scan_power_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_intensity_scan_power.gif" alt="Animation: a p-p probe traces the serpentine scan over the top face of the measurement box while the normal-intensity arrows appear behind it, and the partial powers of the five faces accumulate into the sound power level L_W" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_intensity_scan_power.webm)
+
+A band in which `P < 0` (net inflow, from a stronger source outside the
+surface) is **not determinable** and reported as `NaN`. Two normative field
+indicators qualify each band. The **surface pressure-intensity indicator**
+`FpI` measures how reactive the field is, and the **negative-partial-power
+indicator** `F+/-` measures how much energy circulates in and out:
+
+$$
+F_{pI} = [L_p] - L_W + 10 \log_{10}\frac{S}{S_0}, \qquad
+F_{+/-} = 10 \log_{10}\frac{\sum_i \lvert P_i \rvert}{\lvert \sum_i P_i \rvert} .
+$$
+
+The probe's **dynamic capability** `Ld = δpI0 − K` (pressure-residual
+intensity index minus the bias factor `K`, 10 dB for grade 2 and 7 dB for
+grade 3) must exceed `FpI` (criterion 1); `F+/- ≤ 3 dB` is criterion 2
+(mandatory for grade 2); and the two repeated sweeps must agree within the
+Table 2 limit `s` per segment (criterion 3). A band is **engineering** grade
+when criteria 1, 2 and 3 hold, **survey** when 1 and 3 hold, else `none`.
+An A-weighted total additionally omits the bands failing criteria 1 and/or 2
+(clause 10.6 b); the result flags them in `a_weighting_omitted_bands`.
+
+```python
+import numpy as np
+from phonometry import emission
+
+# 6 surface segments x 6 octave bands: signed normal intensity (W/m^2) from two
+# repeated sweeps, the segment areas, and the per-segment surface SPL (dB).
+freqs = np.array([125, 250, 500, 1000, 2000, 4000], dtype=float)
+areas = np.full(6, 0.5)                                 # 0.5 m^2 per segment
+rng = np.random.default_rng(0)
+scan1 = np.abs(rng.normal(1e-4, 2e-5, size=(6, 6)))     # (segments, bands)
+scan2 = scan1 * (1.0 + rng.normal(0.0, 0.02, size=(6, 6)))
+pressure = np.full((6, 6), 80.0)
+
+res = emission.sound_power_intensity(
+    scan1, areas, normal_intensity_2=scan2, pressure_levels=pressure,
+    pressure_residual_index=12.0, frequencies=freqs,
+    band_type="octave", grade="engineering",
+)
+print(np.round(res.sound_power_level, 1))               # per-band LW
+print(round(res.sound_power_level_a, 1))                # LWA, determinable + qualified bands
+print(round(float(res.dynamic_capability_index[0]), 1)) # Ld = 12 - 10 = 2.0 dB
+print(round(float(res.surface_pressure_intensity_index[0]), 2))   # FpI
+print(list(res.achieved_grade))                         # per-band grade
+
+res.plot()   # LW spectrum; non-positive (undeterminable) bands hatched (needs matplotlib)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_intensity_result_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_intensity_result.svg" alt="The intensity-scanning sound power level spectrum of the ISO 9614-2 example, one bar per octave band from 125 Hz to 4 kHz all near 85 dB, with the A-weighted total of 90.9 dB(A) in the title" width="88%"></picture>
+
+*The partial powers `<In,i>·Si` of the six segments sum to each band's `LW`;
+every band here nets positive power and passes the field-indicator criteria at
+engineering grade, so all six bars stand, and the A-weighted total of
+90.9 dB(A) heads the title.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import emission
+
+# 6 surface segments x 6 octave bands: signed normal intensity (W/m^2) from two
+# repeated sweeps, the segment areas, and the per-segment surface SPL (dB).
+freqs = np.array([125, 250, 500, 1000, 2000, 4000], dtype=float)
+areas = np.full(6, 0.5)                                 # 0.5 m^2 per segment
+rng = np.random.default_rng(0)
+scan1 = np.abs(rng.normal(1e-4, 2e-5, size=(6, 6)))     # (segments, bands)
+scan2 = scan1 * (1.0 + rng.normal(0.0, 0.02, size=(6, 6)))
+pressure = np.full((6, 6), 80.0)
+res = emission.sound_power_intensity(
+    scan1, areas, normal_intensity_2=scan2, pressure_levels=pressure,
+    pressure_residual_index=12.0, frequencies=freqs,
+    band_type="octave", grade="engineering",
+)
+
+# res is the SoundPowerIntensityResult computed above. One line:
+res.plot()
+plt.show()
+
+# By hand: a bar spectrum of LW with the A-weighted total in the title.
+freqs = res.frequencies
+positions = np.arange(freqs.size)
+fig, ax = plt.subplots()
+ax.bar(positions, res.sound_power_level, width=0.7, color="#1f77b4")
+ax.set_xticks(positions)
+ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Sound power level LW [dB]")
+ax.set_title(
+    f"Intensity-scanning sound power (ISO 9614-2)  "
+    f"LWA = {res.sound_power_level_a:.1f} dB(A)")
+plt.show()
+```
+
+</details>
+
+Supplying `normal_intensity_2` (the second sweep) averages the two for the
+partial powers and evaluates criterion 3; `pressure_levels` enables `FpI`;
+`pressure_residual_index` (`δpI0`) plus a second sweep enables the per-band
+achieved grade. The probe's finite-difference intensity has a
+frequency-dependent bias handled in the [intensity guide](https://jmrplens.github.io/phonometry/guides/intensity/).
+
+### `sound_power_intensity()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `normal_intensity` | 2D array | W/m² | `(N_seg, N_bands)` | Signed segment-averaged normal intensity `<In,i>` (first sweep) |
+| `areas` | 1D array | m² | > 0, `(N_seg,)` | Segment areas `Si` |
+| `normal_intensity_2` | 2D array | W/m² | same shape | Second sweep → criterion 3 and averaging |
+| `pressure_levels` | 2D array | dB | same shape | Segment SPL `Lpi` → `FpI` |
+| `pressure_residual_index` | float or 1D array | dB | — | `δpI0` → `Ld` / criterion 1 |
+| `frequencies` | 1D array | Hz | nominal centres | `LWA` and Table 2 limits |
+| `band_type` | str | — | `'third'` (default) / `'octave'` | Table 2 lookup |
+| `grade` | str | — | `'engineering'` (default) / `'survey'` | Selects `K` |
+| `repeatability_limit` | float or 1D array | dB | default Table 2 | Override criterion-3 `s` |
+
+Returns a `SoundPowerIntensityResult`: `partial_power`/`partial_power_level`
+per segment and band, `sound_power`/`sound_power_level` (band total, `NaN`
+where `negative_band`), `surface_pressure_intensity_index` (`FpI`),
+`negative_partial_power_index` (`F+/-`), `repeatability`,
+`dynamic_capability_index` (`Ld`), `achieved_grade`, `surface_area`,
+`sound_power_level_a` and `grade`.
+
+## 2. Precision intensity scanning (ISO 9614-3)
+
+ISO 9614-3 is the grade-1 scanning method: like ISO 9614-2 it integrates the
+normal intensity over a surface enclosing the source, but with a continuous
+scan, tighter field-indicator criteria and an explicit uncertainty budget.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_intensity_scan_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_intensity_scan.svg" alt="ISO 9614-3 precision sound intensity scanning: a source enclosed by a measurement surface divided into segments, a two-microphone intensity probe scanned along a serpentine path over each segment, and the sound power formed by summing the normal intensity times segment area, subject to the field-indicator acceptance criteria" width="92%"></picture>
+
+**Power and level (Clause 7).** The partial power of each segment is
+$P_i = I_{n,i}\,S_i$; the total $P = \sum_i P_i$ gives
+$L_W = 10\lg(P/P_0)$, $P_0 = 1\ \text{pW}$. A band whose net intensity is
+negative (more power flowing in than out) is flagged not-applicable rather than
+logged. The field indicators (temporal variability $F_T$, the signed and
+unsigned pressure–intensity indicators, and the non-uniformity $F_S$) drive the
+five acceptance criteria.
+
+```python
+import numpy as np
+from phonometry import emission
+
+# A fully enclosing surface with a uniform normal intensity In = W/S recovers
+# the source power exactly: LW = 10*lg(W/P0). Here W = 100 uW -> 80 dB.
+areas = np.array([0.5, 1.0, 0.25, 2.0])
+w = 1.0e-4
+i_n = np.full(areas.shape, w / float(areas.sum()))
+res = emission.sound_power_intensity_precision(i_n, areas)
+print(round(float(res.sound_power[0]), 6))          # 0.0001
+print(round(float(res.sound_power_level[0]), 2))    # 80.0
+```
+
+Across several bands the result carries the per-band `LW` (`NaN` where the net
+power is non-positive), flags those bands `not_applicable`, and draws them
+with the one-line `result.plot()` of the figure below:
+
+```python
+import numpy as np
+from phonometry import emission
+
+# Four partial surfaces scanned over five one-third-octave bands. Each cell of
+# partial_intensity is the signed normal intensity In_i (W/m^2); areas are the
+# partial-surface areas Si. The 250 Hz band has net-negative power (a locally
+# reactive field), so ISO 9614-3 flags it not-applicable (clause 9.2) -> NaN.
+freqs = np.array([250, 500, 1000, 2000, 4000], float)
+areas = np.array([0.5, 1.0, 0.75, 0.5])
+base_intensity = np.array([2.0e-6, 8.0e-6, 2.0e-5, 1.0e-5, 3.0e-6])
+partial_intensity = base_intensity[None, :] * np.array([1.0, 1.1, 0.9, 1.05])[:, None]
+partial_intensity[:, 0] = [2.0e-6, -3.0e-6, -4.0e-6, -1.0e-6]   # net-negative band
+
+result = emission.sound_power_intensity_precision(partial_intensity, areas, frequencies=freqs)
+print(result.not_applicable_band.tolist())   # [True, False, False, False, False]
+print(round(result.sound_power_level_a, 1))   # 80.6
+result.plot()   # LW spectrum; the not-applicable band is hatched (needs matplotlib)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_scan_power_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_scan_power.svg" alt="The precision intensity-scanning sound power level spectrum over five one-third-octave bands, four determinate bars and a hatched, greyed 250 Hz band flagged not-applicable because its net intensity is negative, with the A-weighted total of 80.6 dB(A) in the title" width="88%"></picture>
+
+*The 250 Hz band nets negative (more energy flowing in than out), so ISO 9614-3
+declares it not-applicable; the figure hatches and greys it while the four
+determinate bands and the A-weighted total stand.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import emission
+
+# Four partial surfaces scanned over five one-third-octave bands. Each cell of
+# partial_intensity is the signed normal intensity In_i (W/m^2); areas are the
+# partial-surface areas Si. The 250 Hz band has net-negative power (a locally
+# reactive field), so ISO 9614-3 flags it not-applicable (clause 9.2) -> NaN.
+freqs = np.array([250, 500, 1000, 2000, 4000], float)
+areas = np.array([0.5, 1.0, 0.75, 0.5])
+base_intensity = np.array([2.0e-6, 8.0e-6, 2.0e-5, 1.0e-5, 3.0e-6])
+partial_intensity = base_intensity[None, :] * np.array([1.0, 1.1, 0.9, 1.05])[:, None]
+partial_intensity[:, 0] = [2.0e-6, -3.0e-6, -4.0e-6, -1.0e-6]   # net-negative band
+result = emission.sound_power_intensity_precision(partial_intensity, areas, frequencies=freqs)
+
+# result is the PrecisionIntensityResult computed above. One line:
+result.plot()
+plt.show()
+
+# By hand: determinate bands as LW bars; a not-applicable band (its LW is NaN)
+# is flagged by a full-height greyed, hatched span rather than a zero-height bar.
+freqs = result.frequencies
+positions = np.arange(freqs.size)
+neg = result.not_applicable_band
+lw = np.nan_to_num(result.sound_power_level)
+fig, ax = plt.subplots()
+ax.bar(positions[~neg], lw[~neg], width=0.7, color="#1f77b4")
+for pos in positions[neg]:
+    ax.axvspan(pos - 0.35, pos + 0.35, facecolor="#888888", alpha=0.28,
+               hatch="//", edgecolor="#888888")
+ax.set_xticks(positions)
+ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Sound power level LW [dB]")
+ax.set_title(
+    f"Precision intensity scanning (ISO 9614-3)  "
+    f"LWA = {result.sound_power_level_a:.1f} dB(A)")
+plt.show()
+```
+
+</details>
+
+## 3. The measurement report (`.report()`)
+
+The intensity-scanning result (`SoundPowerIntensityResult`, ISO 9614-2)
+writes a one-page PDF fiche laid out like a sound-power test sheet through
+its own `.report()`, sharing the layout and the `ReportMetadata` container of
+the [pressure-method fiche](https://jmrplens.github.io/phonometry/guides/sound-power-pressure/#3-the-measurement-report-report).
+The standard-basis line
+names ISO 9614-2:1996 and the measurement grade, the per-band table lists the
+intensity-derived band sound-power level `LW`, and the boxed `LWA` carries
+the total `LW`, the measurement surface `S` and the determination grade
+(the intensity result has no expanded uncertainty `U`). `verbose=True` adds the
+field indicators `FpI` (surface pressure-intensity) and `F+/-`
+(negative partial power) and the per-band achieved grade; the basis strip
+states the partial-power model (the segment partial powers `Pi = In,i·Si`
+summing to `P`) and the Annex B qualification criteria. A band whose net power
+is non-positive is not determinable (clause 9.2) and prints an em dash.
+
+```python
+import numpy as np
+from phonometry import ReportMetadata, emission
+
+freqs = np.array([125, 250, 500, 1000, 2000, 4000], float)
+# Six equal 0.5 m^2 segments (S = 3.0 m^2); one uniform normal-intensity
+# spectrum scanned twice, with the surface SPL and the instrument residual
+# index that qualify every band at engineering grade.
+intensity = np.array([0.6e-4, 1.0e-4, 1.5e-4, 1.4e-4, 0.9e-4, 0.5e-4])
+scan = np.tile(intensity, (6, 1))
+res = emission.sound_power_intensity(
+    scan, np.full(6, 0.5), normal_intensity_2=scan.copy(),
+    pressure_levels=np.full((6, 6), 80.0), pressure_residual_index=15.0,
+    frequencies=freqs, band_type="octave", grade="engineering",
+)
+
+res.report(
+    "sound_power_intensity.pdf",
+    metadata=ReportMetadata(
+        client="Example manufacturing plant",
+        specimen="Hydraulic power pack (floor-standing)",
+        test_room="Machine hall with steady background noise",
+        instrumentation="Class 1 p-p intensity probe (IEC 61043), s/n 0042",
+        laboratory="Phonometry reference example",
+        report_id="EXAMPLE-9614",
+        requirement=93.0,
+    ),
+)   # LWA = 90.9 dB(A) re 1 pW -> declared limit 93 dB(A): PASS
+```
+
+The example fiche, regenerated with `make reports`, is kept rendered in the
+repository. Click the preview to open the PDF:
+
+[![ISO 9614-2 sound power by intensity example report: a header with the client, the noise source, the machine-hall test environment and the intensity probe and climate, the octave-band table (125 Hz to 4 kHz) of intensity-derived band sound-power levels LW, the sound-power spectrum LW(f) with a nominal band axis, the boxed A-weighted sound power level LWA = 90.9 dB(A) re 1 pW with the total LW = 92.5 dB, the measurement surface S = 3.00 m2 and the engineering grade, and a PASS verdict against the declared 93 dB(A) limit, closed by a basis strip stating the partial-power model, the field indicators FpI and F+/- and the Annex B qualification criteria](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso9614_sound_power_intensity_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso9614_sound_power_intensity_example.pdf)
+
+*Sound power by intensity fiche (`SoundPowerIntensityResult.report`), an
+ISO 9614-2 engineering-grade scan with the field indicators and the boxed
+LWA.*
+
+
+## See also
+
+- [Sound Power](https://jmrplens.github.io/phonometry/guides/sound-power/): choosing among the five determination
+  routes, what the accuracy grades promise, and the ISO 4871 noise-emission
+  declaration a measured `LWA` feeds.
+- [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/guides/intensity/): the two-microphone probe, its
+  finite-difference bias and the ISO 9614-1 field indicators behind the
+  scanning methods.
+- [Sound Power by Pressure Methods (ISO 3744 / ISO 3746 / ISO 3745)](https://jmrplens.github.io/phonometry/guides/sound-power-pressure/):
+  the enveloping-surface and anechoic routes for quiet sites.
+- [Sound Power in the Reverberation Room (ISO 3741)](https://jmrplens.github.io/phonometry/guides/sound-power-reverberation/):
+  the precision diffuse-field route in a qualified laboratory room.
+- [Theory](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/): the field-indicator derivations.
+- API reference: [`emission.sound_power_intensity`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-intensity/).
+
+## References
+
+- Fahy, F. J. (1995). *Sound intensity* (2nd ed.). E&FN Spon.
+  ISBN 978-0-419-19810-9.
+  [doi:10.4324/9780203475386](https://doi.org/10.4324/9780203475386).
+  The monograph on sound energy flux: why intensity separates the energy
+  leaving the source from steady energy passing through, behind both
+  scanning methods.
+- International Organization for Standardization. (1996). *Acoustics —
+  Determination of sound power levels of noise sources using sound
+  intensity — Part 2: Measurement by scanning* (ISO 9614-2:1996).
+  [iso.org catalogue](https://www.iso.org/standard/21247.html).
+  The scanning method of section 1: the partial powers, the `FpI` and
+  `F+/-` field indicators and the grade criteria.
+- International Organization for Standardization. (2002). *Acoustics —
+  Determination of sound power levels of noise sources using sound
+  intensity — Part 3: Precision method for measurement by scanning*
+  (ISO 9614-3:2002).
+  [iso.org catalogue](https://www.iso.org/standard/24012.html).
+  The grade-1 scanning method of section 2, its field indicators and the
+  clause 9.2 not-applicable flagging.
+
+## Standards
+
+ISO 9614-2:1996, *Acoustics — Determination of sound power levels of
+noise sources using sound intensity — Part 2: Measurement by scanning*: the
+partial powers, the `FpI` and `F+/-` field indicators and the grade criteria
+of section 1. ISO 9614-3:2002, *… Part 3: Precision method for measurement by
+scanning*: the grade-1 scanning method, its field indicators and the
+clause 9.2 not-applicable flagging of section 2.
+
+---
+
+
 <!-- source: docs/intensity.md | canonical: https://jmrplens.github.io/phonometry/guides/intensity/ -->
 Source: https://jmrplens.github.io/phonometry/guides/intensity/
 
@@ -388,12 +1529,12 @@ through the AES17 measurement bandwidth, the per-order modulation and
 difference-frequency intermodulation, dynamic intermodulation (DIM) and the
 ITU-R 468 weighted THD, and the Bendat & Piersol frequency-response estimators
 `H1`/`H2` with the ordinary coherence `γ²`. Every quantity has an exact analytic
-oracle, so the numbers are verifiable rather than tuned. The closing sections
-cover the sensitivity conventions of IEC 60268-4 (microphones) and
-IEC 60268-5 (loudspeakers), where most cross-datasheet comparisons go wrong,
-the baffled-piston radiation model behind loudspeaker directivity, and the
-IEC 60268-5 loudspeaker and IEC 60268-4 microphone rated-characteristics
-reports that render the standards' data sheets from a measured response.
+oracle, so the numbers are verifiable rather than tuned. The transducer
+data sheets these measurements feed have their own guides:
+[Loudspeaker Characterisation (IEC 60268-5)](https://jmrplens.github.io/phonometry/guides/loudspeakers/), with the
+sensitivity conventions and the baffled-piston radiation model, and
+[Microphone Characterisation (IEC 60268-4)](https://jmrplens.github.io/phonometry/guides/microphones/), with the
+directional patterns and the inherent-noise weightings.
 
 ## 1. Harmonic distortion (IEC 60268-3 14.12.2–5)
 
@@ -661,7 +1802,69 @@ plt.show()
 
 </details>
 
-## 5. Sensitivity conventions (IEC 60268-4 / IEC 60268-5)
+What these measurements feed, in the end, is a transducer data sheet. The
+sensitivity conventions of IEC 60268-5 (where most cross-datasheet
+comparisons go wrong), the baffled-piston radiation model behind a cone's
+directivity and the rated-characteristics report that renders the
+standard's data sheet live in
+[Loudspeaker Characterisation (IEC 60268-5)](https://jmrplens.github.io/phonometry/guides/loudspeakers/); the
+microphone side, its sensitivity references, directional patterns,
+inherent-noise weightings and its own rated-characteristics report, lives
+in [Microphone Characterisation (IEC 60268-4)](https://jmrplens.github.io/phonometry/guides/microphones/).
+
+## References
+
+- Bendat, J. S., & Piersol, A. G. (2010). *Random data: Analysis and
+  measurement procedures* (4th ed.). Wiley. ISBN 978-0-470-24877-5.
+  [doi:10.1002/9781118032428](https://doi.org/10.1002/9781118032428).
+  The `H1` and `H2` frequency-response estimators and the ordinary
+  coherence `γ²` of section 4.
+
+## Standards
+
+IEC 60268-3:2013, *Sound system equipment – Part 3: Amplifiers*
+(clauses 14.12.2–14.12.11): total harmonic distortion `THD_F`/`THD_R` (the
+14.12.3.2 formula defines the R form), nth-order harmonic distortion `dₙ`, the
+per-order modulation (`d_m,n`) and difference-frequency (`d_d,n`)
+intermodulation, total difference-frequency distortion, dynamic intermodulation
+(DIM) and the ITU-R BS.468-4 / IEC 60268-1 weighted THD. AES17-2015,
+*Measurement of digital audio equipment* (clauses 5.2.5, 5.2.8 and 6.3.1): the
+THD+N ratio via the standard notch filter and the standard measurement
+bandwidth; SINAD is derived from it. ITU-R BS.468-4: the weighting-network
+nominal response. Bendat & Piersol (2010), *Random Data: Analysis and
+Measurement Procedures* (4th ed., Wiley): the `H1` and `H2` frequency-response
+estimators and the ordinary coherence `γ²`. The rated-characteristics
+standards of the transducer guides, IEC 60268-5:2003+A1:2007
+(loudspeakers), IEC 60268-4:2014 (microphones) and IEC 60263:1982 (scales
+for the characteristic graphs), are covered in
+[Loudspeaker Characterisation](https://jmrplens.github.io/phonometry/guides/loudspeakers/) and
+[Microphone Characterisation](https://jmrplens.github.io/phonometry/guides/microphones/). All
+quantities are verified against exact analytic oracles (synthetic signals with
+known harmonic/intermodulation amplitudes, a clipped-sine Fourier oracle, a
+full DIM test-signal synthesis, and a known LTI path).
+
+---
+
+
+<!-- source: docs/loudspeakers.md | canonical: https://jmrplens.github.io/phonometry/guides/loudspeakers/ -->
+Source: https://jmrplens.github.io/phonometry/guides/loudspeakers/
+
+# Loudspeaker Characterisation (IEC 60268-5)
+
+A loudspeaker datasheet is a bundle of conventions, and IEC 60268-5 is the
+standard that fixes them: what "sensitivity" refers to, over which band a
+frequency range is read, how directivity is plotted and at what drive the
+distortion is measured. This guide covers the chain phonometry implements
+around a measured on-axis response: the **sensitivity conventions** where
+cross-datasheet comparisons usually go wrong, the baffled **radiating
+piston** that is the canonical physical model behind a cone's radiation
+impedance and directivity, and the **rated-characteristics report** that
+renders the standard's data sheet, with every panel drawn to the IEC 60263
+scale conventions. The distortion and frequency-response measurements that
+feed it live in [Electroacoustics](https://jmrplens.github.io/phonometry/guides/electroacoustics/); the microphone
+counterpart has [its own guide](https://jmrplens.github.io/phonometry/guides/microphones/).
+
+## 1. Sensitivity conventions (IEC 60268-5)
 
 Distortion and response figures only compare across devices when the
 *sensitivity* conventions behind them match, and two conventions trip people
@@ -669,16 +1872,6 @@ constantly: the microphone reference level and the loudspeaker
 power-and-distance normalization.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_loudspeaker_freefield_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_loudspeaker_freefield.svg" alt="Free-field loudspeaker sensitivity measurement per IEC 60268-5: a loudspeaker on a stand in an anechoic room, driven by an amplifier at 2.83 V, with a measurement microphone at the reference distance r = 1 m on the reference axis, and the governing relations: characteristic sensitivity as Lp at 1 m for 1 W into the rated impedance, the Up = sqrt(R times 1 W) drive voltage, the inverse-distance referral Lp(1 m) = Lp(r) + 20 lg(r / 1 m), and the IEC 60268-4 microphone sensitivity in mV/Pa or dB re 1 V/Pa" width="92%"></picture>
-
-**Microphones (IEC 60268-4 clause 11).** The sensitivity `M` is the output
-voltage per unit sound pressure, quoted in mV/Pa; the sensitivity *level* is
-`LM = 20 lg(M / 1 V/Pa)` dB, which is negative for every real microphone (a
-50 mV/Pa studio condenser sits at −26 dB re 1 V/Pa). The classic pitfall is
-the reference: −26 dB re 1 V/Pa and +34 dB re 1 mV/Pa are the *same*
-microphone, 60 dB apart on paper, so a sensitivity level without its reference
-is meaningless. The standard also distinguishes free-field, diffuse-field and
-pressure sensitivity; for the same capsule they diverge at high frequency,
-so the stated type matters as much as the number.
 
 **Loudspeakers (IEC 60268-5 clause 20.3).** The characteristic sensitivity is
 the sound pressure produced at 1 m on the reference axis, in the free field,
@@ -700,7 +1893,11 @@ hide in that sentence:
   "1 m" figure is then a referred quantity, not what a microphone placed at
   1 m would read.
 
-## 6. Radiating piston: radiation impedance and directivity
+The microphone counterpart, the sensitivity level re 1 V/Pa and its
+reference-value pitfall, is covered in
+[Microphone Characterisation (IEC 60268-4)](https://jmrplens.github.io/phonometry/guides/microphones/).
+
+## 2. Radiating piston: radiation impedance and directivity
 
 The rigid circular **piston in an infinite baffle** is the canonical radiator
 behind a loudspeaker cone, the open end of a duct and the radiation efficiency
@@ -759,7 +1956,7 @@ the `radiation_mass`, the `directivity_index`, the far-field `directivity`
 pattern (when `angles` are given) and `.plot()`. The building blocks
 `piston_resistance`, `piston_reactance` and `piston_directivity` are also
 callable directly. The piston is the companion radiator of the
-[industrial noise-control silencers](https://jmrplens.github.io/phonometry/guides/noise-control/).
+[reactive silencers](https://jmrplens.github.io/phonometry/guides/silencers/).
 
 The far-field **directivity pattern** is a plottable result in its own right:
 `piston_directivity_pattern(ka)` samples `D(theta)` at one or more `ka` values
@@ -821,7 +2018,7 @@ plt.show()
 
 </details>
 
-## 7. Loudspeaker characteristics report (IEC 60268-5)
+## 3. Loudspeaker characteristics report (IEC 60268-5)
 
 The rated characteristics IEC 60268-5 defines around a measured on-axis
 response gather into a single **loudspeaker characteristics** result that
@@ -870,7 +2067,7 @@ effective-range markers to the IEC 60263 proportion (one frequency decade equal
 to 25 dB), and the polar directivity on the IEC 60263 25 dB reference circle.
 The impedance modulus (with the 80 %-of-rated line), the total-harmonic-distortion
 curve and the directivity feed the secondary panels, reusing the radiating
-piston directivity of section 6 and a
+piston directivity of section 2 and a
 [swept-sine THD](https://jmrplens.github.io/phonometry/guides/swept-sine-distortion/) result for the distortion curve.
 
 The rated characteristics are also available interactively through `.plot()`,
@@ -990,9 +2187,137 @@ IEC 60268-5 rated-characteristics table beside the on-axis response, impedance,
 THD and polar panels drawn to the IEC 60263 25 dB-per-decade and 25 dB
 reference-circle conventions.*
 
-## 8. Microphone characteristics report (IEC 60268-4)
 
-The microphone companion of section 7: the rated characteristics IEC 60268-4
+## See also
+
+- [Electroacoustics](https://jmrplens.github.io/phonometry/guides/electroacoustics/): the IEC 60268-3 distortion set,
+  THD+N and SINAD, intermodulation and the H1/H2 frequency-response
+  estimators that produce the curves this guide reports.
+- [Microphone Characterisation (IEC 60268-4)](https://jmrplens.github.io/phonometry/guides/microphones/): the companion
+  rated-characteristics report for the measuring side of the chain.
+- [Swept-sine distortion](https://jmrplens.github.io/phonometry/guides/swept-sine-distortion/): the Farina/Novak
+  harmonic separation whose THD(f) feeds the distortion panel.
+- [Sound Power](https://jmrplens.github.io/phonometry/guides/sound-power/): the emission descriptor of sources that are
+  not supposed to make sound.
+- API reference: [`electroacoustics.piston`](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/piston/) and [`electroacoustics.loudspeaker`](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/loudspeaker/).
+
+## References
+
+- Beranek, L. L., & Mellow, T. J. (2012). *Acoustics: Sound fields and
+  transducers*. Academic Press. ISBN 978-0-12-391421-7.
+  [doi:10.1016/C2011-0-05897-0](https://doi.org/10.1016/C2011-0-05897-0).
+  The transducer physics behind sections 1 and 2: loudspeaker radiation,
+  the baffled-piston impedance and directivity (§4.19, §13.7), and the
+  near-field to far-field transition.
+
+## Standards
+
+IEC 60268-5:2003+A1:2007, *Sound system equipment – Part 5: Loudspeakers*:
+the rated loudspeaker characteristics of section 3, namely the rated impedance
+(16), the rated frequency range (19.1), the characteristic sensitivity and
+its level referred to 1 W at 1 m (20.3/20.4), the effective frequency range
+against the −10 dB band (21.2), the directivity index (23.3) and the total
+harmonic distortion against frequency (24.1). IEC 60263:1982, *Scales and
+sizes for plotting frequency characteristics and polar diagrams*: the scale
+proportions of the characteristic graphs, one frequency decade equal to
+25 dB on the ordinate (clause 2) and the polar diagram on a 25 dB
+reference-circle radius (clause 3). The piston quantities are verified
+against exact analytic oracles (the low- and high-frequency limits of the
+radiation impedance and the half-space directivity index).
+
+---
+
+
+<!-- source: docs/microphones.md | canonical: https://jmrplens.github.io/phonometry/guides/microphones/ -->
+Source: https://jmrplens.github.io/phonometry/guides/microphones/
+
+# Microphone Characterisation (IEC 60268-4)
+
+Every acoustic measurement in this documentation starts at a microphone, and
+IEC 60268-4 is the standard that fixes how the device itself is described:
+what its sensitivity refers to, how its directional pattern is stated, and
+how its self-noise and overload point bound the levels it can read. This
+guide covers the conventions where datasheet comparisons go wrong (the
+sensitivity references and the noise weightings), the directional patterns
+with their directivity index, and the **rated-characteristics report** that
+renders the standard's data sheet from a measured free-field response, with
+every panel drawn to the IEC 60263 scale conventions. The distortion and
+frequency-response measurements themselves live in
+[Electroacoustics](https://jmrplens.github.io/phonometry/guides/electroacoustics/); the loudspeaker counterpart has
+[its own guide](https://jmrplens.github.io/phonometry/guides/loudspeakers/).
+
+## 1. Sensitivity and its references (IEC 60268-4 clause 11)
+
+**Microphones (IEC 60268-4 clause 11).** The sensitivity `M` is the output
+voltage per unit sound pressure, quoted in mV/Pa; the sensitivity *level* is
+`LM = 20 lg(M / 1 V/Pa)` dB, which is negative for every real microphone (a
+50 mV/Pa studio condenser sits at −26 dB re 1 V/Pa). The classic pitfall is
+the reference: −26 dB re 1 V/Pa and +34 dB re 1 mV/Pa are the *same*
+microphone, 60 dB apart on paper, so a sensitivity level without its reference
+is meaningless. The standard also distinguishes free-field, diffuse-field and
+pressure sensitivity; for the same capsule they diverge at high frequency,
+so the stated type matters as much as the number.
+
+Behind the number sits the transducer. A **condenser** capsule (externally
+polarised or electret) reads the sound pressure as a capacitance change and
+needs powering, but converts with high sensitivity, typically some tens of
+mV/Pa for a studio diaphragm and a few mV/Pa for a small measurement
+capsule; virtually every measurement microphone is a condenser because the
+stretched-membrane capsule is stable enough to calibrate. A **dynamic**
+(moving-coil) microphone generates its voltage by induction, needs no
+power and survives abuse, but converts far less efficiently, around
+1-3 mV/Pa, which is why a dynamic on a quiet source runs out of
+preamplifier gain before a condenser does. The rated sensitivity of the
+standard is quoted at the 1 kHz reference frequency (clause 11.3),
+into the rated load, and the stated type (free-field, diffuse-field or
+pressure) is part of the rating, not a detail.
+
+## 2. Directional pattern and the directivity index (clause 13)
+
+The directional response is stated as the pattern of sensitivity against
+the angle of incidence, normalised to the reference axis. The classic
+first-order family mixes an omnidirectional (pressure) term and a cosine
+(pressure-gradient) term, `M(θ) ∝ (1 − b) + b·cos θ`: `b = 0` is the
+omnidirectional capsule, `b = 1/2` the cardioid with its null at 180°, and
+`b = 1` the figure-of-eight with nulls at ±90°. One number condenses the
+pattern: the **directivity index** `D = 20 lg(M0/Mdiff)` compares the
+reference-axis sensitivity with the diffuse-field sensitivity obtained from
+the clause 11.2.2 a) integral over a rotationally symmetric pattern. An
+omni scores 0 dB, the ideal cardioid and figure-of-eight both
+`10 lg 3 = 4.8` dB: in a diffuse room field, a cardioid picks up three
+times less reverberant power than an omni of equal axial sensitivity, which
+is exactly the ratio a talker-to-microphone distance calculation wants.
+Real patterns hold their textbook shape only over the middle of the band;
+at high frequency the capsule's own size makes any microphone directive,
+which is also why the free-field and diffuse-field sensitivities of one
+capsule diverge there.
+
+## 3. Inherent noise: dB(A) and dB(468) (clause 17)
+
+A microphone's electronics and the air load on its diaphragm set a noise
+floor, expressed as the **equivalent noise level**: the sound pressure
+level whose output would equal the weighted inherent-noise voltage,
+`LN = 20 lg((UN/M)/20 µPa)`. The standard states it with two weightings,
+and the numbers are far apart on paper. The **A-weighted** figure (RMS
+detector) is the one most datasheets quote, e.g. 14 dB(A) for a good studio
+condenser. The **ITU-R BS.468-4** figure weights the same noise with the
+curve that peaks +12.2 dB near 6.3 kHz and reads it with a quasi-peak
+detector, so it penalises the hiss and crackle the ear actually notices;
+for typical microphone noise it comes out roughly 10 dB above the
+A-weighted number for the same capsule. Neither is wrong: they are
+different weightings of the same voltage, and comparing a dB(A) figure from
+one datasheet with a dB(468) figure from another silently flatters the
+first by that margin. The signal-to-noise ratio re 1 Pa (94 dB SPL) is
+derived from the same equivalent noise level, and the overload sound
+pressure level (clause 15.2) bounds the usable range from above. The
+BS.468 weighting curve itself is exposed as `itu_r_468_weighting` in the
+[electroacoustics distortion set](https://jmrplens.github.io/phonometry/guides/electroacoustics/), where it also
+weights THD.
+
+## 4. Microphone characteristics report (IEC 60268-4)
+
+The microphone companion of the
+[loudspeaker report](https://jmrplens.github.io/phonometry/guides/loudspeakers/): the rated characteristics IEC 60268-4
 defines around a measured free-field frequency response gather into a single
 **microphone characteristics** result that renders the standard's
 rated-characteristics data sheet. Four of the numbers are computed from the
@@ -1024,11 +2349,13 @@ response += 2.0 * np.exp(-(np.log2(freqs / 9000.0) ** 2) / 0.3)  # presence regi
 
 angles = np.linspace(0, 179, 359)
 cardioid = 20 * np.log10((1 + np.cos(np.radians(angles))) / 2)
+noise_f = np.geomspace(20, 20000, 31)
 
 result = microphone_characteristics(
     freqs, response, 12.5, tolerance_db=3.0,          # 12.5 mV/Pa at 1 kHz
     rated_impedance=150.0, minimum_load_impedance=1000.0,
     noise_voltage=1.25e-6,                             # A-weighted, V
+    noise_spectrum=(noise_f, 6.0 + 12.0 * np.log10(1000.0 / noise_f)),
     max_spl_thd_percent=0.5,
     distortion=(np.linspace(100, 140, 81),
                 0.5 * 10 ** ((np.linspace(100, 140, 81) - 130.0) * 0.08)),
@@ -1172,48 +2499,51 @@ the cardioid directional pattern, inherent-noise and THD-against-level panels
 drawn to the IEC 60263 25 dB-per-decade and 25 dB reference-circle
 conventions.*
 
+
+## See also
+
+- [Electroacoustics](https://jmrplens.github.io/phonometry/guides/electroacoustics/): the IEC 60268-3 distortion set,
+  THD+N and SINAD, the ITU-R 468 weighted THD and the H1/H2
+  frequency-response estimators that produce the measured curves.
+- [Loudspeaker Characterisation (IEC 60268-5)](https://jmrplens.github.io/phonometry/guides/loudspeakers/): the
+  companion rated-characteristics report for the reproducing side of the
+  chain.
+- [Calibration and dBFS](https://jmrplens.github.io/phonometry/guides/calibration/): turning a microphone's rated
+  sensitivity into calibrated sound pressure levels.
+- [Build a sound level meter](https://jmrplens.github.io/phonometry/guides/sound-level-meter/): the measurement chain a
+  characterised microphone feeds.
+- API reference: [`electroacoustics.microphone`](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/microphone/).
+
 ## References
 
 - Beranek, L. L., & Mellow, T. J. (2012). *Acoustics: Sound fields and
   transducers*. Academic Press. ISBN 978-0-12-391421-7.
   [doi:10.1016/C2011-0-05897-0](https://doi.org/10.1016/C2011-0-05897-0).
-  The transducer physics behind section 5: loudspeaker radiation, on-axis
-  pressure and the near-field to far-field transition.
+  The transducer physics behind sections 1 and 2: condenser and moving-coil
+  transduction and first-order directional patterns.
+- International Telecommunication Union. (1986). *Measurement of
+  audio-frequency noise voltage level in sound broadcasting*
+  (Recommendation ITU-R BS.468-4).
+  [itu.int](https://www.itu.int/rec/R-REC-BS.468/en).
+  The weighting network and quasi-peak detection behind the dB(468)
+  inherent-noise figure of section 3.
 
 ## Standards
 
-IEC 60268-3:2013, *Sound system equipment – Part 3: Amplifiers*
-(clauses 14.12.2–14.12.11): total harmonic distortion `THD_F`/`THD_R` (the
-14.12.3.2 formula defines the R form), nth-order harmonic distortion `dₙ`, the
-per-order modulation (`d_m,n`) and difference-frequency (`d_d,n`)
-intermodulation, total difference-frequency distortion, dynamic intermodulation
-(DIM) and the ITU-R BS.468-4 / IEC 60268-1 weighted THD. AES17-2015,
-*Measurement of digital audio equipment* (clauses 5.2.5, 5.2.8 and 6.3.1): the
-THD+N ratio via the standard notch filter and the standard measurement
-bandwidth; SINAD is derived from it. ITU-R BS.468-4: the weighting-network
-nominal response. Bendat & Piersol (2010), *Random Data: Analysis and
-Measurement Procedures* (4th ed., Wiley): the `H1` and `H2` frequency-response
-estimators and the ordinary coherence `γ²`. IEC 60268-4:2014, *Sound system
-equipment – Part 4: Microphones*: the rated microphone characteristics of
-sections 5 and 8 — the free-field sensitivity and its level re 1 V/Pa
-(11.1/11.3), the frequency response and effective frequency range (12.1/12.2),
-the directional pattern and the directivity index through the 11.2.2 a)
-diffuse-field integral (13.1/13.2), the overload sound pressure level (15.2),
-the equivalent sound pressure level due to inherent noise (17) and the rated
-impedances and power supply (9/10); since revised as IEC 60268-4:2018, the
-2014 edition is the implemented one. IEC 60268-5:2003+A1:2007, *Sound system
-equipment – Part 5: Loudspeakers*: the rated loudspeaker characteristics of
-section 7 — the rated impedance (16), the rated frequency range (19.1), the
-characteristic sensitivity and its level referred to 1 W at 1 m (20.3/20.4),
-the effective frequency range against the −10 dB band (21.2), the directivity
-index (23.3) and the total harmonic distortion against frequency (24.1).
-IEC 60263:1982, *Scales and sizes for plotting frequency characteristics and
-polar diagrams*: the scale proportions of the section 7/8 characteristic
-graphs — one frequency decade equal to 25 dB on the ordinate (clause 2) and
-the polar diagram on a 25 dB reference-circle radius (clause 3). All
-quantities are verified against exact analytic oracles (synthetic signals with
-known harmonic/intermodulation amplitudes, a clipped-sine Fourier oracle, a
-full DIM test-signal synthesis, and a known LTI path).
+IEC 60268-4:2014, *Sound system equipment – Part 4: Microphones*: the rated
+microphone characteristics of this guide, namely the free-field sensitivity and
+its level re 1 V/Pa (11.1/11.3), the frequency response and effective
+frequency range (12.1/12.2), the directional pattern and the directivity
+index through the 11.2.2 a) diffuse-field integral (13.1/13.2), the
+overload sound pressure level (15.2), the equivalent sound pressure level
+due to inherent noise (17) and the rated impedances and power supply
+(9/10); since revised as IEC 60268-4:2018, the 2014 edition is the
+implemented one. IEC 60263:1982, *Scales and sizes for plotting frequency
+characteristics and polar diagrams*: the scale proportions of the
+characteristic graphs, one frequency decade equal to 25 dB on the ordinate
+(clause 2) and the polar diagram on a 25 dB reference-circle radius
+(clause 3). ITU-R BS.468-4: the weighting-network nominal response behind
+the dB(468) noise figure.
 
 ---
 
@@ -1516,6 +2846,557 @@ grids.
   [doi:10.1002/9781118032428](https://doi.org/10.1002/9781118032428).
   Section 13.1.4: the Hilbert relation between log-magnitude and phase
   behind the minimum-phase reconstruction.
+
+---
+
+
+<!-- source: docs/silencers.md | canonical: https://jmrplens.github.io/phonometry/guides/silencers/ -->
+Source: https://jmrplens.github.io/phonometry/guides/silencers/
+
+# Silencers
+
+A silencer earns its keep in a duct: between an engine and its tailpipe,
+between a fan and the room it serves. Two working principles divide the
+field. A **reactive** silencer attenuates by *reflecting* sound with
+impedance discontinuities (chambers, side branches) and dominates at low
+frequency, where a tone from a firing engine or a fan blade passage can be
+targeted exactly; a **dissipative** silencer *absorbs* sound in a porous
+lining and dominates broadband, at mid and high frequency. This guide
+covers the reactive family phonometry implements with the engineering
+theory of Bies, Hansen & Howard and Munjal's transfer-matrix formulation:
+the four-pole method, the closed-form expansion chamber, the Helmholtz,
+quarter-wave and extended-tube resonators, the independent FDTD
+cross-check, and the design trade-offs against dissipative linings. The
+rest of the installation, HVAC duct attenuation, flow noise and machine
+enclosures, lives in [Industrial noise control](https://jmrplens.github.io/phonometry/guides/noise-control/).
+
+## 1. Reactive silencers (four-pole method)
+
+A reactive silencer attenuates by *reflecting* sound with impedance
+discontinuities. Each acoustic element is a 2×2 **transfer (four-pole)
+matrix** relating the sound pressure `p` and the volume velocity `Su` at its
+two ends (Bies Eq. (8.133); Munjal, *Acoustics of Ducts and Mufflers*), and a
+compound silencer is the ordered matrix product of its elements. A straight
+duct of length `L` and area `S` is (Bies Eq. (8.143), no flow)
+
+```text
+[ cos(kL)            j (rho c / S) sin(kL) ]
+[ j (S / rho c) sin(kL)   cos(kL)          ] ,   k = omega / c,
+```
+
+and a side branch of acoustic impedance `Z_b` is the shunt
+`[[1, 0], [1/Z_b, 1]]` (Eq. (8.144)). The **transmission loss** follows from
+the compound matrix `T` with the port impedances `Z1 = rho c / S_in` and
+`Zn = rho c / S_out` (Munjal Eq. (3.27); Bies Eq. (8.141) prints the
+`T11`/`T22` impedance weights of this formula inverted and fails the
+sudden-expansion limit, see the [errata registry](https://jmrplens.github.io/phonometry/reference/errata/))
+
+```text
+TL = 10 log10[ (Zn/Z1) (1/4) | T11 + T12/Zn + Z1 T21 + (Z1/Zn) T22 |^2 ] ,
+```
+
+which for equal inlet/outlet areas reduces to (Bies Eq. (8.148))
+
+```text
+TL = 20 log10( (1/2) | T11 + T12/Zc + Zc T21 + T22 | ) ,   Zc = rho c / S,
+```
+
+and the **insertion loss** for a source impedance `Z_s` and a radiation
+impedance `Z_r` is the extra attenuation over a direct (zero-length)
+connection, so a through connection gives `IL = 0`.
+
+### Expansion chamber
+
+A chamber of area `S_exp` and length `L` between pipes of area `S_duct` has the
+closed-form transmission loss (Bies Eq. (8.111)) with area ratio
+`m = S_exp / S_duct`:
+
+```text
+TL = 10 log10[ 1 + (1/4) (m - 1/m)^2 sin^2(kL) ] ,
+```
+
+peaking at `10 log10[1 + (1/4)(m - 1/m)^2]` at `kL = pi/2, 3 pi/2, ...`
+(1.94 dB for `m = 2`, 6.55 dB for `m = 4`, 12.18 dB for `m = 8`, 18.10 dB for
+`m = 16`) and dropping to 0 at `kL = n pi`, where the chamber is a
+half-wavelength long and transparent. The four-pole product reproduces this
+exactly.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_expansion_chamber_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_expansion_chamber.svg" alt="Expansion-chamber transmission loss against frequency for area ratios m = 2, 4, 8 and 16, showing periodic peaks rising with m at odd multiples of the quarter-wave frequency and troughs returning to 0 dB at every half-wavelength of the chamber length" width="88%"></picture>
+
+```python
+import numpy as np
+from phonometry import expansion_chamber
+
+freqs = np.linspace(20.0, 2000.0, 2000)
+res = expansion_chamber(freqs, length=0.3, chamber_area=0.04, pipe_area=0.01)
+print(round(res.transmission_loss.max(), 2))   # 6.55 dB peak (m = 4)
+res.plot()                                      # TL (and IL) vs frequency
+```
+
+The numbers passed to `expansion_chamber` describe a real device, and
+`.plot_geometry()` draws it: the same 0.3 m chamber with its 4:1 area ratio,
+to scale and fully dimensioned.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/expansion_chamber_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/expansion_chamber_geometry.svg" alt="To-scale cross-section of the expansion-chamber silencer of the transmission-loss example: a 300 mm long chamber of 225.7 mm equivalent diameter inserted between inlet and outlet pipes of 112.8 mm equivalent diameter, with the chamber length and both diameters dimensioned" width="88%"></picture>
+
+*The chamber behind the curves above, to scale: the areas enter the four-pole
+method only through the ratio `m`, and the drawing uses the equivalent
+circular diameters `d = 2 sqrt(S / pi)` of the 0.04 and 0.01 m² cross-sections.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import expansion_chamber, plot_silencer_geometry
+
+freqs = np.linspace(20.0, 2000.0, 2000)
+res = expansion_chamber(freqs, length=0.3, chamber_area=0.04, pipe_area=0.01)
+
+# One line: the dimensioned cross-section of the chamber just computed.
+res.plot_geometry()
+plt.show()
+
+# The same drawing without a result, from the free function:
+plot_silencer_geometry("expansion chamber", length=0.3,
+                       chamber_area=0.04, pipe_area=0.01)
+plt.show()
+```
+
+</details>
+
+The clip below runs an m = 4 chamber of the same 0.30 m length in a 2D FDTD
+duct at its two characteristic frequencies. At kL = π the chamber is a
+half-wave resonator and the tone crosses as if it were not there; at kL = π/2
+the two area jumps reflect in phase and send the wave back up the inlet, the
+6.5 dB peak of the four-pole curve above.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_expansion_chamber_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_expansion_chamber.gif" alt="Animation: a 2D FDTD duct with a 0.30 m expansion chamber of area ratio 4 drawn as hardware between a loudspeaker and an anechoic termination, at two frequencies side by side; at 572 Hz the pressure envelope stays flat and the tone crosses the chamber unchanged with the annotated transmission loss of 0.0 dB, while at 286 Hz a standing wave fills the inlet pipe and the outlet is left with less than half the amplitude, matching the annotated 6.5 dB peak" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_expansion_chamber.webm)
+
+### Side-branch and extended-tube resonators
+
+A **Helmholtz resonator** (`helmholtz_resonator`) and a closed **quarter-wave
+tube** (`quarter_wave_resonator`) each short the duct at their tuning
+frequency, `f_0 = (c / 2 pi) sqrt(S_neck / (l_e V))` (Bies Eq. (8.46)) and
+`f = c / 4 l_e` (Eq. (8.44)), giving a sharp transmission-loss spike there. An
+**extended-tube chamber** (`extended_tube_chamber`) buries quarter-wave side
+branches in an expansion chamber to fill its troughs; with zero extensions it
+reduces exactly to the plain chamber. Advanced layouts chain elements directly
+with `duct_matrix`, `shunt_matrix`, `cascade`, `transmission_loss` and
+`insertion_loss`.
+
+```python
+import numpy as np
+from phonometry import (
+    helmholtz_resonator, quarter_wave_resonator, extended_tube_chamber,
+)
+
+f = np.linspace(20.0, 600.0, 4000)
+
+hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
+                         neck_length=0.02, cavity_volume=1e-3)
+print(round(float(hr.resonances[0]), 1))       # tuning frequency, Hz
+hr.plot()   # TL spike at the tuning frequency (needs matplotlib)
+
+qw = quarter_wave_resonator(f, duct_area=0.01, length=1.516, branch_area=2e-3,
+                            speed_of_sound=343.24)
+print(round(float(qw.resonances[0]), 1))        # 56.6 Hz (Bies Example 8.1)
+
+# An inlet extension of L/4 fills the first expansion-chamber trough.
+et = extended_tube_chamber(f, length=0.4, chamber_area=0.04, pipe_area=0.01,
+                           inlet_extension=0.1)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_side_branch_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_side_branch.svg" alt="Transmission loss of a Helmholtz resonator and a closed quarter-wave tube on the same 10 cm2 duct: each side branch produces a sharp spike at its own tuning frequency, near 120 Hz for the Helmholtz volume and near 285 Hz for the 0.3 m tube, and is transparent elsewhere" width="88%"></picture>
+
+*Each side branch shorts the duct at its own tuning frequency and is nearly
+transparent elsewhere: the narrow spike is why resonators are matched to a
+firing frequency or a fan blade-passing tone rather than used broadband.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import helmholtz_resonator, quarter_wave_resonator
+
+f = np.linspace(20.0, 600.0, 4000)
+hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
+                         neck_length=0.02, cavity_volume=1e-3)
+qw = quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
+
+# One line for one device: TL vs frequency with the resonance marked.
+hr.plot()
+plt.show()
+
+# By hand: both side branches on the same axes.
+fig, ax = plt.subplots()
+ax.plot(f, hr.transmission_loss, label="Helmholtz resonator")
+ax.plot(f, qw.transmission_loss, "--", label="Quarter-wave tube")
+for fr in (hr.resonances[0], qw.resonances[0]):
+    ax.axvline(float(fr), ls=":", color="#2ca02c")
+ax.set_xlabel("Frequency [Hz]"); ax.set_ylabel("Transmission loss [dB]")
+ax.set_ylim(0.0, 50.0)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+Both branches are small hardware, and `.plot_geometry()` shows just how
+small: the resonator of the 120 Hz spike is a 1 L cavity fed by a 1 cm²
+neck only 2 cm long.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/helmholtz_branch_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/helmholtz_branch_geometry.svg" alt="To-scale cross-section of the side-branch Helmholtz resonator: a duct of 112.8 mm equivalent diameter with a narrow 11.3 mm neck, 20 mm long, opening into a 1 litre cavity drawn as its equal-volume cube on top of the duct, with the neck diameter, neck length and duct diameter dimensioned" width="88%"></picture>
+
+*The whole 120 Hz notch hangs on a 1 L box and a 2 cm neck: the cavity is
+drawn as its equal-volume cube, and the tuning moves as `sqrt(S_n / (l_e V))`,
+so small errors in these dimensions shift the spike off its target.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import helmholtz_resonator
+
+f = np.linspace(20.0, 600.0, 4000)
+hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
+                         neck_length=0.02, cavity_volume=1e-3)
+
+# One line: the side branch drawn to scale, cavity as its equal-volume cube.
+hr.plot_geometry()
+plt.show()
+```
+
+</details>
+
+The quarter-wave tube needs no cavity at all: the 285 Hz spike of the figure
+above comes from a plain closed tube of the right length standing on the
+same duct.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/quarter_wave_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/quarter_wave_geometry.svg" alt="To-scale cross-section of the quarter-wave side branch: a closed tube 300 mm long and 50.5 mm in equivalent diameter standing on a duct of 112.8 mm equivalent diameter, with the tube length, tube diameter and duct diameter dimensioned" width="88%"></picture>
+
+*A quarter-wave stub is just a closed tube of the right length: 0.3 m of
+pipe puts the spike at `c / 4 l_e ≈ 285 Hz`, and the 20 cm² branch area only
+sets how strongly the stub loads the duct.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import quarter_wave_resonator
+
+f = np.linspace(20.0, 600.0, 4000)
+qw = quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
+
+# One line: the closed 0.3 m tube on its duct, to scale.
+qw.plot_geometry()
+plt.show()
+```
+
+</details>
+
+Each device returns a `ReactiveSilencerResult` with `transmission_loss`,
+`insertion_loss` (when source/radiation impedances are given), the compound
+`transfer_matrix`, the tuning `resonances` and `.plot()`.
+
+
+## 2. Reactive or dissipative?
+
+Everything above works by reflection, and reflection has a shape: sharp,
+periodic, frequency-selective. The complementary family, **dissipative**
+silencers, replaces the impedance discontinuities with a duct section whose
+walls are lined with porous material (often protected by a perforated
+facing), so the grazing wave loses energy to viscous friction in the lining
+instead of being sent back to the source. The behaviours differ where it
+matters for selection:
+
+- **Frequency reach.** A reactive chamber or resonator is strongest exactly
+  where it is tuned and transparent elsewhere; a lined duct attenuates over
+  a broad band that peaks where the lining depth is comparable with a
+  quarter wavelength. At low frequency a practical lining is acoustically
+  thin and does little, which is the regime where the reactive chamber
+  wins; at high frequency the sound beams down the open airway and passes
+  over the lining, so the attenuation of both families collapses and only
+  splitter geometries (narrow airways, more lined perimeter per unit area)
+  keep working.
+- **Spectrum type.** A tonal source, an engine firing order or a
+  blade-passing frequency, is a resonator's natural prey; broadband fan or
+  flow noise wants the dissipative band. Production exhaust silencers
+  routinely combine the two, packing an expansion chamber with fibre so the
+  reflective troughs of the chamber are filled by absorption.
+- **The medium.** A porous lining in a hot, sooty or pulsating exhaust
+  clogs and degrades, one reason vehicle exhausts are predominantly
+  reactive; clean HVAC air is where dissipative attenuators and lined
+  plenums are the default. In either case the airflow adds its own floor:
+  a silencer regenerates flow noise at its own outlet, and past a certain
+  pressure drop the silencer becomes the noise source.
+
+phonometry models the reactive family in closed form on this page. The
+dissipative side enters through the installation data of the
+[HVAC methods](https://jmrplens.github.io/phonometry/guides/noise-control/): the lined-elbow insertion loss and the
+lined plenum attenuation of Wells' method, both from interpolated ASHRAE
+data rather than a liner model. The porous physics that a first-principles
+liner calculation needs, the equivalent-fluid models fed by the airflow
+resistivity, is the same material theory as
+[Porous and Multilayer Absorbers](https://jmrplens.github.io/phonometry/guides/porous-absorbers/).
+
+## Cross-check against the FDTD solver
+
+The four-pole expansion chamber is cross-checked against the independent 2D
+[FDTD wave solver](https://jmrplens.github.io/phonometry/guides/fdtd-simulation/): a plane-wave duct that widens into a
+chamber and narrows back transmits far less at the four-pole TL peak
+(`kL = pi/2`) than at the transparent trough (`kL = pi`), and the measured
+amplitude ratio reproduces the closed-form peak transmission loss to a fraction
+of a decibel (test `tests/noise_control/test_fdtd_crosscheck.py`).
+
+
+## See also
+
+- [Industrial noise control](https://jmrplens.github.io/phonometry/guides/noise-control/): the rest of the
+  installation: HVAC duct attenuation and flow noise, plenums, end
+  reflection and machine enclosures.
+- [2D FDTD wave simulation](https://jmrplens.github.io/phonometry/guides/fdtd-simulation/): the independent solver
+  behind the expansion-chamber cross-check.
+- [Porous and Multilayer Absorbers](https://jmrplens.github.io/phonometry/guides/porous-absorbers/): the
+  equivalent-fluid material theory behind dissipative linings.
+- [Loudspeaker Characterisation (IEC 60268-5)](https://jmrplens.github.io/phonometry/guides/loudspeakers/): the
+  radiating piston, the companion radiator model of a duct's open end.
+- API reference: [`noise_control.silencers`](https://jmrplens.github.io/phonometry/reference/api/noise_control/silencers/).
+
+## References
+
+- Bies, D. A., Hansen, C. H., & Howard, C. Q. (2017). *Engineering noise
+  control* (5th ed.). CRC Press.
+  [doi:10.1201/9781351228152](https://doi.org/10.1201/9781351228152). The
+  muffler four-pole method, the expansion-chamber TL and the resonator
+  tuning formulas (§8.8–8.9) of this guide.
+- Munjal, M. L. (2014). *Acoustics of ducts and mufflers* (2nd ed.). Wiley.
+  [doi:10.1002/9781118443767](https://doi.org/10.1002/9781118443767). The
+  transfer-matrix formulation behind the element matrices and the
+  transmission loss from the compound matrix (Eq. (3.27)), and the
+  reference treatment of dissipative and combined mufflers.
+- Vér, I. L., & Beranek, L. L. (2006). *Noise and vibration control
+  engineering* (2nd ed.). Wiley.
+  [doi:10.1002/9780470172568](https://doi.org/10.1002/9780470172568). The
+  companion treatment of reactive and dissipative silencers.
+
+---
+
+
+<!-- source: docs/noise-control.md | canonical: https://jmrplens.github.io/phonometry/guides/noise-control/ -->
+Source: https://jmrplens.github.io/phonometry/guides/noise-control/
+
+# Industrial noise control: HVAC and enclosures
+
+Three passive measures dominate applied noise control, and the
+`noise_control` domain covers all three with the engineering theory of Bies,
+Hansen & Howard, *Engineering Noise Control* (5th ed., CRC Press 2017):
+**reactive silencers** in a duct (the four-pole transmission-matrix method),
+the passive attenuations and regenerated noise of an **HVAC** run, and the
+insertion loss of a **machine enclosure**. The radiating piston of the
+[loudspeaker guide](https://jmrplens.github.io/phonometry/guides/loudspeakers/) is the companion radiator model.
+
+The three families in one scene: enclose the source, silence the path,
+shield the receiver. Each measure carries the value its section computes,
+here or in the silencer guide.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_noise_control_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_noise_control.svg" alt="Noise-control scene split into three zones: at the source a machine inside a lined enclosure rated IL = R − C = 25 dB at 500 Hz, along the path a 113 mm duct with a 0.30 m expansion chamber of area ratio 4 peaking at 6.5 dB of transmission loss at 286 Hz, a lined elbow worth 6 dB at 1 kHz and an open end reflecting 18 dB at 63 Hz, and at the receiver an operator cabin rated by the same formula at 31 dB at 1 kHz, with a person standing inside" width="92%"></picture>
+
+The path measure, the silencer itself, has its own guide:
+[Silencers](https://jmrplens.github.io/phonometry/guides/silencers/) covers the reactive four-pole method, the
+closed-form expansion chamber, the Helmholtz, quarter-wave and
+extended-tube resonators, the independent FDTD cross-check and the
+trade-off against dissipative linings. This page keeps the rest of the
+installation: what the duct run adds and removes on its own, and what an
+enclosure around the machine actually delivers.
+
+## 1. HVAC duct attenuation and flow noise
+
+`noise_control.hvac` gathers the Bies Chapter 8 duct methods:
+
+- `end_reflection_loss` — the low-frequency reflection back up an open duct end
+  (ASHRAE Table 8.14, interpolated over diameter and frequency; it passes
+  exactly through the tabulated nodes).
+- `elbow_insertion_loss` — the insertion loss per bend for square/round,
+  vaned/unvaned and lined/unlined elbows keyed by `W / lambda` (ASHRAE
+  Table 8.11).
+- `plenum_attenuation` — the plenum-chamber transmission loss by Wells' method
+  (Eq. (8.275)), whose reverberant term uses the plenum
+  [room constant](https://jmrplens.github.io/phonometry/guides/room-image-sources/).
+- `flow_noise_straight_duct`, `flow_noise_bend` — the flow-generated (self)
+  noise sound power of straight ducts and mitred bends (VDI 2081, Eqs. (8.251),
+  (8.254)).
+
+```python
+from phonometry.noise_control import hvac
+
+bands = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0]
+er = hvac.end_reflection_loss(bands, diameter=0.30, termination="flush")
+el = hvac.elbow_insertion_loss(bands, width=0.3, bend_type="square", lined=True)
+er.plot()   # the band attenuation (or regenerated Lw) in one line (needs matplotlib)
+tl = hvac.plenum_attenuation(0.1, 1.0, 20.0, 0.2)      # Wells' method, dB
+fn = hvac.flow_noise_straight_duct(bands, flow_velocity=10.0, area=0.04)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hvac_end_reflection_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hvac_end_reflection.svg" alt="Duct end reflection loss per octave band for flush duct terminations of 150, 300 and 600 mm diameter: the reflection back up the duct grows steeply towards low frequency and shrinks with duct size, exceeding 17 dB at 63 Hz for the 150 mm duct and vanishing above 1 kHz" width="88%"></picture>
+
+*The open end of a duct reflects low-frequency energy back up the run — for
+free, before any silencer: the smaller the duct against the wavelength, the
+larger the loss, which is why small diffuser necks tame low-frequency fan
+rumble and why the correction must not be double-counted when a manufacturer's
+diffuser data already includes it.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry.noise_control import hvac
+
+bands = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0]
+
+# One line for one duct: the HvacSpectrumResult of the 300 mm flush end.
+er = hvac.end_reflection_loss(bands, diameter=0.30, termination="flush")
+er.plot()
+plt.show()
+
+# By hand: the family over duct diameters of the concept figure.
+fig, ax = plt.subplots()
+for diameter in (0.15, 0.30, 0.60):
+    er = hvac.end_reflection_loss(bands, diameter=diameter, termination="flush")
+    ax.semilogx(er.frequencies, er.values, "o-",
+                label=f"D = {int(diameter * 1000)} mm")
+ax.set_xlabel("Frequency [Hz]"); ax.set_ylabel("End reflection loss [dB]")
+ax.legend(title="Duct diameter")
+plt.show()
+```
+
+</details>
+
+Wells' plenum formula takes only two truly geometric inputs, the
+inlet-to-outlet line of sight `r` and the outlet area, plus the lined wall
+area; `plot_plenum_geometry` draws exactly those, honouring `r` and its
+angle off the inlet axis.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/plenum_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/plenum_geometry.svg" alt="Section of a plenum chamber: the inlet duct enters low on the left, the outlet mouth is marked on the right wall, the 1.2 m inlet-to-outlet line of sight is drawn as a dashed diagonal at 0.35 rad off the inlet axis, and the wall area of 6 square metres and outlet area of 0.09 square metres are annotated below" width="88%"></picture>
+
+*Only `r` and its angle off the inlet axis fix the drawn box; `S_out` and
+`S_w` enter Wells' method as bare areas, so any plenum sharing these four
+numbers has the same predicted attenuation.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import plot_plenum_geometry
+
+# The r, S_out and S_w that Wells' formula actually uses, drawn exactly.
+plot_plenum_geometry(0.09, 1.2, 6.0, angle=0.35)
+plt.show()
+```
+
+</details>
+
+Rectangular ducts use the equivalent diameter `D = sqrt(4 S / pi)`. Bies 5th
+ed. gives the duct end reflection only as the ASHRAE table (no closed form in
+that edition); this module reproduces and interpolates it.
+
+## 2. Machine enclosures
+
+A sealed enclosure reduces the radiated noise by its panel transmission loss
+`R`, minus a penalty `C` for the reverberant build-up inside the small, hard
+cavity (Bies Eqs. (7.103), (7.111)):
+
+```text
+IL = R - C ,   C = 10 log10( 0.3 + S_E / R_i ) ,
+```
+
+with the external area `S_E` and the interior room constant
+`R_i = S_i alpha_i / (1 - alpha_i)` (the same `room_constant` as the
+steady-state room field). A hard interior wastes much of the panel `R`; lining
+it drives `C` toward its floor `10 log10 0.3 = -5.2 dB`.
+
+**The panel transmission loss `R` is supplied by the caller** — measured, or
+predicted by a panel model — as a per-band array or a callable of frequency.
+This module never predicts `R` itself; it combines a given `R` with the
+interior absorption.
+
+```python
+import numpy as np
+from phonometry import enclosure_insertion_loss
+
+bands = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+panel_R = np.array([18.0, 24.0, 30.0, 36.0, 42.0, 46.0])   # measured, dB
+enc = enclosure_insertion_loss(panel_R, external_area=6.0, internal_area=5.0,
+                               internal_absorption=0.3, frequencies=bands)
+print(np.round(enc.insertion_loss, 1))          # net IL = R - C per band
+enc.plot()
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosure_insertion_loss_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosure_insertion_loss.svg" alt="Machine-enclosure insertion loss per octave band: the measured panel sound reduction index R as a dashed line, the flat interior correction C near 5 dB for a lined interior, and the net insertion loss IL equal to R minus C tracking about 5 dB below the panel curve" width="88%"></picture>
+
+*What the enclosure delivers is `R − C`, not the panel `R`: even this lined
+interior (mean absorption 0.3) costs about 5 dB of the panel's rating in every
+band, and a hard, unlined interior would cost far more. Budget the lining
+together with the panels, not as an afterthought.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import enclosure_insertion_loss
+
+bands = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+panel_R = np.array([18.0, 24.0, 30.0, 36.0, 42.0, 46.0])   # measured, dB
+
+enc = enclosure_insertion_loss(panel_R, external_area=6.0, internal_area=5.0,
+                               internal_absorption=0.3, frequencies=bands)
+
+# One line — panel R, interior correction C and the net IL = R - C:
+enc.plot()
+plt.show()
+
+# By hand, from the per-band fields the result carries:
+fig, ax = plt.subplots()
+ax.plot(bands, enc.panel_transmission_loss, "s--", label="Panel R")
+ax.plot(bands, enc.correction, "^:", label="Interior correction C")
+ax.plot(bands, enc.insertion_loss, "o-", label="Insertion loss (R - C)")
+ax.set_xlabel("Frequency [Hz]"); ax.set_ylabel("Level [dB]")
+ax.set_xscale("log")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+`enclosure_insertion_loss` returns an `EnclosureResult` with the panel
+`panel_transmission_loss`, the interior `correction`, the net `insertion_loss`,
+the interior `room_constant` and `.plot()`.
+
+## References
+
+- Bies, D. A., Hansen, C. H., & Howard, C. Q. (2017). *Engineering noise
+  control* (5th ed.). CRC Press.
+  [doi:10.1201/9781351228152](https://doi.org/10.1201/9781351228152). The
+  HVAC duct methods (§8.11–8.17) and the machine-enclosure noise reduction
+  (§7.4).
+- Vér, I. L., & Beranek, L. L. (2006). *Noise and vibration control
+  engineering* (2nd ed.). Wiley.
+  [doi:10.1002/9780470172568](https://doi.org/10.1002/9780470172568). The
+  companion treatment of ducts and enclosures.
 
 ---
 

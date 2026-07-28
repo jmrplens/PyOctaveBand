@@ -1,14 +1,7 @@
 ---
 title: "Electroacústica: distorsión y respuesta en frecuencia"
-description: "Distorsión IEC 60268-3: distorsión armónica total y de orden n, THD+N y SINAD a través del ancho de banda de medición AES17, la intermodulación por órdenes de modulación y por frecuencia diferencia, la intermodulación dinámica (DIM) y la THD ponderada ITU-R 468, el rango dinámico y el ruido de canal en reposo de AES17 (ponderación CCIR-RMS), más los estimadores de respuesta en frecuencia H1/H2 de Bendat y Piersol y la coherencia ordinaria, y las convenciones de sensibilidad de IEC 60268-4/-5 (dB re 1 V/Pa, la normalización de campo libre a 1 W / 1 m) con los informes de características nominales de micrófono IEC 60268-4 y de altavoz IEC 60268-5."
+description: "Distorsión IEC 60268-3: distorsión armónica total y de orden n, THD+N y SINAD a través del ancho de banda de medición AES17, la intermodulación por órdenes de modulación y por frecuencia diferencia, la intermodulación dinámica (DIM) y la THD ponderada ITU-R 468, el rango dinámico y el ruido de canal en reposo de AES17 (ponderación CCIR-RMS), más los estimadores de respuesta en frecuencia H1/H2 de Bendat y Piersol y la coherencia ordinaria."
 references:
-  - type: book
-    authors: ["Beranek, L. L.", "Mellow, T. J."]
-    year: 2012
-    title: "Acoustics: Sound fields and transducers"
-    publisher: "Academic Press"
-    doi: "10.1016/C2011-0-05897-0"
-    note: "ISBN 978-0-12-391421-7. La física de transductores que sustenta la sección 5: radiación del altavoz, presión en el eje y la transición de campo cercano a campo lejano."
   - type: standard
     organization: "International Electrotechnical Commission"
     year: 2013
@@ -38,27 +31,6 @@ references:
     publisher: "Wiley"
     doi: "10.1002/9781118032428"
     note: "ISBN 978-0-470-24877-5. Los estimadores de respuesta en frecuencia H1 y H2 y la coherencia ordinaria γ² de la sección 4."
-  - type: standard
-    organization: "International Electrotechnical Commission"
-    year: 2014
-    title: "Sound system equipment – Part 4: Microphones"
-    designation: "IEC 60268-4:2014"
-    url: "https://webstore.iec.ch/en/publication/32039"
-    note: "Las características nominales de micrófono de las secciones 5 y 8: la sensibilidad en campo libre y su nivel re 1 V/Pa (11.1/11.3), la respuesta en frecuencia y el rango de frecuencias efectivo (12.1/12.2), el diagrama direccional y el índice de directividad mediante la integral de campo difuso de 11.2.2 a) (13.1/13.2), el nivel de presión acústica de sobrecarga (15.2), el nivel de presión acústica equivalente debido al ruido inherente (17) y las impedancias nominales y la alimentación (9/10). Revisada después como IEC 60268-4:2018 (misma página de catálogo); la edición implementada es la de 2014."
-  - type: standard
-    organization: "International Electrotechnical Commission"
-    year: 2003
-    title: "Sound system equipment – Part 5: Loudspeakers"
-    designation: "IEC 60268-5:2003+A1:2007"
-    url: "https://webstore.iec.ch/en/publication/1223"
-    note: "Las características nominales de altavoz de la sección 7: la impedancia nominal (16), el rango de frecuencias nominal (19.1), la sensibilidad característica y su nivel referido a 1 W a 1 m (20.3/20.4), el rango de frecuencias efectivo frente a la banda de -10 dB (21.2), el índice de directividad (23.3) y la distorsión armónica total frente a la frecuencia (24.1)."
-  - type: standard
-    organization: "International Electrotechnical Commission"
-    year: 1982
-    title: "Scales and sizes for plotting frequency characteristics and polar diagrams"
-    designation: "IEC 60263:1982"
-    url: "https://webstore.iec.ch/en/publication/1218"
-    note: "Las proporciones de escala de las gráficas características de la sección 7: una década de frecuencia igual a 25 dB en la ordenada (cláusula 2) y el diagrama polar trazado sobre un radio de círculo de referencia de 25 dB (cláusula 3)."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -76,13 +48,13 @@ Piersol con la coherencia ordinaria `γ²`. Toda magnitud tiene un oráculo
 analítico exacto (señales sintéticas con amplitudes armónicas y de
 intermodulación conocidas, un oráculo de Fourier de seno recortado, una
 síntesis completa de la señal de ensayo DIM y un camino LTI conocido), así que
-los valores son verificables y no ajustados. Las secciones finales cubren las
-convenciones de sensibilidad de IEC 60268-4 (micrófonos) e IEC 60268-5
-(altavoces), donde fallan la mayoría de las comparaciones entre hojas de
-datos, el modelo de radiación del pistón con pantalla que hay detrás de la
-directividad de los altavoces, y los informes de características nominales de
-altavoz (IEC 60268-5) y micrófono (IEC 60268-4) que componen las hojas de
-datos de las normas a partir de una respuesta medida.
+los valores son verificables y no ajustados. Las hojas de datos de
+transductor que estas mediciones alimentan tienen sus propias guías:
+[Caracterización de altavoces (IEC 60268-5)](/phonometry/es/guides/loudspeakers/),
+con las convenciones de sensibilidad y el modelo de radiación del pistón en
+pantalla, y
+[Caracterización de micrófonos (IEC 60268-4)](/phonometry/es/guides/microphones/),
+con los patrones direccionales y las ponderaciones de ruido propio.
 
 ## 1. Distorsión armónica (IEC 60268-3 14.12.2–5)
 
@@ -355,534 +327,17 @@ plt.show()
 
 </details>
 
-## 5. Convenciones de sensibilidad (IEC 60268-4 / IEC 60268-5)
-
-Las cifras de distorsión y de respuesta solo son comparables entre
-dispositivos cuando coinciden las convenciones de *sensibilidad* que hay
-detrás, y dos convenciones hacen tropezar constantemente: el nivel de
-referencia del micrófono y la normalización de potencia y distancia del
-altavoz.
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_loudspeaker_freefield_es.svg" alt="Medición de la sensibilidad de un altavoz en campo libre según IEC 60268-5: un altavoz sobre un soporte en una sala anecoica, alimentado por un amplificador a 2,83 V, con un micrófono de medición a la distancia de referencia r = 1 m sobre el eje de referencia, y las relaciones que gobiernan: la sensibilidad característica como Lp a 1 m para 1 W en la impedancia nominal, la tensión de excitación Up = raíz de (R por 1 W), la referencia por distancia inversa Lp(1 m) = Lp(r) + 20 lg(r / 1 m), y la sensibilidad de micrófono de IEC 60268-4 en mV/Pa o dB re 1 V/Pa" width="92%" />
-
-**Micrófonos (IEC 60268-4, cláusula 11).** La sensibilidad `M` es la tensión
-de salida por unidad de presión acústica, expresada en mV/Pa; el *nivel* de
-sensibilidad es `LM = 20 lg(M / 1 V/Pa)` dB, negativo para todo micrófono real
-(un condensador de estudio de 50 mV/Pa queda en −26 dB re 1 V/Pa). El tropiezo
-clásico es la referencia: −26 dB re 1 V/Pa y +34 dB re 1 mV/Pa son el *mismo*
-micrófono, a 60 dB de distancia sobre el papel, así que un nivel de
-sensibilidad sin su referencia no significa nada. La norma también distingue
-sensibilidad de campo libre, de campo difuso y de presión; para la misma
-cápsula divergen en alta frecuencia, de modo que el tipo declarado importa
-tanto como el número.
-
-**Altavoces (IEC 60268-5, cláusula 20.3).** La sensibilidad característica es
-la presión acústica producida a 1 m sobre el eje de referencia, en campo
-libre, referida a una entrada de 1 W en la impedancia nominal; expresada como
-nivel re 20 µPa (cláusula 20.4) es el familiar «dB @ 1 W/1 m». En esa frase se
-esconden dos normalizaciones:
-
-- *La eléctrica.* La tensión de ensayo es `Up = √(R · 1 W)`, numéricamente
-  `√R`: 2,83 V en una impedancia nominal de 8 Ω. Una hoja de datos que anuncia
-  «dB @ 2,83 V/1 m» para un altavoz de 4 Ω le está entregando 2 W, lo que
-  infla la cifra en 3 dB frente a una calificación verdadera de 1 W/1 m;
-  comprueba la impedancia nominal antes de comparar.
-- *La geométrica.* 1 m es una distancia de **referencia**, no necesariamente
-  la de medición. La norma manda medir en campo lejano (a 0,5 m o a un número
-  entero de metros, cláusula 7.1) y referir el resultado con la ley de la
-  distancia inversa, `Lp(1 m) = Lp(r) + 20 lg(r / 1 m)`. Ese escalado solo
-  vale donde el nivel cae de verdad 6 dB por duplicación de distancia, de ahí
-  el campo libre del diagrama; a 1 m de una caja multivía grande puede que el
-  campo cercano aún no haya terminado, y la cifra «a 1 m» es entonces una
-  magnitud referida, no lo que leería un micrófono colocado a 1 m.
-
-## 6. Pistón radiante: impedancia de radiación y directividad
-
-El **pistón circular rígido en pantalla infinita** es el radiador canónico tras
-un cono de altavoz, el extremo abierto de un conducto y la eficiencia de
-radiación de cualquier superficie vibrante finita (Beranek y Mellow §4.19,
-§13.7). Su impedancia mecánica de radiación es $Z_r = \rho c S\,(R_1 + jX_1)$ con
-$S = \pi a^2$ y las funciones adimensionales de resistencia y reactancia
-(Ecs. (13.117), (13.118))
-
-$$
-R_1(x) = 1 - \frac{2 J_1(x)}{x}, \qquad X_1(x) = \frac{2 H_1(x)}{x},
-\qquad x = 2ka,
-$$
-
-donde $J_1$ es la función de Bessel y $H_1$ la de Struve de orden uno. A baja
-frecuencia $R_1 \to (ka)^2/2$ y la reactancia es de tipo másico con la **masa de
-radiación** $M_r = 8\rho a^3/3$ (Ec. (4.151)); a alta frecuencia $R_1 \to 1$,
-$X_1 \to 0$ y el pistón radia como en un tubo infinito. El campo lejano sigue la
-directividad $D(\theta) = 2 J_1(ka\sin\theta)/(ka\sin\theta)$, cuyo primer nulo
-está en $ka\sin\theta = 3.8317$.
-
-```python
-import numpy as np
-from phonometry import radiating_piston
-
-res = radiating_piston(radius=0.1, frequencies=np.geomspace(20, 20000, 200),
-                       angles=np.linspace(0.0, np.pi / 2, 91))
-print(round(res.radiation_mass, 4))            # 8 rho a^3 / 3, kg
-print(round(float(res.directivity_index[0]), 2))  # 3.01 dB, límite de semiespacio
-res.plot()                                      # R1 y X1 vs ka
-```
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_radiation_impedance_es.svg" alt="Resistencia de radiación normalizada R1 y reactancia X1 de un pistón circular con pantalla de 75 mm frente a ka en eje logarítmico: R1 sube desde ka al cuadrado entre dos hasta la unidad con rizados decrecientes, mientras la X1 de tipo masa alcanza su máximo cerca de ka de 1,4 y decae, con el límite de alta frecuencia R1 igual a 1 marcado" width="82%" />
-
-*El `.plot()` del resultado es la figura clásica de impedancia de Beranek y
-Mellow calculada para este pistón: por debajo de `ka ≈ 1` la carga es casi
-puramente de tipo masa (`X₁` domina y `R₁ ∝ (ka)²`, el régimen en el que la
-salida de un altavoz está limitada por rigidez y masa), y por encima la
-resistencia se asienta en `ρcS` con rizados de interferencia mientras la
-reactancia se desvanece.*
-
-<details>
-<summary>Mostrar el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import radiating_piston
-
-res = radiating_piston(radius=0.075, frequencies=np.geomspace(20, 20000, 400))
-res.plot(language="es")   # R1 y X1 normalizadas frente a ka
-plt.show()
-```
-
-</details>
-
-`radiating_piston` devuelve un `RadiatingPistonResult` con la `resistance` y
-`reactance` normalizadas, la `radiation_resistance`/`radiation_reactance`
-mecánicas, la `radiation_mass`, el `directivity_index`, el patrón de campo lejano
-`directivity` (cuando se dan `angles`) y `.plot()`. Los bloques
-`piston_resistance`, `piston_reactance` y `piston_directivity` también son
-invocables directamente. El pistón es el modelo de radiador complementario de los
-[silenciadores de control de ruido industrial](/phonometry/es/guides/noise-control/).
-
-El **patrón de directividad** es, por sí mismo, un resultado representable:
-`piston_directivity_pattern(ka)` muestrea $D(\theta)$ para uno o varios valores
-de $ka$ y devuelve un `PistonDirectivity` (la malla de ángulos polares, la
-`directivity` lineal y su forma en dB `directivity_db`, y los valores de `ka`),
-cuyo `.plot()` dibuja el diagrama de haz clásico. Varios $ka$ se muestran como
-una familia sobre los mismos ejes polares, de modo que el estrechamiento del
-lóbulo principal y la aparición de los lóbulos secundarios se leen de un vistazo:
-
-```python
-from phonometry import piston_directivity_pattern
-
-pattern = piston_directivity_pattern([3.0, 8.0, 16.0])
-print(pattern.directivity_db.shape)  # (3, 361): una fila por ka
-pattern.plot()                       # diagrama de haz polar en dB (necesita matplotlib)
-```
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_directivity_es.svg" alt="Directividad de campo lejano en polar de un pistón circular con pantalla para ka de 3, 8 y 16 sobre el hemisferio frontal, con el nivel en el eje arriba como referencia de 0 dB, que muestra el estrechamiento del lóbulo principal y la aparición de los lóbulos secundarios al crecer ka" width="72%" />
-
-<details>
-<summary>Mostrar el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import piston_directivity_pattern
-
-piston_directivity_pattern([3.0, 8.0, 16.0]).plot(language="es")
-plt.show()
-```
-
-</details>
-
-Detrás de ambas curvas hay un mismo objeto físico, y `.plot_geometry()` del
-resultado del pistón lo dibuja: la placa en su pantalla rígida a escala, con
-el lóbulo de campo lejano de la frecuencia más alta calculada superpuesto en
-el lado de radiación.
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_baffle_geometry_es.svg" alt="Un pistón rígido de 10 cm de radio dibujado a escala como una placa de 200 mm de diámetro empotrada en una pantalla vertical rayada, con el diámetro del pistón acotado y el lóbulo de directividad de campo lejano normalizado para ka de 7,3 superpuesto en el lado de radiación: un lóbulo principal largo pegado al eje punteado con pequeños lóbulos secundarios replegándose cerca de la placa" width="82%" />
-
-*El pistón que describen las curvas de impedancia y directividad, a escala:
-a 4 kHz esta placa de 10 cm de radio tiene `ka ≈ 7,3`, así que el lóbulo
-superpuesto ya es varias veces más estrecho que el hemisferio de baja
-frecuencia y han aparecido los primeros lóbulos secundarios.*
-
-<details>
-<summary>Mostrar el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import radiating_piston
-
-res = radiating_piston(0.1, np.array([500.0, 2000.0, 4000.0]),
-                       angles=np.linspace(-np.pi / 2, np.pi / 2, 181))
-
-# Una línea: el pistón en su pantalla con el lóbulo de la frecuencia más alta.
-res.plot_geometry(language="es")
-plt.show()
-```
-
-</details>
-
-## 7. Informe de características del altavoz (IEC 60268-5)
-
-Las características nominales que IEC 60268-5 define en torno a una respuesta en
-el eje medida se reúnen en un único resultado de **características del altavoz**
-que representa la ficha de características nominales de la norma. Dos de los
-números se calculan a partir de la respuesta en lugar de solo repetirse:
-
-- **Nivel de sensibilidad característica** (20.3/20.4). El nivel en el eje
-  promediado en una banda declarada, referido a 1 W en la impedancia nominal
-  $R$ a 1 m: $L_M = \overline{L} + 20\lg(d/d_0) + 20\lg(U_p/U)$ con
-  $U_p = \sqrt{R\cdot 1\,\text{W}} = \sqrt R$. La excitación por defecto es ese
-  $\sqrt R$ (2,83 V en 8 Ω), de modo que con una respuesta a 1 m el nivel de
-  sensibilidad es la media de banda.
-- **Rango de frecuencias efectivo** (21.2). La banda en la que la respuesta se
-  mantiene dentro de 10 dB del nivel promediado en la banda de una octava en la
-  región de máxima sensibilidad; los valles más estrechos que 1/9 de octava se
-  desprecian.
-
-```python
-import numpy as np
-from phonometry import loudspeaker_characteristics, radiating_piston, ReportMetadata
-
-freqs = np.geomspace(30, 24000, 320)
-spl = 87.0 + 1.2 * np.sin(2 * np.log2(freqs / 900.0))
-spl -= 10 * np.log10(1 + (50.0 / freqs) ** 6)       # caída en baja frecuencia
-spl -= 10 * np.log10(1 + (freqs / 16000.0) ** 7)    # caída en alta frecuencia
-
-result = loudspeaker_characteristics(
-    freqs, spl, rated_impedance=8.0, sensitivity_band=(200.0, 4000.0),
-    impedance=(np.geomspace(20, 20000, 260),
-               6.6 + 24 * np.exp(-(np.log2(np.geomspace(20, 20000, 260) / 52.0) ** 2) / 0.12)),
-    distortion=(np.geomspace(50, 5000, 140),
-                0.3 + 2.6 * np.exp(-(np.log2(np.geomspace(50, 5000, 140) / 70.0) ** 2) / 0.45)),
-    directivity=radiating_piston(0.075, np.array([1000.0, 2000.0, 4000.0]),
-                                 angles=np.radians(np.linspace(0, 90, 46))),
-    polar_frequency=2000.0,
-)
-print(round(result.sensitivity_level_db, 1))                 # dB, 1 W / 1 m
-print(tuple(round(x) for x in result.effective_range))       # Hz
-
-result.report("altavoz.pdf", metadata=ReportMetadata(measurement_standard="IEC 60268-5"),
-              language="es")
-```
-
-`loudspeaker_characteristics` devuelve un `LoudspeakerCharacteristics` con el
-`sensitivity_level_db`, el `effective_range`, el `reference_level_db`, la
-`characteristic_sensitivity_pa` y la `minimum_impedance` calculados, y un
-`.report()` que escribe la ficha. La respuesta en el eje se dibuja con su banda
-de tolerancia y los marcadores del rango efectivo según la proporción de
-IEC 60263 (una década de frecuencia igual a 25 dB), y la directividad polar
-sobre el círculo de referencia de 25 dB de IEC 60263. El módulo de impedancia
-(con la línea del 80 % de la nominal), la curva de distorsión armónica total y
-la directividad alimentan los paneles secundarios, reutilizando la directividad
-del [pistón radiante](#6-pistón-radiante-impedancia-de-radiación-y-directividad)
-de la sección 6 y un resultado de
-[distorsión con barrido sinusoidal](/phonometry/es/guides/swept-sine-distortion/)
-para la curva de distorsión.
-
-Las características nominales también están disponibles de forma interactiva
-mediante `.plot()`, que dibuja **un concepto por figura** con el mismo código de
-paneles que compone el informe, seleccionado con `quantity`. Al pasar unos ejes
-se dibuja sobre ellos:
-
-```python
-result.plot()                        # respuesta en el eje (por defecto)
-result.plot(quantity="impedance")    # módulo |Z| con las líneas nominal / 80 %
-result.plot(quantity="thd")          # distorsión armónica total vs frecuencia
-result.plot(quantity="directivity")  # respuesta polar sobre el círculo de 25 dB
-```
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_response_es.svg" alt="Respuesta del nivel de presión acústica en el eje con su banda de tolerancia sombreada, la línea de referencia de -10 dB y los marcadores del rango efectivo sobre un eje de frecuencias nominales" width="82%" />
-
-<details>
-<summary>Ver el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import loudspeaker_characteristics
-
-freqs = np.geomspace(30, 24000, 320)
-spl = 87.0 + 1.2 * np.sin(2 * np.log2(freqs / 900.0))
-spl -= 10 * np.log10(1 + (50.0 / freqs) ** 6)       # caída en baja frecuencia
-spl -= 10 * np.log10(1 + (freqs / 16000.0) ** 7)    # caída en alta frecuencia
-
-result = loudspeaker_characteristics(freqs, spl, rated_impedance=8.0,
-                                     sensitivity_band=(200.0, 4000.0))
-result.plot(language="es")   # quantity="response" (por defecto)
-plt.show()
-```
-
-</details>
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_impedance_es.svg" alt="Módulo de impedancia del altavoz frente a la frecuencia con la línea de impedancia nominal y la línea del 80 % de la nominal" width="82%" />
-
-<details>
-<summary>Ver el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import loudspeaker_characteristics
-
-freqs = np.geomspace(30, 24000, 320)
-spl = 87.0 - 10 * np.log10(1 + (50.0 / freqs) ** 6)
-fz = np.geomspace(20, 20000, 260)
-
-result = loudspeaker_characteristics(
-    freqs, spl, rated_impedance=8.0, sensitivity_band=(200.0, 4000.0),
-    impedance=(fz, 6.6 + 24 * np.exp(-(np.log2(fz / 52.0) ** 2) / 0.12)),
-)
-result.plot(quantity="impedance", language="es")
-plt.show()
-```
-
-</details>
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_thd_es.svg" alt="Distorsión armónica total del altavoz en porcentaje frente a la frecuencia" width="82%" />
-
-<details>
-<summary>Ver el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import loudspeaker_characteristics
-
-freqs = np.geomspace(30, 24000, 320)
-spl = 87.0 - 10 * np.log10(1 + (50.0 / freqs) ** 6)
-thd_f = np.geomspace(50, 5000, 140)
-
-result = loudspeaker_characteristics(
-    freqs, spl, rated_impedance=8.0, sensitivity_band=(200.0, 4000.0),
-    distortion=(thd_f, 0.3 + 2.6 * np.exp(-(np.log2(thd_f / 70.0) ** 2) / 0.45)),
-)
-result.plot(quantity="thd", language="es")
-plt.show()
-```
-
-</details>
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_directivity_es.svg" alt="Respuesta direccional polar del altavoz a 2000 Hz sobre el círculo de referencia de 25 dB de IEC 60263" width="72%" />
-
-<details>
-<summary>Ver el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import loudspeaker_characteristics, radiating_piston
-
-freqs = np.geomspace(30, 24000, 320)
-spl = 87.0 - 10 * np.log10(1 + (50.0 / freqs) ** 6)
-
-result = loudspeaker_characteristics(
-    freqs, spl, rated_impedance=8.0, sensitivity_band=(200.0, 4000.0),
-    directivity=radiating_piston(0.075, np.array([1000.0, 2000.0, 4000.0]),
-                                 angles=np.radians(np.linspace(0, 90, 46))),
-    polar_frequency=2000.0,
-)
-result.plot(quantity="directivity", language="es")
-plt.show()
-```
-
-</details>
-
-La ficha de ejemplo se regenera con `make reports` y se conserva renderizada en
-el repositorio; pulsa la vista previa para abrir el PDF.
-
-<ReportPreview
-	name="iec60268_5_loudspeaker_example"
-	title="Informe de ejemplo de características del altavoz IEC 60268-5 (PDF)"
-	description="Ficha de características nominales del altavoz IEC 60268-5 de una página: una cabecera con el fabricante y el modelo, la tabla de características nominales (impedancia nominal, sensibilidad característica, rangos de frecuencia efectivo y nominal, frecuencia de resonancia, potencias nominales, impedancia mínima e índice de directividad) junto a la respuesta en frecuencia en el eje con su banda de tolerancia y los marcadores del rango efectivo, y los paneles de impedancia, distorsión armónica total y directividad polar, todos trazados según las convenciones de escala de IEC 60263."
-	caption="Ficha de características del altavoz (LoudspeakerCharacteristics.report), la tabla de características nominales IEC 60268-5 junto a la respuesta en el eje y los paneles de impedancia, THD y polar trazados según las convenciones de 25 dB por década y de círculo de referencia de 25 dB de IEC 60263."
-/>
-
-## 8. Informe de características del micrófono (IEC 60268-4)
-
-El compañero de micrófono de la sección 7: las características nominales que
-IEC 60268-4 define en torno a una respuesta en frecuencia de campo libre medida
-se reúnen en un único resultado de **características del micrófono** que
-representa la ficha de características nominales de la norma. Cuatro de los
-números se calculan a partir de las propias definiciones de la norma en lugar
-de solo repetirse:
-
-- **Nivel de sensibilidad** (11.1). La sensibilidad nominal en campo libre $M$
-  (mV/Pa, a la frecuencia de referencia de 1 kHz de 11.3) como nivel,
-  $L_M = 20\lg(M / 1\,\text{V/Pa})$: 12,5 mV/Pa son $-38{,}1$ dB re 1 V/Pa.
-- **Rango de frecuencias efectivo** (12.2). La banda en la que la respuesta,
-  normalizada a 0 dB en la frecuencia de referencia, se mantiene dentro de la
-  tolerancia $\pm$ declarada; los bordes son los cruces interpolados con la
-  tolerancia.
-- **Índice de directividad** (13.2.2). $D = 20\lg(M_0/M_\mathrm{diff})$ con la
-  sensibilidad de campo difuso de la integral de 11.2.2 a) sobre un diagrama
-  con simetría de revolución; el cardioide ideal devuelve $10\lg 3 = 4{,}8$ dB.
-- **Nivel de ruido equivalente** (17.2). La tensión de ruido inherente
-  ponderada sobre la sensibilidad nominal como nivel de presión acústica,
-  $L_N = 20\lg\bigl((U_N/M)/20\,\mu\text{Pa}\bigr)$, con la relación
-  señal-ruido re 1 Pa (94 dB SPL) derivada de él. El nivel de presión acústica de
-  sobrecarga (15.2) se lee de una curva de distorsión frente a nivel en el
-  límite de THD declarado.
-
-```python
-import numpy as np
-from phonometry import microphone_characteristics, ReportMetadata
-
-freqs = np.geomspace(20, 20000, 400)
-response = -10 * np.log10(1 + (30.0 / freqs) ** 4)      # caída en baja frecuencia
-response -= 10 * np.log10(1 + (freqs / 19000.0) ** 8)   # caída en alta frecuencia
-response += 2.0 * np.exp(-(np.log2(freqs / 9000.0) ** 2) / 0.3)  # región de presencia
-
-angles = np.linspace(0, 179, 359)
-cardioid = 20 * np.log10((1 + np.cos(np.radians(angles))) / 2)
-
-result = microphone_characteristics(
-    freqs, response, 12.5, tolerance_db=3.0,          # 12,5 mV/Pa a 1 kHz
-    rated_impedance=150.0, minimum_load_impedance=1000.0,
-    noise_voltage=1.25e-6,                             # ponderada A, V
-    max_spl_thd_percent=0.5,
-    distortion=(np.linspace(100, 140, 81),
-                0.5 * 10 ** ((np.linspace(100, 140, 81) - 130.0) * 0.08)),
-    polar=(angles, cardioid), polar_frequency=1000.0,
-    powering="Phantom P48 (IEC 61938)", supply_current_ma=3.1,
-)
-print(round(result.sensitivity_level_db, 1))            # -38,1 dB re 1 V/Pa
-print(tuple(round(x) for x in result.effective_range))  # Hz
-print(round(result.directivity_index_db, 1))            # 4,8 dB (cardioide)
-print(round(result.equivalent_noise_level_db, 1))       # dB(A)
-
-result.report("microfono.pdf", metadata=ReportMetadata(measurement_standard="IEC 60268-4"),
-              language="es")
-```
-
-`microphone_characteristics` devuelve un `MicrophoneCharacteristics` con el
-`sensitivity_level_db`, el `effective_range`, el `directivity_index_db`, el
-`equivalent_noise_level_db`, el `max_spl_db`, la `signal_to_noise_ratio_db` y
-el `diffuse_field_sensitivity_level_db` calculados, y un `.report()` que
-escribe la ficha. La respuesta de campo libre se dibuja con su banda de
-tolerancia, el marcador de la frecuencia de referencia y los marcadores del
-rango efectivo según la proporción de IEC 60263 (una década de frecuencia igual
-a 25 dB), y el diagrama direccional sobre el círculo de referencia de 25 dB de
-IEC 60263; el espectro de ruido inherente y la curva de distorsión frente a
-nivel (con el límite de THD y el nivel de sobrecarga marcados) alimentan los
-paneles secundarios. Un `requirement` en los metadatos se comprueba como nivel
-de ruido equivalente máximo permitido.
-
-Las características nominales también están disponibles de forma interactiva
-mediante `.plot()`, que dibuja **un concepto por figura** con el mismo código de
-paneles que compone el informe, seleccionado con `quantity`. Al pasar unos ejes
-se dibuja sobre ellos:
-
-```python
-result.plot()                        # respuesta de campo libre (por defecto)
-result.plot(quantity="directivity")  # diagrama polar sobre el círculo de 25 dB
-result.plot(quantity="noise")        # espectro de banda del ruido inherente
-result.plot(quantity="distortion")   # THD frente al nivel de presión acústica
-```
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_response_es.svg" alt="Respuesta relativa de campo libre del micrófono con su banda de tolerancia sombreada, el marcador de la frecuencia de referencia y los marcadores del rango efectivo sobre un eje de frecuencias nominales" width="82%" />
-
-<details>
-<summary>Ver el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import microphone_characteristics
-
-freqs = np.geomspace(20, 20000, 400)
-response = -10 * np.log10(1 + (30.0 / freqs) ** 4)      # caída en baja frecuencia
-response -= 10 * np.log10(1 + (freqs / 19000.0) ** 8)   # caída en alta frecuencia
-response += 2.0 * np.exp(-(np.log2(freqs / 9000.0) ** 2) / 0.3)  # región de presencia
-
-result = microphone_characteristics(freqs, response, 12.5, tolerance_db=3.0)
-result.plot(language="es")   # quantity="response" (por defecto)
-plt.show()
-```
-
-</details>
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_directivity_es.svg" alt="Diagrama direccional cardioide del micrófono a 1000 Hz sobre el círculo de referencia de 25 dB de IEC 60263" width="72%" />
-
-<details>
-<summary>Ver el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import microphone_characteristics
-
-freqs = np.geomspace(20, 20000, 400)
-response = -10 * np.log10(1 + (30.0 / freqs) ** 4)
-angles = np.linspace(0, 179, 359)
-cardioid = 20 * np.log10((1 + np.cos(np.radians(angles))) / 2)
-
-result = microphone_characteristics(
-    freqs, response, 12.5, tolerance_db=3.0,
-    polar=(angles, cardioid), polar_frequency=1000.0,
-)
-result.plot(quantity="directivity", language="es")
-plt.show()
-```
-
-</details>
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_noise_es.svg" alt="Espectro de nivel de banda del ruido inherente del micrófono frente a la frecuencia" width="82%" />
-
-<details>
-<summary>Ver el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import microphone_characteristics
-
-freqs = np.geomspace(20, 20000, 400)
-response = -10 * np.log10(1 + (30.0 / freqs) ** 4)
-noise_f = np.geomspace(20, 20000, 31)
-
-result = microphone_characteristics(
-    freqs, response, 12.5, tolerance_db=3.0, noise_voltage=1.25e-6,
-    noise_spectrum=(noise_f, 6.0 + 12.0 * np.log10(1000.0 / noise_f)),
-)
-result.plot(quantity="noise", language="es")
-plt.show()
-```
-
-</details>
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_distortion_es.svg" alt="Distorsión armónica total del micrófono en porcentaje frente al nivel de presión acústica, con el límite de THD y el nivel de presión acústica de sobrecarga marcados" width="82%" />
-
-<details>
-<summary>Ver el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import microphone_characteristics
-
-freqs = np.geomspace(20, 20000, 400)
-response = -10 * np.log10(1 + (30.0 / freqs) ** 4)
-spl_axis = np.linspace(100, 140, 81)
-
-result = microphone_characteristics(
-    freqs, response, 12.5, tolerance_db=3.0, max_spl_thd_percent=0.5,
-    distortion=(spl_axis, 0.5 * 10 ** ((spl_axis - 130.0) * 0.08)),
-)
-result.plot(quantity="distortion", language="es")
-plt.show()
-```
-
-</details>
-
-La ficha de ejemplo se regenera con `make reports` y se conserva renderizada en
-el repositorio; pulsa la vista previa para abrir el PDF.
-
-<ReportPreview
-	name="iec60268_4_microphone_example"
-	title="Informe de ejemplo de características del micrófono IEC 60268-4 (PDF)"
-	description="Ficha de características nominales del micrófono IEC 60268-4 de una página: una cabecera con el fabricante y el modelo, la tabla de características nominales (sensibilidad en campo libre en mV/Pa y su nivel re 1 V/Pa, rango de frecuencias efectivo, impedancias nominal y de carga mínima, nivel de ruido equivalente, relación señal-ruido, SPL máximo en el límite de THD declarado, índice de directividad y alimentación phantom) junto a la respuesta en frecuencia de campo libre con su banda de tolerancia y los marcadores del rango efectivo, y los paneles de diagrama direccional, espectro de ruido inherente y distorsión, todos trazados según las convenciones de escala de IEC 60263."
-	caption="Ficha de características del micrófono (MicrophoneCharacteristics.report), la tabla de características nominales IEC 60268-4 junto a la respuesta de campo libre, con el diagrama direccional cardioide y los paneles de ruido inherente y THD frente a nivel trazados según las convenciones de 25 dB por década y de círculo de referencia de 25 dB de IEC 60263."
-/>
+Lo que estas mediciones alimentan, al final, es una hoja de datos de
+transductor. Las convenciones de sensibilidad de IEC 60268-5 (donde fallan
+la mayoría de las comparaciones entre hojas de datos), el modelo de
+radiación del pistón en pantalla detrás de la directividad de un cono y el
+informe de características nominales que compone la hoja de datos de la
+norma viven en
+[Caracterización de altavoces (IEC 60268-5)](/phonometry/es/guides/loudspeakers/);
+el lado de micrófono, sus referencias de sensibilidad, patrones
+direccionales, ponderaciones de ruido propio y su propio informe de
+características nominales, vive en
+[Caracterización de micrófonos (IEC 60268-4)](/phonometry/es/guides/microphones/).
 
 ## Qué cubre esta guía
 
@@ -894,29 +349,30 @@ AES17), la intermodulación por modulación y por frecuencia diferencia, la
 intermodulación dinámica (DIM) y la THD ponderada ITU-R BS.468-4, además del
 margen dinámico y el ruido de canal en reposo de AES17-2015. Los
 estimadores de respuesta en frecuencia `H1`/`H2` de Bendat y Piersol y la
-coherencia ordinaria. Las características nominales de micrófono de la
-IEC 60268-4:2014 (sensibilidad, respuesta y rango de frecuencias, índice de
-directividad, nivel de sobrecarga, nivel de ruido equivalente, impedancias y
-alimentación) mediante `microphone_characteristics` y su `.report()`. Las
-características nominales de altavoz de la IEC 60268-5:2003+A1:2007
-(sensibilidad, rango de frecuencias, índice de directividad, THD frente a
-frecuencia) mediante `loudspeaker_characteristics` y su `.report()`, ambas
-trazadas según las convenciones de escala de la IEC 60263. El modelo de
-radiación de pistón con bafle (`radiating_piston`, Beranek y Mellow
-§4.19/§13.7).
+coherencia ordinaria.
 
 **No cubierto.** Otras partes de la serie IEC 60268 quedan fuera de esta
 página: la Parte 16 (inteligibilidad objetiva del habla, el índice de
-transmisión del habla) no está implementada. Las ediciones implementadas
-están fijadas en IEC 60268-4:2014, IEC 60268-5:2003+A1:2007 y AES17-2015; las
-revisiones sucesoras IEC 60268-4:2018 y AES17-2020 no son las comprobadas.
+transmisión del habla) no está implementada, y los informes de
+características nominales de micrófono (Parte 4) y de altavoz (Parte 5) se
+han trasladado a
+[Caracterización de micrófonos](/phonometry/es/guides/microphones/) y
+[Caracterización de altavoces](/phonometry/es/guides/loudspeakers/). Las
+ediciones implementadas están fijadas en AES17-2015; la revisión sucesora
+AES17-2020 no es la comprobada.
 
 ## Véase también
 
-- [Control de ruido industrial](/phonometry/es/guides/noise-control/):
-  silenciadores reactivos, métodos HVAC de conducto y cerramientos de máquina,
-  que comparten el pistón radiante como radiador canónico.
+- [Caracterización de altavoces (IEC 60268-5)](/phonometry/es/guides/loudspeakers/):
+  las convenciones de sensibilidad, el pistón radiante y el informe de
+  características nominales que estas mediciones alimentan.
+- [Caracterización de micrófonos (IEC 60268-4)](/phonometry/es/guides/microphones/):
+  las referencias de sensibilidad del micrófono, sus patrones direccionales,
+  las ponderaciones de ruido y su informe de características nominales.
+- [Control de ruido industrial](/phonometry/es/guides/noise-control/): los
+  métodos HVAC de conducto y los cerramientos de máquina en el lado receptor
+  de un dispositivo ruidoso.
 - [Distorsión con barrido sinusoidal](/phonometry/es/guides/swept-sine-distortion/):
   la separación armónica de Farina/Novak cuya THD(f) alimenta el panel de
   distorsión del altavoz.
-- Referencia de la API: [`electroacoustics.distortion`](/phonometry/es/reference/api/electroacoustics/distortion/), [`electroacoustics.frequency_response`](/phonometry/es/reference/api/electroacoustics/frequency-response/), [`electroacoustics.piston`](/phonometry/es/reference/api/electroacoustics/piston/), [`electroacoustics.loudspeaker`](/phonometry/es/reference/api/electroacoustics/loudspeaker/) y [`electroacoustics.microphone`](/phonometry/es/reference/api/electroacoustics/microphone/).
+- Referencia de la API: [`electroacoustics.distortion`](/phonometry/es/reference/api/electroacoustics/distortion/) y [`electroacoustics.frequency_response`](/phonometry/es/reference/api/electroacoustics/frequency-response/).

@@ -48,9 +48,11 @@ llega.
 Fuentes de transporte y energía con métricas de certificación propias.
 
 - [Ruido de aeronaves: nivel efectivo de ruido percibido](/phonometry/es/guides/aircraft-noise/):
-  el EPNL del Anexo 16 de la ICAO, el verificador de sistemas de medida IEC 61265,
-  la absorción atmosférica SAE ARP 5534 y la interpolación NPD de ECAC
-  Doc 29.
+  el EPNL del Anexo 16 de la ICAO, el verificador de sistemas de medida
+  IEC 61265 y la absorción atmosférica SAE ARP 5534.
+- [Ruido de aeropuertos (ECAC Doc 29)](/phonometry/es/guides/airport-noise/):
+  el motor nivel-potencia-distancia, la cadena de segmentos de evento único y
+  el contorno de SEL en malla de tierra.
 - [Ruido de rotorcraft: el método del hemisferio](/phonometry/es/guides/rotorcraft-noise/):
   el modelo de fuente de hemisferio de ruido de ECAC Doc 32 con sus ajustes
   de propagación.

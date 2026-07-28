@@ -1,0 +1,408 @@
+---
+title: "Silencers"
+description: "Reactive silencers by the four-pole transmission-matrix method: the closed-form expansion chamber, Helmholtz, quarter-wave and extended-tube resonators with transmission and insertion loss, the independent FDTD cross-check, and the design trade-off against dissipative lined silencers."
+references:
+  - type: book
+    authors: ["Bies, D. A.", "Hansen, C. H.", "Howard, C. Q."]
+    year: 2017
+    title: "Engineering noise control"
+    edition: "5th ed."
+    publisher: "CRC Press"
+    doi: "10.1201/9781351228152"
+    note: "The muffler four-pole method, the expansion-chamber TL and the resonator tuning formulas (§8.8-8.9) of this guide."
+  - type: book
+    authors: ["Munjal, M. L."]
+    year: 2014
+    title: "Acoustics of ducts and mufflers"
+    edition: "2nd ed."
+    publisher: "Wiley"
+    doi: "10.1002/9781118443767"
+    note: "The transfer-matrix formulation, the element matrices and the transmission loss from the compound matrix (Eq. (3.27)), and the reference treatment of dissipative and combined mufflers."
+  - type: book
+    authors: ["Vér, I. L.", "Beranek, L. L."]
+    year: 2006
+    title: "Noise and vibration control engineering: Principles and applications"
+    edition: "2nd ed."
+    publisher: "Wiley"
+    doi: "10.1002/9780470172568"
+    note: "The companion treatment of reactive and dissipative silencers."
+---
+
+import ThemeImage from '../../../components/ThemeImage.astro';
+import Video from '../../../components/Video.astro';
+
+A silencer earns its keep in a duct: between an engine and its tailpipe,
+between a fan and the room it serves. Two working principles divide the
+field. A **reactive** silencer attenuates by *reflecting* sound with
+impedance discontinuities (chambers, side branches) and dominates at low
+frequency, where a tone from a firing engine or a fan blade passage can be
+targeted exactly; a **dissipative** silencer *absorbs* sound in a porous
+lining and dominates broadband, at mid and high frequency. This guide
+covers the reactive family phonometry implements with the engineering
+theory of Bies, Hansen & Howard and Munjal's transfer-matrix formulation:
+the four-pole method, the closed-form expansion chamber, the Helmholtz,
+quarter-wave and extended-tube resonators, the independent FDTD
+cross-check, and the design trade-offs against dissipative linings. The
+rest of the installation, HVAC duct attenuation, flow noise and machine
+enclosures, lives in
+[Industrial noise control](/phonometry/guides/noise-control/).
+
+## 1. Reactive silencers (four-pole method)
+
+A reactive silencer attenuates by *reflecting* sound with impedance
+discontinuities. Each acoustic element is a 2x2 **transfer matrix** relating the
+pressure `p` and volume velocity `Su` at its two ends, and a compound silencer
+is the ordered matrix product of its elements (Bies §8.9). A straight duct of
+length `L` and area `S` is
+
+$$
+\begin{bmatrix} \cos kL & j\,\tfrac{\rho c}{S}\sin kL \\[2pt]
+j\,\tfrac{S}{\rho c}\sin kL & \cos kL \end{bmatrix},
+\qquad k = \omega/c,
+$$
+
+and a side branch of impedance $Z_b$ is the shunt
+$\left[\begin{smallmatrix} 1 & 0 \\ 1/Z_b & 1 \end{smallmatrix}\right]$. The
+**transmission loss** follows from the compound matrix $T$ with the port
+impedances $Z_1 = \rho c/S_\text{in}$ and $Z_n = \rho c/S_\text{out}$
+(Munjal Eq. (3.27); Bies Eq. (8.141) prints the $T_{11}$/$T_{22}$ impedance
+weights of this formula inverted and fails the sudden-expansion limit, see the
+[errata registry](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.md))
+
+$$
+\mathrm{TL} = 10\log_{10}\!\left[\frac{Z_n}{Z_1}\,\tfrac{1}{4}\left|\,T_{11}
++ \tfrac{T_{12}}{Z_n} + Z_1\,T_{21} + \tfrac{Z_1}{Z_n}\,T_{22}\right|^2\right],
+$$
+
+which for equal inlet/outlet areas $S$ reduces to (Bies Eq. (8.148))
+
+$$
+\mathrm{TL} = 20\log_{10}\!\left(\tfrac{1}{2}\left|\,T_{11}
++ \tfrac{T_{12}}{Z_c} + Z_c\,T_{21} + T_{22}\right|\right),
+\qquad Z_c = \frac{\rho c}{S},
+$$
+
+and the **insertion loss** for a source impedance $Z_s$ and radiation impedance
+$Z_r$ is the extra attenuation over a direct connection.
+
+### Expansion chamber
+
+The simplest silencer, a chamber of area $S_\text{exp}$ and length $L$ between
+pipes of area $S_\text{duct}$, has the closed-form transmission loss (Bies
+Eq. (8.111)) with area ratio $m = S_\text{exp}/S_\text{duct}$
+
+$$
+\mathrm{TL} = 10\log_{10}\!\left[1 + \tfrac{1}{4}\left(m - \tfrac{1}{m}\right)^2
+\sin^2 kL\right],
+$$
+
+peaking at $10\log_{10}[1 + \tfrac14(m-1/m)^2]$ when $kL = \pi/2, 3\pi/2, \dots$
+and dropping to $0$ at $kL = n\pi$ where the chamber is a half-wavelength long
+and transparent. The four-pole product reproduces this exactly.
+
+```python
+import numpy as np
+from phonometry import expansion_chamber
+
+freqs = np.linspace(20.0, 2000.0, 2000)
+res = expansion_chamber(freqs, length=0.3, chamber_area=0.04, pipe_area=0.01)
+print(round(res.transmission_loss.max(), 2))   # 6.55 dB peak (m = 4)
+# The troughs at f = n c / 2L are exactly 0 dB (no dissipation).
+print(round(float(res.transmission_loss[np.argmin(res.transmission_loss)]), 6))
+```
+
+The one-liner `res.plot()` draws the transmission loss of the chamber (and its
+insertion loss when the source and radiation impedances are given). The figure
+below sweeps the area ratio instead: a larger mismatch $m$ lifts every peak,
+but the troughs stay at 0 dB and the peaks stay at the same frequencies, set
+only by the chamber length.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_expansion_chamber.svg" alt="Expansion-chamber transmission loss against frequency for area ratios m = 2, 4, 8 and 16, showing periodic peaks rising with m at odd multiples of the quarter-wave frequency and troughs returning to 0 dB at every half-wavelength of the chamber length" width="88%" />
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import expansion_chamber
+
+freqs = np.linspace(20.0, 2000.0, 2000)
+
+# One line for one chamber: TL vs frequency (with the insertion loss too if
+# source/radiation impedances are given).
+expansion_chamber(freqs, 0.3, 0.04, 0.01,
+                  source_impedance=4e4, radiation_impedance=5e3).plot()
+plt.show()
+
+# By hand: the family of area ratios of the concept figure.
+fig, ax = plt.subplots()
+for m in (2.0, 4.0, 8.0, 16.0):
+    res = expansion_chamber(freqs, 0.3, m * 0.01, 0.01)
+    ax.plot(freqs, res.transmission_loss, label=f"m = {int(m)}")
+ax.set_xlabel("Frequency [Hz]"); ax.set_ylabel("Transmission loss [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+The numbers passed to `expansion_chamber` describe a real device, and
+`.plot_geometry()` draws it: the same 0.3 m chamber with its 4:1 area ratio,
+to scale and fully dimensioned.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/expansion_chamber_geometry.svg" alt="To-scale cross-section of the expansion-chamber silencer of the transmission-loss example: a 300 mm long chamber of 225.7 mm equivalent diameter inserted between inlet and outlet pipes of 112.8 mm equivalent diameter, with the chamber length and both diameters dimensioned" width="88%" />
+
+*The chamber behind the curves above, to scale: the areas enter the four-pole
+method only through the ratio `m`, and the drawing uses the equivalent
+circular diameters `d = 2√(S/π)` of the 0.04 and 0.01 m² cross-sections.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import expansion_chamber, plot_silencer_geometry
+
+freqs = np.linspace(20.0, 2000.0, 2000)
+res = expansion_chamber(freqs, length=0.3, chamber_area=0.04, pipe_area=0.01)
+
+# One line: the dimensioned cross-section of the chamber just computed.
+res.plot_geometry()
+plt.show()
+
+# The same drawing without a result, from the free function:
+plot_silencer_geometry("expansion chamber", length=0.3,
+                       chamber_area=0.04, pipe_area=0.01)
+plt.show()
+```
+
+</details>
+
+The clip below runs an m = 4 chamber of the same 0.30 m length in a 2D FDTD
+duct at its two characteristic frequencies. At kL = π the chamber is a
+half-wave resonator and the tone crosses as if it were not there; at kL = π/2
+the two area jumps reflect in phase and send the wave back up the inlet, the
+6.5 dB peak of the four-pole curve above.
+
+<Video
+  name="anim_fdtd_expansion_chamber"
+  width={2400}
+  height={1350}
+  title="The expansion-chamber silencer in a 2D FDTD simulation"
+  description="A 2D FDTD duct with a 0.30 m expansion chamber of area ratio 4, drawn as hardware between a loudspeaker and an anechoic termination, at two frequencies side by side. At 572 Hz the pressure envelope stays flat and the tone crosses the chamber unchanged with the annotated transmission loss of 0.0 dB; at 286 Hz a standing wave fills the inlet pipe and the outlet is left with less than half the amplitude, matching the annotated 6.5 dB peak."
+/>
+
+### Side-branch and extended-tube resonators
+
+A **Helmholtz resonator** (neck area $S_n$, effective length $l_e$, cavity
+volume $V$) and a closed **quarter-wave tube** (length $l_e$) each short the
+duct at their tuning frequency, giving a sharp transmission-loss spike there:
+$f_0 = \tfrac{c}{2\pi}\sqrt{S_n/(l_e V)}$ (Bies Eq. (8.46)) and $f = c/4l_e$
+(Eq. (8.44)). An **extended-tube chamber** buries quarter-wave side branches in
+an expansion chamber to fill the plain chamber's troughs.
+
+```python
+import numpy as np
+from phonometry import (
+    helmholtz_resonator, quarter_wave_resonator, extended_tube_chamber,
+)
+
+f = np.linspace(20.0, 600.0, 4000)
+
+hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
+                         neck_length=0.02, cavity_volume=1e-3)
+print(round(float(hr.resonances[0]), 1))       # tuning frequency, Hz
+hr.plot()   # TL spike at the tuning frequency (needs matplotlib)
+
+qw = quarter_wave_resonator(f, duct_area=0.01, length=1.516, branch_area=2e-3,
+                            speed_of_sound=343.24)
+print(round(float(qw.resonances[0]), 1))        # 56.6 Hz (Bies Example 8.1)
+
+# An inlet extension of L/4 fills the first expansion-chamber trough.
+et = extended_tube_chamber(f, length=0.4, chamber_area=0.04, pipe_area=0.01,
+                           inlet_extension=0.1)
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_side_branch.svg" alt="Transmission loss of a Helmholtz resonator and a closed quarter-wave tube on the same 10 cm2 duct: each side branch produces a sharp spike at its own tuning frequency, near 120 Hz for the Helmholtz volume and near 285 Hz for the 0.3 m tube, and is transparent elsewhere" width="88%" />
+
+*Each side branch shorts the duct at its own tuning frequency and is nearly
+transparent elsewhere: the narrow spike is why resonators are matched to a
+firing frequency or a fan blade-passing tone rather than used broadband.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import helmholtz_resonator, quarter_wave_resonator
+
+f = np.linspace(20.0, 600.0, 4000)
+hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
+                         neck_length=0.02, cavity_volume=1e-3)
+qw = quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
+
+# One line for one device: TL vs frequency with the resonance marked.
+hr.plot()
+plt.show()
+
+# By hand: both side branches on the same axes.
+fig, ax = plt.subplots()
+ax.plot(f, hr.transmission_loss, label="Helmholtz resonator")
+ax.plot(f, qw.transmission_loss, "--", label="Quarter-wave tube")
+for fr in (hr.resonances[0], qw.resonances[0]):
+    ax.axvline(float(fr), ls=":", color="#2ca02c")
+ax.set_xlabel("Frequency [Hz]"); ax.set_ylabel("Transmission loss [dB]")
+ax.set_ylim(0.0, 50.0)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+Both branches are small hardware, and `.plot_geometry()` shows just how
+small: the resonator of the 120 Hz spike is a 1 L cavity fed by a 1 cm²
+neck only 2 cm long.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/helmholtz_branch_geometry.svg" alt="To-scale cross-section of the side-branch Helmholtz resonator: a duct of 112.8 mm equivalent diameter with a narrow 11.3 mm neck, 20 mm long, opening into a 1 litre cavity drawn as its equal-volume cube on top of the duct, with the neck diameter, neck length and duct diameter dimensioned" width="88%" />
+
+*The whole 120 Hz notch hangs on a 1 L box and a 2 cm neck: the cavity is
+drawn as its equal-volume cube, and the tuning moves as `√(Sₙ/(l_e V))`, so
+small errors in these dimensions shift the spike off its target.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import helmholtz_resonator
+
+f = np.linspace(20.0, 600.0, 4000)
+hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
+                         neck_length=0.02, cavity_volume=1e-3)
+
+# One line: the side branch drawn to scale, cavity as its equal-volume cube.
+hr.plot_geometry()
+plt.show()
+```
+
+</details>
+
+The quarter-wave tube needs no cavity at all: the 285 Hz spike of the figure
+above comes from a plain closed tube of the right length standing on the
+same duct.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/quarter_wave_geometry.svg" alt="To-scale cross-section of the quarter-wave side branch: a closed tube 300 mm long and 50.5 mm in equivalent diameter standing on a duct of 112.8 mm equivalent diameter, with the tube length, tube diameter and duct diameter dimensioned" width="88%" />
+
+*A quarter-wave stub is just a closed tube of the right length: 0.3 m of
+pipe puts the spike at `c/4l_e ≈ 285 Hz`, and the 20 cm² branch area only
+sets how strongly the stub loads the duct.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import quarter_wave_resonator
+
+f = np.linspace(20.0, 600.0, 4000)
+qw = quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
+
+# One line: the closed 0.3 m tube on its duct, to scale.
+qw.plot_geometry()
+plt.show()
+```
+
+</details>
+
+Each returns a `ReactiveSilencerResult` with `transmission_loss`,
+`insertion_loss` (when impedances are given), the compound `transfer_matrix`
+and `.plot()`. Advanced layouts chain elements directly with `duct_matrix`,
+`shunt_matrix`, `cascade`, `transmission_loss` and `insertion_loss`.
+
+
+## 2. Reactive or dissipative?
+
+Everything above works by reflection, and reflection has a shape: sharp,
+periodic, frequency-selective. The complementary family, **dissipative**
+silencers, replaces the impedance discontinuities with a duct section whose
+walls are lined with porous material (often protected by a perforated
+facing), so the grazing wave loses energy to viscous friction in the lining
+instead of being sent back to the source. The behaviours differ where it
+matters for selection:
+
+- **Frequency reach.** A reactive chamber or resonator is strongest exactly
+  where it is tuned and transparent elsewhere; a lined duct attenuates over
+  a broad band that peaks where the lining depth is comparable with a
+  quarter wavelength. At low frequency a practical lining is acoustically
+  thin and does little, which is the regime where the reactive chamber
+  wins; at high frequency the sound beams down the open airway and passes
+  over the lining, so the attenuation of both families collapses and only
+  splitter geometries (narrow airways, more lined perimeter per unit area)
+  keep working.
+- **Spectrum type.** A tonal source, an engine firing order or a
+  blade-passing frequency, is a resonator's natural prey; broadband fan or
+  flow noise wants the dissipative band. Production exhaust silencers
+  routinely combine the two, packing an expansion chamber with fibre so the
+  reflective troughs of the chamber are filled by absorption.
+- **The medium.** A porous lining in a hot, sooty or pulsating exhaust
+  clogs and degrades, one reason vehicle exhausts are predominantly
+  reactive; clean HVAC air is where dissipative attenuators and lined
+  plenums are the default. In either case the airflow adds its own floor:
+  a silencer regenerates flow noise at its own outlet, and past a certain
+  pressure drop the silencer becomes the noise source.
+
+phonometry models the reactive family in closed form on this page. The
+dissipative side enters through the installation data of the
+[HVAC methods](/phonometry/guides/noise-control/): the lined-elbow
+insertion loss and the lined plenum attenuation of Wells' method, both from
+interpolated ASHRAE data rather than a liner model. The porous physics that
+a first-principles liner calculation needs, the equivalent-fluid models fed
+by the airflow resistivity, is the same material theory as
+[Porous and Multilayer Absorbers](/phonometry/guides/porous-absorbers/).
+
+## Cross-check against the FDTD solver
+
+The four-pole expansion chamber is cross-checked against the independent 2D
+[FDTD wave solver](/phonometry/guides/fdtd-simulation/): a plane-wave duct that
+widens into a chamber and narrows back transmits far less at the four-pole TL
+peak ($kL = \pi/2$) than at the transparent trough ($kL = \pi$), and the
+measured amplitude ratio reproduces the closed-form peak transmission loss to a
+fraction of a decibel.
+
+
+## What this guide covers
+
+**Covered.** Reactive silencers by the four-pole transfer-matrix method
+(Bies §8.8-8.9, Munjal Eq. (3.27)): the closed-form `expansion_chamber`
+(Eq. (8.111)), `helmholtz_resonator` and `quarter_wave_resonator`
+(Eqs. (8.46), (8.44)), `extended_tube_chamber`, and the `duct_matrix`/
+`shunt_matrix`/`cascade`/`transmission_loss`/`insertion_loss` building
+blocks for arbitrary element chains, each with its to-scale
+`.plot_geometry()` drawing, cross-checked against the independent FDTD
+solver.
+
+**Not covered.** Only reactive elements are computed: dissipative
+(absorptive, duct-lining) silencers are discussed for selection but not
+modelled from the liner properties, and the lined-elbow and plenum data of
+the [HVAC methods](/phonometry/guides/noise-control/) are interpolated
+installation tables, not a liner model. Mean-flow effects (convection,
+temperature gradients, flow-dependent impedance of perforates) are outside
+the no-flow element matrices used here.
+
+## See also
+
+- [Industrial noise control](/phonometry/guides/noise-control/): the rest
+  of the installation: HVAC duct attenuation and flow noise, plenums, end
+  reflection and machine enclosures.
+- [2D FDTD wave simulation](/phonometry/guides/fdtd-simulation/): the
+  independent solver behind the expansion-chamber cross-check.
+- [Porous and Multilayer Absorbers](/phonometry/guides/porous-absorbers/):
+  the equivalent-fluid material theory behind dissipative linings.
+- [Loudspeaker Characterisation (IEC 60268-5)](/phonometry/guides/loudspeakers/):
+  the radiating piston, the companion radiator model of a duct's open end.
+- API reference: [`noise_control.silencers`](/phonometry/reference/api/noise_control/silencers/).

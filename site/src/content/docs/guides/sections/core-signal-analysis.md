@@ -43,6 +43,9 @@ blocks and multichannel arrays.
 - [Filter Banks](/phonometry/guides/filter-banks/): the five filter
   architectures, their frequency responses, band decomposition and zero-phase
   offline filtering.
+- [Filter Class Verification (IEC 61260-1)](/phonometry/guides/filter-compliance/):
+  the Table 1 acceptance mask band by band, the class 0 of the withdrawn 1995
+  edition and the compliance fiche.
 - [Block Processing](/phonometry/guides/block-processing/): stateful streaming
   analysis that carries filter state across buffers, for signals that never
   fit in memory.

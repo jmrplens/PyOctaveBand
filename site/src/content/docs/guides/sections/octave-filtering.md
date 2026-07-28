@@ -1,6 +1,6 @@
 ---
 title: "Octave filtering"
-description: "Fractional octave band analysis in phonometry: the ANSI S1.11 / IEC 61260-1 filter banks and their architectures, stateful block processing for streaming signals, and vectorized multichannel analysis."
+description: "Fractional octave band analysis in phonometry: the ANSI S1.11 / IEC 61260-1 filter banks and their architectures, the IEC 61260-1 class verification, stateful block processing for streaming signals, and vectorized multichannel analysis."
 ---
 
 Acoustic analysis rarely wants a raw FFT: standards, ratings and human hearing
@@ -18,6 +18,12 @@ is decomposed into 1/1, 1/3 or arbitrary 1/b octave bands, and the zero-phase
 offline mode for analysis where filter delay must not smear the result. Under
 the hood every bank is a cascade of second-order sections with multirate
 decimation, which is what keeps low-frequency bands numerically stable.
+
+Proving a designed bank against those tolerances is the job of
+[Filter Class Verification (IEC 61260-1)](/phonometry/guides/filter-compliance/):
+the Table 1 acceptance mask band by band, the stricter class 0 of the
+withdrawn 1995 edition, what a performance class buys in a measurement, and
+the accredited one-page compliance fiche.
 
 The other two pages scale that foundation along two independent axes.
 [Block Processing](/phonometry/guides/block-processing/) scales it in *time*:
@@ -37,6 +43,8 @@ parameters) consumes the band signals or band levels these pages produce.
 - [Filter Banks](/phonometry/guides/filter-banks/): the five filter
   architectures, frequency responses, band decomposition and zero-phase
   filtering.
+- [Filter Class Verification (IEC 61260-1)](/phonometry/guides/filter-compliance/):
+  the Table 1 acceptance mask, class 0 and the compliance fiche.
 - [Block Processing](/phonometry/guides/block-processing/): stateful streaming
   workflows with carried filter state.
 - [Multichannel and Performance](/phonometry/guides/multichannel/): vectorized

@@ -174,8 +174,8 @@ print(metrology.verify_filter_class(bank)["overall_class"])    # 1
 The verdicts also come per band, so you can see exactly where a design would
 leave its class corridor. Deep guides:
 [Frequency Weighting](https://jmrplens.github.io/phonometry/guides/weighting/) (section on class
-verification) and [Filter Banks](https://jmrplens.github.io/phonometry/guides/filter-banks/) (class
-compliance).
+verification) and [Filter class verification](https://jmrplens.github.io/phonometry/guides/filter-compliance/) (the
+Table 1 mask, class 0 and the compliance fiche).
 
 ## Where to go next
 

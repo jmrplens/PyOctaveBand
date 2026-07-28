@@ -1,6 +1,6 @@
 ---
 title: "Guías"
-description: "Las 81 guías de phonometry, agrupadas en las nueve áreas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
+description: "Las 89 guías de phonometry, agrupadas en las nueve áreas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
 head:
   - tag: script
     attrs:
@@ -90,7 +90,7 @@ hay ninguna panorámica del campo: cada página es la documentación de trabajo 
 un módulo, escrita para que un resultado se pueda defender apartado por
 apartado en lugar de darlo por bueno.
 
-Esta página es el mapa. Ochenta y una guías repartidas en nueve áreas, y cada
+Esta página es el mapa. Ochenta y nueve guías repartidas en nueve áreas, y cada
 área tiene su propio índice con el relato largo de cómo encajan sus piezas. Si
 llegas sin una pregunta concreta, lee primero la
 [introducción](/phonometry/es/getting-started/): recorre una señal por toda la
@@ -125,6 +125,9 @@ ISO 1996-1, IEC 60942, ISO 18233 y la GUM.
 - [Bancos de filtros](/phonometry/es/guides/filter-banks/): las cinco
   arquitecturas de filtro, sus respuestas en frecuencia, la descomposición en
   bandas y el filtrado de fase cero fuera de línea.
+- [Verificación de clase de filtros (IEC 61260-1)](/phonometry/es/guides/filter-compliance/):
+  la máscara de aceptación de la Tabla 1 banda a banda, la clase 0 de la
+  edición retirada de 1995 y la ficha de conformidad.
 - [Procesado por bloques](/phonometry/es/guides/block-processing/): análisis en
   streaming con estado, que arrastra el estado de los filtros entre búferes,
   para señales que no caben en memoria.
@@ -417,6 +420,9 @@ SAE ARP 5534, Doc 29/32 CEAC e IEC 61400-11.
 - [Ruido de aeronaves: nivel efectivo de ruido percibido](/phonometry/es/guides/aircraft-noise/):
   la ruidosidad percibida y el PNL, la corrección por tonos, la corrección por
   duración y el verificador del sistema de medida.
+- [Ruido de aeropuertos (ECAC Doc 29)](/phonometry/es/guides/airport-noise/):
+  el motor nivel-potencia-distancia, la cadena de evento único por segmentos y
+  el contorno de SEL en malla de tierra.
 - [Ruido de rotorcraft: el método del hemisferio](/phonometry/es/guides/rotorcraft-noise/):
   el modelo de fuente en hemisferio con sus ajustes de propagación, la
   interpolación de condiciones de vuelo y los contornos de suceso único.
@@ -454,20 +460,32 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 y EBU R 128.
 
 - [Intensidad acústica (p-p)](/phonometry/es/guides/intensity/): la intensidad
   con dos micrófonos y los indicadores de campo que cualifican la medida.
-- [Potencia acústica](/phonometry/es/guides/sound-power/): el nivel de potencia
-  acústica por cinco vías, superficie envolvente, cámara reverberante, cámara
-  anecoica y dos grados de barrido de intensidad.
+- [Potencia acústica](/phonometry/es/guides/sound-power/): la elección del
+  método de determinación y la declaración de emisión de ruido según ISO 4871.
+- [Potencia acústica por métodos de presión](/phonometry/es/guides/sound-power-pressure/):
+  la superficie envolvente de ISO 3744/3746 y el grado de precisión anecoico de
+  ISO 3745.
+- [Potencia acústica en cámara reverberante](/phonometry/es/guides/sound-power-reverberation/):
+  los métodos directo y de comparación de ISO 3741.
+- [Potencia acústica por barrido de intensidad](/phonometry/es/guides/sound-power-intensity/):
+  el barrido in situ de ISO 9614-2 y el grado de precisión ISO 9614-3.
 - [Electroacústica: distorsión y respuesta en frecuencia](/phonometry/es/guides/electroacoustics/):
-  la distorsión armónica y de intermodulación, THD+N y SINAD, el rango dinámico,
-  los estimadores H1/H2 de respuesta en frecuencia y los convenios de
-  sensibilidad.
+  la distorsión armónica y de intermodulación, THD+N y SINAD, el rango dinámico
+  y los estimadores H1/H2 de respuesta en frecuencia.
+- [Caracterización de altavoces (IEC 60268-5)](/phonometry/es/guides/loudspeakers/):
+  los convenios de sensibilidad, el pistón radiante y la ficha de
+  características.
+- [Caracterización de micrófonos (IEC 60268-4)](/phonometry/es/guides/microphones/):
+  las referencias de sensibilidad, los patrones direccionales y el ruido propio.
 - [Distorsión con barridos y utilidades de fase](/phonometry/es/guides/swept-sine-distortion/):
   la separación de armónicos a partir de un solo barrido exponencial, la THD
   frente a la frecuencia de excitación, y la fase mínima, el retardo de grupo y
   la fase en exceso.
-- [Control de ruido: silenciadores, HVAC, cerramientos](/phonometry/es/guides/noise-control/):
-  los silenciadores reactivos por el método de la matriz de transferencia, la
-  atenuación y el ruido de flujo en conductos, y la pérdida por inserción de
+- [Silenciadores](/phonometry/es/guides/silencers/): los silenciadores
+  reactivos por el método de matrices de cuatro polos y la elección entre
+  reactivo y disipativo.
+- [Control de ruido industrial: HVAC y cerramientos](/phonometry/es/guides/noise-control/):
+  la atenuación y el ruido de flujo en conductos, y la pérdida por inserción de
   cerramientos.
 - [Sonoridad de programa y pico verdadero](/phonometry/es/guides/program-loudness/):
   la ponderación K y la sonoridad integrada con puerta en LUFS, los medidores

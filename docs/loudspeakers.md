@@ -1,0 +1,377 @@
+← [Documentation index](README.md)
+
+# Loudspeaker Characterisation (IEC 60268-5)
+
+A loudspeaker datasheet is a bundle of conventions, and IEC 60268-5 is the
+standard that fixes them: what "sensitivity" refers to, over which band a
+frequency range is read, how directivity is plotted and at what drive the
+distortion is measured. This guide covers the chain phonometry implements
+around a measured on-axis response: the **sensitivity conventions** where
+cross-datasheet comparisons usually go wrong, the baffled **radiating
+piston** that is the canonical physical model behind a cone's radiation
+impedance and directivity, and the **rated-characteristics report** that
+renders the standard's data sheet, with every panel drawn to the IEC 60263
+scale conventions. The distortion and frequency-response measurements that
+feed it live in [Electroacoustics](electroacoustics.md); the microphone
+counterpart has [its own guide](microphones.md).
+
+## 1. Sensitivity conventions (IEC 60268-5)
+
+Distortion and response figures only compare across devices when the
+*sensitivity* conventions behind them match, and two conventions trip people
+constantly: the microphone reference level and the loudspeaker
+power-and-distance normalization.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_loudspeaker_freefield_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_loudspeaker_freefield.svg" alt="Free-field loudspeaker sensitivity measurement per IEC 60268-5: a loudspeaker on a stand in an anechoic room, driven by an amplifier at 2.83 V, with a measurement microphone at the reference distance r = 1 m on the reference axis, and the governing relations: characteristic sensitivity as Lp at 1 m for 1 W into the rated impedance, the Up = sqrt(R times 1 W) drive voltage, the inverse-distance referral Lp(1 m) = Lp(r) + 20 lg(r / 1 m), and the IEC 60268-4 microphone sensitivity in mV/Pa or dB re 1 V/Pa" width="92%"></picture>
+
+**Loudspeakers (IEC 60268-5 clause 20.3).** The characteristic sensitivity is
+the sound pressure produced at 1 m on the reference axis, in the free field,
+referred to an input of 1 W into the rated impedance; expressed as a level re
+20 µPa (clause 20.4) it is the familiar "dB @ 1 W/1 m". Two normalizations
+hide in that sentence:
+
+- *The electrical one.* The test voltage is `Up = √(R · 1 W)`, numerically
+  `√R`: 2.83 V into a rated 8 Ω. A datasheet quoting "dB @ 2.83 V/1 m" for a
+  4 Ω loudspeaker is feeding it 2 W, which flatters the figure by 3 dB
+  against a true 1 W/1 m rating; check the rated impedance before comparing.
+- *The geometric one.* 1 m is a **reference** distance, not necessarily the
+  measurement distance. The standard has you measure in the far field (at
+  0.5 m or an integer number of metres, clause 7.1) and refer the result back
+  with the inverse-distance law, `Lp(1 m) = Lp(r) + 20 lg(r / 1 m)`. That
+  scaling only holds where the level actually falls 6 dB per doubling of
+  distance, hence the free field of the diagram; at 1 m from a large
+  multi-way cabinet the near field may not have ended yet, and the quoted
+  "1 m" figure is then a referred quantity, not what a microphone placed at
+  1 m would read.
+
+The microphone counterpart, the sensitivity level re 1 V/Pa and its
+reference-value pitfall, is covered in
+[Microphone Characterisation (IEC 60268-4)](microphones.md).
+
+## 2. Radiating piston: radiation impedance and directivity
+
+The rigid circular **piston in an infinite baffle** is the canonical radiator
+behind a loudspeaker cone, the open end of a duct and the radiation efficiency
+of any finite vibrating surface (Beranek & Mellow §4.19, §13.7). Its mechanical
+radiation impedance is `Z_r = rho c S (R1 + j X1)` with `S = pi a^2` and the
+dimensionless resistance and reactance functions (Eqs. (13.117), (13.118))
+
+```
+R1(x) = 1 - 2 J1(x) / x ,   X1(x) = 2 H1(x) / x ,   x = 2ka,
+```
+
+with `J1` the Bessel function and `H1` the Struve function of order one. At low
+frequency `R1 -> (ka)^2 / 2` and the reactance is mass-like with the radiation
+mass `M_r = 8 rho a^3 / 3` (Eq. (4.151)); at high frequency `R1 -> 1`, `X1 -> 0`
+and the piston radiates as into an infinite tube. The far field follows the
+directivity `D(theta) = 2 J1(ka sin theta) / (ka sin theta)`, whose first null
+is at `ka sin theta = 3.8317`.
+
+```python
+import numpy as np
+from phonometry import radiating_piston
+
+res = radiating_piston(radius=0.1, frequencies=np.geomspace(20, 20000, 200),
+                       angles=np.linspace(0.0, np.pi / 2, 91))
+print(round(res.radiation_mass, 4))               # 8 rho a^3 / 3, kg
+print(round(float(res.directivity_index[0]), 2))  # 3.01 dB half-space limit
+res.plot()                                         # R1 and X1 vs ka
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_radiation_impedance_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_radiation_impedance.svg" alt="Normalized radiation resistance R1 and reactance X1 of a 75 mm baffled circular piston against ka on a logarithmic axis: R1 rises from ka squared over two through unity with decaying ripples, while the mass-like X1 peaks near ka of 1.4 and decays, with the high-frequency limit R1 equal to 1 marked" width="82%"></picture>
+
+*The `.plot()` of the result is the classic Beranek & Mellow impedance figure
+computed for this piston: below `ka ≈ 1` the load is almost purely mass-like
+(`X1` dominates and `R1 ∝ (ka)²`, the regime where a loudspeaker's output is
+stiffness- and mass-limited), and above it the resistance settles on `ρcS`
+with interference ripples while the reactance dies away.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import radiating_piston
+
+res = radiating_piston(radius=0.075, frequencies=np.geomspace(20, 20000, 400))
+res.plot()   # normalized R1 and X1 against ka
+plt.show()
+```
+
+</details>
+
+`radiating_piston` returns a `RadiatingPistonResult` with the normalized
+`resistance`/`reactance`, the mechanical `radiation_resistance`/`radiation_reactance`,
+the `radiation_mass`, the `directivity_index`, the far-field `directivity`
+pattern (when `angles` are given) and `.plot()`. The building blocks
+`piston_resistance`, `piston_reactance` and `piston_directivity` are also
+callable directly. The piston is the companion radiator of the
+[reactive silencers](silencers.md).
+
+The far-field **directivity pattern** is a plottable result in its own right:
+`piston_directivity_pattern(ka)` samples `D(theta)` at one or more `ka` values
+and returns a `PistonDirectivity` (the polar angle grid, the linear `directivity`
+and its dB form `directivity_db`, and the `ka` values) whose `.plot()` draws the
+classic polar beam pattern. Several `ka` are shown as one family, so the main
+lobe narrowing and the side lobes appearing read at a glance:
+
+```python
+from phonometry import piston_directivity_pattern
+
+pattern = piston_directivity_pattern([3.0, 8.0, 16.0])
+print(pattern.directivity_db.shape)  # (3, 361): one row per ka
+pattern.plot()                       # polar beam pattern in dB (needs matplotlib)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_directivity_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_directivity.svg" alt="Polar far-field directivity of a baffled circular piston at ka of 3, 8 and 16 over the front hemisphere, the on-axis level at the top as the 0 dB reference, showing the main lobe narrowing and the side lobes appearing as ka grows" width="72%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import piston_directivity_pattern
+
+piston_directivity_pattern([3.0, 8.0, 16.0]).plot()
+plt.show()
+```
+
+</details>
+
+Behind both curves sits the same physical object, and `.plot_geometry()` on
+the piston result draws it: the plate in its rigid baffle to scale, with the
+far-field lobe of the highest computed frequency overlaid on the radiation
+side.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_baffle_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_baffle_geometry.svg" alt="A 10 cm radius rigid piston drawn to scale as a plate of 200 mm diameter set into a hatched vertical baffle, with the piston diameter dimensioned and the normalised far-field directivity lobe at ka of 7.3 overlaid on the radiation side: a long forward main lobe hugging the dotted axis with small side lobes folding back near the plate" width="82%"></picture>
+
+*The piston the impedance and directivity curves describe, to scale: at
+4 kHz this 10 cm radius plate has `ka ≈ 7.3`, so the overlaid lobe is
+already several times narrower than the low-frequency hemisphere and the
+first side lobes have appeared.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import radiating_piston
+
+res = radiating_piston(0.1, np.array([500.0, 2000.0, 4000.0]),
+                       angles=np.linspace(-np.pi / 2, np.pi / 2, 181))
+
+# One line: the piston in its baffle with the lobe of the highest frequency.
+res.plot_geometry()
+plt.show()
+```
+
+</details>
+
+## 3. Loudspeaker characteristics report (IEC 60268-5)
+
+The rated characteristics IEC 60268-5 defines around a measured on-axis
+response gather into a single **loudspeaker characteristics** result that
+renders the standard's rated-characteristics data sheet. Two of the numbers are
+computed from the response rather than merely repeated:
+
+- **Characteristic sensitivity level** (20.3/20.4). The on-axis level averaged
+  over a stated band, referred to 1 W into the rated impedance `R` at 1 m:
+  `LM = L_mean + 20 lg(d/d0) + 20 lg(Up/U)` with `Up = sqrt(R · 1 W) = sqrt(R)`.
+  The default drive is that `sqrt(R)` (2.83 V into 8 Ω), so with a 1 m response
+  the sensitivity level is the band mean.
+- **Effective frequency range** (21.2). The band over which the response stays
+  within 10 dB of the level averaged over the one-octave band in the region of
+  maximum sensitivity; troughs narrower than 1/9 octave are neglected.
+
+```python
+import numpy as np
+from phonometry import loudspeaker_characteristics, radiating_piston, ReportMetadata
+
+freqs = np.geomspace(30, 24000, 320)
+spl = 87.0 + 1.2 * np.sin(2 * np.log2(freqs / 900.0))
+spl -= 10 * np.log10(1 + (50.0 / freqs) ** 6)       # low-frequency roll-off
+spl -= 10 * np.log10(1 + (freqs / 16000.0) ** 7)    # high-frequency roll-off
+
+result = loudspeaker_characteristics(
+    freqs, spl, rated_impedance=8.0, sensitivity_band=(200.0, 4000.0),
+    impedance=(np.geomspace(20, 20000, 260),
+               6.6 + 24 * np.exp(-(np.log2(np.geomspace(20, 20000, 260) / 52.0) ** 2) / 0.12)),
+    distortion=(np.geomspace(50, 5000, 140),
+                0.3 + 2.6 * np.exp(-(np.log2(np.geomspace(50, 5000, 140) / 70.0) ** 2) / 0.45)),
+    directivity=radiating_piston(0.075, np.array([1000.0, 2000.0, 4000.0]),
+                                 angles=np.radians(np.linspace(0, 90, 46))),
+    polar_frequency=2000.0,
+)
+print(round(result.sensitivity_level_db, 1))                 # dB, 1 W / 1 m
+print(tuple(round(x) for x in result.effective_range))       # Hz
+
+result.report("loudspeaker.pdf", metadata=ReportMetadata(measurement_standard="IEC 60268-5"))
+```
+
+`loudspeaker_characteristics` returns a `LoudspeakerCharacteristics` with the
+computed `sensitivity_level_db`, `effective_range`, `reference_level_db`,
+`characteristic_sensitivity_pa` and `minimum_impedance`, and a `.report()` that
+writes the fiche. The on-axis response is drawn with its tolerance band and the
+effective-range markers to the IEC 60263 proportion (one frequency decade equal
+to 25 dB), and the polar directivity on the IEC 60263 25 dB reference circle.
+The impedance modulus (with the 80 %-of-rated line), the total-harmonic-distortion
+curve and the directivity feed the secondary panels, reusing the radiating
+piston directivity of section 2 and a
+[swept-sine THD](swept-sine-distortion.md) result for the distortion curve.
+
+The rated characteristics are also available interactively through `.plot()`,
+which draws **one concept per figure** with the same panel code the report
+composes, selected by `quantity`. Passing an axes draws on it:
+
+```python
+result.plot()                        # on-axis response (default)
+result.plot(quantity="impedance")    # |Z| modulus with the rated / 80 % lines
+result.plot(quantity="thd")          # total harmonic distortion vs frequency
+result.plot(quantity="directivity")  # polar response on the 25 dB circle
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_response_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_response.svg" alt="On-axis sound-pressure-level response with its shaded tolerance band, the -10 dB reference line and the effective-range markers on a nominal-frequency axis" width="82%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import loudspeaker_characteristics
+
+freqs = np.geomspace(30, 24000, 320)
+spl = 87.0 + 1.2 * np.sin(2 * np.log2(freqs / 900.0))
+spl -= 10 * np.log10(1 + (50.0 / freqs) ** 6)       # low-frequency roll-off
+spl -= 10 * np.log10(1 + (freqs / 16000.0) ** 7)    # high-frequency roll-off
+
+result = loudspeaker_characteristics(freqs, spl, rated_impedance=8.0,
+                                     sensitivity_band=(200.0, 4000.0))
+result.plot()   # quantity="response" (the default)
+plt.show()
+```
+
+</details>
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_impedance_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_impedance.svg" alt="Loudspeaker impedance modulus against frequency with the rated-impedance line and the 80 %-of-rated minimum line" width="82%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import loudspeaker_characteristics
+
+freqs = np.geomspace(30, 24000, 320)
+spl = 87.0 - 10 * np.log10(1 + (50.0 / freqs) ** 6)
+fz = np.geomspace(20, 20000, 260)
+
+result = loudspeaker_characteristics(
+    freqs, spl, rated_impedance=8.0, sensitivity_band=(200.0, 4000.0),
+    impedance=(fz, 6.6 + 24 * np.exp(-(np.log2(fz / 52.0) ** 2) / 0.12)),
+)
+result.plot(quantity="impedance")
+plt.show()
+```
+
+</details>
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_thd_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_thd.svg" alt="Loudspeaker total harmonic distortion in percent against frequency" width="82%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import loudspeaker_characteristics
+
+freqs = np.geomspace(30, 24000, 320)
+spl = 87.0 - 10 * np.log10(1 + (50.0 / freqs) ** 6)
+thd_f = np.geomspace(50, 5000, 140)
+
+result = loudspeaker_characteristics(
+    freqs, spl, rated_impedance=8.0, sensitivity_band=(200.0, 4000.0),
+    distortion=(thd_f, 0.3 + 2.6 * np.exp(-(np.log2(thd_f / 70.0) ** 2) / 0.45)),
+)
+result.plot(quantity="thd")
+plt.show()
+```
+
+</details>
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_directivity_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudspeaker_directivity.svg" alt="Loudspeaker polar directional response at 2000 Hz on the IEC 60263 25 dB reference circle" width="72%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import loudspeaker_characteristics, radiating_piston
+
+freqs = np.geomspace(30, 24000, 320)
+spl = 87.0 - 10 * np.log10(1 + (50.0 / freqs) ** 6)
+
+result = loudspeaker_characteristics(
+    freqs, spl, rated_impedance=8.0, sensitivity_band=(200.0, 4000.0),
+    directivity=radiating_piston(0.075, np.array([1000.0, 2000.0, 4000.0]),
+                                 angles=np.radians(np.linspace(0, 90, 46))),
+    polar_frequency=2000.0,
+)
+result.plot(quantity="directivity")
+plt.show()
+```
+
+</details>
+
+The example fiche, regenerated with `make reports`, is kept rendered in the
+repository. Click the preview to open the PDF:
+
+[![IEC 60268-5 loudspeaker characteristics example report: a header with the manufacturer and model, the rated-characteristics table (rated impedance, characteristic sensitivity, effective and rated frequency ranges, resonance frequency, rated powers, minimum impedance and directivity index) beside the on-axis frequency response with its tolerance band and effective-range markers, and the impedance, total-harmonic-distortion and polar-directivity panels, all drawn to the IEC 60263 scale conventions](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iec60268_5_loudspeaker_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iec60268_5_loudspeaker_example.pdf)
+
+*Loudspeaker characteristics fiche (`LoudspeakerCharacteristics.report`), the
+IEC 60268-5 rated-characteristics table beside the on-axis response, impedance,
+THD and polar panels drawn to the IEC 60263 25 dB-per-decade and 25 dB
+reference-circle conventions.*
+
+
+## See also
+
+- [Electroacoustics](electroacoustics.md): the IEC 60268-3 distortion set,
+  THD+N and SINAD, intermodulation and the H1/H2 frequency-response
+  estimators that produce the curves this guide reports.
+- [Microphone Characterisation (IEC 60268-4)](microphones.md): the companion
+  rated-characteristics report for the measuring side of the chain.
+- [Swept-sine distortion](swept-sine-distortion.md): the Farina/Novak
+  harmonic separation whose THD(f) feeds the distortion panel.
+- [Sound Power](sound-power.md): the emission descriptor of sources that are
+  not supposed to make sound.
+- API reference: [`electroacoustics.piston`](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/piston/) and [`electroacoustics.loudspeaker`](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/loudspeaker/).
+
+## References
+
+- Beranek, L. L., & Mellow, T. J. (2012). *Acoustics: Sound fields and
+  transducers*. Academic Press. ISBN 978-0-12-391421-7.
+  [doi:10.1016/C2011-0-05897-0](https://doi.org/10.1016/C2011-0-05897-0).
+  The transducer physics behind sections 1 and 2: loudspeaker radiation,
+  the baffled-piston impedance and directivity (§4.19, §13.7), and the
+  near-field to far-field transition.
+
+## Standards
+
+IEC 60268-5:2003+A1:2007, *Sound system equipment – Part 5: Loudspeakers*:
+the rated loudspeaker characteristics of section 3, namely the rated impedance
+(16), the rated frequency range (19.1), the characteristic sensitivity and
+its level referred to 1 W at 1 m (20.3/20.4), the effective frequency range
+against the −10 dB band (21.2), the directivity index (23.3) and the total
+harmonic distortion against frequency (24.1). IEC 60263:1982, *Scales and
+sizes for plotting frequency characteristics and polar diagrams*: the scale
+proportions of the characteristic graphs, one frequency decade equal to
+25 dB on the ordinate (clause 2) and the polar diagram on a 25 dB
+reference-circle radius (clause 3). The piston quantities are verified
+against exact analytic oracles (the low- and high-frequency limits of the
+radiation impedance and the half-space directivity index).
