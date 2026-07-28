@@ -3,8 +3,8 @@
 # Metadiffusers
 
 A Schroeder diffuser earns its diffusion with depth: the
-[design equations](diffusers.md) turn a phase sequence into wells whose deepest
-run approaches half the design wavelength, so a diffuser for the low hundreds of hertz
+[design equations](diffusers.md) turn a phase sequence into wells whose maximum
+depth approaches half the design wavelength, so a diffuser for the low hundreds of hertz
 is tens of centimetres thick, and that thickness is what keeps phase-grating
 diffusers out of small rooms, studios and vehicles. A **metadiffuser**
 (Jiménez, Cox, Romero-García and Groby, 2017) reaches the same reflection
