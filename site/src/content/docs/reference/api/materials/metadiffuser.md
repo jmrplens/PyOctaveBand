@@ -73,6 +73,7 @@ exactly as the paper reports `delta_n`.
 | `angles` | Receiver reflection angles `theta`, in degrees. |
 | `source_angle` | Angle of incidence `psi`, in degrees. |
 | `periods` | Number of repetitions `N_p` of the single period. |
+| `resonator_geometry` | `"slit"` (default) for the paper's two-dimensional resonators, `"square"` for square-duct necks and cavities. |
 | `speed_of_sound` | Speed of sound `c0` in air, in m/s. |
 | `air_density` | Air density `rho0`, in kg/m3. |
 | `viscosity` | Dynamic viscosity `eta` of air, in Pa s. |
@@ -124,6 +125,7 @@ with
 | `angles` | Receiver reflection angles `theta`, in degrees. |
 | `source_angle` | Angle of incidence `psi` of the source, in degrees; also applied to the local slit reflection. |
 | `periods` | Number of repetitions `N_p` of the single period; the grating lobes of a Schroeder-like design require `periods >= 2`. |
+| `resonator_geometry` | `"slit"` (default) for the paper's two-dimensional resonators, `"square"` for square-duct necks and cavities. |
 | `speed_of_sound` | Speed of sound `c0` in air, in m/s. |
 | `air_density` | Air density `rho0`, in kg/m3. |
 | `viscosity` | Dynamic viscosity `eta` of air, in Pa s. |
@@ -173,6 +175,7 @@ air impedance.
 | `depth` | Panel depth `L` common to all slits, in metres. |
 | `period` | Well pitch `d` along the panel face, in metres. |
 | `angle` | Polar angle of incidence `theta`, in radians. |
+| `resonator_geometry` | `"slit"` (default) for the paper's two-dimensional resonators, `"square"` for square-duct necks and cavities. |
 | `speed_of_sound` | Speed of sound `c0` in air, in m/s. |
 | `air_density` | Air density `rho0`, in kg/m3. |
 | `viscosity` | Dynamic viscosity `eta` of air, in Pa s. |

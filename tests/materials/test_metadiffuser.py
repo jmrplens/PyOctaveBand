@@ -219,9 +219,10 @@ def test_panel_validation() -> None:
     too_tall = [ABSORBER, _well(110.0, 5.0, 20.0, 4.0, 20.0)]
     with pytest.raises(ValueError, match="smaller than the period"):
         metadiffuser_reflection(f, too_tall, depth=0.03, period=0.10)
+    empty_band = np.array([])
     with pytest.raises(ValueError, match="non-empty"):
         metadiffuser_diffusion_spectrum(
-            np.array([]), [ABSORBER, None], depth=0.03, period=0.10
+            empty_band, [ABSORBER, None], depth=0.03, period=0.10
         )
     with pytest.raises(ValueError, match="at least one resonator"):
         MetadiffuserWell(0.01, ())
