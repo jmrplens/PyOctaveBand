@@ -15869,8 +15869,8 @@ Source: https://jmrplens.github.io/phonometry/guides/metadiffusers/
 # Metadiffusers
 
 A Schroeder diffuser earns its diffusion with depth: the
-[design equations](https://jmrplens.github.io/phonometry/guides/diffusers/) turn a phase sequence into wells that run to a
-quarter of the design wavelength, so a diffuser for the low hundreds of hertz
+[design equations](https://jmrplens.github.io/phonometry/guides/diffusers/) turn a phase sequence into wells whose deepest
+run approaches half the design wavelength, so a diffuser for the low hundreds of hertz
 is tens of centimetres thick, and that thickness is what keeps phase-grating
 diffusers out of small rooms, studios and vehicles. A **metadiffuser**
 (Jiménez, Cox, Romero-García and Groby, 2017) reaches the same reflection
@@ -16434,9 +16434,11 @@ principle hiding inside the classical resonant absorbers of the
   section 1 stated for a locally reacting sheet. An MPP over a cavity tuned
   to $r = 1$ is doing precisely what the slit panel does, with the viscous
   loss provided by submillimetre holes instead of a submillimetre slit; what
-  it cannot do is slow the sound, so its cavity depth stays a quarter
-  wavelength deep at resonance and the construction cannot reach the
-  deep-subwavelength regime.
+  it cannot do is slow the sound. Its peak is the mass-spring resonance of
+  the hole mass against the cavity compliance, with cavities of a tenth to
+  a twentieth of a wavelength, an order short of the slit panel's
+  compression, so the construction cannot reach the deep-subwavelength
+  regime.
 - **Membrane and decorated-membrane absorbers** trade the hole viscosity for
   the flexural loss of a limp sheet; the same loss-versus-leakage balance
   governs their peak, and adding masses to the membrane (the decorated
@@ -22487,9 +22489,11 @@ introduction says both should give similar results between 315 Hz and
   is scoped to reflective surfaces and declared unreliable above a measured
   absorption of 0.15, where its confined reflected wave is no longer strong
   enough to resolve.
-- **Sampled area.** The subtraction technique averages roughly 3 m² of
-  surface per position (the 1.34 m sampled-area radius of section 1), a fair
-  sample of texture and joints; the spot method sees only the patch under
+- **Sampled area.** The subtraction technique averages over a patch whose
+  Annex A clear zone extends to the 1.34 m maximum sampled-area radius of
+  section 1 (about 5.6 m² of pavement, with the area actually contributing
+  at each frequency set by the time window), a fair sample of texture and
+  joints; the spot method sees only the patch under
   the tube mouth, so it trades spatial representativeness for the ability to
   sit on a narrow strip, a wheel track, or a laboratory core.
 - **Bandwidth.** 250–4000 Hz against 250–1600 Hz, which matters because the

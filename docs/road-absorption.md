@@ -266,9 +266,11 @@ introduction says both should give similar results between 315 Hz and
   is scoped to reflective surfaces and declared unreliable above a measured
   absorption of 0.15, where its confined reflected wave is no longer strong
   enough to resolve.
-- **Sampled area.** The subtraction technique averages roughly 3 m² of
-  surface per position (the 1.34 m sampled-area radius of section 1), a fair
-  sample of texture and joints; the spot method sees only the patch under
+- **Sampled area.** The subtraction technique averages over a patch whose
+  Annex A clear zone extends to the 1.34 m maximum sampled-area radius of
+  section 1 (about 5.6 m² of pavement, with the area actually contributing
+  at each frequency set by the time window), a fair sample of texture and
+  joints; the spot method sees only the patch under
   the tube mouth, so it trades spatial representativeness for the ability to
   sit on a narrow strip, a wheel track, or a laboratory core.
 - **Bandwidth.** 250–4000 Hz against 250–1600 Hz, which matters because the
