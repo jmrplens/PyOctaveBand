@@ -213,18 +213,62 @@ def test_panel_validation() -> None:
     f = np.array([500.0])
     with pytest.raises(ValueError, match="at least two wells"):
         metadiffuser_reflection(f, [ABSORBER], depth=0.03, period=0.10)
+    not_a_well = [ABSORBER, 0.01]
     with pytest.raises(TypeError, match="MetadiffuserWell"):
-        metadiffuser_reflection(
-            f, [ABSORBER, 0.01], depth=0.03, period=0.10
-        )
+        metadiffuser_reflection(f, not_a_well, depth=0.03, period=0.10)
+    too_tall = [ABSORBER, _well(110.0, 5.0, 20.0, 4.0, 20.0)]
     with pytest.raises(ValueError, match="smaller than the period"):
-        metadiffuser_reflection(
-            f, [ABSORBER, _well(110.0, 5.0, 20.0, 4.0, 20.0)],
-            depth=0.03, period=0.10,
-        )
+        metadiffuser_reflection(f, too_tall, depth=0.03, period=0.10)
     with pytest.raises(ValueError, match="non-empty"):
         metadiffuser_diffusion_spectrum(
             np.array([]), [ABSORBER, None], depth=0.03, period=0.10
         )
     with pytest.raises(ValueError, match="at least one resonator"):
         MetadiffuserWell(0.01, ())
+
+
+def test_square_resonator_geometry_and_validation() -> None:
+    # The square-duct variant runs end to end, and the geometry switch
+    # validates its inputs.
+    f = np.array([500.0, 1000.0])
+    result = metadiffuser_reflection(
+        f, [ABSORBER, None], depth=0.03, period=0.10,
+        resonator_geometry="square",
+    )
+    assert result.reflection.shape == (2, 2)
+    with pytest.raises(ValueError, match="geometry"):
+        metadiffuser_reflection(
+            f, [ABSORBER, None], depth=0.03, period=0.10,
+            resonator_geometry="round",
+        )
+
+
+def test_result_plots_render_and_validate() -> None:
+    # Smoke pass through both renderers, in both languages, plus the
+    # retained-geometry guard of the drawing.
+    matplotlib = pytest.importorskip("matplotlib")
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from phonometry.materials.metadiffuser import MetadiffuserResult
+
+    f = np.arange(400.0, 601.0, 50.0)
+    result = metadiffuser_reflection(
+        f, [ABSORBER, INVERTER], depth=0.03, period=0.10
+    )
+    for language in ("en", "es"):
+        ax = result.plot(language=language)
+        assert ax.get_lines()
+        plt.close(ax.figure)
+        ax = result.plot_geometry(language=language)
+        assert ax.patches
+        plt.close(ax.figure)
+    bare = MetadiffuserResult(
+        frequency=f,
+        reflection=result.reflection,
+        absorption=result.absorption,
+        well_absorption=result.well_absorption,
+    )
+    with pytest.raises(ValueError, match="retain"):
+        bare.plot_geometry()
+    plt.close("all")

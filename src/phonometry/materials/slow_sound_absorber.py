@@ -300,6 +300,61 @@ def _neck_cavity_correction_2d(neck_width: float, cavity_width: float) -> float:
     return float(0.41 * (1.0 - 1.35 * x + 0.31 * x**3) * neck_width)
 
 
+def _slit_resonator_ducts(
+    f: Real, wn: float, wc: float, slit_height: float | None,
+    lattice_step: float | None, end_correction: bool, air: dict[str, Any],
+) -> tuple[Complex, Complex, Complex, Complex, Complex, Complex, float]:
+    """Duct parameters of the 2-D resonator (Sci. Rep. Eqs. (8)-(12))."""
+    if slit_height is None or lattice_step is None:
+        raise ValueError(
+            "The 'slit' resonator geometry requires 'slit_height' and "
+            "'lattice_step'."
+        )
+    h = require_positive(slit_height, "slit_height")
+    a = require_positive(lattice_step, "lattice_step")
+    rho_n, kap_n = slit_effective_properties(f, slit_height=wn, **air)
+    rho_c, kap_c = slit_effective_properties(f, slit_height=wc, **air)
+    z_n = np.asarray(np.sqrt(kap_n * rho_n) / (wn * a),
+                     dtype=np.complex128)
+    z_c = np.asarray(np.sqrt(kap_c * rho_c) / (wc * a),
+                     dtype=np.complex128)
+    dl = 0.0
+    if end_correction:
+        if wn > h:
+            warnings.warn(
+                "The resonator neck is wider than the slit "
+                f"({wn:g} m > {h:g} m); the Dubos neck-to-slit end "
+                "correction is outside its fitted domain and turns "
+                "negative, which effectively decouples the resonator.",
+                SlowSoundAbsorberWarning,
+                stacklevel=3,
+            )
+        dl = _neck_cavity_correction_2d(wn, wc)
+        dl += _neck_slit_correction_2d(wn, h)
+    return rho_n, kap_n, rho_c, kap_c, z_n, z_c, dl
+
+
+def _square_resonator_ducts(
+    f: Real, wn: float, wc: float, slit_height: float | None,
+    lattice_step: float | None, end_correction: bool,
+    props: dict[str, Any],
+) -> tuple[Complex, Complex, Complex, Complex, Complex, Complex, float]:
+    """Duct parameters of the square resonator (APL Eqs. (A23)-(A26))."""
+    rho_n, kap_n = rectangular_duct_properties(f, side=wn, **props)
+    rho_c, kap_c = rectangular_duct_properties(f, side=wc, **props)
+    z_n = np.asarray(np.sqrt(kap_n * rho_n) / wn**2, dtype=np.complex128)
+    z_c = np.asarray(np.sqrt(kap_c * rho_c) / wc**2, dtype=np.complex128)
+    dl = 0.0
+    if end_correction:
+        dl = _neck_cavity_correction(wn, wc)
+        if slit_height is not None and lattice_step is not None:
+            dl += _neck_slit_correction(
+                wn, require_positive(slit_height, "slit_height"),
+                require_positive(lattice_step, "lattice_step"),
+            )
+    return rho_n, kap_n, rho_c, kap_c, z_n, z_c, dl
+
+
 def helmholtz_resonator_impedance(
     frequency: ArrayLike,
     resonator: HelmholtzResonator,
@@ -374,44 +429,14 @@ def helmholtz_resonator_impedance(
     }
     omega = 2.0 * np.pi * f
     if geometry == "slit":
-        if slit_height is None or lattice_step is None:
-            raise ValueError(
-                "The 'slit' resonator geometry requires 'slit_height' and "
-                "'lattice_step'."
-            )
-        h = require_positive(slit_height, "slit_height")
-        a = require_positive(lattice_step, "lattice_step")
-        rho_n, kap_n = slit_effective_properties(f, slit_height=wn, **air)
-        rho_c, kap_c = slit_effective_properties(f, slit_height=wc, **air)
-        z_n = np.sqrt(kap_n * rho_n) / (wn * a)
-        z_c = np.sqrt(kap_c * rho_c) / (wc * a)
-        dl = 0.0
-        if end_correction:
-            if wn > h:
-                warnings.warn(
-                    "The resonator neck is wider than the slit "
-                    f"({wn:g} m > {h:g} m); the Dubos neck-to-slit end "
-                    "correction is outside its fitted domain and turns "
-                    "negative, which effectively decouples the resonator.",
-                    SlowSoundAbsorberWarning,
-                    stacklevel=2,
-                )
-            dl = _neck_cavity_correction_2d(wn, wc)
-            dl += _neck_slit_correction_2d(wn, h)
+        rho_n, kap_n, rho_c, kap_c, z_n, z_c, dl = _slit_resonator_ducts(
+            f, wn, wc, slit_height, lattice_step, end_correction, air,
+        )
     else:
-        props: dict[str, Any] = dict(air, sum_terms=sum_terms)
-        rho_n, kap_n = rectangular_duct_properties(f, side=wn, **props)
-        rho_c, kap_c = rectangular_duct_properties(f, side=wc, **props)
-        z_n = np.sqrt(kap_n * rho_n) / wn**2
-        z_c = np.sqrt(kap_c * rho_c) / wc**2
-        dl = 0.0
-        if end_correction:
-            dl = _neck_cavity_correction(wn, wc)
-            if slit_height is not None and lattice_step is not None:
-                dl += _neck_slit_correction(
-                    wn, require_positive(slit_height, "slit_height"),
-                    require_positive(lattice_step, "lattice_step"),
-                )
+        rho_n, kap_n, rho_c, kap_c, z_n, z_c, dl = _square_resonator_ducts(
+            f, wn, wc, slit_height, lattice_step, end_correction,
+            dict(air, sum_terms=sum_terms),
+        )
     k_n = omega * np.sqrt(rho_n / kap_n)
     k_c = omega * np.sqrt(rho_c / kap_c)
     cos_n, sin_n = np.cos(k_n * ln), np.sin(k_n * ln)

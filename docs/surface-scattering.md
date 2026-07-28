@@ -483,7 +483,7 @@ plt.show()
 ### Metadiffusers: deep-subwavelength Schroeder diffusers
 
 A metadiffuser replaces the deep wells of a Schroeder diffuser with thin
-slits loaded by Helmholtz resonators (Jimenez, Cox, Romero-Garcia and Groby,
+slits loaded by Helmholtz resonators (Jiménez, Cox, Romero-García and Groby,
 2017). Below their resonance the resonators slow the sound inside each slit,
 so a panel a few centimetres thick reaches the reflection phases that a
 classical phase grating needs tens of centimetres of depth for, and driving
@@ -859,7 +859,7 @@ print(round(s_min, 3), round(s_max, 3))    # 0.078 0.086  (metres)
 
 ## References
 
-- Jimenez, N., Cox, T. J., Romero-Garcia, V., & Groby, J.-P. (2017).
+- Jiménez, N., Cox, T. J., Romero-García, V., & Groby, J.-P. (2017).
   Metadiffusers: Deep-subwavelength sound diffusers. *Scientific Reports*,
   7, 5389.
   [doi:10.1038/s41598-017-05710-5](https://doi.org/10.1038/s41598-017-05710-5).

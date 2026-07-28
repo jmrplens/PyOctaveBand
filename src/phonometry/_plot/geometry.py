@@ -1083,6 +1083,30 @@ def plot_slit_absorber_result_geometry(
     )
 
 
+def _draw_metadiffuser_well(ax: Axes, well: Any, x_slit: float,
+                            depth: float, kwargs: dict[str, Any]) -> None:
+    """One slit with its sideways resonator shelves, panel coordinates."""
+    h = float(well.slit_height)
+    _material_rect(ax, x_slit, 0.0, h, depth, "cavity", **kwargs)
+    chain = list(well.resonators)
+    step = depth / len(chain)
+    for m, resonator in enumerate(chain):
+        w_n = float(resonator.neck_side)
+        l_n = float(resonator.neck_length)
+        w_c = float(resonator.cavity_side)
+        l_c = float(resonator.cavity_length)
+        y_m = depth - (m + 0.5) * step
+        x_neck = x_slit + h
+        _material_rect(
+            ax, x_neck, y_m - 0.5 * w_n, l_n, w_n, "cavity",
+            edgecolor=_C_EDGE, linewidth=0.5,
+        )
+        _material_rect(
+            ax, x_neck + l_n, y_m - 0.5 * w_c, l_c, w_c, "cavity",
+            edgecolor=_C_EDGE, linewidth=0.5,
+        )
+
+
 def plot_metadiffuser_panel_geometry(
     wells: Sequence[Any],
     ax: Axes | None = None,
@@ -1094,12 +1118,12 @@ def plot_metadiffuser_panel_geometry(
 ) -> Axes:
     """Draw one period of a metadiffuser panel, to scale.
 
-    Side cut of the slotted panel (Sci. Rep. 7:5389 Fig. 1(b), rotated so
-    the depth runs left to right): each well is a slit of height ``h_n``
-    running from the mouth at the left into the panel, loaded by its
-    resonators at the lattice step ``a = L / M``; ``None`` wells are flat
-    rigid strips; rigid back wall at the right; the face repeats
-    vertically with the well pitch ``d``.
+    Side cut of the slotted panel (Sci. Rep. 7:5389 Fig. 1(b)): the face
+    runs along the top with the sound arriving from above, the wells
+    repeat horizontally at the pitch ``d``, and each well is a slit of
+    height ``h_n`` descending the panel depth, loaded by its resonators
+    at the lattice step ``a = L / M`` shelved sideways into the septum;
+    ``None`` wells are flat rigid strips; rigid back wall underneath.
 
     :param wells: The well sequence of
         :func:`~phonometry.materials.metadiffuser.metadiffuser_reflection`
@@ -1137,31 +1161,11 @@ def plot_metadiffuser_panel_geometry(
     )
     back = 0.4 * depth
     _material_rect(ax, -0.01 * total, -back, 1.02 * total, back, "rigid")
+    kwargs.setdefault("linewidth", 0.5)
     for index, well in enumerate(cells):
-        x0 = index * d
-        if well is None:
-            continue
-        h = float(well.slit_height)
-        x_slit = x0 + 0.12 * d
-        kwargs.setdefault("linewidth", 0.5)
-        _material_rect(ax, x_slit, 0.0, h, depth, "cavity", **kwargs)
-        chain = list(well.resonators)
-        step = depth / len(chain)
-        for m, resonator in enumerate(chain):
-            w_n = float(resonator.neck_side)
-            l_n = float(resonator.neck_length)
-            w_c = float(resonator.cavity_side)
-            l_c = float(resonator.cavity_length)
-            y_m = depth - (m + 0.5) * step
-            x_neck = x_slit + h
-            _material_rect(
-                ax, x_neck, y_m - 0.5 * w_n, l_n, w_n, "cavity",
-                edgecolor=_C_EDGE, linewidth=0.5,
-            )
-            _material_rect(
-                ax, x_neck + l_n, y_m - 0.5 * w_c, l_c, w_c, "cavity",
-                edgecolor=_C_EDGE, linewidth=0.5,
-            )
+        if well is not None:
+            _draw_metadiffuser_well(ax, well, index * d + 0.12 * d, depth,
+                                    kwargs)
     for index, well in enumerate(cells):
         if well is None:
             continue

@@ -199,6 +199,9 @@ def metadiffuser_reflection(
     :param depth: Panel depth ``L`` common to all slits, in metres.
     :param period: Well pitch ``d`` along the panel face, in metres.
     :param angle: Polar angle of incidence ``theta``, in radians.
+    :param resonator_geometry: ``"slit"`` (default) for the paper's
+        two-dimensional resonators, ``"square"`` for square-duct necks
+        and cavities.
     :param speed_of_sound: Speed of sound ``c0`` in air, in m/s.
     :param air_density: Air density ``rho0``, in kg/m3.
     :param viscosity: Dynamic viscosity ``eta`` of air, in Pa s.
@@ -275,6 +278,9 @@ def metadiffuser_polar_response(
         degrees; also applied to the local slit reflection.
     :param periods: Number of repetitions ``N_p`` of the single period; the
         grating lobes of a Schroeder-like design require ``periods >= 2``.
+    :param resonator_geometry: ``"slit"`` (default) for the paper's
+        two-dimensional resonators, ``"square"`` for square-duct necks
+        and cavities.
     :param speed_of_sound: Speed of sound ``c0`` in air, in m/s.
     :param air_density: Air density ``rho0``, in kg/m3.
     :param viscosity: Dynamic viscosity ``eta`` of air, in Pa s.
@@ -338,6 +344,9 @@ def metadiffuser_diffusion_spectrum(
     :param angles: Receiver reflection angles ``theta``, in degrees.
     :param source_angle: Angle of incidence ``psi``, in degrees.
     :param periods: Number of repetitions ``N_p`` of the single period.
+    :param resonator_geometry: ``"slit"`` (default) for the paper's
+        two-dimensional resonators, ``"square"`` for square-duct necks
+        and cavities.
     :param speed_of_sound: Speed of sound ``c0`` in air, in m/s.
     :param air_density: Air density ``rho0``, in kg/m3.
     :param viscosity: Dynamic viscosity ``eta`` of air, in Pa s.

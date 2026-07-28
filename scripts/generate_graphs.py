@@ -7954,17 +7954,22 @@ def generate_qrd_geometry(output_dir: str) -> None:
     plt.close()
 
 
+#: Table-1 metadiffuser rows (slit h, neck l_n, cavity l_c, neck w_n,
+#: cavity w_c, in mm), shared by the figures and the animation mesh.
+_METADIFFUSER_T1_ROWS = (
+    (14.7, 13.0, 16.4, 6.2, 9.0),
+    (30.9, 9.1, 4.3, 3.5, 9.0),
+    (30.9, 9.1, 4.3, 3.5, 9.0),
+    (15.7, 13.3, 17.0, 6.3, 9.0),
+    (20.3, 18.0, 20.7, 3.2, 9.0),
+)
+
+
 def _qr_metadiffuser_wells() -> tuple[Any, float, float]:
     """The published 2 cm quadratic-residue metadiffuser (wells, L, d)."""
     from phonometry import HelmholtzResonator, MetadiffuserWell
 
-    rows = [
-        (14.7, 13.0, 16.4, 6.2, 9.0),
-        (30.9, 9.1, 4.3, 3.5, 9.0),
-        (30.9, 9.1, 4.3, 3.5, 9.0),
-        (15.7, 13.3, 17.0, 6.3, 9.0),
-        (20.3, 18.0, 20.7, 3.2, 9.0),
-    ]
+    rows = _METADIFFUSER_T1_ROWS
     wells = [
         MetadiffuserWell(
             h * 1e-3,
@@ -14574,7 +14579,7 @@ def animate_fdtd_diffusion(output_dir: str) -> None:
 
     ims: list[Any] = []
     d_txts: list[Any] = []
-    for col in range(3):
+    for col in range(2):
         ax_t = fig.add_subplot(gs[0, col])
         ax_s = fig.add_subplot(gs[1, col])
         im_t = ax_t.imshow(tot_all[col][0], origin="lower",
@@ -14656,13 +14661,7 @@ def _metadiffuser_panel_mask(rho: Any) -> None:
     to-scale drawing uses (slit at 0.12 d into the cell, lattice a = L/2).
     """
     dx, y1 = _META_DX, _META_FACE
-    rows = [
-        (14.7, 13.0, 16.4, 6.2, 9.0),
-        (30.9, 9.1, 4.3, 3.5, 9.0),
-        (30.9, 9.1, 4.3, 3.5, 9.0),
-        (15.7, 13.3, 17.0, 6.3, 9.0),
-        (20.3, 18.0, 20.7, 3.2, 9.0),
-    ]
+    rows = _METADIFFUSER_T1_ROWS
     depth, back = 0.02, 0.003
     rho[round((y1 - depth - back) / dx):round(y1 / dx),
         round(_META_XL / dx):round((_META_XL + _META_PERIODS * 5
@@ -14854,12 +14853,12 @@ def _metadiffuser_fields(
             scat = frames[kind] - frames["ref"]
             scat[:, :face_row, :] = 0.0
             running = np.zeros_like(scat[0])
-            history = []
+            history = np.empty_like(scat)
             for k in range(scat.shape[0]):
                 np.maximum(running * decay, np.abs(scat[k]), out=running)
-                history.append(running.copy())
+                history[k] = running
             tot_list.append(frames[kind].astype(np.float32))
-            trail_list.append(np.stack(history))
+            trail_list.append(history)
         tot = np.stack(tot_list)
         trail = np.stack(trail_list)
         times = np.asarray(sample_steps, dtype=np.float64) * dt
@@ -14873,7 +14872,7 @@ def _metadiffuser_fields(
         tot = np.stack([part[0] for part in parts])
         trail = np.stack([part[1] for part in parts])
         times = parts[0][2]
-    ref = float(trail[:, trail.shape[1] // 3:].max())
+    ref = float(trail[:, trail.shape[1] // 3:].max()) or 1.0
     with np.errstate(divide="ignore"):
         trail_db = 20.0 * np.log10(trail / ref)
     trail_db = np.clip(trail_db, -30.0, 0.0).astype(np.float32)
@@ -14882,9 +14881,9 @@ def _metadiffuser_fields(
 
 def animate_fdtd_metadiffuser(output_dir: str) -> None:
     """The 27 cm deep Schroeder QRD vs the 2 cm metadiffuser that mimics
-    it (2D FDTD at 1 mm, real slits, necks and cavities meshed): the same
-    2 kHz wavefront leaves near-identical scattered fans and diffusion
-    coefficients, from a panel 13.7 times thinner."""
+    it, next to a flat control slab (2D FDTD at 0.25 mm, real slits, necks
+    and cavities meshed): the same 2 kHz wavefront leaves the same kind of
+    scattered fan, from a panel 13.7 times thinner."""
     from matplotlib import patheffects
     from matplotlib.patches import Polygon, Rectangle
 

@@ -36,7 +36,7 @@ reduced to the ISO 17497-2 directional diffusion coefficient.
 ```python
 metadiffuser_diffusion_spectrum(
     frequencies: ArrayLike,
-    wells: ArrayLike,
+    wells: Sequence[MetadiffuserWell | None],
     *,
     depth: float,
     period: float,
@@ -87,7 +87,7 @@ exactly as the paper reports `delta_n`.
 ```python
 metadiffuser_polar_response(
     frequency: float,
-    wells: ArrayLike,
+    wells: Sequence[MetadiffuserWell | None],
     *,
     depth: float,
     period: float,
@@ -138,7 +138,7 @@ with
 ```python
 metadiffuser_reflection(
     frequency: ArrayLike,
-    wells: ArrayLike,
+    wells: Sequence[MetadiffuserWell | None],
     *,
     depth: float,
     period: float,
