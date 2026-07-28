@@ -2343,7 +2343,7 @@ Source: https://jmrplens.github.io/phonometry/guides/system-measurement/
 
 # System measurement: Golay, shaped sweeps, inversion
 
-The [room-acoustics guide](https://jmrplens.github.io/phonometry/guides/sections/room-acoustics/) recovers
+The [room-acoustics guide](https://jmrplens.github.io/phonometry/guides/room-acoustics/) recovers
 impulse responses with the two ISO 18233 work-horses - the exponential sweep
 and the MLS. This page adds the measurement-engineering layer around them,
 from the transfer-function literature rather than a standard: **complementary
@@ -2456,7 +2456,7 @@ plt.show()
 The result is the same
 `ImpulseResponseResult` the sweep
 and MLS front ends return, so everything downstream -
-[room parameters](https://jmrplens.github.io/phonometry/guides/sections/room-acoustics/), decay curves,
+[room parameters](https://jmrplens.github.io/phonometry/guides/room-acoustics/), decay curves,
 [STI](https://jmrplens.github.io/phonometry/guides/speech-transmission/) - consumes it unchanged.
 Recordings spanning several periods are synchronously averaged, so
 uncorrelated background noise falls by 3 dB per doubling while the
@@ -2547,7 +2547,7 @@ loudspeaker's power-handling limits) buys a frequency-independent SNR that no
 post-processing can recover (Mueller & Massarani Sec. 3).
 
 Deconvolution needs nothing new - the result acts as its own reference array
-for the [spectral method](https://jmrplens.github.io/phonometry/guides/sections/room-acoustics/) of
+for the [spectral method](https://jmrplens.github.io/phonometry/guides/room-acoustics/) of
 `impulse_response`, which divides the sweep's coloration out again:
 
 ```python
@@ -2714,7 +2714,7 @@ sweep.plot()   # waveform and spectrum against the inverted-response target
 ## Relation to the other tools
 
 The Golay pair joins `sweep_signal` and `mls_signal` in the
-[ISO 18233 acquisition family](https://jmrplens.github.io/phonometry/guides/sections/room-acoustics/); pick the
+[ISO 18233 acquisition family](https://jmrplens.github.io/phonometry/guides/room-acoustics/); pick the
 sweep for distortion rejection, the MLS for legacy hardware, the pair when
 exact noise-free deconvolution of a time-invariant system matters (HRTF rigs,
 calibration fixtures). Harmonic analysis of what sweeps *discard* lives in
@@ -2722,7 +2722,7 @@ calibration fixtures). Harmonic analysis of what sweeps *discard* lives in
 machinery used to verify the shaped sweep is the
 [calibrated spectral analysis](https://jmrplens.github.io/phonometry/guides/spectral-analysis/) page,
 and the equalized responses feed the same downstream chain as every
-[impulse response](https://jmrplens.github.io/phonometry/guides/sections/room-acoustics/).
+[impulse response](https://jmrplens.github.io/phonometry/guides/room-acoustics/).
 
 ## References
 

@@ -583,7 +583,7 @@ it; the list grows as guides gain their References sections.
   The comprehensive treatment of airborne and impact sound insulation:
   measurement chains, flanking transmission and the EN 12354 prediction
   framework.
-  Cited by [Field Insulation Measurement and Ratings](insulation-field.md),
+  Cited by [Field Insulation Measurement (ISO 16283)](insulation-field.md),
   [Laboratory Insulation Measurement](insulation-lab.md),
   [Predicting Sound Insulation (EN 12354)](insulation-prediction.md),
   [Bending-wave transmission at plate junctions](junction-transmission.md) and
@@ -593,7 +593,7 @@ it; the list grows as guides gain their References sections.
   [doi:10.1201/9781482266016](https://doi.org/10.1201/9781482266016).
   A compact textbook on sound transmission in buildings, from single and
   double constructions to floating floors.
-  Cited by [Field Insulation Measurement and Ratings](insulation-field.md),
+  Cited by [Field Insulation Measurement (ISO 16283)](insulation-field.md),
   [Laboratory Insulation Measurement](insulation-lab.md) and
   [Dynamic stiffness of resilient materials](dynamic-stiffness.md).
 - International Organization for Standardization. (2020). *Acoustics —
@@ -601,13 +601,13 @@ it; the list grows as guides gain their References sections.
   Airborne sound insulation* (ISO 717-1:2020).
   [iso.org catalogue](https://www.iso.org/standard/77435.html).
   The reference-curve rating and the spectrum adaptation terms C and Ctr.
-  Cited by [Field Insulation Measurement and Ratings](insulation-field.md).
+  Cited by [Field Insulation Measurement (ISO 16283)](insulation-field.md).
 - International Organization for Standardization. (2014). *Acoustics — Field
   measurement of sound insulation in buildings and of building elements —
   Part 1: Airborne sound insulation* (ISO 16283-1:2014).
   [iso.org catalogue](https://www.iso.org/standard/55997.html).
   The field airborne measurement method.
-  Cited by [Field Insulation Measurement and Ratings](insulation-field.md).
+  Cited by [Field Insulation Measurement (ISO 16283)](insulation-field.md).
 - International Organization for Standardization. (1989). *Acoustics —
   Determination of dynamic stiffness — Part 1: Materials used under floating
   floors in dwellings* (ISO 9052-1:1989).

@@ -1370,7 +1370,7 @@ harmonic phases carry no residual sub-sample skew.
 
 Recordings made with the plain exponential sweep of
 `phonometry.sweep_signal` (the ISO 18233 excitation used by
-[`impulse_response`](https://jmrplens.github.io/phonometry/guides/sections/room-acoustics/)) are analysed with
+[`impulse_response`](https://jmrplens.github.io/phonometry/guides/room-acoustics/)) are analysed with
 `method="farina"`: the same windowing over the time-reversed,
 amplitude-compensated inverse filter of Farina (2000). The harmonic
 **magnitudes** and the THD are correct (the Chebyshev oracle passes
@@ -1483,7 +1483,7 @@ grids.
 
 ## Relation to other tools
 
-- [`impulse_response`](https://jmrplens.github.io/phonometry/guides/sections/room-acoustics/) recovers the *linear* IR from the
+- [`impulse_response`](https://jmrplens.github.io/phonometry/guides/room-acoustics/) recovers the *linear* IR from the
   same sweep recording and simply discards the negative-time distortion
   products; `swept_sine_distortion` is the tool that reads them.
 - [`thd` / `harmonic_analysis`](https://jmrplens.github.io/phonometry/guides/electroacoustics/) measure distortion
@@ -1878,7 +1878,7 @@ The stacked layout (compliance table on top, plot below) differs from the
 narrow two-panel body of the other fiches because the compliance table needs
 four columns and the loudness-vs-time trace is landscape. It uses the same
 `ReportMetadata` container and rendering engine as the
-[ISO 717 insulation fiche](https://jmrplens.github.io/phonometry/guides/insulation-field/#report-metadata-reportmetadata);
+[ISO 717 insulation fiche](https://jmrplens.github.io/phonometry/guides/insulation-ratings/#report-metadata-reportmetadata);
 a supplied `requirement` is read as the target programme loudness in LUFS
 (defaulting to the EBU R 128 −23.0 LUFS), and the fiche passes when the
 integrated loudness is within the selected R 128 tolerance of it and the true

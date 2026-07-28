@@ -1,6 +1,6 @@
 ---
 title: "Medición del aislamiento en laboratorio"
-description: "Caracterización en laboratorio de elementos constructivos (ISO 10140), aislamiento acústico por intensidad (ISO 15186), mejora a impactos de revestimientos de suelo en maqueta pequeña (ISO 16251-1) y transmisión por flancos en laboratorio (ISO 10848)."
+description: "Caracterización en laboratorio de elementos constructivos (ISO 10140): el índice de reducción acústica R y el nivel de impactos normalizado Ln medidos con los flancos suprimidos, la corrección de ruido de fondo y las fichas de ensayo acreditadas."
 references:
   - type: book
     authors: ["Hopkins, C."]
@@ -8,7 +8,7 @@ references:
     title: "Sound insulation"
     publisher: "Butterworth-Heinemann"
     doi: "10.4324/9780080550473"
-    note: "La monografía de referencia para la medición del aislamiento en laboratorio, la transmisión por flancos y el índice de reducción de vibraciones. ISBN 978-0-7506-6526-1."
+    note: "La monografía de referencia de la medición del aislamiento acústico en laboratorio y la interpretación de los índices de laboratorio. ISBN 978-0-7506-6526-1."
   - type: book
     authors: ["Vigran, T. E."]
     year: 2008
@@ -37,82 +37,26 @@ references:
     designation: "ISO 10140-4:2010"
     url: "https://www.iso.org/standard/42090.html"
     note: "Los procedimientos de medición y la corrección de ruido de fondo comunes al R aéreo y al Ln de impactos."
-  - type: standard
-    organization: "International Organization for Standardization"
-    year: 2000
-    title: "Acoustics — Measurement of sound insulation in buildings and of building elements using sound intensity — Part 1: Laboratory measurements"
-    designation: "ISO 15186-1:2000"
-    url: "https://www.iso.org/standard/26097.html"
-    note: "El índice de reducción acústica por intensidad R_I, su forma modificada por Kc y la diferencia de niveles normalizada por elemento (laboratorio); la herramienta preferida cuando la transmisión por flancos es alta (cláusula 1)."
-  - type: standard
-    organization: "International Organization for Standardization"
-    year: 2003
-    title: "Acoustics — Measurement of sound insulation in buildings and of building elements using sound intensity — Part 2: Field measurements"
-    designation: "ISO 15186-2:2003"
-    url: "https://www.iso.org/standard/30105.html"
-    note: "La contraparte en campo del método por intensidad, que da el índice aparente R'_I."
-  - type: standard
-    organization: "International Organization for Standardization"
-    year: 2014
-    title: "Acoustics — Laboratory measurement of the reduction of transmitted impact noise by floor coverings on a small floor mock-up — Part 1: Heavyweight compact floor"
-    designation: "ISO 16251-1:2014"
-    url: "https://www.iso.org/standard/56017.html"
-    note: "El método de laboratorio en maqueta pequeña para la mejora a impactos ΔL de revestimientos de suelo blandos y de reacción local, con ΔL_w vía el suelo de referencia de ISO 717-2 y el término de adaptación CI,delta."
-  - type: article
-    authors: ["Foret, R.", "Chéné, J.-B.", "Guigou-Carter, C."]
-    year: 2011
-    title: "A comparison of the reduction of transmitted impact noise by floor coverings measured using ISO 140-8 and ISO/CD 16251-1"
-    journal: "Forum Acusticum 2011, Aalborg (CSTB)"
-    note: "El espectro de mejora de una moqueta textil real usado como ejemplo de ISO 16251-1 en esta página (ΔL_w = 29 dB); su ΔL por bandas se digitalizó de su Figura 4."
-  - type: standard
-    organization: "International Organization for Standardization"
-    year: 2020
-    title: "Acoustics — Rating of sound insulation in buildings and of building elements — Part 2: Impact sound insulation"
-    designation: "ISO 717-2:2020"
-    url: "https://www.iso.org/standard/69867.html"
-    note: "El motor de valoración de impactos de un solo número reutilizado aquí y el suelo de referencia L_n,r,0 (Tabla 4) detrás de ΔL_w, con el término de adaptación espectral CI,delta de la Fórmula (A.4)."
-  - type: standard
-    organization: "International Organization for Standardization"
-    year: 2006
-    title: "Acoustics — Laboratory measurement of the flanking transmission of airborne and impact sound between adjoining rooms — Part 1: Frame document"
-    designation: "ISO 10848-1:2006"
-    url: "https://www.iso.org/standard/38284.html"
-    note: "El documento marco de la medición de la transmisión por flancos: definiciones, el índice de reducción de vibraciones Kij, la longitud de absorción equivalente y los descriptores de flanco normalizados D_n,f / L_n,f que alimentan la predicción EN 12354. Como ISO 10848 no contiene ningún ejemplo numérico resuelto, la conformidad se ancla en identidades de forma cerrada."
-  - type: standard
-    organization: "International Organization for Standardization"
-    year: 2006
-    title: "Acoustics — Laboratory measurement of the flanking transmission of airborne and impact sound between adjoining rooms — Part 2: Application to light elements when the junction has a small influence"
-    designation: "ISO 10848-2:2006"
-    url: "https://www.iso.org/standard/35004.html"
-    note: "Aplicación a elementos ligeros cuya unión tiene una influencia pequeña."
-  - type: standard
-    organization: "International Organization for Standardization"
-    year: 2006
-    title: "Acoustics — Laboratory measurement of the flanking transmission of airborne and impact sound between adjoining rooms — Part 3: Application to light elements when the junction has a substantial influence"
-    designation: "ISO 10848-3:2006"
-    url: "https://www.iso.org/standard/35003.html"
-    note: "Aplicación a elementos ligeros cuya unión tiene una influencia sustancial."
-  - type: standard
-    organization: "International Organization for Standardization"
-    year: 2010
-    title: "Acoustics — Laboratory measurement of the flanking transmission of airborne and impact sound between adjoining rooms — Part 4: Application to junctions with at least one heavy element"
-    designation: "ISO 10848-4:2010"
-    url: "https://www.iso.org/standard/45360.html"
-    note: "Aplicación a uniones con al menos un elemento pesado, con las comprobaciones de validez por densidad modal, número de modos por banda y solapamiento modal (bandas con M < 0,25 acotadas, Cláusula 9)."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
 
-Para valorar un elemento constructivo por sí solo (un tipo de pared, un suelo
-flotante, una ventana) se lleva a un laboratorio cualificado, donde la
-transmisión por flancos suprimida hace que la transmisión directa sea toda la
-historia. Esta página cubre la cadena de laboratorio: el índice de reducción
-acústica y el nivel de impactos normalizado de ISO 10140, la alternativa por
-intensidad acústica de ISO 15186, la mejora de revestimientos de suelo en maqueta
-pequeña de ISO 16251-1 y la medición de la transmisión por flancos de
-ISO 10848. La medición en campo y sus índices están en
-[Medición del aislamiento en campo e índices](/phonometry/es/guides/insulation-field/),
+Para valorar un elemento constructivo por sí mismo (un tipo de pared, un
+suelo flotante, una ventana) se lleva a un laboratorio cualificado, donde
+los flancos suprimidos hacen de la transmisión directa toda la historia.
+Esta página cubre la cadena de laboratorio de ISO 10140: el índice de
+reducción acústica $R$, el nivel de impactos normalizado $L_n$, la
+corrección de ruido de fondo y las fichas de ensayo acreditadas. Tres
+métodos de laboratorio hermanos tienen guías propias:
+[Aislamiento acústico por intensidad (ISO 15186)](/phonometry/es/guides/insulation-intensity/),
+[Mejora del aislamiento a impacto de suelos (ISO 16251-1)](/phonometry/es/guides/impact-improvement/)
+y
+[Transmisión por flancos en laboratorio (ISO 10848)](/phonometry/es/guides/flanking-lab/).
+La medición en campo vive en
+[Medición del aislamiento en campo (ISO 16283)](/phonometry/es/guides/insulation-field/),
+los índices de número único en
+[Índices globales de aislamiento (ISO 717)](/phonometry/es/guides/insulation-ratings/),
 y la predicción que consume estos índices de laboratorio en
 [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/).
 
@@ -349,664 +293,54 @@ repositorio. Haz clic en cualquier vista previa para abrir el PDF:
 	caption="Ficha de impactos de laboratorio (LabImpactInsulationResult.report), Ln,w (CI)."
 />
 
-## Aislamiento acústico por intensidad (ISO 15186)
-
-El método de laboratorio de ISO 10140, más arriba, lee la potencia transmitida de forma
-*indirecta*, a partir del nivel de la sala receptora y de su área de absorción,
-lo que falla cuando los flancos filtran una potencia que la sala integra
-igualmente. El método por **intensidad acústica** (ISO 15186) lo evita: una sonda
-de intensidad barre una superficie de medición que envuelve el espécimen y mide
-la potencia radiada de forma *directa*, así que solo contribuye el elemento
-ensayado. Es la herramienta preferida cuando la transmisión por flancos es alta
-(ISO 15186-1:2000, cláusula 1). A partir del nivel de la sala emisora $L_{p1}$ y
-del nivel medio de intensidad normal $L_{In}$ sobre la superficie (área $S_m$),
-para un espécimen de área $S$,
-
-$$
-R_I = L_{p1} - 6 - \left[ L_{In} + 10 \log_{10}\frac{S_m}{S} \right],
-$$
-
-donde los $6$ dB son el desfase de campo difuso entre el nivel de presión acústica
-y el nivel de intensidad incidente. La misma fórmula da el índice aparente
-$R'_I$ en campo (ISO 15186-2). Como el método por intensidad *subestima*
-ligeramente la potencia radiada a una sala receptora real, un **índice
-modificado** $R_{I,M} = R_I + K_c$ reproduce el resultado por presión de la
-ISO 10140-2; el término de adaptación $K_c$ (Anexo B) es
-$10 \log_{10}(1 + S_{b2}\lambda/8V_2)$ para una sala bien definida, o el
-independiente de la sala $10 \log_{10}(1 + 61,4/f)$. Para elementos pequeños, la
-**diferencia de niveles normalizada por elemento** sustituye $10\lg(S_m/S)$ por
-$10\lg(S_m/A_0) + 10\lg N$ ($A_0 = 10\ \text{m}^2$, $N$ unidades de elemento).
-
-```python
-import numpy as np
-from phonometry import building
-
-# Nivel de sala emisora Lp1 y nivel medio de intensidad normal LIn sobre la
-# superficie de medición (Sm), para un espécimen de área S; 16 bandas 1/3 octava.
-lp1 = np.full(16, 85.0)
-l_in = np.full(16, 40.0)
-freqs = [100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
-         1000, 1250, 1600, 2000, 2500, 3150]   # centros nominales 1/3 octava
-kc = building.adaptation_term_kc(freqs)                  # Anexo B (B.2)
-res = building.intensity_sound_reduction(lp1, l_in, measurement_area=12.0, area=10.0, kc=kc)
-print(round(float(res.r_i[0]), 2))          # 38.21  RI = Lp1 - 6 - [LIn + 10 lg(Sm/S)]
-print(round(float(res.r_i_modified[0]), 2)) # 40.29  RI,M = RI + Kc
-print(res.rating.rating)                     # 38  ->  RI,w (motor ISO 717-1)
-
-# Cualifica la superficie de medición: FpI = Lp - LIn debe quedar < 10 dB (< 6 dB
-# si el lado receptor es absorbente); el índice residual de la sonda > FpI+10.
-fpi = building.surface_pressure_intensity_indicator(np.full(16, 46.0), l_in)
-print(round(float(fpi[0]), 1))               # 6.0
-
-res.plot()   # RI medido vs curva de referencia ISO 717-1 desplazada (necesita matplotlib)
-```
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_insulation_es.svg" alt="Índice de reducción acústica por intensidad RI y el índice modificado RI,M a lo largo de las bandas de tercio de octava, con el aumento de adaptación del Anexo B sombreado entre las dos curvas" width="80%" loading="eager" />
-
-*El índice modificado $R_{I,M} = R_I + K_c$ eleva $R_I$ (más en las bandas
-bajas, donde $K_c$ es mayor), de modo que una medición por intensidad reproduce
-el resultado por presión de la ISO 10140-2. El índice automático solo se forma
-con exactamente 16 valores de tercio de octava o 5 de octava
-(`rating`/`rating_modified` son `None` en otro caso). Las subáreas barridas por
-separado se combinan primero con `combine_subareas` (Fórmulas (11)-(12)); una
-subárea cuya energía neta fluye de vuelta hacia el espécimen se introduce con
-área negativa, aplicando la regla del signo menos de la Cláusula 6.4.6
-mientras $S_m$ conserva la suma de áreas sin signo.*
-
-<details>
-<summary>Mostrar el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import building
-
-# Una pared ligera: SPL de la sala emisora Lp1 = 85 dB y el nivel de intensidad
-# normal medido LIn sobre la superficie Sm = 12 m2, 16 bandas de tercio de octava.
-freqs = [100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
-         1000, 1250, 1600, 2000, 2500, 3150]
-l_in = np.array([57.8, 61.9, 60.5, 55.6, 55.8, 55.5, 53.4, 51.6,
-                 50.2, 47.7, 46.4, 45.7, 44.8, 45.2, 47.2, 52.7])
-kc = building.adaptation_term_kc(freqs)           # término de adaptación del Anexo B
-res = building.intensity_sound_reduction(np.full(16, 85.0), l_in,
-                                         measurement_area=12.0, area=10.0,
-                                         kc=kc)
-
-x = np.arange(len(freqs))
-fig, ax = plt.subplots()
-ax.fill_between(x, res.r_i, res.r_i_modified, alpha=0.2, label="Adaptación Kc")
-ax.plot(x, res.r_i, "-o", label="RI (intensidad)")
-ax.plot(x, res.r_i_modified, "--s", label="RI,M = RI + Kc")
-ax.set_xticks(x, [str(f) for f in freqs], rotation=45)
-ax.set(xlabel="Frecuencia [Hz]", ylabel="Índice de reducción acústica [dB]",
-       title=f"RI,w = {res.rating.rating} dB, RI,M,w = {res.rating_modified.rating} dB")
-ax.legend()
-plt.show()
-```
-
-</details>
-
-### Parámetros de `intensity_sound_reduction()` / `adaptation_term_kc()`
-
-| Parámetro | Tipo | Unidades | Rango / def. | Notas |
-| :--- | :--- | :--- | :--- | :--- |
-| `lp1` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Nivel de presión de la sala emisora |
-| `l_in` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Nivel de intensidad normal sobre la superficie |
-| `measurement_area` | float | m² | > 0 | Área de la superficie de medición `Sm` |
-| `area` | float | m² | > 0 | Área del espécimen `S` |
-| `kc` | array 1D | dB | uno por banda / `None` | Término de adaptación para el índice modificado |
-| `freq` | array 1D | Hz | > 0 | Frecuencias centrales (`adaptation_term_kc`) |
-| `boundary_area` / `volume` | float | m² / m³ | > 0, ambos o ninguno | Sala `Sb2` / `V2` para la Fórmula (B.1) |
-
-`intensity_sound_reduction()` devuelve un `IntensityReductionResult` (`r_i`,
-`r_i_modified`, `rating`, `rating_modified`);
-`intensity_element_normalized_difference()` un
-`IntensityElementNormalizedResult` (`d_i_n_e`, `rating`);
-`surface_pressure_intensity_indicator()` y `combine_subareas()` devuelven arrays.
-
-### Informe de ensayo por intensidad de ISO 15186-1 (`.report()`)
-
-`IntensityReductionResult.report()` escribe el informe de ensayo de una página
-de ISO 15186-1:2000 del índice de reducción acústica por intensidad $R_I$,
-reutilizando la misma disposición acreditada de dos paneles que las fichas de
-ISO 10140 e ISO 16283. Como $R_I$ es un índice de reducción acústica ordinario,
-su valor único $R_{I,w}$ es el índice a ruido aéreo de ISO 717-1 evaluado sobre
-el espectro por intensidad: la ficha nombra ISO 15186-1 en su línea de base,
-tabula $R_I$ con un decimal junto a la curva medida frente a la referencia
-desplazada, encajona `RI,w (C; Ctr)` e imprime la declaración de que la potencia
-acústica transmitida se midió directamente sobre la superficie de medición. Con
-`verbose=True` se anexa el índice modificado por $K_c$, $R_{I,M}$ (Fórmula (9)),
-junto a $R_I$ cuando se suministró un término de adaptación.
-
-Los campos aplicables de `ReportMetadata` describen la medición por intensidad:
-`specimen` (el elemento ensayado), `area` (superficie de la muestra $S$),
-`client`, `manufacturer`, `test_room`, `laboratory`, `operator`, `report_id` y
-`test_date`, además de los campos de sala/clima compartidos con las demás
-fichas de aislamiento. No hay un campo específico para la geometría de la
-superficie de medición ni para el método de adquisición por barrido o por
-puntos discretos; anótelos en `notes` y nombre la norma en
-`measurement_standard` (`"ISO 15186-1"`). El veredicto frente al requisito,
-`language="es"` y el extra `phonometry[report]` se comportan igual que en las
-fichas hermanas.
-
-```python
-import numpy as np
-from phonometry import building, ReportMetadata
-
-freqs = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
-                  1000, 1250, 1600, 2000, 2500, 3150], dtype=float)
-lp1, sm, s = 85.0, 12.0, 10.0
-l_in = np.array([57.8, 61.9, 60.5, 55.6, 55.8, 55.5, 53.4, 51.6,
-                 50.2, 47.7, 46.4, 45.7, 44.8, 45.2, 47.2, 52.7])
-kc = building.adaptation_term_kc(freqs)                 # Anexo B, Fórmula (B.2)
-res = building.intensity_sound_reduction(
-    np.full(16, lp1), l_in, measurement_area=sm, area=s, kc=kc
-)
-metadata = ReportMetadata(
-    specimen="100 mm autoclaved aerated concrete block wall",
-    area=10.0, measurement_standard="ISO 15186-1",
-    test_room="Transmission suite (example)",
-    laboratory="Phonometry Reference Laboratory",
-    report_id="PHN-2026-0150",
-    requirement=30.0,                                   # RI,w >= 30 dB -> CUMPLE
-)
-res.report("RIw.pdf", metadata=metadata)                # RI,w (C; Ctr)
-res.report("RIw_kc.pdf", metadata=metadata, verbose=True)  # f | RI | RI,M
-```
-
-La ficha de ejemplo se regenera con `make reports` y se conserva en el
-repositorio. Haga clic en la vista previa para abrir el PDF:
-
-<ReportPreview
-	name="iso15186_intensity_example"
-	title="Informe de ejemplo por intensidad ISO 15186-1 (PDF)"
-	description="Informe de ensayo de aislamiento acústico por intensidad en laboratorio de un elemento constructivo de una página: la cabecera de metadatos (cliente, descripción de la muestra, montaje, superficie de la muestra, volúmenes de las salas, clima), la tabla de RI en tercios de octava junto a la curva medida frente a la referencia desplazada, el índice RI,w (C; Ctr) en caja evaluado según ISO 717-1, la declaración del método por intensidad y un veredicto CUMPLE frente al requisito de 30 dB."
-	caption="Ficha por intensidad (IntensityReductionResult.report), RI,w (C; Ctr)."
-/>
-
-Para un **elemento constructivo pequeño** (un aireador, una caja de enchufe, una
-ventana pequeña) el método por intensidad informa en su lugar la diferencia de
-niveles normalizada de elementos $D_{I,n,e}$ (Fórmula (8)), normalizada al área
-de absorción de referencia $A_0 = 10\ \text{m}^2$.
-`IntensityElementNormalizedResult.report()` escribe la misma ficha de una página
-a través del renderizador compartido, con `DI,n,e,w (C; Ctr)` en caja evaluado
-según ISO 717-1; `verbose=True` muestra la evaluación ISO 717 por banda y un
-`requirement` añade un veredicto CUMPLE/NO CUMPLE (el aislamiento del elemento
-cumple igualando o superando el objetivo).
-
-```python
-import numpy as np
-from phonometry import building, ReportMetadata
-
-lp1, sm, n = 85.0, 12.0, 1                              # NPS fuente, superficie, unidades
-l_in = np.array([57.9, 62.0, 60.6, 55.7, 55.9, 55.6, 53.5, 51.7,
-                 50.3, 47.8, 46.5, 45.8, 44.9, 45.3, 47.3, 52.8])
-res = building.intensity_element_normalized_difference(
-    np.full(16, lp1), l_in, measurement_area=sm, n=n
-)
-metadata = ReportMetadata(
-    specimen="Aireador en un muro de fábrica de 100 mm",
-    measurement_standard="ISO 15186-1",
-    laboratory="Phonometry Reference Laboratory",
-    report_id="PHN-2026-0151",
-    requirement=30.0,                                   # DI,n,e,w >= 30 dB -> CUMPLE
-)
-res.plot()   # DI,n,e frente a la referencia ISO 717-1 desplazada (requiere matplotlib)
-res.report("DIne.pdf", metadata=metadata)               # DI,n,e,w (C; Ctr)
-```
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_element_insulation_es.svg" alt="Diferencia de niveles normalizada de elemento DI,n,e de un aireador por banda de tercio de octava frente a la curva de referencia ISO 717-1 desplazada, con las desviaciones desfavorables sombreadas y el índice DI,n,e,w anotado" width="80%" />
-
-*El elemento pequeño se evalúa exactamente como un muro: $D_{I,n,e}$
-alimenta el motor de ISO 717-1 y las desviaciones desfavorables (referencia
-por encima de la medición) fijan $D_{I,n,e,w}$. La normalización
-$10\lg(S_m/A_0)$ sustituye al término de superficie de la muestra, de modo
-que el número describe el elemento con independencia del muro en el que se
-monte.*
-
-<details>
-<summary>Mostrar el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import building
-
-# Un aireador en un muro de fábrica: NPS de la sala emisora de 85 dB y el
-# nivel de intensidad normal sobre la superficie de medición Sm = 12 m2.
-l_in = np.array([57.9, 62.0, 60.6, 55.7, 55.9, 55.6, 53.5, 51.7,
-                 50.3, 47.8, 46.5, 45.8, 44.9, 45.3, 47.3, 52.8])
-res = building.intensity_element_normalized_difference(
-    np.full(16, 85.0), l_in, measurement_area=12.0, n=1
-)
-
-# Una línea: DI,n,e frente a la referencia ISO 717-1 desplazada:
-res.plot(language="es")
-plt.show()
-
-# A mano, desde el índice que porta el resultado:
-w = res.rating
-fig, ax = plt.subplots()
-ax.semilogx(w.band_centers, res.d_i_n_e, "o-", label="DI,n,e (elemento)")
-ax.semilogx(w.band_centers, w.shifted_reference, "s--",
-            label="referencia desplazada")
-ax.fill_between(w.band_centers, w.measured, w.shifted_reference,
-                where=w.measured < w.shifted_reference, interpolate=True,
-                alpha=0.3, label="desviaciones desfavorables")
-ax.set_xlabel("Frecuencia [Hz]")
-ax.set_ylabel("Diferencia de niveles normalizada de elemento [dB]")
-ax.set_title(f"DI,n,e,w = {w.rating} dB  (C={w.c:+d}; Ctr={w.ctr:+d})")
-ax.legend()
-plt.show()
-```
-
-</details>
-
-<ReportPreview
-	name="iso15186_element_example"
-	title="Informe de ejemplo de elementos por intensidad ISO 15186-1 (PDF)"
-	description="Informe de ensayo de aislamiento acústico por intensidad normalizado de elementos en laboratorio de un elemento constructivo pequeño de una página: la cabecera de metadatos (cliente, descripción de la muestra, montaje, superficie del elemento), la tabla de DI,n,e en tercios de octava junto a la curva medida frente a la referencia desplazada, el índice DI,n,e,w (C; Ctr) en caja evaluado según ISO 717-1, la declaración del método por intensidad y un veredicto CUMPLE frente al requisito de 30 dB."
-	caption="Ficha de elementos por intensidad (IntensityElementNormalizedResult.report), DI,n,e,w (C; Ctr)."
-/>
-
-## Mejora a impacto de revestimientos de suelo (ISO 16251-1)
-
-La ISO 16251-1:2014 es un método de laboratorio para la **mejora del aislamiento
-a ruido de impactos** $\Delta L$ de un revestimiento de suelo blando y de reacción
-local (moqueta, PVC, linóleo). Las dos salas de ISO 10140 se sustituyen por una
-pequeña placa de hormigón con apoyo elástico; una máquina de impactos normalizada
-la excita y se mide el **nivel de aceleración** estructural en la cara inferior con
-y sin el revestimiento. Para revestimientos de reacción local, esa diferencia de
-niveles de aceleración equivale a la reducción de ruido de impactos de ISO 10140.
-
-**Nivel de aceleración (Fórmula (1)).** $L_a = 10\lg(\langle a^2\rangle / a_0^2)$ dB,
-referencia $a_0 = 10^{-6}\ \text{m/s}^2$. La **corrección de ruido de fondo
-(Fórmula (2))** sigue la regla de tres ramas de ISO 10140 (sin cambio si ≥ 15 dB;
-sustracción energética para 6 ≤ margen < 15 dB; el límite de 1,3 dB por debajo de
-6 dB, marcado como $> \Delta L$). La mejora es la diferencia promediada por
-posiciones $\Delta L = L_0 - L_1$ (Fórmulas (3)/(4)); las octavas siguen
-$\Delta L_\text{oct} = -10\lg[\tfrac{1}{3}\sum 10^{-\Delta L_n/10}]$ (Fórmula (5)).
-
-**Mejora ponderada.** $\Delta L_w$ es la reducción ponderada de ISO 717-2: la
-mejora se aplica al **suelo de referencia** pesado $L_{n,r,0}$ (ISO 717-2 Tabla 4),
-$L_{n,r} = L_{n,r,0} - \Delta L$, y $\Delta L_w = 78 - L_{n,r,w}$, calculada por
-`weighted_impact_improvement()`, que reutiliza el motor de valoración de
-ISO 717-2. Una medición según el apartado 6.3 abarca 18 bandas (100–5000 Hz,
-opcionalmente ampliadas hasta 50 Hz); la valoración se forma sobre el subrango
-100–3150 Hz de cualquier espectro que lo contenga. La expresión de resultados
-(apartado 8 e)) incluye además el término de adaptación espectral
-$C_{I,\Delta} = C_{I,r,0} - C_{I,r}$ (ISO 717-2:2020, Fórmula (A.4)), expuesto
-como `ci_delta` en el resultado y de forma independiente como
-`impact_improvement_adaptation_term()`.
-
-El ejemplo siguiente es una medición real: la mejora de una moqueta textil sobre
-la maqueta pesada del CSTB, digitalizada de la Figura 4 de Foret, Chéné y
-Guigou-Carter, "A comparison of the reduction of transmitted impact noise by
-floor coverings measured using ISO 140-8 and ISO/CD 16251-1" (Forum Acusticum
-2011, Aalborg). Su mejora ponderada ISO 16251-1 publicada es
-$\Delta L_w = 29$ dB, reproducida exactamente por el motor de valoración.
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floor_covering_improvement_es.svg" alt="Mejora a impacto de revestimientos de suelo ISO 16251-1: la mejora delta-L de una moqueta textil real creciendo con la frecuencia en bandas de tercio de octava de 100 Hz a 3150 Hz, con el área de mejora sombreada y el número único ponderado delta-Lw anotado" width="80%" />
-
-<details>
-<summary>Mostrar el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import building
-
-freqs = [100, 125, 160, 200, 250, 315, 400, 500,
-         630, 800, 1000, 1250, 1600, 2000, 2500, 3150]
-bare = np.full(16, 78.0)                       # nivel de aceleración de la placa desnuda
-# Una moqueta textil real medida en la maqueta del CSTB (Foret et al. 2011, Fig. 4).
-covering = bare - np.array([5, 8, 10, 14, 18, 23, 30, 31,
-                            39, 49, 53, 57, 60, 67, 68, 71])
-res = building.impact_improvement(bare, covering, freqs)
-print(res.delta_lw)   # mejora ponderada delta-Lw = 29 dB (ISO 717-2)
-res.plot(language="es")
-plt.show()
-```
-
-</details>
-
-```python
-from phonometry import building
-
-# delta-Lw directo de un espectro de mejora (16 bandas de tercio de octava):
-delta_l = [5, 8, 10, 14, 18, 23, 30, 31, 39, 49, 53, 57, 60, 67, 68, 71]
-print(building.weighted_impact_improvement(delta_l))    # 29 dB (moqueta)
-
-# A partir de los niveles de aceleración medidos (desnudo/cubierto) y un fondo:
-freqs = [100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
-         1000, 1250, 1600, 2000, 2500, 3150]
-bare_levels = [72, 73, 74, 74, 75, 75, 76, 76, 77, 77, 78, 78, 79, 79, 80, 80]
-covered_levels = [b - d for b, d in zip(bare_levels, delta_l)]
-bg = [40.0] * 16
-res = building.impact_improvement(bare_levels, covered_levels, freqs, background=bg)
-res.improvement       # delta-L por banda
-res.delta_lw          # número único ponderado (valorado sobre el subrango 100-3150 Hz)
-res.ci_delta          # término de adaptación espectral CI,delta (Fórmula (A.4))
-res.limited           # bandas en el límite de medida de 1,3 dB (> delta-L)
-res.octave_bands()    # (frec. de octava, delta-L_oct) vía Fórmula (5)
-res.plot()            # el espectro de mejora delta-L(f) de arriba (requiere matplotlib)
-```
-
-### Informe de mejora a impacto de ISO 16251-1 (`.report()`)
-
-`FloorCoveringImprovementResult.report(path)` escribe una ficha acreditada de
-mejora a impacto de una página: la línea de base normativa, una cabecera de
-metadatos, la tabla por bandas (frecuencia y $\Delta L$, con las bandas en el
-límite de 1,3 dB precedidas por `>`) junto a la curva de mejora $\Delta L(f)$,
-el número único encuadrado $\Delta L_w\ (C_{I,\Delta})$ (la expresión de
-resultados de la Cláusula 8 e) de ISO 16251-1) y un pie. Pasa un
-`ReportMetadata` para la cabecera; los campos aplicables son `specimen` (el
-revestimiento de suelo ensayado), `client`, `manufacturer`, `mounting`,
-`mass_per_area`, `test_room`, `test_date`, `temperature`, `pressure`,
-`measurement_standard`, `laboratory`, `operator`, `report_id`, `notes` y
-`requirement` (una mejora ponderada mayor es mejor, así que el veredicto es apto
-en cuanto la iguala o la supera). El suelo de referencia desnudo es el suelo
-pesado normalizado de la Tabla 4 de ISO 717-2:2020, fijado por la norma.
-`verbose=True` añade la columna del suelo de referencia con revestimiento
-$L_{n,r} = L_{n,r,0} - \Delta L$, la base de la derivación de $\Delta L_w$.
-
-```python
-from phonometry import building, ReportMetadata
-
-freqs = [100, 125, 160, 200, 250, 315, 400, 500,
-         630, 800, 1000, 1250, 1600, 2000, 2500, 3150]
-delta_l = [5, 8, 10, 14, 18, 23, 30, 31, 39, 49, 53, 57, 60, 67, 68, 71]
-bare = [78.0] * 16
-res = building.impact_improvement(bare, [b - d for b, d in zip(bare, delta_l)], freqs)
-res.report("dLw.pdf",
-           metadata=ReportMetadata(
-               specimen="Revestimiento textil (moqueta), colocada suelta",
-               measurement_standard="ISO 16251-1",
-               requirement=20.0),
-           language="es")  # delta-Lw (CI,delta) = 29 (-13) dB
-```
-
-La ficha de ejemplo se regenera con `make reports` y se mantiene en el
-repositorio. Pulsa la vista previa para abrir el PDF:
-
-<ReportPreview
-	name="iso16251_floor_covering_example"
-	title="Informe de ejemplo de mejora a impacto de revestimientos de suelo ISO 16251-1 (PDF)"
-	description="Informe de ensayo de mejora a impacto de una página para una moqueta textil cuyo espectro de mejora se ha digitalizado del estudio comparativo de Foret et al. (2011) ISO/CD 16251-1 (un ejemplo ilustrativo, no una medición acreditada): la cabecera de metadatos (cliente, descripción del revestimiento, montaje, masa por superficie, clima), la tabla de delta-L en tercios de octava junto a la curva de mejora delta-L(f) creciendo con la frecuencia, el número único encuadrado delta-Lw (CI,delta) = 29 (-13) dB de mejora ponderada (ISO 717-2) y un veredicto APTO frente al requisito de 20 dB (una mejora ponderada mayor es mejor)."
-	caption="Ficha de mejora a impacto de revestimientos de suelo (FloorCoveringImprovementResult.report), delta-Lw (CI,delta)."
-/>
-
-## Transmisión por flancos en laboratorio (ISO 10848)
-
-ISO 10848:2006/2010 es el método de laboratorio que **mide** el **índice de
-reducción de vibraciones** de unión $K_{ij}$ que la [predicción EN 12354](/phonometry/es/guides/insulation-prediction/)
-toma como entrada, junto con los descriptores globales de flanco $D_{n,f}$
-(aéreo) y $L_{n,f}$ (impacto). Es la contraparte de medición de la función
-empírica `junction_vibration_reduction()` de esa predicción.
-
-**Índice de reducción de vibraciones (Fórmula (13)).**
-$K_{ij} = \overline{D}_{v,ij} + 10\lg\!\big(l_{ij} / \sqrt{a_i a_j}\big)$ dB, a
-partir de la diferencia de nivel de velocidad promediada en dirección
-$\overline{D}_{v,ij} = \tfrac{1}{2}(D_{v,ij} + D_{v,ji})$ (Fórmula (11), que hace
-$K_{ij}$ simétrico), la longitud de unión de arista común $l_{ij}$ y las
-**longitudes de absorción equivalentes**
-$a_j = 2.2\pi^2 S_j /(T_{s,j} c_0)\sqrt{f_\text{ref}/f}$ (Fórmula (12),
-$f_\text{ref} = 1000$ Hz). Para elementos ligeros y bien amortiguados
-$a_j = S_j / l_0$ ($l_0 = 1$ m) y la Fórmula (13) se reduce a la Fórmula (14)
-simplificada. El **factor de pérdidas total** asociado es $\eta = 2.2/(f T_s)$.
-
-**Descriptores globales.** $D_{n,f} = L_1 - L_2 - 10\lg(A/A_0)$ (Fórmula (4),
-aéreo) y $L_{n,f} = L_2 + 10\lg(A/A_0)$ (Fórmula (5), máquina de impactos),
-$A_0 = 10\ \text{m}^2$; sus números únicos $D_{n,f,w}$ / $L_{n,f,w}$ reutilizan
-los motores de ISO 717. El número único $\overline{K}_{ij}$ es la media
-aritmética entre 200 y 1250 Hz en tercios de octava, o entre 125 y 1000 Hz en
-bandas de octava (Anexo A).
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/flanking_transmission_es.svg" alt="Índice de reducción de vibraciones de unión Kij ISO 10848 creciendo entre 100 Hz y 5000 Hz en tercios de octava para una unión rígida en T de dos paredes pesadas, con el Kij medio de un solo número entre 200 y 1250 Hz en línea discontinua" width="80%" />
-
-<details>
-<summary>Mostrar el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import building
-
-freqs = [100, 125, 160, 200, 250, 315, 400, 500, 630,
-         800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000]
-# Diferencia de nivel de velocidad promediada en dirección de una unión en T (dB):
-dv = np.array([4.5, 4.8, 5.2, 5.6, 6.0, 6.5, 7.0, 7.6, 8.1, 8.7,
-               9.2, 9.8, 10.3, 10.9, 11.4, 11.9, 12.3, 12.7])
-res = building.vibration_reduction_index(
-    dv, junction_length=4.0, area_i=12.0, area_j=10.0, frequency=freqs,
-    structural_reverberation_time_i=0.35, structural_reverberation_time_j=0.40,
-)
-print(res.single_number)   # Kij medio entre 200 y 1250 Hz (Anexo A)
-res.plot(language="es")
-plt.show()
-```
-
-</details>
-
-**Validez.** $K_{ij}$ se apoya en una simplificación de análisis estadístico de
-energía: `strong_coupling_satisfied()` comprueba la desigualdad de la
-Fórmula (15) y, para las uniones pesadas de la Parte 4, `modal_density()`,
-`band_mode_count()` y `modal_overlap_factor()` (Fórmulas (5)/(4)/(6)) cuantifican
-dónde el número de modos es demasiado bajo para que $K_{ij}$ sea fiable. Pasa el
-factor de solapamiento modal por banda a
-`vibration_reduction_index(..., modal_overlap=M)`: las bandas con $M < 0.25$ se
-marcan en `result.bracketed` y quedan excluidas del número único
-$\overline{K}_{ij}$, como exige la Cláusula 9 de la Parte 4.
-Como ISO 10848 no contiene ningún ejemplo numérico resuelto, la conformidad se
-ancla en identidades de forma cerrada ($K_{ij}$ simplificado, $a_j$ a
-$f_\text{ref}$, $\eta$).
-
-```python
-import numpy as np
-from phonometry import building
-
-freqs = [200, 250, 315, 400, 500, 630, 800, 1000, 1250]
-lij, s_i, s_j = 4.0, 12.0, 10.0     # longitud de unión (m), áreas de elemento (m^2)
-ts = np.linspace(0.30, 0.10, 9)     # tiempo de reverberación estructural Ts (s)
-dv_ij = [5.6, 6.0, 6.5, 7.0, 7.6, 8.1, 8.7, 9.2, 9.8]    # elemento i excitado (dB)
-dv_ji = [6.4, 6.8, 7.3, 7.8, 8.4, 8.9, 9.5, 10.0, 10.6]  # elemento j excitado (dB)
-
-# Kij desde ambas direcciones de excitación (simétrico por el promedio direccional):
-dbar = building.direction_averaged_level_difference(dv_ij, dv_ji)
-res = building.vibration_reduction_index(dbar, lij, s_i, s_j, frequency=freqs,
-                                structural_reverberation_time_i=ts,
-                                structural_reverberation_time_j=ts)
-res.k_ij           # Kij por banda (Fórmula (13))
-res.single_number  # Kij medio entre 200 y 1250 Hz, o None sin ese conjunto de bandas
-res.octave_bands() # Kij en octavas (su número único promedia 125-1000 Hz)
-
-# Descriptor global aéreo de flanco y una comprobación de validez de la Parte 4:
-dnf = building.normalized_flanking_level_difference(np.full(9, 75.0), np.full(9, 42.0),
-                                           absorption_area=np.full(9, 12.0))
-m = building.modal_overlap_factor(s_i, critical_frequency=85.0,
-                         structural_reverberation_time=ts)
-res_m = building.vibration_reduction_index(dbar, lij, s_i, s_j, frequency=freqs,
-                                  modal_overlap=m)   # bandas con M < 0.25 acotadas
-res_m.bracketed    # marcas por banda; las bandas acotadas salen del número único
-
-# Con 16 bandas de tercio de octava (o 5 de octava), dnf.plot() dibuja Dn,f
-# frente a la referencia ISO 717-1 desplazada con Dn,f,w anotado (requiere matplotlib):
-```
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/flanking_level_difference_es.svg" alt="Diferencia de niveles normalizada de flancos Dn,f por banda de tercio de octava frente a la curva de referencia ISO 717-1 desplazada, con las desviaciones desfavorables sombreadas y el índice Dn,f,w anotado" width="80%" />
-
-*El descriptor global de flancos $D_{n,f}$ es una magnitud aérea, así que su
-número único $D_{n,f,w}$ sale del motor de ISO 717-1 sin cambios; entra
-directamente en el modelo EN 12354-1 como dato del camino de flancos de la
-unión ensayada (el homólogo de impactos $L_{n,f}$ se evalúa igual según
-ISO 717-2).*
-
-<details>
-<summary>Mostrar el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import building
-
-# Una unión ligera en el laboratorio: nivel de la sala emisora, nivel de la
-# sala receptora por el camino de flancos y el área de absorción receptora.
-l1 = np.full(16, 80.0)
-dnf_target = np.array([48, 49, 50, 51, 52, 54, 55, 57,
-                       58, 59, 60, 61, 62, 63, 64, 65], dtype=float)
-dnf = building.normalized_flanking_level_difference(
-    l1, l1 - dnf_target, absorption_area=np.full(16, 10.0)
-)
-
-# Una línea: Dn,f frente a la referencia ISO 717-1 desplazada:
-dnf.plot(language="es")
-plt.show()
-
-# A mano, desde el índice que porta el resultado:
-w = dnf.rating
-fig, ax = plt.subplots()
-ax.semilogx(w.band_centers, dnf.d_n_f, "o-", label="Dn,f (flancos)")
-ax.semilogx(w.band_centers, w.shifted_reference, "s--",
-            label="referencia desplazada")
-ax.fill_between(w.band_centers, w.measured, w.shifted_reference,
-                where=w.measured < w.shifted_reference, interpolate=True,
-                alpha=0.3, label="desviaciones desfavorables")
-ax.set_xlabel("Frecuencia [Hz]")
-ax.set_ylabel("Diferencia de niveles normalizada de flancos [dB]")
-ax.set_title(f"Dn,f,w = {w.rating} dB  (C={w.c:+d}; Ctr={w.ctr:+d})")
-ax.legend()
-plt.show()
-```
-
-</details>
-
-### Informes de transmisión por flancos ISO 10848 (`.report()`)
-
-Cada uno de los tres resultados genera una ficha PDF de una página.
-`VibrationReductionResult.report()` escribe un informe de **caracterización de
-la unión** del índice de reducción de vibraciones $K_{ij}$ (ISO 10848-1:2006):
-la línea de base normativa, una cabecera de metadatos opcional, la tabla de
-$K_{ij}$ por banda junto a la curva $K_{ij}(f)$ y un recuadro con el número
-único (media de $K_{ij}$) sobre el intervalo de bandas del anexo A, con el
-recuento de bandas promediadas y acotadas. Las bandas acotadas por solapamiento
-modal insuficiente ($M < 0.25$, ISO 10848-4:2010 apartado 9) imprimen su valor
-entre corchetes y se excluyen de la media; `verbose=True` añade una columna que
-indica si cada banda entra en la media.
-
-`FlankingLevelDifferenceResult.report()` y `FlankingImpactLevelResult.report()`
-escriben informes de **medición** de los descriptores globales $D_{n,f}$
-(aéreo) y $L_{n,f}$ (impactos, máquina de impactos), reutilizando la misma
-disposición de dos paneles del aislamiento: la magnitud por banda junto a la
-curva medida frente a la referencia ISO 717 desplazada y el número único
-`Dn,f,w (C; Ctr)` (ISO 717-1) o `Ln,f,w (CI)` (ISO 717-2). `verbose=True` anexa
-la evaluación ISO 717 por banda (el valor, la referencia desplazada y la
-desviación desfavorable). Un `requirement` indicado en `ReportMetadata` añade un
-veredicto ($D_{n,f,w}$ cumple igualando o superándolo, $L_{n,f,w}$ igualándolo o
-por debajo), y `language="es"` genera cada ficha en español. Se necesita
-reportlab (`pip install phonometry[report]`).
-
-```python
-import numpy as np
-from phonometry import building, ReportMetadata
-
-freqs = [100, 125, 160, 200, 250, 315, 400, 500, 630,
-         800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000]
-dv = np.array([4.5, 4.8, 5.2, 5.6, 6.0, 6.5, 7.0, 7.6, 8.1, 8.7,
-               9.2, 9.8, 10.3, 10.9, 11.4, 11.9, 12.3, 12.7])
-m = np.full(18, 1.0); m[:3] = 0.1                        # acota las bandas bajas
-kij = building.vibration_reduction_index(
-    dv, junction_length=4.0, area_i=12.0, area_j=10.0, frequency=freqs,
-    structural_reverberation_time_i=0.35, structural_reverberation_time_j=0.40,
-    modal_overlap=m,
-)
-kij.report("Kij.pdf", metadata=ReportMetadata(specimen="Unión rígida en T"),
-           language="es")
-
-l1 = np.full(16, 80.0)
-dnf = np.array([48, 49, 50, 51, 52, 54, 55, 57, 58, 59, 60, 61, 62, 63, 64, 65],
-               dtype=float)
-dres = building.normalized_flanking_level_difference(
-    l1, l1 - dnf, absorption_area=np.full(16, 10.0)
-)
-dres.report("Dnf.pdf", metadata=ReportMetadata(requirement=55.0), language="es")
-
-recv = np.array([58, 57, 56, 55, 54, 52, 50, 48, 46, 44, 42, 40, 38, 36, 34, 32],
-                dtype=float)
-lres = building.normalized_flanking_impact_level(recv, absorption_area=np.full(16, 10.0))
-lres.report("Lnf.pdf", metadata=ReportMetadata(requirement=55.0), language="es")
-```
-
-Las fichas de ejemplo se regeneran con `make reports` y se mantienen en el
-repositorio. Pulsa una vista previa para abrir el PDF:
-
-<ReportPreview
-	name="iso10848_kij_example"
-	title="Informe del índice de reducción de vibraciones de unión ISO 10848-1 (PDF)"
-	description="Informe de una página de caracterización de la unión del índice de reducción de vibraciones Kij: la cabecera de metadatos, la tabla de Kij por banda junto a la curva Kij(f) y el recuadro con el número único (media de Kij) sobre el intervalo del anexo A con el recuento de bandas promediadas y acotadas (las tres bandas más bajas acotadas por solapamiento modal insuficiente)."
-	caption="Ficha del índice de reducción de vibraciones (VibrationReductionResult.report), Kij medio."
-/>
-
-<ReportPreview
-	name="iso10848_dnf_example"
-	title="Informe de la diferencia de niveles por flancos aérea ISO 10848-2 (PDF)"
-	description="Informe de una página de transmisión por flancos aérea de la diferencia de niveles por flancos normalizada Dn,f: la cabecera de metadatos, la tabla de Dn,f en tercios de octava junto a la curva medida frente a la referencia desplazada, el recuadro con Dn,f,w (C; Ctr) según ISO 717-1 y un veredicto de CUMPLE frente al requisito de 55 dB."
-	caption="Ficha de la diferencia de niveles por flancos (FlankingLevelDifferenceResult.report), Dn,f,w (C; Ctr)."
-/>
-
-<ReportPreview
-	name="iso10848_lnf_example"
-	title="Informe del nivel de impactos por flancos ISO 10848-2 (PDF)"
-	description="Informe de una página de transmisión por flancos a impactos del nivel de impactos por flancos normalizado Ln,f: la cabecera de metadatos, la tabla de Ln,f en tercios de octava junto a la curva medida frente a la referencia desplazada, el recuadro con Ln,f,w (CI) según ISO 717-2 y un veredicto de CUMPLE frente al requisito de 55 dB."
-	caption="Ficha del nivel de impactos por flancos (FlankingImpactLevelResult.report), Ln,f,w (CI)."
-/>
+## Más allá del método por presión
+
+Tres mediciones de laboratorio hermanas compartían esta página y ahora
+tienen guías propias. Cuando los flancos son demasiado altos para el método
+por presión,
+[Aislamiento acústico por intensidad (ISO 15186)](/phonometry/es/guides/insulation-intensity/)
+lee la potencia transmitida directamente sobre la cara radiante. Para un
+revestimiento de suelo blando,
+[Mejora del aislamiento a impacto de suelos (ISO 16251-1)](/phonometry/es/guides/impact-improvement/)
+sustituye la instalación de dos salas por una pequeña maqueta pesada. Y los
+datos de unión que consume la predicción EN 12354 se miden según
+[Transmisión por flancos en laboratorio (ISO 10848)](/phonometry/es/guides/flanking-lab/).
 
 ## Qué cubre esta guía
 
-**Cubierto.** La ISO 10140-2:2010 (el índice de reducción acústica de
-laboratorio $R$ con la corrección de ruido de fondo del apartado 4.3) y la
+**Cubierto.** ISO 10140-2:2010 (el índice de reducción acústica de
+laboratorio $R$ con la corrección de ruido de fondo de la cláusula 4.3) e
 ISO 10140-3:2010 (el nivel de impactos normalizado de laboratorio $L_n$),
 mediante `building.lab_airborne_insulation`,
-`building.lab_impact_insulation` y `building.background_correction`; el
-índice de reducción acústica por intensidad $R_I$ de la ISO 15186-1:2000
-(apartado 3.8), su versión modificada por $K_c$, $R_{I,M}$ (anexo B), y la
-diferencia normalizada de elemento $D_{I,n,e}$ (apartado 3.9), mediante
-`building.intensity_sound_reduction`, `building.adaptation_term_kc` y
-`building.intensity_element_normalized_difference`; la mejora de
-aislamiento a impactos de revestimientos de suelo $\Delta L$ de la
-ISO 16251-1:2014 y su $\Delta L_w$ ponderado frente al suelo de referencia
-de la Tabla 4 de la ISO 717-2, mediante `building.impact_improvement` y
-`building.weighted_impact_improvement`; y el documento marco de la ISO
-10848-1:2006 (el índice de reducción de vibraciones $K_{ij}$, Fórmula
-(13), la longitud de absorción equivalente y las comprobaciones de validez
-de densidad modal/solape modal del apartado 9 de la Parte 4), con los
-descriptores globales $D_{n,f}$/$L_{n,f}$, mediante
-`building.vibration_reduction_index`,
-`building.normalized_flanking_level_difference` y
-`building.normalized_flanking_impact_level`.
+`building.lab_impact_insulation` y `building.background_correction`; los
+índices globales reutilizan los motores verificados de ISO 717-1/ISO 717-2,
+y ambos resultados escriben la ficha ISO 10140 de una página con
+`.report()`, con el anexo de área de absorción de ISO 10140-4:2010 en la
+forma detallada.
 
 **No cubierto.** Los requisitos generales de instalación de ensayo y de
-tipo de montaje de la ISO 10140-1 no están implementados; la guía solo los
-cita como una cadena de texto en los metadatos del informe (`"Type A
-mounting, mortar-bedded perimeter (ISO 10140-1)"`). La propia medición por
-intensidad acústica (la sonda de barrido, la adquisición con dos
-micrófonos y la calibración de desajuste de fase detrás de $L_{p1}$ y
-$L_{In}$) no está implementada: ambos niveles se toman como entradas ya
-medidas, y la ficha de informe de la ISO 15186-1 declara explícitamente
-que no tiene campo para la geometría de la superficie de medición ni para
-el método de barrido frente a puntos discretos. Las Partes 2, 3 y 4 de la
-ISO 10848 difieren en los tipos de unión y de muestra a los que se
-aplican; phonometry implementa solo las fórmulas de $K_{ij}$/$D_{n,f}$/
-$L_{n,f}$ de la Parte 1 de forma genérica, más la comprobación de validez
-de solape modal de la Parte 4, no las configuraciones de ensayo
-específicas de instalación que describen las demás partes.
+tipo de montaje de ISO 10140-1 no están implementados; la guía solo los
+cita como cadena de texto en los metadatos del informe (`"Type A mounting,
+mortar-bedded perimeter (ISO 10140-1)"`). Los métodos de laboratorio que
+compartían esta página están cubiertos por sus propias guías: el
+aislamiento por intensidad (ISO 15186), la mejora de revestimientos de
+suelo (ISO 16251-1) y la transmisión por flancos (ISO 10848).
 
 ## Véase también
 
-- [Medición del aislamiento en campo e índices](/phonometry/es/guides/insulation-field/):
-  las mediciones aéreas, de impactos y de fachada en el edificio, sus índices
-  de un solo número y su incertidumbre.
+- [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/guides/insulation-field/):
+  las mediciones aéreas, de impacto y de fachada en el edificio, sus índices
+  globales y su incertidumbre.
 - [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/):
   el modelo de flancos que consume los $R$, $L_n$ y $K_{ij}$ de laboratorio.
-- [Potencia acústica](/phonometry/es/guides/sound-power/): los métodos de `LW` que comparten
-  la maquinaria del área de absorción de la sala receptora.
-- Referencia de la API: [`building.lab_insulation`](/phonometry/es/reference/api/building/lab-insulation/), [`building.intensity_insulation`](/phonometry/es/reference/api/building/intensity-insulation/) y [`building.flanking_transmission`](/phonometry/es/reference/api/building/flanking-transmission/).
+- [Aislamiento acústico por intensidad (ISO 15186)](/phonometry/es/guides/insulation-intensity/):
+  la alternativa de potencia directa para situaciones con muchos flancos.
+- [Mejora del aislamiento a impacto de suelos (ISO 16251-1)](/phonometry/es/guides/impact-improvement/):
+  la ΔL en maqueta a pequeña escala de revestimientos blandos.
+- [Transmisión por flancos en laboratorio (ISO 10848)](/phonometry/es/guides/flanking-lab/):
+  el índice de reducción de vibraciones de unión medido.
+- [Índices globales de aislamiento (ISO 717)](/phonometry/es/guides/insulation-ratings/):
+  el motor de curva de referencia tras Rw y Ln,w.
+- [Potencia acústica](/phonometry/es/guides/sound-power/): los métodos de `LW`
+  que comparten la maquinaria de área de absorción de la sala receptora.
+- Referencia de la API: [`building.lab_insulation`](/phonometry/es/reference/api/building/lab-insulation/).

@@ -67,6 +67,12 @@
     "http://localhost:4321/phonometry/guides/room-acoustics/",
     "http://localhost:4321/phonometry/es/guides/impulse-prominence/",
     "http://localhost:4321/phonometry/guides/porous-absorbers/",
-    "http://localhost:4321/phonometry/es/guides/insulation-lab/"
+    "http://localhost:4321/phonometry/es/guides/insulation-lab/",
+    "http://localhost:4321/phonometry/guides/insulation-ratings/",
+    "http://localhost:4321/phonometry/es/guides/insulation-ratings/",
+    "http://localhost:4321/phonometry/guides/facade-insulation/",
+    "http://localhost:4321/phonometry/es/guides/facade-insulation/",
+    "http://localhost:4321/phonometry/guides/sections/insulation-design/",
+    "http://localhost:4321/phonometry/es/guides/sections/insulation-design/"
   ]
 }

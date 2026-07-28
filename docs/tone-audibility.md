@@ -319,7 +319,7 @@ derived tonal adjustment `K` (Table J.1), an optional PASS/FAIL verdict row and 
 prominence note, and a footer with the fixed disclaimer.
 
 It uses the same `ReportMetadata` container
-(documented under [Field insulation](insulation-field.md#report-metadata-reportmetadata))
+(documented under [Insulation ratings](insulation-ratings.md#report-metadata-reportmetadata))
 and rendering engine as the [ISO 532-1 loudness fiche](loudness.md#iso-532-1-report-report);
 a supplied `requirement` is read as the maximum acceptable decisive audibility
 `ΔLta` in dB (a quieter tone passes). Rendering needs reportlab

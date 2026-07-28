@@ -548,7 +548,7 @@ governing prominence `P` together with the derived `LAeq` adjustment `KI`
 and a footer with the fixed disclaimer.
 
 It uses the same `ReportMetadata` container
-(documented under [Field insulation](https://jmrplens.github.io/phonometry/guides/insulation-field/#report-metadata-reportmetadata))
+(documented under [Insulation ratings](https://jmrplens.github.io/phonometry/guides/insulation-ratings/#report-metadata-reportmetadata))
 and rendering engine as the [ISO 532-1 loudness fiche](https://jmrplens.github.io/phonometry/guides/loudness/#iso-532-1-report-report);
 a supplied `requirement` is read as the maximum acceptable governing prominence
 `P` (a less prominent impulse passes). Rendering needs reportlab
@@ -931,7 +931,7 @@ derived tonal adjustment `K` (Table J.1), an optional PASS/FAIL verdict row and 
 prominence note, and a footer with the fixed disclaimer.
 
 It uses the same `ReportMetadata` container
-(documented under [Field insulation](https://jmrplens.github.io/phonometry/guides/insulation-field/#report-metadata-reportmetadata))
+(documented under [Insulation ratings](https://jmrplens.github.io/phonometry/guides/insulation-ratings/#report-metadata-reportmetadata))
 and rendering engine as the [ISO 532-1 loudness fiche](https://jmrplens.github.io/phonometry/guides/loudness/#iso-532-1-report-report);
 a supplied `requirement` is read as the maximum acceptable decisive audibility
 `ΔLta` in dB (a quieter tone passes). Rendering needs reportlab
@@ -2139,7 +2139,7 @@ the clause 6.2 verification verdict.*
 - [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/guides/intensity/): the two-microphone probe, its
   finite-difference bias and the ISO 9614-1 field indicators behind the
   scanning method.
-- [Room Acoustics](https://jmrplens.github.io/phonometry/guides/sections/room-acoustics/): the reverberation time
+- [Room Acoustics](https://jmrplens.github.io/phonometry/guides/room-acoustics/): the reverberation time
   and equivalent absorption area (ISO 354) that feed `K2` and the ISO 3741
   absorption area; impact and airborne insulation.
 - [Levels](https://jmrplens.github.io/phonometry/guides/levels/): energy averaging and the A-weighting behind `LWA`.

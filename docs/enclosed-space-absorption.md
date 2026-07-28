@@ -178,7 +178,7 @@ the metadata's `requirement` field is printed as a reference line only, since a
 room reverberation time is a target range rather than a strictly
 higher/lower-is-better quantity. It uses the same `ReportMetadata` container
 (documented under
-[Field insulation](insulation-field.md#report-metadata-reportmetadata)) and
+[Insulation ratings](insulation-ratings.md#report-metadata-reportmetadata)) and
 rendering engine as the other fiches; passing `metadata=None` produces a bare
 characterisation fiche. Rendering needs reportlab
 (`pip install phonometry[report]`); only `engine="reportlab"` is supported. The

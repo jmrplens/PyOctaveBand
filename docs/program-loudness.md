@@ -355,7 +355,7 @@ The stacked layout (compliance table on top, plot below) differs from the
 narrow two-panel body of the other fiches because the compliance table needs
 four columns and the loudness-vs-time trace is landscape. It uses the same
 `ReportMetadata` container and rendering engine as the
-[ISO 717 insulation fiche](insulation-field.md#report-metadata-reportmetadata);
+[ISO 717 insulation fiche](insulation-ratings.md#report-metadata-reportmetadata);
 a supplied `requirement` is read as the target programme loudness in LUFS
 (defaulting to the EBU R 128 −23.0 LUFS), and the fiche passes when the
 integrated loudness is within the selected R 128 tolerance of it and the true

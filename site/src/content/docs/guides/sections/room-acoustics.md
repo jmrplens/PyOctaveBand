@@ -1,22 +1,29 @@
 ---
 title: "Room acoustics"
-description: "The sound field inside a single room: impulse-response measurement and the ISO 3382 parameters, the ANSI S12.2 room-noise ratings, and reverberation-time prediction by the classical formulae and the EN 12354-6 normative model."
+description: "The sound field inside a single room: impulse-response measurement (ISO 18233), the ISO 3382 parameters, open-plan speech privacy, the ANSI S12.2 room-noise ratings, and reverberation-time prediction by the classical formulae and the EN 12354-6 normative model."
 ---
 
 Almost everything about the sound field inside a room follows from two
 quantities: its **impulse response**, which can be measured, and its **sound
-absorption**, which can be designed. The four pages of this section cover the
+absorption**, which can be designed. The pages of this section cover the
 measurement chain built on the first, the prediction chain built on the
 second, and the rating of the background noise that occupies the room in
 between.
 
-The measurement chain lives in
-[Room Acoustics](/phonometry/guides/room-acoustics/): acquiring the impulse
-response with the deterministic signals of ISO 18233, deriving the ISO 3382
-parameters (reverberation time, EDT, clarity, centre time, and the open-plan
-speech metrics of ISO 3382-3), and, closing the loop, measuring a material's
-absorption coefficient in a reverberation room per ISO 354. That absorption
-coefficient is precisely what the prediction chain needs.
+The measurement chain starts in
+[Measuring the Room Impulse Response](/phonometry/guides/room-impulse-response/):
+the deterministic excitation signals of ISO 18233, the sweep deconvolution
+that turns a recording into an impulse response, and the MLS alternative.
+[Room Acoustics](/phonometry/guides/room-acoustics/) then derives the ISO 3382
+parameters from it (reverberation time, EDT, clarity, definition and centre
+time), and
+[Open-Plan Office Acoustics (ISO 3382-3)](/phonometry/guides/open-plan-acoustics/)
+answers the question a single closed room does not raise: how far speech stays
+intelligible across an open floor, through the spatial decay rate and the
+distraction and privacy distances.
+[Image sources and the steady-state room field](/phonometry/guides/room-image-sources/)
+approaches the same room deterministically, building its impulse response from
+mirrored sources and its steady-state level from the room constant.
 
 Prediction gets two pages because two traditions coexist.
 [Reverberation-time prediction (Sabine, Eyring, Arau)](/phonometry/guides/reverberation-prediction/)
@@ -35,16 +42,24 @@ background noise (ventilation, distant traffic) is acceptable for its use,
 rated against the ANSI/ASA S12.2 criterion curves, with the RC Mark II
 rumble/hiss tag diagnosing *why* a spectrum fails.
 
-Related pages elsewhere: measuring insulation *between* rooms continues in
+Related pages elsewhere: the absorption coefficient the prediction chain
+consumes is measured in
+[Sound Absorption Measurement and Rating](/phonometry/guides/absorption-measurement/),
+insulation *between* rooms continues in
 [Sound insulation](/phonometry/guides/sections/sound-insulation/), and the
 speech intelligibility a room affords is quantified by the
 [Speech Transmission Index](/phonometry/guides/speech-transmission/).
 
 ## Pages in this section
 
-- [Room Acoustics](/phonometry/guides/room-acoustics/): impulse-response
-  acquisition (ISO 18233), room parameters (ISO 3382-1/2), open-plan metrics
-  (ISO 3382-3) and reverberation-room absorption (ISO 354).
+- [Measuring the Room Impulse Response](/phonometry/guides/room-impulse-response/):
+  the ISO 18233 deterministic methods, exponential sweeps and their
+  deconvolution, and MLS.
+- [Room Acoustics](/phonometry/guides/room-acoustics/): the ISO 3382-1/2
+  parameters (T20, T30, EDT, C50, C80, D50, Ts) with the Schroeder integration
+  and the accredited fiche.
+- [Open-Plan Office Acoustics (ISO 3382-3)](/phonometry/guides/open-plan-acoustics/):
+  the spatial decay rate of speech and the distraction and privacy distances.
 - [Image sources and the steady-state room field](/phonometry/guides/room-image-sources/):
   the deterministic image-source room impulse response (Kuttruff/Vorländer) and
   the statistical steady-state level with the room constant, critical distance

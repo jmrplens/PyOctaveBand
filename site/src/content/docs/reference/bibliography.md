@@ -284,13 +284,13 @@ list grows as guides gain their References sections.
   (ISO 3382-3:2012).
   [iso.org catalogue](https://www.iso.org/standard/46520.html).
   The open-plan speech-privacy quantities.
-  Cited by [Room Acoustics](/phonometry/guides/room-acoustics/).
+  Cited by [Open-Plan Office Acoustics](/phonometry/guides/open-plan-acoustics/).
 - International Organization for Standardization. (2006). *Acoustics —
   Application of new measurement methods in building and room acoustics*
   (ISO 18233:2006).
   [iso.org catalogue](https://www.iso.org/standard/40408.html).
   The swept-sine and MLS acquisition of impulse responses.
-  Cited by [Room Acoustics](/phonometry/guides/room-acoustics/).
+  Cited by [Measuring the Room Impulse Response](/phonometry/guides/room-impulse-response/).
 - International Organization for Standardization. (2003). *Acoustics —
   Measurement of sound absorption in a reverberation room* (ISO 354:2003).
   [iso.org catalogue](https://www.iso.org/standard/34545.html).
@@ -483,7 +483,7 @@ list grows as guides gain their References sections.
   The comprehensive treatment of airborne and impact sound insulation:
   measurement chains, flanking transmission and the EN 12354 prediction
   framework.
-  Cited by [Field Insulation Measurement and Ratings](/phonometry/guides/insulation-field/),
+  Cited by [Field Insulation Measurement (ISO 16283)](/phonometry/guides/insulation-field/),
   [Laboratory Insulation Measurement](/phonometry/guides/insulation-lab/) and
   [Predicting Sound Insulation (EN 12354)](/phonometry/guides/insulation-prediction/).
 - Vigran, T. E. (2008). *Building acoustics*. CRC Press.
@@ -491,7 +491,7 @@ list grows as guides gain their References sections.
   [doi:10.1201/9781482266016](https://doi.org/10.1201/9781482266016).
   A compact textbook on sound transmission in buildings, from single and
   double constructions to floating floors.
-  Cited by [Field Insulation Measurement and Ratings](/phonometry/guides/insulation-field/),
+  Cited by [Field Insulation Measurement (ISO 16283)](/phonometry/guides/insulation-field/),
   [Laboratory Insulation Measurement](/phonometry/guides/insulation-lab/) and
   [Dynamic stiffness of resilient materials](/phonometry/guides/dynamic-stiffness/).
 - International Organization for Standardization. (2020). *Acoustics —
@@ -499,13 +499,13 @@ list grows as guides gain their References sections.
   Airborne sound insulation* (ISO 717-1:2020).
   [iso.org catalogue](https://www.iso.org/standard/77435.html).
   The reference-curve rating and the spectrum adaptation terms C and Ctr.
-  Cited by [Field Insulation Measurement and Ratings](/phonometry/guides/insulation-field/).
+  Cited by [Insulation Ratings (ISO 717)](/phonometry/guides/insulation-ratings/).
 - International Organization for Standardization. (2014). *Acoustics — Field
   measurement of sound insulation in buildings and of building elements —
   Part 1: Airborne sound insulation* (ISO 16283-1:2014).
   [iso.org catalogue](https://www.iso.org/standard/55997.html).
   The field airborne measurement method.
-  Cited by [Field Insulation Measurement and Ratings](/phonometry/guides/insulation-field/).
+  Cited by [Field Insulation Measurement (ISO 16283)](/phonometry/guides/insulation-field/).
 - International Organization for Standardization. (1989). *Acoustics —
   Determination of dynamic stiffness — Part 1: Materials used under floating
   floors in dwellings* (ISO 9052-1:1989).

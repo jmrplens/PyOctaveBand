@@ -1,0 +1,315 @@
+---
+title: "Laboratory Flanking Transmission (ISO 10848)"
+description: "The ISO 10848 laboratory measurement of flanking transmission: the junction vibration reduction index Kij from direction-averaged velocity level differences and equivalent absorption lengths, the overall Dn,f and Ln,f descriptors, the Part 4 modal-overlap validity checks and the accredited fiches."
+references:
+  - type: book
+    authors: ["Hopkins, C."]
+    year: 2007
+    title: "Sound insulation"
+    publisher: "Butterworth-Heinemann"
+    doi: "10.4324/9780080550473"
+    note: "The reference monograph for flanking transmission and the vibration reduction index, including the statistical-energy-analysis footing of the validity checks. ISBN 978-0-7506-6526-1."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2006
+    title: "Acoustics — Laboratory measurement of the flanking transmission of airborne and impact sound between adjoining rooms — Part 1: Frame document"
+    designation: "ISO 10848-1:2006"
+    url: "https://www.iso.org/standard/38284.html"
+    note: "The frame document of the flanking-transmission measurement: definitions, the vibration reduction index Kij, the equivalent absorption length and the normalized flanking descriptors D_n,f / L_n,f that feed the EN 12354 prediction. Because ISO 10848 contains no worked numeric example, conformance is anchored on closed-form identities."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2006
+    title: "Acoustics — Laboratory measurement of the flanking transmission of airborne and impact sound between adjoining rooms — Part 2: Application to light elements when the junction has a small influence"
+    designation: "ISO 10848-2:2006"
+    url: "https://www.iso.org/standard/35004.html"
+    note: "Application to light elements whose junction has a small influence."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2006
+    title: "Acoustics — Laboratory measurement of the flanking transmission of airborne and impact sound between adjoining rooms — Part 3: Application to light elements when the junction has a substantial influence"
+    designation: "ISO 10848-3:2006"
+    url: "https://www.iso.org/standard/35003.html"
+    note: "Application to light elements whose junction has a substantial influence."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2010
+    title: "Acoustics — Laboratory measurement of the flanking transmission of airborne and impact sound between adjoining rooms — Part 4: Application to junctions with at least one heavy element"
+    designation: "ISO 10848-4:2010"
+    url: "https://www.iso.org/standard/45360.html"
+    note: "Application to junctions with at least one heavy element, with the modal-density, band-mode-count and modal-overlap validity checks (M < 0.25 bands bracketed, Clause 9)."
+---
+
+import ThemeImage from '../../../components/ThemeImage.astro';
+import ReportPreview from '../../../components/ReportPreview.astro';
+
+EN 12354 predicts a building from its junctions, and ISO 10848 is how a
+junction gets its number. Two structurally decoupled elements meet in a
+laboratory junction rig; shakers and tapping machines drive one, and the
+velocity level differences across the junction condense into the
+**vibration reduction index** $K_{ij}$, together with the overall flanking
+descriptors $D_{n,f}$ (airborne) and $L_{n,f}$ (impact). This guide covers
+that measurement chain: the direction-averaged velocity level difference,
+the equivalent absorption lengths, the SEA validity checks of Part 4 and
+the three accredited fiches. The empirical junction values a prediction
+falls back on when no measurement exists live in
+[Predicting Sound Insulation (EN 12354)](/phonometry/guides/insulation-prediction/);
+the wave-theory $K_{ij}$ of ideal plate junctions is derived in
+[Bending-wave transmission at plate junctions](/phonometry/guides/junction-transmission/).
+
+## The vibration reduction index and the flanking descriptors
+
+ISO 10848:2006/2010 is the laboratory method that **measures** the junction
+**vibration reduction index** $K_{ij}$ that the [EN 12354 prediction](/phonometry/guides/insulation-prediction/) takes
+as an input, together with the overall flanking descriptors $D_{n,f}$
+(airborne) and $L_{n,f}$ (impact). It is the measurement counterpart of the
+empirical `junction_vibration_reduction()` of that prediction.
+
+**Vibration reduction index (Formula (13)).**
+$K_{ij} = \overline{D}_{v,ij} + 10\lg\!\big(l_{ij} / \sqrt{a_i a_j}\big)$ dB, from
+the direction-averaged velocity level difference
+$\overline{D}_{v,ij} = \tfrac{1}{2}(D_{v,ij} + D_{v,ji})$ (Formula (11), which
+makes $K_{ij}$ symmetric), the common-edge junction length $l_{ij}$ and the
+**equivalent absorption lengths** $a_j = 2.2\pi^2 S_j /(T_{s,j} c_0)\sqrt{f_\text{ref}/f}$
+(Formula (12), $f_\text{ref} = 1000$ Hz). For lightweight well-damped elements
+$a_j = S_j / l_0$ ($l_0 = 1$ m) and Formula (13) reduces to the simplified
+Formula (14). The related **total loss factor** is $\eta = 2.2/(f T_s)$.
+
+**Overall descriptors.** $D_{n,f} = L_1 - L_2 - 10\lg(A/A_0)$ (Formula (4),
+airborne) and $L_{n,f} = L_2 + 10\lg(A/A_0)$ (Formula (5), tapping machine),
+$A_0 = 10\ \text{m}^2$; their $D_{n,f,w}$ / $L_{n,f,w}$ single numbers reuse the
+ISO 717 rating engines. The single-number $\overline{K}_{ij}$ is the arithmetic
+mean over 200–1250 Hz for one-third-octave bands, or over 125–1000 Hz for
+octave bands (Annex A).
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/flanking_transmission.svg" alt="ISO 10848 junction vibration reduction index Kij rising across one-third-octave bands from 100 Hz to 5000 Hz for a rigid T-junction of two heavy walls, with the single-number mean Kij over 200-1250 Hz drawn as a dashed line" width="80%" />
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+freqs = [100, 125, 160, 200, 250, 315, 400, 500, 630,
+         800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000]
+# Direction-averaged velocity level difference of a rigid T-junction (dB):
+dv = np.array([4.5, 4.8, 5.2, 5.6, 6.0, 6.5, 7.0, 7.6, 8.1, 8.7,
+               9.2, 9.8, 10.3, 10.9, 11.4, 11.9, 12.3, 12.7])
+res = building.vibration_reduction_index(
+    dv, junction_length=4.0, area_i=12.0, area_j=10.0, frequency=freqs,
+    structural_reverberation_time_i=0.35, structural_reverberation_time_j=0.40,
+)
+print(res.single_number)   # mean Kij over 200-1250 Hz (Annex A)
+res.plot()
+plt.show()
+```
+
+</details>
+
+**Validity.** $K_{ij}$ rests on a statistical-energy-analysis simplification:
+`strong_coupling_satisfied()` checks the Formula (15) inequality and, for the
+heavy junctions of Part 4, `modal_density()`, `band_mode_count()` and
+`modal_overlap_factor()` (Formulae (5)/(4)/(6)) quantify where the mode count
+is too low for $K_{ij}$ to be reliable. Pass the per-band modal overlap factor
+to `vibration_reduction_index(..., modal_overlap=M)`: bands with $M < 0.25$
+are flagged in `result.bracketed` and excluded from the single-number
+$\overline{K}_{ij}$, as Part 4 Clause 9 requires. Because ISO 10848 contains no
+worked numeric example, conformance is anchored on closed-form identities
+(simplified $K_{ij}$, $a_j$ at $f_\text{ref}$, $\eta$).
+
+```python
+import numpy as np
+from phonometry import building
+
+freqs = [200, 250, 315, 400, 500, 630, 800, 1000, 1250]
+lij, s_i, s_j = 4.0, 12.0, 10.0     # junction length (m), element areas (m^2)
+ts = np.linspace(0.30, 0.10, 9)     # structural reverberation time Ts (s)
+dv_ij = [5.6, 6.0, 6.5, 7.0, 7.6, 8.1, 8.7, 9.2, 9.8]    # element i excited (dB)
+dv_ji = [6.4, 6.8, 7.3, 7.8, 8.4, 8.9, 9.5, 10.0, 10.6]  # element j excited (dB)
+
+# Kij from both excitation directions (symmetric via the direction average):
+dbar = building.direction_averaged_level_difference(dv_ij, dv_ji)
+res = building.vibration_reduction_index(dbar, lij, s_i, s_j, frequency=freqs,
+                                structural_reverberation_time_i=ts,
+                                structural_reverberation_time_j=ts)
+res.k_ij           # Kij per band (Formula (13))
+res.single_number  # mean Kij over 200-1250 Hz, or None without the band set
+res.octave_bands() # Kij in octave bands (its single number averages 125-1000 Hz)
+
+# Overall airborne flanking descriptor and a Part-4 modal-overlap validity check:
+dnf = building.normalized_flanking_level_difference(np.full(9, 75.0), np.full(9, 42.0),
+                                           absorption_area=np.full(9, 12.0))
+m = building.modal_overlap_factor(s_i, critical_frequency=85.0,
+                         structural_reverberation_time=ts)
+res_m = building.vibration_reduction_index(dbar, lij, s_i, s_j, frequency=freqs,
+                                  modal_overlap=m)   # M < 0.25 bands bracketed
+res_m.bracketed    # per-band flags; bracketed bands leave the single number
+
+# With 16 one-third-octave (or 5 octave) bands, dnf.plot() draws Dn,f vs the
+# shifted ISO 717-1 reference with Dn,f,w annotated (needs matplotlib):
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/flanking_level_difference.svg" alt="Normalized flanking level difference Dn,f per one-third-octave band against the shifted ISO 717-1 reference curve, with the unfavourable deviations shaded and the Dn,f,w rating annotated" width="80%" />
+
+*The overall flanking descriptor $D_{n,f}$ is an airborne quantity, so its
+single number $D_{n,f,w}$ comes from the unchanged ISO 717-1 engine; it
+drops straight into the EN 12354-1 model as the flanking-path datum of the
+tested junction (the impact counterpart $L_{n,f}$ rates per ISO 717-2 the
+same way).*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+# A lightweight junction in the laboratory: source-room level, receiving-room
+# level over the flanking path, and the receiving-room absorption area.
+l1 = np.full(16, 80.0)
+dnf_target = np.array([48, 49, 50, 51, 52, 54, 55, 57,
+                       58, 59, 60, 61, 62, 63, 64, 65], dtype=float)
+dnf = building.normalized_flanking_level_difference(
+    l1, l1 - dnf_target, absorption_area=np.full(16, 10.0)
+)
+
+# One line — Dn,f vs the shifted ISO 717-1 reference:
+dnf.plot()
+plt.show()
+
+# By hand, from the rating the result carries:
+w = dnf.rating
+fig, ax = plt.subplots()
+ax.semilogx(w.band_centers, dnf.d_n_f, "o-", label="Dn,f (flanking)")
+ax.semilogx(w.band_centers, w.shifted_reference, "s--",
+            label="shifted reference")
+ax.fill_between(w.band_centers, w.measured, w.shifted_reference,
+                where=w.measured < w.shifted_reference, interpolate=True,
+                alpha=0.3, label="unfavourable deviations")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Normalized flanking level difference [dB]")
+ax.set_title(f"Dn,f,w = {w.rating} dB  (C={w.c:+d}; Ctr={w.ctr:+d})")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+## ISO 10848 flanking-transmission reports (`.report()`)
+
+Each of the three results renders a one-page PDF fiche. `VibrationReductionResult.report()`
+writes a **junction characterization** report of $K_{ij}$ (ISO 10848-1:2006):
+the standard-basis line, an optional metadata header, the per-band $K_{ij}$
+table beside the $K_{ij}(f)$ curve and a boxed single-number mean $K_{ij}$ over
+the Annex A band range, with the count of averaged and bracketed bands. Bands
+bracketed for poor modal overlap ($M < 0.25$, ISO 10848-4:2010 Clause 9) print
+their value in brackets and are excluded from the mean; `verbose=True` adds a
+column stating whether each band enters the mean.
+
+`FlankingLevelDifferenceResult.report()` and `FlankingImpactLevelResult.report()`
+write **measurement** reports of the overall descriptors $D_{n,f}$ (airborne)
+and $L_{n,f}$ (impact, tapping machine), reusing the same two-panel insulation
+layout: the per-band quantity beside the measured-versus-shifted-ISO 717-reference
+curve and the boxed single number `Dn,f,w (C; Ctr)` (ISO 717-1) or `Ln,f,w (CI)`
+(ISO 717-2). `verbose=True` annexes the ISO 717 evaluation per band (the value,
+the shifted reference and the unfavourable deviation). A `requirement` supplied
+on the `ReportMetadata` adds a verdict ($D_{n,f,w}$ passes at or above it,
+$L_{n,f,w}$ at or below it), and `language="es"` renders every fiche in Spanish.
+reportlab is required (`pip install phonometry[report]`).
+
+```python
+import numpy as np
+from phonometry import building, ReportMetadata
+
+freqs = [100, 125, 160, 200, 250, 315, 400, 500, 630,
+         800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000]
+dv = np.array([4.5, 4.8, 5.2, 5.6, 6.0, 6.5, 7.0, 7.6, 8.1, 8.7,
+               9.2, 9.8, 10.3, 10.9, 11.4, 11.9, 12.3, 12.7])
+m = np.full(18, 1.0); m[:3] = 0.1                        # bracket the low bands
+kij = building.vibration_reduction_index(
+    dv, junction_length=4.0, area_i=12.0, area_j=10.0, frequency=freqs,
+    structural_reverberation_time_i=0.35, structural_reverberation_time_j=0.40,
+    modal_overlap=m,
+)
+kij.report("Kij.pdf", metadata=ReportMetadata(specimen="Rigid T-junction"))
+
+l1 = np.full(16, 80.0)
+dnf = np.array([48, 49, 50, 51, 52, 54, 55, 57, 58, 59, 60, 61, 62, 63, 64, 65],
+               dtype=float)
+dres = building.normalized_flanking_level_difference(
+    l1, l1 - dnf, absorption_area=np.full(16, 10.0)
+)
+dres.report("Dnf.pdf", metadata=ReportMetadata(requirement=55.0))   # Dn,f,w (C; Ctr)
+
+recv = np.array([58, 57, 56, 55, 54, 52, 50, 48, 46, 44, 42, 40, 38, 36, 34, 32],
+                dtype=float)
+lres = building.normalized_flanking_impact_level(recv, absorption_area=np.full(16, 10.0))
+lres.report("Lnf.pdf", metadata=ReportMetadata(requirement=55.0))   # Ln,f,w (CI)
+```
+
+The example fiches are regenerated with `make reports` and kept in the
+repository. Click a preview to open the PDF:
+
+<ReportPreview
+	name="iso10848_kij_example"
+	title="ISO 10848-1 junction vibration reduction index report (PDF)"
+	description="One-page junction-characterization report of the vibration reduction index Kij: the metadata header, the per-band Kij table beside the Kij(f) curve, and the boxed single-number mean Kij over the Annex A band range with the count of averaged and bracketed bands (the three lowest bands bracketed for poor modal overlap)."
+	caption="Vibration reduction index fiche (VibrationReductionResult.report), mean Kij."
+/>
+
+<ReportPreview
+	name="iso10848_dnf_example"
+	title="ISO 10848-2 airborne flanking level difference report (PDF)"
+	description="One-page airborne flanking-transmission report of the normalized flanking level difference Dn,f: the metadata header, the one-third-octave Dn,f table beside the measured-versus-shifted-reference curve, the boxed Dn,f,w (C; Ctr) rated per ISO 717-1 and a PASS verdict against the 55 dB requirement."
+	caption="Flanking level difference fiche (FlankingLevelDifferenceResult.report), Dn,f,w (C; Ctr)."
+/>
+
+<ReportPreview
+	name="iso10848_lnf_example"
+	title="ISO 10848-2 flanking impact level report (PDF)"
+	description="One-page impact flanking-transmission report of the normalized flanking impact level Ln,f: the metadata header, the one-third-octave Ln,f table beside the measured-versus-shifted-reference curve, the boxed Ln,f,w (CI) rated per ISO 717-2 and a PASS verdict against the 55 dB requirement."
+	caption="Flanking impact level fiche (FlankingImpactLevelResult.report), Ln,f,w (CI)."
+/>
+
+## What this guide covers
+
+**Covered.** ISO 10848-1:2006's vibration reduction index $K_{ij}$
+(Formula (13)) from the direction-averaged velocity level difference
+(Formula (11)) and the equivalent absorption lengths (Formula (12)), with
+the simplified lightweight form (Formula (14)), the total loss factor and
+the Annex A single-number mean, via
+`building.direction_averaged_level_difference` and
+`building.vibration_reduction_index`; the overall descriptors $D_{n,f}$
+(Formula (4)) and $L_{n,f}$ (Formula (5)) with their ISO 717 single
+numbers, via `building.normalized_flanking_level_difference` and
+`building.normalized_flanking_impact_level`; the strong-coupling check
+(Formula (15)) and the ISO 10848-4:2010 modal-density, band-mode-count and
+modal-overlap validity checks that bracket unreliable bands
+(`building.strong_coupling_satisfied`, `building.modal_density`,
+`building.band_mode_count`, `building.modal_overlap_factor`); and the
+three one-page fiches through `.report()`.
+
+**Not covered.** ISO 10848 Parts 2, 3 and 4 differ in which junction and
+specimen types they apply to; phonometry implements only the Part 1
+$K_{ij}$/$D_{n,f}$/$L_{n,f}$ formulae generically, plus the Part 4
+modal-overlap validity check, not the facility-specific test setups the
+other parts describe. Because ISO 10848 contains no worked numeric
+example, conformance is anchored on closed-form identities (simplified
+$K_{ij}$, $a_j$ at $f_\text{ref}$, $\eta$).
+
+## See also
+
+- [Predicting Sound Insulation (EN 12354)](/phonometry/guides/insulation-prediction/):
+  the flanking model that consumes the measured $K_{ij}$, and its empirical
+  Annex E junction values.
+- [Bending-wave transmission at plate junctions](/phonometry/guides/junction-transmission/):
+  the wave-theory transmission coefficients behind an ideal junction's Kij.
+- [Laboratory Insulation Measurement](/phonometry/guides/insulation-lab/):
+  the ISO 10140 suite whose direct transmission these flanking paths bypass.
+- [Insulation Ratings (ISO 717)](/phonometry/guides/insulation-ratings/):
+  the reference-curve engines behind Dn,f,w and Ln,f,w.
+- [Theory](/phonometry/reference/theory/rooms-buildings/): the flanking
+  formulae in the EN 12354 derivation.
+- API reference: [`building.flanking_transmission`](/phonometry/reference/api/building/flanking-transmission/).

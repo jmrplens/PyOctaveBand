@@ -294,13 +294,13 @@ que las guías incorporan sus secciones de Referencias.
   (ISO 3382-3:2012).
   [Catálogo iso.org](https://www.iso.org/standard/46520.html).
   Las magnitudes de privacidad del habla en oficinas diáfanas.
-  Citado por [Acústica de salas](/phonometry/es/guides/room-acoustics/).
+  Citado por [Acústica de oficinas diáfanas](/phonometry/es/guides/open-plan-acoustics/).
 - International Organization for Standardization. (2006). *Acoustics —
   Application of new measurement methods in building and room acoustics*
   (ISO 18233:2006).
   [Catálogo iso.org](https://www.iso.org/standard/40408.html).
   La adquisición de respuestas al impulso por barrido sinusoidal y MLS.
-  Citado por [Acústica de salas](/phonometry/es/guides/room-acoustics/).
+  Citado por [Medición de la respuesta al impulso](/phonometry/es/guides/room-impulse-response/).
 - International Organization for Standardization. (2003). *Acoustics —
   Measurement of sound absorption in a reverberation room* (ISO 354:2003).
   [Catálogo iso.org](https://www.iso.org/standard/34545.html).
@@ -503,7 +503,7 @@ que las guías incorporan sus secciones de Referencias.
   El tratamiento exhaustivo del aislamiento a ruido aéreo y de impactos: las
   cadenas de medición, la transmisión por flancos y el marco de predicción
   EN 12354.
-  Citado por [Medición del aislamiento en campo e índices](/phonometry/es/guides/insulation-field/),
+  Citado por [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/guides/insulation-field/),
   [Medición del aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/) y
   [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/).
 - Vigran, T. E. (2008). *Building acoustics*. CRC Press.
@@ -511,7 +511,7 @@ que las guías incorporan sus secciones de Referencias.
   [doi:10.1201/9781482266016](https://doi.org/10.1201/9781482266016).
   Un manual compacto sobre la transmisión del sonido en edificios, de las
   construcciones simples y dobles a los suelos flotantes.
-  Citado por [Medición del aislamiento en campo e índices](/phonometry/es/guides/insulation-field/),
+  Citado por [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/guides/insulation-field/),
   [Medición del aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/) y
   [Rigidez dinámica de materiales resilientes](/phonometry/es/guides/dynamic-stiffness/).
 - International Organization for Standardization. (2020). *Acoustics —
@@ -520,13 +520,13 @@ que las guías incorporan sus secciones de Referencias.
   [Catálogo iso.org](https://www.iso.org/standard/77435.html).
   La calificación por curva de referencia y los términos de adaptación
   espectral C y Ctr.
-  Citado por [Medición del aislamiento en campo e índices](/phonometry/es/guides/insulation-field/).
+  Citado por [Índices globales de aislamiento (ISO 717)](/phonometry/es/guides/insulation-ratings/).
 - International Organization for Standardization. (2014). *Acoustics — Field
   measurement of sound insulation in buildings and of building elements —
   Part 1: Airborne sound insulation* (ISO 16283-1:2014).
   [Catálogo iso.org](https://www.iso.org/standard/55997.html).
   El método de medición aérea en campo.
-  Citado por [Medición del aislamiento en campo e índices](/phonometry/es/guides/insulation-field/).
+  Citado por [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/guides/insulation-field/).
 - International Organization for Standardization. (1989). *Acoustics —
   Determination of dynamic stiffness — Part 1: Materials used under floating
   floors in dwellings* (ISO 9052-1:1989).

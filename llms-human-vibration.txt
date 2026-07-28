@@ -4,8 +4,8 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/human-vibration.md | canonical: https://jmrplens.github.io/phonometry/guides/sections/human-vibration/ -->
-Source: https://jmrplens.github.io/phonometry/guides/sections/human-vibration/
+<!-- source: docs/human-vibration.md | canonical: https://jmrplens.github.io/phonometry/guides/human-vibration/ -->
+Source: https://jmrplens.github.io/phonometry/guides/human-vibration/
 
 # Human Vibration: Whole-Body and Hand-Arm Exposure
 
@@ -586,7 +586,7 @@ the response peaks, and its `.plot()` draws the injury-probability curve with th
 clause 4 neglects the horizontal contributions to spinal compression by design,
 and the horizontal spinal model of the withdrawn 2004 edition is not reinstated,
 so horizontal whole-body exposure is assessed instead with the r.m.s.,
-running-r.m.s./MTVV and VDV metrics of [Human Vibration](https://jmrplens.github.io/phonometry/guides/sections/human-vibration/)
+running-r.m.s./MTVV and VDV metrics of [Human Vibration](https://jmrplens.github.io/phonometry/guides/human-vibration/)
 (ISO 2631-1).
 
 ## 4. The health-risk report (`.report()`)

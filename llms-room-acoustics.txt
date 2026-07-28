@@ -4,26 +4,25 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/room-acoustics.md | canonical: https://jmrplens.github.io/phonometry/guides/sections/room-acoustics/ -->
-Source: https://jmrplens.github.io/phonometry/guides/sections/room-acoustics/
+<!-- source: docs/room-impulse-response.md | canonical: https://jmrplens.github.io/phonometry/guides/room-impulse-response/ -->
+Source: https://jmrplens.github.io/phonometry/guides/room-impulse-response/
 
-# Room Acoustics
+# Measuring the Room Impulse Response
 
-Room acoustics starts from one measurement: the **impulse response** (IR)
-between a source and a receiver. Filter it into bands and integrate it, and
-it yields reverberation time, clarity and speech intelligibility: everything
-about the sound field inside a single room. This page follows that chain in
-measurement order: acquiring the IR (ISO 18233), turning it into room
-parameters (ISO 3382-1/2) and spatial speech metrics for open-plan offices
-(ISO 3382-3). Two separate decay measurements in a reverberation room, one
-with the room empty and one with the specimen installed, yield a material's
-sound absorption; that method (ISO 354)
-lives in [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/guides/absorption-measurement/).
-For sound insulation *between* spaces (the same IR measured either side of a
-partition) see the companion
-[Field Insulation Measurement and Ratings guide](https://jmrplens.github.io/phonometry/guides/insulation-field/).
+Every room-acoustic quantity on this site starts from the same measurement:
+the **impulse response** (IR) between a source and a receiver. Get it right
+and everything downstream (reverberation time, clarity, insulation, speech
+metrics) is a matter of arithmetic; get it wrong and no later processing
+recovers what the excitation or the microphone position threw away. This
+guide covers the acquisition itself, per ISO 18233: the exponential sine
+sweep and its deconvolution, the MLS correlation method, and where to place
+sources and microphones so the averaged result means something. Turning the
+measured IR into room parameters lives in
+[Room Acoustics](https://jmrplens.github.io/phonometry/guides/room-acoustics/); the same IR measured either side of a
+partition becomes sound insulation in
+[Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/guides/insulation-field/).
 
-## 1. Impulse-response acquisition (ISO 18233)
+## Two deterministic excitations (ISO 18233)
 
 A room behaves, to a good approximation, as a **linear time-invariant**
 system, so everything about it is contained in its IR. You could fire a
@@ -141,11 +140,14 @@ ax2.set(xlabel="Frequency [Hz]", ylabel="Magnitude [dB]", title="MLS spectrum (f
 
 </details>
 
-**The recovered impulse response.** Deconvolving the recording gives the
+## The recovered impulse response
+
+Deconvolving the recording gives the
 broadband IR: the direct sound, discrete early reflections and the decaying
 diffuse tail. Its `.plot()` shows the waveform above and the log-magnitude
 envelope with the Schroeder energy-decay curve below: the straight decay
-whose slope becomes the reverberation time in §2.
+whose slope becomes the reverberation time in the
+[Room Acoustics guide](https://jmrplens.github.io/phonometry/guides/room-acoustics/).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_sweep_deconvolution_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_sweep_deconvolution.gif" alt="Animation: the exponential sweep crosses the room while its spectrogram builds with delayed copies from the reflections, then the inverse filter collapses the whole recording into the impulse response" width="640" height="360" loading="lazy"></picture>
 
@@ -182,49 +184,6 @@ plt.xlabel("Time [s]"); plt.ylabel("Level re peak [dB]")
 
 </details>
 
-**Where to measure.** One IR characterises a single source–receiver pair; a
-reported room parameter is the spatial average over several. ISO 3382-1
-(performance spaces) asks for at least two source positions and microphones
-spaced $\geq 2$ m apart, $\geq 1$ m from any surface, at $1.2$ m
-(seated-ear) height; ISO 3382-2 fixes the minimum number of source,
-microphone and source–microphone combinations per accuracy grade
-(survey / engineering / precision) and asks for microphone positions that
-avoid symmetric placements.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_measurement_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_measurement.svg" alt="Room-acoustics measurement setup: a top-view room plan with two loudspeaker source positions and six microphone positions with the ISO 3382-1 spacing rules, and the ISO 3382-2 table of minimum positions for the survey, engineering and precision grades" width="94%"></picture>
-
-**Averaging across positions.** The reported per-band parameter is the
-arithmetic mean over all source-microphone combinations, and the spread
-across positions is part of the answer, not noise: quote it alongside the
-mean whenever it exceeds the parameter's JND (§2), because a room can meet a
-target on average while individual seats sit far outside it. Four placement
-mistakes bias the mean itself:
-
-- **Correlated positions.** Microphones closer than 2 m to each other
-  sample nearly the same sound field twice, so the average looks more
-  stable than it is. The 1 m minimum from any surface likewise avoids the
-  pressure build-up near a boundary (and the comb filter of the animation
-  below) that colours everything a too-close microphone records.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_comb_filtering_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_comb_filtering.gif" alt="Animation: as the microphone height changes, the delay between the direct sound and the floor reflection shifts and the comb filter in the frequency response moves with it, which is why measurement position matters near reflecting surfaces" width="640" height="360" loading="lazy"></picture>
-
-[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_comb_filtering.webm)
-
-- **Symmetric placements.** In a geometrically symmetric room, mirror-image
-  positions receive mirror-image reflection patterns; averaging them adds
-  no new information. This is why ISO 3382-2 asks for positions that do not
-  sit on symmetry lines.
-- **Too close to the source.** Inside the direct field EDT collapses and
-  C80 saturates upward no matter what the room does. ISO 3382-2 therefore
-  keeps every microphone at least $d_{min} = 2\sqrt{V/(c\,\hat T)}$ from
-  the source, with $\hat T$ an estimate of the expected reverberation time
-  (about 2.2 m for a 200 m³ classroom with an expected 0.5 s).
-- **Low-frequency luck.** Below the Schroeder frequency (§2) each band
-  holds only a handful of room modes, and a microphone on a node of one of
-  them sees a different decay than a microphone on an antinode. The spread
-  of the 63-125 Hz bands across positions is structurally larger; the cure
-  is more positions, not a longer excitation.
-
 ### `sweep_signal()` / `inverse_filter()` parameters
 
 | Parameter | Type | Units | Range / default | Notes |
@@ -253,7 +212,142 @@ mistakes bias the mean itself:
 $2^{\text{order}}-1$); `mls_impulse_response(recorded, mls, length=None)`
 needs `recorded` to span an integer number of MLS periods.
 
-## 2. Decay analysis and room parameters (ISO 3382-1/2)
+## Where to measure
+
+One IR characterises a single source–receiver pair; a
+reported room parameter is the spatial average over several. ISO 3382-1
+(performance spaces) asks for at least two source positions and microphones
+spaced $\geq 2$ m apart, $\geq 1$ m from any surface, at $1.2$ m
+(seated-ear) height; ISO 3382-2 fixes the minimum number of source,
+microphone and source–microphone combinations per accuracy grade
+(survey / engineering / precision) and asks for microphone positions that
+avoid symmetric placements.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_measurement_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_measurement.svg" alt="Room-acoustics measurement setup: a top-view room plan with two loudspeaker source positions and six microphone positions with the ISO 3382-1 spacing rules, and the ISO 3382-2 table of minimum positions for the survey, engineering and precision grades" width="94%"></picture>
+
+**Averaging across positions.** The reported per-band parameter is the
+arithmetic mean over all source-microphone combinations, and the spread
+across positions is part of the answer, not noise: quote it alongside the
+mean whenever it exceeds the parameter's JND (ISO 3382-1 Table A.1), because a room can meet a
+target on average while individual seats sit far outside it. Four placement
+mistakes bias the mean itself:
+
+- **Correlated positions.** Microphones closer than 2 m to each other
+  sample nearly the same sound field twice, so the average looks more
+  stable than it is. The 1 m minimum from any surface likewise avoids the
+  pressure build-up near a boundary (and the comb filter of the animation
+  below) that colours everything a too-close microphone records.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_comb_filtering_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_comb_filtering.gif" alt="Animation: as the microphone height changes, the delay between the direct sound and the floor reflection shifts and the comb filter in the frequency response moves with it, which is why measurement position matters near reflecting surfaces" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_comb_filtering.webm)
+
+- **Symmetric placements.** In a geometrically symmetric room, mirror-image
+  positions receive mirror-image reflection patterns; averaging them adds
+  no new information. This is why ISO 3382-2 asks for positions that do not
+  sit on symmetry lines.
+- **Too close to the source.** Inside the direct field EDT collapses and
+  C80 saturates upward no matter what the room does. ISO 3382-2 therefore
+  keeps every microphone at least $d_{min} = 2\sqrt{V/(c\,\hat T)}$ from
+  the source, with $\hat T$ an estimate of the expected reverberation time
+  (about 2.2 m for a 200 m³ classroom with an expected 0.5 s).
+- **Low-frequency luck.** Below the Schroeder frequency (see the
+[Room Acoustics guide](https://jmrplens.github.io/phonometry/guides/room-acoustics/)) each band
+  holds only a handful of room modes, and a microphone on a node of one of
+  them sees a different decay than a microphone on an antinode. The spread
+  of the 63-125 Hz bands across positions is structurally larger; the cure
+  is more positions, not a longer excitation.
+
+## From the impulse response onward
+
+The IR leaves this page in several directions. Band-filtered and
+backward-integrated it becomes the decay curve whose slope is the
+reverberation time: the [Room Acoustics guide](https://jmrplens.github.io/phonometry/guides/room-acoustics/) picks up
+exactly there, and its open-plan sibling walks the
+[ISO 3382-3 line of workstations](https://jmrplens.github.io/phonometry/guides/open-plan-acoustics/). Measured either
+side of a partition, the same sweeps feed the level differences of
+[field sound insulation](https://jmrplens.github.io/phonometry/guides/insulation-field/). And the harmonic distortion
+that the exponential sweep pushes to negative arrival times is not always
+discarded: read deliberately, it becomes the THD analysis of the
+[swept-sine distortion guide](https://jmrplens.github.io/phonometry/guides/swept-sine-distortion/).
+
+## Quick answers
+
+### Should I measure the room impulse response with a sine sweep or an MLS?
+
+Both are ISO 18233 deconvolution methods that recover the impulse response with 20–30 dB more effective signal-to-noise ratio than an impulsive source. Prefer the exponential sine sweep (Annex B): it places harmonic distortion at negative arrival times, where it is discarded. Use MLS (Annex A) when the excitation must be periodic or the hardware favours a two-level signal; it is more sensitive to time variance.
+
+## References
+
+- International Organization for Standardization. (2006). *Acoustics —
+  Application of new measurement methods in building and room acoustics*
+  (ISO 18233:2006).
+  [iso.org catalogue](https://www.iso.org/standard/40408.html).
+  The swept-sine and MLS acquisition this page implements.
+- International Organization for Standardization. (2009). *Acoustics —
+  Measurement of room acoustic parameters — Part 1: Performance spaces*
+  (ISO 3382-1:2009).
+  [iso.org catalogue](https://www.iso.org/standard/40979.html).
+  The source and microphone position requirements quoted in the
+  where-to-measure rules.
+- International Organization for Standardization. (2008). *Acoustics —
+  Measurement of room acoustic parameters — Part 2: Reverberation time in
+  ordinary rooms* (ISO 3382-2:2008).
+  [iso.org catalogue](https://www.iso.org/standard/36201.html).
+  The accuracy grades, position counts and the minimum source distance
+  behind the position-averaging discussion.
+
+## Standards
+
+ISO 18233:2006 (application of new measurement methods: the swept-sine and
+MLS acquisition of impulse responses); ISO 3382-1:2009 and ISO 3382-2:2008
+(the source and microphone position requirements and accuracy grades applied
+when planning where to measure). Validated against closed-form
+deconvolution identities in the [conformance report](https://jmrplens.github.io/phonometry/reference/conformance/).
+
+## See also
+
+- [Room Acoustics](https://jmrplens.github.io/phonometry/guides/room-acoustics/): the decay analysis and ISO 3382
+  parameters computed from the IR this page acquires.
+- [Open-Plan Office Acoustics (ISO 3382-3)](https://jmrplens.github.io/phonometry/guides/open-plan-acoustics/): the
+  speech-privacy line measured with the same acquisition.
+- [System Measurement](https://jmrplens.github.io/phonometry/guides/system-measurement/): complementary Golay pairs and
+  spectrally shaped sweeps, returning the same result types.
+- [Swept-Sine Distortion & Phase](https://jmrplens.github.io/phonometry/guides/swept-sine-distortion/): the Farina
+  reading of the distortion the sweep separates.
+- [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/guides/insulation-field/): the same
+  measurement either side of a partition.
+- [Image Sources & Steady-State Field](https://jmrplens.github.io/phonometry/guides/room-image-sources/): simulated
+  impulse responses to rehearse the processing chain on.
+- API reference: [`room.room_ir`](https://jmrplens.github.io/phonometry/reference/api/rooms/room-ir/).
+
+---
+
+
+<!-- source: docs/room-acoustics.md | canonical: https://jmrplens.github.io/phonometry/guides/room-acoustics/ -->
+Source: https://jmrplens.github.io/phonometry/guides/room-acoustics/
+
+# Room Acoustics
+
+Room acoustics starts from one measurement: the **impulse response** (IR)
+between a source and a receiver. Filter it into bands and integrate it, and
+it yields reverberation time, clarity and centre time: everything
+ISO 3382-1/2 asks about the sound field inside a single room. This page
+turns a measured IR into those parameters: the Schroeder decay curve, the
+evaluation windows, the validity flags and the accredited fiche. Acquiring
+the IR itself (sweeps, MLS, where to measure) lives in
+[Measuring the Room Impulse Response](https://jmrplens.github.io/phonometry/guides/room-impulse-response/), and the
+open-plan speech metrics of ISO 3382-3 in
+[Open-Plan Office Acoustics](https://jmrplens.github.io/phonometry/guides/open-plan-acoustics/). Two separate decay
+measurements in a reverberation room, one with the room empty and one with
+the specimen installed, yield a material's sound absorption; that method
+(ISO 354) lives in
+[Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/guides/absorption-measurement/). For
+sound insulation *between* spaces (the same IR measured either side of a
+partition) see the companion
+[Field Insulation Measurement (ISO 16283) guide](https://jmrplens.github.io/phonometry/guides/insulation-field/).
+
+## Decay analysis and room parameters (ISO 3382-1/2)
 
 The IR is filtered into octave (or one-third-octave) bands and each band is
 turned into a **decay curve** by Schroeder backward integration of the
@@ -540,7 +634,111 @@ repository. Click the preview to open the PDF:
 
 *Room acoustic parameters fiche (`RoomAcousticsResult.report`), $T_\text{mid}$ and the per-band table.*
 
-## 3. Open-plan offices (ISO 3382-3)
+## The rest of the measurement chain
+
+Two sections that used to live on this page have guides of their own: the
+acquisition of the impulse response, with the ISO 18233 sweeps and MLS and
+the placement rules, is
+[Measuring the Room Impulse Response](https://jmrplens.github.io/phonometry/guides/room-impulse-response/); and the
+ISO 3382-3 open-plan speech metrics, with their fiche, are
+[Open-Plan Office Acoustics](https://jmrplens.github.io/phonometry/guides/open-plan-acoustics/).
+
+## See also
+
+- [Measuring the Room Impulse Response](https://jmrplens.github.io/phonometry/guides/room-impulse-response/): the
+  ISO 18233 acquisition of the IR this page analyses.
+- [Open-Plan Office Acoustics (ISO 3382-3)](https://jmrplens.github.io/phonometry/guides/open-plan-acoustics/): the
+  speech-privacy quantities of open-plan offices.
+- [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/guides/absorption-measurement/): the
+  ISO 354 reverberation-room absorption measurement (`absorption_area`,
+  `absorption_coefficient`, `measure_sound_absorption`) that consumes the
+  reverberation times `room_parameters` returns, and its ISO 11654 rating.
+- [Field](https://jmrplens.github.io/phonometry/guides/insulation-field/), [laboratory](https://jmrplens.github.io/phonometry/guides/insulation-lab/) and
+  [predicted](https://jmrplens.github.io/phonometry/guides/insulation-prediction/) sound insulation: field,
+  laboratory and predicted sound insulation between spaces, and its measurement uncertainty.
+- [Sound Power](https://jmrplens.github.io/phonometry/guides/sound-power/): the `LW` methods that consume the
+  ISO 354 absorption area (the ISO 3744 `K2` and the ISO 3741 absorption term).
+- [Loudness](https://jmrplens.github.io/phonometry/guides/loudness/) and [Sound Quality Metrics](https://jmrplens.github.io/phonometry/guides/sound-quality/): loudness,
+  sharpness and the other perception metrics of what the room delivers.
+- [Filter Banks](https://jmrplens.github.io/phonometry/guides/filter-banks/): the IEC 61260 fractional-octave filters
+  used for band decay curves and insulation spectra.
+- [Theory](https://jmrplens.github.io/phonometry/reference/theory/rooms-buildings/): Schroeder integration, regression windows and the
+  reference-curve derivation.
+- API reference: [`room.room_acoustics`](https://jmrplens.github.io/phonometry/reference/api/rooms/room-acoustics/).
+
+## Quick answers
+
+### How are EDT, T20 and T30 defined?
+
+Each band of the impulse response is turned into a decay curve by Schroeder backward integration of the squared IR, and a least-squares line fitted over an evaluation range is extrapolated to a full 60 dB drop, $T = -60/\text{slope}$ (ISO 3382-1/2): EDT over 0 to −10 dB (perceived reverberance), T20 over −5 to −25 dB and T30 over −5 to −35 dB.
+
+### How much decay range do I need for a valid T20 or T30?
+
+The fit window plus a safety margin must fit inside the impulse-to-noise ratio, the level distance between the band-filtered IR peak and its noise floor: ISO 3382 requires at least 35 dB of usable decay range for T20 and 45 dB for T30. An undersized range biases the fitted time upward, so `room_parameters` tightens its validity flags to 46 dB and 54 dB, keeping the bias inside the 5 % JND.
+
+## References
+
+- Kuttruff, H. (2016). *Room acoustics* (6th ed.). CRC Press.
+  [doi:10.1201/9781315372150](https://doi.org/10.1201/9781315372150).
+  The reference monograph behind this page: the statistical theory of
+  decaying sound fields, the Schroeder frequency and the perceptual room
+  parameters of this page.
+- Schroeder, M. R. (1965). New method of measuring reverberation time.
+  *The Journal of the Acoustical Society of America*, 37(3), 409-412.
+  [doi:10.1121/1.1909343](https://doi.org/10.1121/1.1909343).
+  The backward-integration method that turns the squared impulse response
+  into the smooth decay curve of this page.
+- Hak, C. C. J. M., Wenmaekers, R. H. C., & van Luxemburg, L. C. J. (2012).
+  Measuring room impulse responses: Impact of the decay range on derived
+  room acoustic parameters. *Acta Acustica united with Acustica*, 98(6),
+  907-915. [doi:10.3813/aaa.918574](https://doi.org/10.3813/aaa.918574).
+  The INR analysis behind the dynamic-range discussion and the tightened
+  validity flags of this page.
+- International Organization for Standardization. (2009). *Acoustics —
+  Measurement of room acoustic parameters — Part 1: Performance spaces*
+  (ISO 3382-1:2009).
+  [iso.org catalogue](https://www.iso.org/standard/40979.html).
+  The parameter definitions, position requirements and just-noticeable
+  differences of this page.
+- International Organization for Standardization. (2008). *Acoustics —
+  Measurement of room acoustic parameters — Part 2: Reverberation time in
+  ordinary rooms* (ISO 3382-2:2008).
+  [iso.org catalogue](https://www.iso.org/standard/36201.html).
+  The accuracy grades and the dynamic-range criterion behind the decay
+  analysis; its position rules are applied in the
+  [room-impulse-response guide](https://jmrplens.github.io/phonometry/guides/room-impulse-response/).
+
+## Standards
+
+ISO 3382-1:2009 and ISO 3382-2:2008 (reverberation time and room parameters
+from the Schroeder decay). The impulse-response acquisition (ISO 18233)
+lives in [Measuring the Room Impulse Response](https://jmrplens.github.io/phonometry/guides/room-impulse-response/)
+and the open-plan metrics (ISO 3382-3) in
+[Open-Plan Office Acoustics](https://jmrplens.github.io/phonometry/guides/open-plan-acoustics/). Validated against
+closed-form decays and the standards' own parameter definitions in the
+[conformance report](https://jmrplens.github.io/phonometry/reference/conformance/).
+
+---
+
+
+<!-- source: docs/open-plan-acoustics.md | canonical: https://jmrplens.github.io/phonometry/guides/open-plan-acoustics/ -->
+Source: https://jmrplens.github.io/phonometry/guides/open-plan-acoustics/
+
+# Open-Plan Office Acoustics (ISO 3382-3)
+
+An open-plan office is not a reverberation problem; it is a privacy
+problem, and a room that flatters the closed-room parameters can still fail
+it. ISO 3382-3 therefore characterises the office with four single numbers
+measured along a line of workstations, walking away from a talker. This
+guide covers that measurement chain: the quantities, the to-scale
+measurement line and the accredited fiche. The impulse responses and levels
+behind it are acquired as in
+[Measuring the Room Impulse Response](https://jmrplens.github.io/phonometry/guides/room-impulse-response/); the
+per-position STI comes from the
+[Speech Transmission Index guide](https://jmrplens.github.io/phonometry/guides/speech-transmission/); the closed-room
+decay parameters live in [Room Acoustics](https://jmrplens.github.io/phonometry/guides/room-acoustics/).
+
+## Speech privacy along a line of workstations
 
 Open-plan acoustics are about **speech privacy**: how fast a talker's speech
 fades to unintelligibility as you walk away. Levels and STI are measured
@@ -684,7 +882,7 @@ fields and marks `rd` / `rp`.
 STI can itself be measured with the STIPA tools in the
 [Speech Transmission Index guide](https://jmrplens.github.io/phonometry/guides/speech-transmission/).
 
-### ISO 3382-3 report (`.report()`)
+## ISO 3382-3 report (`.report()`)
 
 `OpenPlanResult.report(path)` renders a one-page PDF fiche laid out like an
 open-plan-office speech-privacy measurement report: a standard-basis line, an
@@ -700,7 +898,7 @@ rate is supplied through the metadata's `requirement` field
 (`ReportMetadata(requirement=...)`, read as the minimum acceptable $D_{2,S}$ in
 dB, reflecting the informative quality ranges of Annex A where a larger spatial
 decay is better; the room passes at or above it). It uses the same
-`ReportMetadata` container as the [ISO 3382-1/-2 room-acoustics fiche](#iso-3382-report-report);
+`ReportMetadata` container as the [ISO 3382-1/-2 room-acoustics fiche](https://jmrplens.github.io/phonometry/guides/room-acoustics/#iso-3382-report-report);
 the open-plan-specific fields `area` (floor area), `source_positions` and
 `receiver_positions` (the number of measurement positions) populate the header,
 alongside `client`, `test_room`, `specimen`, `instrumentation`, `temperature`,
@@ -742,92 +940,380 @@ repository. Click the preview to open the PDF:
 
 *Open-plan office acoustics fiche (`OpenPlanResult.report`), $D_{2,S}$, $L_{p,A,S,4m}$, $r_D$, $r_P$ and the spatial-decay curve.*
 
+## References
+
+- International Organization for Standardization. (2012). *Acoustics —
+  Measurement of room acoustic parameters — Part 3: Open plan offices*
+  (ISO 3382-3:2012).
+  [iso.org catalogue](https://www.iso.org/standard/46520.html).
+  The open-plan speech-privacy quantities this page implements.
+
+## Standards
+
+ISO 3382-3:2012 (open-plan office speech metrics: the spatial decay rate
+$D_{2,S}$, the A-weighted speech level at 4 m, and the distraction and
+privacy distances from STI). Validated against the standard's own quantity
+definitions in the [conformance report](https://jmrplens.github.io/phonometry/reference/conformance/).
+
 ## See also
 
-- [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/guides/absorption-measurement/): the
-  ISO 354 reverberation-room absorption measurement (`absorption_area`,
-  `absorption_coefficient`, `measure_sound_absorption`) that consumes the
-  reverberation times `room_parameters` returns, and its ISO 11654 rating.
-- [Field](https://jmrplens.github.io/phonometry/guides/insulation-field/), [laboratory](https://jmrplens.github.io/phonometry/guides/insulation-lab/) and
-  [predicted](https://jmrplens.github.io/phonometry/guides/insulation-prediction/) sound insulation: field,
-  laboratory and predicted sound insulation between spaces, and its measurement uncertainty.
-- [Sound Power](https://jmrplens.github.io/phonometry/guides/sound-power/): the `LW` methods that consume the
-  ISO 354 absorption area (the ISO 3744 `K2` and the ISO 3741 absorption term).
+- [Room Acoustics](https://jmrplens.github.io/phonometry/guides/room-acoustics/): the ISO 3382-1/2 decay parameters of
+  the same room.
+- [Measuring the Room Impulse Response](https://jmrplens.github.io/phonometry/guides/room-impulse-response/): the
+  acquisition behind the per-position levels.
 - [Speech Transmission Index](https://jmrplens.github.io/phonometry/guides/speech-transmission/): the STI/STIPA
-  measurement that feeds the open-plan `sti_values`.
-- [Loudness](https://jmrplens.github.io/phonometry/guides/loudness/) and [Sound Quality Metrics](https://jmrplens.github.io/phonometry/guides/sound-quality/): loudness,
-  sharpness and the other perception metrics of what the room delivers.
-- [Filter Banks](https://jmrplens.github.io/phonometry/guides/filter-banks/): the IEC 61260 fractional-octave filters
-  used for band decay curves and insulation spectra.
-- [Levels](https://jmrplens.github.io/phonometry/guides/levels/): energy averaging and the level metrics behind
-  source/receiving-room levels.
-- [Theory](https://jmrplens.github.io/phonometry/reference/theory/rooms-buildings/): Schroeder integration, regression windows and the
-  reference-curve derivation.
-- API reference: [`room.room_acoustics`](https://jmrplens.github.io/phonometry/reference/api/rooms/room-acoustics/), [`room.room_ir`](https://jmrplens.github.io/phonometry/reference/api/rooms/room-ir/) and [`room.open_plan`](https://jmrplens.github.io/phonometry/reference/api/rooms/open-plan/).
+  measurement that feeds the per-position `sti_values`.
+- [Speech Intelligibility Index](https://jmrplens.github.io/phonometry/guides/speech-intelligibility/): the ANSI S3.5
+  view of the same intelligibility question.
+- [Levels](https://jmrplens.github.io/phonometry/guides/levels/): the A-weighted levels behind the spatial decay.
+- API reference: [`room.open_plan`](https://jmrplens.github.io/phonometry/reference/api/rooms/open-plan/).
 
-## Quick answers
+---
 
-### How are EDT, T20 and T30 defined?
 
-Each band of the impulse response is turned into a decay curve by Schroeder backward integration of the squared IR, and a least-squares line fitted over an evaluation range is extrapolated to a full 60 dB drop, $T = -60/\text{slope}$ (ISO 3382-1/2): EDT over 0 to −10 dB (perceived reverberance), T20 over −5 to −25 dB and T30 over −5 to −35 dB.
+<!-- source: docs/room-image-sources.md | canonical: https://jmrplens.github.io/phonometry/guides/room-image-sources/ -->
+Source: https://jmrplens.github.io/phonometry/guides/room-image-sources/
 
-### How much decay range do I need for a valid T20 or T30?
+# Image sources and the steady-state room field (Kuttruff / Vorländer / Bies)
 
-The fit window plus a safety margin must fit inside the impulse-to-noise ratio, the level distance between the band-filtered IR peak and its noise floor: ISO 3382 requires at least 35 dB of usable decay range for T20 and 45 dB for T30. An undersized range biases the fitted time upward, so `room_parameters` tightens its validity flags to 46 dB and 54 dB, keeping the bias inside the 5 % JND.
+Where [reverberation-time prediction](https://jmrplens.github.io/phonometry/guides/reverberation-prediction/) gives a
+single statistical decay rate and [room-acoustics measurement](https://jmrplens.github.io/phonometry/guides/room-acoustics/)
+analyses a *measured* impulse response, this page covers the two classical
+*predictions* of the sound field in a rectangular room, both in
+`phonometry.room`:
 
-### Should I measure the room impulse response with a sine sweep or an MLS?
+- the **image-source room impulse response** (`image_source_rir`): the
+  deterministic early reflection pattern built by mirroring a point source in
+  the six walls of a shoebox (Kuttruff *Room Acoustics* 4.1; Vorländer
+  *Auralization* 11.4); and
+- the **steady-state room field** (`steady_state_field` and its parts): the
+  statistical direct-plus-reverberant sound pressure level a source of known
+  power produces, with the room constant, critical distance and Schroeder
+  frequency (Bies *Engineering Noise Control* 6.4; Kuttruff 5.6).
 
-Both are ISO 18233 deconvolution methods that recover the impulse response with 20–30 dB more effective signal-to-noise ratio than an impulsive source. Prefer the exponential sine sweep (Annex B): it places harmonic distortion at negative arrival times, where it is discarded. Use MLS (Annex A) when the excitation must be periodic or the hardware favours a two-level signal; it is more sensitive to time variance.
+Together they bridge the sound power of `phonometry.emission` and the reverberation
+prediction of `phonometry.room`: one gives the full RIR, the other the level
+the same room settles to.
+
+## 1. Image-source room impulse response
+
+A rigid or absorbing rectangular room reflects a point source in its walls;
+each reflection is exactly the free-field sound of a **mirror image** of the
+source. Mirroring a coordinate in a wall (Vorländer Equation (11.36),
+`S_n = S − 2 d n`) turns the source into a regular lattice of images, and the
+room impulse response is the sum of the direct sound and one delayed,
+attenuated impulse per image (Kuttruff Equations (4.4)–(4.5),
+`g(t) = Σ_n A_n δ(t − t_n)`).
+
+Image `i` at distance `r_i` from the receiver arrives at `t_i = r_i / c`
+(Vorländer Equation (11.38)) with amplitude
+
+```text
+A_i = [ Π_walls R_wall^(reflections there) ] · exp(−m r_i / 2) / (4 π r_i)
+```
+
+combining the `1 / (4 π r_i)` spherical spreading, the product of the wall
+**pressure reflection factors** `R = √(1 − α)` (Vorländer Equation (11.39);
+`|R|² = 1 − α` in energy, Kuttruff 4.1) each raised to the number of
+reflections that image made off that wall, and the air pressure attenuation
+`exp(−m r_i / 2)` over the path (Kuttruff 4.1; `m` the *intensity* attenuation
+constant, so intensity falls as `exp(−m r)`).
+
+Along one axis the reflection count off the two walls of an image at lattice
+index `n` and mirror parity `p` is `|n − p|` (wall at 0) and `|n|` (wall at
+`L`), so the total reflection order is
+`|2 n_x − p_x| + |2 n_y − p_y| + |2 n_z − p_z|` (Allen & Berkley 1979). A
+shoebox has exactly `(2/3)(2 i₀³ + 3 i₀² + 4 i₀)` audible images up to order
+`i₀` (Kuttruff Equation (9.23), e.g. 1560 at order 10), and the temporal
+density of reflections grows as `dN/dt = 4 π c³ t² / V` (Kuttruff Equation
+(4.6)).
+
+The construction in one plan: every wall reflection is the straight-line sound
+of an image in a mirror room, so the geometry alone fixes each arrival. In the
+7 × 5 m room below the direct sound lands at 10.7 ms and the four first-order
+lateral images in plan follow between 17.3 and 21.6 ms; the ceiling and floor
+images of the 3-D room are omitted from the drawing.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_image_sources_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_image_sources.svg" alt="Plan of a 7 by 5 m room in the centre of its three by three grid of dashed mirror rooms: the source at (2, 1.6) and the receiver at (5.2, 3.4) joined by the 10.7 ms direct sound, filled first-order images in the four adjacent rooms labelled with their arrival times of 17.3, 20.5 and 21.6 ms, outlined second-order images in the corner rooms at 24.6 and 25.6 ms, and the first far-wall reflection drawn twice, as the real bent path off the wall and as the straight dashed line from the image to the receiver" width="92%"></picture>
+
+```python
+import numpy as np
+from phonometry import room
+
+# A 7 x 5 x 3 m room, source and receiver placed off-centre.
+res = room.image_source_rir(
+    dimensions=(7.0, 5.0, 3.0),
+    source=(2.0, 1.6, 1.5),
+    receiver=(5.2, 3.4, 1.7),
+    absorption=0.12,            # uniform wall absorption
+    fs=48000,
+    max_order=12,
+)
+
+print(res.ir.shape)                          # (n_samples,) broadband RIR
+print(round(res.direct_time * 1000, 2))      # direct-sound arrival, ms
+print(res.times.size, room.audible_image_count(12) + 1)  # images + direct source
+res.plot()   # the reflectogram of the figure below
+
+# Feed the synthetic RIR straight into the ISO 3382 decay analysis.
+params = room.room_parameters(res.ir, res.fs, limits=None)
+print(bool(params.t30_valid[0]))             # True: the decay window is usable
+# T30 rises toward the Eyring estimate as max_order grows (see below); at a low
+# order the specular tail is truncated, so treat this as an order-limited value.
+print(round(float(params.t30[0]), 2))        # reverberation time, s
+```
+
+`image_source_rir` returns an `ImageSourceResult`. Its `ir` is the sampled
+RIR (a 1D array broadband, or one row per octave band for per-band
+absorption); the **exact** sub-sample reflection table is kept separately in
+`times`, `distances`, `orders`, `amplitudes` and `image_positions`, so the
+geometry stays exact regardless of the sample rate. `.plot()` draws the
+reflectogram (reflection level in dB versus arrival time, coloured by order).
+
+Pass per-band coefficients (a `(6, n_bands)` per-wall array, a per-band vector,
+or a `frequencies` list) to synthesise one decay per octave band; pass a
+length-6 vector to set each wall separately (order
+`x0, xL, y0, yL, z0, zL`); and pass `air_attenuation` (the intensity
+coefficient `m` from `air_attenuation_m`) to add the `exp(−m r / 2)` air loss.
+
+```python
+import numpy as np
+from phonometry import room
+
+freqs = [250.0, 500.0, 1000.0, 2000.0]
+alpha = np.array([[0.10, 0.15, 0.25, 0.40]] * 6)     # (6 walls, 4 bands)
+res = room.image_source_rir((7.0, 5.0, 3.0), (2.0, 1.6, 1.5), (5.2, 3.4, 1.7),
+                            alpha, fs=48000, max_order=12, frequencies=freqs)
+print(res.ir.shape)                                  # (4 bands, n_samples)
+print(np.round(np.sum(res.ir ** 2, axis=1), 4))      # more absorption -> less energy
+```
+
+![Image-source reflectogram: the synthetic room impulse response of a 7x5x3 m room as a cloud of reflections coloured by reflection order, decaying under the 1/r spreading envelope with the direct sound marked at order 0](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/image_source_reflectogram.webp)
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import room
+
+res = room.image_source_rir((7.0, 5.0, 3.0), (2.0, 1.6, 1.5),
+                            (5.2, 3.4, 1.7), 0.12, fs=48000, max_order=10)
+
+# One line: the reflectogram (level in dB re direct vs arrival time, by order).
+res.plot()
+plt.show()
+
+# By hand: scatter the reflection amplitudes coloured by order.
+t_ms = np.asarray(res.times) * 1e3
+amp = np.asarray(res.amplitudes)
+level = 20 * np.log10(np.abs(amp) / np.max(np.abs(amp)))
+order = np.asarray(res.orders)
+fig, ax = plt.subplots()
+sc = ax.scatter(t_ms[order > 0], level[order > 0], c=order[order > 0],
+                cmap="viridis", s=18)
+ax.stem([t_ms[order == 0][0]], [0.0])         # direct sound
+fig.colorbar(sc, label="Reflection order")
+ax.set_xlabel("Arrival time [ms]"); ax.set_ylabel("Level re direct [dB]")
+ax.set_xlim(0, 120); ax.set_ylim(-60, 5)
+plt.show()
+```
+
+</details>
+
+Every dot of the reflectogram is a mirror image at a definite place, and
+`.plot_geometry()` shows where: the plan view below draws the room, the
+source, the receiver and every image up to third order on the mirror-room
+grid, coloured by reflection order.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/image_source_plan_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/image_source_plan.svg" alt="Plan view of the image-source lattice of a 7 by 5 metre room outlined in the centre, with the source as a red star at (2, 1.6), the receiver as a blue triangle at (5.2, 3.4), and the image sources at the plane of the source coloured by reflection order, first order orange, second order green and third order purple, spreading in a regular grid of mirror rooms out to about 26 metres" width="88%"></picture>
+
+*The lattice the reflectogram comes from, to scale: each image sits in a
+mirror room at the height plane of the source, and its distance to the
+receiver alone fixes the arrival time and the `1/(4 pi r)` spreading of that
+reflection.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import room
+
+res = room.image_source_rir((7.0, 5.0, 3.0), (2.0, 1.6, 1.5),
+                            (5.2, 3.4, 1.7), 0.3, fs=16000, max_order=3)
+
+# One line: the image lattice in plan, coloured by reflection order.
+res.plot_geometry()
+plt.show()
+```
+
+</details>
+
+**Reproducing the statistical decay.** The fitted initial decay slope of the
+reverberant energy density of the synthetic RIR recovers the **Eyring**
+reverberation time `T = −24 V ln 10 / (c S ln(1 − ᾱ))` (Kuttruff Equation
+(5.23)): the mean reflection rate `c S / 4 V` equals
+`(c/2)(1/Lx + 1/Ly + 1/Lz)`, so the specular field's initial decay rate is the
+one that defines that `T`. The match is exact only in the near-cubic
+limit; an elongated room sustains energy along its long axis, so its pure
+*specular* decay runs slower than Eyring's diffuse-field estimate (the regime
+the [Fitzroy and Arau-Puchades models](https://jmrplens.github.io/phonometry/guides/reverberation-prediction/) correct).
+The model captures specular reflections only, with no diffraction or diffuse
+scattering, and is exact only for real, angle-independent wall reflection
+factors (Kuttruff 4.1).
+
+## 2. Steady-state room field
+
+When a source of constant sound power runs in a room, the sound pressure level
+settles to the sum of a **direct field** that falls with distance and a
+**reverberant field** that (to the diffuse approximation) is the same
+everywhere. The **room constant**
+
+```text
+R = S ᾱ / (1 − ᾱ)                       (Bies Equation (6.44))
+```
+
+with total boundary area `S` and mean Sabine absorption `ᾱ` measures how much
+reverberant field a given power builds up. The **steady-state level** is
+
+```text
+Lp = Lw + 10 log10( Q / (4 π r²) + 4 / R )   [ + 10 log10(ρc / 400) ]
+                                               (Bies Equation (6.43))
+```
+
+with the source directivity factor `Q` (1 omnidirectional, 2 on a hard floor,
+4 in an edge, 8 in a corner). The optional `10 log10(ρc / 400)` term
+(about +0.14 dB at 20 °C) corrects for a characteristic impedance differing
+from 400 Pa·s/m and is omitted by default. The **critical distance**
+
+```text
+rc = √( Q R / (16 π) )
+```
+
+is where the two fields are equal (the crossover of Equation (6.43)); closer
+than `rc` the direct field dominates, farther the reverberant field does.
+Kuttruff's reverberation distance (Equation (5.44), `rc = √(A / 16 π)` for
+`Q = 1`) uses the Sabine absorption area `A = S ᾱ` instead of the room
+constant `R = A / (1 − ᾱ)`; the two coincide for a small `ᾱ` and this module
+uses `R`, so `rc` is exactly the crossover of its own `steady_state_spl`.
+
+```python
+from phonometry import room
+
+# A 90 dB source in a 100 m^2 room with 20 % mean absorption.
+field = room.steady_state_field(
+    sound_power_level=90.0,
+    surface_area=100.0,
+    mean_absorption=0.2,
+)
+print(round(field.room_constant, 1))          # 25.0 m^2
+print(round(field.critical_distance, 2))       # 0.71 m
+field.plot()                                    # direct / reverberant / total vs distance
+
+# The building blocks are exposed individually, too:
+print(round(float(room.room_constant(100.0, 0.2)), 1))            # 25.0
+print(round(float(room.critical_distance(25.0)), 3))              # 0.705
+print(round(float(room.steady_state_spl(90.0, 5.0, 25.0)), 2))    # far-field level
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/steady_state_field_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/steady_state_field.svg" alt="Steady-state room field of a 90 dB source in a workshop with a room constant of 62 square metres: the total sound pressure level follows the 6 dB-per-doubling direct field close to the source, crosses the constant reverberant plateau at the 1.11 m critical distance and flattens onto it beyond" width="80%"></picture>
+
+*A 90 dB re 1 pW source in a 12 x 8 x 4 m workshop with a mean absorption of
+0.15: within $r_c = 1.11$ m moving away drops the level 6 dB per doubling;
+beyond it the reverberant plateau takes over and only absorption, not
+distance, lowers the level (Bies 5e, §6.4).*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import room
+
+field = room.steady_state_field(
+    sound_power_level=90.0,     # Lw, dB re 1 pW
+    surface_area=352.0,          # a 12 x 8 x 4 m workshop
+    mean_absorption=0.15,
+)
+
+# One line: direct, reverberant and total levels with rc marked.
+field.plot()
+plt.show()
+
+# By hand, from the result's fields:
+fig, ax = plt.subplots()
+ax.semilogx(field.distances, field.direct, "--", label="Direct field")
+ax.semilogx(field.distances, field.reverberant, ":", label="Reverberant field")
+ax.semilogx(field.distances, field.total, label="Total")
+ax.axvline(field.critical_distance, ls="-.",
+           label=f"rc = {field.critical_distance:.2f} m")
+ax.set_xlabel("Distance from source [m]")
+ax.set_ylabel("Sound pressure level [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+The **Schroeder frequency**
+
+```text
+f_s = 2000 √(T / V)                       (Kuttruff Equation (3.44))
+```
+
+(`V` in m³, `T` in s) roughly marks the modal-to-diffuse transition, a
+heuristic crossover rather than a sharp cutoff: well below it discrete room
+modes dominate and the diffuse assumptions of `R` and `rc` grow unreliable,
+well above it the modes overlap and the statistical field of this section
+holds. In borderline rooms it is worth checking band by band.
+
+```python
+from phonometry import room
+print(round(float(room.schroeder_frequency(1.0, 200.0)), 0))   # 141 Hz (V=200, T=1)
+```
+
+## Validation
+
+The implementations are checked against the closed forms and the source texts'
+own numeric anchors (see [CONFORMANCE.md](https://jmrplens.github.io/phonometry/reference/conformance/)):
+
+- the direct-sound amplitude `1/(4 π r)` and delay `r / c` (exact geometry),
+  the audible image count (Kuttruff Equation (9.23)) and the reflection
+  density (Equation (4.6));
+- the Eyring reverberation time recovered from the decay of the synthetic RIR
+  in the near-cubic limit (documented ≈ 10 % tolerance), and an independent
+  2D FDTD (`phonometry.simulation`) reproducing the rigid-wall echo delay and
+  the uniform-damping `T60`;
+- the room constant, the critical distance as the exact direct/reverberant
+  crossover, the Schroeder frequency (Kuttruff's classroom example, `V = 200`,
+  `T = 1` → 141 Hz) and the steady-state level (Bies Equation (6.43)).
 
 ## References
 
 - Kuttruff, H. (2016). *Room acoustics* (6th ed.). CRC Press.
   [doi:10.1201/9781315372150](https://doi.org/10.1201/9781315372150).
-  The reference monograph behind this page: the statistical theory of
-  decaying sound fields, the Schroeder frequency and the perceptual room
-  parameters of §2.
-- Schroeder, M. R. (1965). New method of measuring reverberation time.
-  *The Journal of the Acoustical Society of America*, 37(3), 409-412.
-  [doi:10.1121/1.1909343](https://doi.org/10.1121/1.1909343).
-  The backward-integration method that turns the squared impulse response
-  into the smooth decay curve of §2.
-- Hak, C. C. J. M., Wenmaekers, R. H. C., & van Luxemburg, L. C. J. (2012).
-  Measuring room impulse responses: Impact of the decay range on derived
-  room acoustic parameters. *Acta Acustica united with Acustica*, 98(6),
-  907-915. [doi:10.3813/aaa.918574](https://doi.org/10.3813/aaa.918574).
-  The INR analysis behind the dynamic-range discussion and the tightened
-  validity flags of §2.
-- International Organization for Standardization. (2009). *Acoustics —
-  Measurement of room acoustic parameters — Part 1: Performance spaces*
-  (ISO 3382-1:2009).
-  [iso.org catalogue](https://www.iso.org/standard/40979.html).
-  The parameter definitions, position requirements and just-noticeable
-  differences of §2.
-- International Organization for Standardization. (2008). *Acoustics —
-  Measurement of room acoustic parameters — Part 2: Reverberation time in
-  ordinary rooms* (ISO 3382-2:2008).
-  [iso.org catalogue](https://www.iso.org/standard/36201.html).
-  The accuracy grades, position counts and the minimum source distance of
-  the position-averaging discussion in §1.
-- International Organization for Standardization. (2012). *Acoustics —
-  Measurement of room acoustic parameters — Part 3: Open plan offices*
-  (ISO 3382-3:2012).
-  [iso.org catalogue](https://www.iso.org/standard/46520.html).
-  The open-plan speech-privacy quantities of §3.
-- International Organization for Standardization. (2006). *Acoustics —
-  Application of new measurement methods in building and room acoustics*
-  (ISO 18233:2006).
-  [iso.org catalogue](https://www.iso.org/standard/40408.html).
-  The swept-sine and MLS acquisition of §1.
-
-## Standards
-
-ISO 18233:2006 (application of new measurement methods: the
-swept-sine and MLS acquisition of impulse responses); ISO 3382-1:2009 and
-ISO 3382-2:2008 (reverberation time and room parameters from the Schroeder
-decay); ISO 3382-3:2012 (open-plan office speech metrics). Validated
-against closed-form decays and the standards' own parameter definitions in the
-[conformance report](https://jmrplens.github.io/phonometry/reference/conformance/).
+  Section 4.1 (image sources, Equations (4.4)–(4.6)), Section 5.5–5.6
+  (Eyring reverberation, reverberation distance, Equations (5.23), (5.44)),
+  Section 3.6 (Schroeder frequency, Equation (3.44)) and Section 9.8 (audible
+  image count, Equation (9.23)).
+- Vorländer, M. (2020). *Auralization: Fundamentals of acoustics, modelling,
+  simulation, algorithms and acoustic virtual reality* (2nd ed.). Springer.
+  [doi:10.1007/978-3-030-51202-6](https://doi.org/10.1007/978-3-030-51202-6).
+  Chapter 11 (the image-source / mirror-source model, Equations (11.36),
+  (11.38), (11.39)).
+- Allen, J. B., & Berkley, D. A. (1979). Image method for efficiently
+  simulating small-room acoustics. *The Journal of the Acoustical Society of
+  America*, 65(4), 943–950.
+  [doi:10.1121/1.382599](https://doi.org/10.1121/1.382599).
+  The reflection-count decomposition of the rectangular-room image lattice.
+- Bies, D. A., Hansen, C. H., & Howard, C. Q. (2017). *Engineering noise
+  control* (5th ed.). CRC Press.
+  [doi:10.1201/9781351228152](https://doi.org/10.1201/9781351228152).
+  Section 6.4 (steady-state response and the room constant, Equations
+  (6.41)–(6.44)).
 
 ---
 
@@ -842,7 +1328,7 @@ The **reverberation time** $T$, the time for the sound-energy level to fall by
 **boundary areas** and the **sound-absorption coefficients** of its surfaces,
 through the classical statistical-acoustics formulae. This is the design-stage
 counterpart of the *measured* reverberation time of
-[Room Acoustics](https://jmrplens.github.io/phonometry/guides/sections/room-acoustics/) (ISO 3382) and complements the EN 12354-6
+[Room Acoustics](https://jmrplens.github.io/phonometry/guides/room-acoustics/) (ISO 3382) and complements the EN 12354-6
 model of [Sound absorption in enclosed spaces](https://jmrplens.github.io/phonometry/guides/enclosed-space-absorption/),
 which specialises the same physics to that standard's Clause 4.
 
@@ -1044,7 +1530,7 @@ domain of validity:
   coefficients: a single surface with $\alpha_i = 1$ drives the whole
   prediction to zero. Reverberation-room coefficients at or above 1.0 (a
   documented ISO 354 outcome, see the absorption section of
-  [Room Acoustics](https://jmrplens.github.io/phonometry/guides/sections/room-acoustics/)) lie outside the domain of the
+  [Room Acoustics](https://jmrplens.github.io/phonometry/guides/room-acoustics/)) lie outside the domain of the
   logarithmic term, so phonometry enforces each formula's own domain:
   Sabine accepts such coefficients as supplied (its linear
   $A = \sum_i S_i\alpha_i$ stays finite); Eyring accepts them as long as
@@ -1071,7 +1557,7 @@ point, that stays diffuse while it decays. The common breakages:
 - **Coupled volumes** (a hall with an open stage house, two rooms through a
   doorway) produce double-slope decays; no single $T$ exists, and the
   measured T20 and T30 disagree (the curvature diagnostic of
-  [Room Acoustics](https://jmrplens.github.io/phonometry/guides/sections/room-acoustics/)).
+  [Room Acoustics](https://jmrplens.github.io/phonometry/guides/room-acoustics/)).
 - **Disproportionate rooms** (corridors, low flat halls) with the
   absorption on one surface pair keep a grazing sound field parallel to the
   hard surfaces that the absorber barely touches; the measured time can be
@@ -1105,7 +1591,7 @@ is emitted. A target reverberation time supplied through the metadata's
 reverberation time is a target range rather than a strictly
 higher/lower-is-better quantity. It uses the same `ReportMetadata` container
 (documented under
-[Field insulation](https://jmrplens.github.io/phonometry/guides/insulation-field/#report-metadata-reportmetadata)) and
+[Insulation ratings](https://jmrplens.github.io/phonometry/guides/insulation-ratings/#report-metadata-reportmetadata)) and
 rendering engine as the other fiches; passing `metadata=None` produces a bare
 prediction fiche. Rendering needs reportlab (`pip install phonometry[report]`);
 only `engine="reportlab"` is supported. The fiche renders in English by default;
@@ -1316,7 +1802,7 @@ plt.show()
 The `ReverberationResult` carries the per-band absorption area and reverberation
 time, the volume and the object fraction, and its `.plot()` draws the
 reverberation-time spectrum. This is the prediction counterpart of the measured
-reverberation time in [Room Acoustics](https://jmrplens.github.io/phonometry/guides/sections/room-acoustics/)
+reverberation time in [Room Acoustics](https://jmrplens.github.io/phonometry/guides/room-acoustics/)
 (ISO 3382) and of the reverberation-room absorption of
 [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/guides/absorption-measurement/)
 (ISO 354).
@@ -1380,7 +1866,7 @@ the metadata's `requirement` field is printed as a reference line only, since a
 room reverberation time is a target range rather than a strictly
 higher/lower-is-better quantity. It uses the same `ReportMetadata` container
 (documented under
-[Field insulation](https://jmrplens.github.io/phonometry/guides/insulation-field/#report-metadata-reportmetadata)) and
+[Insulation ratings](https://jmrplens.github.io/phonometry/guides/insulation-ratings/#report-metadata-reportmetadata)) and
 rendering engine as the other fiches; passing `metadata=None` produces a bare
 characterisation fiche. Rendering needs reportlab
 (`pip install phonometry[report]`); only `engine="reportlab"` is supported. The
@@ -1977,7 +2463,7 @@ transfer index table beside the per-band MTI bars (the result's own `.plot()`),
 the boxed `STI = X` single number with the Annex F qualification band, an
 optional verdict row and a footer with the fixed disclaimer. It uses the same
 `ReportMetadata` container (documented under
-[Field insulation](https://jmrplens.github.io/phonometry/guides/insulation-field/#report-metadata-reportmetadata)) and
+[Insulation ratings](https://jmrplens.github.io/phonometry/guides/insulation-ratings/#report-metadata-reportmetadata)) and
 rendering engine as the ISO 717 insulation fiche; a supplied `requirement` is
 read as the minimum required STI (a higher STI passes). Rendering needs
 reportlab (`pip install phonometry[report]`); only `engine="reportlab"` is
@@ -2007,7 +2493,7 @@ repository. Click the preview to open the PDF:
 
 ## See also
 
-- [Room Acoustics](https://jmrplens.github.io/phonometry/guides/sections/room-acoustics/): the measured impulse response the
+- [Room Acoustics](https://jmrplens.github.io/phonometry/guides/room-acoustics/): the measured impulse response the
   indirect method consumes, and the open-plan metrics (ISO 3382-3) built on
   per-position STI.
 - [Speech Intelligibility Index](https://jmrplens.github.io/phonometry/guides/speech-intelligibility/): the
@@ -2035,352 +2521,5 @@ index*: the modulation transfer function and the m ↔ STI mapping, the STIPA
 test signal and direct method, the indirect method from the impulse response,
 auditory masking and the reception threshold (Tables A.2/A.3), the revised
 male speech spectrum (clause A.6.1) and the Annex F rating letters.
-
----
-
-
-<!-- source: docs/room-image-sources.md | canonical: https://jmrplens.github.io/phonometry/guides/room-image-sources/ -->
-Source: https://jmrplens.github.io/phonometry/guides/room-image-sources/
-
-# Image sources and the steady-state room field (Kuttruff / Vorländer / Bies)
-
-Where [reverberation-time prediction](https://jmrplens.github.io/phonometry/guides/reverberation-prediction/) gives a
-single statistical decay rate and [room-acoustics measurement](https://jmrplens.github.io/phonometry/guides/sections/room-acoustics/)
-analyses a *measured* impulse response, this page covers the two classical
-*predictions* of the sound field in a rectangular room, both in
-`phonometry.room`:
-
-- the **image-source room impulse response** (`image_source_rir`): the
-  deterministic early reflection pattern built by mirroring a point source in
-  the six walls of a shoebox (Kuttruff *Room Acoustics* 4.1; Vorländer
-  *Auralization* 11.4); and
-- the **steady-state room field** (`steady_state_field` and its parts): the
-  statistical direct-plus-reverberant sound pressure level a source of known
-  power produces, with the room constant, critical distance and Schroeder
-  frequency (Bies *Engineering Noise Control* 6.4; Kuttruff 5.6).
-
-Together they bridge the sound power of `phonometry.emission` and the reverberation
-prediction of `phonometry.room`: one gives the full RIR, the other the level
-the same room settles to.
-
-## 1. Image-source room impulse response
-
-A rigid or absorbing rectangular room reflects a point source in its walls;
-each reflection is exactly the free-field sound of a **mirror image** of the
-source. Mirroring a coordinate in a wall (Vorländer Equation (11.36),
-`S_n = S − 2 d n`) turns the source into a regular lattice of images, and the
-room impulse response is the sum of the direct sound and one delayed,
-attenuated impulse per image (Kuttruff Equations (4.4)–(4.5),
-`g(t) = Σ_n A_n δ(t − t_n)`).
-
-Image `i` at distance `r_i` from the receiver arrives at `t_i = r_i / c`
-(Vorländer Equation (11.38)) with amplitude
-
-```text
-A_i = [ Π_walls R_wall^(reflections there) ] · exp(−m r_i / 2) / (4 π r_i)
-```
-
-combining the `1 / (4 π r_i)` spherical spreading, the product of the wall
-**pressure reflection factors** `R = √(1 − α)` (Vorländer Equation (11.39);
-`|R|² = 1 − α` in energy, Kuttruff 4.1) each raised to the number of
-reflections that image made off that wall, and the air pressure attenuation
-`exp(−m r_i / 2)` over the path (Kuttruff 4.1; `m` the *intensity* attenuation
-constant, so intensity falls as `exp(−m r)`).
-
-Along one axis the reflection count off the two walls of an image at lattice
-index `n` and mirror parity `p` is `|n − p|` (wall at 0) and `|n|` (wall at
-`L`), so the total reflection order is
-`|2 n_x − p_x| + |2 n_y − p_y| + |2 n_z − p_z|` (Allen & Berkley 1979). A
-shoebox has exactly `(2/3)(2 i₀³ + 3 i₀² + 4 i₀)` audible images up to order
-`i₀` (Kuttruff Equation (9.23), e.g. 1560 at order 10), and the temporal
-density of reflections grows as `dN/dt = 4 π c³ t² / V` (Kuttruff Equation
-(4.6)).
-
-The construction in one plan: every wall reflection is the straight-line sound
-of an image in a mirror room, so the geometry alone fixes each arrival. In the
-7 × 5 m room below the direct sound lands at 10.7 ms and the four first-order
-lateral images in plan follow between 17.3 and 21.6 ms; the ceiling and floor
-images of the 3-D room are omitted from the drawing.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_image_sources_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_image_sources.svg" alt="Plan of a 7 by 5 m room in the centre of its three by three grid of dashed mirror rooms: the source at (2, 1.6) and the receiver at (5.2, 3.4) joined by the 10.7 ms direct sound, filled first-order images in the four adjacent rooms labelled with their arrival times of 17.3, 20.5 and 21.6 ms, outlined second-order images in the corner rooms at 24.6 and 25.6 ms, and the first far-wall reflection drawn twice, as the real bent path off the wall and as the straight dashed line from the image to the receiver" width="92%"></picture>
-
-```python
-import numpy as np
-from phonometry import room
-
-# A 7 x 5 x 3 m room, source and receiver placed off-centre.
-res = room.image_source_rir(
-    dimensions=(7.0, 5.0, 3.0),
-    source=(2.0, 1.6, 1.5),
-    receiver=(5.2, 3.4, 1.7),
-    absorption=0.12,            # uniform wall absorption
-    fs=48000,
-    max_order=12,
-)
-
-print(res.ir.shape)                          # (n_samples,) broadband RIR
-print(round(res.direct_time * 1000, 2))      # direct-sound arrival, ms
-print(res.times.size, room.audible_image_count(12) + 1)  # images + direct source
-res.plot()   # the reflectogram of the figure below
-
-# Feed the synthetic RIR straight into the ISO 3382 decay analysis.
-params = room.room_parameters(res.ir, res.fs, limits=None)
-print(bool(params.t30_valid[0]))             # True: the decay window is usable
-# T30 rises toward the Eyring estimate as max_order grows (see below); at a low
-# order the specular tail is truncated, so treat this as an order-limited value.
-print(round(float(params.t30[0]), 2))        # reverberation time, s
-```
-
-`image_source_rir` returns an `ImageSourceResult`. Its `ir` is the sampled
-RIR (a 1D array broadband, or one row per octave band for per-band
-absorption); the **exact** sub-sample reflection table is kept separately in
-`times`, `distances`, `orders`, `amplitudes` and `image_positions`, so the
-geometry stays exact regardless of the sample rate. `.plot()` draws the
-reflectogram (reflection level in dB versus arrival time, coloured by order).
-
-Pass per-band coefficients (a `(6, n_bands)` per-wall array, a per-band vector,
-or a `frequencies` list) to synthesise one decay per octave band; pass a
-length-6 vector to set each wall separately (order
-`x0, xL, y0, yL, z0, zL`); and pass `air_attenuation` (the intensity
-coefficient `m` from `air_attenuation_m`) to add the `exp(−m r / 2)` air loss.
-
-```python
-import numpy as np
-from phonometry import room
-
-freqs = [250.0, 500.0, 1000.0, 2000.0]
-alpha = np.array([[0.10, 0.15, 0.25, 0.40]] * 6)     # (6 walls, 4 bands)
-res = room.image_source_rir((7.0, 5.0, 3.0), (2.0, 1.6, 1.5), (5.2, 3.4, 1.7),
-                            alpha, fs=48000, max_order=12, frequencies=freqs)
-print(res.ir.shape)                                  # (4 bands, n_samples)
-print(np.round(np.sum(res.ir ** 2, axis=1), 4))      # more absorption -> less energy
-```
-
-![Image-source reflectogram: the synthetic room impulse response of a 7x5x3 m room as a cloud of reflections coloured by reflection order, decaying under the 1/r spreading envelope with the direct sound marked at order 0](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/image_source_reflectogram.webp)
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import room
-
-res = room.image_source_rir((7.0, 5.0, 3.0), (2.0, 1.6, 1.5),
-                            (5.2, 3.4, 1.7), 0.12, fs=48000, max_order=10)
-
-# One line: the reflectogram (level in dB re direct vs arrival time, by order).
-res.plot()
-plt.show()
-
-# By hand: scatter the reflection amplitudes coloured by order.
-t_ms = np.asarray(res.times) * 1e3
-amp = np.asarray(res.amplitudes)
-level = 20 * np.log10(np.abs(amp) / np.max(np.abs(amp)))
-order = np.asarray(res.orders)
-fig, ax = plt.subplots()
-sc = ax.scatter(t_ms[order > 0], level[order > 0], c=order[order > 0],
-                cmap="viridis", s=18)
-ax.stem([t_ms[order == 0][0]], [0.0])         # direct sound
-fig.colorbar(sc, label="Reflection order")
-ax.set_xlabel("Arrival time [ms]"); ax.set_ylabel("Level re direct [dB]")
-ax.set_xlim(0, 120); ax.set_ylim(-60, 5)
-plt.show()
-```
-
-</details>
-
-Every dot of the reflectogram is a mirror image at a definite place, and
-`.plot_geometry()` shows where: the plan view below draws the room, the
-source, the receiver and every image up to third order on the mirror-room
-grid, coloured by reflection order.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/image_source_plan_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/image_source_plan.svg" alt="Plan view of the image-source lattice of a 7 by 5 metre room outlined in the centre, with the source as a red star at (2, 1.6), the receiver as a blue triangle at (5.2, 3.4), and the image sources at the plane of the source coloured by reflection order, first order orange, second order green and third order purple, spreading in a regular grid of mirror rooms out to about 26 metres" width="88%"></picture>
-
-*The lattice the reflectogram comes from, to scale: each image sits in a
-mirror room at the height plane of the source, and its distance to the
-receiver alone fixes the arrival time and the `1/(4 pi r)` spreading of that
-reflection.*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import room
-
-res = room.image_source_rir((7.0, 5.0, 3.0), (2.0, 1.6, 1.5),
-                            (5.2, 3.4, 1.7), 0.3, fs=16000, max_order=3)
-
-# One line: the image lattice in plan, coloured by reflection order.
-res.plot_geometry()
-plt.show()
-```
-
-</details>
-
-**Reproducing the statistical decay.** The fitted initial decay slope of the
-reverberant energy density of the synthetic RIR recovers the **Eyring**
-reverberation time `T = −24 V ln 10 / (c S ln(1 − ᾱ))` (Kuttruff Equation
-(5.23)): the mean reflection rate `c S / 4 V` equals
-`(c/2)(1/Lx + 1/Ly + 1/Lz)`, so the specular field's initial decay rate is the
-one that defines that `T`. The match is exact only in the near-cubic
-limit; an elongated room sustains energy along its long axis, so its pure
-*specular* decay runs slower than Eyring's diffuse-field estimate (the regime
-the [Fitzroy and Arau-Puchades models](https://jmrplens.github.io/phonometry/guides/reverberation-prediction/) correct).
-The model captures specular reflections only, with no diffraction or diffuse
-scattering, and is exact only for real, angle-independent wall reflection
-factors (Kuttruff 4.1).
-
-## 2. Steady-state room field
-
-When a source of constant sound power runs in a room, the sound pressure level
-settles to the sum of a **direct field** that falls with distance and a
-**reverberant field** that (to the diffuse approximation) is the same
-everywhere. The **room constant**
-
-```text
-R = S ᾱ / (1 − ᾱ)                       (Bies Equation (6.44))
-```
-
-with total boundary area `S` and mean Sabine absorption `ᾱ` measures how much
-reverberant field a given power builds up. The **steady-state level** is
-
-```text
-Lp = Lw + 10 log10( Q / (4 π r²) + 4 / R )   [ + 10 log10(ρc / 400) ]
-                                               (Bies Equation (6.43))
-```
-
-with the source directivity factor `Q` (1 omnidirectional, 2 on a hard floor,
-4 in an edge, 8 in a corner). The optional `10 log10(ρc / 400)` term
-(about +0.14 dB at 20 °C) corrects for a characteristic impedance differing
-from 400 Pa·s/m and is omitted by default. The **critical distance**
-
-```text
-rc = √( Q R / (16 π) )
-```
-
-is where the two fields are equal (the crossover of Equation (6.43)); closer
-than `rc` the direct field dominates, farther the reverberant field does.
-Kuttruff's reverberation distance (Equation (5.44), `rc = √(A / 16 π)` for
-`Q = 1`) uses the Sabine absorption area `A = S ᾱ` instead of the room
-constant `R = A / (1 − ᾱ)`; the two coincide for a small `ᾱ` and this module
-uses `R`, so `rc` is exactly the crossover of its own `steady_state_spl`.
-
-```python
-from phonometry import room
-
-# A 90 dB source in a 100 m^2 room with 20 % mean absorption.
-field = room.steady_state_field(
-    sound_power_level=90.0,
-    surface_area=100.0,
-    mean_absorption=0.2,
-)
-print(round(field.room_constant, 1))          # 25.0 m^2
-print(round(field.critical_distance, 2))       # 0.71 m
-field.plot()                                    # direct / reverberant / total vs distance
-
-# The building blocks are exposed individually, too:
-print(round(float(room.room_constant(100.0, 0.2)), 1))            # 25.0
-print(round(float(room.critical_distance(25.0)), 3))              # 0.705
-print(round(float(room.steady_state_spl(90.0, 5.0, 25.0)), 2))    # far-field level
-```
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/steady_state_field_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/steady_state_field.svg" alt="Steady-state room field of a 90 dB source in a workshop with a room constant of 62 square metres: the total sound pressure level follows the 6 dB-per-doubling direct field close to the source, crosses the constant reverberant plateau at the 1.11 m critical distance and flattens onto it beyond" width="80%"></picture>
-
-*A 90 dB re 1 pW source in a 12 x 8 x 4 m workshop with a mean absorption of
-0.15: within $r_c = 1.11$ m moving away drops the level 6 dB per doubling;
-beyond it the reverberant plateau takes over and only absorption, not
-distance, lowers the level (Bies 5e, §6.4).*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import room
-
-field = room.steady_state_field(
-    sound_power_level=90.0,     # Lw, dB re 1 pW
-    surface_area=352.0,          # a 12 x 8 x 4 m workshop
-    mean_absorption=0.15,
-)
-
-# One line: direct, reverberant and total levels with rc marked.
-field.plot()
-plt.show()
-
-# By hand, from the result's fields:
-fig, ax = plt.subplots()
-ax.semilogx(field.distances, field.direct, "--", label="Direct field")
-ax.semilogx(field.distances, field.reverberant, ":", label="Reverberant field")
-ax.semilogx(field.distances, field.total, label="Total")
-ax.axvline(field.critical_distance, ls="-.",
-           label=f"rc = {field.critical_distance:.2f} m")
-ax.set_xlabel("Distance from source [m]")
-ax.set_ylabel("Sound pressure level [dB]")
-ax.legend()
-plt.show()
-```
-
-</details>
-
-The **Schroeder frequency**
-
-```text
-f_s = 2000 √(T / V)                       (Kuttruff Equation (3.44))
-```
-
-(`V` in m³, `T` in s) roughly marks the modal-to-diffuse transition, a
-heuristic crossover rather than a sharp cutoff: well below it discrete room
-modes dominate and the diffuse assumptions of `R` and `rc` grow unreliable,
-well above it the modes overlap and the statistical field of this section
-holds. In borderline rooms it is worth checking band by band.
-
-```python
-from phonometry import room
-print(round(float(room.schroeder_frequency(1.0, 200.0)), 0))   # 141 Hz (V=200, T=1)
-```
-
-## Validation
-
-The implementations are checked against the closed forms and the source texts'
-own numeric anchors (see [CONFORMANCE.md](https://jmrplens.github.io/phonometry/reference/conformance/)):
-
-- the direct-sound amplitude `1/(4 π r)` and delay `r / c` (exact geometry),
-  the audible image count (Kuttruff Equation (9.23)) and the reflection
-  density (Equation (4.6));
-- the Eyring reverberation time recovered from the decay of the synthetic RIR
-  in the near-cubic limit (documented ≈ 10 % tolerance), and an independent
-  2D FDTD (`phonometry.simulation`) reproducing the rigid-wall echo delay and
-  the uniform-damping `T60`;
-- the room constant, the critical distance as the exact direct/reverberant
-  crossover, the Schroeder frequency (Kuttruff's classroom example, `V = 200`,
-  `T = 1` → 141 Hz) and the steady-state level (Bies Equation (6.43)).
-
-## References
-
-- Kuttruff, H. (2016). *Room acoustics* (6th ed.). CRC Press.
-  [doi:10.1201/9781315372150](https://doi.org/10.1201/9781315372150).
-  Section 4.1 (image sources, Equations (4.4)–(4.6)), Section 5.5–5.6
-  (Eyring reverberation, reverberation distance, Equations (5.23), (5.44)),
-  Section 3.6 (Schroeder frequency, Equation (3.44)) and Section 9.8 (audible
-  image count, Equation (9.23)).
-- Vorländer, M. (2020). *Auralization: Fundamentals of acoustics, modelling,
-  simulation, algorithms and acoustic virtual reality* (2nd ed.). Springer.
-  [doi:10.1007/978-3-030-51202-6](https://doi.org/10.1007/978-3-030-51202-6).
-  Chapter 11 (the image-source / mirror-source model, Equations (11.36),
-  (11.38), (11.39)).
-- Allen, J. B., & Berkley, D. A. (1979). Image method for efficiently
-  simulating small-room acoustics. *The Journal of the Acoustical Society of
-  America*, 65(4), 943–950.
-  [doi:10.1121/1.382599](https://doi.org/10.1121/1.382599).
-  The reflection-count decomposition of the rectangular-room image lattice.
-- Bies, D. A., Hansen, C. H., & Howard, C. Q. (2017). *Engineering noise
-  control* (5th ed.). CRC Press.
-  [doi:10.1201/9781351228152](https://doi.org/10.1201/9781351228152).
-  Section 6.4 (steady-state response and the room constant, Equations
-  (6.41)–(6.44)).
 
 ---

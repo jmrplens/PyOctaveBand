@@ -111,6 +111,10 @@ def _site_routes() -> dict[str, str]:
         rel = path.relative_to(CONTENT)
         if rel.parts[0] == "es" or rel.parts[:2] == ("reference", "api"):
             continue
+        if "sections" in rel.parts:
+            # Area overviews share their stem with a guide (room-acoustics,
+            # human-vibration); the guide is the docs/ page's counterpart.
+            continue
         routes[path.stem] = rel.with_suffix("").as_posix()
     return routes
 

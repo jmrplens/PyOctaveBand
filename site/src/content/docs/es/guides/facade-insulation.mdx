@@ -1,0 +1,644 @@
+---
+title: "Aislamiento acústico de fachadas"
+description: "El cerramiento del edificio medido y previsto: las magnitudes de campo D2m, D2m,nT, D2m,n y R' de ISO 16283-3 con los métodos de altavoz y tráfico rodado, la predicción de EN 12354-3 a partir de los índices de los elementos, la radiación al exterior de EN 12354-4 y qué separa una fachada medida de una prevista."
+references:
+  - type: book
+    authors: ["Hopkins, C."]
+    year: 2007
+    title: "Sound insulation"
+    publisher: "Butterworth-Heinemann"
+    doi: "10.4324/9780080550473"
+    note: "La física de transmisión del cerramiento tras las magnitudes de fachada medidas y previstas. ISBN 978-0-7506-6526-1."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2016
+    title: "Acoustics — Field measurement of sound insulation in buildings and of building elements — Part 3: Façade sound insulation"
+    designation: "ISO 16283-3:2016"
+    url: "https://www.iso.org/standard/59748.html"
+    note: "Los métodos de fachada de elemento y global en campo, con las correcciones por ángulo de incidencia."
+  - type: standard
+    organization: "European Committee for Standardization"
+    year: 2000
+    title: "Building acoustics — Estimation of acoustic performance of buildings from the performance of elements — Part 3: Airborne sound insulation against outdoor sound"
+    designation: "EN 12354-3:2000"
+    url: "https://knowledge.bsigroup.com/products/building-acoustics-estimation-of-acoustic-performance-in-buildings-from-the-performance-of-elements-airborne-sound-insulation-against-outdoor-sound"
+    note: "La predicción de aislamiento acústico de fachada (ejemplo resuelto del Anexo F). La ficha de catálogo enlazada es la página de BSI Knowledge de BS EN 12354-3:2000."
+  - type: standard
+    organization: "European Committee for Standardization"
+    year: 2000
+    title: "Building acoustics — Estimation of acoustic performance of buildings from the performance of elements — Part 4: Transmission of indoor sound to the outside"
+    designation: "EN 12354-4:2000"
+    url: "https://knowledge.bsigroup.com/products/building-acoustics-estimation-of-acoustic-performance-in-buildings-from-the-performance-of-elements-transmission-of-indoor-sound-to-the-outside"
+    note: "La predicción de radiación al exterior (ejemplo resuelto del Anexo G). La ficha de catálogo enlazada es la página de BSI Knowledge de BS EN 12354-4:2000."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2020
+    title: "Acoustics — Rating of sound insulation in buildings and of building elements — Part 1: Airborne sound insulation"
+    designation: "ISO 717-1:2020"
+    url: "https://www.iso.org/standard/77435.html"
+    note: "El índice de curva de referencia que convierte cada magnitud de fachada de esta página en su número único (Anexo F de ISO 16283-3, EN ISO 717-1 para la predicción)."
+---
+
+import ThemeImage from '../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../components/ReportPreview.astro';
+
+La fachada es el único elemento del edificio que da la cara al ruido del que
+todo el mundo se queja: la carretera, el ferrocarril, la senda de vuelo.
+También es el elemento cuyo aislamiento se pide dos veces, una prevista y otra
+medida, y por eso ambas mitades viven en esta página. La ISO 16283-3 mide el
+cerramiento terminado y refiere el nivel de la sala receptora al nivel a 2 m
+frente a la fachada, con un altavoz a 45° o con el propio tráfico rodado. La
+EN 12354-3 predice esa misma diferencia de niveles estandarizada a partir de
+los índices de reducción acústica del muro, del acristalamiento y de la
+entrada de aire antes de instalar ninguno de ellos, y la EN 12354-4 le da la
+vuelta al cerramiento para radiar al exterior una fuente interior. Una sección
+final pone lado a lado la $D_{2m,nT}$ medida y la prevista y muestra qué las
+separa y qué no. Las curvas de referencia tras cada número único están en
+[Índices globales de aislamiento (ISO 717)](/phonometry/es/guides/insulation-ratings/);
+los cerramientos interiores del mismo edificio, en
+[Medición del aislamiento en campo (ISO 16283)](/phonometry/es/guides/insulation-field/)
+y en
+[Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/).
+
+## ¿Cómo calculo el aislamiento acústico de fachada D2m,nT,w con Python?
+
+Pasa el nivel a 2 m frente a la fachada, el nivel de la sala receptora y el
+tiempo de reverberación de la sala receptora a `building.facade_insulation()`
+y valora después su espectro `d_2m_nt` con `building.weighted_rating()`: la
+magnitud de fachada es a ruido aéreo, así que el motor de ISO 717-1 se aplica
+sin cambios (Anexo F). Antes de que la fachada exista,
+`building.facade_sound_reduction()` predice la misma magnitud a partir de los
+índices de los elementos y devuelve el propio índice global; para el ejemplo
+del Anexo F de EN 12354-3 de más abajo, `fac.d_2m_nt_w` vale 33 dB.
+
+## Medición en campo (ISO 16283-3)
+
+La misma lógica fuente/receptor alcanza la **fachada** del edificio, pero ahora
+la fuente está *en el exterior*: un altavoz a 45° o el propio tráfico rodado. En
+lugar de una diferencia de niveles a través de un cerramiento interior,
+ISO 16283-3 referencia el nivel de la sala receptora $L_2$ al nivel **2 m frente
+a la fachada** $L_{1,2m}$, dando la diferencia de niveles $D_{2m}$ y, exactamente
+como en el caso a ruido aéreo, sus formas estandarizada y normalizada:
+
+$$
+D_{2m} = L_{1,2m} - L_2, \quad
+D_{2m,nT} = D_{2m} + 10 \log_{10}\frac{T}{T_0}, \quad
+D_{2m,n} = D_{2m} - 10 \log_{10}\frac{A}{A_0},
+$$
+
+con $T_0 = 0{,}5$ s, $A_0 = 10$ m² y $A = 0{,}16\ V/T$ (viviendas). Cuando el
+micrófono se sitúa **sobre el elemento de ensayo** (nivel superficial $L_{1,s}$),
+el método del *elemento* también da un índice de reducción acústica aparente, que
+lleva una corrección fija por ángulo de incidencia: $-1{,}5$ dB para el método del
+altavoz a 45° y $-3$ dB para el método de tráfico rodado con todos los ángulos:
+
+$$
+R'_{45°} = L_{1,s} - L_2 + 10 \log_{10}\frac{S}{A} - 1{,}5, \qquad
+R'_{tr,s} = L_{1,s} - L_2 + 10 \log_{10}\frac{S}{A} - 3.
+$$
+
+La magnitud de fachada es a ruido aéreo, así que su índice de un solo número usa
+la curva de referencia de **ISO 717-1** a través de `weighted_rating` sin cambios
+(Anexo F).
+
+```python
+import numpy as np
+from phonometry import building
+
+# Nivel exterior 2 m frente a la fachada, nivel de la sala receptora y T por
+# banda de tercio de octava; surface_level es el micrófono sobre el elemento de ensayo.
+l1_2m = np.full(16, 75.0)                              # L1,2m en el exterior
+l2 = np.full(16, 33.0)                                 # L2 de la sala receptora
+t2 = np.full(16, 0.5)                                  # T de la sala receptora (s)
+
+fac = building.facade_insulation(l1_2m, l2, t2, volume=50.0, area=11.5,
+                        surface_level=np.full(16, 78.0), method="loudspeaker")
+print(round(float(fac.d_2m[0]), 1))                    # 42.0  D2m = L1,2m - L2
+print(round(float(fac.d_2m_nt[0]), 1))                 # 42.0  (= D2m ya que T = T0)
+print(round(float(fac.d_2m_n[0]), 1))                  # 40.0  normalizado a A0 = 10 m^2
+print(round(float(fac.r_prime[0]), 1))                 # 42.1  R'45deg (altavoz, -1.5 dB)
+
+# El método del elemento por tráfico rodado lleva en su lugar la corrección de -3 dB para todos los ángulos
+tr = building.facade_insulation(l1_2m, l2, t2, volume=50.0, area=11.5,
+                       surface_level=np.full(16, 78.0), method="road_traffic")
+print(round(float(tr.r_prime[0]), 1))                  # 40.6  R'tr,s (tráfico, -3 dB)
+
+# La magnitud de fachada es a ruido aéreo: valora D2m,nT con el motor de ISO 717-1
+print(building.weighted_rating(fac.d_2m_nt).rating)             # 42  Dls,2m,nT,w
+
+fac.plot()   # D2m,nT por banda con D2m, D2m,n y R' superpuestos (requiere matplotlib)
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_field_insulation_es.svg" alt="Aislamiento de fachada in situ de una vivienda con el método del altavoz a 45 grados: la D2m,nT estandarizada, la D2m bruta, la D2m,n normalizada y el índice de reducción aparente R'45 por banda de tercio de octava, con el índice Dls,2m,nT,w anotado" width="80%" />
+
+*Las cuatro magnitudes de fachada de una misma medición: la $D_{2m}$ bruta,
+sus formas estandarizada y normalizada, y la $R'_{45°}$ de elemento con la
+corrección por ángulo de incidencia de −1,5 dB. El recuadro recoge el valor
+único $D_{ls,2m,nT,w}$ obtenido al pasar $D_{2m,nT}$ al motor de ISO 717-1.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+# Fachada de una vivienda, método del altavoz a 45°: nivel exterior a 2 m,
+# nivel de la sala receptora y T por banda de tercio de octava.
+bands = np.array([100, 125, 160, 200, 250, 315, 400, 500,
+                  630, 800, 1000, 1250, 1600, 2000, 2500, 3150], float)
+l1_2m = np.array([76.0, 77.0, 78.0, 78.5, 79.0, 79.0, 79.0, 79.0,
+                  78.5, 78.0, 77.5, 77.0, 76.5, 76.0, 75.0, 74.0])
+d2m = np.array([24.0, 25.5, 27.0, 28.5, 30.0, 31.5, 33.0, 34.5,
+                36.0, 37.0, 38.0, 38.5, 39.0, 39.0, 38.5, 38.0])
+t2 = np.array([0.65, 0.62, 0.58, 0.55, 0.52, 0.50, 0.49, 0.48,
+               0.47, 0.46, 0.45, 0.44, 0.43, 0.43, 0.42, 0.42])
+fac = building.facade_insulation(l1_2m, l1_2m - d2m, t2, volume=32.0,
+                                 area=10.8, surface_level=l1_2m + 3.0,
+                                 method="loudspeaker", frequencies=bands)
+
+# Una línea: D2m,nT con D2m, D2m,n y R' superpuestos por banda:
+fac.plot(language="es")
+plt.show()
+
+# A mano, desde los campos del resultado:
+w = building.weighted_rating(fac.d_2m_nt)
+fig, ax = plt.subplots()
+ax.semilogx(bands, fac.d_2m_nt, "-s", label="D2m,nT (estandarizada)")
+ax.semilogx(bands, fac.d_2m, "--o", label="D2m")
+ax.semilogx(bands, fac.d_2m_n, ":", label="D2m,n (normalizada)")
+ax.semilogx(bands, fac.r_prime, "-.", label="R'45°")
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("Diferencia de niveles / índice de reducción [dB]")
+ax.set_title(f"Dls,2m,nT,w = {w.rating} dB  (C={w.c:+d}; Ctr={w.ctr:+d})")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+`surface_level`, `area` y `volume` son todos opcionales: solo con `l1_2m`, `l2`
+y `t2` la función devuelve `d_2m` y `d_2m_nt`; añade `volume` para `d_2m_n`;
+añade `surface_level` **y** `area` **y** `volume` para `r_prime`. Las posiciones
+se promedian en energía con la fórmula del nivel superficial (Cláusula 9.5.1);
+se asume que los niveles por banda ya están corregidos por ruido de fondo.
+
+### Parámetros de `facade_insulation()`
+
+| Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `l1_2m` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Nivel 2 m frente a la fachada `L1,2m` |
+| `l2` | array 1D o 2D | dB | mismo número de bandas | Niveles de la sala receptora |
+| `t2` | array 1D | s | > 0, uno por banda | Tiempo de reverberación de la sala receptora |
+| `area` | float, opcional | m² | > 0, con `surface_level`, `volume` | Superficie del elemento de ensayo `S` (habilita `R'`) |
+| `volume` | float, opcional | m³ | > 0 | Sala receptora `V` (habilita `D2m,n`; requerido para `R'`) |
+| `surface_level` | array 1D/2D, opcional | dB | mismo número de bandas | Nivel superficial `L1,s` sobre el elemento (habilita `R'`) |
+| `method` | str | — | `'loudspeaker'` (−1,5 dB) / `'road_traffic'` (−3 dB) | Corrección por ángulo de incidencia de `R'` |
+| `t0` | float | s | por defecto `0.5` | Tiempo de reverberación de referencia `T0` |
+| `frequencies` | array 1D, opcional | Hz | — | Centros de banda que lleva el resultado para representar |
+
+`facade_insulation()` devuelve un `FacadeInsulationResult` (`d_2m`, `d_2m_nt`,
+`d_2m_n` o `None`, `r_prime` o `None`, `frequencies`); pasa cualquier magnitud de
+fachada de 16 bandas a `weighted_rating` para su número único de ISO 717-1.
+
+### Informe de fachada en campo ISO 16283-3 (`.report()`)
+
+`FacadeInsulationResult.report(path)` escribe el informe de ensayo de fachada en
+campo ISO 16283-3 de una página: la línea de base normativa, una cabecera de
+metadatos opcional, la tabla en tercios de octava junto a la curva medida frente
+a la referencia desplazada, el índice de campo `D2m,nT,w (C; Ctr)` en su recuadro,
+la declaración de método de ingeniería, un veredicto opcional (una diferencia de
+niveles cumple si iguala o supera el requisito) y un pie. `quantity="d_2m_nt"`
+(por defecto) informa la diferencia de niveles estandarizada; `"d_2m_n"` la
+normalizada; `"r_prime"` el índice de reducción acústica aparente `R'45`.
+`verbose=True`, `metadata`, `language="es"` y el extra `phonometry[report]` se
+comportan igual que en las fichas anteriores.
+
+```python
+fac.report("D2mnTw_facade.pdf")                        # D2m,nT,w (C; Ctr)
+fac.report("Rp45_facade.pdf", quantity="r_prime")      # R'45,w (C; Ctr)
+```
+
+<ReportPreview
+	name="iso16283_facade_example"
+	title="Informe de ejemplo de fachada en campo ISO 16283-3 (PDF)"
+	description="Informe de ensayo de aislamiento acústico de fachada en campo de una página: la cabecera de metadatos, la tabla D2m,nT en tercios de octava junto a la curva medida frente a la referencia desplazada, el índice de campo D2m,nT,w (C; Ctr) en su recuadro, la declaración de método de ingeniería y un veredicto CUMPLE."
+	caption="Ficha de fachada en campo (FacadeInsulationResult.report), D2m,nT,w (C; Ctr)."
+/>
+
+## Predicción a partir de los elementos (EN 12354-3)
+
+Las partes 3 y 4 predicen los dos sentidos a través del cerramiento del edificio,
+ambos a partir de la misma suma energética de los **factores de transmisión** de
+los elementos $\tau = 10^{-R/10}$, ponderados por área según $S_i/S$ (un elemento
+pequeño o un paso de aire entra a través de su diferencia de nivel normalizada del
+elemento $D_{n,e}$ con el área de referencia $A_0 = 10\ \text{m}^2$):
+
+$$
+R' = -10 \log_{10}\!\Big( \sum_i \tfrac{S_i}{S}\,10^{-R_i/10}
+                          + \sum_k \tfrac{A_0}{S}\,10^{-D_{n,e,k}/10} \Big).
+$$
+
+**Parte 3: exterior → interior.** A partir de $R'$ (Fórmula 10) se derivan los
+índices referidos a altavoz y a tráfico $R_{45} = R'+1$ y $R_{tr,s} = R'$, y la
+salida principal, la diferencia de nivel estandarizada a 2 m (Fórmula 13)
+
+$$
+D_{2m,nT} = R' + \Delta L_{fs} + 10 \log_{10}\frac{V}{6\,T_0\,S}, \qquad T_0 = 0{,}5\ \text{s},
+$$
+
+con el término de forma de la fachada $\Delta L_{fs}$ (Anexo C; 0 dB para una
+fachada plana reflectante; `facade_shape_level_difference` lo consulta en la
+tabla de la Figura C.2 para galerías, balcones y terrazas, interpolando sobre
+la absorción del intradós $\alpha_w$). Los índices de un solo número reutilizan
+EN ISO 717-1 (`weighted_rating`).
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_prediction_es.svg" alt="Índices de reducción acústica parciales por elemento y la reducción aparente de la fachada R' y la diferencia de nivel estandarizada D2m,nT resultantes para el ejemplo resuelto del Anexo F de EN 12354-3, con la entrada de aire limitando las bandas bajas" width="80%" />
+
+```python
+from phonometry import building
+
+# EN 12354-3 Anexo F: una fachada de 11.3 m² (V = 50 m³, plana con ΔLfs = 0) de una
+# doble hoja, una ventana, un pequeño tragaluz y una entrada de aire con
+# tratamiento acústico (un elemento Dn,e).
+elements = [
+    building.FacadeElement("wall",     area=6.0, r=[41, 46, 52, 58, 64]),   # octava 125-2000
+    building.FacadeElement("window",   area=4.5, r=[23, 22, 30, 36, 37]),
+    building.FacadeElement("skylight", area=0.5, r=[24, 27, 30, 33, 30]),
+    building.FacadeElement("air inlet", dn_e=[28, 23, 25, 38, 44]),         # elemento pequeño
+]
+fac = building.facade_sound_reduction(elements, area=11.3, volume=50.0,
+                             frequencies=[125, 250, 500, 1000, 2000], bands="octave")
+print(fac.r_tr_s_w, fac.c_tr, fac.d_2m_nt_w)   # 31 -3 33  (R'tr,s,w / Ctr / D2m,nT,w)
+
+fac.plot()   # índices parciales por elemento con R' y D2m,nT superpuestos (requiere matplotlib)
+```
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import building
+
+# EN 12354-3 Anexo F: una fachada de 11.3 m² (V = 50 m³, plana con ΔLfs = 0) de una
+# doble hoja, una ventana, un pequeño tragaluz y una entrada de aire con
+# tratamiento acústico (un elemento Dn,e).
+elements = [
+    building.FacadeElement("wall",     area=6.0, r=[41, 46, 52, 58, 64]),   # octava 125-2000
+    building.FacadeElement("window",   area=4.5, r=[23, 22, 30, 36, 37]),
+    building.FacadeElement("skylight", area=0.5, r=[24, 27, 30, 33, 30]),
+    building.FacadeElement("air inlet", dn_e=[28, 23, 25, 38, 44]),         # elemento pequeño
+]
+fac = building.facade_sound_reduction(elements, area=11.3, volume=50.0,
+                             frequencies=[125, 250, 500, 1000, 2000], bands="octave")
+
+x = np.arange(5)
+fig, ax = plt.subplots(figsize=(9, 5.5))
+for name, rp in fac.element_r.items():
+    ax.plot(x, rp, "--", alpha=0.6, marker=".", label=f"Rp — {name}")
+ax.plot(x, fac.r_prime, "k-", lw=2.5, marker="o", label="R′ (fachada)")
+ax.plot(x, fac.d_2m_nt, lw=2, marker="s", label="D2m,nT")
+ax.set_xticks(x); ax.set_xticklabels([125, 250, 500, 1000, 2000])
+ax.set_xlabel("Frecuencia [Hz]"); ax.set_ylabel("Índice / diferencia de nivel [dB]")
+ax.set_title("Aislamiento acústico de fachada EN 12354-3 (Anexo F)")
+ax.legend(ncol=2); ax.grid(alpha=0.4)
+fig.tight_layout(); plt.show()
+```
+
+</details>
+
+El compuesto se razona mejor dibujado como áreas. `plot_facade_elements`
+tesela el alzado con el área dibujada de cada elemento igual a su área real
+(aquí un muro de fábrica de 6 m², una ventana de 1,5 m² y su cajón de persiana
+de 0,3 m²), y una predicción que retuvo sus `elements` redibuja su propia
+fachada con `fac.plot_geometry()`.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_elevation_geometry_es.svg" alt="Alzado a escala de una fachada compuesta: un muro de fábrica rayado de 6 m2, una ventana de 1,5 m2 y un estrecho cajón de persiana de 0,3 m2 dibujados como piezas de una fachada de 3,95 m por 1,97 m cuyas áreas dibujadas igualan las reales, cada pieza rotulada con su área y el ancho y alto totales acotados" width="88%" />
+
+*Las áreas que pondera la suma energética, a escala: la ventana tiene un
+cuarto del área del muro pero cada metro cuadrado suyo transmite cien veces
+más, así que las piezas pequeñas deciden $R'$.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import building
+
+# El compuesto de la predicción dibujado como áreas: 6 m² de muro, una
+# ventana de 1.5 m² y su cajón de persiana de 0.3 m².
+elements = [
+    building.FacadeElement("Masonry wall", area=6.0, r=[50.0] * 5),
+    building.FacadeElement("Window", area=1.5, r=[30.0] * 5),
+    building.FacadeElement("Roller shutter box", area=0.3, r=[22.0] * 5),
+]
+building.plot_facade_elements(elements, language="es")
+plt.show()
+
+# Una predicción retiene sus elementos y redibuja su propio alzado:
+#   fac = building.facade_sound_reduction(elements, area=7.8, volume=50.0)
+#   fac.plot_geometry(language="es")
+```
+
+</details>
+
+La predicción de fachada también escribe un informe de **predicción** de una
+página mediante un método `report(path)`, con la misma maquetación que las
+fichas de predicción a ruido aéreo y de impactos. `FacadePredictionResult.report()`
+representa la tabla de elementos de la fachada (el índice parcial ponderado
+`Rp,w` de cada elemento) junto a la gráfica por elemento / `R'` / `D2m,nT`, el
+número único previsto `D2m,nT,w` en un recuadro (con `R'tr,s,w` y `Ctr`), la
+declaración de predicción y, cuando se aporta un `requirement`, un veredicto
+APTO/NO APTO (la diferencia de niveles cumple si es igual o mayor). `verbose=True`
+añade la fracción de energía sonora transmitida por cada elemento, que señala el
+elemento limitante (aquí la entrada de aire, no la pared). El informe necesita
+los índices de número único de ISO 717-1, así que construye el resultado sobre
+las 5 bandas de octava o las 16 de tercio de octava. Los campos aplicables de
+`ReportMetadata` describen la situación prevista: `specimen` (el conjunto de
+elementos de la fachada), `area` (la superficie expuesta de la fachada), el
+volumen del recinto receptor `receiving_volume`, la situación exterior/de tráfico
+en `test_room`, además de los campos de identidad del calculista / laboratorio
+(`client`, `manufacturer`, `measurement_standard`, `laboratory`, `operator`,
+`report_id`, `test_date`), un resumen libre de la forma de la fachada y del
+modelo en `notes` y el objetivo `D2m,nT,w` en `requirement`. Los metadatos,
+`language="es"` y el extra `phonometry[report]` se comportan como en las fichas
+de medición.
+
+```python
+from phonometry import building, ReportMetadata
+
+# EN 12354-3 Anexo F, fachada -> D2m,nT,w = 33 dB (R'tr,s,w = 31, Ctr = -3).
+elements = [
+    building.FacadeElement("Masonry wall", area=6.0, r=[41, 46, 52, 58, 64]),
+    building.FacadeElement("Glazing",      area=4.5, r=[23, 22, 30, 36, 37]),
+    building.FacadeElement("Roof light",   area=0.5, r=[24, 27, 30, 33, 30]),
+    building.FacadeElement("Air inlet", dn_e=[28, 23, 25, 38, 44]),
+]
+fac = building.facade_sound_reduction(elements, area=11.3, volume=50.0,
+                             frequencies=[125, 250, 500, 1000, 2000], bands="octave")
+fac.report("D2mnT_prediction.pdf", metadata=ReportMetadata(
+    specimen="Masonry wall + window + roof light + air inlet", area=11.3,
+    receiving_volume=50.0, requirement=30.0,
+    notes="Fachada plana, ΔLfs = 0 dB (Anexo C)."))         # D2m,nT,w = 33 dB
+```
+
+<ReportPreview
+	name="iso12354_facade_prediction_example"
+	title="Informe de ejemplo de fachada prevista EN 12354-3 (PDF)"
+	description="Informe de una página de aislamiento acústico de fachada previsto (EN 12354-3 Anexo F): la cabecera de metadatos (conjunto de elementos de la fachada, superficie expuesta, volumen del recinto receptor, situación de tráfico), la tabla de elementos de la fachada (el índice parcial ponderado Rp,w de cada elemento) junto a la gráfica por elemento y R' / D2m,nT, el número único previsto D2m,nT,w = 33 dB en un recuadro (con R'tr,s,w = 31 y Ctr = -3), la declaración de predicción indicando la desviación típica del modelo de unos 2 dB y un veredicto APTO frente al requisito de 30 dB."
+	caption="Ficha de fachada prevista (FacadePredictionResult.report), D2m,nT,w."
+/>
+
+## Sonido interior radiado al exterior (EN 12354-4)
+
+**Parte 4: interior → exterior.** El nivel de potencia acústica radiada por un
+segmento (Fórmula 2) es $L_W = L_{p,in} + C_d - R' + 10 \log_{10}(S/S_0)$ con
+$S_0 = 1$ m² y el término de difusividad del campo interior $C_d$ (Anexo B;
+−6 dB difuso ideal, −5 dB industrial medio). Los huecos son elementos cuya «R»
+es la pérdida por inserción del silenciador (un hueco desnudo es 0 dB). El nivel
+exterior se obtiene de la atenuación simplificada $A_{tot}$ del Anexo E de un lado
+radiante finito, $L_p = L_W - A_{tot}$.
+
+```python
+from phonometry import building
+
+# EN 12354-4 Anexo G, lado 1: un segmento de pared de hormigón de 10×20 m con una
+# puerta industrial de 6×4 m, nivel interior Lp,in, Cd = -5 dB. El tope de 40 dB
+# sobre R' es una nota al pie del ejemplo del Anexo G (fugas en obra), no parte
+# de la Fórmula (2)/(3): pásalo explícitamente para reproducir el Anexo G;
+# por defecto no se aplica ningún tope.
+bands = [63, 125, 250, 500, 1000, 2000, 4000, 8000]
+seg = building.radiated_sound_power(
+    [building.FacadeElement("wall", area=176.0, r=[32, 36, 36, 33, 39, 49, 57, 63]),
+     building.FacadeElement("door", area=24.0,  r=[21, 23, 28, 30, 30, 30, 30, 30])],
+    lp_in=[70, 74, 76, 72, 70, 67, 62, 57], area=200.0, c_d=-5.0,
+    r_prime_cap=40.0, octave_bands=bands)
+print(round(seg.l_w[0], 1), round(seg.l_w[1], 1))     # 59.8 61.2  (LW a 63/125 Hz)
+
+# Nivel exterior a 5 m frente al centro del lado de 60×10 m (LWA = 62.9 dB(A)).
+a_tot = building.outdoor_attenuation(width=60.0, height=10.0, distance=5.0)
+print(round(a_tot, 1), round(building.outdoor_level(62.9, a_tot), 1))   # 26.3 36.6
+
+seg.plot()   # LW radiada por octava con la línea de LWA ponderada A (requiere matplotlib)
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/radiated_power_outdoor_es.svg" alt="Nivel de potencia acústica radiada por banda de octava del segmento de muro con puerta industrial del Anexo G de EN 12354-4, con el valor único ponderado A dibujado como línea discontinua sobre las barras" width="80%" />
+
+*El segmento del lado 1 del Anexo G: el muro domina la superficie pero la
+$R$ más débil de la puerta gobierna la potencia radiada, así que el espectro
+de octavas se mantiene plano donde el muro solo caería. La línea discontinua
+es el valor único ponderado A $L_{WA}$ formado a partir de las octavas.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+# EN 12354-4 Anexo G, lado 1: un segmento de muro de hormigón de 10×20 m con
+# una puerta industrial de 6×4 m, nivel interior Lp,in y Cd = -5 dB.
+bands = [63, 125, 250, 500, 1000, 2000, 4000, 8000]
+seg = building.radiated_sound_power(
+    [building.FacadeElement("muro", area=176.0, r=[32, 36, 36, 33, 39, 49, 57, 63]),
+     building.FacadeElement("puerta", area=24.0, r=[21, 23, 28, 30, 30, 30, 30, 30])],
+    lp_in=[70, 74, 76, 72, 70, 67, 62, 57], area=200.0, c_d=-5.0,
+    r_prime_cap=40.0, octave_bands=bands)
+
+# Una línea: LW por octava con la línea de LWA ponderada A:
+seg.plot(language="es")
+plt.show()
+
+# A mano, desde los campos del resultado:
+x = np.arange(len(bands))
+fig, ax = plt.subplots()
+ax.bar(x, seg.l_w, label="LW radiada por octava")
+ax.axhline(seg.l_w_dba, ls="--", color="tab:red",
+           label=f"LWA = {seg.l_w_dba:.1f} dB(A)")
+ax.set_xticks(x, [str(b) for b in bands])
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("Nivel de potencia acústica radiada [dB re 1 pW]")
+ax.set_title("Potencia acústica radiada EN 12354-4 (Anexo G)")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+> **Nota sobre los ejemplos resueltos.** Los ejemplos resueltos de 2000 arrastran
+> pequeñas inconsistencias internas de redondeo en las bandas de octava altas (el
+> $R'$ impreso de la Parte 3 no concuerda con sus propios índices parciales por
+> elemento a 1 k/2 k; las filas de $R'$ de la Parte 4 por encima de 500 Hz no
+> concuerdan con sus entradas de la Tabla G.2). La implementación es fiel a las
+> fórmulas: reproduce exactamente las bandas bajas, todos los índices de un solo
+> número y toda la propagación del Anexo E.
+
+### Parámetros de `FacadeElement` / `facade_sound_reduction()` / `radiated_sound_power()`
+
+| Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `FacadeElement.area` | float | m² | > 0 para `r` / `insertion_loss` | Área del elemento $S_i$ (se ignora para `dn_e`) |
+| `FacadeElement.r` / `dn_e` / `insertion_loss` | float o secuencia | dB | dar exactamente uno | Elemento de área $R_i$ / elemento pequeño $D_{n,e}$ / pérdida por inserción del hueco |
+| `facade_sound_reduction(area)` | float | m² | > 0 | Área total de la fachada $S$ |
+| `facade_sound_reduction(volume)` | float | m³ | > 0 | Volumen de la sala receptora $V$ (Fórmula 13) |
+| `facade_sound_reduction(delta_l_fs)` | float | dB | por defecto `0` | Término de forma de la fachada $\Delta L_{fs}$ (Anexo C; consúltalo con `facade_shape_level_difference`) |
+| `radiated_sound_power(lp_in)` | float o secuencia | dB | — | Nivel interior $L_{p,in}$ por banda |
+| `radiated_sound_power(c_d)` | float | dB | por defecto `-6` | Término de difusividad $C_d$ (Anexo B) |
+| `radiated_sound_power(r_prime_cap)` | float | dB | por defecto `None` (sin tope) | Tope de campo opcional sobre $R'$, nota al pie del ejemplo del Anexo G (usa 40 dB), no parte de la Fórmula (2)/(3) |
+| `radiated_sound_power(octave_bands)` | sec. de int | Hz | por defecto `None` | Centros de octava que casan con las bandas; habilita el $L_{WA}$ ponderado A |
+| `facade_sound_reduction(frequencies)` | secuencia | Hz | por defecto `None`; longitud = nº de bandas | Centros de banda que se conservan en el resultado para las gráficas |
+| `outdoor_attenuation(width, height, distance)` | float | m | > 0 | Lado radiante finito y distancia de recepción (Anexo E) |
+| `outdoor_level(l_w, attenuation)` | float o sec. | dB | compatibles por difusión | $L_p$ exterior de uno o varios lados (Fórmula E.1) |
+
+`facade_sound_reduction()` devuelve un `FacadePredictionResult` (`r_prime`, `r_45`,
+`r_tr_s`, `d_2m_nt`, `element_r`, y los números únicos `r_tr_s_w` / `d_2m_nt_w` /
+`c_tr`); `radiated_sound_power()` un `RadiatedPowerResult` (`l_w`, `r_prime`,
+`l_w_dba`). Ambos exponen `.plot()`.
+
+## Medición frente a predicción
+
+Las dos mitades de esta guía describen el mismo muro desde extremos opuestos
+de su vida: la EN 12354-3 antes de que exista, la ISO 16283-3 una vez
+construido. Merece la pena compararlas porque acaban en la misma magnitud, la
+diferencia de niveles estandarizada a 2 m, y porque el término geométrico que
+lleva la predicción de un índice a una diferencia de niveles es la propia
+normalización de la medición escrita de otra manera. Se parte de la
+definición medida, se sustituye $D_{2m}$ por el índice aparente que implica y
+se introduce el área de absorción de Sabine $A = 0{,}16\ V/T$:
+
+$$
+D_{2m,nT} = D_{2m} + 10 \log_{10}\frac{T}{T_0}
+          = R' + 10 \log_{10}\frac{A}{S} + 10 \log_{10}\frac{T}{T_0}
+          = R' + 10 \log_{10}\frac{0{,}16\ V}{S\ T_0}.
+$$
+
+El tiempo de reverberación se cancela: lo que sobrevive es el volumen de la
+sala frente a la superficie de la fachada. La Fórmula (13) de EN 12354-3
+escribe ese mismo término como $10 \log_{10} V/(6\,T_0\,S)$, que lleva la
+constante de Sabine como $1/6 = 0{,}167$ en lugar del $0{,}16$ de la norma de
+medición. Ambas difieren, por tanto, en un valor fijo de
+$10 \log_{10}(0{,}167/0{,}16) = 0{,}18$ dB en cada banda y en cualquier sala,
+y en nada más. (La revisión de 2017 de la norma de predicción armonizó su
+constante a 0,16, así que la diferencia es específica de la edición
+EN 12354-3:2000 que implementa el módulo.)
+
+Es una diferencia lo bastante pequeña como para comprobarla numéricamente. Se
+toma la fachada del Anexo F prevista arriba, se coloca en una sala receptora
+de 50 m³ con $T = T_0$ y se reconstruye el nivel de la sala receptora que
+habría encontrado una medición:
+
+```python
+import numpy as np
+from phonometry import building
+
+# La fachada del Anexo F prevista arriba, ahora "medida" en una sala receptora
+# de 50 m3 cuyo tiempo de reverberación es exactamente T0 = 0,5 s.
+elements = [
+    building.FacadeElement("wall",     area=6.0, r=[41, 46, 52, 58, 64]),
+    building.FacadeElement("window",   area=4.5, r=[23, 22, 30, 36, 37]),
+    building.FacadeElement("skylight", area=0.5, r=[24, 27, 30, 33, 30]),
+    building.FacadeElement("air inlet", dn_e=[28, 23, 25, 38, 44]),
+]
+volume, area = 50.0, 11.3
+fac = building.facade_sound_reduction(elements, area=area, volume=volume,
+                             frequencies=[125, 250, 500, 1000, 2000], bands="octave")
+
+# Lo que leería la medición en campo: A = 0,16 V / T es el área de Sabine de
+# ISO 16283-3, y R' - 10 lg(S/A) es la diferencia de niveles que implica.
+t2 = np.full(5, 0.5)
+l1_2m = np.full(5, 75.0)
+l2 = l1_2m - (fac.r_prime - 10 * np.log10(area / (0.16 * volume / t2)))
+meas = building.facade_insulation(l1_2m, l2, t2, volume=volume)
+
+print(np.round(meas.d_2m_nt - fac.d_2m_nt, 2))   # [-0.18 -0.18 -0.18 -0.18 -0.18]
+print(building.weighted_rating(meas.d_2m_nt).rating, fac.d_2m_nt_w)   # 33 33
+```
+
+Las dos curvas van paralelas hasta el segundo decimal y ambas se valoran en
+$D_{2m,nT,w} = 33$ dB. Todo lo que separa una predicción real de una medición
+real está, por tanto, en los datos de entrada y no en las fórmulas:
+
+* **Los índices de los elementos.** La predicción consume valores de $R$ de
+  laboratorio medidos con los flancos suprimidos y con el elemento montado
+  como lo monta el laboratorio. La fachada construida añade sus sellados
+  perimetrales, su cajón de persiana, la junta entre marco y mocheta y lo que
+  la obra haya hecho con ellos.
+* **El término de forma.** $\Delta L_{fs}$ vale 0 dB solo para una fachada
+  plana y reflectante. Un balcón, una galería o una terraza cambian el campo
+  en la posición de 2 m, y la medición se lleva ese cambio tal cual mientras
+  que la predicción tiene que buscarlo en el Anexo C.
+* **La fuente.** La ISO 16283-3 etiqueta el resultado con altavoz como
+  $D_{ls,2m,nT}$ precisamente porque un altavoz a 45° no es tráfico rodado; su
+  índice de elemento lleva una corrección de ángulo de −1,5 dB donde el método
+  de tráfico para todos los ángulos lleva −3 dB. La EN 12354-3 predice
+  directamente el $R_{tr,s} = R'$ referido al tráfico y ofrece
+  $R_{45} = R' + 1$ para la comparación con altavoz.
+* **La sala receptora.** La predicción supone el volumen de proyecto y un
+  campo receptor difuso. La medición toma la sala amueblada, y la hipótesis de
+  difusividad tras $A = 0{,}16\ V/T$ se debilita justo en las salas pequeñas y
+  en las bandas graves donde aprietan los requisitos de fachada.
+
+La lectura práctica: dimensiona el acristalamiento y las entradas de aire con
+la predicción, acepta la fachada terminada con la medición y no interpretes un
+par de decibelios entre ambas como un error de ninguna de las dos. Una
+predicción construida sobre índices de laboratorio y una medición en campo del
+cerramiento terminado llevan cada una su propia incertidumbre de ese orden; la [sección de incertidumbre de ISO 12999-1](/phonometry/es/guides/insulation-field/#incertidumbre-de-medicion-iso-12999-1)
+pone número a la mitad de medición. Y cuando ambas discrepen en mucho más que
+eso, la fracción de energía transmitida por elemento del informe de predicción
+es el primer sitio donde mirar: en esta fachada quien decide el resultado es la
+entrada de aire, no el muro.
+
+## Qué cubre esta guía
+
+**Cubierto.** La ISO 16283-3:2016 (las magnitudes de fachada en campo
+$D_{2m}$, $D_{2m,nT}$, $D_{2m,n}$, $R'_{45°}$ y $R'_{tr,s}$ de los métodos de
+elemento con altavoz y con tráfico rodado, con el promediado de posiciones del
+apartado 9.5.1 y el informe de ensayo del apartado 14) mediante
+`building.facade_insulation`; la EN 12354-3:2000 (la suma de factores de
+transmisión de la Fórmula 10, los índices $R_{45}$ y $R_{tr,s}$, la
+$D_{2m,nT}$ de la Fórmula 13 y el término de forma de fachada del Anexo C)
+mediante `building.facade_sound_reduction` y
+`building.facade_shape_level_difference`; y la EN 12354-4:2000 (la potencia
+acústica radiada de la Fórmula 2 con el término de difusividad del Anexo B y
+la atenuación del Anexo E de un lado radiante finito) mediante
+`building.radiated_sound_power`, `building.outdoor_attenuation` y
+`building.outdoor_level`. Los índices globales reutilizan el motor verificado
+de ISO 717-1, y tanto la medición como la predicción escriben su ficha de una
+página con `.report()`.
+
+**No cubierto.** Los niveles por banda que se pasan a `facade_insulation` se
+suponen ya corregidos por ruido de fondo, y no se comprueban los requisitos de
+procedimiento de la propia ISO 16283-3 (el número y la colocación de las
+posiciones de altavoz y micrófono, el procedimiento de baja frecuencia, la
+elección entre el método global y el de elemento). Los ejemplos resueltos de
+EN 12354-3 y EN 12354-4 de las ediciones de 2000 llevan pequeñas
+inconsistencias internas de redondeo en las bandas de octava altas, señaladas
+donde aparecen: la implementación sigue las fórmulas y no las filas impresas.
+
+## Véase también
+
+- [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/guides/insulation-field/):
+  las mediciones aéreas y de impacto en campo de los cerramientos interiores y
+  la incertidumbre de ISO 12999-1 que cualifica cada índice de campo.
+- [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/):
+  los modelos de flancos aéreos y de impacto de EN 12354-1/2, que comparten la
+  suma de factores de transmisión usada aquí.
+- [Índices globales de aislamiento (ISO 717)](/phonometry/es/guides/insulation-ratings/):
+  el motor de curva de referencia tras los números únicos $D_{2m,nT,w}$,
+  $R'_{45,w}$ y $R'_{tr,s,w}$.
+- [Método de control del aislamiento (ISO 10052)](/phonometry/es/guides/insulation-survey/):
+  la magnitud de fachada en bandas de octava del método rápido de control.
+- [Predicción del aislamiento de paneles](/phonometry/es/guides/panel-sound-insulation/):
+  la ley de masa, la coincidencia y los modelos de aberturas tras los valores
+  de $R$ de elemento que consume la predicción.
+- [Propagación del sonido en exteriores](/phonometry/es/guides/outdoor-propagation/):
+  la propagación desde la fuente hasta la posición a 2 m frente a la fachada y,
+  hacia fuera, desde el lado radiante de EN 12354-4.
+- [Teoría](/phonometry/es/reference/theory/rooms-buildings/): la derivación de
+  la curva de referencia que sustenta los índices ponderados de un solo número.
+- Referencia de la API: [`building.facade_prediction`](/phonometry/es/reference/api/building/facade-prediction/) y [`building.insulation`](/phonometry/es/reference/api/building/insulation/).

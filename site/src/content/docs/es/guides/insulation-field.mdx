@@ -1,6 +1,6 @@
 ---
-title: "Medición del aislamiento en campo e índices"
-description: "Aislamiento en campo a ruido aéreo, a impactos y de fachadas (ISO 16283-1/2/3) con índices ponderados de un solo número (ISO 717-1/2), la incertidumbre de medición que los cualifica (ISO 12999-1) y el método de control de ISO 10052."
+title: "Medición del aislamiento en campo (ISO 16283)"
+description: "Aislamiento acústico en campo con método de ingeniería (ISO 16283-1/-2): las diferencias de niveles aéreas D, DnT y R', los niveles de impactos L'nT y L'n, el informe de ensayo del apartado 14 y la incertidumbre de ISO 12999-1 que cualifica cada valor de campo."
 references:
   - type: book
     authors: ["Hopkins, C."]
@@ -32,13 +32,6 @@ references:
     note: "El método de impactos de campo: los niveles de impactos estandarizado y normalizado."
   - type: standard
     organization: "International Organization for Standardization"
-    year: 2016
-    title: "Acoustics — Field measurement of sound insulation in buildings and of building elements — Part 3: Façade sound insulation"
-    designation: "ISO 16283-3:2016"
-    url: "https://www.iso.org/standard/59748.html"
-    note: "Los métodos de fachada de elemento y global en campo, con las correcciones por ángulo de incidencia."
-  - type: standard
-    organization: "International Organization for Standardization"
     year: 2020
     title: "Acoustics — Rating of sound insulation in buildings and of building elements — Part 1: Airborne sound insulation"
     designation: "ISO 717-1:2020"
@@ -58,13 +51,6 @@ references:
     designation: "ISO 12999-1:2020"
     url: "https://www.iso.org/standard/73930.html"
     note: "Las incertidumbres típicas por situación de medición (Cláusula 5.2) y los factores de cobertura de la Tabla 8; su marco de precisión se apoya en ISO 5725 (contexto, no implementada directamente)."
-  - type: standard
-    organization: "International Organization for Standardization"
-    year: 2021
-    title: "Acoustics — Field measurements of airborne and impact sound insulation and of service equipment sound — Survey method"
-    designation: "ISO 10052:2021"
-    url: "https://www.iso.org/standard/76560.html"
-    note: "El método de control en campo: la corrección por índice de reverberación, las magnitudes aérea, de impacto y de fachada estandarizadas/normalizadas, y el ruido de equipos de servicio. Las fórmulas y la tabla del índice de reverberación son idénticas en la armonizada EN ISO 10052:2004+A1:2010."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -72,25 +58,34 @@ import ReportPreview from '../../../../components/ReportPreview.astro';
 
 Esta guía continúa desde la [guía de Acústica de salas](/phonometry/es/guides/room-acoustics/):
 la misma respuesta al impulso, medida a ambos lados de un cerramiento, da su
-aislamiento acústico. Esta página cubre el aislamiento medido *en el edificio*:
-aislamiento en campo a ruido aéreo, a impactos y de fachadas con índices de un
-solo número (ISO 16283-1/2/3, ISO 717-1/2), la incertidumbre de medición que
-cualifica cada índice (ISO 12999-1) y el método de control rápido de
-ISO 10052. La caracterización en laboratorio de un elemento está en
+aislamiento acústico. Esta página cubre la medición con método de ingeniería
+de ISO 16283 en el edificio terminado: las diferencias de niveles aéreas $D$,
+$D_{nT}$ y $R'$, los niveles de impactos $L'_{nT}$ y $L'_n$, el informe de
+ensayo in situ y la incertidumbre de ISO 12999-1 que cualifica cada valor de
+campo. Tres parientes cercanos tienen guías propias: el motor de curva de
+referencia tras cada número único en
+[Índices globales de aislamiento (ISO 717)](/phonometry/es/guides/insulation-ratings/),
+el cerramiento del edificio en
+[Aislamiento acústico de fachadas](/phonometry/es/guides/facade-insulation/) y
+la vía rápida en bandas de octava en
+[Método de control del aislamiento (ISO 10052)](/phonometry/es/guides/insulation-survey/).
+La caracterización en laboratorio de un elemento vive en
 [Medición del aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/)
 y la predicción del comportamiento in situ en
 [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/).
 
-## ¿Cómo calculo Rw a partir de datos de reducción acústica en tercios de octava con Python?
+## ¿Cómo calculo DnT y R' a partir de una medición en campo con Python?
 
-Pasa los 16 valores en tercios de octava de 100 Hz a 3150 Hz a
-`building.weighted_rating(R)`. Desplaza la curva de referencia de ISO 717-1 y
-devuelve el índice leído a 500 Hz, junto con los términos de adaptación
-espectral C y $C_{tr}$. Para el espectro medido que se usa abajo,
-`w.rating, w.c, w.ctr` imprime `30 -2 -3`: $R_w(C;C_{tr}) = 30(-2;-3)$. La
-misma llamada califica $R'$, $D_n$ y $D_{nT}$.
+Promedia en energía los niveles de las salas emisora y receptora por banda de
+tercio de octava y pásalos, junto con el tiempo de reverberación de la sala
+receptora, a `building.airborne_insulation(l1, l2, t2, area=S, volume=V)`. El
+resultado lleva la diferencia de niveles bruta `d`, la estandarizada `dnt` y,
+cuando se dan `area` y `volume`, la aparente `r_prime`. Las mediciones de
+impactos pasan por `building.impact_insulation(li, t2, volume=V)`, y cualquiera
+de los dos espectros se valora con `building.weighted_rating` /
+`weighted_impact_rating`.
 
-## Aislamiento en campo e índices de un solo número (ISO 16283-1, ISO 717-1)
+## Aislamiento a ruido aéreo en campo (ISO 16283-1)
 
 Para calificar una pared o un forjado, mide el nivel promediado en energía en
 la sala **emisora** ($L_1$) y en la sala **receptora** ($L_2$) por banda de
@@ -120,42 +115,6 @@ completo laboratorio-campo vive en
 la predicción que tiende el puente entre ambos es
 [EN 12354](/phonometry/es/guides/insulation-prediction/).
 
-El espectro por bandas se reduce a un número mediante el **método de la curva
-de referencia** de ISO 717-1: una curva de referencia fija se desplaza en
-pasos de 1 dB hacia la curva medida hasta que la suma de desviaciones
-*desfavorables* (donde la medición cae por debajo de la referencia) es lo más
-grande posible pero no mayor que 32,0 dB (16 bandas de tercio de octava) o
-10,0 dB (5 bandas de octava). El índice (`Rw`, `R'w`, `DnT,w` …) es la
-referencia desplazada leída a 500 Hz. Los **términos de adaptación
-espectral** $C$ (ruido rosa) y $C_{tr}$ (tráfico urbano) añaden la
-penalización en baja frecuencia de una fuente real.
-
-Los dos términos recalifican la misma curva medida frente a los dos espectros
-de fuente del Anexo A de ISO 717-1: $C$ frente a ruido rosa ponderado A,
-representativo de las actividades domésticas (habla, música, radio,
-televisión), y $C_{tr}$ frente a tráfico rodado urbano ponderado A, cuya
-energía se concentra en baja frecuencia. Están definidos de modo que el
-índice más el término ($R_w + C$ para un índice de laboratorio, $R'_w + C$ o
-$D_{nT,w} + C$ para las magnitudes de campo de esta guía, e igual con
-$C_{tr}$) es la diferencia de nivel ponderada A conseguida frente a esa
-fuente. Para leerlos:
-
-* $C$ se mantiene pequeño en la mayoría de construcciones (0 a −2 dB es lo
-  típico): el espectro rosa se parece a la ponderación ya implícita en la
-  curva de referencia.
-* $C_{tr}$ castiga el aislamiento débil en baja frecuencia. Una doble hoja
-  ligera con su resonancia masa-aire-masa cerca de 100 Hz puede llevar un
-  $C_{tr}$ de −5 a −10 dB, mientras que una pared monolítica pesada con el
-  mismo $R_w$ pierde mucho menos: dos construcciones con la misma
-  calificación pueden diferir de forma audible frente al tráfico.
-* Diseña con el descriptor que corresponda al ruido, sobre la magnitud de
-  campo que el requisito califica: $R'_w + C_{tr}$ para una fachada a una
-  calle con tráfico, $D_{nT,w} + C$ (o el índice a secas, donde la
-  reglamentación lo diga) entre viviendas, los dos requisitos de ejemplo de
-  ISO 717-1, 5.3.
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_rating_es.svg" alt="Índice de reducción acústica medido en tercios de octava con la curva de referencia de ISO 717-1 desplazada y el índice ponderado resultante a 500 Hz" width="80%" />
-
 ```python
 import numpy as np
 from phonometry import building
@@ -171,46 +130,10 @@ ins = building.airborne_insulation(l1, l2, t2, area=10.0, volume=50.0)
 print(round(float(ins.dnt[0]), 1))                   # 40.0  (= D ya que T = T0)
 print(round(float(ins.r_prime[0]), 1))               # 38.0
 
-# Índice de un solo número desde un espectro R medido de 16 bandas (ISO 717-1 Anexo C)
-R = [20.4, 16.3, 17.7, 22.6, 22.4, 22.7, 24.8, 26.6,
-     28.0, 30.5, 31.8, 32.5, 33.4, 33.0, 31.0, 25.5]
-w = building.weighted_rating(R)
-print(w.rating, w.c, w.ctr)                          # 30 -2 -3  ->  Rw(C;Ctr) = 30(-2;-3)
-
-w.plot()   # R' medido frente a la referencia ISO 717-1 desplazada, desviaciones sombreadas (requiere matplotlib)
+# El número único sale del motor de ISO 717-1 de la guía de índices
+print(building.weighted_rating(ins.dnt).rating)      # 40  DnT,w
+print(building.weighted_rating(ins.r_prime).rating)  # 38  R'w
 ```
-
-<details>
-<summary>Mostrar el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import building
-
-# Índice de un solo número desde un espectro R medido de 16 bandas (ISO 717-1 Anexo C)
-R = [20.4, 16.3, 17.7, 22.6, 22.4, 22.7, 24.8, 26.6,
-     28.0, 30.5, 31.8, 32.5, 33.4, 33.0, 31.0, 25.5]
-w = building.weighted_rating(R)
-
-# En una línea — la curva medida frente a la referencia ISO 717-1 desplazada:
-w.plot(language="es")
-plt.show()
-
-# A mano, con los campos de la curva por banda que ahora lleva el resultado:
-fig, ax = plt.subplots()
-ax.semilogx(w.band_centers, w.measured, "o-", label="R' medido")
-ax.semilogx(w.band_centers, w.shifted_reference, "s--", label="Referencia desplazada")
-ax.fill_between(w.band_centers, w.measured, w.shifted_reference,
-                where=w.measured < w.shifted_reference, interpolate=True,
-                alpha=0.3, label="Desviaciones desfavorables")
-ax.set_xlabel("Frecuencia [Hz]")
-ax.set_ylabel("Índice de reducción acústica [dB]")
-ax.set_title(f"Rw = {w.rating} dB  (C={w.c:+d}; Ctr={w.ctr:+d})")
-ax.legend()
-plt.show()
-```
-
-</details>
 
 Calcula `l1`, `l2` y `t2` en las mismas 16 bandas de tercio de octava de
 100 Hz a 3150 Hz (obtén `t2` de
@@ -229,101 +152,13 @@ función a `weighted_rating`, de modo que cada banda quede alineada índice a
 | `area` | float, opcional | m² | > 0, con `volume` | Superficie del cerramiento `S` (habilita `R'`) |
 | `volume` | float, opcional | m³ | > 0, con `area` | Volumen de la sala receptora `V` |
 | `t0` | float | s | por defecto `0.5` | Tiempo de reverberación de referencia `T0` |
-
-### Parámetros de `weighted_rating()`
-
-| Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
-| :--- | :--- | :--- | :--- | :--- |
-| `values_by_band` | array 1D | dB | 16 (tercios) o 5 (octavas) | `R`, `R'`, `DnT` … medidos por banda |
-| `bands` | str o `None` | — | `'third-octave'` / `'octave'` / `None` | `None` lo infiere del número de bandas |
-
 `airborne_insulation()` devuelve un `AirborneInsulationResult` (`d`, `dnt`,
-`r_prime` o `None`); `weighted_rating()` devuelve un `WeightedRatingResult`
-(`rating`, `c`, `ctr`, `unfavourable_sum`, todos enteros salvo la suma).
+`r_prime` o `None`). El motor de curva de referencia que convierte cualquiera
+de esos espectros en `Rw`, `R'w` o `DnT,w`, sus términos de adaptación
+espectral y sus variantes de rango ampliado están en
+[Índices globales de aislamiento (ISO 717)](/phonometry/es/guides/insulation-ratings/).
 
-### Rangos de frecuencia ampliados e índices con un decimal
-
-Cuando la medición cubre más que las 16 bandas básicas de 100–3150 Hz, el
-Anexo B de ISO 717-1 define términos de adaptación adicionales con el rango
-como subíndice ($C_{50\text{–}3150}$, $C_{50\text{–}5000}$,
-$C_{100\text{–}5000}$ y sus homólogos $C_{tr}$), calculados con los espectros de
-la Tabla B.1 sobre el rango ampliado. `weighted_rating_extended` toma los
-valores por banda *con sus frecuencias centrales* y devuelve el índice básico
-más todos los términos ampliados que cubra la entrada (la variante de impactos
-`weighted_impact_rating_extended` añade $C_{I,50\text{–}2500}$). Con
-`one_decimal=True` la curva de referencia se desplaza en pasos de 0,1 dB y
-todas las reducciones conservan un decimal: la variante que ISO 717 prescribe
-«para la expresión de la incertidumbre» y que el Anexo B de ISO 12999-1 exige
-al declarar la incertidumbre de un valor único.
-
-```python
-from phonometry import building
-
-# Índice de un solo número desde un espectro R medido de 16 bandas (ISO 717-1 Anexo C)
-R = [20.4, 16.3, 17.7, 22.6, 22.4, 22.7, 24.8, 26.6,
-     28.0, 30.5, 31.8, 32.5, 33.4, 33.0, 31.0, 25.5]
-
-freqs = [50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500,
-         630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000]
-r_ext = [18.7, 19.2, 20.0, *R, 26.8, 29.2]     # ISO 717-1 Anexo C, Tabla C.2
-ext = building.weighted_rating_extended(r_ext, freqs)
-print(ext.rating, ext.c, ext.ctr, ext.c_50_5000, ext.ctr_50_5000)
-# 30 -2 -3 -2 -4   ->  Rw(C;Ctr;C50-5000;Ctr,50-5000) = 30(-2;-3;-2;-4)
-
-one_dp = building.weighted_rating_extended(r_ext, freqs, one_decimal=True)
-print(one_dp.rating)   # 30.0, el índice en pasos de 0,1 dB para incertidumbres
-
-ext.plot()   # curva del rango ampliado frente a la referencia desplazada, términos del Anexo B en el título (requiere matplotlib)
-```
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/extended_insulation_rating_es.svg" alt="Índice de reducción acústica medido sobre el rango ampliado de 50 Hz a 5 kHz con la curva de referencia ISO 717-1 desplazada sobre las 16 bandas básicas, las desviaciones desfavorables sombreadas y las bandas del rango ampliado marcadas en ambos extremos" width="80%" />
-
-*El índice se sigue evaluando sobre las 16 bandas básicas (100–3150 Hz);
-las bandas ampliadas solo entran en los términos de adaptación del Anexo B,
-de modo que la curva de referencia desplazada se detiene en los bordes del
-rango básico mientras la curva medida continúa por el rango ampliado
-sombreado.*
-
-<details>
-<summary>Mostrar el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import building
-
-# Índice de un solo número desde un espectro R medido de 16 bandas (ISO 717-1 Anexo C)
-R = [20.4, 16.3, 17.7, 22.6, 22.4, 22.7, 24.8, 26.6,
-     28.0, 30.5, 31.8, 32.5, 33.4, 33.0, 31.0, 25.5]
-freqs = [50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500,
-         630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000]
-r_ext = [18.7, 19.2, 20.0, *R, 26.8, 29.2]     # ISO 717-1 Anexo C, Tabla C.2
-ext = building.weighted_rating_extended(r_ext, freqs)
-
-# Una línea: la curva del rango ampliado frente a la referencia básica desplazada:
-ext.plot(language="es")
-plt.show()
-
-# A mano, desde las curvas por banda que porta el resultado (la curva completa
-# del rango ampliado en ext, la referencia de las bandas básicas en ext.core):
-fig, ax = plt.subplots()
-ax.semilogx(ext.band_centers, ext.measured, "o-", label="R medido")
-ax.semilogx(ext.core.band_centers, ext.core.shifted_reference, "s--",
-            label="Referencia desplazada (bandas básicas)")
-ax.fill_between(ext.core.band_centers, ext.core.measured,
-                ext.core.shifted_reference,
-                where=ext.core.measured < ext.core.shifted_reference,
-                interpolate=True, alpha=0.3, label="Desviaciones desfavorables")
-ax.set_xlabel("Frecuencia [Hz]")
-ax.set_ylabel("Índice de reducción acústica [dB]")
-ax.set_title(f"Rw = {ext.rating} dB  (C50-5000={ext.c_50_5000:+g}; "
-             f"Ctr,50-5000={ext.ctr_50_5000:+g})")
-ax.legend()
-plt.show()
-```
-
-</details>
-
-### Ruido de impactos (ISO 16283-2, ISO 717-2)
+## Aislamiento a ruido de impactos en campo (ISO 16283-2)
 
 El ruido de pisadas se califica al revés. En lugar de cuánto *bloquea* un
 forjado, el aislamiento a impactos mide cuánto introduce en la sala inferior
@@ -347,21 +182,6 @@ aéreo.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_impact_setup_es.svg" alt="Montaje de aislamiento a impactos en campo: una máquina de impactos normalizada sobre el suelo de la sala emisora superior, micrófonos promediados en energía en la sala receptora inferior, y el tiempo de reverberación de la sala receptora" width="92%" />
 
-El índice de un solo número (ISO 717-2) desplaza el mismo estilo de curva de
-referencia, pero una **desviación desfavorable se produce ahora donde la
-medición *supera* la referencia** (el ruido de impactos es peor cuanto más
-alto), el signo opuesto a ISO 717-1. El índice (`Ln,w`, `L'n,w`, `L'nT,w`) es
-la referencia desplazada leída a 500 Hz; para bandas de octava se reduce además
-en 5 dB. El término de adaptación espectral $C_I = L_{n,\text{sum}} - 15 - L_{n,w}$
-usa la suma energética sobre 100–2500 Hz (los primeros 15 tercios, excluyendo
-3150 Hz) o 125–2000 Hz (octavas). Para mediciones ampliadas hasta 50 Hz,
-`weighted_impact_rating_extended` devuelve además el término de rango ampliado
-$C_{I,50\text{–}2500}$ (NOTA de A.2.1) y, con `one_decimal=True`, el índice en
-pasos de 0,1 dB usado en las declaraciones de incertidumbre (reproduce los
-valores impresos $L_{n,r,0,w} = 77,6$ dB y $C_{I,r,0} = -10,3$ dB de A.2.2).
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_rating_es.svg" alt="Nivel de presión acústica de impactos normalizado medido en tercios de octava con la curva de referencia de ISO 717-2 desplazada y el índice ponderado resultante leído a 500 Hz" width="80%" />
-
 ```python
 import numpy as np
 from phonometry import building
@@ -383,54 +203,13 @@ print(res_imp.rating, res_imp.ci, res_imp.unfavourable_sum)   # 79 -11 28.0  -> 
 # Los datos en banda de octava llevan la reducción extra de -5 dB (Cláusula 4.3.2)
 octave = np.array([65.3, 64.5, 58.0, 55.8, 43.0])
 print(building.weighted_impact_rating(octave).rating)  # 54
-
-res_imp.plot()   # L'nT medido frente a la referencia ISO 717-2 desplazada, exceso sombreado (requiere matplotlib)
 ```
-
-<details>
-<summary>Mostrar el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import building
-
-# 16 niveles de impactos Li en tercios de octava (100 Hz - 3150 Hz), dB, del
-# ejemplo resuelto del Anexo C de ISO 717-2, y el T de la sala receptora por banda.
-li = np.array([62.1, 63.2, 63.5, 66.2, 68.5, 70.0, 71.7, 73.1,
-               73.8, 73.5, 73.8, 73.3, 73.1, 73.0, 72.4, 71.2])
-t2 = np.full(16, 0.5)
-imp = building.impact_insulation(li, t2, volume=50.0)
-# Índice de impactos ponderado + término de adaptación espectral CI (ISO 717-2)
-res_imp = building.weighted_impact_rating(imp.l_n_t)
-
-# En una línea — L'nT medido frente a la referencia ISO 717-2 desplazada (exceso sombreado):
-res_imp.plot(language="es")
-plt.show()
-
-# A mano, con la curva por banda que ahora lleva el resultado (signo opuesto: la
-# desviación desfavorable está donde el nivel MEDIDO supera la referencia).
-# Aquí la entrada fue l_n_t, así que la magnitud valorada es el nivel de campo L'nT,w:
-fig, ax = plt.subplots()
-ax.semilogx(res_imp.band_centers, res_imp.measured, "o-", label="L'nT medido")
-ax.semilogx(res_imp.band_centers, res_imp.shifted_reference, "s--", label="Referencia desplazada")
-ax.fill_between(res_imp.band_centers, res_imp.shifted_reference, res_imp.measured,
-                where=res_imp.measured > res_imp.shifted_reference, interpolate=True,
-                alpha=0.3, label="Desviaciones desfavorables")
-ax.set_xlabel("Frecuencia [Hz]")
-ax.set_ylabel("Nivel de presión acústica de impactos [dB]")
-ax.set_title(f"L'nT,w = {res_imp.rating} dB  (CI={res_imp.ci:+d})")
-ax.legend()
-plt.show()
-```
-
-</details>
 
 Pasa el `l_n_t` (o `l_n`) de `impact_insulation` directamente a
 `weighted_impact_rating`; el índice y `CI` reproducen los valores del Anexo C de
 ISO 717-2 (tercios `L'nT,w = 79`, `CI = −11`; octava `54`, `CI = 0`).
 
-#### Parámetros de `impact_insulation()`
+### Parámetros de `impact_insulation()`
 
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
@@ -439,119 +218,11 @@ ISO 717-2 (tercios `L'nT,w = 79`, `CI = −11`; octava `54`, `CI = 0`).
 | `volume` | float, opcional | m³ | > 0 | `V` de la sala receptora (habilita `L'n`) |
 | `t0` | float | s | por defecto `0.5` | Tiempo de reverberación de referencia `T0` |
 
-#### Parámetros de `weighted_impact_rating()`
-
-| Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
-| :--- | :--- | :--- | :--- | :--- |
-| `values_by_band` | array 1D | dB | 16 (tercios) o 5 (octavas) | `Ln`, `L'n` o `L'nT` medidos por banda |
-| `bands` | str o `None` | — | `'third-octave'` / `'octave'` / `None` | `None` lo infiere del número de bandas |
-
 `impact_insulation()` devuelve un `ImpactInsulationResult` (`l_n_t`, `l_n` o
-`None`); `weighted_impact_rating()` devuelve un `ImpactRatingResult` (`rating`,
-`ci` enteros, `unfavourable_sum` en dB).
+`None`); el lado ISO 717-2 de la cadena está en
+[Índices globales de aislamiento (ISO 717)](/phonometry/es/guides/insulation-ratings/).
 
-### Informe de ISO 717 (`.report()`)
-
-Ambos resultados de calificación generan en PDF una ficha de una sola página con
-el formato de un informe de ensayo de laboratorio acreditado mediante el método
-`report(path)`: la línea de norma base (norma de medición más la parte de
-calificación de ISO 717), un bloque de encabezado de metadatos opcional, la
-tabla de tercios de octava junto a la gráfica de la curva medida frente a la
-referencia desplazada (el propio `.plot()` del resultado), el número único en
-un recuadro, una fila de veredicto opcional y un pie con el descargo fijo.
-`WeightedRatingResult.report()` etiqueta la ficha aérea de ISO 717-1
-(`Rw (C; Ctr)`, desviaciones donde la referencia supera a la medida);
-`ImpactRatingResult.report()` etiqueta la ficha de impactos de ISO 717-2
-(`Ln,w (CI)`, con el signo contrario). `SoundReductionResult.report()` es una
-utilidad que califica el `R(f)` predicho y escribe su ficha en una sola llamada.
-
-Los metadatos del informe se pasan como una dataclase congelada `ReportMetadata`
-(todos los campos opcionales; solo se representan los suministrados y los campos
-numéricos deben ser finitos y positivos). Pasar `metadata=None` genera una ficha
-de predicción ligera (solo el cuerpo, el resultado y el descargo). Cuando se
-define `metadata.requirement` se añade una fila de veredicto: una calificación
-aérea aprueba cuando iguala o supera el requisito y una de impactos cuando lo
-iguala o queda por debajo (un nivel de impactos menor es mejor). Con
-`verbose=True` la tabla de dos columnas `f | valor` se cambia por las columnas
-del Anexo C de ISO 717 (frecuencia, valor medido, referencia desplazada,
-desviación desfavorable).
-
-La generación necesita reportlab, mantenido fuera de las dependencias de
-ejecución como el extra opcional `phonometry[report]`
-(`pip install phonometry[report]`); si falta reportlab se lanza un `ImportError`
-claro con el comando de instalación, y la gráfica sigue necesitando matplotlib
-(`phonometry[plot]`). Solo se admite `engine="reportlab"`; cualquier otro motor
-lanza `ValueError`. La ficha se genera en inglés por defecto; pasa
-`language="es"` para una ficha en español (cadenas fijas traducidas y coma como
-separador decimal), p. ej.
-`building.weighted_rating(R).report("Rw_fiche_es.pdf", language="es")`.
-
-```python
-from phonometry import building, ReportMetadata
-
-# Calificación aérea a partir de un espectro R de 16 bandas (ISO 717-1)
-R = [20.4, 16.3, 17.7, 22.6, 22.4, 22.7, 24.8, 26.6,
-     28.0, 30.5, 31.8, 32.5, 33.4, 33.0, 31.0, 25.5]
-metadata = ReportMetadata(
-    specimen="Muro de hormigón armado de 200 mm",
-    client="Cliente de Ensayos Acústicos S.L.",
-    area=10.0, mass_per_area=460.0,
-    source_volume=53.0, receiving_volume=51.0,
-    temperature=21.5, relative_humidity=45.0, pressure=101.3,
-    test_room="Sala de transmisión T1",
-    measurement_standard="ISO 10140-2",
-    test_date="2026-07-18",
-    laboratory="Laboratorio de Referencia phonometry",
-    operator="J. M. Requena-Plens",
-    report_id="PHN-2026-0042",
-    requirement=42.0,          # añade la fila de veredicto PASS/FAIL
-)
-building.weighted_rating(R).report(
-    "Rw_ficha.pdf", metadata=metadata
-)                                                           # Rw (C; Ctr)
-
-# Calificación de impactos a partir de un espectro L'nT de 16 bandas (ISO 717-2)
-l_nt = [45.0, 47.0, 48.0, 49.0, 51.0, 52.0, 53.0, 54.0,
-        55.0, 56.0, 57.0, 58.0, 55.0, 52.0, 49.0, 46.0]
-building.weighted_impact_rating(l_nt).report("Lnw_ficha.pdf")  # Ln,w (CI)
-```
-
-Ambas fichas de ejemplo se regeneran con `make reports` y se conservan
-renderizadas en el repositorio; pulsa cualquier vista previa para abrir el PDF.
-
-<ReportPreview
-	name="iso717_airborne_example"
-	title="Informe de ejemplo aéreo ISO 717-1 (PDF)"
-	description="Ficha de aislamiento a ruido aéreo de una página: una cabecera de metadatos (cliente, muestra, superficie de la probeta, volúmenes de las salas, temperatura y humedad por sala, presión ambiente y montaje), la tabla de R en tercios de octava junto a la curva medida frente a la referencia desplazada, el resultado de un solo número Rw (C; Ctr) en caja y una fila de veredicto CUMPLE frente al requisito de 30 dB."
-	caption="Ficha de índice aéreo (WeightedRatingResult.report), Rw (C; Ctr)."
-/>
-
-<ReportPreview
-	name="iso717_impact_example"
-	title="Informe de ejemplo de impactos ISO 717-2 (PDF)"
-	description="Ficha de aislamiento a ruido de impactos con el mismo formato acreditado para el nivel de presión acústica de impactos normalizado Ln: la cabecera de metadatos, la tabla de Ln en tercios de octava junto a la curva medida frente a la referencia desplazada con la lectura a 500 Hz, el resultado de un solo número Ln,w (CI) en caja y una fila de veredicto NO CUMPLE frente al requisito de 53 dB (un nivel de impacto más bajo es mejor)."
-	caption="Ficha de índice de impactos (ImpactRatingResult.report), Ln,w (CI)."
-/>
-
-#### Metadatos del informe (`ReportMetadata`)
-
-Todos los campos son opcionales y solo se renderizan los que se aportan, de modo
-que el mismo objeto genera una ficha acreditada completa y una ficha ligera de
-predicción. Los campos numéricos se validan al construir el objeto según su
-rango físico.
-
-| Campo | Tipo | Se renderiza como |
-| --- | --- | --- |
-| `specimen`, `client`, `mounted_by`, `manufacturer` | `str` | Identidad de cabecera del elemento ensayado y para quién / quién lo montó |
-| `area`, `mass_per_area` | `float > 0` | Superficie de la probeta $S$ (m²) y masa por unidad de superficie medida (kg/m²) |
-| `source_volume`, `receiving_volume` | `float > 0` | Volúmenes de las salas (m³) |
-| `temperature`, `relative_humidity`, `pressure` | `float` | Clima representativo único: temperatura del aire (°C, cualquier signo), humedad relativa (0–100 %), presión ambiente (kPa, > 0) |
-| `source_temperature`, `source_relative_humidity`, `receiving_temperature`, `receiving_relative_humidity` | `float` | Clima por sala cuando la sala emisora y la receptora se informan por separado (mismos rangos que arriba) |
-| `test_room`, `mounting`, `measurement_standard`, `test_date` | `str` | Instalación, condición de montaje, norma de medición (forma la línea de base normativa) y fecha de ensayo |
-| `laboratory`, `operator`, `report_id`, `notes` | `str` | Pie: institución, línea de firma del operador, número de informe y observaciones libres |
-| `requirement` | `float > 0` | Valor objetivo de un solo número; añade la fila de veredicto (el aéreo cumple si es mayor o igual, el de impactos si es menor o igual) |
-
-### Informe de ensayo in situ de ISO 16283 (`.report()`)
+## Informe de ensayo in situ de ISO 16283 (`.report()`)
 
 Los resultados de campo por bandas escriben directamente el informe de ensayo
 del apartado 14 de ISO 16283-1:2014 / ISO 16283-2:2020, con el formato de los
@@ -683,161 +354,7 @@ renderizadas en el repositorio; pulsa cualquier vista previa para abrir el PDF.
 	caption="Ficha de impactos in situ (ImpactInsulationResult.report), L'nT,w (CI)."
 />
 
-### Aislamiento a ruido aéreo de fachadas en campo (ISO 16283-3)
-
-La misma lógica fuente/receptor alcanza la **fachada** del edificio, pero ahora
-la fuente está *en el exterior*: un altavoz a 45° o el propio tráfico rodado. En
-lugar de una diferencia de niveles a través de un cerramiento interior,
-ISO 16283-3 referencia el nivel de la sala receptora $L_2$ al nivel **2 m frente
-a la fachada** $L_{1,2m}$, dando la diferencia de niveles $D_{2m}$ y, exactamente
-como en el caso a ruido aéreo, sus formas estandarizada y normalizada:
-
-$$
-D_{2m} = L_{1,2m} - L_2, \quad
-D_{2m,nT} = D_{2m} + 10 \log_{10}\frac{T}{T_0}, \quad
-D_{2m,n} = D_{2m} - 10 \log_{10}\frac{A}{A_0},
-$$
-
-con $T_0 = 0{,}5$ s, $A_0 = 10$ m² y $A = 0{,}16\ V/T$ (viviendas). Cuando el
-micrófono se sitúa **sobre el elemento de ensayo** (nivel superficial $L_{1,s}$),
-el método del *elemento* también da un índice de reducción acústica aparente, que
-lleva una corrección fija por ángulo de incidencia: $-1{,}5$ dB para el método del
-altavoz a 45° y $-3$ dB para el método de tráfico rodado con todos los ángulos:
-
-$$
-R'_{45°} = L_{1,s} - L_2 + 10 \log_{10}\frac{S}{A} - 1{,}5, \qquad
-R'_{tr,s} = L_{1,s} - L_2 + 10 \log_{10}\frac{S}{A} - 3.
-$$
-
-La magnitud de fachada es a ruido aéreo, así que su índice de un solo número usa
-la curva de referencia de **ISO 717-1** a través de `weighted_rating` sin cambios
-(Anexo F).
-
-```python
-import numpy as np
-from phonometry import building
-
-# Nivel exterior 2 m frente a la fachada, nivel de la sala receptora y T por
-# banda de tercio de octava; surface_level es el micrófono sobre el elemento de ensayo.
-l1_2m = np.full(16, 75.0)                              # L1,2m en el exterior
-l2 = np.full(16, 33.0)                                 # L2 de la sala receptora
-t2 = np.full(16, 0.5)                                  # T de la sala receptora (s)
-
-fac = building.facade_insulation(l1_2m, l2, t2, volume=50.0, area=11.5,
-                        surface_level=np.full(16, 78.0), method="loudspeaker")
-print(round(float(fac.d_2m[0]), 1))                    # 42.0  D2m = L1,2m - L2
-print(round(float(fac.d_2m_nt[0]), 1))                 # 42.0  (= D2m ya que T = T0)
-print(round(float(fac.d_2m_n[0]), 1))                  # 40.0  normalizado a A0 = 10 m^2
-print(round(float(fac.r_prime[0]), 1))                 # 42.1  R'45deg (altavoz, -1.5 dB)
-
-# El método del elemento por tráfico rodado lleva en su lugar la corrección de -3 dB para todos los ángulos
-tr = building.facade_insulation(l1_2m, l2, t2, volume=50.0, area=11.5,
-                       surface_level=np.full(16, 78.0), method="road_traffic")
-print(round(float(tr.r_prime[0]), 1))                  # 40.6  R'tr,s (tráfico, -3 dB)
-
-# La magnitud de fachada es a ruido aéreo: valora D2m,nT con el motor de ISO 717-1
-print(building.weighted_rating(fac.d_2m_nt).rating)             # 42  Dls,2m,nT,w
-
-fac.plot()   # D2m,nT por banda con D2m, D2m,n y R' superpuestos (requiere matplotlib)
-```
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_field_insulation_es.svg" alt="Aislamiento de fachada in situ de una vivienda con el método del altavoz a 45 grados: la D2m,nT estandarizada, la D2m bruta, la D2m,n normalizada y el índice de reducción aparente R'45 por banda de tercio de octava, con el índice Dls,2m,nT,w anotado" width="80%" />
-
-*Las cuatro magnitudes de fachada de una misma medición: la $D_{2m}$ bruta,
-sus formas estandarizada y normalizada, y la $R'_{45°}$ de elemento con la
-corrección por ángulo de incidencia de −1,5 dB. El recuadro recoge el valor
-único $D_{ls,2m,nT,w}$ obtenido al pasar $D_{2m,nT}$ al motor de ISO 717-1.*
-
-<details>
-<summary>Mostrar el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import building
-
-# Fachada de una vivienda, método del altavoz a 45°: nivel exterior a 2 m,
-# nivel de la sala receptora y T por banda de tercio de octava.
-bands = np.array([100, 125, 160, 200, 250, 315, 400, 500,
-                  630, 800, 1000, 1250, 1600, 2000, 2500, 3150], float)
-l1_2m = np.array([76.0, 77.0, 78.0, 78.5, 79.0, 79.0, 79.0, 79.0,
-                  78.5, 78.0, 77.5, 77.0, 76.5, 76.0, 75.0, 74.0])
-d2m = np.array([24.0, 25.5, 27.0, 28.5, 30.0, 31.5, 33.0, 34.5,
-                36.0, 37.0, 38.0, 38.5, 39.0, 39.0, 38.5, 38.0])
-t2 = np.array([0.65, 0.62, 0.58, 0.55, 0.52, 0.50, 0.49, 0.48,
-               0.47, 0.46, 0.45, 0.44, 0.43, 0.43, 0.42, 0.42])
-fac = building.facade_insulation(l1_2m, l1_2m - d2m, t2, volume=32.0,
-                                 area=10.8, surface_level=l1_2m + 3.0,
-                                 method="loudspeaker", frequencies=bands)
-
-# Una línea: D2m,nT con D2m, D2m,n y R' superpuestos por banda:
-fac.plot(language="es")
-plt.show()
-
-# A mano, desde los campos del resultado:
-w = building.weighted_rating(fac.d_2m_nt)
-fig, ax = plt.subplots()
-ax.semilogx(bands, fac.d_2m_nt, "-s", label="D2m,nT (estandarizada)")
-ax.semilogx(bands, fac.d_2m, "--o", label="D2m")
-ax.semilogx(bands, fac.d_2m_n, ":", label="D2m,n (normalizada)")
-ax.semilogx(bands, fac.r_prime, "-.", label="R'45°")
-ax.set_xlabel("Frecuencia [Hz]")
-ax.set_ylabel("Diferencia de niveles / índice de reducción [dB]")
-ax.set_title(f"Dls,2m,nT,w = {w.rating} dB  (C={w.c:+d}; Ctr={w.ctr:+d})")
-ax.legend()
-plt.show()
-```
-
-</details>
-
-`surface_level`, `area` y `volume` son todos opcionales: solo con `l1_2m`, `l2`
-y `t2` la función devuelve `d_2m` y `d_2m_nt`; añade `volume` para `d_2m_n`;
-añade `surface_level` **y** `area` **y** `volume` para `r_prime`. Las posiciones
-se promedian en energía con la fórmula del nivel superficial (Cláusula 9.5.1);
-se asume que los niveles por banda ya están corregidos por ruido de fondo.
-
-#### Parámetros de `facade_insulation()`
-
-| Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
-| :--- | :--- | :--- | :--- | :--- |
-| `l1_2m` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Nivel 2 m frente a la fachada `L1,2m` |
-| `l2` | array 1D o 2D | dB | mismo número de bandas | Niveles de la sala receptora |
-| `t2` | array 1D | s | > 0, uno por banda | Tiempo de reverberación de la sala receptora |
-| `area` | float, opcional | m² | > 0, con `surface_level`, `volume` | Superficie del elemento de ensayo `S` (habilita `R'`) |
-| `volume` | float, opcional | m³ | > 0 | Sala receptora `V` (habilita `D2m,n`; requerido para `R'`) |
-| `surface_level` | array 1D/2D, opcional | dB | mismo número de bandas | Nivel superficial `L1,s` sobre el elemento (habilita `R'`) |
-| `method` | str | — | `'loudspeaker'` (−1,5 dB) / `'road_traffic'` (−3 dB) | Corrección por ángulo de incidencia de `R'` |
-| `t0` | float | s | por defecto `0.5` | Tiempo de reverberación de referencia `T0` |
-| `frequencies` | array 1D, opcional | Hz | — | Centros de banda que lleva el resultado para representar |
-
-`facade_insulation()` devuelve un `FacadeInsulationResult` (`d_2m`, `d_2m_nt`,
-`d_2m_n` o `None`, `r_prime` o `None`, `frequencies`); pasa cualquier magnitud de
-fachada de 16 bandas a `weighted_rating` para su número único de ISO 717-1.
-
-#### Informe de fachada en campo ISO 16283-3 (`.report()`)
-
-`FacadeInsulationResult.report(path)` escribe el informe de ensayo de fachada en
-campo ISO 16283-3 de una página: la línea de base normativa, una cabecera de
-metadatos opcional, la tabla en tercios de octava junto a la curva medida frente
-a la referencia desplazada, el índice de campo `D2m,nT,w (C; Ctr)` en su recuadro,
-la declaración de método de ingeniería, un veredicto opcional (una diferencia de
-niveles cumple si iguala o supera el requisito) y un pie. `quantity="d_2m_nt"`
-(por defecto) informa la diferencia de niveles estandarizada; `"d_2m_n"` la
-normalizada; `"r_prime"` el índice de reducción acústica aparente `R'45`.
-`verbose=True`, `metadata`, `language="es"` y el extra `phonometry[report]` se
-comportan igual que en las fichas anteriores.
-
-```python
-fac.report("D2mnTw_facade.pdf")                        # D2m,nT,w (C; Ctr)
-fac.report("Rp45_facade.pdf", quantity="r_prime")      # R'45,w (C; Ctr)
-```
-
-<ReportPreview
-	name="iso16283_facade_example"
-	title="Informe de ejemplo de fachada en campo ISO 16283-3 (PDF)"
-	description="Informe de ensayo de aislamiento acústico de fachada en campo de una página: la cabecera de metadatos, la tabla D2m,nT en tercios de octava junto a la curva medida frente a la referencia desplazada, el índice de campo D2m,nT,w (C; Ctr) en su recuadro, la declaración de método de ingeniería y un veredicto CUMPLE."
-	caption="Ficha de fachada en campo (FacadeInsulationResult.report), D2m,nT,w (C; Ctr)."
-/>
+<span id="incertidumbre-de-medicion-iso-12999-1"></span>
 
 ## Incertidumbre de medición (ISO 12999-1)
 
@@ -933,255 +450,81 @@ plt.show()
 `coverage_factor`, `expanded_uncertainty`, `.lower`, `.upper`). El mapa de solo
 lectura `COVERAGE_FACTORS` expone la Tabla 8 indexada por `(confidence, one_sided)`.
 
-## Método de control en campo (ISO 10052)
+## Más allá de la medición entre dos salas
 
-Los métodos de ingeniería anteriores compran precisión con esfuerzo:
-micrófonos barridos, tiempos de reverberación por banda, corrección de ruido de
-fondo cuidadosa. Para una comprobación rápida en una vivienda, ISO 10052 define
-un **método de control (survey)**: bandas de octava, un sonómetro de mano y una
-sola magnitud, el **índice de reverberación** `k = 10 lg(T/T0)` (`T0 = 0,5 s`),
-que arrastra la corrección de la sala receptora. Cada magnitud del control es
-entonces una simple suma de `k`: la diferencia de niveles estandarizada
-`DnT = D + k`, la normalizada `Dn = D + k + 10 lg(A0 T0 / (0,16 V))`, la aparente
-`R' = D + k + 10 lg(S T0 / (0,16 V))` (usando `V/7,5` como `S` cuando es mayor) y,
-para impactos y fachadas, `L'nT = Li - k` y `D2m,nT = D2m + k`. Las referencias a
-cláusulas siguen ISO 10052:2021; las fórmulas y la tabla del índice de
-reverberación son idénticas en la armonizada EN ISO 10052:2004+A1:2010.
-
-El índice de reverberación se **mide** (pasa el tiempo de reverberación a
-`reverberation_index(T)`) o, en un control, se **estima** a partir del tipo de
-sala y el volumen con `estimate_reverberation_index(V, room)` (Tabla 4:
-amueblada `"kitchen"` / `"bathroom"` / `"furnished"`, o las clases de
-construcción sin amueblar `"a"`–`"h"` y las mixtas `"a+e"`…`"d+h"`). Una cuarta
-magnitud propia de este método es el **ruido de equipos de servicio** `LXY`: la
-media energética de tres posiciones ponderadas A o C.
-
-```python
-import numpy as np
-from phonometry import building
-
-# Niveles por banda de octava (125-2000 Hz) y el T medido de la sala receptora.
-l1 = np.array([88.0, 90.0, 92.0, 92.0, 90.0])
-l2 = np.array([55.0, 51.0, 47.0, 41.0, 35.0])
-k = building.reverberation_index([0.70, 0.60, 0.50, 0.45, 0.40])   # k = 10 lg(T/0.5)
-res = building.survey_airborne_insulation(l1, l2, k, volume=50.0, area=12.0)
-print(np.round(res.d_nt, 1))          # [34.5 39.8 45.  50.5 54. ]  DnT = D + k
-print(res.rating.rating, res.rating.c)        # 49 -1  ->  DnT,w (C)
-print(res.r_prime_rating.rating)               # 48  ->  R'w
-
-# ¿Sin T medido? Estima k con la Tabla 4 (paredes pesadas, suelo duro,
-# 35-60 m³ -> clase "g").
-k_est = building.estimate_reverberation_index(50.0, "g")
-print(k_est)                                   # [4.5 5.  5.5 5.5 5.5]
-
-# Ruido de equipos de servicio: media energética de tres posiciones (dB(A)).
-se = building.survey_service_equipment_level([35.0, 30.0, 32.0], 3.0, volume=50.0)
-print(round(float(se.l_xy), 1), round(float(se.l_xy_nt), 1))   # 32.8 29.8
-
-res.plot()   # DnT vs curva de referencia ISO 717-1 desplazada (necesita matplotlib)
-```
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_insulation_es.svg" alt="Aislamiento aéreo por el método de control: la diferencia de niveles bruta D y la estandarizada DnT en las cinco bandas de octava, con la corrección por índice de reverberación k sombreada entre ambas" width="80%" />
-
-*El índice de reverberación `k = 10 lg(T/T0)` desplaza la diferencia de niveles
-bruta `D` hacia la estandarizada `DnT`: hacia arriba donde la sala es viva
-(`T > T0`), hacia abajo donde es apagada. El índice automático solo se forma con
-exactamente 5 valores de octava (o 16 de tercio de octava).*
-
-<details>
-<summary>Mostrar el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import building
-
-# Niveles por bandas de octava (125-2000 Hz) y el T medido de la sala receptora.
-bands = [125, 250, 500, 1000, 2000]
-l1 = np.array([88.0, 90.0, 92.0, 92.0, 90.0])
-l2 = np.array([55.0, 51.0, 47.0, 41.0, 35.0])
-k = building.reverberation_index([0.70, 0.60, 0.50, 0.45, 0.40])   # k = 10 lg(T/0.5)
-res = building.survey_airborne_insulation(l1, l2, k, volume=50.0)
-
-x = np.arange(len(bands))
-fig, ax = plt.subplots()
-ax.fill_between(x, res.d, res.d_nt, alpha=0.2, label="k = 10 lg(T/T0)")
-ax.plot(x, res.d, "--o", label="D (diferencia de niveles)")
-ax.plot(x, res.d_nt, "-s", label="DnT (estandarizada)")
-ax.set_xticks(x, [str(b) for b in bands])
-ax.set(xlabel="Frecuencia [Hz]", ylabel="Diferencia de niveles [dB]",
-       title=f"Método de control ISO 10052: DnT,w = {res.rating.rating} dB")
-ax.legend()
-plt.show()
-```
-
-</details>
-
-### Parámetros de `survey_airborne_insulation()` y afines
-
-| Parámetro | Tipo | Unidades | Rango / def. | Notas |
-| :--- | :--- | :--- | :--- | :--- |
-| `l1` / `l2` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Niveles emisor / receptor (o exterior `l1_2m`) |
-| `li` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Niveles de impacto (media energética de posiciones) |
-| `reverberation_index` | escalar o array 1D | dB | uno por banda | `k` de `reverberation_index` o `estimate_reverberation_index`; `survey_service_equipment_level()` también acepta un `k` escalar |
-| `volume` | float | m³ | > 0 | Volumen receptor `V` (para `Dn` / `L'n` / `R'` / normalizadas) |
-| `area` | float | m² | > 0 | Área de partición común `S` (aéreo `R'`; regla `V/7,5`) |
-| `measurements` | array | dB | exactamente 3 | Posiciones de equipo de servicio (`survey_service_equipment_level`) |
-| `room` | str | — | `"kitchen"`/`"bathroom"`/`"furnished"`/`"a"`–`"h"`/`"a+e"`… | Clase de sala para `estimate_reverberation_index` (Tabla 4) |
-
-`survey_airborne_insulation()` devuelve un `SurveyAirborneResult` (`d`, `d_nt`,
-`d_n`, `r_prime`, `rating`, `r_prime_rating`); `survey_impact_insulation()` un
-`SurveyImpactResult` (`l_i`, `l_nt`, `l_n`, `rating`);
-`survey_facade_insulation()` un `SurveyFacadeResult`;
-`survey_service_equipment_level()` un `SurveyServiceEquipmentResult` (`l_xy`,
-`l_xy_nt`, `l_xy_n`).
-
-### Informes del método de control ISO 10052 (`.report()`)
-
-Los resultados de control a ruido aéreo, de impactos y de fachada llevan cada
-uno un `.report(path)` que escribe el informe de campo del método de control
-(survey) ISO 10052 de una página: la línea de base normativa que nombra la
-ISO 10052 (bandas de octava), una cabecera de metadatos opcional, la tabla en
-bandas de octava junto a la curva medida frente a la referencia desplazada, el
-índice de campo en su recuadro (`DnT,w`/`R'w`, `L'nT,w` o `D2m,nT,w`), la
-declaración del método de control, un veredicto opcional (las diferencias de
-niveles cumplen si igualan o superan el requisito, y el nivel de impactos si lo
-iguala o queda por debajo) y un pie. El resultado a ruido aéreo informa
-`quantity="dnt"` (por defecto) o `"r_prime"`; `verbose=True`, `metadata` y
-`language="es"` se comportan igual que en las fichas anteriores.
-
-```python
-import numpy as np
-
-res.report("DnTw_survey.pdf",
-           metadata=ReportMetadata(requirement=40.0))   # DnT,w (C; Ctr)
-
-# Los controles de impactos y fachada reutilizan la misma k; li es el nivel de
-# la máquina de impactos en la sala inferior, l1_2m el nivel a 2 m de la fachada.
-li = np.array([66.0, 64.0, 62.0, 60.0, 55.0])
-impact = building.survey_impact_insulation(li, k, volume=50.0)
-impact.plot()   # L'nT frente a la referencia ISO 717-2 desplazada (requiere matplotlib)
-impact.report("LnTw_survey.pdf")                         # L'nT,w (CI)
-
-l1_2m = np.array([76.0, 78.0, 79.0, 79.0, 77.0])
-facade = building.survey_facade_insulation(l1_2m, l2, k, volume=40.0)
-facade.report("D2mnTw_survey.pdf")                       # D2m,nT,w (C; Ctr)
-```
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_impact_insulation_es.svg" alt="Aislamiento a impactos por el método de control: el nivel de impactos medido Li en bandas de octava y el L'nT estandarizado con la corrección por índice de reverberación sombreada entre ambos, el índice L'nT,w anotado y una nota de que una sala viva reduce el nivel de impactos estandarizado" width="80%" />
-
-*El control de impactos aplica el índice de reverberación con el signo
-contrario, `L'nT = Li − k`: una sala receptora viva (`T > T0`) **reduce** el
-nivel de impactos estandarizado. Como en el caso aéreo, el índice automático
-aparece para exactamente 5 valores de octava (o 16 de tercio de octava).*
-
-<details>
-<summary>Mostrar el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import building
-
-# Niveles de la máquina de impactos bajo el suelo, en octavas, y la T medida.
-bands = [125, 250, 500, 1000, 2000]
-li = np.array([66.0, 64.0, 62.0, 60.0, 55.0])
-k = building.reverberation_index([0.70, 0.60, 0.50, 0.45, 0.40])
-impact = building.survey_impact_insulation(li, k, volume=50.0)
-
-# Una línea: L'nT frente a la referencia ISO 717-2 desplazada:
-impact.plot(language="es")
-plt.show()
-
-# A mano, mostrando el cambio de signo de la corrección:
-x = np.arange(len(bands))
-fig, ax = plt.subplots()
-ax.fill_between(x, impact.l_i, impact.l_nt, alpha=0.2, label="-k = -10 lg(T/T0)")
-ax.plot(x, impact.l_i, "--o", label="Li (nivel de impactos)")
-ax.plot(x, impact.l_nt, "-s", label="L'nT (estandarizado)")
-ax.set_xticks(x, [str(b) for b in bands])
-ax.set(xlabel="Frecuencia [Hz]",
-       ylabel="Nivel de presión acústica de impactos [dB]",
-       title=f"Método de control ISO 10052: L'nT,w = {impact.rating.rating} dB")
-ax.legend()
-plt.show()
-```
-
-</details>
-
-<ReportPreview
-	name="iso10052_airborne_example"
-	title="Informe de ejemplo a ruido aéreo del control ISO 10052 (PDF)"
-	description="Informe de campo de aislamiento a ruido aéreo por el método de control entre viviendas de una página: la cabecera de metadatos, la tabla DnT en bandas de octava junto a la curva medida frente a la referencia desplazada, el índice DnT,w (C; Ctr) en su recuadro, la declaración del método de control y un veredicto CUMPLE."
-	caption="Ficha a ruido aéreo de control (SurveyAirborneResult.report), DnT,w (C; Ctr)."
-/>
-
-<ReportPreview
-	name="iso10052_impact_example"
-	title="Informe de ejemplo a impactos del control ISO 10052 (PDF)"
-	description="Informe de campo de aislamiento a ruido de impactos por el método de control para un suelo bajo la máquina de impactos: la cabecera de metadatos, la tabla L'nT en bandas de octava junto a la curva medida frente a la referencia desplazada, el índice L'nT,w (CI) en su recuadro, la declaración del método de control y un veredicto CUMPLE (un nivel de impactos menor es mejor)."
-	caption="Ficha a impactos de control (SurveyImpactResult.report), L'nT,w (CI)."
-/>
-
-<ReportPreview
-	name="iso10052_facade_example"
-	title="Informe de ejemplo de fachada del control ISO 10052 (PDF)"
-	description="Informe de campo de aislamiento acústico de fachada por el método de control de una página: la cabecera de metadatos, la tabla D2m,nT en bandas de octava junto a la curva medida frente a la referencia desplazada, el índice D2m,nT,w (C; Ctr) en su recuadro, la declaración del método de control y un veredicto CUMPLE."
-	caption="Ficha de fachada de control (SurveyFacadeResult.report), D2m,nT,w (C; Ctr)."
-/>
+Tres mediciones que compartían esta página tienen ahora guías propias, y una
+cuarta las acompaña. El cerramiento del edificio, medido frente al nivel a 2 m
+por delante y previsto a partir de sus elementos, es
+[Aislamiento acústico de fachadas](/phonometry/es/guides/facade-insulation/).
+Cuando una medición de ingeniería completa es más de lo que la pregunta
+merece, el método de control en bandas de octava es
+[Método de control del aislamiento (ISO 10052)](/phonometry/es/guides/insulation-survey/).
+Cada número único citado arriba sale de las curvas de referencia de
+[Índices globales de aislamiento (ISO 717)](/phonometry/es/guides/insulation-ratings/).
+Y la vía de intensidad acústica hacia las mismas magnitudes, que lee la
+potencia transmitida sobre la cara radiante en lugar del nivel de la sala
+receptora, es
+[Aislamiento acústico por intensidad (ISO 15186)](/phonometry/es/guides/insulation-intensity/).
 
 ## Qué cubre esta guía
 
-**Cubierto.** La ISO 16283-1:2014 (aislamiento aéreo de campo: la
-diferencia de niveles, la $D_{nT}$ estandarizada y el $R'$ aparente de los
-apartados 3.12 a 3.15 y el promediado de posiciones del apartado 7.8), la
-ISO 16283-2:2015 (aislamiento a ruido de impacto de campo, las mismas
-normalizaciones con el signo invertido) y la ISO 16283-3:2016 (aislamiento
-de fachada, las magnitudes
-$D_{2m}$/$D_{2m,nT}$/$D_{2m,n}$/$R'_{45°}$/$R'_{tr,s}$ de los métodos de
-elemento con altavoz y con tráfico rodado), cada una calificada por el
-método de curva de referencia de la ISO 717-1/ISO 717-2 (con los términos
-de rango ampliado del anexo B/A.2.1) mediante `building.airborne_insulation`,
-`building.impact_insulation`, `building.facade_insulation` y
-`building.weighted_rating`/`weighted_impact_rating`(`_extended`); las
-incertidumbres estándar tabuladas de la ISO 12999-1:2020 (las situaciones
-de medición A/B/C del apartado 5.2 y los factores de cobertura de la Tabla
-8, uni- y bilaterales) mediante `building.band_uncertainty`,
-`building.single_number_uncertainty` y `building.uncertain_value`; y el
-método de control de la ISO 10052:2021 (el índice de reverberación $k$, su
-estimación por clase de sala de la Tabla 4 y las cuatro magnitudes de
-control) mediante `building.survey_airborne_insulation` y sus funciones
-hermanas.
+**Cubierto.** La ISO 16283-1:2014 (aislamiento a ruido aéreo de campo: la diferencia
+de niveles, la $D_{nT}$ estandarizada y el $R'$ aparente de los apartados 3.12
+a 3.15 y el promediado de posiciones del apartado 7.8) y la ISO 16283-2:2015
+(aislamiento a ruido de impacto de campo, las mismas normalizaciones con el
+signo invertido) mediante `building.energy_average_level`,
+`building.airborne_insulation` y `building.impact_insulation`, cada una con su
+informe de ensayo del apartado 14 en `.report()`; y las incertidumbres
+estándar tabuladas de la ISO 12999-1:2020 (las situaciones de medición A/B/C
+del apartado 5.2 y los factores de cobertura de la Tabla 8, uni- y
+bilaterales) mediante `building.band_uncertainty`,
+`building.single_number_uncertainty` y `building.uncertain_value`. Los índices
+globales citados aquí reutilizan los motores verificados de
+ISO 717-1/ISO 717-2.
 
 **No cubierto.** Todas las funciones de campo de aquí toman niveles que el
-usuario ya ha corregido por ruido de fondo (apartado 9.2 de la ISO
-16283-1); la medición y corrección del ruido de fondo en sí no está
-implementada. Los propios requisitos de posición y procedimiento de la
-ISO 16283-1/-2/-3 (el número mínimo de posiciones de fuente y micrófono,
-los procedimientos de baja frecuencia con altavoz móvil o barrido de
-micrófono) no se comprueban: el promediado en energía ocurre una vez que
-se proporcionan las posiciones, pero nada aquí verifica cuántas se
-tomaron ni dónde. La vía de intensidad acústica hacia las mismas
-magnitudes de campo (ISO 15186-1/-2) tampoco está en este módulo: es
-`intensity_insulation`, de la
-[guía de Medición del aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/).
+usuario ya ha corregido por ruido de fondo (apartado 9.2 de la ISO 16283-1);
+la medición y corrección del ruido de fondo en sí no está implementada. Los
+propios requisitos de posición y procedimiento de la ISO 16283-1/-2 (el número
+mínimo de posiciones de fuente y micrófono, los procedimientos de baja
+frecuencia con altavoz móvil o barrido de micrófono) no se comprueban: el
+promediado en energía ocurre una vez que se proporcionan las posiciones, pero
+nada aquí verifica cuántas se tomaron ni dónde. Los demás miembros de la
+familia están cubiertos por sus propias guías: la parte de fachada ISO 16283-3
+([Aislamiento acústico de fachadas](/phonometry/es/guides/facade-insulation/)),
+el método de control ISO 10052
+([Método de control del aislamiento](/phonometry/es/guides/insulation-survey/)),
+los motores de calificación ISO 717-1/-2
+([Índices globales de aislamiento](/phonometry/es/guides/insulation-ratings/)) y
+la vía de intensidad acústica ISO 15186-1/-2
+([Aislamiento acústico por intensidad](/phonometry/es/guides/insulation-intensity/)).
 
 ## Véase también
 
+- [Índices globales de aislamiento (ISO 717)](/phonometry/es/guides/insulation-ratings/):
+  el motor de curva de referencia tras cada número único ponderado de esta página.
+- [Aislamiento acústico de fachadas](/phonometry/es/guides/facade-insulation/):
+  la tercera parte de ISO 16283, medida y prevista.
+- [Método de control del aislamiento (ISO 10052)](/phonometry/es/guides/insulation-survey/):
+  el método de control en bandas de octava que toma estos métodos de ingeniería
+  como referencia.
 - [Medición del aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/):
   la caracterización de elementos de ISO 10140 con la que se comparan estas
   magnitudes de campo.
+- [Aislamiento acústico por intensidad (ISO 15186)](/phonometry/es/guides/insulation-intensity/):
+  la vía de potencia directa hacia los mismos índices de campo y laboratorio.
 - [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/):
   el comportamiento in situ predicho a partir de datos de elemento de laboratorio.
-- [Acústica de salas](/phonometry/es/guides/room-acoustics/): la respuesta al impulso,
-  los parámetros de sala y la absorción acústica sobre los que se apoya la cadena de aislamiento de esta guía.
+- [Acústica de salas](/phonometry/es/guides/room-acoustics/): los parámetros de
+  sala y los tiempos de reverberación sobre los que se apoya la cadena de
+  aislamiento de esta guía.
 - [Niveles](/phonometry/es/guides/levels/): el promediado en energía y las métricas de
   nivel que sustentan los niveles de las salas emisora/receptora.
 - [Bancos de filtros](/phonometry/es/guides/filter-banks/): los filtros de octava
   fraccionaria IEC 61260 usados para los espectros de aislamiento.
 - [Teoría](/phonometry/es/reference/theory/rooms-buildings/): la derivación de la curva de referencia que sustenta
   los índices ponderados de un solo número.
-- Referencia de la API: [`building.insulation`](/phonometry/es/reference/api/building/insulation/), [`building.survey_insulation`](/phonometry/es/reference/api/building/survey-insulation/) y [`building.building_uncertainty`](/phonometry/es/reference/api/building/building-uncertainty/).
+- Referencia de la API: [`building.insulation`](/phonometry/es/reference/api/building/insulation/) y [`building.building_uncertainty`](/phonometry/es/reference/api/building/building-uncertainty/).
 
 ## Respuestas rápidas
 
@@ -1204,12 +547,3 @@ laboratorio del elemento solo, medidas con los flancos suprimidos. En campo
 (ISO 16283-1), $R' = D + 10 \log_{10}(S/A)$ con la superficie del
 cerramiento $S$ y el área de absorción de Sabine $A = 0{,}16\ V/T$.
 
-### ¿Cuál es la diferencia entre los términos de adaptación espectral C y Ctr?
-
-Ambos recalifican la misma curva medida frente a los dos espectros de
-fuente del Anexo A de ISO 717-1: $C$ frente a ruido rosa ponderado A
-(actividades domésticas: habla, música, radio, televisión) y $C_{tr}$
-frente a tráfico rodado urbano ponderado A, cuya energía se concentra en
-baja frecuencia. $C$ suele estar entre 0 y −2 dB, mientras que una doble
-hoja ligera con resonancia masa-aire-masa cerca de 100 Hz puede llevar un
-$C_{tr}$ de −5 a −10 dB.

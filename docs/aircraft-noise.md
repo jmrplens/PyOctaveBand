@@ -119,8 +119,8 @@ plot (the result's own `.plot()`), the boxed `EPNL = X EPNdB` single number, a
 Level | Limit | Margin verdict row when a certification limit is supplied, a
 static reference-conditions strip (25 °C, 70 % RH, sea level, zero wind, ISA)
 and a footer with the fixed disclaimer. It uses the same `ReportMetadata`
-container (documented under [Field
-insulation](insulation-field.md#report-metadata-reportmetadata)) and rendering
+container (documented under [Insulation
+ratings](insulation-ratings.md#report-metadata-reportmetadata)) and rendering
 engine as the ISO 717 insulation fiche; a supplied `requirement` is read as the
 certification EPNL limit in EPNdB (the EPNL passes at or below it), and
 `metadata=None` produces a lightweight prediction fiche with no verdict row.

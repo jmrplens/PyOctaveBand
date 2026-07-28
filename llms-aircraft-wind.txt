@@ -126,8 +126,8 @@ plot (the result's own `.plot()`), the boxed `EPNL = X EPNdB` single number, a
 Level | Limit | Margin verdict row when a certification limit is supplied, a
 static reference-conditions strip (25 °C, 70 % RH, sea level, zero wind, ISA)
 and a footer with the fixed disclaimer. It uses the same `ReportMetadata`
-container (documented under [Field
-insulation](https://jmrplens.github.io/phonometry/guides/insulation-field/#report-metadata-reportmetadata)) and rendering
+container (documented under [Insulation
+ratings](https://jmrplens.github.io/phonometry/guides/insulation-ratings/#report-metadata-reportmetadata)) and rendering
 engine as the ISO 717 insulation fiche; a supplied `requirement` is read as the
 certification EPNL limit in EPNdB (the EPNL passes at or below it), and
 `metadata=None` produces a lightweight prediction fiche with no verdict row.
@@ -1638,7 +1638,7 @@ revised ISO 9613-2 in 2024; this library implements the 1996 edition, the one
 most national regulations and the validation literature still reference.)
 
 See the [Theory](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/) page for the full derivation, the
-[Room Acoustics guide](https://jmrplens.github.io/phonometry/guides/sections/room-acoustics/) for how $\alpha$ feeds
+[Room Acoustics guide](https://jmrplens.github.io/phonometry/guides/room-acoustics/) for how $\alpha$ feeds
 ISO 354, and the [Occupational Noise Exposure guide](https://jmrplens.github.io/phonometry/guides/occupational-exposure/) for the ISO 9612 occupational
 exposure that consumes A-weighted levels.
 
@@ -1773,6 +1773,6 @@ ground effect (Eq. (9), Table 3) with its A-weighted alternative
 correction (Eq. (21)/(22)). ISO 354:2003, *Acoustics — Measurement of sound
 absorption in a reverberation room*: only the clause 8.1.2.1 conversion
 $m = \alpha/(10 \lg e)$ behind `air_attenuation_m`; the reverberation-room
-method itself is covered in the [Room Acoustics guide](https://jmrplens.github.io/phonometry/guides/sections/room-acoustics/).
+method itself is covered in the [Room Acoustics guide](https://jmrplens.github.io/phonometry/guides/room-acoustics/).
 
 ---

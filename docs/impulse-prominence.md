@@ -252,7 +252,7 @@ governing prominence `P` together with the derived `LAeq` adjustment `KI`
 and a footer with the fixed disclaimer.
 
 It uses the same `ReportMetadata` container
-(documented under [Field insulation](insulation-field.md#report-metadata-reportmetadata))
+(documented under [Insulation ratings](insulation-ratings.md#report-metadata-reportmetadata))
 and rendering engine as the [ISO 532-1 loudness fiche](loudness.md#iso-532-1-report-report);
 a supplied `requirement` is read as the maximum acceptable governing prominence
 `P` (a less prominent impulse passes). Rendering needs reportlab

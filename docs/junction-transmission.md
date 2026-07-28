@@ -274,14 +274,14 @@ One junction with a moderate `Kij` already trims 1.6 dB off the direct
 
 The measured, EN 12354 counterpart of `Kij` (from the direction-averaged
 velocity level difference) is the separate
-[flanking-transmission](insulation-field.md) `vibration_reduction_index`; this
+[laboratory flanking-transmission](flanking-lab.md) `vibration_reduction_index`; this
 guide is the closed-form *predicted* value from the wave approach.
 
 ## See also
 
 - [Predicting Sound Insulation (EN 12354)](insulation-prediction.md): the
   flanking model that consumes `Kij` junction by junction.
-- [Laboratory Insulation Measurement](insulation-lab.md): the ISO 10848
+- [Laboratory Flanking Transmission (ISO 10848)](flanking-lab.md): the
   measurement of `Kij` from velocity level differences, the empirical
   counterpart of this page's closed forms.
 - [Structure-borne sound power of equipment (EN 15657)](structure-borne-power.md):
