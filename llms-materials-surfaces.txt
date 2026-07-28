@@ -4,1532 +4,6 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/materials.md | canonical: https://jmrplens.github.io/phonometry/guides/materials/ -->
-Source: https://jmrplens.github.io/phonometry/guides/materials/
-
-# Acoustic Materials
-
-Characterising an absorber or a partition is a laboratory exercise with three
-distinct instruments behind it. The **reverberation room** delivers a spectrum of
-sound-absorption coefficients that ISO 11654 collapses into a single rated number
-$\alpha_w$ with a letter class. The **flow rig** (steady or oscillating)
-measures how hard air is to push through a porous sample, the airflow resistance
-that governs its low-frequency behaviour (ISO 9053-1/-2). And the **impedance
-tube** recovers, at normal incidence, the full complex surface impedance,
-reflection factor and absorption of a small sample, and, with four microphones,
-its transmission loss (ISO 10534-1/-2, ASTM E2611). This page covers all three.
-
-## 1. Sound-absorption rating (ISO 11654)
-
-ISO 354 measures the sound-absorption coefficient $\alpha_s$ of a material in
-one-third-octave bands in a reverberation room. ISO 11654:1997 turns that
-spectrum into a single-number rating comparable across products.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso11654_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso11654.svg" alt="ISO 11654 rating flow: measured alpha_s becomes practical alpha_p per octave band, the reference curve is shifted to best fit, alpha_w is read at 500 Hz with shape indicators, giving the absorption class A to E" width="82%"></picture>
-
-**Practical absorption coefficient (Clause 4.1).** The one-third-octave data are
-first grouped into octave bands, each the arithmetic mean of its three thirds:
-
-$$
-\alpha_{p,i} = \tfrac{1}{3}\big(\alpha_{i1} + \alpha_{i2} + \alpha_{i3}\big),
-$$
-
-evaluated to the second decimal and then rounded in steps of $0.05$ (the
-Clause 4.1 NOTE fixes the rounding, e.g. $0.92 \to 0.90$); rounded means above
-$1.00$ are set to $1.00$. The five rating bands are 250, 500, 1000, 2000 and
-4000 Hz.
-
-**Weighted absorption (Clause 4.2).** A fixed reference curve
-$\{250{:}\,0.80,\ 500{:}\,1.00,\ 1000{:}\,1.00,\ 2000{:}\,1.00,\ 4000{:}\,0.90\}$
-is shifted downwards, towards the measured $\alpha_p$, in steps of $0.05$ until
-the sum of the **unfavourable** deviations (taken only where the measurement
-lies below the shifted curve, with magnitude $(\text{curve} - \text{measured})$)
-is no more than $0.10$. The weighted coefficient $\alpha_w$ is the shifted-curve
-value read at 500 Hz.
-
-**Shape indicators (Clause 4.3).** When a practical coefficient exceeds the
-shifted curve by $0.25$ or more, a shape indicator is appended: `L` at 250 Hz,
-`M` at 500 or 1000 Hz, `H` at 2000 or 4000 Hz (e.g. `0.60(M)`).
-
-**Absorption class (Table B.1).** Finally $\alpha_w$ maps to a class: A
-(0.90–1.00), B (0.80–0.85), C (0.60–0.75), D (0.30–0.55), E (0.15–0.25), or "not
-classified" (0.00–0.10). Because $\alpha_w$ is always a multiple of $0.05$ these
-ranges partition the grid exactly.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating.svg" alt="ISO 11654 weighted sound absorption rating: the practical absorption spectrum plotted against the shifted reference curve over 250 Hz to 4000 Hz, with the unfavourable deviation at 250 Hz shaded and the weighted coefficient alpha_w read at 500 Hz" width="80%"></picture>
-
-*The Annex A.2 worked example: the reference curve is shifted down by 0.40 until
-the unfavourable deviations sum to 0.05 (≤ 0.10), giving $\alpha_w = 0.60$; the
-500 Hz peak overshoots the shifted curve by ≥ 0.25, adding the `M` indicator, so
-the rating is $0.60(\text{M})$, class C.*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import materials
-
-# ISO 11654 Annex A.2 practical coefficients at 250/500/1000/2000/4000 Hz
-result = materials.weighted_absorption([0.35, 1.00, 0.65, 0.60, 0.55])
-result.plot()   # practical curve vs shifted reference, deviations shaded
-plt.show()
-```
-
-</details>
-
-```python
-from phonometry import materials
-
-# ISO 11654 Annex A.2 practical coefficients at 250/500/1000/2000/4000 Hz
-alpha_p = [0.35, 1.00, 0.65, 0.60, 0.55]
-
-result = materials.weighted_absorption(alpha_p)
-print(result.rating_label)          # 0.60(M)
-print(result.alpha_w)               # 0.6
-print(result.absorption_class)      # C
-print(round(result.unfavourable_sum, 2))  # 0.05
-result.plot()   # the figure above: practical curve vs shifted reference
-
-# A bare alpha_w also maps straight to its class (Table B.1)
-print(materials.absorption_class(0.85))       # B
-```
-
-`weighted_absorption` accepts the five octave-band $\alpha_p$ values (as a
-sequence or a `{frequency: value}` mapping); pass the fifteen one-third-octave
-$\alpha_s$ values to `practical_absorption_coefficient` first if you are starting
-from raw ISO 354 data. To keep the one-third-octave $\alpha_s$ on the result (so
-the fiche can print the full table every accredited ISO 354 certificate carries),
-rate it in one step with `weighted_absorption_from_third_octave(alpha_s)`, which
-forms $\alpha_p$, rates it and retains the input $\alpha_s$ and its band centres
-(`third_octave_alpha_s`, `third_octave_bands`). The result carries the shifted
-reference curve and the per-band deviations, and its `.plot()` renders the figure
-above.
-
-```python
-from phonometry import materials
-
-# Fifteen one-third-octave alpha_s (200 Hz to 5000 Hz), as an ISO 354 report gives
-alpha_s = [0.30, 0.35, 0.40, 1.00, 1.00, 1.00, 0.62, 0.66, 0.67,
-           0.58, 0.60, 0.62, 0.53, 0.55, 0.57]
-result = materials.weighted_absorption_from_third_octave(alpha_s)
-print(result.rating_label)          # 0.60(M)
-print(result.third_octave_alpha_s)  # the input alpha_s, retained for the fiche
-```
-
-### ISO 11654 report (`.report()`)
-
-`AbsorptionRatingResult.report(path)` renders a one-page PDF fiche laid out like
-an accredited absorption test report (an ISO 354 reverberation-room measurement
-rated per ISO 11654): a standard-basis line, an optional metadata header block,
-the octave-band $\alpha_p$ table beside the practical-versus-shifted-reference
-plot (the result's own `.plot()`), the boxed $\alpha_w$ single number with its
-absorption class and applied shift, an optional verdict row and a footer with
-the fixed disclaimer. When the rating was built with
-`weighted_absorption_from_third_octave`, the left table becomes the full ISO 354
-one-third-octave $\alpha_s$ table with the octave $\alpha_p$ on the matching
-rows, exactly as accredited certificates print it. It uses the same
-`ReportMetadata` container (documented
-under [Field insulation](https://jmrplens.github.io/phonometry/guides/insulation-field/#report-metadata-reportmetadata))
-and rendering engine as the ISO 717 insulation fiche; passing
-`metadata=None` produces a lightweight prediction fiche, and a supplied
-`requirement` is read as the minimum $\alpha_w$ for the PASS/FAIL verdict.
-Setting `verbose=True` swaps the two-column table for the ISO 11654 evaluation
-columns (practical coefficient, shifted reference, unfavourable deviation).
-Rendering needs reportlab (`pip install phonometry[report]`); only
-`engine="reportlab"` is supported. The fiche renders in English by default;
-pass `language="es"` for a Spanish fiche (translated fixed strings and a comma
-decimal separator), e.g. `result.report("alpha_w_fiche_es.pdf", language="es")`.
-
-```python
-from phonometry import materials, ReportMetadata
-
-# Rate from the fifteen one-third-octave alpha_s so the fiche prints the full
-# ISO 354 table; materials.weighted_absorption([...]) also works from alpha_p.
-alpha_s = [0.30, 0.35, 0.40, 1.00, 1.00, 1.00, 0.62, 0.66, 0.67,
-           0.58, 0.60, 0.62, 0.53, 0.55, 0.57]
-result = materials.weighted_absorption_from_third_octave(alpha_s)
-result.report(
-    "alpha_w_fiche.pdf",
-    metadata=ReportMetadata(
-        specimen="50 mm porous absorber over a 100 mm air gap",
-        area=10.8, mounting="Type A (against a rigid wall)",
-        measurement_standard="ISO 354",
-        temperature=21.4, relative_humidity=54.0,
-        laboratory="Phonometry Reference Laboratory",
-        requirement=0.55,          # adds the PASS/FAIL verdict row
-    ),
-)                                  # alpha_w (shape) + absorption class
-```
-
-The example fiche, regenerated with `make reports`, is kept rendered in the
-repository. Click the preview to open the PDF:
-
-[![ISO 11654 absorption example report: metadata header, the full one-third-octave alpha_s table with the octave alpha_p on the matching rows beside the practical-versus-shifted-reference plot, boxed alpha_w = 0.60 (M) with absorption class C and a PASS verdict](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso11654_absorption_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso11654_absorption_example.pdf)
-
-*Weighted absorption fiche (`AbsorptionRatingResult.report`), $\alpha_w$ with its class.*
-
-### ISO 354 measurement (`measure_sound_absorption`)
-
-The reverberation-room measurement itself is `measure_sound_absorption`. It
-takes the one-third-octave reverberation time of the empty room ($T_1$) and of
-the room with the specimen installed ($T_2$), the room volume $V$ and the
-specimen area $S$, and returns a frozen `SoundAbsorptionMeasurement`. The
-equivalent sound absorption areas follow from Sabine's equation (ISO 354:2003
-Eq. (5)/(7)), $A = 55.3\,V/(c\,T) - 4\,V\,m$, with the speed of sound from
-Eq. (6), $c = 331 + 0.6\,t$; the sound absorption coefficient is
-$\alpha_s = (A_2 - A_1)/S$ (Eq. (8)/(9)). The coefficient may exceed 1.0 from
-edge and diffraction effects (Clause 3.7 NOTE 2) and is never clamped. Air
-attenuation enters only through the per-band coefficient $m$ (default 0, the
-zero-attenuation reference).
-
-ISO 354 is a characterisation: it produces the $\alpha_s$ spectrum, not a
-single-number rating. The weighted coefficient $\alpha_w$ is an ISO 11654
-quantity; feed the measured $\alpha_s$ to `weighted_absorption_from_third_octave`
-above to obtain it.
-
-```python
-import numpy as np
-from phonometry import materials
-
-freqs = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
-                  1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000], float)
-t_empty = np.array([9.0, 9.0, 8.8, 8.6, 8.4, 8.2, 8.0, 7.8, 7.5, 7.2,
-                    6.9, 6.6, 6.2, 5.8, 5.4, 5.0, 4.6, 4.2])
-t_specimen = np.array([8.4, 8.2, 7.7, 7.2, 6.5, 5.7, 4.9, 4.2, 3.6, 3.15,
-                       2.85, 2.65, 2.55, 2.5, 2.55, 2.6, 2.7, 2.85])
-
-m = materials.measure_sound_absorption(
-    freqs, t_empty, t_specimen, volume=200.0, area=10.8, temperature=20.0
-)
-print(m.alpha_s[7])   # alpha_s at 500 Hz: 0.328...
-m.plot()              # alpha_s versus one-third-octave frequency
-```
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_absorption_measurement_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_absorption_measurement.svg" alt="ISO 354 reverberation-room sound absorption: the alpha_s spectrum of a porous absorber sample over the one-third-octave bands from 100 Hz to 5000 Hz, rising from near zero at low frequency to a broad maximum around 0.69 near 1600 Hz and easing off above" width="80%"></picture>
-
-*The Sabine inversion of the two decay times: the porous sample barely
-changes the long low-frequency decays ($\alpha_s \to 0$), bites hardest where
-its thickness approaches a quarter wavelength, and eases off at high
-frequency, a typical thin-porous-absorber signature (Cox & D'Antonio 3e,
-Ch. 5).*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import materials
-
-freqs = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
-                  1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000], float)
-t_empty = np.array([9.0, 9.0, 8.8, 8.6, 8.4, 8.2, 8.0, 7.8, 7.5, 7.2,
-                    6.9, 6.6, 6.2, 5.8, 5.4, 5.0, 4.6, 4.2])
-t_specimen = np.array([8.4, 8.2, 7.7, 7.2, 6.5, 5.7, 4.9, 4.2, 3.6, 3.15,
-                       2.85, 2.65, 2.55, 2.5, 2.55, 2.6, 2.7, 2.85])
-m = materials.measure_sound_absorption(
-    freqs, t_empty, t_specimen, volume=200.0, area=10.8, temperature=20.0
-)
-
-# One line: the alpha_s spectrum over the one-third-octave band axis.
-m.plot()
-plt.show()
-
-# By hand, from the result's fields:
-fig, ax = plt.subplots()
-ax.plot(np.arange(freqs.size), m.alpha_s, "o-")
-ax.set_xticks(np.arange(freqs.size))
-ax.set_xticklabels([f"{f:g}" if f < 1000 else f"{f/1000:g}k" for f in freqs],
-                   rotation=45)
-ax.set_xlabel("Frequency [Hz]")
-ax.set_ylabel("Sound absorption coefficient alpha_s")
-plt.show()
-```
-
-</details>
-
-### ISO 354 report (`.report()`)
-
-`SoundAbsorptionMeasurement.report(path)` renders a one-page PDF fiche laid out
-like an accredited reverberation-room absorption test report (ISO 354:2003): a
-standard-basis line, a metadata header block, the one-third-octave $\alpha_s$
-table beside the $\alpha_s$ curve (the result's own `.plot()`), a boxed
-characterisation headline and a footer with the fixed disclaimer. ISO 354 has
-no pass/fail verdict and no single-number rating, so the fiche carries neither.
-Setting `verbose=True` adds the reverberation times $T_1$/$T_2$ and the
-equivalent absorption areas $A_1$/$A_2$ to the table.
-
-It uses the same `ReportMetadata` container and rendering engine as the other
-fiches. The specimen area $S$, room volume $V$, speed of sound $c$, temperature
-and humidity are taken from the measurement result; the descriptive
-`ReportMetadata` fields that apply here are `client`, `manufacturer`,
-`specimen`, `mounting`, `test_room`, `test_date`, `pressure`,
-`measurement_standard`, `laboratory`, `operator`, `report_id` and `notes`. The
-`requirement` field is ignored (ISO 354 has no verdict). Rendering needs
-reportlab (`pip install phonometry[report]`); only `engine="reportlab"` is
-supported. Pass `language="es"` for a Spanish fiche (translated fixed strings
-and a comma decimal separator).
-
-```python
-from phonometry import materials, ReportMetadata
-
-m = materials.measure_sound_absorption(
-    freqs, t_empty, t_specimen, volume=200.0, area=10.8,
-    temperature=20.0, humidity=54.0,
-)
-m.report(
-    "alpha_s_fiche.pdf",
-    metadata=ReportMetadata(
-        specimen="50 mm porous absorber over a 100 mm air gap",
-        mounting="Type A (against a rigid wall)",
-        measurement_standard="ISO 354",
-        test_room="Reverberation room R1",
-        laboratory="Phonometry Reference Laboratory",
-    ),
-)                                  # one-third-octave alpha_s, 100 Hz to 5000 Hz
-```
-
-The example fiche, regenerated with `make reports`, is kept rendered in the
-repository. Click the preview to open the PDF:
-
-[![ISO 354 absorption example report: metadata header with sample area S, room volume V and speed of sound c, the one-third-octave alpha_s table grouped by octave beside the alpha_s curve, and the boxed characterisation headline over the tested one-third-octave range](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso354_absorption_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso354_absorption_example.pdf)
-
-*Reverberation-room absorption fiche (`SoundAbsorptionMeasurement.report`), the $\alpha_s$ spectrum.*
-
-## 2. Airflow resistance (ISO 9053-1/-2)
-
-The airflow resistance quantifies how strongly a porous material opposes a steady
-or slowly-oscillating flow. Both parts share the same three quantities and units
-(ISO 9053-1:2018, Clause 3):
-
-$$
-R = \frac{\Delta p}{q_v}\ \left[\text{Pa·s/m}^3\right], \qquad
-R_s = R\,A\ \left[\text{Pa·s/m}\right], \qquad
-\sigma = \frac{R_s}{d}\ \left[\text{Pa·s/m}^2\right],
-$$
-
-with $\Delta p$ the pressure difference across the specimen, $q_v$ the volumetric
-flow, $A$ the cross-section and $d$ the thickness. Note the specific airflow
-resistance $R_s$ is in **Pa·s/m** (not Pa·s/m²); the airflow resistivity $\sigma$
-is $R_s$ per metre of thickness.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_airflow_resistance_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_airflow_resistance.svg" alt="Airflow resistance measurement rigs: the ISO 9053-1 static method with a specimen in a holder, a steady laminar flow q_v and a differential manometer reading the pressure drop; and the ISO 9053-2 alternating method with an oscillating piston driving a cavity terminated by the specimen or an airtight plug, and a microphone reading the cavity level" width="92%"></picture>
-
-**Static method (ISO 9053-1:2018).** A steady laminar flow is stepped up and the
-pressure difference plotted against the linear velocity $u = q_v/A$. A regression
-of at least second order **constrained through the origin**, $\Delta p = a\,u +
-b\,u^2$, is fitted, and $\Delta p$ and $R_s$ are read at the reference velocity
-$u = 0.5\ \text{mm/s}$ (Clause 7.5); the highest velocity must not exceed
-15 mm/s. Because $R_s = \Delta p/u = a + b\,u$, the linear term $a$ is the
-zero-velocity specific airflow resistance.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airflow_resistance_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airflow_resistance.svg" alt="ISO 9053-1 static-method airflow resistance: the measured pressure drop against linear airflow velocity, fitted with a through-origin quadratic, with the specific airflow resistance evaluated at the 0.5 mm/s reference velocity" width="80%"></picture>
-
-*The slightly super-linear pressure drop is fitted through the origin; the
-specific airflow resistance is the fit read at 0.5 mm/s.*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import materials
-
-area = np.pi * 0.05**2                      # 100 mm diameter cell [m^2]
-u = np.array([0.5, 1, 2, 4, 8, 12]) * 1e-3  # linear velocity [m/s]
-dp = 1.6e4 * u + 4.0e5 * u**2               # measured pressure drop [Pa]
-r = materials.static_airflow_resistance(u, dp, area=area, thickness=0.05)
-
-u_fit = np.linspace(0.0, 13e-3, 200)
-dp_fit = r.linear_coefficient * u_fit + r.quadratic_coefficient * u_fit**2
-fig, ax = plt.subplots()
-ax.plot(u_fit * 1e3, dp_fit, label="Through-origin fit  dp = a u + b u^2")
-ax.plot(u * 1e3, dp, "o", label="Measured pressure drop")
-ax.plot(r.evaluation_velocity * 1e3, r.pressure_drop, "D",
-        label="Evaluation at 0.5 mm/s")
-ax.set_xlabel("Linear airflow velocity u [mm/s]")
-ax.set_ylabel("Pressure drop dp [Pa]")
-ax.set_title(f"R_s = {r.specific_resistance:.0f} Pa·s/m")
-ax.legend()
-plt.show()
-```
-
-</details>
-
-```python
-import numpy as np
-from phonometry import materials
-
-area = np.pi * 0.05**2            # 100 mm diameter cell [m^2]
-u = np.array([0.5, 1, 2, 4, 8, 12]) * 1e-3      # linear velocity [m/s]
-dp = 1.6e4 * u + 4.0e5 * u**2                    # measured pressure drop [Pa]
-
-r = materials.static_airflow_resistance(u, dp, area=area, thickness=0.05)
-print(round(r.specific_resistance))   # 16200   R_s [Pa*s/m]
-print(round(r.resistivity))           # 324000  sigma [Pa*s/m^2]
-print(round(r.linear_coefficient))    # 16000   a = R_s at u -> 0
-r.plot()   # the figure above: the fitted dp(u) with the evaluation point
-```
-
-### ISO 9053-1 report (`.report()`)
-
-`StaticAirflowResult.report(path)` renders a one-page PDF fiche laid out like an
-accredited airflow-resistance test report (ISO 9053-1:2018, static method): a
-standard-basis line, an optional metadata header block, a two-panel body with a
-metrics table (the evaluation velocity, the fitted pressure difference, the
-airflow resistance $R$, the specific airflow resistance $R_s$, the airflow
-resistivity $\sigma$ when a thickness is available, and the through-origin fit
-coefficients $a$ and $b$) beside the fitted $\Delta p(u)$ curve (the result's
-own `.plot()`), the boxed specific airflow resistance $R_s$ with $R$ and
-$\sigma$ alongside, and a footer with the fixed disclaimer. ISO 9053-1 is a
-material characterisation, so the fiche carries no pass/fail verdict.
-
-It uses the same `ReportMetadata` container and rendering engine as the other
-fiches. The descriptive fields that apply here are `client`, `manufacturer`,
-`specimen`, `thickness` (the specimen thickness $d$, in metres, shown in
-millimetres), `test_room`, `test_date`, `temperature`, `relative_humidity`,
-`measurement_standard`, `laboratory`, `operator`, `report_id` and `notes`. The
-`requirement` field is ignored (ISO 9053-1 has no verdict). The fiche embeds
-the fitted curve, so rendering needs both reportlab and matplotlib
-(`pip install "phonometry[report,plot]"`); only `engine="reportlab"` is
-supported. Pass `language="es"` for a Spanish fiche (translated fixed strings
-and a comma decimal separator).
-
-```python
-from phonometry import materials, ReportMetadata
-
-r = materials.static_airflow_resistance(u, dp, area=area, thickness=0.05)
-r.report(
-    "airflow_fiche.pdf",
-    metadata=ReportMetadata(
-        specimen="50 mm porous absorber (open-cell)",
-        thickness=0.050,
-        measurement_standard="ISO 9053-1",
-        test_room="Static airflow rig, 100 mm cell",
-        laboratory="Phonometry Reference Laboratory",
-    ),
-)                                  # R_s, R and sigma at u = 0.5 mm/s
-```
-
-The example fiche, regenerated with `make reports`, is kept rendered in the
-repository. Click the preview to open the PDF:
-
-[![ISO 9053-1 static airflow-resistance example report: metadata header with the specimen thickness, the metrics table with the evaluation velocity, the fitted pressure difference, the airflow resistance R, the specific airflow resistance R_s, the airflow resistivity sigma and the through-origin fit coefficients beside the fitted pressure-drop curve, and the boxed specific airflow resistance R_s with R and sigma alongside](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso9053_airflow_resistance_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso9053_airflow_resistance_example.pdf)
-
-*Static airflow-resistance fiche (`StaticAirflowResult.report`), $R_s$, $R$ and $\sigma$ at 0.5 mm/s.*
-
-**Alternating method (ISO 9053-2:2020).** A piston oscillating at 1–4 Hz drives
-an alternating flow into a cavity terminated either by the specimen or by an
-airtight plug; the resistance follows from the sound-pressure-level difference
-between the two terminations (Formula (2)):
-
-$$
-R = \frac{\kappa'\,P_S}{2\pi f\,V}\cdot\frac{h_t}{h_s}\cdot
-    10^{(L_{p,s} - L_{p,t})/20},
-$$
-
-where $\kappa'$ is the **effective** ratio of specific heats. Heat conduction
-between the oscillating air and the cavity walls makes the compression not fully
-adiabatic; the normative Annex A corrects $\kappa$ down to
-
-$$
-\kappa' = \frac{\kappa}{\sqrt{1 + (\kappa-1)\tfrac{S}{V}b
-          + \tfrac{1}{2}\big((\kappa-1)\tfrac{S}{V}b\big)^2}},
-\qquad b = \sqrt{\frac{2 c_0 l_h}{\omega}},\quad
-l_h = \frac{k_a}{\rho_0 c_0 C_P},
-$$
-
-with $S$ and $V$ the cavity surface and volume and $b$ the thermal
-boundary-layer thickness. For the Annex A.3 example cavity this gives
-$\kappa' = 1.370$, about 2 % below the adiabatic 1.4008.
-
-```python
-from phonometry import materials
-
-# Annex A.3 cavity: closed cylinder 100 mm x 100 mm, piston at 2 Hz
-kp = materials.effective_kappa(cavity_surface=0.0471, cavity_volume=7.854e-4, frequency=2.0)
-print(round(kp, 3))               # 1.37   effective ratio of specific heats
-
-R = materials.alternating_airflow_resistance(
-    level_specimen=74.0, level_termination=90.0,
-    piston_stroke_specimen=14e-3, piston_stroke_termination=1.4e-3,
-    frequency=2.0, cavity_volume=7.854e-4, kappa_prime=kp,
-)
-print(round(R))                   # 222956  airflow resistance R [Pa*s/m^3]
-```
-
-Pass the `effective_kappa` result to `alternating_airflow_resistance` for an
-Annex-A-conforming figure; its `kappa_prime` argument otherwise defaults to the
-uncorrected adiabatic 1.4. The call warns (via `AirflowResistanceWarning`) when
-the piston frequency leaves 1–4 Hz or the Formula (3)/(4) validity criteria fail.
-
-## 3. Impedance tube (ISO 10534-1/-2, ASTM E2611)
-
-The impedance tube measures a small sample at **normal incidence**. Two standards
-share the geometry but differ in method and sign convention, so the library keeps
-their helpers separate and never mixes them.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_impedance_tube_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_impedance_tube.svg" alt="ISO 10534-2 two-microphone impedance tube: a loudspeaker radiating a plane wave down the tube, two microphones flush in the wall at spacing s and distance x1 from the specimen face, the test specimen against a rigid backing, and the incident and reflected waves" width="92%"></picture>
-
-**Working frequency range (ISO 10534-2, Clause 4).** Everything the tube
-reports assumes the field inside is a single plane wave, and the geometry sets
-both ends of the usable band. Above the cut-on of the first cross-sectional
-mode the field stops being planar: a circular tube of diameter $d$ needs
-$f\,d < 0.58\,c_0$ (Eq. (2); $f\,d < 0.50\,c_0$ for a rectangular tube,
-Eq. (3)). The microphone spacing $s$ must also stay clear of the
-half-wavelength singularity of the transfer-function method,
-$f\,s < 0.45\,c_0$ (Eq. (4)). At the low end the opposite problem appears: a
-spacing much shorter than the wavelength leaves almost no phase difference
-between the microphones to measure, so the Clause 4.2 guideline keeps the
-spacing above 5 % of the wavelength:
-
-$$
-\frac{c_0}{20\,s} \;<\; f \;<\;
-\min\!\left(0.58\,\frac{c_0}{d},\ 0.45\,\frac{c_0}{s}\right).
-$$
-
-No single tube covers the building-acoustics range. A 100 mm tube with a
-100 mm spacing works from roughly 170 Hz to 1.5 kHz; reaching the 5 kHz bands
-takes a small tube (29 mm) with a close spacing, which in turn cannot see the
-low bands. Laboratories therefore pair a large and a small tube (or one tube
-with two spacings) and splice the spectra; the two must agree in the overlap
-bands, and a mismatch there points at the sample cut or mounting, not at the
-physics.
-
-```python
-from phonometry import materials
-
-# A 100 mm tube with 100 mm spacing, and a 29 mm tube with 20 mm spacing.
-f_l, f_u = materials.plane_wave_frequency_range(0.100, 343.2, diameter=0.100)
-print(round(f_l, 1), round(f_u, 1))     # 171.6 1544.4
-f_l, f_u = materials.plane_wave_frequency_range(0.020, 343.2, diameter=0.029)
-print(round(f_l, 1), round(f_u, 1))     # 858.0 6864.0
-```
-
-**Standing-wave-ratio method (ISO 10534-1).** A probe traverses the standing wave
-and reads the level difference $\Delta L = L_\text{max} - L_\text{min}$ between a
-pressure maximum and the adjacent minimum. The standing-wave ratio, reflection
-magnitude and absorption follow in closed form:
-
-$$
-s = 10^{\Delta L/20}, \qquad |r| = \frac{s-1}{s+1}, \qquad
-\alpha = 1 - |r|^2.
-$$
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impedance_tube_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impedance_tube.svg" alt="ISO 10534-1 standing-wave-ratio method: the absorption coefficient and the reflection factor magnitude as functions of the standing-wave level difference, showing that a 9.54 dB difference corresponds to a standing-wave ratio of 3, a reflection magnitude of 0.5 and an absorption of 0.75" width="80%"></picture>
-
-*A small level difference means a near-perfect absorber; a level difference of
-9.54 dB gives $s = 3$, $|r| = 0.5$ and $\alpha = 0.75$.*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import materials
-
-level_diff = np.linspace(0.5, 40.0, 300)    # L_max - L_min [dB]
-swr = materials.standing_wave_ratio_from_level(level_diff)
-fig, ax = plt.subplots()
-ax.plot(level_diff, materials.standing_wave_absorption(swr),
-        label="Absorption coefficient alpha")
-ax.plot(level_diff, materials.standing_wave_reflection_magnitude(swr), "--",
-        label="Reflection factor magnitude |r|")
-ax.set_xlabel("Standing-wave level difference L_max - L_min [dB]")
-ax.set_ylabel("alpha, |r|")
-ax.legend()
-plt.show()
-```
-
-</details>
-
-```python
-from phonometry import materials
-
-s = float(materials.standing_wave_ratio_from_level(9.542))   # level difference [dB] -> SWR
-print(round(s, 2))                                  # 3.0
-print(round(float(materials.standing_wave_absorption(s)), 2)) # 0.75
-```
-
-**Transfer-function method (ISO 10534-2).** Two fixed microphones measure the
-complex transfer function $H_{12}$; from it the reflection factor at the sample
-face, the absorption and the normalised surface impedance follow (Eqs. (17)–(19)):
-
-$$
-r = \frac{H_{12} - H_I}{H_R - H_{12}}\,e^{\,2 j k_0 x_1}, \qquad
-\alpha = 1 - |r|^2, \qquad \frac{Z}{\rho c_0} = \frac{1+r}{1-r},
-$$
-
-with $H_I = e^{-j k_0 s}$, $H_R = e^{+j k_0 s}$, microphone spacing $s$ and $x_1$
-the distance from the sample to the farther microphone.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_standing_wave_tube_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_standing_wave_tube.gif" alt="Animation: incident and reflected waves sum into a standing wave inside the impedance tube; a rigid termination gives deep envelope nodes, a porous sample gives shallow ones, sampled by the two wall microphones" width="640" height="360" loading="lazy"></picture>
-
-[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_standing_wave_tube.webm)
-
-```python
-import numpy as np
-from phonometry import materials
-
-f = np.array([500.0, 1000.0, 1800.0])
-x1, spacing, c0 = 0.12, 0.03, 343.2
-k0 = materials.tube_wavenumber(f, c0)
-
-# A measured transfer function H12 (here synthesised from r = 0.3 - 0.4j)
-target = 0.3 - 0.4j
-x2 = x1 - spacing
-h12 = (np.exp(1j*k0*x2) + target*np.exp(-1j*k0*x2)) / \
-      (np.exp(1j*k0*x1) + target*np.exp(-1j*k0*x1))
-
-r = materials.reflection_factor(h12, spacing=spacing, x1=x1, wavenumber=k0)
-print(np.round(materials.absorption_from_reflection(r), 3))     # [0.75 0.75 0.75]
-print(np.round(materials.normalized_surface_impedance(r), 2))   # Z / rho c0
-# [1.15-1.23j 1.15-1.23j 1.15-1.23j]
-```
-
-The high-level `two_microphone_impedance` wraps this chain and returns an
-`ImpedanceTubeResult` with absorption, reflection factor, surface impedance and
-normalised impedance, applying the plane-wave frequency-range check and optional
-tube attenuation; correct any microphone mismatch beforehand with
-`apply_mic_calibration`. Its `.plot()` draws the absorption spectrum
-$\alpha(f)$ with the reflection-factor magnitude $|r|$ overlaid.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impedance_tube_result_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impedance_tube_result.svg" alt="ISO 10534-2 two-microphone tube result for a 50 mm porous absorber: the normal-incidence absorption coefficient rising from about 0.2 at 200 Hz towards 0.97 above 1 kHz, with the reflection-factor magnitude falling as its mirror image" width="80%"></picture>
-
-*A 50 mm porous absorber measured over the working band of a 100 mm tube:
-the absorption climbs as the layer thickness grows against the wavelength,
-and $|r|$ falls as its mirror image ($\alpha = 1 - |r|^2$).*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import materials
-
-# A 50 mm porous absorber (Miki, sigma = 20 kPa s/m^2) in a 100 mm tube with
-# 100 mm spacing (working band ~170 Hz to 1.5 kHz): the layer model supplies
-# the true reflection factor, from which the transfer function H12 follows.
-f = np.linspace(200.0, 1500.0, 260)
-med = materials.miki(f, 20000.0)
-layer = materials.layered_absorber(f, [materials.PorousLayer(0.05, med)])
-spacing, x1, c0 = 0.10, 0.20, 343.2
-k0 = materials.tube_wavenumber(f, c0)
-x2 = x1 - spacing
-r_true = layer.reflection
-h12 = (np.exp(1j*k0*x2) + r_true*np.exp(-1j*k0*x2)) / \
-      (np.exp(1j*k0*x1) + r_true*np.exp(-1j*k0*x1))
-result = materials.two_microphone_impedance(
-    h12, frequency=f, spacing=spacing, x1=x1, speed_of_sound=c0,
-    characteristic_impedance=407.0, diameter=0.10,
-)
-
-# One line: alpha(f) with |r| overlaid.
-result.plot()
-plt.show()
-
-# By hand, from the result's fields:
-fig, ax = plt.subplots()
-ax.plot(f, result.absorption, label="Absorption alpha")
-ax.plot(f, np.abs(result.reflection), "--", label="Reflection factor |r|")
-ax.set_xlabel("Frequency [Hz]")
-ax.set_ylabel("Coefficient")
-ax.legend()
-plt.show()
-```
-
-</details>
-
-### ISO 10534-2 report (`.report()`)
-
-`ImpedanceTubeResult.report(path)` renders a one-page PDF fiche laid out like an
-accredited normal-incidence impedance-tube test report (ISO 10534-2:2001): a
-standard-basis line, a metadata header block, the per-frequency table (the
-absorption coefficient $\alpha$ and the real and imaginary parts of the
-normalised surface impedance $z = Z/\rho c_0$) beside the $\alpha(f)$ curve (the
-result's own `.plot()`, on a continuous logarithmic frequency axis), a boxed
-characterisation headline and a footer with the fixed disclaimer. ISO 10534-2 is
-a characterisation, so the fiche carries no pass/fail verdict and no
-single-number rating; the normal-incidence coefficient is not comparable to the
-random-incidence $\alpha_s$/$\alpha_w$ of ISO 354 / ISO 11654. Setting
-`verbose=True` inserts the reflection-factor magnitude $|r|$ column.
-
-It uses the same `ReportMetadata` container and rendering engine as the other
-fiches. The measured frequency range is taken from the result; the applicable
-descriptive and geometric `ReportMetadata` fields are `client`, `manufacturer`,
-`specimen`, `tube_diameter`, `mic_spacing`, `mounting`, `test_room`,
-`test_date`, `temperature`, `pressure`, `measurement_standard`, `laboratory`,
-`operator`, `report_id` and `notes` (`tube_diameter` and `mic_spacing` are given
-in metres and printed in millimetres). The `requirement` field is ignored
-(ISO 10534-2 has no verdict). Rendering needs reportlab
-(`pip install phonometry[report]`); only `engine="reportlab"` is supported. Pass
-`language="es"` for a Spanish fiche (translated fixed strings and a comma
-decimal separator).
-
-```python
-from phonometry import materials, ReportMetadata
-
-result = materials.two_microphone_impedance(
-    h12, frequency=freqs, spacing=0.05, x1=0.10,
-    speed_of_sound=c0, characteristic_impedance=rho_c, diameter=0.10,
-)
-result.report(
-    "alpha_fiche.pdf",
-    metadata=ReportMetadata(
-        specimen="Resistive facing over an 86 mm rigidly-backed air cavity",
-        tube_diameter=0.10,            # m (printed as 100 mm)
-        mic_spacing=0.05,              # m (printed as 50 mm)
-        measurement_standard="ISO 10534-2",
-        laboratory="Phonometry Reference Laboratory",
-    ),
-)                       # normal-incidence alpha and impedance over the tube band
-```
-
-The example fiche, regenerated with `make reports`, is kept rendered in the
-repository. Click the preview to open the PDF:
-
-[![ISO 10534-2 impedance-tube example report: a metadata header with the tube diameter, microphone spacing and measured frequency range, the per-frequency table of the absorption coefficient alpha and the real and imaginary parts of the normalised surface impedance z beside the alpha curve on a logarithmic frequency axis, and the boxed characterisation headline](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10534_impedance_tube_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10534_impedance_tube_example.pdf)
-
-*Normal-incidence impedance-tube fiche (`ImpedanceTubeResult.report`), the $\alpha$ spectrum with the surface impedance.*
-
-**Transmission loss (ASTM E2611).** With four microphones (two upstream, two
-downstream of the sample) a two-load (or one-load) measurement recovers the
-sample's transfer matrix, whose entries give the normal-incidence transmission
-loss, reflection and wavenumber:
-
-$$
-\mathrm{TL} = 20\log_{10}\left|\frac{T_{11} + T_{12}/\rho c
-             + \rho c\,T_{21} + T_{22}}{2}\right|.
-$$
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_astm_tube_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_astm_tube.svg" alt="ASTM E2611 four-microphone transmission-loss tube: a sound source, two microphones upstream and two downstream of the test specimen at spacings s1 and s2 and offsets l1 and l2, an adjustable termination for the two-load method, the upstream A and B and downstream C and D travelling waves, and the transfer matrix and transmission-loss relations" width="92%"></picture>
-
-```python
-import numpy as np
-from phonometry import materials
-
-# An air layer is a known transfer matrix; TL = 0 dB (nothing is lost)
-f = np.array([500.0, 1000.0, 2000.0])
-k0 = 2*np.pi*f / 343.2
-rho_c = 1.186 * 343.2
-tm = materials.air_layer_transfer_matrix(thickness=0.05, wavenumber=k0,
-                               characteristic_impedance=rho_c)
-print(np.round(tm.transmission_loss(rho_c), 6))   # [0. 0. 0.]
-```
-
-`transfer_matrix_two_load` / `transfer_matrix_one_load` build the
-`TransferMatrix` from the four measured microphone transfer functions
-`(H1, H2, H3, H4)` of each load; its methods
-(`transmission_loss`, `reflection_hard_backed`, `absorption_hard_backed`,
-`characteristic_impedance_material`, `material_wavenumber`) then read off the
-ASTM E2611 quantities, and its `.plot(frequency, rho_c)` draws the
-transmission loss with the hard-backed absorption overlaid. The matrix does
-not have to come from a measurement: the
-[multilayer solver](https://jmrplens.github.io/phonometry/guides/porous-absorbers/) exposes the chain matrix of any
-modelled stack in the same convention, so a predicted specimen can be read
-out exactly like a measured one.
-
-```python
-import numpy as np
-from phonometry import materials
-
-# The chain matrix of a modelled 50 mm porous layer, read back through the
-# ASTM E2611 machinery: TL and hard-backed absorption of the same specimen.
-f = np.linspace(200.0, 1600.0, 300)
-med = materials.miki(f, 20000.0)
-layer = materials.layered_absorber(f, [materials.PorousLayer(0.05, med)])
-chain = layer.transfer_matrix                       # shape (2, 2, len(f))
-tm = materials.TransferMatrix(t11=chain[0, 0], t12=chain[0, 1],
-                              t21=chain[1, 0], t22=chain[1, 1])
-print(np.round(float(tm.transmission_loss(407.0)[-1]), 1))   # 9.7 dB at 1.6 kHz
-tm.plot(f, 407.0)   # TL(f) with the hard-backed absorption overlaid
-```
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/transfer_matrix_tl_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/transfer_matrix_tl.svg" alt="ASTM E2611 transfer-matrix quantities of a 50 mm porous layer: the normal-incidence transmission loss rising from about 6.6 dB at 200 Hz to over 9 dB at 1.6 kHz on the left axis, and the hard-backed absorption coefficient rising from 0.19 to about 0.97 on the right axis" width="80%"></picture>
-
-*The same four-pole entries answer two different questions: how much sound
-the free-standing layer lets through (the transmission loss, Eq. (26)) and
-how much the rigidly-backed layer absorbs (Eq. (28)).*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import materials
-
-f = np.linspace(200.0, 1600.0, 300)
-med = materials.miki(f, 20000.0)
-layer = materials.layered_absorber(f, [materials.PorousLayer(0.05, med)])
-chain = layer.transfer_matrix                       # shape (2, 2, len(f))
-tm = materials.TransferMatrix(t11=chain[0, 0], t12=chain[0, 1],
-                              t21=chain[1, 0], t22=chain[1, 1])
-
-# One line: TL(f) on the left axis, hard-backed absorption on the right.
-tm.plot(f, 407.0)
-plt.show()
-
-# By hand, from the matrix methods:
-fig, ax = plt.subplots()
-ax.plot(f, tm.transmission_loss(407.0), label="Transmission loss TL_n")
-twin = ax.twinx()
-twin.plot(f, tm.absorption_hard_backed(407.0), "--", color="gray",
-          label="Hard-backed absorption alpha")
-ax.set_xlabel("Frequency [Hz]")
-ax.set_ylabel("Transmission loss TL_n [dB]")
-twin.set_ylabel("Hard-backed absorption alpha")
-plt.show()
-```
-
-</details>
-
-**Mounting pitfalls.** Most bad tube data are made at the sample holder, long
-before the signal processing. The recurring failures:
-
-- **Perimeter gaps.** A specimen cut slightly undersize leaves an air sliver
-  along the tube wall. Sound short-circuits around and behind the sample, and
-  the gap itself resonates, so the measured absorption grows a spurious
-  low-to-mid-frequency hump. Cut for a snug slide fit and seal the rim (a thin
-  film of petroleum jelly is the classic remedy) without loading the front
-  face.
-- **Compression.** A specimen cut oversize and forced in is denser than the
-  product it is supposed to represent: the flow resistivity rises, a limp
-  frame is stiffened, and the absorption curve shifts and flattens. The result
-  is repeatable and wrong.
-- **Hidden back cavity.** If the specimen does not sit flush on the rigid
-  backing, the unintended air layer acts as a quarter-wavelength cavity and
-  moves the absorption peak down in frequency, flattering the material.
-  Backing air gaps are perfectly legitimate mountings, but only when they are
-  deliberate, dimensioned and reported with the result.
-- **Face not plane.** A bulging, tilted or torn front face scatters into
-  cross-sectional modes below the nominal cut-on and breaks the
-  normal-incidence assumption the equations rest on. Cut with a sharp tool;
-  do not tear fibrous materials to size.
-- **One specimen is not the material.** Porous products are inhomogeneous at
-  the scale of a tube sample. Measure several cuts and average; a spread
-  between specimens is product variance worth reporting, not measurement noise
-  to hide.
-
-## Tube or reverberation room?
-
-The tube and the reverberation room both deliver a number called the
-"absorption coefficient", and the two are routinely confused. They are
-different physical quantities, measured under different sound fields, and they
-do not match, sometimes not even closely.
-
-The tube measures a **normal-incidence** coefficient: one plane wave, one
-angle, a specimen a few centimetres across, and a complex reflection factor
-that keeps magnitude and phase. ISO 354 measures the **random-incidence**
-coefficient $\alpha_s$: a diffuse field striking a sample of 10 m² to 12 m²
-from every direction at once, recovered from the change in the room's decay
-time through Sabine's formula, an energy average with no phase left in it.
-Because the diffuse field finds more ways into an absorber than the single
-normal-incidence wave (oblique waves travel a longer path inside the layer),
-$\alpha_s$ usually comes out higher. For a locally reacting surface the two
-are linked by Paris' angular average, which defines the statistical
-absorption coefficient
-
-$$
-\alpha_{st} = \int_0^{\pi/2} \alpha(\theta)\,\sin 2\theta\,\mathrm{d}\theta,
-$$
-
-an integral that weights the oblique angles most heavily; evaluating it
-needs the
-angle-dependent $\alpha(\theta)$ from the measured surface impedance, not just
-the normal-incidence coefficient itself.
-
-**Why ISO 354 values exceed 1.** A ratio of absorbed to incident energy cannot
-exceed one, yet reverberation-room reports of $\alpha_s = 1.05$ to $1.20$ for
-thick porous absorbers are routine and correct by the method. Sabine's formula
-converts the decay-time change into an equivalent absorption area $A$, and
-$\alpha_s = A/S$ divides by the *geometric* sample area $S$. Diffraction at
-the sample edges lets the specimen drain energy from a sound field wider than
-its footprint (the edge effect), so the equivalent area can exceed the
-geometric one. Such values are not errors, but they are not portable either:
-they depend on the sample size and perimeter, which is precisely why ISO 354
-fixes both. The ISO 11654 rating simply truncates: practical coefficients
-above $1.00$ are set to $1.00$ (section 1). Prediction inputs get no such
-silent clipping in this library: each
-[reverberation-time estimator](https://jmrplens.github.io/phonometry/guides/reverberation-prediction/) enforces its own
-mathematical domain, so Sabine and Eyring accept ISO 354 values at or above
-one as supplied (Eyring as long as the mean absorption stays below one),
-while Millington-Sette rejects them (its per-surface logarithm diverges at
-one) and any adjustment below one is left to the caller. The
-equivalent-absorption-area budget of
-[EN 12354-6](https://jmrplens.github.io/phonometry/guides/enclosed-space-absorption/) likewise accepts the coefficients
-as supplied.
-
-**Which to use.** They answer different questions. The reverberation-room
-value is the one that feeds diffuse-field prediction: Sabine reverberation
-estimates, the equivalent absorption areas of
-[EN 12354-6](https://jmrplens.github.io/phonometry/guides/enclosed-space-absorption/) and the $\alpha_w$ rating and
-class, all of which expect random incidence over a mounted, finite sample
-(ISO 354's Annex B mounting types exist because the mounting is part of the
-result). The tube value is the laboratory and development tool: it needs only
-a few square centimetres of material, resolves magnitude *and* phase, and its
-surface impedance pins down the parameters of porous-material models in the
-Allard and Atalla tradition, with the airflow resistivity of section 2 as the
-first input; the fitted model then predicts the layer at any angle, thickness
-or backing. What the tube number is *not* is a drop-in substitute for
-$\alpha_s$: feeding normal-incidence coefficients into a Sabine or EN 12354-6
-budget systematically underpredicts the installed absorption.
-
-## 4. Sound-absorption measurement uncertainty (ISO 12999-2)
-
-A rated absorption coefficient means little without its uncertainty. ISO
-12999-2:2020 gives the standard uncertainty `u` of the quantities produced by a
-reverberation-room measurement (ISO 354) and its ratings (ISO 11654, EN 1793-1),
-estimated from inter-laboratory tests to ISO 5725. It is the sound-absorption
-companion of the sound-insulation uncertainty of ISO 12999-1
-([Field Insulation Measurement and Ratings](https://jmrplens.github.io/phonometry/guides/insulation-field/)).
-
-**One-third-octave bands (Clause 5).** For the sound-absorption coefficient the
-reproducibility standard deviation is `σR = m·αs + n` (Formula (1)), and for the
-equivalent absorption area `σR = m·AT + n·S` with `S = 10 m²` (Formula (2)), where
-`m` and `n` are the frequency-dependent constants of Table 1 (63–5000 Hz). The
-repeatability value is `σr = 0.6·σR` (Formula (3)).
-
-**Practical coefficient (Clause 6).** For the ISO 11654 practical coefficient
-`σR = m·αp + n` in octave bands with the constants of Table 2 (250–4000 Hz);
-again `σr = 0.6·σR`.
-
-**Single numbers (Clause 7).** The weighted coefficient `αw` has a constant
-standard uncertainty (`σR = 0.035`, `σr = 0.020`); the EN 1793-1 single-number
-rating `DLα,NRD` scales with the value (`σR = 0.10·DLα`, `σr = 0.02·DLα`).
-
-**Reporting (Clause 8).** The expanded uncertainty is `U = k·u` (Formula (10))
-with the Table 3 coverage factor `k` (`k = 2.0` at 95 %, Gaussian). The reported
-`U` is rounded to two decimals for absorption coefficients and one decimal for
-the equivalent area and `DLα,NRD`.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_uncertainty_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_uncertainty.svg" alt="ISO 12999-2 sound absorption coefficient uncertainty: the measured alpha_s spectrum over one-third-octave bands from 63 Hz to 5000 Hz with a shaded plus-or-minus U band at coverage factor k = 2, reproducing the standard's worked Table 4 example" width="80%"></picture>
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import materials
-
-# ISO 12999-2 Table 4 worked example: alpha_s per one-third-octave band.
-freqs = [63, 80, 100, 125, 160, 200, 250, 315, 400, 500,
-         630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000]
-alpha_s = [0.33, 0.35, 0.39, 0.38, 0.37, 0.36, 0.36, 0.36, 0.43, 0.49,
-           0.58, 0.63, 0.68, 0.71, 0.73, 0.75, 0.77, 0.79, 0.81, 0.81]
-result = materials.sound_absorption_coefficient_uncertainty(alpha_s, freqs, confidence=0.95)
-result.plot()   # alpha_s with the +/-U (k = 2) reproducibility ribbon
-plt.show()
-```
-</details>
-
-```python
-from phonometry import materials
-
-# Reproducibility uncertainty of alpha_s at 1000 Hz (Table 1: m=0.040, n=0.015).
-r = materials.sound_absorption_coefficient_uncertainty([0.68], [1000], confidence=0.95)
-print(round(float(r.standard_uncertainty[0]), 4))            # 0.0422 (sigma_R)
-print(float(r.reported_expanded_uncertainty[0]))             # 0.08  (U, k=2)
-r.plot()   # the figure above: alpha_s with its +/-U (k = 2) ribbon
-
-# Single-number ratings (Clause 7 worked examples).
-print(float(materials.weighted_coefficient_uncertainty(0.70).reported_expanded_uncertainty[0]))  # 0.07
-print(float(materials.single_number_rating_uncertainty(8.1).reported_expanded_uncertainty[0]))   # 1.6
-```
-
-## References
-
-- Allard, J. F., & Atalla, N. (2009). *Propagation of sound in porous media:
-  Modelling sound absorbing materials* (2nd ed.). Wiley.
-  ISBN 978-0-470-74661-5.
-  [doi:10.1002/9780470747339](https://doi.org/10.1002/9780470747339).
-  The porous-material theory behind the measured quantities: airflow
-  resistivity as a model input, and the surface impedance and absorption the
-  tube recovers.
-- Cox, T. J., & D'Antonio, P. (2017). *Acoustic absorbers and diffusers:
-  Theory, design and application* (3rd ed.). CRC Press.
-  ISBN 978-1-4987-4099-9.
-  [doi:10.1201/9781315369211](https://doi.org/10.1201/9781315369211).
-  Absorber measurement and design in practice: the tube and room methods side
-  by side, mountings, and the edge-effect discussion behind the
-  tube-or-reverberation-room section.
-- International Organization for Standardization. (2003). *Acoustics —
-  Measurement of sound absorption in a reverberation room* (ISO 354:2003).
-  [iso.org catalogue](https://www.iso.org/standard/34545.html).
-  The reverberation-room method that produces the $\alpha_s$ spectra rated by
-  ISO 11654, including the Annex B specimen mountings.
-- International Organization for Standardization. (1998). *Acoustics —
-  Determination of sound absorption coefficient and impedance in impedance
-  tubes — Part 2: Transfer-function method* (ISO 10534-2:1998; adopted in
-  Europe as EN ISO 10534-2:2001, the edition implemented here; since
-  revised as [ISO 10534-2:2023](https://www.iso.org/standard/81294.html)).
-  [iso.org catalogue](https://www.iso.org/standard/22851.html).
-  The two-microphone transfer-function method and its plane-wave
-  frequency-range limits.
-- ASTM International. (2019). *Standard test method for normal incidence
-  determination of porous material acoustical properties based on the
-  transfer matrix method* (ASTM E2611-19, the edition implemented here;
-  since revised as [ASTM E2611-24](https://store.astm.org/e2611-24.html)).
-  [ASTM store](https://store.astm.org/e2611-19.html).
-  The four-microphone transfer-matrix method behind the transmission-loss
-  helpers.
-- International Organization for Standardization. (2018). *Acoustics —
-  Determination of airflow resistance — Part 1: Static airflow method*
-  (ISO 9053-1:2018).
-  [iso.org catalogue](https://www.iso.org/standard/69869.html).
-  The static method of section 2, with the through-origin regression and the
-  0.5 mm/s reference velocity.
-
-## Standards
-
-ISO 11654:1997 (weighted sound-absorption rating); ISO 9053-1:2018
-(static airflow resistance); ISO 9053-2:2020 (alternating airflow resistance);
-BS EN ISO 10534-1:2001 and BS EN ISO 10534-2:2001 (impedance tube); ASTM E2611-19
-(four-microphone transmission loss); ISO 12999-2:2020 (sound-absorption
-measurement uncertainty). Every equation is derived from the standard
-text; the [conformance report](https://jmrplens.github.io/phonometry/reference/conformance/) validates the library against the
-standards' own worked examples (ISO 11654 Annex A, ISO 9053-2 Annex A.3,
-ISO 12999-2 Tables 4/5) and closed-form identities.
-
----
-
-
-<!-- source: docs/porous-absorbers.md | canonical: https://jmrplens.github.io/phonometry/guides/porous-absorbers/ -->
-Source: https://jmrplens.github.io/phonometry/guides/porous-absorbers/
-
-# Porous and Multilayer Absorbers
-
-Given a porous material's **flow resistivity** (the quantity the
-[flow rig](https://jmrplens.github.io/phonometry/guides/materials/) measures) the classical equivalent-fluid models
-predict its complex characteristic impedance and wavenumber, and a
-**transfer-matrix** stack of layers (porous blankets, air gaps, perforated
-and microperforated panels, membranes) predicts the absorption coefficient
-of the whole construction before anything is built. This page covers the
-three porous models (Delany–Bazley, Miki, Johnson–Champoux–Allard), the
-multilayer solver, the resonant sheet layers of Maa and the random-incidence
-(Paris) integral. The measurement counterparts live in
-[Acoustic Materials](https://jmrplens.github.io/phonometry/guides/materials/); rating the predicted spectrum lives in
-[the same page's ISO 11654 section](https://jmrplens.github.io/phonometry/guides/materials/).
-
-## 1. Equivalent-fluid models of a porous material
-
-A rigid-frame porous material behaves like an *equivalent fluid* with a
-complex characteristic impedance $Z_c$ and wavenumber $k$ (time convention
-$e^{+j\omega t}$, so a passive medium has $\mathrm{Im}(k) < 0$).
-
-**Delany–Bazley** (Mechel 2e Sect. G.11; Bies 5e Appendix D, Table D.1;
-Hopkins Eqs. 1.171–1.174) is the one-parameter power law in the absorber
-variable $X = \rho_0 f / \sigma$:
-
-$$
-\frac{Z_c}{\rho_0 c_0} = 1 + C_1 X^{-C_2} - j\,C_3 X^{-C_4}, \qquad
-\frac{k}{k_0} = 1 + C_5 X^{-C_6} - j\,C_7 X^{-C_8},
-$$
-
-with the classic rockwool/fibreglass coefficients
-$(0.0571,\,0.754,\,0.087,\,0.732,\,0.0978,\,0.700,\,0.189,\,0.595)$ and a
-stated fit range $0.01 < X < 1.0$ (porosity close to one). The library also
-ships the Table D.1 presets fitted to polyester (`"garai_pompoli"`) and to
-foams (`"dunn_davern"`, `"wu"`). Outside the fit range a
-`PorousAbsorberWarning` is raised and the extrapolated values are still
-returned; the classic failure is a *negative* real part of the layer
-input impedance at low frequency (Mechel Sect. G.12).
-
-**Miki** (1990) refitted the same Delany–Bazley data under a passivity
-(positive-real) constraint, so the model stays physically well behaved below
-the fit range; it is the usual choice when a one-parameter model must be
-evaluated broadband.
-
-**Johnson–Champoux–Allard (JCA)** is the five-parameter semi-phenomenological
-model (Cox & D'Antonio 3e Eqs. 6.19–6.25): flow resistivity $\sigma$,
-porosity $\phi$, tortuosity $\alpha_\infty$ and the viscous/thermal
-characteristic lengths $\Lambda$, $\Lambda'$ give the effective density and
-bulk modulus with the exact limits $j\omega\rho_e \to \sigma$ at DC,
-$\rho_e \to (\alpha_\infty \rho_0/\phi)(1 + (1-j)\,\delta_v/\Lambda)$ at high
-frequency, and the isothermal-to-adiabatic transition in $K_e$.
-
-```python
-import numpy as np
-from phonometry import materials
-
-f = np.geomspace(200.0, 4000.0, 200)
-db = materials.delany_bazley(f, 20000.0)          # sigma in Pa s/m2
-mk = materials.miki(f, 20000.0)
-jca = materials.johnson_champoux_allard(
-    f, 20000.0, porosity=0.98, tortuosity=1.0,
-    viscous_length=8.7e-5, thermal_length=8.7e-5,
-)
-print(np.round(db.normalized_impedance[0], 3))    # (2.598-2.209j)
-print(np.round(mk.normalized_impedance[0], 3))    # (2.286-1.965j)
-print(np.round(jca.normalized_impedance[0], 3))   # (2.321-2.075j)
-
-db.plot()   # normalised Zc and k components vs frequency
-```
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/porous_medium_model_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/porous_medium_model.svg" alt="Normalised characteristic impedance and wavenumber of a porous material with a flow resistivity of 20 kPa s/m2 predicted by the Miki model on a log-log grid: the real and imaginary components all fall towards unity and zero as frequency rises" width="80%"></picture>
-
-*The classical presentation of an equivalent-fluid model (Cox & D'Antonio
-3e, Figs. 6.19–6.20): at low frequency the viscous forces dominate and the
-material looks stiff and lossy (all four components large); as frequency
-rises the components fall towards the free-air limits
-$Z_c \to \rho_0 c_0$ and $k \to k_0$, so a thin layer only works where its
-thickness is a fair fraction of the wavelength inside the material.*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import materials
-
-f = np.geomspace(100.0, 5000.0, 260)
-mk = materials.miki(f, 20000.0)          # sigma = 20 kPa s/m^2
-
-# One line: normalised Zc and k components on a log-log grid.
-mk.plot()
-plt.show()
-
-# By hand, from the result's fields:
-fig, ax = plt.subplots()
-ax.loglog(f, mk.normalized_impedance.real, label="Re(Zc)/rho c")
-ax.loglog(f, -mk.normalized_impedance.imag, "--", label="-Im(Zc)/rho c")
-ax.loglog(f, mk.normalized_wavenumber.real, label="Re(k)/k0")
-ax.loglog(f, -mk.normalized_wavenumber.imag, "--", label="-Im(k)/k0")
-ax.set(xlabel="Frequency [Hz]", ylabel="Normalised characteristic value")
-ax.legend()
-plt.show()
-```
-
-</details>
-
-The three models agree closely over the Delany–Bazley fit range (Cox &
-D'Antonio Figs. 6.19–6.21 make the same comparison); JCA extends the
-prediction physically outside it. A `PorousMediumResult` built from measured
-data (for example the $Z_c$, $k$ recovered by the
-[ASTM E2611 transfer-matrix reduction](https://jmrplens.github.io/phonometry/guides/materials/)) plugs into the layer
-solver exactly like a modelled one.
-
-## 2. Multilayer prediction by transfer matrices
-
-Each fluid layer of thickness $d$ contributes the chain matrix (Cox &
-D'Antonio Eq. 2.29; equivalently the impedance recursion of Bies Eq. D.95
-and Mechel Sect. D.4)
-
-$$
-\begin{bmatrix} p \\ u \end{bmatrix}_{\text{front}} =
-\begin{bmatrix}
-\cos(k_x d) & j Z_x \sin(k_x d) \\
-j \sin(k_x d)/Z_x & \cos(k_x d)
-\end{bmatrix}
-\begin{bmatrix} p \\ u \end{bmatrix}_{\text{back}},
-$$
-
-with the in-depth wavenumber $k_x = \sqrt{k^2 - k_0^2 \sin^2\theta}$ from
-Snell's law and $Z_x = Z_c k / k_x$. Thin resonant sheets enter as series
-impedances $[[1, z], [0, 1]]$. Closing the chain with a rigid wall (or free
-air, or any impedance) gives the surface impedance, the reflection factor
-$R(\theta)$ and $\alpha(\theta) = 1 - |R|^2$. A single hard-backed porous
-layer reduces to the textbook closed form
-$Z_s = -j Z_c \cot(k d)$ (Mechel Sect. D.3, Eq. 1).
-
-```python
-import numpy as np
-from phonometry import materials
-
-f = np.geomspace(200.0, 4000.0, 300)
-med = materials.miki(f, 20000.0)
-res = materials.layered_absorber(f, [materials.PorousLayer(0.05, med)])
-i = np.argmin(np.abs(f - 1000.0))
-print(round(res.absorption[i], 3))               # 0.937 at 1 kHz
-
-res.plot()   # alpha(f) with |R| overlaid
-```
-
-The solver evaluates the physical quantities through a numerically robust
-admittance recursion (immune to the $e^{|\mathrm{Im}(k_x)| d}$ overflow of
-raw matrix entries for extremely attenuating layers) and still exposes the
-full chain matrix (reciprocal by construction, $\det T = 1$) in
-`transfer_matrix`, ready for the
-[ASTM E2611 machinery](https://jmrplens.github.io/phonometry/guides/materials/) (`TransferMatrix`).
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/porous_absorber_designs_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/porous_absorber_designs.svg" alt="Predicted normal-incidence absorption of four 50 mm constructions: a porous layer absorbs broadband from mid frequency up, a microperforated panel over a cavity peaks near 700 Hz, a perforated panel over porous peaks near 500 Hz, and a membrane over a porous-filled cavity peaks near 175 Hz; dotted vertical lines mark the closed-form Helmholtz and membrane resonances" width="80%"></picture>
-
-*Four constructions, one 50 mm budget: the porous layer works broadband but
-fades at low frequency; the microperforated, perforated and membrane designs
-trade bandwidth for a resonant peak placed ever lower. The dotted lines are
-the shallow-cavity closed forms; the full model sits below them because the
-viscous plug mass and the finite cavity depth are not negligible.*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import materials as m
-
-f = np.geomspace(50.0, 5000.0, 500)
-med = m.miki(f, 20000.0)
-med_light = m.miki(f, 10000.0)
-designs = {
-    "Porous 50 mm": [m.PorousLayer(0.05, med)],
-    "MPP + cavity": [m.MicroperforatedPlateLayer(0.5e-3, 0.15e-3, 0.008),
-                     m.AirLayer(0.048)],
-    "Perforated + porous": [m.PerforatedPlateLayer(0.006, 0.0025, 0.05),
-                            m.PorousLayer(0.025, med), m.AirLayer(0.019)],
-    "Membrane + porous": [m.MembraneLayer(2.0), m.AirLayer(0.01),
-                          m.PorousLayer(0.038, med_light)],
-}
-fig, ax = plt.subplots()
-for label, layers in designs.items():
-    ax.semilogx(f, m.layered_absorber(f, layers).absorption, label=label)
-ax.set(xlabel="Frequency [Hz]", ylabel="Absorption coefficient")
-ax.legend()
-plt.show()
-```
-
-</details>
-
-## 3. Resonant sheets: perforated, microperforated, membrane
-
-**Perforated panel.** The air plugs in the holes are the mass of a
-Helmholtz resonator: $m = (\rho_0/\varepsilon)\,[t + 2\delta a +
-\sqrt{8\nu/\omega}\,(1 + t/2a)]$ with the open area $\varepsilon$, the
-end-correction factor $\delta$ per orifice end and the visco-thermal
-resistance $r = (\rho_0/\varepsilon)\sqrt{8\nu\omega}\,(1 + t/2a)$
-(Cox & D'Antonio Eqs. 7.6/7.12). The default end correction is the
-Fok-function interaction fit $\delta = 0.85\,(1 - 1.47\sqrt{\varepsilon}
-+ 0.47\varepsilon^{3/2})$ (Table 7.1), valid for any open area. For a
-shallow cavity the resonance is
-$f_0 = (c_0/2\pi)\sqrt{\varepsilon/(t'\,d)}$ (Eq. 7.4).
-
-**Microperforated panel (MPP).** With submillimetre holes the viscous
-boundary layer fills the orifice and the panel absorbs *without any porous
-material*. The library implements Maa's exact short-tube impedance
-(Maa 1998, Eq. 2),
-
-$$
-z_1 = j\omega\rho_0 t \left[ 1 -
-\frac{2}{x\sqrt{-j}}\,\frac{J_1(x\sqrt{-j})}{J_0(x\sqrt{-j})} \right]^{-1},
-\qquad x = a\sqrt{\rho_0 \omega/\eta},
-$$
-
-plus the Eq. 5 end corrections (surface resistance
-$\tfrac{1}{2}\sqrt{2\omega\rho_0\eta}$ and piston reactance $0.85\,d$
-total), divided by the open area. The perforate constant $x$ (proportional to the
-hole radius over the viscous boundary-layer thickness) governs everything: at
-the resonance $\omega_0 m = \cot(\omega_0 D/c_0)$ the peak absorption is
-$4r/(1+r)^2$ and the half-absorption bandwidth is
-$f_2/f_1 = \pi/\mathrm{arccot}(1+r) - 1$ (Maa Eqs. 9–21, Table I).
-
-```python
-import numpy as np
-from phonometry import materials
-
-# Maa (1998) Fig. 5: d = t = 0.2 mm, holes every 2.5 mm, cavity 6 cm.
-eps = (np.pi / 4.0) * (0.2 / 2.5) ** 2
-f = np.linspace(100.0, 4000.0, 2000)
-res = materials.layered_absorber(
-    f, [materials.MicroperforatedPlateLayer(0.2e-3, 0.1e-3, eps),
-        materials.AirLayer(0.06)],
-)
-i = np.argmax(res.absorption)
-print(f"peak alpha = {res.absorption[i]:.2f} at {f[i]:.0f} Hz")
-# peak alpha = 0.96 at 677 Hz
-res.plot()   # alpha(f) with |R| overlaid: the resonant MPP peak
-```
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mpp_absorption_peak_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mpp_absorption_peak.svg" alt="Predicted absorption of Maa's microperforated panel over a 6 cm cavity: a broad resonant peak reaching alpha 0.96 near 677 Hz, with the reflection-factor magnitude as its mirror image, and a narrow secondary feature near the half-wave cavity resonance at 2.9 kHz" width="80%"></picture>
-
-*Maa's own Fig. 5 design, no porous material anywhere: the viscous losses in
-the submillimetre holes damp the panel-cavity resonance into a broad
-absorption peak. The narrow feature near 2.9 kHz is the half-wave cavity
-resonance, where the cavity presents a pressure node to the panel and the
-absorption collapses before the next resonance restores it.*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import materials
-
-# Maa (1998) Fig. 5: d = t = 0.2 mm, holes every 2.5 mm, cavity 6 cm.
-eps = (np.pi / 4.0) * (0.2 / 2.5) ** 2
-f = np.linspace(100.0, 4000.0, 1200)
-res = materials.layered_absorber(
-    f, [materials.MicroperforatedPlateLayer(0.2e-3, 0.1e-3, eps),
-        materials.AirLayer(0.06)],
-)
-
-# One line: alpha(f) with |R| overlaid.
-res.plot()
-plt.show()
-
-# By hand, from the result's fields:
-fig, ax = plt.subplots()
-ax.semilogx(f, res.absorption, label="Absorption alpha")
-ax.semilogx(f, np.abs(res.reflection), "--", label="Reflection factor |R|")
-ax.set(xlabel="Frequency [Hz]", ylabel="Coefficient")
-ax.legend()
-plt.show()
-```
-
-</details>
-
-**Membrane.** A limp impervious sheet is the surface mass $z = j\omega m$
-(Cox Eq. 7.14; Bies Eq. D.96); over a cavity it resonates at the classical
-$f_0 \approx 60/\sqrt{m d}$ (adiabatic; $\approx 50/\sqrt{m d}$ when the
-cavity is porous-filled and isothermal, Cox Eqs. 7.9/7.10). The closed forms
-are exposed as `helmholtz_resonance_frequency` and
-`membrane_resonance_frequency`; the full frequency response comes from the
-same layer stack.
-
-## 4. Oblique and random incidence
-
-`layered_absorber(..., angle=theta)` evaluates the full bulk-reacting stack
-at any polar angle; sheets are locally reacting (angle-independent), fluid
-layers refract per Snell's law; for an MPP over a cavity this reproduces
-Maa's oblique closed form (Eq. 23) exactly. The random-incidence coefficient
-is the Paris integral (Mechel Sect. D.5, Eq. 9)
-
-$$
-\alpha_{dif} = \frac{2}{\sin^2\theta_{lim}} \int_0^{\theta_{lim}}
-\alpha(\theta)\,\cos\theta\,\sin\theta\,\mathrm{d}\theta,
-$$
-
-evaluated by Gauss–Legendre quadrature in `diffuse_field_absorption`
-(``angle_limit`` defaults to 90°; truncations at 75–87° are in use). For a
-*locally reacting* surface with known normalised impedance the integral has
-the closed form of Mechel Eq. 10, exposed as `statistical_absorption`; its
-maximum over all passive impedances is the published **0.951** (at
-$z \approx 1.57$).
-
-```python
-import numpy as np
-from phonometry import materials
-
-f = np.array([250.0, 500.0, 1000.0, 2000.0])
-med = materials.miki(f, 20000.0)
-layers = [materials.PorousLayer(0.05, med)]
-normal = materials.layered_absorber(f, layers)
-diffuse = materials.diffuse_field_absorption(f, layers)
-print(np.round(normal.absorption, 2))    # [0.26 0.62 0.94 0.95]
-print(np.round(diffuse.absorption, 2))   # [0.37 0.68 0.9  0.95]
-diffuse.plot()   # alpha_dif(f); overlay normal.absorption to compare
-
-print(round(float(materials.statistical_absorption(1.567 + 0j)), 3))  # 0.951
-```
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuse_field_absorption_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuse_field_absorption.svg" alt="Random-incidence absorption of a 50 mm porous layer by the Paris integral compared with its normal-incidence coefficient: the diffuse-field curve sits clearly above the normal-incidence one below 700 Hz and the two converge towards 0.95 at high frequency" width="80%"></picture>
-
-*Why the reverberation room reads higher than the tube: the Paris integral
-weights the oblique angles, whose waves travel a longer path inside the
-layer, so $\alpha_{dif}$ exceeds the normal-incidence $\alpha(0°)$ exactly
-where the layer is thin against the wavelength. This is the model-side
-counterpart of the tube-versus-reverberation-room discussion of
-[Acoustic Materials](https://jmrplens.github.io/phonometry/guides/materials/).*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import materials
-
-f = np.geomspace(125.0, 4000.0, 200)
-layers = [materials.PorousLayer(0.05, materials.miki(f, 20000.0))]
-normal = materials.layered_absorber(f, layers)
-diffuse = materials.diffuse_field_absorption(f, layers)
-
-# One line, then the normal-incidence overlay on the same axes:
-ax = diffuse.plot()
-ax.plot(f, normal.absorption, "--", label="Normal incidence alpha(0)")
-ax.legend()
-plt.show()
-```
-
-</details>
-
-## 5. Slow-sound slit panels with Helmholtz resonators
-
-A rigid panel of thin closed slits, each loaded on its upper wall by an array
-of Helmholtz resonators, is a locally reacting, deep-subwavelength absorber
-(Jiménez et al. 2017). The resonators slow the sound in the slit, pulling its
-resonance far below the quarter-wavelength frequency, and the visco-thermal
-losses of the sub-millimetre slit and the resonator necks make *perfect*
-absorption possible: when the intrinsic loss balances the leakage, the
-reflection zero lands on the real-frequency axis and $\alpha = 1$ (critical
-coupling). The panel transfer matrix is the chain
-$T = M_{\Delta l}\,\prod_n (M_s\,M_{HR}^{(n)}\,M_s)$; the rigidly-backed
-reflection factor is
-$R = (T_{11}\cos\theta - Z_0 T_{21})/(T_{11}\cos\theta + Z_0 T_{21})$ with
-$Z_0 = \rho_0 c_0 / S_0$. `critical_coupling_design` inverts the model, tuning
-the cavity length and the slit height so both matching conditions
-$\mathrm{Re}(Z)\cos\theta = Z_0$ and $\mathrm{Im}(Z) = 0$ hold.
-
-```python
-import numpy as np
-from phonometry import (
-    HelmholtzResonator, critical_coupling_design, slit_helmholtz_absorber,
-)
-
-base = HelmholtzResonator(
-    neck_length=1.0e-3, neck_side=3.0e-3,
-    cavity_length=30.0e-3, cavity_side=27.0e-3,
-)
-design = critical_coupling_design(300.0, base, lattice_step=3.0e-2, period=5.0e-2)
-print(round(design.absorption, 4))          # ~1.0 (perfect absorption)
-
-f = np.linspace(150.0, 500.0, 700)
-res = slit_helmholtz_absorber(
-    f, design.resonator, slit_height=design.slit_height,
-    lattice_step=3.0e-2, period=5.0e-2,
-)
-res.plot()   # alpha(f) with |R| overlaid; peak = 1 at 300 Hz
-```
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slow_sound_absorber_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slow_sound_absorber.svg" alt="Absorption of a slit panel loaded by one Helmholtz resonator: the critically-coupled design reaches alpha = 1 at 300 Hz, while narrowing or widening the slit breaks the balance and lowers the peak; the panel depth is lambda/38" width="80%"></picture>
-
-*One resonator, one slit, one loss-versus-leakage balance: the critically
-coupled design reaches $\alpha = 1$ at 300 Hz in a panel only $\lambda/38$
-deep; detuning the slit height drops the peak below one.*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import (
-    HelmholtzResonator, critical_coupling_design, slit_helmholtz_absorber,
-)
-
-a, d, f0 = 3.0e-2, 5.0e-2, 300.0
-base = HelmholtzResonator(1.0e-3, 3.0e-3, 30.0e-3, 27.0e-3)
-design = critical_coupling_design(f0, base, lattice_step=a, period=d)
-h0 = design.slit_height
-
-f = np.linspace(150.0, 500.0, 700)
-fig, ax = plt.subplots()
-for factor, label in [(1.0, "critically coupled"),
-                      (0.6, "narrow slit"), (1.7, "wide slit")]:
-    res = slit_helmholtz_absorber(
-        f, design.resonator, slit_height=factor * h0,
-        lattice_step=a, period=d,
-    )
-    ax.plot(f, res.absorption, label=label)
-ax.set(xlabel="Frequency [Hz]", ylabel="Absorption coefficient")
-ax.legend()
-plt.show()
-```
-
-</details>
-
-## Practical notes
-
-**Fit ranges.** Delany–Bazley warns (and extrapolates) outside
-$0.01 < X < 1$ and Miki outside $0.01 < f/\sigma < 1$; treat sub-range
-values as qualitative. JCA needs four extra
-parameters but behaves physically everywhere; with
-$\Lambda = \Lambda' = \sqrt{8\alpha_\infty\eta/(\phi\sigma)}$ and
-$\alpha_\infty = 1$ it tracks Delany–Bazley over the fit range.
-
-**Local vs. bulk reaction.** The layer solver is bulk-reacting (sound
-refracts and travels inside the layers). `statistical_absorption` assumes
-local reaction, a good approximation for high flow resistivity, partitioned
-cavities or thin resonant facings; for thick, light porous layers integrate
-the bulk model with `diffuse_field_absorption` instead (Mechel Sect. D.6).
-
-**Where the numbers were checked.** The models are pinned digit-exact to the
-printed coefficient tables (Bies Table D.1, Miki Eqs. 30–34), the solver to
-the closed forms above and to the `TransferMatrix` recovery of the
-[impedance-tube page](https://jmrplens.github.io/phonometry/guides/materials/), the MPP to Maa's own approximation
-(stated ~6 % agreement with the exact Eq. 2), design example and Table I,
-and the Paris integral to its locally reacting closed form. Five misprints
-found in the sources during this work are recorded in the
-[errata registry](https://jmrplens.github.io/phonometry/reference/errata/).
-
-## References
-
-- Mechel, F. P. (Ed.). (2008). *Formulas of acoustics* (2nd ed.). Springer.
-  [doi:10.1007/978-3-540-76833-3](https://doi.org/10.1007/978-3-540-76833-3).
-  Sections D.3–D.6 (layer reflection, multilayer scheme, diffuse-field
-  integrals) and G.11 (empirical porous relations).
-- Bies, D. A., Hansen, C. H., & Howard, C. Q. (2017). *Engineering noise
-  control* (5th ed.). CRC Press.
-  [doi:10.1201/9781351228152](https://doi.org/10.1201/9781351228152).
-  Appendix D: porous-material properties, Table D.1 coefficient sets and
-  the layered-construction recursions D.91–D.99.
-- Cox, T. J., & D'Antonio, P. (2017). *Acoustic absorbers and diffusers:
-  Theory, design and application* (3rd ed.). CRC Press.
-  [doi:10.1201/9781315369211](https://doi.org/10.1201/9781315369211).
-  Transfer-matrix modelling (Sect. 2.6), porous models (Sect. 6.5) and
-  resonant-absorber design equations (Sects. 7.3/7.5).
-- Attenborough, K., & Van Renterghem, T. (2021). *Predicting
-  outdoor sound* (2nd ed.). CRC Press.
-  [doi:10.1201/9780429470806](https://doi.org/10.1201/9780429470806).
-  Chapter 5: ground-impedance models, including the JCA family.
-- Hopkins, C. (2007). *Sound insulation*. Butterworth-Heinemann.
-  [doi:10.4324/9780080550473](https://doi.org/10.4324/9780080550473).
-  Section 1.3.2.2: the equivalent-gas model and the Delany–Bazley SI form.
-- Miki, Y. (1990). Acoustical properties of porous materials —
-  Modifications of Delany–Bazley models. *Journal of the Acoustical Society
-  of Japan (E)*, 11(1), 19–24.
-  [doi:10.1250/ast.11.19](https://doi.org/10.1250/ast.11.19).
-  The positive-real regression implemented in `miki`.
-- Maa, D.-Y. (1998). Potential of microperforated panel absorber.
-  *Journal of the Acoustical Society of America*, 104(5), 2861–2866.
-  [doi:10.1121/1.423870](https://doi.org/10.1121/1.423870).
-  The exact MPP impedance (Eq. 2), end corrections, design formulas and the
-  Fig. 5 example pinned in the tests.
-- Johnson, D. L., Koplik, J., & Dashen, R. (1987). Theory of dynamic
-  permeability and tortuosity in fluid-saturated porous media. *Journal of
-  Fluid Mechanics*, 176, 379–402.
-  [doi:10.1017/S0022112087000727](https://doi.org/10.1017/S0022112087000727).
-  The dynamic-tortuosity model behind the JCA effective density.
-- Delany, M. E., & Bazley, E. N. (1970). Acoustical properties of fibrous
-  absorbent materials. *Applied Acoustics*, 3(2), 105–116.
-  [doi:10.1016/0003-682X(70)90031-9](https://doi.org/10.1016/0003-682X(70)90031-9).
-  The original empirical relations and their stated validity.
-- Jiménez, N., Groby, J.-P., Pagneux, V., & Romero-García, V. (2017).
-  Iridescent perfect absorption in critically-coupled acoustic metamaterials
-  using the transfer matrix method. *Applied Sciences*, 7(6), 618.
-  [doi:10.3390/app7060618](https://doi.org/10.3390/app7060618). The slit +
-  Helmholtz-resonator transfer-matrix model and the critical-coupling
-  condition implemented in `slit_helmholtz_absorber`.
-- Jiménez, N., Huang, W., Romero-García, V., Pagneux, V., & Groby, J.-P.
-  (2016). Ultra-thin metamaterial for perfect and quasi-omnidirectional sound
-  absorption. *Applied Physics Letters*, 109(12), 121902.
-  [doi:10.1063/1.4962328](https://doi.org/10.1063/1.4962328). The resonator
-  impedance (Eq. A23) and its radiation end corrections (Eqs. A24–A27).
-- Stinson, M. R. (1991). The propagation of plane sound waves in narrow and
-  wide circular tubes, and generalization to uniform tubes of arbitrary
-  cross-sectional shape. *Journal of the Acoustical Society of America*,
-  89(2), 550–558. [doi:10.1121/1.400379](https://doi.org/10.1121/1.400379).
-  The visco-thermal effective parameters of the slit and the square necks
-  and cavities.
-
-## Standards
-
-No standard governs these prediction models; they are textbook and journal
-methods (Mechel; Bies, Hansen & Howard; Cox & D'Antonio; Attenborough & Van
-Renterghem; Miki 1990; Maa 1998; Johnson et al. 1987) implemented
-clean-room from the cited sources. The measurement standards they connect to
-(ISO 9053-1/-2 for flow resistivity, ISO 10534-1/-2 and ASTM E2611
-for the impedance tube, ISO 354 / ISO 11654 for random-incidence absorption and
-rating) live in [Acoustic Materials](https://jmrplens.github.io/phonometry/guides/materials/).
-
----
-
-
 <!-- source: docs/surface-scattering.md | canonical: https://jmrplens.github.io/phonometry/guides/surface-scattering/ -->
 Source: https://jmrplens.github.io/phonometry/guides/surface-scattering/
 
@@ -1713,6 +187,32 @@ Formula (6) area-weights each energy by $N_i$ from Formula (8), and those area
 factors are evaluated in **radians**, which is why a 5° spacing at the zenith
 produces a weight near 1.57, not 51.9.
 
+The rig those formulas assume is worth drawing to scale.
+`plot_goniometer_geometry` lays out the standard arrangement in plan: the
+37-microphone semicircle every 5 degrees at 5 m around the sample, the source
+at 10 m on the normal.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_goniometer_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_goniometer_geometry.svg" alt="To-scale plan of the free-field diffusion goniometer: a semicircle of 37 microphone dots every 5 degrees at 5 m radius around the small sample at the centre, the red source star at 10 m on the normal above it, and the 10 m and 5 m distances dimensioned" width="88%"></picture>
+
+*The polar arc behind every `L_i` of Formula (5), to scale: 37 receivers every
+5 degrees at 5 m, the source twice as far out on the normal, and the sample a
+sliver at the centre.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import materials
+
+# The standard arrangement: 37 microphones every 5 degrees at 5 m, the
+# source at 10 m on the normal.
+materials.plot_goniometer_geometry()
+plt.show()
+```
+
+</details>
+
 The animation below runs that goniometer experiment numerically: the same
 plane wavefront hits a flat rigid panel and a Schroeder diffuser (an N = 7
 quadratic-residue profile), and the scattered energy on the receiver arc turns
@@ -1736,6 +236,37 @@ band-averaged normalised diffusion against the published Appendix B BEM table
 in the 200-400 Hz bands (agreement within 0.01; over the full published
 100-5000 Hz range the model-vs-BEM mean absolute deviation is about 0.09,
 because edge diffraction is outside the Fraunhofer model).
+
+The surface itself is worth drawing before predicting anything from it.
+`plot_qrd_geometry` turns the depth sequence into the to-scale well profile
+below, and a predicted `DiffuserPolarResponse` retains its geometry, so
+`qrd.plot_geometry()` draws the surface it was computed for.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/qrd_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/qrd_geometry.svg" alt="To-scale well profile of two periods of the commercial N = 7 quadratic-residue diffuser: wells 80.7 mm wide at an 85.7 mm pitch, separated by thin fins on a rigid base, following the depth sequence 0, 50, 200, 100, 100, 200, 50 mm with the deepest wells at 200 mm, and the incident sound arriving from above" width="88%"></picture>
+
+*Two of the six periods, to scale: the quadratic residues $n^2 \bmod 7$
+turned into a buildable surface. The 490 Hz design frequency is what puts
+the deepest well at exactly 200 mm.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import materials
+
+# The published N = 7 QRD: well width 3.6 m / 42, deepest well 0.2 m.
+depths = materials.qrd_well_depths(7, 490.0, speed_of_sound=343.0)
+pitch = 3.6 / 42                  # 42 wells across the 3.6 m panel
+fin = 0.005                       # thin fins, included in the pitch
+materials.plot_qrd_geometry(depths, pitch - fin, fin_width=fin, periods=2)
+plt.show()
+
+# A predicted DiffuserPolarResponse retains its geometry, so
+# qrd.plot_geometry() draws the profile it was computed for (all 6 periods).
+```
+
+</details>
 
 ```python
 from phonometry import materials
@@ -1956,6 +487,124 @@ plt.show()
 
 </details>
 
+### Metadiffusers: deep-subwavelength Schroeder diffusers
+
+A metadiffuser replaces the deep wells of a Schroeder diffuser with thin
+slits loaded by Helmholtz resonators (Jiménez, Cox, Romero-García and Groby,
+2017). Below their resonance the resonators slow the sound inside each slit,
+so a panel a few centimetres thick reaches the reflection phases that a
+classical phase grating needs tens of centimetres of depth for, and driving
+a slit to critical coupling adds a perfectly absorbing state, the `0` that
+ternary sequences require. `metadiffuser_reflection` runs the slit
+transfer-matrix chain of the [slow-sound absorber](https://jmrplens.github.io/phonometry/guides/porous-absorbers/) once per
+well (two-dimensional resonators, visco-thermal losses and end corrections
+included) and returns the per-well complex reflection $R_n(f)$;
+`metadiffuser_polar_response` and `metadiffuser_diffusion_spectrum` reduce
+that spatial profile through the same Fraunhofer far field and ISO 17497-2
+coefficient used for the classical designs above.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_geometry.svg" alt="To-scale cross-section of the published quadratic-residue metadiffuser: a 350 by 20 millimetre panel over a rigid backing with five numbered slits opening at the face, each loaded by two Helmholtz resonators whose necks and cavities shelve sideways into the septum between slits; dimension lines mark the 350 millimetre width, the 70 millimetre pitch, the 14.7 millimetre first slit and the 20 millimetre depth, with the incident sound arriving from above" width="92%"></picture>
+
+The published quadratic-residue design packs the whole diffuser into a
+35 cm x 2 cm panel. Its first slit reaches critical coupling (the reflection
+zero the ternary `0` state is built from), and at the 2 kHz evaluation
+frequency the panel scatters like the 27.4 cm deep QRD it mimics:
+
+```python
+import numpy as np
+from phonometry import (
+    HelmholtzResonator,
+    MetadiffuserWell,
+    metadiffuser_polar_response,
+    metadiffuser_reflection,
+)
+
+# The published quadratic-residue metadiffuser: five slits with two
+# resonators each in a 35 cm x 2 cm panel (7 cm pitch), tuned to mimic a
+# QRD designed for 500 Hz whose wells would run up to 27.4 cm deep.
+mm = 1e-3
+rows = [  # slit h, neck l_n, cavity l_c, neck w_n, cavity w_c  [mm]
+    (14.7, 13.0, 16.4, 6.2, 9.0),
+    (30.9, 9.1, 4.3, 3.5, 9.0),
+    (30.9, 9.1, 4.3, 3.5, 9.0),
+    (15.7, 13.3, 17.0, 6.3, 9.0),
+    (20.3, 18.0, 20.7, 3.2, 9.0),
+]
+wells = [
+    MetadiffuserWell(
+        h * mm,
+        2 * (HelmholtzResonator(ln * mm, wn * mm, lc * mm, wc * mm),),
+    )
+    for h, ln, lc, wn, wc in rows
+]
+
+f = np.arange(1800.0, 2601.0, 5.0)
+panel = metadiffuser_reflection(f, wells, depth=0.02, period=0.07)
+alpha1 = panel.well_absorption[0]
+print(round(float(alpha1.max()), 2), int(f[alpha1.argmax()]))  # 0.99 2305
+
+polar = metadiffuser_polar_response(2000.0, wells, depth=0.02,
+                                    period=0.07, periods=6)
+print(round(polar.coefficient, 2))                             # 0.32
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_polar_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_polar.svg" alt="Semicircular polar plot at 2 kilohertz comparing the far-field response of the 2 centimetre metadiffuser panel, drawn as a solid line, with the 27.4 centimetre deep quadratic residue diffuser it mimics, drawn dashed: the two grating-lobe patterns overlap almost exactly across the whole minus 90 to plus 90 degree arc" width="92%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import numpy as np
+from phonometry import (
+    HelmholtzResonator,
+    MetadiffuserWell,
+    materials,
+    metadiffuser_polar_response,
+)
+
+mm = 1e-3
+rows = [
+    (14.7, 13.0, 16.4, 6.2, 9.0),
+    (30.9, 9.1, 4.3, 3.5, 9.0),
+    (30.9, 9.1, 4.3, 3.5, 9.0),
+    (15.7, 13.3, 17.0, 6.3, 9.0),
+    (20.3, 18.0, 20.7, 3.2, 9.0),
+]
+wells = [
+    MetadiffuserWell(
+        h * mm,
+        2 * (HelmholtzResonator(ln * mm, wn * mm, lc * mm, wc * mm),),
+    )
+    for h, ln, lc, wn, wc in rows
+]
+
+# The metadiffuser panel and the QRD it was tuned to at 2 kHz, both with
+# six repetitions of the period.
+meta = metadiffuser_polar_response(2000.0, wells, depth=0.02, period=0.07,
+                                   periods=6)
+sequence = np.roll(materials.quadratic_residue_sequence(5), -1)
+depths = sequence * (343.0 / 500.0) / (2 * 5)
+qrd = materials.predict_diffuser_polar_response(
+    0.07, 2000.0, depths=depths, periods=6, include_obliquity=False,
+)
+
+ax = meta.plot(marker="", linewidth=2.2, label="Metadiffuser, panel 2 cm")
+qrd.plot(ax=ax, marker="", linewidth=1.6, linestyle="--",
+         label="QRD, wells up to 27.4 cm")
+ax.legend(loc="lower center")
+```
+
+</details>
+
+The far-field overlay above is the frequency-domain summary; the FDTD
+animation below meshes both panels for real (the metadiffuser at 0.25 mm, slits,
+necks and cavities included) and lets the same 2 kHz wavefront hit them: the
+27 cm QRD and the 2 cm panel throw out nearly the same scattered fan.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_metadiffuser_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_metadiffuser.gif" alt="Animation: a 2 kHz plane wavefront hits a Schroeder diffuser with wells down to 27 centimetres and, beside it, the 2 centimetre metadiffuser whose real slits and resonators are meshed at 0.25 millimetres; the total field and the persistent scattered envelope show both panels spraying nearly identical fans, with the arc diffusion coefficients annotated" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_metadiffuser.webm)
+
 ## Scattering or diffusion? Two coefficients, two jobs
 
 The two coefficients above are routinely treated as interchangeable, in
@@ -2155,13 +804,43 @@ from phonometry import materials
 print(round(materials.max_sampled_area_radius(5.0e-3), 3))   # 1.343  (metres)
 ```
 
+The whole arrangement fits in one to-scale drawing. `plot_insitu_geometry`
+draws the standard set-up with that sampled radius on the surface, and a
+measured `InsituAbsorptionResult` that retained its heights redraws its own
+with `result.plot_geometry()`.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_setup_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_setup_geometry.svg" alt="To-scale side view of the in-situ absorption set-up: the loudspeaker on its mast 1.25 m above the hatched road surface, the microphone on the same vertical at 0.25 m, the dashed surface-reflected path below it and the 1.34 m radius of the sampled area dimensioned on the surface" width="88%"></picture>
+
+*The standard geometry to scale: source at 1.25 m, microphone at 0.25 m on the
+same vertical, and the 5 ms window turned into the 1.34 m radius of road that
+actually contributes to the reflection.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import materials
+
+# The standard geometry: source at 1.25 m, microphone at 0.25 m, and the
+# 1.34 m sampled-area radius of the 5 ms window.
+materials.plot_insitu_geometry()
+plt.show()
+
+# A measured spectrum retains its heights and redraws its own set-up:
+#   result = materials.insitu_absorption_spectrum(hi, hr, fs)
+#   result.plot_geometry()
+```
+
+</details>
+
 ## 4. In-situ road absorption: spot method (ISO 13472-2)
 
 For smaller patches, ISO 13472-2 seals a short circular tube onto the surface and
 measures the absorption with the two-microphone transfer-function method of
 ISO 10534-2. The library provides the spot-method geometry and validity helpers;
 the transfer-function DSP itself is the impedance-tube routine
-`two_microphone_impedance` (see [Acoustic Materials](https://jmrplens.github.io/phonometry/guides/materials/)).
+`two_microphone_impedance` (see [Impedance Tube](https://jmrplens.github.io/phonometry/guides/impedance-tube/)).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spot_tube_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spot_tube.svg" alt="ISO 13472-2 spot method: a short circular tube sealed onto the road surface with a loudspeaker at the top and two microphones flush in the tube wall at spacing s, measuring absorption over 250 to 1600 Hz via the ISO 10534-2 two-microphone transfer-function method" width="92%"></picture>
 
@@ -2186,6 +865,14 @@ print(round(s_min, 3), round(s_max, 3))    # 0.078 0.086  (metres)
 ```
 
 ## References
+
+- Jiménez, N., Cox, T. J., Romero-García, V., & Groby, J.-P. (2017).
+  Metadiffusers: Deep-subwavelength sound diffusers. *Scientific Reports*,
+  7, 5389.
+  [doi:10.1038/s41598-017-05710-5](https://doi.org/10.1038/s41598-017-05710-5).
+  The metadiffuser model implemented here: slits loaded by Helmholtz
+  resonators reproduce Schroeder phase profiles and ternary sequences from
+  panels 1/46 to 1/20 of the design wavelength thick.
 
 - Cox, T. J., & D'Antonio, P. (2017). *Acoustic absorbers and diffusers:
   Theory, design and application* (3rd ed.). CRC Press.

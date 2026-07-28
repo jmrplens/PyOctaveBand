@@ -606,7 +606,7 @@ exigen decenas de centímetros de profundidad; y llevar una rendija al
 acoplamiento crítico añade un estado perfectamente absorbente, el `0` que
 requieren las secuencias ternarias. `metadiffuser_reflection` ejecuta la
 cadena de matrices de transferencia del
-[absorbedor de sonido lento](/phonometry/es/guides/materials/) una vez por
+[absorbedor de sonido lento](/phonometry/es/guides/porous-absorbers/) una vez por
 pozo (resonadores bidimensionales, pérdidas viscotérmicas y correcciones de
 extremo incluidas) y devuelve la reflexión compleja por pozo $R_n(f)$;
 `metadiffuser_polar_response` y `metadiffuser_diffusion_spectrum` reducen
@@ -964,7 +964,7 @@ superficie y mide la absorción con el método de la función de transferencia d
 dos micrófonos de ISO 10534-2. La librería aporta la geometría del método puntual
 y los ayudantes de validez; el propio DSP de la función de transferencia es la
 rutina de tubo de impedancia `two_microphone_impedance` (véase la
-[guía de Materiales acústicos](/phonometry/es/guides/materials/)).
+[guía del Tubo de impedancia](/phonometry/es/guides/impedance-tube/)).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spot_tube_es.svg" alt="Método puntual de ISO 13472-2: un tubo circular corto sellado sobre la superficie del pavimento con un altavoz en la parte superior y dos micrófonos enrasados en la pared del tubo con espaciado s, midiendo la absorción de 250 a 1600 Hz mediante el método de la función de transferencia de dos micrófonos de ISO 10534-2" width="92%" />
 
@@ -1015,7 +1015,7 @@ las notas de referencia de arriba. El procesado de función de transferencia
 propio de la ISO 13472-2 tampoco está implementado en este módulo: solo se
 proporcionan la geometría y las funciones de validación, y el DSP de dos
 micrófonos real es la rutina ISO 10534-2 de la
-[guía de Materiales Acústicos](/phonometry/es/guides/materials/). El modelo
+[guía del Tubo de impedancia](/phonometry/es/guides/impedance-tube/). El modelo
 de predicción de difusor de Fraunhofer es una estimación de diseño, no
 forma parte de la ISO 17497-2 en sí, y sus propios límites declarados
 (pierde precisión a baja frecuencia, en ángulos rasantes y para superficies

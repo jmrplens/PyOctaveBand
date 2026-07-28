@@ -1,6 +1,6 @@
 ---
 title: "Guías"
-description: "Las 66 guías de phonometry, agrupadas en las nueve áreas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
+description: "Las 68 guías de phonometry, agrupadas en las nueve áreas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
 head:
   - tag: script
     attrs:
@@ -294,10 +294,15 @@ laboratorio o predicho a partir de los parámetros del material. Implementa
 ISO 354, ISO 11654, ISO 10534-2, ISO 9053, ISO 17497-1/-2, ISO 13472 y
 EN 29052.
 
-- [Materiales acústicos](/phonometry/es/guides/materials/): el coeficiente de
-  absorción ponderado y su clase, la resistencia y la resistividad al flujo de
-  aire, y la impedancia superficial, la absorción y las pérdidas por transmisión
-  en tubo de impedancia.
+- [Medida y clasificación de la absorción sonora](/phonometry/es/guides/absorption-measurement/):
+  la medición en cámara reverberante ISO 354, la valoración ponderada con su
+  clase y la incertidumbre de medida de ambas.
+- [Resistencia al flujo de aire](/phonometry/es/guides/airflow-resistance/):
+  la determinación estática y alterna de la resistencia y la resistividad al
+  flujo de aire.
+- [Tubo de impedancia](/phonometry/es/guides/impedance-tube/): la impedancia
+  superficial, la absorción y la pérdida por transmisión a incidencia normal,
+  más el tubo FDTD virtual.
 - [Absorbentes porosos y multicapa](/phonometry/es/guides/porous-absorbers/): los
   modelos de Delany-Bazley, Miki y Johnson-Champoux-Allard, el solver multicapa
   por matriz de transferencia con capas perforadas, microperforadas y de

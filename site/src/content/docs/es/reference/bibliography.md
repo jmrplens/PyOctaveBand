@@ -306,7 +306,7 @@ que las guías incorporan sus secciones de Referencias.
   [Catálogo iso.org](https://www.iso.org/standard/34545.html).
   La medición de absorción en cámara reverberante que sustenta los datos de
   superficie.
-  Citado por [Acústica de salas](/phonometry/es/guides/room-acoustics/) y
+  Citado por
   [Absorción acústica en recintos](/phonometry/es/guides/enclosed-space-absorption/).
 - European Committee for Standardization. (2003). *Building acoustics —
   Estimation of acoustic performance of buildings from the performance of
@@ -330,14 +330,17 @@ que las guías incorporan sus secciones de Referencias.
   [doi:10.1002/9780470747339](https://doi.org/10.1002/9780470747339).
   La teoría del material poroso que enlaza resistividad al flujo, impedancia
   superficial y absorción.
-  Citado por [Materiales acústicos](/phonometry/es/guides/materials/).
+  Citado por
+  [Resistencia al flujo de aire](/phonometry/es/guides/airflow-resistance/) y
+  [Tubo de impedancia](/phonometry/es/guides/impedance-tube/).
 - Cox, T. J., & D'Antonio, P. (2017). *Acoustic absorbers and diffusers:
   Theory, design and application* (3.ª ed.). CRC Press.
   ISBN 978-1-4987-4099-9.
   [doi:10.1201/9781315369211](https://doi.org/10.1201/9781315369211).
   La monografía sobre medida y diseño de absorbentes y difusores, de los
   autores del método del coeficiente de difusión de ISO 17497-2.
-  Citado por [Materiales acústicos](/phonometry/es/guides/materials/) y
+  Citado por
+  [Medida y clasificación de la absorción sonora](/phonometry/es/guides/absorption-measurement/) y
   [Dispersión superficial, difusión y absorción in situ](/phonometry/es/guides/surface-scattering/).
 - Jiménez, N., Umnova, O. y Groby, J.-P. (Eds.). (2021). *Acoustic waves in
   periodic structures, metamaterials, and porous media* (Topics in Applied
@@ -352,7 +355,8 @@ que las guías incorporan sus secciones de Referencias.
   Measurement of sound absorption in a reverberation room* (ISO 354:2003).
   [Catálogo iso.org](https://www.iso.org/standard/34545.html).
   El método de absorción en cámara reverberante y sus montajes de probeta.
-  Citado por [Materiales acústicos](/phonometry/es/guides/materials/).
+  Citado por
+  [Medida y clasificación de la absorción sonora](/phonometry/es/guides/absorption-measurement/).
 - International Organization for Standardization. (1998). *Acoustics —
   Determination of sound absorption coefficient and impedance in impedance
   tubes — Part 2: Transfer-function method* (ISO 10534-2:1998; adoptada en
@@ -361,7 +365,7 @@ que las guías incorporan sus secciones de Referencias.
   [Catálogo iso.org](https://www.iso.org/standard/22851.html).
   El método de la función de transferencia con dos micrófonos y sus límites
   de onda plana.
-  Citado por [Materiales acústicos](/phonometry/es/guides/materials/).
+  Citado por [Tubo de impedancia](/phonometry/es/guides/impedance-tube/).
 - ASTM International. (2019). *Standard test method for normal incidence
   determination of porous material acoustical properties based on the
   transfer matrix method* (ASTM E2611-19, la edición implementada aquí;
@@ -369,14 +373,46 @@ que las guías incorporan sus secciones de Referencias.
   [Tienda ASTM](https://store.astm.org/e2611-19.html).
   El método de pérdida por transmisión por matriz de transferencia con
   cuatro micrófonos.
-  Citado por [Materiales acústicos](/phonometry/es/guides/materials/).
+  Citado por [Tubo de impedancia](/phonometry/es/guides/impedance-tube/).
 - International Organization for Standardization. (2018). *Acoustics —
   Determination of airflow resistance — Part 1: Static airflow method*
   (ISO 9053-1:2018).
   [Catálogo iso.org](https://www.iso.org/standard/69869.html).
   El método estático de resistencia al flujo de aire y su velocidad de
   referencia.
-  Citado por [Materiales acústicos](/phonometry/es/guides/materials/).
+  Citado por
+  [Resistencia al flujo de aire](/phonometry/es/guides/airflow-resistance/).
+- International Organization for Standardization. (2020). *Acoustics —
+  Determination of airflow resistance — Part 2: Alternating airflow method*
+  (ISO 9053-2:2020).
+  [Catálogo iso.org](https://www.iso.org/standard/76744.html).
+  El método alterno de resistencia al flujo de aire con la relación efectiva
+  de calores específicos del Anexo A.
+  Citado por
+  [Resistencia al flujo de aire](/phonometry/es/guides/airflow-resistance/).
+- International Organization for Standardization. (1996). *Acoustics —
+  Determination of sound absorption coefficient and impedance in impedance
+  tubes — Part 1: Method using standing wave ratio* (ISO 10534-1:1996;
+  implementada como su adopción europea BS EN ISO 10534-1:2001).
+  [Catálogo iso.org](https://www.iso.org/standard/18603.html).
+  El método de la razón de onda estacionaria.
+  Citado por [Tubo de impedancia](/phonometry/es/guides/impedance-tube/).
+- International Organization for Standardization. (1997). *Acoustics — Sound
+  absorbers for use in buildings — Rating of sound absorption*
+  (ISO 11654:1997).
+  [Catálogo iso.org](https://www.iso.org/standard/19583.html).
+  La valoración ponderada de absorción acústica, sus indicadores de forma y
+  la clase de absorción.
+  Citado por
+  [Medida y clasificación de la absorción sonora](/phonometry/es/guides/absorption-measurement/).
+- International Organization for Standardization. (2020). *Acoustics —
+  Determination and application of measurement uncertainties in building
+  acoustics — Part 2: Sound absorption* (ISO 12999-2:2020).
+  [Catálogo iso.org](https://www.iso.org/standard/68749.html).
+  Las incertidumbres de reproducibilidad y repetibilidad de las magnitudes
+  de cámara reverberante y de sus valoraciones de número único.
+  Citado por
+  [Medida y clasificación de la absorción sonora](/phonometry/es/guides/absorption-measurement/).
 - International Organization for Standardization. (2004). *Acoustics —
   Sound-scattering properties of surfaces — Part 1: Measurement of the
   random-incidence scattering coefficient in a reverberation room*

@@ -116,13 +116,15 @@ time, the volume and the object fraction, and its `.plot()` draws the
 reverberation-time spectrum. This is the prediction counterpart of the measured
 reverberation time in [Room Acoustics](room-acoustics.md)
 (ISO 3382) and of the reverberation-room absorption of
-[Acoustic Materials](materials.md) (ISO 354).
+[Sound Absorption Measurement and Rating](absorption-measurement.md)
+(ISO 354).
 
 ## 3. Where the input data comes from
 
 **Surface coefficients.** The standard expects the $\alpha_{s,i}$ to come
-from laboratory measurements to EN ISO 354, the reverberation-room method
-of [Acoustic Materials](materials.md); theoretical, empirical or field
+from laboratory measurements to EN ISO 354, the reverberation-room method of
+[Sound Absorption Measurement and Rating](absorption-measurement.md);
+theoretical, empirical or field
 values are admitted as long as the data source is stated. ISO 354 delivers
 one-third-octave data, and an octave-band calculation takes the arithmetic
 mean of the three thirds as its input. A reverberation-room coefficient can

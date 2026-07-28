@@ -65,7 +65,6 @@ references:
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
-import Video from '../../../../components/Video.astro';
 
 La mayor parte de phonometry predice un **número**: un nivel, un tiempo de
 reverberación, una pérdida por transmisión. El dominio `simulation` calcula el
@@ -268,71 +267,15 @@ plt.show()
 
 </details>
 
-## 2b. Tubos de medida virtuales: el solver medido por las normas
-
-Un dominio de tres filas con paredes rígidas es un tubo de onda plana, y
-con el mapa de `damping` por celda una muestra porosa se convierte en un
-fluido equivalente (mapas de densidad, velocidad y pérdidas). Eso cierra un
-círculo notable: las historias de las sondas FDTD pueden reducirse con las
-propias cadenas ISO 10534-2 y ASTM E2611 de la librería como si fueran
-medidas, y los espectros recuperados coinciden con la respuesta analítica
-exacta de la misma capa con pérdidas dentro de 0,035 en absorción y 0,1 dB
-en pérdida de transmisión (los crosschecks de `tests/simulation` lo
-ejecutan en cada commit).
-
-```python
-import numpy as np
-from phonometry.materials import two_microphone_impedance
-from phonometry.simulation import FDTD2D
-
-c0, rho0, dx = 343.0, 1.2, 0.005
-nx, d_cells = 280, 20                     # tubo de 1,4 m, muestra de 10 cm
-c = np.full((3, nx), c0); rho = np.full((3, nx), rho0)
-sigma = np.zeros((3, nx))
-c[:, -d_cells:] = 0.6 * c0                # la muestra: más lenta,
-rho[:, -d_cells:] = 3.0 * rho0            # más densa y con pérdidas
-sigma[:, -d_cells:] = 600.0
-sim = FDTD2D(c, dx, rho=rho, damping=sigma,
-             edge_impedance={"left": rho0 * c0})   # extremo fuente anecoico
-sim.add_plane_wave("right", center=0.35, width=0.05)
-mics = (219, 229)                         # la pareja de micrófonos ISO
-records = np.zeros((2, 9000))
-for n in range(records.shape[1]):
-    sim.step()
-    records[:, n] = sim.p[1, mics]
-spec = np.fft.rfft(records, axis=1)
-freqs = np.fft.rfftfreq(records.shape[1], sim.dt)
-band = (freqs > 300.0) & (freqs < 1200.0)
-result = two_microphone_impedance(
-    spec[1, band] / spec[0, band], frequency=freqs[band],
-    spacing=0.05, x1=(nx - d_cells) * dx - (mics[0] + 0.5) * dx,
-    speed_of_sound=c0, characteristic_impedance=rho0 * c0)
-result.plot(language="es")   # la absorción que "midió" el tubo virtual
-```
-
-Los dos clips de abajo ejecutan exactamente este experimento. En el tubo de
-impedancia un tono plano sostenido construye la onda estacionaria que leen
-los dos micrófonos: contra el extremo rígido los mínimos son profundos,
-delante de la muestra quedan someros. En el tubo de transmisión un paquete
-con portadora cruza un conducto anecoico: el tubo vacío lo deja pasar
-intacto, la capa con pérdidas lo divide en una reflexión y una transmisión
-atenuada que resuelven los cuatro micrófonos ASTM.
-
-<Video
-  name="anim_fdtd_impedance_tube"
-  width={2400}
-  height={1350}
-  title="El tubo de impedancia virtual en una simulación FDTD 2D"
-  description="Un altavoz inyecta un tono plano sostenido de 850 Hz en un tubo de impedancia virtual de 1,2 metros con paredes rígidas, dibujado como el instrumento real con sus dos micrófonos enrasados y su tapón rígido. Contra el tapón la envolvente de la onda estacionaria desarrolla mínimos profundos, mientras que una muestra con pérdidas de 10 cm delante del mismo tapón deja los mínimos someros; se anota la absorción recuperada de 0,54."
-/>
-
-<Video
-  name="anim_fdtd_transmission_tube"
-  width={2400}
-  height={1350}
-  title="El tubo de transmisión virtual en una simulación FDTD 2D"
-  description="El extremo del altavoz dispara un paquete con portadora por un tubo de transmisión virtual de 1,6 metros con paredes rígidas, dibujado como el instrumento real con sus cuatro micrófonos enrasados y su terminación anecoica rayada. El tubo vacío deja pasar el paquete sin cambios; una capa con pérdidas de 10 cm a mitad de tubo lo divide en un tren reflejado y una transmisión atenuada, con la pérdida de transmisión de 3,1 dB anotada."
-/>
+Un dominio de tres filas con paredes rígidas es un tubo de onda plana, y con
+el mapa de `damping` por celda una muestra porosa se convierte en un fluido
+equivalente, lo que convierte al propio solver en una probeta medible: la
+[guía del tubo de impedancia](/phonometry/es/guides/impedance-tube/) ejecuta
+las mediciones ISO 10534-2 y ASTM E2611 de forma virtual sobre exactamente
+ese dominio, animaciones incluidas, y recupera la absorción y la pérdida por
+transmisión analíticas de la muestra modelada con las propias cadenas de
+reducción de la biblioteca (los crosschecks de `tests/simulation` lo ejecutan
+en cada commit).
 
 ## 3. Cuándo usarlo, y los límites del 2D
 

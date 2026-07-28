@@ -114,6 +114,8 @@ float-safe. The two Annex A worked examples are reproduced:
 $\alpha_p = (0.35, 0.70, 0.65, 0.60, 0.55)$ → $\alpha_w = 0.60$, class C; and
 raising 500 Hz to 1.00 keeps $\alpha_w = 0.60$ but adds the indicator, "0.60(M)".
 
+See the [Sound Absorption Measurement and Rating guide](absorption-measurement.md) for usage.
+
 ### Airflow resistance (ISO 9053-1/2)
 
 Airflow resistivity $\sigma = R\,A/d$ is the key transport parameter of a
@@ -137,6 +139,8 @@ The Annex A.3 worked example (100 mm closed cylinder at 2 Hz: $b = 1.83$ mm,
 $\kappa' = 1.370 = 0.978\,\kappa$) is reproduced, and the validity guards of
 Formula 3 (transfer ratio < 0.3) and Formula 4 (10 dB background margin) are
 enforced.
+
+See the [Airflow Resistance guide](airflow-resistance.md) for usage.
 
 ### Impedance tube (ISO 10534-1, ISO 10534-2, ASTM E2611)
 
@@ -181,7 +185,7 @@ analytic air-layer matrix ($\det T = 1$, $T_{11} = T_{22}$, TL = 0 dB,
 hard-backed $|R| = 1$), synthetic round-trips that recover a known $r$, and
 two-load recovery of an asymmetric reciprocal specimen.
 
-See the [Materials guide](materials.md) for usage.
+See the [Impedance Tube guide](impedance-tube.md) for usage.
 
 ## References
 

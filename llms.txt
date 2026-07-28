@@ -2,7 +2,7 @@
 
 > Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 427 numerical conformance checks against 278 standards enforced in CI.
 
-phonometry v3.2.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 427 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 53 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 427 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 53 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -88,7 +88,9 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 ## Materials and surfaces
 
 - [Overview](https://jmrplens.github.io/phonometry/guides/sections/materials-surfaces/)
-- [Acoustic Materials](https://jmrplens.github.io/phonometry/guides/materials/)
+- [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/guides/absorption-measurement/)
+- [Airflow Resistance](https://jmrplens.github.io/phonometry/guides/airflow-resistance/)
+- [Impedance Tube](https://jmrplens.github.io/phonometry/guides/impedance-tube/)
 - [Porous and Multilayer Absorbers](https://jmrplens.github.io/phonometry/guides/porous-absorbers/)
 - [Surface Scattering, Diffusion and In-situ Absorption](https://jmrplens.github.io/phonometry/guides/surface-scattering/)
 
@@ -174,6 +176,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 One file per area, each small enough to fetch whole. `llms-full.txt` is the complete concatenation and is far too large for a single fetch in most clients.
 
 - [Start here](https://jmrplens.github.io/phonometry/llms-start.txt)
+- [Absorbers](https://jmrplens.github.io/phonometry/llms-absorbers.txt)
 - [Aircraft wind](https://jmrplens.github.io/phonometry/llms-aircraft-wind.txt)
 - [Calibration uncertainty](https://jmrplens.github.io/phonometry/llms-calibration-uncertainty.txt)
 - [Hearing exposure](https://jmrplens.github.io/phonometry/llms-hearing-exposure.txt)
@@ -257,6 +260,7 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [materials/diffuser-design](https://jmrplens.github.io/phonometry/reference/api/materials/diffuser-design/)
 - [materials/dynamic-stiffness](https://jmrplens.github.io/phonometry/reference/api/materials/dynamic-stiffness/)
 - [materials/impedance-tube](https://jmrplens.github.io/phonometry/reference/api/materials/impedance-tube/)
+- [materials/metadiffuser](https://jmrplens.github.io/phonometry/reference/api/materials/metadiffuser/)
 - [materials/porous-absorber](https://jmrplens.github.io/phonometry/reference/api/materials/porous-absorber/)
 - [materials/road-absorption](https://jmrplens.github.io/phonometry/reference/api/materials/road-absorption/)
 - [materials/scattering-diffusion](https://jmrplens.github.io/phonometry/reference/api/materials/scattering-diffusion/)
@@ -294,6 +298,7 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [rooms/room-ir](https://jmrplens.github.io/phonometry/reference/api/rooms/room-ir/)
 - [rooms/room-noise](https://jmrplens.github.io/phonometry/reference/api/rooms/room-noise/)
 - [rooms/steady-field](https://jmrplens.github.io/phonometry/reference/api/rooms/steady-field/)
+- [simulation/elastic-fdtd](https://jmrplens.github.io/phonometry/reference/api/simulation/elastic-fdtd/)
 - [simulation/fdtd](https://jmrplens.github.io/phonometry/reference/api/simulation/fdtd/)
 - [spectra/cepstrum](https://jmrplens.github.io/phonometry/reference/api/spectra/cepstrum/)
 - [spectra/inversion](https://jmrplens.github.io/phonometry/reference/api/spectra/inversion/)

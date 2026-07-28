@@ -575,6 +575,14 @@ ECMA-418-2 tonality, roughness and fluctuation strength of the Sottek Hearing
 Model. Loudness itself, including the ECMA-418-2 loudness that shares the
 same auditory front-end, lives in [Loudness](https://jmrplens.github.io/phonometry/guides/loudness/).
 
+The four metrics form one family: a single calibrated signal splits across
+two auditory front ends, and every branch is anchored to a reference sound
+whose normative target is exactly 1. The diagram maps the family with the
+values the library actually computes for each reference (rounded results
+such as 0.9999 asper and 0.9957 vacil_HMS sit against that target of 1).
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sound_quality_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sound_quality.svg" alt="Block diagram of the sound-quality metric family: a calibrated signal in pascals feeds two auditory front ends, the Zwicker specific loudness pattern over 24 Bark and the ECMA-418-2 Sottek Hearing Model with 53 auditory bands; the first drives the DIN 45692 sharpness whose critical-band-wide noise reference at 1 kHz and 60 dB reads 1.00 acum, the second drives the tonality, roughness and fluctuation strength, whose references, a 1 kHz tone at 40 dB and 1 kHz carriers fully amplitude-modulated at 70 Hz and 4 Hz at 60 dB, read 1.000 tu_HMS, 0.9999 asper and 0.9957 vacil_HMS; a closing note states that N5, sharpness, roughness and fluctuation strength feed the Fastl and Zwicker psychoacoustic annoyance" width="92%"></picture>
+
 ## Sharpness in acum (DIN 45692)
 
 Two sounds can be equally loud yet one feels "sharper" (hissy, metallic)
@@ -1167,7 +1175,7 @@ consumes, both the closed form for amplitude-modulated broadband noise
 (Eq. 10.2) and the Osses et al. (2016) signal model, and the signal
 convenience that derives all four sensations from a recording.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/psychoacoustic_annoyance_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/psychoacoustic_annoyance.svg" alt="Psychoacoustic annoyance PA against percentile loudness N5 for three sensation profiles: a neutral baseline where PA equals N5, a sharp sound and a rough-and-fluctuating sound both lifted above the baseline, with the worked example PA = 30.82 marked" width="82%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/psychoacoustic_annoyance_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/psychoacoustic_annoyance.svg" alt="Psychoacoustic annoyance PA against percentile loudness N5 for three sensation profiles: a neutral baseline where PA equals N5, a sharp sound and a rough-and-fluctuating sound both lifted above the baseline, with the worked example PA = 37.05 marked" width="82%"></picture>
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -1244,6 +1252,11 @@ The figure above sweeps `PA` against `N5` for three profiles: a neutral baseline
 (`S = 1.75 acum`, `F = R = 0`, so `PA = N5`), a sharp sound and a
 rough-and-fluctuating sound, both lifted above the baseline, with the worked
 example marked.
+
+The model is small enough to draw whole: two weightings and one combination.
+The diagram traces the worked example through it, sensation by sensation.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_psychoacoustic_annoyance_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_psychoacoustic_annoyance.svg" alt="Block diagram of the Fastl and Zwicker psychoacoustic annoyance model: the four sensations of the worked example, sharpness of 2.0 acum, percentile loudness N5 of 30 sone, fluctuation strength of 0.5 vacil and roughness of 0.3 asper, feed two weightings, the sharpness weighting wS of 0.1001 that is zero below 1.75 acum and the roughness-and-fluctuation weighting wFR of 0.2125 that weighs roughness 0.6 against 0.4, and combine into PA equal to N5 times one plus the root of wS squared plus wFR squared, giving 37.05; a closing note recalls that a neutral sound sits on the baseline PA equal to N5" width="92%"></picture>
 
 ### 2.1 From a signal (engineering estimate)
 

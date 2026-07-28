@@ -140,6 +140,12 @@ $$
 which tends to `5 dB` at the shadow boundary `N → 0` and approximates Maekawa's
 point-source curve within about 1.5 dB.
 
+Every method of this section keys on the same three numbers: the two
+diffracted segments over the edge and the straight path they replace. Drawn on
+the 4 m screen of the snippets, they differ by just 0.15 m.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_ground_barrier_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_ground_barrier.svg" alt="Section of the barrier geometry: a loudspeaker source 1 m above the ground, a thin 4 m screen at 50 m and a microphone receiver 1.5 m high at 100 m, the blocked direct path of 100.00 m drawn dashed through the screen and the diffracted path bent over the edge in two segments A = 50.09 m and B = 50.06 m, with the resulting path difference of 0.15 m giving a Fresnel number of 0.44 and a Kurze-Anderson insertion loss of 10.0 dB at 500 Hz, rising to 15.5 dB at 2 kHz" width="92%"></picture>
+
 ```python
 from phonometry import barrier_insertion_loss, kurze_anderson_attenuation
 
@@ -212,6 +218,35 @@ ax.semilogx(freqs, il_gr.insertion_loss, label="Exact + coherent ground (four pa
 ax.axhline(5.0, color="k", ls=":", label="Kurze-Anderson grazing limit (5 dB)")
 ax.set(xlabel="Frequency [Hz]", ylabel="Insertion loss [dB]")
 ax.legend()
+plt.show()
+```
+
+</details>
+
+All three curves share one geometry, and `.plot_geometry()` draws it to
+scale: at these road-traffic distances the 4 m screen is a sliver, and the
+whole insertion loss rides on a path-length difference of just 0.15 m.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/barrier_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/barrier_geometry.svg" alt="To-scale section of the barrier geometry of the insertion-loss curves: a source star 1 m above the hatched ground, a thin 4 m screen at 50 m, and a receiver triangle 1.5 m high at 100 m, with the dashed direct path cut by the screen, the solid diffracted path bent over its top edge, the path difference of 0.15 m annotated and the 50 m and 100 m distances dimensioned" width="90%"></picture>
+
+*Drawn to scale the screen almost vanishes: the diffracted path over the top
+is only 0.15 m longer than the blocked direct path, and that difference is
+the whole input of the Fresnel number `N = (2/λ)(A + B − d)` that every
+method above keys on.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import barrier_insertion_loss
+
+freqs = np.geomspace(50.0, 5000.0, 240)
+il = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5)
+
+# One line: the section to scale, with the path-length difference annotated.
+il.plot_geometry()
 plt.show()
 ```
 
@@ -662,6 +697,12 @@ from phonometry import psychoacoustics
 print(round(psychoacoustics.tone_audibility(67.96, 49.22, 137.3, 2.7), 2))   # 5.01 dB
 print(round(psychoacoustics.masking_index(137.3), 2))                        # -2.02 dB
 ```
+
+The whole method is one chain from the spectrum to the penalty, and every
+intermediate quantity above is a stop on it. The diagram walks the Annex E
+tone through that chain, down to the Kt the mean audibility earns.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_tone_audibility_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_tone_audibility.svg" alt="Flow diagram of the ISO/PAS 20065 engineering method on the Annex E combustion-engine spectrum: a narrow-band FFT spectrum with 2.7 hertz line spacing yields a tone at 137.3 hertz, its critical band of 101.36 hertz spans 95.67 to 197.04 hertz, the masking noise level of 49.22 decibels and tone level of 67.96 decibels give a masking threshold of 64.97 decibels with a masking index of minus 2.02 decibels, and the audibility is 5.01 decibels, the decisive value of the spectrum; a closing note maps the 6.98 decibel energy-mean audibility of the five spectra to a tonal adjustment Kt of 4 decibels through ISO 1996-2 Table J.1" width="92%"></picture>
 
 ## 3. Decisive and mean audibility
 
@@ -1279,7 +1320,31 @@ band, shape `(NM, NB)`; ISO 3744 clause 8.6), `surface_area`,
 `sound_power_level_a` (`LWA`), `uncertainty` (expanded, 95 %) and `grade`.
 `measurement_positions('hemisphere', radius=…, reflecting_planes=…, tones=…,
 grade=…)` returns the normative `(N, 3)` microphone coordinates (Table B.1 for
-tonal sources, B.2 for broadband).
+tonal sources, B.2 for broadband). Those coordinates plot directly with
+`plot_microphone_positions`, which draws the array on its measurement
+surface in 3-D, numbered as in the standard.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_positions_hemisphere_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/microphone_positions_hemisphere.svg" alt="Three-dimensional view of the ISO 3744 microphone array: ten numbered microphones on a 2 m wireframe hemisphere standing on a shaded circular reflecting plane, with positions 1 and 2 close to the plane, the others staggered in height up to positions 9 and 10 near the top, and the x, y and z axes graduated in metres" width="88%"></picture>
+
+*Where the ten Annex B microphones actually sit on the 2 m hemisphere: the
+heights are staggered so the array samples the whole surface evenly, which
+is what lets the plain energy average of the ten levels stand in for the
+surface integral.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import measurement_positions, plot_microphone_positions
+
+# The 10 ISO 3744 Annex B microphones on a 2 m hemisphere.
+plot_microphone_positions(measurement_positions("hemisphere", radius=2.0),
+                          radius=2.0)
+plt.show()
+```
+
+</details>
 
 ## 2. Reverberation room, precision grade (ISO 3741)
 

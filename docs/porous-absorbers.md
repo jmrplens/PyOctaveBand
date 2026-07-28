@@ -3,16 +3,18 @@
 # Porous and Multilayer Absorbers
 
 Given a porous material's **flow resistivity** (the quantity the
-[flow rig](materials.md) measures) the classical equivalent-fluid models
+[flow rig](airflow-resistance.md) measures) the classical equivalent-fluid models
 predict its complex characteristic impedance and wavenumber, and a
 **transfer-matrix** stack of layers (porous blankets, air gaps, perforated
 and microperforated panels, membranes) predicts the absorption coefficient
 of the whole construction before anything is built. This page covers the
 three porous models (Delany–Bazley, Miki, Johnson–Champoux–Allard), the
 multilayer solver, the resonant sheet layers of Maa and the random-incidence
-(Paris) integral. The measurement counterparts live in
-[Acoustic Materials](materials.md); rating the predicted spectrum lives in
-[the same page's ISO 11654 section](materials.md).
+(Paris) integral. The measurement counterparts live in the
+[impedance tube](impedance-tube.md) and
+[reverberation room](absorption-measurement.md) guides; rating the predicted
+spectrum lives in the latter's
+[ISO 11654 section](absorption-measurement.md#3-weighted-rating-and-absorption-class-iso-11654).
 
 ## 1. Equivalent-fluid models of a porous material
 
@@ -110,7 +112,7 @@ The three models agree closely over the Delany–Bazley fit range (Cox &
 D'Antonio Figs. 6.19–6.21 make the same comparison); JCA extends the
 prediction physically outside it. A `PorousMediumResult` built from measured
 data (for example the $Z_c$, $k$ recovered by the
-[ASTM E2611 transfer-matrix reduction](materials.md)) plugs into the layer
+[ASTM E2611 transfer-matrix reduction](impedance-tube.md)) plugs into the layer
 solver exactly like a modelled one.
 
 ## 2. Multilayer prediction by transfer matrices
@@ -163,7 +165,7 @@ admittance recursion (immune to the $e^{|\mathrm{Im}(k_x)| d}$ overflow of
 raw matrix entries for extremely attenuating layers) and still exposes the
 full chain matrix (reciprocal by construction, $\det T = 1$) in
 `transfer_matrix`, ready for the
-[ASTM E2611 machinery](materials.md) (`TransferMatrix`).
+[ASTM E2611 machinery](impedance-tube.md) (`TransferMatrix`).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/porous_absorber_designs_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/porous_absorber_designs.svg" alt="Predicted normal-incidence absorption of four 50 mm constructions: a porous layer absorbs broadband from mid frequency up, a microperforated panel over a cavity peaks near 700 Hz, a perforated panel over porous peaks near 500 Hz, and a membrane over a porous-filled cavity peaks near 175 Hz; dotted vertical lines mark the closed-form Helmholtz and membrane resonances" width="80%"></picture>
 
@@ -379,7 +381,7 @@ weights the oblique angles, whose waves travel a longer path inside the
 layer, so $\alpha_{dif}$ exceeds the normal-incidence $\alpha(0°)$ exactly
 where the layer is thin against the wavelength. This is the model-side
 counterpart of the tube-versus-reverberation-room discussion of
-[Acoustic Materials](materials.md).*
+[Sound Absorption Measurement and Rating](absorption-measurement.md).*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -567,7 +569,7 @@ the bulk model with `diffuse_field_absorption` instead (Mechel Sect. D.6).
 **Where the numbers were checked.** The models are pinned digit-exact to the
 printed coefficient tables (Bies Table D.1, Miki Eqs. 30–34), the solver to
 the closed forms above and to the `TransferMatrix` recovery of the
-[impedance-tube page](materials.md), the MPP to Maa's own approximation
+[impedance-tube page](impedance-tube.md), the MPP to Maa's own approximation
 (stated ~6 % agreement with the exact Eq. 2), design example and Table I,
 and the Paris integral to its locally reacting closed form. Five misprints
 found in the sources during this work are recorded in the
@@ -639,6 +641,8 @@ No standard governs these prediction models; they are textbook and journal
 methods (Mechel; Bies, Hansen & Howard; Cox & D'Antonio; Attenborough & Van
 Renterghem; Miki 1990; Maa 1998; Johnson et al. 1987) implemented
 clean-room from the cited sources. The measurement standards they connect to
-(ISO 9053-1/-2 for flow resistivity, ISO 10534-1/-2 and ASTM E2611
-for the impedance tube, ISO 354 / ISO 11654 for random-incidence absorption and
-rating) live in [Acoustic Materials](materials.md).
+(ISO 9053-1/-2 for [flow resistivity](airflow-resistance.md),
+ISO 10534-1/-2 and ASTM E2611 for the [impedance tube](impedance-tube.md),
+ISO 354 / ISO 11654 for
+[random-incidence absorption and rating](absorption-measurement.md)) live in
+their own guides.

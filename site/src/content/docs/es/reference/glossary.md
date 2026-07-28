@@ -522,7 +522,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Materiales acústicos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/materials/"
+              "url": "https://jmrplens.github.io/phonometry/es/guides/absorption-measurement/"
             }
           },
           {
@@ -972,7 +972,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Materiales acústicos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/materials/"
+              "url": "https://jmrplens.github.io/phonometry/es/guides/impedance-tube/"
             }
           },
           {
@@ -987,7 +987,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Materiales acústicos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/materials/"
+              "url": "https://jmrplens.github.io/phonometry/es/guides/absorption-measurement/"
             }
           },
           {
@@ -1002,7 +1002,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Materiales acústicos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/materials/"
+              "url": "https://jmrplens.github.io/phonometry/es/guides/absorption-measurement/"
             }
           },
           {
@@ -1017,7 +1017,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Materiales acústicos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/materials/"
+              "url": "https://jmrplens.github.io/phonometry/es/guides/absorption-measurement/"
             }
           },
           {
@@ -1032,7 +1032,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Materiales acústicos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/materials/"
+              "url": "https://jmrplens.github.io/phonometry/es/guides/absorption-measurement/"
             }
           },
           {
@@ -1047,7 +1047,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Materiales acústicos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/materials/"
+              "url": "https://jmrplens.github.io/phonometry/es/guides/airflow-resistance/"
             }
           },
           {
@@ -1062,7 +1062,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Materiales acústicos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/materials/"
+              "url": "https://jmrplens.github.io/phonometry/es/guides/airflow-resistance/"
             }
           },
           {
@@ -1077,7 +1077,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Materiales acústicos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/materials/"
+              "url": "https://jmrplens.github.io/phonometry/es/guides/airflow-resistance/"
             }
           },
           {
@@ -1092,7 +1092,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Materiales acústicos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/materials/"
+              "url": "https://jmrplens.github.io/phonometry/es/guides/impedance-tube/"
             }
           },
           {
@@ -1901,7 +1901,7 @@ norma.
 | C80 | Claridad para la música: la misma relación con la frontera en 80 ms. | dB | ISO 3382-1:2009 (diferencia apenas perceptible en la Tabla A.1) | [Acústica de salas](/phonometry/es/guides/room-acoustics/) |
 | D50 | Definición, o Deutlichkeit: la fracción de la energía total que llega en los primeros 50 ms. | adimensional | ISO 3382-1:2009 (diferencia apenas perceptible en la Tabla A.1) | [Acústica de salas](/phonometry/es/guides/room-acoustics/) |
 | Ts | Tiempo central: el centro de gravedad temporal de la respuesta al impulso al cuadrado, una alternativa a los índices de claridad sin frontera arbitraria. | s | ISO 3382-1:2009, Ecuación (A.13) | [Acústica de salas](/phonometry/es/guides/room-acoustics/) |
-| A | Área de absorción acústica equivalente de un recinto: el área de una superficie perfectamente absorbente que daría el mismo tiempo de reverberación. | m² | ISO 354:2003, Ecuaciones (5) y (7) | [Materiales acústicos](/phonometry/es/guides/materials/) |
+| A | Área de absorción acústica equivalente de un recinto: el área de una superficie perfectamente absorbente que daría el mismo tiempo de reverberación. | m² | ISO 354:2003, Ecuaciones (5) y (7) | [Medida de la absorción](/phonometry/es/guides/absorption-measurement/) |
 | NC | Índice de ruido de sala de un espectro de fondo: el nivel de interferencia con la palabra elige la curva, y el método de tangencia valora el espectro cuando alguna banda la supera. | dB (índice) | ANSI/ASA S12.2-2019, 5.2.2 y 5.2.3 (curvas en la Tabla 1) | [Ruido de salas](/phonometry/es/guides/room-noise/) |
 | SIL | Nivel de interferencia con la palabra: la media de los niveles en las bandas de octava de 500, 1000, 2000 y 4000 Hz. | dB | ANSI/ASA S12.2-2019, apartado 3.2 | [Ruido de salas](/phonometry/es/guides/room-noise/) |
 | RC | Índice RC Mark II: la media de los niveles de 500, 1000 y 2000 Hz, con una etiqueta espectral de retumbo, siseo o neutro. | dB (índice) | ANSI/ASA S12.2-2019, Anexo D (apartados D.3 y D.4) | [Ruido de salas](/phonometry/es/guides/room-noise/) |
@@ -1946,15 +1946,15 @@ norma.
 
 | Símbolo | Magnitud | Unidad | Definida en | Guía |
 | --- | --- | --- | --- | --- |
-| α | Coeficiente de absorción acústica a incidencia normal: la fracción de energía incidente que la superficie no devuelve, obtenida en el tubo de impedancia a partir del factor de reflexión. | adimensional | ISO 10534-2:1998, Ecuaciones (17) a (19) | [Materiales acústicos](/phonometry/es/guides/materials/) |
-| αs | Coeficiente de absorción acústica a incidencia aleatoria medido en cámara reverberante, a partir del cambio del área de absorción equivalente con y sin la muestra. | adimensional | ISO 354:2003, Ecuaciones (8) y (9) | [Materiales acústicos](/phonometry/es/guides/materials/) |
-| αp | Coeficiente de absorción acústica práctico: los datos en tercios de octava agrupados en bandas de octava y redondeados a pasos de 0,05. | adimensional | ISO 11654:1997, apartado 4.1 | [Materiales acústicos](/phonometry/es/guides/materials/) |
-| αw | Coeficiente de absorción acústica ponderado: la curva de referencia fija desplazada hacia los valores prácticos y leída en 500 Hz. | adimensional | ISO 11654:1997, apartado 4.2 | [Materiales acústicos](/phonometry/es/guides/materials/) |
-| Clase de absorción | La clase, de la A a la E, a la que se asigna el coeficiente ponderado, o "sin clasificar". | letra de clase | ISO 11654:1997, Tabla B.1 | [Materiales acústicos](/phonometry/es/guides/materials/) |
-| R | Resistencia al flujo de aire: la diferencia de presión a través de una probeta dividida por el caudal volumétrico que la atraviesa. | Pa·s/m³ | ISO 9053-1:2018, apartado 3 | [Materiales acústicos](/phonometry/es/guides/materials/) |
-| Rs | Resistencia específica al flujo de aire: la resistencia al flujo referida al área de la cara de la probeta. | Pa·s/m | ISO 9053-1:2018, apartado 3 | [Materiales acústicos](/phonometry/es/guides/materials/) |
-| σ | Resistividad al flujo de aire: la resistencia específica por unidad de espesor, la entrada principal de todo modelo poroso empírico. | Pa·s/m² | ISO 9053-1:2018, apartado 3 | [Materiales acústicos](/phonometry/es/guides/materials/) |
-| Z | Impedancia superficial: la relación compleja entre presión acústica y velocidad de partícula en la cara de la muestra, que suele darse normalizada por la impedancia característica del aire. | Pa·s/m | ISO 10534-2:1998, Ecuaciones (17) a (19) | [Materiales acústicos](/phonometry/es/guides/materials/) |
+| α | Coeficiente de absorción acústica a incidencia normal: la fracción de energía incidente que la superficie no devuelve, obtenida en el tubo de impedancia a partir del factor de reflexión. | adimensional | ISO 10534-2:1998, Ecuaciones (17) a (19) | [Tubo de impedancia](/phonometry/es/guides/impedance-tube/) |
+| αs | Coeficiente de absorción acústica a incidencia aleatoria medido en cámara reverberante, a partir del cambio del área de absorción equivalente con y sin la muestra. | adimensional | ISO 354:2003, Ecuaciones (8) y (9) | [Medida de la absorción](/phonometry/es/guides/absorption-measurement/) |
+| αp | Coeficiente de absorción acústica práctico: los datos en tercios de octava agrupados en bandas de octava y redondeados a pasos de 0,05. | adimensional | ISO 11654:1997, apartado 4.1 | [Medida de la absorción](/phonometry/es/guides/absorption-measurement/) |
+| αw | Coeficiente de absorción acústica ponderado: la curva de referencia fija desplazada hacia los valores prácticos y leída en 500 Hz. | adimensional | ISO 11654:1997, apartado 4.2 | [Medida de la absorción](/phonometry/es/guides/absorption-measurement/) |
+| Clase de absorción | La clase, de la A a la E, a la que se asigna el coeficiente ponderado, o "sin clasificar". | letra de clase | ISO 11654:1997, Tabla B.1 | [Medida de la absorción](/phonometry/es/guides/absorption-measurement/) |
+| R | Resistencia al flujo de aire: la diferencia de presión a través de una probeta dividida por el caudal volumétrico que la atraviesa. | Pa·s/m³ | ISO 9053-1:2018, apartado 3 | [Resistencia al flujo](/phonometry/es/guides/airflow-resistance/) |
+| Rs | Resistencia específica al flujo de aire: la resistencia al flujo referida al área de la cara de la probeta. | Pa·s/m | ISO 9053-1:2018, apartado 3 | [Resistencia al flujo](/phonometry/es/guides/airflow-resistance/) |
+| σ | Resistividad al flujo de aire: la resistencia específica por unidad de espesor, la entrada principal de todo modelo poroso empírico. | Pa·s/m² | ISO 9053-1:2018, apartado 3 | [Resistencia al flujo](/phonometry/es/guides/airflow-resistance/) |
+| Z | Impedancia superficial: la relación compleja entre presión acústica y velocidad de partícula en la cara de la muestra, que suele darse normalizada por la impedancia característica del aire. | Pa·s/m | ISO 10534-2:1998, Ecuaciones (17) a (19) | [Tubo de impedancia](/phonometry/es/guides/impedance-tube/) |
 | s | Coeficiente de dispersión: la fracción de energía reflejada que no vuelve de forma especular, medida a incidencia aleatoria sobre una plataforma giratoria en cámara reverberante. | adimensional | ISO 17497-1:2004+A1:2014, Fórmula (5) | [Dispersión superficial](/phonometry/es/guides/surface-scattering/) |
 | d | Coeficiente de difusión: la uniformidad de la respuesta polar de una superficie, a partir de la autocorrelación de la medida en goniómetro de campo libre. | adimensional | ISO 17497-2:2012, Fórmula (5) (forma normalizada en la Fórmula (7)) | [Dispersión superficial](/phonometry/es/guides/surface-scattering/) |
 | s′ | Rigidez dinámica por unidad de superficie de una capa resiliente: una fuerza dinámica por unidad de área dividida por la variación de espesor que provoca. | MN/m³ | EN 29052-1:1992 (ISO 9052-1:1989), Fórmula 1 | [Rigidez dinámica](/phonometry/es/guides/dynamic-stiffness/) |

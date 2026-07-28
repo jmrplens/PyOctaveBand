@@ -116,7 +116,7 @@ import ThemeImage from '../../../../components/ThemeImage.astro';
 import Video from '../../../../components/Video.astro';
 
 A partir de la **resistividad al flujo** de un material poroso (la magnitud
-que mide el [banco de flujo](/phonometry/es/guides/materials/)) los modelos
+que mide el [banco de flujo](/phonometry/es/guides/airflow-resistance/)) los modelos
 clásicos de fluido equivalente predicen su impedancia característica y su
 número de onda complejos, y una pila de capas por **matrices de
 transferencia** (mantas porosas, cámaras de aire, paneles perforados y
@@ -124,10 +124,12 @@ microperforados, membranas) predice el coeficiente de absorción de toda la
 construcción antes de construir nada. Esta página cubre los tres modelos
 porosos (Delany–Bazley, Miki, Johnson–Champoux–Allard), el solucionador
 multicapa, las capas resonantes de Maa y la integral de incidencia aleatoria
-(Paris). Las contrapartes de medida están en
-[Materiales acústicos](/phonometry/es/guides/materials/); la valoración del
-espectro predicho vive en
-[la sección ISO 11654 de esa misma página](/phonometry/es/guides/materials/).
+(Paris). Las contrapartes de medida están en las guías del
+[tubo de impedancia](/phonometry/es/guides/impedance-tube/) y de la
+[cámara reverberante](/phonometry/es/guides/absorption-measurement/); la
+valoración del espectro predicho vive en la
+[sección ISO 11654](/phonometry/es/guides/absorption-measurement/#3-valoración-ponderada-y-clase-de-absorción-iso-11654)
+de esta última.
 
 ## 1. Modelos de fluido equivalente de un material poroso
 
@@ -230,7 +232,7 @@ Delany–Bazley (Cox & D'Antonio, figs. 6.19–6.21, hacen la misma
 comparación); JCA extiende la predicción con base física fuera de él. Un
 `PorousMediumResult` construido con datos medidos (por ejemplo los $Z_c$,
 $k$ recuperados por la
-[reducción de matriz de transferencia ASTM E2611](/phonometry/es/guides/materials/))
+[reducción de matriz de transferencia ASTM E2611](/phonometry/es/guides/impedance-tube/))
 se conecta al solucionador de capas exactamente igual que uno modelado.
 
 ## 2. Predicción multicapa por matrices de transferencia
@@ -285,7 +287,7 @@ admitancias numéricamente robusta (inmune al desbordamiento
 $e^{|\mathrm{Im}(k_x)| d}$ de las entradas matriciales crudas en capas
 extremadamente atenuantes) y aun así expone la matriz de cadena completa
 (recíproca por construcción, $\det T = 1$) en `transfer_matrix`, lista para
-la [maquinaria ASTM E2611](/phonometry/es/guides/materials/)
+la [maquinaria ASTM E2611](/phonometry/es/guides/impedance-tube/)
 (`TransferMatrix`).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/porous_absorber_designs_es.svg" alt="Absorción predicha en incidencia normal de cuatro construcciones de 50 mm: una capa porosa absorbe en banda ancha desde frecuencias medias, un panel microperforado sobre cámara presenta su pico cerca de 700 Hz, un panel perforado sobre poroso cerca de 500 Hz y una membrana sobre cámara con poroso cerca de 175 Hz; las líneas verticales punteadas marcan las resonancias de forma cerrada de Helmholtz y de membrana" width="80%" loading="eager" />
@@ -510,7 +512,7 @@ dentro de la capa, así que $\alpha_{dif}$ supera al $\alpha(0°)$ de
 incidencia normal justo donde la capa es delgada frente a la longitud de
 onda. Es la contraparte de modelo de la discusión tubo frente a cámara
 reverberante de
-[Materiales acústicos](/phonometry/es/guides/materials/).*
+[Medida y clasificación de la absorción sonora](/phonometry/es/guides/absorption-measurement/).*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -728,7 +730,7 @@ limpia desde las fuentes de las referencias de más abajo. Los modelos están fi
 dígito a las tablas de coeficientes impresas (Bies tabla D.1, Miki
 ecs. 30–34), el solucionador a las formas cerradas anteriores y a la
 recuperación por `TransferMatrix` de la
-[página del tubo de impedancia](/phonometry/es/guides/materials/), el MPP a
+[página del tubo de impedancia](/phonometry/es/guides/impedance-tube/), el MPP a
 la propia aproximación de Maa (acuerdo declarado de ~6 % con la ec. 2
 exacta), a su ejemplo de diseño y a su tabla I, y la integral de Paris a su
 forma cerrada de reacción local. El modelo de sonido lento (ranura +
@@ -764,8 +766,10 @@ aparte (`materials.diffuser_design`), documentada en
 
 ## Véase también
 
-- [Materiales acústicos](/phonometry/es/guides/materials/): las normas de
-  medida con las que conectan estos modelos de predicción, a saber,
-  ISO 9053-1/-2 (resistividad al flujo), ISO 10534-1/-2 y ASTM E2611 (tubo
-  de impedancia) e ISO 354 / ISO 11654 (absorción de incidencia aleatoria y
-  su valoración).
+- [Resistencia al flujo de aire](/phonometry/es/guides/airflow-resistance/),
+  [Tubo de impedancia](/phonometry/es/guides/impedance-tube/) y
+  [Medida y clasificación de la absorción sonora](/phonometry/es/guides/absorption-measurement/):
+  las normas de medida con las que conectan estos modelos de predicción, a
+  saber, ISO 9053-1/-2 (resistividad al flujo), ISO 10534-1/-2 y ASTM E2611
+  (tubo de impedancia) e ISO 354 / ISO 11654 (absorción de incidencia
+  aleatoria y su valoración).
