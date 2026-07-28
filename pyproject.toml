@@ -9,7 +9,11 @@ authors = [
   { name="Jose Manuel Requena Plens", email="jmrplens@gmail.com" },
 ]
 description = "Acoustic measurement toolkit: fractional octave-band filters, A/C/Z and time weighting, and sound level metrology per IEC 61260-1 and IEC 61672-1."
-readme = "README.md"
+# The PyPI long description is generated from README.md (which uses
+# theme-aware <picture> elements that PyPI's renderer strips) by
+# scripts/generate_pypi_readme.py; `make pypi-readme` refreshes it and the
+# packaging tests fail on drift.
+readme = "README_PYPI.md"
 requires-python = ">=3.13"
 # Search terms for PyPI: the domains the library actually covers, plus the
 # designations of the standards its metrics are implemented from, so a search
