@@ -43,6 +43,78 @@ and second-order convergence under grid refinement.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
+## ContourProbe
+
+```python
+ContourProbe(
+    sim: FDTD2D,
+    ix0: int,
+    ix1: int,
+    iy0: int,
+    iy1: int,
+    frequencies: ArrayLike,
+)
+```
+
+On-the-fly DFT of `p` and `v_n` on a closed rectangular contour.
+
+Created by [`FDTD2D.add_contour_probe`](/phonometry/reference/api/simulation/fdtd/#fdtd2dadd_contour_probe). The contour is the closed
+rectangle of cell faces around the cell block `ix0..ix1` x
+`iy0..iy1` (inclusive); on each face the engine samples the outward
+normal velocity (which lives exactly there on the staggered grid) and
+the pressure averaged from the two adjacent cell centres, and folds
+them into complex accumulators at each requested frequency, so a
+continuous-wave run never stores full time histories.
+
+After every step the accumulators gain `p * exp(-j omega t)` with the
+fields' own leapfrog time stamps (`t = n dt` for pressure,
+`t = (n - 1/2) dt` for velocity, so the half-step stagger is handled
+exactly). `phasors` scales the sums by `2 / n_samples` into the
+steady-state complex amplitudes of the library's `exp(+j omega t)`
+convention. Accumulate only over the steady state: run the transient
+out, call `reset`, then integrate a window as close as possible
+to a whole number of periods (the residual leakage falls as one over
+the number of periods).
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `positions` | Face-sample positions `(x, y)` [m], shape `(n_points, 2)`, ordered left, right, top, bottom face. |
+| `normals` | Outward unit normals of each sample, same shape. |
+| `frequencies` | The tracked frequencies [Hz]. |
+| `samples` | Number of steps accumulated since the last reset. |
+
+### ContourProbe.phasors()
+
+```python
+ContourProbe.phasors(frequency: float) -> ContourPhasors
+```
+
+The accumulated contour phasors at one tracked frequency.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `frequency` | One of the frequencies the probe was created with, in hertz. |
+
+**Returns:** A [`ContourPhasors`](/phonometry/reference/api/simulation/ntff/#contourphasors) ready for [`far_field_from_contour`](/phonometry/reference/api/simulation/ntff/#far_field_from_contour).
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the frequency is not tracked or nothing has been accumulated yet. |
+
+### ContourProbe.reset()
+
+```python
+ContourProbe.reset() -> None
+```
+
+Clear the accumulators (call once the field is steady).
+
 ## CWSource
 
 ```python
@@ -123,6 +195,56 @@ sides into absorbing or locally reacting boundaries. Sources are soft
 | `shape` | Grid shape `(ny, nx)`, required only when `c` is a scalar. |
 | `edge_impedance` | Locally reacting boundary sides: a mapping from side name to a real specific acoustic impedance [Pa s/m], either a scalar or a per-edge-cell 1D array (length `ny` for `left`/ `right`, `nx` for `top`/`bottom`). Implements Eqs. (4.33)-(4.35); `Z = rho c` is a normal-incidence matched (anechoic) edge. A side cannot be both a sponge and an impedance boundary. |
 | `obstacle_mask` | Boolean map, shape `(ny, nx)`, of rigid cells: every face adjacent to a masked cell is closed (zero normal velocity, Eq. 4.32), rasterising arbitrary interior geometry. |
+
+### FDTD2D.add_contour_probe()
+
+```python
+FDTD2D.add_contour_probe(
+    ix0: int,
+    ix1: int,
+    iy0: int,
+    iy1: int,
+    *,
+    frequencies: ArrayLike,
+) -> ContourProbe
+```
+
+Record `p` and `v_n` phasors on a closed rectangular contour.
+
+The contour is the rectangle of cell faces enclosing the cell
+block `ix0..ix1` x `iy0..iy1` (both ends inclusive): its sides
+lie on `x = ix0 dx`, `x = (ix1 + 1) dx`, `y = iy0 dx` and
+`y = (iy1 + 1) dx`. From the step after registration the engine
+folds the face pressures (averaged from the two adjacent cell
+centres) and the outward face normal velocities into running DFT
+accumulators at each requested frequency; see [`ContourProbe`](/phonometry/reference/api/simulation/fdtd/#contourprobe)
+for the steady-state protocol and
+[`far_field_from_contour`](/phonometry/reference/api/simulation/ntff/#far_field_from_contour) for the
+far-field transformation of the captured phasors.
+
+Place the contour in open air: strictly around the scatterer,
+clear of sponge layers and of any source (point sources and
+plane-wave injection lines must stay outside so the enclosed
+region is source-free in a scattering run, or inside when the
+radiated field itself is the quantity of interest).
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `ix0` | First cell column inside the contour. |
+| `ix1` | Last cell column inside the contour. |
+| `iy0` | First cell row inside the contour. |
+| `iy1` | Last cell row inside the contour. |
+| `frequencies` | Frequencies to track [Hz]. |
+
+**Returns:** The registered [`ContourProbe`](/phonometry/reference/api/simulation/fdtd/#contourprobe).
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | For a block without open faces on all sides or invalid frequencies. |
 
 ### FDTD2D.add_plane_wave()
 

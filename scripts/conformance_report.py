@@ -6596,6 +6596,67 @@ def _chk_fdtd_pulse_delay() -> Outcome:
     return numeric(expected, (t2 - t1) * 1e3, 0.05, unit="ms", places=3)
 
 
+_NTFF_CACHE: dict[str, Any] = {}
+
+
+def _ntff_monopole() -> tuple[Any, complex, float]:
+    """Far-field pattern of an enclosed CW monopole and its analytic level.
+
+    One steady-state 2 kHz run: a contour probe around the source feeds
+    the Kirchhoff-Helmholtz far-field integral, and an independent probe
+    cell 0.55 m away fits the amplitude ``A`` of the analytic line-source
+    field ``p = A H0(2)(k r)``, whose exact far-field pattern is the
+    omnidirectional ``A sqrt(2 / (pi k)) exp(j pi / 4)``.
+    """
+    if "monopole" in _NTFF_CACHE:
+        out = _NTFF_CACHE["monopole"]
+        return cast("tuple[Any, complex, float]", out)
+    from scipy.special import hankel2
+
+    c, dx, f = 343.0, 0.005, 2000.0
+    k = 2.0 * np.pi * f / c
+    sim = ph.FDTD2D(c, dx, shape=(300, 300), sponge_width=40)
+    sim.add_source(ph.CWSource(ix=150, iy=150, frequency=f, ramp_cycles=4.0))
+    probe = sim.add_contour_probe(90, 210, 90, 210, frequencies=[f])
+    sim.run(round(4.5e-3 / sim.dt))
+    probe.reset()
+    acc = 0.0 + 0.0j
+    for _ in range(round(10.0 / f / sim.dt)):
+        sim.step()
+        acc += sim.p[150, 260] * np.exp(-2j * np.pi * f * sim.n * sim.dt)
+    amplitude = (2.0 * acc / probe.samples) / hankel2(0, k * 110 * dx)
+    pattern = ph.far_field_from_contour(
+        probe.phasors(f), np.arange(0.0, 360.0, 5.0),
+        origin=(150.5 * dx, 150.5 * dx))
+    expected = abs(amplitude) * math.sqrt(2.0 / (math.pi * k))
+    result = (pattern, complex(amplitude), float(expected))
+    _NTFF_CACHE["monopole"] = result
+    return result
+
+
+@register(
+    _FDTD,
+    "2D Kirchhoff-Helmholtz NTFF: monopole directivity",
+    "Far-field pattern ripple of an enclosed line source, dB",
+)
+def _chk_ntff_monopole_ripple() -> Outcome:
+    pattern, _, _ = _ntff_monopole()
+    levels = 20.0 * np.log10(np.abs(pattern))
+    return numeric(0.0, float(levels.max() - levels.min()), 0.2,
+                   unit="dB", places=3)
+
+
+@register(
+    _FDTD,
+    "2D Kirchhoff-Helmholtz NTFF: monopole level",
+    "NTFF far-field level vs the 2D Green function A sqrt(2/(pi k)), dB",
+)
+def _chk_ntff_monopole_level() -> Outcome:
+    pattern, _, expected = _ntff_monopole()
+    mean_level = 20.0 * np.log10(float(np.mean(np.abs(pattern))) / expected)
+    return numeric(0.0, mean_level, 0.3, unit="dB", places=3)
+
+
 # ===========================================================================
 # Swept-sine nonlinear analysis & phase utilities (Farina / Novak / B&P)
 # ===========================================================================

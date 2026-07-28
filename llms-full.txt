@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 427 numerical conformance checks against 278 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 429 numerical conformance checks against 279 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 427 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 53 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 429 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 53 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -300,6 +300,7 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [rooms/steady-field](https://jmrplens.github.io/phonometry/reference/api/rooms/steady-field/)
 - [simulation/elastic-fdtd](https://jmrplens.github.io/phonometry/reference/api/simulation/elastic-fdtd/)
 - [simulation/fdtd](https://jmrplens.github.io/phonometry/reference/api/simulation/fdtd/)
+- [simulation/ntff](https://jmrplens.github.io/phonometry/reference/api/simulation/ntff/)
 - [spectra/cepstrum](https://jmrplens.github.io/phonometry/reference/api/spectra/cepstrum/)
 - [spectra/inversion](https://jmrplens.github.io/phonometry/reference/api/spectra/inversion/)
 - [spectra/miso](https://jmrplens.github.io/phonometry/reference/api/spectra/miso/)
@@ -2578,11 +2579,14 @@ cycle and warn on use; they are removed in 4.0.
 | `WBV_ELV_VDV` | `float` | **Whole-body VDV limit value [m/s^1.75].**<br>21.0 | `WBV_ELV_VDV  # 21.0` |
 | `fdtd_simulation` | `function` | **2D acoustic FDTD wave simulation (staggered grid, leapfrog).**<br>• `c`: sound-speed map [m/s], `(ny, nx)` array or scalar with `shape`<br>• `dx`: grid spacing [m]<br>• `duration`: physical time to simulate [s]<br>• `sources`: `GaussianPulse` \| `CWSource` \| `SignalSource` list<br>• `probes`: `(ix, iy)` pressure-probe cells<br>• `boundaries`: `"rigid"` \| `"absorbing"` \| per-side mapping (name or real impedance [Pa·s/m])<br>• `obstacle_mask`: boolean `(ny, nx)` rigid-cell map / `rho` / `cfl` / `damping` / `absorbing_layer_cells` / `snapshot_every` | `res = fdtd_simulation(343, 0.01, 0.02, shape=(200, 300), sources=[GaussianPulse(ix=60, iy=100, width=3e-4)], probes=[(200, 100)])`<br><br>• `FDTDResult` |
 | `FDTDResult` | `dataclass` | **FDTD simulation result.**<br>• `times` [s] / `pressures` [Pa] per probe / `probes` / `probe_positions` [m]<br>• `dx` / `dt` / `shape` / `size` [m] / `sources` / `snapshots` / `snapshot_times` / `obstacle_mask`<br>• `.plot()`: probe histories; `.plot(kind="snapshot")`: pressure field | `res.pressures, res.times`<br>`res.plot()` |
-| `FDTD2D` | `class` | **FDTD stepping engine (frame-by-frame access).**<br>• `c` [m/s] / `dx` [m] / `rho` [kg/m³] / `cfl` / `shape`<br>• `sponge_width` / `sponge_sides` / `sponge_reflection` / `damping`<br>• `edge_impedance`: per-side real impedance [Pa·s/m] / `obstacle_mask` | `sim = FDTD2D(343, 0.01, shape=(200, 300))`<br>`sim.add_source(src); sim.step(); sim.run(400, record_every=10)`<br>• `sim.p` / `sim.vx` / `sim.vy` / `sim.dt` / `sim.time` / `sim.energy()`<br>• `sim.plot_geometry(probes=...)`: draw the configured domain before running<br>• `sim.add_plane_wave(direction, center=..., width=..., wavelength=...)`: one-way plane packet initial condition |
+| `FDTD2D` | `class` | **FDTD stepping engine (frame-by-frame access).**<br>• `c` [m/s] / `dx` [m] / `rho` [kg/m³] / `cfl` / `shape`<br>• `sponge_width` / `sponge_sides` / `sponge_reflection` / `damping`<br>• `edge_impedance`: per-side real impedance [Pa·s/m] / `obstacle_mask` | `sim = FDTD2D(343, 0.01, shape=(200, 300))`<br>`sim.add_source(src); sim.step(); sim.run(400, record_every=10)`<br>• `sim.p` / `sim.vx` / `sim.vy` / `sim.dt` / `sim.time` / `sim.energy()`<br>• `sim.plot_geometry(probes=...)`: draw the configured domain before running<br>• `sim.add_plane_wave(direction, center=..., width=..., wavelength=...)`: one-way plane packet initial condition<br>• `sim.add_contour_probe(ix0, ix1, iy0, iy1, frequencies=...)`: on-the-fly `p`/`v_n` phasor capture on a closed contour |
 | `GaussianPulse` | `dataclass` | **Gaussian pulse source for the FDTD solver.**<br>• `ix` / `iy`: source cell<br>• `width` [s] / `t0` [s] (Default: `4*width`) / `amplitude` [Pa] | `GaussianPulse(ix=60, iy=100, width=3e-4)` |
 | `PlaneWaveSource` | `dataclass` | **Sustained one-way plane wave injected on a line (TF/SF style).**<br>• `direction`: 'down'/'up'/'left'/'right' (travel)<br>• `waveform`: callable t → p_inc(t) [Pa] (reuse a point source's `.value`)<br>• `offset`: line position in cells from the launch edge (place it just inside a sponge)<br>• `amplitude` (Default: 1.0) | `sim.add_source(PlaneWaveSource('down', CWSource(0, 0, frequency=1000.0).value, offset=22))`<br><br>• Transversely plane to machine precision; ~1e-4 residual behind the line |
 | `CWSource` | `dataclass` | **Continuous sine source with raised-cosine onset for the FDTD solver.**<br>• `ix` / `iy`: source cell<br>• `frequency` [Hz] / `amplitude` [Pa] / `ramp_cycles` | `CWSource(ix=25, iy=25, frequency=170)` |
 | `SignalSource` | `dataclass` | **Arbitrary sampled waveform source for the FDTD solver.**<br>• `ix` / `iy`: source cell<br>• `samples` [Pa] / `sample_rate` [Hz] / `amplitude`<br>Linearly interpolated onto the simulation time steps | `SignalSource(ix=60, iy=100, samples=sig, sample_rate=48000)` |
+| `ContourProbe` | `class` | **On-the-fly DFT of `p` and `v_n` on a closed rectangular contour.**<br>Created by `FDTD2D.add_contour_probe`; complex accumulators per point and frequency, so CW runs store no time histories<br>• `positions` / `normals` / `frequencies` / `samples`<br>• `.reset()`: restart accumulation once the field is steady<br>• `.phasors(frequency)`: the captured `ContourPhasors` | `probe = sim.add_contour_probe(90, 470, 90, 345, frequencies=[2000.0])`<br>`sim.run(steps); probe.reset(); sim.run(window)`<br>`ph = probe.phasors(2000.0)` |
+| `ContourPhasors` | `dataclass` | **Steady-state `p` and `v_n` phasors on a closed contour (`exp(+jωt)`).**<br>• `frequency` [Hz] / `positions` `(n, 2)` [m] / `normals` (outward)<br>• `pressure` [Pa] / `normal_velocity` [m/s] (complex) / `segment` [m]<br>• `.subtract(reference)`: scattered = total − incident phasors | `scattered = total.subtract(reference)` |
+| `far_field_from_contour` | `function` | **2D near-to-far-field transformation (Kirchhoff-Helmholtz integral).**<br>• `contour`: `ContourPhasors`<br>• `angles` [deg]: observation directions `(cos a, sin a)` in grid axes<br>• `distance`: `None` (far-field pattern `F(a)`, `p → F e^{−jkr}/√r`) or a radius [m] for the exact Hankel evaluation<br>• `origin`: phase-reference point / `speed_of_sound` / `air_density` | `F = far_field_from_contour(ph, np.arange(-180, 180, 2), origin=(xc, yc))`<br><br>• Complex pattern, one value per angle |
 | `elastic_fdtd_simulation` | `function` | **2D elastic P-SV FDTD wave simulation (velocity-stress, Virieux staggered grid).**<br>• `c_p` / `c_s`: wave-speed maps [m/s], `(ny, nx)` arrays or scalars with `shape` (`c_s = 0` marks fluid cells)<br>• `dx`: grid spacing [m] / `duration` [s] / `rho`: density map [kg/m³]<br>• `sources`: `ExplosionSource` \| `ForceSource` list<br>• `probes`: `(ix, iy)` cells / `probe_fields`: `("p" \| "vx" \| "vy", ...)`<br>• `boundaries`: `"rigid"` \| `"absorbing"` \| `"free"` (stress-imaging surface) \| per-side mapping<br>• `obstacle_mask` / `cfl` / `damping` / `absorbing_layer_cells` / `snapshot_every` / `snapshot_field` | `res = elastic_fdtd_simulation(6320, 3130, 0.001, 5e-5, rho=2700, shape=(300, 600), sources=[ForceSource(ix=300, iy=0, direction='y', waveform=GaussianPulse(0, 0, width=8e-6).value)], boundaries={'top': 'free'})`<br><br>• `ElasticFDTDResult` |
 | `ElasticFDTDResult` | `dataclass` | **Elastic FDTD simulation result.**<br>• `times` [s] / `signals` `(n_probes, n_fields, n_steps+1)` / `probe_fields` / `probes` / `probe_positions` [m]<br>• `dx` / `dt` / `shape` / `size` [m] / `sources` / `snapshots` / `snapshot_times` / `snapshot_field` / `obstacle_mask` / `free_sides`<br>• `.plot()`: probe histories; `.plot(kind="snapshot")`: recorded field | `res.signals, res.times`<br>`res.plot()` |
 | `ElasticFDTD2D` | `class` | **Elastic P-SV stepping engine (frame-by-frame access).**<br>• `c_p` / `c_s` [m/s] / `dx` [m] / `rho` [kg/m³] / `cfl` / `shape`<br>• `free_sides`: traction-free surfaces (stress imaging)<br>• `sponge_width` / `sponge_sides` / `sponge_reflection` / `damping` / `obstacle_mask` | `sim = ElasticFDTD2D(6320, 3130, 0.001, rho=2700, shape=(300, 600), free_sides='top')`<br>`sim.add_source(src); sim.step(); sim.run(400, record_every=10)`<br>• `sim.txx` / `sim.tyy` / `sim.txy` / `sim.vx` / `sim.vy` / `sim.p` / `sim.lam` / `sim.mu` / `sim.dt` / `sim.time` / `sim.energy()`<br>• `sim.collocated(field)`: one field interpolated to cell centres |
@@ -6284,6 +6288,146 @@ included, and recovers the analytic absorption and transmission loss of the
 modelled sample through the library's own reduction chains (the
 `tests/simulation` cross-checks run this on every commit).
 
+## 2b. From the near field to the far field
+
+A polar response or a diffusion coefficient is a far-field quantity, but an
+FDTD box ends a couple of wavelengths from the scatterer. The
+`add_contour_probe` / `far_field_from_contour` pair bridges that gap with
+the 2D Kirchhoff-Helmholtz integral: the probe folds the steady-state
+pressure and outward normal velocity on a closed rectangle of cell faces
+into complex accumulators (an on-the-fly DFT per point and frequency, so a
+continuous-wave run stores no time histories), and the integral propagates
+those phasors to infinity with the free-space Green function
+`-(j/4) H0⁽²⁾(kR)` — the same construction full-wave FEM solvers use to
+report scattering patterns from near-field data. Two properties carry the
+scheme: the staggered grid already holds `v_n` exactly on the contour
+faces, and any field whose sources lie *outside* the contour integrates to
+nothing (extinction), so the total-field phasors of a plane-wave scattering
+run transform directly into the *scattered* far field, no reference run
+needed.
+
+```python
+import numpy as np
+from phonometry import simulation
+
+c0, dx, f0 = 343.0, 0.005, 2000.0
+sim = simulation.FDTD2D(c0, dx, shape=(300, 300), sponge_width=40)
+sim.add_source(simulation.CWSource(ix=150, iy=150, frequency=f0))
+probe = sim.add_contour_probe(90, 210, 90, 210, frequencies=[f0])
+sim.run(round(4.5e-3 / sim.dt))            # run the transient out
+probe.reset()                              # then integrate whole periods
+sim.run(round(10.0 / f0 / sim.dt))
+pattern = simulation.far_field_from_contour(
+    probe.phasors(f0), np.arange(0.0, 360.0, 5.0),
+    origin=(150.5 * dx, 150.5 * dx))
+levels = 20 * np.log10(np.abs(pattern))
+print(round(float(levels.max() - levels.min()), 2))   # 0.04 dB of ripple:
+# a line source is omnidirectional, and its level matches the 2D
+# free-space Green function to 0.11 dB
+```
+
+The analytic oracles behind those numbers run on every commit
+(`tests/simulation`): the reconstructed monopole pattern is flat within
+0.05 dB and sits on the 2D Green-function level within 0.11 dB, an
+antiphase pair reproduces the two-source array factor within 0.4 % of the
+peak, and a contour that does not enclose the source transforms to less
+than 1 % of one that does. On top of them sit two meshed-panel
+cross-checks at 2 kHz: a quadratic-residue diffuser with wells to 27.4 cm,
+whose NTFF polar response tracks the Fraunhofer prediction of
+`predict_diffuser_polar_response` (pattern correlation 0.94, ISO
+17497-2 directional diffusion coefficient within 0.08), and the deep
+subwavelength metadiffuser below.
+
+The far-field chain is what finally closes the metadiffuser loop end to
+end: the Table-1 panel of the paper — every slit, neck and cavity meshed
+at 0.5 mm — driven to steady state by a plane wave, captured on a contour
+and transformed, against the `metadiffuser_polar_response` model (TMM +
+Fraunhofer) of the materials module. That is the library-side counterpart
+of the TMM-vs-FEM comparison the metadiffuser paper itself reports, small
+discrepancies included: the transfer-matrix model homogenises each 7 cm
+cell into one locally reacting reflection coefficient and ignores the
+evanescent coupling between neighbouring mouths, so the lobe structure
+agrees while individual nulls shift by a few degrees.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_ntff_polar_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_ntff_polar.svg" alt="Semicircular polar plot at 2 kHz overlaying the far-field response of the meshed Table-1 metadiffuser computed by FDTD plus the Kirchhoff-Helmholtz near-to-far-field integral, solid line, on the TMM plus Fraunhofer prediction of the library, dashed line: the specular and grating lobes coincide over the arc from minus 90 to plus 90 degrees with small shifts of the deep nulls" width="92%"></picture>
+
+*Two independent routes to the same far field: the meshed panel in a
+full-wave time-domain solver (solid) against the homogenised
+transfer-matrix chain (dashed). The lobes agree; the nulls, sensitive to
+the millimetre end corrections the TMM models analytically, shift by a
+few degrees.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import (HelmholtzResonator, MetadiffuserWell,
+                        metadiffuser_polar_response, simulation)
+
+c0, dx, f0, pitch = 343.0, 0.0005, 2000.0, 0.07
+rows = [(14.7, 13.0, 16.4, 6.2, 9.0), (30.9, 9.1, 4.3, 3.5, 9.0),
+        (30.9, 9.1, 4.3, 3.5, 9.0), (15.7, 13.3, 17.0, 6.3, 9.0),
+        (20.3, 18.0, 20.7, 3.2, 9.0)]     # Table 1: h, l_n, l_c, w_n, w_c
+
+# Mesh the real panel: a rigid slab with the slits, necks and cavities
+# carved out at 0.5 mm (the 3.2 mm narrowest neck spans six cells).
+sponge, gap, marg, front = 60, 60, 20, 40
+face = round(5 * pitch / dx)
+lat = marg + gap + sponge
+r_face = sponge + gap + front
+slab = round(0.023 / dx)                  # 2 cm panel + 3 mm back wall
+mask = np.zeros((r_face + slab + marg + gap + sponge,
+                 face + 2 * lat), dtype=bool)
+mask[r_face:r_face + slab, lat:lat + face] = True
+for n, (h, ln, lc, wn, wc) in enumerate(rows):
+    xs = (n + 0.12) * pitch
+    c0s, c1s = lat + round(xs / dx), lat + round((xs + h * 1e-3) / dx)
+    mask[r_face:r_face + round(0.02 / dx), c0s:c1s] = False
+    for m in range(2):                    # two resonators per slit
+        ym, xn = (m + 0.5) * 0.01, xs + h * 1e-3
+        r0 = r_face + round((ym - 0.5e-3 * wn) / dx)
+        r1 = r_face + round((ym + 0.5e-3 * wn) / dx)
+        mask[r0:r1, c1s:lat + round((xn + ln * 1e-3) / dx)] = False
+        r0 = r_face + round((ym - 0.5e-3 * wc) / dx)
+        r1 = r_face + round((ym + 0.5e-3 * wc) / dx)
+        mask[r0:r1, lat + round((xn + ln * 1e-3) / dx):
+             lat + round((xn + (ln + lc) * 1e-3) / dx)] = False
+
+sim = simulation.FDTD2D(c0, dx, shape=mask.shape, sponge_width=sponge,
+                        cfl=0.9, obstacle_mask=mask)   # 340 cells/lambda:
+sim.add_source(simulation.PlaneWaveSource(           # dispersion negligible
+    "down", simulation.CWSource(0, 0, f0).value, offset=sponge))
+probe = sim.add_contour_probe(lat - marg, lat + face + marg - 1,
+                              r_face - front, r_face + slab + marg - 1,
+                              frequencies=[f0])
+sim.run(round(8e-3 / sim.dt))             # transient (ramp + ring-up) out
+probe.reset()
+sim.run(round(10.0 / f0 / sim.dt))        # ten whole periods of DFT
+angles = np.arange(-90.0, 90.1, 5.0)      # from the panel normal
+pattern = simulation.far_field_from_contour(
+    probe.phasors(f0), angles - 90.0,     # the normal points along -y
+    origin=((lat + face / 2.0) * dx, r_face * dx))
+levels = 20 * np.log10(np.abs(pattern) / np.abs(pattern).max())
+
+wells = [MetadiffuserWell(h * 1e-3,
+                          (HelmholtzResonator(ln * 1e-3, wn * 1e-3,
+                                              lc * 1e-3, wc * 1e-3),) * 2)
+         for h, ln, lc, wn, wc in rows]
+model = metadiffuser_polar_response(f0, wells, depth=0.02, period=pitch,
+                                    angles=angles, periods=1)
+ax = model.plot(color="#1f77b4", marker="", linestyle="--",
+                label="TMM + Fraunhofer model")
+ax.plot(np.radians(angles), levels, color="#d62728", lw=2.2,
+        label="FDTD + NTFF, panel meshed at 0.5 mm")
+ax.set_ylim(-40.0, 2.0)
+ax.legend(loc="lower center")
+plt.show()
+```
+
+</details>
+
 ## 3. When to use it, and the 2D limits
 
 FDTD earns its cost when the **geometry drives the physics**: diffraction
@@ -6753,6 +6897,18 @@ sediment shear stiffness.
   Section 3.5 places time-domain wave-based methods among the numerical
   approaches to the wave equation in enclosures, and chapter 3 gives the
   rigid-room normal modes used as the analytic oracle.
+- Williams, E. G. (1999). *Fourier acoustics: Sound radiation and
+  nearfield acoustical holography*. Academic Press.
+  [doi:10.1016/B978-0-12-753960-7.X5000-1](https://doi.org/10.1016/B978-0-12-753960-7.X5000-1).
+  Chapter 8: the Helmholtz integral equation behind
+  `far_field_from_contour`, with the outgoing free-space Green function
+  and the far-field limit of §2b.
+- Jiménez, N., Cox, T. J., Romero-García, V., & Groby, J.-P. (2017).
+  Metadiffusers: Deep-subwavelength sound diffusers. *Scientific Reports*,
+  7, 5389. [doi:10.1038/s41598-017-05710-5](https://doi.org/10.1038/s41598-017-05710-5).
+  The meshed Table-1 panel and the near-to-far-field polar comparison of
+  §2b reproduce, with this solver, the TMM-vs-full-wave cross-check the
+  paper reports.
 - Virieux, J. (1986). P-SV wave propagation in heterogeneous media:
   velocity-stress finite-difference method. *Geophysics*, 51(4), 889-901.
   [doi:10.1190/1.1442147](https://doi.org/10.1190/1.1442147). The elastic
@@ -7892,7 +8048,7 @@ the normative PDF fiche.
 - [Filter Banks](https://jmrplens.github.io/phonometry/guides/filter-banks/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/guides/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/reference/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 427 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 429 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 

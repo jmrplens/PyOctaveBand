@@ -18,6 +18,22 @@ references:
     publisher: "CRC Press"
     doi: "10.1201/9781315372150"
     note: "La sección 3.5 sitúa los métodos ondulatorios en el dominio del tiempo entre las aproximaciones numéricas a la ecuación de onda en recintos, y el capítulo 3 da los modos normales de sala rígida usados como oráculo analítico."
+  - type: book
+    authors: ["Williams, E. G."]
+    year: 1999
+    title: "Fourier acoustics: Sound radiation and nearfield acoustical holography"
+    publisher: "Academic Press"
+    doi: "10.1016/B978-0-12-753960-7.X5000-1"
+    note: "Capítulo 8: la ecuación integral de Helmholtz tras far_field_from_contour, con la función de Green de espacio libre saliente y el límite de campo lejano de la transformación de campo cercano a lejano de la sección 2b."
+  - type: article
+    authors: ["Jiménez, N.", "Cox, T. J.", "Romero-García, V.", "Groby, J.-P."]
+    year: 2017
+    title: "Metadiffusers: Deep-subwavelength sound diffusers"
+    journal: "Scientific Reports"
+    volume: "7"
+    pages: "5389"
+    doi: "10.1038/s41598-017-05710-5"
+    note: "El panel de la Tabla 1 mallado y la comparación polar de campo lejano de la sección 2b reproducen, con este solucionador, el contraste TMM frente a onda completa que reporta el artículo."
   - type: article
     authors: ["Virieux, J."]
     year: 1986
@@ -276,6 +292,151 @@ ese dominio, animaciones incluidas, y recupera la absorción y la pérdida por
 transmisión analíticas de la muestra modelada con las propias cadenas de
 reducción de la biblioteca (los crosschecks de `tests/simulation` lo ejecutan
 en cada commit).
+
+## 2b. Del campo cercano al campo lejano
+
+Una respuesta polar o un coeficiente de difusión son magnitudes de campo
+lejano, pero una caja FDTD termina a un par de longitudes de onda del
+dispersor. La pareja `add_contour_probe` / `far_field_from_contour` salva
+esa distancia con la integral de Kirchhoff-Helmholtz 2D: la sonda pliega la
+presión y la velocidad normal saliente del régimen estacionario, sobre un
+rectángulo cerrado de caras de celda, en acumuladores complejos (una DFT al
+vuelo por punto y frecuencia, así que un régimen de onda continua no
+almacena historias temporales), y la integral propaga esos fasores hasta el
+infinito con la función de Green de espacio libre `-(j/4) H0⁽²⁾(kR)`, la
+misma construcción con la que los solucionadores FEM de onda completa
+publican patrones de dispersión desde el campo cercano. Dos propiedades
+sostienen el esquema: la malla escalonada ya guarda `v_n` exactamente en
+las caras del contorno, y todo campo cuyas fuentes queden *fuera* del
+contorno integra a nada (extinción), de modo que los fasores del campo
+total de una dispersión con onda plana se transforman directamente en el
+campo lejano *dispersado*, sin necesidad de una pasada de referencia.
+
+```python
+import numpy as np
+from phonometry import simulation
+
+c0, dx, f0 = 343.0, 0.005, 2000.0
+sim = simulation.FDTD2D(c0, dx, shape=(300, 300), sponge_width=40)
+sim.add_source(simulation.CWSource(ix=150, iy=150, frequency=f0))
+probe = sim.add_contour_probe(90, 210, 90, 210, frequencies=[f0])
+sim.run(round(4.5e-3 / sim.dt))            # agotar el transitorio
+probe.reset()                              # e integrar periodos completos
+sim.run(round(10.0 / f0 / sim.dt))
+pattern = simulation.far_field_from_contour(
+    probe.phasors(f0), np.arange(0.0, 360.0, 5.0),
+    origin=(150.5 * dx, 150.5 * dx))
+levels = 20 * np.log10(np.abs(pattern))
+print(round(float(levels.max() - levels.min()), 2))   # 0.04 dB de rizado:
+# una fuente lineal es omnidireccional, y su nivel coincide con la
+# función de Green 2D de espacio libre en 0,11 dB
+```
+
+Los oráculos analíticos tras esos números se ejecutan en cada commit
+(`tests/simulation`): el patrón del monopolo reconstruido es plano dentro
+de 0,05 dB y se asienta sobre el nivel de la función de Green 2D dentro de
+0,11 dB, una pareja en contrafase reproduce el factor de array de dos
+fuentes dentro del 0,4 % del pico, y un contorno que no encierra la fuente
+se transforma en menos del 1 % de uno que sí. Sobre ellos se apoyan dos
+contrastes de panel mallado a 2 kHz: un difusor de residuo cuadrático con
+pozos de hasta 27,4 cm, cuya respuesta polar NTFF sigue la predicción de
+Fraunhofer de `predict_diffuser_polar_response` (correlación de patrones
+de 0,94, coeficiente de difusión direccional ISO 17497-2 dentro de
+0,08), y el metadifusor en sublongitud de onda profunda de abajo.
+
+La cadena de campo lejano es la que por fin cierra de extremo a extremo el
+círculo del metadifusor: el panel de la Tabla 1 del artículo, con cada
+rendija, cuello y cavidad mallados a 0,5 mm, llevado al régimen
+estacionario por una onda plana, capturado sobre un contorno y
+transformado, frente al modelo
+[`metadiffuser_polar_response`](/phonometry/es/reference/api/materials/metadiffuser/)
+(TMM + Fraunhofer) del módulo de materiales. Es la réplica en la librería
+del contraste TMM frente a FEM que reporta el propio artículo de los
+metadifusores, pequeñas discrepancias incluidas: el modelo de matrices de
+transferencia homogeneiza cada celda de 7 cm en un único coeficiente de
+reflexión de reacción local e ignora el acoplamiento evanescente entre
+bocas vecinas, así que la estructura de lóbulos coincide mientras algunos
+nulos se desplazan unos grados.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_ntff_polar_es.svg" alt="Diagrama polar semicircular a 2 kilohercios que superpone la respuesta en campo lejano del metadifusor de la Tabla 1 mallado, calculada por FDTD más la integral de campo cercano a lejano de Kirchhoff-Helmholtz, en trazo continuo, sobre la predicción TMM más Fraunhofer de la librería, en trazo discontinuo: los lóbulos especular y de red coinciden en el arco de menos 90 a más 90 grados con pequeños desplazamientos de los nulos profundos" width="92%" />
+
+*Dos rutas independientes al mismo campo lejano: el panel mallado en un
+solucionador de onda completa en el dominio del tiempo (continuo) frente a
+la cadena de matrices de transferencia homogeneizada (discontinuo). Los
+lóbulos coinciden; los nulos, sensibles a las correcciones de extremo
+milimétricas que el TMM modela analíticamente, se desplazan unos grados.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import (HelmholtzResonator, MetadiffuserWell,
+                        metadiffuser_polar_response, simulation)
+
+c0, dx, f0, pitch = 343.0, 0.0005, 2000.0, 0.07
+rows = [(14.7, 13.0, 16.4, 6.2, 9.0), (30.9, 9.1, 4.3, 3.5, 9.0),
+        (30.9, 9.1, 4.3, 3.5, 9.0), (15.7, 13.3, 17.0, 6.3, 9.0),
+        (20.3, 18.0, 20.7, 3.2, 9.0)]     # Tabla 1: h, l_n, l_c, w_n, w_c
+
+# Mallar el panel real: una losa rígida con las rendijas, cuellos y
+# cavidades excavados a 0,5 mm (el cuello más estrecho, 3,2 mm, abarca
+# seis celdas).
+sponge, gap, marg, front = 60, 60, 20, 40
+face = round(5 * pitch / dx)
+lat = marg + gap + sponge
+r_face = sponge + gap + front
+slab = round(0.023 / dx)                  # panel de 2 cm + fondo de 3 mm
+mask = np.zeros((r_face + slab + marg + gap + sponge,
+                 face + 2 * lat), dtype=bool)
+mask[r_face:r_face + slab, lat:lat + face] = True
+for n, (h, ln, lc, wn, wc) in enumerate(rows):
+    xs = (n + 0.12) * pitch
+    c0s, c1s = lat + round(xs / dx), lat + round((xs + h * 1e-3) / dx)
+    mask[r_face:r_face + round(0.02 / dx), c0s:c1s] = False
+    for m in range(2):                    # dos resonadores por rendija
+        ym, xn = (m + 0.5) * 0.01, xs + h * 1e-3
+        r0 = r_face + round((ym - 0.5e-3 * wn) / dx)
+        r1 = r_face + round((ym + 0.5e-3 * wn) / dx)
+        mask[r0:r1, c1s:lat + round((xn + ln * 1e-3) / dx)] = False
+        r0 = r_face + round((ym - 0.5e-3 * wc) / dx)
+        r1 = r_face + round((ym + 0.5e-3 * wc) / dx)
+        mask[r0:r1, lat + round((xn + ln * 1e-3) / dx):
+             lat + round((xn + (ln + lc) * 1e-3) / dx)] = False
+
+sim = simulation.FDTD2D(c0, dx, shape=mask.shape, sponge_width=sponge,
+                        cfl=0.9, obstacle_mask=mask)  # 340 celdas/lambda:
+sim.add_source(simulation.PlaneWaveSource(          # dispersión despreciable
+    "down", simulation.CWSource(0, 0, f0).value, offset=sponge))
+probe = sim.add_contour_probe(lat - marg, lat + face + marg - 1,
+                              r_face - front, r_face + slab + marg - 1,
+                              frequencies=[f0])
+sim.run(round(8e-3 / sim.dt))             # agotar transitorio y resonadores
+probe.reset()
+sim.run(round(10.0 / f0 / sim.dt))        # diez periodos completos de DFT
+angles = np.arange(-90.0, 90.1, 5.0)      # desde la normal del panel
+pattern = simulation.far_field_from_contour(
+    probe.phasors(f0), angles - 90.0,     # la normal apunta según -y
+    origin=((lat + face / 2.0) * dx, r_face * dx))
+levels = 20 * np.log10(np.abs(pattern) / np.abs(pattern).max())
+
+wells = [MetadiffuserWell(h * 1e-3,
+                          (HelmholtzResonator(ln * 1e-3, wn * 1e-3,
+                                              lc * 1e-3, wc * 1e-3),) * 2)
+         for h, ln, lc, wn, wc in rows]
+model = metadiffuser_polar_response(f0, wells, depth=0.02, period=pitch,
+                                    angles=angles, periods=1)
+ax = model.plot(color="#1f77b4", marker="", linestyle="--",
+                label="Modelo TMM + Fraunhofer", language="es")
+ax.plot(np.radians(angles), levels, color="#d62728", lw=2.2,
+        label="FDTD + NTFF, panel mallado a 0,5 mm")
+ax.set_ylim(-40.0, 2.0)
+ax.legend(loc="lower center")
+plt.show()
+```
+
+</details>
 
 ## 3. Cuándo usarlo, y los límites del 2D
 
@@ -720,7 +881,13 @@ sala rígida (Kuttruff cap. 3), los tiempos de llegada en campo libre y el
 decaimiento cilíndrico en 2D, el eco de imagen de pared rígida, el
 coeficiente de reflexión de impedancia y la relación de dispersión del §4,
 con el orden de convergencia medido coincidiendo con el diseño de segundo
-orden del esquema. El compañero elástico P-SV del §5: el esquema
+orden del esquema. La cadena de campo cercano a lejano del §2b: captura de
+fasores sobre contorno cerrado (`add_contour_probe`) y la integral de
+Kirchhoff-Helmholtz 2D (`far_field_from_contour`, Williams cap. 8),
+validada contra los campos exactos de las fuentes lineales monopolo y
+dipolo, la propiedad de extinción, y los paneles QRD y metadifusor
+mallados frente a los propios modelos de campo lejano Fraunhofer y TMM de
+la librería. El compañero elástico P-SV del §5: el esquema
 velocidad-esfuerzo de Virieux (1986) con los parámetros efectivos y la
 superficie libre por imagen de esfuerzos de Moczo et al. (2007), expuesto a
 través de `elastic_fdtd_simulation`/`ElasticFDTD2D` con `ExplosionSource` y
@@ -757,6 +924,7 @@ las ondas de cuerpo.
 - [Informe de conformidad](/phonometry/es/reference/conformance/): dos de los anclajes
   de validación en forma cerrada del §4 se ejecutan ahí.
 - Referencia de la API: [`simulation.fdtd`](/phonometry/es/reference/api/simulation/fdtd/),
+  [`simulation.ntff`](/phonometry/es/reference/api/simulation/ntff/),
   [`simulation.elastic-fdtd`](/phonometry/es/reference/api/simulation/elastic-fdtd/).
 
 ## Respuestas rápidas

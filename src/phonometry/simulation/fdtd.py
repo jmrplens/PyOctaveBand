@@ -47,6 +47,8 @@ from typing import TYPE_CHECKING, Any, Protocol
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
+from .ntff import ContourPhasors
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
@@ -471,6 +473,160 @@ class _ImpedanceEdge:
             div[-1, :] += self.vb
 
 
+class ContourProbe:
+    """On-the-fly DFT of ``p`` and ``v_n`` on a closed rectangular contour.
+
+    Created by :meth:`FDTD2D.add_contour_probe`. The contour is the closed
+    rectangle of cell faces around the cell block ``ix0..ix1`` x
+    ``iy0..iy1`` (inclusive); on each face the engine samples the outward
+    normal velocity (which lives exactly there on the staggered grid) and
+    the pressure averaged from the two adjacent cell centres, and folds
+    them into complex accumulators at each requested frequency, so a
+    continuous-wave run never stores full time histories.
+
+    After every step the accumulators gain ``p * exp(-j omega t)`` with the
+    fields' own leapfrog time stamps (``t = n dt`` for pressure,
+    ``t = (n - 1/2) dt`` for velocity, so the half-step stagger is handled
+    exactly). :meth:`phasors` scales the sums by ``2 / n_samples`` into the
+    steady-state complex amplitudes of the library's ``exp(+j omega t)``
+    convention. Accumulate only over the steady state: run the transient
+    out, call :meth:`reset`, then integrate a window as close as possible
+    to a whole number of periods (the residual leakage falls as one over
+    the number of periods).
+
+    :ivar positions: Face-sample positions ``(x, y)`` [m], shape
+        ``(n_points, 2)``, ordered left, right, top, bottom face.
+    :ivar normals: Outward unit normals of each sample, same shape.
+    :ivar frequencies: The tracked frequencies [Hz].
+    :ivar samples: Number of steps accumulated since the last reset.
+    """
+
+    def __init__(self, sim: FDTD2D, ix0: int, ix1: int, iy0: int, iy1: int,
+                 frequencies: ArrayLike) -> None:
+        ny, nx = sim.p.shape
+        ix0 = _integer("ix0", ix0)
+        ix1 = _integer("ix1", ix1)
+        iy0 = _integer("iy0", iy0)
+        iy1 = _integer("iy1", iy1)
+        if not (1 <= ix0 <= ix1 <= nx - 2 and 1 <= iy0 <= iy1 <= ny - 2):
+            raise ValueError(
+                "the contour block needs 1 <= ix0 <= ix1 <= nx - 2 and "
+                "1 <= iy0 <= iy1 <= ny - 2, so every sampled face has an "
+                "open cell on both sides")
+        freqs = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
+        if freqs.ndim != 1 or freqs.size == 0 or not np.all(
+                np.isfinite(freqs)) or bool(np.any(freqs <= 0.0)):
+            raise ValueError("frequencies must be a non-empty 1D sequence "
+                             "of positive finite values")
+        if sim._obstacle is not None:
+            # Every sampled face needs open cells on both of its sides:
+            # the two cell columns flanking the vertical faces and the two
+            # cell rows flanking the horizontal ones.
+            blocked = bool(
+                sim._obstacle[iy0:iy1 + 1,
+                              [ix0 - 1, ix0, ix1, ix1 + 1]].any()
+                or sim._obstacle[[iy0 - 1, iy0, iy1, iy1 + 1],
+                                 ix0:ix1 + 1].any())
+            if blocked:
+                raise ValueError(
+                    "the contour faces touch obstacle cells; the closed "
+                    "rectangle must run through open air with the whole "
+                    "scatterer strictly inside")
+        self._ix0, self._ix1 = ix0, ix1
+        self._iy0, self._iy1 = iy0, iy1
+        self._ys = slice(iy0, iy1 + 1)
+        self._xs = slice(ix0, ix1 + 1)
+        n_side = iy1 - iy0 + 1
+        n_band = ix1 - ix0 + 1
+        dx = sim.dx
+        y_faces = (np.arange(iy0, iy1 + 1, dtype=np.float64) + 0.5) * dx
+        x_faces = (np.arange(ix0, ix1 + 1, dtype=np.float64) + 0.5) * dx
+        pos = np.empty((2 * (n_side + n_band), 2), dtype=np.float64)
+        nrm = np.zeros_like(pos)
+        s_left = slice(0, n_side)
+        s_right = slice(n_side, 2 * n_side)
+        s_top = slice(2 * n_side, 2 * n_side + n_band)
+        s_bottom = slice(2 * n_side + n_band, 2 * (n_side + n_band))
+        pos[s_left, 0], pos[s_left, 1] = ix0 * dx, y_faces
+        pos[s_right, 0], pos[s_right, 1] = (ix1 + 1) * dx, y_faces
+        pos[s_top, 0], pos[s_top, 1] = x_faces, iy0 * dx
+        pos[s_bottom, 0], pos[s_bottom, 1] = x_faces, (iy1 + 1) * dx
+        nrm[s_left, 0], nrm[s_right, 0] = -1.0, 1.0
+        nrm[s_top, 1], nrm[s_bottom, 1] = -1.0, 1.0
+        pos.flags.writeable = False
+        nrm.flags.writeable = False
+        self.positions: NDArray[np.float64] = pos
+        self.normals: NDArray[np.float64] = nrm
+        self.frequencies: tuple[float, ...] = tuple(float(f) for f in freqs)
+        self._omega = 2.0 * np.pi * freqs
+        self._dt = sim.dt
+        self._dx = dx
+        self._acc_p = np.zeros((freqs.size, pos.shape[0]),
+                               dtype=np.complex128)
+        self._acc_v = np.zeros_like(self._acc_p)
+        self.samples = 0
+
+    def reset(self) -> None:
+        """Clear the accumulators (call once the field is steady)."""
+        self._acc_p.fill(0.0)
+        self._acc_v.fill(0.0)
+        self.samples = 0
+
+    def _accumulate(self, p: Field2D, vx: Field2D, vy: Field2D,
+                    n: int) -> None:
+        """Fold the current fields into the running DFT sums."""
+        ys, xs = self._ys, self._xs
+        ix0, ix1 = self._ix0, self._ix1
+        iy0, iy1 = self._iy0, self._iy1
+        p_now = np.concatenate((
+            0.5 * (p[ys, ix0 - 1] + p[ys, ix0]),
+            0.5 * (p[ys, ix1] + p[ys, ix1 + 1]),
+            0.5 * (p[iy0 - 1, xs] + p[iy0, xs]),
+            0.5 * (p[iy1, xs] + p[iy1 + 1, xs]),
+        ))
+        v_now = np.concatenate((
+            -vx[ys, ix0 - 1], vx[ys, ix1],
+            -vy[iy0 - 1, xs], vy[iy1, xs],
+        ))
+        # Leapfrog time stamps: p sits at n dt, v half a step earlier.
+        phase_p = np.exp(self._omega * (-1j * (n * self._dt)))
+        phase_v = np.exp(self._omega * (-1j * ((n - 0.5) * self._dt)))
+        self._acc_p += phase_p[:, np.newaxis] * p_now[np.newaxis, :]
+        self._acc_v += phase_v[:, np.newaxis] * v_now[np.newaxis, :]
+        self.samples += 1
+
+    def phasors(self, frequency: float) -> ContourPhasors:
+        """The accumulated contour phasors at one tracked frequency.
+
+        :param frequency: One of the frequencies the probe was created
+            with, in hertz.
+        :return: A :class:`~phonometry.simulation.ntff.ContourPhasors`
+            ready for
+            :func:`~phonometry.simulation.ntff.far_field_from_contour`.
+        :raises ValueError: If the frequency is not tracked or nothing has
+            been accumulated yet.
+        """
+        matches = [i for i, f in enumerate(self.frequencies)
+                   if np.isclose(f, float(frequency))]
+        if not matches:
+            raise ValueError(
+                f"frequency {frequency!r} Hz is not tracked by this probe "
+                f"(tracked: {self.frequencies})")
+        if self.samples == 0:
+            raise ValueError("no samples accumulated yet; step the "
+                             "simulation first")
+        scale = 2.0 / self.samples
+        i = matches[0]
+        return ContourPhasors(
+            frequency=self.frequencies[i],
+            positions=self.positions,
+            normals=self.normals,
+            pressure=np.asarray(scale * self._acc_p[i]),
+            normal_velocity=np.asarray(scale * self._acc_v[i]),
+            segment=self._dx,
+        )
+
+
 class FDTD2D:
     """2D acoustic FDTD stepping engine on a staggered grid.
 
@@ -565,6 +721,7 @@ class FDTD2D:
         self._div: Field2D = np.zeros((ny, nx), dtype=np.float64)
         self._sources: list[Source] = []
         self._plane_sources: list[PlaneWaveSource] = []
+        self._contour_probes: list[ContourProbe] = []
         self.n = 0                                # completed steps
 
         sides = _resolve_sponge_sides(sponge_sides)
@@ -770,6 +927,40 @@ class FDTD2D:
             raise ValueError("source position lies inside an obstacle")
         self._sources.append(source)
 
+    def add_contour_probe(self, ix0: int, ix1: int, iy0: int, iy1: int, *,
+                          frequencies: ArrayLike) -> ContourProbe:
+        """Record ``p`` and ``v_n`` phasors on a closed rectangular contour.
+
+        The contour is the rectangle of cell faces enclosing the cell
+        block ``ix0..ix1`` x ``iy0..iy1`` (both ends inclusive): its sides
+        lie on ``x = ix0 dx``, ``x = (ix1 + 1) dx``, ``y = iy0 dx`` and
+        ``y = (iy1 + 1) dx``. From the step after registration the engine
+        folds the face pressures (averaged from the two adjacent cell
+        centres) and the outward face normal velocities into running DFT
+        accumulators at each requested frequency; see :class:`ContourProbe`
+        for the steady-state protocol and
+        :func:`~phonometry.simulation.ntff.far_field_from_contour` for the
+        far-field transformation of the captured phasors.
+
+        Place the contour in open air: strictly around the scatterer,
+        clear of sponge layers and of any source (point sources and
+        plane-wave injection lines must stay outside so the enclosed
+        region is source-free in a scattering run, or inside when the
+        radiated field itself is the quantity of interest).
+
+        :param ix0: First cell column inside the contour.
+        :param ix1: Last cell column inside the contour.
+        :param iy0: First cell row inside the contour.
+        :param iy1: Last cell row inside the contour.
+        :param frequencies: Frequencies to track [Hz].
+        :return: The registered :class:`ContourProbe`.
+        :raises ValueError: For a block without open faces on all sides or
+            invalid frequencies.
+        """
+        probe = ContourProbe(self, ix0, ix1, iy0, iy1, frequencies)
+        self._contour_probes.append(probe)
+        return probe
+
     def _add_plane_source(self, source: PlaneWaveSource) -> None:
         """Validate and register a plane-wave injection line."""
         if source.direction not in _SIDE_TRAVEL:
@@ -827,6 +1018,8 @@ class FDTD2D:
             self._inject_plane(plane, t_next)
         self.p *= self._decay_p
         self.n += 1
+        for probe in self._contour_probes:
+            probe._accumulate(self.p, self.vx, self.vy, self.n)
 
     def _inject_plane(self, plane: PlaneWaveSource, t_next: float) -> None:
         """Add the incident plane wave on the injection line (one-way).

@@ -291,6 +291,7 @@ _SECTION_LIST: tuple[Section, ...] = (
         label_es="Simulación de ondas",
         modules=(
             "phonometry.simulation.fdtd",
+            "phonometry.simulation.ntff",
             "phonometry.simulation.elastic_fdtd",
         ),
     ),
