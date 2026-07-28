@@ -44,6 +44,11 @@ _ES_EXACT = {
     "The 2 cm metadiffuser scatters like the 27 cm QRD (2 kHz)":
         "El metadifusor de 2 cm dispersa como el QRD de 27 cm (2 kHz)",
     "Metadiffuser, panel 2 cm": "Metadifusor, panel de 2 cm",
+    "Far field of the meshed metadiffuser vs the model (2 kHz)":
+        "Campo lejano del metadifusor mallado frente al modelo (2 kHz)",
+    "TMM + Fraunhofer model": "Modelo TMM + Fraunhofer",
+    "FDTD + NTFF, panel meshed at 0.5 mm":
+        "FDTD + NTFF, panel mallado a 0,5 mm",
     "Schroeder diffuser vs metadiffuser (2D FDTD)":
         "Difusor de Schroeder frente a metadifusor (FDTD 2D)",
     "QRD, wells down to 27 cm": "QRD, pozos de hasta 27 cm",
@@ -8112,6 +8117,114 @@ def generate_metadiffuser_geometry(output_dir: str) -> None:
     plt.close()
 
 
+@lru_cache(maxsize=1)
+def _meshed_metadiffuser_ntff_levels() -> tuple[Any, Any]:
+    """Far-field polar levels of the meshed Table-1 panel at 2 kHz.
+
+    A dedicated continuous-wave FDTD run at dx = 0.5 mm (every slit, neck
+    and cavity of the real panel resolved by at least four cells, unit-cell
+    reflection phases within 2 degrees of a 0.25 mm run): a plane wave from
+    just inside the top sponge drives the panel to steady state, a closed
+    contour probe accumulates the 2 kHz pressure and normal-velocity
+    phasors on the fly, and the 2D Kirchhoff-Helmholtz integral turns them
+    into the far-field pattern. The incident wave extinguishes in the
+    exterior integral, so no reference run is needed. Returns the polar
+    angles [deg from the panel normal] and the levels re the peak [dB].
+    """
+    from phonometry.simulation import (
+        FDTD2D,
+        CWSource,
+        PlaneWaveSource,
+        far_field_from_contour,
+    )
+
+    dx, sponge, f0 = 0.0005, 60, _META_F0
+    gap, marg, front = (round(m / dx) for m in (0.030, 0.010, 0.020))
+    face_cells = round(5 * _META_PITCH / dx)
+    lat = marg + gap + sponge
+    nx = face_cells + 2 * lat
+    r_face = sponge + gap + front
+    slab = round(0.023 / dx)
+    ny = r_face + slab + marg + gap + sponge
+    mask = np.zeros((ny, nx), dtype=bool)
+    mask[r_face:r_face + slab, lat:lat + face_cells] = True
+    for n, (h, l_n, l_c, w_n, w_c) in enumerate(_METADIFFUSER_T1_ROWS):
+        x_slit = (n + 0.12) * _META_PITCH
+        c0s = lat + round(x_slit / dx)
+        c1s = lat + round((x_slit + h * 1e-3) / dx)
+        mask[r_face:r_face + round(0.02 / dx), c0s:c1s] = False
+        for m in range(2):
+            y_m = (m + 0.5) * 0.01
+            x_neck = x_slit + h * 1e-3
+            r0 = r_face + round((y_m - 0.5e-3 * w_n) / dx)
+            r1 = r_face + round((y_m + 0.5e-3 * w_n) / dx)
+            mask[r0:r1, c1s:lat + round((x_neck + l_n * 1e-3) / dx)] = False
+            r0 = r_face + round((y_m - 0.5e-3 * w_c) / dx)
+            r1 = r_face + round((y_m + 0.5e-3 * w_c) / dx)
+            mask[r0:r1, lat + round((x_neck + l_n * 1e-3) / dx):
+                 lat + round((x_neck + (l_n + l_c) * 1e-3) / dx)] = False
+    # cfl 0.9 trims the step count; at 340 cells per wavelength the
+    # numerical dispersion is negligible at any stable Courant number.
+    sim = FDTD2D(343.0, dx, shape=(ny, nx), sponge_width=sponge, cfl=0.9,
+                 obstacle_mask=mask)
+    sim.add_source(PlaneWaveSource("down", CWSource(0, 0, f0).value,
+                                   offset=sponge))
+    probe = sim.add_contour_probe(lat - marg, lat + face_cells + marg - 1,
+                                  r_face - front, r_face + slab + marg - 1,
+                                  frequencies=[f0])
+    sim.run(round(8e-3 / sim.dt))            # transient out (ramp + ring-up)
+    probe.reset()
+    sim.run(round(10.0 / f0 / sim.dt))       # ten whole periods of DFT
+    angles = np.arange(-90.0, 90.1, 5.0)
+    pattern = far_field_from_contour(
+        probe.phasors(f0), angles - 90.0,
+        origin=((lat + face_cells / 2.0) * dx, r_face * dx))
+    magnitude = np.abs(pattern)
+    levels = 20.0 * np.log10(np.maximum(magnitude / magnitude.max(), 1e-10))
+    return angles, levels
+
+
+def generate_metadiffuser_ntff_polar(output_dir: str) -> None:
+    """The meshed metadiffuser radiates the far field the model predicts.
+
+    Far-field polar response of the Table-1 metadiffuser at 2 kHz twice
+    over: the TMM + Fraunhofer prediction of the library and a full 2D
+    FDTD simulation of the meshed panel reduced through the
+    Kirchhoff-Helmholtz near-to-far-field integral. One concept: the
+    model chain is validated end to end by an independent full-wave
+    solver, the library-side counterpart of the paper's TMM-vs-FEM
+    cross-check.
+    """
+    print("Generating metadiffuser_ntff_polar...")
+    from phonometry import metadiffuser_polar_response
+
+    wells, depth, period = _qr_metadiffuser_wells()
+    model = metadiffuser_polar_response(
+        2000.0, wells, depth=depth, period=period, periods=1,
+    )
+    angles, levels = _meshed_metadiffuser_ntff_levels()
+    _fig, ax = plt.subplots(
+        figsize=(10, 6.2), subplot_kw={"projection": "polar"},
+    )
+    model.plot(
+        ax=ax, color=COLOR_PRIMARY, marker="", linewidth=1.6,
+        linestyle="--", label="TMM + Fraunhofer model", language=_LANG,
+    )
+    ax.plot(
+        np.radians(angles), levels, color=COLOR_SECONDARY, linewidth=2.2,
+        label="FDTD + NTFF, panel meshed at 0.5 mm",
+    )
+    ax.set_ylim(-40.0, 2.0)
+    ax.set_title(
+        "Far field of the meshed metadiffuser vs the model (2 kHz)",
+        pad=18, fontweight="bold",
+    )
+    ax.legend(loc="lower center", bbox_to_anchor=(0.5, -0.02), fontsize=9)
+    plt.tight_layout()
+    save_figure(output_dir, "metadiffuser_ntff_polar.svg")
+    plt.close()
+
+
 def generate_impedance_tube_geometry(output_dir: str) -> None:
     """To-scale side view of a 100 mm ISO 10534-2 impedance tube.
 
@@ -12130,6 +12243,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     # Slow-sound slit + Helmholtz-resonator perfect absorbers (Jimenez et al.)
     generate_metadiffuser_geometry,
     generate_metadiffuser_polar,
+    generate_metadiffuser_ntff_polar,
     generate_slow_sound_absorber,
     generate_slit_absorber_geometry,
     generate_helmholtz_resonator_geometry,
@@ -17331,6 +17445,7 @@ _GROUPED_FIGURES = frozenset(
         "tonality_roughness_demo",
         "moore_glasberg_time_loudness",
         "fluctuation_strength",
+        "metadiffuser_ntff_polar",
     }
 )
 
@@ -17340,6 +17455,7 @@ _GROUPED_FIGURES = frozenset(
 # lands at the tail and stretches the run; unlisted figures are treated as
 # fast and staleness is harmless.
 _FIGURE_WEIGHTS: dict[str, float] = {
+    "metadiffuser_ntff_polar": 260.0,
     "loudness_models_comparison": 25.5,
     "tonality_roughness_demo": 19.7,
     "sottek_specific_loudness": 4.1,

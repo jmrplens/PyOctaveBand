@@ -9,7 +9,7 @@ head:
     attrs:
       type: application/ld+json
     content: |
-      {"@context":"https://schema.org","@type":"Dataset","@id":"https://jmrplens.github.io/phonometry/reference/conformance/#dataset","name":"phonometry numerical conformance report","description":"427 numerical conformance checks pinning each implemented acoustic metric to a clause, table or worked example of the governing standard, with the normative expected value, the value phonometry computes, the delta and a pass/fail verdict, across 53 domains and 278 standards. Regenerated and enforced by CI on every pull request.","url":"https://jmrplens.github.io/phonometry/reference/conformance/","inLanguage":"en","license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"creator":{"@id":"https://jmrp.io/#person"},"publisher":{"@id":"https://jmrp.io/#person"},"about":{"@id":"https://github.com/jmrplens/phonometry#software"},"measurementTechnique":"Comparison of computed values against the normative expected values published in the governing standards (tolerance tables and worked examples).","variableMeasured":[{"@type":"PropertyValue","name":"Standard","description":"Governing standard and clause or table"},{"@type":"PropertyValue","name":"Quantity","description":"Acoustic quantity under test"},{"@type":"PropertyValue","name":"Expected","description":"Normative value published in the standard"},{"@type":"PropertyValue","name":"Computed","description":"Value computed by phonometry"},{"@type":"PropertyValue","name":"Delta","description":"Signed difference between computed and expected"},{"@type":"PropertyValue","name":"Status","description":"Pass or fail verdict against the standard's tolerance"}],"distribution":{"@type":"DataDownload","encodingFormat":"text/markdown","contentUrl":"https://raw.githubusercontent.com/jmrplens/phonometry/main/docs/CONFORMANCE.md"},"isBasedOn":"https://github.com/jmrplens/phonometry/blob/main/scripts/conformance_report.py","identifier":{"@type":"PropertyValue","propertyID":"DOI","value":"10.5281/zenodo.21215280"}}
+      {"@context":"https://schema.org","@type":"Dataset","@id":"https://jmrplens.github.io/phonometry/reference/conformance/#dataset","name":"phonometry numerical conformance report","description":"429 numerical conformance checks pinning each implemented acoustic metric to a clause, table or worked example of the governing standard, with the normative expected value, the value phonometry computes, the delta and a pass/fail verdict, across 53 domains and 279 standards. Regenerated and enforced by CI on every pull request.","url":"https://jmrplens.github.io/phonometry/reference/conformance/","inLanguage":"en","license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"creator":{"@id":"https://jmrp.io/#person"},"publisher":{"@id":"https://jmrp.io/#person"},"about":{"@id":"https://github.com/jmrplens/phonometry#software"},"measurementTechnique":"Comparison of computed values against the normative expected values published in the governing standards (tolerance tables and worked examples).","variableMeasured":[{"@type":"PropertyValue","name":"Standard","description":"Governing standard and clause or table"},{"@type":"PropertyValue","name":"Quantity","description":"Acoustic quantity under test"},{"@type":"PropertyValue","name":"Expected","description":"Normative value published in the standard"},{"@type":"PropertyValue","name":"Computed","description":"Value computed by phonometry"},{"@type":"PropertyValue","name":"Delta","description":"Signed difference between computed and expected"},{"@type":"PropertyValue","name":"Status","description":"Pass or fail verdict against the standard's tolerance"}],"distribution":{"@type":"DataDownload","encodingFormat":"text/markdown","contentUrl":"https://raw.githubusercontent.com/jmrplens/phonometry/main/docs/CONFORMANCE.md"},"isBasedOn":"https://github.com/jmrplens/phonometry/blob/main/scripts/conformance_report.py","identifier":{"@type":"PropertyValue","propertyID":"DOI","value":"10.5281/zenodo.21215280"}}
 ---
 
 phonometry's key differentiator is not the feature list but the proof behind
@@ -66,7 +66,7 @@ with its evidence and what the library does about it, is recorded in the
 
 ## Numerical conformance report
 
-&#9989; **427/427 conformance checks pass** across 53 domains and 278 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+&#9989; **429/429 conformance checks pass** across 53 domains and 279 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
 
@@ -833,12 +833,14 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary>&#9989; <b>2D FDTD wave simulation (Attenborough &amp; Van Renterghem 2021, Ch. 4)</b>: 100% (2/2)</summary>
+<summary>&#9989; <b>2D FDTD wave simulation (Attenborough &amp; Van Renterghem 2021, Ch. 4)</b>: 100% (4/4)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
 | Rigid rectangular box eigenfrequency | Mode (1,1) of a 1.0 x 0.7 m rigid box, f = (c/2)*sqrt(1/lx^2 + 1/ly^2), Hz | 299.06 Hz (+/-1.5 Hz) | 298.91 Hz | -0.153 Hz | &#9989; |
 | Free-field pulse arrival delay | Probe-to-probe delay of a pulse over 0.6 m of air, (r2 - r1)/c, ms | 1.749 ms (+/-0.05 ms) | 1.756 ms | 0.007 ms | &#9989; |
+| 2D Kirchhoff-Helmholtz NTFF: monopole directivity | Far-field pattern ripple of an enclosed line source, dB | 0 dB (+/-0.2 dB) | 0.044 dB | 0.044 dB | &#9989; |
+| 2D Kirchhoff-Helmholtz NTFF: monopole level | NTFF far-field level vs the 2D Green function A sqrt(2/(pi k)), dB | 0 dB (+/-0.3 dB) | 0.106 dB | 0.106 dB | &#9989; |
 
 </details>
 

@@ -255,6 +255,7 @@ export const apiSidebar = {
       collapsed: true,
       items: [
         'reference/api/simulation/fdtd',
+        'reference/api/simulation/ntff',
         'reference/api/simulation/elastic-fdtd',
       ],
     },

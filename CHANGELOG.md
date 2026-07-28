@@ -9,6 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- 2D near-to-far-field (NTFF) transformation for the FDTD solver.
+  `FDTD2D.add_contour_probe` captures the steady-state pressure and outward
+  normal-velocity phasors on a closed rectangular contour of cell faces with
+  on-the-fly DFT accumulators (continuous-wave runs store no time
+  histories), and `far_field_from_contour` (new `simulation/ntff.py`, with
+  the `ContourPhasors` carrier and its `subtract` method) evaluates the 2D
+  Kirchhoff-Helmholtz integral with the outgoing free-space Green function
+  `-(j/4) H0(2)(kR)`, either in the far-field limit or exactly at a finite
+  radius via `scipy.special.hankel2`. Validated against analytic
+  line-source oracles (omnidirectionality and absolute level of a monopole
+  against the 2D Green function, the antiphase-pair array factor, the
+  extinction of a non-enclosing contour) and end to end at 2 kHz against
+  the library's own far-field models: the meshed 27.4 cm quadratic-residue
+  diffuser against the Fraunhofer prediction, and the meshed Table-1
+  metadiffuser of Jiménez et al. (2017) against both that meshed QRD and
+  the TMM + Fraunhofer chain, the full-wave counterpart of the paper's
+  TMM-vs-FEM cross-check. Two new conformance checks (NTFF monopole
+  directivity and level), a new figure `metadiffuser_ntff_polar`, and a
+  "From the near field to the far field" section in the FDTD guide, in
+  English and Spanish.
+
 - `make lighthouse` (`site/scripts/lighthouse-audit.mjs`): Lighthouse over a
   fixed sample of built pages against a local preview server, with JSON
   reports under `site/lighthouse-results/` and a console summary listing the

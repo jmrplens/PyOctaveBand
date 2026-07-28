@@ -968,6 +968,7 @@ from .simulation.elastic_fdtd import (
 )
 from .simulation.fdtd import (
     FDTD2D,
+    ContourProbe,
     CWSource,
     FDTDResult,
     GaussianPulse,
@@ -975,6 +976,7 @@ from .simulation.fdtd import (
     SignalSource,
     fdtd_simulation,
 )
+from .simulation.ntff import ContourPhasors, far_field_from_contour
 from .underwater.acoustics import (
     UNDERWATER_REFERENCE_EXPOSURE,
     UNDERWATER_REFERENCE_PRESSURE,
@@ -1228,6 +1230,8 @@ __all__ = [
     "CalibrationWarning",
     "CepstrumResult",
     "CoherentOutputSpectrumResult",
+    "ContourPhasors",
+    "ContourProbe",
     "CorrelationResult",
     "CriticalCouplingResult",
     "CrossSpectralDensityResult",
@@ -1612,6 +1616,7 @@ __all__ = [
     "facade_shape_level_difference",
     "facade_sound_reduction",
     "face_quantities",
+    "far_field_from_contour",
     # 2D FDTD wave simulation
     "fdtd_simulation",
     "field_incidence_correction",

@@ -19,6 +19,7 @@ from .elastic_fdtd import (
 )
 from .fdtd import (
     FDTD2D,
+    ContourProbe,
     CWSource,
     FDTDResult,
     GaussianPulse,
@@ -26,6 +27,7 @@ from .fdtd import (
     SignalSource,
     fdtd_simulation,
 )
+from .ntff import ContourPhasors, far_field_from_contour
 
 __all__ = [
     "AIR",
@@ -35,6 +37,8 @@ __all__ = [
     "STEEL",
     "WATER",
     "CWSource",
+    "ContourPhasors",
+    "ContourProbe",
     "ElasticFDTD2D",
     "ElasticFDTDResult",
     "ExplosionSource",
@@ -45,6 +49,7 @@ __all__ = [
     "PlaneWaveSource",
     "SignalSource",
     "elastic_fdtd_simulation",
+    "far_field_from_contour",
     "fdtd_simulation",
     "scholte_speed",
 ]
