@@ -9496,10 +9496,11 @@ def generate_elastic_halfspace_waves(output_dir: str) -> None:
     c_p, c_s, rho, dx = 6320.0, 3130.0, 2700.0, 0.001
     width = 8e-6
     duration = 7.3e-5
-    dt = 0.6 * dx / (c_p * np.sqrt(2.0))
+    cfl = 0.6
+    dt = cfl * dx / (c_p * np.sqrt(2.0))
     steps = round(duration / dt)
     res = elastic_fdtd_simulation(
-        c_p, c_s, dx, duration, rho=rho, shape=(300, 600),
+        c_p, c_s, dx, duration, rho=rho, shape=(300, 600), cfl=cfl,
         sources=[ForceSource(ix=300, iy=0, direction="y", amplitude=1e6,
                              waveform=GaussianPulse(0, 0, width=width).value)],
         boundaries={"top": "free"},

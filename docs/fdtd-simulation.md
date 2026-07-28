@@ -441,8 +441,10 @@ injection) and `ForceSource` (a directional body force) as sources, probes
 that record ``p``, ``vx`` or ``vy``, the same sponge and obstacle
 machinery, and a frozen `ElasticFDTDResult` with the same `.plot()`. The
 Courant bound depends only on the fastest ``c_P`` in the map (Virieux
-Eqs. 6-7), while the resolution rule uses the slowest ``c_S``, because the
-S wavelength is always the shortest: ``dx <= c_s_min / (10 f)``.
+Eqs. 6-7), while the resolution rule uses the slowest non-zero ``c_S`` of
+the solid cells, because the S wavelength is always the shortest:
+``dx <= c_s_min / (10 f)`` (a wholly fluid map falls back to the acoustic
+rule on the slowest ``c_P``).
 
 ```python
 import numpy as np

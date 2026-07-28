@@ -18,6 +18,9 @@ if TYPE_CHECKING:
     from ..simulation.elastic_fdtd import ElasticFDTDResult
     from ..simulation.fdtd import FDTDResult
 
+_TIME_LABEL = "Time [ms]"
+_VELOCITY_LABEL = "Particle velocity [m/s]"
+
 #: Spanish translations of the fixed strings rendered by the simulation
 #: ``.plot()`` renderers, keyed by their verbatim English text. ``_t``
 #: returns the English key unchanged for any language other than ``"es"``,
@@ -43,8 +46,8 @@ _STRINGS: dict[str, str] = {
 #: Colorbar label of each elastic snapshot field.
 _ELASTIC_FIELD_LABELS = {
     "p": "Pressure [Pa]",
-    "vx": "Particle velocity [m/s]",
-    "vy": "Particle velocity [m/s]",
+    "vx": _VELOCITY_LABEL,
+    "vy": _VELOCITY_LABEL,
 }
 
 #: Snapshot title of each elastic snapshot field.
@@ -172,7 +175,7 @@ def plot_fdtd_probes(
         ax, t_ms,
         [result.pressures[k] for k in range(result.pressures.shape[0])],
         _probe_labels(result.probe_positions, language),
-        xlabel=_t("Time [ms]", language),
+        xlabel=_t(_TIME_LABEL, language),
         ylabel=_t("Pressure [Pa]", language),
         title=_t("FDTD probe pressure", language),
         language=language, **kwargs,
@@ -256,13 +259,15 @@ def plot_elastic_probes(
         for j, field in enumerate(result.probe_fields):
             traces.append(result.signals[k, j])
             labels.append(f"{field}, {base[k]}" if many else base[k])
-    velocities = set(result.probe_fields) <= {"vx", "vy"}
-    ylabel = ("Particle velocity [m/s]" if velocities
-              else "Pressure [Pa]" if result.probe_fields == ("p",)
-              else "Signal [Pa, m/s]")
+    if set(result.probe_fields) <= {"vx", "vy"}:
+        ylabel = _VELOCITY_LABEL
+    elif result.probe_fields == ("p",):
+        ylabel = "Pressure [Pa]"
+    else:
+        ylabel = "Signal [Pa, m/s]"
     return _render_probe_lines(
         ax, t_ms, traces, labels,
-        xlabel=_t("Time [ms]", language),
+        xlabel=_t(_TIME_LABEL, language),
         ylabel=_t(ylabel, language),
         title=_t("Elastic FDTD probe signals", language),
         language=language, **kwargs,

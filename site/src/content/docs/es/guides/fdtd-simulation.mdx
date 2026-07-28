@@ -517,8 +517,10 @@ pieza: mapas de velocidades `c_p` y `c_s` (más `rho`) en lugar de `c`,
 ``p``, ``vx`` o ``vy``, la misma maquinaria de esponjas y obstáculos, y un
 `ElasticFDTDResult` congelado con el mismo `.plot()`. La cota de Courant
 depende solo de la ``c_P`` más rápida del mapa (Virieux, Ecs. 6-7),
-mientras que la regla de resolución usa la ``c_S`` más lenta, porque la
-longitud de onda S es siempre la más corta: ``dx <= c_s_min / (10 f)``.
+mientras que la regla de resolución usa la ``c_S`` no nula más lenta de
+las celdas sólidas, porque la longitud de onda S es siempre la más corta:
+``dx <= c_s_min / (10 f)`` (un mapa completamente fluido recae en la regla
+acústica sobre la ``c_P`` más lenta).
 
 ```python
 import numpy as np

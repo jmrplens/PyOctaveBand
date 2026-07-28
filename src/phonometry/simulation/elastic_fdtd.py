@@ -432,23 +432,36 @@ class ElasticFDTD2D:
         staggered velocity node. Positions are validated against the grid
         and the obstacle mask.
         """
-        ny, nx = self.txx.shape
         ix = _integer("source ix", source.ix)
         iy = _integer("source iy", source.iy)
         if isinstance(source, ExplosionSource):
-            if not (0 <= ix < nx and 0 <= iy < ny):
-                raise ValueError("source position lies outside the grid")
-            if self._obstacle is not None and self._obstacle[iy, ix]:
-                raise ValueError("source position lies inside an obstacle")
+            self._validate_explosion_position(ix, iy)
         else:
-            open_map = (self._vx_open if source.direction == "x"
-                        else self._vy_open)
-            limit = (ny, nx - 1) if source.direction == "x" else (ny - 1, nx)
-            if not (0 <= ix < limit[1] and 0 <= iy < limit[0]):
-                raise ValueError("source position lies outside the grid")
-            if open_map is not None and open_map[iy, ix] == 0.0:
-                raise ValueError("source position lies inside an obstacle")
+            self._validate_force_position(source, ix, iy)
         self._sources.append(source)
+
+    def _validate_explosion_position(self, ix: int, iy: int) -> None:
+        """Check an explosion cell against the grid and the obstacle mask."""
+        ny, nx = self.txx.shape
+        if not (0 <= ix < nx and 0 <= iy < ny):
+            raise ValueError("source position lies outside the grid")
+        if self._obstacle is not None and self._obstacle[iy, ix]:
+            raise ValueError("source position lies inside an obstacle")
+
+    def _validate_force_position(self, source: ForceSource, ix: int,
+                                 iy: int) -> None:
+        """Check a force velocity node against the grid and the obstacle."""
+        ny, nx = self.txx.shape
+        open_map = (self._vx_open if source.direction == "x"
+                    else self._vy_open)
+        limit = (ny, nx - 1) if source.direction == "x" else (ny - 1, nx)
+        if not (0 <= ix < limit[1] and 0 <= iy < limit[0]):
+            raise ValueError("source position lies outside the grid")
+        # The open map holds exact 0.0/1.0 factors cast from booleans:
+        # exact zero marks a face closed by the obstacle mask (<= avoids
+        # the float-equality lint without changing the semantics).
+        if open_map is not None and open_map[iy, ix] <= 0.0:
+            raise ValueError("source position lies inside an obstacle")
 
     def step(self) -> None:
         """Advance the leapfrog scheme by one time step (Virieux Eq. 5)."""
@@ -467,7 +480,7 @@ class ElasticFDTD2D:
         t_half = (self.n + 0.5) * self.dt
         for src in self._sources:
             if isinstance(src, ForceSource):
-                self._inject_force(src, t_half, dt_dx)
+                self._inject_force(src, t_half)
         self.vx *= self._decay_vx
         self.vy *= self._decay_vy
         # Stress step from the velocity gradients (Hooke's law in rate
@@ -599,8 +612,7 @@ class ElasticFDTD2D:
                     self.txx[r, c] = 0.0
                     self.tyy[r, c] = 0.0
 
-    def _inject_force(self, src: ForceSource, t: float,
-                      dt_dx: float) -> None:
+    def _inject_force(self, src: ForceSource, t: float) -> None:
         """Add one body-force increment to the target velocity node."""
         f = src.amplitude * src.waveform(t)
         if src.direction == "x":
@@ -873,8 +885,10 @@ def elastic_fdtd_simulation(
     The grid covers ``(nx * dx, ny * dx)`` metres; a cell index ``(ix, iy)``
     maps to the physical cell centre ``((ix + 0.5) * dx, (iy + 0.5) * dx)``.
     Resolve at least 10 cells per shortest wavelength
-    (``dx <= c_s_min / (10 f)`` over the solid cells, since the S wave is
-    always the shortest; Virieux's rule from the dispersion relations
+    (``dx <= c_s_min / (10 f)`` with ``c_s_min`` the smallest non-zero
+    ``c_s`` over the solid cells, since the S wave is always the shortest;
+    a wholly fluid map falls back to the acoustic rule on the smallest
+    ``c_p``; Virieux's rule from the dispersion relations
     Eqs. 13-14), and 15-20 cells per wavelength when a Rayleigh wave along a
     free surface matters, the second-order stress-imaging surface being the
     most dispersive part of the scheme. The simulation is 2D (plane strain):

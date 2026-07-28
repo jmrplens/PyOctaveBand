@@ -425,21 +425,26 @@ def test_source_validation() -> None:
                         obstacle_mask=mask)
     with pytest.raises(ValueError, match="direction must be"):
         ForceSource(ix=1, iy=1, direction="z", waveform=lambda t: 0.0)
+    # Built up front so each raises block holds a single throwing call.
+    explosion_off_grid = ExplosionSource(ix=20, iy=1, waveform=lambda t: 0.0)
+    force_off_grid = ForceSource(ix=19, iy=1, direction="x",
+                                 waveform=lambda t: 0.0)
+    explosion_in_obstacle = ExplosionSource(ix=9, iy=9,
+                                            waveform=lambda t: 0.0)
+    force_in_obstacle = ForceSource(ix=9, iy=9, direction="y",
+                                    waveform=lambda t: 0.0)
+    explosion_bad_ix = ExplosionSource(ix=1.5, iy=1,  # type: ignore[arg-type]
+                                       waveform=lambda t: 0.0)
     with pytest.raises(ValueError, match="outside the grid"):
-        sim.add_source(ExplosionSource(ix=20, iy=1,
-                                       waveform=lambda t: 0.0))
+        sim.add_source(explosion_off_grid)
     with pytest.raises(ValueError, match="outside the grid"):
-        sim.add_source(ForceSource(ix=19, iy=1, direction="x",
-                                   waveform=lambda t: 0.0))
+        sim.add_source(force_off_grid)
     with pytest.raises(ValueError, match="inside an obstacle"):
-        sim.add_source(ExplosionSource(ix=9, iy=9,
-                                       waveform=lambda t: 0.0))
+        sim.add_source(explosion_in_obstacle)
     with pytest.raises(ValueError, match="inside an obstacle"):
-        sim.add_source(ForceSource(ix=9, iy=9, direction="y",
-                                   waveform=lambda t: 0.0))
+        sim.add_source(force_in_obstacle)
     with pytest.raises(ValueError, match="source ix must be an integer"):
-        sim.add_source(ExplosionSource(ix=1.5, iy=1,  # type: ignore[arg-type]
-                                       waveform=lambda t: 0.0))
+        sim.add_source(explosion_bad_ix)
 
 
 @pytest.mark.parametrize(
@@ -583,6 +588,17 @@ def test_plot_snapshot(small_result: ElasticFDTDResult) -> None:
     np.testing.assert_allclose(np.asarray(images[0].get_array()),
                                small_result.snapshots[-1])
     assert "vy" in ax.get_title()
+    plt.close(ax.figure)
+
+
+def test_plot_localizes_labels(small_result: ElasticFDTDResult) -> None:
+    ax = small_result.plot(language="es")
+    assert ax.get_xlabel() == "Tiempo [ms]"
+    assert ax.get_title() == "Señales en las sondas del FDTD elástico"
+    plt.close(ax.figure)
+
+    ax = small_result.plot(kind="snapshot", language="es")
+    assert ax.get_title().startswith("Campo de vy del FDTD elástico")
     plt.close(ax.figure)
 
 

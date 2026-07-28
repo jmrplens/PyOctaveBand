@@ -93,8 +93,10 @@ each time step and, optionally, full-field snapshots.
 The grid covers `(nx * dx, ny * dx)` metres; a cell index `(ix, iy)`
 maps to the physical cell centre `((ix + 0.5) * dx, (iy + 0.5) * dx)`.
 Resolve at least 10 cells per shortest wavelength
-(`dx <= c_s_min / (10 f)` over the solid cells, since the S wave is
-always the shortest; Virieux's rule from the dispersion relations
+(`dx <= c_s_min / (10 f)` with `c_s_min` the smallest non-zero
+`c_s` over the solid cells, since the S wave is always the shortest;
+a wholly fluid map falls back to the acoustic rule on the smallest
+`c_p`; Virieux's rule from the dispersion relations
 Eqs. 13-14), and 15-20 cells per wavelength when a Rayleigh wave along a
 free surface matters, the second-order stress-imaging surface being the
 most dispersive part of the scheme. The simulation is 2D (plane strain):
