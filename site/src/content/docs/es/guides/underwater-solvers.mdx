@@ -128,8 +128,9 @@ $$
 \qquad \Psi_m(0) = 0,
 $$
 
-con superficie de presión-liberada en $z = 0$ y fondo de presión-liberada o
-rígido. Cada autofunción $\Psi_m(z)$ es una onda estacionaria en
+con superficie de presión-liberada en $z = 0$ y, en el fondo $z = D$,
+$\Psi(D) = 0$ para un lecho de presión-liberada o $d\Psi/dz|_{D} = 0$
+para uno rígido. Cada autofunción $\Psi_m(z)$ es una onda estacionaria en
 profundidad que viaja en distancia como $e^{\,i k_{rm} r}$ con su propio
 número de onda horizontal $k_{rm}$; solo **propagan** los modos con
 $k_{rm}$ real, el resto son evanescentes y se extinguen al cabo de unas
@@ -235,7 +236,8 @@ $$
 \qquad n(z) = \frac{c_0}{c(z)} .
 $$
 
-El algoritmo **split-step de Fourier** la marcha exactamente en dos
+El algoritmo **split-step de Fourier** la marcha por descomposición de
+operadores, alternando dos
 semipasos físicos alternados: la difracción es una multiplicación por
 $e^{-i k_z^2 \Delta r / 2 k_0}$ en el dominio del número de onda vertical,
 y la refracción una pantalla de fase $e^{\,i k_0 (n^2 - 1) \Delta r / 2}$

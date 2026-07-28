@@ -19,8 +19,8 @@ equivalente de ISO 17208-2 mediante la corrección de superficie del espejo
 de Lloyd, y el hincado percusivo de pilotes, con la exposición sonora de un
 golpe, de pico y acumulada de ISO 18406.
 
-La mitad de **camino** abarca ahora dos páginas.
-[Propagación submarina del sonido](/phonometry/es/guides/underwater-propagation/)
+La mitad de **camino** abarca ahora dos páginas. La primera,
+[Propagación submarina del sonido](/phonometry/es/guides/underwater-propagation/),
 predice lo que el mar hace con ese sonido en forma cerrada: divergencia
 geométrica más absorción volumétrica (Francois-Garrison, Ainslie-McColm o
 Thorp), la velocidad del sonido en agua de mar por tres formulaciones, las

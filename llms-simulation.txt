@@ -996,10 +996,12 @@ injection) and `ForceSource` (a directional body force) as sources, probes
 that record ``p``, ``vx`` or ``vy``, the same sponge and obstacle
 machinery, and a frozen `ElasticFDTDResult` with the same `.plot()`. The
 Courant bound depends only on the fastest ``c_P`` in the map (Virieux
-Eqs. 6-7), while the resolution rule uses the slowest non-zero ``c_S`` of
-the solid cells, because the S wavelength is always the shortest:
-``dx <= c_s_min / (10 f)`` (a wholly fluid map falls back to the acoustic
-rule on the slowest ``c_P``).
+Eqs. 6-7), while the resolution rule uses the slowest wave speed anywhere
+in the domain -- the slowest non-zero ``c_S`` of the solid cells or, if a
+fluid region carries a still slower ``c_P``, that fluid speed:
+``dx <= c_min / (10 f)`` (in a wholly solid map the S wavelength is always
+the shortest; in mixed domains the fluid P wavelength can be shorter, as
+in water at 1480 m/s over a 2000 m/s-shear sediment).
 
 ```python
 import numpy as np
@@ -1258,9 +1260,9 @@ stepping cost.
 
 ### What grid resolution does an elastic simulation need?
 
-Resolve at least 10 cells per shortest wavelength using the slowest
-non-zero shear speed, ``dx <= c_s_min / (10 f)``, because the S wavelength
-is always the shortest. Allow 15-20 cells per wavelength along free
+Resolve at least 10 cells per shortest wavelength using the slowest wave
+speed in the domain -- the slowest non-zero shear speed or a slower fluid
+sound speed if one is present -- ``dx <= c_min / (10 f)``. Allow 15-20 cells per wavelength along free
 surfaces (the stress-imaging boundary is the most dispersive part of the
 scheme), and at least 15 points per wavelength when an interface wave has
 to be timed (van Vossen et al. 2002).
@@ -1274,9 +1276,9 @@ the exact characteristic equation (Brekhovskikh & Godin Eq. 4.4.20,
 `scholte_speed`) and always lies below both the fluid sound speed and the
 solid shear speed: 0.03 % below the water speed (1480 m/s) over steel
 (1479.6 m/s),
-but 4 % below it over a soft sediment (1436 m/s for water over a
-3500/2000/2500 bed), which is why seabed interface waves probe the
-sediment shear stiffness.
+but 4 % below the 1500 m/s ocean water of the sediment example (1436 m/s
+for that water over a 3500/2000/2500 bed), which is why seabed interface
+waves probe the sediment shear stiffness.
 
 ## See also
 

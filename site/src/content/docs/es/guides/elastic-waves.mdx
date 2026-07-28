@@ -107,10 +107,13 @@ pieza: mapas de velocidades `c_p` y `c_s` (más `rho`) en lugar de `c`,
 ``p``, ``vx`` o ``vy``, la misma maquinaria de esponjas y obstáculos, y un
 `ElasticFDTDResult` congelado con el mismo `.plot()`. La cota de Courant
 depende solo de la ``c_P`` más rápida del mapa (Virieux, Ecs. 6-7),
-mientras que la regla de resolución usa la ``c_S`` no nula más lenta de
-las celdas sólidas, porque la longitud de onda S es siempre la más corta:
-``dx <= c_s_min / (10 f)`` (un mapa completamente fluido recae en la regla
-acústica sobre la ``c_P`` más lenta).
+mientras que la regla de resolución usa la velocidad de onda más lenta de
+todo el dominio: la ``c_S`` no nula más lenta de las celdas sólidas o, si
+una región fluida lleva una ``c_P`` aún más lenta, esa velocidad del
+fluido: ``dx <= c_min / (10 f)`` (en un mapa completamente sólido la
+longitud de onda S es siempre la más corta; en dominios mixtos la longitud
+de onda P del fluido puede ser más corta, como en agua a 1480 m/s sobre un
+sedimento con cizalla de 2000 m/s).
 
 ```python
 import numpy as np
@@ -426,9 +429,10 @@ avance temporal.
 
 ### ¿Qué resolución de malla necesita una simulación elástica?
 
-Resuelva al menos 10 celdas por longitud de onda más corta con la velocidad
-de cizalla no nula más lenta, ``dx <= c_s_min / (10 f)``, porque la
-longitud de onda S es siempre la más corta. Reserve 15-20 celdas por
+Resuelva al menos 10 celdas por longitud de onda más corta con la
+velocidad de onda más lenta del dominio, la de cizalla no nula más lenta o
+una velocidad del sonido de fluido aún más lenta si la hay:
+``dx <= c_min / (10 f)``. Reserve 15-20 celdas por
 longitud de onda a lo largo de superficies libres (el contorno de imagen de
 esfuerzos es la parte más dispersiva del esquema), y al menos 15 puntos por
 longitud de onda cuando haya que cronometrar una onda de interfase
@@ -444,6 +448,7 @@ homogéneos. Su velocidad resuelve la ecuación característica exacta
 debajo de la velocidad del sonido en el fluido y de la de cizalla del
 sólido: un 0,03 % por debajo de la del agua (1480 m/s) sobre acero
 (1479,6 m/s), pero
-un 4 % por debajo sobre un sedimento blando (1436 m/s para agua sobre un
-lecho 3500/2000/2500), y por eso las ondas de interfase del lecho marino
-sondean la rigidez a cizalla del sedimento.
+un 4 % por debajo de los 1500 m/s del agua oceánica del ejemplo de
+sedimento (1436 m/s para esa agua sobre un lecho 3500/2000/2500), y por
+eso las ondas de interfase del lecho marino sondean la rigidez a cizalla
+del sedimento.

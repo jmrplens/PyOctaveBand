@@ -834,8 +834,9 @@ $$
 \qquad \Psi_m(0) = 0,
 $$
 
-with a pressure-release surface at $z = 0$ and a pressure-release or rigid
-bottom. Each eigenfunction $\Psi_m(z)$ is a standing wave in depth that
+with a pressure-release surface at $z = 0$ and, at the bottom $z = D$,
+$\Psi(D) = 0$ for a pressure-release bed or $d\Psi/dz|_{D} = 0$ for a
+rigid one. Each eigenfunction $\Psi_m(z)$ is a standing wave in depth that
 travels in range as $e^{\,i k_{rm} r}$ with its own horizontal wavenumber
 $k_{rm}$; only the modes with real $k_{rm}$ **propagate**, the rest are
 evanescent and die within a few water depths. The field is the modal sum
@@ -937,7 +938,8 @@ $$
 \qquad n(z) = \frac{c_0}{c(z)} .
 $$
 
-The **split-step Fourier** algorithm marches it exactly in two alternating
+The **split-step Fourier** algorithm marches it by operator splitting,
+alternating two individually exact
 half-physics steps: diffraction is a multiplication by
 $e^{-i k_z^2 \Delta r / 2 k_0}$ in the vertical-wavenumber domain, and
 refraction a phase screen $e^{\,i k_0 (n^2 - 1) \Delta r / 2}$ back in
