@@ -1,6 +1,6 @@
 ---
 title: "Guías"
-description: "Las 68 guías de phonometry, agrupadas en las nueve áreas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
+description: "Las 71 guías de phonometry, agrupadas en las nueve áreas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
 head:
   - tag: script
     attrs:
@@ -41,7 +41,7 @@ head:
             "@type": "ListItem",
             "position": 4,
             "name": "Materiales y superficies",
-            "description": "Absorción, resistencia al flujo de aire, tubo de impedancia, modelos porosos, dispersión.",
+            "description": "Absorción, resistencia al flujo de aire, tubo de impedancia, modelos porosos y de metamaterial, difusores, dispersión.",
             "url": "https://jmrplens.github.io/phonometry/es/guides/sections/materials-surfaces/"
           },
           {
@@ -288,11 +288,11 @@ ISO 10052 y ANSI/ASA S12.2.
 
 ## [Materiales y superficies](/phonometry/es/guides/sections/materials-surfaces/)
 
-Absorción, resistencia al flujo de aire, tubo de impedancia, modelos porosos y
-dispersión. Qué le hace una superficie al sonido que le llega, medido en
-laboratorio o predicho a partir de los parámetros del material. Implementa
-ISO 354, ISO 11654, ISO 10534-2, ISO 9053, ISO 17497-1/-2, ISO 13472 y
-EN 29052.
+Absorción, resistencia al flujo de aire, tubo de impedancia, modelos porosos
+y de metamaterial, difusores y dispersión. Qué le hace una superficie al
+sonido que le llega, medido en laboratorio o predicho a partir de los
+parámetros del material. Implementa ISO 354, ISO 11654, ISO 10534-2,
+ISO 9053, ISO 17497-1/-2, ISO 13472 y EN 29052.
 
 - [Medida y clasificación de la absorción sonora](/phonometry/es/guides/absorption-measurement/):
   la medición en cámara reverberante ISO 354, la valoración ponderada con su
@@ -307,9 +307,20 @@ EN 29052.
   modelos de Delany-Bazley, Miki y Johnson-Champoux-Allard, el solver multicapa
   por matriz de transferencia con capas perforadas, microperforadas y de
   membrana, y la integral de incidencia aleatoria.
-- [Dispersión superficial, difusión y absorción in situ](/phonometry/es/guides/surface-scattering/):
-  el coeficiente de dispersión de incidencia aleatoria, el coeficiente de
-  difusión por autocorrelación y la absorción in situ de firmes de carretera.
+- [Metaabsorbentes](/phonometry/es/guides/metamaterial-absorbers/): la
+  condición de acoplamiento crítico para la absorción perfecta y el panel
+  ranurado de sonido lento cargado con resonadores de Helmholtz, con su
+  solucionador de diseño.
+- [Difusores y sus coeficientes](/phonometry/es/guides/diffusers/): el
+  coeficiente de dispersión de incidencia aleatoria, el coeficiente de
+  difusión por autocorrelación y el diseño de Schroeder con su predicción en
+  campo lejano.
+- [Metadifusores](/phonometry/es/guides/metadiffusers/): difusores de
+  Schroeder en sublongitud de onda profunda a partir de rendijas cargadas con
+  resonadores, sonido lento y secuencias ternarias.
+- [Absorción in situ de firmes de carretera](/phonometry/es/guides/road-absorption/):
+  la absorción in situ de pavimentos por la técnica de sustracción y el
+  método puntual.
 
 ## [Vibración y ruido estructural](/phonometry/es/guides/sections/vibration/)
 

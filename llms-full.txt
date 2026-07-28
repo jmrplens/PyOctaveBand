@@ -92,7 +92,10 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Airflow Resistance](https://jmrplens.github.io/phonometry/guides/airflow-resistance/)
 - [Impedance Tube](https://jmrplens.github.io/phonometry/guides/impedance-tube/)
 - [Porous and Multilayer Absorbers](https://jmrplens.github.io/phonometry/guides/porous-absorbers/)
-- [Surface Scattering, Diffusion and In-situ Absorption](https://jmrplens.github.io/phonometry/guides/surface-scattering/)
+- [Metamaterial Absorbers](https://jmrplens.github.io/phonometry/guides/metamaterial-absorbers/)
+- [Diffusers and Their Coefficients](https://jmrplens.github.io/phonometry/guides/diffusers/)
+- [Metadiffusers](https://jmrplens.github.io/phonometry/guides/metadiffusers/)
+- [In-situ Road-Surface Absorption](https://jmrplens.github.io/phonometry/guides/road-absorption/)
 
 ## Vibration and structure-borne sound
 
@@ -179,6 +182,7 @@ One file per area, each small enough to fetch whole. `llms-full.txt` is the comp
 - [Absorbers](https://jmrplens.github.io/phonometry/llms-absorbers.txt)
 - [Aircraft wind](https://jmrplens.github.io/phonometry/llms-aircraft-wind.txt)
 - [Calibration uncertainty](https://jmrplens.github.io/phonometry/llms-calibration-uncertainty.txt)
+- [Diffusion surfaces](https://jmrplens.github.io/phonometry/llms-diffusion-surfaces.txt)
 - [Hearing exposure](https://jmrplens.github.io/phonometry/llms-hearing-exposure.txt)
 - [Human vibration](https://jmrplens.github.io/phonometry/llms-human-vibration.txt)
 - [Levels weighting](https://jmrplens.github.io/phonometry/llms-levels-weighting.txt)
@@ -191,7 +195,6 @@ One file per area, each small enough to fetch whole. `llms-full.txt` is the comp
 - [Speech](https://jmrplens.github.io/phonometry/llms-speech.txt)
 - [Structure borne](https://jmrplens.github.io/phonometry/llms-structure-borne.txt)
 - [Core signal analysis](https://jmrplens.github.io/phonometry/llms-core-signal-analysis.txt)
-- [Materials and surfaces](https://jmrplens.github.io/phonometry/llms-materials-surfaces.txt)
 - [Underwater acoustics](https://jmrplens.github.io/phonometry/llms-underwater.txt)
 - [Sources and devices](https://jmrplens.github.io/phonometry/llms-sources-devices.txt)
 - [Wave simulation](https://jmrplens.github.io/phonometry/llms-simulation.txt)
@@ -1623,7 +1626,7 @@ will be trusted quantitatively.
 
 The number also travels beyond the porous models. The perforated-panel and
 microperforated-panel impedances contain the same viscous physics evaluated
-in a single hole; the [slit absorber](https://jmrplens.github.io/phonometry/guides/porous-absorbers/) inherits it per
+in a single hole; the [slit absorber](https://jmrplens.github.io/phonometry/guides/metamaterial-absorbers/) inherits it per
 slit; and when an [impedance tube](https://jmrplens.github.io/phonometry/guides/impedance-tube/) measurement disagrees
 with a model prediction, the first parameter to re-measure, before touching
 the model, is $\sigma$.
@@ -4746,6 +4749,664 @@ conscience.
   [doi:10.1002/j.1538-7305.1945.tb00453.x](https://doi.org/10.1002/j.1538-7305.1945.tb00453.x).
   The original level-crossing and peak derivations (Parts I-II are in
   volume 23, 1944).
+
+---
+
+
+<!-- source: docs/diffusers.md | canonical: https://jmrplens.github.io/phonometry/guides/diffusers/ -->
+Source: https://jmrplens.github.io/phonometry/guides/diffusers/
+
+# Diffusers and Their Coefficients
+
+A diffuser is judged by where it sends the sound it reflects, and two
+standardised coefficients grade that job from two different angles. The
+**scattering coefficient** $s$ (ISO 17497-1) is measured in a reverberation
+room and does energy bookkeeping: what fraction of the reflected energy leaves
+the specular direction. The **diffusion coefficient** $d$ (ISO 17497-2) is
+measured on a free-field goniometer and grades spatial quality: how evenly the
+reflected energy covers a polar arc of receivers. This guide covers both
+measurements, the prediction of the diffusion coefficient from a Schroeder
+diffuser design before a sample is built, and the recurring confusion between
+the two coefficients.
+
+The two coefficients answer different questions and are not interchangeable:
+scattering is *how much* energy leaves the specular direction; diffusion is
+*how evenly* the reflected energy is spread over angle. The
+[closing section](#scattering-or-diffusion-two-coefficients-two-jobs) makes
+the distinction precise. The deep-subwavelength relatives of the Schroeder
+designs treated here, panels a few centimetres thick that scatter like wells
+tens of centimetres deep, have their own guide:
+[Metadiffusers](https://jmrplens.github.io/phonometry/guides/metadiffusers/).
+
+## 1. Random-incidence scattering coefficient (ISO 17497-1)
+
+The scattering coefficient $s$ is the fraction of reflected energy that does
+**not** leave the surface in the specular direction. ISO 17497-1 measures it in a
+reverberation room from four reverberation-time situations: with the test sample
+mounted on a turntable and held **stationary**, and with the turntable
+**rotating** (which averages the phase-coherent specular reflection away), each
+with and without a reflecting base plate.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_scattering_reverb_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_scattering_reverb.svg" alt="ISO 17497-1 random-incidence scattering setup: a reverberation room with the test sample on a turntable, a rotating loudspeaker boom and a microphone, measuring reverberation time with the sample stationary (giving the random-incidence absorption) and rotating (giving the specular absorption), from which the scattering coefficient is derived" width="92%"></picture>
+
+**Absorption from reverberation time (Clause 6).** Each situation converts to a
+Sabine absorption coefficient with the standard's own air-attenuation term:
+
+$$
+\alpha = 55.3\,\frac{V}{S}\left(\frac{1}{c_2 T_2} - \frac{1}{c_1 T_1}\right)
+        - 4\,\frac{V}{S}\,(m_2 - m_1),
+$$
+
+where $V$ is the room volume, $S$ the sample area, $T$ the reverberation time,
+$c$ the speed of sound (Eq. (2): $c = 343.2\sqrt{(273.15+t)/293.15}$) and $m$ the
+power attenuation coefficient of air. The **stationary** pair gives the
+random-incidence absorption $\alpha_s$ (Eq. (1)); the **rotating** pair gives the
+specular absorption $\alpha_{spec}$ (Eq. (4)).
+
+**Scattering coefficient (Eq. (5)).** The two combine into
+
+$$
+s = \frac{\alpha_{spec} - \alpha_s}{1 - \alpha_s}.
+$$
+
+A fully specular surface reflects all its non-absorbed energy in the specular
+direction, so $\alpha_{spec} = \alpha_s$ and $s = 0$; a strong diffuser sends
+energy everywhere, raising $\alpha_{spec}$ towards 1 and $s$ towards 1.
+
+```python
+from phonometry import materials
+
+# Four reverberation-time situations reduced to two absorption coefficients.
+# alpha_s from the stationary pair (Eq. 1); alpha_spec from the rotating pair
+# (Eq. 4). V = 200 m^3, S = 10 m^2, c = 343.2 m/s throughout.
+alpha_s = materials.random_incidence_absorption(200.0, 10.0, c1=343.2, T1=8.0,
+                                         c2=343.2, T2=6.0)
+alpha_spec = materials.specular_absorption_coefficient(200.0, 10.0, c3=343.2, T3=7.5,
+                                                c4=343.2, T4=5.0)
+s = materials.scattering_coefficient(alpha_spec, alpha_s)   # Eq. (5)
+print(round(float(alpha_s), 4))     # 0.1343
+print(round(float(alpha_spec), 4))  # 0.2148
+print(round(float(s), 4))           # 0.0931
+```
+
+Over a full one-third-octave measurement, `scattering_coefficient_spectrum`
+pairs the per-band $\alpha_{spec}$ and $\alpha_s$ with their band centres and
+returns a plottable `ScatteringResult`:
+
+```python
+import numpy as np
+from phonometry import materials
+
+# A 13-band measurement (250-4000 Hz): the random-incidence absorption alpha_s
+# (stationary sample) and the specular absorption alpha_spec (rotating
+# turntable). A diffuser scatters more with frequency, so s(f) rises.
+freqs = np.array([250, 315, 400, 500, 630, 800, 1000,
+                  1250, 1600, 2000, 2500, 3150, 4000], float)
+alpha_s = np.full_like(freqs, 0.10)
+alpha_spec = 0.11 + 0.75 * (np.log10(freqs / 250) / np.log10(4000 / 250))
+
+result = materials.scattering_coefficient_spectrum(freqs, alpha_spec, alpha_s)
+print(np.round(result.scattering[[0, 6, 12]], 3))   # [0.011 0.428 0.844]
+result.plot()   # s(f) on a log-frequency axis, 0 to 1 (needs matplotlib)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/scattering_coefficient_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/scattering_coefficient.svg" alt="The random-incidence scattering coefficient s of a diffusing surface over the 13 one-third-octave bands from 250 to 4000 Hz, rising smoothly from near zero at low frequency towards 0.84 at 4 kHz" width="88%"></picture>
+
+*The scattering coefficient climbs with frequency: at low frequency the surface
+relief is small compared with the wavelength and the reflection stays specular
+($s \to 0$); as the wavelength shrinks the relief scatters more energy out of
+the specular direction ($s \to 1$).*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import materials
+
+# A 13-band measurement (250-4000 Hz): the random-incidence absorption alpha_s
+# (stationary sample) and the specular absorption alpha_spec (rotating
+# turntable). A diffuser scatters more with frequency, so s(f) rises.
+freqs = np.array([250, 315, 400, 500, 630, 800, 1000,
+                  1250, 1600, 2000, 2500, 3150, 4000], float)
+alpha_s = np.full_like(freqs, 0.10)
+alpha_spec = 0.11 + 0.75 * (np.log10(freqs / 250) / np.log10(4000 / 250))
+result = materials.scattering_coefficient_spectrum(freqs, alpha_spec, alpha_s)
+
+# result is the ScatteringResult computed above. One line:
+result.plot()
+plt.show()
+
+# By hand, from the result's fields, mirroring what ScatteringResult.plot() draws:
+fig, ax = plt.subplots()
+ax.semilogx(result.frequencies, result.scattering, "o-", color="#1f77b4")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Scattering coefficient s")
+ax.set_ylim(0.0, 1.0)
+ax.set_title("Random-incidence scattering coefficient (ISO 17497-1)")
+plt.show()
+```
+
+</details>
+
+**Base-plate check (Clause 6.4, Table 1).** The empty base plate must itself
+scatter only negligibly, or it would bias the result. ISO 17497-1 caps the
+base-plate scattering coefficient per one-third-octave band; the library exposes
+those limits and a checker.
+
+```python
+from phonometry import materials
+
+# The normative per-band ceilings (Table 1): 0.05 up to 500 Hz, rising to 0.25.
+# materials.BASE_PLATE_BANDS is the band tuple; materials.BASE_PLATE_MAX_SCATTERING maps band -> ceiling.
+print(materials.BASE_PLATE_BANDS[0], materials.BASE_PLATE_MAX_SCATTERING[100])   # 100 0.05
+
+# A base plate whose measured scattering stays under the ceiling passes silently;
+# an over-limit band raises a ScatteringDiffusionWarning listing the offenders.
+materials.check_base_plate_scattering([0.02] * len(materials.BASE_PLATE_BANDS))
+```
+
+**Test-report fiche.** `ScatteringResult.report(path)` renders a one-page
+accredited scattering test report (ISO 17497-1): a metadata header, the
+per-one-third-octave table of the random-incidence absorption $\alpha_s$ and the
+scattering coefficient $s$ beside the $s(f)$ curve on a categorical band axis,
+and a boxed characterisation headline (no pass/fail). `verbose=True` adds the
+specular absorption $\alpha_{spec}$ column and `language="es"` renders the
+Spanish fiche; it needs the report extra (`pip install phonometry[report]`).
+
+[![ISO 17497-1 scattering example report: a metadata header, the per-one-third-octave table of the random-incidence absorption and the scattering coefficient beside the s(f) band-axis curve, and the boxed characterisation headline over the tested frequency range](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso17497_scattering_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso17497_scattering_example.pdf)
+
+## 2. Diffusion coefficient (ISO 17497-2)
+
+The diffusion coefficient $d$ measures the **spatial uniformity** of the
+reflected sound, not how much is scattered. A goniometer sweeps a receiver over a
+polar arc and records the reflected level $L_i$ at each angle; the coefficient is
+the normalised autocorrelation of the polar energy distribution.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_diffusion_goniometer_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_diffusion_goniometer.svg" alt="ISO 17497-2 free-field diffusion goniometer: a test sample on a turntable, a fixed loudspeaker source, and a semicircular arc of receiver microphones sampling the reflected polar response, from which the autocorrelation diffusion coefficient is computed" width="92%"></picture>
+
+**Autocorrelation (Formula (5)).** For $n$ receivers at equal angular spacing,
+with $p_i = 10^{L_i/10}$ the band energy at receiver $i$,
+
+$$
+d = \frac{\left(\sum_i p_i\right)^2 - \sum_i p_i^2}
+         {(n-1)\,\sum_i p_i^2}.
+$$
+
+A perfectly uniform polar response ($L_i$ all equal) gives $d = 1$; a single
+sharp specular lobe gives $d = 0$. When receivers subtend unequal solid angles,
+Formula (6) area-weights each energy by $N_i$ from Formula (8), and those area
+factors are evaluated in **radians**, which is why a 5° spacing at the zenith
+produces a weight near 1.57, not 51.9.
+
+The rig those formulas assume is worth drawing to scale.
+`plot_goniometer_geometry` lays out the standard arrangement in plan: the
+37-microphone semicircle every 5 degrees at 5 m around the sample, the source
+at 10 m on the normal.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_goniometer_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_goniometer_geometry.svg" alt="To-scale plan of the free-field diffusion goniometer: a semicircle of 37 microphone dots every 5 degrees at 5 m radius around the small sample at the centre, the red source star at 10 m on the normal above it, and the 10 m and 5 m distances dimensioned" width="88%"></picture>
+
+*The polar arc behind every `L_i` of Formula (5), to scale: 37 receivers every
+5 degrees at 5 m, the source twice as far out on the normal, and the sample a
+sliver at the centre.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import materials
+
+# The standard arrangement: 37 microphones every 5 degrees at 5 m, the
+# source at 10 m on the normal.
+materials.plot_goniometer_geometry()
+plt.show()
+```
+
+</details>
+
+The animation below runs that goniometer experiment numerically: the same
+plane wavefront hits a flat rigid panel and a Schroeder diffuser (an N = 7
+quadratic-residue profile), and the scattered energy on the receiver arc turns
+a collimated specular beam (d = 0.32) into a wide fan (d = 0.63).
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_diffusion_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_diffusion.gif" alt="Animation: a 2D FDTD simulation of a plane wavefront hitting a flat rigid panel and a Schroeder quadratic-residue diffuser side by side; the flat panel throws a collimated specular beam back while the diffuser's phase-step wells spread the same energy into a wide fan, and the scattered field on a receiver arc yields diffusion coefficients of 0.32 versus 0.63" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_diffusion.webm)
+
+The single-plane response below is the far-field prediction of a published
+diffuser geometry: an N = 7 quadratic-residue diffuser of 6 periods, 3.6 m
+total width and 0.2 m maximum well depth (the "N = 7 QRD, 6 periods, 0.2 m
+deep" row of Cox & D'Antonio, *Acoustic Absorbers and Diffusers*, 3rd ed.,
+Appendix B; the commercial N = 7 QRD measured by Hargreaves, Cox, Lam &
+D'Antonio, *J. Acoust. Soc. Am.* 108(4), 1710-1720, 2000, Table I) and its
+equal-footprint flat reference panel, at 1000 Hz, normal incidence, on the
+standard 37-point semicircle (5 deg spacing, -90 to +90 deg). The same model
+levels drive the phonometry conformance suite as an arithmetic oracle for
+Formulas (5) and (7); the external third-party anchor checks the model's
+band-averaged normalised diffusion against the published Appendix B BEM table
+in the 200-400 Hz bands (agreement within 0.01; over the full published
+100-5000 Hz range the model-vs-BEM mean absolute deviation is about 0.09,
+because edge diffraction is outside the Fraunhofer model).
+
+The surface itself is worth drawing before predicting anything from it.
+`plot_qrd_geometry` turns the depth sequence into the to-scale well profile
+below, and a predicted `DiffuserPolarResponse` retains its geometry, so
+`qrd.plot_geometry()` draws the surface it was computed for.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/qrd_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/qrd_geometry.svg" alt="To-scale well profile of two periods of the commercial N = 7 quadratic-residue diffuser: wells 80.7 mm wide at an 85.7 mm pitch, separated by thin fins on a rigid base, following the depth sequence 0, 50, 200, 100, 100, 200, 50 mm with the deepest wells at 200 mm, and the incident sound arriving from above" width="88%"></picture>
+
+*Two of the six periods, to scale: the quadratic residues $n^2 \bmod 7$
+turned into a buildable surface. The 490 Hz design frequency is what puts
+the deepest well at exactly 200 mm.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import materials
+
+# The published N = 7 QRD: well width 3.6 m / 42, deepest well 0.2 m.
+depths = materials.qrd_well_depths(7, 490.0, speed_of_sound=343.0)
+pitch = 3.6 / 42                  # 42 wells across the 3.6 m panel
+fin = 0.005                       # thin fins, included in the pitch
+materials.plot_qrd_geometry(depths, pitch - fin, fin_width=fin, periods=2)
+plt.show()
+
+# A predicted DiffuserPolarResponse retains its geometry, so
+# qrd.plot_geometry() draws the profile it was computed for (all 6 periods).
+```
+
+</details>
+
+```python
+from phonometry import materials
+
+# The published geometry: N = 7 QRD, 6 periods, 3.6 m wide, 0.2 m deep
+# (Cox & D'Antonio 3rd ed., Appendix B; Hargreaves et al. 2000, Table I).
+# Design frequency 490 Hz puts the deepest well at exactly 0.2 m.
+depths = materials.qrd_well_depths(7, 490.0)   # [0, 0.05, 0.2, 0.1, ...] m
+qrd = materials.predict_diffuser_polar_response(
+    3.6 / 42, 1000.0, depths=depths, periods=6)
+# The flat reference panel: the same 3.6 m footprint with zero-depth wells.
+flat = materials.predict_diffuser_polar_response(
+    3.6 / 42, 1000.0, depths=[0.0] * 7, periods=6)
+
+qrd.plot()   # predicted polar response, d in the title (needs matplotlib)
+
+d = materials.directional_diffusion_coefficient(qrd.levels)    # Formula (5)
+print(round(float(d), 4))            # 0.1099
+d_ref = materials.directional_diffusion_coefficient(flat.levels)
+print(round(float(d_ref), 4))        # 0.0049
+
+# Normalise against the flat reference to isolate the diffuser's own effect
+# (Formula (7)): d_n = (d - d_ref) / (1 - d_ref).
+d_n = materials.normalized_diffusion_coefficient(d, d_ref)
+print(round(float(d_n), 4))          # 0.1055
+
+# Random-incidence value: average the band coefficients over source positions,
+# with the standard's 2-D weighting (0 deg -> 1, +/-30/+/-60 deg -> 3).
+d_random = materials.random_incidence_diffusion(
+    [0.5, 0.2, 0.2, 0.2, 0.2], weights=materials.TWO_DIMENSIONAL_SOURCE_WEIGHTS)
+print(round(float(d_random), 4))     # 0.2231
+```
+
+`directional_diffusion` keeps the receiver angles beside the levels of a full
+goniometer sweep and returns a plottable `DiffusionResult`. Reusing the QRD
+polar levels from above:
+
+```python
+import numpy as np
+from phonometry import materials
+
+# qrd.levels: the 37 predicted QRD levels from the example above.
+angles = np.arange(-90.0, 90.5, 5.0)
+
+result = materials.directional_diffusion(angles, qrd.levels)
+print(round(result.coefficient, 2))   # 0.11
+result.plot()   # polar reflected response, d in the title (needs matplotlib)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_polar_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_polar.svg" alt="A polar plot of the predicted reflected sound-pressure level of a six-period N=7 quadratic-residue diffuser over 37 receivers from -90 to 90 degrees, the energy concentrated in a fan of discrete grating lobes, giving an autocorrelation diffusion coefficient d of about 0.11" width="72%"></picture>
+
+*The periodic QRD array splits the reflected energy into a fan of discrete
+grating lobes rather than one specular spike, but six repetitions of the same
+period concentrate the energy in those few directions, so the autocorrelation
+diffusion coefficient stays modest ($d \approx 0.11$). The flat reference
+panel collapses into the specular direction alone and drops to
+$d \approx 0.005$; this lobing penalty of periodic arrays is exactly why
+Cox & D'Antonio recommend modulated arrangements.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import materials
+
+# qrd.levels: the 37 predicted levels L_i of the six-period N = 7 QRD from
+# the example above (Fraunhofer far-field model, published Cox & D'Antonio
+# Appendix B geometry, 1000 Hz, normal incidence) on the -90..90 deg, 5 deg
+# semicircle. The periodic array concentrates the energy into grating lobes,
+# so the Formula (5) coefficient d is modest.
+angles = np.arange(-90.0, 90.5, 5.0)
+result = materials.directional_diffusion(angles, qrd.levels)
+
+# result is the DiffusionResult computed above. One line:
+result.plot()
+plt.show()
+
+# By hand: a polar plot of the levels, with d annotated in the title.
+fig, ax = plt.subplots(subplot_kw={"projection": "polar"})
+theta = np.radians(result.angles)
+ax.plot(theta, result.levels, "o-", color="#1f77b4")
+ax.fill(theta, result.levels, color="#1f77b4", alpha=0.15)
+ax.set_theta_zero_location("N")
+ax.set_theta_direction(-1)
+ax.set_thetamin(-90)
+ax.set_thetamax(90)
+ax.set_title(f"Directional diffusion  d = {result.coefficient:.2f}  (ISO 17497-2)")
+plt.show()
+```
+
+</details>
+
+**Test-report fiche.** Collected across the one-third-octave bands, the
+diffusion coefficient $d(f)$ forms a `DiffusionSpectrum`
+(`materials.diffusion_spectrum(freqs, d, ...)`), whose `report(path)` renders a
+one-page diffusion test report (ISO 17497-2, Clause 8.5): the per-band table of
+$d$ beside the $d(f)$ band-axis curve, with a boxed characterisation headline.
+Per Clause 8.4 the random-incidence coefficient is itself a per-band quantity,
+the average of the directional coefficients over the source positions band by
+band (not a mean across frequency). `verbose=True` adds the normalised $d_n$
+column to the table (the curve always draws $d_n$ as a companion when present).
+A single band's polar response is itself reportable through
+`DiffusionResult.report(path)`.
+
+```python
+import numpy as np
+from phonometry import materials
+
+# One diffusion coefficient per band (here a closed-form example). In practice
+# each band's random-incidence d is the source-position average of the
+# directional coefficients: for band k, average directional_diffusion_coefficient
+# over the source positions with random_incidence_diffusion (Clause 8.4).
+freqs = np.array([250, 500, 1000, 2000, 4000], float)
+d = np.array([0.30, 0.45, 0.60, 0.75, 0.88])
+spectrum = materials.diffusion_spectrum(freqs, d)
+spectrum.plot()    # d(f) on the band axis (needs matplotlib)
+spectrum.report("diffusion.pdf")   # one-page fiche (needs phonometry[report])
+```
+
+[![ISO 17497-2 diffusion example report: a metadata header, the per-one-third-octave table of the diffusion coefficient d beside the d(f) band-axis curve (with the normalised d_n drawn as a companion curve), and the boxed characterisation headline over the tested frequency range](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso17497_diffusion_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso17497_diffusion_example.pdf)
+
+## 3. Designing a Schroeder diffuser
+
+The measurements above grade a surface that already exists. The classic way to
+*design* one is Schroeder's phase grating: divide the surface into wells of
+equal width and different depths, so that each well returns the incident wave
+with a different phase. A rigid-bottomed well of depth $d_n$ reflects with the
+pressure coefficient
+
+$$
+R_n = e^{-2 j k d_n},
+$$
+
+the round trip down and back up the well, so the depth sequence is a phase
+sequence in disguise. Schroeder's insight is number-theoretic: if the depths
+follow a **quadratic residue sequence**,
+
+$$
+s_n = n^2 \bmod N, \qquad
+d_n = \frac{s_n\,\lambda_0}{2N}, \qquad \lambda_0 = \frac{c}{f_0},
+$$
+
+for a prime $N$ and a chosen **design frequency** $f_0$ (Cox & D'Antonio
+Eqs. (10.2)/(10.3)), then at $f_0$ the reflection phases $-4\pi s_n / (2N)$
+sample a sequence whose discrete Fourier transform has constant magnitude, and
+the energy radiated into the grating lobes of the periodic surface is the same
+in every lobe. The surface spreads the reflection as evenly as a periodic
+surface can.
+
+A handful of design rules follow directly from the geometry:
+
+- **The design frequency sets the depth.** The deepest well is
+  $d_{max} = \max(s_n)\,\lambda_0/(2N)$, close to half a wavelength for large
+  $N$; halve $f_0$ and the diffuser gets twice as deep. This is the cost that
+  the [metadiffuser](https://jmrplens.github.io/phonometry/guides/metadiffusers/) attacks: at 500 Hz an N = 5 design
+  already calls for wells 27.4 cm deep.
+- **The sequence repeats what the prime provides.** $s_n$ is symmetric about
+  $n = 0$ and periodic in $N$, so one period has $N$ wells and the profile is
+  built by repeating it. The flat-phase property also holds at the harmonics
+  $2f_0, 3f_0, \ldots$, except at multiples of $N f_0$, where every well
+  reflects in phase again and the panel momentarily behaves like a flat plate.
+- **The well width sets the ceiling.** Each well is a small waveguide; the
+  single-plane-wave picture inside it holds only while the width $w$ stays
+  below half a wavelength, giving an upper working limit near
+  $f_{max} = c/(2w)$. Narrower wells raise the ceiling but add viscous losses
+  and fins.
+- **Periodicity concentrates, modulation spreads.** Repeating one period
+  locks the reflected energy into grating lobes at
+  $\sin\theta_m = \sin\psi + m\lambda/L$ for period length $L$: even a
+  perfect phase sequence then feeds a finite set of directions, which is the
+  lobing penalty measured on the polar response above. Modulating two
+  different sequences (or a sequence and its inverse) breaks the periodicity
+  and recovers diffusion; primitive-root sequences ($s_n = r^n \bmod N$)
+  additionally suppress the specular lobe at the design frequency.
+
+`qrd_well_depths` evaluates the depth sequence and
+`predict_diffuser_polar_response` grades the design before anything is built,
+which is the subject of the next section.
+
+### Predicting diffusion from a diffuser design
+
+The autocorrelation coefficient above reduces a *measured* polar response. The
+same coefficient can be *predicted* from the physical design of a Schroeder
+phase-grating diffuser, so a well-depth sequence can be graded before a sample
+is built. `predict_diffuser_polar_response` evaluates the single-plane
+Fraunhofer (far-field) model of Cox and D'Antonio: each rigid-bottom well of
+depth $d_n$ contributes a pressure reflection coefficient
+$R_n = e^{-2 j k d_n}$, and the scattered pressure at reflection angle $\theta$
+for a source at incidence $\psi$ is the sum over the wells of the periodic
+surface (Eq. (5.8)),
+
+$$
+p(\theta) = F(\theta) \sum_n R_n \, e^{\,j k x_n (\sin\psi + \sin\theta)},
+$$
+
+with $x_n$ the well centre and $k = 2\pi f / c$. The predicted polar levels
+$L_i = 20\lg|p(\theta_i)|$ feed the same `directional_diffusion_coefficient` as
+a measurement.
+
+```python
+import numpy as np
+from phonometry import materials
+
+# An N = 7 quadratic residue diffuser, design frequency 500 Hz.
+depths = materials.qrd_well_depths(7, 500.0)   # Eqs. (10.2)/(10.3)
+print(np.round(depths * 100, 1))               # well depths in cm:
+                                               # [ 0.   4.9 19.6  9.8  9.8 19.6  4.9]
+
+# Predicted far-field polar response at one frequency (5 repeated periods,
+# 10 cm wells), reduced to the ISO 17497-2 directional diffusion coefficient.
+surface = materials.predict_diffuser_polar_response(0.10, 2000.0, depths=depths,
+                                                    periods=5)
+print(round(surface.coefficient, 3))           # 0.210
+surface.plot()   # predicted polar response, d in the title (needs matplotlib)
+
+# The spectrum variant normalises band by band against the same-footprint flat
+# reference (Formula (7)): the flat panel maps to exactly zero, the QRD well
+# above it.
+freqs = np.array([500, 1000, 2000, 4000], float)
+qrd = materials.predicted_diffusion_spectrum(0.10, freqs, depths=depths, periods=5)
+print(np.round(qrd.normalized, 3))             # [0.352 0.275 0.208 0.073]
+
+flat = materials.predicted_diffusion_spectrum(0.10, freqs,
+                                        depths=np.zeros_like(depths), periods=5)
+print(np.round(flat.normalized, 3))            # [0. 0. 0. 0.]
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuser_prediction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuser_prediction.svg" alt="Predicted diffusion coefficient over the one-third-octave bands from 250 to 5000 Hz for an N = 7 quadratic residue diffuser design compared with a flat panel of the same footprint: the QRD curve sits well above the near-zero flat-panel curve across the band" width="88%"></picture>
+
+*Predicted from the design alone: the N = 7 QRD spreads the reflected energy
+far more evenly than the flat panel of the same footprint, so its predicted
+diffusion coefficient sits well above the near-specular flat reference across
+the band. This is a far-field design estimate, not a substitute for an
+ISO 17497-2 measurement; like every Fourier diffuser model it loses accuracy at
+low frequency, at grazing angles and for strongly absorbing surfaces. An
+arbitrary complex per-well reflection sequence can be supplied through the
+`reflection` argument, so an admittance or resonator-loaded surface computed
+elsewhere can be graded the same way.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import materials
+
+# N = 7 QRD (design frequency 500 Hz, 10 cm wells, five periods) versus the
+# flat panel of the same footprint, over the one-third-octave bands.
+freqs = np.array([250, 315, 400, 500, 630, 800, 1000, 1250, 1600,
+                  2000, 2500, 3150, 4000, 5000], float)
+depths = materials.qrd_well_depths(7, 500.0)
+qrd = materials.predicted_diffusion_spectrum(0.10, freqs, depths=depths, periods=5)
+
+# The DiffusionSpectrum plots the predicted d(f) directly. One line:
+qrd.plot()
+plt.show()
+
+# By hand: predicted d(f) for the QRD against the flat reference.
+flat = materials.predicted_diffusion_spectrum(0.10, freqs,
+                                depths=np.zeros_like(depths), periods=5,
+                                normalize=False)
+fig, ax = plt.subplots()
+ax.semilogx(freqs, qrd.diffusion, "o-", color="#1f77b4", label="N = 7 QRD design")
+ax.semilogx(freqs, flat.diffusion, "s--", color="#d62728", label="Flat panel")
+ax.set_ylim(0.0, 1.0)
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Predicted diffusion coefficient d")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+## Scattering or diffusion? Two coefficients, two jobs
+
+The two coefficients above are routinely treated as interchangeable, in
+product data sheets and occasionally in simulation manuals. They are not, and
+neither can be computed from the other. The scattering coefficient $s$
+(ISO 17497-1) does **energy bookkeeping**: what fraction of the reflected
+energy leaves the specular direction. It says nothing about where that energy
+goes. The diffusion coefficient $d$ (ISO 17497-2) grades **spatial quality**:
+how evenly the reflected energy covers the receiver arc, one source direction
+at a time. It says nothing about how the energy divides between the specular
+lobe and the rest.
+
+A pair of counterexamples keeps them apart. A curved or tilted element that
+*redirects* the reflection concentrates nearly all the reflected energy into
+one strong lobe away from the specular direction: almost everything is
+non-specular, so $s$ is high, yet the beam is as collimated as a mirror's, so
+$d$ stays low. Conversely, a small flat panel measured at low frequency sends
+nearly all the reflected energy toward the specular direction, so $s$ stays
+near zero, yet edge diffraction spreads that reflection so broadly over the
+receiver arc that the measured $d$ comes out surprisingly high. High $s$ does
+not mean uniform; decent $d$ does not mean much energy was scattered at all.
+
+**Which one for design.** The two numbers serve different consumers:
+
+- **The scattering coefficient feeds room-acoustics simulation.**
+  Geometrical-acoustics engines decide at every wall reflection how much
+  energy continues specularly and how much is redistributed; the per-band
+  random-incidence $s$ of each surface is precisely that split, which is what
+  ISO 17497-1 was written to supply. Getting it wrong shows up as the wrong
+  reverberation-time and clarity predictions in non-mixing rooms.
+- **The diffusion coefficient qualifies diffusers.** When the task is to break
+  up an echo, a flutter or a focusing reflection, what matters is that the
+  reflected energy is spread over angle, and $d$ measures exactly that. The
+  normalised $d_n$ (Formula (7)) additionally subtracts the edge diffraction
+  that every finite panel exhibits, so products of different sizes can be
+  compared fairly.
+
+Swapping them fails in both directions: a diffusion coefficient dropped into a
+simulator's scattering slot biases the energy split, and a scattering
+coefficient quoted as proof of "diffusion" may describe a surface that merely
+redirects the problem reflection somewhere else. Both coefficients are
+one-third-octave-band functions that generally rise once the surface relief is
+no longer small against the wavelength; a frequency-blind single number
+("scatters 90 % of the sound") is neither of them.
+
+## See also
+
+- [Metadiffusers](https://jmrplens.github.io/phonometry/guides/metadiffusers/): the deep-subwavelength version of the
+  Schroeder designs of section 3, slits loaded by Helmholtz resonators that
+  reach the same reflection phases from a panel a few centimetres thick.
+- [In-situ Road-Surface Absorption](https://jmrplens.github.io/phonometry/guides/road-absorption/): the other surface
+  family measured in the field rather than the laboratory, with the ISO 13472
+  subtraction and spot methods.
+- [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/guides/absorption-measurement/): the
+  same reverberation room used by ISO 17497-1, measuring absorption instead of
+  scattering.
+- [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/guides/outdoor-propagation/): the full ISO 9613-1
+  atmospheric-absorption model whose pure-tone coefficient the ISO 17497-1
+  air-attenuation relations consume.
+- API reference: [`materials.scattering_diffusion`](https://jmrplens.github.io/phonometry/reference/api/materials/scattering-diffusion/) and [`materials.diffuser_design`](https://jmrplens.github.io/phonometry/reference/api/materials/diffuser-design/).
+
+## References
+
+- Cox, T. J., & D'Antonio, P. (2017). *Acoustic absorbers and diffusers:
+  Theory, design and application* (3rd ed.). CRC Press.
+  ISBN 978-1-4987-4099-9.
+  [doi:10.1201/9781315369211](https://doi.org/10.1201/9781315369211).
+  The reference monograph on diffuser theory and design, by the authors
+  behind the ISO 17497-2 diffusion-coefficient method: the
+  scattering-versus-diffusion distinction, the
+  measurement rigs and the design guidance this page condenses. Appendix B
+  (Normalized diffusion coefficient table, pp. 481-485) is the published BEM
+  anchor for the diffuser-prediction model on this page.
+- Hargreaves, T. J., Cox, T. J., Lam, Y. W., & D'Antonio, P. (2000). Surface
+  diffusion coefficients for room acoustics: Free-field measures of
+  single-plane diffusion. *The Journal of the Acoustical Society of America*,
+  108(4), 1710-1720.
+  [doi:10.1121/1.1310192](https://doi.org/10.1121/1.1310192).
+  The free-field diffusion-coefficient method behind ISO 17497-2; its Table I
+  documents the commercial N = 7 QRD geometry (0.2 m maximum well depth) used
+  in the worked example above.
+- Audio Engineering Society. (2001). *AES information document for room
+  acoustics and sound reinforcement systems — Characterization and
+  measurement of surface scattering uniformity* (AES-4id-2001). *Journal of
+  the Audio Engineering Society*, 49(3), 149-165.
+  [AES standards in print](https://www.aes.org/publications/standards/list.cfm).
+  The single-plane free-field diffusion-coefficient procedure that
+  ISO 17497-2 later standardised.
+- International Organization for Standardization. (2004). *Acoustics —
+  Sound-scattering properties of surfaces — Part 1: Measurement of the
+  random-incidence scattering coefficient in a reverberation room*
+  (ISO 17497-1:2004+A1:2014, the edition implemented here).
+  [iso.org catalogue](https://www.iso.org/standard/31397.html).
+  The turntable method implemented in section 1 of this page and the
+  base-plate limits of the standard's Table 1.
+- International Organization for Standardization. (2012). *Acoustics —
+  Sound-scattering properties of surfaces — Part 2: Measurement of the
+  directional diffusion coefficient in a free field* (ISO 17497-2:2012).
+  [iso.org catalogue](https://www.iso.org/standard/55293.html).
+  The goniometer autocorrelation coefficient behind section 2 of this page,
+  its area weighting and the normalised $d_n$.
+
+## Standards
+
+ISO 17497-1:2004+A1:2014 (scattering coefficient), ISO 17497-2:2012 (diffusion
+coefficient), and ISO 9613-1:1993, from which only the pure-tone attenuation
+coefficient α consumed by the ISO 17497-1 Clause 8 air-attenuation relations
+(Eqs. (2)/(3)); the full atmospheric-absorption model is covered in
+[Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/guides/outdoor-propagation/). Numerical conformance
+against the standards' worked examples and closed forms is tracked in
+[CONFORMANCE.md](https://jmrplens.github.io/phonometry/reference/conformance/).
 
 ---
 
@@ -15202,6 +15863,669 @@ for 10 kg; `|Y| = 1.59155e-4` m/(N·s) at 100 Hz) and the Annex A example
 ---
 
 
+<!-- source: docs/metadiffusers.md | canonical: https://jmrplens.github.io/phonometry/guides/metadiffusers/ -->
+Source: https://jmrplens.github.io/phonometry/guides/metadiffusers/
+
+# Metadiffusers
+
+A Schroeder diffuser earns its diffusion with depth: the
+[design equations](https://jmrplens.github.io/phonometry/guides/diffusers/) turn a phase sequence into wells that run to a
+quarter of the design wavelength, so a diffuser for the low hundreds of hertz
+is tens of centimetres thick, and that thickness is what keeps phase-grating
+diffusers out of small rooms, studios and vehicles. A **metadiffuser**
+(Jiménez, Cox, Romero-García and Groby, 2017) reaches the same reflection
+phases from a panel one to two orders of magnitude thinner: each well becomes
+a thin closed slit loaded by Helmholtz resonators, and the resonators slow the
+sound inside the slit so drastically that a 2 cm panel behaves like wells
+27 cm deep. This guide covers the slow-sound mechanism, the published
+quadratic-residue metadiffuser evaluated end to end, and the design recipe
+that maps any Schroeder sequence onto a deep-subwavelength panel.
+
+## 1. Slow sound in a loaded slit
+
+The unit cell is the same one the
+[slow-sound absorber](https://jmrplens.github.io/phonometry/guides/metamaterial-absorbers/) is built from: a slit of
+height $h_n$ runs the depth $L$ of the panel and is loaded, along its upper
+wall, by an array of Helmholtz resonators on a lattice step $a$. The slit
+chain is evaluated with the transfer-matrix method,
+
+$$
+T = M_{\Delta l}\,\prod_m \left(M_s\,M_{HR}^{(m)}\,M_s\right),
+$$
+
+half-lattice slit steps $M_s$ around each resonator, the resonators as shunt
+point scatterers $[[1,0],[1/Z_{HR},1]]$, and a slit-radiation end correction
+$M_{\Delta l}$, with visco-thermal effective parameters in the slit and in the
+square necks and cavities (Stinson 1991). Below the resonance of the loading
+resonators the shunt compliance adds to the compliance of the slit itself, and
+the effective phase velocity of the slit mode collapses: the retrieved
+effective wavenumber $k_{eff}$ of the chain corresponds to a phase speed of a
+few tens of metres per second. The slit therefore reaches its
+quarter-wavelength condition, and any intermediate reflection phase, at a
+fraction of the depth an air-filled well would need.
+
+Two consequences make the mechanism ideal for diffusers rather than just
+absorbers:
+
+- **The reflection phase is tunable per slit.** The rigidly backed slit
+  reflects with $R_n = (T_{11}\cos\theta - Z_0 T_{21})/(T_{11}\cos\theta +
+  Z_0 T_{21})$, and the resonator geometry tunes the phase of $R_n$ through
+  the full $2\pi$ range at the working frequency while $|R_n|$ stays close to
+  one. A phase profile that a classical grating writes with depth, the
+  metadiffuser writes with resonator tuning.
+- **Critical coupling adds a third state.** Driving one slit to
+  [critical coupling](https://jmrplens.github.io/phonometry/guides/metamaterial-absorbers/) balances its visco-thermal
+  loss against its leakage and produces a reflection zero: $R_n \approx 0$.
+  Ternary sequences (reflection values $+1$, $-1$, $0$) need exactly that
+  perfectly absorbing state, which no rigid well can provide.
+
+`metadiffuser_reflection` runs that chain once per well (two-dimensional
+resonators, visco-thermal losses and end corrections included) and returns the
+per-well complex reflection $R_n(f)$; `metadiffuser_polar_response` and
+`metadiffuser_diffusion_spectrum` reduce that spatial profile through the same
+Fraunhofer far field and ISO 17497-2 coefficient used for the
+[classical designs](https://jmrplens.github.io/phonometry/guides/diffusers/). A `None` entry in the well sequence stands
+for a flat rigid strip ($R = 1$), the $+1$ state of ternary designs.
+
+## 2. The published quadratic-residue metadiffuser
+
+The published design packs a whole N = 5 quadratic-residue diffuser into a
+35 cm x 2 cm panel: five slits, each loaded by two resonators, on a 7 cm
+pitch. Its first slit reaches critical coupling (the reflection zero the
+ternary `0` state is built from), and at the 2 kHz evaluation frequency the
+panel scatters like the 27.4 cm deep QRD it mimics.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_geometry.svg" alt="To-scale cross-section of the published quadratic-residue metadiffuser: a 350 by 20 millimetre panel over a rigid backing with five numbered slits opening at the face, each loaded by two Helmholtz resonators whose necks and cavities shelve sideways into the septum between slits; dimension lines mark the 350 millimetre width, the 70 millimetre pitch, the 14.7 millimetre first slit and the 20 millimetre depth, with the incident sound arriving from above" width="92%"></picture>
+
+As in the published far-field comparison, the polar response repeats the
+five-well sequence six times (`periods=6`, a 2.1 m panel):
+
+```python
+import numpy as np
+from phonometry import (
+    HelmholtzResonator,
+    MetadiffuserWell,
+    metadiffuser_polar_response,
+    metadiffuser_reflection,
+)
+
+# The published quadratic-residue metadiffuser: five slits with two
+# resonators each in a 35 cm x 2 cm panel (7 cm pitch), tuned to mimic a
+# QRD designed for 500 Hz whose wells would run up to 27.4 cm deep.
+mm = 1e-3
+rows = [  # slit h, neck l_n, cavity l_c, neck w_n, cavity w_c  [mm]
+    (14.7, 13.0, 16.4, 6.2, 9.0),
+    (30.9, 9.1, 4.3, 3.5, 9.0),
+    (30.9, 9.1, 4.3, 3.5, 9.0),
+    (15.7, 13.3, 17.0, 6.3, 9.0),
+    (20.3, 18.0, 20.7, 3.2, 9.0),
+]
+wells = [
+    MetadiffuserWell(
+        h * mm,
+        2 * (HelmholtzResonator(ln * mm, wn * mm, lc * mm, wc * mm),),
+    )
+    for h, ln, lc, wn, wc in rows
+]
+
+f = np.arange(1800.0, 2601.0, 5.0)
+panel = metadiffuser_reflection(f, wells, depth=0.02, period=0.07)
+alpha1 = panel.well_absorption[0]
+print(round(float(alpha1.max()), 2), int(f[alpha1.argmax()]))  # 0.99 2305
+
+# Far-field comparison: the five-well sequence repeated six times (2.1 m).
+polar = metadiffuser_polar_response(2000.0, wells, depth=0.02,
+                                    period=0.07, periods=6)
+print(round(polar.coefficient, 2))                             # 0.32
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_polar_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_polar.svg" alt="Semicircular polar plot at 2 kilohertz comparing the far-field response of the 2 centimetre metadiffuser panel, drawn as a solid line, with the 27.4 centimetre deep quadratic residue diffuser it mimics, drawn dashed: the two grating-lobe patterns overlap almost exactly across the whole minus 90 to plus 90 degree arc" width="92%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import numpy as np
+from phonometry import (
+    HelmholtzResonator,
+    MetadiffuserWell,
+    materials,
+    metadiffuser_polar_response,
+)
+
+mm = 1e-3
+rows = [
+    (14.7, 13.0, 16.4, 6.2, 9.0),
+    (30.9, 9.1, 4.3, 3.5, 9.0),
+    (30.9, 9.1, 4.3, 3.5, 9.0),
+    (15.7, 13.3, 17.0, 6.3, 9.0),
+    (20.3, 18.0, 20.7, 3.2, 9.0),
+]
+wells = [
+    MetadiffuserWell(
+        h * mm,
+        2 * (HelmholtzResonator(ln * mm, wn * mm, lc * mm, wc * mm),),
+    )
+    for h, ln, lc, wn, wc in rows
+]
+
+# The metadiffuser panel and the QRD it was tuned to at 2 kHz, both with
+# six repetitions of the period (2.1 m panels).
+meta = metadiffuser_polar_response(2000.0, wells, depth=0.02, period=0.07,
+                                   periods=6)
+sequence = np.roll(materials.quadratic_residue_sequence(5), -1)
+depths = sequence * (343.0 / 500.0) / (2 * 5)
+qrd = materials.predict_diffuser_polar_response(
+    0.07, 2000.0, depths=depths, periods=6, include_obliquity=False,
+)
+
+ax = meta.plot(marker="", linewidth=2.2, label="Metadiffuser, panel 2 cm")
+qrd.plot(ax=ax, marker="", linewidth=1.6, linestyle="--",
+         label="QRD, wells up to 27.4 cm")
+ax.legend(loc="lower center")
+```
+
+</details>
+
+The far-field overlay above is the frequency-domain summary; the FDTD
+animation below meshes both panels for real (the metadiffuser at 0.25 mm, slits,
+necks and cavities included) and lets the same 2 kHz wavefront hit them: the
+27 cm QRD and the 2 cm panel throw out nearly the same scattered fan.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_metadiffuser_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_metadiffuser.gif" alt="Animation: a 2 kHz plane wavefront hits a Schroeder diffuser with wells down to 27 centimetres and, beside it, the 2 centimetre metadiffuser whose real slits and resonators are meshed at 0.25 millimetres; the total field and the persistent scattered envelope show both panels spraying nearly identical fans, with the arc diffusion coefficients annotated" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_metadiffuser.webm)
+
+## 3. The design recipe: phases first, geometry second
+
+Designing a metadiffuser is a two-step translation. First pick the Schroeder
+sequence exactly as for a [classical design](https://jmrplens.github.io/phonometry/guides/diffusers/): the quadratic
+residues $s_n = n^2 \bmod N$ give the target well depths
+$d_n = s_n \lambda_0/(2N)$ and hence the target reflection phases
+$\varphi_n = -2 k d_n$ at the evaluation frequency. Second, tune each slit
+(its height, and the neck and cavity of its resonators) until the chain
+reproduces that phase from the fixed panel depth $L$. The per-well reflection
+returned by `metadiffuser_reflection` is the quantity to match; for the
+published design at 2 kHz the five slits land within a few degrees of the QRD
+targets while keeping $|R_n|$ near one:
+
+```python
+import numpy as np
+from phonometry import materials, metadiffuser_reflection
+
+# wells: the five published slits from the example above.
+panel = metadiffuser_reflection(np.array([2000.0]), wells,
+                                depth=0.02, period=0.07)
+phases = np.degrees(np.angle(panel.reflection[:, 0]))
+print(np.round(np.abs(panel.reflection[:, 0]), 2))  # [0.97 1.   1.   0.97 0.98]
+print(np.round(phases))                             # [ 75. -71. -71.  74.   2.]
+
+# The targets: the 500 Hz N = 5 QRD it mimics, evaluated at 2 kHz.
+sequence = np.roll(materials.quadratic_residue_sequence(5), -1)
+depths = sequence * (343.0 / 500.0) / (2 * 5)          # up to 27.4 cm deep
+k = 2 * np.pi * 2000.0 / 343.0
+targets = np.degrees(np.angle(np.exp(-2j * k * depths)))
+print(np.round(targets))                            # [ 72. -72. -72.  72.   0.]
+```
+
+A 2 cm panel hitting the phases of 27.4 cm wells to within a few degrees is
+the whole trick, and the limits of the trick are worth stating plainly:
+
+- **Losses are not optional.** The same visco-thermal boundary layers that
+  make critical coupling possible shave a few percent off $|R_n|$ everywhere,
+  so a metadiffuser always absorbs a little where a rigid grating would not
+  (the published designs stay in the percent range away from the
+  critically coupled slit). The per-well and face-averaged absorption are
+  exposed as `well_absorption` and `absorption` for exactly this check.
+- **The phase match is dispersive.** A rigid well's phase grows linearly with
+  frequency; a resonator-loaded slit's does not. The sequence is exact at the
+  frequency it was tuned for and degrades away from it, so a broadband design
+  is a compromise across the working band, checked with
+  `metadiffuser_diffusion_spectrum` band by band rather than assumed from the
+  design frequency alone.
+- **Below resonance is the working side.** Above the resonance of the loading
+  resonators the slow-sound branch closes and the slit stops tracking the
+  target phase; designs place the resonances above the working band.
+
+The reduction to a graded coefficient is then identical to the classical
+workflow: `metadiffuser_polar_response` for one frequency,
+`metadiffuser_diffusion_spectrum` for the band-by-band normalised coefficient,
+both against the same-footprint flat reference of ISO 17497-2 Formula (7).
+
+## See also
+
+- [Diffusers and Their Coefficients](https://jmrplens.github.io/phonometry/guides/diffusers/): the ISO 17497-1/-2
+  coefficients this panel is graded by, and the classical Schroeder designs
+  whose phase sequences it borrows.
+- [Metamaterial Absorbers](https://jmrplens.github.io/phonometry/guides/metamaterial-absorbers/): the same slit and
+  resonator cell tuned for perfect absorption instead of controlled phase,
+  with the critical-coupling theory behind the ternary `0` state.
+- [Porous and Multilayer Absorbers](https://jmrplens.github.io/phonometry/guides/porous-absorbers/): the classical
+  equivalent-fluid and resonant layers the metamaterial cells are built from.
+- [2D FDTD wave simulation](https://jmrplens.github.io/phonometry/guides/fdtd-simulation/): the wave solver behind the
+  animation above, meshing the real slit and resonator geometry.
+- API reference: [`materials.metadiffuser`](https://jmrplens.github.io/phonometry/reference/api/materials/metadiffuser/) and [`materials.diffuser_design`](https://jmrplens.github.io/phonometry/reference/api/materials/diffuser-design/).
+
+## References
+
+- Jiménez, N., Cox, T. J., Romero-García, V., & Groby, J.-P. (2017).
+  Metadiffusers: Deep-subwavelength sound diffusers. *Scientific Reports*,
+  7, 5389.
+  [doi:10.1038/s41598-017-05710-5](https://doi.org/10.1038/s41598-017-05710-5).
+  The metadiffuser model implemented here: slits loaded by Helmholtz
+  resonators reproduce Schroeder phase profiles and ternary sequences from
+  panels 1/46 to 1/20 of the design wavelength thick, including the
+  quadratic-residue design of section 2.
+- Jiménez, N., Cox, T. J., Groby, J.-P., & Romero-García, V. (2019). Beyond
+  phase grating diffusers using locally-resonant metamaterials. *Proceedings
+  of the 23rd International Congress on Acoustics (ICA 2019)*, Aachen.
+  [Proceedings PDF](https://pub.dega-akustik.de/ICA2019/data/articles/000706.pdf).
+  The congress companion to the 2017 paper: the transfer-matrix chain,
+  the slow-sound dispersion picture and the far-field comparisons that
+  section 3 condenses.
+- Cox, T. J., & D'Antonio, P. (2017). *Acoustic absorbers and diffusers:
+  Theory, design and application* (3rd ed.). CRC Press.
+  ISBN 978-1-4987-4099-9.
+  [doi:10.1201/9781315369211](https://doi.org/10.1201/9781315369211).
+  The Schroeder sequences, the Fraunhofer far-field model and the
+  diffusion-coefficient machinery the metadiffuser is evaluated with.
+- Jiménez, N., Groby, J.-P., Pagneux, V., & Romero-García, V. (2017).
+  Iridescent perfect absorption in critically-coupled acoustic metamaterials
+  using the transfer matrix method. *Applied Sciences*, 7(6), 618.
+  [doi:10.3390/app7060618](https://doi.org/10.3390/app7060618). The slit +
+  Helmholtz-resonator transfer-matrix chain each well is evaluated with, and
+  the critical-coupling condition behind the ternary `0` state.
+- Jiménez, N., Huang, W., Romero-García, V., Pagneux, V., & Groby, J.-P.
+  (2016). Ultra-thin metamaterial for perfect and quasi-omnidirectional sound
+  absorption. *Applied Physics Letters*, 109(12), 121902.
+  [doi:10.1063/1.4962328](https://doi.org/10.1063/1.4962328). The resonator
+  impedance (Eq. A23) and its radiation end corrections (Eqs. A24-A27) used
+  in every loaded slit.
+- Jiménez, N., Umnova, O., & Groby, J.-P. (Eds.). (2021). *Acoustic waves in
+  periodic structures, metamaterials, and porous media* (Topics in Applied
+  Physics, Vol. 143). Springer.
+  [doi:10.1007/978-3-030-84300-7](https://doi.org/10.1007/978-3-030-84300-7).
+  The book-length treatment of resonant metamaterial absorbers and
+  diffusers; the modern companion to Cox & D'Antonio for this whole family.
+
+## Standards
+
+No standard governs the metadiffuser model itself; it is a journal method
+(Jiménez et al. 2017) implemented clean-room from the cited sources. Its
+output is graded by ISO 17497-2:2012 (diffusion coefficient), covered in
+[Diffusers and Their Coefficients](https://jmrplens.github.io/phonometry/guides/diffusers/), and its unit cell is the
+slit and Helmholtz-resonator chain of
+[Metamaterial Absorbers](https://jmrplens.github.io/phonometry/guides/metamaterial-absorbers/). Numerical conformance
+against the published designs and closed forms is tracked in
+[CONFORMANCE.md](https://jmrplens.github.io/phonometry/reference/conformance/).
+
+---
+
+
+<!-- source: docs/metamaterial-absorbers.md | canonical: https://jmrplens.github.io/phonometry/guides/metamaterial-absorbers/ -->
+Source: https://jmrplens.github.io/phonometry/guides/metamaterial-absorbers/
+
+# Metamaterial Absorbers
+
+A porous blanket absorbs low frequencies only by growing thick: the
+[porous models](https://jmrplens.github.io/phonometry/guides/porous-absorbers/) put the useful absorption where the layer
+is a fair fraction of the wavelength, which at 300 Hz means tens of
+centimetres. Acoustic metamaterial absorbers break that rule with resonance
+instead of bulk. A rigid panel of thin closed slits, each loaded by Helmholtz
+resonators, slows the sound inside the slit until a 3 cm panel resonates where
+a plain cavity of the same depth would need to be ten times deeper, and tuning
+the panel's internal losses against its leakage produces **perfect
+absorption**, $\alpha = 1$, at a design frequency where the panel is only
+$\lambda/38$ deep; published designs of the same family reach $\lambda/88$
+(Jiménez et al. 2016). This guide covers the critical-coupling condition that
+makes perfect absorption possible, the slow-sound slit panel implemented in
+the library, and the classical resonant absorbers re-read through the same
+lens.
+
+## 1. Critical coupling: when loss exactly balances leakage
+
+A rigidly backed absorber panel is a one-port resonator: sound enters through
+the face, rings inside, and either leaks back out or is dissipated. Its
+reflection coefficient over the complex frequency plane has a pole and a zero
+for each resonance. Two rates compete at the resonance: the **leakage rate**,
+how fast the stored energy radiates back into the incident medium, and the
+**intrinsic loss rate**, how fast the visco-thermal boundary layers of the
+structure dissipate it.
+
+- Too little loss (an almost lossless panel) and the energy mostly leaks back
+  out: the reflection dips but recovers, $|R| > 0$.
+- Too much loss (an over-damped panel) and the wave barely enters: the panel
+  starts to look rigid again, $|R| > 0$ from the other side.
+- When the two rates are **equal**, the zero of the reflection coefficient
+  lands exactly on the real-frequency axis: at that frequency nothing is
+  reflected, $R = 0$ and $\alpha = 1 - |R|^2 = 1$. This is the
+  **critical-coupling condition** (Jiménez et al. 2017).
+
+In impedance terms the same statement reads $Z = Z_0$: the panel's surface
+impedance is purely resistive and matched to the incident medium,
+$\mathrm{Re}(Z)\cos\theta = Z_0$ and $\mathrm{Im}(Z) = 0$. The condition says
+nothing about thickness, which is exactly the loophole metamaterial absorbers
+exploit: make the resonance deep-subwavelength with slow sound, then tune the
+loss to match. The balance is delicate by design, and the library's
+`critical_coupling_design` solves it numerically rather than by trial: at the
+returned geometry the normalised impedance sits at $1 + 0j$ and the
+reflection at zero.
+
+```python
+import numpy as np
+from phonometry import (
+    HelmholtzResonator, critical_coupling_design, slit_helmholtz_absorber,
+)
+
+base = HelmholtzResonator(
+    neck_length=1.0e-3, neck_side=3.0e-3,
+    cavity_length=30.0e-3, cavity_side=27.0e-3,
+)
+design = critical_coupling_design(300.0, base, lattice_step=3.0e-2, period=5.0e-2)
+
+f = np.array([300.0])
+res = slit_helmholtz_absorber(
+    f, design.resonator, slit_height=design.slit_height,
+    lattice_step=3.0e-2, period=5.0e-2,
+)
+z = res.normalized_impedance[0]
+print(round(z.real, 2), round(z.imag, 2))       # 1.0 -0.0  (matched)
+print(round(float(np.abs(res.reflection[0])), 3))   # 0.0   (reflection zero)
+```
+
+## 2. The slow-sound slit panel
+
+A rigid panel of thin closed slits, each loaded on its upper wall by an array
+of Helmholtz resonators, is a locally reacting, deep-subwavelength absorber
+(Jiménez et al. 2017). The resonators slow the sound in the slit, pulling its
+resonance far below the quarter-wavelength frequency, and the visco-thermal
+losses of the sub-millimetre slit and the resonator necks make *perfect*
+absorption possible: when the intrinsic loss balances the leakage, the
+reflection zero lands on the real-frequency axis and $\alpha = 1$ (critical
+coupling). The panel transfer matrix is the chain
+$T = M_{\Delta l}\,\prod_n (M_s\,M_{HR}^{(n)}\,M_s)$; the rigidly-backed
+reflection factor is
+$R = (T_{11}\cos\theta - Z_0 T_{21})/(T_{11}\cos\theta + Z_0 T_{21})$ with
+$Z_0 = \rho_0 c_0 / S_0$. The slit uses the narrow-channel visco-thermal
+parameters and the square necks and cavities the rectangular-duct series of
+Stinson (1991). `critical_coupling_design` inverts the model, tuning
+the cavity length and the slit height so both matching conditions
+$\mathrm{Re}(Z)\cos\theta = Z_0$ and $\mathrm{Im}(Z) = 0$ hold.
+
+```python
+import numpy as np
+from phonometry import (
+    HelmholtzResonator, critical_coupling_design, slit_helmholtz_absorber,
+)
+
+base = HelmholtzResonator(
+    neck_length=1.0e-3, neck_side=3.0e-3,
+    cavity_length=30.0e-3, cavity_side=27.0e-3,
+)
+design = critical_coupling_design(300.0, base, lattice_step=3.0e-2, period=5.0e-2)
+print(round(design.absorption, 4))          # ~1.0 (perfect absorption)
+
+f = np.linspace(150.0, 500.0, 700)
+res = slit_helmholtz_absorber(
+    f, design.resonator, slit_height=design.slit_height,
+    lattice_step=3.0e-2, period=5.0e-2,
+)
+res.plot()   # alpha(f) with |R| overlaid; peak = 1 at 300 Hz
+```
+
+The solved geometry is worth a look before the absorption curve. The
+resonator draws itself with `.plot()` and the panel result with
+`.plot_geometry()`, both dimensioned and to scale.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/helmholtz_resonator_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/helmholtz_resonator_geometry.svg" alt="To-scale cross-section of the square-section Helmholtz resonator the 300 Hz critical-coupling design starts from: a neck 3 mm wide and 1 mm long opening into a rigid-walled cavity 27 mm wide and 30 mm deep, with the four defining dimensions dimensioned" width="80%"></picture>
+
+*The four numbers that define the resonator: the neck side and length set
+the moving mass and most of the loss, the cavity side and length set the
+stiffness. `critical_coupling_design` keeps this cross-section and retunes
+the cavity length to place the resonance.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import HelmholtzResonator
+
+resonator = HelmholtzResonator(
+    neck_length=1.0e-3, neck_side=3.0e-3,
+    cavity_length=30.0e-3, cavity_side=27.0e-3,
+)
+resonator.plot()   # dimensioned cross-section, to scale
+plt.show()
+```
+
+</details>
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slit_absorber_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slit_absorber_geometry.svg" alt="To-scale cross-section of one period of the critically-coupled slit panel: a slit about 1 mm high running the 30 mm depth of the panel, loaded by the tuned Helmholtz resonator cavity that fills the rest of the 50 mm period, with the rigid backing behind and the incident sound arriving from the left" width="80%"></picture>
+
+*One period of the solved design, to scale: the whole panel is 30 mm deep,
+$\lambda/38$ at 300 Hz, and the sub-millimetre slit that does all the
+absorbing is barely visible. That is exactly the point of the slow-sound
+mechanism.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import HelmholtzResonator, critical_coupling_design, materials
+
+base = HelmholtzResonator(
+    neck_length=1.0e-3, neck_side=3.0e-3,
+    cavity_length=30.0e-3, cavity_side=27.0e-3,
+)
+design = critical_coupling_design(
+    300.0, base, lattice_step=3.0e-2, period=5.0e-2,
+)
+
+# The free function draws any resonator list; a slit_helmholtz_absorber
+# result retains its geometry, so res.plot_geometry() draws the same period.
+materials.plot_slit_absorber_geometry(
+    [design.resonator], slit_height=design.slit_height,
+    lattice_step=3.0e-2, period=5.0e-2,
+)
+plt.show()
+```
+
+</details>
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slow_sound_absorber_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slow_sound_absorber.svg" alt="Absorption of a slit panel loaded by one Helmholtz resonator: the critically-coupled design reaches alpha = 1 at 300 Hz, while narrowing or widening the slit breaks the balance and lowers the peak; the panel depth is lambda/38" width="80%"></picture>
+
+*One resonator, one slit, one loss-versus-leakage balance: the critically
+coupled design reaches $\alpha = 1$ at 300 Hz in a panel only $\lambda/38$
+deep; detuning the slit height drops the peak below one.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import (
+    HelmholtzResonator, critical_coupling_design, slit_helmholtz_absorber,
+)
+
+a, d, f0 = 3.0e-2, 5.0e-2, 300.0
+base = HelmholtzResonator(1.0e-3, 3.0e-3, 30.0e-3, 27.0e-3)
+design = critical_coupling_design(f0, base, lattice_step=a, period=d)
+h0 = design.slit_height
+
+f = np.linspace(150.0, 500.0, 700)
+fig, ax = plt.subplots()
+for factor, label in [(1.0, "critically coupled"),
+                      (0.6, "narrow slit"), (1.7, "wide slit")]:
+    res = slit_helmholtz_absorber(
+        f, design.resonator, slit_height=factor * h0,
+        lattice_step=a, period=d,
+    )
+    ax.plot(f, res.absorption, label=label)
+ax.set(xlabel="Frequency [Hz]", ylabel="Absorption coefficient")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+The clip below drives this exact cell in a virtual plane-wave tube: the
+sub-millimetre slit and its resonator are meshed on the FDTD grid and filled
+with the model's visco-thermal effective fluids. At the design slit height
+the standing wave collapses and the tone dies inside the panel; at 1.7 times
+the height the loss balance breaks and the reflection rebuilds it.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_slit_absorber_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_slit_absorber.gif" alt="Animation: a 300 Hz plane tone in a 2D FDTD tube meets the meshed critical-coupling cell, its 0.98 mm slit and Helmholtz resonator resolved on the grid and shown in a zoomed panel; at the design slit height the pressure envelope stays flat and the annotated library absorption is 1.00, while the 1.7 times wider slit stands a deep wave in front of the panel and the absorption drops to 0.34" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_slit_absorber.webm)
+
+## 3. How slow is the sound?
+
+The name of the mechanism is measurable. The transfer-matrix result retains
+the retrieved effective wavenumber of the loaded slit, so the phase speed
+inside it is one division away, and the comparison with the empty slit says
+everything about why the panel can be thin:
+
+```python
+import numpy as np
+from phonometry import (
+    HelmholtzResonator, critical_coupling_design, slit_helmholtz_absorber,
+)
+
+base = HelmholtzResonator(
+    neck_length=1.0e-3, neck_side=3.0e-3,
+    cavity_length=30.0e-3, cavity_side=27.0e-3,
+)
+design = critical_coupling_design(300.0, base, lattice_step=3.0e-2, period=5.0e-2)
+res = slit_helmholtz_absorber(
+    np.array([300.0]), design.resonator, slit_height=design.slit_height,
+    lattice_step=3.0e-2, period=5.0e-2,
+)
+
+# Phase speed of the slit mode at the design frequency, from k_eff.
+c_eff = 2 * np.pi * 300.0 / res.effective_wavenumber[0].real
+print(round(float(c_eff), 1))               # 37.0   [m/s]
+print(round(float(c_eff / 343.0), 2))       # 0.11   about a ninth of c0
+
+# Quarter-wave resonance of the 30 mm depth: plain air vs the loaded slit.
+print(round(343.0 / (4 * 0.03)))            # 2858   [Hz] empty slit
+print(round(float(c_eff) / (4 * 0.03)))     # 308    [Hz] loaded slit
+```
+
+Below their resonance the shunt resonators add compliance to the slit without
+adding moving mass, and the phase speed falls to about a ninth of the free-air
+value. The 30 mm slit that would resonate at 2.9 kHz empty resonates at
+about 300 Hz loaded, which is precisely where the critical-coupling design of
+section 1 places its reflection zero. Slow sound moves the resonance into the
+deep-subwavelength regime; critical coupling then makes that resonance
+perfectly absorbing.
+
+## 4. Classical resonant absorbers through the same lens
+
+Critical coupling is not exclusive to metamaterials; it is the organising
+principle hiding inside the classical resonant absorbers of the
+[porous and multilayer guide](https://jmrplens.github.io/phonometry/guides/porous-absorbers/):
+
+- **The microperforated panel is a critically coupled absorber avant la
+  lettre.** Maa's peak absorption $4r/(1+r)^2$ equals one exactly when the
+  normalised resistance $r = 1$, which is the impedance-matching condition of
+  section 1 stated for a locally reacting sheet. An MPP over a cavity tuned
+  to $r = 1$ is doing precisely what the slit panel does, with the viscous
+  loss provided by submillimetre holes instead of a submillimetre slit; what
+  it cannot do is slow the sound, so its cavity depth stays a quarter
+  wavelength deep at resonance and the construction cannot reach the
+  deep-subwavelength regime.
+- **Membrane and decorated-membrane absorbers** trade the hole viscosity for
+  the flexural loss of a limp sheet; the same loss-versus-leakage balance
+  governs their peak, and adding masses to the membrane (the decorated
+  membrane of the metamaterials literature) tunes the resonance downward the
+  way the loading resonators tune the slit.
+- **The design question is always the same.** Pick the resonance with the
+  geometry, then match the loss to the leakage. The porous-layer models ask
+  "how thick"; the resonant family asks "how lossy", and
+  `critical_coupling_design` answers it for the slit panel exactly.
+
+The price of resonance is bandwidth: a critically coupled peak is narrow, and
+away from it the panel reflects like the rigid wall it almost is. Broadband
+metamaterial absorbers stack detuned cells side by side (the iridescent
+absorber of Jiménez et al. 2017 chains resonators of graded dimensions for
+exactly this reason); in the library the spectrum of any candidate geometry comes
+from `slit_helmholtz_absorber` over a frequency array, so a graded design is
+a loop over cells.
+
+## See also
+
+- [Porous and Multilayer Absorbers](https://jmrplens.github.io/phonometry/guides/porous-absorbers/): the equivalent-fluid
+  and resonant layers of the classical family, including the Maa
+  microperforated panel that section 4 re-reads.
+- [Metadiffusers](https://jmrplens.github.io/phonometry/guides/metadiffusers/): the same slit and resonator cell tuned
+  for controlled reflection phase instead of perfect absorption; its ternary
+  designs borrow the critically coupled slit as their `0` state.
+- [Impedance Tube](https://jmrplens.github.io/phonometry/guides/impedance-tube/): the normal-incidence measurement a
+  built panel would be verified in, and the virtual FDTD tube behind the
+  animation above.
+- [Airflow Resistance](https://jmrplens.github.io/phonometry/guides/airflow-resistance/): the viscous physics of the
+  narrow channels, measured on the bulk material.
+- API reference: [`materials.slow_sound_absorber`](https://jmrplens.github.io/phonometry/reference/api/materials/slow-sound-absorber/).
+
+## References
+
+- Jiménez, N., Groby, J.-P., Pagneux, V., & Romero-García, V. (2017).
+  Iridescent perfect absorption in critically-coupled acoustic metamaterials
+  using the transfer matrix method. *Applied Sciences*, 7(6), 618.
+  [doi:10.3390/app7060618](https://doi.org/10.3390/app7060618). The slit +
+  Helmholtz-resonator transfer-matrix model and the critical-coupling
+  condition implemented in `slit_helmholtz_absorber`, plus the graded
+  (iridescent) broadband chains of section 4.
+- Jiménez, N., Huang, W., Romero-García, V., Pagneux, V., & Groby, J.-P.
+  (2016). Ultra-thin metamaterial for perfect and quasi-omnidirectional sound
+  absorption. *Applied Physics Letters*, 109(12), 121902.
+  [doi:10.1063/1.4962328](https://doi.org/10.1063/1.4962328). The resonator
+  impedance (Eq. A23) and its radiation end corrections (Eqs. A24-A27), and
+  the published λ/88 perfect absorber cited in the introduction.
+- Stinson, M. R. (1991). The propagation of plane sound waves in narrow and
+  wide circular tubes, and generalization to uniform tubes of arbitrary
+  cross-sectional shape. *Journal of the Acoustical Society of America*,
+  89(2), 550-558. [doi:10.1121/1.400379](https://doi.org/10.1121/1.400379).
+  The visco-thermal effective parameters of the slit and the square necks
+  and cavities.
+- Maa, D.-Y. (1998). Potential of microperforated panel absorber.
+  *Journal of the Acoustical Society of America*, 104(5), 2861-2866.
+  [doi:10.1121/1.423870](https://doi.org/10.1121/1.423870).
+  The MPP impedance and design formulas whose $r = 1$ peak condition
+  section 4 identifies with critical coupling.
+- Cox, T. J., & D'Antonio, P. (2017). *Acoustic absorbers and diffusers:
+  Theory, design and application* (3rd ed.). CRC Press.
+  ISBN 978-1-4987-4099-9.
+  [doi:10.1201/9781315369211](https://doi.org/10.1201/9781315369211).
+  The classical resonant-absorber designs the metamaterial family extends.
+- Jiménez, N., Umnova, O., & Groby, J.-P. (Eds.). (2021). *Acoustic waves in
+  periodic structures, metamaterials, and porous media* (Topics in Applied
+  Physics, Vol. 143). Springer.
+  [doi:10.1007/978-3-030-84300-7](https://doi.org/10.1007/978-3-030-84300-7).
+  The book-length treatment of critical coupling, slow sound and resonant
+  metamaterial absorbers.
+
+## Standards
+
+No standard governs these prediction models; they are journal methods
+(Jiménez et al. 2016/2017; Stinson 1991) implemented clean-room from the
+cited sources. The model is pinned to its exact analytic anchors: the
+critical-coupling design reaches $\alpha = 1$ at the design frequency, the
+slit and square-duct effective densities reduce to the Poiseuille flow
+resistivities $12\eta/h^2$ and $28.454\eta/w^2$ as $\omega \to 0$, and the
+effective parameters tend to $\rho_0$, $\kappa_0$ as the boundary layers
+vanish. A built panel would be measured in the
+[impedance tube](https://jmrplens.github.io/phonometry/guides/impedance-tube/) (ISO 10534-2) or the
+[reverberation room](https://jmrplens.github.io/phonometry/guides/absorption-measurement/) (ISO 354); misprints found in
+the source papers during this work are recorded in the
+[errata registry](https://jmrplens.github.io/phonometry/reference/errata/).
+
+---
+
+
 <!-- source: docs/miso-coherence.md | canonical: https://jmrplens.github.io/phonometry/guides/miso-coherence/ -->
 Source: https://jmrplens.github.io/phonometry/guides/miso-coherence/
 
@@ -18127,7 +19451,10 @@ multilayer solver, the resonant sheet layers of Maa and the random-incidence
 [impedance tube](https://jmrplens.github.io/phonometry/guides/impedance-tube/) and
 [reverberation room](https://jmrplens.github.io/phonometry/guides/absorption-measurement/) guides; rating the predicted
 spectrum lives in the latter's
-[ISO 11654 section](https://jmrplens.github.io/phonometry/guides/absorption-measurement/#3-weighted-rating-and-absorption-class-iso-11654).
+[ISO 11654 section](https://jmrplens.github.io/phonometry/guides/absorption-measurement/#3-weighted-rating-and-absorption-class-iso-11654);
+and the resonant metamaterial relatives of these constructions, slow-sound
+slit panels that reach perfect absorption at critical coupling, have their
+own guide, [Metamaterial Absorbers](https://jmrplens.github.io/phonometry/guides/metamaterial-absorbers/).
 
 ## 1. Equivalent-fluid models of a porous material
 
@@ -18518,151 +19845,15 @@ plt.show()
 
 </details>
 
-## 5. Slow-sound slit panels with Helmholtz resonators
+The classical layers above absorb with bulk or with a quarter-wave cavity.
+Their resonant metamaterial relatives, rigid panels of sub-millimetre slits
+loaded by Helmholtz resonators that slow the sound and reach perfect
+absorption ($\alpha = 1$) at critical coupling in panels only $\lambda/38$
+deep, moved to their own guide:
+[Metamaterial Absorbers](https://jmrplens.github.io/phonometry/guides/metamaterial-absorbers/) covers the
+transfer-matrix model, the critical-coupling design solver and the FDTD
+cross-check of the meshed cell.
 
-A rigid panel of thin closed slits, each loaded on its upper wall by an array
-of Helmholtz resonators, is a locally reacting, deep-subwavelength absorber
-(Jiménez et al. 2017). The resonators slow the sound in the slit, pulling its
-resonance far below the quarter-wavelength frequency, and the visco-thermal
-losses of the sub-millimetre slit and the resonator necks make *perfect*
-absorption possible: when the intrinsic loss balances the leakage, the
-reflection zero lands on the real-frequency axis and $\alpha = 1$ (critical
-coupling). The panel transfer matrix is the chain
-$T = M_{\Delta l}\,\prod_n (M_s\,M_{HR}^{(n)}\,M_s)$; the rigidly-backed
-reflection factor is
-$R = (T_{11}\cos\theta - Z_0 T_{21})/(T_{11}\cos\theta + Z_0 T_{21})$ with
-$Z_0 = \rho_0 c_0 / S_0$. `critical_coupling_design` inverts the model, tuning
-the cavity length and the slit height so both matching conditions
-$\mathrm{Re}(Z)\cos\theta = Z_0$ and $\mathrm{Im}(Z) = 0$ hold.
-
-```python
-import numpy as np
-from phonometry import (
-    HelmholtzResonator, critical_coupling_design, slit_helmholtz_absorber,
-)
-
-base = HelmholtzResonator(
-    neck_length=1.0e-3, neck_side=3.0e-3,
-    cavity_length=30.0e-3, cavity_side=27.0e-3,
-)
-design = critical_coupling_design(300.0, base, lattice_step=3.0e-2, period=5.0e-2)
-print(round(design.absorption, 4))          # ~1.0 (perfect absorption)
-
-f = np.linspace(150.0, 500.0, 700)
-res = slit_helmholtz_absorber(
-    f, design.resonator, slit_height=design.slit_height,
-    lattice_step=3.0e-2, period=5.0e-2,
-)
-res.plot()   # alpha(f) with |R| overlaid; peak = 1 at 300 Hz
-```
-
-The solved geometry is worth a look before the absorption curve. The
-resonator draws itself with `.plot()` and the panel result with
-`.plot_geometry()`, both dimensioned and to scale.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/helmholtz_resonator_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/helmholtz_resonator_geometry.svg" alt="To-scale cross-section of the square-section Helmholtz resonator the 300 Hz critical-coupling design starts from: a neck 3 mm wide and 1 mm long opening into a rigid-walled cavity 27 mm wide and 30 mm deep, with the four defining dimensions dimensioned" width="80%"></picture>
-
-*The four numbers that define the resonator: the neck side and length set
-the moving mass and most of the loss, the cavity side and length set the
-stiffness. `critical_coupling_design` keeps this cross-section and retunes
-the cavity length to place the resonance.*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import HelmholtzResonator
-
-resonator = HelmholtzResonator(
-    neck_length=1.0e-3, neck_side=3.0e-3,
-    cavity_length=30.0e-3, cavity_side=27.0e-3,
-)
-resonator.plot()   # dimensioned cross-section, to scale
-plt.show()
-```
-
-</details>
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slit_absorber_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slit_absorber_geometry.svg" alt="To-scale cross-section of one period of the critically-coupled slit panel: a slit about 1 mm high running the 30 mm depth of the panel, loaded by the tuned Helmholtz resonator cavity that fills the rest of the 50 mm period, with the rigid backing behind and the incident sound arriving from the left" width="80%"></picture>
-
-*One period of the solved design, to scale: the whole panel is 30 mm deep,
-$\lambda/38$ at 300 Hz, and the sub-millimetre slit that does all the
-absorbing is barely visible. That is exactly the point of the slow-sound
-mechanism.*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import HelmholtzResonator, critical_coupling_design, materials
-
-base = HelmholtzResonator(
-    neck_length=1.0e-3, neck_side=3.0e-3,
-    cavity_length=30.0e-3, cavity_side=27.0e-3,
-)
-design = critical_coupling_design(
-    300.0, base, lattice_step=3.0e-2, period=5.0e-2,
-)
-
-# The free function draws any resonator list; a slit_helmholtz_absorber
-# result retains its geometry, so res.plot_geometry() draws the same period.
-materials.plot_slit_absorber_geometry(
-    [design.resonator], slit_height=design.slit_height,
-    lattice_step=3.0e-2, period=5.0e-2,
-)
-plt.show()
-```
-
-</details>
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slow_sound_absorber_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slow_sound_absorber.svg" alt="Absorption of a slit panel loaded by one Helmholtz resonator: the critically-coupled design reaches alpha = 1 at 300 Hz, while narrowing or widening the slit breaks the balance and lowers the peak; the panel depth is lambda/38" width="80%"></picture>
-
-*One resonator, one slit, one loss-versus-leakage balance: the critically
-coupled design reaches $\alpha = 1$ at 300 Hz in a panel only $\lambda/38$
-deep; detuning the slit height drops the peak below one.*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import (
-    HelmholtzResonator, critical_coupling_design, slit_helmholtz_absorber,
-)
-
-a, d, f0 = 3.0e-2, 5.0e-2, 300.0
-base = HelmholtzResonator(1.0e-3, 3.0e-3, 30.0e-3, 27.0e-3)
-design = critical_coupling_design(f0, base, lattice_step=a, period=d)
-h0 = design.slit_height
-
-f = np.linspace(150.0, 500.0, 700)
-fig, ax = plt.subplots()
-for factor, label in [(1.0, "critically coupled"),
-                      (0.6, "narrow slit"), (1.7, "wide slit")]:
-    res = slit_helmholtz_absorber(
-        f, design.resonator, slit_height=factor * h0,
-        lattice_step=a, period=d,
-    )
-    ax.plot(f, res.absorption, label=label)
-ax.set(xlabel="Frequency [Hz]", ylabel="Absorption coefficient")
-ax.legend()
-plt.show()
-```
-
-</details>
-
-The clip below drives this exact cell in a virtual plane-wave tube: the
-sub-millimetre slit and its resonator are meshed on the FDTD grid and filled
-with the model's visco-thermal effective fluids. At the design slit height
-the standing wave collapses and the tone dies inside the panel; at 1.7 times
-the height the loss balance breaks and the reflection rebuilds it.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_slit_absorber_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_slit_absorber.gif" alt="Animation: a 300 Hz plane tone in a 2D FDTD tube meets the meshed critical-coupling cell, its 0.98 mm slit and Helmholtz resonator resolved on the grid and shown in a zoomed panel; at the design slit height the pressure envelope stays flat and the annotated library absorption is 1.00, while the 1.7 times wider slit stands a deep wave in front of the panel and the absorption drops to 0.34" width="640" height="360" loading="lazy"></picture>
-
-[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_slit_absorber.webm)
 
 ## Practical notes
 
@@ -18684,7 +19875,7 @@ printed coefficient tables (Bies Table D.1, Miki Eqs. 30–34), the solver to
 the closed forms above and to the `TransferMatrix` recovery of the
 [impedance-tube page](https://jmrplens.github.io/phonometry/guides/impedance-tube/), the MPP to Maa's own approximation
 (stated ~6 % agreement with the exact Eq. 2), design example and Table I,
-and the Paris integral to its locally reacting closed form. Five misprints
+and the Paris integral to its locally reacting closed form. Three misprints
 found in the sources during this work are recorded in the
 [errata registry](https://jmrplens.github.io/phonometry/reference/errata/).
 
@@ -18730,23 +19921,6 @@ found in the sources during this work are recorded in the
   absorbent materials. *Applied Acoustics*, 3(2), 105–116.
   [doi:10.1016/0003-682X(70)90031-9](https://doi.org/10.1016/0003-682X(70)90031-9).
   The original empirical relations and their stated validity.
-- Jiménez, N., Groby, J.-P., Pagneux, V., & Romero-García, V. (2017).
-  Iridescent perfect absorption in critically-coupled acoustic metamaterials
-  using the transfer matrix method. *Applied Sciences*, 7(6), 618.
-  [doi:10.3390/app7060618](https://doi.org/10.3390/app7060618). The slit +
-  Helmholtz-resonator transfer-matrix model and the critical-coupling
-  condition implemented in `slit_helmholtz_absorber`.
-- Jiménez, N., Huang, W., Romero-García, V., Pagneux, V., & Groby, J.-P.
-  (2016). Ultra-thin metamaterial for perfect and quasi-omnidirectional sound
-  absorption. *Applied Physics Letters*, 109(12), 121902.
-  [doi:10.1063/1.4962328](https://doi.org/10.1063/1.4962328). The resonator
-  impedance (Eq. A23) and its radiation end corrections (Eqs. A24–A27).
-- Stinson, M. R. (1991). The propagation of plane sound waves in narrow and
-  wide circular tubes, and generalization to uniform tubes of arbitrary
-  cross-sectional shape. *Journal of the Acoustical Society of America*,
-  89(2), 550–558. [doi:10.1121/1.400379](https://doi.org/10.1121/1.400379).
-  The visco-thermal effective parameters of the slit and the square necks
-  and cavities.
 
 ## Standards
 
@@ -19919,8 +21093,71 @@ it; the list grows as guides gain their References sections.
   authors behind the ISO 17497-2 diffusion-coefficient method.
   Cited by
   [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/guides/absorption-measurement/),
-  [Porous and Multilayer Absorbers](https://jmrplens.github.io/phonometry/guides/porous-absorbers/) and
-  [Surface Scattering, Diffusion and In-situ Absorption](https://jmrplens.github.io/phonometry/guides/surface-scattering/).
+  [Porous and Multilayer Absorbers](https://jmrplens.github.io/phonometry/guides/porous-absorbers/),
+  [Diffusers and Their Coefficients](https://jmrplens.github.io/phonometry/guides/diffusers/),
+  [Metadiffusers](https://jmrplens.github.io/phonometry/guides/metadiffusers/) and
+  [Metamaterial Absorbers](https://jmrplens.github.io/phonometry/guides/metamaterial-absorbers/).
+- Hargreaves, T. J., Cox, T. J., Lam, Y. W., & D'Antonio, P. (2000). Surface
+  diffusion coefficients for room acoustics: Free-field measures of
+  single-plane diffusion. *The Journal of the Acoustical Society of America*,
+  108(4), 1710-1720.
+  [doi:10.1121/1.1310192](https://doi.org/10.1121/1.1310192).
+  The free-field diffusion-coefficient method behind ISO 17497-2 and the
+  published N = 7 QRD geometry of the worked example.
+  Cited by [Diffusers and Their Coefficients](https://jmrplens.github.io/phonometry/guides/diffusers/).
+- Audio Engineering Society. (2001). *AES information document for room
+  acoustics and sound reinforcement systems — Characterization and
+  measurement of surface scattering uniformity* (AES-4id-2001). *Journal of
+  the Audio Engineering Society*, 49(3), 149-165.
+  [AES standards in print](https://www.aes.org/publications/standards/list.cfm).
+  The single-plane free-field diffusion-coefficient procedure that
+  ISO 17497-2 later standardised.
+  Cited by [Diffusers and Their Coefficients](https://jmrplens.github.io/phonometry/guides/diffusers/).
+- Jiménez, N., Cox, T. J., Romero-García, V., & Groby, J.-P. (2017).
+  Metadiffusers: Deep-subwavelength sound diffusers. *Scientific Reports*,
+  7, 5389.
+  [doi:10.1038/s41598-017-05710-5](https://doi.org/10.1038/s41598-017-05710-5).
+  The metadiffuser model: resonator-loaded slits reproducing Schroeder phase
+  profiles and ternary sequences from deep-subwavelength panels.
+  Cited by [Metadiffusers](https://jmrplens.github.io/phonometry/guides/metadiffusers/).
+- Jiménez, N., Cox, T. J., Groby, J.-P., & Romero-García, V. (2019). Beyond
+  phase grating diffusers using locally-resonant metamaterials. *Proceedings
+  of the 23rd International Congress on Acoustics (ICA 2019)*, Aachen.
+  [Proceedings PDF](https://pub.dega-akustik.de/ICA2019/data/articles/000706.pdf).
+  The congress companion to the metadiffuser paper: the transfer-matrix
+  chain and the slow-sound dispersion picture.
+  Cited by [Metadiffusers](https://jmrplens.github.io/phonometry/guides/metadiffusers/).
+- Jiménez, N., Groby, J.-P., Pagneux, V., & Romero-García, V. (2017).
+  Iridescent perfect absorption in critically-coupled acoustic metamaterials
+  using the transfer matrix method. *Applied Sciences*, 7(6), 618.
+  [doi:10.3390/app7060618](https://doi.org/10.3390/app7060618).
+  The slit + Helmholtz-resonator transfer-matrix model and the
+  critical-coupling condition.
+  Cited by [Metamaterial Absorbers](https://jmrplens.github.io/phonometry/guides/metamaterial-absorbers/) and
+  [Metadiffusers](https://jmrplens.github.io/phonometry/guides/metadiffusers/).
+- Jiménez, N., Huang, W., Romero-García, V., Pagneux, V., & Groby, J.-P.
+  (2016). Ultra-thin metamaterial for perfect and quasi-omnidirectional
+  sound absorption. *Applied Physics Letters*, 109(12), 121902.
+  [doi:10.1063/1.4962328](https://doi.org/10.1063/1.4962328).
+  The resonator impedance and radiation end corrections, and the published
+  λ/88 perfect absorber.
+  Cited by [Metamaterial Absorbers](https://jmrplens.github.io/phonometry/guides/metamaterial-absorbers/) and
+  [Metadiffusers](https://jmrplens.github.io/phonometry/guides/metadiffusers/).
+- Jiménez, N., Umnova, O., & Groby, J.-P. (Eds.). (2021). *Acoustic waves in
+  periodic structures, metamaterials, and porous media* (Topics in Applied
+  Physics, Vol. 143). Springer.
+  [doi:10.1007/978-3-030-84300-7](https://doi.org/10.1007/978-3-030-84300-7).
+  The book-length treatment of resonant metamaterial absorbers and
+  diffusers; the modern companion to Cox & D'Antonio.
+  Cited by [Metadiffusers](https://jmrplens.github.io/phonometry/guides/metadiffusers/) and
+  [Metamaterial Absorbers](https://jmrplens.github.io/phonometry/guides/metamaterial-absorbers/).
+- Stinson, M. R. (1991). The propagation of plane sound waves in narrow and
+  wide circular tubes, and generalization to uniform tubes of arbitrary
+  cross-sectional shape. *Journal of the Acoustical Society of America*,
+  89(2), 550-558. [doi:10.1121/1.400379](https://doi.org/10.1121/1.400379).
+  The visco-thermal effective parameters of the slit and the square necks
+  and cavities.
+  Cited by [Metamaterial Absorbers](https://jmrplens.github.io/phonometry/guides/metamaterial-absorbers/).
 - Mechel, F. P. (Ed.). (2008). *Formulas of acoustics* (2nd ed.). Springer.
   ISBN 978-3-540-76832-6.
   [doi:10.1007/978-3-540-76833-3](https://doi.org/10.1007/978-3-540-76833-3).
@@ -19956,7 +21193,8 @@ it; the list grows as guides gain their References sections.
   [doi:10.1121/1.423870](https://doi.org/10.1121/1.423870).
   The exact microperforated-panel impedance, its end corrections and the
   design formulas.
-  Cited by [Porous and Multilayer Absorbers](https://jmrplens.github.io/phonometry/guides/porous-absorbers/).
+  Cited by [Porous and Multilayer Absorbers](https://jmrplens.github.io/phonometry/guides/porous-absorbers/) and
+  [Metamaterial Absorbers](https://jmrplens.github.io/phonometry/guides/metamaterial-absorbers/).
 - International Organization for Standardization. (1998). *Acoustics —
   Determination of sound absorption coefficient and impedance in impedance
   tubes — Part 2: Transfer-function method* (ISO 10534-2:1998; adopted in
@@ -20014,13 +21252,28 @@ it; the list grows as guides gain their References sections.
   (ISO 17497-1:2004+A1:2014, the edition implemented here).
   [iso.org catalogue](https://www.iso.org/standard/31397.html).
   The turntable scattering-coefficient method.
-  Cited by [Surface Scattering, Diffusion and In-situ Absorption](https://jmrplens.github.io/phonometry/guides/surface-scattering/).
+  Cited by [Diffusers and Their Coefficients](https://jmrplens.github.io/phonometry/guides/diffusers/).
 - International Organization for Standardization. (2012). *Acoustics —
   Sound-scattering properties of surfaces — Part 2: Measurement of the
   directional diffusion coefficient in a free field* (ISO 17497-2:2012).
   [iso.org catalogue](https://www.iso.org/standard/55293.html).
   The goniometer diffusion-coefficient method.
-  Cited by [Surface Scattering, Diffusion and In-situ Absorption](https://jmrplens.github.io/phonometry/guides/surface-scattering/).
+  Cited by [Diffusers and Their Coefficients](https://jmrplens.github.io/phonometry/guides/diffusers/).
+- International Organization for Standardization. (2002). *Acoustics —
+  Measurement of sound absorption properties of road surfaces in situ —
+  Part 1: Extended surface method* (ISO 13472-1:2002, the edition
+  implemented here; since revised as ISO 13472-1:2022).
+  [iso.org catalogue](https://www.iso.org/standard/35387.html).
+  The subtraction technique with the Adrienne window and the sampled-area
+  radius.
+  Cited by [In-situ Road-Surface Absorption](https://jmrplens.github.io/phonometry/guides/road-absorption/).
+- International Organization for Standardization. (2010). *Acoustics —
+  Measurement of sound absorption properties of road surfaces in situ —
+  Part 2: Spot method for reflective surfaces* (ISO 13472-2:2010, the
+  edition implemented here; since revised as ISO 13472-2:2025).
+  [iso.org catalogue](https://www.iso.org/standard/32304.html).
+  The spot-tube method and its plane-wave and spacing limits.
+  Cited by [In-situ Road-Surface Absorption](https://jmrplens.github.io/phonometry/guides/road-absorption/).
 
 ## Building acoustics
 
@@ -20961,6 +22214,346 @@ hand-computed closed-form values and the model identities (every model
 collapses to Eyring for uniform absorption; Eyring collapses to Sabine as
 $\alpha \to 0$), which transitively carry that real-data anchor to the
 whole family.
+
+---
+
+
+<!-- source: docs/road-absorption.md | canonical: https://jmrplens.github.io/phonometry/guides/road-absorption/ -->
+Source: https://jmrplens.github.io/phonometry/guides/road-absorption/
+
+# In-situ Road-Surface Absorption
+
+How much sound a road surface absorbs decides how loud its traffic is, and a
+core cannot be cut out of a motorway and carried to a laboratory. ISO 13472
+measures the absorption *in situ*, on the pavement as built, twice over. The
+**subtraction technique** of Part 1 fires an impulse from a loudspeaker down
+onto an extended surface and separates the incident and reflected components
+of one microphone's impulse response in time; the **spot method** of Part 2
+seals a short tube onto a small patch and hands the mathematics to the
+impedance-tube transfer-function method. This guide covers both, from the
+mandatory geometry and the Adrienne window to the sampled area and the
+plane-wave limits of the tube, and closes with the choice between them.
+
+## 1. Subtraction technique (ISO 13472-1)
+
+Out in the field there is no reverberation room. ISO 13472-1 measures the sound
+absorption of a road surface (or any extended flat surface) *in situ* by firing
+an impulse from a loudspeaker at height $d_s$ down onto the surface and recording
+the impulse response at a microphone at height $d_m$. The **incident** and
+**reflected** components are separated in time with an Adrienne window; their
+transfer function gives the reflection factor and hence the absorption.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insitu_subtraction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insitu_subtraction.svg" alt="ISO 13472-1 in-situ road absorption by the subtraction technique: a loudspeaker at 1.25 m and a microphone at 0.25 m above the road surface, with the direct and road-reflected ray paths and a free-field reference measurement, the reflected component isolated by an Adrienne time window" width="92%"></picture>
+
+**Geometrical spreading (Clause 4.1).** The reflected wave travels farther than
+the direct wave, so it is attenuated by the geometrical-spreading factor
+
+$$
+K_r = \frac{d_s - d_m}{d_s + d_m},
+$$
+
+which equals $2/3$ for the mandatory geometry $d_s = 1.25$ m, $d_m = 0.25$ m.
+The absorption follows from the windowed incident and reflected spectra
+$H_i$, $H_r$:
+
+$$
+\alpha(f) = 1 - \frac{1}{K_r^2}\left|\frac{H_r(f)}{H_i(f)}\right|^2.
+$$
+
+```python
+import numpy as np
+from phonometry import materials
+
+# A band-limited incident impulse response and a synthetic road reflection
+# hr = Kr * r0 * delayed(hi): a reflection of magnitude r0 = 0.4, delayed by the
+# extra path, and scaled by the geometrical-spreading factor Kr.
+fs, n = 48000.0, 4096
+t = np.arange(n) / fs
+hi = np.zeros(n)
+hi[:64] = np.hanning(64) * np.cos(2.0 * np.pi * 1500.0 * t[:64])
+
+kr = materials.geometric_spreading_factor()          # (ds - dm)/(ds + dm) = 2/3
+hr = kr * 0.4 * np.roll(hi, 96)
+
+# Narrow-band absorption, then reduced to one-third octaves over 250-4000 Hz.
+alpha = materials.insitu_absorption_coefficient(hi, hr)   # 1 - (1/Kr^2)|Hr/Hi|^2
+freq = np.fft.rfftfreq(n, 1.0 / fs)
+centres, band = materials.one_third_octave_absorption(freq, alpha)
+print(round(kr, 4))                # 0.6667
+print(round(float(band[2]), 3))    # 0.84  (alpha = 1 - 0.4^2 = 0.84)
+```
+
+**Adrienne window (Clause 6.4).** The time window that isolates the reflection
+mandates only a sharp leading edge, a 5 ms flat portion and a cosine-squared or
+Blackman-Harris trailing edge; the exact durations are reported per measurement,
+not fixed, so they are configurable here.
+
+```python
+from phonometry import materials
+
+# Default: 0.5 ms leading edge, 5 ms flat top, 5 ms Blackman-Harris trailing.
+w = materials.adrienne_window(48000.0)
+print(w.shape[0])          # 504 samples at 48 kHz
+print(round(float(w.max()), 3))   # 1.0  (flat top and edges meet at unity)
+```
+
+**End-to-end spectrum.** `insitu_absorption_spectrum` runs the whole chain (the
+windowed incident and reflected impulse responses to the narrow-band absorption
+and on to one-third-octave bands) and returns a plottable
+`InsituAbsorptionResult`:
+
+```python
+import numpy as np
+from phonometry import materials
+from scipy.signal import firwin, lfilter
+
+# A synthetic-but-realistic measurement. hi is a unit incident impulse; the road
+# reflection hr = Kr * r0 * roll(hi, shift) uses the geometrical-spreading
+# factor Kr, a mildly frequency-dependent r0 (a gentle low-pass, so a porous
+# surface reflects less as frequency rises) and the reflected-path delay
+# shift = round(2 dm / c * fs).
+fs, n = 48000.0, 8192
+kr = materials.geometric_spreading_factor()           # (ds - dm)/(ds + dm) = 2/3
+hi = np.zeros(n)
+hi[0] = 1.0
+taps = firwin(41, 1200.0, fs=fs)
+taps = taps / taps.sum()
+shift = int(round(2.0 * 0.25 / 340.0 * fs))     # reflected-path delay 2 dm / c
+hr = kr * 0.85 * np.roll(lfilter(taps, 1.0, hi), shift)
+
+result = materials.insitu_absorption_spectrum(hi, hr, fs)
+print(result.frequencies[[0, -1]].astype(int))     # [ 250 4000]
+print(np.round(result.absorption[[0, 6, 12]], 2))  # [0.31 0.65 1.  ]
+result.plot()   # alpha(f) bar chart over 250-4000 Hz (needs matplotlib)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_absorption_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_absorption.svg" alt="An in-situ one-third-octave road-surface absorption spectrum computed by the reflection-factor route from a synthetic road reflection, rising from about 0.3 at 250 Hz to near 1.0 above 2 kHz" width="88%"></picture>
+
+*The absorption rises with frequency because the surface reflects less of the
+high-frequency energy, exactly as the low-pass reflection factor $r_0(f)$
+dictates through $\alpha = 1 - (1/K_r^2)\,|H_r/H_i|^2$.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.signal import firwin, lfilter
+from phonometry import materials
+
+# A synthetic-but-realistic measurement. hi is a unit incident impulse; the road
+# reflection hr = Kr * r0 * roll(hi, shift) uses the geometrical-spreading
+# factor Kr, a mildly frequency-dependent r0 (a gentle low-pass, so a porous
+# surface reflects less as frequency rises) and the reflected-path delay
+# shift = round(2 dm / c * fs).
+fs, n = 48000.0, 8192
+kr = materials.geometric_spreading_factor()           # (ds - dm)/(ds + dm) = 2/3
+hi = np.zeros(n)
+hi[0] = 1.0
+taps = firwin(41, 1200.0, fs=fs)
+taps = taps / taps.sum()
+shift = int(round(2.0 * 0.25 / 340.0 * fs))     # reflected-path delay 2 dm / c
+hr = kr * 0.85 * np.roll(lfilter(taps, 1.0, hi), shift)
+result = materials.insitu_absorption_spectrum(hi, hr, fs)
+
+# result is the InsituAbsorptionResult computed above. One line:
+result.plot()
+plt.show()
+
+# By hand: a bar chart of alpha over the one-third-octave bands.
+freqs = result.frequencies
+positions = np.arange(freqs.size)
+fig, ax = plt.subplots()
+ax.bar(positions, np.nan_to_num(result.absorption), width=0.7, color="#1f77b4")
+ax.set_xticks(positions)
+ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Absorption coefficient alpha")
+ax.set_ylim(0.0, 1.0)
+ax.set_title("In-situ road-surface absorption (ISO 13472-1)")
+plt.show()
+```
+
+</details>
+
+**Maximum sampled area (Annex A).** The finite time window limits how much of the
+surface contributes to the reflection. The maximum sampled area is a circle whose
+radius the library computes from the geometry and window width; the Annex A worked
+example ($d_s = 1.25$ m, $d_m = 0.25$ m, $c = 340$ m/s, 5 ms flat window) gives
+about 1.34 m.
+
+```python
+from phonometry import materials
+print(round(materials.max_sampled_area_radius(5.0e-3), 3))   # 1.343  (metres)
+```
+
+The whole arrangement fits in one to-scale drawing. `plot_insitu_geometry`
+draws the standard set-up with that sampled radius on the surface, and a
+measured `InsituAbsorptionResult` that retained its heights redraws its own
+with `result.plot_geometry()`.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_setup_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_setup_geometry.svg" alt="To-scale side view of the in-situ absorption set-up: the loudspeaker on its mast 1.25 m above the hatched road surface, the microphone on the same vertical at 0.25 m, the dashed surface-reflected path below it and the 1.34 m radius of the sampled area dimensioned on the surface" width="88%"></picture>
+
+*The standard geometry to scale: source at 1.25 m, microphone at 0.25 m on the
+same vertical, and the 5 ms window turned into the 1.34 m radius of road that
+actually contributes to the reflection.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import materials
+
+# The standard geometry: source at 1.25 m, microphone at 0.25 m, and the
+# 1.34 m sampled-area radius of the 5 ms window.
+materials.plot_insitu_geometry()
+plt.show()
+
+# A measured spectrum retains its heights and redraws its own set-up:
+#   result = materials.insitu_absorption_spectrum(hi, hr, fs)
+#   result.plot_geometry()
+```
+
+</details>
+
+## 2. Spot method (ISO 13472-2)
+
+For smaller patches, ISO 13472-2 seals a short circular tube onto the surface and
+measures the absorption with the two-microphone transfer-function method of
+ISO 10534-2. The library provides the spot-method geometry and validity helpers;
+the transfer-function DSP itself is the impedance-tube routine
+`two_microphone_impedance` (see [Impedance Tube](https://jmrplens.github.io/phonometry/guides/impedance-tube/)).
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spot_tube_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spot_tube.svg" alt="ISO 13472-2 spot method: a short circular tube sealed onto the road surface with a loudspeaker at the top and two microphones flush in the tube wall at spacing s, measuring absorption over 250 to 1600 Hz via the ISO 10534-2 two-microphone transfer-function method" width="92%"></picture>
+
+The apparatus is a portable impedance tube stood on end: a loudspeaker at the
+top, two flush-mounted microphones at spacing $s$ in the tube wall, and the
+road surface itself as the sample. A test fixture with a ring of deformable
+material (a rubber O-ring or similar) makes an airtight seal between the tube
+mouth and the pavement, so the patch under the mouth, not the leak around it,
+terminates the tube; the underside of that sealing device defines the plane
+of reference at which the reflection factor is evaluated. The method is
+written for **reflective** surfaces, dense asphalts and test tracks per
+ISO 10844 rather than open porous layers: the standard declares it unreliable
+once the measured absorption coefficient exceeds 0.15, and no longer calls a
+surface reflective above 0.10, because on an absorbing surface the reflected
+wave the two microphones must resolve all but vanishes. The tube samples only
+the circle under its mouth, so one reading is a spot in the statistical sense
+too: on regular roads the standard spaces measurement positions over the
+area of interest with an emphasis on the wheel tracks (as a guideline, one
+position every 10 m), on a surface that must be smooth, flat, free of debris
+and dry.
+
+**Plane-wave limits (Clause 5.4).** The tube supports only plane waves below
+
+$$
+f_u = 0.58\,\frac{c_0}{d},
+$$
+
+with $d$ the tube diameter, and the microphone spacing $s$ must sit between
+$0.05\,c_0/f_{min}$ and $0.45\,c_0/f_{max}$. The reported range is the
+one-third-octave bands 250–1600 Hz.
+
+```python
+from phonometry import materials
+
+# Upper usable frequency of a 100 mm tube and the valid spacing window.
+print(round(materials.spot_tube_upper_frequency(0.100, 343.0), 1))      # 1989.4 Hz
+s_min, s_max = materials.spot_microphone_spacing_bounds(
+    343.0, f_min=220.0, f_max=1800.0)
+print(round(s_min, 3), round(s_max, 3))    # 0.078 0.086  (metres)
+```
+
+The frequency window is the price of portability: the tube diameter that
+keeps the mouth sealable on real pavement caps the upper bands at 1600 Hz,
+and the tube length caps the lower ones at 250 Hz, a narrower window than the
+250–4000 Hz of the subtraction technique. Within it, the reduction is the
+ISO 10534-2 chain unchanged: the transfer function between the two
+microphones separates incident and reflected waves, and the standard's
+Annex A additionally subtracts the internal losses of the system (measured
+once against a rigid plate) so the tube's own dissipation is not billed to
+the road; that correction is `spot_internal_loss_correction`.
+
+## Subtraction or spot?
+
+The two parts of ISO 13472 are complements, not competitors, and Part 2's own
+introduction says both should give similar results between 315 Hz and
+1600 Hz while their fields of application differ:
+
+- **Surface type.** The subtraction technique handles the full range from
+  reflective to highly absorbing (porous asphalt included); the spot method
+  is scoped to reflective surfaces and declared unreliable above a measured
+  absorption of 0.15, where its confined reflected wave is no longer strong
+  enough to resolve.
+- **Sampled area.** The subtraction technique averages roughly 3 m² of
+  surface per position (the 1.34 m sampled-area radius of section 1), a fair
+  sample of texture and joints; the spot method sees only the patch under
+  the tube mouth, so it trades spatial representativeness for the ability to
+  sit on a narrow strip, a wheel track, or a laboratory core.
+- **Bandwidth.** 250–4000 Hz against 250–1600 Hz, which matters because the
+  tyre-road noise the measurement usually serves peaks around 1 kHz but has
+  content beyond the spot method's ceiling.
+- **Logistics.** The subtraction rig needs a mast, a free-field reference
+  measurement and a pause in traffic; the spot tube needs a flat, sealable
+  patch and minutes per point. Surface types and acceptance criteria aside,
+  that practical difference is usually what decides.
+
+Both methods report the same quantity, the normal-incidence absorption
+coefficient in one-third-octave bands, so a low-absorption lane can be
+surveyed with the spot tube and anchored with a subtraction measurement at a
+few positions.
+
+## See also
+
+- [Impedance Tube](https://jmrplens.github.io/phonometry/guides/impedance-tube/): the ISO 10534-2 two-microphone method
+  the spot tube defers its mathematics to, and the laboratory instrument the
+  spot method miniaturises.
+- [Diffusers and Their Coefficients](https://jmrplens.github.io/phonometry/guides/diffusers/): the other family of
+  surface measurements, grading where a surface sends its reflection rather
+  than how much it absorbs.
+- [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/guides/absorption-measurement/): the
+  laboratory (reverberation-room) absorption measurement and its rating, for
+  materials that can be brought indoors.
+- [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/guides/outdoor-propagation/): where the absorption
+  of the ground surface enters the propagation models.
+- API reference: [`materials.road_absorption`](https://jmrplens.github.io/phonometry/reference/api/materials/road-absorption/).
+
+## References
+
+- International Organization for Standardization. (2002). *Acoustics —
+  Measurement of sound absorption properties of road surfaces in situ —
+  Part 1: Extended surface method* (ISO 13472-1:2002, the edition
+  implemented here; since revised as
+  [ISO 13472-1:2022](https://www.iso.org/standard/77032.html)).
+  [iso.org catalogue](https://www.iso.org/standard/35387.html).
+  The subtraction technique of section 1: the mandatory geometry, the
+  Adrienne window and the Annex A sampled-area radius.
+- International Organization for Standardization. (2010). *Acoustics —
+  Measurement of sound absorption properties of road surfaces in situ —
+  Part 2: Spot method for reflective surfaces* (ISO 13472-2:2010, the
+  edition implemented here; since revised as
+  [ISO 13472-2:2025](https://www.iso.org/standard/84925.html)).
+  [iso.org catalogue](https://www.iso.org/standard/32304.html).
+  The spot method of section 2: the plane-wave limits, the microphone
+  spacing window and the deferral to ISO 10534-2.
+- International Organization for Standardization. (1998). *Acoustics —
+  Determination of sound absorption coefficient and impedance in impedance
+  tubes — Part 2: Transfer-function method* (ISO 10534-2:1998).
+  [iso.org catalogue](https://www.iso.org/standard/22851.html).
+  The two-microphone transfer-function reduction the spot method reuses,
+  implemented in the [Impedance Tube](https://jmrplens.github.io/phonometry/guides/impedance-tube/) guide.
+
+## Standards
+
+ISO 13472-1:2002 (in-situ absorption, extended surface) and ISO 13472-2:2010
+(in-situ absorption, spot method); the spot method's transfer-function DSP is
+the ISO 10534-2:1998 routine of the [Impedance Tube](https://jmrplens.github.io/phonometry/guides/impedance-tube/)
+guide. Both road standards have since been revised (ISO 13472-1:2022,
+ISO 13472-2:2025); the earlier editions are the implemented ones. Numerical
+conformance against the standards' worked examples and closed forms is
+tracked in [CONFORMANCE.md](https://jmrplens.github.io/phonometry/reference/conformance/).
 
 ---
 
@@ -26170,925 +27763,6 @@ flushing-cistern source.
 ---
 
 
-<!-- source: docs/surface-scattering.md | canonical: https://jmrplens.github.io/phonometry/guides/surface-scattering/ -->
-Source: https://jmrplens.github.io/phonometry/guides/surface-scattering/
-
-# Surface Scattering, Diffusion and In-situ Absorption
-
-How a surface returns incident sound (how much it scatters away from the
-specular direction, how uniformly it spreads what it scatters, and how much it
-absorbs) is measured by a family of dedicated methods. The **reverberation
-room** gives the random-incidence *scattering coefficient* of a surface by
-comparing decays with the sample held still and rotating (ISO 17497-1). A
-**free-field goniometer** measures the polar response of the reflected sound and
-condenses it into a *diffusion coefficient* (ISO 17497-2). And out on a road, a
-loudspeaker and a single microphone recover the *in-situ absorption* of the
-pavement, either over an extended surface by subtracting the incident wave
-(ISO 13472-1) or through a small tube pressed onto the surface (ISO 13472-2).
-This page covers all four.
-
-The scattering and diffusion coefficients answer different questions and are not
-interchangeable: scattering is *how much* energy leaves the specular direction;
-diffusion is *how evenly* the reflected energy is spread over angle.
-
-## 1. Random-incidence scattering coefficient (ISO 17497-1)
-
-The scattering coefficient $s$ is the fraction of reflected energy that does
-**not** leave the surface in the specular direction. ISO 17497-1 measures it in a
-reverberation room from four reverberation-time situations: with the test sample
-mounted on a turntable and held **stationary**, and with the turntable
-**rotating** (which averages the phase-coherent specular reflection away), each
-with and without a reflecting base plate.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_scattering_reverb_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_scattering_reverb.svg" alt="ISO 17497-1 random-incidence scattering setup: a reverberation room with the test sample on a turntable, a rotating loudspeaker boom and a microphone, measuring reverberation time with the sample stationary (giving the random-incidence absorption) and rotating (giving the specular absorption), from which the scattering coefficient is derived" width="92%"></picture>
-
-**Absorption from reverberation time (Clause 6).** Each situation converts to a
-Sabine absorption coefficient with the standard's own air-attenuation term:
-
-$$
-\alpha = 55.3\,\frac{V}{S}\left(\frac{1}{c_2 T_2} - \frac{1}{c_1 T_1}\right)
-        - 4\,\frac{V}{S}\,(m_2 - m_1),
-$$
-
-where $V$ is the room volume, $S$ the sample area, $T$ the reverberation time,
-$c$ the speed of sound (Eq. (2): $c = 343.2\sqrt{(273.15+t)/293.15}$) and $m$ the
-power attenuation coefficient of air. The **stationary** pair gives the
-random-incidence absorption $\alpha_s$ (Eq. (1)); the **rotating** pair gives the
-specular absorption $\alpha_{spec}$ (Eq. (4)).
-
-**Scattering coefficient (Eq. (5)).** The two combine into
-
-$$
-s = \frac{\alpha_{spec} - \alpha_s}{1 - \alpha_s}.
-$$
-
-A fully specular surface reflects all its non-absorbed energy in the specular
-direction, so $\alpha_{spec} = \alpha_s$ and $s = 0$; a strong diffuser sends
-energy everywhere, raising $\alpha_{spec}$ towards 1 and $s$ towards 1.
-
-```python
-from phonometry import materials
-
-# Four reverberation-time situations reduced to two absorption coefficients.
-# alpha_s from the stationary pair (Eq. 1); alpha_spec from the rotating pair
-# (Eq. 4). V = 200 m^3, S = 10 m^2, c = 343.2 m/s throughout.
-alpha_s = materials.random_incidence_absorption(200.0, 10.0, c1=343.2, T1=8.0,
-                                         c2=343.2, T2=6.0)
-alpha_spec = materials.specular_absorption_coefficient(200.0, 10.0, c3=343.2, T3=7.5,
-                                                c4=343.2, T4=5.0)
-s = materials.scattering_coefficient(alpha_spec, alpha_s)   # Eq. (5)
-print(round(float(alpha_s), 4))     # 0.1343
-print(round(float(alpha_spec), 4))  # 0.2148
-print(round(float(s), 4))           # 0.0931
-```
-
-Over a full one-third-octave measurement, `scattering_coefficient_spectrum`
-pairs the per-band $\alpha_{spec}$ and $\alpha_s$ with their band centres and
-returns a plottable `ScatteringResult`:
-
-```python
-import numpy as np
-from phonometry import materials
-
-# A 13-band measurement (250-4000 Hz): the random-incidence absorption alpha_s
-# (stationary sample) and the specular absorption alpha_spec (rotating
-# turntable). A diffuser scatters more with frequency, so s(f) rises.
-freqs = np.array([250, 315, 400, 500, 630, 800, 1000,
-                  1250, 1600, 2000, 2500, 3150, 4000], float)
-alpha_s = np.full_like(freqs, 0.10)
-alpha_spec = 0.11 + 0.75 * (np.log10(freqs / 250) / np.log10(4000 / 250))
-
-result = materials.scattering_coefficient_spectrum(freqs, alpha_spec, alpha_s)
-print(np.round(result.scattering[[0, 6, 12]], 3))   # [0.011 0.428 0.844]
-result.plot()   # s(f) on a log-frequency axis, 0 to 1 (needs matplotlib)
-```
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/scattering_coefficient_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/scattering_coefficient.svg" alt="The random-incidence scattering coefficient s of a diffusing surface over the 13 one-third-octave bands from 250 to 4000 Hz, rising smoothly from near zero at low frequency towards 0.84 at 4 kHz" width="88%"></picture>
-
-*The scattering coefficient climbs with frequency: at low frequency the surface
-relief is small compared with the wavelength and the reflection stays specular
-($s \to 0$); as the wavelength shrinks the relief scatters more energy out of
-the specular direction ($s \to 1$).*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import materials
-
-# A 13-band measurement (250-4000 Hz): the random-incidence absorption alpha_s
-# (stationary sample) and the specular absorption alpha_spec (rotating
-# turntable). A diffuser scatters more with frequency, so s(f) rises.
-freqs = np.array([250, 315, 400, 500, 630, 800, 1000,
-                  1250, 1600, 2000, 2500, 3150, 4000], float)
-alpha_s = np.full_like(freqs, 0.10)
-alpha_spec = 0.11 + 0.75 * (np.log10(freqs / 250) / np.log10(4000 / 250))
-result = materials.scattering_coefficient_spectrum(freqs, alpha_spec, alpha_s)
-
-# result is the ScatteringResult computed above. One line:
-result.plot()
-plt.show()
-
-# By hand, from the result's fields, mirroring what ScatteringResult.plot() draws:
-fig, ax = plt.subplots()
-ax.semilogx(result.frequencies, result.scattering, "o-", color="#1f77b4")
-ax.set_xlabel("Frequency [Hz]")
-ax.set_ylabel("Scattering coefficient s")
-ax.set_ylim(0.0, 1.0)
-ax.set_title("Random-incidence scattering coefficient (ISO 17497-1)")
-plt.show()
-```
-
-</details>
-
-**Base-plate check (Clause 6.4, Table 1).** The empty base plate must itself
-scatter only negligibly, or it would bias the result. ISO 17497-1 caps the
-base-plate scattering coefficient per one-third-octave band; the library exposes
-those limits and a checker.
-
-```python
-from phonometry import materials
-
-# The normative per-band ceilings (Table 1): 0.05 up to 500 Hz, rising to 0.25.
-# materials.BASE_PLATE_BANDS is the band tuple; materials.BASE_PLATE_MAX_SCATTERING maps band -> ceiling.
-print(materials.BASE_PLATE_BANDS[0], materials.BASE_PLATE_MAX_SCATTERING[100])   # 100 0.05
-
-# A base plate whose measured scattering stays under the ceiling passes silently;
-# an over-limit band raises a ScatteringDiffusionWarning listing the offenders.
-materials.check_base_plate_scattering([0.02] * len(materials.BASE_PLATE_BANDS))
-```
-
-**Test-report fiche.** `ScatteringResult.report(path)` renders a one-page
-accredited scattering test report (ISO 17497-1): a metadata header, the
-per-one-third-octave table of the random-incidence absorption $\alpha_s$ and the
-scattering coefficient $s$ beside the $s(f)$ curve on a categorical band axis,
-and a boxed characterisation headline (no pass/fail). `verbose=True` adds the
-specular absorption $\alpha_{spec}$ column and `language="es"` renders the
-Spanish fiche; it needs the report extra (`pip install phonometry[report]`).
-
-[![ISO 17497-1 scattering example report: a metadata header, the per-one-third-octave table of the random-incidence absorption and the scattering coefficient beside the s(f) band-axis curve, and the boxed characterisation headline over the tested frequency range](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso17497_scattering_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso17497_scattering_example.pdf)
-
-## 2. Diffusion coefficient (ISO 17497-2)
-
-The diffusion coefficient $d$ measures the **spatial uniformity** of the
-reflected sound, not how much is scattered. A goniometer sweeps a receiver over a
-polar arc and records the reflected level $L_i$ at each angle; the coefficient is
-the normalised autocorrelation of the polar energy distribution.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_diffusion_goniometer_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_diffusion_goniometer.svg" alt="ISO 17497-2 free-field diffusion goniometer: a test sample on a turntable, a fixed loudspeaker source, and a semicircular arc of receiver microphones sampling the reflected polar response, from which the autocorrelation diffusion coefficient is computed" width="92%"></picture>
-
-**Autocorrelation (Formula (5)).** For $n$ receivers at equal angular spacing,
-with $p_i = 10^{L_i/10}$ the band energy at receiver $i$,
-
-$$
-d = \frac{\left(\sum_i p_i\right)^2 - \sum_i p_i^2}
-         {(n-1)\,\sum_i p_i^2}.
-$$
-
-A perfectly uniform polar response ($L_i$ all equal) gives $d = 1$; a single
-sharp specular lobe gives $d = 0$. When receivers subtend unequal solid angles,
-Formula (6) area-weights each energy by $N_i$ from Formula (8), and those area
-factors are evaluated in **radians**, which is why a 5° spacing at the zenith
-produces a weight near 1.57, not 51.9.
-
-The rig those formulas assume is worth drawing to scale.
-`plot_goniometer_geometry` lays out the standard arrangement in plan: the
-37-microphone semicircle every 5 degrees at 5 m around the sample, the source
-at 10 m on the normal.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_goniometer_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_goniometer_geometry.svg" alt="To-scale plan of the free-field diffusion goniometer: a semicircle of 37 microphone dots every 5 degrees at 5 m radius around the small sample at the centre, the red source star at 10 m on the normal above it, and the 10 m and 5 m distances dimensioned" width="88%"></picture>
-
-*The polar arc behind every `L_i` of Formula (5), to scale: 37 receivers every
-5 degrees at 5 m, the source twice as far out on the normal, and the sample a
-sliver at the centre.*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import materials
-
-# The standard arrangement: 37 microphones every 5 degrees at 5 m, the
-# source at 10 m on the normal.
-materials.plot_goniometer_geometry()
-plt.show()
-```
-
-</details>
-
-The animation below runs that goniometer experiment numerically: the same
-plane wavefront hits a flat rigid panel and a Schroeder diffuser (an N = 7
-quadratic-residue profile), and the scattered energy on the receiver arc turns
-a collimated specular beam (d = 0.32) into a wide fan (d = 0.63).
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_diffusion_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_diffusion.gif" alt="Animation: a 2D FDTD simulation of a plane wavefront hitting a flat rigid panel and a Schroeder quadratic-residue diffuser side by side; the flat panel throws a collimated specular beam back while the diffuser's phase-step wells spread the same energy into a wide fan, and the scattered field on a receiver arc yields diffusion coefficients of 0.32 versus 0.63" width="640" height="360" loading="lazy"></picture>
-
-[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_diffusion.webm)
-
-The single-plane response below is the far-field prediction of a published
-diffuser geometry: an N = 7 quadratic-residue diffuser of 6 periods, 3.6 m
-total width and 0.2 m maximum well depth (the "N = 7 QRD, 6 periods, 0.2 m
-deep" row of Cox & D'Antonio, *Acoustic Absorbers and Diffusers*, 3rd ed.,
-Appendix B; the commercial N = 7 QRD measured by Hargreaves, Cox, Lam &
-D'Antonio, *J. Acoust. Soc. Am.* 108(4), 1710-1720, 2000, Table I) and its
-equal-footprint flat reference panel, at 1000 Hz, normal incidence, on the
-standard 37-point semicircle (5 deg spacing, -90 to +90 deg). The same model
-levels drive the phonometry conformance suite as an arithmetic oracle for
-Formulas (5) and (7); the external third-party anchor checks the model's
-band-averaged normalised diffusion against the published Appendix B BEM table
-in the 200-400 Hz bands (agreement within 0.01; over the full published
-100-5000 Hz range the model-vs-BEM mean absolute deviation is about 0.09,
-because edge diffraction is outside the Fraunhofer model).
-
-The surface itself is worth drawing before predicting anything from it.
-`plot_qrd_geometry` turns the depth sequence into the to-scale well profile
-below, and a predicted `DiffuserPolarResponse` retains its geometry, so
-`qrd.plot_geometry()` draws the surface it was computed for.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/qrd_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/qrd_geometry.svg" alt="To-scale well profile of two periods of the commercial N = 7 quadratic-residue diffuser: wells 80.7 mm wide at an 85.7 mm pitch, separated by thin fins on a rigid base, following the depth sequence 0, 50, 200, 100, 100, 200, 50 mm with the deepest wells at 200 mm, and the incident sound arriving from above" width="88%"></picture>
-
-*Two of the six periods, to scale: the quadratic residues $n^2 \bmod 7$
-turned into a buildable surface. The 490 Hz design frequency is what puts
-the deepest well at exactly 200 mm.*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import materials
-
-# The published N = 7 QRD: well width 3.6 m / 42, deepest well 0.2 m.
-depths = materials.qrd_well_depths(7, 490.0, speed_of_sound=343.0)
-pitch = 3.6 / 42                  # 42 wells across the 3.6 m panel
-fin = 0.005                       # thin fins, included in the pitch
-materials.plot_qrd_geometry(depths, pitch - fin, fin_width=fin, periods=2)
-plt.show()
-
-# A predicted DiffuserPolarResponse retains its geometry, so
-# qrd.plot_geometry() draws the profile it was computed for (all 6 periods).
-```
-
-</details>
-
-```python
-from phonometry import materials
-
-# The published geometry: N = 7 QRD, 6 periods, 3.6 m wide, 0.2 m deep
-# (Cox & D'Antonio 3rd ed., Appendix B; Hargreaves et al. 2000, Table I).
-# Design frequency 490 Hz puts the deepest well at exactly 0.2 m.
-depths = materials.qrd_well_depths(7, 490.0)   # [0, 0.05, 0.2, 0.1, ...] m
-qrd = materials.predict_diffuser_polar_response(
-    3.6 / 42, 1000.0, depths=depths, periods=6)
-# The flat reference panel: the same 3.6 m footprint with zero-depth wells.
-flat = materials.predict_diffuser_polar_response(
-    3.6 / 42, 1000.0, depths=[0.0] * 7, periods=6)
-
-qrd.plot()   # predicted polar response, d in the title (needs matplotlib)
-
-d = materials.directional_diffusion_coefficient(qrd.levels)    # Formula (5)
-print(round(float(d), 4))            # 0.1099
-d_ref = materials.directional_diffusion_coefficient(flat.levels)
-print(round(float(d_ref), 4))        # 0.0049
-
-# Normalise against the flat reference to isolate the diffuser's own effect
-# (Formula (7)): d_n = (d - d_ref) / (1 - d_ref).
-d_n = materials.normalized_diffusion_coefficient(d, d_ref)
-print(round(float(d_n), 4))          # 0.1055
-
-# Random-incidence value: average the band coefficients over source positions,
-# with the standard's 2-D weighting (0 deg -> 1, +/-30/+/-60 deg -> 3).
-d_random = materials.random_incidence_diffusion(
-    [0.5, 0.2, 0.2, 0.2, 0.2], weights=materials.TWO_DIMENSIONAL_SOURCE_WEIGHTS)
-print(round(float(d_random), 4))     # 0.2231
-```
-
-`directional_diffusion` keeps the receiver angles beside the levels of a full
-goniometer sweep and returns a plottable `DiffusionResult`. Reusing the QRD
-polar levels from above:
-
-```python
-import numpy as np
-from phonometry import materials
-
-# qrd.levels: the 37 predicted QRD levels from the example above.
-angles = np.arange(-90.0, 90.5, 5.0)
-
-result = materials.directional_diffusion(angles, qrd.levels)
-print(round(result.coefficient, 2))   # 0.11
-result.plot()   # polar reflected response, d in the title (needs matplotlib)
-```
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_polar_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_polar.svg" alt="A polar plot of the predicted reflected sound-pressure level of a six-period N=7 quadratic-residue diffuser over 37 receivers from -90 to 90 degrees, the energy concentrated in a fan of discrete grating lobes, giving an autocorrelation diffusion coefficient d of about 0.11" width="72%"></picture>
-
-*The periodic QRD array splits the reflected energy into a fan of discrete
-grating lobes rather than one specular spike, but six repetitions of the same
-period concentrate the energy in those few directions, so the autocorrelation
-diffusion coefficient stays modest ($d \approx 0.11$). The flat reference
-panel collapses into the specular direction alone and drops to
-$d \approx 0.005$; this lobing penalty of periodic arrays is exactly why
-Cox & D'Antonio recommend modulated arrangements.*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import materials
-
-# qrd.levels: the 37 predicted levels L_i of the six-period N = 7 QRD from
-# the example above (Fraunhofer far-field model, published Cox & D'Antonio
-# Appendix B geometry, 1000 Hz, normal incidence) on the -90..90 deg, 5 deg
-# semicircle. The periodic array concentrates the energy into grating lobes,
-# so the Formula (5) coefficient d is modest.
-angles = np.arange(-90.0, 90.5, 5.0)
-result = materials.directional_diffusion(angles, qrd.levels)
-
-# result is the DiffusionResult computed above. One line:
-result.plot()
-plt.show()
-
-# By hand: a polar plot of the levels, with d annotated in the title.
-fig, ax = plt.subplots(subplot_kw={"projection": "polar"})
-theta = np.radians(result.angles)
-ax.plot(theta, result.levels, "o-", color="#1f77b4")
-ax.fill(theta, result.levels, color="#1f77b4", alpha=0.15)
-ax.set_theta_zero_location("N")
-ax.set_theta_direction(-1)
-ax.set_thetamin(-90)
-ax.set_thetamax(90)
-ax.set_title(f"Directional diffusion  d = {result.coefficient:.2f}  (ISO 17497-2)")
-plt.show()
-```
-
-</details>
-
-**Test-report fiche.** Collected across the one-third-octave bands, the
-diffusion coefficient $d(f)$ forms a `DiffusionSpectrum`
-(`materials.diffusion_spectrum(freqs, d, ...)`), whose `report(path)` renders a
-one-page diffusion test report (ISO 17497-2, Clause 8.5): the per-band table of
-$d$ beside the $d(f)$ band-axis curve, with a boxed characterisation headline.
-Per Clause 8.4 the random-incidence coefficient is itself a per-band quantity,
-the average of the directional coefficients over the source positions band by
-band (not a mean across frequency). `verbose=True` adds the normalised $d_n$
-column to the table (the curve always draws $d_n$ as a companion when present).
-A single band's polar response is itself reportable through
-`DiffusionResult.report(path)`.
-
-```python
-import numpy as np
-from phonometry import materials
-
-# One diffusion coefficient per band (here a closed-form example). In practice
-# each band's random-incidence d is the source-position average of the
-# directional coefficients: for band k, average directional_diffusion_coefficient
-# over the source positions with random_incidence_diffusion (Clause 8.4).
-freqs = np.array([250, 500, 1000, 2000, 4000], float)
-d = np.array([0.30, 0.45, 0.60, 0.75, 0.88])
-spectrum = materials.diffusion_spectrum(freqs, d)
-spectrum.plot()    # d(f) on the band axis (needs matplotlib)
-spectrum.report("diffusion.pdf")   # one-page fiche (needs phonometry[report])
-```
-
-[![ISO 17497-2 diffusion example report: a metadata header, the per-one-third-octave table of the diffusion coefficient d beside the d(f) band-axis curve (with the normalised d_n drawn as a companion curve), and the boxed characterisation headline over the tested frequency range](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso17497_diffusion_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso17497_diffusion_example.pdf)
-
-### Predicting diffusion from a diffuser design
-
-The autocorrelation coefficient above reduces a *measured* polar response. The
-same coefficient can be *predicted* from the physical design of a Schroeder
-phase-grating diffuser, so a well-depth sequence can be graded before a sample
-is built. `predict_diffuser_polar_response` evaluates the single-plane
-Fraunhofer (far-field) model of Cox and D'Antonio: each rigid-bottom well of
-depth $d_n$ contributes a pressure reflection coefficient
-$R_n = e^{-2 j k d_n}$, and the scattered pressure at reflection angle $\theta$
-for a source at incidence $\psi$ is the sum over the wells of the periodic
-surface (Eq. (5.8)),
-
-$$
-p(\theta) = F(\theta) \sum_n R_n \, e^{\,j k x_n (\sin\psi + \sin\theta)},
-$$
-
-with $x_n$ the well centre and $k = 2\pi f / c$. The predicted polar levels
-$L_i = 20\lg|p(\theta_i)|$ feed the same `directional_diffusion_coefficient` as
-a measurement. For a quadratic residue diffuser the depth sequence follows from
-the prime generator $N$ and design frequency $f_0$ (Eqs. (10.2)/(10.3)):
-$s_n = n^2 \bmod N$ and $d_n = s_n \lambda_0 / (2N)$ with $\lambda_0 = c/f_0$.
-
-```python
-import numpy as np
-from phonometry import materials
-
-# An N = 7 quadratic residue diffuser, design frequency 500 Hz.
-depths = materials.qrd_well_depths(7, 500.0)   # Eqs. (10.2)/(10.3)
-print(np.round(depths * 100, 1))               # well depths in cm:
-                                               # [ 0.   4.9 19.6  9.8  9.8 19.6  4.9]
-
-# Predicted far-field polar response at one frequency (5 repeated periods,
-# 10 cm wells), reduced to the ISO 17497-2 directional diffusion coefficient.
-surface = materials.predict_diffuser_polar_response(0.10, 2000.0, depths=depths,
-                                                    periods=5)
-print(round(surface.coefficient, 3))           # 0.210
-surface.plot()   # predicted polar response, d in the title (needs matplotlib)
-
-# The spectrum variant normalises band by band against the same-footprint flat
-# reference (Formula (7)): the flat panel maps to exactly zero, the QRD well
-# above it.
-freqs = np.array([500, 1000, 2000, 4000], float)
-qrd = materials.predicted_diffusion_spectrum(0.10, freqs, depths=depths, periods=5)
-print(np.round(qrd.normalized, 3))             # [0.352 0.275 0.208 0.073]
-
-flat = materials.predicted_diffusion_spectrum(0.10, freqs,
-                                        depths=np.zeros_like(depths), periods=5)
-print(np.round(flat.normalized, 3))            # [0. 0. 0. 0.]
-```
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuser_prediction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuser_prediction.svg" alt="Predicted diffusion coefficient over the one-third-octave bands from 250 to 5000 Hz for an N = 7 quadratic residue diffuser design compared with a flat panel of the same footprint: the QRD curve sits well above the near-zero flat-panel curve across the band" width="88%"></picture>
-
-*Predicted from the design alone: the N = 7 QRD spreads the reflected energy
-far more evenly than the flat panel of the same footprint, so its predicted
-diffusion coefficient sits well above the near-specular flat reference across
-the band. This is a far-field design estimate, not a substitute for an
-ISO 17497-2 measurement; like every Fourier diffuser model it loses accuracy at
-low frequency, at grazing angles and for strongly absorbing surfaces. An
-arbitrary complex per-well reflection sequence can be supplied through the
-`reflection` argument, so an admittance or resonator-loaded surface computed
-elsewhere can be graded the same way.*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import materials
-
-# N = 7 QRD (design frequency 500 Hz, 10 cm wells, five periods) versus the
-# flat panel of the same footprint, over the one-third-octave bands.
-freqs = np.array([250, 315, 400, 500, 630, 800, 1000, 1250, 1600,
-                  2000, 2500, 3150, 4000, 5000], float)
-depths = materials.qrd_well_depths(7, 500.0)
-qrd = materials.predicted_diffusion_spectrum(0.10, freqs, depths=depths, periods=5)
-
-# The DiffusionSpectrum plots the predicted d(f) directly. One line:
-qrd.plot()
-plt.show()
-
-# By hand: predicted d(f) for the QRD against the flat reference.
-flat = materials.predicted_diffusion_spectrum(0.10, freqs,
-                                depths=np.zeros_like(depths), periods=5,
-                                normalize=False)
-fig, ax = plt.subplots()
-ax.semilogx(freqs, qrd.diffusion, "o-", color="#1f77b4", label="N = 7 QRD design")
-ax.semilogx(freqs, flat.diffusion, "s--", color="#d62728", label="Flat panel")
-ax.set_ylim(0.0, 1.0)
-ax.set_xlabel("Frequency [Hz]")
-ax.set_ylabel("Predicted diffusion coefficient d")
-ax.legend()
-plt.show()
-```
-
-</details>
-
-### Metadiffusers: deep-subwavelength Schroeder diffusers
-
-A metadiffuser replaces the deep wells of a Schroeder diffuser with thin
-slits loaded by Helmholtz resonators (Jiménez, Cox, Romero-García and Groby,
-2017). Below their resonance the resonators slow the sound inside each slit,
-so a panel a few centimetres thick reaches the reflection phases that a
-classical phase grating needs tens of centimetres of depth for, and driving
-a slit to critical coupling adds a perfectly absorbing state, the `0` that
-ternary sequences require. `metadiffuser_reflection` runs the slit
-transfer-matrix chain of the [slow-sound absorber](https://jmrplens.github.io/phonometry/guides/porous-absorbers/) once per
-well (two-dimensional resonators, visco-thermal losses and end corrections
-included) and returns the per-well complex reflection $R_n(f)$;
-`metadiffuser_polar_response` and `metadiffuser_diffusion_spectrum` reduce
-that spatial profile through the same Fraunhofer far field and ISO 17497-2
-coefficient used for the classical designs above.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_geometry.svg" alt="To-scale cross-section of the published quadratic-residue metadiffuser: a 350 by 20 millimetre panel over a rigid backing with five numbered slits opening at the face, each loaded by two Helmholtz resonators whose necks and cavities shelve sideways into the septum between slits; dimension lines mark the 350 millimetre width, the 70 millimetre pitch, the 14.7 millimetre first slit and the 20 millimetre depth, with the incident sound arriving from above" width="92%"></picture>
-
-The published quadratic-residue design packs the whole diffuser into a
-35 cm x 2 cm panel. Its first slit reaches critical coupling (the reflection
-zero the ternary `0` state is built from), and at the 2 kHz evaluation
-frequency the panel scatters like the 27.4 cm deep QRD it mimics. As in the
-published far-field comparison, the polar response repeats the five-well
-sequence six times (`periods=6`, a 2.1 m panel):
-
-```python
-import numpy as np
-from phonometry import (
-    HelmholtzResonator,
-    MetadiffuserWell,
-    metadiffuser_polar_response,
-    metadiffuser_reflection,
-)
-
-# The published quadratic-residue metadiffuser: five slits with two
-# resonators each in a 35 cm x 2 cm panel (7 cm pitch), tuned to mimic a
-# QRD designed for 500 Hz whose wells would run up to 27.4 cm deep.
-mm = 1e-3
-rows = [  # slit h, neck l_n, cavity l_c, neck w_n, cavity w_c  [mm]
-    (14.7, 13.0, 16.4, 6.2, 9.0),
-    (30.9, 9.1, 4.3, 3.5, 9.0),
-    (30.9, 9.1, 4.3, 3.5, 9.0),
-    (15.7, 13.3, 17.0, 6.3, 9.0),
-    (20.3, 18.0, 20.7, 3.2, 9.0),
-]
-wells = [
-    MetadiffuserWell(
-        h * mm,
-        2 * (HelmholtzResonator(ln * mm, wn * mm, lc * mm, wc * mm),),
-    )
-    for h, ln, lc, wn, wc in rows
-]
-
-f = np.arange(1800.0, 2601.0, 5.0)
-panel = metadiffuser_reflection(f, wells, depth=0.02, period=0.07)
-alpha1 = panel.well_absorption[0]
-print(round(float(alpha1.max()), 2), int(f[alpha1.argmax()]))  # 0.99 2305
-
-# Far-field comparison: the five-well sequence repeated six times (2.1 m).
-polar = metadiffuser_polar_response(2000.0, wells, depth=0.02,
-                                    period=0.07, periods=6)
-print(round(polar.coefficient, 2))                             # 0.32
-```
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_polar_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_polar.svg" alt="Semicircular polar plot at 2 kilohertz comparing the far-field response of the 2 centimetre metadiffuser panel, drawn as a solid line, with the 27.4 centimetre deep quadratic residue diffuser it mimics, drawn dashed: the two grating-lobe patterns overlap almost exactly across the whole minus 90 to plus 90 degree arc" width="92%"></picture>
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import numpy as np
-from phonometry import (
-    HelmholtzResonator,
-    MetadiffuserWell,
-    materials,
-    metadiffuser_polar_response,
-)
-
-mm = 1e-3
-rows = [
-    (14.7, 13.0, 16.4, 6.2, 9.0),
-    (30.9, 9.1, 4.3, 3.5, 9.0),
-    (30.9, 9.1, 4.3, 3.5, 9.0),
-    (15.7, 13.3, 17.0, 6.3, 9.0),
-    (20.3, 18.0, 20.7, 3.2, 9.0),
-]
-wells = [
-    MetadiffuserWell(
-        h * mm,
-        2 * (HelmholtzResonator(ln * mm, wn * mm, lc * mm, wc * mm),),
-    )
-    for h, ln, lc, wn, wc in rows
-]
-
-# The metadiffuser panel and the QRD it was tuned to at 2 kHz, both with
-# six repetitions of the period (2.1 m panels).
-meta = metadiffuser_polar_response(2000.0, wells, depth=0.02, period=0.07,
-                                   periods=6)
-sequence = np.roll(materials.quadratic_residue_sequence(5), -1)
-depths = sequence * (343.0 / 500.0) / (2 * 5)
-qrd = materials.predict_diffuser_polar_response(
-    0.07, 2000.0, depths=depths, periods=6, include_obliquity=False,
-)
-
-ax = meta.plot(marker="", linewidth=2.2, label="Metadiffuser, panel 2 cm")
-qrd.plot(ax=ax, marker="", linewidth=1.6, linestyle="--",
-         label="QRD, wells up to 27.4 cm")
-ax.legend(loc="lower center")
-```
-
-</details>
-
-The far-field overlay above is the frequency-domain summary; the FDTD
-animation below meshes both panels for real (the metadiffuser at 0.25 mm, slits,
-necks and cavities included) and lets the same 2 kHz wavefront hit them: the
-27 cm QRD and the 2 cm panel throw out nearly the same scattered fan.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_metadiffuser_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_metadiffuser.gif" alt="Animation: a 2 kHz plane wavefront hits a Schroeder diffuser with wells down to 27 centimetres and, beside it, the 2 centimetre metadiffuser whose real slits and resonators are meshed at 0.25 millimetres; the total field and the persistent scattered envelope show both panels spraying nearly identical fans, with the arc diffusion coefficients annotated" width="640" height="360" loading="lazy"></picture>
-
-[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_metadiffuser.webm)
-
-## Scattering or diffusion? Two coefficients, two jobs
-
-The two coefficients above are routinely treated as interchangeable, in
-product data sheets and occasionally in simulation manuals. They are not, and
-neither can be computed from the other. The scattering coefficient $s$
-(ISO 17497-1) does **energy bookkeeping**: what fraction of the reflected
-energy leaves the specular direction. It says nothing about where that energy
-goes. The diffusion coefficient $d$ (ISO 17497-2) grades **spatial quality**:
-how evenly the reflected energy covers the receiver arc, one source direction
-at a time. It says nothing about how the energy divides between the specular
-lobe and the rest.
-
-A pair of counterexamples keeps them apart. A curved or tilted element that
-*redirects* the reflection concentrates nearly all the reflected energy into
-one strong lobe away from the specular direction: almost everything is
-non-specular, so $s$ is high, yet the beam is as collimated as a mirror's, so
-$d$ stays low. Conversely, a small flat panel measured at low frequency sends
-nearly all the reflected energy toward the specular direction, so $s$ stays
-near zero, yet edge diffraction spreads that reflection so broadly over the
-receiver arc that the measured $d$ comes out surprisingly high. High $s$ does
-not mean uniform; decent $d$ does not mean much energy was scattered at all.
-
-**Which one for design.** The two numbers serve different consumers:
-
-- **The scattering coefficient feeds room-acoustics simulation.**
-  Geometrical-acoustics engines decide at every wall reflection how much
-  energy continues specularly and how much is redistributed; the per-band
-  random-incidence $s$ of each surface is precisely that split, which is what
-  ISO 17497-1 was written to supply. Getting it wrong shows up as the wrong
-  reverberation-time and clarity predictions in non-mixing rooms.
-- **The diffusion coefficient qualifies diffusers.** When the task is to break
-  up an echo, a flutter or a focusing reflection, what matters is that the
-  reflected energy is spread over angle, and $d$ measures exactly that. The
-  normalised $d_n$ (Formula (7)) additionally subtracts the edge diffraction
-  that every finite panel exhibits, so products of different sizes can be
-  compared fairly.
-
-Swapping them fails in both directions: a diffusion coefficient dropped into a
-simulator's scattering slot biases the energy split, and a scattering
-coefficient quoted as proof of "diffusion" may describe a surface that merely
-redirects the problem reflection somewhere else. Both coefficients are
-one-third-octave-band functions that generally rise once the surface relief is
-no longer small against the wavelength; a frequency-blind single number
-("scatters 90 % of the sound") is neither of them.
-
-## 3. In-situ road absorption: subtraction technique (ISO 13472-1)
-
-Out in the field there is no reverberation room. ISO 13472-1 measures the sound
-absorption of a road surface (or any extended flat surface) *in situ* by firing
-an impulse from a loudspeaker at height $d_s$ down onto the surface and recording
-the impulse response at a microphone at height $d_m$. The **incident** and
-**reflected** components are separated in time with an Adrienne window; their
-transfer function gives the reflection factor and hence the absorption.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insitu_subtraction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insitu_subtraction.svg" alt="ISO 13472-1 in-situ road absorption by the subtraction technique: a loudspeaker at 1.25 m and a microphone at 0.25 m above the road surface, with the direct and road-reflected ray paths and a free-field reference measurement, the reflected component isolated by an Adrienne time window" width="92%"></picture>
-
-**Geometrical spreading (Clause 4.1).** The reflected wave travels farther than
-the direct wave, so it is attenuated by the geometrical-spreading factor
-
-$$
-K_r = \frac{d_s - d_m}{d_s + d_m},
-$$
-
-which equals $2/3$ for the mandatory geometry $d_s = 1.25$ m, $d_m = 0.25$ m.
-The absorption follows from the windowed incident and reflected spectra
-$H_i$, $H_r$:
-
-$$
-\alpha(f) = 1 - \frac{1}{K_r^2}\left|\frac{H_r(f)}{H_i(f)}\right|^2.
-$$
-
-```python
-import numpy as np
-from phonometry import materials
-
-# A band-limited incident impulse response and a synthetic road reflection
-# hr = Kr * r0 * delayed(hi): a reflection of magnitude r0 = 0.4, delayed by the
-# extra path, and scaled by the geometrical-spreading factor Kr.
-fs, n = 48000.0, 4096
-t = np.arange(n) / fs
-hi = np.zeros(n)
-hi[:64] = np.hanning(64) * np.cos(2.0 * np.pi * 1500.0 * t[:64])
-
-kr = materials.geometric_spreading_factor()          # (ds - dm)/(ds + dm) = 2/3
-hr = kr * 0.4 * np.roll(hi, 96)
-
-# Narrow-band absorption, then reduced to one-third octaves over 250-4000 Hz.
-alpha = materials.insitu_absorption_coefficient(hi, hr)   # 1 - (1/Kr^2)|Hr/Hi|^2
-freq = np.fft.rfftfreq(n, 1.0 / fs)
-centres, band = materials.one_third_octave_absorption(freq, alpha)
-print(round(kr, 4))                # 0.6667
-print(round(float(band[2]), 3))    # 0.84  (alpha = 1 - 0.4^2 = 0.84)
-```
-
-**Adrienne window (Clause 6.4).** The time window that isolates the reflection
-mandates only a sharp leading edge, a 5 ms flat portion and a cosine-squared or
-Blackman-Harris trailing edge; the exact durations are reported per measurement,
-not fixed, so they are configurable here.
-
-```python
-from phonometry import materials
-
-# Default: 0.5 ms leading edge, 5 ms flat top, 5 ms Blackman-Harris trailing.
-w = materials.adrienne_window(48000.0)
-print(w.shape[0])          # 504 samples at 48 kHz
-print(round(float(w.max()), 3))   # 1.0  (flat top and edges meet at unity)
-```
-
-**End-to-end spectrum.** `insitu_absorption_spectrum` runs the whole chain (the
-windowed incident and reflected impulse responses to the narrow-band absorption
-and on to one-third-octave bands) and returns a plottable
-`InsituAbsorptionResult`:
-
-```python
-import numpy as np
-from phonometry import materials
-from scipy.signal import firwin, lfilter
-
-# A synthetic-but-realistic measurement. hi is a unit incident impulse; the road
-# reflection hr = Kr * r0 * roll(hi, shift) uses the geometrical-spreading
-# factor Kr, a mildly frequency-dependent r0 (a gentle low-pass, so a porous
-# surface reflects less as frequency rises) and the reflected-path delay
-# shift = round(2 dm / c * fs).
-fs, n = 48000.0, 8192
-kr = materials.geometric_spreading_factor()           # (ds - dm)/(ds + dm) = 2/3
-hi = np.zeros(n)
-hi[0] = 1.0
-taps = firwin(41, 1200.0, fs=fs)
-taps = taps / taps.sum()
-shift = int(round(2.0 * 0.25 / 340.0 * fs))     # reflected-path delay 2 dm / c
-hr = kr * 0.85 * np.roll(lfilter(taps, 1.0, hi), shift)
-
-result = materials.insitu_absorption_spectrum(hi, hr, fs)
-print(result.frequencies[[0, -1]].astype(int))     # [ 250 4000]
-print(np.round(result.absorption[[0, 6, 12]], 2))  # [0.31 0.65 1.  ]
-result.plot()   # alpha(f) bar chart over 250-4000 Hz (needs matplotlib)
-```
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_absorption_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_absorption.svg" alt="An in-situ one-third-octave road-surface absorption spectrum computed by the reflection-factor route from a synthetic road reflection, rising from about 0.3 at 250 Hz to near 1.0 above 2 kHz" width="88%"></picture>
-
-*The absorption rises with frequency because the surface reflects less of the
-high-frequency energy, exactly as the low-pass reflection factor $r_0(f)$
-dictates through $\alpha = 1 - (1/K_r^2)\,|H_r/H_i|^2$.*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from scipy.signal import firwin, lfilter
-from phonometry import materials
-
-# A synthetic-but-realistic measurement. hi is a unit incident impulse; the road
-# reflection hr = Kr * r0 * roll(hi, shift) uses the geometrical-spreading
-# factor Kr, a mildly frequency-dependent r0 (a gentle low-pass, so a porous
-# surface reflects less as frequency rises) and the reflected-path delay
-# shift = round(2 dm / c * fs).
-fs, n = 48000.0, 8192
-kr = materials.geometric_spreading_factor()           # (ds - dm)/(ds + dm) = 2/3
-hi = np.zeros(n)
-hi[0] = 1.0
-taps = firwin(41, 1200.0, fs=fs)
-taps = taps / taps.sum()
-shift = int(round(2.0 * 0.25 / 340.0 * fs))     # reflected-path delay 2 dm / c
-hr = kr * 0.85 * np.roll(lfilter(taps, 1.0, hi), shift)
-result = materials.insitu_absorption_spectrum(hi, hr, fs)
-
-# result is the InsituAbsorptionResult computed above. One line:
-result.plot()
-plt.show()
-
-# By hand: a bar chart of alpha over the one-third-octave bands.
-freqs = result.frequencies
-positions = np.arange(freqs.size)
-fig, ax = plt.subplots()
-ax.bar(positions, np.nan_to_num(result.absorption), width=0.7, color="#1f77b4")
-ax.set_xticks(positions)
-ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
-ax.set_xlabel("Frequency [Hz]")
-ax.set_ylabel("Absorption coefficient alpha")
-ax.set_ylim(0.0, 1.0)
-ax.set_title("In-situ road-surface absorption (ISO 13472-1)")
-plt.show()
-```
-
-</details>
-
-**Maximum sampled area (Annex A).** The finite time window limits how much of the
-surface contributes to the reflection. The maximum sampled area is a circle whose
-radius the library computes from the geometry and window width; the Annex A worked
-example ($d_s = 1.25$ m, $d_m = 0.25$ m, $c = 340$ m/s, 5 ms flat window) gives
-about 1.34 m.
-
-```python
-from phonometry import materials
-print(round(materials.max_sampled_area_radius(5.0e-3), 3))   # 1.343  (metres)
-```
-
-The whole arrangement fits in one to-scale drawing. `plot_insitu_geometry`
-draws the standard set-up with that sampled radius on the surface, and a
-measured `InsituAbsorptionResult` that retained its heights redraws its own
-with `result.plot_geometry()`.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_setup_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_setup_geometry.svg" alt="To-scale side view of the in-situ absorption set-up: the loudspeaker on its mast 1.25 m above the hatched road surface, the microphone on the same vertical at 0.25 m, the dashed surface-reflected path below it and the 1.34 m radius of the sampled area dimensioned on the surface" width="88%"></picture>
-
-*The standard geometry to scale: source at 1.25 m, microphone at 0.25 m on the
-same vertical, and the 5 ms window turned into the 1.34 m radius of road that
-actually contributes to the reflection.*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import materials
-
-# The standard geometry: source at 1.25 m, microphone at 0.25 m, and the
-# 1.34 m sampled-area radius of the 5 ms window.
-materials.plot_insitu_geometry()
-plt.show()
-
-# A measured spectrum retains its heights and redraws its own set-up:
-#   result = materials.insitu_absorption_spectrum(hi, hr, fs)
-#   result.plot_geometry()
-```
-
-</details>
-
-## 4. In-situ road absorption: spot method (ISO 13472-2)
-
-For smaller patches, ISO 13472-2 seals a short circular tube onto the surface and
-measures the absorption with the two-microphone transfer-function method of
-ISO 10534-2. The library provides the spot-method geometry and validity helpers;
-the transfer-function DSP itself is the impedance-tube routine
-`two_microphone_impedance` (see [Impedance Tube](https://jmrplens.github.io/phonometry/guides/impedance-tube/)).
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spot_tube_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spot_tube.svg" alt="ISO 13472-2 spot method: a short circular tube sealed onto the road surface with a loudspeaker at the top and two microphones flush in the tube wall at spacing s, measuring absorption over 250 to 1600 Hz via the ISO 10534-2 two-microphone transfer-function method" width="92%"></picture>
-
-**Plane-wave limits (Clause 5.4).** The tube supports only plane waves below
-
-$$
-f_u = 0.58\,\frac{c_0}{d},
-$$
-
-with $d$ the tube diameter, and the microphone spacing $s$ must sit between
-$0.05\,c_0/f_{min}$ and $0.45\,c_0/f_{max}$. The reported range is the
-one-third-octave bands 250–1600 Hz.
-
-```python
-from phonometry import materials
-
-# Upper usable frequency of a 100 mm tube and the valid spacing window.
-print(round(materials.spot_tube_upper_frequency(0.100, 343.0), 1))      # 1989.4 Hz
-s_min, s_max = materials.spot_microphone_spacing_bounds(
-    343.0, f_min=220.0, f_max=1800.0)
-print(round(s_min, 3), round(s_max, 3))    # 0.078 0.086  (metres)
-```
-
-## References
-
-- Jiménez, N., Cox, T. J., Romero-García, V., & Groby, J.-P. (2017).
-  Metadiffusers: Deep-subwavelength sound diffusers. *Scientific Reports*,
-  7, 5389.
-  [doi:10.1038/s41598-017-05710-5](https://doi.org/10.1038/s41598-017-05710-5).
-  The metadiffuser model implemented here: slits loaded by Helmholtz
-  resonators reproduce Schroeder phase profiles and ternary sequences from
-  panels 1/46 to 1/20 of the design wavelength thick.
-
-- Cox, T. J., & D'Antonio, P. (2017). *Acoustic absorbers and diffusers:
-  Theory, design and application* (3rd ed.). CRC Press.
-  ISBN 978-1-4987-4099-9.
-  [doi:10.1201/9781315369211](https://doi.org/10.1201/9781315369211).
-  The reference monograph on diffuser theory and design, by the authors
-  behind the ISO 17497-2 diffusion-coefficient method: the
-  scattering-versus-diffusion distinction, the
-  measurement rigs and the design guidance this page condenses. Appendix B
-  (Normalized diffusion coefficient table, pp. 481-485) is the published BEM
-  anchor for the diffuser-prediction model on this page.
-- Hargreaves, T. J., Cox, T. J., Lam, Y. W., & D'Antonio, P. (2000). Surface
-  diffusion coefficients for room acoustics: Free-field measures of
-  single-plane diffusion. *The Journal of the Acoustical Society of America*,
-  108(4), 1710-1720.
-  [doi:10.1121/1.1310192](https://doi.org/10.1121/1.1310192).
-  The free-field diffusion-coefficient method behind ISO 17497-2; its Table I
-  documents the commercial N = 7 QRD geometry (0.2 m maximum well depth) used
-  in the worked example above.
-- International Organization for Standardization. (2004). *Acoustics —
-  Sound-scattering properties of surfaces — Part 1: Measurement of the
-  random-incidence scattering coefficient in a reverberation room*
-  (ISO 17497-1:2004+A1:2014, the edition implemented here).
-  [iso.org catalogue](https://www.iso.org/standard/31397.html).
-  The turntable method implemented in section 1 of this page and the
-  base-plate limits of the standard's Table 1.
-- International Organization for Standardization. (2012). *Acoustics —
-  Sound-scattering properties of surfaces — Part 2: Measurement of the
-  directional diffusion coefficient in a free field* (ISO 17497-2:2012).
-  [iso.org catalogue](https://www.iso.org/standard/55293.html).
-  The goniometer autocorrelation coefficient behind section 2 of this page,
-  its area weighting and the normalised $d_n$.
-
-## Standards
-
-ISO 17497-1:2004+A1:2014 (scattering
-coefficient), ISO 17497-2:2012 (diffusion coefficient), ISO 13472-1:2002 (in-situ
-absorption, extended surface), ISO 13472-2:2010 (in-situ absorption, spot
-method), and ISO 9613-1:1993, from which only the pure-tone attenuation coefficient
-α consumed by the ISO 17497-1 Clause 8 air-attenuation relations (Eqs. (2)/(3)); the
-full atmospheric-absorption model is covered in
-[Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/guides/outdoor-propagation/). Numerical conformance against the standards' worked examples and closed
-forms is tracked in [CONFORMANCE.md](https://jmrplens.github.io/phonometry/reference/conformance/).
-
----
-
-
 <!-- source: docs/swept-sine-distortion.md | canonical: https://jmrplens.github.io/phonometry/guides/swept-sine-distortion/ -->
 Source: https://jmrplens.github.io/phonometry/guides/swept-sine-distortion/
 
@@ -28758,7 +29432,7 @@ predictions match the published Appendix B BEM normalised diffusion in the
 200-400 Hz bands within 0.01 (a low-band anchor: the broadband 100-5000 Hz
 mean absolute deviation is about 0.09); zenith area factor 1.5710.
 
-See the [Surface Scattering guide](https://jmrplens.github.io/phonometry/guides/surface-scattering/) for usage.
+See the [Diffusers guide](https://jmrplens.github.io/phonometry/guides/diffusers/) for usage.
 
 ## In-situ road surface absorption (ISO 13472-1, ISO 13472-2)
 
@@ -28788,7 +29462,7 @@ geometry and validity limits ($f_u = 0.58\ c_0/d$; microphone spacing bounds
 $0.45\ c_0/f_{max}$ and $0.05\ c_0/f_{min}$, clause 5.4) and the Annex A
 subtractive correction for internal system losses.
 
-See the [Surface Scattering guide](https://jmrplens.github.io/phonometry/guides/surface-scattering/) for usage.
+See the [In-situ Road-Surface Absorption guide](https://jmrplens.github.io/phonometry/guides/road-absorption/) for usage.
 
 ## Acoustic material characterisation (ISO 11654, ISO 9053-1/2, ISO 10534-1/2, ASTM E2611)
 

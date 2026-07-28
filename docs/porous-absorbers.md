@@ -14,7 +14,10 @@ multilayer solver, the resonant sheet layers of Maa and the random-incidence
 [impedance tube](impedance-tube.md) and
 [reverberation room](absorption-measurement.md) guides; rating the predicted
 spectrum lives in the latter's
-[ISO 11654 section](absorption-measurement.md#3-weighted-rating-and-absorption-class-iso-11654).
+[ISO 11654 section](absorption-measurement.md#3-weighted-rating-and-absorption-class-iso-11654);
+and the resonant metamaterial relatives of these constructions, slow-sound
+slit panels that reach perfect absorption at critical coupling, have their
+own guide, [Metamaterial Absorbers](metamaterial-absorbers.md).
 
 ## 1. Equivalent-fluid models of a porous material
 
@@ -405,151 +408,15 @@ plt.show()
 
 </details>
 
-## 5. Slow-sound slit panels with Helmholtz resonators
+The classical layers above absorb with bulk or with a quarter-wave cavity.
+Their resonant metamaterial relatives, rigid panels of sub-millimetre slits
+loaded by Helmholtz resonators that slow the sound and reach perfect
+absorption ($\alpha = 1$) at critical coupling in panels only $\lambda/38$
+deep, moved to their own guide:
+[Metamaterial Absorbers](metamaterial-absorbers.md) covers the
+transfer-matrix model, the critical-coupling design solver and the FDTD
+cross-check of the meshed cell.
 
-A rigid panel of thin closed slits, each loaded on its upper wall by an array
-of Helmholtz resonators, is a locally reacting, deep-subwavelength absorber
-(Jiménez et al. 2017). The resonators slow the sound in the slit, pulling its
-resonance far below the quarter-wavelength frequency, and the visco-thermal
-losses of the sub-millimetre slit and the resonator necks make *perfect*
-absorption possible: when the intrinsic loss balances the leakage, the
-reflection zero lands on the real-frequency axis and $\alpha = 1$ (critical
-coupling). The panel transfer matrix is the chain
-$T = M_{\Delta l}\,\prod_n (M_s\,M_{HR}^{(n)}\,M_s)$; the rigidly-backed
-reflection factor is
-$R = (T_{11}\cos\theta - Z_0 T_{21})/(T_{11}\cos\theta + Z_0 T_{21})$ with
-$Z_0 = \rho_0 c_0 / S_0$. `critical_coupling_design` inverts the model, tuning
-the cavity length and the slit height so both matching conditions
-$\mathrm{Re}(Z)\cos\theta = Z_0$ and $\mathrm{Im}(Z) = 0$ hold.
-
-```python
-import numpy as np
-from phonometry import (
-    HelmholtzResonator, critical_coupling_design, slit_helmholtz_absorber,
-)
-
-base = HelmholtzResonator(
-    neck_length=1.0e-3, neck_side=3.0e-3,
-    cavity_length=30.0e-3, cavity_side=27.0e-3,
-)
-design = critical_coupling_design(300.0, base, lattice_step=3.0e-2, period=5.0e-2)
-print(round(design.absorption, 4))          # ~1.0 (perfect absorption)
-
-f = np.linspace(150.0, 500.0, 700)
-res = slit_helmholtz_absorber(
-    f, design.resonator, slit_height=design.slit_height,
-    lattice_step=3.0e-2, period=5.0e-2,
-)
-res.plot()   # alpha(f) with |R| overlaid; peak = 1 at 300 Hz
-```
-
-The solved geometry is worth a look before the absorption curve. The
-resonator draws itself with `.plot()` and the panel result with
-`.plot_geometry()`, both dimensioned and to scale.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/helmholtz_resonator_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/helmholtz_resonator_geometry.svg" alt="To-scale cross-section of the square-section Helmholtz resonator the 300 Hz critical-coupling design starts from: a neck 3 mm wide and 1 mm long opening into a rigid-walled cavity 27 mm wide and 30 mm deep, with the four defining dimensions dimensioned" width="80%"></picture>
-
-*The four numbers that define the resonator: the neck side and length set
-the moving mass and most of the loss, the cavity side and length set the
-stiffness. `critical_coupling_design` keeps this cross-section and retunes
-the cavity length to place the resonance.*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import HelmholtzResonator
-
-resonator = HelmholtzResonator(
-    neck_length=1.0e-3, neck_side=3.0e-3,
-    cavity_length=30.0e-3, cavity_side=27.0e-3,
-)
-resonator.plot()   # dimensioned cross-section, to scale
-plt.show()
-```
-
-</details>
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slit_absorber_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slit_absorber_geometry.svg" alt="To-scale cross-section of one period of the critically-coupled slit panel: a slit about 1 mm high running the 30 mm depth of the panel, loaded by the tuned Helmholtz resonator cavity that fills the rest of the 50 mm period, with the rigid backing behind and the incident sound arriving from the left" width="80%"></picture>
-
-*One period of the solved design, to scale: the whole panel is 30 mm deep,
-$\lambda/38$ at 300 Hz, and the sub-millimetre slit that does all the
-absorbing is barely visible. That is exactly the point of the slow-sound
-mechanism.*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import HelmholtzResonator, critical_coupling_design, materials
-
-base = HelmholtzResonator(
-    neck_length=1.0e-3, neck_side=3.0e-3,
-    cavity_length=30.0e-3, cavity_side=27.0e-3,
-)
-design = critical_coupling_design(
-    300.0, base, lattice_step=3.0e-2, period=5.0e-2,
-)
-
-# The free function draws any resonator list; a slit_helmholtz_absorber
-# result retains its geometry, so res.plot_geometry() draws the same period.
-materials.plot_slit_absorber_geometry(
-    [design.resonator], slit_height=design.slit_height,
-    lattice_step=3.0e-2, period=5.0e-2,
-)
-plt.show()
-```
-
-</details>
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slow_sound_absorber_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slow_sound_absorber.svg" alt="Absorption of a slit panel loaded by one Helmholtz resonator: the critically-coupled design reaches alpha = 1 at 300 Hz, while narrowing or widening the slit breaks the balance and lowers the peak; the panel depth is lambda/38" width="80%"></picture>
-
-*One resonator, one slit, one loss-versus-leakage balance: the critically
-coupled design reaches $\alpha = 1$ at 300 Hz in a panel only $\lambda/38$
-deep; detuning the slit height drops the peak below one.*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import (
-    HelmholtzResonator, critical_coupling_design, slit_helmholtz_absorber,
-)
-
-a, d, f0 = 3.0e-2, 5.0e-2, 300.0
-base = HelmholtzResonator(1.0e-3, 3.0e-3, 30.0e-3, 27.0e-3)
-design = critical_coupling_design(f0, base, lattice_step=a, period=d)
-h0 = design.slit_height
-
-f = np.linspace(150.0, 500.0, 700)
-fig, ax = plt.subplots()
-for factor, label in [(1.0, "critically coupled"),
-                      (0.6, "narrow slit"), (1.7, "wide slit")]:
-    res = slit_helmholtz_absorber(
-        f, design.resonator, slit_height=factor * h0,
-        lattice_step=a, period=d,
-    )
-    ax.plot(f, res.absorption, label=label)
-ax.set(xlabel="Frequency [Hz]", ylabel="Absorption coefficient")
-ax.legend()
-plt.show()
-```
-
-</details>
-
-The clip below drives this exact cell in a virtual plane-wave tube: the
-sub-millimetre slit and its resonator are meshed on the FDTD grid and filled
-with the model's visco-thermal effective fluids. At the design slit height
-the standing wave collapses and the tone dies inside the panel; at 1.7 times
-the height the loss balance breaks and the reflection rebuilds it.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_slit_absorber_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_slit_absorber.gif" alt="Animation: a 300 Hz plane tone in a 2D FDTD tube meets the meshed critical-coupling cell, its 0.98 mm slit and Helmholtz resonator resolved on the grid and shown in a zoomed panel; at the design slit height the pressure envelope stays flat and the annotated library absorption is 1.00, while the 1.7 times wider slit stands a deep wave in front of the panel and the absorption drops to 0.34" width="640" height="360" loading="lazy"></picture>
-
-[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_slit_absorber.webm)
 
 ## Practical notes
 
@@ -571,7 +438,7 @@ printed coefficient tables (Bies Table D.1, Miki Eqs. 30–34), the solver to
 the closed forms above and to the `TransferMatrix` recovery of the
 [impedance-tube page](impedance-tube.md), the MPP to Maa's own approximation
 (stated ~6 % agreement with the exact Eq. 2), design example and Table I,
-and the Paris integral to its locally reacting closed form. Five misprints
+and the Paris integral to its locally reacting closed form. Three misprints
 found in the sources during this work are recorded in the
 [errata registry](ERRATA.md).
 
@@ -617,23 +484,6 @@ found in the sources during this work are recorded in the
   absorbent materials. *Applied Acoustics*, 3(2), 105–116.
   [doi:10.1016/0003-682X(70)90031-9](https://doi.org/10.1016/0003-682X(70)90031-9).
   The original empirical relations and their stated validity.
-- Jiménez, N., Groby, J.-P., Pagneux, V., & Romero-García, V. (2017).
-  Iridescent perfect absorption in critically-coupled acoustic metamaterials
-  using the transfer matrix method. *Applied Sciences*, 7(6), 618.
-  [doi:10.3390/app7060618](https://doi.org/10.3390/app7060618). The slit +
-  Helmholtz-resonator transfer-matrix model and the critical-coupling
-  condition implemented in `slit_helmholtz_absorber`.
-- Jiménez, N., Huang, W., Romero-García, V., Pagneux, V., & Groby, J.-P.
-  (2016). Ultra-thin metamaterial for perfect and quasi-omnidirectional sound
-  absorption. *Applied Physics Letters*, 109(12), 121902.
-  [doi:10.1063/1.4962328](https://doi.org/10.1063/1.4962328). The resonator
-  impedance (Eq. A23) and its radiation end corrections (Eqs. A24–A27).
-- Stinson, M. R. (1991). The propagation of plane sound waves in narrow and
-  wide circular tubes, and generalization to uniform tubes of arbitrary
-  cross-sectional shape. *Journal of the Acoustical Society of America*,
-  89(2), 550–558. [doi:10.1121/1.400379](https://doi.org/10.1121/1.400379).
-  The visco-thermal effective parameters of the slit and the square necks
-  and cavities.
 
 ## Standards
 

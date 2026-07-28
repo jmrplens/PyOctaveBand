@@ -152,7 +152,7 @@ bandas de 200-400 Hz dentro de 0,01 (anclaje de baja frecuencia: la
 desviación absoluta media en banda ancha 100-5000 Hz ronda 0,09); factor de
 área del cénit 1,5710.
 
-Consulta la [guía de dispersión superficial](/phonometry/es/guides/surface-scattering/) para su uso.
+Consulta la [guía de difusores](/phonometry/es/guides/diffusers/) para su uso.
 
 ## Absorción in situ de superficies de carretera (ISO 13472-1, ISO 13472-2)
 
@@ -183,7 +183,7 @@ Parte 2 ($f_u = 0{,}58\ c_0/d$; cotas de separación de micrófonos
 $0{,}45\ c_0/f_{max}$ y $0{,}05\ c_0/f_{min}$, cláusula 5.4) y la corrección
 sustractiva del Anexo A por pérdidas internas del sistema.
 
-Consulta la [guía de dispersión superficial](/phonometry/es/guides/surface-scattering/) para su uso.
+Consulta la [guía de absorción in situ de firmes](/phonometry/es/guides/road-absorption/) para su uso.
 
 ## Caracterización de materiales acústicos (ISO 11654, ISO 9053-1/2, ISO 10534-1/2, ASTM E2611)
 

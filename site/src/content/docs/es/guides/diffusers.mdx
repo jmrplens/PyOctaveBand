@@ -1,6 +1,6 @@
 ---
-title: "Dispersión superficial, difusión y absorción in situ"
-description: "Cómo devuelve una superficie el sonido incidente: el coeficiente de dispersión (scattering) de incidencia aleatoria en cámara reverberante (ISO 17497-1), el coeficiente de difusión por autocorrelación de un goniómetro en campo libre (ISO 17497-2) y la absorción in situ de pavimentos por la técnica de sustracción (ISO 13472-1) y el método de tubo puntual (ISO 13472-2)."
+title: "Difusores y sus coeficientes"
+description: "Cómo se mide y se diseña un difusor: el coeficiente de dispersión (scattering) de incidencia aleatoria en cámara reverberante (ISO 17497-1), el coeficiente de difusión por autocorrelación de un goniómetro en campo libre (ISO 17497-2) y el diseño de Schroeder de residuo cuadrático con su predicción en campo lejano."
 references:
   - type: book
     authors: ["Cox, T. J.", "D'Antonio, P."]
@@ -9,16 +9,8 @@ references:
     edition: "3.ª ed."
     publisher: "CRC Press"
     doi: "10.1201/9781315369211"
+    primary: true
     note: "ISBN 978-1-4987-4099-9. La monografía de referencia sobre teoría y diseño de difusores, de los autores del método del coeficiente de difusión de ISO 17497-2: la distinción dispersión-difusión, los montajes de medida y la guía de diseño que esta página condensa. El Apéndice B (tabla de coeficientes de difusión normalizados, pp. 481-485) es el anclaje BEM publicado del modelo de predicción de difusores de esta página."
-  - type: article
-    authors: ["Jiménez, N.", "Cox, T. J.", "Romero-García, V.", "Groby, J.-P."]
-    year: 2017
-    title: "Metadiffusers: Deep-subwavelength sound diffusers"
-    journal: "Scientific Reports"
-    volume: "7"
-    pages: "5389"
-    doi: "10.1038/s41598-017-05710-5"
-    note: "El modelo de metadifusor implementado aquí: rendijas cargadas con resonadores de Helmholtz reproducen perfiles de fase de Schroeder y secuencias ternarias con paneles de 1/46 a 1/20 de la longitud de onda de diseño."
   - type: article
     authors: ["Hargreaves, T. J.", "Cox, T. J.", "Lam, Y. W.", "D'Antonio, P."]
     year: 2000
@@ -30,11 +22,19 @@ references:
     doi: "10.1121/1.1310192"
     note: "El método del coeficiente de difusión en campo libre que sustenta ISO 17497-2; su Tabla I documenta la geometría del QRD comercial N = 7 (0,2 m de profundidad máxima de pozo) usada en el ejemplo de esta página."
   - type: standard
+    organization: "Audio Engineering Society"
+    year: 2001
+    title: "AES information document for room acoustics and sound reinforcement systems — Characterization and measurement of surface scattering uniformity"
+    designation: "AES-4id-2001"
+    url: "https://www.aes.org/publications/standards/list.cfm"
+    note: "El procedimiento del coeficiente de difusión de plano único en campo libre (publicado en J. Audio Eng. Soc. 49(3), 149-165) que ISO 17497-2 normalizó después."
+  - type: standard
     organization: "International Organization for Standardization"
     year: 2004
     title: "Acoustics — Sound-scattering properties of surfaces — Part 1: Measurement of the random-incidence scattering coefficient in a reverberation room"
     designation: "ISO 17497-1:2004+A1:2014"
     url: "https://www.iso.org/standard/31397.html"
+    primary: true
     note: "La edición implementada aquí: el método de mesa giratoria de la sección 1 y los límites de placa base de la Tabla 1 de la norma."
   - type: standard
     organization: "International Organization for Standardization"
@@ -42,21 +42,8 @@ references:
     title: "Acoustics — Sound-scattering properties of surfaces — Part 2: Measurement of the directional diffusion coefficient in a free field"
     designation: "ISO 17497-2:2012"
     url: "https://www.iso.org/standard/55293.html"
+    primary: true
     note: "El coeficiente de autocorrelación del goniómetro que sustenta la sección 2 de esta página, su ponderación por área y el d_n normalizado."
-  - type: standard
-    organization: "International Organization for Standardization"
-    year: 2002
-    title: "Acoustics — Measurement of sound absorption properties of road surfaces in situ — Part 1: Extended surface method"
-    designation: "ISO 13472-1:2002"
-    url: "https://www.iso.org/standard/35387.html"
-    note: "La absorción in situ de una superficie extensa por la técnica de sustracción de la sección 3. Revisada después como ISO 13472-1:2022 (https://www.iso.org/standard/77032.html); la edición de 2002 es la implementada."
-  - type: standard
-    organization: "International Organization for Standardization"
-    year: 2010
-    title: "Acoustics — Measurement of sound absorption properties of road surfaces in situ — Part 2: Spot method for reflective surfaces"
-    designation: "ISO 13472-2:2010"
-    url: "https://www.iso.org/standard/32304.html"
-    note: "El método de tubo puntual de la sección 4. Revisada después como ISO 13472-2:2025 (https://www.iso.org/standard/84925.html); la edición de 2010 es la implementada."
   - type: standard
     organization: "International Organization for Standardization"
     year: 1993
@@ -70,22 +57,26 @@ import Video from '../../../../components/Video.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
 
-Cómo devuelve una superficie el sonido incidente (cuánto dispersa fuera de la
-dirección especular, con qué uniformidad reparte lo que dispersa y cuánto
-absorbe) se mide con una familia de métodos dedicados. La **cámara reverberante**
-proporciona el *coeficiente de dispersión* de incidencia aleatoria de una
-superficie comparando las caídas con la muestra inmóvil y en rotación
-(ISO 17497-1). Un **goniómetro en campo libre** mide la respuesta polar del
-sonido reflejado y la condensa en un *coeficiente de difusión* (ISO 17497-2). Y
-sobre un pavimento, un altavoz y un solo micrófono recuperan la *absorción in
-situ* del firme, ya sea sobre una superficie extensa restando la onda incidente
-(ISO 13472-1) o a través de un pequeño tubo apoyado sobre la superficie
-(ISO 13472-2). Esta página cubre los cuatro.
+Un difusor se juzga por adónde envía el sonido que refleja, y dos
+coeficientes normalizados califican ese trabajo desde dos ángulos distintos.
+El **coeficiente de dispersión** $s$ (ISO 17497-1) se mide en cámara
+reverberante y hace contabilidad de energía: qué fracción de la energía
+reflejada abandona la dirección especular. El **coeficiente de difusión** $d$
+(ISO 17497-2) se mide en un goniómetro de campo libre y califica la calidad
+espacial: cuán uniformemente cubre la energía reflejada un arco polar de
+receptores. Esta guía cubre ambas mediciones, la predicción del coeficiente
+de difusión a partir del diseño de un difusor de Schroeder antes de fabricar
+una muestra, y la confusión recurrente entre los dos coeficientes.
 
-Los coeficientes de dispersión y de difusión responden a preguntas distintas y no
-son intercambiables: la dispersión es *cuánta* energía abandona la dirección
-especular; la difusión es *cuán uniformemente* se reparte en ángulo la energía
-reflejada.
+Los dos coeficientes responden a preguntas distintas y no son
+intercambiables: la dispersión es *cuánta* energía abandona la dirección
+especular; la difusión es *cuán uniformemente* se reparte en ángulo la
+energía reflejada. La
+[sección final](#dispersión-o-difusión-dos-coeficientes-dos-trabajos)
+precisa la distinción. Los parientes en sublongitud de onda profunda de los
+diseños de Schroeder tratados aquí, paneles de pocos centímetros que
+dispersan como pozos de decenas de centímetros, tienen su propia guía:
+[Metadifusores](/phonometry/es/guides/metadiffusers/).
 
 ## 1. Coeficiente de dispersión de incidencia aleatoria (ISO 17497-1)
 
@@ -495,6 +486,69 @@ esa banda.
 	caption="Ficha de respuesta polar de fuente única (DiffusionResult.report), el nivel reflejado sobre el arco de receptores."
 />
 
+## 3. Diseño de un difusor de Schroeder
+
+Las mediciones anteriores califican una superficie que ya existe. La manera
+clásica de *diseñar* una es la rejilla de fase de Schroeder: dividir la
+superficie en pozos de igual anchura y distinta profundidad, de modo que cada
+pozo devuelva la onda incidente con una fase diferente. Un pozo de fondo
+rígido y profundidad $d_n$ refleja con el coeficiente de presión
+
+$$
+R_n = e^{-2 j k d_n},
+$$
+
+el viaje de ida y vuelta por el pozo, así que la secuencia de profundidades es
+una secuencia de fases disfrazada. La intuición de Schroeder es de teoría de
+números: si las profundidades siguen una **secuencia de residuos
+cuadráticos**,
+
+$$
+s_n = n^2 \bmod N, \qquad
+d_n = \frac{s_n\,\lambda_0}{2N}, \qquad \lambda_0 = \frac{c}{f_0},
+$$
+
+para un primo $N$ y una **frecuencia de diseño** $f_0$ elegida (Cox &
+D'Antonio, ecs. (10.2)/(10.3)), entonces a $f_0$ las fases de reflexión
+$-4\pi s_n / (2N)$ muestrean una secuencia cuya transformada de Fourier
+discreta tiene magnitud constante, y la energía radiada a los lóbulos de red
+de la superficie periódica es la misma en todos los lóbulos. La superficie
+reparte la reflexión tan uniformemente como puede hacerlo una superficie
+periódica.
+
+Del propio dibujo se deducen unas cuantas reglas de diseño:
+
+- **La frecuencia de diseño fija la profundidad.** El pozo más profundo es
+  $d_{max} = \max(s_n)\,\lambda_0/(2N)$, cerca de media longitud de onda para
+  $N$ grande; reducir $f_0$ a la mitad duplica la profundidad del difusor.
+  Este es el coste que ataca el
+  [metadifusor](/phonometry/es/guides/metadiffusers/): a 500 Hz un diseño
+  N = 5 ya exige pozos de 27,4 cm.
+- **La secuencia repite lo que da el primo.** $s_n$ es simétrica respecto a
+  $n = 0$ y periódica en $N$, así que un periodo tiene $N$ pozos y el perfil
+  se construye repitiéndolo. La propiedad de fase plana también se cumple en
+  los armónicos $2f_0, 3f_0, \ldots$, salvo en los múltiplos de $N f_0$,
+  donde todos los pozos vuelven a reflejar en fase y el panel se comporta
+  momentáneamente como una placa plana.
+- **La anchura del pozo fija el techo.** Cada pozo es una pequeña guía de
+  ondas; la imagen de una única onda plana en su interior solo vale mientras
+  la anchura $w$ quede por debajo de media longitud de onda, lo que da un
+  límite superior de trabajo cercano a $f_{max} = c/(2w)$. Pozos más
+  estrechos suben el techo, pero añaden pérdidas viscosas y aletas.
+- **La periodicidad concentra, la modulación reparte.** Repetir un periodo
+  encierra la energía reflejada en lóbulos de red en
+  $\sin\theta_m = \sin\psi + m\lambda/L$ para un periodo de longitud $L$:
+  incluso una secuencia de fases perfecta alimenta entonces un conjunto
+  finito de direcciones, que es la penalización por lóbulos medida en la
+  respuesta polar de arriba. Modular dos secuencias distintas (o una
+  secuencia y su inversa) rompe la periodicidad y recupera la difusión; las
+  secuencias de raíz primitiva ($s_n = r^n \bmod N$) suprimen además el
+  lóbulo especular a la frecuencia de diseño.
+
+`qrd_well_depths` evalúa la secuencia de profundidades y
+`predict_diffuser_polar_response` califica el diseño antes de construir nada,
+que es el tema de la sección siguiente.
+
 ### Predicción de la difusión a partir del diseño de un difusor
 
 El coeficiente de autocorrelación anterior reduce una respuesta polar *medida*.
@@ -513,10 +567,7 @@ $$
 
 con $x_n$ el centro del pozo y $k = 2\pi f / c$. Los niveles polares predichos
 $L_i = 20\lg|p(\theta_i)|$ alimentan el mismo `directional_diffusion_coefficient`
-que una medición. Para un difusor de residuo cuadrático la secuencia de
-profundidades se obtiene del generador primo $N$ y la frecuencia de diseño $f_0$
-(Ecs. (10.2)/(10.3)): $s_n = n^2 \bmod N$ y $d_n = s_n \lambda_0 / (2N)$ con
-$\lambda_0 = c/f_0$.
+que una medición.
 
 ```python
 import numpy as np
@@ -595,138 +646,6 @@ plt.show()
 
 </details>
 
-### Metadifusores: difusores de Schroeder en sublongitud de onda profunda
-
-Un metadifusor sustituye los pozos profundos de un difusor de Schroeder por
-rendijas finas cargadas con resonadores de Helmholtz (Jiménez, Cox,
-Romero-García y Groby, 2017). Por debajo de su resonancia, los resonadores
-ralentizan el sonido dentro de cada rendija, de modo que un panel de pocos
-centímetros alcanza las fases de reflexión que a una red de fase clásica le
-exigen decenas de centímetros de profundidad; y llevar una rendija al
-acoplamiento crítico añade un estado perfectamente absorbente, el `0` que
-requieren las secuencias ternarias. `metadiffuser_reflection` ejecuta la
-cadena de matrices de transferencia del
-[absorbedor de sonido lento](/phonometry/es/guides/porous-absorbers/) una vez por
-pozo (resonadores bidimensionales, pérdidas viscotérmicas y correcciones de
-extremo incluidas) y devuelve la reflexión compleja por pozo $R_n(f)$;
-`metadiffuser_polar_response` y `metadiffuser_diffusion_spectrum` reducen
-ese perfil espacial con el mismo campo lejano de Fraunhofer y el mismo
-coeficiente ISO 17497-2 que los diseños clásicos de arriba.
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_geometry_es.svg" alt="Sección a escala del metadifusor de residuo cuadrático publicado: un panel de 350 por 20 milímetros sobre respaldo rígido con cinco rendijas numeradas que se abren en la cara, cada una cargada con dos resonadores de Helmholtz cuyos cuellos y cavidades se alojan lateralmente en el tabique entre rendijas; las cotas marcan los 350 milímetros de anchura, el paso de 70 milímetros, la primera rendija de 14,7 milímetros y los 20 milímetros de espesor, con el sonido incidente llegando desde arriba" width="92%" />
-
-El diseño de residuo cuadrático publicado empaqueta el difusor completo en
-un panel de 35 cm x 2 cm. Su primera rendija alcanza el acoplamiento crítico
-(el cero de reflexión con el que se construye el estado `0` ternario), y a
-la frecuencia de evaluación de 2 kHz el panel dispersa como el QRD de
-27,4 cm de profundidad al que imita. Como en la comparación de campo lejano
-publicada, la respuesta polar repite la secuencia de cinco pozos seis veces
-(`periods=6`, un panel de 2,1 m):
-
-```python
-import numpy as np
-from phonometry import (
-    HelmholtzResonator,
-    MetadiffuserWell,
-    metadiffuser_polar_response,
-    metadiffuser_reflection,
-)
-
-# El metadifusor de residuo cuadrático publicado: cinco rendijas con dos
-# resonadores cada una en un panel de 35 cm x 2 cm (paso de 7 cm),
-# ajustado para imitar un QRD diseñado a 500 Hz cuyos pozos llegarían a
-# 27,4 cm de profundidad.
-mm = 1e-3
-filas = [  # rendija h, cuello l_n, cavidad l_c, cuello w_n, cavidad w_c [mm]
-    (14.7, 13.0, 16.4, 6.2, 9.0),
-    (30.9, 9.1, 4.3, 3.5, 9.0),
-    (30.9, 9.1, 4.3, 3.5, 9.0),
-    (15.7, 13.3, 17.0, 6.3, 9.0),
-    (20.3, 18.0, 20.7, 3.2, 9.0),
-]
-pozos = [
-    MetadiffuserWell(
-        h * mm,
-        2 * (HelmholtzResonator(ln * mm, wn * mm, lc * mm, wc * mm),),
-    )
-    for h, ln, lc, wn, wc in filas
-]
-
-f = np.arange(1800.0, 2601.0, 5.0)
-panel = metadiffuser_reflection(f, pozos, depth=0.02, period=0.07)
-alfa1 = panel.well_absorption[0]
-print(round(float(alfa1.max()), 2), int(f[alfa1.argmax()]))  # 0.99 2305
-
-# Comparación de campo lejano: la secuencia de cinco pozos repetida seis
-# veces (2,1 m).
-polar = metadiffuser_polar_response(2000.0, pozos, depth=0.02,
-                                    period=0.07, periods=6)
-print(round(polar.coefficient, 2))                           # 0.32
-```
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_polar_es.svg" alt="Diagrama polar semicircular a 2 kilohercios que compara la respuesta en campo lejano del panel metadifusor de 2 centímetros, en trazo continuo, con el difusor de residuo cuadrático de 27,4 centímetros de profundidad al que imita, en trazo discontinuo: los dos patrones de lóbulos de red se superponen casi exactamente en todo el arco de menos 90 a más 90 grados" width="92%" />
-
-<details>
-<summary>Ver el código de esta figura</summary>
-
-```python
-import numpy as np
-from phonometry import (
-    HelmholtzResonator,
-    MetadiffuserWell,
-    materials,
-    metadiffuser_polar_response,
-)
-
-mm = 1e-3
-filas = [
-    (14.7, 13.0, 16.4, 6.2, 9.0),
-    (30.9, 9.1, 4.3, 3.5, 9.0),
-    (30.9, 9.1, 4.3, 3.5, 9.0),
-    (15.7, 13.3, 17.0, 6.3, 9.0),
-    (20.3, 18.0, 20.7, 3.2, 9.0),
-]
-pozos = [
-    MetadiffuserWell(
-        h * mm,
-        2 * (HelmholtzResonator(ln * mm, wn * mm, lc * mm, wc * mm),),
-    )
-    for h, ln, lc, wn, wc in filas
-]
-
-# El panel metadifusor y el QRD al que se ajustó, a 2 kHz y con seis
-# repeticiones del periodo (paneles de 2,1 m).
-meta = metadiffuser_polar_response(2000.0, pozos, depth=0.02, period=0.07,
-                                   periods=6)
-secuencia = np.roll(materials.quadratic_residue_sequence(5), -1)
-profundidades = secuencia * (343.0 / 500.0) / (2 * 5)
-qrd = materials.predict_diffuser_polar_response(
-    0.07, 2000.0, depths=profundidades, periods=6, include_obliquity=False,
-)
-
-ax = meta.plot(marker="", linewidth=2.2, language="es",
-               label="Metadifusor, panel de 2 cm")
-qrd.plot(ax=ax, marker="", linewidth=1.6, linestyle="--", language="es",
-         label="QRD, pozos de hasta 27,4 cm")
-ax.legend(loc="lower center")
-```
-
-</details>
-
-La superposición de campo lejano de arriba es el resumen en frecuencia; la
-animación FDTD de abajo malla ambos paneles de verdad (el metadifusor a
-0,25 mm, con sus rendijas, cuellos y cavidades) y lanza el mismo frente de
-2 kHz contra ellos: el QRD de 27 cm y el panel de 2 cm devuelven abanicos
-dispersados casi idénticos.
-
-<Video
-  name="anim_fdtd_metadiffuser"
-  width={2400}
-  height={1350}
-  title="Difusor de Schroeder frente a metadifusor en una simulación FDTD 2D"
-  description="Un frente de onda plano de 2 kHz incide sobre un difusor de Schroeder con pozos de hasta 27 centímetros y, al lado, sobre el metadifusor de 2 centímetros del diseño publicado, cuyas rendijas, cuellos y cavidades reales están mallados a 0,25 milímetros. El campo total y la envolvente dispersada persistente muestran que ambos paneles devuelven abanicos difusos casi idénticos, y los coeficientes de difusión del arco de receptores lo confirman cuantitativamente."
-/>
-
 ## ¿Dispersión o difusión? Dos coeficientes, dos trabajos
 
 Los dos coeficientes anteriores se tratan de forma rutinaria como
@@ -775,224 +694,6 @@ crecen cuando el relieve de la superficie deja de ser pequeño frente a la
 longitud de onda; un número único ciego a la frecuencia ("dispersa el 90 % del
 sonido") no es ninguno de los dos.
 
-## 3. Absorción in situ de pavimentos: técnica de sustracción (ISO 13472-1)
-
-En campo no hay cámara reverberante. ISO 13472-1 mide la absorción acústica de un
-pavimento (o de cualquier superficie plana extensa) *in situ* disparando un
-impulso desde un altavoz a la altura $d_s$ hacia la superficie y registrando la
-respuesta al impulso en un micrófono a la altura $d_m$. Las componentes
-**incidente** y **reflejada** se separan en el tiempo con una ventana de
-Adrienne; su función de transferencia da el factor de reflexión y de ahí la
-absorción.
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insitu_subtraction_es.svg" alt="Absorción in situ de pavimentos por la técnica de sustracción de ISO 13472-1: un altavoz a 1,25 m y un micrófono a 0,25 m sobre la superficie del pavimento, con los trayectos de rayo directo y reflejado por el pavimento y una medición de referencia en campo libre, con la componente reflejada aislada por una ventana temporal de Adrienne" width="92%" />
-
-**Divergencia geométrica (cláusula 4.1).** La onda reflejada recorre más camino
-que la directa, así que se atenúa por el factor de divergencia geométrica
-
-$$
-K_r = \frac{d_s - d_m}{d_s + d_m},
-$$
-
-que vale $2/3$ para la geometría obligatoria $d_s = 1{,}25$ m, $d_m = 0{,}25$ m. La
-absorción se obtiene de los espectros incidente y reflejado enventanados $H_i$,
-$H_r$:
-
-$$
-\alpha(f) = 1 - \frac{1}{K_r^2}\left|\frac{H_r(f)}{H_i(f)}\right|^2.
-$$
-
-```python
-import numpy as np
-from phonometry import materials
-
-# Una respuesta al impulso incidente limitada en banda y una reflexión de
-# pavimento sintética hr = Kr * r0 * delayed(hi): una reflexión de magnitud
-# r0 = 0.4, retardada por el camino adicional y escalada por el factor de
-# divergencia geométrica Kr.
-fs, n = 48000.0, 4096
-t = np.arange(n) / fs
-hi = np.zeros(n)
-hi[:64] = np.hanning(64) * np.cos(2.0 * np.pi * 1500.0 * t[:64])
-
-kr = materials.geometric_spreading_factor()          # (ds - dm)/(ds + dm) = 2/3
-hr = kr * 0.4 * np.roll(hi, 96)
-
-# Absorción de banda estrecha, luego reducida a tercios de octava en 250-4000 Hz.
-alpha = materials.insitu_absorption_coefficient(hi, hr)   # 1 - (1/Kr^2)|Hr/Hi|^2
-freq = np.fft.rfftfreq(n, 1.0 / fs)
-centres, band = materials.one_third_octave_absorption(freq, alpha)
-print(round(kr, 4))                # 0.6667
-print(round(float(band[2]), 3))    # 0.84  (alpha = 1 - 0.4^2 = 0.84)
-```
-
-**Ventana de Adrienne (cláusula 6.4).** La ventana temporal que aísla la
-reflexión solo exige un flanco de subida abrupto, una porción plana de 5 ms y un
-flanco de bajada de coseno cuadrado o Blackman-Harris; las duraciones exactas se
-informan en cada medición, no son fijas, así que aquí son configurables.
-
-```python
-from phonometry import materials
-
-# Por defecto: flanco de subida de 0.5 ms, meseta de 5 ms, bajada Blackman-Harris de 5 ms.
-w = materials.adrienne_window(48000.0)
-print(w.shape[0])          # 504 muestras a 48 kHz
-print(round(float(w.max()), 3))   # 1.0  (la meseta y los flancos se encuentran en la unidad)
-```
-
-**Espectro de principio a fin.** `insitu_absorption_spectrum` ejecuta toda la
-cadena (de las respuestas al impulso incidente y reflejada enventanadas a la
-absorción de banda estrecha y de ahí a las bandas de tercio de octava) y devuelve
-un `InsituAbsorptionResult` representable:
-
-```python
-import numpy as np
-from phonometry import materials
-from scipy.signal import firwin, lfilter
-
-# Una medición sintética pero realista. hi es un impulso incidente unitario; la
-# reflexión del pavimento hr = Kr * r0 * roll(hi, shift) usa el factor de
-# divergencia geométrica Kr, un r0 levemente dependiente de la frecuencia (un
-# suave paso-bajo, de modo que una superficie porosa refleja menos al subir la
-# frecuencia) y el retardo del camino reflejado shift = round(2 dm / c * fs).
-fs, n = 48000.0, 8192
-kr = materials.geometric_spreading_factor()           # (ds - dm)/(ds + dm) = 2/3
-hi = np.zeros(n)
-hi[0] = 1.0
-taps = firwin(41, 1200.0, fs=fs)
-taps = taps / taps.sum()
-shift = int(round(2.0 * 0.25 / 340.0 * fs))     # retardo del camino reflejado 2 dm / c
-hr = kr * 0.85 * np.roll(lfilter(taps, 1.0, hi), shift)
-
-result = materials.insitu_absorption_spectrum(hi, hr, fs)
-print(result.frequencies[[0, -1]].astype(int))     # [ 250 4000]
-print(np.round(result.absorption[[0, 6, 12]], 2))  # [0.31 0.65 1.  ]
-result.plot()   # diagrama de barras alpha(f) en 250-4000 Hz (requiere matplotlib)
-```
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_absorption_es.svg" alt="Un espectro de absorción de pavimento in situ en tercios de octava calculado por la vía del factor de reflexión a partir de una reflexión de pavimento sintética, creciendo desde cerca de 0,3 a 250 Hz hasta casi 1,0 por encima de 2 kHz" width="88%" />
-
-*La absorción crece con la frecuencia porque la superficie refleja menos energía
-de alta frecuencia, exactamente como dicta el factor de reflexión paso-bajo
-$r_0(f)$ a través de $\alpha = 1 - (1/K_r^2)\,|H_r/H_i|^2$.*
-
-<details>
-<summary>Ver el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from scipy.signal import firwin, lfilter
-from phonometry import materials
-
-# Una medición sintética pero realista. hi es un impulso incidente unitario; la
-# reflexión del pavimento hr = Kr * r0 * roll(hi, shift) usa el factor de
-# divergencia geométrica Kr, un r0 levemente dependiente de la frecuencia (un
-# suave paso-bajo, de modo que una superficie porosa refleja menos al subir la
-# frecuencia) y el retardo del camino reflejado shift = round(2 dm / c * fs).
-fs, n = 48000.0, 8192
-kr = materials.geometric_spreading_factor()           # (ds - dm)/(ds + dm) = 2/3
-hi = np.zeros(n)
-hi[0] = 1.0
-taps = firwin(41, 1200.0, fs=fs)
-taps = taps / taps.sum()
-shift = int(round(2.0 * 0.25 / 340.0 * fs))     # retardo del camino reflejado 2 dm / c
-hr = kr * 0.85 * np.roll(lfilter(taps, 1.0, hi), shift)
-result = materials.insitu_absorption_spectrum(hi, hr, fs)
-
-# result es el InsituAbsorptionResult calculado arriba. En una línea:
-result.plot(language="es")
-plt.show()
-
-# A mano: un diagrama de barras de alpha sobre las bandas de tercio de octava.
-freqs = result.frequencies
-positions = np.arange(freqs.size)
-fig, ax = plt.subplots()
-ax.bar(positions, np.nan_to_num(result.absorption), width=0.7, color="#1f77b4")
-ax.set_xticks(positions)
-ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
-ax.set_xlabel("Frecuencia [Hz]")
-ax.set_ylabel("Coeficiente de absorción alpha")
-ax.set_ylim(0.0, 1.0)
-ax.set_title("Absorción in situ de pavimentos (ISO 13472-1)")
-plt.show()
-```
-
-</details>
-
-**Área máxima muestreada (Anexo A).** La ventana temporal finita limita cuánta
-superficie contribuye a la reflexión. El área máxima muestreada es un círculo
-cuyo radio la librería calcula a partir de la geometría y la anchura de la
-ventana; el ejemplo trabajado del Anexo A ($d_s = 1{,}25$ m, $d_m = 0{,}25$ m,
-$c = 340$ m/s, ventana plana de 5 ms) da unos 1,34 m.
-
-```python
-from phonometry import materials
-print(round(materials.max_sampled_area_radius(5.0e-3), 3))   # 1.343  (metros)
-```
-
-Todo el montaje cabe en un dibujo a escala. `plot_insitu_geometry` dibuja la
-disposición estándar con ese radio muestreado sobre la superficie, y un
-`InsituAbsorptionResult` medido que retuvo sus alturas redibuja el suyo con
-`result.plot_geometry()`.
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_setup_geometry_es.svg" alt="Vista lateral a escala del montaje de absorción in situ: el altavoz en su mástil a 1,25 m sobre la superficie rayada de la calzada, el micrófono en la misma vertical a 0,25 m, el trayecto reflejado en la superficie a trazos bajo él y el radio de 1,34 m de la zona muestreada acotado sobre la superficie" width="88%" />
-
-*La geometría estándar a escala: fuente a 1,25 m, micrófono a 0,25 m en la
-misma vertical, y la ventana de 5 ms convertida en los 1,34 m de radio de
-calzada que de verdad contribuyen a la reflexión.*
-
-<details>
-<summary>Ver el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import materials
-
-# La geometría estándar: fuente a 1.25 m, micrófono a 0.25 m y el radio
-# muestreado de 1.34 m de la ventana de 5 ms.
-materials.plot_insitu_geometry(language="es")
-plt.show()
-
-# Un espectro medido retiene sus alturas y redibuja su propio montaje:
-#   result = materials.insitu_absorption_spectrum(hi, hr, fs)
-#   result.plot_geometry(language="es")
-```
-
-</details>
-
-## 4. Absorción in situ de pavimentos: método puntual (ISO 13472-2)
-
-Para parches más pequeños, ISO 13472-2 sella un tubo circular corto sobre la
-superficie y mide la absorción con el método de la función de transferencia de
-dos micrófonos de ISO 10534-2. La librería aporta la geometría del método puntual
-y los ayudantes de validez; el propio DSP de la función de transferencia es la
-rutina de tubo de impedancia `two_microphone_impedance` (véase la
-[guía del Tubo de impedancia](/phonometry/es/guides/impedance-tube/)).
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spot_tube_es.svg" alt="Método puntual de ISO 13472-2: un tubo circular corto sellado sobre la superficie del pavimento con un altavoz en la parte superior y dos micrófonos enrasados en la pared del tubo con espaciado s, midiendo la absorción de 250 a 1600 Hz mediante el método de la función de transferencia de dos micrófonos de ISO 10534-2" width="92%" />
-
-**Límites de onda plana (cláusula 5.4).** El tubo solo soporta ondas planas por
-debajo de
-
-$$
-f_u = 0{,}58\,\frac{c_0}{d},
-$$
-
-con $d$ el diámetro del tubo, y el espaciado de micrófonos $s$ debe situarse entre
-$0{,}05\,c_0/f_{min}$ y $0{,}45\,c_0/f_{max}$. El rango informado son las bandas de
-tercio de octava de 250 a 1600 Hz.
-
-```python
-from phonometry import materials
-
-# Frecuencia superior utilizable de un tubo de 100 mm y la ventana de espaciado válida.
-print(round(materials.spot_tube_upper_frequency(0.100, 343.0), 1))      # 1989.4 Hz
-s_min, s_max = materials.spot_microphone_spacing_bounds(
-    343.0, f_min=220.0, f_max=1800.0)
-print(round(s_min, 3), round(s_max, 3))    # 0.078 0.086  (metros)
-```
-
 ## Qué cubre esta guía
 
 **Cubierto.** El coeficiente de dispersión de incidencia aleatoria de la
@@ -1004,31 +705,37 @@ base de la Tabla 1, mediante `materials.random_incidence_absorption`,
 `materials.check_base_plate_scattering`; el coeficiente de difusión
 direccional y de incidencia aleatoria de la ISO 17497-2:2012 (Fórmulas (5) a
 (8)) mediante `materials.directional_diffusion` y
-`materials.random_incidence_diffusion`, más el modelo de predicción de
-difusor de Fraunhofer de Cox y D'Antonio; la técnica de sustracción de la
-ISO 13472-1:2002 (la propagación geométrica del apartado 4.1, la ventana
-temporal Adrienne del apartado 6.4 y el radio de área muestreada del anexo
-A) mediante `materials.insitu_absorption_spectrum` y sus piezas; y el
-límite de frecuencia de onda plana y la geometría de separación de
-micrófonos del método puntual de la ISO 13472-2:2010.
+`materials.random_incidence_diffusion`; y el juego de diseño de Schroeder
+(`materials.quadratic_residue_sequence`, `materials.qrd_well_depths`) con el
+modelo de predicción de difusor de Fraunhofer de Cox y D'Antonio
+(`materials.predict_diffuser_polar_response`,
+`materials.predicted_diffusion_spectrum`).
 
-**No cubierto.** Ambas normas de absorción in situ de pavimentos se han
-revisado desde entonces (ISO 13472-1:2022, ISO 13472-2:2025); aquí solo
-están implementadas las ediciones anteriores de 2002 y 2010, como indican
-las notas de referencia de arriba. El procesado de función de transferencia
-propio de la ISO 13472-2 tampoco está implementado en este módulo: solo se
-proporcionan la geometría y las funciones de validación, y el DSP de dos
-micrófonos real es la rutina ISO 10534-2 de la
-[guía del Tubo de impedancia](/phonometry/es/guides/impedance-tube/). El modelo
-de predicción de difusor de Fraunhofer es una estimación de diseño, no
-forma parte de la ISO 17497-2 en sí, y sus propios límites declarados
-(pierde precisión a baja frecuencia, en ángulos rasantes y para superficies
-muy absorbentes, e ignora la difracción de borde) hacen que no sustituya a
-una medición real del coeficiente de difusión.
+**No cubierto.** El modelo de predicción de difusor de Fraunhofer es una
+estimación de diseño, no forma parte de la ISO 17497-2 en sí, y sus propios
+límites declarados (pierde precisión a baja frecuencia, en ángulos rasantes y
+para superficies muy absorbentes, e ignora la difracción de borde) hacen que
+no sustituya a una medición real del coeficiente de difusión. Las
+disposiciones de raíz primitiva y moduladas se tratan como guía de diseño en
+la sección 3, pero solo la secuencia de profundidades de residuo cuadrático
+tiene función dedicada; otros perfiles entran por los argumentos explícitos
+`depths` o `reflection`. Los paneles en sublongitud de onda profunda cargados
+con resonadores son el tema de la
+[guía de metadifusores](/phonometry/es/guides/metadiffusers/).
 
 ## Véase también
 
+- [Metadifusores](/phonometry/es/guides/metadiffusers/): la versión en
+  sublongitud de onda profunda de los diseños de Schroeder de la sección 3,
+  rendijas cargadas con resonadores de Helmholtz que alcanzan las mismas
+  fases de reflexión desde un panel de pocos centímetros.
+- [Absorción in situ de firmes de carretera](/phonometry/es/guides/road-absorption/):
+  la otra familia de medidas de superficie realizada en campo y no en
+  laboratorio, con los métodos de sustracción y puntual de ISO 13472.
+- [Medida y clasificación de la absorción sonora](/phonometry/es/guides/absorption-measurement/):
+  la misma cámara reverberante que usa ISO 17497-1, midiendo absorción en
+  lugar de dispersión.
 - [Propagación en exteriores](/phonometry/es/guides/outdoor-propagation/): el
   modelo completo de absorción atmosférica de ISO 9613-1, cuyo coeficiente de
   tono puro consumen las relaciones de atenuación del aire de ISO 17497-1.
-- Referencia de la API: [`materials.scattering_diffusion`](/phonometry/es/reference/api/materials/scattering-diffusion/) y [`materials.road_absorption`](/phonometry/es/reference/api/materials/road-absorption/).
+- Referencia de la API: [`materials.scattering_diffusion`](/phonometry/es/reference/api/materials/scattering-diffusion/) y [`materials.diffuser_design`](/phonometry/es/reference/api/materials/diffuser-design/).

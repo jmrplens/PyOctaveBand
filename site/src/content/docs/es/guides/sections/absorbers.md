@@ -1,12 +1,13 @@
 ---
 title: "Absorbentes"
-description: "Caracterizar y predecir absorbentes acústicos: la medición en cámara reverberante y la valoración ISO 11654, la resistencia al flujo de aire ISO 9053, el tubo de impedancia ISO 10534 / ASTM E2611, y los modelos de predicción porosos y multicapa."
+description: "Caracterizar y predecir absorbentes acústicos: la medición en cámara reverberante y la valoración ISO 11654, la resistencia al flujo de aire ISO 9053, el tubo de impedancia ISO 10534 / ASTM E2611, los modelos de predicción porosos y multicapa, y los metaabsorbentes con acoplamiento crítico."
 ---
 
 Un absorbente puede caracterizarse a tres escalas, y esta subsección las
 recorre en orden: el producto terminado en una cámara reverberante, la
 muestra pequeña en un tubo de impedancia y la materia prima en un banco de
-flujo, con los modelos de predicción que atan las tres.
+flujo, con los modelos de predicción que atan las tres y los diseños de
+metamaterial que los llevan más allá de las reglas clásicas de espesor.
 
 [Medida y clasificación de la absorción sonora](/phonometry/es/guides/absorption-measurement/)
 es la escala de producto: la medición en cámara reverberante ISO 354 del
@@ -38,6 +39,13 @@ medida en impedancia característica y número de onda, y el solver multicapa
 por matrices de transferencia predice la absorción de una construcción
 completa, a cualquier incidencia y en campo difuso, antes de construir nada.
 
+[Metaabsorbentes](/phonometry/es/guides/metamaterial-absorbers/) es donde los
+modelos de predicción dejan atrás las reglas clásicas: paneles ranurados de
+sonido lento cargados con resonadores de Helmholtz alcanzan la absorción
+perfecta en el acoplamiento crítico con paneles de una cuarentava parte de la
+longitud de onda de profundidad, con el modelo de matrices de transferencia,
+el solucionador de diseño y la validación cruzada FDTD de la celda mallada.
+
 ## Páginas de esta sección
 
 - [Medida y clasificación de la absorción sonora](/phonometry/es/guides/absorption-measurement/):
@@ -52,3 +60,6 @@ completa, a cualquier incidencia y en campo difuso, antes de construir nada.
 - [Absorbentes porosos y multicapa](/phonometry/es/guides/porous-absorbers/):
   los modelos de fluido equivalente y el solver multicapa por matrices de
   transferencia con capas perforadas, microperforadas y de membrana.
+- [Metaabsorbentes](/phonometry/es/guides/metamaterial-absorbers/): la
+  condición de acoplamiento crítico y el panel ranurado de sonido lento con
+  su solucionador de diseño.

@@ -1,12 +1,13 @@
 ---
 title: "Absorbers"
-description: "Characterising and predicting sound absorbers: the reverberation-room measurement and ISO 11654 rating, ISO 9053 airflow resistance, the ISO 10534 / ASTM E2611 impedance tube, and the porous and multilayer prediction models."
+description: "Characterising and predicting sound absorbers: the reverberation-room measurement and ISO 11654 rating, ISO 9053 airflow resistance, the ISO 10534 / ASTM E2611 impedance tube, the porous and multilayer prediction models, and the critically coupled metamaterial absorbers."
 ---
 
 An absorber can be characterised at three scales, and this subsection walks
 them in order: the finished product in a reverberation room, the small sample
 in an impedance tube, and the raw material in a flow rig, with the prediction
-models that tie the three together.
+models that tie the three together and the metamaterial designs that push
+them past the classical thickness rules.
 
 [Sound Absorption Measurement and Rating](/phonometry/guides/absorption-measurement/)
 is the product scale: the ISO 354 reverberation-room measurement of the
@@ -35,6 +36,13 @@ impedance and wavenumber, and the transfer-matrix multilayer solver predicts
 the absorption of a whole construction, at any incidence and in a diffuse
 field, before anything is built.
 
+[Metamaterial Absorbers](/phonometry/guides/metamaterial-absorbers/) is where
+the prediction models leave the classical rules behind: slow-sound slit
+panels loaded by Helmholtz resonators reach perfect absorption at critical
+coupling from panels a fortieth of a wavelength deep, with the
+transfer-matrix model, the design solver and the FDTD cross-check of the
+meshed cell.
+
 ## Pages in this section
 
 - [Sound Absorption Measurement and Rating](/phonometry/guides/absorption-measurement/):
@@ -48,3 +56,6 @@ field, before anything is built.
 - [Porous and Multilayer Absorbers](/phonometry/guides/porous-absorbers/):
   the equivalent-fluid models and the transfer-matrix multilayer solver with
   perforated, microperforated and membrane layers.
+- [Metamaterial Absorbers](/phonometry/guides/metamaterial-absorbers/): the
+  critical-coupling condition and the slow-sound slit panel with its design
+  solver.
