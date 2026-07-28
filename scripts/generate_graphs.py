@@ -75,6 +75,13 @@ _ES_EXACT = {
     "P wave front": "Frente de onda P",
     "S wave front": "Frente de onda S",
     "Rayleigh wave": "Onda de Rayleigh",
+    "Scholte wave along a water-sediment interface (elastic FDTD)":
+        "Onda de Scholte en una interfase agua-sedimento (FDTD elástico)",
+    "Scholte wave, evanescent on both sides":
+        "Onda de Scholte, evanescente a ambos lados",
+    "direct water wave": "onda directa en el agua",
+    "water 1500 m/s": "agua 1500 m/s",
+    "seabed 3500 / 2000 m/s": "sedimento 3500 / 2000 m/s",
     "Particle velocity [m/s]": "Velocidad de partícula [m/s]",
     "Predicted diffusion from design (Cox & D'Antonio Fraunhofer model)":
         "Difusión predicha desde el diseño (modelo de Fraunhofer de Cox y D'Antonio)",
@@ -1923,6 +1930,7 @@ _RASTER_FIGURES = frozenset(
         "airport_contour",
         "fdtd_simulation",
         "elastic_halfspace_waves",
+        "scholte_interface_wave",
         # Dense reflectogram: hundreds of image-source stems/markers make the
         # SVG far heavier than the raster (as for schroeder_decay above).
         "image_source_reflectogram",
@@ -9704,6 +9712,71 @@ def generate_elastic_halfspace_waves(output_dir: str) -> None:
     plt.close()
 
 
+@cache
+def _scholte_interface_result() -> Any:
+    """Water over a soft seabed, explosive shot near the contact (cached).
+
+    Language/theme independent: the van Vossen (2002) benchmark media
+    (water 1500/1000 over a 3500/2000/2500 solid), a 50 Hz Ricker
+    explosion 10 m above the interface, run until the Scholte train has
+    crawled ~330 m along the contact.
+    """
+    from phonometry import ExplosionSource, elastic_fdtd_simulation
+
+    ny, nx, dx = 200, 500, 1.0
+    c_p = np.full((ny, nx), 1500.0)
+    c_s = np.zeros((ny, nx))
+    rho = np.full((ny, nx), 1000.0)
+    c_p[100:], c_s[100:], rho[100:] = 3500.0, 2000.0, 2500.0
+    f0, t0 = 50.0, 0.030
+    duration = 0.232
+    dt = 0.6 * dx / (3500.0 * np.sqrt(2.0))
+    steps = round(duration / dt)
+
+    def ricker(t: float) -> float:
+        a = (np.pi * f0 * (t - t0)) ** 2
+        return float((1.0 - 2.0 * a) * np.exp(-a))
+
+    return elastic_fdtd_simulation(
+        c_p, c_s, dx, duration, rho=rho,
+        sources=[ExplosionSource(ix=60, iy=89, waveform=ricker,
+                                 amplitude=1e3)],
+        boundaries="absorbing", absorbing_layer_cells=20,
+        snapshot_every=steps, snapshot_field="vy",
+    )
+
+
+def generate_scholte_interface_wave(output_dir: str) -> None:
+    """Elastic FDTD: Scholte wave crawling along a water-seabed contact."""
+    print("Generating scholte_interface_wave...")
+    res = _scholte_interface_result()
+
+    _fig, ax = plt.subplots(figsize=(9.5, 4.6))
+    assert res.snapshots is not None
+    vmax = 0.22 * float(np.abs(res.snapshots[-1]).max())
+    res.plot(kind="snapshot", frame=-1, ax=ax, vmin=-vmax, vmax=vmax)
+    # The RdBu field keeps a light background in both themes, so the
+    # in-axes annotations use a fixed dark ink rather than COLOR_FG.
+    ink = "#3a3a3a"
+    ax.axhline(100.0, color=ink, linestyle=":", linewidth=1.0, alpha=0.75)
+    ann: dict[str, Any] = {
+        "fontsize": 9, "color": ink,
+        "arrowprops": {"arrowstyle": "->", "color": ink, "lw": 0.9}}
+    ax.annotate("Scholte wave, evanescent on both sides",
+                xy=(350.0, 108.0), xytext=(120.0, 170.0), **ann)
+    ax.annotate("direct water wave", xy=(300.0, 35.0),
+                xytext=(120.0, 14.0), **ann)
+    txt: dict[str, Any] = {"fontsize": 9, "color": ink, "alpha": 0.9}
+    ax.text(12.0, 32.0, "water 1500 m/s", **txt)
+    ax.text(12.0, 192.0, "seabed 3500 / 2000 m/s", **txt)
+    ax.set_title("Scholte wave along a water-sediment interface "
+                 "(elastic FDTD)", fontweight="bold", pad=10)
+
+    plt.tight_layout()
+    save_figure(output_dir, "scholte_interface_wave.png")
+    plt.close()
+
+
 def generate_panel_insulation_concept(output_dir: str) -> None:
     """Theoretical panel sound insulation: the four PR-I predictions."""
     print("Generating panel_insulation_concept.png...")
@@ -12217,6 +12290,8 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_fdtd_simulation,
     # Elastic P-SV FDTD: half-space snapshot with P/S/Rayleigh fronts.
     generate_elastic_halfspace_waves,
+    # Elastic FDTD fluid-solid coupling: the Scholte interface wave.
+    generate_scholte_interface_wave,
     # Theoretical panel sound insulation (single/double wall, radiation, slit).
     generate_panel_insulation_concept,
     generate_silencer_expansion_chamber,

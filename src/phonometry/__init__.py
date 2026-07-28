@@ -953,11 +953,18 @@ from .room.steady_field import (
     steady_state_spl,
 )
 from .simulation.elastic_fdtd import (
+    AIR,
+    ALUMINIUM,
+    CONCRETE,
+    STEEL,
+    WATER,
     ElasticFDTD2D,
     ElasticFDTDResult,
     ExplosionSource,
     ForceSource,
+    Material,
     elastic_fdtd_simulation,
+    scholte_speed,
 )
 from .simulation.fdtd import (
     FDTD2D,
@@ -1141,8 +1148,11 @@ from .vibration.transfer_stiffness import (
 
 # Public methods
 __all__ = [
+    "AIR",
+    "ALUMINIUM",
     "BASE_PLATE_BANDS",
     "BASE_PLATE_MAX_SCATTERING",
+    "CONCRETE",
     "COVERAGE_FACTOR",
     "COVERAGE_FACTORS",
     "DEFAULT_CHANNEL_WEIGHTS",
@@ -1173,12 +1183,14 @@ __all__ = [
     "REFERENCE_VELOCITY",
     "SPOT_FREQUENCY_RANGE",
     "SPOT_NARROW_BAND_RANGE",
+    "STEEL",
     "THIRD_OCTAVE_BANDS",
     "TRANSMISSIBILITY_LIMIT",
     "TWO_DIMENSIONAL_SOURCE_WEIGHTS",
     "UNDERWATER_REFERENCE_EXPOSURE",
     "UNDERWATER_REFERENCE_PRESSURE",
     "VESSEL_CLASSES",
+    "WATER",
     "WBV_EAV_A8",
     "WBV_EAV_VDV",
     "WBV_ELV_A8",
@@ -1301,6 +1313,7 @@ __all__ = [
     "LifterResult",
     "LoudspeakerCharacteristics",
     "MISOCoherenceResult",
+    "Material",
     "MeanGroundPlaneResult",
     "MembraneLayer",
     "MetadiffuserResult",
@@ -1914,6 +1927,7 @@ __all__ = [
     "scattering_coefficient",
     "scattering_coefficient_spectrum",
     "scattering_coefficient_uncertainty",
+    "scholte_speed",
     "schroeder_frequency",
     "sdof_accelerance",
     "sdof_mobility",

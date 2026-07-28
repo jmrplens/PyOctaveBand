@@ -50,7 +50,15 @@ Petersson 2005, Eq. 3.149), the Kirchhoff thin-plate flexural dispersion
 (Eqs. 3.83-3.89), the normal-incidence fluid-solid reflection coefficient
 ``(Z2 - Z1)/(Z2 + Z1)``, the normal-incidence mass law of a thin immersed
 panel, and the exact reduction to the acoustic solver when ``c_s = 0``
-everywhere.
+everywhere. The fluid-solid coupling is further pinned to the oblique
+plane-wave reflection coefficient of Brekhovskikh & Godin, *Acoustics of
+Layered Media I* (Springer 1990), Eqs. 4.2.22-4.2.26 (with the shear-wave
+mode conversion active), to the Scholte interface-wave speed from the exact
+characteristic equation of Eq. 4.4.20 (see :func:`scholte_speed`), and to
+the exact three-media transmission of an immersed plate (B&G Eqs. 2.4.10,
+2.4.14) including its first thickness resonance ``f_1 = c_P / (2 h)``
+(Eq. 2.4.19), following the fluid-solid finite-difference benchmark of
+van Vossen, Robertsson & Chapman, *Geophysics* 67(2), 618-624 (2002).
 """
 
 from __future__ import annotations
@@ -61,6 +69,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from numpy.typing import NDArray
+from scipy.optimize import brentq
 
 from .fdtd import (
     _SIDES,
@@ -163,6 +172,144 @@ class ForceSource:
 
 
 ElasticSource = ExplosionSource | ForceSource
+
+
+@dataclass(frozen=True)
+class Material:
+    """An isotropic elastic medium as measurable wave speeds and density.
+
+    The three numbers the solver's material maps are built from: the
+    compressional speed ``c_p = sqrt((lambda + 2 mu) / rho)``, the shear
+    speed ``c_s = sqrt(mu / rho)`` and the density ``rho``. ``c_s = 0``
+    marks a fluid (the acoustic ``mu = 0`` limit of the elastic scheme,
+    Virieux 1986), so the same dataclass names both fluids and solids.
+    Every material must satisfy ``c_p**2 >= 2 c_s**2`` (non-negative first
+    Lame parameter), the constructor bound of :class:`ElasticFDTD2D`.
+
+    The module constants :data:`AIR`, :data:`WATER`, :data:`STEEL`,
+    :data:`ALUMINIUM` and :data:`CONCRETE` carry the nominal round-number
+    properties used throughout the documentation and the validation suite,
+    mirroring the documented default media of the acoustic solver.
+
+    :ivar c_p: Compressional (P) wave speed [m/s], strictly positive.
+    :ivar c_s: Shear (S) wave speed [m/s], non-negative; 0 marks a fluid.
+    :ivar rho: Density [kg/m3], strictly positive.
+    """
+
+    c_p: float
+    c_s: float
+    rho: float
+
+    def __post_init__(self) -> None:
+        c_p = _positive_finite("c_p", self.c_p)
+        c_s = _finite("c_s", self.c_s)
+        if c_s < 0.0:
+            raise ValueError("c_s must be non-negative (0 marks a fluid)")
+        rho = _positive_finite("rho", self.rho)
+        if c_p**2 < 2.0 * c_s**2 * (1.0 - 1e-9):
+            raise ValueError("c_p**2 must be at least 2 * c_s**2 "
+                             "(non-negative lambda)")
+        object.__setattr__(self, "c_p", c_p)
+        object.__setattr__(self, "c_s", c_s)
+        object.__setattr__(self, "rho", rho)
+
+    @property
+    def is_fluid(self) -> bool:
+        """``True`` when the material carries no shear (``c_s = 0``)."""
+        return self.c_s <= 0.0
+
+
+#: Air at room conditions (fluid), the acoustic solver's default medium.
+AIR = Material(c_p=343.0, c_s=0.0, rho=1.2)
+
+#: Fresh water at room temperature (fluid).
+WATER = Material(c_p=1480.0, c_s=0.0, rho=1000.0)
+
+#: Structural steel (nominal bulk wave speeds).
+STEEL = Material(c_p=5900.0, c_s=3200.0, rho=7850.0)
+
+#: Aluminium (nominal bulk wave speeds).
+ALUMINIUM = Material(c_p=6320.0, c_s=3130.0, rho=2700.0)
+
+#: Dense concrete (nominal bulk wave speeds).
+CONCRETE = Material(c_p=3800.0, c_s=2250.0, rho=2400.0)
+
+
+def _as_material(name: str, value: object) -> Material:
+    """Coerce a :class:`Material` or a ``(c_p, c_s, rho)`` triple."""
+    if isinstance(value, Material):
+        return value
+    if isinstance(value, Sequence) and not isinstance(value, str) \
+            and len(value) == 3:
+        c_p, c_s, rho = (float(np.real(v)) for v in value)
+        return Material(c_p=c_p, c_s=c_s, rho=rho)
+    raise ValueError(f"{name} must be a Material or a (c_p, c_s, rho) "
+                     "triple")
+
+
+def scholte_speed(
+    fluid: Material | tuple[float, float, float],
+    solid: Material | tuple[float, float, float],
+) -> float:
+    """Exact Scholte-wave speed of a fluid over an elastic half-space [m/s].
+
+    The Scholte wave is the true interface wave of a fluid-solid contact:
+    evanescent on both sides, elliptical particle motion, no low-frequency
+    cut-off, and non-dispersive over homogeneous half-spaces (Jensen,
+    Kuperman, Porter & Schmidt, *Computational Ocean Acoustics* 2e,
+    Sections 4.5.2 and 8.5.4). Its speed ``v`` lies below both the fluid
+    sound speed and the solid shear speed, and solves the exact
+    characteristic equation of Brekhovskikh & Godin, *Acoustics of Layered
+    Media I* (1990), Eq. 4.4.20, written in the notation of Eq. 4.4.18
+    (``q = c_S**2/c_P**2``, ``r = c_S**2/c**2``, ``s = v**2/c_S**2``,
+    ``m = rho_solid/rho_fluid``)::
+
+        4 sqrt(1-s) sqrt(1-qs) - (2-s)**2 = (s**2/m) sqrt((1-sq)/(1-sr))
+
+    A root always exists (B&G Section 4.4.3); the ``m -> inf`` limit of the
+    left side is the Rayleigh equation. For stiff beds the root hugs the
+    fluid speed (water over steel: 1479.6 m/s, 0.027 % below ``c``) while
+    for soft sediments it drops well below it, which is why measured
+    seabed interface waves probe the sediment shear speed
+    (``v approx 0.85 c_S`` rule, Jensen et al. Section 5.10.5).
+
+    :param fluid: Fluid half-space: a :class:`Material` with ``c_s = 0``
+        (or a ``(c_p, 0.0, rho)`` triple).
+    :param solid: Elastic half-space: a :class:`Material` with ``c_s > 0``.
+    :return: The Scholte-wave phase speed [m/s].
+    :raises ValueError: If ``fluid`` carries shear or ``solid`` does not.
+    """
+    flu = _as_material("fluid", fluid)
+    sol = _as_material("solid", solid)
+    if not flu.is_fluid:
+        raise ValueError("fluid must have c_s = 0")
+    if sol.is_fluid:
+        raise ValueError("solid must have c_s > 0")
+    q = sol.c_s**2 / sol.c_p**2
+    r = sol.c_s**2 / flu.c_p**2
+    m = sol.rho / flu.rho
+
+    def characteristic(s: float) -> float:
+        # B&G Eq. 4.4.20 rearranged to LHS - RHS; real and single-signed
+        # branches over 0 < s < min(1, 1/r), where v < min(c, c_S).
+        return float(4.0 * np.sqrt(1.0 - s) * np.sqrt(1.0 - q * s)
+                     - (2.0 - s) ** 2
+                     - (s**2 / m) * np.sqrt((1.0 - s * q) / (1.0 - s * r)))
+
+    # The function is positive as s -> 0+ (expansion 2 s (1 - q) + O(s^2))
+    # and diverges to -inf at the upper end, so a sign sweep brackets every
+    # root; the largest one is the Scholte root.
+    s_hi = min(1.0, 1.0 / r) * (1.0 - 1e-12)
+    grid = np.linspace(1e-9, s_hi, 4001)
+    values = np.array([characteristic(s) for s in grid])
+    signs = np.sign(values)
+    crossings = np.nonzero(np.diff(signs) != 0)[0]
+    if crossings.size == 0:     # pragma: no cover - a root always exists
+        raise ValueError("no Scholte root found; check the material pair")
+    k = int(crossings[-1])
+    root = float(brentq(characteristic, grid[k], grid[k + 1], xtol=1e-15,
+                        rtol=8.9e-16))
+    return sol.c_s * float(np.sqrt(root))
 
 
 def _resolve_speed_map(name: str, value: float | Field2D,
@@ -352,6 +499,70 @@ class ElasticFDTD2D:
         self._init_decay(sides, sponge_width, sponge_reflection, damping_map,
                          c_max)
         self._init_obstacle(obstacle_mask, ny, nx)
+
+    @classmethod
+    def from_regions(
+        cls,
+        shape: tuple[int, int],
+        dx: float,
+        *,
+        background: Material | tuple[float, float, float],
+        regions: Iterable[
+            tuple[Any, Material | tuple[float, float, float]]
+        ] = (),
+        **kwargs: Any,
+    ) -> ElasticFDTD2D:
+        """Build the engine from named materials painted over a background.
+
+        Thin sugar over the map constructor for the common layered set-ups
+        (fluid over a solid half-space, an immersed plate, an inclusion):
+        the ``(ny, nx)`` maps of ``c_p``, ``c_s`` and ``rho`` start uniform
+        at ``background`` and each ``(where, material)`` entry of
+        ``regions`` is painted over them in order (later entries overwrite
+        earlier ones), then everything is delegated to the normal
+        constructor. No new physics: a fluid-solid contact still needs no
+        explicit interface treatment, because the constructor's effective
+        parameters (Moczo et al. 2007, Eqs. 7.37-7.39) handle it from the
+        maps alone.
+
+        ``where`` selects the painted cells: a boolean ``(ny, nx)`` mask,
+        or any basic numpy index expression over the ``(row, column)``
+        maps, e.g. ``(slice(120, None), slice(None))`` for the lower half
+        or ``numpy.s_[120:, :]`` for the same thing spelled as a slice.
+
+        :param shape: Grid shape ``(ny, nx)``.
+        :param dx: Grid spacing [m] (square cells).
+        :param background: The material filling the whole grid first: a
+            :class:`Material` or a ``(c_p, c_s, rho)`` triple, e.g.
+            :data:`WATER`.
+        :param regions: ``(where, material)`` pairs painted in order.
+        :param kwargs: Forwarded to :class:`ElasticFDTD2D` (``cfl``,
+            ``sponge_width``, ``sponge_sides``, ``sponge_reflection``,
+            ``damping``, ``free_sides``, ``obstacle_mask``).
+        :return: The configured stepping engine.
+        :raises ValueError: If a mask does not match ``shape`` or a
+            material spec is invalid.
+        """
+        ny = _integer("shape[0]", shape[0])
+        nx = _integer("shape[1]", shape[1])
+        if ny < 2 or nx < 2:
+            raise ValueError("the grid must be at least 2 x 2 cells")
+        bg = _as_material("background", background)
+        c_p = np.full((ny, nx), bg.c_p, dtype=np.float64)
+        c_s = np.full((ny, nx), bg.c_s, dtype=np.float64)
+        rho = np.full((ny, nx), bg.rho, dtype=np.float64)
+        for k, (where, material) in enumerate(regions):
+            mat = _as_material(f"regions[{k}]", material)
+            index = where
+            if isinstance(index, np.ndarray) and (
+                    index.dtype != np.bool_ or index.shape != (ny, nx)):
+                raise ValueError(
+                    f"regions[{k}] mask must be a boolean array of "
+                    f"shape {(ny, nx)}")
+            c_p[index] = mat.c_p
+            c_s[index] = mat.c_s
+            rho[index] = mat.rho
+        return cls(c_p, c_s, dx, rho=rho, **kwargs)
 
     @staticmethod
     def _corner_mu(mu: Field2D) -> Field2D:
