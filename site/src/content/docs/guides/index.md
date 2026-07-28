@@ -1,6 +1,6 @@
 ---
 title: "Guides"
-description: "The 68 guides of phonometry, grouped into the nine areas the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
+description: "The 71 guides of phonometry, grouped into the nine areas the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
 head:
   - tag: script
     attrs:
@@ -41,7 +41,7 @@ head:
             "@type": "ListItem",
             "position": 4,
             "name": "Materials and surfaces",
-            "description": "Absorption, airflow resistance, impedance tube, porous models, scattering.",
+            "description": "Absorption, airflow resistance, impedance tube, porous and metamaterial models, diffusers, scattering.",
             "url": "https://jmrplens.github.io/phonometry/guides/sections/materials-surfaces/"
           },
           {
@@ -276,10 +276,11 @@ ISO 717-1/-2, EN 12354-1 to -6, ISO 12999-1, ISO 10052 and ANSI/ASA S12.2.
 
 ## [Materials and surfaces](/phonometry/guides/sections/materials-surfaces/)
 
-Absorption, airflow resistance, the impedance tube, porous models and
-scattering. What a surface does to the sound that reaches it, measured in a
-laboratory or predicted from the material parameters. Implements ISO 354,
-ISO 11654, ISO 10534-2, ISO 9053, ISO 17497-1/-2, ISO 13472 and EN 29052.
+Absorption, airflow resistance, the impedance tube, porous and metamaterial
+models, diffusers and scattering. What a surface does to the sound that
+reaches it, measured in a laboratory or predicted from the material
+parameters. Implements ISO 354, ISO 11654, ISO 10534-2, ISO 9053,
+ISO 17497-1/-2, ISO 13472 and EN 29052.
 
 - [Sound Absorption Measurement and Rating](/phonometry/guides/absorption-measurement/):
   the ISO 354 reverberation-room measurement, the weighted rating and its
@@ -293,9 +294,18 @@ ISO 11654, ISO 10534-2, ISO 9053, ISO 17497-1/-2, ISO 13472 and EN 29052.
   Delany-Bazley, Miki and Johnson-Champoux-Allard models, the transfer-matrix
   multilayer solver with perforated, microperforated and membrane layers, and
   the random-incidence integral.
-- [Surface Scattering, Diffusion and In-situ Absorption](/phonometry/guides/surface-scattering/):
-  the random-incidence scattering coefficient, the autocorrelation diffusion
-  coefficient, and in-situ road-surface absorption.
+- [Metamaterial Absorbers](/phonometry/guides/metamaterial-absorbers/): the
+  critical-coupling condition for perfect absorption and the slow-sound slit
+  panel loaded by Helmholtz resonators, with its design solver.
+- [Diffusers and Their Coefficients](/phonometry/guides/diffusers/): the
+  random-incidence scattering coefficient, the autocorrelation diffusion
+  coefficient, and Schroeder design with its far-field prediction.
+- [Metadiffusers](/phonometry/guides/metadiffusers/): deep-subwavelength
+  Schroeder diffusers from resonator-loaded slits, slow sound and ternary
+  sequences.
+- [In-situ Road-Surface Absorption](/phonometry/guides/road-absorption/):
+  in-situ road-surface absorption by the subtraction technique and the spot
+  method.
 
 ## [Vibration and structure-borne sound](/phonometry/guides/sections/vibration/)
 

@@ -1,16 +1,17 @@
 ---
 title: "Materials and surfaces"
-description: "Characterising acoustic materials and surfaces: reverberation-room absorption and its rating (ISO 354, ISO 11654), airflow resistance (ISO 9053), the impedance tube (ISO 10534, ASTM E2611), porous and multilayer absorber prediction (Delany-Bazley, Miki, JCA, Maa), scattering and diffusion coefficients (ISO 17497) and in-situ road-surface absorption (ISO 13472)."
+description: "Characterising acoustic materials and surfaces: reverberation-room absorption and its rating (ISO 354, ISO 11654), airflow resistance (ISO 9053), the impedance tube (ISO 10534, ASTM E2611), porous, multilayer and metamaterial absorber prediction, diffusers with their scattering and diffusion coefficients (ISO 17497), metadiffusers, and in-situ road-surface absorption (ISO 13472)."
 ---
 
 Every room prediction and many an insulation model end up consuming a
 coefficient that describes what a material or a surface does to sound. This
 section covers where those coefficients come from: the laboratory instruments
-that measure them, the single-number ratings that summarise them, and the
-in-situ methods that recover them outside the laboratory.
+that measure them, the single-number ratings that summarise them, the
+prediction models that anticipate them, and the in-situ methods that recover
+them outside the laboratory.
 
 The **Absorbers** subsection covers how much energy a material takes out of
-the field, one instrument per guide.
+the field, one instrument or model family per guide.
 [Sound Absorption Measurement and Rating](/phonometry/guides/absorption-measurement/)
 is the reverberation room: the random-incidence coefficients of ISO 354 and
 the ISO 11654 weighted rating α_w with its letter class, the figure absorber
@@ -29,15 +30,22 @@ Johnson-Champoux-Allard equivalent-fluid models give a porous material's
 characteristic impedance and wavenumber, and a transfer-matrix stack of
 porous, air, perforated, microperforated (Maa) and membrane layers predicts
 the absorption of a whole construction before anything is built.
+[Metamaterial Absorbers](/phonometry/guides/metamaterial-absorbers/) pushes
+the same transfer matrices past the classical thickness rules: slow-sound
+slit panels loaded by Helmholtz resonators reach perfect absorption at
+critical coupling from deep-subwavelength panels.
 
-[Surface Scattering, Diffusion and In-situ Absorption](/phonometry/guides/surface-scattering/)
-moves from samples to *surfaces*, asking not how much energy a surface
-absorbs but where it sends what it reflects. The random-incidence
-**scattering coefficient** (ISO 17497-1) quantifies how much energy leaves the
-specular direction; the **diffusion coefficient** (ISO 17497-2) quantifies how
-uniformly the reflected energy spreads; and the ISO 13472 methods measure the
-absorption of a road surface in situ, by the extended-surface subtraction
-technique (Part 1) or the spot tube (Part 2).
+The **Diffusers and surfaces** subsection moves from samples to *surfaces*,
+asking not how much energy a surface absorbs but where it sends what it
+reflects. [Diffusers and Their Coefficients](/phonometry/guides/diffusers/)
+covers the two standardised gradings, the random-incidence **scattering
+coefficient** (ISO 17497-1) and the **diffusion coefficient** (ISO 17497-2),
+together with Schroeder diffuser design and its far-field prediction.
+[Metadiffusers](/phonometry/guides/metadiffusers/) rebuilds the Schroeder
+diffuser from resonator-loaded slits, one to two orders of magnitude thinner.
+And [In-situ Road-Surface Absorption](/phonometry/guides/road-absorption/)
+measures the absorption of a pavement where it lies, by the ISO 13472-1
+subtraction technique over an extended surface or the ISO 13472-2 spot tube.
 
 The consumers of these numbers are spread across the site: absorption
 coefficients feed the reverberation predictions in
@@ -65,6 +73,15 @@ section.
   the Delany-Bazley, Miki and JCA porous models, the transfer-matrix
   multilayer solver with perforated, microperforated and membrane layers,
   and the random-incidence Paris integral.
-- [Surface Scattering, Diffusion and In-situ Absorption](/phonometry/guides/surface-scattering/):
-  ISO 17497-1/2 scattering and diffusion coefficients, and ISO 13472-1/-2
-  in-situ road-surface absorption.
+- [Metamaterial Absorbers](/phonometry/guides/metamaterial-absorbers/):
+  critical coupling and the slow-sound slit panel with its design solver.
+- [Diffusers and surfaces overview](/phonometry/guides/sections/diffusion-surfaces/):
+  what a surface does with the sound it returns, from coefficients to
+  metamaterial panels to pavements.
+- [Diffusers and Their Coefficients](/phonometry/guides/diffusers/):
+  ISO 17497-1/2 scattering and diffusion coefficients, Schroeder design and
+  the far-field prediction.
+- [Metadiffusers](/phonometry/guides/metadiffusers/): deep-subwavelength
+  Schroeder diffusers from resonator-loaded slits.
+- [In-situ Road-Surface Absorption](/phonometry/guides/road-absorption/):
+  ISO 13472-1/-2 in-situ road-surface absorption.

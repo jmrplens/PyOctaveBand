@@ -235,7 +235,7 @@ will be trusted quantitatively.
 
 The number also travels beyond the porous models. The perforated-panel and
 microperforated-panel impedances contain the same viscous physics evaluated
-in a single hole; the [slit absorber](porous-absorbers.md) inherits it per
+in a single hole; the [slit absorber](metamaterial-absorbers.md) inherits it per
 slit; and when an [impedance tube](impedance-tube.md) measurement disagrees
 with a model prediction, the first parameter to re-measure, before touching
 the model, is $\sigma$.

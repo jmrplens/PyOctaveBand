@@ -92,7 +92,10 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Airflow Resistance](https://jmrplens.github.io/phonometry/guides/airflow-resistance/)
 - [Impedance Tube](https://jmrplens.github.io/phonometry/guides/impedance-tube/)
 - [Porous and Multilayer Absorbers](https://jmrplens.github.io/phonometry/guides/porous-absorbers/)
-- [Surface Scattering, Diffusion and In-situ Absorption](https://jmrplens.github.io/phonometry/guides/surface-scattering/)
+- [Metamaterial Absorbers](https://jmrplens.github.io/phonometry/guides/metamaterial-absorbers/)
+- [Diffusers and Their Coefficients](https://jmrplens.github.io/phonometry/guides/diffusers/)
+- [Metadiffusers](https://jmrplens.github.io/phonometry/guides/metadiffusers/)
+- [In-situ Road-Surface Absorption](https://jmrplens.github.io/phonometry/guides/road-absorption/)
 
 ## Vibration and structure-borne sound
 
@@ -179,6 +182,7 @@ One file per area, each small enough to fetch whole. `llms-full.txt` is the comp
 - [Absorbers](https://jmrplens.github.io/phonometry/llms-absorbers.txt)
 - [Aircraft wind](https://jmrplens.github.io/phonometry/llms-aircraft-wind.txt)
 - [Calibration uncertainty](https://jmrplens.github.io/phonometry/llms-calibration-uncertainty.txt)
+- [Diffusion surfaces](https://jmrplens.github.io/phonometry/llms-diffusion-surfaces.txt)
 - [Hearing exposure](https://jmrplens.github.io/phonometry/llms-hearing-exposure.txt)
 - [Human vibration](https://jmrplens.github.io/phonometry/llms-human-vibration.txt)
 - [Levels weighting](https://jmrplens.github.io/phonometry/llms-levels-weighting.txt)
@@ -191,7 +195,6 @@ One file per area, each small enough to fetch whole. `llms-full.txt` is the comp
 - [Speech](https://jmrplens.github.io/phonometry/llms-speech.txt)
 - [Structure borne](https://jmrplens.github.io/phonometry/llms-structure-borne.txt)
 - [Core signal analysis](https://jmrplens.github.io/phonometry/llms-core-signal-analysis.txt)
-- [Materials and surfaces](https://jmrplens.github.io/phonometry/llms-materials-surfaces.txt)
 - [Underwater acoustics](https://jmrplens.github.io/phonometry/llms-underwater.txt)
 - [Sources and devices](https://jmrplens.github.io/phonometry/llms-sources-devices.txt)
 - [Wave simulation](https://jmrplens.github.io/phonometry/llms-simulation.txt)

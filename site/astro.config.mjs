@@ -421,6 +421,8 @@ export default defineConfig({
     '/es/guides/psychoacoustics/': `${basePath}/es/guides/loudness/`,
     '/guides/materials/': `${basePath}/guides/absorption-measurement/`,
     '/es/guides/materials/': `${basePath}/es/guides/absorption-measurement/`,
+    '/guides/surface-scattering/': `${basePath}/guides/diffusers/`,
+    '/es/guides/surface-scattering/': `${basePath}/es/guides/diffusers/`,
   },
   build: {
     // Render prerendered pages in parallel batches (default is 1 at a time).

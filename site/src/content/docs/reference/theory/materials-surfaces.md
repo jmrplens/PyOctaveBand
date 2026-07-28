@@ -148,7 +148,7 @@ predictions match the published Appendix B BEM normalised diffusion in the
 200-400 Hz bands within 0.01 (a low-band anchor: the broadband 100-5000 Hz
 mean absolute deviation is about 0.09); zenith area factor 1.5710.
 
-See the [Surface Scattering guide](/phonometry/guides/surface-scattering/) for usage.
+See the [Diffusers guide](/phonometry/guides/diffusers/) for usage.
 
 ## In-situ road surface absorption (ISO 13472-1, ISO 13472-2)
 
@@ -178,7 +178,7 @@ geometry and validity limits ($f_u = 0.58\ c_0/d$; microphone spacing bounds
 $0.45\ c_0/f_{max}$ and $0.05\ c_0/f_{min}$, clause 5.4) and the Annex A
 subtractive correction for internal system losses.
 
-See the [Surface Scattering guide](/phonometry/guides/surface-scattering/) for usage.
+See the [In-situ Road-Surface Absorption guide](/phonometry/guides/road-absorption/) for usage.
 
 ## Acoustic material characterisation (ISO 11654, ISO 9053-1/2, ISO 10534-1/2, ASTM E2611)
 

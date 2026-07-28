@@ -190,9 +190,20 @@ export const sidebar = [
           'guides/airflow-resistance',
           'guides/impedance-tube',
           'guides/porous-absorbers',
+          'guides/metamaterial-absorbers',
         ],
       },
-      'guides/surface-scattering',
+      {
+        label: 'Diffusers and surfaces',
+        translations: { es: 'Difusores y superficies' },
+        collapsed: true,
+        items: [
+          { slug: 'guides/sections/diffusion-surfaces', label: 'Overview', translations: { es: 'Resumen' } },
+          'guides/diffusers',
+          'guides/metadiffusers',
+          'guides/road-absorption',
+        ],
+      },
     ],
   },
   {

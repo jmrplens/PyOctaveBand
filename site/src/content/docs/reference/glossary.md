@@ -1106,8 +1106,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Surface scattering",
-              "url": "https://jmrplens.github.io/phonometry/guides/surface-scattering/"
+              "name": "Diffusers and their coefficients",
+              "url": "https://jmrplens.github.io/phonometry/guides/diffusers/"
             }
           },
           {
@@ -1121,8 +1121,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Surface scattering",
-              "url": "https://jmrplens.github.io/phonometry/guides/surface-scattering/"
+              "name": "Diffusers and their coefficients",
+              "url": "https://jmrplens.github.io/phonometry/guides/diffusers/"
             }
           },
           {
@@ -1955,8 +1955,8 @@ check that pins each quantity to its standard's own expected value.
 | Rs | Specific airflow resistance: the airflow resistance referred to the specimen face area. | Pa·s/m | ISO 9053-1:2018, Clause 3 | [Airflow resistance](/phonometry/guides/airflow-resistance/) |
 | σ | Airflow resistivity: the specific airflow resistance per unit thickness, the primary input to every empirical porous model. | Pa·s/m² | ISO 9053-1:2018, Clause 3 | [Airflow resistance](/phonometry/guides/airflow-resistance/) |
 | Z | Surface impedance: the complex ratio of sound pressure to particle velocity at the face of the sample, usually reported normalised by the characteristic impedance of air. | Pa·s/m | ISO 10534-2:1998, Equations (17) to (19) | [Impedance tube](/phonometry/guides/impedance-tube/) |
-| s | Scattering coefficient: the fraction of reflected energy that is not returned specularly, measured at random incidence on a turntable in a reverberation room. | dimensionless | ISO 17497-1:2004+A1:2014, Formula (5) | [Surface scattering](/phonometry/guides/surface-scattering/) |
-| d | Diffusion coefficient: the uniformity of the polar response of a surface, from the autocorrelation of the free-field goniometer measurement. | dimensionless | ISO 17497-2:2012, Formula (5) (normalised form in Formula (7)) | [Surface scattering](/phonometry/guides/surface-scattering/) |
+| s | Scattering coefficient: the fraction of reflected energy that is not returned specularly, measured at random incidence on a turntable in a reverberation room. | dimensionless | ISO 17497-1:2004+A1:2014, Formula (5) | [Diffusers](/phonometry/guides/diffusers/) |
+| d | Diffusion coefficient: the uniformity of the polar response of a surface, from the autocorrelation of the free-field goniometer measurement. | dimensionless | ISO 17497-2:2012, Formula (5) (normalised form in Formula (7)) | [Diffusers](/phonometry/guides/diffusers/) |
 | s′ | Dynamic stiffness per unit area of a resilient layer: a dynamic force per unit area divided by the resulting change in thickness. | MN/m³ | EN 29052-1:1992 (ISO 9052-1:1989), Formula 1 | [Dynamic stiffness](/phonometry/guides/dynamic-stiffness/) |
 
 ## Vibration and structure-borne sound

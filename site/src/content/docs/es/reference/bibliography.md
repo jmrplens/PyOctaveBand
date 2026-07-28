@@ -341,8 +341,10 @@ que las guías incorporan sus secciones de Referencias.
   La monografía sobre medida y diseño de absorbentes y difusores, de los
   autores del método del coeficiente de difusión de ISO 17497-2.
   Citado por
-  [Medida y clasificación de la absorción sonora](/phonometry/es/guides/absorption-measurement/) y
-  [Dispersión superficial, difusión y absorción in situ](/phonometry/es/guides/surface-scattering/).
+  [Medida y clasificación de la absorción sonora](/phonometry/es/guides/absorption-measurement/),
+  [Difusores y sus coeficientes](/phonometry/es/guides/diffusers/),
+  [Metadifusores](/phonometry/es/guides/metadiffusers/) y
+  [Metaabsorbentes](/phonometry/es/guides/metamaterial-absorbers/).
 - Jiménez, N., Umnova, O. y Groby, J.-P. (Eds.). (2021). *Acoustic waves in
   periodic structures, metamaterials, and porous media* (Topics in Applied
   Physics, Vol. 143). Springer.
@@ -352,6 +354,62 @@ que las guías incorporan sus secciones de Referencias.
   y el acoplamiento crítico de los absorbentes de metamaterial hasta los
   difusores de sublongitud de onda profunda; el complemento moderno sobre
   metamateriales de Cox & D'Antonio.
+  Citado por [Metadifusores](/phonometry/es/guides/metadiffusers/) y
+  [Metaabsorbentes](/phonometry/es/guides/metamaterial-absorbers/).
+- Hargreaves, T. J., Cox, T. J., Lam, Y. W. y D'Antonio, P. (2000). Surface
+  diffusion coefficients for room acoustics: Free-field measures of
+  single-plane diffusion. *The Journal of the Acoustical Society of America*,
+  108(4), 1710-1720.
+  [doi:10.1121/1.1310192](https://doi.org/10.1121/1.1310192).
+  El método del coeficiente de difusión en campo libre tras ISO 17497-2 y la
+  geometría publicada del QRD N = 7 del ejemplo trabajado.
+  Citado por [Difusores y sus coeficientes](/phonometry/es/guides/diffusers/).
+- Audio Engineering Society. (2001). *AES information document for room
+  acoustics and sound reinforcement systems — Characterization and
+  measurement of surface scattering uniformity* (AES-4id-2001). *Journal of
+  the Audio Engineering Society*, 49(3), 149-165.
+  [Normas AES en vigor](https://www.aes.org/publications/standards/list.cfm).
+  El procedimiento del coeficiente de difusión de plano único en campo libre
+  que ISO 17497-2 normalizó después.
+  Citado por [Difusores y sus coeficientes](/phonometry/es/guides/diffusers/).
+- Jiménez, N., Cox, T. J., Romero-García, V. y Groby, J.-P. (2017).
+  Metadiffusers: Deep-subwavelength sound diffusers. *Scientific Reports*,
+  7, 5389.
+  [doi:10.1038/s41598-017-05710-5](https://doi.org/10.1038/s41598-017-05710-5).
+  El modelo de metadifusor: rendijas cargadas con resonadores que reproducen
+  perfiles de fase de Schroeder y secuencias ternarias con paneles en
+  sublongitud de onda profunda.
+  Citado por [Metadifusores](/phonometry/es/guides/metadiffusers/).
+- Jiménez, N., Cox, T. J., Groby, J.-P. y Romero-García, V. (2019). Beyond
+  phase grating diffusers using locally-resonant metamaterials. *Proceedings
+  of the 23rd International Congress on Acoustics (ICA 2019)*, Aquisgrán.
+  [PDF de las actas](https://pub.dega-akustik.de/ICA2019/data/articles/000706.pdf).
+  El acompañante de congreso del artículo de los metadifusores: la cadena de
+  matrices de transferencia y la imagen de dispersión de sonido lento.
+  Citado por [Metadifusores](/phonometry/es/guides/metadiffusers/).
+- Jiménez, N., Groby, J.-P., Pagneux, V. y Romero-García, V. (2017).
+  Iridescent perfect absorption in critically-coupled acoustic metamaterials
+  using the transfer matrix method. *Applied Sciences*, 7(6), 618.
+  [doi:10.3390/app7060618](https://doi.org/10.3390/app7060618).
+  El modelo por matrices de transferencia de la ranura con resonadores de
+  Helmholtz y la condición de acoplamiento crítico.
+  Citado por [Metaabsorbentes](/phonometry/es/guides/metamaterial-absorbers/)
+  y [Metadifusores](/phonometry/es/guides/metadiffusers/).
+- Jiménez, N., Huang, W., Romero-García, V., Pagneux, V. y Groby, J.-P.
+  (2016). Ultra-thin metamaterial for perfect and quasi-omnidirectional
+  sound absorption. *Applied Physics Letters*, 109(12), 121902.
+  [doi:10.1063/1.4962328](https://doi.org/10.1063/1.4962328).
+  La impedancia del resonador y sus correcciones de radiación, y el
+  absorbente perfecto de λ/88 publicado.
+  Citado por [Metaabsorbentes](/phonometry/es/guides/metamaterial-absorbers/)
+  y [Metadifusores](/phonometry/es/guides/metadiffusers/).
+- Stinson, M. R. (1991). The propagation of plane sound waves in narrow and
+  wide circular tubes, and generalization to uniform tubes of arbitrary
+  cross-sectional shape. *The Journal of the Acoustical Society of America*,
+  89(2), 550-558. [doi:10.1121/1.400379](https://doi.org/10.1121/1.400379).
+  Los parámetros efectivos viscotérmicos de la ranura y de los cuellos y
+  cavidades cuadrados.
+  Citado por [Metaabsorbentes](/phonometry/es/guides/metamaterial-absorbers/).
 - International Organization for Standardization. (1998). *Acoustics —
   Determination of sound absorption coefficient and impedance in impedance
   tubes — Part 2: Transfer-function method* (ISO 10534-2:1998; adoptada en
@@ -414,13 +472,28 @@ que las guías incorporan sus secciones de Referencias.
   (ISO 17497-1:2004+A1:2014, la edición implementada aquí).
   [Catálogo iso.org](https://www.iso.org/standard/31397.html).
   El método del coeficiente de dispersión con mesa giratoria.
-  Citado por [Dispersión superficial, difusión y absorción in situ](/phonometry/es/guides/surface-scattering/).
+  Citado por [Difusores y sus coeficientes](/phonometry/es/guides/diffusers/).
 - International Organization for Standardization. (2012). *Acoustics —
   Sound-scattering properties of surfaces — Part 2: Measurement of the
   directional diffusion coefficient in a free field* (ISO 17497-2:2012).
   [Catálogo iso.org](https://www.iso.org/standard/55293.html).
   El método del coeficiente de difusión con goniómetro.
-  Citado por [Dispersión superficial, difusión y absorción in situ](/phonometry/es/guides/surface-scattering/).
+  Citado por [Difusores y sus coeficientes](/phonometry/es/guides/diffusers/).
+- International Organization for Standardization. (2002). *Acoustics —
+  Measurement of sound absorption properties of road surfaces in situ —
+  Part 1: Extended surface method* (ISO 13472-1:2002, la edición
+  implementada aquí; revisada después como ISO 13472-1:2022).
+  [Catálogo iso.org](https://www.iso.org/standard/35387.html).
+  La técnica de sustracción con la ventana de Adrienne y el radio de área
+  muestreada.
+  Citado por [Absorción in situ de firmes de carretera](/phonometry/es/guides/road-absorption/).
+- International Organization for Standardization. (2010). *Acoustics —
+  Measurement of sound absorption properties of road surfaces in situ —
+  Part 2: Spot method for reflective surfaces* (ISO 13472-2:2010, la
+  edición implementada aquí; revisada después como ISO 13472-2:2025).
+  [Catálogo iso.org](https://www.iso.org/standard/32304.html).
+  El método de tubo puntual y sus límites de onda plana y de espaciado.
+  Citado por [Absorción in situ de firmes de carretera](/phonometry/es/guides/road-absorption/).
 
 ## Acústica de edificios
 

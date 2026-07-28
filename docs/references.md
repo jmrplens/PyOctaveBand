@@ -393,8 +393,71 @@ it; the list grows as guides gain their References sections.
   authors behind the ISO 17497-2 diffusion-coefficient method.
   Cited by
   [Sound Absorption Measurement and Rating](absorption-measurement.md),
-  [Porous and Multilayer Absorbers](porous-absorbers.md) and
-  [Surface Scattering, Diffusion and In-situ Absorption](surface-scattering.md).
+  [Porous and Multilayer Absorbers](porous-absorbers.md),
+  [Diffusers and Their Coefficients](diffusers.md),
+  [Metadiffusers](metadiffusers.md) and
+  [Metamaterial Absorbers](metamaterial-absorbers.md).
+- Hargreaves, T. J., Cox, T. J., Lam, Y. W., & D'Antonio, P. (2000). Surface
+  diffusion coefficients for room acoustics: Free-field measures of
+  single-plane diffusion. *The Journal of the Acoustical Society of America*,
+  108(4), 1710-1720.
+  [doi:10.1121/1.1310192](https://doi.org/10.1121/1.1310192).
+  The free-field diffusion-coefficient method behind ISO 17497-2 and the
+  published N = 7 QRD geometry of the worked example.
+  Cited by [Diffusers and Their Coefficients](diffusers.md).
+- Audio Engineering Society. (2001). *AES information document for room
+  acoustics and sound reinforcement systems — Characterization and
+  measurement of surface scattering uniformity* (AES-4id-2001). *Journal of
+  the Audio Engineering Society*, 49(3), 149-165.
+  [AES standards in print](https://www.aes.org/publications/standards/list.cfm).
+  The single-plane free-field diffusion-coefficient procedure that
+  ISO 17497-2 later standardised.
+  Cited by [Diffusers and Their Coefficients](diffusers.md).
+- Jiménez, N., Cox, T. J., Romero-García, V., & Groby, J.-P. (2017).
+  Metadiffusers: Deep-subwavelength sound diffusers. *Scientific Reports*,
+  7, 5389.
+  [doi:10.1038/s41598-017-05710-5](https://doi.org/10.1038/s41598-017-05710-5).
+  The metadiffuser model: resonator-loaded slits reproducing Schroeder phase
+  profiles and ternary sequences from deep-subwavelength panels.
+  Cited by [Metadiffusers](metadiffusers.md).
+- Jiménez, N., Cox, T. J., Groby, J.-P., & Romero-García, V. (2019). Beyond
+  phase grating diffusers using locally-resonant metamaterials. *Proceedings
+  of the 23rd International Congress on Acoustics (ICA 2019)*, Aachen.
+  [Proceedings PDF](https://pub.dega-akustik.de/ICA2019/data/articles/000706.pdf).
+  The congress companion to the metadiffuser paper: the transfer-matrix
+  chain and the slow-sound dispersion picture.
+  Cited by [Metadiffusers](metadiffusers.md).
+- Jiménez, N., Groby, J.-P., Pagneux, V., & Romero-García, V. (2017).
+  Iridescent perfect absorption in critically-coupled acoustic metamaterials
+  using the transfer matrix method. *Applied Sciences*, 7(6), 618.
+  [doi:10.3390/app7060618](https://doi.org/10.3390/app7060618).
+  The slit + Helmholtz-resonator transfer-matrix model and the
+  critical-coupling condition.
+  Cited by [Metamaterial Absorbers](metamaterial-absorbers.md) and
+  [Metadiffusers](metadiffusers.md).
+- Jiménez, N., Huang, W., Romero-García, V., Pagneux, V., & Groby, J.-P.
+  (2016). Ultra-thin metamaterial for perfect and quasi-omnidirectional
+  sound absorption. *Applied Physics Letters*, 109(12), 121902.
+  [doi:10.1063/1.4962328](https://doi.org/10.1063/1.4962328).
+  The resonator impedance and radiation end corrections, and the published
+  λ/88 perfect absorber.
+  Cited by [Metamaterial Absorbers](metamaterial-absorbers.md) and
+  [Metadiffusers](metadiffusers.md).
+- Jiménez, N., Umnova, O., & Groby, J.-P. (Eds.). (2021). *Acoustic waves in
+  periodic structures, metamaterials, and porous media* (Topics in Applied
+  Physics, Vol. 143). Springer.
+  [doi:10.1007/978-3-030-84300-7](https://doi.org/10.1007/978-3-030-84300-7).
+  The book-length treatment of resonant metamaterial absorbers and
+  diffusers; the modern companion to Cox & D'Antonio.
+  Cited by [Metadiffusers](metadiffusers.md) and
+  [Metamaterial Absorbers](metamaterial-absorbers.md).
+- Stinson, M. R. (1991). The propagation of plane sound waves in narrow and
+  wide circular tubes, and generalization to uniform tubes of arbitrary
+  cross-sectional shape. *Journal of the Acoustical Society of America*,
+  89(2), 550-558. [doi:10.1121/1.400379](https://doi.org/10.1121/1.400379).
+  The visco-thermal effective parameters of the slit and the square necks
+  and cavities.
+  Cited by [Metamaterial Absorbers](metamaterial-absorbers.md).
 - Mechel, F. P. (Ed.). (2008). *Formulas of acoustics* (2nd ed.). Springer.
   ISBN 978-3-540-76832-6.
   [doi:10.1007/978-3-540-76833-3](https://doi.org/10.1007/978-3-540-76833-3).
@@ -430,7 +493,8 @@ it; the list grows as guides gain their References sections.
   [doi:10.1121/1.423870](https://doi.org/10.1121/1.423870).
   The exact microperforated-panel impedance, its end corrections and the
   design formulas.
-  Cited by [Porous and Multilayer Absorbers](porous-absorbers.md).
+  Cited by [Porous and Multilayer Absorbers](porous-absorbers.md) and
+  [Metamaterial Absorbers](metamaterial-absorbers.md).
 - International Organization for Standardization. (1998). *Acoustics —
   Determination of sound absorption coefficient and impedance in impedance
   tubes — Part 2: Transfer-function method* (ISO 10534-2:1998; adopted in
@@ -488,13 +552,28 @@ it; the list grows as guides gain their References sections.
   (ISO 17497-1:2004+A1:2014, the edition implemented here).
   [iso.org catalogue](https://www.iso.org/standard/31397.html).
   The turntable scattering-coefficient method.
-  Cited by [Surface Scattering, Diffusion and In-situ Absorption](surface-scattering.md).
+  Cited by [Diffusers and Their Coefficients](diffusers.md).
 - International Organization for Standardization. (2012). *Acoustics —
   Sound-scattering properties of surfaces — Part 2: Measurement of the
   directional diffusion coefficient in a free field* (ISO 17497-2:2012).
   [iso.org catalogue](https://www.iso.org/standard/55293.html).
   The goniometer diffusion-coefficient method.
-  Cited by [Surface Scattering, Diffusion and In-situ Absorption](surface-scattering.md).
+  Cited by [Diffusers and Their Coefficients](diffusers.md).
+- International Organization for Standardization. (2002). *Acoustics —
+  Measurement of sound absorption properties of road surfaces in situ —
+  Part 1: Extended surface method* (ISO 13472-1:2002, the edition
+  implemented here; since revised as ISO 13472-1:2022).
+  [iso.org catalogue](https://www.iso.org/standard/35387.html).
+  The subtraction technique with the Adrienne window and the sampled-area
+  radius.
+  Cited by [In-situ Road-Surface Absorption](road-absorption.md).
+- International Organization for Standardization. (2010). *Acoustics —
+  Measurement of sound absorption properties of road surfaces in situ —
+  Part 2: Spot method for reflective surfaces* (ISO 13472-2:2010, the
+  edition implemented here; since revised as ISO 13472-2:2025).
+  [iso.org catalogue](https://www.iso.org/standard/32304.html).
+  The spot-tube method and its plane-wave and spacing limits.
+  Cited by [In-situ Road-Surface Absorption](road-absorption.md).
 
 ## Building acoustics
 

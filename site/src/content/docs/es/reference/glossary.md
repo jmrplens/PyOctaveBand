@@ -1106,8 +1106,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Dispersión superficial",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/surface-scattering/"
+              "name": "Difusores y sus coeficientes",
+              "url": "https://jmrplens.github.io/phonometry/es/guides/diffusers/"
             }
           },
           {
@@ -1121,8 +1121,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Dispersión superficial",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/surface-scattering/"
+              "name": "Difusores y sus coeficientes",
+              "url": "https://jmrplens.github.io/phonometry/es/guides/diffusers/"
             }
           },
           {
@@ -1955,8 +1955,8 @@ norma.
 | Rs | Resistencia específica al flujo de aire: la resistencia al flujo referida al área de la cara de la probeta. | Pa·s/m | ISO 9053-1:2018, apartado 3 | [Resistencia al flujo](/phonometry/es/guides/airflow-resistance/) |
 | σ | Resistividad al flujo de aire: la resistencia específica por unidad de espesor, la entrada principal de todo modelo poroso empírico. | Pa·s/m² | ISO 9053-1:2018, apartado 3 | [Resistencia al flujo](/phonometry/es/guides/airflow-resistance/) |
 | Z | Impedancia superficial: la relación compleja entre presión acústica y velocidad de partícula en la cara de la muestra, que suele darse normalizada por la impedancia característica del aire. | Pa·s/m | ISO 10534-2:1998, Ecuaciones (17) a (19) | [Tubo de impedancia](/phonometry/es/guides/impedance-tube/) |
-| s | Coeficiente de dispersión: la fracción de energía reflejada que no vuelve de forma especular, medida a incidencia aleatoria sobre una plataforma giratoria en cámara reverberante. | adimensional | ISO 17497-1:2004+A1:2014, Fórmula (5) | [Dispersión superficial](/phonometry/es/guides/surface-scattering/) |
-| d | Coeficiente de difusión: la uniformidad de la respuesta polar de una superficie, a partir de la autocorrelación de la medida en goniómetro de campo libre. | adimensional | ISO 17497-2:2012, Fórmula (5) (forma normalizada en la Fórmula (7)) | [Dispersión superficial](/phonometry/es/guides/surface-scattering/) |
+| s | Coeficiente de dispersión: la fracción de energía reflejada que no vuelve de forma especular, medida a incidencia aleatoria sobre una plataforma giratoria en cámara reverberante. | adimensional | ISO 17497-1:2004+A1:2014, Fórmula (5) | [Difusores](/phonometry/es/guides/diffusers/) |
+| d | Coeficiente de difusión: la uniformidad de la respuesta polar de una superficie, a partir de la autocorrelación de la medida en goniómetro de campo libre. | adimensional | ISO 17497-2:2012, Fórmula (5) (forma normalizada en la Fórmula (7)) | [Difusores](/phonometry/es/guides/diffusers/) |
 | s′ | Rigidez dinámica por unidad de superficie de una capa resiliente: una fuerza dinámica por unidad de área dividida por la variación de espesor que provoca. | MN/m³ | EN 29052-1:1992 (ISO 9052-1:1989), Fórmula 1 | [Rigidez dinámica](/phonometry/es/guides/dynamic-stiffness/) |
 
 ## Vibración y ruido estructural

@@ -80,40 +80,9 @@ references:
     pages: "105-116"
     doi: "10.1016/0003-682X(70)90031-9"
     note: "Las relaciones empíricas originales y su validez declarada."
-  - type: article
-    authors: ["Jimenez, N.", "Groby, J.-P.", "Pagneux, V.", "Romero-Garcia, V."]
-    year: 2017
-    title: "Iridescent perfect absorption in critically-coupled acoustic metamaterials using the transfer matrix method"
-    journal: "Applied Sciences"
-    volume: 7
-    issue: 6
-    pages: "618"
-    doi: "10.3390/app7060618"
-    note: "El modelo por matrices de transferencia de la ranura con resonadores de Helmholtz y la condición de acoplamiento crítico (absorción perfecta) de slit_helmholtz_absorber."
-  - type: article
-    authors: ["Jimenez, N.", "Huang, W.", "Romero-Garcia, V.", "Pagneux, V.", "Groby, J.-P."]
-    year: 2016
-    title: "Ultra-thin metamaterial for perfect and quasi-omnidirectional sound absorption"
-    journal: "Applied Physics Letters"
-    volume: 109
-    issue: 12
-    pages: "121902"
-    doi: "10.1063/1.4962328"
-    note: "La impedancia del resonador (ec. A23), sus correcciones de radiacion (ecs. A24-A27) y los ejemplos de sonido lento."
-  - type: article
-    authors: ["Stinson, M. R."]
-    year: 1991
-    title: "The propagation of plane sound waves in narrow and wide circular tubes, and generalization to uniform tubes of arbitrary cross-sectional shape"
-    journal: "The Journal of the Acoustical Society of America"
-    volume: 89
-    issue: 2
-    pages: "550-558"
-    doi: "10.1121/1.400379"
-    note: "La densidad efectiva y el modulo de compresibilidad visco-termicos de la ranura y de los cuellos y cavidades cuadrados."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
-import Video from '../../../../components/Video.astro';
 
 A partir de la **resistividad al flujo** de un material poroso (la magnitud
 que mide el [banco de flujo](/phonometry/es/guides/airflow-resistance/)) los modelos
@@ -129,7 +98,10 @@ multicapa, las capas resonantes de Maa y la integral de incidencia aleatoria
 [cámara reverberante](/phonometry/es/guides/absorption-measurement/); la
 valoración del espectro predicho vive en la
 [sección ISO 11654](/phonometry/es/guides/absorption-measurement/#3-valoración-ponderada-y-clase-de-absorción-iso-11654)
-de esta última.
+de esta última; y los parientes de metamaterial resonante de estas
+construcciones, paneles ranurados de sonido lento que alcanzan la absorción
+perfecta en el acoplamiento crítico, tienen su propia guía,
+[Metaabsorbentes](/phonometry/es/guides/metamaterial-absorbers/).
 
 ## 1. Modelos de fluido equivalente de un material poroso
 
@@ -536,177 +508,16 @@ plt.show()
 
 </details>
 
-## 5. Paneles ranurados de sonido lento con resonadores de Helmholtz
+Las capas clásicas de arriba absorben con volumen o con una cavidad de
+cuarto de onda. Sus parientes de metamaterial resonante, paneles rígidos de
+ranuras submilimétricas cargadas con resonadores de Helmholtz que
+ralentizan el sonido y alcanzan la absorción perfecta ($\alpha = 1$) en el
+acoplamiento crítico con paneles de solo $\lambda/38$ de profundidad, se
+mudaron a su propia guía:
+[Metaabsorbentes](/phonometry/es/guides/metamaterial-absorbers/) cubre el
+modelo de matrices de transferencia, el solucionador de diseño con
+acoplamiento crítico y la validación cruzada FDTD de la celda mallada.
 
-Un panel rígido perforado por una red periódica de ranuras finas cerradas,
-cada ranura cargada en su pared superior por una red de resonadores de
-Helmholtz, es un absorbente de reacción local y muy sublongitud de onda
-(Jiménez et al. 2017). Los resonadores frenan el sonido dentro de la ranura y
-bajan su resonancia muy por debajo de la frecuencia de cuarto de onda, de modo
-que un panel de pocos centímetros resuena en las centenas bajas de hercios.
-Las pérdidas visco-térmicas en la ranura submilimétrica y en los cuellos de
-los resonadores son las que hacen posible la absorción *perfecta*: cuando la
-pérdida intrínseca compensa exactamente la fuga de la estructura, el cero del
-coeficiente de reflexión cae sobre el eje de frecuencia real y $\alpha = 1$
-(acoplamiento crítico).
-
-La matriz de transferencia del panel es la cadena
-$T = M_{\Delta l}\,\prod_n (M_s\,M_{HR}^{(n)}\,M_s)$ de medios pasos de ranura
-(con impedancia característica de la ranura
-$Z_s = \sqrt{\kappa_s \rho_s}/S_s$), resonadores como dispersores puntuales en
-derivación $[[1,0],[1/Z_{HR},1]]$ y una corrección de radiación de la ranura.
-El coeficiente de reflexión con fondo rígido es
-$R = (T_{11}\cos\theta - Z_0 T_{21})/(T_{11}\cos\theta + Z_0 T_{21})$ con
-$Z_0 = \rho_0 c_0 / S_0$ y $\alpha = 1 - |R|^2$. La ranura usa los parámetros
-visco-térmicos de canal estrecho y los cuellos y cavidades cuadrados la serie
-de conducto rectangular de Stinson (1991).
-
-`critical_coupling_design` invierte el modelo: dada una frecuencia y un ángulo
-objetivo, ajusta la longitud de la cavidad (que fija la resonancia) y la altura
-de la ranura (que fija la pérdida) para que se cumplan las dos condiciones de
-adaptación $\mathrm{Re}(Z)\cos\theta = Z_0$ e $\mathrm{Im}(Z) = 0$, colocando
-el cero de reflexión sobre el eje real. La geometría devuelta da entonces
-$\alpha \approx 1$ a la frecuencia de diseño.
-
-```python
-import numpy as np
-from phonometry import (
-    HelmholtzResonator, critical_coupling_design, slit_helmholtz_absorber,
-)
-
-base = HelmholtzResonator(
-    neck_length=1.0e-3, neck_side=3.0e-3,
-    cavity_length=30.0e-3, cavity_side=27.0e-3,
-)
-design = critical_coupling_design(
-    300.0, base, lattice_step=3.0e-2, period=5.0e-2,
-)
-print(round(design.absorption, 4))          # ~1.0 (absorción perfecta)
-print(round(design.slit_height * 1e3, 3))    # altura de ranura resuelta, mm
-
-f = np.linspace(150.0, 500.0, 700)
-res = slit_helmholtz_absorber(
-    f, design.resonator, slit_height=design.slit_height,
-    lattice_step=3.0e-2, period=5.0e-2,
-)
-res.plot()   # alpha(f) con |R| superpuesto; pico = 1 a 300 Hz
-```
-
-La geometría resuelta merece un vistazo antes que la curva de absorción. El
-resonador se dibuja con `.plot()` y el resultado del panel con
-`.plot_geometry()`, ambos acotados y a escala.
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/helmholtz_resonator_geometry_es.svg" alt="Sección a escala del resonador de Helmholtz de sección cuadrada del que parte el diseño con acoplamiento crítico a 300 Hz: un cuello de 3 mm de ancho y 1 mm de largo que se abre a una cavidad de paredes rígidas de 27 mm de ancho y 30 mm de profundidad, con las cuatro dimensiones que lo definen acotadas" width="80%" loading="lazy" />
-
-*Los cuatro números que definen el resonador: el lado y la longitud del
-cuello fijan la masa móvil y la mayor parte de la pérdida, y el lado y la
-longitud de la cavidad fijan la rigidez. `critical_coupling_design` conserva
-esta sección y reajusta la longitud de la cavidad para colocar la
-resonancia.*
-
-<details>
-<summary>Mostrar el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import HelmholtzResonator
-
-resonator = HelmholtzResonator(
-    neck_length=1.0e-3, neck_side=3.0e-3,
-    cavity_length=30.0e-3, cavity_side=27.0e-3,
-)
-resonator.plot(language="es")   # sección acotada, a escala
-plt.show()
-```
-
-</details>
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slit_absorber_geometry_es.svg" alt="Sección a escala de un periodo del panel ranurado con acoplamiento crítico: una ranura de aproximadamente 1 mm de altura que recorre los 30 mm de profundidad del panel, cargada por la cavidad del resonador de Helmholtz ajustado que llena el resto del periodo de 50 mm, con el respaldo rígido detrás y el sonido incidente llegando desde la izquierda" width="80%" loading="lazy" />
-
-*Un periodo del diseño resuelto, a escala: el panel entero tiene 30 mm de
-profundidad, $\lambda/38$ a 300 Hz, y la ranura submilimétrica que hace toda
-la absorción apenas se ve. Esa es justamente la gracia del mecanismo de
-sonido lento.*
-
-<details>
-<summary>Mostrar el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import HelmholtzResonator, critical_coupling_design, materials
-
-base = HelmholtzResonator(
-    neck_length=1.0e-3, neck_side=3.0e-3,
-    cavity_length=30.0e-3, cavity_side=27.0e-3,
-)
-design = critical_coupling_design(
-    300.0, base, lattice_step=3.0e-2, period=5.0e-2,
-)
-
-# La función libre dibuja cualquier lista de resonadores; un resultado de
-# slit_helmholtz_absorber retiene su geometría, así que res.plot_geometry()
-# dibuja el mismo periodo.
-materials.plot_slit_absorber_geometry(
-    [design.resonator], slit_height=design.slit_height,
-    lattice_step=3.0e-2, period=5.0e-2,
-    language="es")
-plt.show()
-```
-
-</details>
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slow_sound_absorber_es.svg" alt="Absorción de un panel ranurado con un resonador de Helmholtz: el diseño con acoplamiento crítico alcanza alpha = 1 a 300 Hz, mientras que estrechar la ranura (más pérdida) o ensancharla (menos pérdida) rompe el equilibrio y baja el pico; la profundidad del panel es lambda/38" width="80%" loading="lazy" />
-
-*Un resonador, una ranura, un equilibrio entre pérdida y fuga. El diseño con
-acoplamiento crítico alcanza $\alpha = 1$ a 300 Hz en un panel de solo
-$\lambda/38$ de profundidad; estrechar la ranura sobreamortigua la resonancia
-y ensancharla la subamortigua, y ambos bajan el pico por debajo de uno.*
-
-<details>
-<summary>Ver el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import (
-    HelmholtzResonator, critical_coupling_design, slit_helmholtz_absorber,
-)
-
-a, d, f0 = 3.0e-2, 5.0e-2, 300.0
-base = HelmholtzResonator(1.0e-3, 3.0e-3, 30.0e-3, 27.0e-3)
-design = critical_coupling_design(f0, base, lattice_step=a, period=d)
-h0 = design.slit_height
-
-f = np.linspace(150.0, 500.0, 700)
-fig, ax = plt.subplots()
-for factor, label in [(1.0, "acoplamiento crítico"),
-                      (0.6, "ranura estrecha"), (1.7, "ranura ancha")]:
-    res = slit_helmholtz_absorber(
-        f, design.resonator, slit_height=factor * h0,
-        lattice_step=a, period=d,
-    )
-    ax.plot(f, res.absorption, label=label)
-ax.set(xlabel="Frecuencia [Hz]", ylabel="Coeficiente de absorción")
-ax.legend()
-plt.show()
-```
-
-</details>
-
-El clip de abajo excita exactamente esta celda en un tubo de onda plana
-virtual: la rendija submilimétrica y su resonador están mallados en la
-rejilla FDTD y rellenos con los fluidos efectivos viscotérmicos del modelo.
-A la altura de rendija de diseño la onda estacionaria se desploma y el tono
-muere dentro del panel; a 1,7 veces esa altura el balance de pérdidas se
-rompe y la reflexión la reconstruye.
-
-<Video
-  name="anim_fdtd_slit_absorber"
-  width={2400}
-  height={1350}
-  title="Dentro del absorbedor de rendija de sonido lento en una simulación FDTD 2D"
-  description="Un tono plano de 300 Hz en un tubo FDTD 2D llega a la celda de acoplamiento crítico mallada, con su rendija de 0,98 mm y su resonador de Helmholtz resueltos en la rejilla y mostrados en un panel ampliado. A la altura de rendija de diseño la envolvente de presión queda plana y se anota la absorción 1,00 de la biblioteca; la rendija 1,7 veces más ancha sostiene una onda estacionaria profunda frente al panel y la absorción cae a 0,34."
-/>
 
 ## Notas prácticas
 
@@ -733,36 +544,32 @@ recuperación por `TransferMatrix` de la
 [página del tubo de impedancia](/phonometry/es/guides/impedance-tube/), el MPP a
 la propia aproximación de Maa (acuerdo declarado de ~6 % con la ec. 2
 exacta), a su ejemplo de diseño y a su tabla I, y la integral de Paris a su
-forma cerrada de reacción local. El modelo de sonido lento (ranura +
-resonador de Helmholtz) está fijado a sus anclas analíticas exactas: el diseño
-con acoplamiento crítico alcanza $\alpha = 1$ a la frecuencia de diseño, las
-densidades efectivas de la ranura y del conducto cuadrado se reducen a las
-resistividades de Poiseuille $12\eta/h^2$ y $28.454\eta/w^2$ cuando
-$\omega \to 0$, y los parámetros efectivos tienden a $\rho_0$, $\kappa_0$ al
-desvanecerse las capas límite. Cinco erratas encontradas en las fuentes
+forma cerrada de reacción local. Tres erratas encontradas en las fuentes
 durante este trabajo están registradas en el
 [registro de erratas](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.md).
 
 ## Qué cubre esta guía
 
-**Cubierto.** Ningún estándar rige estos modelos de predicción: son métodos
-de libro y de revista implementados en sala limpia desde Mechel, Bies, Cox y
-D'Antonio, Miki (1990), Maa (1998), Johnson, Koplik y Dashen (1987) y
-Jiménez et al. (2016/2017), las fuentes listadas arriba. Esto cubre los
+**Cubierto.** Los métodos de libro y de revista de Mechel, Bies, Cox y
+D'Antonio, Miki (1990), Maa (1998) y Johnson, Koplik y Dashen (1987),
+implementados en sala limpia como se describe arriba. Esto cubre los
 modelos de fluido equivalente porosos (`delany_bazley`, `miki`,
 `johnson_champoux_allard`), el solucionador multicapa por matrices de
 transferencia (`layered_absorber` con `PorousLayer`, `PerforatedPlateLayer`,
-`MicroperforatedPlateLayer` y `MembraneLayer`), los coeficientes de
+`MicroperforatedPlateLayer` y `MembraneLayer`) y los coeficientes de
 incidencia aleatoria por la integral de Paris (`diffuse_field_absorption`,
-`statistical_absorption`) y el absorbente de ranura con resonador de
-Helmholtz de acoplamiento crítico (`slit_helmholtz_absorber`,
-`critical_coupling_design`).
+`statistical_absorption`).
 
 **No cubierto.** El libro de Cox y D'Antonio trata tanto difusores como
 absorbentes, pero esta guía solo implementa la mitad de absorbentes. La
 predicción del difusor de gradiente de fase de Schroeder vive en un módulo
 aparte (`materials.diffuser_design`), documentada en
-[Dispersión superficial, difusión y absorción in situ](/phonometry/es/guides/surface-scattering/).
+[Difusores y sus coeficientes](/phonometry/es/guides/diffusers/) y, para los
+paneles en sublongitud de onda profunda cargados con resonadores, en
+[Metadifusores](/phonometry/es/guides/metadiffusers/). El absorbente de
+ranura con resonador de Helmholtz de acoplamiento crítico
+(`slit_helmholtz_absorber`, `critical_coupling_design`) es el tema de
+[Metaabsorbentes](/phonometry/es/guides/metamaterial-absorbers/).
 
 ## Véase también
 
@@ -773,3 +580,7 @@ aparte (`materials.diffuser_design`), documentada en
   saber, ISO 9053-1/-2 (resistividad al flujo), ISO 10534-1/-2 y ASTM E2611
   (tubo de impedancia) e ISO 354 / ISO 11654 (absorción de incidencia
   aleatoria y su valoración).
+- [Metaabsorbentes](/phonometry/es/guides/metamaterial-absorbers/): los
+  paneles ranurados de sonido lento y la condición de acoplamiento crítico
+  que llevan la absorción perfecta al régimen de sublongitud de onda
+  profunda.

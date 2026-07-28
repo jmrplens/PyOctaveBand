@@ -10,7 +10,7 @@
  * repository, not written by hand from memory:
  *   checks/domains/standards   conformance-stats.mjs, parsed from
  *                              docs/CONFORMANCE.md at build time
- *   68 guides        site/src/content/docs/guides/*.md*
+ *   71 guides        site/src/content/docs/guides/*.md*
  *   120 API pages    site/src/content/docs/reference/api/**
  *   506 figures      distinct basenames in .github/images (x2 themes x2 langs)
  *   32 PDF fiches    .github/reports/*.pdf
@@ -138,7 +138,7 @@ export const en: HomeContent = {
 	},
 	coverage: {
 		title: 'What it covers',
-		lead: 'Nine areas, 68 guides, 120 API reference pages. Each row links to the area overview; the designations are the standards actually implemented there, not a reading list.',
+		lead: 'Nine areas, 71 guides, 120 API reference pages. Each row links to the area overview; the designations are the standards actually implemented there, not a reading list.',
 		headers: ['Area', 'Standards implemented'],
 		areas: [
 			{
@@ -162,7 +162,7 @@ export const en: HomeContent = {
 			{
 				name: 'Materials and surfaces',
 				href: '/phonometry/guides/sections/materials-surfaces/',
-				summary: 'Absorption, airflow resistance, impedance tube, porous models, scattering.',
+				summary: 'Absorption, airflow resistance, impedance tube, porous and metamaterial models, diffusers, scattering.',
 				standards: ['ISO 354', 'ISO 11654', 'ISO 10534-2', 'ISO 9053', 'ISO 17497-1/-2', 'ISO 13472', 'EN 29052'],
 			},
 			{
@@ -279,7 +279,7 @@ export const es: HomeContent = {
 	},
 	coverage: {
 		title: 'Qué abarca',
-		lead: 'Nueve áreas, 68 guías y 120 páginas de referencia de la API. Cada fila enlaza al índice del área; las designaciones son las normas realmente implementadas ahí, no una lista de lecturas.',
+		lead: 'Nueve áreas, 71 guías y 120 páginas de referencia de la API. Cada fila enlaza al índice del área; las designaciones son las normas realmente implementadas ahí, no una lista de lecturas.',
 		headers: ['Área', 'Normas implementadas'],
 		areas: [
 			{
@@ -303,7 +303,7 @@ export const es: HomeContent = {
 			{
 				name: 'Materiales y superficies',
 				href: '/phonometry/es/guides/sections/materials-surfaces/',
-				summary: 'Absorción, resistencia al flujo de aire, tubo de impedancia, modelos porosos, dispersión.',
+				summary: 'Absorción, resistencia al flujo de aire, tubo de impedancia, modelos porosos y de metamaterial, difusores, dispersión.',
 				standards: ['ISO 354', 'ISO 11654', 'ISO 10534-2', 'ISO 9053', 'ISO 17497-1/-2', 'ISO 13472', 'EN 29052'],
 			},
 			{

@@ -1,0 +1,348 @@
+---
+title: "Metadifusores"
+description: "Difusores de Schroeder en sublongitud de onda profunda: rendijas cargadas con resonadores de Helmholtz ralentizan el sonido hasta que un panel de 2 cm dispersa como un difusor de residuo cuadrático de 27 cm, evaluado con la cadena de matrices de transferencia, el campo lejano de Fraunhofer y el coeficiente ISO 17497-2."
+references:
+  - type: article
+    authors: ["Jiménez, N.", "Cox, T. J.", "Romero-García, V.", "Groby, J.-P."]
+    year: 2017
+    title: "Metadiffusers: Deep-subwavelength sound diffusers"
+    journal: "Scientific Reports"
+    volume: "7"
+    pages: "5389"
+    doi: "10.1038/s41598-017-05710-5"
+    primary: true
+    note: "El modelo de metadifusor implementado aquí: rendijas cargadas con resonadores de Helmholtz reproducen perfiles de fase de Schroeder y secuencias ternarias con paneles de 1/46 a 1/20 de la longitud de onda de diseño, incluido el diseño de residuo cuadrático de la sección 2."
+  - type: article
+    authors: ["Jiménez, N.", "Cox, T. J.", "Groby, J.-P.", "Romero-García, V."]
+    year: 2019
+    title: "Beyond phase grating diffusers using locally-resonant metamaterials"
+    journal: "Proceedings of the 23rd International Congress on Acoustics (ICA 2019)"
+    url: "https://pub.dega-akustik.de/ICA2019/data/articles/000706.pdf"
+    note: "El acompañante de congreso del artículo de 2017: la cadena de matrices de transferencia, la imagen de dispersión de sonido lento y las comparaciones de campo lejano que la sección 3 condensa."
+  - type: book
+    authors: ["Cox, T. J.", "D'Antonio, P."]
+    year: 2017
+    title: "Acoustic absorbers and diffusers: Theory, design and application"
+    edition: "3.ª ed."
+    publisher: "CRC Press"
+    doi: "10.1201/9781315369211"
+    note: "ISBN 978-1-4987-4099-9. Las secuencias de Schroeder, el modelo de campo lejano de Fraunhofer y la maquinaria del coeficiente de difusión con la que se evalúa el metadifusor."
+  - type: article
+    authors: ["Jiménez, N.", "Groby, J.-P.", "Pagneux, V.", "Romero-García, V."]
+    year: 2017
+    title: "Iridescent perfect absorption in critically-coupled acoustic metamaterials using the transfer matrix method"
+    journal: "Applied Sciences"
+    volume: 7
+    issue: 6
+    pages: "618"
+    doi: "10.3390/app7060618"
+    note: "La cadena de matrices de transferencia de rendija con resonadores de Helmholtz con la que se evalúa cada pozo, y la condición de acoplamiento crítico tras el estado ternario 0."
+  - type: article
+    authors: ["Jiménez, N.", "Huang, W.", "Romero-García, V.", "Pagneux, V.", "Groby, J.-P."]
+    year: 2016
+    title: "Ultra-thin metamaterial for perfect and quasi-omnidirectional sound absorption"
+    journal: "Applied Physics Letters"
+    volume: 109
+    issue: 12
+    pages: "121902"
+    doi: "10.1063/1.4962328"
+    note: "La impedancia del resonador (ec. A23) y sus correcciones de radiación (ecs. A24-A27) usadas en cada rendija cargada."
+  - type: book
+    authors: ["Jiménez, N.", "Umnova, O.", "Groby, J.-P. (Eds.)"]
+    year: 2021
+    title: "Acoustic waves in periodic structures, metamaterials, and porous media"
+    publisher: "Springer"
+    doi: "10.1007/978-3-030-84300-7"
+    note: "Topics in Applied Physics, vol. 143. El tratamiento en formato libro de los absorbentes y difusores de metamaterial resonantes; el acompañante moderno de Cox & D'Antonio para toda esta familia."
+---
+
+import Video from '../../../../components/Video.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
+
+Un difusor de Schroeder se gana la difusión con profundidad: las
+[ecuaciones de diseño](/phonometry/es/guides/diffusers/) convierten una
+secuencia de fases en pozos cuya profundidad máxima se acerca a la mitad
+de la longitud de onda de diseño, así que un difusor para las centenas bajas de hercios mide decenas de
+centímetros de espesor, y ese espesor es lo que mantiene a los difusores de
+rejilla de fase fuera de salas pequeñas, estudios y vehículos. Un
+**metadifusor** (Jiménez, Cox, Romero-García y Groby, 2017) alcanza las
+mismas fases de reflexión con un panel entre uno y dos órdenes de magnitud más
+delgado: cada pozo se convierte en una rendija fina cerrada cargada con
+resonadores de Helmholtz, y los resonadores ralentizan el sonido dentro de la
+rendija tan drásticamente que un panel de 2 cm se comporta como pozos de
+27 cm. Esta guía cubre el mecanismo de sonido lento, el metadifusor de
+residuo cuadrático publicado evaluado de principio a fin, y la receta de
+diseño que traslada cualquier secuencia de Schroeder a un panel en
+sublongitud de onda profunda.
+
+## 1. Sonido lento en una rendija cargada
+
+La celda unidad es la misma con la que se construye el
+[absorbente de sonido lento](/phonometry/es/guides/metamaterial-absorbers/):
+una rendija de altura $h_n$ recorre la profundidad $L$ del panel y está
+cargada, a lo largo de su pared superior, por una red de resonadores de
+Helmholtz con paso de red $a$. La cadena de la rendija se evalúa con el
+método de matrices de transferencia,
+
+$$
+T = M_{\Delta l}\,\prod_m \left(M_s\,M_{HR}^{(m)}\,M_s\right),
+$$
+
+medios pasos de rendija $M_s$ alrededor de cada resonador, los resonadores
+como dispersores puntuales en derivación $[[1,0],[1/Z_{HR},1]]$ y una
+corrección de radiación de la rendija $M_{\Delta l}$, con parámetros
+efectivos viscotérmicos en la rendija y en los cuellos y cavidades cuadrados
+(Stinson 1991). Por debajo de la resonancia de los resonadores de carga, la
+compliancia en derivación se suma a la de la propia rendija y la velocidad de
+fase efectiva del modo de rendija se desploma: el número de onda efectivo
+$k_{eff}$ recuperado de la cadena corresponde a una velocidad de fase de unas
+pocas decenas de metros por segundo. La rendija alcanza por tanto su
+condición de cuarto de onda, y cualquier fase de reflexión intermedia, con
+una fracción de la profundidad que necesitaría un pozo lleno de aire.
+
+Dos consecuencias hacen el mecanismo ideal para difusores y no solo para
+absorbentes:
+
+- **La fase de reflexión se ajusta rendija a rendija.** La rendija con
+  respaldo rígido refleja con $R_n = (T_{11}\cos\theta - Z_0
+  T_{21})/(T_{11}\cos\theta + Z_0 T_{21})$, y la geometría del resonador
+  ajusta la fase de $R_n$ en todo el rango de $2\pi$ a la frecuencia de
+  trabajo mientras $|R_n|$ se mantiene cerca de uno. El perfil de fase que
+  una rejilla clásica escribe con profundidad, el metadifusor lo escribe con
+  la sintonía de los resonadores.
+- **El acoplamiento crítico añade un tercer estado.** Llevar una rendija al
+  [acoplamiento crítico](/phonometry/es/guides/metamaterial-absorbers/)
+  equilibra su pérdida viscotérmica con su fuga y produce un cero de
+  reflexión: $R_n \approx 0$. Las secuencias ternarias (valores de reflexión
+  $+1$, $-1$, $0$) necesitan exactamente ese estado perfectamente
+  absorbente, que ningún pozo rígido puede proporcionar.
+
+`metadiffuser_reflection` ejecuta esa cadena una vez por pozo (resonadores
+bidimensionales, pérdidas viscotérmicas y correcciones de extremo incluidas)
+y devuelve la reflexión compleja por pozo $R_n(f)$;
+`metadiffuser_polar_response` y `metadiffuser_diffusion_spectrum` reducen ese
+perfil espacial con el mismo campo lejano de Fraunhofer y el mismo
+coeficiente ISO 17497-2 que los
+[diseños clásicos](/phonometry/es/guides/diffusers/). Una entrada `None` en
+la secuencia de pozos representa una franja rígida plana ($R = 1$), el estado
+$+1$ de los diseños ternarios.
+
+## 2. El metadifusor de residuo cuadrático publicado
+
+El diseño publicado empaqueta un difusor de residuo cuadrático N = 5
+completo en un panel de 35 cm x 2 cm: cinco rendijas, cada una cargada con
+dos resonadores, con paso de 7 cm. Su primera rendija alcanza el
+acoplamiento crítico (el cero de reflexión con el que se construye el estado
+`0` ternario), y a la frecuencia de evaluación de 2 kHz el panel dispersa
+como el QRD de 27,4 cm de profundidad al que imita.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_geometry_es.svg" alt="Sección a escala del metadifusor de residuo cuadrático publicado: un panel de 350 por 20 milímetros sobre respaldo rígido con cinco rendijas numeradas que se abren en la cara, cada una cargada con dos resonadores de Helmholtz cuyos cuellos y cavidades se alojan lateralmente en el tabique entre rendijas; las cotas marcan los 350 milímetros de anchura, el paso de 70 milímetros, la primera rendija de 14,7 milímetros y los 20 milímetros de espesor, con el sonido incidente llegando desde arriba" width="92%" loading="eager" />
+
+Como en la comparación de campo lejano publicada, la respuesta polar repite
+la secuencia de cinco pozos seis veces (`periods=6`, un panel de 2,1 m):
+
+```python
+import numpy as np
+from phonometry import (
+    HelmholtzResonator,
+    MetadiffuserWell,
+    metadiffuser_polar_response,
+    metadiffuser_reflection,
+)
+
+# El metadifusor de residuo cuadrático publicado: cinco rendijas con dos
+# resonadores cada una en un panel de 35 cm x 2 cm (paso de 7 cm),
+# ajustado para imitar un QRD diseñado a 500 Hz cuyos pozos llegarían a
+# 27,4 cm de profundidad.
+mm = 1e-3
+filas = [  # rendija h, cuello l_n, cavidad l_c, cuello w_n, cavidad w_c [mm]
+    (14.7, 13.0, 16.4, 6.2, 9.0),
+    (30.9, 9.1, 4.3, 3.5, 9.0),
+    (30.9, 9.1, 4.3, 3.5, 9.0),
+    (15.7, 13.3, 17.0, 6.3, 9.0),
+    (20.3, 18.0, 20.7, 3.2, 9.0),
+]
+pozos = [
+    MetadiffuserWell(
+        h * mm,
+        2 * (HelmholtzResonator(ln * mm, wn * mm, lc * mm, wc * mm),),
+    )
+    for h, ln, lc, wn, wc in filas
+]
+
+f = np.arange(1800.0, 2601.0, 5.0)
+panel = metadiffuser_reflection(f, pozos, depth=0.02, period=0.07)
+alfa1 = panel.well_absorption[0]
+print(round(float(alfa1.max()), 2), int(f[alfa1.argmax()]))  # 0.99 2305
+
+# Comparación de campo lejano: la secuencia de cinco pozos repetida seis
+# veces (2,1 m).
+polar = metadiffuser_polar_response(2000.0, pozos, depth=0.02,
+                                    period=0.07, periods=6)
+print(round(polar.coefficient, 2))                           # 0.32
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_polar_es.svg" alt="Diagrama polar semicircular a 2 kilohercios que compara la respuesta en campo lejano del panel metadifusor de 2 centímetros, en trazo continuo, con el difusor de residuo cuadrático de 27,4 centímetros de profundidad al que imita, en trazo discontinuo: los dos patrones de lóbulos de red se superponen casi exactamente en todo el arco de menos 90 a más 90 grados" width="92%" />
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import numpy as np
+from phonometry import (
+    HelmholtzResonator,
+    MetadiffuserWell,
+    materials,
+    metadiffuser_polar_response,
+)
+
+mm = 1e-3
+filas = [
+    (14.7, 13.0, 16.4, 6.2, 9.0),
+    (30.9, 9.1, 4.3, 3.5, 9.0),
+    (30.9, 9.1, 4.3, 3.5, 9.0),
+    (15.7, 13.3, 17.0, 6.3, 9.0),
+    (20.3, 18.0, 20.7, 3.2, 9.0),
+]
+pozos = [
+    MetadiffuserWell(
+        h * mm,
+        2 * (HelmholtzResonator(ln * mm, wn * mm, lc * mm, wc * mm),),
+    )
+    for h, ln, lc, wn, wc in filas
+]
+
+# El panel metadifusor y el QRD al que se ajustó, a 2 kHz y con seis
+# repeticiones del periodo (paneles de 2,1 m).
+meta = metadiffuser_polar_response(2000.0, pozos, depth=0.02, period=0.07,
+                                   periods=6)
+secuencia = np.roll(materials.quadratic_residue_sequence(5), -1)
+profundidades = secuencia * (343.0 / 500.0) / (2 * 5)
+qrd = materials.predict_diffuser_polar_response(
+    0.07, 2000.0, depths=profundidades, periods=6, include_obliquity=False,
+)
+
+ax = meta.plot(marker="", linewidth=2.2, language="es",
+               label="Metadifusor, panel de 2 cm")
+qrd.plot(ax=ax, marker="", linewidth=1.6, linestyle="--", language="es",
+         label="QRD, pozos de hasta 27,4 cm")
+ax.legend(loc="lower center")
+```
+
+</details>
+
+La superposición de campo lejano de arriba es el resumen en frecuencia; la
+animación FDTD de abajo malla ambos paneles de verdad (el metadifusor a
+0,25 mm, con sus rendijas, cuellos y cavidades) y lanza el mismo frente de
+2 kHz contra ellos: el QRD de 27 cm y el panel de 2 cm devuelven abanicos
+dispersados casi idénticos.
+
+<Video
+  name="anim_fdtd_metadiffuser"
+  width={2400}
+  height={1350}
+  title="Difusor de Schroeder frente a metadifusor en una simulación FDTD 2D"
+  description="Un frente de onda plano de 2 kHz incide sobre un difusor de Schroeder con pozos de hasta 27 centímetros y, al lado, sobre el metadifusor de 2 centímetros del diseño publicado, cuyas rendijas, cuellos y cavidades reales están mallados a 0,25 milímetros. El campo total y la envolvente dispersada persistente muestran que ambos paneles devuelven abanicos difusos casi idénticos, y los coeficientes de difusión del arco de receptores lo confirman cuantitativamente."
+/>
+
+## 3. La receta de diseño: primero las fases, después la geometría
+
+Diseñar un metadifusor es una traducción en dos pasos. Primero se elige la
+secuencia de Schroeder exactamente igual que para un
+[diseño clásico](/phonometry/es/guides/diffusers/): los residuos cuadráticos
+$s_n = n^2 \bmod N$ dan las profundidades de pozo objetivo
+$d_n = s_n \lambda_0/(2N)$ y con ellas las fases de reflexión objetivo
+$\varphi_n = -2 k d_n$ a la frecuencia de evaluación. Segundo, se sintoniza
+cada rendija (su altura, y el cuello y la cavidad de sus resonadores) hasta
+que la cadena reproduce esa fase desde la profundidad fija $L$ del panel. La
+reflexión por pozo que devuelve `metadiffuser_reflection` es la magnitud a
+igualar; para el diseño publicado a 2 kHz las cinco rendijas caen a pocos
+grados de los objetivos del QRD manteniendo $|R_n|$ cerca de uno:
+
+```python
+import numpy as np
+from phonometry import materials, metadiffuser_reflection
+
+# pozos: las cinco rendijas publicadas del ejemplo de arriba.
+panel = metadiffuser_reflection(np.array([2000.0]), pozos,
+                                depth=0.02, period=0.07)
+fases = np.degrees(np.angle(panel.reflection[:, 0]))
+print(np.round(np.abs(panel.reflection[:, 0]), 2))  # [0.97 1.   1.   0.97 0.98]
+print(np.round(fases))                              # [ 75. -71. -71.  74.   2.]
+
+# Los objetivos: el QRD N = 5 de 500 Hz al que imita, evaluado a 2 kHz.
+secuencia = np.roll(materials.quadratic_residue_sequence(5), -1)
+profundidades = secuencia * (343.0 / 500.0) / (2 * 5)   # hasta 27,4 cm
+k = 2 * np.pi * 2000.0 / 343.0
+objetivos = np.degrees(np.angle(np.exp(-2j * k * profundidades)))
+print(np.round(objetivos))                          # [ 72. -72. -72.  72.   0.]
+```
+
+Que un panel de 2 cm clave las fases de pozos de 27,4 cm con un error de
+pocos grados es todo el truco, y los límites del truco merecen decirse sin
+rodeos:
+
+- **Las pérdidas no son opcionales.** Las mismas capas límite viscotérmicas
+  que hacen posible el acoplamiento crítico recortan unos puntos
+  porcentuales de $|R_n|$ en todas partes, así que un metadifusor siempre
+  absorbe un poco donde una rejilla rígida no lo haría (los diseños
+  publicados se quedan en el rango del porcentaje lejos de la rendija con
+  acoplamiento crítico). La absorción por pozo y la promediada en cara se
+  exponen como `well_absorption` y `absorption` exactamente para esta
+  comprobación.
+- **El ajuste de fase es dispersivo.** La fase de un pozo rígido crece
+  linealmente con la frecuencia; la de una rendija cargada con resonadores
+  no. La secuencia es exacta a la frecuencia para la que se sintonizó y se
+  degrada al alejarse de ella, así que un diseño de banda ancha es un
+  compromiso a lo largo de la banda de trabajo, comprobado banda a banda con
+  `metadiffuser_diffusion_spectrum` en vez de darlo por hecho desde la
+  frecuencia de diseño.
+- **El lado de trabajo es por debajo de la resonancia.** Por encima de la
+  resonancia de los resonadores de carga la rama de sonido lento se cierra y
+  la rendija deja de seguir la fase objetivo; los diseños colocan las
+  resonancias por encima de la banda de trabajo.
+
+La reducción a un coeficiente calificado es entonces idéntica al flujo
+clásico: `metadiffuser_polar_response` para una frecuencia y
+`metadiffuser_diffusion_spectrum` para el coeficiente normalizado banda a
+banda, ambos frente a la referencia plana de igual huella de la fórmula (7)
+de ISO 17497-2.
+
+## Qué cubre esta guía
+
+**Cubierto.** El modelo de metadifusor de Jiménez et al. (2017): la cadena de
+matrices de transferencia de rendija con resonadores de Helmholtz por pozo,
+con parámetros efectivos viscotérmicos, correcciones de extremo y el término
+de radiación de la rendija (`metadiffuser_reflection`, con
+`MetadiffuserWell` y `HelmholtzResonator` como contenedores de geometría y
+pozos `None` como franjas rígidas planas), y su reducción por el campo lejano
+de Fraunhofer al coeficiente de difusión direccional ISO 17497-2
+(`metadiffuser_polar_response`) y al espectro normalizado banda a banda
+(`metadiffuser_diffusion_spectrum`).
+
+**No cubierto.** El modelo es de reacción local (los pozos no se acoplan
+internamente) y comparte los límites declarados del campo lejano de
+Fraunhofer: pierde precisión a baja frecuencia, en ángulos rasantes y donde
+importa la difracción de borde, así que califica diseños en lugar de
+sustituir una medición ISO 17497-2. El problema inverso (resolver geometrías
+de resonador para un perfil de fase objetivo) no está automatizado; el flujo
+de la sección 3 iguala fases por evaluación. El solucionador de diseño con
+acoplamiento crítico para una sola rendija vive en
+[Metaabsorbentes](/phonometry/es/guides/metamaterial-absorbers/).
+
+## Véase también
+
+- [Difusores y sus coeficientes](/phonometry/es/guides/diffusers/): los
+  coeficientes ISO 17497-1/-2 con los que se califica este panel, y los
+  diseños clásicos de Schroeder cuyas secuencias de fase toma prestadas.
+- [Metaabsorbentes](/phonometry/es/guides/metamaterial-absorbers/): la misma
+  celda de rendija y resonador sintonizada para absorción perfecta en lugar
+  de fase controlada, con la teoría del acoplamiento crítico tras el estado
+  ternario `0`.
+- [Absorbentes porosos y multicapa](/phonometry/es/guides/porous-absorbers/):
+  las capas clásicas de fluido equivalente y resonantes con las que se
+  construyen las celdas de metamaterial.
+- [Simulación de ondas FDTD 2D](/phonometry/es/guides/fdtd-simulation/): el
+  solucionador de ondas tras la animación de arriba, que malla la geometría
+  real de rendijas y resonadores.
+- Referencia de la API: [`materials.metadiffuser`](/phonometry/es/reference/api/materials/metadiffuser/) y [`materials.diffuser_design`](/phonometry/es/reference/api/materials/diffuser-design/).
