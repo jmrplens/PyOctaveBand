@@ -419,6 +419,8 @@ export default defineConfig({
     '/es/guides/building-acoustics/': `${basePath}/es/guides/insulation-field/`,
     '/guides/psychoacoustics/': `${basePath}/guides/loudness/`,
     '/es/guides/psychoacoustics/': `${basePath}/es/guides/loudness/`,
+    '/guides/materials/': `${basePath}/guides/absorption-measurement/`,
+    '/es/guides/materials/': `${basePath}/es/guides/absorption-measurement/`,
   },
   build: {
     // Render prerendered pages in parallel batches (default is 1 at a time).

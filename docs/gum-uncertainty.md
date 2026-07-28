@@ -215,7 +215,8 @@ those standardized cases:
   [field insulation measurements](insulation-field.md) apply the tabulated
   reproducibility terms of ISO 12999-1, a standardized budget for one
   specific model.
-- **Absorption.** The [materials page](materials.md) carries the
+- **Absorption.** The
+  [absorption-measurement page](absorption-measurement.md) carries the
   ISO 12999-2 absorption uncertainty, the same construction for the
   reverberation-room method.
 - **Occupational exposure.** The ISO 9612 uncertainty of

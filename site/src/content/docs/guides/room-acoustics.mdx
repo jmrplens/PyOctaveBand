@@ -1,6 +1,6 @@
 ---
 title: "Room Acoustics"
-description: "Impulse-response acquisition (ISO 18233), room parameters EDT/T20/T30/C50/C80/Ts (ISO 3382-1/2), open-plan speech metrics (ISO 3382-3) and sound absorption in a reverberation room (ISO 354)."
+description: "Impulse-response acquisition (ISO 18233), room parameters EDT/T20/T30/C50/C80/Ts (ISO 3382-1/2) and open-plan speech metrics (ISO 3382-3)."
 references:
   - type: book
     authors: ["Kuttruff, H."]
@@ -58,13 +58,6 @@ references:
     designation: "ISO 18233:2006"
     url: "https://www.iso.org/standard/40408.html"
     note: "The swept-sine and MLS acquisition of §1."
-  - type: standard
-    organization: "International Organization for Standardization"
-    year: 2003
-    title: "Acoustics — Measurement of sound absorption in a reverberation room"
-    designation: "ISO 354:2003"
-    url: "https://www.iso.org/standard/34545.html"
-    note: "The reverberation-room absorption measurement of §4."
 ---
 
 import Video from '../../../components/Video.astro';
@@ -76,10 +69,14 @@ between a source and a receiver. Filter it into bands and integrate it, and
 it yields reverberation time, clarity and speech intelligibility: everything
 about the sound field inside a single room. This page follows that chain in
 measurement order: acquiring the IR (ISO 18233), turning it into room
-parameters (ISO 3382-1/2), spatial speech metrics for open-plan offices
-(ISO 3382-3) and, closing the loop, the sound absorption of a material in a
-reverberation room (ISO 354). For sound insulation *between* spaces (the same
-IR measured either side of a partition) see the companion
+parameters (ISO 3382-1/2) and spatial speech metrics for open-plan offices
+(ISO 3382-3). Two separate decay measurements in a reverberation room, one
+with the room empty and one with the specimen installed, yield a material's
+sound absorption; that method
+(ISO 354) lives in
+[Sound Absorption Measurement and Rating](/phonometry/guides/absorption-measurement/).
+For sound insulation *between* spaces (the same IR measured either side of a
+partition) see the companion
 [Field Insulation Measurement and Ratings guide](/phonometry/guides/insulation-field/).
 
 ## 1. Impulse-response acquisition (ISO 18233)
@@ -579,7 +576,7 @@ mid-frequency reverberation time is supplied through the metadata's
 acceptable $T_\text{mid}$, the usual form of a classroom or open-plan limit). A
 broadband result has no 500 Hz / 1000 Hz octaves to average, so its box and
 verdict fall back to the plain broadband $T_{30}$ with no "500-1000 Hz" claim. It uses the same `ReportMetadata` container and rendering engine as the
-[ISO 11654 absorption fiche](/phonometry/guides/materials/#iso-11654-report-report);
+[ISO 11654 absorption fiche](/phonometry/guides/absorption-measurement/#iso-11654-report-report);
 the room-specific fields `room_volume`, `source_positions` and
 `receiver_positions` populate the header (ISO 3382 requires the room volume and
 the number of source and microphone positions to be reported), alongside
@@ -829,65 +826,6 @@ repository; click the preview to open the PDF.
 	caption="Open-plan office acoustics fiche (OpenPlanResult.report): D2,S, Lp,A,S,4m, rD, rP and the spatial-decay curve."
 />
 
-## 4. Sound absorption (ISO 354)
-
-The equivalent absorption area `A` that drives `R'`, `L'n`, the ISO 3744 `K2`
-environmental correction and the ISO 3741 absorption term is itself measured in
-a reverberation room (ISO 354).
-Measure the room's reverberation time **empty** ($T_1$) and again **with the
-test specimen installed** ($T_2$); the specimen's absorption is the difference
-of the two Sabine areas, and dividing by the covered area gives the absorption
-coefficient:
-
-$$
-A = \frac{55.3\ V}{c\ T} - 4 V m, \qquad
-\alpha_s = \frac{A_2 - A_1}{S}, \qquad c = 331 + 0.6\ t ,
-$$
-
-with $c$ from the room air temperature $t$ in °C (valid 15–30 °C) and $m$ the
-power attenuation coefficient of air (default 0; convert an ISO 9613-1
-$\alpha$ in dB/m with `attenuation_from_alpha`). Because edge and diffraction
-effects can scatter more energy than the sample's flat area intercepts,
-$\alpha_s$ may exceed 1.0 and is never clamped (ISO 354 Clause 3.7).
-
-```python
-import numpy as np
-from phonometry import materials
-
-# Third-octave reverberation times of a 200 m^3 room, empty (T1) and with a
-# 10.8 m^2 absorber sample installed (T2).
-t1 = np.array([5.0, 4.0, 3.0])
-t2 = np.array([3.0, 2.5, 2.0])
-
-a_empty = materials.absorption_area(t1, volume=200.0, temperature=20.0)
-print(np.round(a_empty, 2))                    # [ 6.45  8.06 10.75] m^2
-
-alpha = materials.absorption_coefficient(t1, t2, volume=200.0, sample_area=10.8,
-                               temperature1=20.0)
-print(np.round(alpha, 3))                      # [0.398 0.448 0.498]
-```
-
-`T1` and `T2` are exactly the reverberation times `room_parameters` returns, so
-an ISO 3382-2 decay measurement of the empty and treated room flows straight
-into `absorption_coefficient`. A room volume below the 150 m³ minimum or a
-sample area outside 10–12 m² raises an advisory `AbsorptionWarning`; the result
-still returns.
-
-### `absorption_area()` / `absorption_coefficient()` parameters
-
-| Parameter | Type | Units | Range / default | Notes |
-| :--- | :--- | :--- | :--- | :--- |
-| `t60` / `t1`, `t2` | 1D array | s | > 0 | Reverberation time(s); `t1` empty, `t2` with specimen |
-| `volume` | float | m³ | > 0 | Room volume `V` (advisory below 150 m³) |
-| `sample_area` | float | m² | > 0 | Area `S` the specimen covers (coefficient only) |
-| `temperature` / `temperature1`, `temperature2` | float | °C | default `20.0`, 15–30 | Sets `c` via Eq. (6); `temperature2` defaults to `temperature1` |
-| `speed_of_sound` (`…1`, `…2`) | float, optional | m/s | > 0 | Overrides the temperature-derived `c` |
-| `m` (`m1`, `m2`) | float or 1D array | 1/m | ≥ 0, default `0` | Air power attenuation coefficient |
-
-`absorption_area()` returns the equivalent absorption area `A` (m²) with the
-shape of `t60`; `absorption_coefficient()` returns `alpha_s`;
-`attenuation_from_alpha(alpha)` converts an ISO 9613-1 `alpha` (dB/m) to `m`.
-
 ## What this guide covers
 
 **Covered.** ISO 18233:2006 Annexes A and B, the MLS and exponential-sweep
@@ -899,9 +837,7 @@ accuracy-grade position counts and the 5.3.3 dynamic-range criterion),
 computed by `room.room_parameters`/`room.decay_curve`: EDT, T20, T30, C50,
 C80, D50, Ts and the per-band validity and curvature flags; ISO 3382-3:2012
 Clause 4 and Clause 6.2/6.3 open-plan quantities ($D_{2,S}$, $L_{p,A,S,4m}$,
-$r_D$, $r_P$) from `room.open_plan_metrics`; and ISO 354:2003 Clauses 4 and
-8.1 reverberation-room absorption from `materials.absorption_area` and
-`materials.absorption_coefficient`.
+$r_D$, $r_P$) from `room.open_plan_metrics`.
 
 **Not covered.** ISO 3382-1 Annex A also defines the sound-strength $G$ and
 the binaural parameters LF/LFC and IACC; phonometry implements only the
@@ -910,14 +846,15 @@ Ts). ISO 3382-3's per-position STI is taken as an input to
 `open_plan_metrics` rather than computed inside it: measure it with the
 STIPA tools of the
 [Speech Transmission Index guide](/phonometry/guides/speech-transmission/).
-ISO 354's room-qualification requirements (Annex A: the number of
-loudspeaker and microphone positions, the diffusing elements) are not
-checked; `absorption_area`/`absorption_coefficient` only convert an
-already-measured $T_1$/$T_2$ pair and raise an advisory warning when the
-room volume or sample area falls outside the Clause 6 limits.
+The ISO 354 reverberation-room absorption that consumes the measured
+$T_1$/$T_2$ pair has moved to its own guide,
+[Sound Absorption Measurement and Rating](/phonometry/guides/absorption-measurement/).
 
 ## See also
 
+- [Sound Absorption Measurement and Rating](/phonometry/guides/absorption-measurement/):
+  the ISO 354 reverberation-room absorption measurement that consumes the
+  reverberation times `room_parameters` returns, and its ISO 11654 rating.
 - [Field](/phonometry/guides/insulation-field/),
   [laboratory](/phonometry/guides/insulation-lab/) and
   [predicted](/phonometry/guides/insulation-prediction/) sound insulation: field,
@@ -936,7 +873,7 @@ room volume or sample area falls outside the Clause 6 limits.
 - [Theory](/phonometry/reference/theory/rooms-buildings/): Schroeder integration, regression windows and the
   reference-curve derivation.
 - [Conformance report](https://github.com/jmrplens/phonometry/blob/main/docs/CONFORMANCE.md): the closed-form decays and parameter
-  definitions the ISO 18233 / ISO 3382 / ISO 354 implementations are validated against.
+  definitions the ISO 18233 / ISO 3382 implementations are validated against.
 - API reference: [`room.room_acoustics`](/phonometry/reference/api/rooms/room-acoustics/), [`room.room_ir`](/phonometry/reference/api/rooms/room-ir/) and [`room.open_plan`](/phonometry/reference/api/rooms/open-plan/).
 
 ## Quick answers

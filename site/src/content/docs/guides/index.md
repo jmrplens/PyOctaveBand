@@ -1,6 +1,6 @@
 ---
 title: "Guides"
-description: "The 66 guides of phonometry, grouped into the nine areas the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
+description: "The 68 guides of phonometry, grouped into the nine areas the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
 head:
   - tag: script
     attrs:
@@ -281,9 +281,14 @@ scattering. What a surface does to the sound that reaches it, measured in a
 laboratory or predicted from the material parameters. Implements ISO 354,
 ISO 11654, ISO 10534-2, ISO 9053, ISO 17497-1/-2, ISO 13472 and EN 29052.
 
-- [Acoustic Materials](/phonometry/guides/materials/): the weighted absorption
-  rating and its class, airflow resistance and resistivity, and the
-  impedance-tube surface impedance, absorption and transmission loss.
+- [Sound Absorption Measurement and Rating](/phonometry/guides/absorption-measurement/):
+  the ISO 354 reverberation-room measurement, the weighted rating and its
+  class, and the measurement uncertainty of both.
+- [Airflow Resistance](/phonometry/guides/airflow-resistance/): the static
+  and alternating determination of airflow resistance and resistivity.
+- [Impedance Tube](/phonometry/guides/impedance-tube/): the normal-incidence
+  surface impedance, absorption and transmission loss, plus the virtual
+  FDTD tube.
 - [Porous and Multilayer Absorbers](/phonometry/guides/porous-absorbers/): the
   Delany-Bazley, Miki and Johnson-Champoux-Allard models, the transfer-matrix
   multilayer solver with perforated, microperforated and membrane layers, and

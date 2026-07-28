@@ -180,8 +180,18 @@ export const sidebar = [
     collapsed: true,
     items: [
       { slug: 'guides/sections/materials-surfaces', label: 'Overview', translations: { es: 'Resumen' } },
-      'guides/materials',
-      'guides/porous-absorbers',
+      {
+        label: 'Absorbers',
+        translations: { es: 'Absorbentes' },
+        collapsed: true,
+        items: [
+          { slug: 'guides/sections/absorbers', label: 'Overview', translations: { es: 'Resumen' } },
+          'guides/absorption-measurement',
+          'guides/airflow-resistance',
+          'guides/impedance-tube',
+          'guides/porous-absorbers',
+        ],
+      },
       'guides/surface-scattering',
     ],
   },

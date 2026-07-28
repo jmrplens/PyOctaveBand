@@ -37,6 +37,12 @@ R = L_1 - L_2 + 10 \log_{10}\frac{S}{A}, \qquad
 L_n = L_i + 10 \log_{10}\frac{A}{A_0}, \quad A_0 = 10\ \text{m}^2.
 $$
 
+The facility itself is what suppresses the flanking: two structurally
+decoupled reverberation rooms of at least 50 m³ each, with the element under
+test mounted in a test opening of about 10 m² between them.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insulation_lab_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insulation_lab.svg" alt="Plan view of an ISO 10140 laboratory transmission suite: structurally decoupled source and receiving reverberation rooms of about 59 and 51 cubic metres, the test element mounted in the 10 square metre test opening between them, a corner loudspeaker in the source room and a continuously moving microphone with a sweep radius of at least 1 m in each room" width="92%"></picture>
+
 | | Field (ISO 16283) | Laboratory (ISO 10140) |
 | :--- | :--- | :--- |
 | Airborne element index | $R'$ apparent (with flanking) | $R$ direct (flanking suppressed) |
@@ -1254,6 +1260,42 @@ fig.tight_layout(); plt.show()
 
 </details>
 
+The composite is easier to reason about drawn as areas. `plot_facade_elements`
+tiles the elevation with every element's drawn area equal to its real area
+(here a 6 m² masonry wall, a 1.5 m² window and its 0.3 m² roller shutter box),
+and a prediction that retained its `elements` redraws its own façade with
+`fac.plot_geometry()`.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_elevation_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_elevation_geometry.svg" alt="To-scale elevation of a composite facade: a hatched 6 m2 masonry wall, a 1.5 m2 window and a narrow 0.3 m2 roller shutter box drawn as tiles of a 3.95 m by 1.97 m facade whose drawn areas equal their real areas, each tile labelled with its area and the overall width and height dimensioned" width="88%"></picture>
+
+*The areas the energy sum weighs, to scale: the window holds a quarter of the
+wall's area but each square metre of it transmits a hundred times more, so the
+small tiles decide `R'`.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import building
+
+# The prediction's composite drawn as areas: 6 m2 of wall, a 1.5 m2 window
+# and its 0.3 m2 roller shutter box.
+elements = [
+    building.FacadeElement("Masonry wall", area=6.0, r=[50.0] * 5),
+    building.FacadeElement("Window", area=1.5, r=[30.0] * 5),
+    building.FacadeElement("Roller shutter box", area=0.3, r=[22.0] * 5),
+]
+building.plot_facade_elements(elements)
+plt.show()
+
+# A prediction retains its elements, so it redraws its own elevation:
+#   fac = building.facade_sound_reduction(elements, area=7.8, volume=50.0)
+#   fac.plot_geometry()
+```
+
+</details>
+
 The façade prediction also writes a one-page **prediction** report through a
 `report(path)` method, the same layout as the airborne and impact prediction
 fiches. `FacadePredictionResult.report()` renders the façade-element table (each
@@ -1510,6 +1552,30 @@ print(round(s_t / 1e6, 3))                              # 4.935  MN/m3
 # Installed on a 120 kg/m2 floating screed with s' = 10 MN/m3:
 print(round(materials.natural_frequency(10e6, 120.0), 1))      # 45.9  Hz
 ```
+
+That little oscillator is small enough to draw at true scale.
+`plot_dynamic_stiffness_rig` puts the standard 200 mm specimen under the 8 kg
+load plate with the exciter and accelerometer in place.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dynamic_stiffness_rig_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dynamic_stiffness_rig_geometry.svg" alt="To-scale section of the dynamic-stiffness rig: the dotted 200 mm resilient specimen, 20 mm thick, on the hatched rigid foundation, the grey 8 kg load plate on top with the accelerometer ball at its edge, and the exciter block above driving the plate through a red vertical arrow, the specimen side and thickness dimensioned" width="92%"></picture>
+
+*The mass-spring system behind `s'` at true scale: 20 mm of resilient layer
+under the 8 kg plate is all it takes to reproduce the 2 kPa preload of a
+floating floor.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import materials
+
+# The standard rig: a 200 mm square specimen under the 8 kg load plate.
+materials.plot_dynamic_stiffness_rig()
+plt.show()
+```
+
+</details>
 
 ## 2. The enclosed-gas term and airflow resistivity
 

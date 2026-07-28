@@ -116,16 +116,18 @@ import ThemeImage from '../../../components/ThemeImage.astro';
 import Video from '../../../components/Video.astro';
 
 Given a porous material's **flow resistivity** (the quantity the
-[flow rig](/phonometry/guides/materials/) measures) the classical equivalent-fluid models
+[flow rig](/phonometry/guides/airflow-resistance/) measures) the classical equivalent-fluid models
 predict its complex characteristic impedance and wavenumber, and a
 **transfer-matrix** stack of layers (porous blankets, air gaps, perforated
 and microperforated panels, membranes) predicts the absorption coefficient
 of the whole construction before anything is built. This page covers the
 three porous models (Delany–Bazley, Miki, Johnson–Champoux–Allard), the
 multilayer solver, the resonant sheet layers of Maa and the random-incidence
-(Paris) integral. The measurement counterparts live in
-[Acoustic Materials](/phonometry/guides/materials/); rating the predicted spectrum lives in
-[the same page's ISO 11654 section](/phonometry/guides/materials/).
+(Paris) integral. The measurement counterparts live in the
+[impedance tube](/phonometry/guides/impedance-tube/) and
+[reverberation room](/phonometry/guides/absorption-measurement/) guides;
+rating the predicted spectrum lives in the latter's
+[ISO 11654 section](/phonometry/guides/absorption-measurement/#3-weighted-rating-and-absorption-class-iso-11654).
 
 ## 1. Equivalent-fluid models of a porous material
 
@@ -223,7 +225,7 @@ The three models agree closely over the Delany–Bazley fit range (Cox &
 D'Antonio Figs. 6.19–6.21 make the same comparison); JCA extends the
 prediction physically outside it. A `PorousMediumResult` built from measured
 data (for example the $Z_c$, $k$ recovered by the
-[ASTM E2611 transfer-matrix reduction](/phonometry/guides/materials/)) plugs into the layer
+[ASTM E2611 transfer-matrix reduction](/phonometry/guides/impedance-tube/)) plugs into the layer
 solver exactly like a modelled one.
 
 ## 2. Multilayer prediction by transfer matrices
@@ -276,7 +278,7 @@ admittance recursion (immune to the $e^{|\mathrm{Im}(k_x)| d}$ overflow of
 raw matrix entries for extremely attenuating layers) and still exposes the
 full chain matrix (reciprocal by construction, $\det T = 1$) in
 `transfer_matrix`, ready for the
-[ASTM E2611 machinery](/phonometry/guides/materials/) (`TransferMatrix`).
+[ASTM E2611 machinery](/phonometry/guides/impedance-tube/) (`TransferMatrix`).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/porous_absorber_designs.svg" alt="Predicted normal-incidence absorption of four 50 mm constructions: a porous layer absorbs broadband from mid frequency up, a microperforated panel over a cavity peaks near 700 Hz, a perforated panel over porous peaks near 500 Hz, and a membrane over a porous-filled cavity peaks near 175 Hz; dotted vertical lines mark the closed-form Helmholtz and membrane resonances" width="80%" loading="eager" />
 
@@ -493,7 +495,7 @@ weights the oblique angles, whose waves travel a longer path inside the
 layer, so $\alpha_{dif}$ exceeds the normal-incidence $\alpha(0°)$ exactly
 where the layer is thin against the wavelength. This is the model-side
 counterpart of the tube-versus-reverberation-room discussion of
-[Acoustic Materials](/phonometry/guides/materials/).*
+[Sound Absorption Measurement and Rating](/phonometry/guides/absorption-measurement/).*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -704,7 +706,7 @@ models; they are textbook and journal methods implemented clean-room from
 the sources in the references below. The models are pinned digit-exact to the
 printed coefficient tables (Bies Table D.1, Miki Eqs. 30–34), the solver to
 the closed forms above and to the `TransferMatrix` recovery of the
-[impedance-tube page](/phonometry/guides/materials/), the MPP to Maa's own approximation
+[impedance-tube page](/phonometry/guides/impedance-tube/), the MPP to Maa's own approximation
 (stated ~6 % agreement with the exact Eq. 2), design example and Table I,
 and the Paris integral to its locally reacting closed form. The slow-sound
 slit + Helmholtz-resonator model is pinned to its exact analytic anchors: the
@@ -738,7 +740,9 @@ phase-grating diffuser prediction lives in a separate module
 
 ## See also
 
-- [Acoustic Materials](/phonometry/guides/materials/): the measurement
-  standards these prediction models connect to, namely ISO 9053-1/-2 (flow
-  resistivity), ISO 10534-1/-2 and ASTM E2611 (impedance tube), and
-  ISO 354 / ISO 11654 (random-incidence absorption and rating).
+- [Airflow Resistance](/phonometry/guides/airflow-resistance/),
+  [Impedance Tube](/phonometry/guides/impedance-tube/) and
+  [Sound Absorption Measurement and Rating](/phonometry/guides/absorption-measurement/):
+  the measurement standards these prediction models connect to, namely
+  ISO 9053-1/-2 (flow resistivity), ISO 10534-1/-2 and ASTM E2611 (impedance
+  tube), and ISO 354 / ISO 11654 (random-incidence absorption and rating).

@@ -211,6 +211,8 @@ $\alpha_w = 0{,}60$ pero añade el indicador, "0,60(M)".
 
 *La valoración de ISO 11654: absorción práctica frente a la referencia desplazada, con la desviación desfavorable sombreada y el coeficiente ponderado leído a 500 Hz.*
 
+Consulta la [guía de medida y clasificación de la absorción sonora](/phonometry/es/guides/absorption-measurement/) para su uso.
+
 ### Resistencia al flujo de aire (ISO 9053-1/2)
 
 La resistividad al flujo $\sigma = R\,A/d$ es el parámetro de transporte clave
@@ -234,6 +236,8 @@ paredes a través de la capa límite térmica $b = \sqrt{2 c_0 l_h / \omega}$
 100 mm a 2 Hz: $b = 1{,}83$ mm, $\kappa' = 1{,}370 = 0{,}978\,\kappa$) se
 reproduce, y se aplican las salvaguardas de validez de la Fórmula 3 (cociente
 de transferencia < 0,3) y la Fórmula 4 (margen de 10 dB sobre el fondo).
+
+Consulta la [guía de resistencia al flujo de aire](/phonometry/es/guides/airflow-resistance/) para su uso.
 
 ### Tubo de impedancia (ISO 10534-1, ISO 10534-2, ASTM E2611)
 
@@ -280,4 +284,4 @@ son identidades físicas: la matriz analítica de una capa de aire
 recorridos de ida y vuelta sintéticos que recuperan una $r$ conocida y la
 recuperación con dos cargas de una muestra recíproca asimétrica.
 
-Consulta la [guía de materiales](/phonometry/es/guides/materials/) para su uso.
+Consulta la [guía del tubo de impedancia](/phonometry/es/guides/impedance-tube/) para su uso.

@@ -1,6 +1,6 @@
 ---
 title: "Acústica de salas"
-description: "Adquisición de la respuesta al impulso (ISO 18233), parámetros de sala EDT/T20/T30/C50/C80/Ts (ISO 3382-1/2), métricas de habla en oficinas diáfanas (ISO 3382-3) y absorción acústica en cámara reverberante (ISO 354)."
+description: "Adquisición de la respuesta al impulso (ISO 18233), parámetros de sala EDT/T20/T30/C50/C80/Ts (ISO 3382-1/2) y métricas de habla en oficinas diáfanas (ISO 3382-3)."
 references:
   - type: book
     authors: ["Kuttruff, H."]
@@ -58,13 +58,6 @@ references:
     designation: "ISO 18233:2006"
     url: "https://www.iso.org/standard/40408.html"
     note: "La adquisición por barrido sinusoidal y MLS del §1."
-  - type: standard
-    organization: "International Organization for Standardization"
-    year: 2003
-    title: "Acoustics — Measurement of sound absorption in a reverberation room"
-    designation: "ISO 354:2003"
-    url: "https://www.iso.org/standard/34545.html"
-    note: "La medición de absorción en cámara reverberante del §4."
 ---
 
 import Video from '../../../../components/Video.astro';
@@ -76,10 +69,14 @@ La acústica de salas parte de una única medición: la **respuesta al impulso**
 tiempo de reverberación, la claridad y la inteligibilidad del habla: todo
 sobre el campo sonoro dentro de un único recinto. Esta página sigue esa cadena
 en orden de medición: adquirir la RI (ISO 18233), convertirla en parámetros de
-sala (ISO 3382-1/2), métricas espaciales del habla para oficinas diáfanas
-(ISO 3382-3) y, cerrando el ciclo, la absorción acústica de un material en una
-cámara reverberante (ISO 354). Para el aislamiento acústico *entre* recintos (la
-misma RI medida a ambos lados de un cerramiento) consulta la guía complementaria
+sala (ISO 3382-1/2) y métricas espaciales del habla para oficinas diáfanas
+(ISO 3382-3). Dos mediciones de decaimiento separadas en una cámara
+reverberante, una con la sala vacía y otra con la probeta instalada, dan la
+absorción acústica de un material; ese método
+(ISO 354) vive en
+[Medida y clasificación de la absorción sonora](/phonometry/es/guides/absorption-measurement/).
+Para el aislamiento acústico *entre* recintos (la misma RI medida a ambos
+lados de un cerramiento) consulta la guía complementaria
 [Medición del aislamiento en campo e índices](/phonometry/es/guides/insulation-field/).
 
 ## 1. Adquisición de la respuesta al impulso (ISO 18233)
@@ -604,7 +601,7 @@ resultado de banda ancha no tiene octavas de 500 Hz / 1000 Hz que promediar, de
 modo que su recuadro y su veredicto recurren al $T_{30}$ de banda ancha sin
 afirmación de "500-1000 Hz". Usa el mismo contenedor `ReportMetadata` y el mismo motor de
 renderizado que la
-[ficha de absorción ISO 11654](/phonometry/es/guides/materials/#informe-de-iso-11654-report);
+[ficha de absorción ISO 11654](/phonometry/es/guides/absorption-measurement/#informe-de-iso-11654-report);
 los campos específicos de sala `room_volume`, `source_positions` y
 `receiver_positions` rellenan la cabecera (la ISO 3382 exige indicar el volumen
 de la sala y el número de posiciones de fuente y de micrófono), junto con
@@ -861,66 +858,6 @@ el repositorio; haz clic en la vista previa para abrir el PDF.
 	caption="Ficha de acústica de oficinas diáfanas (OpenPlanResult.report): D2,S, Lp,A,S,4m, rD, rP y la curva de decaimiento espacial."
 />
 
-## 4. Absorción acústica (ISO 354)
-
-El área de absorción acústica equivalente `A` que gobierna `R'`, `L'n`, la
-corrección ambiental `K2` de ISO 3744 y el término de absorción de ISO 3741 se
-mide a su vez en una cámara reverberante
-(ISO 354). Mide el tiempo de reverberación de la cámara **vacía** ($T_1$) y de
-nuevo **con la muestra de ensayo instalada** ($T_2$); la absorción de la muestra
-es la diferencia de las dos áreas de Sabine, y dividiendo por el área cubierta
-se obtiene el coeficiente de absorción:
-
-$$
-A = \frac{55{,}3\ V}{c\ T} - 4 V m, \qquad
-\alpha_s = \frac{A_2 - A_1}{S}, \qquad c = 331 + 0{,}6\ t ,
-$$
-
-con $c$ a partir de la temperatura del aire de la cámara $t$ en °C (válida
-15–30 °C) y $m$ el coeficiente de atenuación en potencia del aire (por defecto
-0; convierte un $\alpha$ de ISO 9613-1 en dB/m con `attenuation_from_alpha`).
-Como los efectos de borde y difracción pueden dispersar más energía de la que
-intercepta el área plana de la muestra, $\alpha_s$ puede superar 1,0 y nunca se
-satura (ISO 354 Cláusula 3.7).
-
-```python
-import numpy as np
-from phonometry import materials
-
-# Tiempos de reverberación en tercios de octava de una sala de 200 m^3, vacía (T1)
-# y con una muestra absorbente de 10.8 m^2 instalada (T2).
-t1 = np.array([5.0, 4.0, 3.0])
-t2 = np.array([3.0, 2.5, 2.0])
-
-a_empty = materials.absorption_area(t1, volume=200.0, temperature=20.0)
-print(np.round(a_empty, 2))                    # [ 6.45  8.06 10.75] m^2
-
-alpha = materials.absorption_coefficient(t1, t2, volume=200.0, sample_area=10.8,
-                               temperature1=20.0)
-print(np.round(alpha, 3))                      # [0.398 0.448 0.498]
-```
-
-`T1` y `T2` son exactamente los tiempos de reverberación que devuelve
-`room_parameters`, así que una medición de decaimiento ISO 3382-2 de la sala
-vacía y tratada fluye directamente a `absorption_coefficient`. Un volumen de
-sala por debajo del mínimo de 150 m³ o un área de muestra fuera de 10–12 m²
-genera un `AbsorptionWarning` de aviso; el resultado se devuelve igualmente.
-
-### Parámetros de `absorption_area()` / `absorption_coefficient()`
-
-| Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
-| :--- | :--- | :--- | :--- | :--- |
-| `t60` / `t1`, `t2` | array 1D | s | > 0 | Tiempo(s) de reverberación; `t1` vacía, `t2` con la muestra |
-| `volume` | float | m³ | > 0 | Volumen de la sala `V` (aviso por debajo de 150 m³) |
-| `sample_area` | float | m² | > 0 | Área `S` que cubre la muestra (solo coeficiente) |
-| `temperature` / `temperature1`, `temperature2` | float | °C | por defecto `20.0`, 15–30 | Fija `c` vía Ec. (6); `temperature2` por defecto es `temperature1` |
-| `speed_of_sound` (`…1`, `…2`) | float, opcional | m/s | > 0 | Sobrescribe la `c` derivada de la temperatura |
-| `m` (`m1`, `m2`) | float o array 1D | 1/m | ≥ 0, por defecto `0` | Coeficiente de atenuación en potencia del aire |
-
-`absorption_area()` devuelve el área de absorción acústica equivalente `A` (m²)
-con la forma de `t60`; `absorption_coefficient()` devuelve `alpha_s`;
-`attenuation_from_alpha(alpha)` convierte un `alpha` de ISO 9613-1 (dB/m) a `m`.
-
 ## Qué cubre esta guía
 
 **Cubierto.** Los anexos A y B de la ISO 18233:2006, la adquisición de la
@@ -934,10 +871,7 @@ criterio de rango dinámico del apartado 5.3.3), calculados por
 `room.room_parameters`/`room.decay_curve`: EDT, T20, T30, C50, C80, D50, Ts
 y las marcas de validez y curvatura por banda; las magnitudes de oficina
 diáfana del apartado 4 y los apartados 6.2/6.3 de la ISO 3382-3:2012
-($D_{2,S}$, $L_{p,A,S,4m}$, $r_D$, $r_P$) de `room.open_plan_metrics`; y la
-absorción en cámara reverberante de los apartados 4 y 8.1 de la
-ISO 354:2003 mediante `materials.absorption_area` y
-`materials.absorption_coefficient`.
+($D_{2,S}$, $L_{p,A,S,4m}$, $r_D$, $r_P$) de `room.open_plan_metrics`.
 
 **No cubierto.** El anexo A de la ISO 3382-1 también define la fuerza
 acústica $G$ y los parámetros binaurales LF/LFC e IACC; phonometry
@@ -946,14 +880,16 @@ T20, T30, C50, C80, D50, Ts). La STI por posición de la ISO 3382-3 se toma
 como entrada de `open_plan_metrics` en lugar de calcularse dentro de la
 función: mídela con las herramientas STIPA de la
 [guía del Índice de Transmisión de la Palabra](/phonometry/es/guides/speech-transmission/).
-Los requisitos de calificación de la sala de la ISO 354 (anexo A: número de
-posiciones de altavoz y micrófono, elementos difusores) no se comprueban;
-`absorption_area`/`absorption_coefficient` solo convierten un par
-$T_1$/$T_2$ ya medido y emiten un aviso cuando el volumen de la sala o el
-área de la muestra caen fuera de los límites del apartado 6.
+La absorción en cámara reverberante de ISO 354 que consume el par
+$T_1$/$T_2$ medido se ha trasladado a su propia guía,
+[Medida y clasificación de la absorción sonora](/phonometry/es/guides/absorption-measurement/).
 
 ## Véase también
 
+- [Medida y clasificación de la absorción sonora](/phonometry/es/guides/absorption-measurement/):
+  la medición de absorción en cámara reverberante de ISO 354 que consume los
+  tiempos de reverberación que devuelve `room_parameters`, y su valoración
+  ISO 11654.
 - Aislamiento acústico [en campo](/phonometry/es/guides/insulation-field/),
   [en laboratorio](/phonometry/es/guides/insulation-lab/) y
   [de predicción](/phonometry/es/guides/insulation-prediction/):
@@ -974,7 +910,7 @@ $T_1$/$T_2$ ya medido y emiten un aviso cuando el volumen de la sala o el
 - [Teoría](/phonometry/es/reference/theory/rooms-buildings/): la integración de Schroeder, las ventanas de
   regresión y la derivación de la curva de referencia.
 - [Informe de conformidad](https://github.com/jmrplens/phonometry/blob/main/docs/CONFORMANCE.md): los decaimientos en forma cerrada y las
-  definiciones de parámetros frente a los que se validan las implementaciones de ISO 18233 / ISO 3382 / ISO 354.
+  definiciones de parámetros frente a los que se validan las implementaciones de ISO 18233 / ISO 3382.
 - Referencia de la API: [`room.room_acoustics`](/phonometry/es/reference/api/rooms/room-acoustics/), [`room.room_ir`](/phonometry/es/reference/api/rooms/room-ir/) y [`room.open_plan`](/phonometry/es/reference/api/rooms/open-plan/).
 
 ## Respuestas rápidas

@@ -28,8 +28,9 @@ pascals yields `Pa²/Hz`. Two scalings are available: `'density'` (units²/Hz,
 integrates to the signal power) and `'spectrum'` (units², reads the power of
 discrete tones directly).
 
-The estimator is a fixed pipeline: the window sets the resolution bandwidth
-and the overlap the effective averages, and once those are fixed every
+The estimator is a fixed pipeline: the window sets the resolution bandwidth,
+and the effective averages follow from the record length (the raw segment
+count) together with the window and overlap. Once those are fixed every
 quality figure follows from the main design choice, the segment length. The
 diagram traces it with the numbers of this page's example.
 

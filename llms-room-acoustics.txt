@@ -14,10 +14,13 @@ between a source and a receiver. Filter it into bands and integrate it, and
 it yields reverberation time, clarity and speech intelligibility: everything
 about the sound field inside a single room. This page follows that chain in
 measurement order: acquiring the IR (ISO 18233), turning it into room
-parameters (ISO 3382-1/2), spatial speech metrics for open-plan offices
-(ISO 3382-3) and, closing the loop, the sound absorption of a material in a
-reverberation room (ISO 354). For sound insulation *between* spaces (the same
-IR measured either side of a partition) see the companion
+parameters (ISO 3382-1/2) and spatial speech metrics for open-plan offices
+(ISO 3382-3). Two separate decay measurements in a reverberation room, one
+with the room empty and one with the specimen installed, yield a material's
+sound absorption; that method (ISO 354)
+lives in [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/guides/absorption-measurement/).
+For sound insulation *between* spaces (the same IR measured either side of a
+partition) see the companion
 [Field Insulation Measurement and Ratings guide](https://jmrplens.github.io/phonometry/guides/insulation-field/).
 
 ## 1. Impulse-response acquisition (ISO 18233)
@@ -499,7 +502,7 @@ metadata's `requirement` field (`ReportMetadata(requirement=...)`, read as the
 maximum acceptable $T_\text{mid}$); a broadband result has no 500 Hz / 1000 Hz
 octaves to average, so its box and verdict fall back to the plain broadband
 $T_{30}$ with no "500-1000 Hz" claim. It uses the same
-`ReportMetadata` container as the [ISO 11654 absorption fiche](https://jmrplens.github.io/phonometry/guides/materials/#iso-11654-report-report);
+`ReportMetadata` container as the [ISO 11654 absorption fiche](https://jmrplens.github.io/phonometry/guides/absorption-measurement/#iso-11654-report-report);
 the room-specific fields `room_volume`, `source_positions` and
 `receiver_positions` populate the header (ISO 3382 requires the room volume and
 the number of source and microphone positions to be reported), alongside
@@ -636,6 +639,35 @@ plt.show()
 
 </details>
 
+The line itself is worth a to-scale plan. `plot_open_plan_geometry` draws the
+source, the microphone line across the workstations and the two distances on
+the axis, and a result that retained its positions redraws its own line with
+`m.plot_geometry()`.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_line_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_line_geometry.svg" alt="To-scale plan of the open-plan measurement line: the red source star at the origin, six blue microphone dots from 2 m to 16 m on a dotted line through the grey workstation blocks, the dashed distraction distance rD = 6.5 m and privacy distance rP = 13 m marked across the line and the 16 m span dimensioned" width="86%"></picture>
+
+*Every ISO 3382-3 quantity comes off this one line: six microphones from 2 m
+to 16 m through the workstations, with `rD` and `rP` landing between them.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import room
+
+# The 2-16 m line of the example, with the distraction and privacy
+# distances marked on the axis.
+room.plot_open_plan_geometry([2.0, 4.0, 6.0, 8.0, 12.0, 16.0],
+                             rd=6.5, rp=13.0)
+plt.show()
+
+# A result retains its positions, so m.plot_geometry() draws its own
+# line with the regressed rD and rP.
+```
+
+</details>
+
 ### `open_plan_metrics()` parameters
 
 | Parameter | Type | Units | Range / default | Notes |
@@ -710,67 +742,12 @@ repository. Click the preview to open the PDF:
 
 *Open-plan office acoustics fiche (`OpenPlanResult.report`), $D_{2,S}$, $L_{p,A,S,4m}$, $r_D$, $r_P$ and the spatial-decay curve.*
 
-## 4. Sound absorption (ISO 354)
-
-The equivalent absorption area `A` that drives `R'`, `L'n`, the ISO 3744 `K2`
-environmental correction and the ISO 3741 absorption term is itself measured in
-a reverberation room (ISO 354).
-Measure the room's reverberation time **empty** ($T_1$) and again **with the
-test specimen installed** ($T_2$); the specimen's absorption is the difference
-of the two Sabine areas, and dividing by the covered area gives the absorption
-coefficient:
-
-$$
-A = \frac{55.3\ V}{c\ T} - 4 V m, \qquad
-\alpha_s = \frac{A_2 - A_1}{S}, \qquad c = 331 + 0.6\ t ,
-$$
-
-with $c$ from the room air temperature $t$ in °C (valid 15–30 °C) and $m$ the
-power attenuation coefficient of air (default 0; convert an ISO 9613-1
-$\alpha$ in dB/m with `attenuation_from_alpha`). Because edge and diffraction
-effects can scatter more energy than the sample's flat area intercepts,
-$\alpha_s$ may exceed 1.0 and is never clamped (ISO 354 Clause 3.7).
-
-```python
-import numpy as np
-from phonometry import materials
-
-# Third-octave reverberation times of a 200 m^3 room, empty (T1) and with a
-# 10.8 m^2 absorber sample installed (T2).
-t1 = np.array([5.0, 4.0, 3.0])
-t2 = np.array([3.0, 2.5, 2.0])
-
-a_empty = materials.absorption_area(t1, volume=200.0, temperature=20.0)
-print(np.round(a_empty, 2))                    # [ 6.45  8.06 10.75] m^2
-
-alpha = materials.absorption_coefficient(t1, t2, volume=200.0, sample_area=10.8,
-                               temperature1=20.0)
-print(np.round(alpha, 3))                      # [0.398 0.448 0.498]
-```
-
-`T1` and `T2` are exactly the reverberation times `room_parameters` returns, so
-an ISO 3382-2 decay measurement of the empty and treated room flows straight
-into `absorption_coefficient`. A room volume below the 150 m³ minimum or a
-sample area outside 10–12 m² raises an advisory `AbsorptionWarning`; the result
-still returns.
-
-### `absorption_area()` / `absorption_coefficient()` parameters
-
-| Parameter | Type | Units | Range / default | Notes |
-| :--- | :--- | :--- | :--- | :--- |
-| `t60` / `t1`, `t2` | 1D array | s | > 0 | Reverberation time(s); `t1` empty, `t2` with specimen |
-| `volume` | float | m³ | > 0 | Room volume `V` (advisory below 150 m³) |
-| `sample_area` | float | m² | > 0 | Area `S` the specimen covers (coefficient only) |
-| `temperature` / `temperature1`, `temperature2` | float | °C | default `20.0`, 15–30 | Sets `c` via Eq. (6); `temperature2` defaults to `temperature1` |
-| `speed_of_sound` (`…1`, `…2`) | float, optional | m/s | > 0 | Overrides the temperature-derived `c` |
-| `m` (`m1`, `m2`) | float or 1D array | 1/m | ≥ 0, default `0` | Air power attenuation coefficient |
-
-`absorption_area()` returns the equivalent absorption area `A` (m²) with the
-shape of `t60`; `absorption_coefficient()` returns `alpha_s`;
-`attenuation_from_alpha(alpha)` converts an ISO 9613-1 `alpha` (dB/m) to `m`.
-
 ## See also
 
+- [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/guides/absorption-measurement/): the
+  ISO 354 reverberation-room absorption measurement (`absorption_area`,
+  `absorption_coefficient`, `measure_sound_absorption`) that consumes the
+  reverberation times `room_parameters` returns, and its ISO 11654 rating.
 - [Field](https://jmrplens.github.io/phonometry/guides/insulation-field/), [laboratory](https://jmrplens.github.io/phonometry/guides/insulation-lab/) and
   [predicted](https://jmrplens.github.io/phonometry/guides/insulation-prediction/) sound insulation: field,
   laboratory and predicted sound insulation between spaces, and its measurement uncertainty.
@@ -842,19 +819,14 @@ Both are ISO 18233 deconvolution methods that recover the impulse response with 
   (ISO 18233:2006).
   [iso.org catalogue](https://www.iso.org/standard/40408.html).
   The swept-sine and MLS acquisition of §1.
-- International Organization for Standardization. (2003). *Acoustics —
-  Measurement of sound absorption in a reverberation room* (ISO 354:2003).
-  [iso.org catalogue](https://www.iso.org/standard/34545.html).
-  The reverberation-room absorption measurement of §4.
 
 ## Standards
 
 ISO 18233:2006 (application of new measurement methods: the
 swept-sine and MLS acquisition of impulse responses); ISO 3382-1:2009 and
 ISO 3382-2:2008 (reverberation time and room parameters from the Schroeder
-decay); ISO 3382-3:2012 (open-plan office speech metrics); ISO 354:2003
-(sound absorption in a reverberation room). Validated against closed-form
-decays and the standards' own parameter definitions in the
+decay); ISO 3382-3:2012 (open-plan office speech metrics). Validated
+against closed-form decays and the standards' own parameter definitions in the
 [conformance report](https://jmrplens.github.io/phonometry/reference/conformance/).
 
 ---
@@ -1043,6 +1015,12 @@ plt.show()
 ```
 
 </details>
+
+Sabine and Eyring are the two workhorses, and the per-band spread between
+them is itself a diagnostic. The diagram runs the room of this section
+through both, with the validity boundary every statistical formula shares.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_reverberation_prediction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_reverberation_prediction.svg" alt="Block diagram of the reverberation-time prediction: a 10 by 7 by 3.5 metre room with 245 cubic metres, 259 square metres and a mean absorption rising from 0.21 at 125 hertz to 0.51 at 4 kilohertz feeds the Sabine and Eyring formulas, whose per-octave-band table runs from 0.74 to 0.30 seconds for Sabine and 0.66 to 0.22 seconds for Eyring, Eyring reading 11 to 29 percent shorter; a closing note bounds the domain of validity to a diffuse field, excluding bands below the Schroeder frequency, coupled volumes and corridor-like rooms" width="92%"></picture>
 
 ## 4. Choosing a model, and when every model fails
 
@@ -1340,13 +1318,15 @@ time, the volume and the object fraction, and its `.plot()` draws the
 reverberation-time spectrum. This is the prediction counterpart of the measured
 reverberation time in [Room Acoustics](https://jmrplens.github.io/phonometry/guides/sections/room-acoustics/)
 (ISO 3382) and of the reverberation-room absorption of
-[Acoustic Materials](https://jmrplens.github.io/phonometry/guides/materials/) (ISO 354).
+[Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/guides/absorption-measurement/)
+(ISO 354).
 
 ## 3. Where the input data comes from
 
 **Surface coefficients.** The standard expects the $\alpha_{s,i}$ to come
-from laboratory measurements to EN ISO 354, the reverberation-room method
-of [Acoustic Materials](https://jmrplens.github.io/phonometry/guides/materials/); theoretical, empirical or field
+from laboratory measurements to EN ISO 354, the reverberation-room method of
+[Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/guides/absorption-measurement/);
+theoretical, empirical or field
 values are admitted as long as the data source is stated. ISO 354 delivers
 one-third-octave data, and an octave-band calculation takes the arithmetic
 mean of the three thirds as its input. A reverberation-room coefficient can
@@ -2116,6 +2096,14 @@ shoebox has exactly `(2/3)(2 i₀³ + 3 i₀² + 4 i₀)` audible images up to o
 density of reflections grows as `dN/dt = 4 π c³ t² / V` (Kuttruff Equation
 (4.6)).
 
+The construction in one plan: every wall reflection is the straight-line sound
+of an image in a mirror room, so the geometry alone fixes each arrival. In the
+7 × 5 m room below the direct sound lands at 10.7 ms and the four first-order
+lateral images in plan follow between 17.3 and 21.6 ms; the ceiling and floor
+images of the 3-D room are omitted from the drawing.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_image_sources_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_image_sources.svg" alt="Plan of a 7 by 5 m room in the centre of its three by three grid of dashed mirror rooms: the source at (2, 1.6) and the receiver at (5.2, 3.4) joined by the 10.7 ms direct sound, filled first-order images in the four adjacent rooms labelled with their arrival times of 17.3, 20.5 and 21.6 ms, outlined second-order images in the corner rooms at 24.6 and 25.6 ms, and the first far-wall reflection drawn twice, as the real bent path off the wall and as the straight dashed line from the image to the receiver" width="92%"></picture>
+
 ```python
 import numpy as np
 from phonometry import room
@@ -2197,6 +2185,35 @@ ax.stem([t_ms[order == 0][0]], [0.0])         # direct sound
 fig.colorbar(sc, label="Reflection order")
 ax.set_xlabel("Arrival time [ms]"); ax.set_ylabel("Level re direct [dB]")
 ax.set_xlim(0, 120); ax.set_ylim(-60, 5)
+plt.show()
+```
+
+</details>
+
+Every dot of the reflectogram is a mirror image at a definite place, and
+`.plot_geometry()` shows where: the plan view below draws the room, the
+source, the receiver and every image up to third order on the mirror-room
+grid, coloured by reflection order.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/image_source_plan_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/image_source_plan.svg" alt="Plan view of the image-source lattice of a 7 by 5 metre room outlined in the centre, with the source as a red star at (2, 1.6), the receiver as a blue triangle at (5.2, 3.4), and the image sources at the plane of the source coloured by reflection order, first order orange, second order green and third order purple, spreading in a regular grid of mirror rooms out to about 26 metres" width="88%"></picture>
+
+*The lattice the reflectogram comes from, to scale: each image sits in a
+mirror room at the height plane of the source, and its distance to the
+receiver alone fixes the arrival time and the `1/(4 pi r)` spreading of that
+reflection.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import room
+
+res = room.image_source_rir((7.0, 5.0, 3.0), (2.0, 1.6, 1.5),
+                            (5.2, 3.4, 1.7), 0.3, fs=16000, max_order=3)
+
+# One line: the image lattice in plan, coloured by reflection order.
+res.plot_geometry()
 plt.show()
 ```
 

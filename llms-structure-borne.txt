@@ -663,6 +663,35 @@ reference `Z_{c,0} = 400 N·s/m³` give the fixed `10 lg(411/400) = 0.118 dB`
 term. This module feeds the structure-borne source and building prediction
 standards (ISO 9611, EN 15657, EN 12354-5).
 
+Before any levels, the radiator itself. The `radiation_efficiency` plate model
+that supplies a predicted radiation factor retains its geometry, and
+`sigma.plot_geometry()` draws the plate in its baffle to scale, here 1.5 m by
+1.25 m and simply supported.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/radiation_plate_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/radiation_plate_geometry.svg" alt="To-scale front view of the plate of the radiation model: a grey 1.5 m by 1.25 m simply supported plate inside its hatched rigid baffle, both side lengths dimensioned and the boundary condition named in the title" width="82%"></picture>
+
+*The radiator behind the radiation factor, to scale: the 1.5 m by 1.25 m
+simply supported plate in its rigid baffle, whose area `S` enters `L_W`
+directly while its size decides how far `ε` falls below one under
+coincidence.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import vibration
+
+# The simply supported 1.5 x 1.25 m plate of the radiation model.
+f = np.geomspace(50.0, 5000.0, 200)
+sigma = vibration.radiation_efficiency(f, 1.5, 1.25, 2100.0)
+sigma.plot_geometry()
+plt.show()
+```
+
+</details>
+
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_sound_power_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_sound_power.svg" alt="Radiated sound power level per octave band of a vibrating surface, comparing the ISO/TS 7849-1 upper limit with a fixed radiation factor of one against the ISO/TS 7849-2 engineering value with a measured radiation factor, with the band-summed totals marked" width="82%"></picture>
 
 <details>
@@ -747,6 +776,13 @@ Surface velocity levels from several positions are combined with the energetic
 mean `mean_velocity_level` (Formula 10) or its area-weighted form (Formula 11),
 and the correction `extraneous_velocity_correction` removes extraneous
 vibration per Table 2.
+
+Those positions are not free: the standard divides the radiating surface `S`
+into `N` equal cells and puts one accelerometer at the centre of each. The
+area table gives the initial `N`; a strongly non-uniform vibration field can
+call for more positions or a redistribution.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_vibration_sound_power_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_vibration_sound_power.svg" alt="ISO/TS 7849 surface-velocity method: a machine under test with its vibrating measurement surface of 2.5 by 1.6 metres divided into twenty equal cells, an accelerometer at each cell centre, the radiated airborne sound leaving the surface, the table for the initial number of measurement positions and the survey relation LWA = LvA + 10 lg(S/S0) + 10 lg epsilon" width="92%"></picture>
 
 ## 3. When the radiation-factor assumption breaks
 
@@ -1384,6 +1420,32 @@ what makes them convenient closed-form inputs for statistical energy analysis
 (SEA) and for the EN 12354 flanking-transmission model, where they feed the
 coupling loss factor `ηij` and the vibration reduction index `Kij`.
 
+The object itself first: a T-junction where a 140 mm concrete floor runs into
+a continuous 200 mm wall. A `junction_transmission` result retains its plates,
+so `res.plot_geometry()` draws the junction to scale with the incident bending
+wave marked.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/junction_plate_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/junction_plate_geometry.svg" alt="To-scale cross-section of a T2 plate junction: a 140 mm concrete floor arrives horizontally from the left with the incident-sound arrow on it and ends against the continuous 200 mm wall drawn vertically, both plate thicknesses dimensioned" width="82%"></picture>
+
+*Drawn to scale: the incident bending wave arrives along the 140 mm floor, and
+everything the closed-form coefficients describe happens where it meets the
+continuous 200 mm wall.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import junction_transmission
+
+# A 140 mm concrete floor meeting a 200 mm wall at a T-junction.
+res = junction_transmission("T2", 0.14, 3500.0, 320.0, 0.2, 3500.0, 460.0)
+res.plot_geometry()
+plt.show()
+```
+
+</details>
+
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/junction_transmission_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/junction_transmission.svg" alt="Transmission coefficient versus incidence angle for a rigid X-junction of a 100 mm and a 200 mm concrete plate, showing the corner coefficient tau12 and the straight-section coefficient tau13 falling from their normal-incidence values to zero at grazing incidence, with their diffuse-field angular averages marked as horizontal lines" width="82%"></picture>
 
 <details>
@@ -1529,6 +1591,13 @@ kij = res.corner_reduction_index  # the same, precomputed on the result
 
 res.plot()   # tau(theta) for this junction's corner and straight paths (needs matplotlib)
 ```
+
+`Kij` is also what ISO 10848 measures on a built junction: excite one
+element, read the velocity level difference on both, and normalize by the
+junction length, so the closed-form value above has a direct experimental
+counterpart.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_junction_rig_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_junction_rig.svg" alt="ISO 10848 junction measurement rigs for an L-junction and a T-junction of 140 to 200 mm concrete plates: a shaker or hammer excites element i, accelerometers on elements i and j read the velocity level difference Dv,ij, and the junction length of at least 2.3 m runs along the highlighted corner line" width="92%"></picture>
 
 The junction descriptor is a *design* quantity: sweeping the receiving
 plate's thickness shows how much a mass change at the junction buys. The

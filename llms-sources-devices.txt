@@ -36,6 +36,35 @@ $$
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe.svg" alt="Two-microphone p-p intensity probe with the spacer distance and the measurement axis" width="92%"></picture>
 
+The probe itself is small enough to draw at true scale.
+`plot_pp_probe_geometry` puts the classic 12 mm solid spacer between the two
+face-to-face capsules, and a computed `IntensityResult` that retained its
+`spacing` redraws its own probe with `res.plot_geometry()`.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/pp_probe_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/pp_probe_geometry.svg" alt="To-scale side view of the face-to-face p-p intensity probe: two blue half-inch microphone capsules on their grey cylindrical bodies facing each other across the light 12 mm solid spacer, the spacing dimensioned below and the intensity axis Ir drawn as a blue arrow to the right" width="92%"></picture>
+
+*The finite difference at true scale: two half-inch capsules face to face
+across 12 mm of solid spacer, and that `Δr` is both the sensitivity of the
+gradient estimate and the origin of the high-frequency error.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import emission
+
+# The classic 12 mm solid spacer between two half-inch microphones.
+emission.plot_pp_probe_geometry()
+plt.show()
+
+# A computed IntensityResult retains its spacing:
+#   res = emission.sound_intensity(p1, p2, fs, spacing=0.012)
+#   res.plot_geometry()
+```
+
+</details>
+
 ```python
 import numpy as np
 from phonometry import emission
@@ -762,6 +791,36 @@ plt.show()
 
 </details>
 
+Behind both curves sits the same physical object, and `.plot_geometry()` on
+the piston result draws it: the plate in its rigid baffle to scale, with the
+far-field lobe of the highest computed frequency overlaid on the radiation
+side.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_baffle_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_baffle_geometry.svg" alt="A 10 cm radius rigid piston drawn to scale as a plate of 200 mm diameter set into a hatched vertical baffle, with the piston diameter dimensioned and the normalised far-field directivity lobe at ka of 7.3 overlaid on the radiation side: a long forward main lobe hugging the dotted axis with small side lobes folding back near the plate" width="82%"></picture>
+
+*The piston the impedance and directivity curves describe, to scale: at
+4 kHz this 10 cm radius plate has `ka ≈ 7.3`, so the overlaid lobe is
+already several times narrower than the low-frequency hemisphere and the
+first side lobes have appeared.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import radiating_piston
+
+res = radiating_piston(0.1, np.array([500.0, 2000.0, 4000.0]),
+                       angles=np.linspace(-np.pi / 2, np.pi / 2, 181))
+
+# One line: the piston in its baffle with the lobe of the highest frequency.
+res.plot_geometry()
+plt.show()
+```
+
+</details>
+
 ## 7. Loudspeaker characteristics report (IEC 60268-5)
 
 The rated characteristics IEC 60268-5 defines around a measured on-axis
@@ -1206,6 +1265,12 @@ $$
 \frac{\sqrt{\sum_{n\ge 2} |H_n(nf)|^2}}{|H_1(f)|} .
 $$
 
+The chain is exactly the sketch below: play the sweep, record, convolve with
+the inverse filter, and the harmonics land ahead of the linear response by
+their fixed advances.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_swept_sine_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_swept_sine.svg" alt="Swept-sine distortion measurement chain: an exponential sweep from 20 Hz to 6 kHz in T equal to 4 s drives the weakly nonlinear device under test, the recording is deconvolved with the time-reversed inverse filter with its plus 6 dB per octave tilt, and on the resulting time axis the linear impulse response h1 sits at t equal to zero while the second, third and fourth harmonic responses appear as smaller pre-arrivals in their own dashed windows, advanced by L times ln n, 0.49 s for h2 and 0.77 s for h3 with L equal to 0.70 s" width="92%"></picture>
+
 ```python
 import numpy as np
 from phonometry import swept_sine_distortion, synchronized_sweep_signal
@@ -1469,6 +1534,12 @@ EBU Tech 3341 and Tech 3342 add the *EBU Mode* meter (momentary, short-term
 and integrated loudness) and the *loudness range* (LRA). phonometry
 implements the full chain in the `broadcast` namespace and validates every
 synthesizable EBU test signal against its official tolerance.
+
+The whole Recommendation is one metering chain, and each section below
+details one of its blocks. The diagram lays it out first, with the numbers
+of the examples on this page.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_program_loudness_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_program_loudness.svg" alt="Block diagram of the BS.1770 and EBU R 128 programme-loudness chain: the channel-weighted programme, anchored so a full-scale 997 hertz sine on one front channel reads minus 3.01 LKFS, passes the K-weighting of a plus 4 decibel spherical-head shelf and the RLB high-pass, is measured in 400 millisecond mean-square blocks at 75 percent overlap, gated absolutely at minus 70 LUFS and relatively 10 loudness units below the survivors, minus 39.0 LUFS in the example of 10 seconds of programme plus 30 seconds of quiet, and yields an integrated loudness of minus 23.1 LUFS against the minus 23.0 target; side branches show the loudness range of 10.0 loudness units on the Tech 3342 two-step case and the true peak of plus 0.12 dBTP where the sample peak reads minus 3.01 decibels, under the minus 1 dBTP production ceiling" width="92%"></picture>
 
 ## 1. K-weighting and the loudness measure (Annex 1)
 

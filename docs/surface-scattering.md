@@ -489,7 +489,7 @@ so a panel a few centimetres thick reaches the reflection phases that a
 classical phase grating needs tens of centimetres of depth for, and driving
 a slit to critical coupling adds a perfectly absorbing state, the `0` that
 ternary sequences require. `metadiffuser_reflection` runs the slit
-transfer-matrix chain of the [slow-sound absorber](materials.md) once per
+transfer-matrix chain of the [slow-sound absorber](porous-absorbers.md) once per
 well (two-dimensional resonators, visco-thermal losses and end corrections
 included) and returns the per-well complex reflection $R_n(f)$;
 `metadiffuser_polar_response` and `metadiffuser_diffusion_spectrum` reduce
@@ -501,7 +501,9 @@ coefficient used for the classical designs above.
 The published quadratic-residue design packs the whole diffuser into a
 35 cm x 2 cm panel. Its first slit reaches critical coupling (the reflection
 zero the ternary `0` state is built from), and at the 2 kHz evaluation
-frequency the panel scatters like the 27.4 cm deep QRD it mimics:
+frequency the panel scatters like the 27.4 cm deep QRD it mimics. As in the
+published far-field comparison, the polar response repeats the five-well
+sequence six times (`periods=6`, a 2.1 m panel):
 
 ```python
 import numpy as np
@@ -536,6 +538,7 @@ panel = metadiffuser_reflection(f, wells, depth=0.02, period=0.07)
 alpha1 = panel.well_absorption[0]
 print(round(float(alpha1.max()), 2), int(f[alpha1.argmax()]))  # 0.99 2305
 
+# Far-field comparison: the five-well sequence repeated six times (2.1 m).
 polar = metadiffuser_polar_response(2000.0, wells, depth=0.02,
                                     period=0.07, periods=6)
 print(round(polar.coefficient, 2))                             # 0.32
@@ -572,7 +575,7 @@ wells = [
 ]
 
 # The metadiffuser panel and the QRD it was tuned to at 2 kHz, both with
-# six repetitions of the period.
+# six repetitions of the period (2.1 m panels).
 meta = metadiffuser_polar_response(2000.0, wells, depth=0.02, period=0.07,
                                    periods=6)
 sequence = np.roll(materials.quadratic_residue_sequence(5), -1)
@@ -833,7 +836,7 @@ For smaller patches, ISO 13472-2 seals a short circular tube onto the surface an
 measures the absorption with the two-microphone transfer-function method of
 ISO 10534-2. The library provides the spot-method geometry and validity helpers;
 the transfer-function DSP itself is the impedance-tube routine
-`two_microphone_impedance` (see [Acoustic Materials](materials.md)).
+`two_microphone_impedance` (see [Impedance Tube](impedance-tube.md)).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spot_tube_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spot_tube.svg" alt="ISO 13472-2 spot method: a short circular tube sealed onto the road surface with a loudspeaker at the top and two microphones flush in the tube wall at spacing s, measuring absorption over 250 to 1600 Hz via the ISO 10534-2 two-microphone transfer-function method" width="92%"></picture>
 

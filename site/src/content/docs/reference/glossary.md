@@ -521,8 +521,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Materials",
-              "url": "https://jmrplens.github.io/phonometry/guides/materials/"
+              "name": "Absorption measurement",
+              "url": "https://jmrplens.github.io/phonometry/guides/absorption-measurement/"
             }
           },
           {
@@ -971,8 +971,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Materials",
-              "url": "https://jmrplens.github.io/phonometry/guides/materials/"
+              "name": "Impedance tube",
+              "url": "https://jmrplens.github.io/phonometry/guides/impedance-tube/"
             }
           },
           {
@@ -986,8 +986,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Materials",
-              "url": "https://jmrplens.github.io/phonometry/guides/materials/"
+              "name": "Absorption measurement",
+              "url": "https://jmrplens.github.io/phonometry/guides/absorption-measurement/"
             }
           },
           {
@@ -1001,8 +1001,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Materials",
-              "url": "https://jmrplens.github.io/phonometry/guides/materials/"
+              "name": "Absorption measurement",
+              "url": "https://jmrplens.github.io/phonometry/guides/absorption-measurement/"
             }
           },
           {
@@ -1016,8 +1016,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Materials",
-              "url": "https://jmrplens.github.io/phonometry/guides/materials/"
+              "name": "Absorption measurement",
+              "url": "https://jmrplens.github.io/phonometry/guides/absorption-measurement/"
             }
           },
           {
@@ -1031,8 +1031,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Materials",
-              "url": "https://jmrplens.github.io/phonometry/guides/materials/"
+              "name": "Absorption measurement",
+              "url": "https://jmrplens.github.io/phonometry/guides/absorption-measurement/"
             }
           },
           {
@@ -1046,8 +1046,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Materials",
-              "url": "https://jmrplens.github.io/phonometry/guides/materials/"
+              "name": "Airflow resistance",
+              "url": "https://jmrplens.github.io/phonometry/guides/airflow-resistance/"
             }
           },
           {
@@ -1061,8 +1061,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Materials",
-              "url": "https://jmrplens.github.io/phonometry/guides/materials/"
+              "name": "Airflow resistance",
+              "url": "https://jmrplens.github.io/phonometry/guides/airflow-resistance/"
             }
           },
           {
@@ -1076,8 +1076,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Materials",
-              "url": "https://jmrplens.github.io/phonometry/guides/materials/"
+              "name": "Airflow resistance",
+              "url": "https://jmrplens.github.io/phonometry/guides/airflow-resistance/"
             }
           },
           {
@@ -1091,8 +1091,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Materials",
-              "url": "https://jmrplens.github.io/phonometry/guides/materials/"
+              "name": "Impedance tube",
+              "url": "https://jmrplens.github.io/phonometry/guides/impedance-tube/"
             }
           },
           {
@@ -1901,7 +1901,7 @@ check that pins each quantity to its standard's own expected value.
 | C80 | Clarity for music: the same ratio with the boundary at 80 ms. | dB | ISO 3382-1:2009 (just-noticeable difference in Table A.1) | [Room acoustics](/phonometry/guides/room-acoustics/) |
 | D50 | Definition, or Deutlichkeit: the fraction of the total energy arriving in the first 50 ms. | dimensionless | ISO 3382-1:2009 (just-noticeable difference in Table A.1) | [Room acoustics](/phonometry/guides/room-acoustics/) |
 | Ts | Centre time: the centre of gravity of the squared impulse response in time, a boundary-free alternative to the clarity indices. | s | ISO 3382-1:2009, Equation (A.13) | [Room acoustics](/phonometry/guides/room-acoustics/) |
-| A | Equivalent sound absorption area of a room: the area of a perfectly absorbing surface that would give the same reverberation time. | m² | ISO 354:2003, Equations (5) and (7) | [Materials](/phonometry/guides/materials/) |
+| A | Equivalent sound absorption area of a room: the area of a perfectly absorbing surface that would give the same reverberation time. | m² | ISO 354:2003, Equations (5) and (7) | [Absorption measurement](/phonometry/guides/absorption-measurement/) |
 | NC | Noise criteria rating of a background spectrum: the speech interference level selects the curve, and the tangency method rates the spectrum when a band exceeds it. | dB (index) | ANSI/ASA S12.2-2019, 5.2.2 and 5.2.3 (curves in Table 1) | [Room noise](/phonometry/guides/room-noise/) |
 | SIL | Speech interference level: the average of the 500, 1000, 2000 and 4000 Hz octave-band levels. | dB | ANSI/ASA S12.2-2019, clause 3.2 | [Room noise](/phonometry/guides/room-noise/) |
 | RC | Room criteria Mark II rating: the average of the 500, 1000 and 2000 Hz levels, with a rumble, hiss or neutral spectral tag. | dB (index) | ANSI/ASA S12.2-2019, Annex D (clauses D.3 and D.4) | [Room noise](/phonometry/guides/room-noise/) |
@@ -1946,15 +1946,15 @@ check that pins each quantity to its standard's own expected value.
 
 | Symbol | Quantity | Unit | Defined in | Guide |
 | --- | --- | --- | --- | --- |
-| α | Sound absorption coefficient at normal incidence: the fraction of incident energy not returned by the surface, obtained in the impedance tube from the reflection factor. | dimensionless | ISO 10534-2:1998, Equations (17) to (19) | [Materials](/phonometry/guides/materials/) |
-| αs | Random-incidence sound absorption coefficient measured in a reverberation room, from the change in equivalent absorption area with and without the specimen. | dimensionless | ISO 354:2003, Equations (8) and (9) | [Materials](/phonometry/guides/materials/) |
-| αp | Practical sound absorption coefficient: the one-third-octave data grouped into octave bands and rounded to steps of 0.05. | dimensionless | ISO 11654:1997, Clause 4.1 | [Materials](/phonometry/guides/materials/) |
-| αw | Weighted sound absorption coefficient: the fixed reference curve shifted toward the practical values and read at 500 Hz. | dimensionless | ISO 11654:1997, Clause 4.2 | [Materials](/phonometry/guides/materials/) |
-| Absorption class | The A to E letter class the weighted coefficient maps to, or "not classified". | class letter | ISO 11654:1997, Table B.1 | [Materials](/phonometry/guides/materials/) |
-| R | Airflow resistance: the pressure difference across a specimen divided by the volumetric airflow rate through it. | Pa·s/m³ | ISO 9053-1:2018, Clause 3 | [Materials](/phonometry/guides/materials/) |
-| Rs | Specific airflow resistance: the airflow resistance referred to the specimen face area. | Pa·s/m | ISO 9053-1:2018, Clause 3 | [Materials](/phonometry/guides/materials/) |
-| σ | Airflow resistivity: the specific airflow resistance per unit thickness, the primary input to every empirical porous model. | Pa·s/m² | ISO 9053-1:2018, Clause 3 | [Materials](/phonometry/guides/materials/) |
-| Z | Surface impedance: the complex ratio of sound pressure to particle velocity at the face of the sample, usually reported normalised by the characteristic impedance of air. | Pa·s/m | ISO 10534-2:1998, Equations (17) to (19) | [Materials](/phonometry/guides/materials/) |
+| α | Sound absorption coefficient at normal incidence: the fraction of incident energy not returned by the surface, obtained in the impedance tube from the reflection factor. | dimensionless | ISO 10534-2:1998, Equations (17) to (19) | [Impedance tube](/phonometry/guides/impedance-tube/) |
+| αs | Random-incidence sound absorption coefficient measured in a reverberation room, from the change in equivalent absorption area with and without the specimen. | dimensionless | ISO 354:2003, Equations (8) and (9) | [Absorption measurement](/phonometry/guides/absorption-measurement/) |
+| αp | Practical sound absorption coefficient: the one-third-octave data grouped into octave bands and rounded to steps of 0.05. | dimensionless | ISO 11654:1997, Clause 4.1 | [Absorption measurement](/phonometry/guides/absorption-measurement/) |
+| αw | Weighted sound absorption coefficient: the fixed reference curve shifted toward the practical values and read at 500 Hz. | dimensionless | ISO 11654:1997, Clause 4.2 | [Absorption measurement](/phonometry/guides/absorption-measurement/) |
+| Absorption class | The A to E letter class the weighted coefficient maps to, or "not classified". | class letter | ISO 11654:1997, Table B.1 | [Absorption measurement](/phonometry/guides/absorption-measurement/) |
+| R | Airflow resistance: the pressure difference across a specimen divided by the volumetric airflow rate through it. | Pa·s/m³ | ISO 9053-1:2018, Clause 3 | [Airflow resistance](/phonometry/guides/airflow-resistance/) |
+| Rs | Specific airflow resistance: the airflow resistance referred to the specimen face area. | Pa·s/m | ISO 9053-1:2018, Clause 3 | [Airflow resistance](/phonometry/guides/airflow-resistance/) |
+| σ | Airflow resistivity: the specific airflow resistance per unit thickness, the primary input to every empirical porous model. | Pa·s/m² | ISO 9053-1:2018, Clause 3 | [Airflow resistance](/phonometry/guides/airflow-resistance/) |
+| Z | Surface impedance: the complex ratio of sound pressure to particle velocity at the face of the sample, usually reported normalised by the characteristic impedance of air. | Pa·s/m | ISO 10534-2:1998, Equations (17) to (19) | [Impedance tube](/phonometry/guides/impedance-tube/) |
 | s | Scattering coefficient: the fraction of reflected energy that is not returned specularly, measured at random incidence on a turntable in a reverberation room. | dimensionless | ISO 17497-1:2004+A1:2014, Formula (5) | [Surface scattering](/phonometry/guides/surface-scattering/) |
 | d | Diffusion coefficient: the uniformity of the polar response of a surface, from the autocorrelation of the free-field goniometer measurement. | dimensionless | ISO 17497-2:2012, Formula (5) (normalised form in Formula (7)) | [Surface scattering](/phonometry/guides/surface-scattering/) |
 | s′ | Dynamic stiffness per unit area of a resilient layer: a dynamic force per unit area divided by the resulting change in thickness. | MN/m³ | EN 29052-1:1992 (ISO 9052-1:1989), Formula 1 | [Dynamic stiffness](/phonometry/guides/dynamic-stiffness/) |

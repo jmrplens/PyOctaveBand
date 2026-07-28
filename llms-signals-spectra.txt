@@ -35,6 +35,14 @@ pascals yields `Pa²/Hz`. Two scalings are available: `'density'` (units²/Hz,
 integrates to the signal power) and `'spectrum'` (units², reads the power of
 discrete tones directly).
 
+The estimator is a fixed pipeline: the window sets the resolution bandwidth,
+and the effective averages follow from the record length (the raw segment
+count) together with the window and overlap. Once those are fixed every
+quality figure follows from the main design choice, the segment length. The
+diagram traces it with the numbers of this page's example.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spectral_analysis_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spectral_analysis.svg" alt="Block diagram of the Welch PSD pipeline: a 20 second pink noise record at 48 kilohertz is split into 50 percent overlapped segments of 4096 samples giving 467 segments and an 11.7 hertz bin spacing, each segment is Hann tapered for a resolution bandwidth of 17.6 hertz, the one-sided squared FFT periodograms are averaged into 442 effective averages, and the result is Gxx of f with a chi-square confidence interval, a random error of 1 over the square root of n d equal to 4.8 percent and about 885 degrees of freedom; a final note states the trade-off that longer segments buy resolution but spend averages" width="92%"></picture>
+
 Averaging `nd` independent segments gives the estimate `2·nd` chi-square
 degrees of freedom (Eq. 8.162), from which everything else follows:
 
@@ -621,6 +629,12 @@ For a system with `q` inputs `x1..xq` and output `y`, `miso_coherence`
 estimates every auto- and cross-spectrum by Welch's method and reports three
 coherence functions.
 
+The conditioning story fits in one block diagram: two correlated inputs
+drive their own paths into one measured output, and the Welch cross-spectral
+matrix is what turns the tangle into per-source numbers.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_miso_coherence_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_miso_coherence.svg" alt="Block diagram of a two-input MISO system: input x1 is white noise and input x2 equals 0.7 times x1 plus independent noise, x1 drives a 400 hertz low-pass path and x2 a 1.5 kilohertz high-pass path, and both sum with additive noise into the output y; the output feeds the Welch cross-spectral matrix Gxx and Gxy at nperseg 2048, conditioned by Schur steps in descending ordinary coherence order, which yields on one side the multiple and partial coherences, where input 2 in the 100 to 300 hertz band drops from an ordinary coherence of 0.32 to a partial coherence of 0.00, and on the other the per-source contributions Gvi that with the residual noise reconstruct Gyy exactly; a footnote records that each conditioning step spends one of the 242 effective averages" width="92%"></picture>
+
 The **ordinary coherence** of input `i` with the output, on its own
 (Eq. 7.109), is the familiar single-input quantity
 `γ²iy = |Giy|²/(Gii·Gyy)`.
@@ -762,6 +776,12 @@ closer than a practical full-band FFT bin. Where the
 [levels page](https://jmrplens.github.io/phonometry/guides/levels/) offers the fractional-octave-band
 spectrogram of a sound level meter, this one is its fine-band,
 constant-bandwidth counterpart.
+
+One number rules everything on this page: the segment length, which carves
+the time-frequency plane into cells of fixed area. The diagram shows the
+same record tiled by a short and a long window.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_time_frequency_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_time_frequency.svg" alt="Two time-frequency plane tilings of the same record at 16 kilohertz side by side: with a short 256 sample window the cells are 16 milliseconds wide and 62.5 hertz tall, so a click stays a sharp narrow column while a steady tone smears into a tall band; with a long 1024 sample window the cells are 64 milliseconds wide and 15.6 hertz tall, so the tone sharpens into a thin band while the click smears into a wide column; captions note that each cell is a single unaveraged estimate with unit random error and that the product of time and frequency resolution stays about one" width="92%"></picture>
 
 ## 1. The calibrated spectrogram
 
@@ -979,6 +999,12 @@ the smooth spectral envelope separates from the fine structure by plain
 windowing - **liftering** - in the quefrency domain. The same machinery
 extends the [Hilbert envelope](https://jmrplens.github.io/phonometry/guides/correlation-delay/) with an
 **envelope spectrum** in which amplitude modulations become discrete lines.
+
+The whole trick is a chain of four steps: the logarithm turns a
+multiplicative echo into additive spectral ripple, and the inverse FFT
+collapses that ripple onto a single quefrency spike.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_cepstrum_echoes_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_cepstrum_echoes.svg" alt="Block diagram of the cepstrum chain: a signal made of a source wavelet plus an echo with reflection coefficient 0.5 at 8 milliseconds produces a spectrum rippled with a 125 hertz period, taking the log of the squared magnitude turns the multiplicative echo into an additive ripple, and the inverse FFT lands on the quefrency axis, drawn below with the source wavelet concentrated under 2 milliseconds, a spike of height 0.5 at exactly 8 milliseconds, a negative second rahmonic of minus 0.125 at twice the delay, and a dashed lifter cutoff at 4 milliseconds separating the lowpass envelope side from the highpass ripple side; captions give the rahmonic height series and the plus 3.5 and minus 6.0 decibel ripple bounds" width="92%"></picture>
 
 ## 1. The cepstrum and its three variants
 
@@ -1450,6 +1476,13 @@ call:
 res.plot()          # English labels; res.plot(language="es") for Spanish
 ```
 
+Before the algebra, the procedure itself: a trigger marks each revolution,
+the record is sliced at every trigger, and the aligned blocks are averaged:
+what repeats with the period survives intact while asynchronous content is
+attenuated.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_synchronous_averaging_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_synchronous_averaging.svg" alt="Block diagram of time synchronous averaging: a tachometer delivers one trigger pulse per revolution with period T equal to 1 over 32 seconds, 256 samples at 8192 hertz, the noisy recording is sliced at every trigger into N aligned one-period blocks, and their coherent average, N equal to 40 here, keeps the periodic part with unit comb-filter gain at every order k over T; a dashed note quantifies that asynchronous noise power falls by 10 log N equal to 16 decibels for N equal to 40, an amplitude gain of 6.3, while a residual box holds the record minus the tiled average; the caption recalls McFadden's rule that N equal to 20 places a comb node exactly on a 32.05 order interfering tone while the habitual N equal to 32 does not" width="92%"></picture>
+
 ## 1. The average is a comb filter
 
 Averaging `N` successive periods (McFadden Eq. 5),
@@ -1780,6 +1813,12 @@ model `y(t) = α·x(t-τ0) + n(t)` (B&P Section 5.1.4) by three routes:
   transform, sharpening the peak that the signal's own autocorrelation would
   otherwise smear (their Eq. 9).
 
+The physical picture is two microphones and one wavefront: the extra path to
+the far microphone is c times the delay, and the whole estimation problem is
+locating one peak on the lag axis.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_correlation_delay_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_correlation_delay.svg" alt="Diagram of correlation-based time-delay estimation: a loudspeaker source radiates toward two microphones on stands, microphone 1 capturing x of t and microphone 2 capturing y of t equal to alpha times x delayed by tau 0 plus noise, with the wavefront through microphone 1 leaving an extra path of c times tau 0, about 0.84 meters at 343 meters per second, and sine theta equal to c tau 0 over the spacing d; below, a correlogram panel shows the direct correlator as a broad hump and GCC-PHAT with weighting 1 over the magnitude of Gxy as a sharp spike, both at tau 0 equal to 20 samples over 8192 hertz, 2.44 milliseconds; the caption notes sub-sample refinement by parabolic peak interpolation with 16 times local upsampling to below 0.002 samples" width="92%"></picture>
+
 The weightings of Knapp & Carter's Table I, with the conditions the paper
 attaches to each:
 
@@ -2058,6 +2097,11 @@ bookkeeping. This page covers the signal toolbox of `phonometry.metrology`:
 specification rather than a library default, and **fractional delay** that
 shifts a record by any sub-sample amount with band-limited exactness.
 
+Before the details, the family portrait: what each stimulus looks like in
+time and where its energy sits over frequency.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_test_signals_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_test_signals.svg" alt="Grid of five labelled test-signal miniatures: white noise with a jagged waveform and a flat power spectral density of 0 dB per octave, equal power per hertz; pink noise with a smoother waveform and a minus 3 dB per octave density, equal power per octave; an MLS binary chip stream of period 2 to the m minus 1 samples with a flat line spectrum; a time-frequency sketch where a linear sweep is a straight line while the exponential sweep hugs low frequencies and spends equal time per octave; and an IEC 60268-1 tone burst of whole periods starting at a zero crossing, 25 periods of 5 kHz lasting 5 ms" width="92%"></picture>
+
 ## 1. Tone bursts (IEC 60268-1)
 
 The gated sine burst is the standard stimulus for dynamic behaviour:
@@ -2310,6 +2354,17 @@ prescribed target while keeping a swept sine's crest factor, and the
 measured loudspeaker or microphone response into a safe equalizer, and the
 bridge between the two: the inverse of a measured response is the natural
 target spectrum for the next measurement's sweep.
+
+The two acquisition tools recover the response through their own
+deconvolution: correlation with the pair for Golay, spectral division by the
+sweep's spectrum for shaped sweeps. The two-channel frame of the diagram
+belongs to the broadband-noise workflow: the electrical drive is the
+reference, the microphone is the response, and the Welch cross-spectra
+between them give the H1 frequency response plus a coherence that polices
+it. The regularized inversion then works on the measured response as a
+post-processing step.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_system_measurement_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_system_measurement.svg" alt="Two-channel frequency-response measurement chain: a signal generator producing broadband noise or a sweep feeds a power amplifier and the loudspeaker under test, a measurement microphone picks up the acoustic output, channel 1 carries the electrical reference x(t) and channel 2 the microphone response y(t), dual-channel FFT analysis with Welch-averaged Hann segments at 50 percent overlap yields the spectra Gxx, Gyy and Gxy, and two result boxes give the H1 estimator Gxy over Gxx, unbiased with output noise, and the coherence gamma squared equal to the squared magnitude of Gxy over Gxx times Gyy, which is one for a noiseless linear path and drops with noise, distortion or a drifting, misaligned delay" width="92%"></picture>
 
 ## 1. Complementary Golay pairs
 
