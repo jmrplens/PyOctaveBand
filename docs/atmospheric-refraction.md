@@ -293,6 +293,17 @@ the [porous models](porous-absorbers.md) of the materials domain; the porous
 models work in the opposite `e^{+jωt}` convention, so their impedance is
 conjugated internally.
 
+The clip below runs the full wave physics through both signs of the
+logarithmic profile: a steady 50 Hz source 2 m over rigid ground in a 2D FDTD
+slice, with the library's ray fans traced through the same c(z) profiles laid
+over the fields. Downwind the fronts bend back and stream along the ground to
+the 350 m receiver; upwind they lift off the surface and the ground goes
+quiet beyond the ray-model shadow boundary.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_refraction_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_refraction.gif" alt="Animation: a steady 50 Hz source 2 m above rigid ground in a 2D FDTD slice, downwind and upwind panels with their logarithmic effective sound-speed profiles drawn beside them; downwind the wavefronts curve back to the ground and keep the 350 m receiver loud, upwind they lift away and an acoustic shadow opens beyond the annotated 109 m ray-model boundary, with the library ray fans overlaid and a closing spreading-compensated RMS map showing the bright ground duct against the dark shadow wedge" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_refraction.webm)
+
 ## 4. Validation
 
 The models are anchored by independent oracles:

@@ -1492,6 +1492,50 @@ _ES_EXACT = {
     "Above the median": "Por encima de la mediana",
     "Below the median": "Por debajo de la mediana",
     "Sequence median": "Mediana de la secuencia",
+    # anim_fdtd_slit_absorber
+    "Slow-sound slit absorber at critical coupling (2D FDTD)":
+        "Absorbedor de rendija de sonido lento en acoplamiento crítico "
+        "(FDTD 2D)",
+    "Critically coupled slit: the wave dies inside":
+        "Rendija en acoplamiento crítico: la onda muere dentro",
+    "Wide slit (detuned): the reflection returns":
+        "Rendija ancha (desintonizada): la reflexión vuelve",
+    "inside the cell": "dentro de la celda",
+    # anim_fdtd_expansion_chamber
+    # Kept short: the canvas clips a suptitle much beyond ~80 characters.
+    "Expansion-chamber silencer: pass band vs stop band (2D FDTD)":
+        "Silenciador de cámara de expansión: paso frente a rechazo "
+        "(FDTD 2D)",
+    "the chamber is acoustically invisible":
+        "la cámara es acústicamente invisible",
+    "the mismatch reflects the wave back up the pipe":
+        "el desajuste refleja la onda de vuelta por el conducto",
+    "Position along the duct [m]": "Posición a lo largo del conducto [m]",
+    # anim_fdtd_aperture_slit
+    "Sound through a wall aperture (2D FDTD)":
+        "Sonido a través de una abertura en un muro (FDTD 2D)",
+    "cylindrical re-radiation from the slit":
+        "re-radiación cilíndrica desde la rendija",
+    "the front passes: sharp-edged shadow":
+        "el frente pasa: sombra de bordes nítidos",
+    "RMS level [dB]": "Nivel RMS [dB]",
+    # anim_fdtd_refraction
+    "Atmospheric refraction: downwind duct, upwind shadow (2D FDTD)":
+        "Refracción atmosférica: canal a favor del viento, sombra en "
+        "contra (FDTD 2D)",
+    "Downwind: sound speed grows with height":
+        "A favor del viento: la velocidad del sonido crece con la altura",
+    "Upwind: sound speed falls with height":
+        "En contra del viento: la velocidad del sonido cae con la altura",
+    "bent down: a duct hugs the ground, the receiver stays loud":
+        "curvada hacia abajo: un canal pegado al suelo, el receptor sigue "
+        "oyendo",
+    "bent up: a shadow opens, the receiver goes quiet":
+        "curvada hacia arriba: se abre una sombra, el receptor se queda en "
+        "silencio",
+    "source (h = 2 m)": "fuente (h = 2 m)",
+    "receiver 350 m": "receptor a 350 m",
+    "c_eff(z) [m/s]": "c_ef(z) [m/s]",
 }
 
 _ES_PATTERNS = [
@@ -1706,6 +1750,17 @@ _ES_PATTERNS = [
      r"máx |recuperada - verdadera| = \1"),
     (r"^estimated delay removed: (.+) samples$",
      r"retardo estimado eliminado: \1 muestras"),
+    # FDTD second-batch clips: baked-number pills and titles
+    (r"^slit h = (.+) mm$", r"rendija h = \1 mm"),
+    (r"^Pass band: (\d+) Hz, kL = π$", r"Banda de paso: \1 Hz, kL = π"),
+    (r"^Stop band peak: (\d+) Hz, kL = π/2$",
+     r"Pico de rechazo: \1 Hz, kL = π/2"),
+    (r"^Slit w = (\d+) mm \(λ/20\)$", r"Rendija w = \1 mm (λ/20)"),
+    (r"^Opening w = (.+) m \(= λ\)$", r"Hueco w = \1 m (= λ)"),
+    (r"^slit τ = (.+) \(Gomperts\)$", r"rendija τ = \1 (Gomperts)"),
+    (r"^f = (\d+) Hz \(λ = (.+) m\)$", r"f = \1 Hz (λ = \2 m)"),
+    (r"^shadow beyond ≈ (\d+) m \(ray model\)$",
+     r"sombra más allá de ≈ \1 m (modelo de rayos)"),
 ]
 
 
@@ -12302,6 +12357,8 @@ _ANIM_DPI = 300
 _GIF_FPS = 12
 _GIF_SCALE = 640
 _GIF_COLORS = 64
+# Rounded box of the verdict/annotation pills drawn over the clips.
+_ANIM_PILL_BOX = "round,pad=0.25"
 
 # VP9 encoding for the site WebM. Beyond the constant-quality base
 # (``-crf 40 -b:v 0``) the screen-content tuning, row multithreading and the
@@ -14113,6 +14170,34 @@ _VTUBE_DX = 0.0025
 _VTUBE_F = 850.0                          # CW inside the 100 mm plane range
 
 
+def _anim_speaker(ax: Any, x0: float, y_mid: float, bore: float, *,
+                  tip_inset: float | None = None,
+                  label_y: float | None = None) -> None:
+    """Drive loudspeaker of the FDTD tube/duct clips: magnet block plus
+    cone, the cone tip on the ``x0`` plane, centred on ``y_mid`` for the
+    given ``bore``. The tip stops ``tip_inset`` short of each bore edge
+    (3 % of the bore when omitted); a "loudspeaker" caption is drawn at
+    ``label_y`` when given (``None`` skips it)."""
+    from matplotlib.patches import Polygon, Rectangle
+
+    if tip_inset is None:
+        tip_inset = 0.03 * bore
+    magnet_w, cone_w = 0.05, 0.045
+    ax.add_patch(Rectangle((x0 - magnet_w - cone_w, y_mid - 0.32 * bore),
+                           magnet_w, 0.64 * bore, facecolor="#9a9a9a",
+                           edgecolor=COLOR_FG, linewidth=0.8, zorder=4))
+    ax.add_patch(Polygon(
+        [(x0 - cone_w, y_mid - 0.20 * bore),
+         (x0 - cone_w, y_mid + 0.20 * bore),
+         (x0, y_mid + 0.5 * bore - tip_inset),
+         (x0, y_mid - 0.5 * bore + tip_inset)],
+        closed=True, facecolor="#e8b98a", edgecolor=COLOR_FG,
+        linewidth=0.8, zorder=4))
+    if label_y is not None:
+        ax.text(x0 - magnet_w - cone_w, label_y, "loudspeaker",
+                ha="left", va="top", fontsize=7.5)
+
+
 def _anim_tube_hardware(ax: Any, length: float, *, bore: float = 0.1,
                         sample: tuple[float, float] | None = None,
                         termination: str = "rigid",
@@ -14120,7 +14205,7 @@ def _anim_tube_hardware(ax: Any, length: float, *, bore: float = 0.1,
                         label_speaker: bool = True) -> None:
     """Draw the tube as hardware around the FDTD bore: walls, loudspeaker,
     sample block, microphones and the termination, all to scale (metres)."""
-    from matplotlib.patches import Polygon, Rectangle
+    from matplotlib.patches import Rectangle
 
     wall = 0.014
     grey = "#9a9a9a"
@@ -14128,17 +14213,8 @@ def _anim_tube_hardware(ax: Any, length: float, *, bore: float = 0.1,
         ax.add_patch(Rectangle((0.0, y0), length, wall, facecolor=grey,
                                edgecolor=COLOR_FG, linewidth=0.7, zorder=3))
     # Loudspeaker driving the left end: magnet + cone into the bore.
-    magnet_w, cone_w = 0.05, 0.045
-    ax.add_patch(Rectangle((-magnet_w - cone_w, 0.18 * bore), magnet_w,
-                           0.64 * bore, facecolor=grey,
-                           edgecolor=COLOR_FG, linewidth=0.8, zorder=4))
-    ax.add_patch(Polygon([(-cone_w, 0.30 * bore), (-cone_w, 0.70 * bore),
-                          (0.0, 0.97 * bore), (0.0, 0.03 * bore)],
-                         closed=True, facecolor="#e8b98a",
-                         edgecolor=COLOR_FG, linewidth=0.8, zorder=4))
-    if label_speaker:
-        ax.text(-(magnet_w + cone_w), -0.55 * bore, "loudspeaker",
-                ha="left", va="top", fontsize=7.5)
+    _anim_speaker(ax, 0.0, 0.5 * bore, bore,
+                  label_y=-0.55 * bore if label_speaker else None)
     if sample is not None:
         ax.add_patch(Rectangle((sample[0], 0.0), sample[1] - sample[0],
                                bore, facecolor=COLOR_SECONDARY, alpha=0.30,
@@ -14276,7 +14352,7 @@ def animate_fdtd_impedance_tube(output_dir: str) -> None:
     axes[1].set_xlabel(T("Position along the tube [m]"), fontsize=9)
     a_txt = axes[1].text(0.03, env_base + env_h - 0.015, "", ha="left",
                          va="top", fontsize=9, color="white", zorder=7,
-                         bbox={"boxstyle": "round,pad=0.25",
+                         bbox={"boxstyle": _ANIM_PILL_BOX,
                                "facecolor": "black", "alpha": 0.55,
                                "edgecolor": "none"})
     t_txt = fig.text(0.988, 0.93, "", ha="right", va="top",
@@ -14399,7 +14475,7 @@ def animate_fdtd_transmission_tube(output_dir: str) -> None:
     axes[1].set_xlabel(T("Position along the tube [m]"), fontsize=9)
     tl_txt = axes[1].text(0.02, 0.205, "", ha="left", va="top",
                           fontsize=9, color="white", zorder=7,
-                          bbox={"boxstyle": "round,pad=0.25",
+                          bbox={"boxstyle": _ANIM_PILL_BOX,
                                 "facecolor": "black", "alpha": 0.55,
                                 "edgecolor": "none"})
     t_txt = fig.text(0.988, 0.93, "", ha="right", va="top",
@@ -16032,6 +16108,1068 @@ def animate_comb_filtering(output_dir: str) -> None:
     _render_clip(fig, update, output_dir, "anim_comb_filtering")
 
 
+# ---------------------------------------------------------------------------
+# FDTD wave-field clips, second batch (slit absorber, expansion chamber,
+# wall aperture, atmospheric refraction). Same conventions as the first
+# batch: each simulation runs once per process behind an lru_cache, every
+# clip keeps >= 12 captured frames per period of the highest significant
+# frequency, and every number printed on screen comes from the library
+# models, never from the simulation itself.
+# ---------------------------------------------------------------------------
+
+
+_SLIT_ABS_F0 = 300.0                     # critical-coupling design frequency
+_SLIT_ABS_TUBE = 0.60                    # air column before the panel face
+_SLIT_ABS_PERIOD = 5.0e-2                # panel period d = the tube bore
+_SLIT_ABS_LATTICE = 3.0e-2               # lattice step a = panel depth (N=1)
+_SLIT_ABS_DETUNE = 1.7                   # wide-slit factor of the alpha figure
+
+
+@lru_cache(maxsize=1)
+def _slit_absorber_design() -> Any:
+    """The 300 Hz critical-coupling design of the slow-sound figures."""
+    from phonometry import HelmholtzResonator, critical_coupling_design
+
+    base = HelmholtzResonator(neck_length=1.0e-3, neck_side=3.0e-3,
+                              cavity_length=30.0e-3, cavity_side=27.0e-3)
+    return critical_coupling_design(_SLIT_ABS_F0, base,
+                                    lattice_step=_SLIT_ABS_LATTICE,
+                                    period=_SLIT_ABS_PERIOD)
+
+
+def _lossy_fluid_params(rho_c: complex,
+                        kappa_c: complex) -> tuple[float, float, float]:
+    """Real-coefficient FDTD equivalent of a complex effective fluid.
+
+    The solver carries plane waves through a uniform lossy region as
+    ``k = (omega - j sigma)/c`` at the real impedance ``rho c``, so a
+    visco-thermal effective density/bulk-modulus pair maps onto the phase
+    speed ``omega / Re(k)``, the density ``Re(Z)/c`` and the decay rate
+    ``sigma = -Im(k) c`` at the drive frequency. Returns ``(c, rho, sigma)``.
+    """
+    omega = 2.0 * np.pi * _SLIT_ABS_F0
+    k = omega * complex(np.sqrt(rho_c / kappa_c))
+    z = complex(np.sqrt(rho_c * kappa_c))
+    c_ph = omega / k.real
+    return c_ph, z.real / c_ph, -k.imag * c_ph
+
+
+def _slit_absorber_cell_rows(dx: float, slit_cells: int,
+                             ny: int) -> dict[str, tuple[int, int]]:
+    """Row/column spans of the meshed cell (slit at the top of the period,
+    neck and cavity below it, mirroring ``plot_slit_absorber_geometry``)."""
+    res = _slit_absorber_design().resonator
+    neck_cells = round(res.neck_length / dx)
+    cav_cells = round(res.cavity_length / dx)
+    slit0 = ny - slit_cells
+    neck0 = slit0 - neck_cells
+    return {"slit": (slit0, ny), "neck": (neck0, slit0),
+            "cavity": (neck0 - cav_cells, neck0)}
+
+
+@lru_cache(maxsize=1)
+def _slit_absorber_fields(
+    n_frames: int = _FDTD_ANIM_FRAMES,
+) -> tuple[Any, Any, Any, Any]:
+    """CW build-up against the meshed critical-coupling cell, cached.
+
+    Two runs of a 0.60 m plane-wave tube whose bore is one 50 mm panel
+    period, driven at 300 Hz through a rho c left edge; the right end is
+    the panel itself: slit, neck and cavity carved out of the rigid body
+    with the obstacle mask at ``dx = h/4`` (the slit is the smallest
+    feature) and filled with the library's visco-thermal effective fluids
+    mapped onto real ``(c, rho, sigma)`` triplets. The neck and cavity are
+    square ducts of side ``w`` in 3D, so the 2D slice scales their density
+    (and with it ``kappa = rho c^2``) by the out-of-plane ratio ``a / w``,
+    keeping the 3D cell's acoustic mass and compliance per unit depth. Run
+    one is the critical design; run two detunes only the slit height by
+    the wide-slit factor of the absorption figure. ``cfl = 0.95``: at
+    lambda/4700 the numerical dispersion is negligible and the wide margin
+    of the default would just double the run time. Returns per-run (tube
+    frames, cell-zoom frames, the settled |p| envelope), the frame times
+    and the library absorption at 300 Hz for both slit heights.
+    """
+    import fdtd2d
+
+    from phonometry import slit_helmholtz_absorber
+    from phonometry.materials import (
+        rectangular_duct_properties,
+        slit_effective_properties,
+    )
+
+    design = _slit_absorber_design()
+    res = design.resonator
+    h0 = design.slit_height
+    # Mesh rule: dx = min(smallest scene dimension / 4, lambda/8 at the
+    # carrier) = min(h/4 = 0.244 mm, 1.143 m / 8 = 143 mm) -> the slit
+    # height governs and the grid is h/4 = 0.244 mm (lambda/4677).
+    dx = h0 / 4.0
+    ny = round(_SLIT_ABS_PERIOD / dx)
+    face = round(_SLIT_ABS_TUBE / dx)
+    nx = face + round(_SLIT_ABS_LATTICE / dx)
+    zoom0 = round((_SLIT_ABS_TUBE - 0.015) / dx)
+    x_mouth = _SLIT_ABS_TUBE + 0.5 * _SLIT_ABS_LATTICE
+    neck_c = (round((x_mouth - 0.5 * res.neck_side) / dx),
+              round((x_mouth + 0.5 * res.neck_side) / dx))
+    cav_c = (round((x_mouth - 0.5 * res.cavity_side) / dx),
+             round((x_mouth + 0.5 * res.cavity_side) / dx))
+    freq = np.array([_SLIT_ABS_F0])
+    neck_f = _lossy_fluid_params(
+        *(p.item() for p in rectangular_duct_properties(
+            freq, side=res.neck_side)))
+    cav_f = _lossy_fluid_params(
+        *(p.item() for p in rectangular_duct_properties(
+            freq, side=res.cavity_side)))
+    # 2D-slice calibration: the meshed cell's slot-shaped mouths carry
+    # smaller end-correction masses than the square ducts of the 3D
+    # model, and in this slow-sound cell the resonance is the slit
+    # inertance against the cavity compliance, so the whole cell lands
+    # ~11 % high: a broadband two-microphone probe of the meshed cell
+    # puts its absorption peak at 333 Hz instead of 300. Rescaling the
+    # cavity sound speed by 300/333 = 0.90 restores the design
+    # resonance; the same probe then measures alpha = 0.99 at 300.0 Hz,
+    # the critical coupling the annotation quotes. The rescale is fitted
+    # at the critical slit height only and does not transfer exactly to
+    # the detuned row (the wide-slit cell measures |R| ~ 0.95 where the
+    # 3D model gives 0.81); the visual contrast and the qualitative
+    # message are the correct ones, and the alpha pill quotes the
+    # library model's value.
+    cav_f = (0.90 * cav_f[0], cav_f[1], cav_f[2])
+    scale_neck = _SLIT_ABS_LATTICE / res.neck_side
+    scale_cav = _SLIT_ABS_LATTICE / res.cavity_side
+
+    alphas = (float(design.absorption),
+              float(slit_helmholtz_absorber(
+                  freq, res, slit_height=_SLIT_ABS_DETUNE * h0,
+                  lattice_step=_SLIT_ABS_LATTICE,
+                  period=_SLIT_ABS_PERIOD).absorption[0]))
+    # Clip duration per the deepest-reflector rule: d(source -> cavity
+    # bottom through slit mouth and neck) = 0.60 + 0.015 + 0.001 + 0.0447
+    # = 0.6607 m, the same back to the farthest visible point (the frame's
+    # left edge), over the slowest medium on the path (the slit fluid,
+    # 313.7 m/s): t = 1.2 * 2 * 0.6607 / 313.7 = 5.06 ms -> every = 30
+    # (5.17 ms captured, 232 frames per 300 Hz period >= 12). The window
+    # is far shorter than the resonator ring-up (~6 ms time constant), so
+    # both runs first settle uncaptured for 20 ms and the clip shows the
+    # steady field in slow motion with its exact settled envelope.
+    every = 30
+    runs = []
+    times = np.zeros(0)
+    for h in (h0, _SLIT_ABS_DETUNE * h0):
+        slit_f = _lossy_fluid_params(
+            *(p.item() for p in slit_effective_properties(
+                freq, slit_height=h)))
+        rows = _slit_absorber_cell_rows(dx, round(h / dx), ny)
+        mask = np.zeros((ny, nx), dtype=bool)
+        mask[:, face:] = True
+        c_map = np.full((ny, nx), 343.0)
+        rho_map = np.full((ny, nx), 1.2)
+        sig_map = np.zeros((ny, nx))
+        for name, (c_e, rho_e, sig_e), scale, cols in (
+                ("slit", slit_f, 1.0, (face, nx)),
+                ("neck", neck_f, scale_neck, neck_c),
+                ("cavity", cav_f, scale_cav, cav_c)):
+            r0, r1 = rows[name]
+            sl = (slice(r0, r1), slice(cols[0], cols[1]))
+            mask[sl] = False
+            c_map[sl] = c_e
+            rho_map[sl] = rho_e * scale
+            sig_map[sl] = sig_e
+        sim = fdtd2d.FDTD2D(c_map, dx, rho=rho_map, damping=sig_map,
+                            cfl=0.95, obstacle_mask=mask,
+                            edge_impedance={"left": 1.2 * 343.0})
+        tone = fdtd2d.CWSource(0, 0, frequency=_SLIT_ABS_F0)
+        sim.add_source(fdtd2d.PlaneWaveSource("right", tone.value, offset=2))
+        mid = ny // 2
+        # Settle to steady state, sampling the exact standing-wave
+        # envelope over the final full period.
+        period = round(1.0 / (_SLIT_ABS_F0 * sim.dt))
+        settle = round(0.020 / sim.dt)
+        env = np.zeros(sim.p[mid, :face:2].shape, dtype=np.float32)
+        for i in range(settle):
+            sim.step()
+            if i >= settle - period:
+                np.maximum(env, np.abs(sim.p[mid, :face:2]), out=env)
+        tube: list[Any] = []
+        cell: list[Any] = []
+        ts: list[float] = []
+        while len(tube) < n_frames:
+            sim.step()
+            if sim.n % every == 0:
+                tube.append(sim.p[::4, ::4].astype(np.float32))
+                cell.append(sim.p[:, zoom0:].astype(np.float32))
+                ts.append(sim.time)
+        runs.append((np.stack(tube), np.stack(cell), env))
+        times = np.asarray(ts)
+    return runs[0], runs[1], times, alphas
+
+
+def animate_fdtd_slit_absorber(output_dir: str) -> None:
+    """Inside the slow-sound slit absorber (2D FDTD): a 300 Hz plane tone
+    meets the meshed critical-coupling cell, whose sub-millimetre slit and
+    Helmholtz resonator are resolved on the grid and filled with the
+    library's visco-thermal effective fluids. At the design slit height
+    the loss/leakage balance swallows the wave (alpha = 1, flat envelope);
+    widening the slit breaks the balance and the reflection rebuilds the
+    standing wave. A zoom shows the field crawling through the slit."""
+    from matplotlib.patches import Rectangle
+
+    T = _translate_str
+    (t_c, z_c, e_c), (t_w, z_w, e_w), times, alphas = _slit_absorber_fields()
+    design = _slit_absorber_design()
+    res = design.resonator
+    h0 = design.slit_height
+    dx = h0 / 4.0
+    ny = round(_SLIT_ABS_PERIOD / dx)
+    nx = round(_SLIT_ABS_TUBE / dx) + round(_SLIT_ABS_LATTICE / dx)
+    x_end = nx * dx
+    x_zoom0 = round((_SLIT_ABS_TUBE - 0.015) / dx) * dx
+    bore = ny * dx
+    half = t_c.shape[0] // 2
+    # Color scale from the TUBE columns only: at critical coupling the
+    # cavity rings at several times the incident amplitude and would
+    # otherwise wash the travelling/standing waves out of the map (the
+    # cell interior saturating instead is the point).
+    tube_cols = round(_SLIT_ABS_TUBE / dx) // 4
+    vmax = float(np.quantile(np.abs(t_c[half:, :, :tube_cols]), 0.999))
+    env_base, env_h, env_max = 0.074, 0.034, 2.3
+    x_env = (np.arange(e_c.shape[0]) + 0.5) * 2.0 * dx
+    env_from = 10                          # hide the injection-line step
+
+    fig = _anim_figure()
+    fig.suptitle(T("Slow-sound slit absorber at critical coupling "
+                   "(2D FDTD)"), fontweight="bold")
+    gs = fig.add_gridspec(2, 2, width_ratios=[1.55, 0.52])
+    titles = [T("Critically coupled slit: the wave dies inside"),
+              T("Wide slit (detuned): the reflection returns")]
+    heights = (h0, _SLIT_ABS_DETUNE * h0)
+    envs = (e_c, e_w)
+    ims: list[Any] = []
+    ims_zoom: list[Any] = []
+    a_txts: list[Any] = []
+    for row, (title, h) in enumerate(zip(titles, heights, strict=True)):
+        rows = _slit_absorber_cell_rows(dx, round(h / dx), ny)
+        # Cell silhouette: the rigid part of the panel as five rectangles
+        # around the slit/neck/cavity openings, so both views show the
+        # field inside the openings through the gaps.
+        y_slit0 = rows["slit"][0] * dx
+        y_neck = tuple(r * dx for r in rows["neck"])
+        y_cav = tuple(r * dx for r in rows["cavity"])
+        x_face = _SLIT_ABS_TUBE
+        x_mouth = _SLIT_ABS_TUBE + 0.5 * _SLIT_ABS_LATTICE
+        x_neck = (x_mouth - 0.5 * res.neck_side,
+                  x_mouth + 0.5 * res.neck_side)
+        x_cav = (x_mouth - 0.5 * res.cavity_side,
+                 x_mouth + 0.5 * res.cavity_side)
+        body = [
+            (x_face, 0.0, x_end - x_face, y_cav[0]),
+            (x_face, y_cav[0], x_cav[0] - x_face, y_cav[1] - y_cav[0]),
+            (x_cav[1], y_cav[0], x_end - x_cav[1], y_cav[1] - y_cav[0]),
+            (x_face, y_neck[0], x_neck[0] - x_face, y_neck[1] - y_neck[0]),
+            (x_neck[1], y_neck[0], x_end - x_neck[1],
+             y_neck[1] - y_neck[0]),
+        ]
+        ax = fig.add_subplot(gs[row, 0])
+        ax.grid(False)
+        im = ax.imshow(np.zeros((2, 2)), origin="lower",
+                       extent=(0.0, x_end, 0.0, bore), cmap="RdBu_r",
+                       vmin=-vmax, vmax=vmax, aspect="auto",
+                       interpolation="bilinear", zorder=2)
+        _anim_slit_tube_walls(ax, x_end, bore, speaker=row == 0)
+        for rect in body:
+            ax.add_patch(Rectangle(rect[:2], rect[2], rect[3],
+                                   facecolor="#8b8b8b",
+                                   edgecolor=COLOR_FG, lw=0.4, zorder=3))
+        # Dashed magnifier frame around the cell, echoed on the zoom axes.
+        ax.add_patch(Rectangle((x_zoom0, 0.0), x_end - x_zoom0, bore,
+                               facecolor="none", edgecolor=COLOR_FG,
+                               ls="--", lw=0.8, zorder=5))
+        ax.axhline(env_base, color=COLOR_GRID, lw=0.8, zorder=1)
+        ax.text(0.005, env_base + 0.004, "|p| envelope", fontsize=7.5,
+                ha="left", va="bottom", color=COLOR_FG, alpha=0.8)
+        # The settled standing-wave envelope, static: the clip captures
+        # the steady state, where it no longer changes.
+        ax.plot(x_env[env_from:],
+                env_base + envs[row][env_from:] / env_max * env_h,
+                color=COLOR_PRIMARY, lw=1.8, zorder=6)
+        ax.set_xlim(-0.115, x_end + 0.022)
+        # Headroom above the envelope trace keeps the alpha pill clear
+        # of the curve in both rows.
+        ax.set_ylim(-0.033, env_base + env_h + 0.026)
+        ax.set_yticks([])
+        ax.set_title(title, fontsize=10, fontweight="bold")
+        ax.tick_params(labelsize=7)
+        if row == 0:
+            ax.tick_params(labelbottom=False)
+        else:
+            ax.set_xlabel(T("Position along the tube [m]"), fontsize=9)
+        a_txt = ax.text(0.03, env_base + env_h + 0.023, "", ha="left",
+                        va="top", fontsize=9, color="white", zorder=7,
+                        bbox={"boxstyle": _ANIM_PILL_BOX,
+                              "facecolor": "black", "alpha": 0.55,
+                              "edgecolor": "none"})
+        # Zoom: the last 45 mm at full grid resolution, geometry to scale.
+        ax_z = fig.add_subplot(gs[row, 1])
+        ax_z.grid(False)
+        im_z = ax_z.imshow(np.zeros((2, 2)), origin="lower",
+                           extent=(x_zoom0, x_end, 0.0, bore),
+                           cmap="RdBu_r", vmin=-vmax, vmax=vmax,
+                           aspect="equal", interpolation="nearest",
+                           zorder=2)
+        for rect in body:
+            ax_z.add_patch(Rectangle(rect[:2], rect[2], rect[3],
+                                     facecolor="#8b8b8b",
+                                     edgecolor=COLOR_FG, lw=0.5, zorder=3))
+        for spine in ax_z.spines.values():
+            spine.set_linestyle("--")
+            spine.set_edgecolor(COLOR_FG)
+        ax_z.set_xlim(x_zoom0, x_end)
+        ax_z.set_ylim(0.0, bore)
+        ax_z.set_xticks([])
+        ax_z.set_yticks([])
+        ax_z.annotate(
+            T(f"slit h = {h * 1e3:.2f} mm"),
+            xy=(x_zoom0 + 0.006, y_slit0 + 0.5 * h),
+            xytext=(x_zoom0 + 0.0035, bore - 0.0095),
+            fontsize=7, color=COLOR_FG, ha="left", va="top",
+            arrowprops={"arrowstyle": "-", "color": COLOR_FG, "lw": 0.7},
+            zorder=6,
+            bbox={"boxstyle": "round,pad=0.2",
+                  "facecolor": fig.get_facecolor(), "alpha": 0.55,
+                  "edgecolor": "none"})
+        ax_z.text(x_mouth, 0.5 * (y_cav[0] + y_cav[1]),
+                  T("Helmholtz resonator"), ha="center", va="center",
+                  fontsize=6.5, color=COLOR_FG, zorder=6,
+                  bbox={"boxstyle": "round,pad=0.2",
+                        "facecolor": fig.get_facecolor(), "alpha": 0.55,
+                        "edgecolor": "none"})
+        if row == 0:
+            ax_z.set_title(T("inside the cell"), fontsize=8.5)
+        ims.append(im)
+        ims_zoom.append(im_z)
+        a_txts.append(a_txt)
+    # Bottom-right corner: the top corners belong to the suptitle and the
+    # zoom-column title, and the x-label of the tube column sits centred
+    # well to the left of this spot.
+    t_txt = fig.text(0.988, 0.015, "", ha="right", va="bottom",
+                     family="monospace", fontsize=10, color=COLOR_FG)
+    # The captured field is already steady, so the verdict can come early.
+    reveal = int(0.30 * len(times))
+
+    def update(k: int) -> tuple[Any, ...]:
+        for i, (t_all, z_all, alpha) in enumerate(
+                ((t_c, z_c, alphas[0]), (t_w, z_w, alphas[1]))):
+            ims[i].set_data(t_all[k])
+            ims_zoom[i].set_data(z_all[k])
+            a_txts[i].set_text(
+                T(f"alpha = {alpha:.2f} at {_SLIT_ABS_F0:.0f} Hz")
+                if k >= reveal else "")
+        t_txt.set_text(T(f"t = {times[k] * 1e3:5.1f} ms"))
+        return (*ims, *ims_zoom, *a_txts, t_txt)
+
+    _render_clip(fig, update, output_dir, "anim_fdtd_slit_absorber",
+                 frames=len(times), gif_fps=8)
+
+
+def _anim_slit_tube_walls(ax: Any, length: float, bore: float, *,
+                          speaker: bool = True) -> None:
+    """Tube walls and drive loudspeaker for the slit-absorber clip (the
+    shared ``_anim_tube_hardware`` labels its termination as a plug, but
+    here the termination IS the meshed panel, drawn by the caller)."""
+    from matplotlib.patches import Rectangle
+
+    wall = 0.007
+    grey = "#9a9a9a"
+    for y0 in (-wall, bore):
+        ax.add_patch(Rectangle((0.0, y0), length, wall, facecolor=grey,
+                               edgecolor=COLOR_FG, linewidth=0.7, zorder=3))
+    _anim_speaker(ax, 0.0, 0.5 * bore, bore,
+                  label_y=-0.30 * bore if speaker else None)
+
+
+_CHAMBER_L = 0.30                        # chamber length of the TL example
+_CHAMBER_M = 4.0                         # expansion area ratio
+_CHAMBER_PIPE_A = 0.01                   # pipe area of the TL example [m2]
+# 2D pipe height. The four-pole TL depends only on m and L, but the 2D
+# junction end correction grows with the bore; a 50 mm pipe (a small
+# muffler with a 200 x 300 mm chamber) keeps the sudden-area-change
+# phase error at kL = pi below ~0.15 dB so the simulated pass band
+# actually matches the model's TL = 0 within the line width.
+_CHAMBER_BORE = 0.05
+# Mesh rule: dx = min(smallest scene dimension / 4, lambda/8 at the
+# highest carrier) = min(50 mm / 4 = 12.5 mm, 0.6 m / 8 = 75 mm); the
+# grid runs finer still (2.5 mm, 20 cells across the pipe bore) so the
+# junction fields render smoothly at negligible cost.
+_CHAMBER_DX = 0.0025
+
+
+def _expansion_chamber_freqs() -> tuple[float, float]:
+    """The two CW carriers: full transmission at ``kL = pi`` and the TL
+    peak at ``kL = pi/2`` of the 0.30 m chamber (Bies Eq. (8.111))."""
+    return 343.0 / (2.0 * _CHAMBER_L), 343.0 / (4.0 * _CHAMBER_L)
+
+
+@lru_cache(maxsize=1)
+def _expansion_chamber_fields(
+    n_frames: int = _FDTD_ANIM_FRAMES,
+) -> tuple[Any, Any, Any, Any]:
+    """Two CW runs through the m = 4 expansion chamber, cached.
+
+    A 1.4 m duct at the L and m of the noise-control guide's example
+    (50 mm pipe, 0.30 m chamber, area ratio 4 as the 2D height ratio),
+    walls built from a 10^6:1 density contrast so the sustained plane wave
+    can be injected across the full left edge (an obstacle mask would
+    reject the injection line). rho c edges at both ends make the source
+    non-reflecting and the termination anechoic, so the outlet carries
+    pure transmission. Returns the wall-masked frame stacks (pass band,
+    stop band), the settled centreline |p| envelopes, the frame times and
+    the library transmission losses at the two carriers.
+    """
+    import fdtd2d
+
+    from phonometry import expansion_chamber
+
+    dx = _CHAMBER_DX
+    pipe_cells = round(_CHAMBER_BORE / dx)               # 20 cells
+    ny = round(_CHAMBER_M * _CHAMBER_BORE / dx)          # 80 cells
+    nx = round(1.4 / dx)
+    c0 = round(0.55 / dx)
+    c1 = c0 + round(_CHAMBER_L / dx)
+    p0 = (ny - pipe_cells) // 2
+    air = np.zeros((ny, nx), dtype=bool)
+    air[p0:p0 + pipe_cells, :] = True
+    air[:, c0:c1] = True
+    rho_map = np.where(air, 1.2, 1.2e6)
+    f_pass, f_peak = _expansion_chamber_freqs()
+    tls = expansion_chamber(
+        np.array([f_pass, f_peak]), _CHAMBER_L,
+        _CHAMBER_M * _CHAMBER_PIPE_A, _CHAMBER_PIPE_A).transmission_loss
+    # Clip duration per the deepest-reflector rule: d(source -> chamber
+    # outlet plate, the deepest reflecting feature) = 0.85 m, plus 0.85 m
+    # back to the farthest visible field point (the duct inlet at x = 0):
+    # t = 1.2 * 1.7 / 343 = 5.95 ms -> every = 6 (6.68 ms captured, 94
+    # frames per 572 Hz period >= 12). The window is shorter than the
+    # standing wave's build-up, so both runs settle uncaptured for 30 ms
+    # first and the clip shows the steady field with its exact envelope.
+    every = 6
+    runs = []
+    times = np.zeros(0)
+    for f in (f_pass, f_peak):
+        sim = fdtd2d.FDTD2D(343.0, dx, shape=(ny, nx), rho=rho_map,
+                            edge_impedance={"left": 1.2 * 343.0,
+                                            "right": 1.2 * 343.0})
+        tone = fdtd2d.CWSource(0, 0, frequency=f)
+        sim.add_source(fdtd2d.PlaneWaveSource("right", tone.value,
+                                              offset=2))
+        mid = ny // 2
+        period = round(1.0 / (f * sim.dt))
+        settle = round(0.030 / sim.dt)
+        env = np.zeros(sim.p[mid, ::2].shape, dtype=np.float32)
+        for i in range(settle):
+            sim.step()
+            if i >= settle - period:
+                np.maximum(env, np.abs(sim.p[mid, ::2]), out=env)
+        ps: list[Any] = []
+        ts: list[float] = []
+        while len(ps) < n_frames:
+            sim.step()
+            if sim.n % every == 0:
+                # The dense wall cells ring with the injection line;
+                # blank them to NaN (transparent under imshow) so the
+                # display and its color scale only see the air path.
+                ps.append(np.where(air, sim.p, np.nan)[::2, ::2]
+                          .astype(np.float32))
+                ts.append(sim.time)
+        runs.append((np.stack(ps), env))
+        times = np.asarray(ts)
+    return runs[0], runs[1], times, (float(tls[0]), float(tls[1]))
+
+
+def animate_fdtd_expansion_chamber(output_dir: str) -> None:
+    """The reactive expansion chamber (2D FDTD): the same silencer at its
+    two characteristic frequencies. At kL = pi the chamber is a
+    half-wavelength resonator and the wave crosses as if the chamber were
+    not there (TL = 0); at kL = pi/2 the two area jumps reflect in phase
+    (the pi round trip across the chamber returns both echoes to the
+    inlet in phase) and the wave is sent back up the inlet, leaving the
+    outlet at less than half amplitude (the 6.5 dB four-pole TL peak).
+    No absorption anywhere: a purely reactive silencer."""
+    T = _translate_str
+    (p_pass, e_pass), (p_stop, e_stop), times, tls = (
+        _expansion_chamber_fields())
+    f_pass, f_peak = _expansion_chamber_freqs()
+    dx = _CHAMBER_DX
+    ny = round(_CHAMBER_M * _CHAMBER_BORE / dx)
+    nx = round(1.4 / dx)
+    length, height = nx * dx, ny * dx
+    pipe_y = ((height - _CHAMBER_BORE) / 2.0,
+              (height + _CHAMBER_BORE) / 2.0)
+    env_base, env_h, env_max = 0.245, 0.105, 2.1
+    x_env = (np.arange(p_pass.shape[2]) + 0.5) * 2.0 * dx
+    env_from = 8                           # hide the injection-line step
+    vmaxes = [float(np.nanquantile(np.abs(p[p.shape[0] // 2:]), 0.999))
+              for p in (p_pass, p_stop)]
+
+    fig = _anim_figure()
+    fig.suptitle(T("Expansion-chamber silencer: pass band vs stop band "
+                   "(2D FDTD)"), fontweight="bold")
+    axes = fig.subplots(2, 1, sharex=True)
+    titles = [T(f"Pass band: {f_pass:.0f} Hz, kL = π"),
+              T(f"Stop band peak: {f_peak:.0f} Hz, kL = π/2")]
+    verdicts = [T("the chamber is acoustically invisible"),
+                T("the mismatch reflects the wave back up the pipe")]
+    ims: list[Any] = []
+    tl_txts: list[Any] = []
+    v_txts: list[Any] = []
+    for (ax, title, vmax), env in zip(
+            zip(axes, titles, vmaxes, strict=True), (e_pass, e_stop),
+            strict=True):
+        ax.grid(False)
+        im = ax.imshow(np.zeros((2, 2)), origin="lower",
+                       extent=(0.0, length, 0.0, height), cmap="RdBu_r",
+                       vmin=-vmax, vmax=vmax, aspect="auto",
+                       interpolation="bilinear", zorder=2)
+        _anim_chamber_hardware(ax, length, height, pipe_y,
+                               (0.55, 0.55 + _CHAMBER_L))
+        ax.axhline(env_base, color=COLOR_GRID, lw=0.8, zorder=1)
+        ax.text(0.005, env_base - 0.008, "|p| envelope", fontsize=7.5,
+                ha="left", va="top", color=COLOR_FG, alpha=0.8)
+        # The settled envelope, static: the clip captures steady state.
+        ax.plot(x_env[env_from:],
+                env_base + env[env_from:] / env_max * env_h,
+                color=COLOR_PRIMARY, lw=1.8, zorder=6)
+        ax.set_xlim(-0.115, length + 0.065)
+        # The verdict/TL line sits above the tallest envelope hump
+        # (1.85 of 2.1 full scale), so neither text strikes the curve.
+        ax.set_ylim(-0.030, env_base + env_h + 0.062)
+        ax.set_yticks([])
+        ax.set_title(title, fontsize=10, fontweight="bold")
+        ax.tick_params(labelsize=7)
+        tl_txts.append(
+            ax.text(length + 0.055, env_base + env_h + 0.050, "",
+                    ha="right", va="top", fontsize=9, color="white",
+                    zorder=7,
+                    bbox={"boxstyle": _ANIM_PILL_BOX,
+                          "facecolor": "black", "alpha": 0.55,
+                          "edgecolor": "none"}))
+        v_txts.append(
+            ax.text(0.02, env_base + env_h + 0.046, "", ha="left",
+                    va="top", fontsize=8, color=COLOR_FG, zorder=6))
+        ims.append(im)
+    axes[1].set_xlabel(T("Position along the duct [m]"), fontsize=9)
+    t_txt = fig.text(0.988, 0.93, "", ha="right", va="top",
+                     family="monospace", fontsize=10, color=COLOR_FG)
+    # The captured field is already steady, so the verdict can come early.
+    reveal = int(0.30 * len(times))
+
+    def update(k: int) -> tuple[Any, ...]:
+        for i, (p_all, tl, f) in enumerate(
+                ((p_pass, tls[0], f_pass), (p_stop, tls[1], f_peak))):
+            ims[i].set_data(p_all[k])
+            tl_txts[i].set_text(
+                T(f"TL = {tl:.1f} dB at {f:.0f} Hz")
+                if k >= reveal else "")
+            v_txts[i].set_text(verdicts[i] if k >= reveal else "")
+        t_txt.set_text(T(f"t = {times[k] * 1e3:5.1f} ms"))
+        return (*ims, *tl_txts, *v_txts, t_txt)
+
+    _render_clip(fig, update, output_dir, "anim_fdtd_expansion_chamber",
+                 frames=len(times), gif_fps=8)
+
+
+def _anim_chamber_hardware(ax: Any, length: float, height: float,
+                           pipe_y: tuple[float, float],
+                           chamber_x: tuple[float, float]) -> None:
+    """Draw the silencer as hardware: inlet/outlet pipe walls, the chamber
+    shell with its end plates, the drive loudspeaker and the anechoic
+    termination, all to scale (metres)."""
+    from matplotlib.patches import Rectangle
+
+    wall = 0.012
+    grey = "#9a9a9a"
+    x0, x1 = chamber_x
+    for y_pipe in pipe_y:
+        y0 = y_pipe - (wall if y_pipe == pipe_y[0] else 0.0)
+        for xa, xb in ((0.0, x0), (x1, length)):
+            ax.add_patch(Rectangle((xa, y0), xb - xa, wall,
+                                   facecolor=grey, edgecolor=COLOR_FG,
+                                   linewidth=0.7, zorder=3))
+    for y0 in (-wall, height):             # chamber shell
+        ax.add_patch(Rectangle((x0 - wall, y0), x1 - x0 + 2 * wall, wall,
+                               facecolor=grey, edgecolor=COLOR_FG,
+                               linewidth=0.7, zorder=3))
+    for xe in (x0 - wall, x1):             # end plates (annular in 3D)
+        for ya, yb in ((0.0, pipe_y[0]), (pipe_y[1], height)):
+            ax.add_patch(Rectangle((xe, ya), wall, yb - ya,
+                                   facecolor=grey, edgecolor=COLOR_FG,
+                                   linewidth=0.7, zorder=3))
+    # Loudspeaker into the inlet.
+    bore = pipe_y[1] - pipe_y[0]
+    _anim_speaker(ax, 0.0, 0.5 * (pipe_y[0] + pipe_y[1]), bore,
+                  tip_inset=0.003, label_y=pipe_y[0] - 0.02)
+    ax.add_patch(Rectangle((length, pipe_y[0] - wall), 0.045,
+                           bore + 2 * wall, facecolor=grey, hatch="////",
+                           edgecolor=COLOR_FG, linewidth=0.8, zorder=3))
+    ax.text(length + 0.045, pipe_y[0] - 0.02, "anechoic termination",
+            ha="right", va="top", fontsize=7.5)
+    ax.text(0.5 * (x0 + x1), height + wall + 0.006,
+            f"L = {_CHAMBER_L:.2f} m · m = {_CHAMBER_M:.0f}", ha="center",
+            va="bottom", fontsize=7.5, color=COLOR_FG)
+
+
+_APERTURE_F = 686.0                      # lambda = 0.50 m exactly
+_APERTURE_WIDTHS = (0.025, 0.50)         # sub-lambda slit / lambda-sized gap
+_APERTURE_DEPTH = 0.10                   # wall thickness across the opening
+
+
+@lru_cache(maxsize=1)
+def _aperture_fields(
+    n_frames: int = _FDTD_ANIM_FRAMES,
+) -> tuple[Any, Any, Any, Any]:
+    """Two CW runs against the slotted wall, cached.
+
+    A 6 m x 5 m free field (sponges on the far side and above/below, kept
+    out of the final framing) with a rigid 0.10 m wall at x = 2 m holding
+    a centred opening: 25 mm (lambda/20) in run one, 0.50 m (= lambda) in
+    run two. A sustained 686 Hz plane wave enters through the rho c left
+    edge; the wall reflection travels back out through the same matched
+    edge. ``dx = 6.25 mm`` keeps four cells across the narrow slit.
+    Returns the frame stacks, the running-RMS maps in dB on a SHARED
+    scale (both referenced to the strongest final RMS, so the two
+    transmitted fields are directly comparable), the frame times and the
+    library transmission of the narrow slit at the drive frequency.
+    """
+    import fdtd2d
+
+    from phonometry import slit_transmission_coefficient
+
+    # Mesh rule: dx = min(smallest scene dimension / 4, lambda/8 at the
+    # carrier) = min(25 mm / 4 = 6.25 mm, 0.5 m / 8 = 62.5 mm) -> the
+    # narrow slit governs: dx = 6.25 mm (lambda/80, 4 cells across it).
+    dx = 0.00625
+    ny, nx = 800, 960                      # 5 m x 6 m
+    wall_c = (round(2.0 / dx), round((2.0 + _APERTURE_DEPTH) / dx))
+    # Clip duration per the deepest-reflector rule: d(source -> far wall
+    # face through the opening) = 2.1 m, plus d(slit exit -> farthest
+    # visible frame corner (5.72, 0.7)) = 4.04 m: t = 1.2 * 6.14 / 343 =
+    # 21.5 ms -> every = 8 (22.3 ms captured from cold, so the clip is the
+    # transit story itself; 23.6 frames per 686 Hz period >= 12).
+    every = 8
+    p_all, r_all = [], []
+    times = np.zeros(0)
+    for width in _APERTURE_WIDTHS:
+        gap = round(width / dx)
+        mask = np.zeros((ny, nx), dtype=bool)
+        mask[:, wall_c[0]:wall_c[1]] = True
+        mask[(ny - gap) // 2:(ny + gap) // 2, wall_c[0]:wall_c[1]] = False
+        sim = fdtd2d.FDTD2D(343.0, dx, shape=(ny, nx), sponge_width=40,
+                            sponge_sides=("top", "bottom", "right"),
+                            obstacle_mask=mask,
+                            edge_impedance={"left": 1.2 * 343.0})
+        tone = fdtd2d.CWSource(0, 0, frequency=_APERTURE_F)
+        sim.add_source(fdtd2d.PlaneWaveSource("right", tone.value,
+                                              offset=2))
+        ps, rs, times, _ = _fdtd_cw_capture(sim, _APERTURE_F, every,
+                                            n_frames)
+        p_all.append(ps)
+        r_all.append(rs)
+    rms = np.stack(r_all)
+    ref = float(max(r[-1].max() for r in r_all))
+    with np.errstate(divide="ignore"):
+        db = 20.0 * np.log10(rms / ref)
+    db_all = np.clip(db, -40.0, 0.0).astype(np.float32)
+    res = slit_transmission_coefficient(
+        np.array([_APERTURE_F]), _APERTURE_WIDTHS[0], _APERTURE_DEPTH,
+        field="normal")
+    tau = float(res.transmission_coefficient[0])
+    return np.stack(p_all), db_all, times, tau
+
+
+def animate_fdtd_aperture_slit(output_dir: str) -> None:
+    """A plane wavefront against a rigid wall with an opening (2D FDTD),
+    sub-wavelength versus wavelength-sized side by side: the 25 mm slit
+    re-radiates the little it lets through as a cylindrical wave into a
+    nearly uniform half space, while the 0.50 m gap passes the front
+    almost intact and casts sharp-edged shadows. The Gomperts model of
+    the library gives the narrow slit's transmission coefficient."""
+    from matplotlib import patheffects
+    from matplotlib.patches import Rectangle
+
+    T = _translate_str
+    outline = [patheffects.withStroke(linewidth=2.0, foreground="white")]
+    p_all, db_all, times, tau = _aperture_fields()
+    lam = 343.0 / _APERTURE_F
+    half = p_all.shape[1] // 2
+    vmax = float(np.quantile(np.abs(p_all[0][half:]), 0.999))
+    wall_x = (2.0, 2.0 + _APERTURE_DEPTH)
+
+    fig = _anim_figure()
+    fig.suptitle(T("Sound through a wall aperture (2D FDTD)"),
+                 fontweight="bold")
+    gs = fig.add_gridspec(2, 2)
+    titles = [T(f"Slit w = {_APERTURE_WIDTHS[0] * 1e3:.0f} mm (λ/20)"),
+              T(f"Opening w = {_APERTURE_WIDTHS[1]:.2f} m (= λ)")]
+    verdicts = [T("cylindrical re-radiation from the slit"),
+                T("the front passes: sharp-edged shadow")]
+    ims: list[Any] = []
+    tau_txt: Any = None
+    for col in range(2):
+        gap = _APERTURE_WIDTHS[col]
+        ax_p = fig.add_subplot(gs[0, col])
+        ax_r = fig.add_subplot(gs[1, col])
+        im_p = ax_p.imshow(p_all[col][0], origin="lower",
+                           extent=(0.0, 6.0, 0.0, 5.0), cmap="RdBu_r",
+                           vmin=-vmax, vmax=vmax, interpolation="bilinear")
+        im_r = ax_r.imshow(db_all[col][0], origin="lower",
+                           extent=(0.0, 6.0, 0.0, 5.0), cmap="magma",
+                           vmin=-40.0, vmax=0.0, interpolation="bilinear")
+        ax_p.set_title(titles[col], fontsize=10, fontweight="bold")
+        for ax in (ax_p, ax_r):
+            ax.grid(False)
+            for y0, y1 in ((0.0, 2.5 - gap / 2.0), (2.5 + gap / 2.0, 5.0)):
+                ax.add_patch(Rectangle((wall_x[0], y0),
+                                       _APERTURE_DEPTH, y1 - y0,
+                                       facecolor="#707070",
+                                       edgecolor="white", lw=0.5))
+            # Crop the sponge layers (and the injection seam) out of view,
+            # so the frame edge is physical field.
+            ax.set_xlim(0.08, 5.72)
+            ax.set_ylim(0.7, 4.3)
+            ax.tick_params(labelsize=7)
+        ax_p.tick_params(labelbottom=False)
+        ax_r.set_xlabel("x [m]", fontsize=8)
+        ax_p.annotate("", xy=(1.15, 3.75), xytext=(0.55, 3.75),
+                      arrowprops={"arrowstyle": "-|>", "color": "black",
+                                  "lw": 1.2})
+        ax_p.text(0.85, 3.85, T("incident plane wavefront"), ha="left",
+                  va="bottom", color="black", fontsize=7.5,
+                  path_effects=outline)
+        ax_p.text(2.24, 1.45, T("rigid wall"), ha="left", va="center",
+                  color="black", fontsize=7, path_effects=outline)
+        ax_r.text(3.85, 0.85, verdicts[col], ha="center", va="bottom",
+                  color="white", fontsize=7.5, zorder=6,
+                  bbox={"boxstyle": _ANIM_PILL_BOX,
+                        "facecolor": "black", "alpha": 0.45,
+                        "edgecolor": "none"})
+        if col == 0:
+            ax_p.set_ylabel(T("instantaneous p(x, y)"), fontsize=9)
+            ax_r.set_ylabel(T("RMS level [dB]"), fontsize=9)
+            ax_p.text(0.2, 0.85,
+                      T(f"f = {_APERTURE_F:.0f} Hz (λ = {lam:.2f} m)"),
+                      ha="left", va="bottom", color="black", fontsize=7.5,
+                      path_effects=outline)
+            tau_txt = ax_r.text(5.55, 4.1, "", ha="right", va="top",
+                                fontsize=8.5, color="white", zorder=7,
+                                bbox={"boxstyle": _ANIM_PILL_BOX,
+                                      "facecolor": "black", "alpha": 0.55,
+                                      "edgecolor": "none"})
+        else:
+            ax_p.tick_params(labelleft=False)
+            ax_r.tick_params(labelleft=False)
+            ax_r.text(5.55, 4.1, T("same color scale"), color="white",
+                      fontsize=7, ha="right", va="top")
+        ims += [im_p, im_r]
+    t_txt = fig.text(0.012, 0.985, "", ha="left", va="top",
+                     family="monospace", fontsize=10, color=COLOR_FG)
+    reveal = int(0.5 * p_all.shape[1])
+
+    def update(k: int) -> tuple[Any, ...]:
+        for col in range(2):
+            ims[2 * col].set_data(p_all[col][k])
+            ims[2 * col + 1].set_data(db_all[col][k])
+        tau_txt.set_text(
+            T(f"slit τ = {tau:.2f} (Gomperts)") if k >= reveal else "")
+        t_txt.set_text(T(f"t = {times[k] * 1e3:4.1f} ms"))
+        return (*ims, tau_txt, t_txt)
+
+    _render_clip(fig, update, output_dir, "anim_fdtd_aperture_slit",
+                 frames=int(p_all.shape[1]), gif_fps=8)
+
+
+_REFR_B = 1.0                            # log-profile strength [m/s]
+_REFR_C0 = 340.0                         # ground-level effective speed
+_REFR_SRC = (30.0, 2.0)                  # source range/height [m]
+_REFR_RECV = 350.0                       # receiver distance from the source
+_REFR_F = 50.0                           # CW drive: lambda ~ 6.9 m
+# Mesh rule: dx = min(smallest scene dimension / 4, lambda/8 at the
+# carrier) = min(2 m source height / 4 = 0.5 m, 6.86 m / 8 = 0.857 m);
+# the grid runs finer still (0.3 m, lambda/23) so the long-range phase
+# stays clean over the ~60-wavelength domain.
+_REFR_DX = 0.3
+
+
+def _refraction_profiles() -> tuple[Any, ...]:
+    """The guide's realistic logarithmic surface-layer profiles: downwind
+    (+1 m/s) and upwind (-1 m/s) effective sound speed."""
+    from phonometry import log_linear_sound_speed_profile
+
+    return tuple(
+        log_linear_sound_speed_profile(sign * _REFR_B,
+                                       ground_speed=_REFR_C0,
+                                       max_height=140.0)
+        for sign in (1.0, -1.0)
+    )
+
+
+@lru_cache(maxsize=1)
+def _refraction_fields(
+    n_frames: int = _FDTD_ANIM_FRAMES,
+) -> tuple[Any, Any, Any, Any, Any, Any]:
+    """Two CW runs through the refracting atmosphere, cached.
+
+    A 452 m x 132 m slice over rigid ground with the guide's logarithmic
+    effective-speed profiles (downwind +1 m/s, upwind -1 m/s) written into
+    the sound-speed map row by row; sponges on the sides and the sky. A
+    50 Hz CW source (lambda ~ 6.9 m, short against the ~110 m ray-model
+    shadow distance, so the shadow actually forms) sits 2 m over the
+    ground, the guide's source height. A low-frequency PULSE cannot show
+    this: within the 30-periods-per-clip frame budget its wavelength
+    reaches ~20 m and diffraction refills the shadow (a measured contrast
+    of barely 2 dB). Instead both runs step uncaptured to steady state
+    (~1.3 s, the transit of the domain) and the clip then shows the
+    settled wave field streaming through the refracting atmosphere at 13.6
+    frames per period. Returns the frame stacks, the steady running-RMS
+    maps in dB compensated for cylindrical spreading (the verdict
+    overlay, on a shared scale), the frame times, the height grid and the
+    two c(z) profiles sampled on it, and the library ray fans traced
+    through the same profiles.
+    """
+    import fdtd2d
+
+    from phonometry import atmospheric_ray_paths
+
+    dx = _REFR_DX
+    ny, nx = 440, 1507                     # 132 m x 452 m
+    z = (np.arange(ny) + 0.5) * dx
+    profiles = _refraction_profiles()
+    # Clip duration per the deepest-reflector rule: d(source -> ground)
+    # = 2 m plus d(ground -> farthest visible frame corner (430, 105))
+    # = 413.6 m at the slowest c on the path (upwind, ~333 m/s) gives
+    # t = 1.2 * 415.6 / 333 = 1.50 s, but the >= 12 frames-per-period
+    # floor at the 50 Hz carrier caps the 360-frame window first:
+    # every <= T / (12 dt) = 4.5 -> every = 4 (0.529 s captured, 13.6
+    # frames per period).
+    every = 4
+    rays = [
+        atmospheric_ray_paths(prof, source_height=_REFR_SRC[1],
+                              launch_angles_deg=angles, max_range=430.0,
+                              n_steps=900)
+        for prof, angles in zip(
+            profiles,
+            # Downwind: a shallow fan (the log profile turns anything
+            # under ~8 deg back down, so the duct is thin) plus one
+            # escaping ray; upwind: the same fan bends up and away.
+            ((-2.0, 0.0, 2.0, 4.0, 6.0, 8.0, 10.0),
+             (-2.0, 0.0, 2.0, 4.0, 6.0, 8.0, 10.0)), strict=True)
+    ]
+    p_all, r_all = [], []
+    times = np.zeros(0)
+    for prof in profiles:
+        c_prof = prof.speed_at(z)
+        c_map = np.repeat(c_prof[:, np.newaxis], nx, axis=1)
+        # Row 0 is the ground (rigid, no sponge); "bottom" is the sky in
+        # the low-row-origin naming of fdtd2d, as in the barrier clip.
+        sim = fdtd2d.FDTD2D(c_map, dx, sponge_width=40,
+                            sponge_sides=("left", "right", "bottom"))
+        ix, iy = round(_REFR_SRC[0] / dx), round(_REFR_SRC[1] / dx)
+        sim.add_source(fdtd2d.CWSource(ix=ix, iy=iy, frequency=_REFR_F,
+                                       ramp_cycles=2.0))
+        beta = float(np.exp(-sim.dt * _REFR_F / 2.0))
+        ms = np.zeros_like(sim.p)
+        settle = round(1.30 / sim.dt)      # domain transit + ring-up
+        for _ in range(settle):
+            sim.step()
+            ms = beta * ms + (1.0 - beta) * sim.p**2
+        ps: list[Any] = []
+        ts: list[float] = []
+        while len(ps) < n_frames:
+            sim.step()
+            ms = beta * ms + (1.0 - beta) * sim.p**2
+            if sim.n % every == 0:
+                ps.append(sim.p[::3, ::3].astype(np.float32))
+                ts.append(sim.time)
+        p_all.append(np.stack(ps))
+        r_all.append(np.sqrt(ms))
+        times = np.asarray(ts)
+    rms_maps = np.stack(r_all)
+    # Verdict overlay: the steady RMS map times sqrt(r) to undo the 2D
+    # cylindrical spreading; what remains is pure refraction (the bright
+    # downwind ground duct and interference lobes, the dark upwind shadow
+    # wedge) on a shared dB scale referenced away from the source blast.
+    xs, zs = _REFR_SRC
+    xg, zg = np.meshgrid((np.arange(nx) + 0.5) * dx, z)
+    r_map = np.maximum(np.hypot(xg - xs, zg - zs), 5.0)
+    comp = rms_maps * np.sqrt(r_map)
+    ref = float(np.quantile(comp[:, :, nx // 4:], 0.999))
+    with np.errstate(divide="ignore"):
+        e_db = 20.0 * np.log10(comp[:, ::3, ::3] / ref)
+    e_db = np.clip(e_db, -30.0, 0.0).astype(np.float32)
+    c_profs = np.stack([prof.speed_at(z) for prof in profiles])
+    return np.stack(p_all), e_db, times, z, c_profs, rays
+
+
+def animate_fdtd_refraction(output_dir: str) -> None:
+    """Atmospheric refraction (2D FDTD): the same steady 50 Hz source 2 m
+    over rigid ground, downwind and upwind. With the effective sound
+    speed growing with height the wavefronts bend back down and stream
+    along the ground, keeping the 350 m receiver loud; with it falling
+    they lift off the surface and an acoustic shadow opens at the ground.
+    The library's ray fans, traced through the same c(z) profiles,
+    overlay the fields; the closing seconds crossfade to the
+    spreading-compensated RMS map."""
+    from matplotlib import patheffects
+
+    from phonometry import shadow_zone_distance
+
+    T = _translate_str
+    outline = [patheffects.withStroke(linewidth=2.0, foreground="white")]
+    p_all, e_db, times, z, c_profs, rays = _refraction_fields()
+    profiles = _refraction_profiles()
+    half = p_all.shape[1] // 2
+    vmax = float(np.quantile(np.abs(p_all[:, half // 2:half]), 0.999))
+    # Shadow-boundary estimate exactly as the guide does it: the log
+    # profile's linear-equivalent gradient over the first 10 m, then the
+    # closed-form grazing-ray distance.
+    grad = float(profiles[1].speed_at(10.0) - profiles[1].speed_at(0.0))
+    x_shadow = shadow_zone_distance(grad / 10.0, _REFR_SRC[1],
+                                    _REFR_SRC[1], ground_speed=_REFR_C0)
+    extent = (0.0, 1507 * _REFR_DX, 0.0, 440 * _REFR_DX)
+    src_x, src_h = _REFR_SRC
+    recv_x = src_x + _REFR_RECV
+
+    fig = _anim_figure()
+    fig.suptitle(T("Atmospheric refraction: downwind duct, upwind shadow "
+                   "(2D FDTD)"), fontweight="bold")
+    gs = fig.add_gridspec(2, 2, width_ratios=[0.20, 1.0])
+    titles = [T("Downwind: sound speed grows with height"),
+              T("Upwind: sound speed falls with height")]
+    verdicts = [T("bent down: a duct hugs the ground, the receiver "
+                  "stays loud"),
+                T("bent up: a shadow opens, the receiver goes quiet")]
+    ims: list[Any] = []
+    ims_e: list[Any] = []
+    v_txts: list[Any] = []
+    ray_lines: list[Any] = []
+    for row in range(2):
+        ax_c = fig.add_subplot(gs[row, 0])
+        _grid_axes(ax_c)
+        ax_c.plot(c_profs[row], z, color=COLOR_PRIMARY, lw=1.6)
+        ax_c.plot([float(np.interp(src_h, z, c_profs[row]))], [src_h],
+                  marker="o", ms=5, color=COLOR_TERTIARY,
+                  markeredgecolor="white", markeredgewidth=0.8)
+        ax_c.set_ylim(0.0, 105.0)
+        ax_c.set_xlim(332.0, 348.0)
+        ax_c.set_xticks([335.0, 345.0])
+        ax_c.set_ylabel(T("Height [m]"), fontsize=8)
+        ax_c.tick_params(labelsize=6)
+        if row == 1:
+            ax_c.set_xlabel(T("c_eff(z) [m/s]"), fontsize=7)
+
+        ax_f = fig.add_subplot(gs[row, 1])
+        ax_f.grid(False)
+        im = ax_f.imshow(p_all[row][0], origin="lower", extent=extent,
+                         cmap="RdBu_r", vmin=-vmax, vmax=vmax,
+                         aspect="auto", interpolation="bilinear")
+        im_e = ax_f.imshow(e_db[row], origin="lower", extent=extent,
+                           cmap="magma", vmin=-30.0, vmax=0.0,
+                           aspect="auto", interpolation="bilinear",
+                           alpha=0.0, zorder=2.5)
+        ax_f.set_title(titles[row], fontsize=10, fontweight="bold")
+        ax_f.set_xlim(14.0, 430.0)
+        ax_f.set_ylim(-7.0, 105.0)
+        ax_f.fill_between([14.0, 430.0], -7.0, 0.0, facecolor=COLOR_GRID,
+                          edgecolor=COLOR_FG, lw=0.8, hatch="///")
+        # Library ray fan through the same profile, revealed once the
+        # wavefront has drawn the geometry it explains.
+        lines_row = []
+        result = rays[row]
+        for i in range(result.heights.shape[0]):
+            (ln,) = ax_f.plot(src_x + result.ranges[i],
+                              result.heights[i], color="white",
+                              lw=0.8, alpha=0.0, zorder=3.4,
+                              path_effects=[patheffects.withStroke(
+                                  linewidth=1.5, foreground="#40404060")])
+            lines_row.append(ln)
+        ray_lines.append(lines_row)
+        ax_f.plot([src_x], [src_h], marker="o", ms=5,
+                  color=COLOR_TERTIARY, markeredgecolor="white",
+                  markeredgewidth=0.8, zorder=4)
+        ax_f.text(src_x + 8.0, src_h + 4.0, T("source (h = 2 m)"),
+                  ha="left", va="bottom", color="black", fontsize=7.5,
+                  path_effects=outline, zorder=4)
+        ax_f.plot([recv_x], [src_h], marker="o", ms=5, color="white",
+                  markeredgecolor="black", markeredgewidth=0.8, zorder=4)
+        ax_f.text(recv_x, src_h + 6.0, T("receiver 350 m"), ha="center",
+                  va="bottom", color="black", fontsize=7.5,
+                  path_effects=outline, zorder=4)
+        if row == 0:
+            ax_f.text(20.0, -3.5, T("rigid ground"), ha="left",
+                      va="center", color=COLOR_FG, fontsize=6.5,
+                      bbox={"boxstyle": "round,pad=0.2",
+                            "facecolor": fig.get_facecolor(),
+                            "edgecolor": "none"})
+            ax_f.text(22.0, 97.0, T(f"f = {_REFR_F:.0f} Hz"), ha="left",
+                      va="top", color="black", fontsize=7.5,
+                      path_effects=outline, zorder=4)
+        else:
+            # The ray-model shadow boundary of the library, where the
+            # grazing ray leaves the ground for good.
+            ax_f.axvline(src_x + x_shadow, color="#888888", ls="--",
+                         lw=0.9, alpha=0.8, zorder=3)
+            ax_f.text(src_x + x_shadow + 6.0, 84.0,
+                      T(f"shadow beyond ≈ {x_shadow:.0f} m (ray model)"),
+                      ha="left", va="top", color="black", fontsize=7,
+                      path_effects=outline, zorder=4)
+        v_txt = ax_f.text(424.0, 97.0, "", ha="right", va="top",
+                          color="white", fontsize=8, zorder=4,
+                          bbox={"boxstyle": _ANIM_PILL_BOX,
+                                "facecolor": "black", "alpha": 0.45,
+                                "edgecolor": "none"})
+        ax_f.tick_params(labelsize=7, labelleft=False)
+        if row == 0:
+            ax_f.tick_params(labelbottom=False)
+        else:
+            ax_f.set_xlabel(T("Range [m]"), fontsize=8)
+        ims.append(im)
+        ims_e.append(im_e)
+        v_txts.append(v_txt)
+        if row == 1:
+            # Inside the lower field, top-left: the Spanish suptitle and
+            # row titles leave no free margin at the figure corners, and
+            # this corner stays clear of the shadow-boundary annotation.
+            t_txt = ax_f.text(20.0, 97.0, "", ha="left", va="top",
+                              family="monospace", fontsize=9,
+                              color="white", zorder=4,
+                              bbox={"boxstyle": _ANIM_PILL_BOX,
+                                    "facecolor": "black", "alpha": 0.45,
+                                    "edgecolor": "none"})
+    # The field is already steady when the clip starts, so the ray fan can
+    # come in early and the RMS verdict follows once the streaming motion
+    # has been established.
+    rays_on = int(0.18 * p_all.shape[1])
+    reveal = int(0.80 * p_all.shape[1])
+
+    def update(k: int) -> tuple[Any, ...]:
+        alpha_e = min(1.0, max(0.0, (k - reveal) / 12.0))
+        alpha_r = min(0.65, max(0.0, (k - rays_on) / 20.0))
+        arts: list[Any] = []
+        for row in range(2):
+            ims[row].set_data(p_all[row][k])
+            ims_e[row].set_alpha(alpha_e)
+            for ln in ray_lines[row]:
+                ln.set_alpha(alpha_r)
+                arts.append(ln)
+            v_txts[row].set_text(verdicts[row] if k >= reveal else "")
+        t_txt.set_text(T(f"t = {times[k]:5.2f} s"))
+        return (*ims, *ims_e, *arts, *v_txts, t_txt)
+
+    # gif_fps 4: the steady CW field moves everywhere in every frame, the
+    # worst case for GIF palette coding; 8 fps left the fallback near 8 MB
+    # where every other FDTD clip stays under 4 MB.
+    _render_clip(fig, update, output_dir, "anim_fdtd_refraction",
+                 frames=int(p_all.shape[1]), gif_fps=4)
+
+
 _ANIMATIONS: dict[str, Callable[[str], None]] = {
     "anim_time_weighting": animate_time_weighting_ballistics,
     "anim_onset_detection": animate_onset_detection,
@@ -16052,6 +17190,10 @@ _ANIMATIONS: dict[str, Callable[[str], None]] = {
     "anim_specific_loudness": animate_specific_loudness,
     "anim_power_two_rooms": animate_power_two_rooms,
     "anim_comb_filtering": animate_comb_filtering,
+    "anim_fdtd_slit_absorber": animate_fdtd_slit_absorber,
+    "anim_fdtd_expansion_chamber": animate_fdtd_expansion_chamber,
+    "anim_fdtd_aperture_slit": animate_fdtd_aperture_slit,
+    "anim_fdtd_refraction": animate_fdtd_refraction,
 }
 
 
@@ -16271,6 +17413,10 @@ _ANIM_WEIGHTS: dict[str, float] = {
     "anim_schroeder": 55.0,
     "anim_fdtd_impedance_tube": 260.0,
     "anim_fdtd_transmission_tube": 280.0,
+    "anim_fdtd_slit_absorber": 320.0,
+    "anim_fdtd_aperture_slit": 230.0,
+    "anim_fdtd_refraction": 260.0,
+    "anim_fdtd_expansion_chamber": 150.0,
 }
 
 # A clip rename must not silently drop its scheduling weight; fail fast.

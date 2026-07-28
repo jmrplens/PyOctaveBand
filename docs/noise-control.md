@@ -113,6 +113,16 @@ plt.show()
 
 </details>
 
+The clip below runs an m = 4 chamber of the same 0.30 m length in a 2D FDTD
+duct at its two characteristic frequencies. At kL = π the chamber is a
+half-wave resonator and the tone crosses as if it were not there; at kL = π/2
+the two area jumps reflect in phase and send the wave back up the inlet, the
+6.5 dB peak of the four-pole curve above.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_expansion_chamber_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_expansion_chamber.gif" alt="Animation: a 2D FDTD duct with a 0.30 m expansion chamber of area ratio 4 drawn as hardware between a loudspeaker and an anechoic termination, at two frequencies side by side; at 572 Hz the pressure envelope stays flat and the tone crosses the chamber unchanged with the annotated transmission loss of 0.0 dB, while at 286 Hz a standing wave fills the inlet pipe and the outlet is left with less than half the amplitude, matching the annotated 6.5 dB peak" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_expansion_chamber.webm)
+
 ### Side-branch and extended-tube resonators
 
 A **Helmholtz resonator** (`helmholtz_resonator`) and a closed **quarter-wave

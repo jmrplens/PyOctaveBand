@@ -113,6 +113,7 @@ references:
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
+import Video from '../../../../components/Video.astro';
 
 A partir de la **resistividad al flujo** de un material poroso (la magnitud
 que mide el [banco de flujo](/phonometry/es/guides/materials/)) los modelos
@@ -689,6 +690,21 @@ plt.show()
 ```
 
 </details>
+
+El clip de abajo excita exactamente esta celda en un tubo de onda plana
+virtual: la rendija submilimétrica y su resonador están mallados en la
+rejilla FDTD y rellenos con los fluidos efectivos viscotérmicos del modelo.
+A la altura de rendija de diseño la onda estacionaria se desploma y el tono
+muere dentro del panel; a 1,7 veces esa altura el balance de pérdidas se
+rompe y la reflexión la reconstruye.
+
+<Video
+  name="anim_fdtd_slit_absorber"
+  width={2400}
+  height={1350}
+  title="Dentro del absorbedor de rendija de sonido lento en una simulación FDTD 2D"
+  description="Un tono plano de 300 Hz en un tubo FDTD 2D llega a la celda de acoplamiento crítico mallada, con su rendija de 0,98 mm y su resonador de Helmholtz resueltos en la rejilla y mostrados en un panel ampliado. A la altura de rendija de diseño la envolvente de presión queda plana y se anota la absorción 1,00 de la biblioteca; la rendija 1,7 veces más ancha sostiene una onda estacionaria profunda frente al panel y la absorción cae a 0,34."
+/>
 
 ## Notas prácticas
 

@@ -20,6 +20,7 @@ references:
 ---
 
 import ThemeImage from '../../../components/ThemeImage.astro';
+import Video from '../../../components/Video.astro';
 
 The [ISO 9613-2 method](/phonometry/guides/outdoor-propagation/) and the
 [spherical-wave ground effect](/phonometry/guides/ground-barriers/) both assume
@@ -303,6 +304,21 @@ plt.show()
 ```
 
 </details>
+
+The clip below runs the full wave physics through both signs of the
+logarithmic profile: a steady 50 Hz source 2 m over rigid ground in a 2D FDTD
+slice, with the library's ray fans traced through the same c(z) profiles laid
+over the fields. Downwind the fronts bend back and stream along the ground to
+the 350 m receiver; upwind they lift off the surface and the ground goes
+quiet beyond the ray-model shadow boundary.
+
+<Video
+  name="anim_fdtd_refraction"
+  width={2400}
+  height={1350}
+  title="Atmospheric refraction in a 2D FDTD simulation"
+  description="A steady 50 Hz source 2 m above rigid ground in a 2D FDTD slice, downwind and upwind panels with their logarithmic effective sound-speed profiles drawn beside them. Downwind the wavefronts curve back to the ground and keep the 350 m receiver loud; upwind they lift away and an acoustic shadow opens beyond the annotated 109 m ray-model boundary, with the library ray fans overlaid and a closing spreading-compensated RMS map showing the bright ground duct against the dark shadow wedge."
+/>
 
 ## 4. Validation
 

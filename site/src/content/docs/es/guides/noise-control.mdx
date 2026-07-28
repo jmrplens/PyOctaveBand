@@ -29,6 +29,7 @@ references:
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
+import Video from '../../../../components/Video.astro';
 
 Tres medidas pasivas dominan el control de ruido aplicado: los **silenciadores**
 en un conducto, las atenuaciones pasivas y el ruido autogenerado de una
@@ -183,6 +184,21 @@ plt.show()
 ```
 
 </details>
+
+El clip de abajo ejecuta una cámara con m = 4 y la misma longitud de 0,30 m
+en un conducto FDTD 2D a sus dos frecuencias características. En kL = π la
+cámara es un resonador de media onda y el tono la cruza como si no
+existiera; en kL = π/2 los dos saltos de área reflejan en fase y devuelven
+la onda por el conducto de entrada, el pico de 6,5 dB de la curva de cuatro
+polos de arriba.
+
+<Video
+  name="anim_fdtd_expansion_chamber"
+  width={2400}
+  height={1350}
+  title="El silenciador de cámara de expansión en una simulación FDTD 2D"
+  description="Un conducto FDTD 2D con una cámara de expansión de 0,30 m y relación de áreas 4, dibujada como hardware entre un altavoz y una terminación anecoica, a dos frecuencias en paralelo. A 572 Hz la envolvente de presión queda plana y el tono cruza la cámara sin cambios con la pérdida de transmisión anotada de 0,0 dB; a 286 Hz una onda estacionaria llena el conducto de entrada y la salida queda con menos de la mitad de la amplitud, en línea con el pico anotado de 6,5 dB."
+/>
 
 ### Resonadores laterales y de tubo extendido
 

@@ -244,6 +244,17 @@ plt.show()
 
 </details>
 
+The clip below puts the two regimes side by side in a 2D FDTD field: a plane
+front meets a rigid 0.10 m wall with a 25 mm slit (λ/20 at 686 Hz) and with a
+0.50 m opening (one wavelength). The narrow slit re-radiates what it swallows
+as a cylindrical wave, the Gomperts transmission of the model annotated; the
+wavelength-sized opening lets the front through nearly intact and casts
+sharp-edged shadows.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_aperture_slit_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_aperture_slit.gif" alt="Animation: a 686 Hz plane wave in a 2D FDTD field hits a rigid wall with a 25 mm slit and, in a second panel, a 0.50 m opening; the narrow slit re-radiates a cylindrical wave into an otherwise dark half space with the annotated Gomperts transmission coefficient of 0.55, while the wavelength-sized opening passes a beam with sharp-edged shadows, both RMS maps on the same colour scale" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_aperture_slit.webm)
+
 ## Radiation efficiency of a bending plate (Hopkins 2.9)
 
 How much airborne power a vibrating plate radiates per unit mean-square velocity

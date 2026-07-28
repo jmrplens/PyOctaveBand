@@ -28,6 +28,7 @@ references:
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
+import Video from '../../../../components/Video.astro';
 
 Un ensayo de laboratorio mide el índice de reducción acústica $R$ de un elemento
 acabado; esta página, en cambio, **predice** $R(f)$ a partir de las propiedades
@@ -288,6 +289,21 @@ plt.show()
 ```
 
 </details>
+
+El clip de abajo pone los dos regímenes en paralelo en un campo FDTD 2D: un
+frente plano llega a un muro rígido de 0,10 m con una rendija de 25 mm (λ/20
+a 686 Hz) y con un hueco de 0,50 m (una longitud de onda). La rendija
+estrecha re-radia lo que traga como una onda cilíndrica, con la transmisión
+de Gomperts del modelo anotada; el hueco del tamaño de la longitud de onda
+deja pasar el frente casi intacto y proyecta sombras de bordes nítidos.
+
+<Video
+  name="anim_fdtd_aperture_slit"
+  width={2400}
+  height={1350}
+  title="Sonido a través de una abertura en un muro en una simulación FDTD 2D"
+  description="Una onda plana de 686 Hz en un campo FDTD 2D choca contra un muro rígido con una rendija de 25 mm y, en un segundo panel, con un hueco de 0,50 m. La rendija estrecha re-radia una onda cilíndrica hacia un semiespacio por lo demás oscuro, con el coeficiente de transmisión de Gomperts anotado de 0,55; el hueco del tamaño de la longitud de onda deja pasar un haz con sombras de bordes nítidos, ambos mapas RMS en la misma escala de color."
+/>
 
 ## Eficiencia de radiación de una placa en flexión (Hopkins 2.9)
 

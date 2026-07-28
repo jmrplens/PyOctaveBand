@@ -20,6 +20,7 @@ references:
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
+import Video from '../../../../components/Video.astro';
 
 El [método ISO 9613-2](/phonometry/es/guides/outdoor-propagation/) y el
 [efecto suelo de onda esférica](/phonometry/es/guides/ground-barriers/) suponen
@@ -314,6 +315,22 @@ plt.show()
 ```
 
 </details>
+
+El clip de abajo ejecuta la física ondulatoria completa con los dos signos
+del perfil logarítmico: una fuente estacionaria de 50 Hz a 2 m sobre suelo
+rígido en un corte FDTD 2D, con los abanicos de rayos de la biblioteca
+trazados en los mismos perfiles c(z) superpuestos a los campos. A favor del
+viento los frentes se curvan de vuelta y avanzan pegados al suelo hasta el
+receptor a 350 m; en contra se despegan de la superficie y el suelo queda en
+silencio más allá de la frontera de sombra del modelo de rayos.
+
+<Video
+  name="anim_fdtd_refraction"
+  width={2400}
+  height={1350}
+  title="Refracción atmosférica en una simulación FDTD 2D"
+  description="Una fuente estacionaria de 50 Hz a 2 m sobre suelo rígido en un corte FDTD 2D, con paneles a favor y en contra del viento y sus perfiles logarítmicos de velocidad efectiva del sonido dibujados al lado. A favor del viento los frentes de onda se curvan de vuelta al suelo y mantienen audible al receptor a 350 m; en contra se elevan y se abre una sombra acústica más allá de la frontera anotada de 109 m del modelo de rayos, con los abanicos de rayos de la biblioteca superpuestos y un mapa RMS final compensado en divergencia que muestra el canal brillante junto al suelo frente a la cuña oscura de sombra."
+/>
 
 ## 4. Validación
 
