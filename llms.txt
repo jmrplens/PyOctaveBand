@@ -77,12 +77,23 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 ## Rooms and buildings
 
 - [Overview](https://jmrplens.github.io/phonometry/guides/sections/rooms-buildings/)
-- [Field Insulation Measurement and Ratings](https://jmrplens.github.io/phonometry/guides/insulation-field/)
+- [Measuring the Room Impulse Response](https://jmrplens.github.io/phonometry/guides/room-impulse-response/)
+- [Room Acoustics](https://jmrplens.github.io/phonometry/guides/room-acoustics/)
+- [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/guides/insulation-field/)
 - [Reverberation-time prediction (Sabine · Eyring · Fitzroy · Arau-Puchades)](https://jmrplens.github.io/phonometry/guides/reverberation-prediction/)
 - [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/guides/insulation-prediction/)
+- [Open-Plan Office Acoustics (ISO 3382-3)](https://jmrplens.github.io/phonometry/guides/open-plan-acoustics/)
+- [Image sources and the steady-state room field (Kuttruff / Vorländer / Bies)](https://jmrplens.github.io/phonometry/guides/room-image-sources/)
 - [Room-noise criteria (NC / RC Mark II)](https://jmrplens.github.io/phonometry/guides/room-noise/)
 - [Sound absorption in enclosed spaces (EN 12354-6)](https://jmrplens.github.io/phonometry/guides/enclosed-space-absorption/)
 - [Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/guides/insulation-lab/)
+- [Sound Insulation by Intensity (ISO 15186)](https://jmrplens.github.io/phonometry/guides/insulation-intensity/)
+- [Sound Insulation Survey Method (ISO 10052)](https://jmrplens.github.io/phonometry/guides/insulation-survey/)
+- [Laboratory Flanking Transmission (ISO 10848)](https://jmrplens.github.io/phonometry/guides/flanking-lab/)
+- [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/guides/insulation-ratings/)
+- [Façade Sound Insulation](https://jmrplens.github.io/phonometry/guides/facade-insulation/)
+- [Predicting Panel Sound Insulation (mass law, coincidence, double walls)](https://jmrplens.github.io/phonometry/guides/panel-sound-insulation/)
+- [Floor-Covering Impact Improvement (ISO 16251-1)](https://jmrplens.github.io/phonometry/guides/impact-improvement/)
 - [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/guides/dynamic-stiffness/)
 
 ## Materials and surfaces
@@ -101,6 +112,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 
 - [Overview](https://jmrplens.github.io/phonometry/guides/sections/vibration/)
 - [Mechanical mobility and the FRF family (ISO 7626-1)](https://jmrplens.github.io/phonometry/guides/mechanical-mobility/)
+- [Human Vibration: Whole-Body and Hand-Arm Exposure](https://jmrplens.github.io/phonometry/guides/human-vibration/)
 - [Bending-wave transmission at plate junctions (Cremer / Craik / Hopkins)](https://jmrplens.github.io/phonometry/guides/junction-transmission/)
 - [Dynamic transfer stiffness of resilient elements (ISO 10846)](https://jmrplens.github.io/phonometry/guides/transfer-stiffness/)
 - [Sound power from surface vibration (ISO/TS 7849)](https://jmrplens.github.io/phonometry/guides/vibration-sound-power/)
@@ -145,8 +157,6 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 
 - [Industrial noise control: silencers, HVAC and enclosures](https://jmrplens.github.io/phonometry/guides/noise-control/)
 - [Objective intelligibility (STOI & ESTOI)](https://jmrplens.github.io/phonometry/guides/objective-intelligibility/)
-- [Predicting Panel Sound Insulation (mass law, coincidence, double walls)](https://jmrplens.github.io/phonometry/guides/panel-sound-insulation/)
-- [Image sources and the steady-state room field (Kuttruff / Vorländer / Bies)](https://jmrplens.github.io/phonometry/guides/room-image-sources/)
 
 ## Theory and reference
 
@@ -187,6 +197,7 @@ One file per area, each small enough to fetch whole. `llms-full.txt` is the comp
 - [Diffusion surfaces](https://jmrplens.github.io/phonometry/llms-diffusion-surfaces.txt)
 - [Hearing exposure](https://jmrplens.github.io/phonometry/llms-hearing-exposure.txt)
 - [Human vibration](https://jmrplens.github.io/phonometry/llms-human-vibration.txt)
+- [Insulation design](https://jmrplens.github.io/phonometry/llms-insulation-design.txt)
 - [Levels weighting](https://jmrplens.github.io/phonometry/llms-levels-weighting.txt)
 - [Octave filtering](https://jmrplens.github.io/phonometry/llms-octave-filtering.txt)
 - [Outdoor sound](https://jmrplens.github.io/phonometry/llms-outdoor-sound.txt)

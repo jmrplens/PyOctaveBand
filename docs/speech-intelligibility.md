@@ -328,7 +328,7 @@ band-audibility function *A*<sub>i</sub> beside the audibility and
 importance-weighted contribution bars (the result's own `.plot()`), the boxed
 `SII = X` single number, an optional verdict row and a footer with the fixed
 disclaimer. It uses the same `ReportMetadata` container (documented under
-[Field insulation](insulation-field.md#report-metadata-reportmetadata)) and
+[Insulation ratings](insulation-ratings.md#report-metadata-reportmetadata)) and
 rendering engine as the ISO 717 insulation fiche; a supplied `requirement` is
 read as the minimum required SII (a higher SII passes). `verbose=True` adds the
 equivalent disturbance spectrum level *D*<sub>i</sub> column. Rendering needs

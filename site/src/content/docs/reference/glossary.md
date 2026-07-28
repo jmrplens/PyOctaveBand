@@ -716,8 +716,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Field insulation",
-              "url": "https://jmrplens.github.io/phonometry/guides/insulation-field/"
+              "name": "Insulation survey",
+              "url": "https://jmrplens.github.io/phonometry/guides/insulation-survey/"
             }
           },
           {
@@ -791,8 +791,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Field insulation",
-              "url": "https://jmrplens.github.io/phonometry/guides/insulation-field/"
+              "name": "Insulation ratings",
+              "url": "https://jmrplens.github.io/phonometry/guides/insulation-ratings/"
             }
           },
           {
@@ -821,8 +821,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Field insulation",
-              "url": "https://jmrplens.github.io/phonometry/guides/insulation-field/"
+              "name": "Insulation ratings",
+              "url": "https://jmrplens.github.io/phonometry/guides/insulation-ratings/"
             }
           },
           {
@@ -866,8 +866,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Field insulation",
-              "url": "https://jmrplens.github.io/phonometry/guides/insulation-field/"
+              "name": "Insulation ratings",
+              "url": "https://jmrplens.github.io/phonometry/guides/insulation-ratings/"
             }
           },
           {
@@ -881,8 +881,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Field insulation",
-              "url": "https://jmrplens.github.io/phonometry/guides/insulation-field/"
+              "name": "Insulation ratings",
+              "url": "https://jmrplens.github.io/phonometry/guides/insulation-ratings/"
             }
           },
           {
@@ -896,8 +896,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Laboratory insulation",
-              "url": "https://jmrplens.github.io/phonometry/guides/insulation-lab/"
+              "name": "Floor-covering improvement",
+              "url": "https://jmrplens.github.io/phonometry/guides/impact-improvement/"
             }
           },
           {
@@ -926,8 +926,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Laboratory insulation",
-              "url": "https://jmrplens.github.io/phonometry/guides/insulation-lab/"
+              "name": "Laboratory flanking",
+              "url": "https://jmrplens.github.io/phonometry/guides/flanking-lab/"
             }
           },
           {
@@ -1924,21 +1924,21 @@ check that pins each quantity to its standard's own expected value.
 | --- | --- | --- | --- | --- |
 | D | Level difference: the energy-averaged source-room level minus the receiving-room level, with no normalisation. | dB | ISO 16283-1:2014, 3.12 to 3.15 | [Field insulation](/phonometry/guides/insulation-field/) |
 | DnT | Standardized level difference: the level difference referred to a reference reverberation time, 0.5 s for dwellings. | dB | ISO 16283-1:2014, 3.12 to 3.15 | [Field insulation](/phonometry/guides/insulation-field/) |
-| Dn | Normalized level difference: the level difference referred to a reference absorption area of 10 m². | dB | ISO 10052:2021 | [Field insulation](/phonometry/guides/insulation-field/) |
+| Dn | Normalized level difference: the level difference referred to a reference absorption area of 10 m². | dB | ISO 10052:2021 | [Insulation survey](/phonometry/guides/insulation-survey/) |
 | Dn,e | Element-normalized level difference of a small element or air path, referred to a reference area of 10 m². | dB | EN 12354-3:2000 | [Insulation prediction](/phonometry/guides/insulation-prediction/) |
 | R | Sound reduction index: the level difference corrected by the partition area over the receiving-room absorption area, measured in the laboratory with flanking suppressed. | dB | ISO 10140-2:2010 | [Laboratory insulation](/phonometry/guides/insulation-lab/) |
 | R′ | Apparent sound reduction index: the same construction measured in the building, so it includes every flanking path. The prime is the lab-versus-field marker. | dB | ISO 16283-1:2014, 3.12 to 3.15 | [Field insulation](/phonometry/guides/insulation-field/) |
 | TL | Transmission loss: the airborne insulation of a panel predicted from its physical properties, the same quantity as R in a prediction context. | dB | Bies, Hansen and Howard (2017), Section 7.2; no governing standard | [Panel insulation](/phonometry/guides/panel-sound-insulation/) |
-| Rw, R′w, DnT,w | The weighted single-number ratings: a fixed reference curve is shifted toward the measured spectrum until the unfavourable deviations reach their allowed sum, and the shifted curve is read at 500 Hz. | dB | ISO 717-1:2020 | [Field insulation](/phonometry/guides/insulation-field/) |
+| Rw, R′w, DnT,w | The weighted single-number ratings: a fixed reference curve is shifted toward the measured spectrum until the unfavourable deviations reach their allowed sum, and the shifted curve is read at 500 Hz. | dB | ISO 717-1:2020 | [Insulation ratings](/phonometry/guides/insulation-ratings/) |
 | Dn,e,w | The same reference-curve rating applied to the element-normalized level difference. | dB | ISO 717-1:2020 | [Insulation prediction](/phonometry/guides/insulation-prediction/) |
-| C, Ctr | Spectrum adaptation terms: the corrections that re-rate the measured curve against A-weighted pink noise (C) and against A-weighted urban road traffic (Ctr). | dB | ISO 717-1:2020, Annex A | [Field insulation](/phonometry/guides/insulation-field/) |
+| C, Ctr | Spectrum adaptation terms: the corrections that re-rate the measured curve against A-weighted pink noise (C) and against A-weighted urban road traffic (Ctr). | dB | ISO 717-1:2020, Annex A | [Insulation ratings](/phonometry/guides/insulation-ratings/) |
 | Ln | Normalized impact sound pressure level: the receiving-room level under the standard tapping machine, referred to a 10 m² absorption area. | dB | ISO 10140-3:2010 | [Laboratory insulation](/phonometry/guides/insulation-lab/) |
 | L′nT | Standardized impact sound pressure level, referred to a reference reverberation time. Note the sign: more reverberation lowers it, the opposite of DnT. | dB | ISO 16283-2:2015 | [Field insulation](/phonometry/guides/insulation-field/) |
-| Ln,w, L′nT,w | The weighted impact ratings. The reference curve is shifted the same way, but an unfavourable deviation is now one where the measurement exceeds the reference. | dB | ISO 717-2:2020 | [Field insulation](/phonometry/guides/insulation-field/) |
-| CI | Impact spectrum adaptation term, from the energetic sum over 100 Hz to 2500 Hz. The enlarged-range CI,50-2500 extends it down to 50 Hz. | dB | ISO 717-2:2020 (enlarged range in A.2.1 NOTE) | [Field insulation](/phonometry/guides/insulation-field/) |
-| ΔLw | Weighted reduction of impact sound pressure level given by a floor covering, measured as the improvement over the bare reference floor. | dB | ISO 717-2:2020 (measurement in ISO 16251-1:2014, Formulae (3) and (4)) | [Laboratory insulation](/phonometry/guides/insulation-lab/) |
+| Ln,w, L′nT,w | The weighted impact ratings. The reference curve is shifted the same way, but an unfavourable deviation is now one where the measurement exceeds the reference. | dB | ISO 717-2:2020 | [Insulation ratings](/phonometry/guides/insulation-ratings/) |
+| CI | Impact spectrum adaptation term, from the energetic sum over 100 Hz to 2500 Hz. The enlarged-range CI,50-2500 extends it down to 50 Hz. | dB | ISO 717-2:2020 (enlarged range in A.2.1 NOTE) | [Insulation ratings](/phonometry/guides/insulation-ratings/) |
+| ΔLw | Weighted reduction of impact sound pressure level given by a floor covering, measured as the improvement over the bare reference floor. | dB | ISO 717-2:2020 (measurement in ISO 16251-1:2014, Formulae (3) and (4)) | [Floor-covering improvement](/phonometry/guides/impact-improvement/) |
 | ΔRw | Weighted improvement of airborne insulation contributed by a lining or additional layer, added to the element rating in the prediction. | dB | EN 12354-1:2000, Formulae 27 and 28a | [Insulation prediction](/phonometry/guides/insulation-prediction/) |
-| Kij | Vibration reduction index of a junction: the direction-averaged velocity level difference corrected by the junction length and the equivalent absorption lengths. | dB | ISO 10848-1:2006, Formula (13) | [Laboratory insulation](/phonometry/guides/insulation-lab/) |
+| Kij | Vibration reduction index of a junction: the direction-averaged velocity level difference corrected by the junction length and the equivalent absorption lengths. | dB | ISO 10848-1:2006, Formula (13) | [Laboratory flanking](/phonometry/guides/flanking-lab/) |
 | fc | Critical frequency: the frequency at which the bending wavelength of a panel equals the wavelength in air, where the coincidence dip appears. | Hz | Bies, Hansen and Howard (2017), Equation 7.3; no governing standard | [Panel insulation](/phonometry/guides/panel-sound-insulation/) |
 | σ | Radiation efficiency of a plate: the airborne power radiated per unit mean-square surface velocity, normalised by the plane-wave value. | dimensionless | Hopkins (2007), Equations 2.227 to 2.230; no governing standard | [Panel insulation](/phonometry/guides/panel-sound-insulation/) |
 

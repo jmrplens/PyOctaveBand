@@ -319,7 +319,7 @@ the fixed disclaimer. When the rating was built with
 one-third-octave $\alpha_s$ table with the octave $\alpha_p$ on the matching
 rows, exactly as accredited certificates print it. It uses the same
 `ReportMetadata` container (documented
-under [Field insulation](insulation-field.md#report-metadata-reportmetadata))
+under [Insulation ratings](insulation-ratings.md#report-metadata-reportmetadata))
 and rendering engine as the ISO 717 insulation fiche; passing
 `metadata=None` produces a lightweight prediction fiche, and a supplied
 `requirement` is read as the minimum $\alpha_w$ for the PASS/FAIL verdict.
@@ -431,7 +431,7 @@ A rated absorption coefficient means little without its uncertainty. ISO
 reverberation-room measurement (ISO 354) and its ratings (ISO 11654, EN 1793-1),
 estimated from inter-laboratory tests to ISO 5725. It is the sound-absorption
 companion of the sound-insulation uncertainty of ISO 12999-1
-([Field Insulation Measurement and Ratings](insulation-field.md)).
+([Field Insulation Measurement (ISO 16283)](insulation-field.md)).
 
 **One-third-octave bands (Clause 5).** For the sound-absorption coefficient the
 reproducibility standard deviation is `σR = m·αs + n` (Formula (1)), and for the
@@ -502,7 +502,7 @@ print(float(materials.single_number_rating_uncertainty(8.1).reported_expanded_un
   Eyring and Millington-Sette estimators that consume $\alpha_s$.
 - [Equivalent absorption area of furnished rooms](enclosed-space-absorption.md):
   the EN 12354-6 absorption budget these coefficients feed.
-- [Field Insulation Measurement and Ratings](insulation-field.md): the
+- [Field Insulation Measurement (ISO 16283)](insulation-field.md): the
   sound-insulation companion uncertainty standard, ISO 12999-1.
 - API reference: [`materials.sound_absorption`](https://jmrplens.github.io/phonometry/reference/api/materials/sound-absorption/), [`materials.absorption_rating`](https://jmrplens.github.io/phonometry/reference/api/materials/absorption-rating/) and [`materials.absorption_uncertainty`](https://jmrplens.github.io/phonometry/reference/api/materials/absorption-uncertainty/).
 

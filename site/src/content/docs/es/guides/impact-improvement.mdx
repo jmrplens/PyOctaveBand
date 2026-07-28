@@ -1,0 +1,281 @@
+---
+title: "Mejora del aislamiento a impacto de suelos (ISO 16251-1)"
+description: "La mejora del aislamiento a ruido de impactos de un revestimiento de suelo medida sobre la maqueta pesada a pequeña escala de ISO 16251-1: la cadena de niveles de aceleración, la mejora ponderada frente al suelo de referencia de ISO 717-2, la ficha acreditada y la estimación de suelo flotante de ISO 12354-2 desde la rigidez dinámica."
+references:
+  - type: book
+    authors: ["Vigran, T. E."]
+    year: 2008
+    title: "Building acoustics"
+    publisher: "CRC Press"
+    doi: "10.1201/9781482266016"
+    note: "La teoría de la transmisión de forjados y suelos flotantes que la mejora cuantifica. ISBN 978-0-415-42853-8."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2014
+    title: "Acoustics — Laboratory measurement of the reduction of transmitted impact noise by floor coverings on a small floor mock-up — Part 1: Heavyweight compact floor"
+    designation: "ISO 16251-1:2014"
+    url: "https://www.iso.org/standard/56017.html"
+    note: "El método de laboratorio en maqueta pequeña para la mejora a impactos ΔL de revestimientos de suelo blandos y de reacción local, con ΔL_w vía el suelo de referencia de ISO 717-2 y el término de adaptación CI,delta."
+  - type: article
+    authors: ["Foret, R.", "Chéné, J.-B.", "Guigou-Carter, C."]
+    year: 2011
+    title: "A comparison of the reduction of transmitted impact noise by floor coverings measured using ISO 140-8 and ISO/CD 16251-1"
+    journal: "Forum Acusticum 2011, Aalborg (CSTB)"
+    note: "El espectro de mejora de una moqueta textil real usado como ejemplo de ISO 16251-1 en esta página (ΔL_w = 29 dB); su ΔL por bandas se digitalizó de su Figura 4."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2020
+    title: "Acoustics — Rating of sound insulation in buildings and of building elements — Part 2: Impact sound insulation"
+    designation: "ISO 717-2:2020"
+    url: "https://www.iso.org/standard/69867.html"
+    note: "El motor de valoración de impactos de un solo número reutilizado aquí y el suelo de referencia L_n,r,0 (Tabla 4) detrás de ΔL_w, con el término de adaptación espectral CI,delta de la Fórmula (A.4)."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2017
+    title: "Building acoustics — Estimation of acoustic performance of buildings from the performance of elements — Part 2: Impact sound insulation between rooms"
+    designation: "ISO 12354-2:2017"
+    url: "https://www.iso.org/standard/70239.html"
+    note: "La estimación informativa de suelos flotantes del Anexo C que reproduce esta página (Fórmulas C.1 a C.4, la resonancia 160 raíz(s'/m')) y el suelo resuelto de su Anexo G."
+---
+
+import ThemeImage from '../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../components/ReportPreview.astro';
+
+Un revestimiento de suelo blando no bloquea el ruido aéreo; amortigua las
+pisadas. Lo que mejora es el nivel de impactos del forjado que tiene debajo,
+y medir esa mejora en una instalación completa de ISO 10140 es
+desproporcionado para un metro cuadrado de moqueta. ISO 16251-1 encoge por
+ello el laboratorio a una pequeña maqueta pesada: una placa de hormigón con
+apoyo elástico, una máquina de impactos normalizada y un acelerómetro por
+debajo. Esta guía cubre la medición en maqueta de la mejora $\Delta L$ y su
+$\Delta L_w$ ponderada frente al suelo de referencia de ISO 717-2, la ficha
+acreditada y la estimación de ingeniería de ISO 12354-2 que predice la mejora
+de un suelo flotante a partir de la rigidez dinámica de su capa resiliente.
+La cadena de laboratorio a tamaño completo vive en
+[Medición del aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/);
+la medición de $s'$ tras la estimación es el tema de
+[Rigidez dinámica de materiales resilientes](/phonometry/es/guides/dynamic-stiffness/).
+
+## El método de maqueta a pequeña escala
+
+La ISO 16251-1:2014 es un método de laboratorio para la **mejora del aislamiento
+a ruido de impactos** $\Delta L$ de un revestimiento de suelo blando y de reacción
+local (moqueta, PVC, linóleo). Las dos salas de ISO 10140 se sustituyen por una
+pequeña placa de hormigón con apoyo elástico; una máquina de impactos normalizada
+la excita y se mide el **nivel de aceleración** estructural en la cara inferior con
+y sin el revestimiento. Para revestimientos de reacción local, esa diferencia de
+niveles de aceleración equivale a la reducción de ruido de impactos de ISO 10140.
+
+**Nivel de aceleración (Fórmula (1)).** $L_a = 10\lg(\langle a^2\rangle / a_0^2)$ dB,
+referencia $a_0 = 10^{-6}\ \text{m/s}^2$. La **corrección de ruido de fondo
+(Fórmula (2))** sigue la regla de tres ramas de ISO 10140 (sin cambio si ≥ 15 dB;
+sustracción energética para 6 ≤ margen < 15 dB; el límite de 1,3 dB por debajo de
+6 dB, marcado como $> \Delta L$). La mejora es la diferencia promediada por
+posiciones $\Delta L = L_0 - L_1$ (Fórmulas (3)/(4)); las octavas siguen
+$\Delta L_\text{oct} = -10\lg[\tfrac{1}{3}\sum 10^{-\Delta L_n/10}]$ (Fórmula (5)).
+
+**Mejora ponderada.** $\Delta L_w$ es la reducción ponderada de ISO 717-2: la
+mejora se aplica al **suelo de referencia** pesado $L_{n,r,0}$ (ISO 717-2 Tabla 4),
+$L_{n,r} = L_{n,r,0} - \Delta L$, y $\Delta L_w = 78 - L_{n,r,w}$, calculada por
+`weighted_impact_improvement()`, que reutiliza el motor de valoración de
+ISO 717-2. Una medición según el apartado 6.3 abarca 18 bandas (100–5000 Hz,
+opcionalmente ampliadas hasta 50 Hz); la valoración se forma sobre el subrango
+100–3150 Hz de cualquier espectro que lo contenga. La expresión de resultados
+(apartado 8 e)) incluye además el término de adaptación espectral
+$C_{I,\Delta} = C_{I,r,0} - C_{I,r}$ (ISO 717-2:2020, Fórmula (A.4)), expuesto
+como `ci_delta` en el resultado y de forma independiente como
+`impact_improvement_adaptation_term()`.
+
+El ejemplo siguiente es una medición real: la mejora de una moqueta textil sobre
+la maqueta pesada del CSTB, digitalizada de la Figura 4 de Foret, Chéné y
+Guigou-Carter, "A comparison of the reduction of transmitted impact noise by
+floor coverings measured using ISO 140-8 and ISO/CD 16251-1" (Forum Acusticum
+2011, Aalborg). Su mejora ponderada ISO 16251-1 publicada es
+$\Delta L_w = 29$ dB, reproducida exactamente por el motor de valoración.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floor_covering_improvement_es.svg" alt="Mejora a impacto de revestimientos de suelo ISO 16251-1: la mejora delta-L de una moqueta textil real creciendo con la frecuencia en bandas de tercio de octava de 100 Hz a 3150 Hz, con el área de mejora sombreada y el número único ponderado delta-Lw anotado" width="80%" />
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+freqs = [100, 125, 160, 200, 250, 315, 400, 500,
+         630, 800, 1000, 1250, 1600, 2000, 2500, 3150]
+bare = np.full(16, 78.0)                       # nivel de aceleración de la placa desnuda
+# Una moqueta textil real medida en la maqueta del CSTB (Foret et al. 2011, Fig. 4).
+covering = bare - np.array([5, 8, 10, 14, 18, 23, 30, 31,
+                            39, 49, 53, 57, 60, 67, 68, 71])
+res = building.impact_improvement(bare, covering, freqs)
+print(res.delta_lw)   # mejora ponderada delta-Lw = 29 dB (ISO 717-2)
+res.plot(language="es")
+plt.show()
+```
+
+</details>
+
+```python
+from phonometry import building
+
+# delta-Lw directo de un espectro de mejora (16 bandas de tercio de octava):
+delta_l = [5, 8, 10, 14, 18, 23, 30, 31, 39, 49, 53, 57, 60, 67, 68, 71]
+print(building.weighted_impact_improvement(delta_l))    # 29 dB (moqueta)
+
+# A partir de los niveles de aceleración medidos (desnudo/cubierto) y un fondo:
+freqs = [100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
+         1000, 1250, 1600, 2000, 2500, 3150]
+bare_levels = [72, 73, 74, 74, 75, 75, 76, 76, 77, 77, 78, 78, 79, 79, 80, 80]
+covered_levels = [b - d for b, d in zip(bare_levels, delta_l)]
+bg = [40.0] * 16
+res = building.impact_improvement(bare_levels, covered_levels, freqs, background=bg)
+res.improvement       # delta-L por banda
+res.delta_lw          # número único ponderado (valorado sobre el subrango 100-3150 Hz)
+res.ci_delta          # término de adaptación espectral CI,delta (Fórmula (A.4))
+res.limited           # bandas en el límite de medida de 1,3 dB (> delta-L)
+res.octave_bands()    # (frec. de octava, delta-L_oct) vía Fórmula (5)
+res.plot()            # el espectro de mejora delta-L(f) de arriba (requiere matplotlib)
+```
+
+## Informe de mejora a impacto de ISO 16251-1 (`.report()`)
+
+`FloorCoveringImprovementResult.report(path)` escribe una ficha acreditada de
+mejora a impacto de una página: la línea de base normativa, una cabecera de
+metadatos, la tabla por bandas (frecuencia y $\Delta L$, con las bandas en el
+límite de 1,3 dB precedidas por `>`) junto a la curva de mejora $\Delta L(f)$,
+el número único encuadrado $\Delta L_w\ (C_{I,\Delta})$ (la expresión de
+resultados de la Cláusula 8 e) de ISO 16251-1) y un pie. Pasa un
+`ReportMetadata` para la cabecera; los campos aplicables son `specimen` (el
+revestimiento de suelo ensayado), `client`, `manufacturer`, `mounting`,
+`mass_per_area`, `test_room`, `test_date`, `temperature`, `pressure`,
+`measurement_standard`, `laboratory`, `operator`, `report_id`, `notes` y
+`requirement` (una mejora ponderada mayor es mejor, así que el veredicto es apto
+en cuanto la iguala o la supera). El suelo de referencia desnudo es el suelo
+pesado normalizado de la Tabla 4 de ISO 717-2:2020, fijado por la norma.
+`verbose=True` añade la columna del suelo de referencia con revestimiento
+$L_{n,r} = L_{n,r,0} - \Delta L$, la base de la derivación de $\Delta L_w$.
+
+```python
+from phonometry import building, ReportMetadata
+
+freqs = [100, 125, 160, 200, 250, 315, 400, 500,
+         630, 800, 1000, 1250, 1600, 2000, 2500, 3150]
+delta_l = [5, 8, 10, 14, 18, 23, 30, 31, 39, 49, 53, 57, 60, 67, 68, 71]
+bare = [78.0] * 16
+res = building.impact_improvement(bare, [b - d for b, d in zip(bare, delta_l)], freqs)
+res.report("dLw.pdf",
+           metadata=ReportMetadata(
+               specimen="Revestimiento textil (moqueta), colocado suelto",
+               measurement_standard="ISO 16251-1",
+               requirement=20.0),
+           language="es")  # delta-Lw (CI,delta) = 29 (-13) dB
+```
+
+La ficha de ejemplo se regenera con `make reports` y se mantiene en el
+repositorio. Pulsa la vista previa para abrir el PDF:
+
+<ReportPreview
+	name="iso16251_floor_covering_example"
+	title="Informe de ejemplo de mejora a impacto de revestimientos de suelo ISO 16251-1 (PDF)"
+	description="Informe de ensayo de mejora a impacto de una página para una moqueta textil cuyo espectro de mejora se ha digitalizado del estudio comparativo de Foret et al. (2011) ISO/CD 16251-1 (un ejemplo ilustrativo, no una medición acreditada): la cabecera de metadatos (cliente, descripción del revestimiento, montaje, masa por superficie, clima), la tabla de delta-L en tercios de octava junto a la curva de mejora delta-L(f) creciendo con la frecuencia, el número único encuadrado delta-Lw (CI,delta) = 29 (-13) dB de mejora ponderada (ISO 717-2) y un veredicto APTO frente al requisito de 20 dB (una mejora ponderada mayor es mejor)."
+	caption="Ficha de mejora a impacto de revestimientos de suelo (FloorCoveringImprovementResult.report), delta-Lw (CI,delta)."
+/>
+
+## De la rigidez dinámica a la mejora: la estimación de ISO 12354-2
+
+La maqueta mide un *revestimiento* que ya existe; un **suelo flotante** (una
+losa vertida sobre una capa resiliente) se proyecta al revés, a partir de dos
+números conocidos en fase de proyecto: la masa por unidad de superficie $m'$
+de la losa y la rigidez dinámica por unidad de superficie $s'$ de la capa
+resiliente, medida según EN 29052-1 como en la
+[guía de rigidez dinámica](/phonometry/es/guides/dynamic-stiffness/). Juntos fijan la resonancia masa-muelle
+del sistema (ISO 12354-2:2017, Anexo C, Fórmula (C.2)):
+
+$$
+f_0 = 160 \sqrt{\frac{s'}{m'}}\ \text{Hz}
+\qquad (s'\ \text{en MN/m}^3,\ m'\ \text{en kg/m}^2),
+$$
+
+donde 160 es el $1000/2\pi$ redondeado; `materials.natural_frequency` calcula
+la forma exacta $\tfrac{1}{2\pi}\sqrt{s'/m'}$. Por encima de la resonancia la
+losa se desacopla del forjado y el Anexo C estima la mejora como una recta
+según la Fórmula (C.1), con la Fórmula (C.3), más empinada, para las
+construcciones cuyas mayores pérdidas internas siguen la teoría de placa
+infinita:
+
+$$
+\Delta L = 30 \lg \frac{f}{f_0}\ \text{dB (losas de arena/cemento o sulfato de calcio)},
+\qquad
+\Delta L = 40 \lg \frac{f}{f_0}\ \text{dB (asfalto, losas secas)}.
+$$
+
+```python
+import numpy as np
+from phonometry import building, materials
+
+# El suelo flotante resuelto del Anexo G de ISO 12354-2:2017: una losa de 73,5 kg/m2 sobre
+# una capa resiliente con s' = 8 MN/m3.
+f0 = 160.0 * np.sqrt(8.0 / 73.5)                                 # Fórmula (C.2)
+print(round(f0, 1))                                              # 52.8  Hz
+print(round(float(materials.natural_frequency(8.0e6, 73.5)), 1))  # 52.5  forma exacta 1/(2 pi)
+
+# delta-L = 30 lg(f/f0) por encima de la resonancia (Fórmula (C.1)); se
+# construye el espectro en tercios de octava y se valora con el motor ISO 717-2.
+freqs = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
+                  1000, 1250, 1600, 2000, 2500, 3150], dtype=float)
+delta_l = 30.0 * np.log10(freqs / f0)
+print(building.weighted_impact_improvement(delta_l))             # 32  dB
+
+# La estimación de una línea de la Fórmula (C.4) aterriza justo al lado:
+print(round(13.0 * np.log10(73.5) - 14.2 * np.log10(8.0) + 20.8, 1))   # 32.2 dB
+```
+
+La estimación ponderada en forma cerrada de la Fórmula (C.4),
+$\Delta L_w = 13\lg m' - 14{,}2\lg s' + 20{,}8$ dB, condensa la misma física
+en una línea: losas más pesadas y capas más blandas puntúan mejor. Ambas
+estimaciones son ayudas de proyecto deliberadamente del lado de la seguridad
+(la pendiente de 30 lg recorta la teoría de placa infinita de 40 lg allí
+donde los datos experimentales dicen que las losas reales se quedan cortas);
+en cuanto existe una probeta, la maqueta medida de esta página, o el forjado
+completo de ISO 10140-3, es la referencia, y la
+[predicción EN 12354-2](/phonometry/es/guides/insulation-prediction/) consume el $\Delta L_w$ que se tenga.
+
+## Qué cubre esta guía
+
+**Cubierto.** El nivel de aceleración de ISO 16251-1:2014 (Fórmula (1)), la
+corrección de ruido de fondo de tres ramas (Fórmula (2)), la mejora
+promediada por posiciones $\Delta L$ (Fórmulas (3)/(4)) y su síntesis en
+octavas (Fórmula (5)), mediante `building.acceleration_level`,
+`building.background_corrected_level` y `building.impact_improvement`; la
+declaración de resultados de la cláusula 8 e), $\Delta L_w$ frente al suelo
+de referencia de la Tabla 4 de ISO 717-2 con el término de adaptación
+$C_{I,\Delta}$ (Fórmula (A.4)), mediante
+`building.weighted_impact_improvement` y
+`building.impact_improvement_adaptation_term`; y la ficha acreditada de una
+página con `.report()`.
+
+**No cubierto.** La propia instalación de la maqueta (las dimensiones de la
+placa, los apoyos resilientes, las posiciones de la máquina de impactos de
+la cláusula 5) no se comprueba: las funciones consumen niveles de
+aceleración medidos vengan de donde vengan. Las fórmulas de suelo flotante
+del Anexo C de ISO 12354-2:2017 se citan en esta página como ayudas de proyecto y
+se evalúan en línea con numpy; ningún ayudante dedicado las envuelve. El
+método a tamaño completo ISO 140-8, ya sustituido, aparece aquí solo como
+eje de comparación del ejemplo resuelto de Foret et al. (2011).
+
+## Véase también
+
+- [Medición del aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/):
+  la instalación de ISO 10140 que esta maqueta sustituye para revestimientos
+  blandos, y la medición de la mejora a tamaño completo de ISO 10140-3.
+- [Rigidez dinámica de materiales resilientes](/phonometry/es/guides/dynamic-stiffness/):
+  la medición de s' que alimenta la estimación de suelo flotante.
+- [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/):
+  el modelo de impactos cuya Fórmula (21) consume ΔLw.
+- [Índices globales de aislamiento (ISO 717)](/phonometry/es/guides/insulation-ratings/):
+  el motor de curva de referencia tras la mejora ponderada.
+- [Teoría](/phonometry/es/reference/theory/rooms-buildings/): la derivación
+  de la curva de referencia tras los números únicos ponderados.
+- Referencia de la API: [`building.floor_covering_improvement`](/phonometry/es/reference/api/building/floor-covering-improvement/).

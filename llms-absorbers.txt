@@ -193,7 +193,7 @@ print(np.round(alpha, 3))                      # [0.398 0.448 0.498]
 ```
 
 `T1` and `T2` are exactly the reverberation times
-[`room_parameters`](https://jmrplens.github.io/phonometry/guides/sections/room-acoustics/) returns, so an ISO 3382-2 decay
+[`room_parameters`](https://jmrplens.github.io/phonometry/guides/room-acoustics/) returns, so an ISO 3382-2 decay
 measurement of the empty and treated room flows straight into
 `absorption_coefficient`. A room volume below the 150 m³ minimum or a
 sample area outside 10–12 m² raises an advisory `AbsorptionWarning`; the result
@@ -326,7 +326,7 @@ the fixed disclaimer. When the rating was built with
 one-third-octave $\alpha_s$ table with the octave $\alpha_p$ on the matching
 rows, exactly as accredited certificates print it. It uses the same
 `ReportMetadata` container (documented
-under [Field insulation](https://jmrplens.github.io/phonometry/guides/insulation-field/#report-metadata-reportmetadata))
+under [Insulation ratings](https://jmrplens.github.io/phonometry/guides/insulation-ratings/#report-metadata-reportmetadata))
 and rendering engine as the ISO 717 insulation fiche; passing
 `metadata=None` produces a lightweight prediction fiche, and a supplied
 `requirement` is read as the minimum $\alpha_w$ for the PASS/FAIL verdict.
@@ -438,7 +438,7 @@ A rated absorption coefficient means little without its uncertainty. ISO
 reverberation-room measurement (ISO 354) and its ratings (ISO 11654, EN 1793-1),
 estimated from inter-laboratory tests to ISO 5725. It is the sound-absorption
 companion of the sound-insulation uncertainty of ISO 12999-1
-([Field Insulation Measurement and Ratings](https://jmrplens.github.io/phonometry/guides/insulation-field/)).
+([Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/guides/insulation-field/)).
 
 **One-third-octave bands (Clause 5).** For the sound-absorption coefficient the
 reproducibility standard deviation is `σR = m·αs + n` (Formula (1)), and for the
@@ -503,13 +503,13 @@ print(float(materials.single_number_rating_uncertainty(8.1).reported_expanded_un
   resistivity that anchors the porous-material models behind most absorbers.
 - [Porous and Multilayer Absorbers](https://jmrplens.github.io/phonometry/guides/porous-absorbers/): predicting the
   absorption of a construction from material parameters before it is built.
-- [Room Acoustics](https://jmrplens.github.io/phonometry/guides/sections/room-acoustics/): the ISO 3382 decay measurements that
+- [Room Acoustics](https://jmrplens.github.io/phonometry/guides/room-acoustics/): the ISO 3382 decay measurements that
   supply the reverberation times $T_1$ and $T_2$.
 - [Reverberation-time prediction](https://jmrplens.github.io/phonometry/guides/reverberation-prediction/): the Sabine,
   Eyring and Millington-Sette estimators that consume $\alpha_s$.
 - [Equivalent absorption area of furnished rooms](https://jmrplens.github.io/phonometry/guides/enclosed-space-absorption/):
   the EN 12354-6 absorption budget these coefficients feed.
-- [Field Insulation Measurement and Ratings](https://jmrplens.github.io/phonometry/guides/insulation-field/): the
+- [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/guides/insulation-field/): the
   sound-insulation companion uncertainty standard, ISO 12999-1.
 - API reference: [`materials.sound_absorption`](https://jmrplens.github.io/phonometry/reference/api/materials/sound-absorption/), [`materials.absorption_rating`](https://jmrplens.github.io/phonometry/reference/api/materials/absorption-rating/) and [`materials.absorption_uncertainty`](https://jmrplens.github.io/phonometry/reference/api/materials/absorption-uncertainty/).
 

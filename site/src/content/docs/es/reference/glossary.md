@@ -716,8 +716,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Aislamiento en campo",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-field/"
+              "name": "Método de control",
+              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-survey/"
             }
           },
           {
@@ -791,8 +791,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Aislamiento en campo",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-field/"
+              "name": "Índices de aislamiento",
+              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-ratings/"
             }
           },
           {
@@ -821,8 +821,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Aislamiento en campo",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-field/"
+              "name": "Índices de aislamiento",
+              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-ratings/"
             }
           },
           {
@@ -866,8 +866,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Aislamiento en campo",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-field/"
+              "name": "Índices de aislamiento",
+              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-ratings/"
             }
           },
           {
@@ -881,8 +881,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Aislamiento en campo",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-field/"
+              "name": "Índices de aislamiento",
+              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-ratings/"
             }
           },
           {
@@ -896,8 +896,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Aislamiento en laboratorio",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-lab/"
+              "name": "Mejora de revestimientos",
+              "url": "https://jmrplens.github.io/phonometry/es/guides/impact-improvement/"
             }
           },
           {
@@ -926,8 +926,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Aislamiento en laboratorio",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-lab/"
+              "name": "Flancos en laboratorio",
+              "url": "https://jmrplens.github.io/phonometry/es/guides/flanking-lab/"
             }
           },
           {
@@ -1924,21 +1924,21 @@ norma.
 | --- | --- | --- | --- | --- |
 | D | Diferencia de niveles: el nivel promediado energéticamente en el recinto emisor menos el del receptor, sin normalizar. | dB | ISO 16283-1:2014, 3.12 a 3.15 | [Aislamiento en campo](/phonometry/es/guides/insulation-field/) |
 | DnT | Diferencia de niveles estandarizada: la diferencia de niveles referida a un tiempo de reverberación de referencia, 0,5 s en viviendas. | dB | ISO 16283-1:2014, 3.12 a 3.15 | [Aislamiento en campo](/phonometry/es/guides/insulation-field/) |
-| Dn | Diferencia de niveles normalizada: la diferencia de niveles referida a un área de absorción de referencia de 10 m². | dB | ISO 10052:2021 | [Aislamiento en campo](/phonometry/es/guides/insulation-field/) |
+| Dn | Diferencia de niveles normalizada: la diferencia de niveles referida a un área de absorción de referencia de 10 m². | dB | ISO 10052:2021 | [Método de control](/phonometry/es/guides/insulation-survey/) |
 | Dn,e | Diferencia de niveles normalizada de elemento, para un elemento pequeño o una vía de aire, referida a un área de referencia de 10 m². | dB | EN 12354-3:2000 | [Predicción del aislamiento](/phonometry/es/guides/insulation-prediction/) |
 | R | Índice de reducción acústica: la diferencia de niveles corregida por el área del cerramiento partido por el área de absorción del recinto receptor, medida en laboratorio con los flancos suprimidos. | dB | ISO 10140-2:2010 | [Aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/) |
 | R′ | Índice de reducción acústica aparente: la misma construcción medida en el edificio, así que incluye todas las vías de flanco. La prima es la marca que distingue el laboratorio del campo. | dB | ISO 16283-1:2014, 3.12 a 3.15 | [Aislamiento en campo](/phonometry/es/guides/insulation-field/) |
 | TL | Pérdidas por transmisión: el aislamiento a ruido aéreo de un panel predicho a partir de sus propiedades físicas, la misma magnitud que R en un contexto de predicción. | dB | Bies, Hansen y Howard (2017), Sección 7.2; sin norma aplicable | [Aislamiento de paneles](/phonometry/es/guides/panel-sound-insulation/) |
-| Rw, R′w, DnT,w | Los índices globales ponderados: una curva de referencia fija se desplaza hacia el espectro medido hasta que las desviaciones desfavorables alcanzan su suma admisible, y la curva desplazada se lee en 500 Hz. | dB | ISO 717-1:2020 | [Aislamiento en campo](/phonometry/es/guides/insulation-field/) |
+| Rw, R′w, DnT,w | Los índices globales ponderados: una curva de referencia fija se desplaza hacia el espectro medido hasta que las desviaciones desfavorables alcanzan su suma admisible, y la curva desplazada se lee en 500 Hz. | dB | ISO 717-1:2020 | [Índices de aislamiento](/phonometry/es/guides/insulation-ratings/) |
 | Dn,e,w | El mismo índice global de curva de referencia aplicado a la diferencia de niveles normalizada de elemento. | dB | ISO 717-1:2020 | [Predicción del aislamiento](/phonometry/es/guides/insulation-prediction/) |
-| C, Ctr | Términos de adaptación espectral: las correcciones que vuelven a valorar la curva medida frente a ruido rosa ponderado A (C) y frente a tráfico rodado urbano ponderado A (Ctr). | dB | ISO 717-1:2020, Anexo A | [Aislamiento en campo](/phonometry/es/guides/insulation-field/) |
+| C, Ctr | Términos de adaptación espectral: las correcciones que vuelven a valorar la curva medida frente a ruido rosa ponderado A (C) y frente a tráfico rodado urbano ponderado A (Ctr). | dB | ISO 717-1:2020, Anexo A | [Índices de aislamiento](/phonometry/es/guides/insulation-ratings/) |
 | Ln | Nivel de presión acústica de impactos normalizado: el nivel en el recinto receptor bajo la máquina de impactos normalizada, referido a un área de absorción de 10 m². | dB | ISO 10140-3:2010 | [Aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/) |
 | L′nT | Nivel de presión acústica de impactos estandarizado, referido a un tiempo de reverberación de referencia. Atención al signo: más reverberación lo baja, al revés que el DnT. | dB | ISO 16283-2:2015 | [Aislamiento en campo](/phonometry/es/guides/insulation-field/) |
-| Ln,w, L′nT,w | Los índices globales de impactos. La curva de referencia se desplaza igual, pero ahora una desviación desfavorable es aquella en la que la medida supera a la referencia. | dB | ISO 717-2:2020 | [Aislamiento en campo](/phonometry/es/guides/insulation-field/) |
-| CI | Término de adaptación espectral de impactos, a partir de la suma energética entre 100 Hz y 2500 Hz. El término de rango ampliado CI,50-2500 lo extiende hasta 50 Hz. | dB | ISO 717-2:2020 (rango ampliado en la NOTA de A.2.1) | [Aislamiento en campo](/phonometry/es/guides/insulation-field/) |
-| ΔLw | Reducción ponderada del nivel de presión acústica de impactos que aporta un revestimiento de suelo, medida como la mejora sobre el forjado desnudo de referencia. | dB | ISO 717-2:2020 (medición en ISO 16251-1:2014, Fórmulas (3) y (4)) | [Aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/) |
+| Ln,w, L′nT,w | Los índices globales de impactos. La curva de referencia se desplaza igual, pero ahora una desviación desfavorable es aquella en la que la medida supera a la referencia. | dB | ISO 717-2:2020 | [Índices de aislamiento](/phonometry/es/guides/insulation-ratings/) |
+| CI | Término de adaptación espectral de impactos, a partir de la suma energética entre 100 Hz y 2500 Hz. El término de rango ampliado CI,50-2500 lo extiende hasta 50 Hz. | dB | ISO 717-2:2020 (rango ampliado en la NOTA de A.2.1) | [Índices de aislamiento](/phonometry/es/guides/insulation-ratings/) |
+| ΔLw | Reducción ponderada del nivel de presión acústica de impactos que aporta un revestimiento de suelo, medida como la mejora sobre el forjado desnudo de referencia. | dB | ISO 717-2:2020 (medición en ISO 16251-1:2014, Fórmulas (3) y (4)) | [Mejora de revestimientos](/phonometry/es/guides/impact-improvement/) |
 | ΔRw | Mejora ponderada del aislamiento a ruido aéreo que aporta un trasdosado o una capa adicional, que se suma al índice del elemento en la predicción. | dB | EN 12354-1:2000, Fórmulas 27 y 28a | [Predicción del aislamiento](/phonometry/es/guides/insulation-prediction/) |
-| Kij | Índice de reducción vibracional de una unión: la diferencia de niveles de velocidad promediada en ambos sentidos, corregida por la longitud de la unión y las longitudes de absorción equivalentes. | dB | ISO 10848-1:2006, Fórmula (13) | [Aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/) |
+| Kij | Índice de reducción vibracional de una unión: la diferencia de niveles de velocidad promediada en ambos sentidos, corregida por la longitud de la unión y las longitudes de absorción equivalentes. | dB | ISO 10848-1:2006, Fórmula (13) | [Flancos en laboratorio](/phonometry/es/guides/flanking-lab/) |
 | fc | Frecuencia crítica: aquella en la que la longitud de onda de flexión del panel iguala a la del aire, donde aparece la caída por coincidencia. | Hz | Bies, Hansen y Howard (2017), Ecuación 7.3; sin norma aplicable | [Aislamiento de paneles](/phonometry/es/guides/panel-sound-insulation/) |
 | σ | Eficiencia de radiación de una placa: la potencia aérea radiada por unidad de velocidad cuadrática media de la superficie, normalizada por el valor de onda plana. | adimensional | Hopkins (2007), Ecuaciones 2.227 a 2.230; sin norma aplicable | [Aislamiento de paneles](/phonometry/es/guides/panel-sound-insulation/) |
 

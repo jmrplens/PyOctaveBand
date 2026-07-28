@@ -11,7 +11,7 @@ and apertures that caps any real construction, the radiation efficiency of a
 bending plate, and the point mobilities that set the vibrational power a
 structure absorbs. The measured counterparts these predictions feed live in
 [Predicting Sound Insulation (EN 12354)](insulation-prediction.md) and
-[Field Insulation Measurement and Ratings](insulation-field.md).
+[Field Insulation Measurement (ISO 16283)](insulation-field.md).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/panel_insulation_concept_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/panel_insulation_concept.svg" alt="Four panels: the single-panel mass law with its coincidence dip, the double wall with the mass-spring-mass resonance and cavity gain, the plate radiation efficiency rising to unity above the critical frequency, and a composite wall whose 1 % open slit caps R at the open-area limit" width="92%"></picture>
 

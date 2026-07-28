@@ -232,7 +232,7 @@ Uncorrelated components combine in quadrature $u_c = \sqrt{\sum u_i^2}$
 energy-weighted quadrature sum of the band uncertainties (Formula B.2).
 
 See the [Room Acoustics](room-acoustics.md) and
-[Field Insulation Measurement and Ratings](insulation-field.md) guides for usage.
+[Field Insulation Measurement (ISO 16283)](insulation-field.md) guides for usage.
 
 ### Predicted panel sound insulation (Bies 7.2, Hopkins 2.9/4.3.10, Cremer 5)
 

@@ -20,11 +20,13 @@ Ambas mitades consumen coeficientes medidos en otro lugar: la sección de
 caracteriza los datos de absorción, impedancia y dispersión en los que se
 apoyan las predicciones de sala y de aislamiento de esta sección.
 
-Empieza por [Acústica de salas](/phonometry/es/guides/room-acoustics/): la
-respuesta al impulso que adquiere y los parámetros que deriva son el
+Empieza por
+[Medición de la respuesta al impulso](/phonometry/es/guides/room-impulse-response/)
+y [Acústica de salas](/phonometry/es/guides/room-acoustics/): la respuesta al
+impulso que adquiere la primera y los parámetros que deriva la segunda son el
 vocabulario que habla el resto de la sección. Si tu interés es el
 aislamiento, sigue con
-[Medición del aislamiento en campo e índices](/phonometry/es/guides/insulation-field/);
+[Medición del aislamiento en campo (ISO 16283)](/phonometry/es/guides/insulation-field/);
 si es la predicción en fase de diseño, ve a
 [Predicción del tiempo de reverberación (Sabine, Arau)](/phonometry/es/guides/reverberation-prediction/)
 y [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/).
@@ -35,10 +37,15 @@ El campo sonoro dentro de una sala: medido desde una respuesta al impulso,
 valorado contra curvas de criterio y predicho desde el volumen y la
 absorción.
 
-- [Acústica de salas](/phonometry/es/guides/room-acoustics/): adquisición de
-  la respuesta al impulso (ISO 18233), parámetros de sala (ISO 3382-1/2),
-  métricas de oficinas abiertas (ISO 3382-3) y absorción en cámara
-  reverberante (ISO 354).
+- [Medición de la respuesta al impulso](/phonometry/es/guides/room-impulse-response/):
+  la adquisición determinista de ISO 18233, la deconvolución del barrido y MLS.
+- [Acústica de salas](/phonometry/es/guides/room-acoustics/): los parámetros
+  de sala de ISO 3382-1/2 derivados de esa respuesta al impulso.
+- [Acústica de oficinas diáfanas (ISO 3382-3)](/phonometry/es/guides/open-plan-acoustics/):
+  las magnitudes de privacidad del habla de una planta diáfana.
+- [Fuentes imagen y el campo estacionario de la sala](/phonometry/es/guides/room-image-sources/):
+  la respuesta al impulso determinista por fuentes imagen y el nivel
+  estacionario estadístico.
 - [Criterios de ruido de salas (NC / RC Mark II)](/phonometry/es/guides/room-noise/):
   las valoraciones de ruido de sala de ANSI/ASA S12.2-2019 con sus etiquetas
   espectrales.
@@ -54,16 +61,35 @@ absorción.
 Aislamiento aéreo y de impacto: medido en el edificio, caracterizado en el
 laboratorio y predicho a partir de datos de elemento.
 
-- [Medición del aislamiento en campo e índices](/phonometry/es/guides/insulation-field/):
-  medición en campo ISO 16283-1/2/3, índices ponderados ISO 717-1/2,
-  incertidumbre ISO 12999-1 y el método de control ISO 10052.
+- [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/guides/insulation-field/):
+  medición en campo ISO 16283-1/2, el informe del apartado 14 y la
+  incertidumbre de ISO 12999-1 que lo cualifica.
 - [Medición del aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/):
-  caracterización en laboratorio ISO 10140, aislamiento por intensidad
-  (ISO 15186), mejora de revestimientos de suelo (ISO 16251-1) y flancos
-  (ISO 10848).
+  la caracterización en laboratorio de un elemento según ISO 10140.
+- [Aislamiento acústico por intensidad (ISO 15186)](/phonometry/es/guides/insulation-intensity/):
+  la vía de potencia directa hacia los mismos índices cuando hay muchos flancos.
+- [Método de control del aislamiento (ISO 10052)](/phonometry/es/guides/insulation-survey/):
+  el método de control en bandas de octava y su índice de reverberación.
+- [Transmisión por flancos en laboratorio (ISO 10848)](/phonometry/es/guides/flanking-lab/):
+  el índice de reducción de vibraciones de unión medido y los descriptores de
+  flanco.
+- [Índices globales de aislamiento (ISO 717)](/phonometry/es/guides/insulation-ratings/):
+  los motores de curva de referencia tras Rw, DnT,w, Ln,w y sus términos de
+  adaptación.
+- [Aislamiento acústico de fachadas](/phonometry/es/guides/facade-insulation/):
+  el cerramiento del edificio medido (ISO 16283-3) y previsto (EN 12354-3/4).
+
+## [Diseño del aislamiento](/phonometry/es/guides/sections/insulation-design/)
+
+Las mismas magnitudes antes de que exista el edificio: previstas a partir de
+datos de elemento y a partir de la física del propio elemento.
+
 - [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/):
-  transmisión por flancos aérea y de impacto (EN 12354-1/2), aislamiento de
-  fachada y radiación al exterior (EN 12354-3/4).
+  la transmisión por flancos aérea y de impacto entre salas (EN 12354-1/2).
+- [Predicción del aislamiento de paneles](/phonometry/es/guides/panel-sound-insulation/):
+  la ley de masa, la coincidencia, las dobles hojas y las aberturas.
+- [Mejora del aislamiento a impacto de suelos (ISO 16251-1)](/phonometry/es/guides/impact-improvement/):
+  la mejora ponderada de un revestimiento blando en una maqueta pesada pequeña.
 - [Rigidez dinámica de materiales resilientes (EN 29052-1)](/phonometry/es/guides/dynamic-stiffness/):
   la medición por resonancia de placa de carga detrás de toda predicción de
   suelo flotante.

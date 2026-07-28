@@ -355,7 +355,7 @@ the fixed disclaimer. When the rating was built with
 one-third-octave $\alpha_s$ table with the octave $\alpha_p$ on the matching
 rows, exactly as accredited certificates print it. It uses the same
 `ReportMetadata` container and rendering engine as the
-[ISO 717 insulation fiche](/phonometry/guides/insulation-field/#iso-717-report-report);
+[ISO 717 insulation fiche](/phonometry/guides/insulation-ratings/#iso-717-report-report);
 passing `metadata=None` produces a lightweight prediction fiche, and a supplied
 `requirement` is read as the minimum $\alpha_w$ for the PASS/FAIL verdict.
 Setting `verbose=True` swaps the two-column table for the ISO 11654 evaluation
@@ -470,7 +470,7 @@ A rated absorption coefficient means little without its uncertainty. ISO
 reverberation-room measurement (ISO 354) and its ratings (ISO 11654, EN 1793-1),
 estimated from inter-laboratory tests to ISO 5725. It is the sound-absorption
 companion of the sound-insulation uncertainty of ISO 12999-1
-([Field Insulation Measurement and Ratings](/phonometry/guides/insulation-field/)).
+([Field Insulation Measurement (ISO 16283)](/phonometry/guides/insulation-field/)).
 
 **One-third-octave bands (Clause 5).** For the sound-absorption coefficient the
 reproducibility standard deviation is $\sigma_R = m\,\alpha_s + n$ (Formula (1)),
@@ -572,6 +572,6 @@ measurement method (road-traffic noise-reducing devices) is not.
   the Sabine, Eyring and Millington-Sette estimators that consume $\alpha_s$.
 - [Equivalent absorption area of furnished rooms](/phonometry/guides/enclosed-space-absorption/):
   the EN 12354-6 absorption budget these coefficients feed.
-- [Field Insulation Measurement and Ratings](/phonometry/guides/insulation-field/):
+- [Field Insulation Measurement (ISO 16283)](/phonometry/guides/insulation-field/):
   the sound-insulation companion uncertainty standard, ISO 12999-1.
 - API reference: [`materials.sound_absorption`](/phonometry/reference/api/materials/sound-absorption/), [`materials.absorption_rating`](/phonometry/reference/api/materials/absorption-rating/) and [`materials.absorption_uncertainty`](/phonometry/reference/api/materials/absorption-uncertainty/).

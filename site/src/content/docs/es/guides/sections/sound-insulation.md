@@ -1,39 +1,52 @@
 ---
 title: "Aislamiento acústico"
-description: "El aislamiento a ruido aéreo y de impacto en todo su ciclo de vida: caracterización en laboratorio (ISO 10140 y compañeras), predicción in situ (EN 12354), verificación en campo con índices globales (ISO 16283, ISO 717), y la rigidez dinámica que alimenta el diseño de suelos flotantes."
+description: "El aislamiento a ruido aéreo y de impacto tal como se mide y se valora: caracterización en laboratorio (ISO 10140, ISO 15186, ISO 10848), verificación en campo (ISO 16283, ISO 10052), los índices globales de ISO 717 y el cerramiento del edificio (ISO 16283-3, EN 12354-3/4)."
 ---
 
-El aislamiento acústico tiene un ciclo de vida con tres etapas, y una página
-de esta sección posee cada una de ellas. Un elemento (una solución de muro,
-un suelo flotante, una ventana) se caracteriza primero **en el laboratorio**,
-donde los flancos suprimidos aíslan su transmisión directa. Esos datos de
-laboratorio alimentan una **predicción** de cómo se comportará el edificio
-completo, caminos de flancos incluidos. El edificio terminado se **verifica
-en campo**, donde los valores medidos llevan los índices globales que citan
-las regulaciones. Cada etapa responde a una pregunta distinta y tiene su
-propia familia de normas. Una cuarta página, la de rigidez dinámica, no es
-una etapa en sí, sino la medición de material de apoyo que consume la etapa
-de predicción.
+El aislamiento acústico tiene un ciclo de vida, y las páginas de esta sección
+lo recorren. Un elemento (una solución de muro, un suelo flotante, una
+ventana) se caracteriza primero **en el laboratorio**, donde los flancos
+suprimidos aíslan su transmisión directa. Esos datos de laboratorio alimentan
+una **predicción** de cómo se comportará el edificio completo, caminos de
+flancos incluidos. El edificio terminado se **verifica en campo**. En cada
+etapa el espectro por bandas se reduce al **número único** que citan las
+regulaciones, y esa reducción es un motor compartido y no un paso propio de
+ningún método.
 
+**Laboratorio.**
 [Medición del aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/)
-cubre la primera etapa: el índice de reducción acústica y el nivel de impacto
-normalizado de ISO 10140, la alternativa por intensidad acústica de ISO 15186,
-la mejora de revestimientos de suelo sobre maqueta reducida de ISO 16251-1 y
-la transmisión por flancos en laboratorio según ISO 10848.
+cubre el índice de reducción acústica y el nivel de impactos normalizado de
+ISO 10140 con su corrección de ruido de fondo. Dos métodos de laboratorio la
+acompañan:
+[Aislamiento acústico por intensidad (ISO 15186)](/phonometry/es/guides/insulation-intensity/)
+lee la potencia transmitida sobre la cara radiante cuando los flancos son
+demasiado altos para el método por presión, y
+[Transmisión por flancos en laboratorio (ISO 10848)](/phonometry/es/guides/flanking-lab/)
+mide los datos de unión que consume la predicción. Un tercero, la mejora de
+revestimientos de suelo de ISO 16251-1, se archiva con las páginas de diseño a
+las que alimenta.
 
-[Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/)
-cubre la segunda: los modelos de flancos aéreo y de impacto de EN 12354-1/2
-con sus índices de reducción de vibraciones en las uniones, y el aislamiento
-de fachada y la radiación al exterior de EN 12354-3/4. Su término de mejora
-por suelo flotante consume la rigidez dinámica medida según
-[EN 29052-1](/phonometry/es/guides/dynamic-stiffness/), y por eso esa página
-de medición vive en esta sección.
+**Predicción.** La mitad de fase de diseño tiene sección propia,
+[Diseño del aislamiento](/phonometry/es/guides/sections/insulation-design/): el
+modelo de flancos de EN 12354 entre salas, el aislamiento teórico de un panel y
+las dos mediciones de material que consume el diseño de un suelo.
 
-[Medición del aislamiento en campo e índices](/phonometry/es/guides/insulation-field/)
-cubre la tercera: aislamiento aéreo, de impacto y de fachada en campo según
-ISO 16283-1/2/3, los índices globales ponderados y términos de adaptación
-espectral de ISO 717-1/2, la incertidumbre de ISO 12999-1 que cualifica un
-índice, y el método rápido de control ISO 10052.
+**Campo.**
+[Medición del aislamiento en campo (ISO 16283)](/phonometry/es/guides/insulation-field/)
+cubre la medición aérea y de impacto con método de ingeniería en el edificio,
+su informe del apartado 14 y la incertidumbre de ISO 12999-1 que lo cualifica.
+Cuando la pregunta no merece ese esfuerzo,
+[Método de control del aislamiento (ISO 10052)](/phonometry/es/guides/insulation-survey/)
+cambia exactitud por rapidez con bandas de octava y un índice de reverberación.
+
+**Índices y cerramiento.**
+[Índices globales de aislamiento (ISO 717)](/phonometry/es/guides/insulation-ratings/)
+es el motor de curva de referencia en el que terminan todos esos métodos, con
+sus términos de adaptación espectral C, Ctr y CI. Y
+[Aislamiento acústico de fachadas](/phonometry/es/guides/facade-insulation/)
+mantiene el cerramiento del edificio en un solo sitio: medido según
+ISO 16283-3, previsto según EN 12354-3 y radiando al exterior según
+EN 12354-4.
 
 Dos secciones vecinas completan el cuadro: las magnitudes del lado de la sala
 (tiempo de reverberación, absorción) viven en
@@ -44,15 +57,22 @@ emparentada EN 12354-5, vive en
 
 ## Páginas de esta sección
 
-- [Medición del aislamiento en campo e índices](/phonometry/es/guides/insulation-field/):
-  medición ISO 16283-1/2/3, índices ISO 717-1/2, incertidumbre ISO 12999-1 y
-  el método de control ISO 10052.
+- [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/guides/insulation-field/):
+  la medición en campo de ISO 16283-1/2, su informe de ensayo y la
+  incertidumbre de ISO 12999-1.
 - [Medición del aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/):
-  caracterización ISO 10140, aislamiento por intensidad ISO 15186,
-  revestimientos de suelo ISO 16251-1 y flancos ISO 10848.
-- [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/):
-  transmisión por flancos (EN 12354-1/2), aislamiento de fachada y radiación
-  al exterior (EN 12354-3/4).
-- [Rigidez dinámica de materiales resilientes (EN 29052-1)](/phonometry/es/guides/dynamic-stiffness/):
-  la medición por resonancia de placa de carga y la frecuencia natural del
-  suelo flotante.
+  la caracterización ISO 10140 de un elemento con los flancos suprimidos.
+- [Aislamiento acústico por intensidad (ISO 15186)](/phonometry/es/guides/insulation-intensity/):
+  la vía de potencia directa de ISO 15186-1/-2 hacia los mismos índices.
+- [Método de control del aislamiento (ISO 10052)](/phonometry/es/guides/insulation-survey/):
+  el método de control en bandas de octava, su índice de reverberación y sus
+  magnitudes.
+- [Transmisión por flancos en laboratorio (ISO 10848)](/phonometry/es/guides/flanking-lab/):
+  el índice de reducción de vibraciones Kij medido y los descriptores de
+  flanco Dn,f y Ln,f.
+- [Índices globales de aislamiento (ISO 717)](/phonometry/es/guides/insulation-ratings/):
+  los motores de curva de referencia de ISO 717-1/-2, C, Ctr y CI, los
+  términos de rango ampliado y la ficha de ISO 717.
+- [Aislamiento acústico de fachadas](/phonometry/es/guides/facade-insulation/):
+  el cerramiento medido (ISO 16283-3), previsto (EN 12354-3) y radiando al
+  exterior (EN 12354-4).

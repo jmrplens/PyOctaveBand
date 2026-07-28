@@ -128,7 +128,7 @@ and the *N*<sub>5</sub>/*N*<sub>10</sub> percentiles for a time-varying result)
 beside the specific-loudness pattern *N*′(z) (the result's own `.plot()`), the
 boxed `N = X sone (LN = Y phon)` single number, an optional verdict row and a
 footer with the fixed disclaimer. It uses the same `ReportMetadata` container
-(documented under [Field insulation](insulation-field.md#report-metadata-reportmetadata))
+(documented under [Insulation ratings](insulation-ratings.md#report-metadata-reportmetadata))
 and rendering engine as the ISO 717 insulation fiche; a supplied `requirement`
 is read as the maximum permitted loudness in sone (a lower loudness passes).
 Rendering needs reportlab (`pip install phonometry[report]`); only

@@ -1,6 +1,6 @@
 ---
 title: "Acústica de salas"
-description: "Adquisición de la respuesta al impulso (ISO 18233), parámetros de sala EDT/T20/T30/C50/C80/Ts (ISO 3382-1/2) y métricas de habla en oficinas diáfanas (ISO 3382-3)."
+description: "El análisis del decaimiento de la respuesta al impulso medida según ISO 3382-1/2: la curva de Schroeder, EDT, T20, T30, claridad, definición y tiempo central, las marcas de validez que los mantienen honestos y la ficha acreditada."
 references:
   - type: book
     authors: ["Kuttruff, H."]
@@ -9,7 +9,7 @@ references:
     edition: "6.ª ed."
     publisher: "CRC Press"
     doi: "10.1201/9781315372150"
-    note: "La monografía de referencia que sustenta esta página: la teoría estadística de los campos sonoros en decaimiento, la frecuencia de Schroeder y los parámetros perceptivos de sala del §2."
+    note: "La monografía de referencia que sustenta esta página: la teoría estadística de los campos sonoros en decaimiento, la frecuencia de Schroeder y los parámetros perceptivos de sala de esta página."
   - type: article
     authors: ["Schroeder, M. R."]
     year: 1965
@@ -19,7 +19,7 @@ references:
     issue: 3
     pages: "409-412"
     doi: "10.1121/1.1909343"
-    note: "El método de integración hacia atrás que convierte la respuesta al impulso al cuadrado en la curva suave de decaimiento del §2."
+    note: "El método de integración hacia atrás que convierte la respuesta al impulso al cuadrado en la curva suave de decaimiento de esta página."
   - type: article
     authors: ["Hak, C. C. J. M.", "Wenmaekers, R. H. C.", "van Luxemburg, L. C. J."]
     year: 2012
@@ -29,35 +29,21 @@ references:
     issue: 6
     pages: "907-915"
     doi: "10.3813/aaa.918574"
-    note: "El análisis de la INR que sustenta la discusión del rango dinámico y los indicadores de validez endurecidos del §2."
+    note: "El análisis de la INR que sustenta la discusión del rango dinámico y los indicadores de validez endurecidos de esta página."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2009
     title: "Acoustics — Measurement of room acoustic parameters — Part 1: Performance spaces"
     designation: "ISO 3382-1:2009"
     url: "https://www.iso.org/standard/40979.html"
-    note: "Las definiciones de parámetros, los requisitos de posiciones y las diferencias apenas perceptibles del §2."
+    note: "Las definiciones de parámetros y las diferencias apenas perceptibles tras el análisis del decaimiento."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2008
     title: "Acoustics — Measurement of room acoustic parameters — Part 2: Reverberation time in ordinary rooms"
     designation: "ISO 3382-2:2008"
     url: "https://www.iso.org/standard/36201.html"
-    note: "Los grados de exactitud, los recuentos de posiciones y la distancia mínima a la fuente de la discusión sobre promediado del §1."
-  - type: standard
-    organization: "International Organization for Standardization"
-    year: 2012
-    title: "Acoustics — Measurement of room acoustic parameters — Part 3: Open plan offices"
-    designation: "ISO 3382-3:2012"
-    url: "https://www.iso.org/standard/46520.html"
-    note: "Las magnitudes de privacidad del habla en oficinas diáfanas del §3."
-  - type: standard
-    organization: "International Organization for Standardization"
-    year: 2006
-    title: "Acoustics — Application of new measurement methods in building and room acoustics"
-    designation: "ISO 18233:2006"
-    url: "https://www.iso.org/standard/40408.html"
-    note: "La adquisición por barrido sinusoidal y MLS del §1."
+    note: "Los grados de exactitud y el criterio de rango dinámico tras el análisis del decaimiento; sus reglas de posiciones se aplican en la guía de medición de la respuesta al impulso."
 ---
 
 import Video from '../../../../components/Video.astro';
@@ -66,271 +52,23 @@ import ReportPreview from '../../../../components/ReportPreview.astro';
 
 La acústica de salas parte de una única medición: la **respuesta al impulso**
 (RI) entre una fuente y un receptor. Fíltrala en bandas e intégrala, y da el
-tiempo de reverberación, la claridad y la inteligibilidad del habla: todo
-sobre el campo sonoro dentro de un único recinto. Esta página sigue esa cadena
-en orden de medición: adquirir la RI (ISO 18233), convertirla en parámetros de
-sala (ISO 3382-1/2) y métricas espaciales del habla para oficinas diáfanas
-(ISO 3382-3). Dos mediciones de decaimiento separadas en una cámara
-reverberante, una con la sala vacía y otra con la probeta instalada, dan la
-absorción acústica de un material; ese método
-(ISO 354) vive en
+tiempo de reverberación, la claridad y el tiempo central: todo lo que
+ISO 3382-1/2 pregunta sobre el campo sonoro dentro de un único recinto. Esta
+página convierte una RI medida en esos parámetros: la curva de decaimiento
+de Schroeder, las ventanas de evaluación, las marcas de validez y la ficha
+acreditada. Adquirir la propia RI (barridos, MLS, dónde medir) vive en
+[Medición de la respuesta al impulso](/phonometry/es/guides/room-impulse-response/),
+y las métricas del habla de oficinas diáfanas de ISO 3382-3 en
+[Acústica de oficinas diáfanas](/phonometry/es/guides/open-plan-acoustics/).
+Dos mediciones de decaimiento separadas en una cámara reverberante, una con
+la sala vacía y otra con la probeta instalada, dan la absorción acústica de
+un material; ese método (ISO 354) vive en
 [Medida y clasificación de la absorción sonora](/phonometry/es/guides/absorption-measurement/).
 Para el aislamiento acústico *entre* recintos (la misma RI medida a ambos
 lados de un cerramiento) consulta la guía complementaria
-[Medición del aislamiento en campo e índices](/phonometry/es/guides/insulation-field/).
+[Medición del aislamiento en campo (ISO 16283)](/phonometry/es/guides/insulation-field/).
 
-## 1. Adquisición de la respuesta al impulso (ISO 18233)
-
-Una sala se comporta, con buena aproximación, como un sistema **lineal e
-invariante en el tiempo**, así que todo sobre ella está contenido en su RI.
-Podrías disparar una pistola y grabar la cola, pero una excitación
-determinista reproducida por un altavoz y *deconvolucionada* recupera la
-misma RI con 20–30 dB más de relación señal-ruido efectiva (ISO 18233). Se
-proporcionan dos excitaciones.
-
-**Barrido sinusoidal exponencial (ESS, Anexo B).** La frecuencia
-instantánea crece exponencialmente,
-
-$$
-f(t) = f_1 \left( \frac{f_2}{f_1} \right)^{t/T},
-$$
-
-de modo que el tiempo invertido por octava es constante y la excitación
-imita al ruido rosa (energía constante por banda de octava fraccionaria).
-La RI se recupera mediante división espectral lineal (con relleno de ceros,
-no circular),
-
-$$
-H = \frac{Y\ \overline{X}}{|X|^2 + \varepsilon},
-$$
-
-con un pequeño término de Tikhonov $\varepsilon$ que protege los extremos de
-banda donde el barrido tiene poca energía. Como un barrido de grave a agudo
-sitúa la distorsión armónica en tiempos de llegada *negativos*, la distorsión
-se separa limpiamente de la RI lineal y se descarta conservando solo la parte
-causal. El método `"farina"` llega al mismo resultado convolucionando la
-grabación con el filtro inverso analítico; supone que el barrido de
-referencia se generó con la amplitud y el desvanecimiento por defecto, así
-que usa el método espectral con un barrido de amplitud distinta de la unidad
-o con desvanecimiento personalizado.
-
-**Secuencia de longitud máxima (MLS, Anexo A).** Una secuencia binaria de
-orden `N` y longitud $2^N-1$ cuya autocorrelación circular es una delta casi
-perfecta; la RI se obtiene de la correlación cruzada circular del periodo
-grabado con la secuencia. La MLS excita con amplitud constante y es rápida de
-promediar, pero es más sensible a la varianza temporal (corrientes de aire,
-deriva de temperatura) y no admite tanta potencia como un barrido.
-**Prefiere el barrido** para salas y cerramientos; recurre a la MLS cuando la
-excitación deba ser periódica o el hardware favorezca una señal de dos
-niveles.
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_ir_measurement_es.svg" alt="Cadena de medición indirecta ISO 18233: una excitación (barrido ESS o MLS) alimenta un altavoz en la sala, un micrófono capta la respuesta y la deconvolución (correlación o filtro inverso) recupera la respuesta al impulso" width="92%" loading="eager" />
-
-```python
-import numpy as np
-from scipy.signal import fftconvolve
-from phonometry import room
-
-fs = 48000
-# Un barrido de 3 s, 20 Hz - 20 kHz es una buena excitación de sala de banda ancha
-# sweep: excitación que reproduces por el altavoz
-sweep = room.sweep_signal(fs, 20.0, 20000.0, 3.0)
-
-# Deconvoluciona la respuesta grabada para recuperar la respuesta al impulso
-system = np.zeros(fs); system[100] = 1.0; system[2000] = 0.4   # directo + reflexión
-# recorded: captura de micrófono del barrido reproducido (aquí simulada por convolución con una sala sintética)
-recorded = fftconvolve(sweep, system)
-ir = room.impulse_response(recorded, sweep, fs, method="spectral")
-print(int(np.argmax(np.abs(ir))))                    # 100: sonido directo recuperado
-ir.plot()                # forma de onda + envolvente de Schroeder (figura de abajo)
-
-# Variante de filtro inverso de Farina (necesita la banda del barrido)
-ir_f = room.impulse_response(recorded, sweep, fs, method="farina", f_range=(20.0, 20000.0))
-
-# MLS periódica: excita con >= 2 periodos, promedia, correlaciona
-mls = room.mls_signal(16)                                 # longitud 2**16 - 1 = 65535
-rec = fftconvolve(np.tile(mls, 2), system)[: 2 * mls.size]
-ir_m = room.mls_impulse_response(rec, mls)
-print(int(np.argmax(np.abs(ir_m))))                  # 100
-```
-
-`sweep_signal`/`mls_signal` devuelven arrays simples, listos para escribir en
-un WAV y reproducir. `impulse_response`/`mls_impulse_response` devuelven ahora
-un `ImpulseResponseResult`, un sustituto directo del array de la RI
-(`np.asarray(ir)`, la indexación y `ir.size` siguen funcionando, de modo que
-`room_parameters(ir, fs)` no cambia) que además guarda la frecuencia de
-muestreo y el método y añade un `.plot()`.
-Dos excitaciones más de la literatura de medición de funciones de
-transferencia - los pares complementarios de Golay con deconvolución
-exactamente libre de ruido, y los barridos conformados a un espectro
-objetivo arbitrario - viven en la
-[guía de medición de sistemas](/phonometry/es/guides/system-measurement/) y
-devuelven los mismos tipos de resultado.
-
-**Las dos excitaciones.** El barrido exponencial desplaza su energía hacia
-frecuencias altas a lo largo de toda la señal, mientras que la MLS es una
-secuencia de dos niveles con espectro plano, visible como la magnitud
-casi constante de la derecha.
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/excitation_signals_es.webp" alt="Señales de excitación ISO 18233: la forma de onda del barrido sinusoidal exponencial y su espectrograma con el ascenso exponencial de frecuencia, y una secuencia de longitud máxima con su espectro de magnitud plano" width="96%" />
-
-<details>
-<summary>Ver el código de esta figura</summary>
-
-```python
-from phonometry import room
-from phonometry import plot_excitation
-
-fs = 48000
-sweep = room.sweep_signal(fs, 50.0, 20000.0, 1.0)   # excitación ESS
-mls = room.mls_signal(12).astype(float)             # longitud 2**12 - 1
-
-# Una línea: forma de onda + espectrograma (barrido), secuencia + espectro (MLS)
-plot_excitation(sweep, fs, kind="sweep")
-plot_excitation(mls, fs, kind="mls")
-
-# A mano: el espectrograma del barrido y el espectro de magnitud de la MLS
-import numpy as np
-import matplotlib.pyplot as plt
-
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
-ax1.specgram(sweep, NFFT=1024, Fs=fs, noverlap=512)
-ax1.set(xlabel="Tiempo [s]", ylabel="Frecuencia [Hz]", title="Espectrograma del barrido")
-spec = np.abs(np.fft.rfft(mls))
-freqs = np.fft.rfftfreq(mls.size, d=1.0 / fs)
-ax2.semilogx(freqs[1:], 20 * np.log10(spec[1:] / np.median(spec[1:])))
-ax2.set(xlabel="Frecuencia [Hz]", ylabel="Magnitud [dB]", title="Espectro de la MLS (plano)")
-```
-
-</details>
-
-**La respuesta al impulso recuperada.** Deconvolucionar la grabación da la RI
-de banda ancha: el sonido directo, las reflexiones tempranas discretas y la
-cola difusa que decae. Su `.plot()` muestra la forma de onda arriba y la
-envolvente log-magnitud con la curva de decaimiento de energía de Schroeder
-abajo: el decaimiento recto cuya pendiente se convierte en el tiempo de
-reverberación del §2.
-
-<Video
-  name="anim_sweep_deconvolution"
-  width={2400}
-  height={1350}
-  title="Medición con barrido y deconvolución a la respuesta al impulso"
-  description="Un barrido exponencial cruza una sala dibujada mientras se construye el espectrograma de la grabación, con las reflexiones discretas apareciendo como copias retardadas de la cresta principal; después el filtro inverso colapsa toda la grabación en la respuesta al impulso."
-/>
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impulse_response_es.webp" alt="Respuesta al impulso de la sala recuperada: la forma de onda normalizada con el sonido directo y las reflexiones etiquetadas, y debajo la envolvente log-magnitud en dB con la curva de decaimiento de energía de Schroeder" width="88%" />
-
-<details>
-<summary>Ver el código de esta figura</summary>
-
-```python
-import numpy as np
-from scipy.signal import fftconvolve
-from phonometry import room
-
-fs = 48000
-sweep = room.sweep_signal(fs, 20.0, 20000.0, 1.5)
-# Una sala sintética: sonido directo + dos reflexiones + cola difusa que decae
-system = np.zeros(int(0.7 * fs))
-system[80], system[1400], system[3100] = 1.0, 0.5, 0.32
-ir = room.impulse_response(fftconvolve(sweep, system), sweep, fs, length=system.size)
-
-# Una línea: forma de onda + log-magnitud / decaimiento de Schroeder
-ir.plot(language="es")
-
-# A mano: la envolvente log-magnitud normalizada en dB
-import matplotlib.pyplot as plt
-h = np.asarray(ir)
-t = np.arange(h.size) / fs
-plt.plot(t, 20 * np.log10(np.abs(h) / np.max(np.abs(h))))
-plt.ylim(-80, 5)
-plt.xlabel("Tiempo [s]"); plt.ylabel("Nivel re pico [dB]")
-```
-
-</details>
-
-**Dónde medir.** Una RI caracteriza un único par fuente–receptor; un parámetro
-de sala se obtiene promediando sobre varios. ISO 3382-1 (espacios para
-interpretación) pide al menos dos posiciones de fuente y micrófonos separados
-$\geq 2$ m entre sí, $\geq 1$ m de cualquier superficie, a $1{,}2$ m
-(altura de oído sentado); ISO 3382-2 fija el número mínimo de posiciones de
-fuente, de micrófono y de combinaciones fuente–micrófono según el grado de
-exactitud (control / ingeniería / precisión) y pide posiciones de micrófono
-que eviten las colocaciones simétricas.
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_measurement_es.svg" alt="Configuración de medición de acústica de salas: una planta de la sala en vista superior con dos posiciones de fuente (altavoz) y seis posiciones de micrófono con las reglas de separación de ISO 3382-1, y la tabla de ISO 3382-2 con el número mínimo de posiciones para los grados de control, ingeniería y precisión" width="94%" />
-
-**Promediar entre posiciones.** El parámetro por banda que se informa es la
-media aritmética sobre todas las combinaciones fuente-micrófono, y la
-dispersión entre posiciones es parte de la respuesta, no ruido: indícala
-junto a la media siempre que supere la diferencia apenas perceptible (DAP)
-del parámetro (§2), porque una
-sala puede cumplir un objetivo en promedio mientras butacas concretas
-quedan muy fuera de él. Cuatro errores de colocación sesgan la propia
-media:
-
-- **Posiciones correlacionadas.** Micrófonos a menos de 2 m entre sí muestrean
-  casi el mismo campo sonoro dos veces, así que el promedio parece más
-  estable de lo que es. El mínimo de 1 m a cualquier superficie evita, a
-  su vez, el refuerzo de presión junto a un contorno (y el filtro en peine
-  de la animación de más abajo) que colorea todo lo que graba un micrófono
-  demasiado cercano.
-
-<Video
-  name="anim_comb_filtering"
-  width={2400}
-  height={1350}
-  title="Filtro en peine por una única reflexión del suelo"
-  description="El sonido directo y una reflexión del suelo llegan al micrófono; al cambiar la altura del micrófono varía el retardo entre los dos caminos y el filtro en peine de la respuesta en frecuencia se mueve con él, y por eso importa la posición de medición cerca de superficies reflectantes."
-/>
-
-- **Colocaciones simétricas.** En una sala geométricamente simétrica, las
-  posiciones especulares reciben patrones de reflexión especulares;
-  promediarlas no añade información nueva. Por eso la ISO 3382-2 pide
-  posiciones que no caigan sobre líneas de simetría.
-- **Demasiado cerca de la fuente.** Dentro del campo directo el EDT se
-  desploma y el C80 se satura hacia arriba haga lo que haga la sala. La
-  ISO 3382-2 mantiene por ello cada micrófono al menos a
-  $d_{min} = 2\sqrt{V/(c\,\hat T)}$ de la fuente, con $\hat T$ una
-  estimación del tiempo de reverberación esperado (unos 2,2 m para un aula
-  de 200 m³ con 0,5 s esperados).
-- **La lotería de baja frecuencia.** Por debajo de la frecuencia de
-  Schroeder (§2) cada banda contiene solo un puñado de modos propios, y un
-  micrófono sobre un nodo de uno de ellos ve un decaimiento distinto que
-  otro sobre un antinodo. La dispersión de las bandas de 63-125 Hz entre
-  posiciones es estructuralmente mayor; el remedio son más posiciones, no
-  una excitación más larga.
-
-### Parámetros de `sweep_signal()` / `inverse_filter()`
-
-| Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
-| :--- | :--- | :--- | :--- | :--- |
-| `fs` | int | Hz | > 0 | Frecuencia de muestreo |
-| `f1` | float | Hz | > 0, en/por debajo de la banda más baja | Frecuencia inicial del barrido |
-| `f2` | float | Hz | `f1 < f2 <= fs/2` | Frecuencia final del barrido |
-| `seconds` | float | s | cualquiera; mayor ⇒ más SNR | Duración del barrido |
-| `amplitude` | float | — | por defecto `1.0` | Amplitud de pico |
-| `fade` | float | — | `[0, 0.5)`, por defecto `0.01` | Fracción de fundido medio Hann (elimina transitorios de inicio/fin) |
-
-### Parámetros de `impulse_response()`
-
-| Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
-| :--- | :--- | :--- | :--- | :--- |
-| `recorded` | array 1D | cualquiera | no vacío | Respuesta del sistema grabada |
-| `reference` | array 1D | cualquiera | no vacío | El barrido emitido |
-| `fs` | int | Hz | > 0 | Frecuencia de muestreo |
-| `method` | str | — | `'spectral'` (por defecto) / `'farina'` | `'farina'` requiere `f_range` |
-| `f_range` | (float, float) | Hz | por defecto `None` | `(f1, f2)` del barrido (solo Farina) |
-| `regularization` | float | — | por defecto `1e-6` | Término de Tikhonov como fracción de la energía espectral de pico |
-| `length` | int, opcional | muestras | por defecto `len(recorded)` | Muestras de RI causal a devolver |
-| `return_full` | bool | — | por defecto `False` | Devuelve la secuencia completa (distorsión en la cola) |
-
-`mls_signal(order)` toma un entero `order` en 2–20 (longitud de secuencia
-$2^{\text{order}}-1$); `mls_impulse_response(recorded, mls, length=None)`
-necesita que `recorded` abarque un número entero de periodos de MLS.
-
-## 2. Análisis del decaimiento y parámetros de sala (ISO 3382-1/2)
+## Análisis del decaimiento y parámetros de sala (ISO 3382-1/2)
 
 La RI se filtra en bandas de octava (o de tercio de octava) y cada banda se
 convierte en una **curva de decaimiento** mediante la integración inversa de
@@ -643,249 +381,43 @@ el repositorio; haz clic en la vista previa para abrir el PDF.
 	caption="Ficha de parámetros acústicos de salas (RoomAcousticsResult.report), T_mid y la tabla por banda."
 />
 
-## 3. Oficinas diáfanas (ISO 3382-3)
+## El resto de la cadena de medición
 
-La acústica de oficinas diáfanas trata de la **privacidad del habla**: con
-qué rapidez el habla de un hablante se desvanece hasta la ininteligibilidad a
-medida que uno se aleja. Los niveles y el STI se miden a lo largo de una fila
-de puestos de trabajo (al menos 4 posiciones, preferiblemente 6–10), y cuatro
-magnitudes de un solo número resumen la sala. La **tasa de decaimiento
-espacial** del habla ponderada A es la pendiente del nivel frente a
-$\lg(r/r_0)$, escalada a una cifra por duplicación usando solo las posiciones
-de 2–16 m,
-
-$$
-D_{2,S} = -\lg(2)\ b, \qquad L = a + b\ \lg(r/r_0),\ r_0 = 1\ \text{m},
-$$
-
-con **Lp,A,S,4m** leído en la misma recta a 4 m. La **distancia de
-distracción** rD (STI = 0,50) y la **distancia de privacidad** rP
-(STI = 0,20) provienen de una regresión lineal del STI frente a la distancia.
-Las buenas oficinas empujan rD por debajo de ~5 m; las malas dejan el habla
-molesta más allá de 10 m.
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_open_plan_es.svg" alt="Línea de medición de oficina diáfana ISO 3382-3 desde la fuente a 1 m a lo largo de posiciones de 2 m a 16 m, que alimenta las cuatro magnitudes de índice único D2,S, Lp,A,S,4m, rD y rP" width="86%" />
-
-```python
-import numpy as np
-from phonometry import room
-
-r = np.array([2.0, 4.0, 6.0, 8.0, 12.0, 16.0])       # distancias al hablante (m)
-lp = 65.0 - 7.0 * np.log2(r)                          # nivel de habla ponderado A (dB)
-sti = 0.70 - 0.03 * r                                 # STI por posición
-
-m = room.open_plan_metrics(r, lp, sti)
-print(round(m.d2s, 1), round(m.lp_as_4m, 1))         # 7.0 dB, 51.0 dB
-print(round(m.rd, 1), round(m.rp, 1))                # 6.7 m, 16.7 m
-m.plot()   # la regresión de decaimiento espacial de la figura de abajo
-```
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_decay_es.svg" alt="Decaimiento espacial en oficina abierta: nivel de habla ponderado A y STI frente a la distancia a la fuente en eje logarítmico, con la regresión D2,S, el marcador Lp,A,S,4m a 4 m y los cruces de distancia rD y rP" width="80%" />
-
-<details>
-<summary>Ver el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import room
-
-r = np.array([2.0, 4.0, 6.0, 8.0, 12.0, 16.0])       # distancias al hablante (m)
-lp = 65.0 - 7.0 * np.log2(r)                          # nivel de habla ponderado A (dB)
-sti = 0.70 - 0.03 * r                                 # STI por posición
-m = room.open_plan_metrics(r, lp, sti)
-
-# En una línea: la regresión D2,S reconstruida con los campos del resultado,
-# con los cruces rD / rP marcados (la figura superior añade además los puntos
-# medidos y el eje de STI):
-m.plot(language="es")
-plt.show()
-```
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import room
-
-r = np.array([2.0, 4.0, 6.0, 8.0, 12.0, 16.0])       # distancias al hablante (m)
-lp = 65.0 - 7.0 * np.log2(r)                          # nivel de habla ponderado A (dB)
-sti = 0.70 - 0.03 * r                                 # STI por posición
-m = room.open_plan_metrics(r, lp, sti)
-
-# Decaimiento espacial: Lp,A,S medido frente a la distancia en eje logarítmico,
-# la regresión D2,S reconstruida con los campos del resultado, y el STI con los
-# cruces rD / rP en un eje gemelo:
-b = -m.d2s / np.log10(2.0)                 # pendiente de la regresión frente a lg(r)
-a = m.lp_as_4m - b * np.log10(4.0)         # ordenada desde el nivel a 4 m
-rr = np.logspace(np.log10(2.0), np.log10(16.0), 100)
-
-fig, ax = plt.subplots()
-ax.semilogx(r, lp, "o", label="Lp,A,S medido")
-ax.semilogx(rr, a + b * np.log10(rr), "--", label=f"D2,S = {m.d2s:.1f} dB")
-ax.plot(4.0, m.lp_as_4m, "D", label=f"Lp,A,S,4m = {m.lp_as_4m:.0f} dB")
-ax.set_xlabel("Distancia al hablante r [m]")
-ax.set_ylabel("Nivel de habla ponderado A [dB]")
-ax.set_xlim(1.8, 20.0)
-
-twin = ax.twinx()
-twin.semilogx(r, sti, "s-", color="#2ca02c", label="STI")
-twin.axvline(m.rd, ls=":", color="#2ca02c")
-twin.axvline(m.rp, ls=":", color="#9467bd")
-twin.annotate(f"rD = {m.rd:.1f} m", (m.rd, 0.52))
-twin.annotate(f"rP = {m.rp:.1f} m", (m.rp, 0.22))
-twin.set_ylabel("STI")
-twin.set_ylim(0.0, 1.0)
-
-lines, labels = ax.get_legend_handles_labels()
-tl, tlab = twin.get_legend_handles_labels()
-ax.legend(lines + tl, labels + tlab, loc="best")
-plt.show()
-```
-
-</details>
-
-La propia línea merece una planta a escala. `plot_open_plan_geometry` dibuja
-la fuente, la línea de micrófonos entre los puestos de trabajo y las dos
-distancias sobre el eje, y un resultado que retuvo sus posiciones redibuja su
-propia línea con `m.plot_geometry()`.
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_line_geometry_es.svg" alt="Planta a escala de la línea de medida en oficina diáfana: la estrella roja de la fuente en el origen, seis micrófonos azules de 2 m a 16 m sobre una línea punteada entre los bloques grises de los puestos de trabajo, la distancia de distracción rD = 6,5 m y la de privacidad rP = 13 m marcadas a trazos sobre la línea y los 16 m de recorrido acotados" width="86%" />
-
-*Todas las magnitudes de ISO 3382-3 salen de esta única línea: seis
-micrófonos de 2 m a 16 m entre los puestos de trabajo, con $r_D$ y $r_P$
-cayendo entre ellos.*
-
-<details>
-<summary>Ver el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import room
-
-# La línea de 2-16 m del ejemplo, con las distancias de distracción y
-# de privacidad marcadas sobre el eje.
-room.plot_open_plan_geometry([2.0, 4.0, 6.0, 8.0, 12.0, 16.0],
-                             rd=6.5, rp=13.0, language="es")
-plt.show()
-
-# Un resultado retiene sus posiciones, así que m.plot_geometry() dibuja
-# su propia línea con los rD y rP de la regresión.
-```
-
-</details>
-
-### Parámetros de `open_plan_metrics()`
-
-| Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
-| :--- | :--- | :--- | :--- | :--- |
-| `positions_m` | array 1D | m | ≥ 4 posiciones, todas > 0 | Distancias fuente-receptor |
-| `spl_a_speech` | array 1D | dB | misma longitud | Nivel de habla ponderado A `Lp,A,S,n` por posición |
-| `sti_values` | array 1D | — | misma longitud | STI por posición (método completo de IEC 60268-16) |
-
-Devuelve un `OpenPlanResult` con `d2s`, `lp_as_4m`, `rd` y `rp`; su
-`.plot()` redibuja la regresión de decaimiento espacial del apartado 6.2 a
-partir de esos cuatro campos y marca `rd` / `rp`.
-`d2s`/`lp_as_4m` son `nan` si menos de dos posiciones caen en 2–16 m;
-`rd`/`rp` son `nan` cuando el STI no decrece con la distancia. El STI por
-posición puede medirse a su vez con las herramientas STIPA de la
-[guía del índice de transmisión del habla](/phonometry/es/guides/speech-transmission/).
-
-### Informe ISO 3382-3 (`.report()`)
-
-`OpenPlanResult.report(path)` renderiza una ficha PDF de una página con el
-formato de un informe de medición de privacidad acústica en oficinas diáfanas:
-la línea de norma base, un bloque de cabecera de metadatos opcional, una tabla
-compacta de las cuatro magnitudes de número único del apartado 4 ($D_{2,S}$,
-$L_{p,A,S,4m}$, la distancia de distracción $r_D$ y la distancia de privacidad
-$r_P$) apilada sobre la gráfica de decaimiento espacial a todo el ancho del
-resultado (`.plot()`, la regresión del apartado 6.2 en el eje logarítmico de
-distancia con la lectura a 4 m y los cruces $r_D$ / $r_P$ marcados, la curva al
-estilo de la Figura 3), el $D_{2,S}$ enmarcado con las demás magnitudes al lado,
-y un pie
-con el descargo fijo. La ISO 3382-3 **caracteriza** un espacio en lugar de
-definir un apto/no apto intrínseco, por lo que la fila de veredicto aparece solo
-cuando se suministra una tasa de decaimiento espacial objetivo a través del
-campo `requirement` de los metadatos (`ReportMetadata(requirement=...)`,
-interpretada como el $D_{2,S}$ mínimo aceptable en dB, según los intervalos de
-calidad informativos del Anexo A donde un mayor decaimiento espacial es mejor;
-la sala cumple igualando o superando el objetivo). Usa el mismo contenedor
-`ReportMetadata` y el mismo motor de renderizado que la
-[ficha de acústica de salas ISO 3382-1/-2](#informe-iso-3382-report); los
-campos propios de oficinas diáfanas `area` (superficie del suelo),
-`source_positions` y `receiver_positions` (el número de posiciones de medición)
-rellenan la cabecera, junto con `client`, `test_room` (la oficina o zona),
-`specimen` (la descripción y el estado de amueblamiento), `instrumentation`,
-`temperature`, `relative_humidity`, `pressure`, `measurement_standard`,
-`test_date`, `laboratory`, `operator`, `report_id` y `notes`. Al pasar
-`metadata=None` se obtiene una ficha de caracterización simple. La ficha
-incrusta la gráfica de decaimiento espacial, por lo que el renderizado necesita
-tanto reportlab como matplotlib (`pip install "phonometry[report,plot]"`); solo
-se admite `engine="reportlab"`. La ficha se renderiza en inglés por defecto; pasa
-`language="es"` para una ficha en español (cadenas fijas traducidas y separador
-decimal de coma).
-
-```python
-import numpy as np
-from phonometry import room, ReportMetadata
-
-r = np.array([2.0, 3.0, 4.0, 6.0, 8.0, 11.0, 16.0])   # distancias al hablante (m)
-lp = 62.0 - 7.0 * np.log2(r)                           # nivel de habla ponderado A (dB)
-sti = 0.65 - 0.03 * r                                  # STI por posición
-
-result = room.open_plan_metrics(r, lp, sti)
-result.report(
-    "ficha_oficina_diafana.pdf",
-    metadata=ReportMetadata(
-        test_room="Oficina diáfana B",
-        specimen="Amueblada, desocupada, con ruido de fondo",
-        area=420.0, source_positions=2, receiver_positions=7,
-        measurement_standard="ISO 3382-3",
-        temperature=22.0, relative_humidity=45.0,
-        laboratory="Laboratorio de referencia Phonometry",
-        requirement=7.0,          # añade un veredicto frente a un D2,S objetivo
-    ),
-    language="es",
-)                                 # D2,S + Lp,A,S,4m, rD, rP y la curva de decaimiento
-```
-
-La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
-el repositorio; haz clic en la vista previa para abrir el PDF.
-
-<ReportPreview
-	name="iso3382_3_open_plan_example"
-	title="Informe de ejemplo de acústica de oficinas diáfanas ISO 3382-3 (PDF)"
-	description="Ficha de oficina diáfana de una página: una cabecera de metadatos (cliente, oficina/zona, descripción, superficie del suelo, posiciones de fuente y de medición, instrumentación, temperatura, humedad y presión), la tabla de las cuatro magnitudes de número único (D2,S = 7,0 dB por duplicación, Lp,A,S,4m = 48,0 dB, rD = 5,0 m, rP = 15,0 m) sobre la gráfica de decaimiento espacial en un eje logarítmico de distancia con la regresión de D2,S, la lectura a 4 m y los cruces rD y rP, el D2,S enmarcado, y un veredicto CUMPLE frente al objetivo de 7,0 dB."
-	caption="Ficha de acústica de oficinas diáfanas (OpenPlanResult.report): D2,S, Lp,A,S,4m, rD, rP y la curva de decaimiento espacial."
-/>
+Dos secciones que vivían en esta página tienen guías propias: la
+adquisición de la respuesta al impulso, con los barridos y la MLS de
+ISO 18233 y las reglas de colocación, es
+[Medición de la respuesta al impulso](/phonometry/es/guides/room-impulse-response/);
+y las métricas del habla de oficinas diáfanas de ISO 3382-3, con su ficha,
+son [Acústica de oficinas diáfanas](/phonometry/es/guides/open-plan-acoustics/).
 
 ## Qué cubre esta guía
 
-**Cubierto.** Los anexos A y B de la ISO 18233:2006, la adquisición de la
-respuesta al impulso por MLS y por barrido exponencial de
-`room.mls_signal`/`room.sweep_signal` y
-`room.impulse_response`/`room.mls_impulse_response`; la ISO 3382-1:2009
-(apartado 5.3.3 de integración regresiva, las fórmulas de parámetros del
-anexo A y los requisitos de posición/separación) y la ISO 3382-2:2008
-(apartado 6, los recuentos de posiciones por grado de precisión y el
-criterio de rango dinámico del apartado 5.3.3), calculados por
+**Cubierto.** La ISO 3382-1:2009 (apartado 5.3.3 de integración regresiva y
+las fórmulas de parámetros del anexo A) y la ISO 3382-2:2008 (apartado 6 y
+el criterio de rango dinámico del apartado 5.3.3), calculados por
 `room.room_parameters`/`room.decay_curve`: EDT, T20, T30, C50, C80, D50, Ts
-y las marcas de validez y curvatura por banda; las magnitudes de oficina
-diáfana del apartado 4 y los apartados 6.2/6.3 de la ISO 3382-3:2012
-($D_{2,S}$, $L_{p,A,S,4m}$, $r_D$, $r_P$) de `room.open_plan_metrics`.
+y las marcas de validez y curvatura por banda, con el filtrado de fase cero
+opcional de la NOTA del apartado 7.3 de ISO 3382-2, y la ficha ISO 3382 de
+una página con `.report()`.
 
 **No cubierto.** El anexo A de la ISO 3382-1 también define la fuerza
 acústica $G$ y los parámetros binaurales LF/LFC e IACC; phonometry
 implementa solo la familia de reverberancia y claridad citada arriba (EDT,
-T20, T30, C50, C80, D50, Ts). La STI por posición de la ISO 3382-3 se toma
-como entrada de `open_plan_metrics` en lugar de calcularse dentro de la
-función: mídela con las herramientas STIPA de la
-[guía del Índice de Transmisión de la Palabra](/phonometry/es/guides/speech-transmission/).
+T20, T30, C50, C80, D50, Ts). La adquisición de la respuesta al impulso
+(ISO 18233) y las magnitudes de oficina diáfana (ISO 3382-3) tienen guías
+propias,
+[Medición de la respuesta al impulso](/phonometry/es/guides/room-impulse-response/)
+y [Acústica de oficinas diáfanas](/phonometry/es/guides/open-plan-acoustics/).
 La absorción en cámara reverberante de ISO 354 que consume el par
-$T_1$/$T_2$ medido se ha trasladado a su propia guía,
+$T_1$/$T_2$ medido vive en
 [Medida y clasificación de la absorción sonora](/phonometry/es/guides/absorption-measurement/).
 
 ## Véase también
 
+- [Medición de la respuesta al impulso](/phonometry/es/guides/room-impulse-response/):
+  la adquisición ISO 18233 de la RI que esta página analiza.
+- [Acústica de oficinas diáfanas (ISO 3382-3)](/phonometry/es/guides/open-plan-acoustics/):
+  las magnitudes de privacidad del habla de las oficinas diáfanas.
 - [Medida y clasificación de la absorción sonora](/phonometry/es/guides/absorption-measurement/):
   la medición de absorción en cámara reverberante de ISO 354 que consume los
   tiempos de reverberación que devuelve `room_parameters`, y su valoración
@@ -897,21 +429,17 @@ $T_1$/$T_2$ medido se ha trasladado a su propia guía,
 - [Potencia acústica](/phonometry/es/guides/sound-power/): los métodos de `LW` que
   consumen el área de absorción de ISO 354 (el `K2` de ISO 3744 y el término de
   absorción de ISO 3741).
-- [Índice de transmisión del habla](/phonometry/es/guides/speech-transmission/): la
-  medición STI/STIPA que alimenta los `sti_values` de oficinas diáfanas.
 - [Sonoridad](/phonometry/es/guides/loudness/) y
   [Métricas de calidad sonora](/phonometry/es/guides/sound-quality/): la sonoridad, el
   sharpness y las demás métricas de percepción de lo que entrega la sala.
 - [Bancos de filtros](/phonometry/es/guides/filter-banks/): los filtros de octava
   fraccionaria IEC 61260 usados para las curvas de decaimiento por banda y los espectros de
   aislamiento.
-- [Niveles](/phonometry/es/guides/levels/): el promediado en energía y las métricas de
-  nivel que sustentan los niveles de las salas emisora/receptora.
 - [Teoría](/phonometry/es/reference/theory/rooms-buildings/): la integración de Schroeder, las ventanas de
   regresión y la derivación de la curva de referencia.
 - [Informe de conformidad](https://github.com/jmrplens/phonometry/blob/main/docs/CONFORMANCE.md): los decaimientos en forma cerrada y las
-  definiciones de parámetros frente a los que se validan las implementaciones de ISO 18233 / ISO 3382.
-- Referencia de la API: [`room.room_acoustics`](/phonometry/es/reference/api/rooms/room-acoustics/), [`room.room_ir`](/phonometry/es/reference/api/rooms/room-ir/) y [`room.open_plan`](/phonometry/es/reference/api/rooms/open-plan/).
+  definiciones de parámetros frente a los que se validan las implementaciones de ISO 3382.
+- Referencia de la API: [`room.room_acoustics`](/phonometry/es/reference/api/rooms/room-acoustics/).
 
 ## Respuestas rápidas
 
@@ -922,7 +450,3 @@ Cada banda de la respuesta al impulso se convierte en una curva de decaimiento m
 ### ¿Cuánto rango de decaimiento necesito para un T20 o T30 válido?
 
 La ventana de ajuste más un margen de seguridad debe caber dentro de la relación impulso-ruido, la distancia de nivel entre el pico de la RI filtrada en banda y su suelo de ruido: la ISO 3382 exige al menos 35 dB de rango útil de decaimiento para T20 y 45 dB para T30. Un rango escaso sesga el tiempo ajustado hacia arriba, así que `room_parameters` endurece sus indicadores de validez a 46 dB y 54 dB, manteniendo el sesgo dentro de la DAP del 5 %.
-
-### ¿Mido la respuesta al impulso de la sala con un barrido sinusoidal o con una MLS?
-
-Ambos son métodos de deconvolución de ISO 18233 que recuperan la respuesta al impulso con 20–30 dB más de relación señal-ruido efectiva que una fuente impulsiva. Prefiere el barrido sinusoidal exponencial (Anexo B): sitúa la distorsión armónica en tiempos de llegada negativos, donde se descarta. Usa la MLS (Anexo A) cuando la excitación deba ser periódica o el hardware favorezca una señal de dos niveles; es más sensible a la varianza temporal.

@@ -1,6 +1,6 @@
 ---
 title: "Guides"
-description: "The 73 guides of phonometry, grouped into the nine areas the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
+description: "The 81 guides of phonometry, grouped into the nine areas the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
 head:
   - tag: script
     attrs:
@@ -89,9 +89,8 @@ makes, then runnable code and the figure it draws. Nothing here is a survey of
 the field; each page is the working documentation of a module, written so that
 a result can be defended clause by clause rather than trusted.
 
-This page is the map. Seventy-three guides sit in nine areas, and each area
-has its own overview page with the longer story of how its pieces fit
-together. If you
+This page is the map. Eighty-one guides sit in nine areas, and each area has its
+own overview page with the longer story of how its pieces fit together. If you
 are arriving without a specific question, read
 [Getting Started](/phonometry/getting-started/) first: it runs one signal
 through the whole processing chain and gives the vocabulary the rest of the
@@ -241,9 +240,14 @@ ISO 717-1/-2, EN 12354-1 to -6, ISO 12999-1, ISO 10052 and ANSI/ASA S12.2.
 
 **[Room acoustics](/phonometry/guides/sections/room-acoustics/)**
 
-- [Room Acoustics](/phonometry/guides/room-acoustics/): impulse-response
-  acquisition and the room parameters EDT, T20, T30, C50, C80 and Ts, plus
-  open-plan speech metrics and reverberation-room absorption.
+- [Measuring the Room Impulse Response](/phonometry/guides/room-impulse-response/):
+  the ISO 18233 deterministic acquisition, exponential sweeps with their
+  deconvolution, and MLS.
+- [Room Acoustics](/phonometry/guides/room-acoustics/): the room parameters
+  EDT, T20, T30, C50, C80, D50 and Ts derived from that impulse response.
+- [Open-Plan Office Acoustics (ISO 3382-3)](/phonometry/guides/open-plan-acoustics/):
+  the spatial decay rate of speech and the distraction and privacy distances
+  of an open-plan floor.
 - [Image sources and the steady-state room field](/phonometry/guides/room-image-sources/):
   the deterministic image-source impulse response of a rectangular room, the
   room constant, critical distance and Schroeder frequency.
@@ -259,18 +263,38 @@ ISO 717-1/-2, EN 12354-1 to -6, ISO 12999-1, ISO 10052 and ANSI/ASA S12.2.
 
 **[Sound insulation](/phonometry/guides/sections/sound-insulation/)**
 
-- [Field Insulation Measurement and Ratings](/phonometry/guides/insulation-field/):
-  airborne, impact and façade insulation in the field with their weighted
-  single-number ratings, uncertainty and the survey method.
+- [Field Insulation Measurement (ISO 16283)](/phonometry/guides/insulation-field/):
+  airborne and impact insulation measured in the building, its test report and
+  the ISO 12999-1 uncertainty that qualifies it.
 - [Laboratory Insulation Measurement](/phonometry/guides/insulation-lab/):
-  ISO 10140 element characterisation, insulation by intensity, floor-covering
-  improvement on a mock-up and laboratory flanking transmission.
+  the ISO 10140 characterisation of an element with flanking suppressed.
+- [Sound Insulation by Intensity (ISO 15186)](/phonometry/guides/insulation-intensity/):
+  the transmitted power read off the radiating face, for the whole element or
+  element by element.
+- [Sound Insulation Survey Method (ISO 10052)](/phonometry/guides/insulation-survey/):
+  the octave-band control method with its reverberation index and its
+  airborne, impact, façade and service-equipment quantities.
+- [Laboratory Flanking Transmission (ISO 10848)](/phonometry/guides/flanking-lab/):
+  the junction vibration reduction index and the flanking level differences
+  measured on a test facility.
+- [Insulation Ratings (ISO 717)](/phonometry/guides/insulation-ratings/):
+  the airborne and impact reference-curve engines with C, Ctr and CI, the
+  enlarged-range terms and the ISO 717 fiche.
+- [Façade Sound Insulation](/phonometry/guides/facade-insulation/): the
+  building envelope measured per ISO 16283-3, predicted per EN 12354-3 and
+  radiating outwards per EN 12354-4.
+
+**[Insulation design](/phonometry/guides/sections/insulation-design/)**
+
 - [Predicting Sound Insulation (EN 12354)](/phonometry/guides/insulation-prediction/):
-  in-situ airborne and impact insulation from element data, with flanking
-  paths, façade insulation and outdoor radiation.
+  in-situ airborne and impact insulation between rooms from element data, with
+  their flanking paths.
 - [Predicting Panel Sound Insulation](/phonometry/guides/panel-sound-insulation/):
   the mass law and coincidence dip, double walls, slits and apertures, plate
   radiation efficiency and point mobilities.
+- [Floor-Covering Impact Improvement (ISO 16251-1)](/phonometry/guides/impact-improvement/):
+  the weighted improvement of a soft floor covering measured on a small
+  heavyweight mock-up.
 - [Dynamic stiffness of resilient materials (EN 29052-1)](/phonometry/guides/dynamic-stiffness/):
   the stiffness per unit area under a floating floor from the load-plate
   resonance, with the enclosed-gas term.

@@ -1,38 +1,49 @@
 ---
 title: "Sound insulation"
-description: "Airborne and impact sound insulation across its full life cycle: laboratory characterisation (ISO 10140 and companions), in-situ prediction (EN 12354), field verification with single-number ratings (ISO 16283, ISO 717), and the dynamic stiffness that feeds floating-floor design."
+description: "Airborne and impact sound insulation as it is measured and rated: laboratory characterisation (ISO 10140, ISO 15186, ISO 10848), field verification (ISO 16283, ISO 10052), the ISO 717 single-number ratings and the building envelope (ISO 16283-3, EN 12354-3/4)."
 ---
 
-Sound insulation has a life cycle with three stages, and a page of this
-section owns each of them. An element (a wall build-up, a floating floor, a
-window) is first characterised **in the laboratory**, where suppressed
-flanking isolates its direct transmission. That laboratory data feeds a
-**prediction** of how a whole building will perform, flanking paths included.
-The finished building is then **verified in the field**, where the measured
-values carry the single-number ratings that regulations quote. Each stage
-answers a different question, and each has its own standards family. A fourth
-page, on dynamic stiffness, is not a stage of its own but the supporting
-material measurement that the prediction stage consumes.
+Sound insulation has a life cycle, and the pages of this section follow it.
+An element (a wall build-up, a floating floor, a window) is first
+characterised **in the laboratory**, where suppressed flanking isolates its
+direct transmission. That laboratory data feeds a **prediction** of how a
+whole building will perform, flanking paths included. The finished building is
+then **verified in the field**. At every stage the band spectrum is collapsed
+to the **single number** regulations quote, and that collapse is one shared
+engine rather than a step of any single method.
 
+**Laboratory.**
 [Laboratory Insulation Measurement](/phonometry/guides/insulation-lab/) covers
-the first stage: the ISO 10140 sound reduction index and normalized impact
-level, the sound-intensity alternative of ISO 15186, the small-mock-up
-floor-covering improvement of ISO 16251-1 and laboratory flanking transmission
-per ISO 10848.
+the ISO 10140 sound reduction index and normalized impact level with their
+background-noise correction. Two laboratory methods sit beside it:
+[Sound Insulation by Intensity (ISO 15186)](/phonometry/guides/insulation-intensity/)
+reads the transmitted power off the radiating face when flanking is too high
+for the pressure method, and
+[Laboratory Flanking Transmission (ISO 10848)](/phonometry/guides/flanking-lab/)
+measures the junction data the prediction consumes. A third, the
+floor-covering improvement of ISO 16251-1, is filed with the design pages it
+feeds.
 
-[Predicting Sound Insulation (EN 12354)](/phonometry/guides/insulation-prediction/)
-covers the second: the airborne and impact flanking models of EN 12354-1/2
-with their junction vibration reduction indices, and the façade insulation and
-outdoor radiation of EN 12354-3/4. Its floating-floor improvement term
-consumes the dynamic stiffness measured per
-[EN 29052-1](/phonometry/guides/dynamic-stiffness/), which is why that
-measurement page lives in this section.
+**Prediction.** The design-stage half has a section of its own,
+[Insulation design](/phonometry/guides/sections/insulation-design/): the
+EN 12354 flanking model between rooms, the theoretical insulation of a panel,
+and the two material measurements a floor design consumes.
 
-[Field Insulation Measurement and Ratings](/phonometry/guides/insulation-field/)
-covers the third: field airborne, impact and façade insulation per
-ISO 16283-1/2/3, the weighted single-number ratings and spectrum adaptation
-terms of ISO 717-1/2, the ISO 12999-1 uncertainty that qualifies a rating, and
-the quick ISO 10052 survey method.
+**Field.**
+[Field Insulation Measurement (ISO 16283)](/phonometry/guides/insulation-field/)
+covers the engineering-grade airborne and impact measurement in the building,
+its Clause 14 test report and the ISO 12999-1 uncertainty that qualifies it.
+When the question does not deserve that effort,
+[Sound Insulation Survey Method (ISO 10052)](/phonometry/guides/insulation-survey/)
+trades accuracy for speed with octave bands and a reverberation index.
+
+**Ratings and the envelope.**
+[Insulation Ratings (ISO 717)](/phonometry/guides/insulation-ratings/) is the
+reference-curve engine every one of those methods ends on, with its spectrum
+adaptation terms C, Ctr and CI. And
+[Façade Sound Insulation](/phonometry/guides/facade-insulation/) keeps the
+building envelope in one place: measured per ISO 16283-3, predicted per
+EN 12354-3, and radiating outwards per EN 12354-4.
 
 Two neighbouring sections complete the picture: the room-side quantities
 (reverberation time, absorption) live in
@@ -43,15 +54,22 @@ related EN 12354-5, lives in
 
 ## Pages in this section
 
-- [Field Insulation Measurement and Ratings](/phonometry/guides/insulation-field/):
-  ISO 16283-1/2/3 measurement, ISO 717-1/2 ratings, ISO 12999-1 uncertainty
-  and the ISO 10052 survey method.
+- [Field Insulation Measurement (ISO 16283)](/phonometry/guides/insulation-field/):
+  ISO 16283-1/2 field measurement, its test report and the ISO 12999-1
+  uncertainty.
 - [Laboratory Insulation Measurement](/phonometry/guides/insulation-lab/):
-  ISO 10140 characterisation, ISO 15186 intensity insulation, ISO 16251-1
-  floor coverings and ISO 10848 flanking.
-- [Predicting Sound Insulation (EN 12354)](/phonometry/guides/insulation-prediction/):
-  flanking transmission (EN 12354-1/2), façade insulation and outdoor
-  radiation (EN 12354-3/4).
-- [Dynamic stiffness of resilient materials (EN 29052-1)](/phonometry/guides/dynamic-stiffness/):
-  the load-plate resonance measurement and the floating-floor natural
-  frequency.
+  the ISO 10140 characterisation of an element with flanking suppressed.
+- [Sound Insulation by Intensity (ISO 15186)](/phonometry/guides/insulation-intensity/):
+  the ISO 15186-1/-2 direct-power route to the same indices.
+- [Sound Insulation Survey Method (ISO 10052)](/phonometry/guides/insulation-survey/):
+  the octave-band control method, its reverberation index and its survey
+  quantities.
+- [Laboratory Flanking Transmission (ISO 10848)](/phonometry/guides/flanking-lab/):
+  the measured vibration reduction index Kij and the flanking descriptors
+  Dn,f and Ln,f.
+- [Insulation Ratings (ISO 717)](/phonometry/guides/insulation-ratings/):
+  the ISO 717-1/-2 reference-curve engines, C, Ctr and CI, the enlarged-range
+  terms and the ISO 717 fiche.
+- [Façade Sound Insulation](/phonometry/guides/facade-insulation/):
+  the envelope measured (ISO 16283-3), predicted (EN 12354-3) and radiating
+  outwards (EN 12354-4).

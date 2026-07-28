@@ -1508,8 +1508,8 @@ Uncorrelated components combine in quadrature $u_c = \sqrt{\sum u_i^2}$
 (Formula A.7), and the uncorrelated single-number uncertainty is the
 energy-weighted quadrature sum of the band uncertainties (Formula B.2).
 
-See the [Room Acoustics](https://jmrplens.github.io/phonometry/guides/sections/room-acoustics/) and
-[Field Insulation Measurement and Ratings](https://jmrplens.github.io/phonometry/guides/insulation-field/) guides for usage.
+See the [Room Acoustics](https://jmrplens.github.io/phonometry/guides/room-acoustics/) and
+[Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/guides/insulation-field/) guides for usage.
 
 ### Predicted panel sound insulation (Bies 7.2, Hopkins 2.9/4.3.10, Cremer 5)
 
@@ -2124,7 +2124,7 @@ over 20 years) is reproduced: $D_{zd} = 55.97$ m/s², $R = 1.22$,
 $\Pi = 0.37$. The Annex A finite-element spinal model (distributed by ISO as
 separate software) is out of scope.
 
-See the [Human Vibration guide](https://jmrplens.github.io/phonometry/guides/sections/human-vibration/) and the
+See the [Human Vibration guide](https://jmrplens.github.io/phonometry/guides/human-vibration/) and the
 [Multiple-Shock Vibration guide](https://jmrplens.github.io/phonometry/guides/multiple-shock-vibration/) for usage.
 
 ## Point mobilities and radiation efficiency (Cremer 5, Hopkins 2.9)

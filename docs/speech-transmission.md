@@ -238,7 +238,7 @@ transfer index table beside the per-band MTI bars (the result's own `.plot()`),
 the boxed `STI = X` single number with the Annex F qualification band, an
 optional verdict row and a footer with the fixed disclaimer. It uses the same
 `ReportMetadata` container (documented under
-[Field insulation](insulation-field.md#report-metadata-reportmetadata)) and
+[Insulation ratings](insulation-ratings.md#report-metadata-reportmetadata)) and
 rendering engine as the ISO 717 insulation fiche; a supplied `requirement` is
 read as the minimum required STI (a higher STI passes). Rendering needs
 reportlab (`pip install phonometry[report]`); only `engine="reportlab"` is
