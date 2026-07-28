@@ -79,8 +79,9 @@ res.plot()          # etiquetas en inglés; res.plot(language="es") en español
 ```
 
 Antes del álgebra, el procedimiento en sí: un disparo marca cada revolución,
-el registro se trocea en cada disparo, y los bloques alineados se promedian
-de modo que solo sobrevive lo que se repite con el periodo.
+el registro se trocea en cada disparo, y los bloques alineados se promedian:
+lo que se repite con el periodo sobrevive intacto mientras el contenido
+asíncrono se atenúa.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_synchronous_averaging_es.svg" alt="Diagrama de bloques del promediado síncrono temporal: un tacómetro entrega un pulso de disparo por revolución con periodo T igual a 1 entre 32 segundos, 256 muestras a 8192 hercios, el registro ruidoso se trocea en cada disparo en N bloques alineados de un periodo, y su promedio coherente, aquí N igual a 40, conserva la parte periódica con ganancia unidad del filtro peine en cada orden k entre T; una nota discontinua cuantifica que la potencia del ruido asíncrono cae 10 log N igual a 16 decibelios con N igual a 40, una ganancia en amplitud de 6,3, mientras una caja de residual guarda el registro menos el promedio repetido; el pie recuerda la regla de McFadden de que N igual a 20 pone un nodo del peine exactamente sobre un tono interferente de orden 32,05 mientras el habitual N igual a 32 no" width="92%" />
 

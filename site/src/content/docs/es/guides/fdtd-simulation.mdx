@@ -635,8 +635,8 @@ print(round(scholte_speed(Material(1500.0, 0.0, 1000.0), seabed), 1))  # 1436.0
 ```
 
 Esos dos números cuentan toda la historia. Sobre un lecho **rígido**
-(acero) la onda de Scholte se pega a la velocidad del agua hasta un 0,03 %
-y su cola evanescente alcanza ~7 longitudes de onda dentro del agua: es en
+(acero) la onda de Scholte se pega a la velocidad del agua (1480 m/s)
+hasta un 0,03 % y su cola evanescente alcanza ~7 longitudes de onda dentro del agua: es en
 esencia una onda de agua rasante y no puede separarse por tiempo de vuelo
 en ningún dominio razonable (sobre contactos aire-sólido el déficit se
 desploma a ~10⁻¹² de ``c`` y la onda es directamente inobservable). Sobre
@@ -798,7 +798,8 @@ partícula, sin corte en baja frecuencia y no dispersiva sobre semiespacios
 homogéneos. Su velocidad resuelve la ecuación característica exacta
 (Brekhovskikh y Godin, Ec. 4.4.20, `scholte_speed`) y siempre queda por
 debajo de la velocidad del sonido en el fluido y de la de cizalla del
-sólido: un 0,03 % por debajo de la del agua sobre acero (1479,6 m/s), pero
+sólido: un 0,03 % por debajo de la del agua (1480 m/s) sobre acero
+(1479,6 m/s), pero
 un 4 % por debajo sobre un sedimento blando (1436 m/s para agua sobre un
 lecho 3500/2000/2500), y por eso las ondas de interfase del lecho marino
 sondean la rigidez a cizalla del sedimento.

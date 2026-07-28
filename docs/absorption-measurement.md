@@ -29,7 +29,8 @@ Eq. (6), $c = 331 + 0.6\,t$; the sound absorption coefficient is
 $\alpha_s = (A_2 - A_1)/S$ (Eq. (8)/(9)). The coefficient may exceed 1.0 from
 edge and diffraction effects (Clause 3.7 NOTE 2) and is never clamped. Air
 attenuation enters only through the per-band coefficient $m$ (default 0, the
-zero-attenuation reference).
+zero-attenuation reference); pass `attenuation_from_alpha` of an ISO 9613-1
+value when it is needed.
 
 ISO 354 is a characterisation: it produces the $\alpha_s$ spectrum, not a
 single-number rating. The weighted coefficient $\alpha_w$ is an ISO 11654
@@ -110,14 +111,14 @@ equivalent absorption areas $A_1$/$A_2$ to the table.
 
 It uses the same `ReportMetadata` container and rendering engine as the other
 fiches. The specimen area $S$, room volume $V$, speed of sound $c$, temperature
-and humidity are taken from the measurement result; the descriptive
-`ReportMetadata` fields that apply here are `client`, `manufacturer`,
-`specimen`, `mounting`, `test_room`, `test_date`, `pressure`,
-`measurement_standard`, `laboratory`, `operator`, `report_id` and `notes`. The
-`requirement` field is ignored (ISO 354 has no verdict). Rendering needs
-reportlab (`pip install phonometry[report]`); only `engine="reportlab"` is
-supported. Pass `language="es"` for a Spanish fiche (translated fixed strings
-and a comma decimal separator).
+and humidity are taken from the measurement result (they drove the Sabine
+inversion); the descriptive `ReportMetadata` fields that apply here are
+`client`, `manufacturer`, `specimen`, `mounting`, `test_room`, `test_date`,
+`pressure`, `measurement_standard`, `laboratory`, `operator`, `report_id` and
+`notes`. The `requirement` field is ignored (ISO 354 has no verdict). Rendering
+needs reportlab (`pip install phonometry[report]`); only `engine="reportlab"` is
+supported. The fiche renders in English by default; pass `language="es"` for a
+Spanish fiche (translated fixed strings and a comma decimal separator).
 
 ```python
 from phonometry import materials, ReportMetadata

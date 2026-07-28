@@ -358,7 +358,8 @@ it; the list grows as guides gain their References sections.
   Measurement of sound absorption in a reverberation room* (ISO 354:2003).
   [iso.org catalogue](https://www.iso.org/standard/34545.html).
   The reverberation-room absorption measurement behind the surface data.
-  Cited by [Sound absorption in enclosed spaces](enclosed-space-absorption.md).
+  Cited by [Sound absorption in enclosed spaces](enclosed-space-absorption.md) and
+  [Sound Absorption Measurement and Rating](absorption-measurement.md).
 - European Committee for Standardization. (2003). *Building acoustics —
   Estimation of acoustic performance of buildings from the performance of
   elements — Part 6: Sound absorption in enclosed spaces*
@@ -430,12 +431,6 @@ it; the list grows as guides gain their References sections.
   The exact microperforated-panel impedance, its end corrections and the
   design formulas.
   Cited by [Porous and Multilayer Absorbers](porous-absorbers.md).
-- International Organization for Standardization. (2003). *Acoustics —
-  Measurement of sound absorption in a reverberation room* (ISO 354:2003).
-  [iso.org catalogue](https://www.iso.org/standard/34545.html).
-  The reverberation-room absorption method and its specimen mountings.
-  Cited by
-  [Sound Absorption Measurement and Rating](absorption-measurement.md).
 - International Organization for Standardization. (1998). *Acoustics —
   Determination of sound absorption coefficient and impedance in impedance
   tubes — Part 2: Transfer-function method* (ISO 10534-2:1998; adopted in

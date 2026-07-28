@@ -307,7 +307,8 @@ que las guías incorporan sus secciones de Referencias.
   La medición de absorción en cámara reverberante que sustenta los datos de
   superficie.
   Citado por
-  [Absorción acústica en recintos](/phonometry/es/guides/enclosed-space-absorption/).
+  [Absorción acústica en recintos](/phonometry/es/guides/enclosed-space-absorption/) y
+  [Medida y clasificación de la absorción sonora](/phonometry/es/guides/absorption-measurement/).
 - European Committee for Standardization. (2003). *Building acoustics —
   Estimation of acoustic performance of buildings from the performance of
   elements — Part 6: Sound absorption in enclosed spaces*
@@ -351,12 +352,6 @@ que las guías incorporan sus secciones de Referencias.
   y el acoplamiento crítico de los absorbentes de metamaterial hasta los
   difusores de sublongitud de onda profunda; el complemento moderno sobre
   metamateriales de Cox & D'Antonio.
-- International Organization for Standardization. (2003). *Acoustics —
-  Measurement of sound absorption in a reverberation room* (ISO 354:2003).
-  [Catálogo iso.org](https://www.iso.org/standard/34545.html).
-  El método de absorción en cámara reverberante y sus montajes de probeta.
-  Citado por
-  [Medida y clasificación de la absorción sonora](/phonometry/es/guides/absorption-measurement/).
 - International Organization for Standardization. (1998). *Acoustics —
   Determination of sound absorption coefficient and impedance in impedance
   tubes — Part 2: Transfer-function method* (ISO 10534-2:1998; adoptada en

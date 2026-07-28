@@ -181,9 +181,10 @@ $$
 que tiende a `5 dB` en el límite de sombra `N → 0` y aproxima la curva de
 fuente puntual de Maekawa dentro de unos 1,5 dB.
 
-Todos los métodos de esta sección dependen de los mismos tres números: los dos
-segmentos difractados sobre el borde y el camino recto al que sustituyen.
-Dibujados sobre la pantalla de 4 m de los ejemplos, difieren en solo 0,15 m.
+Los métodos de pantalla delgada comparten las mismas tres magnitudes
+geométricas: los dos segmentos difractados sobre el borde y el camino recto
+al que sustituyen. Dibujados sobre la pantalla de 4 m de los ejemplos,
+difieren en solo 0,15 m.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_ground_barrier_es.svg" alt="Sección de la geometría de barrera: una fuente altavoz a 1 m del suelo, una pantalla delgada de 4 m a 50 m y un receptor micrófono a 1,5 m de altura a 100 m, el camino directo bloqueado de 100,00 m dibujado a trazos a través de la pantalla y el camino difractado doblado sobre el borde en dos segmentos A = 50,09 m y B = 50,06 m, con una diferencia de caminos de 0,15 m que da un número de Fresnel de 0,44 y una pérdida por inserción de Kurze-Anderson de 10,0 dB a 500 Hz, que sube a 15,5 dB a 2 kHz" width="92%" />
 
@@ -265,17 +266,19 @@ plt.show()
 
 </details>
 
-Las tres curvas comparten una única geometría, y `.plot_geometry()` la
+Las tres curvas comparten la misma geometría base, y `.plot_geometry()` la
 dibuja a escala: a estas distancias de tráfico rodado la pantalla de 4 m es
-una lámina, y toda la pérdida por inserción descansa sobre una diferencia de
-caminos de solo 0,15 m.
+una lámina. En las curvas de pantalla delgada la diferencia de caminos de
+0,15 m se combina con la longitud de onda en el número de Fresnel; la curva
+de suelo coherente depende además de la impedancia del suelo y de la
+interferencia de los caminos imagen.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/barrier_geometry_es.svg" alt="Sección a escala de la geometría de barrera de las curvas de pérdida por inserción: una estrella de fuente a 1 m sobre el suelo rayado, una pantalla delgada de 4 m a 50 m, y un triángulo de receptor a 1,5 m de altura a 100 m, con el camino directo a trazos cortado por la pantalla, el camino difractado continuo doblado sobre su borde superior, la diferencia de caminos de 0,15 m anotada y las distancias de 50 m y 100 m acotadas" width="90%" />
 
 *Dibujada a escala, la pantalla casi desaparece: el camino difractado sobre
 el borde es solo 0,15 m más largo que el directo bloqueado, y esa diferencia
-es toda la entrada del número de Fresnel `N = (2/λ)(A + B − d)` del que
-dependen todos los métodos de arriba.*
+es la entrada geométrica del número de Fresnel `N = (2/λ)(A + B − d)` del que
+dependen los métodos de pantalla delgada de arriba.*
 
 <details>
 <summary>Ver el código de esta figura</summary>

@@ -115,8 +115,8 @@ millimetres), `test_room`, `test_date`, `temperature`, `relative_humidity`,
 `requirement` field is ignored (ISO 9053-1 has no verdict). The fiche embeds
 the fitted curve, so rendering needs both reportlab and matplotlib
 (`pip install "phonometry[report,plot]"`); only `engine="reportlab"` is
-supported. Pass `language="es"` for a Spanish fiche (translated fixed strings
-and a comma decimal separator).
+supported. The fiche renders in English by default; pass `language="es"` for a
+Spanish fiche (translated fixed strings and a comma decimal separator).
 
 ```python
 from phonometry import materials, ReportMetadata

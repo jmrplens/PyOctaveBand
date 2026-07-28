@@ -69,8 +69,9 @@ res.plot()          # English labels; res.plot(language="es") for Spanish
 ```
 
 Before the algebra, the procedure itself: a trigger marks each revolution,
-the record is sliced at every trigger, and the aligned blocks are averaged
-so only what repeats with the period survives.
+the record is sliced at every trigger, and the aligned blocks are averaged:
+what repeats with the period survives intact while asynchronous content is
+attenuated.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_synchronous_averaging_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_synchronous_averaging.svg" alt="Block diagram of time synchronous averaging: a tachometer delivers one trigger pulse per revolution with period T equal to 1 over 32 seconds, 256 samples at 8192 hertz, the noisy recording is sliced at every trigger into N aligned one-period blocks, and their coherent average, N equal to 40 here, keeps the periodic part with unit comb-filter gain at every order k over T; a dashed note quantifies that asynchronous noise power falls by 10 log N equal to 16 decibels for N equal to 40, an amplitude gain of 6.3, while a residual box holds the record minus the tiled average; the caption recalls McFadden's rule that N equal to 20 places a comb node exactly on a 32.05 order interfering tone while the habitual N equal to 32 does not" width="92%"></picture>
 

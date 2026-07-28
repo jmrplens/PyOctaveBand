@@ -180,7 +180,7 @@ $$
 which tends to `5 dB` at the shadow boundary `N → 0` and approximates Maekawa's
 point-source curve within about 1.5 dB.
 
-Every method of this section keys on the same three numbers: the two
+The thin-screen methods share the same three geometric quantities: the two
 diffracted segments over the edge and the straight path they replace. Drawn on
 the 4 m screen of the snippets, they differ by just 0.15 m.
 
@@ -263,16 +263,18 @@ plt.show()
 
 </details>
 
-All three curves share one geometry, and `.plot_geometry()` draws it to
-scale: at these road-traffic distances the 4 m screen is a sliver, and the
-whole insertion loss rides on a path-length difference of just 0.15 m.
+All three curves share the same base geometry, and `.plot_geometry()` draws
+it to scale: at these road-traffic distances the 4 m screen is a sliver. For
+the thin-screen curves the 0.15 m path difference combines with wavelength in
+the Fresnel number; the coherent-ground curve also depends on ground
+impedance and image-path interference.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/barrier_geometry.svg" alt="To-scale section of the barrier geometry of the insertion-loss curves: a source star 1 m above the hatched ground, a thin 4 m screen at 50 m, and a receiver triangle 1.5 m high at 100 m, with the dashed direct path cut by the screen, the solid diffracted path bent over its top edge, the path difference of 0.15 m annotated and the 50 m and 100 m distances dimensioned" width="90%" />
 
 *Drawn to scale the screen almost vanishes: the diffracted path over the top
 is only 0.15 m longer than the blocked direct path, and that difference is
-the whole input of the Fresnel number `N = (2/λ)(A + B − d)` that every
-method above keys on.*
+the geometric input of the Fresnel number `N = (2/λ)(A + B − d)` that the
+thin-screen methods above key on.*
 
 <details>
 <summary>Show the code for this figure</summary>

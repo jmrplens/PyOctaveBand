@@ -619,7 +619,9 @@ El diseño de residuo cuadrático publicado empaqueta el difusor completo en
 un panel de 35 cm x 2 cm. Su primera rendija alcanza el acoplamiento crítico
 (el cero de reflexión con el que se construye el estado `0` ternario), y a
 la frecuencia de evaluación de 2 kHz el panel dispersa como el QRD de
-27,4 cm de profundidad al que imita:
+27,4 cm de profundidad al que imita. Como en la comparación de campo lejano
+publicada, la respuesta polar repite la secuencia de cinco pozos seis veces
+(`periods=6`, un panel de 2,1 m):
 
 ```python
 import numpy as np
@@ -655,6 +657,8 @@ panel = metadiffuser_reflection(f, pozos, depth=0.02, period=0.07)
 alfa1 = panel.well_absorption[0]
 print(round(float(alfa1.max()), 2), int(f[alfa1.argmax()]))  # 0.99 2305
 
+# Comparación de campo lejano: la secuencia de cinco pozos repetida seis
+# veces (2,1 m).
 polar = metadiffuser_polar_response(2000.0, pozos, depth=0.02,
                                     period=0.07, periods=6)
 print(round(polar.coefficient, 2))                           # 0.32
@@ -691,7 +695,7 @@ pozos = [
 ]
 
 # El panel metadifusor y el QRD al que se ajustó, a 2 kHz y con seis
-# repeticiones del periodo.
+# repeticiones del periodo (paneles de 2,1 m).
 meta = metadiffuser_polar_response(2000.0, pozos, depth=0.02, period=0.07,
                                    periods=6)
 secuencia = np.roll(materials.quadratic_residue_sequence(5), -1)

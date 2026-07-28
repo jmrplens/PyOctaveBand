@@ -547,9 +547,10 @@ print(round(scholte_speed(Material(1500.0, 0.0, 1000.0), seabed), 1))  # 1436.0
 ```
 
 Those two numbers tell the whole story. Over a **stiff** bed (steel) the
-Scholte wave hugs the water speed to within 0.03 % and its evanescent tail
-reaches ~7 wavelengths up into the water: it is essentially a grazing water
-wave and cannot be separated by time of flight in any reasonable domain
+Scholte wave hugs the water speed (1480 m/s) to within 0.03 % and its
+evanescent tail reaches ~7 wavelengths up into the water: it is essentially
+a grazing water wave and cannot be separated by time of flight in any
+reasonable domain
 (over air-solid contacts the deficit collapses to ~10⁻¹² of ``c`` and the
 wave is unobservable outright). Over a **soft** sediment the speed drops
 well below the water speed and the wave squeezes to within half a
@@ -650,7 +651,8 @@ evanescent into both media, elliptical particle motion, no low-frequency
 cut-off and non-dispersive over homogeneous half-spaces. Its speed solves
 the exact characteristic equation (Brekhovskikh & Godin Eq. 4.4.20,
 `scholte_speed`) and always lies below both the fluid sound speed and the
-solid shear speed: 0.03 % below the water speed over steel (1479.6 m/s),
+solid shear speed: 0.03 % below the water speed (1480 m/s) over steel
+(1479.6 m/s),
 but 4 % below it over a soft sediment (1436 m/s for water over a
 3500/2000/2500 bed), which is why seabed interface waves probe the
 sediment shear stiffness.
