@@ -3,7 +3,7 @@ title: "Teoría"
 description: "Normas, matemáticas y decisiones de diseño detrás de phonometry."
 ---
 
-La referencia de teoría explica las normas, las matemáticas y las decisiones de diseño detrás de cada módulo de phonometry. Está dividida en seis páginas por dominio, listadas abajo con las secciones que aloja cada una. La teoría de los módulos submarinos se encuentra junto a sus guías: [Acústica submarina](/phonometry/es/guides/underwater-acoustics/) y [Propagación submarina](/phonometry/es/guides/underwater-propagation/).
+La referencia de teoría explica las normas, las matemáticas y las decisiones de diseño detrás de cada módulo de phonometry. Está dividida en seis páginas por dominio, listadas abajo con las secciones que aloja cada una. La teoría de los módulos submarinos se encuentra junto a sus guías: [Acústica submarina](/phonometry/es/guides/underwater-acoustics/), [Propagación submarina](/phonometry/es/guides/underwater-propagation/) y [Solvers numéricos de propagación submarina](/phonometry/es/guides/underwater-solvers/).
 
 ## [Análisis de señal](/phonometry/es/reference/theory/signal-analysis/)
 

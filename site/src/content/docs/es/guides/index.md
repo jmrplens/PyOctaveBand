@@ -1,6 +1,6 @@
 ---
 title: "Guías"
-description: "Las 71 guías de phonometry, agrupadas en las nueve áreas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
+description: "Las 73 guías de phonometry, agrupadas en las nueve áreas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
 head:
   - tag: script
     attrs:
@@ -90,7 +90,7 @@ hay ninguna panorámica del campo: cada página es la documentación de trabajo 
 un módulo, escrita para que un resultado se pueda defender apartado por
 apartado en lugar de darlo por bueno.
 
-Esta página es el mapa. Sesenta y seis guías repartidas en nueve áreas, y cada
+Esta página es el mapa. Setenta y tres guías repartidas en nueve áreas, y cada
 área tiene su propio índice con el relato largo de cómo encajan sus piezas. Si
 llegas sin una pregunta concreta, lee primero la
 [introducción](/phonometry/es/getting-started/): recorre una señal por toda la
@@ -417,6 +417,9 @@ ISO 17208-1/-2, ISO 18406 y JOMOPANS-ECHO.
   la divergencia geométrica más la absorción de volumen, la velocidad del sonido
   en agua de mar, la ecuación del sonar, las pérdidas por reflexión en el fondo y
   el espectro de ruido ambiente.
+- [Solvers numéricos de propagación submarina](/phonometry/es/guides/underwater-solvers/):
+  los solvers de modos normales, trazado de rayos y ecuación parabólica de la
+  guía de ondas estratificada, y cómo elegir modelo de propagación.
 
 ## [Fuentes y dispositivos](/phonometry/es/guides/sections/sources-devices/)
 
@@ -450,13 +453,17 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 y EBU R 128.
 
 ## [Simulación de ondas](/phonometry/es/guides/sections/simulation/)
 
-Un solver determinista de diferencias finitas en el dominio del tiempo en 2D,
-validado frente a oráculos analíticos y no frente a una norma. Es la única área
-sin documento aplicable, así que su evidencia es la solución en forma cerrada
-que reproduce.
+Solvers deterministas de diferencias finitas en el dominio del tiempo en 2D,
+acústico y elástico P-SV, validados frente a oráculos analíticos y no frente a
+una norma. Es la única área sin documento aplicable, así que su evidencia es la
+solución en forma cerrada que reproduce.
 
 - [Simulación de ondas FDTD 2D](/phonometry/es/guides/fdtd-simulation/): una
   malla escalonada de presión y velocidad con fuentes gaussianas, tonales y de
   señal arbitraria, obstáculos rasterizados, contornos rígidos, de impedancia y
   absorbentes, y un resultado inmutable con los historiales de sonda y las
   instantáneas del campo.
+- [Ondas elásticas y acoplamiento fluido-sólido](/phonometry/es/guides/elastic-waves/):
+  el solucionador compañero P-SV sobre la misma malla, con ondas de Rayleigh
+  en superficies libres, conversión de modo, ondas de interfase de Scholte y
+  transmisión de placas sumergidas.

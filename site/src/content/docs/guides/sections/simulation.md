@@ -1,23 +1,28 @@
 ---
 title: "Wave simulation"
-description: "Computing the sound field itself: a deterministic 2D acoustic FDTD solver on a staggered pressure-velocity grid, with sources, pressure probes, rasterised obstacles and per-side rigid, impedance or absorbing boundaries."
+description: "Computing the sound field itself: a deterministic 2D FDTD solver on a staggered pressure-velocity grid, with sources, probes, rasterised obstacles and per-side boundaries, plus its elastic P-SV companion with Rayleigh waves, fluid-solid coupling and Scholte interface waves."
 ---
 
 Most of this library predicts a number; this section computes the **wave
 field itself**. A finite-difference time-domain (FDTD) solver integrates the
 linear acoustic equations on a 2D grid, so reflection, diffraction,
 interference, modal behaviour and refraction through inhomogeneous media all
-emerge from first principles. The solver is deterministic (identical inputs
-give bit-identical outputs on the same platform), validated against analytic
-oracles, and doubles as a cross-check engine for the closed-form models of
+emerge from first principles, and its elastic companion carries the same
+scheme into solids. Both solvers are deterministic (identical inputs give
+bit-identical outputs on the same platform), validated against analytic
+oracles, and double as a cross-check engine for the closed-form models of
 the other sections.
 
-The single page of this section explains the numerical method (the staggered
-leapfrog scheme and its Courant stability bound), the building blocks
-(sources, probes, obstacles and boundary conditions, including the
-locally reacting real-impedance edge), when a wave-based simulation is worth
+The section splits along the media it simulates. The acoustic page explains
+the numerical method (the staggered leapfrog scheme and its Courant
+stability bound), the building blocks (sources, probes, obstacles and
+boundary conditions, including the locally reacting real-impedance edge),
+the near-to-far-field transformation, when a wave-based simulation is worth
 its cost, what a 2D domain can and cannot say about a 3D problem, and how
-numerical dispersion sets the cells-per-wavelength resolution rule.
+numerical dispersion sets the cells-per-wavelength resolution rule. The
+elastic page extends the same staggered grid to solids: shear waves, free
+surfaces with Rayleigh waves, and fluid-solid coupling with mode
+conversion, Scholte interface waves and immersed-plate transmission.
 
 A good way to read it is alongside the closed-form pages it cross-checks:
 the modal frequencies of [room acoustics](/phonometry/guides/room-acoustics/)
@@ -36,4 +41,10 @@ the assumptions it rests on.
 - [2D FDTD wave simulation](/phonometry/guides/fdtd-simulation/): the
   staggered-grid pressure-velocity FDTD method following Attenborough & Van
   Renterghem (2021) chapter 4, its sources, probes, obstacles and boundary
-  conditions, the 2D limits and the numerical dispersion rule.
+  conditions, the near-to-far-field chain, the 2D limits and the numerical
+  dispersion rule.
+- [Elastic waves and fluid-solid coupling](/phonometry/guides/elastic-waves/):
+  the P-SV velocity-stress companion solver (Virieux 1986) on the same
+  grid, with stress-imaging free surfaces, Rayleigh waves, mode conversion,
+  Scholte interface waves and immersed-plate transmission, each validated
+  against its exact closed form.

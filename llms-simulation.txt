@@ -16,7 +16,7 @@ and wind change with height, and this **refracts** sound: rays curve, and over a
 few hundred metres the received level can swing by tens of decibels. This page
 covers `phonometry.environmental.atmospheric_refraction`, the
 refracting-atmosphere counterpart of the ocean solvers in
-[`phonometry.underwater.numerical_propagation`](https://jmrplens.github.io/phonometry/guides/underwater-propagation/): a
+[`phonometry.underwater.numerical_propagation`](https://jmrplens.github.io/phonometry/guides/underwater-solvers/): a
 **ray model** and a **parabolic-equation (PE)** solver, both clean-room from
 Salomons, *Computational Atmospheric Acoustics* (2001) and Attenborough & Van
 Renterghem, *Predicting Outdoor Sound* 2e (2021, Ch. 11).
@@ -218,7 +218,7 @@ equation valid within a limiting elevation angle, and marches it in range on a
 range-height grid. `atmospheric_parabolic_equation` implements the **Green's
 Function PE** (GFPE, Salomons Appendix H), the atmospheric member of the same
 split-step Fourier family as the ocean
-[`parabolic_equation`](https://jmrplens.github.io/phonometry/guides/underwater-propagation/). Each range step:
+[`parabolic_equation`](https://jmrplens.github.io/phonometry/guides/underwater-solvers/). Each range step:
 
 1. transforms the field to the vertical-wavenumber domain (FFT);
 2. applies the free-space propagator `exp(i Δr (√(ka² − kz²) − ka))` together
@@ -343,7 +343,7 @@ These checks are pinned numerically in the
 
 ← [Spherical ground and barriers](https://jmrplens.github.io/phonometry/guides/ground-barriers/) ·
 [Outdoor propagation (ISO 9613-2)](https://jmrplens.github.io/phonometry/guides/outdoor-propagation/) ·
-[Underwater numerical propagation](https://jmrplens.github.io/phonometry/guides/underwater-propagation/) ·
+[Underwater propagation solvers](https://jmrplens.github.io/phonometry/guides/underwater-solvers/) ·
 [Documentation index](https://jmrplens.github.io/phonometry/)
 
 ---
@@ -860,7 +860,116 @@ the optional field snapshots with their times and the obstacle mask; its
 `.plot()` draws the probe histories, and `.plot(kind="snapshot")` renders
 one recorded field with the geometry overlaid.
 
-## 5. Elastic waves: P, S and Rayleigh
+The same staggered lattice extends beyond fluids: the companion
+`elastic_fdtd_simulation` integrates the P-SV velocity-stress system of
+Virieux (1986) on the same grid, adding shear waves, stress-imaging free
+surfaces with Rayleigh waves, and fluid-solid coupling with mode
+conversion, Scholte interface waves and immersed-plate transmission. That
+solver has its own guide,
+[Elastic waves and fluid-solid coupling](https://jmrplens.github.io/phonometry/guides/elastic-waves/).
+
+## Quick answers
+
+### How do I choose the FDTD grid spacing?
+
+Resolve at least 10 cells per shortest wavelength,
+``dx <= c_min / (10 f_max)``, using the smallest sound speed in the domain.
+At exactly 10 cells the on-axis dispersion error bound is about 1.6 %,
+reduced to about 1.4 % at the default ``cfl = 0.6``, and halving ``dx``
+quarters the error (the scheme is second order). With ``dx = 1`` cm the
+10-cell point in air sits at roughly 3.4 kHz.
+
+### What Courant number keeps an FDTD simulation stable?
+
+The explicit scheme is stable only while a wavefront crosses at most one
+cell per time step. With square cells the Courant number is
+$\mathrm{CN} = c\,\Delta t\,\sqrt{2}/\Delta x \le 1$ (Attenborough & Van
+Renterghem Eq. 4.13). `fdtd_simulation` derives the time step from the
+`cfl` parameter (the Courant number, default 0.6) and the largest sound
+speed in the map, rejecting values outside $(0, 1)$.
+
+### Can I trust the absolute levels from a 2D FDTD run?
+
+No. A 2D point source is physically an infinite line source: its amplitude
+spreads cylindrically as ``1/sqrt(r)``, 3.0 dB per doubling of distance,
+instead of the spherical ``1/r`` (6.0 dB per doubling) of a 3D point source.
+Interference and diffraction patterns are faithful, but absolute levels and
+decay rates are not those of a 3D room; validate any 3D-quantitative claim
+against a closed form or a 3D solver.
+
+## References
+
+- Attenborough, K., & Van Renterghem, T. (2021). *Predicting outdoor sound*
+  (2nd ed.). CRC Press.
+  [doi:10.1201/9780429470806](https://doi.org/10.1201/9780429470806).
+  Chapter 4: the pressure-velocity FDTD reference model implemented here,
+  from the governing equations (4.3-4.4) and the staggered leapfrog update
+  (4.11-4.12) through the Courant condition (4.13-4.14), the phase-error
+  analysis (4.15) and the rigid and finite-impedance boundary conditions
+  (4.32-4.35).
+- Kuttruff, H. (2016). *Room acoustics* (6th ed.). CRC Press.
+  [doi:10.1201/9781315372150](https://doi.org/10.1201/9781315372150).
+  Section 3.5 places time-domain wave-based methods among the numerical
+  approaches to the wave equation in enclosures, and chapter 3 gives the
+  rigid-room normal modes used as the analytic oracle.
+- Williams, E. G. (1999). *Fourier acoustics: Sound radiation and
+  nearfield acoustical holography*. Academic Press.
+  [doi:10.1016/B978-0-12-753960-7.X5000-1](https://doi.org/10.1016/B978-0-12-753960-7.X5000-1).
+  Chapter 8: the Helmholtz integral equation behind
+  `far_field_from_contour`, with the outgoing free-space Green function
+  and the far-field limit of §2b.
+- Jiménez, N., Cox, T. J., Romero-García, V., & Groby, J.-P. (2017).
+  Metadiffusers: Deep-subwavelength sound diffusers. *Scientific Reports*,
+  7, 5389. [doi:10.1038/s41598-017-05710-5](https://doi.org/10.1038/s41598-017-05710-5).
+  The meshed Table-1 panel and the near-to-far-field polar comparison of
+  §2b reproduce, with this solver, the TMM-vs-full-wave cross-check the
+  paper reports.
+
+## Standards and sources
+
+The module implements a textbook numerical method rather than a measurement
+standard: the discretisation, stability bound and boundary conditions follow
+Attenborough & Van Renterghem (2021) chapter 4 as the citable reference
+formulation. Validation is anchored to closed forms (rigid-box
+eigenfrequencies, cylindrical spreading, image sources, the
+normal-incidence reflection coefficient and the scheme's dispersion
+relation); two of those anchors run in the
+[conformance report](https://jmrplens.github.io/phonometry/reference/conformance/). The elastic P-SV companion solver
+and its own oracles are covered in
+[Elastic waves and fluid-solid coupling](https://jmrplens.github.io/phonometry/guides/elastic-waves/).
+
+---
+
+
+<!-- source: docs/elastic-waves.md | canonical: https://jmrplens.github.io/phonometry/guides/elastic-waves/ -->
+Source: https://jmrplens.github.io/phonometry/guides/elastic-waves/
+
+# Elastic waves and fluid-solid coupling
+
+A fluid carries one wave; a solid carries a family of them. This guide covers
+the elastic companion of the [2D FDTD wave simulation](https://jmrplens.github.io/phonometry/guides/fdtd-simulation/):
+`elastic_fdtd_simulation` integrates the plane-strain velocity-stress system
+of Virieux (1986) on the same staggered grid as the acoustic solver, and with
+it the compressional **P wave**, the shear **S wave**, the **Rayleigh wave**
+of a free surface and the **Scholte wave** of a fluid-solid contact all
+emerge from the same update. Because a fluid is just the shear-free limit of
+the elastic equations, one pair of material maps couples water, air,
+sediment and steel in a single run: oblique reflection with **mode
+conversion**, seabed interface waves and the transmission of immersed plates
+come out of the maps alone, each pinned to its exact closed form by the
+validation suite.
+
+The guide assumes the acoustic solver's vocabulary (sources, probes,
+obstacle masks, sponges and the Courant bound); read
+[2D FDTD wave simulation](https://jmrplens.github.io/phonometry/guides/fdtd-simulation/) first if those are new. The
+closed forms this solver cross-checks live in the building, vibration and
+underwater guides: the mass law of
+[panel sound insulation](https://jmrplens.github.io/phonometry/guides/panel-sound-insulation/), the flexural waves of
+[bending-wave transmission at plate junctions](https://jmrplens.github.io/phonometry/guides/junction-transmission/),
+and the shear-supporting seabed that the fluid-bottom reflection model of
+[underwater sound propagation](https://jmrplens.github.io/phonometry/guides/underwater-propagation/) cannot represent.
+
+## 1. The P-SV velocity-stress scheme
 
 A solid carries more than one wave. Alongside the compressional **P wave**
 at $c_P = \sqrt{(\lambda + 2\mu)/\rho}$ a shear **S wave** propagates at
@@ -887,10 +996,12 @@ injection) and `ForceSource` (a directional body force) as sources, probes
 that record ``p``, ``vx`` or ``vy``, the same sponge and obstacle
 machinery, and a frozen `ElasticFDTDResult` with the same `.plot()`. The
 Courant bound depends only on the fastest ``c_P`` in the map (Virieux
-Eqs. 6-7), while the resolution rule uses the slowest non-zero ``c_S`` of
-the solid cells, because the S wavelength is always the shortest:
-``dx <= c_s_min / (10 f)`` (a wholly fluid map falls back to the acoustic
-rule on the slowest ``c_P``).
+Eqs. 6-7), while the resolution rule uses the slowest wave speed anywhere
+in the domain -- the slowest non-zero ``c_S`` of the solid cells or, if a
+fluid region carries a still slower ``c_P``, that fluid speed:
+``dx <= c_min / (10 f)`` (in a wholly solid map the S wavelength is always
+the shortest; in mixed domains the fluid P wavelength can be shorter, as
+in water at 1480 m/s over a 2000 m/s-shear sediment).
 
 ```python
 import numpy as np
@@ -911,6 +1022,8 @@ t1, t2 = (t[np.abs(res.signals[k, 0, 1:]).argmax()] for k in range(2))
 print(round(0.24 / (t2 - t1)))    # 6316  c_P = sqrt((lambda+2mu)/rho) = 6320
 ```
 
+## 2. Fluids inside the elastic solver
+
 Setting ``c_s = 0`` marks a **fluid** cell: the shear modulus vanishes,
 the system degenerates to the acoustic equations, and with a uniform
 ``c_s = 0`` map the elastic solver reproduces the acoustic one **bit for
@@ -924,6 +1037,8 @@ normal-incidence reflection of a water-steel interface within 2 % of
 ``(Z2 - Z1)/(Z2 + Z1)`` (typically a fraction of a percent) and recovers
 the normal-incidence mass law of a 3 mm immersed steel plate within
 0.3 dB of `mass_law_transmission_loss`.
+
+## 3. Free surfaces and Rayleigh waves
 
 A side declared ``"free"`` becomes a traction-free surface through
 **stress imaging** (Moczo et al. Eq. 9.9): the normal stress is pinned to
@@ -972,7 +1087,15 @@ plt.show()
 
 </details>
 
-## 6. Fluid-solid coupling: mode conversion, Scholte waves and plates
+That flexural wave is worth watching in motion: the
+[bending-wave transmission guide](https://jmrplens.github.io/phonometry/guides/junction-transmission/) embeds an
+animation of this solver launching a 4 kHz bending packet along a 10 mm
+steel plate into an L-junction, where the corner splits it into the
+reflected and transmitted waves the closed form prices at
+``τ12(0°) = 0.5``, plus the fast in-plane precursor the pinned-junction
+model deliberately leaves out.
+
+## 4. Fluid-solid coupling at normal incidence
 
 Because the fluid is just the ``c_s = 0`` limit of the elastic scheme, a
 water-steel contact is **one solver, two bands of the material maps**, and
@@ -1009,6 +1132,8 @@ print(round(float(echo[np.abs(echo).argmax()] / incident), 3))   # 0.938
 # and the steel behaves as a liquid of its rho and c_P (B&G Eq. 4.2.27)
 ```
 
+## 5. Oblique incidence: mode conversion
+
 Away from normal incidence the solid stops being a liquid. The incident
 sound refracts into **two** transmitted waves, P and SV (**mode
 conversion**), each with its own critical angle: for water over steel,
@@ -1020,9 +1145,12 @@ same ``c_P`` would; beyond the S critical angle the reflection is total,
 at 10° and 20° and matches the exact reflection coefficient of
 Brekhovskikh & Godin (Eqs. 4.2.22-4.2.26) within a fraction of a percent,
 mode conversion included. This is exactly the shear physics that the
-fluid-bottom `reflection_coefficient` of the underwater module cannot
-represent, and the reason a shear-supporting seabed loses more energy than
-its equivalent-fluid model.
+fluid-bottom `reflection_coefficient` of the
+[underwater module](https://jmrplens.github.io/phonometry/guides/underwater-propagation/) cannot represent, and the
+reason a shear-supporting seabed loses more energy than its
+equivalent-fluid model.
+
+## 6. The Scholte interface wave
 
 Total reflection beyond the S critical angle leaves both media carrying
 only evanescent fields, and those fields can lock together into a true
@@ -1095,6 +1223,8 @@ plt.show()
 
 </details>
 
+## 7. Immersed plates and the mass law
+
 An **immersed plate** closes the loop with the building-acoustics module.
 At normal incidence no shear is excited, so an elastic plate in water is
 exactly the three-media fluid layer of B&G §2.4: its transmission follows
@@ -1109,34 +1239,33 @@ dip within 0.1 % of the 295 kHz resonance. The same suite stress-tests the
 extreme contrast of an air-steel contact (impedance ratio ~10⁵:1): stable
 over 10 000 steps with the reflected amplitude conserved to 0.5 %.
 
+At oblique incidence the plate physics gets richer, and the
+[panel sound insulation guide](https://jmrplens.github.io/phonometry/guides/panel-sound-insulation/) embeds the
+animation: this solver driving the same 10 mm steel plate, lying in air,
+with a sustained 45° plane wave below and above its coincidence frequency,
+where the trace-matched bending wave re-radiates a growing beam and holds
+the transmitted level at the point where the mass law demands 12 dB more
+blocking.
+
 ## Quick answers
 
-### How do I choose the FDTD grid spacing?
+### When do I need the elastic solver instead of the acoustic one?
 
-Resolve at least 10 cells per shortest wavelength,
-``dx <= c_min / (10 f_max)``, using the smallest sound speed in the domain.
-At exactly 10 cells the on-axis dispersion error bound is about 1.6 %,
-reduced to about 1.4 % at the default ``cfl = 0.6``, and halving ``dx``
-quarters the error (the scheme is second order). With ``dx = 1`` cm the
-10-cell point in air sits at roughly 3.4 kHz.
+Whenever any part of the domain supports shear: mode conversion at oblique
+incidence, Rayleigh waves on free surfaces, Scholte waves at fluid-solid
+contacts and plate transmission all need the elastic equations. If every
+cell is fluid, use the acoustic solver: with a uniform ``c_s = 0`` map the
+elastic solver reproduces it bit for bit, at roughly twice the memory and
+stepping cost.
 
-### What Courant number keeps an FDTD simulation stable?
+### What grid resolution does an elastic simulation need?
 
-The explicit scheme is stable only while a wavefront crosses at most one
-cell per time step. With square cells the Courant number is
-$\mathrm{CN} = c\,\Delta t\,\sqrt{2}/\Delta x \le 1$ (Attenborough & Van
-Renterghem Eq. 4.13). `fdtd_simulation` derives the time step from the
-`cfl` parameter (the Courant number, default 0.6) and the largest sound
-speed in the map, rejecting values outside $(0, 1)$.
-
-### Can I trust the absolute levels from a 2D FDTD run?
-
-No. A 2D point source is physically an infinite line source: its amplitude
-spreads cylindrically as ``1/sqrt(r)``, 3.0 dB per doubling of distance,
-instead of the spherical ``1/r`` (6.0 dB per doubling) of a 3D point source.
-Interference and diffraction patterns are faithful, but absolute levels and
-decay rates are not those of a 3D room; validate any 3D-quantitative claim
-against a closed form or a 3D solver.
+Resolve at least 10 cells per shortest wavelength using the slowest wave
+speed in the domain -- the slowest non-zero shear speed or a slower fluid
+sound speed if one is present -- ``dx <= c_min / (10 f)``. Allow 15-20 cells per wavelength along free
+surfaces (the stress-imaging boundary is the most dispersive part of the
+scheme), and at least 15 points per wavelength when an interface wave has
+to be timed (van Vossen et al. 2002).
 
 ### What is a Scholte wave and how fast does it travel?
 
@@ -1147,50 +1276,41 @@ the exact characteristic equation (Brekhovskikh & Godin Eq. 4.4.20,
 `scholte_speed`) and always lies below both the fluid sound speed and the
 solid shear speed: 0.03 % below the water speed (1480 m/s) over steel
 (1479.6 m/s),
-but 4 % below it over a soft sediment (1436 m/s for water over a
-3500/2000/2500 bed), which is why seabed interface waves probe the
-sediment shear stiffness.
+but 4 % below the 1500 m/s ocean water of the sediment example (1436 m/s
+for that water over a 3500/2000/2500 bed), which is why seabed interface
+waves probe the sediment shear stiffness.
+
+## See also
+
+- [2D FDTD wave simulation](https://jmrplens.github.io/phonometry/guides/fdtd-simulation/): the acoustic solver this
+  guide extends, with the staggered grid, the Courant bound, the sources,
+  probes and boundary machinery shared by both.
+- [Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/guides/panel-sound-insulation/): the mass
+  law and coincidence closed forms; the immersed-plate run of section 7 is
+  their full-wave cross-check.
+- [Bending-wave transmission at plate junctions](https://jmrplens.github.io/phonometry/guides/junction-transmission/):
+  the flexural-wave closed forms of the building model; the Kirchhoff
+  dispersion validated in section 3 is the wave they transport.
+- [Underwater sound propagation](https://jmrplens.github.io/phonometry/guides/underwater-propagation/): the
+  fluid-bottom Rayleigh reflection model whose missing shear physics
+  section 5 quantifies.
+- API reference: [`simulation.elastic-fdtd`](https://jmrplens.github.io/phonometry/reference/api/simulation/elastic-fdtd/).
 
 ## References
 
-- Attenborough, K., & Van Renterghem, T. (2021). *Predicting outdoor sound*
-  (2nd ed.). CRC Press.
-  [doi:10.1201/9780429470806](https://doi.org/10.1201/9780429470806).
-  Chapter 4: the pressure-velocity FDTD reference model implemented here,
-  from the governing equations (4.3-4.4) and the staggered leapfrog update
-  (4.11-4.12) through the Courant condition (4.13-4.14), the phase-error
-  analysis (4.15) and the rigid and finite-impedance boundary conditions
-  (4.32-4.35).
-- Kuttruff, H. (2016). *Room acoustics* (6th ed.). CRC Press.
-  [doi:10.1201/9781315372150](https://doi.org/10.1201/9781315372150).
-  Section 3.5 places time-domain wave-based methods among the numerical
-  approaches to the wave equation in enclosures, and chapter 3 gives the
-  rigid-room normal modes used as the analytic oracle.
-- Williams, E. G. (1999). *Fourier acoustics: Sound radiation and
-  nearfield acoustical holography*. Academic Press.
-  [doi:10.1016/B978-0-12-753960-7.X5000-1](https://doi.org/10.1016/B978-0-12-753960-7.X5000-1).
-  Chapter 8: the Helmholtz integral equation behind
-  `far_field_from_contour`, with the outgoing free-space Green function
-  and the far-field limit of §2b.
-- Jiménez, N., Cox, T. J., Romero-García, V., & Groby, J.-P. (2017).
-  Metadiffusers: Deep-subwavelength sound diffusers. *Scientific Reports*,
-  7, 5389. [doi:10.1038/s41598-017-05710-5](https://doi.org/10.1038/s41598-017-05710-5).
-  The meshed Table-1 panel and the near-to-far-field polar comparison of
-  §2b reproduce, with this solver, the TMM-vs-full-wave cross-check the
-  paper reports.
 - Virieux, J. (1986). P-SV wave propagation in heterogeneous media:
   velocity-stress finite-difference method. *Geophysics*, 51(4), 889-901.
   [doi:10.1190/1.1442147](https://doi.org/10.1190/1.1442147). The elastic
-  solver of §5: the velocity-stress system (Eq. 2), the fully staggered
-  cell and update (Fig. 1, Eq. 5), the P-only Courant bound (Eqs. 6-7),
-  the dispersion relations (Eqs. 13-14) and the liquid as the shear-free
-  limit.
+  solver of section 1: the velocity-stress system (Eq. 2), the fully
+  staggered cell and update (Fig. 1, Eq. 5), the P-only Courant bound
+  (Eqs. 6-7), the dispersion relations (Eqs. 13-14) and the liquid as the
+  shear-free limit.
 - Moczo, P., Kristek, J., Galis, M., Pazak, P., & Balazovjech, M. (2007).
   The finite-difference and finite-element modeling of seismic wave
   propagation and earthquake motion. *Acta Physica Slovaca*, 57(2),
-  177-406. The heterogeneous effective parameters of §5 (harmonic shear
-  modulus, arithmetic density; Eqs. 7.37-7.39) and the stress-imaging free
-  surface (Eq. 9.9).
+  177-406. The heterogeneous effective parameters of section 2 (harmonic
+  shear modulus, arithmetic density; Eqs. 7.37-7.39) and the stress-imaging
+  free surface of section 3 (Eq. 9.9).
 - Cremer, L., Heckl, M., & Petersson, B. A. T. (2005). *Structure-borne
   sound* (3rd ed.). Springer.
   [doi:10.1007/b137728](https://doi.org/10.1007/b137728). The analytic
@@ -1200,11 +1320,12 @@ sediment shear stiffness.
 - Brekhovskikh, L. M., & Godin, O. A. (1990). *Acoustics of layered media
   I: Plane and quasi-plane waves*. Springer.
   [doi:10.1007/978-3-642-52369-4](https://doi.org/10.1007/978-3-642-52369-4).
-  The fluid-solid oracles of §6: the oblique reflection coefficient with
-  mode conversion (Eqs. 4.2.22-4.2.26) and its critical-angle limits
-  (Eqs. 4.2.27-4.2.31), the exact Scholte characteristic equation
-  (Eqs. 4.4.18-4.4.20) with the light-fluid asymptotics (Eqs. 4.4.21-4.4.24),
-  and the three-media layer transmission (Eqs. 2.4.10-2.4.19).
+  The fluid-solid oracles of sections 4-7: the oblique reflection
+  coefficient with mode conversion (Eqs. 4.2.22-4.2.26) and its
+  critical-angle limits (Eqs. 4.2.27-4.2.31), the exact Scholte
+  characteristic equation (Eqs. 4.4.18-4.4.20) with the light-fluid
+  asymptotics (Eqs. 4.4.21-4.4.24), and the three-media layer transmission
+  (Eqs. 2.4.10-2.4.19).
 - van Vossen, R., Robertsson, J. O. A., & Chapman, C. H. (2002).
   Finite-difference modeling of wave propagation in a fluid-solid
   configuration. *Geophysics*, 67(2), 618-624.
@@ -1212,24 +1333,20 @@ sediment shear stiffness.
   fluid-solid benchmark of the same staggered scheme: the harmonic shear
   modulus and arithmetic density averages (Eqs. 9-10) that satisfy the
   interface conditions implicitly, the soft-bed configuration of the
-  Scholte test of §6 and the >= 15 points-per-wavelength rule for the
-  O(2,2) scheme with an interface wave.
+  Scholte test of section 6 and the >= 15 points-per-wavelength rule for
+  the O(2,2) scheme with an interface wave.
 
 ## Standards and sources
 
-The module implements a textbook numerical method rather than a measurement
-standard: the discretisation, stability bound and boundary conditions follow
-Attenborough & Van Renterghem (2021) chapter 4 as the citable reference
-formulation, and the elastic solver follows Virieux (1986) with the
+No measurement standard governs the elastic solver: it implements the
+textbook velocity-stress method of Virieux (1986) with the
 heterogeneous-medium and free-surface treatments of Moczo et al. (2007).
-Validation is anchored to closed forms (rigid-box eigenfrequencies,
-cylindrical spreading, image sources, the normal-incidence reflection
-coefficient, the scheme's dispersion relation, and for the elastic solver
-the body-wave speeds, the exact Rayleigh root, the Kirchhoff flexural
-dispersion, the fluid-solid reflection at normal and oblique incidence
-with mode conversion, the exact Scholte-wave speed, the immersed-plate
-transmission with its thickness resonance and the immersed-panel mass
-law); two of those anchors run in the
-[conformance report](https://jmrplens.github.io/phonometry/reference/conformance/).
+Validation is anchored to closed forms: the P and S body-wave speeds, the
+exact Rayleigh root and the Kirchhoff flexural dispersion (Cremer, Heckl &
+Petersson), the bit-exact acoustic limit, the fluid-solid reflection at
+normal and oblique incidence with mode conversion, the exact Scholte-wave
+speed and the immersed-plate transmission with its thickness resonance
+(Brekhovskikh & Godin), the immersed-panel mass law, and the van Vossen
+(2002) soft-bed interface-wave benchmark.
 
 ---

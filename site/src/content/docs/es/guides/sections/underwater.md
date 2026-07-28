@@ -19,20 +19,23 @@ equivalente de ISO 17208-2 mediante la corrección de superficie del espejo
 de Lloyd, y el hincado percusivo de pilotes, con la exposición sonora de un
 golpe, de pico y acumulada de ISO 18406.
 
-La mitad de **camino**, en
+La mitad de **camino** abarca ahora dos páginas. La primera,
 [Propagación submarina del sonido](/phonometry/es/guides/underwater-propagation/),
-predice lo que el mar hace con ese sonido. Se construye por capas, de las
-formas cerradas a la numérica completa: divergencia geométrica más absorción
-volumétrica (Francois-Garrison, Ainslie-McColm o Thorp), la velocidad del
-sonido en agua de mar por tres formulaciones, las ecuaciones de sonar pasivo
-y activo, la pérdida por reflexión en el lecho marino de Rayleigh, el espectro
-de ruido ambiente de Wenz con el tráfico marítimo JOMOPANS-ECHO, y los
-solvers numéricos de modos normales, trazado de rayos y ecuación parabólica
-para problemas dependientes de la distancia.
+predice lo que el mar hace con ese sonido en forma cerrada: divergencia
+geométrica más absorción volumétrica (Francois-Garrison, Ainslie-McColm o
+Thorp), la velocidad del sonido en agua de mar por tres formulaciones, las
+ecuaciones de sonar pasivo y activo, la pérdida por reflexión en el lecho
+marino de Rayleigh, y el espectro de ruido ambiente de Wenz con el tráfico
+marítimo JOMOPANS-ECHO. Cuando la refracción y los contornos deciden la
+respuesta,
+[Solvers numéricos de propagación submarina](/phonometry/es/guides/underwater-solvers/)
+calcula el campo en su lugar: la expansión en modos normales, el trazado de
+rayos y la ecuación parabólica split-step de Fourier, con la guía para
+elegir entre ellos y las formas cerradas.
 
 Lee las páginas en ese orden: los niveles de referencia van primero porque
 todo resultado de propagación se expresa en ellos. Excepcionalmente en este
-sitio, la teoría de ambas páginas vive junto a las guías en lugar de en la
+sitio, la teoría de estas páginas vive junto a las guías en lugar de en la
 referencia de teoría.
 
 ## Páginas de esta sección
@@ -42,5 +45,8 @@ referencia de teoría.
   monopolar ISO 17208, y exposición por hincado de pilotes ISO 18406.
 - [Propagación submarina del sonido](/phonometry/es/guides/underwater-propagation/):
   pérdida de transmisión, velocidad del sonido, ecuación del sonar, reflexión
-  en el lecho, ruido ambiente oceánico y los solvers numéricos de
-  propagación.
+  en el lecho y ruido ambiente oceánico, en forma cerrada.
+- [Solvers numéricos de propagación submarina](/phonometry/es/guides/underwater-solvers/):
+  los solvers de modos normales, trazado de rayos y ecuación parabólica de
+  la guía de ondas estratificada, cada uno validado contra una forma cerrada
+  exacta, y cómo elegir modelo de propagación.

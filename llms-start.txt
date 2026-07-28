@@ -327,7 +327,7 @@ Source: https://jmrplens.github.io/phonometry/reference/theory/
 
 # Theoretical Background
 
-The theory reference explains the standards, the mathematics and the design decisions behind every phonometry module. It is split into six domain pages, listed below with the sections each one hosts. Theory for the underwater modules lives with its guides: [Underwater Acoustics](https://jmrplens.github.io/phonometry/guides/underwater-acoustics/) and [Underwater Propagation](https://jmrplens.github.io/phonometry/guides/underwater-propagation/).
+The theory reference explains the standards, the mathematics and the design decisions behind every phonometry module. It is split into six domain pages, listed below with the sections each one hosts. Theory for the underwater modules lives with its guides: [Underwater Acoustics](https://jmrplens.github.io/phonometry/guides/underwater-acoustics/), [Underwater Propagation](https://jmrplens.github.io/phonometry/guides/underwater-propagation/) and [Underwater Propagation Solvers](https://jmrplens.github.io/phonometry/guides/underwater-solvers/).
 
 ## [Signal Analysis](https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/)
 

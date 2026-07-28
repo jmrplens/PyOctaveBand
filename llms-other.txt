@@ -582,7 +582,8 @@ plt.show()
 
 </details>
 
-The clip below watches coincidence happen in a 2D elastic FDTD field: a 10 mm
+The clip below watches coincidence happen in a 2D
+[elastic FDTD field](https://jmrplens.github.io/phonometry/guides/elastic-waves/): a 10 mm
 steel plate immersed in air, driven by a sustained plane wave at 45 degrees,
 with both frequencies picked from the library's `coincidence_frequency`. At
 `fc/2` = 603 Hz the measured transmission lands on the oblique mass law; at

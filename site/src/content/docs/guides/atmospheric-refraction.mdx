@@ -30,7 +30,7 @@ rays curve, and over a few hundred metres the received level can swing by tens
 of decibels. This page covers
 `phonometry.environmental.atmospheric_refraction`, the refracting-atmosphere
 counterpart of the ocean solvers in
-[`phonometry.underwater.numerical_propagation`](/phonometry/guides/underwater-propagation/):
+[`phonometry.underwater.numerical_propagation`](/phonometry/guides/underwater-solvers/):
 a **ray model** and a **parabolic-equation (PE)** solver.
 
 Whether refraction matters is mostly a question of range. A representative
@@ -178,7 +178,7 @@ equation valid within a limiting elevation angle, and marches it in range on a
 range-height grid. `atmospheric_parabolic_equation` implements the **Green's
 Function PE** (GFPE, Salomons Appendix H), the atmospheric member of the same
 split-step Fourier family as the ocean
-[`parabolic_equation`](/phonometry/guides/underwater-propagation/). Each range
+[`parabolic_equation`](/phonometry/guides/underwater-solvers/). Each range
 step transforms the field to the vertical-wavenumber domain, applies the
 free-space propagator together with the finite-impedance ground reflection
 `R(kz) = (kz Z − k0)/(kz Z + k0)` (Salomons Eq. H.28), transforms back, adds the
