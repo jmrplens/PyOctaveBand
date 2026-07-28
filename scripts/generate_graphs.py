@@ -16713,8 +16713,8 @@ def _anim_chamber_hardware(ax: Any, length: float, height: float,
     ax.text(length + 0.045, pipe_y[0] - 0.02, "anechoic termination",
             ha="right", va="top", fontsize=7.5)
     ax.text(0.5 * (x0 + x1), height + wall + 0.006,
-            "L = 0.30 m · m = 4", ha="center", va="bottom", fontsize=7.5,
-            color=COLOR_FG)
+            f"L = {_CHAMBER_L:.2f} m · m = {_CHAMBER_M:.0f}", ha="center",
+            va="bottom", fontsize=7.5, color=COLOR_FG)
 
 
 _APERTURE_F = 686.0                      # lambda = 0.50 m exactly
