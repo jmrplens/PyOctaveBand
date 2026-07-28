@@ -547,8 +547,9 @@ que las guías incorporan sus secciones de Referencias.
   Citado por [Movilidad mecánica y la familia de FRF](/phonometry/es/guides/mechanical-mobility/),
   [Rigidez dinámica de transferencia](/phonometry/es/guides/transfer-stiffness/),
   [Potencia acústica desde vibración](/phonometry/es/guides/vibration-sound-power/),
-  [Potencia acústica estructural de equipos](/phonometry/es/guides/structure-borne-power/)
-  y [Ruido estructural instalado](/phonometry/es/guides/installed-structure-borne/).
+  [Potencia acústica estructural de equipos](/phonometry/es/guides/structure-borne-power/),
+  [Ruido estructural instalado](/phonometry/es/guides/installed-structure-borne/)
+  y [Ondas elásticas y acoplamiento fluido-sólido](/phonometry/es/guides/elastic-waves/).
 - Cremer, L., Heckl, M., & Ungar, E. E. (1973). *Structure-borne sound:
   Structural vibrations and sound radiation at audio frequencies* (1.ª ed.).
   Springer. ISBN 978-3-540-06002-4.
@@ -808,7 +809,14 @@ que las guías incorporan sus secciones de Referencias.
   [doi:10.1007/978-1-4419-8678-8](https://doi.org/10.1007/978-1-4419-8678-8).
   La monografía de referencia de la propagación numérica: modos normales,
   trazado de rayos y ecuación parabólica.
-  Citado por [Propagación submarina del sonido](/phonometry/es/guides/underwater-propagation/).
+  Citado por [Solvers numéricos de propagación submarina](/phonometry/es/guides/underwater-solvers/).
+- Munk, W. H. (1974). Sound channel in an exponentially stratified ocean,
+  with application to SOFAR. *The Journal of the Acoustical Society of
+  America*, 55(2), 220-226.
+  [doi:10.1121/1.1914492](https://doi.org/10.1121/1.1914492).
+  El perfil canónico de velocidad del sonido en aguas profundas que usan los
+  ejemplos de los solvers.
+  Citado por [Solvers numéricos de propagación submarina](/phonometry/es/guides/underwater-solvers/).
 - Francois, R. E., & Garrison, G. R. (1982). Sound absorption based on ocean
   measurements: Part I: Pure water and magnesium sulfate contributions.
   *The Journal of the Acoustical Society of America*, 72(3), 896-907.
@@ -891,6 +899,45 @@ que las guías incorporan sus secciones de Referencias.
   [doi:10.1121/1.1427355](https://doi.org/10.1121/1.1427355).
   El modelo de espectro de conjunto de fuentes de buques mercantes.
   Citado por [Propagación submarina del sonido](/phonometry/es/guides/underwater-propagation/).
+
+## Simulación de ondas
+
+- Williams, E. G. (1999). *Fourier acoustics: Sound radiation and nearfield
+  acoustical holography*. Academic Press.
+  [doi:10.1016/B978-0-12-753960-7.X5000-1](https://doi.org/10.1016/B978-0-12-753960-7.X5000-1).
+  La ecuación integral de Helmholtz tras la transformación de campo cercano a
+  campo lejano, con la función de Green de espacio libre saliente y el límite
+  de campo lejano.
+  Citado por [Simulación de ondas FDTD 2D](/phonometry/es/guides/fdtd-simulation/).
+- Virieux, J. (1986). P-SV wave propagation in heterogeneous media:
+  velocity-stress finite-difference method. *Geophysics*, 51(4), 889-901.
+  [doi:10.1190/1.1442147](https://doi.org/10.1190/1.1442147).
+  El esquema elástico velocidad-esfuerzo sobre la celda totalmente
+  escalonada, su cota de Courant y sus relaciones de dispersión, y el líquido
+  como límite sin cizalla.
+  Citado por [Ondas elásticas y acoplamiento fluido-sólido](/phonometry/es/guides/elastic-waves/).
+- Moczo, P., Kristek, J., Galis, M., Pazak, P., & Balazovjech, M. (2007).
+  The finite-difference and finite-element modeling of seismic wave
+  propagation and earthquake motion. *Acta Physica Slovaca*, 57(2), 177-406.
+  Los parámetros efectivos de malla en medio heterogéneo (módulo de cizalla
+  armónico, densidad aritmética) y la superficie libre por imagen de
+  esfuerzos.
+  Citado por [Ondas elásticas y acoplamiento fluido-sólido](/phonometry/es/guides/elastic-waves/).
+- Brekhovskikh, L. M., & Godin, O. A. (1990). *Acoustics of layered media I:
+  Plane and quasi-plane waves*. Springer.
+  [doi:10.1007/978-3-642-52369-4](https://doi.org/10.1007/978-3-642-52369-4).
+  Los oráculos fluido-sólido: el coeficiente de reflexión oblicua con
+  conversión de modo, la ecuación característica exacta de Scholte y la
+  transmisión de la capa de tres medios.
+  Citado por [Ondas elásticas y acoplamiento fluido-sólido](/phonometry/es/guides/elastic-waves/).
+- van Vossen, R., Robertsson, J. O. A., & Chapman, C. H. (2002).
+  Finite-difference modeling of wave propagation in a fluid-solid
+  configuration. *Geophysics*, 67(2), 618-624.
+  [doi:10.1190/1.1468623](https://doi.org/10.1190/1.1468623).
+  El benchmark fluido-sólido del esquema escalonado: las medias de los
+  parámetros efectivos, la configuración de fondo blando de Scholte y la
+  regla de puntos por longitud de onda para las ondas de interfase.
+  Citado por [Ondas elásticas y acoplamiento fluido-sólido](/phonometry/es/guides/elastic-waves/).
 
 ## Habla
 

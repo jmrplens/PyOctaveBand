@@ -10,7 +10,7 @@
  * repository, not written by hand from memory:
  *   checks/domains/standards   conformance-stats.mjs, parsed from
  *                              docs/CONFORMANCE.md at build time
- *   71 guides        site/src/content/docs/guides/*.md*
+ *   73 guides        site/src/content/docs/guides/*.md*
  *   120 API pages    site/src/content/docs/reference/api/**
  *   506 figures      distinct basenames in .github/images (x2 themes x2 langs)
  *   32 PDF fiches    .github/reports/*.pdf
@@ -138,7 +138,7 @@ export const en: HomeContent = {
 	},
 	coverage: {
 		title: 'What it covers',
-		lead: 'Nine areas, 71 guides, 120 API reference pages. Each row links to the area overview; the designations are the standards actually implemented there, not a reading list.',
+		lead: 'Nine areas, 73 guides, 120 API reference pages. Each row links to the area overview; the designations are the standards actually implemented there, not a reading list.',
 		headers: ['Area', 'Standards implemented'],
 		areas: [
 			{
@@ -192,7 +192,7 @@ export const en: HomeContent = {
 			{
 				name: 'Wave simulation',
 				href: '/phonometry/guides/sections/simulation/',
-				summary: 'A deterministic 2D FDTD solver, validated against analytic oracles rather than a standard.',
+				summary: 'Deterministic 2D FDTD solvers, acoustic and elastic P-SV, validated against analytic oracles rather than a standard.',
 				standards: ['no governing standard'],
 			},
 		],
@@ -279,7 +279,7 @@ export const es: HomeContent = {
 	},
 	coverage: {
 		title: 'Qué abarca',
-		lead: 'Nueve áreas, 71 guías y 120 páginas de referencia de la API. Cada fila enlaza al índice del área; las designaciones son las normas realmente implementadas ahí, no una lista de lecturas.',
+		lead: 'Nueve áreas, 73 guías y 120 páginas de referencia de la API. Cada fila enlaza al índice del área; las designaciones son las normas realmente implementadas ahí, no una lista de lecturas.',
 		headers: ['Área', 'Normas implementadas'],
 		areas: [
 			{
@@ -333,7 +333,7 @@ export const es: HomeContent = {
 			{
 				name: 'Simulación de ondas',
 				href: '/phonometry/es/guides/sections/simulation/',
-				summary: 'Un solver FDTD 2D determinista, validado frente a oráculos analíticos y no frente a una norma.',
+				summary: 'Solvers FDTD 2D deterministas, acústico y elástico P-SV, validados frente a oráculos analíticos y no frente a una norma.',
 				standards: ['sin norma aplicable'],
 			},
 		],

@@ -397,152 +397,14 @@ ships, bulkers, vehicle carriers, tankers) carry an extra low-frequency hump
 below 100 Hz. The implementation is validated to the authors' own reference
 calculator (File S1) to better than 0.01 dB.
 
-## 7. Numerical solvers (normal modes, rays, parabolic equation)
-
-For range-independent (horizontally stratified) environments the field can be
-computed numerically. Three solvers are provided (Jensen et al.,
-*Computational Ocean Acoustics*):
-
-- **`normal_modes`** solves the depth-separated Sturm-Liouville eigenvalue
-  problem by finite differences and sums the propagating modes into the
-  transmission loss. Validated against the ideal (pressure-release) waveguide's
-  exact modes.
-- **`ray_trace`** integrates the ray-trajectory equations (Runge-Kutta,
-  vectorised over all rays at once) through a sound-speed profile, reflecting at
-  the surface and bottom. Validated against the circular-arc paths of a linear
-  gradient.
-- **`parabolic_equation`** marches the standard (Tappert) PE with the split-step
-  Fourier algorithm. Validated against free-field spherical spreading; it agrees
-  with the normal-mode transmission loss in trend.
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/numerical_propagation_dark.webp">
-  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/numerical_propagation.webp" alt="Three numerical solvers: a Munk sound-speed profile, ray paths forming convergence zones, and transmission loss versus range from the normal-mode and parabolic-equation solvers agreeing in trend" width="100%">
-</picture>
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import underwater
-
-# A Munk deep-water sound-speed profile.
-z = np.linspace(0.0, 5000.0, 60)
-eta = 2.0 * (z - 1300.0) / 1300.0
-c = 1500.0 * (1.0 + 0.00737 * (eta - 1.0 + np.exp(-eta)))
-
-# Split-step Fourier PE at 50 Hz; a coarse grid keeps the run fast.
-field = underwater.parabolic_equation(50.0, z, c, source_depth=1000.0,
-                                      max_range=50_000.0, range_step=50.0,
-                                      n_depth_points=512)
-field.plot()   # TL(z, r) field showing the convergence zones
-plt.show()
-```
-
-</details>
-
-```python
-import numpy as np
-from phonometry import underwater
-
-# A Munk deep-water profile.
-z = np.linspace(0.0, 5000.0, 60)
-eta = 2.0 * (z - 1300.0) / 1300.0
-c = 1500.0 * (1.0 + 0.00737 * (eta - 1.0 + np.exp(-eta)))
-
-rays = underwater.ray_trace(z, c, source_depth=1000.0,
-                    launch_angles_deg=np.linspace(-12.0, 12.0, 21), max_range=100e3)
-rays.plot()   # ray paths / convergence zones (needs matplotlib)
-
-# Shallow isovelocity waveguide: modes and PE.
-modes = underwater.normal_modes(50.0, [0.0, 200.0], [1500.0, 1500.0],
-                        source_depth=50.0, receiver_depth=100.0)
-print(modes.wavenumbers.size, "propagating modes")
-field = underwater.parabolic_equation(50.0, [0.0, 200.0], [1500.0, 1500.0],
-                              source_depth=50.0, max_range=20e3)
-field.plot()  # TL field over range x depth (needs matplotlib)
-```
-
-`normal_modes` returns a `NormalModeResult` (`wavenumbers`, `mode_functions`,
-`transmission_loss`); `ray_trace` a `RayTraceResult` (`ranges`, `depths` per
-ray); `parabolic_equation` a `ParabolicEquationResult` (the `transmission_loss`
-field). All assume a range-independent water column with a pressure-release
-surface.
-
-## 8. Choosing a model
-
-Every function above answers the same question, "how much level survives the
-path", at a different price in physics. Terminology throughout follows
-ISO 18405:2017 (propagation loss, source level, levels re 1 µPa).
-
-**Sound speed.** The three equations agree to within about 1 m/s inside their
-common domain, so the choice is about *validity range*, not accuracy. The
-default **UNESCO / Chen-Millero** form (as recast by Wong & Zhu 1995) covers
-0–40 °C, 0–40 ppt and 0–1000 bar, the widest envelope, and is the
-international standard. **Del Grosso** (1974) is restricted to 0–30 °C and
-30–40 ppt but is preferred by some authors for deep-ocean work inside that
-domain (much of the SOFAR-channel literature uses it). **Mackenzie** (1981)
-trades pressure for depth directly (2–30 °C, 25–40 ppt, 0–8000 m), which makes
-it the convenient choice when you have an echo-sounder depth rather than a CTD
-pressure; the other two convert depth to pressure through Leroy & Parthiot
-(1998) internally.
-
-**Absorption.** **Francois–Garrison** (1982) is the reference and the default:
-it carries the boric-acid, magnesium-sulfate and pure-water relaxations with
-their full temperature, salinity, depth and pH-implicit dependences, and is
-trusted from about 100 Hz to 1 MHz. **Ainslie–McColm** (1998) is a deliberate
-simplification of the same physics that stays within about 10 % of it across
-that range; use it when a legible formula matters more than the last percent.
-**Thorp** (1967) depends on frequency only (it bakes in 4 °C water near
-1000 m) and predates both; keep it for quick low-frequency estimates below a
-few tens of kHz and for comparison with older literature that used it.
-
-**Spreading law.** Spherical spreading (`20 lg R`) describes a wavefront that
-expands freely in three dimensions, before any boundary confines it;
-cylindrical spreading (`10 lg R`) describes energy trapped between the surface
-and the bottom (or in the SOFAR channel) that can only expand in range. The
-`"practical"` law splices the two at a transition range `R0`, which is
-physically of the order of the water (or channel) depth: spherical while the
-wavefront has not yet filled the duct, cylindrical once it has. In the 10 kHz
-example of section 1 the choice is not cosmetic: against the same figure of
-merit of 87 dB, spherical-only spreading predicts detection out to about
-8.7 km while the practical law with `R0 = 1000 m` stretches it to about
-15.8 km. When the spreading law is the biggest uncertainty in the budget, that
-is the cue to stop using a closed form and compute the field.
-
-**Closed form or solver.** The closed-form transmission loss knows nothing of
-the sound-speed profile, the seabed or the surface; it is honest for short,
-direct, boundary-free paths and for first-cut sonar budgets. When refraction
-and boundaries decide the answer, pick the solver by frequency and geometry
-(Jensen et al. 2011, Ch. 1):
-
-| Solver | Natural regime | What it buys you |
-|---|---|---|
-| `ray_trace` | High frequency (water depth ≫ λ), deep water | Eigenray geometry, travel times, convergence zones; cost independent of frequency |
-| `normal_modes` | Low frequency, shallow water, range-independent | Finite-difference modal sum with few propagating modes (`m < kD/π`); the reference solution for its regime, validated against the ideal waveguide's exact modes |
-| `parabolic_equation` | Low frequency, long one-way paths | Full-field TL(z, r) with refraction, marched in range over the range-independent `c(z)` all three solvers assume |
-
-The boundaries blur in practice: rays remain usable at surprisingly low
-frequencies for travel-time work, and the PE remains the workhorse well above
-its formal small-angle regime. When two of the three agree on a case, as the
-modes and the PE do in the section 7 figure, that agreement is the practical
-convergence test.
-
-**A worked sonar budget.** Chain the pieces end to end: a 140 dB re
-1 µPa²/Hz source at 10 kHz, a 60 dB ambient spectrum level, a 15 dB array
-gain and an 8 dB detection threshold give the figure of merit
-`FOM = 140 - (60 - 15) - 8 = 87 dB` computed by `passive_sonar_equation` in
-section 3. The transmission-loss curve of section 1 (10 °C, 35 ppt, 100 m,
-`alpha = 0.95 dB/km`) crosses 87 dB at about 15.8 km with the practical law:
-that crossing *is* the predicted detection range, and every term of the budget
-moves it. Trim the directivity index to 7.5 dB and the figure of merit falls
-to 79.5 dB, so the range drops to wherever the TL curve crosses that value;
-double the frequency to 20 kHz and `alpha` more than triples to 3.3 dB/km,
-pulling the crossing sharply inward. This coupling between the absorption
-model, the spreading law and the sonar equation is why the three live in one
-module.
+Every closed form above stops being enough when refraction and boundaries
+decide the answer: a sound-speed minimum that traps energy, surface and
+bottom reflections in shallow water, or a detection range that swings with
+the choice of spreading law. At that point the field has to be computed,
+and the normal-mode, ray-tracing and parabolic-equation solvers of the
+module, together with the guidance for choosing between them and these
+closed forms, have their own guide:
+[Underwater propagation solvers](underwater-solvers.md).
 
 ## References
 
@@ -626,12 +488,6 @@ module.
   America*, 111(3), 1211-1231.
   [doi:10.1121/1.1427355](https://doi.org/10.1121/1.1427355).
   The ensemble merchant-ship spectrum model of section 6.
-- Jensen, F. B., Kuperman, W. A., Porter, M. B., & Schmidt, H. (2011).
-  *Computational ocean acoustics* (2nd ed.). Springer.
-  [doi:10.1007/978-1-4419-8678-8](https://doi.org/10.1007/978-1-4419-8678-8).
-  The normal-mode (Ch. 5), ray-tracing (Ch. 3) and split-step Fourier
-  parabolic-equation (Ch. 6) solvers of section 7, and the model-selection
-  guidance of Ch. 1 used by section 8.
 - ISO 18405:2017. *Underwater acoustics — Terminology*.
   [ISO page](https://www.iso.org/standard/62406.html).
   The standardized definitions (propagation loss, source level, sound
@@ -650,7 +506,5 @@ module.
 - Ship-traffic source level: MacGillivray & de Jong (2021),
   *J. Mar. Sci. Eng.* 9(4) 369 (CC-BY, JOMOPANS-ECHO), which also reproduces
   RANDI 3.1 and Wales & Heitmeyer (2002).
-- Numerical solvers: Jensen, Kuperman, Porter & Schmidt,
-  *Computational Ocean Acoustics* (2nd ed., Springer 2011), for normal modes
-  (Ch. 5), ray tracing (Ch. 3) and the split-step Fourier parabolic equation
-  (Ch. 6).
+- Numerical solvers (normal modes, ray tracing, parabolic equation):
+  covered in [Underwater propagation solvers](underwater-solvers.md).

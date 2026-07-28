@@ -125,7 +125,7 @@ tau13 = straight_transmission_coefficient(theta, chi, psi, "X")
 ```
 
 The clip below runs this experiment in the time domain with the library's 2D
-elastic FDTD solver: a bending packet on a 10 mm steel plate reaches an
+[elastic FDTD solver](elastic-waves.md): a bending packet on a 10 mm steel plate reaches an
 L-junction with an identical plate, and the corner splits it into the
 reflected and transmitted waves this section prices at `τ12(0°) = 0.5`. The
 fast in-plane precursor racing down the receiving plate is the mode

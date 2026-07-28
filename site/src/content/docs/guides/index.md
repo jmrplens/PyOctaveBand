@@ -1,6 +1,6 @@
 ---
 title: "Guides"
-description: "The 71 guides of phonometry, grouped into the nine areas the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
+description: "The 73 guides of phonometry, grouped into the nine areas the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
 head:
   - tag: script
     attrs:
@@ -89,8 +89,9 @@ makes, then runnable code and the figure it draws. Nothing here is a survey of
 the field; each page is the working documentation of a module, written so that
 a result can be defended clause by clause rather than trusted.
 
-This page is the map. Sixty-six guides sit in nine areas, and each area has its
-own overview page with the longer story of how its pieces fit together. If you
+This page is the map. Seventy-three guides sit in nine areas, and each area
+has its own overview page with the longer story of how its pieces fit
+together. If you
 are arriving without a specific question, read
 [Getting Started](/phonometry/getting-started/) first: it runs one signal
 through the whole processing chain and gives the vocabulary the rest of the
@@ -397,6 +398,9 @@ JOMOPANS-ECHO.
 - [Underwater sound propagation](/phonometry/guides/underwater-propagation/):
   spreading plus volume absorption, the speed of sound in sea water, the sonar
   equation, seabed reflection loss and the ambient-noise spectrum.
+- [Underwater propagation solvers](/phonometry/guides/underwater-solvers/):
+  the normal-mode, ray-tracing and parabolic-equation solvers of the
+  stratified waveguide, and how to choose a propagation model.
 
 ## [Sources and devices](/phonometry/guides/sections/sources-devices/)
 
@@ -426,11 +430,16 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 and EBU R 128.
 
 ## [Wave simulation](/phonometry/guides/sections/simulation/)
 
-A deterministic 2D finite-difference time-domain solver, validated against
-analytic oracles rather than a standard. It is the one area with no governing
-document, so its evidence is the closed-form solution it reproduces.
+Deterministic 2D finite-difference time-domain solvers, acoustic and elastic
+P-SV, validated against analytic oracles rather than a standard. It is the one
+area with no governing document, so its evidence is the closed-form solution it
+reproduces.
 
 - [2D FDTD wave simulation](/phonometry/guides/fdtd-simulation/): a staggered
   pressure-velocity grid with Gaussian, tone and arbitrary-signal sources,
   rasterised obstacles, rigid, impedance and absorbing boundaries, and a frozen
   result carrying probe histories and field snapshots.
+- [Elastic waves and fluid-solid coupling](/phonometry/guides/elastic-waves/):
+  the P-SV companion solver on the same grid, with Rayleigh waves on free
+  surfaces, mode conversion, Scholte interface waves and immersed-plate
+  transmission.

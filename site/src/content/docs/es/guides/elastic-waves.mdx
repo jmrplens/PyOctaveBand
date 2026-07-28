@@ -1,0 +1,449 @@
+---
+title: "Ondas elásticas y acoplamiento fluido-sólido"
+description: "El compañero elástico P-SV del solucionador FDTD acústico: el esquema velocidad-esfuerzo de Virieux (1986) sobre la misma malla escalonada, superficies libres por imagen de esfuerzos con ondas de Rayleigh, los fluidos como límite sin cizalla, y el acoplamiento fluido-sólido validado contra Brekhovskikh y Godin (1990): reflexión oblicua con conversión de modo, ondas de interfase de Scholte y transmisión de placas sumergidas con sus resonancias de espesor."
+references:
+  - type: article
+    authors: ["Virieux, J."]
+    year: 1986
+    title: "P-SV wave propagation in heterogeneous media: velocity-stress finite-difference method"
+    journal: "Geophysics"
+    volume: "51"
+    issue: "4"
+    pages: "889-901"
+    doi: "10.1190/1.1442147"
+    note: "El solucionador elástico de la sección 1: el sistema velocidad-esfuerzo (Ec. 2), la celda totalmente escalonada y su actualización (Fig. 1, Ec. 5), la cota de Courant solo con P (Ecs. 6-7), las relaciones de dispersión (Ecs. 13-14) y el líquido como límite sin cizalla."
+  - type: article
+    authors: ["Moczo, P.", "Kristek, J.", "Galis, M.", "Pazak, P.", "Balazovjech, M."]
+    year: 2007
+    title: "The finite-difference and finite-element modeling of seismic wave propagation and earthquake motion"
+    journal: "Acta Physica Slovaca"
+    volume: "57"
+    issue: "2"
+    pages: "177-406"
+    note: "Los parámetros efectivos de malla en medio heterogéneo de la sección 2 (módulo de cizalla armónico, densidad aritmética; Ecs. 7.37-7.39) y la superficie libre por imagen de esfuerzos de la sección 3 (Ec. 9.9)."
+  - type: book
+    authors: ["Cremer, L.", "Heckl, M.", "Petersson, B. A. T."]
+    year: 2005
+    title: "Structure-borne sound"
+    edition: "3.ª ed."
+    publisher: "Springer"
+    doi: "10.1007/b137728"
+    note: "Los oráculos analíticos del solucionador elástico: la ecuación característica exacta de Rayleigh (Ec. 3.149) y la dispersión de flexión de Kirchhoff con su corrección de espesor (Ecs. 3.83-3.89, 3.196b)."
+  - type: book
+    authors: ["Brekhovskikh, L. M.", "Godin, O. A."]
+    year: 1990
+    title: "Acoustics of layered media I: Plane and quasi-plane waves"
+    publisher: "Springer"
+    doi: "10.1007/978-3-642-52369-4"
+    note: "Los oráculos fluido-sólido de las secciones 4-7: el coeficiente de reflexión oblicua con conversión de modo (Ecs. 4.2.22-4.2.26) y sus límites en los ángulos críticos (Ecs. 4.2.27-4.2.31), la ecuación característica exacta de Scholte (Ecs. 4.4.18-4.4.20) con las asintóticas de fluido ligero (Ecs. 4.4.21-4.4.24), y la transmisión de capa de tres medios (Ecs. 2.4.10-2.4.19)."
+  - type: article
+    authors: ["van Vossen, R.", "Robertsson, J. O. A.", "Chapman, C. H."]
+    year: 2002
+    title: "Finite-difference modeling of wave propagation in a fluid-solid configuration"
+    journal: "Geophysics"
+    volume: "67"
+    issue: "2"
+    pages: "618-624"
+    doi: "10.1190/1.1468623"
+    note: "El benchmark fluido-sólido del mismo esquema escalonado: las medias armónica del módulo de cizalla y aritmética de la densidad (Ecs. 9-10) que satisfacen implícitamente las condiciones de interfase, la configuración de fondo blando del caso de Scholte de la sección 6 y la regla de >= 15 puntos por longitud de onda para el esquema O(2,2) con una onda de interfase."
+---
+
+import ThemeImage from '../../../../components/ThemeImage.astro';
+
+Un fluido transporta una onda; un sólido, una familia de ellas. Esta guía
+cubre el compañero elástico de la
+[simulación de ondas FDTD 2D](/phonometry/es/guides/fdtd-simulation/):
+`elastic_fdtd_simulation` integra el sistema velocidad-esfuerzo en
+deformación plana de Virieux (1986) sobre la misma malla escalonada que el
+solucionador acústico, y con él la **onda P** de compresión, la **onda S**
+de cizalla, la **onda de Rayleigh** de una superficie libre y la **onda de
+Scholte** de un contacto fluido-sólido emergen de la misma actualización.
+Como un fluido es simplemente el límite sin cizalla de las ecuaciones
+elásticas, un par de mapas de material acopla agua, aire, sedimento y acero
+en una sola ejecución: la reflexión oblicua con **conversión de modo**, las
+ondas de interfase del lecho marino y la transmisión de placas sumergidas
+salen de los mapas sin más, cada una anclada a su forma cerrada exacta por
+la batería de validación.
+
+La guía asume el vocabulario del solucionador acústico (fuentes, sondas,
+máscaras de obstáculos, esponjas y la cota de Courant); lea primero la
+[simulación de ondas FDTD 2D](/phonometry/es/guides/fdtd-simulation/) si
+todo ello le resulta nuevo. Las formas cerradas que este solucionador
+contrasta viven en las guías de edificación, de vibración y de acústica
+submarina: la ley de masas de la
+[predicción del aislamiento de paneles](/phonometry/es/guides/panel-sound-insulation/),
+las ondas de flexión de la
+[transmisión de onda de flexión en uniones de placas](/phonometry/es/guides/junction-transmission/),
+y el lecho marino con cizalla que el modelo de reflexión de fondo fluido de
+la [propagación submarina del sonido](/phonometry/es/guides/underwater-propagation/)
+no puede representar.
+
+## 1. El esquema velocidad-esfuerzo P-SV
+
+Un sólido transporta más de una onda. Junto a la **onda P** de compresión
+a $c_P = \sqrt{(\lambda + 2\mu)/\rho}$ se propaga una **onda S** de
+cizalla a $c_S = \sqrt{\mu/\rho}$, y toda superficie libre de tracción
+guía una **onda de Rayleigh** justo por debajo de $c_S$.
+`elastic_fdtd_simulation` integra el sistema velocidad-esfuerzo 2D en
+deformación plana de Virieux (1986, Ec. 2),
+
+$$
+\rho\,\frac{\partial \mathbf{v}}{\partial t}
+  = \nabla\!\cdot\!\boldsymbol{\tau},
+\qquad
+\frac{\partial \boldsymbol{\tau}}{\partial t}
+  = \lambda\,(\nabla\!\cdot\!\mathbf{v})\,\mathbf{I}
+  + \mu\left(\nabla\mathbf{v} + \nabla\mathbf{v}^{\mathsf T}\right),
+$$
+
+sobre la misma disposición escalonada que el solucionador acústico: los
+esfuerzos normales ``txx``/``tyy`` comparten los centros de celda donde
+vive la presión acústica, las velocidades ocupan las caras y el esfuerzo
+de cizalla ``txy`` las esquinas (la celda totalmente escalonada de
+Virieux, desplazada media celda). La API espeja `fdtd_simulation` pieza a
+pieza: mapas de velocidades `c_p` y `c_s` (más `rho`) en lugar de `c`,
+`ExplosionSource` (una inyección isótropa de esfuerzo) y `ForceSource`
+(una fuerza de cuerpo direccional) como fuentes, sondas que registran
+``p``, ``vx`` o ``vy``, la misma maquinaria de esponjas y obstáculos, y un
+`ElasticFDTDResult` congelado con el mismo `.plot()`. La cota de Courant
+depende solo de la ``c_P`` más rápida del mapa (Virieux, Ecs. 6-7),
+mientras que la regla de resolución usa la ``c_S`` no nula más lenta de
+las celdas sólidas, porque la longitud de onda S es siempre la más corta:
+``dx <= c_s_min / (10 f)`` (un mapa completamente fluido recae en la regla
+acústica sobre la ``c_P`` más lenta).
+
+```python
+import numpy as np
+from phonometry import simulation
+
+# Un bloque de aluminio golpeado por una pequeña explosión: el frente P
+# alcanza dos sondas a 100 y 220 celdas; c_P sale del retardo diferencial.
+w = 8e-6
+res = simulation.elastic_fdtd_simulation(
+    6320.0, 3130.0, 0.002, 1.1e-4, rho=2700.0, shape=(501, 501),
+    sources=[simulation.ExplosionSource(
+        ix=250, iy=250,
+        waveform=simulation.GaussianPulse(0, 0, width=w).value)],
+    probes=[(350, 250), (470, 250)], probe_fields=("p",),
+)
+t = res.times[1:]
+t1, t2 = (t[np.abs(res.signals[k, 0, 1:]).argmax()] for k in range(2))
+print(round(0.24 / (t2 - t1)))    # 6316  c_P = sqrt((lambda+2mu)/rho) = 6320
+```
+
+## 2. Fluidos dentro del solucionador elástico
+
+Poner ``c_s = 0`` marca una celda de **fluido**: el módulo de cizalla se
+anula, el sistema degenera en las ecuaciones acústicas y, con un mapa
+uniforme de ``c_s = 0``, el solucionador elástico reproduce el acústico
+**bit a bit** (la batería de regresión afirma la igualdad exacta). Una
+columna de agua sobre un semiespacio de acero son, por tanto, solo dos
+bandas de los mapas de material: con la densidad promediada
+aritméticamente a las caras y el módulo de cizalla armónicamente a las
+esquinas (Moczo et al. 2007, Ecs. 7.37-7.39), la continuidad de tracción
+de toda interfase interna, contactos fluido-sólido incluidos, emerge de los
+mapas sin más. La batería de validación mide la reflexión a incidencia
+normal de una interfase agua-acero con un error inferior al 2 %
+(típicamente una fracción de punto porcentual) respecto a
+``(Z2 - Z1)/(Z2 + Z1)`` y recupera la ley de masas a incidencia normal de
+una chapa de acero de 3 mm sumergida con un error inferior a 0,3 dB
+respecto a `mass_law_transmission_loss`.
+
+## 3. Superficies libres y ondas de Rayleigh
+
+Un lado declarado ``"free"`` se convierte en superficie libre de tracción
+mediante la **imagen de esfuerzos** (Moczo et al., Ec. 9.9): el esfuerzo
+normal se fija a cero en el plano de la superficie y el esfuerzo de
+cizalla por encima es su imagen antisimétrica. Esa única condición de
+contorno es la que hace a las superficies portadoras de ondas: golpee
+verticalmente la superficie libre de un bloque de aluminio (el problema de
+Lamb) y, además de los frentes de cuerpo P y S, una **onda de Rayleigh**
+rueda por la superficie a $c_R \approx 0.93\,c_S$, la raíz de la ecuación
+característica exacta de Rayleigh (Cremer, Heckl y Petersson, Ec. 3.149).
+Los tests fijan la velocidad de Rayleigh medida a esa raíz dentro del 2 %
+y la onda de flexión de una franja delgada libre-libre a la dispersión de
+placa de Kirchhoff $c_B \propto \sqrt{\omega}$ en su dominio de placa
+delgada. Las superficies libres siguen la regla de muestreo de Rayleigh:
+reserve 15-20 celdas por longitud de onda ahí, pues la superficie de
+imagen de segundo orden es la parte más dispersiva del esquema.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/elastic_halfspace_waves_es.webp" alt="Instantánea de la velocidad de partícula vertical en un bloque de aluminio de 0,6 por 0,3 metros unas centésimas de milisegundo después de un golpe vertical sobre su superficie libre superior: el frente P de compresión es el arco exterior, el frente S de cizalla el arco interior a aproximadamente la mitad de su radio, y los lóbulos más intensos se pegan a la superficie justo detrás del frente S, etiquetados como la onda de Rayleigh; arcos punteados marcan los radios exactos de P y S" width="96%" loading="eager" />
+
+*Una instantánea, tres velocidades: el frente P ha recorrido el doble de
+distancia que el frente S (arcos punteados en los radios exactos $c_P t$ y
+$c_S t$), y el movimiento más intenso viaja a lo largo de la superficie
+libre como la onda de Rayleigh, un pelo más lenta que S.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import simulation
+
+# Un bloque de aluminio de 0,6 x 0,3 m, golpeado en su superficie libre.
+dx, w = 0.001, 8e-6
+dt = 0.6 * dx / (6320.0 * np.sqrt(2.0))
+steps = round(7.3e-5 / dt)
+res = simulation.elastic_fdtd_simulation(
+    6320.0, 3130.0, dx, 7.3e-5, rho=2700.0, shape=(300, 600),
+    sources=[simulation.ForceSource(
+        ix=300, iy=0, direction="y", amplitude=1e6,
+        waveform=simulation.GaussianPulse(0, 0, width=w).value)],
+    boundaries={"top": "free"},
+    snapshot_every=steps, snapshot_field="vy",
+)
+res.plot(kind="snapshot", language="es")
+plt.show()
+```
+
+</details>
+
+Esa onda de flexión merece verse en movimiento: la
+[guía de transmisión de onda de flexión](/phonometry/es/guides/junction-transmission/)
+incrusta una animación de este solucionador lanzando un paquete de flexión
+de 4 kHz por una placa de acero de 10 mm hasta una unión en L, donde la
+esquina lo divide en las ondas reflejada y transmitida que la forma cerrada
+tasa en `tau12(0 grados) = 0,5`, más el rápido precursor de onda en el plano que
+el modelo de unión articulada deja fuera a propósito.
+
+## 4. Acoplamiento fluido-sólido a incidencia normal
+
+Como el fluido es simplemente el límite ``c_s = 0`` del esquema elástico,
+un contacto agua-acero es **un solo solver con dos bandas en los mapas de
+material**, y toda la física del acoplamiento fluido-sólido emerge de la
+misma actualización. Las constantes `Material` y
+`ElasticFDTD2D.from_regions` construyen esos mapas por capas sin cirugía
+manual de arrays: un material de fondo y una lista de regiones pintadas.
+
+```python
+import numpy as np
+from phonometry.simulation import ElasticFDTD2D, STEEL, WATER
+
+# Una columna de agua de 12 m sobre un semiespacio de acero, como tira 1D.
+dx = 0.005
+sim = ElasticFDTD2D.from_regions(
+    (2400, 3), dx, background=WATER, regions=[(np.s_[1200:, :], STEEL)])
+y = (np.arange(2400) + 0.5) * dx
+p0 = np.exp(-(((y - 3.0) / 0.15) ** 2))[:, None]     # pulso plano
+sim.txx[:] = -p0
+sim.tyy[:] = -p0
+y_face = np.arange(1, 2400) * dx + 0.5 * WATER.c_p * sim.dt
+sim.vy += (np.exp(-(((y_face - 3.0) / 0.15) ** 2))
+           / (WATER.rho * WATER.c_p))[:, None]       # unidireccional, consistente con el leapfrog
+trace = []
+for _ in range(round(3.4e-3 / sim.dt)):
+    sim.step()
+    trace.append(sim.p[900, 1])
+trace = np.asarray(trace)
+t = (np.arange(trace.size) + 1) * sim.dt
+incident = trace[t < 1.8e-3].max()
+echo = trace[t > 2.6e-3]
+print(round(float(echo[np.abs(echo).argmax()] / incident), 3))   # 0.938
+# (Z2 - Z1)/(Z2 + Z1) = 0.938: a incidencia normal no se excita cizalla
+# y el acero se comporta como un líquido de su rho y c_P (B&G Ec. 4.2.27)
+```
+
+## 5. Incidencia oblicua: conversión de modo
+
+Fuera de la incidencia normal el sólido deja de ser un líquido. El sonido
+incidente se refracta en **dos** ondas transmitidas, P y SV (**conversión
+de modo**), cada una con su propio ángulo crítico: para agua sobre acero,
+14,5° (P) y 27,5° (S). Entre ambos la P transmitida es evanescente y la
+onda de cizalla se lleva la potencia transmitida, así que la reflexión baja
+a |V| = 0,918 a 20° en vez de reflejar totalmente como haría un fondo
+fluido con el mismo ``c_P``; más allá del ángulo crítico S la reflexión es
+total, |V| = 1 con fase. La batería de validación lanza haces con portadora
+oblicuos a 10° y 20° y reproduce el coeficiente de reflexión exacto de
+Brekhovskikh y Godin (Ecs. 4.2.22-4.2.26) dentro de una fracción de punto
+porcentual, conversión de modo incluida. Esta es exactamente la física de
+cizalla que el `reflection_coefficient` de fondo fluido del
+[módulo submarino](/phonometry/es/guides/underwater-propagation/) no puede
+representar, y la razón por la que un lecho marino con cizalla pierde más
+energía que su modelo de fluido equivalente.
+
+## 6. La onda de interfase de Scholte
+
+La reflexión total más allá del ángulo crítico S deja ambos medios con
+campos solo evanescentes, y esos campos pueden acoplarse en una verdadera
+onda de interfase: la **onda de Scholte**, el análogo fluido-sólido de la
+onda de Rayleigh. Viaja más despacio que la velocidad del sonido en el
+fluido y que la de cizalla del sólido, no tiene corte en baja frecuencia y
+no es dispersiva sobre semiespacios homogéneos; `scholte_speed` resuelve
+su ecuación característica exacta (B&G Ec. 4.4.20).
+
+```python
+from phonometry.simulation import Material, STEEL, WATER, scholte_speed
+
+print(round(scholte_speed(WATER, STEEL), 1))       # 1479.6, un 0,03 % por debajo de la del agua
+seabed = Material(c_p=3500.0, c_s=2000.0, rho=2500.0)
+print(round(scholte_speed(Material(1500.0, 0.0, 1000.0), seabed), 1))  # 1436.0
+```
+
+Esos dos números cuentan toda la historia. Sobre un lecho **rígido**
+(acero) la onda de Scholte se pega a la velocidad del agua (1480 m/s)
+hasta un 0,03 % y su cola evanescente alcanza ~7 longitudes de onda dentro
+del agua: es en esencia una onda de agua rasante y no puede separarse por
+tiempo de vuelo en ningún dominio razonable (sobre contactos aire-sólido
+el déficit se desploma a ~10⁻¹² de ``c`` y la onda es directamente
+inobservable). Sobre un sedimento **blando** la velocidad cae muy por
+debajo de la del agua y la onda se comprime a media longitud de onda del
+contacto, y por eso las ondas de interfase medidas en el lecho marino son
+una sonda estándar de la velocidad de cizalla del sedimento. La
+instantánea de abajo ejecuta ese caso blando: una explosión justo sobre el
+fondo, y el rasgo tardío más intenso es el tren de Scholte pegado a la
+interfase, cronometrado por la batería de tests a 1436 m/s dentro del 2 %
+entre dos sondas en el contacto.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/scholte_interface_wave_es.webp" alt="Instantánea de la velocidad de partícula vertical en un dominio de 500 por 200 metros de agua sobre un semiespacio de sedimento blando, 0,2 segundos después de una explosión 10 metros por encima del contacto: el frente directo del agua se arquea hacia arriba y a la derecha, frentes oblicuos radian hacia el sedimento, y los lóbulos más intensos forman un tren compacto pegado a la línea punteada de la interfase, etiquetado como la onda de Scholte, evanescente a ambos lados" width="96%" />
+
+*Los medios del benchmark de van Vossen (agua sobre un sedimento
+3500/2000/2500): el tren de Scholte repta por el contacto a 1436 m/s,
+evanescente hacia ambos medios, mientras la onda directa del agua corre por
+delante a 1500 m/s.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import simulation
+
+# Agua sobre un lecho blando; Ricker explosivo de 50 Hz a 10 m del contacto.
+ny, nx, dx = 200, 500, 1.0
+c_p = np.full((ny, nx), 1500.0)
+c_s = np.zeros((ny, nx))
+rho = np.full((ny, nx), 1000.0)
+c_p[100:], c_s[100:], rho[100:] = 3500.0, 2000.0, 2500.0
+f0, t0 = 50.0, 0.030
+dt = 0.6 * dx / (3500.0 * np.sqrt(2.0))
+steps = round(0.232 / dt)
+
+def ricker(t):
+    a = (np.pi * f0 * (t - t0)) ** 2
+    return (1.0 - 2.0 * a) * np.exp(-a)
+
+res = simulation.elastic_fdtd_simulation(
+    c_p, c_s, dx, 0.232, rho=rho,
+    sources=[simulation.ExplosionSource(ix=60, iy=89, waveform=ricker,
+                                        amplitude=1e3)],
+    boundaries="absorbing", absorbing_layer_cells=20,
+    snapshot_every=steps, snapshot_field="vy",
+)
+res.plot(kind="snapshot", language="es")
+plt.show()
+```
+
+</details>
+
+## 7. Placas sumergidas y la ley de masas
+
+Una **placa sumergida** cierra el lazo con el módulo de acústica de la
+edificación. A incidencia normal no se excita cizalla, así que una placa
+elástica en agua es exactamente la capa fluida de tres medios de B&G §2.4:
+su transmisión sigue la forma cerrada de la Ec. 2.4.14, que se reduce a la
+conocida ley de masas para placas delgadas y bajas frecuencias y predice
+**transmisión total** en las resonancias de espesor de media onda
+``f_n = n c_P / (2 h)`` (Ec. 2.4.19). Para una placa de acero de 10 mm esa
+primera resonancia cae en 295 kHz, y una sola ejecución FDTD de banda ancha
+reproduce toda la curva: 5,8 dB a 10 kHz (donde
+`mass_law_transmission_loss` con agua como fluido ambiente coincide con la
+forma exacta hasta 0,02 dB), 18,1 dB a 50 kHz, y un mínimo de pérdida de
+transmisión dentro del 0,1 % de la resonancia de 295 kHz. La misma batería
+somete a esfuerzo el contraste extremo de un contacto aire-acero (razón de
+impedancias ~10⁵:1): estable durante 10 000 pasos con la amplitud
+reflejada conservada al 0,5 %.
+
+A incidencia oblicua la física de la placa se enriquece, y la
+[guía de predicción del aislamiento de paneles](/phonometry/es/guides/panel-sound-insulation/)
+incrusta la animación: este solucionador excitando la misma placa de acero
+de 10 mm, tendida en aire, con una onda plana sostenida a 45° por debajo y
+por encima de su frecuencia de coincidencia, donde la onda de flexión con
+la traza adaptada re-radia un haz creciente y mantiene el nivel transmitido
+en el punto donde la ley de masas exige 12 dB más de bloqueo.
+
+## Qué cubre esta guía
+
+**Cubierto.** El compañero elástico P-SV del solucionador FDTD acústico: el
+esquema velocidad-esfuerzo de Virieux (1986) con los parámetros efectivos y
+la superficie libre por imagen de esfuerzos de Moczo et al. (2007),
+expuesto a través de `elastic_fdtd_simulation`/`ElasticFDTD2D` con
+`ExplosionSource` y `ForceSource`, validado contra las velocidades de las
+ondas de cuerpo, la raíz exacta de Rayleigh, la dispersión de flexión de
+Kirchhoff y el límite acústico bit a bit. El acoplamiento fluido-sólido de
+las secciones 4-7, con las constantes `Material`,
+`ElasticFDTD2D.from_regions` y `scholte_speed`: la reflexión oblicua con
+conversión de modo contra Brekhovskikh y Godin (Ecs. 4.2.22-4.2.26) en
+ángulos subcríticos y entre críticos, la velocidad de la onda de Scholte
+contra la ecuación característica exacta (Ec. 4.4.20) y por tiempo de vuelo
+en el benchmark de fondo blando de van Vossen (2002), la transmisión de la
+placa sumergida con su primera resonancia de espesor contra la forma
+cerrada de tres medios (Ecs. 2.4.14-2.4.19), la ley de masas del panel
+sumergido y el test de esfuerzo de contraste extremo aire-acero.
+
+**No cubierto.** Todo lo que el solucionador acústico 2D no puede hacer,
+este tampoco: el dominio es una sección transversal (propagación cilíndrica
+`1/sqrt(r)`, no `1/r`), así que los niveles absolutos y las tasas de
+decaimiento no son los de un problema 3D. El sólido es isótropo y puramente
+elástico: sin anisotropía ni amortiguamiento viscoelástico más allá de la
+tasa de decaimiento volumétrica, así que los factores de pérdidas del
+material no se modelan. No hay capa perfectamente adaptada elástica: la
+esponja absorbe las ondas de Rayleigh rasantes peor que las ondas de
+cuerpo. La dispersión de ondas guiadas más allá del régimen de placa
+delgada de Kirchhoff (modos de Lamb completos) es observable en los campos
+pero no tiene aquí oráculo dedicado en forma cerrada.
+
+## Véase también
+
+- [Simulación de ondas FDTD 2D](/phonometry/es/guides/fdtd-simulation/): el
+  solucionador acústico que esta guía extiende, con la malla escalonada, la
+  cota de Courant y la maquinaria de fuentes, sondas y contornos que ambos
+  comparten.
+- [Predicción del aislamiento de paneles](/phonometry/es/guides/panel-sound-insulation/):
+  las formas cerradas de la ley de masas y la coincidencia; la ejecución de
+  la placa sumergida del §7 es su contraste de onda completa.
+- [Transmisión de onda de flexión en uniones de placas](/phonometry/es/guides/junction-transmission/):
+  las formas cerradas de ondas de flexión del modelo de edificación; la
+  dispersión de Kirchhoff validada en el §3 es la onda que transportan.
+- [Propagación submarina del sonido](/phonometry/es/guides/underwater-propagation/):
+  el modelo de reflexión de Rayleigh de fondo fluido cuya física de cizalla
+  ausente cuantifica el §5.
+- Referencia de la API: [`simulation.elastic-fdtd`](/phonometry/es/reference/api/simulation/elastic-fdtd/).
+
+## Respuestas rápidas
+
+### ¿Cuándo necesito el solucionador elástico en lugar del acústico?
+
+Siempre que alguna parte del dominio soporte cizalla: la conversión de modo
+a incidencia oblicua, las ondas de Rayleigh en superficies libres, las
+ondas de Scholte en contactos fluido-sólido y la transmisión de placas
+necesitan las ecuaciones elásticas. Si todas las celdas son fluidas, use el
+solucionador acústico: con un mapa uniforme de ``c_s = 0`` el elástico lo
+reproduce bit a bit, a aproximadamente el doble de coste en memoria y en
+avance temporal.
+
+### ¿Qué resolución de malla necesita una simulación elástica?
+
+Resuelva al menos 10 celdas por longitud de onda más corta con la velocidad
+de cizalla no nula más lenta, ``dx <= c_s_min / (10 f)``, porque la
+longitud de onda S es siempre la más corta. Reserve 15-20 celdas por
+longitud de onda a lo largo de superficies libres (el contorno de imagen de
+esfuerzos es la parte más dispersiva del esquema), y al menos 15 puntos por
+longitud de onda cuando haya que cronometrar una onda de interfase
+(van Vossen et al. 2002).
+
+### ¿Qué es una onda de Scholte y a qué velocidad viaja?
+
+La onda de Scholte es la verdadera onda de interfase de un contacto
+fluido-sólido: evanescente hacia ambos medios, con movimiento elíptico de
+partícula, sin corte en baja frecuencia y no dispersiva sobre semiespacios
+homogéneos. Su velocidad resuelve la ecuación característica exacta
+(Brekhovskikh y Godin, Ec. 4.4.20, `scholte_speed`) y siempre queda por
+debajo de la velocidad del sonido en el fluido y de la de cizalla del
+sólido: un 0,03 % por debajo de la del agua (1480 m/s) sobre acero
+(1479,6 m/s), pero
+un 4 % por debajo sobre un sedimento blando (1436 m/s para agua sobre un
+lecho 3500/2000/2500), y por eso las ondas de interfase del lecho marino
+sondean la rigidez a cizalla del sedimento.

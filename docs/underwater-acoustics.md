@@ -205,4 +205,5 @@ ISO 18406:2017, *Underwater acoustics — Measurement of radiated underwater sou
 from percussive pile driving*: the single-strike (Formulae 3–4), peak and
 cumulative (Formulae 8–9) sound exposure. All quantities are verified against
 exact analytic oracles. General underwater propagation modelling (ray, normal
-mode, parabolic equation) is out of scope here.
+mode, parabolic equation) is out of scope here: see
+[Underwater propagation solvers](underwater-solvers.md).

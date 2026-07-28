@@ -3,7 +3,7 @@ title: "Theory"
 description: "Standards, math and design decisions behind phonometry."
 ---
 
-The theory reference explains the standards, the mathematics and the design decisions behind every phonometry module. It is split into six domain pages, listed below with the sections each one hosts. Theory for the underwater modules lives with its guides: [Underwater Acoustics](/phonometry/guides/underwater-acoustics/) and [Underwater Propagation](/phonometry/guides/underwater-propagation/).
+The theory reference explains the standards, the mathematics and the design decisions behind every phonometry module. It is split into six domain pages, listed below with the sections each one hosts. Theory for the underwater modules lives with its guides: [Underwater Acoustics](/phonometry/guides/underwater-acoustics/), [Underwater Propagation](/phonometry/guides/underwater-propagation/) and [Underwater Propagation Solvers](/phonometry/guides/underwater-solvers/).
 
 ## [Signal Analysis](/phonometry/reference/theory/signal-analysis/)
 

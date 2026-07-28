@@ -526,8 +526,9 @@ list grows as guides gain their References sections.
   Cited by [Mechanical mobility and the FRF family](/phonometry/guides/mechanical-mobility/),
   [Transfer stiffness of resilient elements](/phonometry/guides/transfer-stiffness/),
   [Sound power from surface vibration](/phonometry/guides/vibration-sound-power/),
-  [Structure-borne sound power of equipment](/phonometry/guides/structure-borne-power/)
-  and [Installed structure-borne sound](/phonometry/guides/installed-structure-borne/).
+  [Structure-borne sound power of equipment](/phonometry/guides/structure-borne-power/),
+  [Installed structure-borne sound](/phonometry/guides/installed-structure-borne/)
+  and [Elastic waves and fluid-solid coupling](/phonometry/guides/elastic-waves/).
 - Cremer, L., Heckl, M., & Ungar, E. E. (1973). *Structure-borne sound:
   Structural vibrations and sound radiation at audio frequencies* (1st ed.).
   Springer. ISBN 978-3-540-06002-4.
@@ -777,7 +778,13 @@ list grows as guides gain their References sections.
   [doi:10.1007/978-1-4419-8678-8](https://doi.org/10.1007/978-1-4419-8678-8).
   The reference monograph on numerical propagation: normal modes, ray
   tracing and the parabolic equation.
-  Cited by [Underwater sound propagation](/phonometry/guides/underwater-propagation/).
+  Cited by [Underwater propagation solvers](/phonometry/guides/underwater-solvers/).
+- Munk, W. H. (1974). Sound channel in an exponentially stratified ocean,
+  with application to SOFAR. *The Journal of the Acoustical Society of
+  America*, 55(2), 220-226.
+  [doi:10.1121/1.1914492](https://doi.org/10.1121/1.1914492).
+  The canonical deep-water sound-speed profile used by the solver examples.
+  Cited by [Underwater propagation solvers](/phonometry/guides/underwater-solvers/).
 - Francois, R. E., & Garrison, G. R. (1982). Sound absorption based on ocean
   measurements: Part I: Pure water and magnesium sulfate contributions.
   *The Journal of the Acoustical Society of America*, 72(3), 896-907.
@@ -860,6 +867,44 @@ list grows as guides gain their References sections.
   [doi:10.1121/1.1427355](https://doi.org/10.1121/1.1427355).
   The ensemble merchant-ship source-spectrum model.
   Cited by [Underwater sound propagation](/phonometry/guides/underwater-propagation/).
+
+## Wave simulation
+
+- Williams, E. G. (1999). *Fourier acoustics: Sound radiation and nearfield
+  acoustical holography*. Academic Press.
+  [doi:10.1016/B978-0-12-753960-7.X5000-1](https://doi.org/10.1016/B978-0-12-753960-7.X5000-1).
+  The Helmholtz integral equation behind the near-to-far-field
+  transformation, with the outgoing free-space Green function and the
+  far-field limit.
+  Cited by [2D FDTD wave simulation](/phonometry/guides/fdtd-simulation/).
+- Virieux, J. (1986). P-SV wave propagation in heterogeneous media:
+  velocity-stress finite-difference method. *Geophysics*, 51(4), 889-901.
+  [doi:10.1190/1.1442147](https://doi.org/10.1190/1.1442147).
+  The elastic velocity-stress scheme on the fully staggered cell, its
+  Courant bound and dispersion relations, and the liquid as the shear-free
+  limit.
+  Cited by [Elastic waves and fluid-solid coupling](/phonometry/guides/elastic-waves/).
+- Moczo, P., Kristek, J., Galis, M., Pazak, P., & Balazovjech, M. (2007).
+  The finite-difference and finite-element modeling of seismic wave
+  propagation and earthquake motion. *Acta Physica Slovaca*, 57(2), 177-406.
+  The heterogeneous effective grid parameters (harmonic shear modulus,
+  arithmetic density) and the stress-imaging free surface.
+  Cited by [Elastic waves and fluid-solid coupling](/phonometry/guides/elastic-waves/).
+- Brekhovskikh, L. M., & Godin, O. A. (1990). *Acoustics of layered media I:
+  Plane and quasi-plane waves*. Springer.
+  [doi:10.1007/978-3-642-52369-4](https://doi.org/10.1007/978-3-642-52369-4).
+  The fluid-solid oracles: the oblique reflection coefficient with mode
+  conversion, the exact Scholte characteristic equation and the three-media
+  layer transmission.
+  Cited by [Elastic waves and fluid-solid coupling](/phonometry/guides/elastic-waves/).
+- van Vossen, R., Robertsson, J. O. A., & Chapman, C. H. (2002).
+  Finite-difference modeling of wave propagation in a fluid-solid
+  configuration. *Geophysics*, 67(2), 618-624.
+  [doi:10.1190/1.1468623](https://doi.org/10.1190/1.1468623).
+  The fluid-solid benchmark of the staggered scheme: the effective-parameter
+  averages, the soft-bed Scholte configuration and the points-per-wavelength
+  rule for interface waves.
+  Cited by [Elastic waves and fluid-solid coupling](/phonometry/guides/elastic-waves/).
 
 ## Speech
 

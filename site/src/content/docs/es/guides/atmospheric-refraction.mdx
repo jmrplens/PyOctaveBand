@@ -30,7 +30,7 @@ con la altura, porque la temperatura y el viento cambian con la altura, y esto
 nivel recibido puede variar en decenas de decibelios. Esta página cubre
 `phonometry.environmental.atmospheric_refraction`, el homólogo para atmósfera
 refractante de los solvers oceánicos de
-[`phonometry.underwater.numerical_propagation`](/phonometry/es/guides/underwater-propagation/):
+[`phonometry.underwater.numerical_propagation`](/phonometry/es/guides/underwater-solvers/):
 un **modelo de rayos** y un solver de **ecuación parabólica (PE)**.
 
 Que la refracción importe es, sobre todo, cuestión de distancia. Un gradiente
@@ -186,7 +186,7 @@ límite, y la marcha en distancia sobre una malla distancia-altura.
 `atmospheric_parabolic_equation` implementa la **PE de la función de Green**
 (GFPE, Salomons apéndice H), el miembro atmosférico de la misma familia
 split-step de Fourier que la
-[`parabolic_equation`](/phonometry/es/guides/underwater-propagation/) oceánica.
+[`parabolic_equation`](/phonometry/es/guides/underwater-solvers/) oceánica.
 Cada paso en distancia transforma el campo al dominio del número de onda
 vertical, aplica el propagador de espacio libre junto con la reflexión del suelo
 de impedancia finita `R(kz) = (kz Z − k0)/(kz Z + k0)` (Salomons Ec. H.28),

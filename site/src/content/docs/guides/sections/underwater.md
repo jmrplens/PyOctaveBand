@@ -19,19 +19,22 @@ level of ISO 17208-2 via the Lloyd's-mirror surface correction, and
 percussive pile driving, with the single-strike, peak and cumulative sound
 exposure of ISO 18406.
 
-The **path** half, in
-[Underwater sound propagation](/phonometry/guides/underwater-propagation/),
-predicts what the sea does to that sound. It layers up from closed forms to
-full numerics: geometrical spreading plus volume absorption
-(Francois-Garrison, Ainslie-McColm or Thorp), the speed of sound in sea water
-by three formulations, the passive and active sonar equation, Rayleigh seabed
-reflection loss, the Wenz ambient-noise spectrum with JOMOPANS-ECHO ship
-traffic, and the normal-mode, ray-tracing and parabolic-equation numerical
-solvers for range-dependent problems.
+The **path** half now spans two pages.
+[Underwater sound propagation](/phonometry/guides/underwater-propagation/)
+predicts what the sea does to that sound in closed form: geometrical
+spreading plus volume absorption (Francois-Garrison, Ainslie-McColm or
+Thorp), the speed of sound in sea water by three formulations, the passive
+and active sonar equation, Rayleigh seabed reflection loss, and the Wenz
+ambient-noise spectrum with JOMOPANS-ECHO ship traffic. When refraction and
+boundaries decide the answer,
+[Underwater propagation solvers](/phonometry/guides/underwater-solvers/)
+computes the field instead: the normal-mode expansion, ray tracing and the
+split-step Fourier parabolic equation, with the guidance for choosing
+between them and the closed forms.
 
 Read the pages in that order: the reference levels come first because every
 propagation result is expressed in them. Unusually for this site, the theory
-for both pages lives inline with the guides rather than in the theory
+for these pages lives inline with the guides rather than in the theory
 reference.
 
 ## Pages in this section
@@ -40,5 +43,9 @@ reference.
   ISO 18405 reference levels, ISO 17208 ship radiated noise and monopole
   source level, and ISO 18406 pile-driving sound exposure.
 - [Underwater sound propagation](/phonometry/guides/underwater-propagation/):
-  transmission loss, sound speed, the sonar equation, seabed reflection,
-  ocean ambient noise and the numerical propagation solvers.
+  transmission loss, sound speed, the sonar equation, seabed reflection and
+  ocean ambient noise, in closed form.
+- [Underwater propagation solvers](/phonometry/guides/underwater-solvers/):
+  the normal-mode, ray-tracing and parabolic-equation solvers of the
+  stratified waveguide, each validated against an exact closed form, and
+  how to choose a propagation model.

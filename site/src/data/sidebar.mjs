@@ -277,6 +277,7 @@ export const sidebar = [
       { slug: 'guides/sections/underwater', label: 'Overview', translations: { es: 'Resumen' } },
       'guides/underwater-acoustics',
       'guides/underwater-propagation',
+      'guides/underwater-solvers',
     ],
   },
   {
@@ -300,6 +301,7 @@ export const sidebar = [
     items: [
       { slug: 'guides/sections/simulation', label: 'Overview', translations: { es: 'Resumen' } },
       'guides/fdtd-simulation',
+      'guides/elastic-waves',
     ],
   },
   {

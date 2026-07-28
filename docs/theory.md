@@ -2,7 +2,7 @@
 
 # Theoretical Background
 
-The theory reference explains the standards, the mathematics and the design decisions behind every phonometry module. It is split into six domain pages, listed below with the sections each one hosts. Theory for the underwater modules lives with its guides: [Underwater Acoustics](underwater-acoustics.md) and [Underwater Propagation](underwater-propagation.md).
+The theory reference explains the standards, the mathematics and the design decisions behind every phonometry module. It is split into six domain pages, listed below with the sections each one hosts. Theory for the underwater modules lives with its guides: [Underwater Acoustics](underwater-acoustics.md), [Underwater Propagation](underwater-propagation.md) and [Underwater Propagation Solvers](underwater-solvers.md).
 
 ## [Signal Analysis](theory-signal-analysis.md)
 

@@ -628,8 +628,9 @@ it; the list grows as guides gain their References sections.
   Cited by [Mechanical mobility and the FRF family](mechanical-mobility.md),
   [Dynamic transfer stiffness of resilient elements](transfer-stiffness.md),
   [Sound power from surface vibration](vibration-sound-power.md),
-  [Structure-borne sound power of building equipment](structure-borne-power.md)
-  and [Installed structure-borne sound from equipment](installed-structure-borne.md).
+  [Structure-borne sound power of building equipment](structure-borne-power.md),
+  [Installed structure-borne sound from equipment](installed-structure-borne.md)
+  and [Elastic waves and fluid-solid coupling](elastic-waves.md).
 - Cremer, L., Heckl, M., & Ungar, E. E. (1973). *Structure-borne sound:
   Structural vibrations and sound radiation at audio frequencies* (1st ed.).
   Springer. ISBN 978-3-540-06002-4.
@@ -699,13 +700,11 @@ it; the list grows as guides gain their References sections.
   (2nd ed.). CRC Press.
   [doi:10.1201/9780429470806](https://doi.org/10.1201/9780429470806).
   Ground impedance models, the spherical-wave reflection coefficient behind
-  the ground dip, and meteorological effects on barriers.
-  Cited by [Outdoor Sound Propagation](outdoor-propagation.md),
-  [Spherical ground effect and advanced barriers](ground-barriers.md) and
-  [Porous and Multilayer Absorbers](porous-absorbers.md).
   the ground dip, meteorological effects on barriers, and the chapter 4
   pressure-velocity FDTD reference model.
-  Cited by [Outdoor Sound Propagation](outdoor-propagation.md) and
+  Cited by [Outdoor Sound Propagation](outdoor-propagation.md),
+  [Spherical ground effect and advanced barriers](ground-barriers.md),
+  [Porous and Multilayer Absorbers](porous-absorbers.md) and
   [2D FDTD wave simulation](fdtd-simulation.md).
 - Maekawa, Z. (1968). Noise reduction by screens. *Applied Acoustics*, 1(3),
   157-173.
@@ -902,7 +901,13 @@ it; the list grows as guides gain their References sections.
   [doi:10.1007/978-1-4419-8678-8](https://doi.org/10.1007/978-1-4419-8678-8).
   The reference monograph on numerical propagation: normal modes, ray
   tracing and the parabolic equation.
-  Cited by [Underwater sound propagation](underwater-propagation.md).
+  Cited by [Underwater propagation solvers](underwater-solvers.md).
+- Munk, W. H. (1974). Sound channel in an exponentially stratified ocean,
+  with application to SOFAR. *The Journal of the Acoustical Society of
+  America*, 55(2), 220-226.
+  [doi:10.1121/1.1914492](https://doi.org/10.1121/1.1914492).
+  The canonical deep-water sound-speed profile used by the solver examples.
+  Cited by [Underwater propagation solvers](underwater-solvers.md).
 - Francois, R. E., & Garrison, G. R. (1982). Sound absorption based on ocean
   measurements: Part I: Pure water and magnesium sulfate contributions.
   *The Journal of the Acoustical Society of America*, 72(3), 896-907.
@@ -985,6 +990,44 @@ it; the list grows as guides gain their References sections.
   [doi:10.1121/1.1427355](https://doi.org/10.1121/1.1427355).
   The ensemble merchant-ship source-spectrum model.
   Cited by [Underwater sound propagation](underwater-propagation.md).
+
+## Wave simulation
+
+- Williams, E. G. (1999). *Fourier acoustics: Sound radiation and
+  nearfield acoustical holography*. Academic Press.
+  [doi:10.1016/B978-0-12-753960-7.X5000-1](https://doi.org/10.1016/B978-0-12-753960-7.X5000-1).
+  The Helmholtz integral equation behind the near-to-far-field
+  transformation, with the outgoing free-space Green function and the
+  far-field limit.
+  Cited by [2D FDTD wave simulation](fdtd-simulation.md).
+- Virieux, J. (1986). P-SV wave propagation in heterogeneous media:
+  velocity-stress finite-difference method. *Geophysics*, 51(4), 889-901.
+  [doi:10.1190/1.1442147](https://doi.org/10.1190/1.1442147).
+  The elastic velocity-stress scheme on the fully staggered cell, its
+  Courant bound and dispersion relations, and the liquid as the shear-free
+  limit.
+  Cited by [Elastic waves and fluid-solid coupling](elastic-waves.md).
+- Moczo, P., Kristek, J., Galis, M., Pazak, P., & Balazovjech, M. (2007).
+  The finite-difference and finite-element modeling of seismic wave
+  propagation and earthquake motion. *Acta Physica Slovaca*, 57(2),
+  177-406. The heterogeneous effective grid parameters (harmonic shear
+  modulus, arithmetic density) and the stress-imaging free surface.
+  Cited by [Elastic waves and fluid-solid coupling](elastic-waves.md).
+- Brekhovskikh, L. M., & Godin, O. A. (1990). *Acoustics of layered media
+  I: Plane and quasi-plane waves*. Springer.
+  [doi:10.1007/978-3-642-52369-4](https://doi.org/10.1007/978-3-642-52369-4).
+  The fluid-solid oracles: the oblique reflection coefficient with mode
+  conversion, the exact Scholte characteristic equation and the three-media
+  layer transmission.
+  Cited by [Elastic waves and fluid-solid coupling](elastic-waves.md).
+- van Vossen, R., Robertsson, J. O. A., & Chapman, C. H. (2002).
+  Finite-difference modeling of wave propagation in a fluid-solid
+  configuration. *Geophysics*, 67(2), 618-624.
+  [doi:10.1190/1.1468623](https://doi.org/10.1190/1.1468623).
+  The fluid-solid benchmark of the staggered scheme: the effective-parameter
+  averages, the soft-bed Scholte configuration and the
+  points-per-wavelength rule for interface waves.
+  Cited by [Elastic waves and fluid-solid coupling](elastic-waves.md).
 
 ## Speech
 
