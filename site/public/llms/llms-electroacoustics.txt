@@ -744,7 +744,8 @@ in the audience, while a cardioid may let it rise to 2 dB below.
 > `+ DM(θ)` on the right-hand side, which contradicts the Equations (18.20) to
 > (18.22) it generalises and would turn the benefit of a directional microphone
 > into a penalty. `feedback_stability` implements the sign of Equation (18.20),
-> so that `Nm = 1` reproduces Long's own special cases exactly.
+> so that `Nm = 1` reproduces Long's own special cases exactly. The defect is
+> recorded in the [errata registry](https://jmrplens.github.io/phonometry/reference/errata/).
 
 ### `feedback_stability()` parameters
 

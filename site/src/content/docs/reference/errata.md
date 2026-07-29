@@ -798,6 +798,72 @@ to the issuing body, with date and reference).
   and a defensive note at the formula.
 - **Status:** unreported (textbook rather than a standard).
 
+## Long, Architectural Acoustics 2e (2014), Eq. (18.24) (sign of the microphone directivity)
+
+- **Location:** Chapter 18, "Multiple Open Microphones", Eq. (18.24) (printed
+  p. 699), the gain-before-feedback stability criterion generalised to several
+  open microphones.
+- **The print:** Z_S + L_H-M + ΔL_nom ≤ L_H-L **+** D_M(θ) − 10, with the
+  microphone directivity index entering the right-hand side with a plus sign.
+- **The problem:** Eq. (18.24) is the number-of-open-microphones
+  generalisation of Eq. (18.20) (printed p. 698), which reads
+  Z_S + L_H-M ≤ L_H-L **−** D_M(θ) − 10 and which follows in turn from the
+  oscillation condition Eq. (18.19), Z_S + L_H-M = L_H-L − D_M(θ), obtained
+  by substituting the feedback-loop gain G_S = L_H-M − L_H-L + D_M(θ)
+  (Eq. (18.18)) into Z_S + G_S = 0 (Eq. (18.16)). Setting N_m = 1 makes
+  ΔL_nom = 0, so Eq. (18.24) must reduce to Eq. (18.20) and does not. The
+  sign matters physically: D_M(θ) is "usually negative" in Long's own
+  definition (about −2 to −3 dB for a cardioid pointed at the talker), so as
+  printed a directional microphone would *cost* gain before feedback instead
+  of buying it, inverting the chapter's own conclusion that "it is prudent to
+  incorporate a cardioid or hypercardioid microphone into a system".
+- **Evidence:** the printed text extracts as `Z S þ L HM þ DL nom  L HL þ D M
+  ðqÞ  10`, where `þ` is the ligature this PDF uses for "+" throughout (it
+  also renders the unambiguous pluses of Eqs. (18.16) and (18.19)), against
+  `L HL  D M ðqÞ  10` in Eq. (18.20) where the same position holds a minus.
+  The minus sign is the one that reproduces Long's own worked special cases
+  at N_m = 1: with Z_S = −6 dB, Eq. (18.21) gives
+  L_H-M ≤ L_H-L − D_M(θ) − 4 (an omnidirectional microphone 4 dB below the
+  average audience level), and Eq. (18.22) gives L_H-M ≤ L_H-L − 2 for a
+  cardioid at D_M = −2 dB. Neither special case is recoverable from the
+  printed Eq. (18.24).
+- **Library behaviour:** `feedback_stability` in
+  [`sound_reinforcement.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/electroacoustics/sound_reinforcement.py)
+  implements the sign of Eq. (18.20), with a note at the criterion. Both of
+  Long's special cases are pinned by regression tests
+  ([`tests/electroacoustics/test_sound_reinforcement.py`](https://github.com/jmrplens/phonometry/blob/main/tests/electroacoustics/test_sound_reinforcement.py))
+  and by the conformance checks "Long, Architectural Acoustics 2e,
+  Eq. (18.21)" and "Eq. (18.22)".
+- **Status:** unreported (textbook rather than a standard, so non-normative).
+
+## Long, Architectural Acoustics 2e (2014), Eq. (17.53) (constant of the communication bound)
+
+- **Location:** Chapter 17, "Restaurant Design", Eq. (17.53) (printed p. 666),
+  the minimum absorption per occupied table for adequate cross-table
+  communication.
+- **The print:** A_tab > 6,33 r_s².
+- **The problem:** the bound is Eq. (17.52),
+  L_SN = 10 lg[Q/(4πr²)] + 10 lg[A_tab/4], solved for A_tab at the stated
+  threshold L_SN > −6 dB, which gives A_tab > 16π·10^(−0,6)·r_s²/Q. With the
+  Q = 2 the chapter uses for a talker, that constant is 6,313, not 6,33.
+- **Evidence:** the immediately following Eq. (17.54) is the same closed form
+  at the privacy threshold L_SN < −9 dB, and its printed constant 3,16 is
+  exactly what 16π·10^(−0,9)/2 = 3,1640 gives, confirming both the formula and
+  Q = 2. Only the −6 dB constant is off. Recovering 6,33 from the same closed
+  form would require Q = 1,995, i.e. no consistent alternative assumption
+  produces it. Long's own prose one paragraph later ("at least 6.3 or more
+  square meters (68 sq ft) of absorption per table") converts to 6,317 m²,
+  agreeing with 6,313 to the precision of his rounding.
+- **Library behaviour:** `absorption_per_table` in
+  [`crowd_noise.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/room/crowd_noise.py) computes the bound
+  from Eq. (17.52) rather than hardcoding either constant, so both bounds stay
+  mutually consistent; the 6,313 value and the printed 3,16 are pinned by
+  regression tests
+  ([`tests/room/test_crowd_noise.py`](https://github.com/jmrplens/phonometry/blob/main/tests/room/test_crowd_noise.py)) and
+  the 3,16 constant by the conformance check "Long, Architectural
+  Acoustics 2e, Eq. (17.54)".
+- **Status:** unreported (textbook rather than a standard, so non-normative).
+
 ---
 
 ## Real Decreto 1367/2007, Annex IV A.3.3 (Kf and Ki threshold tables)
@@ -836,6 +902,18 @@ published sources:
   Francois-Garrison" claim is marginally exceeded at the extreme corners of
   its stated domain (10,4 % at −6 °C / 1 MHz; 12,3 % at 7 km depth). A
   property of the published fit; both transcriptions verified digit-for-digit.
+- **Long, Architectural Acoustics 2e, Chapter 17, adjacent-table level:** the
+  restaurant example states that "at an adjacent table 3 m (10 ft) away, the
+  direct field level from our conversation is about 54 dB", where his own
+  Eq. (17.50) with the Q = 2 and L_W = 70 dB that yield his 60 dB at 1,2 m
+  gives 52,5 dB. It is left unregistered because the intended reading cannot
+  be established from the book: 54 dB is also what the same equation gives at
+  2,5 m (54,1 dB, and 2,5 m is the table spacing the next paragraph derives),
+  and what a single 6 dB distance doubling from the rounded 60 dB would give,
+  while the printed "3 m (10 ft)" is self-consistent in both units and is
+  repeated in the preceding paragraph. `speech_direct_level` evaluates
+  Eq. (17.50) as printed, so it returns 52,5 dB there; do not "correct" it
+  toward 54 dB.
 - **ICAO Annex 16 EPNL constant:** the Annex's rounded constant 13 for
   uniform 0,5 s records differs from the exact −10·lg(T0) form by 0,0103 dB;
   the library uses the exact form, which the ETM's integrated reference

@@ -37,7 +37,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   ceiling adds 170 metric sabins) and on his 3.16 rt² privacy constant; two
   new conformance checks, a new figure `restaurant_crowd_noise`, and a section
   in the open-plan guide in English and Spanish. It is a prediction model and
-  stays separate from the ISO 3382-3 measurement of `room/open_plan.py`.
+  stays separate from the ISO 3382-3 measurement of `room/open_plan.py`. The
+  6.33 constant Long prints for Equation (17.53) is registered in
+  `docs/ERRATA.md`: the same closed form that reproduces his own 3.16 gives
+  6.31.
 
 - Gain before feedback of a sound-reinforcement system
   (`electroacoustics/sound_reinforcement.py`): `feedback_stability` returns
@@ -55,8 +58,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   Zs = -6 dB, and `10 lg Nm`). Note that Equation (18.24) is printed with the
   sign of the microphone directivity flipped relative to Equations (18.20) to
   (18.22); the implementation follows the latter, which is what reproduces
-  Long's own special cases. New figure `sound_reinforcement_geometry` and a
-  section in the loudspeaker guide in English and Spanish.
+  Long's own special cases, and the defect is registered in `docs/ERRATA.md`.
+  New figure `sound_reinforcement_geometry` and a section in the loudspeaker
+  guide in English and Spanish.
 
 - Public ERB_N and Cam utilities (`psychoacoustics/erb_scale.py`):
   `erb_bandwidth`, `cam_from_frequency` and `frequency_from_cam` expose the

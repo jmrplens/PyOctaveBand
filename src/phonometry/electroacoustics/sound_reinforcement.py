@@ -44,8 +44,9 @@ stability criterion is then Equation (18.24),
 .. note::
    Long prints Equation (18.24) with ``+ D_M(theta)`` on the right-hand side,
    which contradicts Equations (18.20) to (18.22) it generalises (and would
-   flip the benefit of a directional microphone into a penalty). This module
-   implements the sign of Equation (18.20), so that ``N_m = 1`` reproduces
+   flip the benefit of a directional microphone into a penalty; see
+   ``docs/ERRATA.md``). This module implements the sign of Equation (18.20),
+   so that ``N_m = 1`` reproduces
    Long's own special cases: with ``Z_S = -6 dB`` the criterion collapses to
    ``L_H-M <= L_H-L - D_M(theta) - 4`` (Equation (18.21)), which for an
    omnidirectional microphone puts the loudspeaker level at the microphone

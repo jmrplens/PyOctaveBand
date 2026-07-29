@@ -39,8 +39,15 @@ distance ``rt`` apart, turns into a pair of design bounds
    Long prints the first constant as ``6.33``; the closed form with the same
    ``Q = 2`` and ``-6 dB`` that yield his second constant ``3.16`` gives
    ``6.31``, which is also what his own conversion of the result ("6.3 or more
-   square metres (68 sq ft)") implies. This module computes both constants
-   from :func:`speech_to_noise_ratio`, so they stay mutually consistent.
+   square metres (68 sq ft)") implies (see ``docs/ERRATA.md``). This module
+   computes both constants from :func:`speech_to_noise_ratio`, so they stay
+   mutually consistent.
+
+   His prose also puts the direct field at an adjacent table 3 m away at
+   "about 54 dB", where :func:`speech_direct_level` with the same ``Q = 2``
+   and ``L_w = 70 dB`` gives 52.5 dB. That one is left as printed rather than
+   reconciled, because the intended reading cannot be established from the
+   book; it is recorded under the non-errata notes of ``docs/ERRATA.md``.
 
 The **Lombard reflex** (talkers raising their voices as the background grows)
 is deliberately *not* modelled: it cancels out of ``L_SN`` as long as everyone

@@ -299,6 +299,15 @@ $$
 A_\text{tab} > 6.31\,r_s^2, \qquad A_\text{tab} < 3.16\,r_t^2 \qquad (Q = 2).
 $$
 
+:::caution
+**The first constant is printed as 6.33.** The closed form above, at the same
+$Q = 2$ that yields Long's own second constant 3.16 exactly, gives 6.31, and
+his prose ("6.3 or more square metres, 68 sq ft") converts to 6.317 m². The
+library computes both bounds from the speech-to-noise ratio rather than
+hardcoding either constant, so they stay mutually consistent; the misprint is
+recorded in the [errata registry](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.md).
+:::
+
 ```python
 from phonometry import room
 

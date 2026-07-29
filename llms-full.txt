@@ -10118,7 +10118,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/guides/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/guides/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/reference/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 437 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 446 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -16751,7 +16751,8 @@ in the audience, while a cardioid may let it rise to 2 dB below.
 > `+ DM(θ)` on the right-hand side, which contradicts the Equations (18.20) to
 > (18.22) it generalises and would turn the benefit of a directional microphone
 > into a penalty. `feedback_stability` implements the sign of Equation (18.20),
-> so that `Nm = 1` reproduces Long's own special cases exactly.
+> so that `Nm = 1` reproduces Long's own special cases exactly. The defect is
+> recorded in the [errata registry](https://jmrplens.github.io/phonometry/reference/errata/).
 
 ### `feedback_stability()` parameters
 
@@ -20049,6 +20050,13 @@ communication at a separation `rs`, and `L_SN < -9` dB so a neighbouring table
 A_tab > 6.31 rs²      (Eq. (17.53))
 A_tab < 3.16 rt²      (Eq. (17.54)),  both for Q = 2
 ```
+
+> **The first constant is printed as 6.33.** The closed form above, at the same
+> Q = 2 that yields Long's own second constant 3.16 exactly, gives 6.31, and his
+> prose ("6.3 or more square metres, 68 sq ft") converts to 6.317 m². The library
+> computes both bounds from the speech-to-noise ratio rather than hardcoding
+> either constant, so they stay mutually consistent; the misprint is recorded in
+> the [errata registry](https://jmrplens.github.io/phonometry/reference/errata/).
 
 ```python
 from phonometry import room
