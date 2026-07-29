@@ -139,6 +139,7 @@ _SECTION_LIST: tuple[Section, ...] = (
             "phonometry.building.floor_covering_improvement",
             "phonometry.building.structure_borne_power",
             "phonometry.building.installed_structure_borne",
+            "phonometry.building.spanish_building_code",
         ),
     ),
     Section(
@@ -187,6 +188,7 @@ _SECTION_LIST: tuple[Section, ...] = (
             "phonometry.environmental.impulsive_sound",
             "phonometry.environmental.rating",
             "phonometry.environmental.measurement",
+            "phonometry.environmental.spanish_regulation",
         ),
     ),
     Section(

@@ -1,6 +1,6 @@
 ---
 title: "Guías"
-description: "Las 93 guías de phonometry, agrupadas en las nueve áreas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
+description: "Las 95 guías de phonometry, agrupadas en las nueve áreas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
 head:
   - tag: script
     attrs:
@@ -156,6 +156,10 @@ ISO 1996-1, IEC 60942, ISO 18233 y la GUM.
 - [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/guides/environmental-levels/):
   Lden, Ldn y los niveles de valoración compuestos, el ajuste tonal, la
   corrección de ruido residual y el presupuesto de incertidumbre.
+- [Normativa española de ruido (RD 1367/2007)](/phonometry/es/guides/spanish-noise-regulation/):
+  el nivel corregido LKeq con sus correcciones Kt, Kf y Ki, los periodos
+  temporales de evaluación y las fases de ruido, las tablas de valores límite
+  y la comprobación del artículo 25.
 
 **[Señales y espectros](/phonometry/es/guides/sections/signals-spectra/)**
 
@@ -309,6 +313,9 @@ ISO 10052 y ANSI/ASA S12.2.
 - [Aislamiento acústico de fachadas](/phonometry/es/guides/facade-insulation/):
   el cerramiento del edificio medido según ISO 16283-3, previsto según
   EN 12354-3 y radiando al exterior según EN 12354-4.
+- [Código Técnico de la Edificación (CTE DB-HR)](/phonometry/es/guides/spanish-building-code/):
+  las magnitudes globales RA, RA,tr, DnT,A y D2m,nT,Atr del DB HR, las tablas de
+  exigencias del apartado 2 y la corrección por tamaño de ventana.
 
 **[Diseño del aislamiento](/phonometry/es/guides/sections/insulation-design/)**
 

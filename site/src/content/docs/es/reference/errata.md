@@ -809,6 +809,30 @@ to the issuing body, with date and reference).
 
 ---
 
+## Real Decreto 1367/2007, Annex IV A.3.3 (Kf and Ki threshold tables)
+
+- **Location:** Annex IV, section A.3.3, the ``Kf`` (low-frequency) and
+  ``Ki`` (impulsive) correction tables, middle row of each.
+- **The print:** both tables print the 3 dB row as "Si 10 > Lf <= 15" and
+  "Si 10 > Li <= 15" respectively (BOE-A-2007-18397, consolidated text).
+- **The problem:** the condition as printed is unsatisfiable. It reads
+  "10 greater than Lf" and "Lf at most 15" simultaneously, which would
+  select levels below 10 dB, but the row above it already assigns those to
+  0 dB ("Si Lf <= 10") and the row below covers "Si Lf > 15". The three
+  rows only partition the range under the reading `10 < Lf <= 15`, so the
+  ">" is a typeset inversion of "<".
+- **Evidence:** the bracketing rows leave no other consistent reading; the
+  identical construction appears in both tables, and the equivalent tables
+  in the autonomous-community noise regulations that transpose this Annex
+  print `10 < Lf <= 15`.
+- **Library behaviour:**
+  [`low_frequency_correction`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/environmental/spanish_regulation.py)
+  and `impulsive_correction` implement `10 < L <= 15`, with a regression
+  test pinning the three branches at the 10 dB and 15 dB boundaries.
+- **Status:** unreported (national regulation, not a standards body).
+
+---
+
 ## Related source properties that are not errata
 
 Recorded here to prevent future "fixes" that would break agreement with the

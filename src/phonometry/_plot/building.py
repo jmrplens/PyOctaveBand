@@ -49,6 +49,10 @@ if TYPE_CHECKING:
         WeightedRatingResult,
     )
     from ..building.panel_transmission import SoundReductionResult
+    from ..building.spanish_building_code import (
+        DbHrAssessment,
+        DbHrGlobalIndexResult,
+    )
     from ..building.structure_borne_power import StructureBornePowerResult
 
 #: Shared x-axis label for the frequency-domain building plots.
@@ -104,6 +108,19 @@ _STRINGS: dict[str, str] = {
     "Shifted reference (core bands)": "Referencia desplazada (bandas 100-3150 Hz)",
     "Improvement of impact sound insulation delta-L [dB]": "Mejora del aislamiento a ruido de impacto delta-L [dB]",
     "ISO 16251-1 Floor-Covering Impact Sound Improvement": "Mejora del aislamiento a ruido de impacto de revestimiento de suelo ISO 16251-1",
+    "band insulation": "aislamiento por banda",
+    "transmitted level $L_{x,i} - X_i$": "nivel transmitido $L_{x,i} - X_i$",
+    "Band insulation $X_i$ [dB]": "Aislamiento por banda $X_i$ [dB]",
+    "Transmitted level [dBA]": "Nivel transmitido [dBA]",
+    "pink noise": "ruido rosa",
+    "road traffic": "ruido de automóviles",
+    "railway": "ruido ferroviario",
+    "aircraft": "ruido de aeronaves",
+    "CTE DB-HR global index": "Índice global CTE DB-HR",
+    "achieved": "obtenido",
+    "required": "exigido",
+    "Value": "Valor",
+    "CTE DB-HR requirement check": "Comprobación de exigencias CTE DB-HR",
 }
 
 
@@ -905,5 +922,118 @@ def plot_floor_covering_improvement(
     ax.grid(True, which="both", alpha=0.3)
     if ax.get_legend_handles_labels()[0]:
         ax.legend()
+    localize_axes(ax, language)
+    return ax
+
+
+#: Localised names of the DB-HR normalised source spectra.
+_DB_HR_SPECTRUM_LABELS = {
+    "pink": "pink noise",
+    "traffic": "road traffic",
+    "railway": "railway",
+    "aircraft": "aircraft",
+}
+
+
+def plot_db_hr_global_index(
+    result: DbHrGlobalIndexResult, ax: Axes | None = None, language: str = "en",
+    **kwargs: Any
+) -> Axes:
+    """Band insulation and per-band transmitted level of a DB-HR global index.
+
+    The band insulation ``X_i`` is drawn as bars and the weighted per-band
+    transmitted level ``L_x,i - X_i`` as a line: the global index is minus the
+    energy sum of that line, so the bands where it peaks are the ones that set
+    the index.
+
+    :param result: A
+        :class:`~phonometry.building.spanish_building_code.DbHrGlobalIndexResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the band-insulation ``bar`` call.
+    :return: The axes.
+    """
+    from .._i18n import format_number, localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    freqs = np.asarray(result.frequencies, dtype=np.float64)
+    values = np.asarray(result.band_values, dtype=np.float64)
+    contributions = np.asarray(result.band_contributions, dtype=np.float64)
+    positions = _band_axis(ax, freqs, language=language)
+
+    kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault("alpha", 0.85)
+    kwargs.setdefault("label", _t("band insulation", language))
+    ax.bar(positions, values, width=0.72, **kwargs)
+    ax.set_ylabel(_t("Band insulation $X_i$ [dB]", language))
+
+    # The two quantities live on disjoint ranges (a positive insulation of
+    # tens of dB against a negative weighted level), so the transmitted level
+    # goes on its own axis; the bands where it peaks are the ones that set the
+    # index, which is minus the energy sum of that curve.
+    twin = ax.twinx()
+    twin.plot(positions, contributions, "o-", color=_C_SECONDARY, ms=4.0,
+              label=_t("transmitted level $L_{x,i} - X_i$", language))
+    twin.set_ylabel(_t("Transmitted level [dBA]", language))
+
+    spectrum = _t(_DB_HR_SPECTRUM_LABELS[result.spectrum], language)
+    ax.set_title(
+        f"{_t('CTE DB-HR global index', language)}: {result.name} = "
+        f"{format_number(result.value, language, decimals=1)} dBA ({spectrum})"
+    )
+    handles, labels = ax.get_legend_handles_labels()
+    extra_handles, extra_labels = twin.get_legend_handles_labels()
+    ax.legend(handles + extra_handles, labels + extra_labels,
+              loc="upper left", fontsize="small")
+    ax.grid(True, axis="y", alpha=0.3)
+    localize_axes(ax, language)
+    localize_axes(twin, language)
+    return ax
+
+
+def plot_db_hr_assessment(
+    result: DbHrAssessment, ax: Axes | None = None, language: str = "en",
+    **kwargs: Any
+) -> Axes:
+    """Achieved values against their CTE DB-HR requirements.
+
+    Each check is a horizontal lollipop from its requirement to the achieved
+    value: a stem reaching to the right of the requirement marker means a
+    compliant "at least" requirement, and the exceedance colour marks a check
+    that is not met.
+
+    :param result: A
+        :class:`~phonometry.building.spanish_building_code.DbHrAssessment`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the achieved-value ``scatter`` call.
+    :return: The axes.
+    """
+    from .._i18n import localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    checks = list(result.checks)
+    rows = np.arange(len(checks), dtype=np.float64)
+    achieved = np.array([c.reported for c in checks], dtype=np.float64)
+    limits = np.array([c.requirement.limit for c in checks], dtype=np.float64)
+    colours = [_C_TERTIARY if c.complies else _C_REFERENCE for c in checks]
+
+    ax.hlines(rows, limits, achieved, colors=colours, linewidth=2.0)
+    ax.scatter(limits, rows, marker="|", s=220, color=_C_MUTED,
+               label=_t("required", language), zorder=4)
+    kwargs.setdefault("marker", "o")
+    kwargs.setdefault("s", 55)
+    kwargs.setdefault("label", _t("achieved", language))
+    ax.scatter(achieved, rows, color=colours, zorder=5, **kwargs)
+
+    ax.set_yticks(rows)
+    ax.set_yticklabels(
+        [f"{c.requirement.quantity} ({c.requirement.unit})" for c in checks]
+    )
+    ax.invert_yaxis()
+    ax.set_xlabel(_t("Value", language))
+    ax.set_title(_t("CTE DB-HR requirement check", language))
+    ax.legend(loc="best", fontsize="small")
+    ax.grid(True, axis="x", alpha=0.3)
     localize_axes(ax, language)
     return ax

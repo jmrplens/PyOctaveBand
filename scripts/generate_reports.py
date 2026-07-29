@@ -3096,6 +3096,52 @@ def _hvac_example() -> tuple[object, ReportMetadata, str]:
     return result, metadata, "hvac_duct_noise_example.pdf"
 
 
+def _rd1367_example() -> tuple[object, ReportMetadata, str]:
+    """RD 1367/2007 fiche: the noise assessment of an activity.
+
+    The published worked case of Aviles Lopez & Perera Martin, Manual de
+    acustica ambiental y arquitectonica, Ejemplos 3.1 to 3.3: an activity on
+    residential land (acoustic area type a) open from 9 h to 21 h, with a noisy
+    machine running from 9 h to 15 h. The two measured noise phases are
+    LAeq,5s = 50 dB with Kt = 6 and Kf = 3 dB (so LKeq,5s = 59 dB) and
+    LAeq,5s = 48 dB with Kt = 3 and Kf = 3 dB (LKeq,5s = 54 dB). Integrating
+    them over the evaluation periods gives LKeq,d = 57 dB and LKeq,e = 51 dB,
+    and averaging over the 303 operating days of the year LK,d = 56 dB and
+    LK,e = 50 dB. Against the 55 dB of Annex III Table B1 the phase and daily
+    criteria are met but the annual LK,d is not, so a new activity does not
+    comply.
+
+    The fiche renders in Spanish, the language of the regulation it applies.
+    """
+    day = [
+        ph.NoisePhase(2.0, 0.0, label="Actividad cerrada"),
+        ph.NoisePhase(6.0, 50.0, kt=6.0, kf=3.0, label="Maquina ruidosa activa"),
+        ph.NoisePhase(4.0, 48.0, kt=3.0, kf=3.0, label="Resto de fuentes"),
+    ]
+    evening = [
+        ph.NoisePhase(2.0, 48.0, kt=3.0, kf=3.0, label="Resto de fuentes"),
+        ph.NoisePhase(2.0, 0.0, label="Actividad cerrada"),
+    ]
+    result = ph.assess_activity(
+        {"day": day, "evening": evening},
+        ph.activity_limits("a"),
+        operating_days=303,
+    )
+    metadata = ReportMetadata(
+        specimen="Actividad con maquinaria, horario 9 h a 21 h",
+        client="Example client",
+        test_room="Ambiente exterior, punto de evaluacion mas desfavorable",
+        instrumentation="Sonometro integrador-promediador clase 1",
+        calibration="Verificacion antes y despues, desviacion 0,1 dB",
+        measurement_standard="RD 1367/2007 Anexo IV",
+        test_date="2026-07-29",
+        laboratory="Phonometry reference example",
+        operator="phonometry",
+        report_id="EXAMPLE-RD1367",
+    )
+    return result, metadata, "rd1367_activity_example.pdf"
+
+
 #: Every example fiche the repository keeps rendered. New report kinds append
 #: their factory here so ``make reports`` regenerates the full set.
 _EXAMPLES: list[Callable[[], tuple[object, ReportMetadata, str]]] = [
@@ -3163,6 +3209,7 @@ _EXAMPLES: list[Callable[[], tuple[object, ReportMetadata, str]]] = [
     _enclosure_example,
     _silencer_example,
     _hvac_example,
+    _rd1367_example,
 ]
 
 
