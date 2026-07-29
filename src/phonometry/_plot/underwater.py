@@ -10,6 +10,7 @@ import numpy as np
 from .common import (
     _C_MUTED,
     _C_PRIMARY,
+    _C_QUATERNARY,
     _C_REFERENCE,
     _C_SECONDARY,
     _C_TERTIARY,
@@ -22,19 +23,25 @@ from .common import (
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
+    from ..underwater.marine_mammal_audiograms import AudiogramResult
+    from ..underwater.marine_mammal_weighting import (
+        AuditoryWeightingResult,
+        WeightedExposureResult,
+    )
     from ..underwater.numerical_propagation import (
         NormalModeResult,
         ParabolicEquationResult,
         RayTraceResult,
     )
     from ..underwater.ocean_ambient_noise import AmbientNoiseResult
-    from ..underwater.pile_driving_noise import PileStrikeResult
+    from ..underwater.pile_driving_noise import PileStrikeResult, StrikeSelSpectrum
     from ..underwater.propagation import TransmissionLossResult
     from ..underwater.seabed_reflection import BottomLossResult, SeabedReflection
     from ..underwater.ship_radiated_noise import ShipSourceLevelResult
     from ..underwater.ship_traffic_noise import ShipTrafficSpectrum
-    from ..underwater.sonar_equation import SonarEquationResult
+    from ..underwater.sonar_equation import DetectionRangeResult, SonarEquationResult
     from ..underwater.sound_speed import SoundSpeedProfile
+    from ..underwater.weston_regimes import WestonPropagationResult
 
 #: Spanish translations of the fixed strings rendered by the underwater
 #: ``.plot()`` renderers, keyed by their verbatim English text.  ``_t``
@@ -91,6 +98,26 @@ _STRINGS: dict[str, str] = {
     "Source": "Fuente",
     "Ray trace": "Trazado de rayos",
     "Parabolic-equation transmission loss": "Pérdida por transmisión por ecuación parabólica",
+    "Weston regimes": "Regímenes de Weston",
+    "Composite": "Compuesto",
+    "Spherical (20 lg r)": "Esférica (20 lg r)",
+    "Cylindrical (10 lg r)": "Cilíndrica (10 lg r)",
+    "Mode stripping (15 lg r)": "Descamado de modos (15 lg r)",
+    "Single mode": "Modo único",
+    "Propagation loss [dB re 1 m²]": "Pérdida de propagación [dB re 1 m²]",
+    "Hearing threshold [dB]": "Umbral de audición [dB]",
+    "Group audiogram": "Audiograma de grupo",
+    "Orca audiogram": "Audiograma de orca",
+    "Best sensitivity": "Mejor sensibilidad",
+    "Weighting W(f) [dB]": "Ponderación W(f) [dB]",
+    "Auditory weighting function": "Función de ponderación auditiva",
+    "Unweighted": "Sin ponderar",
+    "Weighted": "Ponderada",
+    "Band SEL [dB re 1 µPa²·s]": "SEL por banda [dB re 1 µPa²·s]",
+    "Weighted exposure vs criteria": "Exposición ponderada frente a criterios",
+    "Single-strike SEL per band": "SEL por banda de un golpe",
+    "Detection range": "Alcance de detección",
+    "Transmission loss vs figure of merit": "Pérdida por transmisión frente a cifra de mérito",
 }
 
 
@@ -531,5 +558,233 @@ def plot_parabolic_equation(
     ax.set_xlabel(_t("Range [km]", language))
     ax.set_ylabel(_t("Depth [m]", language))
     ax.set_title(_t("Parabolic-equation transmission loss", language))
+    localize_axes(ax, language)
+    return ax
+
+
+def _spectrum_axes(
+    ax: Axes | None, freqs: np.ndarray, *, ylabel: str, title: str, language: str,
+) -> Axes:
+    """Shared frame for the frequency-domain underwater renderers."""
+    ax = ax if ax is not None else _new_axes()
+    ax.set_xscale("log")
+    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_ylabel(_t(ylabel, language))
+    ax.set_title(_t(title, language))
+    ax.grid(True, which="both", alpha=0.3)
+    ax.set_axisbelow(True)
+    format_frequency_axis(ax, float(np.min(freqs)), float(np.max(freqs)))
+    return ax
+
+
+def plot_weston_regimes(
+    result: WestonPropagationResult, ax: Axes | None = None, *, language: str = "en",
+    **kwargs: Any
+) -> Axes:
+    """Composite Weston propagation loss with each regime's law and boundaries.
+
+    :param result: A
+        :class:`~phonometry.underwater.weston_regimes.WestonPropagationResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the composite-loss ``plot`` call.
+    :return: The axes.
+    """
+    from .._i18n import format_number, localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    r = np.asarray(result.range_m, dtype=np.float64)
+    ax.set_xscale("log")
+    for label, curve, color, style in (
+        ("Spherical (20 lg r)", result.spherical, _C_MUTED, ":"),
+        ("Cylindrical (10 lg r)", result.cylindrical, _C_SECONDARY, "--"),
+        ("Mode stripping (15 lg r)", result.mode_stripping, _C_TERTIARY, "-."),
+        ("Single mode", result.single_mode, _C_QUATERNARY, (0, (3, 1, 1, 1))),
+    ):
+        ax.plot(r, np.asarray(curve, dtype=np.float64), ls=style, lw=1.0, color=color,
+                label=_t(label, language))
+    ax.plot(r, np.asarray(result.propagation_loss, dtype=np.float64),
+            **{"color": _C_PRIMARY, "lw": 2.0, "label": _t("Composite", language), **kwargs})
+    for boundary in (
+        result.boundaries.spherical_to_cylindrical,
+        result.boundaries.cylindrical_to_mode_stripping,
+        result.boundaries.mode_stripping_to_single_mode,
+    ):
+        if np.isfinite(boundary) and r[0] <= boundary <= r[-1]:
+            ax.axvline(boundary, color=_C_REFERENCE, ls="--", lw=0.8, alpha=0.7)
+    finite = np.asarray(result.propagation_loss)[np.isfinite(result.propagation_loss)]
+    if finite.size:
+        ax.set_ylim(float(finite.max()) + 10.0, float(finite.min()) - 5.0)
+    ax.set_xlabel(_t("Range [m]", language))
+    ax.set_ylabel(_t("Propagation loss [dB re 1 m²]", language))
+    ax.set_title(
+        f"{_t('Weston regimes', language)} "
+        f"({format_number(result.frequency, language, decimals=0)} Hz, "
+        f"H = {format_number(result.water_depth, language, decimals=0)} m, {result.seabed})"
+    )
+    ax.grid(True, which="both", alpha=0.3)
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower left", fontsize="small")
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_marine_mammal_audiogram(
+    result: AudiogramResult, ax: Axes | None = None, *, language: str = "en",
+    **kwargs: Any
+) -> Axes:
+    """Hearing threshold versus frequency with the point of best sensitivity.
+
+    :param result: An
+        :class:`~phonometry.underwater.marine_mammal_audiograms.AudiogramResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the threshold ``plot`` call.
+    :return: The axes.
+    """
+    from .._i18n import format_number, localize_axes
+
+    freqs = np.asarray(result.frequencies, dtype=np.float64)
+    title = "Orca audiogram" if result.group == "orca" else "Group audiogram"
+    ax = _spectrum_axes(ax, freqs, ylabel="Hearing threshold [dB]",
+                        title=title, language=language)
+    ax.plot(freqs, np.asarray(result.threshold, dtype=np.float64),
+            **{"color": _C_PRIMARY, "lw": 1.4, "label": result.group, **kwargs})
+    ax.plot([result.best_frequency], [result.best_threshold], "o", color=_C_REFERENCE,
+            label=(f"{_t('Best sensitivity', language)}: "
+                   f"{format_number(result.best_threshold, language)} dB"))
+    ax.legend(loc="best", fontsize="small")
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_auditory_weighting(
+    result: AuditoryWeightingResult, ax: Axes | None = None, *, language: str = "en",
+    **kwargs: Any
+) -> Axes:
+    """Auditory weighting function of a marine-mammal hearing group.
+
+    :param result: An
+        :class:`~phonometry.underwater.marine_mammal_weighting.AuditoryWeightingResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the weighting ``plot`` call.
+    :return: The axes.
+    """
+    from .._i18n import localize_axes
+
+    freqs = np.asarray(result.frequencies, dtype=np.float64)
+    ax = _spectrum_axes(ax, freqs, ylabel="Weighting W(f) [dB]",
+                        title="Auditory weighting function", language=language)
+    label = f"{result.group} ({result.guidance})"
+    ax.plot(freqs, np.asarray(result.weighting, dtype=np.float64),
+            **{"color": _C_PRIMARY, "lw": 1.4, "label": label, **kwargs})
+    ax.axhline(0.0, color=_C_MUTED, ls=":", lw=0.8)
+    ax.legend(loc="lower center", fontsize="small")
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_weighted_exposure(
+    result: WeightedExposureResult, ax: Axes | None = None, *, language: str = "en",
+    **kwargs: Any
+) -> Axes:
+    """Unweighted and weighted band spectra against the exposure criteria.
+
+    :param result: A
+        :class:`~phonometry.underwater.marine_mammal_weighting.WeightedExposureResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the weighted-spectrum ``plot`` call.
+    :return: The axes.
+    """
+    from .._i18n import format_number, localize_axes
+
+    freqs = np.asarray(result.frequencies, dtype=np.float64)
+    ax = _spectrum_axes(ax, freqs, ylabel="Band SEL [dB re 1 µPa²·s]",
+                        title="Weighted exposure vs criteria", language=language)
+    ax.plot(freqs, np.asarray(result.band_sel, dtype=np.float64), "o--", ms=3,
+            color=_C_MUTED, lw=1.0, label=_t("Unweighted", language))
+    ax.plot(freqs, np.asarray(result.weighted_band_sel, dtype=np.float64),
+            **{"color": _C_PRIMARY, "lw": 1.6, "marker": "o", "ms": 3,
+               "label": f"{_t('Weighted', language)} ({result.group}, {result.guidance})",
+               **kwargs})
+    for level, color, name in (
+        (result.criteria.tts_sel, _C_SECONDARY, "TTS"),
+        (result.criteria.injury_sel, _C_REFERENCE, result.criteria.injury_label),
+    ):
+        if level is not None:
+            ax.axhline(level, color=color, ls="--", lw=1.2,
+                       label=f"{name} {format_number(level, language, decimals=0)} dB")
+    ax.axhline(result.cumulative_sel, color=_C_TERTIARY, ls="-.", lw=1.2,
+               label=(f"SEL_cum {format_number(result.cumulative_sel, language)} dB "
+                      f"(N = {result.n_events})"))
+    ax.legend(loc="best", fontsize="small")
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_strike_sel_spectrum(
+    result: StrikeSelSpectrum, ax: Axes | None = None, *, language: str = "en",
+    **kwargs: Any
+) -> Axes:
+    """Per-band single-strike sound exposure level of a pile strike.
+
+    :param result: A
+        :class:`~phonometry.underwater.pile_driving_noise.StrikeSelSpectrum`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the band-level ``plot`` call.
+    :return: The axes.
+    """
+    from .._i18n import format_number, localize_axes
+
+    freqs = np.asarray(result.frequencies, dtype=np.float64)
+    ax = _spectrum_axes(ax, freqs, ylabel="Band SEL [dB re 1 µPa²·s]",
+                        title="Single-strike SEL per band", language=language)
+    ax.plot(freqs, np.asarray(result.band_sel, dtype=np.float64),
+            **{"color": _C_PRIMARY, "lw": 1.4, "marker": "o", "ms": 3,
+               "label": f"1/{result.fraction}", **kwargs})
+    ax.axhline(result.total_sel, color=_C_REFERENCE, ls="--", lw=1.2,
+               label=f"SEL_ss {format_number(result.total_sel, language)} dB")
+    ax.legend(loc="best", fontsize="small")
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_detection_range(
+    result: DetectionRangeResult, ax: Axes | None = None, *, language: str = "en",
+    **kwargs: Any
+) -> Axes:
+    """Transmission loss against the figure of merit, with the detection range.
+
+    :param result: A
+        :class:`~phonometry.underwater.sonar_equation.DetectionRangeResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the transmission-loss ``plot`` call.
+    :return: The axes.
+    """
+    from .._i18n import format_number, localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    r = np.asarray(result.range_m, dtype=np.float64)
+    ax.plot(r, np.asarray(result.transmission_loss, dtype=np.float64),
+            **{"color": _C_PRIMARY, "lw": 1.4, "label": _t("Total TL", language), **kwargs})
+    ax.axhline(result.figure_of_merit, color=_C_SECONDARY, ls="--", lw=1.2,
+               label=(f"{_t('Figure of merit', language)} "
+                      f"{format_number(result.figure_of_merit, language)} dB"))
+    if np.isfinite(result.detection_range) and result.detection_range > 0.0:
+        ax.axvline(result.detection_range, color=_C_REFERENCE, ls=":", lw=1.2,
+                   label=(f"{_t('Detection range', language)} "
+                          f"{format_number(result.detection_range, language, decimals=0)} m"))
+    ax.set_xlabel(_t("Range [m]", language))
+    ax.set_ylabel(_t("Transmission loss [dB]", language))
+    ax.set_title(_t("Transmission loss vs figure of merit", language))
+    if not ax.yaxis_inverted():
+        ax.invert_yaxis()
+    ax.grid(True, alpha=0.3)
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower left", fontsize="small")
     localize_axes(ax, language)
     return ax

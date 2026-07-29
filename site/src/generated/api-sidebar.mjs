@@ -179,6 +179,7 @@ export const apiSidebar = {
       items: [
         'reference/api/underwater/acoustics',
         'reference/api/underwater/propagation',
+        'reference/api/underwater/weston-regimes',
         'reference/api/underwater/sound-speed',
         'reference/api/underwater/sonar-equation',
         'reference/api/underwater/ocean-ambient-noise',
@@ -186,6 +187,8 @@ export const apiSidebar = {
         'reference/api/underwater/ship-radiated-noise',
         'reference/api/underwater/ship-traffic-noise',
         'reference/api/underwater/pile-driving-noise',
+        'reference/api/underwater/marine-mammal-audiograms',
+        'reference/api/underwater/marine-mammal-weighting',
         'reference/api/underwater/numerical-propagation',
       ],
     },

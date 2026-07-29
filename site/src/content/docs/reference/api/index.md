@@ -172,6 +172,7 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | :--- | :--- |
 | [`underwater.acoustics`](/phonometry/reference/api/underwater/acoustics/) | Underwater-acoustics reference levels (ISO 18405:2017). |
 | [`underwater.propagation`](/phonometry/reference/api/underwater/propagation/) | Underwater sound propagation: transmission loss (closed-form). |
+| [`underwater.weston_regimes`](/phonometry/reference/api/underwater/weston-regimes/) | Weston's shallow-water propagation regimes (flux theory). |
 | [`underwater.sound_speed`](/phonometry/reference/api/underwater/sound-speed/) | Speed of sound in sea water (empirical equations). |
 | [`underwater.sonar_equation`](/phonometry/reference/api/underwater/sonar-equation/) | The sonar equation (passive and active), in decibels. |
 | [`underwater.ocean_ambient_noise`](/phonometry/reference/api/underwater/ocean-ambient-noise/) | Ocean ambient-noise spectrum levels (Wenz framework). |
@@ -179,6 +180,8 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`underwater.ship_radiated_noise`](/phonometry/reference/api/underwater/ship-radiated-noise/) | Ship radiated noise and equivalent monopole source level (ISO 17208-1/-2). |
 | [`underwater.ship_traffic_noise`](/phonometry/reference/api/underwater/ship-traffic-noise/) | Predicted source-level spectrum of shipping traffic (semi-empirical models). |
 | [`underwater.pile_driving_noise`](/phonometry/reference/api/underwater/pile-driving-noise/) | Radiated underwater sound from percussive pile driving (ISO 18406:2017). |
+| [`underwater.marine_mammal_audiograms`](/phonometry/reference/api/underwater/marine-mammal-audiograms/) | Marine-mammal hearing thresholds (group audiograms and the orca audiogram). |
+| [`underwater.marine_mammal_weighting`](/phonometry/reference/api/underwater/marine-mammal-weighting/) | Regulatory auditory weighting and exposure criteria for marine mammals. |
 | [`underwater.numerical_propagation`](/phonometry/reference/api/underwater/numerical-propagation/) | Numerical models of underwater sound propagation (range-independent ocean). |
 
 ## Sound power and intensity

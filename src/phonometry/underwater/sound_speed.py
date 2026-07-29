@@ -2,7 +2,7 @@
 """
 Speed of sound in sea water (empirical equations).
 
-Three coexisting equations for the sound speed ``c`` as a function of
+Four coexisting equations for the sound speed ``c`` as a function of
 temperature, salinity and depth/pressure, selectable through ``model``:
 
 * ``"unesco"`` -- the UNESCO / Chen & Millero (1977) algorithm, the
@@ -10,6 +10,9 @@ temperature, salinity and depth/pressure, selectable through ``model``:
 * ``"del_grosso"`` -- the Del Grosso (1974) equation (Wong & Zhu 1995 form),
   a high-accuracy alternative over a narrower domain.
 * ``"mackenzie"`` -- the Mackenzie (1981) nine-term depth-based equation.
+* ``"medwin"`` -- the Medwin (1975) six-term short formula, the simplest member
+  of the family, whose partial derivatives are the classic rules of thumb
+  ``∂c/∂T ≈ 4.6 − 0.110·T`` m/s per °C and ``∂c/∂z ≈ 0.016`` m/s per m.
 
 The UNESCO and Del Grosso equations use pressure, not depth, so a depth is first
 converted with the Leroy & Parthiot (1998) standard-ocean formula
@@ -20,7 +23,9 @@ Sources (clean-room, implemented from the equations, validated by cross-model
 agreement and the canonical Mackenzie check value 1550.744 m/s at 25 °C, 35 ppt,
 1000 m): NPL Technical Guide "Speed of Sound in Sea-Water" (Wong & Zhu 1995
 coefficient tables), Mackenzie (1981) JASA 70, Del Grosso (1974) JASA 56,
-Leroy & Parthiot (1998) JASA 103.
+Leroy & Parthiot (1998) JASA 103, Medwin (1975) as printed in Ainslie,
+*Principles of Sonar Performance Modelling* (Springer 2010), Equations
+(1.2)-(1.4), printed p. 20.
 """
 
 from __future__ import annotations
@@ -39,7 +44,9 @@ _BAR_PER_MPA = 10.0
 #: kg/cm² per bar (100 kPa = 1.019716 kg/cm²; 1 bar = 100 kPa).
 _KGCM2_PER_BAR = 1.019716
 
-_MODELS = ("unesco", "del_grosso", "mackenzie")
+_MODELS = ("unesco", "del_grosso", "mackenzie", "medwin")
+#: Models that take a depth directly instead of a pressure.
+_DEPTH_MODELS = ("mackenzie", "medwin")
 
 
 def _positive(value: float, name: str) -> float:
@@ -104,6 +111,31 @@ def _mackenzie(
         + 1.675e-7 * depth**2
         - 1.025e-2 * t * (s - 35.0)
         - 7.139e-13 * t * depth**3
+    )
+
+
+# ---------------------------------------------------------------------------
+# Medwin (1975)
+# ---------------------------------------------------------------------------
+
+
+def _medwin(
+    t: float | NDArray[np.float64], s: float | NDArray[np.float64],
+    depth: float | NDArray[np.float64],
+) -> float | NDArray[np.float64]:
+    """Medwin's short formula, Ainslie (2010) Equation (1.2), printed p. 20.
+
+    ``c = 1449.2 + 4.6·T + 0.016·z − 0.055·T² + [(1.34 − 0.010·T)(S − 35)
+    + 2.9e-4·T³]``; the bracketed pair are the salinity and cubic-temperature
+    corrections, negligible under typical ocean conditions.
+    """
+    return (
+        1449.2
+        + 4.6 * t
+        + 0.016 * depth
+        - 0.055 * t**2
+        + (1.34 - 0.010 * t) * (s - 35.0)
+        + 2.9e-4 * t**3
     )
 
 
@@ -194,7 +226,8 @@ def sea_water_sound_speed(
     :param temperature: Temperature ``T``, in degrees Celsius.
     :param salinity: Salinity ``S``, in parts per thousand (PSU).
     :param depth: Depth below the surface, in metres (``>= 0``).
-    :param model: ``"unesco"`` (default), ``"del_grosso"`` or ``"mackenzie"``.
+    :param model: ``"unesco"`` (default), ``"del_grosso"``, ``"mackenzie"`` or
+        ``"medwin"``.
     :param latitude: Latitude for the depth→pressure conversion, in degrees
         (used by ``"unesco"`` and ``"del_grosso"``; default 45°).
     :return: The sound speed ``c``, in m/s.
@@ -206,7 +239,10 @@ def sea_water_sound_speed(
         T = 40 °C, S = 0, z = 11 km returns an unphysical ~1995 m/s).
         Published validity domains: UNESCO/Chen-Millero T 0-40 °C, S 0-40,
         P 0-1000 bar; Del Grosso T 0-30 °C, S 30-40, P 0-1000 kg/cm²;
-        Mackenzie T 2-30 °C, S 25-40, depth 0-8000 m.
+        Mackenzie T 2-30 °C, S 25-40, depth 0-8000 m. Medwin is a
+        deliberately simplified fit ("not accurate by modern standards", in
+        Ainslie's words) and drifts by a few m/s against the UNESCO standard
+        away from mid-range temperatures and shallow depths.
     """
     t = _finite(temperature, "temperature")
     s = _finite(salinity, "salinity")
@@ -218,6 +254,8 @@ def sea_water_sound_speed(
     key = model.strip().lower()
     if key == "mackenzie":
         return float(_mackenzie(t, s, z))
+    if key == "medwin":
+        return float(_medwin(t, s, z))
     pressure_bar = depth_to_pressure(z, latitude) * _BAR_PER_MPA
     if key == "unesco":
         return float(_unesco(t, s, pressure_bar))
@@ -283,8 +321,8 @@ def sound_speed_profile(
         raise ValueError("'salinities' must be non-negative.")
     key = model.strip().lower()
     lat = _finite(latitude, "latitude")
-    if key == "mackenzie":
-        c_any = _mackenzie(temp, sal, z)
+    if key in _DEPTH_MODELS:
+        c_any = _mackenzie(temp, sal, z) if key == "mackenzie" else _medwin(temp, sal, z)
     elif key in ("unesco", "del_grosso"):
         pressure_bar = np.asarray(_pressure_mpa(z, lat)) * _BAR_PER_MPA
         c_any = (_unesco(temp, sal, pressure_bar) if key == "unesco"

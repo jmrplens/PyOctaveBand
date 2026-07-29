@@ -18,6 +18,12 @@ hammer strike. ISO 18406 characterises them with:
 * [`pile_strike_metrics`](/phonometry/reference/api/underwater/pile-driving-noise/#pile_strike_metrics) -- a [`PileStrikeResult`](/phonometry/reference/api/underwater/pile-driving-noise/#pilestrikeresult) bundling the
   single-strike SEL, the peak sound pressure level, the SPL/Leq and the
   90 %-energy pulse duration for one recorded strike, with a `.plot()`.
+* [`strike_sel_spectrum`](/phonometry/reference/api/underwater/pile-driving-noise/#strike_sel_spectrum) -- the same single-strike SEL resolved into
+  fractional-octave bands (ISO 18406 6.4.2.2), the input a marine-mammal
+  assessment needs: feed it to
+  [`weighted_exposure`](/phonometry/reference/api/underwater/marine-mammal-weighting/#weighted_exposure) to
+  obtain the weighted cumulative SEL of a piling campaign and its margin
+  against the regulatory injury and TTS criteria.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -165,3 +171,79 @@ pulse, in dB re 1 µPa²·s.
 | Exception | When |
 | :--- | :--- |
 | ValueError | If the inputs are invalid. |
+
+## strike_sel_spectrum
+
+```python
+strike_sel_spectrum(
+    pressure: NDArray[np.float64] | list[float],
+    fs: float,
+    *,
+    fraction: int = 3,
+    limits: tuple[float, float] = (10.0, 20000.0),
+) -> StrikeSelSpectrum
+```
+
+Band-resolved single-strike sound exposure level.
+
+The sound exposure `E = ∫p² dt` is split between fractional-octave bands
+by integrating the discrete power spectrum over each band (Parseval), so
+the energy sum of the returned band levels reproduces the broadband
+[`single_strike_sel`](/phonometry/reference/api/underwater/pile-driving-noise/#single_strike_sel) of the same record to within the energy that
+falls outside `limits`.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `pressure` | Sound-pressure time series of one strike (1-D), in Pa. |
+| `fs` | Sample rate, in Hz. |
+| `fraction` | Bandwidth fraction: 1 (octave) or 3 (one-third octave). |
+| `limits` | Lower and upper band-centre limits, in Hz. |
+
+**Returns:** A [`StrikeSelSpectrum`](/phonometry/reference/api/underwater/pile-driving-noise/#strikeselspectrum).
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the inputs are invalid. |
+
+## StrikeSelSpectrum
+
+```python
+StrikeSelSpectrum(
+    frequencies: NDArray[np.float64],
+    band_sel: NDArray[np.float64],
+    total_sel: float,
+    broadband_sel: float,
+    fraction: int,
+    fs: float,
+)
+```
+
+Single-strike sound exposure level resolved into fractional-octave bands.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `frequencies` | Nominal band centre frequencies, in Hz. |
+| `band_sel` | Per-band single-strike SEL, in dB re 1 µPa²·s. |
+| `total_sel` | Energy sum of `band_sel` over the covered bands, in dB re 1 µPa²·s. |
+| `broadband_sel` | The broadband single-strike SEL of the whole record, in dB re 1 µPa²·s (equal to `total_sel` when the bands span the signal's whole occupied spectrum). |
+| `fraction` | Bandwidth fraction (1 for octaves, 3 for one-third octaves). |
+| `fs` | Sample rate, in Hz. |
+
+### StrikeSelSpectrum.plot()
+
+```python
+StrikeSelSpectrum.plot(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Plot the per-band single-strike SEL.

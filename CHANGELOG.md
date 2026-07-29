@@ -320,6 +320,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   checks, a new figure `detailed_prediction_paths`, and a "Detailed Per-Band
   Prediction (ISO 12354)" guide in English and Spanish.
 
+- Weston's shallow-water propagation regimes (`underwater/weston_regimes.py`):
+  `weston_propagation_loss` assembles the composite propagation loss over the
+  four successive regimes (spherical, cylindrical, mode stripping at 15 lg r,
+  single mode) and returns each regime's own law alongside it, with
+  `weston_regime_boundaries` giving the three transition ranges, the effective
+  depth, the waveguide cut-off frequency and the number of cut-on modes.
+  `reflection_loss_gradient`, `critical_grazing_angle`, `effective_depth`,
+  `waveguide_cutoff_frequency` and `loss_parameter` expose the underlying
+  closed forms, and the two characteristic seabeds of Ainslie's Table 9.1 ship
+  as `WESTON_SEABEDS`. Because the energy-flux result is incoherent it doubles
+  as the analytic reference the numerical solvers lacked: with a totally
+  reflecting bottom the cylindrical branch reduces to the exact many-mode limit
+  F = pi/(rH), which the depth- and range-averaged `normal_modes` loss
+  reproduces to within a decibel and `parabolic_equation` to within its known
+  paraxial bias. Three new conformance checks, a `weston_regimes` figure and a
+  new section of the underwater propagation guide, in English and Spanish.
+
+- Marine-mammal hearing and regulatory noise-exposure criteria
+  (`underwater/marine_mammal_audiograms.py` and
+  `underwater/marine_mammal_weighting.py`). `group_audiogram` implements the
+  Southall et al. (2019) group audiogram in both its absolute and normalised
+  fits, and `orca_audiogram` the three-branch killer-whale audiogram of Ainslie
+  Eq. (11.159). `auditory_weighting` implements the band-pass auditory
+  weighting and exposure functions with the guidance version explicit and
+  carried on the result: NMFS 2024 v3.0 by default, with NMFS 2018 v2.0 and
+  Southall et al. 2019 selectable. `exposure_criteria` returns the published
+  TTS and injury (PTS / AUD INJ) onset criteria including the unweighted
+  peak-SPL half of the impulsive dual metric, and `weighted_exposure` runs the
+  assessment end to end: weighting a band spectrum, accumulating it over events
+  and reporting the margin against every applicable criterion.
+  `strike_sel_spectrum` (in `pile_driving_noise.py`) supplies that band
+  spectrum from a recorded pile strike by a Parseval split of the sound
+  exposure, so a piling campaign now goes from waveform to verdict. Validated
+  against the NMFS 2018 Appendix D worked example (W at 1 kHz for the five
+  groups), C recomputed as the peak of W for all three parameter sets, the
+  published Tw = K + C and injury = TTS + 20 dB identities, Southall's three
+  prose audiogram thresholds and both published orca points. Four conformance
+  checks, a `marine_mammal_weighting` figure and a new bilingual guide,
+  "Marine-mammal noise exposure".
+
+- `detection_range` and `detection_range_from_curve` in
+  `underwater/sonar_equation.py`: the figure of merit is the maximum allowable
+  transmission loss, so inverting a loss law at TL = FOM gives the range at
+  which the detection probability is 50 %. The first inverts the closed-form
+  loss (monotone, single root); the second reads the crossing off any computed
+  curve, including the oscillatory loss of a real waveguide, where `crossing`
+  selects the first or last one. Ainslie's seven numeric sonar worked examples
+  are now wired as an end-to-end test suite over the sonar equation and the
+  propagation modules, reproducing every published figure of merit and the
+  detection ranges of 1.3 km, 0.9 km and 241 / 149 / 117 m.
+
+- Medwin (1975) branch of `sea_water_sound_speed` (`model="medwin"`), the
+  simplest member of the sound-speed family, alongside UNESCO/Chen-Millero,
+  Del Grosso and Mackenzie. Pinned by the two partial derivatives Ainslie
+  prints with it and cross-checked against the other three over their common
+  validity range.
+
 - 2D near-to-far-field (NTFF) transformation for the FDTD solver.
   `FDTD2D.add_contour_probe` captures the steady-state pressure and outward
   normal-velocity phasors on a closed rectangular contour of cell faces with
@@ -462,6 +519,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `block_processing_continuity`: the callout marking the filter restart lands
   on top of the dense trace, so it now carries a solid panel and larger text
   instead of relying on the gaps between the waveforms.
+
+- Three new entries in `docs/ERRATA.md`. Ainslie's Equation (9.57) for the
+  mode-stripping to single-mode transition range is larger than its own stated
+  derivation rule gives by a factor pi times He/H, and the library implements
+  the consistent form k^2*He^2*H/(9*pi*eta). NMFS (2024) Table 5 prints
+  C = 1.37 dB for the otariid in-water group where 1.36 is correct (NMFS says
+  so itself in the table footnote; recomputing C as the peak of W gives
+  1.3643), and the library implements 1.36 while keeping the printed digit
+  reachable as `c_db_as_printed`. Southall et al. (2019) Table 7 carries four
+  peak-SPL misprints corrected by the journal's own errata, and the corrected
+  values are the ones implemented.
 
 ## [3.3.0] - 2026-07-27
 

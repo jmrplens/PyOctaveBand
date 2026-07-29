@@ -304,6 +304,7 @@ export const sidebar = [
       'guides/underwater-acoustics',
       'guides/underwater-propagation',
       'guides/underwater-solvers',
+      'guides/marine-mammal-exposure',
     ],
   },
   {

@@ -10,6 +10,7 @@ from __future__ import annotations
 import matplotlib
 
 matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
@@ -21,6 +22,8 @@ from phonometry import (
     pile_strike_metrics,
     single_strike_sel,
     sound_exposure_level,
+    strike_sel_spectrum,
+    weighted_exposure,
 )
 
 FS = 48000
@@ -89,3 +92,66 @@ def test_pile_strike_metrics_bundle_and_plot() -> None:
 def test_pile_strike_metrics_rejects_short_signal() -> None:
     with pytest.raises(ValueError):
         pile_strike_metrics(np.array([1.0]), FS)
+
+
+# ---------------------------------------------------------------------------
+# Band-resolved single-strike SEL and the marine-mammal assessment chain
+# ---------------------------------------------------------------------------
+
+
+def test_band_sel_energy_sum_reproduces_the_broadband_sel() -> None:
+    """Parseval: the band energies sum to the total sound exposure of the record."""
+    x = _pulse(50.0, 0.2)
+    spec = strike_sel_spectrum(x, FS, fraction=3, limits=(10.0, 20_000.0))
+    assert spec.total_sel == pytest.approx(spec.broadband_sel, abs=0.05)
+    assert spec.total_sel == pytest.approx(single_strike_sel(x, FS), abs=0.05)
+
+
+def test_band_sel_octave_and_third_octave_agree_on_the_total() -> None:
+    x = _pulse(50.0, 0.2)
+    octaves = strike_sel_spectrum(x, FS, fraction=1)
+    thirds = strike_sel_spectrum(x, FS, fraction=3)
+    assert octaves.total_sel == pytest.approx(thirds.total_sel, abs=0.05)
+    assert octaves.frequencies.size < thirds.frequencies.size
+
+
+def test_band_sel_peaks_at_the_tone_frequency() -> None:
+    """The synthetic strike is a 200 Hz burst, so the 200 Hz band dominates."""
+    spec = strike_sel_spectrum(_pulse(50.0, 0.2), FS, fraction=3)
+    peak = spec.frequencies[int(np.nanargmax(spec.band_sel))]
+    assert peak == pytest.approx(200.0, rel=0.3)
+
+
+def test_weighted_exposure_of_a_pile_driving_campaign() -> None:
+    """The pile-driving output feeds the regulatory weighting end to end.
+
+    A 200 Hz strike sits inside the LF cetacean weighting passband and far
+    outside the VHF one, so the same campaign weights very differently for the
+    two groups; the accumulation over strikes is the ISO 18406 +10·lg(N).
+    """
+    spec = strike_sel_spectrum(_pulse(50.0, 0.2), FS, fraction=3)
+    finite = np.isfinite(spec.band_sel)
+    lf = weighted_exposure(spec.frequencies[finite], spec.band_sel[finite], "LF",
+                           n_events=1000, impulsive=True)
+    vhf = weighted_exposure(spec.frequencies[finite], spec.band_sel[finite], "VHF",
+                            n_events=1000, impulsive=True)
+    assert lf.weighted_sel > vhf.weighted_sel + 20.0
+    assert lf.cumulative_sel == pytest.approx(lf.weighted_sel + 30.0, abs=1e-9)
+    assert lf.criteria.injury_label == "AUD INJ"
+
+
+def test_strike_sel_spectrum_validates_its_arguments() -> None:
+    x = _pulse(50.0, 0.2)
+    with pytest.raises(ValueError, match="fraction"):
+        strike_sel_spectrum(x, FS, fraction=6)
+    with pytest.raises(ValueError, match="limits"):
+        strike_sel_spectrum(x, FS, limits=(2000.0, 100.0))
+    with pytest.raises(ValueError, match="no energy"):
+        strike_sel_spectrum(np.zeros(1024), FS)
+
+
+def test_strike_sel_spectrum_plot_returns_axes() -> None:
+    spec = strike_sel_spectrum(_pulse(50.0, 0.2), FS)
+    assert spec.plot() is not None
+    assert spec.plot(language="es") is not None
+    plt.close("all")

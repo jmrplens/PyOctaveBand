@@ -16,6 +16,19 @@ transmission loss at the detection limit ``SE = 0``):
 All quantities are in dB (levels re a plane wave of 1 µPa rms; the terms are
 spectrum levels, i.e. referred to a 1 Hz band). Source: Urick, *Principles of
 Underwater Sound*, via Etter (2003), Table 10.2.
+
+The figure of merit is the *maximum allowable transmission loss*, so inverting
+a transmission-loss law at ``TL = FOM`` gives the **detection range**, the
+range at which the detection probability is 50 %:
+
+* :func:`detection_range` inverts the closed-form loss of
+  :mod:`phonometry.underwater.propagation` (spreading plus volume absorption),
+  which is strictly increasing with range and therefore has a single crossing;
+* :func:`detection_range_from_curve` reads the crossing off any computed loss
+  curve -- a normal-mode, parabolic-equation or Weston-regime prediction --
+  where the oscillatory loss of a real waveguide can cross the figure of merit
+  more than once (Ainslie, *Principles of Sonar Performance Modelling*, §11.2.8
+  makes exactly that point about convergence zones).
 """
 
 from __future__ import annotations
@@ -185,3 +198,155 @@ def active_sonar_equation(
         target_strength=ts,
         reverberation_limited=reverb,
     )
+
+
+@dataclass(frozen=True)
+class DetectionRangeResult:
+    """Detection range obtained by inverting a transmission-loss law.
+
+    :ivar detection_range: Range at which ``TL`` equals the figure of merit, in
+        metres (``inf`` when the loss never reaches it inside ``max_range``).
+    :ivar figure_of_merit: The figure of merit inverted, in dB.
+    :ivar frequency: Acoustic frequency, in Hz.
+    :ivar range_m: Range grid over which the loss was evaluated, in metres.
+    :ivar transmission_loss: Transmission loss at each range, in dB.
+    :ivar absorption_coefficient: Absorption coefficient ``α``, in dB/km.
+    :ivar law: The spreading law used.
+    :ivar model: The absorption model used.
+    """
+
+    detection_range: float
+    figure_of_merit: float
+    frequency: float
+    range_m: NDArray[np.float64]
+    transmission_loss: NDArray[np.float64]
+    absorption_coefficient: float
+    law: str
+    model: str
+
+    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+        """Plot the transmission loss against the figure of merit."""
+        from .._i18n import check_language
+        from .._plot.underwater import plot_detection_range
+
+        return plot_detection_range(self, ax=ax, language=check_language(language), **kwargs)
+
+
+def detection_range(
+    figure_of_merit: float,
+    frequency_hz: float,
+    *,
+    law: str = "spherical",
+    transition_range: float | None = None,
+    temperature: float = 10.0,
+    salinity: float = 35.0,
+    depth: float = 0.0,
+    ph: float = 8.0,
+    model: str = "francois-garrison",
+    max_range: float = 500_000.0,
+    n_points: int = 400,
+) -> DetectionRangeResult:
+    """Range at which the closed-form transmission loss equals the figure of merit.
+
+    Solves ``TL(r) = FOM`` for the loss of
+    :func:`~phonometry.underwater.propagation.transmission_loss`, which is
+    strictly increasing in range, so the root is unique. A **one-way** figure of
+    merit works for both sonar modes: the active figure of merit returned by
+    :func:`active_sonar_equation` is already the maximum allowable one-way loss.
+
+    :param figure_of_merit: Maximum allowable one-way transmission loss, in dB.
+    :param frequency_hz: Acoustic frequency, in Hz.
+    :param law: Spreading law (see
+        :func:`~phonometry.underwater.propagation.spreading_loss`).
+    :param transition_range: Transition range for the ``"practical"`` law, in m.
+    :param temperature: Temperature ``T``, in degrees Celsius.
+    :param salinity: Salinity ``S``, in parts per thousand.
+    :param depth: Depth, in metres.
+    :param ph: Acidity (default 8).
+    :param model: Absorption model (see
+        :func:`~phonometry.underwater.propagation.seawater_absorption`).
+    :param max_range: Upper bound of the search, in metres.
+    :param n_points: Number of ranges kept on the returned loss curve.
+    :return: A :class:`DetectionRangeResult`.
+    :raises ValueError: If an input is invalid.
+    """
+    from scipy.optimize import brentq
+
+    from .propagation import transmission_loss
+
+    fom = _finite(figure_of_merit, "figure_of_merit")
+    rmax = _finite(max_range, "max_range")
+    if rmax <= 1.0:
+        raise ValueError("'max_range' must exceed 1 m.")
+    if int(n_points) < 2:
+        raise ValueError("'n_points' must be at least 2.")
+    options = {
+        "law": law, "temperature": temperature, "salinity": salinity,
+        "depth": depth, "ph": ph, "model": model,
+        "transition_range": transition_range,
+    }
+
+    def _loss(r: float) -> float:
+        return float(transmission_loss(r, frequency_hz, **options).tl[0])  # type: ignore[arg-type]
+
+    lo = 1e-3
+    if _loss(rmax) < fom:
+        root = float("inf")
+    elif _loss(lo) > fom:
+        root = 0.0  # the loss already exceeds the figure of merit at 1 mm
+    else:
+        root = float(brentq(lambda r: _loss(r) - fom, lo, rmax, xtol=1e-6, rtol=1e-12))
+    upper = rmax if not np.isfinite(root) else min(rmax, max(2.0 * root, 10.0))
+    grid = np.linspace(max(1.0, upper / 1000.0), upper, int(n_points))
+    curve = transmission_loss(grid, frequency_hz, **options)  # type: ignore[arg-type]
+    return DetectionRangeResult(
+        detection_range=root,
+        figure_of_merit=fom,
+        frequency=curve.frequency,
+        range_m=curve.range_m,
+        transmission_loss=curve.tl,
+        absorption_coefficient=curve.absorption_coefficient,
+        law=curve.law,
+        model=curve.model,
+    )
+
+
+def detection_range_from_curve(
+    figure_of_merit: float,
+    range_m: NDArray[np.float64] | list[float],
+    transmission_loss: NDArray[np.float64] | list[float],
+    *,
+    crossing: str = "first",
+) -> float:
+    """Detection range read off a computed transmission-loss curve.
+
+    Finds where ``TL(r)`` crosses the figure of merit from below, interpolating
+    linearly between the two bracketing samples. Real waveguides oscillate, so
+    ``crossing`` selects which crossing to report.
+
+    :param figure_of_merit: Maximum allowable transmission loss, in dB.
+    :param range_m: Ranges, in metres (1-D, strictly increasing).
+    :param transmission_loss: Loss at each range, in dB (same length).
+    :param crossing: ``"first"`` (default) or ``"last"`` upward crossing.
+    :return: The detection range, in metres, or ``inf`` when the loss never
+        reaches the figure of merit.
+    :raises ValueError: If the inputs are invalid.
+    """
+    fom = _finite(figure_of_merit, "figure_of_merit")
+    r = _finite_array(range_m, "range_m")
+    tl = _finite_array(transmission_loss, "transmission_loss")
+    if r.shape != tl.shape:
+        raise ValueError("'transmission_loss' must have the same length as 'range_m'.")
+    if r.size < 2 or np.any(np.diff(r) <= 0.0):
+        raise ValueError("'range_m' must be strictly increasing with at least two samples.")
+    key = crossing.strip().lower()
+    if key not in ("first", "last"):
+        raise ValueError(f"'crossing' must be 'first' or 'last', got {crossing!r}.")
+    below = tl <= fom
+    up = np.flatnonzero(below[:-1] & ~below[1:])
+    if up.size == 0:
+        return float("inf")
+    i = int(up[0] if key == "first" else up[-1])
+    span = tl[i + 1] - tl[i]
+    frac = 0.0 if span == 0.0 else (fom - tl[i]) / span
+    return float(r[i] + frac * (r[i + 1] - r[i]))

@@ -13,6 +13,12 @@ hammer strike. ISO 18406 characterises them with:
 * :func:`pile_strike_metrics` -- a :class:`PileStrikeResult` bundling the
   single-strike SEL, the peak sound pressure level, the SPL/Leq and the
   90 %-energy pulse duration for one recorded strike, with a ``.plot()``.
+* :func:`strike_sel_spectrum` -- the same single-strike SEL resolved into
+  fractional-octave bands (ISO 18406 6.4.2.2), the input a marine-mammal
+  assessment needs: feed it to
+  :func:`~phonometry.underwater.marine_mammal_weighting.weighted_exposure` to
+  obtain the weighted cumulative SEL of a piling campaign and its margin
+  against the regulatory injury and TTS criteria.
 """
 
 from __future__ import annotations
@@ -127,6 +133,101 @@ class PileStrikeResult:
         from .._plot.underwater import plot_pile_strike
 
         return plot_pile_strike(self, ax=ax, language=check_language(language), **kwargs)
+
+
+@dataclass(frozen=True)
+class StrikeSelSpectrum:
+    """Single-strike sound exposure level resolved into fractional-octave bands.
+
+    :ivar frequencies: Nominal band centre frequencies, in Hz.
+    :ivar band_sel: Per-band single-strike SEL, in dB re 1 µPa²·s.
+    :ivar total_sel: Energy sum of ``band_sel`` over the covered bands, in dB
+        re 1 µPa²·s.
+    :ivar broadband_sel: The broadband single-strike SEL of the whole record,
+        in dB re 1 µPa²·s (equal to ``total_sel`` when the bands span the
+        signal's whole occupied spectrum).
+    :ivar fraction: Bandwidth fraction (1 for octaves, 3 for one-third octaves).
+    :ivar fs: Sample rate, in Hz.
+    """
+
+    frequencies: NDArray[np.float64]
+    band_sel: NDArray[np.float64]
+    total_sel: float
+    broadband_sel: float
+    fraction: int
+    fs: float
+
+    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+        """Plot the per-band single-strike SEL."""
+        from .._i18n import check_language
+        from .._plot.underwater import plot_strike_sel_spectrum
+
+        return plot_strike_sel_spectrum(self, ax=ax, language=check_language(language), **kwargs)
+
+
+def strike_sel_spectrum(
+    pressure: NDArray[np.float64] | list[float],
+    fs: float,
+    *,
+    fraction: int = 3,
+    limits: tuple[float, float] = (10.0, 20_000.0),
+) -> StrikeSelSpectrum:
+    """Band-resolved single-strike sound exposure level.
+
+    The sound exposure ``E = ∫p² dt`` is split between fractional-octave bands
+    by integrating the discrete power spectrum over each band (Parseval), so
+    the energy sum of the returned band levels reproduces the broadband
+    :func:`single_strike_sel` of the same record to within the energy that
+    falls outside ``limits``.
+
+    :param pressure: Sound-pressure time series of one strike (1-D), in Pa.
+    :param fs: Sample rate, in Hz.
+    :param fraction: Bandwidth fraction: 1 (octave) or 3 (one-third octave).
+    :param limits: Lower and upper band-centre limits, in Hz.
+    :return: A :class:`StrikeSelSpectrum`.
+    :raises ValueError: If the inputs are invalid.
+    """
+    from ..metrology.frequencies import nominal_frequencies
+
+    sig = _validate_pressure(pressure, min_samples=2)
+    fs_v = _positive(fs, "fs")
+    if int(fraction) not in (1, 3):
+        raise ValueError("'fraction' must be 1 (octave) or 3 (one-third octave).")
+    lo, hi = (float(limits[0]), float(limits[1]))
+    if not (np.isfinite(lo) and np.isfinite(hi)) or not (0.0 < lo < hi):
+        raise ValueError("'limits' must be a finite, increasing, positive pair.")
+
+    centres, lower, upper, _ = nominal_frequencies(int(fraction), [lo, hi])
+    n = sig.size
+    spectrum = np.fft.rfft(sig)
+    freqs = np.fft.rfftfreq(n, d=1.0 / fs_v)
+    # Parseval on the one-sided spectrum: E = (1/(fs·n))·Σ|X_k|², with the
+    # interior bins counted twice because the negative half is not stored.
+    weight = np.full(freqs.size, 2.0)
+    weight[0] = 1.0
+    if n % 2 == 0:
+        weight[-1] = 1.0
+    energy = weight * np.abs(spectrum) ** 2 / (fs_v * n)
+
+    fc = np.asarray(centres, dtype=np.float64)
+    band_energy = np.array([
+        float(energy[(freqs >= f_lo) & (freqs < f_hi)].sum())
+        for f_lo, f_hi in zip(lower, upper, strict=True)
+    ])
+    e0 = 1e-12  # 1 µPa²·s in Pa²·s
+    with np.errstate(divide="ignore"):
+        band_sel = 10.0 * np.log10(np.where(band_energy > 0.0, band_energy, np.nan) / e0)
+    total = float(band_energy.sum())
+    if total <= 0.0:
+        raise ValueError("'pressure' has no energy inside the requested bands.")
+    return StrikeSelSpectrum(
+        frequencies=fc,
+        band_sel=np.asarray(band_sel, dtype=np.float64),
+        total_sel=float(10.0 * np.log10(total / e0)),
+        broadband_sel=sound_exposure_level(sig, fs_v),
+        fraction=int(fraction),
+        fs=fs_v,
+    )
 
 
 def pile_strike_metrics(
