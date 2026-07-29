@@ -187,3 +187,18 @@ def test_ainslie_mccolm_table_i_oceans_within_ten_percent_of_fg() -> None:
                                  depth=z_km * 1000.0, ph=ph_v,
                                  model="ainslie-mccolm")
         assert float(np.max(np.abs(am - fg) / fg)) <= 0.10, (ph_v, s, t, z_km)
+
+
+def test_ainslie_mccolm_book_spot_value_300hz() -> None:
+    # Ainslie, Principles of Sonar Performance Modelling (Springer, 2010):
+    # the passive worked example of Sec. 3.2.3.8 quotes the seawater
+    # absorption at its 300 Hz tonal as 0.0086 dB/km (footnote, p. 78),
+    # computed for the book's representative conditions T = 10 C, S = 35,
+    # z = 0, pH = 8 (pp. 28-29). The book prints two significant figures
+    # (exact Ainslie-McColm value 0.00858 dB/km), so 1e-4 dB/km covers the
+    # rounding.
+    alpha = seawater_absorption(
+        300.0, temperature=10.0, salinity=35.0, depth=0.0, ph=8.0,
+        model="ainslie-mccolm",
+    )
+    assert float(alpha[0]) == pytest.approx(0.0086, abs=1e-4)

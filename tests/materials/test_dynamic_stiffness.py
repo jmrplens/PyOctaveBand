@@ -171,3 +171,32 @@ def test_plot_returns_axes() -> None:
     matplotlib.use("Agg")
     res = floating_floor_resonance(25.0, 200.0, 100.0)
     assert res.plot() is not None
+
+
+# ---------------------------------------------------------------------------
+# Floating-floor natural frequency — Vigran's published outcomes
+# ---------------------------------------------------------------------------
+
+# Vigran, Building Acoustics (2008), Sec. 8.4.4 "Examples" pp. 317-318,
+# prints the constructions and the resulting natural frequencies (~40 Hz and
+# ~90 Hz); the numeric inputs below are reconstructed from the same section:
+# the total dynamic stiffness s' = 8.0 MPa/m of the 25 mm mineral-wool layer
+# follows from the Table 8.3 dynamic E-modulus plus the enclosed-air
+# stiffness, and the plate masses per unit area are nominal values for the
+# stated build-ups.
+
+
+def test_natural_frequency_vigran_concrete_floating_floor() -> None:
+    # 50 mm concrete floating slab (nominal m' ~ 115 kg/m2) on the
+    # s' = 8.0 MPa/m layer: the book publishes f0 ~= 40 Hz, rounded to the
+    # nearest 10 Hz (the reconstruction gives 42.0 Hz exactly), so 3 Hz
+    # covers the rounding plus the nominal slab mass.
+    assert natural_frequency(8.0e6, 115.0) == pytest.approx(40.0, abs=3.0)
+
+
+def test_natural_frequency_vigran_lightweight_floating_floor() -> None:
+    # Same layer under a lightweight top plate of 22 mm chipboard + 13 mm
+    # plasterboard (nominal m' ~ 16.7 + 11.2 ~ 28 kg/m2): the book publishes
+    # f0 ~= 90 Hz, rounded to the nearest 10 Hz (the reconstruction gives
+    # 85.1 Hz), so 5.5 Hz covers the rounding plus the nominal plate masses.
+    assert natural_frequency(8.0e6, 28.0) == pytest.approx(90.0, abs=5.5)

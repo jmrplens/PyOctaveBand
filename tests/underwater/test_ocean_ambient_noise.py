@@ -125,3 +125,13 @@ def test_ambient_plot_smoke() -> None:
     f = np.logspace(2, 5, 50)
     res = ocean_ambient_noise(f, wind_speed_knots=10.0, shipping=np.full(50, 60.0))
     assert res.plot() is not None
+
+
+def test_thermal_noise_ainslie_closed_form_spot_value() -> None:
+    # Ainslie, Principles of Sonar Performance Modelling (2010), Eq. (9.153)
+    # p. 485: thermal noise NLf = -14.7 + 20 lg F(kHz) dB re uPa2/Hz. At
+    # F = 100 kHz that is 25.3 dB re uPa2/Hz. Ainslie prints the constant to
+    # one decimal, so 0.1 dB covers the rounding against the library's exact
+    # Mellen physical form at its default conditions.
+    got = thermal_noise_spectrum([100000.0])
+    assert float(got[0]) == pytest.approx(-14.7 + 20.0 * 2.0, abs=0.1)

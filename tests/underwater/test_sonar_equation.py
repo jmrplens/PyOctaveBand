@@ -85,3 +85,61 @@ def test_plot_smoke() -> None:
     res = passive_sonar_equation(150.0, np.linspace(40.0, 110.0, 40), 55.0,
                                  detection_threshold=8.0)
     assert res.plot() is not None
+
+
+# ---------------------------------------------------------------------------
+# Ainslie (2010) worked-example figure-of-merit oracles
+# ---------------------------------------------------------------------------
+
+# Ainslie, Principles of Sonar Performance Modelling (Springer, 2010),
+# publishes complete term tables for his sonar-equation worked examples. The
+# term balances below re-combine those printed values through the library's
+# equations; every expected number is the book's, so these anchor the sign
+# conventions of the SL/NL/DI/DT/TS combination against an independent source.
+
+
+def test_ainslie_passive_narrowband_fom() -> None:
+    # Table 3.1 (p. 76), passive narrowband example of Sec. 3.2.3.8:
+    # SL = 133.9 dB re uPa2 m2, NLf = 59.7 dB re uPa2/Hz, AG = 11.5 dB,
+    # DT = 13.8 dB, analysis bandwidth 0.25 Hz (the printed "BW = -6.0 dB"
+    # row) -> FOM = 78.0 dB re m2. The bandwidth term folds into the masking
+    # noise as NL = NLf + 10 lg(0.25 Hz) = 59.7 - 6.0 dB. Five printed
+    # terms, each rounded to 0.1 dB, give a 0.15 dB accumulation allowance.
+    res = passive_sonar_equation(
+        133.9, 0.0, 59.7 - 6.0,
+        directivity_index=11.5, detection_threshold=13.8,
+    )
+    assert res.figure_of_merit == pytest.approx(78.0, abs=0.15)
+
+
+def test_ainslie_passive_broadband_fom() -> None:
+    # Table 3.2 (p. 90), passive broadband example of Sec. 3.2.4.8 (spectral
+    # density form, no bandwidth term): SLf = 100.9 dB re uPa2 m2/Hz,
+    # NLf = 53.2 dB re uPa2/Hz, AGm = 12.8 dB, DT = -18.6 dB ->
+    # FOM = 79.0 dB re m2 (four printed 0.1 dB terms -> 0.15 dB allowance).
+    res = passive_sonar_equation(
+        100.9, 0.0, 53.2,
+        directivity_index=12.8, detection_threshold=-18.6,
+    )
+    assert res.figure_of_merit == pytest.approx(79.0, abs=0.15)
+
+
+def test_ainslie_active_orca_noise_limited_fom() -> None:
+    # Sec. 11.4.6 (orca vs salmon, Tables 11.6-11.7 pp. 620-624): SL(RMS) =
+    # 198.2 dB re uPa2 m2, TS(salmon, 0.8 m) = -29.0 dB re m2, wind noise
+    # NL = 75.0 dB re uPa2, AG = 16.5 dB, DT = 8.7 dB -> noise-limited
+    # FOM_NL = (SL + TS - (NL - AG) - DT)/2 = 51.0 dB re m2.
+    res = active_sonar_equation(
+        198.2, 0.0, -29.0, 75.0,
+        directivity_index=16.5, detection_threshold=8.7,
+    )
+    assert res.figure_of_merit == pytest.approx(51.0, abs=0.05)
+
+
+def test_ainslie_active_orca_hearing_threshold_fom() -> None:
+    # Same example: against the orca's hearing threshold at 50 kHz,
+    # HT = 51.2 dB re uPa2 (audiogram Eq. 11.159), the book's
+    # FOM_HT = (SL + TS - HT)/2 = 59.0 dB re m2; the threshold acts as the
+    # masking level with no array gain and no detection threshold.
+    res = active_sonar_equation(198.2, 0.0, -29.0, 51.2)
+    assert res.figure_of_merit == pytest.approx(59.0, abs=0.05)

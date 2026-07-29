@@ -608,3 +608,133 @@ def test_impact_non_finite_rejected() -> None:
         ValueError, match="'ln_w_eq' must be a finite number"
     ):
         predicted_impact_insulation(ln_w_eq=float("nan"))
+
+
+# --------------------------------------------------------------------------
+# Annex E junction Kij — independent literature oracles
+# --------------------------------------------------------------------------
+
+
+def test_kij_rigid_t_vigran_aerated_concrete_example() -> None:
+    # Vigran, Building Acoustics (Taylor & Francis, 2008), Sec. 9.3.2.3,
+    # p. 353: aerated-concrete test building, 125 mm walls and a 150 mm floor
+    # at 600 kg/m3 (m' = 75 and 90 kg/m2). For the wall-floor-wall path Ff
+    # across the rigid T-junction, "using the expression for a T-junction in
+    # EN 12354-1 we arrive at the value 6.9 dB for Kij". The book prints one
+    # decimal; the exact Annex E value is 6.85 dB, so 0.05 dB covers the
+    # rounding.
+    assert junction_vibration_reduction(
+        "rigid_t", "through", 90.0 / 75.0
+    ) == pytest.approx(6.9, abs=0.05)
+
+
+def test_kij_rigid_t_equal_masses_alba() -> None:
+    # Alba, Escuder, Ramis, del Rey and Segovia, J. Vib. Acoust. 134 (2012)
+    # 021009, Table 1: "The standard gives a fixed value of 5.7 for the
+    # vibration [reduction] index in a rigid T-junction when the surface
+    # densities of the elements forming the junction are equal"
+    # (K12354 = 5.7 dB). Exact value, no rounding involved.
+    assert junction_vibration_reduction(
+        "rigid_t", "corner", 1.0
+    ) == pytest.approx(5.7, abs=1e-9)
+
+
+@pytest.mark.parametrize(
+    ("frequency", "expected"),
+    [
+        # Alba et al. (2012) Table 1, T-junction with elastic interlayer and
+        # equal surface densities: K12 = 10 lg f - 10 lg f1 + 5.7 dB for
+        # f > f1, evaluated by hand from the paper's expression with the
+        # f1 = 125 Hz the paper uses for its theoretical curve, over the
+        # paper's fitted range 200-1250 Hz. Hand values to 0.01 dB.
+        (200.0, 7.74),
+        (500.0, 11.72),
+        (1250.0, 15.70),
+    ],
+)
+def test_kij_flexible_t_alba_frequency_law(
+    frequency: float, expected: float
+) -> None:
+    assert junction_vibration_reduction(
+        "flexible_t", "corner", 1.0, frequency=frequency, f1=125.0
+    ) == pytest.approx(expected, abs=0.005)
+
+
+# Schiavi & Astolfi, Applied Acoustics 71 (2010) 523-530, Table 3: measured
+# average vibration reduction index (one-third-octave bands, in-situ per
+# EN ISO 10848-1) for junctions between beam-and-block floors and brickwork
+# walls in Southern-European buildings. CB = concrete beam-brick wall,
+# BB = ribbed slab with brick blocks-brick wall.
+_SCHIAVI_TABLE3_FREQS = (
+    100.0, 125.0, 160.0, 200.0, 250.0, 315.0, 400.0, 500.0, 630.0,
+    800.0, 1000.0, 1250.0, 1600.0, 2000.0, 2500.0, 3150.0, 4000.0, 5000.0,
+)
+_SCHIAVI_TABLE3_CB = (
+    18.0, 17.5, 17.0, 16.5, 16.0, 15.5, 15.0, 14.5, 14.0,
+    14.0, 14.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0,
+)
+_SCHIAVI_TABLE3_BB = (
+    17.0, 16.5, 16.0, 15.5, 15.0, 14.5, 14.0, 13.5, 13.0,
+    12.5, 12.0, 11.5, 12.0, 12.5, 13.0, 13.5, 14.0, 14.5,
+)
+# Table 3 "Single number (average)" row.
+_SCHIAVI_SINGLE_CB = 16.0
+_SCHIAVI_SINGLE_BB = 14.0
+# Table 1, mwall/mfloor of the 13 BB junctions (junction numbers 3, 5, 7, 11,
+# 13, 14, 15, 16, 17, 18, 19, 21, 29); all are cross junctions.
+_SCHIAVI_BB_RATIOS = (
+    0.4, 0.4, 0.2, 0.3, 0.3, 0.3, 0.4, 0.3, 0.3, 0.2, 0.3, 0.4, 0.2
+)
+# Table 2, "essential" mass ratios mEwall/mEfloor of the 19 CB junctions
+# (junction numbers 1, 2, 4, 6, 8, 9, 10, 12, 20, 22, 23, 24, 25, 26, 27,
+# 28, 30, 31, 32).
+_SCHIAVI_CB_RATIOS = (
+    0.1, 0.1, 0.1, 0.2, 0.1, 0.2, 0.2, 0.2, 0.2, 0.1,
+    0.2, 0.1, 0.1, 0.1, 0.2, 0.2, 0.1, 0.1, 0.2,
+)
+
+
+def test_schiavi_table3_transcription_matches_single_numbers() -> None:
+    # The paper's single-number rows are "obtained from the frequency
+    # averaging from 100 Hz to 5 kHz" and printed as integers: pin the
+    # transcribed per-band columns to them (0.5 dB integer rounding).
+    n_bands = len(_SCHIAVI_TABLE3_FREQS)
+    assert len(_SCHIAVI_TABLE3_CB) == len(_SCHIAVI_TABLE3_BB) == n_bands
+    assert sum(_SCHIAVI_TABLE3_CB) / n_bands == pytest.approx(
+        _SCHIAVI_SINGLE_CB, abs=0.5
+    )
+    assert sum(_SCHIAVI_TABLE3_BB) / n_bands == pytest.approx(
+        _SCHIAVI_SINGLE_BB, abs=0.5
+    )
+
+
+@pytest.mark.parametrize(
+    ("ratios", "measured"),
+    [
+        (_SCHIAVI_BB_RATIOS, _SCHIAVI_SINGLE_BB),
+        (_SCHIAVI_CB_RATIOS, _SCHIAVI_SINGLE_CB),
+    ],
+    ids=["bb-junctions", "cb-junctions"],
+)
+def test_schiavi_measured_kij_anchors_annex_e_prediction(
+    ratios: tuple[float, ...], measured: float
+) -> None:
+    # Schiavi & Astolfi compare their measured Kij with the EN 12354-1
+    # Annex E rigid-cross corner formula (their Eq. (5), chosen "due to the
+    # prevalence of cross junctions in the full set of data") and report that
+    # the differences "are normally distributed, with an average value of
+    # 3.4 dB" (Sec. 5.1); the essential-mass CB comparison of Sec. 4.2 gives
+    # "about 4 dB". This is a tolerance anchor, not a digit oracle: the
+    # library prediction evaluated at the junctions' mean mass ratio must sit
+    # within 4.5 dB (the Sec. 4.2 "about 4 dB" figure plus the paper's
+    # ~0.5 dB standard deviation of the mean) of the measured single-number
+    # Kij. It fixes the
+    # sign convention of M and the Annex E constants against real data.
+    mean_ratio = sum(ratios) / len(ratios)
+    predicted = junction_vibration_reduction("rigid_cross", "corner", mean_ratio)
+    assert abs(measured - predicted) <= 4.5
+    # And the corner branch must be direction-symmetric (the paper notes the
+    # choice of the mass ratio for M is arbitrary for corner transmission).
+    assert junction_vibration_reduction(
+        "rigid_cross", "corner", 1.0 / mean_ratio
+    ) == pytest.approx(predicted, abs=1e-9)

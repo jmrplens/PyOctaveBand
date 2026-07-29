@@ -457,3 +457,61 @@ def test_radiated_power_plot() -> None:
     ax = _annex_g_side1_with_door().plot()
     assert ax.get_ylabel() != ""
     assert len(ax.patches) == len(ref.EN12354_4_ANNEX_G_BANDS)
+
+
+# ---------------------------------------------------------------------------
+# Element compositing — independent literature oracles
+# ---------------------------------------------------------------------------
+
+# The area-weighted transmission-factor sum (Formula 15) is unit-free in the
+# area ratio, so Long's foot-pound examples apply as printed. The receiving
+# volume is not part of R', so a nominal volume is passed.
+
+
+def test_composite_r_long_window_in_wall() -> None:
+    # Long, Architectural Acoustics 2e (Academic Press, 2014), Ch. 10 p. 385:
+    # a 12 ft2 window of TL 25 dB in a 160 ft2 wall of TL 45 dB gives
+    # R = 10 lg[160 / (12*0.0034 + 148*0.00003)] = 35.5 dB. Long rounds the
+    # transmission factors to two significant figures (0.0034 for 10^-2.5 =
+    # 0.00316), which moves the printed result by up to 0.3 dB; the exact
+    # compositing gives 35.74 dB.
+    res = facade_sound_reduction(
+        [
+            FacadeElement("wall", area=148.0, r=45.0),
+            FacadeElement("window", area=12.0, r=25.0),
+        ],
+        area=160.0,
+        volume=50.0,
+    )
+    assert res.r_prime[0] == pytest.approx(35.5, abs=0.3)
+
+
+def test_composite_r_long_slot_under_door() -> None:
+    # Long (2014), Ch. 10 p. 385: a 20 ft2 door of TL 30 dB with a 0.5 in
+    # slot (0.125 ft2, TL 0 dB) beneath it composites to
+    # R = 10 lg[20.125 / (20*0.001 + 0.125*1)] = 21.4 dB (printed to 0.1 dB).
+    res = facade_sound_reduction(
+        [
+            FacadeElement("door", area=20.0, r=30.0),
+            FacadeElement("slot", area=0.125, r=0.0),
+        ],
+        area=20.125,
+        volume=50.0,
+    )
+    assert res.r_prime[0] == pytest.approx(21.4, abs=0.05)
+
+
+def test_composite_r_manual_es_facade() -> None:
+    # Aviles Lopez & Perera Martin, Manual de acustica ambiental y
+    # arquitectonica (Paraninfo), Ejemplo 7.5 (p. 410): 8 m2 facade with a
+    # 2 m2 window; blind part RA = 40 dBA, window RA = 26 dBA ->
+    # Rg = 10 lg[8 / (6*10^-4.0 + 2*10^-2.6)] = 31.5 dBA (printed to 0.1 dB).
+    res = facade_sound_reduction(
+        [
+            FacadeElement("blind part", area=6.0, r=40.0),
+            FacadeElement("window", area=2.0, r=26.0),
+        ],
+        area=8.0,
+        volume=50.0,
+    )
+    assert res.r_prime[0] == pytest.approx(31.5, abs=0.05)

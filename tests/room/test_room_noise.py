@@ -270,3 +270,38 @@ def test_rc_plot_returns_axes() -> None:
     ax = rn.room_criterion(rn.rc_curve(35.0)).plot()
     assert isinstance(ax, plt.Axes)
     plt.close("all")
+
+
+# ---------------------------------------------------------------------------
+# Published NC-rating examples
+# ---------------------------------------------------------------------------
+
+
+def test_nc_rating_manual_es_measured_spectrum() -> None:
+    # Aviles Lopez & Perera Martin, Manual de acustica ambiental y
+    # arquitectonica (Paraninfo), Ejemplo 8.3 (p. 564): measured octave
+    # spectrum 46/44/38/31/27/22/24/21 dB at 63 Hz - 8 kHz. With the classic
+    # 5-step NC family the book rates it NC-30 by tangency and refines to
+    # NC-27 by sliding the curve down 3 dB. The interpolated ANSI S12.2
+    # tangency implemented here lands on the same refined value; 0.5 dB
+    # covers the book's whole-dB curve stepping against the interpolation.
+    res = rn.noise_criterion(
+        [46.0, 44.0, 38.0, 31.0, 27.0, 22.0, 24.0, 21.0],
+        [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0],
+    )
+    assert res.rating == pytest.approx(27.0, abs=0.5)
+    assert res.rating <= 30.0  # the book's unrefined tangency designation
+
+
+def test_nc_verdict_long_hvac_receiver_spectrum() -> None:
+    # Long, Architectural Acoustics 2e (2014), Table 14.9 (pp. 555-558): the
+    # combined supply-plus-return receiver spectrum of the worked HVAC duct
+    # path, 55/45/32/26/23/25/22/12 dB at 63 Hz - 8 kHz, "meets NC 30". The
+    # rating must therefore not exceed 30 (and the spectrum must lie inside
+    # the NC family).
+    res = rn.noise_criterion(
+        [55.0, 45.0, 32.0, 26.0, 23.0, 25.0, 22.0, 12.0],
+        [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0],
+    )
+    assert res.out_of_range is None
+    assert res.rating <= 30.0

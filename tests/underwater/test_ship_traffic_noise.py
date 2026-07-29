@@ -177,3 +177,53 @@ def test_randi_reproduces_report_table_2(
     got = _randi(f, speed_kn, length_ft * 0.3048)
     for idx, (freq, ref) in enumerate(sorted(levels.items())):
         assert float(got[idx]) == pytest.approx(ref, abs=0.1), freq
+
+
+# ---------------------------------------------------------------------------
+# JOMOPANS-ECHO vs the classic Overseas Harriette measurement
+# ---------------------------------------------------------------------------
+
+# Ainslie, Principles of Sonar Performance Modelling (2010), Table 8.16
+# (p. 421): third-octave dipole source levels of the cargo ship M/V Overseas
+# Harriette (173 m bulk carrier) at three speeds, from the Arveson &
+# Vendittis (2000) measurements — the classic single-ship anchor for
+# class-average source-level models. dB re uPa2 m2.
+_HARRIETTE_FREQS = [50.0, 100.0, 200.0, 500.0, 1000.0, 2000.0]
+_HARRIETTE_LEVELS = {
+    16.0: [185.0, 180.0, 174.0, 168.0, 166.0, 163.0],
+    12.0: [178.0, 169.0, 164.0, 161.0, 159.0, 155.0],
+    8.0: [163.0, 154.0, 156.0, 157.0, 156.0, 152.0],
+}
+
+
+@pytest.mark.parametrize("speed_kn", [16.0, 12.0])
+def test_jomopans_echo_tracks_overseas_harriette_at_speed(
+    speed_kn: float,
+) -> None:
+    # At the vessel's service speeds the class-average bulker prediction must
+    # track the measured individual ship within the model's own class spread:
+    # MacGillivray & de Jong (2021) report within-class standard deviations of
+    # roughly 5 dB per band, so 8 dB per band (< 2 sigma) and
+    # 4 dB on the six-band mean are the tolerance. This is a cross-check
+    # anchor for the speed/length scaling and band conversion, not a digit
+    # oracle.
+    res = ship_source_spectrum(
+        speed_kn, 173.0, vessel_class="bulker",
+        frequency_hz=_HARRIETTE_FREQS,
+    )
+    diff = res.band_level - np.asarray(_HARRIETTE_LEVELS[speed_kn])
+    assert float(np.max(np.abs(diff))) <= 8.0
+    assert float(np.mean(np.abs(diff))) <= 4.0
+
+
+def test_jomopans_echo_overseas_harriette_low_speed_mean() -> None:
+    # At 8 kn the v^6 speed law of the class average under-predicts the
+    # machinery-dominated high bands of this particular ship (a documented
+    # limitation of speed-scaled class averages at low speed), so only the
+    # six-band mean deviation is constrained, at 6 dB (about one class
+    # standard deviation).
+    res = ship_source_spectrum(
+        8.0, 173.0, vessel_class="bulker", frequency_hz=_HARRIETTE_FREQS,
+    )
+    diff = res.band_level - np.asarray(_HARRIETTE_LEVELS[8.0])
+    assert float(np.mean(np.abs(diff))) <= 6.0
