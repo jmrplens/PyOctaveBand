@@ -516,8 +516,8 @@ from phonometry import metrology
 fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
-# Default standard measurement
-spl, freq = metrology.octave_filter(x, fs, filter_type='butter')
+# Standard one-third-octave measurement
+spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='butter')
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_3_order_6_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_3_order_6.svg" alt="Butterworth one-third-octave filter bank frequency response" width="60%"></picture>
@@ -550,7 +550,7 @@ fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Selectivity with 0.1 dB passband ripple
-spl, freq = metrology.octave_filter(x, fs, filter_type='cheby1', ripple=0.1)
+spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='cheby1', ripple=0.1)
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_3_order_6_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_3_order_6.svg" alt="Chebyshev I one-third-octave filter bank frequency response" width="60%"></picture>
@@ -584,7 +584,7 @@ fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Flat passband, class-1 default 72 dB stopband attenuation
-spl, freq = metrology.octave_filter(x, fs, filter_type='cheby2')
+spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='cheby2')
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_3_order_6_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_3_order_6.svg" alt="Chebyshev II one-third-octave filter bank frequency response" width="60%"></picture>
@@ -616,7 +616,7 @@ fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Maximum selectivity for extreme band isolation
-spl, freq = metrology.octave_filter(x, fs, filter_type='ellip', ripple=0.1)
+spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='ellip', ripple=0.1)
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_3_order_6_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_3_order_6.svg" alt="Elliptic one-third-octave filter bank frequency response" width="60%"></picture>
@@ -649,7 +649,7 @@ fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Best for pulse analysis and transient preservation
-spl, freq = metrology.octave_filter(x, fs, filter_type='bessel')
+spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='bessel')
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_3_order_6_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_3_order_6.svg" alt="Bessel one-third-octave filter bank frequency response" width="60%"></picture>
@@ -684,7 +684,7 @@ recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Split the recording into Low and High bands at 1000 Hz
 low, high = metrology.linkwitz_riley(recording, fs, freq=1000, order=4)
-# Reconstruction: low + high == recording (flat response)
+# Recombined, low + high has a flat magnitude response (allpass sum)
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/crossover_lr4_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/crossover_lr4.svg" alt="Linkwitz-Riley 4th-order crossover: low-pass, high-pass and their flat sum" width="60%"></picture>
@@ -1072,8 +1072,8 @@ configurations.
 - [Filter Banks](https://jmrplens.github.io/phonometry/guides/filter-banks/): the band mathematics and the
   architectures whose class is verified here.
 - [Frequency Weighting](https://jmrplens.github.io/phonometry/guides/weighting/): the companion verification of the A,
-  C and Z curves against the IEC 61672-1 tolerance tables, with B and AU
-  covered in [Special Weightings](https://jmrplens.github.io/phonometry/guides/special-weightings/).
+  C and Z curves against the IEC 61672-1 tolerance tables, with the G, B, D and
+  AU curves covered in [Special Weightings](https://jmrplens.github.io/phonometry/guides/special-weightings/).
 - [Sound level meter](https://jmrplens.github.io/phonometry/guides/sound-level-meter/): the instrument chain whose
   spectrum stage this class applies to.
 - [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the verified configurations behind

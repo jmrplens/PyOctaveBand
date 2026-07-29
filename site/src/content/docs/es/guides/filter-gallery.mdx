@@ -136,8 +136,8 @@ from phonometry import metrology
 fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
-# Medición estándar por defecto
-spl, freq = metrology.octave_filter(x, fs, filter_type='butter')
+# Medición estándar en tercios de octava
+spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='butter')
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Butterworth de tercio de octava" width="60%" />
@@ -170,7 +170,7 @@ fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Selectividad con 0.1 dB de rizado en la banda de paso
-spl, freq = metrology.octave_filter(x, fs, filter_type='cheby1', ripple=0.1)
+spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='cheby1', ripple=0.1)
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Chebyshev I de tercio de octava" width="60%" />
@@ -205,7 +205,7 @@ fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Banda de paso plana, 72 dB de atenuación por defecto (clase 1)
-spl, freq = metrology.octave_filter(x, fs, filter_type='cheby2')
+spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='cheby2')
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Chebyshev II de tercio de octava" width="60%" />
@@ -238,7 +238,7 @@ fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Máxima selectividad para aislamiento extremo entre bandas
-spl, freq = metrology.octave_filter(x, fs, filter_type='ellip', ripple=0.1)
+spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='ellip', ripple=0.1)
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco elíptico de tercio de octava" width="60%" />
@@ -271,7 +271,7 @@ fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Ideal para análisis de pulsos y preservación de transitorios
-spl, freq = metrology.octave_filter(x, fs, filter_type='bessel')
+spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='bessel')
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Bessel de tercio de octava" width="60%" />
@@ -306,7 +306,7 @@ recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Dividir la grabación en bandas grave y aguda a 1000 Hz
 low, high = metrology.linkwitz_riley(recording, fs, freq=1000, order=4)
-# Reconstrucción: low + high == recording (respuesta plana)
+# Recombinada, low + high tiene una respuesta plana en magnitud (suma paso todo)
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/crossover_lr4_es.svg" alt="Crossover Linkwitz-Riley de 4.º orden: paso-bajo, paso-alto y su suma plana" width="60%" />

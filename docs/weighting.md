@@ -11,6 +11,11 @@ the historical B and D and the AU curve, is
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses.svg" alt="A, B, C, D, AU and Z frequency weighting curves with a zoom showing the positive region of the A curve (+1.27 dB at 2.5 kHz)" width="80%"></picture>
 
+*The audible-range weighting family measured on one chart. This guide covers
+the A, C and Z responses; the B, D and AU curves drawn alongside them, and
+the infrasound G curve, are the subject of
+[Special Weightings](special-weightings.md).*
+
 <details>
 <summary>Show the code for this figure</summary>
 

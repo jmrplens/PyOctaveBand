@@ -938,9 +938,10 @@ All four methods are anchored so a **1 kHz tone at 40 dB SPL is ≈ 1 sone**; th
 are not interchangeable digit-for-digit because the models differ in their
 auditory filters and their loudness summation.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison.svg" alt="Loudness of a 1 kHz tone as a function of level for the Zwicker, Moore-Glasberg and Sottek models, all passing through 1 sone at 40 dB SPL" width="80%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison.svg" alt="Loudness of a 1 kHz tone as a function of level for the Zwicker, Moore-Glasberg and Sottek models, all passing close to 1 sone at 40 dB SPL" width="80%"></picture>
 
-*The three models agree at the 1 sone / 40 dB anchor and diverge with level:
+*The three models pass through approximately 1 sone at the 40 dB anchor
+(the Sottek front-end documents 0.984 sone_HMS there) and diverge with level:
 Zwicker doubles the sone value every +10 phon, while the Sottek model grows
 more slowly (about 1.65× per 10 dB), an intrinsic difference between the
 auditory summations, not a calibration error.*
@@ -953,7 +954,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import psychoacoustics
 
-# 1 kHz tone, 20..80 dB SPL: all three models pass through 1 sone at 40 dB
+# 1 kHz tone, 20..80 dB SPL: all three models pass close to 1 sone at 40 dB
 fs = 48000
 t = np.arange(fs) / fs
 levels = np.arange(20.0, 81.0, 10.0)
@@ -7147,9 +7148,13 @@ Where you put the microphone changes the number: ISO 1996-2 fixes the receiver p
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_env_measurement_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_env_measurement.svg" alt="Environmental noise measurement positions per ISO 1996-2: free field, 2 m from the facade and flush-mounted, with their corrections" width="92%"></picture>
 
-Combine with `laeq()` per time period to go from recordings to Lden, and with
+Combine with `laeq()` per time period to go from recordings to Lden. The
+tonal adjustment itself is justified by the tonal audibility route of the next
+section (fed, for the ISO/PAS 20065 method, by
+[Objective audibility of tones in noise](https://jmrplens.github.io/phonometry/guides/tone-audibility/));
 the `tone_to_noise_ratio()` / `prominence_ratio()` verdicts of
-[Prominent Discrete Tones](https://jmrplens.github.io/phonometry/guides/tone-prominence/) to justify tonal adjustments.
+[Prominent Discrete Tones](https://jmrplens.github.io/phonometry/guides/tone-prominence/) are
+complementary emission screening, not the Kt basis.
 
 ## Determining levels: tonal adjustment, residual noise and uncertainty (ISO 1996-2)
 
@@ -7198,7 +7203,7 @@ percentile levels (Annex I) and rejects inverted percentile orderings.
 
 **Measurement uncertainty (Clause 4, Annex F).** `combined_standard_uncertainty()`
 forms $u = \sqrt{\sum (c_j u_j)^2}$ (Formula (2)) and
-`environmental_expanded_uncertainty()` applies $k = 2$ (95 %) or $k = 1.3$ (80 %);
+`expanded_uncertainty()` applies $k = 2$ (95 %) or $k = 1.3$ (80 %);
 `residual_correction_uncertainty()` carries the residual-correction sensitivity
 (Formulae (F.7)/(F.8)) and `uncertainty_from_repeated_measurements()` the
 repeated-measurement standard uncertainty: the primary energy-domain route
@@ -7237,9 +7242,11 @@ $L_{dn}$ (3.6.5) keeps only the +10 dB night penalty.
 
 - [Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/guides/levels/): the Leq/LAeq, percentile
   and event levels the indicators of this page are assembled from.
-- [Prominent Discrete Tones](https://jmrplens.github.io/phonometry/guides/tone-prominence/): the tone-to-noise and
-  prominence-ratio verdicts that justify the Table A.1 tonal adjustments
-  objectively.
+- [Objective audibility of tones in noise](https://jmrplens.github.io/phonometry/guides/tone-audibility/): the tonal
+  audibility whose mean value maps to the Kt adjustment (Table J.1).
+- [Prominent Discrete Tones](https://jmrplens.github.io/phonometry/guides/tone-prominence/): the ECMA-418-1
+  tone-to-noise and prominence-ratio verdicts, complementary emission
+  screening for the tonal question.
 - [Occupational Noise Exposure](https://jmrplens.github.io/phonometry/guides/occupational-exposure/): the workplace
   counterpart, from task samples to the daily exposure level with its
   uncertainty budget.
@@ -9143,8 +9150,8 @@ configurations.
 - [Filter Banks](https://jmrplens.github.io/phonometry/guides/filter-banks/): the band mathematics and the
   architectures whose class is verified here.
 - [Frequency Weighting](https://jmrplens.github.io/phonometry/guides/weighting/): the companion verification of the A,
-  C and Z curves against the IEC 61672-1 tolerance tables, with B and AU
-  covered in [Special Weightings](https://jmrplens.github.io/phonometry/guides/special-weightings/).
+  C and Z curves against the IEC 61672-1 tolerance tables, with the G, B, D and
+  AU curves covered in [Special Weightings](https://jmrplens.github.io/phonometry/guides/special-weightings/).
 - [Sound level meter](https://jmrplens.github.io/phonometry/guides/sound-level-meter/): the instrument chain whose
   spectrum stage this class applies to.
 - [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the verified configurations behind
@@ -9298,8 +9305,8 @@ from phonometry import metrology
 fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
-# Default standard measurement
-spl, freq = metrology.octave_filter(x, fs, filter_type='butter')
+# Standard one-third-octave measurement
+spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='butter')
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_3_order_6_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_3_order_6.svg" alt="Butterworth one-third-octave filter bank frequency response" width="60%"></picture>
@@ -9332,7 +9339,7 @@ fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Selectivity with 0.1 dB passband ripple
-spl, freq = metrology.octave_filter(x, fs, filter_type='cheby1', ripple=0.1)
+spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='cheby1', ripple=0.1)
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_3_order_6_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_3_order_6.svg" alt="Chebyshev I one-third-octave filter bank frequency response" width="60%"></picture>
@@ -9366,7 +9373,7 @@ fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Flat passband, class-1 default 72 dB stopband attenuation
-spl, freq = metrology.octave_filter(x, fs, filter_type='cheby2')
+spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='cheby2')
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_3_order_6_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_3_order_6.svg" alt="Chebyshev II one-third-octave filter bank frequency response" width="60%"></picture>
@@ -9398,7 +9405,7 @@ fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Maximum selectivity for extreme band isolation
-spl, freq = metrology.octave_filter(x, fs, filter_type='ellip', ripple=0.1)
+spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='ellip', ripple=0.1)
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_3_order_6_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_3_order_6.svg" alt="Elliptic one-third-octave filter bank frequency response" width="60%"></picture>
@@ -9431,7 +9438,7 @@ fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Best for pulse analysis and transient preservation
-spl, freq = metrology.octave_filter(x, fs, filter_type='bessel')
+spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='bessel')
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_3_order_6_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_3_order_6.svg" alt="Bessel one-third-octave filter bank frequency response" width="60%"></picture>
@@ -9466,7 +9473,7 @@ recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Split the recording into Low and High bands at 1000 Hz
 low, high = metrology.linkwitz_riley(recording, fs, freq=1000, order=4)
-# Reconstruction: low + high == recording (flat response)
+# Recombined, low + high has a flat magnitude response (allpass sum)
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/crossover_lr4_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/crossover_lr4.svg" alt="Linkwitz-Riley 4th-order crossover: low-pass, high-pass and their flat sum" width="60%"></picture>
@@ -27825,7 +27832,7 @@ how *rough* or how strongly *fluctuating* they are. This page covers the
 sound-quality metrics that complement loudness: sharpness (DIN 45692) and the
 ECMA-418-2 tonality, roughness and fluctuation strength of the Sottek Hearing
 Model. Loudness itself lives in [Loudness](https://jmrplens.github.io/phonometry/guides/loudness/); the ECMA-418-2
-loudness that shares the same auditory front-end, in
+loudness that shares the same auditory front-end lives in
 [Advanced loudness](https://jmrplens.github.io/phonometry/guides/advanced-loudness/).
 
 The four metrics form one family: a single calibrated signal splits across
@@ -28179,12 +28186,14 @@ each the right tool for a narrower job: the **G** curve of **ISO 7196:1995**
 rates infrasound below 20 Hz the way A-weighting rates audible noise, the
 historical **B** (ANSI S1.4-1983) reproduces measurements taken under older
 national codes, the withdrawn aircraft-noise **D** (IEC 537) serves
-comparisons with legacy data, and **AU** (IEC 61012), the only one still in
-force, keeps ultrasonic components out of an audible-exposure reading.
+comparisons with legacy data, and **AU** (IEC 61012), still in force like the
+G curve, keeps ultrasonic components out of an audible-exposure reading.
 
 All four share the machinery of the IEC 61672-1 curves (0 dB at 1 kHz where
-applicable, `high_accuracy` oversampling, multichannel and stateful block
-processing). The A, C and Z curves themselves, where they come from, the
+applicable, multichannel and stateful block processing), and B, D and AU also
+take the `high_accuracy` oversampling; G ignores that flag, because its
+0.25 Hz to 315 Hz range is already exact with the plain design, and, as with
+A/C/Z, `high_accuracy` cannot be combined with stateful processing. The A, C and Z curves themselves, where they come from, the
 `high_accuracy` design and the class verification against IEC 61672-1
 Table 3 are the subject of [Frequency Weighting](https://jmrplens.github.io/phonometry/guides/weighting/).
 
@@ -28373,7 +28382,7 @@ Use the G frequency weighting of ISO 7196:1995, which rates infrasound the way A
   tolerance limits checked by `verify_weighting_class` in section 3.
 - International Electrotechnical Commission. (1990). *Filters for the
   measurement of audible sound in the presence of ultrasound*
-  (IEC 61012:1990). [IEC webstore](https://webstore.iec.ch/en/publication/4383).
+  (IEC 61012:1990). [IEC webstore](https://webstore.iec.ch/en/publication/4296).
   The AU weighting: U-weighting pole locations (Table 2), nominal responses
   and tolerances (Table 1) and the combined AU definition of subclause 2.2.
 - International Electrotechnical Commission. (1976). *Frequency weighting
@@ -34118,8 +34127,9 @@ other only as supporting evidence.
 
 ## See also
 
-- [Environmental levels](https://jmrplens.github.io/phonometry/guides/environmental-levels/): the ISO 1996-1 rating levels whose tonal adjustments
-  (Table A.1) these prominence verdicts justify objectively.
+- [Environmental levels](https://jmrplens.github.io/phonometry/guides/environmental-levels/): the ISO 1996-1 rating levels and their Table A.1
+  tonal adjustments, whose Kt is justified by the ISO/PAS 20065 audibility
+  route; these prominence verdicts are complementary emission screening.
 - [Sound Quality Metrics](https://jmrplens.github.io/phonometry/guides/sound-quality/): the ECMA-418-2 psychoacoustic
   tonality T in tu_HMS, the hearing-model counterpart of these FFT ratios.
 - [Objective audibility of tones in noise](https://jmrplens.github.io/phonometry/guides/tone-audibility/): the ISO/PAS 20065
@@ -35842,6 +35852,11 @@ the historical B and D and the AU curve, is
 [Special Weightings](https://jmrplens.github.io/phonometry/guides/special-weightings/).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses.svg" alt="A, B, C, D, AU and Z frequency weighting curves with a zoom showing the positive region of the A curve (+1.27 dB at 2.5 kHz)" width="80%"></picture>
+
+*The audible-range weighting family measured on one chart. This guide covers
+the A, C and Z responses; the B, D and AU curves drawn alongside them, and
+the infrasound G curve, are the subject of
+[Special Weightings](https://jmrplens.github.io/phonometry/guides/special-weightings/).*
 
 <details>
 <summary>Show the code for this figure</summary>

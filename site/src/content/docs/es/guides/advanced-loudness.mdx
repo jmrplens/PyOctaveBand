@@ -55,10 +55,10 @@ Los cuatro métodos están anclados de modo que un **tono de 1 kHz a 40 dB SPL
 es ≈ 1 sono**; los valores no son intercambiables dígito a dígito porque los
 modelos difieren en sus filtros auditivos y en su suma de sonoridad.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison_es.svg" alt="Sonoridad de un tono de 1 kHz en función del nivel para los modelos de Zwicker, Moore-Glasberg y Sottek, todos pasando por 1 sono a 40 dB SPL" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison_es.svg" alt="Sonoridad de un tono de 1 kHz en función del nivel para los modelos de Zwicker, Moore-Glasberg y Sottek, todos pasando cerca de 1 sono a 40 dB SPL" width="80%" />
 
-*Los tres modelos coinciden en el ancla de 1 sono / 40 dB y divergen con el
-nivel: Zwicker duplica el valor en sonos cada +10 fonios, mientras que el modelo
+*Los tres modelos pasan por aproximadamente 1 sono en el ancla de 40 dB (el
+frontal de Sottek documenta 0,984 sone_HMS ahí) y divergen con el nivel: Zwicker duplica el valor en sonos cada +10 fonios, mientras que el modelo
 de Sottek crece más lentamente (alrededor de 1,65× por cada 10 dB), una
 diferencia intrínseca entre las sumas auditivas, no un error de calibración.*
 
@@ -70,7 +70,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import psychoacoustics
 
-# Tono de 1 kHz, 20..80 dB SPL: los tres modelos pasan por 1 sono a 40 dB
+# Tono de 1 kHz, 20..80 dB SPL: los tres modelos pasan cerca de 1 sono a 40 dB
 fs = 48000
 t = np.arange(fs) / fs
 levels = np.arange(20.0, 81.0, 10.0)

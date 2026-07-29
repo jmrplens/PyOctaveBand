@@ -7,7 +7,7 @@ how *rough* or how strongly *fluctuating* they are. This page covers the
 sound-quality metrics that complement loudness: sharpness (DIN 45692) and the
 ECMA-418-2 tonality, roughness and fluctuation strength of the Sottek Hearing
 Model. Loudness itself lives in [Loudness](loudness.md); the ECMA-418-2
-loudness that shares the same auditory front-end, in
+loudness that shares the same auditory front-end lives in
 [Advanced loudness](advanced-loudness.md).
 
 The four metrics form one family: a single calibrated signal splits across

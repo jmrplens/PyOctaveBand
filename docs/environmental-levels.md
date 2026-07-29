@@ -90,9 +90,13 @@ Where you put the microphone changes the number: ISO 1996-2 fixes the receiver p
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_env_measurement_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_env_measurement.svg" alt="Environmental noise measurement positions per ISO 1996-2: free field, 2 m from the facade and flush-mounted, with their corrections" width="92%"></picture>
 
-Combine with `laeq()` per time period to go from recordings to Lden, and with
+Combine with `laeq()` per time period to go from recordings to Lden. The
+tonal adjustment itself is justified by the tonal audibility route of the next
+section (fed, for the ISO/PAS 20065 method, by
+[Objective audibility of tones in noise](tone-audibility.md));
 the `tone_to_noise_ratio()` / `prominence_ratio()` verdicts of
-[Prominent Discrete Tones](tone-prominence.md) to justify tonal adjustments.
+[Prominent Discrete Tones](tone-prominence.md) are
+complementary emission screening, not the Kt basis.
 
 ## Determining levels: tonal adjustment, residual noise and uncertainty (ISO 1996-2)
 
@@ -141,7 +145,7 @@ percentile levels (Annex I) and rejects inverted percentile orderings.
 
 **Measurement uncertainty (Clause 4, Annex F).** `combined_standard_uncertainty()`
 forms $u = \sqrt{\sum (c_j u_j)^2}$ (Formula (2)) and
-`environmental_expanded_uncertainty()` applies $k = 2$ (95 %) or $k = 1.3$ (80 %);
+`expanded_uncertainty()` applies $k = 2$ (95 %) or $k = 1.3$ (80 %);
 `residual_correction_uncertainty()` carries the residual-correction sensitivity
 (Formulae (F.7)/(F.8)) and `uncertainty_from_repeated_measurements()` the
 repeated-measurement standard uncertainty: the primary energy-domain route
@@ -180,9 +184,11 @@ $L_{dn}$ (3.6.5) keeps only the +10 dB night penalty.
 
 - [Integrated and Statistical Levels](levels.md): the Leq/LAeq, percentile
   and event levels the indicators of this page are assembled from.
-- [Prominent Discrete Tones](tone-prominence.md): the tone-to-noise and
-  prominence-ratio verdicts that justify the Table A.1 tonal adjustments
-  objectively.
+- [Objective audibility of tones in noise](tone-audibility.md): the tonal
+  audibility whose mean value maps to the Kt adjustment (Table J.1).
+- [Prominent Discrete Tones](tone-prominence.md): the ECMA-418-1
+  tone-to-noise and prominence-ratio verdicts, complementary emission
+  screening for the tonal question.
 - [Occupational Noise Exposure](occupational-exposure.md): the workplace
   counterpart, from task samples to the daily exposure level with its
   uncertainty budget.

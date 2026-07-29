@@ -291,8 +291,8 @@ configurations.
 - [Filter Banks](filter-banks.md): the band mathematics and the
   architectures whose class is verified here.
 - [Frequency Weighting](weighting.md): the companion verification of the A,
-  C and Z curves against the IEC 61672-1 tolerance tables, with B and AU
-  covered in [Special Weightings](special-weightings.md).
+  C and Z curves against the IEC 61672-1 tolerance tables, with the G, B, D and
+  AU curves covered in [Special Weightings](special-weightings.md).
 - [Sound level meter](sound-level-meter.md): the instrument chain whose
   spectrum stage this class applies to.
 - [Conformance report](CONFORMANCE.md): the verified configurations behind

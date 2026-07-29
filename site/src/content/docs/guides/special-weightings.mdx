@@ -20,7 +20,7 @@ references:
     year: 1990
     title: "Filters for the measurement of audible sound in the presence of ultrasound"
     designation: "IEC 61012:1990"
-    url: "https://webstore.iec.ch/en/publication/4383"
+    url: "https://webstore.iec.ch/en/publication/4296"
     note: "The AU weighting: U-weighting pole locations (Table 2), nominal responses and tolerances (Table 1) and the combined AU definition of subclause 2.2."
   - type: standard
     organization: "International Electrotechnical Commission"
@@ -45,12 +45,14 @@ each the right tool for a narrower job: the **G** curve of **ISO 7196:1995**
 rates infrasound below 20 Hz the way A-weighting rates audible noise, the
 historical **B** (ANSI S1.4-1983) reproduces measurements taken under older
 national codes, the withdrawn aircraft-noise **D** (IEC 537) serves
-comparisons with legacy data, and **AU** (IEC 61012), the only one still in
-force, keeps ultrasonic components out of an audible-exposure reading.
+comparisons with legacy data, and **AU** (IEC 61012), still in force like the
+G curve, keeps ultrasonic components out of an audible-exposure reading.
 
 All four share the machinery of the IEC 61672-1 curves (0 dB at 1 kHz where
-applicable, `high_accuracy` oversampling, multichannel and stateful block
-processing). The A, C and Z curves themselves, where they come from, the
+applicable, multichannel and stateful block processing), and B, D and AU also
+take the `high_accuracy` oversampling; G ignores that flag, because its
+0.25 Hz to 315 Hz range is already exact with the plain design, and, as with
+A/C/Z, `high_accuracy` cannot be combined with stateful processing. The A, C and Z curves themselves, where they come from, the
 `high_accuracy` design and the class verification against IEC 61672-1
 Table 3 are the subject of
 [Frequency Weighting](/phonometry/guides/weighting/).

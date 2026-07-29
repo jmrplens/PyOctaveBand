@@ -20,7 +20,7 @@ references:
     year: 1990
     title: "Filters for the measurement of audible sound in the presence of ultrasound"
     designation: "IEC 61012:1990"
-    url: "https://webstore.iec.ch/en/publication/4383"
+    url: "https://webstore.iec.ch/en/publication/4296"
     note: "La ponderación AU: posiciones de los polos de la ponderación U (Tabla 2), respuestas nominales y tolerancias (Tabla 1) y la definición combinada AU del apartado 2.2."
   - type: standard
     organization: "International Electrotechnical Commission"
@@ -46,13 +46,16 @@ concreta: la curva **G** de **ISO 7196:1995** valora el infrasonido por
 debajo de 20 Hz igual que la ponderación A valora el ruido audible, la
 histórica **B** (ANSI S1.4-1983) reproduce mediciones tomadas bajo códigos
 nacionales antiguos, la **D** de ruido de aeronaves de la retirada IEC 537
-sirve para comparaciones con datos heredados, y la **AU** (IEC 61012), la
-única aún en vigor, mantiene las componentes ultrasónicas fuera de una
+sirve para comparaciones con datos heredados, y la **AU** (IEC 61012), aún en
+vigor como la curva G, mantiene las componentes ultrasónicas fuera de una
 lectura de exposición audible.
 
 Las cuatro comparten la maquinaria de las curvas de IEC 61672-1 (0 dB en
-1 kHz donde aplica, sobremuestreo `high_accuracy`, procesado multicanal y
-por bloques con estado). Las propias curvas A, C y Z, su origen, el diseño
+1 kHz donde aplica, procesado multicanal y por bloques con estado), y B, D y
+AU toman además el sobremuestreo `high_accuracy`; la G ignora ese indicador,
+porque su rango de 0,25 Hz a 315 Hz ya es exacto con el diseño simple, y,
+como con A/C/Z, `high_accuracy` no puede combinarse con el procesado con
+estado. Las propias curvas A, C y Z, su origen, el diseño
 `high_accuracy` y la verificación de clase frente a la Tabla 3 de
 IEC 61672-1 son el tema de
 [Ponderación frecuencial](/phonometry/es/guides/weighting/).

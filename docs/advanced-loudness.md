@@ -28,9 +28,10 @@ All four methods are anchored so a **1 kHz tone at 40 dB SPL is ≈ 1 sone**; th
 are not interchangeable digit-for-digit because the models differ in their
 auditory filters and their loudness summation.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison.svg" alt="Loudness of a 1 kHz tone as a function of level for the Zwicker, Moore-Glasberg and Sottek models, all passing through 1 sone at 40 dB SPL" width="80%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison.svg" alt="Loudness of a 1 kHz tone as a function of level for the Zwicker, Moore-Glasberg and Sottek models, all passing close to 1 sone at 40 dB SPL" width="80%"></picture>
 
-*The three models agree at the 1 sone / 40 dB anchor and diverge with level:
+*The three models pass through approximately 1 sone at the 40 dB anchor
+(the Sottek front-end documents 0.984 sone_HMS there) and diverge with level:
 Zwicker doubles the sone value every +10 phon, while the Sottek model grows
 more slowly (about 1.65× per 10 dB), an intrinsic difference between the
 auditory summations, not a calibration error.*
@@ -43,7 +44,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import psychoacoustics
 
-# 1 kHz tone, 20..80 dB SPL: all three models pass through 1 sone at 40 dB
+# 1 kHz tone, 20..80 dB SPL: all three models pass close to 1 sone at 40 dB
 fs = 48000
 t = np.arange(fs) / fs
 levels = np.arange(20.0, 81.0, 10.0)
