@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 437 numerical conformance checks against 283 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 446 numerical conformance checks against 292 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 437 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 53 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 446 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 53 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -263,6 +263,7 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [electroacoustics/loudspeaker](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/loudspeaker/)
 - [electroacoustics/microphone](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/microphone/)
 - [electroacoustics/piston](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/piston/)
+- [electroacoustics/sound-reinforcement](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/sound-reinforcement/)
 - [electroacoustics/swept-sine](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/swept-sine/)
 - [environment/air-absorption](https://jmrplens.github.io/phonometry/reference/api/environment/air-absorption/)
 - [environment/atmospheric-refraction](https://jmrplens.github.io/phonometry/reference/api/environment/atmospheric-refraction/)
@@ -307,6 +308,7 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [power/sound-power-intensity](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-intensity/)
 - [power/sound-power-reverberation](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-reverberation/)
 - [power/vibration-sound-power](https://jmrplens.github.io/phonometry/reference/api/power/vibration-sound-power/)
+- [psychoacoustics/erb-scale](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/erb-scale/)
 - [psychoacoustics/fluctuation-strength](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/fluctuation-strength/)
 - [psychoacoustics/fluctuation-strength-ecma](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/fluctuation-strength-ecma/)
 - [psychoacoustics/loudness-contours](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-contours/)
@@ -320,12 +322,14 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [psychoacoustics/tonality](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/tonality/)
 - [psychoacoustics/tonality-ecma](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/tonality-ecma/)
 - [psychoacoustics/tone-audibility](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/tone-audibility/)
+- [rooms/crowd-noise](https://jmrplens.github.io/phonometry/reference/api/rooms/crowd-noise/)
 - [rooms/enclosed-space-absorption](https://jmrplens.github.io/phonometry/reference/api/rooms/enclosed-space-absorption/)
 - [rooms/image-source](https://jmrplens.github.io/phonometry/reference/api/rooms/image-source/)
 - [rooms/open-plan](https://jmrplens.github.io/phonometry/reference/api/rooms/open-plan/)
 - [rooms/reverberation-prediction](https://jmrplens.github.io/phonometry/reference/api/rooms/reverberation-prediction/)
 - [rooms/room-acoustics](https://jmrplens.github.io/phonometry/reference/api/rooms/room-acoustics/)
 - [rooms/room-ir](https://jmrplens.github.io/phonometry/reference/api/rooms/room-ir/)
+- [rooms/room-modes](https://jmrplens.github.io/phonometry/reference/api/rooms/room-modes/)
 - [rooms/room-noise](https://jmrplens.github.io/phonometry/reference/api/rooms/room-noise/)
 - [rooms/steady-field](https://jmrplens.github.io/phonometry/reference/api/rooms/steady-field/)
 - [simulation/elastic-fdtd](https://jmrplens.github.io/phonometry/reference/api/simulation/elastic-fdtd/)
@@ -983,6 +987,61 @@ plt.show()
 
 </details>
 
+## The ERB_N scale and the Cam axis
+
+Every model on this page except Zwicker's is written on the **ERB_N number**
+axis, so it is worth having the scale itself in hand. The cochlea behaves as a
+bank of overlapping band-pass **auditory filters**; the width of the one centred
+on a given frequency is summarised by its *equivalent rectangular bandwidth*,
+the bandwidth of the rectangular filter that would pass the same power with the
+same peak response. Fitting notched-noise data for young listeners at moderate
+levels, Glasberg and Moore (1990) make it a straight line in frequency (Moore,
+*An Introduction to the Psychology of Hearing* 6e, p. 76):
+
+```text
+ERB_N        = 24.7 (4.37 F + 1)          [Hz], F in kHz
+ERB_N number = 21.4 log10(4.37 F + 1)     [Cam]
+```
+
+The second line integrates `df / ERB_N(f)`, so its unit is one auditory-filter
+width: the **ERB_N number**, whose unit is called the **Cam** (after Cambridge).
+
+```python
+from phonometry import psychoacoustics
+
+cam = psychoacoustics.cam_from_frequency(1000.0)
+print(round(psychoacoustics.erb_bandwidth(1000.0), 1))       # 132.4 Hz
+print(round(cam, 2))                                         # 15.59 Cam
+print(round(psychoacoustics.frequency_from_cam(cam), 1))     # 1000.0 Hz
+```
+
+The library states the same fit with one more significant digit,
+`ERB_N = 24.673 (0.004368 f + 1)` and `21.366 log10(0.004368 f + 1)`, the
+precision the ISO 532-2 implementation uses; the two forms agree to better than
+0.2 % over the audible range, and the extra digits are what make
+`frequency_from_cam` an exact inverse. The functions are not a private helper of
+the loudness model: `loudness_moore_glasberg` imports these very functions, so
+the Cam grid of a `MooreGlasbergLoudness.erb_number` and a hand-built Cam axis
+cannot drift apart.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/erb_bandwidth_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/erb_bandwidth.svg" alt="Auditory-filter bandwidth against centre frequency on log-log axes: the ERB_N line of Glasberg and Moore rising from about 30 Hz at 50 Hz to above 1 kHz at 16 kHz, the constant-percentage one-third-octave bandwidth crossing it near 500 Hz, the 1 kHz point annotated at 15.59 Cam, and a second top axis giving the Cam scale" width="85%"></picture>
+
+*The ear's filter is not a constant fraction of frequency. Below about 500 Hz
+it is markedly narrower than a one-third octave, which is why the "old"
+critical-band function, flat at low frequency, fits the direct measurements so
+poorly there; above that it is wider. The top axis counts the same curve in
+Cams, so equal steps along it are equal numbers of auditory filters.*
+
+### `erb_bandwidth()`, `cam_from_frequency()`, `frequency_from_cam()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `frequency` | float or array | Hz | ≥ 0 | `erb_bandwidth`, `cam_from_frequency` |
+| `cam` | float or array | Cam | ≥ 0 | `frequency_from_cam` |
+
+Each returns a float for a scalar input and an array otherwise. The three
+constants are exported as `ERB_C1`, `ERB_C2` and `CAM_C`.
+
 ## Moore-Glasberg loudness (ISO 532-2)
 
 Where Zwicker uses fixed critical bands on the Bark scale, Moore-Glasberg builds
@@ -1216,6 +1275,11 @@ The Zwicker method (ISO 532-1:2017) is the reference: stationary and time-varyin
 
 ## References
 
+- Moore, B. C. J. (2013). *An introduction to the psychology of hearing*
+  (6th ed.). Brill.
+  [doi:10.1163/9789004252424](https://doi.org/10.1163/9789004252424).
+  Pages 76–77: the ERB_N auditory-filter bandwidth and the Cam (ERB_N number)
+  scale of Glasberg and Moore (1990).
 - International Organization for Standardization. (2017). *Acoustics —
   Methods for calculating loudness — Part 2: Moore-Glasberg method*
   (ISO 532-2:2017).
@@ -2162,6 +2226,9 @@ cycle and warn on use; they are removed in 4.0.
 | `ZwickerLoudness` | `dataclass` | **Loudness result.**<br>• `loudness`: N [sone]<br>• `loudness_level`: LN [phon]<br>• `specific`: N′(z), 240 bins of 0.1 Bark<br>• `n5` / `n10`: percentile loudness (time-varying only)<br>• `time` / `loudness_vs_time`: 500 Hz trace<br>• `field`: sound field assumed ('free'/'diffuse') | `res.loudness, res.n5`<br><br>• Time-varying fields are `None` for stationary results |
 | `sharpness_din` | `function` | **Sharpness in acum (DIN 45692).**<br>• `x`: Signal (1D)<br>• `fs`: Sample rate [Hz]<br>• `field`: 'free' or 'diffuse' (Default: 'free')<br>• `method`: 'din', 'aures' or 'bismarck' (Default: 'din')<br>• `calibration_factor`: Digital units to Pa (Default: 1.0) | `s = sharpness_din(x, fs)`<br><br>• `s`: sharpness [acum] |
 | `sharpness_din_from_specific` | `function` | **Sharpness from a specific-loudness pattern.**<br>• `specific`: N′(z), 240 values at 0.1 Bark (e.g. `ZwickerLoudness.specific`)<br>• `method`: 'din', 'aures' or 'bismarck' (Default: 'din') | `s = sharpness_din_from_specific(res.specific)`<br><br>• `s`: sharpness [acum] |
+| `erb_bandwidth` | `function` | **Auditory-filter equivalent rectangular bandwidth ERB_N (Glasberg & Moore 1990; Moore 6e p. 76).**<br>• `frequency` [Hz] (scalar or array, ≥ 0)<br>• `ERB_N = 24.673(0.004368 f + 1)` [Hz] | `erb_bandwidth(1000.0)  # 132.4` |
+| `cam_from_frequency` / `frequency_from_cam` | `function` | **The Cam (ERB_N-number) frequency scale, one unit per auditory-filter width.**<br>• `cam_from_frequency(f)` = `21.366 log10(0.004368 f + 1)` [Cam]<br>• `frequency_from_cam(i)`: the exact inverse [Hz] | `cam_from_frequency(1000.0)  # 15.59`<br>`frequency_from_cam(15.59)` |
+| `ERB_C1` / `ERB_C2` / `CAM_C` | `constant` | **Constants of the ERB_N fit shared with the ISO 532-2 loudness model.**<br>• `ERB_C1` = 24.673 [Hz], `ERB_C2` = 0.004368 [1/Hz], `CAM_C` = 21.366 [Cam] | `ERB_C1 * (ERB_C2 * f + 1)` |
 | `loudness_moore_glasberg` | `function` | **Moore-Glasberg loudness (ISO 532-2:2017).**<br>• `x`: Calibrated signal in Pa (1D)<br>• `fs`: Sample rate [Hz]<br>• `field`: 'free', 'diffuse' or 'eardrum' (Default: 'free')<br>• `presentation`: 'binaural'/'diotic' or 'monaural' (Default: 'binaural') | `res = loudness_moore_glasberg(x, fs)`<br><br>• `MooreGlasbergLoudness` (roex excitation pattern) |
 | `loudness_moore_glasberg_from_spectrum` | `function` | **Exact loudness from sinusoidal components (ISO 532-2 §5.2/5.4).**<br>• `components`: sequence of (frequency [Hz], level [dB SPL]) pairs<br>• `field`: 'free'/'diffuse'/'eardrum' (Default: 'free')<br>• `presentation`: (Default: 'binaural') | `res = loudness_moore_glasberg_from_spectrum([(1000.0, 40.0)])`<br><br>• 1 kHz/40 dB → 1.000 sone |
 | `loudness_moore_glasberg_from_third_octave` | `function` | **Loudness from 29 one-third-octave band levels (ISO 532-2 §5.5).**<br>• `band_levels`: 29 levels, 25 Hz–16 kHz [dB SPL]<br>• `field` / `presentation`: as above | `res = loudness_moore_glasberg_from_third_octave(levels)`<br><br>• `MooreGlasbergLoudness` |
@@ -2304,6 +2371,14 @@ cycle and warn on use; they are removed in 4.0.
 | `steady_state_field` | `function` | **Steady-state room field (Bies 6.4).**<br>• `sound_power_level` `Lw` [dB]<br>• `surface_area` `S` [m²], `mean_absorption` `ᾱ` (0, 1)<br>• `distances` [m] (Default: 0.1–10 rc)<br>• `directivity` `Q` (Default: 1)<br>• `characteristic_impedance` [Pa·s/m] for the ρc term | `f = steady_state_field(90.0, 100.0, 0.2)`<br><br>• `SteadyFieldResult` |
 | `SteadyFieldResult` | `dataclass` | **SPL vs distance, direct/reverberant/total.**<br>• `distances` [m]<br>• `direct`/`reverberant`/`total` [dB]<br>• `critical_distance` [m], `room_constant` [m²]<br>• `.plot()` | `f.total, f.critical_distance`<br>`f.plot()` |
 | `room_constant` / `critical_distance` / `schroeder_frequency` / `steady_state_spl` | `function` | **Steady-field building blocks (Bies 6.43/6.44, Kuttruff 3.44/5.44).**<br>• `room_constant(S, ᾱ)` = `Sᾱ/(1-ᾱ)` [m²]<br>• `critical_distance(R, directivity=1)` = `√(QR/16π)` [m]<br>• `schroeder_frequency(T, V)` = `2000√(T/V)` [Hz]<br>• `steady_state_spl(Lw, r, R, directivity=1)` [dB] | `R = room_constant(100, 0.2)`<br>`critical_distance(R)`<br>`schroeder_frequency(1.0, 200.0)` |
+| `room_modes` | `function` | **Normal modes of a rectangular room (Long, Architectural Acoustics 2e, Eq. 8.43).**<br>• `dimensions`: `(lx, ly, lz)` [m]<br>• `max_frequency` [Hz] (Default: 200)<br>• `speed_of_sound` [m/s] (Default: 343)<br>• `reverberation_time` [s] (optional, adds the Schroeder frequency) | `m = room_modes((7, 5, 3), max_frequency=100.0)`<br><br>• `RoomModesResult` |
+| `RoomModesResult` | `dataclass` | **Sorted mode list of a shoebox.**<br>• `orders`: `(N, 3)` `(nx, ny, nz)`<br>• `frequencies` [Hz], ascending<br>• `kinds`: 'axial'/'tangential'/'oblique'<br>• `volume`, `surface_area`, `edge_length`, `schroeder_frequency`<br>• `count_by_kind()`, `density(f)`<br>• `.plot()`: mode ladder by family + modal density | `m.frequencies[0], m.count_by_kind()`<br>`m.plot()` |
+| `room_mode_frequency` / `room_mode_count` / `room_modal_density` | `function` | **Mode building blocks (Long Eqs. 8.43, 8.45, 8.46).**<br>• `room_mode_frequency(orders, dimensions)` = `(c0/2)√((nx/lx)²+(ny/ly)²+(nz/lz)²)` [Hz]<br>• `room_mode_count(f, dimensions)`: Morse/Pierce smooth count<br>• `room_modal_density(f, dimensions)` [modes/Hz] | `room_mode_frequency((1, 0, 0), (7, 5, 3))`<br>`room_modal_density(1000.0, (7, 5, 3))` |
+| `MODE_KINDS` | `constant` | **Mode families, strongest first: `('axial', 'tangential', 'oblique')`.** | `MODE_KINDS[0]  # 'axial'` |
+| `crowd_noise` | `function` | **Self-generated crowd noise vs occupancy (Long Ch. 17, Eqs. 17.50–17.52).**<br>• `absorption_areas`: total room absorption [m²] (scalar or 1-D)<br>• `talkers`: occupancy axis N (Default: 1..20)<br>• `distance` r [m] (Default: 1.2), `sound_power_level` Lw [dB] (Default: 70), `directivity` Q (Default: 2) | `c = crowd_noise([20.0, 190.0])`<br><br>• `CrowdNoiseResult` |
+| `CrowdNoiseResult` | `dataclass` | **Crowd self-noise result.**<br>• `talkers`, `absorption_areas`, `levels` [dB] (areas × talkers)<br>• `signal_level` [dB], `communication_level` [dB], `distance`, `sound_power_level`, `directivity`<br>• `speech_to_noise()` [dB]<br>• `.plot()`: level vs occupancy per absorption | `c.levels, c.signal_level`<br>`c.plot()` |
+| `speech_direct_level` / `crowd_noise_level` / `speech_to_noise_ratio` / `absorption_per_table` | `function` | **Crowd-noise building blocks (Long Eqs. 17.50–17.54).**<br>• `speech_direct_level(r)` = `Lw + 10 lg(Q/4πr²)` [dB]<br>• `crowd_noise_level(N, A)` = `Lw + 10 lg N + 10 lg(4/A)` [dB]<br>• `speech_to_noise_ratio(r, A_tab)` [dB]<br>• `absorption_per_table(r, L_SN)` [m²]: the inverse | `crowd_noise_level(20, 20.0)  # 76`<br>`absorption_per_table(1.0, -6.0)  # 6.31` |
+| `NORMAL_VOICE_POWER_LEVEL` / `TALKER_DIRECTIVITY` / `COMMUNICATION_SNR` / `PRIVACY_SNR` | `constant` | **Crowd-noise defaults (Long Ch. 17).**<br>• 70 dB re 1 pW per talker, Q = 2<br>• −6 dB communication limit (Eq. 17.53), −9 dB privacy limit (Eq. 17.54) | `absorption_per_table(1.0, COMMUNICATION_SNR)` |
 | `airborne_insulation` | `function` | **Field airborne insulation (ISO 16283-1).**<br>• `l1`/`l2`: Source/receiving levels [dB], 1D or (positions, bands)<br>• `t2`: Receiving-room T per band [s]<br>• `area`: Partition S [m²] (for R')<br>• `volume`: Receiving V [m³] (for R')<br>• `t0`: Reference T0 [s] (Default: 0.5) | `ins = airborne_insulation(l1, l2, t2, area=10, volume=50)`<br><br>• `AirborneInsulationResult` |
 | `weighted_rating` | `function` | **Single-number rating + C/Ctr (ISO 717-1).**<br>• `values_by_band`: 16 thirds or 5 octaves [dB]<br>• `bands`: 'third-octave', 'octave' or None | `w = weighted_rating(R)`<br><br>• `WeightedRatingResult` (Rw, C, Ctr) |
 | `weighted_rating_extended` | `function` | **Rating + enlarged-range terms (ISO 717-1 Annex B).**<br>• `values_by_band` [dB] with `frequencies` [Hz] (None = the 16 core bands)<br>• `one_decimal`: 0.1 dB shift + one-decimal reductions for uncertainty statements (Default: False) | `ext = weighted_rating_extended(r, freqs)`<br><br>• `ExtendedWeightedRatingResult` (rating, c, ctr, c_50_3150 … ctr_100_5000) |
@@ -2538,6 +2613,11 @@ cycle and warn on use; they are removed in 4.0.
 | `PistonDirectivity` | `dataclass` | **Piston directivity-pattern result.**<br>• `angles` [rad], `ka`, `directivity` (linear), `directivity_db`<br>• `.plot()`: polar beam pattern in dB (family over ka) | `p.plot()` |
 | `loudspeaker_characteristics` | `function` | **Rated loudspeaker characteristics for an IEC 60268-5 report.**<br>• `frequencies`, `spl_db` (on-axis SPL), `rated_impedance` R [Ω]<br>• `input_voltage` (Default: √R → 1 W), `distance` (Default: 1 m), `sensitivity_band`, `tolerance_db`<br>• `impedance`, `distortion`, `directivity`/`polar` panels | `res = loudspeaker_characteristics(f, spl, 8.0)`<br><br>• `LoudspeakerCharacteristics` |
 | `LoudspeakerCharacteristics` | `dataclass` | **Loudspeaker rated-characteristics result (IEC 60268-5).**<br>• `sensitivity_level_db` (1 W/1 m, 20.3/20.4), `effective_range` (21.2), `reference_level_db`, `characteristic_sensitivity_pa`, `minimum_impedance`<br>• `.report()`: IEC 60268-5 fiche (graphs to IEC 60263) | `res.effective_range` |
+| `feedback_stability` | `function` | **Gain before feedback of a reinforcement loop (Long, Architectural Acoustics 2e, Eqs. 18.16–18.24).**<br>• `open_loop_gain` Zs [dB] (≈ −6 in an auditorium)<br>• `level_loudspeaker_at_microphone` L(H-M) [dB]<br>• `level_loudspeaker_at_listener` L(H-L) [dB]<br>• `microphone_directivity` DM(θ) [dB] (Default: 0)<br>• `open_microphones` Nm (Default: 1), `stability_margin` [dB] (Default: 10) | `res = feedback_stability(-6.0, 76.0, 80.0)`<br><br>• `FeedbackStabilityResult` |
+| `FeedbackStabilityResult` | `dataclass` | **Gain structure and stability verdict.**<br>• `open_loop_gain`, `feedback_loop_gain`, `nom_correction`, `loop_gain` [dB]<br>• `margin`, `headroom`, `stability_margin` [dB], `is_stable`<br>• `maximum_open_loop_gain`, `maximum_level_at_microphone` [dB]<br>• `.plot()`: gain bars against the oscillation and margin lines | `res.is_stable, res.headroom`<br>`res.plot()` |
+| `feedback_loop_gain` / `open_microphone_correction` | `function` | **Feedback building blocks (Long Eqs. 18.18, 18.23).**<br>• `feedback_loop_gain(L_HM, L_HL, microphone_directivity=0)` = `L(H-M) − L(H-L) + DM(θ)` [dB]<br>• `open_microphone_correction(Nm)` = `10 lg Nm` [dB] | `open_microphone_correction(4)  # 6.02` |
+| `plot_sound_reinforcement_geometry` | `function` | **Schematic of the feedback loop with each path length annotated.**<br>• `talker_distance`, `microphone_distance`, `listener_distance` [m]<br>• `language` | `plot_sound_reinforcement_geometry(0.3, 4.0, 12.0)` |
+| `DEFAULT_STABILITY_MARGIN` / `CARDIOID_RELATIVE_DIRECTIVITY` | `constant` | **Reinforcement defaults (Long Ch. 18).**<br>• 10 dB feedback stability margin for an equalised system<br>• −2 dB cardioid directivity toward the loudspeaker relative to the talker | `feedback_stability(-6.0, 78.0, 80.0, microphone_directivity=CARDIOID_RELATIVE_DIRECTIVITY)` |
 | `microphone_characteristics` | `function` | **Rated microphone characteristics for an IEC 60268-4 report.**<br>• `frequencies`, `response_db` (free-field, re the reference frequency), `sensitivity_mv_per_pa` M [mV/Pa]<br>• `reference_frequency` (Default: 1 kHz), `tolerance_db` (Default: 2), `rated_impedance`/`minimum_load_impedance` [Ω], `noise_voltage` or `equivalent_noise_level_db`, `max_spl_db`/`max_spl_thd_percent`<br>• `distortion`, `noise_spectrum`, `polar` panels; `powering`, `supply_current_ma` | `res = microphone_characteristics(f, resp, 12.5)`<br><br>• `MicrophoneCharacteristics` |
 | `MicrophoneCharacteristics` | `dataclass` | **Microphone rated-characteristics result (IEC 60268-4).**<br>• `sensitivity_level_db` = 20·lg(M / 1 V/Pa) (11.1), `effective_range` (12.2), `directivity_index_db` (13.2.2), `equivalent_noise_level_db` (17.2), `max_spl_db` (15.2), `signal_to_noise_ratio_db`, `diffuse_field_sensitivity_level_db`<br>• `.report()`: IEC 60268-4 fiche (graphs to IEC 60263) | `res.sensitivity_level_db` |
 | `expansion_chamber` | `function` | **Expansion-chamber silencer TL/IL (Bies Eq. 8.111, four-pole).**<br>• `frequencies`, `length` L, `chamber_area`, `pipe_area`<br>• `source_impedance`/`radiation_impedance` (Default: None → no IL) | `res = expansion_chamber(f, 0.3, 0.04, 0.01)`<br><br>• `ReactiveSilencerResult` |
@@ -10038,7 +10118,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/guides/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/guides/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/reference/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 437 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 446 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -16603,6 +16683,102 @@ THD and polar panels drawn to the IEC 60263 25 dB-per-decade and 25 dB
 reference-circle conventions.*
 
 
+## 4. Gain before feedback of a reinforcement system
+
+Everything above characterises a loudspeaker on its own. Put it in a room with
+an open microphone and the interesting quantity is no longer a datasheet number
+but a **closed loop**: the loudspeaker feeds the audience, and it also feeds the
+microphone that drives it. Long (*Architectural Acoustics* 2e, Chapter 18,
+Equations (18.13) to (18.24)) writes that loop with two decibel gains:
+
+```text
+Zs = L(H-L) − L(T-M)                       (Eq. (18.17))  open-loop system gain
+Gs = L(H-M) − L(H-L) + DM(θ)               (Eq. (18.18))  feedback-loop gain
+```
+
+`Zs` is the level the loudspeaker produces at an average listener minus the
+level the talker produces at the microphone; `Zs = -6` dB, typical of an
+auditorium or a church, means a comfortable conversational level at twice the
+talker-to-microphone distance. `DM(θ)` is the directivity index of the
+microphone toward the loudspeaker *relative to* the talker: zero for an
+omnidirectional microphone, about −2 to −3 dB for a cardioid pointed at the
+talker. Summing the infinite series of round trips, the system oscillates when
+the loop gain reaches unity, that is `Zs + Gs = 0` (Equation (18.16)).
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_reinforcement_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_reinforcement_geometry.svg" alt="Schematic of a sound-reinforcement feedback loop: the talker 0.3 metres in front of the microphone, the flown loudspeaker 4 metres from the microphone and 12 metres from the average listener, with the signal path drawn solid and the feedback path dashed" width="85%"></picture>
+
+*The four points of the loop. Only the sound field the loudspeaker produces at
+two of them, and the type and orientation of the microphone, enter the
+criterion: the loudspeaker's own type, number and power do not appear anywhere
+in it.*
+
+A working system needs margin below that threshold. Long takes **10 dB** for an
+equalised system (other authors quote 12 dB unequalised and 6 dB carefully
+equalised): 6 dB of it covers a sustained tone adding in phase with a reflection
+off a hard surface, and the remaining 4 dB is safety. With several microphones
+open at once the returned signals add at the mixer, which the
+number-of-open-microphones correction `ΔL_nom = 10 log10 Nm` accounts for
+(Equation (18.23)). The criterion is then
+
+```text
+Zs + L(H-M) + ΔL_nom ≤ L(H-L) − DM(θ) − 10
+```
+
+```python
+from phonometry import electroacoustics as ea
+
+# An auditorium at Zs = -6 dB, omnidirectional microphone, one mic open.
+res = ea.feedback_stability(-6.0, 76.0, 80.0)
+print(res.is_stable, round(res.headroom, 1))          # True 0.0 dB
+print(round(res.maximum_level_at_microphone, 1))      # 76.0 dB = L(H-L) - 4
+
+# A cardioid buys back exactly its relative directivity index.
+card = ea.feedback_stability(-6.0, 78.0, 80.0, microphone_directivity=-2.0)
+print(round(card.maximum_level_at_microphone, 1))     # 78.0 dB = L(H-L) - 2
+
+# Four open microphones cost 10 lg 4 = 6 dB of that headroom.
+print(round(ea.open_microphone_correction(4), 1))     # 6.0 dB
+
+res.plot()      # the gain structure against the oscillation and margin lines
+```
+
+Those two special cases are Long's own (Equations (18.21) and (18.22)): with
+`Zs = -6` dB the criterion collapses to `L(H-M) ≤ L(H-L) − DM(θ) − 4`, so an
+omnidirectional microphone must see the loudspeaker 4 dB below the average level
+in the audience, while a cardioid may let it rise to 2 dB below.
+
+> **A sign slip in the printed equation.** Long prints Equation (18.24) with
+> `+ DM(θ)` on the right-hand side, which contradicts the Equations (18.20) to
+> (18.22) it generalises and would turn the benefit of a directional microphone
+> into a penalty. `feedback_stability` implements the sign of Equation (18.20),
+> so that `Nm = 1` reproduces Long's own special cases exactly. The defect is
+> recorded in the [errata registry](https://jmrplens.github.io/phonometry/reference/errata/).
+
+### `feedback_stability()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `open_loop_gain` | float | dB | finite | `Zs = L(H-L) - L(T-M)`; about −6 dB in an auditorium |
+| `level_loudspeaker_at_microphone` | float | dB | finite | `L(H-M)` |
+| `level_loudspeaker_at_listener` | float | dB | finite | `L(H-L)` |
+| `microphone_directivity` | float | dB | default 0 | `DM(theta)`, 0 omni, about −2 cardioid |
+| `open_microphones` | int | — | ≥ 1, default 1 | `Nm` |
+| `stability_margin` | float | dB | ≥ 0, default 10 | Long's equalised-system margin |
+
+Returns a `FeedbackStabilityResult` (`open_loop_gain`, `feedback_loop_gain`,
+`nom_correction`, `loop_gain`, `margin`, `headroom`, `is_stable`,
+`maximum_open_loop_gain`, `maximum_level_at_microphone`) with `.plot()`.
+`feedback_loop_gain` and `open_microphone_correction` are callable directly, and
+`plot_sound_reinforcement_geometry` draws the loop above.
+
+The criterion is a level bookkeeping exercise, not an acoustic model: it
+consumes the two direct-field levels the loudspeaker produces and does not
+compute them from a coverage pattern, nor does it predict the ring frequency or
+the effect of an equaliser or frequency shifter. Long excludes the reverberant
+field deliberately, because a uniform field cannot depend on where the
+microphone is or where it points; the direct-to-reverberant ratio enters the
+design separately.
+
 ## See also
 
 - [Electroacoustics](https://jmrplens.github.io/phonometry/guides/electroacoustics/): the IEC 60268-3 distortion set,
@@ -16625,6 +16801,11 @@ reference-circle conventions.*
   The transducer physics behind sections 1 and 2: loudspeaker radiation,
   the baffled-piston impedance and directivity (§4.19, §13.7), and the
   near-field to far-field transition.
+- Long, M. (2014). *Architectural acoustics* (2nd ed.). Academic Press.
+  [doi:10.1016/C2012-0-03257-5](https://doi.org/10.1016/C2012-0-03257-5).
+  Chapter 18 (the gain-before-feedback criterion of section 4: the open-loop
+  and feedback-loop gains, the stability margin and the
+  number-of-open-microphones correction, Equations (18.13) to (18.24)).
 
 ## Standards
 
@@ -19820,6 +20001,103 @@ repository. Click the preview to open the PDF:
 
 *Open-plan office acoustics fiche (`OpenPlanResult.report`), $D_{2,S}$, $L_{p,A,S,4m}$, $r_D$, $r_P$ and the spatial-decay curve.*
 
+## Crowd self-noise in an occupied room
+
+ISO 3382-3 above **measures** an office. The complementary question at design
+time is a **prediction**: in a room whose only noise source is its own
+occupants, how loud does the background get, and does conversation still work?
+Long (*Architectural Acoustics* 2e, Chapter 17, Equations (17.50) to (17.54))
+sets the two competing levels at a listener:
+
+```text
+Lp(signal) = Lw + 10 log10( Q / (4 π r²) )                (Eq. (17.50))
+Lp(noise)  = Lw + 10 log10 N + 10 log10( 4 / (N A_tab) )  (Eq. (17.51))
+```
+
+with `Lw` the sound power level of one talker (about 70 dB in normal
+conversation), `Q` the talker's forward directivity (about 2), `r` the
+talker-to-listener distance and `A_tab` the equivalent absorption area **per
+occupied table**, so `N A_tab` is the room's total absorption.
+
+```python
+from phonometry import room
+
+# Long's hard restaurant: about 20 metric sabins, a talker at Lw = 70 dB,
+# a listener 1.2 m away across the table.
+print(round(room.speech_direct_level(1.2)))          # 60 dB direct field
+print(round(room.crowd_noise_level(1, 20.0)))        # 63 dB with one talker
+print(round(room.crowd_noise_level(20, 20.0)))       # 76 dB with 20 tables
+
+# An alpha 0.9 ceiling over the 13.7 x 13.7 m room adds 170 metric sabins.
+print(round(room.crowd_noise_level(20, 20.0 + 170.0)))   # 66 dB
+```
+
+Subtracting the two gives the **speech-to-noise ratio**, and this is the result
+worth remembering:
+
+```text
+L_SN = 10 log10( Q / (4 π r²) ) + 10 log10( A_tab / 4 )   (Eq. (17.52))
+```
+
+Neither `Lw` nor `N` survives. A busier room is not intrinsically worse, because
+each new table brings both a talker and its own share of absorption. What
+decides whether a restaurant works is the absorption **per table**, not the
+absorption of the room. Requiring `L_SN > -6` dB for adequate cross-table
+communication at a separation `rs`, and `L_SN < -9` dB so a neighbouring table
+`rt` away is not overheard, turns into a pair of design bounds:
+
+```text
+A_tab > 6.31 rs²      (Eq. (17.53))
+A_tab < 3.16 rt²      (Eq. (17.54)),  both for Q = 2
+```
+
+> **The first constant is printed as 6.33.** The closed form above, at the same
+> Q = 2 that yields Long's own second constant 3.16 exactly, gives 6.31, and his
+> prose ("6.3 or more square metres, 68 sq ft") converts to 6.317 m². The library
+> computes both bounds from the speech-to-noise ratio rather than hardcoding
+> either constant, so they stay mutually consistent; the misprint is recorded in
+> the [errata registry](https://jmrplens.github.io/phonometry/reference/errata/).
+
+```python
+from phonometry import room
+
+print(round(room.absorption_per_table(1.0, -6.0), 2))   # 6.31 m2 per table at 1 m
+print(round(room.absorption_per_table(2.5, -9.0), 1))   # 19.8 m2 at 2.5 m spacing
+
+crowd = room.crowd_noise([20.0, 95.0, 190.0], distance=1.2)
+crowd.plot()      # self-noise vs occupancy, against the -6 dB limit
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/restaurant_crowd_noise_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/restaurant_crowd_noise.svg" alt="Self-generated crowd noise level against the number of simultaneous talkers for three room absorption areas of 20, 95 and 190 metric sabins, with the 60 dB direct speech level at 1.2 m and the 66 dB communication limit drawn as horizontal references" width="85%"></picture>
+
+*The same 20 talkers in three rooms. The hard room (20 m² of absorption)
+crosses the communication limit before the fourth table is occupied; adding the
+absorptive ceiling of Long's example (190 m² in total) keeps all 20 tables below
+it. The curves are parallel because occupancy always costs `10 log10 N`: only
+the vertical offset, which is the absorption, is a design variable.*
+
+### `crowd_noise()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `absorption_areas` | float or 1D array | m² | > 0 | Total room absorption areas to compare |
+| `talkers` | 1D array, optional | — | ≥ 1, default 1..20 | Occupancy axis `N` |
+| `distance` | float | m | > 0, default 1.2 | Talker-to-listener distance `r` |
+| `sound_power_level` | float | dB re 1 pW | default 70 | Talker `Lw` |
+| `directivity` | float | — | > 0, default 2 | Talker `Q` |
+
+Returns a `CrowdNoiseResult` (`talkers`, `absorption_areas`, `levels`,
+`signal_level`, `communication_level`, `speech_to_noise()`) with `.plot()`. The
+pieces `speech_direct_level`, `crowd_noise_level`, `speech_to_noise_ratio` and
+`absorption_per_table` are callable directly.
+
+This is a *design* model and deliberately does not model the Lombard reflex: it
+cancels out of `L_SN` as long as everyone raises their voice equally, so the
+model explains why the level spirals upward in a hard room rather than
+predicting where it stops. It also assumes a diffuse reverberant field and a
+single absorption figure per table, so it says nothing about screens, local
+absorption or where in the room a given table sits.
+
 ## References
 
 - International Organization for Standardization. (2012). *Acoustics —
@@ -19827,6 +20105,9 @@ repository. Click the preview to open the PDF:
   (ISO 3382-3:2012).
   [iso.org catalogue](https://www.iso.org/standard/46520.html).
   The open-plan speech-privacy quantities this page implements.
+- Long, M. (2014). *Architectural acoustics* (2nd ed.). Academic Press.
+  [doi:10.1016/C2012-0-03257-5](https://doi.org/10.1016/C2012-0-03257-5).
+  Chapter 17 (the crowd self-noise model, Equations (17.50) to (17.54)).
 
 ## Standards
 
@@ -22439,6 +22720,15 @@ it; the list grows as guides gain their References sections.
 
 ## Room acoustics
 
+- Long, M. (2014). *Architectural acoustics* (2nd ed.). Academic Press.
+  [doi:10.1016/C2012-0-03257-5](https://doi.org/10.1016/C2012-0-03257-5).
+  The architectural-design companion to the measurement standards: the
+  rectangular-room eigenfrequencies and the Morse/Pierce mode count
+  (Chapter 8), the crowd self-noise of an occupied room (Chapter 17) and the
+  gain-before-feedback criterion of a reinforcement system (Chapter 18).
+  Cited by [Image sources and the steady-state room field](https://jmrplens.github.io/phonometry/guides/room-image-sources/),
+  [Open-plan office acoustics](https://jmrplens.github.io/phonometry/guides/open-plan-acoustics/) and
+  [Loudspeaker characterisation](https://jmrplens.github.io/phonometry/guides/loudspeakers/).
 - Kuttruff, H. (2016). *Room acoustics* (6th ed.). CRC Press.
   [doi:10.1201/9781315372150](https://doi.org/10.1201/9781315372150).
   The reference monograph on sound fields in rooms: statistical decay
@@ -23246,6 +23536,13 @@ it; the list grows as guides gain their References sections.
 
 ## Psychoacoustics
 
+- Moore, B. C. J. (2013). *An introduction to the psychology of hearing*
+  (6th ed.). Brill.
+  [doi:10.1163/9789004252424](https://doi.org/10.1163/9789004252424).
+  The standard textbook on auditory perception; pages 76-77 give the
+  Glasberg and Moore (1990) ERB_N auditory-filter bandwidth and the Cam
+  (ERB_N number) frequency scale the loudness models are written on.
+  Cited by [Advanced loudness](https://jmrplens.github.io/phonometry/guides/advanced-loudness/).
 - Fletcher, H., & Munson, W. A. (1933). Loudness, its definition, measurement
   and calculation. *The Journal of the Acoustical Society of America*, 5(2),
   82-108. [doi:10.1121/1.1915637](https://doi.org/10.1121/1.1915637).
@@ -24506,8 +24803,8 @@ Source: https://jmrplens.github.io/phonometry/guides/room-image-sources/
 
 Where [reverberation-time prediction](https://jmrplens.github.io/phonometry/guides/reverberation-prediction/) gives a
 single statistical decay rate and [room-acoustics measurement](https://jmrplens.github.io/phonometry/guides/room-acoustics/)
-analyses a *measured* impulse response, this page covers the two classical
-*predictions* of the sound field in a rectangular room, both in
+analyses a *measured* impulse response, this page covers the classical
+*predictions* of the sound field in a rectangular room, all in
 `phonometry.room`:
 
 - the **image-source room impulse response** (`image_source_rir`): the
@@ -24517,7 +24814,11 @@ analyses a *measured* impulse response, this page covers the two classical
 - the **steady-state room field** (`steady_state_field` and its parts): the
   statistical direct-plus-reverberant sound pressure level a source of known
   power produces, with the room constant, critical distance and Schroeder
-  frequency (Bies *Engineering Noise Control* 6.4; Kuttruff 5.6).
+  frequency (Bies *Engineering Noise Control* 6.4; Kuttruff 5.6); and
+- the **normal modes** of the shoebox (`room_modes` and its parts): the
+  eigenfrequencies below the Schroeder frequency, their axial / tangential /
+  oblique classification and the Morse/Pierce mode count and modal density
+  (Long *Architectural Acoustics* 2e, Chapter 8).
 
 Together they bridge the sound power of `phonometry.emission` and the reverberation
 prediction of `phonometry.room`: one gives the full RIR, the other the level
@@ -24803,6 +25104,99 @@ from phonometry import room
 print(round(float(room.schroeder_frequency(1.0, 200.0)), 0))   # 141 Hz (V=200, T=1)
 ```
 
+## 3. Modes of a rectangular room
+
+Below the Schroeder frequency the statistical picture of section 2 breaks down
+and the room is a handful of discrete standing waves. For the rigid-walled
+shoebox the wave equation separates and the eigenfrequencies are exact:
+
+```text
+f(nx, ny, nz) = (c0 / 2) √( (nx/lx)² + (ny/ly)² + (nz/lz)² )
+                                        (Long Equation (8.43))
+```
+
+with non-negative integer orders counting the nodal planes on each axis. How
+many of the three orders are non-zero names the family: **axial** (one, a wave
+bouncing between one pair of walls, the loudest), **tangential** (two, grazing
+four walls, about 3 dB weaker) and **oblique** (three, involving all six,
+weaker still).
+
+```python
+from phonometry import room
+
+modes = room.room_modes(
+    (7.0, 5.0, 3.0),            # lx, ly, lz in metres
+    max_frequency=100.0,
+    speed_of_sound=344.0,
+    reverberation_time=0.8,     # optional: carries the Schroeder frequency
+)
+print(modes.orders[0], round(float(modes.frequencies[0]), 1))  # [1 0 0] 24.6 Hz
+print(modes.count_by_kind())   # {'axial': 7, 'tangential': 10, 'oblique': 4}
+print(round(modes.schroeder_frequency, 0))                     # 175 Hz
+modes.plot()                    # mode ladder by family + modal density
+```
+
+Counting lattice points inside the positive octant of a sphere of radius
+`k = 2 π f / c0`, with the half- and quarter-weight corrections for the points
+on the coordinate planes and axes, gives the smooth **integrated mode count**
+and its derivative the **modal density**:
+
+```text
+N(f)     = (4 π / 3) V (f/c0)³ + (π / 4) S (f/c0)² + (L / 8) (f/c0)
+                                        (Long Equation (8.45), after Morse and Pierce)
+dN/df    = 4 π V f² / c0³ + (π / 2) S f / c0² + L / (8 c0)
+                                        (Long Equation (8.46))
+```
+
+with the volume `V`, the total wall area `S` and the sum `L` of the twelve edge
+lengths. These are asymptotic estimates: below a few dozen modes the exact
+enumeration of `room_modes` is the honest answer, while high up they are
+accurate and much cheaper.
+
+```python
+from phonometry import room
+
+room_dims = (7.0, 5.0, 3.0)
+print(round(float(room.room_mode_count(200.0, room_dims, speed_of_sound=344.0)), 1))
+# 128.5, against 128 modes actually enumerated below 200 Hz
+print(round(float(room.room_modal_density(1000.0, room_dims, speed_of_sound=344.0)), 1))
+# 34.3 modes/Hz
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rectangular_room_modes_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rectangular_room_modes.svg" alt="Mode ladder of a 7 by 5 by 3 metre room up to 200 Hz, one raster row per family (axial, tangential, oblique) and the modal density curve below, both marked with the 175 Hz Schroeder frequency" width="85%"></picture>
+
+*The 7 x 5 x 3 m room of Long's Table 8.1 up to 200 Hz. Below about 60 Hz the
+axial modes stand alone and each is separately audible; by the 175 Hz Schroeder
+frequency (T = 0.8 s) the oblique family has filled in and the modal density
+has passed one mode per hertz, which is where the statistical field of
+section 2 takes over.*
+
+### `room_modes()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `dimensions` | 3-tuple | m | > 0 | Room dimensions `(lx, ly, lz)` |
+| `max_frequency` | float | Hz | > 0, default 200 | Highest mode enumerated |
+| `speed_of_sound` | float | m/s | > 0, default 343 | `c0` |
+| `reverberation_time` | float, optional | s | > 0 | Adds the Schroeder frequency to the result |
+
+Returns a `RoomModesResult` (`orders`, `frequencies`, `kinds`, `dimensions`,
+`speed_of_sound`, `schroeder_frequency`, plus the `volume`, `surface_area` and
+`edge_length` properties and `count_by_kind()`) with `.plot()`. The pieces
+`room_mode_frequency`, `room_mode_count` and `room_modal_density` are callable
+directly.
+
+**Reading the ladder.** Two things matter more than any single frequency.
+Modes that coincide colour the sound: if the dimensions are low integer
+multiples of one another the energy coalesces into a few frequencies, which is
+why a cubic room is the worst possible listening room and why the ratio tables
+of Bolt and others exist. And modes crowd together as frequency rises, until
+they merge into the continuum the statistical model of section 2 assumes. The
+mode calculator assumes rigid walls and a rectangular plan: it gives the
+eigen*frequencies*, not the pressure amplitude at a listening position, and
+says nothing about damping, mode shape or a non-shoebox geometry. For those,
+mesh the room and run the [2D FDTD solver](https://jmrplens.github.io/phonometry/guides/fdtd-simulation/).
+
 ## Validation
 
 The implementations are checked against the closed forms and the source texts'
@@ -24817,7 +25211,12 @@ own numeric anchors (see [CONFORMANCE.md](https://jmrplens.github.io/phonometry/
   the uniform-damping `T60`;
 - the room constant, the critical distance as the exact direct/reverberant
   crossover, the Schroeder frequency (Kuttruff's classroom example, `V = 200`,
-  `T = 1` → 141 Hz) and the steady-state level (Bies Equation (6.43)).
+  `T = 1` → 141 Hz) and the steady-state level (Bies Equation (6.43));
+- the six modes Long prints for his 7 x 5 x 3 m room (Table 8.1: 24.6, 34.5,
+  42.4, 49.2, 57.4 and 60.1 Hz, reproduced within one unit of the last printed
+  digit at his `c0 = 344` m/s) and the 34 modes per hertz he states for the
+  same room at 1 kHz (Equation (8.46)), plus the mode count matched against
+  the exact enumeration and the degeneracy of a cubic room.
 
 ## References
 
@@ -24842,6 +25241,11 @@ own numeric anchors (see [CONFORMANCE.md](https://jmrplens.github.io/phonometry/
   [doi:10.1201/9781351228152](https://doi.org/10.1201/9781351228152).
   Section 6.4 (steady-state response and the room constant, Equations
   (6.41)–(6.44)).
+- Long, M. (2014). *Architectural acoustics* (2nd ed.). Academic Press.
+  [doi:10.1016/C2012-0-03257-5](https://doi.org/10.1016/C2012-0-03257-5).
+  Chapter 8 (the rectangular-room eigenfrequencies of Equation (8.43) and
+  Table 8.1, and the Morse/Pierce mode count and modal density of Equations
+  (8.45) and (8.46)).
 
 ---
 

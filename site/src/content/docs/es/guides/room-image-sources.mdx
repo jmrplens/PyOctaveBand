@@ -1,6 +1,6 @@
 ---
 title: "Fuentes imagen y campo estacionario de sala"
-description: "La respuesta al impulso determinista por fuentes imagen de una sala rectangular (Kuttruff, Vorländer) y el nivel estacionario estadístico con la constante de sala, la distancia crítica y la frecuencia de Schroeder (Bies)."
+description: "La respuesta al impulso determinista por fuentes imagen de una sala rectangular (Kuttruff, Vorländer), el nivel estacionario estadístico con la constante de sala, la distancia crítica y la frecuencia de Schroeder (Bies), y los modos propios, el recuento de modos y la densidad modal de la caja por debajo de ella (Long)."
 references:
   - type: book
     authors: ["Kuttruff, H."]
@@ -36,6 +36,14 @@ references:
     publisher: "CRC Press"
     doi: "10.1201/9781351228152"
     note: "El campo estacionario de sala y la constante de sala del §2 (§6.4)."
+  - type: book
+    authors: ["Long, M."]
+    year: 2014
+    title: "Architectural acoustics"
+    edition: "2nd ed."
+    publisher: "Academic Press"
+    doi: "10.1016/C2012-0-03257-5"
+    note: "Los modos de la sala rectangular del §3: las frecuencias propias de la ecuación (8.43), la sala de ejemplo de la tabla 8.1 y el recuento de modos y la densidad modal de Morse y Pierce de las ecuaciones (8.45) y (8.46)."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -367,6 +375,102 @@ Devuelve un `SteadyFieldResult` (`distances`, `direct`, `reverberant`, `total`,
 `critical_distance`, `schroeder_frequency` y `steady_state_spl` también son
 invocables directamente (cada una acepta arrays por banda).
 
+## 3. Modos de una sala rectangular
+
+Por debajo de la frecuencia de Schroeder la imagen estadística del apartado 2
+deja de valer y la sala es un puñado de ondas estacionarias discretas. Para la
+caja rectangular de paredes rígidas la ecuación de ondas se separa y las
+frecuencias propias son exactas (Long, *Architectural Acoustics* 2.ª ed.,
+ec. (8.43)):
+
+$$
+f_{n_x n_y n_z} = \frac{c_0}{2}
+\sqrt{\left(\frac{n_x}{l_x}\right)^2 + \left(\frac{n_y}{l_y}\right)^2
+      + \left(\frac{n_z}{l_z}\right)^2},
+$$
+
+con órdenes enteros no negativos que cuentan los planos nodales de cada eje.
+Cuántos de los tres órdenes son distintos de cero da nombre a la familia:
+**axial** (uno, una onda que rebota entre un par de paredes, la más audible),
+**tangencial** (dos, que roza cuatro paredes, unos 3 dB más débil) y **oblicuo**
+(tres, que involucra las seis, aún más débil).
+
+```python
+from phonometry import room
+
+modes = room.room_modes(
+    (7.0, 5.0, 3.0),            # lx, ly, lz en metros
+    max_frequency=100.0,
+    speed_of_sound=344.0,
+    reverberation_time=0.8,     # opcional: lleva la frecuencia de Schroeder
+)
+print(modes.orders[0], round(float(modes.frequencies[0]), 1))  # [1 0 0] 24,6 Hz
+print(modes.count_by_kind())   # {'axial': 7, 'tangential': 10, 'oblique': 4}
+print(round(modes.schroeder_frequency, 0))                     # 175 Hz
+modes.plot()                    # escalera de modos por familia + densidad modal
+```
+
+Contar los puntos de la red dentro del octante positivo de una esfera de radio
+$k = 2\pi f/c_0$, con las correcciones de medio y de cuarto peso para los
+puntos situados en los planos y ejes coordenados, da el **recuento integrado de
+modos** (ec. (8.45), tras Morse y Pierce) y su derivada, la **densidad modal**
+(ec. (8.46)):
+
+$$
+N(f) = \frac{4\pi}{3} V \left(\frac{f}{c_0}\right)^3
+     + \frac{\pi}{4} S \left(\frac{f}{c_0}\right)^2
+     + \frac{L}{8} \frac{f}{c_0},
+\qquad
+\frac{dN}{df} = \frac{4\pi V f^2}{c_0^3} + \frac{\pi S f}{2 c_0^2}
+              + \frac{L}{8 c_0},
+$$
+
+con el volumen $V$, el área total de paredes $S$ y la suma $L$ de las doce
+aristas. Son estimaciones asintóticas: por debajo de unas pocas decenas de
+modos la enumeración exacta de `room_modes` es la respuesta honesta, mientras
+que en la zona alta son precisas y mucho más baratas.
+
+```python
+from phonometry import room
+
+room_dims = (7.0, 5.0, 3.0)
+print(round(float(room.room_mode_count(200.0, room_dims, speed_of_sound=344.0)), 1))
+# 128,5, frente a los 128 modos realmente enumerados por debajo de 200 Hz
+print(round(float(room.room_modal_density(1000.0, room_dims, speed_of_sound=344.0)), 1))
+# 34,3 modos/Hz
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rectangular_room_modes_es.svg" alt="Escalera de modos de una sala de 7 por 5 por 3 metros hasta 200 Hz, con una fila por familia (axial, tangencial, oblicuo) y la curva de densidad modal debajo, ambas marcadas con la frecuencia de Schroeder de 175 Hz" width="85%" />
+
+*La sala de 7 x 5 x 3 m de la tabla 8.1 de Long hasta 200 Hz. Por debajo de
+unos 60 Hz los modos axiales están aislados y cada uno es audible por separado;
+hacia la frecuencia de Schroeder de 175 Hz (T = 0,8 s) la familia oblicua ya ha
+rellenado el espectro y la densidad modal ha superado un modo por hercio, que
+es donde toma el relevo el campo estadístico del apartado 2.*
+
+### Parámetros de `room_modes()`
+
+| Parámetro | Tipo | Unidades | Rango / defecto | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `dimensions` | tupla de 3 | m | > 0 | Dimensiones de la sala `(lx, ly, lz)` |
+| `max_frequency` | float | Hz | > 0, defecto 200 | Modo más alto enumerado |
+| `speed_of_sound` | float | m/s | > 0, defecto 343 | `c0` |
+| `reverberation_time` | float, opcional | s | > 0 | Añade la frecuencia de Schroeder al resultado |
+
+Devuelve un `RoomModesResult` (`orders`, `frequencies`, `kinds`, `dimensions`,
+`speed_of_sound`, `schroeder_frequency`, más las propiedades `volume`,
+`surface_area` y `edge_length` y el método `count_by_kind()`) con `.plot()`.
+Las piezas `room_mode_frequency`, `room_mode_count` y `room_modal_density` son
+invocables directamente.
+
+**Cómo leer la escalera.** Dos cosas importan más que cualquier frecuencia
+concreta. Los modos que coinciden colorean el sonido: si las dimensiones son
+múltiplos enteros bajos entre sí, la energía se agolpa en unas pocas
+frecuencias, y por eso una sala cúbica es la peor sala de escucha posible y
+existen las tablas de proporciones de Bolt y otros. Y los modos se apiñan al
+subir la frecuencia, hasta fundirse en el continuo que supone el modelo
+estadístico del apartado 2.
+
 ## Validación
 
 Las implementaciones se comprueban contra las formas cerradas y los anclajes
@@ -384,7 +488,13 @@ numéricos de los propios textos fuente (ver el
 - la constante de sala, la distancia crítica como cruce exacto
   directo/reverberante, la frecuencia de Schroeder (el ejemplo de aula de
   Kuttruff, $V = 200$ m³, $T = 1$ s → 141 Hz) y el nivel estacionario
-  (Bies 5.ª ed., ec. (6.43)).
+  (Bies 5.ª ed., ec. (6.43));
+- los seis modos que Long imprime para su sala de 7 x 5 x 3 m (tabla 8.1:
+  24,6, 34,5, 42,4, 49,2, 57,4 y 60,1 Hz, reproducidos dentro de una unidad
+  del último dígito impreso con su $c_0 = 344$ m/s) y los 34 modos por hercio
+  que da para esa misma sala a 1 kHz (ec. (8.46)), además del recuento de
+  modos contrastado con la enumeración exacta y la degeneración de una sala
+  cúbica.
 
 ## Qué cubre esta guía
 
@@ -398,7 +508,12 @@ implementado por `room.image_source_rir`; y el campo estacionario de sala
 de Bies, Hansen y Howard del apartado 6.4 (constante de sala, directividad
 $Q$, distancia crítica) implementado por `room.steady_state_field`,
 `room.room_constant`, `room.critical_distance`, `room.steady_state_spl` y
-`room.schroeder_frequency`.
+`room.schroeder_frequency`; y el capítulo 8 de *Architectural Acoustics*
+de Long (las frecuencias propias de la sala rectangular de la ec. (8.43)
+con su clasificación axial/tangencial/oblicua, y el recuento de modos y la
+densidad modal de Morse y Pierce de las ecs. (8.45) y (8.46))
+implementado por `room.room_modes`, `room.room_mode_frequency`,
+`room.room_mode_count` y `room.room_modal_density`.
 
 **No cubierto.** El modelo de fuentes imagen solo capta reflexiones
 especulares: sin difracción y sin dispersión difusa, de modo que el
@@ -410,7 +525,13 @@ se diseñaron para corregir). La distancia de reverberación alternativa de
 Kuttruff (que usa el área de absorción de Sabine en lugar de la constante
 de sala) se cita como comparación pero no está implementada:
 `steady_state_field` y `critical_distance` usan siempre la formulación de
-Bies con la constante de sala.
+Bies con la constante de sala. El calculador de modos supone paredes
+rígidas y planta rectangular: da las *frecuencias* propias, no la amplitud
+de presión en un punto de escucha, y no dice nada del amortiguamiento, la
+forma modal ni una geometría que no sea una caja. Para eso, mallar la sala
+y ejecutar el
+[solucionador 2D FDTD](/phonometry/es/guides/fdtd-simulation/). Las
+proporciones preferentes de Bolt se comentan pero no se tabulan.
 
 ## Véase también
 

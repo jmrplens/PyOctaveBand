@@ -9,6 +9,69 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Normal modes of a rectangular room (`room/room_modes.py`): `room_modes`
+  enumerates every eigenfrequency of a rigid-walled shoebox up to a limit,
+  sorted and classified as axial, tangential or oblique, and the pieces
+  `room_mode_frequency`, `room_mode_count` and `room_modal_density` expose the
+  closed forms directly (Long, *Architectural Acoustics* 2e, Equations (8.43),
+  (8.45) and (8.46), the Morse/Pierce lattice count with its wall-plane and
+  axis corrections). The result reuses `room.schroeder_frequency` rather than
+  reimplementing it, and its `.plot()` draws the mode ladder coloured by
+  family above the modal-density curve with the Schroeder frequency marked on
+  both panels. Anchored on Long's Table 8.1 for a 7 x 5 x 3 m room (24.6,
+  34.5, 42.4, 49.2, 57.4 and 60.1 Hz) and on the 34 modes per hertz he states
+  for the same room at 1 kHz; two new conformance checks, a new figure
+  `rectangular_room_modes`, and a section in the image-source guide in English
+  and Spanish.
+
+- Crowd self-noise of an occupied room (`room/crowd_noise.py`): `crowd_noise`
+  evaluates the reverberant level a room's own occupants generate against
+  occupancy for a set of absorption areas, with `speech_direct_level`,
+  `crowd_noise_level`, `speech_to_noise_ratio` and `absorption_per_table` as
+  the building blocks (Long Chapter 17, Equations (17.50) to (17.54)). The
+  speech-to-noise ratio drops both the talker power and the number of talkers,
+  so the design variable is the absorption *per table*; `.plot()` draws the
+  occupancy sweep against the direct speech level and the -6 dB communication
+  limit. Anchored on Long's printed restaurant case (60 dB direct field at
+  1.2 m, 63 dB with one talker, 76 dB with twenty, 66 dB after an alpha 0.9
+  ceiling adds 170 metric sabins) and on his 3.16 rt² privacy constant; two
+  new conformance checks, a new figure `restaurant_crowd_noise`, and a section
+  in the open-plan guide in English and Spanish. It is a prediction model and
+  stays separate from the ISO 3382-3 measurement of `room/open_plan.py`. The
+  6.33 constant Long prints for Equation (17.53) is registered in
+  `docs/ERRATA.md`: the same closed form that reproduces his own 3.16 gives
+  6.31.
+
+- Gain before feedback of a sound-reinforcement system
+  (`electroacoustics/sound_reinforcement.py`): `feedback_stability` returns
+  the open-loop gain, the feedback-loop gain, the open-microphone correction
+  and the resulting headroom against the oscillation threshold, with
+  `feedback_loop_gain` and `open_microphone_correction` callable directly
+  (Long Chapter 18, Equations (18.16) to (18.24), with the 10 dB stability
+  margin he adopts for an equalised system). `.plot()` draws the gain
+  structure against the oscillation and margin lines, and
+  `plot_sound_reinforcement_geometry` sketches the four points of the loop
+  with each path length annotated. Long publishes no fully numeric worked case
+  for this chain, so the tests and the three new conformance checks anchor on
+  the closed forms and on the special cases he states in words (the
+  omnidirectional `L(H-M) <= L(H-L) - 4` and the cardioid `L(H-L) - 2` at
+  Zs = -6 dB, and `10 lg Nm`). Note that Equation (18.24) is printed with the
+  sign of the microphone directivity flipped relative to Equations (18.20) to
+  (18.22); the implementation follows the latter, which is what reproduces
+  Long's own special cases, and the defect is registered in `docs/ERRATA.md`.
+  New figure `sound_reinforcement_geometry` and a section in the loudspeaker
+  guide in English and Spanish.
+
+- Public ERB_N and Cam utilities (`psychoacoustics/erb_scale.py`):
+  `erb_bandwidth`, `cam_from_frequency` and `frequency_from_cam` expose the
+  Glasberg and Moore (1990) auditory-filter bandwidth and its Cam frequency
+  scale (Moore, *An Introduction to the Psychology of Hearing* 6e, pp. 76-77),
+  with the constants `ERB_C1`, `ERB_C2` and `CAM_C`. The ISO 532-2 loudness
+  model now imports these functions instead of keeping its own private copies,
+  so the two cannot drift apart. Two new conformance checks, a new figure
+  `erb_bandwidth`, and a section in the advanced-loudness guide in English and
+  Spanish.
+
 - Spanish noise regulation RD 1367/2007 (`environmental/spanish_regulation.py`):
   the corrected level `LKeq,T = LAeq,T + Kt + Kf + Ki` of Annex I A.2 c with
   the three reference procedures of Annex IV A.3.3, each graded 0/3/6 dB and

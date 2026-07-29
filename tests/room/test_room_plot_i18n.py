@@ -24,12 +24,14 @@ from phonometry import decay_curve, room_parameters
 from phonometry._plot.room import plot_excitation
 from phonometry.room import enclosed_space_absorption as esa
 from phonometry.room import room_noise as rn
+from phonometry.room.crowd_noise import crowd_noise
 from phonometry.room.image_source import image_source_rir
 from phonometry.room.open_plan import open_plan_metrics
 from phonometry.room.reverberation_prediction import (
     reverberation_time_models,
 )
 from phonometry.room.room_ir import ImpulseResponseResult
+from phonometry.room.room_modes import room_modes
 from phonometry.room.steady_field import steady_state_field
 
 FS = 48000
@@ -113,6 +115,15 @@ def _steady_field():
     return steady_state_field(90.0, 100.0, 0.2)
 
 
+def _room_modes():
+    return room_modes((7.0, 5.0, 3.0), max_frequency=120.0,
+                      reverberation_time=0.8)
+
+
+def _crowd_noise():
+    return crowd_noise([20.0, 190.0])
+
+
 # (id, builder, expected Spanish substring) for every room result renderer.
 _CASES = [
     ("room_acoustics", _room_acoustics, "Tiempos de caída"),
@@ -126,6 +137,8 @@ _CASES = [
     ("shaped_sweep", _shaped_sweep, "Barrido conformado"),
     ("image_source", _image_source, "Tiempo de llegada [ms]"),
     ("steady_field", _steady_field, "Distancia a la fuente [m]"),
+    ("room_modes", _room_modes, "Modos de la sala"),
+    ("crowd_noise", _crowd_noise, "Ruido autogenerado del público"),
 ]
 
 

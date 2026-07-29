@@ -3,6 +3,14 @@
 
 from __future__ import annotations
 
+from .erb_scale import (
+    CAM_C,
+    ERB_C1,
+    ERB_C2,
+    cam_from_frequency,
+    erb_bandwidth,
+    frequency_from_cam,
+)
 from .fluctuation_strength import (
     FluctuationStrengthResult,
     fluctuation_strength,
@@ -73,6 +81,9 @@ from .tone_audibility import (
 )
 
 __all__ = [
+    "CAM_C",
+    "ERB_C1",
+    "ERB_C2",
     "HANNING_BANDWIDTH_FACTOR",
     "NO_TONE_AUDIBILITY",
     "EcmaFluctuationStrength",
@@ -92,6 +103,7 @@ __all__ = [
     "assess_tones",
     "audibility_from_levels",
     "audibility_uncertainty",
+    "cam_from_frequency",
     "combined_tone_level",
     "critical_band_corners",
     "critical_band_level",
@@ -99,9 +111,11 @@ __all__ = [
     "energy_sum_level",
     "equal_loudness_contour",
     "equal_loudness_contours",
+    "erb_bandwidth",
     "fluctuation_strength",
     "fluctuation_strength_am_noise",
     "fluctuation_strength_ecma",
+    "frequency_from_cam",
     "hearing_threshold",
     "loudness_ecma",
     "loudness_level",

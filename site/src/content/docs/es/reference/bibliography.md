@@ -201,6 +201,16 @@ que las guías incorporan sus secciones de Referencias.
 
 ## Acústica de salas
 
+- Long, M. (2014). *Architectural acoustics* (2.ª ed.). Academic Press.
+  [doi:10.1016/C2012-0-03257-5](https://doi.org/10.1016/C2012-0-03257-5).
+  El complemento de diseño arquitectónico a las normas de medición: las
+  frecuencias propias de la sala rectangular y el recuento de modos de Morse
+  y Pierce (capítulo 8), el ruido autogenerado por los ocupantes de una sala
+  (capítulo 17) y el criterio de ganancia antes de la realimentación de un
+  sistema de refuerzo sonoro (capítulo 18).
+  Citado por [Fuentes imagen y campo estacionario en la sala](/phonometry/es/guides/room-image-sources/),
+  [Acústica de oficinas diáfanas](/phonometry/es/guides/open-plan-acoustics/) y
+  [Caracterización de altavoces](/phonometry/es/guides/loudspeakers/).
 - Kuttruff, H. (2016). *Room acoustics* (6.ª ed.). CRC Press.
   [doi:10.1201/9781315372150](https://doi.org/10.1201/9781315372150).
   La monografía de referencia sobre el campo sonoro en salas: la teoría
@@ -963,6 +973,14 @@ que las guías incorporan sus secciones de Referencias.
 
 ## Psicoacústica
 
+- Moore, B. C. J. (2013). *An introduction to the psychology of hearing*
+  (6.ª ed.). Brill.
+  [doi:10.1163/9789004252424](https://doi.org/10.1163/9789004252424).
+  El libro de texto de referencia sobre percepción auditiva; sus páginas
+  76-77 dan el ancho de banda del filtro auditivo ERB_N de Glasberg y Moore
+  (1990) y la escala de frecuencia Cam (número ERB_N) sobre la que se
+  escriben los modelos de sonoridad.
+  Citado por [Sonoridad avanzada](/phonometry/es/guides/advanced-loudness/).
 - Fletcher, H., & Munson, W. A. (1933). Loudness, its definition, measurement
   and calculation. *The Journal of the Acoustical Society of America*, 5(2),
   82-108. [doi:10.1121/1.1915637](https://doi.org/10.1121/1.1915637).

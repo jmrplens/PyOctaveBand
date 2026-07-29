@@ -725,6 +725,55 @@ def _chk_sabine_rt() -> Outcome:
 
 @register(
     "Room acoustics",
+    "Long, Architectural Acoustics 2e, Table 8.1",
+    "Room modes of a 7 x 5 x 3 m room: the six printed frequencies, Hz",
+)
+def _chk_long_room_modes() -> Outcome:
+    # Long's Chapter 2 quotes c0 = 344 m/s at 20 degC; the printed table is
+    # consistent with 344.7 m/s, so the tolerance is one printed digit.
+    printed = np.array([24.6, 34.5, 42.4, 49.2, 57.4, 60.1])
+    res = ph.room_modes((7.0, 5.0, 3.0), max_frequency=61.0, speed_of_sound=344.0)
+    computed = np.asarray(res.frequencies, dtype=float)
+    worst = int(np.argmax(np.abs(computed - printed)))
+    return numeric(printed[worst], computed[worst], 0.13, unit="Hz", places=2)
+
+
+@register(
+    "Room acoustics",
+    "Long, Architectural Acoustics 2e, Eq. (8.46)",
+    "Modal density of a 7 x 5 x 3 m room at 1 kHz = 34 modes/Hz",
+)
+def _chk_long_modal_density() -> Outcome:
+    density = float(
+        np.asarray(
+            ph.room_modal_density(1000.0, (7.0, 5.0, 3.0), speed_of_sound=344.0)
+        )[()]
+    )
+    return numeric(34.0, density, 0.5, unit="modes/Hz", places=2)
+
+
+@register(
+    "Room acoustics",
+    "Long, Architectural Acoustics 2e, Eq. (17.51)",
+    "Restaurant self-noise, 20 talkers over 20 metric sabins = 76 dB",
+)
+def _chk_long_restaurant_self_noise() -> Outcome:
+    level = float(np.asarray(ph.crowd_noise_level(20, 20.0))[()])
+    return numeric(76.0, level, 0.05, unit="dB", places=3)
+
+
+@register(
+    "Room acoustics",
+    "Long, Architectural Acoustics 2e, Eq. (17.54)",
+    "Privacy bound A_tab < 3.16 rt^2 (Q = 2, L_SN = -9 dB)",
+)
+def _chk_long_privacy_bound() -> Outcome:
+    a_tab = float(np.asarray(ph.absorption_per_table(1.0, -9.0))[()])
+    return numeric(3.16, a_tab, 0.005, unit="m^2", places=4)
+
+
+@register(
+    "Room acoustics",
     "Everest, Master Handbook of Acoustics 4th ed, Fig. 7-22",
     "Sabine RT, worked Example 1 @ 1 kHz (untreated 23.3×16×10 ft room, SI)",
 )
@@ -862,6 +911,27 @@ def _iso532_levels() -> np.ndarray:
         if ":" in line and not line.strip().startswith("#"):
             levels.append(float(line.split(":")[1]))
     return np.array(levels)
+
+
+@register(
+    "Psychoacoustics",
+    "Moore, Psychology of Hearing 6e, p. 77 (Glasberg & Moore 1990)",
+    "ERB_N number of 1000 Hz = 15.59 Cam",
+)
+def _chk_cam_of_1_khz() -> Outcome:
+    cam = float(np.asarray(ph.cam_from_frequency(1000.0))[()])
+    return numeric(15.59, cam, 0.005, unit="Cam", places=4)
+
+
+@register(
+    "Psychoacoustics",
+    "Moore, Psychology of Hearing 6e, p. 76 (Glasberg & Moore 1990)",
+    "ERB_N at 1 kHz vs the printed 24.7(4.37F + 1), Hz",
+)
+def _chk_erb_bandwidth_1_khz() -> Outcome:
+    published = 24.7 * (4.37 * 1.0 + 1.0)
+    erb = float(np.asarray(ph.erb_bandwidth(1000.0))[()])
+    return numeric(published, erb, 3e-3, unit="Hz", rel=True, places=3)
 
 
 @register(
@@ -7266,6 +7336,38 @@ def _chk_piston_directivity_index() -> Outcome:
     res = ph.radiating_piston(0.01, [1.0])
     return numeric(10.0 * math.log10(2.0), float(res.directivity_index[0]),
                    1e-3, unit="dB")
+
+
+@register(
+    _ELECTROACOUSTICS,
+    "Long, Architectural Acoustics 2e, Eq. (18.21)",
+    "Omnidirectional mic at Zs = -6 dB: L(H-M) <= L(H-L) - 4 dB",
+)
+def _chk_feedback_omnidirectional() -> Outcome:
+    res = ph.feedback_stability(-6.0, 76.0, 80.0)
+    return numeric(80.0 - 4.0, res.maximum_level_at_microphone, 1e-9,
+                   unit="dB", places=6)
+
+
+@register(
+    _ELECTROACOUSTICS,
+    "Long, Architectural Acoustics 2e, Eq. (18.22)",
+    "Cardioid mic (DM = -2 dB) at Zs = -6 dB: L(H-M) <= L(H-L) - 2 dB",
+)
+def _chk_feedback_cardioid() -> Outcome:
+    res = ph.feedback_stability(-6.0, 78.0, 80.0, microphone_directivity=-2.0)
+    return numeric(80.0 - 2.0, res.maximum_level_at_microphone, 1e-9,
+                   unit="dB", places=6)
+
+
+@register(
+    _ELECTROACOUSTICS,
+    "Long, Architectural Acoustics 2e, Eq. (18.23)",
+    "Number-of-open-microphones correction 10 lg Nm at Nm = 4",
+)
+def _chk_open_microphone_correction() -> Outcome:
+    return numeric(10.0 * math.log10(4.0), ph.open_microphone_correction(4),
+                   1e-12, unit="dB", places=6)
 
 
 # ===========================================================================

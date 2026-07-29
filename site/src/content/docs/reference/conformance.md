@@ -9,7 +9,7 @@ head:
     attrs:
       type: application/ld+json
     content: |
-      {"@context":"https://schema.org","@type":"Dataset","@id":"https://jmrplens.github.io/phonometry/reference/conformance/#dataset","name":"phonometry numerical conformance report","description":"437 numerical conformance checks pinning each implemented acoustic metric to a clause, table or worked example of the governing standard, with the normative expected value, the value phonometry computes, the delta and a pass/fail verdict, across 53 domains and 283 standards. Regenerated and enforced by CI on every pull request.","url":"https://jmrplens.github.io/phonometry/reference/conformance/","inLanguage":"en","license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"creator":{"@id":"https://jmrp.io/#person"},"publisher":{"@id":"https://jmrp.io/#person"},"about":{"@id":"https://github.com/jmrplens/phonometry#software"},"measurementTechnique":"Comparison of computed values against the normative expected values published in the governing standards (tolerance tables and worked examples).","variableMeasured":[{"@type":"PropertyValue","name":"Standard","description":"Governing standard and clause or table"},{"@type":"PropertyValue","name":"Quantity","description":"Acoustic quantity under test"},{"@type":"PropertyValue","name":"Expected","description":"Normative value published in the standard"},{"@type":"PropertyValue","name":"Computed","description":"Value computed by phonometry"},{"@type":"PropertyValue","name":"Delta","description":"Signed difference between computed and expected"},{"@type":"PropertyValue","name":"Status","description":"Pass or fail verdict against the standard's tolerance"}],"distribution":{"@type":"DataDownload","encodingFormat":"text/markdown","contentUrl":"https://raw.githubusercontent.com/jmrplens/phonometry/main/docs/CONFORMANCE.md"},"isBasedOn":"https://github.com/jmrplens/phonometry/blob/main/scripts/conformance_report.py","identifier":{"@type":"PropertyValue","propertyID":"DOI","value":"10.5281/zenodo.21215280"}}
+      {"@context":"https://schema.org","@type":"Dataset","@id":"https://jmrplens.github.io/phonometry/reference/conformance/#dataset","name":"phonometry numerical conformance report","description":"446 numerical conformance checks pinning each implemented acoustic metric to a clause, table or worked example of the governing standard, with the normative expected value, the value phonometry computes, the delta and a pass/fail verdict, across 53 domains and 292 standards. Regenerated and enforced by CI on every pull request.","url":"https://jmrplens.github.io/phonometry/reference/conformance/","inLanguage":"en","license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"creator":{"@id":"https://jmrp.io/#person"},"publisher":{"@id":"https://jmrp.io/#person"},"about":{"@id":"https://github.com/jmrplens/phonometry#software"},"measurementTechnique":"Comparison of computed values against the normative expected values published in the governing standards (tolerance tables and worked examples).","variableMeasured":[{"@type":"PropertyValue","name":"Standard","description":"Governing standard and clause or table"},{"@type":"PropertyValue","name":"Quantity","description":"Acoustic quantity under test"},{"@type":"PropertyValue","name":"Expected","description":"Normative value published in the standard"},{"@type":"PropertyValue","name":"Computed","description":"Value computed by phonometry"},{"@type":"PropertyValue","name":"Delta","description":"Signed difference between computed and expected"},{"@type":"PropertyValue","name":"Status","description":"Pass or fail verdict against the standard's tolerance"}],"distribution":{"@type":"DataDownload","encodingFormat":"text/markdown","contentUrl":"https://raw.githubusercontent.com/jmrplens/phonometry/main/docs/CONFORMANCE.md"},"isBasedOn":"https://github.com/jmrplens/phonometry/blob/main/scripts/conformance_report.py","identifier":{"@type":"PropertyValue","propertyID":"DOI","value":"10.5281/zenodo.21215280"}}
 ---
 
 phonometry's key differentiator is not the feature list but the proof behind
@@ -66,7 +66,7 @@ with its evidence and what the library does about it, is recorded in the
 
 ## Numerical conformance report
 
-&#9989; **437/437 conformance checks pass** across 53 domains and 283 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+&#9989; **446/446 conformance checks pass** across 53 domains and 292 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
 
@@ -197,11 +197,15 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary>&#9989; <b>Room acoustics</b>: 100% (12/12)</summary>
+<summary>&#9989; <b>Room acoustics</b>: 100% (16/16)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
 | Sabine (W. C. Sabine, 1922) | Reverberation time T = k·V/A  (V=120 m³, S=158 m², α=0.2) | 0.611825 s (+/-0.000001 s) | 0.611825 s | 0 s | &#9989; |
+| Long, Architectural Acoustics 2e, Table 8.1 | Room modes of a 7 x 5 x 3 m room: the six printed frequencies, Hz | 42.4 Hz (+/-0.13 Hz) | 42.27 Hz | -0.126 Hz | &#9989; |
+| Long, Architectural Acoustics 2e, Eq. (8.46) | Modal density of a 7 x 5 x 3 m room at 1 kHz = 34 modes/Hz | 34 modes/Hz (+/-0.5 modes/Hz) | 34.32 modes/Hz | 0.32 modes/Hz | &#9989; |
+| Long, Architectural Acoustics 2e, Eq. (17.51) | Restaurant self-noise, 20 talkers over 20 metric sabins = 76 dB | 76 dB (+/-0.05 dB) | 76.021 dB | 0.021 dB | &#9989; |
+| Long, Architectural Acoustics 2e, Eq. (17.54) | Privacy bound A_tab < 3.16 rt^2 (Q = 2, L_SN = -9 dB) | 3.16 m^2 (+/-0.005 m^2) | 3.164 m^2 | 0.004 m^2 | &#9989; |
 | Everest, Master Handbook of Acoustics 4th ed, Fig. 7-22 | Sabine RT, worked Example 1 @ 1 kHz (untreated 23.3×16×10 ft room, SI) | 3.39 s (+/-0.02 s) | 3.402 s | 0.012 s | &#9989; |
 | Eyring (Norris-Eyring, 1930) | Reverberation time T = k·V/(-S·ln(1-ᾱ))  (α=0.2) | 0.548369 s (+/-0.000001 s) | 0.548369 s | 0 s | &#9989; |
 | Arau-Puchades (Acustica 65, 1988, Formula 18) | T (α=0.5/0.1/0.1 per wall pair, dims 8×5×3 m) | 0.812147 s (+/-0.000001 s) | 0.812147 s | 0 s | &#9989; |
@@ -217,10 +221,12 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary>&#9989; <b>Psychoacoustics</b>: 100% (12/12)</summary>
+<summary>&#9989; <b>Psychoacoustics</b>: 100% (14/14)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
+| Moore, Psychology of Hearing 6e, p. 77 (Glasberg & Moore 1990) | ERB_N number of 1000 Hz = 15.59 Cam | 15.59 Cam (+/-0.005 Cam) | 15.5932 Cam | 0.003 Cam | &#9989; |
+| Moore, Psychology of Hearing 6e, p. 76 (Glasberg & Moore 1990) | ERB_N at 1 kHz vs the printed 24.7(4.37F + 1), Hz | 132.639 Hz (+/-0.3%) | 132.445 Hz | -0.194 Hz | &#9989; |
 | ISO 532-1:2017 Annex B.2 | Zwicker loudness N, stationary test signal 1 | 83.2957 sone (+/-0.1%) | 83.2957 sone | 0 sone | &#9989; |
 | ISO 532-1:2017 Annex B.5 | Time-varying loudness Nmax, technical signal 14 (aircraft, free field) | 22.6399 sone (+/-0.1%) | 22.6399 sone | 0 sone | &#9989; |
 | ISO 532-1:2017 Annex B.5 | Time-varying loudness Nmax, technical signal 15 (vehicle interior, diffuse field) | 9.6059 sone (+/-0.1%) | 9.6059 sone | 0 sone | &#9989; |
@@ -927,7 +933,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary>&#9989; <b>Electroacoustics</b>: 100% (6/6)</summary>
+<summary>&#9989; <b>Electroacoustics</b>: 100% (9/9)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
@@ -937,6 +943,9 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | Beranek & Mellow 2e Eq. (4.151) | Radiation mass M = 8 rho a^3 / 3  (a = 0.1 m, rho = 1.206) | 0.003216 kg (+/-0 kg) | 0.003216 kg | 0 kg | &#9989; |
 | Beranek & Mellow 2e Eq. (13.102), Table 14.1 | First directivity null at ka sin(theta) = 3.8317 (first zero of J1) | 0 (+/-0.000001) | 0 | 0 | &#9989; |
 | Beranek & Mellow 2e §4.19 (half-space baffle) | Directivity index DI -> 10 lg 2 = 3.01 dB as ka -> 0 | 3.0103 dB (+/-0.001 dB) | 3.0103 dB | 0 dB | &#9989; |
+| Long, Architectural Acoustics 2e, Eq. (18.21) | Omnidirectional mic at Zs = -6 dB: L(H-M) <= L(H-L) - 4 dB | 76 dB (+/-0 dB) | 76 dB | 0 dB | &#9989; |
+| Long, Architectural Acoustics 2e, Eq. (18.22) | Cardioid mic (DM = -2 dB) at Zs = -6 dB: L(H-M) <= L(H-L) - 2 dB | 78 dB (+/-0 dB) | 78 dB | 0 dB | &#9989; |
+| Long, Architectural Acoustics 2e, Eq. (18.23) | Number-of-open-microphones correction 10 lg Nm at Nm = 4 | 6.0206 dB (+/-0 dB) | 6.0206 dB | 0 dB | &#9989; |
 
 </details>
 

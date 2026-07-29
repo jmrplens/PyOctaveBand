@@ -654,6 +654,16 @@ _ES_EXACT = {
     "A-weighted SPL [dB]": "SPL ponderado A [dB]",
     "Measured Lp,A,S": "Lp,A,S medido",
     "STI vs distance": "STI vs distancia",
+    # --- ERB_N / Cam auditory-filter scale (Glasberg & Moore 1990) ---
+    "Auditory-Filter Bandwidth and the Cam Scale (Glasberg & Moore, 1990)":
+        "Ancho de banda del filtro auditivo y escala Cam (Glasberg y Moore, 1990)",
+    "Centre frequency [Hz]": "Frecuencia central [Hz]",
+    "Equivalent rectangular bandwidth ERB$_N$ [Hz]":
+        "Ancho de banda rectangular equivalente ERB$_N$ [Hz]",
+    "ERB$_N$ (Glasberg & Moore, 1990)": "ERB$_N$ (Glasberg y Moore, 1990)",
+    "One-third octave (23 % of f)": "Tercio de octava (23 % de f)",
+    "ERB$_N$ number [Cam]": "Número ERB$_N$ [Cam]",
+    "1 kHz = 15.59 Cam": "1 kHz = 15,59 Cam",
     # --- Advanced psychoacoustics figures (plan-17 block A) ---
     "Loudness Models Compared (1 kHz tone)":
         "Modelos de sonoridad comparados (tono de 1 kHz)",
@@ -3897,6 +3907,125 @@ def generate_open_plan_decay(output_dir: str) -> None:
     ax.legend(handles, [str(h.get_label()) for h in handles],
               loc="upper right", fontsize=9)
     save_figure(output_dir, "open_plan_decay.png")
+    plt.close()
+
+
+def generate_rectangular_room_modes(output_dir: str) -> None:
+    """Mode ladder and modal density of Long's 7 x 5 x 3 m example room.
+
+    One concept: where the eigenfrequencies of a rectangular room sit, which
+    family each belongs to, and where the Schroeder frequency ends the modal
+    regime.
+    """
+    print("Generating rectangular_room_modes...")
+    from phonometry import room_modes
+
+    # Long, Architectural Acoustics 2nd ed., Table 8.1 (printed p. 325).
+    result = room_modes(
+        (7.0, 5.0, 3.0), max_frequency=200.0, speed_of_sound=344.0,
+        reverberation_time=0.8,
+    )
+    result.plot(language=_LANG)
+    plt.gcf().set_size_inches(10, 6.5)
+    plt.tight_layout()
+    save_figure(output_dir, "rectangular_room_modes.svg")
+    plt.close()
+
+
+def generate_restaurant_crowd_noise(output_dir: str) -> None:
+    """Restaurant self-noise against occupancy for three absorption areas.
+
+    One concept: the crowd generates its own background, and only absorption
+    keeps it below the level at which cross-table conversation fails.
+    """
+    print("Generating restaurant_crowd_noise...")
+    from phonometry import crowd_noise
+
+    # Long, Chapter 17 (printed pp. 665-666): a hard room of about 20 metric
+    # sabins, the same room with a partly absorptive ceiling, and with the
+    # full alpha 0.9 ceiling of his 13.7 x 13.7 m example (+170 sabins).
+    result = crowd_noise([20.0, 95.0, 190.0], distance=1.2)
+    ax = result.plot(language=_LANG)
+    ax.set_xlim(1.0, 20.0)
+    plt.gcf().set_size_inches(10, 6)
+    plt.tight_layout()
+    save_figure(output_dir, "restaurant_crowd_noise.svg")
+    plt.close()
+
+
+def generate_sound_reinforcement_geometry(output_dir: str) -> None:
+    """The four points of a reinforcement feedback loop, schematically.
+
+    One concept: the distances that set the two direct-field levels
+    ``L(H-M)`` and ``L(H-L)`` of Long's stability criterion. The layout is
+    schematic and each path carries its own length, because a talker 0.3 m
+    from the microphone and a listener 12 m from the loudspeaker cannot share
+    one usable drawing scale.
+    """
+    print("Generating sound_reinforcement_geometry...")
+    from phonometry import plot_sound_reinforcement_geometry
+
+    _fig, ax = plt.subplots(figsize=(10, 4.6))
+    plot_sound_reinforcement_geometry(0.3, 4.0, 12.0, ax=ax, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "sound_reinforcement_geometry.svg")
+    plt.close()
+
+
+def generate_erb_bandwidth(output_dir: str) -> None:
+    """Auditory-filter bandwidth against centre frequency, with the Cam scale.
+
+    One concept: how wide the ear's analysis filter is at each frequency
+    (Glasberg and Moore, 1990), against the constant-percentage one-third
+    octave for scale, with the Cam axis that counts those widths.
+    """
+    print("Generating erb_bandwidth...")
+    from phonometry import cam_from_frequency, erb_bandwidth
+
+    f = np.geomspace(50.0, 16000.0, 400)
+    erb = np.asarray(erb_bandwidth(f))
+    third_octave = f * (2.0 ** (1.0 / 6.0) - 2.0 ** (-1.0 / 6.0))
+
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    ax.loglog(f, erb, color=COLOR_PRIMARY, linewidth=2.2,
+              label="ERB$_N$ (Glasberg & Moore, 1990)")
+    ax.loglog(f, third_octave, color=COLOR_SECONDARY, linewidth=1.6,
+              linestyle="--", label="One-third octave (23 % of f)")
+    ax.set_title("Auditory-Filter Bandwidth and the Cam Scale "
+                 "(Glasberg & Moore, 1990)", fontweight="bold", pad=12)
+    ax.set_xlabel("Centre frequency [Hz]")
+    ax.set_ylabel("Equivalent rectangular bandwidth ERB$_N$ [Hz]")
+    ax.grid(which="both", color=COLOR_GRID, linestyle="-", alpha=0.4)
+    format_frequency_axis(ax, 50.0, 16000.0)
+    from matplotlib.ticker import FixedFormatter, FixedLocator
+    y_ticks = [10.0, 20.0, 50.0, 100.0, 200.0, 500.0, 1000.0, 2000.0]
+    ax.yaxis.set_major_locator(FixedLocator(y_ticks))
+    ax.yaxis.set_major_formatter(FixedFormatter([f"{v:g}" for v in y_ticks]))
+    ax.legend(loc="upper left", fontsize=9)
+
+    cam_1k = float(np.asarray(cam_from_frequency(1000.0))[()])
+    erb_1k = float(np.asarray(erb_bandwidth(1000.0))[()])
+    ax.plot([1000.0], [erb_1k], "o", color=COLOR_PRIMARY, markersize=8,
+            markerfacecolor="white", markeredgewidth=1.6, zorder=6)
+    ax.annotate(f"1 kHz = {cam_1k:.2f} Cam", xy=(1000.0, erb_1k),
+                xytext=(1400.0, 0.45 * erb_1k), fontsize=10,
+                arrowprops={"arrowstyle": "->", "lw": 1.0})
+
+    # Top axis: the Cam scale, which counts ERB_N widths along frequency.
+    from matplotlib.ticker import NullFormatter, NullLocator
+
+    from phonometry import frequency_from_cam
+
+    ax2 = ax.twiny()
+    ax2.set_xscale("log")
+    ax2.set_xlim(ax.get_xlim())
+    cam_ticks = np.array([5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0])
+    ax2.set_xticks(np.asarray(frequency_from_cam(cam_ticks)))
+    ax2.set_xticklabels([f"{c:.0f}" for c in cam_ticks])
+    ax2.xaxis.set_minor_locator(NullLocator())
+    ax2.xaxis.set_minor_formatter(NullFormatter())
+    ax2.set_xlabel("ERB$_N$ number [Cam]", color=COLOR_TERTIARY)
+    save_figure(output_dir, "erb_bandwidth.svg")
     plt.close()
 
 
@@ -12408,6 +12537,11 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     # Psychoacoustics / open-plan plots (sharpness weighting, spatial decay)
     generate_sharpness_weighting,
     generate_open_plan_decay,
+    # Rectangular room modes (Long Ch. 8), restaurant crowd self-noise
+    # (Long Ch. 17) and the ERB_N / Cam auditory-filter scale.
+    generate_rectangular_room_modes,
+    generate_restaurant_crowd_noise,
+    generate_erb_bandwidth,
     # Advanced psychoacoustics: ECMA-418-2 Sottek model and Moore-Glasberg
     # ISO 532-2/-3 loudness (models, specific loudness, sound quality
     # metrics, time-varying loudness).
@@ -12488,6 +12622,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_image_source_reflectogram,
     generate_image_source_plan,
     generate_open_plan_line_geometry,
+    generate_sound_reinforcement_geometry,
     # Underwater acoustics: ship radiated noise / monopole source
     # level (ISO 17208) and pile-driving sound exposure (ISO 18406).
     generate_ship_source_level,
