@@ -618,6 +618,7 @@ def plot_activity_assessment(
             _t("limit + 5 dB", language),
             -step,
             ":",
+            False,
         ),
         (
             [float(p.reported_level) for p in periods],
@@ -628,6 +629,7 @@ def plot_activity_assessment(
             _t("limit + 3 dB", language),
             0.0,
             "--",
+            True,
         ),
         (
             [
@@ -643,14 +645,19 @@ def plot_activity_assessment(
             _t("limit", language),
             step,
             "-",
+            False,
         ),
     )
-    for values, limits, verdicts, colour, label, limit_label, offset, dash in series:
+    for (
+        values, limits, verdicts, colour, label, limit_label, offset, dash, styled
+    ) in series:
         # matplotlib types the dash style as a Literal; the series table above
         # carries it as a plain str, so narrow it back for the hlines call.
         style = cast("Any", dash)
         opts: dict[str, Any] = {"color": colour, "label": label}
-        if offset == 0.0:
+        if styled:
+            # The caller's bar kwargs apply to the daily LKeq,x series, the one
+            # the fiche and the guides treat as the headline result.
             opts.update(kwargs)
         bars = ax.bar(positions + offset, values, width=width, **opts)
         for bar, ok in zip(bars, verdicts, strict=True):
