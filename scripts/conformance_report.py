@@ -560,6 +560,146 @@ def _chk_iso1996_2_uncertainty() -> Outcome:
 
 
 # ---------------------------------------------------------------------------
+# Spanish noise regulation (RD 1367/2007) and building code (CTE DB-HR).
+# Oracles: the printed limit tables and procedures of the two legal texts, and
+# the worked examples of Aviles Lopez & Perera Martin, "Manual de acustica
+# ambiental y arquitectonica" (Paraninfo), Ejemplos 3.1-3.3 and 7.2 / 7.4.
+# ---------------------------------------------------------------------------
+#: Manual Ejemplo 3.1: the day period of an activity on residential land,
+#: split into 2 h shut down, 6 h with the noisy machine (LAeq 50 dB, Kt 6,
+#: Kf 3) and 4 h with the remaining sources (LAeq 48 dB, Kt 3, Kf 3).
+_RD1367_DAY_PHASES = [
+    (2.0, 0.0, 0.0, 0.0),
+    (6.0, 50.0, 6.0, 3.0),
+    (4.0, 48.0, 3.0, 3.0),
+]
+#: Manual Ejemplo 7.2: the measured apparent sound reduction index R' of a
+#: field test, one-third-octave bands 100 Hz to 5 kHz.
+_DBHR_R_PRIME = [
+    36.2, 41.5, 36.9, 40.4, 44.7, 42.4, 45.7, 46.1, 47.1,
+    52.3, 54.3, 57.5, 57.8, 57.3, 59.0, 62.8, 64.7, 65.3,
+]
+
+
+@register(
+    "Levels & dosimetry",
+    "RD 1367/2007 Annex IV A.3.4.2 b",
+    "Corrected period level LKeq,d (Manual Ejemplo 3.1: 3 noise phases, 12 h)",
+)
+def _chk_rd1367_period_level() -> Outcome:
+    phases = [
+        ph.NoisePhase(hours, laeq, kt=kt, kf=kf)
+        for hours, laeq, kt, kf in _RD1367_DAY_PHASES
+    ]
+    level = ph.evaluation_period_level(phases, hours=12.0)
+    return numeric(57.0, float(ph.round_reported_level(level)), 1e-9, unit="dB")
+
+
+@register(
+    "Levels & dosimetry",
+    "RD 1367/2007 Annex I A.2 d",
+    "Long-term level LK,d (Manual Ejemplo 3.2: 303 operating days of 365)",
+)
+def _chk_rd1367_long_term_level() -> Outcome:
+    level = ph.long_term_corrected_level([57.0, 0.0], weights=[303.0, 62.0])
+    return numeric(56.0, float(ph.round_reported_level(level)), 1e-9, unit="dB")
+
+
+@register(
+    "Levels & dosimetry",
+    "RD 1367/2007 Annex III Table B1, Article 25",
+    "Activity verdict (Manual Ejemplo 3.3: area type a, LK,d 56 dB over 55 dB)",
+)
+def _chk_rd1367_activity_verdict() -> Outcome:
+    day = [
+        ph.NoisePhase(hours, laeq, kt=kt, kf=kf)
+        for hours, laeq, kt, kf in _RD1367_DAY_PHASES
+    ]
+    evening = [ph.NoisePhase(2.0, 48.0, kt=3.0, kf=3.0), ph.NoisePhase(2.0, 0.0)]
+    verdict = ph.assess_activity(
+        {"day": day, "evening": evening},
+        ph.activity_limits("a"),
+        operating_days=303,
+    )
+    # The book: the phase and daily criteria pass, the annual one does not, so
+    # a new activity does not comply while one already in operation does.
+    computed = (
+        verdict.periods[0].phase_pass
+        and verdict.periods[0].daily_pass
+        and not verdict.periods[0].long_term_pass
+        and not verdict.complies
+    )
+    return Outcome(
+        expected="phase and daily pass, annual fails, activity not compliant",
+        computed=(
+            "phase and daily pass, annual fails, activity not compliant"
+            if computed
+            else "verdict differs"
+        ),
+        delta="-",
+        passed=bool(computed),
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "CTE DB-HR Annex A, Formula (A.5)",
+    "Global index R'A for pink noise (Manual Ejemplo 7.2)",
+)
+def _chk_dbhr_ra() -> Outcome:
+    computed = ph.ra(_DBHR_R_PRIME).intermediate
+    return numeric(51.4, float(computed), 0.05, unit="dBA", places=2)
+
+
+@register(
+    "Room & building acoustics",
+    "CTE DB-HR Annex A, Formula (A.6)",
+    "Global index D2m,nT,Atr for road traffic (Manual Ejercicio 7.1)",
+)
+def _chk_dbhr_d2m_nt_atr() -> Outcome:
+    values = [
+        28.5, 28.5, 18.9, 23.7, 30.7, 31.3, 37.8, 35.2, 34.7,
+        38.5, 37.7, 43.1, 42.3, 44.2, 41.9, 37.5, 39.4, 41.5,
+    ]
+    computed = ph.d2m_nt_atr(values).intermediate
+    return numeric(32.8, float(computed), 0.05, unit="dBA", places=2)
+
+
+@register(
+    "Room & building acoustics",
+    "Manual de acustica ambiental y arquitectonica, Ejemplo 7.1",
+    "Reported R'A of the field-test wall (printed 51 dBA = R'w 52 + C -1)",
+)
+def _chk_dbhr_route_agreement() -> Outcome:
+    # The book prints the pink-noise figure as 51 dBA, so 51 is the oracle;
+    # comparing the direct route against the library's own ISO 717-1 engine
+    # would be a self-consistency check, not an external validation. The unit
+    # test pins R'w = 52 and C = -1 against the same printed example.
+    computed = float(ph.ra(_DBHR_R_PRIME).reported)
+    return numeric(51.0, computed, 1e-9, unit="dBA", places=1)
+
+
+@register(
+    "Room & building acoustics",
+    "Manual de acustica ambiental y arquitectonica, Ejemplo 7.1",
+    "Reported R'A,tr of the same wall (printed 47 dBA = R'w 52 + Ctr -5)",
+)
+def _chk_dbhr_ra_tr() -> Outcome:
+    computed = float(ph.ra_tr(_DBHR_R_PRIME).reported)
+    return numeric(47.0, computed, 1e-9, unit="dBA", places=1)
+
+
+@register(
+    "Room & building acoustics",
+    "CTE Catalogo de Elementos Constructivos",
+    "Window size correction of RA (Manual Ejemplo 7.4: 4 m2 window, -2 dB)",
+)
+def _chk_dbhr_window_correction() -> Outcome:
+    computed = 26.0 + ph.window_size_correction(4.0)
+    return numeric(24.0, float(computed), 1e-9, unit="dBA", places=1)
+
+
+# ---------------------------------------------------------------------------
 # Reverberation-time prediction (Sabine / Eyring / Millington / Fitzroy /
 # Arau-Puchades). No source carries a machine-readable worked example, so the
 # checks anchor on hand-computed closed-form values and the model identities.

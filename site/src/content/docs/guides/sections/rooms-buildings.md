@@ -72,6 +72,9 @@ laboratory, and predicted from element data.
   reference-curve engines behind Rw, DnT,w, Ln,w and their adaptation terms.
 - [Façade Sound Insulation](/phonometry/guides/facade-insulation/): the
   building envelope measured (ISO 16283-3) and predicted (EN 12354-3/4).
+- [Spanish Building Code (CTE DB-HR)](/phonometry/guides/spanish-building-code/):
+  the DB-HR global indices, the clause 2 requirements and the window-size
+  correction.
 
 ## [Insulation design](/phonometry/guides/sections/insulation-design/)
 

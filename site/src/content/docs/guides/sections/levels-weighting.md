@@ -38,6 +38,12 @@ the day-evening-night level Lden and the rating levels of **ISO 1996-1** with
 their adjustments, and the ISO 1996-2 determination chain of tonal
 adjustment, residual-noise correction and the measurement uncertainty budget.
 
+National frameworks build their own index on top of that chain, and
+[Spanish Noise Regulation (RD 1367/2007)](/phonometry/guides/spanish-noise-regulation/)
+implements the Spanish one: the corrected level LKeq with its tonal,
+low-frequency and impulsive corrections, the evaluation periods split into
+noise phases, and the limit tables an activity is judged against.
+
 ## Pages in this section
 
 - [Frequency Weighting (A, C, Z)](/phonometry/guides/weighting/): the
@@ -53,3 +59,6 @@ adjustment, residual-noise correction and the measurement uncertainty budget.
 - [Environmental Levels (ISO 1996-1/-2)](/phonometry/guides/environmental-levels/):
   Lden, Ldn and rating levels, tonal adjustment, residual noise and
   uncertainty.
+- [Spanish Noise Regulation (RD 1367/2007)](/phonometry/guides/spanish-noise-regulation/):
+  the corrected level LKeq, the Kt/Kf/Ki corrections, the evaluation periods
+  and noise phases, and the limit tables.

@@ -80,6 +80,9 @@ valoración.
 - [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/guides/environmental-levels/):
   Lden, Ldn y los niveles de valoración compuestos, el ajuste tonal, la
   corrección de ruido residual y el presupuesto de incertidumbre.
+- [Normativa española de ruido (RD 1367/2007)](/phonometry/es/guides/spanish-noise-regulation/):
+  el nivel corregido LKeq, las correcciones Kt/Kf/Ki, los periodos temporales
+  de evaluación y las fases de ruido, y las tablas de valores límite.
 
 ## [Señales y espectros](/phonometry/es/guides/sections/signals-spectra/)
 

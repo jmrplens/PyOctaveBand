@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 
@@ -39,6 +39,10 @@ if TYPE_CHECKING:
     from ..environmental.impulse_prominence import ImpulseProminenceResult
     from ..environmental.measurement import TonalAssessmentResult
     from ..environmental.outdoor_propagation import OutdoorAttenuation
+    from ..environmental.spanish_regulation import (
+        ActivityAssessment,
+        TonalCorrectionResult,
+    )
     from ..environmental.wind_turbine_noise import WindTurbineTonalityResult
 
 #: Spanish translations of the fixed strings rendered by the environmental
@@ -91,6 +95,24 @@ _STRINGS: dict[str, str] = {
     r"Attenuation coefficient $\alpha$ [dB/km]":
         r"Coeficiente de atenuación $\alpha$ [dB/km]",
     "ISO 9613-1 atmospheric attenuation": "Atenuación atmosférica ISO 9613-1",
+    "Band level": "Nivel de banda",
+    "$L_t$ vs neighbour mean": "$L_t$ frente a la media de contiguas",
+    "Band level [dB]": "Nivel de banda [dB]",
+    "$L_t$ [dB]": "$L_t$ [dB]",
+    "RD 1367/2007 tonal correction $K_t$ = {kt} dB":
+        "Corrección tonal $K_t$ = {kt} dB (RD 1367/2007)",
+    "max $L_{Keq,Ti}$": "máx. $L_{Keq,Ti}$",
+    "$L_{Keq,x}$ (daily)": "$L_{Keq,x}$ (diario)",
+    "$L_{K,x}$ (annual)": "$L_{K,x}$ (anual)",
+    "limit + 5 dB": "límite + 5 dB",
+    "limit + 3 dB": "límite + 3 dB",
+    "limit": "límite",
+    "Day": "Día",
+    "Evening": "Tarde",
+    "Night": "Noche",
+    "Corrected level [dB]": "Nivel corregido [dB]",
+    "RD 1367/2007 assessment vs limit values":
+        "Evaluación RD 1367/2007 frente a los valores límite",
 }
 
 
@@ -498,5 +520,168 @@ def plot_atmospheric_pe(
     ax.set_ylabel(_t("Height [m]", language))
     ax.set_title(f"{_t('GFPE relative sound level', language)} ({format_number(result.frequency, language, decimals=0)} Hz)")
     ax.legend(loc="upper right", fontsize="small")
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_tonal_correction_rd1367(
+    result: TonalCorrectionResult, ax: Axes | None = None, *, language: str = "en",
+    **kwargs: Any
+) -> Axes:
+    """One-third-octave spectrum with the RD 1367/2007 emergence ``Lt`` per band.
+
+    The band levels are drawn as bars on the left axis and the emergence
+    ``Lt = Lf - Ls`` (the band level above the arithmetic mean of its two
+    neighbours) on a twin right axis, with the band that governs ``Kt``
+    highlighted.
+
+    :param result: A
+        :class:`~phonometry.environmental.spanish_regulation.TonalCorrectionResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the band-level ``bar`` call.
+    :return: The axes (the left, band-level axes).
+    """
+    from .._i18n import format_number, localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    freqs = np.asarray(result.frequencies, dtype=np.float64)
+    levels = np.asarray(result.levels, dtype=np.float64)
+    lt = np.asarray(result.differences, dtype=np.float64)
+    positions = _band_axis(ax, freqs, language=language)
+
+    kwargs.setdefault("color", _C_PRIMARY_LIGHT)
+    kwargs.setdefault("label", _t("Band level", language))
+    ax.bar(positions, levels, width=0.72, **kwargs)
+    ax.set_ylabel(_t("Band level [dB]", language))
+
+    twin = ax.twinx()
+    twin.plot(positions, lt, "o-", color=_C_SECONDARY, ms=4.0,
+              label=_t("$L_t$ vs neighbour mean", language))
+    if result.governing_frequency is not None:
+        index = int(np.argmin(np.abs(freqs - result.governing_frequency)))
+        twin.plot([positions[index]], [lt[index]], "*", color=_C_REFERENCE,
+                  ms=14.0, zorder=5)
+    twin.set_ylabel(_t("$L_t$ [dB]", language))
+    twin.axhline(0.0, color=_C_MUTED, lw=0.8)
+
+    ax.set_title(
+        _t("RD 1367/2007 tonal correction $K_t$ = {kt} dB", language).format(
+            kt=format_number(result.correction, language, decimals=0)
+        )
+    )
+    handles, labels = ax.get_legend_handles_labels()
+    extra_handles, extra_labels = twin.get_legend_handles_labels()
+    ax.legend(handles + extra_handles, labels + extra_labels,
+              loc="upper left", fontsize="small")
+    ax.grid(True, axis="y", alpha=0.3)
+    localize_axes(ax, language)
+    localize_axes(twin, language)
+    return ax
+
+
+def plot_activity_assessment(
+    result: ActivityAssessment, ax: Axes | None = None, *, language: str = "en",
+    **kwargs: Any
+) -> Axes:
+    """Per-period RD 1367/2007 indices against their limit values.
+
+    For every assessed evaluation period the three indices of Article 25.1 b
+    are drawn as grouped bars (the largest measured ``LKeq,Ti``, the daily
+    ``LKeq,x`` and the annual ``LK,x``) with their own limits marked on each
+    group: the table limit plus 5 dB, plus 3 dB and the limit itself. A bar
+    that exceeds its own limit is outlined in the exceedance colour.
+
+    :param result: An
+        :class:`~phonometry.environmental.spanish_regulation.ActivityAssessment`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the ``LKeq,x`` ``bar`` call.
+    :return: The axes.
+    """
+    from .._i18n import localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    periods = list(result.periods)
+    labels = [_t(p.period.capitalize(), language) for p in periods]
+    positions = _band_axis(ax, labels, xlabel=None, language=language)
+
+    step = 0.28
+    width = 0.24
+    series = (
+        (
+            [p.max_phase_level for p in periods],
+            [p.phase_limit for p in periods],
+            [p.phase_pass for p in periods],
+            _C_PRIMARY_LIGHT,
+            _t("max $L_{Keq,Ti}$", language),
+            _t("limit + 5 dB", language),
+            -step,
+            ":",
+            False,
+        ),
+        (
+            [float(p.reported_level) for p in periods],
+            [p.daily_limit for p in periods],
+            [p.daily_pass for p in periods],
+            _C_PRIMARY,
+            _t("$L_{Keq,x}$ (daily)", language),
+            _t("limit + 3 dB", language),
+            0.0,
+            "--",
+            True,
+        ),
+        (
+            [
+                float(p.reported_long_term)
+                if p.reported_long_term is not None
+                else np.nan
+                for p in periods
+            ],
+            [p.limit for p in periods],
+            [p.long_term_pass for p in periods],
+            _C_TERTIARY,
+            _t("$L_{K,x}$ (annual)", language),
+            _t("limit", language),
+            step,
+            "-",
+            False,
+        ),
+    )
+    for (
+        values, limits, verdicts, colour, label, limit_label, offset, dash, styled
+    ) in series:
+        # matplotlib types the dash style as a Literal; the series table above
+        # carries it as a plain str, so narrow it back for the hlines call.
+        style = cast("Any", dash)
+        opts: dict[str, Any] = {"color": colour, "label": label}
+        if styled:
+            # The caller's bar kwargs apply to the daily LKeq,x series, the one
+            # the fiche and the guides treat as the headline result.
+            opts.update(kwargs)
+        bars = ax.bar(positions + offset, values, width=width, **opts)
+        for bar, ok in zip(bars, verdicts, strict=True):
+            if ok is False:
+                bar.set_edgecolor(_C_REFERENCE)
+                bar.set_linewidth(1.6)
+        for index, limit in enumerate(limits):
+            ax.hlines(
+                limit,
+                positions[index] + offset - 0.62 * width,
+                positions[index] + offset + 0.62 * width,
+                colors=_C_REFERENCE, linestyles=style, linewidth=1.5,
+                label=limit_label if index == 0 else "_nolegend_",
+                zorder=4,
+            )
+
+    # The categorical axis here carries two or three period names, not a band
+    # sequence, so the 45-degree band-axis rotation is not needed.
+    ax.set_xticklabels(labels, rotation=0, ha="center")
+    ax.set_xlim(positions[0] - 0.5 - step, positions[-1] + 0.5 + step)
+
+    ax.set_ylabel(_t("Corrected level [dB]", language))
+    ax.set_title(_t("RD 1367/2007 assessment vs limit values", language))
+    ax.legend(loc="upper right", fontsize="small", ncol=2)
+    ax.grid(True, axis="y", alpha=0.3)
     localize_axes(ax, language)
     return ax

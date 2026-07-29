@@ -101,6 +101,7 @@ export const apiSidebar = {
         'reference/api/building/floor-covering-improvement',
         'reference/api/building/structure-borne-power',
         'reference/api/building/installed-structure-borne',
+        'reference/api/building/spanish-building-code',
       ],
     },
     {
@@ -149,6 +150,7 @@ export const apiSidebar = {
         'reference/api/environment/impulsive-sound',
         'reference/api/environment/rating',
         'reference/api/environment/measurement',
+        'reference/api/environment/spanish-regulation',
       ],
     },
     {
