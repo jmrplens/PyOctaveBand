@@ -53,6 +53,7 @@ export const sidebar = [
         items: [
           { slug: 'guides/sections/octave-filtering', label: 'Overview', translations: { es: 'Resumen' } },
           'guides/filter-banks',
+          'guides/filter-gallery',
           'guides/filter-compliance',
           'guides/block-processing',
           'guides/multichannel',
@@ -65,8 +66,10 @@ export const sidebar = [
         items: [
           { slug: 'guides/sections/levels-weighting', label: 'Overview', translations: { es: 'Resumen' } },
           'guides/weighting',
+          'guides/special-weightings',
           'guides/time-weighting',
           'guides/levels',
+          'guides/environmental-levels',
         ],
       },
       {
@@ -111,6 +114,7 @@ export const sidebar = [
         items: [
           { slug: 'guides/sections/psychoacoustics', label: 'Overview', translations: { es: 'Resumen' } },
           'guides/loudness',
+          'guides/advanced-loudness',
           'guides/sound-quality',
           'guides/tone-prominence',
           'guides/tone-audibility',

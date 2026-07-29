@@ -51,7 +51,8 @@ list grows as guides gain their References sections.
   [ccrma.stanford.edu/~jos/filters](https://ccrma.stanford.edu/~jos/filters/).
   Free companion treatment of digital-filter design and analysis, a good next
   step after the filter-bank guides.
-  Cited by [Filter Banks](/phonometry/guides/filter-banks/).
+  Cited by [Filter Banks](/phonometry/guides/filter-banks/) and
+  [Filter Architecture Gallery](/phonometry/guides/filter-gallery/).
 - Bendat, J. S., & Piersol, A. G. (2010). *Random data: Analysis and
   measurement procedures* (4th ed.). Wiley. ISBN 978-0-470-24877-5.
   [doi:10.1002/9781118032428](https://doi.org/10.1002/9781118032428).
@@ -84,6 +85,7 @@ list grows as guides gain their References sections.
   The base-10 band edges and the class acceptance masks of the fractional
   octave banks.
   Cited by [Filter Banks](/phonometry/guides/filter-banks/),
+  [Filter Architecture Gallery](/phonometry/guides/filter-gallery/),
   [Filter Class Verification](/phonometry/guides/filter-compliance/) and
   [Multichannel and Performance](/phonometry/guides/multichannel/).
 - International Electrotechnical Commission. (2013). *Electroacoustics —
@@ -93,7 +95,7 @@ list grows as guides gain their References sections.
   metrics of the sound level meter, with the tolerance tables used for
   verification.
   Cited by [Integrated and Statistical Levels](/phonometry/guides/levels/),
-  [Frequency Weighting (A, C, G, Z)](/phonometry/guides/weighting/),
+  [Frequency Weighting (A, C, Z)](/phonometry/guides/weighting/),
   [Time Weighting and Integration](/phonometry/guides/time-weighting/) and
   [Multichannel and Performance](/phonometry/guides/multichannel/).
 - International Electrotechnical Commission. (2013). *Electroacoustics —
@@ -932,14 +934,14 @@ list grows as guides gain their References sections.
   82-108. [doi:10.1121/1.1915637](https://doi.org/10.1121/1.1915637).
   The original equal-loudness measurements whose 40-phon contour became the
   A-weighting curve.
-  Cited by [Frequency Weighting (A, C, G, Z)](/phonometry/guides/weighting/)
+  Cited by [Frequency Weighting (A, C, Z)](/phonometry/guides/weighting/)
   and [Loudness](/phonometry/guides/loudness/).
 - International Organization for Standardization. (2023). *Acoustics —
   Normal equal-loudness-level contours* (ISO 226:2023).
   [iso.org catalogue](https://www.iso.org/standard/83117.html).
   The modern equal-loudness contours, successors of the Fletcher-Munson
   curves.
-  Cited by [Frequency Weighting (A, C, G, Z)](/phonometry/guides/weighting/)
+  Cited by [Frequency Weighting (A, C, Z)](/phonometry/guides/weighting/)
   and [Loudness](/phonometry/guides/loudness/).
 - Fastl, H., & Zwicker, E. (2007). *Psychoacoustics: Facts and models*
   (3rd ed.). Springer.

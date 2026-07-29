@@ -50,7 +50,8 @@ it; the list grows as guides gain their References sections.
   [ccrma.stanford.edu/~jos/filters](https://ccrma.stanford.edu/~jos/filters/).
   Free companion treatment of digital-filter design and analysis, a good next
   step after the filter-bank guides.
-  Cited by [Filter Banks](filter-banks.md).
+  Cited by [Filter Banks](filter-banks.md) and
+  [Filter Architecture Gallery](filter-gallery.md).
 - Bristow-Johnson, R. *Audio EQ Cookbook*. Republished as a W3C Working Group
   Note (ed. R. Toy), 8 June 2021.
   [w3.org/TR/audio-eq-cookbook](https://www.w3.org/TR/audio-eq-cookbook/).
@@ -122,6 +123,7 @@ it; the list grows as guides gain their References sections.
   The base-10 band edges and the class acceptance masks of the fractional
   octave banks.
   Cited by [Filter Banks](filter-banks.md),
+  [Filter Architecture Gallery](filter-gallery.md),
   [Filter class verification](filter-compliance.md) and
   [Multichannel and Performance](multichannel.md).
 - International Electrotechnical Commission. (2013). *Electroacoustics —
@@ -131,7 +133,7 @@ it; the list grows as guides gain their References sections.
   metrics of the sound level meter, with the tolerance tables used for
   verification.
   Cited by [Integrated and Statistical Levels](levels.md),
-  [Frequency Weighting (A, C, G, Z)](weighting.md),
+  [Frequency Weighting (A, C, Z)](weighting.md),
   [Time Weighting and Integration](time-weighting.md) and
   [Multichannel and Performance](multichannel.md).
 - International Electrotechnical Commission. (2013). *Electroacoustics —
@@ -1079,14 +1081,14 @@ it; the list grows as guides gain their References sections.
   82-108. [doi:10.1121/1.1915637](https://doi.org/10.1121/1.1915637).
   The original equal-loudness measurements whose 40-phon contour became the
   A-weighting curve.
-  Cited by [Frequency Weighting (A, C, G, Z)](weighting.md) and
+  Cited by [Frequency Weighting (A, C, Z)](weighting.md) and
   [Loudness](loudness.md).
 - International Organization for Standardization. (2023). *Acoustics —
   Normal equal-loudness-level contours* (ISO 226:2023).
   [iso.org catalogue](https://www.iso.org/standard/83117.html).
   The modern equal-loudness contours, successors of the Fletcher-Munson
   curves.
-  Cited by [Frequency Weighting (A, C, G, Z)](weighting.md) and
+  Cited by [Frequency Weighting (A, C, Z)](weighting.md) and
   [Loudness](loudness.md).
 - Fastl, H., & Zwicker, E. (2007). *Psychoacoustics: Facts and models*
   (3rd ed.). Springer.

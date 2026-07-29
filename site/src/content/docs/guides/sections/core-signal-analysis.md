@@ -40,9 +40,12 @@ physical units.
 Fractional octave band decomposition and the two ways to scale it: streaming
 blocks and multichannel arrays.
 
-- [Filter Banks](/phonometry/guides/filter-banks/): the five filter
-  architectures, their frequency responses, band decomposition and zero-phase
-  offline filtering.
+- [Filter Banks](/phonometry/guides/filter-banks/): the fractional-octave
+  band mathematics, the bank parameters, the parametric EQ, band
+  decomposition and zero-phase offline filtering.
+- [Filter Architecture Gallery](/phonometry/guides/filter-gallery/): the five
+  filter architectures compared, the full response gallery and
+  per-architecture usage, with the Linkwitz-Riley crossover.
 - [Filter Class Verification (IEC 61260-1)](/phonometry/guides/filter-compliance/):
   the Table 1 acceptance mask band by band, the class 0 of the withdrawn 1995
   edition and the compliance fiche.
@@ -57,13 +60,20 @@ blocks and multichannel arrays.
 From weighted signal to reported level: the frequency weightings, the time
 ballistics and the integrated, statistical and rating levels.
 
-- [Frequency Weighting (A, C, G, Z)](/phonometry/guides/weighting/): the
-  IEC 61672-1 ear-response curves and the ISO 7196 infrasound G-weighting.
+- [Frequency Weighting (A, C, Z)](/phonometry/guides/weighting/): the
+  IEC 61672-1 ear-response curves, the high-frequency accuracy mode and the
+  Table 3 class verification.
+- [Special Weightings (G, B, D, AU)](/phonometry/guides/special-weightings/):
+  the ISO 7196 infrasound G-weighting, the historical B and D curves and AU
+  per IEC 61012.
 - [Time Weighting](/phonometry/guides/time-weighting/): Fast, Slow and Impulse
   exponential ballistics per IEC 61672-1.
 - [Integrated and Statistical Levels](/phonometry/guides/levels/): Leq and
   LAeq, percentile levels L10/L50/L90, LCpeak and SEL, noise dose (IEC 61252),
-  Lden and rating levels (ISO 1996-1), and octave spectrograms.
+  and octave spectrograms.
+- [Environmental Levels (ISO 1996-1/-2)](/phonometry/guides/environmental-levels/):
+  Lden, Ldn and the composite rating levels, the tonal adjustment, the
+  residual-noise correction and the uncertainty budget.
 
 ## [Signals and spectra](/phonometry/guides/sections/signals-spectra/)
 

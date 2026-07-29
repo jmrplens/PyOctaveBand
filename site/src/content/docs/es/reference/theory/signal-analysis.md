@@ -324,7 +324,7 @@ Los cuatro ceros frente a ocho polos dan forma a la respuesta característica: u
 
 Como G actúa sobre 0,25 Hz – 315 Hz, muy por debajo de la frecuencia de Nyquist a tasas de audio, la deformación en frecuencia de la transformación bilineal simple (aplicada sin precompensación) es despreciable en ese rango: en torno al 0,014 % a 315 Hz con $f_s = 48$ kHz, menos de 0,01 dB en la respuesta. Por eso no se aplica el sobremuestreo interno usado en los diseños A/C (cuya acción se extiende hasta 16 kHz).
 
-Consulta la [guía de ponderación frecuencial](/phonometry/es/guides/weighting/) para su uso.
+Consulta la [guía de ponderaciones especiales](/phonometry/es/guides/special-weightings/) para su uso.
 
 ## Métricas de evento y de dosis
 

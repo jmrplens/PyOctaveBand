@@ -1,6 +1,6 @@
 ---
-title: "Ponderación frecuencial (A, B, C, D, G, AU, Z)"
-description: "Ponderación frecuencial A/C/Z según IEC 61672-1 (clase 1, con modo de precisión en alta frecuencia), ponderación G de infrasonido según ISO 7196, las curvas históricas B (ANSI S1.4-1983) y D (IEC 537) y la AU según IEC 61012 para sonido audible en presencia de ultrasonidos."
+title: "Ponderación frecuencial (A, C, Z)"
+description: "Ponderación frecuencial A/C/Z según IEC 61672-1 (clase 1, con modo de precisión en alta frecuencia) y la verificación frente a las tablas de tolerancias de la Tabla 3, con las curvas especiales G, B, D y AU en su propia guía."
 references:
   - type: article
     authors: ["Fletcher, H.", "Munson, W. A."]
@@ -25,51 +25,17 @@ references:
     title: "Electroacoustics — Sound level meters — Part 1: Specifications"
     designation: "IEC 61672-1:2013"
     url: "https://webstore.iec.ch/en/publication/5708"
-    note: "Las curvas de ponderación frecuencial A, C y Z normativas (la definición analítica del Anexo E a partir de cuatro frecuencias de esquina, normalizadas a 0 dB en 1 kHz), las tolerancias de clase 1 que el diseño high_accuracy mantiene hasta 16 kHz y los límites de aceptación de clase 1 y clase 2 de la Tabla 3 que comprueba verify_weighting_class en la sección 8."
-  - type: standard
-    organization: "International Organization for Standardization"
-    year: 1995
-    title: "Acoustics — Frequency-weighting characteristic for infrasound measurements"
-    designation: "ISO 7196:1995"
-    url: "https://www.iso.org/standard/13813.html"
-    note: "La definición de polos y ceros de la ponderación G (Tabla 1), verificada frente a todos los valores nominales de respuesta de la Tabla 2 (0,25 Hz a 315 Hz)."
-  - type: standard
-    organization: "American National Standards Institute"
-    year: 1983
-    title: "Specification for Sound Level Meters"
-    designation: "ANSI S1.4-1983"
-    note: "La ponderación B histórica: definición analítica del Apéndice C (fórmula C2), objetivos de diseño de la Tabla IV y límites de tolerancia de la Tabla V que comprueba verify_weighting_class en la sección 8."
-  - type: standard
-    organization: "International Electrotechnical Commission"
-    year: 1990
-    title: "Filters for the measurement of audible sound in the presence of ultrasound"
-    designation: "IEC 61012:1990"
-    url: "https://webstore.iec.ch/en/publication/4383"
-    note: "La ponderación AU: posiciones de los polos de la ponderación U (Tabla 2), respuestas nominales y tolerancias (Tabla 1) y la definición combinada AU del apartado 2.2."
-  - type: standard
-    organization: "International Electrotechnical Commission"
-    year: 1976
-    title: "Frequency weighting for the measurement of aircraft noise (D-weighting)"
-    designation: "IEC 537:1976 (retirada)"
-    note: "La ponderación D, implementada desde su función de transferencia racional publicada y contrastada con dos implementaciones independientes y con la curva tabulada reeditada en NASA CR-3406 (Tabla SLD-I)."
-  - type: report
-    authors: ["Bennett, R. L.", "Pearsons, K. S."]
-    year: 1981
-    title: "Handbook of Aircraft Noise Metrics"
-    institution: "NASA"
-    number: "NASA CR-3406"
-    url: "https://ntrs.nasa.gov/citations/19810013341"
-    note: "Reedita la tabla de la ponderación D de IEC 537 (Tabla SLD-I) usada para anclar la respuesta D en CI."
+    note: "Las curvas de ponderación frecuencial A, C y Z normativas (la definición analítica del Anexo E a partir de cuatro frecuencias de esquina, normalizadas a 0 dB en 1 kHz), las tolerancias de clase 1 que el diseño high_accuracy mantiene hasta 16 kHz y los límites de aceptación de clase 1 y clase 2 de la Tabla 3 que comprueba verify_weighting_class en la sección 6."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Las curvas de ponderación frecuencial simulan la sensibilidad del oído humano.
-A, C y Z están especificadas en **IEC 61672-1:2013**; la curva G de
-infrasonido, en **ISO 7196:1995**. Tres curvas más completan la familia: la
-histórica **B** (ANSI S1.4-1983), la **D** de ruido de aeronaves de la
-retirada IEC 537 y la **AU** (IEC 61012) para sonido audible en presencia de
-ultrasonidos (sección 4).
+Esta guía cubre **A**, **C** y **Z**, las curvas especificadas en
+**IEC 61672-1:2013**: de dónde vienen, cómo aplicarlas, el diseño
+`high_accuracy` y la verificación de clase frente a la Tabla 3. El resto de
+la familia, la curva G de infrasonido, las históricas B y D y la curva AU, es
+[Ponderaciones especiales](/phonometry/es/guides/special-weightings/).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_es.svg" alt="Curvas de ponderación A, B, C, D, AU y Z con zoom de la región positiva de la curva A (+1,27 dB en 2,5 kHz)" width="80%" loading="eager" />
 
@@ -105,10 +71,10 @@ plt.show()
 * **Ponderación A (`A`):** estándar para ruido ambiental (IEC 61672-1).
 * **Ponderación C (`C`):** para presión acústica de pico y ruido de alto nivel.
 * **Ponderación Z (`Z`):** ponderación cero, respuesta completamente plana.
-* **Ponderación G (`G`):** ponderación de infrasonido según ISO 7196 (ver más abajo).
-* **Ponderación B (`B`):** curva intermedia histórica de ANSI S1.4-1983 (sección 4).
-* **Ponderación D (`D`):** ponderación de ruido de aeronaves de la retirada IEC 537 (sección 4).
-* **Ponderación AU (`AU`):** ponderación A con el corte de ultrasonidos de IEC 61012 (sección 4).
+* **Ponderación G (`G`):** ponderación de infrasonido según ISO 7196 ([Ponderaciones especiales](/phonometry/es/guides/special-weightings/)).
+* **Ponderación B (`B`):** curva intermedia histórica de ANSI S1.4-1983 ([Ponderaciones especiales](/phonometry/es/guides/special-weightings/)).
+* **Ponderación D (`D`):** ponderación de ruido de aeronaves de la retirada IEC 537 ([Ponderaciones especiales](/phonometry/es/guides/special-weightings/)).
+* **Ponderación AU (`AU`):** ponderación A con el corte de ultrasonidos de IEC 61012 ([Ponderaciones especiales](/phonometry/es/guides/special-weightings/)).
 
 ## ¿Cómo aplico la ponderación A a una señal con Python?
 
@@ -157,8 +123,8 @@ IEC 61672-1 (primera edición, 2002) remató la limpieza: B se eliminó, A y C
 se conservaron con tolerancias más estrictas y **Z** se introdujo para
 sustituir el "lineal" mal especificado de los sonómetros antiguos, que
 variaba según el fabricante. La curva B (y la curva D de ruido de aeronaves,
-que corrió la misma suerte) sigue disponible para datos históricos; véase la
-sección 4.
+que corrió la misma suerte) sigue disponible para datos históricos; véase
+[Ponderaciones especiales](/phonometry/es/guides/special-weightings/).
 
 ### Cuándo importa C − A
 
@@ -211,167 +177,23 @@ weighted_signal = metrology.weighting_filter(recording, fs, curve='A')
 c_weighted_signal = metrology.weighting_filter(recording, fs, curve='C')
 ```
 
-## 3. Infrasonido: ponderación G (ISO 7196)
+El resto de la familia tiene su propia guía:
+[Ponderaciones especiales](/phonometry/es/guides/special-weightings/): la
+curva G de infrasonido de ISO 7196, las históricas B y D, y la AU para
+sonido audible en presencia de ultrasonidos.
 
-La **ponderación frecuencial G** (ISO 7196:1995) valora el infrasonido igual que
-la ponderación A valora el ruido audible. Se define por una configuración de
-polos y ceros con ganancia de 0 dB en 10 Hz, sube a 12 dB/octava entre 1 Hz y
-20 Hz (siguiendo el crecimiento abrupto de la percepción en esa banda) y cae a
-24 dB/octava fuera de ella. Úsala con fuentes con energía significativa por
-debajo de 20 Hz (aerogeneradores, climatización, voladuras):
-
-```python
-import numpy as np
-from phonometry import metrology
-
-# recording: una captura de micrófono calibrada (Pa) — grabada con tu cadena de medición. Sintetizada aquí para que la guía funcione por sí sola.
-fs = 48000
-recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
-
-g_weighted = metrology.weighting_filter(recording, fs, curve='G')
-```
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/g_weighting_response_es.svg" alt="Respuesta en frecuencia de la ponderación G de 0,1 Hz a 1 kHz con los valores nominales de la Tabla 2 de ISO 7196 superpuestos" width="80%" />
-
-<details>
-<summary>Mostrar el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import metrology
-
-# Medimos la respuesta G: ponderamos un impulso unitario centrado y
-# tomamos su espectro. Un búfer largo da la resolución que necesita el
-# rango de infrasonido (20 s -> 0,05 Hz).
-fs = 4000
-impulse = np.zeros(20 * fs)
-impulse[impulse.size // 2] = 1.0
-freqs = np.fft.rfftfreq(impulse.size, 1 / fs)
-spectrum = np.fft.rfft(metrology.weighting_filter(impulse, fs, curve="G"))
-
-fig, ax = plt.subplots(figsize=(9, 5))
-ax.semilogx(freqs[1:],
-            20 * np.log10(np.abs(spectrum[1:]) + np.finfo(float).eps))
-ax.plot(10, 0, "o", color="tab:red", label="0 dB en 10 Hz")
-ax.set(xlim=(0.1, 1000), ylim=(-90, 15),
-       xlabel="Frecuencia [Hz]", ylabel="Respuesta de la ponderación G [dB]")
-ax.grid(True, which="both", alpha=0.3)
-ax.legend()
-plt.show()
-```
-
-</details>
-
-La implementación sigue exactamente los polos/ceros de la Tabla 1 de ISO 7196 y
-se verifica en CI contra todos los valores nominales de respuesta de la Tabla 2
-(0,25 Hz a 315 Hz). `WeightingFilter(fs, "G")` admite el mismo procesado
-multicanal y por bloques que A/C. Los niveles medidos con la curva G se
-expresan como L<sub>pG</sub> (o L<sub>Geq</sub> para el nivel equivalente).
-
-## 4. Curvas históricas y de propósito especial: B, D y AU
-
-Tres curvas más completan la familia. Las tres comparten la maquinaria de las
-curvas de IEC 61672-1 (0 dB en 1 kHz, sobremuestreo `high_accuracy`,
-procesado multicanal y por bloques con estado).
-
-### B (ANSI S1.4-1983, histórica)
-
-La curva intermedia del esquema original de conmutación por niveles A/B/C,
-trazada a partir de la isófona de ~70 fonios. Analíticamente es la
-ponderación C con un cero más en el origen y un polo real adicional en
-$f_5 = 158{,}49\ \text{Hz}$ (Apéndice C de ANSI S1.4-1983), así que descarta
-menos graves que A y más que C. Se eliminó cuando IEC 61672-1 sustituyó a las
-normas de sonómetros anteriores; úsala solo para reproducir datos históricos
-y mediciones tomadas bajo códigos nacionales antiguos (algunos procedimientos
-de ensayo de automoción heredados publicaban dB(B)). La implementación sigue
-las constantes del Apéndice C de ANSI S1.4-1983 y está anclada en CI a los
-valores de respuesta de la Tabla IV, dentro de la máscara más estricta de la
-Tabla V (Tipo 0).
-
-### D (IEC 537, retirada: ruido de aeronaves)
-
-La ponderación D aproximaba las curvas de *ruidosidad percibida* del índice
-de nivel de ruido percibido (PNL), para que un sonómetro corriente pudiera
-estimar el ruido de aeronaves: la joroba de +11,5 dB en torno a 3,15 kHz es
-donde más molesta el silbido de la turbomaquinaria (deliberadamente *no* es
-un rasgo de igual sonoridad). El manual de métricas de ruido de aeronaves de
-la NASA da la clásica regla aproximada $L_{PN} \approx L_D + 7\ \text{dB}$.
-IEC 537 fue retirada y la práctica de certificación actual calcula el EPNL a
-partir de análisis en tercios de octava o usa niveles ponderados A, así que
-`D` se ofrece para datos históricos y comparaciones. Con la norma no
-disponible, la implementación usa la función de transferencia racional de
-IEC 537, ampliamente publicada, contrastada con dos implementaciones
-independientes (los polos y ceros de SQAT y la forma cerrada de librosa, que
-coinciden dentro de 0,002 dB) y anclada en CI a la tabla de IEC 537 reeditada
-en NASA CR-3406.
-
-```python
-import numpy as np
-from phonometry import metrology
-
-# Un silbido de 3,15 kHz cae justo en la joroba de la ponderación D:
-# D lo valora 10 dB *más fuerte* que A.
-fs = 96000
-t = np.arange(fs) / fs
-whine = 0.1 * np.sin(2 * np.pi * 3150 * t)
-
-ld = metrology.leq(metrology.weighting_filter(whine, fs, curve="D"))
-la = metrology.leq(metrology.weighting_filter(whine, fs, curve="A"))
-print(f"LD = {ld:.1f} dB   LA = {la:.1f} dB")
-# LD = 82.5 dB   LA = 72.2 dB
-```
-
-### AU (IEC 61012, vigente: sonido audible en presencia de ultrasonidos)
-
-La única de las tres aún en vigor. `AU` es la ponderación A en cascada con el
-filtro paso-bajo **U** de IEC 61012:1990 (seis polos, Tabla 2): plana
-respecto a A hasta 10 kHz y con un corte abrupto después (-13 dB a 16 kHz,
--61,8 dB a 40 kHz para U sola). Úsala cuando componentes ultrasónicos
-intensos (limpiadores y soldadores ultrasónicos, ahuyentadores de roedores,
-algunos disuasorios de espacios públicos) se colarían en una lectura
-ponderada A a través del rechazo imperfecto del sonómetro en alta frecuencia
-y sobreestimarían la exposición *audible*:
-
-```python
-import numpy as np
-from phonometry import metrology
-
-# Tono de 1 kHz (audible) enterrado bajo una componente ultrasónica fuerte de 25 kHz.
-fs = 96000
-t = np.arange(fs) / fs
-audible = 0.1 * np.sin(2 * np.pi * 1000 * t)
-x = audible + 1.0 * np.sin(2 * np.pi * 25000 * t)
-
-la = metrology.leq(metrology.weighting_filter(x, fs, curve="A"))
-lau = metrology.leq(metrology.weighting_filter(x, fs, curve="AU"))
-la_ref = metrology.leq(metrology.weighting_filter(audible, fs, curve="A"))
-print(f"LA = {la:.1f} dB   LAU = {lau:.1f} dB   solo audible = {la_ref:.1f} dB")
-# LA = 78.6 dB   LAU = 71.0 dB   solo audible = 71.0 dB
-# El ultrasonido infla LA en 7,6 dB; AU recupera el nivel audible.
-```
-
-El ultrasonido solo llega a un filtro digital si la frecuencia de muestreo lo
-captura, así que mide a 96 kHz o más (a 48 kHz no hay nada por encima de
-24 kHz que rechazar); el diseño AU sobremuestrea internamente hacia 288 kHz
-para mantener preciso el corte abrupto de U. Los niveles se expresan como
-L<sub>AU</sub>. La implementación sigue exactamente las posiciones de polos
-de la Tabla 2 (reproducen todos los valores nominales de la Tabla 1 dentro
-de 0,05 dB) y se verifica en CI contra las tolerancias de la Tabla 1 hasta
-40 kHz.
-
-## 5. Parámetros de `weighting_filter()` / `WeightingFilter`
+## 3. Parámetros de `weighting_filter()` / `WeightingFilter`
 
 | Parámetro | Tipo | Unidades | Rango / por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | array 1D o 2D | cualquiera | no vacío | 2D es `[channels, samples]` |
 | `fs` | int | Hz | > 0 | |
-| `curve` | str | — | `'A'` (por defecto), `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'` | `'G'` según ISO 7196 (infrasonido); `'B'`/`'D'` históricas (§4); `'AU'` según IEC 61012 (§4); `'Z'` es un bypass |
-| `high_accuracy` | bool | — | por defecto `True` (función); en la clase, `None` se resuelve a `not stateful` | Sobremuestreo interno que mantiene A/C en clase 1 hasta 16 kHz; detalles en el §7 |
+| `curve` | str | — | `'A'` (por defecto), `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'` | `'G'` según ISO 7196 (infrasonido), `'B'`/`'D'` históricas y `'AU'` según IEC 61012 se tratan en [Ponderaciones especiales](/phonometry/es/guides/special-weightings/); `'Z'` es un bypass |
+| `high_accuracy` | bool | — | por defecto `True` (función); en la clase, `None` se resuelve a `not stateful` | Sobremuestreo interno que mantiene A/C en clase 1 hasta 16 kHz; detalles en el §5 |
 | `stateful` | bool (solo clase) | — | por defecto `False` | Conserva el estado del filtro entre bloques (streaming) |
 | `steady_ic` | bool (solo clase) | — | por defecto `False` | Condiciones iniciales estacionarias (sin transitorio de arranque) |
 
-## 6. Objeto de filtro reutilizable
+## 4. Objeto de filtro reutilizable
 
 Si ponderas muchas señales con los mismos parámetros, diseña el filtro una sola vez:
 
@@ -389,7 +211,7 @@ for recording in signals:
     weighted = wf.filter(recording)
 ```
 
-## 7. Precisión en alta frecuencia (`high_accuracy`)
+## 5. Precisión en alta frecuencia (`high_accuracy`)
 
 Un diseño con transformación bilineal simple comprime la respuesta cerca de
 Nyquist: a fs = 48 kHz el error de la curva A a 12,5 kHz alcanza −2,7 dB, fuera
@@ -476,7 +298,7 @@ Consulta [Procesado por bloques](/phonometry/es/guides/block-processing/) para
 el flujo en streaming y [Teoría](/phonometry/es/reference/theory/signal-analysis/) para las
 definiciones analíticas de las curvas.
 
-## 8. Verificación frente a las tablas de tolerancias (IEC 61672-1, ANSI S1.4, IEC 61012)
+## 6. Verificación frente a las tablas de tolerancias (IEC 61672-1)
 
 `verify_weighting_class` comprueba un filtro de ponderación frente a los
 límites de aceptación de **IEC 61672-1:2013** (Tabla 3). Evalúa la respuesta
@@ -509,20 +331,6 @@ La máscara de aceptación de la Tabla 3 también es pública:
 límites de desviación inferior/superior (un límite inferior de `-inf` significa
 que solo se aplica el superior). Los límites cualifican la *desviación* respecto
 al objetivo de diseño, por lo que son idénticos para A, C y Z.
-
-El mismo verificador cubre las curvas de la sección 4 que tienen tablas de
-tolerancias publicadas. Para `B` usa ANSI S1.4-1983 (objetivos de diseño de
-la Tabla IV, límites de la Tabla V) y los veredictos de «clase» se leen como
-los **Tipos** de instrumento 1 y 2 de la norma. Para `AU` usa la Tabla 1 de
-IEC 61012:1990 (A nominal + U nominal con las tolerancias de filtro como
-unidad separada, cero en la referencia de 1 kHz); IEC 61012 publica un único
-juego de tolerancias, así que ambos márgenes coinciden y el veredicto es
-simplemente conforme (1) o no (`None`) — ten en cuenta que comprobar las
-filas por encima de 20 kHz requiere `fs` ≥ 96 kHz (por debajo se descartan y
-el veredicto queda `range_limited`). `G` y `D` se rechazan: ISO 7196 define
-una única tolerancia de ±1 dB sin estructura de clases y la retirada IEC 537
-no dejó tabla de tolerancias (ambas curvas se anclan numéricamente en el
-informe de conformidad de CI).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_class_mask_es.svg" alt="Desviaciones de las ponderaciones A y C a 48 kHz dentro del corredor de aceptación de clase 1 de la Tabla 3 de IEC 61672-1, con los límites más amplios de clase 2 punteados" width="80%" />
 
@@ -571,27 +379,19 @@ plt.show()
 analítica del Anexo E a partir de cuatro frecuencias de esquina, el diseño
 `high_accuracy` que mantiene las tolerancias de clase 1 hasta 16 kHz, y los
 límites de aceptación de clase 1/clase 2 de la Tabla 3 que comprueba
-`verify_weighting_class`. ISO 7196:1995 para la curva G (valores de
-polo/cero de la Tabla 1, verificados frente a todos los valores nominales de
-la Tabla 2). ANSI S1.4-1983 para la curva histórica B (definición del Anexo
-C, objetivos de diseño de la Tabla IV, límites de tolerancia de la
-Tabla V). IEC 61012:1990 para AU (el paso bajo U de la Tabla 2 en cascada
-con A, verificado frente a la Tabla 1). IEC 537:1976 para la curva D de
-ruido de aeronaves, retirada, implementada desde su función de transferencia
-publicada y contrastada con dos implementaciones independientes.
+`verify_weighting_class`.
 
-**No cubierto.** `verify_weighting_class` no produce un veredicto de clase
-para G ni para D: ISO 7196 define una única tolerancia de ±1 dB sin
-estructura de clases, y la retirada IEC 537 no dejó tabla de tolerancias.
-Ambas curvas se fijan numéricamente frente a sus tablas publicadas en el
-informe de conformidad de CI en su lugar, no a través de este verificador
-público. B y D se ofrecen solo para datos históricos y códigos nacionales
-antiguos; ninguna es práctica actual (IEC 61672-1 sustituyó a B, y la
-certificación de ruido de aeronaves informa hoy el EPNL o niveles con
-ponderación A simples en lugar de D).
+**No cubierto.** Las curvas especiales, la G de infrasonido de ISO 7196,
+las históricas B (ANSI S1.4-1983) y D (IEC 537) y la AU de IEC 61012, junto
+con la verificación de B y AU frente a sus tablas de tolerancias, tienen su
+propia guía:
+[Ponderaciones especiales](/phonometry/es/guides/special-weightings/).
 
 ## Véase también
 
+- [Ponderaciones especiales (G, B, D, AU)](/phonometry/es/guides/special-weightings/):
+  la curva G de infrasonido, las históricas B y D, y la AU para sonido
+  audible en presencia de ultrasonidos.
 - Referencia de la API: [`metrology.parametric_filters`](/phonometry/es/reference/api/filters/parametric-filters/) y [`metrology.compliance`](/phonometry/es/reference/api/filters/compliance/).
 
 ## Respuestas rápidas
@@ -599,10 +399,6 @@ ponderación A simples en lugar de D).
 ### ¿Cuándo debo usar la ponderación C en lugar de la ponderación A?
 
 Usa la ponderación C para presión acústica de pico y ruido de alto nivel, y usa la diferencia $L_{Ceq} - L_{Aeq}$ como indicador del contenido en baja frecuencia: por debajo de unos 10 dB el nivel ponderado A califica el espectro con justicia, mientras que en torno a 15 a 20 dB o más la energía se concentra en las bajas frecuencias y el nivel ponderado A subestima el problema. El método HML de ISO 4869-2 se apoya exactamente en esta diferencia C menos A para la selección de protectores auditivos.
-
-### ¿Qué ponderación debo usar para infrasonido por debajo de 20 Hz?
-
-Usa la ponderación frecuencial G de ISO 7196:1995, que valora el infrasonido igual que la ponderación A valora el ruido audible. Tiene ganancia de 0 dB en 10 Hz, sube a 12 dB/octava entre 1 Hz y 20 Hz y cae a 24 dB/octava fuera de esa banda. Aplícala a fuentes como aerogeneradores, climatización y voladuras, y expresa los niveles como $L_{pG}$ (o $L_{Geq}$ para el nivel equivalente).
 
 ### ¿Es precisa la ponderación A cerca de 16 kHz con una frecuencia de muestreo de 48 kHz?
 

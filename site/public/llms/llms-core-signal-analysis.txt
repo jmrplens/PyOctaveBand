@@ -102,7 +102,7 @@ this Fast envelope for you. The energy metrics (Leq, SEL) integrate the
 squared weighted signal directly, with no ballistics, exactly as a meter
 does. The chain is shown here because it *is* the meter's display.
 
-Deep guides: [Frequency Weighting (A, C, G, Z)](https://jmrplens.github.io/phonometry/guides/weighting/)
+Deep guides: [Frequency Weighting (A, C, Z)](https://jmrplens.github.io/phonometry/guides/weighting/)
 and [Time Weighting](https://jmrplens.github.io/phonometry/guides/time-weighting/).
 
 ## 4. Integrate: the numbers a meter reports
@@ -131,7 +131,8 @@ background gets back in duration), LAE is LAeq plus 10 log10 of the 10 s
 duration, and L90 barely notices the event at all.
 
 Deep guide: [Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/guides/levels/),
-which adds noise dose, Lden and rating levels, and octave spectrograms.
+which adds noise dose and octave spectrograms; the Lden and rating levels
+continue in [Environmental levels](https://jmrplens.github.io/phonometry/guides/environmental-levels/).
 
 ## 5. Band-filter: the spectrum view (IEC 61260-1)
 

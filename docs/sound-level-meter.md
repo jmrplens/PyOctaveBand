@@ -95,7 +95,7 @@ this Fast envelope for you. The energy metrics (Leq, SEL) integrate the
 squared weighted signal directly, with no ballistics, exactly as a meter
 does. The chain is shown here because it *is* the meter's display.
 
-Deep guides: [Frequency Weighting (A, C, G, Z)](weighting.md)
+Deep guides: [Frequency Weighting (A, C, Z)](weighting.md)
 and [Time Weighting](time-weighting.md).
 
 ## 4. Integrate: the numbers a meter reports
@@ -124,7 +124,8 @@ background gets back in duration), LAE is LAeq plus 10 log10 of the 10 s
 duration, and L90 barely notices the event at all.
 
 Deep guide: [Integrated and Statistical Levels](levels.md),
-which adds noise dose, Lden and rating levels, and octave spectrograms.
+which adds noise dose and octave spectrograms; the Lden and rating levels
+continue in [Environmental levels](environmental-levels.md).
 
 ## 5. Band-filter: the spectrum view (IEC 61260-1)
 

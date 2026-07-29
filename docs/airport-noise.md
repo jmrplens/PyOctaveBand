@@ -227,7 +227,7 @@ events of the reference workbook are reproduced end-to-end in the test suite.
 - [Outdoor sound propagation](outdoor-propagation.md): the ISO 9613-2
   attenuation terms and the ground effect the lateral attenuation condenses
   into one curve.
-- [Integrated and statistical levels](levels.md): the Lden-style long-term
+- [Environmental levels](environmental-levels.md): the Lden-style long-term
   indices that a full airport study accumulates from single events.
 - API reference: [`aircraft.airport_noise`](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/airport-noise/).
 

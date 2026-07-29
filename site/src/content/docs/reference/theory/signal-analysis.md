@@ -319,7 +319,7 @@ The four zeros against eight poles shape the characteristic response: a rise of 
 
 Since G acts on 0.25 Hz – 315 Hz, far below the Nyquist frequency at audio rates, the frequency warping of the plain bilinear transform (applied without prewarping) is negligible there: about 0.014 % at 315 Hz for $f_s = 48$ kHz, under 0.01 dB on the response. The internal oversampling used for the A/C designs (whose action extends to 16 kHz) is therefore not applied.
 
-See the [Frequency Weighting guide](/phonometry/guides/weighting/) for usage.
+See the [Special Weightings guide](/phonometry/guides/special-weightings/) for usage.
 
 ## Event and dose metrics
 

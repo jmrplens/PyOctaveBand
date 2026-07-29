@@ -1,6 +1,6 @@
 ---
 title: "Guías"
-description: "Las 89 guías de phonometry, agrupadas en las nueve áreas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
+description: "Las 93 guías de phonometry, agrupadas en las nueve áreas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
 head:
   - tag: script
     attrs:
@@ -90,7 +90,7 @@ hay ninguna panorámica del campo: cada página es la documentación de trabajo 
 un módulo, escrita para que un resultado se pueda defender apartado por
 apartado en lugar de darlo por bueno.
 
-Esta página es el mapa. Ochenta y nueve guías repartidas en nueve áreas, y cada
+Esta página es el mapa. Noventa y tres guías repartidas en nueve áreas, y cada
 área tiene su propio índice con el relato largo de cómo encajan sus piezas. Si
 llegas sin una pregunta concreta, lee primero la
 [introducción](/phonometry/es/getting-started/): recorre una señal por toda la
@@ -122,9 +122,14 @@ ISO 1996-1, IEC 60942, ISO 18233 y la GUM.
 
 **[Filtrado en octavas](/phonometry/es/guides/sections/octave-filtering/)**
 
-- [Bancos de filtros](/phonometry/es/guides/filter-banks/): las cinco
-  arquitecturas de filtro, sus respuestas en frecuencia, la descomposición en
-  bandas y el filtrado de fase cero fuera de línea.
+- [Bancos de filtros](/phonometry/es/guides/filter-banks/): la matemática de
+  las bandas de octava fraccional, los parámetros del banco, el ecualizador
+  paramétrico, la descomposición en bandas y el filtrado de fase cero fuera de
+  línea.
+- [Galería de arquitecturas de filtro](/phonometry/es/guides/filter-gallery/):
+  las cinco arquitecturas de filtro comparadas en los bordes de banda, la
+  galería completa de respuestas y el uso de cada arquitectura, con el
+  crossover Linkwitz-Riley.
 - [Verificación de clase de filtros (IEC 61260-1)](/phonometry/es/guides/filter-compliance/):
   la máscara de aceptación de la Tabla 1 banda a banda, la clase 0 de la
   edición retirada de 1995 y la ficha de conformidad.
@@ -137,14 +142,20 @@ ISO 1996-1, IEC 60942, ISO 18233 y la GUM.
 
 **[Niveles y ponderación](/phonometry/es/guides/sections/levels-weighting/)**
 
-- [Ponderación frecuencial (A, B, C, D, G, AU, Z)](/phonometry/es/guides/weighting/):
-  las curvas de respuesta del oído de IEC 61672-1, la ponderación G para
-  infrasonido de ISO 7196 y las curvas históricas B y D.
+- [Ponderación frecuencial (A, C, Z)](/phonometry/es/guides/weighting/):
+  las curvas de respuesta del oído de IEC 61672-1, el modo de precisión en
+  alta frecuencia y la verificación de clase de la Tabla 3.
+- [Ponderaciones especiales (G, B, D, AU)](/phonometry/es/guides/special-weightings/):
+  la ponderación G para infrasonido de ISO 7196, las curvas históricas B y D
+  y la AU para sonido audible en presencia de ultrasonidos.
 - [Ponderación temporal](/phonometry/es/guides/time-weighting/): las balísticas
   exponenciales Fast, Slow e Impulse de IEC 61672-1.
 - [Niveles integrados y estadísticos](/phonometry/es/guides/levels/): Leq y
-  LAeq, los niveles percentiles L10/L50/L90, LCpeak y SEL, la dosis de ruido,
-  Lden y los niveles de valoración de ISO 1996-1.
+  LAeq, los niveles percentiles L10/L50/L90, LCpeak y SEL, y la dosis de
+  ruido.
+- [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/guides/environmental-levels/):
+  Lden, Ldn y los niveles de valoración compuestos, el ajuste tonal, la
+  corrección de ruido residual y el presupuesto de incertidumbre.
 
 **[Señales y espectros](/phonometry/es/guides/sections/signals-spectra/)**
 
@@ -201,9 +212,11 @@ DIN 45692, IEC 60268-16, ANSI S3.5, ISO 7029, ISO 1999 e ISO 9612.
 **[Psicoacústica](/phonometry/es/guides/sections/psychoacoustics/)**
 
 - [Sonoridad](/phonometry/es/guides/loudness/): la sonoridad en sonios según
-  Zwicker, Moore-Glasberg, el modelo variable en el tiempo de ISO 532-3 y el
-  Sottek Hearing Model de ECMA-418-2, además de las curvas isofónicas de
-  ISO 226.
+  el método Zwicker de ISO 532-1 con su ficha de una página, además de las
+  curvas isofónicas de ISO 226.
+- [Sonoridad avanzada (ISO 532-2/-3, ECMA-418-2)](/phonometry/es/guides/advanced-loudness/):
+  los métodos Moore-Glasberg estacionario y variable en el tiempo y la
+  sonoridad del Sottek Hearing Model, con la tabla de elección de modelo.
 - [Métricas de calidad sonora](/phonometry/es/guides/sound-quality/): la
   agudeza en acum, y la tonalidad, la aspereza y la intensidad de fluctuación
   de ECMA-418-2.

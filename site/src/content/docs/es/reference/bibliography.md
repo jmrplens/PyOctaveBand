@@ -53,7 +53,8 @@ que las guías incorporan sus secciones de Referencias.
   [ccrma.stanford.edu/~jos/filters](https://ccrma.stanford.edu/~jos/filters/).
   Tratamiento gratuito y complementario del diseño y análisis de filtros
   digitales, el paso natural tras las guías de bancos de filtros.
-  Citado por [Bancos de filtros](/phonometry/es/guides/filter-banks/).
+  Citado por [Bancos de filtros](/phonometry/es/guides/filter-banks/) y la
+  [Galería de arquitecturas de filtro](/phonometry/es/guides/filter-gallery/).
 - Bendat, J. S., & Piersol, A. G. (2010). *Random data: Analysis and
   measurement procedures* (4.a ed.). Wiley. ISBN 978-0-470-24877-5.
   [doi:10.1002/9781118032428](https://doi.org/10.1002/9781118032428).
@@ -87,6 +88,7 @@ que las guías incorporan sus secciones de Referencias.
   Los bordes de banda en base 10 y las máscaras de aceptación de clase de
   los bancos de octava fraccionaria.
   Citado por [Bancos de filtros](/phonometry/es/guides/filter-banks/),
+  la [Galería de arquitecturas de filtro](/phonometry/es/guides/filter-gallery/),
   [Verificación de clase de filtros](/phonometry/es/guides/filter-compliance/) y
   [Multicanal y rendimiento](/phonometry/es/guides/multichannel/).
 - International Electrotechnical Commission. (2013). *Electroacoustics —
@@ -96,7 +98,7 @@ que las guías incorporan sus secciones de Referencias.
   métricas de nivel del sonómetro, con las tablas de tolerancias usadas en
   la verificación.
   Citado por [Niveles integrados y estadísticos](/phonometry/es/guides/levels/),
-  [Ponderación frecuencial (A, C, G, Z)](/phonometry/es/guides/weighting/),
+  [Ponderación frecuencial (A, C, Z)](/phonometry/es/guides/weighting/),
   [Ponderación temporal](/phonometry/es/guides/time-weighting/) y
   [Multicanal y rendimiento](/phonometry/es/guides/multichannel/).
 - International Electrotechnical Commission. (2013). *Electroacoustics —
@@ -966,14 +968,14 @@ que las guías incorporan sus secciones de Referencias.
   82-108. [doi:10.1121/1.1915637](https://doi.org/10.1121/1.1915637).
   Las mediciones originales de igual sonoridad cuya isófona de 40 fonios se
   convirtió en la curva de ponderación A.
-  Citado por [Ponderación frecuencial (A, C, G, Z)](/phonometry/es/guides/weighting/)
+  Citado por [Ponderación frecuencial (A, C, Z)](/phonometry/es/guides/weighting/)
   y [Sonoridad](/phonometry/es/guides/loudness/).
 - International Organization for Standardization. (2023). *Acoustics —
   Normal equal-loudness-level contours* (ISO 226:2023).
   [Catálogo iso.org](https://www.iso.org/standard/83117.html).
   Las líneas isofónicas modernas, sucesoras de las curvas de Fletcher y
   Munson.
-  Citado por [Ponderación frecuencial (A, C, G, Z)](/phonometry/es/guides/weighting/)
+  Citado por [Ponderación frecuencial (A, C, Z)](/phonometry/es/guides/weighting/)
   y [Sonoridad](/phonometry/es/guides/loudness/).
 - Fastl, H., & Zwicker, E. (2007). *Psychoacoustics: Facts and models*
   (3.ª ed.). Springer.

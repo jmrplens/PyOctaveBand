@@ -10,7 +10,7 @@
  * repository, not written by hand from memory:
  *   checks/domains/standards   conformance-stats.mjs, parsed from
  *                              docs/CONFORMANCE.md at build time
- *   89 guides        site/src/content/docs/guides/*.md*
+ *   93 guides        site/src/content/docs/guides/*.md*
  *   120 API pages    site/src/content/docs/reference/api/**
  *   506 figures      distinct basenames in .github/images (x2 themes x2 langs)
  *   32 PDF fiches    .github/reports/*.pdf
@@ -138,7 +138,7 @@ export const en: HomeContent = {
 	},
 	coverage: {
 		title: 'What it covers',
-		lead: 'Nine areas, 89 guides, 120 API reference pages. Each row links to the area overview; the designations are the standards actually implemented there, not a reading list.',
+		lead: 'Nine areas, 93 guides, 120 API reference pages. Each row links to the area overview; the designations are the standards actually implemented there, not a reading list.',
 		headers: ['Area', 'Standards implemented'],
 		areas: [
 			{
@@ -279,7 +279,7 @@ export const es: HomeContent = {
 	},
 	coverage: {
 		title: 'Qué abarca',
-		lead: 'Nueve áreas, 89 guías y 120 páginas de referencia de la API. Cada fila enlaza al índice del área; las designaciones son las normas realmente implementadas ahí, no una lista de lecturas.',
+		lead: 'Nueve áreas, 93 guías y 120 páginas de referencia de la API. Cada fila enlaza al índice del área; las designaciones son las normas realmente implementadas ahí, no una lista de lecturas.',
 		headers: ['Área', 'Normas implementadas'],
 		areas: [
 			{

@@ -10,10 +10,11 @@ Source: https://jmrplens.github.io/phonometry/guides/loudness/
 # Loudness
 
 Level metrics tell you how much *sound pressure* there is; loudness tells you
-how loud a listener actually *perceives* it. This page covers the three
-loudness model families phonometry ships: the Zwicker method (ISO 532-1), the
-Moore-Glasberg methods (ISO 532-2/3) and the Sottek Hearing Model loudness
-(ECMA-418-2), plus the equal-loudness contours of pure tones (ISO 226).
+how loud a listener actually *perceives* it. This page covers the reference
+method, loudness in sones by Zwicker (ISO 532-1), plus the equal-loudness
+contours of pure tones (ISO 226); the newer model families, Moore-Glasberg
+(ISO 532-2/-3) and the Sottek Hearing Model loudness (ECMA-418-2), are
+[Advanced loudness](https://jmrplens.github.io/phonometry/guides/advanced-loudness/).
 Sharpness, tonality and roughness live in
 [Sound Quality Metrics](https://jmrplens.github.io/phonometry/guides/sound-quality/); speech metrics in
 [Speech Transmission Index](https://jmrplens.github.io/phonometry/guides/speech-transmission/) and
@@ -223,22 +224,89 @@ plt.show()
 Validity per clause 4.1: 20-90 phon (80 phon above 4 kHz); the implementation
 is verified against the Annex B tables in CI. Note this is the loudness of
 *pure tones*; the loudness of arbitrary signals in sones is what the ISO 532
-models on this page compute.
+models compute, the Zwicker method above and the newer families of
+[Advanced loudness](https://jmrplens.github.io/phonometry/guides/advanced-loudness/).
 
-## Advanced loudness models
+Zwicker is the reference model, not the only one. The **Moore-Glasberg**
+loudness of ISO 532-2, its time-varying ISO 532-3 extension and the
+**Sottek Hearing Model** loudness of ECMA-418-2, together with the
+model-choice table that says when to prefer each, are
+[Advanced loudness](https://jmrplens.github.io/phonometry/guides/advanced-loudness/).
 
-ISO 532-1 above is one of the **three** loudness model families phonometry
-ships (four methods in the table below). This
-section adds the **Moore-Glasberg** loudness of ISO 532-2/532-3 and the
-**Sottek Hearing Model** loudness of ECMA-418-2:2025, whose shared auditory
-front-end also powers the tonality and roughness metrics of
-[Sound Quality Metrics](https://jmrplens.github.io/phonometry/guides/sound-quality/).
+## Quick answers
 
-### Choosing a loudness model
+### What is the difference between loudness in sones and loudness level in phons?
+
+Loudness N in sones (ISO 532-1) is a ratio scale of perceived loudness: 4 sones is twice as loud as 2 sones, and by definition a 1 kHz tone at 40 dB SPL is 1 sone. Loudness level in phons (ISO 226) is the SPL of an equally loud 1 kHz pure tone, and every +10 phon doubles the sone value.
+
+### Over what range are the ISO 226:2023 equal-loudness contours valid?
+
+ISO 226:2023 clause 4.1 defines the normal equal-loudness-level contours from 20 to 90 phon, evaluated at the 29 preferred third-octave frequencies of Table 1; above 80 phon the formula is valid only up to 4 kHz, so the 90 phon contour stops there and no higher contours are defined. The contours describe pure tones, not arbitrary signals.
+
+## References
+
+- Fastl, H., & Zwicker, E. (2007). *Psychoacoustics: Facts and models*
+  (3rd ed.). Springer.
+  [doi:10.1007/978-3-540-68888-4](https://doi.org/10.1007/978-3-540-68888-4).
+  The critical-band and masking psychoacoustics behind the Zwicker model.
+- Fletcher, H., & Munson, W. A. (1933). Loudness, its definition, measurement
+  and calculation. *The Journal of the Acoustical Society of America*, 5(2),
+  82-108. [doi:10.1121/1.1915637](https://doi.org/10.1121/1.1915637).
+  The original equal-loudness measurements behind the loudness-level concept
+  of the pure-tone section.
+- International Organization for Standardization. (2023). *Acoustics —
+  Normal equal-loudness-level contours* (ISO 226:2023).
+  [iso.org catalogue](https://www.iso.org/standard/83117.html).
+  The contour model and Table 1 parameters behind the pure-tone loudness
+  levels.
+
+## Standards
+
+ISO 532-1:2017, *Acoustics — Methods for calculating
+loudness — Part 1: Zwicker method* — stationary and time-varying loudness in
+sones from the normative Annex A.4 reference program, with the N5/N10
+percentile loudness, validated against the Annex B set.
+ISO 226:2023, *Acoustics — Normal equal-loudness-level contours* — the
+contours (Formula 1), the loudness level of pure tones (Formula 2) and the
+hearing threshold.
+
+## See also
+
+- [Advanced loudness (ISO 532-2/-3, ECMA-418-2)](https://jmrplens.github.io/phonometry/guides/advanced-loudness/): the
+  Moore-Glasberg and Sottek loudness models and the model-choice table.
+- [Sound Quality Metrics](https://jmrplens.github.io/phonometry/guides/sound-quality/): sharpness,
+  tonality and roughness, the other half of the sound-quality story.
+- [Psychoacoustic annoyance and fluctuation strength](https://jmrplens.github.io/phonometry/guides/psychoacoustic-annoyance/):
+  the Zwicker and Fastl model that consumes the percentile loudness N5.
+- [Theory](https://jmrplens.github.io/phonometry/reference/theory/perception/): the equations behind the loudness models.
+- API reference: [`psychoacoustics.loudness_zwicker`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-zwicker/) and [`psychoacoustics.loudness_contours`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-contours/).
+
+---
+
+
+<!-- source: docs/advanced-loudness.md | canonical: https://jmrplens.github.io/phonometry/guides/advanced-loudness/ -->
+Source: https://jmrplens.github.io/phonometry/guides/advanced-loudness/
+
+# Advanced Loudness (ISO 532-2/-3, ECMA-418-2)
+
+The Zwicker method of ISO 532-1 is the reference route to loudness in sones
+and lives in [Loudness](https://jmrplens.github.io/phonometry/guides/loudness/), together with the ISO 226
+equal-loudness contours. This page covers the newer model families
+phonometry ships beside it: the **Moore-Glasberg** loudness of
+ISO 532-2/532-3 and the **Sottek Hearing Model** loudness of
+ECMA-418-2:2025, whose shared auditory front-end also powers the tonality
+and roughness metrics of [Sound Quality Metrics](https://jmrplens.github.io/phonometry/guides/sound-quality/).
+
+The page opens with the choice: which model fits which measurement, and why
+the sone values of the four methods agree at the 1 kHz / 40 dB anchor yet
+are not interchangeable digit for digit. Each model then gets its own
+section with a worked example, its figure and its parameter table.
+
+## Choosing a loudness model
 
 | Model | Standard | Stationary / time-varying | Output | When to use |
 | :--- | :--- | :--- | :--- | :--- |
-| Zwicker | ISO 532-1:2017 | both | sone | Reference method; one-third-octave input; fast and widely cited |
+| [Zwicker](https://jmrplens.github.io/phonometry/guides/loudness/) | ISO 532-1:2017 | both | sone | Reference method; one-third-octave input; fast and widely cited |
 | Moore-Glasberg | ISO 532-2:2017 | stationary | sone | roex excitation pattern; better for tones and explicit binaural summation |
 | Moore-Glasberg-Schlittenlacher | ISO 532-3:2023 | time-varying | sone (STL/LTL) | Time-varying loudness with short-/long-term traces and the peak N_max |
 | Sottek (Hearing Model) | ECMA-418-2:2025 | time-varying | sone_HMS | Shares one auditory front-end with the ECMA tonality and roughness metrics |
@@ -287,7 +355,7 @@ plt.show()
 
 </details>
 
-### Moore-Glasberg loudness (ISO 532-2)
+## Moore-Glasberg loudness (ISO 532-2)
 
 Where Zwicker uses fixed critical bands on the Bark scale, Moore-Glasberg builds
 an **excitation pattern** with level-dependent rounded-exponential (roex)
@@ -352,7 +420,7 @@ plt.show()
 
 </details>
 
-#### `loudness_moore_glasberg()` parameters
+### `loudness_moore_glasberg()` parameters
 
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
@@ -367,7 +435,7 @@ Returns a `MooreGlasbergLoudness`: `loudness` (N, sone), `loudness_level`
 (phon), `specific` (N′(i), 372 bins of 0.1 Cam), `erb_number`,
 `centre_frequencies`, `field`, `presentation`.
 
-### Time-varying loudness (ISO 532-3)
+## Time-varying loudness (ISO 532-3)
 
 ISO 532-3 wraps the same excitation / specific-loudness model in a running
 multi-resolution spectral analysis (six parallel FFTs, updated every 1 ms) and
@@ -421,7 +489,7 @@ plt.show()
 
 </details>
 
-#### `loudness_moore_glasberg_time()` parameters
+### `loudness_moore_glasberg_time()` parameters
 
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
@@ -435,7 +503,7 @@ Returns a `MooreGlasbergTimeVaryingLoudness`: `time` (1 ms grid),
 `short_term_loudness` / `long_term_loudness` (sone), their `_level` in phon,
 `n_max`, `loudness_level_max`, a `percentiles` dict, `field`, `presentation`.
 
-### Sottek Hearing Model loudness (ECMA-418-2)
+## Sottek Hearing Model loudness (ECMA-418-2)
 
 ECMA-418-2:2025 specifies a single auditory front-end (outer/middle-ear
 filtering, a 53-band gammatone-like filter bank on the Bark_HMS scale
@@ -491,7 +559,7 @@ plt.show()
 
 </details>
 
-#### `loudness_ecma()` parameters
+### `loudness_ecma()` parameters
 
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
@@ -505,60 +573,48 @@ Returns an `EcmaLoudness`: `loudness` (N, sone_HMS), `specific_loudness`
 
 ## Quick answers
 
-### What is the difference between loudness in sones and loudness level in phons?
-
-Loudness N in sones (ISO 532-1) is a ratio scale of perceived loudness: 4 sones is twice as loud as 2 sones, and by definition a 1 kHz tone at 40 dB SPL is 1 sone. Loudness level in phons (ISO 226) is the SPL of an equally loud 1 kHz pure tone, and every +10 phon doubles the sone value.
-
 ### Which loudness model should I choose: Zwicker, Moore-Glasberg or Sottek?
 
 The Zwicker method (ISO 532-1:2017) is the reference: stationary and time-varying, one-third-octave input, fast and widely cited. Moore-Glasberg (ISO 532-2:2017) is stationary, builds roex excitation patterns and models binaural summation explicitly; ISO 532-3:2023 adds time-varying short- and long-term loudness with the peak N_max. The Sottek model (ECMA-418-2:2025) reports sone_HMS and shares its auditory front-end with the ECMA tonality and roughness metrics.
 
-### Over what range are the ISO 226:2023 equal-loudness contours valid?
+## See also
 
-ISO 226:2023 clause 4.1 defines the normal equal-loudness-level contours from 20 to 90 phon, evaluated at the 29 preferred third-octave frequencies of Table 1; above 80 phon the formula is valid only up to 4 kHz, so the 90 phon contour stops there and no higher contours are defined. The contours describe pure tones, not arbitrary signals.
+- [Loudness](https://jmrplens.github.io/phonometry/guides/loudness/): the Zwicker reference method (ISO 532-1), its
+  accredited fiche and the ISO 226 equal-loudness contours.
+- [Sound Quality Metrics](https://jmrplens.github.io/phonometry/guides/sound-quality/): the tonality, roughness and
+  fluctuation strength built on the same ECMA-418-2 front-end.
+- [Theory](https://jmrplens.github.io/phonometry/reference/theory/perception/): the equations behind the loudness models.
+- API reference: [`psychoacoustics.loudness_moore_glasberg`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-moore-glasberg/), [`psychoacoustics.loudness_moore_glasberg_time`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-moore-glasberg-time/) and [`psychoacoustics.loudness_ecma`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-ecma/).
 
 ## References
 
-- Fastl, H., & Zwicker, E. (2007). *Psychoacoustics: Facts and models*
-  (3rd ed.). Springer.
-  [doi:10.1007/978-3-540-68888-4](https://doi.org/10.1007/978-3-540-68888-4).
-  The critical-band and masking psychoacoustics behind the Zwicker model and
-  the loudness sensation the newer models refine.
-- Fletcher, H., & Munson, W. A. (1933). Loudness, its definition, measurement
-  and calculation. *The Journal of the Acoustical Society of America*, 5(2),
-  82-108. [doi:10.1121/1.1915637](https://doi.org/10.1121/1.1915637).
-  The original equal-loudness measurements behind the loudness-level concept
-  of the pure-tone section.
+- International Organization for Standardization. (2017). *Acoustics —
+  Methods for calculating loudness — Part 2: Moore-Glasberg method*
+  (ISO 532-2:2017).
+  [iso.org catalogue](https://www.iso.org/standard/63078.html).
+  Stationary loudness from roex excitation patterns on the ERB-number scale,
+  with explicit binaural summation.
 - International Organization for Standardization. (2023). *Acoustics —
-  Normal equal-loudness-level contours* (ISO 226:2023).
-  [iso.org catalogue](https://www.iso.org/standard/83117.html).
-  The contour model and Table 1 parameters behind the pure-tone loudness
-  levels.
+  Methods for calculating loudness — Part 3: Moore-Glasberg-Schlittenlacher
+  method* (ISO 532-3:2023).
+  [iso.org catalogue](https://www.iso.org/standard/69856.html).
+  Time-varying short-term and long-term loudness and the peak N_max.
+- Ecma International. (2025). *Psychoacoustic metrics for ITT equipment —
+  Part 2 (methods for describing human perception based on the Sottek
+  Hearing Model)* (ECMA-418-2, 4th ed.).
+  [ecma-international.org](https://ecma-international.org/publications-and-standards/standards/ecma-418/).
+  The Sottek Hearing Model loudness (sone_HMS).
 
 ## Standards
 
-ISO 532-1:2017, *Acoustics — Methods for calculating
-loudness — Part 1: Zwicker method* — stationary and time-varying loudness in
-sones from the normative Annex A.4 reference program, with the N5/N10
-percentile loudness, validated against the Annex B set. ISO 532-2:2017,
-*... Part 2: Moore-Glasberg method*: stationary loudness from roex excitation
-patterns on the ERB-number scale, with explicit binaural summation.
-ISO 532-3:2023, *... Part 3: Moore-Glasberg-Schlittenlacher method*:
-time-varying short-term and long-term loudness and the peak N_max.
-ISO 226:2023, *Acoustics — Normal equal-loudness-level contours* — the
-contours (Formula 1), the loudness level of pure tones (Formula 2) and the
-hearing threshold. ECMA-418-2:2025, *Psychoacoustic metrics for ITT
-equipment — Part 2 (methods for describing human perception based on the
-Sottek Hearing Model)*: the Sottek Hearing Model loudness (sone_HMS).
-
-## See also
-
-- [Sound Quality Metrics](https://jmrplens.github.io/phonometry/guides/sound-quality/): sharpness,
-  tonality and roughness, the other half of the sound-quality story.
-- [Psychoacoustic annoyance and fluctuation strength](https://jmrplens.github.io/phonometry/guides/psychoacoustic-annoyance/):
-  the Zwicker and Fastl model that consumes the percentile loudness N5.
-- [Theory](https://jmrplens.github.io/phonometry/reference/theory/perception/): the equations behind the loudness models.
-- API reference: [`psychoacoustics.loudness_zwicker`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-zwicker/), [`psychoacoustics.loudness_moore_glasberg`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-moore-glasberg/) and [`psychoacoustics.loudness_contours`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-contours/).
+ISO 532-2:2017, *Acoustics — Methods for calculating loudness — Part 2:
+Moore-Glasberg method*: stationary loudness from roex excitation patterns on
+the ERB-number scale, with explicit binaural summation. ISO 532-3:2023,
+*... Part 3: Moore-Glasberg-Schlittenlacher method*: time-varying short-term
+and long-term loudness and the peak N_max. ECMA-418-2:2025, *Psychoacoustic
+metrics for ITT equipment — Part 2 (methods for describing human perception
+based on the Sottek Hearing Model)*: the Sottek Hearing Model loudness
+(sone_HMS).
 
 ---
 
@@ -572,8 +628,9 @@ Two sounds of equal loudness can still differ in how *sharp*, how *tonal*,
 how *rough* or how strongly *fluctuating* they are. This page covers the
 sound-quality metrics that complement loudness: sharpness (DIN 45692) and the
 ECMA-418-2 tonality, roughness and fluctuation strength of the Sottek Hearing
-Model. Loudness itself, including the ECMA-418-2 loudness that shares the
-same auditory front-end, lives in [Loudness](https://jmrplens.github.io/phonometry/guides/loudness/).
+Model. Loudness itself lives in [Loudness](https://jmrplens.github.io/phonometry/guides/loudness/); the ECMA-418-2
+loudness that shares the same auditory front-end, in
+[Advanced loudness](https://jmrplens.github.io/phonometry/guides/advanced-loudness/).
 
 The four metrics form one family: a single calibrated signal splits across
 two auditory front ends, and every branch is anchored to a reference sound
@@ -1122,7 +1179,7 @@ other only as supporting evidence.
 
 ## See also
 
-- [Levels](https://jmrplens.github.io/phonometry/guides/levels/): the ISO 1996-1 rating levels whose tonal adjustments
+- [Environmental levels](https://jmrplens.github.io/phonometry/guides/environmental-levels/): the ISO 1996-1 rating levels whose tonal adjustments
   (Table A.1) these prominence verdicts justify objectively.
 - [Sound Quality Metrics](https://jmrplens.github.io/phonometry/guides/sound-quality/): the ECMA-418-2 psychoacoustic
   tonality T in tu_HMS, the hearing-model counterpart of these FFT ratios.
