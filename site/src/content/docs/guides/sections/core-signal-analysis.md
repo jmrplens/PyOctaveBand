@@ -74,6 +74,9 @@ ballistics and the integrated, statistical and rating levels.
 - [Environmental Levels (ISO 1996-1/-2)](/phonometry/guides/environmental-levels/):
   Lden, Ldn and the composite rating levels, the tonal adjustment, the
   residual-noise correction and the uncertainty budget.
+- [Spanish Noise Regulation (RD 1367/2007)](/phonometry/guides/spanish-noise-regulation/):
+  the corrected level LKeq, the Kt/Kf/Ki corrections, the evaluation periods
+  and noise phases, and the limit tables.
 
 ## [Signals and spectra](/phonometry/guides/sections/signals-spectra/)
 

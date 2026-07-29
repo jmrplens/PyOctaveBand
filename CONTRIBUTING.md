@@ -15,6 +15,7 @@ is the right place for anything that is not yet a defect or a pull request:
 | Give feedback on the guides, figures or animations | [Documentation & learning](https://github.com/jmrplens/phonometry/discussions/categories/documentation-learning) |
 | Share a measurement, study or tool you built | [Show and tell](https://github.com/jmrplens/phonometry/discussions/categories/show-and-tell) |
 | Report a reproducible failure with no standard in play, or work on an agreed change | [Issues](https://github.com/jmrplens/phonometry/issues) |
+| Report a suspected security vulnerability | Privately, following the [security policy](SECURITY.md) |
 
 A discrepancy against a standard or a reference implementation belongs in
 Standards & conformance even when it reproduces every time, because settling it
@@ -190,6 +191,22 @@ Pull requests are labelled automatically from the paths they touch, through
 3. **Commit** your changes with clear messages.
 4. **Verify** your code using the commands above (`pytest`, `mypy`, `ruff`).
 5. **Push** to your fork and **Open a Pull Request**.
+
+The pull request description is prefilled from
+[`.github/pull_request_template.md`](.github/pull_request_template.md). Its
+checklist is the CI gates written out, including the regeneration steps above
+and the rule that matters most here: a new normative implementation must name
+the numeric oracle it was validated against, and that oracle must be independent
+of the implementation.
+
+### Security
+
+A suspected vulnerability goes through
+[GitHub's private reporting](https://github.com/jmrplens/phonometry/security/advisories/new)
+rather than an issue or a discussion. The [security policy](SECURITY.md) sets
+out what is treated as a vulnerability, what is not (a value that disagrees with
+a standard is a conformance defect, not a security issue), and what response to
+expect.
 
 ## License
 By contributing to this project, you agree that your contributions will be licensed under the project's [LICENSE](LICENSE) file.

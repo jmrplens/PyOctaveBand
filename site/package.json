@@ -16,8 +16,8 @@
     "lighthouse": "node scripts/lighthouse-audit.mjs"
   },
   "dependencies": {
-    "@astrojs/starlight": "^0.41.3",
-    "astro": "^7.1.1",
+    "@astrojs/starlight": "^0.41.4",
+    "astro": "^7.1.4",
     "astro-mermaid": "^2.1.0",
     "katex": "^0.18.1",
     "mermaid": "^11.16.0",

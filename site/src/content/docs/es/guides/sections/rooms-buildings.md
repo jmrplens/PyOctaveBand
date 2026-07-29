@@ -78,6 +78,9 @@ laboratorio y predicho a partir de datos de elemento.
   adaptación.
 - [Aislamiento acústico de fachadas](/phonometry/es/guides/facade-insulation/):
   el cerramiento del edificio medido (ISO 16283-3) y previsto (EN 12354-3/4).
+- [Código Técnico de la Edificación (CTE DB-HR)](/phonometry/es/guides/spanish-building-code/):
+  las magnitudes globales del DB HR, las exigencias del apartado 2 y la
+  corrección por tamaño de ventana.
 
 ## [Diseño del aislamiento](/phonometry/es/guides/sections/insulation-design/)
 

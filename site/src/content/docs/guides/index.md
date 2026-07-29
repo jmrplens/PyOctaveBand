@@ -1,6 +1,6 @@
 ---
 title: "Guides"
-description: "The 93 guides of phonometry, grouped into the nine areas the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
+description: "The 95 guides of phonometry, grouped into the nine areas the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
 head:
   - tag: script
     attrs:
@@ -152,6 +152,10 @@ IEC 61252, ISO 1996-1, IEC 60942, ISO 18233 and the GUM.
 - [Environmental Levels (ISO 1996-1/-2)](/phonometry/guides/environmental-levels/):
   Lden, Ldn and the composite rating levels, the tonal adjustment, the
   residual-noise correction and the uncertainty budget.
+- [Spanish Noise Regulation (RD 1367/2007)](/phonometry/guides/spanish-noise-regulation/):
+  the corrected level LKeq with its Kt, Kf and Ki corrections, the evaluation
+  periods and noise phases, the limit tables and the Article 25 compliance
+  check.
 
 **[Signals and spectra](/phonometry/guides/sections/signals-spectra/)**
 
@@ -298,6 +302,9 @@ ISO 717-1/-2, EN 12354-1 to -6, ISO 12999-1, ISO 10052 and ANSI/ASA S12.2.
 - [Façade Sound Insulation](/phonometry/guides/facade-insulation/): the
   building envelope measured per ISO 16283-3, predicted per EN 12354-3 and
   radiating outwards per EN 12354-4.
+- [Spanish Building Code (CTE DB-HR)](/phonometry/guides/spanish-building-code/):
+  the DB-HR global indices RA, RA,tr, DnT,A and D2m,nT,Atr, the clause 2
+  requirement tables and the window-size correction.
 
 **[Insulation design](/phonometry/guides/sections/insulation-design/)**
 

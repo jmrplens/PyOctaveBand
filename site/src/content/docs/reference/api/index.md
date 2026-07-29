@@ -104,6 +104,7 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`building.floor_covering_improvement`](/phonometry/reference/api/building/floor-covering-improvement/) | Impact-sound improvement of floor coverings on a small mock-up (ISO 16251-1:2014). |
 | [`building.structure_borne_power`](/phonometry/reference/api/building/structure-borne-power/) | Structure-borne sound power of building equipment (EN 15657:2018; ISO 9611). |
 | [`building.installed_structure_borne`](/phonometry/reference/api/building/installed-structure-borne/) | Installed structure-borne sound from service equipment (EN 12354-5:2009). |
+| [`building.spanish_building_code`](/phonometry/reference/api/building/spanish-building-code/) | Spanish building code CTE DB-HR: global indices and requirement checks. |
 
 ## Materials and surfaces
 
@@ -146,6 +147,7 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`environmental.impulsive_sound`](/phonometry/reference/api/environment/impulsive-sound/) | Objective prominence of impulsive sounds and the `LAeq` adjustment (ISO/PAS 1996-3:2022). |
 | [`environmental.rating`](/phonometry/reference/api/environment/rating/) | Environmental noise descriptors per ISO 1996-1:2016. |
 | [`environmental.measurement`](/phonometry/reference/api/environment/measurement/) | Determination of environmental-noise sound pressure levels (ISO 1996-2:2017). |
+| [`environmental.spanish_regulation`](/phonometry/reference/api/environment/spanish-regulation/) | Spanish noise regulation: the corrected level LKeq (Real Decreto 1367/2007). |
 
 ## Aircraft and wind energy
 

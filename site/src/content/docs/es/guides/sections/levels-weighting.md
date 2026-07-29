@@ -42,6 +42,13 @@ con sus ajustes, y la cadena de determinación de ISO 1996-2 con el ajuste
 tonal, la corrección de ruido residual y el presupuesto de incertidumbre de
 la medición.
 
+Las normativas nacionales construyen su propio índice sobre esa cadena, y
+[Normativa española de ruido (RD 1367/2007)](/phonometry/es/guides/spanish-noise-regulation/)
+implementa la española: el nivel corregido LKeq con sus correcciones por
+componentes tonales, de baja frecuencia e impulsivas, los periodos temporales
+de evaluación divididos en fases de ruido, y las tablas de valores límite con
+las que se juzga una actividad.
+
 ## Páginas de esta sección
 
 - [Ponderación frecuencial (A, C, Z)](/phonometry/es/guides/weighting/):
@@ -58,3 +65,6 @@ la medición.
 - [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/guides/environmental-levels/):
   Lden, Ldn y niveles de valoración, ajuste tonal, ruido residual e
   incertidumbre.
+- [Normativa española de ruido (RD 1367/2007)](/phonometry/es/guides/spanish-noise-regulation/):
+  el nivel corregido LKeq, las correcciones Kt/Kf/Ki, los periodos temporales
+  de evaluación y las fases de ruido, y las tablas de valores límite.

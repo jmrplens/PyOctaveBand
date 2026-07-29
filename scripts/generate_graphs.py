@@ -12232,6 +12232,63 @@ def generate_runs_test(output_dir: str) -> None:
     plt.close()
 
 
+def generate_rd1367_activity_assessment(output_dir: str) -> None:
+    """RD 1367/2007 activity assessment against the Annex III Table B1 limits.
+
+    The worked case of Aviles Lopez & Perera Martin, Manual de acustica
+    ambiental y arquitectonica, Ejemplos 3.1 to 3.3: an activity on residential
+    land whose day period splits into 2 h shut down, 6 h with a noisy machine
+    (LKeq,Ti = 59 dB) and 4 h with the remaining sources (54 dB), giving
+    LKeq,d = 57 dB and, over 303 operating days, LK,d = 56 dB. Against the
+    55 dB limit of area type a the phase (+5 dB) and daily (+3 dB) criteria are
+    met but the annual one is not.
+    """
+    print("Generating rd1367_activity_assessment.png...")
+    from phonometry import NoisePhase, activity_limits, assess_activity
+
+    day = [
+        NoisePhase(2.0, 0.0, label="closed"),
+        NoisePhase(6.0, 50.0, kt=6.0, kf=3.0),
+        NoisePhase(4.0, 48.0, kt=3.0, kf=3.0),
+    ]
+    evening = [NoisePhase(2.0, 48.0, kt=3.0, kf=3.0), NoisePhase(2.0, 0.0)]
+    verdict = assess_activity(
+        {"day": day, "evening": evening}, activity_limits("a"), operating_days=303
+    )
+
+    _, ax = plt.subplots(figsize=(10, 6))
+    # The result's own .plot() draws the three Article 25.1 b indices per
+    # period with their own allowances marked on each group.
+    verdict.plot(ax=ax, language=_LANG)
+    ax.set_ylim(0, 72)
+    save_figure(output_dir, "rd1367_activity_assessment.png")
+    plt.close()
+
+
+def generate_dbhr_global_index(output_dir: str) -> None:
+    """CTE DB-HR global index R'A of a measured wall (Manual Ejemplo 7.2).
+
+    The published eighteen-band apparent sound reduction index R' of a field
+    test, weighted with the normalised pink-noise spectrum of DB-HR Annex A
+    Table A.5. The energy sum of the per-band transmitted level L_Ar,i - R'_i
+    sets the global index, R'A = 51,4 dBA.
+    """
+    print("Generating dbhr_global_index.png...")
+    from phonometry import ra
+
+    r_prime = [
+        36.2, 41.5, 36.9, 40.4, 44.7, 42.4, 45.7, 46.1, 47.1,
+        52.3, 54.3, 57.5, 57.8, 57.3, 59.0, 62.8, 64.7, 65.3,
+    ]
+
+    _, ax = plt.subplots(figsize=(10, 6))
+    # The result's own .plot() draws the band insulation as bars and the
+    # weighted per-band transmitted level as a line on a 1k/2k-labelled axis.
+    ra(r_prime).plot(ax=ax, language=_LANG)
+    save_figure(output_dir, "dbhr_global_index.png")
+    plt.close()
+
+
 _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_filter_type_comparison,
     generate_filter_responses,
@@ -12259,6 +12316,8 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_calibration_stability,
     generate_sel_concept,
     generate_lden_profile,
+    generate_rd1367_activity_assessment,
+    generate_dbhr_global_index,
     generate_tonality_spectrum,
     # Psychoacoustics / intensity plots (loudness, STI, p-p intensity)
     generate_loudness_pattern,

@@ -9,6 +9,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Spanish noise regulation RD 1367/2007 (`environmental/spanish_regulation.py`):
+  the corrected level `LKeq,T = LAeq,T + Kt + Kf + Ki` of Annex I A.2 c with
+  the three reference procedures of Annex IV A.3.3, each graded 0/3/6 dB and
+  their sum capped at 9 dB. `tonal_correction` works on the unweighted
+  one-third-octave spectrum, comparing each band against the arithmetic mean of
+  its two neighbours with the 8/12, 5/8 and 3/5 dB thresholds of the three band
+  ranges; `low_frequency_correction` and `impulsive_correction` grade
+  `LCeq - LAeq` and `LAIeq - LAeq`. These are the regulation's own variants,
+  not the ISO 1996 procedures the library already carries, and the module
+  documents where each differs. `NoisePhase`, `evaluation_period_level` and
+  `long_term_corrected_level` integrate phases into the day, evening and night
+  indices and into the annual `LK,x`, with the regulation's own rounding
+  (`round_reported_level`, add 0,5 dB and take the integer part). The Annex II
+  quality objectives (outdoor, indoor and vibration) and the Annex III
+  immission limits (new transport infrastructure, its `LAmax` variant,
+  activities and ports, and noise transmitted to acoustically adjacent
+  premises) are exposed as lookups, and `assess_activity` applies the three
+  criteria of Article 25 to produce an `ActivityAssessment` with `.plot()` and
+  a one-page `.report()` inspection fiche in Spanish. Each correction is
+  validated against the 0/3/6 dB grading of the Annex IV A.3.3 tables, and a
+  new activity requires the annual index, since Article 25.1 b i is mandatory
+  for it and a verdict that never evaluates a mandatory criterion would
+  assert more than the assessment has shown. Validated against
+  Ejemplos 3.1 to 3.3 of Aviles Lopez & Perera Martin, *Manual de acustica
+  ambiental y arquitectonica* (`LKeq,d` 57 dB, `LKeq,e` 51 dB, `LK,d` 56 dB,
+  `LK,e` 50 dB and the verdict that flips between a new activity and one
+  already in operation), plus the printed limit tables of the regulation
+  itself. New figure `rd1367_activity_assessment`, three conformance checks and
+  a Spanish-first guide, in Spanish and English.
+
+- Spanish building code CTE DB-HR (`building/spanish_building_code.py`): the
+  A-weighted global indices `RA`, `RA,tr`, `DnT,A`, `D2m,nT,A` and
+  `D2m,nT,Atr` computed by the direct Annex A formulae (A.5) to (A.7) over the
+  eighteen one-third-octave bands 100 Hz to 5 kHz, two more than the sixteen
+  of ISO 717-1, with the four normalised source spectra of Tables A.2 to A.5
+  (pink noise, road traffic, railway and aircraft). The facade quantity
+  follows clause 3.1.3.4 point 1: a railway-dominant site is assessed as
+  `D2m,nT,A` through Formula (A.5) and a road-traffic or aircraft one as
+  `D2m,nT,Atr` through (A.6), so `d2m_nt_a` and `d2m_nt_atr` are separate
+  entry points that each refuse the other's spectra rather than one function
+  that could put the wrong quantity name on a report. Results expose the
+  exact value, the one-decimal intermediate and the reported integer that
+  DB-HR 3.1.3.1 point 4 prescribes. The requirement side covers the facade
+  table 2.1 keyed on the day noise index `Ld` (with the sheltered-facade and
+  aircraft-noise rules), the airborne and shared-opening requirements of
+  2.1.1, the party-wall alternatives of 2.1.1 c), the impact limits of 2.1.2,
+  the reverberation and absorption limits of 2.2, and the window-size
+  correction of the Catalogo de Elementos Constructivos, checked through
+  `check_db_hr_requirement` / `assess_db_hr` with `.plot()`. Validated against
+  Ejemplo 7.2 (`R'A` 51,4 dBA), Ejercicio 7.1 (`D2m,nT,Atr` 32,8 dBA) and
+  Ejemplo 7.4 of the same Manual; the direct route is cross-checked against the
+  ISO 717-1 route of `weighted_rating_extended`, which reproduces the book's
+  `R'w` 52 dB with `C` -1 and `Ctr` -5 and agrees to the integer on both
+  published spectra. New figure `dbhr_global_index`, four conformance checks
+  and a guide in English and Spanish.
+
 - 2D near-to-far-field (NTFF) transformation for the FDTD solver.
   `FDTD2D.add_contour_probe` captures the steady-state pressure and outward
   normal-velocity phasors on a closed rectangular contour of cell faces with
@@ -55,6 +111,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   to date` CI job and as the last step of `make graphs`;
   `--report` prints the measured distance and WCAG contrast ratio of every
   region.
+
+- `SECURITY.md`: a security policy written for what this library actually is,
+  a computation package with no service and no credentials. Supported versions
+  (fixes ship forward on the latest 3.x, no backports; Python 3.13 and 3.14 on
+  Ubuntu, macOS and Windows), private reporting through GitHub security
+  advisories with an acknowledgement and assessment window I can keep, a
+  coordinated-disclosure statement, and a scope section that names the real
+  attack surface (untrusted files reaching a reader, deserialisation, the
+  release supply chain, repository automation) while stating plainly that a
+  value disagreeing with a standard is a conformance defect for the issue form,
+  and a defect in the standard itself an entry in `docs/ERRATA.md`. Also
+  records the checks already running: CodeQL, bandit, GitGuardian, Dependabot,
+  the `snyk` target and the conformance staleness gate.
+
+- `.github/pull_request_template.md`: the repository's CI gates written out as a
+  compact checklist, so the recurring failures (a stale `docs/CONFORMANCE.md`,
+  an unregenerated API reference, a module missing from
+  `scripts/api_taxonomy.py`, a figure not produced by `generate_graphs.py`,
+  EN/ES drift) are visible before the build runs. It also asks, for any new
+  normative implementation, which numeric oracle validated it and confirmation
+  that the oracle is independent of the implementation.
 
 - `make lighthouse` (`site/scripts/lighthouse-audit.mjs`): Lighthouse over a
   fixed sample of built pages against a local preview server, with JSON

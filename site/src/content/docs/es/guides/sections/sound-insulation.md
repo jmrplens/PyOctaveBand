@@ -46,7 +46,11 @@ sus términos de adaptación espectral C, Ctr y CI. Y
 [Aislamiento acústico de fachadas](/phonometry/es/guides/facade-insulation/)
 mantiene el cerramiento del edificio en un solo sitio: medido según
 ISO 16283-3, previsto según EN 12354-3 y radiando al exterior según
-EN 12354-4.
+EN 12354-4. Los códigos de edificación nacionales reformulan esos índices en
+magnitudes globales propias, y
+[Código Técnico de la Edificación (CTE DB-HR)](/phonometry/es/guides/spanish-building-code/)
+implementa el español: el índice directo del anexo A sobre dieciocho bandas,
+las tablas de exigencias del apartado 2 y la corrección por tamaño de ventana.
 
 Dos secciones vecinas completan el cuadro: las magnitudes del lado de la sala
 (tiempo de reverberación, absorción) viven en
@@ -76,3 +80,6 @@ emparentada EN 12354-5, vive en
 - [Aislamiento acústico de fachadas](/phonometry/es/guides/facade-insulation/):
   el cerramiento medido (ISO 16283-3), previsto (EN 12354-3) y radiando al
   exterior (EN 12354-4).
+- [Código Técnico de la Edificación (CTE DB-HR)](/phonometry/es/guides/spanish-building-code/):
+  las magnitudes globales RA, RA,tr, DnT,A y D2m,nT,Atr del DB HR, las
+  exigencias del apartado 2 y la corrección por tamaño de ventana.

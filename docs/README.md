@@ -15,6 +15,7 @@ Full documentation for phonometry. Also available as a website:
 - [Calibration and dBFS](calibration.md): physical SPL and digital analysis
 - [Integrated & Statistical Levels](levels.md): Leq, LAeq, L10/L50/L90, LCpeak/SEL, noise dose (IEC 61252), octave spectrogram
 - [Environmental levels](environmental-levels.md): Lden, Ldn and the composite rating levels of ISO 1996-1, with the ISO 1996-2 tonal adjustment, residual-noise correction and measurement uncertainty budget
+- [Spanish Noise Regulation (RD 1367/2007)](spanish-noise-regulation.md): the corrected level LKeq with its tonal, low-frequency and impulsive corrections, the evaluation periods split into noise phases, the acoustic quality objective and immission limit tables, and the Article 25 compliance check of an activity
 - [Frequency Weighting](weighting.md): A, C, Z curves
 - [Special weightings](special-weightings.md): the ISO 7196 G-weighting for infrasound, the historical B (ANSI S1.4-1983) and D (IEC 537) curves, and AU (IEC 61012) for audible sound in the presence of ultrasound
 - [Time Weighting](time-weighting.md): Fast, Slow, Impulse ballistics
@@ -74,6 +75,7 @@ Full documentation for phonometry. Also available as a website:
 - [Sound Insulation Survey Method (ISO 10052)](insulation-survey.md): the ISO 10052 octave-band control method: the reverberation index and its room-class estimate, the airborne, impact, façade and service-equipment quantities and their survey reports
 - [Laboratory Flanking Transmission (ISO 10848)](flanking-lab.md): the ISO 10848 junction vibration reduction index Kij and the flanking descriptors Dn,f and Ln,f measured on a test facility
 - [Insulation Ratings (ISO 717)](insulation-ratings.md): the ISO 717-1 airborne and ISO 717-2 impact reference-curve engines with the spectrum adaptation terms C, Ctr and CI, the enlarged-range and one-decimal variants, and the ISO 717 fiche
+- [Spanish Building Code (CTE DB-HR)](spanish-building-code.md): the DB-HR global indices RA, RA,tr, DnT,A and D2m,nT,Atr from the direct Annex A formula over eighteen bands, the four normalised spectra, the clause 2 requirement tables and the window-size correction
 - [Predicting Sound Insulation (EN 12354)](insulation-prediction.md): airborne and impact flanking-transmission prediction between rooms (EN 12354-1/2)
 - [Façade Sound Insulation](facade-insulation.md): the building envelope measured (ISO 16283-3), predicted from its element indices (EN 12354-3) and radiating an indoor source outwards (EN 12354-4)
 - [Predicting Panel Sound Insulation](panel-sound-insulation.md): theoretical airborne insulation of single panels (mass law and coincidence, Sharp) and double walls (mass-spring-mass, Bies), transmission through slits and apertures (Gomperts/Wilson-Soroka), plate radiation efficiency (Leppington/Maidanik) and the point mobilities of infinite plates and beams (Cremer)
