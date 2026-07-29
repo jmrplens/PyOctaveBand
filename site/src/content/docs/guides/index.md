@@ -440,6 +440,8 @@ electroacoustic chain that reproduces or measures it. Implements ISO 3741,
 ISO 3744/3746, ISO 3745, ISO 9614-1/-2/-3, IEC 61043, ISO 4871,
 IEC 60268-3/-4/-5, ITU-R BS.1770-5 and EBU R 128.
 
+**[Sound power and intensity](/phonometry/guides/sections/sound-power/)**
+
 - [Sound Intensity (p-p)](/phonometry/guides/intensity/): two-microphone
   intensity with the field indicators that qualify the measurement.
 - [Sound Power](/phonometry/guides/sound-power/): choosing the determination
@@ -451,6 +453,9 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 and EBU R 128.
   the direct and comparison methods of ISO 3741.
 - [Sound Power by Intensity Scanning](/phonometry/guides/sound-power-intensity/):
   the on-site scanning of ISO 9614-2 and the ISO 9614-3 precision grade.
+
+**[Electroacoustics](/phonometry/guides/sections/electroacoustics/)**
+
 - [Electroacoustics: distortion and frequency response](/phonometry/guides/electroacoustics/):
   harmonic and intermodulation distortion, THD+N and SINAD, dynamic range and
   the H1/H2 frequency-response estimators.
@@ -462,14 +467,17 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 and EBU R 128.
 - [Swept-sine distortion and phase utilities](/phonometry/guides/swept-sine-distortion/):
   harmonic separation from one exponential sweep, THD against excitation
   frequency, and minimum phase, group delay and excess phase.
+- [Programme loudness and true peak](/phonometry/guides/program-loudness/):
+  K-weighting and gated integrated loudness in LUFS, the momentary and
+  short-term meters, the loudness range and the true-peak level.
+
+**[Noise control](/phonometry/guides/sections/noise-control/)**
+
 - [Silencers](/phonometry/guides/silencers/): reactive silencers by the
   four-pole transmission-matrix method and the reactive-versus-dissipative
   choice.
 - [Industrial Noise Control: HVAC and Enclosures](/phonometry/guides/noise-control/):
   duct attenuation and flow noise, and enclosure insertion loss.
-- [Programme loudness and true peak](/phonometry/guides/program-loudness/):
-  K-weighting and gated integrated loudness in LUFS, the momentary and
-  short-term meters, the loudness range and the true-peak level.
 
 ## [Wave simulation](/phonometry/guides/sections/simulation/)
 

@@ -38,10 +38,10 @@ assessments end in are covered in
 [Integrated and Statistical Levels](/phonometry/guides/levels/), the tonal
 counterpart of the impulsive adjustment in
 [Objective audibility of tones in noise](/phonometry/guides/tone-audibility/),
-and the sources that feed a propagation calculation in
-[Sound Power](/phonometry/guides/sound-power/) and the
+and the sources that feed a propagation calculation in the
+[Sound power and intensity](/phonometry/guides/sections/sound-power/) and
 [Aircraft and wind energy](/phonometry/guides/sections/aircraft-wind/)
-section.
+sections.
 
 ## Pages in this section
 

@@ -18,7 +18,7 @@ Three kinds of artifact are produced:
 ``llms.txt``
     The index. Every page, grouped by area, plus the evidence pages, the
     Spanish tree and the API reference as an Optional section.
-``llms-<area>.txt``
+``llms/llms-<area>.txt``
     One shard per documented area, each small enough to survive a single fetch.
     ``llms-full.txt`` is roughly 291k tokens, so a client that truncates at a
     few hundred kilobytes (most of them do) reads the first few metrology
@@ -27,8 +27,11 @@ Three kinds of artifact are produced:
 ``llms-full.txt``
     The complete concatenation, kept for clients that can take it.
 
-All of them are published to the site by site/scripts/copy-llms.mjs (prebuild).
-Deterministic: regenerate with ``make llms``.
+The two index-level artifacts live at the repo root and are published to the
+site root by site/scripts/copy-llms.mjs (prebuild). The shards are written
+straight into site/public/llms/, which Astro serves verbatim under
+``/llms/``, so the site root holds exactly the two files the llms.txt
+convention names. Deterministic: regenerate with ``make llms``.
 """
 
 from __future__ import annotations
@@ -39,6 +42,10 @@ import re
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
 CONTENT = ROOT / "site" / "src" / "content" / "docs"
+#: Where the per-area shards live. Everything under site/public is served
+#: verbatim at the site root, so these publish at /llms/llms-<area>.txt and
+#: the site root keeps exactly llms.txt and llms-full.txt.
+SHARDS_DIR = ROOT / "site" / "public" / "llms"
 SITE_URL = "https://jmrplens.github.io/phonometry"
 REPO_URL = "https://github.com/jmrplens/phonometry"
 DOI = "10.5281/zenodo.21215280"
@@ -195,12 +202,12 @@ def _area_members() -> dict[str, list[str]]:
 def _shard_members() -> dict[str, list[str]]:
     """Shard slug -> guide routes, at the finest grouping the tree offers.
 
-    The index groups by the nine areas a reader recognises, but two of those
-    areas are large enough that a whole-area shard blows the fetch budget on
-    its own. Several areas are already subdivided in the navigation (octave
-    filtering, levels and weighting, and so on), each with its own overview
-    page, so sharding follows those subdivisions where they exist and falls
-    back to the area where they do not.
+    The index groups by the nine areas a reader recognises, but several of
+    those areas are large enough that a whole-area shard blows the fetch
+    budget on its own. Several areas are already subdivided in the navigation
+    (octave filtering, levels and weighting, and so on), each with its own
+    overview page, so sharding follows those subdivisions where they exist
+    and falls back to the area where they do not.
     """
     sections = CONTENT / "guides" / "sections"
     areas = {slug for slug, _ in AREAS}
@@ -394,11 +401,11 @@ def build_llms_txt(version: str) -> str:
             "most clients."
         ),
         "",
-        f"- [Start here]({SITE_URL}/llms-start.txt)",
+        f"- [Start here]({SITE_URL}/llms/llms-start.txt)",
     ]
     for slug in _shard_members():
         label = labels.get(slug, slug.replace("-", " ").capitalize())
-        lines.append(f"- [{label}]({SITE_URL}/llms-{slug}.txt)")
+        lines.append(f"- [{label}]({SITE_URL}/llms/llms-{slug}.txt)")
     lines += [
         f"- [Everything]({SITE_URL}/llms-full.txt)",
         "",
@@ -522,16 +529,23 @@ def main() -> None:
 
     # Remove shards this run no longer produces. Regrouping a section renames
     # its shard, and an orphan left behind would keep serving text that
-    # llms.txt no longer indexes, silently and indefinitely.
-    keep = {f"llms-{slug}.txt" for slug in shards} | {"llms.txt", "llms-full.txt"}
-    for path in ROOT.glob("llms-*.txt"):
+    # llms.txt no longer indexes, silently and indefinitely. The root-level
+    # sweep also retires shards left by the era when they lived next to
+    # llms.txt.
+    SHARDS_DIR.mkdir(parents=True, exist_ok=True)
+    keep = {f"llms-{slug}.txt" for slug in shards}
+    for path in SHARDS_DIR.glob("llms-*.txt"):
         if path.name not in keep:
+            path.unlink()
+            print(f"  removed stale shard llms/{path.name}")
+    for path in ROOT.glob("llms-*.txt"):
+        if path.name != "llms-full.txt":
             path.unlink()
             print(f"  removed stale shard {path.name}")
 
     oversized: list[tuple[str, int]] = []
     for slug, text in shards.items():
-        (ROOT / f"llms-{slug}.txt").write_text(text, encoding="utf-8")
+        (SHARDS_DIR / f"llms-{slug}.txt").write_text(text, encoding="utf-8")
         size = len(text.encode("utf-8"))
         if size > SHARD_LIMIT_BYTES:
             oversized.append((slug, size))
