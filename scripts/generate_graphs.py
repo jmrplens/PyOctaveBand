@@ -12913,8 +12913,10 @@ def _poster_ss_for(webm: str) -> float | None:
     settled last frame, which for a single travelling packet is an almost
     empty field.
     """
-    if "anim_fdtd_pillar_hall" in os.path.basename(webm):
-        dt_frame = _PILLAR_EVERY * 0.6 * _PILLAR_DX / (343.0 * np.sqrt(2.0))
+    if _PILLAR_STEM in os.path.basename(webm):
+        import fdtd2d
+        dt = fdtd2d.FDTD2D(343.0, _PILLAR_DX, shape=(3, 8)).dt
+        dt_frame = _PILLAR_EVERY * dt
         return float((6.0e-3 / dt_frame - _PILLAR_WARM) / _PILLAR_FPS)
     return None
 
@@ -15335,6 +15337,7 @@ _PILLAR_EVERY = 8
 _PILLAR_FRAMES = 900
 _PILLAR_FPS = 40
 _PILLAR_WARM = 40                     # frames of free travel trimmed
+_PILLAR_STEM = "anim_fdtd_pillar_hall"
 
 
 def _pillar_layout() -> list[tuple[float, float, float]]:
@@ -15344,14 +15347,14 @@ def _pillar_layout() -> list[tuple[float, float, float]]:
     radius spread and random vacancies, so the hall reads as an irregular
     colonnade rather than a perfect crystal, porous enough that the
     wavetrain threads through and fills the right half instead of
-    mirroring off a solid wall of columns. The 11-17 cm column diameters
+    mirroring off a solid wall of columns. The 10-17 cm column diameters
     sit around a quarter to half of the 42.9 cm carrier wavelength, where
     a rigid cylinder scatters strongly and casts a readable shadow. The
     tightest apertures of the seeded layout are 12.1 cm between column
     surfaces and 6.6 cm between a column and a wall, so
     dx = min(smallest aperture / 4, lambda / 8) allows up to 1.6 cm; the
-    5 mm grid is three times finer than that bound and rasterises the
-    cylinders at >= 22 cells per diameter.
+    2.5 mm grid is three times finer than that bound and rasterises the
+    cylinders at >= 44 cells per diameter.
     """
     rng = np.random.default_rng(20260728)
     pitch = 0.30
@@ -15406,14 +15409,14 @@ def _pillar_fields(n_frames: int = _PILLAR_FRAMES) -> tuple[Any, Any]:
     sim.add_plane_wave("right", center=0.30, width=0.08, wavelength=lam0)
     for _ in range(_PILLAR_WARM * _PILLAR_EVERY):
         sim.step()
-    frames: list[Any] = []
-    ts: list[float] = []
-    for _ in range(n_frames):
+    frames = np.empty((n_frames, _PILLAR_NY, _PILLAR_NX), dtype=np.float32)
+    ts = np.empty(n_frames)
+    for k in range(n_frames):
         for _ in range(_PILLAR_EVERY):
             sim.step()
-        frames.append(sim.p.astype(np.float32))
-        ts.append(sim.time)
-    return np.stack(frames), np.asarray(ts)
+        frames[k] = sim.p
+        ts[k] = sim.time
+    return frames, ts
 
 
 def _ensure_field_dark_cmap() -> str:
@@ -15450,10 +15453,9 @@ def animate_fdtd_pillar_hall(output_dir: str) -> None:
     n_active = frames.shape[0]
     dark = bool(_FILENAME_SUFFIX)
     cmap = _ensure_field_dark_cmap() if dark else "RdBu_r"
-    # Colour scale pinned to the settled steady state inside and beyond the
-    # colonnade (x > 1.0 m of the last frame), so the standing wave in
-    # front of the columns saturates boldly while the threaded and
-    # transmitted field keeps the full colour ramp.
+    # Colour scale: 55 % of the packet's global peak, so the travelling
+    # front saturates boldly while each column's shed reflection sits in
+    # the mid ramp and the decaying coda fades instead of clipping.
     vmax = 0.55 * float(np.max(np.abs(frames)))
     fig = plt.figure(figsize=_PILLAR_FIGSIZE, dpi=_ANIM_DPI)
     ax = fig.add_axes((0.0, 0.0, 1.0, 1.0))
@@ -15487,9 +15489,9 @@ def animate_fdtd_pillar_hall(output_dir: str) -> None:
     # README GIF decimates the 40 fps WebM 5x (gif_fps = 8) at the shared
     # 640 px width, landing at 6.2 MB (light) and 6.6 MB (dark), under
     # the ~8 MB GitHub autoplay budget.
-    _render_clip(fig, update, output_dir, "anim_fdtd_pillar_hall",
+    _render_clip(fig, update, output_dir, _PILLAR_STEM,
                  frames=n_active + _ANIM_HOLD, fps=_PILLAR_FPS, gif_fps=8,
-                 poster_ss=_poster_ss_for("anim_fdtd_pillar_hall.webm"))
+                 poster_ss=_poster_ss_for(_PILLAR_STEM + ".webm"))
 
 
 def animate_standing_wave_tube(output_dir: str) -> None:
