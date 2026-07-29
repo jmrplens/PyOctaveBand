@@ -566,7 +566,7 @@ rotorcraft_event_level(
     path_angle: float | NDArray[np.float64] | list[float] | None = None,
     heading: float | NDArray[np.float64] | list[float] | None = None,
     bank_angle: float | NDArray[np.float64] | list[float] | None = None,
-    flow_resistivity: float | str = 'G',
+    flow_resistivity: float | str | np.floating[Any] | np.integer[Any] = 'G',
     temperature: float = 25.0,
     relative_humidity: float = 70.0,
     pressure: float = 101.325,
