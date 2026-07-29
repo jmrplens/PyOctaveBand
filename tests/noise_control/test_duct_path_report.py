@@ -252,14 +252,16 @@ def test_a_long_path_still_renders_on_one_page(tmp_path, verbose: bool) -> None:
 
 def test_unknown_engine_rejected(tmp_path) -> None:
     res = _supply()
+    out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="engine"):
-        res.report(str(tmp_path / "x.pdf"), engine="weasyprint")
+        res.report(out, engine="weasyprint")
 
 
 def test_unknown_language_rejected(tmp_path) -> None:
     res = _supply()
+    out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="language"):
-        res.report(str(tmp_path / "x.pdf"), language="xx")
+        res.report(out, language="xx")
 
 
 def test_plot_returns_axes() -> None:

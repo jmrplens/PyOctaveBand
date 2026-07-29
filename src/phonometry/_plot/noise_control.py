@@ -29,6 +29,7 @@ if TYPE_CHECKING:
     from ..noise_control.silencers import ReactiveSilencerResult
 
 _FREQ_LABEL = "Frequency [Hz]"
+_LEVEL_LABEL = "Level [dB]"
 
 #: Spanish translations of the fixed labels/titles/legends rendered by the
 #: noise-control ``.plot()`` renderers, keyed by their verbatim English
@@ -48,7 +49,7 @@ _STRINGS: dict[str, str] = {
     "Panel R": "R del panel",
     "Interior correction C": "Corrección interior C",
     "Insertion loss (R - C)": "Pérdida por inserción (R - C)",
-    "Level [dB]": "Nivel [dB]",
+    _LEVEL_LABEL: "Nivel [dB]",
     "Machine enclosure insertion loss": "Pérdida por inserción de encapsulado de máquina",
     "Sound power level [dB]": "Nivel de potencia acústica [dB]",
     "Received level": "Nivel recibido",
@@ -216,7 +217,7 @@ def plot_duct_path(
     kwargs.setdefault("ms", 4)
     ax.semilogx(f, np.asarray(result.received_level), **kwargs)
     ax.set_xlabel(_t(_FREQ_LABEL, language))
-    ax.set_ylabel(_t("Level [dB]", language))
+    ax.set_ylabel(_t(_LEVEL_LABEL, language))
     ax.set_title(f"{_t('Duct-borne noise path', language)}: {result.label}")
     ax.grid(True, which="both", alpha=0.3)
     format_frequency_axis(ax)
@@ -304,7 +305,7 @@ def plot_enclosure(
     kwargs.setdefault("marker", "o")
     kwargs.setdefault("ms", 3)
     ax.plot(x, np.asarray(result.insertion_loss), **kwargs)
-    ax.set_ylabel(_t("Level [dB]", language))
+    ax.set_ylabel(_t(_LEVEL_LABEL, language))
     ax.set_title(_t("Machine enclosure insertion loss", language))
     ax.grid(True, which="both", alpha=0.3)
     if continuous:

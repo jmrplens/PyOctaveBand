@@ -288,10 +288,13 @@ def test_element_spectrum_must_be_finite() -> None:
         )
 
 
-def test_combine_requires_paths_and_matching_bands() -> None:
-    supply = _build(SUPPLY_ELEMENTS, SUPPLY_ROOM_EFFECT, "Supply")
+def test_combine_requires_at_least_one_path() -> None:
     with pytest.raises(ValueError, match="at least one"):
         combine_duct_paths([])
+
+
+def test_combine_requires_matching_bands() -> None:
+    supply = _build(SUPPLY_ELEMENTS, SUPPLY_ROOM_EFFECT, "Supply")
     other = duct_path([63.0, 125.0], [90.0, 86.0], [DuctElement("Duct", 3.0)])
     with pytest.raises(ValueError, match="same analysis bands"):
         combine_duct_paths([supply, other])

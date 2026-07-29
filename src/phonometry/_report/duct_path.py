@@ -106,28 +106,32 @@ def _visible_rows(
       ``verbose`` is set, leaving one attenuation row per element in the
       compact sheet.
     """
-    keep: list[dict[str, Any]] = []
-    for position, row in enumerate(rows):
-        kind = row["kind"]
-        if kind == "self_noise":
-            if _regenerates(row):
-                keep.append(row)
-            continue
-        if kind in ("sum", "level"):
-            if not verbose:
-                continue
-            following = rows[position + 1] if position + 1 < len(rows) else None
-            if (
-                kind == "sum"
-                and following is not None
-                and following["kind"] == "self_noise"
-                and not _regenerates(following)
-            ):
-                continue
-            keep.append(row)
-            continue
-        keep.append(row)
-    return keep
+    return [
+        row
+        for position, row in enumerate(rows)
+        if _prints(row, rows[position + 1 :], verbose)
+    ]
+
+
+def _prints(
+    row: dict[str, Any], rest: list[dict[str, Any]], verbose: bool
+) -> bool:
+    """Whether one sheet row survives the selection of :func:`_visible_rows`."""
+    kind = row["kind"]
+    if kind == "self_noise":
+        return _regenerates(row)
+    if kind not in ("sum", "level"):
+        return True
+    if not verbose:
+        return False
+    if kind == "level":
+        return True
+    following = rest[0] if rest else None
+    return not (
+        following is not None
+        and following["kind"] == "self_noise"
+        and not _regenerates(following)
+    )
 
 
 #: A4 minus the fiche margins of :func:`~phonometry._report._layout.build_document`
@@ -461,24 +465,37 @@ def render_duct_path_report(
         footer_flow(metadata, language, disclaimer=PREDICTION_DISCLAIMER)
     )
 
-    # A fiche is one page. Measure what the flow asks for and, if a long path
-    # overruns the frame, elide the middle element rows until it fits; the
-    # complete sheet always stays available through
-    # DuctPathResult.table().
+    _fit_to_one_page(flow, table_index, result, rows, verbose, language)
+    return build_document(
+        path, flow, t("Duct-borne noise path calculation", language)
+    )
+
+
+def _fit_to_one_page(
+    flow: list[Any],
+    table_index: int,
+    result: DuctPathResult,
+    rows: list[dict[str, Any]],
+    verbose: bool,
+    language: str,
+) -> None:
+    """Shrink the sheet's table in place until the flow fits one page.
+
+    A fiche is one page. This measures what the assembled flow asks for and, as
+    long as it overruns the frame, elides the middle element rows and rebuilds
+    the table; the complete sheet always stays available through
+    :meth:`~phonometry.noise_control.duct_path.DuctPathResult.table`.
+    """
     while len(rows) > 4:
         used = _flow_height(flow)
         if used <= _FRAME_HEIGHT:
-            break
+            return
         row_height = flow[table_index].wrap(_FRAME_WIDTH, _FRAME_HEIGHT)[1] / (
             len(rows) + 1
         )
         drop = max(int((used - _FRAME_HEIGHT) / max(row_height, 1.0)) + 1, 1)
         trimmed = _elide(rows, len(rows) - drop, language)
         if len(trimmed) >= len(rows):
-            break
+            return
         rows = trimmed
         flow[table_index], _count = _sheet_table(result, verbose, language, rows)
-
-    return build_document(
-        path, flow, t("Duct-borne noise path calculation", language)
-    )
