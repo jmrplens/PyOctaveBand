@@ -13,7 +13,6 @@ from .common import (
     _C_PRIMARY_LIGHT,
     _C_REFERENCE,
     _C_SECONDARY,
-    _C_SECONDARY_LIGHT,
     _C_TERTIARY,
     _LEGEND_UPPER_RIGHT,
     _STI_BAND_CENTERS,
@@ -281,7 +280,7 @@ def plot_age_threshold(
     su = np.asarray(result.spread_upper, dtype=np.float64)
     sl = np.asarray(result.spread_lower, dtype=np.float64)
 
-    _fractile_band(ax, freqs, median, sl, su, color=_C_PRIMARY_LIGHT, language=language)
+    _fractile_band(ax, freqs, median, sl, su, color=_C_PRIMARY, language=language)
     kwargs.setdefault("color", _C_PRIMARY)
     ax.plot(freqs, median, "o-", label=_t("Median", language), **kwargs)
     if abs(result.fractile - 0.5) > 1e-9:
@@ -321,7 +320,7 @@ def plot_nipts(
     dl = np.asarray(result.spread_lower, dtype=np.float64)
 
     _fractile_band(
-        ax, freqs, median, dl, du, color=_C_SECONDARY_LIGHT, floor=0.0,
+        ax, freqs, median, dl, du, color=_C_SECONDARY, floor=0.0,
         language=language,
     )
     kwargs.setdefault("color", _C_SECONDARY)

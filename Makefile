@@ -60,6 +60,9 @@ graphs:
 	find .github/images -maxdepth 1 -type f \( -name '*.svg' -o -name '*.png' -o -name '*.webp' \) -delete
 	$(FIGURE_ENV) $(PYTHON) scripts/generate_graphs.py
 	$(FIGURE_ENV) $(PYTHON) scripts/generate_diagrams.py
+	# Every shaded region has to be visible against the page it is drawn on,
+	# on both themes; the staleness check cannot see that.
+	$(PYTHON) scripts/check_figure_contrast.py
 
 # Regenerate the Tier-1 documentation animations (WebM for the site, GIF for
 # the GitHub docs). Kept out of `graphs`/CI because the ffmpeg encoding is slow

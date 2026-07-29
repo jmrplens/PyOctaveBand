@@ -34,7 +34,7 @@ L 477.46105 371.3122
 L 477.46105 112.323523 
 L 235.33895 112.323523 
 z
-" clip-path="url(#p472bcebf09)" style="fill: url(#h32e9a0c4a8); opacity: 0.5; stroke: #555555; stroke-width: 0.7; stroke-linejoin: miter"/>
+" clip-path="url(#p472bcebf09)" style="fill: url(#hd504df4412); opacity: 0.5625; stroke: #555555; stroke-width: 0.7; stroke-linejoin: miter"/>
    </g>
    <g id="patch_3">
     <path d="M 344.577632 120.205101 
@@ -42,7 +42,7 @@ L 368.222368 120.205101
 L 368.222368 112.323523 
 L 344.577632 112.323523 
 z
-" clip-path="url(#p472bcebf09)" style="fill: #aec7e8; opacity: 0.5; stroke: #555555; stroke-width: 0.9; stroke-linejoin: miter"/>
+" clip-path="url(#p472bcebf09)" style="fill: #aec7e8; opacity: 0.615234; stroke: #555555; stroke-width: 0.9; stroke-linejoin: miter"/>
    </g>
    <g id="patch_4">
     <path d="M 249.998687 356.652464 
@@ -50,7 +50,7 @@ L 462.801313 356.652464
 L 462.801313 120.205101 
 L 249.998687 120.205101 
 z
-" clip-path="url(#p472bcebf09)" style="fill: #aec7e8; opacity: 0.5; stroke: #555555; stroke-width: 0.9; stroke-linejoin: miter"/>
+" clip-path="url(#p472bcebf09)" style="fill: #aec7e8; opacity: 0.615234; stroke: #555555; stroke-width: 0.9; stroke-linejoin: miter"/>
    </g>
    <g id="text_1">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="356.4" y="16.318125" transform="rotate(-0 356.4 16.318125)">Helmholtz resonator cross-section</text>
@@ -167,7 +167,7 @@ L 455.79755 402.631673
   </clipPath>
  </defs>
  <defs>
-  <pattern id="h32e9a0c4a8" patternUnits="userSpaceOnUse" x="0" y="0" width="72" height="72">
+  <pattern id="hd504df4412" patternUnits="userSpaceOnUse" x="0" y="0" width="72" height="72">
    <rect x="0" y="0" width="73" height="73" fill="#9e9e9e"/>
    <path d="M -36 36 
 L 36 -36 
@@ -195,7 +195,7 @@ M 30 102
 L 102 30 
 M 36 108 
 L 108 36 
-" style="fill: #555555; stroke: #555555; stroke-width: 1.0; stroke-linecap: butt; stroke-linejoin: miter; stroke-opacity: 0.5"/>
+" style="fill: #555555; stroke: #555555; stroke-width: 1.0; stroke-linecap: butt; stroke-linejoin: miter; stroke-opacity: 0.5625"/>
   </pattern>
  </defs>
 </svg>

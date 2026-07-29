@@ -36,6 +36,14 @@ L 49.305469 28.318125
 z
 " style="fill: #ffffff"/>
    </g>
+   <g id="patch_3">
+    <path d="M 49.305469 220.381848 
+L 807.263125 220.381848 
+L 807.263125 93.707483 
+L 49.305469 93.707483 
+z
+" clip-path="url(#p03f602d931)" style="fill: #def0de; stroke: #def0de; stroke-linejoin: miter"/>
+   </g>
    <g id="matplotlib.axis_1">
     <g id="xtick_1">
      <g id="line2d_1">
@@ -235,14 +243,6 @@ L 807.263125 28.318125
     <g id="text_14">
      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="14.798438" y="200.216953" transform="rotate(-90 14.798438 200.216953)">Loudness [LUFS]</text>
     </g>
-   </g>
-   <g id="patch_3">
-    <path d="M 49.305469 220.381848 
-L 807.263125 220.381848 
-L 807.263125 93.707483 
-L 49.305469 93.707483 
-z
-" clip-path="url(#p03f602d931)" style="fill: #2ca02c; opacity: 0.12; stroke: #2ca02c; stroke-linejoin: miter"/>
    </g>
    <g id="line2d_25">
     <path d="M 54.35852 235.865738 
@@ -2804,7 +2804,7 @@ L 75.405469 321.351562
 L 75.405469 315.051562 
 L 57.405469 315.051562 
 z
-" style="fill: #2ca02c; opacity: 0.12; stroke: #2ca02c; stroke-linejoin: miter"/>
+" style="fill: #def0de; stroke: #def0de; stroke-linejoin: miter"/>
     </g>
     <g id="text_22">
      <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="82.605469" y="321.351562" transform="rotate(-0 82.605469 321.351562)">LRA = 17.7 LU (P10-P95)</text>

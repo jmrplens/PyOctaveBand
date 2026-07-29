@@ -36,14 +36,9 @@ L 42.600781 28.798125
 z
 "/>
    </g>
-   <g id="line2d_1">
-    <path d="M 301.990532 378.070125 
-L 301.990532 28.798125 
-" clip-path="url(#p8d175060d6)" style="fill: none; stroke-dasharray: 1.5,2.475; stroke-dashoffset: 0; stroke: #ffffff; stroke-opacity: 0.35; stroke-width: 1.5"/>
-   </g>
    <g id="FillBetweenPolyCollection_1">
     <defs>
-     <path id="ma59987e4ba" d="M 58.538187 -219.959569 
+     <path id="m2f12134267" d="M 58.538187 -219.959569 
 L 58.538187 -107.206349 
 L 92.292096 -73.142057 
 L 129.633496 -95.577646 
@@ -78,10 +73,58 @@ L 129.633496 -176.11566
 L 92.292096 -169.787674 
 L 58.538187 -219.959569 
 z
-" style="stroke: #1f77b4; stroke-opacity: 0.14"/>
+" style="stroke: #081e2e"/>
     </defs>
     <g clip-path="url(#p8d175060d6)">
-     <use xlink:href="#ma59987e4ba" x="0" y="414.271531" style="fill: #1f77b4; fill-opacity: 0.14; stroke: #1f77b4; stroke-opacity: 0.14"/>
+     <use xlink:href="#m2f12134267" x="0" y="414.271531" style="fill: #081e2e; stroke: #081e2e"/>
+    </g>
+   </g>
+   <g id="line2d_1">
+    <path d="M 301.990532 378.070125 
+L 301.990532 28.798125 
+" clip-path="url(#p8d175060d6)" style="fill: none; stroke-dasharray: 1.5,2.475; stroke-dashoffset: 0; stroke: #ffffff; stroke-opacity: 0.35; stroke-width: 1.5"/>
+   </g>
+   <g id="FillBetweenPolyCollection_2">
+    <defs>
+     <path id="mc2b20512b4" d="M 58.538187 -192.346536 
+L 58.538187 -134.819383 
+L 92.292096 -96.810371 
+L 129.633496 -115.301242 
+L 163.387405 -167.692042 
+L 197.141314 -167.692042 
+L 232.100532 -172.828394 
+L 268.236623 -196.455618 
+L 301.990532 -215.973759 
+L 336.94975 -231.382818 
+L 373.085841 -257.064583 
+L 406.83975 -270.4191 
+L 440.593659 -277.609994 
+L 477.93506 -286.85543 
+L 511.688969 -282.746347 
+L 545.442878 -259.119124 
+L 580.402095 -199.53743 
+L 580.402095 -232.410089 
+L 580.402095 -232.410089 
+L 545.442878 -285.828159 
+L 511.688969 -303.291759 
+L 477.93506 -307.400842 
+L 440.593659 -298.155406 
+L 406.83975 -290.964512 
+L 373.085841 -277.609994 
+L 336.94975 -251.92823 
+L 301.990532 -238.573712 
+L 268.236623 -221.110112 
+L 232.100532 -201.591971 
+L 197.141314 -200.5647 
+L 163.387405 -204.673783 
+L 129.633496 -156.392065 
+L 92.292096 -146.119359 
+L 58.538187 -192.346536 
+z
+" style="stroke: #134a71"/>
+    </defs>
+    <g clip-path="url(#p8d175060d6)">
+     <use xlink:href="#mc2b20512b4" x="0" y="414.271531" style="fill: #134a71; stroke: #134a71"/>
     </g>
    </g>
    <g id="matplotlib.axis_1">
@@ -496,49 +539,6 @@ L 600.600781 49.343537
      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="16.473438" y="203.434125" transform="rotate(-90 16.473438 203.434125)">Índice de reducción acústica aparente R' [dB]</text>
     </g>
    </g>
-   <g id="FillBetweenPolyCollection_2">
-    <defs>
-     <path id="md7699716dc" d="M 58.538187 -192.346536 
-L 58.538187 -134.819383 
-L 92.292096 -96.810371 
-L 129.633496 -115.301242 
-L 163.387405 -167.692042 
-L 197.141314 -167.692042 
-L 232.100532 -172.828394 
-L 268.236623 -196.455618 
-L 301.990532 -215.973759 
-L 336.94975 -231.382818 
-L 373.085841 -257.064583 
-L 406.83975 -270.4191 
-L 440.593659 -277.609994 
-L 477.93506 -286.85543 
-L 511.688969 -282.746347 
-L 545.442878 -259.119124 
-L 580.402095 -199.53743 
-L 580.402095 -232.410089 
-L 580.402095 -232.410089 
-L 545.442878 -285.828159 
-L 511.688969 -303.291759 
-L 477.93506 -307.400842 
-L 440.593659 -298.155406 
-L 406.83975 -290.964512 
-L 373.085841 -277.609994 
-L 336.94975 -251.92823 
-L 301.990532 -238.573712 
-L 268.236623 -221.110112 
-L 232.100532 -201.591971 
-L 197.141314 -200.5647 
-L 163.387405 -204.673783 
-L 129.633496 -156.392065 
-L 92.292096 -146.119359 
-L 58.538187 -192.346536 
-z
-" style="stroke: #1f77b4; stroke-opacity: 0.3"/>
-    </defs>
-    <g clip-path="url(#p8d175060d6)">
-     <use xlink:href="#md7699716dc" x="0" y="414.271531" style="fill: #1f77b4; fill-opacity: 0.3; stroke: #1f77b4; stroke-opacity: 0.3"/>
-    </g>
-   </g>
    <g id="patch_3">
     <path d="M 42.600781 378.070125 
 L 42.600781 28.798125 
@@ -649,7 +649,7 @@ L 422.111094 326.585906
 L 422.111094 320.285906 
 L 404.111094 320.285906 
 z
-" style="fill: #1f77b4; fill-opacity: 0.14; stroke: #1f77b4; stroke-opacity: 0.14; stroke-linejoin: miter"/>
+" style="fill: #081e2e; stroke: #081e2e; stroke-linejoin: miter"/>
     </g>
     <g id="text_28">
      <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="429.311094" y="326.585906" transform="rotate(-0 429.311094 326.585906)">Incertidumbre expandida ±U (95 %)</text>
@@ -660,7 +660,7 @@ L 422.111094 340.446609
 L 422.111094 334.146609 
 L 404.111094 334.146609 
 z
-" style="fill: #1f77b4; fill-opacity: 0.3; stroke: #1f77b4; stroke-opacity: 0.3; stroke-linejoin: miter"/>
+" style="fill: #134a71; stroke: #134a71; stroke-linejoin: miter"/>
     </g>
     <g id="text_29">
      <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="429.311094" y="340.446609" transform="rotate(-0 429.311094 340.446609)">Incertidumbre típica ±u</text>

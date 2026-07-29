@@ -46,7 +46,7 @@ L 98.423594 22.318125
 L 98.423594 429.715781 
 L 44.103906 429.715781 
 z
-" clip-path="url(#p9b974d2ed1)" style="fill: #aec7e8; opacity: 0.5"/>
+" clip-path="url(#p9b974d2ed1)" style="fill: #aec7e8; opacity: 0.615234"/>
    </g>
    <g id="patch_4">
     <path d="M 600.880703 22.318125 
@@ -54,7 +54,7 @@ L 655.200391 22.318125
 L 655.200391 429.715781 
 L 600.880703 429.715781 
 z
-" clip-path="url(#p9b974d2ed1)" style="fill: #aec7e8; opacity: 0.5"/>
+" clip-path="url(#p9b974d2ed1)" style="fill: #aec7e8; opacity: 0.615234"/>
    </g>
    <g id="matplotlib.axis_1">
     <g id="xtick_1">
@@ -422,7 +422,7 @@ L 574.529141 35.596875
 L 574.529141 29.996875 
 L 558.529141 29.996875 
 z
-" style="fill: #aec7e8; opacity: 0.5"/>
+" style="fill: #aec7e8; opacity: 0.615234"/>
     </g>
     <g id="text_21">
      <text style="font-size: 8px; font-family: sans-serif; text-anchor: start" x="580.929141" y="35.596875" transform="rotate(-0 580.929141 35.596875)">Sponge layer</text>

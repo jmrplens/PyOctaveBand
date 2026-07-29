@@ -4040,11 +4040,11 @@ L -15.008437 103.873125
 L -15.316065 103.873125 
 L -15.623694 103.873125 
 z
-" clip-path="url(#p0a539e38ea)" style="fill: #d62728; fill-opacity: 0.15; stroke: #d62728; stroke-opacity: 0.15"/>
+" clip-path="url(#p0a539e38ea)" style="fill: #1f0606; stroke: #1f0606"/>
    </g>
    <g id="FillBetweenPolyCollection_2">
     <defs>
-     <path id="m26c4640650" d="M 305.540514 -398.560781 
+     <path id="m31687f14fb" d="M 305.540514 -398.560781 
 L 305.540514 -80.580601 
 L 305.848143 -80.150153 
 L 306.155771 -79.719705 
@@ -4591,10 +4591,10 @@ L 306.155771 -398.560781
 L 305.848143 -398.560781 
 L 305.540514 -398.560781 
 z
-" style="stroke: #9467bd; stroke-opacity: 0.15"/>
+" style="stroke: #1b1322"/>
     </defs>
     <g clip-path="url(#p0a539e38ea)">
-     <use xlink:href="#m26c4640650" x="0" y="427.358906" style="fill: #9467bd; fill-opacity: 0.15; stroke: #9467bd; stroke-opacity: 0.15"/>
+     <use xlink:href="#m31687f14fb" x="0" y="427.358906" style="fill: #1b1322; stroke: #1b1322"/>
     </g>
    </g>
    <g id="matplotlib.axis_1">
@@ -5044,7 +5044,7 @@ L 67.425781 44.096719
 L 67.425781 37.796719 
 L 49.425781 37.796719 
 z
-" style="fill: #d62728; fill-opacity: 0.15; stroke: #d62728; stroke-opacity: 0.15; stroke-linejoin: miter"/>
+" style="fill: #1f0606; stroke: #1f0606; stroke-linejoin: miter"/>
     </g>
     <g id="text_18">
      <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="74.625781" y="44.096719" transform="rotate(-0 74.625781 44.096719)">Prohibido para clase 1 (atenuación insuficiente)</text>
@@ -5055,7 +5055,7 @@ L 67.425781 57.957422
 L 67.425781 51.657422 
 L 49.425781 51.657422 
 z
-" style="fill: #9467bd; fill-opacity: 0.15; stroke: #9467bd; stroke-opacity: 0.15; stroke-linejoin: miter"/>
+" style="fill: #1b1322; stroke: #1b1322; stroke-linejoin: miter"/>
     </g>
     <g id="text_19">
      <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="74.625781" y="57.957422" transform="rotate(-0 74.625781 57.957422)">Prohibido para clase 1 (atenuación excesiva)</text>

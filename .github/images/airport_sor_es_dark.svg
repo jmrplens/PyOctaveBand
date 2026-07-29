@@ -655,7 +655,7 @@ L 84.225595 48.079185
 L 83.401978 46.096956 
 L 82.650064 44.100655 
 z
-" clip-path="url(#pf088d67f1e)" style="fill: #1f77b4; opacity: 0.12; stroke: #1f77b4; stroke-linejoin: miter"/>
+" clip-path="url(#pf088d67f1e)" style="fill: #1f77b4; opacity: 0.253906; stroke: #1f77b4; stroke-linejoin: miter"/>
    </g>
    <g id="patch_3">
     <path d="M 542.138303 44.100655 
@@ -1020,7 +1020,7 @@ L 83.051715 48.099675
 L 82.617981 46.103798 
 L 82.172536 44.100655 
 z
-" clip-path="url(#pf088d67f1e)" style="fill: #d62728; opacity: 0.12; stroke: #d62728; stroke-linejoin: miter"/>
+" clip-path="url(#pf088d67f1e)" style="fill: #d62728; opacity: 0.146484; stroke: #d62728; stroke-linejoin: miter"/>
    </g>
    <g id="line2d_11">
     <path d="M 544.502406 44.100655 

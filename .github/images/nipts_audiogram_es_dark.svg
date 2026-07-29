@@ -38,7 +38,7 @@ z
    </g>
    <g id="FillBetweenPolyCollection_1">
     <defs>
-     <path id="m427fb80c13" d="M 71.145675 -381.306407 
+     <path id="mb234876ff8" d="M 71.145675 -381.306407 
 L 71.145675 -386.114229 
 L 239.738197 -368.328429 
 L 408.330719 -309.335208 
@@ -53,10 +53,10 @@ L 408.330719 -197.425884
 L 239.738197 -340.677394 
 L 71.145675 -381.306407 
 z
-" style="stroke: #ffbb78; stroke-opacity: 0.5"/>
+" style="stroke: #241202"/>
     </defs>
     <g clip-path="url(#p74c6cea50e)">
-     <use xlink:href="#m427fb80c13" x="0" y="424.738299" style="fill: #ffbb78; fill-opacity: 0.5; stroke: #ffbb78; stroke-opacity: 0.5"/>
+     <use xlink:href="#mb234876ff8" x="0" y="424.738299" style="fill: #241202; stroke: #241202"/>
     </g>
    </g>
    <g id="matplotlib.axis_1">
@@ -496,7 +496,7 @@ L 578.586464 36.386498
 L 578.586464 30.555498 
 L 561.926464 30.555498 
 z
-" style="fill: #ffbb78; fill-opacity: 0.5; stroke: #ffbb78; stroke-opacity: 0.5; stroke-linejoin: miter"/>
+" style="fill: #241202; stroke: #241202; stroke-linejoin: miter"/>
     </g>
     <g id="text_18">
      <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="585.250464" y="36.386498" transform="rotate(-0 585.250464 36.386498)">Banda de fractiles 10-90 %</text>

@@ -42,7 +42,7 @@ L 482.675781 360.958125
 L 482.675781 28.318125 
 L 203.675781 28.318125 
 z
-" clip-path="url(#pba3ef3035d)" style="fill: #2ca02c; opacity: 0.1; stroke: #2ca02c; stroke-linejoin: miter"/>
+" clip-path="url(#pba3ef3035d)" style="fill: #def0de; stroke: #def0de; stroke-linejoin: miter"/>
    </g>
    <g id="patch_4">
     <path d="M 482.675781 360.958125 
@@ -50,7 +50,7 @@ L 575.675781 360.958125
 L 575.675781 28.318125 
 L 482.675781 28.318125 
 z
-" clip-path="url(#pba3ef3035d)" style="fill: #e8a838; opacity: 0.15; stroke: #e8a838; stroke-linejoin: miter"/>
+" clip-path="url(#pba3ef3035d)" style="fill: #f9eace; stroke: #f9eace; stroke-linejoin: miter"/>
    </g>
    <g id="patch_5">
     <path d="M 575.675781 360.958125 
@@ -58,7 +58,7 @@ L 598.925781 360.958125
 L 598.925781 28.318125 
 L 575.675781 28.318125 
 z
-" clip-path="url(#pba3ef3035d)" style="fill: #1f77b4; opacity: 0.12; stroke: #1f77b4; stroke-linejoin: miter"/>
+" clip-path="url(#pba3ef3035d)" style="fill: #c8deed; stroke: #c8deed; stroke-linejoin: miter"/>
    </g>
    <g id="patch_6">
     <path d="M 40.925781 360.958125 
@@ -66,7 +66,7 @@ L 203.675781 360.958125
 L 203.675781 28.318125 
 L 40.925781 28.318125 
 z
-" clip-path="url(#pba3ef3035d)" style="fill: #1f77b4; opacity: 0.12; stroke: #1f77b4; stroke-linejoin: miter"/>
+" clip-path="url(#pba3ef3035d)" style="fill: #c8deed; stroke: #c8deed; stroke-linejoin: miter"/>
    </g>
    <g id="matplotlib.axis_1">
     <g id="xtick_1">

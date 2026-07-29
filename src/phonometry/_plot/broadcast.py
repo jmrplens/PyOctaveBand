@@ -16,6 +16,7 @@ from .common import (
     _LEGEND_UPPER_RIGHT,
     _new_axes,
     format_frequency_axis,
+    theme_fill,
 )
 
 if TYPE_CHECKING:
@@ -74,13 +75,13 @@ def plot_program_loudness(
     ax = ax if ax is not None else _new_axes()
     if math.isfinite(result.lra_low) and math.isfinite(result.lra_high):
         lra = format_number(result.loudness_range, language, decimals=1)
-        # Pale opaque tint of _C_SECONDARY (the 15 % composite over white):
-        # the report pipeline renders through svglib, which drops alpha, so a
-        # translucent fill would come out saturated and hide the curves.
+        # Opaque wash derived from the page: the report pipeline renders
+        # through svglib, which drops alpha, so a translucent fill would come
+        # out saturated and hide the curves.
         ax.axhspan(
             result.lra_low,
             result.lra_high,
-            facecolor="#ffecdb",
+            facecolor=theme_fill(_C_SECONDARY, ax),
             edgecolor="none",
             zorder=0,
             label=f"LRA {lra} LU",

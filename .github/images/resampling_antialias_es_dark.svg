@@ -36,6 +36,14 @@ L 50.896094 28.798125
 z
 "/>
    </g>
+   <g id="patch_3">
+    <path d="M 440.870688 386.913437 
+L 700.85375 386.913437 
+L 700.85375 28.798125 
+L 440.870688 28.798125 
+z
+" clip-path="url(#pa224cba612)" style="fill: #1f0606; stroke: #1f0606; stroke-linejoin: miter"/>
+   </g>
    <g id="matplotlib.axis_1">
     <g id="xtick_1">
      <g id="line2d_1">
@@ -390,14 +398,6 @@ L 700.85375 48.69342
     <g id="text_16">
      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="14.798438" y="207.855781" transform="rotate(-90 14.798438 207.855781)">Magnitud [dB]</text>
     </g>
-   </g>
-   <g id="patch_3">
-    <path d="M 440.870688 386.913437 
-L 700.85375 386.913437 
-L 700.85375 28.798125 
-L 440.870688 28.798125 
-z
-" clip-path="url(#pa224cba612)" style="fill: #d62728; opacity: 0.08; stroke: #d62728; stroke-linejoin: miter"/>
    </g>
    <g id="line2d_49">
     <path d="M -1 48.69342 
@@ -3186,7 +3186,7 @@ L 76.996094 376.651328
 L 76.996094 370.351328 
 L 58.996094 370.351328 
 z
-" style="fill: #d62728; opacity: 0.08; stroke: #d62728; stroke-linejoin: miter"/>
+" style="fill: #1f0606; stroke: #1f0606; stroke-linejoin: miter"/>
     </g>
     <g id="text_22">
      <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="84.196094" y="376.651328" transform="rotate(-0 84.196094 376.651328)">Banda rechazada (se plegaría como alias)</text>

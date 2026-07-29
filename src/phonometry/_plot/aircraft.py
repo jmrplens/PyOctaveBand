@@ -16,6 +16,7 @@ from .common import (
     _LEGEND_UPPER_RIGHT,
     _new_axes,
     format_frequency_axis,
+    theme_fill,
 )
 
 if TYPE_CHECKING:
@@ -464,7 +465,7 @@ def plot_terrain_screening(
     ax.plot(d, z, **{"color": _C_MUTED, "lw": 1.8, "label": _t("Terrain profile", language),
             **kwargs})
     floor = min(z.min(), src[1], rcv[1]) - 0.05 * max(np.ptp(z), 1.0) - 0.5
-    ax.fill_between(d, z, floor, color=_C_MUTED, alpha=0.12)
+    ax.fill_between(d, z, floor, color=theme_fill(_C_MUTED, ax), zorder=0)
     ax.plot([src[0], rcv[0]], [src[1], rcv[1]], color=_C_REFERENCE, lw=1.2,
             ls=":", label=_t("Line of sight", language))
     if result.screened and result.diffraction_points.size:

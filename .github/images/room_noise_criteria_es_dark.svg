@@ -797,6 +797,48 @@ L 485.925781 26.798125
 z
 "/>
    </g>
+   <g id="FillBetweenPolyCollection_1">
+    <defs>
+     <path id="m949e4a15e8" d="M 504.118402 -355.550501 
+L 504.118402 -324.258288 
+L 543.778698 -324.258288 
+L 584.361028 -292.966074 
+L 624.476838 -261.67386 
+L 665.059168 -230.381646 
+L 705.641498 -199.089433 
+L 705.641498 -230.381646 
+L 705.641498 -230.381646 
+L 665.059168 -261.67386 
+L 624.476838 -292.966074 
+L 584.361028 -324.258288 
+L 543.778698 -355.550501 
+L 504.118402 -355.550501 
+z
+" style="stroke: #241202"/>
+    </defs>
+    <g clip-path="url(#pc587de4ce9)">
+     <use xlink:href="#m949e4a15e8" x="0" y="396.743045" style="fill: #241202; stroke: #241202"/>
+    </g>
+   </g>
+   <g id="FillBetweenPolyCollection_2">
+    <defs>
+     <path id="m745f09e4e9" d="M 746.223827 -186.572547 
+L 746.223827 -167.797219 
+L 786.806157 -136.505005 
+L 827.388487 -105.212791 
+L 867.970817 -73.920578 
+L 867.970817 -92.695906 
+L 867.970817 -92.695906 
+L 827.388487 -123.98812 
+L 786.806157 -155.280333 
+L 746.223827 -186.572547 
+z
+" style="stroke: #081e2e"/>
+    </defs>
+    <g clip-path="url(#pc587de4ce9)">
+     <use xlink:href="#m745f09e4e9" x="0" y="396.743045" style="fill: #081e2e; stroke: #081e2e"/>
+    </g>
+   </g>
    <g id="matplotlib.axis_3">
     <g id="xtick_31">
      <g id="line2d_75">
@@ -1172,48 +1214,6 @@ L 886.163437 72.484757
      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="459.798437" y="185.136727" transform="rotate(-90 459.798437 185.136727)">Nivel de presión acústica por banda de octava [dB]</text>
     </g>
    </g>
-   <g id="FillBetweenPolyCollection_1">
-    <defs>
-     <path id="maeacd1e3f6" d="M 504.118402 -355.550501 
-L 504.118402 -324.258288 
-L 543.778698 -324.258288 
-L 584.361028 -292.966074 
-L 624.476838 -261.67386 
-L 665.059168 -230.381646 
-L 705.641498 -199.089433 
-L 705.641498 -230.381646 
-L 705.641498 -230.381646 
-L 665.059168 -261.67386 
-L 624.476838 -292.966074 
-L 584.361028 -324.258288 
-L 543.778698 -355.550501 
-L 504.118402 -355.550501 
-z
-" style="stroke: #ff7f0e; stroke-opacity: 0.25"/>
-    </defs>
-    <g clip-path="url(#pc587de4ce9)">
-     <use xlink:href="#maeacd1e3f6" x="0" y="396.743045" style="fill: #ff7f0e; fill-opacity: 0.25; stroke: #ff7f0e; stroke-opacity: 0.25"/>
-    </g>
-   </g>
-   <g id="FillBetweenPolyCollection_2">
-    <defs>
-     <path id="m2e8b994319" d="M 746.223827 -186.572547 
-L 746.223827 -167.797219 
-L 786.806157 -136.505005 
-L 827.388487 -105.212791 
-L 867.970817 -73.920578 
-L 867.970817 -92.695906 
-L 867.970817 -92.695906 
-L 827.388487 -123.98812 
-L 786.806157 -155.280333 
-L 746.223827 -186.572547 
-z
-" style="stroke: #1f77b4; stroke-opacity: 0.2"/>
-    </defs>
-    <g clip-path="url(#pc587de4ce9)">
-     <use xlink:href="#m2e8b994319" x="0" y="396.743045" style="fill: #1f77b4; fill-opacity: 0.2; stroke: #1f77b4; stroke-opacity: 0.2"/>
-    </g>
-   </g>
    <g id="line2d_125">
     <path d="M 504.118402 72.484757 
 L 543.778698 72.484757 
@@ -1327,7 +1327,7 @@ L 764.880625 58.397344
 L 764.880625 51.397344 
 L 744.880625 51.397344 
 z
-" style="fill: #ff7f0e; fill-opacity: 0.25; stroke: #ff7f0e; stroke-opacity: 0.25; stroke-linejoin: miter"/>
+" style="fill: #241202; stroke: #241202; stroke-linejoin: miter"/>
     </g>
     <g id="text_56">
      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="772.880625" y="58.397344" transform="rotate(-0 772.880625 58.397344)">Tol. retumbo (+5 dB)</text>
@@ -1338,7 +1338,7 @@ L 764.880625 73.398125
 L 764.880625 66.398125 
 L 744.880625 66.398125 
 z
-" style="fill: #1f77b4; fill-opacity: 0.2; stroke: #1f77b4; stroke-opacity: 0.2; stroke-linejoin: miter"/>
+" style="fill: #081e2e; stroke: #081e2e; stroke-linejoin: miter"/>
     </g>
     <g id="text_57">
      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="772.880625" y="73.398125" transform="rotate(-0 772.880625 73.398125)">Tol. siseo (+3 dB)</text>

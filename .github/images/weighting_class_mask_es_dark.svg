@@ -38,7 +38,7 @@ z
    </g>
    <g id="FillBetweenPolyCollection_1">
     <defs>
-     <path id="m221a551a8e" d="M 38.571094 -295.601562 
+     <path id="m5f6523e0be" d="M 38.571094 -295.601562 
 L 38.571094 -38.201563 
 L 47.217821 -38.201563 
 L 47.217821 -38.201563 
@@ -177,10 +177,10 @@ L 47.217821 -282.731562
 L 47.217821 -295.601562 
 L 38.571094 -295.601562 
 z
-" style="stroke: #1f77b4; stroke-opacity: 0.1"/>
+" style="stroke: #081e2e"/>
     </defs>
     <g clip-path="url(#p6a365d0685)">
-     <use xlink:href="#m221a551a8e" x="0" y="427.359687" style="fill: #1f77b4; fill-opacity: 0.1; stroke: #1f77b4; stroke-opacity: 0.1"/>
+     <use xlink:href="#m5f6523e0be" x="0" y="427.359687" style="fill: #081e2e; stroke: #081e2e"/>
     </g>
    </g>
    <g id="matplotlib.axis_1">
@@ -1248,7 +1248,7 @@ L 159.134844 355.395
 L 159.134844 349.795 
 L 143.134844 349.795 
 z
-" style="fill: #1f77b4; fill-opacity: 0.1; stroke: #1f77b4; stroke-opacity: 0.1; stroke-linejoin: miter"/>
+" style="fill: #081e2e; stroke: #081e2e; stroke-linejoin: miter"/>
     </g>
     <g id="text_22">
      <text style="font-size: 8px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="165.534844" y="355.395" transform="rotate(-0 165.534844 355.395)">Región de aceptación de clase 1</text>

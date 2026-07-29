@@ -8032,6 +8032,14 @@ L 58.846094 264.316953
 z
 " style="fill: #ffffff"/>
    </g>
+   <g id="patch_8">
+    <path d="M 145.442835 458.433437 
+L 580.667939 458.433437 
+L 580.667939 264.316953 
+L 145.442835 264.316953 
+z
+" clip-path="url(#pdf20c17d6c)" style="fill: #c8deed; stroke: #c8deed; stroke-linejoin: miter"/>
+   </g>
    <g id="matplotlib.axis_3">
     <g id="xtick_10">
      <g id="line2d_38">
@@ -8554,14 +8562,6 @@ L 711.68375 287.154187
      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="24.339063" y="361.375195" transform="rotate(-90 24.339063 361.375195)">Level re in-band max [dB]</text>
     </g>
    </g>
-   <g id="patch_8">
-    <path d="M 145.442835 458.433437 
-L 580.667939 458.433437 
-L 580.667939 264.316953 
-L 145.442835 264.316953 
-z
-" clip-path="url(#pdf20c17d6c)" style="fill: #1f77b4; opacity: 0.08; stroke: #1f77b4; stroke-linejoin: miter"/>
-   </g>
    <g id="line2d_114">
     <path d="M -1 447.211147 
 L 8.327621 459.888541 
@@ -8722,7 +8722,7 @@ L 84.946094 448.171328
 L 84.946094 441.871328 
 L 66.946094 441.871328 
 z
-" style="fill: #1f77b4; opacity: 0.08; stroke: #1f77b4; stroke-linejoin: miter"/>
+" style="fill: #c8deed; stroke: #c8deed; stroke-linejoin: miter"/>
     </g>
     <g id="text_44">
      <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="92.146094" y="448.171328" transform="rotate(-0 92.146094 448.171328)">Sweep band (50 Hz - 5 kHz)</text>

@@ -42,7 +42,7 @@ L 736.73125 83.247659
 L 736.73125 69.239644 
 L 44.533594 69.239644 
 z
-" clip-path="url(#pd7e34ad2ea)" style="fill: #ffecdb"/>
+" clip-path="url(#pd7e34ad2ea)" style="fill: #241202"/>
    </g>
    <g id="matplotlib.axis_1">
     <g id="xtick_1">
@@ -3931,7 +3931,7 @@ L 595.195 172.373789
 L 595.195 166.073789 
 L 577.195 166.073789 
 z
-" style="fill: #ffecdb"/>
+" style="fill: #241202"/>
     </g>
     <g id="text_19">
      <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="602.395" y="172.373789" transform="rotate(-0 602.395 172.373789)">LRA 1,6 LU</text>

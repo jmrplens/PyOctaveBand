@@ -36,6 +36,14 @@ L 41.325781 28.318125
 z
 " style="fill: #ffffff"/>
    </g>
+   <g id="patch_3">
+    <path d="M 300.647541 386.515781 
+L 397.881189 386.515781 
+L 397.881189 28.318125 
+L 300.647541 28.318125 
+z
+" clip-path="url(#pc2a8a5bfcb)" style="fill: #c8deed; stroke: #c8deed; stroke-linejoin: miter"/>
+   </g>
    <g id="matplotlib.axis_1">
     <g id="xtick_1">
      <g id="line2d_1">
@@ -281,14 +289,6 @@ L 705.871333 29.375373
      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="15.198438" y="207.416953" transform="rotate(-90 15.198438 207.416953)">Nivel de presión acústica ponderado A [dB(A)]</text>
     </g>
    </g>
-   <g id="patch_3">
-    <path d="M 300.647541 386.515781 
-L 397.881189 386.515781 
-L 397.881189 28.318125 
-L 300.647541 28.318125 
-z
-" clip-path="url(#pc2a8a5bfcb)" style="fill: #1f77b4; opacity: 0.1; stroke: #1f77b4; stroke-linejoin: miter"/>
-   </g>
    <g id="line2d_31">
     <path d="M 71.532397 361.019018 
 L 86.353659 352.788221 
@@ -531,7 +531,7 @@ L 573.419458 70.260937
 L 573.419458 63.960937 
 L 555.419458 63.960937 
 z
-" style="fill: #1f77b4; opacity: 0.1; stroke: #1f77b4; stroke-linejoin: miter"/>
+" style="fill: #c8deed; stroke: #c8deed; stroke-linejoin: miter"/>
     </g>
     <g id="text_22">
      <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="580.619458" y="70.260937" transform="rotate(-0 580.619458 70.260937)">Ventana 10 dB por debajo</text>

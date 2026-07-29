@@ -2380,24 +2380,11 @@ L 705.32125 422.518516
 L 705.32125 236.367109 
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
-   <g id="patch_13">
-    <path d="M 387.419198 368.218417 
-Q 295.241564 352.292727 203.945299 336.519312 
-" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: round"/>
-    <path d="M 206.826183 338.640752 
-L 203.945299 336.519312 
-L 207.370981 335.487469 
-" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: round"/>
-   </g>
    <g id="text_24">
-    <text style="font-size: 8px; font-family: sans-serif" transform="translate(391.390663 373.994979)">block boundary:</text>
-    <text style="font-size: 8px; font-family: sans-serif" transform="translate(391.390663 383.597167)">filter transient restarts</text>
-   </g>
-   <g id="text_25">
     <text style="font-weight: 700; font-size: 11px; font-family: sans-serif; text-anchor: middle" x="378.902422" y="230.367109" transform="rotate(-0 378.902422 230.367109)">No state: each block restarts the filter transient</text>
    </g>
    <g id="legend_2">
-    <g id="patch_14">
+    <g id="patch_13">
      <path d="M 523.407344 270.568516 
 L 699.02125 270.568516 
 Q 700.82125 270.568516 700.82125 268.768516 
@@ -2416,7 +2403,7 @@ L 534.207344 248.155703
 L 543.207344 248.155703 
 " style="fill: none; stroke: #000000; stroke-opacity: 0.35; stroke-width: 2.2; stroke-linecap: square"/>
     </g>
-    <g id="text_26">
+    <g id="text_25">
      <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="550.407344" y="251.305703" transform="rotate(-0 550.407344 251.305703)">Continuous (whole signal)</text>
     </g>
     <g id="line2d_57">
@@ -2425,9 +2412,35 @@ L 534.207344 261.656406
 L 543.207344 261.656406 
 " style="fill: none; stroke: #d62728; stroke-width: 1.1; stroke-linecap: square"/>
     </g>
-    <g id="text_27">
+    <g id="text_26">
      <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="550.407344" y="264.806406" transform="rotate(-0 550.407344 264.806406)">Independent blocks (state reset)</text>
     </g>
+   </g>
+   <g id="patch_14">
+    <path d="M 385.116794 365.742912 
+Q 294.092228 351.044153 204.061025 336.505803 
+" style="fill: none; stroke: #000000; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 207.509538 338.987286 
+L 204.061025 336.505803 
+L 208.115319 335.235883 
+" style="fill: none; stroke: #000000; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="text_27">
+    <g id="patch_15">
+     <path d="M 391.390663 390.630321 
+L 498.792616 390.630321 
+Q 502.592616 390.630321 502.592616 386.830321 
+L 502.592616 364.025126 
+Q 502.592616 360.225126 498.792616 360.225126 
+L 391.390663 360.225126 
+Q 387.590663 360.225126 387.590663 364.025126 
+L 387.590663 386.830321 
+Q 387.590663 390.630321 391.390663 390.630321 
+z
+" style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
+    </g>
+    <text style="font-size: 9.5px; font-family: sans-serif" transform="translate(391.390663 372.194569)">block boundary:</text>
+    <text style="font-size: 9.5px; font-family: sans-serif" transform="translate(391.390663 383.597167)">filter transient restarts</text>
    </g>
   </g>
  </g>

@@ -19,6 +19,7 @@ from .common import (
     _new_axes,
     _plot_rating,
     format_frequency_axis,
+    theme_fill_alpha,
 )
 
 if TYPE_CHECKING:
@@ -259,7 +260,9 @@ def plot_diffusion_polar(
     from .._i18n import format_number
 
     ax.plot(angles, levels, **kwargs)
-    ax.fill(angles, levels, alpha=0.15, color=kwargs["color"])
+    # Translucent so the polar grid keeps reading through the lobe.
+    ax.fill(angles, levels, color=kwargs["color"],
+            alpha=theme_fill_alpha(kwargs["color"], ax))
     ax.set_title(
         f"{_t('Diffusion coefficient d = ', language)}"
         f"{format_number(float(result.coefficient), language, decimals=2)} "
@@ -834,7 +837,9 @@ def plot_diffuser_polar_response(
     levels = np.asarray(result.levels, dtype=np.float64)
     kwargs.setdefault("marker", "o")
     kwargs.setdefault("color", _C_PRIMARY)
-    ax.fill(angles, levels, alpha=0.15, color=kwargs["color"])
+    # Translucent so the polar grid keeps reading through the lobe.
+    ax.fill(angles, levels, color=kwargs["color"],
+            alpha=theme_fill_alpha(kwargs["color"], ax))
     ax.plot(angles, levels, ms=4, **kwargs)
     polar_ax: Any = ax
     polar_ax.set_theta_zero_location("N")

@@ -36,6 +36,29 @@ L 40.925781 26.53375
 z
 " style="fill: #ffffff"/>
    </g>
+   <g id="FillBetweenPolyCollection_1">
+    <defs>
+     <path id="mc06f6b926e" d="M 59.118402 -351.023427 
+L 59.118402 -355.322135 
+L 160.612466 -339.419724 
+L 262.106531 -286.673464 
+L 321.476752 -218.123057 
+L 363.600595 -204.20265 
+L 422.970817 -266.138968 
+L 422.970817 -125.981686 
+L 422.970817 -125.981686 
+L 363.600595 -73.359689 
+L 321.476752 -68.062135 
+L 262.106531 -186.614539 
+L 160.612466 -314.696736 
+L 59.118402 -351.023427 
+z
+" style="stroke: #f9dede"/>
+    </defs>
+    <g clip-path="url(#p622d6f8f70)">
+     <use xlink:href="#mc06f6b926e" x="0" y="396.87867" style="fill: #f9dede; stroke: #f9dede"/>
+    </g>
+   </g>
    <g id="matplotlib.axis_1">
     <g id="xtick_1">
      <g id="line2d_1">
@@ -331,29 +354,6 @@ L 441.163437 315.791556
      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="14.798438" y="184.872352" transform="rotate(-90 14.798438 184.872352)">NIPTS mediana [dB]</text>
     </g>
    </g>
-   <g id="FillBetweenPolyCollection_1">
-    <defs>
-     <path id="mea771e63e2" d="M 59.118402 -351.023427 
-L 59.118402 -355.322135 
-L 160.612466 -339.419724 
-L 262.106531 -286.673464 
-L 321.476752 -218.123057 
-L 363.600595 -204.20265 
-L 422.970817 -266.138968 
-L 422.970817 -125.981686 
-L 422.970817 -125.981686 
-L 363.600595 -73.359689 
-L 321.476752 -68.062135 
-L 262.106531 -186.614539 
-L 160.612466 -314.696736 
-L 59.118402 -351.023427 
-z
-" style="stroke: #d62728; stroke-opacity: 0.12"/>
-    </defs>
-    <g clip-path="url(#p622d6f8f70)">
-     <use xlink:href="#mea771e63e2" x="0" y="396.87867" style="fill: #d62728; fill-opacity: 0.12; stroke: #d62728; stroke-opacity: 0.12"/>
-    </g>
-   </g>
    <g id="line2d_39">
     <path d="M 59.118402 40.928168 
 L 160.612466 52.749227 
@@ -602,7 +602,7 @@ L 69.925781 331.808609
 L 69.925781 324.808609 
 L 49.925781 324.808609 
 z
-" style="fill: #d62728; fill-opacity: 0.12; stroke: #d62728; stroke-opacity: 0.12; stroke-linejoin: miter"/>
+" style="fill: #f9dede; stroke: #f9dede; stroke-linejoin: miter"/>
     </g>
     <g id="text_22">
      <text style="font-size: 10px; font-family: sans-serif; text-anchor: start" x="77.925781" y="331.808609" transform="rotate(-0 77.925781 331.808609)">Banda 10-90 % (40 años)</text>

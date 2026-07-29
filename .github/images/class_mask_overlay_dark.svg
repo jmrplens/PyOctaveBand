@@ -4040,11 +4040,11 @@ L -15.408437 103.393125
 L -15.716065 103.393125 
 L -16.023694 103.393125 
 z
-" clip-path="url(#pca5f8ac1af)" style="fill: #d62728; fill-opacity: 0.15; stroke: #d62728; stroke-opacity: 0.15"/>
+" clip-path="url(#pca5f8ac1af)" style="fill: #1f0606; stroke: #1f0606"/>
    </g>
    <g id="FillBetweenPolyCollection_2">
     <defs>
-     <path id="m3be88d018b" d="M 305.140514 -398.560781 
+     <path id="ma7b8fcce0e" d="M 305.140514 -398.560781 
 L 305.140514 -80.580601 
 L 305.448143 -80.150153 
 L 305.755771 -79.719705 
@@ -4591,10 +4591,10 @@ L 305.755771 -398.560781
 L 305.448143 -398.560781 
 L 305.140514 -398.560781 
 z
-" style="stroke: #9467bd; stroke-opacity: 0.15"/>
+" style="stroke: #1b1322"/>
     </defs>
     <g clip-path="url(#pca5f8ac1af)">
-     <use xlink:href="#m3be88d018b" x="0" y="426.878906" style="fill: #9467bd; fill-opacity: 0.15; stroke: #9467bd; stroke-opacity: 0.15"/>
+     <use xlink:href="#ma7b8fcce0e" x="0" y="426.878906" style="fill: #1b1322; stroke: #1b1322"/>
     </g>
    </g>
    <g id="matplotlib.axis_1">
@@ -5044,7 +5044,7 @@ L 67.025781 43.256719
 L 67.025781 36.956719 
 L 49.025781 36.956719 
 z
-" style="fill: #d62728; fill-opacity: 0.15; stroke: #d62728; stroke-opacity: 0.15; stroke-linejoin: miter"/>
+" style="fill: #1f0606; stroke: #1f0606; stroke-linejoin: miter"/>
     </g>
     <g id="text_18">
      <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="74.225781" y="43.256719" transform="rotate(-0 74.225781 43.256719)">Forbidden for class 1 (too little attenuation)</text>
@@ -5055,7 +5055,7 @@ L 67.025781 56.757422
 L 67.025781 50.457422 
 L 49.025781 50.457422 
 z
-" style="fill: #9467bd; fill-opacity: 0.15; stroke: #9467bd; stroke-opacity: 0.15; stroke-linejoin: miter"/>
+" style="fill: #1b1322; stroke: #1b1322; stroke-linejoin: miter"/>
     </g>
     <g id="text_19">
      <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="74.225781" y="56.757422" transform="rotate(-0 74.225781 56.757422)">Forbidden for class 1 (too much attenuation)</text>

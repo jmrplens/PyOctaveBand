@@ -149,6 +149,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   "From the near field to the far field" section in the FDTD guide, in
   English and Spanish.
 
+- `theme_fill` and `theme_fill_alpha` in `phonometry._plot.common`: a shaded
+  area region derived from the page it is drawn on, instead of a fixed
+  opacity. Compositing a hue at a fixed alpha cannot be legible on both
+  documentation themes at once (10 % of a mid hue is a pale tint over white
+  but lands within a couple of levels of the near-black page), so the page
+  colour is mixed towards the hue by the smallest amount that puts the result
+  a CIEDE2000 distance of 12 away from it: a pale tint over a light page, a
+  raised shade over a dark one, the same idea as the background-aware
+  wave-field colormap. `theme_fill` returns the wash opaque, so it also
+  survives the fiche PDF pipeline, which drops alpha; `theme_fill_alpha`
+  returns the equivalent opacity for the few regions that genuinely have to
+  blend (overlapping directivity lobes, nested uncertainty bands). Applied to
+  every acceptance corridor, period zone, tolerance band and schematic
+  material fill in the library renderers and in the documentation figures.
+  The library's CIEDE2000 implementation (CIE 142-2001) is verified against
+  the CIE reference data published with Sharma, Wu and Dalal (2005).
+
+- `scripts/check_figure_contrast.py`: a legibility gate over the committed
+  figures. It parses the SVGs, reconstructs every filled area region together
+  with the background behind it, composites the fill with its own opacity as
+  a renderer would, and fails when the perceptual distance between the two is
+  below a CIEDE2000 difference of 10. Runs in the `Documentation figures up
+  to date` CI job and as the last step of `make graphs`;
+  `--report` prints the measured distance and WCAG contrast ratio of every
+  region.
+
 - `SECURITY.md`: a security policy written for what this library actually is,
   a computation package with no service and no credentials. Supported versions
   (fixes ship forward on the latest 3.x, no backports; Python 3.13 and 3.14 on
@@ -193,6 +219,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   definition plus the conformance-check claim, in both languages. The full
   scope enumeration stays in the visible page text and in the
   `SoftwareApplication` description.
+
+- `spectrogram_example` is now computed in 1/12-octave bands stepped at 1/8
+  of the Fast window instead of 1/3-octave bands at half a window: four times
+  the resolution on each axis, so the sweep reads as a line rather than a
+  staircase of cells. The Fast (125 ms) integration is unchanged, so the
+  figure still shows what it always showed.
+
+- `block_processing_continuity`: the callout marking the filter restart lands
+  on top of the dense trace, so it now carries a solid panel and larger text
+  instead of relying on the gaps between the waveforms.
 
 ## [3.3.0] - 2026-07-27
 
