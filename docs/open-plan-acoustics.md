@@ -216,6 +216,103 @@ repository. Click the preview to open the PDF:
 
 *Open-plan office acoustics fiche (`OpenPlanResult.report`), $D_{2,S}$, $L_{p,A,S,4m}$, $r_D$, $r_P$ and the spatial-decay curve.*
 
+## Crowd self-noise in an occupied room
+
+ISO 3382-3 above **measures** an office. The complementary question at design
+time is a **prediction**: in a room whose only noise source is its own
+occupants, how loud does the background get, and does conversation still work?
+Long (*Architectural Acoustics* 2e, Chapter 17, Equations (17.50) to (17.54))
+sets the two competing levels at a listener:
+
+```text
+Lp(signal) = Lw + 10 log10( Q / (4 π r²) )                (Eq. (17.50))
+Lp(noise)  = Lw + 10 log10 N + 10 log10( 4 / (N A_tab) )  (Eq. (17.51))
+```
+
+with `Lw` the sound power level of one talker (about 70 dB in normal
+conversation), `Q` the talker's forward directivity (about 2), `r` the
+talker-to-listener distance and `A_tab` the equivalent absorption area **per
+occupied table**, so `N A_tab` is the room's total absorption.
+
+```python
+from phonometry import room
+
+# Long's hard restaurant: about 20 metric sabins, a talker at Lw = 70 dB,
+# a listener 1.2 m away across the table.
+print(round(room.speech_direct_level(1.2)))          # 60 dB direct field
+print(round(room.crowd_noise_level(1, 20.0)))        # 63 dB with one talker
+print(round(room.crowd_noise_level(20, 20.0)))       # 76 dB with 20 tables
+
+# An alpha 0.9 ceiling over the 13.7 x 13.7 m room adds 170 metric sabins.
+print(round(room.crowd_noise_level(20, 20.0 + 170.0)))   # 66 dB
+```
+
+Subtracting the two gives the **speech-to-noise ratio**, and this is the result
+worth remembering:
+
+```text
+L_SN = 10 log10( Q / (4 π r²) ) + 10 log10( A_tab / 4 )   (Eq. (17.52))
+```
+
+Neither `Lw` nor `N` survives. A busier room is not intrinsically worse, because
+each new table brings both a talker and its own share of absorption. What
+decides whether a restaurant works is the absorption **per table**, not the
+absorption of the room. Requiring `L_SN > -6` dB for adequate cross-table
+communication at a separation `rs`, and `L_SN < -9` dB so a neighbouring table
+`rt` away is not overheard, turns into a pair of design bounds:
+
+```text
+A_tab > 6.31 rs²      (Eq. (17.53))
+A_tab < 3.16 rt²      (Eq. (17.54)),  both for Q = 2
+```
+
+> **The first constant is printed as 6.33.** The closed form above, at the same
+> Q = 2 that yields Long's own second constant 3.16 exactly, gives 6.31, and his
+> prose ("6.3 or more square metres, 68 sq ft") converts to 6.317 m². The library
+> computes both bounds from the speech-to-noise ratio rather than hardcoding
+> either constant, so they stay mutually consistent; the misprint is recorded in
+> the [errata registry](ERRATA.md).
+
+```python
+from phonometry import room
+
+print(round(room.absorption_per_table(1.0, -6.0), 2))   # 6.31 m2 per table at 1 m
+print(round(room.absorption_per_table(2.5, -9.0), 1))   # 19.8 m2 at 2.5 m spacing
+
+crowd = room.crowd_noise([20.0, 95.0, 190.0], distance=1.2)
+crowd.plot()      # self-noise vs occupancy, against the -6 dB limit
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/restaurant_crowd_noise_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/restaurant_crowd_noise.svg" alt="Self-generated crowd noise level against the number of simultaneous talkers for three room absorption areas of 20, 95 and 190 metric sabins, with the 60 dB direct speech level at 1.2 m and the 66 dB communication limit drawn as horizontal references" width="85%"></picture>
+
+*The same 20 talkers in three rooms. The hard room (20 m² of absorption)
+crosses the communication limit before the fourth table is occupied; adding the
+absorptive ceiling of Long's example (190 m² in total) keeps all 20 tables below
+it. The curves are parallel because occupancy always costs `10 log10 N`: only
+the vertical offset, which is the absorption, is a design variable.*
+
+### `crowd_noise()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `absorption_areas` | float or 1D array | m² | > 0 | Total room absorption areas to compare |
+| `talkers` | 1D array, optional | — | ≥ 1, default 1..20 | Occupancy axis `N` |
+| `distance` | float | m | > 0, default 1.2 | Talker-to-listener distance `r` |
+| `sound_power_level` | float | dB re 1 pW | default 70 | Talker `Lw` |
+| `directivity` | float | — | > 0, default 2 | Talker `Q` |
+
+Returns a `CrowdNoiseResult` (`talkers`, `absorption_areas`, `levels`,
+`signal_level`, `communication_level`, `speech_to_noise()`) with `.plot()`. The
+pieces `speech_direct_level`, `crowd_noise_level`, `speech_to_noise_ratio` and
+`absorption_per_table` are callable directly.
+
+This is a *design* model and deliberately does not model the Lombard reflex: it
+cancels out of `L_SN` as long as everyone raises their voice equally, so the
+model explains why the level spirals upward in a hard room rather than
+predicting where it stops. It also assumes a diffuse reverberant field and a
+single absorption figure per table, so it says nothing about screens, local
+absorption or where in the room a given table sits.
+
 ## References
 
 - International Organization for Standardization. (2012). *Acoustics —
@@ -223,6 +320,9 @@ repository. Click the preview to open the PDF:
   (ISO 3382-3:2012).
   [iso.org catalogue](https://www.iso.org/standard/46520.html).
   The open-plan speech-privacy quantities this page implements.
+- Long, M. (2014). *Architectural acoustics* (2nd ed.). Academic Press.
+  [doi:10.1016/C2012-0-03257-5](https://doi.org/10.1016/C2012-0-03257-5).
+  Chapter 17 (the crowd self-noise model, Equations (17.50) to (17.54)).
 
 ## Standards
 

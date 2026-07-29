@@ -49,6 +49,7 @@ if TYPE_CHECKING:
 
 from .._internal.utils import _typesignal
 from .._internal.validation import require_1d_signal
+from .erb_scale import CAM_C, ERB_C1, ERB_C2, erb_bandwidth, frequency_from_cam
 
 # ---------------------------------------------------------------------------
 # Fixed transfer functions (clauses 7.2, 7.3, Table 1)
@@ -236,21 +237,24 @@ _T1_MIDDLE = np.array(
 # ---------------------------------------------------------------------------
 # ERB-number scale and roex auditory filter (clause 7.4)
 # ---------------------------------------------------------------------------
-_ERB_C1 = 24.673
-_ERB_C2 = 0.004368
-_CAM_C = 21.366  # Formula (6): i = 21.366 * log10(C2 * fc + 1)
+# Formulae (1) and (6) of clause 7.4 are the Glasberg and Moore (1990) ERB_N
+# scale; they are shared with the public utilities of
+# :mod:`phonometry.psychoacoustics.erb_scale`, which own the constants.
+_ERB_C1 = ERB_C1
+_ERB_C2 = ERB_C2
+_CAM_C = CAM_C  # Formula (6): i = 21.366 * log10(C2 * fc + 1)
 _ROEX_D = 0.35  # constant D of Formula (5)
 _I_MIN, _I_MAX, _I_STEP = 1.8, 38.9, 0.1  # ERB-number grid (clause 7.4)
 
 
 def _erb_bandwidth(fc: np.ndarray) -> np.ndarray:
     """Equivalent rectangular bandwidth ERB_n in Hz (Formula 1)."""
-    return _ERB_C1 * (_ERB_C2 * fc + 1.0)
+    return np.asarray(erb_bandwidth(fc), dtype=np.float64)
 
 
 def _fc_from_cam(i: np.ndarray) -> np.ndarray:
     """Centre frequency fc in Hz for ERB-number i (inverse of Formula 6)."""
-    return (np.power(10.0, i / _CAM_C) - 1.0) / _ERB_C2
+    return np.asarray(frequency_from_cam(i), dtype=np.float64)
 
 
 _I_GRID = np.round(

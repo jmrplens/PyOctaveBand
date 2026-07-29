@@ -9,6 +9,125 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Normal modes of a rectangular room (`room/room_modes.py`): `room_modes`
+  enumerates every eigenfrequency of a rigid-walled shoebox up to a limit,
+  sorted and classified as axial, tangential or oblique, and the pieces
+  `room_mode_frequency`, `room_mode_count` and `room_modal_density` expose the
+  closed forms directly (Long, *Architectural Acoustics* 2e, Equations (8.43),
+  (8.45) and (8.46), the Morse/Pierce lattice count with its wall-plane and
+  axis corrections). The result reuses `room.schroeder_frequency` rather than
+  reimplementing it, and its `.plot()` draws the mode ladder coloured by
+  family above the modal-density curve with the Schroeder frequency marked on
+  both panels. Anchored on Long's Table 8.1 for a 7 x 5 x 3 m room (24.6,
+  34.5, 42.4, 49.2, 57.4 and 60.1 Hz) and on the 34 modes per hertz he states
+  for the same room at 1 kHz; two new conformance checks, a new figure
+  `rectangular_room_modes`, and a section in the image-source guide in English
+  and Spanish.
+
+- Crowd self-noise of an occupied room (`room/crowd_noise.py`): `crowd_noise`
+  evaluates the reverberant level a room's own occupants generate against
+  occupancy for a set of absorption areas, with `speech_direct_level`,
+  `crowd_noise_level`, `speech_to_noise_ratio` and `absorption_per_table` as
+  the building blocks (Long Chapter 17, Equations (17.50) to (17.54)). The
+  speech-to-noise ratio drops both the talker power and the number of talkers,
+  so the design variable is the absorption *per table*; `.plot()` draws the
+  occupancy sweep against the direct speech level and the -6 dB communication
+  limit. Anchored on Long's printed restaurant case (60 dB direct field at
+  1.2 m, 63 dB with one talker, 76 dB with twenty, 66 dB after an alpha 0.9
+  ceiling adds 170 metric sabins) and on his 3.16 rt² privacy constant; two
+  new conformance checks, a new figure `restaurant_crowd_noise`, and a section
+  in the open-plan guide in English and Spanish. It is a prediction model and
+  stays separate from the ISO 3382-3 measurement of `room/open_plan.py`. The
+  6.33 constant Long prints for Equation (17.53) is registered in
+  `docs/ERRATA.md`: the same closed form that reproduces his own 3.16 gives
+  6.31.
+
+- Gain before feedback of a sound-reinforcement system
+  (`electroacoustics/sound_reinforcement.py`): `feedback_stability` returns
+  the open-loop gain, the feedback-loop gain, the open-microphone correction
+  and the resulting headroom against the oscillation threshold, with
+  `feedback_loop_gain` and `open_microphone_correction` callable directly
+  (Long Chapter 18, Equations (18.16) to (18.24), with the 10 dB stability
+  margin he adopts for an equalised system). `.plot()` draws the gain
+  structure against the oscillation and margin lines, and
+  `plot_sound_reinforcement_geometry` sketches the four points of the loop
+  with each path length annotated. Long publishes no fully numeric worked case
+  for this chain, so the tests and the three new conformance checks anchor on
+  the closed forms and on the special cases he states in words (the
+  omnidirectional `L(H-M) <= L(H-L) - 4` and the cardioid `L(H-L) - 2` at
+  Zs = -6 dB, and `10 lg Nm`). Note that Equation (18.24) is printed with the
+  sign of the microphone directivity flipped relative to Equations (18.20) to
+  (18.22); the implementation follows the latter, which is what reproduces
+  Long's own special cases, and the defect is registered in `docs/ERRATA.md`.
+  New figure `sound_reinforcement_geometry` and a section in the loudspeaker
+  guide in English and Spanish.
+
+- Public ERB_N and Cam utilities (`psychoacoustics/erb_scale.py`):
+  `erb_bandwidth`, `cam_from_frequency` and `frequency_from_cam` expose the
+  Glasberg and Moore (1990) auditory-filter bandwidth and its Cam frequency
+  scale (Moore, *An Introduction to the Psychology of Hearing* 6e, pp. 76-77),
+  with the constants `ERB_C1`, `ERB_C2` and `CAM_C`. The ISO 532-2 loudness
+  model now imports these functions instead of keeping its own private copies,
+  so the two cannot drift apart. Two new conformance checks, a new figure
+  `erb_bandwidth`, and a section in the advanced-loudness guide in English and
+  Spanish.
+
+- Spanish noise regulation RD 1367/2007 (`environmental/spanish_regulation.py`):
+  the corrected level `LKeq,T = LAeq,T + Kt + Kf + Ki` of Annex I A.2 c with
+  the three reference procedures of Annex IV A.3.3, each graded 0/3/6 dB and
+  their sum capped at 9 dB. `tonal_correction` works on the unweighted
+  one-third-octave spectrum, comparing each band against the arithmetic mean of
+  its two neighbours with the 8/12, 5/8 and 3/5 dB thresholds of the three band
+  ranges; `low_frequency_correction` and `impulsive_correction` grade
+  `LCeq - LAeq` and `LAIeq - LAeq`. These are the regulation's own variants,
+  not the ISO 1996 procedures the library already carries, and the module
+  documents where each differs. `NoisePhase`, `evaluation_period_level` and
+  `long_term_corrected_level` integrate phases into the day, evening and night
+  indices and into the annual `LK,x`, with the regulation's own rounding
+  (`round_reported_level`, add 0,5 dB and take the integer part). The Annex II
+  quality objectives (outdoor, indoor and vibration) and the Annex III
+  immission limits (new transport infrastructure, its `LAmax` variant,
+  activities and ports, and noise transmitted to acoustically adjacent
+  premises) are exposed as lookups, and `assess_activity` applies the three
+  criteria of Article 25 to produce an `ActivityAssessment` with `.plot()` and
+  a one-page `.report()` inspection fiche in Spanish. Each correction is
+  validated against the 0/3/6 dB grading of the Annex IV A.3.3 tables, and a
+  new activity requires the annual index, since Article 25.1 b i is mandatory
+  for it and a verdict that never evaluates a mandatory criterion would
+  assert more than the assessment has shown. Validated against
+  Ejemplos 3.1 to 3.3 of Aviles Lopez & Perera Martin, *Manual de acustica
+  ambiental y arquitectonica* (`LKeq,d` 57 dB, `LKeq,e` 51 dB, `LK,d` 56 dB,
+  `LK,e` 50 dB and the verdict that flips between a new activity and one
+  already in operation), plus the printed limit tables of the regulation
+  itself. New figure `rd1367_activity_assessment`, three conformance checks and
+  a Spanish-first guide, in Spanish and English.
+
+- Spanish building code CTE DB-HR (`building/spanish_building_code.py`): the
+  A-weighted global indices `RA`, `RA,tr`, `DnT,A`, `D2m,nT,A` and
+  `D2m,nT,Atr` computed by the direct Annex A formulae (A.5) to (A.7) over the
+  eighteen one-third-octave bands 100 Hz to 5 kHz, two more than the sixteen
+  of ISO 717-1, with the four normalised source spectra of Tables A.2 to A.5
+  (pink noise, road traffic, railway and aircraft). The facade quantity
+  follows clause 3.1.3.4 point 1: a railway-dominant site is assessed as
+  `D2m,nT,A` through Formula (A.5) and a road-traffic or aircraft one as
+  `D2m,nT,Atr` through (A.6), so `d2m_nt_a` and `d2m_nt_atr` are separate
+  entry points that each refuse the other's spectra rather than one function
+  that could put the wrong quantity name on a report. Results expose the
+  exact value, the one-decimal intermediate and the reported integer that
+  DB-HR 3.1.3.1 point 4 prescribes. The requirement side covers the facade
+  table 2.1 keyed on the day noise index `Ld` (with the sheltered-facade and
+  aircraft-noise rules), the airborne and shared-opening requirements of
+  2.1.1, the party-wall alternatives of 2.1.1 c), the impact limits of 2.1.2,
+  the reverberation and absorption limits of 2.2, and the window-size
+  correction of the Catalogo de Elementos Constructivos, checked through
+  `check_db_hr_requirement` / `assess_db_hr` with `.plot()`. Validated against
+  Ejemplo 7.2 (`R'A` 51,4 dBA), Ejercicio 7.1 (`D2m,nT,Atr` 32,8 dBA) and
+  Ejemplo 7.4 of the same Manual; the direct route is cross-checked against the
+  ISO 717-1 route of `weighted_rating_extended`, which reproduces the book's
+  `R'w` 52 dB with `C` -1 and `Ctr` -5 and agrees to the integer on both
+  published spectra. New figure `dbhr_global_index`, four conformance checks
+  and a guide in English and Spanish.
+
 - 2D near-to-far-field (NTFF) transformation for the FDTD solver.
   `FDTD2D.add_contour_probe` captures the steady-state pressure and outward
   normal-velocity phasors on a closed rectangular contour of cell faces with
@@ -29,6 +148,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   directivity and level), a new figure `metadiffuser_ntff_polar`, and a
   "From the near field to the far field" section in the FDTD guide, in
   English and Spanish.
+
+- `SECURITY.md`: a security policy written for what this library actually is,
+  a computation package with no service and no credentials. Supported versions
+  (fixes ship forward on the latest 3.x, no backports; Python 3.13 and 3.14 on
+  Ubuntu, macOS and Windows), private reporting through GitHub security
+  advisories with an acknowledgement and assessment window I can keep, a
+  coordinated-disclosure statement, and a scope section that names the real
+  attack surface (untrusted files reaching a reader, deserialisation, the
+  release supply chain, repository automation) while stating plainly that a
+  value disagreeing with a standard is a conformance defect for the issue form,
+  and a defect in the standard itself an entry in `docs/ERRATA.md`. Also
+  records the checks already running: CodeQL, bandit, GitGuardian, Dependabot,
+  the `snyk` target and the conformance staleness gate.
+
+- `.github/pull_request_template.md`: the repository's CI gates written out as a
+  compact checklist, so the recurring failures (a stale `docs/CONFORMANCE.md`,
+  an unregenerated API reference, a module missing from
+  `scripts/api_taxonomy.py`, a figure not produced by `generate_graphs.py`,
+  EN/ES drift) are visible before the build runs. It also asks, for any new
+  normative implementation, which numeric oracle validated it and confirmation
+  that the oracle is independent of the implementation.
 
 - `make lighthouse` (`site/scripts/lighthouse-audit.mjs`): Lighthouse over a
   fixed sample of built pages against a local preview server, with JSON
@@ -53,6 +193,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   facing the wall, now drawn x10 (+20 dB) in the instantaneous panels only,
   the RMS row keeping its single shared scale. The English and Spanish
   captions say that the scale is compressed.
+
+- Documentation site: a display formula that states several equations on one
+  line now reflows on narrow screens instead of scrolling sideways. A build-time
+  pass splits such a block at the author's own widest top-level separator
+  (`\quad` or `\qquad`), makes each equation a part of a wrapping row and
+  re-expresses the separator as the row's column gap, so a wide screen renders
+  the identical single centred row while a phone stacks one equation per line,
+  each centred. It reaches the 232 blocks on 120 pages (60 English, 60 Spanish)
+  that state more than one equation per block, needs no change to the markdown,
+  and leaves the TeX, the accessible label and the page anchors untouched.
 
 - The home page meta description now fits the ~160-character window search
   engines display (Bing flagged the old 318-character one): the one-sentence

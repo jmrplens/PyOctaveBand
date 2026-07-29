@@ -84,6 +84,7 @@ _SECTION_LIST: tuple[Section, ...] = (
             "phonometry.psychoacoustics.fluctuation_strength",
             "phonometry.psychoacoustics.fluctuation_strength_ecma",
             "phonometry.psychoacoustics.psychoacoustic_annoyance",
+            "phonometry.psychoacoustics.erb_scale",
         ),
     ),
     Section(
@@ -119,6 +120,8 @@ _SECTION_LIST: tuple[Section, ...] = (
             "phonometry.room.enclosed_space_absorption",
             "phonometry.room.image_source",
             "phonometry.room.steady_field",
+            "phonometry.room.room_modes",
+            "phonometry.room.crowd_noise",
         ),
     ),
     Section(
@@ -139,6 +142,7 @@ _SECTION_LIST: tuple[Section, ...] = (
             "phonometry.building.floor_covering_improvement",
             "phonometry.building.structure_borne_power",
             "phonometry.building.installed_structure_borne",
+            "phonometry.building.spanish_building_code",
         ),
     ),
     Section(
@@ -187,6 +191,7 @@ _SECTION_LIST: tuple[Section, ...] = (
             "phonometry.environmental.impulsive_sound",
             "phonometry.environmental.rating",
             "phonometry.environmental.measurement",
+            "phonometry.environmental.spanish_regulation",
         ),
     ),
     Section(
@@ -243,6 +248,7 @@ _SECTION_LIST: tuple[Section, ...] = (
             "phonometry.electroacoustics.piston",
             "phonometry.electroacoustics.loudspeaker",
             "phonometry.electroacoustics.microphone",
+            "phonometry.electroacoustics.sound_reinforcement",
         ),
     ),
     Section(
@@ -343,6 +349,11 @@ _SECTION_SUBPACKAGES: dict[str, tuple[str, ...]] = {
 OBJECT_MODULE_OVERRIDES: dict[str, str] = {
     # Defined in phonometry/__init__.py (reported as module "phonometry").
     "__version__": "phonometry",
+    # The ERB_N / Cam constants are owned by erb_scale and imported by the
+    # ISO 532-2 loudness model, so a plain scan sees them in both modules.
+    "ERB_C1": "phonometry.psychoacoustics.erb_scale",
+    "ERB_C2": "phonometry.psychoacoustics.erb_scale",
+    "CAM_C": "phonometry.psychoacoustics.erb_scale",
     # Defined in phonometry._internal.warnings, exported at the top level.
     "PhonometryWarning": "phonometry",
     # Defined in phonometry._plot.room; documented helper for the ISO 18233
@@ -365,6 +376,8 @@ OBJECT_MODULE_OVERRIDES: dict[str, str] = {
     "plot_microphone_positions": "phonometry.emission.sound_power",
     "plot_aperture_geometry": "phonometry.building.aperture_transmission",
     "plot_piston_geometry": "phonometry.electroacoustics.piston",
+    "plot_sound_reinforcement_geometry":
+        "phonometry.electroacoustics.sound_reinforcement",
     "plot_facade_elements": "phonometry.building.facade_prediction",
     "plot_double_wall_geometry": "phonometry.building.panel_transmission",
     "plot_junction_geometry": "phonometry.vibration.junction_transmission",

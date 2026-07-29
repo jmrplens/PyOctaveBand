@@ -1,7 +1,15 @@
 ---
 title: "Advanced Loudness (ISO 532-2/-3, ECMA-418-2)"
-description: "Moore-Glasberg stationary loudness from roex excitation patterns (ISO 532-2), the time-varying Moore-Glasberg-Schlittenlacher short- and long-term loudness (ISO 532-3) and the Sottek Hearing Model loudness of ECMA-418-2, with the model-choice table."
+description: "The Glasberg and Moore ERB_N auditory-filter bandwidth and its Cam frequency scale, the Moore-Glasberg stationary loudness from roex excitation patterns (ISO 532-2), the time-varying Moore-Glasberg-Schlittenlacher short- and long-term loudness (ISO 532-3) and the Sottek Hearing Model loudness of ECMA-418-2, with the model-choice table."
 references:
+  - type: book
+    authors: ["Moore, B. C. J."]
+    year: 2013
+    title: "An introduction to the psychology of hearing"
+    edition: "6th ed."
+    publisher: "Brill"
+    doi: "10.1163/9789004252424"
+    note: "The ERB_N auditory-filter bandwidth and the Cam (ERB_N number) scale of Glasberg and Moore (1990), pp. 76-77."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2017
@@ -94,6 +102,99 @@ plt.show()
 ```
 
 </details>
+
+## The ERB<sub>N</sub> scale and the Cam axis
+
+Every model on this page except Zwicker's is written on the **ERB<sub>N</sub>
+number** axis, so it is worth having the scale itself in hand. The cochlea
+behaves as a bank of overlapping band-pass **auditory filters**; the width of
+the one centred on a given frequency is summarised by its *equivalent
+rectangular bandwidth*, the bandwidth of the rectangular filter that would pass
+the same power with the same peak response. Fitting notched-noise data for
+young listeners at moderate levels, Glasberg and Moore (1990) make it a
+straight line in frequency (Moore, *An Introduction to the Psychology of
+Hearing* 6e, p. 76):
+
+$$
+\mathrm{ERB}_N = 24.7\,(4.37\,F + 1)\ \text{Hz},\qquad F \text{ in kHz}.
+$$
+
+Integrating $df/\mathrm{ERB}_N(f)$ turns that into a frequency scale whose unit
+is one auditory-filter width, the **ERB<sub>N</sub> number**, whose unit is
+called the **Cam** (after Cambridge):
+
+$$
+\mathrm{ERB}_N\ \text{number} = 21.4 \log_{10}(4.37\,F + 1)\ \text{Cam}.
+$$
+
+```python
+from phonometry import psychoacoustics
+
+cam = psychoacoustics.cam_from_frequency(1000.0)
+print(round(psychoacoustics.erb_bandwidth(1000.0), 1))       # 132.4 Hz
+print(round(cam, 2))                                         # 15.59 Cam
+print(round(psychoacoustics.frequency_from_cam(cam), 1))     # 1000.0 Hz
+```
+
+The library states the same fit with one more significant digit,
+$\mathrm{ERB}_N = 24.673\,(0.004368 f + 1)$ and
+$21.366 \log_{10}(0.004368 f + 1)$, the precision the ISO 532-2 implementation
+uses; the two forms agree to better than 0.2 % over the audible range, and the
+extra digits are what make `frequency_from_cam` an exact inverse. The functions
+are not a private helper of the loudness model: `loudness_moore_glasberg`
+imports these very functions, so the Cam grid of a
+`MooreGlasbergLoudness.erb_number` and a hand-built Cam axis cannot drift
+apart.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/erb_bandwidth.svg" alt="Auditory-filter bandwidth against centre frequency on log-log axes: the ERB_N line of Glasberg and Moore rising from about 30 Hz at 50 Hz to above 1 kHz at 16 kHz, the constant-percentage one-third-octave bandwidth crossing it near 500 Hz, the 1 kHz point annotated at 15.59 Cam, and a second top axis giving the Cam scale" width="85%" />
+
+*The ear's filter is not a constant fraction of frequency. Below about 500 Hz
+it is markedly narrower than a one-third octave, which is why the "old"
+critical-band function, flat at low frequency, fits the direct measurements so
+poorly there; above that it is wider. The top axis counts the same curve in
+Cams, so equal steps along it are equal numbers of auditory filters.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import psychoacoustics
+
+f = np.geomspace(50.0, 16000.0, 400)
+erb = psychoacoustics.erb_bandwidth(f)
+third_octave = f * (2 ** (1 / 6) - 2 ** (-1 / 6))     # 23 % of f, for scale
+
+fig, ax = plt.subplots()
+ax.loglog(f, erb, label="ERB$_N$ (Glasberg & Moore, 1990)")
+ax.loglog(f, third_octave, "--", label="One-third octave (23 % of f)")
+ax.set(xlabel="Centre frequency [Hz]",
+       ylabel="Equivalent rectangular bandwidth ERB$_N$ [Hz]")
+ax.legend()
+
+# The Cam axis on top: tick where whole ERB_N numbers fall.
+cam_ticks = np.arange(5.0, 40.0, 5.0)
+ax2 = ax.twiny()
+ax2.set_xscale("log")
+ax2.set_xlim(ax.get_xlim())
+ax2.set_xticks(psychoacoustics.frequency_from_cam(cam_ticks))
+ax2.set_xticklabels([f"{c:.0f}" for c in cam_ticks])
+ax2.set_xlabel("ERB$_N$ number [Cam]")
+plt.show()
+```
+
+</details>
+
+### `erb_bandwidth()`, `cam_from_frequency()`, `frequency_from_cam()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `frequency` | float or array | Hz | ≥ 0 | `erb_bandwidth`, `cam_from_frequency` |
+| `cam` | float or array | Cam | ≥ 0 | `frequency_from_cam` |
+
+Each returns a float for a scalar input and an array otherwise. The three
+constants are exported as `ERB_C1`, `ERB_C2` and `CAM_C`.
 
 ## Moore-Glasberg loudness (ISO 532-2)
 
@@ -313,7 +414,9 @@ Returns an `EcmaLoudness`: `loudness` (N, sone_HMS), `specific_loudness`
 
 ## What this guide covers
 
-**Covered.** ISO 532-2:2017 (Moore-Glasberg): the roex
+**Covered.** The Glasberg and Moore (1990) ERB<sub>N</sub> bandwidth and Cam
+scale of Moore 6e pp. 76-77, via `erb_bandwidth()`, `cam_from_frequency()`
+and `frequency_from_cam()`. ISO 532-2:2017 (Moore-Glasberg): the roex
 excitation pattern of clause 7 and the binaural inhibition of clause 8, via
 `loudness_moore_glasberg()` and its `_from_spectrum`/`_from_third_octave`
 variants. ISO 532-3:2023 (Moore-Glasberg-Schlittenlacher): the short-term

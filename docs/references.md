@@ -269,6 +269,15 @@ it; the list grows as guides gain their References sections.
 
 ## Room acoustics
 
+- Long, M. (2014). *Architectural acoustics* (2nd ed.). Academic Press.
+  [doi:10.1016/C2012-0-03257-5](https://doi.org/10.1016/C2012-0-03257-5).
+  The architectural-design companion to the measurement standards: the
+  rectangular-room eigenfrequencies and the Morse/Pierce mode count
+  (Chapter 8), the crowd self-noise of an occupied room (Chapter 17) and the
+  gain-before-feedback criterion of a reinforcement system (Chapter 18).
+  Cited by [Image sources and the steady-state room field](room-image-sources.md),
+  [Open-plan office acoustics](open-plan-acoustics.md) and
+  [Loudspeaker characterisation](loudspeakers.md).
 - Kuttruff, H. (2016). *Room acoustics* (6th ed.). CRC Press.
   [doi:10.1201/9781315372150](https://doi.org/10.1201/9781315372150).
   The reference monograph on sound fields in rooms: statistical decay
@@ -1076,6 +1085,13 @@ it; the list grows as guides gain their References sections.
 
 ## Psychoacoustics
 
+- Moore, B. C. J. (2013). *An introduction to the psychology of hearing*
+  (6th ed.). Brill.
+  [doi:10.1163/9789004252424](https://doi.org/10.1163/9789004252424).
+  The standard textbook on auditory perception; pages 76-77 give the
+  Glasberg and Moore (1990) ERB_N auditory-filter bandwidth and the Cam
+  (ERB_N number) frequency scale the loudness models are written on.
+  Cited by [Advanced loudness](advanced-loudness.md).
 - Fletcher, H., & Munson, W. A. (1933). Loudness, its definition, measurement
   and calculation. *The Journal of the Acoustical Society of America*, 5(2),
   82-108. [doi:10.1121/1.1915637](https://doi.org/10.1121/1.1915637).

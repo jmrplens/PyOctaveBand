@@ -7,3 +7,25 @@
   overflow-y: hidden;
   padding-block: 0.25rem;
 }
+
+/* A display block stating several equations on one line is rebuilt at build
+   time (rehypeWrappableMath in src/lib/wrappable-math.mjs) as one part per
+   equation, with the author's \quad or \qquad carried in --katex-eq-gap.
+   Laying the parts out as a wrapping flex row makes the separation a gap, which
+   the browser draws only between parts that share a line: a wide screen keeps
+   the single centred row the formula was written as, and a narrow one stacks
+   one equation per line without a stray gap dangling at the line ends. Each
+   flex line is centred on its own, so no equation starts off-screen.
+
+   `safe center` keeps a part that is wider than the box reachable from the
+   left edge of the scroll container instead of overflowing both ways; the
+   plain `center` before it is what browsers without safe alignment apply. */
+.katex-display > .katex > .katex-html.katex-eq-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  justify-content: safe center;
+  column-gap: var(--katex-eq-gap, 2em);
+  row-gap: 0.7em;
+}

@@ -46,6 +46,7 @@ export const apiSidebar = {
         'reference/api/psychoacoustics/fluctuation-strength',
         'reference/api/psychoacoustics/fluctuation-strength-ecma',
         'reference/api/psychoacoustics/psychoacoustic-annoyance',
+        'reference/api/psychoacoustics/erb-scale',
       ],
     },
     {
@@ -81,6 +82,8 @@ export const apiSidebar = {
         'reference/api/rooms/enclosed-space-absorption',
         'reference/api/rooms/image-source',
         'reference/api/rooms/steady-field',
+        'reference/api/rooms/room-modes',
+        'reference/api/rooms/crowd-noise',
       ],
     },
     {
@@ -101,6 +104,7 @@ export const apiSidebar = {
         'reference/api/building/floor-covering-improvement',
         'reference/api/building/structure-borne-power',
         'reference/api/building/installed-structure-borne',
+        'reference/api/building/spanish-building-code',
       ],
     },
     {
@@ -149,6 +153,7 @@ export const apiSidebar = {
         'reference/api/environment/impulsive-sound',
         'reference/api/environment/rating',
         'reference/api/environment/measurement',
+        'reference/api/environment/spanish-regulation',
       ],
     },
     {
@@ -205,6 +210,7 @@ export const apiSidebar = {
         'reference/api/electroacoustics/piston',
         'reference/api/electroacoustics/loudspeaker',
         'reference/api/electroacoustics/microphone',
+        'reference/api/electroacoustics/sound-reinforcement',
       ],
     },
     {

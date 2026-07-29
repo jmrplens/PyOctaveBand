@@ -43,7 +43,11 @@ reference-curve engine every one of those methods ends on, with its spectrum
 adaptation terms C, Ctr and CI. And
 [Façade Sound Insulation](/phonometry/guides/facade-insulation/) keeps the
 building envelope in one place: measured per ISO 16283-3, predicted per
-EN 12354-3, and radiating outwards per EN 12354-4.
+EN 12354-3, and radiating outwards per EN 12354-4. National building codes
+restate those ratings in their own global quantities, and
+[Spanish Building Code (CTE DB-HR)](/phonometry/guides/spanish-building-code/)
+implements the Spanish one: the direct Annex A index over eighteen bands, the
+clause 2 requirement tables and the window-size correction.
 
 Two neighbouring sections complete the picture: the room-side quantities
 (reverberation time, absorption) live in
@@ -73,3 +77,6 @@ related EN 12354-5, lives in
 - [Façade Sound Insulation](/phonometry/guides/facade-insulation/):
   the envelope measured (ISO 16283-3), predicted (EN 12354-3) and radiating
   outwards (EN 12354-4).
+- [Spanish Building Code (CTE DB-HR)](/phonometry/guides/spanish-building-code/):
+  the DB-HR global indices RA, RA,tr, DnT,A and D2m,nT,Atr, the clause 2
+  requirements and the window-size correction.

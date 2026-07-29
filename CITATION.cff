@@ -5,7 +5,7 @@ title: "phonometry: acoustic measurement toolkit for Python (formerly PyOctaveBa
 authors:
   - family-names: "Requena-Plens"
     given-names: "José M."
-    email: "jmrplens@gmail.com"
+    email: "mail@jmrp.io"
     orcid: "https://orcid.org/0000-0003-1250-6212"
 repository-code: "https://github.com/jmrplens/phonometry"
 url: "https://jmrplens.github.io/phonometry/"

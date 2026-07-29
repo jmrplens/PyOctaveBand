@@ -70,6 +70,7 @@ export const sidebar = [
           'guides/time-weighting',
           'guides/levels',
           'guides/environmental-levels',
+          'guides/spanish-noise-regulation',
         ],
       },
       {
@@ -179,6 +180,7 @@ export const sidebar = [
           'guides/flanking-lab',
           'guides/insulation-ratings',
           'guides/facade-insulation',
+          'guides/spanish-building-code',
         ],
       },
       {

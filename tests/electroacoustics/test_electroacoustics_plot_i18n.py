@@ -76,6 +76,29 @@ def test_swept_sine_distortion_es() -> None:
         res.plot(language="xx")
 
 
+def test_feedback_stability_es() -> None:
+    res = ph.feedback_stability(-6.0, 74.0, 80.0)
+    ax = res.plot(language="es")
+    assert "Ganancia antes de la realimentación" in ax.get_title()
+    assert "Ganancia [dB]" in ax.get_ylabel()
+    assert "Oscilación (0 dB)" in _labels(ax)
+    plt.close("all")
+    unstable = ph.feedback_stability(0.0, 80.0, 80.0)
+    assert "inestable" in unstable.plot(language="es").get_title()
+    plt.close("all")
+    with pytest.raises(ValueError):
+        res.plot(language="xx")
+
+
+def test_sound_reinforcement_geometry_es() -> None:
+    ax = ph.plot_sound_reinforcement_geometry(0.3, 4.0, 12.0, language="es")
+    assert "Lazo de realimentación" in ax.get_title()
+    assert "Camino de realimentación" in _labels(ax)
+    plt.close("all")
+    with pytest.raises(ValueError):
+        ph.plot_sound_reinforcement_geometry(0.3, 4.0, 12.0, language="xx")
+
+
 def test_piston_impedance_es() -> None:
     res = ph.radiating_piston(0.05, np.geomspace(50.0, 5000.0, 60))
     ax = res.plot(language="es")

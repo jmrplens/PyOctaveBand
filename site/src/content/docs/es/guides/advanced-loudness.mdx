@@ -1,7 +1,15 @@
 ---
 title: "Sonoridad avanzada (ISO 532-2/-3, ECMA-418-2)"
-description: "La sonoridad estacionaria de Moore-Glasberg a partir de patrones de excitación roex (ISO 532-2), la sonoridad variable en el tiempo de Moore-Glasberg-Schlittenlacher (ISO 532-3) y la sonoridad del modelo de Sottek de ECMA-418-2, con la tabla de elección de modelo."
+description: "El ancho de banda del filtro auditivo ERB_N de Glasberg y Moore y su escala de frecuencia Cam, la sonoridad estacionaria de Moore-Glasberg a partir de patrones de excitación roex (ISO 532-2), la sonoridad variable en el tiempo de Moore-Glasberg-Schlittenlacher (ISO 532-3) y la sonoridad del modelo de Sottek de ECMA-418-2, con la tabla de elección de modelo."
 references:
+  - type: book
+    authors: ["Moore, B. C. J."]
+    year: 2013
+    title: "An introduction to the psychology of hearing"
+    edition: "6.ª ed."
+    publisher: "Brill"
+    doi: "10.1163/9789004252424"
+    note: "El ancho de banda del filtro auditivo ERB_N y la escala Cam (número ERB_N) de Glasberg y Moore (1990), pp. 76-77."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2017
@@ -94,6 +102,100 @@ plt.show()
 ```
 
 </details>
+
+## La escala ERB<sub>N</sub> y el eje Cam
+
+Todos los modelos de esta página salvo el de Zwicker se escriben sobre el eje
+del **número ERB<sub>N</sub>**, así que conviene tener a mano la escala misma.
+La cóclea se comporta como un banco de **filtros auditivos** paso banda
+solapados; la anchura del centrado en una frecuencia dada se resume con su
+*ancho de banda rectangular equivalente*, el del filtro rectangular que dejaría
+pasar la misma potencia con la misma respuesta de pico. Ajustando datos de
+ruido con muesca de oyentes jóvenes a niveles moderados, Glasberg y Moore
+(1990) lo convierten en una recta en frecuencia (Moore, *An Introduction to the
+Psychology of Hearing* 6.ª ed., p. 76):
+
+$$
+\mathrm{ERB}_N = 24,7\,(4,37\,F + 1)\ \text{Hz},\qquad F \text{ en kHz}.
+$$
+
+Integrar $df/\mathrm{ERB}_N(f)$ convierte eso en una escala de frecuencia cuya
+unidad es una anchura de filtro auditivo, el **número ERB<sub>N</sub>**, cuya
+unidad se llama **Cam** (por Cambridge):
+
+$$
+\mathrm{ERB}_N\ \text{número} = 21,4 \log_{10}(4,37\,F + 1)\ \text{Cam}.
+$$
+
+```python
+from phonometry import psychoacoustics
+
+cam = psychoacoustics.cam_from_frequency(1000.0)
+print(round(psychoacoustics.erb_bandwidth(1000.0), 1))       # 132,4 Hz
+print(round(cam, 2))                                         # 15,59 Cam
+print(round(psychoacoustics.frequency_from_cam(cam), 1))     # 1000,0 Hz
+```
+
+La biblioteca expresa el mismo ajuste con una cifra significativa más,
+$\mathrm{ERB}_N = 24,673\,(0,004368 f + 1)$ y
+$21,366 \log_{10}(0,004368 f + 1)$, la precisión que emplea la implementación
+de ISO 532-2; ambas formas concuerdan mejor del 0,2 % en todo el margen
+audible, y esas cifras de más son las que hacen de `frequency_from_cam` una
+inversa exacta. Las funciones no son un auxiliar privado del modelo de
+sonoridad: `loudness_moore_glasberg` importa exactamente estas funciones, de
+modo que la rejilla Cam de un `MooreGlasbergLoudness.erb_number` y un eje Cam
+construido a mano no pueden separarse.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/erb_bandwidth_es.svg" alt="Ancho de banda del filtro auditivo frente a la frecuencia central en ejes log-log: la recta ERB_N de Glasberg y Moore desde unos 30 Hz a 50 Hz hasta más de 1 kHz a 16 kHz, el ancho de banda de tercio de octava a porcentaje constante cruzándola cerca de 500 Hz, el punto de 1 kHz anotado en 15,59 Cam y un segundo eje superior con la escala Cam" width="85%" />
+
+*El filtro del oído no es una fracción constante de la frecuencia. Por debajo
+de unos 500 Hz es bastante más estrecho que un tercio de octava, y por eso la
+función de banda crítica "antigua", plana en baja frecuencia, ajusta tan mal
+ahí las medidas directas; por encima es más ancho. El eje superior cuenta la
+misma curva en Cam, de modo que pasos iguales sobre él son números iguales de
+filtros auditivos.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import psychoacoustics
+
+f = np.geomspace(50.0, 16000.0, 400)
+erb = psychoacoustics.erb_bandwidth(f)
+third_octave = f * (2 ** (1 / 6) - 2 ** (-1 / 6))     # 23 % de f, como escala
+
+fig, ax = plt.subplots()
+ax.loglog(f, erb, label="ERB$_N$ (Glasberg y Moore, 1990)")
+ax.loglog(f, third_octave, "--", label="Tercio de octava (23 % de f)")
+ax.set(xlabel="Frecuencia central [Hz]",
+       ylabel="Ancho de banda rectangular equivalente ERB$_N$ [Hz]")
+ax.legend()
+
+# El eje Cam arriba: marcas donde caen números ERB_N enteros.
+cam_ticks = np.arange(5.0, 40.0, 5.0)
+ax2 = ax.twiny()
+ax2.set_xscale("log")
+ax2.set_xlim(ax.get_xlim())
+ax2.set_xticks(psychoacoustics.frequency_from_cam(cam_ticks))
+ax2.set_xticklabels([f"{c:.0f}" for c in cam_ticks])
+ax2.set_xlabel("Número ERB$_N$ [Cam]")
+plt.show()
+```
+
+</details>
+
+### Parámetros de `erb_bandwidth()`, `cam_from_frequency()` y `frequency_from_cam()`
+
+| Parámetro | Tipo | Unidades | Rango / defecto | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `frequency` | float o array | Hz | ≥ 0 | `erb_bandwidth`, `cam_from_frequency` |
+| `cam` | float o array | Cam | ≥ 0 | `frequency_from_cam` |
+
+Cada una devuelve un float con entrada escalar y un array en caso contrario.
+Las tres constantes se exportan como `ERB_C1`, `ERB_C2` y `CAM_C`.
 
 ## Sonoridad de Moore-Glasberg (ISO 532-2)
 
@@ -316,7 +418,10 @@ Devuelve un `EcmaLoudness`: `loudness` (N, sone_HMS), `specific_loudness`
 
 ## Qué cubre esta guía
 
-**Cubierto.** ISO 532-2:2017 (Moore-Glasberg): el
+**Cubierto.** El ancho de banda ERB<sub>N</sub> y la escala Cam de Glasberg
+y Moore (1990) de Moore 6.ª ed. pp. 76-77, mediante `erb_bandwidth()`,
+`cam_from_frequency()` y `frequency_from_cam()`. ISO 532-2:2017
+(Moore-Glasberg): el
 patrón de excitación roex del apartado 7 y la inhibición binaural del
 apartado 8, mediante `loudness_moore_glasberg()` y sus variantes
 `_from_spectrum`/`_from_third_octave`. ISO 532-3:2023

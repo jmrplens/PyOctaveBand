@@ -4,8 +4,8 @@
 
 Where [reverberation-time prediction](reverberation-prediction.md) gives a
 single statistical decay rate and [room-acoustics measurement](room-acoustics.md)
-analyses a *measured* impulse response, this page covers the two classical
-*predictions* of the sound field in a rectangular room, both in
+analyses a *measured* impulse response, this page covers the classical
+*predictions* of the sound field in a rectangular room, all in
 `phonometry.room`:
 
 - the **image-source room impulse response** (`image_source_rir`): the
@@ -15,7 +15,11 @@ analyses a *measured* impulse response, this page covers the two classical
 - the **steady-state room field** (`steady_state_field` and its parts): the
   statistical direct-plus-reverberant sound pressure level a source of known
   power produces, with the room constant, critical distance and Schroeder
-  frequency (Bies *Engineering Noise Control* 6.4; Kuttruff 5.6).
+  frequency (Bies *Engineering Noise Control* 6.4; Kuttruff 5.6); and
+- the **normal modes** of the shoebox (`room_modes` and its parts): the
+  eigenfrequencies below the Schroeder frequency, their axial / tangential /
+  oblique classification and the Morse/Pierce mode count and modal density
+  (Long *Architectural Acoustics* 2e, Chapter 8).
 
 Together they bridge the sound power of `phonometry.emission` and the reverberation
 prediction of `phonometry.room`: one gives the full RIR, the other the level
@@ -301,6 +305,99 @@ from phonometry import room
 print(round(float(room.schroeder_frequency(1.0, 200.0)), 0))   # 141 Hz (V=200, T=1)
 ```
 
+## 3. Modes of a rectangular room
+
+Below the Schroeder frequency the statistical picture of section 2 breaks down
+and the room is a handful of discrete standing waves. For the rigid-walled
+shoebox the wave equation separates and the eigenfrequencies are exact:
+
+```text
+f(nx, ny, nz) = (c0 / 2) √( (nx/lx)² + (ny/ly)² + (nz/lz)² )
+                                        (Long Equation (8.43))
+```
+
+with non-negative integer orders counting the nodal planes on each axis. How
+many of the three orders are non-zero names the family: **axial** (one, a wave
+bouncing between one pair of walls, the loudest), **tangential** (two, grazing
+four walls, about 3 dB weaker) and **oblique** (three, involving all six,
+weaker still).
+
+```python
+from phonometry import room
+
+modes = room.room_modes(
+    (7.0, 5.0, 3.0),            # lx, ly, lz in metres
+    max_frequency=100.0,
+    speed_of_sound=344.0,
+    reverberation_time=0.8,     # optional: carries the Schroeder frequency
+)
+print(modes.orders[0], round(float(modes.frequencies[0]), 1))  # [1 0 0] 24.6 Hz
+print(modes.count_by_kind())   # {'axial': 7, 'tangential': 10, 'oblique': 4}
+print(round(modes.schroeder_frequency, 0))                     # 175 Hz
+modes.plot()                    # mode ladder by family + modal density
+```
+
+Counting lattice points inside the positive octant of a sphere of radius
+`k = 2 π f / c0`, with the half- and quarter-weight corrections for the points
+on the coordinate planes and axes, gives the smooth **integrated mode count**
+and its derivative the **modal density**:
+
+```text
+N(f)     = (4 π / 3) V (f/c0)³ + (π / 4) S (f/c0)² + (L / 8) (f/c0)
+                                        (Long Equation (8.45), after Morse and Pierce)
+dN/df    = 4 π V f² / c0³ + (π / 2) S f / c0² + L / (8 c0)
+                                        (Long Equation (8.46))
+```
+
+with the volume `V`, the total wall area `S` and the sum `L` of the twelve edge
+lengths. These are asymptotic estimates: below a few dozen modes the exact
+enumeration of `room_modes` is the honest answer, while high up they are
+accurate and much cheaper.
+
+```python
+from phonometry import room
+
+room_dims = (7.0, 5.0, 3.0)
+print(round(float(room.room_mode_count(200.0, room_dims, speed_of_sound=344.0)), 1))
+# 128.5, against 128 modes actually enumerated below 200 Hz
+print(round(float(room.room_modal_density(1000.0, room_dims, speed_of_sound=344.0)), 1))
+# 34.3 modes/Hz
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rectangular_room_modes_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rectangular_room_modes.svg" alt="Mode ladder of a 7 by 5 by 3 metre room up to 200 Hz, one raster row per family (axial, tangential, oblique) and the modal density curve below, both marked with the 175 Hz Schroeder frequency" width="85%"></picture>
+
+*The 7 x 5 x 3 m room of Long's Table 8.1 up to 200 Hz. Below about 60 Hz the
+axial modes stand alone and each is separately audible; by the 175 Hz Schroeder
+frequency (T = 0.8 s) the oblique family has filled in and the modal density
+has passed one mode per hertz, which is where the statistical field of
+section 2 takes over.*
+
+### `room_modes()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `dimensions` | 3-tuple | m | > 0 | Room dimensions `(lx, ly, lz)` |
+| `max_frequency` | float | Hz | > 0, default 200 | Highest mode enumerated |
+| `speed_of_sound` | float | m/s | > 0, default 343 | `c0` |
+| `reverberation_time` | float, optional | s | > 0 | Adds the Schroeder frequency to the result |
+
+Returns a `RoomModesResult` (`orders`, `frequencies`, `kinds`, `dimensions`,
+`speed_of_sound`, `schroeder_frequency`, plus the `volume`, `surface_area` and
+`edge_length` properties and `count_by_kind()`) with `.plot()`. The pieces
+`room_mode_frequency`, `room_mode_count` and `room_modal_density` are callable
+directly.
+
+**Reading the ladder.** Two things matter more than any single frequency.
+Modes that coincide colour the sound: if the dimensions are low integer
+multiples of one another the energy coalesces into a few frequencies, which is
+why a cubic room is the worst possible listening room and why the ratio tables
+of Bolt and others exist. And modes crowd together as frequency rises, until
+they merge into the continuum the statistical model of section 2 assumes. The
+mode calculator assumes rigid walls and a rectangular plan: it gives the
+eigen*frequencies*, not the pressure amplitude at a listening position, and
+says nothing about damping, mode shape or a non-shoebox geometry. For those,
+mesh the room and run the [2D FDTD solver](fdtd-simulation.md).
+
 ## Validation
 
 The implementations are checked against the closed forms and the source texts'
@@ -315,7 +412,12 @@ own numeric anchors (see [CONFORMANCE.md](CONFORMANCE.md)):
   the uniform-damping `T60`;
 - the room constant, the critical distance as the exact direct/reverberant
   crossover, the Schroeder frequency (Kuttruff's classroom example, `V = 200`,
-  `T = 1` → 141 Hz) and the steady-state level (Bies Equation (6.43)).
+  `T = 1` → 141 Hz) and the steady-state level (Bies Equation (6.43));
+- the six modes Long prints for his 7 x 5 x 3 m room (Table 8.1: 24.6, 34.5,
+  42.4, 49.2, 57.4 and 60.1 Hz, reproduced within one unit of the last printed
+  digit at his `c0 = 344` m/s) and the 34 modes per hertz he states for the
+  same room at 1 kHz (Equation (8.46)), plus the mode count matched against
+  the exact enumeration and the degeneracy of a cubic room.
 
 ## References
 
@@ -340,3 +442,8 @@ own numeric anchors (see [CONFORMANCE.md](CONFORMANCE.md)):
   [doi:10.1201/9781351228152](https://doi.org/10.1201/9781351228152).
   Section 6.4 (steady-state response and the room constant, Equations
   (6.41)–(6.44)).
+- Long, M. (2014). *Architectural acoustics* (2nd ed.). Academic Press.
+  [doi:10.1016/C2012-0-03257-5](https://doi.org/10.1016/C2012-0-03257-5).
+  Chapter 8 (the rectangular-room eigenfrequencies of Equation (8.43) and
+  Table 8.1, and the Morse/Pierce mode count and modal density of Equations
+  (8.45) and (8.46)).

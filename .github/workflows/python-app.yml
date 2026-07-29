@@ -17,6 +17,18 @@ jobs:
       contents: read
     steps:
     - uses: actions/checkout@v7
+    # A conflict resolved carelessly during a rebase can leave markers behind in
+    # a file no other gate reads. CHANGELOG.md is the usual victim: it collides
+    # on every parallel branch and nothing lints it, so the markers ride a fully
+    # green pull request all the way to main. Only the opening and closing
+    # markers are matched, never a bare row of "=", because that is legitimate
+    # Markdown (a setext heading underline).
+    - name: Check for merge-conflict markers
+      run: |
+        if git grep -nE '^(<{7} |>{7} )' -- . ; then
+          echo "::error::Unresolved merge-conflict markers found in the files listed above."
+          exit 1
+        fi
     - name: Set up Python 3.13
       uses: actions/setup-python@v7
       with:
