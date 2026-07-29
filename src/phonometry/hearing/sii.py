@@ -15,6 +15,12 @@ The band-importance function (Table 3, average speech material), the standard
 speech spectrum levels by vocal effort (Table 3) and the reference internal
 noise spectrum level (Table 3) are the standard's own tabulated constants.
 Spectrum levels are as defined in clauses 3.11 and 3.55.
+
+The implementation reproduces the reference implementation ``SII.C`` of ASA
+Working Group S3-79 (the committee that maintains ANSI S3.5) to double
+precision on its official one-third-octave test cases ``TO.TST`` and
+``TO_1.TST``, and computes the Annex C worked examples with the working
+group's official errata applied (see ``docs/ERRATA.md``).
 """
 
 from __future__ import annotations
@@ -340,8 +346,9 @@ def speech_intelligibility_index(
 
     # Clause 5.5/5.6 - equivalent internal noise and disturbance. Di is "the
     # larger of" Zi and Xi' (clause 5.6) - a maximum, not an energy sum. The
-    # official Hornsby SII worksheet computes it as =MAX() in every band, and
-    # the R CRAN worked example C.1 confirms (8000 Hz row: Di = Xi' = -7.1).
+    # WG S3-79 reference implementation SII.C branches on z >= x' exactly so,
+    # the official Hornsby SII worksheet computes it as =MAX() in every band,
+    # and the R CRAN worked example C.1 confirms (8000 Hz row: Di = Xi' = -7.1).
     xp = REFERENCE_INTERNAL_NOISE + t
     d = np.maximum(z, xp)
 
@@ -349,7 +356,8 @@ def speech_intelligibility_index(
     # level-distortion factor Li compares Ei' with the *normal* standard
     # speech spectrum plus 10 dB for every vocal effort (clause 5.7, Formula
     # 6.19 uses Ui of Table 3 for normal vocal effort only) - confirmed
-    # against the official worksheet; not a bug.
+    # against SII.C (whose u[] is the normal-effort spectrum for every input)
+    # and the official worksheet; not a bug.
     level_factor = np.clip(1.0 - (e - _SPEECH_NORMAL - 10.0) / 160.0, 0.0, 1.0)
     audibility = np.clip((e - d + 15.0) / 30.0, 0.0, 1.0)
     a = level_factor * audibility

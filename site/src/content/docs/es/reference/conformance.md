@@ -9,7 +9,7 @@ head:
     attrs:
       type: application/ld+json
     content: |
-      {"@context":"https://schema.org","@type":"Dataset","@id":"https://jmrplens.github.io/phonometry/es/reference/conformance/#dataset","name":"phonometry numerical conformance report","description":"484 comprobaciones numéricas de conformidad que anclan cada métrica acústica implementada a un apartado, tabla o ejemplo resuelto de la norma que la rige, con el valor normativo esperado, el valor que calcula phonometry, la diferencia y un veredicto, en 55 dominios y 325 normas. Se regenera y se verifica en CI en cada pull request.","url":"https://jmrplens.github.io/phonometry/es/reference/conformance/","inLanguage":"es","license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"creator":{"@id":"https://jmrp.io/#person"},"publisher":{"@id":"https://jmrp.io/#person"},"about":{"@id":"https://github.com/jmrplens/phonometry#software"},"measurementTechnique":"Comparison of computed values against the normative expected values published in the governing standards (tolerance tables and worked examples).","variableMeasured":[{"@type":"PropertyValue","name":"Standard","description":"Governing standard and clause or table"},{"@type":"PropertyValue","name":"Quantity","description":"Acoustic quantity under test"},{"@type":"PropertyValue","name":"Expected","description":"Normative value published in the standard"},{"@type":"PropertyValue","name":"Computed","description":"Value computed by phonometry"},{"@type":"PropertyValue","name":"Delta","description":"Signed difference between computed and expected"},{"@type":"PropertyValue","name":"Status","description":"Pass or fail verdict against the standard's tolerance"}],"distribution":{"@type":"DataDownload","encodingFormat":"text/markdown","contentUrl":"https://raw.githubusercontent.com/jmrplens/phonometry/main/docs/CONFORMANCE.md"},"isBasedOn":"https://github.com/jmrplens/phonometry/blob/main/scripts/conformance_report.py","identifier":{"@type":"PropertyValue","propertyID":"DOI","value":"10.5281/zenodo.21215280"}}
+      {"@context":"https://schema.org","@type":"Dataset","@id":"https://jmrplens.github.io/phonometry/es/reference/conformance/#dataset","name":"phonometry numerical conformance report","description":"487 comprobaciones numéricas de conformidad que anclan cada métrica acústica implementada a un apartado, tabla o ejemplo resuelto de la norma que la rige, con el valor normativo esperado, el valor que calcula phonometry, la diferencia y un veredicto, en 55 dominios y 328 normas. Se regenera y se verifica en CI en cada pull request.","url":"https://jmrplens.github.io/phonometry/es/reference/conformance/","inLanguage":"es","license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"creator":{"@id":"https://jmrp.io/#person"},"publisher":{"@id":"https://jmrp.io/#person"},"about":{"@id":"https://github.com/jmrplens/phonometry#software"},"measurementTechnique":"Comparison of computed values against the normative expected values published in the governing standards (tolerance tables and worked examples).","variableMeasured":[{"@type":"PropertyValue","name":"Standard","description":"Governing standard and clause or table"},{"@type":"PropertyValue","name":"Quantity","description":"Acoustic quantity under test"},{"@type":"PropertyValue","name":"Expected","description":"Normative value published in the standard"},{"@type":"PropertyValue","name":"Computed","description":"Value computed by phonometry"},{"@type":"PropertyValue","name":"Delta","description":"Signed difference between computed and expected"},{"@type":"PropertyValue","name":"Status","description":"Pass or fail verdict against the standard's tolerance"}],"distribution":{"@type":"DataDownload","encodingFormat":"text/markdown","contentUrl":"https://raw.githubusercontent.com/jmrplens/phonometry/main/docs/CONFORMANCE.md"},"isBasedOn":"https://github.com/jmrplens/phonometry/blob/main/scripts/conformance_report.py","identifier":{"@type":"PropertyValue","propertyID":"DOI","value":"10.5281/zenodo.21215280"}}
 ---
 
 El activo diferencial de phonometry no es la lista de funcionalidades sino la
@@ -75,7 +75,7 @@ confirmado, con su evidencia y lo que hace la librería al respecto, está en el
 
 ## Informe numérico de conformidad
 
-&#9989; **484/484 conformance checks pass** across 55 domains and 325 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+&#9989; **487/487 conformance checks pass** across 55 domains and 328 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
 
@@ -427,16 +427,19 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary>&#9989; <b>Speech intelligibility (ANSI S3.5-1997)</b>: 100% (7/7)</summary>
+<summary>&#9989; <b>Speech intelligibility (ANSI S3.5-1997)</b>: 100% (10/10)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
 | ANSI S3.5-1997 Table 3 | Band-importance function normalisation | 1 (+/-0) | 1 | 0 | &#9989; |
-| ANSI S3.5-1997 clause 5.4 | Equivalent masking spectrum level at 200 Hz | -1.665 (+/-0.001) | -1.665 | 0 | &#9989; |
+| ASA WG S3-79 SII.C (clause 5.4) | Equivalent masking spectrum level at 200 Hz | -1.665 (+/-0.001) | -1.665 | 0 | &#9989; |
 | ANSI S3.5-1997 clause 5.6 | Equivalent disturbance in quiet at 5000 Hz | -23.6 dB (+/-0.01 dB) | -23.6 dB | 0 dB | &#9989; |
-| ANSI S3.5-1997 clause 6 | SII, noise 30 dB plus hearing loss 40 dB | 0.2185 (+/-0.0001) | 0.2185 | 0 | &#9989; |
-| R CRAN 'SII' Example C.2 | One-third-octave method, independent oracle | 0.851375 (+/-0.0001) | 0.851375 | 0 | &#9989; |
-| ANSI S3.5-1997 clause 6 | SII, standard speech in quiet, normal hearing | 0.99582517 (+/-0.000001) | 0.99582517 | 0 | &#9989; |
+| ASA WG S3-79 SII.C (clause 6) | SII, noise 30 dB plus hearing loss 40 dB | 0.218454 (+/-0.000001) | 0.218454 | 0 | &#9989; |
+| ANSI S3.5-1997 Annex C.2 | Worked example (SII.C / R CRAN, errata applied) | 0.851375 (+/-0.000001) | 0.851375 | 0 | &#9989; |
+| ANSI S3.5-1997 Table C.2 (errata) | Masking Zi at 200 Hz, corrected worksheet | 34.66 dB (+/-0.01 dB) | 34.66 dB | -0.002 dB | &#9989; |
+| ASA WG S3-79 SII.C (clause 6) | SII, standard speech in quiet, normal hearing | 0.99582517 (+/-0.000001) | 0.99582517 | 0 | &#9989; |
+| ASA WG S3-79 TO.TST | Official one-third-octave test case | 0.445 (+/-0.001) | 0.445 | 0 | &#9989; |
+| ASA WG S3-79 TO_1.TST | Official test case, alternative importance | 0.438 (+/-0.001) | 0.438 | 0 | &#9989; |
 | ANSI S3.5-1997 Table 3 | Loud-effort speech spectrum level at 1 kHz | 42.16 dB (+/-0 dB) | 42.16 dB | 0 dB | &#9989; |
 
 </details>

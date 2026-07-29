@@ -592,6 +592,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   each centred. It reaches the 232 blocks on 120 pages (60 English, 60 Spanish)
   that state more than one equation per block, needs no change to the markdown,
   and leaves the TeX, the accessible label and the page anchors untouched.
+- The Speech Intelligibility Index (`hearing/sii.py`) is now anchored on the
+  reference implementation of ASA Working Group S3-79, the committee that
+  maintains ANSI S3.5: the library reproduces `SII.C` to double precision on
+  the official one-third-octave test cases `TO.TST` (published SII 0.445,
+  exact 0.4453910059) and `TO_1.TST` (0.438 / 0.4382176540, alternative
+  band-importance function), both added as tests and conformance checks.
+  The previous surrogate anchors (Hornsby worksheet, R CRAN `SII`) all agree
+  with the committee code and are kept as secondary cross-checks, with every
+  reference constant's provenance restated; the quiet-standard and
+  noise-plus-hearing-loss anchors now carry the committee-code digits, and
+  the Annex C.2 worked example pins the officially corrected worksheet
+  (WG S3-79 errata: Table C.1 row i=5 Li 0.10 -> 1.00, Table C.2 first-row
+  slope -45.59 -> -46.59, both recorded in `docs/ERRATA.md`). No computed
+  value changed; the library already produced the errata-consistent chain.
 
 - Eight defects of the ISO 12354-1:2017 Annex L and ISO 12354-2:2017 Annex G
   worked examples, found while anchoring the detailed model on them, are
