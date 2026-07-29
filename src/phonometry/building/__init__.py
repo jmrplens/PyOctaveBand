@@ -419,4 +419,4 @@ __all__ = [
     "weighted_rating",
     "weighted_rating_extended",
     "window_size_correction",
-]]
+]
