@@ -1,6 +1,6 @@
 ---
 title: "Acústica de oficinas diáfanas (ISO 3382-3)"
-description: "La privacidad del habla en oficinas diáfanas según ISO 3382-3: la tasa de decaimiento espacial D2,S del habla ponderada A, el nivel a 4 m, las distancias de distracción y de privacidad desde el STI, la línea de medición a escala y la ficha acreditada."
+description: "La privacidad del habla en oficinas diáfanas según ISO 3382-3: la tasa de decaimiento espacial D2,S del habla ponderada A, el nivel a 4 m, las distancias de distracción y de privacidad desde el STI, la línea de medición a escala y la ficha acreditada, además de la predicción de Long del ruido que genera una sala ocupada y de la absorción por mesa que necesita."
 references:
   - type: standard
     organization: "International Organization for Standardization"
@@ -9,6 +9,14 @@ references:
     designation: "ISO 3382-3:2012"
     url: "https://www.iso.org/standard/46520.html"
     note: "Las magnitudes de privacidad del habla en oficinas diáfanas que esta página implementa."
+  - type: book
+    authors: ["Long, M."]
+    year: 2014
+    title: "Architectural acoustics"
+    edition: "2.ª ed."
+    publisher: "Academic Press"
+    doi: "10.1016/C2012-0-03257-5"
+    note: "El modelo de ruido autogenerado por los ocupantes del capítulo 17, ecuaciones (17.50) a (17.54)."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -242,13 +250,135 @@ el repositorio; haz clic en la vista previa para abrir el PDF.
 	caption="Ficha de acústica de oficinas diáfanas (OpenPlanResult.report): D2,S, Lp,A,S,4m, rD, rP y la curva de decaimiento espacial."
 />
 
+## Ruido autogenerado por los ocupantes
+
+La ISO 3382-3 de arriba **mide** una oficina. La pregunta complementaria en
+fase de proyecto es una **predicción**: en una sala cuya única fuente de ruido
+son sus propios ocupantes, ¿cuánto sube el fondo y sigue funcionando la
+conversación? Long (*Architectural Acoustics* 2.ª ed., cap. 17, ecs. (17.50) a
+(17.54)) plantea los dos niveles que compiten en el oyente. La señal es el
+campo directo de la persona sentada enfrente,
+
+$$
+L_p(\text{señal}) = L_W + 10\lg\!\left[\frac{Q}{4\pi r^2}\right],
+$$
+
+y el ruido es el campo reverberante que levantan $N$ hablantes simultáneos,
+
+$$
+L_p(\text{ruido}) = L_W + 10\lg N + 10\lg\!\left[\frac{4}{N A_\text{mesa}}\right],
+$$
+
+con $L_W$ el nivel de potencia acústica de un hablante (unos 70 dB en
+conversación normal), $Q$ la directividad frontal del hablante (unos 2), $r$ la
+distancia hablante-oyente y $A_\text{mesa}$ el área de absorción equivalente
+**por mesa ocupada**, de modo que $N A_\text{mesa}$ es la absorción total de la
+sala.
+
+```python
+from phonometry import room
+
+# El restaurante duro de Long: unos 20 sabinios métricos, un hablante con
+# Lw = 70 dB y un oyente a 1,2 m al otro lado de la mesa.
+print(round(room.speech_direct_level(1.2)))          # campo directo de 60 dB
+print(round(room.crowd_noise_level(1, 20.0)))        # 63 dB con un hablante
+print(round(room.crowd_noise_level(20, 20.0)))       # 76 dB con 20 mesas
+
+# Un techo de alfa 0,9 sobre la sala de 13,7 x 13,7 m añade 170 sabinios.
+print(round(room.crowd_noise_level(20, 20.0 + 170.0)))   # 66 dB
+```
+
+Restar ambos da la **relación habla-ruido**, y este es el resultado que merece
+la pena recordar:
+
+$$
+L_{SN} = 10\lg\!\left[\frac{Q}{4\pi r^2}\right] + 10\lg\!\left[\frac{A_\text{mesa}}{4}\right].
+$$
+
+No sobrevive ni $L_W$ ni $N$. Una sala más llena no es intrínsecamente peor,
+porque cada mesa nueva aporta a la vez un hablante y su propia cuota de
+absorción. Lo que decide si un restaurante funciona es la absorción **por
+mesa**, no la absorción de la sala. Exigir $L_{SN} > -6$ dB para una
+comunicación adecuada a una separación $r_s$ a través de la mesa, y
+$L_{SN} < -9$ dB para que no se escuche a una mesa vecina situada a $r_t$, se
+traduce en un par de cotas de diseño (ecs. (17.53) y (17.54)):
+
+$$
+A_\text{mesa} > 6,31\,r_s^2, \qquad A_\text{mesa} < 3,16\,r_t^2 \qquad (Q = 2).
+$$
+
+```python
+from phonometry import room
+
+print(round(room.absorption_per_table(1.0, -6.0), 2))   # 6,31 m2 por mesa a 1 m
+print(round(room.absorption_per_table(2.5, -9.0), 1))   # 19,8 m2 con paso de 2,5 m
+
+crowd = room.crowd_noise([20.0, 95.0, 190.0], distance=1.2)
+crowd.plot()      # ruido autogenerado vs ocupación, frente al límite de -6 dB
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/restaurant_crowd_noise_es.svg" alt="Nivel de ruido autogenerado por el público frente al número de hablantes simultáneos para tres áreas de absorción de sala de 20, 95 y 190 sabinios métricos, con el nivel de habla directo de 60 dB a 1,2 m y el límite de comunicación de 66 dB dibujados como referencias horizontales" width="85%" />
+
+*Los mismos 20 hablantes en tres salas. La sala dura (20 m² de absorción)
+cruza el límite de comunicación antes de que se ocupe la cuarta mesa; añadir
+el techo absorbente del ejemplo de Long (190 m² en total) mantiene las 20
+mesas por debajo. Las curvas son paralelas porque la ocupación siempre cuesta
+$10\lg N$: la única variable de diseño es el desplazamiento vertical, que es
+la absorción.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import room
+
+# Una línea: el barrido de ocupación directamente desde el resultado.
+result = room.crowd_noise([20.0, 95.0, 190.0], distance=1.2)
+result.plot()
+plt.show()
+
+# O dibujarlo a mano desde la ecuación (17.51):
+n = np.arange(1, 21)
+fig, ax = plt.subplots()
+for area in (20.0, 95.0, 190.0):
+    ax.plot(n, room.crowd_noise_level(n, area), label=f"A = {area:.0f} m²")
+signal = room.speech_direct_level(1.2)
+ax.axhline(signal, ls="--", label="Habla a 1,2 m")
+ax.axhline(signal + 6.0, ls=":", label="Límite de comunicación")
+ax.set(xlabel="Hablantes simultáneos N",
+       ylabel="Nivel de ruido autogenerado [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+### Parámetros de `crowd_noise()`
+
+| Parámetro | Tipo | Unidades | Rango / defecto | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `absorption_areas` | float o array 1D | m² | > 0 | Áreas de absorción total de la sala a comparar |
+| `talkers` | array 1D, opcional | — | ≥ 1, defecto 1..20 | Eje de ocupación `N` |
+| `distance` | float | m | > 0, defecto 1,2 | Distancia hablante-oyente `r` |
+| `sound_power_level` | float | dB re 1 pW | defecto 70 | `Lw` del hablante |
+| `directivity` | float | — | > 0, defecto 2 | `Q` del hablante |
+
+Devuelve un `CrowdNoiseResult` (`talkers`, `absorption_areas`, `levels`,
+`signal_level`, `communication_level`, `speech_to_noise()`) con `.plot()`.
+Las piezas `speech_direct_level`, `crowd_noise_level`, `speech_to_noise_ratio`
+y `absorption_per_table` son invocables directamente.
+
 ## Qué cubre esta guía
 
 **Cubierto.** Las magnitudes de oficina diáfana del apartado 4 y los
 apartados 6.2/6.3 de la ISO 3382-3:2012 ($D_{2,S}$, $L_{p,A,S,4m}$, $r_D$,
 $r_P$) de `room.open_plan_metrics`, con el dibujo a escala de la línea de
 medición (`room.plot_open_plan_geometry` y `.plot_geometry()`) y la ficha
-ISO 3382-3 de una página con `.report()`.
+ISO 3382-3 de una página con `.report()`. El modelo de ruido autogenerado por
+los ocupantes del capítulo 17 de *Architectural Acoustics* 2.ª ed. de Long
+(ecs. (17.50) a (17.54)) mediante `room.crowd_noise` y sus piezas.
 
 **No cubierto.** El STI por posición de la ISO 3382-3 se toma como entrada
 de `open_plan_metrics` en lugar de calcularse dentro de la función: mídela
@@ -257,7 +387,13 @@ con las herramientas STIPA de la
 El propio procedimiento de medición de la norma (la directividad del
 altavoz, las condiciones amueblada frente a desocupada, la captura del
 ruido de fondo) no se comprueba: la función consume distancias, niveles y
-valores de STI vengan de donde vengan.
+valores de STI vengan de donde vengan. El modelo de ruido autogenerado es un
+cálculo de *diseño* y deliberadamente no modela el reflejo de Lombard: se
+cancela en $L_{SN}$ mientras todo el mundo alce la voz por igual, de modo que
+el modelo explica por qué el nivel se dispara en una sala dura, no dónde se
+detiene. Supone además un campo reverberante difuso y una única cifra de
+absorción por mesa, así que no dice nada de las mamparas, la absorción local
+ni de dónde está cada mesa dentro de la sala.
 
 ## Véase también
 

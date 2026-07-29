@@ -339,6 +339,101 @@ THD and polar panels drawn to the IEC 60263 25 dB-per-decade and 25 dB
 reference-circle conventions.*
 
 
+## 4. Gain before feedback of a reinforcement system
+
+Everything above characterises a loudspeaker on its own. Put it in a room with
+an open microphone and the interesting quantity is no longer a datasheet number
+but a **closed loop**: the loudspeaker feeds the audience, and it also feeds the
+microphone that drives it. Long (*Architectural Acoustics* 2e, Chapter 18,
+Equations (18.13) to (18.24)) writes that loop with two decibel gains:
+
+```text
+Zs = L(H-L) − L(T-M)                       (Eq. (18.17))  open-loop system gain
+Gs = L(H-M) − L(H-L) + DM(θ)               (Eq. (18.18))  feedback-loop gain
+```
+
+`Zs` is the level the loudspeaker produces at an average listener minus the
+level the talker produces at the microphone; `Zs = -6` dB, typical of an
+auditorium or a church, means a comfortable conversational level at twice the
+talker-to-microphone distance. `DM(θ)` is the directivity index of the
+microphone toward the loudspeaker *relative to* the talker: zero for an
+omnidirectional microphone, about −2 to −3 dB for a cardioid pointed at the
+talker. Summing the infinite series of round trips, the system oscillates when
+the loop gain reaches unity, that is `Zs + Gs = 0` (Equation (18.16)).
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_reinforcement_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_reinforcement_geometry.svg" alt="Schematic of a sound-reinforcement feedback loop: the talker 0.3 metres in front of the microphone, the flown loudspeaker 4 metres from the microphone and 12 metres from the average listener, with the signal path drawn solid and the feedback path dashed" width="85%"></picture>
+
+*The four points of the loop. Only the sound field the loudspeaker produces at
+two of them, and the type and orientation of the microphone, enter the
+criterion: the loudspeaker's own type, number and power do not appear anywhere
+in it.*
+
+A working system needs margin below that threshold. Long takes **10 dB** for an
+equalised system (other authors quote 12 dB unequalised and 6 dB carefully
+equalised): 6 dB of it covers a sustained tone adding in phase with a reflection
+off a hard surface, and the remaining 4 dB is safety. With several microphones
+open at once the returned signals add at the mixer, which the
+number-of-open-microphones correction `ΔL_nom = 10 log10 Nm` accounts for
+(Equation (18.23)). The criterion is then
+
+```text
+Zs + L(H-M) + ΔL_nom ≤ L(H-L) − DM(θ) − 10
+```
+
+```python
+from phonometry import electroacoustics as ea
+
+# An auditorium at Zs = -6 dB, omnidirectional microphone, one mic open.
+res = ea.feedback_stability(-6.0, 76.0, 80.0)
+print(res.is_stable, round(res.headroom, 1))          # True 0.0 dB
+print(round(res.maximum_level_at_microphone, 1))      # 76.0 dB = L(H-L) - 4
+
+# A cardioid buys back exactly its relative directivity index.
+card = ea.feedback_stability(-6.0, 78.0, 80.0, microphone_directivity=-2.0)
+print(round(card.maximum_level_at_microphone, 1))     # 78.0 dB = L(H-L) - 2
+
+# Four open microphones cost 10 lg 4 = 6 dB of that headroom.
+print(round(ea.open_microphone_correction(4), 1))     # 6.0 dB
+
+res.plot()      # the gain structure against the oscillation and margin lines
+```
+
+Those two special cases are Long's own (Equations (18.21) and (18.22)): with
+`Zs = -6` dB the criterion collapses to `L(H-M) ≤ L(H-L) − DM(θ) − 4`, so an
+omnidirectional microphone must see the loudspeaker 4 dB below the average level
+in the audience, while a cardioid may let it rise to 2 dB below.
+
+> **A sign slip in the printed equation.** Long prints Equation (18.24) with
+> `+ DM(θ)` on the right-hand side, which contradicts the Equations (18.20) to
+> (18.22) it generalises and would turn the benefit of a directional microphone
+> into a penalty. `feedback_stability` implements the sign of Equation (18.20),
+> so that `Nm = 1` reproduces Long's own special cases exactly.
+
+### `feedback_stability()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `open_loop_gain` | float | dB | finite | `Zs = L(H-L) - L(T-M)`; about −6 dB in an auditorium |
+| `level_loudspeaker_at_microphone` | float | dB | finite | `L(H-M)` |
+| `level_loudspeaker_at_listener` | float | dB | finite | `L(H-L)` |
+| `microphone_directivity` | float | dB | default 0 | `DM(theta)`, 0 omni, about −2 cardioid |
+| `open_microphones` | int | — | ≥ 1, default 1 | `Nm` |
+| `stability_margin` | float | dB | ≥ 0, default 10 | Long's equalised-system margin |
+
+Returns a `FeedbackStabilityResult` (`open_loop_gain`, `feedback_loop_gain`,
+`nom_correction`, `loop_gain`, `margin`, `headroom`, `is_stable`,
+`maximum_open_loop_gain`, `maximum_level_at_microphone`) with `.plot()`.
+`feedback_loop_gain` and `open_microphone_correction` are callable directly, and
+`plot_sound_reinforcement_geometry` draws the loop above.
+
+The criterion is a level bookkeeping exercise, not an acoustic model: it
+consumes the two direct-field levels the loudspeaker produces and does not
+compute them from a coverage pattern, nor does it predict the ring frequency or
+the effect of an equaliser or frequency shifter. Long excludes the reverberant
+field deliberately, because a uniform field cannot depend on where the
+microphone is or where it points; the direct-to-reverberant ratio enters the
+design separately.
+
 ## See also
 
 - [Electroacoustics](electroacoustics.md): the IEC 60268-3 distortion set,
@@ -361,6 +456,11 @@ reference-circle conventions.*
   The transducer physics behind sections 1 and 2: loudspeaker radiation,
   the baffled-piston impedance and directivity (§4.19, §13.7), and the
   near-field to far-field transition.
+- Long, M. (2014). *Architectural acoustics* (2nd ed.). Academic Press.
+  [doi:10.1016/C2012-0-03257-5](https://doi.org/10.1016/C2012-0-03257-5).
+  Chapter 18 (the gain-before-feedback criterion of section 4: the open-loop
+  and feedback-loop gains, the stability margin and the
+  number-of-open-microphones correction, Equations (18.13) to (18.24)).
 
 ## Standards
 

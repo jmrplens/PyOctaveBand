@@ -33,6 +33,7 @@ if TYPE_CHECKING:
     from ..electroacoustics.loudspeaker import LoudspeakerCharacteristics
     from ..electroacoustics.microphone import MicrophoneCharacteristics
     from ..electroacoustics.piston import PistonDirectivity, RadiatingPistonResult
+    from ..electroacoustics.sound_reinforcement import FeedbackStabilityResult
     from ..electroacoustics.swept_sine import SweptSineDistortionResult
 
 #: Shared frequency-axis label of the electroacoustics renderers.
@@ -105,6 +106,24 @@ _STRINGS: dict[str, str] = {
     "Carrier f₂": "Portadora f₂",
     "Sidebands f₂ ± n·f₁": "Bandas laterales f₂ ± n·f₁",
     "Level re carrier [dB]": "Nivel respecto a la portadora [dB]",
+    # --- Sound-reinforcement gain before feedback (Long Ch. 18) ---
+    "Open-loop gain $Z_S$": "Ganancia en lazo abierto $Z_S$",
+    "Feedback-loop gain $G_S$": "Ganancia del lazo de realimentación $G_S$",
+    r"Open microphones $\Delta L_{nom}$": r"Micrófonos abiertos $\Delta L_{nom}$",
+    "Total loop gain": "Ganancia total del lazo",
+    "Gain [dB]": "Ganancia [dB]",
+    "Oscillation (0 dB)": "Oscilación (0 dB)",
+    "Stability limit ({margin} dB margin)": "Límite de estabilidad (margen de {margin} dB)",
+    "Gain before feedback — stable, {head} dB spare":
+        "Ganancia antes de la realimentación — estable, {head} dB de reserva",
+    "Gain before feedback — unstable by {head} dB":
+        "Ganancia antes de la realimentación — inestable en {head} dB",
+    "Talker (T)": "Hablante (T)",
+    "Microphone (M)": "Micrófono (M)",
+    "Loudspeaker (H)": "Altavoz (H)",
+    "Listener (L)": "Oyente (L)",
+    "Sound-reinforcement feedback geometry":
+        "Geometría de realimentación del sistema de refuerzo sonoro",
 }
 
 
@@ -802,3 +821,74 @@ def plot_microphone_characteristics(
     return _plot_one_quantity(
         result, quantity, _MICROPHONE_QUANTITIES, ax, language, missing
     )
+
+
+def plot_feedback_stability(
+    result: FeedbackStabilityResult, ax: Axes | None = None, *,
+    language: str = "en", **kwargs: Any
+) -> Axes:
+    """Gain structure of a reinforcement loop against its stability limits.
+
+    Bars for the open-loop gain ``Z_S``, the feedback-loop gain ``G_S`` and the
+    open-microphone correction accumulate into the total loop gain (Long
+    Equation (18.24)); the 0 dB oscillation threshold of Equation (18.16) and
+    the required stability margin are drawn as reference lines.
+
+    :param result: A
+        :class:`~phonometry.electroacoustics.sound_reinforcement.FeedbackStabilityResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the component ``Axes.bar`` call.
+    :return: The axes.
+    """
+    from .._i18n import format_number, localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    labels = [
+        _t("Open-loop gain $Z_S$", language),
+        _t("Feedback-loop gain $G_S$", language),
+        _t(r"Open microphones $\Delta L_{nom}$", language),
+        _t("Total loop gain", language),
+    ]
+    values = np.array(
+        [
+            result.open_loop_gain,
+            result.feedback_loop_gain,
+            result.nom_correction,
+            result.loop_gain,
+        ],
+        dtype=np.float64,
+    )
+    colors = [_C_PRIMARY, _C_SECONDARY, _C_TERTIARY,
+              _C_REFERENCE if not result.is_stable else _C_EDGE]
+    kwargs.setdefault("width", 0.62)
+    ax.bar(np.arange(values.size), values, color=colors, edgecolor=_C_EDGE,
+           linewidth=0.6, zorder=3, **kwargs)
+    for i, value in enumerate(values):
+        ax.annotate(
+            format_number(value, language, decimals=1) + " dB",
+            xy=(i, value), xytext=(0, 4 if value >= 0.0 else -12),
+            textcoords="offset points", ha="center", fontsize=8,
+        )
+    ax.axhline(0.0, color=_C_REFERENCE, ls="-", lw=1.2, zorder=2,
+               label=_t("Oscillation (0 dB)", language))
+    ax.axhline(
+        -result.stability_margin, color=_C_TERTIARY, ls="--", lw=1.3, zorder=2,
+        label=_t("Stability limit ({margin} dB margin)", language,
+                 margin=format_number(result.stability_margin, language,
+                                      decimals=0)),
+    )
+    ax.set_xticks(np.arange(values.size))
+    ax.set_xticklabels(labels, fontsize=8)
+    ax.set_ylabel(_t("Gain [dB]", language))
+    head = format_number(abs(result.headroom), language, decimals=1)
+    ax.set_title(
+        _t("Gain before feedback — stable, {head} dB spare", language, head=head)
+        if result.is_stable
+        else _t("Gain before feedback — unstable by {head} dB", language,
+                head=head)
+    )
+    ax.grid(True, axis="y", alpha=0.3)
+    ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
+    localize_axes(ax, language)
+    return ax

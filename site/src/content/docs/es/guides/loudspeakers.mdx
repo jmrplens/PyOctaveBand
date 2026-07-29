@@ -1,6 +1,6 @@
 ---
 title: "Caracterización de altavoces (IEC 60268-5)"
-description: "La cadena de altavoz de IEC 60268-5: la sensibilidad característica y sus convenciones de 1 W / 1 m, el pistón radiante en pantalla infinita con su impedancia de radiación y su directividad, y el informe de características nominales que compone la hoja de datos de la norma con los paneles de respuesta en eje, impedancia, THD y polar según las convenciones de escala de IEC 60263."
+description: "La cadena de altavoz de IEC 60268-5: la sensibilidad característica y sus convenciones de 1 W / 1 m, el pistón radiante en pantalla infinita con su impedancia de radiación y su directividad, y el informe de características nominales que compone la hoja de datos de la norma con los paneles de respuesta en eje, impedancia, THD y polar según las convenciones de escala de IEC 60263, además del criterio de Long de ganancia antes de la realimentación para un lazo de refuerzo sonoro."
 references:
   - type: book
     authors: ["Beranek, L. L.", "Mellow, T. J."]
@@ -23,6 +23,14 @@ references:
     designation: "IEC 60263:1982"
     url: "https://webstore.iec.ch/en/publication/1218"
     note: "Las proporciones de escala de los gráficos de características: una década de frecuencia igual a 25 dB en la ordenada (cláusula 2) y el diagrama polar sobre un círculo de referencia de 25 dB de radio (cláusula 3)."
+  - type: book
+    authors: ["Long, M."]
+    year: 2014
+    title: "Architectural acoustics"
+    edition: "2.ª ed."
+    publisher: "Academic Press"
+    doi: "10.1016/C2012-0-03257-5"
+    note: "El criterio de ganancia antes de la realimentación del apartado 4: las ganancias en lazo abierto y de realimentación, el margen de estabilidad y la corrección por número de micrófonos abiertos (capítulo 18, ecuaciones (18.13) a (18.24))."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -381,6 +389,103 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 />
 
 
+## 4. Ganancia antes de la realimentación en refuerzo sonoro
+
+Todo lo anterior caracteriza un altavoz aislado. Colócalo en una sala con un
+micrófono abierto y la magnitud interesante deja de ser un número de catálogo
+para ser un **lazo cerrado**: el altavoz alimenta al público, pero también al
+micrófono que lo excita. Long (*Architectural Acoustics* 2.ª ed., cap. 18,
+ecs. (18.13) a (18.24)) escribe ese lazo con dos ganancias en decibelios. La
+**ganancia del sistema en lazo abierto** es lo que el sistema le aporta al
+hablante,
+
+$$
+Z_S = L_{H\text{-}L} - L_{T\text{-}M},
+$$
+
+el nivel que el altavoz produce en un oyente medio menos el que el hablante
+produce en el micrófono; $Z_S = -6$ dB, típico de un auditorio o una iglesia,
+significa un nivel de conversación cómodo al doble de la distancia
+hablante-micrófono. La **ganancia del lazo de realimentación** es la parte de
+la salida que vuelve,
+
+$$
+G_S = L_{H\text{-}M} - L_{H\text{-}L} + D_M(\theta),
+$$
+
+con $D_M(\theta)$ el índice de directividad del micrófono hacia el altavoz
+*respecto al* hablante: cero para un micrófono omnidireccional, unos $-2$ a
+$-3$ dB para un cardioide apuntado al hablante. Al sumar la serie infinita de
+idas y vueltas, el sistema oscila cuando la ganancia del lazo alcanza la
+unidad, es decir $Z_S + G_S = 0$ (ec. (18.16)).
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_reinforcement_geometry_es.svg" alt="Esquema del lazo de realimentación de un sistema de refuerzo sonoro: el hablante a 0,3 metros del micrófono, el altavoz colgado a 4 metros del micrófono y a 12 metros del oyente medio, con el camino de la señal en trazo continuo y el de realimentación discontinuo" width="85%" />
+
+*Los cuatro puntos del lazo. En el criterio solo entran el campo sonoro que el
+altavoz produce en dos de ellos y el tipo y la orientación del micrófono: el
+tipo de altavoz, su número y su potencia no aparecen por ninguna parte.*
+
+Un sistema utilizable necesita margen por debajo de ese umbral. Long adopta
+**10 dB** para un sistema ecualizado (otros autores dan 12 dB sin ecualizar y
+6 dB cuidadosamente ecualizado): 6 dB cubren un tono sostenido que se suma en
+fase con una reflexión en una superficie dura y los 4 dB restantes son
+seguridad. Con varios micrófonos abiertos a la vez las señales devueltas se
+suman en la mesa, lo que recoge la corrección por **número de micrófonos
+abiertos** $\Delta L_\text{nom} = 10\lg N_m$ (ec. (18.23)). El criterio queda
+
+$$
+Z_S + L_{H\text{-}M} + \Delta L_\text{nom} \le L_{H\text{-}L} - D_M(\theta) - 10.
+$$
+
+```python
+from phonometry import electroacoustics as ea
+
+# Un auditorio con Zs = -6 dB, micrófono omnidireccional, uno abierto.
+res = ea.feedback_stability(-6.0, 76.0, 80.0)
+print(res.is_stable, round(res.headroom, 1))          # True 0,0 dB
+print(round(res.maximum_level_at_microphone, 1))      # 76,0 dB = L(H-L) - 4
+
+# Un cardioide recupera exactamente su índice de directividad relativo.
+card = ea.feedback_stability(-6.0, 78.0, 80.0, microphone_directivity=-2.0)
+print(round(card.maximum_level_at_microphone, 1))     # 78,0 dB = L(H-L) - 2
+
+# Cuatro micrófonos abiertos cuestan 10 lg 4 = 6 dB de ese margen.
+print(round(ea.open_microphone_correction(4), 1))     # 6,0 dB
+
+res.plot()      # la estructura de ganancias frente a la oscilación y el margen
+```
+
+Esos dos casos particulares son los del propio Long (ecs. (18.21) y (18.22)):
+con $Z_S = -6$ dB el criterio se reduce a
+$L_{H\text{-}M} \le L_{H\text{-}L} - D_M(\theta) - 4$, de modo que un micrófono
+omnidireccional debe ver el altavoz 4 dB por debajo del nivel medio en el
+público, mientras que un cardioide puede dejarlo subir hasta 2 dB por debajo.
+
+:::caution
+**Un desliz de signo en la ecuación impresa.** Long imprime la ec. (18.24) con $+ D_M(\theta)$ en el segundo miembro, lo que
+contradice las ecs. (18.20) a (18.22) que generaliza y convertiría la ventaja
+de un micrófono direccional en una penalización. `feedback_stability`
+implementa el signo de la ec. (18.20), de modo que con $N_m = 1$ reproduce
+exactamente los casos particulares del propio Long.
+:::
+
+### Parámetros de `feedback_stability()`
+
+| Parámetro | Tipo | Unidades | Rango / defecto | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `open_loop_gain` | float | dB | finito | `Zs = L(H-L) - L(T-M)`; unos -6 dB en un auditorio |
+| `level_loudspeaker_at_microphone` | float | dB | finito | `L(H-M)` |
+| `level_loudspeaker_at_listener` | float | dB | finito | `L(H-L)` |
+| `microphone_directivity` | float | dB | defecto 0 | `DM(theta)`, 0 omni, unos -2 cardioide |
+| `open_microphones` | int | — | ≥ 1, defecto 1 | `Nm` |
+| `stability_margin` | float | dB | ≥ 0, defecto 10 | Margen de Long para sistema ecualizado |
+
+Devuelve un `FeedbackStabilityResult` (`open_loop_gain`,
+`feedback_loop_gain`, `nom_correction`, `loop_gain`, `margin`, `headroom`,
+`is_stable`, `maximum_open_loop_gain`, `maximum_level_at_microphone`) con
+`.plot()`. `feedback_loop_gain` y `open_microphone_correction` son invocables
+directamente, y `plot_sound_reinforcement_geometry` dibuja el lazo de arriba.
+
 ## Qué cubre esta guía
 
 **Cubierto.** Las convenciones de sensibilidad de IEC 60268-5:2003+A1:2007
@@ -394,7 +499,11 @@ geometría a escala. Las características nominales mediante
 `loudspeaker_characteristics` y su `.report()`: el nivel de sensibilidad y
 el rango de frecuencias efectivo calculados (21.2), la respuesta en eje con
 su banda de tolerancia y los paneles de impedancia, THD y polar dibujados
-según las convenciones de escala de IEC 60263.
+según las convenciones de escala de IEC 60263. El criterio de ganancia
+antes de la realimentación del capítulo 18 de *Architectural Acoustics*
+2.ª ed. de Long (ecs. (18.13) a (18.24)) mediante `feedback_stability`,
+`feedback_loop_gain`, `open_microphone_correction` y
+`plot_sound_reinforcement_geometry`.
 
 **No cubierto.** Los valores eléctricos y mecánicos que la norma define
 alrededor de la potencia admisible (potencia de ruido nominal, tensiones
@@ -405,6 +514,14 @@ impedancia presenta el módulo medido frente a las líneas de impedancia
 nominal. La propia curva de distorsión procede de una medición, por
 ejemplo de la cadena de
 [distorsión con barrido sinusoidal](/phonometry/es/guides/swept-sine-distortion/).
+El criterio de realimentación es una contabilidad de niveles, no un
+modelo acústico: consume los dos niveles de campo directo que produce
+el altavoz y no los calcula a partir de un patrón de cobertura, ni
+predice la frecuencia de acoplo ni el efecto de un ecualizador o de un
+desplazador de frecuencia. Long excluye el campo reverberante a
+propósito, porque un campo uniforme no puede depender de dónde esté el
+micrófono ni de hacia dónde apunte; la relación directo-reverberante
+entra en el diseño por separado.
 
 ## Véase también
 

@@ -6,6 +6,18 @@ from __future__ import annotations
 from .._plot.geometry import (
     plot_open_plan_geometry,
 )
+from .crowd_noise import (
+    COMMUNICATION_SNR,
+    NORMAL_VOICE_POWER_LEVEL,
+    PRIVACY_SNR,
+    TALKER_DIRECTIVITY,
+    CrowdNoiseResult,
+    absorption_per_table,
+    crowd_noise,
+    crowd_noise_level,
+    speech_direct_level,
+    speech_to_noise_ratio,
+)
 from .enclosed_space_absorption import (
     ReverberationResult,
     air_absorption_area,
@@ -51,6 +63,14 @@ from .room_ir import (
     shaped_sweep_signal,
     sweep_signal,
 )
+from .room_modes import (
+    MODE_KINDS,
+    RoomModesResult,
+    room_modal_density,
+    room_mode_count,
+    room_mode_frequency,
+    room_modes,
+)
 from .room_noise import (
     NCResult,
     RCResult,
@@ -69,6 +89,12 @@ from .steady_field import (
 )
 
 __all__ = [
+    "COMMUNICATION_SNR",
+    "MODE_KINDS",
+    "NORMAL_VOICE_POWER_LEVEL",
+    "PRIVACY_SNR",
+    "TALKER_DIRECTIVITY",
+    "CrowdNoiseResult",
     "DecayCurve",
     "ImageSourceResult",
     "ImpulseResponseResult",
@@ -79,12 +105,16 @@ __all__ = [
     "ReverberationModelResult",
     "ReverberationResult",
     "RoomAcousticsResult",
+    "RoomModesResult",
     "ShapedSweepResult",
     "SteadyFieldResult",
+    "absorption_per_table",
     "air_absorption_area",
     "arau_puchades_reverberation_time",
     "audible_image_count",
     "critical_distance",
+    "crowd_noise",
+    "crowd_noise_level",
     "decay_curve",
     "enclosed_space_reverberation",
     "equivalent_absorption_area",
@@ -111,10 +141,16 @@ __all__ = [
     "reverberation_time_models",
     "room_constant",
     "room_criterion",
+    "room_modal_density",
+    "room_mode_count",
+    "room_mode_frequency",
+    "room_modes",
     "room_parameters",
     "sabine_reverberation_time",
     "schroeder_frequency",
     "shaped_sweep_signal",
+    "speech_direct_level",
+    "speech_to_noise_ratio",
     "steady_state_field",
     "steady_state_spl",
     "sweep_signal",

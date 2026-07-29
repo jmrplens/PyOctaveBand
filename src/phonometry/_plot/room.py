@@ -32,12 +32,14 @@ from .common import (
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
+    from ..room.crowd_noise import CrowdNoiseResult
     from ..room.enclosed_space_absorption import ReverberationResult
     from ..room.image_source import ImageSourceResult
     from ..room.open_plan import OpenPlanResult
     from ..room.reverberation_prediction import ReverberationModelResult
     from ..room.room_acoustics import DecayCurve, RoomAcousticsResult
     from ..room.room_ir import ImpulseResponseResult
+    from ..room.room_modes import RoomModesResult
     from ..room.room_noise import NCResult, RCResult
     from ..room.steady_field import SteadyFieldResult
 
@@ -100,6 +102,24 @@ _STRINGS: dict[str, str] = {
     "Sweep band": "Banda del barrido",
     "Level re in-band max [dB]": "Nivel re máximo en banda [dB]",
     "Crest factor": "Factor de cresta",
+    # --- Rectangular room modes (Long Ch. 8) ---
+    "axial": "axial",
+    "tangential": "tangencial",
+    "oblique": "oblicuo",
+    "Mode kind": "Tipo de modo",
+    "Modal density [modes/Hz]": "Densidad modal [modos/Hz]",
+    "Modal density d$N$/d$f$": "Densidad modal d$N$/d$f$",
+    "Room modes — {lx} x {ly} x {lz} m": "Modos de la sala — {lx} x {ly} x {lz} m",
+    "Schroeder $f_s$ = {value} Hz": "$f_s$ de Schroeder = {value} Hz",
+    # --- Restaurant crowd self-noise (Long Ch. 17) ---
+    "Simultaneous talkers $N$": "Hablantes simultáneos $N$",
+    "Self-generated noise level [dB]": "Nivel de ruido autogenerado [dB]",
+    "$A$ = {value} m²": "$A$ = {value} m²",
+    "Speech at {value} m": "Habla a {value} m",
+    "Communication limit ($L_{SN}$ = -6 dB)":
+        "Límite de comunicación ($L_{SN}$ = -6 dB)",
+    "Crowd self-noise — $L_W$ = {lw} dB per talker":
+        "Ruido autogenerado del público — $L_W$ = {lw} dB por hablante",
 }
 
 
@@ -883,3 +903,144 @@ def plot_shaped_sweep(
     localize_axes(axes[0], language)
     _spectrum(axes[1])
     return axes
+
+
+def plot_room_modes(
+    result: RoomModesResult, ax: Axes | None = None, language: str = "en",
+    **kwargs: Any
+) -> Axes | np.ndarray:
+    """Mode ladder by kind and modal density of a rectangular room.
+
+    The upper panel stems every enumerated eigenfrequency (Long Equation
+    (8.43)) at a height set by its kind, so the axial, tangential and oblique
+    families read apart at a glance; the lower panel draws the smooth modal
+    density of Equation (8.46). When the result carries a Schroeder frequency
+    it is marked on both panels, separating the modal regime on its left from
+    the statistical regime on its right.
+
+    :param result: A :class:`~phonometry.room.room_modes.RoomModesResult`.
+    :param ax: Existing axes for the mode ladder alone, or ``None`` to create
+        the two-panel figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the ``Axes.vlines`` calls of the ladder.
+    :return: The two axes as an array, or the single axes when ``ax`` is given.
+    """
+    from .._i18n import format_number, localize_axes
+
+    single = ax is not None
+    axes = (
+        np.array([ax], dtype=object)
+        if ax is not None
+        else _new_axes_column(
+            2, sharex=True, gridspec_kw={"height_ratios": [2, 1]}
+        )
+    )
+    ladder = cast("Axes", axes[0])
+
+    freqs = np.asarray(result.frequencies, dtype=np.float64)
+    kinds = np.asarray(result.kinds)
+    # One raster row per family: axial on top, then tangential, then oblique.
+    rows = {"axial": 3.0, "tangential": 2.0, "oblique": 1.0}
+    colors = {"axial": _C_PRIMARY, "tangential": _C_SECONDARY,
+              "oblique": _C_TERTIARY}
+    for kind in ("axial", "tangential", "oblique"):
+        mask = kinds == kind
+        if not np.any(mask):
+            continue
+        row = rows[kind]
+        ladder.vlines(freqs[mask], row - 0.35, row + 0.35, color=colors[kind],
+                      lw=1.2, label=_t(kind, language), **kwargs)
+    ladder.set_ylim(0.4, 4.1)
+    order = ("oblique", "tangential", "axial")
+    ladder.set_yticks([rows[k] for k in order])
+    ladder.set_yticklabels([_t(k, language) for k in order], fontsize=8)
+    ladder.set_ylabel(_t("Mode kind", language))
+    lx, ly, lz = result.dimensions
+    ladder.set_title(
+        _t("Room modes — {lx} x {ly} x {lz} m", language).format(
+            lx=format_number(lx, language, decimals=1, trim=True),
+            ly=format_number(ly, language, decimals=1, trim=True),
+            lz=format_number(lz, language, decimals=1, trim=True),
+        )
+    )
+    ladder.grid(True, axis="x", alpha=0.3)
+
+    fs = result.schroeder_frequency
+    if fs is not None and np.isfinite(fs):
+        label = _t("Schroeder $f_s$ = {value} Hz", language).format(
+            value=format_number(fs, language, decimals=0)
+        )
+        for panel in axes:
+            panel.axvline(fs, color=_C_REFERENCE, ls="-.", lw=1.2, label=label)
+    ladder.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small", ncol=2)
+
+    if single:
+        ladder.set_xlabel(_t("Frequency [Hz]", language))
+    else:
+        density_axes = axes[1]
+        grid = np.linspace(0.0, result.max_frequency, 200)
+        density = np.asarray(result.density(grid), dtype=np.float64)
+        density_axes.plot(grid, density, color=_C_QUATERNARY, lw=1.8,
+                          label=_t("Modal density d$N$/d$f$", language))
+        density_axes.set_ylabel(_t("Modal density [modes/Hz]", language))
+        density_axes.set_xlabel(_t("Frequency [Hz]", language))
+        density_axes.grid(True, alpha=0.3)
+        density_axes.legend(loc="upper left", fontsize="small")
+        localize_axes(density_axes, language)
+
+    localize_axes(ladder, language)
+    return axes[0] if single else axes
+
+
+def plot_crowd_noise(
+    result: CrowdNoiseResult, ax: Axes | None = None, language: str = "en",
+    **kwargs: Any
+) -> Axes:
+    """Self-generated crowd noise against occupancy, one curve per absorption.
+
+    Draws Long Equation (17.51) over the occupancy axis for every absorption
+    area of the result, with the direct-field speech level of Equation (17.50)
+    at the listener across the table and the noise level at which the
+    speech-to-noise ratio falls to the -6 dB communication limit of
+    Equation (17.53).
+
+    :param result: A :class:`~phonometry.room.crowd_noise.CrowdNoiseResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to each ``Axes.plot`` call.
+    :return: The axes.
+    """
+    from .._i18n import format_number, localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    n = np.asarray(result.talkers, dtype=np.float64)
+    levels = np.asarray(result.levels, dtype=np.float64)
+    palette = (_C_PRIMARY, _C_SECONDARY, _C_TERTIARY, _C_QUATERNARY, _C_MUTED)
+    for row, (area, curve) in enumerate(zip(result.absorption_areas, levels)):
+        ax.plot(
+            n, curve, color=palette[row % len(palette)], lw=1.8,
+            label=_t("$A$ = {value} m²", language).format(
+                value=format_number(float(area), language, decimals=0)),
+            **kwargs,
+        )
+    ax.axhline(
+        result.signal_level, color=_C_EDGE, ls="--", lw=1.3,
+        label=_t("Speech at {value} m", language).format(
+            value=format_number(result.distance, language, decimals=1,
+                                trim=True)),
+    )
+    ax.axhline(result.communication_level, color=_C_REFERENCE, ls=":", lw=1.4,
+               label=_t("Communication limit ($L_{SN}$ = -6 dB)", language))
+    import matplotlib.ticker as mticker
+
+    ax.xaxis.set_major_locator(mticker.MaxNLocator(integer=True))
+    ax.set_xlabel(_t("Simultaneous talkers $N$", language))
+    ax.set_ylabel(_t("Self-generated noise level [dB]", language))
+    ax.set_title(
+        _t("Crowd self-noise — $L_W$ = {lw} dB per talker", language).format(
+            lw=format_number(result.sound_power_level, language, decimals=0))
+    )
+    ax.grid(True, alpha=0.3)
+    ax.legend(loc="lower right", fontsize="small")
+    localize_axes(ax, language)
+    return ax
