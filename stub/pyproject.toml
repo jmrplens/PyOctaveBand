@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "PyOctaveBand"
 version = "2.1.0"
 authors = [
-  { name="Jose Manuel Requena Plens", email="jmrplens@gmail.com" },
+  { name="José M. Requena-Plens", email="mail@jmrp.io" },
 ]
 description = "PyOctaveBand is now phonometry. This transition package installs phonometry and keeps 'import pyoctaveband' working."
 readme = "README.md"
