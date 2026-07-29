@@ -7568,6 +7568,22 @@ def _chk_duct_path_table_14_9() -> Outcome:
 
 @register(
     _NOISE_CONTROL,
+    "Long 2e Eqs. 13.27-13.33 (Reynolds diffuser self-noise)",
+    "24 x 24 in rectangular diffuser, 312 cfm, 0.05 in pd -> the 33/32/29/23/15 dB "
+    "row of Table 14.9",
+)
+def _chk_diffuser_sound_power() -> Outcome:
+    res = ph.diffuser_sound_power(
+        None, (24.0 * 0.0254) ** 2, 312.0 * 0.0004719474432, 0.05 * 249.0
+    )
+    printed = np.array([33.0, 32.0, 29.0, 23.0, 15.0])
+    worst = float(np.max(np.abs(res.values[:5] - printed)))
+    return numeric(0.0, worst, 1.0, unit="dB",
+                   expected_label="0 dB +/-1 (max |diff| over the five bands)")
+
+
+@register(
+    _NOISE_CONTROL,
     "ASHRAE 2019 Applications Ch. 49 Table 9",
     "Max neck velocity of a supply outlet for design RC(30) -> 2.2 m/s",
 )

@@ -9,7 +9,7 @@ references:
     edition: "2.ª ed."
     publisher: "Academic Press"
     primary: true
-    note: "El modelo de potencia acústica del ventilador (Cap. 13, Ec. 13.1 con las Tablas 13.5-13.8), la atenuación de conductos, el conducto flexible, la pérdida por derivación, la reflexión del extremo, el ruido regenerado del silenciador y el efecto de sala del Cap. 14, y la hoja resuelta de ruido por conductos de la Tabla 14.9 sobre la que se construye esta guía."
+    note: "El modelo de potencia acústica del ventilador (Cap. 13, Ec. 13.1 con las Tablas 13.5-13.8) y el modelo de ruido regenerado del difusor (Cap. 13, Ecs. 13.27-13.33), la atenuación de conductos, el conducto flexible, la pérdida por derivación, la reflexión del extremo, el ruido regenerado del silenciador y el efecto de sala del Cap. 14, y la hoja resuelta de ruido por conductos de la Tabla 14.9 sobre la que se construye esta guía."
   - type: book
     authors: ["Norton, M. P.", "Karczub, D. G."]
     year: 2003
@@ -355,15 +355,41 @@ Ecs. (8.251) y (8.254) de Bies); el modelo del codo lleva la transición en
 número de Strouhal desde el dipolo de sexta potencia de la esquina interior
 al cuadrupolo de octava potencia de la esquina exterior.
 
-La unidad terminal es el elemento que una hoja real nunca modela. Ni ASHRAE
-ni Long publican una forma cerrada para la potencia acústica de una rejilla o
-un difusor: sale de los datos de fabricante medidos según ASHRAE Standard 70.
-Lo que la biblioteca ofrece en su lugar son las dos reglas de cribado del
-capítulo 49 de ASHRAE. `air_terminal_velocity_limit` (Tabla 9) da la máxima
-velocidad en el cuello para un RC de diseño, para usarla cuando no existen
-datos acústicos del equipo elegido, y `air_terminal_damper_correction`
-(Tabla 10) da la penalización por estrangular una compuerta de regulación,
-que es donde fracasan muchísimas instalaciones terminadas.
+La unidad terminal es el último elemento del trayecto y el único que nada
+aguas abajo puede arreglar, porque después de él ya no queda conducto. Su
+potencia acústica suele venir de datos de fabricante medidos según ASHRAE
+Standard 70, que es lo que usa una hoja real. Cuando no se dispone de ellos,
+`diffuser_sound_power` es la estimación de Reynolds tal como la dan las
+Ecs. 13.27 a 13.33 de Long: un nivel global
+`L_W = 10 lg S_G + 30 lg xi + 60 lg U_G - 31.3` a partir del área de la cara,
+la velocidad de aproximación `U_G = Q / S_G` y el coeficiente normalizado de
+pérdida de carga `xi`, repartido por octavas mediante la función de forma
+`C_D = -11.82 - 0.15 A - 1.13 A^2` (`-5.82` si el equipo es circular) en torno
+a la banda de pico `f_P = 48.8 U_G`.
+
+```python
+from phonometry import diffuser_sound_power
+import numpy as np
+
+IN, CFM, IN_WG = 0.0254, 0.0004719474432, 249.0
+
+# El difusor de impulsion de la hoja de Long: 24 x 24 in, 312 cfm, 0.05 in pd.
+print(np.round(diffuser_sound_power(None, (24 * IN) ** 2,
+                                    volume_flow=312 * CFM,
+                                    pressure_drop=0.05 * IN_WG).values, 1))
+# [ 33.4  32.4  29.1  23.6  15.9   5.9  -6.4 -21. ]
+# La Tabla 14.9 de Long imprime 33/32/29/23/15/4/0/0 en esa fila.
+```
+
+La sexta potencia de la velocidad en la Ec. 13.27 es la regla de diseño:
+unos 18 dB por cada duplicación de la velocidad de aproximación una vez que
+la pérdida de carga la acompaña, y unos 15 dB de vuelta por cada duplicación
+del área de la cara con el mismo caudal. Con ello vienen dos reglas de
+cribado del capítulo 49 de ASHRAE. `air_terminal_velocity_limit` (Tabla 9) da
+la máxima velocidad en el cuello para un RC de diseño, y
+`air_terminal_damper_correction` (Tabla 10) da la penalización por estrangular
+una compuerta de regulación, que es donde fracasan muchísimas instalaciones
+terminadas.
 
 ```python
 from phonometry import air_terminal_damper_correction, air_terminal_velocity_limit
@@ -576,6 +602,13 @@ banda:
   `split_loss` da el ramal del 25 por ciento como 6,0 dB frente a los -6 dB
   impresos, y `elbow_insertion_loss` da 0/1/2/3/3/3/3/3 dB frente a la fila
   impresa cuando el codo se lee como redondo (Tabla 14.7) con $w = 24$ in.
+- **La fila del difusor de impulsión también se reproduce.**
+  `diffuser_sound_power` con un equipo rectangular de 24 x 24 in a 312 cfm y
+  0,05 in de pérdida de carga devuelve 33,4/32,4/29,1/23,6/15,9/5,9 dB frente
+  a los 33/32/29/23/15/4 impresos, dentro del propio redondeo de la hoja en
+  las cinco bandas que llevan nivel. La fila de la rejilla de retorno
+  (30/29/26/20/12/1) no se deduce de las mismas ecuaciones a sus 563 cfm, así
+  que es dato de fabricante.
 - **La fila NC 30 difiere 1 dB a 1 kHz.** Long imprime
   57/48/41/35/31/29/28/27; el `nc_curve(30)` de la biblioteca devuelve
   57/48/41/35/**32**/29/28/27, los valores de la Tabla 1 de la

@@ -146,7 +146,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `unlined_circular_duct_attenuation` (Eqs. 14.9-14.11, Table 14.1);
   `lined_rectangular_duct_attenuation` and `lined_circular_duct_attenuation`
   (the Reynolds regressions, Eqs. 14.12-14.13 with Tables 14.2-14.3);
-  `flexible_duct_insertion_loss` (Table 14.4); `split_loss` (Eq. 14.17);
+  `diffuser_sound_power`, the regenerated noise of a grille, register or
+  diffuser from its face area, approach velocity and pressure drop
+  (Eqs. 13.27-13.33); `flexible_duct_insertion_loss` (Table 14.4);
+  `split_loss` (Eq. 14.17);
   `end_reflection_loss_closed_form` and `equivalent_diameter`
   (Eqs. 14.14-14.16, also reachable as `end_reflection_loss(method="long")`
   beside the existing Bies table look-up); `silencer_self_noise` (Eq. 14.31
@@ -156,7 +159,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `air_terminal_velocity_limit` (Table 9) and `air_terminal_damper_correction`
   (Table 10). Validated end to end against Long's worked Table 14.9, whose
   supply and return sheets reproduce row for row within the 1 dB the printed
-  sheet carries, and element by element against the tables themselves; five
+  sheet carries, and element by element against the tables themselves; six
   new conformance rows. The guide records, band by band, which rows of that
   worked sheet the book's own printed tables do and do not reproduce.
 

@@ -65,8 +65,11 @@ diameter `D = sqrt(4 S / pi)`.
      a level shift of the tabulated one, so it comes from other data;
    * the flexible-duct row (14/14/16/15/17/22/16/13 dB) is **not** the
      Table 14.4 entry for 12 in by 6 ft (3/5/10/15/17/16/9 dB);
-   * the silencer, diffuser and grille rows are manufacturer data, which is
-     what a real sheet uses and what [`DuctElement`](/phonometry/reference/api/noise_control/duct-path/#ductelement) accepts.
+   * [`diffuser_sound_power`](/phonometry/reference/api/noise_control/hvac/#diffuser_sound_power) reproduces the supply diffuser row
+     (33/32/29/23/15/4/0/0 dB) to better than 1 dB in the six bands that
+     carry it, reading the device as a 24 x 24 in rectangular diffuser;
+   * the silencer and grille rows are manufacturer data, which is what a
+     real sheet uses and what [`DuctElement`](/phonometry/reference/api/noise_control/duct-path/#ductelement) accepts.
 
    The cascade arithmetic of that sheet is reproduced exactly (see the
    duct-path tests, which feed it its own printed element rows), and the
@@ -128,11 +131,11 @@ ASHRAE (2019) *HVAC Applications Handbook* Chapter 49, Table 9: the "free"
 opening airflow velocity not to be exceeded if the room is to reach a given
 design `RC(N)`, for use when no sound data is available for the selected
 device. It is a screening check, not a spectrum: the sound power of a real
-grille, register or diffuser must come from manufacturer data measured to
-ASHRAE Standard 70, because neither ASHRAE nor Long publishes a closed form
-that predicts it. Several devices in the same room, or a damper throttled
-in the neck, raise the level further and the allowable velocity has to be
-reduced accordingly.
+grille, register or diffuser comes from manufacturer data measured to
+ASHRAE Standard 70, and [`diffuser_sound_power`](/phonometry/reference/api/noise_control/hvac/#diffuser_sound_power) estimates it when that
+data is not to hand. Several devices in the same room, or a damper
+throttled in the neck, raise the level further and the allowable velocity
+has to be reduced accordingly.
 
 **Parameters**
 
@@ -171,6 +174,77 @@ Blade passing frequency `f_bp = rpm x blades / 60` (Long Eq. 13.4).
 | Exception | When |
 | :--- | :--- |
 | ValueError | If `blades` is not a positive integer. |
+
+## diffuser_sound_power
+
+```python
+diffuser_sound_power(
+    frequencies: ArrayLike | None,
+    face_area: float,
+    volume_flow: float,
+    pressure_drop: float,
+    *,
+    shape: str = 'rectangular',
+    count: int = 1,
+) -> HvacSpectrumResult
+```
+
+Regenerated (self) noise of a grille, register or diffuser.
+
+Reynolds's estimate as Long Eqs. 13.27 to 13.33, for when the
+manufacturer's ASHRAE Standard 70 data is not to hand. The overall sound
+power level is Eq. 13.27:
+
+```text
+L_W = 10 lg S_G + 30 lg xi + 60 lg U_G - 31.3
+```
+
+with `S_G` the face area of the device (ft2), `U_G = Q / (60 S_G)` the
+approach velocity (ft/s) and `xi = 334.9 dP / (rho_0 U_G^2)` the
+normalised pressure-drop coefficient of Eq. 13.28 (`dP` in inches of
+water gauge, `rho_0 = 0.075 lb/ft3`); this function takes and returns SI
+and converts internally.
+
+The octave-band spectrum follows from Eq. 13.29, `L_W,oct = L_W + C_D`,
+with the shape functions of Eqs. 13.30 and 13.31:
+
+```text
+C_D = -5.82 - 0.15 A - 1.13 A^2      (round)
+C_D = -11.82 - 0.15 A - 1.13 A^2     (rectangular, including slot)
+```
+
+normalised to the peak frequency `f_P = 48.8 U_G` of Eq. 13.32, where
+`A = N_B(f_P) - N_B(f)` is the distance in octaves from the peak band
+(Eq. 13.33) counted on Long's band numbering, 0 at 32 Hz.
+
+The sixth power of velocity in Eq. 13.27 is the design message: the level
+rises about 18 dB for every doubling of the approach velocity, and for a
+given air volume doubling the face area buys about 15 dB. Nothing
+downstream can take that noise back out, because there is no ductwork
+left, which is why the terminal device usually sets the room criterion in
+the mid and high bands.
+
+Several identical devices serving the same room add `10 lg n`, which is
+what `count` applies.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `frequencies` | Octave-band centres, Hz; `None` uses [`OCTAVE_BANDS`](/phonometry/reference/api/materials/absorption-rating/#octave_bands). |
+| `face_area` | Cross-sectional face area `S_G` of one device, m2. |
+| `volume_flow` | Volume flow `Q` through one device, m3/s. |
+| `pressure_drop` | Static pressure drop `dP` across the device, Pa. |
+| `shape` | `"rectangular"` (Eq. 13.31, includes slot diffusers) or `"round"` (Eq. 13.30). |
+| `count` | Number of identical devices `n` in the room. |
+
+**Returns:** An [`HvacSpectrumResult`](/phonometry/reference/api/noise_control/hvac/#hvacspectrumresult) of the band sound power level, dB re 1e-12 W.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If a dimension is not positive, `count` is not a positive integer or `shape` is unknown. |
 
 ## elbow_insertion_loss
 

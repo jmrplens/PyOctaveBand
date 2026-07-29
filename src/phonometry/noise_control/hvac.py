@@ -59,8 +59,11 @@ end-to-end fan-to-room calculation.
      a level shift of the tabulated one, so it comes from other data;
    * the flexible-duct row (14/14/16/15/17/22/16/13 dB) is **not** the
      Table 14.4 entry for 12 in by 6 ft (3/5/10/15/17/16/9 dB);
-   * the silencer, diffuser and grille rows are manufacturer data, which is
-     what a real sheet uses and what :class:`~.duct_path.DuctElement` accepts.
+   * :func:`diffuser_sound_power` reproduces the supply diffuser row
+     (33/32/29/23/15/4/0/0 dB) to better than 1 dB in the six bands that
+     carry it, reading the device as a 24 x 24 in rectangular diffuser;
+   * the silencer and grille rows are manufacturer data, which is what a
+     real sheet uses and what :class:`~.duct_path.DuctElement` accepts.
 
    The cascade arithmetic of that sheet is reproduced exactly (see the
    duct-path tests, which feed it its own printed element rows), and the
@@ -1270,6 +1273,95 @@ def silencer_self_noise(
     )
 
 
+def _octave_band_number(frequencies: NDArray[np.float64]) -> NDArray[np.float64]:
+    """Long's octave band number ``N_B``: 0 at 32 Hz, 1 at 63 Hz, 2 at 125 Hz."""
+    return np.round(np.log2(frequencies / 32.0))
+
+
+def diffuser_sound_power(
+    frequencies: ArrayLike | None,
+    face_area: float,
+    volume_flow: float,
+    pressure_drop: float,
+    *,
+    shape: str = "rectangular",
+    count: int = 1,
+) -> HvacSpectrumResult:
+    """Regenerated (self) noise of a grille, register or diffuser.
+
+    Reynolds's estimate as Long Eqs. 13.27 to 13.33, for when the
+    manufacturer's ASHRAE Standard 70 data is not to hand. The overall sound
+    power level is Eq. 13.27::
+
+        L_W = 10 lg S_G + 30 lg xi + 60 lg U_G - 31.3
+
+    with ``S_G`` the face area of the device (ft2), ``U_G = Q / (60 S_G)`` the
+    approach velocity (ft/s) and ``xi = 334.9 dP / (rho_0 U_G^2)`` the
+    normalised pressure-drop coefficient of Eq. 13.28 (``dP`` in inches of
+    water gauge, ``rho_0 = 0.075 lb/ft3``); this function takes and returns SI
+    and converts internally.
+
+    The octave-band spectrum follows from Eq. 13.29, ``L_W,oct = L_W + C_D``,
+    with the shape functions of Eqs. 13.30 and 13.31::
+
+        C_D = -5.82 - 0.15 A - 1.13 A^2      (round)
+        C_D = -11.82 - 0.15 A - 1.13 A^2     (rectangular, including slot)
+
+    normalised to the peak frequency ``f_P = 48.8 U_G`` of Eq. 13.32, where
+    ``A = N_B(f_P) - N_B(f)`` is the distance in octaves from the peak band
+    (Eq. 13.33) counted on Long's band numbering, 0 at 32 Hz.
+
+    The sixth power of velocity in Eq. 13.27 is the design message: the level
+    rises about 18 dB for every doubling of the approach velocity, and for a
+    given air volume doubling the face area buys about 15 dB. Nothing
+    downstream can take that noise back out, because there is no ductwork
+    left, which is why the terminal device usually sets the room criterion in
+    the mid and high bands.
+
+    Several identical devices serving the same room add ``10 lg n``, which is
+    what ``count`` applies.
+
+    :param frequencies: Octave-band centres, Hz; ``None`` uses
+        :data:`OCTAVE_BANDS`.
+    :param face_area: Cross-sectional face area ``S_G`` of one device, m2.
+    :param volume_flow: Volume flow ``Q`` through one device, m3/s.
+    :param pressure_drop: Static pressure drop ``dP`` across the device, Pa.
+    :param shape: ``"rectangular"`` (Eq. 13.31, includes slot diffusers) or
+        ``"round"`` (Eq. 13.30).
+    :param count: Number of identical devices ``n`` in the room.
+    :return: An :class:`HvacSpectrumResult` of the band sound power level,
+        dB re 1e-12 W.
+    :raises ValueError: If a dimension is not positive, ``count`` is not a
+        positive integer or ``shape`` is unknown.
+    """
+    f = OCTAVE_BANDS.copy() if frequencies is None else _frequencies(frequencies)
+    area_ft2 = require_positive(face_area, "face_area") / _M_PER_FT**2
+    flow_cfm = require_positive(volume_flow, "volume_flow") / _M3S_PER_CFM
+    drop_in_wg = require_positive(pressure_drop, "pressure_drop") / _PA_PER_IN_WG
+    peak = require_choice(shape, "shape", ("rectangular", "round"))
+    if count <= 0:
+        raise ValueError("'count' must be a positive integer.")
+    # Eq. 13.28: Long prints "ft/min" under U_G but defines it as Q / (60 S_G),
+    # which is ft/s, the unit Eq. 13.27 uses; the two are consistent that way.
+    velocity = flow_cfm / (60.0 * area_ft2)
+    xi = 334.9 * drop_in_wg / (0.075 * velocity**2)
+    overall = (
+        10.0 * np.log10(area_ft2)
+        + 30.0 * np.log10(xi)
+        + 60.0 * np.log10(velocity)
+        - 31.3
+        + 10.0 * np.log10(float(count))
+    )
+    a = _octave_band_number(np.array([48.8 * velocity])) - _octave_band_number(f)
+    base = -5.82 if peak == "round" else -11.82
+    return HvacSpectrumResult(
+        frequencies=f,
+        values=overall + base - 0.15 * a - 1.13 * a**2,
+        quantity="sound_power_level",
+        label=f"Diffuser self-noise (U = {velocity * _M_PER_FT:.2f} m/s)",
+    )
+
+
 def air_terminal_velocity_limit(
     design_criterion: float, *, opening: str = "supply"
 ) -> float:
@@ -1279,11 +1371,11 @@ def air_terminal_velocity_limit(
     opening airflow velocity not to be exceeded if the room is to reach a given
     design ``RC(N)``, for use when no sound data is available for the selected
     device. It is a screening check, not a spectrum: the sound power of a real
-    grille, register or diffuser must come from manufacturer data measured to
-    ASHRAE Standard 70, because neither ASHRAE nor Long publishes a closed form
-    that predicts it. Several devices in the same room, or a damper throttled
-    in the neck, raise the level further and the allowable velocity has to be
-    reduced accordingly.
+    grille, register or diffuser comes from manufacturer data measured to
+    ASHRAE Standard 70, and :func:`diffuser_sound_power` estimates it when that
+    data is not to hand. Several devices in the same room, or a damper
+    throttled in the neck, raise the level further and the allowable velocity
+    has to be reduced accordingly.
 
     :param design_criterion: Design ``RC(N)`` of the room; one of 25, 30, 35,
         40 or 45.

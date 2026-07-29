@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 437 numerical conformance checks against 287 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 438 numerical conformance checks against 288 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 437 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 53 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 438 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 53 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -2514,7 +2514,8 @@ cycle and warn on use; they are removed in 4.0.
 | `silencer_self_noise` | `function` | **Regenerated (self) noise of a splitter silencer (Long Eq. 14.31 + Table 14.8, Fry 1988).**<br>• `frequencies`, `airway_velocity` V [m/s], `passages` N, `height` H [m]<br>L_W = 55·lg V + 10·lg N + 10·lg(H/1 mm) − 45 | `silencer_self_noise(None, 10.0, 4, 0.9)` |
 | `split_loss` | `function` | **Branch power-division loss at a duct split (Long Eq. 14.17), returned as a positive attenuation.**<br>• `main_area` S_m [m²], `branch_areas` [m²], `branch` index | `split_loss(0.6, [0.15]*4)  # 6.02 dB` |
 | `end_reflection_loss_closed_form` / `equivalent_diameter` | `function` | **Reynolds' closed-form duct end reflection (Long Eqs. 14.14-14.16); the alternative to the `end_reflection_loss` table look-up (`method='long'`).**<br>• `frequencies`, `diameter`, `termination` 'flush'/'free'<br>• `equivalent_diameter(area)` = √(4S/π) for a rectangular duct | `end_reflection_loss(bands, 0.3, method='long')` |
-| `air_terminal_velocity_limit` / `air_terminal_damper_correction` | `function` | **Screening checks for grilles, registers and diffusers (ASHRAE 2019 Ch. 49 Tables 9/10); the device spectrum itself is manufacturer data to ASHRAE Standard 70.**<br>• `air_terminal_velocity_limit(design_criterion, opening='supply'/'return')` [m/s]<br>• `air_terminal_damper_correction(pressure_ratio, location='diffuser_neck'/'plenum_inlet'/'supply_duct')` [dB] | `air_terminal_velocity_limit(30)  # 2.2 m/s` |
+| `diffuser_sound_power` | `function` | **Regenerated (self) noise of a grille, register or diffuser (Long Eqs. 13.27-13.33, Reynolds 1990).**<br>• `frequencies`, `face_area` S_G [m²], `volume_flow` Q [m³/s], `pressure_drop` ΔP [Pa]<br>• `shape` 'rectangular'/'round', `count` n (adds 10·lg n)<br>• 18 dB per doubling of approach velocity; peak band at f_P = 48.8·U_G | `diffuser_sound_power(None, 0.372, 0.147, 12.4)` |
+| `air_terminal_velocity_limit` / `air_terminal_damper_correction` | `function` | **Screening checks for grilles, registers and diffusers (ASHRAE 2019 Ch. 49 Tables 9/10); a measured device spectrum to ASHRAE Standard 70 beats both.**<br>• `air_terminal_velocity_limit(design_criterion, opening='supply'/'return')` [m/s]<br>• `air_terminal_damper_correction(pressure_ratio, location='diffuser_neck'/'plenum_inlet'/'supply_duct')` [dB] | `air_terminal_velocity_limit(30)  # 2.2 m/s` |
 | `room_effect` | `function` | **Room effect: the drop from the sound power at the terminal device to the level in the room (Long Eq. 14.40), as a positive attenuation.**<br>• `distance` r [m], `room_constant` R [m²] (scalar or per band)<br>• `directivity` Q (Default: 2, flush in a ceiling) | `room_effect(3.0, room_constant(S, alpha))` |
 | `duct_path` | `function` | **End-to-end duct-borne cascade, fan to room (Long Table 14.9; AHRI 885 Table 8).**<br>• `frequencies`, `source_level` L_W, `elements` (`DuctElement` list)<br>• `room_effect`, `criterion` 'NC'/'RC', `target`, `self_noise_floor` (Default: 0 dB)<br>• `section`/`flow_velocity` → plane-wave validity warning | `duct_path(bands, lw, elements, room_effect=6.0, target=30)`<br><br>• `DuctPathResult` |
 | `DuctElement` / `DuctPathStage` | `dataclass` | **One path element and its computed rows.**<br>• `DuctElement`: `label`, `attenuation` (positive loss; scalar, array or `HvacSpectrumResult`), `self_noise` L_W, `code`<br>• `DuctPathStage`: `attenuation`, `attenuated` (the *Sum* row), `self_noise`, `level` (the *Combined* row) | `DuctElement('Silencer', il, sn, code='3')` |
@@ -6139,15 +6140,39 @@ Eqs. (8.251) and (8.254)); the bend model carries the Strouhal-number
 transition from the sixth-power inner-corner dipole to the eighth-power
 outer-corner quadrupole.
 
-The terminal device is the element a real sheet never models. Neither
-ASHRAE nor Long publishes a closed form for the sound power of a grille,
-register or diffuser: it comes from manufacturer data measured to ASHRAE
-Standard 70. What the library offers instead are the two screening rules of
-ASHRAE Chapter 49. `air_terminal_velocity_limit` (Table 9) gives the
-maximum neck velocity for a design RC, for use when no sound data exists
-for the selected device, and `air_terminal_damper_correction` (Table 10)
-gives the penalty for throttling a balancing damper, which is where a great
-many finished installations fail.
+The terminal device is the last one in the path and the one nothing
+downstream can fix, because there is no ductwork left after it. Its sound
+power is normally manufacturer data measured to ASHRAE Standard 70, and
+that is what a real sheet uses. When there is none to hand,
+`diffuser_sound_power` is Reynolds's estimate as Long Eqs. 13.27 to 13.33:
+an overall level `L_W = 10 lg S_G + 30 lg xi + 60 lg U_G - 31.3` from the
+face area, the approach velocity `U_G = Q / S_G` and the normalised
+pressure-drop coefficient `xi`, spread over the octaves by the shape
+function `C_D = -11.82 - 0.15 A - 1.13 A^2` (`-5.82` for a round device)
+about the peak band `f_P = 48.8 U_G`.
+
+```python
+from phonometry import diffuser_sound_power
+import numpy as np
+
+IN, CFM, IN_WG = 0.0254, 0.0004719474432, 249.0
+
+# The supply diffuser of Long's worked sheet: 24 x 24 in, 312 cfm, 0.05 in pd.
+print(np.round(diffuser_sound_power(None, (24 * IN) ** 2,
+                                    volume_flow=312 * CFM,
+                                    pressure_drop=0.05 * IN_WG).values, 1))
+# [ 33.4  32.4  29.1  23.6  15.9   5.9  -6.4 -21. ]
+# Long Table 14.9 prints 33/32/29/23/15/4/0/0 for that row.
+```
+
+The sixth power of velocity in Eq. 13.27 is the design rule: about 18 dB
+per doubling of the approach velocity once the pressure drop follows it,
+and about 15 dB back for every doubling of face area at the same air
+volume. Two screening rules from ASHRAE Chapter 49 come with it.
+`air_terminal_velocity_limit` (Table 9) gives the maximum neck velocity for
+a design RC, and `air_terminal_damper_correction` (Table 10) gives the
+penalty for throttling a balancing damper, which is where a great many
+finished installations fail.
 
 ```python
 from phonometry import air_terminal_damper_correction, air_terminal_velocity_limit
@@ -6350,6 +6375,12 @@ by band:
   the 25 per cent branch as 6.0 dB against the printed -6 dB, and
   `elbow_insertion_loss` gives 0/1/2/3/3/3/3/3 dB against the printed row
   when the elbow is read as round (Table 14.7) at `w = 24 in`.
+- **The supply diffuser row reproduces too.** `diffuser_sound_power` on a
+  24 x 24 in rectangular device at 312 cfm and 0.05 in pd returns
+  33.4/32.4/29.1/23.6/15.9/5.9 dB against the printed
+  33/32/29/23/15/4, inside the sheet's own rounding in the five bands that
+  carry the level. The return grille row (30/29/26/20/12/1) does not follow
+  from the same equations at its 563 cfm, so it is manufacturer data.
 - **The NC 30 row differs by 1 dB at 1 kHz.** Long prints
   57/48/41/35/31/29/28/27; the library's `nc_curve(30)` returns
   57/48/41/35/**32**/29/28/27, the values of ANSI/ASA S12.2-2019 Table 1.
@@ -6511,8 +6542,9 @@ survive past cut-on.
 
 - Long, M. (2014). *Architectural acoustics* (2nd ed.). Academic Press.
   ISBN 978-0-12-398258-2.
-  The fan sound-power model (Ch. 13, Eq. 13.1 and Tables 13.5-13.8), the
-  duct attenuation, flexible duct, split loss, end reflection, silencer
+  The fan sound-power model (Ch. 13, Eq. 13.1 and Tables 13.5-13.8) and the
+  diffuser self-noise model (Ch. 13, Eqs. 13.27-13.33), the duct
+  attenuation, flexible duct, split loss, end reflection, silencer
   self-noise and room effect of Ch. 14, and the worked duct-borne sheet of
   Table 14.9 this guide is built around.
 - Bies, D. A., Hansen, C. H., & Howard, C. Q. (2017). *Engineering noise

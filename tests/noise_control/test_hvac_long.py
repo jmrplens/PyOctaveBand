@@ -445,6 +445,129 @@ def test_splitter_silencer_validation(
         hvac.splitter_silencer_insertion_loss(*args)  # type: ignore[arg-type]
 
 
+def test_diffuser_sound_power_reproduces_the_table_14_9_row() -> None:
+    """Eqs. 13.27-13.33 against the supply diffuser of Long Table 14.9.
+
+    The sheet's row is "Rectangular Diffuser, 312 cfm, 0.05 in pd" with the
+    self-noise spectrum 33/32/29/23/15/4/0/0 dB. Read as a 24 x 24 in face,
+    the printed equations give it back: the approach velocity is
+    ``312 / (60 x 4 ft2) = 1.3 ft/s``, so the peak frequency
+    ``f_P = 48.8 U_G`` falls in the 63 Hz octave and the spectrum decays from
+    there by the Eq. 13.31 shape. The sheet floors its own rows at 0 dB, so
+    only the six bands that carry a level are compared.
+    """
+    res = hvac.diffuser_sound_power(
+        None, (24.0 * _IN) ** 2, 312.0 * _CFM, 0.05 * _IN_WG
+    )
+    printed = np.array([33.0, 32.0, 29.0, 23.0, 15.0, 4.0])
+    assert np.max(np.abs(res.values[:6] - printed)) < 2.0
+    assert np.max(np.abs(res.values[:5] - printed[:5])) < 1.0
+    assert res.quantity == "sound_power_level"
+
+
+def test_diffuser_sound_power_follows_the_printed_equations() -> None:
+    """Eqs. 13.27 to 13.33 evaluated here with plain arithmetic."""
+    area_ft2, flow_cfm, drop_in_wg = 4.0, 312.0, 0.05
+    velocity = flow_cfm / (60.0 * area_ft2)
+    xi = 334.9 * drop_in_wg / (0.075 * velocity**2)
+    overall = (
+        10.0 * math.log10(area_ft2)
+        + 30.0 * math.log10(xi)
+        + 60.0 * math.log10(velocity)
+        - 31.3
+    )
+    # Eq. 13.32: f_P = 48.8 U_G = 63.4 Hz, i.e. band number 1 (63 Hz).
+    assert 48.8 * velocity == pytest.approx(63.44, abs=0.01)
+    res = hvac.diffuser_sound_power(
+        None, area_ft2 * _FT**2, flow_cfm * _CFM, drop_in_wg * _IN_WG
+    )
+    for band, value in enumerate(res.values):
+        a = 1.0 - (band + 1)  # N_B(f_P) - N_B(f), 63 Hz being band 1
+        assert value == pytest.approx(overall - 11.82 - 0.15 * a - 1.13 * a**2)
+
+
+def test_diffuser_sound_power_round_shape_is_six_decibels_louder() -> None:
+    """Eq. 13.30 against Eq. 13.31: -5.82 instead of -11.82."""
+    args = (None, (24.0 * _IN) ** 2, 312.0 * _CFM, 0.05 * _IN_WG)
+    rectangular = hvac.diffuser_sound_power(*args)
+    round_ = hvac.diffuser_sound_power(*args, shape="round")
+    assert np.allclose(round_.values - rectangular.values, 6.0)
+
+
+def test_diffuser_sound_power_velocity_terms_cancel_at_fixed_pressure_drop() -> None:
+    """Long's own note under Eq. 13.28: 60 lg U and the U in xi cancel.
+
+    The velocity dependence of Eq. 13.27 is carried entirely by the pressure
+    drop, so at a fixed drop the overall level does not move with the flow.
+    Both cases below peak in the 250 Hz octave, so the same band compares the
+    same point of the spectrum.
+    """
+    area, drop = 4.0 * _FT**2, 0.05 * _IN_WG
+    slow = hvac.diffuser_sound_power([250.0], area, 1100.0 * _CFM, drop)
+    fast = hvac.diffuser_sound_power([250.0], area, 1400.0 * _CFM, drop)
+    assert slow.values[0] == pytest.approx(fast.values[0])
+
+
+def test_diffuser_sound_power_velocity_and_area_exponents() -> None:
+    """Long: 18 dB per doubling of velocity, -15 dB per doubling of face area.
+
+    Both statements hold once the pressure drop is allowed to follow the
+    velocity pressure, ``dP ~ U^2``, which is what a real device does. Each
+    case is read in its own peak octave, so only the overall level of
+    Eq. 13.27 is being compared.
+    """
+    area, drop = 4.0 * _FT**2, 0.05 * _IN_WG
+    # 1248 cfm through 4 ft2 is 5.2 ft/s, peaking in the 250 Hz octave.
+    base = hvac.diffuser_sound_power([250.0], area, 1248.0 * _CFM, drop)
+    # Twice the velocity through the same face: four times the pressure drop,
+    # peak in the 500 Hz octave.
+    faster = hvac.diffuser_sound_power(
+        [500.0], area, 2496.0 * _CFM, 4.0 * drop
+    )
+    assert faster.values[0] - base.values[0] == pytest.approx(
+        60.0 * math.log10(2.0), abs=1e-9
+    )
+    # Twice the face area at the same flow: half the velocity, a quarter of
+    # the pressure drop, peak in the 125 Hz octave.
+    wider = hvac.diffuser_sound_power(
+        [125.0], 2.0 * area, 1248.0 * _CFM, 0.25 * drop
+    )
+    assert wider.values[0] - base.values[0] == pytest.approx(
+        10.0 * math.log10(2.0) - 60.0 * math.log10(2.0), abs=1e-9
+    )
+
+
+def test_diffuser_sound_power_counts_identical_devices() -> None:
+    args = (None, (24.0 * _IN) ** 2, 312.0 * _CFM, 0.05 * _IN_WG)
+    one = hvac.diffuser_sound_power(*args)
+    four = hvac.diffuser_sound_power(*args, count=4)
+    assert np.allclose(four.values - one.values, 10.0 * math.log10(4.0))
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "match"),
+    [
+        ({"face_area": 0.0}, "face_area"),
+        ({"volume_flow": 0.0}, "volume_flow"),
+        ({"pressure_drop": -1.0}, "pressure_drop"),
+        ({"shape": "slot"}, "shape"),
+        ({"count": 0}, "count"),
+    ],
+)
+def test_diffuser_sound_power_validation(
+    kwargs: dict[str, object], match: str
+) -> None:
+    call: dict[str, object] = {
+        "frequencies": None,
+        "face_area": 0.37,
+        "volume_flow": 0.15,
+        "pressure_drop": 12.0,
+    }
+    call.update(kwargs)
+    with pytest.raises(ValueError, match=match):
+        hvac.diffuser_sound_power(**call)  # type: ignore[arg-type]
+
+
 @pytest.mark.parametrize(
     ("criterion", "opening", "expected"),
     [(45, "supply", 3.2), (30, "supply", 2.2), (25, "supply", 1.8),

@@ -61,6 +61,19 @@ SUPPLY_ELEMENTS = (
 )
 SUPPLY_ROOM_EFFECT = [6.0, 6.0, 5.0, 5.0, 6.0, 7.0, 6.0, 6.0]
 
+#: Long Table 14.9, supply path, the printed *Self-Noise* rows. Rows the sheet
+#: prints as a line of zeros are the elements whose ``self_noise`` is left
+#: unset above: they check the 0 dB floor of the sheet, not an input.
+SUPPLY_SELF_NOISE = (
+    [41, 39, 36, 29, 20, 6, 0, 0],
+    [49, 43, 44, 42, 42, 45, 35, 24],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [33, 32, 29, 23, 15, 4, 0, 0],
+)
+
 #: Long Table 14.9, supply path, the printed *Sum* and *Combined* rows.
 SUPPLY_ROWS = (
     ([90, 85, 80, 76, 74, 72, 68, 58], [90, 85, 80, 76, 74, 72, 68, 58]),
@@ -87,6 +100,15 @@ RETURN_ELEMENTS = (
      [30, 29, 26, 20, 12, 1, 0, 0]),
 )
 RETURN_ROOM_EFFECT = [9.0, 8.0, 6.0, 8.0, 8.0, 8.0, 9.0, 10.0]
+
+#: Long Table 14.9, return path, the printed *Self-Noise* rows.
+RETURN_SELF_NOISE = (
+    [43, 42, 39, 33, 24, 12, 0, 0],
+    [51, 49, 53, 56, 56, 59, 60, 53],
+    [39, 38, 34, 28, 18, 4, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [30, 29, 26, 20, 12, 1, 0, 0],
+)
 RETURN_ROWS = (
     ([90, 85, 80, 76, 74, 72, 68, 58], [90, 85, 80, 76, 74, 72, 68, 58]),
     ([74, 64, 45, 35, 33, 44, 47, 43], [74, 64, 54, 56, 56, 59, 60, 53]),
@@ -133,22 +155,66 @@ def _assert_sheet(got: np.ndarray, printed: list[int], what: str) -> None:
     )
 
 
+def _row(value: object) -> list[int]:
+    """The eight printed columns of a sheet row given as a scalar or a list."""
+    return [
+        int(v) for v in np.broadcast_to(np.asarray(value, dtype=np.float64), (8,))
+    ]
+
+
+def _assert_path(
+    result: DuctPathResult,
+    elements: tuple[tuple[str, object, object], ...],
+    self_noise_rows: tuple[list[int], ...],
+    level_rows: tuple[tuple[list[int], list[int]], ...],
+    room_effect: list[float],
+    received: list[int],
+    what: str,
+) -> None:
+    """Check all four printed rows of every element, and the two foot rows.
+
+    The attenuation rows are the published ones fed back, so they check that
+    the cascade carries each element's loss into the row it belongs to; the
+    *Self-Noise* rows the sheet prints as zeros check its 0 dB floor; the
+    *Sum* and *Combined* rows check the cascade arithmetic itself.
+    """
+    assert len(result.stages) == len(level_rows)
+    printed = zip(elements, self_noise_rows, level_rows)
+    for stage, ((_, loss, _), self_noise, (row_sum, combined)) in zip(
+        result.stages, printed
+    ):
+        where = f"{what} {stage.code}"
+        _assert_sheet(stage.attenuation, _row(loss), f"{where} attenuation")
+        _assert_sheet(stage.attenuated, row_sum, f"{where} Sum")
+        _assert_sheet(stage.self_noise, self_noise, f"{where} Self-Noise")
+        _assert_sheet(stage.level, combined, f"{where} Combined")
+    assert result.room_effect is not None
+    _assert_sheet(result.room_effect, _row(room_effect), f"{what} room effect")
+    _assert_sheet(result.received_level, received, f"{what} received")
+
+
 def test_long_table_14_9_supply_path_row_for_row() -> None:
-    supply = _build(SUPPLY_ELEMENTS, SUPPLY_ROOM_EFFECT, "Supply")
-    assert len(supply.stages) == len(SUPPLY_ROWS)
-    for stage, (printed_sum, printed_combined) in zip(supply.stages, SUPPLY_ROWS):
-        _assert_sheet(stage.attenuated, printed_sum, f"supply {stage.code} Sum")
-        _assert_sheet(stage.level, printed_combined, f"supply {stage.code} Combined")
-    _assert_sheet(supply.received_level, SUPPLY_RECEIVED, "supply received")
+    _assert_path(
+        _build(SUPPLY_ELEMENTS, SUPPLY_ROOM_EFFECT, "Supply"),
+        SUPPLY_ELEMENTS,
+        SUPPLY_SELF_NOISE,
+        SUPPLY_ROWS,
+        SUPPLY_ROOM_EFFECT,
+        SUPPLY_RECEIVED,
+        "supply",
+    )
 
 
 def test_long_table_14_9_return_path_row_for_row() -> None:
-    path = _build(RETURN_ELEMENTS, RETURN_ROOM_EFFECT, "Return")
-    assert len(path.stages) == len(RETURN_ROWS)
-    for stage, (printed_sum, printed_combined) in zip(path.stages, RETURN_ROWS):
-        _assert_sheet(stage.attenuated, printed_sum, f"return {stage.code} Sum")
-        _assert_sheet(stage.level, printed_combined, f"return {stage.code} Combined")
-    _assert_sheet(path.received_level, RETURN_RECEIVED, "return received")
+    _assert_path(
+        _build(RETURN_ELEMENTS, RETURN_ROOM_EFFECT, "Return"),
+        RETURN_ELEMENTS,
+        RETURN_SELF_NOISE,
+        RETURN_ROWS,
+        RETURN_ROOM_EFFECT,
+        RETURN_RECEIVED,
+        "return",
+    )
 
 
 def test_long_table_14_9_combined_meets_nc_30() -> None:

@@ -15,7 +15,7 @@
 
 ## Numerical conformance report
 
-&#9989; **437/437 conformance checks pass** across 53 domains and 287 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+&#9989; **438/438 conformance checks pass** across 53 domains and 288 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
 
@@ -882,7 +882,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary>&#9989; <b>Industrial noise control</b>: 100% (17/17)</summary>
+<summary>&#9989; <b>Industrial noise control</b>: 100% (18/18)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
@@ -899,6 +899,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | Long 2e Table 14.4 (ASHRAE 1995 lined flexible duct) | 8 in diameter, 9 ft long -> 6/8/16/25/28/28/18 dB (table node) | 0 dB (max |diff| over the 7 bands) | 0 dB | 0 dB | &#9989; |
 | Long 2e Eq. 14.17 (branch power division) | 25 per cent split with area-matched branches -> -10 lg 0.25 = 6.02 dB | 6.0206 dB (+/-0 dB) | 6.0206 dB | 0 dB | &#9989; |
 | Long 2e Table 14.9 (worked duct-borne sheet, supply path) | Fan to room, 8 octave bands -> 52/42/30/18/9/-2/-2/-1 dB at the receiver | 0 dB +/-1 (max |diff| over the 8 bands) | 1 dB | 1 dB | &#9989; |
+| Long 2e Eqs. 13.27-13.33 (Reynolds diffuser self-noise) | 24 x 24 in rectangular diffuser, 312 cfm, 0.05 in pd -> the 33/32/29/23/15 dB row of Table 14.9 | 0 dB +/-1 (max |diff| over the five bands) | 0.8853 dB | 0.885 dB | &#9989; |
 | ASHRAE 2019 Applications Ch. 49 Table 9 | Max neck velocity of a supply outlet for design RC(30) -> 2.2 m/s | 2.2 m/s (+/-0 m/s) | 2.2 m/s | 0 m/s | &#9989; |
 | Norton & Karczub 2e Eqs. 7.6/7.8/7.9 (problem 7.1 answer) | 254 mm duct, steam, 200 m/s: (1,0) cut-on 812 Hz and k_x = -8.23 1/m | 0 +/-1 (Hz, and 1/m x100) | 0.591 | 0.591 | &#9989; |
 | Norton & Karczub 2e Eq. 7.10 (problem 7.2 answer) | 0.65 x 0.4 m duct, 15 m/s: first three cut-on 264 / 428 / 503 Hz | 0 Hz (max |diff| over the 3 modes) | 0 Hz | 0 Hz | &#9989; |
