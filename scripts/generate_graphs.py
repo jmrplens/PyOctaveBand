@@ -15,7 +15,7 @@ for _threads_var in (
 
 from collections.abc import Callable, Sequence
 from functools import cache, lru_cache
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
@@ -1899,6 +1899,48 @@ COLOR_GRID = "#e0e0e0"
 COLOR_FG = "black"
 _FILENAME_SUFFIX = ""
 
+
+def _register_field_dark_cmap() -> None:
+    """Register ``phonometry_field_dark``, the dark-theme wave-field colormap.
+
+    Matplotlib's diverging ``berlin`` map anchors on a dark centre, but its
+    centre is a dark maroon that reads as a wash over the page background.
+    The registered map subtracts that centre bias instead of scaling it away:
+
+        out(x) = clip(berlin(x) - w(x) * berlin(0.5), 0, 1)
+
+    with the weight w(x) falling linearly from 1 at the centre to 0 at 60 %
+    amplitude. Zero pressure becomes true black -- the field blends into the
+    dark page exactly as the white centre of ``RdBu_r`` blends into the light
+    one -- while low-amplitude *differences* keep their size (a multiplicative
+    fade toward black would crush them into invisibility).
+    """
+    import matplotlib as mpl
+    from matplotlib.colors import LinearSegmentedColormap
+
+    if "phonometry_field_dark" in mpl.colormaps:
+        return
+    base = mpl.colormaps["berlin"]
+    xs = np.linspace(0.0, 1.0, 256)
+    cols = base(xs)[:, :3]
+    c0 = np.asarray(base(0.5)[:3])
+    w = np.clip(1.0 - np.abs(2.0 * xs - 1.0) / 0.6, 0.0, 1.0)
+    out = np.clip(cols - w[:, None] * c0, 0.0, 1.0)
+    mpl.colormaps.register(
+        LinearSegmentedColormap.from_list("phonometry_field_dark", out))
+
+
+_register_field_dark_cmap()
+
+# Theme-dependent wave-field styling, switched by set_theme(): the diverging
+# colormap of the instantaneous-pressure/velocity panels (zero maps to the
+# page background on both themes) and the ink/halo pair of the annotations
+# drawn *inside* those fields. Sequential magma panels (RMS maps, level maps)
+# are theme-independent and keep their hardcoded white ink.
+CMAP_FIELD = "RdBu_r"
+FIELD_INK = "black"
+FIELD_STROKE = "white"
+
 # Global matplotlib configuration
 plt.rcParams.update(
     {
@@ -1916,16 +1958,23 @@ plt.rcParams.update(
 def set_theme(dark: bool) -> None:
     """Switch between the light (default) and dark documentation themes."""
     global COLOR_FG, COLOR_GRID, _FILENAME_SUFFIX
+    global CMAP_FIELD, FIELD_INK, FIELD_STROKE
     if dark:
         plt.style.use("dark_background")
         COLOR_FG = "white"
         COLOR_GRID = "#555555"
         _FILENAME_SUFFIX = "_dark"
+        CMAP_FIELD = "phonometry_field_dark"
+        FIELD_INK = "white"
+        FIELD_STROKE = "black"
     else:
         plt.style.use("default")
         COLOR_FG = "black"
         COLOR_GRID = "#e0e0e0"
         _FILENAME_SUFFIX = ""
+        CMAP_FIELD = "RdBu_r"
+        FIELD_INK = "black"
+        FIELD_STROKE = "white"
     plt.rcParams.update(
         {
             "font.size": 10,
@@ -12564,10 +12613,16 @@ _ANIM_FRAMES = _ANIM_FPS * _ANIM_SECONDS
 # Closing hold appended to each schematic timeline: the settled verdict frame
 # stays on screen ~2 s so it can be read before the loop restarts.
 _ANIM_HOLD = 2 * _ANIM_FPS
-# The FDTD room-modes clip runs on its own frame budget: 18 s at the shared
-# 20 fps samples the 0.35 s simulation every ~0.96 ms, i.e. >= 12 frames per
-# period of the 84.3 Hz on-mode drive, so the wavefronts read as continuous
-# motion. On the shared timeline (~4 frames per period) the clip strobes.
+# The wave-field clips run on their own frame budgets: on the shared 12 s
+# timeline a wavefront advances several cells per frame and the field
+# strobes. Each FDTD/elastic clip therefore sizes its own window from the
+# two animation norms -- the captured span is 1.2 times the full round-trip
+# flight (source to the deepest reflector, wells and cavities included, and
+# on to the farthest visible point, at the slowest speed on the path) and
+# the capture stride keeps at least 48 frames per period of the highest
+# carrier -- and states that arithmetic next to its frame count. This 18 s
+# value is the starting budget the older clips were sized against and the
+# default for clips whose own note does not override it.
 _FDTD_ANIM_FRAMES = 18 * _ANIM_FPS
 _ANIM_FIGSIZE = (8.0, 4.5)   # inches at _ANIM_DPI -> 2400 x 1350 px
 _ANIM_DPI = 300
@@ -12657,7 +12712,7 @@ def _schematic_axes(ax: Any, xlim: tuple[float, float],
 
 def _render_clip(fig: Any, update: Callable[[int], tuple[Any, ...]],
                  output_dir: str, stem: str, *, frames: int | None = None,
-                 fps: int | None = None, gif_fps: int | None = None,
+                 fps: float | None = None, gif_fps: int | None = None,
                  poster_ss: float | None = None) -> None:
     """Shared clip tail: drive *update* through FuncAnimation and encode.
 
@@ -13039,7 +13094,7 @@ ssh -o BatchMode=yes -- {q_target} "rm -f {q_dir}/$rid"
 
 
 def _save_animation(anim: Any, fig: Any, output_dir: str, stem: str,
-                    make_gif: bool = True, *, fps: int | None = None,
+                    make_gif: bool = True, *, fps: float | None = None,
                     gif_fps: int | None = None,
                     poster_ss: float | None = None) -> None:
     """Write *anim* to WebM (always), its poster JPEG and, for English, a GIF.
@@ -13060,13 +13115,18 @@ def _save_animation(anim: Any, fig: Any, output_dir: str, stem: str,
 
     webm = _anim_path(output_dir, stem, "webm")
     rate = _ANIM_FPS if fps is None else fps
+    # Matplotlib types the writer rate as an int, but the writer only
+    # formats it into ffmpeg's ``-r`` and a fractional rate is legal there.
+    # A clip whose capture stride was cut by a non-integer factor plays at
+    # the matching fractional rate so its pacing stays exact.
+    rate_arg = cast(int, rate)
     gpu = _gpu_encode_target()
     saved = False
     if gpu is not None:
         wrapper = _write_gpu_ffmpeg_wrapper(gpu["target"], gpu["image"],
                                             gpu["workdir"])
         try:
-            writer = FFMpegWriter(fps=rate, codec="av1_nvenc",
+            writer = FFMpegWriter(fps=rate_arg, codec="av1_nvenc",
                                   extra_args=_av1_nvenc_extra_args())
             with plt.rc_context({"savefig.bbox": "standard",
                                  "animation.ffmpeg_path": wrapper}):
@@ -13078,7 +13138,7 @@ def _save_animation(anim: Any, fig: Any, output_dir: str, stem: str,
         finally:
             os.remove(wrapper)
     if not saved:
-        writer = FFMpegWriter(fps=rate, codec="libvpx-vp9",
+        writer = FFMpegWriter(fps=rate_arg, codec="libvpx-vp9",
                               extra_args=_vp9_extra_args())
         with plt.rc_context({"savefig.bbox": "standard"}):
             anim.save(webm, writer=writer, dpi=_ANIM_DPI,
@@ -13681,16 +13741,39 @@ def animate_schroeder(output_dir: str) -> None:
     _render_clip(fig, update, output_dir, "anim_schroeder")
 
 
+# Room-modes timeline. Mesh: the highest carrier is the off-mode drive at
+# 91.2 Hz (lambda = 3.76 m, lambda / 8 = 0.47 m) and the smallest geometric
+# dimension is the 3.5 m room side (3.5 / 4 = 0.88 m), so the rule
+# dx = min(0.88, 0.47) m allows 0.47 m; dx = 0.01 m sits 47 times finer,
+# because the mode map has to be drawn, not just resolved.
+# Flight: the source at (0.25, 0.25) m reaches the deepest reflector -- the
+# opposite corner (5, 3.5) -- after 5.755 m and the farthest visible point
+# (the near corner) 6.103 m later, so 11.859 m / 343 m/s x 1.2 = 41.5 ms.
+# Sampling: 18 solver steps per frame = 222.6 us gives 49.3 frames per
+# 91.2 Hz period (>= 48). The captured window keeps the committed clip's
+# full 350 ms -- the flight floor is only a floor, and this clip needs
+# 8.4 times it (3.5 amplitude time constants of the T60 = 0.7 s room,
+# tau = T60 / 6.9077 = 101 ms) because the resonance has to be seen
+# *growing* all the way into its settled mode map. 1 572 frames cover that
+# window, played at 13/3 of the shared 20 fps -- exactly the factor by
+# which the stride shrank from the committed clip's 78 solver steps per
+# frame -- so the pacing stays the 19.30 ms of simulation per second of
+# playback the committed clip had, and the clip runs 18.1 s (it ran 18 s).
+_ROOM_EVERY = 18
+_ROOM_FRAMES = 1572
+#: 13/3 of the shared rate, matching the stride cut (see the note above).
+_ROOM_FPS = _ANIM_FPS * 13.0 / 3.0
+
+
 @lru_cache(maxsize=1)
 def _room_mode_fields(
-        n_frames: int = _FDTD_ANIM_FRAMES) -> tuple[Any, Any, Any, float, float]:
+        n_frames: int = _ROOM_FRAMES) -> tuple[Any, Any, Any, float, float]:
     """Run the two FDTD room simulations once per process (all variants).
 
     Returns instantaneous-pressure frames, running-RMS frames (both float32,
     stacked ``(2, n_frames, ny, nx)``), the frame times, and the on-mode and
-    off-mode drive frequencies. ``n_frames`` caps the captured frames and sets
-    the capture stride over the fixed 0.35 s of physical time, so it controls
-    how densely each acoustic period is sampled.
+    off-mode drive frequencies. ``n_frames`` sets the captured window at the
+    fixed ``_ROOM_EVERY`` capture stride (see the timeline note above).
     """
     import fdtd2d
 
@@ -13700,15 +13783,15 @@ def _room_mode_fields(
     f_mode = 0.5 * c0 * float(np.hypot(2 / lx, 1 / ly))   # (2,1) ~ 84.3 Hz
     f_next = 0.5 * c0 * (2 / ly)                          # (0,2) = 98 Hz
     f_off = 0.5 * (f_mode + f_next)              # between resonances
-    duration, t60 = 0.35, 0.7
+    t60 = 0.7
+    every = _ROOM_EVERY
+    steps = every * n_frames
     p_all, r_all = [], []
     times = np.zeros(0)
     for f in (f_mode, f_off):
         sim = fdtd2d.FDTD2D(c0, dx, shape=(ny, nx), damping=6.9077 / t60)
         sim.add_source(fdtd2d.CWSource(ix=25, iy=25, frequency=f,
                                        ramp_cycles=2.0))
-        steps = round(duration / sim.dt)
-        every = max(1, steps // n_frames)
         # Running mean square with a two-period time constant: the pattern
         # (the mode map) builds up as the resonance settles.
         beta = float(np.exp(-sim.dt * f / 2.0))
@@ -13737,7 +13820,8 @@ def animate_fdtd_room_modes(output_dir: str) -> None:
     from matplotlib import patheffects
 
     T = _translate_str
-    outline = [patheffects.withStroke(linewidth=2.0, foreground="white")]
+    outline = [patheffects.withStroke(linewidth=2.0,
+                                      foreground=FIELD_STROKE)]
     p_all, r_all, times, f_mode, f_off = _room_mode_fields()
     half = p_all.shape[1] // 2
     vmax_p = float(np.quantile(np.abs(p_all[0][half:]), 0.995))
@@ -13754,13 +13838,13 @@ def animate_fdtd_room_modes(output_dir: str) -> None:
         ax_p = fig.add_subplot(gs[0, col])
         ax_p.grid(False)
         im_p = ax_p.imshow(p_all[col][0], origin="lower",
-                           extent=(0.0, 5.0, 0.0, 3.5), cmap="RdBu_r",
+                           extent=(0.0, 5.0, 0.0, 3.5), cmap=CMAP_FIELD,
                            vmin=-vmax_p, vmax=vmax_p, interpolation="bilinear")
         ax_p.set_title(titles[col], fontsize=10, fontweight="bold")
         ax_p.plot([0.25], [0.25], marker="o", ms=5, color=COLOR_TERTIARY,
-                  markeredgecolor="white", markeredgewidth=0.8)
+                  markeredgecolor=FIELD_STROKE, markeredgewidth=0.8)
         ax_p.text(0.45, 0.22, T("source"), ha="left", va="center",
-                  color="black", fontsize=7.5, path_effects=outline)
+                  color=FIELD_INK, fontsize=7.5, path_effects=outline)
         ax_p.tick_params(labelsize=7, labelbottom=False)
         ax_r = fig.add_subplot(gs[1, col])
         ax_r.grid(False)
@@ -13793,19 +13877,21 @@ def animate_fdtd_room_modes(output_dir: str) -> None:
         t_txt.set_text(T(f"t = {times[k] * 1000.0:3.0f} ms"))
         return (*ims, t_txt)
 
-    # Own frame budget (see _FDTD_ANIM_FRAMES): enough frames per acoustic
-    # period for fluid wavefronts. The GitHub GIF samples this long clip at a
-    # reduced rate so the palette-quantized file stays well under 4 MB.
+    # Own frame budget and rate (see the _ROOM_FRAMES timeline note):
+    # 1 572 frames at 49.3 per acoustic period, played at 260/3 fps. The
+    # GitHub GIF samples this long clip at a reduced rate so the
+    # palette-quantized file stays well under 4 MB.
     _render_clip(fig, update, output_dir, "anim_fdtd_room_modes",
-                 frames=int(p_all.shape[1]), gif_fps=8)
+                 frames=int(p_all.shape[1]), fps=_ROOM_FPS, gif_fps=5)
 
 
 # ---------------------------------------------------------------------------
 # FDTD wave-field clips (barrier, ground effect, SOFAR duct, diffuser).
 # Every simulation runs once per process behind an lru_cache and its frames
 # are re-rendered for the four language x theme variants; each clip keeps
-# >= 12 captured frames per acoustic period of the highest significant
-# frequency it shows, so the wavefronts read as continuous motion.
+# >= 48 captured frames per acoustic period of its highest carrier, raising
+# its playback rate with the capture stride so the wavefronts read as
+# continuous motion at the pacing the clip was composed for.
 # ---------------------------------------------------------------------------
 
 
@@ -13847,11 +13933,33 @@ _BARRIER_FREQS = (100.0, 500.0)
 # frequencies almost equally (tiny path difference), so the insertion-loss
 # contrast is pure diffraction instead of ground-interference lobes.
 _BARRIER_RECEIVER = (9.0, 0.5)
+# Barrier timeline. Mesh: the highest carrier is 500 Hz (lambda = 0.686 m,
+# lambda / 8 = 86 mm) and the smallest resolved geometric dimension is the
+# 2.5 m screen height (2.5 / 4 = 0.63 m), so the rule dx = min(0.63, 0.086)
+# m allows 86 mm; dx = 20 mm sits 4.3 times finer. (The screen is three
+# cells thick, but its thickness is not an acoustic dimension: a rigid
+# knife edge only has to be impermeable, which the 10^6:1 density contrast
+# makes it, and the diffraction the clip shows is set by the edge height.)
+# Flight: the source at (2.0, 0.5) m reaches the deepest reflector -- the
+# rigid ground 0.5 m below -- and from there the farthest visible point,
+# the top right corner (12, 7), is 12.207 m away, so 12.707 m / 343 m/s
+# x 1.2 = 44.45 ms.
+# Sampling: every solver step is captured, 24.74 us apart, i.e. 80.9 frames
+# per 500 Hz period (>= 48; the grid offers nothing between this and the
+# 40.4 of a two-step stride). 1 800 frames cover the 44.53 ms window,
+# played at 120 fps -- six times the 20 fps of the committed clip, exactly
+# the factor by which the stride shrank from its 6 solver steps per frame
+# -- so the pacing stays the 2.969 ms of simulation per second of playback
+# the committed clip had, and the clip runs 15 s (the old 18 s clip spent
+# its extra seconds past the flight, on the 53.4 ms window trimmed here).
+_BARRIER_EVERY = 1
+_BARRIER_FRAMES = 1800
+_BARRIER_FPS = 120
 
 
 @lru_cache(maxsize=1)
 def _barrier_fields(
-        n_frames: int = _FDTD_ANIM_FRAMES) -> tuple[Any, Any, Any, Any]:
+        n_frames: int = _BARRIER_FRAMES) -> tuple[Any, Any, Any, Any]:
     """Two CW barrier-diffraction runs (low/high frequency), cached.
 
     A 12 m x 7 m half-space over rigid ground with a thin rigid barrier
@@ -13873,8 +13981,7 @@ def _barrier_fields(
     rho = np.full((ny, nx), 1.2)
     bx = round(5.5 / dx)              # thin barrier: 3 cells = 6 cm
     rho[:round(2.5 / dx), bx:bx + 3] = 1.2e6
-    # 6 captured steps per frame: 13.5 frames per 500 Hz period, 53.4 ms.
-    every = 6
+    every = _BARRIER_EVERY
     # Receiver patch: 0.6 m x 0.6 m around the shadow-zone receiver,
     # energy-averaged so residual interference fringes average out.
     rx, ry = _BARRIER_RECEIVER
@@ -13902,7 +14009,7 @@ def _barrier_fields(
                 # Barrier-free reference: same steps, no frames captured.
                 for _ in range(every * n_frames):
                     sim.step()
-            # The clip ends at 53.4 ms, but at 100 Hz the field behind the
+            # The clip ends at 44.5 ms, but at 100 Hz the field behind the
             # barrier has not settled by then: after the 20 ms source ramp
             # the diffracted and ground-bounced paths over the edge keep
             # building the receiver level for several more periods. Step
@@ -13932,7 +14039,8 @@ def animate_fdtd_barrier(output_dir: str) -> None:
     from matplotlib.patches import Rectangle
 
     T = _translate_str
-    outline = [patheffects.withStroke(linewidth=2.0, foreground="white")]
+    outline = [patheffects.withStroke(linewidth=2.0,
+                                      foreground=FIELD_STROKE)]
     p_all, db_all, times, ils = _barrier_fields()
     half = p_all.shape[1] // 2
     lam = tuple(343.0 / f for f in _BARRIER_FREQS)
@@ -13956,7 +14064,7 @@ def animate_fdtd_barrier(output_dir: str) -> None:
         ax_p = fig.add_subplot(gs[0, col])
         ax_r = fig.add_subplot(gs[1, col])
         im_p = ax_p.imshow(p_all[col][0], origin="lower",
-                           extent=(0.0, 12.0, 0.0, 7.0), cmap="RdBu_r",
+                           extent=(0.0, 12.0, 0.0, 7.0), cmap=CMAP_FIELD,
                            vmin=-vmax, vmax=vmax, interpolation="bilinear")
         im_r = ax_r.imshow(db_all[col][0], origin="lower",
                            extent=(0.0, 12.0, 0.0, 7.0), cmap="magma",
@@ -13977,13 +14085,13 @@ def animate_fdtd_barrier(output_dir: str) -> None:
         ax_p.tick_params(labelbottom=False)
         ax_r.set_xlabel("x [m]", fontsize=8)
         ax_p.plot([2.0], [0.5], marker="o", ms=5, color=COLOR_TERTIARY,
-                  markeredgecolor="white", markeredgewidth=0.8)
+                  markeredgecolor=FIELD_STROKE, markeredgewidth=0.8)
         ax_p.text(2.25, 0.55, T("source"), ha="left", va="center",
-                  color="black", fontsize=7.5, path_effects=outline)
+                  color=FIELD_INK, fontsize=7.5, path_effects=outline)
         ax_p.text(5.53, 2.7, T("barrier"), ha="center", va="bottom",
-                  color="black", fontsize=7.5, path_effects=outline)
+                  color=FIELD_INK, fontsize=7.5, path_effects=outline)
         ax_p.text(9.2, 1.1, T("shadow zone"), ha="center", va="center",
-                  color="black", fontsize=7.5, path_effects=outline)
+                  color=FIELD_INK, fontsize=7.5, path_effects=outline)
         ax_r.text(11.7, 6.4, verdicts[col], ha="right", va="top",
                   color="white", fontsize=8)
         ax_r.plot([rx], [ry], marker="o", ms=5, color="white",
@@ -14025,17 +14133,37 @@ def animate_fdtd_barrier(output_dir: str) -> None:
         return (*ims, *il_txts, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_barrier",
-                 frames=int(p_all.shape[1]), gif_fps=8)
+                 frames=int(p_all.shape[1]), fps=_BARRIER_FPS, gif_fps=5)
 
 
 _GROUND_FREQ = 400.0
 _GROUND_H = 1.5
 _GROUND_ARC_R = 8.0
+# Ground-effect timeline. Mesh: the carrier is 400 Hz (lambda = 0.858 m,
+# lambda / 8 = 107 mm) and the smallest geometric dimension is the 1.5 m
+# source height (1.5 / 4 = 0.38 m), so the rule dx = min(0.38, 0.107) m
+# allows 107 mm; dx = 20 mm sits 5.4 times finer, which the 8 m sampling
+# arc needs to stay smooth.
+# Flight: the source at (1.6, 1.5) m reaches the deepest reflector -- the
+# rigid ground 1.5 m below -- and from there the farthest visible point,
+# the top right corner (14, 8), is 14.757 m away, so 16.257 m / 343 m/s
+# x 1.2 = 56.88 ms.
+# Sampling: 2 solver steps per frame = 49.48 us gives 50.5 frames per
+# 400 Hz period (>= 48). 1 150 frames cover the 56.90 ms window, played at
+# 80 fps -- four times the 20 fps of the committed clip, exactly the
+# factor by which the stride shrank from its 8 solver steps per frame --
+# so the pacing stays the 3.958 ms of simulation per second of playback
+# the committed clip had, and the clip runs 14.4 s (the old 18 s clip
+# spent its extra seconds past the flight, on the 71.2 ms window trimmed
+# here).
+_GROUND_EVERY = 2
+_GROUND_FRAMES = 1150
+_GROUND_FPS = 80
 
 
 @lru_cache(maxsize=1)
 def _ground_effect_fields(
-    n_frames: int = _FDTD_ANIM_FRAMES,
+    n_frames: int = _GROUND_FRAMES,
 ) -> tuple[Any, Any, Any, Any, Any, Any, Any]:
     """One CW run of a point source 1.5 m over rigid ground, cached.
 
@@ -14052,8 +14180,7 @@ def _ground_effect_fields(
                         sponge_sides=("left", "right", "bottom"))
     sim.add_source(fdtd2d.CWSource(ix=80, iy=75, frequency=_GROUND_FREQ,
                                    ramp_cycles=2.0))
-    # 8 steps per frame: 12.6 frames per 400 Hz period, 71.3 ms of settling.
-    every = 8
+    every = _GROUND_EVERY
     lam = c0 / _GROUND_FREQ
     theta = np.arange(1.0, 62.5, 0.5)
     rad = np.radians(theta)
@@ -14117,7 +14244,8 @@ def animate_fdtd_ground_effect(output_dir: str) -> None:
     from matplotlib import patheffects
 
     T = _translate_str
-    outline = [patheffects.withStroke(linewidth=2.0, foreground="white")]
+    outline = [patheffects.withStroke(linewidth=2.0,
+                                      foreground=FIELD_STROKE)]
     (p_frames, db_frames, times, theta, arc_db, model_db,
      nulls) = _ground_effect_fields()
     half = p_frames.shape[0] // 2
@@ -14132,7 +14260,7 @@ def animate_fdtd_ground_effect(output_dir: str) -> None:
     ax_l = fig.add_subplot(gs[:, 1])
 
     im_p = ax_p.imshow(p_frames[0], origin="lower",
-                       extent=(0.0, 14.0, 0.0, 8.0), cmap="RdBu_r",
+                       extent=(0.0, 14.0, 0.0, 8.0), cmap=CMAP_FIELD,
                        vmin=-vmax, vmax=vmax, interpolation="bilinear")
     im_r = ax_r.imshow(db_frames[0], origin="lower",
                        extent=(0.0, 14.0, 0.0, 8.0), cmap="magma",
@@ -14152,9 +14280,9 @@ def animate_fdtd_ground_effect(output_dir: str) -> None:
     ax_r.set_ylabel(T("RMS level: interference lobes"), fontsize=8)
     # Source, ghosted image source and the mirror geometry.
     ax_p.plot([1.6], [_GROUND_H], marker="o", ms=5, color=COLOR_TERTIARY,
-              markeredgecolor="white", markeredgewidth=0.8)
+              markeredgecolor=FIELD_STROKE, markeredgewidth=0.8)
     ax_p.text(1.95, 1.65, T("source (h = 1.5 m)"), ha="left", va="center",
-              color="black", fontsize=7.5, path_effects=outline)
+              color=FIELD_INK, fontsize=7.5, path_effects=outline)
     ax_p.plot([1.6], [-_GROUND_H], marker="o", ms=5, mfc="none",
               color=COLOR_TERTIARY, alpha=0.85)
     ax_p.plot([1.6, 1.6], [_GROUND_H, -_GROUND_H], ls=":",
@@ -14166,7 +14294,7 @@ def animate_fdtd_ground_effect(output_dir: str) -> None:
     ax_p.text(13.7, -0.95, T("rigid ground"), ha="right", va="center",
               color=COLOR_FG, fontsize=6.5, bbox=hatch_box)
     ax_p.text(0.3, 7.6, f"f = {_GROUND_FREQ:.0f} Hz", ha="left", va="top",
-              color="black", fontsize=8, path_effects=outline)
+              color=FIELD_INK, fontsize=8, path_effects=outline)
     # Sampling arc and the receiver sitting in the first-order dip.
     ax_r.plot(arc_x, arc_y, ls=":", color="white", lw=0.9, alpha=0.6)
     th_dip = nulls[1]
@@ -14222,7 +14350,7 @@ def animate_fdtd_ground_effect(output_dir: str) -> None:
         return (im_p, im_r, l_sim, verdict_txt, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_ground_effect",
-                 frames=int(p_frames.shape[0]), gif_fps=8)
+                 frames=int(p_frames.shape[0]), fps=_GROUND_FPS, gif_fps=5)
 
 
 _DUCT_AXIS = 400.0                       # channel-axis depth [m]
@@ -14245,9 +14373,36 @@ def _duct_profile(z: Any) -> Any:
     return np.minimum(c, c1 + 250.0)
 
 
+# SOFAR-duct timeline. Mesh: the pulse carries useful energy to ~19 Hz,
+# where the slowest water on the axis (1 480 m/s) gives lambda = 77.9 m and
+# lambda / 8 = 9.7 m; the geometry has no feature smaller than the 300 m
+# profile scale (300 / 4 = 75 m), so the rule dx = min(75, 9.7) m allows
+# 9.7 m and dx = 2 m sits 4.9 times finer, which the refracted wavefronts
+# need to stay smooth over 2.4 km.
+# Flight: nothing in this scene reflects (sponges all round, the turning
+# points are refractive), so the flight is the source out to the farthest
+# visible point, the corner (2 400, 800) m, over the slowest speed on the
+# path (1 480 m/s on the channel axis). The near-surface source at
+# (200, 150) m is the binding one at 2 294 m -- the on-axis source is
+# 2 236 m away -- so 2 294 / 1 480 x 1.2 = 1.860 s, against the old
+# 1.589 s window, which cut the wavefronts off before the frame edge.
+# Sampling: every solver step is captured, 490.5 us apart, i.e. 107.3
+# frames per 19 Hz period (>= 48; a two-step stride would already drop to
+# 53.6, still compliant, but this grid's dt is the natural floor). 3 793
+# frames cover the 1.860 s window, played at 180 fps -- nine times the
+# 20 fps of the committed clip, exactly the factor by which the stride
+# shrank from its 9 solver steps per frame -- so the pacing stays the
+# 88.29 ms of simulation per second of playback the committed clip had,
+# and the clip runs 21.1 s (the old 18 s clip covered only its shorter
+# 1.589 s window at the same speed).
+_DUCT_EVERY = 1
+_DUCT_FRAMES = 3793
+_DUCT_FPS = 180
+
+
 @lru_cache(maxsize=1)
 def _ducting_fields(
-    n_frames: int = _FDTD_ANIM_FRAMES,
+    n_frames: int = _DUCT_FRAMES,
 ) -> tuple[Any, Any, Any, Any, Any, Any]:
     """Two pulse runs in the SOFAR-like channel (on/off axis), cached.
 
@@ -14266,7 +14421,7 @@ def _ducting_fields(
     z = (np.arange(ny) + 0.5) * dx
     c_prof = _duct_profile(z)
     c_map = np.repeat(c_prof[:, np.newaxis], nx, axis=1)
-    every = 9                              # 4.4 ms/frame: 12 f/period @19 Hz
+    every = _DUCT_EVERY
     width, offset = 0.028, 0.033
     p_all, e_all = [], []
     times = np.zeros(0)
@@ -14311,7 +14466,8 @@ def animate_fdtd_ducting(output_dir: str) -> None:
     from matplotlib import patheffects
 
     T = _translate_str
-    outline = [patheffects.withStroke(linewidth=2.0, foreground="white")]
+    outline = [patheffects.withStroke(linewidth=2.0,
+                                      foreground=FIELD_STROKE)]
     p_all, e_db, times, z, c_prof, _ = _ducting_fields()
     half = p_all.shape[1] // 2
     vmax = float(np.quantile(np.abs(p_all[:, :half]), 0.999))
@@ -14347,7 +14503,7 @@ def animate_fdtd_ducting(output_dir: str) -> None:
         ax_f = fig.add_subplot(gs[row, 1])
         ax_f.grid(False)
         im = ax_f.imshow(p_all[row][0], origin="upper", extent=extent,
-                         cmap="RdBu_r", vmin=-vmax, vmax=vmax,
+                         cmap=CMAP_FIELD, vmin=-vmax, vmax=vmax,
                          aspect="auto", interpolation="bilinear")
         # The verdict overlay: fades in over the last seconds (and the
         # poster frame), replacing the instantaneous wavefronts with the
@@ -14360,9 +14516,10 @@ def animate_fdtd_ducting(output_dir: str) -> None:
         ax_f.axhline(_DUCT_AXIS, color="#888888", ls="--", lw=0.9,
                      alpha=0.8, zorder=3)
         ax_f.plot([200.0], [depth], marker="o", ms=5, color=COLOR_TERTIARY,
-                  markeredgecolor="white", markeredgewidth=0.8, zorder=4)
+                  markeredgecolor=FIELD_STROKE, markeredgewidth=0.8,
+                  zorder=4)
         ax_f.text(240.0, depth - 25.0, T("source"), ha="left", va="bottom",
-                  color="black", fontsize=7.5, path_effects=outline,
+                  color=FIELD_INK, fontsize=7.5, path_effects=outline,
                   zorder=4)
         # A translucent dark pill keeps this label legible once the bright
         # magma energy overlay fades in over the channel axis (a plain white
@@ -14372,7 +14529,7 @@ def animate_fdtd_ducting(output_dir: str) -> None:
                   bbox={"boxstyle": "round,pad=0.2", "facecolor": "black",
                         "alpha": 0.45, "edgecolor": "none"})
         v_txt = ax_f.text(60.0, 770.0, "", ha="left", va="bottom",
-                          color="black", fontsize=8, path_effects=outline,
+                          color=FIELD_INK, fontsize=8, path_effects=outline,
                           zorder=4)
         ax_f.tick_params(labelsize=7, labelleft=False)
         if row == 0:
@@ -14388,7 +14545,7 @@ def animate_fdtd_ducting(output_dir: str) -> None:
     # and the (long) centred suptitle.
     t_txt = fig.text(0.988, 0.90, "", ha="right", va="top",
                      family="monospace", fontsize=10, color=COLOR_FG)
-    reveal = int(0.83 * p_all.shape[1])    # ~15 s: pulse has crossed
+    reveal = int(0.83 * p_all.shape[1])    # ~26 s: pulse has crossed
     captions_on = int(0.38 * p_all.shape[1])   # first refocus is visible
 
     def update(k: int) -> tuple[Any, ...]:
@@ -14401,7 +14558,7 @@ def animate_fdtd_ducting(output_dir: str) -> None:
         return (*ims, *ims_e, *v_txts, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_ducting",
-                 frames=int(p_all.shape[1]), gif_fps=8)
+                 frames=int(p_all.shape[1]), fps=_DUCT_FPS, gif_fps=5)
 
 
 #: Virtual-tube sample: the equivalent fluid of the solver cross-checks
@@ -14483,9 +14640,40 @@ def _anim_tube_hardware(ax: Any, length: float, *, bore: float = 0.1,
                 va="bottom", fontsize=7.5, color=COLOR_PRIMARY)
 
 
+# Impedance-tube timeline. Mesh: the carrier is 850 Hz, where the air
+# wavelength is 0.404 m (lambda / 8 = 50 mm) and the equivalent-fluid
+# sample's is 0.242 m (lambda / 8 = 30 mm); the smallest geometric
+# dimension is the 0.1 m bore (0.1 / 4 = 25 mm), so the rule
+# dx = min(25, 30) mm allows 25 mm and dx = 2.5 mm sits ten times finer,
+# which the 10 cm sample (40 cells) and the envelope readout need.
+# Flight: the wave enters at x = 0, crosses 1.1 m of air and 0.1 m of
+# sample to the rigid plug and comes back to the farthest visible point
+# (the left edge), i.e. 2.2 m at 343 m/s plus 0.2 m at the sample's
+# 205.8 m/s = 7.39 ms, x 1.2 = 8.86 ms.
+# Sampling: 7 solver steps per frame = 21.6 us gives 54.3 frames per 850 Hz
+# period (>= 48), and 410 frames cover the 8.87 ms window (the old one ran
+# 16.7 ms at 25 frames per period), played at 15/7 of the shared 20 fps --
+# exactly the factor by which the stride shrank from the committed clip's
+# 15 solver steps per frame -- so the pacing stays the 0.928 ms of
+# simulation per second of playback the committed clip had, and the flight
+# takes 9.6 s (the old 18 s clip ran on well past it). The clip then holds
+# the settled frame for the shared 2 s (86 frames at this rate): the
+# reflected front reaches the left edge on the last captured frame, so the
+# standing-wave envelope -- a running maximum over the trailing period --
+# is only complete right at the end, and the absorption pill is revealed
+# there rather than mid-flight.
+_VTUBE_EVERY = 7
+_VTUBE_ACTIVE = 410
+#: 15/7 of the shared rate, matching the stride cut (see the note above).
+_VTUBE_FPS = _ANIM_FPS * 15.0 / 7.0
+#: The shared 2 s closing hold, counted at this clip's own frame rate.
+_VTUBE_HOLD = round(2.0 * _VTUBE_FPS)
+_VTUBE_FRAMES = _VTUBE_ACTIVE + _VTUBE_HOLD
+
+
 @lru_cache(maxsize=1)
 def _impedance_tube_fields(
-    n_frames: int = _FDTD_ANIM_FRAMES,
+    n_frames: int = _VTUBE_ACTIVE,
 ) -> tuple[Any, Any, Any, Any]:
     """CW build-up in the virtual impedance tube, empty vs sample, cached.
 
@@ -14499,7 +14687,7 @@ def _impedance_tube_fields(
 
     dx = _VTUBE_DX
     ny, nx = 40, 480                       # 0.1 m x 1.2 m
-    every = 15                             # 46.4 us/frame: 25 f/period
+    every = _VTUBE_EVERY
     sample_cells = round(0.10 / dx)
     runs = []
     for with_sample in (False, True):
@@ -14570,7 +14758,7 @@ def animate_fdtd_impedance_tube(output_dir: str) -> None:
         ax.grid(False)
         im = ax.imshow(np.zeros((20, 240)), origin="lower",
                        extent=(0.0, length, 0.0, bore),
-                       cmap="RdBu_r", vmin=-vmax, vmax=vmax,
+                       cmap=CMAP_FIELD, vmin=-vmax, vmax=vmax,
                        aspect="auto", interpolation="bilinear", zorder=2)
         _anim_tube_hardware(
             ax, length, bore=bore,
@@ -14598,29 +14786,68 @@ def animate_fdtd_impedance_tube(output_dir: str) -> None:
                                "edgecolor": "none"})
     t_txt = fig.text(0.988, 0.93, "", ha="right", va="top",
                      family="monospace", fontsize=10, color=COLOR_FG)
-    reveal = int(0.45 * len(times))
+    # The envelope is only settled once the reflected front has run back
+    # down the whole tube (one round trip plus a period of the trailing
+    # maximum), so the absorption pill is revealed at the very end of the
+    # flight and read during the closing hold.
+    n_active = len(times)
+    reveal = n_active - 1
 
     def update(k: int) -> tuple[Any, ...]:
+        kf = min(k, n_active - 1)
         for im, line, (p_all, env) in zip(ims, lines,
                                           ((p_e, env_e), (p_s, env_s))):
-            im.set_data(p_all[k])
-            env_row = np.repeat(env[k], 2)[: x_env.size]
+            im.set_data(p_all[kf])
+            env_row = np.repeat(env[kf], 2)[: x_env.size]
             line.set_data(x_env[env_from:],
                           env_base + env_row[env_from:] / env_max * env_h)
         a_txt.set_text(
             T(f"alpha = {alpha:.2f} at {_VTUBE_F:.0f} Hz")
             if k >= reveal else ""
         )
-        t_txt.set_text(T(f"t = {times[k] * 1e3:5.1f} ms"))
+        t_txt.set_text(T(f"t = {times[kf] * 1e3:5.1f} ms"))
         return (*ims, *lines, a_txt, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_impedance_tube",
-                 frames=len(times), gif_fps=8)
+                 frames=n_active + _VTUBE_HOLD, fps=_VTUBE_FPS, gif_fps=8)
+
+
+# Transmission-tube timeline. Same 2.5 mm mesh and the same 850 Hz carrier
+# as the impedance tube, for the same reason (bore / 4 = 25 mm against
+# lambda_sample / 8 = 30 mm).
+# Flight: the packet starts at x = 0.35 m; its transmitted half crosses
+# 1.15 m of air and the 0.1 m sample to the far end of the frame
+# (1.15 / 343 + 0.1 / 205.8 = 3.84 ms) while its reflected half runs
+# 1.25 m of air back to the left edge (3.64 ms), so 1.2 x 3.84 ms =
+# 4.61 ms of flight -- the old 3.2 ms window froze while both halves were
+# still travelling.
+# Sampling: 7 solver steps per frame = 21.6 us gives 54.3 frames per 850 Hz
+# period (>= 48; the committed clip's 4-step stride gave 95, more than the
+# norm asks, so the capture is coarsened to it), and 213 frames carry the
+# flight, played at 4/7 of the shared 20 fps -- exactly the inverse of the
+# factor by which the stride grew -- so the pacing stays the 0.247 ms of
+# simulation per second of playback the committed clip had, and the flight
+# takes 18.6 s. The clip then holds the settled verdict frame for the
+# shared 2 s (23 frames at this rate).
+_TTUBE_EVERY = 7
+_TTUBE_ACTIVE = 213
+#: 4/7 of the shared rate, undoing the stride coarsening (note above).
+_TTUBE_FPS = _ANIM_FPS * 4.0 / 7.0
+#: The shared 2 s closing hold, counted at this clip's own frame rate.
+_TTUBE_HOLD = round(2.0 * _TTUBE_FPS)
+_TTUBE_FRAMES = _TTUBE_ACTIVE + _TTUBE_HOLD
+#: Frame the closing hold (and with it the deferred-loading poster) freezes
+#: on: t = 3.2 ms, where the reflected and transmitted halves are fully
+#: separated and both still inside the tube. Both ends are anechoic, so by
+#: the end of the flight the packets have been absorbed and the tube is
+#: quiet -- a correct last frame, but an empty verdict. The time readout
+#: follows the frame back, so nothing on screen contradicts anything else.
+_TTUBE_VERDICT = 148
 
 
 @lru_cache(maxsize=1)
 def _transmission_tube_fields(
-    n_frames: int = _FDTD_ANIM_FRAMES,
+    n_frames: int = _TTUBE_FRAMES,
 ) -> tuple[Any, Any, Any, Any]:
     """A carrier packet crossing the virtual transmission tube, cached.
 
@@ -14634,7 +14861,7 @@ def _transmission_tube_fields(
 
     dx = _VTUBE_DX
     ny, nx = 40, 640                       # 0.1 m x 1.6 m
-    every = 4                              # 12.4 us/frame: the ~4 ms transit
+    every = _TTUBE_EVERY
     face = 320
     sample_cells = round(0.10 / dx)
     runs = []
@@ -14654,15 +14881,15 @@ def _transmission_tube_fields(
                            wavelength=343.0 / _VTUBE_F)
         ps: list[Any] = []
         ts: list[float] = []
-        active = min(n_frames, 260)        # ~3.2 ms: both fields on screen
+        active = min(n_frames, _TTUBE_ACTIVE)
         while len(ps) < active:
             sim.step()
             if sim.n % every == 0:
                 ps.append(sim.p[::2, ::2].astype(np.float32))
                 ts.append(sim.time)
         while len(ps) < n_frames:          # end hold on the verdict frame
-            ps.append(ps[-1])
-            ts.append(ts[-1])
+            ps.append(ps[_TTUBE_VERDICT])
+            ts.append(ts[_TTUBE_VERDICT])
         runs.append(np.stack(ps))
     omega = 2.0 * np.pi * _VTUBE_F
     k2 = (omega - 1j * _VTUBE_SIGMA) / _VTUBE_C2
@@ -14699,7 +14926,7 @@ def animate_fdtd_transmission_tube(output_dir: str) -> None:
         ax.grid(False)
         im = ax.imshow(np.zeros((20, 320)), origin="lower",
                        extent=(0.0, length, 0.0, bore),
-                       cmap="RdBu_r", vmin=-vmax, vmax=vmax,
+                       cmap=CMAP_FIELD, vmin=-vmax, vmax=vmax,
                        aspect="auto", interpolation="bilinear", zorder=2)
         _anim_tube_hardware(
             ax, length, bore=bore,
@@ -14734,7 +14961,7 @@ def animate_fdtd_transmission_tube(output_dir: str) -> None:
         return (*ims, tl_txt, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_transmission_tube",
-                 frames=len(times), gif_fps=8)
+                 frames=len(times), fps=_TTUBE_FPS, gif_fps=8)
 
 
 _QRD_DESIGN_F = 343.0 / 0.56             # ~612 Hz: lambda0 = 0.56 m
@@ -14760,9 +14987,37 @@ def _qrd_wells() -> list[tuple[float, float, float]]:
     return wells
 
 
+# Diffuser timeline. Mesh: the carrier is the 612 Hz design frequency
+# (lambda = 0.56 m, lambda / 8 = 70 mm) and the smallest acoustic dimension
+# of the panel is the 4 cm quadratic-residue depth unit (40 / 4 = 10 mm),
+# so the rule dx = min(10, 70) mm gives exactly the 10 mm mesh used here.
+# (The 1 cm fins between wells are one cell wide: they are the discrete
+# stand-in for the infinitely thin rigid separators of Schroeder theory,
+# and one cell of 10^6:1 density contrast already makes them impermeable.
+# What has to be resolved is the well -- 12 cells across, 4 to 16 deep.)
+# Flight: the packet starts 3.2 m up and runs 2.51 m down to the deepest
+# well bottom (0.85 - 0.16 = 0.69 m); the worst-placed of those deepest
+# wells sits at x = 3.715 m (see _qrd_wells), and from there the scattered
+# fan has 4.685 m to the farthest visible corner of the cropped frame
+# (0.4, 4.0). So 7.195 m / 343 m/s x 1.2 = 25.17 ms, against the old
+# 22.27 ms window.
+# Sampling: 2 solver steps per frame = 24.74 us gives 66.0 frames per
+# period of the 612 Hz carrier (>= 48; 30.0 at the 1.35 kHz edge of the
+# packet spectrum, itself well over the old 12-frame floor). 1 018 frames
+# cover the 25.18 ms window, played at 50 fps -- 5/2 of the 20 fps of the
+# committed clip, exactly the factor by which the stride shrank from its
+# 5 solver steps per frame -- so the pacing stays the 1.237 ms of
+# simulation per second of playback the committed clip had, and the clip
+# runs 20.4 s (the old 18 s clip covered only its shorter 22.27 ms window
+# at the same speed).
+_DIFF_EVERY = 2
+_DIFF_FRAMES = 1018
+_DIFF_FPS = 50
+
+
 @lru_cache(maxsize=1)
 def _diffusion_fields(
-    n_frames: int = _FDTD_ANIM_FRAMES,
+    n_frames: int = _DIFF_FRAMES,
 ) -> tuple[Any, Any, Any, Any, Any]:
     """Plane-wave packet onto a flat panel vs a QRD, cached (three runs).
 
@@ -14805,7 +15060,7 @@ def _diffusion_fields(
     ix_arc = np.round((3.0 + 2.2 * np.cos(rad)) / dx).astype(int)
     iy_arc = np.round((y1 + 2.2 * np.sin(rad)) / dx).astype(int)
 
-    every = 5                  # 61.9 us/frame: 12 f/period up to 1.35 kHz
+    every = _DIFF_EVERY
     sims = []
     for rho in (rho_flat, rho_qrd, rho_ref):
         sim = fdtd2d.FDTD2D(c0, dx, rho=rho, shape=(ny, nx),
@@ -14870,7 +15125,8 @@ def animate_fdtd_diffusion(output_dir: str) -> None:
     from phonometry import directional_diffusion_coefficient
 
     T = _translate_str
-    outline = [patheffects.withStroke(linewidth=2.0, foreground="white")]
+    outline = [patheffects.withStroke(linewidth=2.0,
+                                      foreground=FIELD_STROKE)]
     tot_all, trail_db, times, theta, levels = _diffusion_fields()
     d_coef = [directional_diffusion_coefficient(lv) for lv in levels]
     x0, x1, y0, y1 = _QRD_SLAB
@@ -14900,7 +15156,7 @@ def animate_fdtd_diffusion(output_dir: str) -> None:
         ax_t = fig.add_subplot(gs[0, col])
         ax_s = fig.add_subplot(gs[1, col])
         im_t = ax_t.imshow(tot_all[col][0], origin="lower",
-                           extent=(0.0, 6.0, 0.0, 4.4), cmap="RdBu_r",
+                           extent=(0.0, 6.0, 0.0, 4.4), cmap=CMAP_FIELD,
                            vmin=-vmax, vmax=vmax, interpolation="bilinear")
         im_s = ax_s.imshow(trail_db[col][0], origin="lower",
                            extent=(0.0, 6.0, 0.0, 4.4), cmap="magma",
@@ -14919,10 +15175,10 @@ def animate_fdtd_diffusion(output_dir: str) -> None:
         ax_t.tick_params(labelbottom=False)
         ax_s.set_xlabel("x [m]", fontsize=8)
         ax_t.text(3.0, 3.6, T("incident plane wavefront"), ha="center",
-                  va="bottom", color="black", fontsize=7.5,
+                  va="bottom", color=FIELD_INK, fontsize=7.5,
                   path_effects=outline)
         ax_t.annotate("", xy=(3.0, 3.1), xytext=(3.0, 3.55),
-                      arrowprops={"arrowstyle": "-|>", "color": "black",
+                      arrowprops={"arrowstyle": "-|>", "color": FIELD_INK,
                                   "lw": 1.2})
         ax_s.plot(arc_x, arc_y, ls=":", color="white", lw=0.9, alpha=0.65)
         ax_s.text(3.0, 0.15, beams[col], ha="center", va="bottom",
@@ -14940,7 +15196,7 @@ def animate_fdtd_diffusion(output_dir: str) -> None:
             ax_s.tick_params(labelleft=False)
             ax_t.text(3.0, 0.15, T(f"design frequency "
                                    f"{_QRD_DESIGN_F:.0f} Hz"), ha="center",
-                      va="bottom", color="black", fontsize=6.5,
+                      va="bottom", color=FIELD_INK, fontsize=6.5,
                       path_effects=outline)
         ims += [im_t, im_s]
         d_txts.append(d_txt)
@@ -14959,7 +15215,7 @@ def animate_fdtd_diffusion(output_dir: str) -> None:
         return (*ims, *d_txts, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_diffusion",
-                 frames=int(tot_all.shape[1]), gif_fps=8)
+                 frames=int(tot_all.shape[1]), fps=_DIFF_FPS, gif_fps=5)
 
 
 _META_DX = 0.00025
@@ -15205,7 +15461,8 @@ def animate_fdtd_metadiffuser(output_dir: str) -> None:
     from matplotlib.patches import Polygon, Rectangle
 
     T = _translate_str
-    outline = [patheffects.withStroke(linewidth=2.0, foreground="white")]
+    outline = [patheffects.withStroke(linewidth=2.0,
+                                      foreground=FIELD_STROKE)]
     tot_all, trail_db, times = _metadiffuser_fields()
     y1 = _META_FACE
     x_l = _META_XL
@@ -15230,7 +15487,7 @@ def animate_fdtd_metadiffuser(output_dir: str) -> None:
         ax_t = fig.add_subplot(gs[0, col])
         ax_s = fig.add_subplot(gs[1, col])
         im_t = ax_t.imshow(tot_all[col][0], origin="lower",
-                           extent=(0.0, 1.6, 0.0, 1.2), cmap="RdBu_r",
+                           extent=(0.0, 1.6, 0.0, 1.2), cmap=CMAP_FIELD,
                            vmin=-vmax, vmax=vmax, interpolation="bilinear")
         im_s = ax_s.imshow(trail_db[col][0], origin="lower",
                            extent=(0.0, 1.6, 0.0, 1.2), cmap="magma",
@@ -15253,10 +15510,10 @@ def animate_fdtd_metadiffuser(output_dir: str) -> None:
         ax_s.set_xlabel("x [m]", fontsize=8)
         if col == 1:
             ax_t.text(xc, 0.97, T("incident plane wavefront"), ha="center",
-                      va="bottom", color="black", fontsize=7.5,
+                      va="bottom", color=FIELD_INK, fontsize=7.5,
                       path_effects=outline)
             ax_t.annotate("", xy=(xc, 0.83), xytext=(xc, 0.955),
-                          arrowprops={"arrowstyle": "-|>", "color": "black",
+                          arrowprops={"arrowstyle": "-|>", "color": FIELD_INK,
                                       "lw": 1.2})
         d_txt = ax_s.text(xc, 1.03, "", ha="center", va="top",
                           color="white", fontsize=7.5, fontweight="bold")
@@ -15277,7 +15534,7 @@ def animate_fdtd_metadiffuser(output_dir: str) -> None:
         if col == 2:
             ax_t.text(xc, 0.06, T("real slits and resonators meshed at "
                                   "0.25 mm"), ha="center", va="bottom",
-                      color="black", fontsize=6.5, path_effects=outline)
+                      color=FIELD_INK, fontsize=6.5, path_effects=outline)
             ax_t.annotate("", xy=(x_r + 0.045, y1 - 0.023),
                           xytext=(x_r + 0.045, y1),
                           arrowprops={"arrowstyle": "-", "color": COLOR_FG,
@@ -15419,29 +15676,6 @@ def _pillar_fields(n_frames: int = _PILLAR_FRAMES) -> tuple[Any, Any]:
     return frames, ts
 
 
-def _ensure_field_dark_cmap() -> str:
-    """Register the dark-theme diverging field colormap, once.
-
-    ``phonometry_field_dark`` is ``berlin`` (matplotlib >= 3.10) with its
-    centre bias subtracted: ``clip(berlin(x) - w(x) * berlin(0.5))`` with
-    ``w`` falling linearly from 1 at the centre to 0 at 60 % amplitude, so
-    a zero field sits on pure black and blends into the dark documentation
-    background while the +/- lobes keep berlin's blue/red identity.
-    """
-    import matplotlib as mpl
-    from matplotlib.colors import ListedColormap
-
-    name = "phonometry_field_dark"
-    if name not in mpl.colormaps:
-        x = np.linspace(0.0, 1.0, 256)
-        base = mpl.colormaps["berlin"](x)[:, :3]
-        centre = np.asarray(mpl.colormaps["berlin"](0.5), dtype=float)[:3]
-        w = np.clip(1.0 - np.abs(2.0 * x - 1.0) / 0.6, 0.0, 1.0)
-        colors = np.clip(base - w[:, np.newaxis] * centre, 0.0, 1.0)
-        mpl.colormaps.register(ListedColormap(colors, name=name))
-    return name
-
-
 def animate_fdtd_pillar_hall(output_dir: str) -> None:
     """README banner: an 800 Hz plane wavefront sweeps through a hall of
     rigid columns (2D FDTD at 2.5 mm): every pillar diffracts the front and
@@ -15452,7 +15686,7 @@ def animate_fdtd_pillar_hall(output_dir: str) -> None:
     frames, ts = _pillar_fields()
     n_active = frames.shape[0]
     dark = bool(_FILENAME_SUFFIX)
-    cmap = _ensure_field_dark_cmap() if dark else "RdBu_r"
+    cmap = CMAP_FIELD
     # Colour scale: 55 % of the packet's global peak, so the travelling
     # front saturates boldly while each column's shed reflection sits in
     # the mid ramp and the decaying coda fades instead of clipping.
@@ -16541,9 +16775,9 @@ def animate_comb_filtering(output_dir: str) -> None:
 # FDTD wave-field clips, second batch (slit absorber, expansion chamber,
 # wall aperture, atmospheric refraction). Same conventions as the first
 # batch: each simulation runs once per process behind an lru_cache, every
-# clip keeps >= 12 captured frames per period of the highest significant
-# frequency, and every number printed on screen comes from the library
-# models, never from the simulation itself.
+# clip keeps >= 48 captured frames per period of its highest carrier, and
+# every number printed on screen comes from the library models, never from
+# the simulation itself.
 # ---------------------------------------------------------------------------
 
 
@@ -16677,7 +16911,7 @@ def _slit_absorber_fields(
     # = 0.6607 m, the same back to the farthest visible point (the frame's
     # left edge), over the slowest medium on the path (the slit fluid,
     # 313.7 m/s): t = 1.2 * 2 * 0.6607 / 313.7 = 5.06 ms -> every = 30
-    # (5.17 ms captured, 232 frames per 300 Hz period >= 12). The window
+    # (5.17 ms captured, 232 frames per 300 Hz period >= 48). The window
     # is far shorter than the resonator ring-up (~6 ms time constant), so
     # both runs first settle uncaptured for 20 ms and the clip shows the
     # steady field in slow motion with its exact settled envelope.
@@ -16801,7 +17035,7 @@ def animate_fdtd_slit_absorber(output_dir: str) -> None:
         ax = fig.add_subplot(gs[row, 0])
         ax.grid(False)
         im = ax.imshow(np.zeros((2, 2)), origin="lower",
-                       extent=(0.0, x_end, 0.0, bore), cmap="RdBu_r",
+                       extent=(0.0, x_end, 0.0, bore), cmap=CMAP_FIELD,
                        vmin=-vmax, vmax=vmax, aspect="auto",
                        interpolation="bilinear", zorder=2)
         _anim_slit_tube_walls(ax, x_end, bore, speaker=row == 0)
@@ -16842,7 +17076,7 @@ def animate_fdtd_slit_absorber(output_dir: str) -> None:
         ax_z.grid(False)
         im_z = ax_z.imshow(np.zeros((2, 2)), origin="lower",
                            extent=(x_zoom0, x_end, 0.0, bore),
-                           cmap="RdBu_r", vmin=-vmax, vmax=vmax,
+                           cmap=CMAP_FIELD, vmin=-vmax, vmax=vmax,
                            aspect="equal", interpolation="nearest",
                            zorder=2)
         for rect in body:
@@ -16977,7 +17211,7 @@ def _expansion_chamber_fields(
     # outlet plate, the deepest reflecting feature) = 0.85 m, plus 0.85 m
     # back to the farthest visible field point (the duct inlet at x = 0):
     # t = 1.2 * 1.7 / 343 = 5.95 ms -> every = 6 (6.68 ms captured, 94
-    # frames per 572 Hz period >= 12). The window is shorter than the
+    # frames per 572 Hz period >= 48). The window is shorter than the
     # standing wave's build-up, so both runs settle uncaptured for 30 ms
     # first and the clip shows the steady field with its exact envelope.
     every = 6
@@ -17055,7 +17289,7 @@ def animate_fdtd_expansion_chamber(output_dir: str) -> None:
             strict=True):
         ax.grid(False)
         im = ax.imshow(np.zeros((2, 2)), origin="lower",
-                       extent=(0.0, length, 0.0, height), cmap="RdBu_r",
+                       extent=(0.0, length, 0.0, height), cmap=CMAP_FIELD,
                        vmin=-vmax, vmax=vmax, aspect="auto",
                        interpolation="bilinear", zorder=2)
         _anim_chamber_hardware(ax, length, height, pipe_y,
@@ -17149,11 +17383,15 @@ def _anim_chamber_hardware(ax: Any, length: float, height: float,
 _APERTURE_F = 686.0                      # lambda = 0.50 m exactly
 _APERTURE_WIDTHS = (0.025, 0.50)         # sub-lambda slit / lambda-sized gap
 _APERTURE_DEPTH = 0.10                   # wall thickness across the opening
+_APERTURE_EVERY = 3
+_APERTURE_FRAMES = 962
+#: 8/3 of the shared rate, matching the stride cut (see the note below).
+_APERTURE_FPS = _ANIM_FPS * 8.0 / 3.0
 
 
 @lru_cache(maxsize=1)
 def _aperture_fields(
-    n_frames: int = _FDTD_ANIM_FRAMES,
+    n_frames: int = _APERTURE_FRAMES,
 ) -> tuple[Any, Any, Any, Any]:
     """Two CW runs against the slotted wall, cached.
 
@@ -17181,9 +17419,15 @@ def _aperture_fields(
     # Clip duration per the deepest-reflector rule: d(source -> far wall
     # face through the opening) = 2.1 m, plus d(slit exit -> farthest
     # visible frame corner (5.72, 0.7)) = 4.04 m: t = 1.2 * 6.14 / 343 =
-    # 21.5 ms -> every = 8 (22.3 ms captured from cold, so the clip is the
-    # transit story itself; 23.6 frames per 686 Hz period >= 12).
-    every = 8
+    # 21.5 ms captured from cold, so the clip is the transit story itself.
+    # Sampling: 3 solver steps per frame = 23.19 us gives 62.9 frames per
+    # 686 Hz period (>= 48; the old 8-step stride gave 23.6 and a 4-step
+    # one would stop at 47.1). 962 frames cover the 22.31 ms window,
+    # played at 8/3 of the shared 20 fps -- exactly the factor by which the
+    # stride shrank, so both the 18.0 s length and the 1.237 ms of
+    # simulation per second of playback are the ones the committed clip
+    # already had.
+    every = _APERTURE_EVERY
     p_all, r_all = [], []
     times = np.zeros(0)
     for width in _APERTURE_WIDTHS:
@@ -17225,7 +17469,8 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
     from matplotlib.patches import Rectangle
 
     T = _translate_str
-    outline = [patheffects.withStroke(linewidth=2.0, foreground="white")]
+    outline = [patheffects.withStroke(linewidth=2.0,
+                                      foreground=FIELD_STROKE)]
     p_all, db_all, times, tau = _aperture_fields()
     lam = 343.0 / _APERTURE_F
     half = p_all.shape[1] // 2
@@ -17247,7 +17492,7 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
         ax_p = fig.add_subplot(gs[0, col])
         ax_r = fig.add_subplot(gs[1, col])
         im_p = ax_p.imshow(p_all[col][0], origin="lower",
-                           extent=(0.0, 6.0, 0.0, 5.0), cmap="RdBu_r",
+                           extent=(0.0, 6.0, 0.0, 5.0), cmap=CMAP_FIELD,
                            vmin=-vmax, vmax=vmax, interpolation="bilinear")
         im_r = ax_r.imshow(db_all[col][0], origin="lower",
                            extent=(0.0, 6.0, 0.0, 5.0), cmap="magma",
@@ -17268,13 +17513,13 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
         ax_p.tick_params(labelbottom=False)
         ax_r.set_xlabel("x [m]", fontsize=8)
         ax_p.annotate("", xy=(1.15, 3.75), xytext=(0.55, 3.75),
-                      arrowprops={"arrowstyle": "-|>", "color": "black",
+                      arrowprops={"arrowstyle": "-|>", "color": FIELD_INK,
                                   "lw": 1.2})
         ax_p.text(0.85, 3.85, T("incident plane wavefront"), ha="left",
-                  va="bottom", color="black", fontsize=7.5,
+                  va="bottom", color=FIELD_INK, fontsize=7.5,
                   path_effects=outline)
         ax_p.text(2.24, 1.45, T("rigid wall"), ha="left", va="center",
-                  color="black", fontsize=7, path_effects=outline)
+                  color=FIELD_INK, fontsize=7, path_effects=outline)
         ax_r.text(3.85, 0.85, verdicts[col], ha="center", va="bottom",
                   color="white", fontsize=7.5, zorder=6,
                   bbox={"boxstyle": _ANIM_PILL_BOX,
@@ -17285,7 +17530,7 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
             ax_r.set_ylabel(T("RMS level [dB]"), fontsize=9)
             ax_p.text(0.2, 0.85,
                       T(f"f = {_APERTURE_F:.0f} Hz (λ = {lam:.2f} m)"),
-                      ha="left", va="bottom", color="black", fontsize=7.5,
+                      ha="left", va="bottom", color=FIELD_INK, fontsize=7.5,
                       path_effects=outline)
             tau_txt = ax_r.text(5.55, 4.1, "", ha="right", va="top",
                                 fontsize=8.5, color="white", zorder=7,
@@ -17312,7 +17557,7 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
         return (*ims, tau_txt, t_txt)
 
     _render_clip(fig, update, output_dir, "anim_fdtd_aperture_slit",
-                 frames=int(p_all.shape[1]), gif_fps=8)
+                 frames=int(p_all.shape[1]), fps=_APERTURE_FPS, gif_fps=8)
 
 
 _REFR_B = 1.0                            # log-profile strength [m/s]
@@ -17325,6 +17570,9 @@ _REFR_F = 50.0                           # CW drive: lambda ~ 6.9 m
 # the grid runs finer still (0.3 m, lambda/23) so the long-range phase
 # stays clean over the ~60-wavelength domain.
 _REFR_DX = 0.3
+_REFR_EVERY = 1
+_REFR_FRAMES = 1440
+_REFR_FPS = 80
 
 
 def _refraction_profiles() -> tuple[Any, ...]:
@@ -17342,7 +17590,7 @@ def _refraction_profiles() -> tuple[Any, ...]:
 
 @lru_cache(maxsize=1)
 def _refraction_fields(
-    n_frames: int = _FDTD_ANIM_FRAMES,
+    n_frames: int = _REFR_FRAMES,
 ) -> tuple[Any, Any, Any, Any, Any, Any]:
     """Two CW runs through the refracting atmosphere, cached.
 
@@ -17374,11 +17622,18 @@ def _refraction_fields(
     # Clip duration per the deepest-reflector rule: d(source -> ground)
     # = 2 m plus d(ground -> farthest visible frame corner (430, 105))
     # = 413.6 m at the slowest c on the path (upwind, ~333 m/s) gives
-    # t = 1.2 * 415.6 / 333 = 1.50 s, but the >= 12 frames-per-period
-    # floor at the 50 Hz carrier caps the 360-frame window first:
-    # every <= T / (12 dt) = 4.5 -> every = 4 (0.529 s captured, 13.6
-    # frames per period).
-    every = 4
+    # t = 1.2 * 415.6 / 333 = 1.50 s of flight, which the 1.30 s of
+    # uncaptured settling plus this 0.53 s window covers with margin: the
+    # wave has crossed the whole domain before the first captured frame
+    # and the clip then shows the settled streaming field.
+    # Sampling: every solver step is captured, 366.6 us apart downwind and
+    # 375.4 us apart upwind (each run's own c_max sets its dt), i.e. 54.6
+    # and 53.3 frames per 50 Hz period (>= 48; the old 4-step stride gave
+    # 13.6). 1 440 frames, played at 80 fps -- four times the shared
+    # 20 fps, exactly the factor by which the stride shrank, so both the
+    # 18.0 s length and the 29.3 ms of simulation per second of playback
+    # are the ones the committed clip already had.
+    every = _REFR_EVERY
     rays = [
         atmospheric_ray_paths(prof, source_height=_REFR_SRC[1],
                               launch_angles_deg=angles, max_range=430.0,
@@ -17451,7 +17706,8 @@ def animate_fdtd_refraction(output_dir: str) -> None:
     from phonometry import shadow_zone_distance
 
     T = _translate_str
-    outline = [patheffects.withStroke(linewidth=2.0, foreground="white")]
+    outline = [patheffects.withStroke(linewidth=2.0,
+                                      foreground=FIELD_STROKE)]
     p_all, e_db, times, z, c_profs, rays = _refraction_fields()
     profiles = _refraction_profiles()
     half = p_all.shape[1] // 2
@@ -17497,7 +17753,7 @@ def animate_fdtd_refraction(output_dir: str) -> None:
         ax_f = fig.add_subplot(gs[row, 1])
         ax_f.grid(False)
         im = ax_f.imshow(p_all[row][0], origin="lower", extent=extent,
-                         cmap="RdBu_r", vmin=-vmax, vmax=vmax,
+                         cmap=CMAP_FIELD, vmin=-vmax, vmax=vmax,
                          aspect="auto", interpolation="bilinear")
         im_e = ax_f.imshow(e_db[row], origin="lower", extent=extent,
                            cmap="magma", vmin=-30.0, vmax=0.0,
@@ -17521,15 +17777,15 @@ def animate_fdtd_refraction(output_dir: str) -> None:
             lines_row.append(ln)
         ray_lines.append(lines_row)
         ax_f.plot([src_x], [src_h], marker="o", ms=5,
-                  color=COLOR_TERTIARY, markeredgecolor="white",
+                  color=COLOR_TERTIARY, markeredgecolor=FIELD_STROKE,
                   markeredgewidth=0.8, zorder=4)
         ax_f.text(src_x + 8.0, src_h + 4.0, T("source (h = 2 m)"),
-                  ha="left", va="bottom", color="black", fontsize=7.5,
+                  ha="left", va="bottom", color=FIELD_INK, fontsize=7.5,
                   path_effects=outline, zorder=4)
-        ax_f.plot([recv_x], [src_h], marker="o", ms=5, color="white",
-                  markeredgecolor="black", markeredgewidth=0.8, zorder=4)
+        ax_f.plot([recv_x], [src_h], marker="o", ms=5, color=FIELD_STROKE,
+                  markeredgecolor=FIELD_INK, markeredgewidth=0.8, zorder=4)
         ax_f.text(recv_x, src_h + 6.0, T("receiver 350 m"), ha="center",
-                  va="bottom", color="black", fontsize=7.5,
+                  va="bottom", color=FIELD_INK, fontsize=7.5,
                   path_effects=outline, zorder=4)
         if row == 0:
             ax_f.text(20.0, -3.5, T("rigid ground"), ha="left",
@@ -17538,7 +17794,7 @@ def animate_fdtd_refraction(output_dir: str) -> None:
                             "facecolor": fig.get_facecolor(),
                             "edgecolor": "none"})
             ax_f.text(22.0, 97.0, T(f"f = {_REFR_F:.0f} Hz"), ha="left",
-                      va="top", color="black", fontsize=7.5,
+                      va="top", color=FIELD_INK, fontsize=7.5,
                       path_effects=outline, zorder=4)
         else:
             # The ray-model shadow boundary of the library, where the
@@ -17547,7 +17803,7 @@ def animate_fdtd_refraction(output_dir: str) -> None:
                          lw=0.9, alpha=0.8, zorder=3)
             ax_f.text(src_x + x_shadow + 6.0, 84.0,
                       T(f"shadow beyond ≈ {x_shadow:.0f} m (ray model)"),
-                      ha="left", va="top", color="black", fontsize=7,
+                      ha="left", va="top", color=FIELD_INK, fontsize=7,
                       path_effects=outline, zorder=4)
         v_txt = ax_f.text(424.0, 97.0, "", ha="right", va="top",
                           color="white", fontsize=8, zorder=4,
@@ -17596,7 +17852,7 @@ def animate_fdtd_refraction(output_dir: str) -> None:
     # worst case for GIF palette coding; 8 fps left the fallback near 8 MB
     # where every other FDTD clip stays under 4 MB.
     _render_clip(fig, update, output_dir, "anim_fdtd_refraction",
-                 frames=int(p_all.shape[1]), gif_fps=4)
+                 frames=int(p_all.shape[1]), fps=_REFR_FPS, gif_fps=4)
 
 
 # --- Elastic FDTD clips: plate junction and coincidence --------------------
@@ -17998,7 +18254,8 @@ def animate_elastic_coincidence(output_dir: str) -> None:
     from phonometry import coincidence_frequency
 
     T = _translate_str
-    outline = [patheffects.withStroke(linewidth=2.0, foreground="white")]
+    outline = [patheffects.withStroke(linewidth=2.0,
+                                      foreground=FIELD_STROKE)]
     p_lo, p_hi, times, trans_db, n_active = _coincidence_fields()
     bp, m2 = _elastic_plate_bp_m2()
     fc = coincidence_frequency(m2, bp)
@@ -18038,7 +18295,7 @@ def animate_elastic_coincidence(output_dir: str) -> None:
             ((axes[0], titles[0], p_lo), (axes[1], titles[1], p_hi))):
         ax.grid(False)
         im = ax.imshow(data[0], origin="upper", extent=(x0, x1, y1, y0),
-                       cmap="RdBu_r", vmin=-1.6, vmax=1.6,
+                       cmap=CMAP_FIELD, vmin=-1.6, vmax=1.6,
                        aspect="equal", interpolation="bilinear")
         ax.set_title(title, fontsize=10, fontweight="bold")
         ax.add_patch(Rectangle((x0, _EC_PLATE_Y), x1 - x0, _EL_H,
@@ -18047,17 +18304,17 @@ def animate_elastic_coincidence(output_dir: str) -> None:
         if col == 0:
             ax.text(x0 + 0.02, _EC_PLATE_Y - 0.012,
                     T("10 mm steel plate"), ha="left", va="bottom",
-                    color="black", fontsize=7.5, path_effects=outline,
+                    color=FIELD_INK, fontsize=7.5, path_effects=outline,
                     zorder=4)
             ax.set_ylabel("y [m]", fontsize=8)
         ax.text(x0 + 0.02, _EC_PLATE_Y + _EL_H + 0.012,
                 T("air below the plate drawn ×20"), ha="left", va="top",
-                color="black", fontsize=6.5, path_effects=outline,
+                color=FIELD_INK, fontsize=6.5, path_effects=outline,
                 zorder=4)
         # Incidence arrow at 45 degrees.
         ax.annotate("", xy=(x0 + 0.34, y0 + 0.30),
                     xytext=(x0 + 0.13, y0 + 0.09),
-                    arrowprops={"arrowstyle": "-|>", "color": "black",
+                    arrowprops={"arrowstyle": "-|>", "color": FIELD_INK,
                                 "lw": 1.4}, zorder=4)
         ax.set_xlabel("x [m]", fontsize=8)
         ax.tick_params(labelsize=7)
@@ -18119,13 +18376,91 @@ _ANIMATIONS: dict[str, Callable[[str], None]] = {
 }
 
 
-def generate_animations(output_dir: str,
-                        names: list[str] | None = None) -> None:
-    """Render the Tier-1 animations in the active language/theme.
+#: Cached field builders of the clips whose simulation dominates their cost,
+#: keyed by clip name. Calling one fills its ``lru_cache`` in the current
+#: process, which is what lets :func:`_render_anim_variants` fork the four
+#: language/theme variants off a single field computation: the frame stacks
+#: are never written after they are built, so the children share them
+#: copy-on-write instead of paying for the simulation (or the memory) again.
+_ANIM_FIELDS: dict[str, Callable[[], Any]] = {
+    "anim_fdtd_room_modes": _room_mode_fields,
+    "anim_fdtd_barrier": _barrier_fields,
+    "anim_fdtd_ground_effect": _ground_effect_fields,
+    "anim_fdtd_ducting": _ducting_fields,
+    "anim_fdtd_diffusion": _diffusion_fields,
+    "anim_fdtd_metadiffuser": _metadiffuser_fields,
+    "anim_fdtd_impedance_tube": _impedance_tube_fields,
+    "anim_fdtd_transmission_tube": _transmission_tube_fields,
+    "anim_fdtd_slit_absorber": _slit_absorber_fields,
+    "anim_fdtd_expansion_chamber": _expansion_chamber_fields,
+    "anim_fdtd_aperture_slit": _aperture_fields,
+    "anim_fdtd_refraction": _refraction_fields,
+    "anim_elastic_plate_junction": _plate_junction_fields,
+    "anim_elastic_coincidence": _coincidence_fields,
+}
+
+# A clip rename must not silently drop its field builder; fail fast.
+if not _ANIM_FIELDS.keys() <= _ANIMATIONS.keys():
+    _unknown_field = sorted(_ANIM_FIELDS.keys() - _ANIMATIONS.keys())
+    raise RuntimeError(f"animation names not in _ANIMATIONS: {_unknown_field}")
+
+
+def _render_anim_variant(clip: str, output_dir: str, lang: str,
+                         dark: bool) -> None:
+    """Render one language/theme variant of *clip* (fork child entry)."""
+    set_lang(lang)
+    set_theme(dark)
+    try:
+        _ANIMATIONS[clip](output_dir)
+    finally:
+        plt.close("all")
+
+
+def _render_anim_variants(clip: str, output_dir: str) -> None:
+    """Render all four language/theme variants of one clip.
+
+    Where the clip has a registered field builder and the platform can
+    fork, the field is computed once here and the four variants then render
+    concurrently in forked children that share it: the encoding of a
+    600-frame field clip is the long pole, and four of them cost about as
+    much wall time as one. Everything else (no builder, no fork) falls back
+    to rendering the variants one after another in this process, which is
+    what the pool workers of a full run do anyway.
+    """
+    import multiprocessing as mp
+
+    builder = _ANIM_FIELDS.get(clip)
+    if builder is None or "fork" not in mp.get_all_start_methods():
+        for lang, dark in _VARIANTS:
+            _render_anim_variant(clip, output_dir, lang, dark)
+        return
+    builder()
+    ctx = mp.get_context("fork")
+    procs = [
+        ctx.Process(target=_render_anim_variant,
+                    args=(clip, output_dir, lang, dark))
+        for lang, dark in _VARIANTS
+    ]
+    for proc in procs:
+        proc.start()
+    for proc in procs:
+        proc.join()
+    failed = [p.exitcode for p in procs if p.exitcode]
+    if failed:
+        raise RuntimeError(f"{clip}: {len(failed)} variant(s) failed "
+                           f"(exit codes {failed})")
+
+
+def generate_animations(output_dir: str, names: list[str] | None = None,
+                        *, variants: bool = False) -> None:
+    """Render the Tier-1 animations, by default in the active language/theme.
 
     ``names`` (clip stems, e.g. ``anim_schroeder``) restricts the run to a
     subset, used by ``--anim`` to re-render a single clip after review
-    fixes without paying for the whole batch.
+    fixes without paying for the whole batch. With ``variants`` each clip is
+    rendered in all four language x theme variants off one field
+    computation (:func:`_render_anim_variants`) instead of once in whatever
+    language and theme the caller has set.
     """
     import shutil
 
@@ -18140,11 +18475,15 @@ def generate_animations(output_dir: str,
             available = ", ".join(sorted(_ANIMATIONS))
             raise SystemExit(
                 f"unknown animation(s) {unknown}; available: {available}")
-        funcs = [_ANIMATIONS[n] for n in names]
+        clips = list(names)
     else:
-        funcs = list(_ANIMATIONS.values())
-    for func in funcs:
-        func(output_dir)
+        clips = list(_ANIMATIONS)
+    for clip in clips:
+        if variants:
+            print(f"--- Generating {clip} (4 variants) ---")
+            _render_anim_variants(clip, output_dir)
+        else:
+            _ANIMATIONS[clip](output_dir)
 
 
 # ====================================================================# Command line / parallel figure generation
@@ -18314,15 +18653,18 @@ def _generate_figures_parallel(
 # Approximate per-clip render cost (all four variants, the FDTD simulation
 # amortised once per clip through the ``lru_cache``). Used only to submit the
 # heaviest clips to the pool first so a long-pole FDTD clip does not land at
-# the tail; the exact values are irrelevant to correctness. The five FDTD
-# field clips dominate (a full 2D simulation plus four WebM encodes each);
-# the schematics are cheap and unlisted clips are treated as light.
+# the tail; the exact values are irrelevant to correctness. The wave-field
+# clips dominate (a full 2D simulation plus four WebM encodes each) and the
+# weights track their captured frame counts and mesh sizes -- the SOFAR duct
+# at 3 793 frames and the sub-millimetre slit absorber, whose simulation
+# alone runs three quarters of an hour, are the long poles. The schematics
+# are cheap and unlisted clips are treated as light.
 _ANIM_WEIGHTS: dict[str, float] = {
-    "anim_fdtd_room_modes": 520.0,
-    "anim_fdtd_barrier": 320.0,
-    "anim_fdtd_ground_effect": 300.0,
-    "anim_fdtd_ducting": 280.0,
-    "anim_fdtd_diffusion": 260.0,
+    "anim_fdtd_room_modes": 1500.0,
+    "anim_fdtd_barrier": 1000.0,
+    "anim_fdtd_ground_effect": 700.0,
+    "anim_fdtd_ducting": 1600.0,
+    "anim_fdtd_diffusion": 750.0,
     "anim_fdtd_metadiffuser": 540.0,
     "anim_fdtd_pillar_hall": 200.0,
     "anim_standing_wave_tube": 130.0,
@@ -18336,12 +18678,12 @@ _ANIM_WEIGHTS: dict[str, float] = {
     "anim_onset_detection": 55.0,
     "anim_time_weighting": 55.0,
     "anim_schroeder": 55.0,
-    "anim_fdtd_impedance_tube": 260.0,
-    "anim_fdtd_transmission_tube": 280.0,
-    "anim_fdtd_slit_absorber": 320.0,
-    "anim_fdtd_aperture_slit": 230.0,
-    "anim_fdtd_refraction": 260.0,
-    "anim_fdtd_expansion_chamber": 150.0,
+    "anim_fdtd_impedance_tube": 300.0,
+    "anim_fdtd_transmission_tube": 200.0,
+    "anim_fdtd_slit_absorber": 1500.0,
+    "anim_fdtd_aperture_slit": 800.0,
+    "anim_fdtd_refraction": 900.0,
+    "anim_fdtd_expansion_chamber": 250.0,
     "anim_elastic_plate_junction": 420.0,
     "anim_elastic_coincidence": 640.0,
 }
@@ -18505,14 +18847,11 @@ def main(argv: list[str] | None = None) -> None:
 
     if do_anim:
         if args.anim or jobs == 1:
-            # A single-clip re-render (``--anim``) and an explicit ``--jobs 1``
-            # stay sequential: the subset is small and in-process rendering
-            # keeps the FDTD ``lru_cache`` warm across the four variants.
-            for lang, dark in _VARIANTS:
-                set_lang(lang)
-                set_theme(dark)
-                print(f"--- Generating {lang} {'dark' if dark else 'light'} animations ---")
-                generate_animations(img_dir, args.anim)
+            # A targeted re-render (``--anim``) and an explicit ``--jobs 1``
+            # walk the clips one at a time: each clip's field is simulated
+            # once and its four language/theme variants then render off that
+            # single computation (see _render_anim_variants).
+            generate_animations(img_dir, args.anim, variants=True)
         else:
             import shutil
             if shutil.which("ffmpeg") is None:
