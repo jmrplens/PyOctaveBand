@@ -281,11 +281,9 @@ def test_elements_must_be_duct_elements() -> None:
 
 
 def test_element_spectrum_must_be_finite() -> None:
+    elements = [DuctElement("Duct", [1, 2, 3, 4, 5, 6, 7, np.nan])]
     with pytest.raises(ValueError, match="finite"):
-        duct_path(
-            OCTAVE_BANDS, FAN_LW,
-            [DuctElement("Duct", [1, 2, 3, 4, 5, 6, 7, np.nan])],
-        )
+        duct_path(OCTAVE_BANDS, FAN_LW, elements)
 
 
 def test_combine_requires_at_least_one_path() -> None:
