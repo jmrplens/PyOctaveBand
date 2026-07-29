@@ -530,22 +530,25 @@ Assembling the direct path and all twelve flanking paths gives the apparent
 index per band, its energy split and the ISO 717-1 rating in one call:
 
 ```python
+# `paths` holds the twelve flanking paths of the four elements, built the
+# way `d1` was above; the code block under the figure builds all of them.
 res = detailed_airborne_prediction(
     bands, direct_index=direct_reduction_index(el.sound_reduction_index,
                                                delta_r_source=delta),
-    flanking_paths=[d1, ...])          # the twelve paths of the four elements
+    flanking_paths=paths)
 print(np.round(res.r_prime[[0, 10]], 1))   # [28.8 55.9]   Table L.1 total
 print(res.rating.rating, res.dominant[0])  # 57 'Dd'
 res.plot()                                 # per-band path-contribution bars
 ```
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/detailed_prediction_paths_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/detailed_prediction_paths.svg" alt="Stacked per-band shares of the transmitted energy for the thirteen transmission paths of the ISO 12354-1 Annex L building, with the apparent sound reduction index R' overlaid: the direct path Dd carries half the energy at 50 Hz and disappears above 200 Hz, after which flanking paths across the external and internal walls take over" width="92%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/detailed_prediction_paths_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/detailed_prediction_paths.svg" alt="Stacked per-band shares of the transmitted energy for the thirteen transmission paths of the ISO 12354-1 Annex L building, with the apparent sound reduction index R' overlaid: the direct path Dd carries half the energy at 50 Hz, falls away through the 80 Hz to 160 Hz transition and is negligible from 200 Hz upwards, after which flanking paths across the external and internal walls take over" width="92%"></picture>
 
 *This is the plot the whole detailed model exists for. Below 80 Hz the
 separating floor itself is the problem, so a heavier slab or a better floating
-floor would help; from 100 Hz upwards it has vanished from the budget and the
-flanking paths across the walls set $R'$, so no amount of work on the floor
-would move the result. The single number $R'_w = 57$ dB says none of that.*
+floor would help; it fades through the 80 Hz to 160 Hz transition and from
+200 Hz upwards it has left the budget entirely, the flanking paths across the
+walls setting $R'$ on their own, so no amount of work on the floor would move
+the result there. The single number $R'_w = 57$ dB says none of that.*
 
 <details>
 <summary>Show the code for this figure</summary>

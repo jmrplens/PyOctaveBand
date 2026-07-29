@@ -194,23 +194,27 @@ aparente por bandas, su reparto de energía y la valoración ISO 717-1 en una
 sola llamada:
 
 ```python
+# `paths` contiene los doce caminos por flancos de los cuatro elementos,
+# construidos como `d1` más arriba; el bloque de código bajo la figura los
+# construye todos.
 res = detailed_airborne_prediction(
     bands, direct_index=direct_reduction_index(el.sound_reduction_index,
                                                delta_r_source=delta),
-    flanking_paths=[d1, ...])          # los doce caminos de los cuatro elementos
+    flanking_paths=paths)
 print(np.round(res.r_prime[[0, 10]], 1))   # [28.8 55.9]   total de la tabla L.1
 print(res.rating.rating, res.dominant[0])  # 57 'Dd'
 res.plot()                                 # barras de contribución por banda
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/detailed_prediction_paths.svg" alt="Cuotas apiladas por banda de la energía transmitida por los trece caminos de transmisión del edificio del Anexo L de ISO 12354-1, con el índice de reducción acústica aparente R' superpuesto: el camino directo Dd transporta la mitad de la energía a 50 Hz y desaparece por encima de 200 Hz, tras lo cual toman el relevo los caminos por flancos a través de las fachadas y las particiones interiores" width="92%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/detailed_prediction_paths.svg" alt="Cuotas apiladas por banda de la energía transmitida por los trece caminos de transmisión del edificio del Anexo L de ISO 12354-1, con el índice de reducción acústica aparente R' superpuesto: el camino directo Dd transporta la mitad de la energía a 50 Hz, decae en la transición de 80 Hz a 160 Hz y es despreciable a partir de 200 Hz, tras lo cual toman el relevo los caminos por flancos a través de las fachadas y las particiones interiores" width="92%" loading="eager" />
 
 *Esta es la figura por la que existe el modelo detallado. Por debajo de 80 Hz
 el problema es el propio forjado separador, de modo que una losa más pesada o
-un suelo flotante mejor ayudarían; a partir de 100 Hz ha desaparecido del
-reparto y son los caminos por flancos a través de las paredes los que fijan
-$R'$, así que ningún trabajo sobre el forjado movería el resultado. El número
-único $R'_w = 57$ dB no dice nada de eso.*
+un suelo flotante mejor ayudarían; decae en la transición de 80 Hz a 160 Hz y a
+partir de 200 Hz ha salido por completo del reparto, y son los caminos por
+flancos a través de las paredes los que fijan $R'$ por sí solos, así que
+ningún trabajo sobre el forjado movería ya el resultado. El número único
+$R'_w = 57$ dB no dice nada de eso.*
 
 <details>
 <summary>Ver el código de esta figura</summary>

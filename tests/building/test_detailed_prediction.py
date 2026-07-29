@@ -27,6 +27,10 @@ fixture therefore
 Both discrepancies are recorded in ``docs/ERRATA.md``. The printed tables are
 rounded but were computed unrounded, so the per-band comparisons use a 0,1 dB
 tolerance as the standard's own note (Table L.1) invites.
+
+The building itself is built once, in :mod:`iso12354_building`, which the
+conformance report and the documentation figure import too, so none of the
+three can drift from the transcription in :mod:`reference_data`.
 """
 
 from __future__ import annotations
@@ -51,7 +55,6 @@ from phonometry import (
     flanking_reduction_index_from_normalized_difference,
     floating_floor_improvement,
     forced_radiation_factor,
-    impact_flanking_path,
     in_situ_element,
     in_situ_equivalent_absorption_length,
     in_situ_impact_level,
@@ -69,9 +72,12 @@ from phonometry import (
 )
 
 BANDS = np.asarray(ref.ISO12354_ANNEX_L_BANDS, dtype=np.float64)
-FC_FLOOR, FC_EXT, FC_INT = 76.8, 92.6, 128.4
-M_FLOOR, M_EXT, M_INT = 484.0, 219.0, 360.0
-SEPARATING_AREA = 20.0
+# The building's own geometry and material data live in the shared fixture
+# module, so the tests, the conformance report and the documentation figure
+# can never be built from three different transcriptions.
+FC_INT = iso12354_building.FC_INT
+M_INT = iso12354_building.M_INT
+SEPARATING_AREA = iso12354_building.SEPARATING_AREA
 TOL = 0.1
 
 
@@ -206,13 +212,14 @@ def test_table_l4_velocity_level_differences(situ: dict) -> None:
     4d (internal wall 2); see docs/ERRATA.md.
     """
     kij = iso12354_building.junction_indices()
+    lengths = iso12354_building.COUPLING_LENGTH
     d1 = in_situ_velocity_level_difference(
-        kij["floor-ext"], coupling_length=4.0,
+        kij["floor-ext"], coupling_length=lengths["ext1"],
         absorption_length_i=situ["floor"].absorption_length,
         absorption_length_j=situ["ext1"].absorption_length,
     )
     fourth = in_situ_velocity_level_difference(
-        kij["floor-int"], coupling_length=5.0,
+        kij["floor-int"], coupling_length=lengths["int2"],
         absorption_length_i=situ["floor"].absorption_length,
         absorption_length_j=situ["int2"].absorption_length,
     )
@@ -232,36 +239,6 @@ def test_velocity_level_difference_is_floored_at_zero() -> None:
 # --------------------------------------------------------------------------
 # Table L.1 - the airborne chain
 # --------------------------------------------------------------------------
-def _airborne_paths(situ: dict, delta_l: np.ndarray) -> list:
-    """The twelve flanking paths of the Annex L building."""
-    kij = iso12354_building.junction_indices()
-    walls = {
-        "1": ("ext1", 4.0, kij["floor-ext"], kij["ext-ext"]),
-        "2": ("ext2", 5.0, kij["floor-ext"], kij["ext-ext"]),
-        "3": ("int1", 4.0, kij["floor-int"], kij["int-int"]),
-        "4": ("int2", 5.0, kij["floor-int"], kij["int-int"]),
-    }
-    paths = []
-    for tag, (name, lij, k_cross, k_through) in walls.items():
-        wall = situ[name]
-        paths.append(airborne_flanking_path(
-            label=f"D{tag}", kind="Df", element_i=situ["floor"], element_j=wall,
-            vibration_reduction_index=k_cross, coupling_length=lij,
-            separating_area=SEPARATING_AREA, delta_r_i=delta_l,
-        ))
-        paths.append(airborne_flanking_path(
-            label=f"{tag}d", kind="Fd", element_i=wall, element_j=situ["floor"],
-            vibration_reduction_index=k_cross, coupling_length=lij,
-            separating_area=SEPARATING_AREA,
-        ))
-        paths.append(airborne_flanking_path(
-            label=f"{tag}{tag}", kind="Ff", element_i=wall, element_j=wall,
-            vibration_reduction_index=k_through, coupling_length=lij,
-            separating_area=SEPARATING_AREA,
-        ))
-    return paths
-
-
 @pytest.fixture(scope="module")
 def airborne(situ: dict, delta_l: np.ndarray):
     """The Annex L airborne prediction, assembled from the fixture."""
@@ -270,7 +247,7 @@ def airborne(situ: dict, delta_l: np.ndarray):
         direct_index=direct_reduction_index(
             situ["floor"].sound_reduction_index, delta_r_source=delta_l
         ),
-        flanking_paths=_airborne_paths(situ, delta_l),
+        flanking_paths=iso12354_building.airborne_paths(situ, delta_l),
     )
 
 
@@ -310,24 +287,10 @@ def test_path_fractions_sum_to_one_and_name_a_dominant_path(airborne) -> None:
 @pytest.fixture(scope="module")
 def impact(situ: dict, delta_l: np.ndarray):
     """The Annex G impact prediction, assembled from the same fixture."""
-    kij = iso12354_building.junction_indices()
-    walls = {
-        "Df1": ("ext1", 4.0, kij["floor-ext"]),
-        "Df2": ("ext2", 5.0, kij["floor-ext"]),
-        "Df3": ("int1", 4.0, kij["floor-int"]),
-        "Df4": ("int2", 5.0, kij["floor-int"]),
-    }
-    paths = [
-        impact_flanking_path(
-            label=label, floor=situ["floor"], element_j=situ[name],
-            vibration_reduction_index=k, coupling_length=lij, delta_l=delta_l,
-        )
-        for label, (name, lij, k) in walls.items()
-    ]
     return detailed_impact_prediction(
         BANDS,
         direct_level=direct_impact_level(situ["floor"].impact_level, delta_l=delta_l),
-        flanking_paths=paths,
+        flanking_paths=iso12354_building.impact_paths(situ, delta_l),
     )
 
 
@@ -381,11 +344,17 @@ def test_simplified_model_agrees_with_the_detailed_model(airborne) -> None:
     the per-path tolerance is 0,1 dB.
     """
     rw = ref.ISO12354_ANNEX_L10_RW
+    # The simplified model reads the junction indices as Table L.10 prints
+    # them, rounded to 0,1 dB, not the unrounded Annex E values the detailed
+    # model needs for the perimeter sums.
+    kij = ref.ISO12354_ANNEX_L_KIJ
+    lengths = iso12354_building.COUPLING_LENGTH
     paths = []
-    for tag, key, lij in (("1", "ext", 4.0), ("2", "ext", 5.0),
-                          ("3", "int", 4.0), ("4", "int", 5.0)):
-        k_cross = 6.4 if key == "ext" else 8.8
-        k_through = 11.2 if key == "ext" else 11.0
+    for tag, name in iso12354_building.enumerate_flanking():
+        key = iso12354_building.JUNCTION_KIND[name]
+        lij = lengths[name]
+        k_cross = kij["floor-ext"] if key == "ext" else kij["floor-int"]
+        k_through = kij["ext-ext"] if key == "ext" else kij["int-int"]
         paths.extend(flanking_element(
             label=tag, r_flanking=rw[key], r_separating=rw["floor"],
             k_ff=k_through, k_fd=k_cross, k_df=k_cross,
@@ -704,8 +673,9 @@ def test_flanking_path_rejects_an_unknown_kind(situ: dict) -> None:
 
 def test_band_count_mismatch_is_reported(situ: dict) -> None:
     """A path built on a different band set cannot be combined."""
+    too_short = np.zeros(5)
     with pytest.raises(ValueError, match="one value per band"):
-        detailed_airborne_prediction(BANDS, direct_index=np.zeros(5))
+        detailed_airborne_prediction(BANDS, direct_index=too_short)
 
 
 # --------------------------------------------------------------------------

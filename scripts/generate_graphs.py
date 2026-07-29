@@ -11154,7 +11154,6 @@ def generate_detailed_prediction_paths(output_dir: str) -> None:
     import iso12354_building as bld
 
     from phonometry import (
-        airborne_flanking_path,
         detailed_airborne_prediction,
         direct_reduction_index,
         floating_floor_improvement,
@@ -11163,37 +11162,20 @@ def generate_detailed_prediction_paths(output_dir: str) -> None:
 
     # The heavy homogeneous building of ISO 12354-1:2017 Annex L: a 220 mm
     # concrete separating floor with a floating floor, two 365 mm AAC external
-    # walls and two 200 mm calcium-silicate internal walls.
+    # walls and two 200 mm calcium-silicate internal walls. The building and
+    # its twelve flanking paths come from the shared test fixture, which the
+    # conformance report reads too, so the figure cannot drift from the rows.
     bands = np.array([50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630,
                       800, 1000, 1250, 1600, 2000, 2500, 3150], dtype=float)
     situ = {k: in_situ_element(e, bands) for k, e in bld.elements().items()}
-    kij = bld.junction_indices()
     delta = floating_floor_improvement(
         bands, resonance_frequency=bld.floating_floor_resonance()
     )
-    paths = []
-    for tag, name in (("1", "ext1"), ("2", "ext2"), ("3", "int1"), ("4", "int2")):
-        wall = situ[name]
-        lij = bld.COUPLING_LENGTH[name]
-        cross = kij["floor-ext"] if name.startswith("ext") else kij["floor-int"]
-        through = kij["ext-ext"] if name.startswith("ext") else kij["int-int"]
-        paths.append(airborne_flanking_path(
-            label=f"D{tag}", kind="Df", element_i=situ["floor"], element_j=wall,
-            vibration_reduction_index=cross, coupling_length=lij,
-            separating_area=bld.SEPARATING_AREA, delta_r_i=delta))
-        paths.append(airborne_flanking_path(
-            label=f"{tag}d", kind="Fd", element_i=wall, element_j=situ["floor"],
-            vibration_reduction_index=cross, coupling_length=lij,
-            separating_area=bld.SEPARATING_AREA))
-        paths.append(airborne_flanking_path(
-            label=f"{tag}{tag}", kind="Ff", element_i=wall, element_j=wall,
-            vibration_reduction_index=through, coupling_length=lij,
-            separating_area=bld.SEPARATING_AREA))
     res = detailed_airborne_prediction(
         bands,
         direct_index=direct_reduction_index(
             situ["floor"].sound_reduction_index, delta_r_source=delta),
-        flanking_paths=paths,
+        flanking_paths=bld.airborne_paths(situ, delta),
     )
     assert res.rating is not None
 

@@ -2636,22 +2636,33 @@ def _iso12354_detailed_situ() -> tuple[Any, dict[str, Any], np.ndarray]:
 @register(
     "Room & building acoustics",
     "ISO 12354-1:2017 Annex L, Tables L.2 to L.4",
-    "In-situ element chain: sigma, sigma_f, eta_tot, Rsitu, a_situ (21 bands x 5 elements)",
+    "In-situ element chain: 10 lg sigma, 10 lg sigma_f, eta_tot, Rsitu, a_situ "
+    "(21 bands x 5 elements)",
 )
 def _chk_iso12354_annex_l_elements() -> Outcome:
+    # Every quantity is compared on a decibel scale so the reported worst
+    # deviation carries one unit: the two radiation factors and the loss
+    # factor are dimensionless, so they enter as 10 lg of the ratio, and the
+    # absorption length as 10 lg of its ratio to the printed value.
     _bands, situ, _delta = _iso12354_detailed_situ()
+
+    def _ratio_db(computed: Any, printed: Any) -> float:
+        return float(np.max(np.abs(
+            10.0 * np.log10(np.asarray(computed) / np.asarray(printed))
+        )))
+
     worst = 0.0
     for label, printed in ref.ISO12354_ANNEX_L2_SIGMA.items():
-        worst = max(worst, float(np.max(np.abs(
-            situ[label].radiation_factor - np.asarray(printed)
-        ))) * 10.0)
+        worst = max(worst, _ratio_db(situ[label].radiation_factor, printed))
+    for label, printed in ref.ISO12354_ANNEX_L2_SIGMA_F.items():
+        worst = max(worst, _ratio_db(situ[label].forced_radiation_factor, printed))
+    for label, printed in ref.ISO12354_ANNEX_L3_ETA.items():
+        worst = max(worst, _ratio_db(situ[label].total_loss_factor, printed))
+    for label, printed in ref.ISO12354_ANNEX_L4_ABSORPTION.items():
+        worst = max(worst, _ratio_db(situ[label].absorption_length, printed))
     for label, printed in ref.ISO12354_ANNEX_L3_R_SITU.items():
         worst = max(worst, float(np.max(np.abs(
             situ[label].sound_reduction_index - np.asarray(printed)
-        ))))
-    for label, printed in ref.ISO12354_ANNEX_L4_ABSORPTION.items():
-        worst = max(worst, float(np.max(np.abs(
-            situ[label].absorption_length - np.asarray(printed)
         ))))
     return numeric(0.0, worst, 0.1, unit="dB", places=3)
 
@@ -2665,30 +2676,11 @@ def _chk_iso12354_annex_l1() -> Outcome:
     import iso12354_building as bld
 
     bands, situ, delta = _iso12354_detailed_situ()
-    kij = bld.junction_indices()
-    paths = []
-    for tag, name in (("1", "ext1"), ("2", "ext2"), ("3", "int1"), ("4", "int2")):
-        wall = situ[name]
-        lij = bld.COUPLING_LENGTH[name]
-        cross = kij["floor-ext"] if name.startswith("ext") else kij["floor-int"]
-        through = kij["ext-ext"] if name.startswith("ext") else kij["int-int"]
-        paths.append(ph.airborne_flanking_path(
-            label=f"D{tag}", kind="Df", element_i=situ["floor"], element_j=wall,
-            vibration_reduction_index=cross, coupling_length=lij,
-            separating_area=bld.SEPARATING_AREA, delta_r_i=delta))
-        paths.append(ph.airborne_flanking_path(
-            label=f"{tag}d", kind="Fd", element_i=wall, element_j=situ["floor"],
-            vibration_reduction_index=cross, coupling_length=lij,
-            separating_area=bld.SEPARATING_AREA))
-        paths.append(ph.airborne_flanking_path(
-            label=f"{tag}{tag}", kind="Ff", element_i=wall, element_j=wall,
-            vibration_reduction_index=through, coupling_length=lij,
-            separating_area=bld.SEPARATING_AREA))
     result = ph.detailed_airborne_prediction(
         bands,
         direct_index=ph.direct_reduction_index(
             situ["floor"].sound_reduction_index, delta_r_source=delta),
-        flanking_paths=paths,
+        flanking_paths=bld.airborne_paths(situ, delta),
     )
     worst = max(
         float(np.max(np.abs(p.values - np.asarray(ref.ISO12354_ANNEX_L1_PATHS[p.label]))))
@@ -2717,21 +2709,10 @@ def _chk_iso12354_annex_g1() -> Outcome:
     import iso12354_building as bld
 
     bands, situ, delta = _iso12354_detailed_situ()
-    kij = bld.junction_indices()
-    paths = [
-        ph.impact_flanking_path(
-            label=f"Df{tag}", floor=situ["floor"], element_j=situ[name],
-            vibration_reduction_index=(
-                kij["floor-ext"] if name.startswith("ext") else kij["floor-int"]
-            ),
-            coupling_length=bld.COUPLING_LENGTH[name], delta_l=delta,
-        )
-        for tag, name in (("1", "ext1"), ("2", "ext2"), ("3", "int1"), ("4", "int2"))
-    ]
     result = ph.detailed_impact_prediction(
         bands,
         direct_level=ph.direct_impact_level(situ["floor"].impact_level, delta_l=delta),
-        flanking_paths=paths,
+        flanking_paths=bld.impact_paths(situ, delta),
     )
     worst = float(np.max(np.abs(
         situ["floor"].impact_level - np.asarray(ref.ISO12354_ANNEX_G3_LN_SITU)

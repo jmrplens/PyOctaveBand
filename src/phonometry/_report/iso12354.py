@@ -76,9 +76,32 @@ if TYPE_CHECKING:
 #: Clause 6): about 2 dB.
 _MODEL_SD_DB = 2
 
-#: Model standard deviation of the *detailed* per-band model for buildings with
-#: homogeneous elements (ISO 12354-1:2017 Clause 5): 1,5 dB to 2,5 dB.
-_DETAILED_MODEL_SD = "1,5 dB to 2,5 dB"
+#: Method statement of the simplified single-number fiches, below the boxed
+#: rating. ``{sd}`` takes :data:`_MODEL_SD_DB`.
+_SIMPLIFIED_STATEMENT = (
+    "Predicted (estimated) result computed from the building "
+    "elements' performance by the EN/ISO 12354 simplified "
+    "single-number model; it is not a measurement. The reported "
+    "standard deviation of the model is about {sd} dB."
+)
+
+#: Model standard deviation bounds of the *detailed* per-band model for
+#: buildings with homogeneous elements (ISO 12354-1:2017 Clause 5).
+_DETAILED_MODEL_SD_RANGE = (1.5, 2.5)
+
+
+def _detailed_model_sd(language: str) -> str:
+    """The detailed-model standard-deviation range, localised.
+
+    Every other number on a fiche goes through :func:`format_number`, so the
+    range is built here rather than written out, and the English sheet prints
+    "1.5 dB to 2.5 dB" where the Spanish one prints "1,5 dB a 2,5 dB".
+    """
+    low, high = _DETAILED_MODEL_SD_RANGE
+    return (
+        f"{format_number(low, language, decimals=1)} dB "
+        f"{t('to', language)} {format_number(high, language, decimals=1)} dB"
+    )
 
 
 def _prediction_verdict(
@@ -126,24 +149,21 @@ def _render_prediction_fiche(
     metadata: ReportMetadata | None,
     language: str,
     basis_values: dict[str, str] | None = None,
-    statement_key: str = (
-        "Predicted (estimated) result computed from the building "
-        "elements' performance by the EN/ISO 12354 simplified "
-        "single-number model; it is not a measurement. The reported "
-        "standard deviation of the model is about {sd} dB."
-    ),
-    statement_values: dict[str, Any] | None = None,
+    statement: tuple[str, dict[str, Any]] = (_SIMPLIFIED_STATEMENT, {}),
 ) -> str:
     """Render a predicted-insulation fiche to a PDF at ``path``.
 
-    Shared body of both prediction fiches: title and prediction-basis line, an
+    Shared body of every prediction fiche: title and prediction-basis line, an
     optional metadata header, a two-panel body (the left-hand model-term metrics
     table beside the result's own plot), the boxed single-number rating, the
     prediction statement, an optional requirement verdict and the footer.
 
     ``basis_values`` fills ``{}`` placeholders in the (already translated) basis
     line, so a fiche can state its computed apparent-index values in prose; pass
-    ``None`` when the basis line is a plain sentence.
+    ``None`` when the basis line is a plain sentence. ``statement`` is the
+    ``(text, placeholder values)`` pair of the method statement below the boxed
+    rating, defaulting to the simplified model's; the detailed fiches pass
+    their own.
     """
     try:
         from reportlab.lib import colors
@@ -198,7 +218,8 @@ def _render_prediction_fiche(
         "prediction_statement", parent=styles["Normal"], fontSize=8.5,
         textColor=colors.HexColor(_MUTED_HEX), spaceBefore=4,
     )
-    values = {"sd": _MODEL_SD_DB} if statement_values is None else statement_values
+    statement_key, statement_values = statement
+    values = statement_values or {"sd": _MODEL_SD_DB}
     flow.append(
         Paragraph(t(statement_key, language).format(**values), statement_style)
     )
@@ -354,19 +375,21 @@ _DETAILED_STATEMENT = (
 )
 
 
-def _detailed_path_rows(result: Any, verbose: bool, language: str) -> list[tuple[str, str]]:
+def _detailed_path_rows(
+    result: Any, verbose: bool, language: str
+) -> list[tuple[str, str]]:
     """Per-path rows of a detailed-model fiche: energy share, largest first.
 
-    The share is taken over the whole spectrum supplied (the band-summed
-    transmitted energy of the path over the band-summed total), so the table
-    ranks the paths in the order a consultant would treat them. In verbose
-    mode each row also names the band in which that path peaks.
+    Each path's figure is the *mean of its per-band shares* over the spectrum
+    supplied; the per-band shares already partition the energy of each band, so
+    an energy-weighted share across bands cannot be recovered from them alone.
+    The mean still ranks the paths in the order a consultant would treat them.
+    In verbose mode each row also names the band in which that path peaks.
     """
     import numpy as np
 
     fractions = np.atleast_2d(np.asarray(result.fractions, dtype=np.float64))
-    weights = fractions / fractions.sum(axis=0)
-    totals = weights.sum(axis=1) / float(weights.shape[1])
+    totals = fractions.mean(axis=1)
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     rows: list[tuple[str, str]] = []
     for k in np.argsort(-totals):
@@ -434,8 +457,7 @@ def render_iso12354_detailed_airborne_report(
         is_impact=False,
         metadata=metadata,
         language=language,
-        statement_key=_DETAILED_STATEMENT,
-        statement_values={"sd": _DETAILED_MODEL_SD},
+        statement=(_DETAILED_STATEMENT, {"sd": _detailed_model_sd(language)}),
     )
 
 
@@ -484,8 +506,7 @@ def render_iso12354_detailed_impact_report(
         is_impact=True,
         metadata=metadata,
         language=language,
-        statement_key=_DETAILED_STATEMENT,
-        statement_values={"sd": _DETAILED_MODEL_SD},
+        statement=(_DETAILED_STATEMENT, {"sd": _detailed_model_sd(language)}),
     )
 
 

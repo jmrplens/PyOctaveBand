@@ -67,6 +67,10 @@ if TYPE_CHECKING:
 #: Shared x-axis label for the frequency-domain building plots.
 _FREQ_LABEL = "Frequency [Hz]"
 
+#: Shared y-axis label of the path-contribution figures (the simplified
+#: single-number bars and the two detailed per-band ones).
+_SHARE_LABEL = "Share of transmitted energy [%]"
+
 #: Spanish translations of the fixed labels/titles/legends rendered by the
 #: building-domain ``.plot()`` renderers, keyed by their verbatim English
 #: text. ``_t`` returns the English key unchanged for any language other
@@ -754,7 +758,7 @@ def plot_airborne_prediction(
     ax.set_xticks(positions)
     ax.set_xticklabels([c.label for c in contribs], rotation=45, ha="right")
     ax.set_xlabel(_t("Transmission path", language))
-    ax.set_ylabel(_t("Share of transmitted energy [%]", language))
+    ax.set_ylabel(_t(_SHARE_LABEL, language))
     ax.set_title(
         f"EN 12354-1 {_t('flanking prediction', language)} — R'w = "
         f"{format_number(result.r_prime_w, language, decimals=1)} dB "
@@ -854,8 +858,9 @@ def _plot_path_shares(
     if pooled:
         share = 100.0 * fractions[pooled].sum(axis=0)
         ax.bar(positions, share, bottom=bottom, width=0.85, color=_C_MUTED,
-               edgecolor="none", zorder=0, label=_t("other paths", language))
-    ax.set_ylabel(_t("Share of transmitted energy [%]", language))
+               edgecolor="none", zorder=0, label=_t("other paths", language),
+               **kwargs)
+    ax.set_ylabel(_t(_SHARE_LABEL, language))
     ax.set_ylim(0.0, 100.0)
     ax.set_title(title)
 

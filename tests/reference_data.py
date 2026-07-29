@@ -2110,15 +2110,18 @@ ISO12354_ANNEX_L_BANDS = (
 # label -> (area, length1, length2, mass, critical frequency, internal loss
 # factor, density, longitudinal velocity, junction coupling length).
 ISO12354_ANNEX_L_ELEMENTS: dict[str, tuple[float, ...]] = {
-    "floor": (20.00, 5.00, 4.00, 484.0, 76.8, 0.0125, 2200.0, 3800.0, 0.0),
+    "floor": (20.00, 5.00, 4.00, 484.0, 76.8, 0.0050, 2200.0, 3800.0, 0.0),
     "ext1": (11.00, 4.00, 2.75, 219.0, 92.6, 0.0125, 600.0, 1900.0, 4.0),
     "ext2": (13.75, 5.00, 2.75, 219.0, 92.6, 0.0125, 600.0, 1900.0, 5.0),
     "int1": (11.00, 4.00, 2.75, 360.0, 128.4, 0.0100, 1800.0, 2500.0, 4.0),
     "int2": (13.75, 5.00, 2.75, 360.0, 128.4, 0.0100, 1800.0, 2500.0, 5.0),
 }
-# The floor's internal loss factor is 0,005 (concrete, Table B.3); the tuple
-# above carries the AAC value, so the fixture overrides it explicitly.
+# The rows above carry the *element specifications*: 0,005 for the concrete
+# floor and 0,012 5 for the AAC external walls (Annex B Table B.3). The
+# Table L.3 / G.3 input block prints 0,013 for the external walls, which does
+# not reproduce their own column; see docs/ERRATA.md.
 ISO12354_ANNEX_L_FLOOR_ETA_INT = 0.005
+ISO12354_ANNEX_L3_PRINTED_EXT_ETA_INT = 0.013
 
 # Floating floor on the separating element: 35 mm screed on mineral wool.
 ISO12354_ANNEX_L_FLOATING_MASS = 73.5

@@ -22,19 +22,16 @@ pytest.importorskip("reportlab")
 
 from phonometry import (
     ReportMetadata,
-    airborne_flanking_path,
     detailed_airborne_prediction,
     detailed_impact_prediction,
     direct_impact_level,
     direct_reduction_index,
     floating_floor_improvement,
-    impact_flanking_path,
     in_situ_element,
 )
 
 _PDF_MAGIC = b"%PDF"
 _BANDS = np.asarray(ref.ISO12354_ANNEX_L_BANDS, dtype=np.float64)
-_WALLS = (("1", "ext1"), ("2", "ext2"), ("3", "int1"), ("4", "int2"))
 
 
 def _situ() -> tuple[dict, np.ndarray]:
@@ -49,51 +46,21 @@ def _situ() -> tuple[dict, np.ndarray]:
 def _annex_l_airborne():
     """The Annex L detailed airborne prediction (R'w = 57 dB)."""
     situ, delta = _situ()
-    kij = bld.junction_indices()
-    paths = []
-    for tag, name in _WALLS:
-        wall = situ[name]
-        lij = bld.COUPLING_LENGTH[name]
-        cross = kij["floor-ext"] if name.startswith("ext") else kij["floor-int"]
-        through = kij["ext-ext"] if name.startswith("ext") else kij["int-int"]
-        paths.append(airborne_flanking_path(
-            label=f"D{tag}", kind="Df", element_i=situ["floor"], element_j=wall,
-            vibration_reduction_index=cross, coupling_length=lij,
-            separating_area=bld.SEPARATING_AREA, delta_r_i=delta))
-        paths.append(airborne_flanking_path(
-            label=f"{tag}d", kind="Fd", element_i=wall, element_j=situ["floor"],
-            vibration_reduction_index=cross, coupling_length=lij,
-            separating_area=bld.SEPARATING_AREA))
-        paths.append(airborne_flanking_path(
-            label=f"{tag}{tag}", kind="Ff", element_i=wall, element_j=wall,
-            vibration_reduction_index=through, coupling_length=lij,
-            separating_area=bld.SEPARATING_AREA))
     return detailed_airborne_prediction(
         _BANDS,
         direct_index=direct_reduction_index(
             situ["floor"].sound_reduction_index, delta_r_source=delta),
-        flanking_paths=paths,
+        flanking_paths=bld.airborne_paths(situ, delta),
     )
 
 
 def _annex_g_impact():
     """The Annex G detailed impact prediction (L'n,w = 41 dB)."""
     situ, delta = _situ()
-    kij = bld.junction_indices()
-    paths = [
-        impact_flanking_path(
-            label=f"Df{tag}", floor=situ["floor"], element_j=situ[name],
-            vibration_reduction_index=(
-                kij["floor-ext"] if name.startswith("ext") else kij["floor-int"]
-            ),
-            coupling_length=bld.COUPLING_LENGTH[name], delta_l=delta,
-        )
-        for tag, name in _WALLS
-    ]
     return detailed_impact_prediction(
         _BANDS,
         direct_level=direct_impact_level(situ["floor"].impact_level, delta_l=delta),
-        flanking_paths=paths,
+        flanking_paths=bld.impact_paths(situ, delta),
     )
 
 
@@ -130,7 +97,9 @@ def test_detailed_airborne_fiche_boxes_the_annex_l_rating(tmp_path) -> None:
     assert "frequency band" in text
     assert "prediction" in text
     assert "not a measurement" in text
-    assert "1,5 dB to 2,5 dB" in text
+    # The detailed model's own accuracy statement, with the decimal separator
+    # of the fiche language (a period in English, a comma in Spanish).
+    assert "1.5 dB to 2.5 dB" in text
     # The two paths that dominate the spectrum appear in the path table.
     assert "Dd" in text
     assert "2d" in text
@@ -166,6 +135,12 @@ def test_spanish_detailed_fiche_renders(tmp_path) -> None:
     text = _extract_text(str(out))
     assert "ISO 12354-1:2017" in text
     assert "57 dB" in text
+    # The basis line, the path caption and the accuracy statement are
+    # translated, not left in English.
+    assert "banda de frecuencia" in text
+    assert "Vías de transmisión" in text
+    assert "1,5 dB a 2,5 dB" in text
+    assert "not a measurement" not in text
 
 
 def test_detailed_fiche_rejects_an_unrated_spectrum(tmp_path) -> None:
@@ -174,11 +149,14 @@ def test_detailed_fiche_rejects_an_unrated_spectrum(tmp_path) -> None:
         _BANDS[:5], direct_index=np.full(5, 55.0)
     )
     assert partial.rating is None
+    out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="ISO 717"):
-        partial.report(str(tmp_path / "x.pdf"))
+        partial.report(out)
 
 
 def test_detailed_fiche_rejects_an_unknown_engine(tmp_path) -> None:
     """Only the reportlab back end exists."""
+    result = _annex_g_impact()
+    out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="engine"):
-        _annex_g_impact().report(str(tmp_path / "x.pdf"), engine="weasyprint")
+        result.report(out, engine="weasyprint")

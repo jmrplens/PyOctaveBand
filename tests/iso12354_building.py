@@ -43,8 +43,19 @@ M_FLOOR, M_EXT, M_INT = 484.0, 219.0, 360.0
 #: Separating-element area ``Ss`` of the example, in m².
 SEPARATING_AREA = 20.0
 
-#: Junction coupling length of each flanking element, in metres.
-COUPLING_LENGTH = {"ext1": 4.0, "ext2": 5.0, "int1": 4.0, "int2": 5.0}
+#: Junction coupling length of each flanking element, in metres (the ninth
+#: field of each Annex L element row; the separating floor carries 0).
+COUPLING_LENGTH = {
+    label: values[8]
+    for label, values in ref.ISO12354_ANNEX_L_ELEMENTS.items()
+    if values[8] > 0.0
+}
+
+#: The junction each flanking element makes with the separating floor: the
+#: external walls run past it in a rigid T, the internal walls cross it.
+JUNCTION_KIND = {
+    label: "ext" if label.startswith("ext") else "int" for label in COUPLING_LENGTH
+}
 
 
 def junction_indices() -> dict[str, float]:
@@ -119,8 +130,6 @@ def elements() -> dict[str, HomogeneousElement]:
     built: dict[str, HomogeneousElement] = {}
     for label, values in ref.ISO12354_ANNEX_L_ELEMENTS.items():
         area, length1, length2, mass, fc, eta_int, rho, c_l, _lij = values
-        if label == "floor":
-            eta_int = ref.ISO12354_ANNEX_L_FLOOR_ETA_INT
         built[label] = HomogeneousElement(
             label=label,
             area=area,
@@ -134,6 +143,80 @@ def elements() -> dict[str, HomogeneousElement]:
             longitudinal_velocity=c_l,
         )
     return built
+
+
+def airborne_paths(situ: dict, delta_r: object) -> list:
+    """The twelve flanking paths of the Annex L airborne example.
+
+    Each of the four flanking elements contributes ``Df``, ``Fd`` and ``Ff``.
+    The floating floor sits on the separating element in the source room, so
+    its improvement enters the ``Df`` paths (where the separating element is
+    element ``i``) and the direct path, but not ``Fd`` or ``Ff``.
+
+    :param situ: The elements of :func:`elements` run through
+        ``in_situ_element``, keyed by label.
+    :param delta_r: The floating floor's improvement per band, in dB.
+    :return: The twelve :class:`~phonometry.BandPath` objects, labelled as
+        Table L.1 labels its columns (``D1``, ``1d``, ``11``, ...).
+    """
+    from phonometry import airborne_flanking_path
+
+    kij = junction_indices()
+    paths = []
+    for tag, name in enumerate_flanking():
+        wall = situ[name]
+        lij = COUPLING_LENGTH[name]
+        cross, through = junction_paths(name, kij)
+        paths.append(airborne_flanking_path(
+            label=f"D{tag}", kind="Df", element_i=situ["floor"], element_j=wall,
+            vibration_reduction_index=cross, coupling_length=lij,
+            separating_area=SEPARATING_AREA, delta_r_i=delta_r))
+        paths.append(airborne_flanking_path(
+            label=f"{tag}d", kind="Fd", element_i=wall, element_j=situ["floor"],
+            vibration_reduction_index=cross, coupling_length=lij,
+            separating_area=SEPARATING_AREA))
+        paths.append(airborne_flanking_path(
+            label=f"{tag}{tag}", kind="Ff", element_i=wall, element_j=wall,
+            vibration_reduction_index=through, coupling_length=lij,
+            separating_area=SEPARATING_AREA))
+    return paths
+
+
+def impact_paths(situ: dict, delta_l: object) -> list:
+    """The four flanking impact paths of the Annex G example.
+
+    :param situ: The elements of :func:`elements` run through
+        ``in_situ_element``, keyed by label.
+    :param delta_l: The floating floor's improvement per band, in dB.
+    :return: The four :class:`~phonometry.BandPath` objects, labelled as
+        Table G.1 labels its columns (``Df1`` to ``Df4``).
+    """
+    from phonometry import impact_flanking_path
+
+    kij = junction_indices()
+    return [
+        impact_flanking_path(
+            label=f"Df{tag}", floor=situ["floor"], element_j=situ[name],
+            vibration_reduction_index=junction_paths(name, kij)[0],
+            coupling_length=COUPLING_LENGTH[name], delta_l=delta_l,
+        )
+        for tag, name in enumerate_flanking()
+    ]
+
+
+def enumerate_flanking() -> tuple[tuple[str, str], ...]:
+    """The four flanking elements as ``(Table L.1 index, label)`` pairs."""
+    return tuple(
+        (str(index), label)
+        for index, label in enumerate(("ext1", "ext2", "int1", "int2"), start=1)
+    )
+
+
+def junction_paths(label: str, kij: dict[str, float]) -> tuple[float, float]:
+    """The ``(floor-to-element, element-through)`` indices of one junction."""
+    if JUNCTION_KIND[label] == "ext":
+        return kij["floor-ext"], kij["ext-ext"]
+    return kij["floor-int"], kij["int-int"]
 
 
 def floating_floor_resonance() -> float:
