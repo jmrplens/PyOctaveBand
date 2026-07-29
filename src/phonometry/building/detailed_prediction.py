@@ -1710,8 +1710,8 @@ def detailed_impact_prediction(
 
     :param frequencies: Band centre frequencies, in Hz.
     :param direct_level: ``Ln,d`` per band, in dB (see
-        :func:`direct_impact_level`), or ``None`` for the rooms-next-to-each-
-        other case of Formula (2), which has no direct path.
+        :func:`direct_impact_level`), or ``None`` for the Formula (2) case of
+        two rooms next to each other, which has no direct path.
     :param flanking_paths: The flanking paths (see
         :func:`impact_flanking_path`); may be empty when ``direct_level`` is
         given.

@@ -378,7 +378,7 @@ carries no direct path at all.
 | Name | Description |
 | :--- | :--- |
 | `frequencies` | Band centre frequencies, in Hz. |
-| `direct_level` | `Ln,d` per band, in dB (see [`direct_impact_level`](/phonometry/reference/api/building/detailed-prediction/#direct_impact_level)), or `None` for the rooms-next-to-each- other case of Formula (2), which has no direct path. |
+| `direct_level` | `Ln,d` per band, in dB (see [`direct_impact_level`](/phonometry/reference/api/building/detailed-prediction/#direct_impact_level)), or `None` for the Formula (2) case of two rooms next to each other, which has no direct path. |
 | `flanking_paths` | The flanking paths (see [`impact_flanking_path`](/phonometry/reference/api/building/detailed-prediction/#impact_flanking_path)); may be empty when `direct_level` is given. |
 | `direct_label` | Label of the direct path (Default: `"Dd"`). |
 | `bands` | `"third"` (default) or `"octave"`. |
