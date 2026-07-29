@@ -81,7 +81,7 @@ L 638.012903 277.848448
 L 638.012903 209.578653 
 L 614.118475 209.578653 
 z
-" clip-path="url(#p472bcebf09)" style="fill: url(#h32e9a0c4a8); opacity: 0.5; stroke: #555555; stroke-width: 0.9; stroke-linejoin: miter"/>
+" clip-path="url(#p472bcebf09)" style="fill: url(#hd504df4412); opacity: 0.5625; stroke: #555555; stroke-width: 0.9; stroke-linejoin: miter"/>
    </g>
    <g id="patch_8">
     <path d="M 238.634604 260.780999 
@@ -3738,7 +3738,7 @@ C 71.792168 0.357853 71.893919 0.4 72 0.4
 z
 " style="fill: #555555; stroke: #555555; stroke-width: 1.0; stroke-linecap: butt; stroke-linejoin: miter; stroke-opacity: 0.9"/>
   </pattern>
-  <pattern id="h32e9a0c4a8" patternUnits="userSpaceOnUse" x="0" y="0" width="72" height="72">
+  <pattern id="hd504df4412" patternUnits="userSpaceOnUse" x="0" y="0" width="72" height="72">
    <rect x="0" y="0" width="73" height="73" fill="#9e9e9e"/>
    <path d="M -36 36 
 L 36 -36 
@@ -3766,7 +3766,7 @@ M 30 102
 L 102 30 
 M 36 108 
 L 108 36 
-" style="fill: #555555; stroke: #555555; stroke-width: 1.0; stroke-linecap: butt; stroke-linejoin: miter; stroke-opacity: 0.5"/>
+" style="fill: #555555; stroke: #555555; stroke-width: 1.0; stroke-linecap: butt; stroke-linejoin: miter; stroke-opacity: 0.5625"/>
   </pattern>
  </defs>
 </svg>

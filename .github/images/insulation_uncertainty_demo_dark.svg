@@ -36,14 +36,9 @@ L 40.925781 28.318125
 z
 "/>
    </g>
-   <g id="line2d_1">
-    <path d="M 300.315532 377.590125 
-L 300.315532 28.318125 
-" clip-path="url(#pc62de8bccb)" style="fill: none; stroke-dasharray: 1.5,2.475; stroke-dashoffset: 0; stroke: #ffffff; stroke-opacity: 0.35; stroke-width: 1.5"/>
-   </g>
    <g id="FillBetweenPolyCollection_1">
     <defs>
-     <path id="m396bb9b379" d="M 56.863187 -219.959569 
+     <path id="m9186ee87a0" d="M 56.863187 -219.959569 
 L 56.863187 -107.206349 
 L 90.617096 -73.142057 
 L 127.958496 -95.577646 
@@ -78,10 +73,58 @@ L 127.958496 -176.11566
 L 90.617096 -169.787674 
 L 56.863187 -219.959569 
 z
-" style="stroke: #1f77b4; stroke-opacity: 0.14"/>
+" style="stroke: #081e2e"/>
     </defs>
     <g clip-path="url(#pc62de8bccb)">
-     <use xlink:href="#m396bb9b379" x="0" y="413.791531" style="fill: #1f77b4; fill-opacity: 0.14; stroke: #1f77b4; stroke-opacity: 0.14"/>
+     <use xlink:href="#m9186ee87a0" x="0" y="413.791531" style="fill: #081e2e; stroke: #081e2e"/>
+    </g>
+   </g>
+   <g id="line2d_1">
+    <path d="M 300.315532 377.590125 
+L 300.315532 28.318125 
+" clip-path="url(#pc62de8bccb)" style="fill: none; stroke-dasharray: 1.5,2.475; stroke-dashoffset: 0; stroke: #ffffff; stroke-opacity: 0.35; stroke-width: 1.5"/>
+   </g>
+   <g id="FillBetweenPolyCollection_2">
+    <defs>
+     <path id="m5a5fbe7309" d="M 56.863187 -192.346536 
+L 56.863187 -134.819383 
+L 90.617096 -96.810371 
+L 127.958496 -115.301242 
+L 161.712405 -167.692042 
+L 195.466314 -167.692042 
+L 230.425532 -172.828394 
+L 266.561623 -196.455618 
+L 300.315532 -215.973759 
+L 335.27475 -231.382818 
+L 371.410841 -257.064583 
+L 405.16475 -270.4191 
+L 438.918659 -277.609994 
+L 476.26006 -286.85543 
+L 510.013969 -282.746347 
+L 543.767878 -259.119124 
+L 578.727095 -199.53743 
+L 578.727095 -232.410089 
+L 578.727095 -232.410089 
+L 543.767878 -285.828159 
+L 510.013969 -303.291759 
+L 476.26006 -307.400842 
+L 438.918659 -298.155406 
+L 405.16475 -290.964512 
+L 371.410841 -277.609994 
+L 335.27475 -251.92823 
+L 300.315532 -238.573712 
+L 266.561623 -221.110112 
+L 230.425532 -201.591971 
+L 195.466314 -200.5647 
+L 161.712405 -204.673783 
+L 127.958496 -156.392065 
+L 90.617096 -146.119359 
+L 56.863187 -192.346536 
+z
+" style="stroke: #134a71"/>
+    </defs>
+    <g clip-path="url(#pc62de8bccb)">
+     <use xlink:href="#m5a5fbe7309" x="0" y="413.791531" style="fill: #134a71; stroke: #134a71"/>
     </g>
    </g>
    <g id="matplotlib.axis_1">
@@ -496,49 +539,6 @@ L 598.925781 48.863537
      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="14.798437" y="202.954125" transform="rotate(-90 14.798437 202.954125)">Apparent sound reduction index R' [dB]</text>
     </g>
    </g>
-   <g id="FillBetweenPolyCollection_2">
-    <defs>
-     <path id="m0605fa539c" d="M 56.863187 -192.346536 
-L 56.863187 -134.819383 
-L 90.617096 -96.810371 
-L 127.958496 -115.301242 
-L 161.712405 -167.692042 
-L 195.466314 -167.692042 
-L 230.425532 -172.828394 
-L 266.561623 -196.455618 
-L 300.315532 -215.973759 
-L 335.27475 -231.382818 
-L 371.410841 -257.064583 
-L 405.16475 -270.4191 
-L 438.918659 -277.609994 
-L 476.26006 -286.85543 
-L 510.013969 -282.746347 
-L 543.767878 -259.119124 
-L 578.727095 -199.53743 
-L 578.727095 -232.410089 
-L 578.727095 -232.410089 
-L 543.767878 -285.828159 
-L 510.013969 -303.291759 
-L 476.26006 -307.400842 
-L 438.918659 -298.155406 
-L 405.16475 -290.964512 
-L 371.410841 -277.609994 
-L 335.27475 -251.92823 
-L 300.315532 -238.573712 
-L 266.561623 -221.110112 
-L 230.425532 -201.591971 
-L 195.466314 -200.5647 
-L 161.712405 -204.673783 
-L 127.958496 -156.392065 
-L 90.617096 -146.119359 
-L 56.863187 -192.346536 
-z
-" style="stroke: #1f77b4; stroke-opacity: 0.3"/>
-    </defs>
-    <g clip-path="url(#pc62de8bccb)">
-     <use xlink:href="#m0605fa539c" x="0" y="413.791531" style="fill: #1f77b4; fill-opacity: 0.3; stroke: #1f77b4; stroke-opacity: 0.3"/>
-    </g>
-   </g>
    <g id="patch_3">
     <path d="M 40.925781 377.590125 
 L 40.925781 28.318125 
@@ -649,7 +649,7 @@ L 434.42125 326.825906
 L 434.42125 320.525906 
 L 416.42125 320.525906 
 z
-" style="fill: #1f77b4; fill-opacity: 0.14; stroke: #1f77b4; stroke-opacity: 0.14; stroke-linejoin: miter"/>
+" style="fill: #081e2e; stroke: #081e2e; stroke-linejoin: miter"/>
     </g>
     <g id="text_28">
      <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="441.62125" y="326.825906" transform="rotate(-0 441.62125 326.825906)">Expanded uncertainty ±U (95 %)</text>
@@ -660,7 +660,7 @@ L 434.42125 340.326609
 L 434.42125 334.026609 
 L 416.42125 334.026609 
 z
-" style="fill: #1f77b4; fill-opacity: 0.3; stroke: #1f77b4; stroke-opacity: 0.3; stroke-linejoin: miter"/>
+" style="fill: #134a71; stroke: #134a71; stroke-linejoin: miter"/>
     </g>
     <g id="text_29">
      <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="441.62125" y="340.326609" transform="rotate(-0 441.62125 340.326609)">Standard uncertainty ±u</text>

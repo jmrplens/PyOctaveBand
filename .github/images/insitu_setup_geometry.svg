@@ -34,7 +34,7 @@ L 565.854194 335.739529
 L 565.854194 324.107104 
 L 67.055806 324.107104 
 z
-" clip-path="url(#pf3a7d8ede2)" style="fill: url(#h32e9a0c4a8); opacity: 0.5; stroke: #555555; stroke-width: 0.9; stroke-linejoin: miter"/>
+" clip-path="url(#pf3a7d8ede2)" style="fill: url(#hd504df4412); opacity: 0.5625; stroke: #555555; stroke-width: 0.9; stroke-linejoin: miter"/>
    </g>
    <g id="patch_3">
     <path d="M 283.88421 143.804516 
@@ -160,7 +160,7 @@ L 225.395599 137.239216
   </clipPath>
  </defs>
  <defs>
-  <pattern id="h32e9a0c4a8" patternUnits="userSpaceOnUse" x="0" y="0" width="72" height="72">
+  <pattern id="hd504df4412" patternUnits="userSpaceOnUse" x="0" y="0" width="72" height="72">
    <rect x="0" y="0" width="73" height="73" fill="#9e9e9e"/>
    <path d="M -36 36 
 L 36 -36 
@@ -188,7 +188,7 @@ M 30 102
 L 102 30 
 M 36 108 
 L 108 36 
-" style="fill: #555555; stroke: #555555; stroke-width: 1.0; stroke-linecap: butt; stroke-linejoin: miter; stroke-opacity: 0.5"/>
+" style="fill: #555555; stroke: #555555; stroke-width: 1.0; stroke-linecap: butt; stroke-linejoin: miter; stroke-opacity: 0.5625"/>
   </pattern>
  </defs>
 </svg>

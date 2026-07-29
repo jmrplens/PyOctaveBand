@@ -34,7 +34,7 @@ L 456.404963 346.248448
 L 456.404963 93.667802 
 L 67.819355 93.667802 
 z
-" clip-path="url(#pdc15a1629d)" style="fill: url(#h32e9a0c4a8); opacity: 0.5; stroke: #555555; stroke-width: 0.9; stroke-linejoin: miter"/>
+" clip-path="url(#pdc15a1629d)" style="fill: url(#hd504df4412); opacity: 0.5625; stroke: #555555; stroke-width: 0.9; stroke-linejoin: miter"/>
    </g>
    <g id="patch_3">
     <path d="M 456.404963 346.248448 
@@ -42,7 +42,7 @@ L 553.551365 346.248448
 L 553.551365 93.667802 
 L 456.404963 93.667802 
 z
-" clip-path="url(#pdc15a1629d)" style="fill: #aec7e8; opacity: 0.5; stroke: #555555; stroke-width: 0.9; stroke-linejoin: miter"/>
+" clip-path="url(#pdc15a1629d)" style="fill: #aec7e8; opacity: 0.615234; stroke: #555555; stroke-width: 0.9; stroke-linejoin: miter"/>
    </g>
    <g id="patch_4">
     <path d="M 553.551365 346.248448 
@@ -141,7 +141,7 @@ L 54.664516 100.673751
   </clipPath>
  </defs>
  <defs>
-  <pattern id="h32e9a0c4a8" patternUnits="userSpaceOnUse" x="0" y="0" width="72" height="72">
+  <pattern id="hd504df4412" patternUnits="userSpaceOnUse" x="0" y="0" width="72" height="72">
    <rect x="0" y="0" width="73" height="73" fill="#9e9e9e"/>
    <path d="M -36 36 
 L 36 -36 
@@ -169,7 +169,7 @@ M 30 102
 L 102 30 
 M 36 108 
 L 108 36 
-" style="fill: #555555; stroke: #555555; stroke-width: 1.0; stroke-linecap: butt; stroke-linejoin: miter; stroke-opacity: 0.5"/>
+" style="fill: #555555; stroke: #555555; stroke-width: 1.0; stroke-linecap: butt; stroke-linejoin: miter; stroke-opacity: 0.5625"/>
   </pattern>
  </defs>
 </svg>

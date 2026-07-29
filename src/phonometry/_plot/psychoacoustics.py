@@ -19,6 +19,7 @@ from .common import (
     _new_axes,
     _new_axes_column,
     format_frequency_axis,
+    theme_fill,
 )
 
 if TYPE_CHECKING:
@@ -785,19 +786,13 @@ def plot_tone_audibility_levels(
 
     ymin = float(min(lg.min(), lt.min())) - 4.0
     # Shade the decisive tone's critical band below its masking-noise level so
-    # the audible gap reads at a glance. svglib drops alpha, so the fill is a
-    # pale *opaque* colour with no edge and a low zorder (below the curves);
-    # its lightness follows the figure background, so the same fill reads on
-    # the white report page and on a dark-theme documentation figure.
-    from matplotlib.colors import to_rgb
-
-    figure = ax.get_figure()
-    face = to_rgb(figure.get_facecolor()) if figure is not None else (1.0, 1.0, 1.0)
-    light_background = (0.299 * face[0] + 0.587 * face[1] + 0.114 * face[2]) > 0.5
+    # the audible gap reads at a glance. svglib drops alpha, so the fill is an
+    # *opaque* wash with no edge and a low zorder (below the curves); it is
+    # derived from the page, so the same call reads on the white report page
+    # and on a dark-theme documentation figure.
     ax.fill_between(
         [f1[decisive], f2[decisive]], ymin, lg[decisive],
-        color="#eaf0f8" if light_background else "#22303f",
-        edgecolor="none", zorder=0,
+        color=theme_fill(_C_PRIMARY, ax), edgecolor="none", zorder=0,
     )
 
     # Critical-band masking-noise level Lpn: one horizontal segment per tone

@@ -2380,24 +2380,11 @@ L 700.549375 422.518516
 L 700.549375 236.367109 
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
-   <g id="patch_13">
-    <path d="M 382.646429 365.731615 
-Q 290.47208 351.036631 199.181004 336.482463 
-" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: round"/>
-    <path d="M 202.089196 338.56631 
-L 199.181004 336.482463 
-L 202.592997 335.406218 
-" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: round"/>
-   </g>
    <g id="text_24">
-    <text style="font-size: 8px; font-family: sans-serif" transform="translate(386.618788 373.994979)">frontera de bloque:</text>
-    <text style="font-size: 8px; font-family: sans-serif" transform="translate(386.618788 383.597167)">se reinicia el transitorio del filtro</text>
-   </g>
-   <g id="text_25">
     <text style="font-weight: 700; font-size: 11px; font-family: sans-serif; text-anchor: middle" x="374.130547" y="230.367109" transform="rotate(-0 374.130547 230.367109)">Sin estado: cada bloque reinicia el transitorio del filtro</text>
    </g>
    <g id="legend_2">
-    <g id="patch_14">
+    <g id="patch_13">
      <path d="M 469.980625 270.721797 
 L 694.249375 270.721797 
 Q 696.049375 270.721797 696.049375 268.921797 
@@ -2416,7 +2403,7 @@ L 480.780625 248.308984
 L 489.780625 248.308984 
 " style="fill: none; stroke: #000000; stroke-opacity: 0.35; stroke-width: 2.2; stroke-linecap: square"/>
     </g>
-    <g id="text_26">
+    <g id="text_25">
      <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="496.980625" y="251.458984" transform="rotate(-0 496.980625 251.458984)">Continuo (señal completa)</text>
     </g>
     <g id="line2d_57">
@@ -2425,9 +2412,35 @@ L 480.780625 261.809687
 L 489.780625 261.809687 
 " style="fill: none; stroke: #d62728; stroke-width: 1.1; stroke-linecap: square"/>
     </g>
-    <g id="text_27">
+    <g id="text_26">
      <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="496.980625" y="264.959687" transform="rotate(-0 496.980625 264.959687)">Bloques independientes (estado reiniciado)</text>
     </g>
+   </g>
+   <g id="patch_14">
+    <path d="M 380.378947 363.146206 
+Q 289.340358 349.732286 199.297252 336.465045 
+" style="fill: none; stroke: #000000; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 202.779701 338.898674 
+L 199.297252 336.465045 
+L 203.333625 335.139263 
+" style="fill: none; stroke: #000000; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="text_27">
+    <g id="patch_15">
+     <path d="M 386.618788 390.630321 
+L 540.84535 390.630321 
+Q 544.64535 390.630321 544.64535 386.830321 
+L 544.64535 364.025126 
+Q 544.64535 360.225126 540.84535 360.225126 
+L 386.618788 360.225126 
+Q 382.818788 360.225126 382.818788 364.025126 
+L 382.818788 386.830321 
+Q 382.818788 390.630321 386.618788 390.630321 
+z
+" style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
+    </g>
+    <text style="font-size: 9.5px; font-family: sans-serif" transform="translate(386.618788 372.194569)">frontera de bloque:</text>
+    <text style="font-size: 9.5px; font-family: sans-serif" transform="translate(386.618788 383.597167)">se reinicia el transitorio del filtro</text>
    </g>
   </g>
  </g>

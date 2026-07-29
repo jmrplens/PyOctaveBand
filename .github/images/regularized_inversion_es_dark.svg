@@ -36,6 +36,14 @@ L 44.533594 28.318125
 z
 "/>
    </g>
+   <g id="patch_3">
+    <path d="M 257.641431 386.433437 
+L 534.90112 386.433437 
+L 534.90112 28.318125 
+L 257.641431 28.318125 
+z
+" clip-path="url(#p68419b205f)" style="fill: #081e2e; stroke: #081e2e; stroke-linejoin: miter"/>
+   </g>
    <g id="matplotlib.axis_1">
     <g id="xtick_1">
      <g id="line2d_1">
@@ -568,14 +576,6 @@ L 700.73125 55.865457
      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="14.798438" y="207.375781" transform="rotate(-90 14.798438 207.375781)">Magnitud [dB]</text>
     </g>
    </g>
-   <g id="patch_3">
-    <path d="M 257.641431 386.433437 
-L 534.90112 386.433437 
-L 534.90112 28.318125 
-L 257.641431 28.318125 
-z
-" clip-path="url(#p68419b205f)" style="fill: #1f77b4; opacity: 0.08; stroke: #1f77b4; stroke-linejoin: miter"/>
-   </g>
    <g id="line2d_77">
     <path d="M -1 313.168473 
 L 59.212736 250.920145 
@@ -955,7 +955,7 @@ L 305.645703 376.171328
 L 305.645703 369.871328 
 L 287.645703 369.871328 
 z
-" style="fill: #1f77b4; opacity: 0.08; stroke: #1f77b4; stroke-linejoin: miter"/>
+" style="fill: #081e2e; stroke: #081e2e; stroke-linejoin: miter"/>
     </g>
     <g id="text_25">
      <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="312.845703" y="376.171328" transform="rotate(-0 312.845703 376.171328)">Equalized band (200 Hz - 4 kHz)</text>

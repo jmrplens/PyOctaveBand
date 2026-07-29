@@ -24,6 +24,7 @@ figures) so the plot can be composed into a larger layout.
 from __future__ import annotations
 
 from collections.abc import Sequence
+from functools import lru_cache
 from typing import TYPE_CHECKING, Any, Final, cast
 
 import numpy as np
@@ -31,6 +32,7 @@ import numpy as np
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from matplotlib.container import BarContainer
+    from matplotlib.typing import ColorType
 
     from ..building.insulation import (
         ImpactRatingResult,
@@ -130,6 +132,253 @@ def _field_cmap(ax: Axes) -> str:
     r, g, b = to_rgb(ax.get_facecolor())
     luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
     return _FIELD_CMAP_DARK if luminance < 0.5 else _FIELD_CMAP_LIGHT
+
+
+# ---------------------------------------------------------------------------
+# Background-aware shaded fills: the same idea as _field_cmap applied to the
+# opaque area regions (acceptance corridors, period zones, tolerance bands).
+# An alpha-composited fill cannot be legible on both pages at once -- 10 % of a
+# mid hue is a pale tint over white but lands within a couple of levels of the
+# near-black dark page -- so the wash is *derived* from the page instead, and
+# returned opaque (svglib drops alpha when a fiche figure is rendered to PDF).
+# ---------------------------------------------------------------------------
+
+#: sRGB (IEC 61966-2-1) to CIE XYZ matrix, D65 white, 2 degree observer.
+_SRGB_TO_XYZ: Final = np.array(
+    [
+        [0.4124564, 0.3575761, 0.1804375],
+        [0.2126729, 0.7151522, 0.0721750],
+        [0.0193339, 0.1191920, 0.9503041],
+    ]
+)
+
+#: CIE D65 reference white in XYZ, the sRGB adopted white point.
+_D65_WHITE: Final = np.array([0.95047, 1.00000, 1.08883])
+
+#: CIE standard actual response constants (CIE 15:2004), 216/24389 and 24389/27.
+_LAB_EPSILON: Final = 216.0 / 24389.0
+_LAB_KAPPA: Final = 24389.0 / 27.0
+
+#: Perceptual distance a derived fill keeps from the page it is drawn on.
+#: A CIEDE2000 difference of 1 is the just-noticeable difference, 2-3 is
+#: "visible when looked for", and a difference read at a glance without
+#: hunting starts around 10; a documentation figure is skimmed rather than
+#: inspected, so the wash is placed just above that with a margin over the
+#: threshold ``scripts/check_figure_contrast.py`` gates on.
+_FILL_DELTA_E: Final = 12.0
+
+#: Mixing weights are searched on this fixed grid rather than by bisection, so
+#: the returned colour is a quantised function of its inputs and the figure
+#: bytes stay reproducible (a bisection would let a last-bit difference in the
+#: colour-difference evaluation walk into a different final weight).
+_FILL_WEIGHT_STEPS: Final = 512
+
+
+def _srgb_to_lab(rgb: tuple[float, float, float]) -> tuple[float, float, float]:
+    """CIE L*a*b* (D65, 2 degree observer) of a 0-1 sRGB triple."""
+    channels = np.asarray(rgb, dtype=np.float64)
+    linear = np.where(
+        channels <= 0.04045, channels / 12.92, ((channels + 0.055) / 1.055) ** 2.4
+    )
+    ratio = (_SRGB_TO_XYZ @ linear) / _D65_WHITE
+    f = np.where(
+        ratio > _LAB_EPSILON,
+        np.cbrt(ratio),
+        (_LAB_KAPPA * ratio + 16.0) / 116.0,
+    )
+    return (
+        float(116.0 * f[1] - 16.0),
+        float(500.0 * (f[0] - f[1])),
+        float(200.0 * (f[1] - f[2])),
+    )
+
+
+def delta_e_2000(
+    first: tuple[float, float, float], second: tuple[float, float, float]
+) -> float:
+    """CIEDE2000 colour difference between two 0-1 sRGB triples.
+
+    The CIE's current colour-difference formula (CIE 142-2001), implemented
+    from the notes and reference data of Sharma, Wu and Dalal (2005), *The
+    CIEDE2000 color-difference formula: implementation notes, supplementary
+    test data, and mathematical observations*, Color Research & Application
+    30(1), 21-30, with unit parametric factors ``kL = kC = kH = 1``.  A value
+    of about 1 is the just-noticeable difference.
+
+    :param first: First colour as an ``(r, g, b)`` triple in 0-1 sRGB.
+    :param second: Second colour, same convention.
+    :return: The colour difference ``dE00``, zero for identical colours.
+    """
+    l_1, a_1, b_1 = _srgb_to_lab(first)
+    l_2, a_2, b_2 = _srgb_to_lab(second)
+
+    c_mean = 0.5 * (np.hypot(a_1, b_1) + np.hypot(a_2, b_2))
+    g = 0.5 * (1.0 - np.sqrt(c_mean**7 / (c_mean**7 + 25.0**7)))
+    ap_1, ap_2 = (1.0 + g) * a_1, (1.0 + g) * a_2
+    cp_1, cp_2 = np.hypot(ap_1, b_1), np.hypot(ap_2, b_2)
+    hp_1 = float(np.degrees(np.arctan2(b_1, ap_1)) % 360.0) if (ap_1 or b_1) else 0.0
+    hp_2 = float(np.degrees(np.arctan2(b_2, ap_2)) % 360.0) if (ap_2 or b_2) else 0.0
+
+    d_l = l_2 - l_1
+    d_c = cp_2 - cp_1
+    if cp_1 * cp_2 == 0.0:
+        d_h = 0.0
+    elif abs(hp_2 - hp_1) <= 180.0:
+        d_h = hp_2 - hp_1
+    else:
+        d_h = hp_2 - hp_1 - 360.0 * float(np.sign(hp_2 - hp_1))
+    d_hh = 2.0 * np.sqrt(cp_1 * cp_2) * np.sin(np.radians(d_h) / 2.0)
+
+    l_bar = 0.5 * (l_1 + l_2)
+    c_bar = 0.5 * (cp_1 + cp_2)
+    if cp_1 * cp_2 == 0.0:
+        h_bar = hp_1 + hp_2
+    elif abs(hp_1 - hp_2) <= 180.0:
+        h_bar = 0.5 * (hp_1 + hp_2)
+    elif hp_1 + hp_2 < 360.0:
+        h_bar = 0.5 * (hp_1 + hp_2 + 360.0)
+    else:
+        h_bar = 0.5 * (hp_1 + hp_2 - 360.0)
+
+    t = (
+        1.0
+        - 0.17 * np.cos(np.radians(h_bar - 30.0))
+        + 0.24 * np.cos(np.radians(2.0 * h_bar))
+        + 0.32 * np.cos(np.radians(3.0 * h_bar + 6.0))
+        - 0.20 * np.cos(np.radians(4.0 * h_bar - 63.0))
+    )
+    s_l = 1.0 + 0.015 * (l_bar - 50.0) ** 2 / np.sqrt(20.0 + (l_bar - 50.0) ** 2)
+    s_c = 1.0 + 0.045 * c_bar
+    s_h = 1.0 + 0.015 * c_bar * t
+    d_theta = 30.0 * np.exp(-(((h_bar - 275.0) / 25.0) ** 2))
+    r_t = -2.0 * np.sqrt(c_bar**7 / (c_bar**7 + 25.0**7)) * np.sin(
+        np.radians(2.0 * d_theta)
+    )
+
+    return float(
+        np.sqrt(
+            (d_l / s_l) ** 2
+            + (d_c / s_c) ** 2
+            + (d_hh / s_h) ** 2
+            + r_t * (d_c / s_c) * (d_hh / s_h)
+        )
+    )
+
+
+def _page_color(ax: Axes | None, background: str | None) -> tuple[float, float, float]:
+    """The page a fill will be drawn on, as a 0-1 sRGB triple.
+
+    Explicit ``background`` wins; otherwise the axes patch colour is read (so
+    a ``dark_background`` style, or any explicitly dark facecolor, is
+    honoured), falling back to the ``axes.facecolor`` setting when there is no
+    axes yet.
+    """
+    from matplotlib import rcParams
+    from matplotlib.colors import to_rgb
+
+    if background is not None:
+        return to_rgb(background)
+    if ax is not None:
+        return to_rgb(ax.get_facecolor())
+    return to_rgb(rcParams["axes.facecolor"])
+
+
+def theme_fill(
+    color: ColorType,
+    ax: Axes | None = None,
+    *,
+    background: str | None = None,
+    delta_e: float = _FILL_DELTA_E,
+) -> tuple[float, float, float]:
+    """Opaque wash of ``color`` that stays legible on the page it is drawn on.
+
+    Shading an area with ``alpha`` composites the hue onto whatever is behind
+    it, which is why the same call reads as a pale tint on the white page and
+    disappears into the near-black one: 10 % of a mid hue over black is within
+    a couple of levels of black.  This mixes the page colour *towards* the hue
+    instead, by the smallest amount that puts the result :data:`_FILL_DELTA_E`
+    away from the page in :func:`delta_e_2000`.  The direction takes care of
+    itself: over a light page the wash is a pale tint of the hue, over a dark
+    one it is a raised shade of it, exactly as :func:`_field_cmap` picks the
+    diverging map whose centre matches the page.
+
+    The result is opaque, so it survives the fiche PDF pipeline (svglib drops
+    alpha) and does not darken the gridlines it covers; pass it as ``color``
+    and leave ``alpha`` unset::
+
+        ax.fill_between(f, lower, upper, color=theme_fill(_C_PRIMARY, ax))
+
+    Pass a saturated hue: a colour already close to the page (a pale tint, or
+    white over white) has nowhere to move, and the strongest available wash --
+    the hue itself -- is returned instead.
+
+    :param color: Base hue, any matplotlib colour specification.
+    :param ax: Axes whose patch colour is the page; ``None`` reads the current
+        ``axes.facecolor`` setting.
+    :param background: Explicit page colour, overriding ``ax``.
+    :param delta_e: Target CIEDE2000 distance from the page.
+    :return: The wash as an ``(r, g, b)`` triple in 0-1 sRGB.
+    """
+    from matplotlib.colors import to_rgb
+
+    hue = to_rgb(color)
+    page = _page_color(ax, background)
+    weight = _fill_weight(hue, page, delta_e)
+    red, green, blue = (
+        p + weight * (h - p) for p, h in zip(page, hue, strict=True)
+    )
+    return (red, green, blue)
+
+
+def theme_fill_alpha(
+    color: ColorType,
+    ax: Axes | None = None,
+    *,
+    background: str | None = None,
+    delta_e: float = _FILL_DELTA_E,
+) -> float:
+    """Opacity at which ``color`` reaches :func:`theme_fill`'s contrast.
+
+    Compositing a hue at opacity ``a`` over the page and mixing the page
+    towards that hue by weight ``a`` are the same colour, so this is the same
+    computation as :func:`theme_fill` read as an opacity instead of a colour.
+    Prefer :func:`theme_fill`: an opaque wash survives the fiche PDF pipeline
+    and never dulls what it covers.  Use this only where fills genuinely have
+    to blend -- overlapping directivity lobes, nested uncertainty bands, a
+    wash over a hand-drawn polar grid -- and the alternative would be hiding
+    one artist behind another.
+
+    :param color: Base hue, any matplotlib colour specification.
+    :param ax: Axes whose patch colour is the page.
+    :param background: Explicit page colour, overriding ``ax``.
+    :param delta_e: Target CIEDE2000 distance from the page.
+    :return: The opacity to pass as ``alpha``, in 0-1.
+    """
+    from matplotlib.colors import to_rgb
+
+    return _fill_weight(to_rgb(color), _page_color(ax, background), delta_e)
+
+
+@lru_cache(maxsize=256)
+def _fill_weight(
+    hue: tuple[float, float, float],
+    page: tuple[float, float, float],
+    delta_e: float,
+) -> float:
+    """Smallest grid weight mixing ``page`` towards ``hue`` to reach ``delta_e``.
+
+    Cached: a figure draws the same handful of hues on the same two pages over
+    and over, and each miss walks the :data:`_FILL_WEIGHT_STEPS` grid.
+    """
+    for step in range(1, _FILL_WEIGHT_STEPS + 1):
+        weight = step / _FILL_WEIGHT_STEPS
+        red, green, blue = (
+            p + weight * (h - p) for p, h in zip(page, hue, strict=True)
+        )
+        if delta_e_2000((red, green, blue), page) >= delta_e:
+            return weight
+    return 1.0
+
 
 #: Common axis labels reused across the underwater-propagation plots.
 _LABEL_DEPTH_M: Final = "Depth [m]"
@@ -321,8 +570,8 @@ def _fractile_band(
     lower = median - _Z90 * spread_lower
     if floor is not None:
         lower = np.maximum(lower, floor)
-    ax.fill_between(freqs, lower, median + _Z90 * spread_upper,
-                    color=color, alpha=0.5,
+    ax.fill_between(freqs, lower, median + _Z90 * spread_upper, zorder=0,
+                    color=theme_fill(color, ax),
                     label=_t("10-90 % fractile band", language))
 
 

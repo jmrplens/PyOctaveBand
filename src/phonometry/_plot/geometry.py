@@ -34,6 +34,7 @@ from .common import (
     _C_TERTIARY,
     _import_pyplot,
     _new_axes,
+    theme_fill_alpha,
 )
 
 if TYPE_CHECKING:
@@ -275,7 +276,16 @@ def _material_rect(
     kwargs.setdefault("facecolor", face)
     kwargs.setdefault("edgecolor", _C_EDGE)
     kwargs.setdefault("linewidth", 0.9)
-    kwargs.setdefault("alpha", alpha)
+    # The opacity reads as material density (a rigid backing is lighter than a
+    # plate) and a caller may lighten it further to let an overlay through, but
+    # in both cases it is a floor away from the page, not below it: the
+    # thinnest layers would otherwise wash out on the page they sit on. The
+    # floor follows the drawn face, which the caller may also have overridden.
+    face = kwargs["facecolor"]
+    alpha = float(kwargs.pop("alpha", alpha))
+    if face != "none":
+        alpha = max(alpha, theme_fill_alpha(face, ax))
+    kwargs["alpha"] = alpha
     patch = Rectangle((x, y), width, height, hatch=hatch, **kwargs)
     ax.add_patch(patch)
     return patch
@@ -1946,10 +1956,13 @@ def plot_microphone_positions(
         # Reflecting plane disc at z = 0.
         disc_r = np.linspace(0.0, 1.15 * r, 2)
         d_grid, a_grid = np.meshgrid(disc_r, phi)
+        # Translucent so the wireframe behind it keeps reading, with the
+        # opacity derived from the page and the surface left unshaded so the
+        # drawn colour is the one that was measured.
         ax.plot_surface(
             d_grid * np.cos(a_grid), d_grid * np.sin(a_grid),
-            np.zeros_like(d_grid), color=_C_SECONDARY_LIGHT, alpha=0.15,
-            linewidth=0.0,
+            np.zeros_like(d_grid), color=_C_SECONDARY_LIGHT, linewidth=0.0,
+            alpha=theme_fill_alpha(_C_SECONDARY_LIGHT, ax), shade=False,
         )
         ax.text(
             1.1 * r, 0.0, 0.0, _t("Reflecting plane", language), fontsize=8,

@@ -187,6 +187,14 @@ jobs:
       # SVG structure + numeric tolerance and raster RMS instead, so real figure
       # changes still fail while cross-CPU noise passes. See scripts/check_figures.py.
       run: python scripts/check_figures.py
+    - name: Fail if any shaded region is illegible
+      # Staleness says the figures match the code; it says nothing about
+      # whether a shaded region can be seen. This measures every filled area
+      # against the page it is drawn on and fails below the CIEDE2000
+      # threshold, which is what catches a fill tuned on one theme and left
+      # invisible on the other. It parses the committed SVGs (a few seconds
+      # for the whole set) and needs no rendering stack of its own.
+      run: python scripts/check_figure_contrast.py
 
   tests:
     runs-on: ${{ matrix.os }}

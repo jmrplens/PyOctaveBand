@@ -36,6 +36,14 @@ L 52.482813 28.318125
 z
 "/>
    </g>
+   <g id="patch_3">
+    <path d="M 95.594813 386.515781 
+L 2746.982812 386.515781 
+L 2746.982812 28.318125 
+L 95.594813 28.318125 
+z
+" clip-path="url(#p11e2239aa4)" style="fill: #081e2e; stroke: #081e2e; stroke-linejoin: miter"/>
+   </g>
    <g id="matplotlib.axis_1">
     <g id="xtick_1">
      <g id="line2d_1">
@@ -235,14 +243,6 @@ L 699.162813 47.170633
     <g id="text_14">
      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="14.797656" y="207.416953" transform="rotate(-90 14.797656 207.416953)">Cepstrum</text>
     </g>
-   </g>
-   <g id="patch_3">
-    <path d="M 95.594813 386.515781 
-L 2746.982812 386.515781 
-L 2746.982812 28.318125 
-L 95.594813 28.318125 
-z
-" clip-path="url(#p11e2239aa4)" style="fill: #1f77b4; opacity: 0.08; stroke: #1f77b4; stroke-linejoin: miter"/>
    </g>
    <g id="line2d_25">
     <path d="M 52.497551 425.716563 
@@ -1711,7 +1711,7 @@ L 515.119844 56.757422
 L 515.119844 50.457422 
 L 497.119844 50.457422 
 z
-" style="fill: #1f77b4; opacity: 0.08; stroke: #1f77b4; stroke-linejoin: miter"/>
+" style="fill: #081e2e; stroke: #081e2e; stroke-linejoin: miter"/>
     </g>
     <g id="text_18">
      <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="522.319844" y="56.757422" transform="rotate(-0 522.319844 56.757422)">Searched band</text>

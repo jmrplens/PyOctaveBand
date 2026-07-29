@@ -29,6 +29,8 @@ from phonometry import OctaveFilterBank
 from phonometry._plot.common import (
     _register_field_dark_cmap,
     format_frequency_axis,
+    theme_fill,
+    theme_fill_alpha,
 )
 
 # Constants for professional styling
@@ -228,8 +230,8 @@ _ES_EXACT = {
     "Relative attenuation \u0394A [dB]": "Atenuaci\u00f3n relativa \u0394A [dB]",
     "Sound pressure level [dB re 20 \u00b5Pa]": "Nivel de presi\u00f3n ac\u00fastica [dB re 20 \u00b5Pa]",
     "1/3 Octave Band Analysis": "An\u00e1lisis en bandas de octava 1/3",
-    "1/3 Octave Spectrogram (Fast windows, 50% overlap)":
-        "Espectrograma 1/3 de octava (ventanas Fast, 50 % de solape)",
+    "1/12 Octave Spectrogram (Fast windows, 87.5% overlap)":
+        "Espectrograma 1/12 de octava (ventanas Fast, 87,5 % de solape)",
     "4 kHz Toneburst Response vs IEC 61672-1 Table 4 (FAST)":
         "Respuesta a r\u00e1fagas de 4 kHz vs Tabla 4 de IEC 61672-1 (FAST)",
     "A-Weighting": "Ponderaci\u00f3n A",
@@ -1896,10 +1898,18 @@ COLOR_PRIMARY = "#1f77b4"
 COLOR_SECONDARY = "#d62728"
 COLOR_TERTIARY = "#2ca02c"
 COLOR_GRID = "#e0e0e0"
+# Neutral for de-emphasised *data* (a context bar, a reference series): mid
+# grey reads on both pages, unlike COLOR_GRID, which is tuned to disappear
+# into the one it is drawn on.
+COLOR_MUTED = "#9e9e9e"
 
 # Theme state: every figure is generated twice (light + "_dark" suffix).
 # COLOR_FG replaces literal black so annotations stay visible on dark bg.
 COLOR_FG = "black"
+# Solid backing for a text box that has to stay readable over the plotted
+# data: a shade off the page rather than the page itself, so the box reads as
+# a panel and its edge is not the only thing separating it from the figure.
+COLOR_PANEL = "#f0f2f5"
 _FILENAME_SUFFIX = ""
 
 
@@ -1934,12 +1944,13 @@ plt.rcParams.update(
 
 def set_theme(dark: bool) -> None:
     """Switch between the light (default) and dark documentation themes."""
-    global COLOR_FG, COLOR_GRID, _FILENAME_SUFFIX
+    global COLOR_FG, COLOR_GRID, COLOR_PANEL, _FILENAME_SUFFIX
     global CMAP_FIELD, FIELD_INK, FIELD_STROKE
     if dark:
         plt.style.use("dark_background")
         COLOR_FG = "white"
         COLOR_GRID = "#555555"
+        COLOR_PANEL = "#1c2128"
         _FILENAME_SUFFIX = "_dark"
         CMAP_FIELD = "phonometry_field_dark"
         FIELD_INK = "white"
@@ -1948,6 +1959,7 @@ def set_theme(dark: bool) -> None:
         plt.style.use("default")
         COLOR_FG = "black"
         COLOR_GRID = "#e0e0e0"
+        COLOR_PANEL = "#f0f2f5"
         _FILENAME_SUFFIX = ""
         CMAP_FIELD = "RdBu_r"
         FIELD_INK = "black"
@@ -2673,13 +2685,18 @@ def generate_spectrogram_example(output_dir: str) -> None:
     x[int(2.5 * fs):int(2.8 * fs)] += np.sin(2 * np.pi * 250 * t[int(2.5 * fs):int(2.8 * fs)])
     x += 0.01 * rng.standard_normal(len(t))
 
-    bank = OctaveFilterBank(fs=fs, fraction=3, order=6, limits=[50.0, 12000.0])
-    levels, freq, times = bank.spectrogram(x, window_time=0.125, overlap=0.5)
+    # 1/12-octave bands stepped at 1/8 of the window: the Fast (125 ms)
+    # integration still sets the time resolution, but the mesh is sampled four
+    # times finer on each axis than the band spacing and hop it replaces, so
+    # the sweep reads as a line instead of a staircase of cells.
+    bank = OctaveFilterBank(fs=fs, fraction=12, order=6, limits=[50.0, 12000.0])
+    levels, freq, times = bank.spectrogram(x, window_time=0.125, overlap=0.875)
 
     _, ax = plt.subplots()
     mesh = ax.pcolormesh(times, freq, levels, shading="auto", cmap="magma")
     ax.set_yscale("log")
-    ax.set_title("1/3 Octave Spectrogram (Fast windows, 50% overlap)", fontweight="bold", pad=12)
+    ax.set_title("1/12 Octave Spectrogram (Fast windows, 87.5% overlap)",
+                 fontweight="bold", pad=12)
     ax.set_xlabel("Time [s]")
     ax.set_ylabel(LABEL_FREQ_HZ)
     yticks = [63, 125, 250, 500, 1000, 2000, 4000, 8000]
@@ -2937,9 +2954,14 @@ def generate_block_processing_continuity(output_dir: str) -> None:
     ax2.plot(t[zoom], y_stateless[zoom], color=COLOR_SECONDARY, linewidth=1.1,
              label="Independent blocks (state reset)")
     ax2.axvline(block / fs, color=COLOR_FG, linestyle=":", alpha=0.6)
+    # The callout lands on top of the dense trace, so it carries a solid
+    # panel of its own instead of relying on the gaps between the waveforms.
     ax2.annotate("block boundary:\nfilter transient restarts", xy=(block / fs, 0),
                  xytext=(block / fs + 0.02, ax2.get_ylim()[0] * 0.55 if ax2.get_ylim()[0] < 0 else -1),
-                 fontsize=8, arrowprops={"arrowstyle": "->", "lw": 0.8})
+                 fontsize=9.5, color=COLOR_FG, zorder=6,
+                 bbox={"boxstyle": "round,pad=0.4", "facecolor": COLOR_PANEL,
+                       "edgecolor": COLOR_GRID},
+                 arrowprops={"arrowstyle": "->", "lw": 0.9, "color": COLOR_FG})
     ax2.set_title("No state: each block restarts the filter transient",
                   fontsize=11, fontweight="bold")
     ax2.set_xlabel("Time [s]")
@@ -2977,10 +2999,12 @@ def generate_class_mask_overlay(output_dir: str) -> None:
     _, ax = plt.subplots(figsize=(10, 6.5))
     # Forbidden regions for class 1: below the minimum required attenuation
     # (stop band) and above the maximum allowed attenuation (pass band).
-    ax.fill_between(grid, -10, lo1, color=COLOR_SECONDARY, alpha=0.15,
+    ax.fill_between(grid, -10, lo1, color=theme_fill(COLOR_SECONDARY, ax),
+                    zorder=0,
                     label="Forbidden for class 1 (too little attenuation)")
     finite = np.isfinite(hi1)
-    ax.fill_between(grid[finite], hi1[finite], 90, color="#9467bd", alpha=0.15,
+    ax.fill_between(grid[finite], hi1[finite], 90,
+                    color=theme_fill("#9467bd", ax), zorder=0,
                     label="Forbidden for class 1 (too much attenuation)")
     ax.plot(grid, lo2, color=COLOR_TERTIARY, linestyle=":", linewidth=1.2,
             label="Class 2 minimum attenuation")
@@ -3069,7 +3093,7 @@ def generate_weighting_class_mask(output_dir: str) -> None:
 
     _, ax = plt.subplots(figsize=(10, 6.5))
     # Allowed corridor for class 1 (between lower and upper limit).
-    ax.fill_between(freqs, lo1, upper1, color=COLOR_PRIMARY, alpha=0.10,
+    ax.fill_between(freqs, lo1, upper1, color=theme_fill(COLOR_PRIMARY, ax),
                     step="mid", label="Class 1 acceptance region")
     ax.plot(freqs, upper1, color=COLOR_SECONDARY, linewidth=1.3, drawstyle="steps-mid",
             label="Class 1 upper/lower limit")
@@ -3198,10 +3222,10 @@ def generate_lden_profile(output_dir: str) -> None:
     l_den = lden(ld, le, ln_)
 
     _, ax = plt.subplots(figsize=(10, 6))
-    ax.axvspan(7, 19, color=COLOR_TERTIARY, alpha=0.10)
-    ax.axvspan(19, 23, color="#e8a838", alpha=0.15)
-    ax.axvspan(23, 24, color=COLOR_PRIMARY, alpha=0.12)
-    ax.axvspan(0, 7, color=COLOR_PRIMARY, alpha=0.12)
+    ax.axvspan(7, 19, color=theme_fill(COLOR_TERTIARY, ax))
+    ax.axvspan(19, 23, color=theme_fill("#e8a838", ax))
+    ax.axvspan(23, 24, color=theme_fill(COLOR_PRIMARY, ax))
+    ax.axvspan(0, 7, color=theme_fill(COLOR_PRIMARY, ax))
     ax.step(np.r_[hours, 24], np.r_[laeq_h, laeq_h[-1]], where="post",
             color=COLOR_FG, linewidth=1.6, label="Hourly LAeq")
     ax.hlines(ld, 7, 19, color=COLOR_TERTIARY, linestyle="--", linewidth=2,
@@ -3348,7 +3372,8 @@ def generate_sti_curve(output_dir: str) -> None:
     cmap = plt.get_cmap("RdYlGn")
     for i, letter in enumerate(letters):
         lo, hi = bounds[i], bounds[i + 1]
-        ax.axhspan(lo, hi, color=cmap(i / (len(letters) - 1)), alpha=0.13, lw=0)
+        ax.axhspan(lo, hi, color=theme_fill(cmap(i / (len(letters) - 1)), ax),
+                   lw=0, zorder=0)
         ax.text(0.985, (lo + hi) / 2, letter, transform=ax.get_yaxis_transform(),
                 ha="right", va="center", fontsize=8, color=COLOR_FG, alpha=0.7)
     ax.text(0.92, 0.985, "Annex F rating", transform=ax.transAxes,
@@ -4247,7 +4272,6 @@ def generate_fluctuation_strength(output_dir: str) -> None:
     lines2, labels2 = ax2.get_legend_handles_labels()
     ax.legend(lines1 + lines2, labels1 + labels2, loc="upper right", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         "F = 5.8 (1.25 m - 0.25)(0.05 L - 1)",
         "    / [(fmod/5)^2 + 4/fmod + 1.5]  vacil",
@@ -4255,7 +4279,7 @@ def generate_fluctuation_strength(output_dir: str) -> None:
     ax.text(0.015, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="left", fontsize=8.5, color=COLOR_FG,
             family="monospace",
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "fluctuation_strength.svg")
@@ -4306,7 +4330,6 @@ def generate_psychoacoustic_annoyance(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         "PA = N5 (1 + sqrt(wS^2 + wFR^2))",
         "wS  = (S - 1.75) 0.25 lg(N5 + 10)",
@@ -4315,7 +4338,7 @@ def generate_psychoacoustic_annoyance(output_dir: str) -> None:
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=8.5, color=COLOR_FG,
             family="monospace",
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "psychoacoustic_annoyance.svg")
@@ -4375,7 +4398,6 @@ def generate_distortion(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         f"THD (F) = {res.thd_f * 100:.2f}%",
         f"THD (R) = {res.thd_r * 100:.2f}%",
@@ -4385,7 +4407,7 @@ def generate_distortion(output_dir: str) -> None:
     ax.text(0.015, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="left", fontsize=9, color=COLOR_FG,
             family="monospace",
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "distortion.svg")
@@ -4938,7 +4960,8 @@ def generate_program_loudness(output_dir: str) -> None:
     res = program_loudness(np.vstack([x, x]), fs)
 
     _fig, ax = plt.subplots(figsize=(11.5, 5.8))
-    ax.axhspan(res.lra_low, res.lra_high, color=COLOR_TERTIARY, alpha=0.12,
+    ax.axhspan(res.lra_low, res.lra_high, color=theme_fill(COLOR_TERTIARY, ax),
+               zorder=0,
                label=f"LRA = {res.loudness_range:.1f} LU (P10-P95)")
     ax.plot(res.momentary_time, res.momentary, color="#9e9e9e",
             linewidth=0.8, label="Momentary M (400 ms)")
@@ -4956,7 +4979,6 @@ def generate_program_loudness(output_dir: str) -> None:
         if t0 < 60.0:
             ax.axvline(t0, color=COLOR_GRID, linewidth=0.8)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         f"I     = {res.integrated:6.1f} LUFS",
         f"LRA   = {res.loudness_range:6.1f} LU",
@@ -4967,7 +4989,7 @@ def generate_program_loudness(output_dir: str) -> None:
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=8.5, color=COLOR_FG,
             family="monospace",
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
 
     ax.set_xlim(0.0, 60.0)
@@ -5072,7 +5094,8 @@ def generate_cepstrum_echo(output_dir: str) -> None:
     ax.plot(1e3 * res.quefrencies[:half], res.cepstrum[:half],
             color=COLOR_PRIMARY, linewidth=1.1, label="Power cepstrum")
     ax.axvspan(1e3 * res.search_range[0], 1e3 * res.search_range[1],
-               color=COLOR_PRIMARY, alpha=0.08, label="Searched band")
+               color=theme_fill(COLOR_PRIMARY, ax), zorder=0,
+               label="Searched band")
     ax.axvline(1e3 * delay_s, color=COLOR_FG, linestyle="--", linewidth=1.3,
                alpha=0.7, label="True echo delay (8 ms)")
     ax.plot([1e3 * res.delay], [res.reflection_coefficient], "v",
@@ -5253,7 +5276,10 @@ def generate_miso_coherence(output_dir: str) -> None:
     floor = db(res.output_psd[band]).min() - 5.0
     for i, color in ((0, COLOR_PRIMARY), (1, COLOR_TERTIARY)):
         level = db(res.coherent_output_spectra[i][band])
-        ax_top.fill_between(fb, floor, level, color=color, alpha=0.12, lw=0.0)
+        # Both contributions rise from the same floor, so they stay
+        # translucent and only their opacity follows the page.
+        ax_top.fill_between(fb, floor, level, color=color, lw=0.0,
+                            alpha=theme_fill_alpha(color, ax_top))
         ax_top.semilogx(fb, level, color=color, linewidth=1.4,
                         label=f"Input {i + 1} contribution")
     ax_top.semilogx(fb, db(res.noise_psd[band]), color=COLOR_SECONDARY,
@@ -5626,7 +5652,6 @@ def generate_ship_source_level(output_dir: str) -> None:
     tlines, tlabels = twin.get_legend_handles_labels()
     ax.legend(lines + tlines, labels + tlabels, loc="lower left", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         "Ls = LRN + ΔL",
         "ΔL = -10 lg[(2u^4+14u^2)/(14+2u^2+u^4)]",
@@ -5635,7 +5660,7 @@ def generate_ship_source_level(output_dir: str) -> None:
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=8.5, color=COLOR_FG,
             family="monospace",
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "ship_source_level.svg")
@@ -6189,7 +6214,9 @@ def generate_airport_sor(output_dir: str) -> None:
     for data, color, label in ((jet, COLOR_PRIMARY, "Turbofan jet (Eq. 4-24a)"),
                                (prop, COLOR_SECONDARY, "Turboprop (Eq. 4-24b)")):
         dx, dy = _xy(az, data - r0)
-        ax.fill(dx, dy, color=color, alpha=0.12, zorder=1)
+        # The two lobes overlap and the guide arcs run under them, so this one
+        # keeps a translucent fill; only its opacity follows the page.
+        ax.fill(dx, dy, color=color, alpha=theme_fill_alpha(color, ax), zorder=1)
         ax.plot(dx, dy, color=color, linewidth=2.2, zorder=3, label=label)
     for g in (0.0, -4.0, -8.0, -12.0):           # radial dB labels down the centre
         ax.text(0.6, -(g - r0), f"{g:.0f}", fontsize=8, color=COLOR_FG, ha="left",
@@ -6275,8 +6302,9 @@ def generate_rotorcraft_flyover_event(output_dir: str) -> None:
             label=f"$L_{{ASmax}}$ = {event.la_max:.1f} dB(A)")
     window = event.a_levels >= event.la_max - 10.0
     idx = np.nonzero(window)[0]
-    ax.axvspan(event.times[idx[0]], event.times[idx[-1]], color=COLOR_PRIMARY,
-               alpha=0.10, label="10 dB-down window")
+    ax.axvspan(event.times[idx[0]], event.times[idx[-1]], zorder=0,
+               color=theme_fill(COLOR_PRIMARY, ax),
+               label="10 dB-down window")
     ax.axhline(event.la_max - 10.0, color=COLOR_FG, lw=1.0, ls="--", alpha=0.5)
     ax.set_xlabel("Recorded time [s]")
     ax.set_ylabel("A-weighted sound pressure level [dB(A)]")
@@ -6358,7 +6386,7 @@ def generate_moore_glasberg_time_loudness(output_dir: str) -> None:
 
     _, ax = plt.subplots(figsize=(10, 6))
     # Shade the burst window (200-400 ms).
-    ax.axvspan(0.2, 0.4, color=COLOR_FG, alpha=0.07, linewidth=0)
+    ax.axvspan(0.2, 0.4, color=theme_fill(COLOR_FG, ax), linewidth=0, zorder=0)
     ax.plot(time, stl, color=COLOR_PRIMARY, linewidth=1.8,
             label=f"Short-term loudness STL (STL peak = {stl.max():.1f} sone)")
     ax.plot(time, ltl, color=COLOR_SECONDARY, linewidth=2.0,
@@ -6463,7 +6491,6 @@ def generate_prediction_flanking_demo(output_dir: str) -> None:
 
     rw_dd = result.r_direct_w
     rpw = result.r_prime_w
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     lines = [
         f"Rw (Dd) = {rw_dd:.1f} dB",
         f"R'w = {rpw:.1f} dB",
@@ -6472,7 +6499,7 @@ def generate_prediction_flanking_demo(output_dir: str) -> None:
     ]
     ax.text(0.985, 0.62, "\n".join(lines), transform=ax.transAxes,
             va="top", ha="right", fontsize=11, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "prediction_flanking_demo.png")
@@ -6519,7 +6546,6 @@ def generate_facade_prediction(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9, ncol=2)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         f"R′tr,s,w = {result.r_tr_s_w} dB   (Ctr = {result.c_tr})",
         f"D2m,nT,w = {result.d_2m_nt_w} dB",
@@ -6527,7 +6553,7 @@ def generate_facade_prediction(output_dir: str) -> None:
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=11, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "facade_prediction.png")
@@ -6576,7 +6602,6 @@ def generate_intensity_insulation(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     # Data-only info box (language-neutral); the Kc lift is explained by the
     # shaded "Kc adaptation" legend entry, which the ES translator handles.
     info = [
@@ -6585,7 +6610,7 @@ def generate_intensity_insulation(output_dir: str) -> None:
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=11, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "intensity_insulation.png")
@@ -6627,14 +6652,13 @@ def generate_survey_insulation(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         f"DnT,w = {res.rating.rating} dB  (C = {res.rating.c})",
         "octave bands, T0 = 0.5 s",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=11, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "survey_insulation.png")
@@ -6676,14 +6700,13 @@ def generate_floor_covering_improvement(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         f"delta-Lw = {res.delta_lw} dB  (ISO 717-2)",
         "one-third octave, mock-up (a0 = 1e-6 m/s^2)",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=11, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "floor_covering_improvement.png")
@@ -6726,7 +6749,6 @@ def generate_flanking_transmission(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         "rigid T-junction, two heavy walls",
         "lij = 4 m, Si = 12 m^2, Sj = 10 m^2",
@@ -6735,7 +6757,7 @@ def generate_flanking_transmission(output_dir: str) -> None:
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=11, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "flanking_transmission.png")
@@ -6785,7 +6807,6 @@ def generate_reverberation_models(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         "room 10 x 7 x 3.5 m",
         "V = 245 m^3, S = 259 m^2",
@@ -6794,7 +6815,7 @@ def generate_reverberation_models(output_dir: str) -> None:
     ]
     ax.text(0.015, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="left", fontsize=11, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "reverberation_models.svg")
@@ -6831,7 +6852,6 @@ def generate_dynamic_stiffness(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=10)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         "f0 = (1/2pi) sqrt(s'/m')  (Formula 2)",
         "s'  = s't + s'a  (clause 8.2)",
@@ -6840,7 +6860,7 @@ def generate_dynamic_stiffness(output_dir: str) -> None:
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=10, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "dynamic_stiffness.svg")
@@ -6879,7 +6899,6 @@ def generate_junction_transmission(output_dir: str) -> None:
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.legend(loc="upper right", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         "X-junction: 100 mm / 200 mm concrete",
         f"chi = {res.chi:.3f},  psi = {res.psi:.3f}",
@@ -6888,7 +6907,7 @@ def generate_junction_transmission(output_dir: str) -> None:
     ]
     ax.text(0.015, 0.97, "\n".join(info), transform=ax.transAxes,
             va="top", ha="left", fontsize=10, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "junction_transmission.svg")
@@ -6931,7 +6950,6 @@ def generate_mechanical_mobility(output_dir: str) -> None:
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.legend(loc="lower center", fontsize=9, ncol=2)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         "SDOF: m = 2 kg, k = 8000 N/m, c = 5 N.s/m",
         "H = 1/(k - w^2 m + j w c)",
@@ -6940,7 +6958,7 @@ def generate_mechanical_mobility(output_dir: str) -> None:
     ]
     ax.text(0.985, 0.97, "\n".join(info), transform=ax.transAxes,
             va="top", ha="right", fontsize=10, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "mechanical_mobility.svg")
@@ -6974,7 +6992,7 @@ def generate_transfer_stiffness(output_dir: str) -> None:
                 label=r"indirect method $-(2\pi f)^2 m_2 T$")
     ax.axvline(f0, color=COLOR_GRID, linestyle=":", linewidth=1.2,
                label="resonance $f_0$")
-    ax.axvspan(freq[0], 3.0 * f0, color=COLOR_GRID, alpha=0.12)
+    ax.axvspan(freq[0], 3.0 * f0, color=theme_fill(COLOR_FG, ax), zorder=0)
 
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel(r"Transfer stiffness level $L_k$ [dB re 1 N/m]")
@@ -6984,7 +7002,6 @@ def generate_transfer_stiffness(output_dir: str) -> None:
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.legend(loc="upper left", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         "Kelvin-Voigt: k = 1 MN/m, c = 120 N.s/m",
         f"blocking mass m2 = 8 kg,  f0 = {f0:.1f} Hz",
@@ -6993,7 +7010,7 @@ def generate_transfer_stiffness(output_dir: str) -> None:
     ]
     ax.text(0.985, 0.05, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=10, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "transfer_stiffness.svg")
@@ -7057,7 +7074,6 @@ def generate_rigid_mass_calibration(output_dir: str) -> None:
     format_frequency_axis(ax_top, float(freq[0]), float(freq[-1]))
     format_frequency_axis(ax_bot, float(freq[0]), float(freq[-1]))
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         "calibration block m = 10 kg",
         "|A| = 1/m = 0.100 1/kg  (7.5.2)",
@@ -7066,7 +7082,7 @@ def generate_rigid_mass_calibration(output_dir: str) -> None:
     ]
     ax_top.text(0.985, 0.05, "\n".join(info), transform=ax_top.transAxes,
                 va="bottom", ha="right", fontsize=10, color=COLOR_FG,
-                bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+                bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                       "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "rigid_mass_calibration.svg")
@@ -7110,7 +7126,6 @@ def generate_vibration_sound_power(output_dir: str) -> None:
     ax.grid(which="major", axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.legend(loc="upper right", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         "LW = Lv + 10 lg(S/S0) + 10 lg(e) + 10 lg(411/400)",
         f"S = {area:g} m2,  S0 = 1 m2",
@@ -7118,7 +7133,7 @@ def generate_vibration_sound_power(output_dir: str) -> None:
     ]
     ax.text(0.015, 0.02, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="left", fontsize=9, color=COLOR_FG, family="monospace",
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "vibration_sound_power.svg")
@@ -7156,7 +7171,6 @@ def generate_structure_borne_power(output_dir: str) -> None:
     ax.grid(which="major", axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.legend(loc="upper right", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         "LWs = 10 lg(2 pi f eta m S) + Lv - 60 dB",
         "eta = 2.2/(f Ts),  v0 = 1 nm/s",
@@ -7164,7 +7178,7 @@ def generate_structure_borne_power(output_dir: str) -> None:
     ]
     ax.text(0.015, 0.02, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="left", fontsize=9, color=COLOR_FG, family="monospace",
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "structure_borne_power.svg")
@@ -7218,7 +7232,6 @@ def generate_installed_structure_borne(output_dir: str) -> None:
     ax.grid(which="major", axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.legend(loc="upper right", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         "DC = 10 lg(|Ys+Yi|^2 / (|Ys| Re Yi))",
         "Ln,s,ij = LWs,inst - Dsa - Rij - 10 lg(Si/S0) - 10 lg(A0/4)",
@@ -7226,7 +7239,7 @@ def generate_installed_structure_borne(output_dir: str) -> None:
     ]
     ax.text(0.015, 0.02, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="left", fontsize=8.5, color=COLOR_FG, family="monospace",
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "installed_structure_borne.svg")
@@ -7272,7 +7285,6 @@ def generate_tone_audibility(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         "dfc = 25 + 75 (1 + 1.4 (fT/1000)^2)^0.69",
         "LG = LS + 10 lg(dfc/df),  av = -2 - lg(1 + (f/502)^2.5)",
@@ -7280,7 +7292,7 @@ def generate_tone_audibility(output_dir: str) -> None:
     ]
     ax.text(0.015, 0.02, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="left", fontsize=8.5, color=COLOR_FG, family="monospace",
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "tone_audibility.svg")
@@ -7322,14 +7334,13 @@ def generate_absorption_uncertainty(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         "sigma_R = m alpha_s + n  (Table 1)",
         "U = k u,  k = 2  (95 %)",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=11, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "absorption_uncertainty.png")
@@ -7371,11 +7382,13 @@ def generate_insulation_uncertainty_demo(output_dir: str) -> None:
     exp_single = insulation_expanded_uncertainty(u_single, 0.95)
 
     _fig, ax = plt.subplots(figsize=(10, 6.3))
+    # Nested bands: the inner one is placed twice as far from the page as the
+    # outer, so the two read as distinct steps of the same hue.
     ax.fill_between(freqs, measured - exp_band, measured + exp_band,
-                    color=COLOR_PRIMARY, alpha=0.14, zorder=1,
+                    color=theme_fill(COLOR_PRIMARY, ax), zorder=0,
                     label="Expanded uncertainty ±U (95 %)")
     ax.fill_between(freqs, measured - u_band, measured + u_band,
-                    color=COLOR_PRIMARY, alpha=0.30, zorder=2,
+                    color=theme_fill(COLOR_PRIMARY, ax, delta_e=26.0), zorder=0.1,
                     label="Standard uncertainty ±u")
     ax.semilogx(freqs, measured, marker="o", color=COLOR_PRIMARY, linewidth=1.9,
                 markersize=5, markerfacecolor="white", markeredgewidth=1.4,
@@ -7387,7 +7400,6 @@ def generate_insulation_uncertainty_demo(output_dir: str) -> None:
                 label="R'w ± U (single number)")
     ax.axvline(500, color=COLOR_FG, linestyle=":", alpha=0.35, zorder=0)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     # Word-free box (the situation and band meanings are in the title/legend, so
     # translation reduces to the automatic decimal-comma substitution).
     box = [
@@ -7396,7 +7408,7 @@ def generate_insulation_uncertainty_demo(output_dir: str) -> None:
     ]
     ax.text(0.03, 0.97, "\n".join(box), transform=ax.transAxes, va="top",
             ha="left", fontsize=10, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
 
     ax.set_title("ISO 12999-1 Measurement Uncertainty (situation B, airborne)",
@@ -7664,7 +7676,6 @@ def generate_exposure_uncertainty(output_dir: str) -> None:
     ax.axhline(upper, color=COLOR_SECONDARY, linewidth=1.2, linestyle="--",
                zorder=4)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     box = [
         f"LEX,8h = {lex:.1f} dB",
         f"U = {result.expanded_uncertainty:.1f} dB (k = 1.65)",
@@ -7672,7 +7683,7 @@ def generate_exposure_uncertainty(output_dir: str) -> None:
     ]
     ax.text(0.03, 0.78, "\n".join(box), transform=ax.transAxes, va="top",
             ha="left", fontsize=10, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
 
     ax.set_title("ISO 9612 Task-Based Exposure (Annex D)", fontweight="bold",
@@ -8790,7 +8801,9 @@ def generate_diffusion_polar(output_dir: str) -> None:
     theta = np.radians(result.angles)
     polar.plot(theta, result.levels, color=COLOR_PRIMARY, linewidth=1.9,
                marker="o", markersize=4, zorder=3)
-    polar.fill(theta, result.levels, color=COLOR_PRIMARY, alpha=0.15, zorder=1)
+    # Translucent so the polar grid keeps reading through the lobe.
+    polar.fill(theta, result.levels, color=COLOR_PRIMARY, zorder=1,
+               alpha=theme_fill_alpha(COLOR_PRIMARY, ax))
     polar.set_theta_zero_location("N")
     polar.set_theta_direction(-1)
     polar.set_thetamin(-90)
@@ -8878,11 +8891,10 @@ def generate_insitu_absorption(output_dir: str) -> None:
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Absorption coefficient alpha")
     ax.set_ylim(0.0, 1.0)
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     ax.text(0.04, 0.94, "Kr = 2/3\nalpha = 1 - (1/Kr^2)|Hr/Hi|^2",
             transform=ax.transAxes, va="top", ha="left", fontsize=10,
             color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     ax.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
@@ -9428,7 +9440,6 @@ def generate_tonal_audibility(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="lower right", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         "Kt = 0            (dLta < 4)",
         "Kt = dLta - 4  (4 <= dLta <= 10)",
@@ -9436,7 +9447,7 @@ def generate_tonal_audibility(output_dir: str) -> None:
     ]
     ax.text(0.015, 0.97, "\n".join(info), transform=ax.transAxes,
             va="top", ha="left", fontsize=10, color=COLOR_FG, family="monospace",
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "tonal_audibility.png")
@@ -9593,10 +9604,12 @@ def generate_room_noise_criteria(output_dir: str) -> None:
     high = OCTAVE_BANDS >= 1000.0
     ax_rc.plot(OCTAVE_BANDS, ref, "s--", color="#7f7f7f",
                label=f"Reference RC-{rc.rating}")
-    ax_rc.fill_between(OCTAVE_BANDS[low], ref[low], ref[low] + 5.0,
-                       color="#ff7f0e", alpha=0.25, label="Rumble tol. (+5 dB)")
-    ax_rc.fill_between(OCTAVE_BANDS[high], ref[high], ref[high] + 3.0,
-                       color=COLOR_PRIMARY, alpha=0.20, label="Hiss tol. (+3 dB)")
+    ax_rc.fill_between(OCTAVE_BANDS[low], ref[low], ref[low] + 5.0, zorder=0,
+                       color=theme_fill("#ff7f0e", ax_rc),
+                       label="Rumble tol. (+5 dB)")
+    ax_rc.fill_between(OCTAVE_BANDS[high], ref[high], ref[high] + 3.0, zorder=0,
+                       color=theme_fill(COLOR_PRIMARY, ax_rc),
+                       label="Hiss tol. (+3 dB)")
     ax_rc.plot(OCTAVE_BANDS, spectrum, "o-", color=COLOR_PRIMARY, zorder=3,
                label="Measured")
     ax_rc.set_xscale("log")
@@ -9634,7 +9647,7 @@ def generate_hearing_threshold(output_dir: str) -> None:
     z90 = 1.2816
     ax_age.fill_between(freqs, r70.median - z90 * r70.spread_lower,
                         r70.median + z90 * r70.spread_upper,
-                        color=COLOR_PRIMARY, alpha=0.12,
+                        color=theme_fill(COLOR_PRIMARY, ax_age), zorder=0,
                         label="10-90 % band (70 yr)")
     ax_age.set_xscale("log")
     ax_age.set_xticks(list(freqs))
@@ -9690,7 +9703,7 @@ def generate_noise_induced_hearing_loss(output_dir: str) -> None:
     z90 = 1.2816
     ax_n.fill_between(freqs, np.maximum(r40.median - z90 * r40.spread_lower, 0.0),
                       r40.median + z90 * r40.spread_upper,
-                      color=COLOR_SECONDARY, alpha=0.12,
+                      color=theme_fill(COLOR_SECONDARY, ax_n), zorder=0,
                       label="10-90 % band (40 yr)")
     ax_n.set_xscale("log")
     ax_n.set_xticks(list(freqs))
@@ -9778,7 +9791,8 @@ def generate_uncertainty(output_dir: str) -> None:
     gauss = (np.exp(-0.5 * ((grid - result.value) / result.combined_uncertainty) ** 2)
              / (result.combined_uncertainty * np.sqrt(2 * np.pi)))
     ax_m.plot(grid, gauss, color=COLOR_SECONDARY, lw=2, label="GUM Gaussian")
-    ax_m.axvspan(mc.interval[0], mc.interval[1], color=COLOR_PRIMARY, alpha=0.12,
+    ax_m.axvspan(mc.interval[0], mc.interval[1], zorder=0,
+                 color=theme_fill(COLOR_PRIMARY, ax_m),
                  label="95 % coverage interval")
     ax_m.set_xlabel("A-weighted level [dB]")
     ax_m.set_ylabel("Probability density")
@@ -10128,7 +10142,7 @@ def generate_regularized_inversion(output_dir: str) -> None:
                 20.0 * np.log10(np.maximum(eq_mag[pos], tiny)),
                 color=COLOR_TERTIARY, linewidth=1.8,
                 label=r"Equalized $|H \cdot H_{\mathrm{inv}}|$")
-    ax.axvspan(200.0, 4000.0, color=COLOR_PRIMARY, alpha=0.08,
+    ax.axvspan(200.0, 4000.0, color=theme_fill(COLOR_PRIMARY, ax), zorder=0,
                label="Equalized band (200 Hz - 4 kHz)")
     ax.set_xlim(20.0, fs / 2.0)
     ax.set_ylim(-50.0, 15.0)
@@ -10196,8 +10210,8 @@ def generate_shaped_sweep(output_dir: str) -> None:
     axes[1].semilogx(grid[posg], target_db[posg], color=COLOR_SECONDARY,
                      linewidth=1.5, linestyle="--",
                      label="Pink target (-3 dB per octave)")
-    axes[1].axvspan(50.0, 5000.0, color=COLOR_PRIMARY, alpha=0.08,
-                    label="Sweep band (50 Hz - 5 kHz)")
+    axes[1].axvspan(50.0, 5000.0, color=theme_fill(COLOR_PRIMARY, axes[1]),
+                    zorder=0, label="Sweep band (50 Hz - 5 kHz)")
     axes[1].set_xlim(20.0, 20000.0)
     axes[1].set_ylim(-60.0, 8.0)
     format_frequency_axis(axes[1], 20.0, 20000.0)
@@ -10475,9 +10489,10 @@ def generate_extended_insulation_rating(output_dir: str) -> None:
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     x = _band_index_axis(ax, freqs)
     core = slice(3, 19)                     # the 16 core bands 100-3150 Hz
-    ax.axvspan(-0.5, 2.5, color=COLOR_GRID, alpha=0.35, zorder=0,
+    enlarged = theme_fill(COLOR_FG, ax)
+    ax.axvspan(-0.5, 2.5, color=enlarged, zorder=0,
                label="enlarged range (Annex B)")
-    ax.axvspan(18.5, 20.5, color=COLOR_GRID, alpha=0.35, zorder=0)
+    ax.axvspan(18.5, 20.5, color=enlarged, zorder=0)
     ax.plot(x, ext.measured, "-o", color=COLOR_PRIMARY, linewidth=2.2,
             markersize=5, zorder=5, label="measured R")
     ax.plot(x[core], ext.core.shifted_reference, "--s", color=COLOR_FG,
@@ -10496,7 +10511,6 @@ def generate_extended_insulation_rating(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         f"Rw(C;Ctr) = {ext.rating:g}({ext.c:g};{ext.ctr:g})",
         f"C50-5000 = {ext.c_50_5000:g},  Ctr,50-5000 = {ext.ctr_50_5000:g}",
@@ -10504,7 +10518,7 @@ def generate_extended_insulation_rating(output_dir: str) -> None:
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=10, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "extended_insulation_rating.svg")
@@ -10545,14 +10559,13 @@ def generate_field_airborne_insulation(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         f"DnT,w(C;Ctr) = {w.rating}({w.c};{w.ctr}) dB",
         f"R'w = {w_rp.rating} dB   (S = 12.5 m², V = 30.4 m³)",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=10, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "field_airborne_insulation.svg")
@@ -10596,14 +10609,13 @@ def generate_facade_field_insulation(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         f"Dls,2m,nT,w(C;Ctr) = {w.rating}({w.c};{w.ctr}) dB",
         "45° loudspeaker method (-1.5 dB on R')",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=10, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "facade_field_insulation.svg")
@@ -10639,14 +10651,13 @@ def generate_survey_impact_insulation(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="lower left", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         f"L'nT,w(CI) = {res.rating.rating}({res.rating.ci}) dB",
         "note the minus sign: a live room lowers L'nT",
     ]
     ax.text(0.985, 0.97, "\n".join(info), transform=ax.transAxes,
             va="top", ha="right", fontsize=10, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "survey_impact_insulation.svg")
@@ -10740,7 +10751,6 @@ def generate_intensity_element_insulation(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         (f"DI,n,e,w(C;Ctr) = {res.rating.rating}"
          f"({res.rating.c};{res.rating.ctr}) dB"),
@@ -10748,7 +10758,7 @@ def generate_intensity_element_insulation(output_dir: str) -> None:
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=10, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "intensity_element_insulation.svg")
@@ -10791,7 +10801,6 @@ def generate_flanking_level_difference(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         (f"Dn,f,w(C;Ctr) = {res.rating.rating}"
          f"({res.rating.c};{res.rating.ctr}) dB"),
@@ -10799,7 +10808,7 @@ def generate_flanking_level_difference(output_dir: str) -> None:
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=10, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "flanking_level_difference.svg")
@@ -10824,7 +10833,9 @@ def generate_impact_prediction_terms(output_dir: str) -> None:
 
     labels = ["$L_{n,w,eq}$", r"$-\Delta L_w$", "$+K$", "$L'_{n,w}$"]
     values = [imp.ln_w_eq, -imp.delta_l_w, imp.k_correction, imp.l_prime_n_w]
-    colors = [COLOR_GRID, COLOR_TERTIARY, COLOR_SECONDARY, COLOR_PRIMARY]
+    # COLOR_MUTED rather than the gridline grey for the starting term: a bar
+    # is a read value, so it has to hold up against the page on both themes.
+    colors = [COLOR_MUTED, COLOR_TERTIARY, COLOR_SECONDARY, COLOR_PRIMARY]
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     bars = ax.bar(np.arange(4), values, color=colors, zorder=5)
@@ -10845,7 +10856,6 @@ def generate_impact_prediction_terms(output_dir: str) -> None:
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, axis="y", zorder=0)
     ax.set_axisbelow(True)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         "L'n,w = Ln,w,eq - ΔLw + K",
         f"Ln,w,eq = 164 - 35 lg(m'/m'0) = {ln_eq:.1f} dB",
@@ -10853,7 +10863,7 @@ def generate_impact_prediction_terms(output_dir: str) -> None:
     ]
     ax.text(0.985, 0.97, "\n".join(info), transform=ax.transAxes,
             va="top", ha="right", fontsize=10, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "impact_prediction_terms.svg")
@@ -10893,14 +10903,13 @@ def generate_radiated_power_outdoor(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         "LW = Lp,in + Cd - R' + 10 lg(S/S0)",
         "wall 176 m² + industrial door 24 m², Cd = -5 dB",
     ]
     ax.text(0.015, 0.97, "\n".join(info), transform=ax.transAxes,
             va="top", ha="left", fontsize=10, color=COLOR_FG, zorder=10,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "radiated_power_outdoor.svg")
@@ -10947,14 +10956,13 @@ def generate_single_panel_rating(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         f"Rw(C;Ctr) = {w.rating}({w.c};{w.ctr}) dB",
         "6 mm float glass, m'' = 15 kg/m², η = 0.024",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=10, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "single_panel_rating.svg")
@@ -11006,14 +11014,13 @@ def generate_junction_kij_thickness(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         "Kij = 10 lg(1/τ̄) + 5 lg(fc2/1000)",
         "concrete, plate 1 fixed at 100 mm",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=10, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "junction_kij_thickness.svg")
@@ -11053,7 +11060,6 @@ def generate_mobility_result_lines(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="lower center", fontsize=9, ncol=2)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         "below f0: stiffness-controlled, |Y| ~ ω/k",
         "above f0: mass-controlled, |Y| ~ 1/(ωm)",
@@ -11061,7 +11067,7 @@ def generate_mobility_result_lines(output_dir: str) -> None:
     ]
     ax.text(0.015, 0.97, "\n".join(info), transform=ax.transAxes,
             va="top", ha="left", fontsize=10, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "mobility_result_lines.svg")
@@ -11734,7 +11740,8 @@ def generate_resampling_antialias(output_dir: str) -> None:
                linewidth=1.4, label="Stopband edge (alias fold)")
     ax.axhline(-res.stopband_attenuation_db, color=COLOR_FG, linestyle=":",
                linewidth=1.2, alpha=0.7, label="Design attenuation -120 dB")
-    ax.axvspan(res.stopband_edge_hz, f_hi, color=COLOR_SECONDARY, alpha=0.08,
+    ax.axvspan(res.stopband_edge_hz, f_hi, color=theme_fill(COLOR_SECONDARY, ax),
+               zorder=0,
                label="Rejected band (would fold back as aliases)")
     ax.set_xlim(f_lo, f_hi)
     ax.set_ylim(-170.0, 10.0)
@@ -12124,13 +12131,12 @@ def generate_golay_ir(output_dir: str) -> None:
             label="Recovered IR (golay_impulse_response)")
     ax.plot(t_ms[view], true_ir[view], color=COLOR_SECONDARY, linewidth=1.2,
             linestyle="--", label="True system response")
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     ax.text(0.985, 0.05,
             f"max |recovered - true| = {err:.1e}\n"
             "noise-free closed-form identity",
             transform=ax.transAxes, va="bottom", ha="right", fontsize=9,
             color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.4", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.4", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     ax.set_xlabel("Time [ms]")
     ax.set_ylabel("Amplitude")

@@ -36,6 +36,14 @@ L 55.667969 28.318125
 z
 " style="fill: #ffffff"/>
    </g>
+   <g id="patch_3">
+    <path d="M 445.642563 386.433437 
+L 705.625625 386.433437 
+L 705.625625 28.318125 
+L 445.642563 28.318125 
+z
+" clip-path="url(#p66a801bb80)" style="fill: #f9dede; stroke: #f9dede; stroke-linejoin: miter"/>
+   </g>
    <g id="matplotlib.axis_1">
     <g id="xtick_1">
      <g id="line2d_1">
@@ -390,14 +398,6 @@ L 705.625625 48.21342
     <g id="text_16">
      <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="14.798438" y="207.375781" transform="rotate(-90 14.798438 207.375781)">Magnitude [dB]</text>
     </g>
-   </g>
-   <g id="patch_3">
-    <path d="M 445.642563 386.433437 
-L 705.625625 386.433437 
-L 705.625625 28.318125 
-L 445.642563 28.318125 
-z
-" clip-path="url(#p66a801bb80)" style="fill: #d62728; opacity: 0.08; stroke: #d62728; stroke-linejoin: miter"/>
    </g>
    <g id="line2d_49">
     <path d="M -1 48.21342 
@@ -3180,7 +3180,7 @@ L 81.767969 376.171328
 L 81.767969 369.871328 
 L 63.767969 369.871328 
 z
-" style="fill: #d62728; opacity: 0.08; stroke: #d62728; stroke-linejoin: miter"/>
+" style="fill: #f9dede; stroke: #f9dede; stroke-linejoin: miter"/>
     </g>
     <g id="text_22">
      <text style="font-size: 9px; font-family: sans-serif; text-anchor: start" x="88.967969" y="376.171328" transform="rotate(-0 88.967969 376.171328)">Rejected band (would fold back as aliases)</text>
