@@ -14,7 +14,8 @@ Two inputs are taken **corrected**, not as printed (both recorded in
   Formula (C.4), ``αk = Σj √(fc,j/fref) 10^(−Kij/10)``, with the *unrounded*
   Annex E junction indices. The derivation returns the two printed values that
   are self-consistent with their own columns (external wall 1: 2,375 m;
-  internal wall 2: 1,840 m) and supplies the three that are not;
+  internal wall 2: 1,839 m against the printed 1,840 m) and supplies the three
+  that are not;
 * the external walls' internal loss factor is 0,012 5 (the element
   specification and Annex B Table B.3), not the 0,013 of the input block.
 

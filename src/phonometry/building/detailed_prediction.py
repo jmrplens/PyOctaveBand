@@ -1116,6 +1116,47 @@ def flanking_impact_level_from_normalized_difference(
     )
 
 
+def flanking_impact_level_from_flanking_level(
+    normalized_flanking_impact_level: ArrayLike,
+    *,
+    area: float,
+    laboratory_area: float,
+    coupling_length: float,
+    laboratory_coupling_length: float,
+) -> np.ndarray:
+    """Flanking impact level from a measured ``Ln,f`` (Part 2, Formula 13).
+
+    ``Ln,ij = Ln,f,ij,situ − 10 lg(Si llab/(Si,lab lij))``, the impact twin of
+    the airborne :func:`flanking_reduction_index_from_flanking_level`: the
+    route used when the flanking construction is characterised as a whole by a
+    laboratory measurement of the normalized flanking impact sound pressure
+    level (ISO 10848) instead of by the properties of its elements. The
+    laboratory measurement is transferred to the field situation first, as
+    ISO 12354-2:2017, Annex D indicates.
+
+    :param normalized_flanking_impact_level: ``Ln,f,ij,situ`` per band, in dB.
+    :param area: In-situ area ``Si`` of the excited floor, in m².
+    :param laboratory_area: Laboratory area ``Si,lab`` of the excited floor,
+        in m².
+    :param coupling_length: In-situ coupling length ``lij``, in m.
+    :param laboratory_coupling_length: Laboratory coupling length ``llab``,
+        in m. ISO 12354-1 Clause 4.4.2 gives the usual values: 4,5 m for
+        horizontal flanking elements, 2,5 m for vertical ones.
+    :return: ``Ln,ij`` per band, in dB.
+    :raises ValueError: If a geometry value is not positive and finite.
+    """
+    si = require_positive(area, "area")
+    si_lab = require_positive(laboratory_area, "laboratory_area")
+    lij = require_positive(coupling_length, "coupling_length")
+    llab = require_positive(laboratory_coupling_length, "laboratory_coupling_length")
+    ln = np.atleast_1d(
+        np.asarray(normalized_flanking_impact_level, dtype=np.float64)
+    )
+    return np.asarray(
+        ln - 10.0 * np.log10(si * llab / (si_lab * lij)), dtype=np.float64
+    )
+
+
 def floating_floor_improvement(
     frequencies: ArrayLike,
     *,
@@ -1653,7 +1694,7 @@ def detailed_airborne_prediction(
 def detailed_impact_prediction(
     frequencies: ArrayLike,
     *,
-    direct_level: ArrayLike,
+    direct_level: ArrayLike | None = None,
     flanking_paths: Sequence[BandPath] = (),
     direct_label: str = "Dd",
     bands: BandType = "third",
@@ -1663,30 +1704,39 @@ def detailed_impact_prediction(
     ``L'n = 10 lg(Σ 10^(Ln/10))`` over the direct impact path ``Ln,d`` and
     every flanking path ``Ln,ij``, with the ISO 717-2 rating of the resulting
     spectrum whenever the bands cover the rating range. For rooms next to each
-    other (Part 2, Formula 2) there is no direct impact path; ``direct_level``
-    is required all the same, so pass a level far below the flanking ones
-    (``-200.0`` makes its contribution vanish to the last bit) and read the
-    result's first path as the placeholder it is.
+    other there is no direct impact path and the sum runs over the flanking
+    paths only (Part 2, Formula 2): leave ``direct_level`` out and the result
+    carries no direct path at all.
 
     :param frequencies: Band centre frequencies, in Hz.
     :param direct_level: ``Ln,d`` per band, in dB (see
-        :func:`direct_impact_level`).
+        :func:`direct_impact_level`), or ``None`` for the rooms-next-to-each-
+        other case of Formula (2), which has no direct path.
     :param flanking_paths: The flanking paths (see
-        :func:`impact_flanking_path`); may be empty.
+        :func:`impact_flanking_path`); may be empty when ``direct_level`` is
+        given.
     :param direct_label: Label of the direct path (Default: ``"Dd"``).
     :param bands: ``"third"`` (default) or ``"octave"``.
     :return: The :class:`DetailedImpactResult`.
-    :raises ValueError: If a path does not match the band count.
+    :raises ValueError: If a path does not match the band count, or if neither
+        a direct level nor any flanking path is given.
     """
     from .insulation import weighted_impact_rating
 
     f = require_positive_array(frequencies, "frequencies")
-    direct = BandPath(
-        label=direct_label,
-        kind="Dd",
-        values=_band_array(direct_level, f.size, "direct_level"),
-    )
-    paths = (direct, *flanking_paths)
+    if direct_level is None and not flanking_paths:
+        raise ValueError(
+            "'detailed_impact_prediction' needs a 'direct_level', at least one "
+            "flanking path, or both."
+        )
+    paths: tuple[BandPath, ...] = tuple(flanking_paths)
+    if direct_level is not None:
+        direct = BandPath(
+            label=direct_label,
+            kind="Dd",
+            values=_band_array(direct_level, f.size, "direct_level"),
+        )
+        paths = (direct, *paths)
     energy = 10.0 ** (_path_matrix(paths, f.size) / 10.0)
     total = np.sum(energy, axis=0)
     l_prime_n = np.asarray(10.0 * np.log10(total), dtype=np.float64)
@@ -1717,6 +1767,7 @@ __all__ = [
     "direct_impact_level",
     "direct_reduction_index",
     "flanking_impact_level",
+    "flanking_impact_level_from_flanking_level",
     "flanking_impact_level_from_normalized_difference",
     "flanking_reduction_index",
     "flanking_reduction_index_from_flanking_level",

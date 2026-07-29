@@ -304,6 +304,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   (`flanking_reduction_index_from_normalized_difference`,
   `flanking_reduction_index_from_flanking_level`,
   `flanking_impact_level_from_normalized_difference`,
+  `flanking_impact_level_from_flanking_level`,
   `resonant_sound_reduction_index`), and the assembly into `R'` and `L'n` per
   band with their ISO 717 ratings (`detailed_airborne_prediction`,
   `detailed_impact_prediction`). `HomogeneousElement` and `in_situ_element`

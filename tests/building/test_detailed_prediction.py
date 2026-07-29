@@ -20,8 +20,8 @@ fixture therefore
 * builds every ``Σ lk αk`` from Formula (C.4), ``αk = Σj √(fc,j/fref)
   10^(−Kij/10)``, using the *unrounded* Annex E junction indices. That
   derivation reproduces the two printed values that are self-consistent
-  (external wall 1: 2,375 m; internal wall 2: 1,840 m) and supplies the three
-  that are not, and
+  (external wall 1: 2,375 m; internal wall 2: 1,839 m against the printed
+  1,840 m) and supplies the three that are not, and
 * uses ``ηint = 0,012 5``.
 
 Both discrepancies are recorded in ``docs/ERRATA.md``. The printed tables are
@@ -50,6 +50,7 @@ from phonometry import (
     direct_impact_level,
     direct_reduction_index,
     flanking_element,
+    flanking_impact_level_from_flanking_level,
     flanking_impact_level_from_normalized_difference,
     flanking_reduction_index_from_flanking_level,
     flanking_reduction_index_from_normalized_difference,
@@ -137,7 +138,8 @@ def test_table_l2_free_radiation_factor(situ: dict, label: str) -> None:
 
     The internal walls' printed values at 100 Hz sit 0,2 % below the exact
     recomputation because the printed critical frequency (128,4 Hz) is itself
-    rounded, so the tolerance is relative there.
+    rounded. On a σ of about 1,9 that is 0,004, so an absolute tolerance of
+    5·10⁻³ covers it and stays tight everywhere else.
     """
     got = situ[label].radiation_factor
     assert got == pytest.approx(ref.ISO12354_ANNEX_L2_SIGMA[label], abs=5e-3)
@@ -301,9 +303,21 @@ def test_table_g4_direct_and_flanking_impact_levels(impact) -> None:
     assert by_label["Df1"] == pytest.approx(ref.ISO12354_ANNEX_G4_LN_DF, abs=TOL)
 
 
-@pytest.mark.parametrize("label", ("Dd", "Df1", "Df2", "Df3", "Df4"))
-def test_table_g1_paths_from_100_hz(impact, label: str) -> None:
-    """Table G.1, per-element impact levels over the 100 Hz to 5 kHz bands.
+def test_table_g1_direct_path_over_the_whole_range(impact) -> None:
+    """Table G.1, the direct column ``Ln,Dd`` over all 21 bands.
+
+    The Table G.1 / G.4 disagreement recorded in docs/ERRATA.md affects only
+    the four *flanking* columns: Table G.1 and Table G.4 print the same direct
+    column, 57,3 / 55,9 / 53,8 dB at 50 Hz to 80 Hz included, so this one is
+    asserted over the full range.
+    """
+    by_label = {p.label: p.values for p in impact.paths}
+    assert by_label["Dd"] == pytest.approx(ref.ISO12354_ANNEX_G1_PATHS["Dd"], abs=TOL)
+
+
+@pytest.mark.parametrize("label", ("Df1", "Df2", "Df3", "Df4"))
+def test_table_g1_flanking_paths_from_100_hz(impact, label: str) -> None:
+    """Table G.1, per-element flanking impact levels, 100 Hz to 5 kHz.
 
     The 50 Hz, 63 Hz and 80 Hz cells of the four flanking columns of Table G.1
     disagree with Table G.4, which prints the same path Df1 for external wall 1
@@ -319,9 +333,20 @@ def test_table_g1_paths_from_100_hz(impact, label: str) -> None:
 
 
 def test_table_g1_total_and_rating(impact) -> None:
-    """Table G.1, the total ``L'n`` per band and ``L'n,w (CI)`` per ISO 717-2."""
+    """Table G.1, the total ``L'n`` per band and ``L'n,w (CI)`` per ISO 717-2.
+
+    The 50 Hz to 80 Hz flanking cells of Table G.1 feed its own total, so the
+    total inherits the disagreement of docs/ERRATA.md there: the recomputation
+    gives 58,7 / 57,2 / 56,1 dB against the printed 58,6 / 57,0 / 55,9 dB. The
+    three bands are therefore asserted at 0,25 dB, which is tight enough to
+    catch any real drift and honest about where the printed total comes from,
+    and the rest of the range at the usual 0,1 dB.
+    """
     assert impact.l_prime_n[3:] == pytest.approx(
         ref.ISO12354_ANNEX_G1_L_PRIME_N[3:], abs=TOL
+    )
+    assert impact.l_prime_n[:3] == pytest.approx(
+        ref.ISO12354_ANNEX_G1_L_PRIME_N[:3], abs=0.25
     )
     assert impact.rating is not None
     assert impact.rating.rating == ref.ISO12354_ANNEX_G1_L_PRIME_N_W
@@ -451,6 +476,48 @@ def test_table_l15_flanking_index_from_measured_level_difference() -> None:
     assert got == pytest.approx(ref.ISO12354_TABLE_L15_R13, abs=TOL)
 
 
+def test_flanking_impact_level_from_a_measured_flanking_level() -> None:
+    """Part 2, Formula (13): ``Ln,ij = Ln,f,ij,situ − 10 lg(Si llab/(Si,lab lij))``.
+
+    ISO 12354-2 prints no worked example for this route (Annex G characterises
+    every flanking path through the elements), so the oracle is the printed
+    formula evaluated by hand: with Si = 20 m², Si,lab = 10 m², lij = 4 m and
+    llab = 4,5 m the geometry term is 10 lg(20 · 4,5/(10 · 4)) = 10 lg 2,25 =
+    3,521 8 dB, and it must vanish when the field geometry equals the
+    laboratory one.
+    """
+    ln_f = np.array([60.0, 58.0, 56.0])
+    assert flanking_impact_level_from_flanking_level(
+        ln_f, area=20.0, laboratory_area=10.0,
+        coupling_length=4.0, laboratory_coupling_length=4.5,
+    ) == pytest.approx([56.4782, 54.4782, 52.4782], abs=5e-4)
+    assert flanking_impact_level_from_flanking_level(
+        ln_f, area=10.0, laboratory_area=10.0,
+        coupling_length=2.5, laboratory_coupling_length=2.5,
+    ) == pytest.approx(ln_f)
+
+
+def test_impact_prediction_without_a_direct_path_sums_the_flanking_paths() -> None:
+    """Part 2, Formula (2): rooms next to each other carry no direct path.
+
+    ``L'n = 10 lg Σ 10^(Ln,ij/10)`` over the flanking paths alone, so two equal
+    flanking paths add exactly 10 lg 2 = 3,010 3 dB and each carries half the
+    energy. The result must contain no direct path at all, not a placeholder.
+    """
+    from phonometry.building.detailed_prediction import BandPath
+
+    values = np.full(BANDS.size, 50.0)
+    result = detailed_impact_prediction(
+        BANDS,
+        flanking_paths=[BandPath("Ff1", "Ff", values), BandPath("Ff2", "Ff", values)],
+    )
+    assert [p.label for p in result.paths] == ["Ff1", "Ff2"]
+    assert result.l_prime_n == pytest.approx(50.0 + 10.0 * np.log10(2.0))
+    assert result.fractions == pytest.approx(0.5)
+    with pytest.raises(ValueError, match="direct_level"):
+        detailed_impact_prediction(BANDS)
+
+
 def test_table_l16_predicted_flanking_index_matches_the_measurement() -> None:
     """Table L.16, ``R13`` predicted from the elements (Formula 17).
 
@@ -577,6 +644,26 @@ def test_in_situ_transfer_is_symmetric_between_index_and_impact_level() -> None:
     r = in_situ_reduction_index(50.0, ts_situ, lab)
     ln = in_situ_impact_level(60.0, ts_situ, lab)
     assert (r - 50.0) == pytest.approx(-(ln - 60.0))
+
+
+def test_in_situ_transfer_direction_matches_the_printed_signs() -> None:
+    """Formula (9) and Part 2 Formula (5) fix the *direction*, not just the pair.
+
+    ``Rsitu = R − 10 lg(Ts,situ/Ts,lab)`` and ``Ln,situ = Ln + 10 lg(...)``, so
+    an element damped harder in the building than in the test frame
+    (``Ts,situ < Ts,lab``) rings shorter, radiates less, and therefore *gains*
+    sound reduction index and *loses* impact level. The symmetry test above
+    would still pass with both signs flipped; halving and doubling the
+    structural reverberation time pins each sign on its own, against the exact
+    ``10 lg 2 = 3,010 3 dB`` the formulae must produce.
+    """
+    lab = np.full(BANDS.size, 0.20)
+    half, double = np.full(BANDS.size, 0.10), np.full(BANDS.size, 0.40)
+    three = 10.0 * np.log10(2.0)
+    assert in_situ_reduction_index(50.0, half, lab) == pytest.approx(50.0 + three)
+    assert in_situ_impact_level(60.0, half, lab) == pytest.approx(60.0 - three)
+    assert in_situ_reduction_index(50.0, double, lab) == pytest.approx(50.0 - three)
+    assert in_situ_impact_level(60.0, double, lab) == pytest.approx(60.0 + three)
 
 
 def test_in_situ_absorption_length_matches_formula_11(situ: dict) -> None:

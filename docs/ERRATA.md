@@ -172,17 +172,21 @@ to the issuing body, with date and reference).
   values reproduce the columns they are supposed to drive: 2,375 m with
   S = 11 m² gives external wall 1 exactly, and 1,840 m with S = 13,75 m²
   gives internal wall **2** exactly. The separating floor's printed 2,364 m
-  does not reproduce its own column at any band (0,0821 against the printed
-  0,0831 at 50 Hz, 0,0287 against 0,0290 at 500 Hz); 2,659 m does, at every
+  does not reproduce its own column at any band (0,074 9 against the printed
+  0,083 1 at 50 Hz, 0,026 4 against 0,029 0 at 500 Hz); 2,659 m does, at every
   band. The two elements with no printed value need 2,548 m (external wall 2,
   S = 13,75 m²) and 1,636 m (internal wall 1, S = 11 m²).
 - **Evidence:** all five sums re-derived from Formula (C.4),
   `αk = Σj √(fc,j/fref) 10^(−Kij/10)`, over the example's own junction
   geometry with the unrounded Annex E indices: 2,659 / 2,375 / 2,548 / 1,636 /
-  1,840 m. The derivation returns the two printed values that are
-  self-consistent to three decimals and supplies the three that are missing or
-  wrong, and every `ηtot,situ` column of Table L.3 / G.3 then reproduces to
-  5·10⁻⁵.
+  1,839 m. The derivation returns the two printed values that are
+  self-consistent with their own columns (2,375 m, and 1,839 m against the
+  printed 1,840 m) and supplies the three that are missing or wrong, and every
+  `ηtot,situ` column of Table L.3 / G.3 then reproduces to 5·10⁻⁵. The printed
+  values applied to the wrong element of the same type miss by far more than
+  that rounding: 2,375 m on external wall 2 gives 0,108 5 against the printed
+  0,114 9 at 50 Hz, and 1,840 m on internal wall 1 gives 0,085 0 against
+  0,077 0.
 - **Library behaviour:** `in_situ_total_loss_factor` takes `Σ lk αk` as an
   input and `perimeter_absorption_coefficient` implements Formula (C.4); the
   Annex L fixture derives all five sums that way rather than using the printed
@@ -212,15 +216,20 @@ to the issuing body, with date and reference).
   to 13,6 and `Rij` = 43,9 to 84,6 dB.
 - **The problem:** those are the numbers of path **4d** (internal wall 2 to
   the separating floor), not of path 2d (external wall 2). Table L.1 of the
-  same annex prints R2d = 39,5 dB at 50 Hz and R4d = 43,9 dB; the block's
-  first `Rij` is 43,9. The `αi,situ` column agrees: external wall 2 has
-  `a = 10,3 m` at 50 Hz (S = 13,75 m², ηtot = 0,114 9) while internal wall 2
-  has 6,3 m (ηtot = 0,070 3), the printed value. The `Dv,ij,situ` column
-  likewise only follows from the floor-to-internal-wall `Kij` of 8,8 dB, not
-  from the floor-to-external-wall 6,4 dB.
+  same annex prints the whole R4d column, 43,9 to 84,6 dB, and the block's
+  `Rij` column is that column cell for cell. What settles it band by band is
+  the other two columns, which cannot be confused: external wall 2 has
+  `αi,situ` = 10,3 m at 50 Hz (S = 13,75 m², ηtot = 0,114 9) while internal
+  wall 2 has 6,3 m (ηtot = 0,070 3), the printed value; and `Dv,ij,situ`
+  follows the floor-to-internal-wall `Kij` of 8,8 dB, which gives 11,0 to
+  13,6 dB, not the floor-to-external-wall 6,4 dB, which gives 9,6 to 11,9 dB.
 - **Evidence:** independent recomputation of Formulae (10), (11) and (15) for
-  both candidate paths at every band; path 4d reproduces the whole block to
-  0,05 dB, path 2d misses it by 3 to 4 dB.
+  both candidate paths at every band. Path 4d reproduces all three columns of
+  the block to 0,05 dB. Path 2d departs from the block's `Rij` column by
+  0,1 dB to 7,0 dB depending on the band, and comes closest between 100 Hz and
+  160 Hz (0,5 / 0,5 / 0,1 dB), so `Rij` alone does not identify the path over
+  those bands; `αi,situ` (10,3 against 6,3 m at 50 Hz) and `Dv,ij,situ`
+  (1,4 dB to 1,7 dB apart in every band) do.
 - **Library behaviour:** the test that asserts the block builds it as path 4d
   and names the mislabelling.
 - **Status:** unreported.
@@ -244,8 +253,8 @@ to the issuing body, with date and reference).
 - **Evidence:** a continuous-shift solve of the ISO 717-1 reference curve
   against the printed per-band spectra reproduces every printed value in both
   rows (RDd 75,12 against 75,1; RD1 84,54 against 84,5; R11 70,66 against
-  70,6; the total 57,86 against 57,8 / 57,9; on the impact side Ln,Df1 29,59
-  against 29,6 and the total 40,95 against 41,0), whereas the ISO 717-1
+  70,6; the total 57,86 against 57,8 / 57,9; on the impact side Ln,Df1 29,58
+  against 29,6 and the total 40,98 against 41,0), whereas the ISO 717-1
   1 dB-step ratings of the same spectra are 75, 84, 70 and 57 dB.
 - **Library behaviour:** `weighted_rating` / `weighted_impact_rating`
   implement ISO 717-1/-2 as written, so the detailed model returns
@@ -262,12 +271,17 @@ to the issuing body, with date and reference).
   external wall 1, from the same inputs, as 47,8 / 45,9 / 47,0 dB. The two
   tables cannot both be right, and from 100 Hz upwards they agree exactly.
 - **Evidence:** Formula (12) evaluated from the annex's own Table G.3 columns
-  (`Ln,situ`, `Rsitu`) and Table G.4 `Dv,ij,situ` gives 47,83 / 45,86 / 46,96
-  dB, reproducing Table G.4 to 0,05 dB. The other three flanking columns of
-  Table G.1 show the same 0,1 dB to 1,0 dB deficit over the same three bands
-  and none above them. The printed total `L'n` is insensitive to the
-  difference (58,6 dB either way at 50 Hz).
-- **Library behaviour:** the test asserts Table G.4 in full and Table G.1 from
+  (`Ln,situ`, `Rsitu`) and the Table G.4 `Dv,ij,situ` and `ΔLsitu` columns
+  gives 47,80 / 45,85 / 46,95 dB, reproducing the printed 47,8 / 45,9 / 47,0
+  of Table G.4 to 0,05 dB and Table G.1 only from 100 Hz upwards. Carrying the
+  same recomputation through the whole chain puts external wall 2 low by
+  0,5 dB to 1,0 dB over the same three bands and the two internal walls low by
+  up to 0,5 dB at 50 Hz and 63 Hz, while from 100 Hz upwards no flanking
+  column deviates by more than 0,15 dB. Correcting the affected cells raises
+  the printed total `L'n` only slightly: 58,6 to 58,7 dB at 50 Hz, 57,0 to
+  57,2 dB at 63 Hz, 55,9 to 56,1 dB at 80 Hz.
+- **Library behaviour:** the test asserts Table G.4 in full, the Table G.1
+  direct column over the whole range, and the Table G.1 flanking columns from
   100 Hz upwards, naming the disagreement.
 - **Status:** unreported.
 
