@@ -347,6 +347,7 @@ def detection_range_from_curve(
     if up.size == 0:
         return float("inf")
     i = int(up[0] if key == "first" else up[-1])
-    span = tl[i + 1] - tl[i]
-    frac = 0.0 if span == 0.0 else (fom - tl[i]) / span
+    # At an upward crossing tl[i] <= fom < tl[i+1], so the span is strictly
+    # positive and the linear interpolation cannot divide by zero.
+    frac = (fom - tl[i]) / (tl[i + 1] - tl[i])
     return float(r[i] + frac * (r[i + 1] - r[i]))
