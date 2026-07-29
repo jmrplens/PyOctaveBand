@@ -162,6 +162,34 @@ def test_rectangular_validation(kwargs: dict[str, float], match: str) -> None:
         duct_modes.rectangular_duct_cut_on(**kwargs)  # type: ignore[arg-type]
 
 
+def test_plot_draws_both_ladders_and_shades_the_plane_wave_band() -> None:
+    pytest.importorskip("matplotlib")
+    import matplotlib
+
+    matplotlib.use("Agg")
+    from matplotlib.axes import Axes
+
+    res = duct_modes.circular_duct_cut_on(
+        0.254, flow_velocity=200.0, speed_of_sound=_C_STEAM, count=6
+    )
+    ax = res.plot()
+    assert isinstance(ax, Axes)
+    lines = {str(line.get_label()): line for line in ax.get_lines()}
+    assert np.allclose(lines["No flow"].get_ydata(), res.cut_on_no_flow)
+    assert np.allclose(lines[f"M = {res.mach:.3f}"].get_ydata(), res.cut_on)
+    assert [t.get_text() for t in ax.get_xticklabels()] == [
+        f"({p}, {q})" for p, q in res.modes
+    ]
+    matplotlib.pyplot.close(ax.figure)
+
+
+def test_plot_language_is_validated() -> None:
+    pytest.importorskip("matplotlib")
+    res = duct_modes.rectangular_duct_cut_on(0.65, 0.4)
+    with pytest.raises(ValueError, match="language"):
+        res.plot(language="xx")
+
+
 def test_silencer_result_reports_its_plane_wave_limit() -> None:
     from phonometry.noise_control import silencers
 
