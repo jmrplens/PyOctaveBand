@@ -15,7 +15,7 @@
 
 ## Numerical conformance report
 
-&#9989; **436/436 conformance checks pass** across 53 domains and 282 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+&#9989; **437/437 conformance checks pass** across 53 domains and 283 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
 
@@ -81,13 +81,14 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary>&#9989; <b>Room &amp; building acoustics</b>: 100% (56/56)</summary>
+<summary>&#9989; <b>Room &amp; building acoustics</b>: 100% (57/57)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
 | CTE DB-HR Annex A, Formula (A.5) | Global index R'A for pink noise (Manual Ejemplo 7.2) | 51.4 dBA (+/-0.05 dBA) | 51.4 dBA | 0 dBA | &#9989; |
 | CTE DB-HR Annex A, Formula (A.6) | Global index D2m,nT,Atr for road traffic (Manual Ejercicio 7.1) | 32.8 dBA (+/-0.05 dBA) | 32.8 dBA | 0 dBA | &#9989; |
-| CTE DB-HR Annex A vs ISO 717-1 Annex B | Direct route equals Rw + C100-5000 (Manual Ejemplo 7.1: 52 - 1 = 51 dBA) | 51 dBA (+/-0 dBA) | 51 dBA | 0 dBA | &#9989; |
+| Manual de acustica ambiental y arquitectonica, Ejemplo 7.1 | Reported R'A of the field-test wall (printed 51 dBA = R'w 52 + C -1) | 51 dBA (+/-0 dBA) | 51 dBA | 0 dBA | &#9989; |
+| Manual de acustica ambiental y arquitectonica, Ejemplo 7.1 | Reported R'A,tr of the same wall (printed 47 dBA = R'w 52 + Ctr -5) | 47 dBA (+/-0 dBA) | 47 dBA | 0 dBA | &#9989; |
 | CTE Catalogo de Elementos Constructivos | Window size correction of RA (Manual Ejemplo 7.4: 4 m2 window, -2 dB) | 24 dBA (+/-0 dBA) | 24 dBA | 0 dBA | &#9989; |
 | ISO 3382-2:2008 5.3.3 | T30 from a synthetic exponential decay (T=1.0 s) | 1 s (+/-1%) | 1 s | 0 s | &#9989; |
 | ISO 18233:2006 (swept-sine method) | Sweep deconvolution recovers a known IIR response | 0 dB in-band error (+/-0.1 dB) | 0.0006 dB | 0.001 dB | &#9989; |

@@ -27,7 +27,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   activities and ports, and noise transmitted to acoustically adjacent
   premises) are exposed as lookups, and `assess_activity` applies the three
   criteria of Article 25 to produce an `ActivityAssessment` with `.plot()` and
-  a one-page `.report()` inspection fiche in Spanish. Validated against
+  a one-page `.report()` inspection fiche in Spanish. Each correction is
+  validated against the 0/3/6 dB grading of the Annex IV A.3.3 tables, and a
+  new activity requires the annual index, since Article 25.1 b i is mandatory
+  for it and a verdict that never evaluates a mandatory criterion would
+  assert more than the assessment has shown. Validated against
   Ejemplos 3.1 to 3.3 of Aviles Lopez & Perera Martin, *Manual de acustica
   ambiental y arquitectonica* (`LKeq,d` 57 dB, `LKeq,e` 51 dB, `LK,d` 56 dB,
   `LK,e` 50 dB and the verdict that flips between a new activity and one
@@ -36,10 +40,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   a Spanish-first guide, in Spanish and English.
 
 - Spanish building code CTE DB-HR (`building/spanish_building_code.py`): the
-  A-weighted global indices `RA`, `RA,tr`, `DnT,A` and `D2m,nT,Atr` computed by
-  the direct Annex A formulae (A.5) to (A.7) over the eighteen one-third-octave
-  bands 100 Hz to 5 kHz, with the four normalised source spectra of Tables A.2
-  to A.5 (pink noise, road traffic, railway and aircraft). Results expose the
+  A-weighted global indices `RA`, `RA,tr`, `DnT,A`, `D2m,nT,A` and
+  `D2m,nT,Atr` computed by the direct Annex A formulae (A.5) to (A.7) over the
+  eighteen one-third-octave bands 100 Hz to 5 kHz, two more than the sixteen
+  of ISO 717-1, with the four normalised source spectra of Tables A.2 to A.5
+  (pink noise, road traffic, railway and aircraft). The facade quantity
+  follows clause 3.1.3.4 point 1: a railway-dominant site is assessed as
+  `D2m,nT,A` through Formula (A.5) and a road-traffic or aircraft one as
+  `D2m,nT,Atr` through (A.6), so `d2m_nt_a` and `d2m_nt_atr` are separate
+  entry points that each refuse the other's spectra rather than one function
+  that could put the wrong quantity name on a report. Results expose the
   exact value, the one-decimal intermediate and the reported integer that
   DB-HR 3.1.3.1 point 4 prescribes. The requirement side covers the facade
   table 2.1 keyed on the day noise index `Ld` (with the sheltered-facade and

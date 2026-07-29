@@ -54,17 +54,29 @@ $$
 donde $X_i$ es el aislamiento de la banda (el índice de reducción acústica $R$
 o $R'$, la diferencia de niveles estandarizada $D_{nT}$, $D_{2m,nT}$, etc.) y
 $L_{x,i}$ el espectro normalizado de la fuente. La suma recorre **dieciocho**
-bandas de tercio de octava, de 100 Hz a 5 kHz, cuatro más que las dieciséis de
-ISO 717-1 (100 Hz a 3150 Hz), y esas cuatro bandas altas son la primera razón
-por la que las dos vías no dan siempre lo mismo. Los centros de banda están en
-`DB_HR_FREQUENCIES`.
+bandas de tercio de octava, de 100 Hz a 5 kHz, dos más que las dieciséis de
+ISO 717-1 (100 Hz a 3150 Hz): las bandas de 4 kHz y 5 kHz, que son la primera
+razón por la que las dos vías no dan siempre lo mismo. Los centros de banda
+están en `DB_HR_FREQUENCIES`.
 
-| Espectro normalizado | Tabla del anexo A | Magnitud que define |
-| :--- | :--- | :--- |
-| Ruido rosa ponderado A, $L_{Ar,i}$ | Tabla A.5 | $R_A$, $D_{nT,A}$ |
-| Ruido de automóviles, $L_{Atr,i}$ | Tabla A.3 | $R_{A,tr}$, $D_{2m,nT,Atr}$ |
-| Ruido ferroviario, $L_{Aef,i}$ | Tabla A.4 (numéricamente igual a la A.3) | fachadas con ferrocarril dominante |
-| Ruido de aeronaves, $L_{Aav,i}$ | Tabla A.2 | fachadas con aeronaves dominantes |
+| Espectro normalizado | Tabla del anexo A | Magnitud que define | Expresión |
+| :--- | :--- | :--- | :--- |
+| Ruido rosa ponderado A, $L_{Ar,i}$ | Tabla A.5 | $R_A$, $D_{nT,A}$, $D_{2m,nT,A}$ | (A.5), (A.7) |
+| Ruido de automóviles, $L_{Atr,i}$ | Tabla A.3 | $R_{A,tr}$, $D_{2m,nT,Atr}$ | (A.6) |
+| Ruido ferroviario, $L_{Aef,i}$ | Tabla A.4 (numéricamente igual a la A.3) | $D_{2m,nT,A}$ | (A.5) |
+| Ruido de aeronaves, $L_{Aav,i}$ | Tabla A.2 | $D_{2m,nT,Atr}$ | (A.6) |
+
+La fila del ferrocarril conviene leerla dos veces. El apartado 3.1.3.4 punto 1
+dice que cuando el ruido exterior dominante es el ferroviario la fachada se
+valora con la magnitud $D_{2m,nT,A}$ por la expresión (A.5), y que solo el
+ruido de automóviles y el de aeronaves dan $D_{2m,nT,Atr}$ por la (A.6); la
+tabla H.1 recoge el mismo reparto. Como la tabla A.4 es cifra por cifra la
+tabla A.3, una fachada con ferrocarril dominante sale con el mismo *número*
+que una de automóviles, pero la magnitud en la que se expresan la exigencia y
+el informe no es la misma. Por eso `d2m_nt_a()` y `d2m_nt_atr()` son dos
+funciones distintas y cada una rechaza los espectros de la otra, en lugar de
+una sola con un conmutador de espectro que pondría en silencio el nombre
+equivocado en el resultado.
 
 Los cuatro están en `DB_HR_NORMALISED_SPECTRA` con las claves `"pink"`,
 `"traffic"`, `"railway"` y `"aircraft"`. El siguiente cálculo reproduce el
@@ -100,7 +112,7 @@ plt.show()
 
 </details>
 
-`ra()`, `ra_tr()`, `dnt_a()` y `d2m_nt_atr()` son atajos con nombre sobre
+`ra()`, `ra_tr()`, `dnt_a()`, `d2m_nt_a()` y `d2m_nt_atr()` son atajos con nombre sobre
 `db_hr_global_index()`, que acepta cualquier espectro y, con el argumento
 `frequencies`, selecciona las dieciocho bandas del DB HR de una serie más
 larga.
@@ -114,23 +126,42 @@ resultado expone las tres formas: `.value` (sin redondear), `.intermediate`
 (un decimal) y `.reported` (el entero de la comprobación).
 
 El DB HR y la ISO 717-1 llegan al mismo sitio por caminos distintos, y el
-anexo H del propio documento admite las aproximaciones
-$D_{nT,A} \approx D_{nT,w} + C_{100-5000}$ y
-$D_{2m,nT,Atr} \approx D_{2m,nT,w} + C_{tr,100-5000}$ mientras la diferencia
-entre ambas vías sea menor que 1 dB. En los dos oráculos publicados que
-reproduce esta página, la coincidencia es exacta al entero:
+anejo H del propio documento admite tres aproximaciones mientras la diferencia
+entre ambas vías sea menor que 1 dB:
 
-| Caso | Vía directa (anexo A) | Vía ISO 717-1 |
-| :--- | :--- | :--- |
-| Elemento de separación del ejemplo 7.2 | $R'_A = 51{,}4$ dBA, redondeado 51 | $R'_w = 52$ con $C_{100-5000} = -1$, o sea 51 |
-| Fachada del ejercicio 7.1 | $D_{2m,nT,Atr} = 32{,}8$ dBA, redondeado 33 | $D_{2m,nT,w} = 38$ con $C_{tr,100-5000} = -5$, o sea 33 |
+$$D_{nT,A} \approx D_{nT,w} + C \quad (H.1), \qquad
+D_{2m,nT,A} \approx D_{2m,nT,w} + C \quad (H.2), \qquad
+D_{2m,nT,Atr} \approx D_{2m,nT,w} + C_{tr} \quad (H.3)$$
+
+donde la (H.2) cubre el caso de ferrocarril dominante del apartado anterior.
+En los dos espectros publicados que reproduce esta página, la coincidencia es
+exacta al entero:
+
+| Caso | Vía directa (anexo A) | Vía ISO 717-1 | ¿Publicado? |
+| :--- | :--- | :--- | :--- |
+| Elemento de separación del ejemplo 7.2 | $R'_A = 51{,}4$ dBA, redondeado 51 | $R'_w = 52$ con $C_{100-5000} = -1$, o sea 51 | sí, el ejemplo 7.1 imprime $R'_w = 52$, $C = -1$ y los 51 dBA |
+| Fachada del ejercicio 7.1 | $D_{2m,nT,Atr} = 32{,}8$ dBA, redondeado 33 | $D_{2m,nT,w} = 38$ con $C_{tr,100-5000} = -5$, o sea 33 | no, el libro no imprime ni el 38 ni el $-5$ |
+
+Las dos filas no tienen la misma fuerza probatoria. La del elemento de
+separación es una comprobación externa real, porque el *Manual* imprime
+también los números de la ISO 717-1. De la fachada el libro solo publica los
+32,8 dBA; el 38 y el $-5$ salen del propio motor ISO 717-1 de esta biblioteca,
+así que esa fila enseña las dos vías coincidiendo entre sí, no coincidiendo
+con una fuente.
 
 La trampa real está en el nombre de los términos de adaptación espectral. El
-DB HR los llama simplemente $C$ y $C_{tr}$, pero son los términos de **rango
-ampliado** $C_{100-5000}$ y $C_{tr,100-5000}$, no los del rango básico de
-ISO 717-1. En la fachada del ejercicio 7.1 el $C$ del rango básico vale $-2$
-mientras que el $C_{100-5000}$ vale $-1$: usar el término equivocado daría 36
-dBA en lugar de 37 para el índice $D_{2m,nT,A}$ de esa misma fachada.
+anejo H los escribe como $C$ y $C_{tr}$ a secas y remite su definición a la
+UNE-EN ISO 717-1 sin acotar el rango de frecuencias. Como los índices del
+DB HR llegan a 5 kHz y el rango básico de la ISO 717-1 se detiene en 3150 Hz,
+los términos que hacen salir bien las expresiones (H.1) a (H.3) son los de
+**rango ampliado** $C_{100-5000}$ y $C_{tr,100-5000}$; esa lectura no está en
+el anejo H, sino en el *Manual*, en la nota a las expresiones [7.15] y [7.16].
+Y tiene consecuencias: en la fachada del ejercicio 7.1 el $C$ del rango básico
+vale $-2$ y el $C_{100-5000}$ vale $-1$, de modo que tomar el que no es da
+36 dBA en lugar de 37 para el $D_{2m,nT,A}$ de esa fachada. En esa misma
+probeta $C_{tr}$ y $C_{tr,100-5000}$ valen los dos $-5$, así que el
+$D_{2m,nT,Atr}$ que el DB HR exige de verdad no llega a distinguir entre las
+dos lecturas.
 
 ```python
 from phonometry import building, weighted_rating_extended

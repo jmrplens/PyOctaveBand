@@ -118,6 +118,19 @@ def test_global_index_is_minus_the_energy_sum_of_the_band_contributions() -> Non
     assert index.band_contributions == pytest.approx(pink - np.asarray(_R_PRIME))
 
 
+def test_ra_tr_matches_the_traffic_figure_of_ejemplo_7_1() -> None:
+    """Manual Ejemplo 7.1: the same wall is 47 dBA against traffic noise.
+
+    The report of Ejemplo 7.1 prints R'w = 52 dB with Ctr = -5, giving
+    47 dBA, which the direct Annex A route reproduces from the per-band R'
+    of Ejemplo 7.2. This is a second published figure on the same specimen,
+    independent of the pink-noise one.
+    """
+    index = hr.ra_tr(_R_PRIME)
+    assert index.reported == 47
+    assert index.value == pytest.approx(47.35, abs=5e-3)
+
+
 def test_direct_route_and_iso717_route_agree_on_both_published_spectra() -> None:
     """The rounding convention, settled against Manual Ejemplo 7.1 and 7.2.
 
@@ -125,8 +138,14 @@ def test_direct_route_and_iso717_route_agree_on_both_published_spectra() -> None
     DB-HR route. On both published spectra it agrees to the integer with the
     ISO 717-1 route via the enlarged-range adaptation terms: the wall gives
     51,4 -> 51 dBA against R'w + C100-5000 = 52 - 1 = 51, and the facade gives
-    32,8 -> 33 dBA against D2m,nT,w + Ctr,100-5000 = 38 - 5 = 33. Manual
-    Ejemplo 7.1 independently prints R'w = 52 with C = -1 and Ctr = -5.
+    32,8 -> 33 dBA against D2m,nT,w + Ctr,100-5000 = 38 - 5 = 33.
+
+    The two halves do not carry the same weight. For the wall, Manual
+    Ejemplo 7.1 prints R'w = 52 with C = -1 and Ctr = -5, so reproducing
+    them is a genuine external check. For the facade the book prints neither
+    D2m,nT,w = 38 nor Ctr,100-5000 = -5; both come from the library's own
+    ISO 717-1 engine, so that half is a self-consistency check between the
+    two routes rather than a published oracle.
     """
     frequencies = list(hr.DB_HR_FREQUENCIES)
 
@@ -163,15 +182,66 @@ def test_dnt_a_and_ra_tr_use_the_expected_spectra() -> None:
     assert hr.ra_tr(_R_PRIME).name == "RA,tr"
 
 
-def test_aircraft_and_railway_facade_variants() -> None:
-    """A facade may be assessed with the railway or aircraft spectrum instead.
+def test_railway_dominant_facade_is_assessed_as_d2m_nt_a() -> None:
+    """Clause 3.1.3.4 point 1: railway noise gives D2m,nT,A, not D2m,nT,Atr.
 
-    The railway spectrum is numerically the traffic one, so it must give the
-    same index; the aircraft spectrum is different and must not.
+    "Cuando el ruido exterior dominante es el ferroviario o el de estaciones
+    ferroviarias, se debe usar la magnitud de aislamiento global D2m,nT,A.
+    Cuando el ruido exterior dominante es el de automoviles o el de
+    aeronaves, la magnitud del aislamiento global es D2m,nT,Atr." Table H.1
+    prints the same split, routing railway through Formula (A.5) and road
+    traffic and aircraft through (A.6).
+
+    Table A.4 is numerically identical to Table A.3, so the two give the same
+    number; only the name of the reported quantity distinguishes them, which
+    is why this is asserted on the name and not just the value.
     """
-    traffic = hr.d2m_nt_atr(_D2M_NT).value
-    assert hr.d2m_nt_atr(_D2M_NT, spectrum="railway").value == pytest.approx(traffic)
-    assert hr.d2m_nt_atr(_D2M_NT, spectrum="aircraft").value != pytest.approx(traffic)
+    railway = hr.d2m_nt_a(_D2M_NT, spectrum="railway")
+    traffic = hr.d2m_nt_atr(_D2M_NT)
+    assert railway.name == "D2m,nT,A"
+    assert traffic.name == "D2m,nT,Atr"
+    assert railway.value == pytest.approx(traffic.value)
+    assert railway.spectrum == "railway"
+
+
+def test_aircraft_dominant_facade_stays_d2m_nt_atr() -> None:
+    """Formula (A.6) also covers the aircraft case, keeping the D2m,nT,Atr name."""
+    aircraft = hr.d2m_nt_atr(_D2M_NT, spectrum="aircraft")
+    assert aircraft.name == "D2m,nT,Atr"
+    assert aircraft.value != pytest.approx(hr.d2m_nt_atr(_D2M_NT).value)
+
+
+def test_d2m_nt_a_defaults_to_pink_noise() -> None:
+    """Formula (A.5) is the pink-noise facade quantity."""
+    assert hr.d2m_nt_a(_D2M_NT).spectrum == "pink"
+    assert hr.d2m_nt_a(_D2M_NT).name == "D2m,nT,A"
+
+
+def test_facade_helpers_reject_each_other_s_spectra() -> None:
+    """Neither helper accepts a spectrum its formula does not cover."""
+    with pytest.raises(ValueError, match="d2m_nt_a"):
+        hr.d2m_nt_atr(_D2M_NT, spectrum="railway")
+    with pytest.raises(ValueError, match="d2m_nt_atr"):
+        hr.d2m_nt_a(_D2M_NT, spectrum="traffic")
+
+
+def test_railway_facade_requirement_is_stated_in_d2m_nt_a() -> None:
+    """The Table 2.1 requirement names the quantity of clause 3.1.3.4 point 1.
+
+    The numeric limit is the same column either way; the quantity the
+    requirement is expressed in is not.
+    """
+    road = hr.db_hr_facade_requirement(62.0, "residential", "bedrooms")
+    rail = hr.db_hr_facade_requirement(
+        62.0, "residential", "bedrooms", dominant_noise="railway"
+    )
+    air = hr.db_hr_facade_requirement(
+        62.0, "residential", "bedrooms", dominant_noise="aircraft"
+    )
+    assert road.quantity == "D2m,nT,Atr"
+    assert rail.quantity == "D2m,nT,A"
+    assert air.quantity == "D2m,nT,Atr"
+    assert rail.limit == road.limit == 32.0
 
 
 def test_global_index_selects_the_eighteen_bands_from_a_wider_spectrum() -> None:
@@ -237,8 +307,9 @@ def test_window_size_correction_reproduces_ejemplo_7_4() -> None:
 # --------------------------------------------------------------------------- #
 @pytest.mark.parametrize(
     ("ld", "expected"),
-    [(55.0, 30), (60.0, 30), (62.0, 32), (65.0, 32),
-     (68.0, 37), (70.0, 37), (72.0, 42), (75.0, 42), (80.0, 47)],
+    [(55.0, 30), (60.0, 30), (60.1, 32), (62.0, 32), (65.0, 32),
+     (65.1, 37), (68.0, 37), (70.0, 37), (70.1, 42), (72.0, 42), (75.0, 42),
+     (75.1, 47), (76.0, 47), (80.0, 47)],
 )
 def test_facade_requirement_bedrooms_series(ld: float, expected: int) -> None:
     """DB-HR Table 2.1, residential/hospital bedrooms column, every Ld band.
@@ -535,6 +606,31 @@ def test_requirement_lookup_validation() -> None:
         hr.db_hr_airborne_requirement("protected", "outdoors")
     with pytest.raises(ValueError, match="room_use"):
         hr.db_hr_reverberation_requirement("swimming_pool")
+
+
+def test_requirement_direction_is_validated() -> None:
+    """An unchecked direction typo would silently invert the verdict.
+
+    ``check_db_hr_requirement`` branches on "min" and treats anything else as
+    "max", so the dataclass rejects any other spelling at construction.
+    """
+    with pytest.raises(ValueError, match="direction"):
+        hr.DbHrRequirement("D2m,nT,Atr", 32.0, "minimum", "dBA", 0, "ref", "desc")
+    assert hr.DbHrRequirement("T", 0.7, "max", "s", 1, "ref", "desc").direction == "max"
+
+
+def test_published_spectra_are_read_only() -> None:
+    """The Annex A tables are a published constant, not a mutable global."""
+    with pytest.raises(TypeError):
+        hr.DB_HR_NORMALISED_SPECTRA["pink"] = (0.0,) * 18  # type: ignore[index]
+
+
+def test_result_does_not_alias_the_caller_s_array() -> None:
+    """Mutating the input afterwards must not rewrite the stored result."""
+    values = np.asarray(_R_PRIME, dtype=np.float64)
+    index = hr.ra(values)
+    values[0] = 0.0
+    assert index.band_values[0] == pytest.approx(36.2)
 
 
 def test_window_size_and_assessment_validation() -> None:

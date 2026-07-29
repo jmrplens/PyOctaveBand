@@ -9,7 +9,7 @@ head:
     attrs:
       type: application/ld+json
     content: |
-      {"@context":"https://schema.org","@type":"Dataset","@id":"https://jmrplens.github.io/phonometry/reference/conformance/#dataset","name":"phonometry numerical conformance report","description":"436 numerical conformance checks pinning each implemented acoustic metric to a clause, table or worked example of the governing standard, with the normative expected value, the value phonometry computes, the delta and a pass/fail verdict, across 53 domains and 282 standards. Regenerated and enforced by CI on every pull request.","url":"https://jmrplens.github.io/phonometry/reference/conformance/","inLanguage":"en","license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"creator":{"@id":"https://jmrp.io/#person"},"publisher":{"@id":"https://jmrp.io/#person"},"about":{"@id":"https://github.com/jmrplens/phonometry#software"},"measurementTechnique":"Comparison of computed values against the normative expected values published in the governing standards (tolerance tables and worked examples).","variableMeasured":[{"@type":"PropertyValue","name":"Standard","description":"Governing standard and clause or table"},{"@type":"PropertyValue","name":"Quantity","description":"Acoustic quantity under test"},{"@type":"PropertyValue","name":"Expected","description":"Normative value published in the standard"},{"@type":"PropertyValue","name":"Computed","description":"Value computed by phonometry"},{"@type":"PropertyValue","name":"Delta","description":"Signed difference between computed and expected"},{"@type":"PropertyValue","name":"Status","description":"Pass or fail verdict against the standard's tolerance"}],"distribution":{"@type":"DataDownload","encodingFormat":"text/markdown","contentUrl":"https://raw.githubusercontent.com/jmrplens/phonometry/main/docs/CONFORMANCE.md"},"isBasedOn":"https://github.com/jmrplens/phonometry/blob/main/scripts/conformance_report.py","identifier":{"@type":"PropertyValue","propertyID":"DOI","value":"10.5281/zenodo.21215280"}}
+      {"@context":"https://schema.org","@type":"Dataset","@id":"https://jmrplens.github.io/phonometry/reference/conformance/#dataset","name":"phonometry numerical conformance report","description":"437 numerical conformance checks pinning each implemented acoustic metric to a clause, table or worked example of the governing standard, with the normative expected value, the value phonometry computes, the delta and a pass/fail verdict, across 53 domains and 283 standards. Regenerated and enforced by CI on every pull request.","url":"https://jmrplens.github.io/phonometry/reference/conformance/","inLanguage":"en","license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"creator":{"@id":"https://jmrp.io/#person"},"publisher":{"@id":"https://jmrp.io/#person"},"about":{"@id":"https://github.com/jmrplens/phonometry#software"},"measurementTechnique":"Comparison of computed values against the normative expected values published in the governing standards (tolerance tables and worked examples).","variableMeasured":[{"@type":"PropertyValue","name":"Standard","description":"Governing standard and clause or table"},{"@type":"PropertyValue","name":"Quantity","description":"Acoustic quantity under test"},{"@type":"PropertyValue","name":"Expected","description":"Normative value published in the standard"},{"@type":"PropertyValue","name":"Computed","description":"Value computed by phonometry"},{"@type":"PropertyValue","name":"Delta","description":"Signed difference between computed and expected"},{"@type":"PropertyValue","name":"Status","description":"Pass or fail verdict against the standard's tolerance"}],"distribution":{"@type":"DataDownload","encodingFormat":"text/markdown","contentUrl":"https://raw.githubusercontent.com/jmrplens/phonometry/main/docs/CONFORMANCE.md"},"isBasedOn":"https://github.com/jmrplens/phonometry/blob/main/scripts/conformance_report.py","identifier":{"@type":"PropertyValue","propertyID":"DOI","value":"10.5281/zenodo.21215280"}}
 ---
 
 phonometry's key differentiator is not the feature list but the proof behind
@@ -66,7 +66,7 @@ with its evidence and what the library does about it, is recorded in the
 
 ## Numerical conformance report
 
-&#9989; **436/436 conformance checks pass** across 53 domains and 282 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+&#9989; **437/437 conformance checks pass** across 53 domains and 283 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
 
@@ -132,13 +132,14 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary>&#9989; <b>Room &amp; building acoustics</b>: 100% (56/56)</summary>
+<summary>&#9989; <b>Room &amp; building acoustics</b>: 100% (57/57)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
 | CTE DB-HR Annex A, Formula (A.5) | Global index R'A for pink noise (Manual Ejemplo 7.2) | 51.4 dBA (+/-0.05 dBA) | 51.4 dBA | 0 dBA | &#9989; |
 | CTE DB-HR Annex A, Formula (A.6) | Global index D2m,nT,Atr for road traffic (Manual Ejercicio 7.1) | 32.8 dBA (+/-0.05 dBA) | 32.8 dBA | 0 dBA | &#9989; |
-| CTE DB-HR Annex A vs ISO 717-1 Annex B | Direct route equals Rw + C100-5000 (Manual Ejemplo 7.1: 52 - 1 = 51 dBA) | 51 dBA (+/-0 dBA) | 51 dBA | 0 dBA | &#9989; |
+| Manual de acustica ambiental y arquitectonica, Ejemplo 7.1 | Reported R'A of the field-test wall (printed 51 dBA = R'w 52 + C -1) | 51 dBA (+/-0 dBA) | 51 dBA | 0 dBA | &#9989; |
+| Manual de acustica ambiental y arquitectonica, Ejemplo 7.1 | Reported R'A,tr of the same wall (printed 47 dBA = R'w 52 + Ctr -5) | 47 dBA (+/-0 dBA) | 47 dBA | 0 dBA | &#9989; |
 | CTE Catalogo de Elementos Constructivos | Window size correction of RA (Manual Ejemplo 7.4: 4 m2 window, -2 dB) | 24 dBA (+/-0 dBA) | 24 dBA | 0 dBA | &#9989; |
 | ISO 3382-2:2008 5.3.3 | T30 from a synthetic exponential decay (T=1.0 s) | 1 s (+/-1%) | 1 s | 0 s | &#9989; |
 | ISO 18233:2006 (swept-sine method) | Sweep deconvolution recovers a known IIR response | 0 dB in-band error (+/-0.1 dB) | 0.0006 dB | 0.001 dB | &#9989; |

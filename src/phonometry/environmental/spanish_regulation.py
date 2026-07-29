@@ -71,6 +71,7 @@ from __future__ import annotations
 import math
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from types import MappingProxyType
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -82,6 +83,7 @@ if TYPE_CHECKING:
 
 __all__ = [
     "ACOUSTIC_AREA_TYPES",
+    "RD1367_CORRECTION_VALUES",
     "RD1367_EVALUATION_PERIODS",
     "RD1367_MAX_CORRECTION",
     "RD1367_PERIOD_CLOCK_LIMITS",
@@ -113,27 +115,31 @@ __all__ = [
 RD1367_EVALUATION_PERIODS: tuple[str, str, str] = ("day", "evening", "night")
 
 #: Default duration of each evaluation period, in hours (Annex I A.1 a).
-RD1367_PERIOD_HOURS: dict[str, float] = {"day": 12.0, "evening": 4.0, "night": 8.0}
+RD1367_PERIOD_HOURS: Mapping[str, float] = MappingProxyType(
+    {"day": 12.0, "evening": 4.0, "night": 8.0}
+)
 
 #: Local-time start/end hour of each evaluation period (Annex I A.1 b).
-RD1367_PERIOD_CLOCK_LIMITS: dict[str, tuple[int, int]] = {
-    "day": (7, 19),
-    "evening": (19, 23),
-    "night": (23, 7),
-}
+RD1367_PERIOD_CLOCK_LIMITS: Mapping[str, tuple[int, int]] = MappingProxyType(
+    {
+        "day": (7, 19),
+        "evening": (19, 23),
+        "night": (23, 7),
+    }
+)
 
 #: Maximum of the summed correction ``Kt + Kf + Ki``, in dB (Annex IV A.3.3).
 RD1367_MAX_CORRECTION = 9.0
 
 #: The acoustic area types of Article 7 of Ley 37/2003, keyed by their letter.
-ACOUSTIC_AREA_TYPES: dict[str, str] = {
+ACOUSTIC_AREA_TYPES: Mapping[str, str] = MappingProxyType({
     "e": "sanitary, educational and cultural land use requiring special protection",
     "a": "residential land use",
     "d": "tertiary land use other than type c",
     "c": "recreational and public-entertainment land use",
     "b": "industrial land use",
     "f": "general transport-infrastructure systems and public facilities",
-}
+})
 
 #: Accepted spellings of an acoustic area type, mapped to its letter code.
 _AREA_ALIASES: dict[str, str] = {
@@ -444,8 +450,10 @@ def tonal_correction(
         correction = float(band_kt[best])
         governing = float(freqs[best]) if correction > 0.0 else None
     return TonalCorrectionResult(
-        frequencies=freqs,
-        levels=band_levels,
+        # Copy so a later mutation of the caller's arrays cannot rewrite the
+        # spectrum this result reports.
+        frequencies=freqs.copy(),
+        levels=band_levels.copy(),
         differences=differences,
         band_corrections=band_kt,
         correction=correction,
@@ -511,21 +519,33 @@ def impulsive_correction(laieq: float, laeq: float) -> float:
     )
 
 
+#: The only values a single correction can take (Annex IV A.3.3): each of the
+#: three tables grades its parameter 0, 3 or 6 dB and nothing in between.
+RD1367_CORRECTION_VALUES: tuple[float, float, float] = (0.0, 3.0, 6.0)
+
+
 def total_correction(kt: float = 0.0, kf: float = 0.0, ki: float = 0.0) -> float:
     """Summed correction ``K = Kt + Kf + Ki``, capped at 9 dB (Annex IV A.3.3).
 
-    :param kt: Tonal correction, in dB.
-    :param kf: Low-frequency correction, in dB.
-    :param ki: Impulsive correction, in dB.
+    Each of the three tables of Annex IV A.3.3 grades its parameter 0, 3 or
+    6 dB, so any other value is rejected rather than silently accepted: a
+    correction of, say, 4,5 dB is not a reading the regulation can produce.
+
+    :param kt: Tonal correction, in dB (0, 3 or 6).
+    :param kf: Low-frequency correction, in dB (0, 3 or 6).
+    :param ki: Impulsive correction, in dB (0, 3 or 6).
     :return: The summed correction, in dB, never above
         :data:`RD1367_MAX_CORRECTION`.
-    :raises ValueError: If a correction is negative or not finite.
+    :raises ValueError: If a correction is not one of 0, 3 or 6 dB.
     """
     total = 0.0
     for value, name in ((kt, "kt"), (kf, "kf"), (ki, "ki")):
         scalar = _finite(value, name)
-        if scalar < 0.0:
-            raise ValueError(f"'{name}' must be zero or positive.")
+        if not any(math.isclose(scalar, step) for step in RD1367_CORRECTION_VALUES):
+            raise ValueError(
+                f"'{name}' must be 0, 3 or 6 dB, the only values the Annex IV "
+                f"A.3.3 tables grade; got {value!r}."
+            )
         total += scalar
     return min(total, RD1367_MAX_CORRECTION)
 
@@ -1097,11 +1117,18 @@ def assess_activity(
     if period_hours is not None:
         for name, value in period_hours.items():
             durations[_check_period(name)] = _positive(value, "period_hours")
+    if int(year_days) != year_days or int(year_days) <= 0:
+        raise ValueError(
+            f"'year_days' must be a positive whole number; got {year_days!r}."
+        )
     if operating_days is not None:
+        if int(operating_days) != operating_days:
+            raise ValueError(
+                "'operating_days' must be a whole number of days; got "
+                f"{operating_days!r}."
+            )
         days = int(operating_days)
         total_days = int(year_days)
-        if total_days <= 0:
-            raise ValueError("'year_days' must be a positive integer.")
         if not 0 < days <= total_days:
             raise ValueError(
                 "'operating_days' must be a positive integer no larger than "
@@ -1155,6 +1182,18 @@ def assess_activity(
         raise ValueError(
             "None of the supplied keys is an evaluation period; expected "
             f"any of {RD1367_EVALUATION_PERIODS}."
+        )
+    if new_activity and all(p.long_term_pass is None for p in assessments):
+        # Article 25.1 b i is mandatory for a new activity, so an assessment
+        # that never evaluates it cannot conclude anything about compliance.
+        # Checked after the structural validation so the more specific error
+        # about the measurements themselves wins.
+        raise ValueError(
+            "A new activity is assessed against all three criteria of Article "
+            "25.1 b, so the annual index LK,x is required: supply "
+            "'long_term_levels' or 'operating_days'. For the inspection of an "
+            "activity already in operation, which Article 25.2 subjects only "
+            "to the daily and phase criteria, pass new_activity=False."
         )
     return ActivityAssessment(
         periods=tuple(assessments), limits=limits, new_activity=new_activity

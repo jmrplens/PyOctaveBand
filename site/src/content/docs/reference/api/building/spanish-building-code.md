@@ -19,21 +19,41 @@ normalised A-weighted source spectrum and sums it energetically:
 `I_x = -10 lg sum_i 10^((L_x,i - X_i)/10)`   [dBA]
 
 where `X_i` is the band insulation (`R`, `R'`, `DnT`, `D2m,nT` ...)
-and `L_x,i` the normalised spectrum of the source: pink noise (Table A.5) for
-`RA` and `DnT,A`, road traffic (Table A.3) for `RA,tr` and
-`D2m,nT,Atr`, railway noise (Table A.4, numerically the road-traffic
-spectrum) or aircraft noise (Table A.2). The sum runs over the **eighteen**
-one-third-octave bands 100 Hz to 5 kHz, four more than ISO 717-1's sixteen.
+and `L_x,i` the normalised spectrum of the source. The sum runs over the
+**eighteen** one-third-octave bands 100 Hz to 5 kHz, two more than ISO 717-1's
+sixteen: the 4 kHz and 5 kHz bands.
 
-**Relationship with the ISO 717-1 route.** DB-HR Annex H and the Spanish
-literature give `DnT,A ~= DnT,w + C100-5000` and
-`D2m,nT,Atr ~= D2m,nT,w + Ctr,100-5000`, valid while the two routes differ by
-less than 1 dB. The library keeps both: this module implements the direct
-Formula (A.5)-(A.7) route (the normative one for DB-HR), and
+**Which quantity a facade is assessed in (clause 3.1.3.4 point 1).** The name
+of the global quantity depends on the dominant outdoor noise, and it is not a
+free choice:
+
+* dominant **railway** noise (or railway stations) is assessed as
+  `D2m,nT,A` through Formula (A.5), using the Table A.4 railway spectrum;
+* dominant **road traffic** or **aircraft** noise is assessed as
+  `D2m,nT,Atr` through Formula (A.6), using the Table A.3 road-traffic or
+  the Table A.2 aircraft spectrum.
+
+Table H.1 prints the same split. The railway spectrum of Table A.4 happens to
+be numerically identical to the road-traffic spectrum of Table A.3, so the two
+routes give the same number for a rail-dominant site; the *name* of the
+reported quantity still differs, which is why [`d2m_nt_a`](/phonometry/reference/api/building/spanish-building-code/#d2m_nt_a) and
+[`d2m_nt_atr`](/phonometry/reference/api/building/spanish-building-code/#d2m_nt_atr) are separate entry points rather than one function with a
+spectrum switch.
+
+**Relationship with the ISO 717-1 route.** DB-HR Annex H accepts
+`DnT,w + C` as an approximation of `DnT,A` (H.1), `D2m,nT,w + C` of
+`D2m,nT,A` for trains (H.2) and `D2m,nT,w + Ctr` of `D2m,nT,Atr` for
+road traffic (H.3), valid while the two routes differ by less than 1 dB.
+Annex H writes those terms as plain `C` and `Ctr` and refers their
+definition to UNE-EN ISO 717-1 without narrowing the frequency range; the
+reading that they must be the *enlarged-range* terms `C100-5000` and
+`Ctr,100-5000`, because the DB-HR indices run to 5 kHz while the ISO 717-1
+core range stops at 3150 Hz, is the one the Spanish literature makes explicit
+(Aviles Lopez & Perera Martin, note to expressions [7.15] and [7.16]). The
+library keeps both routes: this module implements the direct Formula
+(A.5)-(A.7) route, which is the normative one for DB-HR, and
 [`weighted_rating_extended`](/phonometry/reference/api/building/insulation/#weighted_rating_extended) supplies the
-ISO 717-1 route with the enlarged-range adaptation terms. DB-HR names the
-adaptation terms simply `C` and `Ctr`, which is a known source of error:
-they are the *enlarged-range* terms.
+ISO 717-1 route with the enlarged-range adaptation terms.
 
 **Rounding.** DB-HR 3.1.3.1 point 4 requires the final values of the
 quantities that define the requirements to be expressed rounded to an integer,
@@ -49,6 +69,15 @@ dining rooms and restaurants.
 **Window size (Catalogo de Elementos Constructivos).** Windows are tested on
 about 1,8 m2 specimens; larger windows insulate less, and the CEC corrects
 `RA` and `RA,tr` by 0 to -3 dB by total window area.
+
+:::note
+`"sanitary"` does not mean the same thing here as in
+[`phonometry.environmental.spanish_regulation`](/phonometry/reference/api/environment/spanish-regulation/). In Table 2.1 of DB-HR
+it is the *non-hospital* ambulatory health use of footnote (1) (medical
+practices, consulting rooms), deliberately distinct from `"hospital"`;
+in the RD 1367/2007 tables it is the *hospitalario* use itself. Both names
+reach the top-level [`phonometry`](/phonometry/reference/api/filters/phonometry/) namespace.
+:::
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -106,6 +135,44 @@ for a reverberation time), and the rounded value is compared with the limit.
 | :--- | :--- |
 | ValueError | If `value` is not finite. |
 
+## d2m_nt_a
+
+```python
+d2m_nt_a(
+    level_difference: Sequence[float] | np.ndarray,
+    *,
+    frequencies: Sequence[float] | np.ndarray | None = None,
+    spectrum: str = 'pink',
+) -> DbHrGlobalIndexResult
+```
+
+A-weighted facade level difference `D2m,nT,A` (Formula (A.5)).
+
+The pink-noise global quantity of a facade, a roof or a floor in contact
+with the outside air. Clause 3.1.3.4 point 1 makes this the quantity a
+**railway-dominant** site is assessed in, evaluated through Formula (A.5)
+with the Table A.4 railway spectrum; Table H.1 prints the same split and
+Annex H (H.2) gives `D2m,nT,w + C` as its ISO 717-1 approximation.
+
+For a road-traffic or aircraft dominant site the quantity is
+`D2m,nT,Atr` instead: use [`d2m_nt_atr`](/phonometry/reference/api/building/spanish-building-code/#d2m_nt_atr).
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `level_difference` | Band standardized facade level difference `D2m,nT`, in dB. |
+| `frequencies` | Band centre frequencies, in Hz (optional). |
+| `spectrum` | `"pink"` (default, Table A.5) or `"railway"` (Table A.4), per the dominant outdoor noise. |
+
+**Returns:** A [`DbHrGlobalIndexResult`](/phonometry/reference/api/building/spanish-building-code/#dbhrglobalindexresult) named `"D2m,nT,A"`.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | For a spectrum Formula (A.5) does not cover. |
+
 ## d2m_nt_atr
 
 ```python
@@ -119,15 +186,33 @@ d2m_nt_atr(
 
 A-weighted facade level difference `D2m,nT,Atr` (Formula (A.6)).
 
+The road-traffic global quantity of a facade, a roof or a floor in contact
+with the outside air. Clause 3.1.3.4 point 1 makes this the quantity a
+**road-traffic or aircraft** dominant site is assessed in, the aircraft
+case evaluated through the same Formula (A.6) with the Table A.2 aircraft
+spectrum.
+
+A railway-dominant site is assessed as `D2m,nT,A` through Formula (A.5)
+instead: use [`d2m_nt_a`](/phonometry/reference/api/building/spanish-building-code/#d2m_nt_a). The railway spectrum of Table A.4 is
+numerically identical to the road-traffic spectrum of Table A.3, so the
+two give the same number, but the quantity that the requirement and the
+report are stated in is not the same.
+
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
 | `level_difference` | Band standardized facade level difference `D2m,nT`, in dB. |
 | `frequencies` | Band centre frequencies, in Hz (optional). |
-| `spectrum` | `"traffic"` (default), `"railway"` or `"aircraft"`, per the dominant outdoor noise. |
+| `spectrum` | `"traffic"` (default, Table A.3) or `"aircraft"` (Table A.2), per the dominant outdoor noise. |
 
 **Returns:** A [`DbHrGlobalIndexResult`](/phonometry/reference/api/building/spanish-building-code/#dbhrglobalindexresult) named `"D2m,nT,Atr"`.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | For a spectrum Formula (A.6) does not cover. |
 
 ## db_hr_airborne_requirement
 
@@ -201,10 +286,10 @@ residential acoustic areas.
 | `ld` | Day noise index `Ld` of the site, in dBA. |
 | `building_use` | `"residential"`, `"hospital"`, `"cultural"`, `"sanitary"` (non-hospital health premises), `"educational"` or `"administrative"`. |
 | `room_type` | `"bedrooms"`, `"living"` (living areas) or `"classrooms"`, per the columns of Table 2.1. |
-| `dominant_noise` | `"road"` (default), `"railway"` or `"aircraft"`. |
+| `dominant_noise` | `"road"` (default), `"railway"` or `"aircraft"`. This selects the quantity the requirement is stated in as well as the aircraft increment: `"railway"` gives a `D2m,nT,A` requirement (Formula (A.5)) and the other two a `D2m,nT,Atr` one (Formula (A.6)), per clause 3.1.3.4 point 1. |
 | `quiet_facade` | Assess with `Ld` reduced by 10 dBA. |
 
-**Returns:** The [`DbHrRequirement`](/phonometry/reference/api/building/spanish-building-code/#dbhrrequirement) on `D2m,nT,Atr`.
+**Returns:** The [`DbHrRequirement`](/phonometry/reference/api/building/spanish-building-code/#dbhrrequirement), on `D2m,nT,Atr` or, for a railway-dominant site, on `D2m,nT,A`.
 
 **Raises**
 
@@ -288,7 +373,7 @@ horizontally adjacent to a staircase.
 
 ## DB_HR_NORMALISED_SPECTRA
 
-*Constant* (`dict`).
+*Constant* (`mappingproxy`).
 
 ```python
 DB_HR_NORMALISED_SPECTRA = {'pink': (-30.1, -27.1, -24.4, -21.9, -19.6, -17.6, -15.8, -14.2, -12.9, -11.8, -11.0, -10.4, -10.0, -9.8, -9.7, -9.8, -10.0, -10.5), 'traffic': (-20.0, -20.0, -18.0, -16.0, -15.0, -14.0, -13.0, -12.0, -11.0, -9.0, -8.0, -9.0, -10.0, -11.0, -13.0, -15.0, -16.0, -18.0), 'railway': (-20.0, -20.0, -18.0, -16.0, -15.0, -14.0, -13.0, -12.0, -11.0, -9.0, -8.0, -9.0, -10.0, -11.0, -13.0, -15.0, -16.0, -18.0), 'aircraft': (-23.8, -20.2, -15.4, -13.1, -12.6, -10.4, -9.8, -9.5, -8.7, -9.5, -10.5, -11.0, -12.5, -14.9, -15.9, -18.6, -23.3, -29.9)}

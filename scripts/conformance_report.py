@@ -667,18 +667,26 @@ def _chk_dbhr_d2m_nt_atr() -> Outcome:
 
 @register(
     "Room & building acoustics",
-    "CTE DB-HR Annex A vs ISO 717-1 Annex B",
-    "Direct route equals Rw + C100-5000 (Manual Ejemplo 7.1: 52 - 1 = 51 dBA)",
+    "Manual de acustica ambiental y arquitectonica, Ejemplo 7.1",
+    "Reported R'A of the field-test wall (printed 51 dBA = R'w 52 + C -1)",
 )
 def _chk_dbhr_route_agreement() -> Outcome:
-    rating = ph.weighted_rating_extended(_DBHR_R_PRIME, list(ph.DB_HR_FREQUENCIES))
-    # The eighteen DB-HR bands cover the 100-5000 Hz enlarged range, so the
-    # term is always present here.
-    c_100_5000 = rating.c_100_5000
-    iso_route = float("nan") if c_100_5000 is None else float(rating.rating + c_100_5000)
-    return numeric(
-        iso_route, float(ph.ra(_DBHR_R_PRIME).reported), 1e-9, unit="dBA", places=1
-    )
+    # The book prints the pink-noise figure as 51 dBA, so 51 is the oracle;
+    # comparing the direct route against the library's own ISO 717-1 engine
+    # would be a self-consistency check, not an external validation. The unit
+    # test pins R'w = 52 and C = -1 against the same printed example.
+    computed = float(ph.ra(_DBHR_R_PRIME).reported)
+    return numeric(51.0, computed, 1e-9, unit="dBA", places=1)
+
+
+@register(
+    "Room & building acoustics",
+    "Manual de acustica ambiental y arquitectonica, Ejemplo 7.1",
+    "Reported R'A,tr of the same wall (printed 47 dBA = R'w 52 + Ctr -5)",
+)
+def _chk_dbhr_ra_tr() -> Outcome:
+    computed = float(ph.ra_tr(_DBHR_R_PRIME).reported)
+    return numeric(47.0, computed, 1e-9, unit="dBA", places=1)
 
 
 @register(

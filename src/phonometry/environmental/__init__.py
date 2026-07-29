@@ -89,6 +89,7 @@ from .rating import (
 )
 from .spanish_regulation import (
     ACOUSTIC_AREA_TYPES,
+    RD1367_CORRECTION_VALUES,
     RD1367_EVALUATION_PERIODS,
     RD1367_MAX_CORRECTION,
     RD1367_PERIOD_CLOCK_LIMITS,
@@ -126,6 +127,7 @@ from .wind_turbine_noise import (
 __all__ = [
     "ACOUSTIC_AREA_TYPES",
     "DEFAULT_FREQUENCIES",
+    "RD1367_CORRECTION_VALUES",
     "RD1367_EVALUATION_PERIODS",
     "RD1367_MAX_CORRECTION",
     "RD1367_PERIOD_CLOCK_LIMITS",

@@ -158,6 +158,7 @@ cycle and warn on use; they are removed in 4.0.
 | `RD1367_EVALUATION_PERIODS` | `constant` | **The three daily evaluation periods (Annex I A.1).** | `("day", "evening", "night")` |
 | `RD1367_PERIOD_HOURS` | `constant` | **Default period durations [h] (Annex I A.1 a).** | `{"day": 12, "evening": 4, "night": 8}` |
 | `RD1367_PERIOD_CLOCK_LIMITS` | `constant` | **Local-time start/end hour of each period (Annex I A.1 b).** | `{"day": (7, 19), ...}` |
+| `RD1367_CORRECTION_VALUES` | `constant` | **The only values a single correction takes (Annex IV A.3.3).**<br>Each table grades its parameter 0, 3 or 6 dB | `RD1367_CORRECTION_VALUES  # (0.0, 3.0, 6.0)` |
 | `RD1367_MAX_CORRECTION` | `constant` | **Cap on Kt + Kf + Ki [dB] (Annex IV A.3.3).** | `9.0` |
 | `residual_sound_correction` | `function` | **Residual-noise correction L = 10 lg(10^(L'/10)−10^(Lres/10)) (Formula 16).**<br>• `measured_level` L', `residual_level` Lres [dB] | `res = residual_sound_correction(58.0, 50.0)`<br><br>• `ResidualCorrectionResult` (`.corrected_level`, `.reportable_upper_bound`, `.reliable`) |
 | `gaussian_residual_level` | `function` | **Residual Leq from percentiles (ISO 1996-2 Annex I).**<br>• `l50` [dB]; exactly one of `l90` / `l95` (must not exceed `l50`) | `gaussian_residual_level(50.0, l90=40.0)` |
@@ -215,7 +216,8 @@ cycle and warn on use; they are removed in 4.0.
 | `ra` | `function` | **RA for pink noise (DB-HR Annex A).**<br>• `reduction_index` R or R' [dB]; `frequencies` | `ra(r_prime).intermediate  # 51.4 dBA` |
 | `ra_tr` | `function` | **RA,tr for road-traffic noise (DB-HR Annex A).**<br>• `reduction_index` [dB]; `frequencies` | `ra_tr(r).reported` |
 | `dnt_a` | `function` | **DnT,A between rooms, pink noise (Formula A.7).**<br>• `level_difference` DnT [dB]; `frequencies` | `dnt_a(dnt).reported` |
-| `d2m_nt_atr` | `function` | **D2m,nT,Atr of a facade (Formula A.6).**<br>• `level_difference` D2m,nT [dB]; `frequencies`<br>• `spectrum`: 'traffic' (Default), 'railway', 'aircraft' | `d2m_nt_atr(d).intermediate  # 32.8 dBA` |
+| `d2m_nt_a` | `function` | **D2m,nT,A of a facade (Formula A.5).**<br>• `level_difference` D2m,nT [dB]; `frequencies`<br>• `spectrum`: 'pink' (Default) or 'railway'<br>• Clause 3.1.3.4 point 1: the quantity a railway-dominant site is assessed in | `d2m_nt_a(d, spectrum='railway').name  # 'D2m,nT,A'` |
+| `d2m_nt_atr` | `function` | **D2m,nT,Atr of a facade (Formula A.6).**<br>• `level_difference` D2m,nT [dB]; `frequencies`<br>• `spectrum`: 'traffic' (Default) or 'aircraft'<br>• Railway noise is D2m,nT,A via (A.5): use `d2m_nt_a` | `d2m_nt_atr(d).intermediate  # 32.8 dBA` |
 | `DbHrGlobalIndexResult` | `dataclass` | **A DB-HR A-weighted global index.**<br>• `value` (exact), `intermediate` (1 decimal), `reported` (integer, 3.1.3.1 point 4)<br>• `name`, `spectrum`, `reference`<br>• `frequencies`, `band_values`, `spectrum_levels`, `band_contributions`<br>• `.plot()` | `idx.value, idx.intermediate, idx.reported` |
 | `DB_HR_FREQUENCIES` | `constant` | **The eighteen 1/3-octave centres of DB-HR Annex A, 100 Hz to 5 kHz.** | `DB_HR_FREQUENCIES[0]  # 100.0` |
 | `DB_HR_NORMALISED_SPECTRA` | `constant` | **Normalised A-weighted source spectra [dBA] of Annex A Tables A.2-A.5.**<br>'pink' (A.5), 'traffic' (A.3), 'railway' (A.4, equal to A.3), 'aircraft' (A.2) | `DB_HR_NORMALISED_SPECTRA["pink"]` |

@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 436 numerical conformance checks against 282 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 437 numerical conformance checks against 283 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 436 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 53 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 437 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 53 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -2254,6 +2254,7 @@ cycle and warn on use; they are removed in 4.0.
 | `RD1367_EVALUATION_PERIODS` | `constant` | **The three daily evaluation periods (Annex I A.1).** | `("day", "evening", "night")` |
 | `RD1367_PERIOD_HOURS` | `constant` | **Default period durations [h] (Annex I A.1 a).** | `{"day": 12, "evening": 4, "night": 8}` |
 | `RD1367_PERIOD_CLOCK_LIMITS` | `constant` | **Local-time start/end hour of each period (Annex I A.1 b).** | `{"day": (7, 19), ...}` |
+| `RD1367_CORRECTION_VALUES` | `constant` | **The only values a single correction takes (Annex IV A.3.3).**<br>Each table grades its parameter 0, 3 or 6 dB | `RD1367_CORRECTION_VALUES  # (0.0, 3.0, 6.0)` |
 | `RD1367_MAX_CORRECTION` | `constant` | **Cap on Kt + Kf + Ki [dB] (Annex IV A.3.3).** | `9.0` |
 | `residual_sound_correction` | `function` | **Residual-noise correction L = 10 lg(10^(L'/10)−10^(Lres/10)) (Formula 16).**<br>• `measured_level` L', `residual_level` Lres [dB] | `res = residual_sound_correction(58.0, 50.0)`<br><br>• `ResidualCorrectionResult` (`.corrected_level`, `.reportable_upper_bound`, `.reliable`) |
 | `gaussian_residual_level` | `function` | **Residual Leq from percentiles (ISO 1996-2 Annex I).**<br>• `l50` [dB]; exactly one of `l90` / `l95` (must not exceed `l50`) | `gaussian_residual_level(50.0, l90=40.0)` |
@@ -2311,7 +2312,8 @@ cycle and warn on use; they are removed in 4.0.
 | `ra` | `function` | **RA for pink noise (DB-HR Annex A).**<br>• `reduction_index` R or R' [dB]; `frequencies` | `ra(r_prime).intermediate  # 51.4 dBA` |
 | `ra_tr` | `function` | **RA,tr for road-traffic noise (DB-HR Annex A).**<br>• `reduction_index` [dB]; `frequencies` | `ra_tr(r).reported` |
 | `dnt_a` | `function` | **DnT,A between rooms, pink noise (Formula A.7).**<br>• `level_difference` DnT [dB]; `frequencies` | `dnt_a(dnt).reported` |
-| `d2m_nt_atr` | `function` | **D2m,nT,Atr of a facade (Formula A.6).**<br>• `level_difference` D2m,nT [dB]; `frequencies`<br>• `spectrum`: 'traffic' (Default), 'railway', 'aircraft' | `d2m_nt_atr(d).intermediate  # 32.8 dBA` |
+| `d2m_nt_a` | `function` | **D2m,nT,A of a facade (Formula A.5).**<br>• `level_difference` D2m,nT [dB]; `frequencies`<br>• `spectrum`: 'pink' (Default) or 'railway'<br>• Clause 3.1.3.4 point 1: the quantity a railway-dominant site is assessed in | `d2m_nt_a(d, spectrum='railway').name  # 'D2m,nT,A'` |
+| `d2m_nt_atr` | `function` | **D2m,nT,Atr of a facade (Formula A.6).**<br>• `level_difference` D2m,nT [dB]; `frequencies`<br>• `spectrum`: 'traffic' (Default) or 'aircraft'<br>• Railway noise is D2m,nT,A via (A.5): use `d2m_nt_a` | `d2m_nt_atr(d).intermediate  # 32.8 dBA` |
 | `DbHrGlobalIndexResult` | `dataclass` | **A DB-HR A-weighted global index.**<br>• `value` (exact), `intermediate` (1 decimal), `reported` (integer, 3.1.3.1 point 4)<br>• `name`, `spectrum`, `reference`<br>• `frequencies`, `band_values`, `spectrum_levels`, `band_contributions`<br>• `.plot()` | `idx.value, idx.intermediate, idx.reported` |
 | `DB_HR_FREQUENCIES` | `constant` | **The eighteen 1/3-octave centres of DB-HR Annex A, 100 Hz to 5 kHz.** | `DB_HR_FREQUENCIES[0]  # 100.0` |
 | `DB_HR_NORMALISED_SPECTRA` | `constant` | **Normalised A-weighted source spectra [dBA] of Annex A Tables A.2-A.5.**<br>'pink' (A.5), 'traffic' (A.3), 'railway' (A.4, equal to A.3), 'aircraft' (A.2) | `DB_HR_NORMALISED_SPECTRA["pink"]` |
@@ -10036,7 +10038,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/guides/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/guides/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/reference/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 429 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 437 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -28255,16 +28257,27 @@ $$
 where $X_i$ is the band insulation (the sound reduction index $R$ or $R'$, the
 standardized level difference $D_{nT}$, $D_{2m,nT}$ and so on) and $L_{x,i}$
 the normalised source spectrum. The sum runs over **eighteen** one-third-octave
-bands, 100 Hz to 5 kHz, four more than the sixteen of ISO 717-1 (100 Hz to
-3150 Hz), and those four high bands are the first reason the two routes do not
-always agree. The band centres are in `DB_HR_FREQUENCIES`.
+bands, 100 Hz to 5 kHz, two more than the sixteen of ISO 717-1 (100 Hz to
+3150 Hz): the 4 kHz and 5 kHz bands, which are the first reason the two routes
+do not always agree. The band centres are in `DB_HR_FREQUENCIES`.
 
-| Normalised spectrum | Annex A table | Quantity it defines |
-| :--- | :--- | :--- |
-| A-weighted pink noise, $L_{Ar,i}$ | Table A.5 | $R_A$, $D_{nT,A}$ |
-| Road traffic, $L_{Atr,i}$ | Table A.3 | $R_{A,tr}$, $D_{2m,nT,Atr}$ |
-| Railway noise, $L_{Aef,i}$ | Table A.4 (numerically identical to A.3) | facades with dominant rail noise |
-| Aircraft noise, $L_{Aav,i}$ | Table A.2 | facades with dominant aircraft noise |
+| Normalised spectrum | Annex A table | Quantity it defines | Formula |
+| :--- | :--- | :--- | :--- |
+| A-weighted pink noise, $L_{Ar,i}$ | Table A.5 | $R_A$, $D_{nT,A}$, $D_{2m,nT,A}$ | (A.5), (A.7) |
+| Road traffic, $L_{Atr,i}$ | Table A.3 | $R_{A,tr}$, $D_{2m,nT,Atr}$ | (A.6) |
+| Railway noise, $L_{Aef,i}$ | Table A.4 (numerically identical to A.3) | $D_{2m,nT,A}$ | (A.5) |
+| Aircraft noise, $L_{Aav,i}$ | Table A.2 | $D_{2m,nT,Atr}$ | (A.6) |
+
+The railway row is the one worth reading twice. Clause 3.1.3.4 point 1 says
+that where railway noise dominates the facade is assessed in
+$D_{2m,nT,A}$ through formula (A.5), and only road traffic and aircraft give
+$D_{2m,nT,Atr}$ through (A.6); Table H.1 prints the same split. Because
+Table A.4 is digit for digit Table A.3, a rail-dominant facade comes out at
+the same *number* as a road one, but the quantity the requirement and the
+report are stated in is not the same. That is why `d2m_nt_a()` and
+`d2m_nt_atr()` are separate entry points and each refuses the other's
+spectra, rather than one function with a spectrum switch that would silently
+put the wrong name on the result.
 
 All four are in `DB_HR_NORMALISED_SPECTRA` under the keys `"pink"`,
 `"traffic"`, `"railway"` and `"aircraft"`. The calculation below reproduces
@@ -28300,7 +28313,7 @@ plt.show()
 
 </details>
 
-`ra()`, `ra_tr()`, `dnt_a()` and `d2m_nt_atr()` are named shortcuts over
+`ra()`, `ra_tr()`, `dnt_a()`, `d2m_nt_a()` and `d2m_nt_atr()` are named shortcuts over
 `db_hr_global_index()`, which accepts any spectrum and, given the
 `frequencies` argument, selects the eighteen DB-HR bands out of a longer
 series.
@@ -28314,23 +28327,39 @@ exposes all three forms: `.value` (unrounded), `.intermediate` (one decimal)
 and `.reported` (the integer used in the check).
 
 DB-HR and ISO 717-1 reach the same place by different routes, and Annex H of
-the document itself accepts the approximations
-$D_{nT,A} \approx D_{nT,w} + C_{100-5000}$ and
-$D_{2m,nT,Atr} \approx D_{2m,nT,w} + C_{tr,100-5000}$ as long as the two routes
-differ by less than 1 dB. On the two published oracles this page reproduces,
-the agreement is exact to the integer:
+the document itself accepts three approximations as long as the two routes
+differ by less than 1 dB:
 
-| Case | Direct route (Annex A) | ISO 717-1 route |
-| :--- | :--- | :--- |
-| Party wall of Ejemplo 7.2 | $R'_A = 51.4$ dBA, rounded to 51 | $R'_w = 52$ with $C_{100-5000} = -1$, i.e. 51 |
-| Facade of Ejercicio 7.1 | $D_{2m,nT,Atr} = 32.8$ dBA, rounded to 33 | $D_{2m,nT,w} = 38$ with $C_{tr,100-5000} = -5$, i.e. 33 |
+$$D_{nT,A} \approx D_{nT,w} + C \quad (H.1), \qquad
+D_{2m,nT,A} \approx D_{2m,nT,w} + C \quad (H.2), \qquad
+D_{2m,nT,Atr} \approx D_{2m,nT,w} + C_{tr} \quad (H.3)$$
 
-The real trap is the name of the spectrum adaptation terms. DB-HR calls them
-simply $C$ and $C_{tr}$, but they are the **enlarged-range** terms
-$C_{100-5000}$ and $C_{tr,100-5000}$, not the core-range terms of ISO 717-1. On
-the facade of Ejercicio 7.1 the core-range $C$ is $-2$ while $C_{100-5000}$ is
-$-1$: using the wrong term would give 36 dBA instead of 37 for the
-$D_{2m,nT,A}$ index of that same facade.
+with (H.2) covering the rail-dominant case of the previous section. On the two
+published spectra this page reproduces, the agreement is exact to the integer:
+
+| Case | Direct route (Annex A) | ISO 717-1 route | Published? |
+| :--- | :--- | :--- | :--- |
+| Separating wall of Ejemplo 7.2 | $R'_A = 51.4$ dBA, rounded to 51 | $R'_w = 52$ with $C_{100-5000} = -1$, i.e. 51 | yes, Ejemplo 7.1 prints $R'_w = 52$, $C = -1$ and the 51 dBA |
+| Facade of Ejercicio 7.1 | $D_{2m,nT,Atr} = 32.8$ dBA, rounded to 33 | $D_{2m,nT,w} = 38$ with $C_{tr,100-5000} = -5$, i.e. 33 | no, the book prints neither 38 nor $-5$ |
+
+The two rows are not equally strong evidence. The wall row is a genuine
+external check, because the *Manual* prints the ISO 717-1 numbers as well as
+the direct one. For the facade the book publishes only the 32,8 dBA; the 38
+and the $-5$ come from this library's own ISO 717-1 engine, so that row shows
+the two routes agreeing with each other rather than agreeing with a source.
+
+The real trap is the name of the spectrum adaptation terms. Annex H writes
+them as plain $C$ and $C_{tr}$ and refers their definition to
+UNE-EN ISO 717-1 without narrowing the frequency range. Since the DB-HR
+indices run to 5 kHz while the ISO 717-1 core range stops at 3150 Hz, the
+terms that make (H.1) to (H.3) come out right are the **enlarged-range**
+$C_{100-5000}$ and $C_{tr,100-5000}$; that reading is not in Annex H itself
+but in the *Manual*, in the note to expressions [7.15] and [7.16]. It matters:
+on the facade of Ejercicio 7.1 the core-range $C$ is $-2$ while $C_{100-5000}$
+is $-1$, so taking the wrong one gives 36 dBA instead of 37 for the
+$D_{2m,nT,A}$ of that facade. On the same specimen $C_{tr}$ and
+$C_{tr,100-5000}$ are both $-5$, so the $D_{2m,nT,Atr}$ that DB-HR actually
+requires happens not to discriminate between the two readings at all.
 
 ```python
 from phonometry import building, weighted_rating_extended

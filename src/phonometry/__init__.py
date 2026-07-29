@@ -248,6 +248,7 @@ from .building.spanish_building_code import (
     DbHrRequirement,
     assess_db_hr,
     check_db_hr_requirement,
+    d2m_nt_a,
     d2m_nt_atr,
     db_hr_airborne_requirement,
     db_hr_facade_requirement,
@@ -461,6 +462,7 @@ from .environmental.outdoor_propagation import (
 from .environmental.rating import composite_rating_level, lden, ldn
 from .environmental.spanish_regulation import (
     ACOUSTIC_AREA_TYPES,
+    RD1367_CORRECTION_VALUES,
     RD1367_EVALUATION_PERIODS,
     RD1367_MAX_CORRECTION,
     RD1367_PERIOD_CLOCK_LIMITS,
@@ -1229,6 +1231,7 @@ __all__ = [
     "NO_TONE_AUDIBILITY",
     "OCTAVE_BANDS",
     "PART1_FREQUENCY_RANGE",
+    "RD1367_CORRECTION_VALUES",
     "RD1367_EVALUATION_PERIODS",
     "RD1367_MAX_CORRECTION",
     "RD1367_PERIOD_CLOCK_LIMITS",
@@ -1612,6 +1615,7 @@ __all__ = [
     "cross_spectral_density",
     "cumulative_sel",
     "cumulative_sel_identical",
+    "d2m_nt_a",
     "d2m_nt_atr",
     "daily_dose",
     "daily_dose_multi",

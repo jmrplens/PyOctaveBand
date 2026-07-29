@@ -464,9 +464,26 @@ def test_assess_activity_accepts_annual_levels_directly() -> None:
     assert verdict.periods[0].long_term_pass is False
 
 
-def test_assess_activity_without_annual_information_skips_that_criterion() -> None:
-    """With no annual data the Article 25.1 b i criterion is not evaluated."""
-    verdict = rd.assess_activity(_example_periods(), rd.activity_limits("a"))
+def test_new_activity_without_annual_information_is_refused() -> None:
+    """Article 25.1 b i is mandatory for a new activity, so it cannot be skipped.
+
+    Returning a compliant verdict while never evaluating the annual criterion
+    would assert something the assessment has not shown, so the missing input
+    is an error rather than a silently omitted check.
+    """
+    with pytest.raises(ValueError, match="annual index"):
+        rd.assess_activity(_example_periods(), rd.activity_limits("a"))
+
+
+def test_operating_activity_without_annual_information_is_allowed() -> None:
+    """Article 25.2 subjects an activity in operation only to the other two.
+
+    That inspection needs no annual index, so it is assessed without one and
+    the annual criterion is reported as not evaluated.
+    """
+    verdict = rd.assess_activity(
+        _example_periods(), rd.activity_limits("a"), new_activity=False
+    )
     day = verdict.periods[0]
     assert day.long_term_corrected_level is None
     assert day.reported_long_term is None
@@ -478,7 +495,7 @@ def test_assess_activity_without_annual_information_skips_that_criterion() -> No
 def test_assess_activity_flags_a_phase_that_exceeds_the_five_decibel_allowance() -> None:
     """Article 25.1 b iii: no measured LKeq,Ti more than 5 dB above the limit."""
     phases = {"night": [rd.NoisePhase(8.0, 51.0)]}  # limit 45 dB, allowance 50 dB
-    verdict = rd.assess_activity(phases, rd.activity_limits("a"))
+    verdict = rd.assess_activity(phases, rd.activity_limits("a"), new_activity=False)
     night = verdict.periods[0]
     assert night.phase_limit == 50.0
     assert night.phase_pass is False
@@ -487,7 +504,9 @@ def test_assess_activity_flags_a_phase_that_exceeds_the_five_decibel_allowance()
 
 def test_assess_activity_reports_only_the_periods_supplied() -> None:
     """A period absent from the measurements is not assessed (the night here)."""
-    verdict = rd.assess_activity(_example_periods(), rd.activity_limits("a"))
+    verdict = rd.assess_activity(
+        _example_periods(), rd.activity_limits("a"), operating_days=303
+    )
     assert [p.period for p in verdict.periods] == ["day", "evening"]
 
 
@@ -502,8 +521,46 @@ def test_noise_phase_validation() -> None:
         rd.NoisePhase(-1.0, 50.0)
     with pytest.raises(ValueError, match="finite"):
         rd.NoisePhase(1.0, math.nan)
-    with pytest.raises(ValueError, match="zero or positive"):
+    with pytest.raises(ValueError, match="0, 3 or 6"):
         rd.NoisePhase(1.0, 50.0, kt=-3.0)
+
+
+def test_corrections_are_graded_zero_three_or_six() -> None:
+    """Annex IV A.3.3 grades each correction 0, 3 or 6 dB and nothing else.
+
+    An intermediate reading such as 4,5 dB is not a value any of the three
+    tables can produce, so it is rejected rather than silently accepted.
+    """
+    assert rd.RD1367_CORRECTION_VALUES == (0.0, 3.0, 6.0)
+    for step in rd.RD1367_CORRECTION_VALUES:
+        assert rd.total_correction(step, step, 0.0) == min(2 * step, 9.0)
+    for bad in (1.0, 4.5, 7.0, -3.0):
+        with pytest.raises(ValueError, match="0, 3 or 6"):
+            rd.total_correction(bad)
+        with pytest.raises(ValueError, match="0, 3 or 6"):
+            rd.corrected_level(50.0, kf=bad)
+
+
+def test_published_constant_tables_are_read_only() -> None:
+    """The evaluation periods and area catalogue are published constants."""
+    for table in (
+        rd.RD1367_PERIOD_HOURS,
+        rd.RD1367_PERIOD_CLOCK_LIMITS,
+        rd.ACOUSTIC_AREA_TYPES,
+    ):
+        with pytest.raises(TypeError):
+            table["day"] = 0  # type: ignore[index]
+
+
+def test_tonal_result_does_not_alias_the_caller_s_arrays() -> None:
+    """Mutating the input spectrum afterwards must not rewrite the result."""
+    levels = np.array([50.0, 66.0, 70.0])
+    freqs = np.array([800.0, 1000.0, 1250.0])
+    result = rd.tonal_correction(levels, freqs)
+    levels[1] = 0.0
+    freqs[1] = 1.0
+    assert result.levels[1] == pytest.approx(66.0)
+    assert result.frequencies[1] == pytest.approx(1000.0)
 
 
 def test_tonal_correction_validation() -> None:
@@ -555,6 +612,21 @@ def test_assess_activity_validation() -> None:
             limits,
             operating_days=10,
             year_days=0,
+        )
+    # 'year_days' is validated even when it is the only annual input given,
+    # and a fractional count of days is rejected rather than truncated.
+    with pytest.raises(ValueError, match="year_days"):
+        rd.assess_activity(
+            {"day": [rd.NoisePhase(12.0, 50.0)]},
+            limits,
+            long_term_levels={"day": 50.0},
+            year_days=365.5,  # type: ignore[arg-type]
+        )
+    with pytest.raises(ValueError, match="whole number"):
+        rd.assess_activity(
+            {"day": [rd.NoisePhase(12.0, 50.0)]},
+            limits,
+            operating_days=10.5,  # type: ignore[arg-type]
         )
 
 

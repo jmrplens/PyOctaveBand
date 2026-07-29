@@ -74,7 +74,7 @@ operation (Article 25.2) only the last two apply.
 
 ## ACOUSTIC_AREA_TYPES
 
-*Constant* (`dict`).
+*Constant* (`mappingproxy`).
 
 ```python
 ACOUSTIC_AREA_TYPES = {'e': 'sanitary, educational and cultural land use requiring special protection', 'a': 'residential land use', 'd': 'tertiary land use other than type c', 'c': 'recreational and public-entertainment land use', 'b': 'industrial land use', 'f': 'general transport-infrastructure systems and public facilities'}
@@ -658,6 +658,14 @@ The daily limit `limit + 3` dB (Article 25.1 b ii).
 
 The phase limit `limit + 5` dB (Article 25.1 b iii).
 
+## RD1367_CORRECTION_VALUES
+
+*Constant* (`tuple`).
+
+```python
+RD1367_CORRECTION_VALUES = (0.0, 3.0, 6.0)
+```
+
 ## RD1367_EVALUATION_PERIODS
 
 *Constant* (`tuple`).
@@ -676,7 +684,7 @@ RD1367_MAX_CORRECTION = 9.0
 
 ## RD1367_PERIOD_CLOCK_LIMITS
 
-*Constant* (`dict`).
+*Constant* (`mappingproxy`).
 
 ```python
 RD1367_PERIOD_CLOCK_LIMITS = {'day': (7, 19), 'evening': (19, 23), 'night': (23, 7)}
@@ -684,7 +692,7 @@ RD1367_PERIOD_CLOCK_LIMITS = {'day': (7, 19), 'evening': (19, 23), 'night': (23,
 
 ## RD1367_PERIOD_HOURS
 
-*Constant* (`dict`).
+*Constant* (`mappingproxy`).
 
 ```python
 RD1367_PERIOD_HOURS = {'day': 12.0, 'evening': 4.0, 'night': 8.0}
@@ -842,13 +850,17 @@ total_correction(kt: float = 0.0, kf: float = 0.0, ki: float = 0.0) -> float
 
 Summed correction `K = Kt + Kf + Ki`, capped at 9 dB (Annex IV A.3.3).
 
+Each of the three tables of Annex IV A.3.3 grades its parameter 0, 3 or
+6 dB, so any other value is rejected rather than silently accepted: a
+correction of, say, 4,5 dB is not a reading the regulation can produce.
+
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `kt` | Tonal correction, in dB. |
-| `kf` | Low-frequency correction, in dB. |
-| `ki` | Impulsive correction, in dB. |
+| `kt` | Tonal correction, in dB (0, 3 or 6). |
+| `kf` | Low-frequency correction, in dB (0, 3 or 6). |
+| `ki` | Impulsive correction, in dB (0, 3 or 6). |
 
 **Returns:** The summed correction, in dB, never above [`RD1367_MAX_CORRECTION`](/phonometry/reference/api/environment/spanish-regulation/#rd1367_max_correction).
 
@@ -856,7 +868,7 @@ Summed correction `K = Kt + Kf + Ki`, capped at 9 dB (Annex IV A.3.3).
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If a correction is negative or not finite. |
+| ValueError | If a correction is not one of 0, 3 or 6 dB. |
 
 ## vibration_quality_objective
 

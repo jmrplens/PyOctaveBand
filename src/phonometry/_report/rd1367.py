@@ -74,13 +74,13 @@ from ._layout import (
     stacked_table,
     verdict_flow,
 )
-from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
     from ..environmental.spanish_regulation import (
         ActivityAssessment,
         PeriodAssessment,
     )
+    from .metadata import ReportMetadata
 
 #: Localised names of the three evaluation periods.
 _PERIOD_LABELS = {"day": "Day", "evening": "Evening", "night": "Night"}
@@ -285,9 +285,22 @@ def _results_table(result: ActivityAssessment, language: str = "en") -> Any:
 
 def _statement(result: ActivityAssessment, language: str = "en") -> tuple[str, list[str]]:
     """The boxed conclusion: the governing period and the overall verdict."""
-    governing: PeriodAssessment = max(
-        result.periods, key=lambda p: p.reported_level - p.limit
-    )
+    def _worst_margin(period: PeriodAssessment) -> float:
+        """How far the period is over its worst-breached Article 25 criterion.
+
+        Ranking on the daily criterion alone can name a compliant period as
+        the governing one in a case that fails on the annual criterion, so
+        every criterion that was actually evaluated is considered.
+        """
+        margins = [
+            period.reported_level - period.daily_limit,
+            period.max_phase_level - period.phase_limit,
+        ]
+        if period.reported_long_term is not None and period.long_term_pass is not None:
+            margins.append(period.reported_long_term - period.limit)
+        return max(margins)
+
+    governing: PeriodAssessment = max(result.periods, key=_worst_margin)
     if result.complies:
         statement = t(
             "The activity <b>meets</b> the immission limit values of "
