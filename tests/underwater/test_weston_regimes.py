@@ -16,6 +16,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
+from scipy.special import erf
 
 from phonometry.underwater.numerical_propagation import normal_modes, parabolic_equation
 from phonometry.underwater.weston_regimes import (
@@ -119,18 +120,51 @@ def test_cylindrical_to_mode_stripping_boundary_equates_the_two_laws() -> None:
 def test_mode_stripping_boundary_equates_theta_eff_with_mode_3_over_2() -> None:
     """r_MS is where θ_eff (Eq. 9.47) falls to θ_n (Eq. 9.56) at n = 3/2.
 
-    Ainslie's printed Equation (9.57) reads ``k²·He³/(9·η)``, which is a factor
-    π larger than the value that derivation gives; this pins the consistent one
-    (see ``docs/ERRATA.md``).
+    This exercises the *published* rule, not the implementation formula: the
+    effective angle is rebuilt from Equation (9.47) as printed, with the **true
+    water depth H**, and the mode angle from Equation (9.56) as printed, with
+    the **effective depth He**. Ainslie's printed Equation (9.57) reads
+    ``k²·He³/(9·η)``, which is larger than what that rule gives by ``π·He/H``;
+    this pins the derivation-consistent value (see ``docs/ERRATA.md``).
     """
     h, f, c = 50.0, 250.0, 1500.0
     b = weston_regime_boundaries(f, h, seabed="sand", sound_speed=c)
     k = 2.0 * np.pi * f / c
-    theta_32 = 1.5 * np.pi / (k * b.effective_depth)
+    eta = b.reflection_loss_gradient
     r = b.mode_stripping_to_single_mode
-    theta_eff = np.sqrt(np.pi * b.effective_depth / (4.0 * b.reflection_loss_gradient * r))
+    # Equation (9.56) at n = 3/2, halfway between the first two mode angles.
+    theta_32 = 1.5 * np.pi / (k * b.effective_depth)
+    # Equation (9.47) as printed: the true depth h, not the effective depth.
+    theta_eff = np.sqrt(np.pi * h / (4.0 * eta * r))
     assert theta_eff == pytest.approx(theta_32, rel=1e-12)
-    assert r == pytest.approx(k**2 * b.effective_depth**3 / (9.0 * np.pi * b.reflection_loss_gradient), rel=1e-12)
+    # ...and the same rule solved symbolically for r.
+    assert r == pytest.approx(k**2 * b.effective_depth**2 * h / (9.0 * np.pi * eta), rel=1e-12)
+    # The printed Eq. (9.57) puts the transition where the effective angle has
+    # already fallen below the *first* mode's own angle, which cannot be where
+    # the second mode is stripped.
+    r_printed = k**2 * b.effective_depth**3 / (9.0 * eta)
+    theta_1 = np.pi / (k * b.effective_depth)
+    assert r_printed == pytest.approx(r * np.pi * b.effective_depth / h, rel=1e-12)
+    assert np.sqrt(np.pi * h / (4.0 * eta * r_printed)) < theta_1
+
+
+def test_composite_loss_and_the_boundary_use_the_same_effective_angle() -> None:
+    """θ_eff is Eq. (9.47) with H in both the multipath integral and the boundary.
+
+    The multipath branch of :func:`weston_propagation_loss` and the
+    mode-stripping boundary are two uses of the same printed equation, so at
+    ``r_MS`` the angle implied by the boundary must be the angle the composite
+    loss is evaluating.
+    """
+    h, f, c = 50.0, 250.0, 1500.0
+    b = weston_regime_boundaries(f, h, seabed="sand", sound_speed=c)
+    r = b.mode_stripping_to_single_mode
+    res = weston_propagation_loss(r, f, h, seabed="sand", sound_speed=c)
+    # Recover θ_eff from the printed Eq. (9.46) F_MP = (2·θ_eff/(r·H))·erf(...)
+    # by inverting the closed form the module evaluates.
+    theta_eff = np.sqrt(np.pi * h / (4.0 * b.reflection_loss_gradient * r))
+    expected = (2.0 * theta_eff / (r * h)) * erf(np.sqrt(np.pi) * b.critical_angle / (2.0 * theta_eff))
+    assert res.multipath[0] == pytest.approx(-10.0 * np.log10(expected), rel=1e-12)
 
 
 def test_spherical_to_cylindrical_boundary() -> None:
@@ -251,8 +285,10 @@ def test_parabolic_equation_range_average_matches_weston_cylindrical() -> None:
 
     The standard PE is accurate within ~±15-20° of the horizontal, and an
     ideal 100 m waveguide at 50 Hz carries modes far steeper than that, so the
-    PE under-propagates them and sits a couple of dB below the flux law. The
-    tolerance is set to that known bias rather than to the modal one.
+    PE under-propagates them and sits a couple of dB *lossier* than the flux
+    law. The assertion is a one-sided band around that known bias rather than a
+    symmetric tolerance: a symmetric band would also accept a PE that
+    reproduced the flux law exactly, which for this geometry would be wrong.
     """
     h, c, f = 100.0, 1500.0, 50.0
     depths = np.array([0.0, h])
@@ -266,7 +302,7 @@ def test_parabolic_equation_range_average_matches_weston_cylindrical() -> None:
     )
     flux = weston_propagation_loss(pe.ranges[keep_r], f, h, **_IDEAL)
     expected = -10.0 * np.log10(float(np.mean(10.0 ** (-flux.propagation_loss / 10.0))))
-    assert numeric == pytest.approx(expected, abs=3.0)
+    assert 1.5 < numeric - expected < 2.6
 
 
 def test_ideal_waveguide_has_no_mode_stripping_or_single_mode_regime() -> None:

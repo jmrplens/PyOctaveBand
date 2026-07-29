@@ -250,7 +250,7 @@ dual-metric rule requires.
 | Name | Description |
 | :--- | :--- |
 | `frequency_hz` | Band centre frequencies, in Hz (1-D, positive). |
-| `band_sel` | Per-band single-event SEL, in dB re 1 µPa²·s (or dB re (20 µPa)²·s for an in-air group); same length. |
+| `band_sel` | Per-band single-event SEL, in dB re 1 µPa²·s (or dB re (20 µPa)²·s for an in-air group); same length. `-inf` is accepted for a band that carries no energy, which is what [`strike_sel_spectrum`](/phonometry/reference/api/underwater/pile-driving-noise/#strike_sel_spectrum) returns for bands narrower than its FFT bin spacing; such a band adds nothing to the energy sum. Both input arrays are copied, so the result never aliases the caller's data. |
 | `group` | Hearing-group code as used by `guidance`. |
 | `guidance` | `"nmfs-2024"` (default), `"nmfs-2018"` or `"southall-2019"`. |
 | `impulsive` | Compare against the impulsive criteria (the default, the case for pile driving and air guns). |
@@ -310,8 +310,8 @@ Weighted exposure of a spectrum against a hearing group's criteria.
 | `tts_margin` | `cumulative_sel − tts_sel`, in dB (or `None`). |
 | `peak_margin` | `peak_spl − injury_peak_spl`, in dB (or `None`). |
 | `tts_peak_margin` | `peak_spl − tts_peak_spl`, in dB (or `None`) -- the peak-SPL half of the dual metric on the TTS side, which can trip `exceeds_tts` on its own. |
-| `exceeds_injury` | Whether any injury-onset criterion is exceeded. |
-| `exceeds_tts` | Whether any TTS-onset criterion is exceeded. |
+| `exceeds_injury` | Whether any injury-onset criterion is reached. The test is `margin >= 0`, so an exposure landing exactly **on** the criterion counts as exceeding it; the criteria are onset thresholds and the precautionary reading is the one an assessment wants. |
+| `exceeds_tts` | Whether any TTS-onset criterion is reached, on the same `margin >= 0` convention as `exceeds_injury`. |
 | `guidance` | The guidance version. |
 | `group` | Hearing-group code. |
 

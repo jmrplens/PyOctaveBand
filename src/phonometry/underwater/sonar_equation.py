@@ -205,7 +205,9 @@ class DetectionRangeResult:
     """Detection range obtained by inverting a transmission-loss law.
 
     :ivar detection_range: Range at which ``TL`` equals the figure of merit, in
-        metres (``inf`` when the loss never reaches it inside ``max_range``).
+        metres. ``inf`` when the loss never reaches it inside ``max_range``
+        (detectable throughout) and ``0.0`` when it already exceeds it at the
+        search floor (detectable nowhere).
     :ivar figure_of_merit: The figure of merit inverted, in dB.
     :ivar frequency: Acoustic frequency, in Hz.
     :ivar range_m: Range grid over which the loss was evaluated, in metres.
@@ -328,8 +330,14 @@ def detection_range_from_curve(
     :param range_m: Ranges, in metres (1-D, strictly increasing).
     :param transmission_loss: Loss at each range, in dB (same length).
     :param crossing: ``"first"`` (default) or ``"last"`` upward crossing.
-    :return: The detection range, in metres, or ``inf`` when the loss never
-        reaches the figure of merit.
+    :return: The detection range, in metres. Two limiting cases carry no
+        crossing and are distinguished by the loss at the **last** sample:
+        ``inf`` when the loss is still below the figure of merit there (the
+        target stays detectable past the end of the grid) and ``0.0`` when the
+        loss exceeds it there, which without an upward crossing means it
+        exceeded it at every sample and the target is detectable nowhere.
+        :func:`detection_range` returns the same two values for the same two
+        situations.
     :raises ValueError: If the inputs are invalid.
     """
     fom = _finite(figure_of_merit, "figure_of_merit")
@@ -345,7 +353,13 @@ def detection_range_from_curve(
     below = tl <= fom
     up = np.flatnonzero(below[:-1] & ~below[1:])
     if up.size == 0:
-        return float("inf")
+        # No upward crossing. Either the loss is below the figure of merit at
+        # the far end -- detectable past the grid, so the range is unbounded --
+        # or it is above it there, and since reaching "above" from "below"
+        # would have produced an upward crossing it was above at every sample:
+        # the target is detectable nowhere and the range is zero, which is what
+        # ``detection_range`` returns for the same situation.
+        return float("inf") if bool(below[-1]) else 0.0
     i = int(up[0] if key == "first" else up[-1])
     # At an upward crossing tl[i] <= fom < tl[i+1], so the span is strictly
     # positive and the linear interpolation cannot divide by zero.

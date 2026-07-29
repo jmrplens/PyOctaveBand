@@ -192,6 +192,11 @@ the energy sum of the returned band levels reproduces the broadband
 [`single_strike_sel`](/phonometry/reference/api/underwater/pile-driving-noise/#single_strike_sel) of the same record to within the energy that
 falls outside `limits`.
 
+Bands narrower than the FFT bin spacing `fs/n` contain no bin and are
+reported as `-inf` dB (see [`StrikeSelSpectrum`](/phonometry/reference/api/underwater/pile-driving-noise/#strikeselspectrum)); the result can be
+handed straight to
+[`weighted_exposure`](/phonometry/reference/api/underwater/marine-mammal-weighting/#weighted_exposure).
+
 **Parameters**
 
 | Name | Description |
@@ -229,7 +234,7 @@ Single-strike sound exposure level resolved into fractional-octave bands.
 | Name | Description |
 | :--- | :--- |
 | `frequencies` | Nominal band centre frequencies, in Hz. |
-| `band_sel` | Per-band single-strike SEL, in dB re 1 µPa²·s. |
+| `band_sel` | Per-band single-strike SEL, in dB re 1 µPa²·s. A band that contains no discrete-spectrum bin -- which happens whenever the band is narrower than the FFT bin spacing `fs/n`, i.e. in the lowest bands of a short record -- holds no energy at all and is reported as `-inf`, the level of zero exposure. That is the neutral element of an energy sum, so such bands pass straight through [`weighted_exposure`](/phonometry/reference/api/underwater/marine-mammal-weighting/#weighted_exposure) without contributing. |
 | `total_sel` | Energy sum of `band_sel` over the covered bands, in dB re 1 µPa²·s. |
 | `broadband_sel` | The broadband single-strike SEL of the whole record, in dB re 1 µPa²·s (equal to `total_sel` when the bands span the signal's whole occupied spectrum). |
 | `fraction` | Bandwidth fraction (1 for octaves, 3 for one-third octaves). |

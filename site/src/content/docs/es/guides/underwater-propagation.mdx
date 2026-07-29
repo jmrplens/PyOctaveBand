@@ -240,7 +240,7 @@ además la ley propia de cada régimen; el campo `boundaries` lleva las tres
 distancias de transición junto con la frecuencia de corte de la guía de ondas y
 el número de modos propagantes.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weston_regimes_es.svg" alt="Los cuatro regímenes de propagación de Weston en aguas someras a 250 Hz sobre arena media con 50 m de columna de agua: la pérdida compuesta sigue la divergencia esférica hasta unos 43 m, la cilíndrica hasta 412 m, la ley de descamado de modos 15 lg r hasta unos 21 km y después la caída exponencial de modo único, con cada ley individual dibujada para comparar" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weston_regimes_es.svg" alt="Los cuatro regímenes de propagación de Weston en aguas someras a 250 Hz sobre arena media con 50 m de columna de agua: la pérdida compuesta sigue la divergencia esférica hasta unos 43 m, la cilíndrica hasta 412 m, la ley de descamado de modos 15 lg r hasta unos 20 km y después la caída exponencial de modo único, con cada ley individual dibujada para comparar" width="82%" />
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -281,9 +281,10 @@ la pérdida por modos normales promediada en profundidad y distancia cae sobre
 ella dentro de un decibelio.
 
 :::note
-La Ecuación (9.57) impresa por Ainslie para $r_{MS}$ dice $k^2H_e^3/(9\eta)$,
-un factor $\pi$ mayor que el valor que da su propia regla de derivación. La
-biblioteca implementa la forma consistente; véase
+La Ecuación (9.57) impresa por Ainslie para $r_{MS}$ dice $k^2H_e^3/(9\eta)$.
+Su propia regla de derivación, igualar las Ecuaciones (9.47) y (9.56) tal como
+están impresas, da $k^2H_e^2H/(9\pi\eta)$, menor en $\pi H_e/H$. La biblioteca
+implementa la forma coherente con la derivación; véase
 [Erratas encontradas en fuentes publicadas](/phonometry/es/reference/errata/).
 :::
 

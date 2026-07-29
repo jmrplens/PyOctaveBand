@@ -33,12 +33,16 @@ interference cycles converges on the cylindrical-spreading law, with
 
 .. note::
     Ainslie's Equation (9.57) for the mode-stripping/single-mode transition is
-    printed as ``r_MS ≈ k²·He³/(9·η)``. Equating the effective angle of
-    Equation (9.47) with the mode angle of Equation (9.56) at ``n = 3/2``, as
-    the accompanying text prescribes, gives ``k²·He³/(9·π·η)`` instead: the
-    printed form is a factor ``π`` too large. This module implements the
-    derivation-consistent value and records the discrepancy in
-    ``docs/ERRATA.md``.
+    printed as ``r_MS ≈ k²·He³/(9·η)``. Carrying out the derivation the
+    accompanying text prescribes -- "equating ``θ_n`` and ``θ_eff`` with
+    ``n = 3/2``" -- with the two equations exactly as they are printed, namely
+    ``θ_eff = (π·H/(4·η·r))^½`` (Equation 9.47, with the **true** water depth
+    ``H``) and ``θ_n = n·π/(k·He)`` (Equation 9.56, with the **effective**
+    depth ``He``), gives ``r_MS = k²·He²·H/(9·π·η)`` instead. The printed form
+    is larger by ``π·He/H``. This module implements the derivation-consistent
+    value, which also keeps ``θ_eff`` defined with ``H`` everywhere it is used
+    (the composite loss below evaluates Equation 9.47 the same way), and
+    records the discrepancy in ``docs/ERRATA.md``.
 """
 
 from __future__ import annotations
@@ -265,7 +269,7 @@ class WestonRegimeBoundaries:
         are equal, ``H/(2·ψc)``, in metres.
     :ivar cylindrical_to_mode_stripping: Ainslie Eq. (9.50)
         ``r_CS = π·H/(4·η·ψc²)``, in metres (``inf`` for a lossless bottom).
-    :ivar mode_stripping_to_single_mode: ``r_MS = k²·He³/(9·π·η)``, in metres
+    :ivar mode_stripping_to_single_mode: ``r_MS = k²·He²·H/(9·π·η)``, in metres
         (``inf`` for a lossless bottom). See the module note on Eq. (9.57).
     :ivar critical_angle: Critical grazing angle ``ψc``, in radians.
     :ivar reflection_loss_gradient: ``η``, in Np/rad.
@@ -335,8 +339,11 @@ def weston_regime_boundaries(
     r_ss_cs = h / (2.0 * psi_c)
     if eta > 0.0:
         r_cs = np.pi * h / (4.0 * eta * psi_c**2)
-        # Equation (9.57) with the factor pi restored (see the module note).
-        r_ms = k**2 * h_eff**3 / (9.0 * np.pi * eta)
+        # Equation (9.57) re-derived from Equations (9.47) and (9.56) exactly
+        # as printed -- H in the effective angle, He in the mode angle -- which
+        # restores a factor pi and keeps the true depth where Eq. (9.47) puts
+        # it (see the module note and docs/ERRATA.md).
+        r_ms = k**2 * h_eff**2 * h / (9.0 * np.pi * eta)
     else:
         r_cs = float("inf")
         r_ms = float("inf")

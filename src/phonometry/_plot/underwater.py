@@ -562,6 +562,16 @@ def plot_parabolic_equation(
     return ax
 
 
+def _plottable(levels: Any) -> np.ndarray:
+    """Levels with non-finite entries as ``nan``, which matplotlib skips.
+
+    Band levels carry ``-inf`` where a band holds no energy at all; drawing
+    that literally would collapse the vertical scale.
+    """
+    values = np.asarray(levels, dtype=np.float64)
+    return np.where(np.isfinite(values), values, np.nan)
+
+
 def _spectrum_axes(
     ax: Axes | None, freqs: np.ndarray, *, ylabel: str, title: str, language: str,
 ) -> Axes:
@@ -703,9 +713,9 @@ def plot_weighted_exposure(
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     ax = _spectrum_axes(ax, freqs, ylabel="Band SEL [dB re 1 µPa²·s]",
                         title="Weighted exposure vs criteria", language=language)
-    ax.plot(freqs, np.asarray(result.band_sel, dtype=np.float64), "o--", ms=3,
+    ax.plot(freqs, _plottable(result.band_sel), "o--", ms=3,
             color=_C_MUTED, lw=1.0, label=_t("Unweighted", language))
-    ax.plot(freqs, np.asarray(result.weighted_band_sel, dtype=np.float64),
+    ax.plot(freqs, _plottable(result.weighted_band_sel),
             **{"color": _C_PRIMARY, "lw": 1.6, "marker": "o", "ms": 3,
                "label": f"{_t('Weighted', language)} ({result.group}, {result.guidance})",
                **kwargs})
@@ -742,7 +752,7 @@ def plot_strike_sel_spectrum(
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     ax = _spectrum_axes(ax, freqs, ylabel="Band SEL [dB re 1 µPa²·s]",
                         title="Single-strike SEL per band", language=language)
-    ax.plot(freqs, np.asarray(result.band_sel, dtype=np.float64),
+    ax.plot(freqs, _plottable(result.band_sel),
             **{"color": _C_PRIMARY, "lw": 1.4, "marker": "o", "ms": 3,
                "label": f"1/{result.fraction}", **kwargs})
     ax.axhline(result.total_sel, color=_C_REFERENCE, ls="--", lw=1.2,

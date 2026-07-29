@@ -366,7 +366,7 @@ class AuditoryWeightingResult:
 def _positive_frequencies(
     frequency_hz: NDArray[np.float64] | list[float] | float,
 ) -> NDArray[np.float64]:
-    f = np.atleast_1d(np.asarray(frequency_hz, dtype=np.float64))
+    f = np.array(frequency_hz, dtype=np.float64, copy=True, ndmin=1)
     if f.size == 0 or not np.all(np.isfinite(f)):
         raise ValueError("'frequency_hz' must be finite and non-empty.")
     if np.any(f <= 0.0):
@@ -460,8 +460,12 @@ class WeightedExposureResult:
     :ivar tts_peak_margin: ``peak_spl − tts_peak_spl``, in dB (or ``None``) --
         the peak-SPL half of the dual metric on the TTS side, which can trip
         ``exceeds_tts`` on its own.
-    :ivar exceeds_injury: Whether any injury-onset criterion is exceeded.
-    :ivar exceeds_tts: Whether any TTS-onset criterion is exceeded.
+    :ivar exceeds_injury: Whether any injury-onset criterion is reached. The
+        test is ``margin >= 0``, so an exposure landing exactly **on** the
+        criterion counts as exceeding it; the criteria are onset thresholds and
+        the precautionary reading is the one an assessment wants.
+    :ivar exceeds_tts: Whether any TTS-onset criterion is reached, on the same
+        ``margin >= 0`` convention as ``exceeds_injury``.
     :ivar guidance: The guidance version.
     :ivar group: Hearing-group code.
     """
@@ -523,7 +527,12 @@ def weighted_exposure(
 
     :param frequency_hz: Band centre frequencies, in Hz (1-D, positive).
     :param band_sel: Per-band single-event SEL, in dB re 1 µPa²·s (or
-        dB re (20 µPa)²·s for an in-air group); same length.
+        dB re (20 µPa)²·s for an in-air group); same length. ``-inf`` is
+        accepted for a band that carries no energy, which is what
+        :func:`~phonometry.underwater.pile_driving_noise.strike_sel_spectrum`
+        returns for bands narrower than its FFT bin spacing; such a band adds
+        nothing to the energy sum. Both input arrays are copied, so the result
+        never aliases the caller's data.
     :param group: Hearing-group code as used by ``guidance``.
     :param guidance: ``"nmfs-2024"`` (default), ``"nmfs-2018"`` or
         ``"southall-2019"``.
@@ -537,11 +546,13 @@ def weighted_exposure(
     :raises ValueError: If an input is invalid.
     """
     f = _positive_frequencies(frequency_hz)
-    sel = np.atleast_1d(np.asarray(band_sel, dtype=np.float64))
+    sel = np.array(band_sel, dtype=np.float64, copy=True, ndmin=1)
     if sel.shape != f.shape:
         raise ValueError("'band_sel' must have the same length as 'frequency_hz'.")
-    if not np.all(np.isfinite(sel)):
-        raise ValueError("'band_sel' must be finite.")
+    # -inf is admitted as the level of a band that carries no energy (see
+    # StrikeSelSpectrum.band_sel); it is the neutral element of the energy sum.
+    if np.any(np.isnan(sel)) or np.any(sel == np.inf):
+        raise ValueError("'band_sel' must be finite, or -inf for a band with no energy.")
     n_float = float(n_events)
     if not n_float.is_integer() or int(n_float) < 1:
         raise ValueError("'n_events' must be a whole number of events, at least 1.")
@@ -586,4 +597,5 @@ def weighted_exposure(
 
 
 def _any_positive(*margins: float | None) -> bool:
+    """Whether any published margin has been reached (``>= 0``, criterion included)."""
     return any(m is not None and m >= 0.0 for m in margins)

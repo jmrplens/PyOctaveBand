@@ -95,7 +95,7 @@ cut-off frequency and the number of cut-on modes.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weston_regimes_dark.svg">
-  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weston_regimes.svg" alt="Weston's four shallow-water propagation regimes at 250 Hz over medium sand in 50 m of water: the composite propagation loss follows spherical spreading to about 43 m, cylindrical spreading to 412 m, the 15 lg r mode-stripping law to about 21 km and then the exponential single-mode decay, with each individual law drawn for comparison" width="82%">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weston_regimes.svg" alt="Weston's four shallow-water propagation regimes at 250 Hz over medium sand in 50 m of water: the composite propagation loss follows spherical spreading to about 43 m, cylindrical spreading to 412 m, the 15 lg r mode-stripping law to about 20 km and then the exponential single-mode decay, with each individual law drawn for comparison" width="82%">
 </picture>
 
 <details>
@@ -154,9 +154,10 @@ mean = lambda tl: -10.0 * np.log10(np.mean(10.0 ** (-tl / 10.0)))
 print(mean(flux.propagation_loss), mean(modes.transmission_loss))
 ```
 
-> Ainslie's printed Equation (9.57) for $r_{MS}$ reads $k^2H_e^3/(9\eta)$,
-> a factor $\pi$ larger than the value its own derivation rule gives. The
-> library implements the consistent form; see
+> Ainslie's printed Equation (9.57) for $r_{MS}$ reads $k^2H_e^3/(9\eta)$. Its
+> own derivation rule, equating Equations (9.47) and (9.56) exactly as printed,
+> gives $k^2H_e^2H/(9\pi\eta)$, smaller by $\pi H_e/H$. The library implements
+> the derivation-consistent form; see
 > [Errata found in published sources](ERRATA.md).
 
 ## 2. Speed of sound in sea water

@@ -238,7 +238,7 @@ and returns each regime's own law alongside it; the `boundaries` field carries
 the three transition ranges plus the waveguide cut-off frequency and the number
 of cut-on modes.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weston_regimes.svg" alt="Weston's four shallow-water propagation regimes at 250 Hz over medium sand in 50 m of water: the composite propagation loss follows spherical spreading to about 43 m, cylindrical spreading to 412 m, the 15 lg r mode-stripping law to about 21 km and then the exponential single-mode decay, with each individual law drawn for comparison" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weston_regimes.svg" alt="Weston's four shallow-water propagation regimes at 250 Hz over medium sand in 50 m of water: the composite propagation loss follows spherical spreading to about 43 m, cylindrical spreading to 412 m, the 15 lg r mode-stripping law to about 20 km and then the exponential single-mode decay, with each individual law drawn for comparison" width="82%" />
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -278,9 +278,10 @@ waveguide; the depth- and range-averaged normal-mode loss lands on it to within
 a decibel.
 
 :::note
-Ainslie's printed Equation (9.57) for $r_{MS}$ reads $k^2H_e^3/(9\eta)$, a
-factor $\pi$ larger than the value its own derivation rule gives. The library
-implements the consistent form; see
+Ainslie's printed Equation (9.57) for $r_{MS}$ reads $k^2H_e^3/(9\eta)$. Its
+own derivation rule, equating Equations (9.47) and (9.56) exactly as printed,
+gives $k^2H_e^2H/(9\pi\eta)$, smaller by $\pi H_e/H$. The library implements
+the derivation-consistent form; see
 [Errata found in published sources](/phonometry/reference/errata/).
 :::
 

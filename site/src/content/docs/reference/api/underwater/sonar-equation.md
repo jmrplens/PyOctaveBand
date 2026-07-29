@@ -156,7 +156,7 @@ linearly between the two bracketing samples. Real waveguides oscillate, so
 | `transmission_loss` | Loss at each range, in dB (same length). |
 | `crossing` | `"first"` (default) or `"last"` upward crossing. |
 
-**Returns:** The detection range, in metres, or `inf` when the loss never reaches the figure of merit.
+**Returns:** The detection range, in metres. Two limiting cases carry no crossing and are distinguished by the loss at the **last** sample: `inf` when the loss is still below the figure of merit there (the target stays detectable past the end of the grid) and `0.0` when the loss exceeds it there, which without an upward crossing means it exceeded it at every sample and the target is detectable nowhere. [`detection_range`](/phonometry/reference/api/underwater/sonar-equation/#detection_range) returns the same two values for the same two situations.
 
 **Raises**
 
@@ -185,7 +185,7 @@ Detection range obtained by inverting a transmission-loss law.
 
 | Name | Description |
 | :--- | :--- |
-| `detection_range` | Range at which `TL` equals the figure of merit, in metres (`inf` when the loss never reaches it inside `max_range`). |
+| `detection_range` | Range at which `TL` equals the figure of merit, in metres. `inf` when the loss never reaches it inside `max_range` (detectable throughout) and `0.0` when it already exceeds it at the search floor (detectable nowhere). |
 | `figure_of_merit` | The figure of merit inverted, in dB. |
 | `frequency` | Acoustic frequency, in Hz. |
 | `range_m` | Range grid over which the loss was evaluated, in metres. |

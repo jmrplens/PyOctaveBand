@@ -235,9 +235,33 @@ def test_detection_range_from_curve_handles_multiple_crossings() -> None:
 
 
 def test_detection_range_from_curve_without_a_crossing() -> None:
+    """A loss that stays below the figure of merit is detectable past the grid."""
     assert detection_range_from_curve(
-        10.0, [1.0, 2.0], [40.0, 50.0]
+        60.0, [1.0, 2.0], [40.0, 50.0]
     ) == float("inf")
+    # Descending through the figure of merit: still below it at the far end.
+    assert detection_range_from_curve(
+        60.0, [1.0, 2.0], [70.0, 50.0]
+    ) == float("inf")
+
+
+def test_both_solvers_return_zero_when_the_target_is_undetectable_everywhere() -> None:
+    """The loss exceeds the figure of merit at every range: the range is 0, not ``inf``.
+
+    ``inf`` is this module's value for "detectable at any range", so the
+    opposite situation must not collapse onto it. The two solvers are pinned to
+    the same answer on the same physical case: the closed form inverted below
+    its own loss at the search floor, and the very curve that inversion
+    returns fed back into the curve reader.
+    """
+    res = detection_range(-100.0, 1000.0)
+    assert res.detection_range == 0.0
+    assert float(res.transmission_loss.min()) > res.figure_of_merit
+    assert detection_range_from_curve(
+        res.figure_of_merit, res.range_m, res.transmission_loss
+    ) == 0.0
+    # And directly, on a plain rising curve entirely above the figure of merit.
+    assert detection_range_from_curve(20.0, [1.0, 2.0, 3.0], [50.0, 58.0, 70.0]) == 0.0
 
 
 def test_detection_range_from_curve_bridges_a_numerical_model() -> None:

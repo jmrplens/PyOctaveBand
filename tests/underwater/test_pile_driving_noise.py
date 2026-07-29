@@ -130,14 +130,49 @@ def test_weighted_exposure_of_a_pile_driving_campaign() -> None:
     two groups; the accumulation over strikes is the ISO 18406 +10·lg(N).
     """
     spec = strike_sel_spectrum(_pulse(50.0, 0.2), FS, fraction=3)
-    finite = np.isfinite(spec.band_sel)
-    lf = weighted_exposure(spec.frequencies[finite], spec.band_sel[finite], "LF",
+    # No masking: the spectrum goes into the assessment exactly as returned.
+    lf = weighted_exposure(spec.frequencies, spec.band_sel, "LF",
                            n_events=1000, impulsive=True)
-    vhf = weighted_exposure(spec.frequencies[finite], spec.band_sel[finite], "VHF",
+    vhf = weighted_exposure(spec.frequencies, spec.band_sel, "VHF",
                             n_events=1000, impulsive=True)
     assert lf.weighted_sel > vhf.weighted_sel + 20.0
     assert lf.cumulative_sel == pytest.approx(lf.weighted_sel + 30.0, abs=1e-9)
     assert lf.criteria.injury_label == "AUD INJ"
+
+
+@pytest.mark.parametrize(
+    ("seconds", "fs"), [(1.0, 48000), (0.2, 48000), (0.1, 48000), (0.5, 10000)]
+)
+def test_the_advertised_chain_runs_unaided_on_short_records(seconds: float, fs: int) -> None:
+    """Bands narrower than the bin spacing fs/n are empty; the chain must still run.
+
+    A one-third-octave band below about ``fs/n`` contains no discrete-spectrum
+    bin, which is the normal case for a single strike: at 48 kHz a 0.1 s record
+    empties three of the 34 bands. Those bands carry no energy, are reported as
+    ``-inf`` and must pass through the weighting without being masked out.
+    """
+    t = np.arange(round(seconds * fs)) / fs
+    strike = 50.0 * np.exp(-t / (0.3 * seconds)) * np.sin(2 * np.pi * 200.0 * t)
+    spec = strike_sel_spectrum(strike, fs, fraction=3)
+    assert not np.any(np.isnan(spec.band_sel))
+    res = weighted_exposure(spec.frequencies, spec.band_sel, "LF", impulsive=True)
+    # Empty bands are the neutral element: dropping them changes nothing.
+    finite = np.isfinite(spec.band_sel)
+    masked = weighted_exposure(spec.frequencies[finite], spec.band_sel[finite],
+                               "LF", impulsive=True)
+    assert res.weighted_sel == pytest.approx(masked.weighted_sel, abs=1e-9)
+    assert res.unweighted_sel == pytest.approx(spec.total_sel, abs=1e-9)
+
+
+def test_empty_bands_are_reported_as_minus_infinity() -> None:
+    """A 0.5 s record at 10 kHz empties the lowest bands (bin spacing 2 Hz)."""
+    fs = 10_000
+    t = np.arange(round(0.5 * fs)) / fs
+    strike = 50.0 * np.exp(-t / 0.15) * np.sin(2 * np.pi * 200.0 * t)
+    spec = strike_sel_spectrum(strike, fs, fraction=3)
+    empty = ~np.isfinite(spec.band_sel)
+    assert empty.any()
+    assert np.all(spec.band_sel[empty] == -np.inf)
 
 
 def test_strike_sel_spectrum_validates_its_arguments() -> None:

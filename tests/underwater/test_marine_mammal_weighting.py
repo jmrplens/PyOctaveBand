@@ -40,6 +40,21 @@ _APPENDIX_D_WFA_1KHZ = {
     "LF": -0.06, "MF": -29.11, "HF": -37.55, "PW": -5.90, "OW": -4.87,
 }
 
+#: Generalised hearing ranges as printed in Table ES1 of each NMFS document
+#: (2018 v2.0 printed p. 2; 2024 v3.0 printed p. 2). Southall et al. tabulate
+#: none, so those rows carry ``None`` and are checked as such.
+_PRINTED_HEARING_RANGES = {
+    "nmfs-2018": {
+        "LF": (7.0, 35e3), "MF": (150.0, 160e3), "HF": (275.0, 160e3),
+        "PW": (50.0, 86e3), "OW": (60.0, 39e3),
+    },
+    "nmfs-2024": {
+        "LF": (7.0, 36e3), "HF": (150.0, 160e3), "VHF": (200.0, 165e3),
+        "PW": (40.0, 90e3), "OW": (60.0, 68e3), "PA": (42.0, 52e3),
+        "OA": (90.0, 40e3),
+    },
+}
+
 #: Weighted TTS onset thresholds as printed: NMFS 2018 Table 3, NMFS 2024
 #: Table 5 and Southall Table 6.
 _PRINTED_TTS = {
@@ -93,10 +108,16 @@ def test_c_is_the_negated_peak_of_the_weighting_function(guidance: str) -> None:
 
 @pytest.mark.parametrize("guidance", WEIGHTING_GUIDANCE)
 def test_weighted_tts_onset_is_k_plus_c(guidance: str) -> None:
-    """"mathematically equivalent to K + C" -- the printed footnote of every table."""
+    """"mathematically equivalent to K + C" -- the printed footnote of every table.
+
+    Checked twice over: against the printed thresholds transcribed here, and
+    against the ones the criteria table itself serves, so the two copies of the
+    same published numbers cannot drift apart.
+    """
     for group, printed in _PRINTED_TTS[guidance].items():
         params = weighting_parameters(group, guidance=guidance)
         assert round(params.k_db + params.c_db) == printed
+        assert exposure_criteria(group, guidance=guidance).tts_sel == float(printed)
 
 
 @pytest.mark.parametrize("guidance", WEIGHTING_GUIDANCE)
@@ -120,32 +141,74 @@ def test_non_impulsive_injury_is_tts_plus_20_db(guidance: str) -> None:
         assert crit.injury_sel - crit.tts_sel == pytest.approx(20.0, abs=1e-9)
 
 
-def test_southall_impulsive_offsets() -> None:
-    """Southall printed pp. 155-156: SEL −11 dB, PTS SEL +15 dB, PTS peak +6 dB."""
+def test_southall_impulsive_sel_offset_from_the_non_impulsive_table() -> None:
+    """"181 dB re 1 µPa²s for non-impulsive TTS onset −11 dB" (printed p. 155)."""
     cont = exposure_criteria("PCW", guidance="southall-2019")
     imp = exposure_criteria("PCW", guidance="southall-2019", impulsive=True)
     assert cont.tts_sel is not None and imp.tts_sel is not None
-    # "181 − 11 = 170" for PCW, the example the article works through.
     assert imp.tts_sel - cont.tts_sel == pytest.approx(-11.0, abs=1e-9)
-    for group in hearing_groups("southall-2019"):
-        row = exposure_criteria(group, guidance="southall-2019", impulsive=True)
+
+
+@pytest.mark.parametrize("guidance", ["southall-2019", "nmfs-2024"])
+def test_impulsive_injury_offsets_are_15_db_sel_and_6_db_peak(guidance: str) -> None:
+    """Southall printed p. 155: PTS SEL = TTS SEL + 15 dB, PTS peak = TTS peak + 6 dB.
+
+    NMFS (2024) Table A.E-2 carries the Navy Phase 4 impulsive TTS values that
+    Table ES3 does not repeat, and satisfies the same two offsets on every row,
+    so both versions that publish an impulsive TTS onset are checked here.
+    NMFS 2018 publishes none, which
+    ``test_nmfs_2018_publishes_no_impulsive_tts`` pins instead.
+    """
+    for group in hearing_groups(guidance):
+        row = exposure_criteria(group, guidance=guidance, impulsive=True)
         assert row.tts_sel is not None and row.injury_sel is not None
         assert row.injury_sel - row.tts_sel == pytest.approx(15.0, abs=1e-9)
         assert row.tts_peak_spl is not None and row.injury_peak_spl is not None
         assert row.injury_peak_spl - row.tts_peak_spl == pytest.approx(6.0, abs=1e-9)
 
 
-def test_southall_impulsive_peak_spl_is_threshold_at_f0_plus_159_db() -> None:
-    """"Peak SPL TTS onset was estimated as 212 dB re 1 µPa (53 dB at f0 + 159 dB)"."""
+#: Groups whose impulsive peak-SPL TTS onset the article derives from the
+#: audiogram rather than from data. HF and VHF are excluded because printed
+#: p. 155 says their peak thresholds "were directly based on empirical data",
+#: and LF because Southall et al. publish no audiogram fit for it.
+_PLUS_159_GROUPS = ("SI", "PCW", "OCW", "PCA", "OCA")
+
+
+@pytest.mark.parametrize("group", _PLUS_159_GROUPS)
+def test_southall_impulsive_peak_spl_is_threshold_at_f0_plus_159_db(group: str) -> None:
+    """Printed p. 155: "159 dB was added to the value of the hearing threshold at f0".
+
+    The article works the rule through for PCW: "Peak SPL TTS onset was
+    estimated as 212 dB re 1 µPa (53 dB at f0 + 159 dB)". Applying it to PCA
+    and OCA is what turns the Table 7 errata (``docs/ERRATA.md``) from a
+    transcription into a derived result: the corrected 155 and 170 follow,
+    the printed 138 and 161 do not.
+    """
     from phonometry.underwater.marine_mammal_audiograms import (
         BEST_HEARING_FREQUENCY_KHZ,
         group_audiogram,
     )
 
-    threshold = group_audiogram(BEST_HEARING_FREQUENCY_KHZ["PCW"][0] * 1000.0, "PCW").threshold[0]
-    row = exposure_criteria("PCW", guidance="southall-2019", impulsive=True)
-    assert row.tts_peak_spl == 212.0
-    assert round(threshold) + 159.0 == pytest.approx(212.0, abs=1.0)
+    f0_hz = BEST_HEARING_FREQUENCY_KHZ[group][0] * 1000.0
+    threshold = float(group_audiogram(f0_hz, group).threshold[0])
+    row = exposure_criteria(group, guidance="southall-2019", impulsive=True)
+    assert row.tts_peak_spl is not None
+    # The published values are whole decibels; f0 itself is tabulated to two
+    # significant figures, so half a decibel of slack on the derived value.
+    assert threshold + 159.0 == pytest.approx(row.tts_peak_spl, abs=0.7)
+
+
+def test_the_plus_159_rule_rejects_the_printed_in_air_peak_values() -> None:
+    """The rule discriminates: it is 16 and 9 dB away from the printed PCA/OCA."""
+    from phonometry.underwater.marine_mammal_audiograms import (
+        BEST_HEARING_FREQUENCY_KHZ,
+        group_audiogram,
+    )
+
+    for group, printed in (("PCA", 138.0), ("OCA", 161.0)):
+        f0_hz = BEST_HEARING_FREQUENCY_KHZ[group][0] * 1000.0
+        derived = float(group_audiogram(f0_hz, group).threshold[0]) + 159.0
+        assert abs(derived - printed) > 8.0
 
 
 def test_southall_table_7_errata_values_are_implemented() -> None:
@@ -164,6 +227,21 @@ def test_nmfs_2024_otariid_c_uses_the_corrected_1_36() -> None:
     freqs = np.logspace(0.0, 6.0, 400_001)
     shape = auditory_weighting(freqs, "OW", guidance="nmfs-2024").weighting - params.c_db
     assert -float(np.max(shape)) == pytest.approx(1.3643, abs=5e-4)
+
+
+@pytest.mark.parametrize("guidance", sorted(_PRINTED_HEARING_RANGES))
+def test_generalised_hearing_ranges_match_table_es1(guidance: str) -> None:
+    """Table ES1 of each NMFS document, group by group (24 published numbers)."""
+    printed = _PRINTED_HEARING_RANGES[guidance]
+    assert set(printed) == set(hearing_groups(guidance))
+    for group, expected in printed.items():
+        assert weighting_parameters(group, guidance=guidance).hearing_range_hz == expected
+
+
+def test_southall_rows_carry_no_hearing_range() -> None:
+    """The article tabulates none, so the field is ``None`` rather than borrowed."""
+    for group in hearing_groups("southall-2019"):
+        assert weighting_parameters(group, guidance="southall-2019").hearing_range_hz is None
 
 
 def test_nmfs_2018_and_southall_agree_on_the_five_shared_groups() -> None:
@@ -241,6 +319,16 @@ def test_peak_spl_criterion_is_compared_unweighted() -> None:
     assert res.peak_margin == pytest.approx(8.0, abs=1e-9)
     assert res.exceeds_injury is True
     assert res.sel_margin is not None and res.sel_margin < 0.0
+
+
+def test_an_exposure_exactly_at_the_criterion_counts_as_exceeding_it() -> None:
+    """``exceeds_*`` tests ``margin >= 0``: the onset threshold itself is included."""
+    crit = exposure_criteria("VHF", guidance="nmfs-2024", impulsive=True)
+    assert crit.injury_peak_spl is not None
+    res = weighted_exposure([1000.0], [100.0], "VHF", impulsive=True,
+                            peak_spl=crit.injury_peak_spl)
+    assert res.peak_margin == 0.0
+    assert res.exceeds_injury is True
 
 
 def test_peak_spl_can_trip_tts_alone_and_the_margin_says_so() -> None:
@@ -321,6 +409,29 @@ def test_mismatched_band_spectrum_raises() -> None:
 def test_non_finite_band_spectrum_raises() -> None:
     with pytest.raises(ValueError, match="band_sel"):
         weighted_exposure([100.0, 200.0], [170.0, np.nan], "LF")
+    with pytest.raises(ValueError, match="band_sel"):
+        weighted_exposure([100.0, 200.0], [170.0, np.inf], "LF")
+
+
+def test_minus_infinity_is_an_empty_band_not_an_error() -> None:
+    """A band with no energy contributes nothing and must not be rejected."""
+    both = weighted_exposure([100.0, 200.0], [170.0, -np.inf], "LF")
+    one = weighted_exposure([100.0], [170.0], "LF")
+    assert both.weighted_sel == pytest.approx(one.weighted_sel, abs=1e-12)
+    assert both.unweighted_sel == pytest.approx(170.0, abs=1e-12)
+
+
+def test_the_result_does_not_alias_the_caller_arrays() -> None:
+    """The dataclass is frozen, so its arrays must not be the caller's own."""
+    freqs = np.array([100.0, 200.0])
+    levels = np.array([170.0, 171.0])
+    res = weighted_exposure(freqs, levels, "LF")
+    assert res.frequencies is not freqs
+    assert res.band_sel is not levels
+    levels[0] = 0.0
+    freqs[0] = 999.0
+    assert res.band_sel[0] == 170.0
+    assert res.frequencies[0] == 100.0
 
 
 @pytest.mark.parametrize("n_events", [0, 1.5, -3])
