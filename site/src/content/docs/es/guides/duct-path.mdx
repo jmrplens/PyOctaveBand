@@ -373,7 +373,7 @@ import numpy as np
 
 IN, CFM, IN_WG = 0.0254, 0.0004719474432, 249.0
 
-# El difusor de impulsion de la hoja de Long: 24 x 24 in, 312 cfm, 0.05 in pd.
+# El difusor de impulsión de la hoja de Long: 24 x 24 in, 312 cfm, 0.05 in pd.
 print(np.round(diffuser_sound_power(None, (24 * IN) ** 2,
                                     volume_flow=312 * CFM,
                                     pressure_drop=0.05 * IN_WG).values, 1))
