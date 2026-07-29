@@ -161,8 +161,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Niveles",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/levels/"
+              "name": "Niveles ambientales",
+              "url": "https://jmrplens.github.io/phonometry/es/guides/environmental-levels/"
             }
           },
           {
@@ -176,8 +176,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Niveles",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/levels/"
+              "name": "Niveles ambientales",
+              "url": "https://jmrplens.github.io/phonometry/es/guides/environmental-levels/"
             }
           },
           {
@@ -191,8 +191,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Niveles",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/levels/"
+              "name": "Niveles ambientales",
+              "url": "https://jmrplens.github.io/phonometry/es/guides/environmental-levels/"
             }
           },
           {
@@ -326,8 +326,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Ponderación frecuencial",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/weighting/"
+              "name": "Ponderaciones especiales",
+              "url": "https://jmrplens.github.io/phonometry/es/guides/special-weightings/"
             }
           },
           {
@@ -341,8 +341,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Ponderación frecuencial",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/weighting/"
+              "name": "Ponderaciones especiales",
+              "url": "https://jmrplens.github.io/phonometry/es/guides/special-weightings/"
             }
           },
           {
@@ -356,8 +356,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Ponderación frecuencial",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/weighting/"
+              "name": "Ponderaciones especiales",
+              "url": "https://jmrplens.github.io/phonometry/es/guides/special-weightings/"
             }
           },
           {
@@ -371,8 +371,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Ponderación frecuencial",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/weighting/"
+              "name": "Ponderaciones especiales",
+              "url": "https://jmrplens.github.io/phonometry/es/guides/special-weightings/"
             }
           },
           {
@@ -1867,9 +1867,9 @@ norma.
 
 | Símbolo | Magnitud | Unidad | Definida en | Guía |
 | --- | --- | --- | --- | --- |
-| Lden | Nivel día-tarde-noche: la media energética de los tres periodos con 5 dB añadidos a la tarde y 10 dB a la noche. | dB | ISO 1996-1:2016, 3.6.4 | [Niveles](/phonometry/es/guides/levels/) |
-| Ldn | Nivel día-noche: la misma construcción solo con la penalización de 10 dB nocturna. | dB | ISO 1996-1:2016, 3.6.5 | [Niveles](/phonometry/es/guides/levels/) |
-| Lr | Nivel de valoración: el nivel compuesto de la jornada completa tras los ajustes por carácter de la fuente y por franja horaria. | dB | ISO 1996-1:2016, apartado 6.5 (Fórmulas 5 y 6) | [Niveles](/phonometry/es/guides/levels/) |
+| Lden | Nivel día-tarde-noche: la media energética de los tres periodos con 5 dB añadidos a la tarde y 10 dB a la noche. | dB | ISO 1996-1:2016, 3.6.4 | [Niveles ambientales](/phonometry/es/guides/environmental-levels/) |
+| Ldn | Nivel día-noche: la misma construcción solo con la penalización de 10 dB nocturna. | dB | ISO 1996-1:2016, 3.6.5 | [Niveles ambientales](/phonometry/es/guides/environmental-levels/) |
+| Lr | Nivel de valoración: el nivel compuesto de la jornada completa tras los ajustes por carácter de la fuente y por franja horaria. | dB | ISO 1996-1:2016, apartado 6.5 (Fórmulas 5 y 6) | [Niveles ambientales](/phonometry/es/guides/environmental-levels/) |
 | LAr,T | Nivel de valoración de una fuente impulsiva en un intervalo de referencia: el LAeq más el ajuste graduado por impulsos. | dB | NT ACOU 112:2002, apartado 8 | [Prominencia de impulsos](/phonometry/es/guides/impulse-prominence/) |
 | KI | Ajuste por impulsos que se suma al LAeq, graduado según la prominencia prevista de los impulsos. | dB | NT ACOU 112:2002, apartado 8 | [Prominencia de impulsos](/phonometry/es/guides/impulse-prominence/) |
 | E | Exposición sonora: la integral temporal de la presión acústica ponderada A al cuadrado durante el periodo de exposición. | Pa²h | IEC 61252:1993, 3.1 | [Niveles](/phonometry/es/guides/levels/) |
@@ -1883,10 +1883,10 @@ norma.
 | Símbolo | Magnitud | Unidad | Definida en | Guía |
 | --- | --- | --- | --- | --- |
 | A, C, Z | Las ponderaciones frecuenciales normativas: las curvas de respuesta del oído que se aplican antes de integrar, siendo Z la referencia plana. | dB | IEC 61672-1:2013, Anexo E (límites de aceptación en la Tabla 3) | [Ponderación frecuencial](/phonometry/es/guides/weighting/) |
-| G | Ponderación para infrasonido, definida por sus polos y ceros en el intervalo de 0,25 Hz a 315 Hz. | dB | ISO 7196:1995, Tabla 1 (respuestas nominales en la Tabla 2) | [Ponderación frecuencial](/phonometry/es/guides/weighting/) |
-| B | Ponderación histórica para niveles medios, retirada de la norma vigente de sonómetros. | dB | ANSI S1.4-1983, Apéndice C (Fórmula C2) | [Ponderación frecuencial](/phonometry/es/guides/weighting/) |
-| D | Ponderación histórica para ruido de aeronaves, derivada de la curva de ruidosidad percibida de 40 noys. | dB | IEC 537:1976 (retirada) | [Ponderación frecuencial](/phonometry/es/guides/weighting/) |
-| AU | Ponderación para el sonido audible medido en presencia de ultrasonido. | dB | IEC 61012:1990, apartado 2.2 (Tablas 1 y 2) | [Ponderación frecuencial](/phonometry/es/guides/weighting/) |
+| G | Ponderación para infrasonido, definida por sus polos y ceros en el intervalo de 0,25 Hz a 315 Hz. | dB | ISO 7196:1995, Tabla 1 (respuestas nominales en la Tabla 2) | [Ponderaciones especiales](/phonometry/es/guides/special-weightings/) |
+| B | Ponderación histórica para niveles medios, retirada de la norma vigente de sonómetros. | dB | ANSI S1.4-1983, Apéndice C (Fórmula C2) | [Ponderaciones especiales](/phonometry/es/guides/special-weightings/) |
+| D | Ponderación histórica para ruido de aeronaves, derivada de la curva de ruidosidad percibida de 40 noys. | dB | IEC 537:1976 (retirada) | [Ponderaciones especiales](/phonometry/es/guides/special-weightings/) |
+| AU | Ponderación para el sonido audible medido en presencia de ultrasonido. | dB | IEC 61012:1990, apartado 2.2 (Tablas 1 y 2) | [Ponderaciones especiales](/phonometry/es/guides/special-weightings/) |
 | F, S, I | Ponderaciones temporales exponenciales Fast, Slow e Impulse: las balísticas del detector que producen el nivel mostrado. | s (constante de tiempo) | IEC 61672-1:2013 | [Ponderación temporal](/phonometry/es/guides/time-weighting/) |
 
 ## Acústica de salas

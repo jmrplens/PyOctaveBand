@@ -1,0 +1,385 @@
+---
+title: "Galería de arquitecturas de filtro"
+description: "Las cinco arquitecturas de filtro de banda comparadas en los bordes de banda, la galería completa de respuestas para octava y tercio de octava, ejemplos de uso por arquitectura y el crossover Linkwitz-Riley."
+references:
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2014
+    title: "Electroacoustics — Octave-band and fractional-octave-band filters — Part 1: Specifications"
+    designation: "IEC 61260-1:2014"
+    url: "https://webstore.iec.ch/en/publication/5063"
+    note: "Las frecuencias centrales y los bordes de banda en base 10 a los que se diseña cada banco comparado en esta galería, sea cual sea la arquitectura que realice la banda."
+  - type: standard
+    organization: "American National Standards Institute"
+    year: 2004
+    title: "Specification for octave-band and fractional-octave-band analog and digital filters"
+    designation: "ANSI S1.11-2004"
+    publisher: "Acoustical Society of America"
+    url: "https://webstore.ansi.org/standards/asa/ansis1112004"
+    note: "El convenio de bordes de banda sobre el que cada arquitectura de esta galería sitúa sus puntos de −3 dB, que es lo que hace comparables sus niveles de banda."
+  - type: web
+    authors: ["Smith, J. O."]
+    title: "Introduction to digital filters with audio applications"
+    siteName: "Center for Computer Research in Music and Acoustics (CCRMA), Stanford University"
+    url: "https://ccrma.stanford.edu/~jos/filters/"
+    note: "Libro en línea gratuito y complementario sobre diseño y análisis de filtros digitales, que trata las arquitecturas clásicas comparadas en esta galería."
+---
+
+import ThemeImage from '../../../../components/ThemeImage.astro';
+
+Elegir una arquitectura de filtro es un compromiso: la selectividad, el
+rizado de banda de paso y el comportamiento de fase no pueden ser óptimos a
+la vez, y cada una de las cinco arquitecturas que ofrece phonometry
+resuelve el compromiso de forma distinta. Como todas sitúan sus **puntos de
+−3 dB en los bordes de banda de ANSI S1.11**, la elección cambia cómo
+rechaza una banda a sus vecinas y cómo trata los transitorios, no dónde se
+sitúa la banda. Esta página pone las arquitecturas frente a frente: la
+comparación en el cruce a −3 dB, la galería completa de respuestas en
+octava y tercio de octava, ejemplos de uso por arquitectura y el crossover
+Linkwitz-Riley para cuando el objetivo es dividir una señal en lugar de
+medir bandas.
+
+Las matemáticas de diseño de estos bancos (bordes de banda, polos y ceros,
+diezmado multitasa) y la referencia de parámetros viven en
+[Bancos de filtros](/phonometry/es/guides/filter-banks/); demostrar que un
+banco diseñado cumple una clase de prestaciones de IEC 61260-1 es
+[Verificación de clase de filtros](/phonometry/es/guides/filter-compliance/).
+
+## 1. Comparación de filtros y zoom
+
+Usamos secciones de segundo orden (SOS) en todos los filtros para garantizar la
+estabilidad numérica. La siguiente gráfica compara las arquitecturas centrándose
+en el punto de cruce a −3 dB.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_type_comparison_es.svg" alt="Comparación de la respuesta en magnitud de las cinco arquitecturas para la banda de octava de 1 kHz, con zoom en el cruce a -3 dB" width="80%" />
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.signal import sosfreqz
+from phonometry import metrology
+
+fs = 48000
+fig, ax = plt.subplots(figsize=(9, 5))
+for ftype in ("butter", "cheby1", "cheby2", "ellip", "bessel"):
+    # limits selecciona únicamente la banda de octava de 1 kHz
+    bank = metrology.OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200],
+                            filter_type=ftype)
+    idx = int(np.argmin(np.abs(np.array(bank.freq) - 1000)))
+    fsd = fs / bank.factor[idx]           # frecuencia real de la banda
+    w, h = sosfreqz(bank.sos[idx], worN=16384, fs=fsd)
+    ax.semilogx(w, 20 * np.log10(np.abs(h) + 1e-9), label=ftype)
+ax.axhline(-3, color="gray", linestyle=":", label="-3 dB")
+ax.set(xlim=(100, 8000), ylim=(-80, 5),
+       xlabel="Frecuencia [Hz]", ylabel="Magnitud [dB]")
+ax.grid(True, which="both", alpha=0.3)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+| Tipo | Nombre | Ejemplo de uso | Ideal para |
+| :--- | :--- | :--- | :--- |
+| `butter` | **Butterworth** | `octave_filter(x, fs, filter_type='butter')` | Medición acústica general. |
+| `cheby1` | **Chebyshev I** | `octave_filter(x, fs, filter_type='cheby1', ripple=0.1)` | Caída más abrupta a costa de rizado. |
+| `cheby2` | **Chebyshev II** | `octave_filter(x, fs, filter_type='cheby2')` | Banda de paso plana con ceros en la banda atenuada. |
+| `ellip` | **Elíptico** | `octave_filter(x, fs, filter_type='ellip', ripple=0.1)` | Máxima selectividad. |
+| `bessel` | **Bessel** | `octave_filter(x, fs, filter_type='bessel')` | Preservar la forma de los transitorios. |
+
+## 2. Galería de respuestas del banco
+
+Vista espectral completa de los bancos para octava (1/1) y tercio de octava (1/3).
+
+| Arquitectura | Octava 1/1 (fraction=1) | Octava 1/3 (fraction=3) |
+| :--- | :--- | :--- |
+| **Butterworth** | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_1_order_6_es.svg" alt="Respuesta en frecuencia del banco de filtros Butterworth de banda de octava" width="100%" /> | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Butterworth de tercio de octava" width="100%" /> |
+| **Chebyshev I** | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_1_order_6_es.svg" alt="Respuesta en frecuencia del banco Chebyshev I de banda de octava" width="100%" /> | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Chebyshev I de tercio de octava" width="100%" /> |
+| **Chebyshev II** | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_1_order_6_es.svg" alt="Respuesta en frecuencia del banco Chebyshev II de banda de octava" width="100%" /> | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Chebyshev II de tercio de octava" width="100%" /> |
+| **Elíptico** | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_1_order_6_es.svg" alt="Respuesta en frecuencia del banco elíptico de banda de octava" width="100%" /> | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco elíptico de tercio de octava" width="100%" /> |
+| **Bessel** | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_1_order_6_es.svg" alt="Respuesta en frecuencia del banco Bessel de banda de octava" width="100%" /> | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Bessel de tercio de octava" width="100%" /> |
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+from phonometry import metrology
+
+# Una figura por arquitectura y fracción: la galería completa de respuestas
+fs = 48000
+for ftype in ("butter", "cheby1", "cheby2", "ellip", "bessel"):
+    for fraction in (1, 3):
+        # show=True dibuja la respuesta en frecuencia del banco
+        metrology.OctaveFilterBank(fs=fs, fraction=fraction, order=6,
+                                   limits=[12, 20000], filter_type=ftype,
+                                   show=True)
+```
+
+</details>
+
+## 3. Uso y ejemplos por tipo de filtro
+
+### 1. Butterworth (`butter`)
+
+El filtro Butterworth es conocido por su **banda de paso máximamente plana**. Es
+la elección estándar para mediciones acústicas donde no se admite rizado dentro
+de las bandas de frecuencia.
+
+```python
+import numpy as np
+from phonometry import metrology
+
+# Una señal calibrada en Pa para que la guía funcione por sí sola
+fs = 48000
+x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+
+# Medición estándar en tercios de octava
+spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='butter')
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Butterworth de tercio de octava" width="60%" />
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+from phonometry import metrology
+
+# Dibuja la respuesta de este banco (1/3 de octava, orden 6, Butterworth)
+metrology.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
+                           filter_type='butter', show=True)
+```
+
+</details>
+
+### 2. Chebyshev I (`cheby1`)
+
+Los filtros Chebyshev tipo I ofrecen una **caída más abrupta** que Butterworth a
+cambio de rizado en la banda de paso. Útiles cuando se necesita alta selectividad
+cerca de las frecuencias de corte.
+
+```python
+import numpy as np
+from phonometry import metrology
+
+# Una señal calibrada en Pa para que la guía funcione por sí sola
+fs = 48000
+x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+
+# Selectividad con 0.1 dB de rizado en la banda de paso
+spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='cheby1', ripple=0.1)
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Chebyshev I de tercio de octava" width="60%" />
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+from phonometry import metrology
+
+# Dibuja la respuesta de este banco (1/3 de octava, orden 6, Chebyshev I)
+metrology.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
+                           filter_type='cheby1', ripple=0.1, show=True)
+```
+
+</details>
+
+### 3. Chebyshev II (`cheby2`)
+
+También llamado Chebyshev inverso, tiene **banda de paso plana** y rizado en la
+banda atenuada. Ofrece una caída más rápida que Butterworth sin afectar a la
+señal en la banda de paso. Los bordes de la banda atenuada se colocan
+automáticamente para que los puntos de −3 dB caigan en los bordes de banda
+(`attenuation` debe ser > 3,01 dB).
+
+```python
+import numpy as np
+from phonometry import metrology
+
+# Una señal calibrada en Pa para que la guía funcione por sí sola
+fs = 48000
+x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+
+# Banda de paso plana, 72 dB de atenuación por defecto (clase 1)
+spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='cheby2')
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Chebyshev II de tercio de octava" width="60%" />
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+from phonometry import metrology
+
+# Dibuja la respuesta de este banco (1/3 de octava, orden 6, Chebyshev II)
+metrology.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
+                           filter_type='cheby2', show=True)
+```
+
+</details>
+
+### 4. Elíptico (`ellip`)
+
+Los filtros elípticos (Cauer) tienen la **transición más corta** (caída más
+abrupta) para un orden dado. Presentan rizado tanto en la banda de paso como en
+la atenuada.
+
+```python
+import numpy as np
+from phonometry import metrology
+
+# Una señal calibrada en Pa para que la guía funcione por sí sola
+fs = 48000
+x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+
+# Máxima selectividad para aislamiento extremo entre bandas
+spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='ellip', ripple=0.1)
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco elíptico de tercio de octava" width="60%" />
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+from phonometry import metrology
+
+# Dibuja la respuesta de este banco (1/3 de octava, orden 6, elíptico)
+metrology.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
+                           filter_type='ellip', ripple=0.1, show=True)
+```
+
+</details>
+
+### 5. Bessel (`bessel`)
+
+Los filtros Bessel están optimizados para una **respuesta de fase lineal** y un
+retardo de grupo mínimo. Preservan la forma de las ondas filtradas (transitorios)
+mejor que ningún otro tipo, pero tienen la caída más lenta.
+
+```python
+import numpy as np
+from phonometry import metrology
+
+# Una señal calibrada en Pa para que la guía funcione por sí sola
+fs = 48000
+x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+
+# Ideal para análisis de pulsos y preservación de transitorios
+spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='bessel')
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Bessel de tercio de octava" width="60%" />
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+from phonometry import metrology
+
+# Dibuja la respuesta de este banco (1/3 de octava, orden 6, Bessel)
+metrology.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
+                           filter_type='bessel', show=True)
+```
+
+</details>
+
+### 6. Linkwitz-Riley (`linkwitz_riley`)
+
+Diseñado específicamente para **crossovers de audio**. Los filtros Linkwitz-Riley
+(típicamente de 4.º orden, aunque se admite cualquier orden par) permiten dividir
+una señal en bandas que, al sumarse, producen una respuesta en magnitud
+perfectamente plana y sin diferencia de fase entre bandas en el cruce.
+
+```python
+import numpy as np
+from phonometry import metrology
+
+# recording: una captura calibrada en Pa para que la guía funcione por sí sola
+fs = 48000
+recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+
+# Dividir la grabación en bandas grave y aguda a 1000 Hz
+low, high = metrology.linkwitz_riley(recording, fs, freq=1000, order=4)
+# Recombinada, low + high tiene una respuesta plana en magnitud (suma paso todo)
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/crossover_lr4_es.svg" alt="Crossover Linkwitz-Riley de 4.º orden: paso-bajo, paso-alto y su suma plana" width="60%" />
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.signal import freqz
+from phonometry import metrology
+
+# Medimos ambas ramas: dividimos un impulso unitario y tomamos los espectros.
+fs = 48000
+impulse = np.zeros(fs)
+impulse[0] = 1.0
+low, high = metrology.linkwitz_riley(impulse, fs, freq=1000, order=4)
+
+w, h_lp = freqz(low, worN=8192, fs=fs)
+_, h_hp = freqz(high, worN=8192, fs=fs)
+
+fig, ax = plt.subplots(figsize=(9, 5))
+ax.semilogx(w, 20 * np.log10(np.abs(h_lp) + 1e-9), label="Paso-bajo (LR4)")
+ax.semilogx(w, 20 * np.log10(np.abs(h_hp) + 1e-9), label="Paso-alto (LR4)")
+ax.semilogx(w, 20 * np.log10(np.abs(h_lp + h_hp) + 1e-9), "--",
+            label="Suma (plana)")
+ax.set(xlim=(20, 20000), ylim=(-60, 5),
+       xlabel="Frecuencia [Hz]", ylabel="Magnitud [dB]")
+ax.grid(True, which="both", alpha=0.3)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+## Qué cubre esta guía
+
+**Cubierto.** Las cinco arquitecturas sobre las que puede construirse
+cualquier banco de bandas IEC (Butterworth, Chebyshev I/II, elíptico,
+Bessel): sus respuestas en magnitud comparadas en el cruce a −3 dB y en la
+galería completa de octava y tercio de octava, el convenio de bordes de
+banda a −3 dB de ANSI S1.11 que todas comparten, y un ejemplo de uso por
+arquitectura, más el crossover Linkwitz-Riley cuyas bandas grave y aguda
+suman una respuesta plana.
+
+**No cubierto.** Las matemáticas de banda, el diseño de polos y ceros,
+estabilidad y multitasa y la referencia de parámetros de `octave_filter()`
+/ `OctaveFilterBank` permanecen en
+[Bancos de filtros](/phonometry/es/guides/filter-banks/). Las máscaras de
+aceptación de clase de la Tabla 1 de IEC 61260-1, que deciden la clase que
+alcanza realmente cada una de estas arquitecturas, son
+[Verificación de clase de filtros](/phonometry/es/guides/filter-compliance/).
+
+## Véase también
+
+- [Bancos de filtros](/phonometry/es/guides/filter-banks/): las matemáticas
+  de banda, la maquinaria de diseño y la referencia de parámetros detrás de
+  cada banco mostrado aquí.
+- [Verificación de clase de filtros (IEC 61260-1)](/phonometry/es/guides/filter-compliance/):
+  la máscara de aceptación de la Tabla 1, la clase 0 y la ficha de
+  conformidad de estas arquitecturas.
+- Referencia de la API: [`phonometry`](/phonometry/es/reference/api/filters/phonometry/) y [`metrology.core`](/phonometry/es/reference/api/filters/core/).
+
+## Respuestas rápidas
+
+### ¿Qué arquitectura de filtro debería elegir?
+
+Butterworth es la elección estándar para medición acústica general: banda
+de paso máximamente plana y sin rizado. Chebyshev I da una caída más
+abrupta a costa de rizado en la banda de paso; Chebyshev II mantiene la
+banda de paso plana y traslada el rizado a la banda atenuada; el elíptico
+ofrece la máxima selectividad, con rizado en ambas bandas; y Bessel
+preserva la forma de los transitorios gracias a su respuesta de fase
+lineal, pero tiene la caída más lenta. Linkwitz-Riley es para crossovers de
+audio: sus bandas suman una respuesta perfectamente plana.

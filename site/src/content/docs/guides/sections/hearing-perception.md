@@ -28,9 +28,11 @@ metrics in this section reuse or extend.
 
 The perceptual sensations of sound: loudness and the metrics layered on it.
 
-- [Loudness](/phonometry/guides/loudness/): Zwicker (ISO 532-1),
-  Moore-Glasberg (ISO 532-2/3) and Sottek (ECMA-418-2) loudness in sones,
-  plus the ISO 226:2023 equal-loudness contours.
+- [Loudness](/phonometry/guides/loudness/): the ISO 532-1 Zwicker loudness in
+  sones, plus the ISO 226:2023 equal-loudness contours.
+- [Advanced Loudness (ISO 532-2/-3, ECMA-418-2)](/phonometry/guides/advanced-loudness/):
+  the Moore-Glasberg stationary and time-varying methods and the Sottek
+  Hearing Model loudness, with the model-choice table.
 - [Sound Quality Metrics](/phonometry/guides/sound-quality/): sharpness
   (DIN 45692) and the ECMA-418-2 Sottek Hearing Model tonality, roughness
   and fluctuation strength.

@@ -7,15 +7,19 @@ Full documentation for phonometry. Also available as a website:
 
 - [Getting Started](getting-started.md): installation and first analysis
 - [Build a sound level meter](sound-level-meter.md): an end-to-end walk-through that composes the core API into a working meter: calibrate against an IEC 60942 tone, apply the IEC 61672-1 frequency and time weightings, integrate into Leq, SEL and percentile levels, split into IEC 61260-1 octave bands, and verify the class of every stage
-- [Filter Banks](filter-banks.md): architectures, responses, band decomposition
+- [Filter Banks](filter-banks.md): band mathematics, bank parameters, parametric EQ, band decomposition and zero-phase filtering
+- [Filter architecture gallery](filter-gallery.md): the five filter architectures compared at the band edges, the full response gallery for 1/1 and 1/3 octave, per-architecture usage and the Linkwitz-Riley crossover
 - [Filter class verification](filter-compliance.md): the IEC 61260-1:2014 Table 1 acceptance mask band by band, the class 0 of the withdrawn IEC 61260:1995 / ANSI S1.11-2004 edition, what a performance class buys in a measurement, and the one-page compliance fiche
 - [Block Processing](block-processing.md): stateful real-time workflows
 - [Multichannel](multichannel.md): vectorized multichannel analysis
 - [Calibration and dBFS](calibration.md): physical SPL and digital analysis
-- [Integrated & Statistical Levels](levels.md): Leq, LAeq, L10/L50/L90, LCpeak/SEL, noise dose (IEC 61252), Lden and rating levels (ISO 1996-1), octave spectrogram
+- [Integrated & Statistical Levels](levels.md): Leq, LAeq, L10/L50/L90, LCpeak/SEL, noise dose (IEC 61252), octave spectrogram
+- [Environmental levels](environmental-levels.md): Lden, Ldn and the composite rating levels of ISO 1996-1, with the ISO 1996-2 tonal adjustment, residual-noise correction and measurement uncertainty budget
 - [Frequency Weighting](weighting.md): A, C, Z curves
+- [Special weightings](special-weightings.md): the ISO 7196 G-weighting for infrasound, the historical B (ANSI S1.4-1983) and D (IEC 537) curves, and AU (IEC 61012) for audible sound in the presence of ultrasound
 - [Time Weighting](time-weighting.md): Fast, Slow, Impulse ballistics
-- [Loudness](loudness.md): Zwicker (ISO 532-1), Moore-Glasberg (ISO 532-2/3) and Sottek (ECMA-418-2) loudness in sones, plus the equal-loudness contours (ISO 226)
+- [Loudness](loudness.md): the ISO 532-1 Zwicker loudness in sones with its one-page fiche, plus the equal-loudness contours (ISO 226)
+- [Advanced loudness](advanced-loudness.md): the Moore-Glasberg stationary (ISO 532-2) and time-varying (ISO 532-3) methods and the Sottek Hearing Model loudness (ECMA-418-2), with the model-choice table
 - [Sound Quality Metrics](sound-quality.md): sharpness (DIN 45692) and the ECMA-418-2 Sottek Hearing Model tonality, roughness and fluctuation strength
 - [Prominent discrete tones](tone-prominence.md): the ECMA-418-1 tone-to-noise and prominence ratios that decide whether a discrete tone is prominent and justify tonal rating adjustments
 - [Tonal audibility of tones in noise](tone-audibility.md): the ISO/PAS 20065 engineering method for the audibility ΔL of a tone above the masking threshold: the critical band about the tone, the critical-band masking level, the masking index, and the decisive and mean audibility

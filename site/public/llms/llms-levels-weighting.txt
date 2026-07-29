@@ -7,16 +7,21 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 <!-- source: docs/weighting.md | canonical: https://jmrplens.github.io/phonometry/guides/weighting/ -->
 Source: https://jmrplens.github.io/phonometry/guides/weighting/
 
-# Frequency Weighting (A, B, C, D, G, AU, Z)
+# Frequency Weighting (A, C, Z)
 
-Frequency weighting curves simulate the human ear's sensitivity. A, C and Z
-are specified by **IEC 61672-1:2013**; the infrasound G curve is specified by
-**ISO 7196:1995**. Three more curves round out the family: the historical
-**B** (ANSI S1.4-1983), the withdrawn aircraft-noise **D** (IEC 537) and
-**AU** (IEC 61012) for audible sound in the presence of ultrasound
-(section 4).
+Frequency weighting curves simulate the human ear's sensitivity. This guide
+covers **A**, **C** and **Z**, the curves specified by **IEC 61672-1:2013**:
+where they come from, how to apply them, the `high_accuracy` design and the
+Table 3 class verification. The rest of the family, the infrasound G curve,
+the historical B and D and the AU curve, is
+[Special Weightings](https://jmrplens.github.io/phonometry/guides/special-weightings/).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses.svg" alt="A, B, C, D, AU and Z frequency weighting curves with a zoom showing the positive region of the A curve (+1.27 dB at 2.5 kHz)" width="80%"></picture>
+
+*The audible-range weighting family measured on one chart. This guide covers
+the A, C and Z responses; the B, D and AU curves drawn alongside them, and
+the infrasound G curve, are the subject of
+[Special Weightings](https://jmrplens.github.io/phonometry/guides/special-weightings/).*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -50,10 +55,10 @@ plt.show()
 * **A-Weighting (`A`):** Standard for environmental noise (IEC 61672-1).
 * **C-Weighting (`C`):** Used for peak sound pressure and high-level noise.
 * **Z-Weighting (`Z`):** Zero weighting, completely flat response.
-* **G-Weighting (`G`):** Infrasound weighting per ISO 7196 (see below).
-* **B-Weighting (`B`):** Historical middle curve of ANSI S1.4-1983 (section 4).
-* **D-Weighting (`D`):** Aircraft-noise weighting of the withdrawn IEC 537 (section 4).
-* **AU-Weighting (`AU`):** A-weighting with the IEC 61012 ultrasound cutoff (section 4).
+* **G-Weighting (`G`):** Infrasound weighting per ISO 7196 ([Special Weightings](https://jmrplens.github.io/phonometry/guides/special-weightings/)).
+* **B-Weighting (`B`):** Historical middle curve of ANSI S1.4-1983 ([Special Weightings](https://jmrplens.github.io/phonometry/guides/special-weightings/)).
+* **D-Weighting (`D`):** Aircraft-noise weighting of the withdrawn IEC 537 ([Special Weightings](https://jmrplens.github.io/phonometry/guides/special-weightings/)).
+* **AU-Weighting (`AU`):** A-weighting with the IEC 61012 ultrasound cutoff ([Special Weightings](https://jmrplens.github.io/phonometry/guides/special-weightings/)).
 
 ## 1. Where the curves come from
 
@@ -92,7 +97,8 @@ elaborate metrics. IEC 61672-1 (first edition 2002) finished the cleanup:
 B was dropped, A and C were kept with tightened tolerances, and **Z** was
 introduced to replace the vaguely specified "linear" of older meters, which
 varied by manufacturer. The B curve (and the aircraft-noise D curve that met
-the same fate) remains available for historical data; see section 4.
+the same fate) remains available for historical data; see
+[Special Weightings](https://jmrplens.github.io/phonometry/guides/special-weightings/).
 
 ### When C − A matters
 
@@ -144,162 +150,23 @@ weighted_signal = metrology.weighting_filter(recording, fs, curve='A')
 c_weighted_signal = metrology.weighting_filter(recording, fs, curve='C')
 ```
 
-## 3. Infrasound: G-weighting (ISO 7196)
+The rest of the family has its own guide:
+[Special Weightings](https://jmrplens.github.io/phonometry/guides/special-weightings/): the infrasound G curve of
+ISO 7196, the historical B and D, and AU for audible sound in the
+presence of ultrasound.
 
-The **G frequency weighting** (ISO 7196:1995) rates infrasound the way A-weighting
-rates audible noise. It is defined by a pole-zero configuration with 0 dB gain at
-10 Hz, rises at 12 dB/octave from 1 Hz to 20 Hz (matching the steep growth of
-perception in that band) and falls off at 24 dB/octave outside it. Use it for
-sources with significant energy below 20 Hz (wind turbines, HVAC, blasting):
-
-```python
-import numpy as np
-from phonometry import metrology
-
-# recording: a calibrated microphone capture (Pa) — recorded through your measurement chain. Synthesized here so the guide runs standalone.
-fs = 48000
-recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
-
-g_weighted = metrology.weighting_filter(recording, fs, curve='G')
-```
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/g_weighting_response_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/g_weighting_response.svg" alt="G-weighting frequency response from 0.1 Hz to 1 kHz with the ISO 7196 Table 2 nominal values overlaid" width="80%"></picture>
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import metrology
-
-# Measure the G response: weight a centered unit impulse and take its
-# spectrum. A long buffer gives the resolution the infrasound range
-# needs (20 s -> 0.05 Hz).
-fs = 4000
-impulse = np.zeros(20 * fs)
-impulse[impulse.size // 2] = 1.0
-freqs = np.fft.rfftfreq(impulse.size, 1 / fs)
-spectrum = np.fft.rfft(metrology.weighting_filter(impulse, fs, curve="G"))
-
-fig, ax = plt.subplots(figsize=(9, 5))
-ax.semilogx(freqs[1:],
-            20 * np.log10(np.abs(spectrum[1:]) + np.finfo(float).eps))
-ax.plot(10, 0, "o", color="tab:red", label="0 dB at 10 Hz")
-ax.set(xlim=(0.1, 1000), ylim=(-90, 15),
-       xlabel="Frequency [Hz]", ylabel="G-weighting response [dB]")
-ax.grid(True, which="both", alpha=0.3)
-ax.legend()
-plt.show()
-```
-
-</details>
-
-The implementation follows the ISO 7196 Table 1 pole/zero values exactly and is
-verified in CI against every Table 2 nominal response value (0.25 Hz to 315 Hz).
-`WeightingFilter(fs, "G")` supports the same multichannel and stateful block
-processing as A/C. Levels measured with the G curve are reported as
-L<sub>pG</sub> (or L<sub>Geq</sub> for the equivalent level over time).
-
-## 4. Historical and special-purpose curves: B, D and AU
-
-Three more curves complete the family. All three share the machinery of the
-IEC 61672-1 curves (0 dB at 1 kHz, `high_accuracy` oversampling, multichannel
-and stateful block processing).
-
-### B (ANSI S1.4-1983, historical)
-
-The middle curve of the original A/B/C level-switching scheme, drawn from
-the ~70-phon equal-loudness contour. Analytically it is the C weighting with
-one more zero at the origin and one extra real pole at
-$f_5 = 158.49\ \text{Hz}$ (Appendix C of ANSI S1.4-1983), so it discards
-less bass than A and more than C. It was dropped when IEC 61672-1 replaced
-the older sound-level-meter standards; use it only to reproduce historical
-data and measurements taken under older national codes (some legacy
-automotive test procedures reported dB(B)). The implementation follows the
-ANSI S1.4-1983 Appendix C constants and is pinned in CI against the Table IV
-response values, within the strictest Table V mask (Type 0).
-
-### D (IEC 537, withdrawn: aircraft noise)
-
-The D weighting approximated the *perceived noisiness* contours used by the
-perceived-noise-level (PNL) rating, so a plain sound level meter could
-estimate aircraft noise: the +11.5 dB hump around 3.15 kHz is where jet
-turbomachinery whine annoys most (it is deliberately *not* an equal-loudness
-feature). NASA's aircraft-noise handbook gives the classic rule of thumb
-$L_{PN} \approx L_D + 7\ \text{dB}$. IEC 537 was withdrawn and current
-certification practice reports EPNL from one-third-octave analysis or plain
-A-weighted levels, so `D` is provided for historical data and comparisons.
-With the standard unavailable, the implementation uses the widely published
-IEC 537 rational transfer function and is cross-checked against two
-independent implementations (SQAT's zeros/poles and librosa's closed form,
-which agree within 0.002 dB) and pinned in CI against the IEC 537 table
-republished in NASA CR-3406.
-
-```python
-import numpy as np
-from phonometry import metrology
-
-# A 3.15 kHz whine sits right on the D-weighting hump: D rates it
-# 10 dB *louder* than A does.
-fs = 96000
-t = np.arange(fs) / fs
-whine = 0.1 * np.sin(2 * np.pi * 3150 * t)
-
-ld = metrology.leq(metrology.weighting_filter(whine, fs, curve="D"))
-la = metrology.leq(metrology.weighting_filter(whine, fs, curve="A"))
-print(f"LD = {ld:.1f} dB   LA = {la:.1f} dB")
-# LD = 82.5 dB   LA = 72.2 dB
-```
-
-### AU (IEC 61012, current: audible sound in the presence of ultrasound)
-
-The only one of the three still in force. `AU` is the A weighting cascaded
-with the **U** low-pass filter of IEC 61012:1990 (six poles, Table 2): flat
-relative to A up to 10 kHz, then a steep cutoff (-13 dB at 16 kHz, -61.8 dB
-at 40 kHz for U alone). Use it when strong ultrasonic components (ultrasonic
-cleaners and welders, rodent repellers, some public-space deterrents) would
-otherwise leak into an A-weighted reading through the meter's imperfect
-high-frequency roll-off and overstate the *audible* exposure:
-
-```python
-import numpy as np
-from phonometry import metrology
-
-# 1 kHz tone (audible) buried under a strong 25 kHz ultrasonic component.
-fs = 96000
-t = np.arange(fs) / fs
-audible = 0.1 * np.sin(2 * np.pi * 1000 * t)
-x = audible + 1.0 * np.sin(2 * np.pi * 25000 * t)
-
-la = metrology.leq(metrology.weighting_filter(x, fs, curve="A"))
-lau = metrology.leq(metrology.weighting_filter(x, fs, curve="AU"))
-la_ref = metrology.leq(metrology.weighting_filter(audible, fs, curve="A"))
-print(f"LA = {la:.1f} dB   LAU = {lau:.1f} dB   audible alone = {la_ref:.1f} dB")
-# LA = 78.6 dB   LAU = 71.0 dB   audible alone = 71.0 dB
-# The ultrasound inflates LA by 7.6 dB; AU recovers the audible level.
-```
-
-Ultrasound only reaches a digital filter when the sample rate captures it,
-so measure at 96 kHz or more (at 48 kHz there is nothing above 24 kHz to
-reject); the AU design internally oversamples toward 288 kHz to keep the
-steep U roll-off accurate. Levels are reported as L<sub>AU</sub>. The
-implementation follows the Table 2 pole locations exactly (they reproduce
-every Table 1 nominal value within 0.05 dB) and is verified in CI against
-the Table 1 tolerances up to 40 kHz.
-
-## 5. `weighting_filter()` / `WeightingFilter` parameters
+## 3. `weighting_filter()` / `WeightingFilter` parameters
 
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | 1D or 2D array | any | non-empty | 2D is `[channels, samples]` |
 | `fs` | int | Hz | > 0 | |
-| `curve` | str | — | `'A'` (default), `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'` | `'G'` per ISO 7196 (infrasound); `'B'`/`'D'` historical (§4); `'AU'` per IEC 61012 (§4); `'Z'` is a bypass |
-| `high_accuracy` | bool | — | default `True` (function); class default `None` resolves to `not stateful` | Internal oversampling keeps A/C in class 1 up to 16 kHz; details in §7 |
+| `curve` | str | — | `'A'` (default), `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'` | `'G'` per ISO 7196 (infrasound), `'B'`/`'D'` historical and `'AU'` per IEC 61012 are covered in [Special Weightings](https://jmrplens.github.io/phonometry/guides/special-weightings/); `'Z'` is a bypass |
+| `high_accuracy` | bool | — | default `True` (function); class default `None` resolves to `not stateful` | Internal oversampling keeps A/C in class 1 up to 16 kHz; details in §5 |
 | `stateful` | bool (class only) | — | default `False` | Carries filter state across blocks (streaming) |
 | `steady_ic` | bool (class only) | — | default `False` | Steady-state initial conditions (no onset transient) |
 
-## 6. Reusable filter object
+## 4. Reusable filter object
 
 If you weight many signals with the same parameters, design the filter once:
 
@@ -317,7 +184,7 @@ for recording in signals:
     weighted = wf.filter(recording)
 ```
 
-## 7. High-frequency accuracy (`high_accuracy`)
+## 5. High-frequency accuracy (`high_accuracy`)
 
 A plain bilinear-transform design compresses the response near Nyquist: at
 fs = 48 kHz the A-curve error at 12.5 kHz reaches −2.7 dB, outside the IEC
@@ -403,7 +270,7 @@ for block in blocks:
 See [Block Processing](https://jmrplens.github.io/phonometry/guides/block-processing/) for the streaming workflow and
 [Theory](https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/) for the analytic curve definitions.
 
-## 8. Verifying against the tolerance tables (IEC 61672-1, ANSI S1.4, IEC 61012)
+## 6. Verifying against the tolerance tables (IEC 61672-1)
 
 `verify_weighting_class` checks a weighting filter against the acceptance
 limits of **IEC 61672-1:2013** (Table 3). It evaluates the filter's relative
@@ -434,19 +301,6 @@ The Table 3 acceptance mask itself is public too: `weighting_class_limits(1)`
 returns the 34 nominal frequencies with the lower/upper deviation limits (a
 lower limit of `-inf` means only the upper limit applies). The limits qualify
 the *deviation* from the design goal, so they are the same for A, C and Z.
-
-The same verifier covers the section 4 curves that have published tolerance
-tables. For `B` it uses ANSI S1.4-1983 (Table IV design goals, Table V
-limits) and the "class" verdicts read as the standard's instrument **Types**
-1 and 2. For `AU` it uses IEC 61012:1990 Table 1 (nominal A + nominal U with
-the separate-unit tolerances, zero at the 1 kHz reference); IEC 61012
-publishes a single tolerance set, so both margin slots agree and the verdict
-is simply complies (1) or not (`None`) — note that checking the rows above
-20 kHz needs `fs` ≥ 96 kHz (below that they are dropped and the verdict is
-`range_limited`). `G` and `D` are rejected: ISO 7196 defines one ±1 dB
-tolerance with no class structure, and the withdrawn IEC 537 left no
-tolerance table behind (both curves are pinned numerically in the CI
-conformance report instead).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_class_mask_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_class_mask.svg" alt="A and C weighting deviations at 48 kHz threading within the IEC 61672-1 Table 3 class 1 acceptance corridor, with the wider class 2 limits dotted" width="80%"></picture>
 
@@ -495,10 +349,6 @@ plt.show()
 
 Use C-weighting for peak sound pressure and high-level noise, and use the difference $L_{Ceq} - L_{Aeq}$ as a low-frequency indicator: below about 10 dB the A-weighted level rates the spectrum fairly, while around 15 to 20 dB or more the energy is concentrated at low frequencies and the A-weighted level understates the problem. The HML method of ISO 4869-2 keys on exactly this C minus A difference for hearing-protector selection.
 
-### Which weighting should I use for infrasound below 20 Hz?
-
-Use the G frequency weighting of ISO 7196:1995, which rates infrasound the way A-weighting rates audible noise. It has 0 dB gain at 10 Hz, rises at 12 dB/octave from 1 Hz to 20 Hz and falls off at 24 dB/octave outside that band. Apply it to sources such as wind turbines, HVAC and blasting, and report levels as $L_{pG}$ (or $L_{Geq}$ for the equivalent level over time).
-
 ### Is A-weighting accurate near 16 kHz at a 48 kHz sample rate?
 
 Not with a plain bilinear design: at fs = 48 kHz the A-curve error reaches −2.7 dB at 12.5 kHz, outside the IEC 61672-1 class 1 tolerance (+2.0/−2.5 dB). The default `high_accuracy=True` oversamples internally (up to 8×, reaching 144 kHz or more at common audio rates) and keeps the response within class 1 tolerances up to 16 kHz, with an error of about −0.5 dB at 12.5 kHz.
@@ -519,25 +369,7 @@ Not with a plain bilinear design: at fs = 48 kHz the A-curve error reaches −2.
   Sound level meters — Part 1: Specifications* (IEC 61672-1:2013).
   [IEC webstore](https://webstore.iec.ch/en/publication/5708).
   The normative A/C/Z definitions, the analytic Annex E curves and the
-  Table 3 acceptance limits verified in section 8.
-- American National Standards Institute. (1983). *Specification for Sound
-  Level Meters* (ANSI S1.4-1983). The historical B weighting: Appendix C
-  analytic definition (Formula C2), Table IV design goals and Table V
-  tolerance limits checked by `verify_weighting_class` in section 8.
-- International Electrotechnical Commission. (1990). *Filters for the
-  measurement of audible sound in the presence of ultrasound*
-  (IEC 61012:1990). [IEC webstore](https://webstore.iec.ch/en/publication/4383).
-  The AU weighting: U-weighting pole locations (Table 2), nominal responses
-  and tolerances (Table 1) and the combined AU definition of subclause 2.2.
-- International Electrotechnical Commission. (1976). *Frequency weighting
-  for the measurement of aircraft noise (D-weighting)* (IEC 537:1976,
-  withdrawn). Implemented from its published rational transfer function and
-  cross-checked against independent implementations (section 4).
-- Bennett, R. L., & Pearsons, K. S. (1981). *Handbook of Aircraft Noise
-  Metrics* (NASA CR-3406). NASA.
-  [ntrs.nasa.gov](https://ntrs.nasa.gov/citations/19810013341).
-  Republishes the IEC 537 D-weighting table (Table SLD-I) used to pin the
-  D response in CI.
+  Table 3 acceptance limits verified in section 6.
 
 ## Standards
 
@@ -546,7 +378,234 @@ Part 1: Specifications*: the A, C and Z frequency-weighting curves (the
 Annex E analytic definition from four corner frequencies, normalized to 0 dB
 at 1 kHz), the class 1 tolerances the `high_accuracy` design keeps up to
 16 kHz, and the Table 3 class 1/class 2 acceptance limits checked by
-`verify_weighting_class`. ISO 7196:1995, *Acoustics — Frequency-weighting characteristic for
+`verify_weighting_class`; the special G, B, D and AU curves are covered in
+[Special Weightings](https://jmrplens.github.io/phonometry/guides/special-weightings/).
+
+---
+
+
+<!-- source: docs/special-weightings.md | canonical: https://jmrplens.github.io/phonometry/guides/special-weightings/ -->
+Source: https://jmrplens.github.io/phonometry/guides/special-weightings/
+
+# Special Weightings (G, B, D, AU)
+
+Beyond A, C and Z, the weighting family keeps four special-purpose curves,
+each the right tool for a narrower job: the **G** curve of **ISO 7196:1995**
+rates infrasound below 20 Hz the way A-weighting rates audible noise, the
+historical **B** (ANSI S1.4-1983) reproduces measurements taken under older
+national codes, the withdrawn aircraft-noise **D** (IEC 537) serves
+comparisons with legacy data, and **AU** (IEC 61012), still in force like the
+G curve, keeps ultrasonic components out of an audible-exposure reading.
+
+All four share the machinery of the IEC 61672-1 curves (0 dB at 1 kHz where
+applicable, multichannel and stateful block processing), and B, D and AU also
+take the `high_accuracy` oversampling; G ignores that flag, because its
+0.25 Hz to 315 Hz range is already exact with the plain design, and, as with
+A/C/Z, `high_accuracy` cannot be combined with stateful processing. The A, C and Z curves themselves, where they come from, the
+`high_accuracy` design and the class verification against IEC 61672-1
+Table 3 are the subject of [Frequency Weighting](https://jmrplens.github.io/phonometry/guides/weighting/).
+
+## 1. Infrasound: G-weighting (ISO 7196)
+
+The **G frequency weighting** (ISO 7196:1995) rates infrasound the way A-weighting
+rates audible noise. It is defined by a pole-zero configuration with 0 dB gain at
+10 Hz, rises at 12 dB/octave from 1 Hz to 20 Hz (matching the steep growth of
+perception in that band) and falls off at 24 dB/octave outside it. Use it for
+sources with significant energy below 20 Hz (wind turbines, HVAC, blasting):
+
+```python
+import numpy as np
+from phonometry import metrology
+
+# recording: a calibrated microphone capture (Pa) — recorded through your measurement chain. Synthesized here so the guide runs standalone.
+fs = 48000
+recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+
+g_weighted = metrology.weighting_filter(recording, fs, curve='G')
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/g_weighting_response_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/g_weighting_response.svg" alt="G-weighting frequency response from 0.1 Hz to 1 kHz with the ISO 7196 Table 2 nominal values overlaid" width="80%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import metrology
+
+# Measure the G response: weight a centered unit impulse and take its
+# spectrum. A long buffer gives the resolution the infrasound range
+# needs (20 s -> 0.05 Hz).
+fs = 4000
+impulse = np.zeros(20 * fs)
+impulse[impulse.size // 2] = 1.0
+freqs = np.fft.rfftfreq(impulse.size, 1 / fs)
+spectrum = np.fft.rfft(metrology.weighting_filter(impulse, fs, curve="G"))
+
+fig, ax = plt.subplots(figsize=(9, 5))
+ax.semilogx(freqs[1:],
+            20 * np.log10(np.abs(spectrum[1:]) + np.finfo(float).eps))
+ax.plot(10, 0, "o", color="tab:red", label="0 dB at 10 Hz")
+ax.set(xlim=(0.1, 1000), ylim=(-90, 15),
+       xlabel="Frequency [Hz]", ylabel="G-weighting response [dB]")
+ax.grid(True, which="both", alpha=0.3)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+The implementation follows the ISO 7196 Table 1 pole/zero values exactly and is
+verified in CI against every Table 2 nominal response value (0.25 Hz to 315 Hz).
+`WeightingFilter(fs, "G")` supports the same multichannel and stateful block
+processing as A/C. Levels measured with the G curve are reported as
+L<sub>pG</sub> (or L<sub>Geq</sub> for the equivalent level over time).
+
+## 2. Historical and special-purpose curves: B, D and AU
+
+Three more curves complete the family.
+
+### B (ANSI S1.4-1983, historical)
+
+The middle curve of the original A/B/C level-switching scheme, drawn from
+the ~70-phon equal-loudness contour. Analytically it is the C weighting with
+one more zero at the origin and one extra real pole at
+$f_5 = 158.49\ \text{Hz}$ (Appendix C of ANSI S1.4-1983), so it discards
+less bass than A and more than C. It was dropped when IEC 61672-1 replaced
+the older sound-level-meter standards; use it only to reproduce historical
+data and measurements taken under older national codes (some legacy
+automotive test procedures reported dB(B)). The implementation follows the
+ANSI S1.4-1983 Appendix C constants and is pinned in CI against the Table IV
+response values, within the strictest Table V mask (Type 0).
+
+### D (IEC 537, withdrawn: aircraft noise)
+
+The D weighting approximated the *perceived noisiness* contours used by the
+perceived-noise-level (PNL) rating, so a plain sound level meter could
+estimate aircraft noise: the +11.5 dB hump around 3.15 kHz is where jet
+turbomachinery whine annoys most (it is deliberately *not* an equal-loudness
+feature). NASA's aircraft-noise handbook gives the classic rule of thumb
+$L_{PN} \approx L_D + 7\ \text{dB}$. IEC 537 was withdrawn and current
+certification practice reports EPNL from one-third-octave analysis or plain
+A-weighted levels, so `D` is provided for historical data and comparisons.
+With the standard unavailable, the implementation uses the widely published
+IEC 537 rational transfer function and is cross-checked against two
+independent implementations (SQAT's zeros/poles and librosa's closed form,
+which agree within 0.002 dB) and pinned in CI against the IEC 537 table
+republished in NASA CR-3406.
+
+```python
+import numpy as np
+from phonometry import metrology
+
+# A 3.15 kHz whine sits right on the D-weighting hump: D rates it
+# 10 dB *louder* than A does.
+fs = 96000
+t = np.arange(fs) / fs
+whine = 0.1 * np.sin(2 * np.pi * 3150 * t)
+
+ld = metrology.leq(metrology.weighting_filter(whine, fs, curve="D"))
+la = metrology.leq(metrology.weighting_filter(whine, fs, curve="A"))
+print(f"LD = {ld:.1f} dB   LA = {la:.1f} dB")
+# LD = 82.5 dB   LA = 72.2 dB
+```
+
+### AU (IEC 61012, current: audible sound in the presence of ultrasound)
+
+The only one of the three still in force. `AU` is the A weighting cascaded
+with the **U** low-pass filter of IEC 61012:1990 (six poles, Table 2): flat
+relative to A up to 10 kHz, then a steep cutoff (-13 dB at 16 kHz, -61.8 dB
+at 40 kHz for U alone). Use it when strong ultrasonic components (ultrasonic
+cleaners and welders, rodent repellers, some public-space deterrents) would
+otherwise leak into an A-weighted reading through the meter's imperfect
+high-frequency roll-off and overstate the *audible* exposure:
+
+```python
+import numpy as np
+from phonometry import metrology
+
+# 1 kHz tone (audible) buried under a strong 25 kHz ultrasonic component.
+fs = 96000
+t = np.arange(fs) / fs
+audible = 0.1 * np.sin(2 * np.pi * 1000 * t)
+x = audible + 1.0 * np.sin(2 * np.pi * 25000 * t)
+
+la = metrology.leq(metrology.weighting_filter(x, fs, curve="A"))
+lau = metrology.leq(metrology.weighting_filter(x, fs, curve="AU"))
+la_ref = metrology.leq(metrology.weighting_filter(audible, fs, curve="A"))
+print(f"LA = {la:.1f} dB   LAU = {lau:.1f} dB   audible alone = {la_ref:.1f} dB")
+# LA = 78.6 dB   LAU = 71.0 dB   audible alone = 71.0 dB
+# The ultrasound inflates LA by 7.6 dB; AU recovers the audible level.
+```
+
+Ultrasound only reaches a digital filter when the sample rate captures it,
+so measure at 96 kHz or more (at 48 kHz there is nothing above 24 kHz to
+reject); the AU design internally oversamples toward 288 kHz to keep the
+steep U roll-off accurate. Levels are reported as L<sub>AU</sub>. The
+implementation follows the Table 2 pole locations exactly (they reproduce
+every Table 1 nominal value within 0.05 dB) and is verified in CI against
+the Table 1 tolerances up to 40 kHz.
+
+## 3. Verifying B and AU against their tolerance tables
+
+The `verify_weighting_class` verifier, described in section 6 of
+[Frequency Weighting](https://jmrplens.github.io/phonometry/guides/weighting/), also covers the curves
+of this guide that have published tolerance tables. For `B` it uses
+ANSI S1.4-1983 (Table IV design goals, Table V
+limits) and the "class" verdicts read as the standard's instrument **Types**
+1 and 2. For `AU` it uses IEC 61012:1990 Table 1 (nominal A + nominal U with
+the separate-unit tolerances, zero at the 1 kHz reference); IEC 61012
+publishes a single tolerance set, so both margin slots agree and the verdict
+is simply complies (1) or not (`None`) — note that checking the rows above
+20 kHz needs `fs` ≥ 96 kHz (below that they are dropped and the verdict is
+`range_limited`). `G` and `D` are rejected: ISO 7196 defines one ±1 dB
+tolerance with no class structure, and the withdrawn IEC 537 left no
+tolerance table behind (both curves are pinned numerically in the CI
+conformance report instead).
+
+## Quick answers
+
+### Which weighting should I use for infrasound below 20 Hz?
+
+Use the G frequency weighting of ISO 7196:1995, which rates infrasound the way A-weighting rates audible noise. It has 0 dB gain at 10 Hz, rises at 12 dB/octave from 1 Hz to 20 Hz and falls off at 24 dB/octave outside that band. Apply it to sources such as wind turbines, HVAC and blasting, and report levels as $L_{pG}$ (or $L_{Geq}$ for the equivalent level over time).
+
+## See also
+
+- [Frequency Weighting](https://jmrplens.github.io/phonometry/guides/weighting/): the A, C and Z curves, the
+  `high_accuracy` design and the IEC 61672-1 Table 3 class verification
+  these curves build on.
+- API reference: [`metrology.parametric_filters`](https://jmrplens.github.io/phonometry/reference/api/filters/parametric-filters/) and [`metrology.compliance`](https://jmrplens.github.io/phonometry/reference/api/filters/compliance/).
+
+## References
+
+- International Organization for Standardization. (1995). *Acoustics —
+  Frequency-weighting characteristic for infrasound measurements*
+  (ISO 7196:1995). [iso.org catalogue](https://www.iso.org/standard/13813.html).
+  The G-weighting pole/zero definition (Table 1), verified against every
+  Table 2 nominal response value (0.25 Hz to 315 Hz).
+- American National Standards Institute. (1983). *Specification for Sound
+  Level Meters* (ANSI S1.4-1983). The historical B weighting: Appendix C
+  analytic definition (Formula C2), Table IV design goals and Table V
+  tolerance limits checked by `verify_weighting_class` in section 3.
+- International Electrotechnical Commission. (1990). *Filters for the
+  measurement of audible sound in the presence of ultrasound*
+  (IEC 61012:1990). [IEC webstore](https://webstore.iec.ch/en/publication/4296).
+  The AU weighting: U-weighting pole locations (Table 2), nominal responses
+  and tolerances (Table 1) and the combined AU definition of subclause 2.2.
+- International Electrotechnical Commission. (1976). *Frequency weighting
+  for the measurement of aircraft noise (D-weighting)* (IEC 537:1976,
+  withdrawn). Implemented from its published rational transfer function and
+  cross-checked against independent implementations (section 2).
+- Bennett, R. L., & Pearsons, K. S. (1981). *Handbook of Aircraft Noise
+  Metrics* (NASA CR-3406). NASA.
+  [ntrs.nasa.gov](https://ntrs.nasa.gov/citations/19810013341).
+  Republishes the IEC 537 D-weighting table (Table SLD-I) used to pin the
+  D response in CI.
+
+## Standards
+
+ISO 7196:1995, *Acoustics — Frequency-weighting characteristic for
 infrasound measurements*: the G-weighting pole/zero definition (Table 1),
 verified against every Table 2 nominal response value (0.25 Hz to 315 Hz).
 ANSI S1.4-1983, *Specification for Sound Level Meters*: the historical B
@@ -858,9 +917,8 @@ single numbers that a limit, a regulation or a report can be checked
 against. This page is that reduction chain, computed directly from the
 calibrated signal in pascals rather than from meter readouts: the
 equivalent continuous level $L_{eq}$/$L_{Aeq}$, the percentile levels
-$L_N$, the event and peak measures ($L_{AE}$/SEL, $L_{Cpeak}$), the noise
-dose of IEC 61252 and the whole-day descriptors $L_{den}$/$L_{dn}$ with
-the ISO 1996-1 rating levels. Working from the signal means each
+$L_N$, the event and peak measures ($L_{AE}$/SEL, $L_{Cpeak}$) and the
+noise dose of IEC 61252. Working from the signal means each
 definition (an integral, a percentile, an energy sum) is applied exactly,
 with no detector or display approximation in between.
 
@@ -882,7 +940,8 @@ Bies, Hansen & Howard 2017, §2.5 surveys them side by side):
   [Occupational Noise Exposure](https://jmrplens.github.io/phonometry/guides/occupational-exposure/).
 - **Long-term community annoyance**: $L_{den}$/$L_{dn}$ and the ISO
   1996-1 rating levels, which weight evening and night energy before
-  averaging the day.
+  averaging the day: the subject of
+  [Environmental levels](https://jmrplens.github.io/phonometry/guides/environmental-levels/).
 
 Two boundaries with the sibling pages are worth keeping sharp. The
 integrated metrics here deliberately bypass the exponential detector:
@@ -942,7 +1001,8 @@ spread over 10 dB it already costs a couple of decibels. The few normative
 formulas that do average decibels directly are deliberate approximations and
 say so (ISO 1996-2 offers one as a substitute for repeated-measurement
 uncertainty and warns it inflates once levels spread beyond 3 dB, see the
-uncertainty section below); everywhere else, energy.
+uncertainty section of [Environmental levels](https://jmrplens.github.io/phonometry/guides/environmental-levels/));
+everywhere else, energy.
 
 ### `leq()` / `laeq()` parameters
 
@@ -1056,8 +1116,8 @@ In practice:
 One caution: percentiles do not combine. Two hours with known $L_{90}$
 values do not yield the two-hour $L_{90}$ by any formula; recompute it from
 the pooled envelope. $L_{eq}$ values, by contrast, combine exactly by
-time-weighted energy averaging, which is what `composite_rating_level`
-does below.
+time-weighted energy averaging, which is what the `composite_rating_level`
+of [Environmental levels](https://jmrplens.github.io/phonometry/guides/environmental-levels/) does.
 
 ### `ln_levels()` parameters
 
@@ -1186,153 +1246,12 @@ is +3 dB.
 job samples, with the normative ISO 9612 uncertainty budget, continues in
 [Occupational Noise Exposure](https://jmrplens.github.io/phonometry/guides/occupational-exposure/).
 
-## Environmental noise: Lden, Ldn and rating levels (ISO 1996-1)
-
-Regulatory noise assessment weights evenings and nights more heavily.
-`lden()` implements the day-evening-night level of ISO 1996-1:2016 (3.6.4:
-+5 dB evening, +10 dB night, default 12/4/8 h periods, adjustable because
-countries define them differently), `ldn()` the day-night variant (3.6.5),
-and `composite_rating_level()` the general whole-day composite of clause 6.5
-(Formulae 5-6) for arbitrary periods with source or character adjustments
-(Table A.1: e.g. +5 dB regular impulsive, +12 dB highly impulsive, +3 to
-+6 dB prominent tones):
-
-```python
-from phonometry import environmental
-
-l = environmental.lden(63.2, 58.1, 51.4)                      # from LAeq per period
-r = environmental.composite_rating_level([(63.2, 12, 0.0),    # day
-                            (58.1, 4, 5.0),     # evening (+5)
-                            (51.4, 8, 10.0)])   # night  (+10) == environmental.lden
-```
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile.svg" alt="Synthetic 24-hour urban LAeq profile with day, evening and night bands, the +5 and +10 dB weighted period levels and the resulting Lden" width="80%"></picture>
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-from phonometry import environmental
-
-# Synthetic hourly LAeq of an urban road (dB), hours 00 to 23
-laeq_h = np.array([48, 46, 45, 45, 46, 50, 56, 64, 66, 65, 63, 63,
-                   64, 63, 63, 64, 65, 66, 65, 64, 63, 62, 61, 50], dtype=float)
-
-def period_leq(idx):
-    return 10 * np.log10(np.mean(10 ** (laeq_h[idx] / 10)))  # energy mean
-
-ld = period_leq(np.arange(7, 19))                # day 07-19
-le = period_leq(np.arange(19, 23))               # evening 19-23
-ln_ = period_leq(np.r_[23, np.arange(0, 7)])     # night 23-07
-l_den = environmental.lden(ld, le, ln_)
-print(f"Lden = {l_den:.1f} dB")   # Lden = 64.3 dB
-
-fig, ax = plt.subplots()
-ax.axvspan(19, 23, color="C1", alpha=0.15)                                # evening
-ax.axvspan(23, 24, color="C0", alpha=0.15); ax.axvspan(0, 7, color="C0", alpha=0.15)
-ax.step(np.arange(25), np.r_[laeq_h, laeq_h[-1]], where="post",
-        color="0.3", label="Hourly LAeq")
-ax.hlines(ld, 7, 19, color="C2", linestyle="--", label="Lday (+0 dB)")
-ax.hlines(le + 5, 19, 23, color="C1", linestyle="--", label="Levening + 5 dB")
-ax.hlines([ln_ + 10, ln_ + 10], [23, 0], [24, 7], color="C0",
-          linestyle="--", label="Lnight + 10 dB")
-ax.hlines(l_den, 0, 24, color="C3", linewidth=2, label=f"Lden = {l_den:.1f} dB")
-ax.set(xlabel="Hour of day", ylabel="Level [dB]", xlim=(0, 24))
-ax.legend(loc="upper left", fontsize=8, ncol=2)
-plt.show()
-```
-
-</details>
-
-### `lden()` / `ldn()` / `composite_rating_level()` parameters
-
-| Function | Key parameters | Notes |
-| :--- | :--- | :--- |
-| `lden(lday, levening, lnight, hours=(12, 4, 8))` | period LAeq values [dB]; `hours` must sum to 24 | +5 dB evening, +10 dB night (3.6.4) |
-| `ldn(lday, lnight, hours=(15, 9))` | | +10 dB night (3.6.5) |
-| `composite_rating_level(periods)` | iterable of `(level_db, hours, adjustment_db)`; hours positive, finite and summing to 24 | General Formulae (5)-(6); adjustments per Table A.1 |
-
-Where you put the microphone changes the number: ISO 1996-2 fixes the receiver positions and their façade corrections. The diagram is measurement context; apply the corrections to your levels before analysis:
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_env_measurement_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_env_measurement.svg" alt="Environmental noise measurement positions per ISO 1996-2: free field, 2 m from the facade and flush-mounted, with their corrections" width="92%"></picture>
-
-Combine with `laeq()` per time period to go from recordings to Lden, and with
-the `tone_to_noise_ratio()` / `prominence_ratio()` verdicts of
-[Prominent Discrete Tones](https://jmrplens.github.io/phonometry/guides/tone-prominence/) to justify tonal adjustments.
-
-## Determining levels: tonal adjustment, residual noise and uncertainty (ISO 1996-2)
-
-ISO 1996-2:2017 is the **determination** part: how the measured level is turned
-into a rating level and reported with its uncertainty. The rating-level *summation*
-and the time-of-day penalties live in ISO 1996-1 (above); ISO 1996-2 supplies the
-tonal adjustment, the residual-noise correction and the uncertainty budget.
-
-**Tonal adjustment (engineering method, Annex C).** From the energy-summed tone
-level $L_{pt}$ and the masking-noise level $L_{pn}$ in the critical band around a
-tone, the audibility above the masking threshold is
-$\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \lg[1 + (f_c/502)^{2.5}]$ dB (Formula (C.3)),
-and the adjustment is $K_t = 0$ for $\Delta L_{ta} < 4$, $K_t = \Delta L_{ta} - 4$
-for $4 \le \Delta L_{ta} \le 10$ and $K_t = 6$ above (Formulae (C.4)–(C.6)). The
-critical bandwidth is 100 Hz up to 500 Hz and 20 % of $f_c$ above (Table C.1).
-The one-third-octave **survey method** (`tonal_seeking_survey`) flags a band
-exceeding both neighbours by 15/8/5 dB (low/mid/high), and
-`tonal_adjustment_from_mean_audibility` maps the ISO/PAS 20065 mean audibility to
-$K_t$ (Table J.1).
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tonal_audibility_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tonal_audibility.svg" alt="ISO 1996-2 tonal adjustment Kt as a piecewise function of the tonal audibility: zero below 4 dB, rising linearly to 6 dB between 4 and 10 dB, and 6 dB above, with the four Annex C.5 worked examples and a mid-range tone marked" width="80%"></picture>
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import environmental
-
-# ISO 1996-2:2007 Annex C.5, Example 2 (two tones near 400 Hz):
-res = environmental.assess_tonal_audibility(tone_level=54.1, masking_noise_level=45.2,
-                              centre_frequency=430.0)
-print(res.audibility, res.adjustment)   # ΔLta ≈ 11.1 dB -> Kt = 6 dB
-res.plot()
-plt.show()
-```
-</details>
-
-**Residual-noise correction (Clause 10.4).** `residual_sound_correction()`
-applies $L = 10\lg(10^{L'/10} - 10^{L_\text{res}/10})$ (Formula (16)). With a
-residual within 3 dB of the measured level no correction is allowed: the
-*uncorrected* measured level $L'$ is then the reportable value, as an upper
-bound of the specific sound (exposed as `reportable_upper_bound`, with
-`reliable=False`). `gaussian_residual_level()` estimates the residual from
-percentile levels (Annex I) and rejects inverted percentile orderings.
-
-**Measurement uncertainty (Clause 4, Annex F).** `combined_standard_uncertainty()`
-forms $u = \sqrt{\sum (c_j u_j)^2}$ (Formula (2)) and
-`environmental_expanded_uncertainty()` applies $k = 2$ (95 %) or $k = 1.3$ (80 %);
-`residual_correction_uncertainty()` carries the residual-correction sensitivity
-(Formulae (F.7)/(F.8)) and `uncertainty_from_repeated_measurements()` the
-repeated-measurement standard uncertainty: the primary energy-domain route
-(Formulae (17)+(19)), with the level-domain Note 2 substitute (Formula (20))
-reported alongside as `approximate_uncertainty` and a warning when the levels
-spread beyond 3 dB, where the substitute grossly inflates.
-
-```python
-from phonometry import environmental
-
-# Tonal adjustment for a prominent tone:
-tonal = environmental.assess_tonal_audibility(54.1, 45.2, 430.0)  # TonalAssessmentResult
-kt = tonal.adjustment                                             # 6 dB
-tonal.plot()   # this audibility on the Kt curve, as in the figure above
-
-# Subtract residual (background) noise from a measured level:
-corr = environmental.residual_sound_correction(measured_level=58.0, residual_level=50.0)
-corr.corrected_level, corr.reliable
-
-# Combine an uncertainty budget and expand to 95 %:
-u = environmental.combined_standard_uncertainty([0.59, 0.3, 2.0, 0.40, 0.38])  # 2.18 dB (G.2)
-environmental.expanded_uncertainty(u)                            # 4.36 dB (k = 2)
-```
+Turning these levels into the regulatory day-evening-night indicators and
+reporting them defensibly is
+[Environmental levels](https://jmrplens.github.io/phonometry/guides/environmental-levels/): the Lden and Ldn
+descriptors, the composite rating levels of ISO 1996-1 with their character
+adjustments, and the ISO 1996-2 determination chain of tonal adjustment,
+residual-noise correction and the measurement uncertainty budget.
 
 ## Octave Spectrogram (levels over time)
 
@@ -1434,14 +1353,6 @@ to 8 h. The anchor worth memorizing: 3.2 Pa²h corresponds to exactly 90 dB
 over 8 h. Half the dose is -3 dB, and double duration at the same level is
 +3 dB.
 
-### What penalties does Lden apply to evening and night noise?
-
-$L_{den}$, the day-evening-night level of ISO 1996-1:2016 (3.6.4), adds
-+5 dB to the evening level and +10 dB to the night level before
-energy-averaging the whole day, with default periods of 12, 4 and 8 hours,
-adjustable because countries define them differently. The day-night variant
-$L_{dn}$ (3.6.5) keeps only the +10 dB night penalty.
-
 ## References
 
 - International Electrotechnical Commission. (2013). *Electroacoustics —
@@ -1454,16 +1365,10 @@ $L_{dn}$ (3.6.5) keeps only the +10 dB night penalty.
   [Publisher page](https://www.wiley.com/en-us/Fundamentals+of+Acoustics%2C+4th+Edition-p-9780471847892).
   The sound-pressure, energy and level definitions underneath Leq, SEL and
   the dose measures.
-- British Standards Institution. (2003). *Description and measurement of
-  environmental noise — Guide to quantities and procedures* (BS 7445-1:2003).
-  [BSI Knowledge](https://knowledge.bsigroup.com/products/description-and-measurement-of-environmental-noise-guide-to-quantities-and-procedures).
-  The survey-practice companion of ISO 1996-1: which descriptor family fits
-  which assessment question (BS 7445-2:1991 covers the land-use data
-  acquisition).
 - Bies, D. A., Hansen, C. H., & Howard, C. Q. (2017). *Engineering noise
   control* (5th ed.). CRC Press.
   [doi:10.1201/9781351228152](https://doi.org/10.1201/9781351228152).
-  Section 2.5 (the noise measures: Leq, Ldn, L10/L90 and their intended
+  Section 2.5 (the noise measures: Leq, L10/L90 and their intended
   uses) and Section 2.15 (environmental noise surveys). ISBN
   978-1-4987-2405-0.
 
@@ -1475,10 +1380,229 @@ Part 1: Specifications*: the Fast/Slow/Impulse envelope ballistics behind
 bursts) and the sound exposure level verified against the Table 4 LAE column.
 IEC 61252, *Electroacoustics — Specifications for personal sound exposure
 meters*: the sound exposure E in Pa²h and the normalized 8 h level LEX,8h
-(≡ LEP,d), anchored at 3.2 Pa²h ⇔ exactly 90 dB. ISO 1996-1:2016, *Acoustics —
-Description, measurement and assessment of environmental noise — Part 1:
-Basic quantities and assessment procedures*: Lden (3.6.4), Ldn (3.6.5) and
-the composite whole-day rating level of clause 6.5 (Formulae 5-6, Table A.1
-adjustments).
+(≡ LEP,d), anchored at 3.2 Pa²h ⇔ exactly 90 dB. The ISO 1996-1/-2
+environmental indicators and determination procedures are covered in
+[Environmental levels](https://jmrplens.github.io/phonometry/guides/environmental-levels/).
+
+---
+
+
+<!-- source: docs/environmental-levels.md | canonical: https://jmrplens.github.io/phonometry/guides/environmental-levels/ -->
+Source: https://jmrplens.github.io/phonometry/guides/environmental-levels/
+
+# Environmental Levels (ISO 1996-1/-2)
+
+A community does not hear a single LAeq: it hears a day whose evenings and
+nights matter more, a source whose tones or impulses annoy beyond their
+energy, and a measurement taken over a residual background with a finite
+confidence. This page is the regulatory assessment chain built on top of
+the measured period levels: the whole-day descriptors $L_{den}$/$L_{dn}$
+and the composite rating levels of ISO 1996-1, and the ISO 1996-2
+determination procedures that make the reported number defensible: the
+tonal adjustment, the residual-noise correction and the measurement
+uncertainty budget.
+
+The level-computation half of the topic, the $L_{eq}$/$L_{Aeq}$ integrals,
+the percentile levels $L_N$, SEL and the noise dose that produce the period
+levels this page consumes, is
+[Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/guides/levels/); everything here assumes
+those per-period values are already in hand.
+
+## Environmental noise: Lden, Ldn and rating levels (ISO 1996-1)
+
+Regulatory noise assessment weights evenings and nights more heavily.
+`lden()` implements the day-evening-night level of ISO 1996-1:2016 (3.6.4:
++5 dB evening, +10 dB night, default 12/4/8 h periods, adjustable because
+countries define them differently), `ldn()` the day-night variant (3.6.5),
+and `composite_rating_level()` the general whole-day composite of clause 6.5
+(Formulae 5-6) for arbitrary periods with source or character adjustments
+(Table A.1: e.g. +5 dB regular impulsive, +12 dB highly impulsive, +3 to
++6 dB prominent tones):
+
+```python
+from phonometry import environmental
+
+l = environmental.lden(63.2, 58.1, 51.4)                      # from LAeq per period
+r = environmental.composite_rating_level([(63.2, 12, 0.0),    # day
+                            (58.1, 4, 5.0),     # evening (+5)
+                            (51.4, 8, 10.0)])   # night  (+10) == environmental.lden
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile.svg" alt="Synthetic 24-hour urban LAeq profile with day, evening and night bands, the +5 and +10 dB weighted period levels and the resulting Lden" width="80%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import environmental
+
+# Synthetic hourly LAeq of an urban road (dB), hours 00 to 23
+laeq_h = np.array([48, 46, 45, 45, 46, 50, 56, 64, 66, 65, 63, 63,
+                   64, 63, 63, 64, 65, 66, 65, 64, 63, 62, 61, 50], dtype=float)
+
+def period_leq(idx):
+    return 10 * np.log10(np.mean(10 ** (laeq_h[idx] / 10)))  # energy mean
+
+ld = period_leq(np.arange(7, 19))                # day 07-19
+le = period_leq(np.arange(19, 23))               # evening 19-23
+ln_ = period_leq(np.r_[23, np.arange(0, 7)])     # night 23-07
+l_den = environmental.lden(ld, le, ln_)
+print(f"Lden = {l_den:.1f} dB")   # Lden = 64.3 dB
+
+fig, ax = plt.subplots()
+ax.axvspan(19, 23, color="C1", alpha=0.15)                                # evening
+ax.axvspan(23, 24, color="C0", alpha=0.15); ax.axvspan(0, 7, color="C0", alpha=0.15)
+ax.step(np.arange(25), np.r_[laeq_h, laeq_h[-1]], where="post",
+        color="0.3", label="Hourly LAeq")
+ax.hlines(ld, 7, 19, color="C2", linestyle="--", label="Lday (+0 dB)")
+ax.hlines(le + 5, 19, 23, color="C1", linestyle="--", label="Levening + 5 dB")
+ax.hlines([ln_ + 10, ln_ + 10], [23, 0], [24, 7], color="C0",
+          linestyle="--", label="Lnight + 10 dB")
+ax.hlines(l_den, 0, 24, color="C3", linewidth=2, label=f"Lden = {l_den:.1f} dB")
+ax.set(xlabel="Hour of day", ylabel="Level [dB]", xlim=(0, 24))
+ax.legend(loc="upper left", fontsize=8, ncol=2)
+plt.show()
+```
+
+</details>
+
+### `lden()` / `ldn()` / `composite_rating_level()` parameters
+
+| Function | Key parameters | Notes |
+| :--- | :--- | :--- |
+| `lden(lday, levening, lnight, hours=(12, 4, 8))` | period LAeq values [dB]; `hours` must sum to 24 | +5 dB evening, +10 dB night (3.6.4) |
+| `ldn(lday, lnight, hours=(15, 9))` | | +10 dB night (3.6.5) |
+| `composite_rating_level(periods)` | iterable of `(level_db, hours, adjustment_db)`; hours positive, finite and summing to 24 | General Formulae (5)-(6); adjustments per Table A.1 |
+
+Where you put the microphone changes the number: ISO 1996-2 fixes the receiver positions and their façade corrections. The diagram is measurement context; apply the corrections to your levels before analysis:
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_env_measurement_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_env_measurement.svg" alt="Environmental noise measurement positions per ISO 1996-2: free field, 2 m from the facade and flush-mounted, with their corrections" width="92%"></picture>
+
+Combine with `laeq()` per time period to go from recordings to Lden. The
+tonal adjustment itself is justified by the tonal audibility route of the next
+section (fed, for the ISO/PAS 20065 method, by
+[Objective audibility of tones in noise](https://jmrplens.github.io/phonometry/guides/tone-audibility/));
+the `tone_to_noise_ratio()` / `prominence_ratio()` verdicts of
+[Prominent Discrete Tones](https://jmrplens.github.io/phonometry/guides/tone-prominence/) are
+complementary emission screening, not the Kt basis.
+
+## Determining levels: tonal adjustment, residual noise and uncertainty (ISO 1996-2)
+
+ISO 1996-2:2017 is the **determination** part: how the measured level is turned
+into a rating level and reported with its uncertainty. The rating-level *summation*
+and the time-of-day penalties live in ISO 1996-1 (above); ISO 1996-2 supplies the
+tonal adjustment, the residual-noise correction and the uncertainty budget.
+
+**Tonal adjustment (engineering method, Annex C).** From the energy-summed tone
+level $L_{pt}$ and the masking-noise level $L_{pn}$ in the critical band around a
+tone, the audibility above the masking threshold is
+$\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \lg[1 + (f_c/502)^{2.5}]$ dB (Formula (C.3)),
+and the adjustment is $K_t = 0$ for $\Delta L_{ta} < 4$, $K_t = \Delta L_{ta} - 4$
+for $4 \le \Delta L_{ta} \le 10$ and $K_t = 6$ above (Formulae (C.4)–(C.6)). The
+critical bandwidth is 100 Hz up to 500 Hz and 20 % of $f_c$ above (Table C.1).
+The one-third-octave **survey method** (`tonal_seeking_survey`) flags a band
+exceeding both neighbours by 15/8/5 dB (low/mid/high), and
+`tonal_adjustment_from_mean_audibility` maps the ISO/PAS 20065 mean audibility to
+$K_t$ (Table J.1).
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tonal_audibility_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tonal_audibility.svg" alt="ISO 1996-2 tonal adjustment Kt as a piecewise function of the tonal audibility: zero below 4 dB, rising linearly to 6 dB between 4 and 10 dB, and 6 dB above, with the four Annex C.5 worked examples and a mid-range tone marked" width="80%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import environmental
+
+# ISO 1996-2:2007 Annex C.5, Example 2 (two tones near 400 Hz):
+res = environmental.assess_tonal_audibility(tone_level=54.1, masking_noise_level=45.2,
+                              centre_frequency=430.0)
+print(res.audibility, res.adjustment)   # ΔLta ≈ 11.1 dB -> Kt = 6 dB
+res.plot()
+plt.show()
+```
+</details>
+
+**Residual-noise correction (Clause 10.4).** `residual_sound_correction()`
+applies $L = 10\lg(10^{L'/10} - 10^{L_\text{res}/10})$ (Formula (16)). With a
+residual within 3 dB of the measured level no correction is allowed: the
+*uncorrected* measured level $L'$ is then the reportable value, as an upper
+bound of the specific sound (exposed as `reportable_upper_bound`, with
+`reliable=False`). `gaussian_residual_level()` estimates the residual from
+percentile levels (Annex I) and rejects inverted percentile orderings.
+
+**Measurement uncertainty (Clause 4, Annex F).** `combined_standard_uncertainty()`
+forms $u = \sqrt{\sum (c_j u_j)^2}$ (Formula (2)) and
+`expanded_uncertainty()` applies $k = 2$ (95 %) or $k = 1.3$ (80 %);
+`residual_correction_uncertainty()` carries the residual-correction sensitivity
+(Formulae (F.7)/(F.8)) and `uncertainty_from_repeated_measurements()` the
+repeated-measurement standard uncertainty: the primary energy-domain route
+(Formulae (17)+(19)), with the level-domain Note 2 substitute (Formula (20))
+reported alongside as `approximate_uncertainty` and a warning when the levels
+spread beyond 3 dB, where the substitute grossly inflates.
+
+```python
+from phonometry import environmental
+
+# Tonal adjustment for a prominent tone:
+tonal = environmental.assess_tonal_audibility(54.1, 45.2, 430.0)  # TonalAssessmentResult
+kt = tonal.adjustment                                             # 6 dB
+tonal.plot()   # this audibility on the Kt curve, as in the figure above
+
+# Subtract residual (background) noise from a measured level:
+corr = environmental.residual_sound_correction(measured_level=58.0, residual_level=50.0)
+corr.corrected_level, corr.reliable
+
+# Combine an uncertainty budget and expand to 95 %:
+u = environmental.combined_standard_uncertainty([0.59, 0.3, 2.0, 0.40, 0.38])  # 2.18 dB (G.2)
+environmental.expanded_uncertainty(u)                            # 4.36 dB (k = 2)
+```
+
+## Quick answers
+
+### What penalties does Lden apply to evening and night noise?
+
+$L_{den}$, the day-evening-night level of ISO 1996-1:2016 (3.6.4), adds
++5 dB to the evening level and +10 dB to the night level before
+energy-averaging the whole day, with default periods of 12, 4 and 8 hours,
+adjustable because countries define them differently. The day-night variant
+$L_{dn}$ (3.6.5) keeps only the +10 dB night penalty.
+
+## See also
+
+- [Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/guides/levels/): the Leq/LAeq, percentile
+  and event levels the indicators of this page are assembled from.
+- [Objective audibility of tones in noise](https://jmrplens.github.io/phonometry/guides/tone-audibility/): the tonal
+  audibility whose mean value maps to the Kt adjustment (Table J.1).
+- [Prominent Discrete Tones](https://jmrplens.github.io/phonometry/guides/tone-prominence/): the ECMA-418-1
+  tone-to-noise and prominence-ratio verdicts, complementary emission
+  screening for the tonal question.
+- [Occupational Noise Exposure](https://jmrplens.github.io/phonometry/guides/occupational-exposure/): the workplace
+  counterpart, from task samples to the daily exposure level with its
+  uncertainty budget.
+- API reference: [`environmental.measurement`](https://jmrplens.github.io/phonometry/reference/api/environment/measurement/)
+  and [`environmental.rating`](https://jmrplens.github.io/phonometry/reference/api/environment/rating/).
+
+## References
+
+- British Standards Institution. (2003). *Description and measurement of
+  environmental noise — Guide to quantities and procedures* (BS 7445-1:2003).
+  [BSI Knowledge](https://knowledge.bsigroup.com/products/description-and-measurement-of-environmental-noise-guide-to-quantities-and-procedures).
+  The survey-practice companion of ISO 1996-1: which descriptor family fits
+  which assessment question (BS 7445-2:1991 covers the land-use data
+  acquisition).
+
+## Standards
+
+ISO 1996-1:2016, *Acoustics — Description, measurement and assessment of
+environmental noise — Part 1: Basic quantities and assessment procedures*:
+Lden (3.6.4), Ldn (3.6.5) and the composite whole-day rating level of
+clause 6.5 (Formulae 5-6, Table A.1 adjustments). ISO 1996-2:2017,
+*Acoustics — Description, measurement and assessment of environmental
+noise — Part 2: Determination of sound pressure levels*: the Annex C tonal
+adjustment, the Clause 10.4 residual-noise correction and the Clause 4 /
+Annex F measurement uncertainty budget.
 
 ---

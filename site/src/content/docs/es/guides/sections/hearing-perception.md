@@ -30,9 +30,11 @@ mayoría de las demás métricas de esta sección reutilizan o extienden.
 Las sensaciones perceptivas del sonido: la sonoridad y las métricas
 construidas sobre ella.
 
-- [Sonoridad](/phonometry/es/guides/loudness/): sonoridad de Zwicker
-  (ISO 532-1), Moore-Glasberg (ISO 532-2/3) y Sottek (ECMA-418-2) en sonios,
-  más las curvas isofónicas de ISO 226:2023.
+- [Sonoridad](/phonometry/es/guides/loudness/): la sonoridad Zwicker de
+  ISO 532-1 en sonios, más las curvas isofónicas de ISO 226:2023.
+- [Sonoridad avanzada (ISO 532-2/-3, ECMA-418-2)](/phonometry/es/guides/advanced-loudness/):
+  los métodos Moore-Glasberg estacionario y variable en el tiempo y la
+  sonoridad del Sottek Hearing Model, con la tabla de elección de modelo.
 - [Métricas de calidad sonora](/phonometry/es/guides/sound-quality/): agudeza
   (DIN 45692) y la tonalidad, aspereza e intensidad de fluctuación del
   modelo auditivo de Sottek (ECMA-418-2).

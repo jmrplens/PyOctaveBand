@@ -136,7 +136,7 @@ Every result object exposes a one-line `.plot(language="en"|"es")` figure and,
 where a standard defines a reporting format, a `.report()` method that renders
 the normative PDF fiche.
 
-- [Filter Banks](filter-banks.md): choose an architecture and inspect responses
+- [Filter Architecture Gallery](filter-gallery.md): choose an architecture and inspect responses
 - [Calibration and dBFS](calibration.md): get real-world SPL values
 - [Why phonometry](why-phonometry.md): the conformance-first design philosophy
 - [Conformance report](CONFORMANCE.md): the expected and computed value of all 429 checks

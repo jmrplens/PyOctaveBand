@@ -12,11 +12,15 @@ emphasis), tonality (audible discrete tones), roughness (fast modulation)
 and fluctuation strength (slow modulation). And on top of those sits a combined **annoyance** metric that weighs them into
 a single scalar.
 
-[Loudness](/phonometry/guides/loudness/) is the foundation page. It covers the
-three model families phonometry ships (Zwicker per ISO 532-1, Moore-Glasberg
-per ISO 532-2/3, and the Sottek Hearing Model of ECMA-418-2) together with the
+[Loudness](/phonometry/guides/loudness/) is the foundation page: the Zwicker
+reference method of ISO 532-1 with its one-page fiche, together with the
 ISO 226:2023 equal-loudness contours that anchor the perceptual scale for pure
-tones. [Sound Quality Metrics](/phonometry/guides/sound-quality/) adds
+tones. The newer model families,
+Moore-Glasberg per ISO 532-2/-3 and the Sottek Hearing Model of ECMA-418-2,
+continue in
+[Advanced Loudness](/phonometry/guides/advanced-loudness/), which also
+carries the model-choice table.
+[Sound Quality Metrics](/phonometry/guides/sound-quality/) adds
 sharpness per DIN 45692 and the ECMA-418-2 tonality, roughness and
 fluctuation strength that share the Sottek front-end.
 
@@ -38,8 +42,10 @@ pages define.
 
 ## Pages in this section
 
-- [Loudness](/phonometry/guides/loudness/): Zwicker, Moore-Glasberg and
-  Sottek loudness in sones, plus the ISO 226:2023 equal-loudness contours.
+- [Loudness](/phonometry/guides/loudness/): the ISO 532-1 Zwicker loudness in
+  sones, plus the ISO 226:2023 equal-loudness contours.
+- [Advanced Loudness (ISO 532-2/-3, ECMA-418-2)](/phonometry/guides/advanced-loudness/):
+  the Moore-Glasberg and Sottek loudness models and the model-choice table.
 - [Sound Quality Metrics](/phonometry/guides/sound-quality/): sharpness
   (DIN 45692) and ECMA-418-2 tonality, roughness and fluctuation strength.
 - [Prominent Discrete Tones (ECMA-418-1)](/phonometry/guides/tone-prominence/):

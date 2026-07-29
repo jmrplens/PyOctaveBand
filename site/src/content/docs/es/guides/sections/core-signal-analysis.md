@@ -44,9 +44,13 @@ físicas.
 La descomposición en bandas de octava fraccional y las dos maneras de
 escalarla: bloques en streaming y arrays multicanal.
 
-- [Bancos de filtros](/phonometry/es/guides/filter-banks/): las cinco
-  arquitecturas de filtro, sus respuestas en frecuencia, la descomposición en
-  bandas y el filtrado de fase cero fuera de línea.
+- [Bancos de filtros](/phonometry/es/guides/filter-banks/): la matemática de
+  las bandas de octava fraccional, los parámetros del banco, el ecualizador
+  paramétrico, la descomposición en bandas y el filtrado de fase cero fuera
+  de línea.
+- [Galería de arquitecturas de filtro](/phonometry/es/guides/filter-gallery/):
+  las cinco arquitecturas de filtro comparadas, la galería completa de
+  respuestas y el uso de cada arquitectura, con el crossover Linkwitz-Riley.
 - [Verificación de clase de filtros (IEC 61260-1)](/phonometry/es/guides/filter-compliance/):
   la máscara de aceptación de la Tabla 1 banda a banda, la clase 0 de la
   edición retirada de 1995 y la ficha de conformidad.
@@ -62,15 +66,20 @@ De la señal ponderada al nivel reportado: las ponderaciones frecuenciales,
 las balísticas temporales y los niveles integrados, estadísticos y de
 valoración.
 
-- [Ponderación frecuencial (A, C, G, Z)](/phonometry/es/guides/weighting/):
-  las curvas de respuesta del oído de IEC 61672-1 y la ponderación G para
-  infrasonido de ISO 7196.
+- [Ponderación frecuencial (A, C, Z)](/phonometry/es/guides/weighting/):
+  las curvas de respuesta del oído de IEC 61672-1, el modo de precisión en
+  alta frecuencia y la verificación de clase de la Tabla 3.
+- [Ponderaciones especiales (G, B, D, AU)](/phonometry/es/guides/special-weightings/):
+  la ponderación G para infrasonido de ISO 7196, las curvas históricas B y D
+  y la AU según IEC 61012.
 - [Ponderación temporal](/phonometry/es/guides/time-weighting/): las
   balísticas exponenciales Fast, Slow e Impulse según IEC 61672-1.
 - [Niveles integrados y estadísticos](/phonometry/es/guides/levels/): Leq y
   LAeq, niveles percentiles L10/L50/L90, LCpeak y SEL, dosis de ruido
-  (IEC 61252), Lden y niveles de valoración (ISO 1996-1), y espectrogramas de
-  octava.
+  (IEC 61252), y espectrogramas de octava.
+- [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/guides/environmental-levels/):
+  Lden, Ldn y los niveles de valoración compuestos, el ajuste tonal, la
+  corrección de ruido residual y el presupuesto de incertidumbre.
 
 ## [Señales y espectros](/phonometry/es/guides/sections/signals-spectra/)
 

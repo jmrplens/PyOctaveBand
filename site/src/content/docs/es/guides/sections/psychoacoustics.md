@@ -12,11 +12,13 @@ igual de fuertes: la agudeza (énfasis en altas frecuencias), la tonalidad
 (tonos discretos audibles), la aspereza (modulación rápida) y la intensidad
 de fluctuación (modulación lenta). Y sobre ellas, una métrica combinada de **molestia** que las pesa en un único escalar.
 
-[Sonoridad](/phonometry/es/guides/loudness/) es la página fundacional. Cubre
-las tres familias de modelos que phonometry incluye (Zwicker según ISO 532-1,
-Moore-Glasberg según ISO 532-2/3 y el modelo auditivo de Sottek de
-ECMA-418-2) junto con las curvas isofónicas de ISO 226:2023 que anclan la
-escala perceptiva para tonos puros.
+[Sonoridad](/phonometry/es/guides/loudness/) es la página fundacional: el
+método de referencia Zwicker de ISO 532-1 con su ficha de una página, junto
+con las curvas isofónicas de ISO 226:2023 que anclan la escala perceptiva
+para tonos puros. Las familias de modelos más recientes, Moore-Glasberg según
+ISO 532-2/-3 y el modelo auditivo de Sottek de ECMA-418-2, continúan en
+[Sonoridad avanzada](/phonometry/es/guides/advanced-loudness/), que además
+lleva la tabla de elección de modelo.
 [Métricas de calidad sonora](/phonometry/es/guides/sound-quality/) añade la
 agudeza según DIN 45692 y la tonalidad, la aspereza y la intensidad de
 fluctuación de ECMA-418-2, que comparten el frontal auditivo de Sottek.
@@ -40,9 +42,11 @@ todo lo que definen las demás páginas.
 
 ## Páginas de esta sección
 
-- [Sonoridad](/phonometry/es/guides/loudness/): sonoridad de Zwicker,
-  Moore-Glasberg y Sottek en sonios, más las curvas isofónicas de
-  ISO 226:2023.
+- [Sonoridad](/phonometry/es/guides/loudness/): la sonoridad Zwicker de
+  ISO 532-1 en sonios, más las curvas isofónicas de ISO 226:2023.
+- [Sonoridad avanzada (ISO 532-2/-3, ECMA-418-2)](/phonometry/es/guides/advanced-loudness/):
+  los modelos de sonoridad Moore-Glasberg y Sottek y la tabla de elección de
+  modelo.
 - [Métricas de calidad sonora](/phonometry/es/guides/sound-quality/): agudeza
   (DIN 45692) y tonalidad, aspereza e intensidad de fluctuación de
   ECMA-418-2.

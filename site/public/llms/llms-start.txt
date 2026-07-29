@@ -143,7 +143,7 @@ Every result object exposes a one-line `.plot(language="en"|"es")` figure and,
 where a standard defines a reporting format, a `.report()` method that renders
 the normative PDF fiche.
 
-- [Filter Banks](https://jmrplens.github.io/phonometry/guides/filter-banks/): choose an architecture and inspect responses
+- [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/guides/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/guides/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/reference/why-phonometry/): the conformance-first design philosophy
 - [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 429 checks
@@ -407,7 +407,7 @@ $$
 
 The adjustments $K_i$ cover time-of-day penalties (ISO 1996-1 Table A.1: evening 5 dB, night 10 dB) as well as source-character adjustments (e.g. tonal penalties), which the ECMA-418-1 TNR/PR assessments can justify objectively.
 
-See the [Levels guide](https://jmrplens.github.io/phonometry/guides/levels/) for usage.
+See the [Environmental levels guide](https://jmrplens.github.io/phonometry/guides/environmental-levels/) for usage.
 
 ## Impulsive-sound prominence (NT ACOU 112)
 
@@ -1898,7 +1898,7 @@ The four zeros against eight poles shape the characteristic response: a rise of 
 
 Since G acts on 0.25 Hz – 315 Hz, far below the Nyquist frequency at audio rates, the frequency warping of the plain bilinear transform (applied without prewarping) is negligible there: about 0.014 % at 315 Hz for $f_s = 48$ kHz, under 0.01 dB on the response. The internal oversampling used for the A/C designs (whose action extends to 16 kHz) is therefore not applied.
 
-See the [Frequency Weighting guide](https://jmrplens.github.io/phonometry/guides/weighting/) for usage.
+See the [Special Weightings guide](https://jmrplens.github.io/phonometry/guides/special-weightings/) for usage.
 
 ## Event and dose metrics
 

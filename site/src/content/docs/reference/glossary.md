@@ -161,8 +161,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Levels",
-              "url": "https://jmrplens.github.io/phonometry/guides/levels/"
+              "name": "Environmental Levels",
+              "url": "https://jmrplens.github.io/phonometry/guides/environmental-levels/"
             }
           },
           {
@@ -176,8 +176,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Levels",
-              "url": "https://jmrplens.github.io/phonometry/guides/levels/"
+              "name": "Environmental Levels",
+              "url": "https://jmrplens.github.io/phonometry/guides/environmental-levels/"
             }
           },
           {
@@ -191,8 +191,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Levels",
-              "url": "https://jmrplens.github.io/phonometry/guides/levels/"
+              "name": "Environmental Levels",
+              "url": "https://jmrplens.github.io/phonometry/guides/environmental-levels/"
             }
           },
           {
@@ -326,8 +326,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Weighting",
-              "url": "https://jmrplens.github.io/phonometry/guides/weighting/"
+              "name": "Special Weightings",
+              "url": "https://jmrplens.github.io/phonometry/guides/special-weightings/"
             }
           },
           {
@@ -341,8 +341,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Weighting",
-              "url": "https://jmrplens.github.io/phonometry/guides/weighting/"
+              "name": "Special Weightings",
+              "url": "https://jmrplens.github.io/phonometry/guides/special-weightings/"
             }
           },
           {
@@ -356,8 +356,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Weighting",
-              "url": "https://jmrplens.github.io/phonometry/guides/weighting/"
+              "name": "Special Weightings",
+              "url": "https://jmrplens.github.io/phonometry/guides/special-weightings/"
             }
           },
           {
@@ -371,8 +371,8 @@ head:
             },
             "subjectOf": {
               "@type": "TechArticle",
-              "name": "Weighting",
-              "url": "https://jmrplens.github.io/phonometry/guides/weighting/"
+              "name": "Special Weightings",
+              "url": "https://jmrplens.github.io/phonometry/guides/special-weightings/"
             }
           },
           {
@@ -1867,9 +1867,9 @@ check that pins each quantity to its standard's own expected value.
 
 | Symbol | Quantity | Unit | Defined in | Guide |
 | --- | --- | --- | --- | --- |
-| Lden | Day-evening-night level: the energy mean of the three periods with 5 dB added to the evening and 10 dB to the night. | dB | ISO 1996-1:2016, 3.6.4 | [Levels](/phonometry/guides/levels/) |
-| Ldn | Day-night level: the same construction with the 10 dB night penalty only. | dB | ISO 1996-1:2016, 3.6.5 | [Levels](/phonometry/guides/levels/) |
-| Lr | Rating level: the whole-day composite level after the source-character and time-of-day adjustments. | dB | ISO 1996-1:2016, clause 6.5 (Formulae 5 and 6) | [Levels](/phonometry/guides/levels/) |
+| Lden | Day-evening-night level: the energy mean of the three periods with 5 dB added to the evening and 10 dB to the night. | dB | ISO 1996-1:2016, 3.6.4 | [Environmental Levels](/phonometry/guides/environmental-levels/) |
+| Ldn | Day-night level: the same construction with the 10 dB night penalty only. | dB | ISO 1996-1:2016, 3.6.5 | [Environmental Levels](/phonometry/guides/environmental-levels/) |
+| Lr | Rating level: the whole-day composite level after the source-character and time-of-day adjustments. | dB | ISO 1996-1:2016, clause 6.5 (Formulae 5 and 6) | [Environmental Levels](/phonometry/guides/environmental-levels/) |
 | LAr,T | Rating level of an impulsive source over a reference interval, LAeq plus the graduated impulse adjustment. | dB | NT ACOU 112:2002, clause 8 | [Impulse prominence](/phonometry/guides/impulse-prominence/) |
 | KI | Impulse adjustment added to LAeq, graduated by the predicted prominence of the impulses. | dB | NT ACOU 112:2002, clause 8 | [Impulse prominence](/phonometry/guides/impulse-prominence/) |
 | E | Sound exposure: the time integral of the squared A-weighted sound pressure over the exposure period. | Pa²h | IEC 61252:1993, 3.1 | [Levels](/phonometry/guides/levels/) |
@@ -1883,10 +1883,10 @@ check that pins each quantity to its standard's own expected value.
 | Symbol | Quantity | Unit | Defined in | Guide |
 | --- | --- | --- | --- | --- |
 | A, C, Z | The normative frequency weightings: the ear-response curves applied before integration, Z being the flat reference. | dB | IEC 61672-1:2013, Annex E (acceptance limits in Table 3) | [Weighting](/phonometry/guides/weighting/) |
-| G | Infrasound weighting, defined by its poles and zeros for the 0.25 Hz to 315 Hz range. | dB | ISO 7196:1995, Table 1 (nominal responses in Table 2) | [Weighting](/phonometry/guides/weighting/) |
-| B | Historical mid-level weighting, withdrawn from the current meter standard. | dB | ANSI S1.4-1983, Appendix C (Formula C2) | [Weighting](/phonometry/guides/weighting/) |
-| D | Historical aircraft-noise weighting, derived from the 40-noy perceived-noisiness contour. | dB | IEC 537:1976 (withdrawn) | [Weighting](/phonometry/guides/weighting/) |
-| AU | Weighting for audible sound measured in the presence of ultrasound. | dB | IEC 61012:1990, subclause 2.2 (Tables 1 and 2) | [Weighting](/phonometry/guides/weighting/) |
+| G | Infrasound weighting, defined by its poles and zeros for the 0.25 Hz to 315 Hz range. | dB | ISO 7196:1995, Table 1 (nominal responses in Table 2) | [Special Weightings](/phonometry/guides/special-weightings/) |
+| B | Historical mid-level weighting, withdrawn from the current meter standard. | dB | ANSI S1.4-1983, Appendix C (Formula C2) | [Special Weightings](/phonometry/guides/special-weightings/) |
+| D | Historical aircraft-noise weighting, derived from the 40-noy perceived-noisiness contour. | dB | IEC 537:1976 (withdrawn) | [Special Weightings](/phonometry/guides/special-weightings/) |
+| AU | Weighting for audible sound measured in the presence of ultrasound. | dB | IEC 61012:1990, subclause 2.2 (Tables 1 and 2) | [Special Weightings](/phonometry/guides/special-weightings/) |
 | F, S, I | Fast, Slow and Impulse exponential time weightings: the detector ballistics that produce a displayed level. | s (time constant) | IEC 61672-1:2013 | [Time weighting](/phonometry/guides/time-weighting/) |
 
 ## Room acoustics

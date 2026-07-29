@@ -1,0 +1,229 @@
+← [Documentation index](README.md)
+
+# Special Weightings (G, B, D, AU)
+
+Beyond A, C and Z, the weighting family keeps four special-purpose curves,
+each the right tool for a narrower job: the **G** curve of **ISO 7196:1995**
+rates infrasound below 20 Hz the way A-weighting rates audible noise, the
+historical **B** (ANSI S1.4-1983) reproduces measurements taken under older
+national codes, the withdrawn aircraft-noise **D** (IEC 537) serves
+comparisons with legacy data, and **AU** (IEC 61012), still in force like the
+G curve, keeps ultrasonic components out of an audible-exposure reading.
+
+All four share the machinery of the IEC 61672-1 curves (0 dB at 1 kHz where
+applicable, multichannel and stateful block processing), and B, D and AU also
+take the `high_accuracy` oversampling; G ignores that flag, because its
+0.25 Hz to 315 Hz range is already exact with the plain design, and, as with
+A/C/Z, `high_accuracy` cannot be combined with stateful processing. The A, C and Z curves themselves, where they come from, the
+`high_accuracy` design and the class verification against IEC 61672-1
+Table 3 are the subject of [Frequency Weighting](weighting.md).
+
+## 1. Infrasound: G-weighting (ISO 7196)
+
+The **G frequency weighting** (ISO 7196:1995) rates infrasound the way A-weighting
+rates audible noise. It is defined by a pole-zero configuration with 0 dB gain at
+10 Hz, rises at 12 dB/octave from 1 Hz to 20 Hz (matching the steep growth of
+perception in that band) and falls off at 24 dB/octave outside it. Use it for
+sources with significant energy below 20 Hz (wind turbines, HVAC, blasting):
+
+```python
+import numpy as np
+from phonometry import metrology
+
+# recording: a calibrated microphone capture (Pa) — recorded through your measurement chain. Synthesized here so the guide runs standalone.
+fs = 48000
+recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+
+g_weighted = metrology.weighting_filter(recording, fs, curve='G')
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/g_weighting_response_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/g_weighting_response.svg" alt="G-weighting frequency response from 0.1 Hz to 1 kHz with the ISO 7196 Table 2 nominal values overlaid" width="80%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import metrology
+
+# Measure the G response: weight a centered unit impulse and take its
+# spectrum. A long buffer gives the resolution the infrasound range
+# needs (20 s -> 0.05 Hz).
+fs = 4000
+impulse = np.zeros(20 * fs)
+impulse[impulse.size // 2] = 1.0
+freqs = np.fft.rfftfreq(impulse.size, 1 / fs)
+spectrum = np.fft.rfft(metrology.weighting_filter(impulse, fs, curve="G"))
+
+fig, ax = plt.subplots(figsize=(9, 5))
+ax.semilogx(freqs[1:],
+            20 * np.log10(np.abs(spectrum[1:]) + np.finfo(float).eps))
+ax.plot(10, 0, "o", color="tab:red", label="0 dB at 10 Hz")
+ax.set(xlim=(0.1, 1000), ylim=(-90, 15),
+       xlabel="Frequency [Hz]", ylabel="G-weighting response [dB]")
+ax.grid(True, which="both", alpha=0.3)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+The implementation follows the ISO 7196 Table 1 pole/zero values exactly and is
+verified in CI against every Table 2 nominal response value (0.25 Hz to 315 Hz).
+`WeightingFilter(fs, "G")` supports the same multichannel and stateful block
+processing as A/C. Levels measured with the G curve are reported as
+L<sub>pG</sub> (or L<sub>Geq</sub> for the equivalent level over time).
+
+## 2. Historical and special-purpose curves: B, D and AU
+
+Three more curves complete the family.
+
+### B (ANSI S1.4-1983, historical)
+
+The middle curve of the original A/B/C level-switching scheme, drawn from
+the ~70-phon equal-loudness contour. Analytically it is the C weighting with
+one more zero at the origin and one extra real pole at
+$f_5 = 158.49\ \text{Hz}$ (Appendix C of ANSI S1.4-1983), so it discards
+less bass than A and more than C. It was dropped when IEC 61672-1 replaced
+the older sound-level-meter standards; use it only to reproduce historical
+data and measurements taken under older national codes (some legacy
+automotive test procedures reported dB(B)). The implementation follows the
+ANSI S1.4-1983 Appendix C constants and is pinned in CI against the Table IV
+response values, within the strictest Table V mask (Type 0).
+
+### D (IEC 537, withdrawn: aircraft noise)
+
+The D weighting approximated the *perceived noisiness* contours used by the
+perceived-noise-level (PNL) rating, so a plain sound level meter could
+estimate aircraft noise: the +11.5 dB hump around 3.15 kHz is where jet
+turbomachinery whine annoys most (it is deliberately *not* an equal-loudness
+feature). NASA's aircraft-noise handbook gives the classic rule of thumb
+$L_{PN} \approx L_D + 7\ \text{dB}$. IEC 537 was withdrawn and current
+certification practice reports EPNL from one-third-octave analysis or plain
+A-weighted levels, so `D` is provided for historical data and comparisons.
+With the standard unavailable, the implementation uses the widely published
+IEC 537 rational transfer function and is cross-checked against two
+independent implementations (SQAT's zeros/poles and librosa's closed form,
+which agree within 0.002 dB) and pinned in CI against the IEC 537 table
+republished in NASA CR-3406.
+
+```python
+import numpy as np
+from phonometry import metrology
+
+# A 3.15 kHz whine sits right on the D-weighting hump: D rates it
+# 10 dB *louder* than A does.
+fs = 96000
+t = np.arange(fs) / fs
+whine = 0.1 * np.sin(2 * np.pi * 3150 * t)
+
+ld = metrology.leq(metrology.weighting_filter(whine, fs, curve="D"))
+la = metrology.leq(metrology.weighting_filter(whine, fs, curve="A"))
+print(f"LD = {ld:.1f} dB   LA = {la:.1f} dB")
+# LD = 82.5 dB   LA = 72.2 dB
+```
+
+### AU (IEC 61012, current: audible sound in the presence of ultrasound)
+
+The only one of the three still in force. `AU` is the A weighting cascaded
+with the **U** low-pass filter of IEC 61012:1990 (six poles, Table 2): flat
+relative to A up to 10 kHz, then a steep cutoff (-13 dB at 16 kHz, -61.8 dB
+at 40 kHz for U alone). Use it when strong ultrasonic components (ultrasonic
+cleaners and welders, rodent repellers, some public-space deterrents) would
+otherwise leak into an A-weighted reading through the meter's imperfect
+high-frequency roll-off and overstate the *audible* exposure:
+
+```python
+import numpy as np
+from phonometry import metrology
+
+# 1 kHz tone (audible) buried under a strong 25 kHz ultrasonic component.
+fs = 96000
+t = np.arange(fs) / fs
+audible = 0.1 * np.sin(2 * np.pi * 1000 * t)
+x = audible + 1.0 * np.sin(2 * np.pi * 25000 * t)
+
+la = metrology.leq(metrology.weighting_filter(x, fs, curve="A"))
+lau = metrology.leq(metrology.weighting_filter(x, fs, curve="AU"))
+la_ref = metrology.leq(metrology.weighting_filter(audible, fs, curve="A"))
+print(f"LA = {la:.1f} dB   LAU = {lau:.1f} dB   audible alone = {la_ref:.1f} dB")
+# LA = 78.6 dB   LAU = 71.0 dB   audible alone = 71.0 dB
+# The ultrasound inflates LA by 7.6 dB; AU recovers the audible level.
+```
+
+Ultrasound only reaches a digital filter when the sample rate captures it,
+so measure at 96 kHz or more (at 48 kHz there is nothing above 24 kHz to
+reject); the AU design internally oversamples toward 288 kHz to keep the
+steep U roll-off accurate. Levels are reported as L<sub>AU</sub>. The
+implementation follows the Table 2 pole locations exactly (they reproduce
+every Table 1 nominal value within 0.05 dB) and is verified in CI against
+the Table 1 tolerances up to 40 kHz.
+
+## 3. Verifying B and AU against their tolerance tables
+
+The `verify_weighting_class` verifier, described in section 6 of
+[Frequency Weighting](weighting.md), also covers the curves
+of this guide that have published tolerance tables. For `B` it uses
+ANSI S1.4-1983 (Table IV design goals, Table V
+limits) and the "class" verdicts read as the standard's instrument **Types**
+1 and 2. For `AU` it uses IEC 61012:1990 Table 1 (nominal A + nominal U with
+the separate-unit tolerances, zero at the 1 kHz reference); IEC 61012
+publishes a single tolerance set, so both margin slots agree and the verdict
+is simply complies (1) or not (`None`) — note that checking the rows above
+20 kHz needs `fs` ≥ 96 kHz (below that they are dropped and the verdict is
+`range_limited`). `G` and `D` are rejected: ISO 7196 defines one ±1 dB
+tolerance with no class structure, and the withdrawn IEC 537 left no
+tolerance table behind (both curves are pinned numerically in the CI
+conformance report instead).
+
+## Quick answers
+
+### Which weighting should I use for infrasound below 20 Hz?
+
+Use the G frequency weighting of ISO 7196:1995, which rates infrasound the way A-weighting rates audible noise. It has 0 dB gain at 10 Hz, rises at 12 dB/octave from 1 Hz to 20 Hz and falls off at 24 dB/octave outside that band. Apply it to sources such as wind turbines, HVAC and blasting, and report levels as $L_{pG}$ (or $L_{Geq}$ for the equivalent level over time).
+
+## See also
+
+- [Frequency Weighting](weighting.md): the A, C and Z curves, the
+  `high_accuracy` design and the IEC 61672-1 Table 3 class verification
+  these curves build on.
+- API reference: [`metrology.parametric_filters`](https://jmrplens.github.io/phonometry/reference/api/filters/parametric-filters/) and [`metrology.compliance`](https://jmrplens.github.io/phonometry/reference/api/filters/compliance/).
+
+## References
+
+- International Organization for Standardization. (1995). *Acoustics —
+  Frequency-weighting characteristic for infrasound measurements*
+  (ISO 7196:1995). [iso.org catalogue](https://www.iso.org/standard/13813.html).
+  The G-weighting pole/zero definition (Table 1), verified against every
+  Table 2 nominal response value (0.25 Hz to 315 Hz).
+- American National Standards Institute. (1983). *Specification for Sound
+  Level Meters* (ANSI S1.4-1983). The historical B weighting: Appendix C
+  analytic definition (Formula C2), Table IV design goals and Table V
+  tolerance limits checked by `verify_weighting_class` in section 3.
+- International Electrotechnical Commission. (1990). *Filters for the
+  measurement of audible sound in the presence of ultrasound*
+  (IEC 61012:1990). [IEC webstore](https://webstore.iec.ch/en/publication/4296).
+  The AU weighting: U-weighting pole locations (Table 2), nominal responses
+  and tolerances (Table 1) and the combined AU definition of subclause 2.2.
+- International Electrotechnical Commission. (1976). *Frequency weighting
+  for the measurement of aircraft noise (D-weighting)* (IEC 537:1976,
+  withdrawn). Implemented from its published rational transfer function and
+  cross-checked against independent implementations (section 2).
+- Bennett, R. L., & Pearsons, K. S. (1981). *Handbook of Aircraft Noise
+  Metrics* (NASA CR-3406). NASA.
+  [ntrs.nasa.gov](https://ntrs.nasa.gov/citations/19810013341).
+  Republishes the IEC 537 D-weighting table (Table SLD-I) used to pin the
+  D response in CI.
+
+## Standards
+
+ISO 7196:1995, *Acoustics — Frequency-weighting characteristic for
+infrasound measurements*: the G-weighting pole/zero definition (Table 1),
+verified against every Table 2 nominal response value (0.25 Hz to 315 Hz).
+ANSI S1.4-1983, *Specification for Sound Level Meters*: the historical B
+weighting (Appendix C, Tables IV and V). IEC 61012:1990, *Filters for the
+measurement of audible sound in the presence of ultrasound*: the AU
+weighting (Tables 1 and 2, subclause 2.2). IEC 537:1976 (withdrawn),
+*Frequency weighting for the measurement of aircraft noise*: the D
+weighting, from its published rational transfer function.

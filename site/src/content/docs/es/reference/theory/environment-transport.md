@@ -131,7 +131,7 @@ $$
 
 Los ajustes $K_i$ cubren las penalizaciones horarias (ISO 1996-1 Tabla A.1: tarde 5 dB, noche 10 dB) así como los ajustes por carácter de la fuente (p. ej. penalizaciones tonales), que las evaluaciones TNR/PR de ECMA-418-1 permiten justificar objetivamente.
 
-Consulta la [guía de niveles](/phonometry/es/guides/levels/) para su uso.
+Consulta la [guía de niveles ambientales](/phonometry/es/guides/environmental-levels/) para su uso.
 
 <img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile_es.svg" alt="Perfil LAeq urbano sintético de 24 horas con las bandas de día, tarde y noche, los niveles por periodo ponderados con +5 y +10 dB y el Lden resultante" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile_es_dark.svg" alt="Perfil LAeq urbano sintético de 24 horas con las bandas de día, tarde y noche, los niveles por periodo ponderados con +5 y +10 dB y el Lden resultante" style="width:80%" loading="lazy">
 

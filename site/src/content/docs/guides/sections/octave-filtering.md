@@ -12,12 +12,16 @@ them, and whose designs are verified against the class tolerances of
 **IEC 61260-1:2014**.
 
 The foundation page is [Filter Banks](/phonometry/guides/filter-banks/). It
-covers the five architectures (Butterworth, Chebyshev I/II, Elliptic and
-Bessel), what their frequency responses trade against each other, how a signal
-is decomposed into 1/1, 1/3 or arbitrary 1/b octave bands, and the zero-phase
-offline mode for analysis where filter delay must not smear the result. Under
-the hood every bank is a cascade of second-order sections with multirate
-decimation, which is what keeps low-frequency bands numerically stable.
+covers the band mathematics, how a signal is decomposed into 1/1, 1/3 or
+arbitrary 1/b octave bands, the parametric EQ and the zero-phase offline mode
+for analysis where filter delay must not smear the result. Under the hood
+every bank is a cascade of second-order sections with multirate decimation,
+which is what keeps low-frequency bands numerically stable. Choosing among
+the five architectures (Butterworth, Chebyshev I/II, Elliptic and Bessel) is
+the job of the
+[Filter Architecture Gallery](/phonometry/guides/filter-gallery/): what their
+frequency responses trade against each other, the full response gallery and
+per-architecture usage, plus the Linkwitz-Riley crossover.
 
 Proving a designed bank against those tolerances is the job of
 [Filter Class Verification (IEC 61260-1)](/phonometry/guides/filter-compliance/):
@@ -40,9 +44,11 @@ parameters) consumes the band signals or band levels these pages produce.
 
 ## Pages in this section
 
-- [Filter Banks](/phonometry/guides/filter-banks/): the five filter
-  architectures, frequency responses, band decomposition and zero-phase
+- [Filter Banks](/phonometry/guides/filter-banks/): the band mathematics,
+  bank parameters, parametric EQ, band decomposition and zero-phase
   filtering.
+- [Filter Architecture Gallery](/phonometry/guides/filter-gallery/): the five
+  architectures compared, the response gallery and per-architecture usage.
 - [Filter Class Verification (IEC 61260-1)](/phonometry/guides/filter-compliance/):
   the Table 1 acceptance mask, class 0 and the compliance fiche.
 - [Block Processing](/phonometry/guides/block-processing/): stateful streaming

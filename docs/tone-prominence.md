@@ -203,8 +203,9 @@ other only as supporting evidence.
 
 ## See also
 
-- [Levels](levels.md): the ISO 1996-1 rating levels whose tonal adjustments
-  (Table A.1) these prominence verdicts justify objectively.
+- [Environmental levels](environmental-levels.md): the ISO 1996-1 rating levels and their Table A.1
+  tonal adjustments, whose Kt is justified by the ISO/PAS 20065 audibility
+  route; these prominence verdicts are complementary emission screening.
 - [Sound Quality Metrics](sound-quality.md): the ECMA-418-2 psychoacoustic
   tonality T in tu_HMS, the hearing-model counterpart of these FFT ratios.
 - [Objective audibility of tones in noise](tone-audibility.md): the ISO/PAS 20065

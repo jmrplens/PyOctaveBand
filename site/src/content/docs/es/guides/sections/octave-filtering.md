@@ -13,14 +13,17 @@ filtro que los calcule, y cuyos diseños se verifican contra las tolerancias
 de clase de **IEC 61260-1:2014**.
 
 La página fundacional es
-[Bancos de filtros](/phonometry/es/guides/filter-banks/). Cubre las cinco
-arquitecturas (Butterworth, Chebyshev I/II, elíptica y Bessel), qué
-intercambian sus respuestas en frecuencia entre sí, cómo se descompone una
-señal en bandas de 1/1, 1/3 o 1/b arbitrario, y el modo de fase cero fuera de
-línea para análisis donde el retardo del filtro no debe emborronar el
-resultado. Por dentro, cada banco es una cascada de secciones de segundo
-orden con diezmado multitasa, que es lo que mantiene numéricamente estables
-las bandas de baja frecuencia.
+[Bancos de filtros](/phonometry/es/guides/filter-banks/). Cubre la matemática
+de las bandas, cómo se descompone una señal en bandas de 1/1, 1/3 o 1/b
+arbitrario, el ecualizador paramétrico y el modo de fase cero fuera de línea
+para análisis donde el retardo del filtro no debe emborronar el resultado.
+Por dentro, cada banco es una cascada de secciones de segundo orden con
+diezmado multitasa, que es lo que mantiene numéricamente estables las bandas
+de baja frecuencia. Elegir entre las cinco arquitecturas (Butterworth,
+Chebyshev I/II, elíptica y Bessel) es el trabajo de la
+[Galería de arquitecturas de filtro](/phonometry/es/guides/filter-gallery/):
+qué intercambian sus respuestas en frecuencia entre sí, la galería completa
+de respuestas y el uso de cada arquitectura, más el crossover Linkwitz-Riley.
 
 Demostrar que un banco diseñado cumple esas tolerancias es el trabajo de
 [Verificación de clase de filtros (IEC 61260-1)](/phonometry/es/guides/filter-compliance/):
@@ -45,9 +48,12 @@ páginas producen.
 
 ## Páginas de esta sección
 
-- [Bancos de filtros](/phonometry/es/guides/filter-banks/): las cinco
-  arquitecturas de filtro, respuestas en frecuencia, descomposición en bandas
-  y filtrado de fase cero.
+- [Bancos de filtros](/phonometry/es/guides/filter-banks/): la matemática de
+  las bandas, los parámetros del banco, el ecualizador paramétrico, la
+  descomposición en bandas y el filtrado de fase cero.
+- [Galería de arquitecturas de filtro](/phonometry/es/guides/filter-gallery/):
+  las cinco arquitecturas comparadas, la galería de respuestas y el uso de
+  cada arquitectura.
 - [Verificación de clase de filtros (IEC 61260-1)](/phonometry/es/guides/filter-compliance/):
   la máscara de aceptación de la Tabla 1, la clase 0 y la ficha de
   conformidad.

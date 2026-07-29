@@ -1,0 +1,225 @@
+---
+title: "Niveles ambientales (ISO 1996-1/-2)"
+description: "Lden, Ldn y los niveles de evaluación compuestos de ISO 1996-1, con el ajuste tonal, la corrección de ruido residual y el balance de incertidumbre de medida de ISO 1996-2."
+references:
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2016
+    title: "Acoustics — Description, measurement and assessment of environmental noise — Part 1: Basic quantities and assessment procedures"
+    designation: "ISO 1996-1:2016"
+    url: "https://www.iso.org/standard/59765.html"
+    note: "Lden (3.6.4), Ldn (3.6.5) y el nivel de evaluación compuesto de jornada completa del apartado 6.5 (Fórmulas 5-6, ajustes de la Tabla A.1)."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2017
+    title: "Acoustics — Description, measurement and assessment of environmental noise — Part 2: Determination of sound pressure levels"
+    designation: "ISO 1996-2:2017"
+    url: "https://www.iso.org/standard/59766.html"
+    note: "El ajuste tonal del Anexo C (con el método de cribado y el mapeo de audibilidad media de ISO/PAS 20065), la corrección de ruido residual del apartado 10.4 y el balance de incertidumbre de medida del apartado 4 / Anexo F."
+  - type: standard
+    organization: "British Standards Institution"
+    year: 2003
+    title: "Description and measurement of environmental noise — Guide to quantities and procedures"
+    designation: "BS 7445-1:2003"
+    url: "https://knowledge.bsigroup.com/products/description-and-measurement-of-environmental-noise-guide-to-quantities-and-procedures"
+    note: "El compañero de práctica de medición de ISO 1996-1: qué familia de descriptores encaja con cada pregunta de evaluación, y los procedimientos de medición a su alrededor (BS 7445-2:1991 cubre la adquisición de datos para usos del suelo)."
+---
+
+import ThemeImage from '../../../../components/ThemeImage.astro';
+
+Una comunidad no oye un único LAeq: oye un día cuyas tardes y noches pesan
+más, una fuente cuyos tonos o impulsos molestan más allá de su energía, y
+una medición tomada sobre un fondo residual con una confianza finita. Esta
+página es la cadena de evaluación regulatoria construida sobre los niveles
+por periodo medidos: los descriptores de día completo $L_{den}$/$L_{dn}$ y
+los niveles de evaluación compuestos de ISO 1996-1, y los procedimientos de
+determinación de ISO 1996-2 que hacen defendible el número reportado: el
+ajuste tonal, la corrección de ruido residual y el balance de incertidumbre
+de medida.
+
+La mitad de cálculo de niveles del tema, las integrales de
+$L_{eq}$/$L_{Aeq}$, los niveles percentiles $L_N$, el SEL y la dosis de
+ruido que producen los niveles por periodo que esta página consume, es
+[Niveles integrados y estadísticos](/phonometry/es/guides/levels/); todo lo
+de aquí asume que esos valores por periodo ya están calculados.
+
+## Ruido ambiental: Lden, Ldn y niveles de evaluación (ISO 1996-1)
+
+La evaluación regulatoria del ruido pondera más las tardes y las noches.
+`lden()` implementa el nivel día-tarde-noche de ISO 1996-1:2016 (3.6.4:
++5 dB tarde, +10 dB noche, periodos 12/4/8 h por defecto, ajustables porque
+cada país los define distinto), `ldn()` la variante día-noche (3.6.5) y
+`composite_rating_level()` el compuesto general de jornada completa del
+apartado 6.5 (Fórmulas 5-6) para periodos arbitrarios con ajustes por fuente o
+carácter (Tabla A.1: p. ej. +5 dB impulsivo regular, +12 dB altamente
+impulsivo, +3 a +6 dB tonos prominentes):
+
+```python
+from phonometry import environmental
+
+l = environmental.lden(63.2, 58.1, 51.4)                      # desde LAeq por periodo
+r = environmental.composite_rating_level([(63.2, 12, 0.0),    # día
+                            (58.1, 4, 5.0),     # tarde (+5)
+                            (51.4, 8, 10.0)])   # noche (+10) == environmental.lden
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile_es.svg" alt="Perfil LAeq urbano sintético de 24 horas con las bandas de día, tarde y noche, los niveles por periodo ponderados con +5 y +10 dB y el Lden resultante" width="80%" />
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import environmental
+
+# LAeq horario sintético de una vía urbana (dB), horas 00 a 23
+laeq_h = np.array([48, 46, 45, 45, 46, 50, 56, 64, 66, 65, 63, 63,
+                   64, 63, 63, 64, 65, 66, 65, 64, 63, 62, 61, 50], dtype=float)
+
+def period_leq(idx):
+    return 10 * np.log10(np.mean(10 ** (laeq_h[idx] / 10)))  # media energética
+
+ld = period_leq(np.arange(7, 19))                # día 07-19
+le = period_leq(np.arange(19, 23))               # tarde 19-23
+ln_ = period_leq(np.r_[23, np.arange(0, 7)])     # noche 23-07
+l_den = environmental.lden(ld, le, ln_)
+print(f"Lden = {l_den:.1f} dB")   # Lden = 64.3 dB
+
+fig, ax = plt.subplots()
+ax.axvspan(19, 23, color="C1", alpha=0.15)                                # tarde
+ax.axvspan(23, 24, color="C0", alpha=0.15); ax.axvspan(0, 7, color="C0", alpha=0.15)
+ax.step(np.arange(25), np.r_[laeq_h, laeq_h[-1]], where="post",
+        color="0.3", label="LAeq horario")
+ax.hlines(ld, 7, 19, color="C2", linestyle="--", label="Ldía (+0 dB)")
+ax.hlines(le + 5, 19, 23, color="C1", linestyle="--", label="Ltarde + 5 dB")
+ax.hlines([ln_ + 10, ln_ + 10], [23, 0], [24, 7], color="C0",
+          linestyle="--", label="Lnoche + 10 dB")
+ax.hlines(l_den, 0, 24, color="C3", linewidth=2, label=f"Lden = {l_den:.1f} dB")
+ax.set(xlabel="Hora del día", ylabel="Nivel [dB]", xlim=(0, 24))
+ax.legend(loc="upper left", fontsize=8, ncol=2)
+plt.show()
+```
+
+</details>
+
+### Parámetros de `lden()` / `ldn()` / `composite_rating_level()`
+
+| Función | Parámetros clave | Notas |
+| :--- | :--- | :--- |
+| `lden(lday, levening, lnight, hours=(12, 4, 8))` | LAeq por periodo [dB]; `hours` debe sumar 24 | +5 dB tarde, +10 dB noche (3.6.4) |
+| `ldn(lday, lnight, hours=(15, 9))` | | +10 dB noche (3.6.5) |
+| `composite_rating_level(periods)` | iterable de `(level_db, hours, adjustment_db)` | Fórmulas generales (5)-(6); ajustes según la Tabla A.1 |
+
+Dónde pones el micrófono cambia el número: ISO 1996-2 fija las posiciones del receptor y sus correcciones de fachada. El diagrama es contexto de medida; aplica las correcciones a tus niveles antes del análisis:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_env_measurement_es.svg" alt="Posiciones de medida de ruido ambiental según ISO 1996-2: campo libre, a 2 m de la fachada y enrasado, con sus correcciones" width="92%" />
+
+Combínalo con `laeq()` por periodo para ir de grabaciones a Lden. El propio
+ajuste tonal se justifica por la vía de audibilidad tonal de la sección
+siguiente (alimentada, para el método de ISO/PAS 20065, por
+[Audibilidad objetiva de tonos en ruido](/phonometry/es/guides/tone-audibility/));
+los veredictos `tone_to_noise_ratio()` / `prominence_ratio()` de
+[Tonos discretos prominentes](/phonometry/es/guides/tone-prominence/) son un
+cribado de emisión complementario, no la base del Kt.
+
+## Determinación de niveles: ajuste tonal, ruido residual e incertidumbre (ISO 1996-2)
+
+ISO 1996-2:2017 es la parte de **determinación**: cómo el nivel medido se
+convierte en nivel de valoración y se reporta con su incertidumbre. La *suma* del
+nivel de valoración y las penalizaciones por periodo están en ISO 1996-1 (arriba);
+ISO 1996-2 aporta el ajuste tonal, la corrección de ruido residual y el
+presupuesto de incertidumbre.
+
+**Ajuste tonal (método de ingeniería, Anexo C).** A partir del nivel tonal
+sumado en energía $L_{pt}$ y el nivel de ruido enmascarante $L_{pn}$ en la banda
+crítica alrededor de un tono, la audibilidad sobre el umbral de enmascaramiento es
+$\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \lg[1 + (f_c/502)^{2.5}]$ dB (Fórmula (C.3)),
+y el ajuste es $K_t = 0$ para $\Delta L_{ta} < 4$, $K_t = \Delta L_{ta} - 4$ para
+$4 \le \Delta L_{ta} \le 10$ y $K_t = 6$ por encima (Fórmulas (C.4)–(C.6)). El
+ancho de banda crítico es 100 Hz hasta 500 Hz y el 20 % de $f_c$ por encima
+(Tabla C.1). El **método de cribado** en tercios de octava (`tonal_seeking_survey`)
+marca una banda que supera a ambas vecinas en 15/8/5 dB (baja/media/alta), y
+`tonal_adjustment_from_mean_audibility` mapea la audibilidad media de ISO/PAS 20065
+a $K_t$ (Tabla J.1).
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tonal_audibility_es.svg" alt="Ajuste tonal Kt de ISO 1996-2 como función a tramos de la audibilidad tonal: cero por debajo de 4 dB, creciendo linealmente hasta 6 dB entre 4 y 10 dB, y 6 dB por encima, con los cuatro ejemplos resueltos del Anexo C.5 y un tono de rango medio marcados" width="80%" />
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import environmental
+
+# ISO 1996-2:2007 Anexo C.5, Ejemplo 2 (dos tonos cerca de 400 Hz):
+res = environmental.assess_tonal_audibility(tone_level=54.1, masking_noise_level=45.2,
+                              centre_frequency=430.0)
+print(res.audibility, res.adjustment)   # ΔLta ≈ 11,1 dB -> Kt = 6 dB
+res.plot(language="es")
+plt.show()
+```
+</details>
+
+**Corrección de ruido residual (Cláusula 10.4).** `residual_sound_correction()`
+aplica $L = 10\lg(10^{L'/10} - 10^{L_\text{res}/10})$ (Fórmula (16)). Con un
+residual dentro de 3 dB del nivel medido no se permite corrección alguna: el
+valor reportable es entonces el nivel medido *sin corregir* $L'$, como cota
+superior del sonido específico (expuesto como `reportable_upper_bound`, con
+`reliable=False`). `gaussian_residual_level()` estima el residual a partir de
+niveles percentiles (Anexo I) y rechaza ordenaciones de percentiles
+invertidas.
+
+**Incertidumbre de medición (Cláusula 4, Anexo F).**
+`combined_standard_uncertainty()` forma $u = \sqrt{\sum (c_j u_j)^2}$ (Fórmula (2))
+y `expanded_uncertainty()` aplica $k = 2$ (95 %) o $k = 1.3$ (80 %);
+`residual_correction_uncertainty()` lleva la sensibilidad de la corrección residual
+(Fórmulas (F.7)/(F.8)) y `uncertainty_from_repeated_measurements()` la
+incertidumbre típica de mediciones repetidas: la vía primaria en el dominio
+de energía (Fórmulas (17)+(19)), con el sustituto en niveles de la Nota 2
+(Fórmula (20)) reportado al lado como `approximate_uncertainty` y un aviso
+cuando los niveles se dispersan más de 3 dB, donde el sustituto se infla
+groseramente.
+
+```python
+from phonometry import environmental
+
+tonal = environmental.assess_tonal_audibility(54.1, 45.2, 430.0)  # TonalAssessmentResult
+kt = tonal.adjustment                                             # 6 dB
+tonal.plot()   # esta audibilidad sobre la curva de Kt, como en la figura de arriba
+corr = environmental.residual_sound_correction(measured_level=58.0, residual_level=50.0)
+u = environmental.combined_standard_uncertainty([0.59, 0.3, 2.0, 0.40, 0.38])  # 2,18 dB (G.2)
+environmental.expanded_uncertainty(u)                            # 4,36 dB (k = 2)
+```
+
+## Qué cubre esta guía
+
+**Cubierto.** El Lden, el Ldn y el nivel de valoración compuesto de la ISO
+1996-1:2016 (apartado 6.5,
+`environmental.lden`/`ldn`/`composite_rating_level`); y el ajuste tonal
+(anexo C), la corrección de ruido residual (apartado 10.4) y el balance de
+incertidumbre de medida (apartado 4, anexo F) de la ISO 1996-2:2017.
+
+**No cubierto.** La ISO 1996-2 fija las posiciones del receptor y las
+correcciones de fachada que convierten una medida en bruto en el nivel que
+esperan las funciones de esta página: esos procedimientos de posición y
+corrección no están implementados, solo la aritmética que sigue una vez
+aplicados.
+
+## Véase también
+
+- [Niveles integrados y estadísticos](/phonometry/es/guides/levels/): los niveles Leq/LAeq, percentiles y de suceso con los que se componen los indicadores de esta página.
+- [Audibilidad objetiva de tonos en ruido (ISO/PAS 20065)](/phonometry/es/guides/tone-audibility/): la audibilidad tonal cuyo valor medio se traduce en el ajuste Kt (Tabla J.1).
+- [Tonos discretos prominentes](/phonometry/es/guides/tone-prominence/): los veredictos de relación tono-ruido y de prominencia de ECMA-418-1, cribado de emisión complementario para la cuestión tonal.
+- [Exposición laboral (ISO 9612)](/phonometry/es/guides/occupational-exposure/): la contraparte en el puesto de trabajo, de las muestras por tarea al nivel de exposición diario con su balance de incertidumbre.
+- Referencia de la API: [`environmental.measurement`](/phonometry/es/reference/api/environment/measurement/) y [`environmental.rating`](/phonometry/es/reference/api/environment/rating/).
+
+## Respuestas rápidas
+
+### ¿Qué penalizaciones aplica Lden a la tarde y a la noche?
+
+$L_{den}$, el nivel día-tarde-noche de ISO 1996-1:2016 (3.6.4), suma +5 dB
+al nivel de tarde y +10 dB al de noche antes de promediar energéticamente el
+día completo, con periodos por defecto de 12, 4 y 8 horas, ajustables porque
+cada país los define distinto. La variante día-noche $L_{dn}$ (3.6.5)
+conserva solo la penalización de +10 dB de noche.

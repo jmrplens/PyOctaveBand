@@ -15,9 +15,11 @@ mask and the per-band verdict, the stricter **class 0** kept alive by the
 withdrawn IEC 61260:1995 and ANSI S1.11-2004 masks, a reading of what a
 class actually buys in a measurement (passband error, stopband leakage,
 uncertainty budget), and the one-page accredited fiche that turns the
-verdict into a document. The design half, the band mathematics, the five
-architectures and their responses, is [Filter Banks](filter-banks.md); the
-same machinery applied to the frequency weightings is section 8 of
+verdict into a document. The design half, the band mathematics and the
+parameter reference, is [Filter Banks](filter-banks.md), and the five
+architectures with their compared responses are
+[Filter Architecture Gallery](filter-gallery.md); the same machinery
+applied to the frequency weightings is section 6 of
 [Frequency Weighting](weighting.md).
 
 ## 1. Verifying the class against IEC 61260-1:2014
@@ -289,8 +291,8 @@ configurations.
 - [Filter Banks](filter-banks.md): the band mathematics and the
   architectures whose class is verified here.
 - [Frequency Weighting](weighting.md): the companion verification of the A,
-  C, Z, B, D and G curves against the IEC 61672-1 and ANSI S1.4 tolerance
-  tables.
+  C and Z curves against the IEC 61672-1 tolerance tables, with the G, B, D and
+  AU curves covered in [Special Weightings](special-weightings.md).
 - [Sound level meter](sound-level-meter.md): the instrument chain whose
   spectrum stage this class applies to.
 - [Conformance report](CONFORMANCE.md): the verified configurations behind

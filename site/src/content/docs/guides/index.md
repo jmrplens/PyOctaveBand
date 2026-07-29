@@ -1,6 +1,6 @@
 ---
 title: "Guides"
-description: "The 89 guides of phonometry, grouped into the nine areas the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
+description: "The 93 guides of phonometry, grouped into the nine areas the library covers: what each area is for, the standards implemented in it, and a one-line summary of every guide inside it."
 head:
   - tag: script
     attrs:
@@ -89,7 +89,7 @@ makes, then runnable code and the figure it draws. Nothing here is a survey of
 the field; each page is the working documentation of a module, written so that
 a result can be defended clause by clause rather than trusted.
 
-This page is the map. Eighty-nine guides sit in nine areas, and each area has its
+This page is the map. Ninety-three guides sit in nine areas, and each area has its
 own overview page with the longer story of how its pieces fit together. If you
 are arriving without a specific question, read
 [Getting Started](/phonometry/getting-started/) first: it runs one signal
@@ -120,9 +120,12 @@ IEC 61252, ISO 1996-1, IEC 60942, ISO 18233 and the GUM.
 
 **[Octave filtering](/phonometry/guides/sections/octave-filtering/)**
 
-- [Filter Banks](/phonometry/guides/filter-banks/): the five filter
-  architectures, their frequency responses, band decomposition and zero-phase
-  offline filtering.
+- [Filter Banks](/phonometry/guides/filter-banks/): the fractional-octave band
+  mathematics, the bank parameters, the parametric EQ, band decomposition and
+  zero-phase offline filtering.
+- [Filter Architecture Gallery](/phonometry/guides/filter-gallery/): the five
+  filter architectures compared at the band edges, the full response gallery
+  and per-architecture usage, with the Linkwitz-Riley crossover.
 - [Filter Class Verification (IEC 61260-1)](/phonometry/guides/filter-compliance/):
   the Table 1 acceptance mask band by band, the class 0 of the withdrawn 1995
   edition and the compliance fiche.
@@ -135,14 +138,20 @@ IEC 61252, ISO 1996-1, IEC 60942, ISO 18233 and the GUM.
 
 **[Levels and weighting](/phonometry/guides/sections/levels-weighting/)**
 
-- [Frequency Weighting (A, B, C, D, G, AU, Z)](/phonometry/guides/weighting/):
-  the IEC 61672-1 ear-response curves, ISO 7196 G-weighting for infrasound and
-  the historical B and D curves.
+- [Frequency Weighting (A, C, Z)](/phonometry/guides/weighting/):
+  the IEC 61672-1 ear-response curves, the high-frequency accuracy mode and
+  the Table 3 class verification.
+- [Special Weightings (G, B, D, AU)](/phonometry/guides/special-weightings/):
+  ISO 7196 G-weighting for infrasound, the historical B and D curves and AU
+  for audible sound in the presence of ultrasound.
 - [Time Weighting](/phonometry/guides/time-weighting/): the Fast, Slow and
   Impulse exponential ballistics of IEC 61672-1.
 - [Integrated and Statistical Levels](/phonometry/guides/levels/): Leq and
-  LAeq, the percentile levels L10/L50/L90, LCpeak and SEL, noise dose,
-  Lden and the ISO 1996-1 rating levels.
+  LAeq, the percentile levels L10/L50/L90, LCpeak and SEL, and the noise
+  dose.
+- [Environmental Levels (ISO 1996-1/-2)](/phonometry/guides/environmental-levels/):
+  Lden, Ldn and the composite rating levels, the tonal adjustment, the
+  residual-noise correction and the uncertainty budget.
 
 **[Signals and spectra](/phonometry/guides/sections/signals-spectra/)**
 
@@ -195,9 +204,12 @@ ANSI S3.5, ISO 7029, ISO 1999 and ISO 9612.
 
 **[Psychoacoustics](/phonometry/guides/sections/psychoacoustics/)**
 
-- [Loudness](/phonometry/guides/loudness/): loudness in sones by Zwicker,
-  Moore-Glasberg, the time-varying ISO 532-3 model and the ECMA-418-2 Sottek
-  Hearing Model, plus the ISO 226 equal-loudness contours.
+- [Loudness](/phonometry/guides/loudness/): loudness in sones by the ISO 532-1
+  Zwicker method with its one-page fiche, plus the ISO 226 equal-loudness
+  contours.
+- [Advanced Loudness (ISO 532-2/-3, ECMA-418-2)](/phonometry/guides/advanced-loudness/):
+  the Moore-Glasberg stationary and time-varying methods and the Sottek
+  Hearing Model loudness, with the model-choice table.
 - [Sound Quality Metrics](/phonometry/guides/sound-quality/): sharpness in
   acum, and the ECMA-418-2 tonality, roughness and fluctuation strength.
 - [Prominent Discrete Tones (ECMA-418-1)](/phonometry/guides/tone-prominence/):
