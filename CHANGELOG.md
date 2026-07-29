@@ -289,6 +289,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   (A.1) and on identity checks against F4, which is the same statistic taken
   over the measurement positions instead of the time samples.
 
+- Detailed per-band building prediction (ISO 12354-1/-2:2017 Clause 4.2), the
+  per-band counterpart of the simplified single-number model: new
+  `building/detailed_prediction.py` with the Annex B element performance
+  (`bending_radiation_factor`, `forced_radiation_factor`,
+  `calculated_sound_reduction_index` with its high-frequency plateau, and
+  `bare_floor_impact_level`), the Annex C damping chain
+  (`perimeter_absorption_coefficient`, `in_situ_total_loss_factor`,
+  `laboratory_total_loss_factor`, `structural_reverberation_time`), the
+  in-situ conversions (`in_situ_reduction_index`, `in_situ_impact_level`,
+  `in_situ_equivalent_absorption_length`,
+  `in_situ_velocity_level_difference`), the per-band paths for Type A
+  (`flanking_reduction_index`, `flanking_impact_level`) and Type B elements
+  (`flanking_reduction_index_from_normalized_difference`,
+  `flanking_reduction_index_from_flanking_level`,
+  `flanking_impact_level_from_normalized_difference`,
+  `resonant_sound_reduction_index`), and the assembly into `R'` and `L'n` per
+  band with their ISO 717 ratings (`detailed_airborne_prediction`,
+  `detailed_impact_prediction`). `HomogeneousElement` and `in_situ_element`
+  run the whole chain for one element in one call; `DetailedAirborneResult`
+  and `DetailedImpactResult` expose each path's share of the transmitted
+  energy per band, `.plot()` them as stacked path-contribution bars with the
+  apparent quantity overlaid, and `.report()` a one-page detailed prediction
+  fiche. Also `floating_floor_improvement` (Part 2 Annex C) and
+  `reciprocity_impact_level` (Part 2 Formulae B.3/B.4). Anchored band by band
+  on the worked example that ISO 12354-1 Annex L and ISO 12354-2 Annex G share
+  (about twenty printed tables for one building) plus its lightweight
+  wood-frame second example and ISO 12354-2 Table B.2; three new conformance
+  checks, a new figure `detailed_prediction_paths`, and a "Detailed Per-Band
+  Prediction (ISO 12354)" guide in English and Spanish.
+
 - 2D near-to-far-field (NTFF) transformation for the FDTD solver.
   `FDTD2D.add_contour_probe` captures the steady-state pressure and outward
   normal-velocity phasors on a closed rectangular contour of cell faces with
@@ -403,6 +433,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   each centred. It reaches the 232 blocks on 120 pages (60 English, 60 Spanish)
   that state more than one equation per block, needs no change to the markdown,
   and leaves the TeX, the accessible label and the page anchors untouched.
+
+- Eight defects of the ISO 12354-1:2017 Annex L and ISO 12354-2:2017 Annex G
+  worked examples, found while anchoring the detailed model on them, are
+  recorded in `docs/ERRATA.md`: the perimeter sums and the external-wall
+  internal loss factor of the Table L.3 / G.3 input block (only two of the
+  five sums reproduce their own columns), the Table L.4 block labelled "2d"
+  that carries the numbers of path 4d, the non-integer weighted ratings of
+  Table L.1 / G.1 (a continuously shifted ISO 717 reference curve, printed
+  once truncated and once rounded), the 50 Hz to 80 Hz flanking cells of
+  Table G.1 that contradict Table G.4 for the same path, the Kij and m'i
+  misprints of Table G.8, the mislabelled Table G.6 row and the element label
+  of Table L.10 / G.10.
 
 - The home page meta description now fits the ~160-character window search
   engines display (Bing flagged the old 318-character one): the one-sentence

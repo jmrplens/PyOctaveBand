@@ -1068,6 +1068,10 @@ _ES_EXACT = {
     "EN 12354-1 Flanking Transmission (Annex H.3 example)":
         "Transmisión por flancos EN 12354-1 (ejemplo del Anexo H.3)",
     "Share of transmitted energy [%]": "Cuota de energía transmitida [%]",
+    "ISO 12354-1 Detailed Model: Dominant Path per Band (Annex L)":
+        "Modelo detallado ISO 12354-1: camino dominante por banda (Anexo L)",
+    "other paths": "otros caminos",
+    "R' (apparent)": "R' (aparente)",
     "Transmission path": "Camino de transmisión",
     "Dd — direct": "Dd — directo",
     "Ff — flanking–flanking": "Ff — flanco–flanco",
@@ -11138,6 +11142,106 @@ def generate_impact_prediction_terms(output_dir: str) -> None:
     plt.close()
 
 
+def generate_detailed_prediction_paths(output_dir: str) -> None:
+    """ISO 12354-1 Annex L: which transmission path dominates each band."""
+    print("Generating detailed_prediction_paths...")
+    import sys
+    from pathlib import Path
+
+    tests = str(Path(__file__).resolve().parent.parent / "tests")
+    if tests not in sys.path:
+        sys.path.insert(0, tests)
+    import iso12354_building as bld
+
+    from phonometry import (
+        airborne_flanking_path,
+        detailed_airborne_prediction,
+        direct_reduction_index,
+        floating_floor_improvement,
+        in_situ_element,
+    )
+
+    # The heavy homogeneous building of ISO 12354-1:2017 Annex L: a 220 mm
+    # concrete separating floor with a floating floor, two 365 mm AAC external
+    # walls and two 200 mm calcium-silicate internal walls.
+    bands = np.array([50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630,
+                      800, 1000, 1250, 1600, 2000, 2500, 3150], dtype=float)
+    situ = {k: in_situ_element(e, bands) for k, e in bld.elements().items()}
+    kij = bld.junction_indices()
+    delta = floating_floor_improvement(
+        bands, resonance_frequency=bld.floating_floor_resonance()
+    )
+    paths = []
+    for tag, name in (("1", "ext1"), ("2", "ext2"), ("3", "int1"), ("4", "int2")):
+        wall = situ[name]
+        lij = bld.COUPLING_LENGTH[name]
+        cross = kij["floor-ext"] if name.startswith("ext") else kij["floor-int"]
+        through = kij["ext-ext"] if name.startswith("ext") else kij["int-int"]
+        paths.append(airborne_flanking_path(
+            label=f"D{tag}", kind="Df", element_i=situ["floor"], element_j=wall,
+            vibration_reduction_index=cross, coupling_length=lij,
+            separating_area=bld.SEPARATING_AREA, delta_r_i=delta))
+        paths.append(airborne_flanking_path(
+            label=f"{tag}d", kind="Fd", element_i=wall, element_j=situ["floor"],
+            vibration_reduction_index=cross, coupling_length=lij,
+            separating_area=bld.SEPARATING_AREA))
+        paths.append(airborne_flanking_path(
+            label=f"{tag}{tag}", kind="Ff", element_i=wall, element_j=wall,
+            vibration_reduction_index=through, coupling_length=lij,
+            separating_area=bld.SEPARATING_AREA))
+    res = detailed_airborne_prediction(
+        bands,
+        direct_index=direct_reduction_index(
+            situ["floor"].sound_reduction_index, delta_r_source=delta),
+        flanking_paths=paths,
+    )
+    assert res.rating is not None
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    x = _band_index_axis(ax, bands)
+    order = list(np.argsort(-res.fractions.max(axis=1)))
+    palette = [COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TERTIARY, "#9467bd",
+               "#aec7e8", "#ff9896"]
+    bottom = np.zeros(x.size)
+    for colour, k in zip(palette, order[:6]):
+        share = 100.0 * res.fractions[k]
+        ax.bar(x, share, bottom=bottom, width=0.85, color=colour,
+               edgecolor="none", zorder=2, label=res.paths[k].label)
+        bottom = bottom + share
+    rest = order[6:]
+    if rest:
+        share = 100.0 * res.fractions[rest].sum(axis=0)
+        ax.bar(x, share, bottom=bottom, width=0.85, color=COLOR_GRID,
+               edgecolor="none", zorder=2, label="other paths")
+    ax.set_ylim(0.0, 100.0)
+    ax.set_ylabel("Share of transmitted energy [%]")
+    ax.set_title("ISO 12354-1 Detailed Model: Dominant Path per Band (Annex L)",
+                 fontweight="bold", pad=12)
+    ax.set_axisbelow(True)
+
+    twin = ax.twinx()
+    twin.plot(x, res.r_prime, "-o", color=COLOR_FG, linewidth=2.0,
+              markersize=4, zorder=5, label="R' (apparent)")
+    twin.set_ylabel("Apparent sound reduction index R' [dB]")
+    handles, labels = ax.get_legend_handles_labels()
+    extra, extra_labels = twin.get_legend_handles_labels()
+    ax.legend(handles + extra, labels + extra_labels, loc="upper left",
+              fontsize=9, ncol=3)
+
+    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
+    info = [
+        "R' = -10 lg(Σ 10^(-Rij/10))",
+        f"R'w (C; Ctr) = {res.rating.rating} ({res.rating.c}; {res.rating.ctr}) dB",
+    ]
+    ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
+            va="bottom", ha="right", fontsize=10, color=COLOR_FG,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+                  "edgecolor": COLOR_GRID})
+    plt.tight_layout()
+    save_figure(output_dir, "detailed_prediction_paths.svg")
+    plt.close()
+
+
 def generate_radiated_power_outdoor(output_dir: str) -> None:
     """EN 12354-4 Annex G radiated sound power of a wall with a door."""
     print("Generating radiated_power_outdoor...")
@@ -13204,6 +13308,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_intensity_element_insulation,
     generate_flanking_level_difference,
     generate_impact_prediction_terms,
+    generate_detailed_prediction_paths,
     generate_radiated_power_outdoor,
     generate_single_panel_rating,
     generate_junction_kij_thickness,

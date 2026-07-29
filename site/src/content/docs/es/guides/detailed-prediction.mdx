@@ -1,0 +1,419 @@
+---
+title: "Predicción detallada por bandas (ISO 12354)"
+description: "El modelo detallado por bandas de ISO 12354-1/-2:2017: conversión in situ de los datos de elemento y de unión, el índice de reducción acústica por flancos y el nivel de impactos banda a banda, y las contribuciones por camino que hay detrás de R'w y L'n,w."
+references:
+  - type: book
+    authors: ["Hopkins, C."]
+    year: 2007
+    title: "Sound insulation"
+    publisher: "Butterworth-Heinemann"
+    doi: "10.4324/9780080550473"
+    note: "La base física de cada término del modelo detallado: eficiencia de radiación, tiempo de reverberación estructural, longitud de absorción equivalente y el fundamento de análisis estadístico de energía de la suma de caminos. ISBN 978-0-7506-6526-1."
+  - type: book
+    authors: ["Vigran, T. E."]
+    year: 2008
+    title: "Building acoustics"
+    publisher: "Taylor & Francis"
+    note: "El modelo de transmisión de elementos homogéneos y la forma cerrada del nivel de impactos que hay detrás del Anexo B de ambas partes. ISBN 978-0-415-42853-8."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2017
+    title: "Building acoustics — Estimation of acoustic performance of buildings from the performance of elements — Part 1: Airborne sound insulation between rooms"
+    designation: "ISO 12354-1:2017"
+    url: "https://www.iso.org/standard/70242.html"
+    note: "El apartado 4.2 define el modelo detallado por bandas a ruido aéreo; el Anexo B el comportamiento calculado del elemento y los factores de radiación, el Anexo C el tiempo de reverberación estructural, el Anexo E los índices de unión y el Anexo L los ejemplos resueltos."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2017
+    title: "Building acoustics — Estimation of acoustic performance of buildings from the performance of elements — Part 2: Impact sound insulation between rooms"
+    designation: "ISO 12354-2:2017"
+    url: "https://www.iso.org/standard/70243.html"
+    note: "El apartado 4.2 define el modelo detallado por bandas a ruido de impactos; el Anexo B el nivel de impactos calculado del forjado desnudo, el Anexo C la mejora del suelo flotante y el Anexo G los ejemplos resueltos, que comparten el edificio del Anexo L de ISO 12354-1."
+---
+
+import ThemeImage from '../../../../components/ThemeImage.astro';
+
+El modelo simplificado de
+[Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/)
+devuelve un solo número, $R'_w$ o $L'_{n,w}$, y oculta todo lo que ocurre
+dentro del espectro. El **modelo detallado** (ISO 12354-1:2017 apartado 4.2 a
+ruido aéreo, ISO 12354-2:2017 apartado 4.2 a ruido de impactos) lleva en cambio
+cada magnitud por las bandas de tercio de octava: convierte los datos de
+laboratorio del elemento en sus valores *in situ*, forma cada camino de
+transmisión banda a banda, los suma energéticamente y solo entonces valora el
+espectro con ISO 717. Es lo que se calcula cuando se conocen los espectros de
+los elementos y la pregunta no es "¿cumple?" sino "¿qué camino tengo que
+corregir, y en qué bandas?".
+
+Esta página recorre el edificio del ejemplo resuelto de la propia norma de
+principio a fin y cierra con la rama ligera (Tipo B) y con las comprobaciones
+que la norma ofrece sobre sus propios números.
+
+## La cadena, banda a banda
+
+Ambas partes comparten la misma maquinaria, así que el edificio se describe una
+sola vez y las cadenas de ruido aéreo y de impactos leen los mismos datos de
+elemento in situ.
+
+**1. Comportamiento del elemento.** Para un elemento homogéneo la norma calcula
+el índice de reducción acústica a partir de las propiedades del material
+(Anexo B):
+
+$$
+\tau = \left(\frac{2\rho_o c_o}{2\pi f m'}\right)^2 \cdot
+\frac{\pi f_c \sigma^2}{2 f \eta_\text{tot}} \quad (f > f_c)
+$$
+
+con el factor de radiación para ondas de flexión libres $\sigma$ (fórmulas
+B.4-B.6), el factor de radiación para ondas forzadas $\sigma_f$ (fórmula B.3)
+por debajo de $f_c$ y una tercera rama para la banda que contiene $f_c$. Por
+encima de aproximadamente 1 kHz un elemento grueso deja de mejorar, y la
+fórmula (B.10) acota inferiormente el factor de transmisión con una meseta
+fijada por $\rho c_L$.
+
+**2. Conversión in situ.** El elemento radia y se amortigua de forma distinta
+en el edificio y en el marco de ensayo. El factor de pérdidas total in situ es
+(fórmula C.1)
+
+$$
+\eta_\text{tot} = \eta_\text{int}
++ \frac{2\rho_o c_o \sigma}{2\pi f m'}
++ \frac{c_o}{\pi^2 S \sqrt{f f_c}} \sum_k l_k \alpha_k
+$$
+
+siendo los tres términos las pérdidas internas del material, la radiación al
+aire y las pérdidas en el perímetro. Los coeficientes de perímetro se deducen
+de las propias uniones, $\alpha_k = \sum_j \sqrt{f_{c,j}/f_\text{ref}}
+\, 10^{-K_{ij}/10}$ (fórmula C.4). De $\eta_\text{tot}$ salen el tiempo de
+reverberación estructural $T_s = 2{,}2/(f\,\eta_\text{tot})$ y la longitud de
+absorción equivalente $a_\text{situ} = 2{,}2\pi^2 S \sqrt{f_\text{ref}/f} /
+(c_o T_{s,\text{situ}})$ (fórmula 11).
+
+**3. Uniones.** El $K_{ij}$, invariante frente a la situación, se convierte en
+la caída de nivel que la unión produce realmente (fórmula 10):
+
+$$
+\overline{D}_{v,ij,\text{situ}} = K_{ij}
+- 10\lg\!\left(\frac{l_{ij}}{\sqrt{a_{i,\text{situ}}\,a_{j,\text{situ}}}}\right)
+\ \ge 0\ \text{dB}
+$$
+
+**4. Caminos.** El camino directo es $R_{Dd} = R_{s,\text{situ}} +
+\Delta R_{D,\text{situ}} + \Delta R_{d,\text{situ}}$ (fórmula 14) y cada camino
+por flancos (fórmula 15)
+
+$$
+R_{ij} = \frac{R_{i,\text{situ}}}{2} + \Delta R_{i,\text{situ}}
++ \frac{R_{j,\text{situ}}}{2} + \Delta R_{j,\text{situ}}
++ \overline{D}_{v,ij,\text{situ}}
++ 10\lg\!\left(\frac{S_s}{\sqrt{S_i S_j}}\right)
+$$
+
+La parte de impactos discurre en paralelo: el nivel por bandas del forjado
+desnudo es
+$L_n = 155 - 30\lg m' + 10\lg T_s + 10\lg\sigma + 10\lg(f/f_\text{ref})$
+(fórmula B.2 de la parte 2), el camino directo resta el revestimiento de suelo
+y cualquier techo suspendido (fórmula 11), y cada camino por flancos es la
+fórmula (12).
+
+**5. Ensamblaje.** $R' = -10\lg\sum 10^{-R/10}$ sobre los trece caminos de un
+recinto con cuatro elementos de flanco, y $L'_n = 10\lg\sum 10^{L_n/10}$ sobre
+los cinco caminos de impactos, y después ISO 717.
+
+## El edificio resuelto del Anexo L / Anexo G
+
+El Anexo L de ISO 12354-1:2017 y el Anexo G de ISO 12354-2:2017 describen el
+**mismo** edificio: dos viviendas una sobre otra, recintos de 55 m³, un forjado
+separador de 5,00 m × 4,00 m de hormigón de 220 mm con una losa flotante de
+35 mm sobre lana mineral, dos fachadas de bloque de hormigón celular de 365 mm
+y dos particiones interiores de silicocalcáreo de 200 mm, que se encuentran en
+uniones rígidas en T y en cruz. Entre ambos imprimen cerca de veinte tablas por
+bandas, una por magnitud intermedia, lo que convierte el ejemplo en un oráculo
+completo del modelo. Ocho defectos de esas tablas impresas están registrados en
+[Erratas](/phonometry/es/reference/errata/), y el conjunto de datos de abajo
+toma las lecturas corregidas.
+
+```python
+import numpy as np
+from phonometry import (
+    HomogeneousElement, airborne_flanking_path, detailed_airborne_prediction,
+    direct_reduction_index, floating_floor_improvement, in_situ_element,
+    junction_vibration_reduction, perimeter_absorption_coefficient,
+)
+
+bands = np.array([50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630,
+                  800, 1000, 1250, 1600, 2000, 2500, 3150], float)
+
+# Uniones del Anexo E (sin redondear): forjado-fachada en T rígida, fachada
+# pasante, forjado-partición interior en cruz rígida, partición pasante.
+k_floor_ext = junction_vibration_reduction("rigid_t", "corner", 484.0 / 219.0)
+k_ext_ext = junction_vibration_reduction("rigid_t", "through", 484.0 / 219.0)
+k_floor_int = junction_vibration_reduction("rigid_cross", "corner", 360.0 / 484.0)
+k_int_int = junction_vibration_reduction("rigid_cross", "through", 484.0 / 360.0)
+print(round(k_floor_ext, 1), round(k_ext_ext, 1))     # 6.4 11.2  (tabla L.5)
+print(round(k_floor_int, 1), round(k_int_int, 1))     # 8.8 11.0  (tabla L.6)
+
+# Perímetro del forjado: topa contra una fachada arriba y abajo en cada uno de
+# sus dos bordes exteriores, y cruza las particiones interiores en los otros dos.
+a_at_ext = perimeter_absorption_coefficient([92.6, 92.6], [k_floor_ext] * 2)
+a_at_int = perimeter_absorption_coefficient(
+    [76.8, 128.4, 128.4], [junction_vibration_reduction(
+        "rigid_cross", "through", 360.0 / 484.0), k_floor_int, k_floor_int])
+floor_perimeter = 9.0 * (a_at_ext + a_at_int)         # 2,659 m (fórmula C.4)
+
+floor = HomogeneousElement("floor", 20.0, 5.0, 4.0, 484.0, 76.8, 0.005,
+                           floor_perimeter, 2200.0, 3800.0)
+el = in_situ_element(floor, bands)
+print(np.round(el.total_loss_factor[[0, 10]], 4))     # [0.0831 0.029 ]  tabla L.3
+print(np.round(el.sound_reduction_index[[0, 10]], 1)) # [31.8 54.9]      tabla L.3
+print(np.round(el.impact_level[[0, 10]], 1))          # [57.3 63.6]      tabla G.3
+print(np.round(el.absorption_length[[0, 10]], 1))     # [10.8 11.9]      tabla L.4
+```
+
+Cada columna impresa de las tablas L.2, L.3, L.4, G.3 y G.4 se reproduce con un
+margen de 0,06 dB, y el mismo conjunto de datos alimenta los dos totales.
+
+```python
+# Suelo flotante: losa de 35 mm, m' = 73,5 kg/m2 sobre s' = 8 MN/m3.
+f0 = 160.0 * np.sqrt(8.0 / 73.5)                      # 52,8 Hz (fórmula C.2)
+delta = floating_floor_improvement(bands, resonance_frequency=f0)  # 30 lg(f/f0)
+
+wall = in_situ_element(HomogeneousElement(
+    "ext1", 11.0, 4.0, 2.75, 219.0, 92.6, 0.0125, 2.375, 600.0, 1900.0), bands)
+
+# Camino D1 (Df: forjado separador -> fachada 1), tabla L.4.
+d1 = airborne_flanking_path(
+    label="D1", kind="Df", element_i=el, element_j=wall,
+    vibration_reduction_index=k_floor_ext, coupling_length=4.0,
+    separating_area=20.0, delta_r_i=delta)
+print(np.round(d1.values[[0, 10]], 1))                # [ 41.2  93.6]  tabla L.1
+```
+
+Ensamblar el camino directo y los doce caminos por flancos da el índice
+aparente por bandas, su reparto de energía y la valoración ISO 717-1 en una
+sola llamada:
+
+```python
+res = detailed_airborne_prediction(
+    bands, direct_index=direct_reduction_index(el.sound_reduction_index,
+                                               delta_r_source=delta),
+    flanking_paths=[d1, ...])          # los doce caminos de los cuatro elementos
+print(np.round(res.r_prime[[0, 10]], 1))   # [28.8 55.9]   total de la tabla L.1
+print(res.rating.rating, res.dominant[0])  # 57 'Dd'
+res.plot()                                 # barras de contribución por banda
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/detailed_prediction_paths.svg" alt="Cuotas apiladas por banda de la energía transmitida por los trece caminos de transmisión del edificio del Anexo L de ISO 12354-1, con el índice de reducción acústica aparente R' superpuesto: el camino directo Dd transporta la mitad de la energía a 50 Hz y desaparece por encima de 200 Hz, tras lo cual toman el relevo los caminos por flancos a través de las fachadas y las particiones interiores" width="92%" loading="eager" />
+
+*Esta es la figura por la que existe el modelo detallado. Por debajo de 80 Hz
+el problema es el propio forjado separador, de modo que una losa más pesada o
+un suelo flotante mejor ayudarían; a partir de 100 Hz ha desaparecido del
+reparto y son los caminos por flancos a través de las paredes los que fijan
+$R'$, así que ningún trabajo sobre el forjado movería el resultado. El número
+único $R'_w = 57$ dB no dice nada de eso.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import (
+    HomogeneousElement, airborne_flanking_path, detailed_airborne_prediction,
+    direct_reduction_index, floating_floor_improvement, in_situ_element,
+    junction_vibration_reduction, perimeter_absorption_coefficient,
+)
+
+bands = np.array([50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630,
+                  800, 1000, 1250, 1600, 2000, 2500, 3150], float)
+k = {
+    "floor-ext": junction_vibration_reduction("rigid_t", "corner", 484.0 / 219.0),
+    "ext-ext": junction_vibration_reduction("rigid_t", "through", 484.0 / 219.0),
+    "floor-floor": junction_vibration_reduction("rigid_cross", "through", 360.0 / 484.0),
+    "floor-int": junction_vibration_reduction("rigid_cross", "corner", 360.0 / 484.0),
+    "int-int": junction_vibration_reduction("rigid_cross", "through", 484.0 / 360.0),
+    "int-ext": junction_vibration_reduction("rigid_t", "corner", 360.0 / 219.0),
+    "extT-ext": junction_vibration_reduction("rigid_t", "through", 360.0 / 219.0),
+    "corner": junction_vibration_reduction("corner", "corner", 1.0),
+    "int-int-x": junction_vibration_reduction("rigid_cross", "through", 1.0),
+}
+a = perimeter_absorption_coefficient
+floor_sum = 9.0 * (a([92.6, 92.6], [k["floor-ext"]] * 2)
+                   + a([76.8, 128.4, 128.4],
+                       [k["floor-floor"], k["floor-int"], k["floor-int"]]))
+ext_top = a([76.8, 92.6], [k["floor-ext"], k["ext-ext"]])
+ext_side = a([92.6], [k["corner"]]) + a([128.4, 92.6], [k["int-ext"], k["extT-ext"]])
+int_top = a([76.8, 76.8, 128.4], [k["floor-int"], k["floor-int"], k["int-int"]])
+int_side = a([92.6, 92.6], [k["int-ext"]] * 2) + a([128.4] * 3, [k["int-int-x"]] * 3)
+
+specs = {
+    "floor": (20.0, 5.0, 4.0, 484.0, 76.8, 0.005, floor_sum, 2200.0, 3800.0),
+    "ext1": (11.0, 4.0, 2.75, 219.0, 92.6, 0.0125,
+             8.0 * ext_top + 2.75 * ext_side, 600.0, 1900.0),
+    "ext2": (13.75, 5.0, 2.75, 219.0, 92.6, 0.0125,
+             10.0 * ext_top + 2.75 * ext_side, 600.0, 1900.0),
+    "int1": (11.0, 4.0, 2.75, 360.0, 128.4, 0.01,
+             8.0 * int_top + 2.75 * int_side, 1800.0, 2500.0),
+    "int2": (13.75, 5.0, 2.75, 360.0, 128.4, 0.01,
+             10.0 * int_top + 2.75 * int_side, 1800.0, 2500.0),
+}
+situ = {name: in_situ_element(HomogeneousElement(name, *spec), bands)
+        for name, spec in specs.items()}
+delta = floating_floor_improvement(bands,
+                                   resonance_frequency=160.0 * np.sqrt(8.0 / 73.5))
+
+paths = []
+for tag, name, lij in (("1", "ext1", 4.0), ("2", "ext2", 5.0),
+                       ("3", "int1", 4.0), ("4", "int2", 5.0)):
+    wall = situ[name]
+    cross = k["floor-ext"] if name.startswith("ext") else k["floor-int"]
+    through = k["ext-ext"] if name.startswith("ext") else k["int-int"]
+    paths += [
+        airborne_flanking_path(label=f"D{tag}", kind="Df", element_i=situ["floor"],
+                               element_j=wall, vibration_reduction_index=cross,
+                               coupling_length=lij, separating_area=20.0,
+                               delta_r_i=delta),
+        airborne_flanking_path(label=f"{tag}d", kind="Fd", element_i=wall,
+                               element_j=situ["floor"], vibration_reduction_index=cross,
+                               coupling_length=lij, separating_area=20.0),
+        airborne_flanking_path(label=f"{tag}{tag}", kind="Ff", element_i=wall,
+                               element_j=wall, vibration_reduction_index=through,
+                               coupling_length=lij, separating_area=20.0),
+    ]
+res = detailed_airborne_prediction(
+    bands,
+    direct_index=direct_reduction_index(situ["floor"].sound_reduction_index,
+                                        delta_r_source=delta),
+    flanking_paths=paths)
+
+# Una línea: las contribuciones por camino y banda con R' superpuesto.
+res.plot()
+plt.show()
+```
+
+</details>
+
+La parte de impactos del mismo edificio se apoya en el mismo diccionario
+`situ`:
+
+```python
+from phonometry import (detailed_impact_prediction, direct_impact_level,
+                        impact_flanking_path)
+
+direct = direct_impact_level(situ["floor"].impact_level, delta_l=delta)
+flanking = [
+    impact_flanking_path(label=f"Df{tag}", floor=situ["floor"], element_j=situ[name],
+                         vibration_reduction_index=(
+                             k["floor-ext"] if name.startswith("ext") else k["floor-int"]),
+                         coupling_length=lij, delta_l=delta)
+    for tag, name, lij in (("1", "ext1", 4.0), ("2", "ext2", 5.0),
+                           ("3", "int1", 4.0), ("4", "int2", 5.0))
+]
+imp = detailed_impact_prediction(bands, direct_level=direct, flanking_paths=flanking)
+print(np.round(imp.l_prime_n[[3, 10]], 1))     # [54.  35.9]   total de la tabla G.1
+print(imp.rating.rating, imp.rating.ci)        # 41 2           impreso 41,0 (2)
+```
+
+## Simplificado frente a detallado
+
+La norma aplica su modelo simplificado al mismo edificio (tablas L.10 / G.10):
+$R'_w = 57{,}0$ dB y $L'_{n,w} = 39{,}7$ dB, frente a los $R'_w = 57$ dB y
+$L'_{n,w} = 41$ dB del modelo detallado. Ambos coinciden holgadamente dentro de
+la dispersión que los propios modelos declaran, y el conjunto de pruebas de la
+biblioteca fija esa coincidencia. La ventaja del modelo detallado no está en la
+exactitud del número único sino en el espectro que hay detrás: la predicción a
+ruido aéreo del modelo detallado no tiene error sistemático y su desviación
+típica es de 1,5 dB a 2,5 dB (apartado 5), frente a unos 2 dB del simplificado.
+
+## Construcciones ligeras (Tipo B)
+
+Para elementos cuyo tiempo de reverberación estructural *no* lo fijan los
+elementos conectados, la norma toma $T_{s,\text{situ}} = T_{s,\text{lab}}$ y
+describe la unión con la diferencia de niveles de velocidad **normalizada**
+$\overline{D}_{v,ij,n}$ en lugar de $K_{ij}$ (fórmula 17), o con una medición
+en laboratorio de la diferencia de niveles por flancos $D_{n,f}$ (fórmula 16).
+Por debajo de $f_c$ los índices del elemento deben corregirse antes a
+transmisión resonante únicamente (Anexo B.1/B.2, una estimación de 8 dB para
+elementos de entramado simple sin cámara).
+
+```python
+from phonometry import (flanking_reduction_index_from_flanking_level,
+                        flanking_reduction_index_from_normalized_difference,
+                        resonant_sound_reduction_index)
+
+# ISO 12354-1 L.2.1: edificio de entramado de madera, forjado 20 m2, unión 4 m.
+r_star = resonant_sound_reduction_index(r_wall_leaf, bands,
+                                        critical_frequency=2200.0)   # +8 dB bajo fc
+r_ff = flanking_reduction_index_from_normalized_difference(
+    index_i=r_star, index_j=r_star, normalized_velocity_level_difference=dv_n,
+    separating_area=20.0, coupling_length=4.0)                        # tabla L.11
+
+# ISO 12354-1 L.2.2: unión medida entre dos paredes de entramado de madera.
+r13 = flanking_reduction_index_from_flanking_level(
+    dnf_13, separating_area=10.44, coupling_length=2.41,
+    laboratory_coupling_length=2.5)                                   # tabla L.15
+```
+
+## Comprobaciones que da la propia norma
+
+Dos identidades permiten que un espectro se compruebe a sí mismo. Para un
+forjado homogéneo el índice a ruido aéreo y el nivel de impactos suman una
+función solo de la frecuencia (fórmulas B.3/B.4 de la parte 2),
+$R + L_n = 38 + 30\lg f$ en bandas de tercio de octava y $43 + 30\lg f$ en
+bandas de octava, válida donde la transmisión forzada es despreciable;
+`reciprocity_impact_level` la implementa. Y la tabla B.2 de la parte 2 tabula
+el $L_n$ en bandas de octava de cuatro forjados monolíticos calculados como los
+calcula este módulo, una referencia útil de contraste para una solución
+constructiva nueva.
+
+## Parámetros de `in_situ_element()`
+
+| Parámetro | Tipo | Unidades | Rango / por defecto | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `element` | `HomogeneousElement` | — | — | Área, longitudes de lado, `m'`, `fc`, `ηint`, `Σ lk αk` y opcionalmente `ρ`/`cL` |
+| `frequencies` | array | Hz | > 0 | Frecuencias centrales de banda |
+| `bands` | str | — | `'third'` (por defecto) / `'octave'` | Fija la banda que lleva la rama `f ≈ fc` |
+| `resonant_only` | bool | — | por defecto `False` | Elimina el término de transmisión forzada por debajo de `fc` (Anexo B.1, caminos por flancos) |
+| `speed_of_sound` | float | m/s | por defecto `340` | El valor que fija el Anexo A de ISO 12354-1 |
+| `air_density` | float | kg/m³ | por defecto `1.29` | `ρo` del modelo del Anexo B |
+
+## Parámetros de `airborne_flanking_path()` / `impact_flanking_path()`
+
+| Parámetro | Tipo | Unidades | Rango / por defecto | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `label` | str | — | — | Nombre visible del camino |
+| `kind` | str | — | `'Ff'` / `'Df'` / `'Fd'` | Solo a ruido aéreo; el constructor de impactos es siempre `Df` |
+| `element_i` / `element_j` | `InSituElementResult` | — | — | Elementos del recinto emisor y del receptor (`floor` / `element_j` en impactos) |
+| `vibration_reduction_index` | float o array | dB | — | `Kij` de este camino |
+| `coupling_length` | float | m | > 0 | Longitud de acoplamiento de la unión `lij` |
+| `separating_area` | float | m² | > 0 | `Ss` (solo a ruido aéreo) |
+| `delta_r_i` / `delta_r_j` | float o array | dB | por defecto `0` | Mejoras por trasdosados |
+| `delta_l` | float o array | dB | por defecto `0` | Mejora del revestimiento de suelo (solo impactos) |
+
+## Informe de predicción detallada (`.report()`)
+
+`DetailedAirborneResult.report()` y `DetailedImpactResult.report()` escriben la
+versión por bandas de las fichas de predicción simplificada: el mismo formato
+de una página, una línea de base que cita el apartado 4.2 de ISO 12354-1/-2:2017,
+la tabla de cuota de energía por camino junto a la figura de contribución por
+banda, el `R'w` / `L'n,w` recuadrado, la desviación típica de 1,5 dB a 2,5 dB
+del modelo detallado y un veredicto CUMPLE/NO CUMPLE frente a un `requirement`.
+`verbose=True` añade la banda en la que cada camino alcanza su máximo. Ambos
+necesitan la valoración ISO 717, así que el espectro debe cubrir de 100 Hz a
+3150 Hz (o de 125 Hz a 2000 Hz en bandas de octava).
+
+## Véase también
+
+- [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/):
+  el modelo simplificado de número único y el catálogo de uniones del Anexo E
+  sobre el que se apoya esta página.
+- [Transmisión por flancos en laboratorio (ISO 10848)](/phonometry/es/guides/flanking-lab/):
+  de dónde salen el `Kij` medido y la longitud de absorción equivalente.
+- [Valoración del aislamiento (ISO 717)](/phonometry/es/guides/insulation-ratings/):
+  el motor de curva de referencia que convierte el espectro previsto en
+  `R'w` / `L'n,w`.
+- [Medición del aislamiento in situ (ISO 16283)](/phonometry/es/guides/insulation-field/):
+  el resultado construido frente al que se contrasta la predicción.
+- [Rigidez dinámica de materiales elásticos (EN 29052-1)](/phonometry/es/guides/dynamic-stiffness/):
+  la `s'` que hay detrás de la frecuencia de resonancia del suelo flotante.
+- Referencia de la API: [`building.detailed_prediction`](/phonometry/es/reference/api/building/detailed-prediction/).

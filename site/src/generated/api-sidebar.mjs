@@ -100,6 +100,7 @@ export const apiSidebar = {
         'reference/api/building/flanking-transmission',
         'reference/api/building/facade-prediction',
         'reference/api/building/building-prediction',
+        'reference/api/building/detailed-prediction',
         'reference/api/building/building-uncertainty',
         'reference/api/building/floor-covering-improvement',
         'reference/api/building/structure-borne-power',

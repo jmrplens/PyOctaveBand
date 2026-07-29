@@ -65,12 +65,20 @@ if TYPE_CHECKING:
         AirbornePredictionResult,
         ImpactPredictionResult,
     )
+    from ..building.detailed_prediction import (
+        DetailedAirborneResult,
+        DetailedImpactResult,
+    )
     from ..building.facade_prediction import FacadePredictionResult
 
 #: Model standard deviation of the simplified single-number prediction, stated
 #: for reference in the method statement (EN 12354-1:2000 Clause 5, EN 12354-2
 #: Clause 6): about 2 dB.
 _MODEL_SD_DB = 2
+
+#: Model standard deviation of the *detailed* per-band model for buildings with
+#: homogeneous elements (ISO 12354-1:2017 Clause 5): 1,5 dB to 2,5 dB.
+_DETAILED_MODEL_SD = "1,5 dB to 2,5 dB"
 
 
 def _prediction_verdict(
@@ -118,6 +126,13 @@ def _render_prediction_fiche(
     metadata: ReportMetadata | None,
     language: str,
     basis_values: dict[str, str] | None = None,
+    statement_key: str = (
+        "Predicted (estimated) result computed from the building "
+        "elements' performance by the EN/ISO 12354 simplified "
+        "single-number model; it is not a measurement. The reported "
+        "standard deviation of the model is about {sd} dB."
+    ),
+    statement_values: dict[str, Any] | None = None,
 ) -> str:
     """Render a predicted-insulation fiche to a PDF at ``path``.
 
@@ -183,16 +198,9 @@ def _render_prediction_fiche(
         "prediction_statement", parent=styles["Normal"], fontSize=8.5,
         textColor=colors.HexColor(_MUTED_HEX), spaceBefore=4,
     )
+    values = {"sd": _MODEL_SD_DB} if statement_values is None else statement_values
     flow.append(
-        Paragraph(
-            t(
-                "Predicted (estimated) result computed from the building "
-                "elements' performance by the EN/ISO 12354 simplified "
-                "single-number model; it is not a measurement. The reported "
-                "standard deviation of the model is about {sd} dB.", language
-            ).format(sd=_MODEL_SD_DB),
-            statement_style,
-        )
+        Paragraph(t(statement_key, language).format(**values), statement_style)
     )
 
     if metadata is not None and metadata.requirement is not None:
@@ -334,6 +342,150 @@ def render_iso12354_impact_report(
         is_impact=True,
         metadata=metadata,
         language=language,
+    )
+
+
+_DETAILED_STATEMENT = (
+    "Predicted (estimated) result computed band by band from the building "
+    "elements' performance by the EN/ISO 12354 detailed model; it is not a "
+    "measurement. For buildings with homogeneous elements the prediction of "
+    "the single-number rating carries no bias error and a standard deviation "
+    "of {sd}."
+)
+
+
+def _detailed_path_rows(result: Any, verbose: bool, language: str) -> list[tuple[str, str]]:
+    """Per-path rows of a detailed-model fiche: energy share, largest first.
+
+    The share is taken over the whole spectrum supplied (the band-summed
+    transmitted energy of the path over the band-summed total), so the table
+    ranks the paths in the order a consultant would treat them. In verbose
+    mode each row also names the band in which that path peaks.
+    """
+    import numpy as np
+
+    fractions = np.atleast_2d(np.asarray(result.fractions, dtype=np.float64))
+    weights = fractions / fractions.sum(axis=0)
+    totals = weights.sum(axis=1) / float(weights.shape[1])
+    freqs = np.asarray(result.frequencies, dtype=np.float64)
+    rows: list[tuple[str, str]] = []
+    for k in np.argsort(-totals):
+        value = format_number(100.0 * float(totals[k]), language, decimals=1)
+        text = f"{value}%"
+        if verbose:
+            peak = freqs[int(np.argmax(fractions[k]))]
+            text = f"{text} &#183; {fmt_num(float(peak), language)} Hz"
+        rows.append((result.paths[int(k)].label, text))
+    return rows
+
+
+def _detailed_rating(result: Any) -> Any:
+    """Return the result's ISO 717 rating, refusing an unrated spectrum."""
+    if result.rating is None:
+        raise ValueError(
+            "A detailed prediction report needs the ISO 717 single-number "
+            "rating: build the result on bands covering 100 Hz to 3150 Hz "
+            "(one-third octave) or 125 Hz to 2000 Hz (octave)."
+        )
+    return result.rating
+
+
+def render_iso12354_detailed_airborne_report(
+    result: DetailedAirborneResult,
+    path: str,
+    *,
+    metadata: ReportMetadata | None = None,
+    verbose: bool = False,
+    language: str = "en",
+) -> str:
+    """Render a detailed per-band airborne prediction fiche (EN/ISO 12354-1).
+
+    :param result: The
+        :class:`~phonometry.building.detailed_prediction.DetailedAirborneResult`
+        carrying the per-band ``R'``, the per-band path contributions and the
+        ISO 717-1 rating.
+    :param path: Destination path of the PDF file.
+    :param metadata: Optional :class:`ReportMetadata`; ``None`` produces a
+        lightweight fiche (body, rating, statement and disclaimer).
+    :param verbose: When ``True`` each path row also names the band in which
+        that path contributes most.
+    :param language: ``"en"`` (default) or ``"es"``.
+    :return: The written ``path`` as a :class:`str`.
+    :raises ValueError: If the result carries no ISO 717-1 rating.
+    :raises ImportError: If reportlab (or, for the figure, matplotlib) is not
+        installed.
+    """
+    rating = _detailed_rating(result)
+    return _render_prediction_fiche(
+        result=result,
+        path=path,
+        title_key="Predicted airborne sound insulation between rooms",
+        basis_key=(
+            "Predicted apparent sound reduction index R&#8242; per frequency "
+            "band (direct and flanking transmission, in-situ element and "
+            "junction data) estimated in accordance with ISO 12354-1:2017 "
+            "(detailed model, Clause 4.2). This is a prediction from element "
+            "data, not a measurement. R&#8242;<sub>w</sub> per ISO 717-1."
+        ),
+        rating_value=float(rating.rating),
+        rating_symbol="R&#8242;<sub>w</sub>",
+        left_caption_key="Transmission paths - share of energy",
+        metric_rows=_detailed_path_rows(result, verbose, language),
+        is_impact=False,
+        metadata=metadata,
+        language=language,
+        statement_key=_DETAILED_STATEMENT,
+        statement_values={"sd": _DETAILED_MODEL_SD},
+    )
+
+
+def render_iso12354_detailed_impact_report(
+    result: DetailedImpactResult,
+    path: str,
+    *,
+    metadata: ReportMetadata | None = None,
+    verbose: bool = False,
+    language: str = "en",
+) -> str:
+    """Render a detailed per-band impact prediction fiche (EN/ISO 12354-2).
+
+    :param result: The
+        :class:`~phonometry.building.detailed_prediction.DetailedImpactResult`
+        carrying the per-band ``L'n``, the per-band path contributions and the
+        ISO 717-2 rating.
+    :param path: Destination path of the PDF file.
+    :param metadata: Optional :class:`ReportMetadata`; ``None`` produces a
+        lightweight fiche (body, rating, statement and disclaimer).
+    :param verbose: When ``True`` each path row also names the band in which
+        that path contributes most.
+    :param language: ``"en"`` (default) or ``"es"``.
+    :return: The written ``path`` as a :class:`str`.
+    :raises ValueError: If the result carries no ISO 717-2 rating.
+    :raises ImportError: If reportlab (or, for the figure, matplotlib) is not
+        installed.
+    """
+    rating = _detailed_rating(result)
+    return _render_prediction_fiche(
+        result=result,
+        path=path,
+        title_key="Predicted impact sound insulation of floors",
+        basis_key=(
+            "Predicted apparent normalized impact sound pressure level "
+            "L&#8242;<sub>n</sub> per frequency band (direct and flanking "
+            "transmission, in-situ element and junction data) estimated in "
+            "accordance with ISO 12354-2:2017 (detailed model, Clause 4.2). "
+            "This is a prediction from element data, not a measurement. "
+            "L&#8242;<sub>n,w</sub> per ISO 717-2."
+        ),
+        rating_value=float(rating.rating),
+        rating_symbol="L&#8242;<sub>n,w</sub>",
+        left_caption_key="Transmission paths - share of energy",
+        metric_rows=_detailed_path_rows(result, verbose, language),
+        is_impact=True,
+        metadata=metadata,
+        language=language,
+        statement_key=_DETAILED_STATEMENT,
+        statement_values={"sd": _DETAILED_MODEL_SD},
     )
 
 

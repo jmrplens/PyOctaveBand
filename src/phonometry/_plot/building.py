@@ -10,8 +10,11 @@ import numpy as np
 from .common import (
     _C_MUTED,
     _C_PRIMARY,
+    _C_PRIMARY_LIGHT,
+    _C_QUATERNARY,
     _C_REFERENCE,
     _C_SECONDARY,
+    _C_SECONDARY_LIGHT,
     _C_TERTIARY,
     _annotate_impact_500,
     _band_axis,
@@ -36,6 +39,11 @@ if TYPE_CHECKING:
         ImpactPredictionResult,
     )
     from ..building.building_uncertainty import BandUncertainty
+    from ..building.detailed_prediction import (
+        DetailedAirborneResult,
+        DetailedImpactResult,
+        InSituElementResult,
+    )
     from ..building.facade_prediction import FacadePredictionResult, RadiatedPowerResult
     from ..building.flanking_transmission import VibrationReductionResult
     from ..building.floor_covering_improvement import FloorCoveringImprovementResult
@@ -123,6 +131,10 @@ _STRINGS: dict[str, str] = {
     "required": "exigido",
     "Value": "Valor",
     "CTE DB-HR requirement check": "Comprobación de exigencias CTE DB-HR",
+    "detailed prediction": "predicción detallada",
+    "other paths": "otros trayectos",
+    "In-situ element performance (ISO 12354)": "Comportamiento del elemento in situ (ISO 12354)",
+    "Reduction index / impact level [dB]": "Índice de reducción / nivel de impactos [dB]",
 }
 
 
@@ -792,6 +804,164 @@ def plot_impact_prediction(
         f"{format_number(result.l_prime_n_w, language, decimals=1)} dB"
     )
     ax.grid(True, axis="y", alpha=0.3)
+    localize_axes(ax, language)
+    return ax
+
+
+#: Maximum number of individually coloured paths in the detailed-prediction
+#: stacked bars; the remaining ones are pooled into a single "other paths" bar.
+_MAX_NAMED_PATHS = 6
+
+
+def _plot_path_shares(
+    result: Any,
+    total: np.ndarray,
+    *,
+    total_label: str,
+    ylabel: str,
+    title: str,
+    ax: Axes | None,
+    language: str,
+    **kwargs: Any,
+) -> Axes:
+    """Stacked per-band path shares with the resulting total on a twin axis.
+
+    Shared body of the two detailed-model renderers (EN/ISO 12354-1 airborne
+    and -2 impact): one stacked bar per band showing which transmission path
+    carries the energy, plus the resulting apparent quantity on a right-hand
+    axis. The paths are ordered by their *largest* per-band share, so every
+    path that dominates a band is named, and any beyond
+    :data:`_MAX_NAMED_PATHS` are pooled.
+    """
+    from .._i18n import localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    fractions = np.atleast_2d(np.asarray(result.fractions, dtype=np.float64))
+    labels = [p.label for p in result.paths]
+    order = list(np.argsort(-fractions.max(axis=1)))
+    named = order[:_MAX_NAMED_PATHS]
+    pooled = order[_MAX_NAMED_PATHS:]
+
+    positions = _band_axis(ax, np.asarray(result.frequencies), language=language)
+    palette = (_C_PRIMARY, _C_SECONDARY, _C_TERTIARY, _C_QUATERNARY,
+               _C_PRIMARY_LIGHT, _C_SECONDARY_LIGHT)
+    bottom = np.zeros(positions.size, dtype=np.float64)
+    for colour, k in zip(palette, named):
+        share = 100.0 * fractions[k]
+        ax.bar(positions, share, bottom=bottom, width=0.85, color=colour,
+               edgecolor="none", zorder=0, label=labels[k], **kwargs)
+        bottom = bottom + share
+    if pooled:
+        share = 100.0 * fractions[pooled].sum(axis=0)
+        ax.bar(positions, share, bottom=bottom, width=0.85, color=_C_MUTED,
+               edgecolor="none", zorder=0, label=_t("other paths", language))
+    ax.set_ylabel(_t("Share of transmitted energy [%]", language))
+    ax.set_ylim(0.0, 100.0)
+    ax.set_title(title)
+
+    twin = ax.twinx()
+    twin.plot(positions, np.asarray(total, dtype=np.float64), color=_C_REFERENCE,
+              lw=2.0, marker="o", ms=4, label=total_label, zorder=3)
+    twin.set_ylabel(_t(ylabel, language))
+    handles, texts = ax.get_legend_handles_labels()
+    extra_handles, extra_texts = twin.get_legend_handles_labels()
+    ax.legend(handles + extra_handles, texts + extra_texts, loc="best",
+              fontsize="small", ncol=2)
+    ax.grid(True, axis="y", alpha=0.3)
+    localize_axes(ax, language)
+    localize_axes(twin, language)
+    return ax
+
+
+def plot_detailed_airborne_prediction(
+    result: DetailedAirborneResult, ax: Axes | None = None, language: str = "en",
+    **kwargs: Any
+) -> Axes:
+    """Per-band path contributions and ``R'`` (EN/ISO 12354-1 detailed model).
+
+    :param result: A
+        :class:`~phonometry.building.detailed_prediction.DetailedAirborneResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the stacked :meth:`~matplotlib.axes.Axes.bar`.
+    :return: The axes.
+    """
+    from .._i18n import format_number
+
+    title = f"EN 12354-1 {_t('detailed prediction', language)}"
+    if result.rating is not None:
+        title += (
+            f" — R'w = {format_number(result.rating.rating, language, decimals=0)}"
+            " dB"
+        )
+    return _plot_path_shares(
+        result, result.r_prime, total_label="$R'$",
+        ylabel="Sound reduction index [dB]", title=title, ax=ax,
+        language=language, **kwargs,
+    )
+
+
+def plot_detailed_impact_prediction(
+    result: DetailedImpactResult, ax: Axes | None = None, language: str = "en",
+    **kwargs: Any
+) -> Axes:
+    """Per-band path contributions and ``L'n`` (EN/ISO 12354-2 detailed model).
+
+    :param result: A
+        :class:`~phonometry.building.detailed_prediction.DetailedImpactResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the stacked :meth:`~matplotlib.axes.Axes.bar`.
+    :return: The axes.
+    """
+    from .._i18n import format_number
+
+    title = f"EN 12354-2 {_t('detailed prediction', language)}"
+    if result.rating is not None:
+        title += (
+            f" — L'n,w = "
+            f"{format_number(result.rating.rating, language, decimals=0)} dB"
+        )
+    return _plot_path_shares(
+        result, result.l_prime_n, total_label="$L'_n$",
+        ylabel="Impact sound pressure level [dB]", title=title, ax=ax,
+        language=language, **kwargs,
+    )
+
+
+def plot_in_situ_element(
+    result: InSituElementResult, ax: Axes | None = None, language: str = "en",
+    **kwargs: Any
+) -> Axes:
+    """In-situ ``Rsitu`` and ``Ln,situ`` of one element (EN/ISO 12354).
+
+    :param result: An
+        :class:`~phonometry.building.detailed_prediction.InSituElementResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the ``Rsitu`` curve ``plot`` call.
+    :return: The axes.
+    """
+    from .._i18n import localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    freqs = np.asarray(result.frequencies, dtype=np.float64)
+    kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault("marker", "o")
+    kwargs.setdefault("ms", 4)
+    ax.plot(freqs, result.sound_reduction_index, label="$R_{situ}$", **kwargs)
+    ax.plot(freqs, result.impact_level, color=_C_SECONDARY, marker="s", ms=4,
+            label="$L_{n,situ}$")
+    ax.set_xscale("log")
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
+    ax.set_ylabel(_t("Reduction index / impact level [dB]", language))
+    ax.set_title(
+        f"{_t('In-situ element performance (ISO 12354)', language)} — "
+        f"{result.label}"
+    )
+    ax.grid(True, which="both", alpha=0.3)
+    ax.legend(loc="best", fontsize="small")
+    format_frequency_axis(ax, float(freqs.min()), float(freqs.max()))
     localize_axes(ax, language)
     return ax
 

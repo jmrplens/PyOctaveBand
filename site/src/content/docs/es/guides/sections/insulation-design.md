@@ -23,6 +23,12 @@ a la medición en campo con la que se contrasta la predicción y junto a la guí
 de fachadas, que lleva esta misma familia a través del cerramiento del
 edificio.
 
+[Predicción detallada por bandas (ISO 12354)](/phonometry/es/guides/detailed-prediction/)
+ejecuta la misma norma banda a banda en lugar de sobre números únicos: los
+datos de laboratorio de elemento y de unión se convierten a sus valores in
+situ, cada camino se forma por banda y el resultado muestra qué camino domina
+cada banda, no solo si el recinto cumple.
+
 [Predicción del aislamiento de paneles](/phonometry/es/guides/panel-sound-insulation/)
 baja un nivel más, hasta el origen del propio $R$ de elemento: la ley de masa y
 la caída de coincidencia de un panel simple, el comportamiento masa-muelle-masa
@@ -45,6 +51,10 @@ mejora.
 - [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/):
   los modelos de flancos aéreo y de impacto entre recintos (EN 12354-1/2) con sus
   índices de reducción de vibraciones de unión y sus fichas de predicción.
+- [Predicción detallada por bandas (ISO 12354)](/phonometry/es/guides/detailed-prediction/):
+  el modelo detallado por bandas de ISO 12354-1/-2 con la conversión in situ de
+  los datos de elemento y de unión, los índices por flancos banda a banda y las
+  contribuciones por camino que hay detrás de la valoración.
 - [Predicción del aislamiento de paneles](/phonometry/es/guides/panel-sound-insulation/):
   la ley de masa y la coincidencia (Sharp), las dobles hojas (Bies), las
   rendijas y aberturas (Gomperts, Wilson-Soroka), la eficiencia de radiación
