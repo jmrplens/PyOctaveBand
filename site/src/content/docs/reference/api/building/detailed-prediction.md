@@ -357,7 +357,7 @@ the bands cover the rating range (100 Hz to 3150 Hz in one-third octaves,
 detailed_impact_prediction(
     frequencies: ArrayLike,
     *,
-    direct_level: ArrayLike,
+    direct_level: ArrayLike | None = None,
     flanking_paths: Sequence[BandPath] = (),
     direct_label: str = 'Dd',
     bands: BandType = 'third',
@@ -369,18 +369,17 @@ Combine direct and flanking paths into `L'n` per band (Part 2, (1)).
 `L'n = 10 lg(Σ 10^(Ln/10))` over the direct impact path `Ln,d` and
 every flanking path `Ln,ij`, with the ISO 717-2 rating of the resulting
 spectrum whenever the bands cover the rating range. For rooms next to each
-other (Part 2, Formula 2) there is no direct impact path; `direct_level`
-is required all the same, so pass a level far below the flanking ones
-(`-200.0` makes its contribution vanish to the last bit) and read the
-result's first path as the placeholder it is.
+other there is no direct impact path and the sum runs over the flanking
+paths only (Part 2, Formula 2): leave `direct_level` out and the result
+carries no direct path at all.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
 | `frequencies` | Band centre frequencies, in Hz. |
-| `direct_level` | `Ln,d` per band, in dB (see [`direct_impact_level`](/phonometry/reference/api/building/detailed-prediction/#direct_impact_level)). |
-| `flanking_paths` | The flanking paths (see [`impact_flanking_path`](/phonometry/reference/api/building/detailed-prediction/#impact_flanking_path)); may be empty. |
+| `direct_level` | `Ln,d` per band, in dB (see [`direct_impact_level`](/phonometry/reference/api/building/detailed-prediction/#direct_impact_level)), or `None` for the rooms-next-to-each- other case of Formula (2), which has no direct path. |
+| `flanking_paths` | The flanking paths (see [`impact_flanking_path`](/phonometry/reference/api/building/detailed-prediction/#impact_flanking_path)); may be empty when `direct_level` is given. |
 | `direct_label` | Label of the direct path (Default: `"Dd"`). |
 | `bands` | `"third"` (default) or `"octave"`. |
 
@@ -390,7 +389,7 @@ result's first path as the placeholder it is.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If a path does not match the band count. |
+| ValueError | If a path does not match the band count, or if neither a direct level nor any flanking path is given. |
 
 ## DetailedAirborneResult
 
@@ -661,6 +660,47 @@ and `j` the flanking element radiating in the receiving room.
 | Exception | When |
 | :--- | :--- |
 | ValueError | If an area is not positive and finite. |
+
+## flanking_impact_level_from_flanking_level
+
+```python
+flanking_impact_level_from_flanking_level(
+    normalized_flanking_impact_level: ArrayLike,
+    *,
+    area: float,
+    laboratory_area: float,
+    coupling_length: float,
+    laboratory_coupling_length: float,
+) -> np.ndarray
+```
+
+Flanking impact level from a measured `Ln,f` (Part 2, Formula 13).
+
+`Ln,ij = Ln,f,ij,situ − 10 lg(Si llab/(Si,lab lij))`, the impact twin of
+the airborne [`flanking_reduction_index_from_flanking_level`](/phonometry/reference/api/building/detailed-prediction/#flanking_reduction_index_from_flanking_level): the
+route used when the flanking construction is characterised as a whole by a
+laboratory measurement of the normalized flanking impact sound pressure
+level (ISO 10848) instead of by the properties of its elements. The
+laboratory measurement is transferred to the field situation first, as
+ISO 12354-2:2017, Annex D indicates.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `normalized_flanking_impact_level` | `Ln,f,ij,situ` per band, in dB. |
+| `area` | In-situ area `Si` of the excited floor, in m². |
+| `laboratory_area` | Laboratory area `Si,lab` of the excited floor, in m². |
+| `coupling_length` | In-situ coupling length `lij`, in m. |
+| `laboratory_coupling_length` | Laboratory coupling length `llab`, in m. ISO 12354-1 Clause 4.4.2 gives the usual values: 4,5 m for horizontal flanking elements, 2,5 m for vertical ones. |
+
+**Returns:** `Ln,ij` per band, in dB.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If a geometry value is not positive and finite. |
 
 ## flanking_impact_level_from_normalized_difference
 

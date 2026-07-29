@@ -338,10 +338,14 @@ $\overline{D}_{v,ij,n}$ en lugar de $K_{ij}$ (fórmula 17), o con una medición
 en laboratorio de la diferencia de niveles por flancos $D_{n,f}$ (fórmula 16).
 Por debajo de $f_c$ los índices del elemento deben corregirse antes a
 transmisión resonante únicamente (Anexo B.1/B.2, una estimación de 8 dB para
-elementos de entramado simple sin cámara).
+elementos de entramado simple sin cámara). El lado de impactos ofrece las dos
+mismas vías: la fórmula (14) de la parte 2 a partir de
+$\overline{D}_{v,ij,n}$ y la fórmula (13) de la parte 2 a partir de un nivel
+de impactos normalizado por flancos medido $L_{n,f}$.
 
 ```python
-from phonometry import (flanking_reduction_index_from_flanking_level,
+from phonometry import (flanking_impact_level_from_flanking_level,
+                        flanking_reduction_index_from_flanking_level,
                         flanking_reduction_index_from_normalized_difference,
                         resonant_sound_reduction_index)
 
@@ -356,6 +360,11 @@ r_ff = flanking_reduction_index_from_normalized_difference(
 r13 = flanking_reduction_index_from_flanking_level(
     dnf_13, separating_area=10.44, coupling_length=2.41,
     laboratory_coupling_length=2.5)                                   # tabla L.15
+
+# ISO 12354-2 fórmula (13): el gemelo de impactos, a partir de un Ln,f medido.
+ln_13 = flanking_impact_level_from_flanking_level(
+    lnf_13, area=20.0, laboratory_area=10.0,
+    coupling_length=4.0, laboratory_coupling_length=4.5)
 ```
 
 ## Comprobaciones que da la propia norma

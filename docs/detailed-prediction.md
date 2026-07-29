@@ -296,10 +296,13 @@ $\overline{D}_{v,ij,n}$ instead of $K_{ij}$ (Formula 17), or with a laboratory
 measurement of the flanking level difference $D_{n,f}$ (Formula 16). Below
 $f_c$ the element indices must first be corrected to resonant transmission
 only (Annex B.1/B.2, an 8 dB estimate for single frame elements without a
-cavity).
+cavity). The impact side offers the same two routes: Part 2 Formula (14) from
+$\overline{D}_{v,ij,n}$ and Part 2 Formula (13) from a measured normalized
+flanking impact level $L_{n,f}$.
 
 ```python
-from phonometry import (flanking_reduction_index_from_flanking_level,
+from phonometry import (flanking_impact_level_from_flanking_level,
+                        flanking_reduction_index_from_flanking_level,
                         flanking_reduction_index_from_normalized_difference,
                         resonant_sound_reduction_index)
 
@@ -314,6 +317,11 @@ r_ff = flanking_reduction_index_from_normalized_difference(
 r13 = flanking_reduction_index_from_flanking_level(
     dnf_13, separating_area=10.44, coupling_length=2.41,
     laboratory_coupling_length=2.5)                                   # Table L.15
+
+# ISO 12354-2 Formula (13): the impact twin, from a measured Ln,f.
+ln_13 = flanking_impact_level_from_flanking_level(
+    lnf_13, area=20.0, laboratory_area=10.0,
+    coupling_length=4.0, laboratory_coupling_length=4.5)
 ```
 
 ## Checks the standard gives you

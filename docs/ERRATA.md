@@ -225,7 +225,8 @@ to the issuing body, with date and reference).
   13,6 dB, not the floor-to-external-wall 6,4 dB, which gives 9,6 to 11,9 dB.
 - **Evidence:** independent recomputation of Formulae (10), (11) and (15) for
   both candidate paths at every band. Path 4d reproduces all three columns of
-  the block to 0,05 dB. Path 2d departs from the block's `Rij` column by
+  the block, `αi,situ` to 0,05 m and `Dv,ij,situ` and `Rij` to 0,05 dB, which
+  is the printed resolution. Path 2d departs from the block's `Rij` column by
   0,1 dB to 7,0 dB depending on the band, and comes closest between 100 Hz and
   160 Hz (0,5 / 0,5 / 0,1 dB), so `Rij` alone does not identify the path over
   those bands; `αi,situ` (10,3 against 6,3 m at 50 Hz) and `Dv,ij,situ`
@@ -276,10 +277,10 @@ to the issuing body, with date and reference).
   of Table G.4 to 0,05 dB and Table G.1 only from 100 Hz upwards. Carrying the
   same recomputation through the whole chain puts external wall 2 low by
   0,5 dB to 1,0 dB over the same three bands and the two internal walls low by
-  up to 0,5 dB at 50 Hz and 63 Hz, while from 100 Hz upwards no flanking
-  column deviates by more than 0,15 dB. Correcting the affected cells raises
-  the printed total `L'n` only slightly: 58,6 to 58,7 dB at 50 Hz, 57,0 to
-  57,2 dB at 63 Hz, 55,9 to 56,1 dB at 80 Hz.
+  up to 0,5 dB at 50 Hz and 63 Hz (their 80 Hz cells agree). From 100 Hz
+  upwards no flanking column deviates by more than 0,15 dB. Correcting the
+  affected cells raises the printed total `L'n` only slightly: 58,6 to
+  58,7 dB at 50 Hz, 57,0 to 57,2 dB at 63 Hz, 55,9 to 56,1 dB at 80 Hz.
 - **Library behaviour:** the test asserts Table G.4 in full, the Table G.1
   direct column over the whole range, and the Table G.1 flanking columns from
   100 Hz upwards, naming the disagreement.
