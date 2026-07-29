@@ -830,6 +830,36 @@ to the issuing body, with date and reference).
   ([`tests/noise_control/test_hvac_long.py`](https://github.com/jmrplens/phonometry/blob/main/tests/noise_control/test_hvac_long.py)).
 - **Status:** unreported (textbook rather than a standard).
 
+## Long, Architectural Acoustics 2e (2014), Eq. 13.28 (units of U_G)
+
+- **Location:** Chapter 13, Eq. 13.28 (printed p. 521), the normalised
+  pressure-drop coefficient ξ = 334,9·ΔP/(ρ0·U_G²) of the diffuser sound-power
+  model.
+- **The print:** the nomenclature under the equation gives "U_G = flow
+  velocity prior to the diffuser (ft/min)" and, on the next line,
+  "= Q/(60·S_G) (for Q in cfm)".
+- **The problem:** the two statements contradict each other. Q in ft³/min
+  divided by 60·S_G is a velocity in **ft/s**, not ft/min, and only the ft/s
+  reading makes the constant right: 334,9/ρ0 with ρ0 = 0,075 lb/ft³ is
+  4465·ΔP/U², which is the standard velocity-pressure relation
+  ΔP/(U/4005)² only when U is converted from ft/s. Read as ft/min the
+  coefficient comes out 3600 times too small, and Eq. 13.27 then gives
+  −67 dB for the worked diffuser of Table 14.9 instead of its printed 33 dB.
+  Eq. 13.27 itself declares U_G in ft/s, so the "(ft/min)" label under
+  Eq. 13.28 is the odd one out.
+- **Evidence:** dimensional check of Q/(60·S_G); reconstruction of the
+  334,9/ρ0 constant from the velocity-pressure relation; and the worked
+  diffuser row of Table 14.9, which the ft/s reading reproduces to better
+  than 1 dB in the five bands that carry a level while the ft/min reading
+  misses it by 100 dB.
+- **Library behaviour:** `diffuser_sound_power` in
+  [`hvac.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/noise_control/hvac.py) reads U_G in ft/s
+  internally (SI at the interface), with the Table 14.9 row pinned by
+  `test_diffuser_sound_power_reproduces_the_table_14_9_row`
+  ([`tests/noise_control/test_hvac_long.py`](https://github.com/jmrplens/phonometry/blob/main/tests/noise_control/test_hvac_long.py))
+  and the conformance check "Long 2e Eqs. 13.27-13.33".
+- **Status:** unreported (textbook rather than a standard).
+
 ---
 
 ## Real Decreto 1367/2007, Annex IV A.3.3 (Kf and Ki threshold tables)

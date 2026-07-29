@@ -1341,8 +1341,10 @@ def diffuser_sound_power(
     profile = require_choice(shape, "shape", ("rectangular", "round"))
     if count <= 0:
         raise ValueError("'count' must be a positive integer.")
-    # Eq. 13.28: Long prints "ft/min" under U_G but defines it as Q / (60 S_G),
-    # which is ft/s, the unit Eq. 13.27 uses; the two are consistent that way.
+    # Eq. 13.28: Long prints "ft/min" under U_G but defines it in the same
+    # breath as Q / (60 S_G), which is ft/s, the unit Eq. 13.27 declares and
+    # the only one for which the 334.9 constant is the velocity-pressure
+    # relation (see docs/ERRATA.md).
     velocity = flow_cfm / (60.0 * area_ft2)
     xi = 334.9 * drop_in_wg / (0.075 * velocity**2)
     overall = (
