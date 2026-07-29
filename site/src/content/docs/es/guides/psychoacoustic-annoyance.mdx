@@ -1,6 +1,6 @@
 ---
 title: "Molestia psicoacústica e intensidad de fluctuación"
-description: "La molestia psicoacústica de Fastl y Zwicker PA = N5·(1 + √(wS² + wFR²)) a partir de sonoridad, nitidez, aspereza e intensidad de fluctuación (Ecs 16.2–16.4), la forma cerrada para ruido de banda ancha AM (Ec. 10.2) y el modelo de señal de intensidad de fluctuación de Osses 2016."
+description: "La molestia psicoacústica de Fastl y Zwicker PA = N5·(1 + √(wS² + wFR²)) a partir de sonoridad, agudeza, aspereza e intensidad de fluctuación (Ecs 16.2–16.4), la forma cerrada para ruido de banda ancha AM (Ec. 10.2) y el modelo de señal de intensidad de fluctuación de Osses 2016."
 references:
   - type: book
     authors: ["Fastl, H.", "Zwicker, E."]
@@ -33,7 +33,7 @@ import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Lo *molesto* que resulta un sonido depende de algo más que de su sonoridad.
 Fastl y Zwicker, *Psychoacoustics: Facts and Models*, combinan cuatro
-sensaciones psicoacústicas (**sonoridad**, **nitidez**, **aspereza** e
+sensaciones psicoacústicas (**sonoridad**, **agudeza**, **aspereza** e
 **intensidad de fluctuación**) en una única **molestia psicoacústica** `PA`, un
 escalar que crece con la sonoridad y se eleva aún más cuando el sonido es agudo,
 áspero o fluctúa lentamente. Esta página cubre el modelo exacto de `PA`
@@ -81,7 +81,7 @@ su propio modelo y unidad en la biblioteca:
 - **Sonoridad**: la sonoridad percentil `N5` (la sonoridad superada el 5 % del
   tiempo), en **sonios**, del modelo Zwicker variable en el tiempo de la ISO
   532-1 (`loudness_zwicker`, véase [Sonoridad](/phonometry/es/guides/loudness/)).
-- **Nitidez** `S`, en **acum**: el balance espectral hacia las altas
+- **Agudeza** `S`, en **acum**: el balance espectral hacia las altas
   frecuencias, DIN 45692 (`sharpness_din`).
 - **Aspereza** `R`, en **asper**: la dureza de la modulación de amplitud rápida
   (~70 Hz), modelo de Sottek ECMA-418-2 (`roughness_ecma`).
@@ -91,7 +91,7 @@ su propio modelo y unidad en la biblioteca:
 ## 2. Molestia psicoacústica (Ecs 16.2–16.4)
 
 El modelo exacto (Fastl y Zwicker Ec. 16.2; origen Widmann 1992) escala `N5` por
-un factor que crece con la ponderación de nitidez `wS` y la ponderación combinada
+un factor que crece con la ponderación de agudeza `wS` y la ponderación combinada
 de aspereza/fluctuación `wFR`:
 
 $$
@@ -100,7 +100,7 @@ w_S = (S - 1{,}75)\,0{,}25\,\lg(N_5 + 10)\ \ (S > 1{,}75\ \mathrm{acum}), \qquad
 w_{FR} = \frac{2{,}18}{N_5^{0{,}4}}\,(0{,}4\,F + 0{,}6\,R).
 $$
 
-`wS` es cero para `S ≤ 1,75 acum` (la nitidez solo añade molestia por encima de
+`wS` es cero para `S ≤ 1,75 acum` (la agudeza solo añade molestia por encima de
 ese umbral); `wFR` pondera la aspereza con más peso que la intensidad de
 fluctuación (0,6 frente a 0,4). `psychoacoustic_annoyance` toma las cuatro
 magnitudes directamente y devuelve la molestia junto con las dos ponderaciones
@@ -125,13 +125,13 @@ El modelo es tan compacto que cabe entero en un dibujo: dos ponderaciones y
 una combinación. El diagrama recorre con él el ejemplo resuelto, sensación a
 sensación.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_psychoacoustic_annoyance_es.svg" alt="Diagrama de bloques del modelo de molestia psicoacústica de Fastl y Zwicker: las cuatro sensaciones del ejemplo resuelto, sharpness de 2,0 acum, sonoridad percentil N5 de 30 sone, intensidad de fluctuación de 0,5 vacil y aspereza de 0,3 asper, alimentan dos ponderaciones, la del sharpness wS de 0,1001, nula por debajo de 1,75 acum, y la de aspereza y fluctuación wFR de 0,2125, que pesa la aspereza 0,6 frente a 0,4, y se combinan en PA igual a N5 por uno más la raíz de wS al cuadrado más wFR al cuadrado, con resultado 37,05; una nota final recuerda que un sonido neutro queda en la línea base PA igual a N5" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_psychoacoustic_annoyance_es.svg" alt="Diagrama de bloques del modelo de molestia psicoacústica de Fastl y Zwicker: las cuatro sensaciones del ejemplo resuelto, agudeza de 2,0 acum, sonoridad percentil N5 de 30 sone, intensidad de fluctuación de 0,5 vacil y aspereza de 0,3 asper, alimentan dos ponderaciones, la de la agudeza wS de 0,1001, nula por debajo de 1,75 acum, y la de aspereza y fluctuación wFR de 0,2125, que pesa la aspereza 0,6 frente a 0,4, y se combinan en PA igual a N5 por uno más la raíz de wS al cuadrado más wFR al cuadrado, con resultado 37,05; una nota final recuerda que un sonido neutro queda en la línea base PA igual a N5" width="92%" />
 
 ### 2.1 A partir de una señal (estimación de ingeniería)
 
 `psychoacoustic_annoyance_from_signal` es una utilidad que deriva las cuatro
 sensaciones a partir de una señal de presión calibrada y las combina: `N5` de la
-sonoridad Zwicker variable en el tiempo de la ISO 532-1, `S` de la nitidez DIN
+sonoridad Zwicker variable en el tiempo de la ISO 532-1, `S` de la agudeza DIN
 45692, `R` de la aspereza de Sottek ECMA-418-2 y `F` del modelo de señal de
 intensidad de fluctuación.
 

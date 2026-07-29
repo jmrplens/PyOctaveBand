@@ -416,7 +416,7 @@ rango físico.
 | `area`, `mass_per_area` | `float > 0` | Superficie de la probeta $S$ (m²) y masa por unidad de superficie medida (kg/m²) |
 | `source_volume`, `receiving_volume` | `float > 0` | Volúmenes de las salas (m³) |
 | `temperature`, `relative_humidity`, `pressure` | `float` | Clima representativo único: temperatura del aire (°C, cualquier signo), humedad relativa (0–100 %), presión ambiente (kPa, > 0) |
-| `source_temperature`, `source_relative_humidity`, `receiving_temperature`, `receiving_relative_humidity` | `float` | Clima por sala cuando la sala emisora y la receptora se informan por separado (mismos rangos que arriba) |
+| `source_temperature`, `source_relative_humidity`, `receiving_temperature`, `receiving_relative_humidity` | `float` | Clima por recinto cuando el recinto emisor y el receptor se informan por separado (mismos rangos que arriba) |
 | `test_room`, `mounting`, `measurement_standard`, `test_date` | `str` | Instalación, condición de montaje, norma de medición (forma la línea de base normativa) y fecha de ensayo |
 | `laboratory`, `operator`, `report_id`, `notes` | `str` | Pie: institución, línea de firma del operador, número de informe y observaciones libres |
 | `requirement` | `float > 0` | Valor objetivo de un solo número; añade la fila de veredicto (el aéreo cumple si es mayor o igual, el de impactos si es menor o igual) |

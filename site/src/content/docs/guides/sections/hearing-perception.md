@@ -46,8 +46,9 @@ The perceptual sensations of sound: loudness and the metrics layered on it.
 
 ## [Speech](/phonometry/guides/sections/speech/)
 
-Two complementary indices of speech intelligibility: STI rates the
-transmission channel, SII rates the listening condition.
+Two complementary indices of speech intelligibility, STI for the
+transmission channel and SII for the listening condition, plus the
+signal-based STOI and ESTOI measures.
 
 - [Speech Transmission Index (STI)](/phonometry/guides/speech-transmission/):
   the IEC 60268-16 modulation transfer function, the indirect method from an
@@ -55,6 +56,9 @@ transmission channel, SII rates the listening condition.
 - [Speech Intelligibility Index](/phonometry/guides/speech-intelligibility/):
   the ANSI S3.5-1997 one-third-octave-band SII from speech, noise and hearing
   threshold spectra.
+- [Objective Intelligibility (STOI & ESTOI)](/phonometry/guides/objective-intelligibility/):
+  the correlation-based measures for time-frequency weighted noisy speech, from
+  a clean/degraded pair.
 
 ## [Hearing and exposure](/phonometry/guides/sections/hearing-exposure/)
 

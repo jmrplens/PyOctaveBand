@@ -370,7 +370,7 @@ _ES: dict[str, str] = {
     "Sound intensity · scanning": "Intensidad acústica · barrido de intensidad",
     "K2A ≤ 4 dB (3744) / ≤ 7 dB (3746)":
         "K2A ≤ 4 dB (3744) / ≤ 7 dB (3746)",
-    "V ≥ 200 m³ , qualified room": "V ≥ 200 m³ , sala cualificada",
+    "V ≥ 200 m³ , qualified room": "V ≥ 200 m³ , cámara cualificada",
     "no negative-power bands": "sin bandas de potencia negativa",
     "Method": "Método",
     "Environment": "Entorno",
@@ -518,7 +518,7 @@ _ES: dict[str, str] = {
         "Tubo sellado sobre la carretera; solo ondas planas por debajo de f_u",
     # d19 - ISO 3745 precision sound power (anechoic / hemi-anechoic room)
     "Precision sound power in an anechoic room (ISO 3745)":
-        "Potencia acústica de precisión en sala anecoica (ISO 3745)",
+        "Potencia acústica de precisión en cámara anecoica (ISO 3745)",
     "Reflecting plane (hemi-anechoic)": "Plano reflectante (semianecoica)",
     "Anechoic wedges": "Cuñas anecoicas",
     "Source (DUT)": "Fuente (DUT)",
@@ -1362,7 +1362,7 @@ _ES: dict[str, str] = {
         "Etapa de entrada del modelo de Sottek (ECMA-418-2)",
     "outer/middle-ear filter + 53 auditory bands (Bark_HMS)":
         "filtro de oído externo/medio + 53 bandas auditivas (Bark_HMS)",
-    "Sharpness S": "Sharpness S",
+    "Sharpness S": "Agudeza S",
     "g(z)-weighted first moment": "primer momento ponderado",
     "of N'(z), with k = 0.108": "por g(z) de N'(z), k = 0,108",
     "critical-band-wide noise": "ruido de una banda crítica",
@@ -1428,7 +1428,7 @@ _ES: dict[str, str] = {
     "Psychoacoustic annoyance: four sensations, one scalar":
         "Molestia psicoacústica: cuatro sensaciones, un escalar",
     "S = 2.0 acum": "S = 2,0 acum",
-    "sharpness (DIN 45692)": "sharpness (DIN 45692)",
+    "sharpness (DIN 45692)": "agudeza (DIN 45692)",
     "counts only above 1.75 acum": "solo cuenta sobre 1,75 acum",
     "N5 = 30 sone": "N5 = 30 sone",
     "percentile loudness (ISO 532-1)": "sonoridad percentil (ISO 532-1)",
@@ -1440,7 +1440,7 @@ _ES: dict[str, str] = {
     "roughness": "aspereza",
     "fast modulation, ≈ 70 Hz": "modulación rápida, ≈ 70 Hz",
     "Sharpness weighting wS = 0.1001":
-        "Ponderación del sharpness wS = 0,1001",
+        "Ponderación de la agudeza wS = 0,1001",
     "wS = (S − 1.75) · 0.25 · lg(N5 + 10)":
         "wS = (S − 1,75) · 0,25 · lg(N5 + 10)",
     "zero for S ≤ 1.75 acum": "cero para S ≤ 1,75 acum",
@@ -1458,7 +1458,7 @@ _ES: dict[str, str] = {
         "un sonido neutro (S ≤ 1,75 acum, F = R = 0) queda en la línea "
         "base PA = N5",
     "sharpness, roughness and fluctuation only ever lift the annoyance above the loudness":
-        "el sharpness, la aspereza y la fluctuación solo elevan la "
+        "la agudeza, la aspereza y la fluctuación solo elevan la "
         "molestia por encima de la sonoridad",
     # Objective intelligibility (STOI / ESTOI)
     "STOI and ESTOI: correlating clean against degraded speech":

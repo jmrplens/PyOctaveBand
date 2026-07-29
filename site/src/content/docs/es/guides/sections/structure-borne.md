@@ -40,8 +40,8 @@ y deriva las magnitudes de fuente independientes de la placa (fuerza
 bloqueada, nivel de potencia característico, velocidad libre).
 [Ruido estructural instalado (EN 12354-5)](/phonometry/es/guides/installed-structure-borne/)
 consume exactamente esas magnitudes, las acopla a través de las movilidades
-de fuente y receptor, y predice el nivel de presión acústica en la sala
-receptora, que es donde esta sección se encuentra con los modelos de
+de fuente y receptor, y predice el nivel de presión acústica en el recinto
+receptor, que es donde esta sección se encuentra con los modelos de
 [aislamiento acústico](/phonometry/es/guides/sections/sound-insulation/).
 
 ## Páginas de esta sección
@@ -62,4 +62,4 @@ receptora, que es donde esta sección se encuentra con los modelos de
   el método de la placa de recepción y las magnitudes de fuente
   independientes de la placa.
 - [Ruido estructural instalado (EN 12354-5)](/phonometry/es/guides/installed-structure-borne/):
-  el nivel predicho en la sala receptora desde el equipo instalado.
+  el nivel predicho en el recinto receptor desde el equipo instalado.

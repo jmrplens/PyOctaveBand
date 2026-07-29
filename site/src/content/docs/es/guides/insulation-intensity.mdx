@@ -28,8 +28,8 @@ references:
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
 
-Una cámara reverberante lee la potencia sonora transmitida de forma
-*indirecta*: la sala receptora integra cada vatio que llega, lo traiga la vía
+Una cámara reverberante lee la potencia acústica transmitida de forma
+*indirecta*: el recinto receptor integra cada vatio que llega, lo traiga la vía
 que lo traiga, y el área de absorción convierte el nivel de la sala de nuevo
 en potencia. El método por **intensidad acústica** de ISO 15186 sustituye esa
 inferencia por una lectura directa: una sonda de intensidad p-p barre una
@@ -49,13 +49,13 @@ la física de la sonda y sus indicadores de campo son el tema de la
 
 El [método de laboratorio de ISO 10140](/phonometry/es/guides/insulation-lab/)
 lee la potencia transmitida de forma
-*indirecta*, a partir del nivel de la sala receptora y de su área de absorción,
+*indirecta*, a partir del nivel del recinto receptor y de su área de absorción,
 lo que falla cuando los flancos filtran una potencia que la sala integra
 igualmente. El método por **intensidad acústica** (ISO 15186) lo evita: una sonda
 de intensidad barre una superficie de medición que envuelve el espécimen y mide
 la potencia radiada de forma *directa*, así que solo contribuye el elemento
 ensayado. Es la herramienta preferida cuando la transmisión por flancos es alta
-(ISO 15186-1:2000, cláusula 1). A partir del nivel de la sala emisora $L_{p1}$ y
+(ISO 15186-1:2000, cláusula 1). A partir del nivel del recinto emisor $L_{p1}$ y
 del nivel medio de intensidad normal $L_{In}$ sobre la superficie (área $S_m$),
 para un espécimen de área $S$,
 
@@ -66,7 +66,7 @@ $$
 donde los $6$ dB son el desfase de campo difuso entre el nivel de presión acústica
 y el nivel de intensidad incidente. La misma fórmula da el índice aparente
 $R'_I$ en campo (ISO 15186-2). Como el método por intensidad *subestima*
-ligeramente la potencia radiada a una sala receptora real, un **índice
+ligeramente la potencia radiada a un recinto receptor real, un **índice
 modificado** $R_{I,M} = R_I + K_c$ reproduce el resultado por presión de la
 ISO 10140-2; el término de adaptación $K_c$ (Anexo B) es
 $10 \log_{10}(1 + S_{b2}\lambda/8V_2)$ para una sala bien definida, o el
@@ -78,7 +78,7 @@ $10\lg(S_m/A_0) + 10\lg N$ ($A_0 = 10\ \text{m}^2$, $N$ unidades de elemento).
 import numpy as np
 from phonometry import building
 
-# Nivel de sala emisora Lp1 y nivel medio de intensidad normal LIn sobre la
+# Nivel del recinto emisor Lp1 y nivel medio de intensidad normal LIn sobre la
 # superficie de medición (Sm), para un espécimen de área S; 16 bandas 1/3 octava.
 lp1 = np.full(16, 85.0)
 l_in = np.full(16, 40.0)
@@ -118,7 +118,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import building
 
-# Una pared ligera: SPL de la sala emisora Lp1 = 85 dB y el nivel de intensidad
+# Una pared ligera: SPL del recinto emisor Lp1 = 85 dB y el nivel de intensidad
 # normal medido LIn sobre la superficie Sm = 12 m2, 16 bandas de tercio de octava.
 freqs = [100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
          1000, 1250, 1600, 2000, 2500, 3150]
@@ -147,7 +147,7 @@ plt.show()
 
 | Parámetro | Tipo | Unidades | Rango / def. | Notas |
 | :--- | :--- | :--- | :--- | :--- |
-| `lp1` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Nivel de presión de la sala emisora |
+| `lp1` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Nivel de presión del recinto emisor |
 | `l_in` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Nivel de intensidad normal sobre la superficie |
 | `measurement_area` | float | m² | > 0 | Área de la superficie de medición `Sm` |
 | `area` | float | m² | > 0 | Área del espécimen `S` |
@@ -272,7 +272,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import building
 
-# Un aireador en un muro de fábrica: NPS de la sala emisora de 85 dB y el
+# Un aireador en un muro de fábrica: NPS del recinto emisor de 85 dB y el
 # nivel de intensidad normal sobre la superficie de medición Sm = 12 m2.
 l_in = np.array([57.9, 62.0, 60.6, 55.7, 55.9, 55.6, 53.5, 51.7,
                  50.3, 47.8, 46.5, 45.8, 44.9, 45.3, 47.3, 52.8])
@@ -313,7 +313,7 @@ plt.show()
 ## ¿Laboratorio o campo? (ISO 15186-2)
 
 La parte 1 es un método de laboratorio: el espécimen ocupa una abertura de
-ensayo entre dos salas, y los flancos suprimidos de la instalación hacen de
+ensayo entre dos recintos, y los flancos suprimidos de la instalación hacen de
 $R_I$ una propiedad del elemento. ISO 15186-2 lleva la misma sonda, el mismo
 barrido de superficie y la misma fórmula al edificio terminado, donde el
 resultado es el índice aparente $R'_I$ del elemento instalado, con su

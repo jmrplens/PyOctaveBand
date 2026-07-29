@@ -90,7 +90,7 @@ references:
     title: "Acoustics — Determination of sound power levels and sound energy levels of noise sources using sound pressure — Precision methods for anechoic rooms and hemi-anechoic rooms"
     designation: "ISO 3745:2012"
     url: "https://www.iso.org/standard/45362.html"
-    note: "El método de precisión en sala anecoica con sus correcciones meteorológicas y sus mallas de micrófonos."
+    note: "El método de precisión en cámara anecoica con sus correcciones meteorológicas y sus mallas de micrófonos."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2010
@@ -314,9 +314,9 @@ $S = 4(ab + bc + ca)$ con $a = 0{,}5\ l_1 + d$, $b = 0{,}5\ l_2 + d$,
 $c = l_3 + d$. ISO 3746 (inspección) comparte las matemáticas con criterios más
 laxos. La incertidumbre expandida es $U = 2 \sqrt{\sigma_{R0}^2 + \sigma_{omc}^2}$.
 
-### Grado de precisión en salas anecoicas (ISO 3745)
+### Grado de precisión en cámaras anecoicas (ISO 3745)
 
-ISO 3745:2012 es el hermano de grado 1 (precisión): una sala anecoica o
+ISO 3745:2012 es el hermano de grado 1 (precisión): una cámara anecoica o
 semianecoica cualificada elimina el campo reverberante, así que no hay término
 $K_2$ y las correcciones pasan a ser meteorológicas. El nivel de potencia es
 $L_W = \bar{L}_p + 10 \lg(S/S_0) + C_1 + C_2 + C_3$ (Ec. 14/15) sobre una

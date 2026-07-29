@@ -204,8 +204,8 @@ DIN 45692, IEC 60268-16, ANSI S3.5, ISO 7029, ISO 1999 e ISO 9612.
   Zwicker, Moore-Glasberg, el modelo variable en el tiempo de ISO 532-3 y el
   Sottek Hearing Model de ECMA-418-2, además de las curvas isofónicas de
   ISO 226.
-- [Métricas de calidad sonora](/phonometry/es/guides/sound-quality/): el
-  sharpness en acum, y la tonalidad, la aspereza y la intensidad de fluctuación
+- [Métricas de calidad sonora](/phonometry/es/guides/sound-quality/): la
+  agudeza en acum, y la tonalidad, la aspereza y la intensidad de fluctuación
   de ECMA-418-2.
 - [Tonos discretos prominentes (ECMA-418-1)](/phonometry/es/guides/tone-prominence/):
   la relación tono-ruido y la relación de prominencia, con sus criterios
@@ -215,7 +215,7 @@ DIN 45692, IEC 60268-16, ANSI S3.5, ISO 7029, ISO 1999 e ISO 9612.
   y la audibilidad de un tono sobre el umbral de enmascaramiento.
 - [Molestia psicoacústica e intensidad de fluctuación](/phonometry/es/guides/psychoacoustic-annoyance/):
   el modelo de molestia de Fastl y Zwicker construido a partir de sonoridad,
-  nitidez, aspereza e intensidad de fluctuación.
+  agudeza, aspereza e intensidad de fluctuación.
 
 **[Habla](/phonometry/es/guides/sections/speech/)**
 
@@ -300,7 +300,7 @@ ISO 10052 y ANSI/ASA S12.2.
 **[Diseño del aislamiento](/phonometry/es/guides/sections/insulation-design/)**
 
 - [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/):
-  el aislamiento in situ a ruido aéreo y de impactos entre salas a partir de
+  el aislamiento in situ a ruido aéreo y de impactos entre recintos a partir de
   datos de elementos, con sus caminos de flancos.
 - [Predicción del aislamiento de paneles](/phonometry/es/guides/panel-sound-insulation/):
   la ley de masa y la caída de coincidencia, las paredes dobles, rendijas y
@@ -379,7 +379,7 @@ ISO 8041.
   fuente.
 - [Ruido estructural instalado (EN 12354-5)](/phonometry/es/guides/installed-structure-borne/):
   el término de acoplamiento a partir de las movilidades de fuente y receptor, la
-  potencia instalada y el nivel de presión sonora por vía en el recinto receptor.
+  potencia instalada y el nivel de presión acústica por vía en el recinto receptor.
 
 **[Vibración en humanos](/phonometry/es/guides/sections/human-vibration/)**
 

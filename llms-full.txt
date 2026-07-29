@@ -71,6 +71,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Psychoacoustic annoyance and fluctuation strength (Fastl & Zwicker)](https://jmrplens.github.io/phonometry/guides/psychoacoustic-annoyance/)
 - [Speech Transmission Index (IEC 60268-16)](https://jmrplens.github.io/phonometry/guides/speech-transmission/)
 - [Speech Intelligibility Index (SII)](https://jmrplens.github.io/phonometry/guides/speech-intelligibility/)
+- [Objective intelligibility (STOI & ESTOI)](https://jmrplens.github.io/phonometry/guides/objective-intelligibility/)
 - [Hearing threshold (age and reference zero)](https://jmrplens.github.io/phonometry/guides/hearing-threshold/)
 - [Noise-induced hearing loss (ISO 1999)](https://jmrplens.github.io/phonometry/guides/noise-induced-hearing-loss/)
 - [Occupational Noise Exposure (ISO 9612)](https://jmrplens.github.io/phonometry/guides/occupational-exposure/)
@@ -162,10 +163,6 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [2D FDTD wave simulation](https://jmrplens.github.io/phonometry/guides/fdtd-simulation/)
 - [Elastic waves and fluid-solid coupling](https://jmrplens.github.io/phonometry/guides/elastic-waves/)
 
-## Other guides
-
-- [Objective intelligibility (STOI & ESTOI)](https://jmrplens.github.io/phonometry/guides/objective-intelligibility/)
-
 ## Theory and reference
 
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/)
@@ -219,7 +216,6 @@ One file per area, each small enough to fetch whole. `llms-full.txt` is the comp
 - [Underwater acoustics](https://jmrplens.github.io/phonometry/llms-underwater.txt)
 - [Sources and devices](https://jmrplens.github.io/phonometry/llms-sources-devices.txt)
 - [Wave simulation](https://jmrplens.github.io/phonometry/llms-simulation.txt)
-- [Other](https://jmrplens.github.io/phonometry/llms-other.txt)
 - [Everything](https://jmrplens.github.io/phonometry/llms-full.txt)
 
 ## Spanish

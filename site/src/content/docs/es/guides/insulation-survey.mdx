@@ -40,7 +40,7 @@ micrófonos barridos, tiempos de reverberación por banda, corrección de ruido 
 fondo cuidadosa. Para una comprobación rápida en una vivienda, ISO 10052 define
 un **método de control (survey)**: bandas de octava, un sonómetro de mano y una
 sola magnitud, el **índice de reverberación** `k = 10 lg(T/T0)` (`T0 = 0,5 s`),
-que arrastra la corrección de la sala receptora. Cada magnitud del control es
+que arrastra la corrección del recinto receptor. Cada magnitud del control es
 entonces una simple suma de `k`: la diferencia de niveles estandarizada
 `DnT = D + k`, la normalizada `Dn = D + k + 10 lg(A0 T0 / (0,16 V))`, la aparente
 `R' = D + k + 10 lg(S T0 / (0,16 V))` (usando `V/7,5` como `S` cuando es mayor) y,
@@ -60,7 +60,7 @@ media energética de tres posiciones ponderadas A o C.
 import numpy as np
 from phonometry import building
 
-# Niveles por banda de octava (125-2000 Hz) y el T medido de la sala receptora.
+# Niveles por banda de octava (125-2000 Hz) y el T medido del recinto receptor.
 l1 = np.array([88.0, 90.0, 92.0, 92.0, 90.0])
 l2 = np.array([55.0, 51.0, 47.0, 41.0, 35.0])
 k = building.reverberation_index([0.70, 0.60, 0.50, 0.45, 0.40])   # k = 10 lg(T/0.5)
@@ -96,7 +96,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import building
 
-# Niveles por bandas de octava (125-2000 Hz) y el T medido de la sala receptora.
+# Niveles por bandas de octava (125-2000 Hz) y el T medido del recinto receptor.
 bands = [125, 250, 500, 1000, 2000]
 l1 = np.array([88.0, 90.0, 92.0, 92.0, 90.0])
 l2 = np.array([55.0, 51.0, 47.0, 41.0, 35.0])
@@ -173,7 +173,7 @@ facade.report("D2mnTw_survey.pdf")                       # D2m,nT,w (C; Ctr)
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_impact_insulation_es.svg" alt="Aislamiento a impactos por el método de control: el nivel de impactos medido Li en bandas de octava y el L'nT estandarizado con la corrección por índice de reverberación sombreada entre ambos, el índice L'nT,w anotado y una nota de que una sala viva reduce el nivel de impactos estandarizado" width="80%" />
 
 *El control de impactos aplica el índice de reverberación con el signo
-contrario, `L'nT = Li − k`: una sala receptora viva (`T > T0`) **reduce** el
+contrario, `L'nT = Li − k`: un recinto receptor vivo (`T > T0`) **reduce** el
 nivel de impactos estandarizado. Como en el caso aéreo, el índice automático
 aparece para exactamente 5 valores de octava (o 16 de tercio de octava).*
 

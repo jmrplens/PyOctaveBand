@@ -264,20 +264,20 @@ L 706.163437 28.798125
    </g>
    <g id="text_14">
     <g id="patch_7">
-     <path d="M 439.929935 68.93991 
+     <path d="M 431.61431 68.93991 
 L 696.190873 68.93991 
 Q 701.190873 68.93991 701.190873 63.93991 
 L 701.190873 39.534441 
 Q 701.190873 34.534441 696.190873 34.534441 
-L 439.929935 34.534441 
-Q 434.929935 34.534441 434.929935 39.534441 
-L 434.929935 63.93991 
-Q 434.929935 68.93991 439.929935 68.93991 
+L 431.61431 34.534441 
+Q 426.61431 34.534441 426.61431 39.534441 
+L 426.61431 63.93991 
+Q 426.61431 68.93991 431.61431 68.93991 
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
     <text style="font-size: 10px; font-family: sans-serif" transform="translate(584.711185 48.133855)">L'nT,w(CI) = 58(-4) dB</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(439.929935 60.53659)">atención al signo menos: una sala viva reduce L'nT</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(431.61431 60.53659)">atención al signo menos: un recinto vivo reduce L'nT</text>
    </g>
    <g id="text_15">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="373.744609" y="16.798125" transform="rotate(-0 373.744609 16.798125)">Método de control ISO 10052: ruido de impactos</text>

@@ -1,6 +1,6 @@
 ---
 title: "Potencia acústica por métodos de presión"
-description: "El nivel de potencia acústica LW a partir de la presión sonora: los métodos de superficie envolvente de ingeniería (ISO 3744) y de inspección (ISO 3746) con las correcciones K1 de fondo y K2 de entorno, el método de precisión de ISO 3745 en sala anecoica o semianecoica cualificada con sus mallas fijas de micrófonos y correcciones meteorológicas, y la ficha de ensayo de estilo acreditado."
+description: "El nivel de potencia acústica LW a partir de la presión acústica: los métodos de superficie envolvente de ingeniería (ISO 3744) y de inspección (ISO 3746) con las correcciones K1 de fondo y K2 de entorno, el método de precisión de ISO 3745 en cámara anecoica o semianecoica cualificada con sus mallas fijas de micrófonos y correcciones meteorológicas, y la ficha de ensayo de estilo acreditado."
 references:
   - type: book
     authors: ["Beranek, L. L.", "Mellow, T. J."]
@@ -22,7 +22,7 @@ references:
     title: "Acoustics — Determination of sound power levels and sound energy levels of noise sources using sound pressure — Precision methods for anechoic rooms and hemi-anechoic rooms"
     designation: "ISO 3745:2012"
     url: "https://www.iso.org/standard/45362.html"
-    note: "El método de precisión en sala anecoica de la sección 2: el nivel de potencia de la Cláusula 8, la corrección de fondo por posición (Ec. 11), las correcciones meteorológicas y las mallas de micrófonos normalizadas."
+    note: "El método de precisión en cámara anecoica de la sección 2: el nivel de potencia de la Cláusula 8, la corrección de fondo por posición (Ec. 11), las correcciones meteorológicas y las mallas de micrófonos normalizadas."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2010
@@ -37,7 +37,7 @@ import ReportPreview from '../../../../components/ReportPreview.astro';
 
 De las vías normalizadas hasta el nivel de potencia acústica `LW`, los
 métodos de presión son los que no necesitan nada más exótico que un
-sonómetro: muestrear la presión sonora sobre una superficie que envuelve la
+sonómetro: muestrear la presión acústica sobre una superficie que envuelve la
 fuente, promediarla en energía, corregirla y sumar el término de superficie.
 Esta guía cubre los tres. Los métodos de **superficie envolvente** de
 ISO 3744 (grado de ingeniería) e ISO 3746 (grado de inspección) funcionan in
@@ -268,16 +268,16 @@ plt.show()
 
 </details>
 
-## 2. Grado de precisión, sala anecoica (ISO 3745)
+## 2. Grado de precisión, cámara anecoica (ISO 3745)
 
 Cuando se requiere la máxima exactitud, ISO 3745 mide la potencia acústica en una
-**sala anecoica** o **semianecoica** cualificada, donde el campo libre permite que
+**cámara anecoica** o **semianecoica** cualificada, donde el campo libre permite que
 un conjunto fijo de micrófonos muestree directamente la presión acústica radiada. Es
 la contraparte de grado 1 del método de superficie envolvente de la Sección 1, con
 coordenadas de micrófono normalizadas, una corrección por ruido de fondo por
 posición y una corrección meteorológica explícita.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_precision_anechoic_es.svg" alt="Potencia acústica de precisión de ISO 3745 en una sala anecoica: paredes revestidas de cuñas, el dispositivo bajo ensayo en el centro y un conjunto hemisférico de micrófonos a un radio fijo, con el nivel de potencia acústica formado a partir de la presión promediada en la superficie más las correcciones de área, ruido de fondo y meteorológica" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_precision_anechoic_es.svg" alt="Potencia acústica de precisión de ISO 3745 en una cámara anecoica: paredes revestidas de cuñas, el dispositivo bajo ensayo en el centro y un conjunto hemisférico de micrófonos a un radio fijo, con el nivel de potencia acústica formado a partir de la presión promediada en la superficie más las correcciones de área, ruido de fondo y meteorológica" width="92%" />
 
 **Nivel de potencia acústica (Cláusula 8).** El nivel de potencia acústica por banda es
 el nivel de presión promediado en la superficie más el término de superficie y las
@@ -463,7 +463,7 @@ res.report(
     metadata=ReportMetadata(
         client="Planta de fabricación de ejemplo",
         specimen="Grupo hidráulico (de suelo)",
-        test_room="Sala semianecoica sobre suelo reflectante",
+        test_room="Cámara semianecoica sobre suelo reflectante",
         instrumentation="Sonómetro clase 1 (IEC 61672-1), n/s 0042",
         laboratory="Ejemplo de referencia de phonometry",
         report_id="EXAMPLE-3744",
@@ -515,7 +515,7 @@ ISO 4871 que un resultado alimenta, viven en
   de emisión sonora de ISO 4871.
 - [Potencia acústica en cámara reverberante (ISO 3741)](/phonometry/es/guides/sound-power-reverberation/):
   la alternativa de precisión en campo difuso cuando la fuente puede viajar
-  a una sala cualificada.
+  a una cámara cualificada.
 - [Potencia acústica por barrido de intensidad (ISO 9614)](/phonometry/es/guides/sound-power-intensity/):
   las vías que toleran el ruido de fondo estacionario que un método de
   presión no puede restar.

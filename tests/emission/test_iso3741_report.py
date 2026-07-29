@@ -265,7 +265,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     _assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Determinación de la potencia acústica" in text
-    assert "sala de ensayo reverberante" in text
+    assert "cámara reverberante cualificada" in text
     assert "método directo" in text
     # Comma decimal separator on the A-weighted total.
     assert f"{_oracle_lwa():.1f}".replace(".", ",") in text

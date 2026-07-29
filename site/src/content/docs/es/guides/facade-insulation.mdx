@@ -46,7 +46,7 @@ La fachada es el único elemento del edificio que da la cara al ruido del que
 todo el mundo se queja: la carretera, el ferrocarril, la senda de vuelo.
 También es el elemento cuyo aislamiento se pide dos veces, una prevista y otra
 medida, y por eso ambas mitades viven en esta página. La ISO 16283-3 mide el
-cerramiento terminado y refiere el nivel de la sala receptora al nivel a 2 m
+cerramiento terminado y refiere el nivel del recinto receptor al nivel a 2 m
 frente a la fachada, con un altavoz a 45° o con el propio tráfico rodado. La
 EN 12354-3 predice esa misma diferencia de niveles estandarizada a partir de
 los índices de reducción acústica del muro, del acristalamiento y de la
@@ -62,8 +62,8 @@ y en
 
 ## ¿Cómo calculo el aislamiento acústico de fachada D2m,nT,w con Python?
 
-Pasa el nivel a 2 m frente a la fachada, el nivel de la sala receptora y el
-tiempo de reverberación de la sala receptora a `building.facade_insulation()`
+Pasa el nivel a 2 m frente a la fachada, el nivel del recinto receptor y el
+tiempo de reverberación del recinto receptor a `building.facade_insulation()`
 y valora después su espectro `d_2m_nt` con `building.weighted_rating()`: la
 magnitud de fachada es a ruido aéreo, así que el motor de ISO 717-1 se aplica
 sin cambios (Anexo F). Antes de que la fachada exista,
@@ -76,7 +76,7 @@ del Anexo F de EN 12354-3 de más abajo, `fac.d_2m_nt_w` vale 33 dB.
 La misma lógica fuente/receptor alcanza la **fachada** del edificio, pero ahora
 la fuente está *en el exterior*: un altavoz a 45° o el propio tráfico rodado. En
 lugar de una diferencia de niveles a través de un cerramiento interior,
-ISO 16283-3 referencia el nivel de la sala receptora $L_2$ al nivel **2 m frente
+ISO 16283-3 referencia el nivel del recinto receptor $L_2$ al nivel **2 m frente
 a la fachada** $L_{1,2m}$, dando la diferencia de niveles $D_{2m}$ y, exactamente
 como en el caso a ruido aéreo, sus formas estandarizada y normalizada:
 
@@ -105,11 +105,11 @@ la curva de referencia de **ISO 717-1** a través de `weighted_rating` sin cambi
 import numpy as np
 from phonometry import building
 
-# Nivel exterior 2 m frente a la fachada, nivel de la sala receptora y T por
+# Nivel exterior 2 m frente a la fachada, nivel del recinto receptor y T por
 # banda de tercio de octava; surface_level es el micrófono sobre el elemento de ensayo.
 l1_2m = np.full(16, 75.0)                              # L1,2m en el exterior
-l2 = np.full(16, 33.0)                                 # L2 de la sala receptora
-t2 = np.full(16, 0.5)                                  # T de la sala receptora (s)
+l2 = np.full(16, 33.0)                                 # L2 del recinto receptor
+t2 = np.full(16, 0.5)                                  # T del recinto receptor (s)
 
 fac = building.facade_insulation(l1_2m, l2, t2, volume=50.0, area=11.5,
                         surface_level=np.full(16, 78.0), method="loudspeaker")
@@ -145,7 +145,7 @@ import numpy as np
 from phonometry import building
 
 # Fachada de una vivienda, método del altavoz a 45°: nivel exterior a 2 m,
-# nivel de la sala receptora y T por banda de tercio de octava.
+# nivel del recinto receptor y T por banda de tercio de octava.
 bands = np.array([100, 125, 160, 200, 250, 315, 400, 500,
                   630, 800, 1000, 1250, 1600, 2000, 2500, 3150], float)
 l1_2m = np.array([76.0, 77.0, 78.0, 78.5, 79.0, 79.0, 79.0, 79.0,
@@ -189,10 +189,10 @@ se asume que los niveles por banda ya están corregidos por ruido de fondo.
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
 | `l1_2m` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Nivel 2 m frente a la fachada `L1,2m` |
-| `l2` | array 1D o 2D | dB | mismo número de bandas | Niveles de la sala receptora |
-| `t2` | array 1D | s | > 0, uno por banda | Tiempo de reverberación de la sala receptora |
+| `l2` | array 1D o 2D | dB | mismo número de bandas | Niveles del recinto receptor |
+| `t2` | array 1D | s | > 0, uno por banda | Tiempo de reverberación del recinto receptor |
 | `area` | float, opcional | m² | > 0, con `surface_level`, `volume` | Superficie del elemento de ensayo `S` (habilita `R'`) |
-| `volume` | float, opcional | m³ | > 0 | Sala receptora `V` (habilita `D2m,n`; requerido para `R'`) |
+| `volume` | float, opcional | m³ | > 0 | Recinto receptor `V` (habilita `D2m,n`; requerido para `R'`) |
 | `surface_level` | array 1D/2D, opcional | dB | mismo número de bandas | Nivel superficial `L1,s` sobre el elemento (habilita `R'`) |
 | `method` | str | — | `'loudspeaker'` (−1,5 dB) / `'road_traffic'` (−3 dB) | Corrección por ángulo de incidencia de `R'` |
 | `t0` | float | s | por defecto `0.5` | Tiempo de reverberación de referencia `T0` |
@@ -485,7 +485,7 @@ plt.show()
 | `FacadeElement.area` | float | m² | > 0 para `r` / `insertion_loss` | Área del elemento $S_i$ (se ignora para `dn_e`) |
 | `FacadeElement.r` / `dn_e` / `insertion_loss` | float o secuencia | dB | dar exactamente uno | Elemento de área $R_i$ / elemento pequeño $D_{n,e}$ / pérdida por inserción del hueco |
 | `facade_sound_reduction(area)` | float | m² | > 0 | Área total de la fachada $S$ |
-| `facade_sound_reduction(volume)` | float | m³ | > 0 | Volumen de la sala receptora $V$ (Fórmula 13) |
+| `facade_sound_reduction(volume)` | float | m³ | > 0 | Volumen del recinto receptor $V$ (Fórmula 13) |
 | `facade_sound_reduction(delta_l_fs)` | float | dB | por defecto `0` | Término de forma de la fachada $\Delta L_{fs}$ (Anexo C; consúltalo con `facade_shape_level_difference`) |
 | `radiated_sound_power(lp_in)` | float o secuencia | dB | — | Nivel interior $L_{p,in}$ por banda |
 | `radiated_sound_power(c_d)` | float | dB | por defecto `-6` | Término de difusividad $C_d$ (Anexo B) |
@@ -528,15 +528,15 @@ constante a 0,16, así que la diferencia es específica de la edición
 EN 12354-3:2000 que implementa el módulo.)
 
 Es una diferencia lo bastante pequeña como para comprobarla numéricamente. Se
-toma la fachada del Anexo F prevista arriba, se coloca en una sala receptora
-de 50 m³ con $T = T_0$ y se reconstruye el nivel de la sala receptora que
+toma la fachada del Anexo F prevista arriba, se coloca en un recinto receptor
+de 50 m³ con $T = T_0$ y se reconstruye el nivel del recinto receptor que
 habría encontrado una medición:
 
 ```python
 import numpy as np
 from phonometry import building
 
-# La fachada del Anexo F prevista arriba, ahora "medida" en una sala receptora
+# La fachada del Anexo F prevista arriba, ahora "medida" en un recinto receptor
 # de 50 m3 cuyo tiempo de reverberación es exactamente T0 = 0,5 s.
 elements = [
     building.FacadeElement("wall",     area=6.0, r=[41, 46, 52, 58, 64]),
@@ -578,9 +578,9 @@ real está, por tanto, en los datos de entrada y no en las fórmulas:
   de tráfico para todos los ángulos lleva −3 dB. La EN 12354-3 predice
   directamente el $R_{tr,s} = R'$ referido al tráfico y ofrece
   $R_{45} = R' + 1$ para la comparación con altavoz.
-* **La sala receptora.** La predicción supone el volumen de proyecto y un
-  campo receptor difuso. La medición toma la sala amueblada, y la hipótesis de
-  difusividad tras $A = 0{,}16\ V/T$ se debilita justo en las salas pequeñas y
+* **El recinto receptor.** La predicción supone el volumen de proyecto y un
+  campo receptor difuso. La medición toma el recinto amueblado, y la hipótesis de
+  difusividad tras $A = 0{,}16\ V/T$ se debilita justo en los recintos pequeños y
   en las bandas graves donde aprietan los requisitos de fachada.
 
 La lectura práctica: dimensiona el acristalamiento y las entradas de aire con
