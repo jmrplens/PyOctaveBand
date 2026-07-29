@@ -219,9 +219,15 @@ def delta_e_2000(
     hp_1 = float(np.degrees(np.arctan2(b_1, ap_1)) % 360.0) if (ap_1 or b_1) else 0.0
     hp_2 = float(np.degrees(np.arctan2(b_2, ap_2)) % 360.0) if (ap_2 or b_2) else 0.0
 
+    # "C'1 C'2 = 0" in the standard's notation: one of the pair is neutral, so
+    # its hue angle is undefined and every hue term drops out. Tested on the
+    # two factors rather than on their product, which would also underflow to
+    # zero for a pair of very small but non-zero chromas.
+    neutral_pair = not cp_1 or not cp_2
+
     d_l = l_2 - l_1
     d_c = cp_2 - cp_1
-    if cp_1 * cp_2 == 0.0:
+    if neutral_pair:
         d_h = 0.0
     elif abs(hp_2 - hp_1) <= 180.0:
         d_h = hp_2 - hp_1
@@ -231,7 +237,7 @@ def delta_e_2000(
 
     l_bar = 0.5 * (l_1 + l_2)
     c_bar = 0.5 * (cp_1 + cp_2)
-    if cp_1 * cp_2 == 0.0:
+    if neutral_pair:
         h_bar = hp_1 + hp_2
     elif abs(hp_1 - hp_2) <= 180.0:
         h_bar = 0.5 * (hp_1 + hp_2)
