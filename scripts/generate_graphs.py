@@ -26,7 +26,10 @@ from scipy import signal as scipy_signal
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 
 from phonometry import OctaveFilterBank
-from phonometry._plot.common import format_frequency_axis
+from phonometry._plot.common import (
+    _register_field_dark_cmap,
+    format_frequency_axis,
+)
 
 # Constants for professional styling
 # ---------------------------------------------------------------------------
@@ -1900,36 +1903,10 @@ COLOR_FG = "black"
 _FILENAME_SUFFIX = ""
 
 
-def _register_field_dark_cmap() -> None:
-    """Register ``phonometry_field_dark``, the dark-theme wave-field colormap.
-
-    Matplotlib's diverging ``berlin`` map anchors on a dark centre, but its
-    centre is a dark maroon that reads as a wash over the page background.
-    The registered map subtracts that centre bias instead of scaling it away:
-
-        out(x) = clip(berlin(x) - w(x) * berlin(0.5), 0, 1)
-
-    with the weight w(x) falling linearly from 1 at the centre to 0 at 60 %
-    amplitude. Zero pressure becomes true black -- the field blends into the
-    dark page exactly as the white centre of ``RdBu_r`` blends into the light
-    one -- while low-amplitude *differences* keep their size (a multiplicative
-    fade toward black would crush them into invisibility).
-    """
-    import matplotlib as mpl
-    from matplotlib.colors import LinearSegmentedColormap
-
-    if "phonometry_field_dark" in mpl.colormaps:
-        return
-    base = mpl.colormaps["berlin"]
-    xs = np.linspace(0.0, 1.0, 256)
-    cols = base(xs)[:, :3]
-    c0 = np.asarray(base(0.5)[:3])
-    w = np.clip(1.0 - np.abs(2.0 * xs - 1.0) / 0.6, 0.0, 1.0)
-    out = np.clip(cols - w[:, None] * c0, 0.0, 1.0)
-    mpl.colormaps.register(
-        LinearSegmentedColormap.from_list("phonometry_field_dark", out))
-
-
+# The dark-theme wave-field colormap (berlin with its centre bias subtracted
+# so zero maps to true black) now lives in the library, where the result
+# ``.plot()`` renderers pick it whenever the axes background is dark; the
+# clips address it by name, so it is registered eagerly here.
 _register_field_dark_cmap()
 
 # Theme-dependent wave-field styling, switched by set_theme(): the diverging
@@ -9948,9 +9925,11 @@ def generate_scholte_interface_wave(output_dir: str) -> None:
     assert res.snapshots is not None
     vmax = 0.22 * float(np.abs(res.snapshots[-1]).max())
     res.plot(kind="snapshot", frame=-1, ax=ax, vmin=-vmax, vmax=vmax)
-    # The RdBu field keeps a light background in both themes, so the
-    # in-axes annotations use a fixed dark ink rather than COLOR_FG.
-    ink = "#3a3a3a"
+    # The light RdBu_r field stays light everywhere, so its in-axes
+    # annotations keep a fixed dark ink rather than COLOR_FG; on the dark
+    # theme the renderer picks the black-centred field, which takes the
+    # white FIELD_INK of the animated clips.
+    ink = FIELD_INK if _FILENAME_SUFFIX else "#3a3a3a"
     ax.axhline(100.0, color=ink, linestyle=":", linewidth=1.0, alpha=0.75)
     ann: dict[str, Any] = {
         "fontsize": 9, "color": ink,

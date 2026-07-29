@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .common import _C_MUTED, _C_REFERENCE, _new_axes
+from .common import _C_MUTED, _C_REFERENCE, _field_cmap, _new_axes
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -119,7 +119,7 @@ def _render_snapshot(
     img = ax.imshow(
         field,
         **{
-            "cmap": "RdBu_r",
+            "cmap": _field_cmap(ax),
             "vmin": -vmax,
             "vmax": vmax,
             "origin": "upper",
@@ -190,7 +190,10 @@ def plot_fdtd_snapshot(
 
     The field is rendered as a single raster image (``imshow``, symmetric
     diverging scale); rigid obstacle cells are drawn in grey and the source
-    and probe cells are marked.
+    and probe cells are marked.  The default colormap follows the axes
+    background so zero pressure blends into the page -- ``RdBu_r`` on a
+    light background, the black-centred ``phonometry_field_dark`` on a dark
+    one -- and ``cmap`` overrides it.
 
     :param result: A :class:`~phonometry.simulation.fdtd.FDTDResult` with
         recorded snapshots.
@@ -282,7 +285,9 @@ def plot_elastic_snapshot(
 
     Renders the recorded ``snapshot_field`` (synthetic pressure or one
     velocity component, at cell centres) with the same raster styling as
-    the acoustic snapshot renderer.
+    the acoustic snapshot renderer, including its background-aware default
+    colormap (``RdBu_r`` on a light axes background, the black-centred
+    ``phonometry_field_dark`` on a dark one; ``cmap`` overrides it).
 
     :param result: An
         :class:`~phonometry.simulation.elastic_fdtd.ElasticFDTDResult`

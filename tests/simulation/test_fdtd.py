@@ -585,6 +585,25 @@ def test_plot_snapshot(small_result: FDTDResult) -> None:
     plt.close(ax.figure)
 
 
+def test_plot_snapshot_cmap_follows_background(small_result: FDTDResult) -> None:
+    """Diverging default: white-centred on light axes, black-centred on dark."""
+    ax = small_result.plot(kind="snapshot")
+    assert ax.get_images()[0].get_cmap().name == "RdBu_r"
+    plt.close(ax.figure)
+
+    _fig, dark_ax = plt.subplots()
+    dark_ax.set_facecolor("black")
+    ax = small_result.plot(kind="snapshot", ax=dark_ax)
+    assert ax.get_images()[0].get_cmap().name == "phonometry_field_dark"
+    plt.close(ax.figure)
+
+    _fig, dark_ax = plt.subplots()
+    dark_ax.set_facecolor("black")
+    ax = small_result.plot(kind="snapshot", ax=dark_ax, cmap="viridis")
+    assert ax.get_images()[0].get_cmap().name == "viridis"
+    plt.close(ax.figure)
+
+
 def test_plot_rejects_unknown_kind_and_missing_snapshots() -> None:
     res = fdtd_simulation(C0, 0.05, 1e-3, shape=(20, 20),
                           sources=[GaussianPulse(ix=5, iy=5, width=1e-4)],
