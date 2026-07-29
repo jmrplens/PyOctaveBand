@@ -17,6 +17,7 @@ from .common import (
     _C_TERTIARY,
     _LEGEND_UPPER_RIGHT,
     _band_axis,
+    _field_cmap,
     _freq_axis,
     _new_axes,
     format_frequency_axis,
@@ -456,7 +457,10 @@ def plot_atmospheric_pe(
 
     The field is drawn as a single raster image (``imshow``): per-cell vector
     quads are avoided so the figure stays light and free of moire (the repo's
-    pcolormesh-in-SVG policy).
+    pcolormesh-in-SVG policy).  The default diverging colormap follows the
+    axes background so the centre of the scale blends into the page --
+    ``RdBu_r`` on a light background, the black-centred
+    ``phonometry_field_dark`` on a dark one -- and ``cmap`` overrides it.
 
     :param result: An
         :class:`~phonometry.environmental.atmospheric_refraction.AtmosphericPEResult`.
@@ -478,7 +482,7 @@ def plot_atmospheric_pe(
     img = ax.imshow(
         dl,
         **{
-            "cmap": "RdBu_r",
+            "cmap": _field_cmap(ax),
             "vmin": -30.0,
             "vmax": vmax,
             "aspect": "auto",

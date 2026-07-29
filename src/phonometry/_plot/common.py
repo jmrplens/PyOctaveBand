@@ -73,6 +73,64 @@ _C_EDGE: Final = "#555555"
 #: Standard-normal quantile of 0.9 (the 10 % / 90 % fractile offset).
 _Z90: Final = 1.2816
 
+# ---------------------------------------------------------------------------
+# Signed wave-field colormaps: the zero of a diverging field should blend
+# into the page, so the default is picked from the axes background at draw
+# time -- RdBu_r (white centre) on a light background and the registered
+# phonometry_field_dark (black centre) on a dark one.
+# ---------------------------------------------------------------------------
+
+#: Diverging wave-field colormap of a light axes background (white centre).
+_FIELD_CMAP_LIGHT: Final = "RdBu_r"
+#: Diverging wave-field colormap of a dark axes background (black centre).
+_FIELD_CMAP_DARK: Final = "phonometry_field_dark"
+
+
+def _register_field_dark_cmap() -> None:
+    """Register ``phonometry_field_dark``, the dark-background wave-field map.
+
+    Matplotlib's diverging ``berlin`` map anchors on a dark centre, but its
+    centre is a dark maroon that reads as a wash over a dark page.  The
+    registered map subtracts that centre bias instead of scaling it away::
+
+        out(x) = clip(berlin(x) - w(x) * berlin(0.5), 0, 1)
+
+    with the weight ``w(x)`` falling linearly from 1 at the centre to 0 at
+    60 % amplitude.  Zero maps to true black -- the field blends into a dark
+    background exactly as the white centre of ``RdBu_r`` blends into a light
+    one -- while low-amplitude *differences* keep their size (a
+    multiplicative fade toward black would crush them into invisibility).
+    """
+    import matplotlib as mpl
+    from matplotlib.colors import LinearSegmentedColormap
+
+    if _FIELD_CMAP_DARK in mpl.colormaps:
+        return
+    base = mpl.colormaps["berlin"]
+    xs = np.linspace(0.0, 1.0, 256)
+    cols = base(xs)[:, :3]
+    c0 = np.asarray(base(0.5)[:3])
+    w = np.clip(1.0 - np.abs(2.0 * xs - 1.0) / 0.6, 0.0, 1.0)
+    out = np.clip(cols - w[:, None] * c0, 0.0, 1.0)
+    mpl.colormaps.register(
+        LinearSegmentedColormap.from_list(_FIELD_CMAP_DARK, out))
+
+
+def _field_cmap(ax: Axes) -> str:
+    """Background-aware diverging colormap name for a signed wave field.
+
+    Reads the axes patch color (so a ``dark_background`` style, or any
+    explicitly dark facecolor, is honoured) and returns the map whose centre
+    matches it.  Registers :data:`_FIELD_CMAP_DARK` on first use, so the name
+    is also available for an explicit ``cmap`` override.
+    """
+    from matplotlib.colors import to_rgb
+
+    _register_field_dark_cmap()
+    r, g, b = to_rgb(ax.get_facecolor())
+    luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
+    return _FIELD_CMAP_DARK if luminance < 0.5 else _FIELD_CMAP_LIGHT
+
 #: Common axis labels reused across the underwater-propagation plots.
 _LABEL_DEPTH_M: Final = "Depth [m]"
 _LABEL_TL_DB: Final = "Transmission loss [dB]"
