@@ -516,6 +516,9 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 y EBU R 128.
 - [Silenciadores](/phonometry/es/guides/silencers/): los silenciadores
   reactivos por el método de matrices de cuatro polos y la elección entre
   reactivo y disipativo.
+- [Ruido por conductos: del ventilador a la sala](/phonometry/es/guides/duct-path/):
+  el cálculo completo del ventilador a la sala frente a un criterio de ruido de
+  fondo, y el corte de modos superiores que limita todo método de onda plana.
 - [Control de ruido industrial: HVAC y cerramientos](/phonometry/es/guides/noise-control/):
   la atenuación y el ruido de flujo en conductos, y la pérdida por inserción de
   cerramientos.

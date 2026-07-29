@@ -22,5 +22,8 @@ itself, and that is determined by the
 
 - [Silencers](/phonometry/guides/silencers/): reactive silencers by the
   four-pole method and the reactive-versus-dissipative choice.
+- [Duct-Borne Noise: Fan to Room](/phonometry/guides/duct-path/): the
+  end-to-end fan-to-room calculation against a room criterion, and the
+  higher-order-mode cut-on that limits every plane-wave method.
 - [Industrial Noise Control: HVAC and Enclosures](/phonometry/guides/noise-control/):
   duct attenuation, flow noise and machine-enclosure insertion loss.

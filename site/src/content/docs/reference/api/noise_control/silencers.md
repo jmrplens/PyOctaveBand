@@ -66,6 +66,15 @@ dropping to `0` at `kL = n pi` (no dissipation). The four-pole product
 reproduces this exactly, and the machinery extends to side-branch (Helmholtz,
 quarter-wave) and extended-tube resonators that the closed form cannot cover.
 
+**Validity.** All of this is one-dimensional: it holds while the duct and the
+chamber carry plane waves only, that is below the first higher-order-mode
+cut-on frequency of the widest cross section
+([`phonometry.noise_control.duct_modes`](/phonometry/reference/api/noise_control/duct-modes/)). Every result reports that
+frequency as [`ReactiveSilencerResult.plane_wave_limit`](/phonometry/reference/api/noise_control/duct-modes/#plane_wave_limit) and raises a
+[`PlaneWaveWarning`](/phonometry/reference/api/noise_control/duct-modes/#planewavewarning) when the
+analysis grid reaches past it: the numbers are still returned, but above cut-on
+they describe the plane-wave mode alone and a measurement will show the rest.
+
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## expansion_chamber
@@ -275,6 +284,7 @@ ReactiveSilencerResult(
     kind: str,
     resonances: np.ndarray | None = None,
     geometry: dict[str, float] | None = None,
+    plane_wave_limit: float | None = None,
 )
 ```
 
@@ -291,6 +301,7 @@ Transmission and insertion loss of a reactive silencer over frequency.
 | `kind` | A short label of the device (e.g. `"expansion chamber"`). |
 | `resonances` | Notable resonance frequencies, Hz (e.g. the resonator tuning frequency), or `None`. |
 | `geometry` | The defining geometry the constructor was called with (keys matching its keyword names, e.g. `length`/`chamber_area`/ `pipe_area` for a chamber), retained so `plot_geometry` can draw the device; appended after the original fields and `None` for hand-built results. |
+| `plane_wave_limit` | The first higher-order-mode cut-on frequency of the widest cross section of the device, Hz (Norton & Karczub Eq. 7.6, [`phonometry.noise_control.duct_modes.plane_wave_limit`](/phonometry/reference/api/noise_control/duct-modes/#plane_wave_limit)). The four-pole algebra of this module is one-dimensional and is valid below it; above it several modes propagate at once and the result describes the plane-wave mode only, which is why a [`PlaneWaveWarning`](/phonometry/reference/api/noise_control/duct-modes/#planewavewarning) is raised when the analysis reaches past it. `None` for hand-built results that do not retain their geometry. |
 
 ### ReactiveSilencerResult.plot()
 

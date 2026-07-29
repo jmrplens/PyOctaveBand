@@ -495,6 +495,9 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 and EBU R 128.
 - [Silencers](/phonometry/guides/silencers/): reactive silencers by the
   four-pole transmission-matrix method and the reactive-versus-dissipative
   choice.
+- [Duct-Borne Noise: Fan to Room](/phonometry/guides/duct-path/): the
+  end-to-end fan-to-room calculation against a room criterion, and the
+  higher-order-mode cut-on that limits every plane-wave method.
 - [Industrial Noise Control: HVAC and Enclosures](/phonometry/guides/noise-control/):
   duct attenuation and flow noise, and enclosure insertion loss.
 

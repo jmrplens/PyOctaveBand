@@ -258,6 +258,8 @@ _SECTION_LIST: tuple[Section, ...] = (
         modules=(
             "phonometry.noise_control.silencers",
             "phonometry.noise_control.hvac",
+            "phonometry.noise_control.duct_path",
+            "phonometry.noise_control.duct_modes",
             "phonometry.noise_control.enclosures",
         ),
     ),

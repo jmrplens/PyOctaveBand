@@ -22,7 +22,9 @@ closed-form expansion chamber, the Helmholtz, quarter-wave and
 extended-tube resonators, the independent FDTD cross-check and the
 trade-off against dissipative linings. This page keeps the rest of the
 installation: what the duct run adds and removes on its own, and what an
-enclosure around the machine actually delivers.
+enclosure around the machine actually delivers. Chaining those element
+models end to end, from the fan sound power to the room criterion, is
+[Duct-borne noise: fan to room](duct-path.md).
 
 ## 1. HVAC duct attenuation and flow noise
 

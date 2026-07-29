@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 446 numerical conformance checks against 292 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 437 numerical conformance checks against 287 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 446 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 53 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 437 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 53 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -53,7 +53,6 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Special Weightings (G, B, D, AU)](https://jmrplens.github.io/phonometry/guides/special-weightings/)
 - [Time Weighting and Integration](https://jmrplens.github.io/phonometry/guides/time-weighting/)
 - [Environmental Levels (ISO 1996-1/-2)](https://jmrplens.github.io/phonometry/guides/environmental-levels/)
-- [Spanish Noise Regulation (RD 1367/2007)](https://jmrplens.github.io/phonometry/guides/spanish-noise-regulation/)
 - [Calibrated spectral analysis (Bendat & Piersol)](https://jmrplens.github.io/phonometry/guides/spectral-analysis/)
 - [Multiple and partial coherence (Bendat & Piersol)](https://jmrplens.github.io/phonometry/guides/miso-coherence/)
 - [Time-frequency analysis](https://jmrplens.github.io/phonometry/guides/time-frequency/)
@@ -99,7 +98,6 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Laboratory Flanking Transmission (ISO 10848)](https://jmrplens.github.io/phonometry/guides/flanking-lab/)
 - [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/guides/insulation-ratings/)
 - [Façade Sound Insulation](https://jmrplens.github.io/phonometry/guides/facade-insulation/)
-- [Spanish Building Code (CTE DB-HR)](https://jmrplens.github.io/phonometry/guides/spanish-building-code/)
 - [Predicting Panel Sound Insulation (mass law, coincidence, double walls)](https://jmrplens.github.io/phonometry/guides/panel-sound-insulation/)
 - [Floor-Covering Impact Improvement (ISO 16251-1)](https://jmrplens.github.io/phonometry/guides/impact-improvement/)
 - [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/guides/dynamic-stiffness/)
@@ -168,6 +166,10 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Atmospheric refraction: ray tracing and the parabolic equation (Salomons / Attenborough)](https://jmrplens.github.io/phonometry/guides/atmospheric-refraction/)
 - [2D FDTD wave simulation](https://jmrplens.github.io/phonometry/guides/fdtd-simulation/)
 - [Elastic waves and fluid-solid coupling](https://jmrplens.github.io/phonometry/guides/elastic-waves/)
+
+## Other guides
+
+- [Duct-borne noise: fan to room](https://jmrplens.github.io/phonometry/guides/duct-path/)
 
 ## Theory and reference
 
@@ -253,7 +255,6 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [building/intensity-insulation](https://jmrplens.github.io/phonometry/reference/api/building/intensity-insulation/)
 - [building/lab-insulation](https://jmrplens.github.io/phonometry/reference/api/building/lab-insulation/)
 - [building/panel-transmission](https://jmrplens.github.io/phonometry/reference/api/building/panel-transmission/)
-- [building/spanish-building-code](https://jmrplens.github.io/phonometry/reference/api/building/spanish-building-code/)
 - [building/structure-borne-power](https://jmrplens.github.io/phonometry/reference/api/building/structure-borne-power/)
 - [building/survey-insulation](https://jmrplens.github.io/phonometry/reference/api/building/survey-insulation/)
 - [correlation/correlation](https://jmrplens.github.io/phonometry/reference/api/correlation/correlation/)
@@ -263,7 +264,6 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [electroacoustics/loudspeaker](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/loudspeaker/)
 - [electroacoustics/microphone](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/microphone/)
 - [electroacoustics/piston](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/piston/)
-- [electroacoustics/sound-reinforcement](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/sound-reinforcement/)
 - [electroacoustics/swept-sine](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/swept-sine/)
 - [environment/air-absorption](https://jmrplens.github.io/phonometry/reference/api/environment/air-absorption/)
 - [environment/atmospheric-refraction](https://jmrplens.github.io/phonometry/reference/api/environment/atmospheric-refraction/)
@@ -273,7 +273,6 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [environment/measurement](https://jmrplens.github.io/phonometry/reference/api/environment/measurement/)
 - [environment/outdoor-propagation](https://jmrplens.github.io/phonometry/reference/api/environment/outdoor-propagation/)
 - [environment/rating](https://jmrplens.github.io/phonometry/reference/api/environment/rating/)
-- [environment/spanish-regulation](https://jmrplens.github.io/phonometry/reference/api/environment/spanish-regulation/)
 - [filters/compliance](https://jmrplens.github.io/phonometry/reference/api/filters/compliance/)
 - [filters/core](https://jmrplens.github.io/phonometry/reference/api/filters/core/)
 - [filters/equalizer](https://jmrplens.github.io/phonometry/reference/api/filters/equalizer/)
@@ -299,6 +298,8 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [materials/sound-absorption](https://jmrplens.github.io/phonometry/reference/api/materials/sound-absorption/)
 - [metrology/random-data](https://jmrplens.github.io/phonometry/reference/api/metrology/random-data/)
 - [metrology/uncertainty](https://jmrplens.github.io/phonometry/reference/api/metrology/uncertainty/)
+- [noise_control/duct-modes](https://jmrplens.github.io/phonometry/reference/api/noise_control/duct-modes/)
+- [noise_control/duct-path](https://jmrplens.github.io/phonometry/reference/api/noise_control/duct-path/)
 - [noise_control/enclosures](https://jmrplens.github.io/phonometry/reference/api/noise_control/enclosures/)
 - [noise_control/hvac](https://jmrplens.github.io/phonometry/reference/api/noise_control/hvac/)
 - [noise_control/silencers](https://jmrplens.github.io/phonometry/reference/api/noise_control/silencers/)
@@ -308,7 +309,6 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [power/sound-power-intensity](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-intensity/)
 - [power/sound-power-reverberation](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-reverberation/)
 - [power/vibration-sound-power](https://jmrplens.github.io/phonometry/reference/api/power/vibration-sound-power/)
-- [psychoacoustics/erb-scale](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/erb-scale/)
 - [psychoacoustics/fluctuation-strength](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/fluctuation-strength/)
 - [psychoacoustics/fluctuation-strength-ecma](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/fluctuation-strength-ecma/)
 - [psychoacoustics/loudness-contours](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-contours/)
@@ -322,14 +322,12 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [psychoacoustics/tonality](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/tonality/)
 - [psychoacoustics/tonality-ecma](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/tonality-ecma/)
 - [psychoacoustics/tone-audibility](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/tone-audibility/)
-- [rooms/crowd-noise](https://jmrplens.github.io/phonometry/reference/api/rooms/crowd-noise/)
 - [rooms/enclosed-space-absorption](https://jmrplens.github.io/phonometry/reference/api/rooms/enclosed-space-absorption/)
 - [rooms/image-source](https://jmrplens.github.io/phonometry/reference/api/rooms/image-source/)
 - [rooms/open-plan](https://jmrplens.github.io/phonometry/reference/api/rooms/open-plan/)
 - [rooms/reverberation-prediction](https://jmrplens.github.io/phonometry/reference/api/rooms/reverberation-prediction/)
 - [rooms/room-acoustics](https://jmrplens.github.io/phonometry/reference/api/rooms/room-acoustics/)
 - [rooms/room-ir](https://jmrplens.github.io/phonometry/reference/api/rooms/room-ir/)
-- [rooms/room-modes](https://jmrplens.github.io/phonometry/reference/api/rooms/room-modes/)
 - [rooms/room-noise](https://jmrplens.github.io/phonometry/reference/api/rooms/room-noise/)
 - [rooms/steady-field](https://jmrplens.github.io/phonometry/reference/api/rooms/steady-field/)
 - [simulation/elastic-fdtd](https://jmrplens.github.io/phonometry/reference/api/simulation/elastic-fdtd/)
@@ -987,61 +985,6 @@ plt.show()
 
 </details>
 
-## The ERB_N scale and the Cam axis
-
-Every model on this page except Zwicker's is written on the **ERB_N number**
-axis, so it is worth having the scale itself in hand. The cochlea behaves as a
-bank of overlapping band-pass **auditory filters**; the width of the one centred
-on a given frequency is summarised by its *equivalent rectangular bandwidth*,
-the bandwidth of the rectangular filter that would pass the same power with the
-same peak response. Fitting notched-noise data for young listeners at moderate
-levels, Glasberg and Moore (1990) make it a straight line in frequency (Moore,
-*An Introduction to the Psychology of Hearing* 6e, p. 76):
-
-```text
-ERB_N        = 24.7 (4.37 F + 1)          [Hz], F in kHz
-ERB_N number = 21.4 log10(4.37 F + 1)     [Cam]
-```
-
-The second line integrates `df / ERB_N(f)`, so its unit is one auditory-filter
-width: the **ERB_N number**, whose unit is called the **Cam** (after Cambridge).
-
-```python
-from phonometry import psychoacoustics
-
-cam = psychoacoustics.cam_from_frequency(1000.0)
-print(round(psychoacoustics.erb_bandwidth(1000.0), 1))       # 132.4 Hz
-print(round(cam, 2))                                         # 15.59 Cam
-print(round(psychoacoustics.frequency_from_cam(cam), 1))     # 1000.0 Hz
-```
-
-The library states the same fit with one more significant digit,
-`ERB_N = 24.673 (0.004368 f + 1)` and `21.366 log10(0.004368 f + 1)`, the
-precision the ISO 532-2 implementation uses; the two forms agree to better than
-0.2 % over the audible range, and the extra digits are what make
-`frequency_from_cam` an exact inverse. The functions are not a private helper of
-the loudness model: `loudness_moore_glasberg` imports these very functions, so
-the Cam grid of a `MooreGlasbergLoudness.erb_number` and a hand-built Cam axis
-cannot drift apart.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/erb_bandwidth_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/erb_bandwidth.svg" alt="Auditory-filter bandwidth against centre frequency on log-log axes: the ERB_N line of Glasberg and Moore rising from about 30 Hz at 50 Hz to above 1 kHz at 16 kHz, the constant-percentage one-third-octave bandwidth crossing it near 500 Hz, the 1 kHz point annotated at 15.59 Cam, and a second top axis giving the Cam scale" width="85%"></picture>
-
-*The ear's filter is not a constant fraction of frequency. Below about 500 Hz
-it is markedly narrower than a one-third octave, which is why the "old"
-critical-band function, flat at low frequency, fits the direct measurements so
-poorly there; above that it is wider. The top axis counts the same curve in
-Cams, so equal steps along it are equal numbers of auditory filters.*
-
-### `erb_bandwidth()`, `cam_from_frequency()`, `frequency_from_cam()` parameters
-
-| Parameter | Type | Units | Range / default | Notes |
-| :--- | :--- | :--- | :--- | :--- |
-| `frequency` | float or array | Hz | ≥ 0 | `erb_bandwidth`, `cam_from_frequency` |
-| `cam` | float or array | Cam | ≥ 0 | `frequency_from_cam` |
-
-Each returns a float for a scalar input and an array otherwise. The three
-constants are exported as `ERB_C1`, `ERB_C2` and `CAM_C`.
-
 ## Moore-Glasberg loudness (ISO 532-2)
 
 Where Zwicker uses fixed critical bands on the Bark scale, Moore-Glasberg builds
@@ -1275,11 +1218,6 @@ The Zwicker method (ISO 532-1:2017) is the reference: stationary and time-varyin
 
 ## References
 
-- Moore, B. C. J. (2013). *An introduction to the psychology of hearing*
-  (6th ed.). Brill.
-  [doi:10.1163/9789004252424](https://doi.org/10.1163/9789004252424).
-  Pages 76–77: the ERB_N auditory-filter bandwidth and the Cam (ERB_N number)
-  scale of Glasberg and Moore (1990).
 - International Organization for Standardization. (2017). *Acoustics —
   Methods for calculating loudness — Part 2: Moore-Glasberg method*
   (ISO 532-2:2017).
@@ -2226,9 +2164,6 @@ cycle and warn on use; they are removed in 4.0.
 | `ZwickerLoudness` | `dataclass` | **Loudness result.**<br>• `loudness`: N [sone]<br>• `loudness_level`: LN [phon]<br>• `specific`: N′(z), 240 bins of 0.1 Bark<br>• `n5` / `n10`: percentile loudness (time-varying only)<br>• `time` / `loudness_vs_time`: 500 Hz trace<br>• `field`: sound field assumed ('free'/'diffuse') | `res.loudness, res.n5`<br><br>• Time-varying fields are `None` for stationary results |
 | `sharpness_din` | `function` | **Sharpness in acum (DIN 45692).**<br>• `x`: Signal (1D)<br>• `fs`: Sample rate [Hz]<br>• `field`: 'free' or 'diffuse' (Default: 'free')<br>• `method`: 'din', 'aures' or 'bismarck' (Default: 'din')<br>• `calibration_factor`: Digital units to Pa (Default: 1.0) | `s = sharpness_din(x, fs)`<br><br>• `s`: sharpness [acum] |
 | `sharpness_din_from_specific` | `function` | **Sharpness from a specific-loudness pattern.**<br>• `specific`: N′(z), 240 values at 0.1 Bark (e.g. `ZwickerLoudness.specific`)<br>• `method`: 'din', 'aures' or 'bismarck' (Default: 'din') | `s = sharpness_din_from_specific(res.specific)`<br><br>• `s`: sharpness [acum] |
-| `erb_bandwidth` | `function` | **Auditory-filter equivalent rectangular bandwidth ERB_N (Glasberg & Moore 1990; Moore 6e p. 76).**<br>• `frequency` [Hz] (scalar or array, ≥ 0)<br>• `ERB_N = 24.673(0.004368 f + 1)` [Hz] | `erb_bandwidth(1000.0)  # 132.4` |
-| `cam_from_frequency` / `frequency_from_cam` | `function` | **The Cam (ERB_N-number) frequency scale, one unit per auditory-filter width.**<br>• `cam_from_frequency(f)` = `21.366 log10(0.004368 f + 1)` [Cam]<br>• `frequency_from_cam(i)`: the exact inverse [Hz] | `cam_from_frequency(1000.0)  # 15.59`<br>`frequency_from_cam(15.59)` |
-| `ERB_C1` / `ERB_C2` / `CAM_C` | `constant` | **Constants of the ERB_N fit shared with the ISO 532-2 loudness model.**<br>• `ERB_C1` = 24.673 [Hz], `ERB_C2` = 0.004368 [1/Hz], `CAM_C` = 21.366 [Cam] | `ERB_C1 * (ERB_C2 * f + 1)` |
 | `loudness_moore_glasberg` | `function` | **Moore-Glasberg loudness (ISO 532-2:2017).**<br>• `x`: Calibrated signal in Pa (1D)<br>• `fs`: Sample rate [Hz]<br>• `field`: 'free', 'diffuse' or 'eardrum' (Default: 'free')<br>• `presentation`: 'binaural'/'diotic' or 'monaural' (Default: 'binaural') | `res = loudness_moore_glasberg(x, fs)`<br><br>• `MooreGlasbergLoudness` (roex excitation pattern) |
 | `loudness_moore_glasberg_from_spectrum` | `function` | **Exact loudness from sinusoidal components (ISO 532-2 §5.2/5.4).**<br>• `components`: sequence of (frequency [Hz], level [dB SPL]) pairs<br>• `field`: 'free'/'diffuse'/'eardrum' (Default: 'free')<br>• `presentation`: (Default: 'binaural') | `res = loudness_moore_glasberg_from_spectrum([(1000.0, 40.0)])`<br><br>• 1 kHz/40 dB → 1.000 sone |
 | `loudness_moore_glasberg_from_third_octave` | `function` | **Loudness from 29 one-third-octave band levels (ISO 532-2 §5.5).**<br>• `band_levels`: 29 levels, 25 Hz–16 kHz [dB SPL]<br>• `field` / `presentation`: as above | `res = loudness_moore_glasberg_from_third_octave(levels)`<br><br>• `MooreGlasbergLoudness` |
@@ -2296,33 +2231,6 @@ cycle and warn on use; they are removed in 4.0.
 | `tonal_adjustment_from_mean_audibility` | `function` | **Kt from mean audibility ΔL (ISO 1996-2 Table J.1).**<br>• `mean_audibility` [dB], `coarse` (Default: False) | `tonal_adjustment_from_mean_audibility(5.0)  # 3` |
 | `critical_bandwidth` | `function` | **Critical bandwidth (ISO 1996-2 Table C.1).**<br>• `centre_frequency` [Hz] (100 Hz ≤ 500 Hz, else 20 %·fc) | `critical_bandwidth(4000.0)  # 800 Hz` |
 | `tonal_seeking_survey` | `function` | **One-third-octave tonal screen (ISO 1996-2 Annex K).**<br>• `levels` [dB], `frequencies` [Hz] (15/8/5 dB neighbour rule) | `flags = tonal_seeking_survey(levels, freqs)` |
-| `NoisePhase` | `dataclass` | **Noise phase Ti of steady emission (RD 1367/2007 Annex IV A.3.4.2 b).**<br>• `hours` Ti [h], `laeq` background-corrected LAeq,Ti [dB]<br>• `kt`, `kf`, `ki` corrections [dB]; `label`<br>• `.correction` (capped at 9 dB), `.lkeq` | `NoisePhase(6, 50.0, kt=6, kf=3)  # LKeq,Ti = 59 dB` |
-| `tonal_correction` | `function` | **Kt from an unweighted 1/3-octave spectrum (Annex IV A.3.3).**<br>• `levels` [dB], `frequencies` [Hz]<br>• Lt = Lf − Ls against the arithmetic mean of the two neighbours; 8/12, 5/8 and 3/5 dB thresholds by band range | `res = tonal_correction(levels, freqs)`<br><br>• `TonalCorrectionResult` (`.correction`, `.plot()`) |
-| `TonalCorrectionResult` | `dataclass` | **RD 1367/2007 tonal correction.**<br>• `correction` Kt [dB] (0/3/6), `governing_frequency`<br>• `differences` Lt and `band_corrections` per band (NaN where not evaluable)<br>• `frequencies`, `levels` | `res.correction, res.governing_frequency` |
-| `low_frequency_correction` | `function` | **Kf from Lf = LCeq,Ti − LAeq,Ti (Annex IV A.3.3).**<br>• `lceq`, `laeq` [dB], background-corrected | `low_frequency_correction(63.0, 50.0)  # 3.0 dB` |
-| `impulsive_correction` | `function` | **Ki from Li = LAIeq,Ti − LAeq,Ti (Annex IV A.3.3).**<br>• `laieq`, `laeq` [dB], background-corrected | `impulsive_correction(67.0, 50.0)  # 6.0 dB` |
-| `total_correction` | `function` | **K = Kt + Kf + Ki, capped at 9 dB (Annex IV A.3.3).**<br>• `kt`, `kf`, `ki` [dB] | `total_correction(6, 3, 0)  # 9.0` |
-| `corrected_level` | `function` | **LKeq,T = LAeq,T + Kt + Kf + Ki (Annex I A.2 c).**<br>• `laeq` [dB]; `kt`, `kf`, `ki` [dB] | `corrected_level(50.0, kt=6, kf=3)  # 59.0 dB` |
-| `evaluation_period_level` | `function` | **LKeq,T from its noise phases (Annex IV A.3.4.2 b).**<br>• `phases`: `NoisePhase` list<br>• `hours` T [h] (None = sum of Ti) | `evaluation_period_level(phases, hours=12)` |
-| `long_term_corrected_level` | `function` | **Annual LK,x, energy mean of the daily levels (Annex I A.2 d).**<br>• `daily_levels` [dB]; `weights`: days each level represents | `long_term_corrected_level([57, 0], weights=[303, 62])  # 56.2` |
-| `round_reported_level` | `function` | **Rounding of Annex IV A.3.4.2: add 0,5 dB, take the integer part.**<br>• `value` [dB] | `round_reported_level(56.82)  # 57` |
-| `outdoor_quality_objectives` | `function` | **Outdoor quality objectives Ld/Le/Ln (Annex II Table A).**<br>• `area_type`: 'e','a','d','c','b' or an alias<br>• `urbanisation`: 'existing' or 'new' (−5 dB, Article 14.2) | `outdoor_quality_objectives("a")  # 65/65/55 dB` |
-| `indoor_quality_objectives` | `function` | **Indoor quality objectives (Annex II Table B).**<br>• `building_use`: 'residential','sanitary','educational'<br>• `room_type`: 'living','bedrooms','classrooms','reading_rooms' | `indoor_quality_objectives("residential", "bedrooms")` |
-| `vibration_quality_objective` | `function` | **Indoor vibration objective Law [dB] (Annex II Table C).**<br>• `building_use` | `vibration_quality_objective("residential")  # 75.0` |
-| `infrastructure_limits` | `function` | **Immission limits for new transport infrastructure (Annex III Table A1).**<br>• `area_type` | `infrastructure_limits("a")  # 60/60/50 dB` |
-| `max_infrastructure_limit` | `function` | **LAmax limit for rail and airport infrastructure (Annex III Table A2).**<br>• `area_type` | `max_infrastructure_limit("a")  # 85.0 dB` |
-| `activity_limits` | `function` | **Outdoor limits for activities and ports (Annex III Table B1).**<br>• `area_type` | `activity_limits("a")  # LK,d/e/n = 55/55/45 dB` |
-| `adjacent_premises_limits` | `function` | **Noise transmitted to acoustically adjacent premises (Annex III Table B2).**<br>• `building_use`, `room_type` | `adjacent_premises_limits("residential", "bedrooms")` |
-| `RegulationLimits` | `dataclass` | **A day/evening/night limit triple of RD 1367/2007.**<br>• `day`, `evening`, `night` [dB]; `index`, `reference`, `description`<br>• Indexable by period; `.as_dict()` | `lim["night"]` |
-| `assess_activity` | `function` | **Article 25 compliance of an activity or port.**<br>• `measurements`: phases keyed by period<br>• `limits`: a `RegulationLimits` row<br>• `long_term_levels` or `operating_days` / `year_days` / `closed_level`<br>• `new_activity` (Default: True; False = Article 25.2)<br>• `period_hours` | `v = assess_activity({"day": day}, activity_limits("a"), operating_days=303)`<br><br>• `ActivityAssessment` |
-| `ActivityAssessment` | `dataclass` | **RD 1367/2007 activity verdict.**<br>• `periods`: `PeriodAssessment` tuple; `limits`; `new_activity`<br>• `.complies`<br>• `.plot()`; `.report(path, language='es')`: one-page inspection fiche → PDF | `v.complies`<br>`v.report("acta.pdf")` |
-| `PeriodAssessment` | `dataclass` | **One evaluation period against its limit.**<br>• `evaluation_period_level`, `reported_level` (rounded)<br>• `long_term_corrected_level`, `reported_long_term`<br>• `limit`, `daily_limit` (+3), `phase_limit` (+5), `max_phase_level`<br>• `phase_pass`, `daily_pass`, `long_term_pass`, `.complies` | `p.reported_level, p.long_term_pass` |
-| `ACOUSTIC_AREA_TYPES` | `constant` | **Acoustic area types of Article 7 of Ley 37/2003, keyed by letter.**<br>e sanitary/educational/cultural, a residential, d tertiary, c recreational, b industrial, f transport systems | `ACOUSTIC_AREA_TYPES["a"]` |
-| `RD1367_EVALUATION_PERIODS` | `constant` | **The three daily evaluation periods (Annex I A.1).** | `("day", "evening", "night")` |
-| `RD1367_PERIOD_HOURS` | `constant` | **Default period durations [h] (Annex I A.1 a).** | `{"day": 12, "evening": 4, "night": 8}` |
-| `RD1367_PERIOD_CLOCK_LIMITS` | `constant` | **Local-time start/end hour of each period (Annex I A.1 b).** | `{"day": (7, 19), ...}` |
-| `RD1367_CORRECTION_VALUES` | `constant` | **The only values a single correction takes (Annex IV A.3.3).**<br>Each table grades its parameter 0, 3 or 6 dB | `RD1367_CORRECTION_VALUES  # (0.0, 3.0, 6.0)` |
-| `RD1367_MAX_CORRECTION` | `constant` | **Cap on Kt + Kf + Ki [dB] (Annex IV A.3.3).** | `9.0` |
 | `residual_sound_correction` | `function` | **Residual-noise correction L = 10 lg(10^(L'/10)−10^(Lres/10)) (Formula 16).**<br>• `measured_level` L', `residual_level` Lres [dB] | `res = residual_sound_correction(58.0, 50.0)`<br><br>• `ResidualCorrectionResult` (`.corrected_level`, `.reportable_upper_bound`, `.reliable`) |
 | `gaussian_residual_level` | `function` | **Residual Leq from percentiles (ISO 1996-2 Annex I).**<br>• `l50` [dB]; exactly one of `l90` / `l95` (must not exceed `l50`) | `gaussian_residual_level(50.0, l90=40.0)` |
 | `combined_standard_uncertainty` | `function` | **u = √(Σ(cj·uj)²) (ISO 1996-2 Formula 2).**<br>• `contributions`: cj·uj products or (uj, cj) pairs | `u = combined_standard_uncertainty([0.59, 0.3, 2.0, 0.40, 0.38])  # 2.18` |
@@ -2371,38 +2279,10 @@ cycle and warn on use; they are removed in 4.0.
 | `steady_state_field` | `function` | **Steady-state room field (Bies 6.4).**<br>• `sound_power_level` `Lw` [dB]<br>• `surface_area` `S` [m²], `mean_absorption` `ᾱ` (0, 1)<br>• `distances` [m] (Default: 0.1–10 rc)<br>• `directivity` `Q` (Default: 1)<br>• `characteristic_impedance` [Pa·s/m] for the ρc term | `f = steady_state_field(90.0, 100.0, 0.2)`<br><br>• `SteadyFieldResult` |
 | `SteadyFieldResult` | `dataclass` | **SPL vs distance, direct/reverberant/total.**<br>• `distances` [m]<br>• `direct`/`reverberant`/`total` [dB]<br>• `critical_distance` [m], `room_constant` [m²]<br>• `.plot()` | `f.total, f.critical_distance`<br>`f.plot()` |
 | `room_constant` / `critical_distance` / `schroeder_frequency` / `steady_state_spl` | `function` | **Steady-field building blocks (Bies 6.43/6.44, Kuttruff 3.44/5.44).**<br>• `room_constant(S, ᾱ)` = `Sᾱ/(1-ᾱ)` [m²]<br>• `critical_distance(R, directivity=1)` = `√(QR/16π)` [m]<br>• `schroeder_frequency(T, V)` = `2000√(T/V)` [Hz]<br>• `steady_state_spl(Lw, r, R, directivity=1)` [dB] | `R = room_constant(100, 0.2)`<br>`critical_distance(R)`<br>`schroeder_frequency(1.0, 200.0)` |
-| `room_modes` | `function` | **Normal modes of a rectangular room (Long, Architectural Acoustics 2e, Eq. 8.43).**<br>• `dimensions`: `(lx, ly, lz)` [m]<br>• `max_frequency` [Hz] (Default: 200)<br>• `speed_of_sound` [m/s] (Default: 343)<br>• `reverberation_time` [s] (optional, adds the Schroeder frequency) | `m = room_modes((7, 5, 3), max_frequency=100.0)`<br><br>• `RoomModesResult` |
-| `RoomModesResult` | `dataclass` | **Sorted mode list of a shoebox.**<br>• `orders`: `(N, 3)` `(nx, ny, nz)`<br>• `frequencies` [Hz], ascending<br>• `kinds`: 'axial'/'tangential'/'oblique'<br>• `volume`, `surface_area`, `edge_length`, `schroeder_frequency`<br>• `count_by_kind()`, `density(f)`<br>• `.plot()`: mode ladder by family + modal density | `m.frequencies[0], m.count_by_kind()`<br>`m.plot()` |
-| `room_mode_frequency` / `room_mode_count` / `room_modal_density` | `function` | **Mode building blocks (Long Eqs. 8.43, 8.45, 8.46).**<br>• `room_mode_frequency(orders, dimensions)` = `(c0/2)√((nx/lx)²+(ny/ly)²+(nz/lz)²)` [Hz]<br>• `room_mode_count(f, dimensions)`: Morse/Pierce smooth count<br>• `room_modal_density(f, dimensions)` [modes/Hz] | `room_mode_frequency((1, 0, 0), (7, 5, 3))`<br>`room_modal_density(1000.0, (7, 5, 3))` |
-| `MODE_KINDS` | `constant` | **Mode families, strongest first: `('axial', 'tangential', 'oblique')`.** | `MODE_KINDS[0]  # 'axial'` |
-| `crowd_noise` | `function` | **Self-generated crowd noise vs occupancy (Long Ch. 17, Eqs. 17.50–17.52).**<br>• `absorption_areas`: total room absorption [m²] (scalar or 1-D)<br>• `talkers`: occupancy axis N (Default: 1..20)<br>• `distance` r [m] (Default: 1.2), `sound_power_level` Lw [dB] (Default: 70), `directivity` Q (Default: 2) | `c = crowd_noise([20.0, 190.0])`<br><br>• `CrowdNoiseResult` |
-| `CrowdNoiseResult` | `dataclass` | **Crowd self-noise result.**<br>• `talkers`, `absorption_areas`, `levels` [dB] (areas × talkers)<br>• `signal_level` [dB], `communication_level` [dB], `distance`, `sound_power_level`, `directivity`<br>• `speech_to_noise()` [dB]<br>• `.plot()`: level vs occupancy per absorption | `c.levels, c.signal_level`<br>`c.plot()` |
-| `speech_direct_level` / `crowd_noise_level` / `speech_to_noise_ratio` / `absorption_per_table` | `function` | **Crowd-noise building blocks (Long Eqs. 17.50–17.54).**<br>• `speech_direct_level(r)` = `Lw + 10 lg(Q/4πr²)` [dB]<br>• `crowd_noise_level(N, A)` = `Lw + 10 lg N + 10 lg(4/A)` [dB]<br>• `speech_to_noise_ratio(r, A_tab)` [dB]<br>• `absorption_per_table(r, L_SN)` [m²]: the inverse | `crowd_noise_level(20, 20.0)  # 76`<br>`absorption_per_table(1.0, -6.0)  # 6.31` |
-| `NORMAL_VOICE_POWER_LEVEL` / `TALKER_DIRECTIVITY` / `COMMUNICATION_SNR` / `PRIVACY_SNR` | `constant` | **Crowd-noise defaults (Long Ch. 17).**<br>• 70 dB re 1 pW per talker, Q = 2<br>• −6 dB communication limit (Eq. 17.53), −9 dB privacy limit (Eq. 17.54) | `absorption_per_table(1.0, COMMUNICATION_SNR)` |
 | `airborne_insulation` | `function` | **Field airborne insulation (ISO 16283-1).**<br>• `l1`/`l2`: Source/receiving levels [dB], 1D or (positions, bands)<br>• `t2`: Receiving-room T per band [s]<br>• `area`: Partition S [m²] (for R')<br>• `volume`: Receiving V [m³] (for R')<br>• `t0`: Reference T0 [s] (Default: 0.5) | `ins = airborne_insulation(l1, l2, t2, area=10, volume=50)`<br><br>• `AirborneInsulationResult` |
 | `weighted_rating` | `function` | **Single-number rating + C/Ctr (ISO 717-1).**<br>• `values_by_band`: 16 thirds or 5 octaves [dB]<br>• `bands`: 'third-octave', 'octave' or None | `w = weighted_rating(R)`<br><br>• `WeightedRatingResult` (Rw, C, Ctr) |
 | `weighted_rating_extended` | `function` | **Rating + enlarged-range terms (ISO 717-1 Annex B).**<br>• `values_by_band` [dB] with `frequencies` [Hz] (None = the 16 core bands)<br>• `one_decimal`: 0.1 dB shift + one-decimal reductions for uncertainty statements (Default: False) | `ext = weighted_rating_extended(r, freqs)`<br><br>• `ExtendedWeightedRatingResult` (rating, c, ctr, c_50_3150 … ctr_100_5000) |
 | `ExtendedWeightedRatingResult` | `dataclass` | **Weighted rating with the enlarged-range adaptation terms (ISO 717-1 Annex B).**<br>• `rating` + `c`, `ctr`<br>• `c_50_3150`, `c_50_5000`, `c_100_5000` and the `ctr_` twins<br>• `core`: the base `WeightedRatingResult` | `res = weighted_rating_extended(freqs, r)` |
-| `db_hr_global_index` | `function` | **A-weighted global index Ix = −10 lg Σ 10^((Lx,i−Xi)/10) (CTE DB-HR Annex A, A.5-A.7).**<br>• `band_values` Xi [dB] over the 18 bands 100 Hz-5 kHz<br>• `spectrum`: 'pink','traffic','railway','aircraft'<br>• `frequencies` [Hz], `name` | `idx = db_hr_global_index(r, "pink")`<br><br>• `DbHrGlobalIndexResult` |
-| `ra` | `function` | **RA for pink noise (DB-HR Annex A).**<br>• `reduction_index` R or R' [dB]; `frequencies` | `ra(r_prime).intermediate  # 51.4 dBA` |
-| `ra_tr` | `function` | **RA,tr for road-traffic noise (DB-HR Annex A).**<br>• `reduction_index` [dB]; `frequencies` | `ra_tr(r).reported` |
-| `dnt_a` | `function` | **DnT,A between rooms, pink noise (Formula A.7).**<br>• `level_difference` DnT [dB]; `frequencies` | `dnt_a(dnt).reported` |
-| `d2m_nt_a` | `function` | **D2m,nT,A of a facade (Formula A.5).**<br>• `level_difference` D2m,nT [dB]; `frequencies`<br>• `spectrum`: 'pink' (Default) or 'railway'<br>• Clause 3.1.3.4 point 1: the quantity a railway-dominant site is assessed in | `d2m_nt_a(d, spectrum='railway').name  # 'D2m,nT,A'` |
-| `d2m_nt_atr` | `function` | **D2m,nT,Atr of a facade (Formula A.6).**<br>• `level_difference` D2m,nT [dB]; `frequencies`<br>• `spectrum`: 'traffic' (Default) or 'aircraft'<br>• Railway noise is D2m,nT,A via (A.5): use `d2m_nt_a` | `d2m_nt_atr(d).intermediate  # 32.8 dBA` |
-| `DbHrGlobalIndexResult` | `dataclass` | **A DB-HR A-weighted global index.**<br>• `value` (exact), `intermediate` (1 decimal), `reported` (integer, 3.1.3.1 point 4)<br>• `name`, `spectrum`, `reference`<br>• `frequencies`, `band_values`, `spectrum_levels`, `band_contributions`<br>• `.plot()` | `idx.value, idx.intermediate, idx.reported` |
-| `DB_HR_FREQUENCIES` | `constant` | **The eighteen 1/3-octave centres of DB-HR Annex A, 100 Hz to 5 kHz.** | `DB_HR_FREQUENCIES[0]  # 100.0` |
-| `DB_HR_NORMALISED_SPECTRA` | `constant` | **Normalised A-weighted source spectra [dBA] of Annex A Tables A.2-A.5.**<br>'pink' (A.5), 'traffic' (A.3), 'railway' (A.4, equal to A.3), 'aircraft' (A.2) | `DB_HR_NORMALISED_SPECTRA["pink"]` |
-| `window_size_correction` | `function` | **Window-size correction of RA / RA,tr [dB] (CTE Catálogo de Elementos Constructivos).**<br>• `area` [m²]: 0 up to 2,7; −1 to 3,6; −2 to 4,6; −3 above | `26 + window_size_correction(4.0)  # 24 dBA` |
-| `db_hr_facade_requirement` | `function` | **Required D2m,nT,Atr (DB-HR Table 2.1).**<br>• `ld` [dBA], `building_use`, `room_type`<br>• `dominant_noise`: 'road','railway','aircraft' (+4 dBA)<br>• `quiet_facade`: assess with Ld − 10 dBA | `db_hr_facade_requirement(62, "residential", "bedrooms")  # 32 dBA` |
-| `db_hr_airborne_requirement` | `function` | **Airborne requirements between rooms (DB-HR 2.1.1).**<br>• `receiving_room`: 'protected'/'habitable'<br>• `source_room`: 'same_unit','other_unit','installations','activity'<br>• `shared_opening`: the RA pair on the door/window and its enclosure | `(req,) = db_hr_airborne_requirement("protected", "other_unit")  # 50 dBA` |
-| `db_hr_party_wall_requirement` | `function` | **Party wall between two buildings (DB-HR 2.1.1 c), alternatives.**<br>• `quantity`: 'D2m,nT,Atr' (40 dBA per leaf) or 'DnT,A' (50 dBA for both) | `db_hr_party_wall_requirement()` |
-| `db_hr_impact_requirement` | `function` | **Impact requirement L'nT,w (DB-HR 2.1.2).**<br>• `receiving_room`, `source_room` (65 dB against another use unit, 60 dB otherwise) | `db_hr_impact_requirement("protected", "other_unit")  # ≤ 65 dB` |
-| `db_hr_reverberation_requirement` | `function` | **Reverberation / absorption requirement (DB-HR 2.2).**<br>• `room_use`: 'classroom','restaurant','common_area' (or aliases)<br>• `furnished`: classroom with seating (0,5 s) | `db_hr_reverberation_requirement("classroom")  # ≤ 0.7 s` |
-| `DbHrRequirement` | `dataclass` | **A single DB-HR performance requirement.**<br>• `quantity`, `limit`, `direction` ('min'/'max'), `unit`<br>• `decimals`: rounding before the comparison<br>• `reference`, `description` | `req.quantity, req.limit` |
-| `check_db_hr_requirement` | `function` | **Check an achieved value against a requirement.**<br>• `value`, `requirement`<br>• Rounds as DB-HR prescribes, then compares | `check_db_hr_requirement(32.8, req)`<br><br>• `DbHrCheck` |
-| `DbHrCheck` | `dataclass` | **A DB-HR requirement checked.**<br>• `requirement`, `value`, `reported`, `margin`, `complies` | `chk.reported, chk.complies` |
-| `assess_db_hr` | `function` | **Check a set of (value, requirement) pairs.**<br>• `items` | `assess_db_hr([(33.0, req)])`<br><br>• `DbHrAssessment` |
-| `DbHrAssessment` | `dataclass` | **A set of DB-HR requirement checks.**<br>• `checks`; `.complies`<br>• `.plot()` | `a.complies` |
 | `energy_average_level` | `function` | **Energy-average level (ISO 16283-1 (9)).**<br>• `levels`: Levels [dB] to average<br>• `axis`: Averaging axis (Default: -1) | `L = energy_average_level([60, 66])`<br><br>• `10 lg( mean(10^(Li/10)) )` |
 | `AirborneInsulationResult` | `dataclass` | **Field insulation per band.**<br>• `d`: Level difference D [dB]<br>• `dnt`: Standardized DnT [dB]<br>• `r_prime`: Apparent R' [dB] or None<br>• `l1`, `l2`, `t2`, `t0`: retained measurement chain (or None)<br>• `.report(path, quantity='dnt'/'r_prime', ...)`: ISO 16283-1 field test report (Annex B form) with the ISO 717-1 rating → PDF | `res.report("DnTw.pdf", metadata=ReportMetadata(requirement=50.0))` |
 | `WeightedRatingResult` | `dataclass` | **Weighted rating result.**<br>• `rating`: Rw/DnT,w … [dB], int<br>• `c`: Spectrum term C, int<br>• `ctr`: Spectrum term Ctr, int<br>• `unfavourable_sum`: [dB]<br>• `band_centers`: Measured-curve centres [Hz] or None<br>• `measured`: Measured band values [dB] or None<br>• `shifted_reference`: Shifted Table 3 reference [dB] or None | `w.rating, w.c, w.ctr` |
@@ -2613,11 +2493,6 @@ cycle and warn on use; they are removed in 4.0.
 | `PistonDirectivity` | `dataclass` | **Piston directivity-pattern result.**<br>• `angles` [rad], `ka`, `directivity` (linear), `directivity_db`<br>• `.plot()`: polar beam pattern in dB (family over ka) | `p.plot()` |
 | `loudspeaker_characteristics` | `function` | **Rated loudspeaker characteristics for an IEC 60268-5 report.**<br>• `frequencies`, `spl_db` (on-axis SPL), `rated_impedance` R [Ω]<br>• `input_voltage` (Default: √R → 1 W), `distance` (Default: 1 m), `sensitivity_band`, `tolerance_db`<br>• `impedance`, `distortion`, `directivity`/`polar` panels | `res = loudspeaker_characteristics(f, spl, 8.0)`<br><br>• `LoudspeakerCharacteristics` |
 | `LoudspeakerCharacteristics` | `dataclass` | **Loudspeaker rated-characteristics result (IEC 60268-5).**<br>• `sensitivity_level_db` (1 W/1 m, 20.3/20.4), `effective_range` (21.2), `reference_level_db`, `characteristic_sensitivity_pa`, `minimum_impedance`<br>• `.report()`: IEC 60268-5 fiche (graphs to IEC 60263) | `res.effective_range` |
-| `feedback_stability` | `function` | **Gain before feedback of a reinforcement loop (Long, Architectural Acoustics 2e, Eqs. 18.16–18.24).**<br>• `open_loop_gain` Zs [dB] (≈ −6 in an auditorium)<br>• `level_loudspeaker_at_microphone` L(H-M) [dB]<br>• `level_loudspeaker_at_listener` L(H-L) [dB]<br>• `microphone_directivity` DM(θ) [dB] (Default: 0)<br>• `open_microphones` Nm (Default: 1), `stability_margin` [dB] (Default: 10) | `res = feedback_stability(-6.0, 76.0, 80.0)`<br><br>• `FeedbackStabilityResult` |
-| `FeedbackStabilityResult` | `dataclass` | **Gain structure and stability verdict.**<br>• `open_loop_gain`, `feedback_loop_gain`, `nom_correction`, `loop_gain` [dB]<br>• `margin`, `headroom`, `stability_margin` [dB], `is_stable`<br>• `maximum_open_loop_gain`, `maximum_level_at_microphone` [dB]<br>• `.plot()`: gain bars against the oscillation and margin lines | `res.is_stable, res.headroom`<br>`res.plot()` |
-| `feedback_loop_gain` / `open_microphone_correction` | `function` | **Feedback building blocks (Long Eqs. 18.18, 18.23).**<br>• `feedback_loop_gain(L_HM, L_HL, microphone_directivity=0)` = `L(H-M) − L(H-L) + DM(θ)` [dB]<br>• `open_microphone_correction(Nm)` = `10 lg Nm` [dB] | `open_microphone_correction(4)  # 6.02` |
-| `plot_sound_reinforcement_geometry` | `function` | **Schematic of the feedback loop with each path length annotated.**<br>• `talker_distance`, `microphone_distance`, `listener_distance` [m]<br>• `language` | `plot_sound_reinforcement_geometry(0.3, 4.0, 12.0)` |
-| `DEFAULT_STABILITY_MARGIN` / `CARDIOID_RELATIVE_DIRECTIVITY` | `constant` | **Reinforcement defaults (Long Ch. 18).**<br>• 10 dB feedback stability margin for an equalised system<br>• −2 dB cardioid directivity toward the loudspeaker relative to the talker | `feedback_stability(-6.0, 78.0, 80.0, microphone_directivity=CARDIOID_RELATIVE_DIRECTIVITY)` |
 | `microphone_characteristics` | `function` | **Rated microphone characteristics for an IEC 60268-4 report.**<br>• `frequencies`, `response_db` (free-field, re the reference frequency), `sensitivity_mv_per_pa` M [mV/Pa]<br>• `reference_frequency` (Default: 1 kHz), `tolerance_db` (Default: 2), `rated_impedance`/`minimum_load_impedance` [Ω], `noise_voltage` or `equivalent_noise_level_db`, `max_spl_db`/`max_spl_thd_percent`<br>• `distortion`, `noise_spectrum`, `polar` panels; `powering`, `supply_current_ma` | `res = microphone_characteristics(f, resp, 12.5)`<br><br>• `MicrophoneCharacteristics` |
 | `MicrophoneCharacteristics` | `dataclass` | **Microphone rated-characteristics result (IEC 60268-4).**<br>• `sensitivity_level_db` = 20·lg(M / 1 V/Pa) (11.1), `effective_range` (12.2), `directivity_index_db` (13.2.2), `equivalent_noise_level_db` (17.2), `max_spl_db` (15.2), `signal_to_noise_ratio_db`, `diffuse_field_sensitivity_level_db`<br>• `.report()`: IEC 60268-4 fiche (graphs to IEC 60263) | `res.sensitivity_level_db` |
 | `expansion_chamber` | `function` | **Expansion-chamber silencer TL/IL (Bies Eq. 8.111, four-pole).**<br>• `frequencies`, `length` L, `chamber_area`, `pipe_area`<br>• `source_impedance`/`radiation_impedance` (Default: None → no IL) | `res = expansion_chamber(f, 0.3, 0.04, 0.01)`<br><br>• `ReactiveSilencerResult` |
@@ -2630,6 +2505,24 @@ cycle and warn on use; they are removed in 4.0.
 | `plot_plenum_geometry` | `function` | **Plenum section honouring r and θ exactly.**<br>• `exit_area` S_out [m²], `line_of_sight` r [m], `wall_area` S_w [m²]<br>• `angle` θ [rad] (Default: 0)<br>• `language` | `plot_plenum_geometry(0.09, 1.2, 6.0, angle=0.35)`<br><br>• Box fixed by r/θ, S_out mouth to scale, S_w annotated |
 | `flow_noise_straight_duct` / `flow_noise_bend` | `function` | **HVAC flow-generated (self) noise sound power (VDI 2081, Bies Eqs. 8.251/8.254).**<br>• `frequencies`, `flow_velocity`, `area` (+ `height` for the bend) | `flow_noise_straight_duct(bands, 10.0, 0.04)`<br><br>• `HvacSpectrumResult` |
 | `HvacSpectrumResult` | `dataclass` | **Per-frequency HVAC attenuation or regenerated Lw.**<br>• `frequencies`, `values`, `quantity`, `label`<br>• `.plot()` | `res.values` |
+| `fan_sound_power` | `function` | **Octave-band fan sound power from the operating point (Long Eq. 13.1; ASHRAE 1987).**<br>• `volume_flow` Q [m³/s], `static_pressure` P [Pa]<br>• `fan_type` (Table 13.5 rows: `'forward_curved'`, `'airfoil_large'`, `'radial_high'`, `'vaneaxial_hub_low'`, `'tubeaxial_small'`, `'propeller'` …)<br>• `relative_efficiency` [% of peak] (Default: 80 → C_EFF 6 dB), `blade_frequency`, `frequencies` | `fan_sound_power(2.36, 498.0)`<br><br>• `HvacSpectrumResult`; prefer AMCA 300 manufacturer data |
+| `fan_efficiency_correction` / `blade_passing_frequency` / `fan_casing_attenuation` | `function` | **The three side terms of the fan model (Long Tables 13.6/13.7/13.8, Eq. 13.4).**<br>• `fan_efficiency_correction(relative_efficiency)` → C_EFF [dB]<br>• `blade_passing_frequency(rotational_speed, blades)` = rpm·N/60 [Hz]<br>• `fan_casing_attenuation(frequencies)` → casing-radiated attenuation | `blade_passing_frequency(1200.0, 12)  # 240 Hz` |
+| `unlined_rectangular_duct_attenuation` / `unlined_circular_duct_attenuation` | `function` | **Straight unlined sheet-metal duct attenuation (Long Eqs. 14.9-14.11, Table 14.1).**<br>• rectangular: `frequencies`, `width`, `height`, `length`, `wrapped` (fibreglass blanket doubles 63-250 Hz)<br>• circular: `frequencies`, `length` (about a tenth of the rectangular loss) | `unlined_rectangular_duct_attenuation(bands, 0.9, 0.6, 1.5)`<br><br>• `HvacSpectrumResult` |
+| `lined_rectangular_duct_attenuation` / `lined_circular_duct_attenuation` | `function` | **Lined-duct insertion loss, Reynolds (1990) regressions (Long Eqs. 14.12/14.13, Tables 14.2/14.3).**<br>• rectangular: `frequencies`, `width`, `height`, `length`, `lining_thickness`, `include_unlined`<br>• circular: `frequencies`, `diameter`, `length`, `lining_thickness`<br>• Flanking caps a run at 40 dB | `lined_rectangular_duct_attenuation(None, 0.46, 0.30, 1.8, 0.025)` |
+| `flexible_duct_insertion_loss` | `function` | **Lined round flexible duct IL (Long Table 14.4, ASHRAE 1995), 63 Hz-4 kHz.**<br>• `frequencies`, `diameter` (100-406 mm), `length` (0.9-3.7 m)<br>• Interpolated over length and log diameter | `flexible_duct_insertion_loss(None, 0.305, 1.8)` |
+| `splitter_silencer_insertion_loss` | `function` | **Parallel-splitter (dissipative) silencer IL: each airway a lined duct of half the splitter thickness, combined by Bies Eq. (8.241).**<br>• `frequencies`, `height`, `length`, `airway_widths` (scalar or per airway), `splitter_thickness`<br>• Prefer the manufacturer's dynamic insertion loss | `splitter_silencer_insertion_loss(None, 0.6, 1.5, [0.1]*3, 0.2)` |
+| `silencer_self_noise` | `function` | **Regenerated (self) noise of a splitter silencer (Long Eq. 14.31 + Table 14.8, Fry 1988).**<br>• `frequencies`, `airway_velocity` V [m/s], `passages` N, `height` H [m]<br>L_W = 55·lg V + 10·lg N + 10·lg(H/1 mm) − 45 | `silencer_self_noise(None, 10.0, 4, 0.9)` |
+| `split_loss` | `function` | **Branch power-division loss at a duct split (Long Eq. 14.17), returned as a positive attenuation.**<br>• `main_area` S_m [m²], `branch_areas` [m²], `branch` index | `split_loss(0.6, [0.15]*4)  # 6.02 dB` |
+| `end_reflection_loss_closed_form` / `equivalent_diameter` | `function` | **Reynolds' closed-form duct end reflection (Long Eqs. 14.14-14.16); the alternative to the `end_reflection_loss` table look-up (`method='long'`).**<br>• `frequencies`, `diameter`, `termination` 'flush'/'free'<br>• `equivalent_diameter(area)` = √(4S/π) for a rectangular duct | `end_reflection_loss(bands, 0.3, method='long')` |
+| `air_terminal_velocity_limit` / `air_terminal_damper_correction` | `function` | **Screening checks for grilles, registers and diffusers (ASHRAE 2019 Ch. 49 Tables 9/10); the device spectrum itself is manufacturer data to ASHRAE Standard 70.**<br>• `air_terminal_velocity_limit(design_criterion, opening='supply'/'return')` [m/s]<br>• `air_terminal_damper_correction(pressure_ratio, location='diffuser_neck'/'plenum_inlet'/'supply_duct')` [dB] | `air_terminal_velocity_limit(30)  # 2.2 m/s` |
+| `room_effect` | `function` | **Room effect: the drop from the sound power at the terminal device to the level in the room (Long Eq. 14.40), as a positive attenuation.**<br>• `distance` r [m], `room_constant` R [m²] (scalar or per band)<br>• `directivity` Q (Default: 2, flush in a ceiling) | `room_effect(3.0, room_constant(S, alpha))` |
+| `duct_path` | `function` | **End-to-end duct-borne cascade, fan to room (Long Table 14.9; AHRI 885 Table 8).**<br>• `frequencies`, `source_level` L_W, `elements` (`DuctElement` list)<br>• `room_effect`, `criterion` 'NC'/'RC', `target`, `self_noise_floor` (Default: 0 dB)<br>• `section`/`flow_velocity` → plane-wave validity warning | `duct_path(bands, lw, elements, room_effect=6.0, target=30)`<br><br>• `DuctPathResult` |
+| `DuctElement` / `DuctPathStage` | `dataclass` | **One path element and its computed rows.**<br>• `DuctElement`: `label`, `attenuation` (positive loss; scalar, array or `HvacSpectrumResult`), `self_noise` L_W, `code`<br>• `DuctPathStage`: `attenuation`, `attenuated` (the *Sum* row), `self_noise`, `level` (the *Combined* row) | `DuctElement('Silencer', il, sn, code='3')` |
+| `DuctPathResult` | `dataclass` | **Duct-borne noise path result.**<br>• `received_level`, `stages`, `room_effect`, `criterion`, `target`, `contributions`<br>• `.rating` (NC/RC), `.criterion_curve`, `.exceedance`, `.meets_target`<br>• `.table()`: the printed sheet, row by row<br>• `.plot()`: the cascade vs the criterion curve; `.report()`: one-page sheet | `res.meets_target` |
+| `combine_duct_paths` | `function` | **Energy sum of the received spectra of several paths (supply + return).**<br>• `paths`, `criterion`, `target`, `label` | `combine_duct_paths([supply, ret])`<br><br>• `DuctPathResult` with `contributions` |
+| `circular_duct_cut_on` / `rectangular_duct_cut_on` | `function` | **Higher-order acoustic mode cut-on with mean flow (Norton & Karczub Eqs. 7.6-7.10, Table 7.1).**<br>• circular: `diameter`, `flow_velocity`, `speed_of_sound`, `count` (≤ 12)<br>• rectangular: `width`, `height`, …<br>• Flow lowers every cut-on by √(1 − M²) and shifts it to k_x = −Mκ/√(1 − M²) | `circular_duct_cut_on(0.254, flow_velocity=200.0)`<br><br>• `DuctModeResult` |
+| `DuctModeResult` | `dataclass` | **Duct cut-on result.**<br>• `modes` (p, q), `cut_on`, `cut_on_no_flow`, `axial_wavenumber`, `mach`<br>• `.plane_wave_limit`: the lowest cut-on<br>• `.plot()`: the cut-on ladder with and without flow | `res.plane_wave_limit` |
+| `plane_wave_limit` / `PlaneWaveWarning` | `function` | **The frequency above which a duct stops carrying plane waves only, and the warning the plane-wave results raise past it.**<br>• `plane_wave_limit(diameter=…)`, or `width`/`height`, or `area`<br>• `flow_velocity`, `speed_of_sound`<br>• Raised by `duct_path(section=…)` and by every `ReactiveSilencerResult` | `plane_wave_limit(width=0.65, height=0.4)  # 264 Hz` |
 | `enclosure_insertion_loss` | `function` | **Machine-enclosure insertion loss IL = R − C (Bies Eqs. 7.103/7.111); panel R supplied by the caller, never predicted.**<br>• `panel_transmission_loss` (per-band array or callable of f)<br>• `external_area`, `internal_area`, `internal_absorption`<br>• `frequencies` (required for a callable R) | `enclosure_insertion_loss(R, 6.0, 5.0, 0.3)`<br><br>• `EnclosureResult` |
 | `EnclosureResult` | `dataclass` | **Enclosure insertion-loss result.**<br>• `panel_transmission_loss`, `correction` C, `insertion_loss`, `room_constant`, `external_area`, `internal_area`<br>• `.plot()` | `res.insertion_loss` |
 | `program_loudness` | `function` | **EBU R 128 measurement set of a programme (BS.1770-5 + Tech 3341/3342).**<br>• `x`: signal (1D mono or 2D [channels, samples], 1.0 = 0 dBFS)<br>• `fs` [Hz]<br>• `weights`: per-channel Gi (Default: Table 3 by channel count)<br>• `momentary_step` [s] (Default: 0.01), `short_term_step` [s] (Default: 0.1)<br>• `oversample`: true-peak factor (Default: None → reaches 192 kHz) | `res = program_loudness(x, fs)`<br><br>• `ProgramLoudnessResult` |
@@ -5952,6 +5845,697 @@ coefficient α consumed by the ISO 17497-1 Clause 8 air-attenuation relations
 [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/guides/outdoor-propagation/). Numerical conformance
 against the standards' worked examples and closed forms is tracked in
 [CONFORMANCE.md](https://jmrplens.github.io/phonometry/reference/conformance/).
+
+---
+
+
+<!-- source: docs/duct-path.md | canonical: https://jmrplens.github.io/phonometry/guides/duct-path/ -->
+Source: https://jmrplens.github.io/phonometry/guides/duct-path/
+
+# Duct-borne noise: fan to room
+
+Air-conditioning noise is not predicted, it is *accounted for*. You start
+from the sound power the fan puts into the duct, walk down the path, and at
+every element subtract what it attenuates and add back what its own airflow
+regenerates. What survives to the terminal device is turned into a sound
+pressure level by the room, the supply and the return paths are added
+together, and the total is laid against the design criterion. If it fails,
+the sheet itself tells you which element to change: the row with the small
+attenuation, or the row whose self-noise is now the floor.
+
+That bookkeeping is what `noise_control.duct_path` implements, with the
+element models of `noise_control.hvac` feeding it and
+`noise_control.duct_modes` marking the frequency above which the whole
+one-dimensional picture stops being exact. The reference throughout is
+Long, *Architectural Acoustics* (2nd ed., Academic Press 2014), Chapters 13
+and 14, whose Table 14.9 is the worked sheet this guide is built around,
+with the ASHRAE *HVAC Applications Handbook* Chapter 49 for the air
+terminal devices and Bies, Hansen & Howard for the splitter silencers and
+the plenums. The reactive four-pole silencers of
+[Silencers](https://jmrplens.github.io/phonometry/guides/silencers/) and the rest of the installation methods in
+[Industrial noise control](https://jmrplens.github.io/phonometry/guides/noise-control/) are the companion pages.
+
+## 1. The sheet, and how it adds up
+
+A duct-borne calculation is a table: octave bands across the columns
+(63 Hz to 8 kHz, the range the published procedures use), one block of rows
+per physical element. Each block prints what the element takes out, the
+running level after subtracting it, what the element puts back, and the
+level leaving it. `DuctElement` carries exactly the two spectra an element
+owns, and `duct_path` walks them:
+
+```python
+from phonometry import DuctElement, duct_path
+
+bands = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]
+fan = [90.0, 86.0, 82.0, 79.0, 77.0, 75.0, 71.0, 61.0]
+
+path = duct_path(
+    bands, fan,
+    [
+        DuctElement("Elbow, 36 x 24 in, unlined",
+                    attenuation=[0, 1, 2, 3, 3, 3, 3, 3],
+                    self_noise=[41, 39, 36, 29, 20, 6, 0, 0], code="2"),
+        DuctElement("Silencer, 3 ft, standard pressure drop",
+                    attenuation=[7, 12, 16, 28, 35, 35, 28, 17],
+                    self_noise=[49, 43, 44, 42, 42, 45, 35, 24], code="3"),
+    ],
+    source_label="Fan, centrifugal FC, 5000 cfm, 2 in w.g.",
+)
+
+for row in path.table():
+    print(f"{row['code']:>2} {row['label'][:38]:<38} "
+          f"{[round(float(v)) for v in row['values']]}")
+```
+
+Three conventions matter, and they are worth stating once because every
+published sheet states them differently.
+
+**Attenuations are positive.** Every element model in `noise_control.hvac`
+returns a loss as a positive number of decibels, and the cascade subtracts
+it. Printed worksheets show the same quantity as a negative level change,
+so `DuctPathResult.table()` flips the sign back for the `"attenuation"`
+rows: the table reads like the reference, the arithmetic does not have to.
+
+**Regenerated noise adds on a power basis.** The self-noise of an element
+is a sound power level in its own right, not a correction to the incoming
+level, so it is combined as `10 lg(10^(L/10) + 10^(L_sn/10))` rather than
+added arithmetically. That is why the `Self-noise` row sits between the
+`Sum` and the `Combined` row and never touches the attenuation.
+
+**There is a self-noise floor.** Long's sheet uses a 0 dB sound power level
+wherever an element has no regenerated-noise data, and also as a floor
+under any computed level that would go negative, which is why his received
+spectrum bottoms out near 0 dB instead of running off to minus infinity.
+`self_noise_floor` reproduces that (default `0.0`) and `None` switches it
+off entirely.
+
+## 2. The source: fan sound power
+
+The fan is the one element whose spectrum you can build from the operating
+point alone. `fan_sound_power` implements the ASHRAE scaling law printed as
+Long Eq. 13.1:
+
+```text
+L_W = K_F + 10 lg(Q_F / Q_REF) + 10 lg(P_F / P_REF) + C_EFF + C_BFI ,
+```
+
+with the spectral constant `K_F` of Table 13.5 (one row per fan type), the
+off-peak efficiency correction `C_EFF` of Table 13.6 and the blade
+frequency increment `C_BFI` of Table 13.7 dropped into the single octave
+band that contains the blade passing frequency. In SI the references are
+`Q_REF = 0.472 L/s` and `P_REF = 249 Pa`, so the two logarithmic terms take
+the same values as the foot-pound form in cfm and inches of water gauge.
+
+```python
+from phonometry import (
+    blade_passing_frequency, fan_casing_attenuation,
+    fan_efficiency_correction, fan_sound_power,
+)
+
+CFM, IN_WG = 0.0004719474432, 249.0
+
+fan = fan_sound_power(volume_flow=5000 * CFM, static_pressure=2 * IN_WG,
+                      fan_type="forward_curved", relative_efficiency=80.0)
+print([round(float(v)) for v in fan.values])
+# [99, 99, 89, 84, 82, 77, 72, 67]
+
+print(fan_efficiency_correction(80.0))          # 6.0 dB off the peak
+print(blade_passing_frequency(1200.0, 24))      # 480.0 Hz, in the 500 Hz band
+print(fan_casing_attenuation().values)          # what the housing holds back
+# [ 0.  0.  5. 10. 15. 20. 22. 25.]
+fan.plot()                                      # the band spectrum, one line
+```
+
+Two habits keep this honest. The law assumes ideal inlet and outlet flow
+conditions, so a fan boxed into a plant room with a bad inlet is louder
+than it says; and ASHRAE's own current guidance is that a fan's sound power
+"is best obtained from manufacturers' test data" to AMCA Standard 300 or
+ASHRAE Standard 68. Treat Eq. 13.1 as the early-design fallback, not as the
+answer. The fan radiates the same power from its intake and from its
+discharge, which is why the supply and return paths of a real sheet start
+from the *same* row.
+
+`fan_efficiency_correction` is a step function, and a brutal one: a fan
+running at 90 per cent of its peak static efficiency adds nothing, one at
+80 per cent adds 6 dB, one below 50 per cent adds 16 dB. Selecting a fan
+away from its best point is the cheapest way to lose a duct-noise budget
+before any silencer is priced. `fan_casing_attenuation` (Table 13.8) is the
+other side of the same source: the power the housing radiates into the
+plant room instead of into the duct, zero at 63 and 125 Hz because a
+vibrating casing radiates low frequency as freely as the unhoused fan.
+
+## 3. What the run takes out
+
+Everything between the fan and the room removes something, and most of it
+is free. The models are Long Chapter 14 with the Reynolds (1990)
+regressions, and they all return an `HvacSpectrumResult` with `.values`,
+`.plot()` and `.report()`.
+
+**Straight ducts.** An unlined rectangular duct loses energy into the
+induced motion of its own walls, so the loss grows with the
+perimeter-to-area ratio: a wide shallow duct has floppier side walls than a
+square one. `unlined_rectangular_duct_attenuation` fits that below 250 Hz
+and holds a flat rate above it; an external fibreglass blanket
+(`wrapped=True`) doubles the low-frequency part. A circular duct is far
+stiffer in its breathing mode, so it hardly responds at all, and
+`unlined_circular_duct_attenuation` is a bare length rate of 0.03 to
+0.07 dB/ft. Lining the duct changes the order of magnitude:
+`lined_rectangular_duct_attenuation` and
+`lined_circular_duct_attenuation` evaluate the Reynolds regressions, valid
+for 25 mm to 52 mm linings and clipped at 40 dB per run because flanking
+takes over beyond that.
+
+```python
+from phonometry import (
+    lined_rectangular_duct_attenuation, unlined_rectangular_duct_attenuation,
+)
+import numpy as np
+
+IN, FT = 0.0254, 0.3048
+bands = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]
+
+bare = unlined_rectangular_duct_attenuation(bands, 36 * IN, 24 * IN, 5 * FT)
+lined = lined_rectangular_duct_attenuation(bands, 36 * IN, 24 * IN, 5 * FT,
+                                           1 * IN, include_unlined=True)
+print(np.round(bare.values, 1))    # [1.1 0.7 0.5 0.2 0.2 0.2 0.2 0.2]
+print(np.round(lined.values, 1))   # [ 1.3  1.3  2.5  6.7 12.8 10.6  9.7  9. ]
+```
+
+The `include_unlined=True` switch is not cosmetic. The lined-duct
+regression was fitted to an *insertion loss*, measured by substituting the
+lined section for an unlined one of the same face size, so the side-wall
+contribution has been subtracted out of it; Long recommends adding it back
+for rectangular ducts, and ignoring it for circular ones where it is
+negligible.
+
+**Flexible duct.** The last run of a supply branch is usually flexible
+duct, and its published insertion loss is startling: 2 to 3 dB per foot in
+the mid bands. `flexible_duct_insertion_loss` interpolates ASHRAE
+Table 14.4 over length and log diameter. Part of that number is the duct's
+own breakout rather than dissipation, which is exactly why a serpentine run
+of flexible duct in a joist space works as an improvised silencer.
+
+**Elbows and splits.** `elbow_insertion_loss` is keyed by `W / lambda` and
+covers square and round bends, vaned and unvaned, lined and unlined; a
+lined square bend is worth 10 to 11 dB where a round one gives 3.
+`split_loss` handles a duct division: the power is shared between the
+branches in proportion to their areas, plus a reflection when the total
+branch area does not match the feeder, and a 25 per cent branch therefore
+costs 6 dB.
+
+```python
+from phonometry import elbow_insertion_loss, split_loss
+
+IN = 0.0254
+area = 36 * IN * 24 * IN
+print(round(split_loss(area, [0.25 * area, 0.75 * area], branch=0), 1))  # 6.0
+print(elbow_insertion_loss(
+    [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0],
+    24 * IN, bend_type="round").values)          # [0. 1. 2. 3. 3. 3. 3. 3.]
+```
+
+**End reflection.** An open duct end reflects low frequency back up the
+run, for free, before any silencer. `end_reflection_loss` offers both
+published methods and neither replaces the other: `method="bies"` (the
+default) interpolates the ASHRAE table of Bies Table 8.14, and
+`method="long"` evaluates Reynolds' closed form
+`R = 10 lg[1 + (a c / pi f d)^1.88]` with `a = 0.8` for a flush termination
+and `a = 1` for a free one. The two agree within a decibel or so over the
+bands both cover. Use `equivalent_diameter(area)` for a rectangular duct,
+and do not apply the correction at all when the duct terminates in a
+diffuser: the flare smooths the impedance transition, and a manufacturer's
+diffuser rating already contains whatever is left of it.
+
+```python
+from phonometry import end_reflection_loss, equivalent_diameter
+import numpy as np
+
+bands = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0]
+print(np.round(end_reflection_loss(bands, 0.30, method="bies").values, 1))
+# [12.  7.  3.  1.  0.  0.]
+print(np.round(end_reflection_loss(bands, 0.30, method="long").values, 1))
+# [12.7  7.7  3.7  1.3  0.4  0.1]
+print(round(equivalent_diameter(0.36 * 0.24), 3))    # 0.332 m
+```
+
+**Silencers and plenums.** A parallel-splitter attenuator reduces, in Bies
+§8.10.5, to a set of lined ducts whose liner thickness is half the splitter
+thickness, combined by the energy average of Eq. 8.241 so that the leakiest
+airway dominates. `plenum_attenuation` is Wells' method for a lined plenum
+chamber (Bies Eq. (8.275)), whose reverberant term uses the plenum
+[room constant](https://jmrplens.github.io/phonometry/guides/room-image-sources/).
+
+```python
+from phonometry import plenum_attenuation, splitter_silencer_insertion_loss
+import numpy as np
+
+IN, FT = 0.0254, 0.3048
+sil = splitter_silencer_insertion_loss(
+    None, height=24 * IN, length=5 * FT,
+    airway_widths=[0.10] * 5, splitter_thickness=0.10,
+)
+print(np.round(sil.values, 1))
+# [ 5.8  8.6 14.1 28.2 34.5 33.5 18.4 12.1]
+print(round(plenum_attenuation(0.36, 2.4, 74.0, 0.5), 1))   # 16.1 dB
+```
+
+Read that estimate for what it is. The 5 ft unit Long's return path
+actually specifies is a low-frequency design worth 16 and 21 dB at 63 and
+125 Hz, where this geometry-only model gives 6 and 9. Published dynamic
+insertion loss from the manufacturer, measured with the design airflow and
+in the design direction, is what belongs in the sheet; the model is for
+sizing the airway before there is a manufacturer.
+
+## 4. What the system puts back
+
+Attenuation is only half the sheet. Every disturbance of the airflow
+generates noise of its own, and past a certain velocity the silencer bought
+to remove the fan becomes the loudest thing in the duct.
+
+`silencer_self_noise` is Fry's estimate as Long Eq. 14.31,
+`L_W = 55 lg(V / V_0) + 10 lg N + 10 lg(H / H_0) - 45`, spread over the
+octave bands by the corrections of Table 14.8. The exponent is the whole
+message: the fifth-and-a-half power of the airway velocity means that
+*doubling the face velocity of a silencer adds about 17 dB*.
+
+```python
+from phonometry import silencer_self_noise
+import numpy as np
+
+IN = 0.0254
+slow = silencer_self_noise(None, airway_velocity=10.0, passages=5,
+                           height=24 * IN)
+fast = silencer_self_noise(None, airway_velocity=20.0, passages=5,
+                           height=24 * IN)
+print(np.round(slow.values, 1))
+# [40.8 40.8 38.8 36.8 31.8 26.8 21.8 16.8]
+print(round(float(fast.values[0] - slow.values[0]), 1))     # 16.6 dB
+```
+
+Straight duct and bends regenerate too, through
+`flow_noise_straight_duct` and `flow_noise_bend` (VDI 2081 as Bies
+Eqs. (8.251) and (8.254)); the bend model carries the Strouhal-number
+transition from the sixth-power inner-corner dipole to the eighth-power
+outer-corner quadrupole.
+
+The terminal device is the element a real sheet never models. Neither
+ASHRAE nor Long publishes a closed form for the sound power of a grille,
+register or diffuser: it comes from manufacturer data measured to ASHRAE
+Standard 70. What the library offers instead are the two screening rules of
+ASHRAE Chapter 49. `air_terminal_velocity_limit` (Table 9) gives the
+maximum neck velocity for a design RC, for use when no sound data exists
+for the selected device, and `air_terminal_damper_correction` (Table 10)
+gives the penalty for throttling a balancing damper, which is where a great
+many finished installations fail.
+
+```python
+from phonometry import air_terminal_damper_correction, air_terminal_velocity_limit
+
+print(air_terminal_velocity_limit(30, opening="supply"))   # 2.2 m/s
+print(air_terminal_velocity_limit(30, opening="return"))   # 2.5 m/s
+print(air_terminal_damper_correction(3.0, location="diffuser_neck"))  # 15.0 dB
+print(air_terminal_damper_correction(3.0, location="supply_duct"))    #  2.0 dB
+```
+
+Fifteen decibels in the neck against two decibels 1.5 m back in the duct,
+for the same pressure ratio, is the entire design rule: throttle far from
+the outlet, or balance the system by sizing the ductwork instead.
+
+## 5. From sound power to room level
+
+The last step converts the sound power arriving at the terminal device into
+a sound pressure level where somebody is sitting, through the steady-state
+room relation `L_p = L_W + 10 lg[Q / (4 pi r^2) + 4 / R]`. `room_effect`
+returns that as a positive attenuation so it drops into the cascade beside
+every other loss, with `Q = 2` by default for a diffuser flush in a
+ceiling.
+
+```python
+from phonometry import room_constant, room_effect
+
+# The 20 x 20 x 8 ft room of Long's worked sheet, drywall and carpet.
+area = 2 * 6.10 * 6.10 + 4 * 6.10 * 2.44        # 134.0 m2
+r_const = room_constant(area, 0.15)             # 23.6 m2
+print(round(float(room_effect(1.83, r_const, directivity=2.0)), 1))   # 6.6 dB
+```
+
+Long's sheet prints 5 to 7 dB for that room across the bands, so a single
+mean absorption of 0.15 lands in the right place; a per-band absorption
+gives a per-band room effect, which is what the carpet actually does.
+
+Pass `target=` and `criterion=` to `duct_path` and the result rates itself.
+`criterion_curve` samples the NC or RC curve at the analysis bands,
+`exceedance` is the band-by-band excess over it, `meets_target` is the
+band-by-band verdict a design sheet applies, and `rating` is the full
+`NCResult` or `RCResult` derived by the ANSI/ASA S12.2-2019 procedure,
+which is a different question and can differ from the tangency verdict.
+
+## 6. The worked example: Long's Table 14.9
+
+Long's Chapter 14 closes with a complete sheet: a 5000 cfm forward-curved
+fan at 2 in w.g., feeding one room through a supply path (elbow, silencer,
+lined duct, a 25 per cent branch split, a second lined duct, flexible duct,
+a rectangular diffuser) and a return path (elbow, low-frequency silencer,
+lined elbow, plenum, grille), each ending in the room effect of a
+20 x 20 x 8 ft carpeted office, combined and checked against NC 30. Every
+row below is the one Long prints, including the manufacturer data for the
+silencers and the terminal devices, which is what a real sheet uses.
+
+```python
+import numpy as np
+from phonometry import DuctElement, combine_duct_paths, duct_path
+
+bands = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]
+fan = [90.0, 86.0, 82.0, 79.0, 77.0, 75.0, 71.0, 61.0]
+source = "Fan, centrifugal FC, 5000 cfm, 2 in w.g."
+
+supply = duct_path(
+    bands, fan,
+    [
+        DuctElement("Elbow, 36 x 24 in, unlined", [0, 1, 2, 3, 3, 3, 3, 3],
+                    [41, 39, 36, 29, 20, 6, 0, 0], code="2"),
+        DuctElement("Silencer, 3 ft, standard pressure drop",
+                    [7, 12, 16, 28, 35, 35, 28, 17],
+                    [49, 43, 44, 42, 42, 45, 35, 24], code="3"),
+        DuctElement("Duct, 36 x 24 in, 5 ft, 1 in lining",
+                    [2, 2, 3, 7, 15, 12, 11, 9], code="4"),
+        DuctElement("Split, 25 per cent", 6.0, code="5"),
+        DuctElement("Duct, 18 x 12 in, 6 ft, 1 in lining",
+                    [3, 3, 5, 11, 25, 22, 16, 13], code="6"),
+        DuctElement("Flexible duct, 12 in, 6 ft",
+                    [14, 14, 16, 15, 17, 22, 16, 13], code="7"),
+        DuctElement("Rectangular diffuser, 312 cfm", None,
+                    [33, 32, 29, 23, 15, 4, 0, 0], code="8"),
+    ],
+    room_effect=[6, 6, 5, 5, 6, 7, 6, 6],
+    source_label=source, target=30.0, label="Supply",
+)
+
+ret = duct_path(
+    bands, fan,
+    [
+        DuctElement("Elbow, 36 x 24 in, unlined", [0, 1, 2, 3, 3, 3, 3, 3],
+                    [43, 42, 39, 33, 24, 12, 0, 0], code="2"),
+        DuctElement("Silencer, 5 ft, low-frequency type",
+                    [16, 21, 35, 41, 41, 28, 21, 15],
+                    [51, 49, 53, 56, 56, 59, 60, 53], code="3"),
+        DuctElement("Elbow, 36 x 24 in, lined, 1 in", [1, 2, 3, 4, 5, 6, 8, 10],
+                    [39, 38, 34, 28, 18, 4, 0, 0], code="4"),
+        DuctElement("Plenum, 800 sq ft, 50 per cent lined",
+                    [12, 13, 19, 20, 20, 20, 21, 21], code="5"),
+        DuctElement("Rectangular grille, 24 x 24 in, 563 cfm", None,
+                    [30, 29, 26, 20, 12, 1, 0, 0], code="6"),
+    ],
+    room_effect=[9, 8, 6, 8, 8, 8, 9, 10],
+    source_label=source, target=30.0, label="Return",
+)
+
+total = combine_duct_paths([supply, ret], label="Supply + return")
+print(np.round(supply.received_level, 0))    # Long: 52 42 30 18  9 -2 -2 -1
+print(np.round(ret.received_level, 0))       # Long: 52 41 27 25 23 25 22 12
+print(np.round(total.received_level, 0))     # Long: 55 45 32 26 23 25 22 12
+print(total.meets_target)                    # True
+print(round(float(total.rating.rating), 1))  # 26.7, governed at 63 Hz
+```
+
+Every printed row comes back within the sheet's own 1 dB rounding: the
+supply is 1 dB low at 4 kHz, the return 1 dB low at 500 Hz, and the
+combination 1 dB low at 500 Hz and 1 dB high at 8 kHz, everything else
+exact. The room lands at NC 27, comfortably inside its NC 30 target, and
+the 63 Hz band is what governs the rating, which is the usual outcome of a
+duct-noise design and the reason low-frequency silencer performance is
+worth paying for.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/duct_path_cascade_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/duct_path_cascade.svg" alt="Octave-band levels delivered into the room by the supply and return paths of Long's worked HVAC sheet, together with their energy sum and the NC 30 criterion curve: both paths start near 52 dB at 63 Hz, the supply falls away steeply above 500 Hz to below 0 dB while the return stays flat near 23 to 25 dB, and the combined received spectrum runs a few decibels under the NC 30 curve in every band" width="88%"></picture>
+
+*The two paths and their sum against NC 30. The supply, with its silencer,
+two lined runs, a branch split and six feet of flexible duct, has nothing
+left above 1 kHz; the return, with a plenum but a silencer whose own
+self-noise floors it near 25 dB, is what the room actually hears in the mid
+and high bands. Adding low-frequency attenuation to the supply would change
+nothing at all: the return already sets the answer everywhere except at
+63 Hz, and that is the row to argue about.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import combine_duct_paths
+
+# `supply` and `ret` are the two DuctPathResult objects built above.
+
+# One line for one path: the cascade of the supply run against NC 30.
+supply.plot()
+plt.show()
+
+# The concept figure: both paths, their energy sum and the criterion.
+total = combine_duct_paths([supply, ret], label="Supply + return")
+total.plot()
+plt.gca().set_ylim(-6.0, 62.0)
+plt.show()
+```
+
+</details>
+
+`DuctPathResult` also prints and files itself. `.table()` returns the sheet
+row by row with the worksheet sign convention, and `.report()` renders a
+one-page PDF in the layout of the published procedures (AHRI Standard 885
+Table 8; Long Table 14.9): the element table, the cascade chart against the
+criterion curve, the boxed room-criterion rating and the verdict.
+
+```python
+for row in total.table():
+    print(f"{row['kind']:<12} {row['label'][:26]:<26} "
+          f"{[round(float(v)) for v in row['values']]}")
+
+total.report("duct-path.pdf")            # needs phonometry[report]
+```
+
+The example fiche, regenerated with `make reports`, is kept rendered in the
+repository. Click the preview to open the PDF:
+
+[![Duct-borne noise path calculation example report: a metadata header with the client, the noise source, the test environment and the date, the octave-band path table listing the fan sound power, each element attenuation as a negative level change, the self-noise rows of the elbow, the silencer and the diffuser, the room effect, the received level and the NC 30 curve, and beneath it the boxed room criterion NC-22.6 at 125 Hz with the verdict that no band exceeds NC 30 beside the cascade chart of every element against the criterion curve](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/duct_path_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/duct_path_example.pdf)
+
+*Duct-borne noise path fiche (`DuctPathResult.report`): the supply path of the
+worked sheet element by element, rated NC-22.6 and passing NC 30 with 5 dB to
+spare at 63 Hz.*
+
+## 7. What reproduces, and what does not
+
+Long's Table 14.9 was produced by a commercial computer program, not by
+hand from the tables printed alongside it, and being honest about that is
+more useful than pretending otherwise. The *arithmetic* of the sheet is
+reproduced exactly, as section 6 shows. Several of its **element rows**,
+however, do not follow from the book's own printed data, and the functions
+in this library implement the printed equations and tables. Verified band
+by band:
+
+- **The fan row does not come from Eq. 13.1.** The sheet prints
+  90/86/82/79/77/75/71/61 dB. Eq. 13.1 with the Table 13.5 forward-curved
+  constants at 5000 cfm and 2 in w.g. gives 99/99/89/84/82/77/72/67 dB, and
+  the printed spectrum is not a level shift of the tabulated one, so it
+  comes from other data (a manufacturer's, most likely).
+- **The flexible-duct row is not Table 14.4.** The sheet prints
+  14/14/16/15/17/22/16/13 dB for 12 in by 6 ft;
+  `flexible_duct_insertion_loss` reads 3/5/10/15/17/16/9 dB out of the
+  table for that duct.
+- **The lined rectangular ducts agree in the mid and high bands.** For the
+  18 x 12 in, 6 ft, 1 in run the library returns 11/25/22/16/13 dB from
+  500 Hz up, exactly the printed row, and is 1 to 2 dB high below it
+  (5/4/6 against 3/3/5). For the 36 x 24 in, 5 ft run it matches at 250,
+  500 and 8 kHz and is 1 to 2 dB low elsewhere.
+- **The split and the unlined elbow reproduce exactly.** `split_loss` gives
+  the 25 per cent branch as 6.0 dB against the printed -6 dB, and
+  `elbow_insertion_loss` gives 0/1/2/3/3/3/3/3 dB against the printed row
+  when the elbow is read as round (Table 14.7) at `w = 24 in`.
+- **The NC 30 row differs by 1 dB at 1 kHz.** Long prints
+  57/48/41/35/31/29/28/27; the library's `nc_curve(30)` returns
+  57/48/41/35/**32**/29/28/27, the values of ANSI/ASA S12.2-2019 Table 1.
+  Long is using the original Beranek 1957 curve. The difference does not
+  change the verdict here, but it is worth knowing which NC you are quoting.
+
+None of that is a defect of the sheet. It is what a real duct-borne
+calculation looks like: the elements a manufacturer publishes (fans,
+silencers, diffusers, grilles) come from test data, and the elements nobody
+publishes (duct runs, elbows, splits, end reflections, the room) come from
+the tables. `DuctElement` takes both without caring which is which, which
+is the point.
+
+## 8. The plane-wave limit
+
+Every element model above, and every four-pole silencer in
+[Silencers](https://jmrplens.github.io/phonometry/guides/silencers/), is one-dimensional. It assumes a single sound
+pressure describes the whole duct cross section, which is true only below
+the frequency at which the first higher-order acoustic mode cuts on. Above
+it several modes propagate at once, each with its own axial wavenumber, and
+a plane-wave prediction quietly stops being right.
+
+`noise_control.duct_modes` implements the cut-on analysis of Norton &
+Karczub, *Fundamentals of Noise and Vibration Analysis for Engineers*
+(2nd ed.), section 7.3: circular ducts by Eq. 7.6 with the `pi alpha_pq`
+eigenvalues of Table 7.1 that solve `J'_p(kappa_pq a_i) = 0`, rectangular
+ducts by Eq. 7.10, and the mean-flow correction of Eqs. 7.8 and 7.9, in
+which a uniform axial flow of Mach number `M` lowers every cut-on frequency
+by `sqrt(1 - M^2)` and moves the cut-on itself from `k_x = 0` to
+`k_x = -M kappa_pq / sqrt(1 - M^2)`.
+
+```python
+import numpy as np
+from phonometry import plane_wave_limit, rectangular_duct_cut_on
+
+# Norton problem 7.2: a 0.65 x 0.4 m air-conditioning duct at 15 m/s.
+modes = rectangular_duct_cut_on(0.65, 0.40, flow_velocity=15.0, count=6)
+print(modes.modes[:3])                          # ((1, 0), (0, 1), (1, 1))
+print(np.round(modes.cut_on[:3], 1))            # [263.6 428.3 502.9] Hz
+print(np.round(modes.cut_on_no_flow[:3], 1))    # [263.8 428.8 503.4] Hz
+print(round(modes.plane_wave_limit, 1))         # 263.6 Hz
+
+IN = 0.0254
+print(round(plane_wave_limit(width=36 * IN, height=24 * IN), 1))   # 187.6 Hz
+print(round(plane_wave_limit(diameter=12 * IN), 1))                # 659.5 Hz
+```
+
+Those ventilation numbers are blunt: in that duct plane waves are the whole
+story only up to the 250 Hz octave, and a 36 x 24 in supply trunk gives up at
+188 Hz.
+
+At 15 m/s the flow correction is invisible: `M = 0.044` gives
+`sqrt(1 - M^2) = 0.999`, which moves the first cut-on by 0.2 Hz. It earns its
+place in high-speed pipework instead. Norton's problem 7.1 is that case, a
+254 mm line carrying steam (`c = 405 m/s`) at 200 m/s, `M = 0.494`, and there
+the two ladders separate by more than a hundred hertz at every rung.
+
+```python
+import numpy as np
+from phonometry import circular_duct_cut_on
+
+# Norton problem 7.1: a 254 mm circular duct carrying steam at 200 m/s.
+steam = circular_duct_cut_on(0.254, flow_velocity=200.0,
+                             speed_of_sound=405.0, count=6)
+print(steam.modes)
+# ((1, 0), (2, 0), (0, 1), (3, 0), (4, 0), (1, 1))
+print(np.round(steam.cut_on_no_flow, 1))
+# [ 934.5 1550.1 1944.7 2132.3 2698.9 2705.9]
+print(np.round(steam.cut_on, 1))
+# [ 812.6 1347.9 1691.1 1854.1 2346.8 2352.9]
+print(np.round(steam.axial_wavenumber, 2))
+# [ -8.23 -13.66 -17.13 -18.79 -23.78 -23.84]
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/duct_mode_cut_on_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/duct_mode_cut_on.svg" alt="Cut-on frequency of the first six higher-order acoustic modes of a 254 mm circular steam line, plotted against the mode order (1,0), (2,0), (0,1), (3,0), (4,0) and (1,1): the still-air ladder climbs from 935 Hz to 2706 Hz as a grey dashed line while the 200 m/s ladder runs 12 per cent below it from 813 Hz to 2353 Hz, and the band below the first cut-on is shaded as the plane-wave-only region" width="88%"></picture>
+
+*Norton's problem 7.1, the case where the mean flow is worth drawing: half
+the speed of sound in the pipe pulls every cut-on down by
+`sqrt(1 - M^2) = 0.870`, so the first higher-order mode appears at 813 Hz
+instead of 935 Hz and the plane-wave band, shaded, is 13 per cent narrower
+than the still-air calculation would promise. The axial wavenumber at cut-on
+is negative in every rung: with flow, the mode is already travelling upstream
+at the frequency at which it appears.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import circular_duct_cut_on, rectangular_duct_cut_on
+
+# One line for one duct: the cut-on ladder with the plane-wave band shaded.
+steam = circular_duct_cut_on(0.254, flow_velocity=200.0,
+                             speed_of_sound=405.0, count=6)
+steam.plot()
+plt.show()
+
+# The ventilation duct of problem 7.2, where the flow shift is negligible.
+rectangular_duct_cut_on(0.65, 0.40, flow_velocity=15.0, count=6).plot()
+plt.show()
+```
+
+</details>
+
+Two results carry this limit for you. Every `ReactiveSilencerResult` now
+reports the first cut-on of its widest cross section as
+`plane_wave_limit`, and `duct_path` accepts a `section=` description of the
+duct it is walking. Both raise a `PlaneWaveWarning` when the analysis grid
+runs past that frequency: the numbers are still returned, and above cut-on
+they describe the plane-wave mode alone, which a measurement will not.
+
+```python
+import warnings
+from phonometry import DuctElement, PlaneWaveWarning, duct_path
+
+IN = 0.0254
+bands = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]
+
+with warnings.catch_warnings(record=True) as caught:
+    warnings.simplefilter("always")
+    duct_path(bands, [90.0] * 8, [DuctElement("Straight run", 3.0)],
+              section={"width": 36 * IN, "height": 24 * IN},
+              flow_velocity=6.0, label="Supply")
+print(caught[0].category is PlaneWaveWarning)
+print(str(caught[0].message))
+# Supply: 6 of 8 frequencies are above the first duct cut-on frequency
+# (188 Hz), where higher-order modes propagate and the plane-wave result
+# describes the plane-wave mode only.
+```
+
+Six of the eight octave bands of a standard duct-noise sheet sit above the
+cut-on of a 36 x 24 in duct. That is not a reason to distrust the sheet:
+the ASHRAE element models it is built from are *empirical*, fitted to
+measurements of real ducts in which those modes were present, so they carry
+the multimode behaviour inside their regression constants. The warning is
+aimed at the analytical methods, the four-pole silencer algebra above all,
+where the plane-wave assumption is structural rather than statistical, and
+where the peaks and troughs of a computed transmission loss simply do not
+survive past cut-on.
+
+## See also
+
+- [Silencers](https://jmrplens.github.io/phonometry/guides/silencers/): the reactive four-pole elements (expansion
+  chambers, Helmholtz, quarter-wave and extended-tube resonators) whose
+  validity ends at the same cut-on frequency.
+- [Industrial noise control](https://jmrplens.github.io/phonometry/guides/noise-control/): the rest of the
+  installation, the individual HVAC duct methods and machine-enclosure
+  insertion loss.
+- [Room-noise criteria (NC / RC Mark II)](https://jmrplens.github.io/phonometry/guides/room-noise/): the ANSI/ASA
+  S12.2-2019 families the received spectrum is judged against.
+- [Steady-state room field](https://jmrplens.github.io/phonometry/guides/room-image-sources/): the room constant
+  behind the room effect and the plenum reverberant term.
+- API reference:
+  [`noise_control.duct_path`](https://jmrplens.github.io/phonometry/reference/api/noise_control/duct-path/),
+  [`noise_control.duct_modes`](https://jmrplens.github.io/phonometry/reference/api/noise_control/duct-modes/),
+  [`noise_control.hvac`](https://jmrplens.github.io/phonometry/reference/api/noise_control/hvac/).
+
+## References
+
+- Long, M. (2014). *Architectural acoustics* (2nd ed.). Academic Press.
+  ISBN 978-0-12-398258-2.
+  The fan sound-power model (Ch. 13, Eq. 13.1 and Tables 13.5-13.8), the
+  duct attenuation, flexible duct, split loss, end reflection, silencer
+  self-noise and room effect of Ch. 14, and the worked duct-borne sheet of
+  Table 14.9 this guide is built around.
+- Bies, D. A., Hansen, C. H., & Howard, C. Q. (2017). *Engineering noise
+  control* (5th ed.). CRC Press.
+  [doi:10.1201/9781351228152](https://doi.org/10.1201/9781351228152). The
+  end-reflection table (§8.13), the elbow insertion loss (§8.11), the
+  splitter-muffler reduction to lined ducts (§8.10.5, Eq. 8.241), the
+  plenum chamber (§8.17) and the flow-generated noise of ducts and bends
+  (§8.15).
+- Norton, M. P., & Karczub, D. G. (2003). *Fundamentals of noise and
+  vibration analysis for engineers* (2nd ed.). Cambridge University Press.
+  [doi:10.1017/CBO9781139163927](https://doi.org/10.1017/CBO9781139163927).
+  The higher-order duct modes, the cut-on frequencies of circular and
+  rectangular ducts and the mean-flow correction (§7.3, Eqs. 7.6-7.10).
+- ASHRAE (2019). *ASHRAE handbook: HVAC applications* (SI ed.), Chapter 49,
+  Noise and vibration control. ASHRAE. The air terminal velocity limits
+  (Table 9) and the volume-damper corrections (Table 10), and the guidance
+  that fan sound power is best taken from manufacturer test data.
+- Air-Conditioning, Heating and Refrigeration Institute. *AHRI Standard
+  885: Procedure for estimating occupied space sound levels in the
+  application of air terminals and air outlets*. The industry row
+  structure of the duct-borne calculation sheet (Table 8) that
+  `DuctPathResult.table()` and `.report()` follow.
 
 ---
 
@@ -10118,7 +10702,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/guides/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/guides/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/reference/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 446 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 437 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -16683,102 +17267,6 @@ THD and polar panels drawn to the IEC 60263 25 dB-per-decade and 25 dB
 reference-circle conventions.*
 
 
-## 4. Gain before feedback of a reinforcement system
-
-Everything above characterises a loudspeaker on its own. Put it in a room with
-an open microphone and the interesting quantity is no longer a datasheet number
-but a **closed loop**: the loudspeaker feeds the audience, and it also feeds the
-microphone that drives it. Long (*Architectural Acoustics* 2e, Chapter 18,
-Equations (18.13) to (18.24)) writes that loop with two decibel gains:
-
-```text
-Zs = L(H-L) − L(T-M)                       (Eq. (18.17))  open-loop system gain
-Gs = L(H-M) − L(H-L) + DM(θ)               (Eq. (18.18))  feedback-loop gain
-```
-
-`Zs` is the level the loudspeaker produces at an average listener minus the
-level the talker produces at the microphone; `Zs = -6` dB, typical of an
-auditorium or a church, means a comfortable conversational level at twice the
-talker-to-microphone distance. `DM(θ)` is the directivity index of the
-microphone toward the loudspeaker *relative to* the talker: zero for an
-omnidirectional microphone, about −2 to −3 dB for a cardioid pointed at the
-talker. Summing the infinite series of round trips, the system oscillates when
-the loop gain reaches unity, that is `Zs + Gs = 0` (Equation (18.16)).
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_reinforcement_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_reinforcement_geometry.svg" alt="Schematic of a sound-reinforcement feedback loop: the talker 0.3 metres in front of the microphone, the flown loudspeaker 4 metres from the microphone and 12 metres from the average listener, with the signal path drawn solid and the feedback path dashed" width="85%"></picture>
-
-*The four points of the loop. Only the sound field the loudspeaker produces at
-two of them, and the type and orientation of the microphone, enter the
-criterion: the loudspeaker's own type, number and power do not appear anywhere
-in it.*
-
-A working system needs margin below that threshold. Long takes **10 dB** for an
-equalised system (other authors quote 12 dB unequalised and 6 dB carefully
-equalised): 6 dB of it covers a sustained tone adding in phase with a reflection
-off a hard surface, and the remaining 4 dB is safety. With several microphones
-open at once the returned signals add at the mixer, which the
-number-of-open-microphones correction `ΔL_nom = 10 log10 Nm` accounts for
-(Equation (18.23)). The criterion is then
-
-```text
-Zs + L(H-M) + ΔL_nom ≤ L(H-L) − DM(θ) − 10
-```
-
-```python
-from phonometry import electroacoustics as ea
-
-# An auditorium at Zs = -6 dB, omnidirectional microphone, one mic open.
-res = ea.feedback_stability(-6.0, 76.0, 80.0)
-print(res.is_stable, round(res.headroom, 1))          # True 0.0 dB
-print(round(res.maximum_level_at_microphone, 1))      # 76.0 dB = L(H-L) - 4
-
-# A cardioid buys back exactly its relative directivity index.
-card = ea.feedback_stability(-6.0, 78.0, 80.0, microphone_directivity=-2.0)
-print(round(card.maximum_level_at_microphone, 1))     # 78.0 dB = L(H-L) - 2
-
-# Four open microphones cost 10 lg 4 = 6 dB of that headroom.
-print(round(ea.open_microphone_correction(4), 1))     # 6.0 dB
-
-res.plot()      # the gain structure against the oscillation and margin lines
-```
-
-Those two special cases are Long's own (Equations (18.21) and (18.22)): with
-`Zs = -6` dB the criterion collapses to `L(H-M) ≤ L(H-L) − DM(θ) − 4`, so an
-omnidirectional microphone must see the loudspeaker 4 dB below the average level
-in the audience, while a cardioid may let it rise to 2 dB below.
-
-> **A sign slip in the printed equation.** Long prints Equation (18.24) with
-> `+ DM(θ)` on the right-hand side, which contradicts the Equations (18.20) to
-> (18.22) it generalises and would turn the benefit of a directional microphone
-> into a penalty. `feedback_stability` implements the sign of Equation (18.20),
-> so that `Nm = 1` reproduces Long's own special cases exactly. The defect is
-> recorded in the [errata registry](https://jmrplens.github.io/phonometry/reference/errata/).
-
-### `feedback_stability()` parameters
-
-| Parameter | Type | Units | Range / default | Notes |
-| :--- | :--- | :--- | :--- | :--- |
-| `open_loop_gain` | float | dB | finite | `Zs = L(H-L) - L(T-M)`; about −6 dB in an auditorium |
-| `level_loudspeaker_at_microphone` | float | dB | finite | `L(H-M)` |
-| `level_loudspeaker_at_listener` | float | dB | finite | `L(H-L)` |
-| `microphone_directivity` | float | dB | default 0 | `DM(theta)`, 0 omni, about −2 cardioid |
-| `open_microphones` | int | — | ≥ 1, default 1 | `Nm` |
-| `stability_margin` | float | dB | ≥ 0, default 10 | Long's equalised-system margin |
-
-Returns a `FeedbackStabilityResult` (`open_loop_gain`, `feedback_loop_gain`,
-`nom_correction`, `loop_gain`, `margin`, `headroom`, `is_stable`,
-`maximum_open_loop_gain`, `maximum_level_at_microphone`) with `.plot()`.
-`feedback_loop_gain` and `open_microphone_correction` are callable directly, and
-`plot_sound_reinforcement_geometry` draws the loop above.
-
-The criterion is a level bookkeeping exercise, not an acoustic model: it
-consumes the two direct-field levels the loudspeaker produces and does not
-compute them from a coverage pattern, nor does it predict the ring frequency or
-the effect of an equaliser or frequency shifter. Long excludes the reverberant
-field deliberately, because a uniform field cannot depend on where the
-microphone is or where it points; the direct-to-reverberant ratio enters the
-design separately.
-
 ## See also
 
 - [Electroacoustics](https://jmrplens.github.io/phonometry/guides/electroacoustics/): the IEC 60268-3 distortion set,
@@ -16801,11 +17289,6 @@ design separately.
   The transducer physics behind sections 1 and 2: loudspeaker radiation,
   the baffled-piston impedance and directivity (§4.19, §13.7), and the
   near-field to far-field transition.
-- Long, M. (2014). *Architectural acoustics* (2nd ed.). Academic Press.
-  [doi:10.1016/C2012-0-03257-5](https://doi.org/10.1016/C2012-0-03257-5).
-  Chapter 18 (the gain-before-feedback criterion of section 4: the open-loop
-  and feedback-loop gains, the stability margin and the
-  number-of-open-microphones correction, Equations (18.13) to (18.24)).
 
 ## Standards
 
@@ -18851,7 +19334,9 @@ closed-form expansion chamber, the Helmholtz, quarter-wave and
 extended-tube resonators, the independent FDTD cross-check and the
 trade-off against dissipative linings. This page keeps the rest of the
 installation: what the duct run adds and removes on its own, and what an
-enclosure around the machine actually delivers.
+enclosure around the machine actually delivers. Chaining those element
+models end to end, from the fan sound power to the room criterion, is
+[Duct-borne noise: fan to room](https://jmrplens.github.io/phonometry/guides/duct-path/).
 
 ## 1. HVAC duct attenuation and flow noise
 
@@ -20001,103 +20486,6 @@ repository. Click the preview to open the PDF:
 
 *Open-plan office acoustics fiche (`OpenPlanResult.report`), $D_{2,S}$, $L_{p,A,S,4m}$, $r_D$, $r_P$ and the spatial-decay curve.*
 
-## Crowd self-noise in an occupied room
-
-ISO 3382-3 above **measures** an office. The complementary question at design
-time is a **prediction**: in a room whose only noise source is its own
-occupants, how loud does the background get, and does conversation still work?
-Long (*Architectural Acoustics* 2e, Chapter 17, Equations (17.50) to (17.54))
-sets the two competing levels at a listener:
-
-```text
-Lp(signal) = Lw + 10 log10( Q / (4 π r²) )                (Eq. (17.50))
-Lp(noise)  = Lw + 10 log10 N + 10 log10( 4 / (N A_tab) )  (Eq. (17.51))
-```
-
-with `Lw` the sound power level of one talker (about 70 dB in normal
-conversation), `Q` the talker's forward directivity (about 2), `r` the
-talker-to-listener distance and `A_tab` the equivalent absorption area **per
-occupied table**, so `N A_tab` is the room's total absorption.
-
-```python
-from phonometry import room
-
-# Long's hard restaurant: about 20 metric sabins, a talker at Lw = 70 dB,
-# a listener 1.2 m away across the table.
-print(round(room.speech_direct_level(1.2)))          # 60 dB direct field
-print(round(room.crowd_noise_level(1, 20.0)))        # 63 dB with one talker
-print(round(room.crowd_noise_level(20, 20.0)))       # 76 dB with 20 tables
-
-# An alpha 0.9 ceiling over the 13.7 x 13.7 m room adds 170 metric sabins.
-print(round(room.crowd_noise_level(20, 20.0 + 170.0)))   # 66 dB
-```
-
-Subtracting the two gives the **speech-to-noise ratio**, and this is the result
-worth remembering:
-
-```text
-L_SN = 10 log10( Q / (4 π r²) ) + 10 log10( A_tab / 4 )   (Eq. (17.52))
-```
-
-Neither `Lw` nor `N` survives. A busier room is not intrinsically worse, because
-each new table brings both a talker and its own share of absorption. What
-decides whether a restaurant works is the absorption **per table**, not the
-absorption of the room. Requiring `L_SN > -6` dB for adequate cross-table
-communication at a separation `rs`, and `L_SN < -9` dB so a neighbouring table
-`rt` away is not overheard, turns into a pair of design bounds:
-
-```text
-A_tab > 6.31 rs²      (Eq. (17.53))
-A_tab < 3.16 rt²      (Eq. (17.54)),  both for Q = 2
-```
-
-> **The first constant is printed as 6.33.** The closed form above, at the same
-> Q = 2 that yields Long's own second constant 3.16 exactly, gives 6.31, and his
-> prose ("6.3 or more square metres, 68 sq ft") converts to 6.317 m². The library
-> computes both bounds from the speech-to-noise ratio rather than hardcoding
-> either constant, so they stay mutually consistent; the misprint is recorded in
-> the [errata registry](https://jmrplens.github.io/phonometry/reference/errata/).
-
-```python
-from phonometry import room
-
-print(round(room.absorption_per_table(1.0, -6.0), 2))   # 6.31 m2 per table at 1 m
-print(round(room.absorption_per_table(2.5, -9.0), 1))   # 19.8 m2 at 2.5 m spacing
-
-crowd = room.crowd_noise([20.0, 95.0, 190.0], distance=1.2)
-crowd.plot()      # self-noise vs occupancy, against the -6 dB limit
-```
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/restaurant_crowd_noise_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/restaurant_crowd_noise.svg" alt="Self-generated crowd noise level against the number of simultaneous talkers for three room absorption areas of 20, 95 and 190 metric sabins, with the 60 dB direct speech level at 1.2 m and the 66 dB communication limit drawn as horizontal references" width="85%"></picture>
-
-*The same 20 talkers in three rooms. The hard room (20 m² of absorption)
-crosses the communication limit before the fourth table is occupied; adding the
-absorptive ceiling of Long's example (190 m² in total) keeps all 20 tables below
-it. The curves are parallel because occupancy always costs `10 log10 N`: only
-the vertical offset, which is the absorption, is a design variable.*
-
-### `crowd_noise()` parameters
-
-| Parameter | Type | Units | Range / default | Notes |
-| :--- | :--- | :--- | :--- | :--- |
-| `absorption_areas` | float or 1D array | m² | > 0 | Total room absorption areas to compare |
-| `talkers` | 1D array, optional | — | ≥ 1, default 1..20 | Occupancy axis `N` |
-| `distance` | float | m | > 0, default 1.2 | Talker-to-listener distance `r` |
-| `sound_power_level` | float | dB re 1 pW | default 70 | Talker `Lw` |
-| `directivity` | float | — | > 0, default 2 | Talker `Q` |
-
-Returns a `CrowdNoiseResult` (`talkers`, `absorption_areas`, `levels`,
-`signal_level`, `communication_level`, `speech_to_noise()`) with `.plot()`. The
-pieces `speech_direct_level`, `crowd_noise_level`, `speech_to_noise_ratio` and
-`absorption_per_table` are callable directly.
-
-This is a *design* model and deliberately does not model the Lombard reflex: it
-cancels out of `L_SN` as long as everyone raises their voice equally, so the
-model explains why the level spirals upward in a hard room rather than
-predicting where it stops. It also assumes a diffuse reverberant field and a
-single absorption figure per table, so it says nothing about screens, local
-absorption or where in the room a given table sits.
-
 ## References
 
 - International Organization for Standardization. (2012). *Acoustics —
@@ -20105,9 +20493,6 @@ absorption or where in the room a given table sits.
   (ISO 3382-3:2012).
   [iso.org catalogue](https://www.iso.org/standard/46520.html).
   The open-plan speech-privacy quantities this page implements.
-- Long, M. (2014). *Architectural acoustics* (2nd ed.). Academic Press.
-  [doi:10.1016/C2012-0-03257-5](https://doi.org/10.1016/C2012-0-03257-5).
-  Chapter 17 (the crowd self-noise model, Equations (17.50) to (17.54)).
 
 ## Standards
 
@@ -22720,15 +23105,6 @@ it; the list grows as guides gain their References sections.
 
 ## Room acoustics
 
-- Long, M. (2014). *Architectural acoustics* (2nd ed.). Academic Press.
-  [doi:10.1016/C2012-0-03257-5](https://doi.org/10.1016/C2012-0-03257-5).
-  The architectural-design companion to the measurement standards: the
-  rectangular-room eigenfrequencies and the Morse/Pierce mode count
-  (Chapter 8), the crowd self-noise of an occupied room (Chapter 17) and the
-  gain-before-feedback criterion of a reinforcement system (Chapter 18).
-  Cited by [Image sources and the steady-state room field](https://jmrplens.github.io/phonometry/guides/room-image-sources/),
-  [Open-plan office acoustics](https://jmrplens.github.io/phonometry/guides/open-plan-acoustics/) and
-  [Loudspeaker characterisation](https://jmrplens.github.io/phonometry/guides/loudspeakers/).
 - Kuttruff, H. (2016). *Room acoustics* (6th ed.). CRC Press.
   [doi:10.1201/9781315372150](https://doi.org/10.1201/9781315372150).
   The reference monograph on sound fields in rooms: statistical decay
@@ -23536,13 +23912,6 @@ it; the list grows as guides gain their References sections.
 
 ## Psychoacoustics
 
-- Moore, B. C. J. (2013). *An introduction to the psychology of hearing*
-  (6th ed.). Brill.
-  [doi:10.1163/9789004252424](https://doi.org/10.1163/9789004252424).
-  The standard textbook on auditory perception; pages 76-77 give the
-  Glasberg and Moore (1990) ERB_N auditory-filter bandwidth and the Cam
-  (ERB_N number) frequency scale the loudness models are written on.
-  Cited by [Advanced loudness](https://jmrplens.github.io/phonometry/guides/advanced-loudness/).
 - Fletcher, H., & Munson, W. A. (1933). Loudness, its definition, measurement
   and calculation. *The Journal of the Acoustical Society of America*, 5(2),
   82-108. [doi:10.1121/1.1915637](https://doi.org/10.1121/1.1915637).
@@ -24803,8 +25172,8 @@ Source: https://jmrplens.github.io/phonometry/guides/room-image-sources/
 
 Where [reverberation-time prediction](https://jmrplens.github.io/phonometry/guides/reverberation-prediction/) gives a
 single statistical decay rate and [room-acoustics measurement](https://jmrplens.github.io/phonometry/guides/room-acoustics/)
-analyses a *measured* impulse response, this page covers the classical
-*predictions* of the sound field in a rectangular room, all in
+analyses a *measured* impulse response, this page covers the two classical
+*predictions* of the sound field in a rectangular room, both in
 `phonometry.room`:
 
 - the **image-source room impulse response** (`image_source_rir`): the
@@ -24814,11 +25183,7 @@ analyses a *measured* impulse response, this page covers the classical
 - the **steady-state room field** (`steady_state_field` and its parts): the
   statistical direct-plus-reverberant sound pressure level a source of known
   power produces, with the room constant, critical distance and Schroeder
-  frequency (Bies *Engineering Noise Control* 6.4; Kuttruff 5.6); and
-- the **normal modes** of the shoebox (`room_modes` and its parts): the
-  eigenfrequencies below the Schroeder frequency, their axial / tangential /
-  oblique classification and the Morse/Pierce mode count and modal density
-  (Long *Architectural Acoustics* 2e, Chapter 8).
+  frequency (Bies *Engineering Noise Control* 6.4; Kuttruff 5.6).
 
 Together they bridge the sound power of `phonometry.emission` and the reverberation
 prediction of `phonometry.room`: one gives the full RIR, the other the level
@@ -25104,99 +25469,6 @@ from phonometry import room
 print(round(float(room.schroeder_frequency(1.0, 200.0)), 0))   # 141 Hz (V=200, T=1)
 ```
 
-## 3. Modes of a rectangular room
-
-Below the Schroeder frequency the statistical picture of section 2 breaks down
-and the room is a handful of discrete standing waves. For the rigid-walled
-shoebox the wave equation separates and the eigenfrequencies are exact:
-
-```text
-f(nx, ny, nz) = (c0 / 2) √( (nx/lx)² + (ny/ly)² + (nz/lz)² )
-                                        (Long Equation (8.43))
-```
-
-with non-negative integer orders counting the nodal planes on each axis. How
-many of the three orders are non-zero names the family: **axial** (one, a wave
-bouncing between one pair of walls, the loudest), **tangential** (two, grazing
-four walls, about 3 dB weaker) and **oblique** (three, involving all six,
-weaker still).
-
-```python
-from phonometry import room
-
-modes = room.room_modes(
-    (7.0, 5.0, 3.0),            # lx, ly, lz in metres
-    max_frequency=100.0,
-    speed_of_sound=344.0,
-    reverberation_time=0.8,     # optional: carries the Schroeder frequency
-)
-print(modes.orders[0], round(float(modes.frequencies[0]), 1))  # [1 0 0] 24.6 Hz
-print(modes.count_by_kind())   # {'axial': 7, 'tangential': 10, 'oblique': 4}
-print(round(modes.schroeder_frequency, 0))                     # 175 Hz
-modes.plot()                    # mode ladder by family + modal density
-```
-
-Counting lattice points inside the positive octant of a sphere of radius
-`k = 2 π f / c0`, with the half- and quarter-weight corrections for the points
-on the coordinate planes and axes, gives the smooth **integrated mode count**
-and its derivative the **modal density**:
-
-```text
-N(f)     = (4 π / 3) V (f/c0)³ + (π / 4) S (f/c0)² + (L / 8) (f/c0)
-                                        (Long Equation (8.45), after Morse and Pierce)
-dN/df    = 4 π V f² / c0³ + (π / 2) S f / c0² + L / (8 c0)
-                                        (Long Equation (8.46))
-```
-
-with the volume `V`, the total wall area `S` and the sum `L` of the twelve edge
-lengths. These are asymptotic estimates: below a few dozen modes the exact
-enumeration of `room_modes` is the honest answer, while high up they are
-accurate and much cheaper.
-
-```python
-from phonometry import room
-
-room_dims = (7.0, 5.0, 3.0)
-print(round(float(room.room_mode_count(200.0, room_dims, speed_of_sound=344.0)), 1))
-# 128.5, against 128 modes actually enumerated below 200 Hz
-print(round(float(room.room_modal_density(1000.0, room_dims, speed_of_sound=344.0)), 1))
-# 34.3 modes/Hz
-```
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rectangular_room_modes_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rectangular_room_modes.svg" alt="Mode ladder of a 7 by 5 by 3 metre room up to 200 Hz, one raster row per family (axial, tangential, oblique) and the modal density curve below, both marked with the 175 Hz Schroeder frequency" width="85%"></picture>
-
-*The 7 x 5 x 3 m room of Long's Table 8.1 up to 200 Hz. Below about 60 Hz the
-axial modes stand alone and each is separately audible; by the 175 Hz Schroeder
-frequency (T = 0.8 s) the oblique family has filled in and the modal density
-has passed one mode per hertz, which is where the statistical field of
-section 2 takes over.*
-
-### `room_modes()` parameters
-
-| Parameter | Type | Units | Range / default | Notes |
-| :--- | :--- | :--- | :--- | :--- |
-| `dimensions` | 3-tuple | m | > 0 | Room dimensions `(lx, ly, lz)` |
-| `max_frequency` | float | Hz | > 0, default 200 | Highest mode enumerated |
-| `speed_of_sound` | float | m/s | > 0, default 343 | `c0` |
-| `reverberation_time` | float, optional | s | > 0 | Adds the Schroeder frequency to the result |
-
-Returns a `RoomModesResult` (`orders`, `frequencies`, `kinds`, `dimensions`,
-`speed_of_sound`, `schroeder_frequency`, plus the `volume`, `surface_area` and
-`edge_length` properties and `count_by_kind()`) with `.plot()`. The pieces
-`room_mode_frequency`, `room_mode_count` and `room_modal_density` are callable
-directly.
-
-**Reading the ladder.** Two things matter more than any single frequency.
-Modes that coincide colour the sound: if the dimensions are low integer
-multiples of one another the energy coalesces into a few frequencies, which is
-why a cubic room is the worst possible listening room and why the ratio tables
-of Bolt and others exist. And modes crowd together as frequency rises, until
-they merge into the continuum the statistical model of section 2 assumes. The
-mode calculator assumes rigid walls and a rectangular plan: it gives the
-eigen*frequencies*, not the pressure amplitude at a listening position, and
-says nothing about damping, mode shape or a non-shoebox geometry. For those,
-mesh the room and run the [2D FDTD solver](https://jmrplens.github.io/phonometry/guides/fdtd-simulation/).
-
 ## Validation
 
 The implementations are checked against the closed forms and the source texts'
@@ -25211,12 +25483,7 @@ own numeric anchors (see [CONFORMANCE.md](https://jmrplens.github.io/phonometry/
   the uniform-damping `T60`;
 - the room constant, the critical distance as the exact direct/reverberant
   crossover, the Schroeder frequency (Kuttruff's classroom example, `V = 200`,
-  `T = 1` → 141 Hz) and the steady-state level (Bies Equation (6.43));
-- the six modes Long prints for his 7 x 5 x 3 m room (Table 8.1: 24.6, 34.5,
-  42.4, 49.2, 57.4 and 60.1 Hz, reproduced within one unit of the last printed
-  digit at his `c0 = 344` m/s) and the 34 modes per hertz he states for the
-  same room at 1 kHz (Equation (8.46)), plus the mode count matched against
-  the exact enumeration and the degeneracy of a cubic room.
+  `T = 1` → 141 Hz) and the steady-state level (Bies Equation (6.43)).
 
 ## References
 
@@ -25241,11 +25508,6 @@ own numeric anchors (see [CONFORMANCE.md](https://jmrplens.github.io/phonometry/
   [doi:10.1201/9781351228152](https://doi.org/10.1201/9781351228152).
   Section 6.4 (steady-state response and the room constant, Equations
   (6.41)–(6.44)).
-- Long, M. (2014). *Architectural acoustics* (2nd ed.). Academic Press.
-  [doi:10.1016/C2012-0-03257-5](https://doi.org/10.1016/C2012-0-03257-5).
-  Chapter 8 (the rectangular-room eigenfrequencies of Equation (8.43) and
-  Table 8.1, and the Morse/Pierce mode count and modal density of Equations
-  (8.45) and (8.46)).
 
 ---
 
@@ -26586,6 +26848,9 @@ of a decibel (test `tests/noise_control/test_fdtd_crosscheck.py`).
 
 ## See also
 
+- [Duct-borne noise: fan to room](https://jmrplens.github.io/phonometry/guides/duct-path/): the end-to-end fan-to-room
+  calculation these silencers sit inside, and the higher-order-mode cut-on
+  above which the four-pole method describes the plane-wave mode alone.
 - [Industrial noise control](https://jmrplens.github.io/phonometry/guides/noise-control/): the rest of the
   installation: HVAC duct attenuation and flow noise, plenums, end
   reflection and machine enclosures.
@@ -28627,675 +28892,6 @@ for ITT equipment — Part 2 (methods for describing human perception based on
 the Sottek Hearing Model)*: the Sottek Hearing Model tonality (tu_HMS,
 clause 6), roughness (asper, clause 7) and fluctuation strength (vacil_HMS,
 clause 9, the HSA-based envelope analysis).
-
----
-
-
-<!-- source: docs/spanish-building-code.md | canonical: https://jmrplens.github.io/phonometry/guides/spanish-building-code/ -->
-Source: https://jmrplens.github.io/phonometry/guides/spanish-building-code/
-
-# Spanish Building Code (CTE DB-HR)
-
-The *Documento Básico HR* "Protección frente al ruido" of the Spanish building
-code states its requirements in A-weighted global quantities that are close
-relatives of, but not identical to, the ISO 717-1 weighted ratings: $R_A$,
-$R_{A,tr}$, $D_{nT,A}$ and $D_{2m,nT,Atr}$. This page implements the direct
-Annex A route, which is the normative one for DB-HR, the requirement tables of
-clause 2, and the two design calculations most often used with them: the
-window-size correction and the insulation of a composite facade.
-
-The band spectra it consumes come from field measurement or from prediction;
-the ISO 717 reference-curve engine, which it is worth not confusing this with,
-is in [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/guides/insulation-ratings/).
-
-## The global index of Annex A
-
-Instead of shifting a reference curve, DB-HR weights the measured band
-insulation with a normalised source spectrum and sums it energetically
-(Formulae A.5 to A.7):
-
-$$
-I_x = -10 \lg \sum_i 10^{(L_{x,i} - X_i)/10} \quad \text{[dBA]}
-$$
-
-where $X_i$ is the band insulation (the sound reduction index $R$ or $R'$, the
-standardized level difference $D_{nT}$, $D_{2m,nT}$ and so on) and $L_{x,i}$
-the normalised source spectrum. The sum runs over **eighteen** one-third-octave
-bands, 100 Hz to 5 kHz, two more than the sixteen of ISO 717-1 (100 Hz to
-3150 Hz): the 4 kHz and 5 kHz bands, which are the first reason the two routes
-do not always agree. The band centres are in `DB_HR_FREQUENCIES`.
-
-| Normalised spectrum | Annex A table | Quantity it defines | Formula |
-| :--- | :--- | :--- | :--- |
-| A-weighted pink noise, $L_{Ar,i}$ | Table A.5 | $R_A$, $D_{nT,A}$, $D_{2m,nT,A}$ | (A.5), (A.7) |
-| Road traffic, $L_{Atr,i}$ | Table A.3 | $R_{A,tr}$, $D_{2m,nT,Atr}$ | (A.6) |
-| Railway noise, $L_{Aef,i}$ | Table A.4 (numerically identical to A.3) | $D_{2m,nT,A}$ | (A.5) |
-| Aircraft noise, $L_{Aav,i}$ | Table A.2 | $D_{2m,nT,Atr}$ | (A.6) |
-
-The railway row is the one worth reading twice. Clause 3.1.3.4 point 1 says
-that where railway noise dominates the facade is assessed in
-$D_{2m,nT,A}$ through formula (A.5), and only road traffic and aircraft give
-$D_{2m,nT,Atr}$ through (A.6); Table H.1 prints the same split. Because
-Table A.4 is digit for digit Table A.3, a rail-dominant facade comes out at
-the same *number* as a road one, but the quantity the requirement and the
-report are stated in is not the same. That is why `d2m_nt_a()` and
-`d2m_nt_atr()` are separate entry points and each refuses the other's
-spectra, rather than one function with a spectrum switch that would silently
-put the wrong name on the result.
-
-All four are in `DB_HR_NORMALISED_SPECTRA` under the keys `"pink"`,
-`"traffic"`, `"railway"` and `"aircraft"`. The calculation below reproduces
-Ejemplo 7.2 of the *Manual*, the apparent sound reduction index $R'$ of a party
-wall taken from a real field test report:
-
-```python
-from phonometry import building
-
-r_prime = [36.2, 41.5, 36.9, 40.4, 44.7, 42.4, 45.7, 46.1, 47.1,
-           52.3, 54.3, 57.5, 57.8, 57.3, 59.0, 62.8, 64.7, 65.3]
-index = building.ra(r_prime)
-index.value        # 51.44 dBA
-index.intermediate # 51.4 dBA, the one-decimal intermediate
-index.reported     # 51 dBA, the integer that defines the requirement
-```
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dbhr_global_index_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dbhr_global_index.svg" alt="CTE DB-HR global index R'A: per-band apparent sound reduction index as bars with the pink-noise weighted transmitted level per band, whose energy sum sets the 51.4 dBA index" width="80%"></picture>
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import building
-
-r_prime = [36.2, 41.5, 36.9, 40.4, 44.7, 42.4, 45.7, 46.1, 47.1,
-           52.3, 54.3, 57.5, 57.8, 57.3, 59.0, 62.8, 64.7, 65.3]
-
-building.ra(r_prime).plot()
-plt.show()
-```
-
-</details>
-
-`ra()`, `ra_tr()`, `dnt_a()`, `d2m_nt_a()` and `d2m_nt_atr()` are named shortcuts over
-`db_hr_global_index()`, which accepts any spectrum and, given the
-`frequencies` argument, selects the eighteen DB-HR bands out of a longer
-series.
-
-## Rounding and the relationship with the ISO 717 route
-
-Clause 3.1.3.1 point 4 of DB-HR requires the final values of the quantities
-that define the requirements to be expressed rounded to an integer, while
-intermediate values are carried with one decimal. The result object therefore
-exposes all three forms: `.value` (unrounded), `.intermediate` (one decimal)
-and `.reported` (the integer used in the check).
-
-DB-HR and ISO 717-1 reach the same place by different routes, and Annex H of
-the document itself accepts three approximations as long as the two routes
-differ by less than 1 dB:
-
-$$D_{nT,A} \approx D_{nT,w} + C \quad (H.1), \qquad
-D_{2m,nT,A} \approx D_{2m,nT,w} + C \quad (H.2), \qquad
-D_{2m,nT,Atr} \approx D_{2m,nT,w} + C_{tr} \quad (H.3)$$
-
-with (H.2) covering the rail-dominant case of the previous section. On the two
-published spectra this page reproduces, the agreement is exact to the integer:
-
-| Case | Direct route (Annex A) | ISO 717-1 route | Published? |
-| :--- | :--- | :--- | :--- |
-| Separating wall of Ejemplo 7.2 | $R'_A = 51.4$ dBA, rounded to 51 | $R'_w = 52$ with $C_{100-5000} = -1$, i.e. 51 | yes, Ejemplo 7.1 prints $R'_w = 52$, $C = -1$ and the 51 dBA |
-| Facade of Ejercicio 7.1 | $D_{2m,nT,Atr} = 32.8$ dBA, rounded to 33 | $D_{2m,nT,w} = 38$ with $C_{tr,100-5000} = -5$, i.e. 33 | no, the book prints neither 38 nor $-5$ |
-
-The two rows are not equally strong evidence. The wall row is a genuine
-external check, because the *Manual* prints the ISO 717-1 numbers as well as
-the direct one. For the facade the book publishes only the 32,8 dBA; the 38
-and the $-5$ come from this library's own ISO 717-1 engine, so that row shows
-the two routes agreeing with each other rather than agreeing with a source.
-
-The real trap is the name of the spectrum adaptation terms. Annex H writes
-them as plain $C$ and $C_{tr}$ and refers their definition to
-UNE-EN ISO 717-1 without narrowing the frequency range. Since the DB-HR
-indices run to 5 kHz while the ISO 717-1 core range stops at 3150 Hz, the
-terms that make (H.1) to (H.3) come out right are the **enlarged-range**
-$C_{100-5000}$ and $C_{tr,100-5000}$; that reading is not in Annex H itself
-but in the *Manual*, in the note to expressions [7.15] and [7.16]. It matters:
-on the facade of Ejercicio 7.1 the core-range $C$ is $-2$ while $C_{100-5000}$
-is $-1$, so taking the wrong one gives 36 dBA instead of 37 for the
-$D_{2m,nT,A}$ of that facade. On the same specimen $C_{tr}$ and
-$C_{tr,100-5000}$ are both $-5$, so the $D_{2m,nT,Atr}$ that DB-HR actually
-requires happens not to discriminate between the two readings at all.
-
-```python
-from phonometry import building, weighted_rating_extended
-
-d2m_nt = [28.5, 28.5, 18.9, 23.7, 30.7, 31.3, 37.8, 35.2, 34.7,
-          38.5, 37.7, 43.1, 42.3, 44.2, 41.9, 37.5, 39.4, 41.5]
-
-direct = building.d2m_nt_atr(d2m_nt)
-direct.intermediate, direct.reported   # 32.8 dBA -> 33 dBA
-
-iso = weighted_rating_extended(d2m_nt, building.DB_HR_FREQUENCIES)
-iso.rating, iso.ctr_100_5000           # 38 dB, -5 dB -> 33 dBA, the same figure
-iso.c, iso.c_100_5000                  # -2 and -1: core range versus enlarged range
-```
-
-## The requirements of clause 2
-
-DB-HR states its requirements on two kinds of room: the **protected room**
-(*recinto protegido*, a habitable room with reinforced acoustic protection:
-bedrooms, living areas, classrooms, operating theatres, professional offices)
-and the **habitable room** (*recinto habitable*) in general.
-
-**Facades (Table 2.1).** The requirement on $D_{2m,nT,Atr}$ is read by bands of
-the site's day noise index $L_d$ ($L_d \le 60$, $60 < L_d \le 65$,
-$65 < L_d \le 70$, $70 < L_d \le 75$ and $L_d > 75$ dBA):
-
-| Use and room | $\le 60$ | 60-65 | 65-70 | 70-75 | $> 75$ |
-| :--- | ---: | ---: | ---: | ---: | ---: |
-| Residential and hospital, bedrooms; cultural, health, educational and administrative, living areas | 30 | 32 | 37 | 42 | 47 |
-| Residential and hospital, living areas; cultural, health, educational and administrative, classrooms | 30 | 30 | 32 | 37 | 42 |
-
-Three rules modify the reading: a facade not directly exposed to the dominant
-noise (an enclosed courtyard, a quiet surrounding) is assessed with $L_d$
-reduced by 10 dBA, where aircraft noise dominates the table value is increased
-by 4 dBA, and where no official $L_d$ exists for the site, 60 dBA is assumed
-for residential acoustic areas.
-
-**Airborne insulation between rooms (clause 2.1.1).** Partition walls
-(*tabiquería*) within one use unit must have $R_A \ge 33$ dBA. Against a room
-of another use unit, a protected room requires $D_{nT,A} \ge 50$ dBA and a
-habitable room $\ge 45$ dBA; against a services or activity room, a protected
-room requires $\ge 55$ dBA and a habitable room $\ge 45$ dBA. When the two
-rooms share a door or a window, the requirement moves to the opening (sound
-reduction index of 30 dBA for the protected room, 20 dBA for the habitable
-one) and to the enclosure around it (50 dBA).
-
-**Party walls (clause 2.1.1 c).** Against a *medianería* DB-HR offers two
-**alternative** routes, not cumulative ones: either each of the two leaves
-reaches $D_{2m,nT,Atr} \ge 40$ dBA, or the two leaves taken together reach
-$D_{nT,A} \ge 50$ dBA. `db_hr_party_wall_requirement()` returns whichever route
-is asked for.
-
-**Impact sound (clause 2.1.2).** The standardized impact sound pressure level
-$L'_{nT,w}$ must not exceed 65 dB in a protected room against a room of another
-use unit, nor 60 dB against a services or activity room; that same 60 dB limit
-applies to the habitable room.
-
-**Reverberation and absorption (clause 2.2).** The reverberation time must not
-exceed 0.7 s in an empty classroom or conference hall under 350 m³, 0.5 s with
-the fixed seating installed, or 0.9 s in empty restaurants and dining rooms. In
-common areas sharing doors with protected rooms, the equivalent sound
-absorption area must be at least 0.2 m² per cubic metre of volume.
-
-```python
-from phonometry import building
-
-facade = building.db_hr_facade_requirement(65.0, "residential", "bedrooms")
-facade.limit                                        # 32 dBA (Table 2.1)
-
-airborne = building.db_hr_airborne_requirement("protected", "other_unit")
-[(r.quantity, r.limit) for r in airborne]           # [("DnT,A", 50.0)]
-
-building.db_hr_impact_requirement("protected", "other_unit").limit    # 65 dB
-building.db_hr_party_wall_requirement().limit                         # 40 dBA per leaf
-building.db_hr_party_wall_requirement("DnT,A").limit                  # 50 dBA both together
-building.db_hr_reverberation_requirement("classroom").limit           # 0.7 s
-
-check = building.assess_db_hr([(33.0, facade), (51.44, airborne[0])])
-check.complies                                      # True
-```
-
-`check_db_hr_requirement()` rounds the achieved value the way DB-HR asks before
-comparing it (to an integer for the dB quantities, to one decimal for the
-reverberation time) and returns the margin; `assess_db_hr()` does the same over
-a list of value-requirement pairs.
-
-## Windows and composite facades
-
-The tests that determine the sound reduction index of a window are run on
-specimens of about 1.8 m², and a larger window insulates less. The *Catálogo de
-Elementos Constructivos* of the building code corrects the catalogue value of
-$R_A$ and $R_{A,tr}$ by total window area: 0 dB up to 2.7 m², $-1$ dB between
-2.7 and 3.6 m², $-2$ dB between 3.6 and 4.6 m² and $-3$ dB above 4.6 m². A 4 m²
-sliding window with 4-6-4 glazing, catalogued at $R_A = 26$ dBA, ends up at
-24 dBA (Ejemplo 7.4).
-
-A real facade is not a homogeneous element: it has a blind part and one or more
-openings. The sound reduction index of the whole follows from the
-area-weighted sum of the transmittances, which is what
-`composite_transmission_loss()` does in
-[Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/guides/panel-sound-insulation/). With the 8 m²
-facade of Ejemplo 7.5, a blind part of 40 dBA and a 2 m² window of 26 dBA, the
-whole comes out at 31.5 dBA:
-
-```python
-from phonometry import building
-from phonometry.building.aperture_transmission import composite_transmission_loss
-
-building.window_size_correction(4.0)          # -2 dB: 26 dBA catalogued -> 24 dBA
-
-composite_transmission_loss([6.0, 2.0], [40.0, 26.0])   # 31.53 dBA
-composite_transmission_loss([6.0, 2.0], [50.0, 26.0])   # 31.97 dBA: +10 dBA on the blind part
-composite_transmission_loss([6.0, 2.0], [40.0, 31.0])   # 35.63 dBA: +5 dBA on the window
-```
-
-Those last three lines hold the most useful rule of thumb in facade design:
-improving the blind part by 10 dBA raises the overall insulation by 0.4 dBA,
-practically nothing, whereas improving the window by 5 dBA raises it by
-4.1 dBA, almost the full increment. The weak element is where the effort pays.
-
-## Plots
-
-`DbHrGlobalIndexResult.plot()` draws the band insulation together with the
-transmitted level weighted by the normalised spectrum, as in the figure above:
-it shows at a glance which bands dominate the energy sum, and therefore where
-the element has to be improved. `DbHrAssessment.plot()` draws the achieved
-values against their limits, one per checked requirement.
-
-## What this guide covers
-
-**Covered.** The DB-HR Annex A global index (Formulae A.5 to A.7) over the
-eighteen bands from 100 Hz to 5 kHz with the four normalised spectra of Tables
-A.2 to A.5, the rounding of clause 3.1.3.1 point 4, the requirements of clause
-2 (Table 2.1 for facades, 2.1.1 airborne and party walls, 2.1.2 impact and 2.2
-reverberation and absorption) and the window-size correction of the *Catálogo
-de Elementos Constructivos*.
-
-**Not covered.** The design options of clause 3 (the simplified option with its
-solution tables, and the general option, which is the EN 12354 prediction) are
-not implemented here: the calculation route of the general option lives in
-[Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/guides/insulation-prediction/). The
-execution conditions of clause 5 and the maintenance conditions of clause 6
-are out of scope as well.
-
-## Quick answers
-
-### How does the DB-HR index RA differ from the Rw of ISO 717-1?
-
-The $R_w$ of ISO 717-1 comes from shifting a reference curve over sixteen
-one-third-octave bands (100 Hz to 3150 Hz). The $R_A$ of DB-HR comes from
-weighting the band sound reduction index with a normalised pink-noise spectrum
-and summing energetically over **eighteen** bands (100 Hz to 5 kHz). DB-HR
-accepts the equivalence $R_A \approx R_w + C$, but that $C$ is the
-enlarged-range term $C_{100-5000}$, not the core-range one.
-
-## See also
-
-- [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/guides/insulation-ratings/): the reference-curve
-  route with Rw, C, Ctr and the enlarged-range terms that DB-HR calls simply C
-  and Ctr.
-- [Spanish Noise Regulation (RD 1367/2007)](https://jmrplens.github.io/phonometry/guides/spanish-noise-regulation/): where
-  the site's day noise index Ld that Table 2.1 is entered with comes from.
-- [Façade Sound Insulation](https://jmrplens.github.io/phonometry/guides/facade-insulation/): the ISO 16283-3 measurement
-  of D2m,nT and its EN 12354-3 prediction, which feed the D2m,nT,Atr index of
-  this page.
-- [Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/guides/panel-sound-insulation/): the
-  composite-facade calculation and transmission through openings and slits.
-- [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/guides/insulation-field/): the band
-  spectra of R', DnT and L'nT that these global quantities summarise.
-- API reference: [`building.spanish_building_code`](https://jmrplens.github.io/phonometry/reference/api/building/spanish-building-code/).
-
-## References
-
-- Avilés López, R., & Perera Martín, R. (2017). *Manual de acústica ambiental
-  y arquitectónica*. Paraninfo. ISBN 978-84-283-3814-1.
-  Ejemplo 7.2 and Ejercicio 7.1 (pp. 394-395) are the numeric oracles of the
-  global index on this page, and Ejemplos 7.4 and 7.5 (pp. 408-410) the
-  window-size correction and the composite-facade calculation.
-- Ministerio de la Presidencia (Spain). (2007). *Real Decreto 1367/2007,
-  developing Ley 37/2003 del Ruido on acoustic zoning, quality objectives and
-  acoustic emissions* (BOE-A-2007-18397).
-  [BOE consolidated text](https://www.boe.es/buscar/act.php?id=BOE-A-2007-18397).
-  The source of the day noise index Ld that Table 2.1 of DB-HR is read
-  against.
-
-## Standards
-
-CTE Documento Básico HR *Protección frente al ruido*, the noise part of the
-Spanish building code:
-[codigotecnico.org](https://www.codigotecnico.org/pdf/Documentos/HR/DBHR.pdf).
-The Annex A global index (Formulae A.5 to A.7) over the eighteen bands 100 Hz
-to 5 kHz with the normalised spectra of Tables A.2 to A.5, the rounding rule of
-clause 3.1.3.1 point 4, and the requirements of clause 2: Table 2.1 for
-facades, 2.1.1 for airborne insulation and party walls, 2.1.2 for impact sound
-and 2.2 for reverberation and absorption.
-
----
-
-
-<!-- source: docs/spanish-noise-regulation.md | canonical: https://jmrplens.github.io/phonometry/guides/spanish-noise-regulation/ -->
-Source: https://jmrplens.github.io/phonometry/guides/spanish-noise-regulation/
-
-# Spanish Noise Regulation (RD 1367/2007)
-
-Acoustic assessment in Spain does not stop at an $L_{Aeq}$. Real Decreto
-1367/2007, which develops Ley 37/2003 del Ruido, defines an index of its own,
-the **corrected equivalent continuous sound pressure level** $L_{Keq,T}$, and
-builds the whole compliance chain on it: the day is split into evaluation
-periods, each period into noise phases, each phase is corrected for tonal,
-low-frequency and impulsive character, the result is integrated up to an
-annual value, and that value is compared against three different criteria read
-off the same limit table. This page implements that chain end to end.
-
-The per-period levels that feed it come from
-[Integrated & Statistical Levels](https://jmrplens.github.io/phonometry/guides/levels/), and the European
-$L_{den}$/$L_{dn}$ indicators they coexist with, from
-[Environmental levels](https://jmrplens.github.io/phonometry/guides/environmental-levels/).
-
-## The corrected level LKeq and its three corrections
-
-The index of the regulation is (Annex I A.2 c):
-
-$$
-L_{Keq,T} = L_{Aeq,T} + K_t + K_f + K_i
-$$
-
-where $L_{Aeq,T}$ is the A-weighted equivalent continuous sound pressure level,
-already corrected for background noise, and the three corrections penalise the
-character of the noise. Each is 0, 3 or 6 dB, and their sum is capped at 9 dB
-(Annex IV A.3.3), a cap exposed as `RD1367_MAX_CORRECTION`. Although the index
-derives from an A-weighted level, the regulation expresses it in dB.
-
-| Correction | Input quantity | Thresholds | Function |
-| :--- | :--- | :--- | :--- |
-| $K_t$, emergent tonal components | **Unweighted** one-third-octave spectrum; $L_t = L_f - L_s$, with $L_s$ the **arithmetic** mean of the two adjacent bands | 8/12 dB (20 to 125 Hz), 5/8 dB (160 to 400 Hz), 3/5 dB (500 Hz to 10 kHz) | `tonal_correction()` |
-| $K_f$, low-frequency components | $L_f = L_{Ceq,Ti} - L_{Aeq,Ti}$ | 0 dB up to 10 dB, 3 dB for $10 < L_f \le 15$, 6 dB above | `low_frequency_correction()` |
-| $K_i$, impulsive components | $L_i = L_{AIeq,Ti} - L_{Aeq,Ti}$ | the same 10 and 15 dB | `impulsive_correction()` |
-
-$K_t$ is evaluated band by band and, when several emergent tones are present,
-the largest of the resulting $K_t$ governs (step d):
-
-```python
-from phonometry import environmental
-
-freqs = [100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000]
-levels = [58.0, 60.0, 59.0, 61.0, 72.0, 62.0, 60.0, 58.0, 56.0, 54.0, 52.0]
-
-kt = environmental.tonal_correction(levels, freqs)
-kt.correction              # 6 dB
-kt.governing_frequency     # 250.0 Hz
-kt.differences[4]          # Lt = 10.5 dB above the mean of the neighbours
-
-environmental.low_frequency_correction(lceq=76.0, laeq=63.0)   # Lf = 13 dB -> Kf = 3 dB
-environmental.impulsive_correction(laieq=68.0, laeq=63.0)      # Li = 5 dB  -> Ki = 0 dB
-environmental.corrected_level(63.0, kt=6, kf=3, ki=0)          # LKeq = 72.0 dB
-environmental.total_correction(kt=6, kf=6, ki=3)               # 9.0 dB: the cap
-```
-
-## Relationship with the ISO 1996 procedures
-
-The corrections of the regulation resemble ISO 1996 procedures the library
-already implements, but they are **not interchangeable**, which is why this
-module implements the RD's own variants instead of delegating to them:
-
-- `tonal_audibility()` / `tonal_adjustment()` are the engineering method of
-  ISO 1996-2 Annex C, based on the audibility $\Delta L_{ta}$ within the
-  critical band around the tone, and return a **continuous** $K_t$ between 0
-  and 6 dB. The RD works on one-third-octave band differences and produces
-  only 0, 3 or 6 dB.
-- `tonal_seeking_survey()` (survey method, ISO 1996-2:2017 Annex K) is the
-  closest relative, because it also splits the spectrum at 125 and 400 Hz, but
-  it requires the band to exceed **both** neighbours by 15/8/5 dB and only
-  returns a prominence flag; the RD compares against the **mean** of the
-  neighbours with 8/5/3 dB thresholds and grades the result.
-- `impulsive_sound_adjustment()` is the onset-rate method of ISO/PAS 1996-3 on
-  a calibrated signal. The RD's $K_i$ is the classic $L_{AIeq} - L_{Aeq}$
-  difference read off a sound level meter, not the same quantity.
-- $K_f$ has no counterpart in ISO 1996 at all: the $L_{Ceq} - L_{Aeq}$
-  difference is specific to the Spanish regulation.
-
-## Evaluation periods and noise phases
-
-The regulation defines three evaluation periods (Annex I A.1): day from 07:00
-to 19:00 (12 h), evening from 19:00 to 23:00 (4 h) and night from 23:00 to
-07:00 (8 h), with the durations and clock limits in `RD1367_PERIOD_HOURS` and
-`RD1367_PERIOD_CLOCK_LIMITS`.
-
-When emission varies within a period, the period is split into **noise phases**
-$T_i$ of uniformly perceived level. $L_{Aeq,Ti}$ is measured over at least 5 s
-in each phase and corrected, and the period level is the energy mean weighted
-by phase duration (Annex IV A.3.4.2 b):
-
-$$
-L_{Keq,T} = 10 \lg \left[ \frac{1}{T} \sum_i T_i \, 10^{L_{Keq,Ti}/10} \right]
-$$
-
-The annual average $L_{K,x}$ of each period is in turn the energy mean of the
-daily $L_{Keq,x}$ over the year (Annex I A.2 d). The regulation also fixes its
-own rounding: add 0.5 dB to the result and take the integer part, which is what
-`round_reported_level()` does.
-
-```python
-from phonometry import environmental
-
-environmental.RD1367_PERIOD_CLOCK_LIMITS["day"]     # (7, 19)
-environmental.RD1367_PERIOD_HOURS["day"]            # 12.0 h
-
-day = [environmental.NoisePhase(2, 0.0, label="cerrada"),
-       environmental.NoisePhase(6, 50.0, kt=6, kf=3),
-       environmental.NoisePhase(4, 48.0, kt=3, kf=3)]
-
-lkeq_d = environmental.evaluation_period_level(day)   # 56.82 dB, unrounded
-environmental.round_reported_level(lkeq_d)            # 57 dB
-
-lk_d = environmental.long_term_corrected_level([57.0, 0.0], weights=[303, 62])
-environmental.round_reported_level(lk_d)              # 56 dB (303 days open, 62 closed)
-```
-
-## Acoustic quality objectives and immission limit values
-
-The regulation separates two families of values. The **acoustic quality
-objectives** of Annex II are what the whole set of acoustic emitters reaching
-an acoustic area or a room must meet; the **immission limit values** of Annex
-III are what a single emitter is held to.
-
-| Table | Content | Function |
-| :--- | :--- | :--- |
-| Annex II, Table A | Outdoor objectives by acoustic area type: e 60/60/50, a 65/65/55, d 70/70/65, c 73/73/63, b 75/75/65 dB (as amended by RD 1038/2012) | `outdoor_quality_objectives()` |
-| Annex II, Table B | Indoor objectives by building use and room type | `indoor_quality_objectives()` |
-| Annex II, Table C | Vibration objective $Law$ | `vibration_quality_objective()` |
-| Annex III, Tables A1 and A2 | Limit values for new road, rail and airport infrastructure, and $L_{Amax}$ | `infrastructure_limits()`, `max_infrastructure_limit()` |
-| Annex III, Table B1 | Limit values for port infrastructure and activities | `activity_limits()` |
-| Annex III, Table B2 | Noise transmitted by activities to acoustically adjacent premises | `adjacent_premises_limits()` |
-
-Two details of Table A are worth keeping in mind. Acoustic area type f (general
-transport-infrastructure systems and public facilities) carries no numeric
-value: footnote 2 refers it to the objectives of the adjoining areas, which is
-why `ACOUSTIC_AREA_TYPES` lists it but the limit functions do not accept it.
-And in areas urbanised after the regulation entered into force (24 October
-2007) the objective is 5 dB stricter (Article 14.2), which is what
-`urbanisation="new"` applies.
-
-```python
-from phonometry import environmental
-
-environmental.outdoor_quality_objectives("a")                       # 65 / 65 / 55 dB
-environmental.outdoor_quality_objectives("a", urbanisation="new")   # 60 / 60 / 50 dB
-environmental.indoor_quality_objectives("residential", "bedrooms")  # 40 / 40 / 30 dB
-environmental.infrastructure_limits("a")                            # 60 / 60 / 50 dB
-environmental.max_infrastructure_limit("a")                         # 85 dB (LAmax)
-environmental.activity_limits("a")                                  # 55 / 55 / 45 dB
-environmental.adjacent_premises_limits("residential", "bedrooms")   # 35 / 35 / 25 dB
-environmental.vibration_quality_objective("residential")            # 75 dB
-```
-
-Meeting an immission limit value is not simply staying below the number in the
-table. For activities and port infrastructure, Article 25.1 b) demands three
-things at once: no annual average $L_{K,x}$ above the table value, no daily
-$L_{Keq,x}$ more than 3 dB above it, and no $L_{Keq,Ti}$ measured in a noise
-phase more than 5 dB above it. For the inspection of an activity already in
-operation, Article 25.2 applies only the last two.
-
-## Worked example: a new activity on residential land
-
-A new activity on residential land (acoustic area type a) opens continuously
-from 9 to 21 h. A noisy machine runs only between 9 and 15 h; for the rest of
-the opening hours the levels are steady, and while the activity is shut down it
-emits nothing. The levels measured outdoors, already corrected for background
-noise, are:
-
-| Phase | $L_{Aeq,5s}$ | $K_t$ | $K_f$ | $K_i$ | $K$ | $L_{Keq,5s}$ |
-| :--- | ---: | ---: | ---: | ---: | ---: | ---: |
-| With the noisy machine | 50 dB | 6 | 3 | 0 | 9 | 59 dB |
-| Rest of the opening hours | 48 dB | 3 | 3 | 0 | 6 | 54 dB |
-
-The day period splits into three phases (2 h closed, 6 h with the machine, 4 h
-with the remaining sources) and gives $L_{Keq,d} = 57$ dB; the evening period
-splits into two (2 h open, 2 h closed) and gives $L_{Keq,e} = 51$ dB. The
-activity opens 303 days a year and closes 62 (July and August), from which
-$L_{K,d} = 56$ dB and $L_{K,e} = 50$ dB. The limit values for area type a
-(Annex III, Table B1) are 55/55/45 dB, so the applicable criteria are 60 dB on
-each $L_{Keq,Ti}$, 58 dB on the daily $L_{Keq,x}$ and 55 dB on the annual
-$L_{K,x}$:
-
-```python
-from phonometry import environmental
-
-day = [environmental.NoisePhase(2, 0.0, label="cerrada"),
-       environmental.NoisePhase(6, 50.0, kt=6, kf=3),
-       environmental.NoisePhase(4, 48.0, kt=3, kf=3)]
-evening = [environmental.NoisePhase(2, 48.0, kt=3, kf=3),
-           environmental.NoisePhase(2, 0.0, label="cerrada")]
-
-limits = environmental.activity_limits("a")          # 55 / 55 / 45 dB
-verdict = environmental.assess_activity(
-    {"day": day, "evening": evening}, limits, operating_days=303)
-
-verdict.periods[0].reported_level        # 57 dB  (LKeq,d)
-verdict.periods[0].reported_long_term    # 56 dB  (LK,d)
-verdict.complies                         # False: LK,d exceeds 55 dB
-```
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rd1367_activity_assessment_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rd1367_activity_assessment.svg" alt="RD 1367/2007 activity assessment: per-period maximum phase level, daily LKeq,x and annual LK,x against the +5 dB, +3 dB and table limit values, with the day annual level exceeding its limit" width="80%"></picture>
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import environmental
-
-day = [environmental.NoisePhase(2, 0.0, label="cerrada"),
-       environmental.NoisePhase(6, 50.0, kt=6, kf=3),
-       environmental.NoisePhase(4, 48.0, kt=3, kf=3)]
-evening = [environmental.NoisePhase(2, 48.0, kt=3, kf=3),
-           environmental.NoisePhase(2, 0.0, label="cerrada")]
-
-verdict = environmental.assess_activity(
-    {"day": day, "evening": evening},
-    environmental.activity_limits("a"),
-    operating_days=303,
-)
-verdict.plot()
-plt.show()
-```
-
-</details>
-
-The verdict is the fine point of the example. The measured $L_{Keq,Ti}$ (59 and
-54 dB) stay below 60 dB, and the daily values (57 and 51 dB) below 58 dB, but
-the annual average of the day period, $L_{K,d} = 56$ dB, exceeds the 55 dB of
-the table. A **new** activity does not comply. An activity already in
-operation, judged under Article 25.2, would comply, because only the phase and
-daily values are required of it; building the verdict with
-`new_activity=False` shows exactly that.
-
-## Plots and the inspection report
-
-`ActivityAssessment.plot()` draws the three indices of each period against
-their three criteria, as in the figure above, and
-`TonalCorrectionResult.plot()` draws the one-third-octave spectrum with the
-$L_t$ differences that justify the applied $K_t$.
-
-`ActivityAssessment.report()` goes one step further and renders a one-page
-acoustic inspection fiche: identification header, per-phase measurement table
-with the $K_t$/$K_f$/$K_i$ corrections, per-period assessment against the
-applicable limit values and the boxed verdict. The default language is Spanish,
-the language of the regulation; `language="en"` translates it.
-
-```python
-from phonometry import environmental
-
-verdict = environmental.assess_activity(
-    {"day": [environmental.NoisePhase(2, 0.0, label="cerrada"),
-             environmental.NoisePhase(6, 50.0, kt=6, kf=3),
-             environmental.NoisePhase(4, 48.0, kt=3, kf=3)],
-     "evening": [environmental.NoisePhase(2, 48.0, kt=3, kf=3),
-                 environmental.NoisePhase(2, 0.0, label="cerrada")]},
-    environmental.activity_limits("a"),
-    operating_days=303,
-)
-
-verdict.plot()                       # the three criteria per period
-verdict.report("acta.pdf")           # acoustic inspection fiche, in Spanish
-```
-
-## What this guide covers
-
-**Covered.** The corrected level $L_{Keq,T}$ and the $K_t$, $K_f$ and $K_i$
-corrections of RD 1367/2007 (Annex I A.2 c and Annex IV A.3.3), the evaluation
-periods and the noise-phase and annual integration (Annex I A.1 and Annex IV
-A.3.4.2 b) with the regulation's own rounding, the acoustic quality objective
-(Annex II) and immission limit value (Annex III) tables, and the Article 25
-compliance check of activities and port infrastructure.
-
-**Not covered.** The acoustic zoning into acoustic areas, the noise maps and
-the action plans of Ley 37/2003 are planning instruments rather than
-calculations, and are out of scope. The measurement procedures themselves
-(microphone positions, series duration, number of measurements of Annex IV) are
-not implemented either: this page starts where the sound level meter ends.
-
-## Quick answers
-
-### What is the LKeq level of RD 1367/2007?
-
-It is the **corrected** equivalent continuous sound pressure level:
-$L_{Keq,T} = L_{Aeq,T} + K_t + K_f + K_i$ (Annex I A.2 c), where $K_t$, $K_f$
-and $K_i$ penalise the presence of emergent tonal, low-frequency and impulsive
-components with 0, 3 or 6 dB each. The sum of the three corrections never
-exceeds 9 dB.
-
-## See also
-
-- [Environmental levels](https://jmrplens.github.io/phonometry/guides/environmental-levels/): the Lden and Ldn indicators
-  and the ISO 1996-2 adjustments the corrections of the regulation coexist
-  with.
-- [Integrated & Statistical Levels](https://jmrplens.github.io/phonometry/guides/levels/): the per-phase LAeq, LCeq and
-  LAIeq levels that feed the three corrections.
-- [Spanish Building Code (CTE DB-HR)](https://jmrplens.github.io/phonometry/guides/spanish-building-code/): the other half
-  of the Spanish framework, which shares the site's day noise index Ld with
-  this page.
-- [Impulsive-sound prominence](https://jmrplens.github.io/phonometry/guides/impulse-prominence/): the ISO/PAS 1996-3
-  impulsive adjustment, the relative of Ki that is not interchangeable with it.
-- API reference: [`environmental.spanish_regulation`](https://jmrplens.github.io/phonometry/reference/api/environment/spanish-regulation/).
-
-## References
-
-- Avilés López, R., & Perera Martín, R. (2017). *Manual de acústica ambiental
-  y arquitectónica*. Paraninfo. ISBN 978-84-283-3814-1.
-  Ejemplos 3.1 to 3.3 (pp. 171-176) are the worked case reproduced here, with
-  the noise-phase breakdown, the annual integration and the Article 25 verdict.
-- Jefatura del Estado (Spain). (2003). *Ley 37/2003, de 17 de noviembre, del
-  Ruido* (BOE-A-2003-20976).
-  [BOE consolidated text](https://www.boe.es/buscar/act.php?id=BOE-A-2003-20976).
-  The act the RD develops: the acoustic area types of Article 7, the figure of
-  the acoustic emitter and the inspection regime of Articles 25 to 27.
-- Ministerio de la Presidencia (Spain). (2007). *Real Decreto 1367/2007,
-  developing Ley 37/2003 del Ruido on acoustic zoning, quality objectives and
-  acoustic emissions* (BOE-A-2007-18397).
-  [BOE consolidated text](https://www.boe.es/buscar/act.php?id=BOE-A-2007-18397).
-  The corrected level, the corrections, the evaluation periods, the quality
-  objectives and the immission limit values implemented on this page.
-
-## Standards
-
-RD 1367/2007 (BOE-A-2007-18397), the regulation that develops Ley 37/2003 del
-Ruido on acoustic zoning, quality objectives and acoustic emissions: the
-corrected level LKeq,T and the corrections Kt, Kf and Ki (Annex I A.2 c, Annex
-IV A.3.3), the evaluation periods and the noise-phase integration (Annex I
-A.1, Annex IV A.3.4.2 b), the acoustic quality objectives of Annex II (Table A
-as amended by RD 1038/2012) and the immission limit values of Annex III, with
-the compliance criteria of Article 25.
 
 ---
 
