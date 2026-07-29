@@ -266,9 +266,13 @@ front meets a rigid 0.10 m wall with a 25 mm slit (λ/20 at 686 Hz) and with a
 0.50 m opening (one wavelength). The narrow slit re-radiates what it swallows
 as a cylindrical wave, the Gomperts transmission of the model annotated; the
 wavelength-sized opening lets the front through nearly intact and casts
-sharp-edged shadows.
+sharp-edged shadows. What the slit passes is about 23 dB under the standing
+wave that faces the wall, so in the instantaneous panels the half space
+behind the wall rides the display gain each panel prints (x10 for the slit,
+none for the wavelength-sized opening); the RMS maps below keep one shared
+scale, which is where the two openings are compared level for level.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_aperture_slit_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_aperture_slit.gif" alt="Animation: a 686 Hz plane wave in a 2D FDTD field hits a rigid wall with a 25 mm slit and, in a second panel, a 0.50 m opening; the narrow slit re-radiates a cylindrical wave into an otherwise dark half space with the annotated Gomperts transmission coefficient of 0.55, while the wavelength-sized opening passes a beam with sharp-edged shadows, both RMS maps on the same colour scale" width="640" height="360" loading="lazy"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_aperture_slit_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_aperture_slit.gif" alt="Animation: a 686 Hz plane wave in a 2D FDTD field hits a rigid wall with a 25 mm slit and, in a second panel, a 0.50 m opening; the narrow slit re-radiates a cylindrical wave into the half space behind, drawn with an annotated ten-fold display gain and with the Gomperts transmission coefficient of 0.55 annotated, while the wavelength-sized opening passes a beam with sharp-edged shadows at unit gain, both RMS maps on the same colour scale" width="640" height="360" loading="lazy"></picture>
 
 [Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_aperture_slit.webm)
 

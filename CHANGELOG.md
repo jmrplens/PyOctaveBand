@@ -38,6 +38,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Documentation animations: a field that sits tens of dB under the one
+  setting the colour scale is now drawn with an explicit display gain
+  instead of collapsing into the page background. The gain is measured off
+  the field itself (the largest round factor that still keeps the quiet
+  region inside the ramp, and none at all above a fifth of it) and every
+  panel that uses one prints the factor with its dB equivalent, so the
+  compression is stated wherever it applies and the measured levels stay
+  the physical ones. Two clips were regenerated in all four variants:
+  `anim_elastic_coincidence`, where the air below the plate transmits about
+  47 dB under the incident wave and the fixed x20 gain it used left it
+  black, and `anim_fdtd_aperture_slit`, where the half space past the 25 mm
+  slit is about 23 dB under the standing wave facing the wall, in the
+  instantaneous panels only, the RMS row keeping its single shared scale.
+  The English and Spanish captions say that the scale is compressed.
+
 - The home page meta description now fits the ~160-character window search
   engines display (Bing flagged the old 318-character one): the one-sentence
   definition plus the conformance-check claim, in both languages. The full
