@@ -3,8 +3,8 @@ message: "If you use this software, please cite it as below."
 type: software
 title: "phonometry: acoustic measurement toolkit for Python (formerly PyOctaveBand)"
 authors:
-  - family-names: "Requena Plens"
-    given-names: "Jose Manuel"
+  - family-names: "Requena-Plens"
+    given-names: "José M."
     email: "jmrplens@gmail.com"
     orcid: "https://orcid.org/0000-0003-1250-6212"
 repository-code: "https://github.com/jmrplens/phonometry"
