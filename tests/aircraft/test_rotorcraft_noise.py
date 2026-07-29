@@ -1100,10 +1100,10 @@ def test_event_numpy_scalar_flow_resistivity_is_scalar() -> None:
                                   flow_resistivity=2.0e5)
     for sigma in (np.float32(2.0e5), np.int64(200_000), np.array(2.0e5)):
         res = rotorcraft_event_level(hems, spd, ang, t, pos, (300.0, 0.0),
-                                     flow_resistivity=sigma)  # type: ignore[arg-type]
+                                     flow_resistivity=sigma)
         assert np.allclose(res.a_levels, base.a_levels, atol=1e-9)
     with_dem = rotorcraft_event_level(hems, spd, ang, t, pos, (300.0, 0.0),
-                                      flow_resistivity=np.float32(2.0e5),  # type: ignore[arg-type]
+                                      flow_resistivity=np.float32(2.0e5),
                                       terrain=dem, terrain_resolution=100.0)
     assert with_dem.sel == pytest.approx(base.sel, abs=1e-9)
 

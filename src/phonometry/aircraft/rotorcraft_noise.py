@@ -1468,7 +1468,8 @@ def _event_setup(
     path_angle: float | NDArray[np.float64] | list[float] | None,
     heading: float | NDArray[np.float64] | list[float] | None,
     bank_angle: float | NDArray[np.float64] | list[float] | None,
-    flow_resistivity: float | str | NDArray[np.float64] | list[float] | list[list[float]],
+    flow_resistivity: float | str | np.floating[Any] | np.integer[Any]
+    | NDArray[np.float64] | list[float] | list[list[float]],
     temperature: float,
     relative_humidity: float,
     pressure: float,
@@ -1528,7 +1529,8 @@ def _section_spacing(
 
 
 def _setup_resistivity(
-    flow_resistivity: float | str | NDArray[np.float64] | list[float] | list[list[float]],
+    flow_resistivity: float | str | np.floating[Any] | np.integer[Any]
+    | NDArray[np.float64] | list[float] | list[list[float]],
     dem: tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]] | None,
 ) -> float | NDArray[np.float64]:
     """The scalar (or per-receiver) flow resistivity of an event run."""
@@ -1834,7 +1836,7 @@ def rotorcraft_event_level(
     path_angle: float | NDArray[np.float64] | list[float] | None = None,
     heading: float | NDArray[np.float64] | list[float] | None = None,
     bank_angle: float | NDArray[np.float64] | list[float] | None = None,
-    flow_resistivity: float | str = "G",
+    flow_resistivity: float | str | np.floating[Any] | np.integer[Any] = "G",
     temperature: float = 25.0,
     relative_humidity: float = 70.0,
     pressure: float = 101.325,
