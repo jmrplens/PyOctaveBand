@@ -173,6 +173,10 @@ See the
 [contributing guide](https://github.com/jmrplens/phonometry/blob/main/CONTRIBUTING.md)
 and the
 [changelog](https://github.com/jmrplens/phonometry/blob/main/CHANGELOG.md).
+Suspected vulnerabilities go through
+[GitHub's private reporting](https://github.com/jmrplens/phonometry/security/advisories/new),
+as set out in the
+[security policy](https://github.com/jmrplens/phonometry/blob/main/SECURITY.md).
 
 ## 📄 License
 
