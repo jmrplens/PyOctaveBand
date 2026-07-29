@@ -14545,7 +14545,7 @@ def animate_fdtd_ducting(output_dir: str) -> None:
     # and the (long) centred suptitle.
     t_txt = fig.text(0.988, 0.90, "", ha="right", va="top",
                      family="monospace", fontsize=10, color=COLOR_FG)
-    reveal = int(0.83 * p_all.shape[1])    # ~26 s: pulse has crossed
+    reveal = int(0.83 * p_all.shape[1])    # ~17.5 s: pulse has crossed
     captions_on = int(0.38 * p_all.shape[1])   # first refocus is visible
 
     def update(k: int) -> tuple[Any, ...]:
