@@ -4,10 +4,11 @@
 
 phonometry is a scientific Python library. It computes acoustic, vibration and
 psychoacoustic quantities from arrays and files you hand it, inside your own
-process. It runs no service, opens no socket, holds no credentials and executes
-nothing it did not ship with. That shapes what a vulnerability can be here, so
-this policy is written for this library rather than copied from a generic
-template.
+process. It runs no service, opens no socket, holds no credentials, and never
+executes code derived from what you pass it: it calls its own code and its
+declared dependencies, nothing else. That shapes what a vulnerability can be
+here, so this policy is written for this library rather than copied from a
+generic template.
 
 ## Supported versions
 
@@ -16,24 +17,26 @@ version from `main`, and the remedy for any older version is to upgrade.
 
 | Version | Supported |
 | :--- | :--- |
-| 3.3.x (latest release) | Yes |
-| 3.0.x to 3.2.x | Upgrade to the latest 3.x |
+| Latest 3.x release | Yes |
+| Earlier 3.x releases | Upgrade to the latest 3.x |
 | 2.x and earlier, including `PyOctaveBand` | No |
 
-The `PyOctaveBand` package on PyPI is a 2.1.0 stub that only redirects to
+The `PyOctaveBand` package on PyPI is a stub that only redirects to
 `phonometry` and receives no fixes.
 
-Supported interpreters are the ones CI exercises: Python 3.13 and 3.14 on
-Ubuntu, macOS and Windows. A report that reproduces only on an interpreter or
-platform outside that matrix is handled as an ordinary bug.
+Supported interpreters and platforms are whatever the test matrix in
+[`.github/workflows/python-app.yml`](.github/workflows/python-app.yml)
+exercises, at the time of writing Python 3.13 and 3.14 on Ubuntu, macOS and
+Windows. That workflow is the authority, not this paragraph. A report that
+reproduces only outside the matrix is handled as an ordinary bug.
 
 ## Reporting a vulnerability
 
 Report privately through GitHub, with **Security > Report a vulnerability**, or
 directly at
 [github.com/jmrplens/phonometry/security/advisories/new](https://github.com/jmrplens/phonometry/security/advisories/new).
-That opens a private advisory visible only to you and me, and keeps the report,
-the fix and any CVE in one place.
+That opens a private advisory visible only to you and the maintainers, and keeps
+the report, the fix and any CVE in one place.
 
 If private reporting is not available to you, write to `mail@jmrp.io`, the
 maintainer address already published in [`CITATION.cff`](CITATION.cff) and
