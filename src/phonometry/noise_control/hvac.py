@@ -1338,7 +1338,7 @@ def diffuser_sound_power(
     area_ft2 = require_positive(face_area, "face_area") / _M_PER_FT**2
     flow_cfm = require_positive(volume_flow, "volume_flow") / _M3S_PER_CFM
     drop_in_wg = require_positive(pressure_drop, "pressure_drop") / _PA_PER_IN_WG
-    peak = require_choice(shape, "shape", ("rectangular", "round"))
+    profile = require_choice(shape, "shape", ("rectangular", "round"))
     if count <= 0:
         raise ValueError("'count' must be a positive integer.")
     # Eq. 13.28: Long prints "ft/min" under U_G but defines it as Q / (60 S_G),
@@ -1352,8 +1352,10 @@ def diffuser_sound_power(
         - 31.3
         + 10.0 * np.log10(float(count))
     )
-    a = _octave_band_number(np.array([48.8 * velocity])) - _octave_band_number(f)
-    base = -5.82 if peak == "round" else -11.82
+    # Eqs. 13.32 and 13.33: the distance in octaves from the peak band.
+    peak_band = float(np.round(np.log2(48.8 * velocity / 32.0)))
+    a = peak_band - _octave_band_number(f)
+    base = -5.82 if profile == "round" else -11.82
     return HvacSpectrumResult(
         frequencies=f,
         values=overall + base - 0.15 * a - 1.13 * a**2,
