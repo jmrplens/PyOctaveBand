@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 438 numerical conformance checks against 288 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 446 numerical conformance checks against 292 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 438 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 53 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 446 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 53 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -53,6 +53,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Special Weightings (G, B, D, AU)](https://jmrplens.github.io/phonometry/guides/special-weightings/)
 - [Time Weighting and Integration](https://jmrplens.github.io/phonometry/guides/time-weighting/)
 - [Environmental Levels (ISO 1996-1/-2)](https://jmrplens.github.io/phonometry/guides/environmental-levels/)
+- [Spanish Noise Regulation (RD 1367/2007)](https://jmrplens.github.io/phonometry/guides/spanish-noise-regulation/)
 - [Calibrated spectral analysis (Bendat & Piersol)](https://jmrplens.github.io/phonometry/guides/spectral-analysis/)
 - [Multiple and partial coherence (Bendat & Piersol)](https://jmrplens.github.io/phonometry/guides/miso-coherence/)
 - [Time-frequency analysis](https://jmrplens.github.io/phonometry/guides/time-frequency/)
@@ -98,6 +99,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Laboratory Flanking Transmission (ISO 10848)](https://jmrplens.github.io/phonometry/guides/flanking-lab/)
 - [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/guides/insulation-ratings/)
 - [Façade Sound Insulation](https://jmrplens.github.io/phonometry/guides/facade-insulation/)
+- [Spanish Building Code (CTE DB-HR)](https://jmrplens.github.io/phonometry/guides/spanish-building-code/)
 - [Predicting Panel Sound Insulation (mass law, coincidence, double walls)](https://jmrplens.github.io/phonometry/guides/panel-sound-insulation/)
 - [Floor-Covering Impact Improvement (ISO 16251-1)](https://jmrplens.github.io/phonometry/guides/impact-improvement/)
 - [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/guides/dynamic-stiffness/)
@@ -255,6 +257,7 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [building/intensity-insulation](https://jmrplens.github.io/phonometry/reference/api/building/intensity-insulation/)
 - [building/lab-insulation](https://jmrplens.github.io/phonometry/reference/api/building/lab-insulation/)
 - [building/panel-transmission](https://jmrplens.github.io/phonometry/reference/api/building/panel-transmission/)
+- [building/spanish-building-code](https://jmrplens.github.io/phonometry/reference/api/building/spanish-building-code/)
 - [building/structure-borne-power](https://jmrplens.github.io/phonometry/reference/api/building/structure-borne-power/)
 - [building/survey-insulation](https://jmrplens.github.io/phonometry/reference/api/building/survey-insulation/)
 - [correlation/correlation](https://jmrplens.github.io/phonometry/reference/api/correlation/correlation/)
@@ -273,6 +276,7 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [environment/measurement](https://jmrplens.github.io/phonometry/reference/api/environment/measurement/)
 - [environment/outdoor-propagation](https://jmrplens.github.io/phonometry/reference/api/environment/outdoor-propagation/)
 - [environment/rating](https://jmrplens.github.io/phonometry/reference/api/environment/rating/)
+- [environment/spanish-regulation](https://jmrplens.github.io/phonometry/reference/api/environment/spanish-regulation/)
 - [filters/compliance](https://jmrplens.github.io/phonometry/reference/api/filters/compliance/)
 - [filters/core](https://jmrplens.github.io/phonometry/reference/api/filters/core/)
 - [filters/equalizer](https://jmrplens.github.io/phonometry/reference/api/filters/equalizer/)
@@ -2231,6 +2235,33 @@ cycle and warn on use; they are removed in 4.0.
 | `tonal_adjustment_from_mean_audibility` | `function` | **Kt from mean audibility ΔL (ISO 1996-2 Table J.1).**<br>• `mean_audibility` [dB], `coarse` (Default: False) | `tonal_adjustment_from_mean_audibility(5.0)  # 3` |
 | `critical_bandwidth` | `function` | **Critical bandwidth (ISO 1996-2 Table C.1).**<br>• `centre_frequency` [Hz] (100 Hz ≤ 500 Hz, else 20 %·fc) | `critical_bandwidth(4000.0)  # 800 Hz` |
 | `tonal_seeking_survey` | `function` | **One-third-octave tonal screen (ISO 1996-2 Annex K).**<br>• `levels` [dB], `frequencies` [Hz] (15/8/5 dB neighbour rule) | `flags = tonal_seeking_survey(levels, freqs)` |
+| `NoisePhase` | `dataclass` | **Noise phase Ti of steady emission (RD 1367/2007 Annex IV A.3.4.2 b).**<br>• `hours` Ti [h], `laeq` background-corrected LAeq,Ti [dB]<br>• `kt`, `kf`, `ki` corrections [dB]; `label`<br>• `.correction` (capped at 9 dB), `.lkeq` | `NoisePhase(6, 50.0, kt=6, kf=3)  # LKeq,Ti = 59 dB` |
+| `tonal_correction` | `function` | **Kt from an unweighted 1/3-octave spectrum (Annex IV A.3.3).**<br>• `levels` [dB], `frequencies` [Hz]<br>• Lt = Lf − Ls against the arithmetic mean of the two neighbours; 8/12, 5/8 and 3/5 dB thresholds by band range | `res = tonal_correction(levels, freqs)`<br><br>• `TonalCorrectionResult` (`.correction`, `.plot()`) |
+| `TonalCorrectionResult` | `dataclass` | **RD 1367/2007 tonal correction.**<br>• `correction` Kt [dB] (0/3/6), `governing_frequency`<br>• `differences` Lt and `band_corrections` per band (NaN where not evaluable)<br>• `frequencies`, `levels` | `res.correction, res.governing_frequency` |
+| `low_frequency_correction` | `function` | **Kf from Lf = LCeq,Ti − LAeq,Ti (Annex IV A.3.3).**<br>• `lceq`, `laeq` [dB], background-corrected | `low_frequency_correction(63.0, 50.0)  # 3.0 dB` |
+| `impulsive_correction` | `function` | **Ki from Li = LAIeq,Ti − LAeq,Ti (Annex IV A.3.3).**<br>• `laieq`, `laeq` [dB], background-corrected | `impulsive_correction(67.0, 50.0)  # 6.0 dB` |
+| `total_correction` | `function` | **K = Kt + Kf + Ki, capped at 9 dB (Annex IV A.3.3).**<br>• `kt`, `kf`, `ki` [dB] | `total_correction(6, 3, 0)  # 9.0` |
+| `corrected_level` | `function` | **LKeq,T = LAeq,T + Kt + Kf + Ki (Annex I A.2 c).**<br>• `laeq` [dB]; `kt`, `kf`, `ki` [dB] | `corrected_level(50.0, kt=6, kf=3)  # 59.0 dB` |
+| `evaluation_period_level` | `function` | **LKeq,T from its noise phases (Annex IV A.3.4.2 b).**<br>• `phases`: `NoisePhase` list<br>• `hours` T [h] (None = sum of Ti) | `evaluation_period_level(phases, hours=12)` |
+| `long_term_corrected_level` | `function` | **Annual LK,x, energy mean of the daily levels (Annex I A.2 d).**<br>• `daily_levels` [dB]; `weights`: days each level represents | `long_term_corrected_level([57, 0], weights=[303, 62])  # 56.2` |
+| `round_reported_level` | `function` | **Rounding of Annex IV A.3.4.2: add 0,5 dB, take the integer part.**<br>• `value` [dB] | `round_reported_level(56.82)  # 57` |
+| `outdoor_quality_objectives` | `function` | **Outdoor quality objectives Ld/Le/Ln (Annex II Table A).**<br>• `area_type`: 'e','a','d','c','b' or an alias<br>• `urbanisation`: 'existing' or 'new' (−5 dB, Article 14.2) | `outdoor_quality_objectives("a")  # 65/65/55 dB` |
+| `indoor_quality_objectives` | `function` | **Indoor quality objectives (Annex II Table B).**<br>• `building_use`: 'residential','sanitary','educational'<br>• `room_type`: 'living','bedrooms','classrooms','reading_rooms' | `indoor_quality_objectives("residential", "bedrooms")` |
+| `vibration_quality_objective` | `function` | **Indoor vibration objective Law [dB] (Annex II Table C).**<br>• `building_use` | `vibration_quality_objective("residential")  # 75.0` |
+| `infrastructure_limits` | `function` | **Immission limits for new transport infrastructure (Annex III Table A1).**<br>• `area_type` | `infrastructure_limits("a")  # 60/60/50 dB` |
+| `max_infrastructure_limit` | `function` | **LAmax limit for rail and airport infrastructure (Annex III Table A2).**<br>• `area_type` | `max_infrastructure_limit("a")  # 85.0 dB` |
+| `activity_limits` | `function` | **Outdoor limits for activities and ports (Annex III Table B1).**<br>• `area_type` | `activity_limits("a")  # LK,d/e/n = 55/55/45 dB` |
+| `adjacent_premises_limits` | `function` | **Noise transmitted to acoustically adjacent premises (Annex III Table B2).**<br>• `building_use`, `room_type` | `adjacent_premises_limits("residential", "bedrooms")` |
+| `RegulationLimits` | `dataclass` | **A day/evening/night limit triple of RD 1367/2007.**<br>• `day`, `evening`, `night` [dB]; `index`, `reference`, `description`<br>• Indexable by period; `.as_dict()` | `lim["night"]` |
+| `assess_activity` | `function` | **Article 25 compliance of an activity or port.**<br>• `measurements`: phases keyed by period<br>• `limits`: a `RegulationLimits` row<br>• `long_term_levels` or `operating_days` / `year_days` / `closed_level`<br>• `new_activity` (Default: True; False = Article 25.2)<br>• `period_hours` | `v = assess_activity({"day": day}, activity_limits("a"), operating_days=303)`<br><br>• `ActivityAssessment` |
+| `ActivityAssessment` | `dataclass` | **RD 1367/2007 activity verdict.**<br>• `periods`: `PeriodAssessment` tuple; `limits`; `new_activity`<br>• `.complies`<br>• `.plot()`; `.report(path, language='es')`: one-page inspection fiche → PDF | `v.complies`<br>`v.report("acta.pdf")` |
+| `PeriodAssessment` | `dataclass` | **One evaluation period against its limit.**<br>• `evaluation_period_level`, `reported_level` (rounded)<br>• `long_term_corrected_level`, `reported_long_term`<br>• `limit`, `daily_limit` (+3), `phase_limit` (+5), `max_phase_level`<br>• `phase_pass`, `daily_pass`, `long_term_pass`, `.complies` | `p.reported_level, p.long_term_pass` |
+| `ACOUSTIC_AREA_TYPES` | `constant` | **Acoustic area types of Article 7 of Ley 37/2003, keyed by letter.**<br>e sanitary/educational/cultural, a residential, d tertiary, c recreational, b industrial, f transport systems | `ACOUSTIC_AREA_TYPES["a"]` |
+| `RD1367_EVALUATION_PERIODS` | `constant` | **The three daily evaluation periods (Annex I A.1).** | `("day", "evening", "night")` |
+| `RD1367_PERIOD_HOURS` | `constant` | **Default period durations [h] (Annex I A.1 a).** | `{"day": 12, "evening": 4, "night": 8}` |
+| `RD1367_PERIOD_CLOCK_LIMITS` | `constant` | **Local-time start/end hour of each period (Annex I A.1 b).** | `{"day": (7, 19), ...}` |
+| `RD1367_CORRECTION_VALUES` | `constant` | **The only values a single correction takes (Annex IV A.3.3).**<br>Each table grades its parameter 0, 3 or 6 dB | `RD1367_CORRECTION_VALUES  # (0.0, 3.0, 6.0)` |
+| `RD1367_MAX_CORRECTION` | `constant` | **Cap on Kt + Kf + Ki [dB] (Annex IV A.3.3).** | `9.0` |
 | `residual_sound_correction` | `function` | **Residual-noise correction L = 10 lg(10^(L'/10)−10^(Lres/10)) (Formula 16).**<br>• `measured_level` L', `residual_level` Lres [dB] | `res = residual_sound_correction(58.0, 50.0)`<br><br>• `ResidualCorrectionResult` (`.corrected_level`, `.reportable_upper_bound`, `.reliable`) |
 | `gaussian_residual_level` | `function` | **Residual Leq from percentiles (ISO 1996-2 Annex I).**<br>• `l50` [dB]; exactly one of `l90` / `l95` (must not exceed `l50`) | `gaussian_residual_level(50.0, l90=40.0)` |
 | `combined_standard_uncertainty` | `function` | **u = √(Σ(cj·uj)²) (ISO 1996-2 Formula 2).**<br>• `contributions`: cj·uj products or (uj, cj) pairs | `u = combined_standard_uncertainty([0.59, 0.3, 2.0, 0.40, 0.38])  # 2.18` |
@@ -2283,6 +2314,26 @@ cycle and warn on use; they are removed in 4.0.
 | `weighted_rating` | `function` | **Single-number rating + C/Ctr (ISO 717-1).**<br>• `values_by_band`: 16 thirds or 5 octaves [dB]<br>• `bands`: 'third-octave', 'octave' or None | `w = weighted_rating(R)`<br><br>• `WeightedRatingResult` (Rw, C, Ctr) |
 | `weighted_rating_extended` | `function` | **Rating + enlarged-range terms (ISO 717-1 Annex B).**<br>• `values_by_band` [dB] with `frequencies` [Hz] (None = the 16 core bands)<br>• `one_decimal`: 0.1 dB shift + one-decimal reductions for uncertainty statements (Default: False) | `ext = weighted_rating_extended(r, freqs)`<br><br>• `ExtendedWeightedRatingResult` (rating, c, ctr, c_50_3150 … ctr_100_5000) |
 | `ExtendedWeightedRatingResult` | `dataclass` | **Weighted rating with the enlarged-range adaptation terms (ISO 717-1 Annex B).**<br>• `rating` + `c`, `ctr`<br>• `c_50_3150`, `c_50_5000`, `c_100_5000` and the `ctr_` twins<br>• `core`: the base `WeightedRatingResult` | `res = weighted_rating_extended(freqs, r)` |
+| `db_hr_global_index` | `function` | **A-weighted global index Ix = −10 lg Σ 10^((Lx,i−Xi)/10) (CTE DB-HR Annex A, A.5-A.7).**<br>• `band_values` Xi [dB] over the 18 bands 100 Hz-5 kHz<br>• `spectrum`: 'pink','traffic','railway','aircraft'<br>• `frequencies` [Hz], `name` | `idx = db_hr_global_index(r, "pink")`<br><br>• `DbHrGlobalIndexResult` |
+| `ra` | `function` | **RA for pink noise (DB-HR Annex A).**<br>• `reduction_index` R or R' [dB]; `frequencies` | `ra(r_prime).intermediate  # 51.4 dBA` |
+| `ra_tr` | `function` | **RA,tr for road-traffic noise (DB-HR Annex A).**<br>• `reduction_index` [dB]; `frequencies` | `ra_tr(r).reported` |
+| `dnt_a` | `function` | **DnT,A between rooms, pink noise (Formula A.7).**<br>• `level_difference` DnT [dB]; `frequencies` | `dnt_a(dnt).reported` |
+| `d2m_nt_a` | `function` | **D2m,nT,A of a facade (Formula A.5).**<br>• `level_difference` D2m,nT [dB]; `frequencies`<br>• `spectrum`: 'pink' (Default) or 'railway'<br>• Clause 3.1.3.4 point 1: the quantity a railway-dominant site is assessed in | `d2m_nt_a(d, spectrum='railway').name  # 'D2m,nT,A'` |
+| `d2m_nt_atr` | `function` | **D2m,nT,Atr of a facade (Formula A.6).**<br>• `level_difference` D2m,nT [dB]; `frequencies`<br>• `spectrum`: 'traffic' (Default) or 'aircraft'<br>• Railway noise is D2m,nT,A via (A.5): use `d2m_nt_a` | `d2m_nt_atr(d).intermediate  # 32.8 dBA` |
+| `DbHrGlobalIndexResult` | `dataclass` | **A DB-HR A-weighted global index.**<br>• `value` (exact), `intermediate` (1 decimal), `reported` (integer, 3.1.3.1 point 4)<br>• `name`, `spectrum`, `reference`<br>• `frequencies`, `band_values`, `spectrum_levels`, `band_contributions`<br>• `.plot()` | `idx.value, idx.intermediate, idx.reported` |
+| `DB_HR_FREQUENCIES` | `constant` | **The eighteen 1/3-octave centres of DB-HR Annex A, 100 Hz to 5 kHz.** | `DB_HR_FREQUENCIES[0]  # 100.0` |
+| `DB_HR_NORMALISED_SPECTRA` | `constant` | **Normalised A-weighted source spectra [dBA] of Annex A Tables A.2-A.5.**<br>'pink' (A.5), 'traffic' (A.3), 'railway' (A.4, equal to A.3), 'aircraft' (A.2) | `DB_HR_NORMALISED_SPECTRA["pink"]` |
+| `window_size_correction` | `function` | **Window-size correction of RA / RA,tr [dB] (CTE Catálogo de Elementos Constructivos).**<br>• `area` [m²]: 0 up to 2,7; −1 to 3,6; −2 to 4,6; −3 above | `26 + window_size_correction(4.0)  # 24 dBA` |
+| `db_hr_facade_requirement` | `function` | **Required D2m,nT,Atr (DB-HR Table 2.1).**<br>• `ld` [dBA], `building_use`, `room_type`<br>• `dominant_noise`: 'road','railway','aircraft' (+4 dBA)<br>• `quiet_facade`: assess with Ld − 10 dBA | `db_hr_facade_requirement(62, "residential", "bedrooms")  # 32 dBA` |
+| `db_hr_airborne_requirement` | `function` | **Airborne requirements between rooms (DB-HR 2.1.1).**<br>• `receiving_room`: 'protected'/'habitable'<br>• `source_room`: 'same_unit','other_unit','installations','activity'<br>• `shared_opening`: the RA pair on the door/window and its enclosure | `(req,) = db_hr_airborne_requirement("protected", "other_unit")  # 50 dBA` |
+| `db_hr_party_wall_requirement` | `function` | **Party wall between two buildings (DB-HR 2.1.1 c), alternatives.**<br>• `quantity`: 'D2m,nT,Atr' (40 dBA per leaf) or 'DnT,A' (50 dBA for both) | `db_hr_party_wall_requirement()` |
+| `db_hr_impact_requirement` | `function` | **Impact requirement L'nT,w (DB-HR 2.1.2).**<br>• `receiving_room`, `source_room` (65 dB against another use unit, 60 dB otherwise) | `db_hr_impact_requirement("protected", "other_unit")  # ≤ 65 dB` |
+| `db_hr_reverberation_requirement` | `function` | **Reverberation / absorption requirement (DB-HR 2.2).**<br>• `room_use`: 'classroom','restaurant','common_area' (or aliases)<br>• `furnished`: classroom with seating (0,5 s) | `db_hr_reverberation_requirement("classroom")  # ≤ 0.7 s` |
+| `DbHrRequirement` | `dataclass` | **A single DB-HR performance requirement.**<br>• `quantity`, `limit`, `direction` ('min'/'max'), `unit`<br>• `decimals`: rounding before the comparison<br>• `reference`, `description` | `req.quantity, req.limit` |
+| `check_db_hr_requirement` | `function` | **Check an achieved value against a requirement.**<br>• `value`, `requirement`<br>• Rounds as DB-HR prescribes, then compares | `check_db_hr_requirement(32.8, req)`<br><br>• `DbHrCheck` |
+| `DbHrCheck` | `dataclass` | **A DB-HR requirement checked.**<br>• `requirement`, `value`, `reported`, `margin`, `complies` | `chk.reported, chk.complies` |
+| `assess_db_hr` | `function` | **Check a set of (value, requirement) pairs.**<br>• `items` | `assess_db_hr([(33.0, req)])`<br><br>• `DbHrAssessment` |
+| `DbHrAssessment` | `dataclass` | **A set of DB-HR requirement checks.**<br>• `checks`; `.complies`<br>• `.plot()` | `a.complies` |
 | `energy_average_level` | `function` | **Energy-average level (ISO 16283-1 (9)).**<br>• `levels`: Levels [dB] to average<br>• `axis`: Averaging axis (Default: -1) | `L = energy_average_level([60, 66])`<br><br>• `10 lg( mean(10^(Li/10)) )` |
 | `AirborneInsulationResult` | `dataclass` | **Field insulation per band.**<br>• `d`: Level difference D [dB]<br>• `dnt`: Standardized DnT [dB]<br>• `r_prime`: Apparent R' [dB] or None<br>• `l1`, `l2`, `t2`, `t0`: retained measurement chain (or None)<br>• `.report(path, quantity='dnt'/'r_prime', ...)`: ISO 16283-1 field test report (Annex B form) with the ISO 717-1 rating → PDF | `res.report("DnTw.pdf", metadata=ReportMetadata(requirement=50.0))` |
 | `WeightedRatingResult` | `dataclass` | **Weighted rating result.**<br>• `rating`: Rw/DnT,w … [dB], int<br>• `c`: Spectrum term C, int<br>• `ctr`: Spectrum term Ctr, int<br>• `unfavourable_sum`: [dB]<br>• `band_centers`: Measured-curve centres [Hz] or None<br>• `measured`: Measured band values [dB] or None<br>• `shifted_reference`: Shifted Table 3 reference [dB] or None | `w.rating, w.c, w.ctr` |
@@ -10734,7 +10785,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/guides/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/guides/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/reference/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 437 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 446 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -28924,6 +28975,675 @@ for ITT equipment — Part 2 (methods for describing human perception based on
 the Sottek Hearing Model)*: the Sottek Hearing Model tonality (tu_HMS,
 clause 6), roughness (asper, clause 7) and fluctuation strength (vacil_HMS,
 clause 9, the HSA-based envelope analysis).
+
+---
+
+
+<!-- source: docs/spanish-building-code.md | canonical: https://jmrplens.github.io/phonometry/guides/spanish-building-code/ -->
+Source: https://jmrplens.github.io/phonometry/guides/spanish-building-code/
+
+# Spanish Building Code (CTE DB-HR)
+
+The *Documento Básico HR* "Protección frente al ruido" of the Spanish building
+code states its requirements in A-weighted global quantities that are close
+relatives of, but not identical to, the ISO 717-1 weighted ratings: $R_A$,
+$R_{A,tr}$, $D_{nT,A}$ and $D_{2m,nT,Atr}$. This page implements the direct
+Annex A route, which is the normative one for DB-HR, the requirement tables of
+clause 2, and the two design calculations most often used with them: the
+window-size correction and the insulation of a composite facade.
+
+The band spectra it consumes come from field measurement or from prediction;
+the ISO 717 reference-curve engine, which it is worth not confusing this with,
+is in [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/guides/insulation-ratings/).
+
+## The global index of Annex A
+
+Instead of shifting a reference curve, DB-HR weights the measured band
+insulation with a normalised source spectrum and sums it energetically
+(Formulae A.5 to A.7):
+
+$$
+I_x = -10 \lg \sum_i 10^{(L_{x,i} - X_i)/10} \quad \text{[dBA]}
+$$
+
+where $X_i$ is the band insulation (the sound reduction index $R$ or $R'$, the
+standardized level difference $D_{nT}$, $D_{2m,nT}$ and so on) and $L_{x,i}$
+the normalised source spectrum. The sum runs over **eighteen** one-third-octave
+bands, 100 Hz to 5 kHz, two more than the sixteen of ISO 717-1 (100 Hz to
+3150 Hz): the 4 kHz and 5 kHz bands, which are the first reason the two routes
+do not always agree. The band centres are in `DB_HR_FREQUENCIES`.
+
+| Normalised spectrum | Annex A table | Quantity it defines | Formula |
+| :--- | :--- | :--- | :--- |
+| A-weighted pink noise, $L_{Ar,i}$ | Table A.5 | $R_A$, $D_{nT,A}$, $D_{2m,nT,A}$ | (A.5), (A.7) |
+| Road traffic, $L_{Atr,i}$ | Table A.3 | $R_{A,tr}$, $D_{2m,nT,Atr}$ | (A.6) |
+| Railway noise, $L_{Aef,i}$ | Table A.4 (numerically identical to A.3) | $D_{2m,nT,A}$ | (A.5) |
+| Aircraft noise, $L_{Aav,i}$ | Table A.2 | $D_{2m,nT,Atr}$ | (A.6) |
+
+The railway row is the one worth reading twice. Clause 3.1.3.4 point 1 says
+that where railway noise dominates the facade is assessed in
+$D_{2m,nT,A}$ through formula (A.5), and only road traffic and aircraft give
+$D_{2m,nT,Atr}$ through (A.6); Table H.1 prints the same split. Because
+Table A.4 is digit for digit Table A.3, a rail-dominant facade comes out at
+the same *number* as a road one, but the quantity the requirement and the
+report are stated in is not the same. That is why `d2m_nt_a()` and
+`d2m_nt_atr()` are separate entry points and each refuses the other's
+spectra, rather than one function with a spectrum switch that would silently
+put the wrong name on the result.
+
+All four are in `DB_HR_NORMALISED_SPECTRA` under the keys `"pink"`,
+`"traffic"`, `"railway"` and `"aircraft"`. The calculation below reproduces
+Ejemplo 7.2 of the *Manual*, the apparent sound reduction index $R'$ of a party
+wall taken from a real field test report:
+
+```python
+from phonometry import building
+
+r_prime = [36.2, 41.5, 36.9, 40.4, 44.7, 42.4, 45.7, 46.1, 47.1,
+           52.3, 54.3, 57.5, 57.8, 57.3, 59.0, 62.8, 64.7, 65.3]
+index = building.ra(r_prime)
+index.value        # 51.44 dBA
+index.intermediate # 51.4 dBA, the one-decimal intermediate
+index.reported     # 51 dBA, the integer that defines the requirement
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dbhr_global_index_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dbhr_global_index.svg" alt="CTE DB-HR global index R'A: per-band apparent sound reduction index as bars with the pink-noise weighted transmitted level per band, whose energy sum sets the 51.4 dBA index" width="80%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import building
+
+r_prime = [36.2, 41.5, 36.9, 40.4, 44.7, 42.4, 45.7, 46.1, 47.1,
+           52.3, 54.3, 57.5, 57.8, 57.3, 59.0, 62.8, 64.7, 65.3]
+
+building.ra(r_prime).plot()
+plt.show()
+```
+
+</details>
+
+`ra()`, `ra_tr()`, `dnt_a()`, `d2m_nt_a()` and `d2m_nt_atr()` are named shortcuts over
+`db_hr_global_index()`, which accepts any spectrum and, given the
+`frequencies` argument, selects the eighteen DB-HR bands out of a longer
+series.
+
+## Rounding and the relationship with the ISO 717 route
+
+Clause 3.1.3.1 point 4 of DB-HR requires the final values of the quantities
+that define the requirements to be expressed rounded to an integer, while
+intermediate values are carried with one decimal. The result object therefore
+exposes all three forms: `.value` (unrounded), `.intermediate` (one decimal)
+and `.reported` (the integer used in the check).
+
+DB-HR and ISO 717-1 reach the same place by different routes, and Annex H of
+the document itself accepts three approximations as long as the two routes
+differ by less than 1 dB:
+
+$$D_{nT,A} \approx D_{nT,w} + C \quad (H.1), \qquad
+D_{2m,nT,A} \approx D_{2m,nT,w} + C \quad (H.2), \qquad
+D_{2m,nT,Atr} \approx D_{2m,nT,w} + C_{tr} \quad (H.3)$$
+
+with (H.2) covering the rail-dominant case of the previous section. On the two
+published spectra this page reproduces, the agreement is exact to the integer:
+
+| Case | Direct route (Annex A) | ISO 717-1 route | Published? |
+| :--- | :--- | :--- | :--- |
+| Separating wall of Ejemplo 7.2 | $R'_A = 51.4$ dBA, rounded to 51 | $R'_w = 52$ with $C_{100-5000} = -1$, i.e. 51 | yes, Ejemplo 7.1 prints $R'_w = 52$, $C = -1$ and the 51 dBA |
+| Facade of Ejercicio 7.1 | $D_{2m,nT,Atr} = 32.8$ dBA, rounded to 33 | $D_{2m,nT,w} = 38$ with $C_{tr,100-5000} = -5$, i.e. 33 | no, the book prints neither 38 nor $-5$ |
+
+The two rows are not equally strong evidence. The wall row is a genuine
+external check, because the *Manual* prints the ISO 717-1 numbers as well as
+the direct one. For the facade the book publishes only the 32,8 dBA; the 38
+and the $-5$ come from this library's own ISO 717-1 engine, so that row shows
+the two routes agreeing with each other rather than agreeing with a source.
+
+The real trap is the name of the spectrum adaptation terms. Annex H writes
+them as plain $C$ and $C_{tr}$ and refers their definition to
+UNE-EN ISO 717-1 without narrowing the frequency range. Since the DB-HR
+indices run to 5 kHz while the ISO 717-1 core range stops at 3150 Hz, the
+terms that make (H.1) to (H.3) come out right are the **enlarged-range**
+$C_{100-5000}$ and $C_{tr,100-5000}$; that reading is not in Annex H itself
+but in the *Manual*, in the note to expressions [7.15] and [7.16]. It matters:
+on the facade of Ejercicio 7.1 the core-range $C$ is $-2$ while $C_{100-5000}$
+is $-1$, so taking the wrong one gives 36 dBA instead of 37 for the
+$D_{2m,nT,A}$ of that facade. On the same specimen $C_{tr}$ and
+$C_{tr,100-5000}$ are both $-5$, so the $D_{2m,nT,Atr}$ that DB-HR actually
+requires happens not to discriminate between the two readings at all.
+
+```python
+from phonometry import building, weighted_rating_extended
+
+d2m_nt = [28.5, 28.5, 18.9, 23.7, 30.7, 31.3, 37.8, 35.2, 34.7,
+          38.5, 37.7, 43.1, 42.3, 44.2, 41.9, 37.5, 39.4, 41.5]
+
+direct = building.d2m_nt_atr(d2m_nt)
+direct.intermediate, direct.reported   # 32.8 dBA -> 33 dBA
+
+iso = weighted_rating_extended(d2m_nt, building.DB_HR_FREQUENCIES)
+iso.rating, iso.ctr_100_5000           # 38 dB, -5 dB -> 33 dBA, the same figure
+iso.c, iso.c_100_5000                  # -2 and -1: core range versus enlarged range
+```
+
+## The requirements of clause 2
+
+DB-HR states its requirements on two kinds of room: the **protected room**
+(*recinto protegido*, a habitable room with reinforced acoustic protection:
+bedrooms, living areas, classrooms, operating theatres, professional offices)
+and the **habitable room** (*recinto habitable*) in general.
+
+**Facades (Table 2.1).** The requirement on $D_{2m,nT,Atr}$ is read by bands of
+the site's day noise index $L_d$ ($L_d \le 60$, $60 < L_d \le 65$,
+$65 < L_d \le 70$, $70 < L_d \le 75$ and $L_d > 75$ dBA):
+
+| Use and room | $\le 60$ | 60-65 | 65-70 | 70-75 | $> 75$ |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| Residential and hospital, bedrooms; cultural, health, educational and administrative, living areas | 30 | 32 | 37 | 42 | 47 |
+| Residential and hospital, living areas; cultural, health, educational and administrative, classrooms | 30 | 30 | 32 | 37 | 42 |
+
+Three rules modify the reading: a facade not directly exposed to the dominant
+noise (an enclosed courtyard, a quiet surrounding) is assessed with $L_d$
+reduced by 10 dBA, where aircraft noise dominates the table value is increased
+by 4 dBA, and where no official $L_d$ exists for the site, 60 dBA is assumed
+for residential acoustic areas.
+
+**Airborne insulation between rooms (clause 2.1.1).** Partition walls
+(*tabiquería*) within one use unit must have $R_A \ge 33$ dBA. Against a room
+of another use unit, a protected room requires $D_{nT,A} \ge 50$ dBA and a
+habitable room $\ge 45$ dBA; against a services or activity room, a protected
+room requires $\ge 55$ dBA and a habitable room $\ge 45$ dBA. When the two
+rooms share a door or a window, the requirement moves to the opening (sound
+reduction index of 30 dBA for the protected room, 20 dBA for the habitable
+one) and to the enclosure around it (50 dBA).
+
+**Party walls (clause 2.1.1 c).** Against a *medianería* DB-HR offers two
+**alternative** routes, not cumulative ones: either each of the two leaves
+reaches $D_{2m,nT,Atr} \ge 40$ dBA, or the two leaves taken together reach
+$D_{nT,A} \ge 50$ dBA. `db_hr_party_wall_requirement()` returns whichever route
+is asked for.
+
+**Impact sound (clause 2.1.2).** The standardized impact sound pressure level
+$L'_{nT,w}$ must not exceed 65 dB in a protected room against a room of another
+use unit, nor 60 dB against a services or activity room; that same 60 dB limit
+applies to the habitable room.
+
+**Reverberation and absorption (clause 2.2).** The reverberation time must not
+exceed 0.7 s in an empty classroom or conference hall under 350 m³, 0.5 s with
+the fixed seating installed, or 0.9 s in empty restaurants and dining rooms. In
+common areas sharing doors with protected rooms, the equivalent sound
+absorption area must be at least 0.2 m² per cubic metre of volume.
+
+```python
+from phonometry import building
+
+facade = building.db_hr_facade_requirement(65.0, "residential", "bedrooms")
+facade.limit                                        # 32 dBA (Table 2.1)
+
+airborne = building.db_hr_airborne_requirement("protected", "other_unit")
+[(r.quantity, r.limit) for r in airborne]           # [("DnT,A", 50.0)]
+
+building.db_hr_impact_requirement("protected", "other_unit").limit    # 65 dB
+building.db_hr_party_wall_requirement().limit                         # 40 dBA per leaf
+building.db_hr_party_wall_requirement("DnT,A").limit                  # 50 dBA both together
+building.db_hr_reverberation_requirement("classroom").limit           # 0.7 s
+
+check = building.assess_db_hr([(33.0, facade), (51.44, airborne[0])])
+check.complies                                      # True
+```
+
+`check_db_hr_requirement()` rounds the achieved value the way DB-HR asks before
+comparing it (to an integer for the dB quantities, to one decimal for the
+reverberation time) and returns the margin; `assess_db_hr()` does the same over
+a list of value-requirement pairs.
+
+## Windows and composite facades
+
+The tests that determine the sound reduction index of a window are run on
+specimens of about 1.8 m², and a larger window insulates less. The *Catálogo de
+Elementos Constructivos* of the building code corrects the catalogue value of
+$R_A$ and $R_{A,tr}$ by total window area: 0 dB up to 2.7 m², $-1$ dB between
+2.7 and 3.6 m², $-2$ dB between 3.6 and 4.6 m² and $-3$ dB above 4.6 m². A 4 m²
+sliding window with 4-6-4 glazing, catalogued at $R_A = 26$ dBA, ends up at
+24 dBA (Ejemplo 7.4).
+
+A real facade is not a homogeneous element: it has a blind part and one or more
+openings. The sound reduction index of the whole follows from the
+area-weighted sum of the transmittances, which is what
+`composite_transmission_loss()` does in
+[Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/guides/panel-sound-insulation/). With the 8 m²
+facade of Ejemplo 7.5, a blind part of 40 dBA and a 2 m² window of 26 dBA, the
+whole comes out at 31.5 dBA:
+
+```python
+from phonometry import building
+from phonometry.building.aperture_transmission import composite_transmission_loss
+
+building.window_size_correction(4.0)          # -2 dB: 26 dBA catalogued -> 24 dBA
+
+composite_transmission_loss([6.0, 2.0], [40.0, 26.0])   # 31.53 dBA
+composite_transmission_loss([6.0, 2.0], [50.0, 26.0])   # 31.97 dBA: +10 dBA on the blind part
+composite_transmission_loss([6.0, 2.0], [40.0, 31.0])   # 35.63 dBA: +5 dBA on the window
+```
+
+Those last three lines hold the most useful rule of thumb in facade design:
+improving the blind part by 10 dBA raises the overall insulation by 0.4 dBA,
+practically nothing, whereas improving the window by 5 dBA raises it by
+4.1 dBA, almost the full increment. The weak element is where the effort pays.
+
+## Plots
+
+`DbHrGlobalIndexResult.plot()` draws the band insulation together with the
+transmitted level weighted by the normalised spectrum, as in the figure above:
+it shows at a glance which bands dominate the energy sum, and therefore where
+the element has to be improved. `DbHrAssessment.plot()` draws the achieved
+values against their limits, one per checked requirement.
+
+## What this guide covers
+
+**Covered.** The DB-HR Annex A global index (Formulae A.5 to A.7) over the
+eighteen bands from 100 Hz to 5 kHz with the four normalised spectra of Tables
+A.2 to A.5, the rounding of clause 3.1.3.1 point 4, the requirements of clause
+2 (Table 2.1 for facades, 2.1.1 airborne and party walls, 2.1.2 impact and 2.2
+reverberation and absorption) and the window-size correction of the *Catálogo
+de Elementos Constructivos*.
+
+**Not covered.** The design options of clause 3 (the simplified option with its
+solution tables, and the general option, which is the EN 12354 prediction) are
+not implemented here: the calculation route of the general option lives in
+[Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/guides/insulation-prediction/). The
+execution conditions of clause 5 and the maintenance conditions of clause 6
+are out of scope as well.
+
+## Quick answers
+
+### How does the DB-HR index RA differ from the Rw of ISO 717-1?
+
+The $R_w$ of ISO 717-1 comes from shifting a reference curve over sixteen
+one-third-octave bands (100 Hz to 3150 Hz). The $R_A$ of DB-HR comes from
+weighting the band sound reduction index with a normalised pink-noise spectrum
+and summing energetically over **eighteen** bands (100 Hz to 5 kHz). DB-HR
+accepts the equivalence $R_A \approx R_w + C$, but that $C$ is the
+enlarged-range term $C_{100-5000}$, not the core-range one.
+
+## See also
+
+- [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/guides/insulation-ratings/): the reference-curve
+  route with Rw, C, Ctr and the enlarged-range terms that DB-HR calls simply C
+  and Ctr.
+- [Spanish Noise Regulation (RD 1367/2007)](https://jmrplens.github.io/phonometry/guides/spanish-noise-regulation/): where
+  the site's day noise index Ld that Table 2.1 is entered with comes from.
+- [Façade Sound Insulation](https://jmrplens.github.io/phonometry/guides/facade-insulation/): the ISO 16283-3 measurement
+  of D2m,nT and its EN 12354-3 prediction, which feed the D2m,nT,Atr index of
+  this page.
+- [Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/guides/panel-sound-insulation/): the
+  composite-facade calculation and transmission through openings and slits.
+- [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/guides/insulation-field/): the band
+  spectra of R', DnT and L'nT that these global quantities summarise.
+- API reference: [`building.spanish_building_code`](https://jmrplens.github.io/phonometry/reference/api/building/spanish-building-code/).
+
+## References
+
+- Avilés López, R., & Perera Martín, R. (2017). *Manual de acústica ambiental
+  y arquitectónica*. Paraninfo. ISBN 978-84-283-3814-1.
+  Ejemplo 7.2 and Ejercicio 7.1 (pp. 394-395) are the numeric oracles of the
+  global index on this page, and Ejemplos 7.4 and 7.5 (pp. 408-410) the
+  window-size correction and the composite-facade calculation.
+- Ministerio de la Presidencia (Spain). (2007). *Real Decreto 1367/2007,
+  developing Ley 37/2003 del Ruido on acoustic zoning, quality objectives and
+  acoustic emissions* (BOE-A-2007-18397).
+  [BOE consolidated text](https://www.boe.es/buscar/act.php?id=BOE-A-2007-18397).
+  The source of the day noise index Ld that Table 2.1 of DB-HR is read
+  against.
+
+## Standards
+
+CTE Documento Básico HR *Protección frente al ruido*, the noise part of the
+Spanish building code:
+[codigotecnico.org](https://www.codigotecnico.org/pdf/Documentos/HR/DBHR.pdf).
+The Annex A global index (Formulae A.5 to A.7) over the eighteen bands 100 Hz
+to 5 kHz with the normalised spectra of Tables A.2 to A.5, the rounding rule of
+clause 3.1.3.1 point 4, and the requirements of clause 2: Table 2.1 for
+facades, 2.1.1 for airborne insulation and party walls, 2.1.2 for impact sound
+and 2.2 for reverberation and absorption.
+
+---
+
+
+<!-- source: docs/spanish-noise-regulation.md | canonical: https://jmrplens.github.io/phonometry/guides/spanish-noise-regulation/ -->
+Source: https://jmrplens.github.io/phonometry/guides/spanish-noise-regulation/
+
+# Spanish Noise Regulation (RD 1367/2007)
+
+Acoustic assessment in Spain does not stop at an $L_{Aeq}$. Real Decreto
+1367/2007, which develops Ley 37/2003 del Ruido, defines an index of its own,
+the **corrected equivalent continuous sound pressure level** $L_{Keq,T}$, and
+builds the whole compliance chain on it: the day is split into evaluation
+periods, each period into noise phases, each phase is corrected for tonal,
+low-frequency and impulsive character, the result is integrated up to an
+annual value, and that value is compared against three different criteria read
+off the same limit table. This page implements that chain end to end.
+
+The per-period levels that feed it come from
+[Integrated & Statistical Levels](https://jmrplens.github.io/phonometry/guides/levels/), and the European
+$L_{den}$/$L_{dn}$ indicators they coexist with, from
+[Environmental levels](https://jmrplens.github.io/phonometry/guides/environmental-levels/).
+
+## The corrected level LKeq and its three corrections
+
+The index of the regulation is (Annex I A.2 c):
+
+$$
+L_{Keq,T} = L_{Aeq,T} + K_t + K_f + K_i
+$$
+
+where $L_{Aeq,T}$ is the A-weighted equivalent continuous sound pressure level,
+already corrected for background noise, and the three corrections penalise the
+character of the noise. Each is 0, 3 or 6 dB, and their sum is capped at 9 dB
+(Annex IV A.3.3), a cap exposed as `RD1367_MAX_CORRECTION`. Although the index
+derives from an A-weighted level, the regulation expresses it in dB.
+
+| Correction | Input quantity | Thresholds | Function |
+| :--- | :--- | :--- | :--- |
+| $K_t$, emergent tonal components | **Unweighted** one-third-octave spectrum; $L_t = L_f - L_s$, with $L_s$ the **arithmetic** mean of the two adjacent bands | 8/12 dB (20 to 125 Hz), 5/8 dB (160 to 400 Hz), 3/5 dB (500 Hz to 10 kHz) | `tonal_correction()` |
+| $K_f$, low-frequency components | $L_f = L_{Ceq,Ti} - L_{Aeq,Ti}$ | 0 dB up to 10 dB, 3 dB for $10 < L_f \le 15$, 6 dB above | `low_frequency_correction()` |
+| $K_i$, impulsive components | $L_i = L_{AIeq,Ti} - L_{Aeq,Ti}$ | the same 10 and 15 dB | `impulsive_correction()` |
+
+$K_t$ is evaluated band by band and, when several emergent tones are present,
+the largest of the resulting $K_t$ governs (step d):
+
+```python
+from phonometry import environmental
+
+freqs = [100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000]
+levels = [58.0, 60.0, 59.0, 61.0, 72.0, 62.0, 60.0, 58.0, 56.0, 54.0, 52.0]
+
+kt = environmental.tonal_correction(levels, freqs)
+kt.correction              # 6 dB
+kt.governing_frequency     # 250.0 Hz
+kt.differences[4]          # Lt = 10.5 dB above the mean of the neighbours
+
+environmental.low_frequency_correction(lceq=76.0, laeq=63.0)   # Lf = 13 dB -> Kf = 3 dB
+environmental.impulsive_correction(laieq=68.0, laeq=63.0)      # Li = 5 dB  -> Ki = 0 dB
+environmental.corrected_level(63.0, kt=6, kf=3, ki=0)          # LKeq = 72.0 dB
+environmental.total_correction(kt=6, kf=6, ki=3)               # 9.0 dB: the cap
+```
+
+## Relationship with the ISO 1996 procedures
+
+The corrections of the regulation resemble ISO 1996 procedures the library
+already implements, but they are **not interchangeable**, which is why this
+module implements the RD's own variants instead of delegating to them:
+
+- `tonal_audibility()` / `tonal_adjustment()` are the engineering method of
+  ISO 1996-2 Annex C, based on the audibility $\Delta L_{ta}$ within the
+  critical band around the tone, and return a **continuous** $K_t$ between 0
+  and 6 dB. The RD works on one-third-octave band differences and produces
+  only 0, 3 or 6 dB.
+- `tonal_seeking_survey()` (survey method, ISO 1996-2:2017 Annex K) is the
+  closest relative, because it also splits the spectrum at 125 and 400 Hz, but
+  it requires the band to exceed **both** neighbours by 15/8/5 dB and only
+  returns a prominence flag; the RD compares against the **mean** of the
+  neighbours with 8/5/3 dB thresholds and grades the result.
+- `impulsive_sound_adjustment()` is the onset-rate method of ISO/PAS 1996-3 on
+  a calibrated signal. The RD's $K_i$ is the classic $L_{AIeq} - L_{Aeq}$
+  difference read off a sound level meter, not the same quantity.
+- $K_f$ has no counterpart in ISO 1996 at all: the $L_{Ceq} - L_{Aeq}$
+  difference is specific to the Spanish regulation.
+
+## Evaluation periods and noise phases
+
+The regulation defines three evaluation periods (Annex I A.1): day from 07:00
+to 19:00 (12 h), evening from 19:00 to 23:00 (4 h) and night from 23:00 to
+07:00 (8 h), with the durations and clock limits in `RD1367_PERIOD_HOURS` and
+`RD1367_PERIOD_CLOCK_LIMITS`.
+
+When emission varies within a period, the period is split into **noise phases**
+$T_i$ of uniformly perceived level. $L_{Aeq,Ti}$ is measured over at least 5 s
+in each phase and corrected, and the period level is the energy mean weighted
+by phase duration (Annex IV A.3.4.2 b):
+
+$$
+L_{Keq,T} = 10 \lg \left[ \frac{1}{T} \sum_i T_i \, 10^{L_{Keq,Ti}/10} \right]
+$$
+
+The annual average $L_{K,x}$ of each period is in turn the energy mean of the
+daily $L_{Keq,x}$ over the year (Annex I A.2 d). The regulation also fixes its
+own rounding: add 0.5 dB to the result and take the integer part, which is what
+`round_reported_level()` does.
+
+```python
+from phonometry import environmental
+
+environmental.RD1367_PERIOD_CLOCK_LIMITS["day"]     # (7, 19)
+environmental.RD1367_PERIOD_HOURS["day"]            # 12.0 h
+
+day = [environmental.NoisePhase(2, 0.0, label="cerrada"),
+       environmental.NoisePhase(6, 50.0, kt=6, kf=3),
+       environmental.NoisePhase(4, 48.0, kt=3, kf=3)]
+
+lkeq_d = environmental.evaluation_period_level(day)   # 56.82 dB, unrounded
+environmental.round_reported_level(lkeq_d)            # 57 dB
+
+lk_d = environmental.long_term_corrected_level([57.0, 0.0], weights=[303, 62])
+environmental.round_reported_level(lk_d)              # 56 dB (303 days open, 62 closed)
+```
+
+## Acoustic quality objectives and immission limit values
+
+The regulation separates two families of values. The **acoustic quality
+objectives** of Annex II are what the whole set of acoustic emitters reaching
+an acoustic area or a room must meet; the **immission limit values** of Annex
+III are what a single emitter is held to.
+
+| Table | Content | Function |
+| :--- | :--- | :--- |
+| Annex II, Table A | Outdoor objectives by acoustic area type: e 60/60/50, a 65/65/55, d 70/70/65, c 73/73/63, b 75/75/65 dB (as amended by RD 1038/2012) | `outdoor_quality_objectives()` |
+| Annex II, Table B | Indoor objectives by building use and room type | `indoor_quality_objectives()` |
+| Annex II, Table C | Vibration objective $Law$ | `vibration_quality_objective()` |
+| Annex III, Tables A1 and A2 | Limit values for new road, rail and airport infrastructure, and $L_{Amax}$ | `infrastructure_limits()`, `max_infrastructure_limit()` |
+| Annex III, Table B1 | Limit values for port infrastructure and activities | `activity_limits()` |
+| Annex III, Table B2 | Noise transmitted by activities to acoustically adjacent premises | `adjacent_premises_limits()` |
+
+Two details of Table A are worth keeping in mind. Acoustic area type f (general
+transport-infrastructure systems and public facilities) carries no numeric
+value: footnote 2 refers it to the objectives of the adjoining areas, which is
+why `ACOUSTIC_AREA_TYPES` lists it but the limit functions do not accept it.
+And in areas urbanised after the regulation entered into force (24 October
+2007) the objective is 5 dB stricter (Article 14.2), which is what
+`urbanisation="new"` applies.
+
+```python
+from phonometry import environmental
+
+environmental.outdoor_quality_objectives("a")                       # 65 / 65 / 55 dB
+environmental.outdoor_quality_objectives("a", urbanisation="new")   # 60 / 60 / 50 dB
+environmental.indoor_quality_objectives("residential", "bedrooms")  # 40 / 40 / 30 dB
+environmental.infrastructure_limits("a")                            # 60 / 60 / 50 dB
+environmental.max_infrastructure_limit("a")                         # 85 dB (LAmax)
+environmental.activity_limits("a")                                  # 55 / 55 / 45 dB
+environmental.adjacent_premises_limits("residential", "bedrooms")   # 35 / 35 / 25 dB
+environmental.vibration_quality_objective("residential")            # 75 dB
+```
+
+Meeting an immission limit value is not simply staying below the number in the
+table. For activities and port infrastructure, Article 25.1 b) demands three
+things at once: no annual average $L_{K,x}$ above the table value, no daily
+$L_{Keq,x}$ more than 3 dB above it, and no $L_{Keq,Ti}$ measured in a noise
+phase more than 5 dB above it. For the inspection of an activity already in
+operation, Article 25.2 applies only the last two.
+
+## Worked example: a new activity on residential land
+
+A new activity on residential land (acoustic area type a) opens continuously
+from 9 to 21 h. A noisy machine runs only between 9 and 15 h; for the rest of
+the opening hours the levels are steady, and while the activity is shut down it
+emits nothing. The levels measured outdoors, already corrected for background
+noise, are:
+
+| Phase | $L_{Aeq,5s}$ | $K_t$ | $K_f$ | $K_i$ | $K$ | $L_{Keq,5s}$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| With the noisy machine | 50 dB | 6 | 3 | 0 | 9 | 59 dB |
+| Rest of the opening hours | 48 dB | 3 | 3 | 0 | 6 | 54 dB |
+
+The day period splits into three phases (2 h closed, 6 h with the machine, 4 h
+with the remaining sources) and gives $L_{Keq,d} = 57$ dB; the evening period
+splits into two (2 h open, 2 h closed) and gives $L_{Keq,e} = 51$ dB. The
+activity opens 303 days a year and closes 62 (July and August), from which
+$L_{K,d} = 56$ dB and $L_{K,e} = 50$ dB. The limit values for area type a
+(Annex III, Table B1) are 55/55/45 dB, so the applicable criteria are 60 dB on
+each $L_{Keq,Ti}$, 58 dB on the daily $L_{Keq,x}$ and 55 dB on the annual
+$L_{K,x}$:
+
+```python
+from phonometry import environmental
+
+day = [environmental.NoisePhase(2, 0.0, label="cerrada"),
+       environmental.NoisePhase(6, 50.0, kt=6, kf=3),
+       environmental.NoisePhase(4, 48.0, kt=3, kf=3)]
+evening = [environmental.NoisePhase(2, 48.0, kt=3, kf=3),
+           environmental.NoisePhase(2, 0.0, label="cerrada")]
+
+limits = environmental.activity_limits("a")          # 55 / 55 / 45 dB
+verdict = environmental.assess_activity(
+    {"day": day, "evening": evening}, limits, operating_days=303)
+
+verdict.periods[0].reported_level        # 57 dB  (LKeq,d)
+verdict.periods[0].reported_long_term    # 56 dB  (LK,d)
+verdict.complies                         # False: LK,d exceeds 55 dB
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rd1367_activity_assessment_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rd1367_activity_assessment.svg" alt="RD 1367/2007 activity assessment: per-period maximum phase level, daily LKeq,x and annual LK,x against the +5 dB, +3 dB and table limit values, with the day annual level exceeding its limit" width="80%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import environmental
+
+day = [environmental.NoisePhase(2, 0.0, label="cerrada"),
+       environmental.NoisePhase(6, 50.0, kt=6, kf=3),
+       environmental.NoisePhase(4, 48.0, kt=3, kf=3)]
+evening = [environmental.NoisePhase(2, 48.0, kt=3, kf=3),
+           environmental.NoisePhase(2, 0.0, label="cerrada")]
+
+verdict = environmental.assess_activity(
+    {"day": day, "evening": evening},
+    environmental.activity_limits("a"),
+    operating_days=303,
+)
+verdict.plot()
+plt.show()
+```
+
+</details>
+
+The verdict is the fine point of the example. The measured $L_{Keq,Ti}$ (59 and
+54 dB) stay below 60 dB, and the daily values (57 and 51 dB) below 58 dB, but
+the annual average of the day period, $L_{K,d} = 56$ dB, exceeds the 55 dB of
+the table. A **new** activity does not comply. An activity already in
+operation, judged under Article 25.2, would comply, because only the phase and
+daily values are required of it; building the verdict with
+`new_activity=False` shows exactly that.
+
+## Plots and the inspection report
+
+`ActivityAssessment.plot()` draws the three indices of each period against
+their three criteria, as in the figure above, and
+`TonalCorrectionResult.plot()` draws the one-third-octave spectrum with the
+$L_t$ differences that justify the applied $K_t$.
+
+`ActivityAssessment.report()` goes one step further and renders a one-page
+acoustic inspection fiche: identification header, per-phase measurement table
+with the $K_t$/$K_f$/$K_i$ corrections, per-period assessment against the
+applicable limit values and the boxed verdict. The default language is Spanish,
+the language of the regulation; `language="en"` translates it.
+
+```python
+from phonometry import environmental
+
+verdict = environmental.assess_activity(
+    {"day": [environmental.NoisePhase(2, 0.0, label="cerrada"),
+             environmental.NoisePhase(6, 50.0, kt=6, kf=3),
+             environmental.NoisePhase(4, 48.0, kt=3, kf=3)],
+     "evening": [environmental.NoisePhase(2, 48.0, kt=3, kf=3),
+                 environmental.NoisePhase(2, 0.0, label="cerrada")]},
+    environmental.activity_limits("a"),
+    operating_days=303,
+)
+
+verdict.plot()                       # the three criteria per period
+verdict.report("acta.pdf")           # acoustic inspection fiche, in Spanish
+```
+
+## What this guide covers
+
+**Covered.** The corrected level $L_{Keq,T}$ and the $K_t$, $K_f$ and $K_i$
+corrections of RD 1367/2007 (Annex I A.2 c and Annex IV A.3.3), the evaluation
+periods and the noise-phase and annual integration (Annex I A.1 and Annex IV
+A.3.4.2 b) with the regulation's own rounding, the acoustic quality objective
+(Annex II) and immission limit value (Annex III) tables, and the Article 25
+compliance check of activities and port infrastructure.
+
+**Not covered.** The acoustic zoning into acoustic areas, the noise maps and
+the action plans of Ley 37/2003 are planning instruments rather than
+calculations, and are out of scope. The measurement procedures themselves
+(microphone positions, series duration, number of measurements of Annex IV) are
+not implemented either: this page starts where the sound level meter ends.
+
+## Quick answers
+
+### What is the LKeq level of RD 1367/2007?
+
+It is the **corrected** equivalent continuous sound pressure level:
+$L_{Keq,T} = L_{Aeq,T} + K_t + K_f + K_i$ (Annex I A.2 c), where $K_t$, $K_f$
+and $K_i$ penalise the presence of emergent tonal, low-frequency and impulsive
+components with 0, 3 or 6 dB each. The sum of the three corrections never
+exceeds 9 dB.
+
+## See also
+
+- [Environmental levels](https://jmrplens.github.io/phonometry/guides/environmental-levels/): the Lden and Ldn indicators
+  and the ISO 1996-2 adjustments the corrections of the regulation coexist
+  with.
+- [Integrated & Statistical Levels](https://jmrplens.github.io/phonometry/guides/levels/): the per-phase LAeq, LCeq and
+  LAIeq levels that feed the three corrections.
+- [Spanish Building Code (CTE DB-HR)](https://jmrplens.github.io/phonometry/guides/spanish-building-code/): the other half
+  of the Spanish framework, which shares the site's day noise index Ld with
+  this page.
+- [Impulsive-sound prominence](https://jmrplens.github.io/phonometry/guides/impulse-prominence/): the ISO/PAS 1996-3
+  impulsive adjustment, the relative of Ki that is not interchangeable with it.
+- API reference: [`environmental.spanish_regulation`](https://jmrplens.github.io/phonometry/reference/api/environment/spanish-regulation/).
+
+## References
+
+- Avilés López, R., & Perera Martín, R. (2017). *Manual de acústica ambiental
+  y arquitectónica*. Paraninfo. ISBN 978-84-283-3814-1.
+  Ejemplos 3.1 to 3.3 (pp. 171-176) are the worked case reproduced here, with
+  the noise-phase breakdown, the annual integration and the Article 25 verdict.
+- Jefatura del Estado (Spain). (2003). *Ley 37/2003, de 17 de noviembre, del
+  Ruido* (BOE-A-2003-20976).
+  [BOE consolidated text](https://www.boe.es/buscar/act.php?id=BOE-A-2003-20976).
+  The act the RD develops: the acoustic area types of Article 7, the figure of
+  the acoustic emitter and the inspection regime of Articles 25 to 27.
+- Ministerio de la Presidencia (Spain). (2007). *Real Decreto 1367/2007,
+  developing Ley 37/2003 del Ruido on acoustic zoning, quality objectives and
+  acoustic emissions* (BOE-A-2007-18397).
+  [BOE consolidated text](https://www.boe.es/buscar/act.php?id=BOE-A-2007-18397).
+  The corrected level, the corrections, the evaluation periods, the quality
+  objectives and the immission limit values implemented on this page.
+
+## Standards
+
+RD 1367/2007 (BOE-A-2007-18397), the regulation that develops Ley 37/2003 del
+Ruido on acoustic zoning, quality objectives and acoustic emissions: the
+corrected level LKeq,T and the corrections Kt, Kf and Ki (Annex I A.2 c, Annex
+IV A.3.3), the evaluation periods and the noise-phase integration (Annex I
+A.1, Annex IV A.3.4.2 b), the acoustic quality objectives of Annex II (Table A
+as amended by RD 1038/2012) and the immission limit values of Annex III, with
+the compliance criteria of Article 25.
 
 ---
 
