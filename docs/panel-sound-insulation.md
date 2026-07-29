@@ -127,8 +127,8 @@ The clip below watches coincidence happen in a 2D
 steel plate immersed in air, driven by a sustained plane wave at 45 degrees,
 with both frequencies picked from the library's `coincidence_frequency`. At
 `fc/2` = 603 Hz the measured transmission lands on the oblique mass law; at
-`2 fc` = 2413 Hz the 45 degree trace equals `λB` exactly and the trace-matched
-plate re-radiates a 45 degree beam that grows along the plate, pinning the
+`2 fc` = 2413 Hz the 45-degree trace equals `λB` exactly and the trace-matched
+plate re-radiates a 45-degree beam that grows along the plate, pinning the
 transmitted level at the `fc/2` figure even though the mass law demands 12 dB
 more blocking at four times the frequency. The air drives the heavy steel so
 weakly that the resonant bending wave needs tens of metres of illuminated
@@ -142,7 +142,7 @@ with the display gain printed on them (x150, that is +44 dB); the gain is the
 same on the two so the panels stay comparable, and the level annotations are
 the measured, physical ones.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_coincidence_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_coincidence.gif" alt="Animation: two side-by-side 2D elastic FDTD fields of the same 10 mm steel plate lying in air while a sustained plane wave arrives at 45 degrees; at 603 Hz, half the coincidence frequency, the wave reflects almost totally and the faint transmitted level matches the oblique mass law, while at 2413 Hz, twice the coincidence frequency, the trace wavelength matches the free bending wavelength and a 45 degree transmitted beam grows below the plate, holding the same level as the low-frequency panel where the mass law predicted 12 dB more insulation, the air below the plate drawn on both panels with an annotated 150-fold display gain so the transmitted field is legible, with the 1206 Hz coincidence frequency of the library and both measured and mass-law levels annotated" width="640" height="360" loading="lazy"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_coincidence_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_coincidence.gif" alt="Animation: two side-by-side 2D elastic FDTD fields of the same 10 mm steel plate lying in air while a sustained plane wave arrives at 45 degrees; at 603 Hz, half the coincidence frequency, the wave reflects almost totally and the faint transmitted level matches the oblique mass law, while at 2413 Hz, twice the coincidence frequency, the trace wavelength matches the free bending wavelength and a 45-degree transmitted beam grows below the plate, holding the same level as the low-frequency panel where the mass law predicted 12 dB more insulation, the air below the plate drawn on both panels with an annotated 150-fold display gain (+44 dB) so the transmitted field is legible, with the 1206 Hz coincidence frequency of the library and both measured and mass-law levels annotated" width="640" height="360" loading="lazy"></picture>
 
 [Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_coincidence.webm)
 
@@ -275,11 +275,12 @@ as a cylindrical wave, the Gomperts transmission of the model annotated; the
 wavelength-sized opening lets the front through nearly intact and casts
 sharp-edged shadows. What the slit passes is about 23 dB under the standing
 wave that faces the wall, so in the instantaneous panels the half space
-behind the wall rides the display gain each panel prints (x10 for the slit,
-none for the wavelength-sized opening); the RMS maps below keep one shared
-scale, which is where the two openings are compared level for level.
+behind the wall rides the display gain each panel prints (x10, that is
++20 dB, for the slit and none for the wavelength-sized opening); the RMS
+maps below keep one shared scale, which is where the two openings are
+compared level for level.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_aperture_slit_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_aperture_slit.gif" alt="Animation: a 686 Hz plane wave in a 2D FDTD field hits a rigid wall with a 25 mm slit and, in a second panel, a 0.50 m opening; the narrow slit re-radiates a cylindrical wave into the half space behind, drawn with an annotated ten-fold display gain and with the Gomperts transmission coefficient of 0.55 annotated, while the wavelength-sized opening passes a beam with sharp-edged shadows at unit gain, both RMS maps on the same colour scale" width="640" height="360" loading="lazy"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_aperture_slit_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_aperture_slit.gif" alt="Animation: a 686 Hz plane wave in a 2D FDTD field hits a rigid wall with a 25 mm slit and, in a second panel, a 0.50 m opening; the narrow slit re-radiates a cylindrical wave into the half space behind, drawn with an annotated ten-fold display gain (+20 dB) and with the Gomperts transmission coefficient of 0.55 annotated, while the wavelength-sized opening passes a beam with sharp-edged shadows at unit gain, both RMS maps on the same colour scale" width="640" height="360" loading="lazy"></picture>
 
 [Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_aperture_slit.webm)
 
