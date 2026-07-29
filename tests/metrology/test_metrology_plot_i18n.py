@@ -223,6 +223,24 @@ def test_filter_class_es() -> None:
         res.plot(language="xx")
 
 
+def test_intensity_class_es() -> None:
+    from phonometry.metrology.intensity_compliance import (
+        intensity_class_compliance,
+        residual_index_limits,
+    )
+
+    freqs, class1, _ = residual_index_limits("probe")
+    res = intensity_class_compliance(class1 + 1.0, freqs, device="probe")
+    ax = res.plot(language="es")
+    assert "Tabla 2 de IEC 61043" in ax.get_title()
+    assert "sonda" in ax.get_title()
+    assert "Mínimo clase 1" in _labels(ax)
+    assert "Región de aceptación clase 1" in _labels(ax)
+    plt.close("all")
+    with pytest.raises(ValueError):
+        res.plot(language="xx")
+
+
 def test_tone_burst_es_and_bad_language() -> None:
     res = ph.tone_burst(FS, 5000.0, 25, repetitions=2, repetition_rate=10.0)
     ax = res.plot(language="es")

@@ -11,6 +11,7 @@ from .common import (
     _C_MUTED,
     _C_PRIMARY,
     _C_REFERENCE,
+    _C_SECONDARY,
     _C_TERTIARY,
     _band_axis,
     _bar_width,
@@ -50,8 +51,11 @@ _STRINGS: dict[str, str] = {
     "F3 (negative partial power)": "F3 (potencia parcial negativa)",
     "Dynamic capability Ld": "Capacidad dinámica Ld",
     "F4 (non-uniformity)": "F4 (no uniformidad)",
+    "F1 (temporal variability)": "F1 (variabilidad temporal)",
+    "F1 limit (Table B.3)": "Límite de F1 (tabla B.3)",
     "Indicator [dB]": "Indicador [dB]",
     "Field non-uniformity F4": "No uniformidad del campo F4",
+    "Dimensionless indicators F1, F4": "Indicadores adimensionales F1, F4",
     "ISO 9614-1 field indicators": "Indicadores de campo ISO 9614-1",
 }
 
@@ -261,6 +265,21 @@ def plot_field_indicators(
         label=_t("F4 (non-uniformity)", language),
     )
     twin.set_ylabel(_t("Field non-uniformity F4", language))
+    if result.f1 is not None:
+        # F1 is dimensionless like F4, so it shares the twin axis; the
+        # Table B.3 threshold above which the field is not stationary enough
+        # is drawn alongside it.
+        from ..emission.intensity import TEMPORAL_VARIABILITY_LIMIT
+
+        f1 = np.broadcast_to(
+            np.asarray(result.f1, dtype=np.float64), freqs.shape
+        )
+        twin.plot(freqs, f1, "^-", color=_C_SECONDARY, lw=1.4,
+                  label=_t("F1 (temporal variability)", language))
+        twin.axhline(TEMPORAL_VARIABILITY_LIMIT, ls="-.", lw=1.0,
+                     color=_C_SECONDARY,
+                     label=_t("F1 limit (Table B.3)", language))
+        twin.set_ylabel(_t("Dimensionless indicators F1, F4", language))
 
     lines, labels = ax.get_legend_handles_labels()
     tlines, tlabels = twin.get_legend_handles_labels()

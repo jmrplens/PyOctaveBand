@@ -884,6 +884,53 @@ ISO9614_3_UNIFORM_AREAS: tuple[float, ...] = (0.5, 1.0, 0.25, 2.0)
 ISO9614_3_UNIFORM_LW = 80.0  # 10*lg(W/1e-12) (dB)
 
 # ---------------------------------------------------------------------------
+# IEC 61043:1993 (EN 61043:1994) Table 2, standard page 14: minimum
+# pressure-residual intensity index delta_pI0 requirements, in decibels, for
+# probes, processors and instruments at the 25 mm nominal microphone
+# separation. Transcribed digit for digit and cross-checked against the same
+# table as reproduced in Fahy, "Sound Intensity" 2nd ed., Table 6.1 (printed
+# page 136), which agrees exactly. Note 1 of the table: for a microphone
+# separation x in millimetres, add 10 lg(x/25) dB to every figure.
+# Row = (nominal_third_octave_Hz, probe_class1, probe_class2,
+#        processor_class1, processor_class2, instrument_class1,
+#        instrument_class2).
+# ---------------------------------------------------------------------------
+IEC61043_TABLE2: list[tuple[float, float, float, float, float, float, float]] = [
+    (50, 13, 7, 19, 13, 12, 6),
+    (63, 14, 8, 20, 14, 13, 7),
+    (80, 15, 9, 21, 15, 14, 8),
+    (100, 16, 10, 22, 16, 15, 9),
+    (125, 17, 11, 23, 17, 16, 10),
+    (160, 18, 12, 24, 18, 17, 11),
+    (200, 19, 13, 25, 19, 18, 12),
+    (250, 20, 14, 26, 20, 19, 13),
+    (315, 20, 15, 26, 20, 19, 14),
+    (400, 20, 16, 26, 20, 19, 14.5),
+    (500, 20, 17, 26, 20, 19, 15),
+    (630, 20, 18, 26, 20, 19, 16),
+    (800, 20, 18, 26, 20, 19, 16),
+    (1000, 20, 18, 26, 20, 19, 16),
+    (1250, 20, 18, 26, 20, 19, 16),
+    (1600, 20, 18, 26, 20, 19, 16),
+    (2000, 20, 18, 26, 20, 19, 16),
+    (2500, 20, 18, 26, 20, 19, 16),
+    (3150, 20, 18, 26, 20, 19, 16),
+    (4000, 20, 18, 26, 20, 19, 16),
+    (5000, 20, 18, 26, 20, 19, 16),
+    (6300, 20, 18, 26, 20, 19, 16),
+]
+
+# Fahy, "Sound Intensity" 2nd ed., section 6.8 (printed page 135), explaining
+# the effect of the Table 2 requirement on the allowable channel phase
+# mismatch: "a specified value of delta_pI0 of 20 dB corresponds to a phase
+# mismatch of one-hundredth of the phase difference kd ...: at 1000 Hz, this
+# corresponds to a phase mismatch of about 0.26 degrees" (25 mm separation).
+IEC61043_PHASE_INDEX_DB = 20.0
+IEC61043_PHASE_FREQUENCY_HZ = 1000.0
+IEC61043_PHASE_SPACING_M = 0.025
+IEC61043_PHASE_MISMATCH_DEG = 0.26
+
+# ---------------------------------------------------------------------------
 # PR-F human vibration (ISO 8041-1 / ISO 2631 / ISO 5349 / Directive 2002/44/EC).
 # The true IEC 61260 one-third-octave centre is 10^(n/10) Hz; the reference
 # frequencies of ISO 8041-1 Table 1 are exact (rad/s -> Hz). Design-goal

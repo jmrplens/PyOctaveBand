@@ -152,8 +152,38 @@ carries both:
 - **Reactive fields**: when `pressure_intensity_index` (F2 in ISO 9614-1)
   approaches the probe's residual index δ_pI0, phase errors dominate.
 
-Over a measurement surface, the ISO 9614-1 Annex A field indicators grade the
-scan itself. **F2**, the surface pressure-intensity indicator, is the surface
+Before any of that, ISO 9614-1 asks a question about the *field* rather than
+the surface: is it steady enough to be scanned at all? In the initial test
+(clause 8.2) one typical position is picked on an initial measurement surface
+and the normal intensity is sampled there `M` times with a short averaging
+time (Note 9 suggests `M = 10` and 8 s to 12 s per sample). **F1**, the
+temporal variability indicator, is the coefficient of variation of those
+samples (equations (A.1)–(A.2)), so it is zero for a perfectly steady field
+and grows as the extraneous intensity wanders. Table B.3 asks for action code
+(e) above `F1 > 0.6`: reduce the variability, measure during quieter periods,
+or lengthen the averaging time at each position. Annex B also has it evaluated
+immediately before and after the measurement on any one surface (B.1.4).
+
+```python
+from phonometry import emission
+
+# The M short-time samples of the normal intensity at one fixed position (W/m²).
+samples = [1.20e-5, 0.94e-5, 1.51e-5, 1.08e-5, 1.33e-5,
+           1.02e-5, 1.44e-5, 1.17e-5, 0.88e-5, 1.29e-5]
+
+f1 = emission.temporal_variability_indicator(samples)
+print(round(f1, 3))                          # 0.177, a steady field
+
+# Or carried on the surface result alongside F2/F3/F4, by handing the same
+# samples to field_indicators together with the per-position scan below:
+fi = emission.field_indicators([74.1, 73.8, 74.5, 73.2],
+                               [1.2e-5, 1.0e-5, 1.4e-5, 0.9e-5],
+                               temporal_intensity=samples)
+print(fi.field_is_stationary())              # True (Table B.3 limit 0.6)
+```
+
+Over a measurement surface, the remaining ISO 9614-1 Annex A field indicators
+grade the scan itself. **F2**, the surface pressure-intensity indicator, is the surface
 pressure level minus the level of the mean *magnitude* of the normal
 intensity: the larger it is, the closer the measurement sits to the probe's
 phase-error floor. **F3**, the negative partial power indicator, is the same
@@ -275,6 +305,115 @@ the field's `δpI` rises spends a decibel of margin, and when `δpI` reaches
 pressure-intensity index, not the microphone quality, gates the achievable
 accuracy of every intensity measurement.
 
+### Grading the instrument: IEC 61043 Table 2
+
+`δpI0` is not just a number to subtract `K` from; it is what IEC 61043 grades
+the hardware by. Table 2 of the standard sets a **minimum** `δpI0` in every
+one-third-octave band from 50 Hz to 6.3 kHz, separately for a **probe**, a
+**processor** and a **complete instrument**, in class 1 and class 2, printed
+for the nominal 25 mm microphone separation. Note 1 rescales the whole table
+for any other spacer by `+10 lg(x/25)` with `x` in millimetres, which is the
+same 3 dB per doubling the previous section arrived at from the physics.
+
+`intensity_class_compliance` compares a measured `δpI0` spectrum against both
+masks band by band and returns the class the chain actually meets:
+the loosest class every band clears, or `None` when some band clears neither:
+
+```python
+from phonometry import metrology
+
+# The band centres Table 2 is defined on, and the measured residual index of
+# the chain: one value per band, taken with the spacer that will be fitted in
+# the field. Replace the placeholder with your own residual-intensity test.
+freqs, _, _ = metrology.residual_index_limits("instrument", spacing=0.012)
+measured_delta_pi0 = [11.0, 11.9, 11.2, 10.0, 13.2, 15.9, 17.0, 18.0,
+                      19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 24.0, 24.0,
+                      24.0, 24.0, 24.0, 24.0, 24.0, 24.0]   # dB, 22 bands
+
+res = metrology.intensity_class_compliance(measured_delta_pi0, freqs,
+                                           device="instrument", spacing=0.012)
+print(res.overall_class)          # 2: one band misses the class 1 minimum
+print(res.binding_margin())       # smallest per-band margin to that class [dB]
+print(res.failing_bands(1))       # the band centres that cost it class 1 [Hz]
+res.plot()                        # measured δpI0 over the two Table 2 masks
+res.report("verification.pdf")    # one-page verification fiche (PDF)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_class_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_class.svg" alt="Measured pressure-residual intensity index of a complete intensity instrument with a 12 mm spacer, drawn as a step curve over the IEC 61043 Table 2 class 1 and class 2 minima; the shaded class 2 pass region lies above the dashed class 2 mask, and the 100 Hz band is ringed where the measured index dips below the solid class 1 mask" width="92%"></picture>
+
+*Both Table 2 masks come down by `10 lg(12/25) = −3.2 dB` for the 12 mm
+spacer. The measured index climbs 10 dB per decade at low frequency, parallel
+to the requirement, because a channel phase mismatch that is constant in
+degrees buys exactly that slope; it flattens above 1 kHz where the mismatch of
+a real chain starts growing with frequency instead. A vent resonance around
+100 Hz costs 4 dB and drops that one band below the class 1 minimum, so the
+whole chain is graded class 2.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import metrology
+
+# A complete instrument with the common 12 mm spacer. The measured index is
+# modelled from the physics behind Table 2: a residual phase mismatch φs reads
+# as δpI0 = 10 lg(kd/φs), so a mismatch that is constant in degrees already
+# climbs 10 dB per decade, and above 1 kHz the mismatch of a real chain grows
+# with frequency, so the index levels off.
+spacing = 0.012
+freqs, _, _ = metrology.residual_index_limits("instrument", spacing=spacing)
+phase_mismatch = 0.05 * np.maximum(1.0, freqs / 1000.0)          # degrees
+measured = metrology.residual_index_from_phase_mismatch(phase_mismatch, freqs,
+                                                        spacing)
+measured = measured - 4.0 * np.exp(-((np.log(freqs / 100.0) / 0.25) ** 2))
+
+res = metrology.intensity_class_compliance(measured, freqs, spacing=spacing)
+res.plot()
+plt.show()
+```
+
+</details>
+
+Two companion rules of the standard come with it. Clause 6.1 fixes the
+frequency range a class attests (45 Hz to 7.1 kHz in one-third octaves for
+class 1, or 45 Hz to 5.6 kHz in octaves for class 2), and a verdict computed
+over fewer bands is flagged `range_limited` so it cannot be read as a
+full-range claim. Clause 8 combines separately supplied components:
+`instrument_class_from_components(probe_class, processor_class)` returns 1
+only when both are class 1, and 2 for every other pairing.
+
+### Reading `δpI0` as a phase error
+
+The requirement is really a phase-matching requirement in disguise. In an
+axially propagating plane wave the *true* phase difference across the spacer
+is `kd`, so a residual intensity produced by a channel mismatch `φs` gives
+
+$$
+\delta_{pI0} = 10 \log_{10}\!\left( \frac{k d}{\varphi_s} \right)
+$$
+
+and the two conversions run both ways:
+
+```python
+from phonometry import metrology
+
+# 20 dB of residual index at 1 kHz over a 25 mm spacer:
+phi = metrology.phase_mismatch_from_residual_index(20.0, 1000.0, 0.025)
+print(round(float(phi), 2))     # 0.26 degrees, a hundredth of kd
+
+# And back, for a chain whose channels are matched to 0.05°:
+print(round(float(metrology.residual_index_from_phase_mismatch(
+    0.05, 1000.0, 0.012)), 1))  # 24.0 dB
+```
+
+That is why the low-frequency end of Table 2 rises 1 dB per third-octave band
+up to 250 Hz and then flattens: below the knee the standard is asking for a
+*constant* phase match, and above it for a constant index. It is also why a
+tenth of a degree of channel mismatch is a demanding specification, and why a
+probe must be verified with the spacer it will actually be used with.
+
 ### Reactive fields near sources
 
 Close to a source the field turns **reactive**: pressure and particle
@@ -344,13 +483,15 @@ for absolute scaling of the two channels.
   as EN 61043:1994).
   [IEC webstore](https://webstore.iec.ch/en/publication/4353).
   The instrument standard: the cross-spectral estimator, the
-  residual-intensity test behind `δpI0` and the class 1 / class 2
-  requirements.
+  residual-intensity test behind `δpI0`, the Table 2 minima per band for
+  probes, processors and instruments with the `+10 lg(x/25)` separation rule
+  (Note 1), the frequency ranges of clause 6.1 and the component-combination
+  rule of clause 8.
 - International Organization for Standardization. (1993). *Acoustics —
   Determination of sound power levels of noise sources using sound
   intensity — Part 1: Measurement at discrete points* (ISO 9614-1:1993).
   [iso.org catalogue](https://www.iso.org/standard/17427.html).
-  The field indicators F2 to F4, the dynamic-capability criterion and the
+  The field indicators F1 to F4, the dynamic-capability criterion and the
   0.5 m surface-distance rule.
 
 ## Standards
@@ -359,8 +500,13 @@ IEC 61043:1993 (EN 61043:1994), *Electroacoustics —
 Instruments for the measurement of sound intensity — Measurements with pairs
 of pressure sensing microphones*: the two-microphone cross-spectral
 intensity estimator, the finite-difference bias correction and the
-usable-bandwidth bound (clause 7.3,
-Table 3). ISO 9614-1:1993, *Acoustics — Determination of sound power levels
-of noise sources using sound intensity — Part 1: Measurement at discrete
-points*: the pressure-intensity index, the Annex A field indicators F2, F3
-and F4, and the dynamic-capability criterion (Annex B).
+usable-bandwidth bound (clause 7.3, Table 3), the minimum pressure-residual
+intensity index per band for probes, processors and instruments in class 1
+and class 2 with its separation rule (Table 2 and its Note 1), the processor
+frequency ranges (clause 6.1) and the class of an instrument assembled from
+separate components (clause 8). ISO 9614-1:1993, *Acoustics — Determination
+of sound power levels of noise sources using sound intensity — Part 1:
+Measurement at discrete points*: the pressure-intensity index, the Annex A
+field indicators F1 (equations (A.1)–(A.2), evaluated in the initial test of
+clause 8.2 and again per Annex B, B.1.4), F2, F3 and F4, the Table B.3
+temporal-variability limit and the dynamic-capability criterion (Annex B).

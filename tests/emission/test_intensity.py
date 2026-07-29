@@ -1,11 +1,11 @@
 #  Copyright (c) 2026. Jose M. Requena-Plens
 """
-p-p sound intensity (IEC 61043:1994) and ISO 9614-1:1993 field indicators.
+p-p sound intensity (IEC 61043:1993) and ISO 9614-1:1993 field indicators.
 
 Physics anchors:
 - Plane progressive wave: I = p_rms^2 / (rho*c), so Lp - LI =
-  10*lg(rho*c/400) = 0,14 dB (IEC 61043:1994 clause 5 note).
-- Finite-difference estimator bias sin(k*dr)/(k*dr) (IEC 61043:1994, 7.3;
+  10*lg(rho*c/400) = 0,14 dB (IEC 61043:1993 clause 5 note).
+- Finite-difference estimator bias sin(k*dr)/(k*dr) (IEC 61043:1993, 7.3;
   Table 3 nominal -10,5 dB at 6,3 kHz for 25 mm separation).
 - Field indicators from ISO 9614-1:1993 Annex A, equations (A.3)-(A.9).
 """
@@ -14,11 +14,13 @@ import numpy as np
 import pytest
 
 from phonometry import (
+    TEMPORAL_VARIABILITY_LIMIT,
     FieldIndicators,
     IntensityResult,
     dynamic_capability_index,
     field_indicators,
     sound_intensity,
+    temporal_variability_indicator,
 )
 
 FS = 48000
@@ -58,7 +60,7 @@ def test_plane_progressive_wave_broadband() -> None:
     # 0.015 keeps ~3x headroom (was 0.03).
     assert res.total_intensity == pytest.approx(expected, rel=0.015)
     assert res.total_direction == 1
-    # IEC 61043:1994 clause 5: Lp - LI = 10*lg(rho*c/400) = 0,14 dB.
+    # IEC 61043:1993 clause 5: Lp - LI = 10*lg(rho*c/400) = 0,14 dB.
     assert res.total_pressure_intensity_index == pytest.approx(
         10 * np.log10(RHO * C / 400.0), abs=0.35
     )
@@ -70,7 +72,7 @@ def test_plane_progressive_wave_broadband() -> None:
 
 def test_bias_correct_undoes_finite_difference_underread() -> None:
     """bias_correct=True lifts each in-band bin by (k*dr)/sin(k*dr)
-    (IEC 61043:1994, 7.3). For a single tone the corrected total therefore
+    (IEC 61043:1993, 7.3). For a single tone the corrected total therefore
     equals the raw total times that factor; at low frequency it is ~1."""
     spacing, f0 = 0.05, 500.0
     t = np.arange(int(FS * 2)) / FS
@@ -201,7 +203,7 @@ def test_1khz_tone_exact_analytic_intensity() -> None:
     idx = int(np.argmin(np.abs(res.frequency - 1000.0)))
     assert res.intensity[idx] == pytest.approx(expected, rel=0.01)
     # Applying the documented sin(k*dr)/(k*dr) correction recovers the
-    # unbiased plane-wave intensity (IEC 61043:1994, 7.3).
+    # unbiased plane-wave intensity (IEC 61043:1993, 7.3).
     corrected = res.intensity[idx] * res.bias_correction[idx]
     assert corrected == pytest.approx(true_plane, rel=0.01)
 
@@ -359,3 +361,168 @@ def test_dynamic_capability_index() -> None:
     assert dynamic_capability_index(18.0, bias_error_factor=7.0) == pytest.approx(11.0)
     with pytest.raises(ValueError, match="bias_error_factor"):
         dynamic_capability_index(18.0, bias_error_factor=0.0)
+
+
+# ---------------------------------------------------------------------------
+# ISO 9614-1:1993 F1, the temporal variability indicator (equation (A.1))
+#
+# ISO 9614-1 publishes no numeric worked example for F1 to F4 (the real cases
+# of the literature present them only as figures), so F1 is anchored on the
+# closed form of equation (A.1) itself: the coefficient of variation of the M
+# short-time samples of the normal intensity at one fixed position, i.e. the
+# sample standard deviation (N - 1 denominator, equation (A.1)) over the
+# algebraic mean (equation (A.2)). The Table B.3 threshold of 0,6 is the
+# standard's own number.
+# ---------------------------------------------------------------------------
+
+
+def test_f1_is_zero_for_a_perfectly_steady_field() -> None:
+    """A constant short-time intensity has no temporal variability."""
+    assert temporal_variability_indicator(np.full(10, 3.4e-5)) == pytest.approx(0.0)
+
+
+def test_f1_two_sample_closed_form() -> None:
+    """For M = 2, equation (A.1) reduces to sqrt(2)*|b - a| / (a + b)."""
+    a, b = 1.0e-5, 3.0e-5
+    expected = np.sqrt(2.0) * abs(b - a) / (a + b)
+    assert temporal_variability_indicator([a, b]) == pytest.approx(expected)
+
+
+def test_f1_is_the_coefficient_of_variation() -> None:
+    """Equation (A.1) is the sample std (ddof = 1) over the mean of (A.2)."""
+    rng = np.random.default_rng(1993)
+    samples = 5.0e-5 * (1.0 + rng.normal(0.0, 0.3, 10))
+    expected = float(np.std(samples, ddof=1) / np.mean(samples))
+    assert temporal_variability_indicator(samples) == pytest.approx(expected)
+
+
+def test_f1_is_scale_invariant() -> None:
+    """F1 is dimensionless: a gain change on every sample leaves it unchanged."""
+    samples = np.array([1.0e-5, 1.4e-5, 0.8e-5, 1.1e-5, 1.3e-5])
+    assert temporal_variability_indicator(samples * 1000.0) == pytest.approx(
+        temporal_variability_indicator(samples)
+    )
+
+
+def test_f1_and_f4_share_the_closed_form() -> None:
+    """(A.1) over M samples and (A.8) over N positions are the same statistic."""
+    values = np.array([2.0e-5, 1.6e-5, 2.4e-5, 1.9e-5, 2.2e-5, 2.1e-5])
+    surface = field_indicators(np.full(values.size, 80.0), values)
+    assert temporal_variability_indicator(values) == pytest.approx(surface.f4)
+
+
+def test_f1_per_band_matches_the_per_column_scalars() -> None:
+    """2D (samples, bands) input evaluates every band of Annex A.1 at once."""
+    rng = np.random.default_rng(614)
+    samples = 3.0e-5 * (1.0 + rng.normal(0.0, 0.25, (10, 4)))
+    per_band = temporal_variability_indicator(samples)
+    assert isinstance(per_band, np.ndarray) and per_band.shape == (4,)
+    for b in range(4):
+        assert per_band[b] == pytest.approx(
+            temporal_variability_indicator(samples[:, b])
+        )
+
+
+def test_f1_validation() -> None:
+    with pytest.raises(ValueError, match="two short-time samples"):
+        temporal_variability_indicator([1.0e-5])
+    three_dimensional = np.zeros((2, 2, 2))
+    with pytest.raises(ValueError, match="1D .samples,. or 2D"):
+        temporal_variability_indicator(three_dimensional)
+    with pytest.raises(ValueError, match="not positive"):
+        temporal_variability_indicator([1.0e-5, -3.0e-5])
+    # A NaN or infinite sample would otherwise slip past the positivity test
+    # and turn the indicator into a silent NaN.
+    with_nan = [1.0e-5, float("nan"), 1.2e-5]
+    with pytest.raises(ValueError, match="finite"):
+        temporal_variability_indicator(with_nan)
+    with_inf = [1.0e-5, float("inf"), 1.2e-5]
+    with pytest.raises(ValueError, match="finite"):
+        temporal_variability_indicator(with_inf)
+
+
+def test_f1_follows_the_shape_of_its_sibling_indicators() -> None:
+    """F1 is scalar where F2/F3/F4 are scalar, and an array where they are.
+
+    A 1D per-position surface yields scalar indicators, so a one-column
+    ``(M, 1)`` sample array must not leave ``f1`` as ``array([x])``: the
+    Table B.3 check would then answer ``array([True])`` where its siblings are
+    plain floats. A 2D one-band surface keeps per-band arrays throughout.
+    """
+    samples_1d = np.array([1.0e-5, 1.2e-5, 0.9e-5, 1.1e-5, 1.0e-5])
+    samples_2d = samples_1d.reshape(-1, 1)
+
+    scalar = field_indicators(
+        np.full(4, 80.0), np.full(4, 1.0e-5), temporal_intensity=samples_2d
+    )
+    assert np.ndim(scalar.f1) == 0
+    assert np.ndim(scalar.f2) == 0
+    assert scalar.field_is_stationary() is True
+
+    per_band = field_indicators(
+        np.full((4, 1), 80.0),
+        np.full((4, 1), 1.0e-5),
+        [1000.0],
+        temporal_intensity=samples_1d,
+    )
+    assert np.ndim(per_band.f1) == 1 and np.size(per_band.f1) == 1
+    assert np.ndim(per_band.f4) == 1
+    assert np.asarray(per_band.field_is_stationary()).shape == (1,)
+
+
+def test_field_indicators_carries_f1_when_given_the_samples() -> None:
+    """The optional temporal samples fill f1 alongside F2/F3/F4."""
+    lp = np.full(6, 82.0)
+    i_n = np.full(6, 1.5e-5)
+    samples = np.array([1.4e-5, 1.6e-5, 1.5e-5, 1.7e-5, 1.3e-5, 1.5e-5])
+    ind = field_indicators(lp, i_n, temporal_intensity=samples)
+    assert ind.f1 == pytest.approx(temporal_variability_indicator(samples))
+    assert field_indicators(lp, i_n).f1 is None
+
+
+def test_field_indicators_f1_column_count_must_match_the_bands() -> None:
+    lp = np.full((5, 3), 82.0)
+    i_n = np.full((5, 3), 1.5e-5)
+    two_band_samples = np.full((10, 2), 1.5e-5)
+    with pytest.raises(ValueError, match="one column per band"):
+        field_indicators(lp, i_n, temporal_intensity=two_band_samples)
+
+
+def test_field_is_stationary_against_the_table_b3_limit() -> None:
+    """ISO 9614-1 Table B.3 calls for action when F1 exceeds 0,6."""
+    assert TEMPORAL_VARIABILITY_LIMIT == 0.6
+    lp = np.full(4, 80.0)
+    i_n = np.full(4, 1.0e-5)
+    steady = field_indicators(lp, i_n, temporal_intensity=np.full(10, 1.0e-5))
+    assert steady.field_is_stationary() is True
+    # A pair chosen so equation (A.1) lands exactly on the 0,6 threshold, and
+    # a wilder pair above it: sqrt(2)*(b - a)/(a + b) with a = 1, b = r.
+    r = (np.sqrt(2.0) + 0.6) / (np.sqrt(2.0) - 0.6)
+    on_limit = field_indicators(lp, i_n, temporal_intensity=[1.0e-5, r * 1.0e-5])
+    assert float(np.asarray(on_limit.f1)) == pytest.approx(0.6)
+    assert on_limit.field_is_stationary() is True  # the limit itself passes
+    varying = field_indicators(lp, i_n, temporal_intensity=[1.0e-5, 5.0e-5])
+    assert varying.field_is_stationary() is False
+    without_f1 = field_indicators(lp, i_n)
+    with pytest.raises(ValueError, match="no F1"):
+        without_f1.field_is_stationary()
+
+
+def test_field_indicators_plot_draws_f1_and_its_limit() -> None:
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    rng = np.random.default_rng(43)
+    freqs = np.array([250.0, 500.0, 1000.0, 2000.0])
+    lp = 76.0 + rng.normal(0.0, 0.5, (10, 4))
+    i_n = 2.0e-5 * (1.0 + rng.normal(0.0, 0.25, (10, 4)))
+    samples = 2.0e-5 * (1.0 + rng.normal(0.0, 0.15, (10, 4)))
+    ind = field_indicators(lp, i_n, freqs, temporal_intensity=samples)
+    ax = ind.plot()
+    twin = next(a for a in ax.figure.axes if a is not ax)
+    ydata = [np.asarray(line.get_ydata(), dtype=float) for line in twin.lines]
+    assert any(np.allclose(y, np.asarray(ind.f1)) for y in ydata)
+    assert any(np.allclose(y, TEMPORAL_VARIABILITY_LIMIT) for y in ydata)
+    plt.close("all")
