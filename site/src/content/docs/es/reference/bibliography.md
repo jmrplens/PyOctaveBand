@@ -172,7 +172,7 @@ que las guías incorporan sus secciones de Referencias.
   sources using sound pressure — Precision methods for anechoic rooms and
   hemi-anechoic rooms* (ISO 3745:2012).
   [Catálogo iso.org](https://www.iso.org/standard/45362.html).
-  El método de precisión en sala anecoica.
+  El método de precisión en cámara anecoica.
   Citado por [Potencia acústica por métodos de presión](/phonometry/es/guides/sound-power-pressure/).
 - International Organization for Standardization. (1996). *Acoustics —
   Declaration and verification of noise emission values of machinery and

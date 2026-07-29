@@ -87,7 +87,7 @@ references:
     note: "El modelo de NIPTS, sus fractiles y la suma comprimida HTLAN de la sección de pérdida auditiva."
 ---
 
-Esta página reúne la teoría de la audición y la psicoacústica: las líneas isofónicas, los modelos de sonoridad de Zwicker, Moore-Glasberg y Sottek, las métricas de calidad sonora (tonalidad, aspereza y sharpness), la prominencia tonal, las métricas del habla STI y SII, y la estadística de los umbrales de audición y de la pérdida auditiva. Forma parte de la [referencia de teoría](/phonometry/es/reference/theory/).
+Esta página reúne la teoría de la audición y la psicoacústica: las líneas isofónicas, los modelos de sonoridad de Zwicker, Moore-Glasberg y Sottek, las métricas de calidad sonora (tonalidad, aspereza y agudeza), la prominencia tonal, las métricas del habla STI y SII, y la estadística de los umbrales de audición y de la pérdida auditiva. Forma parte de la [referencia de teoría](/phonometry/es/reference/theory/).
 
 ## Líneas isofónicas (ISO 226:2023)
 
@@ -238,9 +238,9 @@ $$
 
 (Fórmulas 65–111). El valor único $R$ es el percentil 90 de $R(l_{50})$ en el tiempo (Cláusula 7.1.10); la constante $c_R$ (Fórmula 104) calibra el sonido de referencia (un portador de 1 kHz modulado en amplitud al 100 % a 70 Hz y 60 dB SPL) a 1 asper.
 
-### Sharpness (DIN 45692)
+### Agudeza (DIN 45692)
 
-El sharpness condensa en un solo número el énfasis en alta frecuencia de un sonido: el primer momento ponderado por $g(z)$ del patrón de sonoridad específica estacionaria de ISO 532-1 (DIN 45692:2009, Ecuación 1):
+La agudeza (*sharpness*) condensa en un solo número el énfasis en alta frecuencia de un sonido: el primer momento ponderado por $g(z)$ del patrón de sonoridad específica estacionaria de ISO 532-1 (DIN 45692:2009, Ecuación 1):
 
 $$
 S = k\ \frac{\int_0^{24} N'(z)\ g(z)\ z\ dz}{\int_0^{24} N'(z)\ dz} \ \text{acum}, \qquad

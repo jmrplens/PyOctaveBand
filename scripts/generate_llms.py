@@ -167,7 +167,11 @@ def _area_members() -> dict[str, list[str]]:
     lands in a trailing group, so the partition is total either way.
     """
     sections = CONTENT / "guides" / "sections"
-    guides = {path.stem for path in (CONTENT / "guides").glob("*.md*")}
+    guides = {
+        path.stem
+        for path in (CONTENT / "guides").glob("*.md*")
+        if path.stem != "index"  # the guides landing page, linked from Start here
+    }
     members: dict[str, list[str]] = {}
     claimed: set[str] = set()
     for slug, _label in AREAS:
@@ -203,7 +207,11 @@ def _shard_members() -> dict[str, list[str]]:
     subsections = sorted(
         path.stem for path in sections.glob("*.md*") if path.stem not in areas
     )
-    guides = {path.stem for path in (CONTENT / "guides").glob("*.md*")}
+    guides = {
+        path.stem
+        for path in (CONTENT / "guides").glob("*.md*")
+        if path.stem != "index"  # the guides landing page, linked from Start here
+    }
 
     def linked(slug: str) -> list[str]:
         page = sections / f"{slug}.md"

@@ -28,7 +28,7 @@ las que alimenta.
 
 **Predicción.** La mitad de fase de diseño tiene sección propia,
 [Diseño del aislamiento](/phonometry/es/guides/sections/insulation-design/): el
-modelo de flancos de EN 12354 entre salas, el aislamiento teórico de un panel y
+modelo de flancos de EN 12354 entre recintos, el aislamiento teórico de un panel y
 las dos mediciones de material que consume el diseño de un suelo.
 
 **Campo.**

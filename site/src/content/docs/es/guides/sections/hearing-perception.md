@@ -48,8 +48,9 @@ construidas sobre ella.
 
 ## [Habla](/phonometry/es/guides/sections/speech/)
 
-Dos índices complementarios de inteligibilidad: el STI valora el canal de
-transmisión, el SII valora la condición de escucha.
+Dos índices complementarios de inteligibilidad, el STI para el canal de
+transmisión y el SII para la condición de escucha, más las medidas STOI
+y ESTOI basadas en la señal.
 
 - [Índice de transmisión del habla (STI)](/phonometry/es/guides/speech-transmission/):
   la función de transferencia de modulación de IEC 60268-16, el método
@@ -57,6 +58,9 @@ transmisión, el SII valora la condición de escucha.
 - [Índice de inteligibilidad del habla](/phonometry/es/guides/speech-intelligibility/):
   el SII de ANSI S3.5-1997 en tercios de octava a partir de los espectros de
   habla, ruido y umbral de audición.
+- [Inteligibilidad objetiva (STOI y ESTOI)](/phonometry/es/guides/objective-intelligibility/):
+  las medidas basadas en correlación para habla ruidosa con ponderación
+  tiempo-frecuencia, a partir de un par limpio/degradado.
 
 ## [Audición y exposición](/phonometry/es/guides/sections/hearing-exposure/)
 

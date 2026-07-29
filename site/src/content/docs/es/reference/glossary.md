@@ -1430,7 +1430,7 @@ head:
             "@id": "https://jmrplens.github.io/phonometry/es/reference/glossary/#term-95",
             "name": "S",
             "termCode": "S",
-            "description": "Sharpness: la posición del centro de gravedad de la sonoridad específica en la escala de bandas críticas, normalizada para que el ruido de banda estrecha de referencia valga exactamente 1,00 acum. Unidad: acum. Definida en: DIN 45692:2009, apartado 6.",
+            "description": "Agudeza (sharpness): la posición del centro de gravedad de la sonoridad específica en la escala de bandas críticas, normalizada para que el ruido de banda estrecha de referencia valga exactamente 1,00 acum. Unidad: acum. Definida en: DIN 45692:2009, apartado 6.",
             "inDefinedTermSet": {
               "@id": "https://jmrplens.github.io/phonometry/es/reference/glossary/#glossary"
             },
@@ -1535,7 +1535,7 @@ head:
             "@id": "https://jmrplens.github.io/phonometry/es/reference/glossary/#term-102",
             "name": "PA",
             "termCode": "PA",
-            "description": "Molestia psicoacústica: la sonoridad percentil escalada por la nitidez y por un término que combina fluctuación y aspereza. Unidad: adimensional. Definida en: Fastl y Zwicker (2007), Ecuación 16.2; sin norma aplicable.",
+            "description": "Molestia psicoacústica: la sonoridad percentil escalada por la agudeza y por un término que combina fluctuación y aspereza. Unidad: adimensional. Definida en: Fastl y Zwicker (2007), Ecuación 16.2; sin norma aplicable.",
             "inDefinedTermSet": {
               "@id": "https://jmrplens.github.io/phonometry/es/reference/glossary/#glossary"
             },
@@ -1987,14 +1987,14 @@ norma.
 | N | Sonoridad: la magnitud percibida de un sonido, anclada de modo que un tono de 1 kHz a 40 dB SPL vale exactamente 1 sonio. | sonio | ISO 532-1:2017, apartado 5 (estacionaria) y apartado 6 (variable en el tiempo) | [Sonoridad](/phonometry/es/guides/loudness/) |
 | N′ | Sonoridad específica: la densidad de sonoridad a lo largo de la escala de bandas críticas, cuya integral es N. | sonio/Bark | ISO 532-1:2017 (forma en sonio/Cam en ISO 532-2:2017, Fórmula 7) | [Sonoridad](/phonometry/es/guides/loudness/) |
 | LN | Nivel de sonoridad: el nivel del tono de 1 kHz en campo libre que se juzga igual de fuerte que el sonido. | fonio | ISO 226:2023, Fórmula (2) (curvas en la Fórmula (1)) | [Sonoridad](/phonometry/es/guides/loudness/) |
-| S | Sharpness: la posición del centro de gravedad de la sonoridad específica en la escala de bandas críticas, normalizada para que el ruido de banda estrecha de referencia valga exactamente 1,00 acum. | acum | DIN 45692:2009, apartado 6 | [Calidad sonora](/phonometry/es/guides/sound-quality/) |
+| S | Agudeza (sharpness): la posición del centro de gravedad de la sonoridad específica en la escala de bandas críticas, normalizada para que el ruido de banda estrecha de referencia valga exactamente 1,00 acum. | acum | DIN 45692:2009, apartado 6 | [Calidad sonora](/phonometry/es/guides/sound-quality/) |
 | R | Aspereza: la sensación áspera de una modulación de amplitud rápida, en torno a 70 Hz, normalizada para que el tono modulado de referencia valga 1 asper. | asper | ECMA-418-2:2025, apartado 7 (Fórmula 104) | [Calidad sonora](/phonometry/es/guides/sound-quality/) |
 | F | Intensidad de fluctuación: la modulación de amplitud lenta percibida, en torno a 4 Hz, normalizada para que el tono modulado de referencia valga 1 vacil. | vacil | ECMA-418-2:2025, apartado 9 (Fórmula 163) | [Calidad sonora](/phonometry/es/guides/sound-quality/) |
 | T | Tonalidad: el contenido tonal percibido de un sonido, obtenido de la autocorrelación de las envolventes por banda. | tu | ECMA-418-2:2025, apartado 6 | [Calidad sonora](/phonometry/es/guides/sound-quality/) |
 | TNR | Relación tono-ruido: el nivel de un tono discreto sobre el ruido enmascarante de la banda crítica que lo rodea. | dB | ECMA-418-1:2024, apartado 11 (Fórmulas 9 a 11) | [Tonos prominentes](/phonometry/es/guides/tone-prominence/) |
 | PR | Relación de prominencia: el nivel de la banda crítica que contiene el tono sobre la media de las dos bandas contiguas. | dB | ECMA-418-1:2024, apartado 12 (Fórmula 23) | [Tonos prominentes](/phonometry/es/guides/tone-prominence/) |
 | ΔL | Audibilidad de un tono en ruido: el nivel del tono menos el nivel de enmascaramiento de la banda crítica menos el índice de enmascaramiento. | dB | ISO/PAS 20065:2016, Fórmula 14 | [Audibilidad de tonos](/phonometry/es/guides/tone-audibility/) |
-| PA | Molestia psicoacústica: la sonoridad percentil escalada por la nitidez y por un término que combina fluctuación y aspereza. | adimensional | Fastl y Zwicker (2007), Ecuación 16.2; sin norma aplicable | [Molestia psicoacústica](/phonometry/es/guides/psychoacoustic-annoyance/) |
+| PA | Molestia psicoacústica: la sonoridad percentil escalada por la agudeza y por un término que combina fluctuación y aspereza. | adimensional | Fastl y Zwicker (2007), Ecuación 16.2; sin norma aplicable | [Molestia psicoacústica](/phonometry/es/guides/psychoacoustic-annoyance/) |
 
 ## Electroacústica y sonoridad de programa
 

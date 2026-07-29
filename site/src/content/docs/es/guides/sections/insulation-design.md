@@ -1,6 +1,6 @@
 ---
 title: "Diseño del aislamiento"
-description: "El aislamiento acústico antes de construirlo: la predicción de flancos de EN 12354 entre salas, el aislamiento teórico de un panel a partir de sus propiedades físicas y las dos mediciones de material que consume el diseño de un suelo (revestimientos ISO 16251-1, rigidez dinámica EN 29052-1)."
+description: "El aislamiento acústico antes de construirlo: la predicción de flancos de EN 12354 entre recintos, el aislamiento teórico de un panel a partir de sus propiedades físicas y las dos mediciones de material que consume el diseño de un suelo (revestimientos ISO 16251-1, rigidez dinámica EN 29052-1)."
 ---
 
 Las páginas de la sección de
@@ -43,7 +43,7 @@ mejora.
 ## Páginas de esta sección
 
 - [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/):
-  los modelos de flancos aéreo y de impacto entre salas (EN 12354-1/2) con sus
+  los modelos de flancos aéreo y de impacto entre recintos (EN 12354-1/2) con sus
   índices de reducción de vibraciones de unión y sus fichas de predicción.
 - [Predicción del aislamiento de paneles](/phonometry/es/guides/panel-sound-insulation/):
   la ley de masa y la coincidencia (Sharp), las dobles hojas (Bies), las

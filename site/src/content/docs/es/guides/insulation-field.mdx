@@ -76,9 +76,9 @@ y la predicción del comportamiento in situ en
 
 ## ¿Cómo calculo DnT y R' a partir de una medición en campo con Python?
 
-Promedia en energía los niveles de las salas emisora y receptora por banda de
-tercio de octava y pásalos, junto con el tiempo de reverberación de la sala
-receptora, a `building.airborne_insulation(l1, l2, t2, area=S, volume=V)`. El
+Promedia en energía los niveles de los recintos emisor y receptor por banda de
+tercio de octava y pásalos, junto con el tiempo de reverberación del recinto
+receptor, a `building.airborne_insulation(l1, l2, t2, area=S, volume=V)`. El
 resultado lleva la diferencia de niveles bruta `d`, la estandarizada `dnt` y,
 cuando se dan `area` y `volume`, la aparente `r_prime`. Las mediciones de
 impactos pasan por `building.impact_insulation(li, t2, volume=V)`, y cualquiera
@@ -88,10 +88,10 @@ de los dos espectros se valora con `building.weighted_rating` /
 ## Aislamiento a ruido aéreo en campo (ISO 16283-1)
 
 Para calificar una pared o un forjado, mide el nivel promediado en energía en
-la sala **emisora** ($L_1$) y en la sala **receptora** ($L_2$) por banda de
+el recinto **emisor** ($L_1$) y en el recinto **receptor** ($L_2$) por banda de
 tercio de octava y forma la diferencia de niveles $D = L_1 - L_2$. Dos
-normalizaciones la hacen comparable entre salas. La **diferencia de niveles
-estandarizada** refiere el tiempo de reverberación de la sala receptora $T$ a
+normalizaciones la hacen comparable entre recintos. La **diferencia de niveles
+estandarizada** refiere el tiempo de reverberación del recinto receptor $T$ a
 $T_0 = 0{,}5$ s (de modo que con $T = 0{,}5$ s, $D_{nT} = D$ exactamente), y el
 **índice de reducción acústica aparente** normaliza por la superficie del
 cerramiento $S$ y el área de absorción de Sabine $A$:
@@ -104,7 +104,7 @@ $$
 Las posiciones se promedian en energía con
 $L = 10 \log_{10}\left( \frac{1}{n} \sum_i 10^{L_i/10} \right)$.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insulation_setup_es.svg" alt="Montaje de aislamiento a ruido aéreo en campo: un altavoz en la sala emisora, micrófonos promediados en energía en las salas emisora y receptora a través del cerramiento común" width="92%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insulation_setup_es.svg" alt="Montaje de aislamiento a ruido aéreo en campo: un altavoz en el recinto emisor, micrófonos promediados en energía en los recintos emisor y receptor a través del cerramiento común" width="92%" loading="eager" />
 
 La prima de $R'$ es una convención, no un adorno: las magnitudes con prima
 ($R'$, $L'_n$, $L'_{nT}$) se miden **en el edificio** e incluyen todas las
@@ -123,9 +123,9 @@ from phonometry import building
 print(round(float(building.energy_average_level([60.0, 66.0])), 1))   # 64.0
 
 # Aislamiento en campo por banda; la superficie S y el volumen V añaden R'
-l1 = np.full(16, 80.0)                                # niveles de la sala emisora
-l2 = np.full(16, 40.0)                                # niveles de la sala receptora
-t2 = np.full(16, 0.5)                                 # T de la sala receptora (s)
+l1 = np.full(16, 80.0)                                # niveles del recinto emisor
+l2 = np.full(16, 40.0)                                # niveles del recinto receptor
+t2 = np.full(16, 0.5)                                 # T del recinto receptor (s)
 ins = building.airborne_insulation(l1, l2, t2, area=10.0, volume=50.0)
 print(round(float(ins.dnt[0]), 1))                   # 40.0  (= D ya que T = T0)
 print(round(float(ins.r_prime[0]), 1))               # 38.0
@@ -146,11 +146,11 @@ función a `weighted_rating`, de modo que cada banda quede alineada índice a
 
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
-| `l1` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Niveles de la sala emisora (2D se promedia en energía) |
-| `l2` | array 1D o 2D | dB | mismo número de bandas | Niveles de la sala receptora |
-| `t2` | array 1D | s | > 0, uno por banda | Tiempo de reverberación de la sala receptora |
+| `l1` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Niveles del recinto emisor (2D se promedia en energía) |
+| `l2` | array 1D o 2D | dB | mismo número de bandas | Niveles del recinto receptor |
+| `t2` | array 1D | s | > 0, uno por banda | Tiempo de reverberación del recinto receptor |
 | `area` | float, opcional | m² | > 0, con `volume` | Superficie del cerramiento `S` (habilita `R'`) |
-| `volume` | float, opcional | m³ | > 0, con `area` | Volumen de la sala receptora `V` |
+| `volume` | float, opcional | m³ | > 0, con `area` | Volumen del recinto receptor `V` |
 | `t0` | float | s | por defecto `0.5` | Tiempo de reverberación de referencia `T0` |
 `airborne_insulation()` devuelve un `AirborneInsulationResult` (`d`, `dnt`,
 `r_prime` o `None`). El motor de curva de referencia que convierte cualquiera
@@ -164,7 +164,7 @@ El ruido de pisadas se califica al revés. En lugar de cuánto *bloquea* un
 forjado, el aislamiento a impactos mide cuánto introduce en la sala inferior
 una **máquina de impactos normalizada** situada en el forjado superior, así que
 un número *mayor* es *peor*. El nivel de presión acústica de impactos $L_i$
-promediado en energía en la sala receptora se normaliza igual que el caso
+promediado en energía en el recinto receptor se normaliza igual que el caso
 aéreo, pero con un cambio de signo en el término de reverberación:
 
 $$
@@ -174,20 +174,20 @@ A_0 = 10\ \text{m}^2,\ A = \frac{0{,}16\ V}{T}.
 $$
 
 El nivel de impactos **estandarizado** $L'_{nT}$ ($T_0 = 0{,}5$ s para viviendas)
-solo necesita el $T$ de la sala receptora, así que con $T = 0{,}5$ s es igual a
+solo necesita el $T$ del recinto receptor, así que con $T = 0{,}5$ s es igual a
 $L_i$; el nivel **normalizado** $L'_n$ (referido a un área de absorción de
-10 m²) necesita además el volumen de la sala receptora. Fíjate en el signo
+10 m²) necesita además el volumen del recinto receptor. Fíjate en el signo
 **menos**: más reverberación *reduce* $L'_{nT}$, al contrario que el $D_{nT}$
 aéreo.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_impact_setup_es.svg" alt="Montaje de aislamiento a impactos en campo: una máquina de impactos normalizada sobre el suelo de la sala emisora superior, micrófonos promediados en energía en la sala receptora inferior, y el tiempo de reverberación de la sala receptora" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_impact_setup_es.svg" alt="Montaje de aislamiento a impactos en campo: una máquina de impactos normalizada sobre el suelo del recinto emisor superior, micrófonos promediados en energía en el recinto receptor inferior, y el tiempo de reverberación del recinto receptor" width="92%" />
 
 ```python
 import numpy as np
 from phonometry import building
 
 # 16 niveles de impactos Li en tercios de octava (100 Hz - 3150 Hz), dB, del
-# ejemplo resuelto del Anexo C de ISO 717-2, y el T de la sala receptora por banda.
+# ejemplo resuelto del Anexo C de ISO 717-2, y el T del recinto receptor por banda.
 li = np.array([62.1, 63.2, 63.5, 66.2, 68.5, 70.0, 71.7, 73.1,
                73.8, 73.5, 73.8, 73.3, 73.1, 73.0, 72.4, 71.2])
 t2 = np.full(16, 0.5)
@@ -214,8 +214,8 @@ ISO 717-2 (tercios `L'nT,w = 79`, `CI = −11`; octava `54`, `CI = 0`).
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
 | `li` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | SPL de impactos promediado en energía (2D se promedia sobre las posiciones) |
-| `t2` | array 1D | s | > 0, uno por banda | Tiempo de reverberación de la sala receptora |
-| `volume` | float, opcional | m³ | > 0 | `V` de la sala receptora (habilita `L'n`) |
+| `t2` | array 1D | s | > 0, uno por banda | Tiempo de reverberación del recinto receptor |
+| `volume` | float, opcional | m³ | > 0 | `V` del recinto receptor (habilita `L'n`) |
 | `t0` | float | s | por defecto `0.5` | Tiempo de reverberación de referencia `T0` |
 
 `impact_insulation()` devuelve un `ImpactInsulationResult` (`l_n_t`, `l_n` o
@@ -282,7 +282,7 @@ field.report("Rpw_insitu.pdf", quantity="r_prime",
 field.report("DnTw_cadena.pdf", metadata=metadata,
              verbose=True, language="es")              # f | L1 | L2 | T | DnT
 
-# Impactos in situ: niveles de la máquina de impactos en la sala receptora
+# Impactos in situ: niveles de la máquina de impactos en el recinto receptor
 li = np.array([58.0, 60.5, 62.0, 63.5, 65.0, 66.0, 66.5, 66.0,
                65.5, 65.0, 64.0, 62.0, 59.0, 56.0, 53.0, 50.0])
 imp = building.impact_insulation(li, t2, volume=30.4)
@@ -292,7 +292,7 @@ imp.report("LnTw_insitu.pdf", language="es",
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/field_airborne_insulation_es.svg" alt="Cadena de medida aérea in situ: la diferencia de niveles bruta D y la DnT estandarizada en las dieciséis bandas de tercio de octava, con la corrección de reverberación sombreada entre ambas y los índices DnT,w y R'w anotados" width="80%" />
 
-*El tiempo de reverberación de la sala receptora convierte la diferencia de
+*El tiempo de reverberación del recinto receptor convierte la diferencia de
 niveles bruta $D$ en la $D_{nT}$ estandarizada banda a banda; con $T$ por
 encima de $T_0 = 0{,}5$ s en todo el rango, la corrección eleva ligeramente
 la curva. El recuadro recoge los dos valores únicos de esta medición,
@@ -450,7 +450,7 @@ plt.show()
 `coverage_factor`, `expanded_uncertainty`, `.lower`, `.upper`). El mapa de solo
 lectura `COVERAGE_FACTORS` expone la Tabla 8 indexada por `(confidence, one_sided)`.
 
-## Más allá de la medición entre dos salas
+## Más allá de la medición entre dos recintos
 
 Tres mediciones que compartían esta página tienen ahora guías propias, y una
 cuarta las acompaña. El cerramiento del edificio, medido frente al nivel a 2 m
@@ -462,8 +462,8 @@ merece, el método de control en bandas de octava es
 Cada número único citado arriba sale de las curvas de referencia de
 [Índices globales de aislamiento (ISO 717)](/phonometry/es/guides/insulation-ratings/).
 Y la vía de intensidad acústica hacia las mismas magnitudes, que lee la
-potencia transmitida sobre la cara radiante en lugar del nivel de la sala
-receptora, es
+potencia transmitida sobre la cara radiante en lugar del nivel del recinto
+receptor, es
 [Aislamiento acústico por intensidad (ISO 15186)](/phonometry/es/guides/insulation-intensity/).
 
 ## Qué cubre esta guía
@@ -471,7 +471,7 @@ receptora, es
 **Cubierto.** La ISO 16283-1:2014 (aislamiento a ruido aéreo de campo: la diferencia
 de niveles, la $D_{nT}$ estandarizada y el $R'$ aparente de los apartados 3.12
 a 3.15 y el promediado de posiciones del apartado 7.8) y la ISO 16283-2:2015
-(aislamiento a ruido de impacto de campo, las mismas normalizaciones con el
+(aislamiento a ruido de impactos de campo, las mismas normalizaciones con el
 signo invertido) mediante `building.energy_average_level`,
 `building.airborne_insulation` y `building.impact_insulation`, cada una con su
 informe de ensayo del apartado 14 en `.report()`; y las incertidumbres
@@ -519,7 +519,7 @@ la vía de intensidad acústica ISO 15186-1/-2
   sala y los tiempos de reverberación sobre los que se apoya la cadena de
   aislamiento de esta guía.
 - [Niveles](/phonometry/es/guides/levels/): el promediado en energía y las métricas de
-  nivel que sustentan los niveles de las salas emisora/receptora.
+  nivel que sustentan los niveles de los recintos emisor/receptor.
 - [Bancos de filtros](/phonometry/es/guides/filter-banks/): los filtros de octava
   fraccionaria IEC 61260 usados para los espectros de aislamiento.
 - [Teoría](/phonometry/es/reference/theory/rooms-buildings/): la derivación de la curva de referencia que sustenta
@@ -532,9 +532,9 @@ la vía de intensidad acústica ISO 15186-1/-2
 
 $D_{nT,w}$ es la diferencia de niveles estandarizada ponderada. Por banda
 de tercio de octava, $D_{nT} = D + 10 \log_{10}(T/T_0)$ refiere el tiempo
-de reverberación de la sala receptora $T$ a $T_0 = 0{,}5$ s, con
-$D = L_1 - L_2$ la diferencia de niveles entre la sala emisora y la
-receptora (ISO 16283-1). El método de la curva de referencia de ISO 717-1
+de reverberación del recinto receptor $T$ a $T_0 = 0{,}5$ s, con
+$D = L_1 - L_2$ la diferencia de niveles entre el recinto emisor y el
+receptor (ISO 16283-1). El método de la curva de referencia de ISO 717-1
 reduce después las 16 bandas de 100 Hz a 3150 Hz al número único leído a
 500 Hz.
 

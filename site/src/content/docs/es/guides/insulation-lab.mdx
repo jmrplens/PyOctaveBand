@@ -69,7 +69,7 @@ flotante, una ventana), se lleva a un **laboratorio** cualificado (ISO 10140),
 donde la transmisión por flancos suprimida hace que la transmisión *directa* sea
 toda la historia. Las fórmulas pierden sus primas: el **índice de reducción
 acústica** $R$ (no $R'$) y el **nivel de impactos normalizado** $L_n$ (no $L'_n$),
-con el área de absorción de la sala receptora $A = 0{,}16\ V/T$ ahora una propiedad
+con el área de absorción del recinto receptor $A = 0{,}16\ V/T$ ahora una propiedad
 conocida de la instalación:
 
 $$
@@ -77,7 +77,7 @@ R = L_1 - L_2 + 10 \log_{10}\frac{S}{A}, \qquad
 L_n = L_i + 10 \log_{10}\frac{A}{A_0}, \quad A_0 = 10\ \text{m}^2.
 $$
 
-La propia instalación es la que suprime los flancos: dos salas reverberantes
+La propia instalación es la que suprime los flancos: dos cámaras reverberantes
 desacopladas estructuralmente de al menos 50 m³ cada una, con el elemento a
 ensayo montado en una abertura de ensayo de unos 10 m² entre ambas.
 
@@ -105,7 +105,7 @@ domina.
 Los índices de un solo número reutilizan los mismísimos motores de ISO 717-1/2
 (`weighted_rating`, `weighted_impact_rating`): un espectro $R$ se valora a $R_w$
 exactamente igual que un espectro $R'$ se valoraba a $R'_w$. Antes de formar el
-índice, los niveles de la sala receptora deben **corregirse por ruido de fondo**
+índice, los niveles del recinto receptor deben **corregirse por ruido de fondo**
 (Cláusula 4.3): la resta energética $10 \log_{10}(10^{L_{sb}/10} - 10^{L_b/10})$
 se aplica para un margen señal-fondo de 6–15 dB, una corrección fija de 1,3 dB
 (el *límite de medición*) en 6 dB o por debajo, y ninguna corrección en 15 dB o
@@ -115,8 +115,8 @@ por encima.
 import numpy as np
 from phonometry import building
 
-# Niveles emisor/receptor y T de la sala receptora en las 16 bandas de tercio
-# de octava; S es el área libre de la abertura de ensayo, V el volumen de la sala receptora.
+# Niveles emisor/receptor y T del recinto receptor en las 16 bandas de tercio
+# de octava; S es el área libre de la abertura de ensayo, V el volumen del recinto receptor.
 l1 = np.full(16, 80.0)
 l2 = np.full(16, 40.0)
 t2 = np.full(16, 0.5)
@@ -204,9 +204,9 @@ plt.show()
 | :--- | :--- | :--- | :--- | :--- |
 | `l1` / `l2` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Niveles emisor / receptor (ruido aéreo) |
 | `li` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | SPL de impactos de la máquina de impactos (impactos) |
-| `t2` | array 1D | s | > 0, uno por banda | Tiempo de reverberación de la sala receptora |
+| `t2` | array 1D | s | > 0, uno por banda | Tiempo de reverberación del recinto receptor |
 | `area` | float | m² | > 0 | Área libre de la abertura de ensayo `S` (solo ruido aéreo) |
-| `volume` | float | m³ | > 0 | Volumen de la sala receptora `V` |
+| `volume` | float | m³ | > 0 | Volumen del recinto receptor `V` |
 
 `lab_airborne_insulation()` devuelve un `LabAirborneInsulationResult` (`r`,
 `absorption`, `rating`); `lab_impact_insulation()` un
@@ -342,5 +342,5 @@ suelo (ISO 16251-1) y la transmisión por flancos (ISO 10848).
 - [Índices globales de aislamiento (ISO 717)](/phonometry/es/guides/insulation-ratings/):
   el motor de curva de referencia tras Rw y Ln,w.
 - [Potencia acústica](/phonometry/es/guides/sound-power/): los métodos de `LW`
-  que comparten la maquinaria de área de absorción de la sala receptora.
+  que comparten la maquinaria de área de absorción del recinto receptor.
 - Referencia de la API: [`building.lab_insulation`](/phonometry/es/reference/api/building/lab-insulation/).

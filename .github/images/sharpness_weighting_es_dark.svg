@@ -595,7 +595,7 @@ L 389.036588 316.137395
     <text style="font-size: 9px; font-family: sans-serif; fill: #2ca02c" transform="translate(191.493594 370.533404)">15 Bark</text>
    </g>
    <g id="text_14">
-    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="325.200781" y="16.798125" transform="rotate(-0 325.200781 16.798125)">Ponderación de nitidez g(z) (DIN 45692)</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="325.200781" y="16.798125" transform="rotate(-0 325.200781 16.798125)">Ponderación de agudeza g(z) (DIN 45692)</text>
    </g>
    <g id="legend_1">
     <g id="patch_9">

@@ -629,7 +629,7 @@ _ES_EXACT = {
         "Curva de referencia desplazada (ISO 717-1)",
     "Unfavourable deviations": "Desviaciones desfavorables",
     "Sharpness Weighting g(z) (DIN 45692)":
-        "Ponderación de nitidez g(z) (DIN 45692)",
+        "Ponderación de agudeza g(z) (DIN 45692)",
     "Weighting g(z)": "Ponderación g(z)",
     "DIN 45692 g(z)": "g(z) DIN 45692",
     "von Bismarck (Annex B)": "von Bismarck (Anexo B)",
@@ -1149,8 +1149,8 @@ _ES_EXACT = {
     "shallow nodes": "nodos poco profundos",
     "Flanking transmission paths (EN 12354-1)":
         "Caminos de transmisión por flancos (EN 12354-1)",
-    "source room": "sala emisora",
-    "receiving room": "sala receptora",
+    "source room": "recinto emisor",
+    "receiving room": "recinto receptor",
     "direct, wall to wall": "directo, de muro a muro",
     "floor to floor": "de suelo a suelo",
     "floor to wall": "de suelo a muro",
@@ -1763,7 +1763,7 @@ _ES_PATTERNS = [
      "Dls,2m,nT,w(C;Ctr) = \\1 dB\nmétodo del altavoz a 45° (-1,5 dB en R')"),
     ((r"^L'nT,w\(CI\) = (.+) dB\nnote the minus sign: a live room lowers "
       r"L'nT$"),
-     "L'nT,w(CI) = \\1 dB\natención al signo menos: una sala viva reduce L'nT"),
+     "L'nT,w(CI) = \\1 dB\natención al signo menos: un recinto vivo reduce L'nT"),
     ((r"^LW = Lp,in \+ Cd - R' \+ 10 lg\(S/S0\)\nwall 176 m² \+ industrial "
       r"door 24 m², Cd = -5 dB$"),
      ("LW = Lp,in + Cd - R' + 10 lg(S/S0)\n"

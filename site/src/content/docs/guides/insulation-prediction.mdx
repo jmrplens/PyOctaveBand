@@ -390,6 +390,37 @@ element transmission factors used above, and both are covered, beside the
 ISO 16283-3 measurement they are compared against, in
 [Façade Sound Insulation](/phonometry/guides/facade-insulation/).
 
+## What this guide covers
+
+**Covered.** The simplified single-number models of EN 12354-1:2000
+(Clause 4.4) and EN 12354-2:2000 (Clause 4.3). Airborne: the Formula (26)
+energetic sum of the direct and flanking paths through
+`building.flanking_path`, `building.flanking_element` and
+`building.predicted_airborne_insulation`, with the Annex E vibration
+reduction indices $K_{ij}$ (rigid cross and T junctions, flexible
+interlayers, lightweight façades and double-leaf walls, corners and
+thickness changes) and the Clause 4.4.2 floor $K_{ij,\min}$ via
+`building.junction_vibration_reduction` and
+`building.junction_min_vibration_reduction`. Impact: the Formula (21)
+subtraction $L'_{n,w} = L_{n,w,eq} - \Delta L_w + K$ through
+`building.equivalent_impact_level`, `building.impact_flanking_correction`,
+`building.predicted_impact_insulation` and
+`building.standardized_impact_level`. Both results write a prediction fiche
+with `.report()`.
+
+**Not covered.** The *detailed* per-band models of both parts; the
+predictions here stop at the weighted single-number ratings. The element
+inputs themselves ($R_w$, $\Delta R_w$, $\Delta L_w$, mass per unit area)
+are taken as given, from laboratory data or from the mass-law estimates of
+[Predicting Panel Sound Insulation](/phonometry/guides/panel-sound-insulation/).
+The rest of the family is covered by its own guides: EN 12354-3 and
+EN 12354-4 across the building envelope in
+[Façade Sound Insulation](/phonometry/guides/facade-insulation/),
+EN 12354-5's service equipment in
+[Installed structure-borne sound](/phonometry/guides/installed-structure-borne/)
+and EN 12354-6's absorption model in
+[Sound absorption in enclosed spaces](/phonometry/guides/enclosed-space-absorption/).
+
 ## See also
 
 - [Façade Sound Insulation](/phonometry/guides/facade-insulation/): the

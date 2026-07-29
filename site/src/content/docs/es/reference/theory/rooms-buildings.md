@@ -211,7 +211,7 @@ El índice de un solo número (ISO 717-1, Cláusula 4.4) desplaza la **curva de 
 ### Aislamiento a impactos y absorción (ISO 16283-2, ISO 717-2, ISO 354)
 
 El aislamiento a impactos cambia la fuente aérea por una **máquina de impactos
-normalizada** y califica el nivel de la sala receptora, así que las convenciones
+normalizada** y califica el nivel del recinto receptor, así que las convenciones
 de signo se invierten. Los niveles de impactos estandarizado y normalizado son $L'_{nT} = L_i - 10 \log_{10}(T/T_0)$
 (el término de reverberación se *resta*, al contrario que $D_{nT}$) y
 $L'_n = L_i + 10 \log_{10}(A/A_0)$ con $A_0 = 10$ m² y $A = 0{,}16\ V/T$. El índice
@@ -250,12 +250,12 @@ la misma forma cerrada evaluada con el $A$ conocido de la instalación o el
 $A = 0{,}16\ V/T$ medido de la sala. El par a impactos es el nivel normalizado de
 laboratorio $L_n = L_i + 10 \log_{10}(A/A_0)$ (ISO 10140-3) frente al $L'_n$ de
 campo (ISO 16283-2), ambos referidos a $A_0 = 10$ m². Antes de formar cualquiera
-de ellos, el nivel de la sala receptora se corrige por ruido de fondo mediante la
+de ellos, el nivel del recinto receptor se corrige por ruido de fondo mediante la
 resta energética $L = 10 \log_{10}(10^{L_{sb}/10} - 10^{L_b/10})$ para un margen
 señal-fondo de 6–15 dB, saturada en un valor fijo de $1{,}3$ dB (el límite de
 medición) en 6 dB o por debajo y omitida en 15 dB o por encima (ISO 10140-4,
 Cláusula 4.3), el análogo de laboratorio de la regla 6/10 dB de ISO 16283-1. La
-extensión a fachadas (ISO 16283-3) sustituye el nivel de la sala emisora por el
+extensión a fachadas (ISO 16283-3) sustituye el nivel del recinto emisor por el
 nivel 2 m frente a la fachada, $D_{2m} = L_{1,2m} - L_2$, y añade una corrección
 fija por ángulo de incidencia al índice de reducción acústica del elemento, $-1{,}5$
 dB para el método del altavoz a 45° ($R'_{45°}$) y $-3$ dB para el método de

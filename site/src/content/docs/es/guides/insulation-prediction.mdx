@@ -1,6 +1,6 @@
 ---
 title: "Predicción del aislamiento acústico (EN 12354)"
-description: "Predicción EN 12354 del aislamiento acústico in situ entre salas a partir de datos de elemento: los modelos de flancos aéreos y de impacto de EN 12354-1/2 con sus índices de reducción de vibraciones de unión y sus fichas de predicción."
+description: "Predicción EN 12354 del aislamiento acústico in situ entre recintos a partir de datos de elemento: los modelos de flancos aéreos y de impacto de EN 12354-1/2 con sus índices de reducción de vibraciones de unión y sus fichas de predicción."
 references:
   - type: book
     authors: ["Hopkins, C."]
@@ -31,7 +31,7 @@ import ReportPreview from '../../../../components/ReportPreview.astro';
 
 Un índice de laboratorio describe un elemento aislado; un edificio también
 transmite sonido por todas las vías de flancos. Esta página cubre la
-predicción EN 12354 del comportamiento in situ entre salas a partir de datos
+predicción EN 12354 del comportamiento in situ entre recintos a partir de datos
 de elemento de laboratorio: el modelo aéreo de EN 12354-1 con sus índices de
 reducción de vibraciones de unión, el modelo de impactos de EN 12354-2 y las
 fichas de predicción de ambos. Las partes tercera y cuarta de la misma
@@ -57,7 +57,7 @@ El aislamiento a impactos pasa por `predicted_impact_insulation()`.
 Un índice de laboratorio describe un elemento de forma aislada, pero el sonido
 que un edificio transmite realmente también viaja *alrededor* del cerramiento
 (por el suelo, por la fachada, a través de las paredes de flanco) y se vuelve a
-radiar en la sala receptora. Esta **transmisión por flancos** es toda la
+radiar en el recinto receptor. Esta **transmisión por flancos** es toda la
 diferencia entre el $R$ de laboratorio y el $R'$ de campo. EN 12354 predice el
 índice aparente in situ a partir de los índices de laboratorio de los elementos
 más la transmisión vibratoria de sus uniones.
@@ -73,7 +73,7 @@ junto al único camino directo $Dd$.
   width={2400}
   height={1350}
   title="Pulsos de energía por los caminos directo y de flancos"
-  description="Los pulsos de energía salen de la sala emisora por el camino directo Dd y los caminos de flanco Ff, Fd y Df, encogiéndose en cada elemento y unión, y la etiqueta de cada camino se ilumina cuando su pulso vuelve a radiar en la sala receptora."
+  description="Los pulsos de energía salen del recinto emisor por el camino directo Dd y los caminos de flanco Ff, Fd y Df, encogiéndose en cada elemento y unión, y la etiqueta de cada camino se ilumina cuando su pulso vuelve a radiar en el recinto receptor."
 />
 
 El **modelo simplificado de un solo número**
@@ -391,13 +391,45 @@ PDF.
 ## A través del cerramiento: partes 3 y 4
 
 Las dos partes restantes de EN 12354 predicen del mismo modo, pero a través
-del cerramiento del edificio en lugar de entre dos salas: la EN 12354-3, el
+del cerramiento del edificio en lugar de entre dos recintos: la EN 12354-3, el
 aislamiento a ruido aéreo frente al sonido exterior, y la EN 12354-4, la
 potencia acústica que una fuente interior radia al exterior. Ambas se
 construyen sobre la misma suma de factores de transmisión ponderada por
 superficie usada arriba, y ambas están cubiertas, junto a la medición de
 ISO 16283-3 con la que se contrastan, en
 [Aislamiento acústico de fachadas](/phonometry/es/guides/facade-insulation/).
+
+## Qué cubre esta guía
+
+**Cubierto.** Los modelos simplificados de índice global de la
+EN 12354-1:2000 (apartado 4.4) y la EN 12354-2:2000 (apartado 4.3). Aéreo: la
+suma energética de la Fórmula (26) del camino directo y los caminos de
+flancos mediante `building.flanking_path`, `building.flanking_element` y
+`building.predicted_airborne_insulation`, con los índices de reducción
+vibracional $K_{ij}$ del Anexo E (uniones rígidas en cruz y en T, capas
+intermedias flexibles, fachadas ligeras y muros de doble hoja, esquinas y
+cambios de espesor) y el límite inferior $K_{ij,\min}$ del apartado 4.4.2 mediante
+`building.junction_vibration_reduction` y
+`building.junction_min_vibration_reduction`. Impactos: la resta de la
+Fórmula (21) $L'_{n,w} = L_{n,w,eq} - \Delta L_w + K$ mediante
+`building.equivalent_impact_level`, `building.impact_flanking_correction`,
+`building.predicted_impact_insulation` y
+`building.standardized_impact_level`. Ambos resultados escriben una ficha de
+predicción con `.report()`.
+
+**No cubierto.** Los modelos *detallados* por banda de ambas partes; las
+predicciones de aquí se quedan en los índices globales ponderados. Los
+propios datos de los elementos ($R_w$, $\Delta R_w$, $\Delta L_w$, masa por
+unidad de superficie) se toman como dados, de datos de laboratorio o de las
+estimaciones de ley de masas de
+[Predicción del aislamiento de paneles](/phonometry/es/guides/panel-sound-insulation/).
+El resto de la familia está cubierto por sus propias guías: la EN 12354-3 y
+la EN 12354-4 a través del cerramiento del edificio en
+[Aislamiento acústico de fachadas](/phonometry/es/guides/facade-insulation/),
+los equipos de servicio de la EN 12354-5 en
+[Ruido estructural instalado](/phonometry/es/guides/installed-structure-borne/)
+y el modelo de absorción de la EN 12354-6 en
+[Absorción acústica en recintos](/phonometry/es/guides/enclosed-space-absorption/).
 
 ## Véase también
 

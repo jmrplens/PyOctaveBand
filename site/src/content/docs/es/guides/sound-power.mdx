@@ -37,7 +37,7 @@ ficha técnica, alimenta una predicción de sala (EN 12354) o se contrasta con
 un límite de emisión de ruido. phonometry implementa cinco vías normalizadas
 para obtenerlo, repartidas en tres guías de método: una superficie
 envolvente de *presión* en campo (ISO 3744/3746) y el grado de precisión en
-*sala anecoica* (ISO 3745), cubiertas en
+*cámara anecoica* (ISO 3745), cubiertas en
 [Potencia acústica por métodos de presión](/phonometry/es/guides/sound-power-pressure/);
 el campo difuso de una *cámara reverberante* (ISO 3741), cubierto en
 [Potencia acústica en cámara reverberante](/phonometry/es/guides/sound-power-reverberation/);
@@ -65,13 +65,13 @@ prácticas distintos.
 | Método | Norma | Magnitud medida | Entorno | Grado de precisión | Cuándo usarlo |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | Superficie envolvente | **ISO 3744** (ingeniería) / **ISO 3746** (inspección) | Presión acústica sobre una semiesfera o caja | Campo esencialmente libre sobre uno o varios planos reflectantes | Grado 2 (`σR0 ≈ 1,5 dB`) / grado 3 (`≈ 3,0 dB`) | In situ o en una sala grande; sin instalación de ensayo especial disponible |
-| Sala reverberante | **ISO 3741** | Presión acústica en el campo difuso | Sala reverberante cualificada de paredes rígidas | Grado 1 (precisión) | Máxima precisión para fuentes estacionarias de banda ancha en laboratorio |
+| Cámara reverberante | **ISO 3741** | Presión acústica en el campo difuso | Cámara reverberante cualificada de paredes rígidas | Grado 1 (precisión) | Máxima precisión para fuentes estacionarias de banda ancha en laboratorio |
 | Barrido de intensidad | **ISO 9614-2** | Intensidad acústica normal barrida sobre una superficie | Casi cualquiera, tolerante al ruido extraño estacionario | Grado 2 / 3 (a partir de los indicadores de campo por banda) | In situ con ruido de fondo, o una máquina entre muchas |
-| Sala anecoica | **ISO 3745** | Presión acústica sobre un conjunto fijo de micrófonos | Sala anecoica o semianecoica cualificada | Grado 1 (precisión) | Emisión de grado de referencia en un laboratorio de campo libre |
+| Cámara anecoica | **ISO 3745** | Presión acústica sobre un conjunto fijo de micrófonos | Cámara anecoica o semianecoica cualificada | Grado 1 (precisión) | Emisión de grado de referencia en un laboratorio de campo libre |
 | Barrido de intensidad de precisión | **ISO 9614-3** | Intensidad normal barrida, con criterios más estrictos | Casi cualquiera, tolerante al ruido extraño estacionario | Grado 1 (precisión) | Precisión in situ, con las comprobaciones de indicadores de campo de ISO 9614-3 |
 
 Los métodos de presión corrigen el nivel superficial por la sala (`K2`) y por
-el ruido de fondo (`K1`); el método en cámara reverberante necesita una sala
+el ruido de fondo (`K1`); el método en cámara reverberante necesita que la cámara esté
 *cualificada* pero alcanza el grado de precisión; la intensidad rechaza la
 energía de fondo estacionaria a costa de una sonda de dos micrófonos y una
 comprobación de validez por banda. Cada guía de método recorre sus vías por
@@ -133,7 +133,7 @@ primera coincidencia nombra la norma.
 2. **¿Puede la fuente viajar al laboratorio?** ISO 3741 quiere la fuente
    pequeña frente a la cámara (volumen no mayor de aproximadamente el 2 % del
    volumen de la cámara) y su ruido estacionario; ISO 3745 la quiere dentro de
-   una sala anecoica o semianecoica cualificada con una dimensión
+   una cámara anecoica o semianecoica cualificada con una dimensión
    característica menor que la mitad del radio de medición, y es la vía que
    además proporciona la directividad. Una máquina anclada a su bancada
    descarta ambas y deja los métodos in situ.
