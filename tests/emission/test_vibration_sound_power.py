@@ -177,3 +177,18 @@ def test_plot_returns_axes() -> None:
         np.array([70.0, 75.0, 72.0]), 1.5, frequencies=np.array([250.0, 500.0, 1000.0])
     )
     assert res.plot() is not None
+
+
+def test_radiated_power_norton_diesel_engine_example() -> None:
+    # Norton & Karczub, Fundamentals of Noise and Vibration Analysis for
+    # Engineers 2e (CUP, 2003), problem 3.9 (p. 580) with the published
+    # answer (p. 611): a diesel engine approximated by a 1.2 m cube (five
+    # radiating faces, S = 7.2 m2) with v_rms = 12.2 mm/s in the 500 Hz
+    # octave band and radiation ratio sigma = 0.25 radiates W = 0.1112 W,
+    # i.e. Lw = 110.5 dB re 1 pW — the ISO/TS 7849-style vibration-velocity
+    # method. The book uses rho*c ~ 415 N.s/m3 against the standard's
+    # normalized 411 N.s/m3 (0.04 dB) and rounds to 0.1 dB, so 0.15 dB
+    # covers both.
+    lv = 20.0 * math.log10(12.2e-3 / 5e-8)  # dB re 5e-8 m/s
+    lw = radiated_sound_power_level(lv, 7.2, radiation_factor=0.25)
+    assert float(lw) == pytest.approx(110.5, abs=0.15)

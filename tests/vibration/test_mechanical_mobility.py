@@ -277,3 +277,56 @@ def test_rigid_mass_plot_rejects_unknown_language() -> None:
     res = rigid_mass_calibration_check([0.1], [100.0], 10.0)
     with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
+
+
+# ---------------------------------------------------------------------------
+# SDOF resonance — published tapping-machine/covering spot oracles
+# ---------------------------------------------------------------------------
+
+# These anchor the SDOF resonance relation f0 = (1/2pi) sqrt(k/m) on published
+# building-acoustics worked values for the ISO tapping-machine hammer
+# (m = 0.5 kg) resting on the contact stiffness of a floor covering — the
+# input side of the ISO 16251-1 / ISO 10140-3 improvement prediction models.
+
+
+def test_resonance_vigran_floor_covering_spot_values() -> None:
+    # Vigran, Building Acoustics (2008), Sec. 8.4.5 pp. 319-321 (Figs. 8.36
+    # and 8.37): hammer mass 0.5 kg on measured covering stiffnesses
+    # s = 3.2e5 N/m (carpet squares) -> f0 ~= 130 Hz, and s = 5.2e6 N/m
+    # (vinyl on felt) -> f0 ~= 510 Hz. The book quotes rounded frequencies
+    # (exact values 127.3 and 513.3 Hz), so 4 Hz covers the rounding.
+    # (The Fig. 8.37 caption prints the carpet stiffness as 3.2e6 N/m; the
+    # body text value 3.2e5 N/m is the one that reproduces 130 Hz — a book
+    # erratum, not one of the standard.)
+    assert resonance_frequency(0.5, 3.2e5) == pytest.approx(130.0, abs=4.0)
+    assert resonance_frequency(0.5, 5.2e6) == pytest.approx(510.0, abs=4.0)
+
+
+def test_resonance_hopkins_contact_stiffness_cutoffs() -> None:
+    # Hopkins, Sound Insulation (2007), Sec. 4.4.3.1 pp. 513-514 with the
+    # model of Sec. 3.6.3.1 (Eqs. 3.97/3.98/3.102): ISO tapping machine
+    # hammer m = 0.5 kg, contact radius r = 15 mm.
+    m_hammer = 0.5
+    r_contact = 0.015
+    # Covering No. 2, E/d = 2.8e8 N/m3: K = (E/d)*pi*r^2 (Eq. 3.98) and
+    # fco = (1/2pi) sqrt(K/m); Hopkins publishes fco = 100 Hz (exact
+    # 100.1 Hz).
+    k_covering_2 = 2.8e8 * math.pi * r_contact**2
+    assert resonance_frequency(m_hammer, k_covering_2) == pytest.approx(
+        100.0, abs=0.5
+    )
+    # Covering No. 1, E/d = 1.5e11 N/m3: Hopkins publishes fco ~= 2300 Hz
+    # (exact 2318 Hz; the book rounds to two significant figures).
+    k_covering_1 = 1.5e11 * math.pi * r_contact**2
+    assert resonance_frequency(m_hammer, k_covering_1) == pytest.approx(
+        2300.0, abs=25.0
+    )
+    # Bare 140 mm concrete slab: K = 2 r E / (1 - nu^2) (Eq. 3.97) with
+    # E = cL^2 rho (1 - nu^2) from cL = 3800 m/s, rho = 2200 kg/m3,
+    # nu = 0.2; Hopkins publishes fco ~= 7000 Hz (exact 6947 Hz, rounded to
+    # one significant figure in the book).
+    e_concrete = 3800.0**2 * 2200.0 * (1.0 - 0.2**2)
+    k_plate = 2.0 * r_contact * e_concrete / (1.0 - 0.2**2)
+    assert resonance_frequency(m_hammer, k_plate) == pytest.approx(
+        7000.0, abs=100.0
+    )

@@ -402,3 +402,41 @@ def test_plot_returns_axes() -> None:
     matplotlib.use("Agg")
     res = reverberation_time_models(DIMS, (0.2, 0.15, 0.3), frequencies=[125.0, 250.0])
     assert res.plot() is not None
+
+
+# ---------------------------------------------------------------------------
+# Sabine chain — published Spanish classroom example
+# ---------------------------------------------------------------------------
+
+
+def test_sabine_manual_es_classroom_chain() -> None:
+    # Aviles Lopez & Perera Martin, Manual de acustica ambiental y
+    # arquitectonica (Paraninfo), Ejemplos 8.1 (pp. 524-525, equivalent
+    # absorption areas) and 8.2 (p. 549, Sabine reverberation times) for a
+    # 6.0 x 10.2 m classroom: V = 214.2 m3 with the original plaster ceiling
+    # and 189.7 m3 with the absorbent false ceiling. Octave bands
+    # 125 Hz - 4 kHz. The book evaluates T = 0.16 V / A and rounds to
+    # 0.01 s; the library's exact 55.26/c0 constant (0.161) differs by 0.6 %,
+    # so 0.04 s covers both effects at the longest published time (4.31 s).
+    cases = [
+        # (volume m3, A per band m2, published T per band s)
+        (
+            214.2,
+            (34.83, 14.36, 9.74, 7.94, 10.39, 12.67),
+            (0.98, 2.39, 3.52, 4.31, 3.30, 2.71),
+        ),
+        (
+            189.7,
+            (34.74, 19.80, 25.00, 41.09, 58.44, 47.00),
+            (0.87, 1.53, 1.21, 0.74, 0.52, 0.65),
+        ),
+        (
+            189.7,
+            (38.34, 27.00, 42.70, 70.49, 92.34, 80.60),
+            (0.79, 1.12, 0.71, 0.43, 0.33, 0.38),
+        ),
+    ]
+    for volume, areas, expected in cases:
+        for area, t_published in zip(areas, expected, strict=True):
+            t = sabine_reverberation_time(volume, [(area, 1.0)])
+            assert t == pytest.approx(t_published, abs=0.04), (volume, area)

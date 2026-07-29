@@ -445,3 +445,49 @@ def test_impact_one_decimal_reference_floor() -> None:
     assert res.rating == pytest.approx(77.6)
     assert res.ci == pytest.approx(-10.3)
     assert res.core.rating == 78 and res.core.ci == -11
+
+
+# ---------------------------------------------------------------------------
+# ISO 717-1 rating of a published Spanish field test report (CTE DB-HR chain)
+# ---------------------------------------------------------------------------
+
+# Aviles Lopez & Perera Martin, "Manual de acustica ambiental y
+# arquitectonica" (Paraninfo, ISBN 978-84-283-3814-1), Ejemplo 7.2
+# (pp. 394-395): apparent sound reduction index R' of a separating wall from a
+# real field test report, one-third-octave bands 100 Hz - 3150 Hz (the report
+# extends to 5 kHz; the 16 ISO 717-1 rating bands are used here).
+_MANUAL_ES_R_PRIME = (
+    36.2, 41.5, 36.9, 40.4, 44.7, 42.4, 45.7, 46.1,
+    47.1, 52.3, 54.3, 57.5, 57.8, 57.3, 59.0, 62.8,
+)
+
+# Ejercicio 7.1 (p. 395): standardized facade level difference D2m,nT of the
+# same building's facade, same band layout.
+_MANUAL_ES_D_2M_NT = (
+    28.5, 28.5, 18.9, 23.7, 30.7, 31.3, 37.8, 35.2,
+    34.7, 38.5, 37.7, 43.1, 42.3, 44.2, 41.9, 37.5,
+)
+
+
+def test_weighted_rating_manual_es_field_report() -> None:
+    # Ejemplo 7.1 (pp. 391-392) publishes the report's ISO 717-1 statement for
+    # this curve: R'w = 52 dB with C = -1 and Ctr = -5, hence the CTE DB-HR
+    # global indices R'A = R'w + C = 51 dBA (pink noise) and
+    # R'A,tr = R'w + Ctr = 47 dBA (traffic). All integers by definition.
+    res = weighted_rating(_MANUAL_ES_R_PRIME)
+    assert res.rating == 52
+    assert res.c == -1
+    assert res.ctr == -5
+    # The published global indices 51 dBA and 47 dBA follow as 52 - 1 and
+    # 52 - 5 from the three values asserted above.
+
+
+def test_weighted_rating_manual_es_facade_traffic_index() -> None:
+    # Ejercicio 7.1 evaluates the CTE DB-HR facade index directly with the
+    # one-decimal formula D2m,nT,Atr = -10 lg sum 10^((LAtr,i - Di)/10) and
+    # publishes 32.8 dBA. The ISO 717-1 route implemented here yields the
+    # integer pair D2m,nT,w + Ctr; the two definitions agree to within the
+    # C-term's integer rounding, so 1.0 dB is the definitional tolerance
+    # (0.5 dB rounding of Ctr plus 0.5 dB of the printed one-decimal value).
+    res = weighted_rating(_MANUAL_ES_D_2M_NT)
+    assert res.rating + res.ctr == pytest.approx(32.8, abs=1.0)

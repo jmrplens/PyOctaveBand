@@ -87,3 +87,11 @@ def test_composite_accepts_generator_and_rejects_empty() -> None:
 def test_composite_rejects_non_finite_hours() -> None:
     with pytest.raises(ValueError, match="finite"):
         composite_rating_level([(60.0, float("nan"), 0.0), (50.0, 12.0, 0.0)])
+
+
+def test_lden_manual_es_published_example() -> None:
+    # Aviles Lopez & Perera Martin, Manual de acustica ambiental y
+    # arquitectonica (Paraninfo), Ejemplo 1.7 (p. 27): Ld = 65, Le = 62,
+    # Ln = 54 dBA give Lden = 65.1 dB with the standard 12/4/8 h day.
+    # The book prints one decimal (exact value 65.12), so 0.05 covers it.
+    assert lden(65.0, 62.0, 54.0) == pytest.approx(65.1, abs=0.05)
