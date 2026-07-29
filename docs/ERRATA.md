@@ -772,7 +772,6 @@ to the issuing body, with date and reference).
   and a defensive note at the formula.
 - **Status:** unreported (textbook rather than a standard).
 
-<<<<<<< HEAD
 ## Long, Architectural Acoustics 2e (2014), Eq. (18.24) (sign of the microphone directivity)
 
 - **Location:** Chapter 18, "Multiple Open Microphones", Eq. (18.24) (printed
@@ -838,7 +837,6 @@ to the issuing body, with date and reference).
   the 3,16 constant by the conformance check "Long, Architectural
   Acoustics 2e, Eq. (17.54)".
 - **Status:** unreported (textbook rather than a standard, so non-normative).
-=======
 ## Long, Architectural Acoustics 2e (2014), Table 14.7 (round elbow rows)
 
 - **Location:** Chapter 14, Table 14.7, "Insertion Loss of Round Elbows"
@@ -861,7 +859,6 @@ to the issuing body, with date and reference).
   `test_elbow_tables_by_frequency_width_product`
   ([`tests/noise_control/test_hvac_long.py`](../tests/noise_control/test_hvac_long.py)).
 - **Status:** unreported (textbook rather than a standard).
->>>>>>> 9026b2d3 (Diffuser self-noise from the printed equations, and the sheet's errata registered)
 
 ## Long, Architectural Acoustics 2e (2014), Eq. 13.28 (units of U_G)
 
