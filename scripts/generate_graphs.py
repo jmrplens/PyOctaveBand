@@ -12657,7 +12657,8 @@ def _schematic_axes(ax: Any, xlim: tuple[float, float],
 
 def _render_clip(fig: Any, update: Callable[[int], tuple[Any, ...]],
                  output_dir: str, stem: str, *, frames: int | None = None,
-                 fps: int | None = None, gif_fps: int | None = None) -> None:
+                 fps: int | None = None, gif_fps: int | None = None,
+                 poster_ss: float | None = None) -> None:
     """Shared clip tail: drive *update* through FuncAnimation and encode.
 
     Static artists (tick labels included) get the same Spanish pass as the
@@ -12673,7 +12674,7 @@ def _render_clip(fig: Any, update: Callable[[int], tuple[Any, ...]],
     rate = _ANIM_FPS if fps is None else fps
     anim = FuncAnimation(fig, update, frames=n_frames,
                          interval=1000 / rate, blit=False)
-    _save_animation(anim, fig, output_dir, stem, fps=rate, gif_fps=gif_fps)
+    _save_animation(anim, fig, output_dir, stem, fps=rate, gif_fps=gif_fps, poster_ss=poster_ss)
 
 
 # --- shared schematic vocabulary (mics, gauges, flow boxes, arrows) --------
@@ -12904,7 +12905,21 @@ def _draw_resistor(ax: Any, x0: float, x1: float, y: float) -> None:
     ax.plot(xs, ys, color=COLOR_FG, lw=1.4)
 
 
-def _extract_poster(webm: str) -> str:
+def _poster_ss_for(webm: str) -> float | None:
+    """Per-clip poster-time override; None keeps the end-of-hold default.
+
+    The pillar-hall banner poster is grabbed mid-flight (simulation time
+    6 ms, the front threading the middle of the hall) instead of the
+    settled last frame, which for a single travelling packet is an almost
+    empty field.
+    """
+    if "anim_fdtd_pillar_hall" in os.path.basename(webm):
+        dt_frame = _PILLAR_EVERY * 0.6 * _PILLAR_DX / (343.0 * np.sqrt(2.0))
+        return float((6.0e-3 / dt_frame - _PILLAR_WARM) / _PILLAR_FPS)
+    return None
+
+
+def _extract_poster(webm: str, poster_ss: float | None = None) -> str:
     """Extract the deferred-loading poster still from a rendered WebM.
 
     The frame is grabbed half a second before the end of the clip, i.e.
@@ -12917,8 +12932,11 @@ def _extract_poster(webm: str) -> str:
 
     poster = webm.removesuffix(".webm") + "_poster.jpg"
     subprocess.run(
-        ["ffmpeg", "-y", "-loglevel", "error", "-sseof", "-0.5", "-i", webm,
-         "-frames:v", "1", "-q:v", "3", "-update", "1", poster],
+        ["ffmpeg", "-y", "-loglevel", "error"]
+        + (["-ss", f"{poster_ss:.2f}"] if poster_ss is not None
+           else ["-sseof", "-0.5"])
+        + ["-i", webm, "-frames:v", "1", "-q:v", "3", "-update", "1",
+           poster],
         check=True)
     return poster
 
@@ -12936,7 +12954,7 @@ def generate_posters(output_dir: str) -> None:
         raise RuntimeError(f"no anim_*.webm files found in {output_dir}; "
                            "run `make animations` first")
     for webm in webms:
-        poster = _extract_poster(webm)
+        poster = _extract_poster(webm, _poster_ss_for(webm))
         print(f"  {os.path.basename(webm)} -> {os.path.basename(poster)}")
 
 
@@ -13020,7 +13038,8 @@ ssh -o BatchMode=yes -- {q_target} "rm -f {q_dir}/$rid"
 
 def _save_animation(anim: Any, fig: Any, output_dir: str, stem: str,
                     make_gif: bool = True, *, fps: int | None = None,
-                    gif_fps: int | None = None) -> None:
+                    gif_fps: int | None = None,
+                    poster_ss: float | None = None) -> None:
     """Write *anim* to WebM (always), its poster JPEG and, for English, a GIF.
 
     The GIF is derived from the just-written WebM with an ffmpeg palette pass
@@ -13062,7 +13081,7 @@ def _save_animation(anim: Any, fig: Any, output_dir: str, stem: str,
         with plt.rc_context({"savefig.bbox": "standard"}):
             anim.save(webm, writer=writer, dpi=_ANIM_DPI,
                       savefig_kwargs={"facecolor": fig.get_facecolor()})
-    _extract_poster(webm)
+    _extract_poster(webm, poster_ss)
     made_gif = False
     if make_gif and _LANG == "en":
         gif = _anim_path(output_dir, stem, "gif")
@@ -15292,20 +15311,30 @@ def animate_fdtd_metadiffuser(output_dir: str) -> None:
 # interference of the scattered wavelets. Banner canvas: 8.0 x 2.0 in at
 # 300 dpi = 2400 x 600 px; the visible window is exactly 4 m x 1 m so the
 # field is shown at true physical aspect.
-_PILLAR_DX = 0.005                    # [m]
+_PILLAR_DX = 0.0025                   # [m]
 _PILLAR_LX, _PILLAR_LY = 4.4, 1.0     # domain [m]; 0.2 m sponge ends hidden
-_PILLAR_NX = round(_PILLAR_LX / _PILLAR_DX)   # 880
-_PILLAR_NY = round(_PILLAR_LY / _PILLAR_DX)   # 200
+_PILLAR_NX = round(_PILLAR_LX / _PILLAR_DX)   # 1760
+_PILLAR_NY = round(_PILLAR_LY / _PILLAR_DX)   # 400
 _PILLAR_F0 = 800.0                    # carrier [Hz], lambda = 42.9 cm
 _PILLAR_VIEW = (0.2, 4.2)             # visible x window [m] (4:1 exact)
 _PILLAR_FIGSIZE = (8.0, 2.0)          # in at _ANIM_DPI -> 2400 x 600 px
-# Duration rule: full flight of the first front from the injection line
-# (x = 0.21 m) to the far absorbing end (x = 4.40 m) = 4.19 m -> 12.2 ms,
-# x 1.2 = 14.7 ms. With dt = 0.6 dx / (c sqrt(2)) = 6.18 us and one
-# stored frame every 4 steps (24.7 us), the 1.25 ms carrier period is
-# sampled 50.5 times (>= 48 frames per period), giving 593 field frames.
-_PILLAR_EVERY = 4
-_PILLAR_FRAMES = 593
+# Mesh rule: the smallest geometric dimension is the 6.6 cm column-wall
+# aperture (6.6 / 4 = 1.65 cm) against lambda / 8 = 5.36 cm at 800 Hz, so
+# the bound is 1.65 cm; dx = 2.5 mm sits 6.6x finer (>= 44 cells per
+# column diameter) for the definition the banner format demands.
+# Duration rule: the packet crosses injection (x = 0.30 m) to the far
+# absorbing end (4.40 m) in 12.0 ms and the norm floor is x 1.2 = 14.3 ms;
+# the captured window runs 22.3 ms so the multiple-scattering coda is
+# also seen decaying to silence. With dt = 0.6 dx / (c sqrt(2)) = 3.09 us
+# and one stored frame every 8 steps (24.7 us), the 1.25 ms carrier
+# period is sampled 50.5 times (>= 48 frames per period). The first 40
+# frames (~1.0 ms of free travel before the first columns) are trimmed,
+# leaving 900 frames played at 40 fps: the same 0.99 ms of simulation
+# per clip second as the approved preview pacing, 22.5 s + hold.
+_PILLAR_EVERY = 8
+_PILLAR_FRAMES = 900
+_PILLAR_FPS = 40
+_PILLAR_WARM = 40                     # frames of free travel trimmed
 
 
 def _pillar_layout() -> list[tuple[float, float, float]]:
@@ -15357,27 +15386,26 @@ def _pillar_fields(n_frames: int = _PILLAR_FRAMES) -> tuple[Any, Any]:
     The top and bottom edges stay rigid (the hall walls), the left and
     right ends absorb through 0.2 m sponges hidden outside the visible
     window, and the columns are rigid rasterised cells. The incident wave
-    is a sustained one-way plane-wave line at the 800 Hz carrier (two
-    ramp-on periods), injected just inside the left sponge, so the first
-    front sweeps the hall and the wavetrain behind it builds up the
-    steady multiple-scattering interference pattern; a mild bulk damping
-    (25 1/s, a ~0.28 s T60 stand-in for air and wall absorption) keeps
-    the steady state bounded. Small enough (176 k cells, 2372 steps) to
-    run on the CPU in well under a minute, so the GPU runner is not
-    involved.
+    is a single one-way plane-wave packet (Gaussian envelope one carrier
+    wavelength wide) launched just before the first columns, so one front
+    sweeps the hall, each pillar sheds a visible reflection into the
+    structured coda behind it, and the hall then empties through the
+    absorbing ends; a mild bulk damping (25 1/s, a ~0.28 s T60 stand-in
+    for air and wall absorption) keeps the decay physical. 704 k cells
+    and 7520 steps, still comfortably a CPU job, so the GPU runner is
+    not involved.
     """
     import fdtd2d
 
     sim = fdtd2d.FDTD2D(
         343.0, _PILLAR_DX, shape=(_PILLAR_NY, _PILLAR_NX),
-        sponge_width=40, sponge_sides=("left", "right"),
+        sponge_width=80, sponge_sides=("left", "right"),
         damping=25.0, obstacle_mask=_pillar_mask())
 
-    def waveform(t: float) -> float:
-        ramp = min(1.0, t * _PILLAR_F0 / 2.0)
-        return ramp * float(np.sin(2.0 * np.pi * _PILLAR_F0 * t))
-
-    sim.add_source(fdtd2d.PlaneWaveSource("right", waveform, offset=42))
+    lam0 = 343.0 / _PILLAR_F0
+    sim.add_plane_wave("right", center=0.30, width=0.08, wavelength=lam0)
+    for _ in range(_PILLAR_WARM * _PILLAR_EVERY):
+        sim.step()
     frames: list[Any] = []
     ts: list[float] = []
     for _ in range(n_frames):
@@ -15413,7 +15441,7 @@ def _ensure_field_dark_cmap() -> str:
 
 def animate_fdtd_pillar_hall(output_dir: str) -> None:
     """README banner: an 800 Hz plane wavefront sweeps through a hall of
-    rigid columns (2D FDTD at 5 mm): every pillar diffracts the front and
+    rigid columns (2D FDTD at 2.5 mm): every pillar diffracts the front and
     the scattered wavelets interfere until they fill the whole hall."""
     from matplotlib.patches import Circle
 
@@ -15426,8 +15454,7 @@ def animate_fdtd_pillar_hall(output_dir: str) -> None:
     # colonnade (x > 1.0 m of the last frame), so the standing wave in
     # front of the columns saturates boldly while the threaded and
     # transmitted field keeps the full colour ramp.
-    vmax = float(np.quantile(
-        np.abs(frames[-1][:, round(1.0 / _PILLAR_DX):]), 0.99))
+    vmax = 0.55 * float(np.max(np.abs(frames)))
     fig = plt.figure(figsize=_PILLAR_FIGSIZE, dpi=_ANIM_DPI)
     ax = fig.add_axes((0.0, 0.0, 1.0, 1.0))
     im = ax.imshow(frames[0], origin="lower",
@@ -15457,11 +15484,12 @@ def animate_fdtd_pillar_hall(output_dir: str) -> None:
         return (im, t_txt)
 
     # GIF budget: the full-frame wave motion compresses poorly, so the
-    # README GIF keeps the smooth 2x decimation of the 20 fps WebM
-    # (gif_fps = 10) at the shared 640 px width, landing at 7.1 MB (light)
-    # and 7.5 MB (dark), under the ~8 MB GitHub autoplay budget.
+    # README GIF decimates the 40 fps WebM 5x (gif_fps = 8) at the shared
+    # 640 px width, landing at 6.2 MB (light) and 6.6 MB (dark), under
+    # the ~8 MB GitHub autoplay budget.
     _render_clip(fig, update, output_dir, "anim_fdtd_pillar_hall",
-                 frames=n_active + _ANIM_HOLD, gif_fps=10)
+                 frames=n_active + _ANIM_HOLD, fps=_PILLAR_FPS, gif_fps=8,
+                 poster_ss=_poster_ss_for("anim_fdtd_pillar_hall.webm"))
 
 
 def animate_standing_wave_tube(output_dir: str) -> None:
