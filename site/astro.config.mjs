@@ -9,6 +9,7 @@ import rehypeKatex from 'rehype-katex';
 import { sidebar } from './src/data/sidebar.mjs';
 import { basePath, siteUrl } from './src/data/site.mjs';
 import { isOurMedia, mediaUrl, REMOTE_PREFIXES } from './src/lib/media.mjs';
+import { rehypeWrappableMath } from './src/lib/wrappable-math.mjs';
 import {
   featureList,
   keywords,
@@ -439,7 +440,13 @@ export default defineConfig({
     remarkPlugins: [remarkMath],
     // rehypeSingleTextMath must run after rehypeKatex: it rewrites the
     // elements KaTeX has just produced.
-    rehypePlugins: [rehypeKatex, rehypeSingleTextMath, rehypeLocalMedia, rehypeTableAlign],
+    rehypePlugins: [
+      rehypeKatex,
+      rehypeSingleTextMath,
+      rehypeWrappableMath,
+      rehypeLocalMedia,
+      rehypeTableAlign,
+    ],
   },
   integrations: [
     mermaid({

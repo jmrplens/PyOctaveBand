@@ -94,6 +94,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Documentation site: a display formula that states several equations on one
+  line now reflows on narrow screens instead of scrolling sideways. A build-time
+  pass splits such a block at the author's own widest top-level separator
+  (`\quad` or `\qquad`), makes each equation a part of a wrapping row and
+  re-expresses the separator as the row's column gap, so a wide screen renders
+  the identical single centred row while a phone stacks one equation per line,
+  each centred. It reaches the 232 blocks on 120 pages (60 English, 60 Spanish)
+  that state more than one equation per block, needs no change to the markdown,
+  and leaves the TeX, the accessible label and the page anchors untouched.
+
 - The home page meta description now fits the ~160-character window search
   engines display (Bing flagged the old 318-character one): the one-sentence
   definition plus the conformance-check claim, in both languages. The full
