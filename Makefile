@@ -84,6 +84,13 @@ brand:
 llms:
 	$(PYTHON) scripts/generate_llms.py
 
+# Regenerate README_PYPI.md (the PyPI long description) from README.md:
+# theme-aware <picture> elements collapse to their light <img> fallback and
+# animated GIFs to poster stills, because PyPI strips <picture>/<source>.
+# The packaging tests fail if the committed file drifts.
+pypi-readme:
+	$(PYTHON) scripts/generate_pypi_readme.py
+
 # Regenerate the committed Starlight API reference (site/src/content/docs/
 # reference/api + site/src/generated/api-sidebar.mjs) from the source
 # docstrings. CI fails if this drifts (see the api-docs job in python-app.yml).
@@ -148,4 +155,4 @@ coverage:
 check: lint security test
 
 .PHONY: install lint format security snyk sonar graphs reports animations posters brand lighthouse \
-	llms api-docs site-reports conformance install-hooks test coverage check
+	llms pypi-readme api-docs site-reports conformance install-hooks test coverage check

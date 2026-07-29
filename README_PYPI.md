@@ -1,3 +1,10 @@
+<!-- AUTO-GENERATED FILE - DO NOT EDIT BY HAND.
+  PyPI long description derived from README.md by
+  scripts/generate_pypi_readme.py (make pypi-readme): every picture
+  element collapses to its light-theme img fallback and animated
+  clips to their poster stills, because PyPI's readme renderer
+  strips the picture and source tags. Edit README.md instead. -->
+
 <a href="https://jmrplens.github.io/phonometry/"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/brand/banner.webp" alt="phonometry, acoustic measurement toolkit for Python" width="100%"></a>
 
 <!-- Package -->
@@ -29,7 +36,7 @@ to the values the library computes, and CI regenerates it on every pull
 request. Filters are class 1 per **IEC 61260-1:2014 / ANSI S1.11-2004** and
 weightings and levels class 1 per **IEC 61672-1:2013**.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_pillar_hall_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_pillar_hall.gif" alt="Animation: an 800 Hz plane wavefront sweeps through a hall of rigid columns in a 2D FDTD simulation; every column diffracts the front and the scattered wavelets interfere until the whole hall is filled" width="100%"></picture>
+<img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_pillar_hall_poster.jpg" alt="An 800 Hz plane wavefront sweeps through a hall of rigid columns in a 2D FDTD simulation; every column diffracts the front and the scattered wavelets interfere until the whole hall is filled" width="100%">
 
 *An 800 Hz wavefront threading a hall of columns, computed with the library's
 own [2D FDTD engine](https://github.com/jmrplens/phonometry/blob/main/docs/fdtd-simulation.md)
@@ -65,7 +72,7 @@ print(f"Bands: {freq}")
 print(f"SPL [dB]: {spl}")
 ```
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_fraction_3_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_fraction_3.svg" alt="One-third-octave spectrum analysis of a multi-tone signal with the raw PSD in the background" width="80%"></picture>
+<img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_fraction_3.svg" alt="One-third-octave spectrum analysis of a multi-tone signal with the raw PSD in the background" width="80%">
 
 *1/3 octave band spectrum analysis of a complex signal. More examples in the
 [documentation](https://jmrplens.github.io/phonometry/).*
@@ -111,7 +118,7 @@ Cross-cutting, everywhere in the library:
   workflows
 - 🌐 Documentation fully in English and Spanish
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_type_comparison_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_type_comparison.svg" alt="Magnitude response comparison of the five filter architectures for the 1 kHz octave band, with a zoom at the -3 dB crossover" width="80%"></picture>
+<img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_type_comparison.svg" alt="Magnitude response comparison of the five filter architectures for the 1 kHz octave band, with a zoom at the -3 dB crossover" width="80%">
 
 *The five filter architectures on the 1 kHz octave band, with the −3 dB
 points on the ANSI band edges.*
