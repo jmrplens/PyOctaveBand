@@ -465,6 +465,41 @@ to the issuing body, with date and reference).
   in [`distortion.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/electroacoustics/distortion.py).
 - **Status:** unreported.
 
+## UNE-EN 61043:1999, clause 6.1 (class 2 frequency range dropped in translation)
+
+- **Location:** clause 6.1 "Rango de frecuencias", the class 2 sentence, of
+  UNE-EN 61043 (April 1999), which declares itself "la versión oficial, en
+  español, de la Norma Europea EN 61043 de enero 1994, que a su vez adopta la
+  Norma Internacional CEI 61043:1993".
+- **The print:** a single sentence, "Los procesadores de clase 2 deberán
+  cubrir, al menos, el rango desde 45 Hz a 5,6 kHz en bandas de octava."
+- **The problem:** the EN/IEC text gives class 2 processors two alternative
+  ranges, not one: "Class 2 processors shall, at least, cover the range from
+  45 Hz to 7,1 kHz in one-third octave bands, **or** the range from 45 Hz to
+  5,6 kHz in one octave bands" (BS EN 61043:1994, clause 6.1). The
+  translation drops the first alternative. The omission is normative rather
+  than editorial: it removes one of the two ways clause 6.1 can be satisfied,
+  and a reader of the Spanish text alone would conclude that class 2 is
+  *defined* over octave bands, so that a one-third-octave chain verified over
+  the 22 tabulated bands from 50 Hz to 6,3 kHz could not attest class 2 over
+  its full range.
+- **Evidence:** side-by-side reading of clause 6.1 in both prints. The class 1
+  sentence is word-for-word equivalent in the two documents, so the divergence
+  is confined to the class 2 sentence. The Spanish print also contradicts
+  itself: its Table 2 tabulates the pressure-residual intensity index for
+  class 2 processors at all 22 one-third-octave centres, and its faithfully
+  translated Note 2 ("Para procesadores con análisis en bandas de octavas
+  únicamente, los requisitos se aplican únicamente a las frecuencias centrales
+  de las bandas de octava") carves out octave-only processors as a special
+  case. Both are redundant if every class 2 processor is an octave-band one.
+- **Library behaviour:** implements the EN/IEC reading.
+  [`verify_intensity_class`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/metrology/intensity_compliance.py)
+  treats the full 22-band one-third-octave set as attesting either class, and
+  the 7-band octave set (63 Hz to 4 kHz) as a class 2 alternative that never
+  attests class 1, with both branches pinned by regression tests
+  ([`tests/metrology/test_intensity_compliance.py`](https://github.com/jmrplens/phonometry/blob/main/tests/metrology/test_intensity_compliance.py)).
+- **Status:** unreported (national translation, not the issuing body's text).
+
 ## ISO/PAS 1996-3:2022, Clause 5 (cross-references of r and d)
 
 - **Location:** Clause 5, Formula (2), the definitions of the symbols of the

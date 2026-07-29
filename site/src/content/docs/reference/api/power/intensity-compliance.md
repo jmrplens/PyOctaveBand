@@ -29,13 +29,18 @@ Two related requirements of the same standard are exposed here as well:
 
 * **Clause 6.1** (frequency range of processors): a class 1 processor covers at
   least 45 Hz to 7,1 kHz in one-third-octave bands (the 22 tabulated bands from
-  50 Hz to 6,3 kHz); a class 2 processor covers at least 45 Hz to 5,6 kHz in
-  octave bands (the 7 octave bands from 63 Hz to 4 kHz). A verdict computed
-  over a narrower set of bands attests only the bands supplied, which
-  [`verify_intensity_class`](/phonometry/reference/api/power/intensity-compliance/#verify_intensity_class) flags as `range_limited`. Because the
-  octave range is the *class 2* alternative, a class 1 verdict reached over
-  octave bands alone is flagged too, and a probe (tested in one-third octaves
-  by clause 12.4) cannot use the alternative at all.
+  50 Hz to 6,3 kHz). A class 2 processor covers *either* that same
+  one-third-octave range *or*, alternatively, 45 Hz to 5,6 kHz in octave bands
+  (the 7 octave bands from 63 Hz to 4 kHz). A verdict computed over a narrower
+  set of bands attests only the bands supplied, which
+  [`verify_intensity_class`](/phonometry/reference/api/power/intensity-compliance/#verify_intensity_class) flags as `range_limited`. Because the octave
+  range is open to class 2 alone, a class 1 verdict reached over octave bands
+  only is flagged too, and a probe (tested in one-third octaves by clause 12.4)
+  cannot use the alternative at all.
+
+  The Spanish translation UNE-EN 61043:1999 states only the octave alternative
+  for class 2, dropping the one-third-octave one; this module follows the
+  EN/IEC text (see `docs/ERRATA.md`).
 * **Clause 8** (instrument assembled from separate components): a class 1
   instrument consists of a class 1 processor and a class 1 probe; a class 2
   instrument of any other combination of class 1 and class 2 components. See
@@ -440,10 +445,11 @@ one-third-octave bands (the 22 tabulated bands, 50 Hz to 6,3 kHz), or, for
 an octave-band processor, 45 Hz to 5,6 kHz in octave bands (63 Hz to
 4 kHz). `range_limited` is `True` when the supplied bands cover neither
 of those sets, in which case the returned class attests the bands actually
-verified and not the standard's full frequency range. Clause 6.1 gives the
-one-third-octave range to class 1 and offers the octave range only to
-class 2, so a verdict computed over the 7 octave bands attests a class 2
-result but is still `range_limited` when it reaches class 1. The octave
+verified and not the standard's full frequency range. The one-third-octave
+range is required for class 1 and available to class 2, while the octave
+range is offered as a class 2 alternative only, so a verdict computed over
+the 7 octave bands attests a class 2 result but is still `range_limited`
+when it reaches class 1. The octave
 alternative is not open to a `"probe"` at all: a probe has no analysis
 bands of its own and clause 12.4 determines its index at one-third-octave
 intervals across the whole 50 Hz to 6,3 kHz range.

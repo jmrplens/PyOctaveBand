@@ -215,7 +215,10 @@ def plot_field_indicators(
     per band, the optional dynamic capability index ``Ld`` as the
     criterion-1 reference line (the measurement arrangement is adequate
     where ``Ld > F2``) and, on a twin axis, the dimensionless field
-    non-uniformity F4.
+    non-uniformity F4. When the result carries the temporal variability
+    indicator F1 (that is, ``temporal_intensity`` was supplied), it is
+    drawn on the same twin axis beside F4, together with the Table B.3
+    limit of 0,6 that F1 must stay under.
 
     :param result: A :class:`~phonometry.emission.intensity.FieldIndicators`
         with per-band data (2D input to

@@ -190,8 +190,9 @@ Antes que nada, ISO 9614-1 plantea una pregunta sobre el *campo* y no sobre
 la superficie: ¿es lo bastante estacionario como para barrerlo? En el ensayo
 inicial (apartado 8.2) se elige una posición "típica" sobre una superficie
 inicial de medida y allí se muestrea la intensidad normal `M` veces con un
-tiempo de promediación corto (la nota 9 sugiere `M = 10` y de 8 s a 12 s por
-muestra). **F1**, el indicador de variabilidad temporal, es el coeficiente de
+tiempo de promediación corto (la nota 9 sugiere `M = 10` y, para señales
+periódicas, de 8 s a 12 s por muestra o cualquier número entero de ciclos).
+**F1**, el indicador de variabilidad temporal, es el coeficiente de
 variación de esas muestras (ecuaciones (A.1)-(A.2)), de modo que vale cero
 para un campo perfectamente estacionario y crece a medida que la intensidad
 parásita fluctúa. La tabla B.3 exige el código de acción (e) por encima de
@@ -208,7 +209,7 @@ samples = [1.20e-5, 0.94e-5, 1.51e-5, 1.08e-5, 1.33e-5,
            1.02e-5, 1.44e-5, 1.17e-5, 0.88e-5, 1.29e-5]
 
 f1 = emission.temporal_variability_indicator(samples)
-print(round(f1, 3))                          # 0,177, un campo estacionario
+print(round(f1, 3))                          # 0.177, un campo estacionario
 
 # O bien acompañando al resultado de superficie junto a F2/F3/F4, pasando las
 # mismas muestras a field_indicators junto con el barrido por posiciones:
@@ -425,10 +426,14 @@ plt.show()
 </details>
 
 Con ello llegan dos reglas complementarias de la norma. El apartado 6.1 fija
-el rango de frecuencias que acredita una clase (de 45 Hz a 7,1 kHz en tercios
-de octava para la clase 1, o de 45 Hz a 5,6 kHz en octavas para la clase 2), y
-un veredicto calculado sobre menos bandas se marca con `range_limited` para
-que no pueda leerse como una declaración de rango completo. El apartado 8
+el rango de frecuencias que acredita una clase: de 45 Hz a 7,1 kHz en tercios
+de octava, que la clase 1 exige y la clase 2 también puede emplear, o de
+45 Hz a 5,6 kHz en octavas, que se ofrece a la clase 2 como alternativa. Un
+veredicto calculado sobre menos bandas se marca con `range_limited` para que
+no pueda leerse como una declaración de rango completo. La traducción
+UNE-EN 61043:1999 recoge solo la alternativa en octavas para la clase 2 y
+omite la de tercios de octava; la biblioteca sigue el texto EN/CEI (véase el
+[registro de erratas](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.md)). El apartado 8
 combina componentes suministrados por separado:
 `instrument_class_from_components(probe_class, processor_class)` devuelve 1
 solo cuando ambos son de clase 1, y 2 para cualquier otra combinación.
@@ -451,17 +456,21 @@ from phonometry import metrology
 
 # 20 dB de índice residual a 1 kHz con un separador de 25 mm:
 phi = metrology.phase_mismatch_from_residual_index(20.0, 1000.0, 0.025)
-print(round(float(phi), 2))     # 0,26 grados, una centésima de kd
+print(round(float(phi), 2))     # 0.26 grados, una centésima de kd
 
 # Y a la inversa, para una cadena con los canales emparejados a 0,05°:
 print(round(float(metrology.residual_index_from_phase_mismatch(
-    0.05, 1000.0, 0.012)), 1))  # 24,0 dB
+    0.05, 1000.0, 0.012)), 1))  # 24.0 dB
 ```
 
 Por eso el extremo de baja frecuencia de la tabla 2 sube 1 dB por banda de
-tercio de octava hasta 250 Hz y después se aplana: por debajo del codo la
-norma pide un emparejamiento de fase *constante*, y por encima un índice
-constante. También por eso una décima de grado de desfase entre canales es
+tercio de octava y después se aplana: por debajo del codo la norma pide un
+emparejamiento de fase *constante*, y por encima un índice constante. El codo
+está en 250 Hz para las tres columnas de clase 1 y para el procesador de
+clase 2, y en 630 Hz para la sonda de clase 2 y el instrumento completo de
+clase 2, que es además donde la tabla deja de avanzar en decibelios enteros
+(el instrumento pasa por 14 dB a 315 Hz, 14,5 dB a 400 Hz y 15 dB a 500 Hz).
+También por eso una décima de grado de desfase entre canales es
 una especificación exigente, y por eso una sonda debe verificarse con el
 separador con el que realmente se va a usar.
 

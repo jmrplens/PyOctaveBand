@@ -1603,7 +1603,8 @@ Before any of that, ISO 9614-1 asks a question about the *field* rather than
 the surface: is it steady enough to be scanned at all? In the initial test
 (clause 8.2) one typical position is picked on an initial measurement surface
 and the normal intensity is sampled there `M` times with a short averaging
-time (Note 9 suggests `M = 10` and 8 s to 12 s per sample). **F1**, the
+time (Note 9 suggests `M = 10`, and, for periodic signals, 8 s to 12 s per
+sample or any whole number of cycles). **F1**, the
 temporal variability indicator, is the coefficient of variation of those
 samples (equations (A.1)–(A.2)), so it is zero for a perfectly steady field
 and grows as the extraneous intensity wanders. Table B.3 asks for action code
@@ -1824,10 +1825,13 @@ plt.show()
 </details>
 
 Two companion rules of the standard come with it. Clause 6.1 fixes the
-frequency range a class attests (45 Hz to 7.1 kHz in one-third octaves for
-class 1, or 45 Hz to 5.6 kHz in octaves for class 2), and a verdict computed
-over fewer bands is flagged `range_limited` so it cannot be read as a
-full-range claim. Clause 8 combines separately supplied components:
+frequency range a class attests: 45 Hz to 7.1 kHz in one-third octaves, which
+class 1 requires and class 2 may also use, or 45 Hz to 5.6 kHz in octaves,
+which is offered to class 2 as an alternative. A verdict computed over fewer
+bands is flagged `range_limited` so it cannot be read as a full-range claim.
+The Spanish translation UNE-EN 61043:1999 records only the octave alternative
+for class 2 and drops the one-third-octave one; the library follows the
+EN/IEC text (see the [errata registry](https://jmrplens.github.io/phonometry/reference/errata/)). Clause 8 combines separately supplied components:
 `instrument_class_from_components(probe_class, processor_class)` returns 1
 only when both are class 1, and 2 for every other pairing.
 
@@ -1856,8 +1860,12 @@ print(round(float(metrology.residual_index_from_phase_mismatch(
 ```
 
 That is why the low-frequency end of Table 2 rises 1 dB per third-octave band
-up to 250 Hz and then flattens: below the knee the standard is asking for a
-*constant* phase match, and above it for a constant index. It is also why a
+and then flattens: below the knee the standard is asking for a *constant*
+phase match, and above it for a constant index. The knee sits at 250 Hz for
+the three class 1 columns and for the class 2 processor, and at 630 Hz for the
+class 2 probe and the class 2 complete instrument, which is also where the
+table stops stepping in whole decibels (the instrument goes 14 dB at 315 Hz,
+14,5 dB at 400 Hz, 15 dB at 500 Hz). It is also why a
 tenth of a degree of channel mismatch is a demanding specification, and why a
 probe must be verified with the spacer it will actually be used with.
 

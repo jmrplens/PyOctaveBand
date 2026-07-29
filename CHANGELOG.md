@@ -198,9 +198,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   Table 2 of EN 61043:1994 transcribed digit for digit and cross-checked
   against its reproduction as Table 6.1 in Fahy, *Sound Intensity* 2nd ed.,
   and on Fahy's worked check that 20 dB at 1 kHz over 25 mm is a mismatch of
-  about 0.26 degrees. Four new conformance checks, a new figure
-  `intensity_class`, and two sections in the intensity guide in English and
-  Spanish.
+  about 0.26 degrees. Clause 6.1 follows the EN/IEC text, in which class 2 is
+  met over either the one-third-octave range or the octave one; the official
+  Spanish version UNE-EN 61043:1999 states only the octave alternative, and
+  that omission is recorded in `docs/ERRATA.md`. Four new conformance checks,
+  a new figure `intensity_class`, and two sections in the intensity guide in
+  English and Spanish.
 
 - ISO 9614-1 field indicator F1, the temporal variability of the sound field
   (`temporal_variability_indicator`, equations (A.1)-(A.2)): the coefficient

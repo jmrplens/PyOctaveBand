@@ -15,7 +15,7 @@
 
 ## Numerical conformance report
 
-&#9989; **455/455 conformance checks pass** across 53 domains and 301 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+&#9989; **459/459 conformance checks pass** across 53 domains and 303 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
 
@@ -223,13 +223,17 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary>&#9989; <b>Intensity &amp; sound power</b>: 100% (6/6)</summary>
+<summary>&#9989; <b>Intensity &amp; sound power</b>: 100% (10/10)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
-| IEC 61043:1994 Clause 5 | Plane-wave intensity I = p^2 / (rho c) | 0.00238 W/m^2 (+/-1.5%) | 0.00239 W/m^2 | 0 W/m^2 | &#9989; |
+| IEC 61043:1993 Clause 5 | Plane-wave intensity I = p^2 / (rho c) | 0.00238 W/m^2 (+/-1.5%) | 0.00239 W/m^2 | 0 W/m^2 | &#9989; |
 | ISO 3744:2010 Eq. 18 | Monopole hemisphere recovers LW (r=4 m) | 95 dB (+/-0 dB) | 95 dB | 0 dB | &#9989; |
 | ISO 9614-2:1996 Eq. 12 | Intensity scan recovers LW of an enclosed source | 90 dB (+/-0.000001 dB) | 90 dB | 0 dB | &#9989; |
+| IEC 61043:1993 Table 2 | Minimum delta_pI0 per band, probe/processor/instrument, class 1/2 | 132 tabulated minima reproduced | max absolute deviation 0.000 dB | 0 dB | &#9989; |
+| IEC 61043:1993 Table 2 Note 1 | Separation rule +10 lg(x/25) on all six columns of 25 mm minima (x = 50 mm) | 3.0103 dB (+/-0 dB) | 3.0103 dB | 0 dB | &#9989; |
+| Fahy, Sound Intensity 2e, 6.8 | delta_pI0 = 20 dB is a phase mismatch of 0.26 deg (1 kHz, 25 mm) | 0.26 deg (+/-0.005 deg) | 0.2624 deg | 0.002 deg | &#9989; |
+| ISO 9614-1:1993 Eqs (A.1)/(A.2) | Temporal variability F1 is the coefficient of variation of M samples | 0.185164 (+/-0) | 0.185164 | 0 | &#9989; |
 | ISO 4871:1996 clause 3.15 / Annex B | Declared L_WAd = L_WA + K_WA (Annex B, L_WA=88, K_WA=2) | 90 dB (+/-0 dB) | 90 dB | 0 dB | &#9989; |
 | ISO 4871:1996 clause 6.2 | Single-machine verification boundary L_1 <= L_WAd | L_1=90 verified, L_1=91 rejected (L_WAd=90) | 90->True, 91->False | boundary L_1 = L_WAd | &#9989; |
 | ISO 3741:2010 Eq. 20 | Reverberation-room method inverts to a known LW | 0 dB error | 0 dB | 0 dB | &#9989; |

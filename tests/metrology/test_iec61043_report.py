@@ -179,6 +179,37 @@ def test_range_limited_note_renders(tmp_path) -> None:
     )
 
 
+def test_range_limited_note_drops_the_class_wording_when_no_class_is_met(
+    tmp_path,
+) -> None:
+    """With no class reached there is no "stated class" for the note to qualify.
+
+    ``verify_intensity_class`` grants full-range status over the 7 octave bands
+    only when the chain reaches class 2, so a chain that meets no class over
+    exactly those bands is ``range_limited``. The note then sits directly under
+    the "Does not comply" box, where a sentence about what "the stated class
+    attests" has no referent.
+    """
+    octaves = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
+    freqs, _, class2 = residual_index_limits("processor", frequencies=octaves)
+    result = intensity_class_compliance(class2 - 2.0, freqs, device="processor")
+    assert result.overall_class is None
+    assert result.range_limited is True
+
+    path = result.report(str(tmp_path / "noclass.pdf"), metadata=_metadata())
+    _assert_one_page(path)
+    text = _extract_text(path)
+    assert "this verification covers the bands listed above" in text
+    assert "the stated class attests" not in text
+
+    es_path = result.report(
+        str(tmp_path / "noclass_es.pdf"), metadata=_metadata(), language="es"
+    )
+    es_text = _extract_text(es_path)
+    assert "esta verificación abarca las bandas listadas" in es_text
+    assert "la clase indicada acredita" not in es_text
+
+
 def test_unknown_engine_is_rejected(tmp_path) -> None:
     result = _class1_chain()
     target = str(tmp_path / "engine.pdf")

@@ -346,19 +346,21 @@ def render_iec61043_report(
     statement, extended = _statement(result, language)
     flow.append(result_box(statement, styles, accent, extended))
     if result.range_limited:
-        flow.append(
-            fiche_paragraph(
-                t(
-                    "The verified bands cover neither the 22 one-third-octave "
-                    "bands from 50 Hz to 6.3 kHz nor the 7 octave bands from "
-                    "63 Hz to 4 kHz of IEC 61043:1993 clause 6.1, so the "
-                    "stated class attests the bands listed above and not the "
-                    "full frequency range of the standard.",
-                    language,
-                ),
-                strip_style,
-            )
+        # With no class reached there is no "stated class" for the note to
+        # qualify, so it talks about the verification itself instead. Both
+        # completed sentences are keys of the translation table.
+        tail = (
+            "this verification covers"
+            if result.overall_class is None
+            else "the stated class attests"
         )
+        strip = (
+            "The verified bands cover neither the 22 one-third-octave bands "
+            "from 50 Hz to 6.3 kHz nor the 7 octave bands from 63 Hz to 4 kHz "
+            f"of IEC 61043:1993 clause 6.1, so {tail} the bands listed above "
+            "and not the full frequency range of the standard."
+        )
+        flow.append(fiche_paragraph(t(strip, language), strip_style))
     if metadata is not None and metadata.required_class is not None:
         if metadata.required_class not in (1, 2):
             raise ValueError(

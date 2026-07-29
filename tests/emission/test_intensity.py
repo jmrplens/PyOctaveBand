@@ -441,6 +441,26 @@ def test_f1_validation() -> None:
         temporal_variability_indicator(with_inf)
 
 
+def test_non_positive_mean_cites_a23_only_for_the_surface_indicators() -> None:
+    """F4 rejects a non-positive mean *because* the standard says so; F1 does not.
+
+    ISO 9614-1:1993 A.2.3 ends with "Si sum(Ini/I0) es negativo en alguna banda
+    de frecuencia, las condiciones del ensayo no satisfacen los requerimientos
+    de esta parte de la Norma ISO 9614 en esa banda", so the surface-scan
+    indicators may attribute the rejection to the standard. A.2.1, which
+    defines F1 over the M short-time samples at one position, states no such
+    condition, so the F1 message must not claim A.2.3 backing.
+    """
+    with pytest.raises(ValueError) as surface:
+        field_indicators([90.0, 90.0], [1e-3, -2e-3])
+    assert "A.2.3" in str(surface.value)
+
+    with pytest.raises(ValueError) as temporal:
+        temporal_variability_indicator([1.0e-5, -3.0e-5])
+    assert "A.2.3" not in str(temporal.value)
+    assert "A.1" in str(temporal.value)
+
+
 def test_f1_follows_the_shape_of_its_sibling_indicators() -> None:
     """F1 is scalar where F2/F3/F4 are scalar, and an array where they are.
 

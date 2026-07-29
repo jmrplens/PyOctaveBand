@@ -212,6 +212,10 @@ FieldIndicators.plot(
 
 Plot the per-band indicators F2/F3, the Ld line and F4.
 
+F1 and its Table B.3 limit of 0,6 are drawn beside F4 when the
+result carries them, that is when `temporal_intensity` was
+supplied to [`field_indicators`](/phonometry/reference/api/power/intensity/#field_indicators).
+
 Requires per-band data (call [`field_indicators`](/phonometry/reference/api/power/intensity/#field_indicators) with 2D
 `(positions, bands)` arrays and `frequencies`) and matplotlib
 (`pip install phonometry[plot]`); returns the
@@ -442,7 +446,7 @@ periodic signals. Table B.3 requires corrective action when
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If fewer than two samples are supplied, the input is not 1D or 2D, or the mean intensity of a band is not positive (the test conditions then fall outside ISO 9614-1 in that band). |
+| ValueError | If fewer than two samples are supplied, the input is not 1D or 2D, or the mean intensity of a band is not positive. A.2.1 states no positivity condition on the M samples, but F1 normalizes by that mean, so a non-positive one leaves the indicator meaningless and the Table B.3 criterion vacuous; this library rejects it rather than return a negative F1. |
 
 ## TEMPORAL_VARIABILITY_LIMIT
 

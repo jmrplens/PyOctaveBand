@@ -1621,18 +1621,27 @@ def _chk_iec61043_table2() -> Outcome:
 @register(
     "Intensity & sound power",
     "IEC 61043:1993 Table 2 Note 1",
-    "Separation rule +10 lg(x/25) on the 25 mm minima (x = 50 mm)",
+    "Separation rule +10 lg(x/25) on all six columns of 25 mm minima "
+    "(x = 50 mm)",
 )
 def _chk_iec61043_spacing_rule() -> Outcome:
-    _, base, _ = ph.residual_index_limits("instrument")
-    _, wide, _ = ph.residual_index_limits("instrument", spacing=0.050)
-    return numeric(
-        10.0 * math.log10(2.0),
-        float(np.max(np.abs(wide - base))),
-        1e-12,
-        unit="dB",
-        places=6,
-    )
+    # Note 1 applies to every figure in the table, so the check sweeps all
+    # six columns (probe/processor/instrument x class 1/2) over all 22
+    # bands rather than one array, so a column that failed to shift cannot
+    # hide behind another that did.
+    expected = 10.0 * math.log10(2.0)
+    offsets: list[float] = []
+    for device in ("probe", "processor", "instrument"):
+        base = ph.residual_index_limits(device)
+        wide = ph.residual_index_limits(device, spacing=0.050)
+        for cls in (1, 2):
+            offsets.extend(
+                (np.asarray(wide[cls]) - np.asarray(base[cls])).tolist()
+            )
+    # Report the single offset furthest from the rule, so one column that
+    # failed to shift cannot average out against five that did.
+    worst = max(offsets, key=lambda v: abs(v - expected))
+    return numeric(expected, float(worst), 1e-12, unit="dB", places=6)
 
 
 @register(

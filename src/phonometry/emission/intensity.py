@@ -233,6 +233,10 @@ class FieldIndicators:
     ) -> Axes:
         """Plot the per-band indicators F2/F3, the Ld line and F4.
 
+        F1 and its Table B.3 limit of 0,6 are drawn beside F4 when the
+        result carries them, that is when ``temporal_intensity`` was
+        supplied to :func:`field_indicators`.
+
         Requires per-band data (call :func:`field_indicators` with 2D
         ``(positions, bands)`` arrays and ``frequencies``) and matplotlib
         (``pip install phonometry[plot]``); returns the
@@ -443,13 +447,37 @@ def sound_intensity(
     )
 
 
-def _coefficient_of_variation(samples: np.ndarray) -> float:
+# A.2.3 makes the sign of the surface sum a condition of the test itself, so
+# F4 (and F3 with it) cites the standard.
+_F4_NON_POSITIVE = (
+    "The algebraic mean normal intensity over the measurement surface is not "
+    "positive: the test conditions do not satisfy ISO 9614-1 (clause A.2.3)."
+)
+# A.2.1 places no positivity condition on the M short-time samples at one
+# position, so F1 states the reason without attributing it to the standard:
+# F1 as defined would come out negative and the Table B.3 criterion vacuous.
+_F1_NON_POSITIVE = (
+    "The algebraic mean of the short-time normal intensity samples is not "
+    "positive, so the temporal variability indicator F1 of ISO 9614-1 "
+    "(equation (A.1)) is not meaningful at this position: the field is not "
+    "flowing outwards there on average."
+)
+
+
+def _coefficient_of_variation(
+    samples: np.ndarray, *, non_positive_message: str
+) -> float:
     """``(1/mean) * sqrt(sum((x - mean)^2) / (n - 1))`` of one sample set.
 
     The common closed form of the ISO 9614-1:1993 indicators F1 (equation
     (A.1), M short-time samples at one position) and F4 (equation (A.8), N
     positions on the surface): the sample standard deviation of the normal
     intensity normalized by its algebraic mean.
+
+    The two indicators reject a non-positive mean for different reasons, so
+    the caller supplies the message: A.2.3 makes a negative surface sum a
+    failure of the test conditions, whereas A.2.1 states no such condition on
+    the M temporal samples and the rejection there is this library's own.
     """
     # A NaN or infinite sample slips past the positivity test below and turns
     # the whole indicator into a silent NaN, so it is rejected up front.
@@ -457,10 +485,7 @@ def _coefficient_of_variation(samples: np.ndarray) -> float:
         raise ValueError("The normal intensity samples must all be finite.")
     mean = float(np.mean(samples))
     if mean <= 0.0:
-        raise ValueError(
-            "The algebraic mean normal intensity is not positive: the test "
-            "conditions do not satisfy ISO 9614-1 (clause A.2.3)."
-        )
+        raise ValueError(non_positive_message)
     deviation = float(
         np.sqrt(np.sum((samples - mean) ** 2) / (samples.size - 1))
     )
@@ -496,8 +521,11 @@ def temporal_variability_indicator(
     :return: F1 as a float for 1D input, or a per-band
         :class:`numpy.ndarray` for 2D input.
     :raises ValueError: If fewer than two samples are supplied, the input is
-        not 1D or 2D, or the mean intensity of a band is not positive (the
-        test conditions then fall outside ISO 9614-1 in that band).
+        not 1D or 2D, or the mean intensity of a band is not positive. A.2.1
+        states no positivity condition on the M samples, but F1 normalizes by
+        that mean, so a non-positive one leaves the indicator meaningless and
+        the Table B.3 criterion vacuous; this library rejects it rather than
+        return a negative F1.
     """
     samples = np.atleast_1d(np.asarray(short_time_intensity, dtype=np.float64))
     if samples.ndim not in (1, 2):
@@ -511,9 +539,16 @@ def temporal_variability_indicator(
             "(ISO 9614-1 Annex A Note 9 recommends M = 10)."
         )
     if samples.ndim == 1:
-        return _coefficient_of_variation(samples)
+        return _coefficient_of_variation(
+            samples, non_positive_message=_F1_NON_POSITIVE
+        )
     return np.asarray(
-        [_coefficient_of_variation(samples[:, b]) for b in range(samples.shape[1])],
+        [
+            _coefficient_of_variation(
+                samples[:, b], non_positive_message=_F1_NON_POSITIVE
+            )
+            for b in range(samples.shape[1])
+        ],
         dtype=np.float64,
     )
 
@@ -529,7 +564,7 @@ def _field_indicators_1d(
     # Equation (A.8) with (A.9): normalized non-uniformity of In (the same
     # coefficient of variation F1 uses, over the N positions instead of the M
     # short-time samples). It rejects a non-positive algebraic mean first.
-    f4 = _coefficient_of_variation(i_n)
+    f4 = _coefficient_of_variation(i_n, non_positive_message=_F4_NON_POSITIVE)
     # Equation (A.7): algebraic surface intensity level.
     li_alg = _level(float(np.mean(i_n)), _I0)
     return lp_surface - li_abs, lp_surface - li_alg, f4
