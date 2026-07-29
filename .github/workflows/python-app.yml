@@ -280,7 +280,11 @@ jobs:
   sonar:
     needs: tests
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    # Dependabot runs with a restricted token and no access to repository secrets, so
+    # SONAR_TOKEN is empty there and the scan can only ever fail. Skip it for those runs.
+    if: >-
+      github.actor != 'dependabot[bot]' &&
+      (github.event_name == 'pull_request' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
     steps:
     - uses: actions/checkout@v7
       with:
