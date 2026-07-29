@@ -18369,6 +18369,9 @@ def _run_anim_task(clip: str, img_dir: str) -> str:
             func(img_dir)
     finally:
         plt.close("all")
+        # The banner's 2.5 mm frame stack is ~2.5 GB; do not let it stay
+        # pinned in this worker while it renders the next clip.
+        _pillar_fields.cache_clear()
     return clip
 
 
