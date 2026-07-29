@@ -458,6 +458,8 @@ más la cadena electroacústica que lo reproduce o lo mide. Implementa ISO 3741,
 ISO 3744/3746, ISO 3745, ISO 9614-1/-2/-3, IEC 61043, ISO 4871,
 IEC 60268-3/-4/-5, ITU-R BS.1770-5 y EBU R 128.
 
+**[Potencia acústica e intensidad](/phonometry/es/guides/sections/sound-power/)**
+
 - [Intensidad acústica (p-p)](/phonometry/es/guides/intensity/): la intensidad
   con dos micrófonos y los indicadores de campo que cualifican la medida.
 - [Potencia acústica](/phonometry/es/guides/sound-power/): la elección del
@@ -469,6 +471,9 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 y EBU R 128.
   los métodos directo y de comparación de ISO 3741.
 - [Potencia acústica por barrido de intensidad](/phonometry/es/guides/sound-power-intensity/):
   el barrido in situ de ISO 9614-2 y el grado de precisión ISO 9614-3.
+
+**[Electroacústica](/phonometry/es/guides/sections/electroacoustics/)**
+
 - [Electroacústica: distorsión y respuesta en frecuencia](/phonometry/es/guides/electroacoustics/):
   la distorsión armónica y de intermodulación, THD+N y SINAD, el rango dinámico
   y los estimadores H1/H2 de respuesta en frecuencia.
@@ -481,16 +486,19 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 y EBU R 128.
   la separación de armónicos a partir de un solo barrido exponencial, la THD
   frente a la frecuencia de excitación, y la fase mínima, el retardo de grupo y
   la fase en exceso.
+- [Sonoridad de programa y pico verdadero](/phonometry/es/guides/program-loudness/):
+  la ponderación K y la sonoridad integrada con puerta en LUFS, los medidores
+  momentáneo y de corto plazo, el rango de sonoridad y el nivel de pico
+  verdadero.
+
+**[Control de ruido](/phonometry/es/guides/sections/noise-control/)**
+
 - [Silenciadores](/phonometry/es/guides/silencers/): los silenciadores
   reactivos por el método de matrices de cuatro polos y la elección entre
   reactivo y disipativo.
 - [Control de ruido industrial: HVAC y cerramientos](/phonometry/es/guides/noise-control/):
   la atenuación y el ruido de flujo en conductos, y la pérdida por inserción de
   cerramientos.
-- [Sonoridad de programa y pico verdadero](/phonometry/es/guides/program-loudness/):
-  la ponderación K y la sonoridad integrada con puerta en LUFS, los medidores
-  momentáneo y de corto plazo, el rango de sonoridad y el nivel de pico
-  verdadero.
 
 ## [Simulación de ondas](/phonometry/es/guides/sections/simulation/)
 

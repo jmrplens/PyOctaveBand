@@ -39,8 +39,8 @@ que terminan las evaluaciones se cubren en
 [Niveles integrados y estadísticos](/phonometry/es/guides/levels/), la
 contraparte tonal del ajuste impulsivo en
 [Audibilidad objetiva de tonos en ruido](/phonometry/es/guides/tone-audibility/),
-y las fuentes que alimentan un cálculo de propagación en
-[Potencia acústica](/phonometry/es/guides/sound-power/) y la sección de
+y las fuentes que alimentan un cálculo de propagación en las secciones de
+[Potencia acústica e intensidad](/phonometry/es/guides/sections/sound-power/) y
 [Aeronaves y energía eólica](/phonometry/es/guides/sections/aircraft-wind/).
 
 ## Páginas de esta sección

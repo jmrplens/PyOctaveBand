@@ -77,9 +77,10 @@ site/node_modules/
 site/dist/
 site/.astro/
 
-# Published copies of the root-level llms artifacts (llms.txt, llms-full.txt
-# and the per-area shards). The prebuild step copies them in from the repo
-# root, which is where the committed originals live.
+# Published copies of the root-level llms artifacts (llms.txt and
+# llms-full.txt). The prebuild step copies them in from the repo root, which
+# is where the committed originals live. The per-area shards are not ignored:
+# they are committed in site/public/llms/, which this pattern does not reach.
 site/public/llms*.txt
 stub/dist/
 stub/src/*.egg-info/
