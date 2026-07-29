@@ -86,6 +86,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   "From the near field to the far field" section in the FDTD guide, in
   English and Spanish.
 
+- `SECURITY.md`: a security policy written for what this library actually is,
+  a computation package with no service and no credentials. Supported versions
+  (fixes ship forward on the latest 3.x, no backports; Python 3.13 and 3.14 on
+  Ubuntu, macOS and Windows), private reporting through GitHub security
+  advisories with an acknowledgement and assessment window I can keep, a
+  coordinated-disclosure statement, and a scope section that names the real
+  attack surface (untrusted files reaching a reader, deserialisation, the
+  release supply chain, repository automation) while stating plainly that a
+  value disagreeing with a standard is a conformance defect for the issue form,
+  and a defect in the standard itself an entry in `docs/ERRATA.md`. Also
+  records the checks already running: CodeQL, bandit, GitGuardian, Dependabot,
+  the `snyk` target and the conformance staleness gate.
+
+- `.github/pull_request_template.md`: the repository's CI gates written out as a
+  compact checklist, so the recurring failures (a stale `docs/CONFORMANCE.md`,
+  an unregenerated API reference, a module missing from
+  `scripts/api_taxonomy.py`, a figure not produced by `generate_graphs.py`,
+  EN/ES drift) are visible before the build runs. It also asks, for any new
+  normative implementation, which numeric oracle validated it and confirmation
+  that the oracle is independent of the implementation.
+
 - `make lighthouse` (`site/scripts/lighthouse-audit.mjs`): Lighthouse over a
   fixed sample of built pages against a local preview server, with JSON
   reports under `site/lighthouse-results/` and a console summary listing the
