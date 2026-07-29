@@ -11,10 +11,16 @@ grid (``.onl``: ``SEL``, ``LASmax``, ``PNLTM``, ``EPNL``). Those outputs are
 the oracle for the flight-condition interpolation, the kinematics/retarded
 time, :func:`rotorcraft_event_level` and :func:`rotorcraft_noise_contour`.
 
-The NORAH2 database and prototype outputs are third-party data (EASA) and are
-not committed; this module skips cleanly when ``plan/NORAH2_V2.0.74_public.zip``
-is absent (CI) and runs locally where the archive is kept
-(``NORAH2_DATA`` overrides with the path of an existing extraction).
+The verification subset consumed here (the R22 hemisphere set and the ARP
+single-event cases below) is committed under ``tests/data/norah2/`` with its
+provenance in the README, so the suite runs everywhere including CI. The full
+public release is preferred when present (``plan/NORAH2_V2.0.74_public.zip``,
+or an extraction pointed at by ``NORAH2_DATA``).
+
+Case 1 (terrain screening) is not exercised: the frame of the public release's
+DEM is not reconstructible (a global template match finds no consistent
+placement against the printed outputs), so the terrain chain is anchored to
+closed-form oracles in the unit suite instead of fitted to that case.
 
 Measured deviations on which the tolerances rest (see the module docstring of
 ``phonometry.aircraft.rotorcraft_noise`` for the method):
@@ -62,17 +68,13 @@ from phonometry.aircraft.rotorcraft_noise import (
     rotorcraft_noise_contour,
 )
 
-# NORAH2_DATA points at an existing extraction root; without it the archive
-# is read from the local (gitignored) plan/ workspace.
+# NORAH2_DATA points at an existing extraction root and the full archive in
+# the local (gitignored) plan/ workspace comes next; the committed
+# verification subset (see tests/data/norah2/README.md) covers CI.
 _ZIP = pathlib.Path(__file__).parents[2] / "plan" / "NORAH2_V2.0.74_public.zip"
+_EXTRACT = (pathlib.Path(__file__).parents[1] / "data" / "norah2"
+            / "norah2_arp_extract.zip")
 _OVERRIDE = os.environ.get("NORAH2_DATA")
-_DATA_PRESENT = (_OVERRIDE is not None and pathlib.Path(_OVERRIDE).is_dir()) or _ZIP.is_file()
-
-pytestmark = pytest.mark.skipif(
-    not _DATA_PRESENT,
-    reason="NORAH2 public database absent (local-only oracle; set NORAH2_DATA "
-    "to an extraction or place NORAH2_V2.0.74_public.zip under plan/)",
-)
 
 _PREFIXES = (
     "NORAH2_V2.0.74_public/Hemispheres/R22_",
@@ -92,7 +94,7 @@ def norah_root(tmp_path_factory: pytest.TempPathFactory) -> pathlib.Path:
     if _OVERRIDE is not None and pathlib.Path(_OVERRIDE).is_dir():
         return pathlib.Path(_OVERRIDE)
     root = tmp_path_factory.mktemp("norah2")
-    with zipfile.ZipFile(_ZIP) as zf:
+    with zipfile.ZipFile(_ZIP if _ZIP.is_file() else _EXTRACT) as zf:
         members = [m for m in zf.namelist() if m.startswith(_PREFIXES)]
         assert members, "unexpected zip layout"
         zf.extractall(root, members=members)

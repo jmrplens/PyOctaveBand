@@ -1092,6 +1092,22 @@ def test_event_and_contour_array_argument_validation() -> None:
                                  ground_elevation=zeros_four)
 
 
+def test_event_numpy_scalar_flow_resistivity_is_scalar() -> None:
+    # 0-d scalar-likes (np.float32, np.int64, 0-d arrays) mean a single
+    # resistivity, not a per-receiver map, also when a terrain model is given.
+    hems, spd, ang, t, pos, dem = _terrain_case(np.zeros((41, 41)))
+    base = rotorcraft_event_level(hems, spd, ang, t, pos, (300.0, 0.0),
+                                  flow_resistivity=2.0e5)
+    for sigma in (np.float32(2.0e5), np.int64(200_000), np.array(2.0e5)):
+        res = rotorcraft_event_level(hems, spd, ang, t, pos, (300.0, 0.0),
+                                     flow_resistivity=sigma)  # type: ignore[arg-type]
+        assert np.allclose(res.a_levels, base.a_levels, atol=1e-9)
+    with_dem = rotorcraft_event_level(hems, spd, ang, t, pos, (300.0, 0.0),
+                                      flow_resistivity=np.float32(2.0e5),  # type: ignore[arg-type]
+                                      terrain=dem, terrain_resolution=100.0)
+    assert with_dem.sel == pytest.approx(base.sel, abs=1e-9)
+
+
 def test_terrain_must_cover_track_and_receivers() -> None:
     # Points beyond the elevation model would otherwise use fabricated edge
     # elevations; both the track and the receivers must be covered.
