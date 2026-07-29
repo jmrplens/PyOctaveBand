@@ -22,7 +22,7 @@ applies and delete the lines that do not.
 
 Ran locally, same as CI:
 
-- [ ] `ruff check .` and `ruff format --check .`
+- [ ] `ruff check .`, plus `ruff format --check` on the files you touched
 - [ ] `mypy src scripts`
 - [ ] `bandit -r src` (any finding fails, including Low)
 - [ ] `pytest -q`

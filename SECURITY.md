@@ -35,7 +35,7 @@ directly at
 That opens a private advisory visible only to you and me, and keeps the report,
 the fix and any CVE in one place.
 
-If private reporting is not available to you, write to `jmrplens@gmail.com`, the
+If private reporting is not available to you, write to `mail@jmrp.io`, the
 maintainer address already published in [`CITATION.cff`](CITATION.cff) and
 [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md), with `phonometry security` in the
 subject. Please do not use a public issue, a discussion or a pull request for a
