@@ -1532,10 +1532,10 @@ def _setup_resistivity(
     dem: tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]] | None,
 ) -> float | NDArray[np.float64]:
     """The scalar (or per-receiver) flow resistivity of an event run."""
-    if isinstance(flow_resistivity, (str, float, int)):
-        return _resolve_flow_resistivity(
-            flow_resistivity if isinstance(flow_resistivity, str)
-            else float(flow_resistivity))
+    if isinstance(flow_resistivity, str):
+        return _resolve_flow_resistivity(flow_resistivity)
+    if np.ndim(flow_resistivity) == 0:
+        return _resolve_flow_resistivity(float(np.asarray(flow_resistivity)))
     if dem is not None:
         raise ValueError("With 'terrain', 'flow_resistivity' must be a single "
                          "value or class (per-path maps are not supported).")
