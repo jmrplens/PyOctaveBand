@@ -27,10 +27,12 @@ if TYPE_CHECKING:
     from ..noise_control.duct_path import DuctPathResult
     from ..noise_control.enclosures import EnclosureResult
     from ..noise_control.hvac import HvacSpectrumResult
+    from ..noise_control.room_to_room import RoomToRoomResult
     from ..noise_control.silencers import ReactiveSilencerResult
 
 _FREQ_LABEL = "Frequency [Hz]"
 _LEVEL_LABEL = "Level [dB]"
+_TL_LABEL = "Transmission loss"
 
 #: Spanish translations of the fixed labels/titles/legends rendered by the
 #: noise-control ``.plot()`` renderers, keyed by their verbatim English
@@ -40,7 +42,7 @@ _LEVEL_LABEL = "Level [dB]"
 _STRINGS: dict[str, str] = {
     "Frequency [Hz]": "Frecuencia [Hz]",
     "Band": "Banda",
-    "Transmission loss": "Pérdida por transmisión",
+    _TL_LABEL: "Pérdida por transmisión",
     "Insertion loss": "Pérdida por inserción",
     "Resonance": "Resonancia",
     "Loss [dB]": "Pérdida [dB]",
@@ -61,6 +63,11 @@ _STRINGS: dict[str, str] = {
     "No flow": "Sin flujo",
     "Plane waves only": "Solo ondas planas",
     "Duct higher-order-mode cut-on": "Corte de modos superiores del conducto",
+    "Source room": "Recinto emisor",
+    "Receiving room": "Recinto receptor",
+    "Noise reduction": "Reducción de ruido",
+    "Loss and noise reduction [dB]": "Pérdida y reducción de ruido [dB]",
+    "Room-to-room transmission": "Transmisión entre recintos",
 }
 
 
@@ -87,7 +94,7 @@ def plot_reactive_silencer(
     ax = ax if ax is not None else _new_axes()
     f = np.asarray(result.frequencies, dtype=np.float64)
     kwargs.setdefault("color", _C_PRIMARY)
-    kwargs.setdefault("label", _t("Transmission loss", language))
+    kwargs.setdefault("label", _t(_TL_LABEL, language))
     kwargs.setdefault("lw", 1.8)
     ax.plot(f, np.asarray(result.transmission_loss), **kwargs)
     if result.insertion_loss is not None:
@@ -227,6 +234,68 @@ def plot_duct_path(
         ncol=2 if len(series) > 4 else 1, framealpha=0.85,
     )
     localize_axes(ax, language)
+    return ax
+
+
+def plot_room_to_room(
+    result: RoomToRoomResult, ax: Axes | None = None, language: str = "en",
+    **kwargs: Any
+) -> Axes:
+    """Source-room level, received level and criterion curve of a partition.
+
+    The two reverberant spectra bracket the design criterion curve on the left
+    axis; the transmission loss of the partition and the noise reduction it
+    actually delivers share a twin axis on the right, which is where the point
+    of Equation (4.101) shows: the two are not the same number.
+
+    :param result: A
+        :class:`~phonometry.noise_control.room_to_room.RoomToRoomResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the received-level ``Axes.plot``.
+    :return: The axes.
+    """
+    from .._i18n import localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    f = np.asarray(result.frequencies, dtype=np.float64)
+    ax.semilogx(f, np.asarray(result.source_level), color=_C_SECONDARY, lw=1.6,
+                ls="--", marker="s", ms=4, label=_t("Source room", language))
+    curve = result.criterion_curve
+    if curve is not None:
+        ax.semilogx(f, curve, ls=":", color=_C_REFERENCE, lw=1.5,
+                    label=f"{result.criterion} {result.target:g}")
+    kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault("label", _t("Receiving room", language))
+    kwargs.setdefault("lw", 2.4)
+    kwargs.setdefault("marker", "o")
+    kwargs.setdefault("ms", 4)
+    ax.semilogx(f, np.asarray(result.received_level), **kwargs)
+    ax.set_ylabel(_t(_LEVEL_LABEL, language))
+    ax.set_title(f"{_t('Room-to-room transmission', language)}: {result.label}")
+    ax.grid(True, which="both", alpha=0.3)
+
+    twin = ax.twinx()
+    twin.plot(f, np.asarray(result.transmission_loss), color=_C_MUTED, lw=1.2,
+              ls="--", label=_t(_TL_LABEL, language))
+    twin.plot(f, np.asarray(result.noise_reduction), color=_C_TERTIARY,
+              lw=1.5, ls="-.", marker="^", ms=3,
+              label=_t("Noise reduction", language))
+    twin.set_ylabel(_t("Loss and noise reduction [dB]", language),
+                    color=_C_TERTIARY)
+    twin.tick_params(axis="y", labelcolor=_C_TERTIARY)
+    twin.grid(False)
+    handles, labels = ax.get_legend_handles_labels()
+    extra_handles, extra_labels = twin.get_legend_handles_labels()
+    ax.legend(handles + extra_handles, labels + extra_labels, loc="best",
+              fontsize="small", framealpha=0.85, ncol=2)
+    # The twin axis resets the shared log-frequency formatting, so the ticks are
+    # set last and on both axes.
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
+    format_frequency_axis(ax)
+    format_frequency_axis(twin)
+    localize_axes(ax, language)
+    localize_axes(twin, language)
     return ax
 
 

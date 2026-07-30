@@ -55,7 +55,14 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from .._internal.validation import require_choice
+from ._criterion import (
+    as_band_spectrum,
+    curve_of,
+    exceedance_of,
+    meets_target_of,
+    rating_of,
+    validate_target,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -67,26 +74,6 @@ if TYPE_CHECKING:
 #: no regenerated-noise data and as the floor for a negative computed level
 #: (Long, Table 14.9 commentary).
 DEFAULT_SELF_NOISE_FLOOR = 0.0
-
-
-def _as_spectrum(
-    value: Any, n: int, name: str, *, default: float = 0.0
-) -> NDArray[np.float64]:
-    """Coerce a scalar, array or ``HvacSpectrumResult`` to an ``n``-band array."""
-    if value is None:
-        return np.full(n, default, dtype=np.float64)
-    values = getattr(value, "values", value)
-    arr = np.atleast_1d(np.asarray(values, dtype=np.float64))
-    if arr.size == 1:
-        arr = np.full(n, float(arr[0]), dtype=np.float64)
-    if arr.shape != (n,):
-        raise ValueError(
-            f"'{name}' must be a scalar or have one value per band ({n}); "
-            f"got shape {arr.shape}."
-        )
-    if not np.all(np.isfinite(arr)):
-        raise ValueError(f"'{name}' must be finite.")
-    return arr
 
 
 def _combine(a: NDArray[np.float64], b: NDArray[np.float64]) -> NDArray[np.float64]:
@@ -192,11 +179,7 @@ class DuctPathResult:
         :attr:`criterion` is ``"NC"``, otherwise an
         :class:`~phonometry.room.room_noise.RCResult` (ANSI/ASA S12.2-2019).
         """
-        from ..room.room_noise import noise_criterion, room_criterion
-
-        if self.criterion == "NC":
-            return noise_criterion(self.received_level, self.frequencies)
-        return room_criterion(self.received_level, self.frequencies)
+        return rating_of(self)
 
     @property
     def criterion_curve(self) -> np.ndarray | None:
@@ -205,17 +188,7 @@ class DuctPathResult:
         The NC or RC curve of :attr:`target`, sampled at the analysis bands, so
         it can be compared band by band with :attr:`received_level`.
         """
-        if self.target is None:
-            return None
-        from ..room.room_noise import OCTAVE_BANDS, nc_curve, rc_curve
-
-        curve = nc_curve(self.target) if self.criterion == "NC" else rc_curve(self.target)
-        return np.array(
-            [
-                curve[int(np.argmin(np.abs(np.log2(OCTAVE_BANDS / f))))]
-                for f in self.frequencies
-            ]
-        )
+        return curve_of(self)
 
     @property
     def exceedance(self) -> np.ndarray | None:
@@ -224,8 +197,7 @@ class DuctPathResult:
         Positive where the design criterion is exceeded. ``None`` when no
         target was declared.
         """
-        curve = self.criterion_curve
-        return None if curve is None else self.received_level - curve
+        return exceedance_of(self)
 
     @property
     def meets_target(self) -> bool | None:
@@ -235,8 +207,7 @@ class DuctPathResult:
         design sheet applies, not the NC *rating* of :attr:`rating`, which the
         standard derives by its own two-step procedure.
         """
-        excess = self.exceedance
-        return None if excess is None else bool(np.all(excess <= 0.0))
+        return meets_target_of(self)
 
     # -- tabular view -----------------------------------------------------
     def table(self) -> list[dict[str, Any]]:
@@ -411,17 +382,6 @@ class DuctPathResult:
         )
 
 
-def _validate_target(criterion: str, target: float | None) -> tuple[str, float | None]:
-    """Validate the criterion family and its target value."""
-    family = require_choice(criterion, "criterion", ("NC", "RC"))
-    if target is None:
-        return family, None
-    value = float(target)
-    if not np.isfinite(value):
-        raise ValueError("'target' must be a finite criterion value.")
-    return family, value
-
-
 def duct_path(
     frequencies: ArrayLike,
     source_level: ArrayLike,
@@ -481,8 +441,8 @@ def duct_path(
     if f.ndim != 1 or f.size == 0:
         raise ValueError("'frequencies' must be a non-empty 1-D array.")
     n = f.size
-    level = _as_spectrum(source_level, n, "source_level")
-    family, goal = _validate_target(criterion, target)
+    level = as_band_spectrum(source_level, n, "source_level")
+    family, goal = validate_target(criterion, target)
 
     if section is not None:
         from .duct_modes import plane_wave_limit, warn_above_plane_wave_limit
@@ -499,11 +459,11 @@ def duct_path(
                 "'elements' must hold DuctElement entries; got "
                 f"{type(element).__name__} at position {position}."
             )
-        attenuation = _as_spectrum(
+        attenuation = as_band_spectrum(
             element.attenuation, n, f"elements[{position - 1}].attenuation"
         )
         attenuated = level - attenuation
-        self_noise = _as_spectrum(
+        self_noise = as_band_spectrum(
             element.self_noise,
             n,
             f"elements[{position - 1}].self_noise",
@@ -523,11 +483,11 @@ def duct_path(
             )
         )
 
-    room = None if room_effect is None else _as_spectrum(room_effect, n, "room_effect")
+    room = None if room_effect is None else as_band_spectrum(room_effect, n, "room_effect")
     received = level if room is None else level - room
     return DuctPathResult(
         frequencies=f,
-        source_level=_as_spectrum(source_level, n, "source_level"),
+        source_level=as_band_spectrum(source_level, n, "source_level"),
         source_label=source_label,
         stages=tuple(stages),
         room_effect=room,
@@ -570,7 +530,7 @@ def combine_duct_paths(
     for other in items[1:]:
         if not np.array_equal(np.asarray(other.frequencies, dtype=np.float64), f):
             raise ValueError("all paths must share the same analysis bands.")
-    family, goal = _validate_target(
+    family, goal = validate_target(
         items[0].criterion if criterion is None else criterion,
         next((p.target for p in items if p.target is not None), None)
         if target is None

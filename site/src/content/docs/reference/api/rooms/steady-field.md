@@ -31,6 +31,10 @@ dead room a large `R`.
 with the source directivity factor `Q` (`= 1` omnidirectional, `2` on a
 hard floor, ...), the distance `r` and the room constant `R`. The first
 term inside the bracket is the direct field, the second the reverberant field.
+Dropping the direct term (`distance=None`) leaves `Lp = Lw + 10 log10(4/R)`,
+the reverberant field alone: the level far from the source, and the one a
+diffuse-field calculation such as a room-to-room transmission
+([`phonometry.noise_control.room_to_room`](/phonometry/reference/api/noise_control/room-to-room/)) works from.
 The optional `10 log10(rho c / 400)` term corrects for a characteristic
 impedance `rho c` differing from the reference 400 Pa s/m; it is about
 `+0.14 dB` at 20 degC and is omitted by default (Bies notes the `~0.1 dB`
@@ -45,6 +49,18 @@ field does. Kuttruff's reverberation distance (Equation (5.44),
 the two coincide for a small `alpha_bar` and differ by the factor
 `1 - alpha_bar` otherwise. This module uses the room constant, so `rc` is
 exactly the crossover of its own [`steady_state_spl`](/phonometry/reference/api/rooms/steady-field/#steady_state_spl).
+
+**Sound power model.** Both relations above assume the radiated power itself is
+a property of the machine. Norton & Karczub, *Fundamentals of Noise and
+Vibration Analysis for Engineers* 2nd ed., 4.6 (Table 4.5), point out that this
+is only one of three positions: a *constant-power* source radiates the same
+`Pi_0` wherever it stands, a *constant-volume* source is loaded by nearby
+reflecting boundaries and radiates `Pi_0 Q` (up to `+9 dB` in a corner,
+the conservative upper bound a design estimate uses), and a *constant-pressure*
+source, a theoretical lower bound, radiates `Pi_0 / Q`. Real machines sit
+between the first two whenever the source is closer to the boundary than a
+wavelength. `source_model` selects which of the three
+[`SOURCE_POWER_MODELS`](/phonometry/reference/api/rooms/steady-field/#source_power_models) is applied.
 
 **Schroeder frequency** `f_s = 2000 sqrt(T / V)` (Kuttruff Equation (3.44),
 `V` in cubic metres, `T` in seconds) marks the boundary between the
@@ -126,6 +142,14 @@ modes and `R` / `rc` lose their meaning.
 
 **Returns:** The Schroeder frequency, Hz.
 
+## SOURCE_POWER_MODELS
+
+*Constant* (`dict`).
+
+```python
+SOURCE_POWER_MODELS = {'constant_power': 0.0, 'constant_volume': 1.0, 'constant_pressure': -1.0}
+```
+
 ## steady_state_field
 
 ```python
@@ -165,10 +189,11 @@ distance (crossover of the two fields).
 ```python
 steady_state_spl(
     sound_power_level: ArrayLike,
-    distance: ArrayLike,
+    distance: ArrayLike | None,
     room_constant: ArrayLike,
     *,
     directivity: float = 1.0,
+    source_model: str = 'constant_power',
     characteristic_impedance: float | None = None,
 ) -> np.ndarray | float
 ```
@@ -178,19 +203,29 @@ Steady-state sound pressure level in a room (Bies Equation (6.43)).
 `Lp = Lw + 10 log10( Q / (4 pi r^2) + 4 / R )` (plus the optional
 `10 log10(rho c / 400)` characteristic-impedance term). The bracket sums
 the direct field `Q / (4 pi r^2)` and the (position-independent)
-reverberant field `4 / R`.
+reverberant field `4 / R`. Passing `distance=None` drops the direct
+term and leaves the reverberant field alone, `Lp = Lw + 10 log10(4 / R)`:
+the limit far from the source, and the level a diffuse-field calculation
+such as a room-to-room transmission uses.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
 | `sound_power_level` | Source sound power level `Lw`, dB re 1 pW (scalar or per-band); e.g. from `phonometry.emission`. |
-| `distance` | Source-receiver distance `r`, m (scalar or array). |
+| `distance` | Source-receiver distance `r`, m (scalar or array), or `None` for the reverberant field alone. |
 | `room_constant` | Room constant `R`, m2 (scalar or per-band); from [`room_constant`](/phonometry/reference/api/rooms/steady-field/#room_constant). |
-| `directivity` | Source directivity factor `Q` (default 1). |
+| `directivity` | Source directivity factor `Q` (default 1; `2` on one reflecting plane, `4` in an edge, `8` in a corner). |
+| `source_model` | Sound power model of Norton & Karczub 2e Table 4.5: `"constant_power"` (default, `Pi = Pi_0`, the position of the source does not change its radiated power), `"constant_volume"` (`Pi = Pi_0 Q`, reflecting boundaries raise the radiated power by `10 lg Q`; the conservative upper bound) or `"constant_pressure"` (`Pi = Pi_0 / Q`, the theoretical lower bound). See [`SOURCE_POWER_MODELS`](/phonometry/reference/api/rooms/steady-field/#source_power_models). |
 | `characteristic_impedance` | Air characteristic impedance `rho c`, Pa s/m. When given, the `10 log10(rho c / 400)` term is added (about `+0.14 dB` at 20 degC where `rho c = 413`); `None` (default) omits it, matching the common textbook form. |
 
 **Returns:** The steady-state SPL `Lp`, dB; a float for scalar inputs, otherwise an array broadcasting `sound_power_level`, `distance` and `room_constant`.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If `distance` or `room_constant` is not positive and finite, or `source_model` is not one of [`SOURCE_POWER_MODELS`](/phonometry/reference/api/rooms/steady-field/#source_power_models). |
 
 ## SteadyFieldResult
 

@@ -929,7 +929,12 @@ from .noise_control.duct_path import (
     combine_duct_paths,
     duct_path,
 )
-from .noise_control.enclosures import EnclosureResult, enclosure_insertion_loss
+from .noise_control.enclosures import (
+    ENCLOSURE_MODELS,
+    EnclosureResult,
+    enclosure_insertion_loss,
+    enclosure_required_transmission_loss,
+)
 from .noise_control.hvac import (
     HvacSpectrumResult,
     air_terminal_damper_correction,
@@ -956,6 +961,7 @@ from .noise_control.hvac import (
     unlined_circular_duct_attenuation,
     unlined_rectangular_duct_attenuation,
 )
+from .noise_control.room_to_room import RoomToRoomResult, room_to_room_transmission
 from .noise_control.silencers import (
     ReactiveSilencerResult,
     expansion_chamber,
@@ -1113,6 +1119,7 @@ from .room.room_noise import (
     room_criterion,
 )
 from .room.steady_field import (
+    SOURCE_POWER_MODELS,
     SteadyFieldResult,
     critical_distance,
     room_constant,
@@ -1405,6 +1412,7 @@ __all__ = [
     "DEFAULT_STABILITY_MARGIN",
     "DELANY_BAZLEY_COEFFICIENTS",
     "DELANY_BAZLEY_VALIDITY",
+    "ENCLOSURE_MODELS",
     "ERB_C1",
     "ERB_C2",
     "FDTD2D",
@@ -1435,6 +1443,7 @@ __all__ = [
     "REFERENCE_DURATION_S",
     "REFERENCE_STIFFNESS",
     "REFERENCE_VELOCITY",
+    "SOURCE_POWER_MODELS",
     "SPOT_FREQUENCY_RANGE",
     "SPOT_NARROW_BAND_RANGE",
     "STEEL",
@@ -1660,6 +1669,7 @@ __all__ = [
     "RoadAbsorptionWarning",
     "RoomAcousticsResult",
     "RoomModesResult",
+    "RoomToRoomResult",
     "RotorcraftEventResult",
     "RotorcraftHemisphere",
     "RotorcraftNoiseContourResult",
@@ -1911,6 +1921,7 @@ __all__ = [
     "enclosed_gas_stiffness",
     "enclosed_space_reverberation",
     "enclosure_insertion_loss",
+    "enclosure_required_transmission_loss",
     "end_reflection_loss",
     "end_reflection_loss_closed_form",
     "energy_average_level",
@@ -2314,6 +2325,7 @@ __all__ = [
     "room_mode_frequency",
     "room_modes",
     "room_parameters",
+    "room_to_room_transmission",
     "rotorcraft_event_level",
     "rotorcraft_noise_contour",
     "roughness_ecma",

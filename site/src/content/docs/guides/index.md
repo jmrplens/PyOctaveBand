@@ -503,6 +503,9 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 and EBU R 128.
 - [Duct-Borne Noise: Fan to Room](/phonometry/guides/duct-path/): the
   end-to-end fan-to-room calculation against a room criterion, and the
   higher-order-mode cut-on that limits every plane-wave method.
+- [Room to Room: Partition, Receiving Room, Criterion](/phonometry/guides/room-to-room/):
+  the source-room level through a partition into the receiving room, the noise
+  criterion verdict and the transmission loss a partition or an enclosure needs.
 - [Industrial Noise Control: HVAC and Enclosures](/phonometry/guides/noise-control/):
   duct attenuation and flow noise, and enclosure insertion loss.
 

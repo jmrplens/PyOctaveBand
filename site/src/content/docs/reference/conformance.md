@@ -9,7 +9,7 @@ head:
     attrs:
       type: application/ld+json
     content: |
-      {"@context":"https://schema.org","@type":"Dataset","@id":"https://jmrplens.github.io/phonometry/reference/conformance/#dataset","name":"phonometry numerical conformance report","description":"470 numerical conformance checks pinning each implemented acoustic metric to a clause, table or worked example of the governing standard, with the normative expected value, the value phonometry computes, the delta and a pass/fail verdict, across 55 domains and 312 standards. Regenerated and enforced by CI on every pull request.","url":"https://jmrplens.github.io/phonometry/reference/conformance/","inLanguage":"en","license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"creator":{"@id":"https://jmrp.io/#person"},"publisher":{"@id":"https://jmrp.io/#person"},"about":{"@id":"https://github.com/jmrplens/phonometry#software"},"measurementTechnique":"Comparison of computed values against the normative expected values published in the governing standards (tolerance tables and worked examples).","variableMeasured":[{"@type":"PropertyValue","name":"Standard","description":"Governing standard and clause or table"},{"@type":"PropertyValue","name":"Quantity","description":"Acoustic quantity under test"},{"@type":"PropertyValue","name":"Expected","description":"Normative value published in the standard"},{"@type":"PropertyValue","name":"Computed","description":"Value computed by phonometry"},{"@type":"PropertyValue","name":"Delta","description":"Signed difference between computed and expected"},{"@type":"PropertyValue","name":"Status","description":"Pass or fail verdict against the standard's tolerance"}],"distribution":{"@type":"DataDownload","encodingFormat":"text/markdown","contentUrl":"https://raw.githubusercontent.com/jmrplens/phonometry/main/docs/CONFORMANCE.md"},"isBasedOn":"https://github.com/jmrplens/phonometry/blob/main/scripts/conformance_report.py","identifier":{"@type":"PropertyValue","propertyID":"DOI","value":"10.5281/zenodo.21215280"}}
+      {"@context":"https://schema.org","@type":"Dataset","@id":"https://jmrplens.github.io/phonometry/reference/conformance/#dataset","name":"phonometry numerical conformance report","description":"474 numerical conformance checks pinning each implemented acoustic metric to a clause, table or worked example of the governing standard, with the normative expected value, the value phonometry computes, the delta and a pass/fail verdict, across 55 domains and 316 standards. Regenerated and enforced by CI on every pull request.","url":"https://jmrplens.github.io/phonometry/reference/conformance/","inLanguage":"en","license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"creator":{"@id":"https://jmrp.io/#person"},"publisher":{"@id":"https://jmrp.io/#person"},"about":{"@id":"https://github.com/jmrplens/phonometry#software"},"measurementTechnique":"Comparison of computed values against the normative expected values published in the governing standards (tolerance tables and worked examples).","variableMeasured":[{"@type":"PropertyValue","name":"Standard","description":"Governing standard and clause or table"},{"@type":"PropertyValue","name":"Quantity","description":"Acoustic quantity under test"},{"@type":"PropertyValue","name":"Expected","description":"Normative value published in the standard"},{"@type":"PropertyValue","name":"Computed","description":"Value computed by phonometry"},{"@type":"PropertyValue","name":"Delta","description":"Signed difference between computed and expected"},{"@type":"PropertyValue","name":"Status","description":"Pass or fail verdict against the standard's tolerance"}],"distribution":{"@type":"DataDownload","encodingFormat":"text/markdown","contentUrl":"https://raw.githubusercontent.com/jmrplens/phonometry/main/docs/CONFORMANCE.md"},"isBasedOn":"https://github.com/jmrplens/phonometry/blob/main/scripts/conformance_report.py","identifier":{"@type":"PropertyValue","propertyID":"DOI","value":"10.5281/zenodo.21215280"}}
 ---
 
 phonometry's key differentiator is not the feature list but the proof behind
@@ -66,7 +66,7 @@ with its evidence and what the library does about it, is recorded in the
 
 ## Numerical conformance report
 
-&#9989; **470/470 conformance checks pass** across 55 domains and 312 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+&#9989; **474/474 conformance checks pass** across 55 domains and 316 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
 
@@ -981,7 +981,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary>&#9989; <b>Industrial noise control</b>: 100% (18/18)</summary>
+<summary>&#9989; <b>Industrial noise control</b>: 100% (22/22)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
@@ -1003,6 +1003,10 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | Norton & Karczub 2e Eqs. 7.6/7.8/7.9 (problem 7.1 answer) | 254 mm duct, steam, 200 m/s: (1,0) cut-on 812 Hz and k_x = -8.23 1/m | 0 +/-1 (Hz, and 1/m x100) | 0.591 | 0.591 | &#9989; |
 | Norton & Karczub 2e Eq. 7.10 (problem 7.2 answer) | 0.65 x 0.4 m duct, 15 m/s: first three cut-on 264 / 428 / 503 Hz | 0 Hz (max |diff| over the 3 modes) | 0 Hz | 0 Hz | &#9989; |
 | Bies 5e Eqs. (7.103), (7.111) (enclosure, fully absorbing limit) | Enclosure correction C -> 10 lg 0.3 = -5.23 dB as alpha_i -> 1 | -5.2288 dB (+/-0.001 dB) | -5.2288 dB | 0 dB | &#9989; |
+| Norton & Karczub 2e Eq. (4.101) (problem 4.21 answer) | Double brick wall into an 8 x 9 x 3 m room -> NR 37.5/40.8/49.0/62.8/65.3/65.9 dB | 0 dB +/-0.05 (max |diff| over the 6 bands) | 0.0308 dB | 0.031 dB | &#9989; |
+| Norton & Karczub 2e 4.6/4.9 (problem 4.18 answer) | Blower in a plant room to the operator room -> 72.3/60.4/41.4/41.0/33.8/30.7 dB | 0 dB +/-0.1 (max |diff| over the 6 bands) | 0.0682 dB | 0.068 dB | &#9989; |
+| Norton & Karczub 2e Eq. (4.115) (problem 4.16 answer) | Lined compressor enclosure against NC-45 -> required TL 14.4/25.2/28.9/34.4/35.2/34.7/34.7/31.6 dB | 0 dB +/-0.15 (max |diff| over the 8 bands) | 0.1099 dB | 0.11 dB | &#9989; |
+| Norton & Karczub 2e Table 4.5 (constant-volume source power) | Source in the intersection of two flat surfaces (Q = 4) -> +10 lg 4 = 6.02 dB | 6.0206 dB (+/-0 dB) | 6.0206 dB | 0 dB | &#9989; |
 
 </details>
 

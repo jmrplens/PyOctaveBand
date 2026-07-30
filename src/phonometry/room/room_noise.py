@@ -365,6 +365,28 @@ def rc_curve(index: float) -> np.ndarray:
     return curve
 
 
+def _criterion_curve_at(
+    family: str, index: float, frequencies: ArrayLike
+) -> np.ndarray:
+    """An NC or RC curve resampled onto an arbitrary octave-band grid.
+
+    Design sheets compare a received spectrum band by band with the criterion
+    curve, so the curve has to be read at the analysis bands rather than at the
+    ten bands of Table 1. Each requested frequency takes the value of the
+    nearest Table 1 band on a logarithmic frequency scale.
+
+    :param family: ``"NC"`` or ``"RC"``.
+    :param index: The curve designation (e.g. ``45`` for NC 45).
+    :param frequencies: Band centre frequencies to sample at, in hertz.
+    :return: The curve levels at ``frequencies``, in dB.
+    """
+    curve = nc_curve(index) if family == "NC" else rc_curve(index)
+    freqs = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
+    return np.array(
+        [curve[int(np.argmin(np.abs(np.log2(OCTAVE_BANDS / f))))] for f in freqs]
+    )
+
+
 def _align_levels(levels: ArrayLike, frequencies: ArrayLike | None) -> np.ndarray:
     """Validate levels and align them to :data:`OCTAVE_BANDS`."""
     lv = np.atleast_1d(np.asarray(levels, dtype=np.float64))

@@ -23,6 +23,24 @@ panel ``R``; lining the enclosure drives ``C`` toward its floor
 Bies terms this net reduction the enclosure *noise reduction*; it is the
 insertion loss of the enclosure.
 
+Norton & Karczub, *Fundamentals of Noise and Vibration Analysis for Engineers*
+2nd ed., 4.10 (Equation (4.115)) derive the same design equation from the same
+power balance but **without the ``0.3``**:
+
+    IL = R - 10 log10( S_E / R_i ) ,
+
+so a well-lined enclosure keeps rising instead of levelling off at ``R + 5.2``.
+The two agree to a few tenths of a decibel while ``S_E / R_i`` stays above about
+unity (a hard or lightly lined interior) and diverge once the lining takes over,
+where Bies' floor is the safer statement. ``model`` selects between them, and
+the difference is the reason a published worked answer has to be reproduced with
+the model its author used.
+
+Turned around, the same equation answers the question a designer actually asks:
+*given the noise reduction I need, what transmission loss must the panels have?*
+That is :func:`enclosure_required_transmission_loss`, which returns the required
+``R`` per band in the same :class:`EnclosureResult`.
+
 **The panel transmission loss ``R`` is supplied by the caller** -- measured, or
 predicted by a panel model -- as a per-band array, a callable of frequency, or
 a panel prediction result (a :class:`phonometry.building.SoundReductionResult`
@@ -41,8 +59,15 @@ from typing import TYPE_CHECKING, Any, Protocol, cast
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from .._internal.validation import require_positive
+from .._internal.validation import require_choice, require_positive
 from ..room.steady_field import room_constant
+
+#: Interior build-up correction models. The value is the additive floor inside
+#: the logarithm of ``C = 10 lg(floor + S_E / R_i)``: Bies, Hansen & Howard
+#: (Equation (7.111)) carry ``0.3``, which caps the insertion loss of a fully
+#: lined enclosure at ``R + 5.2 dB``; Norton & Karczub (Equation (4.115)) carry
+#: none.
+ENCLOSURE_MODELS: dict[str, float] = {"bies": 0.3, "norton": 0.0}
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -172,24 +197,75 @@ def _resolve_frequencies(
 
 
 def _resolve_panel_r(
-    panel_transmission_loss: ArrayLike | Callable[[NDArray[np.float64]], ArrayLike],
+    values: ArrayLike | Callable[[NDArray[np.float64]], ArrayLike],
     freqs: NDArray[np.float64] | None,
+    name: str = "panel_transmission_loss",
 ) -> NDArray[np.float64]:
-    """Resolve the panel transmission loss ``R`` into a validated 1-D array."""
-    if callable(panel_transmission_loss):
+    """Resolve a per-band decibel spectrum into a validated 1-D array."""
+    if callable(values):
         if freqs is None:
-            raise ValueError(
-                "'frequencies' is required when 'panel_transmission_loss' "
-                "is a callable."
-            )
-        r = np.atleast_1d(np.asarray(panel_transmission_loss(freqs), dtype=np.float64))
+            raise ValueError(f"'frequencies' is required when '{name}' is a callable.")
+        r = np.atleast_1d(np.asarray(values(freqs), dtype=np.float64))
     else:
-        r = np.atleast_1d(np.asarray(panel_transmission_loss, dtype=np.float64))
+        r = np.atleast_1d(np.asarray(values, dtype=np.float64))
     if r.ndim != 1 or r.size == 0:
-        raise ValueError("'panel_transmission_loss' must be a non-empty 1-D array.")
+        raise ValueError(f"'{name}' must be a non-empty 1-D array.")
     if not np.all(np.isfinite(r)):
-        raise ValueError("'panel_transmission_loss' must be finite.")
+        raise ValueError(f"'{name}' must be finite.")
     return r
+
+
+def _resolve_interior(
+    values: ArrayLike | Callable[[NDArray[np.float64]], ArrayLike],
+    external_area: float,
+    internal_area: float,
+    internal_absorption: ArrayLike,
+    frequencies: ArrayLike | None,
+    model: str,
+    name: str,
+) -> tuple[
+    NDArray[np.float64] | None,
+    NDArray[np.float64],
+    NDArray[np.float64],
+    NDArray[np.float64],
+    float,
+    float,
+]:
+    """Shared geometry of the enclosure equation, in either direction.
+
+    Validates the two areas, the interior absorption and the per-band spectrum
+    ``values`` (a panel ``R`` for :func:`enclosure_insertion_loss`, a target
+    ``IL`` for :func:`enclosure_required_transmission_loss`), and returns
+    ``(frequencies, values, correction C, room constant R_i, S_E, S_i)``.
+    """
+    s_e = require_positive(external_area, "external_area")
+    s_i = require_positive(internal_area, "internal_area")
+    floor = ENCLOSURE_MODELS[require_choice(model, "model", tuple(ENCLOSURE_MODELS))]
+
+    freqs = _resolve_frequencies(frequencies)
+    v = _resolve_panel_r(values, freqs, name)
+
+    alpha = np.asarray(internal_absorption, dtype=np.float64)
+    if alpha.ndim > 1:
+        raise ValueError("'internal_absorption' must be a scalar or a 1-D array.")
+    if np.any(alpha <= 0.0) or np.any(alpha >= 1.0) or not np.all(np.isfinite(alpha)):
+        raise ValueError("'internal_absorption' must lie strictly in (0, 1).")
+
+    r_i = np.atleast_1d(np.asarray(room_constant(s_i, alpha), dtype=np.float64))
+    r_i_b, v_b = np.broadcast_arrays(r_i, v)
+    if freqs is not None and freqs.shape != v_b.shape:
+        raise ValueError(
+            f"'frequencies' must match the number of {name} / absorption bands."
+        )
+    correction = 10.0 * np.log10(floor + s_e / r_i_b)
+    return (
+        freqs,
+        np.array(v_b, dtype=np.float64),
+        np.array(correction, dtype=np.float64),
+        np.array(r_i_b, dtype=np.float64),
+        s_e,
+        s_i,
+    )
 
 
 def enclosure_insertion_loss(
@@ -203,6 +279,7 @@ def enclosure_insertion_loss(
     internal_absorption: ArrayLike,
     *,
     frequencies: ArrayLike | None = None,
+    model: str = "bies",
 ) -> EnclosureResult:
     """Net insertion loss of a machine enclosure (Bies Eqs. (7.103), (7.111)).
 
@@ -228,11 +305,12 @@ def enclosure_insertion_loss(
     :param frequencies: Band centre frequencies, Hz; required when
         ``panel_transmission_loss`` is a callable, optional otherwise (used to
         label the result and the plot).
+    :param model: Interior build-up model, one of :data:`ENCLOSURE_MODELS`:
+        ``"bies"`` (default) carries the ``0.3`` floor of Bies Equation (7.111),
+        ``"norton"`` the bare ``C = 10 lg(S_E / R_i)`` of Norton & Karczub
+        Equation (4.115).
     :return: An :class:`EnclosureResult`.
     """
-    s_e = require_positive(external_area, "external_area")
-    s_i = require_positive(internal_area, "internal_area")
-
     if (
         not callable(panel_transmission_loss)
         and not isinstance(panel_transmission_loss, (np.ndarray, list, tuple))
@@ -246,29 +324,77 @@ def enclosure_insertion_loss(
             result.transmission_loss, dtype=np.float64
         )
 
-    freqs = _resolve_frequencies(frequencies)
-    r = _resolve_panel_r(panel_transmission_loss, freqs)
-
-    alpha = np.asarray(internal_absorption, dtype=np.float64)
-    if alpha.ndim > 1:
-        raise ValueError("'internal_absorption' must be a scalar or a 1-D array.")
-    if np.any(alpha <= 0.0) or np.any(alpha >= 1.0) or not np.all(np.isfinite(alpha)):
-        raise ValueError("'internal_absorption' must lie strictly in (0, 1).")
-
-    r_i = np.atleast_1d(np.asarray(room_constant(s_i, alpha), dtype=np.float64))
-    r_i_b, r_b = np.broadcast_arrays(r_i, r)
-    if freqs is not None and freqs.shape != r_b.shape:
-        raise ValueError(
-            "'frequencies' must match the number of panel-R / absorption bands."
-        )
-    correction = 10.0 * np.log10(0.3 + s_e / r_i_b)
-    il = r_b - correction
+    freqs, r_b, correction, r_i_b, s_e, s_i = _resolve_interior(
+        panel_transmission_loss,
+        external_area,
+        internal_area,
+        internal_absorption,
+        frequencies,
+        model,
+        "panel_transmission_loss",
+    )
     return EnclosureResult(
         frequencies=freqs,
-        panel_transmission_loss=np.array(r_b, dtype=np.float64),
-        correction=np.array(correction, dtype=np.float64),
-        insertion_loss=np.array(il, dtype=np.float64),
+        panel_transmission_loss=r_b,
+        correction=correction,
+        insertion_loss=r_b - correction,
         external_area=s_e,
         internal_area=s_i,
-        room_constant=np.array(r_i_b, dtype=np.float64),
+        room_constant=r_i_b,
+    )
+
+
+def enclosure_required_transmission_loss(
+    insertion_loss: ArrayLike | Callable[[NDArray[np.float64]], ArrayLike],
+    external_area: float,
+    internal_area: float,
+    internal_absorption: ArrayLike,
+    *,
+    frequencies: ArrayLike | None = None,
+    model: str = "bies",
+) -> EnclosureResult:
+    """Panel ``R`` an enclosure needs to deliver a given insertion loss.
+
+    The design equation of :func:`enclosure_insertion_loss` solved the other
+    way, ``R = IL + C``: the enclosure geometry and its interior lining fix the
+    build-up correction ``C``, and the panels have to make up the rest. This is
+    the number an enclosure is specified from, and the form Norton & Karczub use
+    in 4.10 when the target ``IL`` is the gap between the level a machine
+    produces in the room and a noise-criterion curve.
+
+    :param insertion_loss: Required insertion loss ``IL`` per band, dB (a
+        per-band array, or a callable of the frequency array, in which case
+        ``frequencies`` is required).
+    :param external_area: External enclosure surface area ``S_E``, m2.
+    :param internal_area: Internal surface area ``S_i``, m2, including the
+        surface of the enclosed machine.
+    :param internal_absorption: Mean interior absorption ``alpha_i`` in
+        ``(0, 1)`` (scalar or per-band); e.g. from
+        :func:`phonometry.room.mean_absorption` over the lined enclosure walls
+        and the machine surface.
+    :param frequencies: Band centre frequencies, Hz; required for a callable
+        ``insertion_loss``, optional otherwise.
+    :param model: Interior build-up model, one of :data:`ENCLOSURE_MODELS`
+        (see :func:`enclosure_insertion_loss`).
+    :return: An :class:`EnclosureResult` whose ``panel_transmission_loss`` is
+        the **required** ``R`` and whose ``insertion_loss`` is the requested
+        target, so it plots and reports like a forward calculation.
+    """
+    freqs, il_b, correction, r_i_b, s_e, s_i = _resolve_interior(
+        insertion_loss,
+        external_area,
+        internal_area,
+        internal_absorption,
+        frequencies,
+        model,
+        "insertion_loss",
+    )
+    return EnclosureResult(
+        frequencies=freqs,
+        panel_transmission_loss=il_b + correction,
+        correction=correction,
+        insertion_loss=il_b,
+        external_area=s_e,
+        internal_area=s_i,
+        room_constant=r_i_b,
     )

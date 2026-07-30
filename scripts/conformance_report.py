@@ -7968,6 +7968,118 @@ def _chk_enclosure_floor() -> Outcome:
                    unit="dB")
 
 
+# --- Room-to-room chain (Norton & Karczub 2e, Chapter 4 problems) ---------
+
+#: Receiving room of Norton problem 4.21: 8 x 9 x 3 m, printed absorption
+#: coefficients of the walls, floor and ceiling over 125 Hz to 4 kHz.
+_N421_BANDS = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+_N421_SURFACES = (
+    (2.0 * (8.0 * 3.0) + 2.0 * (9.0 * 3.0),
+     np.array([0.04, 0.04, 0.09, 0.15, 0.17, 0.23])),
+    (72.0, np.array([0.02, 0.06, 0.14, 0.37, 0.60, 0.66])),
+    (72.0, np.array([0.30, 0.20, 0.15, 0.05, 0.05, 0.05])),
+)
+
+
+@register(
+    _NOISE_CONTROL,
+    "Norton & Karczub 2e Eq. (4.101) (problem 4.21 answer)",
+    "Double brick wall into an 8 x 9 x 3 m room -> NR 37.5/40.8/49.0/62.8/65.3/65.9 dB",
+)
+def _chk_room_to_room_noise_reduction() -> Outcome:
+    res = ph.room_to_room_transmission(
+        _N421_BANDS,
+        [37.0, 41.0, 48.0, 60.0, 61.0, 61.0],
+        8.0 * 3.0,
+        ph.equivalent_absorption_area(_N421_SURFACES),
+        source_level=90.0,
+    )
+    printed = np.array([37.5, 40.8, 49.0, 62.8, 65.3, 65.9])
+    worst = float(np.max(np.abs(np.asarray(res.noise_reduction) - printed)))
+    return numeric(0.0, worst, 0.05, unit="dB",
+                   expected_label="0 dB +/-0.05 (max |diff| over the 6 bands)")
+
+
+@register(
+    _NOISE_CONTROL,
+    "Norton & Karczub 2e 4.6/4.9 (problem 4.18 answer)",
+    "Blower in a plant room to the operator room -> "
+    "72.3/60.4/41.4/41.0/33.8/30.7 dB",
+)
+def _chk_room_to_room_chain() -> Outcome:
+    ceiling = np.array([0.07, 0.20, 0.40, 0.52, 0.60, 0.67])
+    walls = np.array([0.03, 0.03, 0.03, 0.04, 0.05, 0.07])
+    plant = (
+        (80.0, np.array([0.01, 0.01, 0.015, 0.02, 0.02, 0.02])),
+        (80.0, ceiling),
+        (108.0, walls),
+    )
+    operator = (
+        (25.0, np.array([0.08, 0.24, 0.57, 0.69, 0.71, 0.73])),
+        (25.0, ceiling),
+        (60.0, walls),
+    )
+    res = ph.room_to_room_transmission(
+        _N421_BANDS,
+        [39.0, 42.0, 50.0, 58.0, 63.0, 67.0],
+        15.0,
+        ph.equivalent_absorption_area(operator),
+        source_power_level=[105.0, 103.0, 98.0, 108.0, 107.0, 109.0],
+        source_room_constant=ph.room_constant(268.0, ph.mean_absorption(plant)),
+        source_directivity=4.0,
+        source_model="constant_volume",
+    )
+    printed = np.array([72.3, 60.4, 41.4, 41.0, 33.8, 30.7])
+    worst = float(np.max(np.abs(np.asarray(res.received_level) - printed)))
+    return numeric(0.0, worst, 0.1, unit="dB",
+                   expected_label="0 dB +/-0.1 (max |diff| over the 6 bands)")
+
+
+@register(
+    _NOISE_CONTROL,
+    "Norton & Karczub 2e Eq. (4.115) (problem 4.16 answer)",
+    "Lined compressor enclosure against NC-45 -> required TL "
+    "14.4/25.2/28.9/34.4/35.2/34.7/34.7/31.6 dB",
+)
+def _chk_enclosure_required_transmission_loss() -> Outcome:
+    external = 2.0 * (2.5 * 2.5) + 2.0 * (3.5 * 2.5) + 2.5 * 3.5
+    machine = 2.0 * (1.5 * 1.5) + 2.0 * (2.5 * 1.5) + 1.5 * 2.5
+    bare_floor = 2.5 * 3.5 - 1.5 * 2.5
+    wool = np.array([0.10, 0.20, 0.45, 0.65, 0.75, 0.80, 0.80, 0.80])
+    concrete = np.array([0.01, 0.01, 0.01, 0.02, 0.02, 0.02, 0.03, 0.03])
+    lp1 = np.array([72.0, 79.0, 81.0, 84.0, 83.0, 81.0, 80.0, 75.0])
+    lp2 = np.array([67.0, 60.0, 54.0, 49.0, 46.0, 44.0, 43.0, 41.0])
+    res = ph.enclosure_required_transmission_loss(
+        lp1 - lp2,
+        external,
+        external + bare_floor + machine,
+        ph.mean_absorption(
+            ((external, wool), (bare_floor + machine, concrete))
+        ),
+        frequencies=[63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0],
+        model="norton",
+    )
+    printed = np.array([14.4, 25.2, 28.9, 34.4, 35.2, 34.7, 34.7, 31.6])
+    worst = float(np.max(np.abs(res.panel_transmission_loss - printed)))
+    return numeric(0.0, worst, 0.15, unit="dB",
+                   expected_label="0 dB +/-0.15 (max |diff| over the 8 bands)")
+
+
+@register(
+    _NOISE_CONTROL,
+    "Norton & Karczub 2e Table 4.5 (constant-volume source power)",
+    "Source in the intersection of two flat surfaces (Q = 4) -> +10 lg 4 = 6.02 dB",
+)
+def _chk_constant_volume_source_model() -> Outcome:
+    base = float(ph.steady_state_spl(100.0, None, 40.0, directivity=4.0))
+    raised = float(
+        ph.steady_state_spl(
+            100.0, None, 40.0, directivity=4.0, source_model="constant_volume"
+        )
+    )
+    return numeric(10.0 * math.log10(4.0), raised - base, 1e-9, unit="dB")
+
+
 # ===========================================================================
 # Markdown rendering
 # ===========================================================================

@@ -1,6 +1,6 @@
 ---
 title: "Noise control"
-description: "Industrial noise control on the path: reactive four-pole silencers (expansion chambers, Helmholtz, quarter-wave and extended-tube resonators) and the reactive-versus-dissipative choice, HVAC duct attenuation and flow noise, and machine-enclosure insertion loss."
+description: "Industrial noise control on the path: reactive four-pole silencers (expansion chambers, Helmholtz, quarter-wave and extended-tube resonators) and the reactive-versus-dissipative choice, HVAC duct attenuation and flow noise, machine-enclosure insertion loss and the room-to-room noise-reduction chain against a design criterion."
 ---
 
 Machinery noise is attacked at the source, the path and the receiver in turn,
@@ -25,5 +25,8 @@ itself, and that is determined by the
 - [Duct-Borne Noise: Fan to Room](/phonometry/guides/duct-path/): the
   end-to-end fan-to-room calculation against a room criterion, and the
   higher-order-mode cut-on that limits every plane-wave method.
+- [Room to Room: Partition, Receiving Room, Criterion](/phonometry/guides/room-to-room/):
+  the composed source-room to receiving-room chain and the transmission loss a
+  partition or an enclosure needs to meet a noise criterion.
 - [Industrial Noise Control: HVAC and Enclosures](/phonometry/guides/noise-control/):
   duct attenuation, flow noise and machine-enclosure insertion loss.

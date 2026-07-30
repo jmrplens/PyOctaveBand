@@ -230,6 +230,7 @@ export const apiSidebar = {
         'reference/api/noise_control/duct-path',
         'reference/api/noise_control/duct-modes',
         'reference/api/noise_control/enclosures',
+        'reference/api/noise_control/room-to-room',
       ],
     },
     {

@@ -9,6 +9,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Room-to-room noise reduction (`noise_control/room_to_room.py`, Norton &
+  Karczub 2003 Section 4.9): `room_to_room_transmission` composes the whole
+  chain a practitioner runs, from the reverberant level a machine builds up in
+  the source room, through the transmission loss of the partition and the
+  equivalent absorption area of the receiving room, to the received octave-band
+  spectrum and its room-criterion verdict. The step that lived nowhere else is
+  the steady-state power balance of Eq. (4.101),
+  `NR = TL - 10 lg[S_w/(S_2 alpha_2 + tau S_w)]`, which says that the noise
+  reduction is not the transmission loss: a large partition into a hard room
+  delivers less, a small one into an absorbing room more. The `tau S_w` term is
+  optional (`include_partition_transmission`), and `flanking_penalty` records
+  the allowance Norton warns about for flanking paths and air leaks.
+  `RoomToRoomResult` carries every intermediate spectrum, rates itself against
+  an NC or RC target (`rating`, `criterion_curve`, `exceedance`,
+  `meets_target`), inverts the chain into the partition `TL` that would just
+  meet the criterion (`required_transmission_loss`), prints the rows of the
+  hand calculation with `.table()` and draws the whole path with `.plot()`.
+  Anchored end to end on the printed octave-band answers to Norton's problems
+  4.18 (72.3/60.4/41.4/41.0/33.8/30.7 dB in the operator room, to 0.1 dB) and
+  4.21 (the noise reduction of three partitions into one receiving room, to
+  0.05 dB). New guide "Room to room: partition, receiving room, criterion" with
+  the plant-room chain figure, in English and Spanish.
+
+- Enclosure transmission loss solved the other way
+  (`enclosure_required_transmission_loss`, Norton & Karczub 2003 Eq. (4.115)):
+  given the insertion loss an enclosure has to deliver, the panel `R` its walls
+  need, which is what an enclosure is actually specified from. It returns the
+  same `EnclosureResult` as the forward calculation, so it plots and reports
+  identically. `enclosure_insertion_loss` gains `model` (`ENCLOSURE_MODELS`) to
+  choose between the Bies, Hansen & Howard Eq. (7.111) correction, which
+  carries a `0.3` inside the logarithm and floors the insertion loss of a fully
+  lined enclosure at `R + 5.2 dB`, and Norton's Eq. (4.115), which has no such
+  floor; the two diverge once the lining dominates, and reproducing a published
+  answer needs the model its author used. Anchored on Norton's problem 4.16
+  (the transmission loss a lined compressor enclosure needs to reach an NC-45
+  curve, eight octave bands to 0.15 dB).
+
+- `steady_state_spl` accepts `distance=None` for the reverberant field alone,
+  `Lp = Lw + 10 lg(4/R)`, the `r -> infinity` limit of Bies Eq. (6.43) and the
+  level a diffuse-field room-to-room calculation works from; and gains
+  `source_model` (`SOURCE_POWER_MODELS`) for the three sound power models of
+  Norton & Karczub Table 4.5, where a constant-power source radiates the same
+  power wherever it stands, a constant-volume source is loaded by nearby
+  reflecting boundaries and radiates `10 lg Q` more (the conservative upper
+  bound a design estimate uses), and a constant-pressure source `10 lg Q` less.
+
 - Kinematic machine fault frequencies (`vibration/machine_diagnostics.py`,
   Norton & Karczub 2003 Section 8.4): `bearing_fault_frequencies` returns the
   seven rolling-contact bearing lines after Shahan and Kamperman (shaft, cage
