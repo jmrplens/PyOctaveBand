@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 487 numerical conformance checks against 328 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 499 numerical conformance checks against 338 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 487 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 55 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 499 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 55 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -2635,11 +2635,14 @@ cycle and warn on use; they are removed in 4.0.
 | `OccupationalExposureWarning` | `warning class` | **ISO 9612 sampling advisory.**<br>Emitted for the 3 dB task spread (Clause 9.3), c₁u₁ > 3.5 dB (Clause 10.4) or a short Table 1 cumulative duration | `warnings.simplefilter('error', OccupationalExposureWarning)` |
 | `SoundPowerWarning` | `warning class` | **ISO 3744/3746/3741/9614-2 qualification issue.**<br>Emitted when the background margin is below the criterion, K2 exceeds the validity limit, a band's power is negative, or the room fails qualification; levels are then upper bounds | `warnings.simplefilter('error', SoundPowerWarning)` |
 | `AbsorptionWarning` | `warning class` | **ISO 354 advisory.**<br>Emitted for a room below 150 m³, a sample area outside 10-12 m², an out-of-range temperature, or a non-physical α_s ≤ 0; the result still returns | `warnings.simplefilter('error', AbsorptionWarning)` |
-| `speech_intelligibility_index` | `function` | **Speech Intelligibility Index (ANSI S3.5-1997, one-third-octave method).**<br>• `speech_spectrum`: 18 equivalent speech spectrum levels, 160 Hz–8 kHz [dB SPL], or a vocal-effort name 'normal'/'raised'/'loud'/'shout' (Table 3)<br>• `noise_spectrum`: equivalent noise spectrum levels [dB SPL] (Default: None → quiet, −80 dB)<br>• `threshold`: equivalent hearing threshold [dB HL] (Default: None → 0) | `res = speech_intelligibility_index("normal", noise_spectrum=[40.0]*18)`<br><br>• `SIIResult`; `res.sii` = 0.066 |
+| `speech_intelligibility_index` | `function` | **Speech Intelligibility Index (ANSI S3.5-1997, any of its four band procedures).**<br>• `speech_spectrum`: equivalent speech spectrum levels [dB SPL] on the procedure's bands, or a vocal-effort name 'normal'/'raised'/'loud'/'shout' ('normal' only outside the one-third-octave procedure)<br>• `noise_spectrum`: equivalent noise spectrum levels [dB SPL] (Default: None → quiet, −80 dB)<br>• `threshold`: equivalent hearing threshold [dB HL] (Default: None → 0)<br>• `method`: one of `SII_METHODS` (Default: 'one-third-octave')<br>• `band_importance`: alternative `Ii` per band (Default: None → the procedure's table) | `res = speech_intelligibility_index("normal", noise_spectrum=[40.0]*18)`<br><br>• `SIIResult`; `res.sii` = 0.066 |
 | `standard_speech_spectrum` | `function` | **Standard speech spectrum level by vocal effort (ANSI S3.5-1997 Table 3).**<br>• `vocal_effort`: 'normal', 'raised', 'loud' or 'shout' (Default: 'normal') | `u = standard_speech_spectrum('raised')`<br><br>• 18 band levels [dB SPL] |
 | `standard_speech_spectra` | `function` | **Plottable standard speech spectra by vocal effort (ANSI S3.5-1997 Table 3).**<br>• `vocal_efforts`: a name or sequence of 'normal'/'raised'/'loud'/'shout' (Default: the full family) | `res = standard_speech_spectra()`<br><br>• `StandardSpeechSpectrum`; `res.plot()` |
 | `StandardSpeechSpectrum` | `dataclass` | **Standard speech spectrum result.**<br>• `frequencies`: the 18 band centres [Hz]<br>• `vocal_efforts`: the efforts carried<br>• `levels`: `Ui` per effort, `(len(vocal_efforts), 18)` [dB SPL]<br>• `.plot()`: the speech spectrum level vs one-third-octave band, one line per effort | `res.levels, res.vocal_efforts` |
-| `SIIResult` | `dataclass` | **SII result.**<br>• `sii`: index in [0, 1]<br>• `band_audibility`: Ai per band (§5.8)<br>• `band_importance`: Ii (Table 3)<br>• `frequencies` [Hz]<br>• `speech_spectrum` / `disturbance` / `masking`: Ei′ / Di / Zi per band [dB]<br>• `.plot()` | `res.sii, res.band_audibility` |
+| `SIIResult` | `dataclass` | **SII result.**<br>• `sii`: index in [0, 1]<br>• `band_audibility`: Ai per band (§5.8)<br>• `band_importance`: Ii used<br>• `frequencies` [Hz]<br>• `speech_spectrum` / `disturbance` / `masking`: Ei′ / Di / Zi per band [dB]<br>• `level_distortion`: Li per band (§5.7)<br>• `method`: the band procedure used<br>• `.plot()` | `res.sii, res.band_audibility` |
+| `SII_METHODS` | `constant` | **The four ANSI S3.5-1997 band procedures, in the order of its Tables 1 to 4.**<br>`('critical-band', 'equally-contributing', 'one-third-octave', 'octave')`, i.e. 21, 17, 18 and 6 bands | `for m in SII_METHODS: ...` |
+| `sii_procedure` | `function` | **Tabulated band table of one ANSI S3.5-1997 band procedure (Tables 1–4).**<br>• `method`: one of `SII_METHODS` (Default: 'one-third-octave') | `proc = sii_procedure('octave')`<br><br>• `SIIProcedure`; `proc.plot()` |
+| `SIIProcedure` | `dataclass` | **ANSI S3.5-1997 band-procedure constants.**<br>• `method`: the procedure name<br>• `frequencies`: nominal band centres [Hz]<br>• `band_edges`: band limits [Hz], one more than the band count<br>• `band_importance`: `Ii`<br>• `internal_noise`: `Xi` [dB SPL]<br>• `speech_spectrum`: `Ui`, normal vocal effort [dB SPL]<br>• `.plot()`: `Ii` stepped over the band limits | `proc.band_importance, proc.band_edges` |
 | `stoi` | `function` | **Short-time objective intelligibility STOI / ESTOI (Taal et al. 2011; Jensen & Taal 2016).**<br>• `clean`: clean reference (1D)<br>• `degraded`: degraded/processed signal (1D, same length)<br>• `fs` [Hz] (resampled to 10 kHz internally)<br>• `extended`: use ESTOI (Default: False) | `d = stoi(clean, degraded, fs)`<br><br>• `STOIResult`; `d.value` in ~[0, 1] (1 if identical) |
 | `STOIResult` | `dataclass` | **STOI / ESTOI result.**<br>• `value`: the intelligibility index<br>• `extended`: True for ESTOI<br>• `segment_scores`: per-segment intermediate<br>• `band_scores`: per-band mean correlation (STOI; None for ESTOI)<br>• `band_frequencies` [Hz]<br>• `sample_rate` (10 kHz)<br>• `.plot()` | `res.value, res.band_scores` |
 | `thd` | `function` | **Total harmonic distortion (IEC 60268-3 14.12.2–3).**<br>• `signal` (1D), `fs` [Hz]<br>• `fundamental` [Hz] (Default: None → largest peak)<br>• `kind`: 'F' rel. fundamental or 'R' rel. total RMS (Default: 'F')<br>• `n_harmonics` (Default: 10)<br>• `window` (Default: 'hann') | `thd(sig, fs, 1000.0, kind="F")`<br><br>• ratio (0..) |
@@ -3281,7 +3284,7 @@ cycle and warn on use; they are removed in 4.0.
 | `STIWarning` | `warning class` | **STI/STIPA advisory.**<br>Emitted for suspect speech-intelligibility measurements or inputs | `warnings.simplefilter('error', STIWarning)` |
 | `octavefilter` / `getansifrequencies` / `normalizedfreq` / `calculate_sensitivity` / `coverage_factor` / `expanded_uncertainty` | `function` | **Deprecated aliases (warn on use; removal in 4.0).**<br>New names: `octave_filter`, `nominal_frequencies`, `normalized_frequencies`, `sensitivity`, `insulation_coverage_factor`, `insulation_expanded_uncertainty` | `octave_filter(x, fs)  # not octavefilter` |
 | `__version__` | `str` | **Package version string.**<br>(no parameters) | `phonometry.__version__  # '3.2.0'` |
-| `.plot()` | `method` | **One-line canonical figure on every result object (soft matplotlib dependency).**<br>Available on `ZwickerLoudness`, `MooreGlasbergLoudness`, `MooreGlasbergTimeVaryingLoudness`, `EcmaLoudness`, `EcmaTonality`, `EcmaRoughness`, `PsychoacousticAnnoyanceResult`, `FluctuationStrengthResult`, `ProgramLoudnessResult`, `KWeightingResponse`, `STIResult`, `SIIResult`, `StandardSpeechSpectrum`, `NCResult`, `RCResult`, `AgeThresholdResult`, `NiptsResult`, `HtlanResult`, `ImpulseProminenceResult`, `ImpulsiveSoundResult`, `MultipleShockResult`, `ImpulseResponseResult`, `DecayCurve`, `RoomAcousticsResult`, `ReverberationResult`, `ReverberationModelResult`, `DynamicStiffnessResult`, `MobilityResult`, `TransferStiffnessResult`, `VibrationSoundPowerResult`, `StructureBornePowerResult`, `InstalledSourceResult`, `WeightedRatingResult`, `ImpactRatingResult`, `FacadeInsulationResult`, `LabAirborneInsulationResult`, `LabImpactInsulationResult`, `SoundPowerResult`, `ReverberationSoundPowerResult`, `SoundPowerIntensityResult`, `PrecisionSoundPowerResult`, `PrecisionIntensityResult`, `IntensityResult`, `UncertaintyResult`, `AbsorptionRatingResult`, `ScatteringResult`, `DiffusionResult`, `DiffusionSpectrum`, `InsituAbsorptionResult`, `WeightingResponse`, `WeightedSpectrum` and `DailyVibrationExposure`.<br>• `ax`: existing Axes, or None to build a fresh figure (Default: None)<br>• returns the Matplotlib `Axes` (an array of Axes for multi-panel figures); never calls `plt.show()`<br>• needs matplotlib (`pip install phonometry[plot]`) | `res.plot()`<br>`decay_curve(ir, fs).plot()` |
+| `.plot()` | `method` | **One-line canonical figure on every result object (soft matplotlib dependency).**<br>Available on `ZwickerLoudness`, `MooreGlasbergLoudness`, `MooreGlasbergTimeVaryingLoudness`, `EcmaLoudness`, `EcmaTonality`, `EcmaRoughness`, `PsychoacousticAnnoyanceResult`, `FluctuationStrengthResult`, `ProgramLoudnessResult`, `KWeightingResponse`, `STIResult`, `SIIResult`, `SIIProcedure`, `StandardSpeechSpectrum`, `NCResult`, `RCResult`, `AgeThresholdResult`, `NiptsResult`, `HtlanResult`, `ImpulseProminenceResult`, `ImpulsiveSoundResult`, `MultipleShockResult`, `ImpulseResponseResult`, `DecayCurve`, `RoomAcousticsResult`, `ReverberationResult`, `ReverberationModelResult`, `DynamicStiffnessResult`, `MobilityResult`, `TransferStiffnessResult`, `VibrationSoundPowerResult`, `StructureBornePowerResult`, `InstalledSourceResult`, `WeightedRatingResult`, `ImpactRatingResult`, `FacadeInsulationResult`, `LabAirborneInsulationResult`, `LabImpactInsulationResult`, `SoundPowerResult`, `ReverberationSoundPowerResult`, `SoundPowerIntensityResult`, `PrecisionSoundPowerResult`, `PrecisionIntensityResult`, `IntensityResult`, `UncertaintyResult`, `AbsorptionRatingResult`, `ScatteringResult`, `DiffusionResult`, `DiffusionSpectrum`, `InsituAbsorptionResult`, `WeightingResponse`, `WeightedSpectrum` and `DailyVibrationExposure`.<br>• `ax`: existing Axes, or None to build a fresh figure (Default: None)<br>• returns the Matplotlib `Axes` (an array of Axes for multi-panel figures); never calls `plt.show()`<br>• needs matplotlib (`pip install phonometry[plot]`) | `res.plot()`<br>`decay_curve(ir, fs).plot()` |
 
 ## Notes
 
@@ -33112,8 +33115,10 @@ audible, and therefore intelligible, to a listener in a given noise and hearing
 condition. It reduces a speech spectrum, a noise spectrum and a hearing
 threshold to a single number in `[0, 1]`: `0` when nothing useful reaches the
 listener, `1` when the whole speech-bearing spectrum is audible. This page
-covers the **one-third-octave-band method** of **ANSI S3.5-1997 (R2017)**: 18
-bands from 160 Hz to 8000 Hz.
+covers all four band procedures of **ANSI S3.5-1997 (R2017)**: the
+**one-third-octave-band method** (18 bands from 160 Hz to 8000 Hz), which is
+the default and the one sections 1 to 4 work through, and the critical-band,
+equally-contributing critical-band and octave-band methods of section 5.
 
 > [!NOTE]
 > **SII vs STI.** The SII predicts intelligibility from *audibility* (how much
@@ -33401,7 +33406,150 @@ plt.show()
 The vocal-effort names work anywhere a speech spectrum is expected, including as
 the first argument to `speech_intelligibility_index`.
 
-## 5. SII or STI?
+## 5. The four band procedures
+
+The standard's own title is plural, and so is the standard: ANSI S3.5-1997
+defines **four** band procedures. They differ only in the band table and in how
+the upward spread of masking is expressed, and `method=` selects one. The
+default is the one-third-octave procedure used above.
+
+| `method=` | Bands | Range | Constants | Spread of masking |
+| :--- | ---: | :--- | :--- | :--- |
+| `"critical-band"` | 21 | 100 Hz to 9500 Hz | Table 1 | between tabulated band limits |
+| `"equally-contributing"` | 17 | 300 Hz to 6400 Hz | Table 2 | between tabulated band limits |
+| `"one-third-octave"` | 18 | 160 Hz to 8000 Hz | Table 3 | between band centre frequencies |
+| `"octave"` | 6 | 177 Hz to 11314 Hz | Table 4 | none |
+
+Every procedure runs the same chain as section 2: self-speech masking, the
+upward spread of masking, the equivalent internal noise and disturbance, the
+level-distortion factor and the band-audibility function, weighted by that
+procedure's own band-importance function. The masking slope is one formula
+throughout, $C_i = -80 + 0.6\,(B_i + 10\log_{10} W_i)$ with $W_i$ the band
+width in hertz. The critical-band and equally-contributing procedures spread
+the masking from the upper limit of the masker band up to the centre frequency
+of the masked band; the one-third-octave procedure writes that same geometry in
+terms of the band centres, which is where its printed $0.89\,f_i/f_k$ and
+$-6.353$ dB come from. The octave-band procedure carries **no** spread of
+masking at all: an octave band is already wider than the spread being
+modelled, so its equivalent masking spectrum level is the equivalent noise
+spectrum level itself.
+
+The four band-importance functions are one underlying distribution sampled at
+four resolutions, so the wider the bands, the larger each $I_i$. Each function
+sums to one, except Table 2's, which prints `0.0588` in each of its 17 bands
+and so sums to 0.9996.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_band_procedures_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_band_procedures.svg" alt="The band-importance function of the four ANSI S3.5-1997 band procedures overlaid on one logarithmic frequency axis: the 21 critical bands, the 17 equally-contributing critical bands, the 18 one-third-octave bands and the 6 octave bands, each drawn as a step across its own band limits. All four trace the same rise to a maximum around 2 kHz, and the wider the bands the higher the step, the octave function peaking at 0.265 against 0.090 for the one-third-octave function" width="90%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import SII_METHODS, sii_procedure
+
+# One line: each procedure's own .plot() steps its Ii over its band limits.
+fig, ax = plt.subplots(figsize=(10, 6))
+for method in SII_METHODS:
+    sii_procedure(method).plot(ax=ax, linewidth=1.8)
+plt.show()
+
+# By hand, mirroring what SIIProcedure.plot() draws:
+fig, ax = plt.subplots()
+for method in SII_METHODS:
+    proc = sii_procedure(method)
+    ii = proc.band_importance
+    ax.plot(proc.band_edges, np.append(ii, ii[-1]), drawstyle="steps-post",
+            label=method)
+ax.set_xscale("log")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel(r"Band importance $I_i$")
+ax.set_ylim(bottom=0.0)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+Because an equivalent spectrum level is a per-hertz quantity, a white noise has
+the *same* equivalent noise spectrum level in every band of every procedure,
+which makes the four directly comparable:
+
+```python
+import numpy as np
+from phonometry import hearing
+
+for method in hearing.SII_METHODS:
+    n_bands = hearing.sii_procedure(method).frequencies.size
+    result = hearing.speech_intelligibility_index(
+        "normal", np.full(n_bands, 25.0), method=method
+    )
+    print(method, n_bands, round(result.sii, 3))
+# critical-band        21 0.343
+# equally-contributing 17 0.333
+# one-third-octave     18 0.350
+# octave                6 0.369
+```
+
+The four agree to within about 0.04 on the same listening situation. The octave
+procedure reads highest because it drops the spread of masking, which is
+exactly the risk it carries: feed it a strong low-frequency noise and it will
+not see that noise reaching up into the speech-bearing bands.
+
+**Which procedure to use.**
+
+- `"one-third-octave"` is the working default: the finest resolution the
+  standard offers, the only table that carries all four vocal-effort speech
+  spectra, and the resolution measurement data usually arrives in.
+- `"critical-band"` follows the auditory filter. Its 21 bands are the classical
+  critical bands, so it is the procedure to pair with critical-band models of
+  masking or loudness, and the only one that reaches down to 100 Hz.
+- `"equally-contributing"` gives all 17 of its bands the same importance over
+  300 Hz to 6400 Hz, so the index reads directly as the fraction of
+  equally-important bands that are audible. That makes it fast to check by
+  hand, and it is the presentation closest to the articulation-index tradition
+  the SII grew out of.
+- `"octave"` is for octave-band data, which is what sound level meters, HVAC
+  selections and building-acoustics reports routinely give. Use it when that is
+  all you have, and read it knowing the spread of masking is missing.
+
+**An alternative band-importance function.** `band_importance=` replaces the
+procedure's tabulated $I_i$ with one of your own, which is how the standard's
+Annex B functions for particular speech test materials (nonsense syllables,
+monosyllabic word lists, short passages) are applied. It changes the weighting
+only: the audibility chain, and therefore `result.band_audibility`, is
+untouched.
+
+```python
+res = hearing.speech_intelligibility_index(
+    "normal", np.full(6, 25.0), method="octave",
+    band_importance=[0.0, 0.0, 1.0, 0.0, 0.0, 0.0],   # all the weight at 1 kHz
+)
+print(round(res.sii, 3))          # 0.5  (the 1 kHz octave band alone)
+```
+
+**The tabulated constants.** `sii_procedure(method)` returns an `SIIProcedure`
+carrying that procedure's band centre frequencies, band limits, band-importance
+function, reference internal noise spectrum level and normal-effort standard
+speech spectrum level; its `.plot()` draws the band-importance function as a
+step over the band limits, which is the figure above. Tables 1, 2 and 4 are
+tabulated for normal vocal effort only, so `"raised"`, `"loud"` and `"shout"`
+are available on the one-third-octave procedure alone.
+
+```python
+octave = hearing.sii_procedure("octave")
+print(octave.frequencies)          # [ 250.  500. 1000. 2000. 4000. 8000.]
+print(octave.band_importance)      # [0.0617 0.1671 0.2373 0.2648 0.2142 0.0549]
+
+# Table 2 is critical bands 3 to 19 of Table 1, weighted equally.
+equal = hearing.sii_procedure("equally-contributing")
+print(equal.band_edges[0], equal.band_edges[-1])       # 300.0 6400.0
+print(equal.band_importance.sum().round(4))            # 0.9996
+```
+
+
+## 6. SII or STI?
 
 The two speech metrics answer different questions from different measurements,
 and each is blind to what the other captures:
@@ -33423,7 +33571,7 @@ spectrum clears the noise. When both mechanisms are in play, compute both; the
 inputs are cheap once the room and the noise have been measured. See the
 [Speech Transmission Index guide](https://jmrplens.github.io/phonometry/guides/speech-transmission/) for the STI side.
 
-## 6. ANSI S3.5-1997 report (`.report()`)
+## 7. ANSI S3.5-1997 report (`.report()`)
 
 `SIIResult.report(path)` renders a one-page PDF fiche laid out like a
 speech-audibility report: a standard-basis line, an optional metadata header
@@ -33478,6 +33626,20 @@ $A_i = \operatorname{clip}\!\left((E_i' - D_i + 15)/30,\; 0,\; 1\right)$
 the equivalent disturbance combining external noise, upward spread of masking
 and the equivalent internal noise. The index lies in $[0, 1]$.
 
+### Which of the four ANSI S3.5 band procedures should I use?
+
+ANSI S3.5-1997 defines four: critical band (21 bands, 100 Hz to 9500 Hz),
+equally-contributing critical band (17 bands, 300 Hz to 6400 Hz), one-third
+octave (18 bands, 160 Hz to 8000 Hz) and octave (6 bands, 250 Hz to 8000 Hz
+nominal). Use `method="one-third-octave"` by default: it is the finest
+resolution and the only procedure whose table carries the raised, loud and
+shout speech spectra. Use `method="critical-band"` to align the index with a
+critical-band (Bark) masking or loudness model, `method="equally-contributing"`
+when the index should read as the fraction of equally-important bands that are
+audible, and `method="octave"` when octave-band data is all that was measured,
+remembering that the octave procedure carries no upward spread of masking and
+so reads high under strong low-frequency noise.
+
 ### When should I use the SII instead of the STI?
 
 Use the SII (ANSI S3.5) when the question is whether enough of the speech
@@ -33499,9 +33661,11 @@ mechanisms are in play, compute both.
 ## Standards
 
 ANSI S3.5-1997 (R2017), *American National Standard Methods for
-the Calculation of the Speech Intelligibility Index*: the one-third-octave-band
-method (18 bands), band-importance function (Table 3), standard speech spectrum
-level and reference internal noise (Table 3), and the masking, disturbance and
+the Calculation of the Speech Intelligibility Index*: the four band procedures
+(critical band, 21 bands, Table 1; equally-contributing critical band, 17
+bands, Table 2; one-third octave, 18 bands, Table 3; octave, 6 bands, Table 4)
+with their band-importance functions, standard speech spectrum levels and
+reference internal noise spectrum levels, and the masking, disturbance and
 band-audibility procedure (clause 5) and the index (clause 6).
 
 ---

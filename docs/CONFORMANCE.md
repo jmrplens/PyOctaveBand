@@ -15,7 +15,7 @@
 
 ## Numerical conformance report
 
-&#9989; **487/487 conformance checks pass** across 55 domains and 328 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+&#9989; **499/499 conformance checks pass** across 55 domains and 338 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
 
@@ -367,7 +367,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary>&#9989; <b>Speech intelligibility (ANSI S3.5-1997)</b>: 100% (10/10)</summary>
+<summary>&#9989; <b>Speech intelligibility (ANSI S3.5-1997)</b>: 100% (22/22)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
@@ -380,6 +380,18 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ASA WG S3-79 SII.C (clause 6) | SII, standard speech in quiet, normal hearing | 0.99582517 (+/-0.000001) | 0.99582517 | 0 | &#9989; |
 | ASA WG S3-79 TO.TST | Official one-third-octave test case | 0.445 (+/-0.001) | 0.445 | 0 | &#9989; |
 | ASA WG S3-79 TO_1.TST | Official test case, alternative importance | 0.438 (+/-0.001) | 0.438 | 0 | &#9989; |
+| ASA WG S3-79 CB.TST | Official critical-band test case | 0.273 (+/-0.001) | 0.273 | 0 | &#9989; |
+| ASA WG S3-79 CB_1.TST | Critical band, alternative importance | 0.41 (+/-0.001) | 0.41 | 0 | &#9989; |
+| ASA WG S3-79 ECB.TST | Official equally-contributing test case | 0.278 (+/-0.001) | 0.278 | 0 | &#9989; |
+| ASA WG S3-79 ECB_1.TST | Equally contributing, alternative importance | 0.41 (+/-0.001) | 0.41 | 0 | &#9989; |
+| ASA WG S3-79 OCTAVE.TST | Official octave-band test case | 0.491 (+/-0.001) | 0.491 | 0 | &#9989; |
+| ASA WG S3-79 OCTAVE_1.TST | Octave band, alternative importance | 0.323 (+/-0.001) | 0.323 | 0 | &#9989; |
+| ANSI S3.5-1997 Annex C.1 | Octave-band worked example (SII.C) | 0.504 (+/-0.001) | 0.504 | 0 | &#9989; |
+| ANSI S3.5-1997 Table C.1 (errata) | Level distortion Li, row i = 5 | 1 (+/-0.01) | 1 | -0.004 | &#9989; |
+| ANSI S3.5-1997 Table 1 | Critical-band importance normalisation | 1 (+/-0) | 1 | 0 | &#9989; |
+| ANSI S3.5-1997 Table 2 | Equally-contributing importance, 17 x 0.0588 | 0.9996 (+/-0) | 0.9996 | 0 | &#9989; |
+| ANSI S3.5-1997 Table 4 | Octave-band importance normalisation | 1 (+/-0) | 1 | 0 | &#9989; |
+| ANSI S3.5-1997 Table 4 | Octave-band speech spectrum level at 1 kHz | 25.01 dB (+/-0 dB) | 25.01 dB | 0 dB | &#9989; |
 | ANSI S3.5-1997 Table 3 | Loud-effort speech spectrum level at 1 kHz | 42.16 dB (+/-0 dB) | 42.16 dB | 0 dB | &#9989; |
 
 </details>
