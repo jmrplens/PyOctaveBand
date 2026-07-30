@@ -605,7 +605,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the header shows the mark beside a wordmark set in the brand face while
   loading no web font and reserving no space for one, and the mark alone now
   fills the landing hero's second column, which the layout had always left
-  empty.
+  empty. `.github/brand/logo.svg` carries the same `p-ink` and `p-grid` classes
+  as the favicon and the lockup, so both marks on a page take their two teals
+  from the site's theme tokens and stay in step with each other and with the
+  palette under the site's own theme switch.
 
 ### Changed
 
@@ -630,11 +633,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   claims live in YAML frontmatter, which is parsed before MDX compiles and
   therefore cannot interpolate an import whatever the file extension, so they
   stay with the writer rather than with `conformance-stats.mjs`.
+
 - Documentation site: previous and next links name the section they lead to.
-  Thirty-one sidebar rows are called "Overview", one per group, so 61 of 283
-  entries had a card that said only "Overview" and the page between two groups
-  said it twice. Each card now carries the group trail above the label, looked
-  up in the sidebar the page already renders.
+  Thirty-one sidebar rows are called "Overview", one per group, so 62 of the 564
+  previous/next cards in each language said only "Overview" and the page between
+  two groups said it twice. Each card now carries the group trail above the
+  label, looked up in the sidebar the page already renders.
 
 - Documentation site presentation: the heading scale is fluid and one step
   quieter at the top (an H2 goes from 29-35 px to 23-29 px, so a heading with a
@@ -880,6 +884,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   reachable as `c_db_as_printed`. Southall et al. (2019) Table 7 carries four
   peak-SPL misprints corrected by the journal's own errata, and the corrected
   values are the ones implemented.
+
+- Bibliography data in the documentation frontmatter. `Vorländer, M. (eds.)`
+  becomes `(Eds.)` on the four pages that carry the Havelock handbook, the
+  volume, issue and pages of McFadden (1987) and Harris (1978) move out of the
+  journal name into the structured fields the schema already has so they stop
+  being italicised as part of it, Hadden and Pierce (1981) uses the same
+  journal name as the other sixty-two entries that cite it, ANSI/ASA S12.2-2019
+  carries the year its own designation states, and the Spanish page for
+  programme loudness names the AES convention as it is published instead of
+  translating it.
 
 ## [3.3.0] - 2026-07-27
 

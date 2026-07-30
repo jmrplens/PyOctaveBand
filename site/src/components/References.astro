@@ -6,10 +6,17 @@
  * the MarkdownContent override; pages without `references` render nothing.
  * The matching "On this page" entry is added by src/routeData.ts.
  *
- * Web-flavoured APA: the title carries the link when a catalogue/store URL
- * exists (descriptive link text instead of a bare URL), the DOI renders as
- * its own https://doi.org link with nothing after it, and the optional note
- * follows as an annotation line, annotated-bibliography style.
+ * Three deliberate departures from strict APA 7, and nothing else:
+ *  - a standard prints its designation alone, `(IEC 61672-1:2013)`, rather than
+ *    APA's `(IEC Standard No. 61672-1:2013)`, because the designation is how
+ *    the rest of the site and the conformance tables name the document;
+ *  - the title carries the link when a catalogue or store URL exists, so the
+ *    link text is descriptive instead of a bare URL trailing the entry;
+ *  - an entry may carry a note, which follows as an annotation line,
+ *    annotated-bibliography style.
+ *
+ * The DOI form is not one of them: `https://doi.org/<doi>` with nothing after
+ * it, not even a period, is what APA 7 asks for.
  */
 import { referenceAnchors, type Reference } from '../lib/reference-chips';
 

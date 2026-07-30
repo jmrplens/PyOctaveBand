@@ -215,8 +215,11 @@ def mark_svg(
 ) -> str:
     """The mark as a standalone SVG.
 
-    With ``theme_aware`` a ``prefers-color-scheme: dark`` rule lightens the mark
-    against a dark browser chrome, so one favicon covers both. The colours still
+    With ``theme_aware`` the two roles carry the ``p-ink`` and ``p-grid`` class
+    names and a ``prefers-color-scheme: dark`` rule lightens them against a dark
+    ground, so one file covers both themes: the rule for the asset opened on its
+    own, the classes for a page that inlines it and has its own theme switch,
+    which can disagree with the operating system. The colours still
     travel as presentation attributes and the media query only overrides them:
     written as CSS custom properties instead, every renderer without variable
     support (cairosvg and svglib among them) falls back to black.
@@ -679,7 +682,11 @@ def generate_all() -> None:
 
     print("Generating brand marks...")
     for path, svg in (
-        (brand / "logo.svg", mark_svg()),
+        # Theme-aware like the favicon and the lockup: the classes are what the
+        # documentation site restyles per theme when it inlines this file (the
+        # landing hero does), and the media rule keeps the asset legible when it
+        # is opened on its own.
+        (brand / "logo.svg", mark_svg(theme_aware=True)),
         # One flat colour inherited from the surrounding text, for badges,
         # stamps and anywhere the mark has to survive a single-ink reproduction.
         (brand / "logo-mono.svg", mark_svg("currentColor", "currentColor",

@@ -41,7 +41,7 @@ const marks = [
 	<span class="links">
 		{
 			marks.map((mark) => (
-				<a href={mark.href} aria-label={mark.label} title={mark.label}>
+				<a class="mark" href={mark.href} aria-label={mark.label} title={mark.label}>
 					<Icon name={mark.icon} size="1.15rem" />
 				</a>
 			))
@@ -84,6 +84,15 @@ const marks = [
 	.links a:hover,
 	.links a:focus-visible {
 		color: var(--sl-color-text-accent);
+	}
+	/* A 1.15rem glyph is an 18 px pointer target, which only clears WCAG 2.2
+	   SC 2.5.8 through the spacing exception, and these replaced text links
+	   that were larger. The padding takes each mark past the 24 px minimum on
+	   its own; the matching negative margin means nothing moves on screen and
+	   the two hit areas still do not touch. */
+	.links a.mark {
+		padding: 0.3rem;
+		margin: -0.3rem;
 	}
 	.orcid {
 		font-family: var(--ph-mono);
