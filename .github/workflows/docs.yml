@@ -69,6 +69,15 @@ jobs:
       - name: Validate HTML
         run: pnpm run html-validate
         working-directory: site
+      - name: Check every formula rendered
+        # KaTeX does not fail a build on a parse error: it emits a
+        # `katex-error` span and ships the page. A display block whose `$$`
+        # sits on a content line is worse than mis-rendered, because the
+        # parser then eats the rest of the document; that silently cost one
+        # guide six sections in both locales. HTML validation and the
+        # accessibility audit both pass on such a page.
+        run: pnpm run check:math
+        working-directory: site
       - name: Accessibility audit (pa11y, WCAG2AA)
         run: pnpm run pa11y
         working-directory: site

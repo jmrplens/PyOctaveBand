@@ -612,6 +612,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- The Spanish building-code guide had lost six of its sections, in both
+  languages, since the day a display formula was written with its `$$` on the
+  same line as the first term. Nothing complained: KaTeX does not fail a build
+  on a parse error, it emits an error span and ships the page, and here the
+  parser ran past the end of the formula and swallowed the requirements of
+  clause 2, windows and composite facades, the plots, what the guide covers,
+  the See also and the quick answers. HTML validation and the accessibility
+  audit passed on that page throughout, because both were answering a different
+  question. The delimiters now sit on their own lines, as the other 416 display
+  blocks in the documentation already did, and `site/scripts/check-math-render.mjs`
+  fails the build on any `katex-error` span left in the output or any `$$` that
+  shares a line with content.
+
 - The conformance counts quoted outside the report are generated, not typed.
   `docs/CONFORMANCE.md` has always been the authority for "N/N conformance
   checks pass across D domains and S standards", and the Astro page bodies
