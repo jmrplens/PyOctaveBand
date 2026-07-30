@@ -93,6 +93,9 @@ export const apiSidebar = {
       items: [
         'reference/api/building/insulation',
         'reference/api/building/panel-transmission',
+        'reference/api/building/masonry-cavity-wall',
+        'reference/api/building/heavy-impact',
+        'reference/api/building/ceiling-plenum',
         'reference/api/building/aperture-transmission',
         'reference/api/building/lab-insulation',
         'reference/api/building/survey-insulation',

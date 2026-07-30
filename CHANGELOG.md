@@ -9,6 +9,74 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Heavy and soft impact sources (`building/heavy_impact.py`, ISO 16283-2:2020
+  Annex A, ISO 10140-5:2010 Annex F, JIS A 1418-2:2019, ISO 717-2:2020
+  Annex D): the rubber ball and the bang machine, the two standard sources for
+  the slow, low-frequency impacts the tapping machine says nothing about.
+  `impact_force_exposure_level` evaluates the defining Formula (A.1)
+  `LFE = 10 lg[(1/Tref) integral F^2/F0^2 dt]` from a sampled force record;
+  `heavy_impact_source_specification`, `heavy_impact_source_limits` and
+  `check_heavy_impact_source` carry the printed octave-band spectra with their
+  tolerances and verify a calibration run against them.
+  `standardized_maximum_impact_level` implements Formulae (4), (5) and (6),
+  where the receiving room cannot be corrected with the usual `10 lg(T/T0)`
+  because the rated quantity is a Fast time-weighted *maximum*: the correction
+  saturates through `g(C)/g(C0)` with `C = T/1,7275`, exposed on its own as
+  `fast_reverberation_correction`, and vanishes exactly at `T = T0`.
+  `a_weighted_maximum_impact_level` is the normative single number of
+  ISO 717-2 Annex D, an A-weighted energy sum rather than a shifted reference
+  curve, and reproduces the Table D.4 worked example to every printed digit
+  including its deliberately unrounded 55,350 66... intermediate. The
+  rubber-ball spectrum is pinned against three independent printings
+  (ISO 16283-2 Table A.1, ISO 10140-5 Table F.1, JIS A 1418-2 Table A.2) and
+  the bang machine against JIS A 1418-2 Table A.1; the standardization is
+  anchored on its own `T = T0` identity and on a published 25-band
+  reproduction of Formula (4). New guide "Heavy and Soft Impact Sources" with
+  the source-spectrum and rating figure, in English and Spanish.
+
+- Suspended-ceiling plenum flanking (`building/ceiling_plenum.py`,
+  ISO 140-9:1985, ASTM E1414 through ASTM E413-22, Vigran 2008 Section 9.2.3):
+  the path where sound leaves one office through the ceiling tiles, crosses
+  the plenum over the partition and comes back down into the next.
+  `plenum_flanking_reduction_index` implements Mechel's one-dimensional model,
+  both the full attenuated form (Eq. (9.18), with the receiving-side leakage
+  term of Eq. (9.17)) and its small-attenuation limit
+  `Rcl = RS + RR - 10 lg[eps^2 LR/(4h)]` (Eq. (9.20)), which is what makes the
+  geometry visible: a deep plenum helps, a long room hurts and reflecting
+  sidewalls cost 6 dB against absorbing ones.
+  `partition_referenced_reduction_index` refers the path to the partition area
+  (Eq. (9.13)) so it can be added to the direct path.
+  `normalized_ceiling_attenuation` is the measured quantity
+  `Dn,c = D - 10 lg(A/A0)` with the ISO reference `A0 = 10 m2` or the ASTM
+  `12 m2`, and `ceiling_attenuation_class` the ASTM E413 rating that ASTM E1414
+  invokes, with the clause 5.2 integer rounding, the 32 dB deficiency sum and
+  the 8 dB single-band limit. The rating engine is anchored on three accredited
+  ASTM E1414 laboratory reports, reproducing their printed CAC 34, CAC 39 and
+  CAC 25 and, band by band, the deficiency column of two of them; the plenum
+  model itself has no published numeric output anywhere, so it is anchored on
+  its closed forms and on the convergence of Eq. (9.18) to Eq. (9.20). New
+  section in the ISO 10848 laboratory flanking guide with its own figure, in
+  English and Spanish.
+
+- The wall-tie bridge of masonry cavity walls (`building/masonry_cavity_wall.py`,
+  Hopkins 2007 Sections 3.11.3.2 and 4.3.5.4.1): the double-leaf prediction
+  treated the cavity as pure air, but a real cavity wall is stitched together
+  by ties every few courses. `WALL_TIE_STIFFNESS` and `wall_tie_stiffness`
+  carry Hopkins' Table A4, the dynamic stiffness of four ties measured on
+  concrete cubes, and `wall_tie_stiffness_per_area` builds the `N k / S` term
+  that acts in parallel with the cavity air spring. `mass_spring_mass_resonance`
+  and `double_wall_transmission_loss` gain a `tie_stiffness_per_area` keyword
+  that folds it in (Eq. 4.89), reproducing the pair Hopkins prints for one
+  fully specified wall: 26 Hz without ties, 50 Hz with 2,5 ties/m2 of 2 MN/m,
+  which extends the combined-mass branch straight into the rating range.
+  `wall_tie_coupling_loss_factor` gives the structure-borne path, the
+  point-connection coupling loss factor of Eq. 4.87 with the linear-spring
+  connector mobility of Eq. 4.88 and infinite thin-plate driving-point
+  mobilities; the plate area cancels, so only the tie density enters, and a
+  soft butterfly tie rolls off as `1/f^3` where a rigid connection only falls
+  as `1/f`. New section in the panel prediction guide with its own figure, in
+  English and Spanish.
+
 - Room-to-room noise reduction (`noise_control/room_to_room.py`, Norton &
   Karczub 2003 Section 4.9): `room_to_room_transmission` composes the whole
   chain a practitioner runs, from the reverberant level a machine builds up in

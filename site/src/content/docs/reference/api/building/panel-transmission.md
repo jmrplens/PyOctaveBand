@@ -181,6 +181,7 @@ double_wall_transmission_loss(
     *,
     loss_factor: float = 0.1,
     cavity_medium: PorousMediumResult | None = None,
+    tie_stiffness_per_area: float = 0.0,
     band: str = 'third',
     speed_of_sound: float = 343.0,
     air_density: float = 1.205,
@@ -195,6 +196,11 @@ limiting frequency `f_l = c0/(2 pi d)` the two mass laws add plus
 `20 lg(2 k d)`; above `f_l` they add plus 6 dB. The curve is continuous
 at `f_l` (`20 lg(2 k d) = 6` there).
 
+Ties or mounts bridging the cavity stiffen it (Hopkins Eq. 4.89), pushing
+`f0` up and extending the combined-mass branch; pass their stiffness per
+unit area as *tie_stiffness_per_area* (see
+[`phonometry.wall_tie_stiffness_per_area`](/phonometry/reference/api/building/masonry-cavity-wall/#wall_tie_stiffness_per_area)).
+
 **Parameters**
 
 | Name | Description |
@@ -205,6 +211,7 @@ at `f_l` (`20 lg(2 k d) = 6` there).
 | `gap` | Cavity depth `d`, in m (> 0). |
 | `loss_factor` | Leaf loss factor `eta` (> 0, Default: 0.1); reserved for the coincidence extension and reported for reference. |
 | `cavity_medium` | Optional porous fill; see [`mass_spring_mass_resonance`](/phonometry/reference/api/building/panel-transmission/#mass_spring_mass_resonance). |
+| `tie_stiffness_per_area` | Stiffness per unit area `N k / S` of a connection array bridging the cavity, in N/m^3 (>= 0, Default: 0). |
 | `band` | Band width for the field correction (`"third"`/`"octave"`). |
 | `speed_of_sound` | Speed of sound in air `c0` (Default: 343 m/s). |
 | `air_density` | Air density `rho0` (Default: 1.205 kg/m^3). |
@@ -291,6 +298,7 @@ mass_spring_mass_resonance(
     gap: float,
     *,
     cavity_medium: PorousMediumResult | None = None,
+    tie_stiffness_per_area: float = 0.0,
     speed_of_sound: float = 343.0,
     air_density: float = 1.205,
 ) -> float
@@ -304,6 +312,13 @@ Hopkins Eq. 4.72); with a porous *cavity_medium* the fill's effective
 (near-isothermal) bulk modulus at the lowest supplied frequency sets a
 softer `s'' = Re(K_e) / d`, lowering `f0`.
 
+An array of mechanical connections across the cavity (wall ties in a
+masonry cavity wall, resilient mounts under a floating floor) acts as a
+spring **in parallel** with the cavity, adding `N k / S` to `s''`
+(Hopkins Eq. 4.89). Pass that term as *tie_stiffness_per_area*; the helper
+[`phonometry.wall_tie_stiffness_per_area`](/phonometry/reference/api/building/masonry-cavity-wall/#wall_tie_stiffness_per_area) builds it from a tie density
+and Hopkins' Table A4.
+
 **Parameters**
 
 | Name | Description |
@@ -312,6 +327,7 @@ softer `s'' = Re(K_e) / d`, lowering `f0`.
 | `mass2` | Surface density of leaf 2 `m2`, in kg/m^2 (> 0). |
 | `gap` | Cavity depth `d`, in m (> 0). |
 | `cavity_medium` | Optional porous fill (a [`PorousMediumResult`](/phonometry/reference/api/materials/porous-absorber/#porousmediumresult)) whose effective bulk modulus sets the cavity stiffness. |
+| `tie_stiffness_per_area` | Stiffness per unit area `N k / S` of a connection array bridging the cavity, in N/m^3 (>= 0, Default: 0). |
 | `speed_of_sound` | Speed of sound in air `c0` (Default: 343 m/s). |
 | `air_density` | Air density `rho0` (Default: 1.205 kg/m^3). |
 

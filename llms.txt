@@ -179,6 +179,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 
 - [Detailed Per-Band Prediction (ISO 12354)](https://jmrplens.github.io/phonometry/guides/detailed-prediction/)
 - [Duct-borne noise: fan to room](https://jmrplens.github.io/phonometry/guides/duct-path/)
+- [Heavy and Soft Impact Sources (ISO 16283-2, JIS A 1418-2, ISO 717-2 Annex D)](https://jmrplens.github.io/phonometry/guides/heavy-impact-sources/)
 - [Room to room: partition, receiving room, criterion](https://jmrplens.github.io/phonometry/guides/room-to-room/)
 
 ## Theory and reference
@@ -236,6 +237,7 @@ One file per area, each small enough to fetch whole. `llms-full.txt` is the comp
 - [Core signal analysis](https://jmrplens.github.io/phonometry/llms/llms-core-signal-analysis.txt)
 - [Underwater acoustics](https://jmrplens.github.io/phonometry/llms/llms-underwater.txt)
 - [Wave simulation](https://jmrplens.github.io/phonometry/llms/llms-simulation.txt)
+- [Other](https://jmrplens.github.io/phonometry/llms/llms-other.txt)
 - [Everything](https://jmrplens.github.io/phonometry/llms-full.txt)
 
 ## Spanish
@@ -257,14 +259,17 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [building/aperture-transmission](https://jmrplens.github.io/phonometry/reference/api/building/aperture-transmission/)
 - [building/building-prediction](https://jmrplens.github.io/phonometry/reference/api/building/building-prediction/)
 - [building/building-uncertainty](https://jmrplens.github.io/phonometry/reference/api/building/building-uncertainty/)
+- [building/ceiling-plenum](https://jmrplens.github.io/phonometry/reference/api/building/ceiling-plenum/)
 - [building/detailed-prediction](https://jmrplens.github.io/phonometry/reference/api/building/detailed-prediction/)
 - [building/facade-prediction](https://jmrplens.github.io/phonometry/reference/api/building/facade-prediction/)
 - [building/flanking-transmission](https://jmrplens.github.io/phonometry/reference/api/building/flanking-transmission/)
 - [building/floor-covering-improvement](https://jmrplens.github.io/phonometry/reference/api/building/floor-covering-improvement/)
+- [building/heavy-impact](https://jmrplens.github.io/phonometry/reference/api/building/heavy-impact/)
 - [building/installed-structure-borne](https://jmrplens.github.io/phonometry/reference/api/building/installed-structure-borne/)
 - [building/insulation](https://jmrplens.github.io/phonometry/reference/api/building/insulation/)
 - [building/intensity-insulation](https://jmrplens.github.io/phonometry/reference/api/building/intensity-insulation/)
 - [building/lab-insulation](https://jmrplens.github.io/phonometry/reference/api/building/lab-insulation/)
+- [building/masonry-cavity-wall](https://jmrplens.github.io/phonometry/reference/api/building/masonry-cavity-wall/)
 - [building/panel-transmission](https://jmrplens.github.io/phonometry/reference/api/building/panel-transmission/)
 - [building/spanish-building-code](https://jmrplens.github.io/phonometry/reference/api/building/spanish-building-code/)
 - [building/structure-borne-power](https://jmrplens.github.io/phonometry/reference/api/building/structure-borne-power/)

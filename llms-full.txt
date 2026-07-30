@@ -179,6 +179,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 
 - [Detailed Per-Band Prediction (ISO 12354)](https://jmrplens.github.io/phonometry/guides/detailed-prediction/)
 - [Duct-borne noise: fan to room](https://jmrplens.github.io/phonometry/guides/duct-path/)
+- [Heavy and Soft Impact Sources (ISO 16283-2, JIS A 1418-2, ISO 717-2 Annex D)](https://jmrplens.github.io/phonometry/guides/heavy-impact-sources/)
 - [Room to room: partition, receiving room, criterion](https://jmrplens.github.io/phonometry/guides/room-to-room/)
 
 ## Theory and reference
@@ -236,6 +237,7 @@ One file per area, each small enough to fetch whole. `llms-full.txt` is the comp
 - [Core signal analysis](https://jmrplens.github.io/phonometry/llms/llms-core-signal-analysis.txt)
 - [Underwater acoustics](https://jmrplens.github.io/phonometry/llms/llms-underwater.txt)
 - [Wave simulation](https://jmrplens.github.io/phonometry/llms/llms-simulation.txt)
+- [Other](https://jmrplens.github.io/phonometry/llms/llms-other.txt)
 - [Everything](https://jmrplens.github.io/phonometry/llms-full.txt)
 
 ## Spanish
@@ -257,14 +259,17 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [building/aperture-transmission](https://jmrplens.github.io/phonometry/reference/api/building/aperture-transmission/)
 - [building/building-prediction](https://jmrplens.github.io/phonometry/reference/api/building/building-prediction/)
 - [building/building-uncertainty](https://jmrplens.github.io/phonometry/reference/api/building/building-uncertainty/)
+- [building/ceiling-plenum](https://jmrplens.github.io/phonometry/reference/api/building/ceiling-plenum/)
 - [building/detailed-prediction](https://jmrplens.github.io/phonometry/reference/api/building/detailed-prediction/)
 - [building/facade-prediction](https://jmrplens.github.io/phonometry/reference/api/building/facade-prediction/)
 - [building/flanking-transmission](https://jmrplens.github.io/phonometry/reference/api/building/flanking-transmission/)
 - [building/floor-covering-improvement](https://jmrplens.github.io/phonometry/reference/api/building/floor-covering-improvement/)
+- [building/heavy-impact](https://jmrplens.github.io/phonometry/reference/api/building/heavy-impact/)
 - [building/installed-structure-borne](https://jmrplens.github.io/phonometry/reference/api/building/installed-structure-borne/)
 - [building/insulation](https://jmrplens.github.io/phonometry/reference/api/building/insulation/)
 - [building/intensity-insulation](https://jmrplens.github.io/phonometry/reference/api/building/intensity-insulation/)
 - [building/lab-insulation](https://jmrplens.github.io/phonometry/reference/api/building/lab-insulation/)
+- [building/masonry-cavity-wall](https://jmrplens.github.io/phonometry/reference/api/building/masonry-cavity-wall/)
 - [building/panel-transmission](https://jmrplens.github.io/phonometry/reference/api/building/panel-transmission/)
 - [building/spanish-building-code](https://jmrplens.github.io/phonometry/reference/api/building/spanish-building-code/)
 - [building/structure-borne-power](https://jmrplens.github.io/phonometry/reference/api/building/structure-borne-power/)
@@ -11127,6 +11132,110 @@ plt.show()
 
 </details>
 
+## Suspended ceilings: the plenum flanking path (ISO 140-9, Vigran 9.2.3)
+
+Two offices separated by a partition that stops at the suspended ceiling share
+one continuous plenum above it. Sound leaves the source room through the
+ceiling tiles, travels sideways over the partition and comes back down through
+the tiles of the receiving room. That path is often the weakest link in an
+open-plan fit-out, and it is not what a partition's $R_w$ describes.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ceiling_plenum_flanking_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ceiling_plenum_flanking.svg" alt="Two panels: the ceiling-plenum flanking reduction index Rcl per octave band for two plenum depths against the sum of the two ceiling reduction indices, and the normalized ceiling attenuation of an accredited ASTM E1414 test report with the fitted ASTM E413 contour and its shaded deficiencies giving CAC 34" width="92%"></picture>
+
+*Left: the plenum charges a fixed penalty against the sum of the two ceilings,
+and a deeper plenum pays some of it back. Right: the same measured quantity
+rated as a ceiling attenuation class.*
+
+**The one-dimensional model.** Mechel's one-dimensional variant, as presented
+by Vigran in Section 9.2.3, treats the plenum as a duct lined on one side. The
+ceiling on each side has a transmission factor $\tau_S = \tau_{S,pl}\tau_{S,a}$
+(plates times any plenum absorber, Eq. (9.14)); the injected power splits,
+a fraction $s_S$ heading for the partition, and decays as $\exp(-mx)$ with the
+power attenuation coefficient $m = 2\,\mathrm{Re}\{\Gamma\} = -2\,\mathrm{Im}\{k'\}$
+(Eqs. (9.15) and (9.16)). Integrating over the ceiling length on both sides
+gives Eq. (9.18), whose receiving-side exponent carries the leakage back into
+the room, $m'_R = m_R + s_R\tau_R/h$ (Eq. (9.17)). For a plenum with little
+attenuation and $s_S = s_R = 0{,}5$ that collapses to the compact form that
+makes the geometry visible (Eqs. (9.19) and (9.20)):
+
+$$
+R_{cl} = R_S + R_R - 10\lg\!\left[\frac{\varepsilon^2 L_R}{4h}\right],
+$$
+
+with $\varepsilon = 1$ for totally absorbing plenum sidewalls and
+$\varepsilon = 2$ for totally reflecting ones. A deep plenum helps, a long room
+hurts, and doubling the tile insulation helps twice over because $R_S$ and
+$R_R$ both appear. Referred to the partition area instead of the ceiling,
+$R_{cl,p} = R_{cl} + 10\lg(H_S/L_S)$ (Eq. (9.13)), which is what lets the
+ceiling path be added to the direct path as transmission factors.
+
+```python
+from phonometry import (
+    partition_referenced_reduction_index,
+    plenum_flanking_reduction_index,
+)
+
+freqs = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
+ceiling = [17.0, 21.0, 25.0, 29.0, 32.0, 30.0, 38.0]   # 9.5 mm plasterboard
+
+# Vigran's example geometry: LS = LR = 4.75 m, plenum 0.43 m, reflecting walls.
+res = plenum_flanking_reduction_index(
+    ceiling, ceiling, ceiling_length=4.75, plenum_height=0.43, frequency=freqs
+)
+print(round(res.geometry_term, 1))    # 10.4 dB charged against RS + RR
+res.plot()                            # Rcl against the two ceilings
+
+# A lined plenum attenuates the sideways path (Eq. (9.18) instead of (9.20)):
+damped = plenum_flanking_reduction_index(
+    ceiling, ceiling, ceiling_length=4.75, plenum_height=0.43,
+    attenuation_source=[0.5] * 7, attenuation_receiving=[0.5] * 7,
+)
+
+# Referred to the partition instead of the ceiling (Eq. (9.13)):
+print(partition_referenced_reduction_index(res.reduction_index, 2.7, 4.75))
+```
+
+**The measured quantity.** A ceiling is not rated by $R_{cl}$ but by the
+**normalized ceiling attenuation** $D_{n,c} = D - 10\lg(A/A_0)$ (ISO 140-9:1985
+clause 3.3), with $A$ the receiving-room equivalent absorption area and the
+reference $A_0 = 10\ \text{m}^2$. The facility has two rooms of at least
+50 m³ whose volumes differ by at least 10 %, a dividing wall tapered to at most
+100 mm at the top, and a plenum 650 mm to 760 mm deep with one sidewall and
+both end walls lined; the standard prints the required lining absorption
+$\alpha_s \ge 0{,}65$ at 125 Hz and $\ge 0{,}80$ from 250 Hz to 4000 Hz, and
+requires $\alpha < 0{,}10$ on the other sidewall and on the plenum ceiling.
+The North American counterpart, ASTM E1414, uses $A_0 = 12\ \text{m}^2$, so an
+ASTM value runs about $10\lg(12/10) = 0{,}79$ dB higher for the same rooms.
+
+ISO rates $D_{n,c}$ with the ISO 717-1 curve, giving $D_{n,c,w}$; ASTM E1414
+rates it through ASTM E413 as the **ceiling attenuation class**. E413 rounds the
+data to the nearest integer (clause 5.2), raises its reference contour in 1 dB
+steps while the sum of the deficiencies stays at or below 32 dB and no single
+deficiency exceeds 8 dB (clauses 5.3 and 5.4), and reads the rating off the
+shifted contour at 500 Hz (clause 5.5).
+
+```python
+from phonometry import (
+    ceiling_attenuation_class,
+    normalized_ceiling_attenuation,
+    weighted_rating,
+)
+
+# ASTM E1414 normalizes to A0 = 12 m2, ISO 140-9 to A0 = 10 m2.
+dnc = normalized_ceiling_attenuation(l1, l2, absorption, reference_area=12.0)
+
+# A 28 mm perforated plaster acoustic tile, measured to ASTM E1414 (CAC 34).
+dnc = [14.4, 18.6, 21.7, 24.1, 23.4, 30.3, 33.7, 35.2,
+       41.6, 44.2, 42.1, 36.8, 35.7, 36.0, 36.9, 37.9]
+res = ceiling_attenuation_class(dnc)
+print(res.rating, res.deficiency_sum, res.max_deficiency)   # 34, 27.0, 7.0
+res.plot()                                                  # Dn,c vs the contour
+
+# The ISO single number of the same spectrum, shifted to A0 = 10 m2:
+iso = [v - 0.79 for v in dnc]
+print(weighted_rating(iso).rating)                          # Dn,c,w
+```
+
 ## ISO 10848 flanking-transmission reports (`.report()`)
 
 Each of the three results renders a one-page PDF fiche. `VibrationReductionResult.report()`
@@ -11220,6 +11329,23 @@ repository. Click a preview to open the PDF:
   The heavy-junction application with the modal-density and modal-overlap
   validity checks behind the bracketed bands.
 
+- International Organization for Standardization. (1985). *Acoustics —
+  Measurement of sound insulation in buildings and of building elements —
+  Part 9: Laboratory measurement of room-to-room airborne sound insulation of
+  a suspended ceiling with a plenum above it* (ISO 140-9:1985).
+  [iso.org catalogue](https://www.iso.org/standard/3944.html).
+  The normalized ceiling attenuation $D_{n,c}$ (clause 3.3) and the plenum
+  test facility.
+- ASTM International. (2022). *Classification for Rating Sound Insulation*
+  (ASTM E413-22).
+  [astm.org catalogue](https://www.astm.org/e0413-22.html).
+  The reference contour and fitting rules that ASTM E1414 invokes for the
+  ceiling attenuation class.
+- Vigran, T. E. (2008). *Building acoustics*. CRC Press.
+  ISBN 978-0-415-42853-8.
+  [doi:10.1201/9781482266016](https://doi.org/10.1201/9781482266016).
+  Section 9.2.3 presents Mechel's one-dimensional plenum model.
+
 ## Standards
 
 ISO 10848-1:2006, ISO 10848-2:2006, ISO 10848-3:2006 and ISO 10848-4:2010,
@@ -11229,6 +11355,16 @@ normalized flanking descriptors $D_{n,f}$ / $L_{n,f}$ and the modal-overlap
 validity checks that feed the EN 12354 prediction. Because ISO 10848
 contains no worked numeric example, conformance is anchored on closed-form
 identities (simplified $K_{ij}$, $a_j$ at $f_\text{ref}$, $\eta$).
+
+
+The suspended-ceiling branch adds ISO 140-9:1985, which defines the normalized
+ceiling attenuation $D_{n,c}$ and its laboratory, and ASTM E413-22, the rating
+classification that ASTM E1414 invokes for the ceiling attenuation class. The
+one-dimensional plenum model itself is not standardized: it comes from Mechel
+through Vigran Section 9.2.3, and every published output of it is a figure, so
+it is anchored on its closed forms and on the convergence of Eq. (9.18) to
+Eq. (9.20). The `Dn,c` measurement chain and the class are anchored on
+accredited ASTM E1414 laboratory reports.
 
 ## See also
 
@@ -11241,7 +11377,10 @@ identities (simplified $K_{ij}$, $a_j$ at $f_\text{ref}$, $\eta$).
   suite whose direct transmission these flanking paths bypass.
 - [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/guides/insulation-ratings/): the
   reference-curve engines behind Dn,f,w and Ln,f,w.
-- API reference: [`building.flanking_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/flanking-transmission/).
+- [Room-to-room and open-plan acoustics](https://jmrplens.github.io/phonometry/guides/open-plan-acoustics/): the
+  open-plan context the ceiling flanking path usually appears in.
+- API reference: [`building.flanking_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/flanking-transmission/)
+  and [`building.ceiling_plenum`](https://jmrplens.github.io/phonometry/reference/api/building/ceiling-plenum/).
 
 ---
 
@@ -12168,6 +12307,261 @@ around the median (clause 4.3, Tables 2–5) and its application (clause 4.4).
 ISO 389-7:2005, *Reference zero for the calibration of audiometric equipment —
 Reference threshold of hearing under free-field and diffuse-field listening
 conditions* (Table 1).
+
+---
+
+
+<!-- source: docs/heavy-impact-sources.md | canonical: https://jmrplens.github.io/phonometry/guides/heavy-impact-sources/ -->
+Source: https://jmrplens.github.io/phonometry/guides/heavy-impact-sources/
+
+# Heavy and Soft Impact Sources (ISO 16283-2, JIS A 1418-2, ISO 717-2 Annex D)
+
+The ISO tapping machine is a *light* impact source. Its five 500 g hammers fall
+40 mm and produce a hard, quasi-stationary excitation whose energy sits well
+above 100 Hz, which is exactly where a bare concrete slab already performs
+well. The impacts people actually complain about, a child jumping off a chair
+or an adult walking barefoot on a timber floor, are slow, soft and
+low-frequency, and the tapping machine says almost nothing about them. The
+**standard heavy impact sources** were introduced to close that gap: a hollow
+silicone **rubber ball** dropped from 1 m, and the **bang machine**, a car tyre
+dropped from 85 cm. This guide covers their normative specification, the
+laboratory verification of a source against it, the standardization of the
+maximum level in the receiving room, and the A-weighted single number. The
+tapping-machine chain lives in
+[Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/guides/insulation-field/) and
+[Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/guides/insulation-lab/).
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/heavy_impact_sources_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/heavy_impact_sources.svg" alt="Two panels: the octave-band impact force exposure levels of the rubber ball and the bang machine with their printed tolerance bands from 31.5 Hz to 500 Hz, and the ISO 717-2 Annex D rating of a field measurement showing the measured octave levels, their A-weighted contributions and the resulting single number" width="92%"></picture>
+
+*Left: the two source specifications are pure spectra of force, not geometry.
+Right: the rating adds the A-weighted band contributions in energy, so the
+63 Hz band decides almost everything.*
+
+## Both sources are specified by the energy of their force pulse
+
+A heavy source is not defined by its shape but by the **impact force exposure
+level** it delivers into a rigid floor (ISO 16283-2:2020 Formula (A.1) =
+JIS A 1418-2:2019 Formula (1)):
+
+$$
+L_{FE} = 10\lg\!\left[\frac{1}{T_\text{ref}}
+\int_{t_1}^{t_2}\frac{F^2(t)}{F_0^2}\,\mathrm{d}t\right]\ \text{dB re 1 N},
+$$
+
+with $F_0 = 1$ N, $T_\text{ref} = 1$ s and $t_2 - t_1$ the duration of the
+impact. Both characteristics require a **single-peak** waveform of
+$20 \pm 2$ ms (JIS A 1418-2:2019 A.2 b)). The octave-band values are printed
+identically in ISO 16283-2:2020 Table A.1, ISO 10140-5:2010 Table F.1 and
+JIS A 1418-2:2019 Table A.2 for the ball; the bang machine appears only in
+JIS A 1418-2:2019 Table A.1.
+
+| Octave (Hz) | Rubber ball $L_{FE}$ (dB re 1 N) | Bang machine $L_{FE}$ (dB re 1 N) |
+|---|---|---|
+| 31.5 | 39.0 ± 1.0 | 47.0 ± 1.0 |
+| 63 | 31.0 ± 1.5 | 40.0 ± 1.5 |
+| 125 | 23.0 ± 1.5 | 22.0 ± 1.5 |
+| 250 | 17.0 ± 2.0 | 11.5 ± 2.0 |
+| 500 | 12.5 ± 2.0 | 5.5 ± 2.0 |
+
+The bang machine puts 8 dB more energy into the two lowest octaves and 7 dB
+less into the top one, which is why the two sources are not interchangeable and
+why a floor can pass one and fail the other.
+
+```python
+from phonometry import (
+    check_heavy_impact_source,
+    heavy_impact_source_limits,
+    heavy_impact_source_specification,
+    impact_force_exposure_level,
+)
+
+spec = heavy_impact_source_specification("rubber_ball")
+print(spec.drop_height, spec.effective_mass)      # 1.0 m, 2.5 kg
+print(spec.contact_time, spec.contact_time_tolerance)   # 0.02 s +/- 0.002 s
+
+freqs, lower, upper = heavy_impact_source_limits("bang_machine")
+print(list(zip(freqs, lower, upper))[0])          # (31.5, 46.0, 48.0)
+
+# A calibration run: five measured octave-band LFE against the printed table.
+check = check_heavy_impact_source([39.4, 30.2, 23.6, 18.5, 12.9])
+print(check.passed, list(check.within_tolerance))
+check.plot()   # measured LFE over the tolerance band (needs matplotlib)
+```
+
+`impact_force_exposure_level` evaluates Formula (A.1) directly from a sampled
+force record, which is what the JIS A 1418-2 Annex C calibration procedure
+measures with a force plate:
+
+```python
+import numpy as np
+from phonometry import impact_force_exposure_level
+
+fs = 200_000.0
+t = np.arange(0.0, 0.020, 1.0 / fs)          # the 20 ms contact time
+force = 1500.0 * np.sin(np.pi * t / 0.020)   # a single-peak half-sine pulse
+print(round(impact_force_exposure_level(force, fs), 2))   # 10 lg(Fp^2 t / 2)
+```
+
+The construction examples the two standards give are informative, not
+normative: a hollow silicone ball of 180 mm outer diameter with a 30 mm wall,
+effective mass $(2.5 \pm 0.1)$ kg and coefficient of restitution
+$0.8 \pm 0.1$, dropped from $(100 \pm 1)$ cm measured from the bottom of the
+ball; and a car tyre inflated to $(2.4 \pm 0.2)\times 10^5$ Pa with an
+effective mass of $(7.3 \pm 0.2)$ kg, dropped from 85 cm.
+
+## The receiving room: a maximum level cannot be corrected like an average
+
+The rated quantity is a **maximum** of a Fast time-weighted level, not an
+energy average, so the usual $10\lg(T/T_0)$ standardization is wrong: a Fast
+detector never integrates more than about 1.7 s of decay, so the correction has
+to saturate. ISO 16283-2:2020 (definition 3.16, Formulae (4), (5) and (6))
+therefore uses
+
+$$
+L'_{i,F\max,V,T} = L_{i,F\max} + 10\lg\frac{V}{V_0}
+- 10\lg\frac{g(C)}{g(C_0)},\qquad
+C = \frac{T}{1{,}7275},\quad C_0 = \frac{T_0}{1{,}7275},
+$$
+
+with $T_0 = 0{,}5$ s, $V_0 = 50\ \text{m}^3$ for dwellings and, writing
+Formula (4) compactly,
+
+$$
+g(C) = \frac{C^{1/(1-C)} - C^{-1/(1-1/C)}}{1 - 1/C}.
+$$
+
+$g$ is the peak of the Fast-weighted response to an exponentially decaying
+burst. It has a removable singularity at $C = 1$ (i.e. $T = 1{,}7275$ s) where
+its value is $1/e$. When $T = T_0$ the bracket collapses to 1 and the whole
+correction reduces to the volume term, as it must.
+
+```python
+from phonometry import (
+    fast_reverberation_correction,
+    heavy_impact_octave_levels,
+    standardized_maximum_impact_level,
+)
+
+freqs = [63.0, 125.0, 250.0, 500.0]
+li_fmax = [65.3, 64.5, 58.0, 55.8]           # energy-averaged over ball positions
+t = [1.43, 3.70, 3.10, 2.38]                 # receiving-room reverberation time
+
+res = standardized_maximum_impact_level(li_fmax, 41.4, t, frequency=freqs)
+print(res.volume_term)                        # 10 lg(41.4/50) = -0.8 dB
+print(fast_reverberation_correction([0.5]))   # exactly 0 dB at T = T0
+res.plot()   # measured and standardized spectra (needs matplotlib)
+
+# One-third-octave measurements combine into octaves with Formula (20):
+print(heavy_impact_octave_levels([60.0] * 6))   # +10 lg 3 dB per octave
+```
+
+## The single number is an A-weighted sum, not a shifted curve
+
+ISO 717-2:2020 Annex D is normative and does not use a reference curve at all.
+The rating is an energy sum of A-weighted band levels (Formula (D.1)):
+
+$$
+X_{iA,F\max} = 10\lg\!\left(\sum_j 10^{(X_{i,F\max,j} + A_j)/10}\right),
+$$
+
+over the one-third-octave bands 50 Hz to 630 Hz **or** the octave bands 63 Hz
+to 500 Hz, with the Table D.3 corrections $A_j$, rounded half-up to an integer.
+A one-third-octave measurement is rated in one-third octaves; the standard
+warns explicitly against summing thirds into octaves first, because the two
+routes do not give the same answer. The same formula rates all four quantities
+of Tables D.1 and D.2: $L_{iA,F\max}$, $L_{iA,F\max,V,T}$, $L'_{iA,F\max}$ and
+$L'_{iA,F\max,V,T}$.
+
+The worked example of Table D.4 is reproduced exactly, including the
+deliberately unrounded intermediate the standard prints:
+
+```python
+from phonometry import a_weighted_maximum_impact_level
+
+# ISO 717-2:2020 Table D.4: a field measurement in octave bands.
+res = a_weighted_maximum_impact_level([65.3, 64.5, 58.0, 55.8])
+print(list(res.corrected))   # 39.1, 48.3, 49.3, 52.6 dB
+print(res.unrounded)         # 55.350667... dB
+print(res.rating)            # 55 dB
+res.plot()                   # band levels, A-weighted contributions, rating
+```
+
+Because the A-weighting is 23 dB steeper at 63 Hz than at 500 Hz, a heavy
+source's rating is dominated by whichever band survives that slope. For the
+Table D.4 spectrum the four A-weighted contributions are 39.1, 48.3, 49.3 and
+52.6 dB, so the 500 Hz band carries the most weight even though 63 Hz is the
+loudest band by 10 dB.
+
+## What this guide covers
+
+**Covered.** The impact force exposure level of ISO 16283-2:2020
+Formula (A.1) from a sampled force record, via
+`building.impact_force_exposure_level`; the printed octave-band specifications
+of ISO 16283-2:2020 Table A.1 / ISO 10140-5:2010 Table F.1 (rubber ball) and
+JIS A 1418-2:2019 Tables A.1 and A.2 (both characteristics) with their
+tolerances, via `building.heavy_impact_source_specification`,
+`building.heavy_impact_source_limits` and
+`building.check_heavy_impact_source`; the standardized maximum impact sound
+pressure level of Formulae (4), (5) and (6) and the octave synthesis of
+Formula (20), via `building.standardized_maximum_impact_level`,
+`building.fast_reverberation_correction` and
+`building.heavy_impact_octave_levels`; and the normative A-weighted rating of
+ISO 717-2:2020 Annex D with the Table D.3 corrections, via
+`building.a_weighted_maximum_impact_level`.
+
+**Not covered.** The field measurement procedure itself (the four or more
+drop positions of ISO 10140-3 Annex A, the microphone positions and the
+low-frequency corner procedure) is not automated: the functions consume levels
+that were already energy-averaged over positions. There is no prediction model
+that takes a floor construction to a heavy-impact level; Hopkins states
+plainly that the complexity of the input force and the use of a
+time-weighted maximum leave no simple counterpart to the tapping-machine
+prediction. No accredited worked example exists anywhere that carries a real
+floor from measured $L_{i,F\max}$ through to $L'_{iA,F\max,V,T}$, so the
+standardization chain is anchored on its own $T = T_0$ identity and on a
+published 25-band reproduction of Formula (4).
+
+## References
+
+- ISO 16283-2:2020, *Acoustics — Field measurement of sound insulation in
+  buildings and of building elements — Part 2: Impact sound insulation*.
+  Definition 3.16 and Formulae (4), (5), (6), (9), (15) and (20); Annex A.2
+  (rubber ball) with Table A.1 and Formula (A.1).
+- ISO 10140-5:2010, *Acoustics — Laboratory measurement of sound insulation of
+  building elements — Part 5: Requirements for test facilities and equipment*.
+  Annex F (normative): F.1 the modified tapping machine, F.2 the rubber ball
+  with Table F.1.
+- ISO 10140-3:2010, Annex A (informative), *Measurement using heavy and soft
+  impact sources*.
+- JIS A 1418-2:2019, *Acoustics — Measurement of floor impact sound insulation
+  of buildings — Part 2: Method using standard heavy impact sources*.
+  Annex A (normative) with Tables A.1 and A.2, Annex B (informative)
+  construction examples, Annex C (informative) force calibration.
+- ISO 717-2:2020, *Acoustics — Rating of sound insulation in buildings and of
+  building elements — Part 2: Impact sound insulation*. Annex D (normative),
+  Formula (D.1), Tables D.1 to D.4.
+- Hopkins, C. (2007). *Sound Insulation*. Butterworth-Heinemann, Section 3.6.4.
+
+## Standards
+
+| Standard | Scope in this guide |
+|---|---|
+| ISO 16283-2:2020 | Field measurement with the rubber ball: the source spectrum (Annex A) and the standardized maximum level (Formulae (4) to (6), (20)) |
+| ISO 10140-5:2010 | Laboratory requirements: Annex F, the heavy and soft impact sources |
+| ISO 10140-3:2010 | Laboratory measurement with heavy and soft sources (Annex A) |
+| JIS A 1418-2:2019 | Both impact force characteristics with their tolerances and construction examples |
+| ISO 717-2:2020 | Annex D, the A-weighted maximum impact sound pressure level |
+
+## See also
+
+- [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/guides/insulation-field/): the
+  tapping-machine chain of the same standard.
+- [Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/guides/insulation-lab/): the ISO 10140
+  laboratory suite the heavy sources extend.
+- [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/guides/insulation-ratings/): the reference-curve
+  engine that rates the tapping-machine quantities.
+- [Floor-Covering Impact Improvement (ISO 16251-1)](https://jmrplens.github.io/phonometry/guides/impact-improvement/):
+  the improvement a soft covering gives against the light source.
 
 ---
 
@@ -23392,6 +23786,106 @@ plt.show()
 
 </details>
 
+## Masonry cavity walls: the wall-tie bridge (Hopkins 4.3.5.4)
+
+The double-wall model above treats the cavity as pure air. A real masonry
+cavity wall is stitched together by **wall ties** every few courses, and those
+ties do two things the air-only model cannot see: they add a mechanical spring
+in parallel with the air spring, which pushes the mass-spring-mass resonance
+up, and they open a structure-borne path from one leaf to the other.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/masonry_wall_ties_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/masonry_wall_ties.svg" alt="Two panels: the coupling loss factor of a wall-tie array against frequency for three tie types with the rigid-connection ceiling as a dashed line, and the predicted sound reduction index of a masonry cavity wall with and without ties showing the shaded band between the two mass-spring-mass resonances" width="92%"></picture>
+
+*Left: a soft tie rolls the structure-borne coupling off as $1/f^3$, a stiff
+one stays on the rigid ceiling for another two octaves. Right: the same ties
+lift the resonance from 26 Hz to 50 Hz, extending the combined-mass branch.*
+
+**The tie as a spring (Hopkins Eq. 4.89).** A tie is characterised by a single
+number, its dynamic stiffness $s_{X\,\text{mm}}$ at a cavity width $X$,
+measured on two nominally identical 100 mm concrete cubes
+(Section 3.11.3.2, Eq. 3.202). $N$ ties over a plate of area $S$ add
+$Nk/S$ to the cavity air stiffness:
+
+$$
+f_\text{msm} = \frac{1}{2\pi}
+\sqrt{\frac{s_a + Nk/S}{\rho_{s1}\rho_{s2}/(\rho_{s1}+\rho_{s2})}}.
+$$
+
+Below $f_\text{msm}$ the two leaves act as one plate of the combined mass, so
+stiff ties are doubly bad: they raise the resonance into the rating range and
+bridge the cavity. `WALL_TIE_STIFFNESS` carries Hopkins' Table A4, whose 50 mm
+rows come from Hopkins, Wilson & Craik (1999) and whose 100 mm row from
+Hall & Hopkins (2001).
+
+| Wall tie | Cavity width (mm) | $s_{X\,\text{mm}}$ (MN/m) |
+|---|---|---|
+| Butterfly tie (BS 1243:1978) | 50 | 1.7 |
+| Double-triangle tie (BS 1243:1978) | 50 | 16.1 |
+| Vertical-twist tie (BS 1243:1978) | 50 | 94.0 |
+| Vertical-twist tie (proprietary) | 100 | 43.4 |
+
+```python
+from phonometry import (
+    double_wall_transmission_loss,
+    mass_spring_mass_resonance,
+    wall_tie_stiffness,
+    wall_tie_stiffness_per_area,
+)
+
+print(wall_tie_stiffness("butterfly"))        # (0.05 m, 1.7e6 N/m)
+
+# Hopkins Fig. 4.35: two 140 kg/m2 leaves across an empty 75 mm cavity.
+print(round(mass_spring_mass_resonance(140.0, 140.0, 0.075)))          # 26 Hz
+
+# Add 2.5 ties per m2 of s_75mm = 2 MN/m: the resonance nearly doubles.
+ties = wall_tie_stiffness_per_area(2.5, 2.0e6)
+print(round(mass_spring_mass_resonance(140.0, 140.0, 0.075,
+                                       tie_stiffness_per_area=ties)))  # 50 Hz
+
+dw = double_wall_transmission_loss(bands, 140.0, 140.0, 0.075,
+                                   tie_stiffness_per_area=ties)
+```
+
+**The tie as a point connection (Hopkins Eqs. 4.84 to 4.88).** Each tie
+transmits structure-borne power between the leaves. With the driving-point
+mobilities $Y_i$, $Y_j$ of the two leaves (infinite thin plates,
+$Y = 1/(8\sqrt{B'm''})$, Eq. 2.190) and the connector mobility of a linear
+spring $Y_c = \mathrm{i}\omega/k$ (Eq. 4.88), $N$ identical uncorrelated
+connections give the coupling loss factor (Eq. 4.87)
+
+$$
+\eta_{ij} = \frac{N}{\omega m_i}
+\frac{\mathrm{Re}\{Y_j\}}{|Y_i + Y_j + Y_c|^2}.
+$$
+
+The plate area cancels ($N/m_i = n/\rho_{s1}$ with $n$ ties per m²), so only
+the tie density enters. A rigid connection (a screw, a nail, a bolt, or a tie
+stiff enough never to yield) is the limit $Y_c = 0$; a resilient tie rolls the
+coupling off as $1/f^2$ below that ceiling once $|Y_c|$ overtakes the plate
+mobilities, which is exactly why a butterfly tie at 1.7 MN/m and a
+vertical-twist tie at 94 MN/m behave so differently.
+
+```python
+import numpy as np
+from phonometry import plate_bending_stiffness, wall_tie_coupling_loss_factor
+
+freq = np.logspace(np.log10(50.0), np.log10(5000.0), 60)
+b1 = plate_bending_stiffness(2.0e10, 0.1, 0.2)   # 100 mm masonry leaves
+res = wall_tie_coupling_loss_factor(
+    freq, 150.0, 170.0, b1, b1, ties_per_area=2.5, tie="butterfly"
+)
+print(res.coupling_loss_factor[0], res.rigid_coupling_loss_factor[0])
+res.plot()   # eta_ij against the rigid-connection ceiling (needs matplotlib)
+```
+
+The **inputs** of this model are printed data: Table A4, corroborated by
+Hopkins, Wilson & Craik (1999) Table 1 at a 50 mm cavity and by Craik & Wilson
+(1995) Table 1 at 85 mm. The **output** is not: every published sound reduction
+index of a bridged masonry cavity wall is a figure, so the per-band
+transmission-loss penalty of the ties has no printed numeric oracle. The
+resonance shift does: Hopkins Fig. 4.35 prints 26 Hz without ties and 50 Hz
+with them for the same wall.
+
 ## Slits, holes and apertures (Hopkins 4.3.10)
 
 A small air path is the real limit on any heavy construction. The transmission
@@ -23581,6 +24075,12 @@ fig.tight_layout(); plt.show()
   Timoshenko & Woinowsky-Krieger) and 6.5.3 (orthotropic panel transmission,
   Eqs 6.107-6.113 after Heckl 1960 and Hansen 1993).
 
+- Hopkins, C., Wilson, R., & Craik, R. J. M. (1999). Dynamic stiffness as an
+  acoustic specification parameter for wall ties used in masonry cavity walls.
+  *Applied Acoustics*, 58, 51-68.
+  [doi:10.1016/S0003-682X(98)00068-1](https://doi.org/10.1016/S0003-682X(98)00068-1).
+  The measurement behind the 50 mm rows of Hopkins' Table A4.
+
 ## See also
 
 - [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/guides/insulation-prediction/): assembles
@@ -23591,7 +24091,7 @@ fig.tight_layout(); plt.show()
   the measured counterpart of the theoretical point mobilities.
 - [Porous and multilayer absorbers](https://jmrplens.github.io/phonometry/guides/porous-absorbers/): the cavity-fill models
   a double wall consumes.
-- API reference: [`building.panel_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/panel-transmission/), [`building.aperture_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/aperture-transmission/), [`vibration.radiation_efficiency`](https://jmrplens.github.io/phonometry/reference/api/vibration/radiation-efficiency/) and [`vibration.point_mobility`](https://jmrplens.github.io/phonometry/reference/api/vibration/point-mobility/).
+- API reference: [`building.panel_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/panel-transmission/), [`building.masonry_cavity_wall`](https://jmrplens.github.io/phonometry/reference/api/building/masonry-cavity-wall/), [`building.aperture_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/aperture-transmission/), [`vibration.radiation_efficiency`](https://jmrplens.github.io/phonometry/reference/api/vibration/radiation-efficiency/) and [`vibration.point_mobility`](https://jmrplens.github.io/phonometry/reference/api/vibration/point-mobility/).
 
 ---
 

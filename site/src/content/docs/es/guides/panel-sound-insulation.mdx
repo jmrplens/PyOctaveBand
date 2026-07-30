@@ -32,9 +32,16 @@ references:
     publisher: "Taylor & Francis"
     doi: "10.1201/9781482266016"
     note: "Sections 3.7.3.3 (orthotropic plate eigenfrequencies, Eqs 3.113-3.115 after Timoshenko & Woinowsky-Krieger) and 6.5.3 (orthotropic panel transmission, Eqs 6.107-6.113 after Heckl 1960 and Hansen 1993). ISBN 978-0-415-42853-8."
+  - type: article
+    authors: ["Hopkins, C.", "Wilson, R.", "Craik, R. J. M."]
+    year: 1999
+    title: "Dynamic stiffness as an acoustic specification parameter for wall ties used in masonry cavity walls"
+    journal: "Applied Acoustics 58, 51-68"
+    doi: "10.1016/S0003-682X(98)00068-1"
+    note: "La medición que hay detrás de las filas de 50 mm de la Tabla A4 de Hopkins: mariposa 1,7 MN/m, doble triángulo 16,1 MN/m y torsión vertical 94,0 MN/m."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
+import import ThemeImage from '../../../../components/ThemeImage.astro';
 import Video from '../../../../components/Video.astro';
 
 Un ensayo de laboratorio mide el índice de reducción acústica $R$ de un elemento
@@ -529,6 +536,110 @@ plt.show()
 
 </details>
 
+## Muros de fábrica con cámara: el puente de las llaves (Hopkins 4.3.5.4)
+
+El modelo de doble hoja anterior trata la cámara como aire puro. Un muro de
+fábrica con cámara real está cosido por **llaves de muro** cada pocas hiladas,
+y esas llaves hacen dos cosas que el modelo con solo aire no puede ver: añaden
+un muelle mecánico en paralelo con el muelle de aire, lo que sube la frecuencia
+de resonancia masa-muelle-masa, y abren un camino estructural de una hoja a la
+otra.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/masonry_wall_ties_es.svg" alt="Dos paneles: el factor de pérdidas por acoplamiento de un conjunto de llaves frente a la frecuencia para tres tipos de llave con el techo de unión rígida en línea discontinua, y el índice de reducción acústica previsto de un muro de fábrica con cámara con y sin llaves mostrando la banda sombreada entre las dos resonancias masa-muelle-masa" width="92%" />
+
+*Izquierda: una llave blanda hace caer el acoplamiento estructural como
+$1/f^3$; una rígida se mantiene sobre el techo rígido dos octavas más.
+Derecha: esas mismas llaves suben la resonancia de 26 Hz a 50 Hz, prolongando
+la rama de masa combinada.*
+
+**La llave como muelle (Hopkins Ec. 4.89).** Una llave se caracteriza por un
+único número, su rigidez dinámica $s_{X\,\text{mm}}$ para un ancho de cámara
+$X$, medida sobre dos cubos de hormigón de 100 mm nominalmente idénticos
+(Sección 3.11.3.2, Ec. 3.202). $N$ llaves sobre una placa de área $S$ añaden
+$Nk/S$ a la rigidez del aire de la cámara:
+
+$$
+f_\text{msm} = \frac{1}{2\pi}
+\sqrt{\frac{s_a + Nk/S}{\rho_{s1}\rho_{s2}/(\rho_{s1}+\rho_{s2})}}.
+$$
+
+Por debajo de $f_\text{msm}$ las dos hojas actúan como una sola placa de masa
+combinada, así que las llaves rígidas son doblemente malas: suben la resonancia
+hasta el rango de valoración y puentean la cámara. `WALL_TIE_STIFFNESS`
+contiene la Tabla A4 de Hopkins, cuyas filas de 50 mm proceden de Hopkins,
+Wilson y Craik (1999) y la de 100 mm de Hall y Hopkins (2001).
+
+| Llave de muro | Ancho de cámara (mm) | $s_{X\,\text{mm}}$ (MN/m) |
+|---|---|---|
+| Llave de mariposa (BS 1243:1978) | 50 | 1,7 |
+| Llave de doble triángulo (BS 1243:1978) | 50 | 16,1 |
+| Llave de torsión vertical (BS 1243:1978) | 50 | 94,0 |
+| Llave de torsión vertical (propietaria) | 100 | 43,4 |
+
+```python
+from phonometry import (
+    double_wall_transmission_loss,
+    mass_spring_mass_resonance,
+    wall_tie_stiffness,
+    wall_tie_stiffness_per_area,
+)
+
+print(wall_tie_stiffness("butterfly"))        # (0,05 m; 1,7e6 N/m)
+
+# Hopkins Fig. 4.35: dos hojas de 140 kg/m2 con cámara vacía de 75 mm.
+print(round(mass_spring_mass_resonance(140.0, 140.0, 0.075)))          # 26 Hz
+
+# Se añaden 2,5 llaves/m2 de s_75mm = 2 MN/m: la resonancia casi se duplica.
+ties = wall_tie_stiffness_per_area(2.5, 2.0e6)
+print(round(mass_spring_mass_resonance(140.0, 140.0, 0.075,
+                                       tie_stiffness_per_area=ties)))  # 50 Hz
+
+dw = double_wall_transmission_loss(bands, 140.0, 140.0, 0.075,
+                                   tie_stiffness_per_area=ties)
+```
+
+**La llave como unión puntual (Hopkins Ecs. 4.84 a 4.88).** Cada llave
+transmite potencia estructural entre las hojas. Con las movilidades en el punto
+de excitación $Y_i$, $Y_j$ de las dos hojas (placas delgadas infinitas,
+$Y = 1/(8\sqrt{B'm''})$, Ec. 2.190) y la movilidad del conector de un muelle
+lineal $Y_c = \mathrm{i}\omega/k$ (Ec. 4.88), $N$ uniones idénticas y no
+correlacionadas dan el factor de pérdidas por acoplamiento (Ec. 4.87)
+
+$$
+\eta_{ij} = \frac{N}{\omega m_i}
+\frac{\mathrm{Re}\{Y_j\}}{|Y_i + Y_j + Y_c|^2}.
+$$
+
+El área de la placa se cancela ($N/m_i = n/\rho_{s1}$ con $n$ llaves por m²),
+así que solo entra la densidad de llaves. Una unión rígida (un tornillo, un
+clavo, un perno o una llave tan rígida que nunca cede) es el límite
+$Y_c = 0$; una llave elástica hace caer el acoplamiento como $1/f^2$ por debajo
+de ese techo en cuanto $|Y_c|$ supera a las movilidades de las placas, que es
+exactamente por lo que una llave de mariposa de 1,7 MN/m y una de torsión
+vertical de 94 MN/m se comportan de forma tan distinta.
+
+```python
+import numpy as np
+from phonometry import plate_bending_stiffness, wall_tie_coupling_loss_factor
+
+freq = np.logspace(np.log10(50.0), np.log10(5000.0), 60)
+b1 = plate_bending_stiffness(2.0e10, 0.1, 0.2)   # hojas de fábrica de 100 mm
+res = wall_tie_coupling_loss_factor(
+    freq, 150.0, 170.0, b1, b1, ties_per_area=2.5, tie="butterfly"
+)
+print(res.coupling_loss_factor[0], res.rigid_coupling_loss_factor[0])
+res.plot()   # eta_ij frente al techo de unión rígida (requiere matplotlib)
+```
+
+Los **datos de entrada** de este modelo están impresos: la Tabla A4,
+corroborada por la Tabla 1 de Hopkins, Wilson y Craik (1999) para cámara de
+50 mm y por la Tabla 1 de Craik y Wilson (1995) para 85 mm. La **salida** no:
+todo índice de reducción acústica publicado de un muro de fábrica con cámara
+puenteado es una figura, de modo que la penalización por bandas que introducen
+las llaves no tiene oráculo numérico impreso. El desplazamiento de la
+resonancia sí lo tiene: la Fig. 4.35 de Hopkins imprime 26 Hz sin llaves y
+50 Hz con ellas para el mismo muro.
+
 ## Rendijas, orificios y aberturas (Hopkins 4.3.10)
 
 Un pequeño camino de aire es el límite real de cualquier construcción pesada. El
@@ -760,7 +871,15 @@ equivalentes de Timoshenko de una greca sinusoidal (Ec. 3.115) y la
 autofrecuencia de placa ortótropa (Ec. 3.113), mediante
 `orthotropic_transmission_loss`, `orthotropic_critical_frequencies`,
 `corrugated_plate_stiffness`, `corrugated_plate_mass_factor` y
-`orthotropic_plate_resonance`.
+`orthotropic_plate_resonance`. Los muros de fábrica con cámara añaden el puente
+de las llaves de las Secciones 3.11.3.2 y 4.3.5.4.1 de Hopkins: las rigideces
+dinámicas de la Tabla A4, el conjunto de llaves actuando en paralelo con el
+aire de la cámara (Ec. 4.89, accesible con el argumento
+`tie_stiffness_per_area` de `mass_spring_mass_resonance` y
+`double_wall_transmission_loss`) y el factor de pérdidas por acoplamiento de
+unión puntual con conector de muelle lineal (Ecs. 4.87 y 4.88), mediante
+`wall_tie_stiffness`, `wall_tie_stiffness_per_area` y
+`wall_tie_coupling_loss_factor`.
 
 **No cubierto.** Cada predicción se mantiene dentro del rango de validez
 que declara su fuente, que la guía señala pero no extiende: el método de
@@ -789,4 +908,4 @@ cita Vigran.
   la contraparte medida de las movilidades puntuales teóricas.
 - [Absorbentes porosos y multicapa](/phonometry/es/guides/porous-absorbers/): los
   modelos de relleno de cámara que consume una pared doble.
-- Referencia de API: [`building.panel_transmission`](/phonometry/reference/api/building/panel-transmission/), [`building.aperture_transmission`](/phonometry/reference/api/building/aperture-transmission/), [`vibration.radiation_efficiency`](/phonometry/reference/api/vibration/radiation-efficiency/) y [`vibration.point_mobility`](/phonometry/reference/api/vibration/point-mobility/).
+- Referencia de API: [`building.panel_transmission`](/phonometry/reference/api/building/panel-transmission/), [`building.masonry_cavity_wall`](/phonometry/reference/api/building/masonry-cavity-wall/), [`building.aperture_transmission`](/phonometry/reference/api/building/aperture-transmission/), [`vibration.radiation_efficiency`](/phonometry/reference/api/vibration/radiation-efficiency/) y [`vibration.point_mobility`](/phonometry/reference/api/vibration/point-mobility/).

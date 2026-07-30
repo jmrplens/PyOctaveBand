@@ -7297,15 +7297,15 @@ def generate_ceiling_plenum_flanking(output_dir: str) -> None:
     # ALA 16-091-5 (2016), tested to ASTM E1414/E1414M-11a: CAC 34.
     dnc = np.array([14.4, 18.6, 21.7, 24.1, 23.4, 30.3, 33.7, 35.2,
                     41.6, 44.2, 42.1, 36.8, 35.7, 36.0, 36.9, 37.9])
-    res = ceiling_attenuation_class(dnc)
+    cac = ceiling_attenuation_class(dnc)
     xc = np.arange(dnc.size)
-    ax_cac.fill_between(xc, res.measured, res.shifted_reference,
-                        where=(res.measured < res.shifted_reference).tolist(),
+    ax_cac.fill_between(xc, cac.measured, cac.shifted_reference,
+                        where=(cac.measured < cac.shifted_reference).tolist(),
                         color=COLOR_SECONDARY, alpha=0.25, interpolate=True,
                         zorder=1, label="deficiencies")
-    ax_cac.plot(xc, res.measured, "-o", color=COLOR_PRIMARY, linewidth=2.4,
+    ax_cac.plot(xc, cac.measured, "-o", color=COLOR_PRIMARY, linewidth=2.4,
                 markersize=6, zorder=4, label="Dn,c (measured)")
-    ax_cac.plot(xc, res.shifted_reference, "--s", color=COLOR_TERTIARY,
+    ax_cac.plot(xc, cac.shifted_reference, "--s", color=COLOR_TERTIARY,
                 linewidth=2.0, markersize=5, zorder=3,
                 label="ASTM E413 contour, fitted")
     ax_cac.set_xticks(xc[::2])
@@ -7314,7 +7314,7 @@ def generate_ceiling_plenum_flanking(output_dir: str) -> None:
     ax_cac.set_xlabel(LABEL_FREQ_HZ)
     ax_cac.set_ylabel("Normalized ceiling attenuation Dn,c [dB]")
     ax_cac.set_title(f"Ceiling attenuation class\n(ASTM E1414/E413, "
-                     f"CAC = {res.rating} dB)", fontweight="bold", pad=10)
+                     f"CAC = {cac.rating} dB)", fontweight="bold", pad=10)
     ax_cac.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax_cac.set_axisbelow(True)
     ax_cac.legend(loc="upper left", fontsize=9)
@@ -7344,12 +7344,12 @@ def generate_masonry_wall_ties(output_dir: str) -> None:
     ties = ("butterfly", "double_triangle", "vertical_twist")
     colours = (COLOR_PRIMARY, COLOR_TERTIARY, COLOR_SECONDARY)
     for tie, colour in zip(ties, colours, strict=True):
-        res = wall_tie_coupling_loss_factor(
+        clf = wall_tie_coupling_loss_factor(
             freq, 150.0, 170.0, stiffness1, stiffness2,
             ties_per_area=2.5, tie=tie,
         )
         label = f"{tie.replace('_', ' ')} ({wall_tie_stiffness(tie)[1] / 1e6:g} MN/m)"
-        ax_clf.loglog(freq, res.coupling_loss_factor, color=colour, linewidth=2.4,
+        ax_clf.loglog(freq, clf.coupling_loss_factor, color=colour, linewidth=2.4,
                       zorder=4, label=label)
     rigid = wall_tie_coupling_loss_factor(
         freq, 150.0, 170.0, stiffness1, stiffness2, ties_per_area=2.5
@@ -7387,8 +7387,8 @@ def generate_masonry_wall_ties(output_dir: str) -> None:
     ax_tl.plot(xb, tied.transmission_loss, "--s", color=COLOR_SECONDARY,
                linewidth=2.4, markersize=6, zorder=4, label="2.5 ties/m2, k = 2 MN/m")
     positions = []
-    for res, colour in ((plain, COLOR_PRIMARY), (tied, COLOR_SECONDARY)):
-        f0 = res.resonance_frequency
+    for curve, colour in ((plain, COLOR_PRIMARY), (tied, COLOR_SECONDARY)):
+        f0 = curve.resonance_frequency
         assert f0 is not None
         pos = float(np.interp(np.log10(f0), np.log10(bands), xb))
         positions.append(pos)

@@ -134,6 +134,9 @@ _SECTION_LIST: tuple[Section, ...] = (
         modules=(
             "phonometry.building.insulation",
             "phonometry.building.panel_transmission",
+            "phonometry.building.masonry_cavity_wall",
+            "phonometry.building.heavy_impact",
+            "phonometry.building.ceiling_plenum",
             "phonometry.building.aperture_transmission",
             "phonometry.building.lab_insulation",
             "phonometry.building.survey_insulation",
