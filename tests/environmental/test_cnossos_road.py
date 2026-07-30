@@ -624,8 +624,9 @@ def test_invalid_inputs_are_rejected() -> None:
     negative = RoadTraffic(RoadVehicleCategory.LIGHT, -1.0, 50.0)
     with pytest.raises(ValueError, match="non-negative"):
         road_source_power(negative)
+    power = np.array([90.0])
     with pytest.raises(ValueError, match="positive number of metres"):
-        line_source_segment_power(np.array([90.0]), 0.0)
+        line_source_segment_power(power, 0.0)
 
 
 def test_substituted_database_may_replace_one_row() -> None:
