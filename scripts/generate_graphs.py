@@ -1169,6 +1169,24 @@ _ES_EXACT = {
         "Desglose de la atenuación (ISO 9613-2, con barrera de 4 m)",
     "Octave-band centre frequency [Hz]":
         "Frecuencia central de banda de octava [Hz]",
+    "1/3-octave band centre frequency [Hz]":
+        "Frecuencia central de banda de tercio de octava [Hz]",
+    "CNOSSOS-EU Railway Source Line Power (96 coaches/h at 160 km/h)":
+        "Potencia de la línea fuente ferroviaria CNOSSOS-EU "
+        "(96 coches/h a 160 km/h)",
+    "Line power L'W,eq,line [dB re 1 pW/m]":
+        "Potencia de la línea L'W,eq,line [dB re 1 pW/m]",
+    "Both source heights": "Ambas alturas de fuente",
+    "Source A, 0,5 m (rolling, impact, traction)":
+        "Fuente A, 0,5 m (rodadura, impacto, tracción)",
+    "Source B, 4,0 m (traction, aerodynamic)":
+        "Fuente B, 4,0 m (tracción, aerodinámico)",
+    "CNOSSOS-EU Total Effective Roughness against Speed "
+    "(f = v/λ, λ in the wavelength domain)":
+        "Rugosidad efectiva total CNOSSOS-EU frente a la velocidad "
+        "(f = v/λ, λ en el dominio de longitud de onda)",
+    "Total effective roughness LR,TOT [dB re 1 μm]":
+        "Rugosidad efectiva total LR,TOT [dB re 1 μm]",
     "Attenuation A [dB]": "Atenuación A [dB]",
     "Adiv — divergence": "Adiv — divergencia",
     "Aatm — atmospheric": "Aatm — atmosférica",
@@ -13692,6 +13710,141 @@ def generate_dbhr_global_index(output_dir: str) -> None:
     plt.close()
 
 
+def _cnossos_rail_scene() -> tuple[Any, Any]:
+    """A four-axle disc-braked coach on a normally maintained ballasted track.
+
+    The vehicle is the 920 mm wheel of Table G-3b at the 50 kN wheel load of
+    Table G-2, the track a concrete mono-block sleeper on a medium-stiffness
+    rail pad with one joint per 100 m, which is the default Annex II prescribes
+    for jointed track.
+    """
+    from phonometry import (
+        BrakeType,
+        ContactFilter,
+        RailRoughnessClass,
+        RailwayTrack,
+        RollingStock,
+        TrackTransferClass,
+        TractionVehicle,
+        WheelDiameter,
+        aerodynamic_sound_power,
+        contact_filter,
+        impact_roughness_single,
+        rail_roughness,
+        track_transfer,
+        traction_sound_power,
+        wheel_roughness,
+        wheel_transfer,
+    )
+
+    stock = RollingStock(
+        axles=4,
+        wheel_roughness=wheel_roughness(BrakeType.NON_TREAD),
+        contact_filter=contact_filter(ContactFilter.LOAD_50_DIAMETER_920),
+        wheel_transfer=wheel_transfer(WheelDiameter.MM_920),
+        traction=traction_sound_power(TractionVehicle.ELECTRIC_MULTIPLE_UNIT),
+        aerodynamic=aerodynamic_sound_power(),
+    )
+    track = RailwayTrack(
+        rail_roughness=rail_roughness(RailRoughnessClass.NORMAL),
+        track_transfer=track_transfer(TrackTransferClass.MONOBLOCK_MEDIUM),
+        impact_roughness=impact_roughness_single(),
+    )
+    return stock, track
+
+
+def generate_cnossos_rail_emission(output_dir: str) -> None:
+    """CNOSSOS-EU railway source-line power at the two equivalent heights."""
+    print("Generating cnossos_rail_emission.png...")
+    from phonometry import RailwayVehicle, railway_source_power
+
+    stock, track = _cnossos_rail_scene()
+    bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
+    # 96 coaches per hour at 160 km/h: eight eight-car trains an hour on a
+    # conventional main line, seen broadside and slightly from above.
+    result = railway_source_power(
+        RailwayVehicle(stock, flow_rate=96.0, speed=160.0), track, phi=90.0, psi=10.0,
+    )
+    x = np.arange(len(bands))
+    _fig, ax = plt.subplots(figsize=(11, 6.4))
+    ax.bar(x, result.total_line_power, color=COLOR_MUTED, edgecolor=COLOR_FG,
+           linewidth=0.6, label="Both source heights", zorder=2)
+    for row, color, marker, label in zip(
+        result.line_power, (COLOR_PRIMARY, COLOR_SECONDARY), ("o", "s"),
+        ("Source A, 0,5 m (rolling, impact, traction)",
+         "Source B, 4,0 m (traction, aerodynamic)"), strict=True,
+    ):
+        ax.plot(x, row, color=color, marker=marker, linewidth=1.8, markersize=6,
+                markerfacecolor="white", markeredgewidth=1.3, zorder=5, label=label)
+
+    ax.set_title(
+        "CNOSSOS-EU Railway Source Line Power (96 coaches/h at 160 km/h)",
+        fontweight="bold", pad=12,
+    )
+    ax.set_xlabel("Octave-band centre frequency [Hz]")
+    ax.set_ylabel("Line power L'W,eq,line [dB re 1 pW/m]")
+    ax.set_xticks(x)
+    ax.set_xticklabels([f"{b:g}" for b in bands])
+    ax.set_ylim(30.0, 95.0)
+    ax.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower left", fontsize=9)
+    plt.tight_layout()
+    save_figure(output_dir, "cnossos_rail_emission.png")
+    plt.close()
+
+
+def generate_cnossos_rail_roughness_shift(output_dir: str) -> None:
+    """The roughness spectrum sliding along the frequency axis with speed."""
+    print("Generating cnossos_rail_roughness_shift.png...")
+    from phonometry import (
+        RAILWAY_THIRD_OCTAVE_BANDS,
+        BrakeType,
+        ContactFilter,
+        RailRoughnessClass,
+        contact_filter,
+        rail_roughness,
+        roughness_to_frequency,
+        total_effective_roughness,
+        wheel_roughness,
+    )
+
+    freqs = np.asarray(RAILWAY_THIRD_OCTAVE_BANDS)
+    rail = rail_roughness(RailRoughnessClass.NORMAL)
+    wheel = wheel_roughness(BrakeType.NON_TREAD)
+    filt = contact_filter(ContactFilter.LOAD_50_DIAMETER_920)
+
+    _fig, ax = plt.subplots(figsize=(11, 6.4))
+    for speed, color, marker in (
+        (60.0, COLOR_PRIMARY, "o"), (160.0, COLOR_TERTIARY, "s"),
+        (300.0, COLOR_SECONDARY, "D"),
+    ):
+        total = total_effective_roughness(
+            roughness_to_frequency(rail[1], rail[0], speed),
+            roughness_to_frequency(wheel[1], wheel[0], speed),
+            roughness_to_frequency(filt[1], filt[0], speed),
+        )
+        ax.semilogx(freqs, total, color=color, marker=marker, linewidth=1.8,
+                    markersize=5, markerfacecolor="white", markeredgewidth=1.2,
+                    label=f"v = {speed:g} km/h", zorder=4)
+    ax.axhline(0.0, color=COLOR_MUTED, linewidth=0.9, zorder=1)
+    ax.set_title(
+        "CNOSSOS-EU Total Effective Roughness against Speed "
+        "(f = v/λ, λ in the wavelength domain)",
+        fontweight="bold", pad=12,
+    )
+    ax.set_xlabel("1/3-octave band centre frequency [Hz]")
+    ax.set_ylabel("Total effective roughness LR,TOT [dB re 1 μm]")
+    ax.set_xlim(50.0, 10000.0)
+    format_frequency_axis(ax, 50.0, 10000.0)
+    ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper right", fontsize=10)
+    plt.tight_layout()
+    save_figure(output_dir, "cnossos_rail_roughness_shift.png")
+    plt.close()
+
+
 _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_filter_type_comparison,
     generate_filter_responses,
@@ -13766,6 +13919,9 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_outdoor_attenuation_breakdown,
     generate_ground_effect_spherical,
     generate_atmospheric_refraction,
+    # CNOSSOS-EU railway source emission (Directive 2002/49/EC Annex II, 2.3).
+    generate_cnossos_rail_emission,
+    generate_cnossos_rail_roughness_shift,
     generate_exposure_uncertainty,
     # Materials: absorption rating, airflow resistance, impedance tube
     # (ISO 11654, ISO 9053-1/-2, ISO 10534-1/-2, ASTM E2611)

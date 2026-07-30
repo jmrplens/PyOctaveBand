@@ -243,8 +243,11 @@ def _case_result(case: dict[str, str]) -> RailwayEmissionResult:
         track_transfer=np.asarray(
             frequency[("track_transfer", case["track_transfer"], "")]
         ),
+        # A joint density of zero means no joint at all, so the workbook's
+        # impact spectrum for that case is never read and is not committed.
         impact_roughness=(
-            lam, list(wavelength[("impact_roughness", case["impact_roughness"])])
+            (lam, list(wavelength[("impact_roughness", case["impact_roughness"])]))
+            if case["impact_roughness"] else None
         ),
         joint_density=float(case["joint_density_per_m"]),
         # The 2015 text made the bridge a constant added to the rolling noise;
@@ -312,9 +315,50 @@ def test_committed_cases_span_the_workbook_grid() -> None:
     assert len({c["vehicle"] for c in cases}) == 20
     assert len({c["track_transfer"] for c in cases}) == 9
     assert len({c["rail_roughness"] for c in cases}) == 4
-    assert len({c["impact_roughness"] for c in cases}) == 3
+    assert len({c["impact_roughness"] for c in cases}) == 3   # two densities + none
     assert len({(c["phi_deg"], c["psi_deg"]) for c in cases}) == 4
     assert {c["curve_radius_m"] for c in cases} >= {"250", "500", "5000"}
+
+
+def test_every_committed_catalogue_row_is_exercised_unmasked() -> None:
+    """No committed coefficient row may sit behind a louder term in every case.
+
+    A row that only ever appears where something 20 dB louder covers it is data
+    the end-to-end agreement does not test, however green the run looks. Each
+    kind of row therefore has to appear in the regime that exposes it: the
+    rolling tables at source A under constant speed, the constant-speed traction
+    at source B below 200 km/h where it is alone, the idling traction in an
+    idling case, and the aerodynamic spectra above 200 km/h.
+    """
+    cases = ref.cnossos_rail_workbook_cases()
+    vehicles = ref.cnossos_rail_2015_vehicles()
+    exposed: set[tuple[str, str]] = set()
+    for case in cases:
+        vehicle = vehicles[case["vehicle"]]
+        fast = float(case["speed_kmh"]) > 200.0
+        if case["condition"] == "idling":
+            exposed.add(("traction_idling", vehicle["traction"]))
+        elif case["source_height"] == "A":
+            exposed.add(("wheel_roughness", vehicle["wheel_roughness"]))
+            exposed.add(("contact_filter", vehicle["contact_filter"]))
+            exposed.add(("wheel_transfer", vehicle["wheel_transfer"]))
+            exposed.add(("rail_roughness", case["rail_roughness"]))
+            exposed.add(("track_transfer", case["track_transfer"]))
+            exposed.add(("superstructure_transfer", case["superstructure_transfer"]))
+            if case["impact_roughness"]:
+                exposed.add(("impact_roughness", case["impact_roughness"]))
+            if fast:
+                exposed.add(("aerodynamic", vehicle["aerodynamic"]))
+        elif fast:
+            exposed.add(("aerodynamic", vehicle["aerodynamic"]))
+        else:
+            exposed.add(("traction_constant", vehicle["traction"]))
+
+    committed = {(table, key) for table, key in
+                 ref.cnossos_rail_2015_wavelength_tables()}
+    committed |= {(table, key) for table, key, _ in
+                  ref.cnossos_rail_2015_frequency_tables()}
+    assert committed <= exposed, sorted(committed - exposed)
 
 
 def test_workbook_exercises_every_physical_source() -> None:

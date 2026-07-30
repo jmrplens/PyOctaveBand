@@ -277,6 +277,7 @@ export const sidebar = [
         items: [
           { slug: 'guides/sections/outdoor-sound', label: 'Overview', translations: { es: 'Resumen' } },
           'guides/outdoor-propagation',
+          'guides/cnossos-rail-emission',
           'guides/ground-barriers',
           'guides/atmospheric-refraction',
           'guides/impulse-prominence',

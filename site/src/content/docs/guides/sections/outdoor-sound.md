@@ -17,6 +17,14 @@ averages. The page keeps the per-term breakdown visible, so a prediction is
 never a black box: you can see exactly which mechanism buys how many decibels
 at which frequency.
 
+[CNOSSOS-EU railway source emission](/phonometry/guides/cnossos-rail-emission/)
+is the source half for the railway. Section 2.3 of Annex II to Directive
+2002/49/EC turns a roughness spectrum, a set of transfer functions and a train
+flow into the two equivalent source lines every strategic noise map in the
+European Union starts from, at 0,5 m and at 4,0 m above the rail head, with
+impact noise, curve squeal, traction, aerodynamic noise above 200 km/h and the
+bridge term each allocated to the height it radiates from.
+
 [Spherical ground effect and advanced barriers](/phonometry/guides/ground-barriers/)
 goes underneath the ISO 9613-2 fits to the wave acoustics they approximate: the
 Weyl-Van der Pol spherical-wave reflection coefficient of a finite-impedance
@@ -48,6 +56,9 @@ sections.
 - [Outdoor Sound Propagation](/phonometry/guides/outdoor-propagation/):
   ISO 9613-1 atmospheric absorption and the ISO 9613-2 general method with a
   per-term octave-band attenuation breakdown.
+- [CNOSSOS-EU railway source emission](/phonometry/guides/cnossos-rail-emission/):
+  the common EU railway emission method, from rail and wheel roughness to the
+  directional sound power per metre of the two equivalent source lines.
 - [Spherical ground effect and advanced barriers](/phonometry/guides/ground-barriers/):
   the Weyl-Van der Pol spherical-wave ground reflection and wave-theoretic
   barrier diffraction (Kurze-Anderson, exact rigid half-plane, thick barriers

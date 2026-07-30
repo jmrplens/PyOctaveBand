@@ -196,6 +196,7 @@ _SECTION_LIST: tuple[Section, ...] = (
             "phonometry.environmental.ground_barriers",
             "phonometry.environmental.atmospheric_refraction",
             "phonometry.environmental.air_absorption",
+            "phonometry.environmental.cnossos_rail",
             "phonometry.environmental.impulse_prominence",
             "phonometry.environmental.impulsive_sound",
             "phonometry.environmental.rating",
