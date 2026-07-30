@@ -239,8 +239,13 @@ ceiling on each side has a transmission factor $\tau_S = \tau_{S,pl}\tau_{S,a}$
 a fraction $s_S$ heading for the partition, and decays as $\exp(-mx)$ with the
 power attenuation coefficient $m = 2\,\mathrm{Re}\{\Gamma\} = -2\,\mathrm{Im}\{k'\}$
 (Eqs. (9.15) and (9.16)). Integrating over the ceiling length on both sides
-gives Eq. (9.18), whose receiving-side exponent carries the leakage back into
-the room, $m'_R = m_R + s_R\tau_R/h$ (Eq. (9.17)). For a plenum with little
+gives Eq. (9.18), whose receiving side carries the leakage back into the room,
+$m'_R = m_R + s_R\tau_R/h$ (Eq. (9.17)). Vigran prints the *unprimed* $m_R$ in
+that expression's denominator; that is a misprint, recorded in
+[the errata register](/phonometry/reference/errata/), and the derived $m'_R$ is
+used here. Read literally, the printed form is non-monotonic in the plenum
+damping (adding absorber would predict a worse path than none) and unbounded as
+$m_R \to 0$. For a plenum with little
 attenuation and $s_S = s_R = 0{,}5$ that collapses to the compact form that
 makes the geometry visible (Eqs. (9.19) and (9.20)):
 
@@ -434,7 +439,9 @@ one-dimensional plenum model of Vigran Section 9.2.3, via
 `building.plenum_flanking_reduction_index` and
 `building.partition_referenced_reduction_index`. The plenum model has
 no published numeric output of its own, so it is anchored on its
-closed forms and on the convergence of Eq. (9.18) to Eq. (9.20); the
+closed forms and on the structural properties a wrong reading breaks:
+monotonicity in the plenum damping, the bound $\tau_{cl} \le 1$, and the
+convergence of Eq. (9.18) to Eq. (9.20); the
 measurement chain and the class are anchored on accredited
 ASTM E1414 laboratory reports. The plenum propagation constant
 $k'$ of a lined duct is an input here, not a prediction.

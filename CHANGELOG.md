@@ -40,7 +40,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the plenum over the partition and comes back down into the next.
   `plenum_flanking_reduction_index` implements Mechel's one-dimensional model,
   both the full attenuated form (Eq. (9.18), with the receiving-side leakage
-  term of Eq. (9.17)) and its small-attenuation limit
+  term of Eq. (9.17), whose printed denominator is a misprint now recorded in
+  `docs/ERRATA.md`) and its small-attenuation limit
   `Rcl = RS + RR - 10 lg[eps^2 LR/(4h)]` (Eq. (9.20)), which is what makes the
   geometry visible: a deep plenum helps, a long room hurts and reflecting
   sidewalls cost 6 dB against absorbing ones.
@@ -54,7 +55,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   ASTM E1414 laboratory reports, reproducing their printed CAC 34, CAC 39 and
   CAC 25 and, band by band, the deficiency column of two of them; the plenum
   model itself has no published numeric output anywhere, so it is anchored on
-  its closed forms and on the convergence of Eq. (9.18) to Eq. (9.20). New
+  its closed forms and on the structural properties a wrong reading breaks:
+  monotonicity in the plenum damping, the bound `tau_cl <= 1`, and the
+  convergence of Eq. (9.18) to Eq. (9.20). New
   section in the ISO 10848 laboratory flanking guide with its own figure, in
   English and Spanish.
 

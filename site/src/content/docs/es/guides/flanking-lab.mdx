@@ -246,8 +246,13 @@ dirigida hacia el tabique, y decae como $\exp(-mx)$ con el coeficiente de
 atenuación de potencia
 $m = 2\,\mathrm{Re}\{\Gamma\} = -2\,\mathrm{Im}\{k'\}$ (Ecs. (9.15) y (9.16)).
 Integrando sobre la longitud del techo a ambos lados se obtiene la Ec. (9.18),
-cuyo exponente del lado receptor incorpora la fuga de vuelta al recinto,
-$m'_R = m_R + s_R\tau_R/h$ (Ec. (9.17)). Para un plenum con poca atenuación y
+cuyo lado receptor incorpora la fuga de vuelta al recinto,
+$m'_R = m_R + s_R\tau_R/h$ (Ec. (9.17)). Vigran imprime el $m_R$ *sin prima* en
+el denominador de esa expresión; es una errata, registrada en
+[el registro de erratas](/phonometry/es/reference/errata/), y aquí se usa el
+$m'_R$ derivado. Leída al pie de la letra, la forma impresa no es monótona con
+el amortiguamiento del plenum (añadir absorbente predeciría un trayecto peor
+que no poner nada) y no está acotada cuando $m_R \to 0$. Para un plenum con poca atenuación y
 $s_S = s_R = 0{,}5$ eso se reduce a la forma compacta que hace visible la
 geometría (Ecs. (9.19) y (9.20)):
 
@@ -452,7 +457,9 @@ unidimensional de plenum de la Sección 9.2.3 de Vigran, con
 `building.plenum_flanking_reduction_index` y
 `building.partition_referenced_reduction_index`. El modelo de plenum
 no tiene salida numérica publicada propia, así que se ancla en sus
-formas cerradas y en la convergencia de la Ec. (9.18) a la Ec. (9.20);
+formas cerradas y en las propiedades estructurales que una lectura errónea
+rompe: la monotonía con el amortiguamiento del plenum, la cota
+$\tau_{cl} \le 1$ y la convergencia de la Ec. (9.18) a la Ec. (9.20);
 la cadena de medición y la clase se anclan en informes de laboratorio
 acreditados ASTM E1414. La constante de propagación $k'$ de un
 conducto revestido es aquí un dato de entrada, no una predicción.
