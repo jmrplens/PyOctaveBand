@@ -8315,7 +8315,7 @@ def generate_cnossos_road_emission(output_dir: str) -> None:
     )
     x = np.arange(len(bands))
     _fig, ax = plt.subplots(figsize=(11, 6.4))
-    ax.bar(x, result.total_line_power, color=COLOR_PANEL, edgecolor=COLOR_FG,
+    ax.bar(x, result.total_line_power, color=COLOR_MUTED, edgecolor=COLOR_FG,
            linewidth=0.6, label="Total source line", zorder=2)
     labels = {
         "1": "Light vehicles (1)",
