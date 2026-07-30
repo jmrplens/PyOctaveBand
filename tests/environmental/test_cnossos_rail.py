@@ -33,8 +33,8 @@ import math
 
 import numpy as np
 import pytest
+import reference_data as ref
 
-import tests.reference_data as ref
 from phonometry.environmental.cnossos_rail import (
     AERODYNAMIC_REFERENCE_SPEED,
     RAILWAY_MINIMUM_SPEED,
