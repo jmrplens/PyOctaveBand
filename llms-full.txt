@@ -31721,9 +31721,11 @@ DB-HR and ISO 717-1 reach the same place by different routes, and Annex H of
 the document itself accepts three approximations as long as the two routes
 differ by less than 1 dB:
 
-$$D_{nT,A} \approx D_{nT,w} + C \quad (H.1), \qquad
+$$
+D_{nT,A} \approx D_{nT,w} + C \quad (H.1), \qquad
 D_{2m,nT,A} \approx D_{2m,nT,w} + C \quad (H.2), \qquad
-D_{2m,nT,Atr} \approx D_{2m,nT,w} + C_{tr} \quad (H.3)$$
+D_{2m,nT,Atr} \approx D_{2m,nT,w} + C_{tr} \quad (H.3)
+$$
 
 with (H.2) covering the rail-dominant case of the previous section. On the two
 published spectra this page reproduces, the agreement is exact to the integer:
