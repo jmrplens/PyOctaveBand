@@ -202,6 +202,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   a machine transcription of the Official Journal. New guide "CNOSSOS-EU road
   traffic source emission" with the source-line spectrum and the
   rolling/propulsion speed-crossover figures, in English and Spanish.
+- Prediction of resilient-layer performance
+  (`building/resilient_layers.py`, Hopkins, *Sound Insulation* Sections 3.6.3,
+  4.3.8, 4.4.3.1 and 4.4.4; ISO 12354-1:2017 Annex D; ISO 12354-2:2017
+  Annex C; Vigran, *Building Acoustics* Section 8.4). The library measured
+  what a covering or a resilient layer achieved and stopped at the resonance
+  frequency; this is the chain from the material data to the improvement
+  spectrum, so a construction can be sized before it exists. It starts at the
+  excitation, because the force the ISO tapping machine injects is a property
+  of the floor as much as of the machine: `tapping_force_spectrum` solves
+  Lindblad's mass-spring-dashpot of the hammer, the contact stiffness and the
+  floor's driving-point impedance in closed form, splitting the over-critical
+  case (a lightweight walking surface, no rebound, force tending to
+  `m v0/Ti`) from the under-critical one (concrete, full rebound, `2 m v0/Ti`),
+  the 6 dB that separates a tapping-machine level on timber from one on
+  concrete. From it follow `force_pulse`, `tapping_cut_off_frequency`,
+  `hammer_limiting_frequency`, `plate_contact_stiffness`,
+  `covering_contact_stiffness` and `short_pulse_mean_square_force`. A soft
+  covering then alters nothing but that force, so `covering_improvement`
+  returns both the force ratio `20 lg(|Fn|without/|Fn|with)` and the two-line
+  design estimate, 0 dB below the covering's cut-off and 12 dB per octave
+  above. Floating floors get their resonance from `160 sqrt(s'/m')`
+  (`floating_floor_resonance_frequency`), the three improvement laws above it
+  through `floating_floor_improvement_spectrum` (the 30 lg law of
+  EN 12354-2 for sand-cement screeds, Cremer's 40 lg law for asphalt and dry
+  floors, and the same law with the hammer-impedance term for a lightweight
+  walking surface), the weighted single numbers from
+  `weighted_floating_floor_improvement`, the series combination of layers from
+  `combined_dynamic_stiffness`, the two resonances of a stacked pair from
+  `double_floating_floor_resonances`, and Ver's discrete-mount SEA model, which
+  rises 30 dB per decade rather than 40, from `resilient_mount_improvement`.
+  Wall linings close the set: `lining_resonance_frequency` for a layer bonded
+  directly or built on studs over a filled cavity, `weighted_lining_improvement`
+  for the Annex D table that reads the rating off that resonance (a lining
+  below 200 Hz helps, above it costs up to 10 dB), `lining_improvement` for the
+  exterior-system and stud fits with their anchor and glued-area corrections,
+  and `lining_improvement_in_situ` for the laboratory-to-field transfer.
+  Anchored on the 21 printed per-band values of ISO 12354-2:2017 Table G.4 and
+  its `DeltaLw = 32,2 dB`, on Hopkins's printed cut-off frequencies (7 000,
+  2 300 and 100 Hz), on the over/under-critical classification of his four
+  walking surfaces, on the double-floating-floor resonances of his Fig. 4.73
+  (74 Hz and 195 Hz) and the lining resonances of his Fig. 4.48 (104, 123, 247
+  and 542 Hz), and on the identity between Hopkins Eq. (4.118) and Vigran
+  Eq. (8.45), which state the same SEA model in different algebra. Four
+  results with `.plot()`, two figures and a new guide "Predicting
+  Resilient-Layer Performance" in English and Spanish.
 
 - Room-to-room noise reduction (`noise_control/room_to_room.py`, Norton &
   Karczub 2003 Section 4.9): `room_to_room_transmission` composes the whole

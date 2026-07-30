@@ -180,6 +180,38 @@ def test_lightweight_plates_tend_to_the_lower_limit(name: str, thickness: float)
     )) >= 5.0
 
 
+def test_over_critical_cut_off_is_the_lower_root() -> None:
+    """H printed p. 282, chipboard and OSB.
+
+    "For the 22 mm chipboard and 15 mm OSB plates, the longer duration pulse
+    means that the force spectrum is not flat and decreases above 100 Hz."
+    Equation (3.101) has two roots; only the lower one is compatible with that
+    statement, the upper one landing above 8 kHz. The branch is also continuous
+    with the under-critical Eq. (3.102): at the critical boundary
+    ``K m = 4 Zdp^2`` the discriminant vanishes and both give
+    ``sqrt(K/m)/(2 pi)``.
+    """
+    for name, thickness in (("chipboard", 0.022), ("osb", 0.015)):
+        stiffness, impedance = _plate(name, thickness)
+        decay = stiffness / (2.0 * impedance)
+        root = np.sqrt(decay**2 - stiffness / TAPPING_HAMMER_MASS)
+        fco = tapping_cut_off_frequency(stiffness, impedance)
+        assert fco == pytest.approx((decay - root) / (2.0 * np.pi))
+        assert fco < 1000.0
+        assert (decay + root) / (2.0 * np.pi) > 8000.0
+
+    # Continuity across the critical boundary, from both sides.
+    stiffness = 1.0e8
+    critical = np.sqrt(stiffness * TAPPING_HAMMER_MASS) / 2.0
+    undamped = np.sqrt(stiffness / TAPPING_HAMMER_MASS) / (2.0 * np.pi)
+    assert tapping_cut_off_frequency(stiffness, critical * (1.0 - 1e-9)) == (
+        pytest.approx(undamped, rel=1e-4)
+    )
+    assert tapping_cut_off_frequency(stiffness, critical * (1.0 + 1e-9)) == (
+        pytest.approx(undamped, rel=1e-4)
+    )
+
+
 def test_bare_concrete_cut_off_is_about_7000_hz() -> None:
     """H printed p. 514: bare 140 mm slab, "fco = 7000 Hz" (Eqs. 3.97/3.102)."""
     stiffness, impedance = _plate("concrete", 0.14)
@@ -633,6 +665,16 @@ def test_asphalt_weighted_improvement_exceeds_the_screed_branch() -> None:
     assert asphalt > screed
     # Both fall as the resilient layer stiffens.
     assert weighted_floating_floor_improvement(73.5, 2e7) < screed
+    # The transcription itself is pinned by restating the printed formula,
+    # DeltaLw = ((-0,21 m') - 5,45) lg(s') + (0,46 m') + 23,8, with s' in
+    # MN/m3, independently of the implementation.
+    for mass, stiffness in ((73.5, 8.0), (120.0, 20.0), (25.0, 3.0)):
+        printed = (
+            (-0.21 * mass - 5.45) * np.log10(stiffness) + 0.46 * mass + 23.8
+        )
+        assert weighted_floating_floor_improvement(
+            mass, stiffness * 1e6, floor="asphalt"
+        ) == pytest.approx(printed, abs=1e-9)
 
 
 # ===========================================================================
