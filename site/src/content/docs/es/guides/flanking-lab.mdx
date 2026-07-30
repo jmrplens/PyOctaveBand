@@ -37,9 +37,30 @@ references:
     designation: "ISO 10848-4:2010"
     url: "https://www.iso.org/standard/45360.html"
     note: "Aplicación a uniones con al menos un elemento pesado, con las comprobaciones de validez por densidad modal, número de modos por banda y solapamiento modal (bandas con M < 0,25 acotadas, Cláusula 9)."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 1985
+    title: "Acoustics — Measurement of sound insulation in buildings and of building elements — Part 9: Laboratory measurement of room-to-room airborne sound insulation of a suspended ceiling with a plenum above it"
+    designation: "ISO 140-9:1985"
+    url: "https://www.iso.org/standard/3944.html"
+    note: "El apartado 3.3 define la diferencia de niveles normalizada del techo suspendido Dn,c con A0 = 10 m2, y los apartados de instalación fijan la profundidad del plenum, los volúmenes de los recintos y la absorción exigida al revestimiento."
+  - type: standard
+    organization: "ASTM International"
+    year: 2022
+    title: "Classification for Rating Sound Insulation"
+    designation: "ASTM E413-22"
+    url: "https://www.astm.org/e0413-22.html"
+    note: "La Tabla 1 es la curva de referencia y el apartado 5 las reglas de ajuste que invoca ASTM E1414 para obtener la clase de atenuación de techo."
+  - type: book
+    authors: ["Vigran, T. E."]
+    year: 2008
+    title: "Building acoustics"
+    publisher: "CRC Press"
+    doi: "10.1201/9781482266016"
+    note: "La Sección 9.2.3 presenta el modelo unidimensional de plenum de Mechel, Ecs. (9.13) a (9.20). ISBN 978-0-415-42853-8."
 ---
 
-import ThemeImage from '../../../../components/ThemeImage.astro';
+import import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
 
 EN 12354 predice un edificio a partir de sus uniones, e ISO 10848 es la vía
@@ -201,6 +222,122 @@ plt.show()
 
 </details>
 
+## Techos suspendidos: el trayecto por el plenum (ISO 140-9, Vigran 9.2.3)
+
+Dos despachos separados por un tabique que se detiene en el techo suspendido
+comparten un único plenum continuo por encima. El sonido sale del recinto
+emisor a través de las placas del techo, viaja lateralmente por encima del
+tabique y vuelve a bajar a través de las placas del recinto receptor. Ese
+trayecto suele ser el eslabón más débil de una distribución de oficinas, y no
+es lo que describe el $R_w$ de un tabique.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ceiling_plenum_flanking_es.svg" alt="Dos paneles: el índice de reducción del trayecto techo-plenum Rcl por bandas de octava para dos profundidades de plenum frente a la suma de los índices de los dos techos, y la diferencia de niveles normalizada del techo de un informe de ensayo acreditado ASTM E1414 con la curva ASTM E413 ajustada y sus deficiencias sombreadas dando CAC 34" width="92%" />
+
+*Izquierda: el plenum cobra una penalización fija frente a la suma de los dos
+techos, y un plenum más profundo devuelve parte de ella. Derecha: la misma
+magnitud medida, valorada como clase de atenuación de techo.*
+
+**El modelo unidimensional.** La variante unidimensional de Mechel, tal como la
+presenta Vigran en la Sección 9.2.3, trata el plenum como un conducto revestido
+por un lado. El techo de cada lado tiene un factor de transmisión
+$\tau_S = \tau_{S,pl}\tau_{S,a}$ (las placas por el eventual absorbente del
+plenum, Ec. (9.14)); la potencia inyectada se reparte, con una fracción $s_S$
+dirigida hacia el tabique, y decae como $\exp(-mx)$ con el coeficiente de
+atenuación de potencia
+$m = 2\,\mathrm{Re}\{\Gamma\} = -2\,\mathrm{Im}\{k'\}$ (Ecs. (9.15) y (9.16)).
+Integrando sobre la longitud del techo a ambos lados se obtiene la Ec. (9.18),
+cuyo lado receptor incorpora la fuga de vuelta al recinto,
+$m'_R = m_R + s_R\tau_R/h$ (Ec. (9.17)). Vigran imprime el $m_R$ *sin prima* en
+el denominador de esa expresión; es una errata, registrada en
+[el registro de erratas](/phonometry/es/reference/errata/), y aquí se usa el
+$m'_R$ derivado. Leída al pie de la letra, la forma impresa no es monótona con
+el amortiguamiento del plenum (añadir absorbente predeciría un trayecto peor
+que no poner nada) y no está acotada cuando $m_R \to 0$. Para un plenum con poca atenuación y
+$s_S = s_R = 0{,}5$ eso se reduce a la forma compacta que hace visible la
+geometría (Ecs. (9.19) y (9.20)):
+
+$$
+R_{cl} = R_S + R_R - 10\lg\!\left[\frac{\varepsilon^2 L_R}{4h}\right],
+$$
+
+con $\varepsilon = 1$ para paredes laterales del plenum totalmente absorbentes
+y $\varepsilon = 2$ para totalmente reflectantes. Un plenum profundo ayuda, un
+recinto largo perjudica, y duplicar el aislamiento de las placas ayuda el doble
+porque $R_S$ y $R_R$ aparecen los dos. Referido al área del tabique en lugar de
+a la del techo, $R_{cl,p} = R_{cl} + 10\lg(H_S/L_S)$ (Ec. (9.13)), que es lo
+que permite sumar el trayecto por el techo al trayecto directo como factores de
+transmisión.
+
+```python
+from phonometry import (
+    partition_referenced_reduction_index,
+    plenum_flanking_reduction_index,
+)
+
+freqs = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
+ceiling = [17.0, 21.0, 25.0, 29.0, 32.0, 30.0, 38.0]   # placa de yeso de 9,5 mm
+
+# La geometría del ejemplo de Vigran: LS = LR = 4,75 m, plenum 0,43 m,
+# paredes laterales reflectantes.
+res = plenum_flanking_reduction_index(
+    ceiling, ceiling, ceiling_length=4.75, plenum_height=0.43, frequency=freqs
+)
+print(round(res.geometry_term, 1))    # 10,4 dB cobrados a RS + RR
+res.plot()                            # Rcl frente a los dos techos
+
+# Un plenum revestido atenúa el trayecto lateral (Ec. (9.18) en vez de (9.20)):
+damped = plenum_flanking_reduction_index(
+    ceiling, ceiling, ceiling_length=4.75, plenum_height=0.43,
+    attenuation_source=[0.5] * 7, attenuation_receiving=[0.5] * 7,
+)
+
+# Referido al tabique en lugar de al techo (Ec. (9.13)):
+print(partition_referenced_reduction_index(res.reduction_index, 2.7, 4.75))
+```
+
+**La magnitud medida.** Un techo no se valora por $R_{cl}$ sino por la
+**diferencia de niveles normalizada del techo suspendido** $D_{n,c} = D - 10\lg(A/A_0)$
+(ISO 140-9:1985, apartado 3.3), con $A$ el área de absorción acústica
+equivalente del recinto receptor y la referencia $A_0 = 10\ \text{m}^2$. La
+instalación tiene dos recintos de al menos 50 m³ cuyos volúmenes difieren en al
+menos un 10 %, un tabique divisorio adelgazado a 100 mm como máximo en su parte
+superior y un plenum de 650 mm a 760 mm de profundidad con una pared lateral y
+las dos testeras revestidas; la norma imprime la absorción exigida al
+revestimiento, $\alpha_s \ge 0{,}65$ a 125 Hz y $\ge 0{,}80$ de 250 Hz a
+4000 Hz, y exige $\alpha < 0{,}10$ en la otra pared lateral y en el techo del
+plenum. Su equivalente norteamericana, ASTM E1414, usa
+$A_0 = 12\ \text{m}^2$, de modo que un valor ASTM queda unos
+$10\lg(12/10) = 0{,}79$ dB por encima para los mismos recintos.
+
+ISO valora $D_{n,c}$ con la curva de ISO 717-1, dando $D_{n,c,w}$; ASTM E1414
+lo valora a través de ASTM E413 como **clase de atenuación de techo**. E413
+redondea los datos al entero más próximo (apartado 5.2), eleva su curva de
+referencia en pasos de 1 dB mientras la suma de las deficiencias no supere
+32 dB y ninguna deficiencia individual pase de 8 dB (apartados 5.3 y 5.4), y
+lee la valoración sobre la curva desplazada a 500 Hz (apartado 5.5).
+
+```python
+from phonometry import (
+    ceiling_attenuation_class,
+    normalized_ceiling_attenuation,
+    weighted_rating,
+)
+
+# ASTM E1414 normaliza a A0 = 12 m2, ISO 140-9 a A0 = 10 m2.
+dnc = normalized_ceiling_attenuation(l1, l2, absorption, reference_area=12.0)
+
+# Una placa acústica de yeso perforada de 28 mm, medida según ASTM E1414 (CAC 34).
+dnc = [14.4, 18.6, 21.7, 24.1, 23.4, 30.3, 33.7, 35.2,
+       41.6, 44.2, 42.1, 36.8, 35.7, 36.0, 36.9, 37.9]
+res = ceiling_attenuation_class(dnc)
+print(res.rating, res.deficiency_sum, res.max_deficiency)   # 34; 27,0; 7,0
+res.plot()                                                  # Dn,c frente a la curva
+
+# El número único ISO del mismo espectro, trasladado a A0 = 10 m2:
+iso = [v - 0.79 for v in dnc]
+print(weighted_rating(iso).rating)                          # Dn,c,w
+```
+
 ## Informes de transmisión por flancos ISO 10848 (`.report()`)
 
 Cada uno de los tres resultados genera una ficha PDF de una página.
@@ -311,6 +448,22 @@ no contiene ejemplo numérico resuelto, la conformidad se ancla en
 identidades de forma cerrada ($K_{ij}$ simplificado, $a_j$ en
 $f_\text{ref}$, $\eta$).
 
+La rama de techos suspendidos cubre la atenuación normalizada del
+techo $D_{n,c}$ del apartado 3.3 de ISO 140-9:1985, la clase de
+atenuación de techo de ASTM E413-22 que invoca ASTM E1414 y el modelo
+unidimensional de plenum de la Sección 9.2.3 de Vigran, con
+`building.normalized_ceiling_attenuation`,
+`building.ceiling_attenuation_class`,
+`building.plenum_flanking_reduction_index` y
+`building.partition_referenced_reduction_index`. El modelo de plenum
+no tiene salida numérica publicada propia, así que se ancla en sus
+formas cerradas y en las propiedades estructurales que una lectura errónea
+rompe: la monotonía con el amortiguamiento del plenum, la cota
+$\tau_{cl} \le 1$ y la convergencia de la Ec. (9.18) a la Ec. (9.20);
+la cadena de medición y la clase se anclan en informes de laboratorio
+acreditados ASTM E1414. La constante de propagación $k'$ de un
+conducto revestido es aquí un dato de entrada, no una predicción.
+
 ## Véase también
 
 - [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/):
@@ -326,4 +479,7 @@ $f_\text{ref}$, $\eta$).
   los motores de curva de referencia tras Dn,f,w y Ln,f,w.
 - [Teoría](/phonometry/es/reference/theory/rooms-buildings/): las fórmulas
   de flancos en la derivación de EN 12354.
-- Referencia de la API: [`building.flanking_transmission`](/phonometry/es/reference/api/building/flanking-transmission/).
+- [Acústica de recintos y espacios diáfanos](/phonometry/es/guides/open-plan-acoustics/): el contexto de oficina
+  diáfana en el que suele aparecer el trayecto por el techo.
+- Referencia de la API: [`building.flanking_transmission`](/phonometry/es/reference/api/building/flanking-transmission/)
+  y [`building.ceiling_plenum`](/phonometry/es/reference/api/building/ceiling-plenum/).

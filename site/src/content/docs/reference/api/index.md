@@ -96,6 +96,9 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | :--- | :--- |
 | [`building.insulation`](/phonometry/reference/api/building/insulation/) | Field airborne sound insulation (ISO 16283-1:2014) and impact sound insulation (ISO 16283-2), with single-number weighted ratings and spectrum adaptation terms (ISO 717-1 airborne, ISO 717-2 impact). |
 | [`building.panel_transmission`](/phonometry/reference/api/building/panel-transmission/) | Predicted airborne sound reduction index of panels (Bies, Hansen & Howard 2017, Engineering Noise Control 5e, Section 7.2; Sharp 1973). |
+| [`building.masonry_cavity_wall`](/phonometry/reference/api/building/masonry-cavity-wall/) | Wall ties in masonry cavity walls: the structural bridge across the cavity (Hopkins 2007, Sections 3.11.3.2 and 4.3.5.4.1). |
+| [`building.heavy_impact`](/phonometry/reference/api/building/heavy-impact/) | Heavy and soft impact sources: rubber ball and bang machine (ISO 16283-2:2020 Annex A, ISO 10140-5:2010 Annex F, JIS A 1418-2:2019, ISO 717-2:2020 Annex D). |
+| [`building.ceiling_plenum`](/phonometry/reference/api/building/ceiling-plenum/) | Suspended-ceiling plenum flanking path (Vigran 9.2.3 after Mechel 1980; ISO 140-9 / ISO 10848-2; ASTM E1414 / ASTM E413). |
 | [`building.aperture_transmission`](/phonometry/reference/api/building/aperture-transmission/) | Sound transmission through slits, holes and apertures (Hopkins 2007, Sound Insulation, Section 4.3.10; Gomperts 1964; Wilson & Soroka 1965). |
 | [`building.lab_insulation`](/phonometry/reference/api/building/lab-insulation/) | Laboratory sound insulation of building elements (ISO 10140). |
 | [`building.survey_insulation`](/phonometry/reference/api/building/survey-insulation/) | Field survey method for sound insulation and service-equipment noise (ISO 10052:2021). |

@@ -9,7 +9,7 @@ head:
     attrs:
       type: application/ld+json
     content: |
-      {"@context":"https://schema.org","@type":"Dataset","@id":"https://jmrplens.github.io/phonometry/reference/conformance/#dataset","name":"phonometry numerical conformance report","description":"501 numerical conformance checks pinning each implemented acoustic metric to a clause, table or worked example of the governing standard, with the normative expected value, the value phonometry computes, the delta and a pass/fail verdict, across 55 domains and 338 standards. Regenerated and enforced by CI on every pull request.","url":"https://jmrplens.github.io/phonometry/reference/conformance/","inLanguage":"en","license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"creator":{"@id":"https://jmrp.io/#person"},"publisher":{"@id":"https://jmrp.io/#person"},"about":{"@id":"https://github.com/jmrplens/phonometry#software"},"measurementTechnique":"Comparison of computed values against the normative expected values published in the governing standards (tolerance tables and worked examples).","variableMeasured":[{"@type":"PropertyValue","name":"Standard","description":"Governing standard and clause or table"},{"@type":"PropertyValue","name":"Quantity","description":"Acoustic quantity under test"},{"@type":"PropertyValue","name":"Expected","description":"Normative value published in the standard"},{"@type":"PropertyValue","name":"Computed","description":"Value computed by phonometry"},{"@type":"PropertyValue","name":"Delta","description":"Signed difference between computed and expected"},{"@type":"PropertyValue","name":"Status","description":"Pass or fail verdict against the standard's tolerance"}],"distribution":{"@type":"DataDownload","encodingFormat":"text/markdown","contentUrl":"https://raw.githubusercontent.com/jmrplens/phonometry/main/docs/CONFORMANCE.md"},"isBasedOn":"https://github.com/jmrplens/phonometry/blob/main/scripts/conformance_report.py","identifier":{"@type":"PropertyValue","propertyID":"DOI","value":"10.5281/zenodo.21215280"}}
+      {"@context":"https://schema.org","@type":"Dataset","@id":"https://jmrplens.github.io/phonometry/reference/conformance/#dataset","name":"phonometry numerical conformance report","description":"509 numerical conformance checks pinning each implemented acoustic metric to a clause, table or worked example of the governing standard, with the normative expected value, the value phonometry computes, the delta and a pass/fail verdict, across 55 domains and 344 standards. Regenerated and enforced by CI on every pull request.","url":"https://jmrplens.github.io/phonometry/reference/conformance/","inLanguage":"en","license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"creator":{"@id":"https://jmrp.io/#person"},"publisher":{"@id":"https://jmrp.io/#person"},"about":{"@id":"https://github.com/jmrplens/phonometry#software"},"measurementTechnique":"Comparison of computed values against the normative expected values published in the governing standards (tolerance tables and worked examples).","variableMeasured":[{"@type":"PropertyValue","name":"Standard","description":"Governing standard and clause or table"},{"@type":"PropertyValue","name":"Quantity","description":"Acoustic quantity under test"},{"@type":"PropertyValue","name":"Expected","description":"Normative value published in the standard"},{"@type":"PropertyValue","name":"Computed","description":"Value computed by phonometry"},{"@type":"PropertyValue","name":"Delta","description":"Signed difference between computed and expected"},{"@type":"PropertyValue","name":"Status","description":"Pass or fail verdict against the standard's tolerance"}],"distribution":{"@type":"DataDownload","encodingFormat":"text/markdown","contentUrl":"https://raw.githubusercontent.com/jmrplens/phonometry/main/docs/CONFORMANCE.md"},"isBasedOn":"https://github.com/jmrplens/phonometry/blob/main/scripts/conformance_report.py","identifier":{"@type":"PropertyValue","propertyID":"DOI","value":"10.5281/zenodo.21215280"}}
 ---
 
 phonometry's key differentiator is not the feature list but the proof behind
@@ -66,7 +66,7 @@ with its evidence and what the library does about it, is recorded in the
 
 ## Numerical conformance report
 
-&#9989; **501/501 conformance checks pass** across 55 domains and 338 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+&#9989; **509/509 conformance checks pass** across 55 domains and 344 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
 
@@ -132,7 +132,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary>&#9989; <b>Room &amp; building acoustics</b>: 100% (60/60)</summary>
+<summary>&#9989; <b>Room &amp; building acoustics</b>: 100% (68/68)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
@@ -172,6 +172,14 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ISO 7626-1:2011 Table 1 / 3.1.2 | Closed-form SDOF driving-point mobility peak mag(Y(f0)) = 1/c  (c=5 N·s/m) | 0.2 m/(N·s) (+/-0.000001 m/(N·s)) | 0.2 m/(N·s) | 0 m/(N·s) | &#9989; |
 | ISO 7626-1:2011 Table 1 / 3.1.2 | Closed-form SDOF static receptance H(0) = 1/k  (k=8000 N/m) | 0.000125 m/N (+/-0.0001%) | 0.000125 m/N | 0 m/N | &#9989; |
 | ISO 7626-1:2011 Table 1 | FRF reciprocity: impedance × mobility = 1  (at 37 Hz) | 1 (= Z·Y) | 1 | 0 | &#9989; |
+| ISO 717-2:2020 Table D.4 | A-weighted maximum impact level LiA,Fmax of the Annex D worked example | 55,350 66... dB (rated 55 dB) | 55.350668 dB | 0 dB | &#9989; |
+| ISO 16283-2:2020 Table A.1 / JIS A 1418-2:2019 Table A.2 | Rubber-ball impact force exposure level LFE, five octave bands | 39,0 / 31,0 / 23,0 / 17,0 / 12,5 dB re 1 N at 31,5 to 500 Hz | 39 / 31 / 23 / 17 / 12,5 dB re 1 N | max \|dev\| 0.000 dB | &#9989; |
+| ISO 16283-2:2020 Formulae (4), (5), (6) | Standardized maximum impact level reduces to 10 lg(V/V0) at T = T0 | 73,0103 dB (= 70 + 10 lg(100/50)) | 73.0103 dB | 0 dB | &#9989; |
+| ASTM E413-22 clause 5 (ASTM E1414 CAC) | Ceiling attenuation class of two accredited E1414 test reports | CAC 34 (ALA 16-091-4); CAC 25, sum 24 dB (Intertek J7488.04) | CAC 34; CAC 25, sum 24.0 dB | exact | &#9989; |
+| ISO 140-9:1985 clause 3.3 | Normalized ceiling attenuation Dn,c = D - 10 lg(A/A0), A0 = 10 m2 | 43.0103 dB (+/-0 dB) | 43.0103 dB | 0 dB | &#9989; |
+| Vigran (2008) Eqs. (9.18)-(9.20) | Plenum model: Eq. (9.18) converges to Eq. (9.20) as the damping vanishes | Eq. (9.20) value, reproduced by Eq. (9.18) | 139.5682 dB | 0 dB | &#9989; |
+| Hopkins (2007) Eq. 4.89 / Fig. 4.35 | Mass-spring-mass resonance of a masonry cavity wall without and with ties | 26 Hz (no ties) / 50 Hz (2,5 ties/m2, k = 2 MN/m) | 26.15 Hz / 49.93 Hz | +0.15 / -0.07 Hz | &#9989; |
+| Hopkins (2007) Table A4 | Dynamic stiffness of four wall ties (butterfly, double-triangle, twist) | 1,7 / 16,1 / 94,0 MN/m at 50 mm; 43,4 MN/m at 100 mm | 1.7 / 16.1 / 94 / 43.4 MN/m | exact | &#9989; |
 | ISO 10846-2:2008 3.17 | Transfer-stiffness level Lk = 20 lg(\|k\|/k0), k0 = 1 N/m  (\|k\| = 1 MN/m) | 120 dB (+/-0 dB) | 120 dB | 0 dB | &#9989; |
 | ISO 10846-3:2002 Formula (1) | Indirect method k2,1 = -(2πf)²·m2·T  (f=500 Hz, m2=10 kg, T=0,01) | -986960.4 N/m (+/-0.1%) | -986960.4 N/m | 0 N/m | &#9989; |
 | ISO 10846-1:2008 Table A.2 | FRF relation k = jω·Z at 250 Hz  (\|k\| recovered from impedance) | 1001249.2 N/m (+/-0.0001%) | 1001249.2 N/m | 0 N/m | &#9989; |

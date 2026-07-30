@@ -2374,6 +2374,193 @@ def _chk_iso7626_reciprocity() -> Outcome:
     return numeric(1.0, abs(z * y), 1e-9, expected_label="1 (= Z·Y)")
 
 
+
+# --- Heavy and soft impact sources (ISO 16283-2 / JIS A 1418-2 / ISO 717-2) ---
+#: ISO 717-2:2020 Table D.4 (printed p. 22): a field measurement in octave
+#: bands, Li,Fmax at 63/125/250/500 Hz, rated LiA,Fmax = 55,350 66... = 55 dB.
+_ISO717_2_D4_LEVELS = (65.3, 64.5, 58.0, 55.8)
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 717-2:2020 Table D.4",
+    "A-weighted maximum impact level LiA,Fmax of the Annex D worked example",
+)
+def _chk_iso717_2_annex_d_rating() -> Outcome:
+    res = ph.a_weighted_maximum_impact_level(_ISO717_2_D4_LEVELS)
+    return numeric(
+        55.350_667, res.unrounded, 1e-4, unit="dB", places=6,
+        expected_label="55,350 66... dB (rated 55 dB)",
+    ) if res.rating == 55 else Outcome(
+        expected="55,350 66... dB (rated 55 dB)",
+        computed=f"{res.unrounded:.6f} dB (rated {res.rating} dB)",
+        delta=f"{res.unrounded - 55.350_667:+.3f} dB",
+        passed=False,
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 16283-2:2020 Table A.1 / JIS A 1418-2:2019 Table A.2",
+    "Rubber-ball impact force exposure level LFE, five octave bands",
+)
+def _chk_iso16283_2_rubber_ball_spectrum() -> Outcome:
+    # ISO 16283-2 Table A.1, ISO 10140-5 Table F.1 and JIS A 1418-2 Table A.2
+    # print the same five values; the tolerance band is +/-1,0 / 1,5 / 1,5 /
+    # 2,0 / 2,0 dB, and a source on the nominal must conform in every band.
+    freqs, lower, upper = ph.heavy_impact_source_limits("rubber_ball")
+    nominal = 0.5 * (lower + upper)
+    check = ph.check_heavy_impact_source(nominal)
+    printed = "39,0 / 31,0 / 23,0 / 17,0 / 12,5 dB re 1 N"
+    return Outcome(
+        expected=f"{printed} at 31,5 to 500 Hz",
+        computed=" / ".join(f"{v:g}".replace(".", ",") for v in nominal) + " dB re 1 N",
+        delta=f"max |dev| {float(np.max(np.abs(check.deviation))):.3f} dB",
+        passed=bool(
+            check.passed
+            and np.allclose(freqs, ph.HEAVY_IMPACT_OCTAVE_BANDS)
+            and np.allclose(upper - lower, [2.0, 3.0, 3.0, 4.0, 4.0])
+        ),
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 16283-2:2020 Formulae (4), (5), (6)",
+    "Standardized maximum impact level reduces to 10 lg(V/V0) at T = T0",
+)
+def _chk_iso16283_2_standardization_identity() -> Outcome:
+    # Li,Fmax = 70 dB in a 100 m3 room at the reference T0 = 0,5 s: the Fast
+    # correction term is identically zero, leaving 10 lg(100/50) = 3,0103 dB.
+    res = ph.standardized_maximum_impact_level([70.0], 100.0, 0.5)
+    return numeric(
+        70.0 + 10.0 * math.log10(2.0), float(res.standardized[0]), 1e-9,
+        unit="dB", places=6,
+        expected_label="73,0103 dB (= 70 + 10 lg(100/50))",
+    )
+
+
+# --- Suspended-ceiling plenum flanking (ASTM E1414/E413, ISO 140-9, Vigran) ---
+#: Acoustic Laboratories Australia report ALA 16-091-4 (2016), tested to
+#: ASTM E1414/E1414M-11a: the printed one-third-octave Dn,c of a 28 mm plaster
+#: acoustic tile, 125 Hz to 4 kHz, rated CAC 34 in the report.
+_ALA_DNC = (
+    14.4, 18.6, 21.7, 24.1, 23.4, 30.3, 33.7, 35.2,
+    41.6, 44.2, 42.1, 36.8, 35.7, 36.0, 36.9, 37.9,
+)
+#: Intertek report J7488.04-113-11-R0 (2019), tested to ASTM E1414: printed
+#: Dn,c of ceiling planks, rated CAC 25 with a sum of deficiencies of 24 dB.
+_INTERTEK_DNC = (8, 13, 15, 15, 19, 23, 24, 21, 23, 26, 26, 27, 29, 32, 34, 36)
+
+
+@register(
+    "Room & building acoustics",
+    "ASTM E413-22 clause 5 (ASTM E1414 CAC)",
+    "Ceiling attenuation class of two accredited E1414 test reports",
+)
+def _chk_astm_e413_cac() -> Outcome:
+    ala = ph.ceiling_attenuation_class(_ALA_DNC)
+    intertek = ph.ceiling_attenuation_class(_INTERTEK_DNC)
+    ok = (
+        ala.rating == 34
+        and intertek.rating == 25
+        and abs(intertek.deficiency_sum - 24.0) < 1e-9
+    )
+    return Outcome(
+        expected="CAC 34 (ALA 16-091-4); CAC 25, sum 24 dB (Intertek J7488.04)",
+        computed=(
+            f"CAC {ala.rating}; CAC {intertek.rating}, "
+            f"sum {intertek.deficiency_sum:.1f} dB"
+        ),
+        delta="exact",
+        passed=ok,
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 140-9:1985 clause 3.3",
+    "Normalized ceiling attenuation Dn,c = D - 10 lg(A/A0), A0 = 10 m2",
+)
+def _chk_iso140_9_normalization() -> Outcome:
+    dnc = ph.normalized_ceiling_attenuation([90.0], [50.0], 5.0)
+    return numeric(40.0 + 10.0 * math.log10(2.0), float(dnc[0]), 1e-9, unit="dB")
+
+
+@register(
+    "Room & building acoustics",
+    "Vigran (2008) Eqs. (9.18)-(9.20)",
+    "Plenum model: Eq. (9.18) converges to Eq. (9.20) as the damping vanishes",
+)
+def _chk_vigran_plenum_convergence() -> Outcome:
+    # Vigran prints the geometry of his own example (LS = LR = 4,75 m,
+    # h = 0,43 m, eps = 2) but no numeric output anywhere in Section 9.2.3, so
+    # the check is structural rather than a transcribed value: the full
+    # attenuated form of Eq. (9.18) has to reproduce its own small-attenuation
+    # limit, Eq. (9.20). That fails outright on the printed reading of the
+    # receiving-side coefficient (see docs/ERRATA.md).
+    undamped = ph.plenum_flanking_reduction_index(
+        [50.0], [100.0], ceiling_length=4.75, plenum_height=0.43
+    )
+    attenuated = ph.plenum_flanking_reduction_index(
+        [50.0], [100.0], ceiling_length=4.75, plenum_height=0.43,
+        attenuation_source=[1e-5], attenuation_receiving=[1e-5],
+    )
+    return numeric(
+        float(undamped.reduction_index[0]),
+        float(attenuated.reduction_index[0]),
+        1e-3, unit="dB", places=4,
+        expected_label="Eq. (9.20) value, reproduced by Eq. (9.18)",
+    )
+
+
+# --- Masonry cavity-wall ties (Hopkins 2007) ---
+@register(
+    "Room & building acoustics",
+    "Hopkins (2007) Eq. 4.89 / Fig. 4.35",
+    "Mass-spring-mass resonance of a masonry cavity wall without and with ties",
+)
+def _chk_hopkins_wall_tie_resonance() -> Outcome:
+    # Fig. 4.35: two 140 kg/m2 leaves, empty 75 mm cavity, then 2,5 ties/m2 of
+    # s_75mm = 2e6 N/m. The caption prints fmsm = 26 Hz and fmsm = 50 Hz.
+    ties = ph.wall_tie_stiffness_per_area(2.5, 2.0e6)
+    untied = ph.mass_spring_mass_resonance(140.0, 140.0, 0.075)
+    tied = ph.mass_spring_mass_resonance(
+        140.0, 140.0, 0.075, tie_stiffness_per_area=ties
+    )
+    ok = round(untied) == 26 and round(tied) == 50
+    return Outcome(
+        expected="26 Hz (no ties) / 50 Hz (2,5 ties/m2, k = 2 MN/m)",
+        computed=f"{untied:.2f} Hz / {tied:.2f} Hz",
+        delta=f"{untied - 26.0:+.2f} / {tied - 50.0:+.2f} Hz",
+        passed=ok,
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "Hopkins (2007) Table A4",
+    "Dynamic stiffness of four wall ties (butterfly, double-triangle, twist)",
+)
+def _chk_hopkins_wall_tie_table() -> Outcome:
+    printed = {
+        "butterfly": (0.050, 1.7e6),
+        "double_triangle": (0.050, 16.1e6),
+        "vertical_twist": (0.050, 94.0e6),
+        "vertical_twist_100mm": (0.100, 43.4e6),
+    }
+    computed = {name: ph.wall_tie_stiffness(name) for name in printed}
+    ok = all(
+        abs(computed[n][0] - x) < 1e-12 and abs(computed[n][1] - k) < 1e-3
+        for n, (x, k) in printed.items()
+    )
+    return Outcome(
+        expected="1,7 / 16,1 / 94,0 MN/m at 50 mm; 43,4 MN/m at 100 mm",
+        computed=" / ".join(f"{computed[n][1] / 1e6:g}" for n in printed) + " MN/m",
+        delta="exact",
+        passed=ok,
+    )
+
 # --- Dynamic transfer stiffness of resilient elements (ISO 10846) ---
 @register(
     "Room & building acoustics",

@@ -179,6 +179,7 @@ export const sidebar = [
           'guides/insulation-intensity',
           'guides/insulation-survey',
           'guides/flanking-lab',
+          'guides/heavy-impact-sources',
           'guides/insulation-ratings',
           'guides/facade-insulation',
           'guides/spanish-building-code',

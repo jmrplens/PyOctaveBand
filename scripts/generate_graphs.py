@@ -423,6 +423,48 @@ _ES_EXACT = {
     "Improvement of impact sound insulation [dB]":
         "Mejora del aislamiento a impactos [dB]",
     "delta-L (improvement)": "delta-L (mejora)",
+    # heavy_impact_sources figure (ISO 16283-2 / JIS A 1418-2 / ISO 717-2)
+    "Standard heavy impact sources\n(ISO 16283-2 Table A.1, JIS A 1418-2 Tables A.1/A.2)":
+        "Fuentes de impacto pesadas normalizadas\n(ISO 16283-2 Tabla A.1, "
+        "JIS A 1418-2 Tablas A.1/A.2)",
+    "Impact force exposure level LFE [dB re 1 N]":
+        "Nivel de exposición a la fuerza de impacto LFE [dB re 1 N]",
+    "rubber ball tolerance": "tolerancia de la pelota de caucho",
+    "rubber ball nominal": "pelota de caucho nominal",
+    "bang machine tolerance": "tolerancia de la máquina de neumático",
+    "bang machine nominal": "máquina de neumático nominal",
+    "A-weighted heavy-impact rating\n(ISO 717-2 Annex D, Table D.4 worked example)":
+        "Índice de impacto pesado ponderado A\n(ISO 717-2 Anexo D, ejemplo de "
+        "la Tabla D.4)",
+    "Maximum impact sound pressure level [dB]":
+        "Nivel máximo de presión acústica de impactos [dB]",
+    "Li,Fmax (measured)": "Li,Fmax (medido)",
+    "Li,Fmax + A (Table D.3)": "Li,Fmax + A (Tabla D.3)",
+    # ceiling_plenum_flanking figure (Vigran 9.2.3 / ASTM E1414 / ASTM E413)
+    "Suspended-ceiling plenum path\n(one-dimensional model, LR = 4.75 m, reflecting sidewalls)":
+        "Trayecto por plenum de techo suspendido\n(modelo unidimensional, "
+        "LR = 4.75 m, paredes laterales reflectantes)",
+    "RS + RR (two ceilings)": "RS + RR (dos techos)",
+    "Ceiling attenuation class\n(ASTM E1414/E413, CAC = 34 dB)":
+        "Clase de atenuación de techo\n(ASTM E1414/E413, CAC = 34 dB)",
+    "Normalized ceiling attenuation Dn,c [dB]":
+        "Diferencia de niveles normalizada del techo Dn,c [dB]",
+    "Dn,c (measured)": "Dn,c (medido)",
+    "ASTM E413 contour, fitted": "curva ASTM E413 ajustada",
+    "deficiencies": "deficiencias",
+    # masonry_wall_ties figure (Hopkins 3.11.3.2 / 4.3.5.4.1)
+    "Wall-tie structure-borne coupling\n(point-connection model, 2.5 ties/m2)":
+        "Acoplamiento estructural por llaves de muro\n(modelo de unión puntual, "
+        "2.5 llaves/m2)",
+    "Coupling loss factor eta_ij": "Factor de pérdidas por acoplamiento eta_ij",
+    "rigid connection (Yc = 0)": "unión rígida (Yc = 0)",
+    "Ties stiffen the cavity\n(140 kg/m2 leaves, 75 mm cavity, 2.5 ties/m2)":
+        "Las llaves rigidizan la cámara\n(hojas de 140 kg/m2, cámara de 75 mm, "
+        "2.5 llaves/m2)",
+    "cavity wall, no ties": "muro con cámara, sin llaves",
+    "2.5 ties/m2, k = 2 MN/m": "2,5 llaves/m2, k = 2 MN/m",
+    "combined-mass range added by the ties":
+        "rango de masa combinada añadido por las llaves",
     # flanking_transmission figure (ISO 10848)
     "ISO 10848 Junction Vibration Reduction Index":
         "Índice de reducción de vibraciones de unión (ISO 10848)",
@@ -1675,6 +1717,13 @@ _ES_EXACT = {
 }
 
 _ES_PATTERNS = [
+    # masonry_wall_ties legend entries (tie name + baked-in Table A4 stiffness).
+    (r"^butterfly \((.+) MN/m\)$", r"mariposa (\1 MN/m)"),
+    (r"^double triangle \((.+) MN/m\)$", r"doble triángulo (\1 MN/m)"),
+    (r"^vertical twist \((.+) MN/m\)$", r"torsión vertical (\1 MN/m)"),
+    # heavy_impact_sources info box (baked-in ISO 717-2 Table D.4 sum).
+    (r"^unrounded sum = (\d+)\.(\d+) dB$",
+     r"suma sin redondear = \1,\2 dB"),
     # experimental_sea_clf info box (baked-in input power).
     ((r"^platform driven, cylinder driven only through the joints\n"
       r"input power = (.+) W\n"
@@ -7138,6 +7187,231 @@ def generate_floor_covering_improvement(output_dir: str) -> None:
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "floor_covering_improvement.png")
+    plt.close()
+
+
+
+def generate_heavy_impact_sources(output_dir: str) -> None:
+    """Rubber-ball and bang-machine LFE spectra with their printed tolerances."""
+    print("Generating heavy_impact_sources...")
+    from phonometry import (
+        a_weighted_maximum_impact_level,
+        heavy_impact_source_limits,
+        heavy_impact_source_specification,
+    )
+
+    _fig, (ax_src, ax_rate) = plt.subplots(1, 2, figsize=(13.0, 5.6))
+
+    x = np.arange(5)
+    for source, colour in (
+        ("rubber_ball", COLOR_PRIMARY), ("bang_machine", COLOR_SECONDARY)
+    ):
+        spec = heavy_impact_source_specification(source)
+        _f, lower, upper = heavy_impact_source_limits(source)
+        label = source.replace("_", " ")
+        ax_src.fill_between(x, lower, upper, color=colour, alpha=0.30, zorder=1,
+                            label=f"{label} tolerance")
+        ax_src.plot(x, spec.force_exposure_level, "-o", color=colour, linewidth=2.4,
+                    markersize=7, zorder=4, label=f"{label} nominal")
+    ax_src.set_xticks(x)
+    ax_src.set_xticklabels(["31.5", "63", "125", "250", "500"])
+    ax_src.set_xlabel(LABEL_FREQ_HZ)
+    ax_src.set_ylabel("Impact force exposure level LFE [dB re 1 N]")
+    ax_src.set_title("Standard heavy impact sources\n(ISO 16283-2 Table A.1, "
+                     "JIS A 1418-2 Tables A.1/A.2)", fontweight="bold", pad=10)
+    ax_src.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax_src.set_axisbelow(True)
+    ax_src.legend(loc="upper right", fontsize=9)
+
+    # ISO 717-2:2020 Table D.4: a field measurement in octave bands.
+    levels = [65.3, 64.5, 58.0, 55.8]
+    res = a_weighted_maximum_impact_level(levels)
+    xr = np.arange(4)
+    ax_rate.bar(xr - 0.19, res.levels, width=0.36, color=COLOR_PRIMARY,
+                label="Li,Fmax (measured)", zorder=3)
+    ax_rate.bar(xr + 0.19, res.corrected, width=0.36, color=COLOR_TERTIARY,
+                label="Li,Fmax + A (Table D.3)", zorder=3)
+    ax_rate.axhline(res.rating, color=COLOR_SECONDARY, linewidth=2.0, zorder=4,
+                    label=f"LiA,Fmax = {res.rating} dB")
+    ax_rate.set_xticks(xr)
+    ax_rate.set_xticklabels(["63", "125", "250", "500"])
+    ax_rate.set_xlabel(LABEL_FREQ_HZ)
+    ax_rate.set_ylabel("Maximum impact sound pressure level [dB]")
+    ax_rate.set_title("A-weighted heavy-impact rating\n(ISO 717-2 Annex D, "
+                      "Table D.4 worked example)", fontweight="bold", pad=10)
+    ax_rate.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax_rate.set_axisbelow(True)
+    ax_rate.legend(loc="upper right", fontsize=9)
+    ax_rate.text(
+        0.02, 0.03,
+        f"unrounded sum = {res.unrounded:.6f} dB",
+        transform=ax_rate.transAxes, va="bottom", ha="left", fontsize=10,
+        color=COLOR_FG,
+        bbox={"boxstyle": "round,pad=0.4", "facecolor": COLOR_PANEL,
+              "edgecolor": COLOR_GRID},
+    )
+
+    plt.tight_layout()
+    save_figure(output_dir, "heavy_impact_sources.png")
+    plt.close()
+
+
+def generate_ceiling_plenum_flanking(output_dir: str) -> None:
+    """Ceiling/plenum flanking path Rcl and the CAC of an accredited report."""
+    print("Generating ceiling_plenum_flanking...")
+    from phonometry import (
+        ceiling_attenuation_class,
+        plenum_flanking_reduction_index,
+    )
+
+    _fig, (ax_path, ax_cac) = plt.subplots(1, 2, figsize=(13.0, 5.6))
+
+    # Vigran Figs. 9.11-9.13 geometry: LS = LR = 4,75 m, plenum h = 0,43 m,
+    # 9,5 mm plasterboard ceiling, reflecting plenum sidewalls.
+    freqs = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+    ceiling = np.array([17.0, 21.0, 25.0, 29.0, 32.0, 30.0, 38.0])
+    x = np.arange(freqs.size)
+    for depth, colour, style in (
+        (0.43, COLOR_PRIMARY, "-"), (0.86, COLOR_TERTIARY, "--")
+    ):
+        res = plenum_flanking_reduction_index(
+            ceiling, ceiling, ceiling_length=4.75, plenum_height=depth,
+            frequency=freqs,
+        )
+        ax_path.plot(x, res.reduction_index, style, color=colour, linewidth=2.4,
+                     marker="o", markersize=6, zorder=4,
+                     label=f"Rcl, plenum h = {depth:g} m")
+    ax_path.plot(x, 2.0 * ceiling, ":", color=COLOR_SECONDARY, linewidth=2.0,
+                 marker="s", markersize=5, zorder=3, label="RS + RR (two ceilings)")
+    ax_path.set_xticks(x)
+    ax_path.set_xticklabels(["63", "125", "250", "500", "1k", "2k", "4k"])
+    ax_path.set_xlabel(LABEL_FREQ_HZ)
+    ax_path.set_ylabel("Sound reduction index [dB]")
+    ax_path.set_title("Suspended-ceiling plenum path\n(one-dimensional model, "
+                      "LR = 4.75 m, reflecting sidewalls)",
+                      fontweight="bold", pad=10)
+    ax_path.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax_path.set_axisbelow(True)
+    ax_path.legend(loc="upper left", fontsize=9)
+
+    # ALA 16-091-4 (2016), tested to ASTM E1414/E1414M-11a: CAC 34.
+    dnc = np.array([14.4, 18.6, 21.7, 24.1, 23.4, 30.3, 33.7, 35.2,
+                    41.6, 44.2, 42.1, 36.8, 35.7, 36.0, 36.9, 37.9])
+    cac = ceiling_attenuation_class(dnc)
+    xc = np.arange(dnc.size)
+    ax_cac.fill_between(xc, cac.measured, cac.shifted_reference,
+                        where=(cac.measured < cac.shifted_reference).tolist(),
+                        color=COLOR_SECONDARY, alpha=0.25, interpolate=True,
+                        zorder=1, label="deficiencies")
+    ax_cac.plot(xc, cac.measured, "-o", color=COLOR_PRIMARY, linewidth=2.4,
+                markersize=6, zorder=4, label="Dn,c (measured)")
+    ax_cac.plot(xc, cac.shifted_reference, "--s", color=COLOR_TERTIARY,
+                linewidth=2.0, markersize=5, zorder=3,
+                label="ASTM E413 contour, fitted")
+    ax_cac.set_xticks(xc[::2])
+    ax_cac.set_xticklabels(["125", "200", "315", "500", "800", "1.25k",
+                            "2k", "3.15k"], rotation=45, fontsize=8)
+    ax_cac.set_xlabel(LABEL_FREQ_HZ)
+    ax_cac.set_ylabel("Normalized ceiling attenuation Dn,c [dB]")
+    ax_cac.set_title(f"Ceiling attenuation class\n(ASTM E1414/E413, "
+                     f"CAC = {cac.rating} dB)", fontweight="bold", pad=10)
+    ax_cac.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax_cac.set_axisbelow(True)
+    ax_cac.legend(loc="upper left", fontsize=9)
+
+    plt.tight_layout()
+    save_figure(output_dir, "ceiling_plenum_flanking.png")
+    plt.close()
+
+
+def generate_masonry_wall_ties(output_dir: str) -> None:
+    """Wall-tie coupling loss factor and the resonance shift it causes."""
+    print("Generating masonry_wall_ties...")
+    from phonometry import (
+        double_wall_transmission_loss,
+        wall_tie_coupling_loss_factor,
+        wall_tie_stiffness,
+        wall_tie_stiffness_per_area,
+    )
+
+    _fig, (ax_clf, ax_tl) = plt.subplots(1, 2, figsize=(13.0, 5.6))
+
+    # Two 100 mm masonry leaves, 150 and 170 kg/m2 (Hopkins Fig. 5.30
+    # flanking-laboratory cavity wall), 2,5 ties per m2.
+    freq = np.logspace(np.log10(50.0), np.log10(5000.0), 200)
+    stiffness1 = 150.0 * 2000.0**2 * 0.1**2 / 12.0
+    stiffness2 = 170.0 * 2000.0**2 * 0.1**2 / 12.0
+    ties = ("butterfly", "double_triangle", "vertical_twist")
+    colours = (COLOR_PRIMARY, COLOR_TERTIARY, COLOR_SECONDARY)
+    for tie, colour in zip(ties, colours, strict=True):
+        clf = wall_tie_coupling_loss_factor(
+            freq, 150.0, 170.0, stiffness1, stiffness2,
+            ties_per_area=2.5, tie=tie,
+        )
+        label = f"{tie.replace('_', ' ')} ({wall_tie_stiffness(tie)[1] / 1e6:g} MN/m)"
+        ax_clf.loglog(freq, clf.coupling_loss_factor, color=colour, linewidth=2.4,
+                      zorder=4, label=label)
+    rigid = wall_tie_coupling_loss_factor(
+        freq, 150.0, 170.0, stiffness1, stiffness2, ties_per_area=2.5
+    )
+    ax_clf.loglog(freq, rigid.rigid_coupling_loss_factor, "--", color=COLOR_MUTED,
+                  linewidth=2.0, zorder=3, label="rigid connection (Yc = 0)")
+    ax_clf.set_xticks([50, 125, 250, 500, 1000, 2000, 4000])
+    ax_clf.set_xticklabels(["50", "125", "250", "500", "1k", "2k", "4k"])
+    ax_clf.set_xlim(50.0, 5000.0)
+    # Plain ASCII decade labels: the mathtext 10^-n exponent would put a
+    # U+2212 minus in the SVG, which not every reader's sans-serif font has.
+    ax_clf.set_yticks([1e-8, 1e-6, 1e-4, 1e-2, 1.0])
+    ax_clf.set_yticklabels(["1e-8", "1e-6", "1e-4", "1e-2", "1"])
+    ax_clf.set_ylim(1e-8, 2.0)
+    ax_clf.set_xlabel(LABEL_FREQ_HZ)
+    ax_clf.set_ylabel("Coupling loss factor eta_ij")
+    ax_clf.set_title("Wall-tie structure-borne coupling\n(point-connection model, "
+                     "2.5 ties/m2)", fontweight="bold", pad=10)
+    ax_clf.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax_clf.set_axisbelow(True)
+    ax_clf.legend(loc="lower left", fontsize=9)
+
+    # Hopkins Fig. 4.35: two 140 kg/m2 leaves, empty 75 mm cavity, 2,5 ties/m2
+    # of s_75mm = 2e6 N/m, which lifts fmsm from 26 Hz to 50 Hz.
+    bands = np.array([20.0, 25.0, 31.5, 40.0, 50.0, 63.0, 80.0, 100.0,
+                      125.0, 160.0, 200.0, 250.0, 315.0, 400.0, 500.0])
+    per_area = wall_tie_stiffness_per_area(2.5, 2.0e6)
+    plain = double_wall_transmission_loss(bands, 140.0, 140.0, 0.075)
+    tied = double_wall_transmission_loss(
+        bands, 140.0, 140.0, 0.075, tie_stiffness_per_area=per_area
+    )
+    xb = np.arange(bands.size)
+    ax_tl.plot(xb, plain.transmission_loss, "-o", color=COLOR_PRIMARY,
+               linewidth=2.4, markersize=6, zorder=4, label="cavity wall, no ties")
+    ax_tl.plot(xb, tied.transmission_loss, "--s", color=COLOR_SECONDARY,
+               linewidth=2.4, markersize=6, zorder=4, label="2.5 ties/m2, k = 2 MN/m")
+    positions = []
+    for curve, colour in ((plain, COLOR_PRIMARY), (tied, COLOR_SECONDARY)):
+        f0 = curve.resonance_frequency
+        assert f0 is not None
+        pos = float(np.interp(np.log10(f0), np.log10(bands), xb))
+        positions.append(pos)
+        ax_tl.axvline(pos, color=colour, linestyle=":", linewidth=1.8, zorder=2)
+        ax_tl.annotate(
+            f"fmsm = {f0:.0f} Hz", xy=(pos, 0.46),
+            xycoords=("data", "axes fraction"), ha="right" if positions[:1] else "left",
+            va="bottom", fontsize=9, color=colour, rotation=90,
+        )
+    ax_tl.axvspan(positions[0], positions[1], color=COLOR_SECONDARY, alpha=0.30,
+                  zorder=1, label="combined-mass range added by the ties")
+    ax_tl.set_xticks(xb[::2])
+    ax_tl.set_xticklabels(["20", "31.5", "50", "80", "125", "200", "315", "500"])
+    ax_tl.set_xlabel(LABEL_FREQ_HZ)
+    ax_tl.set_ylabel("Sound reduction index R [dB]")
+    ax_tl.set_title("Ties stiffen the cavity\n(140 kg/m2 leaves, 75 mm cavity, "
+                    "2.5 ties/m2)", fontweight="bold", pad=10)
+    ax_tl.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax_tl.set_axisbelow(True)
+    ax_tl.legend(loc="upper left", fontsize=9)
+
+    plt.tight_layout()
+    save_figure(output_dir, "masonry_wall_ties.png")
     plt.close()
 
 
@@ -13466,6 +13740,9 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_intensity_insulation,
     generate_survey_insulation,
     generate_floor_covering_improvement,
+    generate_heavy_impact_sources,
+    generate_ceiling_plenum_flanking,
+    generate_masonry_wall_ties,
     generate_flanking_transmission,
     generate_reverberation_models,
     generate_dynamic_stiffness,

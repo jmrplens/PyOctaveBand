@@ -1288,6 +1288,50 @@ to the issuing body, with date and reference).
 
 ---
 
+## Vigran, Building Acoustics (2008), Eq. (9.18) (receiving-side coefficient)
+
+- **Location:** Section 9.2.3.2, Eq. (9.18) (printed p. 339), the transmission
+  factor of the one-dimensional suspended-ceiling plenum model after
+  Mechel (1980).
+- **The print:** the denominator reads ``mS LS · mR LR h`` with the **unprimed**
+  ``mR``, while the exponent of the same expression carries the primed
+  ``m'R = mR + sR tauR / h`` of Eq. (9.17).
+- **The problem:** the two sides of the plenum are integrated the same way. The
+  receiving-side integral is
+  ``int_0^LR exp(-eps m'R x) dx = (1 - exp(-eps m'R LR)) / (eps m'R)``, so the
+  factor that normalises it must be ``m'R LR``, exactly as the source-side one
+  is ``mS LS``. Read literally, the printed expression is not a transmission
+  factor at all: it carries a spurious ``m'R / mR = 1 + sR tauR / (h mR)``, so
+  it grows without bound as the plenum damping falls. Two consequences are
+  visible with ordinary inputs (``LS = LR = 5 m``, ``h = 0,6 m``,
+  ``RS = RR = 25 dB``, ``eps = 2``, ``sS = sR = 0,5``): the model becomes
+  **non-monotonic in the damping**, giving ``Rcl = 40,26 dB`` at
+  ``mR = 0,01 1/m`` but only ``26,48 dB`` at ``10^-4``, i.e. adding plenum
+  absorber is predicted to make the flanking path worse than leaving it bare;
+  and it **breaks energy conservation**, returning ``tau_cl = 4,45`` at
+  ``RS = RR = 6 dB``, ``mR = 0,01`` and ``tau_cl = 829`` at ``RS = RR = 0 dB``,
+  ``mR = 10^-3``.
+- **Evidence:** with ``m'R`` in the denominator every one of those pathologies
+  disappears: ``tau_cl`` is monotonically decreasing in the damping, is bounded
+  above by 1 because ``(1 - exp(-eps m'R LR)) / (eps m'R LR) <= 1``, and reduces
+  to Vigran's own small-attenuation result, Eq. (9.19)
+  ``tau_cl = eps^2 tauS tauR LR / (4h)``, whenever ``mS LS`` and ``m'R LR`` are
+  both small. With the printed ``mR`` the same limit picks up the factor
+  ``m'R / mR``, which diverges, so Eq. (9.18) as printed does not reduce to
+  Eq. (9.19) at all: the two equations the book presents as a pair are
+  inconsistent with each other.
+- **Library behaviour:** `plenum_flanking_reduction_index` in
+  [`ceiling_plenum.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/building/ceiling_plenum.py)
+  implements the derived ``m'R`` in both the exponent and the denominator, with
+  the reading documented at the formula, and rejects a transmission factor
+  above unity rather than reporting a negative sound reduction index. Tests pin
+  the monotonicity, the ``tau_cl <= 1`` bound, the convergence to Eq. (9.20)
+  and the size of the Eq. (9.17) leakage term at a realistic ceiling
+  ([`tests/building/test_ceiling_plenum.py`](https://github.com/jmrplens/phonometry/blob/main/tests/building/test_ceiling_plenum.py)).
+- **Status:** unreported (textbook rather than a standard). Mechel's original
+  1980 paper, which Vigran reproduces, was not available to check whether the
+  misprint originates there.
+
 ## Real Decreto 1367/2007, Annex IV A.3.3 (Kf and Ki threshold tables)
 
 - **Location:** Annex IV, section A.3.3, the ``Kf`` (low-frequency) and

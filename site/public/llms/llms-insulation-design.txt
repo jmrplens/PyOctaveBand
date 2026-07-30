@@ -1257,6 +1257,112 @@ plt.show()
 
 </details>
 
+## Masonry cavity walls: the wall-tie bridge (Hopkins 4.3.5.4)
+
+The double-wall model above treats the cavity as pure air. A real masonry
+cavity wall is stitched together by **wall ties** every few courses, and those
+ties do two things the air-only model cannot see: they add a mechanical spring
+in parallel with the air spring, which pushes the mass-spring-mass resonance
+up, and they open a structure-borne path from one leaf to the other.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/masonry_wall_ties_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/masonry_wall_ties.svg" alt="Two panels: the coupling loss factor of a wall-tie array against frequency for three tie types with the rigid-connection ceiling as a dashed line, and the predicted sound reduction index of a masonry cavity wall with and without ties showing the shaded band between the two mass-spring-mass resonances" width="92%"></picture>
+
+*Left: a soft tie rolls the structure-borne coupling off as $1/f^3$, a stiff
+one stays on the rigid ceiling for another two octaves. Right: the same ties
+lift the resonance from 26 Hz to 50 Hz, extending the combined-mass branch.*
+
+**The tie as a spring (Hopkins Eq. 4.89).** A tie is characterised by a single
+number, its dynamic stiffness $s_{X\,\text{mm}}$ at a cavity width $X$,
+measured on two nominally identical 100 mm concrete cubes
+(Section 3.11.3.2, Eq. 3.202). $N$ ties over a plate of area $S$ add
+$Nk/S$ to the cavity air stiffness:
+
+$$
+f_\text{msm} = \frac{1}{2\pi}
+\sqrt{\frac{s_a + Nk/S}{\rho_{s1}\rho_{s2}/(\rho_{s1}+\rho_{s2})}}.
+$$
+
+Below $f_\text{msm}$ the two leaves act as one plate of the combined mass, so
+stiff ties are doubly bad: they raise the resonance into the rating range and
+bridge the cavity. `WALL_TIE_STIFFNESS` carries Hopkins' Table A4, whose 50 mm
+rows come from Hopkins, Wilson & Craik (1999) and whose 100 mm row from
+Hall & Hopkins (2001).
+
+| Wall tie | Cavity width (mm) | $s_{X\,\text{mm}}$ (MN/m) |
+|---|---|---|
+| Butterfly tie (BS 1243:1978) | 50 | 1.7 |
+| Double-triangle tie (BS 1243:1978) | 50 | 16.1 |
+| Vertical-twist tie (BS 1243:1978) | 50 | 94.0 |
+| Vertical-twist tie (proprietary) | 100 | 43.4 |
+
+```python
+from phonometry import (
+    double_wall_transmission_loss,
+    mass_spring_mass_resonance,
+    wall_tie_stiffness,
+    wall_tie_stiffness_per_area,
+)
+
+print(wall_tie_stiffness("butterfly"))        # (0.05 m, 1.7e6 N/m)
+
+# Hopkins Fig. 4.35: two 140 kg/m2 leaves across an empty 75 mm cavity.
+print(round(mass_spring_mass_resonance(140.0, 140.0, 0.075)))          # 26 Hz
+
+# Add 2.5 ties per m2 of s_75mm = 2 MN/m: the resonance nearly doubles.
+ties = wall_tie_stiffness_per_area(2.5, 2.0e6)
+print(round(mass_spring_mass_resonance(140.0, 140.0, 0.075,
+                                       tie_stiffness_per_area=ties)))  # 50 Hz
+
+dw = double_wall_transmission_loss(bands, 140.0, 140.0, 0.075,
+                                   tie_stiffness_per_area=ties)
+```
+
+**The tie as a point connection (Hopkins Eqs. 4.84 to 4.88).** Each tie
+transmits structure-borne power between the leaves. With the driving-point
+mobilities $Y_i$, $Y_j$ of the two leaves (infinite thin plates,
+$Y = 1/(8\sqrt{B'm''})$, Eq. 2.190) and the connector mobility of a linear
+spring $Y_c = \mathrm{i}\omega/k$ (Eq. 4.88), $N$ identical uncorrelated
+connections give the coupling loss factor (Eq. 4.87)
+
+$$
+\eta_{ij} = \frac{N}{\omega m_i}
+\frac{\mathrm{Re}\{Y_j\}}{|Y_i + Y_j + Y_c|^2}.
+$$
+
+The plate area cancels ($N/m_i = n/\rho_{s1}$ with $n$ ties per m²), so only
+the tie density enters. A rigid connection (a screw, a nail, a bolt, or a tie
+stiff enough never to yield) is the limit $Y_c = 0$; a resilient tie rolls the
+coupling off two powers faster once $|Y_c| = \omega/k$ overtakes the plate
+mobilities: $\eta_{ij}$ then falls as $1/f^3$ against the rigid ceiling's
+$1/f$, so the *ratio* between them goes as $1/f^2$. That is exactly why a
+butterfly tie at 1.7 MN/m and a vertical-twist tie at 94 MN/m behave so
+differently.
+
+```python
+import numpy as np
+from phonometry import plate_bending_stiffness, wall_tie_coupling_loss_factor
+
+freq = np.logspace(np.log10(50.0), np.log10(5000.0), 60)
+b1 = plate_bending_stiffness(2.0e10, 0.1, 0.2)   # 100 mm masonry leaves
+res = wall_tie_coupling_loss_factor(
+    freq, 150.0, 170.0, b1, b1, ties_per_area=2.5, tie="butterfly"
+)
+print(res.coupling_loss_factor[0], res.rigid_coupling_loss_factor[0])
+res.plot()   # eta_ij against the rigid-connection ceiling (needs matplotlib)
+```
+
+The **inputs** of this model are printed data: Table A4, confirmed value for
+value by Hopkins, Wilson & Craik (1999) Table 1, which prints the same
+1.7 / 16.1 / 94.0 MN/m at a 50 mm cavity. Craik & Wilson (1995) Table 1
+measures the same tie *types* at an 85 mm cavity and reports 1.1 and
+4.3 MN/m for the butterfly and double-triangle ties, so it corroborates the
+ordering but not the values: the dynamic stiffness is defined at a given
+cavity width and changes with it. The **output** is not printed anywhere: every published sound reduction
+index of a bridged masonry cavity wall is a figure, so the per-band
+transmission-loss penalty of the ties has no printed numeric oracle. The
+resonance shift does: Hopkins Fig. 4.35 prints 26 Hz without ties and 50 Hz
+with them for the same wall.
+
 ## Slits, holes and apertures (Hopkins 4.3.10)
 
 A small air path is the real limit on any heavy construction. The transmission
@@ -1446,6 +1552,12 @@ fig.tight_layout(); plt.show()
   Timoshenko & Woinowsky-Krieger) and 6.5.3 (orthotropic panel transmission,
   Eqs 6.107-6.113 after Heckl 1960 and Hansen 1993).
 
+- Hopkins, C., Wilson, R., & Craik, R. J. M. (1999). Dynamic stiffness as an
+  acoustic specification parameter for wall ties used in masonry cavity walls.
+  *Applied Acoustics*, 58, 51-68.
+  [doi:10.1016/S0003-682X(98)00068-1](https://doi.org/10.1016/S0003-682X(98)00068-1).
+  The measurement behind the 50 mm rows of Hopkins' Table A4.
+
 ## See also
 
 - [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/guides/insulation-prediction/): assembles
@@ -1456,7 +1568,7 @@ fig.tight_layout(); plt.show()
   the measured counterpart of the theoretical point mobilities.
 - [Porous and multilayer absorbers](https://jmrplens.github.io/phonometry/guides/porous-absorbers/): the cavity-fill models
   a double wall consumes.
-- API reference: [`building.panel_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/panel-transmission/), [`building.aperture_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/aperture-transmission/), [`vibration.radiation_efficiency`](https://jmrplens.github.io/phonometry/reference/api/vibration/radiation-efficiency/) and [`vibration.point_mobility`](https://jmrplens.github.io/phonometry/reference/api/vibration/point-mobility/).
+- API reference: [`building.panel_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/panel-transmission/), [`building.masonry_cavity_wall`](https://jmrplens.github.io/phonometry/reference/api/building/masonry-cavity-wall/), [`building.aperture_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/aperture-transmission/), [`vibration.radiation_efficiency`](https://jmrplens.github.io/phonometry/reference/api/vibration/radiation-efficiency/) and [`vibration.point_mobility`](https://jmrplens.github.io/phonometry/reference/api/vibration/point-mobility/).
 
 ---
 
