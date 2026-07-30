@@ -189,9 +189,10 @@ correct one half uphill and the other downhill.
 
 ## 5. The road surface (2.2.19, 2.2.20 and Table F-4)
 
-Table F-4 gives, for each of fourteen surfaces, an octave-band coefficient
-`alpha` and a speed coefficient `beta`, per vehicle category, with the speed
-range over which the row is declared valid. The surface enters the two terms
+Table F-4 gives, for the reference surface and each of fourteen named
+pavements, an octave-band coefficient `alpha` and a speed coefficient `beta`,
+per vehicle category, with the speed range over which the row is declared
+valid. The surface enters the two terms
 differently:
 
 $$
