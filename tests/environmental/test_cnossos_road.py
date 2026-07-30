@@ -571,15 +571,15 @@ def test_invalid_inputs_are_rejected() -> None:
         road_rolling_noise("1", 50.0, temperature=float("nan"))
     with pytest.raises(ValueError, match="at least one vehicle category"):
         road_source_power([])
+    repeated = [
+        RoadTraffic(RoadVehicleCategory.LIGHT, 100.0, 50.0),
+        RoadTraffic(RoadVehicleCategory.LIGHT, 200.0, 60.0),
+    ]
     with pytest.raises(ValueError, match="at most one flow per vehicle category"):
-        road_source_power(
-            [
-                RoadTraffic(RoadVehicleCategory.LIGHT, 100.0, 50.0),
-                RoadTraffic(RoadVehicleCategory.LIGHT, 200.0, 60.0),
-            ]
-        )
+        road_source_power(repeated)
+    negative = RoadTraffic(RoadVehicleCategory.LIGHT, -1.0, 50.0)
     with pytest.raises(ValueError, match="non-negative"):
-        road_source_power(RoadTraffic(RoadVehicleCategory.LIGHT, -1.0, 50.0))
+        road_source_power(negative)
     with pytest.raises(ValueError, match="positive number of metres"):
         line_source_segment_power(np.array([90.0]), 0.0)
 
@@ -624,10 +624,9 @@ def test_incomplete_database_is_rejected_as_an_invalid_input() -> None:
             call("3", 70.0, coefficients=partial)
     with pytest.raises(ValueError, match="no category '3'"):
         road_vehicle_sound_power("3", 70.0, coefficients=partial)
+    heavy = RoadTraffic(RoadVehicleCategory.HEAVY, 100.0, 70.0)
     with pytest.raises(ValueError, match="no category '3'"):
-        road_source_power(
-            RoadTraffic(RoadVehicleCategory.HEAVY, 100.0, 70.0), coefficients=partial
-        )
+        road_source_power(heavy, coefficients=partial)
 
 
 def test_incomplete_surface_row_is_rejected_as_an_invalid_input() -> None:

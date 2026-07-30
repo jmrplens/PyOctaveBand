@@ -127,7 +127,6 @@ _STRINGS: dict[str, str] = {
     "Heavy vehicles (3)": "Vehículos pesados (3)",
     "Mopeds (4a)": "Ciclomotores (4a)",
     "Motorcycles (4b)": "Motocicletas (4b)",
-    "$L'_{W,eq,line}$ [dB re 1 pW/m]": "$L'_{W,eq,line}$ [dB re 1 pW/m]",
     "CNOSSOS-EU road source line power":
         "Potencia de la línea fuente viaria CNOSSOS-EU",
 }
@@ -451,7 +450,9 @@ def plot_cnossos_road_emission(
             marker=marker, lw=1.2, ms=4, zorder=4,
             label=_t(_ROAD_CATEGORY_LABELS[category.value], language),
         )
-    ax.set_ylabel(_t("$L'_{W,eq,line}$ [dB re 1 pW/m]", language))
+    # Pure symbol notation, identical in every language, so it is set directly
+    # rather than routed through the translation table.
+    ax.set_ylabel("$L'_{W,eq,line}$ [dB re 1 pW/m]")
     ax.set_title(_t("CNOSSOS-EU road source line power", language))
     ax.legend(loc="best", fontsize="small")
     ax.grid(True, axis="y", alpha=0.3)
