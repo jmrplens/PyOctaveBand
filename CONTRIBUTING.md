@@ -213,8 +213,8 @@ python scripts/check_errata_evidence.py --ratios # only the irrational-ratio lin
 
 1. **The ratio linter** parses each entry for printed-versus-derived value
    pairs and flags any ratio within 0,5 % of √2, √3, π, 2π, 1/√2, ln 2 or a
-   small integer. A flagged entry is not necessarily wrong — a genuine
-   factor-of-ten misprint trips it too — but it must then say, in the same
+   small integer. A flagged entry is not necessarily wrong (a genuine
+   factor-of-ten misprint trips it too), but it must then say, in the same
    entry, that the page was read as an image. The retracted entry above tripped
    it twice on its own text.
 2. **The render-evidence check** requires every entry to name a render or to be

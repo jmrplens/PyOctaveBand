@@ -136,7 +136,7 @@ for the checks that enforce it
   measured floor "with covering" over all sixteen bands 100 Hz to 3150 Hz.
   A.2.1 defines CI from the reference floor with covering (the
   "Ln,r,0 − ΔL" column) over 100 Hz to 2500 Hz (15 bands), which gives
-  75,674 dB (printed chain) or 75,710 dB (corrected 800 Hz cell) — both
+  75,674 dB (printed chain) or 75,710 dB (corrected 800 Hz cell), both
   round to 76 dB, so CI,r = 76 − 15 − 63 = −2 either way, giving
   CI,Δ = −11 − (−2) = −9 and ΔLlin = 6 dB, not the printed −3 / −8 / 7 dB
   chain.
@@ -541,7 +541,7 @@ for the checks that enforce it
 - **Location:** the simplified-model input table of both parts, fourth row:
   Table L.10 (printed p. 84) and Table G.10 (printed p. 41).
 - **The print:** ISO 12354-1 prints "Internal wall 4 (F = f = 4)";
-  ISO 12354-2 prints "Internal wall 4 (f4)" — the two parts label the row
+  ISO 12354-2 prints "Internal wall 4 (f4)": the two parts label the row
   differently, and an earlier revision of this entry quoted the Part 1 form
   for both.
 - **The problem:** the example has two internal walls; the element indexed
@@ -676,7 +676,7 @@ for the checks that enforce it
   all other quantities", and Formula (10) then forms U = k·u.
 - **The problem:** the document's own Tables 4 and 5 only reproduce when U is
   computed from the unrounded u and rounded last. Neither table prints a *u*
-  column at all — each has only the coefficient (αs or αp) and ±U (k = 2) —
+  column at all (each has only the coefficient αs or αp and ±U with k = 2),
   so the printed U values are the whole of the evidence, and 11 of the 25 of
   them are unreachable under the literal clause wording.
 - **Evidence:** recomputation of all 25 entries (Table 4: 20 rows, Table 5:
@@ -985,7 +985,7 @@ for the checks that enforce it
   (clause 5.3.2). The same offset appears in the "5 FG" row of Tabelle I.10
   (printed p. 46), where the two member tones at 705,2 and 732,1 Hz have
   L_T = 55,12 and 54,23 dB, sum to 57,708 dB, and are printed as 55,95 dB,
-  1,758 dB lower — and there the printed delta L = 3,22 dB follows the printed
+  1,758 dB lower, and there the printed delta L = 3,22 dB follows the printed
   L_T exactly (55,95 − 55,28 + 2,55 = 3,22), so the Tabelle I.10 row is
   internally consistent and the Tabelle I.6 row is not. The third combined
   row, "2 FG" of the same Tabelle I.6, carries no offset at all: its three
@@ -1046,7 +1046,7 @@ for the checks that enforce it
   over `U_1 … U_9` and includes `U_2`. Meanwhile the defining clause
   14.12.9.1 states the ratio of the r.m.s. sum of the Table 2 intermodulation
   product voltages "to the amplitude of the output voltage at the frequency
-  f_s", i.e. the 15 kHz sine component `U_s`, the Otala convention — and item
+  f_s", i.e. the 15 kHz sine component `U_s`, the Otala convention, and item
   d) measures "the amplitudes of the sinusoidal signal `U_s`" precisely so
   that it can be used, which the f) formula then never does. The denominator
   should be `U_s`. An earlier revision of this entry said that "U2 is used
