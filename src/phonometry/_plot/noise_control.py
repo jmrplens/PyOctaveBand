@@ -32,6 +32,7 @@ if TYPE_CHECKING:
 
 _FREQ_LABEL = "Frequency [Hz]"
 _LEVEL_LABEL = "Level [dB]"
+_TL_LABEL = "Transmission loss"
 
 #: Spanish translations of the fixed labels/titles/legends rendered by the
 #: noise-control ``.plot()`` renderers, keyed by their verbatim English
@@ -41,7 +42,7 @@ _LEVEL_LABEL = "Level [dB]"
 _STRINGS: dict[str, str] = {
     "Frequency [Hz]": "Frecuencia [Hz]",
     "Band": "Banda",
-    "Transmission loss": "Pérdida por transmisión",
+    _TL_LABEL: "Pérdida por transmisión",
     "Insertion loss": "Pérdida por inserción",
     "Resonance": "Resonancia",
     "Loss [dB]": "Pérdida [dB]",
@@ -93,7 +94,7 @@ def plot_reactive_silencer(
     ax = ax if ax is not None else _new_axes()
     f = np.asarray(result.frequencies, dtype=np.float64)
     kwargs.setdefault("color", _C_PRIMARY)
-    kwargs.setdefault("label", _t("Transmission loss", language))
+    kwargs.setdefault("label", _t(_TL_LABEL, language))
     kwargs.setdefault("lw", 1.8)
     ax.plot(f, np.asarray(result.transmission_loss), **kwargs)
     if result.insertion_loss is not None:
@@ -276,7 +277,7 @@ def plot_room_to_room(
 
     twin = ax.twinx()
     twin.plot(f, np.asarray(result.transmission_loss), color=_C_MUTED, lw=1.2,
-              ls="--", label=_t("Transmission loss", language))
+              ls="--", label=_t(_TL_LABEL, language))
     twin.plot(f, np.asarray(result.noise_reduction), color=_C_TERTIARY,
               lw=1.5, ls="-.", marker="^", ms=3,
               label=_t("Noise reduction", language))

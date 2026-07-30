@@ -20,17 +20,25 @@ from phonometry import room_to_room_transmission
 from phonometry.noise_control.room_to_room import RoomToRoomResult
 
 _BANDS = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+_SOURCE = np.array([90.0, 88.0, 86.0, 84.0, 82.0, 80.0])
+#: A flat receiving-room absorption equal to the partition area, so the
+#: logarithm of Eq. (4.101) vanishes and NR is exactly TL.
+_ABSORPTION = np.full(6, 20.0)
+_NAN_SPECTRUM = np.full(6, np.nan)
+_NO_ABSORPTION = np.zeros(6)
+_FLAT_SOURCE = np.full(6, 95.0)
+_NAN = float("nan")
 
 
 def _chain(**kwargs: object) -> RoomToRoomResult:
     """A plain six-band chain with round numbers, for the option tests."""
     defaults: dict[str, object] = {
-        "source_level": np.array([90.0, 88.0, 86.0, 84.0, 82.0, 80.0]),
+        "source_level": _SOURCE,
         "criterion": "NC",
     }
     defaults.update(kwargs)
     return room_to_room_transmission(
-        _BANDS, 40.0, 20.0, np.full(6, 20.0), **defaults  # type: ignore[arg-type]
+        _BANDS, 40.0, 20.0, _ABSORPTION, **defaults  # type: ignore[arg-type]
     )
 
 
@@ -86,7 +94,7 @@ def test_source_power_models_scale_by_ten_lg_q(model: str, expected: float) -> N
         _BANDS,
         40.0,
         20.0,
-        np.full(6, 20.0),
+        _ABSORPTION,
         source_power_level=100.0,
         source_room_constant=50.0,
         source_directivity=4.0,
@@ -108,7 +116,7 @@ def test_required_transmission_loss_closes_the_gap() -> None:
     assert np.allclose(required - result.transmission_loss, excess)
     # Re-running with that TL lands exactly on the criterion curve.
     tightened = room_to_room_transmission(
-        _BANDS, required, 20.0, np.full(6, 20.0),
+        _BANDS, required, 20.0, _ABSORPTION,
         source_level=result.source_level, target=45.0,
     )
     assert np.allclose(tightened.received_level, result.criterion_curve)
@@ -142,8 +150,8 @@ def test_nc_rating_of_the_received_spectrum() -> None:
         _BANDS,
         [50.0, 55.0, 60.0, 62.0, 62.0, 62.0],
         20.0,
-        np.full(6, 20.0),
-        source_level=np.array([95.0, 95.0, 95.0, 95.0, 95.0, 95.0]),
+        _ABSORPTION,
+        source_level=_FLAT_SOURCE,
         target=30.0,
     )
     assert result.rating.__class__.__name__ == "NCResult"
@@ -153,15 +161,15 @@ def test_nc_rating_of_the_received_spectrum() -> None:
 def test_source_description_is_exclusive() -> None:
     """Exactly one of ``source_level`` / ``source_power_level`` is required."""
     with pytest.raises(ValueError, match="exactly one"):
-        room_to_room_transmission(_BANDS, 40.0, 20.0, np.full(6, 20.0))
+        room_to_room_transmission(_BANDS, 40.0, 20.0, _ABSORPTION)
     with pytest.raises(ValueError, match="exactly one"):
         room_to_room_transmission(
-            _BANDS, 40.0, 20.0, np.full(6, 20.0),
+            _BANDS, 40.0, 20.0, _ABSORPTION,
             source_level=90.0, source_power_level=100.0,
         )
     with pytest.raises(ValueError, match="source_room_constant"):
         room_to_room_transmission(
-            _BANDS, 40.0, 20.0, np.full(6, 20.0), source_power_level=100.0
+            _BANDS, 40.0, 20.0, _ABSORPTION, source_power_level=100.0
         )
 
 
@@ -171,16 +179,16 @@ def test_validation() -> None:
         room_to_room_transmission([], 40.0, 20.0, 20.0, source_level=90.0)
     with pytest.raises(ValueError, match="one value per band"):
         room_to_room_transmission(
-            _BANDS, [40.0, 41.0], 20.0, np.full(6, 20.0), source_level=90.0
+            _BANDS, [40.0, 41.0], 20.0, _ABSORPTION, source_level=90.0
         )
     with pytest.raises(ValueError, match="finite"):
         room_to_room_transmission(
-            _BANDS, np.full(6, np.nan), 20.0, np.full(6, 20.0), source_level=90.0
+            _BANDS, _NAN_SPECTRUM, 20.0, _ABSORPTION, source_level=90.0
         )
     with pytest.raises(ValueError, match="partition_area"):
-        room_to_room_transmission(_BANDS, 40.0, 0.0, np.full(6, 20.0), source_level=90.0)
+        room_to_room_transmission(_BANDS, 40.0, 0.0, _ABSORPTION, source_level=90.0)
     with pytest.raises(ValueError, match="receiving_absorption"):
-        room_to_room_transmission(_BANDS, 40.0, 20.0, np.zeros(6), source_level=90.0)
+        room_to_room_transmission(_BANDS, 40.0, 20.0, _NO_ABSORPTION, source_level=90.0)
     with pytest.raises(ValueError, match="flanking_penalty"):
         _chain(flanking_penalty=-1.0)
     with pytest.raises(ValueError, match="criterion"):
@@ -188,7 +196,7 @@ def test_validation() -> None:
     with pytest.raises(ValueError, match="source_model"):
         _chain(source_model="constant_energy")
     with pytest.raises(ValueError, match="target"):
-        _chain(target=float("nan"))
+        _chain(target=_NAN)
 
 
 def test_plot_smoke() -> None:
