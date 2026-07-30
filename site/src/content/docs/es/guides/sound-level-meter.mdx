@@ -34,18 +34,7 @@ sonómetro funcional. Todos los fragmentos se ejecutan tal cual (las señales
 se sintetizan para que la página sea autocontenida), y cada etapa enlaza con
 la guía de fondo que la explica por completo.
 
-```mermaid
-flowchart LR
-    A["Tono de calibrador\n(IEC 60942)"] --> B["sensitivity()"]
-    B --> C["Ponderación frecuencial\nweighting_filter('A')"]
-    C --> D["Ponderación temporal\ntime_weighting('fast')"]
-    D --> E["Pantalla + percentiles\nLAF(t), ln_levels"]
-    C --> F["Niveles integrados\nlaeq / sel / lc_peak"]
-    C -.-> G["Bandas de octava\noctave_filter (IEC 61260-1)"]
-    E --> H["Informe"]
-    F --> H
-    G --> H
-```
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_slm_pipeline_es.svg" alt="La cadena del sonómetro de esta página: el tono del calibrador alimenta a sensitivity() para obtener el factor en pascales por unidad digital, la grabación de medición se une a él como presión calibrada y de ahí salen tres ramas de lectura, weighting_filter con time_weighting para el LAF(t) de pantalla y los niveles percentiles, laeq, sel y lc_peak para los niveles integrados, y octave_filter para el espectro en tercios de octava, cerradas por verify_weighting_class y verify_filter_class frente a los límites de aceptación de la Tabla 3 de IEC 61672-1 y la Tabla 1 de IEC 61260-1" width="92%" loading="eager" />
 
 Es la misma cadena que IEC 61672-1 dibuja para el instrumento físico: el
 calibrador de clase 1 ancla el micrófono a 94 dB a 1 kHz, y cada etapa

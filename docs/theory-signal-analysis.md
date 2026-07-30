@@ -166,16 +166,7 @@ To ensure **100% stability** across the entire audible spectrum (even at low
 frequencies like 16 Hz with high sample rates), phonometry employs two
 critical strategies:
 
-```mermaid
-flowchart LR
-    X["Input signal\nfs"] --> D{"Low band?"}
-    D -- "yes" --> R["Decimate\nresample_poly (1/M)"] --> S1["SOS band filter\nat fs/M"]
-    D -- "no" --> S2["SOS band filter\nat fs"]
-    S1 --> L["Band level (RMS/peak)"]
-    S2 --> L
-    S1 -- "sigbands=True" --> U["Interpolate back\nresample_poly (M/1)"] --> Y["Band signal\nat fs"]
-    S2 -- "sigbands=True" --> Y
-```
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow.svg" alt="Data flow inside one band of the filter bank: a low band, whose centre frequency is far below half the sample rate, takes the resample_poly decimation branch to fs over M so its poles stay clear of the unit circle, every band is then a cascade of second-order sections with the minus 3 dB points on the band edges rather than one high-order transfer function, both branches end in the band level in dB, and sigbands=True additionally returns the band signal at the input rate" width="92%"></picture>
 
 1. **Second-Order Sections (SOS):** All filters are implemented as a series of
    cascaded biquads. This avoids the catastrophic numerical precision loss

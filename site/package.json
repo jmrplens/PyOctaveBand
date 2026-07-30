@@ -18,9 +18,7 @@
   "dependencies": {
     "@astrojs/starlight": "^0.41.4",
     "astro": "^7.1.4",
-    "astro-mermaid": "^2.1.0",
     "katex": "^0.18.1",
-    "mermaid": "^11.16.0",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
     "satori": "^0.29.0",

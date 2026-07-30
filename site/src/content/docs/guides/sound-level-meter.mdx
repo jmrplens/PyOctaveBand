@@ -34,18 +34,7 @@ working meter. Every snippet runs as written (the signals are synthesized so
 the page is self-contained), and each stage links to the deep guide that
 explains it fully.
 
-```mermaid
-flowchart LR
-    A["Calibrator tone\n(IEC 60942)"] --> B["sensitivity()"]
-    B --> C["Frequency weighting\nweighting_filter('A')"]
-    C --> D["Time weighting\ntime_weighting('fast')"]
-    D --> E["Display + percentiles\nLAF(t), ln_levels"]
-    C --> F["Integrated levels\nlaeq / sel / lc_peak"]
-    C -.-> G["Octave bands\noctave_filter (IEC 61260-1)"]
-    E --> H["Report"]
-    F --> H
-    G --> H
-```
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_slm_pipeline.svg" alt="The sound level meter pipeline of this page: the calibrator tone feeding sensitivity() to obtain the factor in pascals per digital unit, the measurement recording joining it as the calibrated pressure, and three readout branches from there, weighting_filter with time_weighting for the displayed LAF(t) and the percentile levels, laeq, sel and lc_peak for the integrated levels, and octave_filter for the one-third-octave spectrum, all closed by verify_weighting_class and verify_filter_class against the IEC 61672-1 Table 3 and IEC 61260-1 Table 1 acceptance limits" width="92%" loading="eager" />
 
 This is the same chain IEC 61672-1 draws for the physical instrument: the
 class 1 calibrator anchors the microphone to 94 dB at 1 kHz, and every stage

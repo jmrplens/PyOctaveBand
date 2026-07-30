@@ -239,16 +239,7 @@ Para garantizar **estabilidad total** en todo el espectro audible (incluso a
 frecuencias bajas como 16 Hz con frecuencias de muestreo altas), phonometry
 emplea dos estrategias fundamentales:
 
-```mermaid
-flowchart LR
-    X["Señal de entrada\nfs"] --> D{"¿Banda grave?"}
-    D -- "sí" --> R["Diezmar\nresample_poly (1/M)"] --> S1["Filtro SOS de banda\na fs/M"]
-    D -- "no" --> S2["Filtro SOS de banda\na fs"]
-    S1 --> L["Nivel de banda (RMS/pico)"]
-    S2 --> L
-    S1 -- "sigbands=True" --> U["Interpolar de vuelta\nresample_poly (M/1)"] --> Y["Señal de banda\na fs"]
-    S2 -- "sigbands=True" --> Y
-```
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow_es.svg" alt="Flujo de datos dentro de una banda del banco de filtros: una banda grave, cuya frecuencia central queda muy por debajo de la mitad de la frecuencia de muestreo, toma la rama de diezmado con resample_poly hasta fs entre M para que sus polos se alejen del círculo unidad, después toda banda es una cascada de secciones de segundo orden con los puntos de menos 3 dB en los bordes de banda en lugar de una función de transferencia de orden alto, ambas ramas terminan en el nivel de banda en dB y sigbands=True devuelve además la señal de banda a la frecuencia de entrada" style="width:92%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow_es_dark.svg" alt="Flujo de datos dentro de una banda del banco de filtros: una banda grave, cuya frecuencia central queda muy por debajo de la mitad de la frecuencia de muestreo, toma la rama de diezmado con resample_poly hasta fs entre M para que sus polos se alejen del círculo unidad, después toda banda es una cascada de secciones de segundo orden con los puntos de menos 3 dB en los bordes de banda en lugar de una función de transferencia de orden alto, ambas ramas terminan en el nivel de banda en dB y sigbands=True devuelve además la señal de banda a la frecuencia de entrada" style="width:92%" loading="lazy">
 
 1. **Secciones de segundo orden (SOS):** todos los filtros se implementan como
    biquads en cascada, evitando la pérdida catastrófica de precisión de las

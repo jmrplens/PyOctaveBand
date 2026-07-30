@@ -81,15 +81,7 @@ Para obtener mediciones SPL precisas a partir de una grabación digital, primero
 debes calcular la sensibilidad de tu cadena de medición usando un tono de
 referencia (p. ej. 94 dB @ 1 kHz).
 
-```mermaid
-flowchart LR
-    A["Tono del calibrador\n94 dB @ 1 kHz\n(IEC 60942)"] --> B["Grabación\ncalibrator_recording"]
-    B --> C["sensitivity()"]
-    C --> D["calibration_factor\n(unidades digitales → Pa)"]
-    D --> E["octave_filter / leq / laeq / ln_levels"]
-    F["Grabación de\nmedición"] --> E
-    E --> G["Niveles en dB SPL\n(re 20 µPa)"]
-```
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_calibration_dataflow_es.svg" alt="Flujo de datos de la calibración: la grabación del calibrador y la grabación de medición proceden de la misma cadena sin tocar, sensitivity() convierte la primera en el factor S en pascales por unidad digital y comprueba la estabilidad a corto plazo de IEC 60942, toda función de nivel acepta ese factor como calibration_factor y el resultado son niveles en dB SPL re 20 µPa; si se omite el factor, los niveles quedan en dBFS" width="92%" />
 
 ```python
 import numpy as np
