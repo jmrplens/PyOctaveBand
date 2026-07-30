@@ -831,8 +831,8 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ECAC Doc 29 NPD interpolation | Log-linear NPD level at the log-midpoint distance (Eq. 4-4), dB | 97 dB (+/-0 dB) | 97 dB | 0 dB | &#9989; |
 | SAE ARP 5534 pure-tone coefficient (ISO 9613-1) | Mid-band α at 1 kHz, 25 °C, 70 % RH, 101.325 kPa, dB/m | 0.006186 dB/m (+/-0 dB/m) | 0.006186 dB/m | 0 dB/m | &#9989; |
 | ICAO Annex 16 Vol. I App. 2 Table A2-3 | Perceived noisiness at SPL(b), 1 kHz band, in noys | 1 (+/-0) | 1 | 0 | &#9989; |
-| ICAO Doc 9507 ETM Vol. I Table 3-7 | Tone correction of the turbofan example, dB | 2 (+/-0) | 2 | 0 | &#9989; |
-| ICAO Doc 9507 ETM Vol. I Table 4-4 | Integrated-method reference EPNL, EPNdB | 92.619 EPNdB (+/-0.01 EPNdB) | 92.619 EPNdB | 0 EPNdB | &#9989; |
+| ICAO Doc 9501 ETM Vol. I Table 3-7 | Tone correction of the turbofan example, dB | 2 (+/-0) | 2 | 0 | &#9989; |
+| ICAO Doc 9501 ETM Vol. I Table 4-4 | Integrated-method reference EPNL, EPNdB | 92.619 EPNdB (+/-0.01 EPNdB) | 92.619 EPNdB | 0 EPNdB | &#9989; |
 | IEC 61265:1995 Table 1 | Directional-response tolerance at 4 kHz / 90°, dB | 2 dB (+/-0 dB) | 2 dB | 0 dB | &#9989; |
 
 </details>
@@ -869,7 +869,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary>&#9989; <b>Porous &amp; multilayer absorbers (Mechel / Bies / Cox &amp; D'Antonio)</b>: 100% (14/14)</summary>
+<summary>&#9989; <b>Porous &amp; multilayer absorbers (Mechel / Bies / Cox &amp; D'Antonio)</b>: 100% (20/20)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
@@ -887,6 +887,12 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | Allard & Atalla 2e Eq. (11.55), printed p. 253 (prose limit) | Limp effective density at DC = apparent total density rho_t, kg/m3 | 31.1809 kg/m3 (+/-0.01%) | 31.1809 kg/m3 | 0 kg/m3 | &#9989; |
 | Allard & Atalla 2e Eq. (11.55), printed p. 253 (prose limit) | Heavy frame recovers the rigid-frame Zc (relative deviation) | 0 (+/-0.00001) | 0 | 0 | &#9989; |
 | Allard & Atalla 2e printed p. 254 (Doutres et al. 2007) | Limp-frame bulk-modulus limit for air, kPa | 20 kPa (+/-0.3 kPa) | 20.27 kPa | 0.265 kPa | &#9989; |
+| Allard & Atalla 2e Eq. (6.110), Table 6.1 glass wool | Frame lambda/4 resonance of a 10 cm layer, Hz | 459.9 Hz (+/-0.05 Hz) | 459.93 Hz | 0.033 Hz | &#9989; |
+| Allard & Atalla 2e Sect. 6.5.4 (Biot model output), pp. 124-125 | Airborne compressional branch changes root at 495 Hz | 495 Hz (+/-1%) | 495.9 Hz | 0.9 Hz | &#9989; |
+| Allard & Atalla 2e Sect. 6.5.4 (Biot model output), pp. 124-125 | Frame-borne velocity ratio mu_b at 1500 Hz | 0.82 (+/-2%) | 0.811 | -0.009 | &#9989; |
+| Allard & Atalla 2e Sect. 6.6.3 (Biot model output), p. 129 | Surface-impedance peak of a 5,6 cm layer, Hz | 860 Hz (+/-2%) | 863.5 Hz | 3.5 Hz | &#9989; |
+| Allard & Atalla 2e Sect. 11.3.4 (rigid-frame limit) | Stiff, heavy frame recovers the JCA layer (max rel deviation) | 0 (+/-0.0000001) | 0.0000000034 | 0 | &#9989; |
+| Allard & Atalla 2e Eq. (6.107) vs Sect. 11.5 assembly | Two independent derivations of Zs (max rel deviation) | 0 (+/-0.0000000001) | 0 | 0 | &#9989; |
 
 </details>
 
