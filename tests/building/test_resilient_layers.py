@@ -1552,3 +1552,22 @@ def test_octave_bandwidth_factor() -> None:
 def test_invalid_inputs_raise(call: object, match: str) -> None:
     with pytest.raises(ValueError, match=match):
         call()  # type: ignore[operator]
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "match"),
+    [
+        ({"system": "studs", "glued_area": 40.0}, "glued exterior systems"),
+        ({"glued_area": 100.1}, "glued_area"),
+        ({"glued_area": 0.0}, "glued_area"),
+    ],
+)
+def test_glued_area_guards(kwargs: dict[str, object], match: str) -> None:
+    """Formula (D.6) applies to glued exterior systems over part of the area.
+
+    A stud system is corrected by Formula (D.5) instead, and the glued fraction
+    is a percentage of the element area, so it cannot exceed 100 nor be zero:
+    the formula divides by it. None of the three was covered.
+    """
+    with pytest.raises(ValueError, match=match):
+        lining_improvement(100.0, **kwargs)  # type: ignore[arg-type]
