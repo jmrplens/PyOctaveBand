@@ -318,18 +318,27 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     root: pathlib.Path = args.root.resolve()
 
+    # Every failure that means "the CLAIMS table or the report format needs
+    # attention" surfaces as a ValueError: a report whose headline no longer
+    # parses, a number two patterns read differently, spans that intersect.
+    # They are all editing mistakes, so they get the same one-line diagnostic
+    # rather than a traceback.
     try:
-        expected = expected_counts(root)
+        return _run(args.write, root)
     except ValueError as error:
         print(error, file=sys.stderr)
         return 1
 
+
+def _run(writing: bool, root: pathlib.Path) -> int:
+    """Body of :func:`main`, once the arguments are settled."""
+    expected = expected_counts(root)
     summary = (
         f"{expected['total']} checks, {expected['domains']} domains, "
         f"{expected['standards']} standards"
     )
 
-    if args.write:
+    if writing:
         changes = write(root, expected)
         for change in changes:
             print(f"  {change}")

@@ -257,6 +257,24 @@ def test_a_claim_read_two_ways_is_rejected(monkeypatch):
         ccc.claims_in(f"the suite runs {OLD_TOTAL} conformance checks")
 
 
+def test_an_ambiguous_pattern_pair_reports_instead_of_crashing(
+    corpus, monkeypatch, capsys
+):
+    """The command exits 1 with the diagnostic, not with a traceback."""
+    import re
+
+    monkeypatch.setattr(
+        ccc,
+        "CLAIMS",
+        (
+            (re.compile(r"(\d+)\s+conformance checks"), "total"),
+            (re.compile(r"(\d+)\s+conformance checks"), "standards"),
+        ),
+    )
+    assert _run(corpus, "--write") == 1
+    assert "ambiguous conformance claim" in capsys.readouterr().err
+
+
 def test_a_report_without_a_headline_is_an_error(tmp_path, capsys):
     """A format change must fail loudly rather than rewrite prose to nothing."""
     _write(tmp_path / "docs" / "CONFORMANCE.md", "no headline here\n")
