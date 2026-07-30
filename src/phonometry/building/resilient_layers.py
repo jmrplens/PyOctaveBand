@@ -1328,7 +1328,7 @@ def lining_improvement(
     :param glued_area: Glued area ``%So`` as a percentage of the element area,
         greater than 0 and at most 100, or ``None`` to keep the 40 % reference.
         Formula (D.6) divides by the glued area, so a wholly unglued system is
-        not a case of it: use ``anchors`` for a mechanically fixed lining. Formula (D.6)
+        not a case of it: use ``anchors`` for a mechanically fixed lining. It
         corrects the glued exterior systems only, so it is rejected for
         ``system="studs"``.
     :return: A :class:`LiningImprovementResult`.
