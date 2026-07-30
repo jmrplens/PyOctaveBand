@@ -402,7 +402,7 @@ Directional sound power per metre of a CNOSSOS-EU road source line.
 | :--- | :--- |
 | `frequencies` | Octave-band midband frequencies, in Hz (63 Hz to 8 kHz). |
 | `categories` | The vehicle categories of the modelled flows, in the order of the rows of the per-category arrays. |
-| `rolling` | `L_WR,i,m` per category and band, in dB re 1 pW. |
+| `rolling` | `L_WR,i,m` per category and band, in dB re 1 pW. The row of a powered two-wheeler is the zero row Table F-1 prints for it, and does **not** enter its sound power, which is the propulsion term alone (2.2.3). |
 | `propulsion` | `L_WP,i,m` per category and band, in dB re 1 pW. |
 | `vehicle_power` | `L_W,i,m` per category and band (2.2.2)/(2.2.3), in dB re 1 pW. |
 | `line_power` | `L'_W,eq,line,i,m` per category and band (2.2.1), in dB re 1 pW per metre. |
