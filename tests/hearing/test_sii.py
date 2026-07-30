@@ -21,6 +21,10 @@ from __future__ import annotations
 import numpy as np
 import pytest
 from reference_data import (
+    ANSIS3_5_ANNEX_C1,
+    ANSIS3_5_ANNEX_C1_LEVEL_DISTORTION_I5,
+    ANSIS3_5_ANNEX_C1_NOISE,
+    ANSIS3_5_ANNEX_C1_SPEECH,
     ANSIS3_5_ANNEX_C2,
     ANSIS3_5_ANNEX_C2_MASKING,
     ANSIS3_5_BAND_IMPORTANCE_SUM,
@@ -532,6 +536,30 @@ def test_sii_wg_s3_79_official_test_case_octave1() -> None:
     )
     assert result.sii == pytest.approx(ANSIS3_5_WG_OCTAVE1_SII, abs=5e-4)
     assert result.sii == pytest.approx(ANSIS3_5_WG_OCTAVE1_SII_EXACT, abs=1e-7)
+
+
+def test_sii_annex_c1_worked_example() -> None:
+    # ANSI S3.5-1997 Annex C.1 worked example (octave-band procedure), whose
+    # input the WG DevelopmentKit readme prints in full. SII.C gives
+    # 0.5039555062. Table C.1's own Li column, row i = 5, reads 1.00 with the
+    # official WG S3-79 erratum applied (printed 0.10); the level-distortion
+    # factor of clause 5.7 for that row is 0.99581, which prints as 1.00.
+    result = sii.speech_intelligibility_index(
+        np.array(ANSIS3_5_ANNEX_C1_SPEECH),
+        np.array(ANSIS3_5_ANNEX_C1_NOISE),
+        method="octave",
+    )
+    assert result.sii == pytest.approx(ANSIS3_5_ANNEX_C1, abs=1e-7)
+    assert result.level_distortion[4] == pytest.approx(
+        ANSIS3_5_ANNEX_C1_LEVEL_DISTORTION_I5, abs=5e-3
+    )
+    # Where the speech stays at or below the standard normal-effort spectrum
+    # plus 10 dB the factor is exactly unity: band 2 has Ei' = 40 dB against
+    # Ui = 34.27 dB, and band 6 has Ei' = 0 dB against Ui = 1.13 dB.
+    assert result.level_distortion[1] == 1.0
+    assert result.level_distortion[5] == 1.0
+    assert np.all(result.level_distortion > 0.0)
+    assert np.all(result.level_distortion <= 1.0)
 
 
 def test_alternative_importance_reweights_the_same_audibility() -> None:

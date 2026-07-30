@@ -4069,6 +4069,29 @@ def _chk_sii_wg_octave1_tst() -> Outcome:
     )
 
 
+@register(_SII, "ANSI S3.5-1997 Annex C.1", "Octave-band worked example (SII.C)")
+def _chk_sii_annex_c1() -> Outcome:
+    return _sii_official_case(
+        "octave", ref.ANSIS3_5_ANNEX_C1_SPEECH, ref.ANSIS3_5_ANNEX_C1_NOISE,
+        (0.0,) * 6, ref.ANSIS3_5_ANNEX_C1,
+    )
+
+
+@register(_SII, "ANSI S3.5-1997 Table C.1 (errata)", "Level distortion Li, row i = 5")
+def _chk_sii_annex_c1_level_distortion() -> Outcome:
+    # Table C.1's Li column with the official WG S3-79 erratum applied (the
+    # printed 0.10 should be 1.00); clause 5.7 gives 0.99581 for that row.
+    result = ph.hearing.sii.speech_intelligibility_index(
+        np.array(ref.ANSIS3_5_ANNEX_C1_SPEECH),
+        np.array(ref.ANSIS3_5_ANNEX_C1_NOISE),
+        method="octave",
+    )
+    return numeric(
+        ref.ANSIS3_5_ANNEX_C1_LEVEL_DISTORTION_I5,
+        float(result.level_distortion[4]), 5e-3, places=2,
+    )
+
+
 @register(_SII, "ANSI S3.5-1997 Table 1", "Critical-band importance normalisation")
 def _chk_sii_critical_importance_sum() -> Outcome:
     total = float(ph.sii_procedure("critical-band").band_importance.sum())

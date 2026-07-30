@@ -404,6 +404,9 @@ class SIIResult:
     :ivar speech_spectrum: Equivalent speech spectrum level ``Ei'`` per band.
     :ivar disturbance: Equivalent disturbance spectrum level ``Di`` (clause 5.6).
     :ivar masking: Equivalent masking spectrum level ``Zi`` (clause 5.4).
+    :ivar level_distortion: Per-band level-distortion factor ``Li`` in [0, 1]
+        (clause 5.7), unity until the speech spectrum level rises above the
+        standard normal-effort spectrum by more than 10 dB.
     :ivar method: The band procedure used, one of :data:`SII_METHODS`.
     """
 
@@ -414,6 +417,7 @@ class SIIResult:
     speech_spectrum: np.ndarray
     disturbance: np.ndarray
     masking: np.ndarray
+    level_distortion: np.ndarray
     method: str = "one-third-octave"
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
@@ -744,6 +748,7 @@ def speech_intelligibility_index(
         speech_spectrum=e,
         disturbance=d,
         masking=z,
+        level_distortion=level_factor,
         method=proc.method,
     )
 

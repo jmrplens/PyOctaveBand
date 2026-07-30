@@ -27,8 +27,9 @@ speech. Noise, self-masking, upward spread of masking and the listener's own
 hearing threshold all enter explicitly, which is why SII extends naturally to
 hearing loss.
 [Speech Intelligibility Index](/phonometry/guides/speech-intelligibility/)
-covers the one-third-octave-band method, including the standard speech spectra
-for normal to shouted vocal effort.
+covers all four of the standard's band procedures (critical band,
+equally-contributing critical band, one-third octave and octave), including the
+standard speech spectra for normal to shouted vocal effort.
 
 A third pair of measures, **STOI** and **ESTOI**, answers yet another question:
 given a clean reference *and* a degraded or processed version of the same

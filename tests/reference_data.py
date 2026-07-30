@@ -1219,8 +1219,10 @@ ANSIS3_5_WG_ECB1_IMPORTANCE = (
 )
 ANSIS3_5_WG_ECB1_SII = 0.410  # published in the WG DevelopmentKit readme
 ANSIS3_5_WG_ECB1_SII_EXACT = 0.4104741231  # SII.C run on ECB_1.TST
-# The octave case is also the input printed in the DevelopmentKit readme as
-# "the octave band procedure of the example in Section C.1".
+# The octave case is the input printed in the DevelopmentKit readme as "the
+# octave band procedure of the example in Section C.1", except that OCTAVE.TST
+# raises the 8000 Hz equivalent hearing threshold to 7.1 dB HL where Annex C.1
+# has 0; ANSIS3_5_ANNEX_C1_* below carries the Annex C.1 input itself.
 ANSIS3_5_WG_OCTAVE_SPEECH = (50.0, 40.0, 40.0, 30.0, 20.0, 0.0)
 ANSIS3_5_WG_OCTAVE_NOISE = (70.0, 65.0, 45.0, 25.0, 1.0, -15.0)
 ANSIS3_5_WG_OCTAVE_THRESHOLD = (0.0, 0.0, 0.0, 0.0, 0.0, 7.1)
@@ -1247,6 +1249,19 @@ ANSIS3_5_OCTAVE_INTERNAL_NOISE_1KHZ = -12.5
 # internal noise spectrum level Xi. Digits from the WG S3-79 reference
 # implementation SII.C (limit[], i_avg[], u[], x[]); the R CRAN package "SII"
 # prints the same six rows of Table 1 from its own transcription.
+# ANSI S3.5-1997 Annex C.1 worked example (octave-band procedure). Its input is
+# printed in the WG DevelopmentKit readme: equivalent speech spectrum level
+# 50/40/40/30/20/0 dB, equivalent noise spectrum level 70/65/45/25/1/-15 dB,
+# normal hearing. SII.C run on that input = 0.5039555062.
+ANSIS3_5_ANNEX_C1_SPEECH = (50.0, 40.0, 40.0, 30.0, 20.0, 0.0)
+ANSIS3_5_ANNEX_C1_NOISE = (70.0, 65.0, 45.0, 25.0, 1.0, -15.0)
+ANSIS3_5_ANNEX_C1 = 0.5039555062
+# Table C.1, row i = 5 (the 4000 Hz octave band), column Li under Step 6, with
+# the official WG S3-79 erratum applied: the printed 0.10 should be 1.00. The
+# level-distortion factor of clause 5.7 with the example's own inputs
+# (Ei' = 20 dB, Ui = 9.33 dB) is 1 - (20 - 9.33 - 10)/160 = 0.99581, which is
+# what prints as 1.00 to two decimals.
+ANSIS3_5_ANNEX_C1_LEVEL_DISTORTION_I5 = 1.00
 ANSIS3_5_CRITICAL_TABLE1_HEAD = (
     (150.0, 100.0, 200.0, 0.0103, 31.44, 1.5),
     (250.0, 200.0, 300.0, 0.0261, 34.75, -3.9),

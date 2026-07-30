@@ -1,6 +1,6 @@
 ---
 title: "Speech Intelligibility Index"
-description: "The ANSI S3.5-1997 one-third-octave-band Speech Intelligibility Index (SII): equivalent speech/noise/threshold spectrum levels, the Table 3 band-importance function, self-speech and upward spread of masking, the band-audibility function, and the index in noise and hearing loss."
+description: "The ANSI S3.5-1997 Speech Intelligibility Index (SII) in all four of its band procedures (critical band, equally contributing, one-third octave, octave): equivalent speech/noise/threshold spectrum levels, the band-importance functions, self-speech and upward spread of masking, the band-audibility function, and the index in noise and hearing loss."
 references:
   - type: standard
     organization: "American National Standards Institute"
@@ -9,7 +9,7 @@ references:
     designation: "ANSI S3.5-1997 (R2017)"
     publisher: "Acoustical Society of America"
     url: "https://webstore.ansi.org/standards/asa/ansiasas31997r2017"
-    note: "The one-third-octave-band method (18 bands): the band-importance function (Table 3), the standard speech spectrum level and reference internal noise (Table 3), the masking, disturbance and band-audibility procedure (clause 5) and the index (clause 6)."
+    note: "The four band procedures: critical band (21 bands, Table 1), equally-contributing critical band (17 bands, Table 2), one-third octave (18 bands, Table 3) and octave (6 bands, Table 4), each with its band-importance function, standard speech spectrum level and reference internal noise; the masking, disturbance and band-audibility procedure (clause 5) and the index (clause 6)."
   - type: article
     authors: ["French, N. R.", "Steinberg, J. C."]
     year: 1947
@@ -30,8 +30,10 @@ audible, and therefore intelligible, to a listener in a given noise and hearing
 condition. It reduces a speech spectrum, a noise spectrum and a hearing
 threshold to a single number in `[0, 1]`: `0` when nothing useful reaches the
 listener, `1` when the whole speech-bearing spectrum is audible. This page
-covers the **one-third-octave-band method** of **ANSI S3.5-1997 (R2017)**: 18
-bands from 160 Hz to 8000 Hz.
+covers all four band procedures of **ANSI S3.5-1997 (R2017)**: the
+**one-third-octave-band method** (18 bands from 160 Hz to 8000 Hz), which is
+the default and the one sections 1 to 4 work through, and the critical-band,
+equally-contributing critical-band and octave-band methods of section 5.
 
 :::note
 **SII vs STI.** The SII predicts intelligibility from *audibility* (how much
@@ -342,7 +344,154 @@ plt.show()
 The vocal-effort names work anywhere a speech spectrum is expected, including as
 the first argument to `speech_intelligibility_index`.
 
-## 5. SII or STI?
+## 5. The four band procedures
+
+The standard's own title is plural, and so is the standard: ANSI S3.5-1997
+defines **four** band procedures. They differ only in the band table and in how
+the upward spread of masking is expressed, and `method=` selects one. The
+default is the one-third-octave procedure used above.
+
+| `method=` | Bands | Range | Constants | Spread of masking |
+| :--- | ---: | :--- | :--- | :--- |
+| `"critical-band"` | 21 | 100 Hz to 9500 Hz | Table 1 | between tabulated band limits |
+| `"equally-contributing"` | 17 | 300 Hz to 6400 Hz | Table 2 | between tabulated band limits |
+| `"one-third-octave"` | 18 | 160 Hz to 8000 Hz | Table 3 | between band centre frequencies |
+| `"octave"` | 6 | 177 Hz to 11314 Hz | Table 4 | none |
+
+Every procedure runs the same chain as section 2: self-speech masking, the
+upward spread of masking, the equivalent internal noise and disturbance, the
+level-distortion factor and the band-audibility function, weighted by that
+procedure's own band-importance function. The masking slope is one formula
+throughout, $C_i = -80 + 0.6\,(B_i + 10\log_{10} W_i)$ with $W_i$ the band
+width in hertz. The critical-band and equally-contributing procedures spread
+the masking from the upper limit of the masker band up to the centre frequency
+of the masked band; the one-third-octave procedure writes that same geometry in
+terms of the band centres, which is where its printed $0.89\,f_i/f_k$ and
+$-6.353$ dB come from. The octave-band procedure carries **no** spread of
+masking at all: an octave band is already wider than the spread being
+modelled, so its equivalent masking spectrum level is the equivalent noise
+spectrum level itself.
+
+The four band-importance functions are one underlying distribution sampled at
+four resolutions, so the wider the bands, the larger each $I_i$. Each function
+sums to one, except Table 2's, which prints `0.0588` in each of its 17 bands
+and so sums to 0.9996.
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_band_procedures.svg"
+  alt="The band-importance function of the four ANSI S3.5-1997 band procedures overlaid on one logarithmic frequency axis: the 21 critical bands, the 17 equally-contributing critical bands, the 18 one-third-octave bands and the 6 octave bands, each drawn as a step across its own band limits. All four trace the same rise to a maximum around 2 kHz, and the wider the bands the higher the step, the octave function peaking at 0.265 against 0.090 for the one-third-octave function"
+  width="90%"
+/>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import SII_METHODS, sii_procedure
+
+# One line: each procedure's own .plot() steps its Ii over its band limits.
+fig, ax = plt.subplots(figsize=(10, 6))
+for method in SII_METHODS:
+    sii_procedure(method).plot(ax=ax, linewidth=1.8)
+plt.show()
+
+# By hand, mirroring what SIIProcedure.plot() draws:
+fig, ax = plt.subplots()
+for method in SII_METHODS:
+    proc = sii_procedure(method)
+    ii = proc.band_importance
+    ax.plot(proc.band_edges, np.append(ii, ii[-1]), drawstyle="steps-post",
+            label=method)
+ax.set_xscale("log")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel(r"Band importance $I_i$")
+ax.set_ylim(bottom=0.0)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+Because an equivalent spectrum level is a per-hertz quantity, a white noise has
+the *same* equivalent noise spectrum level in every band of every procedure,
+which makes the four directly comparable:
+
+```python
+import numpy as np
+from phonometry import hearing
+
+for method in hearing.SII_METHODS:
+    n_bands = hearing.sii_procedure(method).frequencies.size
+    result = hearing.speech_intelligibility_index(
+        "normal", np.full(n_bands, 25.0), method=method
+    )
+    print(method, n_bands, round(result.sii, 3))
+# critical-band        21 0.343
+# equally-contributing 17 0.333
+# one-third-octave     18 0.350
+# octave                6 0.369
+```
+
+The four agree to within about 0.04 on the same listening situation. The octave
+procedure reads highest because it drops the spread of masking, which is
+exactly the risk it carries: feed it a strong low-frequency noise and it will
+not see that noise reaching up into the speech-bearing bands.
+
+**Which procedure to use.**
+
+- `"one-third-octave"` is the working default: the finest resolution the
+  standard offers, the only table that carries all four vocal-effort speech
+  spectra, and the resolution measurement data usually arrives in.
+- `"critical-band"` follows the auditory filter. Its 21 bands are the classical
+  critical bands, so it is the procedure to pair with critical-band models of
+  masking or loudness, and the only one that reaches down to 100 Hz.
+- `"equally-contributing"` gives all 17 of its bands the same importance over
+  300 Hz to 6400 Hz, so the index reads directly as the fraction of
+  equally-important bands that are audible. That makes it fast to check by
+  hand, and it is the presentation closest to the articulation-index tradition
+  the SII grew out of.
+- `"octave"` is for octave-band data, which is what sound level meters, HVAC
+  selections and building-acoustics reports routinely give. Use it when that is
+  all you have, and read it knowing the spread of masking is missing.
+
+**An alternative band-importance function.** `band_importance=` replaces the
+procedure's tabulated $I_i$ with one of your own, which is how the standard's
+Annex B functions for particular speech test materials (nonsense syllables,
+monosyllabic word lists, short passages) are applied. It changes the weighting
+only: the audibility chain, and therefore `result.band_audibility`, is
+untouched.
+
+```python
+res = hearing.speech_intelligibility_index(
+    "normal", np.full(6, 25.0), method="octave",
+    band_importance=[0.0, 0.0, 1.0, 0.0, 0.0, 0.0],   # all the weight at 1 kHz
+)
+print(round(res.sii, 3))          # 0.5  (the 1 kHz octave band alone)
+```
+
+**The tabulated constants.** `sii_procedure(method)` returns an `SIIProcedure`
+carrying that procedure's band centre frequencies, band limits, band-importance
+function, reference internal noise spectrum level and normal-effort standard
+speech spectrum level; its `.plot()` draws the band-importance function as a
+step over the band limits, which is the figure above. Tables 1, 2 and 4 are
+tabulated for normal vocal effort only, so `"raised"`, `"loud"` and `"shout"`
+are available on the one-third-octave procedure alone.
+
+```python
+octave = hearing.sii_procedure("octave")
+print(octave.frequencies)          # [ 250.  500. 1000. 2000. 4000. 8000.]
+print(octave.band_importance)      # [0.0617 0.1671 0.2373 0.2648 0.2142 0.0549]
+
+# Table 2 is critical bands 3 to 19 of Table 1, weighted equally.
+equal = hearing.sii_procedure("equally-contributing")
+print(equal.band_edges[0], equal.band_edges[-1])       # 300.0 6400.0
+print(equal.band_importance.sum().round(4))            # 0.9996
+```
+
+
+## 6. SII or STI?
 
 The two speech metrics answer different questions from different measurements,
 and each is blind to what the other captures:
@@ -365,7 +514,7 @@ inputs are cheap once the room and the noise have been measured. See the
 [Speech Transmission Index guide](/phonometry/guides/speech-transmission/) for
 the STI side.
 
-## 6. ANSI S3.5-1997 report (`.report()`)
+## 7. ANSI S3.5-1997 report (`.report()`)
 
 `SIIResult.report(path)` renders a one-page PDF fiche laid out like a
 speech-audibility report: a standard-basis line, an optional metadata header
@@ -408,24 +557,31 @@ repository; click the preview to open the PDF.
 
 ## What this guide covers
 
-**Covered.** ANSI S3.5-1997 (R2017)'s one-third-octave-band method (18 bands,
-160 Hz to 8000 Hz): the equivalent speech, noise and hearing-threshold
-spectrum levels, the Table 3 band-importance function and standard speech
-spectra by vocal effort, the self-speech masking, upward spread of masking,
-level-distortion factor and band-audibility function of clause 5, and the
-index of clause 6. `speech_intelligibility_index`, `standard_speech_spectrum`
-and `standard_speech_spectra` implement these, and `SIIResult.report(path)`
-renders the ANSI S3.5-1997 fiche.
+**Covered.** All four band procedures of ANSI S3.5-1997 (R2017): the
+critical-band method (21 bands, Table 1), the equally-contributing
+critical-band method (17 bands, Table 2), the one-third-octave-band method (18
+bands, Table 3, the default) and the octave-band method (6 bands, Table 4).
+For each: the equivalent speech, noise and hearing-threshold spectrum levels,
+the band-importance function and standard speech spectrum level, the
+self-speech masking, upward spread of masking, level-distortion factor and
+band-audibility function of clause 5, and the index of clause 6.
+`speech_intelligibility_index` (with `method=` and `band_importance=`),
+`sii_procedure`, `standard_speech_spectrum` and `standard_speech_spectra`
+implement these, and `SIIResult.report(path)` renders the ANSI S3.5-1997 fiche
+for whichever procedure was used.
 
-**Not covered.** The standard's own title is plural ("Methods for the
-Calculation of the Speech Intelligibility Index"): phonometry implements only
-the one-third-octave-band procedure, not the standard's other band-resolution
-methods. The band-importance function used is always Table 3's
-average-speech compromise; Annex B's alternative importance functions for
-specific test materials (nonsense syllables, monosyllabic word lists, short
-passages) are not implemented. The Speech Transmission Index, a different
-metric for a transmission channel rather than listener audibility, is covered
-separately in the
+**Not covered.** The standard speech spectra for raised, loud and shout vocal
+effort are carried for the one-third-octave procedure only; Tables 1, 2 and 4
+are implemented with their normal-effort column, which is the column the
+level-distortion factor of clause 5.7 needs. The tabulated band-importance
+functions are the average-speech compromise of each table; Annex B's
+alternative importance functions for specific test materials (nonsense
+syllables, monosyllabic word lists, short passages) are not shipped as
+constants, but any importance function can be applied with
+`band_importance=`. No resampling between the four band sets is provided: each
+procedure is fed spectra on its own bands. The Speech Transmission Index, a
+different metric for a transmission channel rather than listener audibility,
+is covered separately in the
 [Speech Transmission Index guide](/phonometry/guides/speech-transmission/).
 
 ## See also
@@ -456,6 +612,20 @@ $A_i = \operatorname{clip}\!\left((E_i' - D_i + 15)/30,\; 0,\; 1\right)$
 (clause 5.8), where $E_i'$ is the equivalent speech spectrum level and $D_i$
 the equivalent disturbance combining external noise, upward spread of masking
 and the equivalent internal noise. The index lies in $[0, 1]$.
+
+### Which of the four ANSI S3.5 band procedures should I use?
+
+ANSI S3.5-1997 defines four: critical band (21 bands, 100 Hz to 9500 Hz),
+equally-contributing critical band (17 bands, 300 Hz to 6400 Hz), one-third
+octave (18 bands, 160 Hz to 8000 Hz) and octave (6 bands, 250 Hz to 8000 Hz
+nominal). Use `method="one-third-octave"` by default: it is the finest
+resolution and the only procedure whose table carries the raised, loud and
+shout speech spectra. Use `method="critical-band"` to align the index with a
+critical-band (Bark) masking or loudness model, `method="equally-contributing"`
+when the index should read as the fraction of equally-important bands that are
+audible, and `method="octave"` when octave-band data is all that was measured,
+remembering that the octave procedure carries no upward spread of masking and
+so reads high under strong low-frequency noise.
 
 ### When should I use the SII instead of the STI?
 
