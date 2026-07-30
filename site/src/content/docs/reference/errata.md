@@ -666,8 +666,8 @@ which is the check that enforces the rule; see
 - **The problem:** the document's own Tables 4 and 5 only reproduce when U is
   computed from the unrounded u and rounded last. Neither table prints a *u*
   column at all (each has only the coefficient αs or αp and ±U with k = 2),
-  so the printed U values are the whole of the evidence, and 11 of the 25 of
-  them are unreachable under the literal clause wording.
+  so the printed U values are the whole of the evidence, and 11 of the 25 are
+  unreachable under the literal clause wording.
 - **Evidence:** recomputation of all 25 entries (Table 4: 20 rows, Table 5:
   5 rows) from Formula (1) with the Table 1 constants and from Formula (4)
   with the Table 2 constants, under both conventions. Round-last reproduces
@@ -695,13 +695,13 @@ which is the check that enforces the rule; see
   octave band is missing between them. The document contradicts itself on the
   same quantity two pages earlier: Table 2, which supplies the m and n
   constants of Formula (4) for exactly these five frequencies, is headed
-  "Octave midband frequency". Table 4, on the same page as Table 5, carries a
-  genuine one-third-octave series (63 Hz to 5 000 Hz, 20 rows) under the same
-  header text, which is where the header was evidently copied from.
+  "Octave midband frequency". The same header text stands over Table 4 on the
+  same page, where it is correct: that table carries a genuine one-third-octave
+  series, 63 Hz to 5 000 Hz in 20 rows.
 - **Evidence:** the five tabulated frequencies themselves, and the
   "Octave midband frequency" header of Table 2 for the same αp constants.
   Renders: `plan/[ISO 12999-2_2020] building acoustics uncertainty part
-  2.pdf`, PDF page 13, printed p. 7, 200 dpi (Tables 4 and 5 side by side),
+  2.pdf`, PDF page 13, printed p. 7, 200 dpi (Tables 4 and 5, one above the other),
   and PDF page 11, printed p. 5, 200 dpi (Table 2).
 - **Library behaviour:** `_TABLE2` in
   [`absorption_uncertainty.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/materials/absorption_uncertainty.py)
