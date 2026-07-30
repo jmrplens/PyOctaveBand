@@ -385,7 +385,7 @@ def plenum_flanking_reduction_index(
             "'attenuation_source' and 'attenuation_receiving' must be given "
             "together."
         )
-    if attenuation_source is None:
+    if attenuation_source is None or attenuation_receiving is None:
         geometry = float(10.0 * np.log10(eps**2 * lr / (4.0 * h)))
         tau = eps**2 * tau_s * tau_r * lr / (4.0 * h)
         rcl = rs + rr - geometry

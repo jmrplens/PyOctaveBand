@@ -39,6 +39,10 @@ if TYPE_CHECKING:
         ImpactPredictionResult,
     )
     from ..building.building_uncertainty import BandUncertainty
+    from ..building.ceiling_plenum import (
+        CeilingAttenuationResult,
+        PlenumFlankingResult,
+    )
     from ..building.detailed_prediction import (
         DetailedAirborneResult,
         DetailedImpactResult,
@@ -47,6 +51,11 @@ if TYPE_CHECKING:
     from ..building.facade_prediction import FacadePredictionResult, RadiatedPowerResult
     from ..building.flanking_transmission import VibrationReductionResult
     from ..building.floor_covering_improvement import FloorCoveringImprovementResult
+    from ..building.heavy_impact import (
+        AWeightedMaximumImpactResult,
+        HeavyImpactSourceCheck,
+        StandardizedMaximumImpactResult,
+    )
     from ..building.installed_structure_borne import InstalledSourceResult
     from ..building.insulation import (
         AirborneInsulationResult,
@@ -57,6 +66,7 @@ if TYPE_CHECKING:
         ImpactRatingResult,
         WeightedRatingResult,
     )
+    from ..building.masonry_cavity_wall import WallTieCouplingResult
     from ..building.panel_transmission import SoundReductionResult
     from ..building.spanish_building_code import (
         DbHrAssessment,
@@ -140,7 +150,53 @@ _STRINGS: dict[str, str] = {
     "other paths": "otros trayectos",
     "In-situ element performance (ISO 12354)": "Comportamiento del elemento in situ (ISO 12354)",
     "Reduction index / impact level [dB]": "Índice de reducción / nivel de impactos [dB]",
+    "tolerance band": "banda de tolerancia",
+    "nominal $L_{FE}$": "$L_{FE}$ nominal",
+    "measured $L_{FE}$": "$L_{FE}$ medido",
+    "outside tolerance": "fuera de tolerancia",
+    "Impact force exposure level $L_{FE}$ [dB re 1 N]":
+        "Nivel de exposición a la fuerza de impacto $L_{FE}$ [dB re 1 N]",
+    "conforms": "cumple",
+    "does not conform": "no cumple",
+    "Heavy impact source conformance": "Conformidad de la fuente de impacto pesada",
+    "rubber ball": "pelota de caucho",
+    "bang machine": "máquina de neumático",
+    "$L_{i,Fmax}$ (measured)": "$L_{i,Fmax}$ (medido)",
+    "$L'_{i,Fmax,V,T}$ (standardized)": "$L'_{i,Fmax,V,T}$ (estandarizado)",
+    "standardization correction": "corrección de estandarización",
+    "Maximum impact sound pressure level [dB]":
+        "Nivel máximo de presión acústica de impactos [dB]",
+    "ISO 16283-2 rubber-ball standardization":
+        "Estandarización de la pelota de caucho ISO 16283-2",
+    "A-weighted contribution": "contribución ponderada A",
+    "$X_{i,Fmax}$ (unweighted)": "$X_{i,Fmax}$ (sin ponderar)",
+    "ISO 717-2 Annex D heavy-impact rating":
+        "Índice de impacto pesado ISO 717-2 Anexo D",
+    "one-third octave": "tercio de octava",
+    "octave": "octava",
+    "Normalized ceiling attenuation": "Atenuación normalizada del techo",
+    "Normalized ceiling attenuation $D_{n,c}$ [dB]":
+        "Atenuación normalizada del techo $D_{n,c}$ [dB]",
+    "$R_S + R_R$ (two ceilings)": "$R_S + R_R$ (dos techos)",
+    "$R_{cl}$ (ceiling/plenum path)": "$R_{cl}$ (trayecto techo/plénum)",
+    "plenum penalty": "penalización del plénum",
+    "Suspended-ceiling plenum path": "Trayecto por plénum de techo suspendido",
+    "rigid connection ($Y_c$ = 0)": "unión rígida ($Y_c$ = 0)",
+    "resilient tie array": "conjunto de llaves elásticas",
+    "isolation gained by the tie": "aislamiento aportado por la llave",
+    "Coupling loss factor $\\eta_{ij}$": "Factor de pérdidas por acoplamiento $\\eta_{ij}$",
+    "Wall-tie structure-borne coupling": "Acoplamiento estructural por llaves de muro",
+    "ties/m$^2$": "llaves/m$^2$",
 }
+
+#: Localised names of the two standard heavy and soft impact sources.
+_HEAVY_IMPACT_SOURCE_LABELS = {
+    "rubber_ball": "rubber ball",
+    "bang_machine": "bang machine",
+}
+
+#: Localised names of the two ISO 717-2 Annex D rating band widths.
+_HEAVY_IMPACT_BAND_LABELS = {"third": "one-third octave", "octave": "octave"}
 
 
 def _t(text: str, language: str = "en") -> str:
@@ -1236,5 +1292,265 @@ def plot_db_hr_assessment(
     ax.set_title(_t("CTE DB-HR requirement check", language))
     ax.legend(loc="best", fontsize="small")
     ax.grid(True, axis="x", alpha=0.3)
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_heavy_impact_source(
+    result: HeavyImpactSourceCheck, ax: Axes | None = None,
+    language: str = "en", **kwargs: Any
+) -> Axes:
+    """Measured heavy-impact source ``LFE`` against its printed tolerance band.
+
+    :param result: A
+        :class:`~phonometry.building.heavy_impact.HeavyImpactSourceCheck`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the measured-curve ``plot`` call.
+    :return: The axes.
+    """
+    from .._i18n import localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    positions = _band_axis(ax, result.frequencies, language=language)
+    lower = result.nominal - result.tolerance
+    upper = result.nominal + result.tolerance
+    ax.fill_between(
+        positions, lower, upper, color=theme_fill(_C_TERTIARY, ax), lw=0, zorder=0,
+        label=_t("tolerance band", language),
+    )
+    ax.plot(positions, result.nominal, "s--", color=_C_REFERENCE, lw=1.2,
+            label=_t("nominal $L_{FE}$", language))
+    kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault("marker", "o")
+    ax.plot(positions, result.measured, "-", label=_t("measured $L_{FE}$", language),
+            **kwargs)
+    failing = ~result.within_tolerance
+    if bool(np.any(failing)):
+        ax.plot(positions[failing], result.measured[failing], ls="", marker="X",
+                color=_C_SECONDARY, ms=11, zorder=6,
+                label=_t("outside tolerance", language))
+    ax.set_ylabel(_t("Impact force exposure level $L_{FE}$ [dB re 1 N]", language))
+    verdict = _t("conforms", language) if result.passed else _t("does not conform", language)
+    source = _t(_HEAVY_IMPACT_SOURCE_LABELS[result.source], language)
+    ax.set_title(
+        f"{_t('Heavy impact source conformance', language)}: {source} ({verdict})"
+    )
+    ax.grid(True, which="both", alpha=0.3)
+    ax.legend(loc="best", fontsize="small")
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_standardized_maximum_impact(
+    result: StandardizedMaximumImpactResult, ax: Axes | None = None,
+    language: str = "en", **kwargs: Any
+) -> Axes:
+    """Measured and standardized maximum impact levels (ISO 16283-2 3.16).
+
+    :param result: A
+        :class:`~phonometry.building.heavy_impact.StandardizedMaximumImpactResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the standardized-curve ``plot`` call.
+    :return: The axes.
+    """
+    from .._i18n import format_number, localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    labels = (
+        result.frequencies if result.frequencies is not None
+        else np.arange(result.measured.size) + 1.0
+    )
+    positions = _band_axis(
+        ax, labels,
+        xlabel="Frequency [Hz]" if result.frequencies is not None else "Band index",
+        language=language,
+    )
+    ax.plot(positions, result.measured, "s--", color=_C_REFERENCE, lw=1.2,
+            label=_t("$L_{i,Fmax}$ (measured)", language))
+    kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault("marker", "o")
+    ax.plot(positions, result.standardized, "-",
+            label=_t("$L'_{i,Fmax,V,T}$ (standardized)", language), **kwargs)
+    ax.fill_between(
+        positions, result.measured, result.standardized,
+        color=theme_fill(_C_SECONDARY, ax), lw=0, zorder=0,
+        label=_t("standardization correction", language),
+    )
+    ax.set_ylabel(_t("Maximum impact sound pressure level [dB]", language))
+    ax.set_title(
+        f"{_t('ISO 16283-2 rubber-ball standardization', language)} "
+        f"(V = {format_number(result.volume, language, decimals=1)} m$^3$)"
+    )
+    ax.grid(True, which="both", alpha=0.3)
+    ax.legend(loc="best", fontsize="small")
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_a_weighted_maximum_impact(
+    result: AWeightedMaximumImpactResult, ax: Axes | None = None,
+    language: str = "en", **kwargs: Any
+) -> Axes:
+    """A-weighted maximum impact level and its band contributions (ISO 717-2 D).
+
+    :param result: An
+        :class:`~phonometry.building.heavy_impact.AWeightedMaximumImpactResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the ``bar`` call for the corrected values.
+    :return: The axes.
+    """
+    from .._i18n import format_number, localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    positions = _band_axis(ax, result.frequencies, language=language)
+    kwargs.setdefault("color", _C_PRIMARY)
+    ax.bar(positions, result.corrected, width=0.7, zorder=2,
+           label=_t("A-weighted contribution", language), **kwargs)
+    ax.plot(positions, result.levels, "s--", color=_C_REFERENCE, lw=1.2, zorder=3,
+            label=_t("$X_{i,Fmax}$ (unweighted)", language))
+    ax.axhline(result.rating, color=_C_SECONDARY, ls="-", lw=1.6, zorder=4,
+               label=f"$X_{{iA,Fmax}}$ = {result.rating} dB")
+    ax.set_ylabel(_t("Maximum impact sound pressure level [dB]", language))
+    ax.set_title(
+        f"{_t('ISO 717-2 Annex D heavy-impact rating', language)} "
+        f"({_t(_HEAVY_IMPACT_BAND_LABELS[result.band], language)}, "
+        f"{format_number(result.unrounded, language, decimals=2)} dB)"
+    )
+    ax.grid(True, axis="y", alpha=0.3)
+    ax.legend(loc="best", fontsize="small")
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_ceiling_attenuation(
+    result: CeilingAttenuationResult, ax: Axes | None = None,
+    language: str = "en", **kwargs: Any
+) -> Axes:
+    """Normalized ceiling attenuation against the fitted ASTM E413 contour.
+
+    :param result: A
+        :class:`~phonometry.building.ceiling_plenum.CeilingAttenuationResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the measured-curve ``plot`` call.
+    :return: The axes.
+    """
+    from .._i18n import format_number, localize_axes
+
+    ax = _plot_rating(
+        result.frequencies,
+        result.measured,
+        result.shifted_reference,
+        impact=False,
+        title=(
+            f"ASTM E413 CAC = {result.rating} dB  "
+            f"({_t('Sigma unfav.', language)} = "
+            f"{format_number(result.deficiency_sum, language, decimals=1)} dB)"
+        ),
+        measured_label="Normalized ceiling attenuation",
+        ylabel=_t("Normalized ceiling attenuation $D_{n,c}$ [dB]", language),
+        ax=ax,
+        language=language,
+        **kwargs,
+    )
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_plenum_flanking(
+    result: PlenumFlankingResult, ax: Axes | None = None,
+    language: str = "en", **kwargs: Any
+) -> Axes:
+    """Ceiling/plenum flanking path ``Rcl`` against the two ceilings.
+
+    :param result: A
+        :class:`~phonometry.building.ceiling_plenum.PlenumFlankingResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the ``Rcl`` curve ``plot`` call.
+    :return: The axes.
+    """
+    from .._i18n import format_number, localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    labels = (
+        result.frequencies if result.frequencies is not None
+        else np.arange(result.reduction_index.size) + 1.0
+    )
+    positions = _band_axis(
+        ax, labels,
+        xlabel="Frequency [Hz]" if result.frequencies is not None else "Band index",
+        language=language,
+    )
+    total = result.reduction_index_source + result.reduction_index_receiving
+    ax.plot(positions, total, "s--", color=_C_REFERENCE, lw=1.2,
+            label=_t("$R_S + R_R$ (two ceilings)", language))
+    kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault("marker", "o")
+    ax.plot(positions, result.reduction_index, "-",
+            label=_t("$R_{cl}$ (ceiling/plenum path)", language), **kwargs)
+    ax.fill_between(
+        positions, result.reduction_index, total,
+        color=theme_fill(_C_SECONDARY, ax), lw=0, zorder=0,
+        label=_t("plenum penalty", language),
+    )
+    ax.set_ylabel(_t("Sound reduction index $R$ [dB]", language))
+    ax.set_title(
+        f"{_t('Suspended-ceiling plenum path', language)} "
+        f"(h = {format_number(result.plenum_height, language, decimals=2)} m, "
+        f"$L_R$ = {format_number(result.ceiling_length, language, decimals=2)} m, "
+        f"$\\varepsilon$ = {result.epsilon:.0f})"
+    )
+    ax.grid(True, which="both", alpha=0.3)
+    ax.legend(loc="best", fontsize="small")
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_wall_tie_coupling(
+    result: WallTieCouplingResult, ax: Axes | None = None,
+    language: str = "en", **kwargs: Any
+) -> Axes:
+    """Wall-tie coupling loss factor against the rigid-connection ceiling.
+
+    :param result: A
+        :class:`~phonometry.building.masonry_cavity_wall.WallTieCouplingResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the ``eta_ij`` curve ``plot`` call.
+    :return: The axes.
+    """
+    from .._i18n import format_number, localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    freq = np.asarray(result.frequencies, dtype=np.float64)
+    ax.loglog(freq, result.rigid_coupling_loss_factor, "--", color=_C_REFERENCE,
+              lw=1.2, label=_t("rigid connection ($Y_c$ = 0)", language))
+    kwargs.setdefault("color", _C_PRIMARY)
+    ax.loglog(freq, result.coupling_loss_factor,
+              label=_t("resilient tie array", language), **kwargs)
+    ax.fill_between(
+        freq, result.coupling_loss_factor, result.rigid_coupling_loss_factor,
+        color=theme_fill(_C_TERTIARY, ax), lw=0, zorder=0,
+        label=_t("isolation gained by the tie", language),
+    )
+    format_frequency_axis(ax, float(freq.min()), float(freq.max()))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
+    ax.set_ylabel(_t("Coupling loss factor $\\eta_{ij}$", language))
+    stiffness = (
+        "" if result.tie_stiffness is None
+        else ", $k$ = "
+             f"{format_number(result.tie_stiffness / 1e6, language, decimals=1)} MN/m"
+    )
+    ax.set_title(
+        f"{_t('Wall-tie structure-borne coupling', language)} "
+        f"({format_number(result.ties_per_area, language, decimals=1)} "
+        f"{_t('ties/m$^2$', language)}{stiffness})"
+    )
+    ax.grid(True, which="both", alpha=0.3)
+    ax.legend(loc="best", fontsize="small")
     localize_axes(ax, language)
     return ax

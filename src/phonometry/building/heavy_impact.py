@@ -92,10 +92,10 @@ if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
 __all__ = [
-    "AWeightedMaximumImpactResult",
     "HEAVY_IMPACT_A_WEIGHTING",
     "HEAVY_IMPACT_OCTAVE_BANDS",
     "HEAVY_IMPACT_SOURCES",
+    "AWeightedMaximumImpactResult",
     "HeavyImpactSourceCheck",
     "HeavyImpactSourceSpec",
     "StandardizedMaximumImpactResult",
