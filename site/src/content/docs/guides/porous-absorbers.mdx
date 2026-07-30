@@ -87,7 +87,7 @@ references:
     edition: "2nd ed."
     publisher: "Wiley"
     doi: "10.1002/9780470747339"
-    note: "Section 11.3.4: the rigid and limp frame limits of the Biot theory, the decoupling frequency and the limp effective density (Eqs 11.53-11.55, after Panneton 2007). ISBN 978-0-470-74661-5."
+    note: "Chapter 6: the Biot theory of an elastic-framed porous material, its elastic coefficients, its two compressional waves and its shear wave, and the surface impedance and quarter-wave frame resonance of a hard-backed layer (Eqs 6.107-6.110). Chapter 11: the transfer-matrix method, the six-variable poroelastic layer matrix (Table 11.1), the coupling matrices (Sect. 11.4) and the global assembly (Sect. 11.5). Section 11.3.4: the rigid and limp frame limits of the Biot theory, the decoupling frequency and the limp effective density (Eqs 11.53-11.55, after Panneton 2007). ISBN 978-0-470-74661-5."
 ---
 
 import ThemeImage from '../../../components/ThemeImage.astro';
@@ -830,7 +830,9 @@ fluid, and `limp_frame` adds its inertia (Allard & Atalla Eqs 11.53-11.55).
 Use it for felts, screens and light fibreglass, for anything measured
 unconstrained in an impedance tube, and wherever the frame in vacuum is softer
 than about 20 kPa (`limp_frame_applicable`); do not use it, or the rigid model
-either, for a material bonded to a vibrating structure.
+either, for a material bonded to a vibrating structure. When the frame is stiff
+and heavy enough to resonate in the band of interest, neither equivalent fluid
+will do at all: use a `PoroelasticLayer` and the full Biot theory.
 
 **Local vs. bulk reaction.** The layer solver is bulk-reacting (sound
 refracts and travels inside the layers). `statistical_absorption` assumes
@@ -845,7 +847,7 @@ printed coefficient tables (Bies Table D.1, Miki Eqs. 30–34), the solver to
 the closed forms above and to the `TransferMatrix` recovery of the
 [impedance-tube page](/phonometry/guides/impedance-tube/), the MPP to Maa's own approximation
 (stated ~6 % agreement with the exact Eq. 2), design example and Table I,
-and the Paris integral to its locally reacting closed form. Three misprints
+and the Paris integral to its locally reacting closed form. Misprints
 found in the sources during this work are recorded in the
 [errata registry](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.md).
 
@@ -853,12 +855,15 @@ found in the sources during this work are recorded in the
 
 **Covered.** The textbook and journal methods of Mechel, Bies, Cox &
 D'Antonio, Miki (1990), Maa (1998) and Johnson, Koplik & Dashen (1987),
-implemented clean-room as described above. That covers the
+implemented clean-room as described above, together with the Biot theory of
+Allard & Atalla chapters 6 and 11. That covers the
 equivalent-fluid porous models (`delany_bazley`, `miki`,
-`johnson_champoux_allard`), the transfer-matrix multilayer solver
-(`layered_absorber` with `PorousLayer`, `PerforatedPlateLayer`,
-`MicroperforatedPlateLayer` and `MembraneLayer`) and the Paris-integral
-random-incidence coefficients (`diffuse_field_absorption`,
+`johnson_champoux_allard`, `limp_frame`), the poroelastic layer
+(`biot_waves`, `biot_surface_impedance`, `PoroelasticLayer`), the
+transfer-matrix multilayer solver
+(`layered_absorber` with `PorousLayer`, `PoroelasticLayer`,
+`PerforatedPlateLayer`, `MicroperforatedPlateLayer` and `MembraneLayer`) and
+the Paris-integral random-incidence coefficients (`diffuse_field_absorption`,
 `statistical_absorption`).
 
 **Not covered.** Cox & D'Antonio's book covers diffusers as well as

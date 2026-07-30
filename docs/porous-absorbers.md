@@ -739,7 +739,9 @@ fluid, and `limp_frame` adds its inertia (Allard & Atalla Eqs 11.53-11.55).
 Use it for felts, screens and light fibreglass, for anything measured
 unconstrained in an impedance tube, and wherever the frame in vacuum is softer
 than about 20 kPa (`limp_frame_applicable`); do not use it, or the rigid model
-either, for a material bonded to a vibrating structure.
+either, for a material bonded to a vibrating structure. When the frame is stiff
+and heavy enough to resonate in the band of interest, neither equivalent fluid
+will do at all: use a `PoroelasticLayer` and the full Biot theory.
 
 **Local vs. bulk reaction.** The layer solver is bulk-reacting (sound
 refracts and travels inside the layers). `statistical_absorption` assumes
@@ -752,7 +754,7 @@ printed coefficient tables (Bies Table D.1, Miki Eqs. 30–34), the solver to
 the closed forms above and to the `TransferMatrix` recovery of the
 [impedance-tube page](impedance-tube.md), the MPP to Maa's own approximation
 (stated ~6 % agreement with the exact Eq. 2), design example and Table I,
-and the Paris integral to its locally reacting closed form. Three misprints
+and the Paris integral to its locally reacting closed form. Misprints
 found in the sources during this work are recorded in the
 [errata registry](ERRATA.md).
 
@@ -766,9 +768,14 @@ found in the sources during this work are recorded in the
   Modelling Sound Absorbing Materials* (2nd ed.). Wiley.
   ISBN 978-0-470-74661-5.
   [doi:10.1002/9780470747339](https://doi.org/10.1002/9780470747339).
-  Section 11.3.4: the rigid and limp frame limits of the Biot theory, the
-  decoupling frequency and the limp effective density (Eqs 11.53-11.55, after
-  Panneton 2007).
+  Chapter 6: the Biot theory of an elastic-framed porous material, its elastic
+  coefficients, its two compressional waves and its shear wave, and the surface
+  impedance and quarter-wave frame resonance of a hard-backed layer
+  (Eqs 6.107-6.110). Chapter 11: the transfer-matrix method, the six-variable
+  poroelastic layer matrix (Table 11.1), the coupling matrices (Sect. 11.4) and
+  the global assembly (Sect. 11.5). Section 11.3.4: the rigid and limp frame
+  limits of the Biot theory, the decoupling frequency and the limp effective
+  density (Eqs 11.53-11.55, after Panneton 2007).
 - Bies, D. A., Hansen, C. H., & Howard, C. Q. (2017). *Engineering noise
   control* (5th ed.). CRC Press.
   [doi:10.1201/9781351228152](https://doi.org/10.1201/9781351228152).

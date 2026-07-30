@@ -87,7 +87,7 @@ references:
     edition: "2nd ed."
     publisher: "Wiley"
     doi: "10.1002/9780470747339"
-    note: "Section 11.3.4: the rigid and limp frame limits of the Biot theory, the decoupling frequency and the limp effective density (Eqs 11.53-11.55, after Panneton 2007). ISBN 978-0-470-74661-5."
+    note: "Chapter 6: the Biot theory of an elastic-framed porous material, its elastic coefficients, its two compressional waves and its shear wave, and the surface impedance and quarter-wave frame resonance of a hard-backed layer (Eqs 6.107-6.110). Chapter 11: the transfer-matrix method, the six-variable poroelastic layer matrix (Table 11.1), the coupling matrices (Sect. 11.4) and the global assembly (Sect. 11.5). Section 11.3.4: the rigid and limp frame limits of the Biot theory, the decoupling frequency and the limp effective density (Eqs 11.53-11.55, after Panneton 2007). ISBN 978-0-470-74661-5."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -862,7 +862,9 @@ inercia (Allard & Atalla, ecs. 11.53-11.55). Úsalo con fieltros, velos y fibra
 de vidrio ligera, con cualquier material medido sin sujeción en un tubo de
 impedancia y siempre que el esqueleto en vacío sea más blando que unos 20 kPa
 (`limp_frame_applicable`); no lo uses, ni tampoco el modelo rígido, con un
-material adherido a una estructura vibrante.
+material adherido a una estructura vibrante. Cuando el esqueleto es lo bastante
+rígido y pesado como para resonar en la banda de interés no vale ningún fluido
+equivalente: usa una `PoroelasticLayer` y la teoría de Biot completa.
 
 **Reacción local frente a volumétrica.** El solucionador de capas es de
 reacción volumétrica (el sonido refracta y viaja dentro de las capas).
@@ -888,13 +890,16 @@ durante este trabajo están registradas en el
 
 **Cubierto.** Los métodos de libro y de revista de Mechel, Bies, Cox y
 D'Antonio, Miki (1990), Maa (1998) y Johnson, Koplik y Dashen (1987),
-implementados en sala limpia como se describe arriba. Esto cubre los
+implementados en sala limpia como se describe arriba, junto con la teoría de
+Biot de los capítulos 6 y 11 de Allard y Atalla. Esto cubre los
 modelos de fluido equivalente porosos (`delany_bazley`, `miki`,
-`johnson_champoux_allard`), el solucionador multicapa por matrices de
-transferencia (`layered_absorber` con `PorousLayer`, `PerforatedPlateLayer`,
-`MicroperforatedPlateLayer` y `MembraneLayer`) y los coeficientes de
-incidencia aleatoria por la integral de Paris (`diffuse_field_absorption`,
-`statistical_absorption`).
+`johnson_champoux_allard`, `limp_frame`), la capa poroelástica
+(`biot_waves`, `biot_surface_impedance`, `PoroelasticLayer`), el
+solucionador multicapa por matrices de
+transferencia (`layered_absorber` con `PorousLayer`, `PoroelasticLayer`,
+`PerforatedPlateLayer`, `MicroperforatedPlateLayer` y `MembraneLayer`) y los
+coeficientes de incidencia aleatoria por la integral de Paris
+(`diffuse_field_absorption`, `statistical_absorption`).
 
 **No cubierto.** El libro de Cox y D'Antonio trata tanto difusores como
 absorbentes, pero esta guía solo implementa la mitad de absorbentes. La
