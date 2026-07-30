@@ -15,7 +15,7 @@
 
 ## Numerical conformance report
 
-&#9989; **523/523 conformance checks pass** across 56 domains and 357 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+&#9989; **529/529 conformance checks pass** across 57 domains and 360 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
 
@@ -792,6 +792,20 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | NORAH2 guidance mean flow resistivity (Eq. 41) | Log-average of equal 1e4 and 1e6 Pa·s/m2 halves, hand-checked, Pa·s/m2 | 100000 Pa·s/m² (+/-0 Pa·s/m²) | 100000 Pa·s/m² | 0 Pa·s/m² | &#9989; |
 | NORAH2 guidance diffraction at grazing (Eq. 42) | Pure diffraction with the edge on the line of sight, 10·lg 3, dB | 4.7712 dB (+/-0.0001 dB) | 4.7712 dB | 0 dB | &#9989; |
 | NORAH2 guidance screening path difference (§A.4.5) | Rubber-band delta over a 40 m hill, hand-checked geometry, m | 4.2848 m (+/-0 m) | 4.2848 m | 0 m | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>CNOSSOS-EU road source (Directive 2002/49/EC Annex II)</b>: 100% (6/6)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| CIRCABC CNOSSOS-EU road emission test set | Line power of the 60 committed cases of the 4 875-case published test set, 8 octave bands each, dB re 1 pW/m | <= 0.01 dB on 480 published band levels (60 cases) | 0.005 dB | 0.005 dB | &#9989; |
+| Directive (EU) 2021/1226 Annex pt (19)(a), Table F-1 | Rolling and propulsion coefficients, 5 categories x 4 rows x 8 bands | 160 coefficients identical | 0 mismatches | 0 mismatches | &#9989; |
+| Directive (EU) 2021/1226 Annex pt (19)(b), Table F-4 | Road-surface coefficients, 15 surfaces x 5 categories x (8 alpha + beta) | 675 stored coefficients identical | 0 mismatches | 0 mismatches | &#9989; |
+| Directive (EU) 2015/996 Appendix F, Tables F-2 and F-3 | Studded-tyre and junction coefficients, unchanged since 2015 | 36 coefficients identical | 0 mismatches | 0 mismatches | &#9989; |
+| Directive (EU) 2015/996 Annex II 2.2.4 / 2.2.11 | Sound power at v_ref = 70 km/h under reference conditions, dB re 1 pW | exactly A_R,i,m and A_P,i,m | 0 dB | 0 dB | &#9989; |
+| Directive (EU) 2021/1226 Annex pt (8)(b) | Octave-band A-weighting AWC_f,i prescribed by 2.5.5, dB | 8 values identical | 0 mismatches | 0 mismatches | &#9989; |
 
 </details>
 

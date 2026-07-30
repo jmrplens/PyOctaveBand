@@ -127,29 +127,7 @@ _STRINGS: dict[str, str] = {
     "Heavy vehicles (3)": "Vehículos pesados (3)",
     "Mopeds (4a)": "Ciclomotores (4a)",
     "Motorcycles (4b)": "Motocicletas (4b)",
-    "CNOSSOS-EU road source line power":
-        "Potencia de la línea fuente viaria CNOSSOS-EU",
-}
-
-#: Localised legend labels of the five CNOSSOS-EU road vehicle categories,
-#: keyed by the Table [2.2.a] category code.
-_ROAD_CATEGORY_LABELS: dict[str, str] = {
-    "1": "Light vehicles (1)",
-    "2": "Medium heavy vehicles (2)",
-    "3": "Heavy vehicles (3)",
-    "4a": "Mopeds (4a)",
-    "4b": "Motorcycles (4b)",
-}
-
-#: Colour and marker of each road vehicle category, keyed by the category code
-#: rather than by row position, so a category keeps its appearance whichever
-#: subset of the five is present in the traffic mix.
-_ROAD_CATEGORY_STYLE: dict[str, tuple[str, str]] = {
-    "1": (_C_PRIMARY, "o"),
-    "2": (_C_TERTIARY, "s"),
-    "3": (_C_REFERENCE, "D"),
-    "4a": (_C_SECONDARY, "^"),
-    "4b": (_C_QUATERNARY, "v"),
+    "CNOSSOS-EU road source line power": "Potencia de la línea fuente viaria CNOSSOS-EU",
 }
 
 
@@ -389,19 +367,6 @@ def plot_cnossos_rail_emission(
 
     :param result: A
         :class:`~phonometry.environmental.cnossos_rail.RailwayEmissionResult`.
-def plot_cnossos_road_emission(
-    result: RoadEmissionResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
-) -> Axes:
-    """Per-metre road source-line power with its vehicle-category breakdown.
-
-    Draws the energy-summed line power ``L'_W,eq,line,i`` of the traffic mix as
-    bars over the eight CNOSSOS-EU octave bands, with the contribution of each
-    vehicle category overlaid as a marker line, so the band where a category
-    governs the source is read directly off the chart.
-
-    :param result: A
-        :class:`~phonometry.environmental.cnossos_road.RoadEmissionResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the total-line-power ``bar`` call.
@@ -435,25 +400,6 @@ def plot_cnossos_road_emission(
     # rather than routed through the translation table.
     ax.set_ylabel("$L'_{W,eq,line}$ [dB re 1 pW/m]")
     ax.set_title(_t("CNOSSOS-EU railway source line power", language))
-    kwargs.setdefault("label", _t("Total line", language))
-    # An empty category carries -inf, which no axis can hold; masking it leaves
-    # the band out of the drawing instead of collapsing the whole scale.
-    total = np.asarray(result.total_line_power, dtype=np.float64)
-    ax.bar(positions, np.where(np.isfinite(total), total, np.nan), **kwargs)
-
-    for row, category in zip(
-        np.asarray(result.line_power, dtype=np.float64), result.categories, strict=True
-    ):
-        color, marker = _ROAD_CATEGORY_STYLE[category.value]
-        ax.plot(
-            positions, np.where(np.isfinite(row), row, np.nan), color=color,
-            marker=marker, lw=1.2, ms=4, zorder=4,
-            label=_t(_ROAD_CATEGORY_LABELS[category.value], language),
-        )
-    # Pure symbol notation, identical in every language, so it is set directly
-    # rather than routed through the translation table.
-    ax.set_ylabel("$L'_{W,eq,line}$ [dB re 1 pW/m]")
-    ax.set_title(_t("CNOSSOS-EU road source line power", language))
     ax.legend(loc="best", fontsize="small")
     ax.grid(True, axis="y", alpha=0.3)
     localize_axes(ax, language)
@@ -803,6 +749,79 @@ def plot_activity_assessment(
     ax.set_ylabel(_t("Corrected level [dB]", language))
     ax.set_title(_t("RD 1367/2007 assessment vs limit values", language))
     ax.legend(loc="upper right", fontsize="small", ncol=2)
+    ax.grid(True, axis="y", alpha=0.3)
+    localize_axes(ax, language)
+    return ax
+
+
+#: Localised legend labels of the five CNOSSOS-EU road vehicle categories,
+#: keyed by the Table [2.2.a] category code.
+_ROAD_CATEGORY_LABELS: dict[str, str] = {
+    "1": "Light vehicles (1)",
+    "2": "Medium heavy vehicles (2)",
+    "3": "Heavy vehicles (3)",
+    "4a": "Mopeds (4a)",
+    "4b": "Motorcycles (4b)",
+}
+
+
+#: Colour and marker of each road vehicle category, keyed by the category code
+#: rather than by row position, so a category keeps its appearance whichever
+#: subset of the five is present in the traffic mix.
+_ROAD_CATEGORY_STYLE: dict[str, tuple[str, str]] = {
+    "1": (_C_PRIMARY, "o"),
+    "2": (_C_TERTIARY, "s"),
+    "3": (_C_REFERENCE, "D"),
+    "4a": (_C_SECONDARY, "^"),
+    "4b": (_C_QUATERNARY, "v"),
+}
+
+
+def plot_cnossos_road_emission(
+    result: RoadEmissionResult, ax: Axes | None = None, *, language: str = "en",
+    **kwargs: Any
+) -> Axes:
+    """Per-metre road source-line power with its vehicle-category breakdown.
+
+    Draws the energy-summed line power ``L'_W,eq,line,i`` of the traffic mix as
+    bars over the eight CNOSSOS-EU octave bands, with the contribution of each
+    vehicle category overlaid as a marker line, so the band where a category
+    governs the source is read directly off the chart.
+
+    :param result: A
+        :class:`~phonometry.environmental.cnossos_road.RoadEmissionResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the total-line-power ``bar`` call.
+    :return: The axes.
+    """
+    from .._i18n import localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    freqs = np.asarray(result.frequencies, dtype=np.float64)
+    positions = _band_axis(ax, freqs, language=language)
+
+    kwargs.setdefault("color", _C_PRIMARY_LIGHT)
+    kwargs.setdefault("label", _t("Total line", language))
+    # An empty category carries -inf, which no axis can hold; masking it leaves
+    # the band out of the drawing instead of collapsing the whole scale.
+    total = np.asarray(result.total_line_power, dtype=np.float64)
+    ax.bar(positions, np.where(np.isfinite(total), total, np.nan), **kwargs)
+
+    for row, category in zip(
+        np.asarray(result.line_power, dtype=np.float64), result.categories, strict=True
+    ):
+        color, marker = _ROAD_CATEGORY_STYLE[category.value]
+        ax.plot(
+            positions, np.where(np.isfinite(row), row, np.nan), color=color,
+            marker=marker, lw=1.2, ms=4, zorder=4,
+            label=_t(_ROAD_CATEGORY_LABELS[category.value], language),
+        )
+    # Pure symbol notation, identical in every language, so it is set directly
+    # rather than routed through the translation table.
+    ax.set_ylabel("$L'_{W,eq,line}$ [dB re 1 pW/m]")
+    ax.set_title(_t("CNOSSOS-EU road source line power", language))
+    ax.legend(loc="best", fontsize="small")
     ax.grid(True, axis="y", alpha=0.3)
     localize_axes(ax, language)
     return ax

@@ -1202,8 +1202,6 @@ _ES_EXACT = {
     "Attenuation A [dB]": "Atenuación A [dB]",
     "CNOSSOS-EU Road Source Line Power (urban arterial, 50 km/h)":
         "Potencia de la línea fuente viaria CNOSSOS-EU (vía urbana, 50 km/h)",
-    "Line power L'W,eq,line [dB re 1 pW/m]":
-        "Potencia de línea L'W,eq,line [dB re 1 pW/m]",
     "Total source line": "Línea fuente total",
     "Light vehicles (1)": "Vehículos ligeros (1)",
     "Medium heavy vehicles (2)": "Vehículos pesados medios (2)",

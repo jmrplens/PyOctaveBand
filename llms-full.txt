@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 523 numerical conformance checks against 357 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 529 numerical conformance checks against 360 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 523 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 56 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 529 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 57 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -178,6 +178,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 ## Other guides
 
 - [CNOSSOS-EU railway source emission](https://jmrplens.github.io/phonometry/guides/cnossos-rail-emission/)
+- [CNOSSOS-EU road traffic source emission](https://jmrplens.github.io/phonometry/guides/cnossos-road-emission/)
 - [Detailed Per-Band Prediction (ISO 12354)](https://jmrplens.github.io/phonometry/guides/detailed-prediction/)
 - [Duct-borne noise: fan to room](https://jmrplens.github.io/phonometry/guides/duct-path/)
 - [Heavy and Soft Impact Sources (ISO 16283-2, JIS A 1418-2, ISO 717-2 Annex D)](https://jmrplens.github.io/phonometry/guides/heavy-impact-sources/)
@@ -287,6 +288,7 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [environment/air-absorption](https://jmrplens.github.io/phonometry/reference/api/environment/air-absorption/)
 - [environment/atmospheric-refraction](https://jmrplens.github.io/phonometry/reference/api/environment/atmospheric-refraction/)
 - [environment/cnossos-rail](https://jmrplens.github.io/phonometry/reference/api/environment/cnossos-rail/)
+- [environment/cnossos-road](https://jmrplens.github.io/phonometry/reference/api/environment/cnossos-road/)
 - [environment/ground-barriers](https://jmrplens.github.io/phonometry/reference/api/environment/ground-barriers/)
 - [environment/impulse-prominence](https://jmrplens.github.io/phonometry/reference/api/environment/impulse-prominence/)
 - [environment/impulsive-sound](https://jmrplens.github.io/phonometry/reference/api/environment/impulsive-sound/)
@@ -2681,6 +2683,23 @@ cycle and warn on use; they are removed in 4.0.
 | `AERODYNAMIC_THRESHOLD_SPEED` | `float` | **Speed above which aerodynamic noise is relevant [km/h].**<br>(no parameters) | `AERODYNAMIC_THRESHOLD_SPEED  # 200.0` |
 | `AERODYNAMIC_REFERENCE_SPEED` | `float` | **Reference speed v0 of Annex II 2.3.13/2.3.14 [km/h].**<br>(no parameters) | `AERODYNAMIC_REFERENCE_SPEED  # 300.0` |
 | `REFERENCE_JOINT_DENSITY` | `float` | **Joint density Table G-4 is given for [1/m].**<br>(no parameters) | `REFERENCE_JOINT_DENSITY  # 0.01` |
+| `road_source_power` | `function` | **CNOSSOS-EU road source line power (Directive 2002/49/EC Annex II, 2.2.1).**<br>• `traffic`: one `RoadTraffic` or a sequence, at most one per category<br>• `surface`: `RoadSurface`, its description or a `RoadSurfaceCoefficients` (Default: reference surface)<br>• `temperature` tau [°C] (Default: 20)<br>• `gradient` s [%] (Default: 0, positive uphill)<br>• `studded_months` Ts (Default: 0)<br>• `junction_distance` x [m], `junction_type` (`JunctionType`)<br>• `coefficients`: Appendix F database (Default: `ROAD_COEFFICIENTS`) | `res = road_source_power([RoadTraffic(RoadVehicleCategory.LIGHT, 1200, 50)])`<br><br>• `RoadEmissionResult` |
+| `RoadTraffic` | `dataclass` | **Traffic of one vehicle category on a source line.**<br>• `category`: `RoadVehicleCategory`<br>• `flow_rate` Qm [veh/h]<br>• `speed` vm [km/h] (powers frozen below 20 km/h)<br>• `studded_fraction` Qstud,ratio (Default: 0, category 1 only) | `RoadTraffic(RoadVehicleCategory.HEAVY, 45.0, 50.0)` |
+| `RoadEmissionResult` | `dataclass` | **CNOSSOS-EU road source-line power per metre.**<br>• `frequencies` [Hz] (63…8000)<br>• `categories`<br>• `rolling`, `propulsion`, `vehicle_power`, `line_power`: (N_cat, 8) [dB]<br>• `total_line_power` [dB re 1 pW/m]<br>• `source_height` (0.05 m)<br>• `.a_weighted_line_power` [dB(A)]<br>• `.plot()` | `res.total_line_power, res.a_weighted_line_power` |
+| `road_vehicle_sound_power` | `function` | **Single-vehicle sound power LW,i,m (Annex II 2.2.2/2.2.3).**<br>• `category`, `speed` [km/h]<br>• same surface/temperature/gradient/studded/junction parameters as `road_source_power` | `lw = road_vehicle_sound_power("1", 90.0)`<br><br>• 8 octave bands [dB]; category 4 takes propulsion alone |
+| `road_rolling_noise` | `function` | **Rolling-noise sound power LWR,i,m (Annex II 2.2.4/2.2.5).**<br>• `category`, `speed` [km/h]<br>• `surface`, `temperature`, `studded_fraction`, `studded_months`, `junction_distance`, `junction_type`, `coefficients` | `lwr = road_rolling_noise("1", 90.0, temperature=5.0)`<br><br>• AR + BR·lg(v/70) + ΔLWR per band |
+| `road_propulsion_noise` | `function` | **Propulsion-noise sound power LWP,i,m (Annex II 2.2.11/2.2.12).**<br>• `category`, `speed` [km/h]<br>• `surface`, `gradient`, `junction_distance`, `junction_type`, `coefficients` | `lwp = road_propulsion_noise("3", 80.0, gradient=-8.0)`<br><br>• AP + BP·(v−70)/70 + ΔLWP per band |
+| `road_surface_coefficients` | `function` | **Table F-4 row of a road surface (as replaced by (EU) 2021/1226).**<br>• `surface`: `RoadSurface` or its description | `row = road_surface_coefficients(RoadSurface.THIN_LAYER_A)`<br><br>• `RoadSurfaceCoefficients` |
+| `RoadSurfaceCoefficients` | `dataclass` | **One Table F-4 row.**<br>• `name`<br>• `alpha`: per category, 8 bands [dB]<br>• `beta`: per category<br>• `speed_range` (vmin, vmax) [km/h] or `None` | `row.alpha["1"], row.beta["1"], row.speed_range` |
+| `RoadEmissionCoefficients` | `dataclass` | **Appendix F database (Tables F-1 to F-3 + Km).**<br>• `rolling_a`/`rolling_b`/`propulsion_a`/`propulsion_b`: per category, 8 bands<br>• `studded_a`/`studded_b` (Table F-2)<br>• `junction_c` (Table F-3)<br>• `temperature_k` Km [dB/°C] | `ROAD_COEFFICIENTS.rolling_a["1"]` |
+| `ROAD_COEFFICIENTS` | `dataclass` | **The consolidated Appendix F database.**<br>Tables F-1/F-4 as replaced by (EU) 2021/1226, F-2/F-3 as published in (EU) 2015/996 | `ROAD_COEFFICIENTS.propulsion_a["3"]` |
+| `RoadVehicleCategory` | `enum` | **Vehicle categories of Table [2.2.a].**<br>`LIGHT` (1), `MEDIUM_HEAVY` (2), `HEAVY` (3), `MOPEDS` (4a), `MOTORCYCLES` (4b) | `RoadVehicleCategory.HEAVY.value  # '3'` |
+| `RoadSurface` | `enum` | **The fifteen road surfaces of Table F-4.**<br>`REFERENCE`, `ONE_LAYER_ZOAB`, `TWO_LAYER_ZOAB`, `TWO_LAYER_ZOAB_FINE`, `SMA_NL5`, `SMA_NL8`, `BRUSHED_DOWN_CONCRETE`, `OPTIMISED_BRUSHED_DOWN_CONCRETE`, `FINE_BROOMED_CONCRETE`, `WORKED_SURFACE`, `HARD_ELEMENTS_HERRINGBONE`, `HARD_ELEMENTS_NOT_HERRINGBONE`, `QUIET_HARD_ELEMENTS`, `THIN_LAYER_A`, `THIN_LAYER_B` | `RoadSurface.QUIET_HARD_ELEMENTS` |
+| `JunctionType` | `enum` | **Junction types k of Table F-3.**<br>`NONE` (0), `CROSSING` (1), `ROUNDABOUT` (2) | `JunctionType.ROUNDABOUT` |
+| `line_source_segment_power` | `function` | **Point-source power of a segment of source line (arithmetic; the split is outside the scope of Annex II 2.5.3).**<br>• `line_power` [dB re 1 pW/m]<br>• `length` dL [m] | `lw = line_source_segment_power(res.total_line_power, 20.0)`<br><br>• L'W,eq,line + 10 lg(dL) |
+| `CNOSSOS_A_WEIGHTING` | `tuple` | **Octave-band A-weighting AWCf,i printed by Annex II 2.5.5 as amended by (EU) 2021/1226.**<br>(no parameters) | `CNOSSOS_A_WEIGHTING  # (-26.2, …, -1.1)` |
+| `ROAD_OCTAVE_BANDS` | `tuple` | **CNOSSOS-EU road source octave bands (63 Hz…8 kHz, per the 2018 corrigendum to 2.2.1).**<br>(no parameters) | `ROAD_OCTAVE_BANDS` |
+| `ROAD_REFERENCE_SPEED` / `ROAD_REFERENCE_TEMPERATURE` / `ROAD_SOURCE_HEIGHT` | `float` | **Reference conditions of Annex II 2.2.**<br>vref = 70 km/h, tauref = 20 °C, source height 0,05 m | `ROAD_REFERENCE_SPEED  # 70.0` |
 | `ground_effect` | `function` | **Spherical-wave ground effect ΔL (Weyl-Van der Pol; Attenborough 2e Eq. 2.40, Salomons Eq. 3.4).**<br>• `frequencies` [Hz], `source_height` hs, `receiver_height` hr, `distance` [m]<br>• `impedance` (normalized) or `flow_resistivity` σ [Pa·s/m²]<br>• `model` 'delany_bazley'/'miki' | `r = ground_effect(bands, 1, 1.5, 50, flow_resistivity=2e5)`<br><br>• `SphericalGroundResult` (ΔL, Q, Rp, F) |
 | `spherical_reflection_coefficient` | `function` | **Spherical-wave reflection coefficient Q = Rp + (1−Rp)F(w) (Attenborough Eq. 2.40c; Salomons Eq. D.58).**<br>• `frequencies`, `normalized_impedance`, `source_height`, `receiver_height`, `distance` | `q = spherical_reflection_coefficient(bands, 12-6j, 1, 1.5, 50)` |
 | `SphericalGroundResult` | `dataclass` | **Spherical-wave ground-effect result.**<br>• `excess_attenuation` ΔL [dB re free field]<br>• `reflection_coefficient` Q, `plane_reflection_coefficient` Rp, `boundary_loss` F<br>• `r_direct`, `r_reflected` [m]<br>• `.plot()` | `r.excess_attenuation, r.reflection_coefficient` |
@@ -5113,6 +5132,333 @@ such as depots, stations and loudspeakers, are treated by the industrial method.
   ISO 9613-2 chain that carries a source power to a receiver.
 - [Environmental noise levels](https://jmrplens.github.io/phonometry/guides/environmental-levels/): the
   Lden and Lnight indicators the resulting maps are drawn for.
+
+---
+
+
+<!-- source: docs/cnossos-road-emission.md | canonical: https://jmrplens.github.io/phonometry/guides/cnossos-road-emission/ -->
+Source: https://jmrplens.github.io/phonometry/guides/cnossos-road-emission/
+
+# CNOSSOS-EU road traffic source emission
+
+Every strategic noise map drawn in the European Union since 2021 starts from the
+same two numbers per octave band: how loud a vehicle is, and how many of them go
+past per hour. **Annex II of Directive 2002/49/EC**, as replaced by the CNOSSOS-EU
+methods, turns those into a **directional sound power per metre of source line**,
+which the propagation stage then carries to the receiver.
+
+This guide covers the road source, section 2.2 of Annex II with the coefficient
+database of Appendix F. The railway source (2.3, Appendix G) and the CNOSSOS-EU
+propagation model (2.5) are separate.
+
+## 1. Which text is implemented
+
+Annex II is a moving target and getting the layering wrong is the easiest way to
+ship a wrong table. Three instruments are in play:
+
+| Instrument | What it does to the road source |
+| :--- | :--- |
+| Commission Directive (EU) **2015/996** | Replaces the whole of Annex II. Supplies formulae 2.2.1 to 2.2.20 and Tables F-1 to F-4. |
+| **Corrigendum** of OJ L 5, 10.1.2018 | Corrects 2.2.1: the sound powers are calculated "for each octave band from **63 Hz to 8 kHz**", not the 125 Hz to 4 kHz the original text printed. Appendix F always covered 63 Hz to 8 kHz, so the uncorrected text contradicted its own tables. |
+| Commission Delegated Directive (EU) **2021/1226** | Replaces **Table F-1** and **Table F-4** in their entirety, merges the former 4a and 4b rows of Table F-4 into one, and prints the octave-band A-weighting to be used in 2.5.5. |
+
+The library implements the consolidated result. Tables F-2 (studded tyres) and
+F-3 (junctions) have never been amended. The 2021 amendment is not cosmetic: the
+current road source is about **2,5 to 3,5 dB(A) louder** than the one published
+in 2015, so any comparison with pre-2021 literature carries that offset.
+
+## 2. The source and the source line
+
+Each vehicle is one **point source 0,05 m above the road surface**, radiating
+uniformly; the first reflection on the pavement is already inside the sound
+power, which is why the method calls it a semi-free-field quantity. A traffic
+flow is an incoherent **source line**, ideally one line per lane at the lane
+centre.
+
+For each vehicle category `m` and octave band `i`, formula (2.2.1) turns a
+single-vehicle sound power into a power per metre of line:
+
+$$
+L'_{W,\mathrm{eq,line},i,m} = L_{W,i,m} + 10\,\lg\!\left(\frac{Q_m}{1000\,v_m}\right),
+$$
+
+with `Qm` in vehicles per hour and `vm` in km/h. The vehicle power itself is the
+energy sum of a **rolling** and a **propulsion** term (2.2.2), except for the
+powered two-wheelers of category 4, which have no rolling noise at all and take
+the propulsion term alone (2.2.3):
+
+$$
+L_{W,i,m} = 10\,\lg\!\left(10^{L_{WR,i,m}/10} + 10^{L_{WP,i,m}/10}\right).
+$$
+
+Table [2.2.a] fixes five modelled categories: **1** light motor vehicles, **2**
+medium heavy vehicles, **3** heavy vehicles, **4a** mopeds and **4b**
+motorcycles. (A sixth "open" category exists in the text but carries no
+coefficients.)
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_emission_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_emission.svg" alt="Octave-band source-line power of an urban arterial: grey bars for the total and marker lines for the light, medium heavy, heavy and motorcycle contributions, with the heavy vehicles above the light ones from 125 Hz to 500 Hz and the light ones taking the lead again at 1 kHz" width="88%"></picture>
+
+*Light vehicles carry the flow, but 45 heavy vehicles per hour still take over
+the mid frequencies: the per-metre spectrum shows exactly where each category
+governs.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import (
+    JunctionType, RoadSurface, RoadTraffic, RoadVehicleCategory, road_source_power,
+)
+
+traffic = [
+    RoadTraffic(RoadVehicleCategory.LIGHT, 1200.0, 50.0),
+    RoadTraffic(RoadVehicleCategory.MEDIUM_HEAVY, 90.0, 50.0),
+    RoadTraffic(RoadVehicleCategory.HEAVY, 45.0, 50.0),
+    RoadTraffic(RoadVehicleCategory.MOTORCYCLES, 60.0, 50.0),
+]
+result = road_source_power(
+    traffic, surface=RoadSurface.THIN_LAYER_A, temperature=12.0, gradient=3.0,
+    junction_distance=60.0, junction_type=JunctionType.CROSSING,
+)
+result.plot()
+plt.show()
+```
+
+</details>
+
+## 3. Rolling noise (2.2.4 to 2.2.10)
+
+Rolling noise is tyre-road noise. It grows logarithmically with speed from the
+reference speed `vref = 70 km/h`:
+
+$$
+L_{WR,i,m} = A_{R,i,m} + B_{R,i,m}\,\lg\!\left(\frac{v_m}{v_\mathrm{ref}}\right)
+             + \Delta L_{WR,i,m},
+$$
+
+where the correction collects four independent effects (2.2.5): the road
+surface, the studded tyres, the junction and the air temperature.
+
+**Air temperature** (2.2.10) is a straight line, applied equally to all eight
+bands: `dLW,temp = Km (20 °C − tau)`, with `K1 = 0,08 dB/°C` for light vehicles
+and `K2 = K3 = 0,04 dB/°C` for the two heavy categories. Cold air makes tyres
+harder and the road louder, so the correction is *positive* below 20 °C.
+
+**Studded tyres** (2.2.6 to 2.2.9) apply to category 1 only. The per-tyre excess
+`Dstud,i(v)` saturates below 50 km/h and above 90 km/h, and the fleet-level
+correction weights it by the share of the year that studded tyres are on the
+road, `ps = Qstud,ratio · Ts/12`:
+
+$$
+\Delta L_{\mathrm{studded},i} = 10\,\lg\!\left[(1 - p_s) + p_s\,10^{D_{\mathrm{stud},i}/10}\right].
+$$
+
+**Junctions** (2.2.17) add `CR,m,k · max(1 − |x|/100, 0)`, with `x` the distance
+in metres to the nearest junction and `k` the junction type: 1 for a crossing
+with traffic lights, 2 for a roundabout. The rolling coefficients `CR` are
+*negative* (traffic near a junction is slower), the propulsion coefficients `CP`
+positive (it is accelerating). Both vanish from 100 m out.
+
+## 4. Propulsion noise (2.2.11 to 2.2.16)
+
+Propulsion noise is the power train: engine, exhaust, transmission, intake. It
+is **linear** in speed, not logarithmic, because at low speed the engine is
+working hardest relative to the distance covered:
+
+$$
+L_{WP,i,m} = A_{P,i,m} + B_{P,i,m}\,\frac{v_m - v_\mathrm{ref}}{v_\mathrm{ref}}
+             + \Delta L_{WP,i,m}.
+$$
+
+Where the two speed laws cross is what makes the road source behave the way
+it does: below the crossover the source is an engine, above it a tyre.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_speed_law_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_speed_law.svg" alt="A-weighted single-vehicle sound power against speed from 20 to 130 km/h for light and heavy vehicles, with the rolling and propulsion components dashed and dotted and the crossover speed marked on each pair" width="88%"></picture>
+
+*A light vehicle is tyre-dominated from about 25 km/h; a heavy vehicle only
+from about 60 km/h, which is why a lorry is still an engine at urban speeds.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import (
+    CNOSSOS_A_WEIGHTING, road_propulsion_noise, road_rolling_noise,
+    road_vehicle_sound_power,
+)
+
+weights = np.asarray(CNOSSOS_A_WEIGHTING)
+a_weighted = lambda bands: 10.0 * np.log10(np.sum(10.0 ** ((bands + weights) / 10.0)))
+
+speeds = np.linspace(20.0, 130.0, 221)
+fig, ax = plt.subplots()
+for category, name in [("1", "Light vehicles (1)"), ("3", "Heavy vehicles (3)")]:
+    rolling = [a_weighted(road_rolling_noise(category, v)) for v in speeds]
+    propulsion = [a_weighted(road_propulsion_noise(category, v)) for v in speeds]
+    total = [a_weighted(road_vehicle_sound_power(category, v)) for v in speeds]
+    ax.plot(speeds, total, lw=2.4, label=f"{name} - total")
+    ax.plot(speeds, rolling, ls="--", lw=1.2, label=f"{name} - rolling")
+    ax.plot(speeds, propulsion, ls=":", lw=1.2, label=f"{name} - propulsion")
+ax.set_xlabel("Speed v [km/h]")
+ax.set_ylabel("A-weighted sound power [dB(A) re 1 pW]")
+ax.legend(fontsize="small")
+plt.show()
+```
+
+</details>
+
+**Road gradient** (2.2.13 to 2.2.16) is the one correction whose published form
+is genuinely asymmetric, and the asymmetry is not a transcription slip. For
+light vehicles the downhill branch has **no speed factor**, while the two heavy
+categories do and use different speed offsets:
+
+| Category | Downhill (`s` below the breakpoint) | Flat band | Uphill |
+| :--- | :--- | :--- | :--- |
+| 1 | `(min(12 %, −s) − 6 %)/1 %` | −6 % to 2 % | `(min(12 %, s) − 2 %)/1,5 % · v/100` |
+| 2 | `(min(12 %, −s) − 4 %)/0,7 % · (v − 20)/100` | −4 % to 0 % | `min(12 %, s)/1 % · v/100` |
+| 3 | `(min(12 %, −s) − 4 %)/0,5 % · (v − 10)/100` | −4 % to 0 % | `min(12 %, s)/0,8 % · v/100` |
+
+Category 4 takes no gradient correction. The slope saturates at 12 % in both
+directions. Downhill noise comes from engine braking, uphill noise from load, so
+both branches are positive. For a bidirectional flow, split the flow in two and
+correct one half uphill and the other downhill.
+
+## 5. The road surface (2.2.19, 2.2.20 and Table F-4)
+
+Table F-4 gives, for the reference surface and each of fourteen named
+pavements, an octave-band coefficient `alpha` and a speed coefficient `beta`,
+per vehicle category, with the speed range over which the row is declared
+valid. The surface enters the two terms
+differently:
+
+$$
+\Delta L_{WR,\mathrm{road},i,m} = \alpha_{i,m} + \beta_m\,\lg\!\left(\frac{v_m}{v_\mathrm{ref}}\right),
+\qquad
+\Delta L_{WP,\mathrm{road},i,m} = \min\{\alpha_{i,m};\,0\}.
+$$
+
+An absorbing surface reduces propulsion noise; a noisy one does not increase it.
+That asymmetry is deliberate: the pavement can absorb the engine sound radiated
+down onto it, but a rough texture only generates tyre noise, and tyre noise is
+already the rolling term.
+
+```python
+from phonometry import RoadSurface, road_surface_coefficients
+
+row = road_surface_coefficients(RoadSurface.TWO_LAYER_ZOAB_FINE)
+row.speed_range          # (80.0, 130.0) km/h, the printed validity range
+row.alpha["1"]           # alpha per octave band for light vehicles
+row.beta["1"]            # -0.1, the speed coefficient
+```
+
+The reference surface of the first row is all zeros: it is the virtual average
+of a dense asphalt concrete 0/11 and a stone mastic asphalt 0/11, between two
+and seven years old, in representative maintenance condition, dry, with no
+studded tyres, at 20 °C, on the flat. Under exactly those conditions every
+correction in 2.2 vanishes identically, so at the reference speed
+`vm = vref = 70 km/h`, where the two speed terms vanish as well, the sound
+powers **are** the Table F-1 coefficients `AR,i,m` and `AP,i,m`.
+
+## 6. Handing the source to a propagation model
+
+The emission stage produces a power per metre. Splitting that line into
+equivalent point sources is, in the words of section 2.5.3, "outside the scope
+of the current methodology": a point source standing for a segment of length
+`dL` simply carries `L'W,eq,line,i + 10 lg(dL)`, which is arithmetic and is
+offered as such.
+
+```python
+from phonometry import (
+    RoadTraffic, RoadVehicleCategory, line_source_segment_power,
+    predicted_receiver_level, road_source_power,
+)
+
+result = road_source_power([
+    RoadTraffic(RoadVehicleCategory.LIGHT, 1000.0, 90.0),
+    RoadTraffic(RoadVehicleCategory.HEAVY, 120.0, 80.0),
+])
+segment = line_source_segment_power(result.total_line_power, 20.0)  # a 20 m segment
+levels = predicted_receiver_level(
+    segment, 100.0, result.source_height, 4.0, frequencies=result.frequencies,
+)
+```
+
+Note what this is and is not. CNOSSOS-EU has **its own** propagation method in
+section 2.5 of Annex II, and it is not ISO 9613-2: the two differ in the ground
+model, in the diffraction treatment and in the way favourable and homogeneous
+conditions are combined. Chaining a CNOSSOS emission onto the ISO 9613-2
+propagation of this library is a legitimate engineering estimate, but it is not
+the normative CNOSSOS chain and must not be reported as one.
+
+For the A-weighted total, use the octave-band weighting the Directive itself
+prints in 2.5.5 as amended, rather than recomputing it:
+
+```python
+from phonometry import CNOSSOS_A_WEIGHTING
+
+CNOSSOS_A_WEIGHTING   # (-26.2, -16.1, -8.6, -3.2, 0.0, 1.2, 1.0, -1.1)
+result.a_weighted_line_power
+```
+
+## 7. Substituting a national database
+
+Appendix F is called a *database*, not a table of constants, because Member
+States may substitute measured national values, and because the same equations
+have already been evaluated with two different coefficient sets (the 2015 one
+and the 2021 one). Both coefficient objects can be replaced:
+
+```python
+import dataclasses
+
+from phonometry import ROAD_COEFFICIENTS
+
+# One measured national row for light vehicles, the rest of Appendix F as published.
+national = dataclasses.replace(
+    ROAD_COEFFICIENTS,
+    rolling_a={
+        **ROAD_COEFFICIENTS.rolling_a,
+        "1": (83.4, 89.0, 88.1, 93.6, 100.4, 96.9, 87.0, 76.5),
+    },
+)
+```
+
+A substituted database has to cover every category of the traffic it is used
+with: reaching for a category it does not carry raises `ValueError` rather than
+failing later.
+
+That mechanism is also what pins the implementation: the European Commission
+published a test set of 4 875 road emission cases computed with the 2015
+coefficients, and feeding the shipped equations that superseded database (not
+the 2021 tables the library ships by default) reproduces every published band
+level to 0,005 dB, inside the two decimals the test set prints.
+
+## What this guide covers
+
+**Covered.** Section 2.2 of Annex II to Directive 2002/49/EC in the consolidated
+text: the traffic-flow line power (2.2.1), the vehicle power (2.2.2, 2.2.3),
+rolling noise with its studded-tyre and temperature corrections (2.2.4 to
+2.2.10), propulsion noise with the road-gradient correction (2.2.11 to 2.2.16),
+the junction correction (2.2.17, 2.2.18) and the road-surface effect (2.2.19,
+2.2.20), together with the whole Appendix F database, through
+`road_source_power`, `road_vehicle_sound_power`, `road_rolling_noise`,
+`road_propulsion_noise` and `road_surface_coefficients`.
+
+**Not covered.** The railway source (2.3 and Appendix G), the industrial source
+(2.4 and Appendix H), the aircraft source (2.6 and 2.7) and the CNOSSOS-EU
+propagation method of section 2.5, which is a different model from the
+ISO 9613-2 one implemented in this library. The open vehicle category 5 has no
+coefficients in Appendix F and is therefore not modelled. How a source line is
+split into point sources is declared out of scope by the method itself.
+
+## See also
+
+- [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/guides/outdoor-propagation/): the ISO 9613-2 chain that
+  carries a source power to a receiver.
+- [Environmental noise levels](https://jmrplens.github.io/phonometry/guides/environmental-levels/): the Lden and Lnight
+  indicators the resulting maps are drawn for.
 
 ---
 
@@ -12062,7 +12408,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/guides/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/guides/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/reference/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 523 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 529 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -42040,7 +42386,7 @@ sample from the metrology core:
 | IEC 60942:2017 Table 2 | Calibrator short-term stability limits (frequency-dependent, class 1) in `sensitivity()` | `tests/metrology/test_calibration_validation.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
-523 numerical conformance checks across 56 domains and 357 standards, covering
+529 numerical conformance checks across 57 domains and 360 standards, covering
 psychoacoustics and speech intelligibility, room, building and materials
 acoustics, human and machine vibration, environmental, aircraft, rotorcraft
 and underwater noise, electroacoustics, broadcast loudness, industrial noise
