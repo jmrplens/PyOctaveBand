@@ -632,9 +632,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   Spanish): `diagram_slm_pipeline` draws the guide's own chain, from the two
   recordings through the sensitivity factor to the display, integrated and band
   branches and the class verifiers that close it; `diagram_calibration_dataflow`
-  draws one factor reaching every level function, and the dBFS branch taken when
-  no factor exists; `diagram_bank_dataflow` draws both numerical-stability
-  strategies of the filter bank, the biquad cascade and the decimation decision,
+  draws one factor reaching every level function, and what happens with no
+  calibrator, where the factor stays at 1 and the samples are read as pascals
+  unless `dbfs=True` asks for levels referred to digital full scale;
+  `diagram_bank_dataflow` draws both numerical-stability strategies of the
+  filter bank, the biquad cascade and the decimation decision,
   ending in the band level and the optional band signal. The `astro-mermaid`
   integration and the `mermaid` dependency are removed from the site and its
   lockfile.

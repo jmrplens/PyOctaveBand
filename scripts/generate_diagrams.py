@@ -1695,8 +1695,8 @@ _ES: dict[str, str] = {
         "el factor S en pascales por unidad digital",
     "Calibrated pressure   p(t) = S · x(t)   in pascals":
         "Presión calibrada   p(t) = S · x(t)   en pascales",
-    "every level function takes it as calibration_factor=":
-        "toda función de nivel lo acepta como calibration_factor=",
+    "every level function takes S as calibration_factor=":
+        "toda función de nivel acepta S como calibration_factor=",
     "Display and statistics": "Pantalla y estadística",
     "exponential detector, τF = 125 ms":
         "detector exponencial, τF = 125 ms",
@@ -1719,32 +1719,33 @@ _ES: dict[str, str] = {
     "the same chain, untouched": "la misma cadena, sin tocar",
     "nothing in the chain may change between the two":
         "nada de la cadena puede cambiar entre una y otra",
-    "checks the short-term stability (IEC 60942)":
-        "comprueba la estabilidad a corto plazo (IEC 60942)",
+    "fs enables the IEC 60942 stability check":
+        "con fs comprueba la estabilidad (IEC 60942)",
     "pascals per digital unit": "pascales por unidad digital",
     "every level function accepts calibration_factor=":
         "toda función de nivel acepta calibration_factor=",
     "one factor for the whole library": "un solo factor para toda la biblioteca",
     "Levels in dB SPL": "Niveles en dB SPL",
     "No calibrator?": "¿Sin calibrador?",
-    "omit the factor and": "omite el factor y",
-    "the levels are dBFS": "los niveles son dBFS",
+    "S = 1, samples read as Pa": "S = 1, muestras como Pa",
+    "use dbfs=True for dBFS": "usa dbfs=True para dBFS",
     # Filter bank data flow: decimation decision and band outputs
     "Inside a band: the decimation decision and the biquad cascade":
         "Dentro de una banda: diezmado y cascada de biquads",
     "Input signal  x(t)": "Señal de entrada  x(t)",
     "sample rate fs": "frecuencia de muestreo fs",
-    "Low band?": "¿Banda grave?",
-    "fc far below fs / 2": "fc muy por debajo de fs / 2",
-    "anti-alias and decimate to fs / M":
-        "filtrar el aliasing y diezmar a fs / M",
+    "Room to decimate?": "¿Cabe diezmar?",
+    "fs / 2 ≥ 1.25 · f_upper": "fs / 2 ≥ 1,25 · f_sup",
+    "M = floor[(fs / 2) / (1.25 · f_upper)]":
+        "M = floor[(fs / 2) / (1,25 · f_sup)]",
     "poles stay clear of z = 1": "los polos se alejan de z = 1",
     "SOS band filter at fs / M": "Filtro SOS de banda a fs / M",
     "SOS band filter at fs": "Filtro SOS de banda a fs",
     "cascaded biquads": "biquads en cascada",
-    "−3 dB at the band edges": "−3 dB en los bordes de banda",
+    "designed on the IEC 61260-1 band edges":
+        "diseñado sobre los bordes IEC 61260-1",
     "Every band filter": "Todo filtro de banda",
-    "is a biquad cascade": "es cascada de biquads",
+    "is a biquad cascade": "es una cascada de biquads",
     "not one high-order": "no un par (b, a)",
     "(b, a) pair": "de orden alto",
     "Band level": "Nivel de banda",
@@ -7210,8 +7211,8 @@ def _d_slm_pipeline(s: SVG, th: Theme) -> None:
     # --- The sensitivity factor, derived from the calibrator tone ----------
     s.arrow(230, 122, 230, 150, th.fg, 2.0)
     s.rect(40, 150, 380, 78, th.panel, th.primary, rx=12, sw=2)
-    s.text(230, 182, "sensitivity(calibrator, target_spl=94.0)", 15, th.fg,
-           bold=True, mono=True)
+    s.text(230, 182, "sensitivity(calibrator, target_spl=94.0, fs=fs)", 13,
+           th.fg, bold=True, mono=True)
     s.text(230, 208, "the factor S in pascals per digital unit", 15, th.muted)
 
     # --- Calibrated pressure: where both inputs meet -----------------------
@@ -7220,7 +7221,7 @@ def _d_slm_pipeline(s: SVG, th: Theme) -> None:
     s.rect(120, 266, 660, 64, "none", th.accent, rx=12, sw=2.4)
     s.text(450, 296, "Calibrated pressure   p(t) = S · x(t)   in pascals", 21,
            th.fg, bold=True)
-    s.text(450, 320, "every level function takes it as calibration_factor=",
+    s.text(450, 320, "every level function takes S as calibration_factor=",
            16, th.accent)
 
     # --- Three readout branches, one guide section each --------------------
@@ -7229,7 +7230,7 @@ def _d_slm_pipeline(s: SVG, th: Theme) -> None:
          "time_weighting(mode='fast')", "exponential detector, τF = 125 ms",
          "LAF(t)   L10 / L50 / L90", True),
         (320.0, "Integrated levels", "laeq · sel · lc_peak",
-         "leq · sound_exposure", "energy average, no ballistics",
+         "", "energy average, no ballistics",
          "LAeq   LAE   LCpeak", True),
         (600.0, "Band spectrum", "octave_filter(fraction=3)",
          "OctaveFilterBank", "IEC 61260-1 band edges",
@@ -7240,8 +7241,11 @@ def _d_slm_pipeline(s: SVG, th: Theme) -> None:
         s.arrow(cx, 330, cx, 370, th.fg, 2.0)
         s.rect(x0, 370, 260, 104, th.panel, th.primary, rx=12, sw=2)
         s.text(cx, 400, head, 19, th.fg, bold=True)
-        s.text(cx, 426, code1, 14, th.fg, mono=True)
-        s.text(cx, 448, code2, 14, th.fg, mono=True)
+        # A branch with a single call keeps its one line centred in the gap the
+        # two-line branches use, rather than leaving a hole under the heading.
+        s.text(cx, 426 if code2 else 437, code1, 14, th.fg, mono=True)
+        if code2:
+            s.text(cx, 448, code2, 14, th.fg, mono=True)
         s.text(cx, 468, note, 14, th.muted)
         s.arrow(cx, 474, cx, 510, th.fg, 2.0)
         s.rect(x0, 510, 260, 62, "none", th.accent, rx=12, sw=2.2)
@@ -7282,10 +7286,10 @@ def _d_calibration_dataflow(s: SVG, th: Theme) -> None:
     # --- sensitivity(): the equation of the guide, plus its stability check -
     s.arrow(220, 126, 220, 166, th.fg, 2.0)
     s.rect(40, 166, 360, 88, th.panel, th.primary, rx=12, sw=2)
-    s.text(220, 196, "sensitivity(calibrator, target_spl=94.0)", 14, th.fg,
-           bold=True, mono=True)
+    s.text(220, 196, "sensitivity(calibrator, target_spl=94.0, fs=fs)", 12,
+           th.fg, bold=True, mono=True)
     s.text(220, 222, "S = p_ref · 10^(L_cal / 20) / x̃_ref", 16, th.fg)
-    s.text(220, 244, "checks the short-term stability (IEC 60942)", 14, th.muted)
+    s.text(220, 244, "fs enables the IEC 60942 stability check", 14, th.muted)
 
     # --- The factor itself --------------------------------------------------
     s.arrow(220, 254, 220, 290, th.fg, 2.0)
@@ -7311,8 +7315,8 @@ def _d_calibration_dataflow(s: SVG, th: Theme) -> None:
     s.text(450, 574, "re 20 µPa", 16, th.accent, mono=True)
     s.rect(650, 514, 210, 80, "none", th.secondary, rx=12, sw=1.8, dash="7,5")
     s.text(755, 542, "No calibrator?", 16, th.secondary, bold=True)
-    s.text(755, 564, "omit the factor and", 14, th.muted)
-    s.text(755, 584, "the levels are dBFS", 14, th.fg)
+    s.text(755, 564, "S = 1, samples read as Pa", 13, th.muted)
+    s.text(755, 584, "use dbfs=True for dBFS", 13, th.fg)
 
 
 # ---------------------------------------------------------------------------
@@ -7331,8 +7335,8 @@ def _d_bank_dataflow(s: SVG, th: Theme) -> None:
     s.arrow(450, 118, 450, 132, th.fg, 2.0)
     s.path("M 450 132 L 610 184 L 450 236 L 290 184 Z", th.panel, th.primary,
            sw=2)
-    s.text(450, 180, "Low band?", 20, th.fg, bold=True)
-    s.text(450, 204, "fc far below fs / 2", 14, th.muted)
+    s.text(450, 180, "Room to decimate?", 20, th.fg, bold=True)
+    s.text(450, 204, "fs / 2 ≥ 1.25 · f_upper", 14, th.muted)
 
     s.line(290, 184, 190, 184, th.fg, 2.0)
     s.arrow(190, 184, 190, 244, th.fg, 2.0)
@@ -7344,7 +7348,7 @@ def _d_bank_dataflow(s: SVG, th: Theme) -> None:
     # --- The decimated branch ----------------------------------------------
     s.rect(50, 244, 280, 80, th.panel, th.primary, rx=12, sw=2)
     s.text(190, 274, "resample_poly(1, M)", 15, th.fg, bold=True, mono=True)
-    s.text(190, 298, "anti-alias and decimate to fs / M", 14, th.muted)
+    s.text(190, 298, "M = floor[(fs / 2) / (1.25 · f_upper)]", 13, th.muted)
     s.text(190, 318, "poles stay clear of z = 1", 14, th.muted)
     s.arrow(190, 324, 190, 360, th.fg, 2.0)
 
@@ -7354,10 +7358,11 @@ def _d_bank_dataflow(s: SVG, th: Theme) -> None:
         s.rect(x0, 360, 280, 84, th.panel, th.primary, rx=12, sw=2)
         s.text(x0 + 140, 390, head, 18, th.fg, bold=True)
         s.text(x0 + 140, 414, "cascaded biquads", 15, th.muted)
-        s.text(x0 + 140, 434, "−3 dB at the band edges", 14, th.muted)
-    s.rect(360, 260, 180, 96, "none", th.secondary, rx=12, sw=1.8, dash="7,5")
-    s.text(450, 288, "Every band filter", 15, th.secondary, bold=True)
-    s.text(450, 308, "is a biquad cascade", 15, th.secondary, bold=True)
+        s.text(x0 + 140, 434, "designed on the IEC 61260-1 band edges", 12,
+               th.muted)
+    s.rect(340, 260, 220, 96, "none", th.secondary, rx=12, sw=1.8, dash="7,5")
+    s.text(450, 288, "Every band filter", 14, th.secondary, bold=True)
+    s.text(450, 308, "is a biquad cascade", 14, th.secondary, bold=True)
     s.text(450, 332, "not one high-order", 14, th.muted)
     s.text(450, 350, "(b, a) pair", 14, th.muted)
 

@@ -221,8 +221,12 @@ $$
 
 ### Colocación de los bordes de banda
 
-Para todas las arquitecturas, el banco sitúa los **puntos de −3 dB en los bordes
-de banda**. Dos casos requieren tratamiento especial:
+Todas las arquitecturas se diseñan sobre los propios bordes de banda, con la
+ganancia que cada una define en su frecuencia de borde: **−3 dB** en
+Butterworth, Chebyshev II y Bessel, y el **borde de rizado de la banda de paso**
+(`ripple` dB, 0,1 dB por defecto) en Chebyshev I y elíptico, que son
+equirrizados en la banda de paso y no tienen ahí ningún punto de −3 dB. Dos
+casos requieren tratamiento especial:
 
 - **Chebyshev II**: en scipy, `Wn` es el borde de la banda *atenuada*.
   phonometry mapea analíticamente los bordes de −3 dB deseados a bordes de
@@ -239,14 +243,20 @@ Para garantizar **estabilidad total** en todo el espectro audible (incluso a
 frecuencias bajas como 16 Hz con frecuencias de muestreo altas), phonometry
 emplea dos estrategias fundamentales:
 
-<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow_es.svg" alt="Flujo de datos dentro de una banda del banco de filtros: una banda grave, cuya frecuencia central queda muy por debajo de la mitad de la frecuencia de muestreo, toma la rama de diezmado con resample_poly hasta fs entre M para que sus polos se alejen del círculo unidad, después toda banda es una cascada de secciones de segundo orden con los puntos de menos 3 dB en los bordes de banda en lugar de una función de transferencia de orden alto, ambas ramas terminan en el nivel de banda en dB y sigbands=True devuelve además la señal de banda a la frecuencia de entrada" style="width:92%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow_es_dark.svg" alt="Flujo de datos dentro de una banda del banco de filtros: una banda grave, cuya frecuencia central queda muy por debajo de la mitad de la frecuencia de muestreo, toma la rama de diezmado con resample_poly hasta fs entre M para que sus polos se alejen del círculo unidad, después toda banda es una cascada de secciones de segundo orden con los puntos de menos 3 dB en los bordes de banda en lugar de una función de transferencia de orden alto, ambas ramas terminan en el nivel de banda en dB y sigbands=True devuelve además la señal de banda a la frecuencia de entrada" style="width:92%" loading="lazy">
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow_es.svg" alt="Flujo de datos dentro de una banda del banco de filtros: una banda en la que cabe diezmar, es decir en la que la mitad de la frecuencia de muestreo sigue por encima de 1,25 veces su borde superior, toma la rama de diezmado con resample_poly hasta fs entre M para que sus polos se alejen del círculo unidad, después toda banda es una cascada de secciones de segundo orden diseñada sobre los bordes de banda de IEC 61260-1 en lugar de una función de transferencia de orden alto, ambas ramas terminan en el nivel de banda en dB y sigbands=True devuelve además la señal de banda devuelta a la frecuencia de entrada" style="width:92%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow_es_dark.svg" alt="Flujo de datos dentro de una banda del banco de filtros: una banda en la que cabe diezmar, es decir en la que la mitad de la frecuencia de muestreo sigue por encima de 1,25 veces su borde superior, toma la rama de diezmado con resample_poly hasta fs entre M para que sus polos se alejen del círculo unidad, después toda banda es una cascada de secciones de segundo orden diseñada sobre los bordes de banda de IEC 61260-1 en lugar de una función de transferencia de orden alto, ambas ramas terminan en el nivel de banda en dB y sigbands=True devuelve además la señal de banda devuelta a la frecuencia de entrada" style="width:92%" loading="lazy">
 
 1. **Secciones de segundo orden (SOS):** todos los filtros se implementan como
    biquads en cascada, evitando la pérdida catastrófica de precisión de las
    funciones de transferencia de orden alto.
-2. **Diezmado multitasa:** para las bandas graves, la señal se diezma antes de
-   filtrar y se interpola después. Esto mantiene los polos digitales lejos del
-   borde del círculo unidad, evitando oscilaciones y ruido. Los bancos
+2. **Diezmado multitasa:** siempre que la mitad de la frecuencia de muestreo
+   siga por encima de 1,25 veces el borde superior de la banda, la señal se
+   diezma automáticamente por `M = floor[(fs / 2) / (1,25 * f_sup)]` antes de
+   filtrar, lo que ocurre en la mayoría de las bandas y no solo en las graves
+   (29 de las 33 bandas de tercio de octava a 48 kHz). Esto mantiene los polos
+   digitales lejos del borde del círculo unidad, evitando oscilaciones y ruido.
+   El nivel de banda se calcula sobre la señal diezmada; solo con
+   `sigbands=True` la señal de banda vuelve a la frecuencia de entrada, con
+   `resample_poly(M, 1)`. Los bancos
    Chebyshev II reservan margen de diezmado adicional para que sus bordes de
    banda atenuada queden por debajo del Nyquist diezmado.
 
