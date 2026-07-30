@@ -168,20 +168,26 @@ grados, con las dos frecuencias elegidas con la
 `coincidence_frequency` de la librería. A `fc/2` = 603 Hz la transmisión
 medida cae sobre la ley de masas oblicua; a `2 fc` = 2413 Hz la traza a 45
 grados iguala exactamente la longitud de onda de flexión y la placa en
-coincidencia reirradia un haz a 45 grados que crece a lo largo de la placa
-(dibujado con ganancia x20 bajo ella), clavando el nivel transmitido en la
-cifra de `fc/2` aunque la ley de masas exige 12 dB más de bloqueo a
-cuatro veces la frecuencia. El aire excita el pesado acero tan débilmente
-que la onda de flexión resonante necesita decenas de metros de placa
-iluminada para desarrollarse del todo, y por eso las medidas muestran un
-valle de coincidencia real y no una transparencia total.
+coincidencia reirradia un haz a 45 grados que crece a lo largo de la placa,
+clavando el nivel transmitido en la cifra de `fc/2` aunque la ley de masas
+exige 12 dB más de bloqueo a cuatro veces la frecuencia. El aire excita el
+pesado acero tan débilmente que la onda de flexión resonante necesita decenas
+de metros de placa iluminada para desarrollarse del todo, y por eso las
+medidas muestran un valle de coincidencia real y no una transparencia total.
+
+Lo que la placa deja pasar queda unos 47 dB por debajo de la onda incidente,
+así que en la escala de color que fija la onda estacionaria sobre la placa el
+campo transmitido saldría como una banda negra. Por eso los dos paneles
+dibujan el aire bajo la placa con la ganancia de representación que indican
+(×150, es decir +44 dB); la ganancia es la misma en ambos para que sigan
+siendo comparables, y los niveles anotados son los medidos, los físicos.
 
 <Video
   name="anim_elastic_coincidence"
   width={2400}
   height={1350}
   title="Coincidencia en una placa de acero de 10 mm en una simulación FDTD elástica 2D"
-  description="Dos campos FDTD elásticos lado a lado de la misma placa de acero de 10 mm tendida en aire mientras llega una onda plana sostenida a 45 grados. A 603 Hz, la mitad de la frecuencia de coincidencia, la onda se refleja casi por completo y el débil nivel transmitido coincide con la ley de masas oblicua. A 2413 Hz, el doble de la frecuencia de coincidencia, la traza acústica iguala la longitud de onda de flexión libre y un haz transmitido a 45 grados crece bajo la placa, manteniendo el mismo nivel que el panel de baja frecuencia donde la ley de masas predecía 12 dB más de aislamiento, con la frecuencia de coincidencia de 1206 Hz de la librería y los niveles medidos y de la ley de masas anotados."
+  description="Dos campos FDTD elásticos lado a lado de la misma placa de acero de 10 mm tendida en aire mientras llega una onda plana sostenida a 45 grados. A 603 Hz, la mitad de la frecuencia de coincidencia, la onda se refleja casi por completo y el débil nivel transmitido coincide con la ley de masas oblicua. A 2413 Hz, el doble de la frecuencia de coincidencia, la traza acústica iguala la longitud de onda de flexión libre y un haz transmitido a 45 grados crece bajo la placa, manteniendo el mismo nivel que el panel de baja frecuencia donde la ley de masas predecía 12 dB más de aislamiento; el aire bajo la placa se dibuja en los dos paneles con una ganancia de representación anotada de 150 veces (+44 dB) para que el campo transmitido sea legible, con la frecuencia de coincidencia de 1206 Hz de la librería y los niveles medidos y de la ley de masas anotados."
 />
 
 ## Pared doble: la resonancia masa-muelle-masa (Bies 7.2.6)
@@ -318,14 +324,20 @@ frente plano llega a un muro rígido de 0,10 m con una rendija de 25 mm (λ/20
 a 686 Hz) y con un hueco de 0,50 m (una longitud de onda). La rendija
 estrecha re-radia lo que traga como una onda cilíndrica, con la transmisión
 de Gomperts del modelo anotada; el hueco del tamaño de la longitud de onda
-deja pasar el frente casi intacto y proyecta sombras de bordes nítidos.
+deja pasar el frente casi intacto y proyecta sombras de bordes nítidos. Lo
+que pasa por la rendija queda unos 23 dB por debajo de la onda estacionaria
+que hay frente al muro, así que en los paneles instantáneos el semiespacio
+tras el muro lleva la ganancia de representación que cada panel indica
+(×10, es decir +20 dB, en la rendija y ninguna en el hueco del tamaño de la
+longitud de onda); los mapas RMS de abajo mantienen una sola escala
+compartida, que es donde se comparan nivel a nivel las dos aberturas.
 
 <Video
   name="anim_fdtd_aperture_slit"
   width={2400}
   height={1350}
   title="Sonido a través de una abertura en un muro en una simulación FDTD 2D"
-  description="Una onda plana de 686 Hz en un campo FDTD 2D choca contra un muro rígido con una rendija de 25 mm y, en un segundo panel, con un hueco de 0,50 m. La rendija estrecha re-radia una onda cilíndrica hacia un semiespacio por lo demás oscuro, con el coeficiente de transmisión de Gomperts anotado de 0,55; el hueco del tamaño de la longitud de onda deja pasar un haz con sombras de bordes nítidos, ambos mapas RMS en la misma escala de color."
+  description="Una onda plana de 686 Hz en un campo FDTD 2D choca contra un muro rígido con una rendija de 25 mm y, en un segundo panel, con un hueco de 0,50 m. La rendija estrecha re-radia una onda cilíndrica hacia el semiespacio de detrás, dibujado con una ganancia de representación anotada de diez veces (+20 dB) y con el coeficiente de transmisión de Gomperts anotado de 0,55; el hueco del tamaño de la longitud de onda deja pasar un haz con sombras de bordes nítidos a ganancia unidad, ambos mapas RMS en la misma escala de color."
 />
 
 ## Eficiencia de radiación de una placa en flexión (Hopkins 2.9)

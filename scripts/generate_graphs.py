@@ -1587,7 +1587,6 @@ _ES_EXACT = {
         "Coincidencia: la misma placa de acero, bajo y sobre f_c "
         "(FDTD elástico 2D)",
     "10 mm steel plate": "placa de acero de 10 mm",
-    "air below the plate drawn ×20": "aire bajo la placa dibujado ×20",
 }
 
 _ES_PATTERNS = [
@@ -1638,6 +1637,12 @@ _ES_PATTERNS = [
      r"sobre f_c: la traza iguala λ_B: \1 dB, la ley de masas decía \2"),
     (r"^coincidence_frequency: f_c = (\d+) Hz \(10 mm steel\)$",
      r"coincidence_frequency: f_c = \1 Hz (acero de 10 mm)"),
+    # Weak-field display-gain notes (_gain_note); the factor is measured off
+    # the field, so the number and its dB equivalent ride through.
+    (r"^air below the plate drawn ×(\d+) \(\+(\d+) dB\)$",
+     r"aire bajo la placa dibujado ×\1 (+\2 dB)"),
+    (r"^past the wall drawn ×(\d+) \(\+(\d+) dB\)$",
+     r"tras el muro dibujado ×\1 (+\2 dB)"),
     # seabed_reflection / seabed_reflection_coefficient critical-angle legend.
     (r"^Critical angle \((\d+)\.(\d+)°\)$", r"Ángulo crítico (\1,\2°)"),
     # equal_loudness_contours per-contour annotations ("20 phon" ... "90 phon").
@@ -14214,6 +14219,59 @@ def _rms_to_db(rms_frames: Any, *, floor: float = -40.0) -> Any:
     return np.clip(db, floor, 0.0).astype(np.float32)
 
 
+# --- weak-field display gain ----------------------------------------------
+# A transmitted or shadowed field can sit tens of dB below the incident one
+# that sets the colour scale, and a single linear diverging ramp cannot show
+# both: give the quiet side half the ramp and the loud side saturates into a
+# flat slab, hiding the wavefronts the clip exists to show. Compressing the
+# ramp instead (signed log, asinh, gamma) has the same ceiling -- a factor of
+# 250 between the two sides is a factor of 250 whatever the transfer curve --
+# and it costs the loud side its shape as well.
+# The treatment used across the clips is therefore a per-region display gain:
+# the quiet region is drawn amplified by a fixed factor picked from the field
+# itself, so each region uses the full ramp, the *shape* of both fields
+# survives, and the panel states the factor (and the dB it stands for) in
+# writing. The measured level annotations stay the physical ones, so nothing
+# on screen is silently rescaled.
+# The ladder is coarse on purpose (1-1.5-2-3-5-7 per decade): a round factor is
+# readable in an annotation and stays put when the field is re-simulated. It
+# starts at 5 (14 dB) so a region that already uses a fifth of the ramp is
+# left alone -- the caveat such a panel would have to print costs more than
+# the contrast it would buy.
+_GAIN_STEPS = (5.0, 7.0, 10.0, 15.0, 20.0, 30.0, 50.0, 70.0, 100.0, 150.0,
+               200.0, 300.0, 500.0, 700.0, 1000.0)
+
+
+def _weak_field_gain(weak: Any, vmax: float, *,
+                     quantile: float = 0.999) -> float:
+    """Rounded display gain that lifts a weak field onto a readable colour.
+
+    ``weak`` is the quiet region of the field (any shape), ``vmax`` the
+    colour-scale half-range the loud region set. The gain is the largest rung
+    of :data:`_GAIN_STEPS` at or under the factor that makes the ``quantile``
+    amplitude of ``weak`` fill the ramp, so the quiet region gets the whole
+    colour scale and at most a thousandth of its samples saturate. A region
+    already within 14 dB of the ramp is returned at 1.0 (no gain, and so no
+    annotation).
+    """
+    peak = float(np.quantile(np.abs(weak), quantile))
+    if not np.isfinite(peak) or peak <= 0.0:
+        return 1.0
+    raw = float(vmax) / peak
+    return max((g for g in _GAIN_STEPS if g <= raw), default=1.0)
+
+
+def _gain_note(region: str, gain: float) -> str:
+    """English annotation for a region drawn with a display gain.
+
+    Empty for a unit gain (nothing to declare). The dB equivalent rides along
+    so the reader can put the compression next to the level annotations.
+    """
+    if gain <= 1.0:
+        return ""
+    return f"{region} drawn ×{gain:g} (+{20.0 * np.log10(gain):.0f} dB)"
+
+
 _BARRIER_FREQS = (100.0, 500.0)
 # Receiver low over the ground: there the ground bounce reinforces both
 # frequencies almost equally (tiny path difference), so the insertion-loss
@@ -17669,6 +17727,10 @@ def _anim_chamber_hardware(ax: Any, length: float, height: float,
 _APERTURE_F = 686.0                      # lambda = 0.50 m exactly
 _APERTURE_WIDTHS = (0.025, 0.50)         # sub-lambda slit / lambda-sized gap
 _APERTURE_DEPTH = 0.10                   # wall thickness across the opening
+# Mesh rule: dx = min(smallest scene dimension / 4, lambda/8 at the carrier)
+# = min(25 mm / 4 = 6.25 mm, 0.5 m / 8 = 62.5 mm) -> the narrow slit governs
+# (lambda/80, 4 cells across it).
+_APERTURE_DX = 0.00625
 _APERTURE_EVERY = 3
 _APERTURE_FRAMES = 962
 #: 8/3 of the shared rate, matching the stride cut (see the note below).
@@ -17696,10 +17758,7 @@ def _aperture_fields(
 
     from phonometry import slit_transmission_coefficient
 
-    # Mesh rule: dx = min(smallest scene dimension / 4, lambda/8 at the
-    # carrier) = min(25 mm / 4 = 6.25 mm, 0.5 m / 8 = 62.5 mm) -> the
-    # narrow slit governs: dx = 6.25 mm (lambda/80, 4 cells across it).
-    dx = 0.00625
+    dx = _APERTURE_DX
     ny, nx = 800, 960                      # 5 m x 6 m
     wall_c = (round(2.0 / dx), round((2.0 + _APERTURE_DEPTH) / dx))
     # Clip duration per the deepest-reflector rule: d(source -> far wall
@@ -17750,7 +17809,10 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
     re-radiates the little it lets through as a cylindrical wave into a
     nearly uniform half space, while the 0.50 m gap passes the front
     almost intact and casts sharp-edged shadows. The Gomperts model of
-    the library gives the narrow slit's transmission coefficient."""
+    the library gives the narrow slit's transmission coefficient. The
+    shadow side of each instantaneous panel rides its own annotated
+    display gain so the slit's re-radiation is visible next to the
+    standing wave facing the wall; the RMS row keeps one shared scale."""
     from matplotlib import patheffects
     from matplotlib.patches import Rectangle
 
@@ -17762,6 +17824,16 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
     half = p_all.shape[1] // 2
     vmax = float(np.quantile(np.abs(p_all[0][half:]), 0.999))
     wall_x = (2.0, 2.0 + _APERTURE_DEPTH)
+    # What the lambda/20 slit passes is ~30 dB under the standing wave that
+    # faces the wall and sets the colour scale, so on the incident ramp the
+    # cylindrical re-radiation this panel exists to show is a black field.
+    # The shadow side of each panel therefore carries its own display gain
+    # (see :func:`_weak_field_gain`), stated on the panel; the gain is per
+    # panel because the wavelength-sized opening needs none, and the RMS row
+    # below keeps the single shared scale that compares the two.
+    past = round((wall_x[1] / 6.0) * p_all.shape[3])
+    gains = [_weak_field_gain(p_all[col][half::4, :, past:], vmax)
+             for col in range(2)]
 
     fig = _anim_figure()
     fig.suptitle(T("Sound through a wall aperture (2D FDTD)"),
@@ -17806,6 +17878,9 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
                   path_effects=outline)
         ax_p.text(2.24, 1.45, T("rigid wall"), ha="left", va="center",
                   color=FIELD_INK, fontsize=7, path_effects=outline)
+        if (note := _gain_note("past the wall", gains[col])):
+            ax_p.text(5.62, 4.28, T(note), ha="right", va="top",
+                      color=FIELD_INK, fontsize=6.5, path_effects=outline)
         ax_r.text(3.85, 0.85, verdicts[col], ha="center", va="bottom",
                   color="white", fontsize=7.5, zorder=6,
                   bbox={"boxstyle": _ANIM_PILL_BOX,
@@ -17833,9 +17908,23 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
                      family="monospace", fontsize=10, color=COLOR_FG)
     reveal = int(0.5 * p_all.shape[1])
 
+    def shadow_gained(col: int, k: int) -> Any:
+        """Frame *k* of panel *col* with the shadow side amplified.
+
+        The gain is applied frame by frame: the field stack is memoised and
+        shared by the four language/theme variants, so it must not be
+        rescaled in place.
+        """
+        frame = p_all[col][k]
+        if gains[col] <= 1.0:
+            return frame
+        out = frame.copy()
+        out[:, past:] *= gains[col]
+        return out
+
     def update(k: int) -> tuple[Any, ...]:
         for col in range(2):
-            ims[2 * col].set_data(p_all[col][k])
+            ims[2 * col].set_data(shadow_gained(col, k))
             ims[2 * col + 1].set_data(db_all[col][k])
         tau_txt.set_text(
             T(f"slit τ = {tau:.2f} (Gomperts)") if k >= reveal else "")
@@ -18424,10 +18513,15 @@ _EC_CB_TUNE = 1.0971
 # ~13 dB above the mass law (growing visibly along x). A steady-scene scan
 # of the tune factor (+-4 % around the value below, same domain and
 # source) moves the under-plate level by < 1.2 dB, confirming the level is
-# this aperture-limited build-up and not residual detuning. The air below
-# the plate is therefore drawn with a fixed x20 gain, annotated on both
-# panels.
-_EC_BELOW_GAIN = 20.0
+# this aperture-limited build-up and not residual detuning. Both panels
+# therefore draw the air below the plate with the display gain
+# :func:`_weak_field_gain` measures off the settled field -- one gain for
+# the two, since the clip's whole point is that they transmit the same
+# level -- and print it.
+# Colour half-range of the instantaneous panels, on the normalisation that
+# puts the incident wave at unit amplitude: 1.6 leaves the standing wave
+# above the plate (incident plus near-total reflection) room to breathe.
+_EC_VLIM = 1.6
 
 
 @lru_cache(maxsize=1)
@@ -18533,7 +18627,9 @@ def animate_elastic_coincidence(output_dir: str) -> None:
     where the mass law demanded 12 dB more. The two frequencies and the
     angle come from the library's coincidence_frequency; the verdicts
     quote the oblique mass law (Bies Eq. 7.41) each panel is judged
-    against."""
+    against. Both panels draw the air below the plate with the same
+    annotated display gain, so the transmitted field is legible next to an
+    incident wave some 45 dB louder."""
     from matplotlib import patheffects
     from matplotlib.patches import Rectangle
 
@@ -18546,14 +18642,20 @@ def animate_elastic_coincidence(output_dir: str) -> None:
     bp, m2 = _elastic_plate_bp_m2()
     fc = coincidence_frequency(m2, bp)
     x0, x1, y0, y1 = _EC_VIEW
-    # The air below the plate rides a fixed, annotated x20 display gain
-    # (see _EC_BELOW_GAIN); the fields are cached, so amplify copies.
+    # The air below the plate rides an annotated display gain measured off
+    # the settled field of both runs at once (see the _EC_VLIM note); the
+    # field stacks are cached and shared by the four variants, so the gain
+    # goes on copies.
     dx = _EL_DX
     i_below = (round((_EC_PLATE_Y + _EL_H) / dx) - round(y0 / dx)) // 2
+    settled = slice(3 * n_active // 4, n_active)
+    gain = _weak_field_gain(
+        np.concatenate([p_lo[settled, i_below:, :].ravel(),
+                        p_hi[settled, i_below:, :].ravel()]), _EC_VLIM)
     p_lo = p_lo.copy()
     p_hi = p_hi.copy()
     for stack in (p_lo, p_hi):
-        stack[:, i_below:, :] *= _EC_BELOW_GAIN
+        stack[:, i_below:, :] *= gain
 
     fig = _anim_figure()
     fig.suptitle(T("Coincidence: the same steel plate, below and above "
@@ -18581,7 +18683,7 @@ def animate_elastic_coincidence(output_dir: str) -> None:
             ((axes[0], titles[0], p_lo), (axes[1], titles[1], p_hi))):
         ax.grid(False)
         im = ax.imshow(data[0], origin="upper", extent=(x0, x1, y1, y0),
-                       cmap=CMAP_FIELD, vmin=-1.6, vmax=1.6,
+                       cmap=CMAP_FIELD, vmin=-_EC_VLIM, vmax=_EC_VLIM,
                        aspect="equal", interpolation="bilinear")
         ax.set_title(title, fontsize=10, fontweight="bold")
         ax.add_patch(Rectangle((x0, _EC_PLATE_Y), x1 - x0, _EL_H,
@@ -18594,9 +18696,9 @@ def animate_elastic_coincidence(output_dir: str) -> None:
                     zorder=4)
             ax.set_ylabel("y [m]", fontsize=8)
         ax.text(x0 + 0.02, _EC_PLATE_Y + _EL_H + 0.012,
-                T("air below the plate drawn ×20"), ha="left", va="top",
-                color=FIELD_INK, fontsize=6.5, path_effects=outline,
-                zorder=4)
+                T(_gain_note("air below the plate", gain)), ha="left",
+                va="top", color=FIELD_INK, fontsize=6.5,
+                path_effects=outline, zorder=4)
         # Incidence arrow at 45 degrees.
         ax.annotate("", xy=(x0 + 0.34, y0 + 0.30),
                     xytext=(x0 + 0.13, y0 + 0.09),
