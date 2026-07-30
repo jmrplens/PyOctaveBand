@@ -61,31 +61,8 @@ WORKBOOK_TOLERANCE = 0.01
 CATEGORIES = ("1", "2", "3", "4a", "4b")
 
 
-@functools.cache
-def _coefficients_2015() -> RoadEmissionCoefficients:
-    """Table F-1 as published in (EU) 2015/996, the workbook's own database."""
-    table = ref.cnossos_road_2015_coefficients()
-    return RoadEmissionCoefficients(
-        rolling_a={k: v["AR"] for k, v in table.items()},
-        rolling_b={k: v["BR"] for k, v in table.items()},
-        propulsion_a={k: v["AP"] for k, v in table.items()},
-        propulsion_b={k: v["BP"] for k, v in table.items()},
-        studded_a=ROAD_COEFFICIENTS.studded_a,
-        studded_b=ROAD_COEFFICIENTS.studded_b,
-        junction_c=ROAD_COEFFICIENTS.junction_c,
-        temperature_k=ROAD_COEFFICIENTS.temperature_k,
-    )
-
-
-@functools.cache
-def _surfaces_2015() -> dict[str, RoadSurfaceCoefficients]:
-    """Table F-4 as published in (EU) 2015/996, keyed by the workbook's ID."""
-    return {
-        surface: RoadSurfaceCoefficients(
-            name=name, alpha=alpha, beta=beta, speed_range=None
-        )
-        for surface, (name, alpha, beta) in ref.cnossos_road_2015_surfaces().items()
-    }
+from cnossos_road_oracle import coefficients_2015 as _coefficients_2015
+from cnossos_road_oracle import surfaces_2015 as _surfaces_2015
 
 
 @functools.cache

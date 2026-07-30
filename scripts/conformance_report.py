@@ -7063,27 +7063,15 @@ _CNOSSOS_ROAD = "CNOSSOS-EU road source (Directive 2002/49/EC Annex II)"
 
 
 def _cnossos_road_2015_inputs() -> tuple[Any, dict[str, Any]]:
-    """The superseded (EU) 2015/996 Appendix F database the workbook used."""
-    from phonometry import RoadEmissionCoefficients, RoadSurfaceCoefficients
+    """The superseded (EU) 2015/996 Appendix F database the workbook used.
 
-    table = ref.cnossos_road_2015_coefficients()
-    coefficients = RoadEmissionCoefficients(
-        rolling_a={k: v["AR"] for k, v in table.items()},
-        rolling_b={k: v["BR"] for k, v in table.items()},
-        propulsion_a={k: v["AP"] for k, v in table.items()},
-        propulsion_b={k: v["BP"] for k, v in table.items()},
-        studded_a=ph.ROAD_COEFFICIENTS.studded_a,
-        studded_b=ph.ROAD_COEFFICIENTS.studded_b,
-        junction_c=ph.ROAD_COEFFICIENTS.junction_c,
-        temperature_k=ph.ROAD_COEFFICIENTS.temperature_k,
-    )
-    surfaces = {
-        surface: RoadSurfaceCoefficients(
-            name=name, alpha=alpha, beta=beta, speed_range=None
-        )
-        for surface, (name, alpha, beta) in ref.cnossos_road_2015_surfaces().items()
-    }
-    return coefficients, surfaces
+    Wrapped in ``tests/cnossos_road_oracle.py`` so this report and the test
+    suite read the same database; two copies of the wrapping could drift and
+    leave the two validating against different tables.
+    """
+    import cnossos_road_oracle as oracle
+
+    return oracle.coefficients_2015(), oracle.surfaces_2015()
 
 
 @register(

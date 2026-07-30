@@ -459,7 +459,7 @@ One row of Table F-4: the acoustic signature of a road surface.
 | `name` | The surface description as printed in Table F-4. |
 | `alpha` | `alpha_i,m` per category, eight octave bands, in dB. |
 | `beta` | `beta_m` per category (dimensionless speed coefficient). |
-| `speed_range` | `(v_min, v_max)` over which the row is declared valid, in km/h, or `None` for the reference surface, which carries no range. |
+| `speed_range` | `(v_min, v_max)` over which the row is declared valid, in km/h, or `None` for the reference surface, which carries no range. Carried for the reader, not enforced: Table F-4 prints these columns without attaching a consequence to them, so refusing a speed outside the range would be stricter than the method itself. |
 
 ## RoadTraffic
 

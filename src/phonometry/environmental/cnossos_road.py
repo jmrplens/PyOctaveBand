@@ -391,6 +391,9 @@ class RoadSurfaceCoefficients:
     :ivar beta: ``beta_m`` per category (dimensionless speed coefficient).
     :ivar speed_range: ``(v_min, v_max)`` over which the row is declared valid,
         in km/h, or ``None`` for the reference surface, which carries no range.
+        Carried for the reader, not enforced: Table F-4 prints these columns
+        without attaching a consequence to them, so refusing a speed outside
+        the range would be stricter than the method itself.
     """
 
     name: str
