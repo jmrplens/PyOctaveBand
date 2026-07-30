@@ -118,7 +118,7 @@ the version you actually ran.
 
 APA:
 
-> Requena Plens, J. M. (2026). *phonometry: acoustic measurement toolkit for
+> Requena-Plens, J. M. (2026). *phonometry: acoustic measurement toolkit for
 > Python* (Version 3.2.0) [Computer software].
 > https://doi.org/10.5281/zenodo.21215280
 
@@ -126,7 +126,7 @@ BibTeX:
 
 ```bibtex
 @software{requenaplens_phonometry,
-  author  = {Requena Plens, Jose Manuel},
+  author  = {Requena-Plens, Jose M.},
   title   = {phonometry: acoustic measurement toolkit for Python
              (formerly PyOctaveBand)},
   year    = {2026},

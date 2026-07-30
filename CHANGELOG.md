@@ -658,6 +658,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   said `[report]` alone renders a fiche, which is not true: its figure panel
   needs matplotlib as well.
 
+- One rule now governs how my name is written across the repository: the
+  hyphenated "Requena-Plens" is the bibliographic citation form, and everywhere
+  else the name is written out in full as two given names and two surnames,
+  "José Manuel Requena Plens". `CITATION.cff` and `.zenodo.json` already read
+  "Requena-Plens, José M." and are unchanged. The About page did not follow the
+  rule: it wrote the inverted citation form with the surnames unjoined, in both
+  the APA line and the BibTeX entry and in both languages, so the site
+  disagreed with the metadata it points readers at. Those four citation strings
+  now match, with the BibTeX field matching modulo the diacritic that block
+  already drops. `paper/paper.md` is in the same class, since its `surname:`
+  field is what renders the paper's own citation, so it carries the hyphen too.
+  Running text, the `LICENSE` copyright line and the `author` meta tag keep the
+  full unhyphenated name, which is also what the ORCID record
+  `0000-0003-1250-6212` and the canonical Person document fetched from jmrp.io
+  hold, so the citation form and the name record are meant to differ and
+  neither needs changing.
+
 - The filter-bank reuse test asserts the property it is named after instead of a
   stopwatch. It used to compare `time.time()` deltas and require the class-based
   path to stay within 1.5x of the functional one, which on a shared runner under

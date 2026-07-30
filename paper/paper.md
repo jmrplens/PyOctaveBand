@@ -11,7 +11,7 @@ tags:
 authors:
   - name:
       given-names: José Manuel
-      surname: Requena Plens
+      surname: Requena-Plens
     orcid: 0000-0003-1250-6212
     affiliation: 1
 affiliations:
