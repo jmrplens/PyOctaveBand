@@ -46,6 +46,16 @@ _WITH_RENDER = """
 - **Status:** unreported.
 """
 
+#: A render-shaped string outside the Evidence bullet is not evidence.
+_RENDER_IN_THE_WRONG_BULLET = """
+## Some standard, Formula (1)
+
+- **Location:** Formula (1).
+- **The print:** `A = 0,32 V`, as `plan/some-standard.pdf`, PDF page 8, printed p. 6, 600 dpi shows.
+- **Evidence:** direct algebra.
+- **Status:** unreported.
+"""
+
 _NO_RATIO_NO_RENDER = """
 ## Some standard, Clause 4 (a broken cross-reference)
 
@@ -103,6 +113,22 @@ def test_an_incomplete_render_citation_does_not_satisfy_the_check(
     incomplete = _WITH_RENDER.replace(missing, "")
     assert incomplete != _WITH_RENDER, "the fixture no longer contains that field"
     assert not _entries(incomplete)[0].cites_render
+
+
+def test_a_render_outside_the_evidence_bullet_does_not_count() -> None:
+    """Only the Evidence bullet is read.
+
+    A render-shaped string quoted in "The print" or narrated in "The problem"
+    would otherwise let an entry through with an Evidence bullet that still
+    rests on an extraction.
+    """
+    entries = _entries(_RENDER_IN_THE_WRONG_BULLET)
+    assert "PDF page 8" in entries[0].body
+    assert "PDF page 8" not in entries[0].evidence
+    assert not entries[0].cites_render
+    problems = cee.check_renders(entries)
+    assert len(problems) == 1
+    assert "cites no page render in its Evidence bullet" in problems[0]
 
 
 def test_an_entry_with_no_multiplicative_claim_is_not_flagged() -> None:

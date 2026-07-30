@@ -162,6 +162,15 @@ _DECIBEL = re.compile(
 )
 
 
+#: The start of the bullet the render has to live in. Anything quoted in "The
+#: print" or narrated in "The problem" is not evidence, so the citation is only
+#: read from here to the next top-level bullet.
+_EVIDENCE_BULLET = re.compile(
+    r"^- \*\*Evidence:?\*\*.*?(?=^- \*\*|\Z)",
+    re.MULTILINE | re.DOTALL,
+)
+
+
 @dataclass(frozen=True)
 class Entry:
     """One ``## `` section of the registry."""
@@ -171,8 +180,13 @@ class Entry:
     line: int
 
     @property
+    def evidence(self) -> str:
+        """The Evidence bullet, including its continuation lines."""
+        return "".join(match.group(0) for match in _EVIDENCE_BULLET.finditer(self.body))
+
+    @property
     def cites_render(self) -> bool:
-        return RENDER.search(self.body) is not None
+        return RENDER.search(self.evidence) is not None
 
 
 @dataclass(frozen=True)
@@ -262,11 +276,12 @@ def check_renders(entries: list[Entry]) -> list[str]:
             continue
         if entry.title in RENDER_ALLOWLIST:
             continue
+        where = "in its Evidence bullet" if entry.evidence else "(it has no Evidence bullet)"
         problems.append(
             f"{REGISTRY.name}:{entry.line}: entry '{entry.title}' cites no page "
-            "render. Add 'Render: `plan/<file>.pdf`, PDF page N, printed p. M, "
-            "D dpi.' to its Evidence bullet, or list it in RENDER_ALLOWLIST "
-            "with a reason."
+            f"render {where}. Add 'Render: `plan/<file>.pdf`, PDF page N, "
+            "printed p. M, D dpi.' to its Evidence bullet, or list it in "
+            "RENDER_ALLOWLIST with a reason."
         )
     return problems
 

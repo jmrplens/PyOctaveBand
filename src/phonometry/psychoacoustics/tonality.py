@@ -340,7 +340,7 @@ def tone_to_noise_ratio(
 # the constant term where the linear coefficient belongs; its own where-list
 # declares C_L,0/C_L,1/C_L,2, Table 2 tabulates a C_L,1 column and the parallel
 # Formula (22) prints C_U,1 correctly. Read as printed the middle range would
-# return -149.5 - 149.5*ft, negative everywhere. See docs/ERRATA.md.
+# return -149.5 - 149.5*ft - 6.90e-5*ft**2, negative everywhere. See ERRATA.
 _LOWER_EDGE_COEFFS = (
     (89.1, 171.4, (20.0, 0.0, 0.0)),
     (171.4, 1600.0, (-149.5, 1.001, -6.90e-5)),

@@ -770,7 +770,7 @@ which is the check that enforces the rule; see
   quantity to different precision rather than a typographical error:
   `10 000 · 2^(1/6) = 11 224,6 Hz` is the upper edge of the 10 kHz
   one-third-octave band that closes the range of interest, which rounds to
-  11 220 Hz at three significant figures and to 11 200 Hz at two. An earlier
+  11 220 Hz at four significant figures and to 11 200 Hz at three. An earlier
   revision of this entry called it a typo and added that "no other clause
   mentions 11 220 Hz"; the last x-axis tick of Figure 6 (printed p. 20) is
   labelled 11220. What clause 4.1 does carry is a structural defect: 4.1.2
@@ -2106,9 +2106,14 @@ which is the check that enforces the rule; see
     and OCA. The errata resolves the conflict in favour of values consistent
     with the +159 dB rule, so it supersedes the sentence as well as the table;
     the sentence is left standing in the article.
-  Render: `plan/underwater-sources/Southall-2019-with-errata.pdf`, PDF page 31,
-  printed p. 155, 300 dpi (the "in water (LF, SI, PCW, and OCW)" restriction
-  and the 15 dB in-air offset in the same paragraph).
+  Renders, all of `plan/underwater-sources/Southall-2019-with-errata.pdf`,
+  which bundles the article and the errata: PDF page 31, printed p. 155,
+  300 dpi (the "in water (LF, SI, PCW, and OCW)" restriction and the 15 dB
+  in-air offset in the same paragraph); PDF page 32, printed p. 156, 200 dpi
+  (the article's Table 7, with the PCA row 123 / 138 / 138 / 144 and the OCA
+  row 146 / 161 / 161 / 167 that show the duplication); and PDF page 110,
+  printed p. 570, 250 dpi (the errata's reprinted Table 7, with PCA
+  123 / 155 / 138 / 161 and OCA 146 / 170 / 161 / 176).
 - **Library behaviour:** the errata-corrected values are the ones implemented
   in [`marine_mammal_weighting.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/underwater/marine_mammal_weighting.py),
   pinned by `test_southall_table_7_errata_values_are_implemented`, with the
