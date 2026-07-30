@@ -43,8 +43,19 @@ python tests/data/stipa/make_extract.py tests/data-local/stipa-verification
   were developed by Embedded Acoustics and may be used for commercial and
   non-commercial use free of charge."* The same page is explicit that the
   signals are **not** STIPA measurement signals and that the STIPA measurement
-  signals sold by instrument manufacturers are separately copyrighted; none of
-  those is used here.
+  signals sold by instrument manufacturers are separately copyrighted and
+  require a paid licence to redistribute; none of those is used here.
+- **What that grant does and does not say.** It grants unrestricted use, free
+  of charge, for any purpose, and it draws the redistribution line explicitly
+  around the *measurement* signals — not around these. It does not, however,
+  contain the words "redistribute" or "copy" about the verification signals
+  themselves, so this extract is committed on the reading that a free-of-charge
+  grant with no restriction attached, for material published precisely so that
+  implementations can be verified against it, covers carrying a subset in a
+  verification suite. That reading has not been confirmed in writing by
+  Embedded Acoustics. If you are Embedded Acoustics and it is wrong, see the
+  removal policy below; the extract comes out and the suites fall back to the
+  local-only bench.
 - The encoded blobs in the zip are a lossless re-encoding of that material, not
   original Embedded Acoustics files; `manifest.json` is ours.
 

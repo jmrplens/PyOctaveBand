@@ -76,6 +76,21 @@ SELECTION: tuple[str, ...] = (
 #: Difference orders tried when encoding; the smallest output wins.
 _ORDERS = (0, 1, 2, 3, 4)
 
+#: The whole bench is 48 kHz mono; anything else is the wrong download.
+_FS = 48000
+
+#: Fixed member timestamp, so rebuilding the archive is byte-reproducible
+#: (the zip format would otherwise stamp the current time into every entry).
+_EPOCH = (1980, 1, 1, 0, 0, 0)
+
+
+def _member(name: str) -> zipfile.ZipInfo:
+    """A deterministic archive entry for ``name``."""
+    info = zipfile.ZipInfo(name, date_time=_EPOCH)
+    info.compress_type = zipfile.ZIP_LZMA
+    info.external_attr = 0o644 << 16
+    return info
+
 
 def encode(samples: np.ndarray, order: int) -> bytes:
     """Return the ``order``-th difference of ``samples`` as little-endian i4."""
@@ -103,11 +118,13 @@ def build(source: pathlib.Path, destination: pathlib.Path) -> None:
         for relative in SELECTION:
             path = source / relative
             fs, samples = wavfile.read(path)
+            if fs != _FS:
+                raise SystemExit(f"{relative}: expected {_FS} Hz, got {fs}")
             if samples.dtype != np.int16 or samples.ndim != 1:
                 raise SystemExit(f"{relative}: expected 16-bit mono PCM")
             order = best_order(samples)
             member = f"{relative}.i4"
-            archive.writestr(member, encode(samples, order))
+            archive.writestr(_member(member), encode(samples, order))
             entries.append(
                 {
                     "path": relative,
@@ -121,7 +138,7 @@ def build(source: pathlib.Path, destination: pathlib.Path) -> None:
                 }
             )
         archive.writestr(
-            "manifest.json",
+            _member("manifest.json"),
             json.dumps(
                 {
                     "format": "phonometry-stipa-extract/1",

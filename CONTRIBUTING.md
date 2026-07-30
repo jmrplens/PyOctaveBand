@@ -83,7 +83,9 @@ To check coverage locally:
 ```bash
 pytest --cov=src/phonometry --cov-report=term-missing tests/
 ```
+
 ### 3b. Oracle data (committed vs local)
+
 Some suites are validated against reference material that is too large or not
 redistributable. Each of them keeps a small committed oracle under
 `tests/data/<dataset>/` (a derived measurement series, or a lossless extract of

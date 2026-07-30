@@ -33,7 +33,7 @@ that steps over itself in CI is a suite nobody but the maintainer runs.
 `pytest` prints the resolution of every dataset in its run header, so a green
 run is never ambiguous about which oracle produced it:
 
-```
+```text
 oracle data:
   stipa-verification: full set from tests/data-local/stipa-verification
   ebu-loudness-test-set: committed oracle (block-loudness series, tests/data/broadcast/)

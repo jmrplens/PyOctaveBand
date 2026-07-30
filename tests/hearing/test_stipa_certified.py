@@ -286,28 +286,26 @@ def test_a312_filter_bank_phase(ti: float) -> None:
 # Inventory guards
 # ---------------------------------------------------------------------------
 
+#: The exact 27 signals the extract must hold. Pinned name by name, not by
+#: count: swapping a worst-case point for an easier one of the same suite
+#: would keep the counts right and quietly weaken the committed coverage.
+_COMMITTED = (
+    frozenset(_C32_FILES[m] for m in (0.0, 0.9, 1.0))
+    | frozenset(_C33_FILES.values())
+    | frozenset(_C42_FILES.values())
+    | frozenset(_A22_FILES[pair] for pair in ((125, 250), (1000, 2000)))
+    | frozenset({_A312_FILES[0.9]})
+)
+
+
 def test_committed_extract_inventory() -> None:
     """The committed extract must hold exactly the 27 declared signals and
     every one of them must decode to the digest of the original samples."""
-    declared = (
-        set(_C32_FILES.values())
-        | set(_C33_FILES.values())
-        | set(_C42_FILES.values())
-        | set(_A22_FILES.values())
-        | set(_A312_FILES.values())
+    assert set(_MANIFEST) == set(_COMMITTED), (
+        "the extract no longer matches the documented selection "
+        "(see tests/data/stipa/README.md)"
     )
-    assert set(_MANIFEST) <= declared, "extract holds signals no suite reads"
-    assert len(_MANIFEST) == 27, f"expected 27 signals, found {len(_MANIFEST)}"
-    counts = {
-        "Annex C.3.2/": 3,
-        "Annex C.3.3/": 7,
-        "Annex C.4.2/": 14,
-        "Annex A.2.2 - weight factor test/": 2,
-        "Annex A.3.1.2 - filter bank phase test/": 1,
-    }
-    for prefix, n in counts.items():
-        found = sum(1 for path in _MANIFEST if path.startswith(prefix))
-        assert found == n, f"{prefix}: expected {n} signals, found {found}"
+    assert len(_COMMITTED) == 27, f"expected 27 signals, found {len(_COMMITTED)}"
     for relative in _MANIFEST:
         # _decode() verifies the SHA-256 and the sample rate itself.
         assert _decode(relative).size > 0
