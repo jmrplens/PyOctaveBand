@@ -11193,7 +11193,9 @@ def generate_detailed_prediction_paths(output_dir: str) -> None:
     rest = order[6:]
     if rest:
         share = 100.0 * res.fractions[rest].sum(axis=0)
-        ax.bar(x, share, bottom=bottom, width=0.85, color=COLOR_GRID,
+        # The pooled segment is de-emphasised *data*, so it takes the mid grey
+        # that reads on both pages, not the gridline grey that hides in one.
+        ax.bar(x, share, bottom=bottom, width=0.85, color=COLOR_MUTED,
                edgecolor="none", zorder=2, label="other paths")
     ax.set_ylim(0.0, 100.0)
     ax.set_ylabel("Share of transmitted energy [%]")
@@ -11210,14 +11212,13 @@ def generate_detailed_prediction_paths(output_dir: str) -> None:
     ax.legend(handles + extra, labels + extra_labels, loc="upper left",
               fontsize=9, ncol=3)
 
-    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
         "R' = -10 lg(Σ 10^(-Rij/10))",
         f"R'w (C; Ctr) = {res.rating.rating} ({res.rating.c}; {res.rating.ctr}) dB",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=10, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "detailed_prediction_paths.svg")
