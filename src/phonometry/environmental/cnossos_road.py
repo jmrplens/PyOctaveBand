@@ -453,6 +453,23 @@ def _bands(values: tuple[float, ...]) -> NDArray[np.float64]:
     return np.asarray(values, dtype=np.float64)
 
 
+def _combine_rolling_and_propulsion(
+    key: str, rolling: np.ndarray, propulsion: np.ndarray
+) -> np.ndarray:
+    """(2.2.3): the energy sum of the two source terms, in dB.
+
+    Categories 4a and 4b carry no rolling term, so their total is the
+    propulsion power alone. The rule lives here rather than at each call site
+    because a copy of it that no test reaches is a copy that can drift.
+    """
+    if key in ("4a", "4b"):
+        return np.asarray(propulsion, dtype=np.float64)
+    return np.asarray(
+        10.0 * np.log10(10.0 ** (rolling / 10.0) + 10.0 ** (propulsion / 10.0)),
+        dtype=np.float64,
+    )
+
+
 def _category_key(category: RoadVehicleCategory | str) -> str:
     key = category.value if isinstance(category, RoadVehicleCategory) else str(category)
     if key not in _TABLE_F1:
@@ -738,10 +755,7 @@ def road_vehicle_sound_power(
         junction_distance=junction_distance, junction_type=junction_type,
         coefficients=coefficients,
     )
-    return np.asarray(
-        10.0 * np.log10(10.0 ** (rolling / 10.0) + 10.0 ** (propulsion / 10.0)),
-        dtype=np.float64,
-    )
+    return _combine_rolling_and_propulsion(key, rolling, propulsion)
 
 
 @dataclass(frozen=True)
@@ -857,11 +871,7 @@ def road_source_power(
             junction_distance=junction_distance, junction_type=junction_type,
             coefficients=coefficients,
         )
-        lw = (
-            lwp
-            if key in ("4a", "4b")
-            else 10.0 * np.log10(10.0 ** (lwr / 10.0) + 10.0 ** (lwp / 10.0))
-        )
+        lw = _combine_rolling_and_propulsion(key, lwr, lwp)
         # (2.2.1): the flow term uses the true speed, never the 20 km/h floor.
         flow_term = -np.inf if q <= 0.0 else 10.0 * np.log10(q / (1000.0 * v))
         rolling.append(lwr)

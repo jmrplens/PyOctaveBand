@@ -429,6 +429,50 @@ def test_gradient_correction_uphill_branches() -> None:
     ) == pytest.approx(np.full(8, 6.0 / 0.8 * v / 100.0), abs=1e-12)
 
 
+@pytest.mark.parametrize(
+    ("category", "inside", "just_outside"),
+    [
+        ("1", (-5.5, -0.5, 1.0), (-6.5, 2.5)),
+        ("2", (-3.5, -0.5), (-4.5, 0.5)),
+        ("3", (-3.5, -0.5), (-4.5, 0.5)),
+    ],
+)
+def test_gradient_dead_band_is_pinned_on_both_sides_of_every_breakpoint(
+    category: str, inside: tuple[float, ...], just_outside: tuple[float, ...]
+) -> None:
+    """(2.2.13)-(2.2.15): the dead band ends exactly at the printed breakpoints.
+
+    The correction is continuous, so it evaluates to zero *at* every breakpoint
+    and a test that samples only the edges cannot tell a widened branch from
+    the printed one: at s = 2 % the category 1 uphill branch returns
+    (2 - 2)/1,5 = 0 whether it opens at 0 % or at 2 %. These gradients sit
+    strictly inside the band, where a breakpoint moved outwards makes the
+    correction negative, and strictly outside it, where one moved inwards
+    would leave it at zero.
+    """
+    base = road_propulsion_noise(category, 70.0)
+    for slope in inside:
+        assert np.array_equal(road_propulsion_noise(category, 70.0, gradient=slope), base)
+    for slope in just_outside:
+        assert not np.array_equal(road_propulsion_noise(category, 70.0, gradient=slope), base)
+
+
+def test_gradient_correction_never_subtracts() -> None:
+    """The published correction only ever adds propulsion noise.
+
+    Every branch of (2.2.13)-(2.2.15) is non-negative by construction, so a
+    misplaced breakpoint shows up as a negative correction on the gentle
+    slopes that make up most of a real network. Swept rather than sampled,
+    because that is the property the breakpoints have to preserve.
+    """
+    for category in ("1", "2", "3", "4a", "4b"):
+        base = road_propulsion_noise(category, 70.0)
+        for slope in np.arange(-15.0, 15.001, 0.25):
+            assert np.all(
+                road_propulsion_noise(category, 70.0, gradient=float(slope)) >= base - 1e-12
+            )
+
+
 def test_gradient_saturates_at_twelve_per_cent() -> None:
     """``Min(12 %, s)`` caps the correction in both directions."""
     for category in ("1", "2", "3"):
