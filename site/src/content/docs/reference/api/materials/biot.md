@@ -63,11 +63,12 @@ rigid-frame limit reproduces the already-anchored Johnson-Champoux-Allard
 equivalent fluid, the limp limit reproduces
 [`limp_frame`](/phonometry/reference/api/materials/porous-absorber/#limp_frame), and the chapter 11
 assembly reproduces the chapter 6 closed form Eq. (6.107) to machine precision.
-The book does print three *output* digits for the fully specified glass wool of
-Table 6.1, and all three are reproduced: the airborne branch changes from
-`(delta1, mu1)` to `(delta2, mu2)` at 495 Hz (printed p. 124),
-`|mu_a| > 40` above 50 Hz (printed p. 124) and the impedance peak of a
-5,6 cm layer sits at 860 Hz (printed p. 129). See `tests/materials/test_biot.py`.
+The book does print four *output* numbers for the fully specified glass wool of
+Table 6.1, and all four are reproduced: the airborne branch changes from
+`(delta1, mu1)` to `(delta2, mu2)` at 495 Hz, `|mu_a| > 40` above 50 Hz,
+and `mu_b` runs from 1,0 at 50 Hz to 0,82 at 1500 Hz (all printed
+pp. 124-125), while the impedance peak of a 5,6 cm layer sits at 860 Hz
+(printed p. 129). See `tests/materials/test_biot.py`.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
