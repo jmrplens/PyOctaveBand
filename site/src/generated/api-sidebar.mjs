@@ -220,6 +220,8 @@ export const apiSidebar = {
       items: [
         'reference/api/noise_control/silencers',
         'reference/api/noise_control/hvac',
+        'reference/api/noise_control/duct-path',
+        'reference/api/noise_control/duct-modes',
         'reference/api/noise_control/enclosures',
       ],
     },

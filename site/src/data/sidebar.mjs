@@ -343,6 +343,7 @@ export const sidebar = [
         items: [
           { slug: 'guides/sections/noise-control', label: 'Overview', translations: { es: 'Resumen' } },
           'guides/silencers',
+          'guides/duct-path',
           'guides/noise-control',
         ],
       },

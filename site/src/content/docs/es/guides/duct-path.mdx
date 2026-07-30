@@ -1,0 +1,783 @@
+---
+title: "Ruido por conductos: del ventilador a la sala"
+description: "El cálculo completo de ruido en conductos de climatización: la potencia acústica del ventilador desde su punto de funcionamiento, la atenuación de tramos rectos, codos, derivaciones, conducto flexible, silenciadores y plenums, el ruido regenerado de silenciadores y unidades terminales, el efecto de sala y el veredicto NC, anclado en la hoja resuelta de la Tabla 14.9 de Long, más el corte de los modos de orden superior que limita todo método de onda plana."
+references:
+  - type: book
+    authors: ["Long, M."]
+    year: 2014
+    title: "Architectural acoustics"
+    edition: "2.ª ed."
+    publisher: "Academic Press"
+    primary: true
+    note: "El modelo de potencia acústica del ventilador (Cap. 13, Ec. 13.1 con las Tablas 13.5-13.8) y el modelo de ruido regenerado del difusor (Cap. 13, Ecs. 13.27-13.33), la atenuación de conductos, el conducto flexible, la pérdida por derivación, la reflexión del extremo, el ruido regenerado del silenciador y el efecto de sala del Cap. 14, y la hoja resuelta de ruido por conductos de la Tabla 14.9 sobre la que se construye esta guía."
+  - type: book
+    authors: ["Norton, M. P.", "Karczub, D. G."]
+    year: 2003
+    title: "Fundamentals of noise and vibration analysis for engineers"
+    edition: "2.ª ed."
+    publisher: "Cambridge University Press"
+    doi: "10.1017/CBO9781139163927"
+    primary: true
+    note: "Los modos acústicos de orden superior de los conductos, las frecuencias de corte de secciones circulares y rectangulares y la corrección por flujo medio (§7.3, Ecs. 7.6-7.10)."
+  - type: book
+    authors: ["Bies, D. A.", "Hansen, C. H.", "Howard, C. Q."]
+    year: 2017
+    title: "Engineering noise control"
+    edition: "5.ª ed."
+    publisher: "CRC Press"
+    doi: "10.1201/9781351228152"
+    note: "La tabla de reflexión del extremo (§8.13), la pérdida por inserción de codos (§8.11), la reducción de un silenciador de bafles a conductos revestidos (§8.10.5, Ec. 8.241), la cámara plenum (§8.17) y el ruido generado por el flujo en conductos y codos (§8.15)."
+  - type: report
+    organization: "American Society of Heating, Refrigerating and Air-Conditioning Engineers"
+    year: 2019
+    title: "ASHRAE handbook: HVAC applications (edición SI), Capítulo 49, Noise and vibration control"
+    institution: "ASHRAE"
+    note: "Los límites de velocidad en las unidades terminales (Tabla 9), las correcciones por compuerta de regulación (Tabla 10) y la indicación de que la potencia acústica de un ventilador se toma preferentemente de los ensayos del fabricante."
+  - type: standard
+    organization: "Air-Conditioning, Heating and Refrigeration Institute"
+    designation: "AHRI Standard 885"
+    title: "Procedure for estimating occupied space sound levels in the application of air terminals and air outlets"
+    note: "La estructura de filas del sector para la hoja de cálculo de ruido por conductos (Tabla 8) que siguen DuctPathResult.table() y .report()."
+---
+
+import ThemeImage from '../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../components/ReportPreview.astro';
+
+El ruido de la climatización no se predice, se *contabiliza*. Se parte de la
+potencia acústica que el ventilador introduce en el conducto, se recorre el
+trayecto y, en cada elemento, se resta lo que atenúa y se vuelve a sumar lo
+que su propio flujo de aire regenera. Lo que sobrevive hasta la unidad
+terminal lo convierte la sala en un nivel de presión acústica, se suman los
+trayectos de impulsión y de retorno, y el total se enfrenta al criterio de
+diseño. Si no cumple, la propia hoja indica qué elemento cambiar: la fila
+con la atenuación pequeña, o la fila cuyo ruido regenerado se ha convertido
+en el suelo del cálculo.
+
+Esa contabilidad es lo que implementa `noise_control.duct_path`, alimentado
+por los modelos de elemento de `noise_control.hvac` y con
+`noise_control.duct_modes` marcando la frecuencia por encima de la cual toda
+la imagen unidimensional deja de ser exacta. La referencia de fondo es Long,
+*Architectural Acoustics* (2.ª ed.), capítulos 13 y 14, cuya Tabla 14.9 es la
+hoja resuelta sobre la que se construye esta guía, con el *HVAC Applications
+Handbook* de ASHRAE, capítulo 49, para las unidades terminales y con Bies,
+Hansen y Howard para los silenciadores de bafles y los plenums. Los
+silenciadores reactivos de cuatro polos de
+[Silenciadores](/phonometry/es/guides/silencers/) y el resto de métodos de
+instalación de
+[Control de ruido industrial](/phonometry/es/guides/noise-control/) son las
+páginas complementarias.
+
+## 1. La hoja y cómo suma
+
+Un cálculo de ruido por conductos es una tabla: las bandas de octava en las
+columnas (de 63 Hz a 8 kHz, el rango que usan los procedimientos publicados)
+y un bloque de filas por elemento físico. Cada bloque imprime lo que el
+elemento quita, el nivel resultante tras restarlo, lo que el elemento aporta
+y el nivel que sale de él. `DuctElement` lleva exactamente los dos espectros
+que pertenecen a un elemento, y `duct_path` los recorre:
+
+```python
+from phonometry import DuctElement, duct_path
+
+bandas = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]
+ventilador = [90.0, 86.0, 82.0, 79.0, 77.0, 75.0, 71.0, 61.0]
+
+trayecto = duct_path(
+    bandas, ventilador,
+    [
+        DuctElement("Codo, 36 x 24 in, sin revestir",
+                    attenuation=[0, 1, 2, 3, 3, 3, 3, 3],
+                    self_noise=[41, 39, 36, 29, 20, 6, 0, 0], code="2"),
+        DuctElement("Silenciador, 3 ft, pérdida de carga estándar",
+                    attenuation=[7, 12, 16, 28, 35, 35, 28, 17],
+                    self_noise=[49, 43, 44, 42, 42, 45, 35, 24], code="3"),
+    ],
+    source_label="Ventilador centrífugo FC, 5000 cfm, 2 in c.a.",
+)
+
+for fila in trayecto.table():
+    print(f"{fila['code']:>2} {fila['label'][:38]:<38} "
+          f"{[round(float(v)) for v in fila['values']]}")
+```
+
+Importan tres convenios, y conviene enunciarlos una vez porque cada hoja
+publicada los enuncia de forma distinta.
+
+**Las atenuaciones son positivas.** Todos los modelos de elemento de
+`noise_control.hvac` devuelven la pérdida como un número positivo de
+decibelios, y la cascada la resta. Las hojas impresas muestran esa misma
+magnitud como un cambio de nivel negativo, así que
+`DuctPathResult.table()` le devuelve el signo a las filas de tipo
+`"attenuation"`: la tabla se lee como la referencia sin que la aritmética
+tenga que hacerlo.
+
+**El ruido regenerado se suma en energía.** El ruido propio de un elemento
+es un nivel de potencia acústica por derecho propio, no una corrección del
+nivel entrante, así que se combina como
+$10\log_{10}(10^{L/10} + 10^{L_\text{sn}/10})$ y no de forma aritmética. Por
+eso la fila `Self-noise` se sitúa entre la fila `Sum` y la fila `Combined` y
+nunca toca la atenuación.
+
+**Hay un suelo de ruido regenerado.** La hoja de Long usa un nivel de
+potencia acústica de 0 dB allí donde un elemento no tiene datos de ruido
+regenerado, y también como suelo de cualquier nivel calculado que resultase
+negativo, y por eso su espectro recibido se aplana cerca de 0 dB en vez de
+irse a menos infinito. `self_noise_floor` reproduce ese comportamiento (por
+defecto `0.0`) y `None` lo desactiva por completo.
+
+## 2. La fuente: la potencia acústica del ventilador
+
+El ventilador es el único elemento cuyo espectro puede construirse solo a
+partir del punto de funcionamiento. `fan_sound_power` implementa la ley de
+escalado de ASHRAE tal como la imprime Long en la Ec. 13.1,
+
+$$
+L_W = K_F + 10\log_{10}\frac{Q_F}{Q_\text{REF}}
+    + 10\log_{10}\frac{P_F}{P_\text{REF}} + C_\text{EFF} + C_\text{BFI},
+$$
+
+con la constante espectral $K_F$ de la Tabla 13.5 (una fila por tipo de
+ventilador), la corrección $C_\text{EFF}$ por trabajar fuera del rendimiento
+máximo de la Tabla 13.6 y el incremento $C_\text{BFI}$ por frecuencia de paso
+de álabes de la Tabla 13.7, aplicado a la única banda de octava que contiene
+esa frecuencia. En SI las referencias son $Q_\text{REF} = 0{,}472$ L/s y
+$P_\text{REF} = 249$ Pa, de modo que los dos términos logarítmicos toman los
+mismos valores que la forma anglosajona en cfm y pulgadas de columna de agua.
+
+```python
+from phonometry import (
+    blade_passing_frequency, fan_casing_attenuation,
+    fan_efficiency_correction, fan_sound_power,
+)
+
+CFM, IN_CA = 0.0004719474432, 249.0
+
+ventilador = fan_sound_power(volume_flow=5000 * CFM, static_pressure=2 * IN_CA,
+                             fan_type="forward_curved", relative_efficiency=80.0)
+print([round(float(v)) for v in ventilador.values])
+# [99, 99, 89, 84, 82, 77, 72, 67]
+
+print(fan_efficiency_correction(80.0))          # 6.0 dB fuera del máximo
+print(blade_passing_frequency(1200.0, 24))      # 480.0 Hz, en la banda de 500 Hz
+print(fan_casing_attenuation().values)          # lo que retiene la carcasa
+# [ 0.  0.  5. 10. 15. 20. 22. 25.]
+ventilador.plot(language="es")                  # el espectro por bandas
+```
+
+Dos costumbres mantienen esto honesto. La ley supone condiciones ideales de
+flujo en la aspiración y en la descarga, así que un ventilador encajonado en
+una sala de máquinas con una mala aspiración es más ruidoso de lo que ella
+dice; y la propia guía vigente de ASHRAE es que la potencia acústica de un
+ventilador "se obtiene mejor de los datos de ensayo del fabricante" según
+AMCA Standard 300 o ASHRAE Standard 68. Trate la Ec. 13.1 como el recurso de
+anteproyecto, no como la respuesta. El ventilador radia la misma potencia por
+la aspiración que por la descarga, y por eso los trayectos de impulsión y de
+retorno de una hoja real parten de la *misma* fila.
+
+`fan_efficiency_correction` es una función escalonada, y brutal: un
+ventilador que trabaja al 90 por ciento de su rendimiento estático máximo no
+añade nada, uno al 80 por ciento añade 6 dB y uno por debajo del 50 por
+ciento añade 16 dB. Elegir un ventilador lejos de su punto óptimo es la forma
+más barata de perder el presupuesto de ruido antes de cotizar ningún
+silenciador. `fan_casing_attenuation` (Tabla 13.8) es la otra cara de la
+misma fuente: la potencia que la carcasa radia a la sala de máquinas en vez
+de al conducto, nula a 63 y 125 Hz porque una carcasa que vibra radia la baja
+frecuencia con la misma facilidad que el ventilador desnudo.
+
+## 3. Lo que el trayecto quita
+
+Todo lo que hay entre el ventilador y la sala quita algo, y casi todo sale
+gratis. Los modelos son los del capítulo 14 de Long con las regresiones de
+Reynolds (1990), y todos devuelven un `HvacSpectrumResult` con `.values`,
+`.plot()` y `.report()`.
+
+**Tramos rectos.** Un conducto rectangular sin revestir pierde energía en el
+movimiento inducido de sus propias paredes, así que la pérdida crece con la
+relación perímetro-área: un conducto ancho y bajo tiene paredes laterales más
+flexibles que uno cuadrado. `unlined_rectangular_duct_attenuation` ajusta eso
+por debajo de 250 Hz y mantiene una tasa constante por encima; una manta
+exterior de lana de vidrio (`wrapped=True`) duplica la parte de baja
+frecuencia. Un conducto circular es mucho más rígido en su modo de
+respiración, así que apenas responde, y
+`unlined_circular_duct_attenuation` es una simple tasa por longitud de 0,03 a
+0,07 dB/ft. Revestirlo cambia el orden de magnitud:
+`lined_rectangular_duct_attenuation` y `lined_circular_duct_attenuation`
+evalúan las regresiones de Reynolds, válidas para revestimientos de 25 mm a
+52 mm y recortadas a 40 dB por tramo porque a partir de ahí manda la
+transmisión por flancos.
+
+```python
+from phonometry import (
+    lined_rectangular_duct_attenuation, unlined_rectangular_duct_attenuation,
+)
+import numpy as np
+
+IN, FT = 0.0254, 0.3048
+bandas = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]
+
+desnudo = unlined_rectangular_duct_attenuation(bandas, 36 * IN, 24 * IN, 5 * FT)
+revestido = lined_rectangular_duct_attenuation(bandas, 36 * IN, 24 * IN, 5 * FT,
+                                               1 * IN, include_unlined=True)
+print(np.round(desnudo.values, 1))    # [1.1 0.7 0.5 0.2 0.2 0.2 0.2 0.2]
+print(np.round(revestido.values, 1))  # [ 1.3  1.3  2.5  6.7 12.8 10.6  9.7  9. ]
+```
+
+El conmutador `include_unlined=True` no es cosmético. La regresión del
+conducto revestido se ajustó a una *pérdida por inserción*, medida
+sustituyendo el tramo revestido por uno sin revestir de la misma sección, así
+que la contribución de las paredes ya está restada; Long recomienda volver a
+sumarla en conductos rectangulares y despreciarla en los circulares, donde es
+insignificante.
+
+**Conducto flexible.** El último tramo de un ramal de impulsión suele ser
+conducto flexible, y su pérdida por inserción publicada sorprende: de 2 a
+3 dB por pie en las bandas medias. `flexible_duct_insertion_loss` interpola
+la Tabla 14.4 de ASHRAE en longitud y en logaritmo del diámetro. Parte de ese
+número es la radiación por la propia pared del conducto y no disipación, que
+es justo el motivo por el que un tramo serpenteante de conducto flexible en
+un forjado funciona como silenciador improvisado.
+
+**Codos y derivaciones.** `elbow_insertion_loss` se indexa por $W/\lambda$ y
+cubre codos cuadrados y redondos, con y sin álabes deflectores, revestidos y
+sin revestir; un codo cuadrado revestido vale de 10 a 11 dB donde uno redondo
+da 3. `split_loss` resuelve una bifurcación del conducto: la potencia se
+reparte entre los ramales en proporción a sus áreas, más una reflexión cuando
+el área total de los ramales no coincide con la del conducto que los
+alimenta, de modo que un ramal del 25 por ciento cuesta 6 dB.
+
+```python
+from phonometry import elbow_insertion_loss, split_loss
+
+IN = 0.0254
+area = 36 * IN * 24 * IN
+print(round(split_loss(area, [0.25 * area, 0.75 * area], branch=0), 1))  # 6.0
+print(elbow_insertion_loss(
+    [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0],
+    24 * IN, bend_type="round").values)          # [0. 1. 2. 3. 3. 3. 3. 3.]
+```
+
+**Reflexión del extremo.** El extremo abierto de un conducto refleja la baja
+frecuencia de vuelta hacia el trayecto, gratis, antes de cualquier
+silenciador. `end_reflection_loss` ofrece los dos métodos publicados y
+ninguno sustituye al otro: `method="bies"` (el predeterminado) interpola la
+tabla ASHRAE de la Tabla 8.14 de Bies, y `method="long"` evalúa la forma
+cerrada de Reynolds
+
+$$
+R = 10\log_{10}\!\left[1 + \left(\frac{a\,c}{\pi f d}\right)^{1.88}\right],
+$$
+
+con $a = 0{,}8$ para una terminación enrasada y $a = 1$ para una libre. Los
+dos coinciden dentro de un decibelio en las bandas que ambos cubren. Use
+`equivalent_diameter(area)` para un conducto rectangular, y no aplique la
+corrección en absoluto cuando el conducto termina en un difusor: el
+abocinamiento suaviza la transición de impedancia, y la valoración de un
+difusor de fabricante ya contiene lo que quede de ella.
+
+```python
+from phonometry import end_reflection_loss, equivalent_diameter
+import numpy as np
+
+bandas = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0]
+print(np.round(end_reflection_loss(bandas, 0.30, method="bies").values, 1))
+# [12.  7.  3.  1.  0.  0.]
+print(np.round(end_reflection_loss(bandas, 0.30, method="long").values, 1))
+# [12.7  7.7  3.7  1.3  0.4  0.1]
+print(round(equivalent_diameter(0.36 * 0.24), 3))    # 0.332 m
+```
+
+**Silenciadores y plenums.** Un atenuador de bafles paralelos se reduce, en
+el §8.10.5 de Bies, a un conjunto de conductos revestidos cuyo espesor de
+revestimiento es la mitad del espesor del bafle, combinados por la media
+energética de la Ec. 8.241 de modo que domina el paso más permeable.
+`plenum_attenuation` es el método de Wells para una cámara plenum revestida
+(Ec. (8.275) de Bies), cuyo término reverberante usa la
+[constante de sala](/phonometry/es/guides/room-image-sources/) del plenum.
+
+```python
+from phonometry import plenum_attenuation, splitter_silencer_insertion_loss
+import numpy as np
+
+IN, FT = 0.0254, 0.3048
+sil = splitter_silencer_insertion_loss(
+    None, height=24 * IN, length=5 * FT,
+    airway_widths=[0.10] * 5, splitter_thickness=0.10,
+)
+print(np.round(sil.values, 1))
+# [ 5.8  8.6 14.1 28.2 34.5 33.5 18.4 12.1]
+print(round(plenum_attenuation(0.36, 2.4, 74.0, 0.5), 1))   # 16.1 dB
+```
+
+Interprete esa estimación por lo que es. La unidad de 5 ft que especifica de
+verdad el trayecto de retorno de Long es un diseño de baja frecuencia que
+vale 16 y 21 dB a 63 y 125 Hz, donde este modelo puramente geométrico da 6 y
+9. La pérdida por inserción dinámica publicada por el fabricante, medida con
+el caudal de diseño y en el sentido de diseño, es lo que corresponde poner en
+la hoja; el modelo sirve para dimensionar el paso de aire antes de que haya
+fabricante.
+
+## 4. Lo que el sistema devuelve
+
+La atenuación es solo la mitad de la hoja. Toda perturbación del flujo genera
+ruido propio y, pasada cierta velocidad, el silenciador comprado para
+eliminar el ventilador se convierte en lo más ruidoso del conducto.
+
+`silencer_self_noise` es la estimación de Fry tal como la da Long en la
+Ec. 14.31,
+
+$$
+L_W = 55\log_{10}\frac{V}{V_0} + 10\log_{10} N
+    + 10\log_{10}\frac{H}{H_0} - 45,
+$$
+
+repartida por bandas de octava con las correcciones de la Tabla 14.8. El
+exponente es todo el mensaje: la potencia cinco y media de la velocidad en el
+paso de aire significa que *duplicar la velocidad frontal de un silenciador
+añade unos 17 dB*.
+
+```python
+from phonometry import silencer_self_noise
+import numpy as np
+
+IN = 0.0254
+lento = silencer_self_noise(None, airway_velocity=10.0, passages=5,
+                            height=24 * IN)
+rapido = silencer_self_noise(None, airway_velocity=20.0, passages=5,
+                             height=24 * IN)
+print(np.round(lento.values, 1))
+# [40.8 40.8 38.8 36.8 31.8 26.8 21.8 16.8]
+print(round(float(rapido.values[0] - lento.values[0]), 1))     # 16.6 dB
+```
+
+Los tramos rectos y los codos también regeneran, mediante
+`flow_noise_straight_duct` y `flow_noise_bend` (VDI 2081 tal como lo dan las
+Ecs. (8.251) y (8.254) de Bies); el modelo del codo lleva la transición en
+número de Strouhal desde el dipolo de sexta potencia de la esquina interior
+al cuadrupolo de octava potencia de la esquina exterior.
+
+La unidad terminal es el último elemento del trayecto y el único que nada
+aguas abajo puede arreglar, porque después de él ya no queda conducto. Su
+potencia acústica suele venir de datos de fabricante medidos según ASHRAE
+Standard 70, que es lo que usa una hoja real. Cuando no se dispone de ellos,
+`diffuser_sound_power` es la estimación de Reynolds tal como la dan las
+Ecs. 13.27 a 13.33 de Long: un nivel global
+`L_W = 10 lg S_G + 30 lg xi + 60 lg U_G - 31.3` a partir del área de la cara,
+la velocidad de aproximación `U_G = Q / S_G` y el coeficiente normalizado de
+pérdida de carga `xi`, repartido por octavas mediante la función de forma
+`C_D = -11.82 - 0.15 A - 1.13 A^2` (`-5.82` si el equipo es circular) en torno
+a la banda de pico `f_P = 48.8 U_G`.
+
+```python
+from phonometry import diffuser_sound_power
+import numpy as np
+
+IN, CFM, IN_WG = 0.0254, 0.0004719474432, 249.0
+
+# El difusor de impulsión de la hoja de Long: 24 x 24 in, 312 cfm, 0.05 in pd.
+print(np.round(diffuser_sound_power(None, (24 * IN) ** 2,
+                                    volume_flow=312 * CFM,
+                                    pressure_drop=0.05 * IN_WG).values, 1))
+# [ 33.4  32.4  29.1  23.6  15.9   5.9  -6.4 -21. ]
+# La Tabla 14.9 de Long imprime 33/32/29/23/15/4/0/0 en esa fila.
+```
+
+La sexta potencia de la velocidad en la Ec. 13.27 es la regla de diseño:
+unos 18 dB por cada duplicación de la velocidad de aproximación una vez que
+la pérdida de carga la acompaña, y unos 15 dB de vuelta por cada duplicación
+del área de la cara con el mismo caudal. Con ello vienen dos reglas de
+cribado del capítulo 49 de ASHRAE. `air_terminal_velocity_limit` (Tabla 9) da
+la máxima velocidad en el cuello para un RC de diseño, y
+`air_terminal_damper_correction` (Tabla 10) da la penalización por estrangular
+una compuerta de regulación, que es donde fracasan muchísimas instalaciones
+terminadas.
+
+```python
+from phonometry import air_terminal_damper_correction, air_terminal_velocity_limit
+
+print(air_terminal_velocity_limit(30, opening="supply"))   # 2.2 m/s
+print(air_terminal_velocity_limit(30, opening="return"))   # 2.5 m/s
+print(air_terminal_damper_correction(3.0, location="diffuser_neck"))  # 15.0 dB
+print(air_terminal_damper_correction(3.0, location="supply_duct"))    #  2.0 dB
+```
+
+Quince decibelios en el cuello frente a dos decibelios a 1,5 m aguas arriba
+en el conducto, para la misma relación de presiones, es toda la regla de
+diseño: estrangule lejos de la boca de salida, o equilibre el sistema
+dimensionando los conductos.
+
+## 5. De la potencia acústica al nivel en la sala
+
+El último paso convierte la potencia acústica que llega a la unidad terminal
+en un nivel de presión acústica donde hay alguien sentado, mediante la
+relación de campo estacionario de la sala
+$L_p = L_W + 10\log_{10}\left[Q/(4\pi r^2) + 4/R\right]$. `room_effect`
+devuelve eso como una atenuación positiva, de modo que encaja en la cascada
+junto a cualquier otra pérdida, con $Q = 2$ por defecto para un difusor
+enrasado en el techo.
+
+```python
+from phonometry import room_constant, room_effect
+
+# La sala de 20 x 20 x 8 ft de la hoja resuelta de Long, con cartón-yeso y moqueta.
+area = 2 * 6.10 * 6.10 + 4 * 6.10 * 2.44        # 134.0 m2
+r_sala = room_constant(area, 0.15)              # 23.6 m2
+print(round(float(room_effect(1.83, r_sala, directivity=2.0)), 1))   # 6.6 dB
+```
+
+La hoja de Long imprime de 5 a 7 dB para esa sala en todas las bandas, así
+que una única absorción media de 0,15 cae en el sitio correcto; una absorción
+por bandas da un efecto de sala por bandas, que es lo que la moqueta hace en
+realidad.
+
+Pase `target=` y `criterion=` a `duct_path` y el resultado se valora solo.
+`criterion_curve` muestrea la curva NC o RC en las bandas de análisis,
+`exceedance` es el exceso banda a banda sobre ella, `meets_target` es el
+veredicto banda a banda que aplica una hoja de diseño, y `rating` es el
+`NCResult` o `RCResult` completo obtenido con el procedimiento de la
+ANSI/ASA S12.2-2019, que es otra pregunta y puede diferir del veredicto por
+tangencia.
+
+## 6. El ejemplo resuelto: la Tabla 14.9 de Long
+
+El capítulo 14 de Long se cierra con una hoja completa: un ventilador
+centrífugo de álabes curvados hacia delante de 5000 cfm a 2 in de columna de
+agua que alimenta una sala por un trayecto de impulsión (codo, silenciador,
+conducto revestido, una derivación del 25 por ciento, un segundo conducto
+revestido, conducto flexible y un difusor rectangular) y un trayecto de
+retorno (codo, silenciador de baja frecuencia, codo revestido, plenum y
+rejilla), cada uno terminado en el efecto de sala de una oficina enmoquetada
+de 20 x 20 x 8 ft, combinados y comprobados contra NC 30. Todas las filas de
+abajo son las que imprime Long, incluidos los datos de fabricante de los
+silenciadores y de las unidades terminales, que es lo que usa una hoja real.
+
+```python
+import numpy as np
+from phonometry import DuctElement, combine_duct_paths, duct_path
+
+bandas = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]
+ventilador = [90.0, 86.0, 82.0, 79.0, 77.0, 75.0, 71.0, 61.0]
+fuente = "Ventilador centrífugo FC, 5000 cfm, 2 in c.a."
+
+impulsion = duct_path(
+    bandas, ventilador,
+    [
+        DuctElement("Codo, 36 x 24 in, sin revestir", [0, 1, 2, 3, 3, 3, 3, 3],
+                    [41, 39, 36, 29, 20, 6, 0, 0], code="2"),
+        DuctElement("Silenciador, 3 ft, pérdida de carga estándar",
+                    [7, 12, 16, 28, 35, 35, 28, 17],
+                    [49, 43, 44, 42, 42, 45, 35, 24], code="3"),
+        DuctElement("Conducto, 36 x 24 in, 5 ft, revestimiento de 1 in",
+                    [2, 2, 3, 7, 15, 12, 11, 9], code="4"),
+        DuctElement("Derivación, 25 por ciento", 6.0, code="5"),
+        DuctElement("Conducto, 18 x 12 in, 6 ft, revestimiento de 1 in",
+                    [3, 3, 5, 11, 25, 22, 16, 13], code="6"),
+        DuctElement("Conducto flexible, 12 in, 6 ft",
+                    [14, 14, 16, 15, 17, 22, 16, 13], code="7"),
+        DuctElement("Difusor rectangular, 312 cfm", None,
+                    [33, 32, 29, 23, 15, 4, 0, 0], code="8"),
+    ],
+    room_effect=[6, 6, 5, 5, 6, 7, 6, 6],
+    source_label=fuente, target=30.0, label="Impulsión",
+)
+
+retorno = duct_path(
+    bandas, ventilador,
+    [
+        DuctElement("Codo, 36 x 24 in, sin revestir", [0, 1, 2, 3, 3, 3, 3, 3],
+                    [43, 42, 39, 33, 24, 12, 0, 0], code="2"),
+        DuctElement("Silenciador, 5 ft, tipo baja frecuencia",
+                    [16, 21, 35, 41, 41, 28, 21, 15],
+                    [51, 49, 53, 56, 56, 59, 60, 53], code="3"),
+        DuctElement("Codo, 36 x 24 in, revestido, 1 in", [1, 2, 3, 4, 5, 6, 8, 10],
+                    [39, 38, 34, 28, 18, 4, 0, 0], code="4"),
+        DuctElement("Plenum, 800 sq ft, 50 por ciento revestido",
+                    [12, 13, 19, 20, 20, 20, 21, 21], code="5"),
+        DuctElement("Rejilla rectangular, 24 x 24 in, 563 cfm", None,
+                    [30, 29, 26, 20, 12, 1, 0, 0], code="6"),
+    ],
+    room_effect=[9, 8, 6, 8, 8, 8, 9, 10],
+    source_label=fuente, target=30.0, label="Retorno",
+)
+
+total = combine_duct_paths([impulsion, retorno], label="Impulsión + retorno")
+print(np.round(impulsion.received_level, 0))  # Long: 52 42 30 18  9 -2 -2 -1
+print(np.round(retorno.received_level, 0))    # Long: 52 41 27 25 23 25 22 12
+print(np.round(total.received_level, 0))      # Long: 55 45 32 26 23 25 22 12
+print(total.meets_target)                     # True
+print(round(float(total.rating.rating), 1))   # 26.7, gobernado por los 63 Hz
+```
+
+Todas las filas impresas vuelven dentro del propio redondeo de 1 dB de la
+hoja: la impulsión queda 1 dB baja a 4 kHz, el retorno 1 dB bajo a 500 Hz y
+la combinación 1 dB baja a 500 Hz y 1 dB alta a 8 kHz; el resto, exacto. La
+sala se sitúa en NC 27, cómodamente dentro de su objetivo NC 30, y la banda
+de 63 Hz es la que gobierna la valoración, que es el desenlace habitual de un
+diseño de ruido por conductos y la razón por la que merece la pena pagar por
+el comportamiento en baja frecuencia de un silenciador.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/duct_path_cascade_es.svg" alt="Niveles por banda de octava que los trayectos de impulsión y retorno de la hoja resuelta de Long entregan a la sala, junto con su suma energética y la curva de criterio NC 30: los dos trayectos arrancan cerca de 52 dB a 63 Hz, la impulsión cae con fuerza por encima de 500 Hz hasta por debajo de 0 dB mientras que el retorno se mantiene plano cerca de 23 a 25 dB, y el espectro recibido combinado discurre unos decibelios por debajo de la curva NC 30 en todas las bandas" width="88%" />
+
+*Los dos trayectos y su suma frente a NC 30. La impulsión, con su
+silenciador, dos tramos revestidos, una derivación y seis pies de conducto
+flexible, no deja nada por encima de 1 kHz; el retorno, con plenum pero con
+un silenciador cuyo propio ruido regenerado lo deja en unos 25 dB, es lo que
+la sala oye realmente en las bandas medias y altas. Añadir atenuación de baja
+frecuencia a la impulsión no cambiaría nada: el retorno ya fija la respuesta
+en todas partes salvo a 63 Hz, y esa es la fila sobre la que discutir.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import combine_duct_paths
+
+# `impulsion` y `retorno` son los dos DuctPathResult construidos arriba.
+
+# Una línea para un trayecto: la cascada de la impulsión frente a NC 30.
+impulsion.plot(language="es")
+plt.show()
+
+# La figura de concepto: ambos trayectos, su suma energética y el criterio.
+total = combine_duct_paths([impulsion, retorno], label="Impulsión + retorno")
+total.plot(language="es")
+plt.gca().set_ylim(-6.0, 62.0)
+plt.show()
+```
+
+</details>
+
+`DuctPathResult` también se imprime y se archiva solo. `.table()` devuelve la
+hoja fila a fila con el convenio de signos de las hojas de cálculo, y
+`.report()` genera un PDF de una página con la disposición de los
+procedimientos publicados (Tabla 8 de la AHRI Standard 885; Tabla 14.9 de
+Long): la tabla de elementos, el gráfico de la cascada frente a la curva de
+criterio, la valoración de criterio de sala en su recuadro y el veredicto.
+
+```python
+for fila in total.table():
+    print(f"{fila['kind']:<12} {fila['label'][:26]:<26} "
+          f"{[round(float(v)) for v in fila['values']]}")
+
+total.report("ruido-conductos.pdf", language="es")   # necesita phonometry[report]
+```
+
+La ficha de ejemplo, regenerada con `make reports`, se mantiene renderizada en
+el repositorio. Pulse la vista previa para abrir el PDF:
+
+<ReportPreview
+	name="duct_path_example"
+	title="Informe de ejemplo del cálculo de un trayecto de ruido por conductos (PDF)"
+	description="Informe de ejemplo del cálculo de un trayecto de ruido por conductos: una cabecera de metadatos con el cliente, la fuente de ruido, el entorno de ensayo y la fecha, la tabla del trayecto por bandas de octava con la potencia acústica del ventilador, la atenuación de cada elemento como cambio de nivel negativo, las filas de ruido regenerado del codo, del silenciador y del difusor, el efecto de sala, el nivel recibido y la curva NC 30, y debajo el criterio de sala NC-22.6 en un recuadro a 125 Hz con el veredicto de que ninguna banda supera NC 30, junto al gráfico de cascada de todos los elementos frente a la curva de criterio."
+	caption="Ficha del trayecto de ruido por conductos (DuctPathResult.report): el trayecto de impulsión de la hoja resuelta elemento a elemento, valorado NC-22.6 y cumpliendo NC 30 con 5 dB de margen a 63 Hz."
+/>
+
+## 7. Qué se reproduce y qué no
+
+La Tabla 14.9 de Long la produjo un programa comercial, no un cálculo a mano
+con las tablas impresas junto a ella, y ser honesto con eso es más útil que
+disimularlo. La *aritmética* de la hoja se reproduce exactamente, como
+muestra la sección 6. Varias de sus **filas de elemento**, en cambio, no se
+deducen de los datos impresos del propio libro, y las funciones de esta
+biblioteca implementan las ecuaciones y tablas impresas. Verificado banda a
+banda:
+
+- **La fila del ventilador no sale de la Ec. 13.1.** La hoja imprime
+  90/86/82/79/77/75/71/61 dB. La Ec. 13.1 con las constantes de la Tabla 13.5
+  para álabes curvados hacia delante a 5000 cfm y 2 in c.a. da
+  99/99/89/84/82/77/72/67 dB, y el espectro impreso no es un desplazamiento
+  en nivel del tabulado, así que procede de otros datos (de un fabricante, lo
+  más probable).
+- **La fila del conducto flexible no es la Tabla 14.4.** La hoja imprime
+  14/14/16/15/17/22/16/13 dB para 12 in por 6 ft;
+  `flexible_duct_insertion_loss` lee 3/5/10/15/17/16/9 dB de la tabla para
+  ese conducto.
+- **Los conductos rectangulares revestidos coinciden en medias y altas.**
+  Para el tramo de 18 x 12 in, 6 ft y revestimiento de 1 in la biblioteca
+  devuelve 11/25/22/16/13 dB desde 500 Hz hacia arriba, exactamente la fila
+  impresa, y queda de 1 a 2 dB alta por debajo (5/4/6 frente a 3/3/5). Para
+  el tramo de 36 x 24 in y 5 ft coincide a 250, 500 y 8 kHz y queda de 1 a
+  2 dB baja en el resto.
+- **La derivación y el codo sin revestir se reproducen exactamente.**
+  `split_loss` da el ramal del 25 por ciento como 6,0 dB frente a los -6 dB
+  impresos, y `elbow_insertion_loss` da 0/1/2/3/3/3/3/3 dB frente a la fila
+  impresa cuando el codo se lee como redondo (Tabla 14.7) con $w = 24$ in.
+- **La fila del difusor de impulsión también se reproduce.**
+  `diffuser_sound_power` con un equipo rectangular de 24 x 24 in a 312 cfm y
+  0,05 in de pérdida de carga devuelve 33,4/32,4/29,1/23,6/15,9/5,9 dB frente
+  a los 33/32/29/23/15/4 impresos, dentro del propio redondeo de la hoja en
+  las cinco bandas que llevan nivel. La fila de la rejilla de retorno
+  (30/29/26/20/12/1) no se deduce de las mismas ecuaciones a sus 563 cfm, así
+  que es dato de fabricante.
+- **La fila NC 30 difiere 1 dB a 1 kHz.** Long imprime
+  57/48/41/35/31/29/28/27; el `nc_curve(30)` de la biblioteca devuelve
+  57/48/41/35/**32**/29/28/27, los valores de la Tabla 1 de la
+  ANSI/ASA S12.2-2019. Long usa la curva original de Beranek de 1957. La
+  diferencia no cambia el veredicto aquí, pero conviene saber qué NC se está
+  citando.
+
+Nada de eso es un defecto de la hoja. Es el aspecto que tiene un cálculo real
+de ruido por conductos: los elementos que un fabricante publica
+(ventiladores, silenciadores, difusores, rejillas) vienen de ensayos, y los
+elementos que nadie publica (tramos de conducto, codos, derivaciones,
+reflexiones de extremo, la sala) vienen de las tablas. `DuctElement` acepta
+ambos sin preocuparse de cuál es cuál, que es justo la idea.
+
+## 8. El límite de onda plana
+
+Todos los modelos de elemento anteriores, y todos los silenciadores de cuatro
+polos de [Silenciadores](/phonometry/es/guides/silencers/), son
+unidimensionales. Suponen que una única presión acústica describe toda la
+sección del conducto, lo que solo es cierto por debajo de la frecuencia a la
+que empieza a propagarse el primer modo acústico de orden superior. Por
+encima de ella se propagan varios modos a la vez, cada uno con su propio
+número de onda axial, y una predicción de onda plana deja de ser correcta sin
+avisar.
+
+`noise_control.duct_modes` implementa el análisis de corte de Norton y
+Karczub, *Fundamentals of Noise and Vibration Analysis for Engineers*
+(2.ª ed.), sección 7.3: conductos circulares por la Ec. 7.6 con los
+autovalores $\pi\alpha_{pq}$ de la Tabla 7.1 que resuelven
+$J'_p(\kappa_{pq} a_i) = 0$, conductos rectangulares por la Ec. 7.10,
+
+$$
+(f_\text{co})_{pq} = \frac{c}{2}\sqrt{(p/a)^2 + (q/b)^2}\,\sqrt{1 - M^2},
+$$
+
+y la corrección por flujo medio de las Ecs. 7.8 y 7.9, en la que un flujo
+axial uniforme de número de Mach $M$ baja todas las frecuencias de corte en
+$\sqrt{1 - M^2}$ y desplaza el propio corte de $k_x = 0$ a
+$k_x = -M\kappa_{pq}/\sqrt{1 - M^2}$.
+
+```python
+import numpy as np
+from phonometry import plane_wave_limit, rectangular_duct_cut_on
+
+# Problema 7.2 de Norton: un conducto de climatización de 0.65 x 0.4 m a 15 m/s.
+modos = rectangular_duct_cut_on(0.65, 0.40, flow_velocity=15.0, count=6)
+print(modos.modes[:3])                          # ((1, 0), (0, 1), (1, 1))
+print(np.round(modos.cut_on[:3], 1))            # [263.6 428.3 502.9] Hz
+print(np.round(modos.cut_on_no_flow[:3], 1))    # [263.8 428.8 503.4] Hz
+print(round(modos.plane_wave_limit, 1))         # 263.6 Hz
+
+IN = 0.0254
+print(round(plane_wave_limit(width=36 * IN, height=24 * IN), 1))   # 187.6 Hz
+print(round(plane_wave_limit(diameter=12 * IN), 1))                # 659.5 Hz
+```
+
+Esas cifras de ventilación son contundentes: en ese conducto las ondas planas
+lo explican todo solo hasta la octava de 250 Hz, y un tronco de impulsión de
+36 x 24 in se rinde a 188 Hz.
+
+A 15 m/s la corrección por flujo es invisible: $M = 0{,}044$ da
+$\sqrt{1 - M^2} = 0{,}999$, que desplaza el primer corte 0,2 Hz. Se gana el
+sueldo en tuberías de alta velocidad. El problema 7.1 de Norton es ese caso,
+una línea de 254 mm que transporta vapor ($c = 405$ m/s) a 200 m/s,
+$M = 0{,}494$, y allí las dos escaleras se separan más de cien hercios en
+todos los peldaños.
+
+```python
+import numpy as np
+from phonometry import circular_duct_cut_on
+
+# Problema 7.1 de Norton: un conducto circular de 254 mm con vapor a 200 m/s.
+vapor = circular_duct_cut_on(0.254, flow_velocity=200.0,
+                             speed_of_sound=405.0, count=6)
+print(vapor.modes)
+# ((1, 0), (2, 0), (0, 1), (3, 0), (4, 0), (1, 1))
+print(np.round(vapor.cut_on_no_flow, 1))
+# [ 934.5 1550.1 1944.7 2132.3 2698.9 2705.9]
+print(np.round(vapor.cut_on, 1))
+# [ 812.6 1347.9 1691.1 1854.1 2346.8 2352.9]
+print(np.round(vapor.axial_wavenumber, 2))
+# [ -8.23 -13.66 -17.13 -18.79 -23.78 -23.84]
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/duct_mode_cut_on_es.svg" alt="Frecuencia de corte de los seis primeros modos acústicos de orden superior de una línea de vapor circular de 254 mm, representada frente al orden del modo (1,0), (2,0), (0,1), (3,0), (4,0) y (1,1): la escalera sin flujo sube de 935 Hz a 2706 Hz como línea gris discontinua mientras que la escalera a 200 m/s discurre un 12 por ciento por debajo, de 813 Hz a 2353 Hz, y la banda por debajo del primer corte aparece sombreada como la región de solo ondas planas" width="88%" />
+
+*El problema 7.1 de Norton, el caso en el que merece la pena dibujar el flujo
+medio: media velocidad del sonido dentro de la tubería tira de todos los
+cortes hacia abajo en $\sqrt{1 - M^2} = 0{,}870$, de modo que el primer modo
+de orden superior aparece a 813 Hz en vez de a 935 Hz y la banda de onda
+plana, sombreada, es un 13 por ciento más estrecha de lo que prometería el
+cálculo sin flujo. El número de onda axial en el corte es negativo en todos
+los peldaños: con flujo, el modo ya viaja aguas arriba en la frecuencia a la
+que aparece.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import circular_duct_cut_on, rectangular_duct_cut_on
+
+# Una línea para un conducto: la escalera de corte con la banda de onda plana.
+vapor = circular_duct_cut_on(0.254, flow_velocity=200.0,
+                             speed_of_sound=405.0, count=6)
+vapor.plot(language="es")
+plt.show()
+
+# El conducto de ventilación del problema 7.2, donde el flujo casi no cuenta.
+rectangular_duct_cut_on(0.65, 0.40, flow_velocity=15.0, count=6).plot(language="es")
+plt.show()
+```
+
+</details>
+
+Dos resultados llevan este límite por usted. Todo `ReactiveSilencerResult`
+informa ahora del primer corte de su sección más ancha en
+`plane_wave_limit`, y `duct_path` acepta una descripción `section=` del
+conducto que está recorriendo. Ambos lanzan un `PlaneWaveWarning` cuando la
+malla de análisis rebasa esa frecuencia: los números se siguen devolviendo y,
+por encima del corte, describen solo el modo de onda plana, cosa que una
+medición no hará.
+
+```python
+import warnings
+from phonometry import DuctElement, PlaneWaveWarning, duct_path
+
+IN = 0.0254
+bandas = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]
+
+with warnings.catch_warnings(record=True) as avisos:
+    warnings.simplefilter("always")
+    duct_path(bandas, [90.0] * 8, [DuctElement("Tramo recto", 3.0)],
+              section={"width": 36 * IN, "height": 24 * IN},
+              flow_velocity=6.0, label="Impulsión")
+print(avisos[0].category is PlaneWaveWarning)
+print(str(avisos[0].message))
+# Impulsión: 6 of 8 frequencies are above the first duct cut-on frequency
+# (188 Hz), where higher-order modes propagate and the plane-wave result
+# describes the plane-wave mode only.
+```
+
+Seis de las ocho bandas de octava de una hoja estándar de ruido por conductos
+quedan por encima del corte de un conducto de 36 x 24 in. Eso no es motivo
+para desconfiar de la hoja: los modelos de elemento de ASHRAE con los que
+está construida son *empíricos*, ajustados a mediciones de conductos reales
+en los que esos modos estaban presentes, así que llevan el comportamiento
+multimodal dentro de sus constantes de regresión. El aviso apunta a los
+métodos analíticos, y sobre todo al álgebra de cuatro polos de los
+silenciadores, donde la hipótesis de onda plana es estructural y no
+estadística, y donde los máximos y mínimos de una pérdida de transmisión
+calculada sencillamente no sobreviven al corte.
+
+## Véase también
+
+- [Silenciadores](/phonometry/es/guides/silencers/): los elementos reactivos
+  de cuatro polos (cámaras de expansión, resonadores de Helmholtz, de cuarto
+  de onda y de tubo extendido) cuya validez acaba en la misma frecuencia de
+  corte.
+- [Control de ruido industrial](/phonometry/es/guides/noise-control/): el
+  resto de la instalación, los métodos individuales de conductos HVAC y la
+  pérdida por inserción de un cerramiento de máquina.
+- [Criterios de ruido de fondo (NC / RC Mark II)](/phonometry/es/guides/room-noise/):
+  las familias de la ANSI/ASA S12.2-2019 contra las que se juzga el espectro
+  recibido.
+- [Campo estacionario de la sala](/phonometry/es/guides/room-image-sources/):
+  la constante de sala que hay detrás del efecto de sala y del término
+  reverberante del plenum.
+- Referencia de la API:
+  [`noise_control.duct_path`](/phonometry/reference/api/noise_control/duct-path/),
+  [`noise_control.duct_modes`](/phonometry/reference/api/noise_control/duct-modes/),
+  [`noise_control.hvac`](/phonometry/reference/api/noise_control/hvac/).

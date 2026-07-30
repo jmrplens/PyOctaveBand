@@ -9,7 +9,7 @@ head:
     attrs:
       type: application/ld+json
     content: |
-      {"@context":"https://schema.org","@type":"Dataset","@id":"https://jmrplens.github.io/phonometry/reference/conformance/#dataset","name":"phonometry numerical conformance report","description":"446 numerical conformance checks pinning each implemented acoustic metric to a clause, table or worked example of the governing standard, with the normative expected value, the value phonometry computes, the delta and a pass/fail verdict, across 53 domains and 292 standards. Regenerated and enforced by CI on every pull request.","url":"https://jmrplens.github.io/phonometry/reference/conformance/","inLanguage":"en","license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"creator":{"@id":"https://jmrp.io/#person"},"publisher":{"@id":"https://jmrp.io/#person"},"about":{"@id":"https://github.com/jmrplens/phonometry#software"},"measurementTechnique":"Comparison of computed values against the normative expected values published in the governing standards (tolerance tables and worked examples).","variableMeasured":[{"@type":"PropertyValue","name":"Standard","description":"Governing standard and clause or table"},{"@type":"PropertyValue","name":"Quantity","description":"Acoustic quantity under test"},{"@type":"PropertyValue","name":"Expected","description":"Normative value published in the standard"},{"@type":"PropertyValue","name":"Computed","description":"Value computed by phonometry"},{"@type":"PropertyValue","name":"Delta","description":"Signed difference between computed and expected"},{"@type":"PropertyValue","name":"Status","description":"Pass or fail verdict against the standard's tolerance"}],"distribution":{"@type":"DataDownload","encodingFormat":"text/markdown","contentUrl":"https://raw.githubusercontent.com/jmrplens/phonometry/main/docs/CONFORMANCE.md"},"isBasedOn":"https://github.com/jmrplens/phonometry/blob/main/scripts/conformance_report.py","identifier":{"@type":"PropertyValue","propertyID":"DOI","value":"10.5281/zenodo.21215280"}}
+      {"@context":"https://schema.org","@type":"Dataset","@id":"https://jmrplens.github.io/phonometry/reference/conformance/#dataset","name":"phonometry numerical conformance report","description":"455 numerical conformance checks pinning each implemented acoustic metric to a clause, table or worked example of the governing standard, with the normative expected value, the value phonometry computes, the delta and a pass/fail verdict, across 53 domains and 301 standards. Regenerated and enforced by CI on every pull request.","url":"https://jmrplens.github.io/phonometry/reference/conformance/","inLanguage":"en","license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"creator":{"@id":"https://jmrp.io/#person"},"publisher":{"@id":"https://jmrp.io/#person"},"about":{"@id":"https://github.com/jmrplens/phonometry#software"},"measurementTechnique":"Comparison of computed values against the normative expected values published in the governing standards (tolerance tables and worked examples).","variableMeasured":[{"@type":"PropertyValue","name":"Standard","description":"Governing standard and clause or table"},{"@type":"PropertyValue","name":"Quantity","description":"Acoustic quantity under test"},{"@type":"PropertyValue","name":"Expected","description":"Normative value published in the standard"},{"@type":"PropertyValue","name":"Computed","description":"Value computed by phonometry"},{"@type":"PropertyValue","name":"Delta","description":"Signed difference between computed and expected"},{"@type":"PropertyValue","name":"Status","description":"Pass or fail verdict against the standard's tolerance"}],"distribution":{"@type":"DataDownload","encodingFormat":"text/markdown","contentUrl":"https://raw.githubusercontent.com/jmrplens/phonometry/main/docs/CONFORMANCE.md"},"isBasedOn":"https://github.com/jmrplens/phonometry/blob/main/scripts/conformance_report.py","identifier":{"@type":"PropertyValue","propertyID":"DOI","value":"10.5281/zenodo.21215280"}}
 ---
 
 phonometry's key differentiator is not the feature list but the proof behind
@@ -66,7 +66,7 @@ with its evidence and what the library does about it, is recorded in the
 
 ## Numerical conformance report
 
-&#9989; **446/446 conformance checks pass** across 53 domains and 292 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+&#9989; **455/455 conformance checks pass** across 53 domains and 301 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
 
@@ -950,7 +950,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary>&#9989; <b>Industrial noise control</b>: 100% (9/9)</summary>
+<summary>&#9989; <b>Industrial noise control</b>: 100% (18/18)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
@@ -962,6 +962,15 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | Bies 5e Eqs. (8.141)/(8.148) (four-pole insertion loss) | Insertion loss = transmission loss for the anechoic reference Zs=Zr=rho c/S | 6.2498 dB (= TL) | 6.2498 dB | 0 dB | &#9989; |
 | Bies 5e Eq. (8.275) (Wells' plenum method) | Plenum TL = -10 lg[S_out(cos0/pi r^2 + (1-a)/(Sw a))] (S_out=.1,r=1,Sw=20,a=.2) | 12.8541 dB (+/-0 dB) | 12.8541 dB | 0 dB | &#9989; |
 | Bies 5e Table 8.14 (ASHRAE end reflection, flush) | Duct end reflection D = 200 mm at 125 Hz = 10 dB (table node) | 10 dB (+/-0 dB) | 10 dB | 0 dB | &#9989; |
+| Long 2e Eq. 13.1 with Table 13.5 (ASHRAE 1987 fan model) | Forward-curved fan at Q_REF, P_REF, peak efficiency -> K_F + C_BFI at 500 Hz | 38 dB (+/-0 dB) | 38 dB | 0 dB | &#9989; |
+| Long 2e Eq. 14.12 with Table 14.2 (Reynolds lined rectangular duct) | 18 x 12 in duct, 6 ft, 1 in lining at 1 kHz -> 1.77 (10/3)^0.695 6 dB | 24.5203 dB (+/-0 dB) | 24.5203 dB | 0 dB | &#9989; |
+| Long 2e Table 14.4 (ASHRAE 1995 lined flexible duct) | 8 in diameter, 9 ft long -> 6/8/16/25/28/28/18 dB (table node) | 0 dB (max |diff| over the 7 bands) | 0 dB | 0 dB | &#9989; |
+| Long 2e Eq. 14.17 (branch power division) | 25 per cent split with area-matched branches -> -10 lg 0.25 = 6.02 dB | 6.0206 dB (+/-0 dB) | 6.0206 dB | 0 dB | &#9989; |
+| Long 2e Table 14.9 (worked duct-borne sheet, supply path) | Fan to room, 8 octave bands -> 52/42/30/18/9/-2/-2/-1 dB at the receiver | 0 dB +/-1 (max |diff| over the 8 bands) | 1 dB | 1 dB | &#9989; |
+| Long 2e Eqs. 13.27-13.33 (Reynolds diffuser self-noise) | 24 x 24 in rectangular diffuser, 312 cfm, 0.05 in pd -> the 33/32/29/23/15 dB row of Table 14.9 | 0 dB +/-1 (max |diff| over the five bands) | 0.8853 dB | 0.885 dB | &#9989; |
+| ASHRAE 2019 Applications Ch. 49 Table 9 | Max neck velocity of a supply outlet for design RC(30) -> 2.2 m/s | 2.2 m/s (+/-0 m/s) | 2.2 m/s | 0 m/s | &#9989; |
+| Norton & Karczub 2e Eqs. 7.6/7.8/7.9 (problem 7.1 answer) | 254 mm duct, steam, 200 m/s: (1,0) cut-on 812 Hz and k_x = -8.23 1/m | 0 +/-1 (Hz, and 1/m x100) | 0.591 | 0.591 | &#9989; |
+| Norton & Karczub 2e Eq. 7.10 (problem 7.2 answer) | 0.65 x 0.4 m duct, 15 m/s: first three cut-on 264 / 428 / 503 Hz | 0 Hz (max |diff| over the 3 modes) | 0 Hz | 0 Hz | &#9989; |
 | Bies 5e Eqs. (7.103), (7.111) (enclosure, fully absorbing limit) | Enclosure correction C -> 10 lg 0.3 = -5.23 dB as alpha_i -> 1 | -5.2288 dB (+/-0.001 dB) | -5.2288 dB | 0 dB | &#9989; |
 
 </details>

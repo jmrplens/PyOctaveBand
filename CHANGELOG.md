@@ -127,6 +127,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `R'w` 52 dB with `C` -1 and `Ctr` -5 and agrees to the integer on both
   published spectra. New figure `dbhr_global_index`, four conformance checks
   and a guide in English and Spanish.
+- End-to-end HVAC duct-borne noise calculation. `duct_path` (new
+  `noise_control/duct_path.py`) cascades a fan-to-room path element by
+  element, subtracting each attenuation, combining each element's regenerated
+  sound power on an energy basis over a 0 dB self-noise floor, applying the
+  room effect and rating the received spectrum against an NC or RC design
+  curve; `combine_duct_paths` adds a supply and a return path. The
+  `DuctPathResult` exposes the calculation as a printed sheet (`.table()`,
+  one row per element with the *Sum*, *Self-noise* and *Combined* rows of the
+  published worksheets), a `.plot()` cascade against the criterion curve and a
+  one-page `.report()` sheet in the AHRI Standard 885 Table 8 layout, which
+  elides its middle rows rather than spilling onto a second page.
+  The element models it chains are new in `noise_control/hvac.py`, all from
+  Long, *Architectural Acoustics* 2nd ed., Chapters 13-14: `fan_sound_power`
+  (Eq. 13.1 with the ASHRAE Tables 13.5-13.7) with
+  `fan_efficiency_correction`, `blade_passing_frequency` and
+  `fan_casing_attenuation`; `unlined_rectangular_duct_attenuation` and
+  `unlined_circular_duct_attenuation` (Eqs. 14.9-14.11, Table 14.1);
+  `lined_rectangular_duct_attenuation` and `lined_circular_duct_attenuation`
+  (the Reynolds regressions, Eqs. 14.12-14.13 with Tables 14.2-14.3);
+  `diffuser_sound_power`, the regenerated noise of a grille, register or
+  diffuser from its face area, approach velocity and pressure drop
+  (Eqs. 13.27-13.33); `flexible_duct_insertion_loss` (Table 14.4);
+  `split_loss` (Eq. 14.17);
+  `end_reflection_loss_closed_form` and `equivalent_diameter`
+  (Eqs. 14.14-14.16, also reachable as `end_reflection_loss(method="long")`
+  beside the existing Bies table look-up); `silencer_self_noise` (Eq. 14.31
+  with Table 14.8); `splitter_silencer_insertion_loss`, the dissipative
+  parallel-baffle unit as airways combined by Bies Eq. (8.241); `room_effect`;
+  and the two ASHRAE (2019) Applications Handbook Chapter 49 screening tables,
+  `air_terminal_velocity_limit` (Table 9) and `air_terminal_damper_correction`
+  (Table 10). Validated end to end against Long's worked Table 14.9, whose
+  supply and return sheets reproduce row for row within the 1 dB the printed
+  sheet carries, and element by element against the tables themselves; six
+  new conformance rows. The guide records, band by band, which rows of that
+  worked sheet the book's own printed tables do and do not reproduce.
+
+- Higher-order duct modes with mean flow (new `noise_control/duct_modes.py`):
+  `circular_duct_cut_on` and `rectangular_duct_cut_on` return the cut-on
+  frequency and the axial wavenumber at cut-on of each mode, with the uniform
+  mean-flow correction (Norton & Karczub, *Fundamentals of Noise and Vibration
+  Analysis for Engineers* 2nd ed., Eqs. 7.6-7.10 and the Table 7.1
+  eigenvalues), and `DuctModeResult.plot()` draws the cut-on ladder with and
+  without flow. `plane_wave_limit` gives the frequency below which a duct
+  carries plane waves only, and the plane-wave methods now say where they stop
+  being valid: every `ReactiveSilencerResult` carries its `plane_wave_limit`
+  and raises the new `PlaneWaveWarning` when the analysis grid reaches past
+  it, as does `duct_path` when a duct section is declared. Validated against
+  the printed answers to Norton's problems 7.1 and 7.2. Three new conformance
+  rows.
 
 - 2D near-to-far-field (NTFF) transformation for the FDTD solver.
   `FDTD2D.add_contour_probe` captures the steady-state pressure and outward

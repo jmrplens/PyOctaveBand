@@ -308,6 +308,9 @@ of a decibel (test `tests/noise_control/test_fdtd_crosscheck.py`).
 
 ## See also
 
+- [Duct-borne noise: fan to room](duct-path.md): the end-to-end fan-to-room
+  calculation these silencers sit inside, and the higher-order-mode cut-on
+  above which the four-pole method describes the plane-wave mode alone.
 - [Industrial noise control](noise-control.md): the rest of the
   installation: HVAC duct attenuation and flow noise, plenums, end
   reflection and machine enclosures.

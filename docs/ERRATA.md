@@ -837,6 +837,58 @@ to the issuing body, with date and reference).
   the 3,16 constant by the conformance check "Long, Architectural
   Acoustics 2e, Eq. (17.54)".
 - **Status:** unreported (textbook rather than a standard, so non-normative).
+## Long, Architectural Acoustics 2e (2014), Table 14.7 (round elbow rows)
+
+- **Location:** Chapter 14, Table 14.7, "Insertion Loss of Round Elbows"
+  (printed p. 541), indexed by the frequency-width product f w (kHz times
+  inches).
+- **The print:** four rows only: f w < 1,9 → 0 dB; 1,9 < f w < 3,8 → 1 dB;
+  3,8 < f w < 7,5 → 2 dB; f w > 15 → 3 dB.
+- **The problem:** the band 7,5 < f w < 15 has no row, while the neighbouring
+  Tables 14.5 and 14.6 (square elbows, same source and same index) both carry
+  six rows covering it. A duct-borne calculation lands in that band routinely:
+  a 24 in elbow at 500 Hz has f w = 12.
+- **Evidence:** the same data adapted from the same ASHRAE source appear in
+  Bies, Hansen & Howard, *Engineering Noise Control* 5e, Table 8.11, indexed
+  by W/λ (= 0,074 f w). Its round-elbow column has six rows and gives 3 dB for
+  0,55 ≤ W/λ < 1,11, which is exactly the 7,5 < f w < 15 band Long omits; the
+  other five rows of the two tables agree entry for entry.
+- **Library behaviour:** `elbow_insertion_loss` in
+  [`hvac.py`](../src/phonometry/noise_control/hvac.py) carries the six-row
+  round column with 3 dB in the missing band, pinned by
+  `test_elbow_tables_by_frequency_width_product`
+  ([`tests/noise_control/test_hvac_long.py`](../tests/noise_control/test_hvac_long.py)).
+- **Status:** unreported (textbook rather than a standard).
+
+## Long, Architectural Acoustics 2e (2014), Eq. 13.28 (units of U_G)
+
+- **Location:** Chapter 13, Eq. 13.28 (printed p. 521), the normalised
+  pressure-drop coefficient ξ = 334,9·ΔP/(ρ0·U_G²) of the diffuser sound-power
+  model.
+- **The print:** the nomenclature under the equation gives "U_G = flow
+  velocity prior to the diffuser (ft/min)" and, on the next line,
+  "= Q/(60·S_G) (for Q in cfm)".
+- **The problem:** the two statements contradict each other. Q in ft³/min
+  divided by 60·S_G is a velocity in **ft/s**, not ft/min, and only the ft/s
+  reading makes the constant right: 334,9/ρ0 with ρ0 = 0,075 lb/ft³ is
+  4465·ΔP/U², which is the standard velocity-pressure relation
+  ΔP/(U/4005)² only when U is converted from ft/s. Read as ft/min the
+  coefficient comes out 3600 times too small, and Eq. 13.27 then gives
+  −67 dB for the worked diffuser of Table 14.9 instead of its printed 33 dB.
+  Eq. 13.27 itself declares U_G in ft/s, so the "(ft/min)" label under
+  Eq. 13.28 is the odd one out.
+- **Evidence:** dimensional check of Q/(60·S_G); reconstruction of the
+  334,9/ρ0 constant from the velocity-pressure relation; and the worked
+  diffuser row of Table 14.9, which the ft/s reading reproduces to better
+  than 1 dB in the five bands that carry a level while the ft/min reading
+  misses it by 100 dB.
+- **Library behaviour:** `diffuser_sound_power` in
+  [`hvac.py`](../src/phonometry/noise_control/hvac.py) reads U_G in ft/s
+  internally (SI at the interface), with the Table 14.9 row pinned by
+  `test_diffuser_sound_power_reproduces_the_table_14_9_row`
+  ([`tests/noise_control/test_hvac_long.py`](../tests/noise_control/test_hvac_long.py))
+  and the conformance check "Long 2e Eqs. 13.27-13.33".
+- **Status:** unreported (textbook rather than a standard).
 
 ---
 
@@ -892,3 +944,18 @@ published sources:
   uniform 0,5 s records differs from the exact −10·lg(T0) form by 0,0103 dB;
   the library uses the exact form, which the ETM's integrated reference
   reproduces to five decimals.
+- **Long Table 14.9 element rows:** the worked duct-borne sheet of Chapter 14
+  was produced by a commercial program, as the text introducing it states, and
+  several of its element rows do not follow from the tables printed beside
+  them: the fan row (90/86/82/79/77/75/71/61 dB) is not what Eq. 13.1 gives
+  with the Table 13.5 forward-curved constants at that duty
+  (99/99/89/84/82/77/72/67 dB, and not a level shift of it), and the
+  flexible-duct row (14/14/16/15/17/22/16/13 dB) is not the Table 14.4 entry
+  for 12 in by 6 ft (3/5/10/15/17/16/9 dB). The library implements the printed
+  equations and tables, and uses the sheet only for what it genuinely pins,
+  the cascade arithmetic; its element rows are fed in as published in
+  [`tests/noise_control/test_duct_path.py`](../tests/noise_control/test_duct_path.py).
+  The sheet's own rounding is likewise not always self-consistent (supply row
+  3 prints a *Sum* of 49 dB at 500 Hz where 76 − 28 = 48, then a *Combined*
+  consistent with 48), which is why the comparison runs at the 1 dB the
+  printed sheet carries.

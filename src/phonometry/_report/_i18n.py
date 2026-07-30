@@ -27,6 +27,26 @@ from __future__ import annotations
 #: English output is byte-for-byte identical to the pre-i18n renderers.
 _STRINGS: dict[str, str] = {
     # --- titles ----------------------------------------------------------
+    # --- duct-borne noise path calculation sheet -------------------------
+    "Duct-borne noise path calculation": "Cálculo del trayecto de ruido por conductos",
+    "Octave-band sound level in an occupied space from an air distribution system, estimated element by element along the duct path (AHRI Standard 885; Long, Architectural Acoustics 2nd ed., Chapters 13-14). Room criterion per ANSI/ASA S12.2-2019. This is a prediction from design data, not a measurement.": "Nivel sonoro en bandas de octava en un recinto ocupado debido a un sistema de distribución de aire, estimado elemento a elemento a lo largo del trayecto del conducto (AHRI Standard 885; Long, Architectural Acoustics 2.ª ed., capítulos 13-14). Criterio de recinto según ANSI/ASA S12.2-2019. Se trata de una predicción a partir de datos de diseño, no de una medición.",
+    "Octave-band path calculation, dB": "Cálculo del trayecto en bandas de octava, dB",
+    "Ref.": "Ref.",
+    "Element": "Elemento",
+    "Sum": "Suma",
+    "Combined": "Combinado",
+    "Self-noise": "Ruido propio",
+    "Room effect": "Efecto de sala",
+    "Received level": "Nivel recibido",
+    "{count} further elements omitted": "{count} elementos adicionales omitidos",
+    "Room criterion <b>{label}</b>": "Criterio de recinto <b>{label}</b>",
+    "Received level from {source}": "Nivel recibido procedente de {source}",
+    "Design criterion {criterion} {target}": "Criterio de diseño {criterion} {target}",
+    "no band exceeds {criterion} {target}; smallest margin {margin} dB at {band} Hz": "ninguna banda supera {criterion} {target}; margen mínimo {margin} dB a {band} Hz",
+    "{criterion} {target} exceeded by {margin} dB at {band} Hz": "{criterion} {target} superado en {margin} dB a {band} Hz",
+    "Attenuations are printed as negative level changes and summed band by band; a regenerated (self) noise row is a sound power level and is combined with the running level on an energy basis. The room effect converts the sound power reaching the terminal device into a sound pressure level in the room.": "Las atenuaciones se imprimen como cambios de nivel negativos y se suman banda a banda; una fila de ruido propio (regenerado) es un nivel de potencia acústica y se combina energéticamente con el nivel acumulado. El efecto de sala convierte la potencia acústica que llega al difusor en un nivel de presión acústica en el recinto.",
+    "The verdict compares the received octave-band levels with the {criterion} {target} curve of ANSI/ASA S12.2-2019 band by band; the boxed designation is the standard's own rating of the received spectrum.": "El dictamen compara los niveles recibidos en bandas de octava con la curva {criterion} {target} de ANSI/ASA S12.2-2019 banda a banda; la designación recuadrada es el índice que la propia norma asigna al espectro recibido.",
+    "Predicted (estimated) result computed from the declared duct geometry, element data and room condition; it is not a measurement. A real installation also depends on the balancing of the system, on breakout along the run and on flanking paths the sheet does not carry.": "Resultado predicho (estimado) calculado a partir de la geometría de conductos declarada, los datos de los elementos y las condiciones del recinto; no es una medición. Una instalación real depende además del equilibrado del sistema, de la radiación a través de las paredes del conducto y de las transmisiones indirectas que la hoja no recoge.",
     "Airborne sound insulation rating": "Índice de aislamiento acústico a ruido aéreo",
     "Impact sound insulation rating": "Índice de aislamiento acústico a ruido de impactos",
     "Sound absorption rating": "Índice de absorción acústica",

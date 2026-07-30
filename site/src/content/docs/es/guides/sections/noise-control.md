@@ -22,6 +22,9 @@ la propia máquina, y esa se determina en las páginas de
 
 - [Silenciadores](/phonometry/es/guides/silencers/): silenciadores reactivos
   por el método de cuatro polos y la elección entre reactivo y disipativo.
+- [Ruido por conductos: del ventilador a la sala](/phonometry/es/guides/duct-path/):
+  el cálculo completo del ventilador a la sala frente a un criterio de ruido de
+  fondo, y el corte de modos superiores que limita todo método de onda plana.
 - [Control de ruido industrial: HVAC y cerramientos](/phonometry/es/guides/noise-control/):
   atenuación en conductos, ruido de flujo y pérdida de inserción de
   cerramientos de máquina.

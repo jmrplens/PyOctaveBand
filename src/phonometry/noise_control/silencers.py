@@ -60,6 +60,15 @@ peaking at ``10 log10[1 + (1/4)(m - 1/m)^2]`` when ``kL = pi/2, 3pi/2, ...`` and
 dropping to ``0`` at ``kL = n pi`` (no dissipation). The four-pole product
 reproduces this exactly, and the machinery extends to side-branch (Helmholtz,
 quarter-wave) and extended-tube resonators that the closed form cannot cover.
+
+**Validity.** All of this is one-dimensional: it holds while the duct and the
+chamber carry plane waves only, that is below the first higher-order-mode
+cut-on frequency of the widest cross section
+(:mod:`phonometry.noise_control.duct_modes`). Every result reports that
+frequency as :attr:`ReactiveSilencerResult.plane_wave_limit` and raises a
+:class:`~phonometry.noise_control.duct_modes.PlaneWaveWarning` when the
+analysis grid reaches past it: the numbers are still returned, but above cut-on
+they describe the plane-wave mode alone and a measurement will show the rest.
 """
 
 from __future__ import annotations
@@ -71,6 +80,8 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from .._internal.validation import require_non_negative, require_positive
+from .duct_modes import plane_wave_limit as _plane_wave_limit
+from .duct_modes import warn_above_plane_wave_limit
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -340,6 +351,15 @@ class ReactiveSilencerResult:
         ``pipe_area`` for a chamber), retained so :meth:`plot_geometry` can
         draw the device; appended after the original fields and ``None`` for
         hand-built results.
+    :ivar plane_wave_limit: The first higher-order-mode cut-on frequency of the
+        widest cross section of the device, Hz (Norton & Karczub Eq. 7.6,
+        :func:`phonometry.noise_control.duct_modes.plane_wave_limit`). The
+        four-pole algebra of this module is one-dimensional and is valid below
+        it; above it several modes propagate at once and the result describes
+        the plane-wave mode only, which is why a
+        :class:`~phonometry.noise_control.duct_modes.PlaneWaveWarning` is
+        raised when the analysis reaches past it. ``None`` for hand-built
+        results that do not retain their geometry.
     """
 
     frequencies: np.ndarray
@@ -349,6 +369,7 @@ class ReactiveSilencerResult:
     kind: str
     resonances: np.ndarray | None = None
     geometry: dict[str, float] | None = None
+    plane_wave_limit: float | None = None
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the transmission (and insertion) loss against frequency.
@@ -449,7 +470,24 @@ def _result(
     resonances: NDArray[np.float64] | None = None,
     geometry: dict[str, float] | None = None,
 ) -> ReactiveSilencerResult:
-    """Assemble a :class:`ReactiveSilencerResult` from a compound matrix."""
+    """Assemble a :class:`ReactiveSilencerResult` from a compound matrix.
+
+    Also determines the frequency at which the plane-wave assumption behind the
+    whole four-pole formulation expires: the first higher-order-mode cut-on of
+    the widest cross section the device presents (the chamber of an expansion
+    silencer, the duct of a side-branch resonator), and warns when the analysis
+    grid reaches past it.
+    """
+    limit: float | None = None
+    if geometry is not None:
+        areas = [
+            value
+            for key, value in geometry.items()
+            if key.endswith("_area") and value > 0.0
+        ]
+        if areas:
+            limit = _plane_wave_limit(area=max(areas), speed_of_sound=c)
+            warn_above_plane_wave_limit(f, limit, kind, stacklevel=4)
     tl = transmission_loss(
         t, inlet_area=inlet_area, outlet_area=outlet_area,
         speed_of_sound=c, density=rho,
@@ -468,6 +506,7 @@ def _result(
         kind=kind,
         resonances=resonances,
         geometry=geometry,
+        plane_wave_limit=limit,
     )
 
 

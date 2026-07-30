@@ -3142,6 +3142,77 @@ def _rd1367_example() -> tuple[object, ReportMetadata, str]:
     return result, metadata, "rd1367_activity_example.pdf"
 
 
+def _duct_path_example() -> tuple[object, ReportMetadata, str]:
+    """Duct-path fiche: a fan-to-room supply path checked against NC 30.
+
+    The supply half of the classic duct-borne worked sheet (Long,
+    Architectural Acoustics 2nd ed., Table 14.9): a forward-curved centrifugal
+    fan at 5000 cfm and 2 in w.g. feeding a 20 x 20 x 8 ft carpeted office
+    through an unlined elbow, a 3 ft standard-pressure-drop silencer, two lined
+    rectangular runs either side of a 25 per cent branch split, a flexible
+    final run and a rectangular diffuser, with the room effect converting the
+    sound power reaching the diffuser into the level at the listener.
+
+    The element attenuations and the silencer and diffuser self-noise spectra
+    are the ones printed in that sheet (silencers and air terminal devices are
+    always manufacturer data in a real calculation), so the fiche exercises the
+    cascade, the criterion comparison and the sheet layout on published
+    numbers. The design criterion is NC 30, which the received spectrum meets.
+    """
+    from phonometry.noise_control.duct_path import DuctElement, duct_path
+    from phonometry.noise_control.hvac import OCTAVE_BANDS
+
+    result = duct_path(
+        OCTAVE_BANDS,
+        [90.0, 86.0, 82.0, 79.0, 77.0, 75.0, 71.0, 61.0],
+        [
+            DuctElement(
+                "Elbow, 36 x 24 in, unlined",
+                [0, 1, 2, 3, 3, 3, 3, 3], [41, 39, 36, 29, 20, 6, 0, 0],
+                code="2",
+            ),
+            DuctElement(
+                "Silencer, standard pressure drop, 3 ft",
+                [7, 12, 16, 28, 35, 35, 28, 17], [49, 43, 44, 42, 42, 45, 35, 24],
+                code="3",
+            ),
+            DuctElement(
+                "Duct, 36 x 24 in, 5 ft, 1 in lining",
+                [2, 2, 3, 7, 15, 12, 11, 9], code="4",
+            ),
+            DuctElement("Branch split, 25 per cent", 6.0, code="5"),
+            DuctElement(
+                "Duct, 18 x 12 in, 6 ft, 1 in lining",
+                [3, 3, 5, 11, 25, 22, 16, 13], code="6",
+            ),
+            DuctElement(
+                "Flexible duct, 12 in diameter, 6 ft",
+                [14, 14, 16, 15, 17, 22, 16, 13], code="7",
+            ),
+            DuctElement(
+                "Rectangular diffuser, 312 cfm",
+                0.0, [33, 32, 29, 23, 15, 4, 0, 0], code="8",
+            ),
+        ],
+        room_effect=[6, 6, 5, 5, 6, 7, 6, 6],
+        source_label="Fan, centrifugal, forward-curved, 5000 cfm, 2 in w.g.",
+        criterion="NC",
+        target=30.0,
+        label="Supply path",
+    )
+    metadata = ReportMetadata(
+        specimen="Supply air path, roof-mounted built-up air handler (design case)",
+        client="Example client",
+        test_room="Open-plan office, 6.1 x 6.1 x 2.4 m, carpeted (design case)",
+        measurement_standard="AHRI Standard 885 procedure; ANSI/ASA S12.2-2019 criterion",
+        test_date="2026-07-29",
+        laboratory="Phonometry reference example",
+        operator="phonometry",
+        report_id="EXAMPLE-DUCT-PATH",
+    )
+    return result, metadata, "duct_path_example.pdf"
+
+
 #: Every example fiche the repository keeps rendered. New report kinds append
 #: their factory here so ``make reports`` regenerates the full set.
 _EXAMPLES: list[Callable[[], tuple[object, ReportMetadata, str]]] = [
@@ -3209,6 +3280,7 @@ _EXAMPLES: list[Callable[[], tuple[object, ReportMetadata, str]]] = [
     _enclosure_example,
     _silencer_example,
     _hvac_example,
+    _duct_path_example,
     _rd1367_example,
 ]
 

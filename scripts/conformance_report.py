@@ -7485,6 +7485,144 @@ def _chk_end_reflection_table() -> Outcome:
 
 @register(
     _NOISE_CONTROL,
+    "Long 2e Eq. 13.1 with Table 13.5 (ASHRAE 1987 fan model)",
+    "Forward-curved fan at Q_REF, P_REF, peak efficiency -> K_F + C_BFI at 500 Hz",
+)
+def _chk_fan_sound_power_reference_point() -> Outcome:
+    res = ph.fan_sound_power(
+        0.472e-3, 249.0, fan_type="forward_curved", relative_efficiency=100.0
+    )
+    # Table 13.5 forward-curved 500 Hz entry (36 dB) plus the Table 13.7
+    # blade frequency increment of the 500 Hz octave (2 dB).
+    return numeric(38.0, float(res.values[3]), 1e-9, unit="dB")
+
+
+@register(
+    _NOISE_CONTROL,
+    "Long 2e Eq. 14.12 with Table 14.2 (Reynolds lined rectangular duct)",
+    "18 x 12 in duct, 6 ft, 1 in lining at 1 kHz -> 1.77 (10/3)^0.695 6 dB",
+)
+def _chk_lined_rectangular_duct() -> Outcome:
+    res = ph.lined_rectangular_duct_attenuation(
+        None, 18.0 * 0.0254, 12.0 * 0.0254, 6.0 * 0.3048, 0.0254
+    )
+    expected = 1.7700 * (10.0 / 3.0) ** 0.695 * 6.0
+    return numeric(expected, float(res.values[4]), 1e-9, unit="dB")
+
+
+@register(
+    _NOISE_CONTROL,
+    "Long 2e Table 14.4 (ASHRAE 1995 lined flexible duct)",
+    "8 in diameter, 9 ft long -> 6/8/16/25/28/28/18 dB (table node)",
+)
+def _chk_flexible_duct_table() -> Outcome:
+    res = ph.flexible_duct_insertion_loss(None, 8.0 * 0.0254, 9.0 * 0.3048)
+    printed = np.array([6, 8, 16, 25, 28, 28, 18], dtype=float)
+    worst = float(np.max(np.abs(res.values - printed)))
+    return numeric(0.0, worst, 1e-9, unit="dB",
+                   expected_label="0 dB (max |diff| over the 7 bands)")
+
+
+@register(
+    _NOISE_CONTROL,
+    "Long 2e Eq. 14.17 (branch power division)",
+    "25 per cent split with area-matched branches -> -10 lg 0.25 = 6.02 dB",
+)
+def _chk_split_loss() -> Outcome:
+    loss = ph.split_loss(0.6, [0.15, 0.15, 0.15, 0.15], branch=0)
+    return numeric(-10.0 * math.log10(0.25), loss, 1e-9, unit="dB")
+
+
+@register(
+    _NOISE_CONTROL,
+    "Long 2e Table 14.9 (worked duct-borne sheet, supply path)",
+    "Fan to room, 8 octave bands -> 52/42/30/18/9/-2/-2/-1 dB at the receiver",
+)
+def _chk_duct_path_table_14_9() -> Outcome:
+    from phonometry.noise_control.duct_path import DuctElement, duct_path
+    from phonometry.noise_control.hvac import OCTAVE_BANDS
+
+    res = duct_path(
+        OCTAVE_BANDS,
+        [90.0, 86.0, 82.0, 79.0, 77.0, 75.0, 71.0, 61.0],
+        [
+            DuctElement("Elbow", [0, 1, 2, 3, 3, 3, 3, 3],
+                        [41, 39, 36, 29, 20, 6, 0, 0]),
+            DuctElement("Silencer", [7, 12, 16, 28, 35, 35, 28, 17],
+                        [49, 43, 44, 42, 42, 45, 35, 24]),
+            DuctElement("Lined duct 36x24", [2, 2, 3, 7, 15, 12, 11, 9]),
+            DuctElement("Split 25%", 6.0),
+            DuctElement("Lined duct 18x12", [3, 3, 5, 11, 25, 22, 16, 13]),
+            DuctElement("Flexible duct", [14, 14, 16, 15, 17, 22, 16, 13]),
+            DuctElement("Diffuser", 0.0, [33, 32, 29, 23, 15, 4, 0, 0]),
+        ],
+        room_effect=[6, 6, 5, 5, 6, 7, 6, 6],
+    )
+    printed = np.array([52, 42, 30, 18, 9, -2, -2, -1], dtype=float)
+    worst = float(np.max(np.abs(np.round(res.received_level) - printed)))
+    # The printed sheet carries whole decibels and its own rounding is not
+    # always self-consistent, so 1 dB is the published resolution.
+    return numeric(0.0, worst, 1.0, unit="dB",
+                   expected_label="0 dB +/-1 (max |diff| over the 8 bands)")
+
+
+@register(
+    _NOISE_CONTROL,
+    "Long 2e Eqs. 13.27-13.33 (Reynolds diffuser self-noise)",
+    "24 x 24 in rectangular diffuser, 312 cfm, 0.05 in pd -> the 33/32/29/23/15 dB "
+    "row of Table 14.9",
+)
+def _chk_diffuser_sound_power() -> Outcome:
+    res = ph.diffuser_sound_power(
+        None, (24.0 * 0.0254) ** 2, 312.0 * 0.0004719474432, 0.05 * 249.0
+    )
+    printed = np.array([33.0, 32.0, 29.0, 23.0, 15.0])
+    worst = float(np.max(np.abs(res.values[:5] - printed)))
+    return numeric(0.0, worst, 1.0, unit="dB",
+                   expected_label="0 dB +/-1 (max |diff| over the five bands)")
+
+
+@register(
+    _NOISE_CONTROL,
+    "ASHRAE 2019 Applications Ch. 49 Table 9",
+    "Max neck velocity of a supply outlet for design RC(30) -> 2.2 m/s",
+)
+def _chk_air_terminal_velocity() -> Outcome:
+    return numeric(2.2, ph.air_terminal_velocity_limit(30), 1e-9, unit="m/s")
+
+
+@register(
+    _NOISE_CONTROL,
+    "Norton & Karczub 2e Eqs. 7.6/7.8/7.9 (problem 7.1 answer)",
+    "254 mm duct, steam, 200 m/s: (1,0) cut-on 812 Hz and k_x = -8.23 1/m",
+)
+def _chk_duct_cut_on_with_flow() -> Outcome:
+    res = ph.circular_duct_cut_on(
+        0.254, flow_velocity=200.0, speed_of_sound=405.0, count=1
+    )
+    worst = max(
+        abs(float(res.cut_on[0]) - 812.0),
+        abs(float(res.axial_wavenumber[0]) + 8.23) * 100.0,
+    )
+    return numeric(0.0, worst, 1.0,
+                   expected_label="0 +/-1 (Hz, and 1/m x100)")
+
+
+@register(
+    _NOISE_CONTROL,
+    "Norton & Karczub 2e Eq. 7.10 (problem 7.2 answer)",
+    "0.65 x 0.4 m duct, 15 m/s: first three cut-on 264 / 428 / 503 Hz",
+)
+def _chk_rectangular_duct_cut_on() -> Outcome:
+    res = ph.rectangular_duct_cut_on(0.65, 0.4, flow_velocity=15.0, count=3)
+    printed = np.array([264.0, 428.0, 503.0])
+    worst = float(np.max(np.abs(np.round(res.cut_on) - printed)))
+    return numeric(0.0, worst, 1e-9, unit="Hz",
+                   expected_label="0 Hz (max |diff| over the 3 modes)")
+
+
+@register(
+    _NOISE_CONTROL,
     "Bies 5e Eqs. (7.103), (7.111) (enclosure, fully absorbing limit)",
     "Enclosure correction C -> 10 lg 0.3 = -5.23 dB as alpha_i -> 1",
 )
