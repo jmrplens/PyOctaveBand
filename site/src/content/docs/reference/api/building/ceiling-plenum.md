@@ -25,13 +25,16 @@ ceiling length on both sides gives (Eq. (9.18)):
 
 ```text
 tau_cl = sS sR tauS tauR LR / (mS LS mR LR h)
-         * (1 - exp(-2 mS LS)) (1 - exp(-2 m'R LR))
+         * (1 - exp(-eps mS LS)) (1 - exp(-eps m'R LR))
 ```
 
 with the receiving-side coefficient increased by the leakage back into the room,
-`m'R = mR + sR tauR / h` (Eq. (9.17)). For a plenum with little attenuation
-(`mS LS`, `mR LR` \<\< 1) and `sS = sR = 0,5` this collapses to the compact
-result that makes the geometry visible (Eqs. (9.19) and (9.20)):
+`m'R = mR + sR tauR / h` (Eq. (9.17)). Vigran prints the exponents with a
+factor 2 for totally reflecting plenum sidewalls and states that totally
+absorbing ones give the same expression "without the factor 2", so the factor is
+the same `eps` that the compact form carries. For a plenum with little
+attenuation (`mS LS`, `mR LR` \<\< 1) and `sS = sR = 0,5` it collapses to
+the result that makes the geometry visible (Eqs. (9.19) and (9.20)):
 
 ```text
 tau_cl = eps**2 tauS tauR LR / (4 h)
@@ -269,13 +272,13 @@ receiving-side exponent carries the leakage term `m'R = mR + sR tauR/h`
 | `reduction_index_receiving` | Receiving-side ceiling `RR` per band, in dB. |
 | `ceiling_length` | Receiving-side ceiling length `LR`, in m (> 0). |
 | `plenum_height` | Plenum height `h`, in m (> 0). |
-| `sidewalls` | `"reflecting"` (`eps = 2`, Default) or `"absorbing"` (`eps = 1`). |
+| `sidewalls` | `"reflecting"` (`eps = 2`, Default) or `"absorbing"` (`eps = 1`); `eps` scales both the geometry penalty of Eq. (9.20) and the exponents of Eq. (9.18). |
 | `frequency` | Optional band centre frequencies, in Hz. |
 | `attenuation_source` | Optional plenum power attenuation coefficient `mS` per band, in 1/m (> 0); switches to Eq. (9.18). |
 | `attenuation_receiving` | Optional `mR` per band, in 1/m (> 0); required together with *attenuation_source*. |
 | `source_length` | Source-side ceiling length `LS`, in m (Default: equal to *ceiling_length*). |
-| `split_source` | Power split `sS` towards the partition (Default: 0,5). |
-| `split_receiving` | Power split `sR` on the receiving side (Default: 0,5). |
+| `split_source` | Power split `sS` towards the partition, in `(0, 1]` (Default: 0,5). |
+| `split_receiving` | Power split `sR` on the receiving side, in `(0, 1]` (Default: 0,5). |
 
 **Returns:** A [`PlenumFlankingResult`](/phonometry/reference/api/building/ceiling-plenum/#plenumflankingresult).
 
