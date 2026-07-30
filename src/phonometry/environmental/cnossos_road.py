@@ -796,15 +796,17 @@ def road_source_power(
         if q < 0.0:
             raise ValueError("'flow_rate' must be a non-negative number of vehicles/h.")
         v = _positive_speed(flow.speed)
-        common = {
-            "surface": surface, "junction_distance": junction_distance,
-            "junction_type": junction_type, "coefficients": coefficients,
-        }
         lwr = road_rolling_noise(
-            key, v, temperature=temperature, studded_fraction=flow.studded_fraction,
-            studded_months=studded_months, **common,
+            key, v, surface=surface, temperature=temperature,
+            studded_fraction=flow.studded_fraction, studded_months=studded_months,
+            junction_distance=junction_distance, junction_type=junction_type,
+            coefficients=coefficients,
         )
-        lwp = road_propulsion_noise(key, v, gradient=gradient, **common)
+        lwp = road_propulsion_noise(
+            key, v, surface=surface, gradient=gradient,
+            junction_distance=junction_distance, junction_type=junction_type,
+            coefficients=coefficients,
+        )
         lw = (
             lwp
             if key in ("4a", "4b")

@@ -3148,3 +3148,34 @@ CNOSSOS_ROAD_TABLE_F4: dict[str, dict[str, tuple[tuple[float, ...], float]]] = {
 }
 
 CNOSSOS_A_WEIGHTING_TABLE: tuple[float, ...] = (-26.2, -16.1, -8.6, -3.2, 0.0, 1.2, 1.0, -1.1)
+
+# Validity speed ranges printed in the two leading columns of Table F-4, in
+# km/h; the reference road surface carries none. Same instrument as
+# CNOSSOS_ROAD_TABLE_F4.
+CNOSSOS_ROAD_TABLE_F4_SPEED_RANGE: dict[str, tuple[float, float] | None] = {
+    "reference road surface": None,
+    "1-layer ZOAB": (50.0, 130.0),
+    "2-layer ZOAB": (50.0, 130.0),
+    "2-layer ZOAB (fine)": (80.0, 130.0),
+    "SMA-NL5": (40.0, 80.0),
+    "SMA-NL8": (40.0, 80.0),
+    "brushed down concrete": (70.0, 120.0),
+    "optimised brushed down concrete": (70.0, 80.0),
+    "fine broomed concrete": (70.0, 120.0),
+    "worked surface": (50.0, 130.0),
+    "hard elements in herringbone": (30.0, 60.0),
+    "hard elements not in herringbone": (30.0, 60.0),
+    "quiet hard elements": (30.0, 60.0),
+    "thin layer A": (40.0, 130.0),
+    "thin layer B": (40.0, 130.0),
+}
+
+# Air-temperature coefficients K_m of formula (2.2.10), in dB per degree
+# Celsius: "a generic coefficient Km=1 = 0,08 dB/degC for light vehicles
+# (category 1) and Km=2 = Km=3 = 0,04 dB/degC for heavy vehicles (categories 2
+# and 3)" (Directive (EU) 2015/996, Annex II 2.2.3, unamended). The powered
+# two-wheelers of category 4 have no rolling noise, so the Directive prints no
+# K_m for them and the correction is identically zero.
+CNOSSOS_ROAD_TEMPERATURE_K: dict[str, float] = {
+    "1": 0.08, "2": 0.04, "3": 0.04, "4a": 0.0, "4b": 0.0,
+}

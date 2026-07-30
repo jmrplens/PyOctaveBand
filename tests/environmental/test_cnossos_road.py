@@ -213,14 +213,21 @@ def test_octave_bands_are_the_corrected_range() -> None:
     assert ROAD_OCTAVE_BANDS == (63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0)
 
 
-def test_table_f4_speed_ranges() -> None:
+@pytest.mark.parametrize("surface", list(RoadSurface))
+def test_table_f4_speed_ranges(surface: RoadSurface) -> None:
     """The validity ranges printed in the two leading columns of Table F-4."""
-    assert road_surface_coefficients(RoadSurface.REFERENCE).speed_range is None
-    assert road_surface_coefficients(RoadSurface.ONE_LAYER_ZOAB).speed_range == (50.0, 130.0)
-    assert road_surface_coefficients(RoadSurface.TWO_LAYER_ZOAB_FINE).speed_range == (80.0, 130.0)
-    assert road_surface_coefficients(RoadSurface.SMA_NL5).speed_range == (40.0, 80.0)
-    assert road_surface_coefficients(RoadSurface.QUIET_HARD_ELEMENTS).speed_range == (30.0, 60.0)
-    assert road_surface_coefficients(RoadSurface.THIN_LAYER_B).speed_range == (40.0, 130.0)
+    expected = ref.CNOSSOS_ROAD_TABLE_F4_SPEED_RANGE[surface.value]
+    assert road_surface_coefficients(surface).speed_range == expected
+
+
+def test_temperature_coefficients_match_the_directive() -> None:
+    """``K_1 = 0,08`` and ``K_2 = K_3 = 0,04 dB/degC`` (Annex II 2.2.3).
+
+    Category 4 has no rolling noise, so the Directive prints no ``K_m`` for it
+    and the correction is identically zero; the stored zeros are asserted here
+    because no computed level can reach them.
+    """
+    assert ROAD_COEFFICIENTS.temperature_k == ref.CNOSSOS_ROAD_TEMPERATURE_K
 
 
 # ---------------------------------------------------------------------------

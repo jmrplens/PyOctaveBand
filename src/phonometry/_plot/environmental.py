@@ -33,11 +33,11 @@ if TYPE_CHECKING:
         EffectiveSoundSpeedProfile,
     )
     from ..environmental.cnossos_rail import RailwayEmissionResult
+    from ..environmental.cnossos_road import RoadEmissionResult
     from ..environmental.ground_barriers import (
         BarrierInsertionLoss,
         SphericalGroundResult,
     )
-    from ..environmental.cnossos_road import RoadEmissionResult
     from ..environmental.impulse_prominence import ImpulseProminenceResult
     from ..environmental.measurement import TonalAssessmentResult
     from ..environmental.outdoor_propagation import OutdoorAttenuation
