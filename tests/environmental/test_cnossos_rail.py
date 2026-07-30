@@ -766,16 +766,20 @@ def test_invalid_inputs() -> None:
     stock = _reference_stock()
     with pytest.raises(ValueError, match="at least one vehicle"):
         railway_source_power([], track)
+    # the vehicles are built outside the raises blocks, so each block holds
+    # exactly the one call whose exception is under test
+    standing = RailwayVehicle(stock, flow_rate=1.0, speed=0.0)
+    negative_flow = RailwayVehicle(stock, flow_rate=-1.0, speed=50.0)
+    running = RailwayVehicle(stock, flow_rate=1.0, speed=50.0)
+    zero_length = _reference_track(length=0.0)
     with pytest.raises(ValueError, match="positive number of km/h"):
-        railway_source_power(RailwayVehicle(stock, flow_rate=1.0, speed=0.0), track)
+        railway_source_power(standing, track)
     with pytest.raises(ValueError, match="non-negative number per hour"):
-        railway_source_power(RailwayVehicle(stock, flow_rate=-1.0, speed=50.0), track)
+        railway_source_power(negative_flow, track)
     with pytest.raises(ValueError, match="positive period"):
-        railway_source_power(RailwayVehicle(stock, flow_rate=1.0, speed=50.0), track,
-                             reference_time=0.0)
+        railway_source_power(running, track, reference_time=0.0)
     with pytest.raises(ValueError, match="positive number of metres"):
-        railway_source_power(RailwayVehicle(stock, flow_rate=1.0, speed=50.0),
-                             _reference_track(length=0.0))
+        railway_source_power(running, zero_length)
     with pytest.raises(ValueError, match="height"):
         vertical_directivity(10.0, height=3)
     with pytest.raises(ValueError, match="Unknown brake type"):

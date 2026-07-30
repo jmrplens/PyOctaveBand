@@ -1105,7 +1105,9 @@ def impact_roughness(single: Any, joint_density: float) -> NDArray[np.float64]:
     if density < 0.0:
         raise ValueError("'joint_density' must be a non-negative number of m^-1.")
     spectrum = _spectrum(single, "single")
-    if density == 0.0:
+    # The guard above already rejects a negative density, so this is the
+    # zero case: no joint at all, and no impact roughness to add.
+    if density <= 0.0:
         return np.full_like(spectrum, -np.inf)
     return np.asarray(
         spectrum + 10.0 * np.log10(density / REFERENCE_JOINT_DENSITY),
@@ -1439,6 +1441,90 @@ def _rolling_and_bridge(
     return rolling, bridge
 
 
+def _roughness_speed_floor(
+    stock: RollingStock, minimum_speed: float | None
+) -> float:
+    """Speed floor of 2.3.2: 50 km/h, or 30 km/h for a tram or light metro."""
+    if minimum_speed is not None:
+        return _finite(minimum_speed, "minimum_speed")
+    return TRAM_MINIMUM_SPEED if stock.tram else RAILWAY_MINIMUM_SPEED
+
+
+def _flow_term(
+    vehicle: RailwayVehicle, reference_time: float, length: float
+) -> float:
+    """Flow term of (2.3.2) for a running train, (2.3.4) for an idling one."""
+    if vehicle.condition is RunningCondition.IDLING:
+        idle = _finite(vehicle.idling_time, "idling_time")
+        if idle < 0.0:
+            raise ValueError("'idling_time' must be a non-negative period.")
+        # The guard above leaves only the zero case: a vehicle that never
+        # idles contributes no energy at all.
+        if idle <= 0.0:
+            return -np.inf
+        return 10.0 * np.log10(idle / (reference_time * length))
+    q = _finite(vehicle.flow_rate, "flow_rate")
+    if q < 0.0:
+        raise ValueError("'flow_rate' must be a non-negative number per hour.")
+    # As above: an empty track is a legitimate input and carries -inf.
+    if q <= 0.0:
+        return -np.inf
+    return 10.0 * np.log10(q / (1000.0 * _speed(vehicle.speed)))
+
+
+def _vehicle_spectra(
+    vehicle: RailwayVehicle,
+    track: RailwayTrack,
+    floor: float,
+    interpolation: RoughnessInterpolation,
+    ver_aero_b: NDArray[np.float64],
+) -> tuple[
+    list[list[NDArray[np.float64]]],
+    list[NDArray[np.float64]],
+    list[tuple[str, int, NDArray[np.float64]]],
+]:
+    """Every source spectrum of one vehicle, sorted by source height.
+
+    :return: ``(directional, omni, components)``: the spectra that take the
+        directivity corrections, per height; the ones that do not, all of which
+        sit at source A; and the per-source breakdown as
+        ``(name, height, spectrum)``.
+    """
+    stock = vehicle.stock
+    directional: list[list[NDArray[np.float64]]] = [[], []]
+    # (EU) 2021/1226 point (4)(c): bridge noise is at source A and
+    # omni-directional, so it bypasses the directivity corrections.
+    omni: list[NDArray[np.float64]] = []
+    components: list[tuple[str, int, NDArray[np.float64]]] = []
+
+    if vehicle.condition is not RunningCondition.IDLING:
+        speed = _speed(vehicle.speed)
+        rolling, bridge = _rolling_and_bridge(
+            vehicle, track, max(speed, floor), interpolation,
+            include_impact=speed >= floor,
+        )
+        directional[0].append(rolling)
+        components.append(("rolling", 0, rolling))
+        if bridge is not None:
+            omni.append(bridge)
+            components.append(("bridge", 0, bridge))
+        if stock.aerodynamic is not None and speed > AERODYNAMIC_THRESHOLD_SPEED:
+            low, high = aerodynamic_sound_power(
+                speed, reference=stock.aerodynamic, alpha=stock.aerodynamic_alpha
+            )
+            directional[0].append(low)
+            directional[1].append(high + ver_aero_b)
+            components.append(("aerodynamic", 0, low))
+            components.append(("aerodynamic", 1, high))
+    if stock.traction is not None:
+        for height, spectrum in enumerate(stock.traction):
+            directional[height].append(np.asarray(spectrum, dtype=np.float64))
+            components.append(
+                ("traction", height, np.asarray(spectrum, dtype=np.float64))
+            )
+    return directional, omni, components
+
+
 def railway_source_power(
     traffic: RailwayVehicle | list[RailwayVehicle] | tuple[RailwayVehicle, ...],
     track: RailwayTrack,
@@ -1501,58 +1587,14 @@ def railway_source_power(
     ver_aero_b = vertical_directivity(psi, height=2, aerodynamic=True)
 
     for vehicle in vehicles:
-        stock = vehicle.stock
-        idling = vehicle.condition is RunningCondition.IDLING
-        floor = (
-            (TRAM_MINIMUM_SPEED if stock.tram else RAILWAY_MINIMUM_SPEED)
-            if minimum_speed is None
-            else _finite(minimum_speed, "minimum_speed")
+        sources, omni, breakdown = _vehicle_spectra(
+            vehicle, track,
+            _roughness_speed_floor(vehicle.stock, minimum_speed),
+            interpolation, ver_aero_b,
         )
-        sources: list[list[NDArray[np.float64]]] = [[], []]
-        # (EU) 2021/1226 point (4)(c): bridge noise is at source A and
-        # omni-directional, so it bypasses the directivity corrections.
-        omni: list[NDArray[np.float64]] = []
-        if not idling:
-            speed = _speed(vehicle.speed)
-            rolling, bridge = _rolling_and_bridge(
-                vehicle, track, max(speed, floor), interpolation,
-                include_impact=speed >= floor,
-            )
-            sources[0].append(rolling)
-            components["rolling"][0].append(rolling)
-            if bridge is not None:
-                omni.append(bridge)
-                components["bridge"][0].append(bridge)
-            if stock.aerodynamic is not None and speed > AERODYNAMIC_THRESHOLD_SPEED:
-                low, high = aerodynamic_sound_power(
-                    speed, reference=stock.aerodynamic, alpha=stock.aerodynamic_alpha
-                )
-                sources[0].append(low)
-                sources[1].append(high + ver_aero_b)
-                components["aerodynamic"][0].append(low)
-                components["aerodynamic"][1].append(high)
-        if stock.traction is not None:
-            for h, spectrum in enumerate(stock.traction):
-                sources[h].append(np.asarray(spectrum, dtype=np.float64))
-                components["traction"][h].append(
-                    np.asarray(spectrum, dtype=np.float64)
-                )
-        if idling:
-            idle = _finite(vehicle.idling_time, "idling_time")
-            if idle < 0.0:
-                raise ValueError("'idling_time' must be a non-negative period.")
-            flow = (
-                -np.inf if idle == 0.0
-                else 10.0 * np.log10(idle / (reference_time * track.length))
-            )  # (2.3.4)
-        else:
-            q = _finite(vehicle.flow_rate, "flow_rate")
-            if q < 0.0:
-                raise ValueError("'flow_rate' must be a non-negative number per hour.")
-            flow = (
-                -np.inf if q == 0.0
-                else 10.0 * np.log10(q / (1000.0 * _speed(vehicle.speed)))
-            )  # (2.3.2)
+        for name, height, spectrum in breakdown:
+            components[name][height].append(spectrum)
+        flow = _flow_term(vehicle, reference_time, track.length)
         for h in (0, 1):
             emitted = list(sources[h])
             directed = (
