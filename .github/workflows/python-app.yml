@@ -236,8 +236,10 @@ jobs:
     # certified STIPA bench, the NORAH2 public release) are never fetched here.
     # The suites that use them fall back to the committed derived series and
     # extracts under tests/data/ - see tests/data/README.md - which is the path
-    # CI takes and which never skips. Only the extra cases of the full sets are
-    # local-only; pytest prints the resolution in its run header.
+    # CI takes, and whose assertions never skip. A handful of cases that exist
+    # only to exercise a full set do skip here and report as such (the EBU
+    # programme-audio cases and the full-bench inventory guard); pytest prints
+    # the resolution in its run header.
     - name: Run tests
       # -n auto fans the suite out across the runner's cores via pytest-xdist;
       # pytest-cov combines the per-worker coverage into a single coverage.xml.

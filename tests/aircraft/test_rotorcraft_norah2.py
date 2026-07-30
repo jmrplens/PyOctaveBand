@@ -98,7 +98,7 @@ def norah_root(tmp_path_factory: pytest.TempPathFactory) -> pathlib.Path:
         assert _RELEASE.path is not None
         return _RELEASE.path
     source = (
-        _RELEASE.path / _RELEASE.dataset.marker
+        _RELEASE.path / oracle_data.NORAH2_ARCHIVE
         if _RELEASE.path is not None
         else _EXTRACT
     )

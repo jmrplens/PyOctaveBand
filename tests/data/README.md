@@ -25,10 +25,17 @@ same order:
 (`iso532_1/` predates the split and has no separate full set: its committed
 folder *is* the oracle, and `ISO532_1_TESTDATA` relocates that same folder.)
 
-**The committed path is the fallback and it must never skip.** That is the
-whole point: CI has neither the environment variable nor `tests/data-local/`,
-so it takes route 3, and route 3 has to assert real published values. A suite
-that steps over itself in CI is a suite nobody but the maintainer runs.
+**The assertions on the committed data must never skip.** That is the whole
+point: CI has neither the environment variable nor `tests/data-local/`, so it
+takes route 3, and route 3 has to assert real published values. A suite that
+steps over itself in CI is a suite nobody but the maintainer runs.
+
+What may still skip on route 3 is a test that exists *only* to exercise the
+full set and has no committed counterpart — the six EBU cases that read the
+programme audio, and the inventory guard on the full STIPA download. Those
+report as skipped in CI by design. The rule is about coverage, not about the
+skip count: every published value the full set pins must also be pinned by
+something that runs without it.
 
 `pytest` prints the resolution of every dataset in its run header, so a green
 run is never ambiguous about which oracle produced it:

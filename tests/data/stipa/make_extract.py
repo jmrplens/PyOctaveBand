@@ -110,7 +110,24 @@ def best_order(samples: np.ndarray) -> int:
 
 
 def build(source: pathlib.Path, destination: pathlib.Path) -> None:
-    """Write the LZMA-compressed extract of :data:`SELECTION` to ``destination``."""
+    """Write the LZMA-compressed extract of :data:`SELECTION` to ``destination``.
+
+    The archive is built beside ``destination`` and moved into place only once
+    it has closed cleanly, so a missing or malformed source file cannot leave
+    the committed extract truncated.
+    """
+    staging = destination.with_suffix(destination.suffix + ".tmp")
+    try:
+        _write(source, staging)
+    except BaseException:
+        staging.unlink(missing_ok=True)
+        raise
+    staging.replace(destination)
+    print(f"{destination}: {len(SELECTION)} signals, {destination.stat().st_size} bytes")
+
+
+def _write(source: pathlib.Path, destination: pathlib.Path) -> None:
+    """Build the archive at ``destination`` (see :func:`build`)."""
     entries = []
     with zipfile.ZipFile(
         destination, "w", compression=zipfile.ZIP_LZMA
@@ -155,7 +172,6 @@ def build(source: pathlib.Path, destination: pathlib.Path) -> None:
                 indent=1,
             ),
         )
-    print(f"{destination}: {len(entries)} signals, {destination.stat().st_size} bytes")
 
 
 if __name__ == "__main__":

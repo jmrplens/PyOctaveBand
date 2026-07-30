@@ -6,7 +6,9 @@ certified test bench signals from stipa.info (Embedded Acoustics BV).
 The bench is 49 mono 48 kHz WAV files, 133 MB of PCM that does not compress
 as audio. ``tests/data/stipa/`` carries a **27-signal extract** of it, stored
 losslessly (see that folder's ``README.md`` for the selection, the encoding
-and the licence), so these suites run everywhere including CI and never skip.
+and the licence), so all five verification suites run everywhere including CI;
+none of their assertions skips there. Only the inventory guard on the full
+download does, and it says so.
 A full local copy wins when there is one, resolved by ``tests/oracle_data.py``
 (``$STIPA_VERIFICATION_DATA`` first, then ``tests/data-local/``); every
 parametrized case then runs, otherwise the parameter lists shrink to the
@@ -115,9 +117,21 @@ def _read_wav(path: pathlib.Path) -> np.ndarray:
 
 def _load(relative: str) -> np.ndarray:
     """The bench signal ``relative``, from the full copy when there is one."""
-    if FULL_BENCH is not None:
-        return _read_wav(FULL_BENCH / relative)
-    return _decode(relative)
+    if FULL_BENCH is None:
+        return _decode(relative)
+    path = FULL_BENCH / relative
+    if not path.is_file():
+        # All five annex directories were there, so the copy was taken for
+        # the full bench, but a signal inside one of them is missing. Say so
+        # rather than dying on a bare FileNotFoundError - and do not quietly
+        # substitute the committed extract, which would hide the gap.
+        raise AssertionError(
+            f"{relative} is missing from the local bench at {FULL_BENCH}. "
+            "The download is incomplete: remove or complete it, or point "
+            "STIPA_VERIFICATION_DATA elsewhere, to fall back to the "
+            "committed extract."
+        )
+    return _read_wav(path)
 
 
 def _available(cases: Mapping[Any, str]) -> list[Any]:

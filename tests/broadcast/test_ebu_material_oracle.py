@@ -15,11 +15,14 @@ So this module runs on two levels:
 * **always, including CI** - the committed series in
   ``tests/data/broadcast/ebu_programme_block_loudness.npz`` drive the gating
   and loudness-range stages and must reproduce the EBU-published targets
-  (integrated -23,0 LUFS; LRA 5 LU for NLR and 15 LU for WLR). Nothing skips;
+  (integrated -23,0 LUFS; LRA 5 LU for NLR and 15 LU for WLR). These four
+  assertions never skip;
 * **where a full local copy of the set exists** - resolved by
   ``tests/oracle_data.py`` (``$EBU_LOUDNESS_TEST_SET`` first, then
   ``tests/data-local/ebu-loudness-test-set/``) - the same targets are asserted
-  end to end from the WAV files, at the same tolerances.
+  end to end from the WAV files, at the same tolerances. These six cases read
+  audio that cannot be committed, so they skip everywhere else, CI included,
+  and the skip reason says why.
 
 What the committed series therefore cannot assert: the stages *upstream* of
 the block envelope, i.e. 24-bit WAV decoding, the BS.1770 K-weighting front

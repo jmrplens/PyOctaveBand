@@ -622,7 +622,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   gitignored `tests/data-local/`, and every suite that uses it resolves the same
   way through the new `tests/oracle_data.py`: environment override, then
   `tests/data-local/`, then the committed data under `tests/data/` — the path CI
-  takes, which never skips. `pytest` now prints which copy each dataset resolved
+  takes, whose assertions never skip. `pytest` now prints which copy each dataset resolved
   to in its run header, so a green run says which oracle produced it. The
   convention, and what each committed oracle can and cannot assert, is written
   down in `tests/data/README.md`.

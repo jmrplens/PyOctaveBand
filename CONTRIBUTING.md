@@ -92,8 +92,10 @@ redistributable. Each of them keeps a small committed oracle under
 a representative subset) and prefers a full local copy when one is available.
 Resolution order, applied by `tests/oracle_data.py`: the dataset's environment
 variable, then the gitignored `tests/data-local/<dataset>/`, then the committed
-data. **The committed path never skips** — that is what CI runs. `pytest`
-prints which copy each dataset resolved to in its run header.
+data. **The assertions on the committed data never skip** — that is what CI
+runs. Tests that exist only to exercise the full set, and have no committed
+counterpart, do skip there and say so. `pytest` prints which copy each dataset
+resolved to in its run header.
 
 To run a suite against the full original set, drop it in `tests/data-local/`:
 
