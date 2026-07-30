@@ -486,7 +486,11 @@ def _studded_correction(
     coefficients: RoadEmissionCoefficients,
 ) -> NDArray[np.float64]:
     """``dL_studdedtyres,i,m`` of (2.2.6) to (2.2.9), in dB per octave band."""
-    if key != "1" or studded_months <= 0.0 or studded_fraction <= 0.0:
+    if not 0.0 <= studded_fraction <= 1.0:
+        raise ValueError("'studded_fraction' must be a fraction in [0, 1].")
+    if not 0.0 <= studded_months <= 12.0:
+        raise ValueError("'studded_months' must be a number of months in [0, 12].")
+    if key != "1" or studded_months == 0.0 or studded_fraction == 0.0:
         return np.zeros(len(ROAD_OCTAVE_BANDS))
     # (2.2.6): the speed dependence saturates below 50 km/h and above 90 km/h.
     clipped = min(max(speed, 50.0), 90.0)

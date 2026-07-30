@@ -596,6 +596,25 @@ def test_invalid_inputs_are_rejected() -> None:
         line_source_segment_power(np.array([90.0]), 0.0)
 
 
+def test_studded_tyre_inputs_are_range_checked() -> None:
+    """``Q_stud,ratio`` is a fraction and ``T_s`` a share of a 12-month year.
+
+    Outside those ranges ``p_s`` of (2.2.7) leaves [0, 1] and the logarithm of
+    (2.2.8) takes a negative argument, which would silently return NaN.
+    """
+    for fraction in (-0.1, 1.5):
+        with pytest.raises(ValueError, match="fraction in "):
+            road_rolling_noise("1", 60.0, studded_fraction=fraction, studded_months=3.0)
+    for months in (-1.0, 13.0):
+        with pytest.raises(ValueError, match="months in "):
+            road_rolling_noise("1", 60.0, studded_fraction=0.5, studded_months=months)
+    # The check runs for every category, not only the one it can affect.
+    with pytest.raises(ValueError, match="fraction in "):
+        road_rolling_noise("3", 60.0, studded_fraction=2.0)
+    # The two extremes themselves are valid.
+    assert road_rolling_noise("1", 60.0, studded_fraction=1.0, studded_months=12.0).shape == (8,)
+
+
 def test_plot_draws_the_total_and_every_category() -> None:
     import matplotlib.pyplot as plt
 
