@@ -149,7 +149,8 @@ which is the check that enforces the rule; see
 - **The problem:** two independent defects. (a) The displayed male formula
   omits the `− Sstat,i` term that normative Formula (C.3) puts in the
   denominator, and that the same annex fixes at
-  Sstat = 0,029 · 9,81 = 0,281 MPa in the where-list under Formula (C.3).
+  Sstat = 0,029 · 9,81 = 0,281 MPa in the sentence that follows the where-list
+  of Formula (C.3).
   Evaluated exactly as
   displayed the sum gives R = 1,1497, which prints as 1,15, not the printed
   1,22; restoring the missing term gives 1,2168 with the printed
