@@ -29,7 +29,9 @@ Ran locally, same as CI:
 
 Regenerated where this change touches them:
 
-- [ ] `make conformance`, with `docs/CONFORMANCE.md` committed
+- [ ] `make conformance`, with `docs/CONFORMANCE.md` and everything else it
+      rewrites committed (it also updates the counts quoted in `.zenodo.json`,
+      `docs/` and the site frontmatter, so never edit those by hand)
 - [ ] `make api-docs`, with `site/src/content/docs/reference/api/` and
       `site/src/generated/api-sidebar.mjs` committed
 - [ ] `make llms`, with `llms.txt`, `llms-full.txt` and the shards under

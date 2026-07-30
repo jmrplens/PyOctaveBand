@@ -8,6 +8,14 @@
  * what stops a guide from still claiming last quarter's count after the
  * report has moved on.
  *
+ * Page *bodies*, that is. Frontmatter is static YAML, parsed before MDX
+ * compiles, so the meta descriptions and the JSON-LD blocks declared there
+ * cannot import this module however the page is authored. Those, and the
+ * plain-markdown mirror under `docs/`, and the `.zenodo.json` description, are
+ * rewritten instead by `scripts/check_conformance_claims.py --write`, which
+ * `make conformance` runs right after regenerating the report. Between the two
+ * mechanisms nothing states the counts by hand.
+ *
  * Parsing rather than importing a JSON sidecar keeps the report a single
  * artefact: one generator, one file, no second thing to regenerate.
  */
