@@ -86,7 +86,11 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from numpy.typing import ArrayLike
 
-from .._internal.validation import require_choice, require_positive
+from .._internal.validation import (
+    require_choice,
+    require_finite_array,
+    require_positive,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -304,11 +308,9 @@ def impact_force_exposure_level(
     :return: The impact force exposure level ``LFE``, in dB re 1 N.
     :raises ValueError: for a malformed record or a non-positive parameter.
     """
-    f = np.atleast_1d(np.asarray(force, dtype=np.float64))
-    if f.ndim != 1 or f.size < 2:
+    f = require_finite_array(force, "force")
+    if f.size < 2:
         raise ValueError("'force' must be a 1-D record of at least two samples.")
-    if not np.all(np.isfinite(f)):
-        raise ValueError("'force' must contain only finite values.")
     fs = require_positive(sample_rate, "sample_rate")
     f0 = require_positive(reference_force, "reference_force")
     tref = require_positive(reference_time, "reference_time")
@@ -371,15 +373,13 @@ def check_heavy_impact_source(
     :raises ValueError: for an unknown source or a wrong number of bands.
     """
     spec = heavy_impact_source_specification(source)
-    measured = np.atleast_1d(np.asarray(force_exposure_level, dtype=np.float64))
+    measured = require_finite_array(force_exposure_level, "force_exposure_level")
     n = len(spec.frequencies)
     if measured.shape != (n,):
         raise ValueError(
             f"'force_exposure_level' must hold {n} octave-band values "
             f"(31,5 Hz to 500 Hz)."
         )
-    if not np.all(np.isfinite(measured)):
-        raise ValueError("'force_exposure_level' must contain only finite values.")
     nominal = np.asarray(spec.force_exposure_level, dtype=np.float64)
     tol = np.asarray(spec.tolerance, dtype=np.float64)
     deviation = measured - nominal
@@ -433,10 +433,8 @@ def fast_reverberation_correction(
     :return: The correction per band, in dB.
     :raises ValueError: for a non-positive reverberation time.
     """
-    t = np.atleast_1d(np.asarray(reverberation_time, dtype=np.float64))
-    if t.ndim != 1 or t.size == 0:
-        raise ValueError("'reverberation_time' must be a non-empty 1-D array.")
-    if np.any(t <= 0.0) or not np.all(np.isfinite(t)):
+    t = require_finite_array(reverberation_time, "reverberation_time")
+    if np.any(t <= 0.0):
         raise ValueError("'reverberation_time' must be positive and finite.")
     t0 = require_positive(reference_time, "reference_time")
     c = t / _FAST_FACTOR
@@ -512,21 +510,17 @@ def standardized_maximum_impact_level(
     :return: A :class:`StandardizedMaximumImpactResult`.
     :raises ValueError: for mismatched shapes or non-positive inputs.
     """
-    li = np.atleast_1d(np.asarray(level, dtype=np.float64))
-    if li.ndim != 1 or li.size == 0:
-        raise ValueError("'level' must be a non-empty 1-D array.")
-    if not np.all(np.isfinite(li)):
-        raise ValueError("'level' must contain only finite values.")
+    li = require_finite_array(level, "level")
     v = require_positive(volume, "volume")
     v0 = require_positive(reference_volume, "reference_volume")
-    t = np.atleast_1d(np.asarray(reverberation_time, dtype=np.float64))
+    t = require_finite_array(reverberation_time, "reverberation_time")
     if t.size == 1:
         t = np.full(li.shape, float(t[0]))
     if t.shape != li.shape:
         raise ValueError("'reverberation_time' must be a scalar or match 'level'.")
     freqs: np.ndarray | None = None
     if frequency is not None:
-        freqs = np.atleast_1d(np.asarray(frequency, dtype=np.float64))
+        freqs = require_finite_array(frequency, "frequency")
         if freqs.shape != li.shape:
             raise ValueError("'frequency' must match 'level'.")
     correction = fast_reverberation_correction(t, reference_time=reference_time)
@@ -557,11 +551,9 @@ def heavy_impact_octave_levels(level: ArrayLike) -> np.ndarray:
     :return: The octave-band levels, in dB.
     :raises ValueError: when the length is not a positive multiple of three.
     """
-    x = np.atleast_1d(np.asarray(level, dtype=np.float64))
-    if x.ndim != 1 or x.size == 0 or x.size % 3 != 0:
+    x = require_finite_array(level, "level")
+    if x.size % 3 != 0:
         raise ValueError("'level' must be a 1-D array whose length is a multiple of 3.")
-    if not np.all(np.isfinite(x)):
-        raise ValueError("'level' must contain only finite values.")
     return np.asarray(
         10.0 * np.log10(np.sum(10.0 ** (x.reshape(-1, 3) / 10.0), axis=1)),
         dtype=np.float64,
@@ -631,11 +623,7 @@ def a_weighted_maximum_impact_level(
     :return: An :class:`AWeightedMaximumImpactResult`.
     :raises ValueError: for a wrong number of values or mismatched bands.
     """
-    x = np.atleast_1d(np.asarray(level, dtype=np.float64))
-    if x.ndim != 1:
-        raise ValueError("'level' must be a 1-D array.")
-    if not np.all(np.isfinite(x)):
-        raise ValueError("'level' must contain only finite values.")
+    x = require_finite_array(level, "level")
     if band is None:
         band = {12: "third", 4: "octave"}.get(x.size, "")
         if not band:
@@ -652,7 +640,7 @@ def a_weighted_maximum_impact_level(
             f"({bands[0]:g} Hz to {bands[-1]:g} Hz)."
         )
     if frequency is not None:
-        given = np.atleast_1d(np.asarray(frequency, dtype=np.float64))
+        given = require_finite_array(frequency, "frequency")
         if given.shape != bands.shape or not np.allclose(given, bands):
             raise ValueError(
                 f"'frequency' must be the ISO 717-2 Annex D rating bands for "

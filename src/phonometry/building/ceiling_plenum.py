@@ -19,12 +19,15 @@ as ``exp(-m x)`` with the power attenuation coefficient
 ceiling length on both sides gives (Eq. (9.18))::
 
     tau_cl = sS sR tauS tauR LR / (mS LS mR LR h)
-             * (1 - exp(-2 mS LS)) (1 - exp(-2 m'R LR))
+             * (1 - exp(-eps mS LS)) (1 - exp(-eps m'R LR))
 
 with the receiving-side coefficient increased by the leakage back into the room,
-``m'R = mR + sR tauR / h`` (Eq. (9.17)). For a plenum with little attenuation
-(``mS LS``, ``mR LR`` << 1) and ``sS = sR = 0,5`` this collapses to the compact
-result that makes the geometry visible (Eqs. (9.19) and (9.20))::
+``m'R = mR + sR tauR / h`` (Eq. (9.17)). Vigran prints the exponents with a
+factor 2 for totally reflecting plenum sidewalls and states that totally
+absorbing ones give the same expression "without the factor 2", so the factor is
+the same ``eps`` that the compact form carries. For a plenum with little
+attenuation (``mS LS``, ``mR LR`` << 1) and ``sS = sR = 0,5`` it collapses to
+the result that makes the geometry visible (Eqs. (9.19) and (9.20))::
 
     tau_cl = eps**2 tauS tauR LR / (4 h)
     Rcl    = RS + RR - 10 lg[eps**2 LR / (4 h)]
@@ -75,7 +78,11 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from numpy.typing import ArrayLike
 
-from .._internal.validation import require_choice, require_positive
+from .._internal.validation import (
+    require_choice,
+    require_finite_array,
+    require_positive,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -112,17 +119,22 @@ _MAX_DEFICIENCY_SUM = 32.0
 #: Maximum deficiency at any one frequency, ASTM E413-22 clause 5.4.2, in dB.
 _MAX_SINGLE_DEFICIENCY = 8.0
 
-#: Sidewall reflection cases of Vigran Eq. (9.19): the constant ``eps``.
+#: Sidewall reflection cases of Vigran Eqs. (9.18) and (9.19): the constant
+#: ``eps``, which is both the prefactor of the compact form and the factor in
+#: the exponents of the attenuated one.
 _SIDEWALLS: dict[str, float] = {"absorbing": 1.0, "reflecting": 2.0}
 
 
-def _band_values(values: ArrayLike, name: str) -> np.ndarray:
-    a = np.atleast_1d(np.asarray(values, dtype=np.float64))
-    if a.ndim != 1 or a.size == 0:
-        raise ValueError(f"'{name}' must be a non-empty 1-D array.")
-    if not np.all(np.isfinite(a)):
-        raise ValueError(f"'{name}' must contain only finite values.")
-    return a
+def _require_split(value: float, name: str) -> float:
+    """Require a power-split ratio in ``(0, 1]`` (Vigran Section 9.2.3.2).
+
+    ``sS`` and ``sR`` are the fraction of the power injected into the plenum
+    that heads towards the partition, so a value above 1 is not a split.
+    """
+    ratio = require_positive(value, name)
+    if ratio > 1.0:
+        raise ValueError(f"'{name}' must be a power split in (0, 1].")
+    return ratio
 
 
 def normalized_ceiling_attenuation(
@@ -148,11 +160,11 @@ def normalized_ceiling_attenuation(
     :return: The normalized ceiling attenuation ``Dn,c`` per band, in dB.
     :raises ValueError: for mismatched shapes or a non-positive area.
     """
-    l1 = _band_values(level_source, "level_source")
-    l2 = _band_values(level_receiving, "level_receiving")
+    l1 = require_finite_array(level_source, "level_source")
+    l2 = require_finite_array(level_receiving, "level_receiving")
     if l1.shape != l2.shape:
         raise ValueError("'level_source' and 'level_receiving' must share their shape.")
-    area = _band_values(absorption_area, "absorption_area")
+    area = require_finite_array(absorption_area, "absorption_area")
     if area.size == 1:
         area = np.full(l1.shape, float(area[0]))
     if area.shape != l1.shape:
@@ -225,14 +237,14 @@ def ceiling_attenuation_class(
     contour = np.asarray(
         [CEILING_ATTENUATION_CONTOUR[float(b)] for b in bands], dtype=np.float64
     )
-    values = _band_values(attenuation, "attenuation")
+    values = require_finite_array(attenuation, "attenuation")
     if values.shape != bands.shape:
         raise ValueError(
             f"'attenuation' must hold {bands.size} one-third-octave values "
             f"(125 Hz to 4000 Hz)."
         )
     if frequency is not None:
-        given = _band_values(frequency, "frequency")
+        given = require_finite_array(frequency, "frequency")
         if given.shape != bands.shape or not np.allclose(given, bands):
             raise ValueError(
                 "'frequency' must be the 16 ASTM E413 contour bands "
@@ -342,7 +354,8 @@ def plenum_flanking_reduction_index(
     :param ceiling_length: Receiving-side ceiling length ``LR``, in m (> 0).
     :param plenum_height: Plenum height ``h``, in m (> 0).
     :param sidewalls: ``"reflecting"`` (``eps = 2``, Default) or
-        ``"absorbing"`` (``eps = 1``).
+        ``"absorbing"`` (``eps = 1``); ``eps`` scales both the geometry
+        penalty of Eq. (9.20) and the exponents of Eq. (9.18).
     :param frequency: Optional band centre frequencies, in Hz.
     :param attenuation_source: Optional plenum power attenuation coefficient
         ``mS`` per band, in 1/m (> 0); switches to Eq. (9.18).
@@ -350,16 +363,16 @@ def plenum_flanking_reduction_index(
         required together with *attenuation_source*.
     :param source_length: Source-side ceiling length ``LS``, in m
         (Default: equal to *ceiling_length*).
-    :param split_source: Power split ``sS`` towards the partition
-        (Default: 0,5).
-    :param split_receiving: Power split ``sR`` on the receiving side
-        (Default: 0,5).
+    :param split_source: Power split ``sS`` towards the partition, in
+        ``(0, 1]`` (Default: 0,5).
+    :param split_receiving: Power split ``sR`` on the receiving side, in
+        ``(0, 1]`` (Default: 0,5).
     :return: A :class:`PlenumFlankingResult`.
     :raises ValueError: for mismatched shapes, an unknown sidewall case, or a
         non-positive dimension.
     """
-    rs = _band_values(reduction_index_source, "reduction_index_source")
-    rr = _band_values(reduction_index_receiving, "reduction_index_receiving")
+    rs = require_finite_array(reduction_index_source, "reduction_index_source")
+    rr = require_finite_array(reduction_index_receiving, "reduction_index_receiving")
     if rs.shape != rr.shape:
         raise ValueError(
             "'reduction_index_source' and 'reduction_index_receiving' must "
@@ -370,11 +383,11 @@ def plenum_flanking_reduction_index(
     ls = lr if source_length is None else require_positive(source_length, "source_length")
     case = require_choice(sidewalls, "sidewalls", tuple(_SIDEWALLS))
     eps = _SIDEWALLS[case]
-    ss = require_positive(split_source, "split_source")
-    sr = require_positive(split_receiving, "split_receiving")
+    ss = _require_split(split_source, "split_source")
+    sr = _require_split(split_receiving, "split_receiving")
     freqs: np.ndarray | None = None
     if frequency is not None:
-        freqs = _band_values(frequency, "frequency")
+        freqs = require_finite_array(frequency, "frequency")
         if freqs.shape != rs.shape:
             raise ValueError("'frequency' must match the reduction indices.")
 
@@ -403,8 +416,8 @@ def plenum_flanking_reduction_index(
             ceiling_length=lr,
         )
 
-    ms = _band_values(attenuation_source, "attenuation_source")
-    mr = _band_values(attenuation_receiving, "attenuation_receiving")
+    ms = require_finite_array(attenuation_source, "attenuation_source")
+    mr = require_finite_array(attenuation_receiving, "attenuation_receiving")
     if ms.shape != rs.shape or mr.shape != rs.shape:
         raise ValueError("the attenuation coefficients must match the reduction indices.")
     if np.any(ms <= 0.0) or np.any(mr <= 0.0):
@@ -448,7 +461,7 @@ def partition_referenced_reduction_index(
     :return: The partition-referenced ``Rcl,p`` per band, in dB.
     :raises ValueError: for a non-positive dimension.
     """
-    rcl = _band_values(reduction_index, "reduction_index")
+    rcl = require_finite_array(reduction_index, "reduction_index")
     hs = require_positive(room_height, "room_height")
     ls = require_positive(room_length, "room_length")
     return np.asarray(rcl + 10.0 * np.log10(hs / ls), dtype=np.float64)

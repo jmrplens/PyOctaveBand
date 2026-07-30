@@ -87,6 +87,26 @@ def require_positive_array(x: ArrayLike, name: str) -> np.ndarray:
     return arr
 
 
+def require_finite_array(x: ArrayLike, name: str) -> np.ndarray:
+    """Coerce *x* to a non-empty 1-D float64 array of finite values.
+
+    The sign-agnostic sibling of :func:`require_positive_array`, for the
+    level-like quantities (dB values, corrections) that may legitimately be
+    negative but never NaN.
+
+    :param x: The input (scalar or 1-D array-like).
+    :param name: Parameter name used in the error message.
+    :return: The validated ``float64`` array (at least 1-D).
+    :raises ValueError: for an empty, multi-dimensional or non-finite input.
+    """
+    arr = np.atleast_1d(np.asarray(x, dtype=np.float64))
+    if arr.ndim != 1 or arr.size == 0:
+        raise ValueError(f"'{name}' must be a non-empty 1-D array.")
+    if not np.all(np.isfinite(arr)):
+        raise ValueError(f"'{name}' must contain only finite values.")
+    return arr
+
+
 def require_1d_signal(x: ArrayLike, name: str = "signal") -> np.ndarray:
     """Coerce *x* to a float64 array and require a 1-D time series.
 

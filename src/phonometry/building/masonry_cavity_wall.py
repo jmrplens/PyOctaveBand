@@ -67,7 +67,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from numpy.typing import ArrayLike
 
-from .._internal.validation import require_positive
+from .._internal.validation import require_finite_array, require_positive
 from ..vibration.point_mobility import infinite_plate_mobility
 
 if TYPE_CHECKING:
@@ -211,10 +211,8 @@ def wall_tie_coupling_loss_factor(
     :return: A :class:`WallTieCouplingResult`.
     :raises ValueError: for a non-positive input or an unknown tie name.
     """
-    f = np.atleast_1d(np.asarray(frequency, dtype=np.float64))
-    if f.ndim != 1 or f.size == 0:
-        raise ValueError("'frequency' must be a non-empty 1-D array.")
-    if np.any(f <= 0.0) or not np.all(np.isfinite(f)):
+    f = require_finite_array(frequency, "frequency")
+    if np.any(f <= 0.0):
         raise ValueError("'frequency' must be positive and finite.")
     m1 = require_positive(mass1, "mass1")
     require_positive(mass2, "mass2")

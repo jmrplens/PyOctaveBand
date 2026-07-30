@@ -393,6 +393,55 @@ def test_plenum_attenuation_increases_the_reduction_index() -> None:
     assert values == sorted(values)
 
 
+def test_attenuated_model_carries_the_sidewall_factor_in_its_exponents() -> None:
+    """Vigran on Eq. (9.18): absorbing sidewalls drop the factor 2.
+
+    "The other extreme situation, assuming the sidewalls are totally absorbing,
+    gives the same expression, however without the factor 2 in the exponential
+    terms." The reflecting case must therefore be the absorbing one with every
+    exponent doubled, which for a fixed geometry is the same as halving the
+    attenuation coefficients.
+    """
+    kwargs = {"ceiling_length": 4.75, "plenum_height": 0.43}
+    reflecting = plenum_flanking_reduction_index(
+        [50.0], [100.0], sidewalls="reflecting",
+        attenuation_source=[0.2], attenuation_receiving=[0.2], **kwargs,
+    )
+    absorbing = plenum_flanking_reduction_index(
+        [50.0], [100.0], sidewalls="absorbing",
+        attenuation_source=[0.4], attenuation_receiving=[0.4], **kwargs,
+    )
+    # The two exponents then agree exactly; only the 1/(mS LS mR LR) prefactor
+    # differs, and halving both coefficients quadruples it, so the reflecting
+    # case must come out 10 lg 4 = 6,02 dB lower.
+    assert float(reflecting.reduction_index[0]) == pytest.approx(
+        float(absorbing.reduction_index[0]) - 10.0 * np.log10(4.0), abs=1e-6
+    )
+
+
+def test_absorbing_sidewalls_converge_to_their_own_undamped_limit() -> None:
+    """The eps = 1 attenuated form collapses to the eps = 1 compact form."""
+    kwargs = {"ceiling_length": 4.75, "plenum_height": 0.43, "sidewalls": "absorbing"}
+    undamped = plenum_flanking_reduction_index([50.0], [100.0], **kwargs)
+    attenuated = plenum_flanking_reduction_index(
+        [50.0], [100.0], attenuation_source=[1e-5],
+        attenuation_receiving=[1e-5], **kwargs,
+    )
+    assert float(attenuated.reduction_index[0]) == pytest.approx(
+        float(undamped.reduction_index[0]), abs=1e-3
+    )
+
+
+@pytest.mark.parametrize("name", ["split_source", "split_receiving"])
+def test_power_split_must_be_a_fraction(name: str) -> None:
+    """sS and sR are fractions of the injected power, so 1,2 is not a split."""
+    with pytest.raises(ValueError, match=name):
+        plenum_flanking_reduction_index(
+            [30.0], [30.0], ceiling_length=4.75, plenum_height=0.43,
+            **{name: 1.2},
+        )
+
+
 def test_attenuation_coefficients_must_come_in_pairs() -> None:
     with pytest.raises(ValueError, match="together"):
         plenum_flanking_reduction_index(
