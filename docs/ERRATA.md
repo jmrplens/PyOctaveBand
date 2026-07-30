@@ -756,8 +756,7 @@ for the checks that enforce it
   discrete-tone range, which is the duplicated note rather than the NOTE 2
   that states it.
 - **Evidence:** the arithmetic above, and the Table 2/3 ranges and Figure 6
-  axis read side by side with NOTE 2. Renders: `plan/ECMA-418-1_3rd_edition_
-  december_2024.pdf`, PDF page 10, printed p. 2, 300 dpi (clause 4.1.1
+  axis read side by side with NOTE 2. Renders: `plan/ECMA-418-1_3rd_edition_december_2024.pdf`, PDF page 10, printed p. 2, 300 dpi (clause 4.1.1
   NOTE 2), PDF page 25, printed p. 17, 300 dpi (Table 2) and PDF page 28,
   printed p. 20, 220 dpi (Figure 6 and its 11220 tick).
 - **Library behaviour:** uses the internally consistent 89,1 Hz to
@@ -781,8 +780,7 @@ for the checks that enforce it
   `−149,5 − 149,5 f_t − 6,90·10⁻⁵ f_t²`, negative everywhere, instead of a
   band edge a little below `f_t`.
 - **Evidence:** the formula, its own where-list and Table 2 on one page, with
-  Formula (22) as the consistent control. Render: `plan/ECMA-418-1_3rd_
-  edition_december_2024.pdf`, PDF page 25, printed p. 17, 300 dpi.
+  Formula (22) as the consistent control. Render: `plan/ECMA-418-1_3rd_edition_december_2024.pdf`, PDF page 25, printed p. 17, 300 dpi.
 - **Library behaviour:** implements the `C_L,1` reading, which is the only one
   that returns a usable band edge, with a code note in
   [`tonality.py`](../src/phonometry/psychoacoustics/tonality.py).
@@ -803,8 +801,7 @@ for the checks that enforce it
   for the band edges: the critical bandwidth itself is Formula (2), and
   Formula (3) is the relation `f_2 − f_1 = Δf_c` that turns it into band
   edges.
-- **Evidence:** the rendered clause. Render: `plan/ECMA-418-1_3rd_edition_
-  december_2024.pdf`, PDF page 20, printed p. 12, 300 dpi.
+- **Evidence:** the rendered clause. Render: `plan/ECMA-418-1_3rd_edition_december_2024.pdf`, PDF page 20, printed p. 12, 300 dpi.
 - **Library behaviour:** none required; the library implements the critical
   bandwidth from Formulae (3)/(6) directly.
 - **Status:** unreported.
@@ -1240,8 +1237,7 @@ for the checks that enforce it
   definition.
 - **Evidence:** numeric evaluation of Eq. (27) with the printed assignment and
   with the assignment exchanged, against the Table 4 500 Hz cell on the same
-  page. Render: `plan/aircraft-sources/norah2/NORAH2_D1.5d_rotorcraft_noise_
-  modelling_guidance.pdf`, PDF page 20, printed p. 21, 250 dpi.
+  page. Render: `plan/aircraft-sources/norah2/NORAH2_D1.5d_rotorcraft_noise_modelling_guidance.pdf`, PDF page 20, printed p. 21, 250 dpi.
 - **Library behaviour:** implements the correct pairing; the module docstring
   carries a defensive note so the misprint is not transcribed as a "fix".
 - **Status:** unreported.
@@ -1323,8 +1319,7 @@ for the checks that enforce it
   it.
 - **Evidence:** the terms are attenuations in dB, which only Eq. (42)
   produces; Eq. (44) is a dimensionless coefficient consumed by Eq. (42).
-  Renders: `plan/aircraft-sources/norah2/NORAH2_D1.5d_rotorcraft_noise_
-  modelling_guidance.pdf`, PDF page 31, printed p. 32, 250 dpi, and PDF
+  Renders: `plan/aircraft-sources/norah2/NORAH2_D1.5d_rotorcraft_noise_modelling_guidance.pdf`, PDF page 31, printed p. 32, 250 dpi, and PDF
   page 32, printed p. 33, 250 dpi.
 - **Library behaviour:** evaluates the image-path and direct diffraction
   terms with Eq. (42), using Eq. (44) for C″ inside it.
@@ -1399,8 +1394,7 @@ for the checks that enforce it
   `c = 1412 + 3.21 T + 1.19 S + 0.0167 D`, introduced by "where c is the sound
   speed (m/s), given approximately by".
 - **Evidence:** the block's own use of `c` two lines above, and the source
-  paper. Renders: `plan/underwater-sources/Fundamentals-of-acoustical-
-  oceanography.pdf`, PDF page 131, printed p. 110, 300 dpi, and
+  paper. Renders: `plan/underwater-sources/Fundamentals-of-acoustical-oceanography.pdf`, PDF page 131, printed p. 110, 300 dpi, and
   `plan/underwater-sources/Francois-Garrison-1982-P2-boric-acid-total-absorption-equation-JASA72.pdf`,
   PDF page 8, 300 dpi.
 - **Library behaviour:** unaffected; the absorption model takes the sound
@@ -1423,7 +1417,10 @@ for the checks that enforce it
 - **Evidence:** recomputation of both bracket variants against Eq. (4),
   Eq. (3a) and the Fig. 1 curve; the exact Bessel solution of Eq. (2) agrees
   with Eq. (4) within Maa's stated ~6 % only with the 3² form (the 1 form
-  errs by >30 % at low k).
+  errs by >30 % at low k). Render: `plan/[Maa_1998_JASA] potential of
+  microperforated panel absorber.pdf`, PDF page 2, printed p. 2862, 500 dpi,
+  which carries Eq. (4) with `(3² + k²/2)^(−1/2)` and Eq. (5b) with
+  `[1 + k²/2]^(−1/2)` fifteen lines apart on the same column.
 - **Library behaviour:** implements the exact Eq. (2) (no approximation), so
   the misprint does not enter the code; the regression test
   ``test_maa_exact_vs_wide_range_approximation`` pins the exact solution to
@@ -1827,7 +1824,14 @@ for the checks that enforce it
 - **Evidence:** the 10 dB offset is exactly one decade of ``10 lg(eta)``, and
   the frequency dependence of the printed pair independently fixes
   fc = 4939 Hz against the Appendix 4 value of 4885 Hz. The eight values below
-  coincidence reproduce exactly from Eq. (3.104) and do not involve eta.
+  coincidence reproduce exactly from Eq. (3.104) and do not involve eta. The
+  discrepancy is a decade in a printed exponent, so the two figures were read
+  as images rather than through the text layer. Renders:
+  `plan/books/vibration/Norton & Karczub (2003) Fundamentals of Noise and
+  Vibration Analysis for Engineers 2e (CUP).pdf`, PDF page 600, printed
+  p. 580, 300 dpi (the problem statement, "a structural loss factor of
+  ~1.5 × 10⁻²"), and PDF page 631, printed p. 611, 250 dpi (the answer table,
+  27 dB at 8 kHz and 38,6 dB at 16 kHz in both columns).
 - **Library behaviour:** the regression test uses eta = 1,5·10⁻³, the value
   the printed answers require
   ([`tests/building/test_panel_transmission.py`](../tests/building/test_panel_transmission.py)).

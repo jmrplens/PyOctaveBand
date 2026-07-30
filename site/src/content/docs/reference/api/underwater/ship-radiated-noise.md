@@ -168,11 +168,13 @@ Tabulated expanded source-level uncertainty (ISO 17208-2 §5), in dB.
 
 5 dB for the low-frequency bands (the standard lists 10 Hz-100 Hz; values
 below 10 Hz reuse it), 3 dB for the mid-frequency bands (125 Hz-16 kHz)
-and 4 dB for the high-frequency bands. The standard's own wording leaves
-the 20 kHz band unassigned (its high band starts "above 20 000 Hz");
-this implementation takes the conservative reading and applies the 4 dB
-high-band value from just above 16 kHz. These are representative values,
-not exact.
+and 4 dB for the high-frequency bands. Part 2 prints its high band as
+"> 20 000 Hz", which leaves the 20 kHz band itself unassigned; Part 1,
+from which the values are taken, prints ">= 20 000 Hz". This
+implementation follows Part 1, so the 4 dB high-band value applies from
+the 20 kHz band upwards (the cut is written at 16 kHz because no
+one-third-octave band lies between the two). These are representative
+values, not exact.
 
 **Parameters**
 

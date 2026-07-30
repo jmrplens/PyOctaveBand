@@ -272,6 +272,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   about a constant, coefficient, exponent or symbol may rest on text extracted
   from a PDF: extraction drops radicals silently, so the page is rendered as
   an image at 600 dpi and read.
+- Two checks over `docs/ERRATA.md`, and a contributor tool for the sources it
+  cites. `scripts/check_errata_evidence.py` requires every entry to name the
+  page render its claim rests on (file, PDF page, printed folio, dpi) or to sit
+  on an explicit, shrinking allowlist with a reason, and separately flags any
+  multiplicative claim whose ratio lands within 0,5 % of `√2`, `√3`, `π`, `2π`,
+  `1/√2`, `ln 2` or a small integer, which is the arithmetic signature of a
+  glyph lost in extraction rather than an author's error. A flagged entry has
+  to cite a render; the allowlist does not excuse it. It runs in CI as the
+  `errata-evidence` job. `scripts/glyph_census.py` is the companion tool, not a
+  gate: it reports whether a document's text layer emits any `√` or `−` at all,
+  and counts the C0 control characters and Latin-1 ligature stand-ins that mark
+  a broken encoding, so that a source can be screened before anything is quoted
+  from it. `CONTRIBUTING.md` states the rule the two enforce.
+
+- A test that can tell `combined_tone_level` (ISO/PAS 20065 Formula (17) with
+  Anmerkung 2) from a plain union sum. The Annex E "2 FG" oracle cannot: its
+  three tones occupy disjoint line runs, so counting each line once and summing
+  the three tone levels give the same 72,15 dB. The new case pairs tones whose
+  runs coincide and tones whose runs nest, in the same committed spectrum, and
+  pins the exact gap an implementation without the deduplication would open
+  (10 lg 2 and 2,91 dB). Removing the deduplication now fails the suite.
 
 - Room-to-room noise reduction (`noise_control/room_to_room.py`, Norton &
   Karczub 2003 Section 4.9): `room_to_room_transmission` composes the whole
@@ -1020,6 +1041,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `0000-0003-1250-6212` and the canonical Person document fetched from jmrp.io
   hold, so the citation form and the name record are meant to differ and
   neither needs changing.
+
+- `docs/ERRATA.md` is now anchored on page renders. Every claim that turns on
+  the exact characters of a formula, constant, symbol, inequality or table cell
+  has been re-read from a rendered image of the cited page, and each Evidence
+  bullet records the render it rests on: source file, PDF page index, printed
+  folio and dpi. The reason is that PDF text extraction deletes glyphs without
+  saying so. Of the twenty-five source documents the registry cites, twenty-two
+  emit no `√` at all over their whole text layer, so `f_T/√2` extracts as
+  `f_T/2`; eleven emit no `−` either, and one textbook returns every `+` as
+  `þ`. Eight further defects were found in the process and registered:
+  EN 12354-3:2000 Formula (5), whose reduced form prints `0,32 V` where the
+  standard's own `A0 = 10 m²` and `T0 = 0,5 s` give `0,032 V`, a straight 10 dB
+  (the library never used the reduced form, and the identical Formula (3) of
+  Part 2 prints it correctly); ECMA-418-1 Formula (21), which repeats the
+  constant term `C_L,0` where the linear coefficient `C_L,1` belongs, making
+  the fit negative everywhere over its middle range; two unresolved
+  word-processor field references typeset in bold in clause 11.3 of the same
+  standard; ISO 12999-2 Table 5, headed "one-third octave" over the ISO 11654
+  octave series its own Table 2 heads "octave"; DIN 45681 Tabellen I.2 and
+  I.10, each carrying one column header with the wrong spectrum index; the
+  sound speed printed as `q` in Medwin & Clay Eq. (3.4.30) where the same block
+  divides by `c`; the displayed male example of ISO 2631-5 Annex C, which drops
+  the `− S_stat` term of Formula (C.3) and as displayed gives R = 1,15 against
+  its own printed 1,22; and three further cells of ISO 717-2 Table C.2 that the
+  800 Hz misprint propagates into, plus the last digit of the Table C.1 energy
+  sum. Thirteen entries whose finding stands but whose stated evidence did not
+  have their arguments replaced, among them the ISO/PAS 20065 edge-steepness
+  entry, which had the two edges the wrong way round because the DIN radicals
+  it was compared against had been eaten by extraction, and the Long Eq. 13.28
+  entry, which claimed a 100 dB discriminator for a level that is identically
+  independent of the velocity in question. Two ANSI S3.5-1997 entries and one
+  EN 12354-3 attribution now say plainly what they rest on.
 
 - The filter-bank reuse test asserts the property it is named after instead of a
   stopwatch. It used to compare `time.time()` deltas and require the class-based

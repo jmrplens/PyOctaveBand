@@ -157,6 +157,87 @@ Optionally run `make install-hooks` once to install a pre-commit hook that does
 this automatically when relevant sources change; the CI check is the enforcement,
 the hook is just convenience.
 
+### 6. Filing an errata entry
+
+`docs/ERRATA.md` records every defect this project claims to have found in a
+published standard, guidance document, textbook or paper. Each entry is a
+permanent, public statement about a named issuing body or a living author, so
+it carries a higher evidential bar than the rest of the documentation.
+
+> **The render rule.** Every errata entry whose claim depends on the exact
+> characters of a formula, constant, coefficient, symbol, inequality or table
+> cell must be verified against a **rendered image** of the cited page, and its
+> Evidence bullet must record that render: source file, PDF page index,
+> printed folio, and dpi. Extracted text may locate a page; it may never be
+> quoted as "the print". Establish the page offset empirically. Before filing,
+> run the entry's own arithmetic against the familiar irrationals: if the ratio
+> between printed and derived is within 0,5 % of √2, √3, π, 2π, 1/√2, ln 2 or a
+> small integer, treat the entry as unproven until the page has been read as an
+> image, because that ratio is the signature of a lost glyph rather than an
+> author's error.
+
+The rule exists because text extraction silently deletes glyphs. Of the
+twenty-five source documents whose renders the registry cites, twenty-two emit
+no `√` (U+221A) at all over their whole text layer, so every radical in them
+extracts as if it were not there: `f_T/√2` becomes `f_T/2`. Eleven of the
+twenty-five emit no `−` (U+2212) either, while emitting ASCII hyphens, and
+several replace `+` with a `þ` ligature. One entry was published on that basis
+and accused an author of
+printing `2/(3 π)` where the page prints `2/(√3 π)`; three independent
+extractors agreed with each other and all three were wrong. The registry's
+own ISO/PAS 20065 entry is the live example: `pdftotext` reads DIN 45681's
+`f_T/√2` back as `f_T/2` on both edges, which makes the DIN and ISO prints look
+identical when they are not.
+
+Practical notes:
+
+- Render with `pypdfium2` (or any renderer) into a **private temporary
+  directory per call**. Writing intermediate images to a fixed path and reading
+  back "the last one" races with any other render running at the same time and
+  can return a page from a different document.
+- 200 dpi is enough to read a heading; use 400 to 1200 dpi for a single
+  formula, especially to tell `+` from `−` or to see a radical.
+- The page offset differs per document and drifts inside one document
+  (books omit blank versos), so confirm the printed folio on the render itself
+  rather than assuming a constant offset.
+- Write the render as `Render: \`plan/<file>.pdf\`, PDF page N, printed p. M,
+  D dpi.` at the end of the Evidence bullet. Two checks read that line.
+
+Two checks run in CI over the registry
+([`scripts/check_errata_evidence.py`](scripts/check_errata_evidence.py)):
+
+```bash
+python scripts/check_errata_evidence.py          # both checks
+python scripts/check_errata_evidence.py --ratios # only the irrational-ratio linter
+```
+
+1. **The ratio linter** parses each entry for printed-versus-derived value
+   pairs and flags any ratio within 0,5 % of √2, √3, π, 2π, 1/√2, ln 2 or a
+   small integer. A flagged entry is not necessarily wrong — a genuine
+   factor-of-ten misprint trips it too — but it must then say, in the same
+   entry, that the page was read as an image. The retracted entry above tripped
+   it twice on its own text.
+2. **The render-evidence check** requires every entry to name a render or to be
+   listed, with a reason, in the allowlist at the top of the script. The
+   allowlist is meant to shrink: do not add to it to get a new entry through.
+
+A third script is a contributor tool rather than a gate:
+
+```bash
+python scripts/glyph_census.py plan/some-standard.pdf ...
+```
+
+It reports, per document, whether the text layer emits any `√` or `−`, and how
+many C0 control characters and `þ ð ¼` ligatures it produces. A maths-bearing
+document with zero `√` has invisible radicals and must not be read through its
+text layer.
+
+An OCR pass over a rendered crop, compared against the extraction, is the
+screen that would have caught the retracted entry directly; `tesseract` is not
+installed in this environment, so it is not wired up. If it is added, the
+comparison has to be **asymmetric**: flag tokens that OCR sees and the
+extraction lacks, which is the direction a dropped glyph shows up in.
+
 ## 🏷️ Naming Conventions
 
 All identifiers follow PEP 8 with the project-specific rules below (validated
