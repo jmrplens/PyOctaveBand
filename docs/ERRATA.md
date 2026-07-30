@@ -332,6 +332,35 @@ to the issuing body, with date and reference).
 - **Library behaviour:** none needed; the numbers are unaffected.
 - **Status:** unreported.
 
+## ISO 12354-1:2017, Table D.1 (1 600 Hz covered by two rows)
+
+- **Location:** Annex D, Table D.1 (printed p. 39), which reads the weighted
+  sound reduction index improvement of an interior lining off its resonance
+  frequency.
+- **The print:** the last two rows are "630 to 1 600 -> -10" and
+  "1 600 <= f0 <= 5 000 -> -5".
+- **The problem:** 1 600 Hz belongs to both rows, with different values, and
+  Clause D.2.2 requires f0 to be rounded to a one-third-octave centre, so
+  1 600 Hz is a value the table is actually read at rather than an unreachable
+  edge. Every other boundary in the table is a distinct band centre (200, 250,
+  315, 400, 500 Hz), and no other pair of rows overlaps.
+- **Evidence:** the printed table itself; the two rows are adjacent and share
+  the endpoint verbatim. Neither row can be discarded, because 630 Hz to
+  1 250 Hz has no other entry and 2 000 Hz to 5 000 Hz has none either, so the
+  intended reading is one of "630 to 1 250" or "1 600 < f0 <= 5 000".
+- **Library behaviour:** `weighted_lining_improvement` returns the more
+  conservative -10 dB at exactly 1 600 Hz and -5 dB above it, with the
+  ambiguity named in the docstring and pinned in
+  [`tests/building/test_resilient_layers.py`](../tests/building/test_resilient_layers.py).
+- **Status:** unreported.
+
+- **Related, not an erratum:** NOTE 1 of the same table sets a floor of 0 dB
+  on the 30 Hz to 160 Hz branch `74,4 - 20 lg(f0) - Rw/2`. Inside the validity
+  box Clause D.2.2 states for the table (30 Hz <= f0 <= 160 Hz,
+  20 dB <= Rw <= 60 dB) the branch never reaches it: its minimum is
+  74,4 - 20 lg(160) - 60/2 = 0,32 dB. The floor is therefore inactive for
+  every input the table is stated for.
+
 ## ISO 15186-1:2000, Clause 3.9, Formula (8) (sign of the 10 lg N term)
 
 - **Location:** Clause 3.9, Formula (8), the intensity element normalized
@@ -1166,6 +1195,31 @@ to the issuing body, with date and reference).
   ([`tests/noise_control/test_hvac_long.py`](../tests/noise_control/test_hvac_long.py))
   and the conformance check "Long 2e Eqs. 13.27-13.33".
 - **Status:** unreported (textbook rather than a standard).
+
+## Vigran, Building Acoustics (2008), Eq. (8.46) (coefficient of the Ver model)
+
+- **Non-normative source** (textbook).
+- **Location:** section 8.4.1, printed p. 309 / pdf p. 331, the "approximate
+  expression" for the improvement of impact sound insulation of a floating
+  floor on discrete resilient mounts.
+- **The print:** `DeltaLn ~= 10 lg[2 cL1 h1 eta1 N/(3 pi) * f^3/f0^4]`,
+  presented as Eq. (8.45) with the floating slab's point impedance inserted.
+- **The problem:** Eq. (8.45)'s dominant term is
+  `Z1 eta1 N f^3/(2 pi m1 f0^4)`, and for an infinite thin plate
+  `Z1 = 8 sqrt(B1 m1) = 2,31 rho cL h^2 = 2,31 m1 cL h`. Substituting gives
+  the coefficient `2,31/(2 pi) = 0,366`, not `2/(3 pi) = 0,212`. The printed
+  form is therefore 1,73 times too small, a fixed 2,4 dB offset; Eq. (8.45)
+  itself is correct and is identical to Hopkins Eq. (4.118).
+- **Evidence:** algebraic substitution of `f0 = sqrt(N s/m1)/(2 pi)` into
+  Eq. (8.45) reduces it exactly to Hopkins Eq. (4.118),
+  `10 lg(2,3 rhos1^2 cL1 h1 eta1 S1 omega^3/(N k^2))`; the two books agree
+  term for term. Only Vigran's own simplified Eq. (8.46) departs, and by a
+  constant factor, which is the signature of a substitution slip rather than a
+  different model.
+- **Library behaviour:** `resilient_mount_improvement` implements Eq. (8.45) /
+  Eq. (4.118), and the cross-source identity is pinned in
+  [`tests/building/test_resilient_layers.py`](../tests/building/test_resilient_layers.py).
+- **Status:** unreported.
 
 ## Norton & Karczub, Fundamentals of Noise and Vibration Analysis for Engineers 2e (2003), Eq. (6.56)
 
