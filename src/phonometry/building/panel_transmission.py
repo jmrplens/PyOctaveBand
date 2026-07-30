@@ -76,7 +76,11 @@ from numpy.typing import ArrayLike
 from scipy.integrate import quad
 from scipy.special import ellipe
 
-from .._internal.validation import require_choice, require_positive
+from .._internal.validation import (
+    require_choice,
+    require_non_negative,
+    require_positive,
+)
 from ..vibration.radiation_efficiency import coincidence_frequency
 
 if TYPE_CHECKING:
@@ -1050,6 +1054,7 @@ def mass_spring_mass_resonance(
     gap: float,
     *,
     cavity_medium: PorousMediumResult | None = None,
+    tie_stiffness_per_area: float = 0.0,
     speed_of_sound: float = _SPEED_OF_SOUND,
     air_density: float = _AIR_DENSITY,
 ) -> float:
@@ -1061,12 +1066,21 @@ def mass_spring_mass_resonance(
     (near-isothermal) bulk modulus at the lowest supplied frequency sets a
     softer ``s'' = Re(K_e) / d``, lowering ``f0``.
 
+    An array of mechanical connections across the cavity (wall ties in a
+    masonry cavity wall, resilient mounts under a floating floor) acts as a
+    spring **in parallel** with the cavity, adding ``N k / S`` to ``s''``
+    (Hopkins Eq. 4.89). Pass that term as *tie_stiffness_per_area*; the helper
+    :func:`phonometry.wall_tie_stiffness_per_area` builds it from a tie density
+    and Hopkins' Table A4.
+
     :param mass1: Surface density of leaf 1 ``m1``, in kg/m^2 (> 0).
     :param mass2: Surface density of leaf 2 ``m2``, in kg/m^2 (> 0).
     :param gap: Cavity depth ``d``, in m (> 0).
     :param cavity_medium: Optional porous fill (a
         :class:`~phonometry.materials.PorousMediumResult`) whose effective bulk
         modulus sets the cavity stiffness.
+    :param tie_stiffness_per_area: Stiffness per unit area ``N k / S`` of a
+        connection array bridging the cavity, in N/m^3 (>= 0, Default: 0).
     :param speed_of_sound: Speed of sound in air ``c0`` (Default: 343 m/s).
     :param air_density: Air density ``rho0`` (Default: 1.205 kg/m^3).
     :return: The mass-spring-mass resonance ``f0``, in hertz.
@@ -1075,6 +1089,7 @@ def mass_spring_mass_resonance(
     m1 = require_positive(mass1, "mass1")
     m2 = require_positive(mass2, "mass2")
     d = require_positive(gap, "gap")
+    ties = require_non_negative(tie_stiffness_per_area, "tie_stiffness_per_area")
     c0 = require_positive(speed_of_sound, "speed_of_sound")
     rho0 = require_positive(air_density, "air_density")
     if cavity_medium is None:
@@ -1087,7 +1102,7 @@ def mass_spring_mass_resonance(
         if stiffness <= 0.0:
             raise ValueError("'cavity_medium' bulk modulus must be positive.")
     reduced = (m1 + m2) / (m1 * m2)
-    return float(np.sqrt(stiffness * reduced) / (2.0 * np.pi))
+    return float(np.sqrt((stiffness + ties) * reduced) / (2.0 * np.pi))
 
 
 def double_wall_transmission_loss(
@@ -1098,6 +1113,7 @@ def double_wall_transmission_loss(
     *,
     loss_factor: float = 0.1,
     cavity_medium: PorousMediumResult | None = None,
+    tie_stiffness_per_area: float = 0.0,
     band: str = "third",
     speed_of_sound: float = _SPEED_OF_SOUND,
     air_density: float = _AIR_DENSITY,
@@ -1110,6 +1126,11 @@ def double_wall_transmission_loss(
     ``20 lg(2 k d)``; above ``f_l`` they add plus 6 dB. The curve is continuous
     at ``f_l`` (``20 lg(2 k d) = 6`` there).
 
+    Ties or mounts bridging the cavity stiffen it (Hopkins Eq. 4.89), pushing
+    ``f0`` up and extending the combined-mass branch; pass their stiffness per
+    unit area as *tie_stiffness_per_area* (see
+    :func:`phonometry.wall_tie_stiffness_per_area`).
+
     :param frequency: Band centre frequencies ``f``, in hertz (array, > 0).
     :param mass1: Surface density of leaf 1 ``m1``, in kg/m^2 (> 0).
     :param mass2: Surface density of leaf 2 ``m2``, in kg/m^2 (> 0).
@@ -1118,6 +1139,8 @@ def double_wall_transmission_loss(
         for the coincidence extension and reported for reference.
     :param cavity_medium: Optional porous fill; see
         :func:`mass_spring_mass_resonance`.
+    :param tie_stiffness_per_area: Stiffness per unit area ``N k / S`` of a
+        connection array bridging the cavity, in N/m^3 (>= 0, Default: 0).
     :param band: Band width for the field correction (``"third"``/``"octave"``).
     :param speed_of_sound: Speed of sound in air ``c0`` (Default: 343 m/s).
     :param air_density: Air density ``rho0`` (Default: 1.205 kg/m^3).
@@ -1134,6 +1157,7 @@ def double_wall_transmission_loss(
 
     f0 = mass_spring_mass_resonance(
         m1, m2, d, cavity_medium=cavity_medium,
+        tie_stiffness_per_area=tie_stiffness_per_area,
         speed_of_sound=c0, air_density=rho0,
     )
     f_l = c0 / (2.0 * np.pi * d)
