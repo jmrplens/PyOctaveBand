@@ -117,6 +117,7 @@ the affected images together with the code change:
 
 ```bash
 make graphs   # runs both: python scripts/generate_graphs.py && python scripts/generate_diagrams.py
+make figures  # the same generation, then the legibility and staleness checks CI runs
 ```
 
 When adding a feature with visual output, add a `generate_*` function to
