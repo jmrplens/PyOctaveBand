@@ -199,13 +199,14 @@ SIIResult.report(
 
 Render an ANSI S3.5-1997 speech-intelligibility-index fiche to a PDF.
 
-Writes a one-page speech-audibility report: a standard-basis line, an
-optional metadata header block, a per-one-third-octave-band table (the
-equivalent speech spectrum `Ei'`, the band-importance function `Ii`
-of Table 3 and the band-audibility function `Ai`) beside the
-audibility and importance-weighted contribution bars (the result's own
-`plot`), the boxed `SII = X` single number, an optional verdict
-row and a footer with the fixed disclaimer.
+Writes a one-page speech-audibility report: a standard-basis line
+naming the band procedure, an optional metadata header block, a per-band
+table over that procedure's bands (the equivalent speech spectrum
+`Ei'`, the band-importance function `Ii` and the band-audibility
+function `Ai`) beside the audibility and importance-weighted
+contribution bars (the result's own `plot`), the boxed
+`SII = X` single number, an optional verdict row and a footer with the
+fixed disclaimer.
 
 **Parameters**
 
