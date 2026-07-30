@@ -1725,12 +1725,16 @@ to the issuing body, with date and reference).
   the printed 1500 Hz. Read as the modulus it is right at neither: `|mu_b|`
   is 1,002 at 50 Hz but *rises* to 1,008 by 400 Hz before turning over, and
   only reaches 0,82 at 2634 Hz, 76 % above the printed frequency. No
-  admissible reading of the printed inputs closes that gap: with the loss
-  factor at 0 or 0,2, the viscous length halved or doubled, the resistivity
+  admissible reading of the printed inputs closes that gap. With the loss
+  factor at 0 or at 0,2, the viscous length halved or doubled,
+  `Lambda' = 2 Lambda` in place of the printed 1,1e-4 m, the resistivity
   halved or doubled, the tortuosity at 1 or the Poisson coefficient at 0,3,
-  `|mu_b(1500)|` moves only between 0,67 and 1,07, and every one of those
-  variants also breaks the 495 Hz branch crossing or the `|mu_a| > 40` of the
-  same page.
+  `|mu_b(1500)|` moves only between 0,874 and 1,073. The closest of the eight,
+  0,874 at zero loss factor, is still 6,6 % from the printed 0,82, and it
+  loses the 495 Hz branch crossing of the same section altogether; the only
+  variant that keeps that crossing (`Lambda' = 2 Lambda`, 495,2 Hz) leaves
+  `|mu_b|` at 0,937. Reading the sentence as `Re(mu_b)` needs no variant at
+  all.
 - **Library behaviour:** `biot_waves` computes `mu_b` from Eq. (6.71) as
   printed. The conformance row and
   `test_frame_borne_velocity_ratio_matches_the_two_published_values` are
