@@ -185,7 +185,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
   The implemented text is the consolidated one: the equations of (EU) 2015/996,
   the 63 Hz to 8 kHz octave-band range restored by the corrigendum of OJ L 5,
-  10.1.2018, and Tables F-1 and F-4 as replaced by (EU) 2021/1226 — which is
+  10.1.2018, and Tables F-1 and F-4 as replaced by (EU) 2021/1226, which is
   worth 2,5 to 3,5 dB(A) against the tables published in 2015. Every shipped
   table names the instrument it comes from, and both coefficient objects
   (`RoadEmissionCoefficients`, `RoadSurfaceCoefficients`) can be replaced, which
@@ -196,8 +196,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the CIRCABC road emission workbook are committed under `tests/data/cnossos/`
   with the 2015 coefficient tables they were computed with, and the shipped
   equations reproduce every published band level to 0,005 dB, inside the two
-  decimals the workbook prints. What the workbook cannot reach — the studded
-  speed branches, the gradient breakpoints, the 20 km/h floor — is pinned on
+  decimals the workbook prints. What the workbook cannot reach (the studded
+  speed branches, the gradient breakpoints, the 20 km/h floor) is pinned on
   the exact closed forms, and the current Appendix F tables are pinned against
   a machine transcription of the Official Journal. New guide "CNOSSOS-EU road
   traffic source emission" with the source-line spectrum and the
