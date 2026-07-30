@@ -813,8 +813,9 @@ measured-versus-shifted-ISO 717-reference curve and the boxed single number
 annexes the ISO 717 evaluation per band (the value, the shifted reference and
 the unfavourable deviation). A `requirement` supplied on the `ReportMetadata`
 adds a verdict (`Dn,f,w` passes at or above it, `Ln,f,w` at or below it), and
-`language="es"` renders every fiche in Spanish. reportlab is required
-(`pip install phonometry[report]`).
+`language="es"` renders every fiche in Spanish. reportlab is required, and
+matplotlib too for the figure the fiche embeds (`pip install
+"phonometry[report,plot]"`).
 
 ```python
 import numpy as np

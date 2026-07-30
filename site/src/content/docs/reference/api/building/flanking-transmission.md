@@ -280,7 +280,7 @@ measurement statement, an optional requirement verdict and a footer.
 | Exception | When |
 | :--- | :--- |
 | ValueError | If `engine` is unknown, `part` is not 2, 3 or 4, or the result has no single-number rating (the band count is neither 16 nor 5). |
-| ImportError | If reportlab is not installed (`pip install phonometry[report]`). |
+| ImportError | If reportlab is not installed (`pip install phonometry[report]`), or matplotlib is missing for the embedded figure (`pip install phonometry[plot]`). |
 
 ## FlankingLevelDifferenceResult
 
@@ -354,7 +354,7 @@ measurement statement, an optional requirement verdict and a footer.
 | Exception | When |
 | :--- | :--- |
 | ValueError | If `engine` is unknown, `part` is not 2, 3 or 4, or the result has no single-number rating (the band count is neither 16 nor 5). |
-| ImportError | If reportlab is not installed (`pip install phonometry[report]`). |
+| ImportError | If reportlab is not installed (`pip install phonometry[report]`), or matplotlib is missing for the embedded figure (`pip install phonometry[plot]`). |
 
 ## modal_density
 
@@ -782,4 +782,4 @@ excluded from the single number.
 | Exception | When |
 | :--- | :--- |
 | ValueError | If `engine` is unknown or the result carries no band centre frequencies. |
-| ImportError | If reportlab is not installed (`pip install phonometry[report]`). |
+| ImportError | If reportlab is not installed (`pip install phonometry[report]`), or matplotlib is missing for the embedded figure (`pip install phonometry[plot]`). |

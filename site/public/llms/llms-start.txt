@@ -33,6 +33,12 @@ leaves unavailable are the figures (`.plot()` and the filter response plots),
 the normative PDF fiches (`.report()`) and the compiled kernel that speeds up
 the `impulse` time weighting.
 
+One caveat about `[full]`: numba declares `numpy<2.5`, so `phonometry[full]`
+(like `phonometry[perf]`) resolves NumPy below 2.5 while a plain install gets
+the newest release. numba only makes the `impulse` time weighting faster, so if
+you would rather keep NumPy current, install `phonometry[plot,report]` and
+leave `[perf]` out.
+
 **Option 2: Cloning and Installing**
 
 ```bash
@@ -212,7 +218,7 @@ level.
 | 200 ms | −1.0 | −0.98 | +0.02 | ✅ PASS |
 | 50 ms | −4.8 | −4.82 | −0.02 | ✅ PASS |
 | 10 ms | −11.1 | −11.14 | −0.04 | ✅ PASS |
-| 1 ms | −20.9 | −20.99 | −0.09 | ✅ PASS |
+| 1 ms | −21.0 | −20.99 | +0.01 | ✅ PASS |
 
 **python-acoustics results (FAST, squared signal passed as required by that
 library):**
@@ -222,7 +228,7 @@ library):**
 | 200 ms | −1.0 | −0.97 | +0.03 | ✅ PASS |
 | 50 ms | −4.8 | −3.93 | **+0.87** | ⚠️ FAIL |
 | 10 ms | −11.1 | −10.90 | +0.20 | ✅ PASS |
-| 1 ms | −20.9 | −20.90 | +0.00 | ✅ PASS |
+| 1 ms | −21.0 | −20.90 | +0.10 | ✅ PASS |
 
 phonometry maintains high precision across all test cases. The block-based
 approach deviates significantly (> 0.8 dB) for the 50 ms burst because 125 ms
@@ -291,7 +297,7 @@ sample from the metrology core:
 | IEC 61672-1:2013 Table 5 | `lc_peak()` one-cycle/half-cycle peak responses, class 1 limits | `tests/metrology/test_levels.py` |
 | IEC 61260-1:2014 Table 1 | Filter-bank class 1/2 acceptance limits via `verify_filter_class()` | `tests/metrology/test_compliance.py` |
 | ISO 7196:1995 Table 2 | G weighting (infrasound) at every nominal response value, 0.25–315 Hz | `tests/metrology/test_g_weighting.py` |
-| ISO 226:2023 Annex B | Equal-loudness contours, loudness levels and hearing threshold against the Annex B tables | `tests/psychoacoustics/test_loudness_contours.py` |
+| ISO 226:2023 Table 1 and Annex B | Equal-loudness contours and loudness levels against the Annex B tables, hearing threshold against the Table 1 `T_f` parameters | `tests/psychoacoustics/test_loudness_contours.py` |
 | ECMA-418-1:2024 | TNR/PR tone prominence: critical bandwidths, proximity spacing and prominence criteria against the worked examples in clauses 10–12 | `tests/psychoacoustics/test_tonality.py` |
 | ISO 1996-1:2016 | `lden()`, `ldn()` and `composite_rating_level()` against hand-computed formula values | `tests/environmental/test_environmental.py` |
 | IEC 60942:2017 Table 2 | Calibrator short-term stability limits (frequency-dependent, class 1) in `sensitivity()` | `tests/metrology/test_calibration_validation.py` |
@@ -327,8 +333,11 @@ wrong equation.
 
 Those cases are not quietly patched. Each confirmed one is written down in
 [Standards errata](https://jmrplens.github.io/phonometry/reference/errata/) with the printed edition and the exact location,
-what the document says, why it cannot be right, the independent evidence, the
-reading the library implements, and the regression test that pins that reading.
+what the document says, why it cannot be right, the independent evidence and
+the reading the library implements. Where that reading changes a number the
+library reports, the entry names the check or test that pins it; where it does
+not, because the defect is a label, a cross-reference or a table the library
+never reads, the entry says so instead.
 There are dozens of them now, across standards, guidance documents, textbooks
 and journal papers, each marked as reported to the issuing body or not. A
 defect listed there is never a defect of the method: in every case the intended
@@ -342,23 +351,30 @@ nothing in the port ever notices.
 
 - **python-acoustics** was archived in February 2024 and is no longer
   maintained. Its comparison above reflects the last released code.
-- **acoustic-toolbox**, the community successor to python-acoustics, depends
-  on phonometry for its weighted level computations rather than reimplementing
+- **acoustic-toolbox**, the community successor to python-acoustics, builds
+  its IEC 61672-1 time and frequency weighting on `pyoctaveband`, the former
+  name of this library, which since 2.1.0 is a shim over phonometry. It is only
+  the filters that it takes from here: its own `weighting.py` still carries
+  hard-coded one-third-octave A and C weighting tables.
+- **MoSQITo** focuses on psychoacoustic sound-quality metrics and covers a
+  good part of that ground already: Zwicker loudness, ECMA-418-2 loudness and
+  roughness, DIN 45692 sharpness, ECMA-74 tone-to-noise and prominence ratio,
+  and the ANSI S3.5 speech intelligibility index. phonometry implements the
+  same family, and adds ISO 532-2 and ISO 532-3 loudness, ECMA-418-2 tonality,
+  fluctuation strength and the Fastl & Zwicker annoyance model, none of which
+  MoSQITo exports. What differs most is the setting. Here those metrics sit in
+  the same conformance harness as the metrology core and compose directly with
+  the weighting filters, ballistics, band filtering and calibration that feed
   them.
-- **MoSQITo** focuses on psychoacoustic sound-quality metrics (loudness,
-  sharpness, roughness). That used to be a clean split, and it no longer is:
-  phonometry now implements the same family, with ISO 532-1, ISO 532-2 and
-  ISO 532-3 loudness, ECMA-418-2 tonality, roughness and fluctuation strength,
-  DIN 45692 sharpness and the Fastl & Zwicker annoyance model. What differs is
-  the setting. Here those metrics sit in the same conformance harness as the
-  metrology core and compose directly with the weighting filters, ballistics,
-  band filtering and calibration that feed them.
 - **pyroomacoustics** simulates room impulse responses for audio and machine
   learning pipelines (image sources, ray tracing, beamforming, direction of
-  arrival). phonometry's room and simulation modules answer the measurement
-  question instead: its image-source and FDTD solvers are pinned to published
-  closed forms, and what comes out of them goes through the same ISO 3382
-  parameter analysis as a measured impulse response.
+  arrival), and it does reach the measurement side too, with sweep-based
+  impulse-response acquisition and an RT60 estimator. What it does not carry is
+  the ISO 3382 parameter set. phonometry's image-source and FDTD solvers are
+  pinned to published closed forms, and the image-source impulse response goes
+  through the same `room_parameters` analysis (EDT, T20, T30, C50, C80, D50,
+  Ts, per band, with the ISO 3382 decay-range validity flags) as a measured
+  one.
 
 If your work needs numbers you can defend against a standard's tolerance
 table, whether for measurement reports, environmental assessments or
@@ -1857,8 +1873,11 @@ $$
 
 ### Band-edge placement
 
-For every architecture the bank places the **−3 dB points on the band edges**.
-Two cases need special handling:
+Every architecture is designed on the band edges themselves, at whichever
+gain that architecture defines its edge frequency: **−3 dB** for Butterworth,
+Chebyshev II and Bessel, and the **passband ripple edge** (`ripple` dB, 0.1 dB
+by default) for Chebyshev I and elliptic, which are equiripple in the passband
+and have no −3 dB point there. Two cases need special handling:
 
 - **Chebyshev II**: scipy's `Wn` is the *stopband* edge. phonometry maps the
   desired −3 dB edges to stopband edges analytically (the prototype transition
@@ -1874,15 +1893,19 @@ To ensure **100% stability** across the entire audible spectrum (even at low
 frequencies like 16 Hz with high sample rates), phonometry employs two
 critical strategies:
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow.svg" alt="Data flow inside one band of the filter bank: a low band, whose centre frequency is far below half the sample rate, takes the resample_poly decimation branch to fs over M so its poles stay clear of the unit circle, every band is then a cascade of second-order sections with the minus 3 dB points on the band edges rather than one high-order transfer function, both branches end in the band level in dB, and sigbands=True additionally returns the band signal at the input rate" width="92%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow.svg" alt="Data flow inside one band of the filter bank: a band with room to decimate, meaning half the sample rate still clears 1.25 times its upper edge, takes the resample_poly branch down to fs over M so its poles stay clear of the unit circle, every band is then a cascade of second-order sections designed on the IEC 61260-1 band edges rather than one high-order transfer function, both branches end in the band level in dB, and sigbands=True additionally returns the band signal brought back to the input rate" width="92%"></picture>
 
 1. **Second-Order Sections (SOS):** All filters are implemented as a series of
    cascaded biquads. This avoids the catastrophic numerical precision loss
    associated with high-order transfer functions (coefficients a, b).
-2. **Multi-rate Decimation:** For low-frequency bands, the signal is
-   automatically downsampled (decimated) before filtering and upsampled
-   afterwards. This keeps the digital pole locations far from the unit circle
-   boundary, preventing oscillation and noise. Chebyshev II banks reserve extra
+2. **Multi-rate Decimation:** Whenever half the sample rate still clears the
+   band's upper edge by a factor of 1.25, the signal is automatically
+   downsampled (decimated) by `M = floor[(fs / 2) / (1.25 * f_upper)]` before
+   filtering, which is most bands rather than only the low ones (29 of the 33
+   one-third-octave bands at 48 kHz). This keeps the digital pole locations far
+   from the unit circle boundary, preventing oscillation and noise. The band
+   level is computed on the decimated signal; only `sigbands=True` brings the
+   band signal back to the input rate, with `resample_poly(M, 1)`. Chebyshev II banks reserve extra
    decimation headroom so their stopband edges stay below the decimated Nyquist.
 
 ## Weighting Curves (IEC 61672-1)
