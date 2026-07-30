@@ -17,10 +17,14 @@
     --sl-content-inline-start: 0rem;
   }
 
-  /* The hero grid is 7fr 4fr even when there is no hero image, which caps the
-     copy at 62 % of a column that is now wide. There is no image here. */
+  /* Starlight's hero grid is 7fr 4fr, which caps the copy at 62 % of a column
+     that is now wide, and it did that whether or not there was an image to put
+     in the second track. The mark is in that track now (Hero.astro), so the
+     split is by content instead of by ratio: the copy takes what is left and
+     the mark takes exactly its own width. */
   [data-has-hero] .hero {
-    grid-template-columns: 100%;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: clamp(2rem, 5vw, 4.5rem);
   }
 }
 

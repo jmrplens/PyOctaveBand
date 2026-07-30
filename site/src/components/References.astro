@@ -94,14 +94,23 @@ function sourceParts(ref: Reference): Part[] {
 	}
 }
 
-/** Full citation as an ordered list of fragments, APA-7 punctuation included. */
+/**
+ * The "Author. (Year)." that opens every entry, kept apart from the rest so the
+ * template can give it the weight a reader scans a bibliography for. It is
+ * always plain text: neither the author position nor the year is ever a link or
+ * italicised, so unlike the rest of the citation it needs no fragments.
+ */
+function opening(ref: Reference): string {
+	const author = who(ref);
+	return `${author.endsWith('.') ? author : `${author}.`} (${yearLabel(ref)}).`;
+}
+
+/** The rest of the citation as fragments, APA-7 punctuation included. */
 function citationParts(ref: Reference): Part[] {
 	const parts: Part[] = [];
-	const author = who(ref);
 	const italicTitle = ref.type === 'article' ? undefined : ('cite' as const);
 
-	parts.push({ text: author.endsWith('.') ? author : `${author}.` });
-	parts.push({ text: ` (${yearLabel(ref)}). ` });
+	parts.push({ text: ' ' });
 	parts.push({ text: ref.title, italic: italicTitle, href: ref.url });
 	const suffix = titleSuffix(ref);
 	if (suffix) parts.push({ text: ` (${suffix})` });
@@ -174,6 +183,7 @@ const sorted = [...references.entries()].sort(([, a], [, b]) =>
 			<ul role="list">
 				{sorted.map(([index, ref]) => (
 					<li id={anchors[index]}>
+						<span class="ref-who">{opening(ref)}</span>
 						{citationParts(ref).map((part) => {
 							const inner =
 								part.italic === 'cite' ? (
@@ -212,10 +222,19 @@ const sorted = [...references.entries()].sort(([, a], [, b]) =>
 }
 
 <style>
-	/* APA hanging indent; keep Starlight's content typography for the rest. */
+	/* A reference list, not more prose.
+	   The entries are set at the body size but on the tighter leading of a
+	   bibliography (1.45 against the page's 1.75) and one step down in size, so
+	   a block of a dozen citations reads as a list of records instead of as
+	   another run of paragraphs. The author and year that open each entry carry
+	   the weight, which is what a reader scans for, and the space between
+	   entries is larger than the space inside one: with the hanging indent that
+	   is what separates one record from the next. */
 	.page-references ul {
 		list-style: none;
 		padding-inline-start: 0;
+		font-size: var(--sl-text-sm);
+		line-height: 1.45;
 	}
 	.page-references li {
 		padding-inline-start: 1.5rem;
@@ -223,7 +242,27 @@ const sorted = [...references.entries()].sort(([, a], [, b]) =>
 		overflow-wrap: break-word;
 	}
 	.page-references li + li {
-		margin-top: 0.75rem;
+		margin-top: 0.7rem;
+	}
+	/* The opening "Author. (Year)." of each entry. Marked in the template so
+	   the weight can never land on the wrong fragment. */
+	.page-references .ref-who {
+		font-weight: 600;
+		color: var(--sl-color-white);
+	}
+	/* Most of an entry is a link (the title, then the DOI), so a full-strength
+	   underline on every row is what made the block look like solid text. It
+	   stays, because colour alone must not be what marks a link, but as a
+	   hairline clear of the descenders; it comes up to full strength on hover
+	   and focus. */
+	.page-references a {
+		text-decoration-thickness: 1px;
+		text-decoration-color: var(--sl-color-gray-4);
+		text-underline-offset: 0.18em;
+	}
+	.page-references a:hover,
+	.page-references a:focus-visible {
+		text-decoration-color: currentColor;
 	}
 	/* Landing spot for the page header chips, declared once for every target
 	   they can point at: the entries, and the section heading that the

@@ -2,40 +2,97 @@
 // Custom Starlight <Footer> override: renders the default footer, then a
 // human-visible maintainer block that corroborates the Person node in the
 // site-wide JSON-LD @graph (GEO: entity corroboration).
+//
+// The block used to be one line of text links separated by middle dots, which
+// on a phone became a single run of words wrapping mid-list. It is now two
+// parts that wrap as units: the credit, and a row of destinations where the two
+// code hosts are marks rather than words. Everything the old line linked to is
+// still linked, from the same URLs.
 import Default from '@astrojs/starlight/components/Footer.astro';
+import { Icon } from '@astrojs/starlight/components';
 
 const path = Astro.url.pathname;
 const lang = path.includes('/es/') || path.endsWith('/es') ? 'es' : 'en';
-const text =
-  lang === 'es'
-    ? 'Creado y mantenido por'
-    : 'Created and maintained by';
+const text = lang === 'es' ? 'Creado y mantenido por' : 'Created and maintained by';
 
 // The maintainer's project index. Gives a reader — and a crawler — a path from
 // this project to the whole portfolio, where every #software node in the
 // identity graph is listed together. Not `rel="me"`: it is a page, not an
 // identity profile.
-const projectsUrl =
-  lang === 'es' ? 'https://jmrp.io/es/projects/' : 'https://jmrp.io/projects/';
+const projectsUrl = lang === 'es' ? 'https://jmrp.io/es/projects/' : 'https://jmrp.io/projects/';
 const projectsText = lang === 'es' ? 'Todos los proyectos' : 'All projects';
+
+// Icon links carry their name in `aria-label` and in `title`, since the mark
+// itself says nothing to a screen reader and nothing to a reader who does not
+// recognise it. The repository and the package are works, so neither takes
+// `rel="me"`; the ORCID record below is an identity page of the same person as
+// the Person node, which is what the attribute is for.
+const marks = [
+	{ href: 'https://github.com/jmrplens/phonometry', label: 'GitHub', icon: 'github' },
+	{ href: 'https://pypi.org/project/phonometry/', label: 'PyPI', icon: 'seti:python' },
+] as const;
 ---
 
 <Default><slot /></Default>
 <div class="maintainer">
-  {text}
-  <a href="https://jmrp.io" rel="author">José M. Requena-Plens</a>
-  · <a href="https://github.com/jmrplens/phonometry">GitHub</a>
-  · <a href="https://pypi.org/project/phonometry/">PyPI</a>
-  · <a href={projectsUrl}>{projectsText}</a>
+	<span class="credit"
+		>{text} <a href="https://jmrp.io" rel="author">José M. Requena-Plens</a></span
+	>
+	<span class="links">
+		{
+			marks.map((mark) => (
+				<a href={mark.href} aria-label={mark.label} title={mark.label}>
+					<Icon name={mark.icon} size="1.15rem" />
+				</a>
+			))
+		}
+		<a class="orcid" href="https://orcid.org/0000-0003-1250-6212" rel="me">ORCID</a>
+		<a class="projects" href={projectsUrl}>{projectsText}</a>
+	</span>
 </div>
 
 <style>
-  .maintainer {
-    margin-top: 1rem;
-    font-size: var(--sl-text-xs);
-    color: var(--sl-color-gray-3);
-  }
-  .maintainer a {
-    color: var(--sl-color-text-accent);
-  }
+	.maintainer {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.4rem 1rem;
+		margin-top: 1rem;
+		font-size: var(--sl-text-xs);
+		color: var(--sl-color-gray-3);
+	}
+	/* One flex item, so the sentence wraps as a sentence and never leaves the
+	   maintainer's name stranded on a line of its own. */
+	.credit {
+		text-wrap: balance;
+	}
+	.links {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.75rem;
+	}
+	.maintainer a {
+		color: var(--sl-color-text-accent);
+	}
+	.links a {
+		display: inline-flex;
+		align-items: center;
+		color: var(--sl-color-gray-3);
+		text-decoration: none;
+	}
+	.links a:hover,
+	.links a:focus-visible {
+		color: var(--sl-color-text-accent);
+	}
+	.orcid {
+		font-family: var(--ph-mono);
+		font-size: var(--sl-text-2xs);
+		letter-spacing: 0.08em;
+	}
+	.projects,
+	.orcid {
+		text-decoration: none;
+		border-bottom: 1px solid var(--ph-border-strong);
+	}
 </style>

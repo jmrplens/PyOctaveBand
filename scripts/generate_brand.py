@@ -335,15 +335,13 @@ TAGLINE = "Acoustic measurement toolkit for Python"
 STRAPLINE = "Conformance-tested against the standards it implements"
 
 
-def text_svg_path(
-    text: str, font: Path, size: float, origin: Point, colour: str,
-) -> str:
-    """One ``<path>`` holding the text as outlines.
+def text_outline(text: str, font: Path, size: float, origin: Point) -> MplPath:
+    """The glyph outlines of ``text``, in SVG coordinates.
 
     Outlines rather than a ``<text>`` element: GitHub renders README SVGs with
     no guarantee about available fonts, so live text falls back to whatever the
     viewer has, or to a serif. Converted glyphs look the same everywhere and
-    need no font embedded.
+    need no font embedded. ``origin`` is the baseline start, as in SVG.
     """
     from matplotlib.font_manager import FontProperties
     from matplotlib.textpath import TextPath
@@ -351,10 +349,16 @@ def text_svg_path(
 
     tp = TextPath((0, 0), text, size=size, prop=FontProperties(fname=str(font)))
     # matplotlib's y axis points up and SVG's points down.
-    flipped = Affine2D().scale(1, -1).translate(*origin).transform_path(tp)
+    return Affine2D().scale(1, -1).translate(*origin).transform_path(tp)
 
+
+def text_svg_path(
+    text: str, font: Path, size: float, origin: Point, colour: str,
+    *, css_class: str = "",
+) -> str:
+    """One ``<path>`` element holding the text as outlines."""
     parts: list[str] = []
-    for verts, code in flipped.iter_segments():
+    for verts, code in text_outline(text, font, size, origin).iter_segments():
         if code == MplPath.MOVETO:
             parts.append(f"M{_fmt(verts[0])} {_fmt(verts[1])}")
         elif code == MplPath.LINETO:
@@ -368,19 +372,45 @@ def text_svg_path(
                          f" {_fmt(verts[4])} {_fmt(verts[5])}")
         elif code == MplPath.CLOSEPOLY:
             parts.append("Z")
-    return f'<path fill="{colour}" d="{"".join(parts)}"/>' 
+    attr = f' class="{css_class}"' if css_class else ""
+    return f'<path{attr} fill="{colour}" d="{"".join(parts)}"/>'
 
 
-def _mark_group(x: float, y: float, scale: float, ink: str, grid_ink: str) -> str:
+def _mark_group(
+    x: float, y: float, scale: float, ink: str, grid_ink: str,
+    *, ink_class: str = "", grid_class: str = "",
+) -> str:
     """The mark, translated and scaled into a larger composition."""
+    ink_attr = f' class="{ink_class}"' if ink_class else ""
+    grid_attr = f' class="{grid_class}"' if grid_class else ""
     return (
         f'<g transform="translate({_fmt(x)} {_fmt(y)}) scale({scale:.4f})">'
-        f'<g fill="none" stroke="{grid_ink}" stroke-width="{_fmt(GRID_STROKE)}">'
+        f'<g{grid_attr} fill="none" stroke="{grid_ink}"'
+        f' stroke-width="{_fmt(GRID_STROKE)}">'
         f'<rect x="{_fmt(GX)}" y="{_fmt(GY)}"'
         f' width="{_fmt(GRID_W)}" height="{_fmt(GRID_W)}"/>'
         f'<path d="{_grid_d()}"/></g>'
-        f'<g fill="{ink}">{_wave_shapes()}</g></g>'
+        f'<g{ink_attr} fill="{ink}">{_wave_shapes()}</g></g>'
     )
+
+
+def _mark_ink_bounds() -> tuple[Point, Point]:
+    """The mark's ink bounds in mark coordinates, as (top-left, bottom-right).
+
+    Not the grid square: the outer rule is drawn on the 192-unit rectangle so
+    half its stroke falls outside, and the wavefronts overshoot the grid on the
+    right, so anything that trims the mark to its ink has to measure it.
+    """
+    half = GRID_STROKE / 2
+    x0, y0 = GX - half, GY - half
+    x1, y1 = GX + GRID_W + half, GY + GRID_W + half
+    for ribbon in RIBBONS:
+        box = _mpl_path(*ribbon_outline(ribbon)).get_extents()
+        x0, y0 = min(x0, box.x0), min(y0, box.y0)
+        x1, y1 = max(x1, box.x1), max(y1, box.y1)
+    x0, y0 = min(x0, SRC_C[0] - SRC_R), min(y0, SRC_C[1] - SRC_R)
+    x1, y1 = max(x1, SRC_C[0] + SRC_R), max(y1, SRC_C[1] + SRC_R)
+    return (x0, y0), (x1, y1)
 
 
 # Artwork the cards are composed over. Generated once and committed, then the
@@ -508,6 +538,51 @@ def card_svg(card: Card, art: Path) -> str:
     )
 
 
+def lockup_svg() -> str:
+    """Mark and wordmark side by side, trimmed to their ink.
+
+    The proportions are the banner's, read from ``banner_layout`` rather than
+    restated, so the header of the documentation site and the card at the top of
+    the README cannot drift apart. Two things differ from the card. The wordmark
+    is emitted as outlines in ``currentColor``, so a page that inlines this
+    asset colours it with the text around it and no web font has to load, which
+    is also why the header cannot shift while it renders. And the viewBox is the
+    ink itself rather than a padded canvas, so the height set in CSS is the
+    height the reader sees, with the spacing left to the layout.
+
+    The mark keeps the brand teals and carries the same class names as the
+    favicon, so a dark ground can restyle it; the ``prefers-color-scheme`` rule
+    is there for the file viewed on its own, and a site with its own theme
+    switch overrides both classes from its stylesheet.
+    """
+    card = banner_layout()
+    word = card.lines[0]
+    scale = card.mark_px / VB
+    (mx0, my0), (mx1, my1) = _mark_ink_bounds()
+    mark = (
+        card.mark_at[0] + mx0 * scale, card.mark_at[1] + my0 * scale,
+        card.mark_at[0] + mx1 * scale, card.mark_at[1] + my1 * scale,
+    )
+    ink = text_outline(word.text, word.font, word.size, word.at).get_extents()
+    x0, y0 = min(mark[0], ink.x0), min(mark[1], ink.y0)
+    width = max(mark[2], ink.x1) - x0
+    height = max(mark[3], ink.y1) - y0
+
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {_fmt(width)}'
+        f' {_fmt(height)}" role="img" aria-label="phonometry">\n'
+        "  <title>phonometry</title>\n"
+        "  <style>@media(prefers-color-scheme:dark){"
+        f".p-ink{{fill:{INK_DARK}}}.p-grid{{stroke:{GRID_INK_DARK}}}"
+        "}</style>\n"
+        f'  <g transform="translate({_fmt(-x0)} {_fmt(-y0)})">\n'
+        f"    {_mark_group(*card.mark_at, scale, INK, GRID_INK, ink_class='p-ink', grid_class='p-grid')}\n"
+        f"    {text_svg_path(word.text, word.font, word.size, word.at, 'currentColor', css_class='p-word')}\n"
+        "  </g>\n"
+        "</svg>\n"
+    )
+
+
 def card_png(dest: Path, card: Card, art: Path, *, scale: int = 1) -> None:
     """The same card as a raster, composed from the same layout and geometry.
 
@@ -610,6 +685,10 @@ def generate_all() -> None:
         (brand / "logo-mono.svg", mark_svg("currentColor", "currentColor",
                                            grid_opacity=0.45)),
         (public / "favicon.svg", mark_svg(theme_aware=True)),
+        # Mark and wordmark as one asset, for the header of the documentation
+        # site: the type is already outlines, so the header needs no web font
+        # and cannot reflow while one loads.
+        (brand / "lockup.svg", lockup_svg()),
     ):
         path.write_text(svg, encoding="utf-8")
         _report(path)

@@ -1,0 +1,168 @@
+---
+/**
+ * Custom Starlight <Pagination> override: previous/next links that say which
+ * section they lead to.
+ *
+ * Thirty-one of the sidebar's entries are called "Overview", one per group,
+ * because a group label cannot itself be a link in Starlight and each group
+ * carries its landing page as a first row instead (see src/data/sidebar.mjs).
+ * Every page next to one of them therefore had a card reading "Next: Overview":
+ * 61 entries of 283, better than one in five, with at least one card that named
+ * no destination, and "Build a sound level meter" sits between two groups and
+ * had "Previous: Overview" and "Next: Overview" at once. Nothing in the labels
+ * can fix that, because they are correct in the sidebar, where the group above
+ * them supplies exactly the context the card was missing.
+ *
+ * So the card carries that context too: the group trail the neighbour sits in,
+ * above its label. It is shown for every entry that belongs to a group rather
+ * than only where two labels would collide, so the reader learns to read the
+ * small line as "where this goes", and a trail deeper than two levels keeps
+ * only its last two, which is as much as the card can hold on a phone.
+ *
+ * The trail is looked up in the same sidebar the page renders, so it follows
+ * the tree without a second list to maintain.
+ */
+import { Icon } from '@astrojs/starlight/components';
+
+/** The shape of the sidebar tree this component walks, narrowed to what it uses. */
+type Entry =
+	| { type: 'link'; href: string; label: string }
+	| { type: 'group'; label: string; entries: Entry[] };
+
+const { dir, pagination, sidebar } = Astro.locals.starlightRoute;
+const { prev, next } = pagination;
+const isRtl = dir === 'rtl';
+
+/** Labels of the groups enclosing `href`, outermost first; null when absent. */
+function groupTrail(entries: Entry[], href: string, trail: string[] = []): string[] | null {
+	for (const entry of entries) {
+		if (entry.type === 'link') {
+			if (entry.href === href) return trail;
+		} else {
+			const found = groupTrail(entry.entries, href, [...trail, entry.label]);
+			if (found) return found;
+		}
+	}
+	return null;
+}
+
+/** The two innermost group labels: enough context, short enough for a card. */
+function context(href: string): string {
+	const trail = groupTrail(sidebar as Entry[], href) ?? [];
+	return trail.slice(-2).join(' / ');
+}
+
+const links = [
+	{
+		link: prev,
+		rel: 'prev',
+		relation: Astro.locals.t('page.previousLink'),
+		icon: isRtl ? 'right-arrow' : 'left-arrow',
+	},
+	{
+		link: next,
+		rel: 'next',
+		relation: Astro.locals.t('page.nextLink'),
+		icon: isRtl ? 'left-arrow' : 'right-arrow',
+	},
+] as const;
+---
+
+<div class="pagination-links print:hidden" dir={dir}>
+	{
+		links.map(({ link, rel, relation, icon }) => {
+			if (!link) return <span class="ph-pag-empty" aria-hidden="true" />;
+			const trail = context(link.href);
+			return (
+				<a href={link.href} rel={rel}>
+					<Icon name={icon} size="1.25rem" />
+					<span class="ph-pag-text">
+						<span class="ph-pag-relation">{relation}</span>
+						{trail && <span class="ph-pag-trail">{trail}</span>}
+						<span class="link-title">{link.label}</span>
+					</span>
+				</a>
+			);
+		})
+	}
+</div>
+
+<style>
+	@layer starlight.core {
+		.pagination-links {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr));
+			gap: 0.75rem;
+		}
+
+		/* Hairline and flat ground, like the rest of the chrome: the default
+		   card leans on a drop shadow, which is the one thing this palette
+		   never uses. */
+		a {
+			display: flex;
+			align-items: center;
+			gap: 0.6rem;
+			padding: 0.75rem 0.9rem;
+			border: 1px solid var(--ph-border);
+			border-radius: var(--ph-radius, 4px);
+			background: var(--ph-surface);
+			text-decoration: none;
+			color: var(--sl-color-gray-2);
+			overflow-wrap: anywhere;
+		}
+		[rel='next'] {
+			justify-content: end;
+			text-align: end;
+			flex-direction: row-reverse;
+		}
+		a:hover {
+			border-color: var(--ph-border-strong);
+			background: var(--ph-surface-raised);
+		}
+		a:hover .link-title {
+			color: var(--sl-color-text-accent);
+		}
+
+		/* An empty grid cell rather than a missing one: without it the single
+		   card on a first or last page stretches across the full width and
+		   stops looking like the pair it belongs to. */
+		.ph-pag-empty {
+			display: none;
+		}
+		@media (min-width: 50rem) {
+			.ph-pag-empty {
+				display: block;
+			}
+		}
+
+		.ph-pag-text {
+			display: flex;
+			flex-direction: column;
+			gap: 0.1rem;
+			min-width: 0;
+		}
+		.ph-pag-relation {
+			font-family: var(--ph-mono, monospace);
+			font-size: var(--sl-text-2xs);
+			letter-spacing: 0.1em;
+			text-transform: uppercase;
+			color: var(--sl-color-gray-3);
+		}
+		.ph-pag-trail {
+			font-size: var(--sl-text-xs);
+			line-height: 1.3;
+			color: var(--sl-color-gray-3);
+		}
+		.link-title {
+			color: var(--sl-color-white);
+			font-size: var(--sl-text-lg);
+			font-weight: 600;
+			line-height: 1.25;
+		}
+
+		svg {
+			flex-shrink: 0;
+			color: var(--sl-color-gray-3);
+		}
+	}
+</style>
