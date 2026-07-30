@@ -1,0 +1,51 @@
+---
+/**
+ * Custom Starlight <SiteTitle> override: the brand lockup instead of the plain
+ * text title.
+ *
+ * Starlight's own `logo` option was the other route, and it cannot produce this
+ * result: it takes an image file, so the mark would arrive as an <img> that
+ * neither follows the theme nor lets the wordmark be set in the brand's display
+ * face, and `replacesTitle` would drop the text without giving anything back to
+ * a screen reader. The lockup carries both in one generated asset, with the
+ * wordmark already converted to outlines, so no web font is fetched and nothing
+ * reflows once the page has painted.
+ *
+ * The accessible name comes from the visually hidden label inside the link, so
+ * the header still announces the site title, and the document <title> and all
+ * other metadata are untouched.
+ */
+import BrandLockup from './BrandLockup.astro';
+
+const { siteTitle, siteTitleHref } = Astro.locals.starlightRoute;
+---
+
+<a href={siteTitleHref} class="site-title sl-flex">
+	<BrandLockup asset="lockup" label={siteTitle} />
+</a>
+
+<style>
+	@layer starlight.core {
+		.site-title {
+			align-items: center;
+			color: var(--sl-color-text-accent);
+			text-decoration: none;
+			min-width: 0;
+		}
+		/* One number sets the whole lockup: the asset is trimmed to its ink, so
+		   this is the height the reader sees, and the width follows from the
+		   viewBox. The phone step keeps it clear of the search field on a
+		   360 px bar. */
+		.site-title :global(svg) {
+			display: block;
+			height: 2.05rem;
+			width: auto;
+			max-width: 100%;
+		}
+		@media (min-width: 50rem) {
+			.site-title :global(svg) {
+				height: 2.4rem;
+			}
+		}
+	}
+</style>

@@ -1,0 +1,34 @@
+---
+/**
+ * The generated brand assets, inlined.
+ *
+ * `.github/brand/lockup.svg` (mark plus wordmark) and `.github/brand/logo.svg`
+ * (mark alone) are written by scripts/generate_brand.py from the same geometry
+ * as the favicon, the icons and the README card. They are read from there at
+ * build time rather than copied into the site, so the repository holds one copy
+ * of the artwork and the header cannot fall behind the generator.
+ *
+ * Inlined rather than linked as an `img` for three reasons: the wordmark's
+ * outlines take `currentColor` and so follow the text colour of whatever they
+ * sit in, the mark's two teals are restyled per theme through the `p-ink` and
+ * `p-grid` classes (src/styles/brand.css), and the markup arrives with the
+ * page, so the header paints once instead of reflowing when an image lands.
+ */
+import { brandSvg, type BrandAsset } from '../lib/brand';
+
+interface Props {
+	/** Which generated asset to inline. */
+	asset?: BrandAsset;
+	/** Accessible name, rendered visually hidden. Omit when the parent names it. */
+	label?: string;
+	class?: string;
+}
+
+const { asset = 'lockup', label, class: className } = Astro.props;
+const svg = brandSvg(asset);
+---
+
+<span class:list={['ph-brand', `ph-brand-${asset}`, className]}>
+	<Fragment set:html={svg} />
+	{label && <span class="sr-only" translate="no">{label}</span>}
+</span>

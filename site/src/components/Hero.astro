@@ -1,0 +1,27 @@
+---
+/**
+ * Custom Starlight <Hero> override: the default hero, with the mark supplied
+ * for its image slot.
+ *
+ * Placed here rather than in the landing page's frontmatter because the asset
+ * is generated: frontmatter would need the artwork pasted into it, and it would
+ * have to be pasted again into the Spanish page. Filling the slot the theme
+ * already has also means the mark is laid out by the theme, in the empty right
+ * column of the two-column hero on a wide screen and above the title on a
+ * phone, instead of by a rule of ours that would have to track it.
+ *
+ * The mark is decoration here: the H1 beside it is the name, in text, so the
+ * SVG is inlined with no accessible name of its own (see src/lib/brand.ts).
+ */
+import Default from '@astrojs/starlight/components/Hero.astro';
+import { brandSvg } from '../lib/brand';
+
+const { data } = Astro.locals.starlightRoute.entry;
+if (data.hero && !data.hero.image) {
+	data.hero.image = {
+		html: `<span class="ph-brand ph-brand-mark">${brandSvg('mark')}</span>`,
+	};
+}
+---
+
+<Default />

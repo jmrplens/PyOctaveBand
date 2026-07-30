@@ -476,12 +476,22 @@ export default defineConfig({
         // Default H1 plus the page header chips run derived from the page's
         // own `references` frontmatter (see TOC-REDESIGN-NOTES.md).
         PageTitle: './src/components/PageTitle.astro',
+        // The generated brand lockup (mark plus wordmark) in place of the
+        // plain text site title.
+        SiteTitle: './src/components/SiteTitle.astro',
+        // Previous/next links that name the section each neighbour belongs to.
+        Pagination: './src/components/Pagination.astro',
+        // Default splash hero plus the mark in its image slot.
+        Hero: './src/components/Hero.astro',
       },
       customCss: [
         // The site palette. Unlayered, so its `:root` blocks win over
         // Starlight's `@layer starlight.base` defaults; loaded first so the
         // later sheets can still reference the tokens it defines.
         './src/styles/theme.css',
+        './src/styles/typography.css',
+        './src/styles/brand.css',
+        './src/styles/see-also.css',
         './src/styles/katex.css',
         './src/styles/containment.css',
         './src/styles/theme-images.css',

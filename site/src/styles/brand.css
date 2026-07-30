@@ -1,0 +1,49 @@
+/* ------------------------------------------------------------------ *
+ * The mark, wherever it is inlined (header lockup, landing hero).
+ *
+ * The generated SVGs carry the light-ground teals as presentation attributes
+ * and a `prefers-color-scheme` rule for when the file is opened on its own.
+ * Neither is right here: the site has its own theme switch, which can disagree
+ * with the operating system in both directions. These two rules settle it,
+ * with a class selector on each side so they outrank the media rule inside the
+ * asset, and one pair of tokens per theme so the mark cannot drift from the
+ * palette in src/styles/theme.css.
+ * ------------------------------------------------------------------ */
+:root {
+  /* Dark ground: the mid teal muddies against it, so both roles lighten. */
+  --ph-mark-ink: #5ecbe6;
+  --ph-mark-grid: #1c7fa0;
+}
+:root[data-theme='light'] {
+  --ph-mark-ink: #0a6f8c;
+  --ph-mark-grid: #35b8d8;
+}
+
+.ph-brand .p-ink {
+  fill: var(--ph-mark-ink);
+}
+.ph-brand .p-grid {
+  stroke: var(--ph-mark-grid);
+}
+/* The wordmark is outlines filled with currentColor, so it inherits from the
+   element it is placed in and needs no rule of its own. */
+
+/* The mark alone, as the landing hero's figure.
+   On a wide screen it fills the second column of the theme's two-column hero,
+   which the landing page has always left empty. On a phone that column becomes
+   a band above the title, and there the mark is deliberately small: the first
+   screen belongs to the sentence that says what the library does, not to a
+   240 px logo pushing it below the fold. */
+.hero .hero-html {
+  width: min(38%, 7rem);
+}
+.ph-brand-mark svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+@media (min-width: 50rem) {
+  .hero .hero-html {
+    width: min(100%, 15rem);
+  }
+}
