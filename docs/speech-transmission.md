@@ -241,8 +241,9 @@ optional verdict row and a footer with the fixed disclaimer. It uses the same
 [Insulation ratings](insulation-ratings.md#report-metadata-reportmetadata)) and
 rendering engine as the ISO 717 insulation fiche; a supplied `requirement` is
 read as the minimum required STI (a higher STI passes). Rendering needs
-reportlab (`pip install phonometry[report]`); only `engine="reportlab"` is
-supported. Pass `language="es"` for a Spanish fiche.
+reportlab and, for the figure the fiche embeds, matplotlib (`pip install
+"phonometry[report,plot]"`); only `engine="reportlab"` is supported. Pass
+`language="es"` for a Spanish fiche.
 
 ```python
 from phonometry import hearing, ReportMetadata

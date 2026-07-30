@@ -124,12 +124,13 @@ ratings](insulation-ratings.md#report-metadata-reportmetadata)) and rendering
 engine as the ISO 717 insulation fiche; a supplied `requirement` is read as the
 certification EPNL limit in EPNdB (the EPNL passes at or below it), and
 `metadata=None` produces a lightweight prediction fiche with no verdict row.
-Rendering needs reportlab (`pip install phonometry[report]`); only
-`engine="reportlab"` is supported. The fiche renders in English by default;
-pass `language="es"` for a Spanish fiche (translated fixed strings and a comma
-decimal separator), e.g. `res.report("epnl_fiche_es.pdf", language="es")`. The
-fiche is a computational EPNL result and is not an official State noise
-certificate; it does not reproduce any TCDSN.
+Rendering needs reportlab and, for the figure the fiche embeds, matplotlib (`pip
+install "phonometry[report,plot]"`); only `engine="reportlab"` is supported. The
+fiche renders in English by default; pass `language="es"` for a Spanish fiche
+(translated fixed strings and a comma decimal separator), e.g.
+`res.report("epnl_fiche_es.pdf", language="es")`. The fiche is a computational
+EPNL result and is not an official State noise certificate; it does not
+reproduce any TCDSN.
 
 ```python
 from phonometry import effective_perceived_noise_level, ReportMetadata

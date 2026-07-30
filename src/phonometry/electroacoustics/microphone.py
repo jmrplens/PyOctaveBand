@@ -357,7 +357,8 @@ class MicrophoneCharacteristics:
         :raises ValueError: If ``engine`` is not ``"reportlab"`` or ``language``
             is unknown.
         :raises ImportError: If reportlab is not installed
-            (``pip install phonometry[report]``).
+            (``pip install phonometry[report]``), or matplotlib is missing for
+            the embedded figure (``pip install phonometry[plot]``).
         """
         from .._i18n import check_language
 

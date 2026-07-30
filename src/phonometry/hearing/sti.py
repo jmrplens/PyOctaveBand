@@ -155,7 +155,8 @@ class STIResult:
         :raises ValueError: If ``engine`` is not ``"reportlab"`` or
             ``language`` is not a supported language.
         :raises ImportError: If reportlab is not installed
-            (``pip install phonometry[report]``).
+            (``pip install phonometry[report]``), or matplotlib is missing for
+            the embedded figure (``pip install phonometry[plot]``).
         """
         from .._i18n import check_language
 

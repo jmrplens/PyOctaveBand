@@ -294,9 +294,9 @@ una fila de veredicto opcional y un pie con el descargo fijo. Usa el mismo
 contenedor `ReportMetadata` y el mismo motor que la
 [ficha de aislamiento de ISO 717](/phonometry/es/guides/insulation-ratings/#informe-de-iso-717-report);
 un `requirement` indicado se interpreta como el STI mínimo exigido (un STI mayor
-cumple). La generación necesita reportlab (`pip install phonometry[report]`);
-solo se admite `engine="reportlab"`. Pasa `language="es"` para la ficha en
-español.
+cumple). La generación necesita reportlab y, para la figura que incrusta la
+ficha, matplotlib (`pip install "phonometry[report,plot]"`); solo se admite
+`engine="reportlab"`. Pasa `language="es"` para la ficha en español.
 
 ```python
 from phonometry import hearing, ReportMetadata

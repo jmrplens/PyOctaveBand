@@ -276,10 +276,11 @@ the number of source and microphone positions to be reported), alongside
 `test_room`, `specimen`, `area`, `instrumentation`, `temperature`,
 `relative_humidity`, `pressure`, `measurement_standard`, `test_date`,
 `laboratory`, `operator`, `report_id` and `notes`. Passing `metadata=None`
-produces a bare characterisation fiche. Rendering needs reportlab
-(`pip install phonometry[report]`); only `engine="reportlab"` is supported. The
-fiche renders in English by default; pass `language="es"` for a Spanish fiche
-(translated fixed strings and a comma decimal separator).
+produces a bare characterisation fiche. Rendering needs reportlab and, for the
+figure the fiche embeds, matplotlib (`pip install "phonometry[report,plot]"`);
+only `engine="reportlab"` is supported. The fiche renders in English by default;
+pass `language="es"` for a Spanish fiche (translated fixed strings and a comma
+decimal separator).
 
 ```python
 from phonometry import room, ReportMetadata

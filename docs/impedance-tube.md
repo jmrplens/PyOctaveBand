@@ -326,10 +326,11 @@ descriptive and geometric `ReportMetadata` fields are `client`, `manufacturer`,
 `test_date`, `temperature`, `pressure`, `measurement_standard`, `laboratory`,
 `operator`, `report_id` and `notes` (`tube_diameter` and `mic_spacing` are given
 in metres and printed in millimetres). The `requirement` field is ignored
-(ISO 10534-2 has no verdict). Rendering needs reportlab
-(`pip install phonometry[report]`); only `engine="reportlab"` is supported. The
-fiche renders in English by default; pass `language="es"` for a Spanish fiche
-(translated fixed strings and a comma decimal separator).
+(ISO 10534-2 has no verdict). Rendering needs reportlab and, for the figure the
+fiche embeds, matplotlib (`pip install "phonometry[report,plot]"`); only
+`engine="reportlab"` is supported. The fiche renders in English by default; pass
+`language="es"` for a Spanish fiche (translated fixed strings and a comma
+decimal separator).
 
 ```python
 from phonometry import materials, ReportMetadata

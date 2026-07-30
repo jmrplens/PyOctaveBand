@@ -348,9 +348,10 @@ estado de ocupación), `area`, `instrumentation`, `temperature`,
 `relative_humidity`, `pressure`, `measurement_standard`, `test_date`,
 `laboratory`, `operator`, `report_id` y `notes`. Al pasar `metadata=None` se
 obtiene una ficha de caracterización mínima. El renderizado necesita reportlab
-(`pip install phonometry[report]`); solo se admite `engine="reportlab"`. La
-ficha se genera en inglés por defecto; pasa `language="es"` para una ficha en
-español (cadenas fijas traducidas y separador decimal de coma).
+y, para la figura que incrusta la ficha, matplotlib (`pip install
+"phonometry[report,plot]"`); solo se admite `engine="reportlab"`. La ficha se
+genera en inglés por defecto; pasa `language="es"` para una ficha en español
+(cadenas fijas traducidas y separador decimal de coma).
 
 ```python
 from phonometry import room, ReportMetadata

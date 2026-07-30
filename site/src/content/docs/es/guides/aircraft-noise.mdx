@@ -148,10 +148,11 @@ contenedor `ReportMetadata` y el mismo motor de renderizado que la
 [ficha de aislamiento de ISO 717](/phonometry/es/guides/insulation-ratings/#informe-de-iso-717-report);
 un `requirement` aportado se lee como el límite de certificación EPNL en EPNdB
 (el EPNL cumple si es igual o inferior), y `metadata=None` produce una ficha de
-predicción ligera sin fila de veredicto. El renderizado necesita reportlab
-(`pip install phonometry[report]`); solo se admite `engine="reportlab"`. La
-ficha se genera en inglés por defecto; pasa `language="es"` para una ficha en
-español (cadenas fijas traducidas y coma como separador decimal), p. ej.
+predicción ligera sin fila de veredicto. El renderizado necesita reportlab y,
+para la figura que incrusta la ficha, matplotlib (`pip install
+"phonometry[report,plot]"`); solo se admite `engine="reportlab"`. La ficha se
+genera en inglés por defecto; pasa `language="es"` para una ficha en español
+(cadenas fijas traducidas y coma como separador decimal), p. ej.
 `res.report("epnl_fiche_es.pdf", language="es")`. La ficha es un resultado EPNL
 calculado y no es un certificado oficial de ruido de un Estado; no reproduce
 ningún TCDSN.

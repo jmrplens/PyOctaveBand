@@ -192,10 +192,11 @@ veredicto y un pie con el descargo fijo. Usa el mismo contenedor
 `ReportMetadata` y el mismo motor de renderizado que la
 [ficha de aislamiento de ISO 717](/phonometry/es/guides/insulation-ratings/#informe-de-iso-717-report);
 un `requirement` aportado se lee como la sonoridad máxima admisible en sonos
-(una sonoridad menor cumple). El renderizado necesita reportlab
-(`pip install phonometry[report]`); solo se admite `engine="reportlab"`. La
-ficha se genera en inglés por defecto; pasa `language="es"` para una ficha en
-español (cadenas fijas traducidas y coma como separador decimal), p. ej.
+(una sonoridad menor cumple). El renderizado necesita reportlab y, para la
+figura que incrusta la ficha, matplotlib (`pip install
+"phonometry[report,plot]"`); solo se admite `engine="reportlab"`. La ficha se
+genera en inglés por defecto; pasa `language="es"` para una ficha en español
+(cadenas fijas traducidas y coma como separador decimal), p. ej.
 `res.report("loudness_fiche_es.pdf", language="es")`.
 
 ```python
