@@ -872,8 +872,8 @@ L_{WP,i,m} = A_{P,i,m} + B_{P,i,m}\,\frac{v_m - v_\mathrm{ref}}{v_\mathrm{ref}}
              + \Delta L_{WP,i,m}.
 $$
 
-The two speed laws crossing is what makes the road source behave the way it
-does: below the crossover the source is an engine, above it a tyre.
+Where the two speed laws cross is what makes the road source behave the way
+it does: below the crossover the source is an engine, above it a tyre.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_speed_law_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_speed_law.svg" alt="A-weighted single-vehicle sound power against speed from 20 to 130 km/h for light and heavy vehicles, with the rolling and propulsion components dashed and dotted and the crossover speed marked on each pair" width="88%"></picture>
 
@@ -959,8 +959,9 @@ The reference surface of the first row is all zeros: it is the virtual average
 of a dense asphalt concrete 0/11 and a stone mastic asphalt 0/11, between two
 and seven years old, in representative maintenance condition, dry, with no
 studded tyres, at 20 °C, on the flat. Under exactly those conditions every
-correction in 2.2 vanishes identically, and the sound powers **are** the
-Table F-1 coefficients `AR,i,m` and `AP,i,m`.
+correction in 2.2 vanishes identically, so at the reference speed
+`vm = vref = 70 km/h`, where the two speed terms vanish as well, the sound
+powers **are** the Table F-1 coefficients `AR,i,m` and `AP,i,m`.
 
 ## 6. Handing the source to a propagation model
 

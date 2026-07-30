@@ -1930,8 +1930,6 @@ __all__ = [
     "WindowMetricsResult",
     "ZoomFFTResult",
     "ZwickerLoudness",
-    # ISO 17497-1/-2 scattering & diffusion,
-    # ISO 8041-1 / ISO 2631 / ISO 5349 / Directive 2002/44/EC human vibration,
     "__version__",
     "a_weighted_maximum_impact_level",
     "absorption_area",
@@ -2196,6 +2194,7 @@ __all__ = [
     "frame_elastic_coefficient",
     "frame_quarter_wave_resonance",
     "frequency_from_cam",
+    # ISO 8041-1 / ISO 2631 / ISO 5349 / Directive 2002/44/EC human vibration
     "frequency_weighting",
     "fresnel_number",
     "full_day_exposure",
@@ -2622,6 +2621,7 @@ __all__ = [
     "speech_direct_level",
     "speech_intelligibility_index",
     "speech_to_noise_ratio",
+    # ISO 17497-1/-2 scattering & diffusion
     "speed_of_sound",
     "speed_of_sound_astm",
     "speed_of_sound_iso",

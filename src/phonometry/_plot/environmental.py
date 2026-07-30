@@ -142,6 +142,17 @@ _ROAD_CATEGORY_LABELS: dict[str, str] = {
     "4b": "Motorcycles (4b)",
 }
 
+#: Colour and marker of each road vehicle category, keyed by the category code
+#: rather than by row position, so a category keeps its appearance whichever
+#: subset of the five is present in the traffic mix.
+_ROAD_CATEGORY_STYLE: dict[str, tuple[str, str]] = {
+    "1": (_C_PRIMARY, "o"),
+    "2": (_C_TERTIARY, "s"),
+    "3": (_C_REFERENCE, "D"),
+    "4a": (_C_SECONDARY, "^"),
+    "4b": (_C_QUATERNARY, "v"),
+}
+
 
 def _t(text: str, language: str = "en") -> str:
     """Localise a fixed string; English is returned verbatim (byte-identical)."""
@@ -426,16 +437,18 @@ def plot_cnossos_road_emission(
     ax.set_ylabel("$L'_{W,eq,line}$ [dB re 1 pW/m]")
     ax.set_title(_t("CNOSSOS-EU railway source line power", language))
     kwargs.setdefault("label", _t("Total line", language))
-    ax.bar(positions, np.asarray(result.total_line_power, dtype=np.float64), **kwargs)
+    # An empty category carries -inf, which no axis can hold; masking it leaves
+    # the band out of the drawing instead of collapsing the whole scale.
+    total = np.asarray(result.total_line_power, dtype=np.float64)
+    ax.bar(positions, np.where(np.isfinite(total), total, np.nan), **kwargs)
 
-    colors = (_C_PRIMARY, _C_TERTIARY, _C_REFERENCE, _C_SECONDARY, _C_QUATERNARY)
-    markers = ("o", "s", "D", "^", "v")
-    for row, category, color, marker in zip(
-        np.asarray(result.line_power, dtype=np.float64), result.categories,
-        colors, markers, strict=False,
+    for row, category in zip(
+        np.asarray(result.line_power, dtype=np.float64), result.categories, strict=True
     ):
+        color, marker = _ROAD_CATEGORY_STYLE[category.value]
         ax.plot(
-            positions, row, color=color, marker=marker, lw=1.2, ms=4, zorder=4,
+            positions, np.where(np.isfinite(row), row, np.nan), color=color,
+            marker=marker, lw=1.2, ms=4, zorder=4,
             label=_t(_ROAD_CATEGORY_LABELS[category.value], language),
         )
     ax.set_ylabel(_t("$L'_{W,eq,line}$ [dB re 1 pW/m]", language))

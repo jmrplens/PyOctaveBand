@@ -26,6 +26,7 @@ closed forms of the published equations.
 
 from __future__ import annotations
 
+import functools
 import math
 import warnings
 
@@ -60,6 +61,7 @@ WORKBOOK_TOLERANCE = 0.01
 CATEGORIES = ("1", "2", "3", "4a", "4b")
 
 
+@functools.cache
 def _coefficients_2015() -> RoadEmissionCoefficients:
     """Table F-1 as published in (EU) 2015/996, the workbook's own database."""
     table = ref.cnossos_road_2015_coefficients()
@@ -75,6 +77,7 @@ def _coefficients_2015() -> RoadEmissionCoefficients:
     )
 
 
+@functools.cache
 def _surfaces_2015() -> dict[str, RoadSurfaceCoefficients]:
     """Table F-4 as published in (EU) 2015/996, keyed by the workbook's ID."""
     return {
@@ -85,6 +88,7 @@ def _surfaces_2015() -> dict[str, RoadSurfaceCoefficients]:
     }
 
 
+@functools.cache
 def _workbook_cases() -> list[dict[str, str]]:
     return ref.cnossos_road_workbook_cases()
 
@@ -624,6 +628,22 @@ def test_incomplete_database_is_rejected_as_an_invalid_input() -> None:
         road_source_power(
             RoadTraffic(RoadVehicleCategory.HEAVY, 100.0, 70.0), coefficients=partial
         )
+
+
+def test_incomplete_surface_row_is_rejected_as_an_invalid_input() -> None:
+    """A Table F-4 row missing the requested category fails as a ValueError."""
+    published = road_surface_coefficients(RoadSurface.THIN_LAYER_A)
+    partial = RoadSurfaceCoefficients(
+        name="light vehicles only",
+        alpha={"1": published.alpha["1"]},
+        beta={"1": published.beta["1"]},
+        speed_range=published.speed_range,
+    )
+    assert road_rolling_noise("1", 70.0, surface=partial).shape == (8,)
+    with pytest.raises(ValueError, match="no coefficients for category '2'"):
+        road_rolling_noise("2", 70.0, surface=partial)
+    with pytest.raises(ValueError, match="no coefficients for category '2'"):
+        road_propulsion_noise("2", 70.0, surface=partial)
 
 
 def test_studded_tyre_inputs_are_range_checked() -> None:

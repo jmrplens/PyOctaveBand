@@ -493,11 +493,23 @@ def _require_category(key: str, coefficients: RoadEmissionCoefficients) -> None:
 
 
 def _surface_of(
-    surface: RoadSurface | str | RoadSurfaceCoefficients,
+    surface: RoadSurface | str | RoadSurfaceCoefficients, key: str
 ) -> RoadSurfaceCoefficients:
-    if isinstance(surface, RoadSurfaceCoefficients):
-        return surface
-    return road_surface_coefficients(surface)
+    """Resolve a surface and check that it covers the vehicle category.
+
+    A substituted Table F-4 row may carry fewer categories than the published
+    one, and reaching for a missing one has to fail as an invalid input.
+    """
+    row = surface if isinstance(surface, RoadSurfaceCoefficients) else (
+        road_surface_coefficients(surface)
+    )
+    if key not in row.alpha or key not in row.beta:
+        raise ValueError(
+            f"The road surface {row.name!r} has no coefficients for category "
+            f"{key!r}; a substituted Table F-4 row must cover every category "
+            "of the modelled traffic."
+        )
+    return row
 
 
 def _junction_factor(distance: float | None, junction: JunctionType) -> float:
@@ -519,7 +531,7 @@ def _studded_correction(
         raise ValueError("'studded_fraction' must be a fraction in [0, 1].")
     if not 0.0 <= studded_months <= 12.0:
         raise ValueError("'studded_months' must be a number of months in [0, 12].")
-    if key != "1" or studded_months == 0.0 or studded_fraction == 0.0:
+    if key != "1" or studded_months <= 0.0 or studded_fraction <= 0.0:
         return np.zeros(len(ROAD_OCTAVE_BANDS))
     # (2.2.6): the speed dependence saturates below 50 km/h and above 90 km/h.
     clipped = min(max(speed, 50.0), 90.0)
@@ -539,7 +551,7 @@ def _gradient_correction(key: str, slope: float, speed: float) -> float:
     branch of category 1 carries no speed factor, while categories 2 and 3 do,
     and their uphill branches subtract no constant from the slope.
     """
-    if key in ("4a", "4b") or slope == 0.0:
+    if key in ("4a", "4b"):
         return 0.0
     if key == "1":
         if slope < -6.0:
@@ -598,7 +610,7 @@ def road_rolling_noise(
     key = _category_key(category)
     _require_category(key, coefficients)
     v = max(_positive_speed(speed), _ROAD_MINIMUM_SPEED)
-    row = _surface_of(surface)
+    row = _surface_of(surface, key)
     log_speed = np.log10(v / ROAD_REFERENCE_SPEED)
 
     base = _bands(coefficients.rolling_a[key]) + _bands(coefficients.rolling_b[key]) * log_speed
@@ -656,7 +668,7 @@ def road_propulsion_noise(
     key = _category_key(category)
     _require_category(key, coefficients)
     v = max(_positive_speed(speed), _ROAD_MINIMUM_SPEED)
-    row = _surface_of(surface)
+    row = _surface_of(surface, key)
 
     base = _bands(coefficients.propulsion_a[key]) + _bands(
         coefficients.propulsion_b[key]
@@ -851,7 +863,7 @@ def road_source_power(
             else 10.0 * np.log10(10.0 ** (lwr / 10.0) + 10.0 ** (lwp / 10.0))
         )
         # (2.2.1): the flow term uses the true speed, never the 20 km/h floor.
-        flow_term = -np.inf if q == 0.0 else 10.0 * np.log10(q / (1000.0 * v))
+        flow_term = -np.inf if q <= 0.0 else 10.0 * np.log10(q / (1000.0 * v))
         rolling.append(lwr)
         propulsion.append(lwp)
         vehicle.append(lw)

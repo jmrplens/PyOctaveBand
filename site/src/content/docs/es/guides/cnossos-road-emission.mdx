@@ -181,7 +181,7 @@ L_{WP,i,m} = A_{P,i,m} + B_{P,i,m}\,\frac{v_m - v_\mathrm{ref}}{v_\mathrm{ref}}
              + \Delta L_{WP,i,m}.
 $$
 
-El cruce de las dos leyes de velocidad es lo que da a la fuente viaria su
+Dónde se cruzan las dos leyes de velocidad es lo que da a la fuente viaria su
 comportamiento: por debajo del cruce la fuente es un motor, por encima es un
 neumático.
 
@@ -272,11 +272,13 @@ row.beta["1"]            # -0.1, el coeficiente de velocidad
 ```
 
 El pavimento de referencia de la primera fila es todo ceros: es el promedio
-virtual de una mezcla asfáltica densa 0/11 y una mezcla drenante tipo SMA 0/11,
-de entre dos y siete años, en estado de mantenimiento representativo, seca, sin
-neumáticos con clavos, a 20 °C y en llano. Exactamente en esas condiciones toda
-corrección del 2.2 se anula de forma idéntica, y las potencias acústicas **son**
-los coeficientes `AR,i,m` y `AP,i,m` de la Tabla F-1.
+virtual de una mezcla bituminosa densa 0/11 y una mezcla bituminosa discontinua
+tipo SMA 0/11, de entre dos y siete años, en estado de mantenimiento
+representativo, seca, sin neumáticos con clavos, a 20 °C y en llano. Exactamente
+en esas condiciones toda corrección del 2.2 se anula de forma idéntica, así que
+a la velocidad de referencia `vm = vref = 70 km/h`, donde también se anulan los
+dos términos de velocidad, las potencias acústicas **son** los coeficientes
+`AR,i,m` y `AP,i,m` de la Tabla F-1.
 
 ## 6. Entregar la fuente a un modelo de propagación
 

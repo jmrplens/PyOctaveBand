@@ -1367,7 +1367,8 @@ to the issuing body, with date and reference).
   version replaced by (EU) 2021/1226, is printed over the eight octave bands
   **63 Hz to 8 kHz**, and point 2.1.1 of the same Annex defines the frequency
   range of the method as 63 Hz to 8 kHz. A calculation restricted to
-  125 Hz - 4 kHz would silently discard four of the eight tabulated bands.
+  125 Hz - 4 kHz would silently discard the 63 Hz and 8 kHz bands, which
+  Appendix F tabulates like every other.
 - **Evidence:** corrected by the corrigendum published in OJ L 5, 10.1.2018,
   p. 35, which reads in full: 'On page 8, in the Annex, in point 2.2.1, in the
   second paragraph under the heading "Traffic flow": for: "each octave band i
