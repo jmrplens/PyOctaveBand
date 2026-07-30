@@ -37,6 +37,7 @@ if TYPE_CHECKING:
         BarrierInsertionLoss,
         SphericalGroundResult,
     )
+    from ..environmental.cnossos_road import RoadEmissionResult
     from ..environmental.impulse_prominence import ImpulseProminenceResult
     from ..environmental.measurement import TonalAssessmentResult
     from ..environmental.outdoor_propagation import OutdoorAttenuation
@@ -120,6 +121,25 @@ _STRINGS: dict[str, str] = {
     "Corrected level [dB]": "Nivel corregido [dB]",
     "RD 1367/2007 assessment vs limit values":
         "Evaluación RD 1367/2007 frente a los valores límite",
+    "Total line": "Línea total",
+    "Light vehicles (1)": "Vehículos ligeros (1)",
+    "Medium heavy vehicles (2)": "Vehículos pesados medios (2)",
+    "Heavy vehicles (3)": "Vehículos pesados (3)",
+    "Mopeds (4a)": "Ciclomotores (4a)",
+    "Motorcycles (4b)": "Motocicletas (4b)",
+    "$L'_{W,eq,line}$ [dB re 1 pW/m]": "$L'_{W,eq,line}$ [dB re 1 pW/m]",
+    "CNOSSOS-EU road source line power":
+        "Potencia de la línea fuente viaria CNOSSOS-EU",
+}
+
+#: Localised legend labels of the five CNOSSOS-EU road vehicle categories,
+#: keyed by the Table [2.2.a] category code.
+_ROAD_CATEGORY_LABELS: dict[str, str] = {
+    "1": "Light vehicles (1)",
+    "2": "Medium heavy vehicles (2)",
+    "3": "Heavy vehicles (3)",
+    "4a": "Mopeds (4a)",
+    "4b": "Motorcycles (4b)",
 }
 
 
@@ -359,6 +379,19 @@ def plot_cnossos_rail_emission(
 
     :param result: A
         :class:`~phonometry.environmental.cnossos_rail.RailwayEmissionResult`.
+def plot_cnossos_road_emission(
+    result: RoadEmissionResult, ax: Axes | None = None, *, language: str = "en",
+    **kwargs: Any
+) -> Axes:
+    """Per-metre road source-line power with its vehicle-category breakdown.
+
+    Draws the energy-summed line power ``L'_W,eq,line,i`` of the traffic mix as
+    bars over the eight CNOSSOS-EU octave bands, with the contribution of each
+    vehicle category overlaid as a marker line, so the band where a category
+    governs the source is read directly off the chart.
+
+    :param result: A
+        :class:`~phonometry.environmental.cnossos_road.RoadEmissionResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the total-line-power ``bar`` call.
@@ -392,6 +425,21 @@ def plot_cnossos_rail_emission(
     # rather than routed through the translation table.
     ax.set_ylabel("$L'_{W,eq,line}$ [dB re 1 pW/m]")
     ax.set_title(_t("CNOSSOS-EU railway source line power", language))
+    kwargs.setdefault("label", _t("Total line", language))
+    ax.bar(positions, np.asarray(result.total_line_power, dtype=np.float64), **kwargs)
+
+    colors = (_C_PRIMARY, _C_TERTIARY, _C_REFERENCE, _C_SECONDARY, _C_QUATERNARY)
+    markers = ("o", "s", "D", "^", "v")
+    for row, category, color, marker in zip(
+        np.asarray(result.line_power, dtype=np.float64), result.categories,
+        colors, markers, strict=False,
+    ):
+        ax.plot(
+            positions, row, color=color, marker=marker, lw=1.2, ms=4, zorder=4,
+            label=_t(_ROAD_CATEGORY_LABELS[category.value], language),
+        )
+    ax.set_ylabel(_t("$L'_{W,eq,line}$ [dB re 1 pW/m]", language))
+    ax.set_title(_t("CNOSSOS-EU road source line power", language))
     ax.legend(loc="best", fontsize="small")
     ax.grid(True, axis="y", alpha=0.3)
     localize_axes(ax, language)
