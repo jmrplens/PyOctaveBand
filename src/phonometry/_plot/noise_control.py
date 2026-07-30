@@ -17,6 +17,7 @@ from .common import (
     _C_TERTIARY,
     _new_axes,
     format_frequency_axis,
+    theme_fill,
 )
 
 if TYPE_CHECKING:
@@ -251,8 +252,8 @@ def plot_duct_modes(
 
     ax = ax if ax is not None else _new_axes()
     x = np.arange(len(result.modes), dtype=np.float64)
-    ax.axhspan(0.0, result.plane_wave_limit, color=_C_PRIMARY, alpha=0.10,
-               label=_t("Plane waves only", language))
+    ax.axhspan(0.0, result.plane_wave_limit, color=theme_fill(_C_PRIMARY, ax),
+               zorder=0, label=_t("Plane waves only", language))
     ax.plot(x, np.asarray(result.cut_on_no_flow), ls="--", color=_C_MUTED,
             marker="s", ms=4, lw=1.3, label=_t("No flow", language))
     kwargs.setdefault("color", _C_PRIMARY)

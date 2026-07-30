@@ -42,7 +42,7 @@ L 706.008438 370.06456
 L 706.008438 271.752183 
 L 53.650781 271.752183 
 z
-" clip-path="url(#p4ec35c0b19)" style="fill: #1f77b4; opacity: 0.1; stroke: #1f77b4; stroke-linejoin: miter"/>
+" clip-path="url(#p4ec35c0b19)" style="fill: #c8deed; stroke: #c8deed; stroke-linejoin: miter"/>
    </g>
    <g id="matplotlib.axis_1">
     <g id="xtick_1">
@@ -342,7 +342,7 @@ L 77.807781 40.144623
 L 77.807781 34.313623 
 L 61.147781 34.313623 
 z
-" style="fill: #1f77b4; opacity: 0.1; stroke: #1f77b4; stroke-linejoin: miter"/>
+" style="fill: #c8deed; stroke: #c8deed; stroke-linejoin: miter"/>
     </g>
     <g id="text_16">
      <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start" x="84.471781" y="40.144623" transform="rotate(-0 84.471781 40.144623)">Plane waves only</text>
