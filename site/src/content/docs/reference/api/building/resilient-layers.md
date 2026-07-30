@@ -75,7 +75,7 @@ recorded in `docs/ERRATA.md`: the overlap of the last two rows of Table D.1 at
 ## combined_dynamic_stiffness
 
 ```python
-combined_dynamic_stiffness(layers: Sequence[float]) -> float
+combined_dynamic_stiffness(layers: ArrayLike) -> float
 ```
 
 Total dynamic stiffness of stacked resilient layers (Formula C.6).
@@ -88,7 +88,7 @@ the whole floor without cuts for pipes or electrical devices.
 
 | Name | Description |
 | :--- | :--- |
-| `layers` | Dynamic stiffnesses per unit area `s'i`, in N/m³. |
+| `layers` | Dynamic stiffnesses per unit area `s'i`, in N/m³ (any 1-D array-like). |
 
 **Returns:** The total dynamic stiffness `s'tot`, in N/m³.
 
@@ -142,7 +142,7 @@ covering_improvement(
     impedance: float,
     *,
     mass: float = 0.5,
-    band: str = 'third',
+    band: BandWidth = 'third',
 ) -> CoveringImprovementResult
 ```
 
@@ -273,7 +273,7 @@ floating_floor_improvement_spectrum(
     frequencies: ArrayLike,
     *,
     resonance_frequency: float,
-    model: str = 'en12354',
+    model: FloatingFloorModel = 'en12354',
     limiting_frequency: float | None = None,
     mass_per_area: float | None = None,
     dynamic_stiffness: float | None = None,
@@ -316,7 +316,7 @@ reported to hold in `fo < f < 4 fo`.
 | `model` | `"en12354"`, `"cremer"` or `"cremer_hammer"`. |
 | `limiting_frequency` | Limiting frequency `flimit`, in Hz; required by `"cremer_hammer"` and ignored otherwise ([`hammer_limiting_frequency`](/phonometry/reference/api/building/resilient-layers/#hammer_limiting_frequency)). |
 | `mass_per_area` | Optional `m'` of the floating floor, in kg/m². |
-| `dynamic_stiffness` | Optional `s'` of the resilient layer, in N/m³; supplied together with `mass_per_area` it adds `ΔLw` to the result. |
+| `dynamic_stiffness` | Optional `s'` of the resilient layer, in N/m³; supplied together with `mass_per_area` it adds `ΔLw` to the result, from Formula (C.4) for `"en12354"` (screeds) and Formula (C.5) for the other two models (asphalt and dry floating floors). |
 
 **Returns:** A [`FloatingFloorImprovementResult`](/phonometry/reference/api/building/resilient-layers/#floatingfloorimprovementresult).
 
@@ -386,7 +386,7 @@ Predicted improvement `ΔL(f)` of a floating floor.
 | `model` | `"en12354"`, `"cremer"` or `"cremer_hammer"`. |
 | `slope` | Slope of the law, in dB per decade (30 or 40). |
 | `limiting_frequency` | Limiting frequency `flimit` of the hammer term, in Hz, or `None` when the term is not applied. |
-| `delta_lw` | Weighted improvement `ΔLw` from Formulae (C.4)/(C.5), in dB, or `None` when the floor data were not supplied. |
+| `delta_lw` | Weighted improvement `ΔLw`, in dB, or `None` when the floor data were not supplied: Formula (C.4) for the `"en12354"` model, Formula (C.5) for the other two. |
 
 ### FloatingFloorImprovementResult.plot()
 
@@ -425,7 +425,11 @@ driving-point impedance `Zdp`. For an **over-critical** oscillation
 (`K m ≥ 4 Zdp²`) the pulse decays to zero without changing sign
 (Eq. 3.95); for an **under-critical** one it is a decaying sinusoid whose
 first positive lobe is the impact proper (Eq. 3.96), the later oscillations
-being suppressed by the machine's hammer-catching mechanism.
+being suppressed by the machine's hammer-catching mechanism. That
+suppression is applied here, so the under-critical pulse is returned as
+zero beyond its first zero crossing at `t = π/β`; it is the same
+truncation [`tapping_force_spectrum`](/phonometry/reference/api/building/resilient-layers/#tapping_force_spectrum) transforms, so integrating this
+pulse reproduces that spectrum over any window.
 
 **Parameters**
 
@@ -437,7 +441,7 @@ being suppressed by the machine's hammer-catching mechanism.
 | `mass` | Hammer mass `m`, in kg (Default: 0,5). |
 | `impact_velocity` | Impact velocity `vo`, in m/s (Default: [`hammer_impact_velocity`](/phonometry/reference/api/building/resilient-layers/#hammer_impact_velocity)). |
 
-**Returns:** The force `F1(t)`, in N, with the same shape as `time`.
+**Returns:** The force `F1(t)`, in N, with the same shape as `time`; never negative.
 
 **Raises**
 
@@ -509,7 +513,7 @@ the same frequency as `fz = 4 √(m1 B1)/(π mh)`.
 lining_improvement(
     resonance_frequency: float,
     *,
-    system: str = 'mineral_wool',
+    system: LiningSystem = 'mineral_wool',
     anchors: bool = False,
     glued_area: float | None = None,
 ) -> LiningImprovementResult
@@ -544,7 +548,7 @@ reference formula, in the order the annex states them.
 | `resonance_frequency` | Resonance frequency `fo`, in Hz ([`lining_resonance_frequency`](/phonometry/reference/api/building/resilient-layers/#lining_resonance_frequency)). |
 | `system` | `"mineral_wool"`, `"foam"` or `"studs"`. |
 | `anchors` | Apply the Formula (D.5) anchor/batten correction. |
-| `glued_area` | Glued area `%So` as a percentage, or `None` to keep the 40 % reference. Only meaningful for the glued exterior systems. |
+| `glued_area` | Glued area `%So` as a percentage of the element area (0 to 100), or `None` to keep the 40 % reference. Formula (D.6) corrects the glued exterior systems only, so it is rejected for `system="studs"`. |
 
 **Returns:** A [`LiningImprovementResult`](/phonometry/reference/api/building/resilient-layers/#liningimprovementresult).
 
@@ -552,7 +556,7 @@ reference formula, in the order the annex states them.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If an input is not positive and finite, or `system` is unknown. |
+| ValueError | If an input is not positive and finite, `system` is unknown, or `glued_area` is out of range or combined with `system="studs"`. |
 
 ## lining_improvement_in_situ
 
@@ -638,7 +642,7 @@ Exactly one of the two branches applies:
 ```python
 LiningImprovementResult(
     resonance_frequency: float,
-    system: str,
+    system: LiningSystem,
     delta_rw: float,
     delta_ra: float,
     delta_ratr: float,
@@ -779,7 +783,7 @@ Eq. (8.45) with a coefficient `2/(3 π)` where `2,3/(2 π)` follows, a
 short_pulse_mean_square_force(
     frequencies: ArrayLike,
     *,
-    band: str = 'third',
+    band: BandWidth = 'third',
 ) -> np.ndarray
 ```
 
@@ -860,7 +864,7 @@ tapping_force_spectrum(
     mass: float = 0.5,
     impact_rate: float = 10.0,
     impact_velocity: float | None = None,
-    band: str = 'third',
+    band: BandWidth = 'third',
 ) -> TappingForceResult
 ```
 
@@ -993,7 +997,7 @@ weighted_floating_floor_improvement(
     mass_per_area: float,
     dynamic_stiffness: float,
     *,
-    floor: str = 'screed',
+    floor: FloorType = 'screed',
 ) -> float
 ```
 

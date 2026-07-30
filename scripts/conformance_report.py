@@ -3023,9 +3023,12 @@ def _chk_iso12354_2_floating_floor() -> Outcome:
     worst = float(np.max(np.abs(
         spectrum.improvement - np.asarray(ref.ISO12354_ANNEX_G4_DELTA_L)
     )))
-    worst = max(worst, abs(f0 - ref.ISO12354_ANNEX_L_FLOATING_F0))
     delta_lw = float(ph.weighted_floating_floor_improvement(mass, stiffness))
     worst = max(worst, abs(delta_lw - ref.ISO12354_ANNEX_G10_DELTA_LW))
+    # The resonance frequency is in hertz, so it is verified separately rather
+    # than folded into the decibel residual reported below.
+    if abs(f0 - ref.ISO12354_ANNEX_L_FLOATING_F0) > 0.05:
+        worst = float("inf")
     return numeric(0.0, worst, 0.05, unit="dB", places=3)
 
 

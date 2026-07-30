@@ -2586,10 +2586,6 @@ ISO12354_ANNEX_G4_DELTA_L = (
     0.0, 2.3, 5.4, 8.3, 11.2, 14.4, 17.4, 20.3, 23.3, 26.4, 29.3, 32.3,
     35.4, 38.3, 41.2, 44.4, 47.4, 50.3, 53.3, 56.4, 59.3,
 )
-# ISO 12354-2:2017 Formula (C.4) evaluated for the same floating floor, as
-# printed in Table G.10 / ISO 12354-1 Table L.10 of the simplified model.
-ISO12354_ANNEX_G10_DELTA_LW = 32.2
-
 # Table G.4 - the printed direct and Df (external wall 1) impact levels.
 ISO12354_ANNEX_G4_LN_DD = (
     57.3, 55.9, 53.8, 51.8, 49.9, 47.7, 45.2, 42.5, 39.7, 36.9, 34.3, 31.7,

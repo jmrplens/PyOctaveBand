@@ -68,7 +68,6 @@ recorded in ``docs/ERRATA.md``: the overlap of the last two rows of Table D.1 at
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -187,9 +186,6 @@ _TABLE_D1_HIGH: tuple[tuple[float, float], ...] = (
 #: Validity range of ``fo`` covered by ISO 12354-1:2017 Table D.1, in Hz.
 _TABLE_D1_RANGE = (30.0, 5000.0)
 
-#: Validity range of ``Rw`` for which Table D.1 is stated, in dB (Clause D.2.2).
-_TABLE_D1_RW_RANGE = (20.0, 60.0)
-
 #: ISO 12354-1:2017 Formulae (D.3), (D.4) and (D.7): the reference-situation
 #: single-number ratings as ``(slope, intercept, floor)`` triples for
 #: ``ΔRw``, ``ΔRA`` and ``ΔRA,tr``, keyed by the interlayer type.
@@ -230,12 +226,17 @@ _THIRD_OCTAVE_CENTRES: tuple[float, ...] = (
     1600.0, 2000.0, 2500.0, 3150.0, 4000.0, 5000.0, 6300.0, 8000.0, 10000.0,
 )
 
+#: Band width of the mean-square force (Hopkins Eq. 3.91).
+BandWidth = Literal["third", "octave"]
+#: Floating-floor construction of ISO 12354-2:2017 Annex C.
 FloorType = Literal["screed", "asphalt"]
+#: Additional-layer system of ISO 12354-1:2017 Annex D.
 LiningSystem = Literal["mineral_wool", "foam", "studs"]
+#: Improvement law of a floating floor above its resonance.
 FloatingFloorModel = Literal["en12354", "cremer", "cremer_hammer"]
 
 
-def _band_factor(band: str) -> float:
+def _band_factor(band: BandWidth) -> float:
     """Band-width factor ``B/f`` of Hopkins Eq. (3.91)."""
     require_choice(band, "band", ("third", "octave"))
     return _BANDWIDTH_FACTOR[band]
@@ -389,7 +390,11 @@ def force_pulse(
     (``K m ≥ 4 Zdp²``) the pulse decays to zero without changing sign
     (Eq. 3.95); for an **under-critical** one it is a decaying sinusoid whose
     first positive lobe is the impact proper (Eq. 3.96), the later oscillations
-    being suppressed by the machine's hammer-catching mechanism.
+    being suppressed by the machine's hammer-catching mechanism. That
+    suppression is applied here, so the under-critical pulse is returned as
+    zero beyond its first zero crossing at ``t = π/β``; it is the same
+    truncation :func:`tapping_force_spectrum` transforms, so integrating this
+    pulse reproduces that spectrum over any window.
 
     :param time: Time ``t`` since the impact, in s (scalar or array, ``≥ 0``).
     :param contact_stiffness: Contact stiffness ``K``, in N/m.
@@ -397,7 +402,8 @@ def force_pulse(
     :param mass: Hammer mass ``m``, in kg (Default: 0,5).
     :param impact_velocity: Impact velocity ``vo``, in m/s
         (Default: :func:`hammer_impact_velocity`).
-    :return: The force ``F1(t)``, in N, with the same shape as ``time``.
+    :return: The force ``F1(t)``, in N, with the same shape as ``time``; never
+        negative.
     :raises ValueError: If an input is not positive and finite, or ``time``
         contains a negative value.
     """
@@ -421,11 +427,12 @@ def force_pulse(
         shape = t * np.exp(0.0) if gamma == 0.0 else np.sinh(gamma * t) / gamma
         return np.asarray(envelope * shape, dtype=np.float64)
     beta = np.sqrt(omega0_sq - decay**2)
-    return np.asarray(envelope * np.sin(beta * t) / beta, dtype=np.float64)
+    pulse = envelope * np.sin(beta * t) / beta
+    return np.asarray(np.where(t <= np.pi / beta, pulse, 0.0), dtype=np.float64)
 
 
 def short_pulse_mean_square_force(
-    frequencies: ArrayLike, *, band: str = "third"
+    frequencies: ArrayLike, *, band: BandWidth = "third"
 ) -> np.ndarray:
     """Band mean-square force of a short impact ``F²rms = 3,9 B`` (Eq. 3.92).
 
@@ -509,7 +516,7 @@ def tapping_force_spectrum(
     mass: float = TAPPING_HAMMER_MASS,
     impact_rate: float = TAPPING_IMPACT_RATE,
     impact_velocity: float | None = None,
-    band: str = "third",
+    band: BandWidth = "third",
 ) -> TappingForceResult:
     """Force spectrum of the ISO tapping machine on a floor (Hopkins 3.6.3.1).
 
@@ -629,7 +636,7 @@ def covering_improvement(
     impedance: float,
     *,
     mass: float = TAPPING_HAMMER_MASS,
-    band: str = "third",
+    band: BandWidth = "third",
 ) -> CoveringImprovementResult:
     """Improvement of impact sound insulation by a soft covering (Eq. 4.114).
 
@@ -707,14 +714,15 @@ def floating_floor_resonance_frequency(
     return float(_ISO_RESONANCE_CONSTANT * np.sqrt(s * 1e-6 / m))
 
 
-def combined_dynamic_stiffness(layers: Sequence[float]) -> float:
+def combined_dynamic_stiffness(layers: ArrayLike) -> float:
     """Total dynamic stiffness of stacked resilient layers (Formula C.6).
 
     ``s'tot = (Σ 1/s'i)^(−1)``, springs in series (Hopkins Eq. 4.121 states the
     same rule). ISO 12354-2:2017 warns that it holds only if every layer covers
     the whole floor without cuts for pipes or electrical devices.
 
-    :param layers: Dynamic stiffnesses per unit area ``s'i``, in N/m³.
+    :param layers: Dynamic stiffnesses per unit area ``s'i``, in N/m³
+        (any 1-D array-like).
     :return: The total dynamic stiffness ``s'tot``, in N/m³.
     :raises ValueError: If ``layers`` is empty or holds a non-positive value.
     """
@@ -764,7 +772,10 @@ def double_floating_floor_resonances(
 
 
 def weighted_floating_floor_improvement(
-    mass_per_area: float, dynamic_stiffness: float, *, floor: str = "screed"
+    mass_per_area: float,
+    dynamic_stiffness: float,
+    *,
+    floor: FloorType = "screed",
 ) -> float:
     """Weighted improvement ``ΔLw`` of a floating floor (Formulae C.4/C.5).
 
@@ -809,8 +820,9 @@ class FloatingFloorImprovementResult:
     :ivar slope: Slope of the law, in dB per decade (30 or 40).
     :ivar limiting_frequency: Limiting frequency ``flimit`` of the hammer term,
         in Hz, or ``None`` when the term is not applied.
-    :ivar delta_lw: Weighted improvement ``ΔLw`` from Formulae (C.4)/(C.5), in
-        dB, or ``None`` when the floor data were not supplied.
+    :ivar delta_lw: Weighted improvement ``ΔLw``, in dB, or ``None`` when the
+        floor data were not supplied: Formula (C.4) for the ``"en12354"``
+        model, Formula (C.5) for the other two.
     """
 
     frequencies: np.ndarray
@@ -838,7 +850,7 @@ def floating_floor_improvement_spectrum(
     frequencies: ArrayLike,
     *,
     resonance_frequency: float,
-    model: str = "en12354",
+    model: FloatingFloorModel = "en12354",
     limiting_frequency: float | None = None,
     mass_per_area: float | None = None,
     dynamic_stiffness: float | None = None,
@@ -878,7 +890,9 @@ def floating_floor_improvement_spectrum(
         (:func:`hammer_limiting_frequency`).
     :param mass_per_area: Optional ``m'`` of the floating floor, in kg/m².
     :param dynamic_stiffness: Optional ``s'`` of the resilient layer, in N/m³;
-        supplied together with ``mass_per_area`` it adds ``ΔLw`` to the result.
+        supplied together with ``mass_per_area`` it adds ``ΔLw`` to the result,
+        from Formula (C.4) for ``"en12354"`` (screeds) and Formula (C.5) for
+        the other two models (asphalt and dry floating floors).
     :return: A :class:`FloatingFloorImprovementResult`.
     :raises ValueError: If an input is not positive and finite, ``model`` is
         unknown, or ``"cremer_hammer"`` is used without a limiting frequency.
@@ -901,10 +915,15 @@ def floating_floor_improvement_spectrum(
         )
     delta_lw: float | None = None
     if mass_per_area is not None and dynamic_stiffness is not None:
+        # The weighted fit follows the construction the law belongs to:
+        # Formula (C.4) for the sand-cement screeds of the 30 lg law, and
+        # Formula (C.5) for the asphalt and dry floating floors of the 40 lg
+        # law, which are also the lightweight walking surfaces the hammer term
+        # applies to.
         delta_lw = weighted_floating_floor_improvement(
             mass_per_area,
             dynamic_stiffness,
-            floor="asphalt" if model == "cremer" else "screed",
+            floor="screed" if model == "en12354" else "asphalt",
         )
     return FloatingFloorImprovementResult(
         frequencies=f,
@@ -1014,9 +1033,9 @@ def lining_resonance_frequency(
         )
     if dynamic_stiffness is not None:
         stiffness = require_positive(dynamic_stiffness, "dynamic_stiffness")
-    elif cavity_depth is not None:
+    else:
         stiffness = _CAVITY_STIFFNESS / require_positive(
-            cavity_depth, "cavity_depth"
+            cavity_depth or 0.0, "cavity_depth"
         )
     return float(np.sqrt(stiffness * (1.0 / m1 + 1.0 / m2)) / (2.0 * np.pi))
 
@@ -1092,7 +1111,7 @@ class LiningImprovementResult:
     """
 
     resonance_frequency: float
-    system: str
+    system: LiningSystem
     delta_rw: float
     delta_ra: float
     delta_ratr: float
@@ -1122,7 +1141,7 @@ class LiningImprovementResult:
 def lining_improvement(
     resonance_frequency: float,
     *,
-    system: str = "mineral_wool",
+    system: LiningSystem = "mineral_wool",
     anchors: bool = False,
     glued_area: float | None = None,
 ) -> LiningImprovementResult:
@@ -1152,11 +1171,14 @@ def lining_improvement(
         (:func:`lining_resonance_frequency`).
     :param system: ``"mineral_wool"``, ``"foam"`` or ``"studs"``.
     :param anchors: Apply the Formula (D.5) anchor/batten correction.
-    :param glued_area: Glued area ``%So`` as a percentage, or ``None`` to keep
-        the 40 % reference. Only meaningful for the glued exterior systems.
+    :param glued_area: Glued area ``%So`` as a percentage of the element area
+        (0 to 100), or ``None`` to keep the 40 % reference. Formula (D.6)
+        corrects the glued exterior systems only, so it is rejected for
+        ``system="studs"``.
     :return: A :class:`LiningImprovementResult`.
-    :raises ValueError: If an input is not positive and finite, or ``system``
-        is unknown.
+    :raises ValueError: If an input is not positive and finite, ``system`` is
+        unknown, or ``glued_area`` is out of range or combined with
+        ``system="studs"``.
     """
     f0 = require_positive(resonance_frequency, "resonance_frequency")
     require_choice(system, "system", tuple(_ANNEX_D_SYSTEMS))
@@ -1170,7 +1192,14 @@ def lining_improvement(
             for value, (factor, offset) in zip(ratings, _ANNEX_D_ANCHORS)
         ]
     if glued_area is not None:
+        if system == "studs":
+            raise ValueError(
+                "'glued_area' applies to the glued exterior systems of "
+                "Formulae (D.3)/(D.4); Formula (D.7) has no glued area."
+            )
         area = require_positive(glued_area, "glued_area")
+        if area > 100.0:
+            raise ValueError("'glued_area' is a percentage and cannot exceed 100.")
         slope, offset = _ANNEX_D_GLUE
         ratings = [value + slope * area + offset for value in ratings]
     return LiningImprovementResult(
