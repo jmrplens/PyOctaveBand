@@ -7380,16 +7380,34 @@ _AA_TABLE_6_1_RHO1 = 130.0
 _AA_TABLE_6_1_SHEAR = 220.0e4 * (1.0 + 0.1j)
 
 
-def _aa_glass_wool_waves(frequency: np.ndarray) -> Any:
-    medium = ph.johnson_champoux_allard(
+def _aa_glass_wool_medium(frequency: np.ndarray) -> Any:
+    """The rigid-frame JCA equivalent fluid of the Table 6.1 glass wool."""
+    return ph.johnson_champoux_allard(
         frequency, _AA_TABLE_6_1_SIGMA, **_AA_TABLE_6_1
     )
+
+
+def _aa_glass_wool_waves(frequency: np.ndarray) -> Any:
     return ph.biot_waves(
-        medium,
+        _aa_glass_wool_medium(frequency),
         porosity=_AA_TABLE_6_1["porosity"],
         tortuosity=_AA_TABLE_6_1["tortuosity"],
         frame_density=_AA_TABLE_6_1_RHO1,
         shear_modulus=_AA_TABLE_6_1_SHEAR,
+    )
+
+
+def _aa_glass_wool_layer(
+    medium: Any, thickness: float, scale: float = 1.0
+) -> Any:
+    """The same material as a poroelastic layer, optionally frozen stiff."""
+    return ph.PoroelasticLayer(
+        thickness,
+        medium,
+        _AA_TABLE_6_1["porosity"],
+        _AA_TABLE_6_1["tortuosity"],
+        _AA_TABLE_6_1_RHO1 * scale,
+        _AA_TABLE_6_1_SHEAR * scale,
     )
 
 
@@ -7422,7 +7440,7 @@ def _chk_biot_branch_crossing() -> Outcome:
 @register(
     _POROUS,
     "Allard & Atalla 2e Sect. 6.5.4 (Biot model output), pp. 124-125",
-    "Frame-borne velocity ratio mu_b at 1500 Hz",
+    "Frame-borne velocity ratio Re(mu_b) at 1500 Hz (see ERRATA)",
 )
 def _chk_biot_frame_borne_ratio() -> Outcome:
     waves = _aa_glass_wool_waves(np.array([1500.0]))
@@ -7449,19 +7467,13 @@ def _chk_biot_impedance_peak() -> Outcome:
 )
 def _chk_biot_rigid_frame_limit() -> Outcome:
     frequency = np.geomspace(50.0, 5000.0, 40)
-    medium = ph.johnson_champoux_allard(
-        frequency, _AA_TABLE_6_1_SIGMA, **_AA_TABLE_6_1
-    )
+    medium = _aa_glass_wool_medium(frequency)
     reference = ph.layered_absorber(
         frequency, [ph.PorousLayer(0.05, medium)], angle=math.pi / 4.0
     ).surface_impedance
     frozen = ph.layered_absorber(
         frequency,
-        [ph.PoroelasticLayer(
-            0.05, medium, _AA_TABLE_6_1["porosity"],
-            _AA_TABLE_6_1["tortuosity"], _AA_TABLE_6_1_RHO1 * 1e8,
-            _AA_TABLE_6_1_SHEAR * 1e8,
-        )],
+        [_aa_glass_wool_layer(medium, 0.05, 1e8)],
         angle=math.pi / 4.0,
     ).surface_impedance
     deviation = float(np.max(np.abs(frozen / reference - 1.0)))
@@ -7475,24 +7487,10 @@ def _chk_biot_rigid_frame_limit() -> Outcome:
 )
 def _chk_biot_assembly_vs_closed_form() -> Outcome:
     frequency = np.geomspace(20.0, 5000.0, 80)
-    medium = ph.johnson_champoux_allard(
-        frequency, _AA_TABLE_6_1_SIGMA, **_AA_TABLE_6_1
-    )
-    waves = ph.biot_waves(
-        medium,
-        porosity=_AA_TABLE_6_1["porosity"],
-        tortuosity=_AA_TABLE_6_1["tortuosity"],
-        frame_density=_AA_TABLE_6_1_RHO1,
-        shear_modulus=_AA_TABLE_6_1_SHEAR,
-    )
-    closed = ph.biot_surface_impedance(waves, 0.10)
+    medium = _aa_glass_wool_medium(frequency)
+    closed = ph.biot_surface_impedance(_aa_glass_wool_waves(frequency), 0.10)
     assembled = ph.layered_absorber(
-        frequency,
-        [ph.PoroelasticLayer(
-            0.10, medium, _AA_TABLE_6_1["porosity"],
-            _AA_TABLE_6_1["tortuosity"], _AA_TABLE_6_1_RHO1,
-            _AA_TABLE_6_1_SHEAR,
-        )],
+        frequency, [_aa_glass_wool_layer(medium, 0.10)]
     ).surface_impedance
     deviation = float(np.max(np.abs(assembled / closed - 1.0)))
     return numeric(0.0, deviation, 1e-10, places=12)

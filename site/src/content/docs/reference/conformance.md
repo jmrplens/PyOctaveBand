@@ -880,7 +880,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | Allard & Atalla 2e printed p. 254 (Doutres et al. 2007) | Limp-frame bulk-modulus limit for air, kPa | 20 kPa (+/-0.3 kPa) | 20.27 kPa | 0.265 kPa | &#9989; |
 | Allard & Atalla 2e Eq. (6.110), Table 6.1 glass wool | Frame lambda/4 resonance of a 10 cm layer, Hz | 459.9 Hz (+/-0.05 Hz) | 459.93 Hz | 0.033 Hz | &#9989; |
 | Allard & Atalla 2e Sect. 6.5.4 (Biot model output), pp. 124-125 | Airborne compressional branch changes root at 495 Hz | 495 Hz (+/-1%) | 495.9 Hz | 0.9 Hz | &#9989; |
-| Allard & Atalla 2e Sect. 6.5.4 (Biot model output), pp. 124-125 | Frame-borne velocity ratio mu_b at 1500 Hz | 0.82 (+/-2%) | 0.811 | -0.009 | &#9989; |
+| Allard & Atalla 2e Sect. 6.5.4 (Biot model output), pp. 124-125 | Frame-borne velocity ratio Re(mu_b) at 1500 Hz (see ERRATA) | 0.82 (+/-2%) | 0.811 | -0.009 | &#9989; |
 | Allard & Atalla 2e Sect. 6.6.3 (Biot model output), p. 129 | Surface-impedance peak of a 5,6 cm layer, Hz | 860 Hz (+/-2%) | 863.5 Hz | 3.5 Hz | &#9989; |
 | Allard & Atalla 2e Sect. 11.3.4 (rigid-frame limit) | Stiff, heavy frame recovers the JCA layer (max rel deviation) | 0 (+/-0.0000001) | 0.0000000034 | 0 | &#9989; |
 | Allard & Atalla 2e Eq. (6.107) vs Sect. 11.5 assembly | Two independent derivations of Zs (max rel deviation) | 0 (+/-0.0000000001) | 0 | 0 | &#9989; |

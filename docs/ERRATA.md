@@ -1600,8 +1600,12 @@ to the issuing body, with date and reference).
   `-w^2 rho11 psi_s - w^2 rho12 psi_f = N grad^2 psi_s = -N delta3^2 psi_s`, so
   `(N delta3^2 - w^2 rho11) psi_s = w^2 rho12 psi_f` and therefore
   `mu3 = psi_f/psi_s = (N delta3^2 - w^2 rho11)/(w^2 rho12)`. With that reading
-  the two forms agree identically, for any material, which the printed one does
-  not do for any.
+  the two forms agree identically, for every material. The printed form instead
+  differs from Eq. (6.84) by the factor `rho12/rho22`, so it coincides with it
+  only where that ratio is exactly 0 or exactly 1. With
+  `rho12/rho22 = rho0/(phi rho_eq) - 1` those two cases ask for
+  `rho_eq = rho0/phi` and `rho_eq = rho0/(2 phi)`, both real; the effective
+  density of a lossy porous medium is complex, so neither is ever met.
 - **Library behaviour:** `biot_waves` implements Eq. (6.84) as printed, and
   `test_shear_velocity_ratio_matches_the_corrected_second_printed_form` checks
   it against the corrected Eq. (6.85) over four decades of frequency, and also
@@ -1617,9 +1621,14 @@ to the issuing body, with date and reference).
 - **Location:** Sect. 11.3.3 (printed pp. 251-252), the fluid normal stress
   `sigma33^f` of a poroelastic layer and the matrix `[Gamma]` it feeds.
 - **The print:** Eq. (11.48) reads
-  `sigma33^f = sum (Q + R mu_i)(kt^2 + ki3^2) { -(A_i - A'_i) cos(ki3 x3)
-  + j (A_i - A'_i) sin(k33 x3) }`; Table 11.1 writes `k_{i3}` in the two
-  columns that carry `mu1`, `D1` and `E1`.
+
+  ```text
+  sigma33^f = sum (Q + R mu_i)(kt^2 + ki3^2)
+              { -(A_i - A'_i) cos(ki3 x3) + j (A_i - A'_i) sin(k33 x3) }
+  ```
+
+  and Table 11.1 writes `k_{i3}` in the two columns that carry `mu1`, `D1`
+  and `E1`.
 - **The problem:** two independent misprints in the same equation, plus a
   subscript slip in the table.
   - The coefficient of the *symmetric* amplitude `(A_i + A'_i)` is missing:
@@ -1661,20 +1670,71 @@ to the issuing body, with date and reference).
   l = 10 cm and l = 5,4 cm"; two sentences later the peak of the second sample
   is placed at "860 Hz for l = 5,6 cm", and the caption of Figure 6.11 says
   "l = 5,6 cm".
-- **The problem:** the two thicknesses cannot both be right, and the paragraph
-  gives no way to tell which is the misprint by inspection. Scaling the 10 cm
-  peak alone does not settle it: 470 x (10/5,4) = 870 Hz and
-  470 x (10/5,6) = 839 Hz bracket the published 860 Hz.
-- **Evidence:** computing the peak from the printed material does settle it.
-  Evaluating Eq. (6.107) on the fully specified Table 6.1 glass wool puts the
-  maximum of `Im(Zs)` at **863,5 Hz** for l = 5,6 cm, 0,4 % from the published
-  860 Hz, and at **896 Hz** for l = 5,4 cm, 4,2 % away. The 5,6 cm of the third
-  sentence and of the figure caption is the correct value; the "5,4 cm" of the
-  first sentence is the misprint.
+- **The problem:** the two thicknesses cannot both be right.
+- **Evidence:** textual, and only textual. Two printed statements carry
+  5,6 cm, the sentence about the 860 Hz peak and the independent caption of
+  Figure 6.11, against one carrying 5,4 cm; a single slip in the opening
+  sentence is the shorter explanation than the same slip made twice.
+  The numbers do **not** settle it, and this entry does not claim they do.
+  The book gives no peak-finding rule, and the answer follows the rule chosen:
+  - Taking the peak as the maximum of `Im(Zs)`, Eq. (6.107) on the fully
+    specified Table 6.1 glass wool gives 863,5 Hz for 5,6 cm (+0,4 % against
+    the printed 860) and 896,2 Hz for 5,4 cm (+4,2 %), which favours 5,6 cm.
+    But the same rule puts the undisputed 10 cm sample at 480,0 Hz against
+    its printed 470, a +2,1 % bias of the same size as the effect being
+    resolved.
+  - Taking the peak as the maximum of `|Zs - Zs,rigid|`, which is the
+    departure the same paragraph describes ("close to each other, except
+    around the peaks which are not predicted by the one-wave model"), the
+    10 cm sample lands at 469,2 Hz (-0,2 %) and **both** printed frequencies
+    then come out of the pair (10 cm, 5,4 cm): 861,2 Hz for 5,4 cm (+0,1 %)
+    against 831,0 Hz for 5,6 cm (-3,4 %). That rule favours 5,4 cm.
+  - Scaling the 10 cm peak is no help either, and leans the other way from
+    the conclusion: 470 x (10/5,4) = 870 Hz is 10 Hz from the published 860,
+    470 x (10/5,6) = 839 Hz is 21 Hz from it.
+  - The agreement of "860 Hz" with "5,6 cm" is in any case partly circular,
+    since both sit in the same clause: it tests that sentence against itself,
+    not which of the two sentences is the misprint.
 - **Library behaviour:** recorded, with no effect on the implementation.
   `test_impedance_peak_of_the_thin_layer_resolves_the_printed_thickness` pins
-  the 5,6 cm peak against the published 860 Hz and checks that the 5,4 cm
-  reading is the worse of the two.
+  the 5,6 cm peak against the published 860 Hz under the `Im(Zs)` rule and
+  checks that the 5,4 cm reading is the worse of the two under that rule.
+- **Status:** unreported, and the weakest of the four entries here: the
+  conclusion rests on the two-against-one reading of the printed page, not on
+  a computation.
+
+---
+
+## Allard & Atalla 2e (2009), Sect. 6.5.4 (the frame-borne velocity ratio)
+
+*Textbook, not a standard.*
+
+- **Location:** Sect. 6.5.4, printed p. 125, the one sentence of the book that
+  quotes computed values of `mu_b` for the Table 6.1 glass wool.
+- **The print:** "The ratio modulus `|mu_b|` of the velocities of the frame
+  and the air for the frame-borne wave decreases from 1,0 at 50 Hz to 0,82 at
+  1500 Hz."
+- **The problem:** the two quoted values are the *real part* of `mu_b`, not
+  its modulus. `mu_b` is complex, and the sentence names the modulus
+  explicitly.
+- **Evidence:** on the fully specified Table 6.1 material the model gives
+  `mu_b(1500 Hz) = 0,811 + 0,473 j`. Its real part is **0,811**, 1,1 % from
+  the printed 0,82; its modulus is **0,939**, 14,5 % away. Read as the real
+  part, the sentence is right at both ends and describes a monotone decrease:
+  `Re(mu_b)` is 1,002 at 50 Hz and passes through 0,82 at 1467 Hz, 2,2 % from
+  the printed 1500 Hz. Read as the modulus it is right at neither: `|mu_b|`
+  is 1,002 at 50 Hz but *rises* to 1,008 by 400 Hz before turning over, and
+  only reaches 0,82 at 2634 Hz, 76 % above the printed frequency. No
+  admissible reading of the printed inputs closes that gap: with the loss
+  factor at 0 or 0,2, the viscous length halved or doubled, the resistivity
+  halved or doubled, the tortuosity at 1 or the Poisson coefficient at 0,3,
+  `|mu_b(1500)|` moves only between 0,67 and 1,07, and every one of those
+  variants also breaks the 495 Hz branch crossing or the `|mu_a| > 40` of the
+  same page.
+- **Library behaviour:** `biot_waves` computes `mu_b` from Eq. (6.71) as
+  printed. The conformance row and
+  `test_frame_borne_velocity_ratio_matches_the_two_published_values` are
+  written against `Re(mu_b)`, and say so.
 - **Status:** unreported.
 
 ---

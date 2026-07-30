@@ -68,7 +68,10 @@ Table 6.1, and all four are reproduced: the airborne branch changes from
 `(delta1, mu1)` to `(delta2, mu2)` at 495 Hz, `|mu_a| > 40` above 50 Hz,
 and `mu_b` runs from 1,0 at 50 Hz to 0,82 at 1500 Hz (all printed
 pp. 124-125), while the impedance peak of a 5,6 cm layer sits at 860 Hz
-(printed p. 129). See `tests/materials/test_biot.py`.
+(printed p. 129). The third of those is reproduced by `Re(mu_b)`: the printed
+sentence calls it a modulus, but `|mu_b|` is 0,939 at 1500 Hz against the
+printed 0,82, and `docs/ERRATA.md` records why. See
+`tests/materials/test_biot.py`.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -225,6 +228,25 @@ rather than the numbered ones.
 *property*
 
 Whether the airborne wave is `(delta2, mu2)` at each frequency.
+
+**Neither labelling is continuous in general.** `delta1` and
+`delta2` are the two branches of one square root (Eqs. (6.67) and
+(6.68)), so `compressional_wavenumber_1` and
+`compressional_wavenumber_2` swap wherever the discriminant crosses
+the cut of `numpy.sqrt`; on the Table 6.1 glass wool that
+happens at 495,99 Hz, exactly where the book puts the change of root,
+and the two wavenumbers jump past each other by 24 rad/m there. This
+`|mu|` sorting is the physical labelling of Sect. 6.5.4 and it
+removes that jump where the two events coincide, as they do there,
+but it introduces one of its own wherever `|mu1|` and `|mu2|`
+cross *away* from the cut: on a sweep of 864 parameter sets, 30 left
+a visible step in the sorted airborne wavenumber.
+
+Nothing downstream depends on which root is called which. The closed
+form Eq. (6.107) and the `[Gamma]` of Table 11.1 are both invariant
+under the permutation of the two compressional waves and under a sign
+flip of either, so the surface impedance is continuous across the
+crossing even where the labels are not.
 
 ### BiotWavesResult.airborne_velocity_ratio
 

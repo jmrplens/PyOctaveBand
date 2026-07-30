@@ -359,7 +359,10 @@ contribute the oblique chain matrix of Cox & D'Antonio 3e Eq. (2.29)
 (equivalently the impedance recursion of Bies 5e Eq. (D.95) and the
 scheme of Mechel 2e Sect. D.4); sheet layers ([`PerforatedPlateLayer`](/phonometry/reference/api/materials/porous-absorber/#perforatedplatelayer),
 [`MicroperforatedPlateLayer`](/phonometry/reference/api/materials/porous-absorber/#microperforatedplatelayer), [`MembraneLayer`](/phonometry/reference/api/materials/porous-absorber/#membranelayer)) enter as
-locally reacting series impedances. The chain is closed by a rigid wall
+locally reacting series impedances; a [`PoroelasticLayer`](/phonometry/reference/api/materials/porous-absorber/#poroelasticlayer) carries the
+three Biot waves of its elastic frame and switches the whole stack to the
+six-variable global-matrix assembly of Allard & Atalla 2e Sect. 11.5, with
+the coupling matrices of Sect. 11.4. The chain is closed by a rigid wall
 (`termination="rigid"`), by radiation into free air behind
 (`termination="free"`, `Z_L = rho c / cos(theta)`) or by an arbitrary
 complex impedance. The reflection factor is

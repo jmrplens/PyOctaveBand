@@ -41,6 +41,9 @@ import pytest
 import reference_data as ref
 
 from phonometry.materials.impedance_tube import TransferMatrix
+
+# The termination admittance the equivalent-fluid recursion consumes, checked
+# bit for bit in TestLayeredAbsorber.
 from phonometry.materials.porous_absorber import (
     DELANY_BAZLEY_COEFFICIENTS,
     DELANY_BAZLEY_VALIDITY,
@@ -51,6 +54,7 @@ from phonometry.materials.porous_absorber import (
     PorousAbsorberWarning,
     PorousLayer,
     PorousMediumResult,
+    _termination_admittance,
     delany_bazley,
     diffuse_field_absorption,
     helmholtz_resonance_frequency,
@@ -367,6 +371,27 @@ class TestLayeredAbsorber:
             f, [AirLayer(0.1)], termination="free", angle=0.7
         )
         np.testing.assert_allclose(np.abs(res_ob.reflection), 0.0, atol=1e-12)
+
+    def test_free_termination_admittance_is_the_literal_cosine_over_rho_c(
+        self,
+    ) -> None:
+        """The equivalent-fluid path must not be reassociated.
+
+        The global-matrix assembly needs the termination as an impedance,
+        ``rho c / cos(theta)``, while the admittance recursion has always used
+        ``cos(theta) / rho c``. Those are not the same double: on a sweep of
+        4001 angles ``1 / (rho c / cos theta)`` differs in bits from
+        ``cos(theta) / rho c`` for 997 of them. Bit equality, not a tolerance,
+        is the assertion, because a few ulps is exactly what such a
+        reassociation costs and exactly what no tolerance would catch.
+        """
+        f = _grid(100.0, 1000.0, 3)
+        for theta in np.linspace(0.0, np.pi / 2.0, 4001, endpoint=False):
+            cos_t = float(np.cos(theta))
+            assert np.array_equal(
+                _termination_admittance("free", f, cos_t=cos_t, rc=RC),
+                np.full(f.shape, cos_t / RC, dtype=np.complex128),
+            )
 
     def test_impedance_termination_matches_rigid_limit(self) -> None:
         f = _grid(200.0, 1000.0, 50)

@@ -1748,8 +1748,8 @@ $$
 \sigma^f_{ij} = -\phi p\,\delta_{ij} = (Q\theta^s + R\theta^f)\delta_{ij},
 $$
 
-and for the usual case of a skeleton built from a material far stiffer than the
-skeleton itself ($K_s \to \infty$, true of glass, rock and polymer frames) the
+and for the usual case of a frame whose solid grains are much stiffer than the
+frame they build ($K_s \to \infty$, true of glass, rock and polymer frames) the
 three elastic coefficients follow from the shear modulus $N$, the Poisson
 coefficient $\nu$ and the bulk modulus $K_f$ of the fluid in the pores
 (Eqs. 6.26-6.29):
@@ -1895,8 +1895,14 @@ the book gives, the ch. 6 closed form Eq. 6.107 and the ch. 11 global-matrix
 assembly; and the three computed numbers the book does print in prose for the
 Table 6.1 glass wool, all reproduced: the airborne wave changes root at 495 Hz,
 $|\mu_a| > 40$ above 50 Hz, and $\mu_b$ falls from 1.0 at 50 Hz to 0.82 at
-1500 Hz. The impedance peak of the book's thinner sample is printed as 860 Hz
-and comes out at 863.5 Hz. Everything else, including the whole
+1500 Hz. That last one is matched by $\mathrm{Re}(\mu_b)$, not by $|\mu_b|$,
+even though the printed sentence says "the ratio modulus": the model gives
+$\mu_b(1500) = 0.811 + 0.473j$, whose real part is 1.1 % from the printed
+value while its modulus, 0.939, is 14.5 % away. That is recorded in
+[Errata](/phonometry/reference/errata/), along with the parameter sweep that
+fails to bring $|\mu_b|$ anywhere near 0.82. The impedance peak of the book's
+thinner sample is printed as 860 Hz and comes out at 863.5 Hz under the
+$\mathrm{Im}(Z_s)$ peak rule. Everything else, including the whole
 oblique-incidence behaviour beyond its rigid-frame limit, rests on closed forms
 and on structural identities, not on published digits.
 
@@ -2248,7 +2254,7 @@ found in the sources during this work are recorded in the
   Chapter 6: the Biot theory of an elastic-framed porous material, its elastic
   coefficients, its two compressional waves and its shear wave, and the surface
   impedance and quarter-wave frame resonance of a hard-backed layer
-  (Eqs 6.107-6.110). Chapter 11: the transfer-matrix method, the six-variable
+  (Eqs 6.107-6.111). Chapter 11: the transfer-matrix method, the six-variable
   poroelastic layer matrix (Table 11.1), the coupling matrices (Sect. 11.4) and
   the global assembly (Sect. 11.5). Section 11.3.4: the rigid and limp frame
   limits of the Biot theory, the decoupling frequency and the limp effective

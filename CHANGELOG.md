@@ -138,10 +138,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   chapter 6 closed form and the chapter 11 assembly agreeing to machine
   precision, and on the three computed numbers the book prints in prose (the
   airborne branch change at 495 Hz, `|mu_a| > 40` above 50 Hz and `mu_b` from
-  1,0 at 50 Hz to 0,82 at 1500 Hz) plus its published 860 Hz impedance peak.
-  Six new conformance rows.
+  1,0 at 50 Hz to 0,82 at 1500 Hz, this last one read as `Re(mu_b)`, see the
+  errata below) plus its published 860 Hz impedance peak. Six new conformance
+  rows. Fluid runs and poroelastic layers are split into blocks of bounded
+  attenuation before the global matrix is assembled, so a stack that
+  attenuates by hundreds of nepers stays finite and passive instead of
+  overflowing `float64` or returning a negative absorption coefficient, and a
+  layer that would need more than 64 such blocks, which is what a shear
+  modulus driven to zero asks for, is refused with a clear message.
 
-- Three defects of Allard & Atalla 2e recorded in `docs/ERRATA.md`: the second
+- Four defects of Allard & Atalla 2e recorded in `docs/ERRATA.md`: the second
   printed form of the shear velocity ratio, Eq. (6.85), whose denominator
   should be `w^2 rho12` and not `w^2 rho22`, as its own Eq. (6.80) shows and
   Eq. (6.84) requires; Eq. (11.48), which attaches both of its terms to the
@@ -149,9 +155,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   compressional waves, contradicting the Table 11.1 it is tabulated into; and
   the thickness of the second glass-wool sample of Sect. 6.6.3, printed as
   5,4 cm in one sentence and as 5,6 cm two sentences later and in the caption
-  of Figure 6.11. Computing the impedance peak from the printed material
-  settles the last one at 5,6 cm, which gives 863,5 Hz against the published
-  860 Hz where 5,4 cm gives 896 Hz.
+  of Figure 6.11; and the sentence of Sect. 6.5.4 that quotes "the ratio
+  modulus `|mu_b|`" decreasing from 1,0 to 0,82, whose two values are the real
+  part of `mu_b` (0,811 against the printed 0,82, while the modulus is 0,939).
+  The thickness entry is settled on textual grounds only, two printed
+  statements against one: the numbers are ambiguous, because the peak-finding
+  rule is not printed and the two natural rules point at different
+  thicknesses, which the entry now states.
 
 - Room-to-room noise reduction (`noise_control/room_to_room.py`, Norton &
   Karczub 2003 Section 4.9): `room_to_room_transmission` composes the whole

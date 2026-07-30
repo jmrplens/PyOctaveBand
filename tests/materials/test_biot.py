@@ -30,9 +30,11 @@ four kinds of evidence, in decreasing strength:
    Table 6.1 (printed p. 124), the only "computed" numbers the Biot chapter
    publishes: the airborne wave changes branch from ``(delta1, mu1)`` to
    ``(delta2, mu2)`` at **495 Hz**, ``|mu_a| > 40`` above 50 Hz, and
-   ``mu_b`` runs from **1,0 at 50 Hz to 0,82 at 1500 Hz** (all printed p. 124).
-   These are genuine independent oracles: they come out of the book's own run
-   of the full Biot model on a material whose every parameter is printed.
+   ``mu_b`` runs from **1,0 at 50 Hz to 0,82 at 1500 Hz** (all printed
+   pp. 124-125). These are genuine independent oracles: they come out of the
+   book's own run of the full Biot model on a material whose every parameter
+   is printed. The third is matched by ``Re(mu_b)``, not by ``|mu_b|``, even
+   though the printed sentence says "modulus"; see ``docs/ERRATA.md``.
 4. **The published resonance frequencies**: the surface-impedance peak that no
    equivalent-fluid model can produce sits "around 470 Hz" for a 10 cm layer
    and at **860 Hz** for a 5,6 cm layer (printed p. 129), against the closed
@@ -279,19 +281,32 @@ def test_airborne_velocity_ratio_exceeds_the_published_forty() -> None:
 
 
 def test_frame_borne_velocity_ratio_matches_the_two_published_values() -> None:
-    """A&A printed p. 125: ``mu_b`` "decreases from 1,0 at 50 Hz to 0,82 at 1500 Hz".
+    """A&A printed p. 125, read as ``Re(mu_b)``, not as ``|mu_b|``.
+
+    The printed sentence is "the ratio **modulus** ``|mu_b|`` of the velocities
+    of the frame and the air for the frame-borne wave decreases from 1,0 at
+    50 Hz to 0,82 at 1500 Hz", but the two values it quotes are the real part:
+    the model gives ``mu_b(1500) = 0,811 + 0,473 j``, whose real part is 1,1 %
+    from 0,82 while its modulus, 0,939, is 14,5 % away. ``docs/ERRATA.md``
+    records the sentence and the evidence, including the parameter sweep that
+    fails to bring ``|mu_b|`` anywhere near 0,82. The assertions here are
+    therefore written against ``Re(mu_b)`` and the test also states what
+    ``|mu_b|`` really does, so a future change cannot quietly reinterpret it.
 
     The frame-borne wave drags a comparable amount of air with it, which is
     exactly what an equivalent fluid cannot represent. The book prints one
     decimal at 50 Hz and two at 1500 Hz; it does not state the air constants it
-    used, so the comparison carries a 2 % tolerance (the shipped defaults give
-    1,002 and 0,811).
+    used, so the comparison carries a 2 % tolerance.
     """
     waves = _glass_wool_waves(np.array([50.0, 1500.0]))
     ratio = waves.frame_borne_velocity_ratio
     assert float(ratio[0].real) == pytest.approx(1.0, rel=0.02)
     assert float(ratio[1].real) == pytest.approx(0.82, rel=0.02)
     assert float(ratio[1].real) < float(ratio[0].real)
+    # The modulus reading of the same sentence, pinned so the erratum stays
+    # honest: it is nowhere near 0,82 at 1500 Hz.
+    assert abs(ratio[1]) == pytest.approx(0.939, rel=0.01)
+    assert abs(abs(ratio[1]) / 0.82 - 1.0) > 0.1
 
 
 def test_velocity_ratios_satisfy_the_second_printed_form() -> None:

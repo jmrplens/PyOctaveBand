@@ -87,7 +87,7 @@ references:
     edition: "2nd ed."
     publisher: "Wiley"
     doi: "10.1002/9780470747339"
-    note: "Chapter 6: the Biot theory of an elastic-framed porous material, its elastic coefficients, its two compressional waves and its shear wave, and the surface impedance and quarter-wave frame resonance of a hard-backed layer (Eqs 6.107-6.110). Chapter 11: the transfer-matrix method, the six-variable poroelastic layer matrix (Table 11.1), the coupling matrices (Sect. 11.4) and the global assembly (Sect. 11.5). Section 11.3.4: the rigid and limp frame limits of the Biot theory, the decoupling frequency and the limp effective density (Eqs 11.53-11.55, after Panneton 2007). ISBN 978-0-470-74661-5."
+    note: "Chapter 6: the Biot theory of an elastic-framed porous material, its elastic coefficients, its two compressional waves and its shear wave, and the surface impedance and quarter-wave frame resonance of a hard-backed layer (Eqs 6.107-6.111). Chapter 11: the transfer-matrix method, the six-variable poroelastic layer matrix (Table 11.1), the coupling matrices (Sect. 11.4) and the global assembly (Sect. 11.5). Section 11.3.4: the rigid and limp frame limits of the Biot theory, the decoupling frequency and the limp effective density (Eqs 11.53-11.55, after Panneton 2007). ISBN 978-0-470-74661-5."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -374,9 +374,9 @@ $$
 \sigma^f_{ij} = -\phi p\,\delta_{ij} = (Q\theta^s + R\theta^f)\delta_{ij},
 $$
 
-y para el caso habitual de un armazón fabricado con un material mucho más rígido
-que el propio armazón ($K_s \to \infty$, cierto en esqueletos de vidrio, roca y
-polímero) los tres coeficientes elásticos salen del módulo de cizalla $N$, el
+y para el caso habitual de un armazón cuyos granos sólidos son mucho más rígidos
+que el armazón que forman ($K_s \to \infty$, cierto en esqueletos de vidrio,
+roca y polímero) los tres coeficientes elásticos salen del módulo de cizalla $N$, el
 coeficiente de Poisson $\nu$ y el módulo de compresibilidad $K_f$ del fluido de
 los poros (ecs. 6.26-6.29):
 
@@ -528,8 +528,14 @@ del cap. 6 y el ensamblado por matriz global del cap. 11; y los tres números
 calculados que el libro sí imprime en prosa para la lana de vidrio de la tabla
 6.1, los tres reproducidos: la onda del aire cambia de raíz en 495 Hz,
 $|\mu_a| > 40$ por encima de 50 Hz y $\mu_b$ cae de 1,0 en 50 Hz a 0,82 en
-1500 Hz. El pico de impedancia de la muestra más delgada del libro está impreso
-como 860 Hz y sale en 863,5 Hz. Todo lo demás, incluido el comportamiento en
+1500 Hz. Este último lo reproduce $\mathrm{Re}(\mu_b)$, no $|\mu_b|$, aunque
+la frase impresa diga "el módulo del cociente": el modelo da
+$\mu_b(1500) = 0,811 + 0,473j$, cuya parte real queda a un 1,1 % del valor
+impreso mientras su módulo, 0,939, se aparta un 14,5 %. Queda registrado en
+[Erratas](/phonometry/es/reference/errata/), junto con el barrido de parámetros
+que no logra acercar $|\mu_b|$ a 0,82. El pico de impedancia de la muestra más
+delgada del libro está impreso como 860 Hz y sale en 863,5 Hz con la regla del
+máximo de $\mathrm{Im}(Z_s)$. Todo lo demás, incluido el comportamiento en
 incidencia oblicua más allá de su límite de esqueleto rígido, descansa en formas
 cerradas y en identidades estructurales, no en dígitos publicados.
 
@@ -896,8 +902,9 @@ modelos de fluido equivalente porosos (`delany_bazley`, `miki`,
 `johnson_champoux_allard`, `limp_frame`), la capa poroelástica
 (`biot_waves`, `biot_surface_impedance`, `PoroelasticLayer`), el
 solucionador multicapa por matrices de
-transferencia (`layered_absorber` con `PorousLayer`, `PoroelasticLayer`,
-`PerforatedPlateLayer`, `MicroperforatedPlateLayer` y `MembraneLayer`) y los
+transferencia (`layered_absorber` con `AirLayer`, `PorousLayer`,
+`PoroelasticLayer`, `PerforatedPlateLayer`, `MicroperforatedPlateLayer` y
+`MembraneLayer`) y los
 coeficientes de incidencia aleatoria por la integral de Paris
 (`diffuse_field_absorption`, `statistical_absorption`).
 

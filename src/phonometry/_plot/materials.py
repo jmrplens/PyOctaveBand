@@ -732,8 +732,11 @@ def plot_biot_waves(
     (attenuation) of the airborne compressional wave, the frame-borne
     compressional wave and the shear wave, the presentation of Allard &
     Atalla 2e Fig. 6.6. The airborne and frame-borne labels follow the
-    ``|mu|`` sorting of :class:`~phonometry.materials.biot.BiotWavesResult`,
-    so the curves stay smooth across the branch swap.
+    ``|mu|`` sorting of
+    :attr:`~phonometry.materials.biot.BiotWavesResult.airborne_is_second`,
+    which is the physical labelling of Sect. 6.5.4, not a smoothing: read that
+    property before reading a step in these curves as physics, because neither
+    labelling of the two compressional roots is continuous in general.
 
     :param result: A :class:`~phonometry.materials.biot.BiotWavesResult`.
     :param ax: Existing axes, or ``None`` to create a figure.

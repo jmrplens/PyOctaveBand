@@ -1171,7 +1171,16 @@ def _termination_admittance(
     cos_t: float,
     rc: float,
 ) -> Complex:
-    """Admittance ``G = u/p`` at the termination face of the stack."""
+    """Admittance ``G = u/p`` at the termination face of the stack.
+
+    ``"free"`` is evaluated as the literal ``cos(theta) / rho c`` the
+    recursion has always used, not as the reciprocal of the impedance the
+    global-matrix assembly needs: ``1 / (rho c / cos theta)`` is a different
+    double for about a quarter of the angles in ``[0, pi/2)``, and the
+    equivalent-fluid path must stay bit-identical.
+    """
+    if isinstance(termination, str) and termination == "free":
+        return np.full(f.shape, cos_t / rc, dtype=np.complex128)
     zl_arr = _termination_impedance(termination, f, cos_t=cos_t, rc=rc)
     if zl_arr is None:
         return np.zeros_like(f, dtype=np.complex128)
@@ -1402,7 +1411,10 @@ def layered_absorber(
     (equivalently the impedance recursion of Bies 5e Eq. (D.95) and the
     scheme of Mechel 2e Sect. D.4); sheet layers (:class:`PerforatedPlateLayer`,
     :class:`MicroperforatedPlateLayer`, :class:`MembraneLayer`) enter as
-    locally reacting series impedances. The chain is closed by a rigid wall
+    locally reacting series impedances; a :class:`PoroelasticLayer` carries the
+    three Biot waves of its elastic frame and switches the whole stack to the
+    six-variable global-matrix assembly of Allard & Atalla 2e Sect. 11.5, with
+    the coupling matrices of Sect. 11.4. The chain is closed by a rigid wall
     (``termination="rigid"``), by radiation into free air behind
     (``termination="free"``, ``Z_L = rho c / cos(theta)``) or by an arbitrary
     complex impedance. The reflection factor is
