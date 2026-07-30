@@ -1,0 +1,375 @@
+---
+title: "Emisión de la fuente de tráfico viario CNOSSOS-EU"
+description: "El método común europeo para la emisión de ruido de tráfico viario (Anexo II de la Directiva 2002/49/CE, apartado 2.2 y Apéndice F): las potencias acústicas de rodadura y propulsión de cada categoría de vehículo, las correcciones por pavimento, temperatura del aire, neumáticos con clavos, pendiente y cruces, y la potencia acústica direccional por metro de línea fuente."
+references:
+  - type: standard
+    organization: "European Union"
+    year: 2015
+    title: "Commission Directive (EU) 2015/996 establishing common noise assessment methods according to Directive 2002/49/EC of the European Parliament and of the Council"
+    designation: "Directive (EU) 2015/996"
+    url: "https://eur-lex.europa.eu/eli/dir/2015/996/oj"
+    note: "Sustituye por completo el Anexo II de la Directiva 2002/49/CE por los métodos CNOSSOS-EU. La fuente viaria implementada es el apartado 2.2 (fórmulas 2.2.1 a 2.2.20) con la base de coeficientes del Apéndice F."
+  - type: standard
+    organization: "European Union"
+    year: 2018
+    title: "Corrigendum to Commission Directive (EU) 2015/996"
+    designation: "OJ L 5, 10.1.2018, p. 35"
+    url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32015L0996R(01)"
+    note: "Corrige el rango de bandas de octava de la fuente viaria a 63 Hz - 8 kHz, sustituye íntegramente el Apéndice G y corrige a metros por segundo la conversión de rugosidad ferroviaria."
+  - type: standard
+    organization: "European Union"
+    year: 2021
+    title: "Commission Delegated Directive (EU) 2021/1226 amending, for the purposes of adapting to scientific and technical progress, Annex II to Directive 2002/49/EC as regards common assessment methods for noise"
+    designation: "Directive (EU) 2021/1226"
+    url: "https://eur-lex.europa.eu/eli/dir_del/2021/1226/oj"
+    note: "La modificación en vigor desde el 31 de diciembre de 2021. Sustituye por completo las Tablas F-1 y F-4 e imprime la ponderación A por bandas de octava con la que se suma el espectro de la fuente."
+  - type: report
+    authors: ["Kephalopoulos, S.", "Paviotti, M.", "Anfosso-Lédée, F."]
+    year: 2012
+    title: "Common noise assessment methods in Europe (CNOSSOS-EU)"
+    number: "EUR 25379 EN"
+    institution: "Publications Office of the European Union"
+    doi: "10.2788/31776"
+    url: "https://publications.jrc.ec.europa.eu/repository/handle/JRC72550"
+    note: "El informe de referencia del Centro Común de Investigación del que desciende el texto de la Directiva, con las campañas de medida que hay detrás de los coeficientes del Apéndice F."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 1996
+    title: "Acoustics — Attenuation of sound during propagation outdoors — Part 2: General method of calculation"
+    designation: "ISO 9613-2:1996"
+    url: "https://www.iso.org/standard/20649.html"
+    note: "El modelo de propagación que aquí lleva la emisión hasta un receptor. CNOSSOS-EU tiene su propio método de propagación en el apartado 2.5 del Anexo II, que no es la ISO 9613-2."
+---
+
+import ThemeImage from '../../../../components/ThemeImage.astro';
+
+Todo mapa estratégico de ruido trazado en la Unión Europea desde 2021 parte de
+los mismos dos números por banda de octava: cuánto ruido hace un vehículo y
+cuántos pasan por hora. El **Anexo II de la Directiva 2002/49/CE**, sustituido
+por los métodos CNOSSOS-EU, los convierte en una **potencia acústica direccional
+por metro de línea fuente**, que la etapa de propagación lleva luego hasta el
+receptor.
+
+Esta guía cubre la fuente viaria, el apartado 2.2 del Anexo II con la base de
+coeficientes del Apéndice F. La fuente ferroviaria (2.3, Apéndice G) y el modelo
+de propagación CNOSSOS-EU (2.5) van aparte.
+
+## 1. Qué texto está implementado
+
+El Anexo II es un blanco móvil y equivocarse en la superposición de instrumentos
+es la forma más fácil de publicar una tabla incorrecta. Hay tres en juego:
+
+| Instrumento | Qué le hace a la fuente viaria |
+| :--- | :--- |
+| Directiva (UE) **2015/996** de la Comisión | Sustituye el Anexo II completo. Aporta las fórmulas 2.2.1 a 2.2.20 y las Tablas F-1 a F-4. |
+| **Corrección de errores** del DO L 5, 10.1.2018 | Corrige el 2.2.1: las potencias acústicas se calculan "para cada banda de octava de **63 Hz a 8 kHz**", no de 125 Hz a 4 kHz como imprimía el texto original. El Apéndice F siempre cubrió de 63 Hz a 8 kHz, así que el texto sin corregir contradecía sus propias tablas. |
+| Directiva Delegada (UE) **2021/1226** de la Comisión | Sustituye por completo la **Tabla F-1** y la **Tabla F-4**, funde en una sola las antiguas filas 4a y 4b de la Tabla F-4 e imprime la ponderación A por bandas de octava que se usa en 2.5.5. |
+
+La biblioteca implementa el resultado consolidado. Las Tablas F-2 (neumáticos
+con clavos) y F-3 (cruces) nunca se han modificado. La modificación de 2021 no
+es cosmética: la fuente viaria vigente es unos **2,5 a 3,5 dB(A) más ruidosa**
+que la publicada en 2015, así que toda comparación con bibliografía anterior a
+2021 arrastra ese desfase.
+
+## 2. La fuente y la línea fuente
+
+Cada vehículo es una **fuente puntual a 0,05 m sobre el pavimento**, que radia
+uniformemente; la primera reflexión en la calzada ya está dentro de la potencia
+acústica, y por eso el método la llama magnitud de semicampo libre. Un flujo de
+tráfico es una **línea fuente** incoherente, idealmente una por carril en el eje
+del carril.
+
+Para cada categoría de vehículo `m` y banda de octava `i`, la fórmula (2.2.1)
+convierte la potencia acústica de un vehículo en potencia por metro de línea:
+
+$$
+L'_{W,\mathrm{eq,line},i,m} = L_{W,i,m} + 10\,\lg\!\left(\frac{Q_m}{1000\,v_m}\right),
+$$
+
+con `Qm` en vehículos por hora y `vm` en km/h. La potencia del vehículo es a su
+vez la suma energética de un término de **rodadura** y otro de **propulsión**
+(2.2.2), salvo para los vehículos de dos ruedas de la categoría 4, que no tienen
+rodadura alguna y se quedan solo con la propulsión (2.2.3):
+
+$$
+L_{W,i,m} = 10\,\lg\!\left(10^{L_{WR,i,m}/10} + 10^{L_{WP,i,m}/10}\right).
+$$
+
+La Tabla [2.2.a] fija cinco categorías modelizadas: **1** vehículos ligeros,
+**2** vehículos pesados medios, **3** vehículos pesados, **4a** ciclomotores y
+**4b** motocicletas. (Existe una sexta categoría "abierta" en el texto, pero no
+tiene coeficientes.)
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_emission.svg"
+  alt="Potencia por metro de línea fuente en bandas de octava de una vía urbana: barras para el total y líneas con marcadores para las aportaciones de ligeros, pesados medios, pesados y motocicletas, con los ligeros dominando por debajo de 500 Hz y los pesados a 1 kHz"
+  width="88%"
+  loading="eager"
+/>
+
+*Los vehículos ligeros llevan el grueso del flujo, pero 45 pesados por hora se
+imponen igualmente en las frecuencias medias: el espectro por metro enseña
+exactamente dónde manda cada categoría.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import (
+    JunctionType, RoadSurface, RoadTraffic, RoadVehicleCategory, road_source_power,
+)
+
+traffic = [
+    RoadTraffic(RoadVehicleCategory.LIGHT, 1200.0, 50.0),
+    RoadTraffic(RoadVehicleCategory.MEDIUM_HEAVY, 90.0, 50.0),
+    RoadTraffic(RoadVehicleCategory.HEAVY, 45.0, 50.0),
+    RoadTraffic(RoadVehicleCategory.MOTORCYCLES, 60.0, 50.0),
+]
+result = road_source_power(
+    traffic, surface=RoadSurface.THIN_LAYER_A, temperature=12.0, gradient=3.0,
+    junction_distance=60.0, junction_type=JunctionType.CROSSING,
+)
+result.plot()
+plt.show()
+```
+
+</details>
+
+## 3. Ruido de rodadura (2.2.4 a 2.2.10)
+
+El ruido de rodadura es el ruido neumático-calzada. Crece logarítmicamente con
+la velocidad a partir de la velocidad de referencia `vref = 70 km/h`:
+
+$$
+L_{WR,i,m} = A_{R,i,m} + B_{R,i,m}\,\lg\!\left(\frac{v_m}{v_\mathrm{ref}}\right)
+             + \Delta L_{WR,i,m},
+$$
+
+donde la corrección reúne cuatro efectos independientes (2.2.5): el pavimento,
+los neumáticos con clavos, el cruce y la temperatura del aire.
+
+La **temperatura del aire** (2.2.10) es una recta, aplicada por igual a las ocho
+bandas: `dLW,temp = Km (20 °C − tau)`, con `K1 = 0,08 dB/°C` para los ligeros y
+`K2 = K3 = 0,04 dB/°C` para las dos categorías pesadas. El aire frío endurece
+los neumáticos y hace más ruidosa la calzada, así que la corrección es
+*positiva* por debajo de 20 °C.
+
+Los **neumáticos con clavos** (2.2.6 a 2.2.9) solo se aplican a la categoría 1.
+El exceso por neumático `Dstud,i(v)` se satura por debajo de 50 km/h y por
+encima de 90 km/h, y la corrección de parque lo pondera por la fracción del año
+en que los clavos están en circulación, `ps = Qstud,ratio · Ts/12`:
+
+$$
+\Delta L_{\mathrm{studded},i} = 10\,\lg\!\left[(1 - p_s) + p_s\,10^{D_{\mathrm{stud},i}/10}\right].
+$$
+
+Los **cruces** (2.2.17) suman `CR,m,k · max(1 − |x|/100, 0)`, con `x` la
+distancia en metros al cruce más próximo y `k` el tipo de cruce: 1 para un cruce
+regulado por semáforo y 2 para una glorieta. Los coeficientes de rodadura `CR`
+son *negativos* (el tráfico junto a un cruce va más despacio) y los de
+propulsión `CP` positivos (va acelerando). Ambos se anulan a partir de 100 m.
+
+## 4. Ruido de propulsión (2.2.11 a 2.2.16)
+
+El ruido de propulsión es el del grupo motopropulsor: motor, escape, transmisión
+y admisión. Es **lineal** con la velocidad, no logarítmico, porque a baja
+velocidad el motor trabaja más por unidad de distancia recorrida:
+
+$$
+L_{WP,i,m} = A_{P,i,m} + B_{P,i,m}\,\frac{v_m - v_\mathrm{ref}}{v_\mathrm{ref}}
+             + \Delta L_{WP,i,m}.
+$$
+
+El cruce de las dos leyes de velocidad es lo que da a la fuente viaria su
+comportamiento: por debajo del cruce la fuente es un motor, por encima es un
+neumático.
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_speed_law.svg"
+  alt="Potencia acústica ponderada A de un solo vehículo frente a la velocidad de 20 a 130 km/h para ligeros y pesados, con las componentes de rodadura y propulsión en trazo discontinuo y punteado y la velocidad de cruce marcada en cada par"
+  width="88%"
+/>
+
+*Un vehículo ligero está dominado por el neumático desde unos 30 km/h; uno
+pesado solo hacia los 60 km/h, y por eso un camión sigue siendo un motor a
+velocidades urbanas.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import (
+    CNOSSOS_A_WEIGHTING, road_propulsion_noise, road_rolling_noise,
+    road_vehicle_sound_power,
+)
+
+weights = np.asarray(CNOSSOS_A_WEIGHTING)
+a_weighted = lambda bands: 10.0 * np.log10(np.sum(10.0 ** ((bands + weights) / 10.0)))
+
+speeds = np.linspace(20.0, 130.0, 221)
+fig, ax = plt.subplots()
+for category, name in [("1", "Vehículos ligeros (1)"), ("3", "Vehículos pesados (3)")]:
+    rolling = [a_weighted(road_rolling_noise(category, v)) for v in speeds]
+    propulsion = [a_weighted(road_propulsion_noise(category, v)) for v in speeds]
+    total = [a_weighted(road_vehicle_sound_power(category, v)) for v in speeds]
+    ax.plot(speeds, total, lw=2.4, label=f"{name} - total")
+    ax.plot(speeds, rolling, ls="--", lw=1.2, label=f"{name} - rodadura")
+    ax.plot(speeds, propulsion, ls=":", lw=1.2, label=f"{name} - propulsión")
+ax.set_xlabel("Velocidad v [km/h]")
+ax.set_ylabel("Potencia acústica ponderada A [dB(A) re 1 pW]")
+ax.legend(fontsize="small")
+plt.show()
+```
+
+</details>
+
+La **pendiente de la vía** (2.2.13 a 2.2.16) es la única corrección cuya forma
+publicada es genuinamente asimétrica, y la asimetría no es un desliz de
+transcripción. Para los ligeros la rama de bajada **no lleva factor de
+velocidad**, mientras que las dos categorías pesadas sí lo llevan y con
+desplazamientos de velocidad distintos:
+
+| Categoría | Bajada (`s` por debajo del codo) | Banda plana | Subida |
+| :--- | :--- | :--- | :--- |
+| 1 | `(min(12 %, −s) − 6 %)/1 %` | −6 % a 2 % | `(min(12 %, s) − 2 %)/1,5 % · v/100` |
+| 2 | `(min(12 %, −s) − 4 %)/0,7 % · (v − 20)/100` | −4 % a 0 % | `min(12 %, s)/1 % · v/100` |
+| 3 | `(min(12 %, −s) − 4 %)/0,5 % · (v − 10)/100` | −4 % a 0 % | `min(12 %, s)/0,8 % · v/100` |
+
+La categoría 4 no lleva corrección por pendiente. La pendiente se satura en el
+12 % en ambos sentidos. El ruido de bajada viene del freno motor y el de subida
+de la carga, así que las dos ramas son positivas. Para un flujo bidireccional,
+divide el flujo en dos y corrige una mitad en subida y la otra en bajada.
+
+## 5. El pavimento (2.2.19, 2.2.20 y Tabla F-4)
+
+La Tabla F-4 da, para cada uno de catorce pavimentos, un coeficiente por banda
+de octava `alpha` y un coeficiente de velocidad `beta`, por categoría de
+vehículo, con el rango de velocidad en que la fila se declara válida. El
+pavimento entra de forma distinta en cada término:
+
+$$
+\Delta L_{WR,\mathrm{road},i,m} = \alpha_{i,m} + \beta_m\,\lg\!\left(\frac{v_m}{v_\mathrm{ref}}\right),
+\qquad
+\Delta L_{WP,\mathrm{road},i,m} = \min\{\alpha_{i,m};\,0\}.
+$$
+
+Un pavimento absorbente reduce el ruido de propulsión; uno ruidoso no lo
+aumenta. Esa asimetría es deliberada: la calzada puede absorber el sonido del
+motor que se radia hacia ella, pero una textura rugosa solo genera ruido de
+neumático, y el ruido de neumático ya es el término de rodadura.
+
+```python
+from phonometry import RoadSurface, road_surface_coefficients
+
+row = road_surface_coefficients(RoadSurface.TWO_LAYER_ZOAB_FINE)
+row.speed_range          # (80.0, 130.0) km/h, el rango de validez impreso
+row.alpha["1"]           # alpha por banda de octava para vehículos ligeros
+row.beta["1"]            # -0.1, el coeficiente de velocidad
+```
+
+El pavimento de referencia de la primera fila es todo ceros: es el promedio
+virtual de una mezcla asfáltica densa 0/11 y una mezcla drenante tipo SMA 0/11,
+de entre dos y siete años, en estado de mantenimiento representativo, seca, sin
+neumáticos con clavos, a 20 °C y en llano. Exactamente en esas condiciones toda
+corrección del 2.2 se anula de forma idéntica, y las potencias acústicas **son**
+los coeficientes `AR,i,m` y `AP,i,m` de la Tabla F-1.
+
+## 6. Entregar la fuente a un modelo de propagación
+
+La etapa de emisión produce una potencia por metro. Trocear esa línea en fuentes
+puntuales equivalentes queda, en palabras del apartado 2.5.3, "fuera del alcance
+de la presente metodología": una fuente puntual que representa un tramo de
+longitud `dL` lleva simplemente `L'W,eq,line,i + 10 lg(dL)`, que es aritmética y
+se ofrece como tal.
+
+```python
+from phonometry import (
+    RoadTraffic, RoadVehicleCategory, line_source_segment_power,
+    predicted_receiver_level, road_source_power,
+)
+
+result = road_source_power([
+    RoadTraffic(RoadVehicleCategory.LIGHT, 1000.0, 90.0),
+    RoadTraffic(RoadVehicleCategory.HEAVY, 120.0, 80.0),
+])
+segment = line_source_segment_power(result.total_line_power, 20.0)  # tramo de 20 m
+levels = predicted_receiver_level(
+    segment, 100.0, result.source_height, 4.0, frequencies=result.frequencies,
+)
+```
+
+Conviene ver qué es esto y qué no. CNOSSOS-EU tiene **su propio** método de
+propagación en el apartado 2.5 del Anexo II, y no es la ISO 9613-2: difieren en
+el modelo de suelo, en el tratamiento de la difracción y en la forma de combinar
+las condiciones favorables y las homogéneas. Encadenar una emisión CNOSSOS con
+la propagación ISO 9613-2 de esta biblioteca es una estimación de ingeniería
+legítima, pero no es la cadena normativa CNOSSOS y no debe informarse como tal.
+
+Para el total ponderado A, usa la ponderación por bandas de octava que la propia
+Directiva imprime en el 2.5.5 modificado, en lugar de recalcularla:
+
+```python
+from phonometry import CNOSSOS_A_WEIGHTING
+
+CNOSSOS_A_WEIGHTING   # (-26.2, -16.1, -8.6, -3.2, 0.0, 1.2, 1.0, -1.1)
+result.a_weighted_line_power
+```
+
+## 7. Sustituir por una base de datos nacional
+
+El Apéndice F se llama *base de datos*, y no tabla de constantes, porque los
+Estados miembros pueden sustituir sus valores por otros medidos a escala
+nacional, y porque las mismas ecuaciones ya se han evaluado con dos juegos de
+coeficientes distintos (el de 2015 y el de 2021). Los dos objetos de
+coeficientes se pueden reemplazar:
+
+```python
+from phonometry import ROAD_COEFFICIENTS, RoadEmissionCoefficients
+
+national = RoadEmissionCoefficients(
+    rolling_a={"1": (83.1, 89.2, 87.7, 93.1, 100.1, 96.7, 86.8, 76.2), ...},
+    rolling_b=ROAD_COEFFICIENTS.rolling_b,
+    propulsion_a=ROAD_COEFFICIENTS.propulsion_a,
+    propulsion_b=ROAD_COEFFICIENTS.propulsion_b,
+    studded_a=ROAD_COEFFICIENTS.studded_a,
+    studded_b=ROAD_COEFFICIENTS.studded_b,
+    junction_c=ROAD_COEFFICIENTS.junction_c,
+    temperature_k=ROAD_COEFFICIENTS.temperature_k,
+)
+```
+
+Ese mecanismo es además lo que ancla la implementación: la Comisión Europea
+publicó un juego de prueba de 4.875 casos de emisión viaria calculados con los
+coeficientes de 2015, y alimentar las ecuaciones implementadas con esa base
+superada reproduce todos los niveles publicados por banda con 0,005 dB, dentro
+de los dos decimales que imprime el juego de prueba.
+
+## Qué cubre esta guía
+
+**Cubierto.** El apartado 2.2 del Anexo II de la Directiva 2002/49/CE en el
+texto consolidado: la potencia de línea del flujo de tráfico (2.2.1), la
+potencia del vehículo (2.2.2, 2.2.3), el ruido de rodadura con sus correcciones
+por neumáticos con clavos y temperatura (2.2.4 a 2.2.10), el ruido de propulsión
+con la corrección por pendiente (2.2.11 a 2.2.16), la corrección por cruce
+(2.2.17, 2.2.18) y el efecto del pavimento (2.2.19, 2.2.20), junto con toda la
+base de datos del Apéndice F, a través de `road_source_power`,
+`road_vehicle_sound_power`, `road_rolling_noise`, `road_propulsion_noise` y
+`road_surface_coefficients`.
+
+**No cubierto.** La fuente ferroviaria (2.3 y Apéndice G), la fuente industrial
+(2.4 y Apéndice H), la fuente aeronáutica (2.6 y 2.7) y el método de propagación
+CNOSSOS-EU del apartado 2.5, que es un modelo distinto del de la ISO 9613-2
+implementado en esta biblioteca. La categoría de vehículo abierta 5 no tiene
+coeficientes en el Apéndice F y por eso no se modeliza. Cómo se trocea una línea
+fuente en fuentes puntuales lo declara fuera de alcance el propio método.
+
+## Véase también
+
+- Referencia de la API: [`environmental.cnossos_road`](/phonometry/es/reference/api/environment/cnossos-road/).
+- [Propagación del sonido en exteriores](/phonometry/es/guides/outdoor-propagation/):
+  la cadena ISO 9613-2 que lleva una potencia de fuente hasta un receptor.
+- [Niveles de ruido ambiental](/phonometry/es/guides/environmental-levels/): los
+  indicadores Lden y Lnight para los que se trazan los mapas resultantes.

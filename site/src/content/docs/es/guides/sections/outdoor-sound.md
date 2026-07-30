@@ -5,7 +5,9 @@ description: "El sonido en su camino por el aire libre y el carácter de lo que 
 
 La evaluación del sonido en exteriores tiene dos mitades: predecir el nivel
 que una fuente entrega a un receptor lejano, y juzgar el carácter del sonido
-que efectivamente llega. Cada página de esta sección toma una mitad.
+que efectivamente llega. Las páginas de esta sección se reparten por esa
+línea, con la mitad de predicción empezando un paso antes, en la propia
+fuente.
 
 [Propagación del sonido en exteriores](/phonometry/es/guides/outdoor-propagation/)
 es la mitad de predicción. Partiendo de la **potencia acústica** de la fuente,
@@ -36,6 +38,14 @@ Kurze-Anderson, el semiplano rígido exacto, las barreras gruesas y la barrera
 coherente de cuatro caminos sobre el suelo, resolviendo la interferencia
 dependiente de la frecuencia que los términos por banda de octava suavizan.
 
+[Emisión de la fuente de tráfico viario CNOSSOS-EU](/phonometry/es/guides/cnossos-road-emission/)
+suministra la potencia acústica de la que parte una predicción, para la fuente
+que domina casi todos los mapas de ruido: el tráfico viario. El método común
+europeo del Anexo II de la Directiva 2002/49/CE construye una potencia acústica
+de rodadura y otra de propulsión para cada categoría de vehículo, las corrige
+por pavimento, temperatura del aire, neumáticos con clavos, pendiente y cruces,
+y entrega una potencia acústica direccional por metro de línea fuente.
+
 [Prominencia de sonidos impulsivos (NT ACOU 112)](/phonometry/es/guides/impulse-prominence/)
 es la mitad de evaluación. El ruido con impulsos claros (martilleo,
 remachado, hincado de pilotes) molesta más que un sonido estacionario del
@@ -62,6 +72,10 @@ y las fuentes que alimentan un cálculo de propagación en las secciones de
   el método común europeo de emisión ferroviaria, de la rugosidad del carril y
   de la rueda a la potencia acústica direccional por metro de las dos líneas
   fuente equivalentes.
+- [Emisión de la fuente de tráfico viario CNOSSOS-EU](/phonometry/es/guides/cnossos-road-emission/):
+  la fuente viaria del Anexo II de la Directiva 2002/49/CE: potencia acústica
+  de rodadura y propulsión por categoría de vehículo con la base de datos del
+  Apéndice F, y la potencia acústica direccional por metro de línea fuente.
 - [Efecto suelo esférico y barreras avanzadas](/phonometry/es/guides/ground-barriers/):
   la reflexión de onda esférica de Weyl-Van der Pol en el suelo y la difracción
   de barreras por teoría ondulatoria (Kurze-Anderson, semiplano rígido exacto,

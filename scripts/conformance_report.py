@@ -7057,6 +7057,189 @@ def _chk_ac_iec61265() -> Outcome:
 
 
 # ===========================================================================
+# CNOSSOS-EU road traffic source (Directive 2002/49/EC Annex II, 2.2)
+# ===========================================================================
+_CNOSSOS_ROAD = "CNOSSOS-EU road source (Directive 2002/49/EC Annex II)"
+_CNOSSOS_BANDS = ("63", "125", "250", "500", "1000", "2000", "4000", "8000")
+
+
+def _cnossos_road_csv(name: str) -> list[dict[str, str]]:
+    import csv
+
+    with (_DATA / "cnossos" / name).open(newline="", encoding="utf-8") as handle:
+        return list(csv.DictReader(handle))
+
+
+def _cnossos_road_2015_inputs() -> tuple[Any, dict[str, Any]]:
+    """The superseded (EU) 2015/996 Appendix F database the workbook used."""
+    from phonometry import RoadEmissionCoefficients, RoadSurfaceCoefficients
+
+    table: dict[str, dict[str, tuple[float, ...]]] = {}
+    for row in _cnossos_road_csv("road_coefficients_2015.csv"):
+        table.setdefault(row["category"], {})[row["coefficient"]] = tuple(
+            float(row[b]) for b in _CNOSSOS_BANDS
+        )
+    coefficients = RoadEmissionCoefficients(
+        rolling_a={k: v["AR"] for k, v in table.items()},
+        rolling_b={k: v["BR"] for k, v in table.items()},
+        propulsion_a={k: v["AP"] for k, v in table.items()},
+        propulsion_b={k: v["BP"] for k, v in table.items()},
+        studded_a=ph.ROAD_COEFFICIENTS.studded_a,
+        studded_b=ph.ROAD_COEFFICIENTS.studded_b,
+        junction_c=ph.ROAD_COEFFICIENTS.junction_c,
+        temperature_k=ph.ROAD_COEFFICIENTS.temperature_k,
+    )
+    alpha: dict[str, dict[str, tuple[float, ...]]] = {}
+    beta: dict[str, dict[str, float]] = {}
+    names: dict[str, str] = {}
+    for row in _cnossos_road_csv("road_surfaces_2015.csv"):
+        names[row["surface"]] = row["description"]
+        alpha.setdefault(row["surface"], {})[row["category"]] = tuple(
+            float(row[b]) for b in _CNOSSOS_BANDS
+        )
+        beta.setdefault(row["surface"], {})[row["category"]] = float(row["beta"])
+    surfaces = {
+        sid: RoadSurfaceCoefficients(
+            name=names[sid], alpha=alpha[sid], beta=beta[sid], speed_range=None
+        )
+        for sid in names
+    }
+    return coefficients, surfaces
+
+
+@register(
+    _CNOSSOS_ROAD,
+    "CIRCABC CNOSSOS-EU road emission test set",
+    "Line power of 60 published test cases, 8 octave bands each, dB re 1 pW/m",
+)
+def _chk_cnossos_road_workbook() -> Outcome:
+    """Worst per-band deviation from the published test workbook.
+
+    The European Commission source-module test set was computed with the
+    Appendix F tables of Commission Directive (EU) 2015/996, so the shipped
+    equations are fed that superseded database. The workbook prints two
+    decimals, hence the 0,01 dB budget.
+    """
+    coefficients, surfaces = _cnossos_road_2015_inputs()
+    worst = 0.0
+    for case in _cnossos_road_csv("road_emission_cases.csv"):
+        traffic = [
+            ph.RoadTraffic(
+                ph.RoadVehicleCategory(c), float(case[f"q_{c}"]), float(case[f"v_{c}"]),
+                studded_fraction=0.5 if c == "1" else 0.0,
+            )
+            for c in ("1", "2", "3", "4a", "4b")
+        ]
+        result = ph.road_source_power(
+            traffic,
+            surface=surfaces[case["surface"]],
+            temperature=float(case["temperature_c"]),
+            gradient=float(case["gradient_pct"]),
+            studded_months=float(case["studded_months"]),
+            junction_distance=float(case["junction_distance_m"]),
+            junction_type=ph.JunctionType(int(case["junction_type"])),
+            coefficients=coefficients,
+        )
+        for got, band in zip(result.total_line_power, _CNOSSOS_BANDS):
+            worst = max(worst, abs(float(got) - float(case[f"lw_{band}"])))
+    return numeric(0.0, worst, 0.01, unit="dB", places=4,
+                   expected_label="<= 0.01 dB on 480 published band levels")
+
+
+@register(
+    _CNOSSOS_ROAD,
+    "Directive (EU) 2021/1226 Annex pt (19)(a), Table F-1",
+    "Rolling and propulsion coefficients, 5 categories x 4 rows x 8 bands",
+)
+def _chk_cnossos_road_table_f1() -> Outcome:
+    bad = 0
+    for category, expected in ref.CNOSSOS_ROAD_TABLE_F1.items():
+        pairs = (
+            (ph.ROAD_COEFFICIENTS.rolling_a[category], expected["AR"]),
+            (ph.ROAD_COEFFICIENTS.rolling_b[category], expected["BR"]),
+            (ph.ROAD_COEFFICIENTS.propulsion_a[category], expected["AP"]),
+            (ph.ROAD_COEFFICIENTS.propulsion_b[category], expected["BP"]),
+        )
+        bad += sum(1 for got, want in pairs for a, b in zip(got, want) if a != b)
+    return numeric(0.0, float(bad), 0.0, unit=" mismatches", places=0,
+                   expected_label="160 coefficients identical")
+
+
+@register(
+    _CNOSSOS_ROAD,
+    "Directive (EU) 2021/1226 Annex pt (19)(b), Table F-4",
+    "Road-surface coefficients, 15 surfaces x 4 rows x (8 alpha + beta)",
+)
+def _chk_cnossos_road_table_f4() -> Outcome:
+    bad = 0
+    for surface in ph.RoadSurface:
+        row = ph.road_surface_coefficients(surface)
+        expected = ref.CNOSSOS_ROAD_TABLE_F4[surface.value]
+        for category in ("1", "2", "3", "4a", "4b"):
+            key = category if category in expected else "4a/4b"
+            bad += sum(1 for a, b in zip(row.alpha[category], expected[key][0]) if a != b)
+            bad += int(row.beta[category] != expected[key][1])
+    return numeric(0.0, float(bad), 0.0, unit=" mismatches", places=0,
+                   expected_label="540 coefficients identical")
+
+
+@register(
+    _CNOSSOS_ROAD,
+    "Directive (EU) 2015/996 Appendix F, Tables F-2 and F-3",
+    "Studded-tyre and junction coefficients, unchanged since 2015",
+)
+def _chk_cnossos_road_tables_f2_f3() -> Outcome:
+    bad = sum(
+        1
+        for got, want in (
+            (ph.ROAD_COEFFICIENTS.studded_a, ref.CNOSSOS_ROAD_TABLE_F2["ai"]),
+            (ph.ROAD_COEFFICIENTS.studded_b, ref.CNOSSOS_ROAD_TABLE_F2["bi"]),
+        )
+        for a, b in zip(got, want)
+        if a != b
+    )
+    for category, expected in ref.CNOSSOS_ROAD_TABLE_F3.items():
+        bad += int(ph.ROAD_COEFFICIENTS.junction_c[category] != (expected[1], expected[2]))
+    return numeric(0.0, float(bad), 0.0, unit=" mismatches", places=0,
+                   expected_label="36 coefficients identical")
+
+
+@register(
+    _CNOSSOS_ROAD,
+    "Directive (EU) 2015/996 Annex II 2.2.4 / 2.2.11",
+    "Sound power at v_ref = 70 km/h under reference conditions, dB re 1 pW",
+)
+def _chk_cnossos_road_reference_conditions() -> Outcome:
+    """At the reference conditions every correction vanishes identically, so
+    the rolling and propulsion powers are the Table F-1 coefficients A_R, A_P.
+    """
+    worst = 0.0
+    for category in ("1", "2", "3", "4a", "4b"):
+        rolling = ph.road_rolling_noise(category, 70.0)
+        propulsion = ph.road_propulsion_noise(category, 70.0)
+        for got, want in (
+            (rolling, ph.ROAD_COEFFICIENTS.rolling_a[category]),
+            (propulsion, ph.ROAD_COEFFICIENTS.propulsion_a[category]),
+        ):
+            worst = max(worst, max(abs(float(a) - b) for a, b in zip(got, want)))
+    return numeric(0.0, worst, 0.0, unit="dB", places=6,
+                   expected_label="exactly A_R,i,m and A_P,i,m")
+
+
+@register(
+    _CNOSSOS_ROAD,
+    "Directive (EU) 2021/1226 Annex pt (8)(b)",
+    "Octave-band A-weighting AWC_f,i prescribed by 2.5.5, dB",
+)
+def _chk_cnossos_a_weighting() -> Outcome:
+    bad = sum(
+        1 for a, b in zip(ph.CNOSSOS_A_WEIGHTING, ref.CNOSSOS_A_WEIGHTING_TABLE) if a != b
+    )
+    return numeric(0.0, float(bad), 0.0, unit=" mismatches", places=0,
+                   expected_label="8 values identical")
+
+
+# ===========================================================================
 # Wind-turbine noise (IEC 61400-11)
 # ===========================================================================
 _WIND_TURBINE = "Wind-turbine noise (IEC 61400-11)"

@@ -432,6 +432,10 @@ SAE ARP 5534, Doc 29/32 CEAC e IEC 61400-11.
 - [Propagación del sonido en exteriores](/phonometry/es/guides/outdoor-propagation/):
   la absorción atmosférica y el método general de ISO 9613-2, con el desglose de
   la atenuación por bandas de octava y por términos.
+- [Emisión de la fuente de tráfico viario CNOSSOS-EU](/phonometry/es/guides/cnossos-road-emission/):
+  la fuente viaria común europea del Anexo II 2.2: potencia acústica de rodadura
+  y propulsión por categoría de vehículo y potencia direccional por metro de
+  línea fuente.
 - [Efecto suelo esférico y barreras avanzadas](/phonometry/es/guides/ground-barriers/):
   el coeficiente de reflexión de Weyl-Van der Pol sobre suelo de impedancia
   finita y la difracción en barreras desde la teoría ondulatoria.

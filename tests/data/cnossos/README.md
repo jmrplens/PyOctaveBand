@@ -95,6 +95,58 @@ amendment changed is therefore covered by the table transcriptions and by the
 closed-form assertions in the same test module, not by these cases.
 
 Deliberately excluded: the workbook itself (9 MB of repeated cases), the
+| `road_emission_cases.csv` | derived (extract of a published result set) | 60 of the 4 875 cases of `CNOSSOS_ROAD_EMISSION_TEST.xlsx`, the road emission test workbook published by the European Commission on CIRCABC with the CNOSSOS-EU source module. Each row carries the segment description recovered from the workbook (see below) and the workbook's own per-octave-band and total line-power levels, copied verbatim to the two decimals it prints. |
+| `road_coefficients_2015.csv` | transcribed | Table F-1 of Appendix F of Annex II to Directive 2002/49/EC **as published in Commission Directive (EU) 2015/996** (OJ L 168, 1.7.2015, p. 124), that is the version the workbook was computed with and which Commission Delegated Directive (EU) 2021/1226 later replaced. Machine-transcribed from the Official Journal text. |
+| `road_surfaces_2015.csv` | transcribed | Table F-4 of the same 2015 text (OJ L 168, 1.7.2015, pp. 125-129), keyed by the `NLxx` surface identifiers the workbook uses. Also superseded by (EU) 2021/1226. |
+
+The workbook tabulates the **total** line power of a segment carrying all five
+vehicle categories, while each of its rows names only the category whose flow
+and speed that row varies. The traffic composition behind each block was
+recovered by exhaustive search over the flow and speed grids of the workbook
+and then verified against **all 4 875 rows**, which it reproduces to 0,005 dB,
+i.e. inside the workbook's own rounding. `road_emission_cases.csv` therefore
+writes the five flows out explicitly, so the committed cases are readable
+without the reconstruction.
+
+The coefficients of the current text, Tables F-1 to F-4 as they stand after
+(EU) 2021/1226, are *not* here: they live in `tests/reference_data.py`, also
+machine-transcribed from the Official Journal, and pin the tables shipped in
+`phonometry.environmental.cnossos_road`.
+
+## Source and authorship
+
+- The workbook is `CNOSSOS_ROAD_EMISSION_TEST.xlsx`, delivered with the
+  *Testing of Emission DLL's for CNOSSOS-EU Road, Rail and Industry Noise
+  Sources* report (Stapelfeldt Ingenieurgesellschaft mbH, Dortmund, doc. rev.
+  1406-2, 7 July 2014) as part of the CNOSSOS-EU source module of the Joint
+  Research Centre of the European Commission. It is distributed through the
+  Commission's CIRCABC document repository
+  (<https://circabc.europa.eu/>, CNOSSOS-EU interest group), retrieved
+  2026-07-29. Its results were produced twice, once by the reference emission
+  library of DGMR and once by an independent implementation, and agree to
+  0,01 dB.
+- The coefficient tables are the text of Commission Directive (EU) 2015/996
+  (OJ L 168, 1.7.2015, p. 1). Official Journal texts are published by the
+  Publications Office of the European Union; reuse is authorised under
+  Commission Decision 2011/833/EU, provided the source is acknowledged, which
+  the header of every file here does.
+- **This repository's MIT licence does not cover these files.** The Official
+  Journal material is reused under the Commission's reuse policy; the workbook
+  extract is redistributed under the same policy as a Commission publication.
+
+## Purpose and scope of use
+
+`tests/environmental/test_cnossos_road.py` feeds the shipped equations of
+Annex II 2.2 the superseded 2015 coefficient set and requires the workbook's
+levels back, band by band. That is the only oracle that pins the *equations*:
+the Directive itself prints no worked example anywhere in 2.2 or Appendix F.
+The 60 committed cases span all thirteen road surfaces exercised by the
+workbook, all five vehicle categories, all five gradient and junction
+combinations, all four temperature and studded-tyre combinations and all twelve
+speeds, so the committed subset reaches everything the full set does except the
+sheer number of repetitions.
+
+Deliberately excluded: the workbook itself (10 MB of repeated cases), the
 CNOSSOS-EU reference source module and its libraries, and the Official Journal
 PDFs. The data are **not** part of the `phonometry` package and are not
 installed with it.
@@ -108,3 +160,6 @@ contact the maintainer (see `CITATION.cff`) and it will be removed promptly.
 The suite would then lose its only oracle for the railway emission equations:
 the Appendix G transcriptions and the closed-form assertions would still run,
 but the end-to-end cases would have to go with it.
+The suite would then lose its only oracle for the road emission equations: the
+coefficient-table and closed-form assertions would still run, but the
+end-to-end cases would have to go with it.

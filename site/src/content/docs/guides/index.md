@@ -412,6 +412,9 @@ IEC 61400-11.
 - [Outdoor Sound Propagation](/phonometry/guides/outdoor-propagation/):
   atmospheric absorption and the ISO 9613-2 general method, with a per-term
   octave-band attenuation breakdown.
+- [CNOSSOS-EU road traffic source emission](/phonometry/guides/cnossos-road-emission/):
+  the common EU road source of Annex II 2.2: rolling and propulsion sound power
+  per vehicle category and the directional power per metre of source line.
 - [Spherical ground effect and advanced barriers](/phonometry/guides/ground-barriers/):
   the Weyl-Van der Pol reflection coefficient over finite-impedance ground, and
   wave-theoretic barrier diffraction.

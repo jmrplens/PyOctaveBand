@@ -162,6 +162,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   statements against one: the numbers are ambiguous, because the peak-finding
   rule is not printed and the two natural rules point at different
   thicknesses, which the entry now states.
+- CNOSSOS-EU road traffic source emission
+  (`environmental/cnossos_road.py`, Directive 2002/49/EC Annex II section 2.2
+  and Appendix F). The source model every strategic noise map in the European
+  Union has been drawn from since 2021: each vehicle is a point source 0,05 m
+  above the pavement whose sound power is the energy sum of a **rolling** term
+  growing logarithmically with speed (2.2.4) and a **propulsion** term growing
+  linearly with it (2.2.11), and a traffic flow is a source line carrying
+  `L'W,eq,line = LW + 10 lg[Q/(1000 v)]` per metre (2.2.1). Implemented in full:
+  the studded-tyre correction with its 50 and 90 km/h saturation branches
+  (2.2.6 to 2.2.9), the air-temperature correction (2.2.10), the road-gradient
+  correction with the published asymmetry between the light and heavy
+  categories (2.2.13 to 2.2.16), the junction correction that fades out over
+  100 m (2.2.17, 2.2.18), and the road-surface effect, which enters rolling
+  noise as `alpha + beta lg(v/vref)` and propulsion noise as `min(alpha, 0)`
+  (2.2.19, 2.2.20). `road_source_power` assembles a whole traffic mix into a
+  `RoadEmissionResult` that keeps the rolling, propulsion, per-vehicle and
+  per-category line spectra, A-weights itself with the octave-band table the
+  Directive prints in 2.5.5, and draws the category breakdown with `.plot()`;
+  `line_source_segment_power` converts the per-metre power into the point
+  source of a segment, which the method itself declares out of its own scope.
+
+  The implemented text is the consolidated one: the equations of (EU) 2015/996,
+  the 63 Hz to 8 kHz octave-band range restored by the corrigendum of OJ L 5,
+  10.1.2018, and Tables F-1 and F-4 as replaced by (EU) 2021/1226 — which is
+  worth 2,5 to 3,5 dB(A) against the tables published in 2015. Every shipped
+  table names the instrument it comes from, and both coefficient objects
+  (`RoadEmissionCoefficients`, `RoadSurfaceCoefficients`) can be replaced, which
+  is how Appendix F is meant to be used: as a database a Member State may
+  substitute.
+
+  Anchored on the European Commission's own test set: 60 of the 4 875 cases of
+  the CIRCABC road emission workbook are committed under `tests/data/cnossos/`
+  with the 2015 coefficient tables they were computed with, and the shipped
+  equations reproduce every published band level to 0,005 dB, inside the two
+  decimals the workbook prints. What the workbook cannot reach — the studded
+  speed branches, the gradient breakpoints, the 20 km/h floor — is pinned on
+  the exact closed forms, and the current Appendix F tables are pinned against
+  a machine transcription of the Official Journal. New guide "CNOSSOS-EU road
+  traffic source emission" with the source-line spectrum and the
+  rolling/propulsion speed-crossover figures, in English and Spanish.
 
 - Room-to-room noise reduction (`noise_control/room_to_room.py`, Norton &
   Karczub 2003 Section 4.9): `room_to_room_transmission` composes the whole

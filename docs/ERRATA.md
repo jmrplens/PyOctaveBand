@@ -1330,6 +1330,34 @@ to the issuing body, with date and reference).
 
 ---
 
+## Commission Directive (EU) 2015/996, Annex II 2.2.1 (octave-band range of the road source)
+
+- **Location:** the Annex, point 2.2.1, second paragraph under the heading
+  "Traffic flow" (OJ L 168, 1.7.2015, p. 8).
+- **The print:** "these sound power levels are calculated for each octave band
+  i from 125 Hz to 4 kHz".
+- **The problem:** the road source model contradicts its own coefficient
+  database. Every table of Appendix F, both in the 2015 text and in the
+  version replaced by (EU) 2021/1226, is printed over the eight octave bands
+  **63 Hz to 8 kHz**, and point 2.1.1 of the same Annex defines the frequency
+  range of the method as 63 Hz to 8 kHz. A calculation restricted to
+  125 Hz - 4 kHz would silently discard four of the eight tabulated bands.
+- **Evidence:** corrected by the corrigendum published in OJ L 5, 10.1.2018,
+  p. 35, which reads in full: 'On page 8, in the Annex, in point 2.2.1, in the
+  second paragraph under the heading "Traffic flow": for: "each octave band i
+  from 125 Hz to 4 kHz", read: "each octave band i from 63 Hz to 8 kHz"'. The
+  same corrigendum also adds "octave bands" to the frequency range of 2.1.1.
+- **Library behaviour:**
+  [`cnossos_road`](../src/phonometry/environmental/cnossos_road.py) works over
+  the corrected 63 Hz to 8 kHz grid (`ROAD_OCTAVE_BANDS`), pinned by
+  `test_octave_bands_are_the_corrected_range` and by the workbook cases, whose
+  published levels cover all eight bands.
+- **Status:** corrected by the issuing body (corrigendum of 10 January 2018);
+  recorded because the uncorrected 2015 text is still the one most often
+  downloaded and quoted.
+
+---
+
 ## Ainslie, Principles of Sonar Performance Modelling (2010), Eq. (9.57)
 
 *Textbook, not a standard.*

@@ -118,6 +118,16 @@ def _outdoor() -> ph.OutdoorAttenuation:
     )
 
 
+def _cnossos_road() -> ph.RoadEmissionResult:
+    return ph.road_source_power(
+        [
+            ph.RoadTraffic(ph.RoadVehicleCategory.LIGHT, 1200.0, 50.0),
+            ph.RoadTraffic(ph.RoadVehicleCategory.HEAVY, 45.0, 50.0),
+        ],
+        surface=ph.RoadSurface.THIN_LAYER_A, temperature=12.0, gradient=3.0,
+    )
+
+
 def _porous_medium() -> ph.PorousMediumResult:
     f = np.linspace(400.0, 4000.0, 40)
     return ph.miki(f, 20000.0)
@@ -565,6 +575,7 @@ _KWARG_PLOT_CASES = [
         [70.0, 72.0, 74.0], [40.0, 41.0, 42.0], [0.5, 0.5, 0.5]), "line"),
     ("open_plan", _open_plan, "line"),
     ("outdoor", _outdoor, "line"),
+    ("cnossos_road", _cnossos_road, "bar"),
     ("impedance_tube", _impedance_tube, "line"),
     ("porous_medium", _porous_medium, "line"),
     ("layered_absorber", _layered_absorber, "line"),
@@ -1093,6 +1104,7 @@ def test_single_axes_plots_accept_external_ax() -> None:
         _sound_power(),
         _open_plan(),
         _outdoor(),
+        _cnossos_road(),
         _impedance_tube(),
         _porous_medium(),
         _layered_absorber(),
