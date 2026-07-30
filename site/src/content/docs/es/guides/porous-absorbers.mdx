@@ -87,7 +87,7 @@ references:
     edition: "2nd ed."
     publisher: "Wiley"
     doi: "10.1002/9780470747339"
-    note: "Chapter 6: the Biot theory of an elastic-framed porous material, its elastic coefficients, its two compressional waves and its shear wave, and the surface impedance and quarter-wave frame resonance of a hard-backed layer (Eqs 6.107-6.111). Chapter 11: the transfer-matrix method, the six-variable poroelastic layer matrix (Table 11.1), the coupling matrices (Sect. 11.4) and the global assembly (Sect. 11.5). Section 11.3.4: the rigid and limp frame limits of the Biot theory, the decoupling frequency and the limp effective density (Eqs 11.53-11.55, after Panneton 2007). ISBN 978-0-470-74661-5."
+    note: "Capítulo 6: la teoría de Biot de un material poroso de esqueleto elástico, sus coeficientes elásticos, sus dos ondas de compresión y su onda de cortante, y la impedancia de superficie y la resonancia de cuarto de onda del esqueleto de una capa con fondo rígido (ecs. 6.107-6.111). Capítulo 11: el método de matrices de transferencia, la matriz de capa poroelástica de seis variables (tabla 11.1), las matrices de acoplamiento (apdo. 11.4) y el ensamblado global (apdo. 11.5). Apartado 11.3.4: los límites de esqueleto rígido y blando de la teoría de Biot, la frecuencia de desacoplamiento y la densidad efectiva blanda (ecs. 11.53-11.55, según Panneton 2007). ISBN 978-0-470-74661-5."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -474,8 +474,11 @@ teoría necesita, $[v_1^s, v_3^s, v_3^f, \sigma^s_{33}, \sigma^s_{13},
 \sigma^f_{33}]$, de modo que `layered_absorber` pasa de la cadena de dos
 variables al ensamblado por matriz global del apdo. 11.5 de Allard & Atalla: las
 capas de fluido y las láminas conservan sus matrices 2x2, cada capa
-poroelástica aporta la suya de 6x6 y ambas se unen mediante las matrices de
-acoplamiento impresas del apdo. 11.4. Dos capas poroelásticas contiguas se
+poroelástica entra por las seis amplitudes de onda de sus propios bloques
+$[\Gamma]$ y no por una matriz de transferencia, y ambas se unen mediante las
+matrices de acoplamiento impresas del apdo. 11.4. Resolver directamente en las
+amplitudes evita invertir $[\Gamma(0)]$, que es lo que hace tratable un
+esqueleto muy blando o muy grueso. Dos capas poroelásticas contiguas se
 acoplan como esqueletos **pegados** (su ec. 11.67); una lámina junto a una de
 ellas se acopla como pantalla libre, desacoplada mecánicamente. El
 `transfer_matrix` devuelto se rellena con `nan` en una pila así, porque para

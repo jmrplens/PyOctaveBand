@@ -729,9 +729,10 @@ def plot_biot_waves(
     """The three Biot wavenumbers of a poroelastic layer vs frequency.
 
     Draws the real part (propagation) and the negative imaginary part
-    (attenuation) of the airborne compressional wave, the frame-borne
-    compressional wave and the shear wave, the presentation of Allard &
-    Atalla 2e Fig. 6.6. The airborne and frame-borne labels follow the
+    (attenuation) of the two compressional waves, and the real part of the
+    shear wave, the presentation of Allard & Atalla 2e Fig. 6.6. The shear
+    attenuation is left out because it tracks its own real part closely enough
+    over this range to sit on top of it. The airborne and frame-borne labels follow the
     ``|mu|`` sorting of
     :attr:`~phonometry.materials.biot.BiotWavesResult.airborne_is_second`,
     which is the physical labelling of Sect. 6.5.4, not a smoothing: read that

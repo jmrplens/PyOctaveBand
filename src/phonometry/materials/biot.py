@@ -918,9 +918,14 @@ def _stack_surface_impedance(
     velocity = solution[:, 0, 0]
     # A lossless stack over a rigid wall drives the surface velocity to zero,
     # which maps to an infinite surface impedance.
-    moving = np.abs(velocity) > 0.0
+    # A degenerate solve returns NaN, and `abs(nan) > 0` is False, so testing
+    # only for a moving surface would report the failure as the rigid-wall
+    # case. Keep NaN as NaN: an unusable answer must not look like a physical
+    # one.
+    finite = np.isfinite(velocity)
+    moving = finite & (np.abs(velocity) > 0.0)
     with np.errstate(divide="ignore", invalid="ignore"):
+        impedance = np.where(moving, 1.0 / np.where(moving, velocity, 1.0), np.inf + 0j)
         return np.asarray(
-            np.where(moving, 1.0 / np.where(moving, velocity, 1.0), np.inf + 0j),
-            dtype=np.complex128,
+            np.where(finite, impedance, np.nan + 0j), dtype=np.complex128
         )

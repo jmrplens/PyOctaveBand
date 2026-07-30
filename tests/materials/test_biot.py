@@ -510,13 +510,14 @@ def test_global_assembly_reproduces_the_chapter_6_closed_form() -> None:
         assert np.max(np.abs(assembled / closed - 1.0)) < 1e-10
 
 
-def test_transfer_matrix_composes_and_matches_the_assembly() -> None:
+def test_transfer_matrix_composes() -> None:
     """``[T p]`` of Eq. (11.34) is a propagator: ``T(h1) T(h2) = T(h1 + h2)``.
 
     That identity holds only if the six columns of ``[Gamma]`` are solutions of
     the same constant-coefficient system, so a ``sin``/``cos`` swap or a
-    misplaced ``j`` inside a column breaks it. ``T(h)`` is also checked against
-    the assembly through the two-layer stack it must equal.
+    misplaced ``j`` inside a column breaks it. The comparison against the
+    assembly is the test above, which checks the closed form of Eq. (6.107)
+    against ``layered_absorber`` at four thicknesses.
     """
     frequency = np.geomspace(100.0, 2000.0, 20)
     waves = _glass_wool_waves(frequency)

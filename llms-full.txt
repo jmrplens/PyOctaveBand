@@ -25012,8 +25012,11 @@ Inside a stack, a `PoroelasticLayer` carries the same six variables the theory
 needs, $[v_1^s, v_3^s, v_3^f, \sigma^s_{33}, \sigma^s_{13}, \sigma^f_{33}]$, so
 `layered_absorber` switches from the two-variable chain to the global-matrix
 assembly of Allard & Atalla Sect. 11.5: fluid and sheet layers keep their 2x2
-matrices, each poroelastic layer contributes its 6x6 one, and the two are joined
-by the printed coupling matrices of Sect. 11.4. Two adjacent poroelastic layers
+matrices, each poroelastic layer enters through the six wave amplitudes of its
+own $[\Gamma]$ blocks rather than through a transfer matrix, and the two are
+joined by the printed coupling matrices of Sect. 11.4. Solving for the
+amplitudes directly avoids inverting $[\Gamma(0)]$, which is what makes a very
+soft or very thick frame tractable at all. Two adjacent poroelastic layers
 are coupled as **bonded** frames (their Eq. 11.67); a sheet next to one is
 coupled as a free, mechanically decoupled screen. The returned
 `transfer_matrix` is filled with `nan` for such a stack, because a 2x2 chain
