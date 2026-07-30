@@ -12,9 +12,13 @@ Install:
 pip install phonometry            # core (NumPy + SciPy only)
 pip install phonometry[plot]      # + matplotlib figures and .plot()
 pip install phonometry[perf]      # + numba-jitted impulse kernel
-pip install phonometry[report]    # + reportlab, for .report() PDF fiches
-pip install phonometry[full]      # all of the above
+pip install phonometry[report]    # + reportlab and svglib, for .report() PDF fiches
+pip install phonometry[full]      # all of the above (recommended)
 ```
+
+I recommend `pip install phonometry[full]`, which enables every feature. The base install computes every metric on NumPy and SciPy alone; without the extras only the `.plot()` figures and the `.report()` PDF fiches (whose figure panel needs matplotlib as well as reportlab and svglib) are unavailable. The `impulse` time weighting still works without numba, on a pure-Python kernel that is only slower.
+
+One caveat about `[full]`: numba declares `numpy<2.5`, so `phonometry[full]` (like `phonometry[perf]`) resolves NumPy below 2.5 while a plain install gets the newest release. numba only makes the `impulse` time weighting faster, so install `phonometry[plot,report]` instead if you would rather keep NumPy current.
 
 Minimal usage (all functions treat time as the LAST axis; 2D input is (channels, samples)):
 
@@ -505,9 +509,10 @@ inversion); the descriptive `ReportMetadata` fields that apply here are
 `client`, `manufacturer`, `specimen`, `mounting`, `test_room`, `test_date`,
 `pressure`, `measurement_standard`, `laboratory`, `operator`, `report_id` and
 `notes`. The `requirement` field is ignored (ISO 354 has no verdict). Rendering
-needs reportlab (`pip install phonometry[report]`); only `engine="reportlab"` is
-supported. The fiche renders in English by default; pass `language="es"` for a
-Spanish fiche (translated fixed strings and a comma decimal separator).
+needs reportlab and, for the figure the fiche embeds, matplotlib (`pip install
+"phonometry[report,plot]"`); only `engine="reportlab"` is supported. The fiche
+renders in English by default; pass `language="es"` for a Spanish fiche
+(translated fixed strings and a comma decimal separator).
 
 ```python
 from phonometry import materials, ReportMetadata
@@ -714,10 +719,11 @@ and rendering engine as the ISO 717 insulation fiche; passing
 `requirement` is read as the minimum $\alpha_w$ for the PASS/FAIL verdict.
 Setting `verbose=True` swaps the two-column table for the ISO 11654 evaluation
 columns (practical coefficient, shifted reference, unfavourable deviation).
-Rendering needs reportlab (`pip install phonometry[report]`); only
-`engine="reportlab"` is supported. The fiche renders in English by default;
-pass `language="es"` for a Spanish fiche (translated fixed strings and a comma
-decimal separator), e.g. `result.report("alpha_w_fiche_es.pdf", language="es")`.
+Rendering needs reportlab and, for the figure the fiche embeds, matplotlib (`pip
+install "phonometry[report,plot]"`); only `engine="reportlab"` is supported. The
+fiche renders in English by default; pass `language="es"` for a Spanish fiche
+(translated fixed strings and a comma decimal separator), e.g.
+`result.report("alpha_w_fiche_es.pdf", language="es")`.
 
 ```python
 from phonometry import materials, ReportMetadata
@@ -1456,12 +1462,13 @@ ratings](https://jmrplens.github.io/phonometry/guides/insulation-ratings/#report
 engine as the ISO 717 insulation fiche; a supplied `requirement` is read as the
 certification EPNL limit in EPNdB (the EPNL passes at or below it), and
 `metadata=None` produces a lightweight prediction fiche with no verdict row.
-Rendering needs reportlab (`pip install phonometry[report]`); only
-`engine="reportlab"` is supported. The fiche renders in English by default;
-pass `language="es"` for a Spanish fiche (translated fixed strings and a comma
-decimal separator), e.g. `res.report("epnl_fiche_es.pdf", language="es")`. The
-fiche is a computational EPNL result and is not an official State noise
-certificate; it does not reproduce any TCDSN.
+Rendering needs reportlab and, for the figure the fiche embeds, matplotlib (`pip
+install "phonometry[report,plot]"`); only `engine="reportlab"` is supported. The
+fiche renders in English by default; pass `language="es"` for a Spanish fiche
+(translated fixed strings and a comma decimal separator), e.g.
+`res.report("epnl_fiche_es.pdf", language="es")`. The fiche is a computational
+EPNL result and is not an official State noise certificate; it does not
+reproduce any TCDSN.
 
 ```python
 from phonometry import effective_perceived_noise_level, ReportMetadata
@@ -3922,15 +3929,7 @@ To get accurate SPL measurements from a digital recording, you must first
 calculate the sensitivity of your measurement chain using a reference tone
 (e.g., 94 dB @ 1 kHz).
 
-```mermaid
-flowchart LR
-    A["Calibrator tone\n94 dB @ 1 kHz\n(IEC 60942)"] --> B["Recording\ncalibrator_recording"]
-    B --> C["sensitivity()"]
-    C --> D["calibration_factor\n(digital units → Pa)"]
-    D --> E["octave_filter / leq / laeq / ln_levels"]
-    F["Measurement\nrecording"] --> E
-    E --> G["Levels in dB SPL\n(re 20 µPa)"]
-```
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_calibration_dataflow_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_calibration_dataflow.svg" alt="Calibration data flow: the calibrator recording and the measurement recording come from the same untouched chain, sensitivity() turns the first into the factor S in pascals per digital unit and, given fs, checks the short-term stability of IEC 60942, every level function accepts that factor as calibration_factor, and the result is levels in dB SPL re 20 µPa; with no calibrator the factor stays at 1 and the samples are read as pascals, so dbfs=True is what gives levels referred to digital full scale" width="92%"></picture>
 
 ```python
 import numpy as np
@@ -8385,10 +8384,11 @@ higher/lower-is-better quantity. It uses the same `ReportMetadata` container
 (documented under
 [Insulation ratings](https://jmrplens.github.io/phonometry/guides/insulation-ratings/#report-metadata-reportmetadata)) and
 rendering engine as the other fiches; passing `metadata=None` produces a bare
-characterisation fiche. Rendering needs reportlab
-(`pip install phonometry[report]`); only `engine="reportlab"` is supported. The
-fiche renders in English by default; pass `language="es"` for a Spanish fiche
-(translated fixed strings and a comma decimal separator).
+characterisation fiche. Rendering needs reportlab and, for the figure the fiche
+embeds, matplotlib (`pip install "phonometry[report,plot]"`); only
+`engine="reportlab"` is supported. The fiche renders in English by default; pass
+`language="es"` for a Spanish fiche (translated fixed strings and a comma
+decimal separator).
 
 ```python
 from phonometry import (
@@ -11148,8 +11148,9 @@ measured-versus-shifted-ISO 717-reference curve and the boxed single number
 annexes the ISO 717 evaluation per band (the value, the shifted reference and
 the unfavourable deviation). A `requirement` supplied on the `ReportMetadata`
 adds a verdict (`Dn,f,w` passes at or above it, `Ln,f,w` at or below it), and
-`language="es"` renders every fiche in Spanish. reportlab is required
-(`pip install phonometry[report]`).
+`language="es"` renders every fiche in Spanish. reportlab is required, and
+matplotlib too for the figure the fiche embeds (`pip install
+"phonometry[report,plot]"`).
 
 ```python
 import numpy as np
@@ -11263,9 +11264,22 @@ Optional extras:
 ```bash
 pip install phonometry[plot]    # matplotlib, for filter response plots and result .plot() methods
 pip install phonometry[perf]    # numba, faster 'impulse' time weighting
-pip install phonometry[report]  # reportlab + svglib, so result .report() methods render normative PDF fiches
-pip install phonometry[full]    # all of the above
+pip install phonometry[report]  # reportlab + svglib, so result .report() methods render normative PDF fiches (their figure panel needs [plot] too)
+pip install phonometry[full]    # all of the above (recommended)
 ```
+
+I recommend `pip install phonometry[full]`: it brings matplotlib, numba,
+reportlab and svglib in one go, so every feature of the library is enabled. The
+base install computes every metric on NumPy and SciPy alone; the only things it
+leaves unavailable are the figures (`.plot()` and the filter response plots),
+the normative PDF fiches (`.report()`) and the compiled kernel that speeds up
+the `impulse` time weighting.
+
+One caveat about `[full]`: numba declares `numpy<2.5`, so `phonometry[full]`
+(like `phonometry[perf]`) resolves NumPy below 2.5 while a plain install gets
+the newest release. numba only makes the `impulse` time weighting faster, so if
+you would rather keep NumPy current, install `phonometry[plot,report]` and
+leave `[perf]` out.
 
 **Option 2: Cloning and Installing**
 
@@ -13166,10 +13180,11 @@ descriptive and geometric `ReportMetadata` fields are `client`, `manufacturer`,
 `test_date`, `temperature`, `pressure`, `measurement_standard`, `laboratory`,
 `operator`, `report_id` and `notes` (`tube_diameter` and `mic_spacing` are given
 in metres and printed in millimetres). The `requirement` field is ignored
-(ISO 10534-2 has no verdict). Rendering needs reportlab
-(`pip install phonometry[report]`); only `engine="reportlab"` is supported. The
-fiche renders in English by default; pass `language="es"` for a Spanish fiche
-(translated fixed strings and a comma decimal separator).
+(ISO 10534-2 has no verdict). Rendering needs reportlab and, for the figure the
+fiche embeds, matplotlib (`pip install "phonometry[report,plot]"`); only
+`engine="reportlab"` is supported. The fiche renders in English by default; pass
+`language="es"` for a Spanish fiche (translated fixed strings and a comma
+decimal separator).
 
 ```python
 from phonometry import materials, ReportMetadata
@@ -13728,11 +13743,11 @@ It uses the same `ReportMetadata` container
 (documented under [Insulation ratings](https://jmrplens.github.io/phonometry/guides/insulation-ratings/#report-metadata-reportmetadata))
 and rendering engine as the [ISO 532-1 loudness fiche](https://jmrplens.github.io/phonometry/guides/loudness/#iso-532-1-report-report);
 a supplied `requirement` is read as the maximum acceptable governing prominence
-`P` (a less prominent impulse passes). Rendering needs reportlab
-(`pip install phonometry[report]`); only `engine="reportlab"` is supported. The
-fiche renders in English by default; pass `language="es"` for a Spanish fiche
-(translated fixed strings and a comma decimal separator), e.g.
-`res.report("impulse_fiche_es.pdf", language="es")`.
+`P` (a less prominent impulse passes). Rendering needs reportlab and, for the
+figure the fiche embeds, matplotlib (`pip install "phonometry[report,plot]"`);
+only `engine="reportlab"` is supported. The fiche renders in English by default;
+pass `language="es"` for a Spanish fiche (translated fixed strings and a comma
+decimal separator), e.g. `res.report("impulse_fiche_es.pdf", language="es")`.
 
 ```python
 from phonometry import environmental, ReportMetadata
@@ -17746,10 +17761,11 @@ footer with the fixed disclaimer. It uses the same `ReportMetadata` container
 (documented under [Insulation ratings](https://jmrplens.github.io/phonometry/guides/insulation-ratings/#report-metadata-reportmetadata))
 and rendering engine as the ISO 717 insulation fiche; a supplied `requirement`
 is read as the maximum permitted loudness in sone (a lower loudness passes).
-Rendering needs reportlab (`pip install phonometry[report]`); only
-`engine="reportlab"` is supported. The fiche renders in English by default;
-pass `language="es"` for a Spanish fiche (translated fixed strings and a comma
-decimal separator), e.g. `res.report("loudness_fiche_es.pdf", language="es")`.
+Rendering needs reportlab and, for the figure the fiche embeds, matplotlib (`pip
+install "phonometry[report,plot]"`); only `engine="reportlab"` is supported. The
+fiche renders in English by default; pass `language="es"` for a Spanish fiche
+(translated fixed strings and a comma decimal separator), e.g.
+`res.report("loudness_fiche_es.pdf", language="es")`.
 
 ```python
 from phonometry import psychoacoustics, ReportMetadata
@@ -24606,10 +24622,11 @@ item i) (loudness workflows such as Quality Control), and `"live"` applies the
 achievable practically (live programmes, for example); the applied rule and
 its R 128 item are printed on the fiche. The verdict is evaluated on the
 loudness rounded to the displayed 0.1 LU, so the printed numbers can never
-contradict it. Rendering needs reportlab (`pip install phonometry[report]`); only
-`engine="reportlab"` is supported. The fiche renders in English by default;
-pass `language="es"` for a Spanish fiche (translated fixed strings and a comma
-decimal separator), e.g. `res.report("loudness_fiche_es.pdf", language="es")`.
+contradict it. Rendering needs reportlab and, for the figure the fiche embeds,
+matplotlib (`pip install "phonometry[report,plot]"`); only `engine="reportlab"`
+is supported. The fiche renders in English by default; pass `language="es"` for
+a Spanish fiche (translated fixed strings and a comma decimal separator), e.g.
+`res.report("loudness_fiche_es.pdf", language="es")`.
 
 ```python
 from phonometry import broadcast, ReportMetadata
@@ -26553,9 +26570,10 @@ higher/lower-is-better quantity. It uses the same `ReportMetadata` container
 (documented under
 [Insulation ratings](https://jmrplens.github.io/phonometry/guides/insulation-ratings/#report-metadata-reportmetadata)) and
 rendering engine as the other fiches; passing `metadata=None` produces a bare
-prediction fiche. Rendering needs reportlab (`pip install phonometry[report]`);
-only `engine="reportlab"` is supported. The fiche renders in English by default;
-pass `language="es"` for a Spanish fiche (translated fixed strings and a comma
+prediction fiche. Rendering needs reportlab and, for the figure the fiche
+embeds, matplotlib (`pip install "phonometry[report,plot]"`); only
+`engine="reportlab"` is supported. The fiche renders in English by default; pass
+`language="es"` for a Spanish fiche (translated fixed strings and a comma
 decimal separator).
 
 ```python
@@ -27266,10 +27284,11 @@ the number of source and microphone positions to be reported), alongside
 `test_room`, `specimen`, `area`, `instrumentation`, `temperature`,
 `relative_humidity`, `pressure`, `measurement_standard`, `test_date`,
 `laboratory`, `operator`, `report_id` and `notes`. Passing `metadata=None`
-produces a bare characterisation fiche. Rendering needs reportlab
-(`pip install phonometry[report]`); only `engine="reportlab"` is supported. The
-fiche renders in English by default; pass `language="es"` for a Spanish fiche
-(translated fixed strings and a comma decimal separator).
+produces a bare characterisation fiche. Rendering needs reportlab and, for the
+figure the fiche embeds, matplotlib (`pip install "phonometry[report,plot]"`);
+only `engine="reportlab"` is supported. The fiche renders in English by default;
+pass `language="es"` for a Spanish fiche (translated fixed strings and a comma
+decimal separator).
 
 ```python
 from phonometry import room, ReportMetadata
@@ -28377,9 +28396,10 @@ room-specific `room_volume` and `area` populate the header alongside `client`,
 `test_room`, `specimen`, `instrumentation`, the climate fields,
 `measurement_standard`, `test_date`, `laboratory`, `operator` and `report_id`.
 Passing `metadata=None` produces a bare assessment fiche. Rendering needs
-reportlab (`pip install phonometry[report]`); only `engine="reportlab"` is
-supported, and `language="es"` renders a Spanish fiche (translated fixed strings
-and a comma decimal separator).
+reportlab and, for the figure the fiche embeds, matplotlib (`pip install
+"phonometry[report,plot]"`); only `engine="reportlab"` is supported, and
+`language="es"` renders a Spanish fiche (translated fixed strings and a comma
+decimal separator).
 
 ```python
 import numpy as np
@@ -29607,18 +29627,7 @@ working meter. Every snippet runs as written (the signals are synthesized so
 the page is self-contained), and each stage links to the deep guide that
 explains it fully.
 
-```mermaid
-flowchart LR
-    A["Calibrator tone\n(IEC 60942)"] --> B["sensitivity()"]
-    B --> C["Frequency weighting\nweighting_filter('A')"]
-    C --> D["Time weighting\ntime_weighting('fast')"]
-    D --> E["Display + percentiles\nLAF(t), ln_levels"]
-    C --> F["Integrated levels\nlaeq / sel / lc_peak"]
-    C -.-> G["Octave bands\noctave_filter (IEC 61260-1)"]
-    E --> H["Report"]
-    F --> H
-    G --> H
-```
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_slm_pipeline_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_slm_pipeline.svg" alt="The sound level meter pipeline of this page: the calibrator tone feeding sensitivity() to obtain the factor in pascals per digital unit, the measurement recording joining it as the calibrated pressure, and three readout branches from there, weighting_filter with time_weighting for the displayed LAF(t) and the percentile levels, laeq, sel and lc_peak for the integrated levels, and octave_filter for the one-third-octave spectrum, all closed by verify_weighting_class and verify_filter_class against the IEC 61672-1 Table 3 and IEC 61260-1 Table 1 acceptance limits" width="92%"></picture>
 
 This is the same chain IEC 61672-1 draws for the physical instrument: the
 class 1 calibrator anchors the microphone to 94 dB at 1 kHz, and every stage
@@ -33586,8 +33595,9 @@ disclaimer. It uses the same `ReportMetadata` container (documented under
 rendering engine as the ISO 717 insulation fiche; a supplied `requirement` is
 read as the minimum required SII (a higher SII passes). `verbose=True` adds the
 equivalent disturbance spectrum level *D*<sub>i</sub> column. Rendering needs
-reportlab (`pip install phonometry[report]`); only `engine="reportlab"` is
-supported. Pass `language="es"` for a Spanish fiche.
+reportlab and, for the figure the fiche embeds, matplotlib (`pip install
+"phonometry[report,plot]"`); only `engine="reportlab"` is supported. Pass
+`language="es"` for a Spanish fiche.
 
 ```python
 from phonometry import hearing, ReportMetadata
@@ -33916,8 +33926,9 @@ optional verdict row and a footer with the fixed disclaimer. It uses the same
 [Insulation ratings](https://jmrplens.github.io/phonometry/guides/insulation-ratings/#report-metadata-reportmetadata)) and
 rendering engine as the ISO 717 insulation fiche; a supplied `requirement` is
 read as the minimum required STI (a higher STI passes). Rendering needs
-reportlab (`pip install phonometry[report]`); only `engine="reportlab"` is
-supported. Pass `language="es"` for a Spanish fiche.
+reportlab and, for the figure the fiche embeds, matplotlib (`pip install
+"phonometry[report,plot]"`); only `engine="reportlab"` is supported. Pass
+`language="es"` for a Spanish fiche.
 
 ```python
 from phonometry import hearing, ReportMetadata
@@ -36900,8 +36911,11 @@ $$
 
 ### Band-edge placement
 
-For every architecture the bank places the **−3 dB points on the band edges**.
-Two cases need special handling:
+Every architecture is designed on the band edges themselves, at whichever
+gain that architecture defines its edge frequency: **−3 dB** for Butterworth,
+Chebyshev II and Bessel, and the **passband ripple edge** (`ripple` dB, 0.1 dB
+by default) for Chebyshev I and elliptic, which are equiripple in the passband
+and have no −3 dB point there. Two cases need special handling:
 
 - **Chebyshev II**: scipy's `Wn` is the *stopband* edge. phonometry maps the
   desired −3 dB edges to stopband edges analytically (the prototype transition
@@ -36917,24 +36931,19 @@ To ensure **100% stability** across the entire audible spectrum (even at low
 frequencies like 16 Hz with high sample rates), phonometry employs two
 critical strategies:
 
-```mermaid
-flowchart LR
-    X["Input signal\nfs"] --> D{"Low band?"}
-    D -- "yes" --> R["Decimate\nresample_poly (1/M)"] --> S1["SOS band filter\nat fs/M"]
-    D -- "no" --> S2["SOS band filter\nat fs"]
-    S1 --> L["Band level (RMS/peak)"]
-    S2 --> L
-    S1 -- "sigbands=True" --> U["Interpolate back\nresample_poly (M/1)"] --> Y["Band signal\nat fs"]
-    S2 -- "sigbands=True" --> Y
-```
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow.svg" alt="Data flow inside one band of the filter bank: a band with room to decimate, meaning half the sample rate still clears 1.25 times its upper edge, takes the resample_poly branch down to fs over M so its poles stay clear of the unit circle, every band is then a cascade of second-order sections designed on the IEC 61260-1 band edges rather than one high-order transfer function, both branches end in the band level in dB, and sigbands=True additionally returns the band signal brought back to the input rate" width="92%"></picture>
 
 1. **Second-Order Sections (SOS):** All filters are implemented as a series of
    cascaded biquads. This avoids the catastrophic numerical precision loss
    associated with high-order transfer functions (coefficients a, b).
-2. **Multi-rate Decimation:** For low-frequency bands, the signal is
-   automatically downsampled (decimated) before filtering and upsampled
-   afterwards. This keeps the digital pole locations far from the unit circle
-   boundary, preventing oscillation and noise. Chebyshev II banks reserve extra
+2. **Multi-rate Decimation:** Whenever half the sample rate still clears the
+   band's upper edge by a factor of 1.25, the signal is automatically
+   downsampled (decimated) by `M = floor[(fs / 2) / (1.25 * f_upper)]` before
+   filtering, which is most bands rather than only the low ones (29 of the 33
+   one-third-octave bands at 48 kHz). This keeps the digital pole locations far
+   from the unit circle boundary, preventing oscillation and noise. The band
+   level is computed on the decimated signal; only `sigbands=True` brings the
+   band signal back to the input rate, with `resample_poly(M, 1)`. Chebyshev II banks reserve extra
    decimation headroom so their stopband edges stay below the decimated Nyquist.
 
 ## Weighting Curves (IEC 61672-1)
@@ -38160,11 +38169,11 @@ It uses the same `ReportMetadata` container
 (documented under [Insulation ratings](https://jmrplens.github.io/phonometry/guides/insulation-ratings/#report-metadata-reportmetadata))
 and rendering engine as the [ISO 532-1 loudness fiche](https://jmrplens.github.io/phonometry/guides/loudness/#iso-532-1-report-report);
 a supplied `requirement` is read as the maximum acceptable decisive audibility
-`ΔLta` in dB (a quieter tone passes). Rendering needs reportlab
-(`pip install phonometry[report]`); only `engine="reportlab"` is supported. The
-fiche renders in English by default; pass `language="es"` for a Spanish fiche
-(translated fixed strings and a comma decimal separator), e.g.
-`res.report("tone_fiche_es.pdf", language="es")`.
+`ΔLta` in dB (a quieter tone passes). Rendering needs reportlab and, for the
+figure the fiche embeds, matplotlib (`pip install "phonometry[report,plot]"`);
+only `engine="reportlab"` is supported. The fiche renders in English by default;
+pass `language="es"` for a Spanish fiche (translated fixed strings and a comma
+decimal separator), e.g. `res.report("tone_fiche_es.pdf", language="es")`.
 
 ```python
 from phonometry import psychoacoustics, ReportMetadata
@@ -40716,7 +40725,7 @@ level.
 | 200 ms | −1.0 | −0.98 | +0.02 | ✅ PASS |
 | 50 ms | −4.8 | −4.82 | −0.02 | ✅ PASS |
 | 10 ms | −11.1 | −11.14 | −0.04 | ✅ PASS |
-| 1 ms | −20.9 | −20.99 | −0.09 | ✅ PASS |
+| 1 ms | −21.0 | −20.99 | +0.01 | ✅ PASS |
 
 **python-acoustics results (FAST, squared signal passed as required by that
 library):**
@@ -40726,7 +40735,7 @@ library):**
 | 200 ms | −1.0 | −0.97 | +0.03 | ✅ PASS |
 | 50 ms | −4.8 | −3.93 | **+0.87** | ⚠️ FAIL |
 | 10 ms | −11.1 | −10.90 | +0.20 | ✅ PASS |
-| 1 ms | −20.9 | −20.90 | +0.00 | ✅ PASS |
+| 1 ms | −21.0 | −20.90 | +0.10 | ✅ PASS |
 
 phonometry maintains high precision across all test cases. The block-based
 approach deviates significantly (> 0.8 dB) for the 50 ms burst because 125 ms
@@ -40785,50 +40794,104 @@ plt.show()
 
 The tone-burst case above is not an isolated check. For each standard the
 library implements, the reference values and acceptance limits are transcribed
-from the official text into the test suite, so any regression fails CI:
+from the official text into the test suite, so any regression fails CI. A
+sample from the metrology core:
 
 | Standard | What is verified | Test file |
 | :--- | :--- | :--- |
-| IEC 61672-1:2013 Table 3 | A/C/Z weighting at all 34 nominal frequencies, class 1 limits, at 48 and 96 kHz | `tests/test_iec_weighting_table3.py` |
-| IEC 61672-1:2013 Table 4 | F/S tone-burst responses (1 s to 1 ms) and the LAE column for `sel()` | `tests/test_iec_compliance.py` |
-| IEC 61672-1:2013 Table 5 | `lc_peak()` one-cycle/half-cycle peak responses, class 1 limits | `tests/test_levels.py` |
-| IEC 61260-1:2014 Table 1 | Filter-bank class 1/2 acceptance limits via `verify_filter_class()` | `tests/test_compliance.py` |
-| ISO 7196:1995 Table 2 | G weighting (infrasound) at every nominal response value, 0.25–315 Hz | `tests/test_g_weighting.py` |
-| ISO 226:2023 Annex B | Equal-loudness contours, loudness levels and hearing threshold against the Annex B tables | `tests/test_loudness_contours.py` |
-| ECMA-418-1:2024 | TNR/PR tone prominence: critical bandwidths, proximity spacing and prominence criteria against the worked examples in clauses 10–12 | `tests/test_tonality.py` |
-| ISO 1996-1:2016 | `lden()`, `ldn()` and `composite_rating_level()` against hand-computed formula values | `tests/test_environmental.py` |
-| IEC 60942:2017 Table 2 | Calibrator short-term stability limits (frequency-dependent, class 1) in `sensitivity()` | `tests/test_calibration_validation.py` |
+| IEC 61672-1:2013 Table 3 | A/C/Z weighting at all 34 nominal frequencies, class 1 limits, at 48 and 96 kHz | `tests/metrology/test_iec_weighting_table3.py` |
+| IEC 61672-1:2013 Table 4 | F/S tone-burst responses (1 s to 1 ms) and the LAE column for `sel()` | `tests/metrology/test_iec_compliance.py` |
+| IEC 61672-1:2013 Table 5 | `lc_peak()` one-cycle/half-cycle peak responses, class 1 limits | `tests/metrology/test_levels.py` |
+| IEC 61260-1:2014 Table 1 | Filter-bank class 1/2 acceptance limits via `verify_filter_class()` | `tests/metrology/test_compliance.py` |
+| ISO 7196:1995 Table 2 | G weighting (infrasound) at every nominal response value, 0.25–315 Hz | `tests/metrology/test_g_weighting.py` |
+| ISO 226:2023 Table 1 and Annex B | Equal-loudness contours and loudness levels against the Annex B tables, hearing threshold against the Table 1 `T_f` parameters | `tests/psychoacoustics/test_loudness_contours.py` |
+| ECMA-418-1:2024 | TNR/PR tone prominence: critical bandwidths, proximity spacing and prominence criteria against the worked examples in clauses 10–12 | `tests/psychoacoustics/test_tonality.py` |
+| ISO 1996-1:2016 | `lden()`, `ldn()` and `composite_rating_level()` against hand-computed formula values | `tests/environmental/test_environmental.py` |
+| IEC 60942:2017 Table 2 | Calibrator short-term stability limits (frequency-dependent, class 1) in `sensitivity()` | `tests/metrology/test_calibration_validation.py` |
 
-The full numerical report (the expected value and the value the library
-computes for every check, regenerated on every pull request) is published
-as [CONFORMANCE.md](https://jmrplens.github.io/phonometry/reference/conformance/).
+The same discipline applies far beyond the metrology core: today the suite runs
+501 numerical conformance checks across 55 domains and 338 standards, covering
+psychoacoustics and speech intelligibility, room, building and materials
+acoustics, human and machine vibration, environmental, aircraft, rotorcraft
+and underwater noise, electroacoustics, broadcast loudness, industrial noise
+control, calibrated signal analysis and the FDTD wave solver. The full
+numerical report (the expected value and the value the library computes for
+every check, regenerated on every pull request) is published as
+[CONFORMANCE.md](https://jmrplens.github.io/phonometry/reference/conformance/).
 
 Beyond IEC 61252-style noise dose (`sound_exposure()`, `lex_8h()`), the same
 standards-first mindset shows up in the numerics: filter banks place their
 −3 dB points on the **ANSI S1.11 / IEC 61260-1** band edges for every
 architecture (including Chebyshev II and Bessel, where scipy's raw
-parametrization would not), and A/C weighting stays within class 1 tolerances
-up to 16 kHz at common audio rates via internal oversampling (see
+parametrization would not), the default Butterworth bank is checked against
+the stricter class 0 of the withdrawn IEC 61260:1995 / ANSI S1.11-2004 edition
+as well as the current class 1, and A/C weighting stays within class 1
+tolerances up to 16 kHz at common audio rates via internal oversampling (see
 [Frequency Weighting](https://jmrplens.github.io/phonometry/guides/weighting/)).
+
+## When the source is what is wrong
+
+Transcribing a standard rather than porting somebody else's code has a
+consequence that only shows up at scale: sooner or later the recomputed value
+and the printed one disagree, and sometimes it is the printed one that cannot
+be right. A worked example that contradicts its own normative clause, a
+constant with a digit lost in typesetting, a cross-reference pointing at the
+wrong equation.
+
+Those cases are not quietly patched. Each confirmed one is written down in
+[Standards errata](https://jmrplens.github.io/phonometry/reference/errata/) with the printed edition and the exact location,
+what the document says, why it cannot be right, the independent evidence and
+the reading the library implements. Where that reading changes a number the
+library reports, the entry names the check or test that pins it; where it does
+not, because the defect is a label, a cross-reference or a table the library
+never reads, the entry says so instead.
+There are dozens of them now, across standards, guidance documents, textbooks
+and journal papers, each marked as reported to the issuing body or not. A
+defect listed there is never a defect of the method: in every case the intended
+reading could be established from the document itself or from physics.
+
+That registry is the part of the approach that is hardest to fake. Code ported
+from another implementation inherits whatever the misprint made it do, and
+nothing in the port ever notices.
 
 ## Where phonometry fits in the Python ecosystem
 
 - **python-acoustics** was archived in February 2024 and is no longer
   maintained. Its comparison above reflects the last released code.
-- **acoustic-toolbox**, the community successor to python-acoustics, depends
-  on phonometry for its weighted level computations rather than reimplementing
+- **acoustic-toolbox**, the community successor to python-acoustics, builds
+  its IEC 61672-1 time and frequency weighting on `pyoctaveband`, the former
+  name of this library, which since 2.1.0 is a shim over phonometry. It is only
+  the filters that it takes from here: its own `weighting.py` still carries
+  hard-coded one-third-octave A and C weighting tables.
+- **MoSQITo** focuses on psychoacoustic sound-quality metrics and covers a
+  good part of that ground already: Zwicker loudness, ECMA-418-2 loudness and
+  roughness, DIN 45692 sharpness, ECMA-74 tone-to-noise and prominence ratio,
+  and the ANSI S3.5 speech intelligibility index. phonometry implements the
+  same family, and adds ISO 532-2 and ISO 532-3 loudness, ECMA-418-2 tonality,
+  fluctuation strength and the Fastl & Zwicker annoyance model, none of which
+  MoSQITo exports. What differs most is the setting. Here those metrics sit in
+  the same conformance harness as the metrology core and compose directly with
+  the weighting filters, ballistics, band filtering and calibration that feed
   them.
-- **MoSQITo** focuses on psychoacoustic sound-quality metrics (loudness,
-  sharpness, roughness). It complements rather than overlaps phonometry:
-  it does not cover sound level metrology (weighting filters, ballistics,
-  Leq/SEL/Lden, calibration) and does not claim conformance testing against
-  the standards' tolerance tables.
+- **pyroomacoustics** simulates room impulse responses for audio and machine
+  learning pipelines (image sources, ray tracing, beamforming, direction of
+  arrival), and it does reach the measurement side too, with sweep-based
+  impulse-response acquisition and an RT60 estimator. What it does not carry is
+  the ISO 3382 parameter set. phonometry's image-source and FDTD solvers are
+  pinned to published closed forms, and the image-source impulse response goes
+  through the same `room_parameters` analysis (EDT, T20, T30, C50, C80, D50,
+  Ts, per band, with the ISO 3382 decay-range validity flags) as a measured
+  one.
 
 If your work needs numbers you can defend against a standard's tolerance
 table, whether for measurement reports, environmental assessments or
-instrument cross-checks, that verification layer is what phonometry is for. The
-sources behind it are collected in the [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/),
-every entry with a verified DOI or official publisher link.
+instrument cross-checks, that verification layer is what phonometry is for.
+Where the standard also fixes how the result is to be reported, the result
+object renders that one-page fiche itself with `.report()`, in English or
+Spanish, so the document you hand over carries the same numbers the check does.
+The sources behind all of it are collected in the
+[Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/), every entry with a verified DOI or official
+publisher link.
 
 ---
 

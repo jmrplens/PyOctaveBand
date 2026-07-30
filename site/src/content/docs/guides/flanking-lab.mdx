@@ -217,7 +217,8 @@ curve and the boxed single number `Dn,f,w (C; Ctr)` (ISO 717-1) or `Ln,f,w (CI)`
 the shifted reference and the unfavourable deviation). A `requirement` supplied
 on the `ReportMetadata` adds a verdict ($D_{n,f,w}$ passes at or above it,
 $L_{n,f,w}$ at or below it), and `language="es"` renders every fiche in Spanish.
-reportlab is required (`pip install phonometry[report]`).
+reportlab is required, and matplotlib too for the figure the fiche embeds (`pip
+install "phonometry[report,plot]"`).
 
 ```python
 import numpy as np

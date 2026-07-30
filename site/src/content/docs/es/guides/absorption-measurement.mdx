@@ -155,9 +155,10 @@ la inversión de Sabine); los campos descriptivos de `ReportMetadata` que
 aplican aquí son `client`, `manufacturer`, `specimen`, `mounting`, `test_room`,
 `test_date`, `pressure`, `measurement_standard`, `laboratory`, `operator`,
 `report_id` y `notes`. El campo `requirement` se ignora (la ISO 354 no tiene
-veredicto). La generación necesita reportlab (`pip install phonometry[report]`);
-solo se admite `engine="reportlab"`. La ficha se genera en inglés por defecto;
-pasa `language="es"` para una ficha en español (cadenas fijas traducidas y coma
+veredicto). La generación necesita reportlab y, para la figura que incrusta la
+ficha, matplotlib (`pip install "phonometry[report,plot]"`); solo se admite
+`engine="reportlab"`. La ficha se genera en inglés por defecto; pasa
+`language="es"` para una ficha en español (cadenas fijas traducidas y coma
 decimal).
 
 ```python
@@ -369,10 +370,12 @@ pasar `metadata=None` produce una ficha ligera de predicción, y un `requirement
 aportado se lee como el $\alpha_w$ mínimo para el veredicto CUMPLE/NO CUMPLE.
 Con `verbose=True` la tabla cambia a las columnas de evaluación de ISO 11654
 (coeficiente práctico, referencia desplazada, desviación desfavorable). El
-renderizado necesita reportlab (`pip install phonometry[report]`); solo se
-admite `engine="reportlab"`. La ficha se genera en inglés por defecto; pasa
+renderizado necesita reportlab y, para la figura que incrusta la ficha,
+matplotlib (`pip install "phonometry[report,plot]"`); solo se admite
+`engine="reportlab"`. La ficha se genera en inglés por defecto; pasa
 `language="es"` para una ficha en español (cadenas fijas traducidas y coma como
-separador decimal), p. ej. `result.report("alpha_w_fiche_es.pdf", language="es")`.
+separador decimal), p. ej. `result.report("alpha_w_fiche_es.pdf",
+language="es")`.
 
 ```python
 from phonometry import materials, ReportMetadata

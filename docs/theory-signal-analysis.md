@@ -149,8 +149,11 @@ $$
 
 ### Band-edge placement
 
-For every architecture the bank places the **−3 dB points on the band edges**.
-Two cases need special handling:
+Every architecture is designed on the band edges themselves, at whichever
+gain that architecture defines its edge frequency: **−3 dB** for Butterworth,
+Chebyshev II and Bessel, and the **passband ripple edge** (`ripple` dB, 0.1 dB
+by default) for Chebyshev I and elliptic, which are equiripple in the passband
+and have no −3 dB point there. Two cases need special handling:
 
 - **Chebyshev II**: scipy's `Wn` is the *stopband* edge. phonometry maps the
   desired −3 dB edges to stopband edges analytically (the prototype transition
@@ -166,24 +169,19 @@ To ensure **100% stability** across the entire audible spectrum (even at low
 frequencies like 16 Hz with high sample rates), phonometry employs two
 critical strategies:
 
-```mermaid
-flowchart LR
-    X["Input signal\nfs"] --> D{"Low band?"}
-    D -- "yes" --> R["Decimate\nresample_poly (1/M)"] --> S1["SOS band filter\nat fs/M"]
-    D -- "no" --> S2["SOS band filter\nat fs"]
-    S1 --> L["Band level (RMS/peak)"]
-    S2 --> L
-    S1 -- "sigbands=True" --> U["Interpolate back\nresample_poly (M/1)"] --> Y["Band signal\nat fs"]
-    S2 -- "sigbands=True" --> Y
-```
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow.svg" alt="Data flow inside one band of the filter bank: a band with room to decimate, meaning half the sample rate still clears 1.25 times its upper edge, takes the resample_poly branch down to fs over M so its poles stay clear of the unit circle, every band is then a cascade of second-order sections designed on the IEC 61260-1 band edges rather than one high-order transfer function, both branches end in the band level in dB, and sigbands=True additionally returns the band signal brought back to the input rate" width="92%"></picture>
 
 1. **Second-Order Sections (SOS):** All filters are implemented as a series of
    cascaded biquads. This avoids the catastrophic numerical precision loss
    associated with high-order transfer functions (coefficients a, b).
-2. **Multi-rate Decimation:** For low-frequency bands, the signal is
-   automatically downsampled (decimated) before filtering and upsampled
-   afterwards. This keeps the digital pole locations far from the unit circle
-   boundary, preventing oscillation and noise. Chebyshev II banks reserve extra
+2. **Multi-rate Decimation:** Whenever half the sample rate still clears the
+   band's upper edge by a factor of 1.25, the signal is automatically
+   downsampled (decimated) by `M = floor[(fs / 2) / (1.25 * f_upper)]` before
+   filtering, which is most bands rather than only the low ones (29 of the 33
+   one-third-octave bands at 48 kHz). This keeps the digital pole locations far
+   from the unit circle boundary, preventing oscillation and noise. The band
+   level is computed on the decimated signal; only `sigbands=True` brings the
+   band signal back to the input rate, with `resample_poly(M, 1)`. Chebyshev II banks reserve extra
    decimation headroom so their stopband edges stay below the decimated Nyquist.
 
 ## Weighting Curves (IEC 61672-1)

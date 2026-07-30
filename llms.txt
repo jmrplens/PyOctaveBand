@@ -12,9 +12,13 @@ Install:
 pip install phonometry            # core (NumPy + SciPy only)
 pip install phonometry[plot]      # + matplotlib figures and .plot()
 pip install phonometry[perf]      # + numba-jitted impulse kernel
-pip install phonometry[report]    # + reportlab, for .report() PDF fiches
-pip install phonometry[full]      # all of the above
+pip install phonometry[report]    # + reportlab and svglib, for .report() PDF fiches
+pip install phonometry[full]      # all of the above (recommended)
 ```
+
+I recommend `pip install phonometry[full]`, which enables every feature. The base install computes every metric on NumPy and SciPy alone; without the extras only the `.plot()` figures and the `.report()` PDF fiches (whose figure panel needs matplotlib as well as reportlab and svglib) are unavailable. The `impulse` time weighting still works without numba, on a pure-Python kernel that is only slower.
+
+One caveat about `[full]`: numba declares `numpy<2.5`, so `phonometry[full]` (like `phonometry[perf]`) resolves NumPy below 2.5 while a plain install gets the newest release. numba only makes the `impulse` time weighting faster, so install `phonometry[plot,report]` instead if you would rather keep NumPy current.
 
 Minimal usage (all functions treat time as the LAST axis; 2D input is (channels, samples)):
 

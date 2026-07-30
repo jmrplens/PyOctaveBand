@@ -211,8 +211,9 @@ el tiempo de reverberación de una sala es un intervalo objetivo y no una
 magnitud en la que simplemente cuanto más alto o más bajo, mejor. Usa el mismo
 contenedor `ReportMetadata` y el mismo motor de renderizado que las demás
 fichas; pasar `metadata=None` produce una ficha de caracterización básica. El
-renderizado necesita reportlab (`pip install phonometry[report]`); solo se
-admite `engine="reportlab"`. La ficha se renderiza en inglés por defecto; pasa
+renderizado necesita reportlab y, para la figura que incrusta la ficha,
+matplotlib (`pip install "phonometry[report,plot]"`); solo se admite
+`engine="reportlab"`. La ficha se renderiza en inglés por defecto; pasa
 `language="es"` para una ficha en español (cadenas fijas traducidas y separador
 decimal de coma).
 

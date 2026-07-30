@@ -382,7 +382,8 @@ class VibrationReductionResult:
         :raises ValueError: If ``engine`` is unknown or the result carries no
             band centre frequencies.
         :raises ImportError: If reportlab is not installed
-            (``pip install phonometry[report]``).
+            (``pip install phonometry[report]``), or matplotlib is missing for
+            the embedded figure (``pip install phonometry[plot]``).
         """
         _validate_report_request(engine, language)
         from .._report.iso10848 import render_vibration_reduction_report
@@ -666,7 +667,8 @@ class FlankingLevelDifferenceResult:
             4, or the result has no single-number rating (the band count is
             neither 16 nor 5).
         :raises ImportError: If reportlab is not installed
-            (``pip install phonometry[report]``).
+            (``pip install phonometry[report]``), or matplotlib is missing for
+            the embedded figure (``pip install phonometry[plot]``).
         """
         _validate_report_request(engine, language)
         if self.rating is None:
@@ -741,7 +743,8 @@ class FlankingImpactLevelResult:
             4, or the result has no single-number rating (the band count is
             neither 16 nor 5).
         :raises ImportError: If reportlab is not installed
-            (``pip install phonometry[report]``).
+            (``pip install phonometry[report]``), or matplotlib is missing for
+            the embedded figure (``pip install phonometry[plot]``).
         """
         _validate_report_request(engine, language)
         if self.rating is None:

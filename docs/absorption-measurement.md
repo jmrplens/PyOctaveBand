@@ -116,9 +116,10 @@ inversion); the descriptive `ReportMetadata` fields that apply here are
 `client`, `manufacturer`, `specimen`, `mounting`, `test_room`, `test_date`,
 `pressure`, `measurement_standard`, `laboratory`, `operator`, `report_id` and
 `notes`. The `requirement` field is ignored (ISO 354 has no verdict). Rendering
-needs reportlab (`pip install phonometry[report]`); only `engine="reportlab"` is
-supported. The fiche renders in English by default; pass `language="es"` for a
-Spanish fiche (translated fixed strings and a comma decimal separator).
+needs reportlab and, for the figure the fiche embeds, matplotlib (`pip install
+"phonometry[report,plot]"`); only `engine="reportlab"` is supported. The fiche
+renders in English by default; pass `language="es"` for a Spanish fiche
+(translated fixed strings and a comma decimal separator).
 
 ```python
 from phonometry import materials, ReportMetadata
@@ -325,10 +326,11 @@ and rendering engine as the ISO 717 insulation fiche; passing
 `requirement` is read as the minimum $\alpha_w$ for the PASS/FAIL verdict.
 Setting `verbose=True` swaps the two-column table for the ISO 11654 evaluation
 columns (practical coefficient, shifted reference, unfavourable deviation).
-Rendering needs reportlab (`pip install phonometry[report]`); only
-`engine="reportlab"` is supported. The fiche renders in English by default;
-pass `language="es"` for a Spanish fiche (translated fixed strings and a comma
-decimal separator), e.g. `result.report("alpha_w_fiche_es.pdf", language="es")`.
+Rendering needs reportlab and, for the figure the fiche embeds, matplotlib (`pip
+install "phonometry[report,plot]"`); only `engine="reportlab"` is supported. The
+fiche renders in English by default; pass `language="es"` for a Spanish fiche
+(translated fixed strings and a comma decimal separator), e.g.
+`result.report("alpha_w_fiche_es.pdf", language="es")`.
 
 ```python
 from phonometry import materials, ReportMetadata

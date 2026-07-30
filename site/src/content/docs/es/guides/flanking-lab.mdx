@@ -224,7 +224,8 @@ la evaluación ISO 717 por banda (el valor, la referencia desplazada y la
 desviación desfavorable). Un `requirement` indicado en `ReportMetadata` añade un
 veredicto ($D_{n,f,w}$ cumple igualando o superándolo, $L_{n,f,w}$ igualándolo o
 por debajo), y `language="es"` genera cada ficha en español. Se necesita
-reportlab (`pip install phonometry[report]`).
+reportlab y, para la figura que incrusta la ficha, matplotlib
+(`pip install "phonometry[report,plot]"`).
 
 ```python
 import numpy as np

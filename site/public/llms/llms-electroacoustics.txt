@@ -1809,10 +1809,11 @@ item i) (loudness workflows such as Quality Control), and `"live"` applies the
 achievable practically (live programmes, for example); the applied rule and
 its R 128 item are printed on the fiche. The verdict is evaluated on the
 loudness rounded to the displayed 0.1 LU, so the printed numbers can never
-contradict it. Rendering needs reportlab (`pip install phonometry[report]`); only
-`engine="reportlab"` is supported. The fiche renders in English by default;
-pass `language="es"` for a Spanish fiche (translated fixed strings and a comma
-decimal separator), e.g. `res.report("loudness_fiche_es.pdf", language="es")`.
+contradict it. Rendering needs reportlab and, for the figure the fiche embeds,
+matplotlib (`pip install "phonometry[report,plot]"`); only `engine="reportlab"`
+is supported. The fiche renders in English by default; pass `language="es"` for
+a Spanish fiche (translated fixed strings and a comma decimal separator), e.g.
+`res.report("loudness_fiche_es.pdf", language="es")`.
 
 ```python
 from phonometry import broadcast, ReportMetadata

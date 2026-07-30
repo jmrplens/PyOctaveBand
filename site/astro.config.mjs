@@ -3,7 +3,6 @@ import { readFileSync } from 'node:fs';
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightLinksValidator from 'starlight-links-validator';
-import mermaid from 'astro-mermaid';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { sidebar } from './src/data/sidebar.mjs';
@@ -449,10 +448,6 @@ export default defineConfig({
     ],
   },
   integrations: [
-    mermaid({
-      theme: 'default',
-      autoTheme: true,
-    }),
     starlight({
       title: 'phonometry',
       routeMiddleware: './src/routeData.ts',

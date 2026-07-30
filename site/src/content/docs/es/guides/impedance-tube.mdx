@@ -380,10 +380,11 @@ geométricos de `ReportMetadata` que aplican aquí son `client`, `manufacturer`,
 `test_date`, `temperature`, `pressure`, `measurement_standard`, `laboratory`,
 `operator`, `report_id` y `notes` (`tube_diameter` y `mic_spacing` se dan en
 metros y se imprimen en milímetros). El campo `requirement` se ignora (la
-ISO 10534-2 no tiene veredicto). La generación necesita reportlab
-(`pip install phonometry[report]`); solo se admite `engine="reportlab"`. La
-ficha se genera en inglés por defecto; pasa `language="es"` para una ficha en
-español (cadenas fijas traducidas y coma decimal).
+ISO 10534-2 no tiene veredicto). La generación necesita reportlab y, para la
+figura que incrusta la ficha, matplotlib (`pip install
+"phonometry[report,plot]"`); solo se admite `engine="reportlab"`. La ficha se
+genera en inglés por defecto; pasa `language="es"` para una ficha en español
+(cadenas fijas traducidas y coma decimal).
 
 ```python
 from phonometry import materials, ReportMetadata

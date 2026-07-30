@@ -323,7 +323,8 @@ class AirborneInsulationResult:
             16 core one-third-octave bands (100 Hz to 3150 Hz) the ISO 717-1
             rating needs, or ``verbose=True`` without the per-band chain.
         :raises ImportError: If reportlab is not installed
-            (``pip install phonometry[report]``).
+            (``pip install phonometry[report]``), or matplotlib is missing for
+            the embedded figure (``pip install phonometry[plot]``).
         """
         return _render_iso16283(
             self, path, quantity=quantity, metadata=metadata, engine=engine,
@@ -419,7 +420,8 @@ class WeightedRatingResult:
             without the per-band data (``band_centers``, ``measured``,
             ``shifted_reference``).
         :raises ImportError: If reportlab is not installed
-            (``pip install phonometry[report]``).
+            (``pip install phonometry[report]``), or matplotlib is missing for
+            the embedded figure (``pip install phonometry[plot]``).
         """
         return _render_iso717(
             self, path, metadata=metadata, engine=engine, verbose=verbose,
@@ -509,7 +511,8 @@ class ImpactInsulationResult:
             16 core one-third-octave bands (100 Hz to 3150 Hz) the ISO 717-2
             rating needs, or ``verbose=True`` without the per-band chain.
         :raises ImportError: If reportlab is not installed
-            (``pip install phonometry[report]``).
+            (``pip install phonometry[report]``), or matplotlib is missing for
+            the embedded figure (``pip install phonometry[plot]``).
         """
         return _render_iso16283(
             self, path, quantity=quantity, metadata=metadata, engine=engine,
@@ -602,7 +605,8 @@ class ImpactRatingResult:
             without the per-band data (``band_centers``, ``measured``,
             ``shifted_reference``).
         :raises ImportError: If reportlab is not installed
-            (``pip install phonometry[report]``).
+            (``pip install phonometry[report]``), or matplotlib is missing for
+            the embedded figure (``pip install phonometry[plot]``).
         """
         return _render_iso717(
             self, path, metadata=metadata, engine=engine, verbose=verbose,
@@ -708,7 +712,8 @@ class FacadeInsulationResult:
             the 16 core one-third-octave bands (100 Hz to 3150 Hz) the
             ISO 717-1 rating needs.
         :raises ImportError: If reportlab is not installed
-            (``pip install phonometry[report]``).
+            (``pip install phonometry[report]``), or matplotlib is missing for
+            the embedded figure (``pip install phonometry[plot]``).
         """
         return _render_iso16283_facade(
             self, path, quantity=quantity, metadata=metadata, engine=engine,

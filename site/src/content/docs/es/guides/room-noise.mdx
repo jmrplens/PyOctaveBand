@@ -268,7 +268,8 @@ las demás fichas; los campos específicos de sala `room_volume` y `area` rellen
 la cabecera junto a `client`, `test_room`, `specimen`, `instrumentation`, los
 campos de clima, `measurement_standard`, `test_date`, `laboratory`, `operator` y
 `report_id`. Pasar `metadata=None` produce una ficha de evaluación básica. La
-generación necesita reportlab (`pip install phonometry[report]`); solo se admite
+generación necesita reportlab y, para la figura que incrusta la ficha,
+matplotlib (`pip install "phonometry[report,plot]"`); solo se admite
 `engine="reportlab"`, y `language="es"` genera una ficha en español (cadenas
 fijas traducidas y separador decimal de coma).
 

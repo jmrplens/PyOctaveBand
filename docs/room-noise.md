@@ -216,9 +216,10 @@ room-specific `room_volume` and `area` populate the header alongside `client`,
 `test_room`, `specimen`, `instrumentation`, the climate fields,
 `measurement_standard`, `test_date`, `laboratory`, `operator` and `report_id`.
 Passing `metadata=None` produces a bare assessment fiche. Rendering needs
-reportlab (`pip install phonometry[report]`); only `engine="reportlab"` is
-supported, and `language="es"` renders a Spanish fiche (translated fixed strings
-and a comma decimal separator).
+reportlab and, for the figure the fiche embeds, matplotlib (`pip install
+"phonometry[report,plot]"`); only `engine="reportlab"` is supported, and
+`language="es"` renders a Spanish fiche (translated fixed strings and a comma
+decimal separator).
 
 ```python
 import numpy as np

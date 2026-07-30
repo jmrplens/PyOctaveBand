@@ -322,11 +322,11 @@ It uses the same `ReportMetadata` container
 (documented under [Insulation ratings](insulation-ratings.md#report-metadata-reportmetadata))
 and rendering engine as the [ISO 532-1 loudness fiche](loudness.md#iso-532-1-report-report);
 a supplied `requirement` is read as the maximum acceptable decisive audibility
-`ΔLta` in dB (a quieter tone passes). Rendering needs reportlab
-(`pip install phonometry[report]`); only `engine="reportlab"` is supported. The
-fiche renders in English by default; pass `language="es"` for a Spanish fiche
-(translated fixed strings and a comma decimal separator), e.g.
-`res.report("tone_fiche_es.pdf", language="es")`.
+`ΔLta` in dB (a quieter tone passes). Rendering needs reportlab and, for the
+figure the fiche embeds, matplotlib (`pip install "phonometry[report,plot]"`);
+only `engine="reportlab"` is supported. The fiche renders in English by default;
+pass `language="es"` for a Spanish fiche (translated fixed strings and a comma
+decimal separator), e.g. `res.report("tone_fiche_es.pdf", language="es")`.
 
 ```python
 from phonometry import psychoacoustics, ReportMetadata

@@ -622,6 +622,100 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   therefore cannot interpolate an import whatever the file extension, so they
   stay with the writer rather than with `conformance-stats.mjs`.
 
+- The last three mermaid flowcharts are now generated SVGs, and the mermaid
+  runtime is gone from the site. The sound level meter guide, the calibration
+  guide and the signal analysis theory page each rendered one diagram with
+  mermaid, which meant every reader of the site downloaded and ran the mermaid
+  bundle for three figures while every other diagram in the documentation is a
+  deterministic SVG from `scripts/generate_diagrams.py`. Three new diagrams take
+  their place, each in the usual four variants (light and dark, English and
+  Spanish): `diagram_slm_pipeline` draws the guide's own chain, from the two
+  recordings through the sensitivity factor to the display, integrated and band
+  branches and the class verifiers that close it; `diagram_calibration_dataflow`
+  draws one factor reaching every level function, and what happens with no
+  calibrator, where the factor stays at 1 and the samples are read as pascals
+  unless `dbfs=True` asks for levels referred to digital full scale;
+  `diagram_bank_dataflow` draws both numerical-stability strategies of the
+  filter bank, the biquad cascade and the decimation decision,
+  ending in the band level and the optional band signal. The `astro-mermaid`
+  integration and the `mermaid` dependency are removed from the site and its
+  lockfile.
+
+- "Why phonometry" argues the same thing with current evidence. Every test path
+  in its conformance table pointed at the flat `tests/test_*.py` layout the
+  suite no longer has, and the markdown mirror had lost the check, domain and
+  standards count paragraph the site pages carry; both are fixed, and that
+  paragraph's domain sweep now names the areas added since it was written. The
+  MoSQITo comparison no longer claims a split that the sound-quality modules
+  ended, a `pyroomacoustics` entry joins the ecosystem list now that room and
+  wave simulation exist here, the numerics paragraph mentions the class 0 check
+  on the default bank, and a new section covers what happens when the standard
+  itself is what is wrong, with the errata registry as its evidence.
+
+  Four claims on that page are corrected while it is being rewritten. The
+  IEC 61672-1 Table 4 target for the 1 ms toneburst is −21,0 dB, not −20.9;
+  Equation (7) gives 10 lg(1 − e^(−0,001/0,125)) = −20,9865 and the library's own
+  transcription in `tests/metrology/test_iec_compliance.py` reads −21.0. Printed
+  as −20.9 the row reversed its own comparison, showing phonometry at −0.09 and
+  python-acoustics at exactly 0.00, when the errors are +0.01 and +0.10. The
+  three ecosystem entries are corrected too: acoustic-toolbox declares
+  `pyoctaveband>=1.1.3` rather than phonometry, and still hard-codes its own
+  one-third-octave weighting tables; pyroomacoustics does ship measurement
+  routines, so the defensible contrast is the ISO 3382 parameter set it lacks;
+  and MoSQITo already has ECMA-418-2 loudness and roughness and the SII, so what
+  is actually added here is ISO 532-2, ISO 532-3, ECMA-418-2 tonality,
+  fluctuation strength and the Fastl & Zwicker annoyance model. The ISO 3382
+  chain is stated for the image-source solver, which produces an impulse
+  response, and not for the FDTD one, which produces probe pressure histories.
+  The errata paragraph promised a regression test for every entry, which 38 of
+  the 62 do not have (several record that no change was required), so it now
+  says what the entries actually carry, as does the introduction of the errata
+  registry itself. The conformance table credited ISO 226:2023 Annex B for the
+  hearing threshold, which the test pins against the Table 1 `T_f` parameters.
+
+- Every install page recommends `phonometry[full]`. The plain install stays the
+  default, with a note that the extra brings matplotlib, numba, reportlab and
+  svglib in one go, that the base install computes every metric on NumPy and
+  SciPy alone, and that what it leaves unavailable is the `.plot()` figures, the
+  `.report()` PDF fiches and the compiled `impulse` kernel. Every install page,
+  in both languages, now also states the one consequence of that
+  recommendation: numba declares `numpy<2.5`, so `phonometry[full]` resolves
+  NumPy below 2.5 where a plain install gets the newest release, and
+  `phonometry[plot,report]` is the route that keeps NumPy current, since numba
+  only affects speed. The llms export and the transition-package README said the
+  `impulse` time weighting is unavailable without numba; it is not, it falls
+  back to a pure-Python kernel that is only slower, which is what `README.md`
+  already said and what they say now.
+
+- The `[report]` extra no longer claims to be enough for a fiche that embeds a
+  figure. 46 of the 49 fiche renderers call `_layout.render_figure_drawing()`
+  and two more (`iec60268_4`, `iec60268_5`) their own equivalent, all of which
+  import matplotlib and svglib before drawing anything, so only the ISO 4871
+  declaration fiche renders on reportlab alone. 35 `.report()` docstrings still
+  documented `:raises ImportError: If reportlab is not installed` on renderers
+  that need matplotlib too, and CI rebuilt 24 pages of the API reference from
+  them on every run; the guides repeated it in prose on 14 topics, in both
+  languages, and the llms exports mirrored that. All of them now say that
+  reportlab is needed and that matplotlib is needed for the figure the fiche
+  embeds, and point at `pip install "phonometry[report,plot]"`.
+
+- One rule now governs how my name is written across the repository: the
+  hyphenated "Requena-Plens" is the bibliographic citation form, and everywhere
+  else the name is written out in full as two given names and two surnames,
+  "José Manuel Requena Plens". `CITATION.cff` and `.zenodo.json` already read
+  "Requena-Plens, José M." and are unchanged. The About page did not follow the
+  rule: it wrote the inverted citation form with the surnames unjoined, in both
+  the APA line and the BibTeX entry and in both languages, so the site
+  disagreed with the metadata it points readers at. Those four citation strings
+  now match, with the BibTeX field matching modulo the diacritic that block
+  already drops. `paper/paper.md` is in the same class, since its `surname:`
+  field is what renders the paper's own citation, so it carries the hyphen too.
+  Running text, the `LICENSE` copyright line and the `author` meta tag keep the
+  full unhyphenated name, which is also what the ORCID record
+  `0000-0003-1250-6212` and the canonical Person document fetched from jmrp.io
+  hold, so the citation form and the name record are meant to differ and
+  neither needs changing.
+
 - The filter-bank reuse test asserts the property it is named after instead of a
   stopwatch. It used to compare `time.time()` deltas and require the class-based
   path to stay within 1.5x of the functional one, which on a shared runner under

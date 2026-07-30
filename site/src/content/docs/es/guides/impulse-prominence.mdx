@@ -304,9 +304,10 @@ y una nota de categoría de prominencia, y un pie con el descargo fijo.
 Usa el mismo contenedor `ReportMetadata` y el mismo motor de renderizado que la
 [ficha de sonoridad ISO 532-1](/phonometry/es/guides/loudness/#informe-de-iso-532-1-report);
 un `requirement` indicado se interpreta como la prominencia rectora `P` máxima
-admisible (un impulso menos destacado es apto). El renderizado necesita reportlab
-(`pip install phonometry[report]`); solo se admite `engine="reportlab"`. La ficha
-se genera en inglés por defecto; pase `language="es"` para una ficha en español
+admisible (un impulso menos destacado es apto). El renderizado necesita
+reportlab y, para la figura que incrusta la ficha, matplotlib (`pip install
+"phonometry[report,plot]"`); solo se admite `engine="reportlab"`. La ficha se
+genera en inglés por defecto; pase `language="es"` para una ficha en español
 (cadenas fijas traducidas y separador decimal de coma), p. ej.
 `res.report("impulse_fiche_es.pdf", language="es")`.
 

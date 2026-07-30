@@ -443,10 +443,11 @@ tolerancia de ±1,0 LU del punto h), permitida solo cuando el nivel objetivo no
 es alcanzable en la práctica (por ejemplo, programas en directo); la regla
 aplicada y su punto de R 128 se imprimen en la ficha. El veredicto se evalúa
 sobre la sonoridad redondeada a los 0,1 LU mostrados, de modo que los números
-impresos nunca pueden contradecirlo. El renderizado necesita reportlab
-(`pip install phonometry[report]`); solo se admite `engine="reportlab"`. La
-ficha se genera en inglés por defecto; pasa `language="es"` para una ficha en
-español (cadenas fijas traducidas y coma como separador decimal), p. ej.
+impresos nunca pueden contradecirlo. El renderizado necesita reportlab y, para
+la figura que incrusta la ficha, matplotlib (`pip install
+"phonometry[report,plot]"`); solo se admite `engine="reportlab"`. La ficha se
+genera en inglés por defecto; pasa `language="es"` para una ficha en español
+(cadenas fijas traducidas y coma como separador decimal), p. ej.
 `res.report("loudness_fiche_es.pdf", language="es")`.
 
 ```python

@@ -377,7 +377,8 @@ class SurveyAirborneResult:
             5 octave or 16 one-third-octave bands, and ``R'`` needs ``area``
             and ``volume``).
         :raises ImportError: If reportlab is not installed
-            (``pip install phonometry[report]``).
+            (``pip install phonometry[report]``), or matplotlib is missing for
+            the embedded figure (``pip install phonometry[plot]``).
         """
         _validate_report_request(engine, language)
         if quantity not in ("dnt", "r_prime"):
@@ -460,7 +461,8 @@ class SurveyImpactResult:
             single-number rating (the survey needs 5 octave or 16
             one-third-octave bands).
         :raises ImportError: If reportlab is not installed
-            (``pip install phonometry[report]``).
+            (``pip install phonometry[report]``), or matplotlib is missing for
+            the embedded figure (``pip install phonometry[plot]``).
         """
         _validate_report_request(engine, language)
         if self.rating is None:
@@ -536,7 +538,8 @@ class SurveyFacadeResult:
             single-number rating (the survey needs 5 octave or 16
             one-third-octave bands).
         :raises ImportError: If reportlab is not installed
-            (``pip install phonometry[report]``).
+            (``pip install phonometry[report]``), or matplotlib is missing for
+            the embedded figure (``pip install phonometry[plot]``).
         """
         _validate_report_request(engine, language)
         if self.rating is None:

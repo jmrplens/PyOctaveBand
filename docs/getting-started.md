@@ -15,9 +15,22 @@ Optional extras:
 ```bash
 pip install phonometry[plot]    # matplotlib, for filter response plots and result .plot() methods
 pip install phonometry[perf]    # numba, faster 'impulse' time weighting
-pip install phonometry[report]  # reportlab + svglib, so result .report() methods render normative PDF fiches
-pip install phonometry[full]    # all of the above
+pip install phonometry[report]  # reportlab + svglib, so result .report() methods render normative PDF fiches (their figure panel needs [plot] too)
+pip install phonometry[full]    # all of the above (recommended)
 ```
+
+I recommend `pip install phonometry[full]`: it brings matplotlib, numba,
+reportlab and svglib in one go, so every feature of the library is enabled. The
+base install computes every metric on NumPy and SciPy alone; the only things it
+leaves unavailable are the figures (`.plot()` and the filter response plots),
+the normative PDF fiches (`.report()`) and the compiled kernel that speeds up
+the `impulse` time weighting.
+
+One caveat about `[full]`: numba declares `numpy<2.5`, so `phonometry[full]`
+(like `phonometry[perf]`) resolves NumPy below 2.5 while a plain install gets
+the newest release. numba only makes the `impulse` time weighting faster, so if
+you would rather keep NumPy current, install `phonometry[plot,report]` and
+leave `[perf]` out.
 
 **Option 2: Cloning and Installing**
 
