@@ -613,10 +613,12 @@ $$
 El área de la placa se cancela ($N/m_i = n/\rho_{s1}$ con $n$ llaves por m²),
 así que solo entra la densidad de llaves. Una unión rígida (un tornillo, un
 clavo, un perno o una llave tan rígida que nunca cede) es el límite
-$Y_c = 0$; una llave elástica hace caer el acoplamiento como $1/f^2$ por debajo
-de ese techo en cuanto $|Y_c|$ supera a las movilidades de las placas, que es
-exactamente por lo que una llave de mariposa de 1,7 MN/m y una de torsión
-vertical de 94 MN/m se comportan de forma tan distinta.
+$Y_c = 0$, donde $\eta_{ij}$ cae como $1/f$. Una llave elástica añade dos
+potencias más en cuanto $|Y_c| = \omega/k$ supera a las movilidades de las
+placas: $\eta_{ij}$ cae entonces como $1/f^3$ y la *razón* frente al techo
+rígido como $1/f^2$. Es exactamente por lo que una llave de mariposa de
+1,7 MN/m y una de torsión vertical de 94 MN/m se comportan de forma tan
+distinta.
 
 ```python
 import numpy as np
@@ -632,8 +634,12 @@ res.plot()   # eta_ij frente al techo de unión rígida (requiere matplotlib)
 ```
 
 Los **datos de entrada** de este modelo están impresos: la Tabla A4,
-corroborada por la Tabla 1 de Hopkins, Wilson y Craik (1999) para cámara de
-50 mm y por la Tabla 1 de Craik y Wilson (1995) para 85 mm. La **salida** no:
+confirmada valor a valor por la Tabla 1 de Hopkins, Wilson y Craik (1999), que
+imprime los mismos 1,7 / 16,1 / 94,0 MN/m para cámara de 50 mm. La Tabla 1 de
+Craik y Wilson (1995) mide los mismos *tipos* de llave con cámara de 85 mm y da
+1,1 y 4,3 MN/m para la de mariposa y la de doble triángulo, así que corrobora el
+orden pero no los valores: la rigidez dinámica está definida para un ancho de
+cámara dado y cambia con él. La **salida** no está impresa en ninguna parte:
 todo índice de reducción acústica publicado de un muro de fábrica con cámara
 puenteado es una figura, de modo que la penalización por bandas que introducen
 las llaves no tiene oráculo numérico impreso. El desplazamiento de la
