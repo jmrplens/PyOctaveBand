@@ -7161,14 +7161,14 @@ def _chk_cnossos_road_table_f1() -> Outcome:
             (ph.ROAD_COEFFICIENTS.propulsion_b[category], expected["BP"]),
         )
         bad += sum(1 for got, want in pairs for a, b in zip(got, want) if a != b)
-    return numeric(0.0, float(bad), 0.0, unit=" mismatches", places=0,
+    return numeric(0.0, float(bad), 0.0, unit="mismatches", places=0,
                    expected_label="160 coefficients identical")
 
 
 @register(
     _CNOSSOS_ROAD,
     "Directive (EU) 2021/1226 Annex pt (19)(b), Table F-4",
-    "Road-surface coefficients, 15 surfaces x 4 rows x (8 alpha + beta)",
+    "Road-surface coefficients, 15 surfaces x 5 categories x (8 alpha + beta)",
 )
 def _chk_cnossos_road_table_f4() -> Outcome:
     bad = 0
@@ -7179,8 +7179,8 @@ def _chk_cnossos_road_table_f4() -> Outcome:
             key = category if category in expected else "4a/4b"
             bad += sum(1 for a, b in zip(row.alpha[category], expected[key][0]) if a != b)
             bad += int(row.beta[category] != expected[key][1])
-    return numeric(0.0, float(bad), 0.0, unit=" mismatches", places=0,
-                   expected_label="540 coefficients identical")
+    return numeric(0.0, float(bad), 0.0, unit="mismatches", places=0,
+                   expected_label="675 stored coefficients identical")
 
 
 @register(
@@ -7200,7 +7200,7 @@ def _chk_cnossos_road_tables_f2_f3() -> Outcome:
     )
     for category, expected in ref.CNOSSOS_ROAD_TABLE_F3.items():
         bad += int(ph.ROAD_COEFFICIENTS.junction_c[category] != (expected[1], expected[2]))
-    return numeric(0.0, float(bad), 0.0, unit=" mismatches", places=0,
+    return numeric(0.0, float(bad), 0.0, unit="mismatches", places=0,
                    expected_label="36 coefficients identical")
 
 
@@ -7235,7 +7235,7 @@ def _chk_cnossos_a_weighting() -> Outcome:
     bad = sum(
         1 for a, b in zip(ph.CNOSSOS_A_WEIGHTING, ref.CNOSSOS_A_WEIGHTING_TABLE) if a != b
     )
-    return numeric(0.0, float(bad), 0.0, unit=" mismatches", places=0,
+    return numeric(0.0, float(bad), 0.0, unit="mismatches", places=0,
                    expected_label="8 values identical")
 
 
