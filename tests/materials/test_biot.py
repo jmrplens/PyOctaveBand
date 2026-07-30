@@ -46,6 +46,8 @@ checked), and the shear wave beyond its role in the transfer matrix.
 
 from __future__ import annotations
 
+import itertools
+
 import numpy as np
 import pytest
 
@@ -643,7 +645,7 @@ def test_rigid_frame_limit_converges_on_the_jca_equivalent_fluid(
             float(np.max(np.abs(result.surface_impedance / reference - 1.0)))
         )
     assert residuals[-1] < 1e-8
-    for coarse, fine in zip(residuals, residuals[1:]):
+    for coarse, fine in itertools.pairwise(residuals):
         assert fine == pytest.approx(coarse / 100.0, rel=0.05)
 
 
@@ -766,7 +768,7 @@ def test_limp_limit_converges_on_the_limp_frame_equivalent_fluid() -> None:
         residuals.append(float(np.max(np.abs(result / reference - 1.0))))
     assert residuals[-1] < 3e-3
     assert residuals[0] > 0.3
-    for coarse, fine in zip(residuals, residuals[1:]):
+    for coarse, fine in itertools.pairwise(residuals):
         assert fine < coarse / 3.0
 
 

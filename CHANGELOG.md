@@ -110,6 +110,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   with, the shipped model reproduces all 34 560 published rows of the twenty
   vehicles whose catalogue entries are well formed, 17 280 cases at both source
   heights, to 0,0055 dB, and 123 of those cases are committed and run in CI.
+- Poroelastic (Biot) layers in the multilayer absorber solver
+  (`materials/biot.py`, Allard & Atalla 2e chapters 6 and 11). Every porous
+  model shipped so far collapses the material into an equivalent fluid, so the
+  skeleton either stands still or is dragged along by the pore fluid, and
+  neither can resonate. `biot_waves` solves the full Biot theory instead: the
+  elastic coefficients `P`, `Q`, `R` of Eqs. (6.26)-(6.29), the modified
+  densities of Eq. (6.56), and the three waves an isotropic porous material
+  really carries, two compressional (Eqs. (6.67)-(6.69)) and one shear
+  (Eq. (6.83)), with the fluid-to-frame velocity ratios that identify the
+  airborne and the frame-borne branch. `biot_surface_impedance` evaluates the
+  hard-backed closed form Eqs. (6.107)-(6.108) at normal incidence,
+  `frame_quarter_wave_resonance` the frame resonance of Eq. (6.110), and
+  `frame_bulk_modulus` / `frame_elastic_coefficient` the frame moduli in
+  vacuum. `PoroelasticLayer` puts the layer into `layered_absorber`, which then
+  switches to the global-matrix assembly of Sect. 11.5 with the coupling
+  matrices of Sect. 11.4 and the six-variable layer matrix of Table 11.1,
+  exposed on its own as `poroelastic_transfer_matrix`. Fluid layers, sheets,
+  air gaps, oblique incidence, bonded poroelastic layers and rigid or radiating
+  terminations all keep working, and a stack without a poroelastic layer takes
+  the old two-variable path unchanged. `BiotWavesResult.plot()` draws the three
+  wavenumbers, and a new figure and guide section in English and Spanish show
+  the frame resonance no equivalent fluid can produce. No published table of
+  `Zs(f)` exists for a Biot layer, so validation rests on the rigid-frame limit
+  converging first order on the digit-anchored JCA equivalent fluid at four
+  angles of incidence, on the limp limit converging on `limp_frame`, on the
+  chapter 6 closed form and the chapter 11 assembly agreeing to machine
+  precision, and on the three computed numbers the book prints in prose (the
+  airborne branch change at 495 Hz, `|mu_a| > 40` above 50 Hz and `mu_b` from
+  1,0 at 50 Hz to 0,82 at 1500 Hz) plus its published 860 Hz impedance peak.
+  Six new conformance rows.
+
+- Three defects of Allard & Atalla 2e recorded in `docs/ERRATA.md`: the second
+  printed form of the shear velocity ratio, Eq. (6.85), whose denominator
+  should be `w^2 rho12` and not `w^2 rho22`, as its own Eq. (6.80) shows and
+  Eq. (6.84) requires; Eq. (11.48), which attaches both of its terms to the
+  antisymmetric amplitude and carries the shear `k33` inside a sum over the two
+  compressional waves, contradicting the Table 11.1 it is tabulated into; and
+  the thickness of the second glass-wool sample of Sect. 6.6.3, printed as
+  5,4 cm in one sentence and as 5,6 cm two sentences later and in the caption
+  of Figure 6.11. Computing the impedance peak from the printed material
+  settles the last one at 5,6 cm, which gives 863,5 Hz against the published
+  860 Hz where 5,4 cm gives 896 Hz.
 
 - Room-to-room noise reduction (`noise_control/room_to_room.py`, Norton &
   Karczub 2003 Section 4.9): `room_to_room_transmission` composes the whole

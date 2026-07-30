@@ -1583,6 +1583,102 @@ to the issuing body, with date and reference).
 
 ---
 
+## Allard & Atalla, Propagation of Sound in Porous Media 2e (2009), Eq. (6.85)
+
+*Textbook, not a standard.*
+
+- **Location:** Sect. 6.5.2 (printed p. 123), the second form of the shear-wave
+  velocity ratio `mu3`.
+- **The print:** `mu3 = (N delta3^2 - w^2 rho11) / (w^2 rho22)`, offered as an
+  alternative to Eq. (6.84), `mu3 = -rho12 / rho22`.
+- **The problem:** the two printed forms are not equal. Substituting the shear
+  wavenumber of Eq. (6.83), `delta3^2 = (w^2/N)(rho11 rho22 - rho12^2)/rho22`,
+  into the printed Eq. (6.85) gives `-rho12^2 / rho22^2`, which is Eq. (6.84)
+  multiplied by the spurious factor `rho12/rho22`. The denominator should read
+  `w^2 rho12`.
+- **Evidence:** the book's own derivation. Eq. (6.80), printed p. 122, is
+  `-w^2 rho11 psi_s - w^2 rho12 psi_f = N grad^2 psi_s = -N delta3^2 psi_s`, so
+  `(N delta3^2 - w^2 rho11) psi_s = w^2 rho12 psi_f` and therefore
+  `mu3 = psi_f/psi_s = (N delta3^2 - w^2 rho11)/(w^2 rho12)`. With that reading
+  the two forms agree identically, for any material, which the printed one does
+  not do for any.
+- **Library behaviour:** `biot_waves` implements Eq. (6.84) as printed, and
+  `test_shear_velocity_ratio_matches_the_corrected_second_printed_form` checks
+  it against the corrected Eq. (6.85) over four decades of frequency, and also
+  asserts that the form exactly as printed disagrees.
+- **Status:** unreported.
+
+---
+
+## Allard & Atalla 2e (2009), Eq. (11.48) and Table 11.1 (poroelastic layer)
+
+*Textbook, not a standard.*
+
+- **Location:** Sect. 11.3.3 (printed pp. 251-252), the fluid normal stress
+  `sigma33^f` of a poroelastic layer and the matrix `[Gamma]` it feeds.
+- **The print:** Eq. (11.48) reads
+  `sigma33^f = sum (Q + R mu_i)(kt^2 + ki3^2) { -(A_i - A'_i) cos(ki3 x3)
+  + j (A_i - A'_i) sin(k33 x3) }`; Table 11.1 writes `k_{i3}` in the two
+  columns that carry `mu1`, `D1` and `E1`.
+- **The problem:** two independent misprints in the same equation, plus a
+  subscript slip in the table.
+  - The coefficient of the *symmetric* amplitude `(A_i + A'_i)` is missing:
+    Eq. (11.48) attaches both terms to `(A_i - A'_i)`, which would leave the
+    first and third columns of `[Gamma]` with no `sigma33^f` entry at all,
+    contradicting Table 11.1, whose row 6 prints `-E1 cos(k13 x3)` and
+    `-E2 cos(k23 x3)` in exactly those columns. The first term is
+    `-(A_i + A'_i) cos(ki3 x3)`.
+  - The sine carries `k33`, the *shear* wave-number component, inside a sum
+    over the two compressional waves `i = 1, 2`. It must be `ki3`. Table 11.1
+    again gives the intended reading: its row 6 has `j E1 sin(k13 x3)` and
+    `j E2 sin(k23 x3)`, and zero in both shear columns, because a shear wave
+    produces no dilatation and therefore no `sigma33^f`.
+  - Table 11.1 prints the running subscript `k_{i3}` in its first two columns,
+    which belong to the first compressional wave alone: the `mu1`, `D1` and
+    `E1` in the same columns make `k_{13}` the only consistent reading.
+- **Evidence:** the two readings above are forced by Table 11.1, which the same
+  page declares to be the tabulation of Eqs. (11.37), (11.38) and
+  (11.46)-(11.48). They are also what the stress-strain relation Eq. (11.41),
+  `sigma33^f = R div u_f + Q div u_s`, gives when the displacement potentials
+  of Eqs. (11.22)-(11.25) are differentiated directly.
+- **Library behaviour:** the `[Gamma]` of Table 11.1 is implemented with the
+  corrected readings, and
+  `test_gamma_matches_the_field_rebuilt_from_the_potentials` checks all
+  thirty-six of its entries at three frequencies, three depths and three angles
+  of incidence against the field rebuilt from Eqs. (11.22)-(11.28) without
+  going through the table.
+- **Status:** unreported.
+
+---
+
+## Allard & Atalla 2e (2009), Sect. 6.6.3 (thickness of the second sample)
+
+*Textbook, not a standard.*
+
+- **Location:** Sect. 6.6.3, printed p. 129, the two glass-wool samples whose
+  measured and predicted surface impedances are Figures 6.10 and 6.11.
+- **The print:** the first sentence says the impedances are shown "for
+  l = 10 cm and l = 5,4 cm"; two sentences later the peak of the second sample
+  is placed at "860 Hz for l = 5,6 cm", and the caption of Figure 6.11 says
+  "l = 5,6 cm".
+- **The problem:** the two thicknesses cannot both be right, and the paragraph
+  gives no way to tell which is the misprint by inspection. Scaling the 10 cm
+  peak alone does not settle it: 470 x (10/5,4) = 870 Hz and
+  470 x (10/5,6) = 839 Hz bracket the published 860 Hz.
+- **Evidence:** computing the peak from the printed material does settle it.
+  Evaluating Eq. (6.107) on the fully specified Table 6.1 glass wool puts the
+  maximum of `Im(Zs)` at **863,5 Hz** for l = 5,6 cm, 0,4 % from the published
+  860 Hz, and at **896 Hz** for l = 5,4 cm, 4,2 % away. The 5,6 cm of the third
+  sentence and of the figure caption is the correct value; the "5,4 cm" of the
+  first sentence is the misprint.
+- **Library behaviour:** recorded, with no effect on the implementation.
+  `test_impedance_peak_of_the_thin_layer_resolves_the_printed_thickness` pins
+  the 5,6 cm peak against the published 860 Hz and checks that the 5,4 cm
+  reading is the worse of the two.
+- **Status:** unreported.
+
+---
+
 ## Related source properties that are not errata
 
 Recorded here to prevent future "fixes" that would break agreement with the
