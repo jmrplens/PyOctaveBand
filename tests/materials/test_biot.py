@@ -70,8 +70,11 @@ from phonometry import (
 
 # The private [Gamma] of A&A Table 11.1: the field-versus-amplitude matrix the
 # transfer matrix is built from, checked directly against the equations it
-# transcribes in test_gamma_matches_the_field_rebuilt_from_the_potentials.
-from phonometry.materials.biot import _gamma
+# transcribes in test_gamma_matches_the_field_rebuilt_from_the_potentials, and
+# the [Ipp] interface of Eq. (11.67), checked against the continuity conditions
+# of Eq. (11.65). The module itself is imported for the block budget.
+from phonometry.materials import biot as biot_module
+from phonometry.materials.biot import _gamma, _porous_porous_matrix
 
 # ---------------------------------------------------------------------------
 # A&A Table 6.1 (printed p. 124): glass wool "Domisol Coffrage", with the
@@ -606,6 +609,265 @@ def test_bonded_poroelastic_layers_split_without_changing_the_result() -> None:
     )
 
 
+def test_bonded_interface_satisfies_the_printed_continuity_conditions() -> None:
+    """A&A Eq. (11.65), printed p. 257: ``[Ipp]`` at unequal porosity.
+
+    The test above pins ``[Ipp]`` only where the two frames share a porosity,
+    which is the unit-matrix case the book itself flags; every off-diagonal
+    entry is then zero. Here the matrix is checked against the six continuity
+    conditions it is built from, transcribed from the printed equations rather
+    than from the printed matrix, on an arbitrary field vector and a porosity
+    ratio far from one:
+
+    ``v1s`` and ``v3s`` continuous, ``phi (v3f - v3s)`` continuous (the
+    relative volume flow), ``s33s + s33f`` continuous (the total normal
+    stress), ``s13s`` continuous and ``s33f / phi`` continuous (the pore
+    pressure).
+    """
+    phi_left, phi_right = 0.62, 0.97
+    i_pp = _porous_porous_matrix(phi_left, phi_right)
+    # An arbitrary right-hand field vector [v1s, v3s, v3f, s33s, s13s, s33f];
+    # [Ipp] maps it onto the left-hand one, V(M2) = [Ipp] V(M3).
+    right = np.array(
+        [0.7 - 0.3j, -1.9 + 0.4j, 2.6 + 1.1j, -4.5e3 + 2e3j, 8e2 - 5e2j,
+         -1.3e3 - 9e2j],
+        dtype=np.complex128,
+    )
+    left = i_pp @ right
+
+    assert left[0] == pytest.approx(right[0])
+    assert left[1] == pytest.approx(right[1])
+    assert phi_left * (left[2] - left[1]) == pytest.approx(
+        phi_right * (right[2] - right[1])
+    )
+    assert left[3] + left[5] == pytest.approx(right[3] + right[5])
+    assert left[4] == pytest.approx(right[4])
+    assert left[5] / phi_left == pytest.approx(right[5] / phi_right)
+    # The equal-porosity case really is the unit matrix (printed note below
+    # Eq. (11.67)), so the check above is the only one that sees the couplings.
+    assert np.array_equal(_porous_porous_matrix(0.8, 0.8), np.eye(6))
+
+
+def test_two_bonded_materials_reduce_to_the_two_layer_equivalent_fluid() -> None:
+    """The ``[Ipp]`` couplings survive a real two-material stack.
+
+    Two *different* bonded poroelastic layers, 0,94 and 0,98 porosity on two
+    different Johnson-Champoux-Allard media, driven to the rigid-frame limit of
+    A&A Sect. 11.3.4. The result must converge on the same two-layer stack
+    built from :class:`~phonometry.materials.porous_absorber.PorousLayer`,
+    whose equivalent-fluid path is pinned on published digits and never touches
+    ``[Ipp]``. Unlike the equal-porosity split, this exercises the ``phi2/phi1``
+    and ``phi1/phi2`` entries of Eq. (11.67), and it is a convergence test: the
+    residual must fall by two decades for every two decades of frame scaling.
+    """
+    frequency = np.geomspace(50.0, 5000.0, 40)
+    glass_wool = _glass_wool_medium(frequency)
+    fibrous = _soft_fibrous(frequency)
+    reference = layered_absorber(
+        frequency,
+        [PorousLayer(0.04, glass_wool), PorousLayer(0.03, fibrous)],
+    ).surface_impedance
+
+    residuals = []
+    for scale in (1e2, 1e4, 1e6, 1e8):
+        stack = layered_absorber(
+            frequency,
+            [
+                _glass_wool_layer(frequency, 0.04, scale=scale),
+                PoroelasticLayer(
+                    0.03,
+                    fibrous,
+                    TABLE_11_2["porosity"],
+                    TABLE_11_2["tortuosity"],
+                    TABLE_11_2_FRAME_DENSITY * scale,
+                    TABLE_6_1_SHEAR_MODULUS * scale,
+                    TABLE_6_1_POISSON_RATIO,
+                ),
+            ],
+        )
+        residuals.append(
+            float(np.max(np.abs(stack.surface_impedance / reference - 1.0)))
+        )
+    assert residuals[-1] < 1e-8
+    for coarse, fine in itertools.pairwise(residuals):
+        assert fine == pytest.approx(coarse / 100.0, rel=0.05)
+
+
+# ---------------------------------------------------------------------------
+# Strongly attenuating blocks: the assembly must not lose the stack
+# ---------------------------------------------------------------------------
+#: A dense fibrous material, 500 kPa s/m2, whose in-depth attenuation reaches
+#: 410 nepers per metre at 20 kHz. Any run of it thicker than about 1,7 m
+#: overflows a raw ``float64`` chain matrix.
+_DENSE_RESISTIVITY = 500.0e3
+
+
+def _dense_medium(frequency: np.ndarray) -> PorousMediumResult:
+    return johnson_champoux_allard(
+        frequency,
+        _DENSE_RESISTIVITY,
+        porosity=TABLE_6_1_POROSITY,
+        tortuosity=TABLE_6_1_TORTUOSITY,
+        viscous_length=TABLE_6_1_VISCOUS_LENGTH,
+        thermal_length=TABLE_6_1_THERMAL_LENGTH,
+    )
+
+
+def _dense_poroelastic(
+    frequency: np.ndarray, thickness: float
+) -> PoroelasticLayer:
+    return PoroelasticLayer(
+        thickness,
+        _dense_medium(frequency),
+        TABLE_6_1_POROSITY,
+        TABLE_6_1_TORTUOSITY,
+        TABLE_6_1_FRAME_DENSITY,
+        TABLE_6_1_SHEAR_MODULUS,
+        TABLE_6_1_POISSON_RATIO,
+    )
+
+
+def test_attenuating_fluid_run_in_front_of_a_biot_layer_gives_the_half_space() -> (
+    None
+):
+    """A fluid run that overflows its chain matrix must not poison the solve.
+
+    Two metres of the dense material attenuate by 245 nepers at 2 kHz and by
+    821 nepers at 20 kHz, so over the top of the band ``cos(kx d)`` and
+    ``sin(kx d)``, of order ``e^{|Im kx| d}``, are past the ``1,8e308`` of
+    ``float64``. Nothing behind such a run can be heard, so the oracle is the
+    definition of the characteristic impedance: the surface impedance of a
+    half-space at normal incidence is ``Zc`` of its medium, to machine
+    precision, whatever closes the stack. Before the run was split into blocks
+    of bounded attenuation the assembly returned ``inf``/``NaN`` here and
+    ``alpha`` collapsed to zero.
+    """
+    frequency = np.geomspace(2000.0, 20000.0, 12)
+    medium = _dense_medium(frequency)
+    result = layered_absorber(
+        frequency,
+        [PorousLayer(2.0, medium), _dense_poroelastic(frequency, 0.05)],
+    )
+    assert np.all(np.isfinite(result.surface_impedance))
+    assert np.allclose(
+        result.surface_impedance,
+        np.asarray(medium.characteristic_impedance),
+        rtol=1e-12,
+        atol=0.0,
+    )
+
+
+def test_attenuating_fluid_run_behind_a_biot_layer_acts_as_its_termination() -> (
+    None
+):
+    """The same defect on the other side of the layer, where it bites sooner.
+
+    A fluid run *behind* the poroelastic layer enters the system through the
+    porous-fluid coupling of Eq. (11.73), and a single half-metre of the dense
+    material was already enough to return a negative absorption coefficient
+    for a passive stack. A run this attenuating is a half-space, and a
+    half-space of characteristic impedance ``Zc`` behind the layer is exactly
+    what ``termination=Zc`` builds through Eqs. (11.84)-(11.85), a branch of
+    the assembly that holds no fluid block at all.
+    """
+    frequency = np.geomspace(2000.0, 20000.0, 12)
+    medium = _dense_medium(frequency)
+    layer = _dense_poroelastic(frequency, 0.05)
+    half_space = layered_absorber(
+        frequency, [layer], termination=np.asarray(medium.characteristic_impedance)
+    ).surface_impedance
+    for thickness in (0.5, 1.0, 2.0):
+        backed = layered_absorber(
+            frequency, [layer, PorousLayer(thickness, medium)]
+        )
+        assert np.all(np.isfinite(backed.surface_impedance))
+        assert np.all(backed.absorption >= 0.0)
+        assert np.allclose(
+            backed.surface_impedance, half_space, rtol=1e-11, atol=0.0
+        )
+
+
+def test_thick_poroelastic_layer_hides_whatever_is_behind_it() -> None:
+    """The six-variable block has the same dynamic range as the fluid one.
+
+    ``[Gamma(0)]`` is of order one while ``[Gamma(-h)]`` grows as ``e^{|Im k| h}``
+    with the most damped Biot wave, so a thick layer put the same two decades
+    per row into the system. A 40 cm layer with a 2 cm air gap behind it
+    returned a negative absorption; here the air gap must simply become
+    invisible, and the residual against the hard-backed stack must fall
+    monotonically towards zero as the layer thickens.
+    """
+    frequency = np.geomspace(2000.0, 20000.0, 12)
+    residuals = []
+    for thickness in (0.3, 0.6, 1.2, 2.4):
+        layer = _dense_poroelastic(frequency, thickness)
+        hard = layered_absorber(frequency, [layer]).surface_impedance
+        gap = layered_absorber(frequency, [layer, AirLayer(0.02)])
+        assert np.all(np.isfinite(gap.surface_impedance))
+        assert np.all(gap.absorption >= 0.0)
+        assert np.all(gap.absorption <= 1.0)
+        residuals.append(float(np.max(np.abs(gap.surface_impedance / hard - 1.0))))
+    assert residuals[-1] < 1e-7
+    for coarse, fine in itertools.pairwise(residuals):
+        assert fine < coarse / 4.0
+
+
+def test_an_unresolvable_stack_is_refused_instead_of_exhausting_memory() -> None:
+    """The block budget must not turn a bad input into an unbounded solve.
+
+    The shear wavenumber of Eq. (6.87) goes as ``omega sqrt(rho_c / N)``, so
+    a frame stiffness driven towards zero, the limit the guide invites the
+    reader to explore, makes the shear attenuation across even a thin layer
+    diverge. Left uncapped the assembly would ask for thousands of blocks and
+    die on the allocation; it has to refuse, and say why. The same guard
+    covers a fluid run nobody could hear through.
+    """
+    frequency = np.geomspace(500.0, 5000.0, 10)
+    medium = _glass_wool_medium(frequency)
+    floppy = PoroelasticLayer(
+        0.05,
+        medium,
+        TABLE_6_1_POROSITY,
+        TABLE_6_1_TORTUOSITY,
+        TABLE_6_1_FRAME_DENSITY,
+        1.0e-4 * (1.0 + 0.1j),
+        TABLE_6_1_POISSON_RATIO,
+    )
+    with pytest.raises(ValueError, match="nepers"):
+        layered_absorber(frequency, [floppy])
+    with pytest.raises(ValueError, match="nepers"):
+        layered_absorber(
+            frequency,
+            [PorousLayer(400.0, _dense_medium(frequency)),
+             _dense_poroelastic(frequency, 0.05)],
+        )
+
+
+def test_splitting_a_block_is_exact(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Cutting the stack into more blocks is algebra, not approximation.
+
+    A homogeneous fluid layer of phase ``kx d`` is the product of ``m`` layers
+    of phase ``kx d / m``, and two bonded halves of one poroelastic material
+    couple through the unit matrix (Eq. (11.67) at equal porosity), so the
+    block budget must not show up in the answer. Driving it from "never split"
+    down to one neper has to leave a well-conditioned stack unchanged.
+    """
+    frequency = np.geomspace(500.0, 8000.0, 20)
+    medium = _glass_wool_medium(frequency)
+    layers = [
+        AirLayer(0.01),
+        PorousLayer(0.03, medium),
+        _glass_wool_layer(frequency, 0.05),
+        AirLayer(0.02),
+    ]
+    monkeypatch.setattr(biot_module, "_BLOCK_NEPERS", 1.0e9)
+    unsplit = layered_absorber(frequency, layers, angle=0.4).surface_impedance
+    for budget in (5.0, 2.0, 1.0):
+        monkeypatch.setattr(biot_module, "_BLOCK_NEPERS", budget)
+        split = layered_absorber(frequency, layers, angle=0.4).surface_impedance
+        assert np.allclose(split, unsplit, rtol=1e-11, atol=0.0)
+
+
 # ---------------------------------------------------------------------------
 # The rigid-frame limit: convergence on the already-anchored JCA fluid
 # ---------------------------------------------------------------------------
@@ -744,8 +1006,17 @@ def test_limp_limit_converges_on_the_limp_frame_equivalent_fluid() -> None:
     :func:`~phonometry.materials.porous_absorber.limp_frame` implements in
     Panneton's algebraically identical form Eq. (11.55). Driving the shear
     modulus of the Biot layer towards zero must reproduce it. Tested as a
-    convergence over four decades of ``N`` on a 50 Hz to 4 kHz sweep, on the
+    convergence over six decades of ``N`` on a 50 Hz to 4 kHz sweep, on the
     soft fibrous material of Table 11.2 the limp model was written for.
+
+    The residual is first order in ``N`` and the test says so: from
+    ``N = 1e3`` down it falls by a factor between 7,6 and 10 for every decade,
+    not merely "by some". Above that the layer is not limp yet (only 3,2 from
+    1e5 to 1e4), and below ``N = 1e-1`` the shear wavenumber
+    ``delta3 = omega sqrt(rho_c / N)`` of Eq. (6.87) has diverged so far that
+    the assembly refuses the layer outright, which
+    :func:`test_an_unresolvable_stack_is_refused_instead_of_exhausting_memory`
+    covers.
     """
     frequency = np.geomspace(50.0, 4000.0, 50)
     medium = _soft_fibrous(frequency)
@@ -756,7 +1027,7 @@ def test_limp_limit_converges_on_the_limp_frame_equivalent_fluid() -> None:
                                 porosity=TABLE_11_2["porosity"]))],
     ).surface_impedance
     residuals = []
-    for shear in (1e5, 1e4, 1e3, 1e2):
+    for shear in (1e5, 1e4, 1e3, 1e2, 1e1, 1e0, 1e-1):
         result = layered_absorber(
             frequency,
             [PoroelasticLayer(
@@ -766,10 +1037,12 @@ def test_limp_limit_converges_on_the_limp_frame_equivalent_fluid() -> None:
             )],
         ).surface_impedance
         residuals.append(float(np.max(np.abs(result / reference - 1.0))))
-    assert residuals[-1] < 3e-3
     assert residuals[0] > 0.3
-    for coarse, fine in itertools.pairwise(residuals):
-        assert fine < coarse / 3.0
+    assert residuals[-1] < 3e-6
+    # Not limp yet at 1e5 -> 1e4, first order everywhere below 1e3.
+    assert residuals[0] / residuals[1] < 5.0
+    for coarse, fine in itertools.pairwise(residuals[2:]):
+        assert 7.5 < coarse / fine < 12.0
 
 
 def test_limp_and_rigid_limits_of_the_same_layer_differ_at_low_frequency() -> None:

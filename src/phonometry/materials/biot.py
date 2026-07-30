@@ -692,6 +692,77 @@ def _poroelastic_block(
     )
 
 
+#: Largest attenuation, in nepers, allowed inside one block of the assembly.
+#: ``[Gamma(0)]`` stays of order one while ``[Gamma(-h)]`` grows as ``e^b``
+#: with the attenuation ``b`` of the most damped wave across the layer, so a
+#: single block spanning ``b`` nepers puts rows differing by ``e^b`` into the
+#: system of Sect. 11.6: the elimination of the block then loses about
+#: ``b / ln(10)`` digits, and past ``b ~ 710`` the entries overflow float64.
+#: Splitting the layer into equally thick bonded sub-layers is exact, because
+#: two bonded halves of one material couple through ``[Ipp] = [I]``
+#: (Eq. (11.67) with ``phi1 = phi2``).
+_BLOCK_NEPERS = 20.0
+
+#: Largest number of blocks one layer or one fluid run may be split into.
+#: The assembled system grows with the block count, so an input that would
+#: need more than this is rejected rather than silently turned into a very
+#: large solve. At the budget above the limit corresponds to about 1300
+#: nepers, some 11 000 dB, across a single layer: no physical stack reaches
+#: it, but a vanishing shear modulus does, because the shear wavenumber of
+#: Eq. (6.87) diverges as ``1 / sqrt(N)``.
+_MAX_BLOCKS = 64
+
+
+def _block_count(attenuation: float, owner: str) -> int:
+    """Blocks needed to keep *attenuation* nepers under the budget."""
+    pieces = max(1, int(np.ceil(attenuation / _BLOCK_NEPERS)))
+    if pieces > _MAX_BLOCKS:
+        raise ValueError(
+            f"{owner} attenuates by {attenuation:.0f} nepers, which the "
+            f"global-matrix assembly cannot resolve in {_MAX_BLOCKS} blocks. "
+            "Reduce the thickness, or, for a frame with no stiffness, model "
+            "the material with limp_frame() instead of a Biot layer."
+        )
+    return pieces
+
+
+def _layer_attenuation(
+    waves: BiotWavesResult, thickness: float, k_t: Complex
+) -> float:
+    """Nepers accumulated by the most damped Biot wave across the layer."""
+    kt2 = k_t**2
+    depths = [
+        _positive_real_root(wavenumber**2 - kt2)
+        for wavenumber in (
+            waves.compressional_wavenumber_1,
+            waves.compressional_wavenumber_2,
+            waves.shear_wavenumber,
+        )
+    ]
+    return float(
+        max(float(np.max(np.abs(depth.imag))) for depth in depths) * thickness
+    )
+
+
+def _poroelastic_blocks(
+    waves: BiotWavesResult, thickness: float, transverse_wavenumber: ArrayLike
+) -> list[_Block]:
+    """The bonded sub-layer blocks of one poroelastic layer.
+
+    A single block whenever the layer stays inside :data:`_BLOCK_NEPERS`, so
+    ordinary layers keep exactly the matrices they had.
+
+    :raises ValueError: when the layer would need more than
+        :data:`_MAX_BLOCKS` of them.
+    """
+    h = require_positive(thickness, "thickness")
+    k_t = np.asarray(transverse_wavenumber, dtype=np.complex128)
+    pieces = _block_count(
+        _layer_attenuation(waves, h, k_t), "PoroelasticLayer"
+    )
+    return [_poroelastic_block(waves, h / pieces, k_t) for _ in range(pieces)]
+
+
 def _interface(left: _Block | None, right: _Block) -> tuple[Complex, Complex]:
     """Coupling matrices ``([I], [J])`` between two adjacent media.
 

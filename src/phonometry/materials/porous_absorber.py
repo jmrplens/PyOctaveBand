@@ -1264,6 +1264,60 @@ def _check_medium_grid(medium: PorousMediumResult, f: Real, owner: str) -> None:
         )
 
 
+def _split_fluid_run(
+    terms: list[tuple[str, Complex, Complex]], budget: float, limit: int
+) -> list[list[tuple[str, Complex, Complex]]]:
+    """Group a fluid run into chain blocks of at most *budget* nepers.
+
+    A fluid run that attenuates by ``b`` nepers has chain-matrix entries of
+    order ``e^b`` while the same block's back face is the identity, so the
+    assembled system of Allard & Atalla Sect. 11.6 holds rows differing by
+    ``e^b`` and the elimination of the block loses about ``b / ln(10)``
+    digits; past ``b ~ 710`` the entries overflow float64 outright. The split
+    is algebraically exact, because a homogeneous fluid layer of phase
+    ``kx d`` is the product of ``m`` layers of phase ``kx d / m``.
+
+    Returns the run unchanged, as a single group, whenever it stays inside
+    the budget, so ordinary stacks keep the exact chain product they had.
+    Sheet layers carry no attenuation and never force a split of their own.
+
+    :raises ValueError: when the run would need more than *limit* blocks.
+    """
+    parts: list[tuple[str, Complex, Complex, float]] = []
+    attenuation = 0.0
+    for kind, a, b in terms:
+        if kind != "fluid":
+            parts.append((kind, a, b, 0.0))
+            continue
+        loss = float(np.max(np.abs(np.imag(b))))
+        attenuation += loss
+        pieces = max(1, int(np.ceil(loss / budget)))
+        if pieces == 1:
+            parts.append((kind, a, b, loss))
+        else:
+            parts.extend([(kind, a, b / pieces, loss / pieces)] * pieces)
+    if attenuation > budget * limit:
+        raise ValueError(
+            f"the fluid layers of the stack attenuate by {attenuation:.0f} "
+            f"nepers, which the global-matrix assembly cannot resolve in "
+            f"{limit} blocks. Reduce their thickness: nothing behind such a "
+            "run contributes to the surface impedance."
+        )
+
+    groups: list[list[tuple[str, Complex, Complex]]] = []
+    current: list[tuple[str, Complex, Complex]] = []
+    total = 0.0
+    for kind, a, b, loss in parts:
+        if current and total + loss > budget:
+            groups.append(current)
+            current, total = [], 0.0
+        current.append((kind, a, b))
+        total += loss
+    if current:
+        groups.append(current)
+    return groups
+
+
 def _stack_blocks(
     layers: list[Layer] | tuple[Layer, ...],
     f: Real,
@@ -1277,9 +1331,12 @@ def _stack_blocks(
 ) -> list[Any]:
     """Split a stack into fluid blocks and poroelastic blocks.
 
-    Consecutive fluid and sheet layers collapse into one two-variable block
+    Consecutive fluid and sheet layers collapse into two-variable blocks
     carrying their chain-matrix product; each :class:`PoroelasticLayer` becomes
-    a six-variable block of Allard & Atalla Sect. 11.3.3.
+    a six-variable block of Allard & Atalla Sect. 11.3.3. A run or a layer
+    that attenuates by more than ``biot._BLOCK_NEPERS`` is cut into several
+    blocks first, which the global matrix handles exactly as it handles
+    adjacent fluid layers and bonded halves of one poroelastic material.
     """
     from . import biot
 
@@ -1293,8 +1350,12 @@ def _stack_blocks(
             pending, f, k0=k0, k0_sin2=k0_sin2, rc=rc, rho0=rho0,
             viscosity=viscosity,
         )
-        chain = _chain_matrix(terms, f)
-        blocks.append(biot._fluid_block(np.moveaxis(chain, -1, 0)))
+        groups = _split_fluid_run(
+            terms, biot._BLOCK_NEPERS, biot._MAX_BLOCKS
+        )
+        for group in groups:
+            chain = _chain_matrix(group, f)
+            blocks.append(biot._fluid_block(np.moveaxis(chain, -1, 0)))
         pending.clear()
 
     for layer in layers:
@@ -1314,8 +1375,8 @@ def _stack_blocks(
                 shear_modulus=layer.shear_modulus,
                 poisson_ratio=layer.poisson_ratio,
             )
-            blocks.append(
-                biot._poroelastic_block(waves, thickness, transverse_wavenumber)
+            blocks.extend(
+                biot._poroelastic_blocks(waves, thickness, transverse_wavenumber)
             )
         else:
             pending.append(layer)
