@@ -885,9 +885,11 @@ def dynamic_intermodulation_distortion(
     # Reference: the output amplitude at f_s, per the 14.12.9.1 definition
     # ("the ratio of the r.m.s. sum of the output voltages ... to the
     # amplitude of the output voltage at the frequency f_s"). The 14.12.9.2 f)
-    # formula prints the denominator as "U2", which contradicts 14.12.9.1 and
-    # is an editorial defect of IEC 60268-3:2013 (see docs/ERRATA.md); the
-    # Otala convention implemented here follows the 14.12.9.1 definition.
+    # formula prints the denominator as "U2", which Table 2 and item d) define
+    # as the 8,70 kHz intermodulation component -- i.e. one of the nine terms
+    # of the formula's own numerator. That is an editorial defect of
+    # IEC 60268-3:2013 (see docs/ERRATA.md); the Otala convention implemented
+    # here follows the 14.12.9.1 definition.
     ref = _tone_amplitude(freqs, amp, fsine, search)
     if ref <= 0.0:
         raise ValueError("No 15 kHz sine component found.")

@@ -168,10 +168,19 @@ def test_impulsive_injury_offsets_are_15_db_sel_and_6_db_peak(guidance: str) -> 
 
 
 #: Groups whose impulsive peak-SPL TTS onset the article derives from the
-#: audiogram rather than from data. HF and VHF are excluded because printed
-#: p. 155 says their peak thresholds "were directly based on empirical data",
-#: and LF because Southall et al. publish no audiogram fit for it.
-_PLUS_159_GROUPS = ("SI", "PCW", "OCW", "PCA", "OCA")
+#: audiogram with the +159 dB rule. Printed p. 155 restricts the rule to the
+#: groups "in water": "For other species groups in water (LF, SI, PCW, and
+#: OCW), 159 dB was added to the value of the hearing threshold at f0". HF and
+#: VHF are excluded because their peak thresholds "were directly based on
+#: empirical data", and LF because Southall et al. publish no audiogram fit
+#: for it. PCA and OCA are in air and are covered by the separate
+#: extrapolation test below, not by this one.
+_PLUS_159_GROUPS = ("SI", "PCW", "OCW")
+
+#: The two in-air carnivore groups, for which the article uses a nominal 15 dB
+#: SEL-to-peak offset instead. Applying the +159 dB rule to them is an
+#: extrapolation this project makes, not the article's own method.
+_IN_AIR_GROUPS = ("PCA", "OCA")
 
 
 @pytest.mark.parametrize("group", _PLUS_159_GROUPS)
@@ -179,10 +188,9 @@ def test_southall_impulsive_peak_spl_is_threshold_at_f0_plus_159_db(group: str) 
     """Printed p. 155: "159 dB was added to the value of the hearing threshold at f0".
 
     The article works the rule through for PCW: "Peak SPL TTS onset was
-    estimated as 212 dB re 1 µPa (53 dB at f0 + 159 dB)". Applying it to PCA
-    and OCA is what turns the Table 7 errata (``docs/ERRATA.md``) from a
-    transcription into a derived result: the corrected 155 and 170 follow,
-    the printed 138 and 161 do not.
+    estimated as 212 dB re 1 µPa (53 dB at f0 + 159 dB)". This test covers only
+    the in-water groups the sentence names, which is where the rule is
+    validated against published values.
     """
     from phonometry.underwater.marine_mammal_audiograms import (
         BEST_HEARING_FREQUENCY_KHZ,
@@ -199,16 +207,26 @@ def test_southall_impulsive_peak_spl_is_threshold_at_f0_plus_159_db(group: str) 
 
 
 def test_the_plus_159_rule_rejects_the_printed_in_air_peak_values() -> None:
-    """The rule discriminates: it is 16 and 9 dB away from the printed PCA/OCA."""
+    """Extrapolating the +159 dB rule to the two in-air groups.
+
+    The article restricts the rule to the in-water groups, so this is an
+    extrapolation rather than the article's own method (its in-air rule is a
+    nominal 15 dB SEL-to-peak offset, which is what reproduces the *printed*
+    138 and 161). Extrapolated, it lands 0.6 dB and 0.4 dB from the
+    errata-corrected 155 and 170 and 16 dB and 9 dB from the printed values,
+    so it corroborates the errata without depending on it. Note that 154.4
+    rounds to 154, not to the corrected 155; see docs/ERRATA.md.
+    """
     from phonometry.underwater.marine_mammal_audiograms import (
         BEST_HEARING_FREQUENCY_KHZ,
         group_audiogram,
     )
 
-    for group, printed in (("PCA", 138.0), ("OCA", 161.0)):
+    for group, printed, corrected in (("PCA", 138.0, 155.0), ("OCA", 161.0, 170.0)):
         f0_hz = BEST_HEARING_FREQUENCY_KHZ[group][0] * 1000.0
         derived = float(group_audiogram(f0_hz, group).threshold[0]) + 159.0
         assert abs(derived - printed) > 8.0
+        assert abs(derived - corrected) < 0.7
 
 
 def test_southall_table_7_errata_values_are_implemented() -> None:

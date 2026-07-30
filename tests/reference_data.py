@@ -458,9 +458,12 @@ EN12354_2_ANNEX_E3_LPRIME_N_W = 45
 # the low bands (125-500 Hz) and every single-number rating are exact.
 # NOTE 2: the printed D2m,nT row of Annex F equals R' + 1,5 dB, whereas
 # Formula (13) with V = 50 m3, S = 11,3 m2, T0 = 0,5 s gives
-# 10 lg(50/(6*0,5*11,3)) = +1,69 dB - another internal inconsistency of the
-# 2000 example. The module implements the formula; the single-number oracle
-# D2m,nT,w = 33 reproduces either way.
+# 10 lg(50/(6*0,5*11,3)) = +1,69 dB. The example is the self-consistent one
+# here: 10 lg(0,16*50/(0,5*11,3)) = 1,5116 dB is the printed row, and
+# Formula (13)'s "6" is a rounded 1/0,16 = 6,25, worth 10 lg(6,25/6) = 0,18 dB.
+# ISO 12354-3:2017 Formula (4) replaces the 6 with an explicit Csab = 0,16 s/m,
+# i.e. it adopts the example's constant. The module implements Formula (13) as
+# printed; the single-number oracle D2m,nT,w = 33 reproduces either way.
 # ---------------------------------------------------------------------------
 EN12354_3_ANNEX_F_BANDS = (125.0, 250.0, 500.0, 1000.0, 2000.0)
 EN12354_3_ANNEX_F_AREA = 11.3
@@ -2037,9 +2040,13 @@ DIN45681_I11_J48 = (228.8, 6.11, 38.32, 58.24, 54.19, -2.06, 3.00)
 # critical band. The printed dL = 9.12 dB reproduces from the *plain*
 # Formula (17) energy sum of the three tone levels (82.87 dB) through the
 # audibility chain at 592.2 Hz (LS = 59.53); the printed LT column (81.11 dB)
-# is consistent with the Anmerkung-2 shared-line dedupe instead and does NOT
-# reproduce the printed dL -- the two printed cells contradict each other, so
-# only the dL chain is pinned.
+# is that same sum less exactly 1.763 dB = 10 lg 1.5, the standard's own
+# Hanning correction, and does NOT reproduce the printed dL -- the two printed
+# cells contradict each other, so only the dL chain is pinned. The same 1.76 dB
+# offset carries the "5 FG" row of Tabelle I.10 (55.12 + 54.23 -> 57.71 dB
+# summed, 55.95 dB printed), where the printed dL = 3.22 dB does follow the
+# printed LT, so that row is self-consistent and this one is not. See
+# docs/ERRATA.md.
 DIN45681_I6_6FG_TONE_LEVELS = [78.31, 75.00, 79.75]
 DIN45681_I6_6FG = (592.2, 9.12, 59.53, -2.40)     # (fT, dL, LS, av)
 # Anhang I.3 Step 3/5: mean audibility over the 53 spectra and the resulting

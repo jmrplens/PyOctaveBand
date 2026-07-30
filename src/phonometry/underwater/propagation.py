@@ -98,11 +98,15 @@ def _thorp(f_khz: NDArray[np.float64]) -> NDArray[np.float64]:
 def _francois_garrison(
     f_khz: NDArray[np.float64], t: float, s: float, z_m: float, ph: float
 ) -> NDArray[np.float64]:
+    # Sound speed c, printed as "q = 1412 + 3.21T + 1.19S + 0.0167z" in the
+    # Medwin & Clay transcription (Eq. (3.4.30), printed p. 110) although the
+    # same block divides by c; the original paper names it c. See ERRATA.
     c = 1412.0 + 3.21 * t + 1.19 * s + 0.0167 * z_m
     # Boric-acid factor A1 = (8.86/c)*10^(0.78 pH - 5) per the original paper
     # (Francois & Garrison 1982 Part II, Eq. (10)/Fig. 7), whose own Table IV
-    # reproduces only with 8.86; the Medwin & Clay transcription prints 8.68
-    # (digit transposition), biasing boric-dominated bands by up to 1.7 %.
+    # reproduces only with 8.86; the Medwin & Clay transcription (Eq. (3.4.30),
+    # printed p. 110) prints 8.68 (digit transposition), biasing
+    # boric-dominated bands by up to 1.7 %.
     a1 = (8.86 / c) * 10.0 ** (0.78 * ph - 5.0)
     f1 = 2.8 * (s / 35.0) ** 0.5 * 10.0 ** (4.0 - 1245.0 / (273.0 + t))
     a2 = 21.44 * (s / c) * (1.0 + 0.025 * t)

@@ -479,7 +479,9 @@ def _is_distinct(
     (``Frequenz(i)/Sqr(2)``). The two cannot both be satisfied; this
     implementation follows the DIN/sqrt(2) reading (the ISO print is
     plausibly a typesetting corruption of it, see docs/ERRATA.md).
-    Borderline tones with a one-sided edge steepness in roughly
+    Relative to DIN, the ISO print is sqrt(2) STRICTER on the lower edge
+    (1/2 < 1/sqrt(2)) and sqrt(2) MORE LENIENT on the upper (no divisor at
+    all). Borderline tones with a one-sided edge steepness in roughly
     [17, 34] dB/oct flip classification between the two readings.
     """
     n_lines = high - low + 1

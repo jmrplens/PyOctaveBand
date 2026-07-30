@@ -335,7 +335,12 @@ def tone_to_noise_ratio(
     return ToneAssessment(ft, tnr, criterion, prominent)
 
 
-# ECMA-418-1:2024 Table 2 (p. 17): f_1,L = C0 + C1*ft + C2*ft^2 (Formula 21)
+# ECMA-418-1:2024 Table 2 (p. 17): f_1,L = C0 + C1*ft + C2*ft^2 (Formula 21).
+# Formula (21) is printed "f_1,L = C_L,0 + C_L,0 ft + C_L,2 ft^2", repeating
+# the constant term where the linear coefficient belongs; its own where-list
+# declares C_L,0/C_L,1/C_L,2, Table 2 tabulates a C_L,1 column and the parallel
+# Formula (22) prints C_U,1 correctly. Read as printed the middle range would
+# return -149.5 - 149.5*ft, negative everywhere. See docs/ERRATA.md.
 _LOWER_EDGE_COEFFS = (
     (89.1, 171.4, (20.0, 0.0, 0.0)),
     (171.4, 1600.0, (-149.5, 1.001, -6.90e-5)),
