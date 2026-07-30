@@ -15,8 +15,7 @@
 
 ## Numerical conformance report
 
-&#9989; **517/517 conformance checks pass** across 56 domains and 352 standards - filters class 1 - weightings within IEC 61672-1 class 1.
-&#9989; **507/507 conformance checks pass** across 55 domains and 343 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+&#9989; **523/523 conformance checks pass** across 56 domains and 357 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
 

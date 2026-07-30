@@ -134,8 +134,8 @@ sample from the metrology core:
 | IEC 60942:2017 Table 2 | Calibrator short-term stability limits (frequency-dependent, class 1) in `sensitivity()` | `tests/metrology/test_calibration_validation.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
-517 numerical conformance checks across 56 domains and 352 standards, covering
-507 numerical conformance checks across 55 domains and 343 standards, covering
+523 numerical conformance checks across 56 domains and 357 standards, covering
+523 numerical conformance checks across 56 domains and 357 standards, covering
 psychoacoustics and speech intelligibility, room, building and materials
 acoustics, human and machine vibration, environmental, aircraft, rotorcraft
 and underwater noise, electroacoustics, broadcast loudness, industrial noise
