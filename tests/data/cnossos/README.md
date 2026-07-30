@@ -6,6 +6,9 @@
 | `rail_vehicles_2015.csv` | transcribed | The vehicle definitions of `CNOSSOS_Rail_Vehicles.xml` v1.1 (catalogue date 2015-04-09), the vehicle database of the same Commission source module: number of axles and the reference into each spectrum table. |
 | `rail_wavelength_tables_2015.csv` | transcribed | The spectra of that catalogue and of `CNOSSOS_Rail_Track.xml` v1.0 (2014-04-27) that are given against wavelength: wheel roughness, contact filter, rail roughness and impact roughness, on the 32-step 1/3-octave grid from 1 000 mm to 0,8 mm. |
 | `rail_frequency_tables_2015.csv` | transcribed | The spectra of the same two catalogues that are given against frequency, in the 24 1/3-octave bands from 50 Hz to 10 kHz: wheel, track and superstructure transfer functions, traction sound power for constant speed and for idling, and the aerodynamic reference spectra. |
+| `road_emission_cases.csv` | derived (extract of a published result set) | 60 of the 4 875 cases of `CNOSSOS_ROAD_EMISSION_TEST.xlsx`, the road emission test workbook published by the European Commission on CIRCABC with the CNOSSOS-EU source module. Each row carries the segment description recovered from the workbook (see below) and the workbook's own per-octave-band and total line-power levels, copied verbatim to the two decimals it prints. |
+| `road_coefficients_2015.csv` | transcribed | Table F-1 of Appendix F of Annex II to Directive 2002/49/EC **as published in Commission Directive (EU) 2015/996** (OJ L 168, 1.7.2015, p. 124), that is the version the workbook was computed with and which Commission Delegated Directive (EU) 2021/1226 later replaced. Machine-transcribed from the Official Journal text. |
+| `road_surfaces_2015.csv` | transcribed | Table F-4 of the same 2015 text (OJ L 168, 1.7.2015, pp. 125-129), keyed by the `NLxx` surface identifiers the workbook uses. Also superseded by (EU) 2021/1226. |
 
 These are the **2015** coefficients, not the ones the library ships. The
 workbook was computed in 2014 with the database that Commission Directive
@@ -107,11 +110,6 @@ switched off, which is how the reference program behaves. Everything the 2021
 amendment changed is therefore covered by the table transcriptions and by the
 closed-form assertions in the same test module, not by these cases.
 
-Deliberately excluded: the workbook itself (9 MB of repeated cases), the
-| `road_emission_cases.csv` | derived (extract of a published result set) | 60 of the 4 875 cases of `CNOSSOS_ROAD_EMISSION_TEST.xlsx`, the road emission test workbook published by the European Commission on CIRCABC with the CNOSSOS-EU source module. Each row carries the segment description recovered from the workbook (see below) and the workbook's own per-octave-band and total line-power levels, copied verbatim to the two decimals it prints. |
-| `road_coefficients_2015.csv` | transcribed | Table F-1 of Appendix F of Annex II to Directive 2002/49/EC **as published in Commission Directive (EU) 2015/996** (OJ L 168, 1.7.2015, p. 124), that is the version the workbook was computed with and which Commission Delegated Directive (EU) 2021/1226 later replaced. Machine-transcribed from the Official Journal text. |
-| `road_surfaces_2015.csv` | transcribed | Table F-4 of the same 2015 text (OJ L 168, 1.7.2015, pp. 125-129), keyed by the `NLxx` surface identifiers the workbook uses. Also superseded by (EU) 2021/1226. |
-
 The workbook tabulates the **total** line power of a segment carrying all five
 vehicle categories, while each of its rows names only the category whose flow
 and speed that row varies. The traffic composition behind each block was
@@ -136,10 +134,11 @@ combinations, all four temperature and studded-tyre combinations and all twelve
 speeds, so the committed subset reaches everything the full set does except the
 sheer number of repetitions.
 
-Deliberately excluded: the workbook itself (10 MB of repeated cases), the
-CNOSSOS-EU reference source module and its libraries, and the Official Journal
-PDFs. The data are **not** part of the `phonometry` package and are not
-installed with it.
+Deliberately excluded: the two workbooks themselves (10 MB for the railway set
+and 9 MB for the road one, almost all of it repeated cases), the CNOSSOS-EU
+reference source module and its libraries, and the Official Journal PDFs. The
+data are **not** part of the `phonometry` package and are not installed with
+it.
 
 ## Removal policy
 
