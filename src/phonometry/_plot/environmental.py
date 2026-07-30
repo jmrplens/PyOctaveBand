@@ -32,6 +32,7 @@ if TYPE_CHECKING:
         AtmosphericRayResult,
         EffectiveSoundSpeedProfile,
     )
+    from ..environmental.cnossos_rail import RailwayEmissionResult
     from ..environmental.ground_barriers import (
         BarrierInsertionLoss,
         SphericalGroundResult,
@@ -75,6 +76,12 @@ _STRINGS: dict[str, str] = {
     "$A$ — total": "$A$ — total",
     "Attenuation A [dB]": "Atenuación A [dB]",
     "ISO 9613-2 attenuation breakdown": "Desglose de atenuación ISO 9613-2",
+    "CNOSSOS-EU railway source line power": (
+        "Potencia de la línea fuente ferroviaria CNOSSOS-EU"
+    ),
+    "Both heights": "Ambas alturas",
+    "Source A (0,5 m)": "Fuente A (0,5 m)",
+    "Source B (4,0 m)": "Fuente B (4,0 m)",
     "Excess attenuation $\\Delta L$": "Atenuación en exceso $\\Delta L$",
     "Free field (0 dB)": "Campo libre (0 dB)",
     "Hard-ground limit (+6 dB)": "Límite de suelo duro (+6 dB)",
@@ -333,6 +340,58 @@ def plot_outdoor_attenuation(
     ax.axhline(0.0, color=_C_MUTED, lw=0.8)
     ax.set_ylabel(_t("Attenuation A [dB]", language))
     ax.set_title(_t("ISO 9613-2 attenuation breakdown", language))
+    ax.legend(loc="best", fontsize="small")
+    ax.grid(True, axis="y", alpha=0.3)
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_cnossos_rail_emission(
+    result: RailwayEmissionResult, ax: Axes | None = None, *, language: str = "en",
+    **kwargs: Any
+) -> Axes:
+    """Per-metre railway source-line power of the two equivalent source heights.
+
+    Draws the energy-summed line power of the track as bars over the eight
+    CNOSSOS-EU octave bands, with source A (0,5 m) and source B (4,0 m) overlaid
+    as marker lines, so the bands where the roof and pantograph sources matter
+    are read directly off the chart.
+
+    :param result: A
+        :class:`~phonometry.environmental.cnossos_rail.RailwayEmissionResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the total-line-power ``bar`` call.
+    :return: The axes.
+    """
+    from .._i18n import localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    freqs = np.asarray(result.frequencies, dtype=np.float64)
+    positions = _band_axis(ax, freqs, language=language)
+
+    kwargs.setdefault("color", _C_PRIMARY_LIGHT)
+    kwargs.setdefault("label", _t("Both heights", language))
+    # A silent source carries -inf, which no axis can hold; masking it leaves
+    # the band out of the drawing instead of collapsing the whole scale.
+    total = np.asarray(result.total_line_power, dtype=np.float64)
+    ax.bar(positions, np.where(np.isfinite(total), total, np.nan), **kwargs)
+
+    styles = (
+        (_C_PRIMARY, "o", "Source A (0,5 m)"),
+        (_C_SECONDARY, "s", "Source B (4,0 m)"),
+    )
+    for row, (color, marker, label) in zip(
+        np.asarray(result.line_power, dtype=np.float64), styles, strict=True
+    ):
+        ax.plot(
+            positions, np.where(np.isfinite(row), row, np.nan), color=color,
+            marker=marker, lw=1.2, ms=4, zorder=4, label=_t(label, language),
+        )
+    # Pure symbol notation, identical in every language, so it is set directly
+    # rather than routed through the translation table.
+    ax.set_ylabel("$L'_{W,eq,line}$ [dB re 1 pW/m]")
+    ax.set_title(_t("CNOSSOS-EU railway source line power", language))
     ax.legend(loc="best", fontsize="small")
     ax.grid(True, axis="y", alpha=0.3)
     localize_axes(ax, language)

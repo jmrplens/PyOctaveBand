@@ -1,0 +1,21 @@
+id,code,description,axles,wheel_transfer,contact_filter,wheel_roughness,traction,aerodynamic
+3,SNCF BB66400,Diesel loc,4,6,6,3,3,3
+4,SNCF CC72000,Diesel loc,4,6,6,3,4,3
+6,NS6400 Dloco,Diesel loc,4,3,6,3,6,3
+7,TKOJ JT42CWR/Class66,Diesel loc,6,6,6,4,7,3
+8,NS DM 90 DMU,DMU,4,3,6,5,8,3
+9,NS 1700 Eloco,ELoco,4,6,6,3,9,3
+10,NS mat 64 EMU,EMU,4,3,6,3,10,3
+11,RMR Cat 1,Block braked passenger,4,3,6,3,10,3
+12,RMR Cat 2 (a),"ICM-III, ICR trailer, SNCF passenger, TEE",4,3,6,3,10,3
+13,RMR Cat 2 (b),"ICR 1700, DDM-1 1800 loco, Belgian locos",4,6,6,3,9,3
+14,RMR Cat 3,Disc braked passenger trains,4,3,6,5,10,3
+16,RMR Cat 5 (a),"DE1, DE2, DE3",4,3,6,3,8,3
+17,RMR Cat 5 (b),"2200, 2300 locos",4,3,6,3,3,3
+18,RMR Cat 5 (c),"2400, 2500 locos",4,3,6,3,3,3
+19,RMR Cat 6,Diesel trains with disc brakes,4,3,6,5,8,3
+20,RMR Cat 7,Disc braked urban subway and rapid tram trains,3,3,6,5,10,3
+21,RMR Cat 8 (a),"ICM IV, IRM",4,3,6,5,10,3
+22,RMR Cat 8 (b),DDM 2/3,4,3,6,3,10,3
+23,RMR Cat 9 (a),"TGV PBA type, power car",4,3,6,3,9,3
+26,RMR Cat 10,ICE-3 type assuming no wheel dampers,4,3,6,5,10,3
