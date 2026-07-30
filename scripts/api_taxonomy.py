@@ -147,6 +147,7 @@ _SECTION_LIST: tuple[Section, ...] = (
             "phonometry.building.detailed_prediction",
             "phonometry.building.building_uncertainty",
             "phonometry.building.floor_covering_improvement",
+            "phonometry.building.resilient_layers",
             "phonometry.building.structure_borne_power",
             "phonometry.building.installed_structure_borne",
             "phonometry.building.spanish_building_code",
