@@ -17,7 +17,7 @@ that is what ``test_workbook_*`` asserts.
 
 **The coefficient tables** cannot be pinned by the workbook, which predates the
 2021 amendment, so they are pinned against a second, machine-made transcription
-of the Official Journal text held in :mod:`tests.reference_data`.
+of the Official Journal text held in ``tests/reference_data.py``.
 
 Everything the workbook does not reach - the studded-tyre speed branches above
 50 km/h, the gradient breakpoints, the 20 km/h floor - is anchored on the exact
@@ -34,8 +34,8 @@ import matplotlib
 matplotlib.use("Agg")
 import numpy as np
 import pytest
+import reference_data as ref
 
-import tests.reference_data as ref
 from phonometry.environmental.cnossos_road import (
     CNOSSOS_A_WEIGHTING,
     ROAD_COEFFICIENTS,
