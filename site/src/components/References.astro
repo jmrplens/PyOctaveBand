@@ -294,11 +294,14 @@ const sorted = [...references.entries()].sort(([, a], [, b]) =>
 	.page-references i {
 		font-style: italic;
 	}
-	/* Annotation line below the citation, annotated-bibliography style. */
+	/* Annotation line below the citation, annotated-bibliography style. One
+	   step quieter than the citation it belongs to, so the two are told apart
+	   by weight as well as by position: the record is what the reader is
+	   scanning, the annotation is what they read once they have found it. */
 	.ref-note {
 		display: block;
 		text-indent: 0;
-		margin-top: 0.15rem;
-		color: var(--sl-color-gray-2);
+		margin-top: 0.2rem;
+		color: var(--sl-color-gray-3);
 	}
 </style>

@@ -598,6 +598,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `6.353` into the bandwidth term reassociates the sum and moves the index by
   a few units in the last place.
 
+- Brand lockup (`.github/brand/lockup.svg`, `scripts/generate_brand.py`): the
+  mark and the wordmark as one asset, trimmed to its ink, with the type
+  converted to outlines from the same display face and the same proportions the
+  README banner uses. The documentation site inlines it as the site title, so
+  the header shows the mark beside a wordmark set in the brand face while
+  loading no web font and reserving no space for one, and the mark alone now
+  fills the landing hero's second column, which the layout had always left
+  empty.
+
 ### Changed
 
 - The conformance counts quoted outside the report are generated, not typed.
@@ -621,6 +630,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   claims live in YAML frontmatter, which is parsed before MDX compiles and
   therefore cannot interpolate an import whatever the file extension, so they
   stay with the writer rather than with `conformance-stats.mjs`.
+- Documentation site: previous and next links name the section they lead to.
+  Thirty-one sidebar rows are called "Overview", one per group, so 61 of 283
+  entries had a card that said only "Overview" and the page between two groups
+  said it twice. Each card now carries the group trail above the label, looked
+  up in the sidebar the page already renders.
+
+- Documentation site presentation: the heading scale is fluid and one step
+  quieter at the top (an H2 goes from 29-35 px to 23-29 px, so a heading with a
+  function name in it fits a phone in two lines instead of three), inline code
+  inside a heading drops the chip and sizes to the heading around it, "See also"
+  sections read as a panel while staying anchored sections in the table of
+  contents, the per-page bibliography is set as a reference list rather than as
+  more prose, the copy button on a code block is smaller, and the footer credit
+  wraps as two units with the code hosts as marks instead of a run of words
+  separated by dots.
 
 - The last three mermaid flowcharts are now generated SVGs, and the mermaid
   runtime is gone from the site. The sound level meter guide, the calibration
