@@ -1017,10 +1017,11 @@ which is the check that enforces the rule; see
 - **Evidence:** Table 2, item d) and item f) read together in both language
   columns of the bilingual edition; the historical DIM literature (Otala)
   defines the ratio to the sine amplitude. Renders: `plan/[IEC 60268-3_2013]
-  Sound system equipment - Part 3_ Amplifiers.pdf`, PDF page 41, printed
-  p. 39, 400 dpi (the item f) formula), and PDF page 101, printed p. 99,
-  250 dpi (the French Tableau 2 and clause 14.12.9.1, which give `U_2` the
-  same 8,70 kHz definition and the same `f_s` reference).
+  Sound system equipment - Part 3_ Amplifiers.pdf`, PDF page 40, printed
+  p. 38, 250 dpi (Table 2 and item a)), PDF page 41, printed p. 39, 400 dpi
+  (the item f) formula), and PDF page 101, printed p. 99, 250 dpi (the French
+  Tableau 2 and clause 14.12.9.1, which give `U_2` the same 8,70 kHz
+  definition and the same `f_s` reference).
 - **Library behaviour:** follows the 14.12.9.1 definition (reference = the
   output amplitude at f_s), with a code comment at the reference measurement
   in [`distortion.py`](../src/phonometry/electroacoustics/distortion.py).
