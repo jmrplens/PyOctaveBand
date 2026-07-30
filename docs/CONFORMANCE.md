@@ -16,6 +16,7 @@
 ## Numerical conformance report
 
 &#9989; **517/517 conformance checks pass** across 56 domains and 352 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+&#9989; **507/507 conformance checks pass** across 55 domains and 343 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
 
@@ -807,7 +808,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary>&#9989; <b>Porous &amp; multilayer absorbers (Mechel / Bies / Cox &amp; D'Antonio)</b>: 100% (14/14)</summary>
+<summary>&#9989; <b>Porous &amp; multilayer absorbers (Mechel / Bies / Cox &amp; D'Antonio)</b>: 100% (20/20)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
@@ -825,6 +826,12 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | Allard & Atalla 2e Eq. (11.55), printed p. 253 (prose limit) | Limp effective density at DC = apparent total density rho_t, kg/m3 | 31.1809 kg/m3 (+/-0.01%) | 31.1809 kg/m3 | 0 kg/m3 | &#9989; |
 | Allard & Atalla 2e Eq. (11.55), printed p. 253 (prose limit) | Heavy frame recovers the rigid-frame Zc (relative deviation) | 0 (+/-0.00001) | 0 | 0 | &#9989; |
 | Allard & Atalla 2e printed p. 254 (Doutres et al. 2007) | Limp-frame bulk-modulus limit for air, kPa | 20 kPa (+/-0.3 kPa) | 20.27 kPa | 0.265 kPa | &#9989; |
+| Allard & Atalla 2e Eq. (6.110), Table 6.1 glass wool | Frame lambda/4 resonance of a 10 cm layer, Hz | 459.9 Hz (+/-0.05 Hz) | 459.93 Hz | 0.033 Hz | &#9989; |
+| Allard & Atalla 2e Sect. 6.5.4 (Biot model output), pp. 124-125 | Airborne compressional branch changes root at 495 Hz | 495 Hz (+/-1%) | 495.9 Hz | 0.9 Hz | &#9989; |
+| Allard & Atalla 2e Sect. 6.5.4 (Biot model output), pp. 124-125 | Frame-borne velocity ratio mu_b at 1500 Hz | 0.82 (+/-2%) | 0.811 | -0.009 | &#9989; |
+| Allard & Atalla 2e Sect. 6.6.3 (Biot model output), p. 129 | Surface-impedance peak of a 5,6 cm layer, Hz | 860 Hz (+/-2%) | 863.5 Hz | 3.5 Hz | &#9989; |
+| Allard & Atalla 2e Sect. 11.3.4 (rigid-frame limit) | Stiff, heavy frame recovers the JCA layer (max rel deviation) | 0 (+/-0.0000001) | 0.0000000034 | 0 | &#9989; |
+| Allard & Atalla 2e Eq. (6.107) vs Sect. 11.5 assembly | Two independent derivations of Zs (max rel deviation) | 0 (+/-0.0000000001) | 0 | 0 | &#9989; |
 
 </details>
 

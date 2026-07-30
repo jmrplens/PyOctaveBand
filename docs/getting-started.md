@@ -153,5 +153,6 @@ the normative PDF fiche.
 - [Calibration and dBFS](calibration.md): get real-world SPL values
 - [Why phonometry](why-phonometry.md): the conformance-first design philosophy
 - [Conformance report](CONFORMANCE.md): the expected and computed value of all 517 checks
+- [Conformance report](CONFORMANCE.md): the expected and computed value of all 507 checks
 - [API Reference](api-reference.md): every parameter of every function
 - [Bibliography](references.md): the books and papers behind every guide, each with a verified link

@@ -7363,6 +7363,141 @@ def _chk_limp_frame_criterion_limit() -> Outcome:
                    0.3, unit="kPa", places=2)
 
 
+# Biot poroelastic layer (Allard & Atalla 2e, ch. 6 and 11). The book prints
+# no table of computed surface impedances, so these rows pin the closed forms
+# it does print, the three output digits its Sect. 6.5.4 states in prose for the
+# fully specified Table 6.1 glass wool, and the two exact limits (rigid frame
+# onto the digit-anchored JCA equivalent fluid, and the chapter 11 assembly onto
+# the chapter 6 closed form Eq. (6.107)).
+_AA_TABLE_6_1 = {
+    "porosity": 0.94,
+    "tortuosity": 1.06,
+    "viscous_length": 0.56e-4,
+    "thermal_length": 1.1e-4,
+}
+_AA_TABLE_6_1_SIGMA = 40_000.0
+_AA_TABLE_6_1_RHO1 = 130.0
+_AA_TABLE_6_1_SHEAR = 220.0e4 * (1.0 + 0.1j)
+
+
+def _aa_glass_wool_waves(frequency: np.ndarray) -> Any:
+    medium = ph.johnson_champoux_allard(
+        frequency, _AA_TABLE_6_1_SIGMA, **_AA_TABLE_6_1
+    )
+    return ph.biot_waves(
+        medium,
+        porosity=_AA_TABLE_6_1["porosity"],
+        tortuosity=_AA_TABLE_6_1["tortuosity"],
+        frame_density=_AA_TABLE_6_1_RHO1,
+        shear_modulus=_AA_TABLE_6_1_SHEAR,
+    )
+
+
+@register(
+    _POROUS,
+    "Allard & Atalla 2e Eq. (6.110), Table 6.1 glass wool",
+    "Frame lambda/4 resonance of a 10 cm layer, Hz",
+)
+def _chk_biot_frame_resonance() -> Outcome:
+    value = ph.frame_quarter_wave_resonance(
+        0.10, shear_modulus=_AA_TABLE_6_1_SHEAR, poisson_ratio=0.0,
+        frame_density=_AA_TABLE_6_1_RHO1,
+    )
+    return numeric(459.9, value, 0.05, unit="Hz", places=2)
+
+
+@register(
+    _POROUS,
+    "Allard & Atalla 2e Sect. 6.5.4 (Biot model output), pp. 124-125",
+    "Airborne compressional branch changes root at 495 Hz",
+)
+def _chk_biot_branch_crossing() -> Outcome:
+    grid = np.arange(400.0, 600.0, 0.1)
+    waves = _aa_glass_wool_waves(grid)
+    swap = np.flatnonzero(np.diff(waves.airborne_is_second.astype(int)) != 0)
+    crossing = float(grid[swap[0]]) if swap.size == 1 else float("nan")
+    return numeric(495.0, crossing, 0.01, rel=True, unit="Hz", places=1)
+
+
+@register(
+    _POROUS,
+    "Allard & Atalla 2e Sect. 6.5.4 (Biot model output), pp. 124-125",
+    "Frame-borne velocity ratio mu_b at 1500 Hz",
+)
+def _chk_biot_frame_borne_ratio() -> Outcome:
+    waves = _aa_glass_wool_waves(np.array([1500.0]))
+    value = float(np.real(waves.frame_borne_velocity_ratio[0]))
+    return numeric(0.82, value, 0.02, rel=True, places=3)
+
+
+@register(
+    _POROUS,
+    "Allard & Atalla 2e Sect. 6.6.3 (Biot model output), p. 129",
+    "Surface-impedance peak of a 5,6 cm layer, Hz",
+)
+def _chk_biot_impedance_peak() -> Outcome:
+    grid = np.arange(500.0, 1200.0, 0.25)
+    impedance = ph.biot_surface_impedance(_aa_glass_wool_waves(grid), 0.056)
+    peak = float(grid[int(np.argmax(impedance.imag))])
+    return numeric(860.0, peak, 0.02, rel=True, unit="Hz", places=1)
+
+
+@register(
+    _POROUS,
+    "Allard & Atalla 2e Sect. 11.3.4 (rigid-frame limit)",
+    "Stiff, heavy frame recovers the JCA layer (max rel deviation)",
+)
+def _chk_biot_rigid_frame_limit() -> Outcome:
+    frequency = np.geomspace(50.0, 5000.0, 40)
+    medium = ph.johnson_champoux_allard(
+        frequency, _AA_TABLE_6_1_SIGMA, **_AA_TABLE_6_1
+    )
+    reference = ph.layered_absorber(
+        frequency, [ph.PorousLayer(0.05, medium)], angle=math.pi / 4.0
+    ).surface_impedance
+    frozen = ph.layered_absorber(
+        frequency,
+        [ph.PoroelasticLayer(
+            0.05, medium, _AA_TABLE_6_1["porosity"],
+            _AA_TABLE_6_1["tortuosity"], _AA_TABLE_6_1_RHO1 * 1e8,
+            _AA_TABLE_6_1_SHEAR * 1e8,
+        )],
+        angle=math.pi / 4.0,
+    ).surface_impedance
+    deviation = float(np.max(np.abs(frozen / reference - 1.0)))
+    return numeric(0.0, deviation, 1e-7, places=10)
+
+
+@register(
+    _POROUS,
+    "Allard & Atalla 2e Eq. (6.107) vs Sect. 11.5 assembly",
+    "Two independent derivations of Zs (max rel deviation)",
+)
+def _chk_biot_assembly_vs_closed_form() -> Outcome:
+    frequency = np.geomspace(20.0, 5000.0, 80)
+    medium = ph.johnson_champoux_allard(
+        frequency, _AA_TABLE_6_1_SIGMA, **_AA_TABLE_6_1
+    )
+    waves = ph.biot_waves(
+        medium,
+        porosity=_AA_TABLE_6_1["porosity"],
+        tortuosity=_AA_TABLE_6_1["tortuosity"],
+        frame_density=_AA_TABLE_6_1_RHO1,
+        shear_modulus=_AA_TABLE_6_1_SHEAR,
+    )
+    closed = ph.biot_surface_impedance(waves, 0.10)
+    assembled = ph.layered_absorber(
+        frequency,
+        [ph.PoroelasticLayer(
+            0.10, medium, _AA_TABLE_6_1["porosity"],
+            _AA_TABLE_6_1["tortuosity"], _AA_TABLE_6_1_RHO1,
+            _AA_TABLE_6_1_SHEAR,
+        )],
+    ).surface_impedance
+    deviation = float(np.max(np.abs(assembled / closed - 1.0)))
+    return numeric(0.0, deviation, 1e-10, places=12)
+
+
 # ===========================================================================
 # Slow-sound slit + Helmholtz-resonator perfect absorbers (Jimenez et al.)
 # ===========================================================================
