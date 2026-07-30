@@ -590,8 +590,8 @@ def poroelastic_transfer_matrix(
     printed p. 249), relating the field vector
     ``[v1s, v3s, v3f, s33s, s13s, s33f]`` (Eq. (11.26)) just inside the front
     face of the layer to the same vector just inside its back face,
-    ``V(M) = [T p] V(M')``. The trace-free ``[Gamma]`` of Table 11.1 is built by
-    :func:`_gamma`.
+    ``V(M) = [T p] V(M')``. The wave-amplitude matrix ``[Gamma]`` of Table 11.1
+    behind it is built by :func:`_gamma`.
 
     The layer solver of
     :func:`~phonometry.materials.porous_absorber.layered_absorber` does *not*

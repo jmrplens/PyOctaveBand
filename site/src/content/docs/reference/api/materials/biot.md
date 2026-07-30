@@ -388,8 +388,8 @@ The 6x6 transfer matrix `[T p]` of a Biot poroelastic layer.
 printed p. 249), relating the field vector
 `[v1s, v3s, v3f, s33s, s13s, s33f]` (Eq. (11.26)) just inside the front
 face of the layer to the same vector just inside its back face,
-`V(M) = [T p] V(M')`. The trace-free `[Gamma]` of Table 11.1 is built by
-`_gamma`.
+`V(M) = [T p] V(M')`. The wave-amplitude matrix `[Gamma]` of Table 11.1
+behind it is built by `_gamma`.
 
 The layer solver of
 [`layered_absorber`](/phonometry/reference/api/materials/porous-absorber/#layered_absorber) does *not*
