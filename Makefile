@@ -73,7 +73,12 @@ figure-contrast:
 
 # What to run locally before committing a figure change: regenerate, then
 # verify legibility and staleness the way CI does, each as its own step.
-figures: graphs figure-contrast
+# Recipe lines rather than prerequisites: prerequisites are free to run
+# concurrently under `make -j`, which would let the contrast checker parse the
+# SVGs while the generators are still deleting and rewriting them.
+figures:
+	$(MAKE) graphs
+	$(MAKE) figure-contrast
 	$(PYTHON) scripts/check_figures.py
 
 # Regenerate the Tier-1 documentation animations (WebM for the site, GIF for
