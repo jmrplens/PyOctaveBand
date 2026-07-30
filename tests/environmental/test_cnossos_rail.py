@@ -278,7 +278,7 @@ def _case_result(case: dict[str, str]) -> RailwayEmissionResult:
 
 
 @pytest.mark.parametrize("case", ref.cnossos_rail_workbook_cases(),
-                         ids=lambda c: f"{c['case']}{c['source_height']}")
+                         ids=lambda c: f"v{c['vehicle']}-{c['case']}{c['source_height']}")
 def test_workbook_cases(case: dict[str, str]) -> None:
     """Reproduce the CIRCABC railway emission workbook band by band.
 
@@ -308,7 +308,7 @@ def test_workbook_total_is_the_energy_sum_of_its_own_bands() -> None:
 def test_committed_cases_span_the_workbook_grid() -> None:
     """The committed extract must not quietly lose a level of any factor."""
     cases = ref.cnossos_rail_workbook_cases()
-    assert len(cases) >= 100
+    assert len(cases) >= 120
     assert {c["source_height"] for c in cases} == {"A", "B"}
     assert {c["condition"] for c in cases} == {"constant", "idling"}
     assert {c["speed_kmh"] for c in cases} == {"30", "120", "260"}

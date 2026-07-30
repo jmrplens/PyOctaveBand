@@ -4,7 +4,7 @@
 
 | File | Kind | Provenance |
 | :--- | :--- | :--- |
-| `rail_emission_cases.csv` | derived (extract of a published result set) | 121 of the 19 872 cases of `CNOSSOS_RAIL_EMISSION_TEST.xlsx`, the railway emission test workbook published by the European Commission on CIRCABC with the CNOSSOS-EU source module. Each row carries the full case description read straight out of the workbook, together with the workbook's own per-octave-band and total line-power levels, copied verbatim to the two decimals it prints. |
+| `rail_emission_cases.csv` | derived (extract of a published result set) | 123 of the 19 872 cases of `CNOSSOS_RAIL_EMISSION_TEST.xlsx`, the railway emission test workbook published by the European Commission on CIRCABC with the CNOSSOS-EU source module. Each row carries the full case description read straight out of the workbook, together with the workbook's own per-octave-band and total line-power levels, copied verbatim to the two decimals it prints. |
 | `rail_vehicles_2015.csv` | transcribed | The vehicle definitions of `CNOSSOS_Rail_Vehicles.xml` v1.1 (catalogue date 2015-04-09), the vehicle database of the same Commission source module: number of axles and the reference into each spectrum table. |
 | `rail_wavelength_tables_2015.csv` | transcribed | The spectra of that catalogue and of `CNOSSOS_Rail_Track.xml` v1.0 (2014-04-27) that are given against wavelength: wheel roughness, contact filter, rail roughness and impact roughness, on the 32-step 1/3-octave grid from 1 000 mm to 0,8 mm. |
 | `rail_frequency_tables_2015.csv` | transcribed | The spectra of the same two catalogues that are given against frequency, in the 24 1/3-octave bands from 50 Hz to 10 kHz: wheel, track and superstructure transfer functions, traction sound power for constant speed and for idling, and the aerodynamic reference spectra. |
@@ -57,7 +57,7 @@ exactly.
 Annex II 2.3 the 2015 coefficient set and requires the workbook's levels back,
 band by band, at both source heights. That is the only oracle that pins the
 *equations*: the Directive itself prints no worked example anywhere in 2.3 or
-Appendix G. The 121 committed cases cover all twenty usable vehicles, both
+Appendix G. The 123 committed cases cover all twenty usable vehicles, both
 source heights, all three speeds, both running conditions, all nine
 track-parameter combinations, all four receiver-angle pairs and both flow
 rates, so the committed subset reaches every level of every factor the full set
