@@ -716,6 +716,12 @@ def plot_porous_medium(
     return ax
 
 
+#: Legend suffixes of the Biot wavenumber curves: the mathtext is the same for
+#: every wave, only the wave name in front of it changes.
+_BIOT_REAL_PART = r", Re$(\delta)$"
+_BIOT_IMAG_PART = r", $-$Im$(\delta)$"
+
+
 def plot_biot_waves(
     result: BiotWavesResult, ax: Axes | None = None, language: str = "en",
     **kwargs: Any
@@ -739,23 +745,25 @@ def plot_biot_waves(
     ax = ax if ax is not None else _new_axes()
     freqs = np.asarray(result.frequency, dtype=np.float64)
     kwargs.setdefault("color", _C_PRIMARY)
-    kwargs.setdefault("label", _t("Airborne", language) + r", Re$(\delta)$")
+    kwargs.setdefault(
+        "label", _t("Airborne", language) + _BIOT_REAL_PART
+    )
     ax.semilogx(freqs, result.airborne_wavenumber.real, **kwargs)
     ax.semilogx(
         freqs, -result.airborne_wavenumber.imag, ls="--", color=_C_PRIMARY_LIGHT,
-        label=_t("Airborne", language) + r", $-$Im$(\delta)$",
+        label=_t("Airborne", language) + _BIOT_IMAG_PART,
     )
     ax.semilogx(
         freqs, result.frame_borne_wavenumber.real, color=_C_REFERENCE,
-        label=_t("Frame-borne", language) + r", Re$(\delta)$",
+        label=_t("Frame-borne", language) + _BIOT_REAL_PART,
     )
     ax.semilogx(
         freqs, -result.frame_borne_wavenumber.imag, ls="--", color=_C_MUTED,
-        label=_t("Frame-borne", language) + r", $-$Im$(\delta)$",
+        label=_t("Frame-borne", language) + _BIOT_IMAG_PART,
     )
     ax.semilogx(
         freqs, result.shear_wavenumber.real, ls=":", color=_C_REFERENCE,
-        label=_t("Shear", language) + r", Re$(\delta)$",
+        label=_t("Shear", language) + _BIOT_REAL_PART,
     )
     format_frequency_axis(ax, float(freqs.min()), float(freqs.max()))
     ax.set_xlabel(_t(_FREQ_LABEL, language))

@@ -702,17 +702,19 @@ def _interface(left: _Block | None, right: _Block) -> tuple[Complex, Complex]:
     matrices interchanged for a fluid-porous boundary.
     """
     left_kind = "fluid" if left is None else left.kind
-    if left_kind == "fluid" and right.kind == "fluid":
-        return np.eye(2, dtype=np.complex128), -np.eye(2, dtype=np.complex128)
-    if left_kind == "poroelastic" and right.kind == "poroelastic":
-        left_phi = 1.0 if left is None else left.porosity
+    left_porosity = 1.0 if left is None else left.porosity
+    if left_kind == right.kind:
+        if left_kind == "fluid":
+            return (
+                np.eye(2, dtype=np.complex128),
+                -np.eye(2, dtype=np.complex128),
+            )
         return (
             np.eye(6, dtype=np.complex128),
-            -_porous_porous_matrix(left_phi, right.porosity),
+            -_porous_porous_matrix(left_porosity, right.porosity),
         )
     if left_kind == "poroelastic":
-        i_pf, j_pf = _porous_fluid_matrices(left.porosity)  # type: ignore[union-attr]
-        return i_pf, j_pf
+        return _porous_fluid_matrices(left_porosity)
     i_pf, j_pf = _porous_fluid_matrices(right.porosity)
     return j_pf, i_pf
 
@@ -820,9 +822,11 @@ def _stack_surface_impedance(
         lhs / scale[:, :, None], (rhs / scale)[:, :, None]
     )
     velocity = solution[:, 0, 0]
-    finite = velocity != 0.0
+    # A lossless stack over a rigid wall drives the surface velocity to zero,
+    # which maps to an infinite surface impedance.
+    moving = np.abs(velocity) > 0.0
     with np.errstate(divide="ignore", invalid="ignore"):
         return np.asarray(
-            np.where(finite, 1.0 / np.where(finite, velocity, 1.0), np.inf + 0j),
+            np.where(moving, 1.0 / np.where(moving, velocity, 1.0), np.inf + 0j),
             dtype=np.complex128,
         )
