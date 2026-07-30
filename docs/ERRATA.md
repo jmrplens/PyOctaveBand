@@ -1600,7 +1600,9 @@ to the issuing body, with date and reference).
   `-w^2 rho11 psi_s - w^2 rho12 psi_f = N grad^2 psi_s = -N delta3^2 psi_s`, so
   `(N delta3^2 - w^2 rho11) psi_s = w^2 rho12 psi_f` and therefore
   `mu3 = psi_f/psi_s = (N delta3^2 - w^2 rho11)/(w^2 rho12)`. With that reading
-  the two forms agree identically, for every material. The printed form instead
+  the two forms agree identically wherever `rho12` is non-zero; at `rho12 = 0`
+  the corrected quotient is `0/0` while Eq. (6.84) stays defined and gives
+  `mu3 = -rho12/rho22 = 0`, which is the value to use there. The printed form instead
   differs from Eq. (6.84) by the factor `rho12/rho22`, so it coincides with it
   only where that ratio is exactly 0 or exactly 1. With
   `rho12/rho22 = rho0/(phi rho_eq) - 1` those two cases ask for

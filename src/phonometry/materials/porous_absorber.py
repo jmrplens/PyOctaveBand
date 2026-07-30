@@ -1326,6 +1326,18 @@ def _split_fluid_run(
         total += loss
     if current:
         groups.append(current)
+    # The pre-check bounds the total loss, not the packing. Next-fit needs up
+    # to twice the optimal number of bins (alternating items just over half a
+    # budget open a block each), so a run that clears the sum can still be cut
+    # into more blocks than the assembly resolves. Refuse on what was actually
+    # produced rather than on what was estimated.
+    if len(groups) > limit:
+        raise ValueError(
+            f"the fluid layers of the stack pack into {len(groups)} chain "
+            f"blocks of at most {budget:.0f} nepers, more than the {limit} "
+            "the global-matrix assembly can resolve. Reduce their thickness: "
+            "nothing behind such a run contributes to the surface impedance."
+        )
     return groups
 
 
