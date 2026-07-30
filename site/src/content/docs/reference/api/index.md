@@ -124,6 +124,7 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`materials.dynamic_stiffness`](/phonometry/reference/api/materials/dynamic-stiffness/) | Dynamic stiffness of resilient materials under floating floors (EN 29052-1:1992). |
 | [`materials.impedance_tube`](/phonometry/reference/api/materials/impedance-tube/) | Impedance-tube material characterisation. |
 | [`materials.porous_absorber`](/phonometry/reference/api/materials/porous-absorber/) | Porous-material models and multilayer absorber prediction. |
+| [`materials.biot`](/phonometry/reference/api/materials/biot/) | Biot poroelastic layers: the three waves and the 6x6 transfer matrix. |
 | [`materials.slow_sound_absorber`](/phonometry/reference/api/materials/slow-sound-absorber/) | Slow-sound slit panels loaded with Helmholtz resonators (perfect absorbers). |
 | [`materials.scattering_diffusion`](/phonometry/reference/api/materials/scattering-diffusion/) | Random-incidence scattering and directional diffusion coefficients. |
 | [`materials.diffuser_design`](/phonometry/reference/api/materials/diffuser-design/) | Far-field polar response and diffusion coefficient predicted from a diffuser design. |
