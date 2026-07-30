@@ -1,0 +1,397 @@
+---
+title: "Predicción del comportamiento de capas elásticas (revestimientos, suelos flotantes, trasdosados)"
+description: "El lado de la predicción de las capas elásticas: la máquina de impactos como sistema masa-resorte-amortiguador, la frecuencia de corte de un revestimiento de suelo blando a partir de su rigidez de contacto, las leyes 30 lg y 40 lg de mejora de un suelo flotante por encima de su resonancia masa-resorte, y la mejora ponderada de un trasdosado según el Anexo D de ISO 12354-1 a partir de su frecuencia de resonancia."
+references:
+  - type: book
+    authors: ["Hopkins, C."]
+    year: 2007
+    title: "Sound insulation"
+    publisher: "Butterworth-Heinemann"
+    note: "Apartados 3.6.3 (el impulso de fuerza de la máquina de impactos y su frecuencia de corte), 4.3.8 (acabados y trasdosados), 4.4.3.1 (revestimientos de suelo blandos) y 4.4.4 (suelos flotantes), origen de los modelos de esta página. ISBN 978-0-7506-6526-1."
+  - type: book
+    authors: ["Vigran, T. E."]
+    year: 2008
+    title: "Building acoustics"
+    publisher: "CRC Press"
+    doi: "10.1201/9781482266016"
+    note: "Apartado 8.4, el enunciado independiente de los mismos modelos de suelo flotante y revestimiento de suelo (ecs. 8.40, 8.45 a 8.48, 8.51), usado aquí como comprobación cruzada entre fuentes. ISBN 978-0-415-42853-8."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2017
+    title: "Building acoustics — Estimation of acoustic performance of buildings from the performance of elements — Part 1: Airborne sound insulation between rooms"
+    designation: "ISO 12354-1:2017"
+    url: "https://www.iso.org/standard/70238.html"
+    note: "Anexo D, la frecuencia de resonancia de una capa adicional (fórmulas D.1/D.2) y la mejora del índice de reducción acústica ponderado que implica (tabla D.1, fórmulas D.3 a D.8)."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2017
+    title: "Building acoustics — Estimation of acoustic performance of buildings from the performance of elements — Part 2: Impact sound insulation between rooms"
+    designation: "ISO 12354-2:2017"
+    url: "https://www.iso.org/standard/70239.html"
+    note: "Anexo C, las leyes de reducción del nivel de presión acústica de impactos de los suelos flotantes (fórmulas C.1 a C.3), los ajustes de la reducción ponderada (C.4/C.5) y la combinación en serie de capas elásticas (C.6); anexo G tabla G.4, la reducción por bandas impresa que aquí se reproduce."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 1989
+    title: "Acoustics — Determination of dynamic stiffness — Part 1: Materials used under floating floors in dwellings"
+    designation: "EN 29052-1:1992 (ISO 9052-1:1989)"
+    url: "https://www.iso.org/standard/16637.html"
+    note: "La medida de la rigidez dinámica por unidad de área s' de la que parte toda fórmula de esta página."
+---
+
+import ThemeImage from '../../../../components/ThemeImage.astro';
+
+Una capa elástica es la forma más barata de comprar aislamiento a ruido de
+impactos y la más fácil de estropear. Sea una moqueta sobre una losa, una
+solera flotando sobre lana mineral o un trasdosado de placa de yeso sobre una
+pared de fábrica, la capa es un resorte, y lo único que importa es dónde cae
+su resonancia con la masa que soporta. Por debajo de esa frecuencia no hace
+nada, en ella la solución es *peor* que la desnuda, y por encima la mejora
+crece a un ritmo que decide el tipo de construcción. Esta guía es el lado de
+la predicción de esa historia, del dato de material al espectro de mejora; el
+lado de la medida está en
+[Mejora del aislamiento a impacto de suelos (ISO 16251-1)](/phonometry/es/guides/impact-improvement/)
+y en
+[Rigidez dinámica de materiales resilientes](/phonometry/es/guides/dynamic-stiffness/).
+
+## La excitación: la máquina de impactos como masa-resorte-amortiguador
+
+Todo lo que sigue depende de la fuerza que la máquina de impactos normalizada
+inyecta realmente, y esa fuerza no es una propiedad solo de la máquina. Cada
+martillo es una masa de 0,5 kg que cae desde 40 mm, de modo que llega a
+$v_0 = \sqrt{2gh} = 0{,}886\ \text{m/s}$, diez veces por segundo. Si el impacto
+fuese corto frente a los 0,1 s entre golpes, la cantidad de movimiento fijaría
+por sí sola la fuerza y daría el espectro de líneas $|F_n| = 2 m v_0 / T_i$ y
+la fuerza cuadrática media por banda $F_\text{rms}^2 = 3{,}9 B$ con la que se
+reducen habitualmente las medidas ISO 10140 sobre hormigón.
+
+Los suelos reales se deforman. El martillo, la rigidez de contacto $K$ que
+comprime y la impedancia de punto de excitación del suelo $Z_\text{dp}$ forman
+un sistema masa-resorte-amortiguador cuyo impulso se divide en dos casos:
+
+- **sobrecrítico**, $K m \ge 4 Z_\text{dp}^2$: un único impulso positivo, sin
+  rebote. Es el caso de una superficie de paso ligera (tablero de partículas,
+  OSB), donde el espectro tiende a $|F_n|_\text{lower} = m v_0/T_i$;
+- **subcrítico**, $K m < 4 Z_\text{dp}^2$: el martillo rebota y solo cuenta el
+  primer lóbulo positivo. Es el caso de una losa de hormigón o una solera,
+  donde el espectro queda a menos de 1 dB de
+  $|F_n|_\text{upper} = 2 m v_0/T_i$ por debajo de 4 kHz y la estimación de
+  impulso corto es suficiente.
+
+Los dos límites distan 6 dB en valor cuadrático medio, que es justo la razón
+por la que un nivel de máquina de impactos sobre un forjado de madera no se
+puede comparar sin más con uno sobre hormigón. Por encima de la frecuencia de
+corte
+
+$$
+f_\text{co} = \frac{1}{2\pi}\sqrt{\frac{K}{m}}\quad\text{(subcrítico)},
+\qquad
+f_\text{co} = \frac{1}{2\pi}\left[\frac{K}{2Z_\text{dp}} - \sqrt{\left(\frac{K}{2Z_\text{dp}}\right)^2 - \frac{K}{m}}\right]\quad\text{(sobrecrítico)},
+$$
+
+la fuerza decae, y por encima de la frecuencia límite
+$f_\text{limit} = Z_\text{dp}/(2\pi m)$ es la impedancia de masa del propio
+martillo, y no el suelo, la que limita la potencia inyectada.
+
+```python
+import numpy as np
+from phonometry import (
+    hammer_impact_velocity, infinite_plate_impedance, plate_bending_stiffness,
+    plate_contact_stiffness, tapping_force_spectrum,
+)
+
+print(round(hammer_impact_velocity(), 3))     # 0,886 m/s (0,5 kg desde 40 mm)
+
+# Losa de hormigón in situ de 140 mm: 2200 kg/m3, cL = 3800 m/s, nu = 0,2.
+rho, c_l, nu, h = 2200.0, 3800.0, 0.2, 0.14
+E = rho * c_l**2 * (1 - nu**2)
+z = infinite_plate_impedance(plate_bending_stiffness(E, h, nu), rho * h)
+k = plate_contact_stiffness(E, poisson_ratio=nu)
+
+freqs = np.array([100, 200, 400, 800, 1600, 3150], dtype=float)
+res = tapping_force_spectrum(freqs, k, z)
+res.over_critical             # False: el martillo rebota sobre el hormigón
+round(res.cut_off_frequency)  # 6948 Hz, por encima del rango de edificación
+res.peak_force                # |Fn| por banda, a menos de 1 dB de upper_limit
+res.power_input_level         # 10 lg(Win/1 pW), sube 3 dB por duplicación
+res.plot()                    # el espectro de fuerza con ambas asíntotas
+```
+
+## Revestimientos de suelo blandos: la frecuencia de corte es el diseño
+
+Un revestimiento blando sobre un suelo pesado no cambia nada salvo la fuerza
+de entrada: su masa es despreciable y apenas afecta al factor de pérdidas ni a
+la rigidez a flexión de la losa. Su mejora es, por tanto, el cociente de los
+dos espectros de fuerza,
+
+$$
+\Delta L = 20 \lg \frac{|F_n|_\text{without}}{|F_n|_\text{with}} \ \text{dB},
+$$
+
+y todo el diseño se reduce a un número, la frecuencia de corte del propio
+revestimiento, fijada por su rigidez de contacto $K = E \pi r^2 / d$ con el
+radio del martillo $r = 15$ mm. Por debajo de $f_\text{co}$ el revestimiento no
+hace nada; por encima, la mejora sube 12 dB por octava. Dos rectas son
+entonces una estimación utilizable, y engrosar un revestimiento homogéneo baja
+$f_\text{co}$ y compra mejora en todo lo que hay por encima.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/soft_covering_prediction.svg" alt="Mejora prevista del aislamiento a ruido de impactos de dos revestimientos de suelo blandos sobre una losa de hormigón de 140 mm: un revestimiento rígido de PVC cuya frecuencia de corte de 2318 Hz lo deja inútil en todo el rango de edificación, y un revestimiento con soporte elástico cuya frecuencia de corte de 100 Hz da 70 dB a 5 kHz, cada uno frente a su estimación de dos rectas de 12 dB por octava" width="80%" />
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import (
+    covering_contact_stiffness, covering_improvement, infinite_plate_impedance,
+    plate_bending_stiffness, plate_contact_stiffness,
+)
+
+rho, c_l, nu, h = 2200.0, 3800.0, 0.2, 0.14        # losa de hormigón 140 mm
+E = rho * c_l**2 * (1 - nu**2)
+z = infinite_plate_impedance(plate_bending_stiffness(E, h, nu), rho * h)
+plate = plate_contact_stiffness(E, poisson_ratio=nu)
+
+# La fuerza de la máquina de impactos es un espectro de líneas en múltiplos de
+# 10 Hz, así que la mejora por banda es el cociente de las fuerzas cuadráticas
+# medias sobre las líneas de cada banda; ese promedio elimina el rizado del
+# modelo sin amortiguamiento.
+bands = np.array([50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630,
+                  800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000.0])
+lines = np.arange(1, 700) * 10.0
+edge = np.log10(2.0) / 6.0
+
+d = 0.005
+for label, modulus_over_thickness in (("PVC", 1.5e11), ("vinilo", 2.8e8)):
+    res = covering_improvement(
+        lines, covering_contact_stiffness(modulus_over_thickness * d, d),
+        plate, z)
+    banded = [
+        10 * np.log10(np.mean(res.bare.peak_force[m] ** 2)
+                      / np.mean(res.covered.peak_force[m] ** 2))
+        for m in (np.abs(np.log10(lines / b)) <= edge for b in bands)
+    ]
+    plt.semilogx(bands, banded, marker="o", label=f"{label}: fco = "
+                 f"{res.cut_off_frequency:.0f} Hz")
+plt.legend()
+plt.show()
+```
+
+</details>
+
+```python
+from phonometry import covering_contact_stiffness, covering_improvement
+
+# Revestimiento n.o 2 de la fig. 4.64 de Hopkins: E/d = 2,8e8 N/m3, un vinilo
+# o moqueta con soporte elástico, 5 mm sobre la misma losa de 140 mm.
+d = 0.005
+covering = covering_contact_stiffness(2.8e8 * d, d)
+res = covering_improvement([125.0, 250.0, 500.0, 1000.0], covering, k, z)
+round(res.cut_off_frequency)        # 100 Hz
+round(res.bare_cut_off_frequency)   # 6948 Hz, la corte de la losa desnuda
+res.improvement                     # delta-L del cociente de fuerzas
+res.two_line                        # 0 dB bajo fco, 40 lg(f/fco) encima
+res.plot()
+```
+
+El modelo trata el revestimiento como un resorte *lineal*. Bajo la fuerza
+elevada de la máquina de impactos muchos revestimientos reales se endurecen y
+presentan dos o tres pendientes entre 5 y 22 dB por octava en vez de una, y
+por eso un $\Delta L$ de laboratorio sigue siendo la referencia en cuanto
+existe una probeta.
+
+## Suelos flotantes: tres leyes sobre una resonancia
+
+Un suelo flotante es una superficie de paso rígida sobre una capa elástica, y
+su resonancia sale de los dos números conocidos en fase de proyecto, la masa
+por unidad de superficie $m'$ de la solera y la rigidez dinámica por unidad de
+área $s'$ de la capa según EN 29052-1:
+
+$$
+f_0 = 160 \sqrt{\frac{s'}{m'}}\ \text{Hz}
+\qquad (s'\ \text{en MN/m}^3,\ m'\ \text{en kg/m}^2),
+$$
+
+donde 160 es el redondeo que hace la norma de $1000/2\pi$. Por encima, qué ley
+se aplica es una pregunta sobre el amortiguamiento, no sobre la capa:
+
+| Modelo | Ley | Cuándo |
+| --- | --- | --- |
+| `"cremer"` | $\Delta L = 40 \lg (f/f_0)$ | resultado de placa infinita de Cremer; soleras de asfalto y suelos flotantes secos, cuyas pérdidas internas bastan para comportarse como placas infinitas (fórmula C.3 de ISO 12354-2) |
+| `"en12354"` | $\Delta L = 30 \lg (f/f_0)$ | soleras de mortero de cemento y de sulfato de calcio, cuyo bajo factor de pérdidas las convierte en placas finitas con campo reverberante de flexión (fórmula C.1) |
+| `"cremer_hammer"` | $40 \lg (f/f_0) + 10 \lg[1 + (f/f_\text{limit})^2]$ | superficie de paso ligera, donde la impedancia del martillo ya no es despreciable; tiende a 18 dB por octava |
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floating_floor_prediction.svg" alt="Mejora del aislamiento a ruido de impactos de una solera flotante de 73,5 kg por metro cuadrado sobre una capa elástica de 8 meganewton por metro cúbico: nada por debajo de la resonancia masa-resorte de 52,8 Hz y después la ley 30 lg de EN 12354-2 alcanzando 59 dB a 5 kHz, frente a la ley 40 lg de Cremer, más pronunciada, y a la rama de 18 dB por octava que incluye la impedancia del martillo de la máquina de impactos" width="80%" />
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import (
+    floating_floor_improvement_spectrum, floating_floor_resonance_frequency,
+)
+
+# El suelo flotante del ejemplo del anexo G de ISO 12354-2:2017.
+f0 = floating_floor_resonance_frequency(8.0e6, 73.5)     # 52,8 Hz
+freqs = np.logspace(np.log10(40.0), np.log10(5000.0), 400)
+for model, kwargs in (("en12354", {}), ("cremer", {}),
+                      ("cremer_hammer", {"limiting_frequency": 521.0})):
+    res = floating_floor_improvement_spectrum(
+        freqs, resonance_frequency=f0, model=model, **kwargs)
+    plt.semilogx(freqs, res.improvement, label=model)
+plt.axvline(f0, ls=":")
+plt.legend()
+plt.show()
+```
+
+</details>
+
+```python
+from phonometry import (
+    combined_dynamic_stiffness, double_floating_floor_resonances,
+    floating_floor_improvement_spectrum, floating_floor_resonance_frequency,
+    weighted_floating_floor_improvement,
+)
+
+# Solera de 35 mm, m' = 73,5 kg/m2, sobre una capa elástica de s' = 8 MN/m3.
+f0 = floating_floor_resonance_frequency(8.0e6, 73.5)
+round(f0, 1)                                                    # 52,8 Hz
+
+bands = [50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630,
+         800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000.0]
+res = floating_floor_improvement_spectrum(
+    bands, resonance_frequency=f0, mass_per_area=73.5, dynamic_stiffness=8.0e6)
+res.improvement          # 0,0, 2,3, 5,4, 8,3, 11,2 ... 59,3 dB
+round(res.delta_lw, 1)   # 32,2 dB, la reducción ponderada de la fórmula (C.4)
+res.plot()
+
+# Dos capas elásticas actúan como resortes en serie (fórmula C.6), lo que baja
+# la resonancia en sqrt(2) y compra unos 4,5 dB en todo lo que hay por encima.
+round(floating_floor_resonance_frequency(
+    combined_dynamic_stiffness([8.0e6, 8.0e6]), 73.5), 1)       # 37,3 Hz
+
+# Un suelo flotante sobre otro tiene dos resonancias en vez de una; desaparece
+# la caída adversa, pero la subida pronunciada no empieza hasta la más alta.
+double_floating_floor_resonances(7.25e6, 12.78, 7.25e6, 12.78)  # (74, 194) Hz
+```
+
+Las magnitudes globales salen directamente de esos mismos dos datos, así que
+un suelo flotante se puede dimensionar sin dibujar un solo espectro:
+$\Delta L_w = 13\lg m' - 14{,}2\lg s' + 20{,}8$ dB para una solera de mortero
+de cemento (fórmula C.4) y el ajuste más pronunciado de la fórmula (C.5) para
+asfalto y suelos secos. Soleras más pesadas y capas más blandas puntúan mejor,
+y ambas estimaciones están deliberadamente del lado de la seguridad.
+
+Un suelo flotante apoyado en **apoyos discretos** en lugar de en una capa
+continua es otro problema: la superficie de paso sostiene un campo reverberante
+de ondas de flexión y toda la transmisión pasa por los apoyos, lo que el modelo
+SEA de dos subsistemas de Vér convierte en una subida de 30 dB por década en
+lugar de 40. Menos apoyos, una superficie de paso más gruesa o más
+amortiguamiento interno la elevan.
+
+```python
+from phonometry import resilient_mount_improvement
+
+# Superficie de paso de hormigón de 50 mm sobre 4 apoyos/m2 de 2 MN/m.
+resilient_mount_improvement(
+    [125.0, 250.0, 500.0, 1000.0], impedance=3.8e5, mass_per_area=115.0,
+    loss_factor=0.02, mount_stiffness=2.0e6, mount_density=4.0)
+```
+
+## Trasdosados: el anexo D lee la magnitud global en la resonancia
+
+Un trasdosado sobre una pared es el mismo problema de resorte con el signo
+cambiado: puede *reducir* el aislamiento acústico, y el anexo D de
+ISO 12354-1 predice cuánto solo a partir de la frecuencia de resonancia. Qué
+fórmula da $f_0$ depende de cómo se fije la capa:
+
+$$
+f_0 = \frac{1}{2\pi}\sqrt{s'\left(\frac{1}{m_1'} + \frac{1}{m_2'}\right)}
+\ \text{(D.1, adherida directamente)},
+\qquad
+f_0 = \frac{1}{2\pi}\sqrt{\frac{0{,}111}{d}\left(\frac{1}{m_1'} + \frac{1}{m_2'}\right)}
+\ \text{(D.2, montantes sobre cámara rellena)}.
+$$
+
+La tabla D.1 lee entonces la mejora ponderada en $f_0$, redondeada a la banda
+de tercio de octava en la que cae. Por debajo de 200 Hz el trasdosado ayuda,
+en $74{,}4 - 20\lg f_0 - R_w/2$ dB, y cuanto mejor sea la pared desnuda menos
+hay que ganar. De 200 Hz hacia arriba cuesta: 1 dB a 200 Hz bajando hasta
+10 dB de 630 Hz a 1600 Hz, y recuperando a 5 dB por encima. Llevar la
+resonancia bien por debajo del rango de interés es, por tanto, todo el
+encargo de diseño.
+
+```python
+from phonometry import (
+    lining_improvement, lining_improvement_in_situ, lining_resonance_frequency,
+    weighted_lining_improvement,
+)
+
+# Placa de yeso de 9,5 mm laminada con 32 mm de EPS (s' = 65 MN/m3), adherida
+# con pelladas a una pared de bloque de hormigón celular de 51 kg/m2.
+f0 = lining_resonance_frequency(51.0, 6.3, dynamic_stiffness=65e6)
+round(f0)                                       # 542 Hz: justo en medio
+round(weighted_lining_improvement(f0, 45.0))    # -9 dB, empeora las cosas
+
+# El mismo trasdosado sobre montantes con cámara de 100 mm rellena de lana.
+f0 = lining_resonance_frequency(51.0, 6.3, cavity_depth=0.100)
+round(f0)                                        # 71 Hz
+round(weighted_lining_improvement(f0, 45.0), 1)  # +15,9 dB
+
+# Los sistemas de aislamiento térmico exterior tienen sus propios ajustes.
+res = lining_improvement(100.0, system="mineral_wool")   # fórmula (D.3)
+res.delta_rw, res.delta_ra, res.delta_ratr               # (10,5, 8,0, 9,7) dB
+lining_improvement(100.0, system="mineral_wool", anchors=True).delta_rw  # (D.5)
+res.plot()   # las magnitudes del anexo D frente a fo, con este sistema marcado
+
+# Una magnitud de laboratorio se traslada a obra con la fórmula (D.8).
+round(lining_improvement_in_situ(10.0, 100.0, 60.0), 1)  # 4,4 dB con Rw 60
+```
+
+## Qué cubre esta guía
+
+**Cubierto.** El impulso de fuerza de la máquina de impactos del apartado
+3.6.3 de Hopkins (ecs. 3.85, 3.90 a 3.92, 3.95 a 3.106) mediante
+`tapping_force_spectrum`, `force_pulse`, `plate_contact_stiffness`,
+`covering_contact_stiffness`, `tapping_cut_off_frequency`,
+`hammer_limiting_frequency` y `short_pulse_mean_square_force`; la mejora por
+revestimiento blando del apartado 4.4.3.1 de Hopkins (ec. 4.114 y la
+estimación de dos rectas) mediante `covering_improvement`; el anexo C de
+ISO 12354-2:2017 (fórmulas C.1 a C.6) con el apartado 4.4.4 de Hopkins y el
+8.4 de Vigran mediante `floating_floor_resonance_frequency`,
+`floating_floor_improvement_spectrum`, `weighted_floating_floor_improvement`,
+`combined_dynamic_stiffness`, `double_floating_floor_resonances` y
+`resilient_mount_improvement`; y el anexo D de ISO 12354-1:2017 (fórmulas D.1
+a D.8 y tabla D.1) mediante `lining_resonance_frequency`,
+`weighted_lining_improvement`, `lining_improvement` y
+`lining_improvement_in_situ`.
+
+**No cubierto.** El modelo de fuerza supone una impedancia de punto de
+excitación independiente de la frecuencia, así que un forjado ligero con
+viguetas o rastreles, cuya impedancia cambia según dónde caiga el martillo,
+queda fuera; Hopkins remite allí a métodos numéricos. Los revestimientos
+blandos se tratan como resortes lineales y no se modela su falta de linealidad
+medida bajo la máquina de impactos. No hay predicción por bandas del
+$\Delta R(f)$ de un trasdosado: el anexo D es un método de magnitud global, y
+donde ISO 12354 necesita un espectro de trasdosado o bien lo mide (anexo G de
+ISO 10140-1) o bien, para un suelo flotante, toma $\Delta R(f) = \Delta L(f)$,
+lo que su propio anexo L califica de aproximación burda. Las fuentes de
+impacto pesadas (la pelota de caucho) no las cubre ninguno de estos modelos.
+
+## Véase también
+
+- [Mejora del aislamiento a impacto de suelos (ISO 16251-1)](/phonometry/es/guides/impact-improvement/):
+  la medida con la que se contrastan estas predicciones.
+- [Rigidez dinámica de materiales resilientes (EN 29052-1)](/phonometry/es/guides/dynamic-stiffness/):
+  de dónde sale $s'$.
+- [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/):
+  el modelo simplificado que consume $\Delta L_w$ y $\Delta R_w$.
+- [Predicción detallada por bandas (ISO 12354)](/phonometry/es/guides/detailed-prediction/):
+  el modelo por bandas cuyo término de suelo flotante es
+  `floating_floor_improvement`.
+- [Predicción del aislamiento de paneles](/phonometry/es/guides/panel-sound-insulation/):
+  la resonancia masa-resorte-masa de una hoja doble, la contrapartida a ruido
+  aéreo de la resonancia del trasdosado.
+- Referencia de la API: [`building.resilient_layers`](/phonometry/reference/api/building/resilient-layers/).

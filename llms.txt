@@ -107,6 +107,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Spanish Building Code (CTE DB-HR)](https://jmrplens.github.io/phonometry/guides/spanish-building-code/)
 - [Predicting Panel Sound Insulation (mass law, coincidence, double walls)](https://jmrplens.github.io/phonometry/guides/panel-sound-insulation/)
 - [Floor-Covering Impact Improvement (ISO 16251-1)](https://jmrplens.github.io/phonometry/guides/impact-improvement/)
+- [Predicting Resilient-Layer Performance (Coverings, Floating Floors, Linings)](https://jmrplens.github.io/phonometry/guides/resilient-layers/)
 - [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/guides/dynamic-stiffness/)
 
 ## Materials and surfaces

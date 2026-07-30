@@ -322,6 +322,10 @@ ISO 717-1/-2, EN 12354-1 to -6, ISO 12999-1, ISO 10052 and ANSI/ASA S12.2.
 - [Floor-Covering Impact Improvement (ISO 16251-1)](/phonometry/guides/impact-improvement/):
   the weighted improvement of a soft floor covering measured on a small
   heavyweight mock-up.
+- [Predicting Resilient-Layer Performance](/phonometry/guides/resilient-layers/):
+  the tapping-machine force model, the cut-off frequency of a soft covering,
+  the floating-floor improvement laws and the ISO 12354-1 Annex D rating of a
+  wall lining.
 - [Dynamic stiffness of resilient materials (EN 29052-1)](/phonometry/guides/dynamic-stiffness/):
   the stiffness per unit area under a floating floor from the load-plate
   resonance, with the enclosed-gas term.

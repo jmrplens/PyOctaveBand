@@ -245,6 +245,9 @@ not a measurement).
   ISO 10140-3 improvement measurement.
 - [Dynamic stiffness of resilient materials (EN 29052-1)](dynamic-stiffness.md):
   the s' measurement that feeds the floating-floor estimate.
+- [Predicting Resilient-Layer Performance](resilient-layers.md): the
+  prediction counterpart of this page, from the tapping-machine force model
+  to floating floors and wall linings.
 - [Predicting Sound Insulation (EN 12354)](insulation-prediction.md): the
   impact model whose Formula (21) consumes ΔLw.
 - [Insulation Ratings (ISO 717)](insulation-ratings.md): the reference-curve

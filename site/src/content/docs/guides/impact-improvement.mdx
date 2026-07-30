@@ -248,8 +248,11 @@ fiche through `.report()`.
 resilient supports, the tapping-machine positions of Clause 5) is not
 checked: the functions consume measured acceleration levels wherever they
 came from. The ISO 12354-2:2017 Annex C floating-floor formulas are quoted on
-this page as design aids and evaluated inline with numpy; no dedicated
-helper wraps them. The superseded full-size ISO 140-8 method exists here
+this page as design aids and evaluated inline with numpy; the dedicated
+helpers that wrap them, together with the tapping-machine force model behind
+a soft covering's improvement and the ISO 12354-1 Annex D rating of a wall
+lining, are the subject of
+[Predicting Resilient-Layer Performance](/phonometry/guides/resilient-layers/). The superseded full-size ISO 140-8 method exists here
 only as the comparison axis of the Foret et al. (2011) worked example.
 
 ## See also
@@ -259,6 +262,9 @@ only as the comparison axis of the Foret et al. (2011) worked example.
   full-size ISO 10140-3 improvement measurement.
 - [Dynamic stiffness of resilient materials](/phonometry/guides/dynamic-stiffness/):
   the s' measurement that feeds the floating-floor estimate.
+- [Predicting Resilient-Layer Performance](/phonometry/guides/resilient-layers/):
+  the prediction counterpart of this page, from the tapping-machine force
+  model to floating floors and wall linings.
 - [Predicting Sound Insulation (EN 12354)](/phonometry/guides/insulation-prediction/):
   the impact model whose Formula (21) consumes ΔLw.
 - [Insulation Ratings (ISO 717)](/phonometry/guides/insulation-ratings/):
