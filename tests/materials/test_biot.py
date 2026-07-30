@@ -848,14 +848,14 @@ def test_an_unresolvable_stack_is_refused_instead_of_exhausting_memory() -> None
         1.0e-4 * (1.0 + 0.1j),
         TABLE_6_1_POISSON_RATIO,
     )
+    deaf_run = [
+        PorousLayer(400.0, _dense_medium(frequency)),
+        _dense_poroelastic(frequency, 0.05),
+    ]
     with pytest.raises(ValueError, match="nepers"):
         layered_absorber(frequency, [floppy])
     with pytest.raises(ValueError, match="nepers"):
-        layered_absorber(
-            frequency,
-            [PorousLayer(400.0, _dense_medium(frequency)),
-             _dense_poroelastic(frequency, 0.05)],
-        )
+        layered_absorber(frequency, deaf_run)
 
 
 def test_splitting_a_block_is_exact(monkeypatch: pytest.MonkeyPatch) -> None:
