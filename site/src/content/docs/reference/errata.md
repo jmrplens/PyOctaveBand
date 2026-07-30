@@ -1390,7 +1390,8 @@ which is the check that enforces the rule; see
   `plan/underwater-sources/Fundamentals-of-acoustical-oceanography.pdf`, PDF
   page 131, printed p. 110, 300 dpi (the Eq. (3.4.30) block), and
   `plan/underwater-sources/Francois-Garrison-1982-P2-boric-acid-total-absorption-equation-JASA72.pdf`,
-  PDF page 8, 300 dpi (the paper's own `A1 = (8.86/c)·10^(0.78 pH − 5)`).
+  PDF page 8, printed p. 1886, 300 dpi (the paper's own
+  `A1 = (8.86/c)·10^(0.78 pH − 5)`).
 - **Library behaviour:** implements the paper's 8,86 with a defensive note;
   the pinned Table IV set includes the boric-dominated rows.
 - **Status:** unreported (textbook rather than a standard).
@@ -1410,7 +1411,7 @@ which is the check that enforces the rule; see
 - **Evidence:** the block's own use of `c` two lines above, and the source
   paper. Renders: `plan/underwater-sources/Fundamentals-of-acoustical-oceanography.pdf`, PDF page 131, printed p. 110, 300 dpi, and
   `plan/underwater-sources/Francois-Garrison-1982-P2-boric-acid-total-absorption-equation-JASA72.pdf`,
-  PDF page 8, 300 dpi.
+  PDF page 8, printed p. 1886, 300 dpi.
 - **Library behaviour:** unaffected; the absorption model takes the sound
   speed from the same polynomial under the name `c`.
 - **Status:** unreported (textbook rather than a standard).
