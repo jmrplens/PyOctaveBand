@@ -178,9 +178,9 @@ _STRINGS: dict[str, str] = {
     "Normalized ceiling attenuation $D_{n,c}$ [dB]":
         "Atenuación normalizada del techo $D_{n,c}$ [dB]",
     "$R_S + R_R$ (two ceilings)": "$R_S + R_R$ (dos techos)",
-    "$R_{cl}$ (ceiling/plenum path)": "$R_{cl}$ (trayecto techo/plénum)",
-    "plenum penalty": "penalización del plénum",
-    "Suspended-ceiling plenum path": "Trayecto por plénum de techo suspendido",
+    "$R_{cl}$ (ceiling/plenum path)": "$R_{cl}$ (trayecto techo/plenum)",
+    "plenum penalty": "penalización del plenum",
+    "Suspended-ceiling plenum path": "Trayecto por plenum de techo suspendido",
     "rigid connection ($Y_c$ = 0)": "unión rígida ($Y_c$ = 0)",
     "resilient tie array": "conjunto de llaves elásticas",
     "isolation gained by the tie": "aislamiento aportado por la llave",

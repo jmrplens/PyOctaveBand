@@ -442,7 +442,7 @@ _ES_EXACT = {
     "Li,Fmax + A (Table D.3)": "Li,Fmax + A (Tabla D.3)",
     # ceiling_plenum_flanking figure (Vigran 9.2.3 / ASTM E1414 / ASTM E413)
     "Suspended-ceiling plenum path\n(one-dimensional model, LR = 4.75 m, reflecting sidewalls)":
-        "Trayecto por plénum de techo suspendido\n(modelo unidimensional, "
+        "Trayecto por plenum de techo suspendido\n(modelo unidimensional, "
         "LR = 4.75 m, paredes laterales reflectantes)",
     "RS + RR (two ceilings)": "RS + RR (dos techos)",
     "Ceiling attenuation class\n(ASTM E1414/E413, CAC = 34 dB)":

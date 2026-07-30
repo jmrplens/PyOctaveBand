@@ -43,7 +43,7 @@ references:
     title: "Acoustics — Measurement of sound insulation in buildings and of building elements — Part 9: Laboratory measurement of room-to-room airborne sound insulation of a suspended ceiling with a plenum above it"
     designation: "ISO 140-9:1985"
     url: "https://www.iso.org/standard/3944.html"
-    note: "El apartado 3.3 define la atenuación normalizada del techo Dn,c con A0 = 10 m2, y los apartados de instalación fijan la profundidad del plénum, los volúmenes de los recintos y la absorción exigida al revestimiento."
+    note: "El apartado 3.3 define la atenuación normalizada del techo Dn,c con A0 = 10 m2, y los apartados de instalación fijan la profundidad del plenum, los volúmenes de los recintos y la absorción exigida al revestimiento."
   - type: standard
     organization: "ASTM International"
     year: 2022
@@ -57,7 +57,7 @@ references:
     title: "Building acoustics"
     publisher: "CRC Press"
     doi: "10.1201/9781482266016"
-    note: "La Sección 9.2.3 presenta el modelo unidimensional de plénum de Mechel, Ecs. (9.13) a (9.20). ISBN 978-0-415-42853-8."
+    note: "La Sección 9.2.3 presenta el modelo unidimensional de plenum de Mechel, Ecs. (9.13) a (9.20). ISBN 978-0-415-42853-8."
 ---
 
 import import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -222,32 +222,32 @@ plt.show()
 
 </details>
 
-## Techos suspendidos: el trayecto por el plénum (ISO 140-9, Vigran 9.2.3)
+## Techos suspendidos: el trayecto por el plenum (ISO 140-9, Vigran 9.2.3)
 
 Dos despachos separados por un tabique que se detiene en el techo suspendido
-comparten un único plénum continuo por encima. El sonido sale del recinto
+comparten un único plenum continuo por encima. El sonido sale del recinto
 emisor a través de las placas del techo, viaja lateralmente por encima del
 tabique y vuelve a bajar a través de las placas del recinto receptor. Ese
 trayecto suele ser el eslabón más débil de una distribución de oficinas, y no
 es lo que describe el $R_w$ de un tabique.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ceiling_plenum_flanking_es.svg" alt="Dos paneles: el índice de reducción del trayecto techo-plénum Rcl por bandas de octava para dos profundidades de plénum frente a la suma de los índices de los dos techos, y la atenuación normalizada del techo de un informe de ensayo acreditado ASTM E1414 con la curva ASTM E413 ajustada y sus deficiencias sombreadas dando CAC 34" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ceiling_plenum_flanking_es.svg" alt="Dos paneles: el índice de reducción del trayecto techo-plenum Rcl por bandas de octava para dos profundidades de plenum frente a la suma de los índices de los dos techos, y la atenuación normalizada del techo de un informe de ensayo acreditado ASTM E1414 con la curva ASTM E413 ajustada y sus deficiencias sombreadas dando CAC 34" width="92%" />
 
-*Izquierda: el plénum cobra una penalización fija frente a la suma de los dos
-techos, y un plénum más profundo devuelve parte de ella. Derecha: la misma
+*Izquierda: el plenum cobra una penalización fija frente a la suma de los dos
+techos, y un plenum más profundo devuelve parte de ella. Derecha: la misma
 magnitud medida, valorada como clase de atenuación de techo.*
 
 **El modelo unidimensional.** La variante unidimensional de Mechel, tal como la
-presenta Vigran en la Sección 9.2.3, trata el plénum como un conducto revestido
+presenta Vigran en la Sección 9.2.3, trata el plenum como un conducto revestido
 por un lado. El techo de cada lado tiene un factor de transmisión
 $\tau_S = \tau_{S,pl}\tau_{S,a}$ (las placas por el eventual absorbente del
-plénum, Ec. (9.14)); la potencia inyectada se reparte, con una fracción $s_S$
+plenum, Ec. (9.14)); la potencia inyectada se reparte, con una fracción $s_S$
 dirigida hacia el tabique, y decae como $\exp(-mx)$ con el coeficiente de
 atenuación de potencia
 $m = 2\,\mathrm{Re}\{\Gamma\} = -2\,\mathrm{Im}\{k'\}$ (Ecs. (9.15) y (9.16)).
 Integrando sobre la longitud del techo a ambos lados se obtiene la Ec. (9.18),
 cuyo exponente del lado receptor incorpora la fuga de vuelta al recinto,
-$m'_R = m_R + s_R\tau_R/h$ (Ec. (9.17)). Para un plénum con poca atenuación y
+$m'_R = m_R + s_R\tau_R/h$ (Ec. (9.17)). Para un plenum con poca atenuación y
 $s_S = s_R = 0{,}5$ eso se reduce a la forma compacta que hace visible la
 geometría (Ecs. (9.19) y (9.20)):
 
@@ -255,8 +255,8 @@ $$
 R_{cl} = R_S + R_R - 10\lg\!\left[\frac{\varepsilon^2 L_R}{4h}\right],
 $$
 
-con $\varepsilon = 1$ para paredes laterales del plénum totalmente absorbentes
-y $\varepsilon = 2$ para totalmente reflectantes. Un plénum profundo ayuda, un
+con $\varepsilon = 1$ para paredes laterales del plenum totalmente absorbentes
+y $\varepsilon = 2$ para totalmente reflectantes. Un plenum profundo ayuda, un
 recinto largo perjudica, y duplicar el aislamiento de las placas ayuda el doble
 porque $R_S$ y $R_R$ aparecen los dos. Referido al área del tabique en lugar de
 a la del techo, $R_{cl,p} = R_{cl} + 10\lg(H_S/L_S)$ (Ec. (9.13)), que es lo
@@ -272,7 +272,7 @@ from phonometry import (
 freqs = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
 ceiling = [17.0, 21.0, 25.0, 29.0, 32.0, 30.0, 38.0]   # placa de yeso de 9,5 mm
 
-# La geometría del ejemplo de Vigran: LS = LR = 4,75 m, plénum 0,43 m,
+# La geometría del ejemplo de Vigran: LS = LR = 4,75 m, plenum 0,43 m,
 # paredes laterales reflectantes.
 res = plenum_flanking_reduction_index(
     ceiling, ceiling, ceiling_length=4.75, plenum_height=0.43, frequency=freqs
@@ -280,7 +280,7 @@ res = plenum_flanking_reduction_index(
 print(round(res.geometry_term, 1))    # 10,4 dB cobrados a RS + RR
 res.plot()                            # Rcl frente a los dos techos
 
-# Un plénum revestido atenúa el trayecto lateral (Ec. (9.18) en vez de (9.20)):
+# Un plenum revestido atenúa el trayecto lateral (Ec. (9.18) en vez de (9.20)):
 damped = plenum_flanking_reduction_index(
     ceiling, ceiling, ceiling_length=4.75, plenum_height=0.43,
     attenuation_source=[0.5] * 7, attenuation_receiving=[0.5] * 7,
@@ -296,11 +296,11 @@ print(partition_referenced_reduction_index(res.reduction_index, 2.7, 4.75))
 equivalente del recinto receptor y la referencia $A_0 = 10\ \text{m}^2$. La
 instalación tiene dos recintos de al menos 50 m³ cuyos volúmenes difieren en al
 menos un 10 %, un tabique divisorio adelgazado a 100 mm como máximo en su parte
-superior y un plénum de 650 mm a 760 mm de profundidad con una pared lateral y
+superior y un plenum de 650 mm a 760 mm de profundidad con una pared lateral y
 las dos testeras revestidas; la norma imprime la absorción exigida al
 revestimiento, $\alpha_s \ge 0{,}65$ a 125 Hz y $\ge 0{,}80$ de 250 Hz a
 4000 Hz, y exige $\alpha < 0{,}10$ en la otra pared lateral y en el techo del
-plénum. Su equivalente norteamericana, ASTM E1414, usa
+plenum. Su equivalente norteamericana, ASTM E1414, usa
 $A_0 = 12\ \text{m}^2$, de modo que un valor ASTM queda unos
 $10\lg(12/10) = 0{,}79$ dB por encima para los mismos recintos.
 
@@ -446,11 +446,11 @@ $f_\text{ref}$, $\eta$).
 La rama de techos suspendidos cubre la atenuación normalizada del
 techo $D_{n,c}$ del apartado 3.3 de ISO 140-9:1985, la clase de
 atenuación de techo de ASTM E413-22 que invoca ASTM E1414 y el modelo
-unidimensional de plénum de la Sección 9.2.3 de Vigran, con
+unidimensional de plenum de la Sección 9.2.3 de Vigran, con
 `building.normalized_ceiling_attenuation`,
 `building.ceiling_attenuation_class`,
 `building.plenum_flanking_reduction_index` y
-`building.partition_referenced_reduction_index`. El modelo de plénum
+`building.partition_referenced_reduction_index`. El modelo de plenum
 no tiene salida numérica publicada propia, así que se ancla en sus
 formas cerradas y en la convergencia de la Ec. (9.18) a la Ec. (9.20);
 la cadena de medición y la clase se anclan en informes de laboratorio
