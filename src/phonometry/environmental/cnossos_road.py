@@ -463,6 +463,35 @@ def _category_key(category: RoadVehicleCategory | str) -> str:
     return key
 
 
+def _require_category(key: str, coefficients: RoadEmissionCoefficients) -> None:
+    """Check that a substituted Appendix F database covers the category.
+
+    :func:`_category_key` only checks that the category exists in Table
+    [2.2.a]; a national database supplied through ``coefficients`` may cover
+    fewer categories, and reaching for a missing row must fail as an invalid
+    input rather than as a bare lookup error.
+    """
+    missing = [
+        name
+        for name, table in (
+            ("rolling_a", coefficients.rolling_a),
+            ("rolling_b", coefficients.rolling_b),
+            ("propulsion_a", coefficients.propulsion_a),
+            ("propulsion_b", coefficients.propulsion_b),
+            ("junction_c", coefficients.junction_c),
+            ("temperature_k", coefficients.temperature_k),
+        )
+        if key not in table
+    ]
+    if missing:
+        raise ValueError(
+            f"The supplied coefficient database has no category {key!r} in "
+            + ", ".join(missing)
+            + "; a substituted Appendix F database must cover every category "
+            "of the modelled traffic."
+        )
+
+
 def _surface_of(
     surface: RoadSurface | str | RoadSurfaceCoefficients,
 ) -> RoadSurfaceCoefficients:
@@ -567,6 +596,7 @@ def road_rolling_noise(
     :raises ValueError: If an input is invalid.
     """
     key = _category_key(category)
+    _require_category(key, coefficients)
     v = max(_positive_speed(speed), _ROAD_MINIMUM_SPEED)
     row = _surface_of(surface)
     log_speed = np.log10(v / ROAD_REFERENCE_SPEED)
@@ -624,6 +654,7 @@ def road_propulsion_noise(
     :raises ValueError: If an input is invalid.
     """
     key = _category_key(category)
+    _require_category(key, coefficients)
     v = max(_positive_speed(speed), _ROAD_MINIMUM_SPEED)
     row = _surface_of(surface)
 
@@ -824,7 +855,10 @@ def road_source_power(
         line.append(lw + flow_term)
 
     line_power = np.asarray(line, dtype=np.float64)
-    total = 10.0 * np.log10(np.sum(10.0 ** (line_power / 10.0), axis=0))
+    # An empty road is a legitimate input and its line power is -inf, so the
+    # logarithm of the zero energy sum is silenced rather than warned about.
+    with np.errstate(divide="ignore"):
+        total = 10.0 * np.log10(np.sum(10.0 ** (line_power / 10.0), axis=0))
     return RoadEmissionResult(
         frequencies=np.asarray(ROAD_OCTAVE_BANDS, dtype=np.float64),
         categories=tuple(RoadVehicleCategory(key) for key in keys),

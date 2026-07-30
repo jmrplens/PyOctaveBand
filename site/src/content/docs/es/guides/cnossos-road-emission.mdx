@@ -328,19 +328,23 @@ coeficientes distintos (el de 2015 y el de 2021). Los dos objetos de
 coeficientes se pueden reemplazar:
 
 ```python
-from phonometry import ROAD_COEFFICIENTS, RoadEmissionCoefficients
+import dataclasses
 
-national = RoadEmissionCoefficients(
-    rolling_a={"1": (83.1, 89.2, 87.7, 93.1, 100.1, 96.7, 86.8, 76.2), ...},
-    rolling_b=ROAD_COEFFICIENTS.rolling_b,
-    propulsion_a=ROAD_COEFFICIENTS.propulsion_a,
-    propulsion_b=ROAD_COEFFICIENTS.propulsion_b,
-    studded_a=ROAD_COEFFICIENTS.studded_a,
-    studded_b=ROAD_COEFFICIENTS.studded_b,
-    junction_c=ROAD_COEFFICIENTS.junction_c,
-    temperature_k=ROAD_COEFFICIENTS.temperature_k,
+from phonometry import ROAD_COEFFICIENTS
+
+# Una fila nacional medida para vehículos ligeros y el resto del Apéndice F tal cual.
+national = dataclasses.replace(
+    ROAD_COEFFICIENTS,
+    rolling_a={
+        **ROAD_COEFFICIENTS.rolling_a,
+        "1": (83.4, 89.0, 88.1, 93.6, 100.4, 96.9, 87.0, 76.5),
+    },
 )
 ```
+
+Una base sustituida tiene que cubrir todas las categorías del tráfico con el que
+se use: pedir una categoría que no lleva lanza `ValueError` en lugar de fallar
+más adelante.
 
 Ese mecanismo es además lo que ancla la implementación: la Comisión Europea
 publicó un juego de prueba de 4.875 casos de emisión viaria calculados con los

@@ -321,19 +321,23 @@ have already been evaluated with two different coefficient sets (the 2015 one
 and the 2021 one). Both coefficient objects can be replaced:
 
 ```python
-from phonometry import ROAD_COEFFICIENTS, RoadEmissionCoefficients
+import dataclasses
 
-national = RoadEmissionCoefficients(
-    rolling_a={"1": (83.1, 89.2, 87.7, 93.1, 100.1, 96.7, 86.8, 76.2), ...},
-    rolling_b=ROAD_COEFFICIENTS.rolling_b,
-    propulsion_a=ROAD_COEFFICIENTS.propulsion_a,
-    propulsion_b=ROAD_COEFFICIENTS.propulsion_b,
-    studded_a=ROAD_COEFFICIENTS.studded_a,
-    studded_b=ROAD_COEFFICIENTS.studded_b,
-    junction_c=ROAD_COEFFICIENTS.junction_c,
-    temperature_k=ROAD_COEFFICIENTS.temperature_k,
+from phonometry import ROAD_COEFFICIENTS
+
+# One measured national row for light vehicles, the rest of Appendix F as published.
+national = dataclasses.replace(
+    ROAD_COEFFICIENTS,
+    rolling_a={
+        **ROAD_COEFFICIENTS.rolling_a,
+        "1": (83.4, 89.0, 88.1, 93.6, 100.4, 96.9, 87.0, 76.5),
+    },
 )
 ```
+
+A substituted database has to cover every category of the traffic it is used
+with: reaching for a category it does not carry raises `ValueError` rather than
+failing later.
 
 That mechanism is also what pins the implementation: the European Commission
 published a test set of 4 875 road emission cases computed with the 2015

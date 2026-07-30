@@ -27,6 +27,7 @@ closed forms of the published equations.
 from __future__ import annotations
 
 import math
+import warnings
 
 import matplotlib
 
@@ -282,9 +283,13 @@ def test_zero_flow_contributes_nothing() -> None:
     busy = RoadTraffic(RoadVehicleCategory.LIGHT, 800.0, 60.0)
     empty = RoadTraffic(RoadVehicleCategory.HEAVY, 0.0, 60.0)
     alone = road_source_power(busy)
-    with np.errstate(divide="ignore"):
-        both = road_source_power([busy, empty])
+    both = road_source_power([busy, empty])
     assert both.total_line_power == pytest.approx(alone.total_line_power, abs=1e-12)
+    # An empty road is a legitimate input: no source, no warning, -inf power.
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        deserted = road_source_power(empty)
+    assert np.all(np.isneginf(deserted.total_line_power))
 
 
 # ---------------------------------------------------------------------------
@@ -573,6 +578,52 @@ def test_invalid_inputs_are_rejected() -> None:
         road_source_power(RoadTraffic(RoadVehicleCategory.LIGHT, -1.0, 50.0))
     with pytest.raises(ValueError, match="positive number of metres"):
         line_source_segment_power(np.array([90.0]), 0.0)
+
+
+def test_substituted_database_may_replace_one_row() -> None:
+    """A national Appendix F row overrides only the coefficients it carries."""
+    import dataclasses
+
+    row = (83.4, 89.0, 88.1, 93.6, 100.4, 96.9, 87.0, 76.5)
+    national = dataclasses.replace(
+        ROAD_COEFFICIENTS,
+        rolling_a={**ROAD_COEFFICIENTS.rolling_a, "1": row},
+    )
+    assert road_rolling_noise("1", 70.0, coefficients=national) == pytest.approx(
+        np.asarray(row), abs=1e-12
+    )
+    assert road_rolling_noise("3", 70.0, coefficients=national) == pytest.approx(
+        np.asarray(ROAD_COEFFICIENTS.rolling_a["3"]), abs=1e-12
+    )
+
+
+def test_incomplete_database_is_rejected_as_an_invalid_input() -> None:
+    """A database missing the requested category fails as a ValueError.
+
+    ``_category_key`` only checks Table [2.2.a]; the coefficients actually in
+    use may cover fewer categories, and that has to surface as an invalid input
+    rather than as a bare lookup error deeper in the calculation.
+    """
+    partial = RoadEmissionCoefficients(
+        rolling_a={"1": ROAD_COEFFICIENTS.rolling_a["1"]},
+        rolling_b={"1": ROAD_COEFFICIENTS.rolling_b["1"]},
+        propulsion_a={"1": ROAD_COEFFICIENTS.propulsion_a["1"]},
+        propulsion_b={"1": ROAD_COEFFICIENTS.propulsion_b["1"]},
+        studded_a=ROAD_COEFFICIENTS.studded_a,
+        studded_b=ROAD_COEFFICIENTS.studded_b,
+        junction_c={"1": ROAD_COEFFICIENTS.junction_c["1"]},
+        temperature_k={"1": ROAD_COEFFICIENTS.temperature_k["1"]},
+    )
+    assert road_rolling_noise("1", 70.0, coefficients=partial).shape == (8,)
+    for call in (road_rolling_noise, road_propulsion_noise):
+        with pytest.raises(ValueError, match="no category '3'"):
+            call("3", 70.0, coefficients=partial)
+    with pytest.raises(ValueError, match="no category '3'"):
+        road_vehicle_sound_power("3", 70.0, coefficients=partial)
+    with pytest.raises(ValueError, match="no category '3'"):
+        road_source_power(
+            RoadTraffic(RoadVehicleCategory.HEAVY, 100.0, 70.0), coefficients=partial
+        )
 
 
 def test_studded_tyre_inputs_are_range_checked() -> None:
