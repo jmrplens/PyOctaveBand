@@ -265,7 +265,10 @@ def plot_sii_procedure(
         0.0, max(float(ax.get_ylim()[1]), float(importance.max()) * 1.15)
     )
     ax.set_title(_t("ANSI S3.5-1997 band-importance function", language))
-    format_frequency_axis(ax, float(edges[0]), float(edges[-1]))
+    # No explicit range: the tick set follows the axis limits, so overlaying a
+    # second procedure that reaches lower or higher relabels the whole axis
+    # instead of clipping the ticks to the first one drawn.
+    format_frequency_axis(ax)
     ax.set_xlabel(_t("Frequency [Hz]", language))
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     ax.grid(True, alpha=0.3)
