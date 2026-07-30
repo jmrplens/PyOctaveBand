@@ -26,10 +26,14 @@
  * the complaint was about.
  * ------------------------------------------------------------------ */
 
+/* The size goes on the wrapper, not on the heading: Starlight sizes the hover
+   anchor icon in the wrapper's em, so a heading shrunk on its own gets an icon
+   drawn for the size it used to be, sitting on top of its own last word. */
 .sl-markdown-content .sl-heading-wrapper:has(> h2#see-also),
 .sl-markdown-content .sl-heading-wrapper:has(> h2#véase-también) {
   margin-top: 2.5rem;
   padding: 0.7rem 1rem 0.1rem;
+  font-size: var(--sl-text-xs);
   background: var(--ph-surface);
   border: 1px solid var(--ph-border);
   border-bottom: 0;
@@ -39,7 +43,7 @@
 .sl-markdown-content .sl-heading-wrapper:has(> h2#see-also) > h2,
 .sl-markdown-content .sl-heading-wrapper:has(> h2#véase-también) > h2 {
   font-family: var(--ph-mono);
-  font-size: var(--sl-text-xs);
+  font-size: inherit;
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
