@@ -52,7 +52,15 @@ pip install phonometry
 Optional extras: `phonometry[plot]` (matplotlib for response plots and result
 `.plot()` methods), `phonometry[perf]` (numba for faster impulse ballistics),
 `phonometry[report]` (reportlab and svglib, so result `.report()` methods can
-render normative PDF fiches), `phonometry[full]` (all of the above).
+render normative PDF fiches, whose figure panel also needs matplotlib),
+`phonometry[full]` (all of the above).
+
+I recommend `pip install phonometry[full]`: it brings matplotlib, numba,
+reportlab and svglib in one go, so every feature of the library is enabled. The
+base install computes every metric on NumPy and SciPy alone; the only things it
+leaves unavailable are the figures (`.plot()` and the filter response plots),
+the normative PDF fiches (`.report()`) and the compiled kernel that speeds up
+the `impulse` time weighting.
 
 ## ⚡ Quick start
 

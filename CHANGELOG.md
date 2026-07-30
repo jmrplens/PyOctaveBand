@@ -622,6 +622,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   therefore cannot interpolate an import whatever the file extension, so they
   stay with the writer rather than with `conformance-stats.mjs`.
 
+- The last three mermaid flowcharts are now generated SVGs, and the mermaid
+  runtime is gone from the site. The sound level meter guide, the calibration
+  guide and the signal analysis theory page each rendered one diagram with
+  mermaid, which meant every reader of the site downloaded and ran the mermaid
+  bundle for three figures while every other diagram in the documentation is a
+  deterministic SVG from `scripts/generate_diagrams.py`. Three new diagrams take
+  their place, each in the usual four variants (light and dark, English and
+  Spanish): `diagram_slm_pipeline` draws the guide's own chain, from the two
+  recordings through the sensitivity factor to the display, integrated and band
+  branches and the class verifiers that close it; `diagram_calibration_dataflow`
+  draws one factor reaching every level function, and the dBFS branch taken when
+  no factor exists; `diagram_bank_dataflow` draws both numerical-stability
+  strategies of the filter bank, the biquad cascade and the decimation decision,
+  ending in the band level and the optional band signal. The `astro-mermaid`
+  integration and the `mermaid` dependency are removed from the site and its
+  lockfile.
+
+- "Why phonometry" argues the same thing with current evidence. Every test path
+  in its conformance table pointed at the flat `tests/test_*.py` layout the
+  suite no longer has, and the markdown mirror had lost the check, domain and
+  standards count paragraph the site pages carry; both are fixed, and that
+  paragraph's domain sweep now names the areas added since it was written. The
+  MoSQITo comparison no longer claims a split that the sound-quality modules
+  ended, a `pyroomacoustics` entry joins the ecosystem list now that room and
+  wave simulation exist here, the numerics paragraph mentions the class 0 check
+  on the default bank, and a new section covers what happens when the standard
+  itself is what is wrong, with the errata registry as its evidence.
+
+- Every install page recommends `phonometry[full]`. The plain install stays the
+  default, with a note that the extra brings matplotlib, numba, reportlab and
+  svglib in one go, that the base install computes every metric on NumPy and
+  SciPy alone, and that what it leaves unavailable is the `.plot()` figures, the
+  `.report()` PDF fiches and the compiled `impulse` kernel. The extras list also
+  said `[report]` alone renders a fiche, which is not true: its figure panel
+  needs matplotlib as well.
+
 - The filter-bank reuse test asserts the property it is named after instead of a
   stopwatch. It used to compare `time.time()` deltas and require the class-based
   path to stay within 1.5x of the functional one, which on a shared runner under

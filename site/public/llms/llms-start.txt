@@ -22,9 +22,16 @@ Optional extras:
 ```bash
 pip install phonometry[plot]    # matplotlib, for filter response plots and result .plot() methods
 pip install phonometry[perf]    # numba, faster 'impulse' time weighting
-pip install phonometry[report]  # reportlab + svglib, so result .report() methods render normative PDF fiches
-pip install phonometry[full]    # all of the above
+pip install phonometry[report]  # reportlab + svglib, so result .report() methods render normative PDF fiches (their figure panel needs [plot] too)
+pip install phonometry[full]    # all of the above (recommended)
 ```
+
+I recommend `pip install phonometry[full]`: it brings matplotlib, numba,
+reportlab and svglib in one go, so every feature of the library is enabled. The
+base install computes every metric on NumPy and SciPy alone; the only things it
+leaves unavailable are the figures (`.plot()` and the filter response plots),
+the normative PDF fiches (`.report()`) and the compiled kernel that speeds up
+the `impulse` time weighting.
 
 **Option 2: Cloning and Installing**
 
@@ -274,31 +281,62 @@ plt.show()
 
 The tone-burst case above is not an isolated check. For each standard the
 library implements, the reference values and acceptance limits are transcribed
-from the official text into the test suite, so any regression fails CI:
+from the official text into the test suite, so any regression fails CI. A
+sample from the metrology core:
 
 | Standard | What is verified | Test file |
 | :--- | :--- | :--- |
-| IEC 61672-1:2013 Table 3 | A/C/Z weighting at all 34 nominal frequencies, class 1 limits, at 48 and 96 kHz | `tests/test_iec_weighting_table3.py` |
-| IEC 61672-1:2013 Table 4 | F/S tone-burst responses (1 s to 1 ms) and the LAE column for `sel()` | `tests/test_iec_compliance.py` |
-| IEC 61672-1:2013 Table 5 | `lc_peak()` one-cycle/half-cycle peak responses, class 1 limits | `tests/test_levels.py` |
-| IEC 61260-1:2014 Table 1 | Filter-bank class 1/2 acceptance limits via `verify_filter_class()` | `tests/test_compliance.py` |
-| ISO 7196:1995 Table 2 | G weighting (infrasound) at every nominal response value, 0.25–315 Hz | `tests/test_g_weighting.py` |
-| ISO 226:2023 Annex B | Equal-loudness contours, loudness levels and hearing threshold against the Annex B tables | `tests/test_loudness_contours.py` |
-| ECMA-418-1:2024 | TNR/PR tone prominence: critical bandwidths, proximity spacing and prominence criteria against the worked examples in clauses 10–12 | `tests/test_tonality.py` |
-| ISO 1996-1:2016 | `lden()`, `ldn()` and `composite_rating_level()` against hand-computed formula values | `tests/test_environmental.py` |
-| IEC 60942:2017 Table 2 | Calibrator short-term stability limits (frequency-dependent, class 1) in `sensitivity()` | `tests/test_calibration_validation.py` |
+| IEC 61672-1:2013 Table 3 | A/C/Z weighting at all 34 nominal frequencies, class 1 limits, at 48 and 96 kHz | `tests/metrology/test_iec_weighting_table3.py` |
+| IEC 61672-1:2013 Table 4 | F/S tone-burst responses (1 s to 1 ms) and the LAE column for `sel()` | `tests/metrology/test_iec_compliance.py` |
+| IEC 61672-1:2013 Table 5 | `lc_peak()` one-cycle/half-cycle peak responses, class 1 limits | `tests/metrology/test_levels.py` |
+| IEC 61260-1:2014 Table 1 | Filter-bank class 1/2 acceptance limits via `verify_filter_class()` | `tests/metrology/test_compliance.py` |
+| ISO 7196:1995 Table 2 | G weighting (infrasound) at every nominal response value, 0.25–315 Hz | `tests/metrology/test_g_weighting.py` |
+| ISO 226:2023 Annex B | Equal-loudness contours, loudness levels and hearing threshold against the Annex B tables | `tests/psychoacoustics/test_loudness_contours.py` |
+| ECMA-418-1:2024 | TNR/PR tone prominence: critical bandwidths, proximity spacing and prominence criteria against the worked examples in clauses 10–12 | `tests/psychoacoustics/test_tonality.py` |
+| ISO 1996-1:2016 | `lden()`, `ldn()` and `composite_rating_level()` against hand-computed formula values | `tests/environmental/test_environmental.py` |
+| IEC 60942:2017 Table 2 | Calibrator short-term stability limits (frequency-dependent, class 1) in `sensitivity()` | `tests/metrology/test_calibration_validation.py` |
 
-The full numerical report (the expected value and the value the library
-computes for every check, regenerated on every pull request) is published
-as [CONFORMANCE.md](https://jmrplens.github.io/phonometry/reference/conformance/).
+The same discipline applies far beyond the metrology core: today the suite runs
+501 numerical conformance checks across 55 domains and 338 standards, covering
+psychoacoustics and speech intelligibility, room, building and materials
+acoustics, human and machine vibration, environmental, aircraft, rotorcraft
+and underwater noise, electroacoustics, broadcast loudness, industrial noise
+control, calibrated signal analysis and the FDTD wave solver. The full
+numerical report (the expected value and the value the library computes for
+every check, regenerated on every pull request) is published as
+[CONFORMANCE.md](https://jmrplens.github.io/phonometry/reference/conformance/).
 
 Beyond IEC 61252-style noise dose (`sound_exposure()`, `lex_8h()`), the same
 standards-first mindset shows up in the numerics: filter banks place their
 −3 dB points on the **ANSI S1.11 / IEC 61260-1** band edges for every
 architecture (including Chebyshev II and Bessel, where scipy's raw
-parametrization would not), and A/C weighting stays within class 1 tolerances
-up to 16 kHz at common audio rates via internal oversampling (see
+parametrization would not), the default Butterworth bank is checked against
+the stricter class 0 of the withdrawn IEC 61260:1995 / ANSI S1.11-2004 edition
+as well as the current class 1, and A/C weighting stays within class 1
+tolerances up to 16 kHz at common audio rates via internal oversampling (see
 [Frequency Weighting](https://jmrplens.github.io/phonometry/guides/weighting/)).
+
+## When the source is what is wrong
+
+Transcribing a standard rather than porting somebody else's code has a
+consequence that only shows up at scale: sooner or later the recomputed value
+and the printed one disagree, and sometimes it is the printed one that cannot
+be right. A worked example that contradicts its own normative clause, a
+constant with a digit lost in typesetting, a cross-reference pointing at the
+wrong equation.
+
+Those cases are not quietly patched. Each confirmed one is written down in
+[Standards errata](https://jmrplens.github.io/phonometry/reference/errata/) with the printed edition and the exact location,
+what the document says, why it cannot be right, the independent evidence, the
+reading the library implements, and the regression test that pins that reading.
+There are dozens of them now, across standards, guidance documents, textbooks
+and journal papers, each marked as reported to the issuing body or not. A
+defect listed there is never a defect of the method: in every case the intended
+reading could be established from the document itself or from physics.
+
+That registry is the part of the approach that is hardest to fake. Code ported
+from another implementation inherits whatever the misprint made it do, and
+nothing in the port ever notices.
 
 ## Where phonometry fits in the Python ecosystem
 
@@ -308,16 +346,29 @@ up to 16 kHz at common audio rates via internal oversampling (see
   on phonometry for its weighted level computations rather than reimplementing
   them.
 - **MoSQITo** focuses on psychoacoustic sound-quality metrics (loudness,
-  sharpness, roughness). It complements rather than overlaps phonometry:
-  it does not cover sound level metrology (weighting filters, ballistics,
-  Leq/SEL/Lden, calibration) and does not claim conformance testing against
-  the standards' tolerance tables.
+  sharpness, roughness). That used to be a clean split, and it no longer is:
+  phonometry now implements the same family, with ISO 532-1, ISO 532-2 and
+  ISO 532-3 loudness, ECMA-418-2 tonality, roughness and fluctuation strength,
+  DIN 45692 sharpness and the Fastl & Zwicker annoyance model. What differs is
+  the setting. Here those metrics sit in the same conformance harness as the
+  metrology core and compose directly with the weighting filters, ballistics,
+  band filtering and calibration that feed them.
+- **pyroomacoustics** simulates room impulse responses for audio and machine
+  learning pipelines (image sources, ray tracing, beamforming, direction of
+  arrival). phonometry's room and simulation modules answer the measurement
+  question instead: its image-source and FDTD solvers are pinned to published
+  closed forms, and what comes out of them goes through the same ISO 3382
+  parameter analysis as a measured impulse response.
 
 If your work needs numbers you can defend against a standard's tolerance
 table, whether for measurement reports, environmental assessments or
-instrument cross-checks, that verification layer is what phonometry is for. The
-sources behind it are collected in the [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/),
-every entry with a verified DOI or official publisher link.
+instrument cross-checks, that verification layer is what phonometry is for.
+Where the standard also fixes how the result is to be reported, the result
+object renders that one-page fiche itself with `.report()`, in English or
+Spanish, so the document you hand over carries the same numbers the check does.
+The sources behind all of it are collected in the
+[Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/), every entry with a verified DOI or official
+publisher link.
 
 ---
 
@@ -1823,16 +1874,7 @@ To ensure **100% stability** across the entire audible spectrum (even at low
 frequencies like 16 Hz with high sample rates), phonometry employs two
 critical strategies:
 
-```mermaid
-flowchart LR
-    X["Input signal\nfs"] --> D{"Low band?"}
-    D -- "yes" --> R["Decimate\nresample_poly (1/M)"] --> S1["SOS band filter\nat fs/M"]
-    D -- "no" --> S2["SOS band filter\nat fs"]
-    S1 --> L["Band level (RMS/peak)"]
-    S2 --> L
-    S1 -- "sigbands=True" --> U["Interpolate back\nresample_poly (M/1)"] --> Y["Band signal\nat fs"]
-    S2 -- "sigbands=True" --> Y
-```
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow.svg" alt="Data flow inside one band of the filter bank: a low band, whose centre frequency is far below half the sample rate, takes the resample_poly decimation branch to fs over M so its poles stay clear of the unit circle, every band is then a cascade of second-order sections with the minus 3 dB points on the band edges rather than one high-order transfer function, both branches end in the band level in dB, and sigbands=True additionally returns the band signal at the input rate" width="92%"></picture>
 
 1. **Second-Order Sections (SOS):** All filters are implemented as a series of
    cascaded biquads. This avoids the catastrophic numerical precision loss

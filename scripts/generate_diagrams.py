@@ -1736,8 +1736,6 @@ _ES: dict[str, str] = {
     "sample rate fs": "frecuencia de muestreo fs",
     "Low band?": "¿Banda grave?",
     "fc far below fs / 2": "fc muy por debajo de fs / 2",
-    "yes": "sí",
-    "no": "no",
     "anti-alias and decimate to fs / M":
         "filtrar el aliasing y diezmar a fs / M",
     "poles stay clear of z = 1": "los polos se alejan de z = 1",
