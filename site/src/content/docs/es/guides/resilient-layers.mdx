@@ -189,7 +189,7 @@ from phonometry import covering_contact_stiffness, covering_improvement
 # o moqueta con soporte elástico, 5 mm sobre la misma losa de 140 mm.
 d = 0.005
 covering = covering_contact_stiffness(2.8e8 * d, d)
-res = covering_improvement([125.0, 250.0, 500.0, 1000.0], covering, k, z)
+res = covering_improvement([125.0, 250.0, 500.0, 1000.0], covering, plate, z)
 round(res.cut_off_frequency)        # 100 Hz
 round(res.bare_cut_off_frequency)   # 6948 Hz, la corte de la losa desnuda
 res.improvement                     # 3,2 / 17,0 / 33,3 / 43,0 dB, por banda
@@ -319,6 +319,12 @@ f_0 = \frac{1}{2\pi}\sqrt{s'\left(\frac{1}{m_1'} + \frac{1}{m_2'}\right)}
 f_0 = \frac{1}{2\pi}\sqrt{\frac{0{,}111}{d}\left(\frac{1}{m_1'} + \frac{1}{m_2'}\right)}
 \ \text{(D.2, montantes sobre cámara rellena)}.
 $$
+
+Ambas rigideces van en MN/m³ y ambas masas por unidad de superficie en kg/m²,
+que es como las imprime el anexo: el término de cámara de (D.2) es
+$s' = 0{,}111/d$ MN/m³ con $d$ en metros, es decir $0{,}111\times10^{6}/d$ en
+unidades SI. Sustituir el valor SI sin la conversión da una frecuencia de
+resonancia unas mil veces menor.
 
 La tabla D.1 lee entonces la mejora ponderada en $f_0$, redondeada a la banda
 de tercio de octava en la que cae. Por debajo de 200 Hz la capa adicional ayuda,

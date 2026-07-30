@@ -712,7 +712,7 @@ def covering_improvement(
     multiples of ``fco``, so a band centre that happens to land on one reads
     tens of dB high. With the 100 Hz cut-off of Hopkins's covering No. 2, the
     line ratio at 500 Hz is 66,8 dB against a two-line estimate of 27,9 dB,
-    while the band value is 29,1 dB. Hopkins notes below Fig. 4.64 that the
+    while the band value is 33,3 dB. Hopkins notes below Fig. 4.64 that the
     troughs vanish once the covering's internal damping is included and the
     spectrum is averaged into bands.
 
@@ -1325,8 +1325,10 @@ def lining_improvement(
         (:func:`lining_resonance_frequency`).
     :param system: ``"mineral_wool"``, ``"foam"`` or ``"studs"``.
     :param anchors: Apply the Formula (D.5) anchor/batten correction.
-    :param glued_area: Glued area ``%So`` as a percentage of the element area
-        (0 to 100), or ``None`` to keep the 40 % reference. Formula (D.6)
+    :param glued_area: Glued area ``%So`` as a percentage of the element area,
+        greater than 0 and at most 100, or ``None`` to keep the 40 % reference.
+        Formula (D.6) divides by the glued area, so a wholly unglued system is
+        not a case of it: use ``anchors`` for a mechanically fixed lining. Formula (D.6)
         corrects the glued exterior systems only, so it is rejected for
         ``system="studs"``.
     :return: A :class:`LiningImprovementResult`.

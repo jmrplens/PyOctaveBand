@@ -1630,7 +1630,8 @@ def _plot_improvement_spectrum(
     values, label, colour, style = first
     kwargs.setdefault("color", colour)
     kwargs.setdefault("ls", style)
-    ax.plot(freqs, values, label=_t(label, language), **kwargs)
+    # The caller may name the curve; do not hand matplotlib two labels.
+    ax.plot(freqs, values, label=kwargs.pop("label", _t(label, language)), **kwargs)
     for values, label, colour, style in rest:
         ax.plot(freqs, values, color=colour, ls=style, label=_t(label, language))
     if marker_frequency is not None:
@@ -1667,7 +1668,8 @@ def plot_tapping_force(
     ax = ax if ax is not None else _new_axes()
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     kwargs.setdefault("color", _C_PRIMARY)
-    ax.plot(freqs, result.peak_force, label=_t("force spectrum $|F_n|$", language),
+    ax.plot(freqs, result.peak_force,
+            label=kwargs.pop("label", _t("force spectrum $|F_n|$", language)),
             **kwargs)
     ax.axhline(result.upper_limit, color=_C_REFERENCE, ls="--", lw=1.2,
                label="$|F_n|_{upper}$")
@@ -1789,7 +1791,7 @@ def plot_lining_improvement(
     ]
     curves = np.asarray(ratings, dtype=np.float64)
     kwargs.setdefault("color", _C_PRIMARY)
-    ax.plot(sweep, curves[:, 0], label=r"$\Delta R_w$", **kwargs)
+    ax.plot(sweep, curves[:, 0], label=kwargs.pop("label", r"$\Delta R_w$"), **kwargs)
     ax.plot(sweep, curves[:, 1], color=_C_SECONDARY, ls="--", label=r"$\Delta R_A$")
     ax.plot(sweep, curves[:, 2], color=_C_TERTIARY, ls="-.", label=r"$\Delta R_{A,tr}$")
     ax.plot([result.resonance_frequency], [result.delta_rw], marker="o", ms=8,

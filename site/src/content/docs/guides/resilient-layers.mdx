@@ -184,7 +184,7 @@ from phonometry import covering_contact_stiffness, covering_improvement
 # with a resilient backing, 5 mm thick on the same 140 mm slab.
 d = 0.005
 covering = covering_contact_stiffness(2.8e8 * d, d)
-res = covering_improvement([125.0, 250.0, 500.0, 1000.0], covering, k, z)
+res = covering_improvement([125.0, 250.0, 500.0, 1000.0], covering, plate, z)
 round(res.cut_off_frequency)        # 100 Hz
 round(res.bare_cut_off_frequency)   # 6948 Hz, the bare slab's own cut-off
 res.improvement                     # 3.2, 17.0, 33.3, 43.0 dB, band values
@@ -312,6 +312,12 @@ f_0 = \frac{1}{2\pi}\sqrt{s'\left(\frac{1}{m_1'} + \frac{1}{m_2'}\right)}
 f_0 = \frac{1}{2\pi}\sqrt{\frac{0.111}{d}\left(\frac{1}{m_1'} + \frac{1}{m_2'}\right)}
 \ \text{(D.2, studs over a filled cavity)}.
 $$
+
+Both stiffnesses are in MN/m³ and both masses per unit area in kg/m², which is
+how the annex prints them: the cavity term of (D.2) is $s' = 0{,}111/d$ MN/m³
+with $d$ in metres, that is $0{,}111\times10^{6}/d$ in SI units. Substituting
+the SI value without the conversion gives a resonance about a thousand times
+too low.
 
 Table D.1 then reads the weighted improvement off $f_0$, rounded to the
 one-third-octave band it falls in. Below 200 Hz the lining helps, by

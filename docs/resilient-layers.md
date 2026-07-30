@@ -146,7 +146,7 @@ from phonometry import covering_contact_stiffness, covering_improvement
 # with a resilient backing, 5 mm thick on the same 140 mm slab.
 d = 0.005
 covering = covering_contact_stiffness(2.8e8 * d, d)
-res = covering_improvement([125.0, 250.0, 500.0, 1000.0], covering, k, z)
+res = covering_improvement([125.0, 250.0, 500.0, 1000.0], covering, plate, z)
 round(res.cut_off_frequency)        # 100 Hz
 round(res.bare_cut_off_frequency)   # 6948 Hz, the bare slab's own cut-off
 res.improvement                     # 3.2, 17.0, 33.3, 43.0 dB, band values
@@ -275,6 +275,12 @@ f_0 = \frac{1}{2\pi}\sqrt{\frac{0.111}{d}\left(\frac{1}{m_1'} + \frac{1}{m_2'}\r
 \ \text{(D.2, studs over a filled cavity)}.
 $$
 
+Both stiffnesses are in MN/m³ and both masses per unit area in kg/m², which is
+how the annex prints them: the cavity term of (D.2) is $s' = 0{,}111/d$ MN/m³
+with $d$ in metres, that is $0{,}111\times10^{6}/d$ in SI units. Substituting
+the SI value without the conversion gives a resonance about a thousand times
+too low.
+
 Table D.1 then reads the weighted improvement off $f_0$, rounded to the
 one-third-octave band it falls in. Below 200 Hz the lining helps, by
 $74.4 - 20\lg f_0 - R_w/2$ dB, and the better the bare wall the less there is
@@ -374,6 +380,47 @@ single-number method, and where ISO 12354 needs a lining spectrum it either
 measures it (ISO 10140-1 Annex G) or, for a floating floor, takes
 $\Delta R(f) = \Delta L(f)$, which its own Annex L calls rough. Heavy impact
 sources (the rubber ball) are not covered by any of these models.
+
+## References
+
+- Hopkins, C. (2007). *Sound insulation*. Butterworth-Heinemann.
+  ISBN 978-0-7506-6526-1.
+  [doi:10.4324/9780080550176](https://doi.org/10.4324/9780080550176).
+  Section 3.6.3 for the tapping-machine contact model and the force spectrum,
+  Section 4.3.8 for the covering cut-off frequency and the two-line estimate,
+  and Sections 4.3.9 and 4.3.10 for the floating-floor improvement laws.
+- Vigran, T. E. (2008). *Building acoustics*. CRC Press.
+  ISBN 978-0-415-42853-8.
+  [doi:10.1201/9781482266016](https://doi.org/10.1201/9781482266016).
+  Section 8.4 for the resilient-mount improvement and the hammer-on-covering
+  resonances used here as spot checks.
+- International Organization for Standardization. (2017). *Building acoustics
+  — Estimation of acoustic performance of buildings from the performance of
+  elements — Part 1: Airborne sound insulation between rooms*
+  (ISO 12354-1:2017).
+  [iso.org catalogue](https://www.iso.org/standard/70242.html).
+  Annex D, the additional-layer ratings this page reads off the resonance
+  frequency.
+- International Organization for Standardization. (2017). *Building acoustics
+  — Estimation of acoustic performance of buildings from the performance of
+  elements — Part 2: Impact sound insulation between rooms*
+  (ISO 12354-2:2017).
+  [iso.org catalogue](https://www.iso.org/standard/70243.html).
+  Annex C, the floating-floor improvement and its weighted rating, and the
+  Annex G worked example whose per-band column anchors Formula (C.1).
+
+## Standards
+
+ISO 12354-2:2017, Annex C: the floating-floor resonance (Formula C.2), the
+improvement spectrum of Formula (C.1) and the weighted ratings of Formulae
+(C.4) and (C.5), with the combination rule of Formula (C.6). The per-band
+column of the Annex G worked example anchors Formula (C.1) band for band.
+
+ISO 12354-1:2017, Annex D: the additional-layer resonance (Formulae D.1 and
+D.2), the Table D.1 ratings read at the rounded one-third-octave band of the
+resonance, and the corrections of Formulae (D.3) to (D.8). Two defects of the
+printed annex are recorded in `docs/ERRATA.md`. What each formula rests on is
+set out in "What is anchored on a published number, and what is not" above.
 
 ## See also
 
