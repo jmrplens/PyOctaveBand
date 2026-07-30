@@ -177,12 +177,13 @@ def test_empty_bands_are_reported_as_minus_infinity() -> None:
 
 def test_strike_sel_spectrum_validates_its_arguments() -> None:
     x = _pulse(50.0, 0.2)
+    silence = np.zeros(1024)
     with pytest.raises(ValueError, match="fraction"):
         strike_sel_spectrum(x, FS, fraction=6)
     with pytest.raises(ValueError, match="limits"):
         strike_sel_spectrum(x, FS, limits=(2000.0, 100.0))
     with pytest.raises(ValueError, match="no energy"):
-        strike_sel_spectrum(np.zeros(1024), FS)
+        strike_sel_spectrum(silence, FS)
 
 
 def test_strike_sel_spectrum_plot_returns_axes() -> None:

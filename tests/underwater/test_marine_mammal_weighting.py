@@ -441,8 +441,9 @@ def test_invalid_event_count_raises(n_events: float) -> None:
 
 
 def test_non_finite_peak_spl_raises() -> None:
+    not_a_number = float("nan")
     with pytest.raises(ValueError, match="peak_spl"):
-        weighted_exposure([1000.0], [170.0], "LF", peak_spl=float("nan"))
+        weighted_exposure([1000.0], [170.0], "LF", peak_spl=not_a_number)
 
 
 def test_plot_returns_axes() -> None:

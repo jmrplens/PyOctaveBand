@@ -9,7 +9,7 @@ head:
     attrs:
       type: application/ld+json
     content: |
-      {"@context":"https://schema.org","@type":"Dataset","@id":"https://jmrplens.github.io/phonometry/reference/conformance/#dataset","name":"phonometry numerical conformance report","description":"462 numerical conformance checks pinning each implemented acoustic metric to a clause, table or worked example of the governing standard, with the normative expected value, the value phonometry computes, the delta and a pass/fail verdict, across 53 domains and 304 standards. Regenerated and enforced by CI on every pull request.","url":"https://jmrplens.github.io/phonometry/reference/conformance/","inLanguage":"en","license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"creator":{"@id":"https://jmrp.io/#person"},"publisher":{"@id":"https://jmrp.io/#person"},"about":{"@id":"https://github.com/jmrplens/phonometry#software"},"measurementTechnique":"Comparison of computed values against the normative expected values published in the governing standards (tolerance tables and worked examples).","variableMeasured":[{"@type":"PropertyValue","name":"Standard","description":"Governing standard and clause or table"},{"@type":"PropertyValue","name":"Quantity","description":"Acoustic quantity under test"},{"@type":"PropertyValue","name":"Expected","description":"Normative value published in the standard"},{"@type":"PropertyValue","name":"Computed","description":"Value computed by phonometry"},{"@type":"PropertyValue","name":"Delta","description":"Signed difference between computed and expected"},{"@type":"PropertyValue","name":"Status","description":"Pass or fail verdict against the standard's tolerance"}],"distribution":{"@type":"DataDownload","encodingFormat":"text/markdown","contentUrl":"https://raw.githubusercontent.com/jmrplens/phonometry/main/docs/CONFORMANCE.md"},"isBasedOn":"https://github.com/jmrplens/phonometry/blob/main/scripts/conformance_report.py","identifier":{"@type":"PropertyValue","propertyID":"DOI","value":"10.5281/zenodo.21215280"}}
+      {"@context":"https://schema.org","@type":"Dataset","@id":"https://jmrplens.github.io/phonometry/reference/conformance/#dataset","name":"phonometry numerical conformance report","description":"470 numerical conformance checks pinning each implemented acoustic metric to a clause, table or worked example of the governing standard, with the normative expected value, the value phonometry computes, the delta and a pass/fail verdict, across 55 domains and 312 standards. Regenerated and enforced by CI on every pull request.","url":"https://jmrplens.github.io/phonometry/reference/conformance/","inLanguage":"en","license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"creator":{"@id":"https://jmrp.io/#person"},"publisher":{"@id":"https://jmrp.io/#person"},"about":{"@id":"https://github.com/jmrplens/phonometry#software"},"measurementTechnique":"Comparison of computed values against the normative expected values published in the governing standards (tolerance tables and worked examples).","variableMeasured":[{"@type":"PropertyValue","name":"Standard","description":"Governing standard and clause or table"},{"@type":"PropertyValue","name":"Quantity","description":"Acoustic quantity under test"},{"@type":"PropertyValue","name":"Expected","description":"Normative value published in the standard"},{"@type":"PropertyValue","name":"Computed","description":"Value computed by phonometry"},{"@type":"PropertyValue","name":"Delta","description":"Signed difference between computed and expected"},{"@type":"PropertyValue","name":"Status","description":"Pass or fail verdict against the standard's tolerance"}],"distribution":{"@type":"DataDownload","encodingFormat":"text/markdown","contentUrl":"https://raw.githubusercontent.com/jmrplens/phonometry/main/docs/CONFORMANCE.md"},"isBasedOn":"https://github.com/jmrplens/phonometry/blob/main/scripts/conformance_report.py","identifier":{"@type":"PropertyValue","propertyID":"DOI","value":"10.5281/zenodo.21215280"}}
 ---
 
 phonometry's key differentiator is not the feature list but the proof behind
@@ -66,7 +66,7 @@ with its evidence and what the library does about it, is recorded in the
 
 ## Numerical conformance report
 
-&#9989; **462/462 conformance checks pass** across 53 domains and 304 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+&#9989; **470/470 conformance checks pass** across 55 domains and 312 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
 
@@ -720,7 +720,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary>&#9989; <b>Underwater sound propagation (transmission loss)</b>: 100% (15/15)</summary>
+<summary>&#9989; <b>Underwater sound propagation (transmission loss)</b>: 100% (16/16)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
@@ -739,6 +739,30 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | Mellen thermal noise | Thermal spectrum level at 50 kHz, 16.85 °C (physical), dB re 1 µPa²/Hz | 19.3426 dB (+/-0 dB) | 19.3426 dB | 0 dB | &#9989; |
 | JOMOPANS-ECHO ship source level | Bulker V=13.5 kn L=211 m band level at 1 kHz (File S1 oracle), dB re 1 µPa m | 161.394 dB (+/-0.01 dB) | 161.394 dB | 0 dB | &#9989; |
 | UNESCO sound speed (EOS-80 canonical value) | SVEL(S = 40, T68 = 40 °C, P = 1000 bar) vs Fofonoff & Millard 1983, m/s | 1731.995 m/s (+/-0.02 m/s) | 1732.004 m/s | 0.009 m/s | &#9989; |
+| Medwin (1975) sound speed (Ainslie Eqs. 1.2-1.4) | ∂c/∂T at 10 °C, neglecting the bracketed terms, m/s per °C | 3.5 m/s per °C (+/-0.001 m/s per °C) | 3.5 m/s per °C | 0 m/s per °C | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Underwater propagation regimes (Weston flux theory)</b>: 100% (3/3)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| Ainslie (2010) Table 9.1, medium sand | Reflection loss gradient η from Equation (9.51), Np/rad | 0.28 Np/rad (+/-0.005 Np/rad) | 0.278 Np/rad | -0.002 Np/rad | &#9989; |
+| Ainslie (2010) Table 9.1, mud | Reflection loss gradient η from Equation (9.53) at 1 Hz, Np/rad | 0.021 Np/rad (+/-0.0005 Np/rad) | 0.02073 Np/rad | 0 Np/rad | &#9989; |
+| Weston cylindrical spreading vs normal modes | Range-averaged TL in an ideal 100 m waveguide at 100 Hz, 20-30 km, dB | 58.949 dB (+/-1 dB) | 58.399 dB | -0.55 dB | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Marine-mammal auditory weighting (NMFS / Southall)</b>: 100% (4/4)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| NMFS (2018) Appendix D worked example | Weighting factor adjustment W(1 kHz) for high-frequency cetaceans, dB | -37.55 dB (+/-0.01 dB) | -37.545 dB | 0.005 dB | &#9989; |
+| NMFS (2024) v3.0 Table 5, otariid C | C recomputed as the peak of W(f) for the OW row (printed 1.37, corrected 1.36), dB | 1.3643 dB (+/-0.0005 dB) | 1.3643 dB | 0 dB | &#9989; |
+| Ainslie (2010) Equation (11.159), orca audiogram | Hearing threshold at 50 kHz (third branch), dB re 1 µPa | 51.2 dB (+/-0.05 dB) | 51.199 dB | -0.001 dB | &#9989; |
+| Ainslie (2010) §11.4.6, orca versus salmon | Noise-limited figure of merit (SL + TS − NL + AG − DT)/2, dB re m² | 51 dB (+/-0 dB) | 51 dB | 0 dB | &#9989; |
 
 </details>
 

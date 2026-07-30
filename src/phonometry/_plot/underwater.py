@@ -14,6 +14,7 @@ from .common import (
     _C_REFERENCE,
     _C_SECONDARY,
     _C_TERTIARY,
+    _LEGEND_LOWER_LEFT,
     _LEGEND_UPPER_RIGHT,
     _new_axes,
     _new_axes_column,
@@ -42,6 +43,11 @@ if TYPE_CHECKING:
     from ..underwater.sonar_equation import DetectionRangeResult, SonarEquationResult
     from ..underwater.sound_speed import SoundSpeedProfile
     from ..underwater.weston_regimes import WestonPropagationResult
+
+#: Axis label and legend placement reused by several renderers in this module
+#: (kept as named constants so the literal appears once).
+_RANGE_LABEL = "Range [m]"
+_BAND_SEL_LABEL = "Band SEL [dB re 1 µPa²·s]"
 
 #: Spanish translations of the fixed strings rendered by the underwater
 #: ``.plot()`` renderers, keyed by their verbatim English text.  ``_t``
@@ -261,7 +267,7 @@ def plot_sound_speed_profile(
     ax.set_ylabel(_t("Depth [m]", language))
     ax.set_title(_t("Sea-water sound-speed profile", language))
     ax.grid(True, alpha=0.3)
-    ax.legend(loc="lower left", fontsize="small")
+    ax.legend(loc=_LEGEND_LOWER_LEFT, fontsize="small")
     localize_axes(ax, language)
     return ax
 
@@ -289,7 +295,7 @@ def plot_transmission_loss(
             label=f"{_t('Spreading', language)} ({result.law})")
     ax.plot(r, np.asarray(result.absorption), color=_C_SECONDARY, lw=1.0, ls=":",
             label=f"{_t('Absorption', language)} ({decimal_comma(f'{result.absorption_coefficient:.3g}', language)} dB/km)")
-    ax.set_xlabel(_t("Range [m]", language))
+    ax.set_xlabel(_t(_RANGE_LABEL, language))
     ax.set_ylabel(_t("Transmission loss [dB]", language))
     ax.set_title(f"{_t('Underwater transmission loss', language)} ({result.model})")
     if not ax.yaxis_inverted():
@@ -625,7 +631,7 @@ def plot_weston_regimes(
     finite = np.asarray(result.propagation_loss)[np.isfinite(result.propagation_loss)]
     if finite.size:
         ax.set_ylim(float(finite.max()) + 10.0, float(finite.min()) - 5.0)
-    ax.set_xlabel(_t("Range [m]", language))
+    ax.set_xlabel(_t(_RANGE_LABEL, language))
     ax.set_ylabel(_t("Propagation loss [dB re 1 m²]", language))
     ax.set_title(
         f"{_t('Weston regimes', language)} "
@@ -634,7 +640,7 @@ def plot_weston_regimes(
     )
     ax.grid(True, which="both", alpha=0.3)
     ax.set_axisbelow(True)
-    ax.legend(loc="lower left", fontsize="small")
+    ax.legend(loc=_LEGEND_LOWER_LEFT, fontsize="small")
     localize_axes(ax, language)
     return ax
 
@@ -711,7 +717,7 @@ def plot_weighted_exposure(
     from .._i18n import format_number, localize_axes
 
     freqs = np.asarray(result.frequencies, dtype=np.float64)
-    ax = _spectrum_axes(ax, freqs, ylabel="Band SEL [dB re 1 µPa²·s]",
+    ax = _spectrum_axes(ax, freqs, ylabel=_BAND_SEL_LABEL,
                         title="Weighted exposure vs criteria", language=language)
     ax.plot(freqs, _plottable(result.band_sel), "o--", ms=3,
             color=_C_MUTED, lw=1.0, label=_t("Unweighted", language))
@@ -750,7 +756,7 @@ def plot_strike_sel_spectrum(
     from .._i18n import format_number, localize_axes
 
     freqs = np.asarray(result.frequencies, dtype=np.float64)
-    ax = _spectrum_axes(ax, freqs, ylabel="Band SEL [dB re 1 µPa²·s]",
+    ax = _spectrum_axes(ax, freqs, ylabel=_BAND_SEL_LABEL,
                         title="Single-strike SEL per band", language=language)
     ax.plot(freqs, _plottable(result.band_sel),
             **{"color": _C_PRIMARY, "lw": 1.4, "marker": "o", "ms": 3,
@@ -788,13 +794,13 @@ def plot_detection_range(
         ax.axvline(result.detection_range, color=_C_REFERENCE, ls=":", lw=1.2,
                    label=(f"{_t('Detection range', language)} "
                           f"{format_number(result.detection_range, language, decimals=0)} m"))
-    ax.set_xlabel(_t("Range [m]", language))
+    ax.set_xlabel(_t(_RANGE_LABEL, language))
     ax.set_ylabel(_t("Transmission loss [dB]", language))
     ax.set_title(_t("Transmission loss vs figure of merit", language))
     if not ax.yaxis_inverted():
         ax.invert_yaxis()
     ax.grid(True, alpha=0.3)
     ax.set_axisbelow(True)
-    ax.legend(loc="lower left", fontsize="small")
+    ax.legend(loc=_LEGEND_LOWER_LEFT, fontsize="small")
     localize_axes(ax, language)
     return ax

@@ -117,14 +117,20 @@ def _row(
     )
 
 
+#: Group descriptions shared by the three parameter tables. The NMFS 2018 "MF"
+#: row and the NMFS 2024 / Southall "HF" row are the same animals under
+#: different codes, which is why the same description text recurs.
+_LF_CETACEANS = "Low-frequency cetaceans"
+_HF_CETACEANS = "High-frequency cetaceans"
+
 #: NMFS (2018) revision v2.0, Table 3 = Table ES2 (printed pp. 18 and 3) with
 #: the generalised hearing ranges of Table ES1 (printed p. 2).
 _NMFS_2018: dict[str, WeightingParameters] = {
-    "LF": _row("LF", "nmfs-2018", "Low-frequency cetaceans",
+    "LF": _row("LF", "nmfs-2018", _LF_CETACEANS,
                1.0, 2.0, 0.2, 19.0, 0.13, 179.0, hearing_range=(7.0, 35e3)),
     "MF": _row("MF", "nmfs-2018", "Mid-frequency cetaceans",
                1.6, 2.0, 8.8, 110.0, 1.20, 177.0, hearing_range=(150.0, 160e3)),
-    "HF": _row("HF", "nmfs-2018", "High-frequency cetaceans",
+    "HF": _row("HF", "nmfs-2018", _HF_CETACEANS,
                1.8, 2.0, 12.0, 140.0, 1.36, 152.0, hearing_range=(275.0, 160e3)),
     "PW": _row("PW", "nmfs-2018", "Phocid pinnipeds (underwater)",
                1.0, 2.0, 1.9, 30.0, 0.75, 180.0, hearing_range=(50.0, 86e3)),
@@ -136,9 +142,9 @@ _NMFS_2018: dict[str, WeightingParameters] = {
 #: generalised hearing ranges of Table ES1 (printed p. 2). The otariid ``C`` is
 #: implemented as 1.36 dB (see the module note).
 _NMFS_2024: dict[str, WeightingParameters] = {
-    "LF": _row("LF", "nmfs-2024", "Low-frequency cetaceans",
+    "LF": _row("LF", "nmfs-2024", _LF_CETACEANS,
                0.99, 5.0, 0.168, 26.6, 0.12, 177.0, hearing_range=(7.0, 36e3)),
-    "HF": _row("HF", "nmfs-2024", "High-frequency cetaceans",
+    "HF": _row("HF", "nmfs-2024", _HF_CETACEANS,
                1.55, 5.0, 1.73, 129.0, 0.32, 181.0, hearing_range=(150.0, 160e3)),
     "VHF": _row("VHF", "nmfs-2024", "Very high-frequency cetaceans",
                 2.23, 5.0, 5.93, 186.0, 0.91, 160.0, hearing_range=(200.0, 165e3)),
@@ -158,9 +164,9 @@ _NMFS_2024: dict[str, WeightingParameters] = {
 #: Southall et al. (2019) Table 5 (printed p. 149). The article tabulates no
 #: generalised hearing range, so those fields stay ``None``.
 _SOUTHALL_2019: dict[str, WeightingParameters] = {
-    "LF": _row("LF", "southall-2019", "Low-frequency cetaceans",
+    "LF": _row("LF", "southall-2019", _LF_CETACEANS,
                1.0, 2.0, 0.20, 19.0, 0.13, 179.0),
-    "HF": _row("HF", "southall-2019", "High-frequency cetaceans",
+    "HF": _row("HF", "southall-2019", _HF_CETACEANS,
                1.6, 2.0, 8.8, 110.0, 1.20, 177.0),
     "VHF": _row("VHF", "southall-2019", "Very high-frequency cetaceans",
                 1.8, 2.0, 12.0, 140.0, 1.36, 152.0),
