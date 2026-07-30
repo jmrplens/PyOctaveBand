@@ -138,13 +138,17 @@ lighthouse:
 reports:
 	$(PYTHON) scripts/generate_reports.py
 
-# Regenerate the committed, versioned numerical conformance report. The
-# --file-header flag prepends the "do not hand-edit" note; the body is exactly
-# what the CI PR-comment harness computes. CI fails if this drifts (see the
-# `conformance` job in python-app.yml).
+# Regenerate the committed, versioned numerical conformance report, then bring
+# every count quoted from it into line. The --file-header flag prepends the
+# "do not hand-edit" note; the body is exactly what the CI PR-comment harness
+# computes. The second step rewrites the counts in the prose that has no build
+# step to interpolate them through (.zenodo.json, the plain-markdown mirror
+# under docs/, the site frontmatter); the Astro page bodies import them from
+# site/src/data/conformance-stats.mjs and need nothing. CI fails if either
+# output drifts (see the `conformance` job in python-app.yml).
 conformance:
 	$(PYTHON) scripts/conformance_report.py --file-header > docs/CONFORMANCE.md
-	$(PYTHON) scripts/check_conformance_claims.py
+	$(PYTHON) scripts/check_conformance_claims.py --write
 
 # Optional convenience: install a git pre-commit hook that regenerates
 # docs/CONFORMANCE.md when the library source or the report generator changes.

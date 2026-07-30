@@ -600,6 +600,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- The conformance counts quoted outside the report are generated, not typed.
+  `docs/CONFORMANCE.md` has always been the authority for "N/N conformance
+  checks pass across D domains and S standards", and the Astro page bodies
+  import those integers from `site/src/data/conformance-stats.mjs`, but six
+  further places wrote them out and were only validated: `.zenodo.json`,
+  `docs/getting-started.md`, the two landing-page meta descriptions and the
+  JSON-LD `description` of both conformance pages. Every change that moved a
+  count left all six stale until someone edited them, and one of them merged
+  silently wrong, because a file quoting two counts whose sides agree on one and
+  differ on the other merges without a conflict. `scripts/check_conformance_claims.py`
+  now has a `--write` (`--fix`) mode that substitutes the authoritative value in
+  place, and `make conformance` runs it straight after regenerating the report,
+  so the numbers come out of the pipeline. Checking and writing share one list
+  of patterns and cannot diverge, the substitution uses the span of the captured
+  digits rather than a textual replace (so an unrelated figure that happens to
+  equal the old count is left alone), and the default read-only behaviour is
+  unchanged and remains the CI gate, now with the staleness diff widened from
+  the report alone to every file the pipeline can rewrite. The four site-side
+  claims live in YAML frontmatter, which is parsed before MDX compiles and
+  therefore cannot interpolate an import whatever the file extension, so they
+  stay with the writer rather than with `conformance-stats.mjs`.
+
 - The filter-bank reuse test asserts the property it is named after instead of a
   stopwatch. It used to compare `time.time()` deltas and require the class-based
   path to stay within 1.5x of the functional one, which on a shared runner under

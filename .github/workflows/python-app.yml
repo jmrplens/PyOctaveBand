@@ -48,7 +48,8 @@ jobs:
       run: bandit -r src
 
   # Fast gate (~12 s harness, runtime deps only, no pytest): the committed
-  # docs/CONFORMANCE.md must equal a fresh `make conformance` run.
+  # docs/CONFORMANCE.md, and every count quoted from it, must equal a fresh
+  # `make conformance` run.
   conformance:
     name: Conformance report up to date
     runs-on: ubuntu-latest
@@ -66,16 +67,24 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -e .
-    - name: Regenerate docs/CONFORMANCE.md
+    - name: Regenerate docs/CONFORMANCE.md and the counts quoted from it
       run: make conformance
-    - name: Fail if the committed report is stale
+    # `make conformance` now writes as well as reads: it regenerates the report
+    # and rewrites the counts quoted in .zenodo.json, the docs/ mirror and the
+    # site frontmatter. So the staleness gate has to cover the whole tree, not
+    # just the report. Diffing only docs/CONFORMANCE.md would let the rewrite
+    # fix the prose in the runner's checkout and pass, while the branch keeps
+    # the stale numbers.
+    - name: Fail if the committed report or any quoted count is stale
       run: |
-        if ! git diff --exit-code docs/CONFORMANCE.md; then
-          echo "::error file=docs/CONFORMANCE.md::docs/CONFORMANCE.md is out of date - run 'make conformance' and commit the result."
+        if ! git diff --exit-code; then
+          echo "::error::The conformance report or a count quoted from it is out of date - run 'make conformance' and commit the result."
           exit 1
         fi
-    # The report can be current while the prose quoting it is not: the counts
-    # were typed out in three places and two of them fell a release behind.
+    # Belt and braces, and the command to run locally: the read-only check on
+    # the committed state. The report can be current while the prose quoting it
+    # is not; the counts were typed out in three places and two of them fell a
+    # release behind.
     - name: Fail if any page quotes a stale conformance count
       run: python scripts/check_conformance_claims.py
 

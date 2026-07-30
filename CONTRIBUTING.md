@@ -131,8 +131,27 @@ library's own computations against the standards — never hand-edited. If CI's
 a reference table), regenerate and commit it:
 
 ```bash
-make conformance   # writes docs/CONFORMANCE.md
+make conformance   # writes docs/CONFORMANCE.md, then the counts quoted from it
 ```
+
+The header line of that report (`N/N conformance checks pass across D domains
+and S standards`) is the only place those three integers are authoritative.
+Nothing else states them by hand:
+
+- the Astro pages import them from `site/src/data/conformance-stats.mjs`, which
+  parses the header at build time;
+- everything with no build step to interpolate through — `.zenodo.json`, the
+  plain-markdown mirror under `docs/`, the landing-page meta descriptions and
+  the JSON-LD blocks in the site frontmatter — is rewritten by the second step
+  of `make conformance`, which is
+  `scripts/check_conformance_claims.py --write`. It replaces only the digits of
+  a recognised claim, so unrelated numbers and the surrounding prose are left
+  alone.
+
+Run `make conformance` and commit whatever it changes; do not edit those counts
+by hand. The read-only `python scripts/check_conformance_claims.py` is the CI
+gate, and is worth running after every rebase: a file that quotes two counts and
+only disagrees on one merges without a conflict and comes out silently wrong.
 
 Optionally run `make install-hooks` once to install a pre-commit hook that does
 this automatically when relevant sources change; the CI check is the enforcement,
