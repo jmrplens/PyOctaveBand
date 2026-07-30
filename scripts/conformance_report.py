@@ -6039,6 +6039,130 @@ def _chk_uwp_unesco_canonical() -> Outcome:
     return numeric(1731.995, got, 0.02, unit="m/s", places=3)
 
 
+@register(
+    _UW_PROP,
+    "Medwin (1975) sound speed (Ainslie Eqs. 1.2-1.4)",
+    "∂c/∂T at 10 °C, neglecting the bracketed terms, m/s per °C",
+)
+def _chk_uwp_medwin_derivative() -> Outcome:
+    # Oracle: Ainslie prints "∂c/∂T ≈ 4.6 − 0.110·T", i.e. 3.5 m/s per °C at
+    # 10 °C (printed p. 20). The cubic term sits inside the brackets the
+    # published derivative excludes, so it is removed before comparing.
+    from phonometry.underwater.sound_speed import sea_water_sound_speed
+
+    h = 1e-5
+    grad = (sea_water_sound_speed(10.0 + h, 35.0, 0.0, model="medwin")
+            - sea_water_sound_speed(10.0 - h, 35.0, 0.0, model="medwin")) / (2.0 * h)
+    return numeric(3.5, grad - 3.0 * 2.9e-4 * 100.0, 1e-3, unit="m/s per °C", places=4)
+
+
+_UW_WESTON = "Underwater propagation regimes (Weston flux theory)"
+
+
+@register(
+    _UW_WESTON,
+    "Ainslie (2010) Table 9.1, medium sand",
+    "Reflection loss gradient η from Equation (9.51), Np/rad",
+)
+def _chk_uww_eta_sand() -> Outcome:
+    # Oracle: the printed value 0.28 Np/rad of Table 9.1 (printed p. 454).
+    return numeric(0.28, float(ph.reflection_loss_gradient("sand")), 5e-3,
+                   unit="Np/rad", places=4)
+
+
+@register(
+    _UW_WESTON,
+    "Ainslie (2010) Table 9.1, mud",
+    "Reflection loss gradient η from Equation (9.53) at 1 Hz, Np/rad",
+)
+def _chk_uww_eta_mud() -> Outcome:
+    # Oracle: Table 9.1 prints η_mud = 0.021·f̂ Np/rad.
+    got = float(ph.reflection_loss_gradient("mud", frequency_hz=1.0))
+    return numeric(0.021, got, 5e-4, unit="Np/rad", places=5)
+
+
+@register(
+    _UW_WESTON,
+    "Weston cylindrical spreading vs normal modes",
+    "Range-averaged TL in an ideal 100 m waveguide at 100 Hz, 20-30 km, dB",
+)
+def _chk_uww_flux_vs_modes() -> Outcome:
+    # Independent cross-check: the range average of the coherent modal field is
+    # the incoherent modal sum, whose many-mode limit is exactly F = π/(r·H) --
+    # Equation (9.42) with ψc = π/2. Averaged over receiver depth to remove the
+    # sin² sampling bias of a single depth.
+    import numpy as _np
+
+    ranges = _np.linspace(20_000.0, 30_000.0, 1001)
+    energies = [
+        _np.mean(10.0 ** (-ph.normal_modes(
+            100.0, [0.0, 100.0], [1500.0, 1500.0], source_depth=41.0,
+            receiver_depth=float(zr), ranges_m=ranges).transmission_loss / 10.0))
+        for zr in _np.linspace(10.0, 90.0, 9)
+    ]
+    numeric_tl = -10.0 * math.log10(float(_np.mean(energies)))
+    flux = ph.weston_propagation_loss(ranges, 100.0, 100.0, critical_angle=90.0,
+                                      reflection_loss_gradient_value=0.0)
+    expected = -10.0 * math.log10(
+        float(_np.mean(10.0 ** (-flux.propagation_loss / 10.0))))
+    return numeric(expected, numeric_tl, 1.0, unit="dB", places=3)
+
+
+_UW_FAUNA = "Marine-mammal auditory weighting (NMFS / Southall)"
+
+
+@register(
+    _UW_FAUNA,
+    "NMFS (2018) Appendix D worked example",
+    "Weighting factor adjustment W(1 kHz) for high-frequency cetaceans, dB",
+)
+def _chk_uwf_appendix_d() -> Outcome:
+    # Oracle: the published worked example (printed p. 130) lists W(1 kHz) for
+    # the five hearing groups; the HF value is -37.55 dB.
+    got = float(ph.auditory_weighting(1000.0, "HF", guidance="nmfs-2018").weighting[0])
+    return numeric(-37.55, got, 0.01, unit="dB", places=3)
+
+
+@register(
+    _UW_FAUNA,
+    "NMFS (2024) v3.0 Table 5, otariid C",
+    "C recomputed as the peak of W(f) for the OW row (printed 1.37, corrected 1.36), dB",
+)
+def _chk_uwf_otariid_c() -> Outcome:
+    # NMFS's own footnote states the printed 1.37 should read 1.36; recomputing
+    # C = -max W(f) from the same row's a/b/f1/f2 gives 1.3643 dB.
+    import numpy as _np
+
+    params = ph.weighting_parameters("OW", guidance="nmfs-2024")
+    freqs = _np.logspace(0.0, 6.0, 400_001)
+    shape = ph.auditory_weighting(freqs, "OW", guidance="nmfs-2024").weighting - params.c_db
+    return numeric(1.3643, -float(_np.max(shape)), 5e-4, unit="dB", places=4)
+
+
+@register(
+    _UW_FAUNA,
+    "Ainslie (2010) Equation (11.159), orca audiogram",
+    "Hearing threshold at 50 kHz (third branch), dB re 1 µPa",
+)
+def _chk_uwf_orca() -> Outcome:
+    # Oracle: "The threshold ... at the pulse center frequency (50 kHz) is
+    # 51.2 dB re µPa²" (printed p. 619); the second branch would give 50.5 dB.
+    return numeric(51.2, float(ph.orca_audiogram(50e3).threshold[0]), 0.05,
+                   unit="dB", places=3)
+
+
+@register(
+    _UW_FAUNA,
+    "Ainslie (2010) §11.4.6, orca versus salmon",
+    "Noise-limited figure of merit (SL + TS − NL + AG − DT)/2, dB re m²",
+)
+def _chk_uwf_orca_fom() -> Outcome:
+    # Oracle: Table 11.7 (printed p. 624) prints FOM_NL = 51.0 dB re m².
+    res = ph.active_sonar_equation(198.2, [0.0], -29.0, 75.0, directivity_index=16.5,
+                                   detection_threshold=8.7)
+    return numeric(51.0, res.figure_of_merit, 1e-6, unit="dB", places=3)
+
+
 _UW_NUM = "Underwater numerical propagation (modes / rays / PE)"
 
 

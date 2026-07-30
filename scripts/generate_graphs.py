@@ -1030,6 +1030,19 @@ _ES_EXACT = {
     "Depth [m]": "Profundidad [m]",
     "UNESCO sound speed": "Velocidad del sonido UNESCO",
     "Sound-channel axis": "Eje del canal sonoro",
+    # Weston shallow-water propagation regimes (Ainslie section 9.1.1.2).
+    "Weston Shallow-Water Propagation Regimes (Ainslie §9.1.1.2)":
+        "Regímenes de propagación de Weston en aguas someras (Ainslie §9.1.1.2)",
+    "Propagation loss [dB re 1 m²]": "Pérdida de propagación [dB re 1 m²]",
+    "Spherical, 20 lg r": "Esférica, 20 lg r",
+    "Cylindrical, 10 lg r": "Cilíndrica, 10 lg r",
+    "Mode stripping, 15 lg r": "Descamado de modos, 15 lg r",
+    "Single mode": "Modo único",
+    "Composite propagation loss": "Pérdida de propagación compuesta",
+    # Marine-mammal auditory weighting (NMFS 2024 v3.0).
+    "Marine-Mammal Auditory Weighting (NMFS 2024, v3.0)":
+        "Ponderación auditiva de mamíferos marinos (NMFS 2024, v3.0)",
+    "Weighting amplitude W(f) [dB]": "Amplitud de ponderación W(f) [dB]",
     "Passive Sonar Equation": "Ecuación del sonar pasivo",
     "Signal excess [dB]": "Exceso de señal [dB]",
     "Signal excess": "Exceso de señal",
@@ -1678,6 +1691,18 @@ _ES_PATTERNS = [
     (r"^LRA = (.+) LU \(P10-P95\)$", "LRA = \\1 LU (P10-P95)"),
     (r"^f = 10 kHz, α = (.+) dB/km\npractical spreading \(R₀ = 1000 m\)$",
      "f = 10 kHz, α = \\1 dB/km\\nensanchamiento práctico (R₀ = 1000 m)"),
+    (r"^f = 250 Hz, H = 50 m, medium sand\nψc = (.+)°, η = (.+) Np/rad, (.+) modes$",
+     "f = 250 Hz, H = 50 m, arena media\\nψc = \\1°, η = \\2 Np/rad, \\3 modos"),
+    (r"^Low-frequency cetaceans \(AUD INJ (.+) dB\)$",
+     r"Cetáceos de baja frecuencia (AUD INJ \1 dB)"),
+    (r"^High-frequency cetaceans \(AUD INJ (.+) dB\)$",
+     r"Cetáceos de alta frecuencia (AUD INJ \1 dB)"),
+    (r"^Very high-frequency cetaceans \(AUD INJ (.+) dB\)$",
+     r"Cetáceos de muy alta frecuencia (AUD INJ \1 dB)"),
+    (r"^Phocid pinnipeds \(water\) \(AUD INJ (.+) dB\)$",
+     r"Pinnípedos fócidos (agua) (AUD INJ \1 dB)"),
+    (r"^Otariid pinnipeds \(water\) \(AUD INJ (.+) dB\)$",
+     r"Pinnípedos otáridos (agua) (AUD INJ \1 dB)"),
     (r"^SL = 140, NL = 60, DI = 15, DT = 8 dB\nfigure of merit = (.+) dB$",
      "SL = 140, NL = 60, DI = 15, DT = 8 dB\\nfigura de mérito = \\1 dB"),
     (r"^SAE band \((\d+) m\)$", r"banda SAE (\1 m)"),
@@ -6104,6 +6129,99 @@ def generate_underwater_transmission_loss(output_dir: str) -> None:
             bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.6})
     plt.tight_layout()
     save_figure(output_dir, "underwater_transmission_loss.svg")
+    plt.close()
+
+
+def generate_weston_regimes(output_dir: str) -> None:
+    """Weston's four shallow-water propagation regimes and their boundaries."""
+    print("Generating weston_regimes...")
+    from phonometry import weston_propagation_loss
+
+    # A 50 m shallow-water site over medium sand at 250 Hz, the frequency and
+    # sediment pair Ainslie uses to illustrate the transition (Figure 9.7).
+    ranges = np.logspace(1.0, 5.3, 500)
+    res = weston_propagation_loss(ranges, 250.0, 50.0, seabed="sand",
+                                  source_depth=10.0, receiver_depth=25.0)
+    bounds = res.boundaries
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    ax.set_xscale("log")
+    # Each law is drawn from a third of a decade before it takes over: an
+    # asymptotic form extrapolated far outside its own regime is meaningless
+    # (the single-mode formula would sit below free field at 10 m).
+    for curve, onset, label, color, style in (
+        (res.spherical, 0.0, "Spherical, 20 lg r", "#8c8c8c", ":"),
+        (res.cylindrical, bounds.spherical_to_cylindrical,
+         "Cylindrical, 10 lg r", COLOR_SECONDARY, "--"),
+        (res.mode_stripping, bounds.cylindrical_to_mode_stripping,
+         "Mode stripping, 15 lg r", COLOR_TERTIARY, "-."),
+        (res.single_mode, bounds.mode_stripping_to_single_mode,
+         "Single mode", "#9467bd", (0, (3, 1, 1, 1))),
+    ):
+        shown = np.where(res.range_m >= onset / 3.0, curve, np.nan)
+        ax.plot(res.range_m, shown, linestyle=style, linewidth=1.3, color=color, label=label)
+    ax.plot(res.range_m, res.propagation_loss, color=COLOR_PRIMARY, linewidth=2.6,
+            label="Composite propagation loss")
+    for boundary, name in (
+        (bounds.spherical_to_cylindrical, "H/2ψc"),
+        (bounds.cylindrical_to_mode_stripping, "r_CS"),
+        (bounds.mode_stripping_to_single_mode, "r_MS"),
+    ):
+        ax.axvline(boundary, color=COLOR_SECONDARY, linestyle="--", linewidth=0.9, alpha=0.6)
+        ax.annotate(name, xy=(boundary, 22.0), xytext=(4, 0), textcoords="offset points",
+                    fontsize=9, color=COLOR_SECONDARY)
+    ax.set_xlabel("Range [m]")
+    ax.set_ylabel("Propagation loss [dB re 1 m²]")
+    ax.set_title("Weston Shallow-Water Propagation Regimes (Ainslie §9.1.1.2)",
+                 fontweight="bold", pad=12)
+    ax.set_ylim(130.0, 18.0)
+    ax.set_xlim(float(ranges[0]), float(ranges[-1]))
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower left", fontsize=9)
+    ax.text(0.98, 0.05,
+            f"f = 250 Hz, H = 50 m, medium sand\n"
+            f"ψc = {np.degrees(bounds.critical_angle):.1f}°, "
+            f"η = {bounds.reflection_loss_gradient:.2f} Np/rad, "
+            f"{bounds.mode_count:.0f} modes",
+            transform=ax.transAxes, va="bottom", ha="right", fontsize=10,
+            bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.6})
+    plt.tight_layout()
+    save_figure(output_dir, "weston_regimes.svg")
+    plt.close()
+
+
+def generate_marine_mammal_weighting(output_dir: str) -> None:
+    """NMFS 2024 auditory weighting functions for the five in-water groups."""
+    print("Generating marine_mammal_weighting...")
+    from phonometry import auditory_weighting, exposure_criteria
+
+    freqs = np.logspace(1.0, 5.4, 700)
+    groups = (
+        ("LF", "Low-frequency cetaceans", COLOR_PRIMARY, "-"),
+        ("HF", "High-frequency cetaceans", COLOR_SECONDARY, "--"),
+        ("VHF", "Very high-frequency cetaceans", COLOR_TERTIARY, "-."),
+        ("PW", "Phocid pinnipeds (water)", "#9467bd", ":"),
+        ("OW", "Otariid pinnipeds (water)", "#8c564b", (0, (3, 1, 1, 1))),
+    )
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    for group, label, color, style in groups:
+        res = auditory_weighting(freqs, group, guidance="nmfs-2024")
+        crit = exposure_criteria(group, guidance="nmfs-2024", impulsive=True)
+        ax.semilogx(res.frequencies, res.weighting, color=color, linestyle=style,
+                    linewidth=2.0,
+                    label=f"{label} (AUD INJ {crit.injury_sel:.0f} dB)")
+    ax.axhline(0.0, color="#8c8c8c", linestyle=":", linewidth=1.0)
+    ax.set_xlabel("Frequency [Hz]")
+    ax.set_ylabel("Weighting amplitude W(f) [dB]")
+    ax.set_title("Marine-Mammal Auditory Weighting (NMFS 2024, v3.0)",
+                 fontweight="bold", pad=12)
+    ax.set_ylim(-75.0, 5.0)
+    ax.set_xlim(10.0, 250e3)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower center", fontsize=9, ncol=2, framealpha=0.92)
+    plt.tight_layout()
+    save_figure(output_dir, "marine_mammal_weighting.svg")
     plt.close()
 
 
@@ -13236,8 +13354,11 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     # Underwater propagation: transmission loss, sound-speed profile and the
     # sonar equation.
     generate_underwater_transmission_loss,
+    generate_weston_regimes,
     generate_underwater_sound_speed,
     generate_sonar_equation,
+    # Underwater fauna: regulatory auditory weighting (NMFS 2024).
+    generate_marine_mammal_weighting,
     # Underwater propagation: seabed reflection, ambient noise (Wenz) and
     # ship-traffic source level (JOMOPANS-ECHO).
     generate_seabed_reflection,

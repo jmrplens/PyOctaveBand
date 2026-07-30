@@ -220,6 +220,7 @@ _SECTION_LIST: tuple[Section, ...] = (
         modules=(
             "phonometry.underwater.acoustics",
             "phonometry.underwater.propagation",
+            "phonometry.underwater.weston_regimes",
             "phonometry.underwater.sound_speed",
             "phonometry.underwater.sonar_equation",
             "phonometry.underwater.ocean_ambient_noise",
@@ -227,6 +228,8 @@ _SECTION_LIST: tuple[Section, ...] = (
             "phonometry.underwater.ship_radiated_noise",
             "phonometry.underwater.ship_traffic_noise",
             "phonometry.underwater.pile_driving_noise",
+            "phonometry.underwater.marine_mammal_audiograms",
+            "phonometry.underwater.marine_mammal_weighting",
             "phonometry.underwater.numerical_propagation",
         ),
     ),

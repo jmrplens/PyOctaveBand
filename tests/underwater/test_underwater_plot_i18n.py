@@ -63,6 +63,71 @@ def test_seabed_reflection_plot_labels() -> None:
     plt.close("all")
 
 
+def test_weston_regime_plot_labels() -> None:
+    import numpy as np
+
+    from phonometry.underwater.weston_regimes import weston_propagation_loss
+
+    res = weston_propagation_loss(np.logspace(1.0, 5.0, 60), 250.0, 50.0, seabed="sand")
+    ax = res.plot()
+    assert ax.get_xlabel() == "Range [m]"
+    assert ax.get_ylabel() == "Propagation loss [dB re 1 m²]"
+    assert "Weston regimes" in ax.get_title()
+    labels = [t.get_text() for t in ax.get_legend().get_texts()]
+    assert "Composite" in labels
+    ax_es = res.plot(language="es")
+    labels_es = [t.get_text() for t in ax_es.get_legend().get_texts()]
+    assert ax_es.get_xlabel() == "Distancia [m]"
+    assert "Compuesto" in labels_es
+    assert "Modo único" in labels_es
+    assert not any("Cylindrical" in text for text in labels_es)
+    plt.close("all")
+
+
+def test_marine_mammal_plot_labels() -> None:
+    import numpy as np
+
+    from phonometry.underwater.marine_mammal_audiograms import group_audiogram
+    from phonometry.underwater.marine_mammal_weighting import (
+        auditory_weighting,
+        weighted_exposure,
+    )
+
+    freqs = np.logspace(2.0, 5.0, 80)
+    ax = group_audiogram(freqs, "VHF").plot()
+    assert ax.get_title() == "Group audiogram"
+    assert ax.get_ylabel() == "Hearing threshold [dB]"
+    ax_es = group_audiogram(freqs, "VHF").plot(language="es")
+    assert ax_es.get_title() == "Audiograma de grupo"
+    assert ax_es.get_ylabel() == "Umbral de audición [dB]"
+
+    ax_w = auditory_weighting(freqs, "LF").plot(language="es")
+    assert ax_w.get_title() == "Función de ponderación auditiva"
+    assert ax_w.get_ylabel() == "Ponderación W(f) [dB]"
+
+    bands = np.array([125.0, 250.0, 500.0, 1000.0])
+    res = weighted_exposure(bands, np.full(bands.size, 180.0), "LF", peak_spl=210.0)
+    ax_e = res.plot(language="es")
+    labels = [t.get_text() for t in ax_e.get_legend().get_texts()]
+    assert ax_e.get_title() == "Exposición ponderada frente a criterios"
+    assert any(text.startswith("Sin ponderar") for text in labels)
+    assert not any(text.startswith("Unweighted") for text in labels)
+    plt.close("all")
+
+
+def test_detection_range_plot_labels() -> None:
+    from phonometry.underwater.sonar_equation import detection_range
+
+    res = detection_range(78.0, 300.0)
+    ax = res.plot()
+    assert ax.get_title() == "Transmission loss vs figure of merit"
+    ax_es = res.plot(language="es")
+    labels = [t.get_text() for t in ax_es.get_legend().get_texts()]
+    assert ax_es.get_title() == "Pérdida por transmisión frente a cifra de mérito"
+    assert any(text.startswith("Alcance de detección") for text in labels)
+    plt.close("all")
+
+
 def test_ambient_noise_legend_localized() -> None:
     # A legend-heavy renderer: the composite curve plus its wind/thermal
     # components. Guards that every legend entry is localized (the composite

@@ -1,11 +1,13 @@
 #  Copyright (c) 2026. Jose M. Requena-Plens
-"""Tests for the speed of sound in sea water (UNESCO / Del Grosso / Mackenzie).
+"""Tests for the speed of sound in sea water (UNESCO / Del Grosso / Mackenzie / Medwin).
 
 Oracles: the printed Wong & Zhu (1995) ITS-90 check tables (Tables III and IV,
 the exact refit the module implements), the canonical Mackenzie check value
-1550.744 m/s (published, absolute), mutual agreement of the three independent
-equations within their common domain, and the Leroy & Parthiot standard-ocean
-pressure.
+1550.744 m/s (published, absolute), mutual agreement of the four independent
+equations within their common domain, the Leroy & Parthiot standard-ocean
+pressure, and for Medwin the two partial derivatives Ainslie prints alongside
+the formula (*Principles of Sonar Performance Modelling*, Springer 2010,
+Equations 1.2 to 1.4, printed p. 20).
 """
 
 from __future__ import annotations
@@ -115,6 +117,69 @@ def test_three_models_agree_in_common_domain() -> None:
     assert c_d == pytest.approx(1506.31, abs=0.05)
     assert c_m == pytest.approx(1506.26, abs=0.05)
     assert max(abs(c_u - c_d), abs(c_u - c_m), abs(c_d - c_m)) < 1.0
+
+
+def test_medwin_matches_hand_evaluation_of_equation_1_2() -> None:
+    """Ainslie Eq. (1.2): 1449.2 + 4.6T + 0.016z − 0.055T² + [(1.34 − 0.010T)(S−35)
+    + 2.9e-4·T³], recomputed term by term at 15 °C, 38 ppt, 200 m.
+    """
+    t, s, z = 15.0, 38.0, 200.0
+    expected = (
+        1449.2 + 4.6 * t + 0.016 * z - 0.055 * t**2
+        + (1.34 - 0.010 * t) * (s - 35.0) + 2.9e-4 * t**3
+    )
+    assert sea_water_sound_speed(t, s, z, model="medwin") == pytest.approx(expected, rel=1e-12)
+
+
+@pytest.mark.parametrize("temperature", [0.0, 10.0, 20.0, 30.0])
+def test_medwin_temperature_derivative_matches_equation_1_3(temperature: float) -> None:
+    """"∂c/∂T ≈ 4.6 − 0.110·T m/s per degree Celsius", neglecting the bracketed terms.
+
+    Ainslie states 3.5 m/s per °C at T = 10 °C.
+    """
+    h = 1e-5
+    kw = {"model": "medwin"}
+    full = (
+        sea_water_sound_speed(temperature + h, 35.0, 0.0, **kw)
+        - sea_water_sound_speed(temperature - h, 35.0, 0.0, **kw)
+    ) / (2.0 * h)
+    # Remove the derivative of the bracketed cubic term the equation excludes.
+    reduced = full - 3.0 * 2.9e-4 * temperature**2
+    assert reduced == pytest.approx(4.6 - 0.110 * temperature, abs=1e-4)
+    if temperature == 10.0:
+        assert reduced == pytest.approx(3.5, abs=1e-4)
+
+
+def test_medwin_depth_derivative_matches_equation_1_4() -> None:
+    """"∂c/∂z ≈ 0.016 m/s per meter" -- exact for the Medwin form."""
+    h = 1e-3
+    kw = {"model": "medwin"}
+    gradient = (
+        sea_water_sound_speed(10.0, 35.0, 500.0 + h, **kw)
+        - sea_water_sound_speed(10.0, 35.0, 500.0 - h, **kw)
+    ) / (2.0 * h)
+    assert gradient == pytest.approx(0.016, abs=1e-6)
+
+
+def test_medwin_agrees_with_the_other_three_over_the_common_domain() -> None:
+    """Medwin is a deliberately simplified fit; it stays within ~2.5 m/s of the rest."""
+    worst = 0.0
+    for t in (2.0, 10.0, 20.0, 30.0):
+        for s in (30.0, 35.0, 40.0):
+            for z in (0.0, 500.0, 1000.0, 2000.0):
+                speeds = [
+                    sea_water_sound_speed(t, s, z, model=m)
+                    for m in ("unesco", "del_grosso", "mackenzie", "medwin")
+                ]
+                worst = max(worst, max(speeds) - min(speeds))
+    assert worst < 2.5
+
+
+def test_medwin_profile_gradient_is_constant_in_isothermal_water() -> None:
+    depths = np.linspace(0.0, 1000.0, 21)
+    profile = sound_speed_profile(depths, 10.0, 35.0, model="medwin")
+    assert profile.model == "medwin"
+    assert np.allclose(profile.gradient, 0.016, atol=1e-9)
 
 
 def test_surface_speed_increases_with_temperature() -> None:

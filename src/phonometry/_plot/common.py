@@ -49,6 +49,8 @@ _STI_BAND_CENTERS = (125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0)
 
 #: Default legend placement shared by the band-spectrum figures.
 _LEGEND_UPPER_RIGHT: Final = "upper right"
+#: Legend placement for the range-axis figures, whose curves fall to the right.
+_LEGEND_LOWER_LEFT: Final = "lower left"
 
 # ---------------------------------------------------------------------------
 # Shared artist colors (matplotlib "tab10" hues plus neutral greys).

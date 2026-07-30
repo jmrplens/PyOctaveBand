@@ -7,7 +7,7 @@ sidebar:
 
 Speed of sound in sea water (empirical equations).
 
-Three coexisting equations for the sound speed `c` as a function of
+Four coexisting equations for the sound speed `c` as a function of
 temperature, salinity and depth/pressure, selectable through `model`:
 
 * `"unesco"` -- the UNESCO / Chen & Millero (1977) algorithm, the
@@ -15,6 +15,9 @@ temperature, salinity and depth/pressure, selectable through `model`:
 * `"del_grosso"` -- the Del Grosso (1974) equation (Wong & Zhu 1995 form),
   a high-accuracy alternative over a narrower domain.
 * `"mackenzie"` -- the Mackenzie (1981) nine-term depth-based equation.
+* `"medwin"` -- the Medwin (1975) six-term short formula, the simplest member
+  of the family, whose partial derivatives are the classic rules of thumb
+  `∂c/∂T ≈ 4.6 − 0.110·T` m/s per °C and `∂c/∂z ≈ 0.016` m/s per m.
 
 The UNESCO and Del Grosso equations use pressure, not depth, so a depth is first
 converted with the Leroy & Parthiot (1998) standard-ocean formula
@@ -25,7 +28,9 @@ Sources (clean-room, implemented from the equations, validated by cross-model
 agreement and the canonical Mackenzie check value 1550.744 m/s at 25 °C, 35 ppt,
 1000 m): NPL Technical Guide "Speed of Sound in Sea-Water" (Wong & Zhu 1995
 coefficient tables), Mackenzie (1981) JASA 70, Del Grosso (1974) JASA 56,
-Leroy & Parthiot (1998) JASA 103.
+Leroy & Parthiot (1998) JASA 103, Medwin (1975) as printed in Ainslie,
+*Principles of Sonar Performance Modelling* (Springer 2010), Equations
+(1.2)-(1.4), printed p. 20.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -77,7 +82,7 @@ Speed of sound in sea water, in metres per second.
 | `temperature` | Temperature `T`, in degrees Celsius. |
 | `salinity` | Salinity `S`, in parts per thousand (PSU). |
 | `depth` | Depth below the surface, in metres (`>= 0`). |
-| `model` | `"unesco"` (default), `"del_grosso"` or `"mackenzie"`. |
+| `model` | `"unesco"` (default), `"del_grosso"`, `"mackenzie"` or `"medwin"`. |
 | `latitude` | Latitude for the depth→pressure conversion, in degrees (used by `"unesco"` and `"del_grosso"`; default 45°). |
 
 **Returns:** The sound speed `c`, in m/s.
@@ -94,7 +99,10 @@ Each equation is a fit over a bounded oceanographic domain and
 T = 40 °C, S = 0, z = 11 km returns an unphysical ~1995 m/s).
 Published validity domains: UNESCO/Chen-Millero T 0-40 °C, S 0-40,
 P 0-1000 bar; Del Grosso T 0-30 °C, S 30-40, P 0-1000 kg/cm²;
-Mackenzie T 2-30 °C, S 25-40, depth 0-8000 m.
+Mackenzie T 2-30 °C, S 25-40, depth 0-8000 m. Medwin is a
+deliberately simplified fit ("not accurate by modern standards", in
+Ainslie's words) and drifts by a few m/s against the UNESCO standard
+away from mid-range temperatures and shallow depths.
 :::
 
 ## sound_speed_profile

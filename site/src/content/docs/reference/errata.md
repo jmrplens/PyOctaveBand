@@ -1240,6 +1240,145 @@ to the issuing body, with date and reference).
 
 ---
 
+## Ainslie, Principles of Sonar Performance Modelling (2010), Eq. (9.57)
+
+*Textbook, not a standard.*
+
+- **Location:** Section 9.1.1.2.4 (printed p. 457), the transition range
+  between the mode-stripping and single-mode regimes of the Weston flux model.
+- **The print:** r_MS ≈ k²·He³/(9·η), where H is the water depth, He the
+  Weston effective depth of Eq. (9.55), k = ω/c_w and η the reflection loss
+  gradient.
+- **The problem:** the sentence immediately above it prescribes the
+  derivation, "estimated by equating θ_n and θ_eff with n = 3/2", and the two
+  angles are printed on the same page:
+  - Eq. (9.47), θ_eff = (π·H/(4·η·r))^½, with the **true water depth H** (it
+    comes from the multipath integral Eq. (9.46), whose 1/(r·H) prefactor is
+    the cylinder area A_CS = 2π·r·H of Eq. (9.44), so H is the depth that
+    counts bottom bounces);
+  - Eq. (9.56), θ_n ≈ n·π/(k·He), with the **effective depth He** (mode angles
+    are set by the apparent pressure-release boundary).
+
+  Equating them at n = 3/2 gives π·H/(4·η·r) = 9·π²/(4·k²·He²), that is
+  **r_MS = k²·He²·H/(9·π·η)**. The printed form is larger by π·He/H. The
+  factor π is unconditional: it survives even if He is substituted for H in
+  Eq. (9.47), which is presumably how the printed He³ arose, and that reading
+  would give k²·He³/(9·π·η), still π below the print. The residual He/H is the
+  depth substitution itself, and it tends to 1 at high frequency. The other
+  transition of the same section, Eq. (9.50) r_CS = π·H/(4·η·ψc²), follows its
+  own derivation exactly (it is where Eq. (9.42) and Eq. (9.49) cross), so the
+  defect is confined to Eq. (9.57).
+- **Evidence:** the symbolic re-derivation above, checked numerically for
+  H = 50 m, f = 250 Hz, c_w = 1500 m/s over the Table 9.1 sand seabed
+  (η = 0,28 Np/rad, ψc = 33,56°, He = 53,63 m, k = 1,047 m⁻¹):
+
+  | | r_MS | θ_eff there (Eq. 9.47) |
+  |---|---|---|
+  | derivation, k²·He²·H/(9·π·η) | 19,9 km | 4,808° |
+  | printed Eq. (9.57), k²·He³/(9·η) | 67,1 km | 2,619° |
+
+  The ratio 67,1/19,9 is π·He/H = 3,3695 to every digit carried. The angle
+  column is an independent check that does not depend on how the derivation is
+  read: the first two mode angles of Eq. (9.56) are θ₁ = 3,205° and
+  θ₂ = 6,410°, so θ_3/2 = 4,808°. At the derived range the effective angle is
+  exactly θ_3/2, halfway between the first two modes, which is what the text
+  asks for. At the printed range it has fallen to 2,619°, **below θ₁ itself**:
+  the second mode would have been stripped long before, so that range cannot
+  be where the single-mode regime begins.
+- **Library behaviour:** `weston_regime_boundaries` in
+  [`weston_regimes.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/underwater/weston_regimes.py)
+  implements the derivation-consistent k²·He²·H/(9·π·η), which is also what
+  keeps θ_eff defined with H everywhere the module evaluates Eq. (9.47). The
+  equating rule is pinned by
+  `test_mode_stripping_boundary_equates_theta_eff_with_mode_3_over_2`, which
+  rebuilds both angles from the printed equations rather than from the
+  implementation, and the shared definition of θ_eff by
+  `test_composite_loss_and_the_boundary_use_the_same_effective_angle` (both in
+  [`tests/underwater/test_weston_regimes.py`](https://github.com/jmrplens/phonometry/blob/main/tests/underwater/test_weston_regimes.py)).
+- **Status:** unreported (textbook rather than a standard).
+
+---
+
+## NMFS (2024) Updated Technical Guidance v3.0, Table 5 / Table ES2 (otariid C)
+
+*Regulatory guidance document, not a standard.*
+
+- **Location:** Table 5 (printed p. 25), repeated as Table ES2 (printed p. 3):
+  the auditory weighting parameter C of the otariid pinniped in-water group
+  (OW / OCW).
+- **The print:** C = 1,37 dB.
+- **The problem:** the correct value is 1,36 dB. NMFS states so itself in the
+  table's own footnote: "During the public comment period, an error was
+  identified with the Navy's rounding, where this value should be 1.36,
+  instead of 1.37. Because this is such a minor error and to remain consistent
+  with the Navy, NMFS decided rely upon the value the Navy originally
+  provided." The document therefore knowingly publishes the wrong digit.
+- **Evidence:** independent recomputation of C from its own definition, the
+  negated peak of W(f), with the same row's parameters a = 1,58, b = 5,
+  f1 = 2,53 kHz, f2 = 43,8 kHz: C = 1,3643 dB, which rounds to 1,36. The
+  published weighted TTS onset of the same row (179 dB = K + C with K = 178)
+  is unaffected by the third digit.
+- **Library behaviour:**
+  [`marine_mammal_weighting.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/underwater/marine_mammal_weighting.py)
+  implements 1,36 and keeps the printed 1,37 available as
+  `WeightingParameters.c_db_as_printed`, so an assessment that must reproduce
+  the published table verbatim still can. Pinned by
+  `test_nmfs_2024_otariid_c_uses_the_corrected_1_36`.
+- **Status:** unreported (the issuing body has already documented it).
+
+---
+
+## Southall et al. (2019), Aquatic Mammals 45(2), Table 7 (impulsive peak SPL)
+
+*Peer-reviewed journal paper, not a standard.*
+
+- **Location:** Table 7 (printed p. 156), the impulsive-noise TTS and PTS onset
+  criteria; the two in-air carnivore rows PCA and OCA.
+- **The print:** PCA TTS peak SPL 138 and PTS peak SPL 144; OCA TTS peak SPL
+  161 and PTS peak SPL 167 dB re 20 µPa.
+- **The problem:** all four are typographical errors. The authors' own errata
+  (*Aquatic Mammals* 45(5), 569-572, DOI 10.1578/AM.45.5.2019.569, printed
+  pp. 569-570) reprints the corrected table: PCA 155 and 161, OCA 170 and 176.
+  The same errata also clarifies that the column headed "B" in Table 5 is the
+  parameter b of Eq. (2).
+- **Evidence:** two independent lines, one on the mechanism of the error and
+  one on the value that replaces it. Note first what does *not* discriminate:
+  the PTS peak = TTS peak + 6 dB rule of printed p. 156 is satisfied by the
+  printed pair as well (144 − 138 = 6, just as 161 − 155 = 6), so it says
+  nothing about which pair is right.
+  - **Mechanism.** In each printed row the peak-SPL TTS entry is numerically
+    identical to that same row's PTS-onset **SEL** entry: PCA 123 / 138 / 138 /
+    144 and OCA 146 / 161 / 161 / 167, reading TTS SEL, TTS peak, PTS SEL, PTS
+    peak. A value duplicated from the neighbouring column, with the +6 dB rule
+    then applied to the duplicate, is the signature of a column slip, and it is
+    exactly the two entries per row the errata replaces.
+  - **Value.** The corrected numbers are what the article's own extrapolation
+    rule produces. Printed p. 155 sets the impulsive peak-SPL TTS onset of a
+    group without direct data at the hearing threshold at the frequency of best
+    sensitivity f₀ plus 159 dB, and works it through for PCW: "Peak SPL TTS
+    onset was estimated as 212 dB re 1 µPa (53 dB at f₀ + 159 dB)". Evaluating
+    the Table 2 group audiogram at the Table 4 f₀ gives PCA −4,6 dB re 20 µPa
+    at 2,3 kHz and OCA 11,4 dB re 20 µPa at 10 kHz, hence 154,4 and 170,4,
+    which round to the corrected **155** and **170** and are nowhere near the
+    printed 138 and 161. The same computation reproduces the three undisputed
+    rows the errata does not touch (SI 219,6 against a published 220; PCW 212,5
+    against 212; OCW 226,1 against 226), so the rule is validated before it is
+    applied to the two rows in question.
+  - **A second, unrepaired inconsistency.** Printed p. 155 also states that for
+    the in-air carnivores specifically "a nominal 15 dB offset is used ...
+    between the SEL-based TTS threshold and the peak SPL-based threshold",
+    which reproduces the *printed* 138 and 161 from the SEL column. The errata
+    resolves the conflict in favour of the +159 dB rule, so it supersedes that
+    sentence as well as the table; the sentence is left standing in the article.
+- **Library behaviour:** the errata-corrected values are the ones implemented
+  in [`marine_mammal_weighting.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/underwater/marine_mammal_weighting.py),
+  pinned by `test_southall_table_7_errata_values_are_implemented`, with the
+  +159 dB rule itself checked against the audiogram for PCW, PCA and OCA in
+  `test_southall_impulsive_peak_spl_is_threshold_at_f0_plus_159_db`.
+- **Status:** reported by the authors themselves (errata published 2019).
+
+---
+
 ## Related source properties that are not errata
 
 Recorded here to prevent future "fixes" that would break agreement with the

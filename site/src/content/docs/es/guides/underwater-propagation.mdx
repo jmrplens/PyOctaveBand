@@ -1,6 +1,6 @@
 ---
 title: "Propagación submarina del sonido"
-description: "Propagación submarina de forma cerrada: ensanchamiento geométrico más absorción de volumen (Francois-Garrison, Ainslie-McColm, Thorp), la velocidad del sonido en agua de mar (UNESCO/Chen-Millero, Del Grosso, Mackenzie), la ecuación del sonar, la pérdida por reflexión en el fondo (Rayleigh) y el espectro de ruido ambiental oceánico (viento/térmico de Wenz más tráfico marítimo JOMOPANS-ECHO)."
+description: "Propagación submarina de forma cerrada: ensanchamiento geométrico más absorción de volumen (Francois-Garrison, Ainslie-McColm, Thorp), los cuatro regímenes de aguas someras de Weston, la velocidad del sonido en agua de mar (UNESCO/Chen-Millero, Del Grosso, Mackenzie, Medwin), la ecuación del sonar con la inversión del alcance de detección, la pérdida por reflexión en el fondo (Rayleigh) y el espectro de ruido ambiental oceánico (viento/térmico de Wenz más tráfico marítimo JOMOPANS-ECHO)."
 references:
   - type: article
     authors: ["Francois, R. E.", "Garrison, G. R."]
@@ -150,6 +150,13 @@ references:
     designation: "ISO 18405:2017"
     url: "https://www.iso.org/standard/62406.html"
     note: "Las definiciones normalizadas (pérdida por propagación, nivel de fuente, nivel de presión acústica re 1 µPa) tras las magnitudes de esta página."
+  - type: book
+    authors: ["Ainslie, M. A."]
+    year: 2010
+    title: "Principles of Sonar Performance Modelling"
+    publisher: "Springer/Praxis"
+    doi: "10.1007/978-3-540-87662-5"
+    note: "The Weston shallow-water propagation regimes (section 9.1.1.2, Equations 9.42 to 9.61 and Table 9.1), the Medwin sound-speed formula (Equation 1.2) and the seven numeric sonar worked examples of chapters 3 and 11 that pin the sonar-equation section."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -209,13 +216,88 @@ print(tl.absorption_coefficient, tl.tl[-1])
 tl.plot()   # TL frente a distancia con la separación ensanchamiento/absorción
 ```
 
+### Regímenes de aguas someras de Weston
+
+Fijar a mano la ley de divergencia funciona en mar abierto, pero en aguas
+someras la ley *cambia con la distancia* a medida que el fondo toma el mando.
+La teoría de flujo de energía de Weston, tal como la expone Ainslie §9.1.1.2,
+deriva los cuatro regímenes sucesivos y las distancias en que se relevan, solo
+a partir de la reflectividad del fondo:
+
+| Régimen | Factor de propagación $F$ | Ley de pérdida | Termina en |
+|---|---|---|---|
+| Esférico | $1/r^2$ | $20 \lg r$ | $r = H/(2\psi_c)$ |
+| Cilíndrico | $2\psi_c/(rH)$ | $10 \lg r$ | $r_{CS} = \pi H/(4\eta\psi_c^2)$ |
+| Descamado de modos | $\sqrt{\pi/(\eta H)}\, r^{-3/2}$ | $15 \lg r$ | $r_{MS} = k^2 H_e^3/(9\pi\eta)$ |
+| Modo único | Ec. (9.54), exponencial | más pronunciada que $15 \lg r$ | — |
+
+$\psi_c = \arccos(c_w/c_{sed})$ es el ángulo rasante crítico, $\eta$ el
+**gradiente de pérdida por reflexión** en neperios por radián ($|R(\theta)|
+\approx e^{-\eta\theta}$) y $H_e$ la profundidad efectiva de Weston, el nivel
+poco por debajo del fondo real en el que parece situarse un contorno de presión
+nula. `weston_propagation_loss` compone la pérdida $PL = -10 \lg F$ y devuelve
+además la ley propia de cada régimen; el campo `boundaries` lleva las tres
+distancias de transición junto con la frecuencia de corte de la guía de ondas y
+el número de modos propagantes.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weston_regimes_es.svg" alt="Los cuatro regímenes de propagación de Weston en aguas someras a 250 Hz sobre arena media con 50 m de columna de agua: la pérdida compuesta sigue la divergencia esférica hasta unos 43 m, la cilíndrica hasta 412 m, la ley de descamado de modos 15 lg r hasta unos 20 km y después la caída exponencial de modo único, con cada ley individual dibujada para comparar" width="82%" />
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import underwater
+
+# 50 m de agua sobre arena media (Ainslie Tabla 9.1) a 250 Hz.
+ranges = np.logspace(1.0, 5.3, 500)
+res = underwater.weston_propagation_loss(ranges, 250.0, 50.0, seabed="sand",
+                                         source_depth=10.0, receiver_depth=25.0)
+b = res.boundaries
+print(f"psi_c = {np.degrees(b.critical_angle):.1f} grados, eta = {b.reflection_loss_gradient:.2f} Np/rad")
+res.plot(language="es")   # pérdida compuesta con la ley de cada régimen y las fronteras
+plt.show()
+```
+
+</details>
+
+```python
+from phonometry import underwater
+
+b = underwater.weston_regime_boundaries(250.0, 50.0, seabed="sand")
+print(b.cylindrical_to_mode_stripping)   # r_CS, en metros
+print(b.cutoff_frequency, b.mode_count)  # la propagación guiada exige f > f_c
+print(underwater.reflection_loss_gradient("sand"))   # 0,278 Np/rad
+```
+
+Al ser un resultado *incoherente*, el flujo describe el campo promediado en
+distancia, y eso es justo lo que lo convierte en referencia para los solvers
+numéricos de
+[Solvers de propagación submarina](/phonometry/es/guides/underwater-solvers/).
+Con el ángulo crítico a 90° y el gradiente de pérdida a cero, la rama cilíndrica
+se reduce a $F = \pi/(rH)$, el límite exacto de muchos modos de una guía ideal;
+la pérdida por modos normales promediada en profundidad y distancia cae sobre
+ella dentro de un decibelio.
+
+:::note
+La Ecuación (9.57) impresa por Ainslie para $r_{MS}$ dice $k^2H_e^3/(9\eta)$.
+Su propia regla de derivación, igualar las Ecuaciones (9.47) y (9.56) tal como
+están impresas, da $k^2H_e^2H/(9\pi\eta)$, menor en $\pi H_e/H$. La biblioteca
+implementa la forma coherente con la derivación; véase
+[Erratas encontradas en fuentes publicadas](/phonometry/es/reference/errata/).
+:::
+
 ## Velocidad del sonido en agua de mar
 
 `sea_water_sound_speed(T, S, depth, model=…)` usa la ecuación **UNESCO /
 Chen–Millero** (por defecto, en la forma Wong & Zhu 1995 ITS-90), **Del Grosso**
-(1974) o **Mackenzie** (1981). La profundidad se convierte a presión con
-Leroy & Parthiot (1998). Las tres coinciden en ~1 m/s; el valor de verificación
-canónico de Mackenzie es `1550,744 m/s` a 25 °C, 35 ‰, 1000 m.
+(1974), **Mackenzie** (1981) o **Medwin** (1975). La profundidad se convierte a
+presión con Leroy & Parthiot (1998). Las cuatro coinciden en ~2,5 m/s; el valor de
+verificación canónico de Mackenzie es `1550,744 m/s` a 25 °C, 35 ‰, 1000 m. La
+forma de seis términos de Medwin es la más basta de la familia y la que está
+detrás de las reglas clásicas $\partial c/\partial T \approx 4.6 - 0.110\,T$ m/s
+por °C y $\partial c/\partial z \approx 0.016$ m/s por metro.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_sound_speed_es.svg" alt="Perfil de velocidad del sonido en agua de mar con la ecuación UNESCO: capa de mezcla cálida, termoclina, eje del canal sonoro en el mínimo y la velocidad creciendo con la presión en profundidad" width="60%" />
 
@@ -320,6 +402,25 @@ se.plot()   # exceso de señal frente a pérdida por transmisión
 Los niveles de sonar, propagación y ambiental están en dB re una onda plana de
 1 µPa rms (niveles espectrales). Los niveles de fuente (más abajo) usan la
 convención de fuente, dB re 1 µPa²/Hz **a 1 m**.
+
+### Alcance de detección
+
+Como la cifra de mérito *es* la pérdida por transmisión máxima admisible,
+invertir una ley de pérdida en $TL = FOM$ da el **alcance de detección**, la
+distancia a la que la probabilidad de detección es del 50 %. `detection_range`
+invierte la pérdida en forma cerrada anterior, que crece monótonamente con la
+distancia y por tanto tiene un único cruce; `detection_range_from_curve` lee el
+cruce sobre cualquier curva calculada, incluida la pérdida oscilante de una
+guía real, donde puede haber varios.
+
+```python
+from phonometry import underwater
+
+# Ejemplo de sonar activo CW de Ainslie: FOM = 82,7 dB re m2 a 50 kHz -> r50 ~ 1,3 km.
+res = underwater.detection_range(82.7, 50e3)
+print(res.detection_range)          # metros
+res.plot(language="es")             # TL frente a FOM con el cruce marcado
+```
 
 ## Pérdida por reflexión en el fondo
 
@@ -507,10 +608,14 @@ geométrico más los modelos de absorción de Francois-Garrison (1982, por
 defecto), Ainslie-McColm (1998) y Thorp (1967). `sea_water_sound_speed` y
 `sound_speed_profile` implementan las ecuaciones de velocidad del sonido
 UNESCO/Chen-Millero (forma ITS-90 de Wong y Zhu de 1995, por defecto), Del
-Grosso (1974) y Mackenzie (1981), con la conversión de profundidad a presión
-de Leroy y Parthiot (1998). `passive_sonar_equation` y
-`active_sonar_equation` implementan las ecuaciones del sonar pasivo y activo
-monostático (Urick, vía Etter 2003). `seabed_reflection` y
+Grosso (1974), Mackenzie (1981) y Medwin (1975), con la conversión de
+profundidad a presión de Leroy y Parthiot (1998). `weston_propagation_loss` y
+`weston_regime_boundaries` implementan los cuatro regímenes de flujo de energía
+de Weston y sus distancias de transición (Ainslie sección 9.1.1.2, Tabla 9.1).
+`passive_sonar_equation` y `active_sonar_equation` implementan las ecuaciones
+del sonar pasivo y activo monostático (Urick, vía Etter 2003), y
+`detection_range` / `detection_range_from_curve` invierten una pérdida por
+transmisión en la cifra de mérito. `seabed_reflection` y
 `bottom_reflection_loss` implementan el coeficiente de reflexión de Rayleigh
 fluido-fluido y el ángulo crítico (Medwin & Clay). `ocean_ambient_noise` suma
 el ruido de viento de Wenz por la "regla de los cincos" y el ruido térmico de

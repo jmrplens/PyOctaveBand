@@ -1028,6 +1028,44 @@ it; the list grows as guides gain their References sections.
   [doi:10.1121/1.1427355](https://doi.org/10.1121/1.1427355).
   The ensemble merchant-ship source-spectrum model.
   Cited by [Underwater sound propagation](underwater-propagation.md).
+- Ainslie, M. A. (2010). *Principles of Sonar Performance Modelling*.
+  Springer/Praxis.
+  [doi:10.1007/978-3-540-87662-5](https://doi.org/10.1007/978-3-540-87662-5).
+  The reference treatment of sonar performance prediction: the Weston
+  energy-flux propagation regimes of shallow water, the sonar equations with
+  seven fully numeric worked examples, and the orca audiogram.
+  Cited by [Underwater sound propagation](underwater-propagation.md) and
+  [Marine-mammal noise exposure](marine-mammal-exposure.md).
+- National Marine Fisheries Service (2018). *2018 Revision to: Technical
+  Guidance for Assessing the Effects of Anthropogenic Sound on Marine Mammal
+  Hearing (Version 2.0)*. NOAA Technical Memorandum NMFS-OPR-59.
+  [NOAA Fisheries](https://www.fisheries.noaa.gov/s3/2023-05/TECHMEMOGuidance508.pdf).
+  The auditory weighting parameters and PTS onset thresholds of the 2018
+  guidance, with the Appendix D worked example.
+  Cited by [Marine-mammal noise exposure](marine-mammal-exposure.md).
+- National Marine Fisheries Service (2024). *2024 Update to: Technical
+  Guidance for Assessing the Effects of Anthropogenic Sound on Marine Mammal
+  Hearing (Version 3.0)*. NOAA Technical Memorandum NMFS-OPR-71.
+  [NOAA Fisheries](https://www.fisheries.noaa.gov/s3/2024-11/Tech_Memo-Guidance_-3.0-_OCT-2024-508_OPR1.pdf).
+  The current U.S. guidance: revised weighting parameters and the auditory
+  injury onset criteria that supersede the 2018 PTS thresholds.
+  Cited by [Marine-mammal noise exposure](marine-mammal-exposure.md).
+- Southall, B. L., Finneran, J. J., Reichmuth, C., Nachtigall, P. E.,
+  Ketten, D. R., Bowles, A. E., Ellison, W. T., Nowacek, D. P., &
+  Tyack, P. L. (2019). Marine mammal noise exposure criteria: Updated
+  scientific recommendations for residual hearing effects. *Aquatic Mammals*,
+  45(2), 125-232.
+  [doi:10.1578/AM.45.2.2019.125](https://doi.org/10.1578/AM.45.2.2019.125).
+  The peer-reviewed hearing groups, group audiograms and TTS/PTS onset
+  criteria, with the errata of 45(5), 569-572.
+  Cited by [Marine-mammal noise exposure](marine-mammal-exposure.md).
+- Finneran, J. J. (2016). *Auditory weighting functions and TTS/PTS exposure
+  functions for marine mammals exposed to underwater noise*. Technical Report
+  3026, SSC Pacific.
+  [Report page](https://apps.dtic.mil/sti/citations/AD1026445).
+  The band-pass weighting-function form and the audiogram equation that the
+  NMFS and Southall criteria both adopt.
+  Cited by [Marine-mammal noise exposure](marine-mammal-exposure.md).
 
 ## Wave simulation
 

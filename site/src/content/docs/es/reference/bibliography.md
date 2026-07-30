@@ -811,8 +811,12 @@ que las guías incorporan sus secciones de Referencias.
   Springer.
   [doi:10.1007/978-3-540-87662-5](https://doi.org/10.1007/978-3-540-87662-5).
   El tratamiento sistemático de las magnitudes acústicas submarinas en la
-  línea que la ISO 18405 normalizó.
-  Citado por [Acústica submarina](/phonometry/es/guides/underwater-acoustics/).
+  línea que la ISO 18405 normalizó, los regímenes de propagación de flujo de
+  energía de Weston en aguas someras, las ecuaciones del sonar con siete
+  ejemplos trabajados totalmente numéricos y el audiograma de orca.
+  Citado por [Acústica submarina](/phonometry/es/guides/underwater-acoustics/),
+  [Propagación submarina del sonido](/phonometry/es/guides/underwater-propagation/)
+  y [Exposición a ruido de mamíferos marinos](/phonometry/es/guides/marine-mammal-exposure/).
 - Medwin, H., & Clay, C. S. (1998). *Fundamentals of acoustical oceanography*.
   Academic Press. ISBN 978-0-12-487570-8.
   [Página del editor](https://shop.elsevier.com/books/fundamentals-of-acoustical-oceanography/medwin/978-0-12-487570-8).
@@ -914,6 +918,37 @@ que las guías incorporan sus secciones de Referencias.
   [doi:10.1121/1.1427355](https://doi.org/10.1121/1.1427355).
   El modelo de espectro de conjunto de fuentes de buques mercantes.
   Citado por [Propagación submarina del sonido](/phonometry/es/guides/underwater-propagation/).
+- National Marine Fisheries Service (2018). *2018 Revision to: Technical
+  Guidance for Assessing the Effects of Anthropogenic Sound on Marine Mammal
+  Hearing (Version 2.0)*. NOAA Technical Memorandum NMFS-OPR-59.
+  [NOAA Fisheries](https://www.fisheries.noaa.gov/s3/2023-05/TECHMEMOGuidance508.pdf).
+  Los parámetros de ponderación auditiva y los umbrales de inicio de PTS de la
+  guía de 2018, con el ejemplo trabajado del Apéndice D.
+  Citado por [Exposición a ruido de mamíferos marinos](/phonometry/es/guides/marine-mammal-exposure/).
+- National Marine Fisheries Service (2024). *2024 Update to: Technical
+  Guidance for Assessing the Effects of Anthropogenic Sound on Marine Mammal
+  Hearing (Version 3.0)*. NOAA Technical Memorandum NMFS-OPR-71.
+  [NOAA Fisheries](https://www.fisheries.noaa.gov/s3/2024-11/Tech_Memo-Guidance_-3.0-_OCT-2024-508_OPR1.pdf).
+  La guía estadounidense vigente: parámetros de ponderación revisados y los
+  criterios de inicio de lesión auditiva que sustituyen a los umbrales de PTS
+  de 2018.
+  Citado por [Exposición a ruido de mamíferos marinos](/phonometry/es/guides/marine-mammal-exposure/).
+- Southall, B. L., Finneran, J. J., Reichmuth, C., Nachtigall, P. E.,
+  Ketten, D. R., Bowles, A. E., Ellison, W. T., Nowacek, D. P., &
+  Tyack, P. L. (2019). Marine mammal noise exposure criteria: Updated
+  scientific recommendations for residual hearing effects. *Aquatic Mammals*,
+  45(2), 125-232.
+  [doi:10.1578/AM.45.2.2019.125](https://doi.org/10.1578/AM.45.2.2019.125).
+  Los grupos auditivos, los audiogramas de grupo y los criterios de inicio de
+  TTS y PTS revisados por pares, con la fe de erratas de 45(5), 569-572.
+  Citado por [Exposición a ruido de mamíferos marinos](/phonometry/es/guides/marine-mammal-exposure/).
+- Finneran, J. J. (2016). *Auditory weighting functions and TTS/PTS exposure
+  functions for marine mammals exposed to underwater noise*. Technical Report
+  3026, SSC Pacific.
+  [Página del informe](https://apps.dtic.mil/sti/citations/AD1026445).
+  La forma del filtro paso banda de ponderación y la ecuación del audiograma
+  que adoptan tanto los criterios NMFS como los de Southall.
+  Citado por [Exposición a ruido de mamíferos marinos](/phonometry/es/guides/marine-mammal-exposure/).
 
 ## Simulación de ondas
 
