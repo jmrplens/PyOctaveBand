@@ -1,6 +1,6 @@
 ---
 title: "Índice de inteligibilidad del habla"
-description: "El índice de inteligibilidad del habla (SII) por bandas de tercio de octava de ANSI S3.5-1997: niveles espectrales equivalentes de habla/ruido/umbral, la función de importancia de banda (Tabla 3), la automáscara del habla y la propagación ascendente de la máscara, la función de audibilidad de banda y el índice en ruido y en pérdida auditiva."
+description: "El índice de inteligibilidad del habla (SII) de ANSI S3.5-1997 en sus cuatro procedimientos por bandas (bandas críticas, contribución equitativa, tercio de octava, octava): niveles espectrales equivalentes de habla/ruido/umbral, las funciones de importancia de banda, la automáscara del habla y la propagación ascendente de la máscara, la función de audibilidad de banda y el índice en ruido y en pérdida auditiva."
 references:
   - type: standard
     organization: "American National Standards Institute"
@@ -9,7 +9,7 @@ references:
     designation: "ANSI S3.5-1997 (R2017)"
     publisher: "Acoustical Society of America"
     url: "https://webstore.ansi.org/standards/asa/ansiasas31997r2017"
-    note: "El método por bandas de tercio de octava (18 bandas): la función de importancia de banda (Tabla 3), el nivel espectral del habla estándar y el ruido interno de referencia (Tabla 3), el procedimiento de enmascaramiento, perturbación y audibilidad de banda (cláusula 5) y el índice (cláusula 6)."
+    note: "Los cuatro procedimientos por bandas: bandas críticas (21 bandas, Tabla 1), bandas críticas de contribución equitativa (17 bandas, Tabla 2), tercio de octava (18 bandas, Tabla 3) y octava (6 bandas, Tabla 4), cada uno con su función de importancia de banda, nivel espectral del habla estándar y ruido interno de referencia; el procedimiento de enmascaramiento, perturbación y audibilidad de banda (cláusula 5) y el índice (cláusula 6)."
   - type: article
     authors: ["French, N. R.", "Steinberg, J. C."]
     year: 1947
@@ -29,9 +29,12 @@ El **índice de inteligibilidad del habla** predice cuánto de una señal de hab
 es audible, y por tanto inteligible, para un oyente en una condición dada de
 ruido y audición. Reduce un espectro de habla, un espectro de ruido y un umbral
 auditivo a un único número en `[0, 1]`: `0` cuando nada útil alcanza al oyente,
-`1` cuando todo el espectro portador del habla es audible. Esta página cubre el
-**método por bandas de tercio de octava** de **ANSI S3.5-1997 (R2017)**: 18
-bandas de 160 Hz a 8000 Hz.
+`1` cuando todo el espectro portador del habla es audible. Esta página cubre los
+cuatro procedimientos por bandas de **ANSI S3.5-1997 (R2017)**: el **método por
+bandas de tercio de octava** (18 bandas de 160 Hz a 8000 Hz), que es el valor
+por omisión y el que recorren los apartados 1 a 4, y los métodos por bandas
+críticas, por bandas críticas de contribución equitativa y por bandas de octava
+del apartado 5.
 
 :::note
 **SII frente a STI.** El SII predice la inteligibilidad desde la
@@ -351,7 +354,163 @@ Los nombres de esfuerzo vocal funcionan en cualquier sitio donde se espere un
 espectro de voz, incluido como primer argumento de
 `speech_intelligibility_index`.
 
-## 5. ¿SII o STI?
+## 5. Los cuatro procedimientos por bandas
+
+El título de la norma está en plural, y la norma también: ANSI S3.5-1997 define
+**cuatro** procedimientos por bandas. Solo se diferencian en la tabla de bandas
+y en cómo se expresa la propagación ascendente del enmascaramiento, y `method=`
+elige uno. El valor por omisión es el procedimiento por tercios de octava usado
+arriba.
+
+| `method=` | Bandas | Intervalo | Constantes | Propagación de la máscara |
+| :--- | ---: | :--- | :--- | :--- |
+| `"critical-band"` | 21 | 100 Hz a 9500 Hz | Tabla 1 | entre los límites de banda tabulados |
+| `"equally-contributing"` | 17 | 300 Hz a 6400 Hz | Tabla 2 | entre los límites de banda tabulados |
+| `"one-third-octave"` | 18 | 160 Hz a 8000 Hz | Tabla 3 | entre las frecuencias centrales de banda |
+| `"octave"` | 6 | 177 Hz a 11314 Hz | Tabla 4 | ninguna |
+
+Todos los procedimientos recorren la misma cadena del apartado 2: la automáscara
+del habla, la propagación ascendente del enmascaramiento, el ruido interno
+equivalente y la perturbación, el factor de distorsión de nivel y la función de
+audibilidad de banda, ponderada por la función de importancia de banda propia de
+cada procedimiento. La pendiente de enmascaramiento es una sola fórmula en todos
+ellos, $C_i = -80 + 0,6\,(B_i + 10\log_{10} W_i)$, con $W_i$ el ancho de banda en
+hercios. Los procedimientos por bandas críticas y de contribución equitativa
+propagan el enmascaramiento desde el límite superior de la banda enmascarante
+hasta la frecuencia central de la banda enmascarada; el de tercios de octava
+escribe esa misma geometría en función de las frecuencias centrales, de donde
+salen su $0,89\,f_i/f_k$ y su $-6,353$ dB impresos. El procedimiento por bandas
+de octava **no** tiene propagación del enmascaramiento: una banda de octava ya es
+más ancha que la propagación que se modela, así que su nivel espectral de
+enmascaramiento equivalente es el propio nivel espectral de ruido equivalente.
+
+Las cuatro funciones de importancia de banda son una sola distribución
+subyacente muestreada a cuatro resoluciones, así que cuanto más anchas son las
+bandas, mayor es cada $I_i$. Cada función suma uno, salvo la de la Tabla 2, que
+imprime `0,0588` en cada una de sus 17 bandas y por tanto suma 0,9996.
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sii_band_procedures_es.svg"
+  alt="La función de importancia de banda de los cuatro procedimientos por bandas de ANSI S3.5-1997 superpuestos en un mismo eje logarítmico de frecuencia: las 21 bandas críticas, las 17 bandas críticas de contribución equitativa, las 18 bandas de tercio de octava y las 6 bandas de octava, cada una dibujada como escalón sobre sus propios límites de banda. Las cuatro trazan el mismo ascenso hasta un máximo en torno a 2 kHz, y cuanto más anchas son las bandas más alto es el escalón: la función de octava culmina en 0,265 frente a 0,090 de la de tercio de octava"
+  width="90%"
+/>
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import SII_METHODS, sii_procedure
+
+# Una línea: el .plot() de cada procedimiento escalona su Ii sobre sus límites.
+fig, ax = plt.subplots(figsize=(10, 6))
+for method in SII_METHODS:
+    sii_procedure(method).plot(ax=ax, linewidth=1.8)
+plt.show()
+
+# A mano, replicando lo que dibuja SIIProcedure.plot():
+fig, ax = plt.subplots()
+for method in SII_METHODS:
+    proc = sii_procedure(method)
+    ii = proc.band_importance
+    ax.plot(proc.band_edges, np.append(ii, ii[-1]), drawstyle="steps-post",
+            label=method)
+ax.set_xscale("log")
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel(r"Importancia de banda $I_i$")
+ax.set_ylim(bottom=0.0)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+Como el nivel espectral equivalente es una magnitud por hercio, un ruido blanco
+tiene el *mismo* nivel espectral de ruido equivalente en todas las bandas de
+todos los procedimientos, lo que hace que los cuatro sean directamente
+comparables:
+
+```python
+import numpy as np
+from phonometry import hearing
+
+for method in hearing.SII_METHODS:
+    n_bands = hearing.sii_procedure(method).frequencies.size
+    result = hearing.speech_intelligibility_index(
+        "normal", np.full(n_bands, 25.0), method=method
+    )
+    print(method, n_bands, round(result.sii, 3))
+# critical-band        21 0.343
+# equally-contributing 17 0.333
+# one-third-octave     18 0.350
+# octave                6 0.369
+```
+
+Los cuatro coinciden dentro de unas 0,04 unidades en la misma situación de
+escucha. El de octava es el que lee más alto porque prescinde de la propagación
+del enmascaramiento, que es justo el riesgo que arrastra: si se le da un ruido
+fuerte en baja frecuencia, no verá ese ruido alcanzando las bandas que portan el
+habla.
+
+**Qué procedimiento usar.**
+
+- `"one-third-octave"` es el valor por omisión de trabajo: la resolución más
+  fina que ofrece la norma, la única tabla que trae los cuatro espectros de voz
+  por esfuerzo vocal y la resolución en la que suelen llegar los datos de
+  medición.
+- `"critical-band"` sigue el filtro auditivo. Sus 21 bandas son las bandas
+  críticas clásicas, por lo que es el procedimiento a emparejar con modelos de
+  enmascaramiento o sonoridad por bandas críticas, y el único que baja hasta los
+  100 Hz.
+- `"equally-contributing"` da a sus 17 bandas la misma importancia entre 300 Hz
+  y 6400 Hz, así que el índice se lee directamente como la fracción de bandas
+  igualmente importantes que son audibles. Eso lo hace rápido de comprobar a
+  mano, y es la presentación más cercana a la tradición del índice de
+  articulación de la que nació el SII.
+- `"octave"` es para datos por bandas de octava, que es lo que dan de forma
+  rutinaria los sonómetros, la selección de equipos de climatización y los
+  informes de acústica de la edificación. Úsalo cuando sea todo lo que tengas, y
+  léelo sabiendo que falta la propagación del enmascaramiento.
+
+**Una función de importancia de banda alternativa.** `band_importance=`
+sustituye la $I_i$ tabulada del procedimiento por otra propia, que es la forma
+de aplicar las funciones del Anexo B de la norma para materiales de ensayo de
+habla concretos (sílabas sin sentido, listas de palabras monosílabas, pasajes
+cortos). Solo cambia la ponderación: la cadena de audibilidad, y por tanto
+`result.band_audibility`, queda intacta.
+
+```python
+res = hearing.speech_intelligibility_index(
+    "normal", np.full(6, 25.0), method="octave",
+    band_importance=[0.0, 0.0, 1.0, 0.0, 0.0, 0.0],   # todo el peso en 1 kHz
+)
+print(round(res.sii, 3))          # 0.5  (solo la banda de octava de 1 kHz)
+```
+
+**Las constantes tabuladas.** `sii_procedure(method)` devuelve un `SIIProcedure`
+con las frecuencias centrales de banda, los límites de banda, la función de
+importancia de banda, el nivel espectral de ruido interno de referencia y el
+nivel espectral de voz estándar de esfuerzo normal de ese procedimiento; su
+`.plot()` dibuja la función de importancia de banda como escalón sobre los
+límites de banda, que es la figura de arriba. Las Tablas 1, 2 y 4 están
+tabuladas solo para esfuerzo vocal normal, de modo que `"raised"`, `"loud"` y
+`"shout"` están disponibles únicamente en el procedimiento por tercios de
+octava.
+
+```python
+octave = hearing.sii_procedure("octave")
+print(octave.frequencies)          # [ 250.  500. 1000. 2000. 4000. 8000.]
+print(octave.band_importance)      # [0.0617 0.1671 0.2373 0.2648 0.2142 0.0549]
+
+# La Tabla 2 son las bandas críticas 3 a 19 de la Tabla 1, ponderadas por igual.
+equal = hearing.sii_procedure("equally-contributing")
+print(equal.band_edges[0], equal.band_edges[-1])       # 300.0 6400.0
+print(equal.band_importance.sum().round(4))            # 0.9996
+```
+
+
+## 6. ¿SII o STI?
 
 Las dos métricas del habla responden preguntas distintas a partir de
 mediciones distintas, y cada una es ciega a lo que la otra captura:
@@ -375,7 +534,7 @@ medidas la sala y el ruido. Consulta la
 [guía del índice de transmisión del habla](/phonometry/es/guides/speech-transmission/)
 para el lado del STI.
 
-## 6. Informe ANSI S3.5-1997 (`.report()`)
+## 7. Informe ANSI S3.5-1997 (`.report()`)
 
 `SIIResult.report(path)` genera una ficha PDF de una página dispuesta como un
 informe de audibilidad del habla: una línea de norma base, un bloque de
@@ -420,26 +579,31 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 
 ## Qué cubre esta guía
 
-**Cubierto.** El método por bandas de tercio de octava de ANSI S3.5-1997
-(R2017) (18 bandas, 160 Hz a 8000 Hz): los niveles espectrales equivalentes de
-habla, ruido y umbral de audición, la función de importancia de banda de la
-Tabla 3 y los espectros de voz estándar por esfuerzo vocal, la automáscara del
-habla, la propagación ascendente de la máscara, el factor de distorsión de
-nivel y la función de audibilidad de banda de la cláusula 5, y el índice de la
-cláusula 6. `speech_intelligibility_index`, `standard_speech_spectrum` y
-`standard_speech_spectra` implementan esto, y `SIIResult.report(path)` genera
-la ficha de ANSI S3.5-1997.
+**Cubierto.** Los cuatro procedimientos por bandas de ANSI S3.5-1997 (R2017):
+el método por bandas críticas (21 bandas, Tabla 1), el de bandas críticas de
+contribución equitativa (17 bandas, Tabla 2), el de bandas de tercio de octava
+(18 bandas, Tabla 3, el valor por omisión) y el de bandas de octava (6 bandas,
+Tabla 4). Para cada uno: los niveles espectrales equivalentes de habla, ruido y
+umbral de audición, la función de importancia de banda y el nivel espectral de
+voz estándar, la automáscara del habla, la propagación ascendente de la máscara,
+el factor de distorsión de nivel y la función de audibilidad de banda de la
+cláusula 5, y el índice de la cláusula 6. `speech_intelligibility_index` (con
+`method=` y `band_importance=`), `sii_procedure`, `standard_speech_spectrum` y
+`standard_speech_spectra` implementan esto, y `SIIResult.report(path)` genera la
+ficha de ANSI S3.5-1997 para el procedimiento que se haya usado.
 
-**No cubierto.** El título de la norma está en plural ("Methods for the
-Calculation of the Speech Intelligibility Index"): phonometry implementa solo
-el procedimiento por bandas de tercio de octava, no los demás métodos de
-resolución de banda de la norma. La función de importancia de banda usada es
-siempre el compromiso de habla promedio de la Tabla 3; las funciones de
-importancia alternativas del Anexo B para materiales de ensayo concretos
-(sílabas sin sentido, listas de palabras monosílabas, pasajes cortos) no están
-implementadas. El índice de transmisión del habla, una métrica distinta para
-un canal de transmisión en vez de la audibilidad de quien escucha, se cubre
-aparte en la
+**No cubierto.** Los espectros de voz estándar de esfuerzo vocal elevado, alto y
+de grito solo se incluyen para el procedimiento por tercios de octava; las
+Tablas 1, 2 y 4 se implementan con su columna de esfuerzo normal, que es la que
+necesita el factor de distorsión de nivel de la cláusula 5.7. Las funciones de
+importancia de banda tabuladas son el compromiso de habla promedio de cada
+tabla; las funciones de importancia alternativas del Anexo B para materiales de
+ensayo concretos (sílabas sin sentido, listas de palabras monosílabas, pasajes
+cortos) no se distribuyen como constantes, pero cualquier función de importancia
+puede aplicarse con `band_importance=`. No se ofrece remuestreo entre los cuatro
+conjuntos de bandas: cada procedimiento se alimenta con espectros en sus propias
+bandas. El índice de transmisión del habla, una métrica distinta para un canal de
+transmisión en vez de la audibilidad de quien escucha, se cubre aparte en la
 [guía del índice de transmisión del habla](/phonometry/es/guides/speech-transmission/).
 
 ## Véase también
@@ -472,6 +636,21 @@ $A_i = \operatorname{clip}\!\left((E_i' - D_i + 15)/30,\; 0,\; 1\right)$
 $D_i$ la perturbación equivalente, que combina el ruido externo, la
 propagación ascendente del enmascaramiento y el ruido interno equivalente. El
 índice queda en $[0, 1]$.
+
+### ¿Cuál de los cuatro procedimientos por bandas de ANSI S3.5 debo usar?
+
+ANSI S3.5-1997 define cuatro: bandas críticas (21 bandas, 100 Hz a 9500 Hz),
+bandas críticas de contribución equitativa (17 bandas, 300 Hz a 6400 Hz), tercio
+de octava (18 bandas, 160 Hz a 8000 Hz) y octava (6 bandas, 250 Hz a 8000 Hz
+nominales). Usa `method="one-third-octave"` por omisión: es la resolución más
+fina y el único procedimiento cuya tabla trae los espectros de voz elevado, alto
+y de grito. Usa `method="critical-band"` para alinear el índice con un modelo de
+enmascaramiento o sonoridad por bandas críticas (Bark),
+`method="equally-contributing"` cuando el índice deba leerse como la fracción de
+bandas igualmente importantes que son audibles, y `method="octave"` cuando solo
+se hayan medido datos por bandas de octava, recordando que el procedimiento de
+octava no incluye la propagación ascendente del enmascaramiento y por tanto lee
+alto con ruido fuerte en baja frecuencia.
 
 ### ¿Cuándo debo usar el SII en vez del STI?
 

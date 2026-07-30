@@ -707,7 +707,9 @@ to the issuing body, with date and reference).
   C1 = −80 + 0.6 (40 + 10 lg 160 − 6.353) = −46.587, which prints as −46.59,
   not −45.59; the example's Zi column is only consistent with the corrected
   slope (Z2 recomputes to 34.658 = printed 34.66 dB, whereas the misprinted
-  slope would give 34.76 dB).
+  slope would give 34.76 dB). The Table C.1 example is the octave-band
+  procedure and the Table C.2 example the one-third-octave procedure, so one
+  cell of each is affected.
 - **Evidence:** the official errata list published by ASA Working Group
   S3-79, the committee that maintains ANSI S3.5, on its support site
   (sii.to): "Page 21, Table C1, row i=5, column Li under Step 6: the value
@@ -715,17 +717,49 @@ to the issuing body, with date and reference).
   first row of numbers, value −45.59 should be −46.59"; plus independent
   recomputation of both cells from the normative clauses (above). The same
   list carries five further corrections (a reference spelling, the
-  Tables 1-4 caption wording, the insertion gain Gi missing from Eq. 23,
-  and two Annex B wording fixes about the audio-visual approximation);
-  none of those touches a formula this library implements.
+  Tables 1-4 caption wording recorded in the next entry, the insertion gain Gi
+  missing from Eq. 23, and two Annex B wording fixes about the audio-visual
+  approximation); none of those touches a formula this library implements.
 - **Library behaviour:** unaffected; the library computes the corrected
   values from the normative clauses and always did. Its Annex C.2 anchors
   ([`tests/reference_data.py`](../tests/reference_data.py),
-  `ANSIS3_5_ANNEX_C2*`) pin the errata-consistent chain, cross-checked to
-  double precision against the working group's own reference implementation
-  `SII.C` and its published `TO.TST`/`TO_1.TST` test-case results.
+  `ANSIS3_5_ANNEX_C1*` and `ANSIS3_5_ANNEX_C2*`) pin the errata-consistent
+  chain of both examples, cross-checked to double precision against the working
+  group's own reference implementation `SII.C` and its published test-case
+  results. The Table C.1 cell is pinned directly: the level-distortion factor
+  of clause 5.7 for row i = 5 of the Annex C.1 octave-band example computes to
+  0.99581, which prints as the corrected 1.00.
 - **Status:** published corrections by the issuing working group; nothing
   to report upstream.
+
+## ANSI S3.5-1997, captions of Tables 1 to 4 (official WG S3-79 erratum)
+
+- **Location:** the captions of Tables 1, 2, 3 and 4 (pp. 3-5 of the 1997
+  printing), the constant tables of the four band procedures: critical band
+  (21 bands), equally-contributing critical band (17 bands), one-third octave
+  (18 bands) and octave (6 bands).
+- **The print:** each caption lists the quantities the table tabulates and
+  includes the phrase "hearing threshold levels,".
+- **The problem:** none of the four tables tabulates a hearing threshold
+  level. Each carries the band centre frequency (and, for Tables 1, 2 and 4,
+  the band limits), the band-importance function Ii, the standard speech
+  spectrum level Ui by vocal effort and the reference internal noise spectrum
+  level Xi. The hearing threshold level Ti′ is a *user input* to the procedure
+  (clause 5.5, where the equivalent internal noise spectrum level is
+  Xi′ = Xi + Ti′), which is exactly the quantity the caption invites the
+  reader to look for in the table and to confuse with Xi.
+- **Evidence:** the official errata list published by ASA Working Group S3-79,
+  the committee that maintains ANSI S3.5, on its support site (sii.to):
+  "Pages 3-5, Tables 1-4: in each caption the phrase 'hearing threshold
+  levels,' should be deleted"; plus the tables themselves, which have no such
+  column.
+- **Library behaviour:** unaffected. The four tables are implemented with the
+  columns they actually carry, exposed per procedure by `sii_procedure()` as
+  `band_importance`, `speech_spectrum` (Ui) and `internal_noise` (Xi), and the
+  hearing threshold stays the `threshold=` argument of
+  `speech_intelligibility_index` ([`src/phonometry/hearing/sii.py`](../src/phonometry/hearing/sii.py)).
+- **Status:** published correction by the issuing working group; nothing to
+  report upstream.
 
 ## NORAH2 rotorcraft guidance SC01.D1.5d (EASA.2020.FC.06), Eq. (27)
 

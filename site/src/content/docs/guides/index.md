@@ -237,8 +237,8 @@ ANSI S3.5, ISO 7029, ISO 1999 and ISO 9612.
   the modulation transfer function, the indirect method from an impulse
   response and the direct STIPA measurement.
 - [Speech Intelligibility Index](/phonometry/guides/speech-intelligibility/):
-  the one-third-octave SII with its band-importance function, self-masking and
-  upward spread of masking.
+  the SII in all four of the standard's band procedures, with the
+  band-importance functions, self-masking and upward spread of masking.
 - [Objective Intelligibility (STOI and ESTOI)](/phonometry/guides/objective-intelligibility/):
   the two correlation-based measures for time-frequency weighted noisy speech.
 

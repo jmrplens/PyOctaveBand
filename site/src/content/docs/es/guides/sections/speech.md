@@ -31,8 +31,10 @@ extensión ascendente del enmascaramiento y el umbral de audición del propio
 oyente entran explícitamente, y por eso el SII se extiende con naturalidad a
 la pérdida auditiva.
 [Índice de inteligibilidad del habla](/phonometry/es/guides/speech-intelligibility/)
-cubre el método en tercios de octava, incluidos los espectros normalizados de
-habla desde el esfuerzo vocal normal hasta el grito.
+cubre los cuatro procedimientos por bandas de la norma (bandas críticas,
+bandas críticas de contribución equitativa, tercio de octava y octava),
+incluidos los espectros normalizados de habla desde el esfuerzo vocal normal
+hasta el grito.
 
 Un tercer par de medidas, **STOI** y **ESTOI**, responde a otra pregunta:
 dada una referencia limpia *y* una versión degradada o procesada de la misma

@@ -1,14 +1,22 @@
 #  Copyright (c) 2026. Jose M. Requena-Plens
 """Tests for :mod:`phonometry.hearing.sii` (Speech Intelligibility Index, ANSI S3.5-1997).
 
-The one-third-octave-band procedure is validated against the reference
-implementation of ASA Working Group S3-79, the committee that maintains
-ANSI S3.5 (``SII.C`` and its official test-input files ``TO.TST`` and
-``TO_1.TST`` with published results, from the WG support site sii.to),
-against the standard's own tabulated constants and its Annex C.2 worked
-example (with the official errata applied), and against the independent
-Hornsby worksheet and R CRAN "SII" implementations where they overlap.
-See ``tests/reference_data.py`` for the provenance of every constant.
+All four band procedures are validated against the reference implementation
+of ASA Working Group S3-79, the committee that maintains ANSI S3.5
+(``SII.C`` and its eight official test-input files with published results,
+from the WG support site sii.to): ``CB.TST``/``CB_1.TST`` for the
+critical-band procedure, ``ECB.TST``/``ECB_1.TST`` for the
+equally-contributing critical-band procedure, ``TO.TST``/``TO_1.TST`` for
+the one-third-octave procedure and ``OCTAVE.TST``/``OCTAVE_1.TST`` for the
+octave-band procedure, the ``_1`` file of each pair exercising an
+alternative band-importance function. Two of the eight, ``CB_1.TST`` and
+``ECB_1.TST``, are the same confirmation twice (see
+``test_sii_wg_s3_79_official_test_cases``), so the eight cases carry seven
+independent confirmations. They are also validated against the
+standard's own tabulated constants and its Annex C.2 worked example (with
+the official errata applied), and against the independent Hornsby worksheet
+and R CRAN "SII" implementations where they overlap. See
+``tests/reference_data.py`` for the provenance of every constant.
 """
 
 from __future__ import annotations
@@ -16,13 +24,47 @@ from __future__ import annotations
 import numpy as np
 import pytest
 from reference_data import (
+    ANSIS3_5_ANNEX_C1,
+    ANSIS3_5_ANNEX_C1_LEVEL_DISTORTION_I5,
+    ANSIS3_5_ANNEX_C1_NOISE,
+    ANSIS3_5_ANNEX_C1_SPEECH,
     ANSIS3_5_ANNEX_C2,
     ANSIS3_5_ANNEX_C2_MASKING,
     ANSIS3_5_BAND_IMPORTANCE_SUM,
+    ANSIS3_5_CRITICAL_IMPORTANCE_SUM,
+    ANSIS3_5_CRITICAL_TABLE1_HEAD,
     ANSIS3_5_DISTURBANCE_5000HZ,
+    ANSIS3_5_EQUAL_IMPORTANCE_SUM,
     ANSIS3_5_LOUD_1KHZ,
     ANSIS3_5_NOISE_PLUS_LOSS,
+    ANSIS3_5_OCTAVE_IMPORTANCE_SUM,
+    ANSIS3_5_OCTAVE_INTERNAL_NOISE_1KHZ,
+    ANSIS3_5_OCTAVE_SPEECH_1KHZ,
     ANSIS3_5_STANDARD_QUIET,
+    ANSIS3_5_WG_CB1_IMPORTANCE,
+    ANSIS3_5_WG_CB1_SII,
+    ANSIS3_5_WG_CB1_SII_EXACT,
+    ANSIS3_5_WG_CB_NOISE,
+    ANSIS3_5_WG_CB_SII,
+    ANSIS3_5_WG_CB_SII_EXACT,
+    ANSIS3_5_WG_CB_SPEECH,
+    ANSIS3_5_WG_CB_THRESHOLD,
+    ANSIS3_5_WG_ECB1_IMPORTANCE,
+    ANSIS3_5_WG_ECB1_SII,
+    ANSIS3_5_WG_ECB1_SII_EXACT,
+    ANSIS3_5_WG_ECB_NOISE,
+    ANSIS3_5_WG_ECB_SII,
+    ANSIS3_5_WG_ECB_SII_EXACT,
+    ANSIS3_5_WG_ECB_SPEECH,
+    ANSIS3_5_WG_ECB_THRESHOLD,
+    ANSIS3_5_WG_OCTAVE1_IMPORTANCE,
+    ANSIS3_5_WG_OCTAVE1_SII,
+    ANSIS3_5_WG_OCTAVE1_SII_EXACT,
+    ANSIS3_5_WG_OCTAVE_NOISE,
+    ANSIS3_5_WG_OCTAVE_SII,
+    ANSIS3_5_WG_OCTAVE_SII_EXACT,
+    ANSIS3_5_WG_OCTAVE_SPEECH,
+    ANSIS3_5_WG_OCTAVE_THRESHOLD,
     ANSIS3_5_WG_TO1_IMPORTANCE,
     ANSIS3_5_WG_TO1_SII,
     ANSIS3_5_WG_TO1_SII_EXACT,
@@ -324,3 +366,319 @@ def test_standard_speech_spectra_plot_forwards_kwargs_and_rejects_language() -> 
     with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
     plt.close("all")
+
+
+# ---------------------------------------------------------------------------
+# The other three band procedures of ANSI S3.5-1997 (Tables 1, 2 and 4).
+# ---------------------------------------------------------------------------
+
+
+def test_sii_methods_are_the_four_procedures_of_the_standard() -> None:
+    # ANSI S3.5-1997 defines four band procedures; the library exposes them
+    # in the order of the standard's Tables 1 to 4.
+    assert sii.SII_METHODS == (
+        "critical-band", "equally-contributing", "one-third-octave", "octave",
+    )
+    sizes = {
+        method: sii.sii_procedure(method).band_importance.size
+        for method in sii.SII_METHODS
+    }
+    assert sizes == {
+        "critical-band": 21, "equally-contributing": 17,
+        "one-third-octave": 18, "octave": 6,
+    }
+
+
+def test_band_importance_sums_of_every_procedure() -> None:
+    # Tables 1 and 4 are normalised like Table 3; Table 2 prints 0.0588 in
+    # each of its 17 bands, which sums to 0.9996 rather than to one.
+    assert sii.sii_procedure("critical-band").band_importance.sum() == pytest.approx(
+        ANSIS3_5_CRITICAL_IMPORTANCE_SUM, abs=1e-12
+    )
+    assert sii.sii_procedure("octave").band_importance.sum() == pytest.approx(
+        ANSIS3_5_OCTAVE_IMPORTANCE_SUM, abs=1e-12
+    )
+    assert sii.sii_procedure(
+        "equally-contributing"
+    ).band_importance.sum() == pytest.approx(ANSIS3_5_EQUAL_IMPORTANCE_SUM, abs=1e-12)
+
+
+def test_critical_band_table_head() -> None:
+    # ANSI S3.5-1997 Table 1, first six rows: nominal centre frequency, band
+    # limits, band importance Ii, normal-effort speech spectrum level Ui and
+    # reference internal noise spectrum level Xi.
+    proc = sii.sii_procedure("critical-band")
+    for i, (fc, lo, hi, imp, speech, noise) in enumerate(
+        ANSIS3_5_CRITICAL_TABLE1_HEAD
+    ):
+        assert proc.frequencies[i] == pytest.approx(fc)
+        assert proc.band_edges[i] == pytest.approx(lo)
+        assert proc.band_edges[i + 1] == pytest.approx(hi)
+        assert proc.band_importance[i] == pytest.approx(imp)
+        assert proc.speech_spectrum[i] == pytest.approx(speech)
+        assert proc.internal_noise[i] == pytest.approx(noise)
+
+
+def test_octave_table_is_the_same_spectrum_level_as_table_3() -> None:
+    # ANSI S3.5-1997 Table 4 tabulates Ui and Xi at 1000 Hz as the same
+    # figures Table 3 gives at 1000 Hz: both are spectrum (per-hertz) levels,
+    # so they do not depend on the analysis bandwidth.
+    proc = sii.sii_procedure("octave")
+    k = int(np.flatnonzero(np.isclose(proc.frequencies, 1000.0))[0])
+    assert proc.speech_spectrum[k] == pytest.approx(ANSIS3_5_OCTAVE_SPEECH_1KHZ)
+    assert proc.internal_noise[k] == pytest.approx(
+        ANSIS3_5_OCTAVE_INTERNAL_NOISE_1KHZ
+    )
+
+
+def test_equally_contributing_is_the_300_to_6400_hz_span_of_table_1() -> None:
+    # ANSI S3.5-1997 Table 2 is critical bands 3 to 19 of Table 1 with an
+    # equal importance in every band.
+    critical = sii.sii_procedure("critical-band")
+    equal = sii.sii_procedure("equally-contributing")
+    np.testing.assert_allclose(equal.frequencies, critical.frequencies[2:19])
+    np.testing.assert_allclose(equal.band_edges, critical.band_edges[2:20])
+    np.testing.assert_allclose(equal.speech_spectrum, critical.speech_spectrum[2:19])
+    np.testing.assert_allclose(equal.internal_noise, critical.internal_noise[2:19])
+    np.testing.assert_allclose(equal.band_importance, 0.0588)
+    assert equal.band_edges[0] == 300.0
+    assert equal.band_edges[-1] == 6400.0
+
+
+#: The six official ASA WG S3-79 test cases of the three procedures added
+#: here (DevelopmentKit SOURCES/*.TST, from the WG support site sii.to). Per
+#: case: the ``.TST`` file name, the ``method=`` it exercises, the equivalent
+#: speech spectrum level, the equivalent noise spectrum level, the equivalent
+#: hearing threshold level, an alternative band-importance function or
+#: ``None``, the SII published in the kit's readme (three decimals) and the
+#: value the committee's ``SII.C`` prints when compiled unmodified and run on
+#: the file. The one-third-octave pair ``TO.TST``/``TO_1.TST`` keeps its own
+#: two tests above.
+_WG_OFFICIAL_CASES = (
+    ("CB.TST", "critical-band", ANSIS3_5_WG_CB_SPEECH, ANSIS3_5_WG_CB_NOISE,
+     ANSIS3_5_WG_CB_THRESHOLD, None,
+     ANSIS3_5_WG_CB_SII, ANSIS3_5_WG_CB_SII_EXACT),
+    ("CB_1.TST", "critical-band", ANSIS3_5_WG_CB_SPEECH, ANSIS3_5_WG_CB_NOISE,
+     ANSIS3_5_WG_CB_THRESHOLD, ANSIS3_5_WG_CB1_IMPORTANCE,
+     ANSIS3_5_WG_CB1_SII, ANSIS3_5_WG_CB1_SII_EXACT),
+    ("ECB.TST", "equally-contributing", ANSIS3_5_WG_ECB_SPEECH,
+     ANSIS3_5_WG_ECB_NOISE, ANSIS3_5_WG_ECB_THRESHOLD, None,
+     ANSIS3_5_WG_ECB_SII, ANSIS3_5_WG_ECB_SII_EXACT),
+    ("ECB_1.TST", "equally-contributing", ANSIS3_5_WG_ECB_SPEECH,
+     ANSIS3_5_WG_ECB_NOISE, ANSIS3_5_WG_ECB_THRESHOLD,
+     ANSIS3_5_WG_ECB1_IMPORTANCE,
+     ANSIS3_5_WG_ECB1_SII, ANSIS3_5_WG_ECB1_SII_EXACT),
+    ("OCTAVE.TST", "octave", ANSIS3_5_WG_OCTAVE_SPEECH,
+     ANSIS3_5_WG_OCTAVE_NOISE, ANSIS3_5_WG_OCTAVE_THRESHOLD, None,
+     ANSIS3_5_WG_OCTAVE_SII, ANSIS3_5_WG_OCTAVE_SII_EXACT),
+    ("OCTAVE_1.TST", "octave", ANSIS3_5_WG_OCTAVE_SPEECH,
+     ANSIS3_5_WG_OCTAVE_NOISE, ANSIS3_5_WG_OCTAVE_THRESHOLD,
+     ANSIS3_5_WG_OCTAVE1_IMPORTANCE,
+     ANSIS3_5_WG_OCTAVE1_SII, ANSIS3_5_WG_OCTAVE1_SII_EXACT),
+)
+
+
+@pytest.mark.parametrize(
+    ("case", "method", "speech", "noise", "threshold", "importance",
+     "published", "committee"),
+    _WG_OFFICIAL_CASES,
+    ids=[case[0] for case in _WG_OFFICIAL_CASES],
+)
+def test_sii_wg_s3_79_official_test_cases(
+    case: str,
+    method: str,
+    speech: tuple[float, ...],
+    noise: tuple[float, ...],
+    threshold: tuple[float, ...],
+    importance: tuple[float, ...] | None,
+    published: float,
+    committee: float,
+) -> None:
+    """Each official ``.TST`` case against its published SII and SII.C value.
+
+    The published results are printed to three decimals in the ASA WG S3-79
+    DevelopmentKit readme, hence the 5e-4 tolerance on the first assertion;
+    the second pins the full precision of the committee's own C program, which
+    the library reproduces to within one unit in the last place of a double.
+
+    These six cases are not six independent confirmations. ``CB_1.TST`` and
+    ``ECB_1.TST`` are the same one twice: the equally-contributing bands are
+    critical bands 3 to 19, their two alternative importance functions weight
+    the same physical bands, and the two extra critical bands below 300 Hz sit
+    80 dB under the speech, so their upward spread of masking never reaches a
+    weighted band. Both procedures consequently return the identical
+    0.4104741231, which the kit publishes as 0.410 for each. Counting
+    honestly, the eight official cases give seven independent confirmations.
+    The redundant one still earns its place: it would break the moment either
+    procedure's band mapping went wrong.
+    """
+    result = sii.speech_intelligibility_index(
+        np.array(speech),
+        np.array(noise),
+        threshold=np.array(threshold),
+        method=method,
+        band_importance=None if importance is None else np.array(importance),
+    )
+    assert result.method == method
+    assert result.sii == pytest.approx(published, abs=5e-4), case
+    assert result.sii == pytest.approx(committee, abs=1e-9), case
+    if importance is not None:
+        np.testing.assert_allclose(result.band_importance, importance)
+
+
+def test_octave_procedure_has_no_spread_of_masking() -> None:
+    # ANSI S3.5-1997's octave-band procedure omits the upward spread of
+    # masking, so the equivalent masking spectrum level Zi is the equivalent
+    # noise spectrum level Ni' itself. Checked on the official OCTAVE.TST
+    # input, whose noise spans 85 dB across the six bands.
+    result = sii.speech_intelligibility_index(
+        np.array(ANSIS3_5_WG_OCTAVE_SPEECH),
+        np.array(ANSIS3_5_WG_OCTAVE_NOISE),
+        threshold=np.array(ANSIS3_5_WG_OCTAVE_THRESHOLD),
+        method="octave",
+    )
+    np.testing.assert_allclose(result.masking, ANSIS3_5_WG_OCTAVE_NOISE)
+
+
+
+def test_sii_annex_c1_worked_example() -> None:
+    # ANSI S3.5-1997 Annex C.1 worked example (octave-band procedure), whose
+    # input the WG DevelopmentKit readme prints in full. SII.C gives
+    # 0.5039555062. Table C.1's own Li column, row i = 5, reads 1.00 with the
+    # official WG S3-79 erratum applied (printed 0.10); the level-distortion
+    # factor of clause 5.7 for that row is 0.99581, which prints as 1.00.
+    result = sii.speech_intelligibility_index(
+        np.array(ANSIS3_5_ANNEX_C1_SPEECH),
+        np.array(ANSIS3_5_ANNEX_C1_NOISE),
+        method="octave",
+    )
+    assert result.sii == pytest.approx(ANSIS3_5_ANNEX_C1, abs=1e-9)
+    assert result.level_distortion[4] == pytest.approx(
+        ANSIS3_5_ANNEX_C1_LEVEL_DISTORTION_I5, abs=5e-3
+    )
+    # Where the speech stays at or below the standard normal-effort spectrum
+    # plus 10 dB the factor is exactly unity: band 2 has Ei' = 40 dB against
+    # Ui = 34.27 dB, and band 6 has Ei' = 0 dB against Ui = 1.13 dB.
+    assert result.level_distortion[1] == 1.0
+    assert result.level_distortion[5] == 1.0
+    assert np.all(result.level_distortion > 0.0)
+    assert np.all(result.level_distortion <= 1.0)
+
+
+def test_alternative_importance_reweights_the_same_audibility() -> None:
+    # The alternative-importance index is the dot product of the alternative
+    # Ii with the band audibility Ai of the same run, so band_importance=
+    # changes only the weighting, never the audibility chain.
+    common = {
+        "noise_spectrum": np.array(ANSIS3_5_WG_TO_NOISE),
+        "threshold": np.array(ANSIS3_5_WG_TO_THRESHOLD),
+    }
+    base = sii.speech_intelligibility_index(np.array(ANSIS3_5_WG_TO_SPEECH), **common)
+    alt = sii.speech_intelligibility_index(
+        np.array(ANSIS3_5_WG_TO_SPEECH),
+        band_importance=np.array(ANSIS3_5_WG_TO1_IMPORTANCE),
+        **common,
+    )
+    np.testing.assert_allclose(alt.band_audibility, base.band_audibility)
+    assert alt.sii == pytest.approx(
+        float(np.sum(np.array(ANSIS3_5_WG_TO1_IMPORTANCE) * base.band_audibility))
+    )
+    assert alt.sii == pytest.approx(ANSIS3_5_WG_TO1_SII_EXACT, abs=1e-9)
+
+
+def test_default_method_is_unchanged_one_third_octave() -> None:
+    # The default call signature keeps computing the one-third-octave
+    # procedure, band for band.
+    default = sii.speech_intelligibility_index("normal")
+    explicit = sii.speech_intelligibility_index("normal", method="one-third-octave")
+    assert default.method == "one-third-octave"
+    assert default.sii == explicit.sii
+    np.testing.assert_allclose(default.frequencies, sii.BAND_CENTERS)
+
+
+def test_speech_intelligibility_index_rejects_unknown_method() -> None:
+    with pytest.raises(ValueError, match="Unknown SII method"):
+        sii.speech_intelligibility_index("normal", method="bark")
+    with pytest.raises(ValueError, match="Unknown SII method"):
+        sii.sii_procedure("bark")
+
+
+def test_speech_intelligibility_index_checks_band_count_per_method() -> None:
+    # An 18-band vector is the wrong length for the 6-band octave procedure,
+    # and the message names the procedure and its frequency span.
+    with pytest.raises(ValueError, match="6 octave band values"):
+        sii.speech_intelligibility_index(np.full(18, 50.0), method="octave")
+    with pytest.raises(ValueError, match="21 critical-band band values"):
+        sii.speech_intelligibility_index(
+            np.full(21, 50.0), np.full(18, 30.0), method="critical-band"
+        )
+    with pytest.raises(ValueError, match="band_importance"):
+        sii.speech_intelligibility_index(
+            np.full(6, 50.0), method="octave", band_importance=np.full(5, 0.2)
+        )
+
+
+def test_vocal_effort_names_outside_the_one_third_octave_procedure() -> None:
+    # Tables 1, 2 and 4 are carried for normal vocal effort only.
+    for method in ("critical-band", "equally-contributing", "octave"):
+        proc = sii.sii_procedure(method)
+        quiet = sii.speech_intelligibility_index("normal", method=method)
+        np.testing.assert_allclose(quiet.speech_spectrum, proc.speech_spectrum)
+        with pytest.raises(ValueError, match="normal vocal effort only"):
+            sii.speech_intelligibility_index("shout", method=method)
+        with pytest.raises(ValueError, match="Unknown vocal_effort"):
+            sii.speech_intelligibility_index("whisper", method=method)
+
+
+def test_sii_procedure_returns_copies() -> None:
+    proc = sii.sii_procedure("critical-band")
+    proc.band_importance[0] = 99.0
+    assert sii.sii_procedure("critical-band").band_importance[0] == pytest.approx(
+        0.0103
+    )
+
+
+def test_sii_procedure_plot_returns_axes() -> None:
+    pytest.importorskip("matplotlib")
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.axes import Axes
+
+    ax = sii.sii_procedure("octave").plot()
+    assert isinstance(ax, Axes)
+    assert ax.get_xlabel() == "Frequency [Hz]"
+    assert ax.get_ylabel() == "Band importance $I_i$"
+    assert "ANSI S3.5-1997" in ax.get_title()
+    # The four procedures overlay on one axes, one labelled step each.
+    for method in sii.SII_METHODS:
+        sii.sii_procedure(method).plot(ax=ax)
+    assert len(ax.lines) == 1 + len(sii.SII_METHODS)
+    labels = [line.get_label() for line in ax.lines]
+    assert "Critical band (21)" in labels
+    plt.close("all")
+
+    ax_es = sii.sii_procedure("critical-band").plot(language="es")
+    assert ax_es.get_ylabel() == "Importancia de banda $I_i$"
+    assert [line.get_label() for line in ax_es.lines] == ["Banda crítica (21)"]
+    plt.close("all")
+    with pytest.raises(ValueError, match="Unknown language"):
+        sii.sii_procedure("octave").plot(language="xx")
+    plt.close("all")
+
+
+def test_sii_result_plot_for_every_procedure() -> None:
+    pytest.importorskip("matplotlib")
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    for method in sii.SII_METHODS:
+        proc = sii.sii_procedure(method)
+        noise = np.full(proc.frequencies.size, 20.0)
+        result = sii.speech_intelligibility_index("normal", noise, method=method)
+        ax = result.plot()
+        assert len(ax.patches) == 2 * proc.frequencies.size
+        plt.close("all")

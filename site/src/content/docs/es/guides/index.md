@@ -246,8 +246,9 @@ DIN 45692, IEC 60268-16, ANSI S3.5, ISO 7029, ISO 1999 e ISO 9612.
   la función de transferencia de modulación, el método indirecto a partir de una
   respuesta al impulso y la medida directa STIPA.
 - [Índice de inteligibilidad del habla](/phonometry/es/guides/speech-intelligibility/):
-  el SII en tercios de octava con su función de importancia por bandas, el
-  autoenmascaramiento y la extensión ascendente del enmascaramiento.
+  el SII en los cuatro procedimientos por bandas de la norma, con las
+  funciones de importancia por bandas, el autoenmascaramiento y la extensión
+  ascendente del enmascaramiento.
 - [Inteligibilidad objetiva (STOI y ESTOI)](/phonometry/es/guides/objective-intelligibility/):
   las dos medidas basadas en correlación para habla ruidosa ponderada en
   tiempo-frecuencia.

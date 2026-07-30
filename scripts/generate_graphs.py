@@ -9858,6 +9858,23 @@ def generate_standard_speech_spectrum(output_dir: str) -> None:
     plt.close()
 
 
+def generate_sii_band_procedures(output_dir: str) -> None:
+    """The band-importance functions of the four ANSI S3.5-1997 procedures."""
+    print("Generating sii_band_procedures...")
+    from phonometry import SII_METHODS, sii_procedure
+
+    _, ax = plt.subplots(figsize=(10, 6))
+    # Each procedure's own .plot() steps Ii across its tabulated band limits on
+    # a shared logarithmic frequency axis, so the 6-band octave function and
+    # the 21-band critical-band function are directly comparable: the same
+    # importance is spread over very different bandwidths (Tables 1 to 4).
+    for method in SII_METHODS:
+        sii_procedure(method).plot(ax=ax, language=_LANG, linewidth=1.8)
+    plt.tight_layout()
+    save_figure(output_dir, "sii_band_procedures.svg")
+    plt.close()
+
+
 def generate_impulse_prominence(output_dir: str) -> None:
     """NT ACOU 112: predicted prominence and the LAeq adjustment."""
     print("Generating impulse_prominence.png...")
@@ -13515,6 +13532,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_speech_intelligibility,
     generate_sii_vocal_efforts,
     generate_standard_speech_spectrum,
+    generate_sii_band_procedures,
     generate_impulse_prominence,
     # Room-noise criteria (ANSI S12.2-2019): NC tangency and RC Mark II.
     generate_room_noise_criteria,

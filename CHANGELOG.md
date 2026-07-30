@@ -552,6 +552,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   scores and every remaining opportunity. `BASE_URL` audits the live site
   instead; `-- --desktop` switches the throttling profile.
 
+- The three remaining band procedures of ANSI S3.5-1997 in `hearing/sii.py`.
+  The standard's title is plural and so is the standard: alongside the
+  one-third-octave procedure the library already had, `method=` now selects
+  the critical-band procedure (21 bands, 100 Hz to 9500 Hz, Table 1), the
+  equally-contributing critical-band procedure (17 bands, 300 Hz to 6400 Hz,
+  Table 2) or the octave-band procedure (6 bands, Table 4). The band table and
+  the geometry of the upward spread of masking became parameters of one shared
+  chain rather than four copies of it: the critical-band and
+  equally-contributing procedures spread the masking between tabulated band
+  limits, the one-third-octave procedure between band centre frequencies, and
+  the octave-band procedure omits the spread entirely because an octave band is
+  already wider than the spread being modelled. `band_importance=` applies an
+  alternative band-importance function to any procedure (how the Annex B
+  functions for particular speech test materials are used), and
+  `sii_procedure(method)` returns an `SIIProcedure` carrying that procedure's
+  band centre frequencies, band limits, band-importance function, reference
+  internal noise spectrum level and normal-effort standard speech spectrum
+  level, with a `.plot()` that steps `Ii` over the band limits. `SIIResult`
+  carries the `method` used and the fiche names it. The existing call
+  signature is unchanged and still computes the one-third-octave procedure.
+  All eight official ASA Working Group S3-79 test cases now run as oracles,
+  two per procedure: `CB.TST` (published SII 0.273), `CB_1.TST` (0.410),
+  `ECB.TST` (0.278), `ECB_1.TST` (0.410), `OCTAVE.TST` (0.491),
+  `OCTAVE_1.TST` (0.323), `TO.TST` (0.445) and `TO_1.TST` (0.438); the library
+  reproduces the committee's `SII.C` to within one unit in the last place of a
+  double on every one. Note that `CB_1.TST` and `ECB_1.TST` are the same
+  confirmation twice, since the equally-contributing bands are critical bands 3
+  to 19 and their two alternative importance functions weight the same physical
+  bands, so the eight cases are seven independent ones. Twelve new conformance
+  checks, a new figure
+  `sii_band_procedures` overlaying the four band-importance functions, and a
+  new section of the speech-intelligibility guide in English and Spanish.
+  Tables 1, 2 and 4 are implemented with their normal-effort speech spectrum
+  column, the one the level-distortion factor of clause 5.7 uses; the raised,
+  loud and shout spectra remain one-third-octave only.
+
 ### Changed
 
 - Frequency-weighting guides: the single chart that drew A, B, C, D, AU and Z
@@ -592,6 +628,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   each centred. It reaches the 232 blocks on 120 pages (60 English, 60 Spanish)
   that state more than one equation per block, needs no change to the markdown,
   and leaves the TeX, the accessible label and the page anchors untouched.
+
 - The Speech Intelligibility Index (`hearing/sii.py`) is now anchored on the
   reference implementation of ASA Working Group S3-79, the committee that
   maintains ANSI S3.5: the library reproduces `SII.C` to double precision on

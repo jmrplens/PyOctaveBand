@@ -1158,6 +1158,122 @@ ANSIS3_5_WG_TO1_IMPORTANCE = (
 ANSIS3_5_WG_TO1_SII = 0.438  # published in the WG DevelopmentKit readme
 ANSIS3_5_WG_TO1_SII_EXACT = 0.4382176540  # SII.C run on TO_1.TST
 
+# Official WG S3-79 test cases for the other three band procedures
+# (DevelopmentKit SOURCES/CB.TST, CB_1.TST, ECB.TST, ECB_1.TST, OCTAVE.TST and
+# OCTAVE_1.TST). Same file layout as the one-third-octave pair above: the
+# equivalent speech spectrum level, the equivalent noise spectrum level and
+# the equivalent hearing threshold level over the procedure's bands, and for
+# the "_1" variants a fourth line with an alternative band-importance
+# function. Published results (readme, 3 decimals) and the value SII.C prints
+# when compiled unmodified with gcc and run on the file:
+#
+#   CB.TST      0.273   0.2729353808      critical band, 21 bands
+#   CB_1.TST    0.410   0.4104741231      critical band, alternative Ii
+#   ECB.TST     0.278   0.2781386550      equally contributing, 17 bands
+#   ECB_1.TST   0.410   0.4104741231      equally contributing, alternative Ii
+#   OCTAVE.TST  0.491   0.4909625062      octave, 6 bands
+#   OCTAVE_1.TST 0.323  0.3229375000      octave, alternative Ii
+#
+# CB_1.TST and ECB_1.TST are NOT two independent oracles. They coincide to
+# every printed digit because the equally-contributing bands are critical
+# bands 3 to 19: the two alternative importance functions select the same
+# physical bands, and the two extra critical bands below 300 Hz sit 80 dB
+# below the speech, so their upward spread of masking never reaches a
+# weighted band. The eight official cases therefore carry seven independent
+# confirmations, not eight; the pair is still worth running, because a wrong
+# band mapping in either procedure would break the coincidence.
+ANSIS3_5_WG_CB_SPEECH = (
+    -10.0, -10.0, -10.0, 90.0, 5.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0,
+    40.0, 40.0, 40.0, 40.0, 40.0, -10.0, -10.0, -10.0, -10.0,
+)
+ANSIS3_5_WG_CB_NOISE = (
+    10.0, 10.0, 10.0, 10.0, -10.0, -10.0, 70.0, -10.0, -10.0, -10.0, -10.0,
+    -10.0, -10.0, -10.0, -10.0, -10.0, -10.0, 10.0, 10.0, 10.0, 10.0,
+)
+ANSIS3_5_WG_CB_THRESHOLD = (
+    0.0, 0.0, 0.0, 90.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+)
+ANSIS3_5_WG_CB_SII = 0.273  # published in the WG DevelopmentKit readme
+ANSIS3_5_WG_CB_SII_EXACT = 0.2729353808  # SII.C run on CB.TST
+ANSIS3_5_WG_CB1_IMPORTANCE = (
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.1, 0.1, 0.1,
+    0.1, 0.1, 0.1, 0.3, 0.0, 0.0, 0.0,
+)
+ANSIS3_5_WG_CB1_SII = 0.410  # published in the WG DevelopmentKit readme
+ANSIS3_5_WG_CB1_SII_EXACT = 0.4104741231  # SII.C run on CB_1.TST
+ANSIS3_5_WG_ECB_SPEECH = (
+    -10.0, 90.0, 5.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0,
+    40.0, 40.0, 40.0, -10.0, -10.0,
+)
+ANSIS3_5_WG_ECB_NOISE = (
+    10.0, 10.0, -10.0, -10.0, 70.0, -10.0, -10.0, -10.0, -10.0, -10.0, -10.0,
+    -10.0, -10.0, -10.0, -10.0, 10.0, 10.0,
+)
+ANSIS3_5_WG_ECB_THRESHOLD = (
+    0.0, 90.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+    0.0, 0.0, 0.0,
+)
+ANSIS3_5_WG_ECB_SII = 0.278  # published in the WG DevelopmentKit readme
+ANSIS3_5_WG_ECB_SII_EXACT = 0.2781386550  # SII.C run on ECB.TST
+ANSIS3_5_WG_ECB1_IMPORTANCE = (
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,
+    0.1, 0.3, 0.0,
+)
+ANSIS3_5_WG_ECB1_SII = 0.410  # published in the WG DevelopmentKit readme
+ANSIS3_5_WG_ECB1_SII_EXACT = 0.4104741231  # SII.C run on ECB_1.TST
+# The octave case is the input printed in the DevelopmentKit readme as "the
+# octave band procedure of the example in Section C.1", except that OCTAVE.TST
+# raises the 8000 Hz equivalent hearing threshold to 7.1 dB HL where Annex C.1
+# has 0; ANSIS3_5_ANNEX_C1_* below carries the Annex C.1 input itself.
+ANSIS3_5_WG_OCTAVE_SPEECH = (50.0, 40.0, 40.0, 30.0, 20.0, 0.0)
+ANSIS3_5_WG_OCTAVE_NOISE = (70.0, 65.0, 45.0, 25.0, 1.0, -15.0)
+ANSIS3_5_WG_OCTAVE_THRESHOLD = (0.0, 0.0, 0.0, 0.0, 0.0, 7.1)
+ANSIS3_5_WG_OCTAVE_SII = 0.491  # published in the WG DevelopmentKit readme
+ANSIS3_5_WG_OCTAVE_SII_EXACT = 0.4909625062  # SII.C run on OCTAVE.TST
+ANSIS3_5_WG_OCTAVE1_IMPORTANCE = (0.0, 0.0, 1.0, 0.0, 0.0, 0.0)
+ANSIS3_5_WG_OCTAVE1_SII = 0.323  # published in the WG DevelopmentKit readme
+ANSIS3_5_WG_OCTAVE1_SII_EXACT = 0.3229375000  # SII.C run on OCTAVE_1.TST
+# Sums of the tabulated band-importance functions. Tables 1 and 4 sum to one
+# like Table 3; Table 2 prints 0.0588 in each of its 17 bands, so it sums to
+# 0.9996 (1/17 = 0.058823...) rather than to exactly one.
+ANSIS3_5_CRITICAL_IMPORTANCE_SUM = 1.0
+ANSIS3_5_OCTAVE_IMPORTANCE_SUM = 1.0
+ANSIS3_5_EQUAL_IMPORTANCE_SUM = 0.9996
+# Table 4 tabulates the standard speech spectrum level Ui and the reference
+# internal noise spectrum level Xi at 1000 Hz as the same figures Table 3 gives
+# at 1000 Hz: both are spectrum (per-hertz) levels, so they do not depend on
+# the analysis bandwidth. SII.C carries both tables independently and its
+# u[]/x[] entries agree.
+ANSIS3_5_OCTAVE_SPEECH_1KHZ = 25.01
+ANSIS3_5_OCTAVE_INTERNAL_NOISE_1KHZ = -12.5
+# Table 1, first six rows: nominal centre frequency, band limits, band
+# importance Ii, normal-effort standard speech spectrum level Ui and reference
+# internal noise spectrum level Xi. Digits from the WG S3-79 reference
+# implementation SII.C (limit[], i_avg[], u[], x[]); the R CRAN package "SII"
+# prints the same six rows of Table 1 from its own transcription.
+# ANSI S3.5-1997 Annex C.1 worked example (octave-band procedure). Its input is
+# printed in the WG DevelopmentKit readme: equivalent speech spectrum level
+# 50/40/40/30/20/0 dB, equivalent noise spectrum level 70/65/45/25/1/-15 dB,
+# normal hearing. SII.C run on that input = 0.5039555062.
+ANSIS3_5_ANNEX_C1_SPEECH = (50.0, 40.0, 40.0, 30.0, 20.0, 0.0)
+ANSIS3_5_ANNEX_C1_NOISE = (70.0, 65.0, 45.0, 25.0, 1.0, -15.0)
+ANSIS3_5_ANNEX_C1 = 0.5039555062
+# Table C.1, row i = 5 (the 4000 Hz octave band), column Li under Step 6, with
+# the official WG S3-79 erratum applied: the printed 0.10 should be 1.00. The
+# level-distortion factor of clause 5.7 with the example's own inputs
+# (Ei' = 20 dB, Ui = 9.33 dB) is 1 - (20 - 9.33 - 10)/160 = 0.99581, which is
+# what prints as 1.00 to two decimals.
+ANSIS3_5_ANNEX_C1_LEVEL_DISTORTION_I5 = 1.00
+ANSIS3_5_CRITICAL_TABLE1_HEAD = (
+    (150.0, 100.0, 200.0, 0.0103, 31.44, 1.5),
+    (250.0, 200.0, 300.0, 0.0261, 34.75, -3.9),
+    (350.0, 300.0, 400.0, 0.0419, 34.14, -7.2),
+    (450.0, 400.0, 510.0, 0.0577, 34.58, -8.9),
+    (570.0, 510.0, 630.0, 0.0577, 33.17, -10.3),
+    (700.0, 630.0, 770.0, 0.0577, 30.64, -11.4),
+)
+
 # ---------------------------------------------------------------------------
 # Prominence of impulsive sounds - NT ACOU 112:2002.
 # P = 3*lg(1000) + 2*lg(30) = 11.9542 (Formula 1); the adjustment at P = 10 is

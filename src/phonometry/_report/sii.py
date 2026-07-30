@@ -7,9 +7,11 @@ like a speech-audibility report:
 * a title and the standard-basis line (measurement standard + ANSI S3.5-1997);
 * an optional metadata header block (client, listener/condition ...), rendered
   only for the fields supplied on the :class:`ReportMetadata`;
-* a two-panel body with the per-one-third-octave-band table on the left (the
-  equivalent speech spectrum ``Ei'``, the band-importance function ``Ii`` of
-  Table 3 and the band-audibility function ``Ai``) and the result's own
+* a two-panel body with the per-band table on the left (the equivalent speech
+  spectrum ``Ei'``, the band-importance function ``Ii`` and the
+  band-audibility function ``Ai``, over the bands of whichever of the
+  standard's four band procedures the result was computed with) and the
+  result's own
   ``plot(ax=...)`` (the audibility and its importance-weighted contribution) on
   the right, so the chart is native to the library;
 * a boxed single-number result ``SII = X``;
@@ -54,6 +56,26 @@ from .metadata import ReportMetadata
 if TYPE_CHECKING:
     from ..hearing.sii import SIIResult
 
+#: The band procedure the fiche describes when the result carries no other.
+_DEFAULT_METHOD = "one-third-octave"
+
+#: Name of each ANSI S3.5-1997 band procedure as it reads in the standard-basis
+#: line, keyed by the ``method=`` name of the result.
+_METHOD_NAMES: dict[str, str] = {
+    "critical-band": "critical-band",
+    "equally-contributing": "equally-contributing critical-band",
+    "one-third-octave": "one-third-octave-band",
+    "octave": "octave-band",
+}
+
+#: Caption of the left-hand band table, keyed by the ``method=`` name.
+_TABLE_CAPTIONS: dict[str, str] = {
+    "critical-band": "Critical band audibility",
+    "equally-contributing": "Equally-contributing critical band audibility",
+    "one-third-octave": "One-third-octave band audibility",
+    "octave": "Octave band audibility",
+}
+
 
 def _metadata_pairs(
     metadata: ReportMetadata, language: str = "en"
@@ -79,10 +101,10 @@ def _metadata_pairs(
 
 
 def _band_table(result: SIIResult, verbose: bool, language: str = "en") -> Any:
-    """Build the left-hand per-one-third-octave-band audibility table.
+    """Build the left-hand per-band audibility table of the procedure.
 
     The default table carries the equivalent speech spectrum level ``Ei'``, the
-    band-importance function ``Ii`` (Table 3) and the band-audibility function
+    band-importance function ``Ii`` and the band-audibility function
     ``Ai``; ``verbose`` adds the equivalent disturbance spectrum level ``Di``
     (clause 5.6). Called only after :func:`render_sii_report` has imported
     reportlab.
@@ -221,16 +243,17 @@ def render_sii_report(
     measurement_standard = (
         metadata.measurement_standard if metadata is not None else None
     )
+    method = t(_METHOD_NAMES.get(result.method, "one-third-octave-band"), language)
     if measurement_standard:
         basis = t(
-            "{standard} speech intelligibility index. Rating per ANSI S3.5-1997 (one-third-octave-band method).",
+            "{standard} speech intelligibility index. Rating per ANSI S3.5-1997 ({method} method).",
             language,
-        ).format(standard=html.escape(measurement_standard))
+        ).format(standard=html.escape(measurement_standard), method=method)
     else:
         basis = t(
-            "Speech intelligibility index per ANSI S3.5-1997 (one-third-octave-band method).",
+            "Speech intelligibility index per ANSI S3.5-1997 ({method} method).",
             language,
-        )
+        ).format(method=method)
 
     flow: list[Any] = [
         Paragraph(title, title_style),
@@ -245,7 +268,11 @@ def render_sii_report(
     flow.append(Spacer(1, 8))
 
     left_cell = [
-        Paragraph(t("One-third-octave band audibility", language), caption_style),
+        Paragraph(
+            t(_TABLE_CAPTIONS.get(result.method, _TABLE_CAPTIONS[_DEFAULT_METHOD]),
+              language),
+            caption_style,
+        ),
         _band_table(result, verbose, language),
     ]
     # The verbose table adds a column, so the two-panel split is rebalanced to
