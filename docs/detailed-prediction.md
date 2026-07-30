@@ -1,0 +1,408 @@
+← [Documentation index](README.md)
+
+# Detailed Per-Band Prediction (ISO 12354)
+
+The simplified model of
+[Predicting Sound Insulation (EN 12354)](insulation-prediction.md) returns one
+number, $R'_w$ or $L'_{n,w}$, and hides everything that happens inside the
+spectrum. The **detailed model** (ISO 12354-1:2017 Clause 4.2 airborne,
+ISO 12354-2:2017 Clause 4.2 impact) carries every quantity through the
+one-third-octave bands instead: it converts the laboratory element data into
+their *in-situ* values, forms each transmission path band by band, sums them
+energetically and only then rates the spectrum through ISO 717. That is what a
+consultant runs when the element spectra are known and the question is not
+"does it pass" but "which path do I have to fix, and in which bands".
+
+This page walks the standard's own worked building end to end, and closes with
+the lightweight (Type B) branch and the checks the standard offers on its own
+numbers.
+
+## The chain, band by band
+
+Both parts share the same machinery, so a building is described once and the
+airborne and impact chains read the same in-situ element data.
+
+**1. Element performance.** For a homogeneous element the standard calculates
+the sound reduction index from the material properties (Annex B):
+
+$$
+\tau = \left(\frac{2\rho_o c_o}{2\pi f m'}\right)^2 \cdot
+\frac{\pi f_c \sigma^2}{2 f \eta_\text{tot}} \quad (f > f_c)
+$$
+
+with the radiation factor for free bending waves $\sigma$ (Formulae B.4-B.6),
+the radiation factor for forced waves $\sigma_f$ (Formula B.3) below $f_c$,
+and a third branch for the band that straddles $f_c$. Above about 1 kHz a
+thick element stops improving, and Formula (B.10) floors the transmission
+factor at a plateau set by $\rho c_L$.
+
+**2. In-situ conversion.** The element radiates and is damped differently in
+the building than in the test frame. The total loss factor in situ is
+(Formula C.1)
+
+$$
+\eta_\text{tot} = \eta_\text{int}
++ \frac{2\rho_o c_o \sigma}{2\pi f m'}
++ \frac{c_o}{\pi^2 S \sqrt{f f_c}} \sum_k l_k \alpha_k
+$$
+
+the three terms being the internal losses of the material, the radiation into
+the air, and the losses at the perimeter. The perimeter coefficients follow
+from the junctions themselves, $\alpha_k = \sum_j \sqrt{f_{c,j}/f_\text{ref}}
+\, 10^{-K_{ij}/10}$ (Formula C.4). From $\eta_\text{tot}$ come the structural
+reverberation time $T_s = 2{,}2/(f\,\eta_\text{tot})$ and the equivalent
+absorption length $a_\text{situ} = 2{,}2\pi^2 S \sqrt{f_\text{ref}/f} /
+(c_o T_{s,\text{situ}})$ (Formula 11).
+
+**3. Junctions.** The situation-invariant $K_{ij}$ becomes the level drop the
+junction actually produces (Formula 10):
+
+$$
+\overline{D}_{v,ij,\text{situ}} = K_{ij}
+- 10\lg\!\left(\frac{l_{ij}}{\sqrt{a_{i,\text{situ}}\,a_{j,\text{situ}}}}\right)
+\ \ge 0\ \text{dB}
+$$
+
+**4. Paths.** The direct path is $R_{Dd} = R_{s,\text{situ}} +
+\Delta R_{D,\text{situ}} + \Delta R_{d,\text{situ}}$ (Formula 14) and every
+flanking path (Formula 15)
+
+$$
+R_{ij} = \frac{R_{i,\text{situ}}}{2} + \Delta R_{i,\text{situ}}
++ \frac{R_{j,\text{situ}}}{2} + \Delta R_{j,\text{situ}}
++ \overline{D}_{v,ij,\text{situ}}
++ 10\lg\!\left(\frac{S_s}{\sqrt{S_i S_j}}\right)
+$$
+
+The impact side runs in parallel: the bare slab's per-band level is
+$L_n = 155 - 30\lg m' + 10\lg T_s + 10\lg\sigma + 10\lg(f/f_\text{ref})$
+(Part 2 Formula B.2), the direct path subtracts the covering and any ceiling
+(Formula 11), and each flanking path is Formula (12).
+
+**5. Assembly.** $R' = -10\lg\sum 10^{-R/10}$ over the thirteen paths of a
+four-flanking-element room, and $L'_n = 10\lg\sum 10^{L_n/10}$ over the five
+impact paths, then ISO 717.
+
+## The worked building of Annex L / Annex G
+
+ISO 12354-1:2017 Annex L and ISO 12354-2:2017 Annex G describe the **same**
+building: two dwellings one above the other, 55 m³ rooms, a 5,00 m × 4,00 m
+separating floor of 220 mm concrete carrying a 35 mm floating screed on
+mineral wool, two 365 mm autoclaved aerated concrete external walls and two
+200 mm calcium-silicate internal walls, meeting at rigid T and cross
+junctions. Together they print about twenty per-band tables, one per
+intermediate quantity, which makes the example a complete oracle for the
+model. Eight defects of those printed tables are recorded in
+[Errata](ERRATA.md), and the fixture below takes the corrected readings.
+
+```python
+import numpy as np
+from phonometry import (
+    HomogeneousElement, airborne_flanking_path, detailed_airborne_prediction,
+    direct_reduction_index, floating_floor_improvement, in_situ_element,
+    junction_vibration_reduction, perimeter_absorption_coefficient,
+)
+
+bands = np.array([50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630,
+                  800, 1000, 1250, 1600, 2000, 2500, 3150], float)
+
+# Annex E junctions (unrounded): floor-to-external-wall rigid T, external wall
+# in-line across it, floor-to-internal-wall rigid cross, internal wall in-line.
+k_floor_ext = junction_vibration_reduction("rigid_t", "corner", 484.0 / 219.0)
+k_ext_ext = junction_vibration_reduction("rigid_t", "through", 484.0 / 219.0)
+k_floor_int = junction_vibration_reduction("rigid_cross", "corner", 360.0 / 484.0)
+k_int_int = junction_vibration_reduction("rigid_cross", "through", 484.0 / 360.0)
+print(round(k_floor_ext, 1), round(k_ext_ext, 1))     # 6.4 11.2  (Table L.5)
+print(round(k_floor_int, 1), round(k_int_int, 1))     # 8.8 11.0  (Table L.6)
+
+# The floor's perimeter: it butts into an external wall above and below at each
+# of its two external edges, and crosses the internal walls at the other two.
+a_at_ext = perimeter_absorption_coefficient([92.6, 92.6], [k_floor_ext] * 2)
+a_at_int = perimeter_absorption_coefficient(
+    [76.8, 128.4, 128.4], [junction_vibration_reduction(
+        "rigid_cross", "through", 360.0 / 484.0), k_floor_int, k_floor_int])
+floor_perimeter = 9.0 * (a_at_ext + a_at_int)         # 2.659 m (Formula C.4)
+
+floor = HomogeneousElement("floor", 20.0, 5.0, 4.0, 484.0, 76.8, 0.005,
+                           floor_perimeter, 2200.0, 3800.0)
+el = in_situ_element(floor, bands)
+print(np.round(el.total_loss_factor[[0, 10]], 4))     # [0.0831 0.029 ]  Table L.3
+print(np.round(el.sound_reduction_index[[0, 10]], 1)) # [31.8 54.9]      Table L.3
+print(np.round(el.impact_level[[0, 10]], 1))          # [57.3 63.6]      Table G.3
+print(np.round(el.absorption_length[[0, 10]], 1))     # [10.8 11.9]      Table L.4
+```
+
+Every printed column of Tables L.2, L.3, L.4, G.3 and G.4 comes back within
+0,06 dB, and the same fixture drives both totals.
+
+```python
+# The floating floor: 35 mm screed, m' = 73,5 kg/m2 on s' = 8 MN/m3.
+f0 = 160.0 * np.sqrt(8.0 / 73.5)                      # 52.8 Hz (Formula C.2)
+delta = floating_floor_improvement(bands, resonance_frequency=f0)  # 30 lg(f/f0)
+
+wall = in_situ_element(HomogeneousElement(
+    "ext1", 11.0, 4.0, 2.75, 219.0, 92.6, 0.0125, 2.375, 600.0, 1900.0), bands)
+
+# Path D1 (Df: separating floor -> external wall 1), Table L.4.
+d1 = airborne_flanking_path(
+    label="D1", kind="Df", element_i=el, element_j=wall,
+    vibration_reduction_index=k_floor_ext, coupling_length=4.0,
+    separating_area=20.0, delta_r_i=delta)
+print(np.round(d1.values[[0, 10]], 1))                # [ 41.2  93.6]  Table L.1
+```
+
+Assembling the direct path and all twelve flanking paths gives the apparent
+index per band, its energy split and the ISO 717-1 rating in one call:
+
+```python
+# `paths` holds the twelve flanking paths of the four elements, built the
+# way `d1` was above; the code block under the figure builds all of them.
+res = detailed_airborne_prediction(
+    bands, direct_index=direct_reduction_index(el.sound_reduction_index,
+                                               delta_r_source=delta),
+    flanking_paths=paths)
+print(np.round(res.r_prime[[0, 10]], 1))   # [28.8 55.9]   Table L.1 total
+print(res.rating.rating, res.dominant[0])  # 57 'Dd'
+res.plot()                                 # per-band path-contribution bars
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/detailed_prediction_paths_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/detailed_prediction_paths.svg" alt="Stacked per-band shares of the transmitted energy for the thirteen transmission paths of the ISO 12354-1 Annex L building, with the apparent sound reduction index R' overlaid: the direct path Dd carries half the energy at 50 Hz, falls away through the 80 Hz to 160 Hz transition and is negligible from 200 Hz upwards, after which flanking paths across the external and internal walls take over" width="92%"></picture>
+
+*This is the plot the whole detailed model exists for. Below 80 Hz the
+separating floor itself is the problem, so a heavier slab or a better floating
+floor would help; it fades through the 80 Hz to 160 Hz transition and from
+200 Hz upwards it has left the budget entirely, the flanking paths across the
+walls setting $R'$ on their own, so no amount of work on the floor would move
+the result there. The single number $R'_w = 57$ dB says none of that.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import (
+    HomogeneousElement, airborne_flanking_path, detailed_airborne_prediction,
+    direct_reduction_index, floating_floor_improvement, in_situ_element,
+    junction_vibration_reduction, perimeter_absorption_coefficient,
+)
+
+bands = np.array([50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630,
+                  800, 1000, 1250, 1600, 2000, 2500, 3150], float)
+k = {
+    "floor-ext": junction_vibration_reduction("rigid_t", "corner", 484.0 / 219.0),
+    "ext-ext": junction_vibration_reduction("rigid_t", "through", 484.0 / 219.0),
+    "floor-floor": junction_vibration_reduction("rigid_cross", "through", 360.0 / 484.0),
+    "floor-int": junction_vibration_reduction("rigid_cross", "corner", 360.0 / 484.0),
+    "int-int": junction_vibration_reduction("rigid_cross", "through", 484.0 / 360.0),
+    "int-ext": junction_vibration_reduction("rigid_t", "corner", 360.0 / 219.0),
+    "extT-ext": junction_vibration_reduction("rigid_t", "through", 360.0 / 219.0),
+    "corner": junction_vibration_reduction("corner", "corner", 1.0),
+    "int-int-x": junction_vibration_reduction("rigid_cross", "through", 1.0),
+}
+a = perimeter_absorption_coefficient
+floor_sum = 9.0 * (a([92.6, 92.6], [k["floor-ext"]] * 2)
+                   + a([76.8, 128.4, 128.4],
+                       [k["floor-floor"], k["floor-int"], k["floor-int"]]))
+ext_top = a([76.8, 92.6], [k["floor-ext"], k["ext-ext"]])
+ext_side = a([92.6], [k["corner"]]) + a([128.4, 92.6], [k["int-ext"], k["extT-ext"]])
+int_top = a([76.8, 76.8, 128.4], [k["floor-int"], k["floor-int"], k["int-int"]])
+int_side = a([92.6, 92.6], [k["int-ext"]] * 2) + a([128.4] * 3, [k["int-int-x"]] * 3)
+
+specs = {
+    "floor": (20.0, 5.0, 4.0, 484.0, 76.8, 0.005, floor_sum, 2200.0, 3800.0),
+    "ext1": (11.0, 4.0, 2.75, 219.0, 92.6, 0.0125,
+             8.0 * ext_top + 2.75 * ext_side, 600.0, 1900.0),
+    "ext2": (13.75, 5.0, 2.75, 219.0, 92.6, 0.0125,
+             10.0 * ext_top + 2.75 * ext_side, 600.0, 1900.0),
+    "int1": (11.0, 4.0, 2.75, 360.0, 128.4, 0.01,
+             8.0 * int_top + 2.75 * int_side, 1800.0, 2500.0),
+    "int2": (13.75, 5.0, 2.75, 360.0, 128.4, 0.01,
+             10.0 * int_top + 2.75 * int_side, 1800.0, 2500.0),
+}
+situ = {name: in_situ_element(HomogeneousElement(name, *spec), bands)
+        for name, spec in specs.items()}
+delta = floating_floor_improvement(bands,
+                                   resonance_frequency=160.0 * np.sqrt(8.0 / 73.5))
+
+paths = []
+for tag, name, lij in (("1", "ext1", 4.0), ("2", "ext2", 5.0),
+                       ("3", "int1", 4.0), ("4", "int2", 5.0)):
+    wall = situ[name]
+    cross = k["floor-ext"] if name.startswith("ext") else k["floor-int"]
+    through = k["ext-ext"] if name.startswith("ext") else k["int-int"]
+    paths += [
+        airborne_flanking_path(label=f"D{tag}", kind="Df", element_i=situ["floor"],
+                               element_j=wall, vibration_reduction_index=cross,
+                               coupling_length=lij, separating_area=20.0,
+                               delta_r_i=delta),
+        airborne_flanking_path(label=f"{tag}d", kind="Fd", element_i=wall,
+                               element_j=situ["floor"], vibration_reduction_index=cross,
+                               coupling_length=lij, separating_area=20.0),
+        airborne_flanking_path(label=f"{tag}{tag}", kind="Ff", element_i=wall,
+                               element_j=wall, vibration_reduction_index=through,
+                               coupling_length=lij, separating_area=20.0),
+    ]
+res = detailed_airborne_prediction(
+    bands,
+    direct_index=direct_reduction_index(situ["floor"].sound_reduction_index,
+                                        delta_r_source=delta),
+    flanking_paths=paths)
+
+# One line — the per-band path contributions with R' overlaid:
+res.plot()
+plt.show()
+```
+
+</details>
+
+The impact side of the same building runs on the same `situ` dictionary:
+
+```python
+from phonometry import (detailed_impact_prediction, direct_impact_level,
+                        impact_flanking_path)
+
+direct = direct_impact_level(situ["floor"].impact_level, delta_l=delta)
+flanking = [
+    impact_flanking_path(label=f"Df{tag}", floor=situ["floor"], element_j=situ[name],
+                         vibration_reduction_index=(
+                             k["floor-ext"] if name.startswith("ext") else k["floor-int"]),
+                         coupling_length=lij, delta_l=delta)
+    for tag, name, lij in (("1", "ext1", 4.0), ("2", "ext2", 5.0),
+                           ("3", "int1", 4.0), ("4", "int2", 5.0))
+]
+imp = detailed_impact_prediction(bands, direct_level=direct, flanking_paths=flanking)
+print(np.round(imp.l_prime_n[[3, 10]], 1))     # [54.  35.9]   Table G.1 total
+print(imp.rating.rating, imp.rating.ci)        # 41 2           printed 41,0 (2)
+```
+
+## Simplified against detailed
+
+The standard applies its simplified model to the same building (Tables L.10 /
+G.10): $R'_w = 57{,}0$ dB and $L'_{n,w} = 39{,}7$ dB against the detailed
+model's $R'_w = 57$ dB and $L'_{n,w} = 41$ dB. The two agree well inside the
+models' own stated spread, and the library's test suite pins that agreement.
+The detailed model's advantage is not accuracy on the single number but the
+spectrum behind it: the airborne prediction of the detailed model carries no
+bias error and a standard deviation of 1,5 dB to 2,5 dB (Clause 5) against
+about 2 dB for the simplified one.
+
+## Lightweight constructions (Type B)
+
+For elements whose structural reverberation time is *not* set by the connected
+elements the standard takes $T_{s,\text{situ}} = T_{s,\text{lab}}$ and
+describes the junction with the **normalized** velocity level difference
+$\overline{D}_{v,ij,n}$ instead of $K_{ij}$ (Formula 17), or with a laboratory
+measurement of the flanking level difference $D_{n,f}$ (Formula 16). Below
+$f_c$ the element indices must first be corrected to resonant transmission
+only (Annex B.1/B.2, an 8 dB estimate for single frame elements without a
+cavity). The impact side offers the same two routes: Part 2 Formula (14) from
+$\overline{D}_{v,ij,n}$ and Part 2 Formula (13) from a measured normalized
+flanking impact level $L_{n,f}$.
+
+```python
+from phonometry import (flanking_impact_level_from_flanking_level,
+                        flanking_reduction_index_from_flanking_level,
+                        flanking_reduction_index_from_normalized_difference,
+                        resonant_sound_reduction_index)
+
+# ISO 12354-1 L.2.1: a wood frame building, floor 20 m2, junction 4 m.
+r_star = resonant_sound_reduction_index(r_wall_leaf, bands,
+                                        critical_frequency=2200.0)   # +8 dB below fc
+r_ff = flanking_reduction_index_from_normalized_difference(
+    index_i=r_star, index_j=r_star, normalized_velocity_level_difference=dv_n,
+    separating_area=20.0, coupling_length=4.0)                        # Table L.11
+
+# ISO 12354-1 L.2.2: a measured junction between two timber frame walls.
+r13 = flanking_reduction_index_from_flanking_level(
+    dnf_13, separating_area=10.44, coupling_length=2.41,
+    laboratory_coupling_length=2.5)                                   # Table L.15
+
+# ISO 12354-2 Formula (13): the impact twin, from a measured Ln,f.
+ln_13 = flanking_impact_level_from_flanking_level(
+    lnf_13, area=20.0, laboratory_area=10.0,
+    coupling_length=4.0, laboratory_coupling_length=4.5)
+```
+
+## Checks the standard gives you
+
+Two identities let a spectrum check itself. For a homogeneous floor the
+airborne index and the impact level add up to a function of frequency alone
+(Part 2 Formulae B.3/B.4), $R + L_n = 38 + 30\lg f$ in one-third-octave bands
+and $43 + 30\lg f$ in octave bands, valid where forced transmission is
+negligible; `reciprocity_impact_level` implements it. And Table B.2 of Part 2
+tabulates the octave-band $L_n$ of four monolithic floors calculated the way
+this module does, a useful sanity target for a new floor build-up.
+
+## `in_situ_element()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `element` | `HomogeneousElement` | — | — | Area, side lengths, `m'`, `fc`, `ηint`, `Σ lk αk`, and optionally `ρ`/`cL` |
+| `frequencies` | array | Hz | > 0 | Band centres |
+| `bands` | str | — | `'third'` (default) / `'octave'` | Sets the band that carries the `f ≈ fc` branch |
+| `resonant_only` | bool | — | default `False` | Drops the forced-transmission term below `fc` (Annex B.1, flanking paths) |
+| `speed_of_sound` | float | m/s | default `340` | The value ISO 12354-1 Annex A fixes |
+| `air_density` | float | kg/m³ | default `1.29` | `ρo` of the Annex B model |
+
+## `airborne_flanking_path()` / `impact_flanking_path()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `label` | str | — | — | Display name of the path |
+| `kind` | str | — | `'Ff'` / `'Df'` / `'Fd'` | Airborne only; the impact builder is always `Df` |
+| `element_i` / `element_j` | `InSituElementResult` | — | — | Source-room and receiving-room elements (`floor` / `element_j` for impact) |
+| `vibration_reduction_index` | float or array | dB | — | `Kij` of this path |
+| `coupling_length` | float | m | > 0 | Junction coupling length `lij` |
+| `separating_area` | float | m² | > 0 | `Ss` (airborne only) |
+| `delta_r_i` / `delta_r_j` | float or array | dB | default `0` | Lining improvements |
+| `delta_l` | float or array | dB | default `0` | Floor-covering improvement (impact only) |
+
+## Detailed prediction report (`.report()`)
+
+`DetailedAirborneResult.report()` and `DetailedImpactResult.report()` write the
+per-band counterpart of the simplified prediction fiches: the same one-page
+layout, a basis line naming ISO 12354-1/-2:2017 Clause 4.2, the per-path
+share-of-energy table beside the per-band path-contribution figure, the boxed
+`R'w` / `L'n,w`, the detailed model's 1,5 dB to 2,5 dB standard deviation and a
+PASS/FAIL verdict against a `requirement`. `verbose=True` annexes the band in
+which each path peaks. Both need the ISO 717 rating, so the spectrum must cover
+100 Hz to 3150 Hz (or 125 Hz to 2000 Hz in octaves).
+
+## References
+
+- Hopkins, C. (2007). *Sound insulation*. Butterworth-Heinemann.
+  ISBN 978-0-7506-6526-1.
+  [doi:10.4324/9780080550473](https://doi.org/10.4324/9780080550473).
+  The physical background of every term of the detailed model: radiation
+  efficiency, structural reverberation time, the equivalent absorption length
+  and the statistical-energy-analysis footing of the path summation.
+- Vigran, T. E. (2008). *Building acoustics*. Taylor & Francis.
+  ISBN 978-0-415-42853-8.
+  The homogeneous-element transmission model and the impact-level closed form
+  behind Annex B of both parts.
+
+## Standards
+
+ISO 12354-1:2017 and ISO 12354-2:2017, whose Clause 4.2 defines the detailed
+per-band model, Annex B the calculated element performance and radiation
+factors, Annex C the structural reverberation time and Annex E the junction
+vibration reduction indices. The worked examples of ISO 12354-1 Annex L and
+ISO 12354-2 Annex G describe one shared building in about twenty per-band
+tables and are the numerical anchor of this module; the defects found in their
+printed tables are recorded in [Errata](ERRATA.md).
+
+## See also
+
+- [Predicting Sound Insulation (EN 12354)](insulation-prediction.md): the
+  simplified single-number model and the Annex E junction catalogue this page
+  builds on.
+- [Laboratory Flanking Transmission (ISO 10848)](flanking-lab.md): where the
+  measured `Kij` and the equivalent absorption length come from.
+- [Insulation Ratings (ISO 717)](insulation-ratings.md): the reference-curve
+  engine that turns the predicted spectrum into `R'w` / `L'n,w`.
+- [Field Insulation Measurement (ISO 16283)](insulation-field.md): the built
+  result the prediction is checked against.
+- [Dynamic stiffness of resilient materials (EN 29052-1)](dynamic-stiffness.md):
+  the `s'` behind the floating floor's resonance frequency.
+- API reference: [`building.detailed_prediction`](https://jmrplens.github.io/phonometry/reference/api/building/detailed-prediction/).

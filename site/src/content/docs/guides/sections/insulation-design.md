@@ -20,6 +20,12 @@ ISO 10140 and junction data measured per ISO 10848, both of which live in
 field measurement the prediction is checked against, and beside the façade
 guide that carries the same family across the building envelope.
 
+[Detailed Per-Band Prediction (ISO 12354)](/phonometry/guides/detailed-prediction/)
+runs the same standard band by band instead of on single numbers: the
+laboratory element and junction data are converted to their in-situ values,
+every path is formed per band, and the result shows which path dominates each
+band rather than only whether the room passes.
+
 [Predicting Panel Sound Insulation](/phonometry/guides/panel-sound-insulation/)
 goes one level deeper, to where the element $R$ itself comes from: the mass law
 and the coincidence dip of a single panel, the mass-spring-mass behaviour of a
@@ -41,6 +47,10 @@ floor, and with it the resonance frequency the whole improvement hangs on.
 - [Predicting Sound Insulation (EN 12354)](/phonometry/guides/insulation-prediction/):
   the airborne and impact flanking models between rooms (EN 12354-1/2) with
   their junction vibration reduction indices and prediction fiches.
+- [Detailed Per-Band Prediction (ISO 12354)](/phonometry/guides/detailed-prediction/):
+  the per-band detailed model of ISO 12354-1/-2 with in-situ element and
+  junction conversion, the flanking indices per band and the per-path
+  contributions behind the rating.
 - [Predicting Panel Sound Insulation](/phonometry/guides/panel-sound-insulation/):
   the mass law and coincidence dip (Sharp), double walls (Bies), slits and
   apertures (Gomperts, Wilson-Soroka), radiation efficiency

@@ -2620,6 +2620,132 @@ def _chk_iso9611_mean_velocity() -> Outcome:
     return numeric(ref.ISO9611_MEAN_EXPECTED, computed, 1e-9, unit="dB", places=4)
 
 
+# --- Detailed per-band building prediction (ISO 12354-1/-2:2017) ---
+def _iso12354_detailed_situ() -> tuple[Any, dict[str, Any], np.ndarray]:
+    """The Annex L / Annex G building evaluated in situ, per band."""
+    import iso12354_building as bld
+
+    bands = np.asarray(ref.ISO12354_ANNEX_L_BANDS, dtype=np.float64)
+    situ = {k: ph.in_situ_element(e, bands) for k, e in bld.elements().items()}
+    delta = ph.floating_floor_improvement(
+        bands, resonance_frequency=bld.floating_floor_resonance()
+    )
+    return bands, situ, delta
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 12354-1:2017 Annex L, Tables L.2 to L.4",
+    "In-situ element chain: 10 lg sigma, 10 lg sigma_f, eta_tot, Rsitu, a_situ "
+    "(21 bands x 5 elements)",
+)
+def _chk_iso12354_annex_l_elements() -> Outcome:
+    # Every quantity is compared on a decibel scale so the reported worst
+    # deviation carries one unit: the two radiation factors and the loss
+    # factor are dimensionless, so they enter as 10 lg of the ratio, and the
+    # absorption length as 10 lg of its ratio to the printed value.
+    _bands, situ, _delta = _iso12354_detailed_situ()
+
+    def _ratio_db(computed: Any, printed: Any) -> float:
+        return float(np.max(np.abs(
+            10.0 * np.log10(np.asarray(computed) / np.asarray(printed))
+        )))
+
+    worst = 0.0
+    for label, printed in ref.ISO12354_ANNEX_L2_SIGMA.items():
+        worst = max(worst, _ratio_db(situ[label].radiation_factor, printed))
+    for label, printed in ref.ISO12354_ANNEX_L2_SIGMA_F.items():
+        worst = max(worst, _ratio_db(situ[label].forced_radiation_factor, printed))
+    for label, printed in ref.ISO12354_ANNEX_L3_ETA.items():
+        worst = max(worst, _ratio_db(situ[label].total_loss_factor, printed))
+    for label, printed in ref.ISO12354_ANNEX_L4_ABSORPTION.items():
+        worst = max(worst, _ratio_db(situ[label].absorption_length, printed))
+    for label, printed in ref.ISO12354_ANNEX_L3_R_SITU.items():
+        worst = max(worst, float(np.max(np.abs(
+            situ[label].sound_reduction_index - np.asarray(printed)
+        ))))
+    return numeric(0.0, worst, 0.1, unit="dB", places=3)
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 12354-1:2017 Annex L, Table L.1",
+    "Detailed airborne model: 13 paths + R' per band, R'w = 57 dB",
+)
+def _chk_iso12354_annex_l1() -> Outcome:
+    import iso12354_building as bld
+
+    bands, situ, delta = _iso12354_detailed_situ()
+    result = ph.detailed_airborne_prediction(
+        bands,
+        direct_index=ph.direct_reduction_index(
+            situ["floor"].sound_reduction_index, delta_r_source=delta),
+        flanking_paths=bld.airborne_paths(situ, delta),
+    )
+    worst = max(
+        float(np.max(np.abs(p.values - np.asarray(ref.ISO12354_ANNEX_L1_PATHS[p.label]))))
+        for p in result.paths
+    )
+    worst = max(worst, float(np.max(np.abs(
+        result.r_prime - np.asarray(ref.ISO12354_ANNEX_L1_R_PRIME)
+    ))))
+    rating = result.rating.rating if result.rating is not None else None
+    ok = worst <= 0.1 and rating == ref.ISO12354_ANNEX_L1_R_PRIME_W
+    return Outcome(
+        expected=f"max path/total dev <= 0,1 dB; R'w = "
+        f"{ref.ISO12354_ANNEX_L1_R_PRIME_W} dB",
+        computed=f"{worst:.3f} dB; {rating} dB",
+        delta=f"{worst:.3f} dB",
+        passed=ok,
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 12354-2:2017 Annex G, Tables G.3, G.4 and G.1",
+    "Detailed impact model: Ln,situ, Ln,Dd, Ln,Df, L'n per band, L'n,w = 41 dB",
+)
+def _chk_iso12354_annex_g1() -> Outcome:
+    import iso12354_building as bld
+
+    bands, situ, delta = _iso12354_detailed_situ()
+    result = ph.detailed_impact_prediction(
+        bands,
+        direct_level=ph.direct_impact_level(situ["floor"].impact_level, delta_l=delta),
+        flanking_paths=bld.impact_paths(situ, delta),
+    )
+    worst = float(np.max(np.abs(
+        situ["floor"].impact_level - np.asarray(ref.ISO12354_ANNEX_G3_LN_SITU)
+    )))
+    by_label = {p.label: np.asarray(p.values) for p in result.paths}
+    worst = max(worst, float(np.max(np.abs(
+        by_label["Dd"] - np.asarray(ref.ISO12354_ANNEX_G4_LN_DD)
+    ))))
+    worst = max(worst, float(np.max(np.abs(
+        by_label["Df1"] - np.asarray(ref.ISO12354_ANNEX_G4_LN_DF)
+    ))))
+    # Table G.1's flanking columns disagree with Table G.4 below 100 Hz; see
+    # docs/ERRATA.md. The total is compared over the same 100 Hz to 5 kHz range.
+    worst = max(worst, float(np.max(np.abs(
+        result.l_prime_n[3:] - np.asarray(ref.ISO12354_ANNEX_G1_L_PRIME_N[3:])
+    ))))
+    rating = result.rating
+    ok = (
+        worst <= 0.1
+        and rating is not None
+        and rating.rating == ref.ISO12354_ANNEX_G1_L_PRIME_N_W
+        and rating.ci == ref.ISO12354_ANNEX_G1_CI
+    )
+    printed = f"{ref.ISO12354_ANNEX_G1_L_PRIME_N_W} ({ref.ISO12354_ANNEX_G1_CI})"
+    got = "n/a" if rating is None else f"{rating.rating} ({rating.ci})"
+    return Outcome(
+        expected=f"max path/total dev <= 0,1 dB; L'n,w (CI) = {printed} dB",
+        computed=f"{worst:.3f} dB; {got} dB",
+        delta=f"{worst:.3f} dB",
+        passed=ok,
+    )
+
+
 # --- Installed structure-borne sound from equipment (EN 12354-5) ---
 @register(
     "Room & building acoustics",

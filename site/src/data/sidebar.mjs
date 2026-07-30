@@ -191,6 +191,7 @@ export const sidebar = [
         items: [
           { slug: 'guides/sections/insulation-design', label: 'Overview', translations: { es: 'Resumen' } },
           'guides/insulation-prediction',
+          'guides/detailed-prediction',
           'guides/panel-sound-insulation',
           'guides/impact-improvement',
           'guides/dynamic-stiffness',

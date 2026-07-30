@@ -103,6 +103,7 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`building.flanking_transmission`](/phonometry/reference/api/building/flanking-transmission/) | Laboratory measurement of flanking sound transmission (ISO 10848:2006/2010). |
 | [`building.facade_prediction`](/phonometry/reference/api/building/facade-prediction/) | Façade sound insulation and outdoor radiation prediction (EN 12354-3/-4:2000). |
 | [`building.building_prediction`](/phonometry/reference/api/building/building-prediction/) | Building acoustic performance prediction (EN 12354-1/-2:2000). |
+| [`building.detailed_prediction`](/phonometry/reference/api/building/detailed-prediction/) | Detailed per-band building prediction (EN/ISO 12354-1/-2:2017). |
 | [`building.building_uncertainty`](/phonometry/reference/api/building/building-uncertainty/) | Measurement uncertainty in building acoustics (ISO 12999-1:2020). |
 | [`building.floor_covering_improvement`](/phonometry/reference/api/building/floor-covering-improvement/) | Impact-sound improvement of floor coverings on a small mock-up (ISO 16251-1:2014). |
 | [`building.structure_borne_power`](/phonometry/reference/api/building/structure-borne-power/) | Structure-borne sound power of building equipment (EN 15657:2018; ISO 9611). |
