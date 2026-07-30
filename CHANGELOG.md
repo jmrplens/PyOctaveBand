@@ -177,6 +177,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the printed answers to Norton's problems 7.1 and 7.2. Three new conformance
   rows.
 
+- IEC 61043 instrument-class verification for two-microphone sound-intensity
+  chains (new `metrology/intensity_compliance.py`). `residual_index_limits`
+  returns the Table 2 minimum pressure-residual intensity index per
+  one-third-octave band from 50 Hz to 6.3 kHz for a probe, a processor or a
+  complete instrument in class 1 and class 2, rescaled to any microphone
+  separation by the Note 1 rule `+10 lg(x/25)`; `verify_intensity_class` and
+  `intensity_class_compliance` grade a measured `δpI0` spectrum against both
+  masks band by band, returning the class the chain meets, the binding
+  margin, the bands that miss it and a `range_limited` flag when the verified
+  bands cover neither frequency range of clause 6.1;
+  `instrument_class_from_components` applies the clause 8 rule for a probe
+  and a processor supplied separately. The result exposes `.plot()` (measured
+  index over the two Table 2 masks, with the pass region shaded and the
+  blocking bands ringed) and `.report()`, a one-page verification fiche laid
+  out like a published accredited calibration certificate. New
+  `phase_mismatch_from_residual_index` and
+  `residual_index_from_phase_mismatch` convert between the index and the
+  equivalent channel phase mismatch, `δpI0 = 10 lg(kd/φs)`. Anchored on
+  Table 2 of EN 61043:1994 transcribed digit for digit and cross-checked
+  against its reproduction as Table 6.1 in Fahy, *Sound Intensity* 2nd ed.,
+  and on Fahy's worked check that 20 dB at 1 kHz over 25 mm is a mismatch of
+  about 0.26 degrees. Clause 6.1 follows the EN/IEC text, in which class 2 is
+  met over either the one-third-octave range or the octave one; the official
+  Spanish version UNE-EN 61043:1999 states only the octave alternative, and
+  that omission is recorded in `docs/ERRATA.md`. Four new conformance checks,
+  a new figure `intensity_class`, and two sections in the intensity guide in
+  English and Spanish.
+
+- ISO 9614-1 field indicator F1, the temporal variability of the sound field
+  (`temporal_variability_indicator`, equations (A.1)-(A.2)): the coefficient
+  of variation of the M short-time-averaged normal-intensity samples taken at
+  one typical position in the initial test (clause 8.2). `field_indicators`
+  accepts those samples as `temporal_intensity` and fills `f1` on the result
+  alongside F2, F3 and F4, `FieldIndicators.field_is_stationary()` checks it
+  against the Table B.3 limit of 0.6 (`TEMPORAL_VARIABILITY_LIMIT`), and the
+  indicator plot draws F1 and that limit beside F4. ISO 9614-1 publishes no
+  worked example for F1, so it is anchored on the closed form of equation
+  (A.1) and on identity checks against F4, which is the same statistic taken
+  over the measurement positions instead of the time samples.
+
 - 2D near-to-far-field (NTFF) transformation for the FDTD solver.
   `FDTD2D.add_contour_probe` captures the steady-state pressure and outward
   normal-velocity phasors on a closed rectangular contour of cell faces with

@@ -1265,6 +1265,40 @@ def _filter_class_1995_example() -> tuple[object, ReportMetadata, str]:
     return result, metadata, "iec61260_filter_1995_example.pdf"
 
 
+def _intensity_class_example() -> tuple[object, ReportMetadata, str]:
+    """IEC 61043 fiche: class verification of a p-p intensity chain.
+
+    A complete instrument fitted with the common 12 mm spacer. The measured
+    index follows the physics behind Table 2: a residual channel phase
+    mismatch ``phi_s`` reads as ``delta_pI0 = 10 lg(kd/phi_s)``, so a mismatch
+    that is constant in degrees already climbs 10 dB per decade (the slope of
+    the requirement below 250 Hz) and levels off above 1 kHz where the
+    mismatch of a real chain grows with frequency. A vent resonance of the
+    capsules costs 4 dB around 100 Hz, the one band that drops out of class 1,
+    so the fiche boxes a Class 2 COMPLIES result and fails the
+    required-class-1 verdict, showing both halves of the layout at once.
+    """
+    spacing = 0.012
+    freqs, _, _ = ph.residual_index_limits("instrument", spacing=spacing)
+    phase_mismatch = 0.05 * np.maximum(1.0, freqs / 1000.0)  # degrees
+    measured = ph.residual_index_from_phase_mismatch(phase_mismatch, freqs, spacing)
+    measured = measured - 4.0 * np.exp(-((np.log(freqs / 100.0) / 0.25) ** 2))
+    result = ph.intensity_class_compliance(measured, freqs, spacing=spacing)
+    metadata = ReportMetadata(
+        specimen="p-p sound intensity probe and analyser, 12 mm spacer",
+        client="Example client",
+        manufacturer="Example instruments",
+        test_room="Electroacoustics laboratory (example)",
+        measurement_standard="IEC 61043:1993",
+        test_date="2026-07-20",
+        laboratory="Phonometry reference example",
+        operator="phonometry",
+        report_id="EXAMPLE-61043",
+        required_class=1,
+    )
+    return result, metadata, "iec61043_intensity_example.pdf"
+
+
 def _iso4871_declaration_example() -> tuple[object, ReportMetadata, str]:
     """ISO 4871 fiche: a dual-number machinery noise-emission declaration.
 
@@ -3239,6 +3273,7 @@ _EXAMPLES: list[Callable[[], tuple[object, ReportMetadata, str]]] = [
     _epnl_example,
     _filter_class_example,
     _filter_class_1995_example,
+    _intensity_class_example,
     _iso4871_declaration_example,
     _loudspeaker_example,
     _microphone_example,

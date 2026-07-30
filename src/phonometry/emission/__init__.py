@@ -13,11 +13,13 @@ from .declaration import (
     OperatingModeDeclaration,
 )
 from .intensity import (
+    TEMPORAL_VARIABILITY_LIMIT,
     FieldIndicators,
     IntensityResult,
     dynamic_capability_index,
     field_indicators,
     sound_intensity,
+    temporal_variability_indicator,
 )
 from .sound_power import (
     MeteorologicalCorrection,
@@ -62,6 +64,7 @@ from .vibration_sound_power import (
 __all__ = [
     "NORMALIZED_IMPEDANCE",
     "REFERENCE_VELOCITY",
+    "TEMPORAL_VARIABILITY_LIMIT",
     "DeclarationForm",
     "FieldIndicators",
     "IntensityResult",
@@ -102,6 +105,7 @@ __all__ = [
     "sound_power_intensity_precision",
     "sound_power_pressure",
     "sound_power_reverberation",
+    "temporal_variability_indicator",
     "velocity_level",
     "velocity_level_from_acceleration",
 ]

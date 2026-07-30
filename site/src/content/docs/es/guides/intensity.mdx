@@ -16,14 +16,14 @@ references:
     title: "Electroacoustics — Instruments for the measurement of sound intensity — Measurements with pairs of pressure sensing microphones"
     designation: "IEC 61043:1993"
     url: "https://webstore.iec.ch/en/publication/4353"
-    note: "Adoptada en Europa como EN 61043:1994. La norma de instrumentación: el estimador por espectro cruzado con dos micrófonos, el ensayo de intensidad residual detrás de δpI0, los requisitos de clase 1 / clase 2, y la corrección del sesgo por diferencias finitas con su límite de ancho de banda utilizable (cláusula 7.3, Tabla 3)."
+    note: "Adoptada en Europa como EN 61043:1994. La norma de instrumentación: el estimador por espectro cruzado con dos micrófonos, el ensayo de intensidad residual detrás de δpI0, los mínimos por banda del índice residual de la tabla 2 para sondas, procesadores e instrumentos en clase 1 y clase 2 con su regla de separación +10 lg(x/25) (nota 1), los rangos de frecuencia de los procesadores (apartado 6.1), la regla de combinación de componentes (apartado 8), y la corrección del sesgo por diferencias finitas con su límite de ancho de banda utilizable (apartado 7.3, tabla 3)."
   - type: standard
     organization: "International Organization for Standardization"
     year: 1993
     title: "Acoustics — Determination of sound power levels of noise sources using sound intensity — Part 1: Measurement at discrete points"
     designation: "ISO 9614-1:1993"
     url: "https://www.iso.org/standard/17427.html"
-    note: "El índice presión-intensidad, los indicadores de campo F2 a F4 del Anexo A, el criterio de capacidad dinámica (Anexo B) y la regla de los 0,5 m de distancia de la superficie."
+    note: "El índice presión-intensidad, los indicadores de campo F1 a F4 del Anexo A (F1 según las ecuaciones (A.1)-(A.2), evaluado en el ensayo inicial del apartado 8.2 y de nuevo según B.1.4), el límite de variabilidad temporal de la tabla B.3, el criterio de capacidad dinámica (Anexo B) y la regla de los 0,5 m de distancia de la superficie."
 ---
 
 import Video from '../../../../components/Video.astro';
@@ -186,8 +186,41 @@ ambos:
 - **Campos reactivos**: cuando `pressure_intensity_index` (F2 en ISO 9614-1)
   se acerca al índice residual δ_pI0 de la sonda, dominan los errores de fase.
 
-Sobre una superficie de medición, los indicadores de campo del Anexo A de
-ISO 9614-1 califican el propio barrido. **F2**, el indicador
+Antes que nada, ISO 9614-1 plantea una pregunta sobre el *campo* y no sobre
+la superficie: ¿es lo bastante estacionario como para barrerlo? En el ensayo
+inicial (apartado 8.2) se elige una posición "típica" sobre una superficie
+inicial de medida y allí se muestrea la intensidad normal `M` veces con un
+tiempo de promediación corto (la nota 9 sugiere `M = 10` y, para señales
+periódicas, de 8 s a 12 s por muestra o cualquier número entero de ciclos).
+**F1**, el indicador de variabilidad temporal, es el coeficiente de
+variación de esas muestras (ecuaciones (A.1)-(A.2)), de modo que vale cero
+para un campo perfectamente estacionario y crece a medida que la intensidad
+parásita fluctúa. La tabla B.3 exige el código de acción (e) por encima de
+`F1 > 0,6`: reducir la variabilidad, medir en periodos más tranquilos o
+alargar el tiempo de promediación en cada posición. El Anexo B además lo
+evalúa inmediatamente antes y después de la medida en cualquiera de las
+superficies (B.1.4).
+
+```python
+from phonometry import emission
+
+# Las M muestras de tiempo corto de la intensidad normal en una posición fija (W/m²).
+samples = [1.20e-5, 0.94e-5, 1.51e-5, 1.08e-5, 1.33e-5,
+           1.02e-5, 1.44e-5, 1.17e-5, 0.88e-5, 1.29e-5]
+
+f1 = emission.temporal_variability_indicator(samples)
+print(round(f1, 3))                          # 0.177, un campo estacionario
+
+# O bien acompañando al resultado de superficie junto a F2/F3/F4, pasando las
+# mismas muestras a field_indicators junto con el barrido por posiciones:
+fi = emission.field_indicators([74.1, 73.8, 74.5, 73.2],
+                               [1.2e-5, 1.0e-5, 1.4e-5, 0.9e-5],
+                               temporal_intensity=samples)
+print(fi.field_is_stationary())              # True (límite 0,6 de la tabla B.3)
+```
+
+Sobre una superficie de medición, los demás indicadores de campo del Anexo A
+de ISO 9614-1 califican el propio barrido. **F2**, el indicador
 presión-intensidad de superficie, es el nivel de presión de superficie menos
 el nivel de la *magnitud* media de la intensidad normal: cuanto mayor es,
 más cerca está la medición del suelo de error de fase de la sonda. **F3**, el
@@ -318,6 +351,129 @@ error de fase, de cualquier signo. Por eso el índice presión-intensidad, y
 no la calidad de los micrófonos, es el que acota la exactitud alcanzable de
 toda medida de intensidad.
 
+### Clasificar el instrumento: tabla 2 de IEC 61043
+
+`δpI0` no es solo un número al que restar `K`; es aquello por lo que
+IEC 61043 clasifica el hardware. La tabla 2 de la norma fija un `δpI0`
+**mínimo** en cada banda de tercio de octava de 50 Hz a 6,3 kHz, por separado
+para una **sonda**, un **procesador** y un **instrumento completo**, en
+clase 1 y clase 2, impreso para la separación nominal entre micrófonos de
+25 mm. La nota 1 reescala toda la tabla para cualquier otro separador con
+`+10 lg(x/25)`, con `x` en milímetros: los mismos 3 dB por duplicación a los
+que llegaba el apartado anterior a partir de la física.
+
+`intensity_class_compliance` compara un espectro de `δpI0` medido con ambas
+máscaras banda a banda y devuelve la clase que la cadena cumple realmente: la
+clase más laxa que superan todas las bandas, o `None` cuando alguna banda no
+supera ninguna de las dos:
+
+```python
+from phonometry import metrology
+
+# Las frecuencias centrales sobre las que se define la tabla 2, y el índice
+# residual medido de la cadena: un valor por banda, tomado con el separador que
+# se montará en campo. Sustituye el marcador por tu propio ensayo residual.
+freqs, _, _ = metrology.residual_index_limits("instrument", spacing=0.012)
+measured_delta_pi0 = [11.0, 11.9, 11.2, 10.0, 13.2, 15.9, 17.0, 18.0,
+                      19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 24.0, 24.0,
+                      24.0, 24.0, 24.0, 24.0, 24.0, 24.0]   # dB, 22 bandas
+
+res = metrology.intensity_class_compliance(measured_delta_pi0, freqs,
+                                           device="instrument", spacing=0.012)
+print(res.overall_class)          # 2: una banda no llega al mínimo de clase 1
+print(res.binding_margin())       # menor margen por banda hasta esa clase [dB]
+print(res.failing_bands(1))       # las bandas que le cuestan la clase 1 [Hz]
+res.plot()                        # δpI0 medido sobre las dos máscaras de la tabla 2
+res.report("verificacion.pdf")    # ficha de verificación de una página (PDF)
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_class_es.svg" alt="Índice presión-intensidad residual medido de un instrumento de intensidad completo con separador de 12 mm, dibujado como curva escalonada sobre los mínimos de clase 1 y clase 2 de la tabla 2 de IEC 61043; la región de aceptación de clase 2 sombreada queda por encima de la máscara discontinua de clase 2, y la banda de 100 Hz aparece marcada donde el índice medido cae por debajo de la máscara continua de clase 1" width="92%" />
+
+*Ambas máscaras de la tabla 2 bajan `10 lg(12/25) = −3,2 dB` por el separador
+de 12 mm. El índice medido sube 10 dB por década en baja frecuencia, paralelo
+al requisito, porque un desfase entre canales constante en grados compra
+exactamente esa pendiente; se aplana por encima de 1 kHz, donde el desfase de
+una cadena real empieza a crecer con la frecuencia. Una resonancia de
+ventilación en torno a 100 Hz cuesta 4 dB y hace caer esa única banda por
+debajo del mínimo de clase 1, así que toda la cadena se clasifica como
+clase 2.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import metrology
+
+# Un instrumento completo con el separador habitual de 12 mm. El índice medido
+# se modela a partir de la física que hay tras la tabla 2: un desfase residual
+# φs se lee como δpI0 = 10 lg(kd/φs), de modo que un desfase constante en
+# grados ya sube 10 dB por década y, por encima de 1 kHz, el desfase de una
+# cadena real crece con la frecuencia y el índice se aplana.
+spacing = 0.012
+freqs, _, _ = metrology.residual_index_limits("instrument", spacing=spacing)
+phase_mismatch = 0.05 * np.maximum(1.0, freqs / 1000.0)          # grados
+measured = metrology.residual_index_from_phase_mismatch(phase_mismatch, freqs,
+                                                        spacing)
+measured = measured - 4.0 * np.exp(-((np.log(freqs / 100.0) / 0.25) ** 2))
+
+res = metrology.intensity_class_compliance(measured, freqs, spacing=spacing)
+res.plot()
+plt.show()
+```
+
+</details>
+
+Con ello llegan dos reglas complementarias de la norma. El apartado 6.1 fija
+el rango de frecuencias que acredita una clase: de 45 Hz a 7,1 kHz en tercios
+de octava, que la clase 1 exige y la clase 2 también puede emplear, o de
+45 Hz a 5,6 kHz en octavas, que se ofrece a la clase 2 como alternativa. Un
+veredicto calculado sobre menos bandas se marca con `range_limited` para que
+no pueda leerse como una declaración de rango completo. La traducción
+UNE-EN 61043:1999 recoge solo la alternativa en octavas para la clase 2 y
+omite la de tercios de octava; la biblioteca sigue el texto EN/CEI (véase el
+[registro de erratas](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.md)). El apartado 8
+combina componentes suministrados por separado:
+`instrument_class_from_components(probe_class, processor_class)` devuelve 1
+solo cuando ambos son de clase 1, y 2 para cualquier otra combinación.
+
+### Leer `δpI0` como un error de fase
+
+El requisito es en realidad un requisito de emparejamiento de fase
+disfrazado. En una onda plana que se propaga axialmente la diferencia de fase
+*verdadera* entre los dos puntos es `kd`, de modo que una intensidad residual
+producida por un desfase entre canales `φs` da
+
+$$
+\delta_{pI0} = 10 \log_{10}\!\left( \frac{k d}{\varphi_s} \right)
+$$
+
+y las dos conversiones funcionan en ambos sentidos:
+
+```python
+from phonometry import metrology
+
+# 20 dB de índice residual a 1 kHz con un separador de 25 mm:
+phi = metrology.phase_mismatch_from_residual_index(20.0, 1000.0, 0.025)
+print(round(float(phi), 2))     # 0.26 grados, una centésima de kd
+
+# Y a la inversa, para una cadena con los canales emparejados a 0,05°:
+print(round(float(metrology.residual_index_from_phase_mismatch(
+    0.05, 1000.0, 0.012)), 1))  # 24.0 dB
+```
+
+Por eso el extremo de baja frecuencia de la tabla 2 sube 1 dB por banda de
+tercio de octava y después se aplana: por debajo del codo la norma pide un
+emparejamiento de fase *constante*, y por encima un índice constante. El codo
+está en 250 Hz para las tres columnas de clase 1 y para el procesador de
+clase 2, y en 630 Hz para la sonda de clase 2 y el instrumento completo de
+clase 2, que es además donde la tabla deja de avanzar en decibelios enteros
+(el instrumento pasa por 14 dB a 315 Hz, 14,5 dB a 400 Hz y 15 dB a 500 Hz).
+También por eso una décima de grado de desfase entre canales es
+una especificación exigente, y por eso una sonda debe verificarse con el
+separador con el que realmente se va a usar.
+
 ### Campos reactivos cerca de la fuente
 
 Cerca de una fuente el campo se vuelve **reactivo**: la presión y la
@@ -383,10 +539,17 @@ los dos canales.
 **Cubierto.** IEC 61043:1993 (EN 61043:1994) para el estimador de
 intensidad por espectro cruzado de dos micrófonos de `sound_intensity`, la
 corrección de sesgo por diferencias finitas y su límite de ancho de banda
-útil (apartado 7.3, Tabla 3), y el índice residual de presión-intensidad
-`δpI0` como el suelo de error de fase del instrumento. ISO 9614-1:1993 para
-los indicadores de campo del Anexo A F2, F3 y F4 (`field_indicators`) y el
-criterio de capacidad dinámica del Anexo B (`dynamic_capability_index`).
+útil (apartado 7.3, tabla 3), el índice residual de presión-intensidad
+`δpI0` como el suelo de error de fase del instrumento, y la clasificación del
+instrumento construida sobre él: los mínimos por banda de la tabla 2 para
+sondas, procesadores e instrumentos con la regla de separación de la nota 1,
+los rangos de frecuencia del apartado 6.1 y la regla de combinación de
+componentes del apartado 8 (`intensity_class_compliance`,
+`residual_index_limits`, `instrument_class_from_components`), además de la
+conversión entre `δpI0` y desfase en ambos sentidos. ISO 9614-1:1993 para los
+indicadores de campo del Anexo A F1 a F4 (`temporal_variability_indicator`,
+`field_indicators`) con el límite de la tabla B.3 sobre F1, y el criterio de
+capacidad dinámica del Anexo B (`dynamic_capability_index`).
 
 **No cubierto.** La propia determinación de potencia acústica de ISO 9614-1,
 apartados 8 y 9, que suma las potencias parciales `Ii·Si` de los puntos de
@@ -396,11 +559,10 @@ calidad de campo, no de una potencia sumada. Las vías de barrido que sí
 calculan `LW` a partir de la intensidad (ISO 9614-2 e ISO 9614-3) están en
 la guía de
 [potencia acústica por barrido de intensidad](/phonometry/es/guides/sound-power-intensity/).
-Los
-límites de aceptación del índice residual de clase 1 / clase 2 de
-IEC 61043 tampoco se verifican en la biblioteca: `δpI0` es un valor que
-quien mide aporta desde su propia cadena sonda-analizador, no algo que
-phonometry clasifique.
+El propio *ensayo* de intensidad residual de IEC 61043 tampoco lo realiza la
+biblioteca: `δpI0` es un valor que quien mide obtiene en su propia cadena
+sonda-analizador, con el separador que va a montar, y aporta. Lo que
+phonometry hace con él es clasificarlo frente a la tabla 2.
 
 ## Véase también
 

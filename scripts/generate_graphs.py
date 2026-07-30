@@ -11672,6 +11672,40 @@ def generate_field_indicators(output_dir: str) -> None:
     plt.close()
 
 
+def generate_intensity_class(output_dir: str) -> None:
+    """Measured delta_pI0 of a p-p chain over the IEC 61043 Table 2 masks."""
+    print("Generating intensity_class.svg...")
+    from phonometry import metrology
+
+    # A complete instrument verified with the common 12 mm spacer, so the
+    # printed 25 mm minima come down by 10 lg(12/25) = -3,2 dB (Table 2,
+    # Note 1). The measured index is modelled from the physics behind the
+    # table: a residual channel phase mismatch phi_s turns into
+    # delta_pI0 = 10 lg(kd/phi_s), so a mismatch that is constant in degrees
+    # already buys 10 dB per decade of index - which is exactly the slope of
+    # the Table 2 requirement below 250 Hz. Above 1 kHz the mismatch of a real
+    # chain grows with frequency instead of staying put, so the index levels
+    # off where the requirement does.
+    spacing = 0.012
+    freqs, _, _ = metrology.residual_index_limits("instrument", spacing=spacing)
+    phase_mismatch = 0.05 * np.maximum(1.0, freqs / 1000.0)   # degrees
+    measured = metrology.residual_index_from_phase_mismatch(
+        phase_mismatch, freqs, spacing
+    )
+    # A vent resonance of the capsules costs 4 dB around 100 Hz, the one band
+    # that drops out of class 1 and drags the whole verdict down to class 2.
+    measured = measured - 4.0 * np.exp(-(((np.log(freqs / 100.0)) / 0.25) ** 2))
+
+    result = metrology.intensity_class_compliance(measured, freqs, spacing=spacing)
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    # The result's own .plot() shades the pass region of the achieved class and
+    # rings the bands that cost the chain the next class up.
+    result.plot(ax=ax, language=_LANG)
+    plt.tight_layout()
+    save_figure(output_dir, "intensity_class.svg")
+    plt.close()
+
+
 def generate_silencer_side_branch(output_dir: str) -> None:
     """Helmholtz and quarter-wave side branches shorting the duct at tuning."""
     print("Generating silencer_side_branch.svg...")
@@ -12850,6 +12884,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_aperture_slit_geometry,
     generate_fdtd_domain_geometry,
     generate_field_indicators,
+    generate_intensity_class,
     generate_silencer_side_branch,
     generate_helmholtz_branch_geometry,
     generate_quarter_wave_geometry,

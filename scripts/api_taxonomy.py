@@ -17,11 +17,14 @@ Consistency is enforced at import time (fails loudly):
 
 - every module appears in exactly one section;
 - each section only contains modules from the subpackages declared for it in
-  ``_SECTION_SUBPACKAGES``. Two sections deliberately span more than one
-  parent: ``filters`` adds the package top level next to ``metrology``, and
+  ``_SECTION_SUBPACKAGES``. Three sections deliberately span more than one
+  parent: ``filters`` adds the package top level next to ``metrology``,
   ``aeroacoustics`` includes ``environmental.wind_turbine_noise`` because the
   section groups by audience (aircraft and wind energy) while the module
-  lives with the other environmental-rating code.
+  lives with the other environmental-rating code, and ``power`` includes
+  ``metrology.intensity_compliance`` (the IEC 61043 class checker sits with
+  the other instrument-conformance code but documents the intensity chain
+  the rest of the section measures with).
 
 The generator additionally checks the taxonomy against reality: every module
 that owns a public name must be mapped here, and every mapped module must
@@ -233,6 +236,7 @@ _SECTION_LIST: tuple[Section, ...] = (
             "phonometry.emission.sound_power_intensity",
             "phonometry.emission.sound_power_reverberation",
             "phonometry.emission.intensity",
+            "phonometry.metrology.intensity_compliance",
             "phonometry.emission.vibration_sound_power",
             "phonometry.emission.declaration",
         ),
@@ -334,7 +338,7 @@ _SECTION_SUBPACKAGES: dict[str, tuple[str, ...]] = {
     "environment": ("environmental",),
     "aeroacoustics": ("aircraft", "environmental"),
     "underwater": ("underwater",),
-    "power": ("emission",),
+    "power": ("emission", "metrology"),
     "electroacoustics": ("electroacoustics",),
     "noise_control": ("noise_control",),
     "broadcast": ("broadcast",),

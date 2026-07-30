@@ -45,6 +45,15 @@ from .frequencies import (
     normalized_frequencies,
     normalizedfreq,
 )
+from .intensity_compliance import (
+    IntensityInstrumentComplianceResult,
+    instrument_class_from_components,
+    intensity_class_compliance,
+    phase_mismatch_from_residual_index,
+    residual_index_from_phase_mismatch,
+    residual_index_limits,
+    verify_intensity_class,
+)
 from .inversion import InverseFilterResult, regularized_inverse_filter
 from .levels import laeq, lc_peak, leq, lex_8h, ln_levels, sel, sound_exposure
 from .miso import MISOCoherenceResult, miso_coherence
@@ -131,6 +140,7 @@ __all__ = [
     "EnvelopeSpectrumResult",
     "FilterBankWarning",
     "FilterComplianceResult",
+    "IntensityInstrumentComplianceResult",
     "InverseFilterResult",
     "LevelCrossingResult",
     "LifterResult",
@@ -176,6 +186,8 @@ __all__ = [
     "getansifrequencies",
     "group_delay",
     "impulse_response_delay",
+    "instrument_class_from_components",
+    "intensity_class_compliance",
     "laeq",
     "lc_peak",
     "leq",
@@ -197,10 +209,13 @@ __all__ = [
     "parametric_eq",
     "peak_statistics",
     "phase_decomposition",
+    "phase_mismatch_from_residual_index",
     "power_spectral_density",
     "rectangular",
     "regularized_inverse_filter",
     "resample_signal",
+    "residual_index_from_phase_mismatch",
+    "residual_index_limits",
     "resolution_bias_error",
     "sel",
     "sensitivity",
@@ -216,6 +231,7 @@ __all__ = [
     "u_shaped",
     "verify_aircraft_noise_system",
     "verify_filter_class",
+    "verify_intensity_class",
     "verify_weighting_class",
     "weighting_class_limits",
     "weighting_filter",

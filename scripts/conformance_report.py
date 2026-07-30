@@ -1554,7 +1554,7 @@ def _plane_wave_pair(
 
 @register(
     "Intensity & sound power",
-    "IEC 61043:1994 Clause 5",
+    "IEC 61043:1993 Clause 5",
     "Plane-wave intensity I = p^2 / (rho c)",
 )
 def _chk_plane_wave_intensity() -> Outcome:
@@ -1590,6 +1590,92 @@ def _chk_intensity_scan_lw() -> Outcome:
     intensity = np.full((4, 1), w / areas.sum())
     res = ph.sound_power_intensity(intensity, areas)
     return numeric(90.0, float(res.sound_power_level[0]), 1e-6, unit="dB", places=6)
+
+
+@register(
+    "Intensity & sound power",
+    "IEC 61043:1993 Table 2",
+    "Minimum delta_pI0 per band, probe/processor/instrument, class 1/2",
+)
+def _chk_iec61043_table2() -> Outcome:
+    """All 22 bands x 3 device kinds x 2 classes against the printed table."""
+    columns = {"probe": (1, 2), "processor": (3, 4), "instrument": (5, 6)}
+    worst = 0.0
+    for device, (col1, col2) in columns.items():
+        _, class1, class2 = ph.residual_index_limits(device)
+        for i, row in enumerate(ref.IEC61043_TABLE2):
+            worst = max(
+                worst,
+                abs(float(class1[i]) - row[col1]),
+                abs(float(class2[i]) - row[col2]),
+            )
+    n = len(ref.IEC61043_TABLE2) * len(columns) * 2
+    return Outcome(
+        expected=f"{n} tabulated minima reproduced",
+        computed=f"max absolute deviation {worst:.3f} dB",
+        delta=_fmt(worst, "dB", _DELTA_PLACES),
+        passed=worst == 0.0,
+    )
+
+
+@register(
+    "Intensity & sound power",
+    "IEC 61043:1993 Table 2 Note 1",
+    "Separation rule +10 lg(x/25) on all six columns of 25 mm minima "
+    "(x = 50 mm)",
+)
+def _chk_iec61043_spacing_rule() -> Outcome:
+    # Note 1 applies to every figure in the table, so the check sweeps all
+    # six columns (probe/processor/instrument x class 1/2) over all 22
+    # bands rather than one array, so a column that failed to shift cannot
+    # hide behind another that did.
+    expected = 10.0 * math.log10(2.0)
+    offsets: list[float] = []
+    for device in ("probe", "processor", "instrument"):
+        base = ph.residual_index_limits(device)
+        wide = ph.residual_index_limits(device, spacing=0.050)
+        for cls in (1, 2):
+            offsets.extend(
+                (np.asarray(wide[cls]) - np.asarray(base[cls])).tolist()
+            )
+    # Report the single offset furthest from the rule, so one column that
+    # failed to shift cannot average out against five that did.
+    worst = max(offsets, key=lambda v: abs(v - expected))
+    return numeric(expected, float(worst), 1e-12, unit="dB", places=6)
+
+
+@register(
+    "Intensity & sound power",
+    "Fahy, Sound Intensity 2e, 6.8",
+    "delta_pI0 = 20 dB is a phase mismatch of 0.26 deg (1 kHz, 25 mm)",
+)
+def _chk_iec61043_phase_mismatch() -> Outcome:
+    phi = ph.phase_mismatch_from_residual_index(
+        ref.IEC61043_PHASE_INDEX_DB,
+        ref.IEC61043_PHASE_FREQUENCY_HZ,
+        ref.IEC61043_PHASE_SPACING_M,
+    )
+    return numeric(
+        ref.IEC61043_PHASE_MISMATCH_DEG, float(phi), 0.005, unit="deg", places=4
+    )
+
+
+@register(
+    "Intensity & sound power",
+    "ISO 9614-1:1993 Eqs (A.1)/(A.2)",
+    "Temporal variability F1 is the coefficient of variation of M samples",
+)
+def _chk_iso9614_1_f1() -> Outcome:
+    samples = np.array([1.2e-5, 0.9e-5, 1.5e-5, 1.1e-5, 1.3e-5, 1.0e-5])
+    # Equations (A.1)/(A.2) written out: sample standard deviation (M - 1
+    # denominator) over the algebraic mean of the M short-time samples.
+    mean = float(np.sum(samples) / samples.size)
+    expected = (
+        math.sqrt(float(np.sum((samples - mean) ** 2)) / (samples.size - 1)) / mean
+    )
+    return numeric(
+        expected, float(ph.temporal_variability_indicator(samples)), 1e-12, places=6
+    )
 
 
 @register(
