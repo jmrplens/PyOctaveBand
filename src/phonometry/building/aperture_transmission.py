@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Sound transmission through slits, holes and apertures (Hopkins 2007, Sound
 Insulation, Section 4.3.10; Gomperts 1964; Wilson & Soroka 1965).

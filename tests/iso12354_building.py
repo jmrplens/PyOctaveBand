@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Shared ISO 12354 Annex L / Annex G building fixture (tests + conformance).
 
 Builds the heavy homogeneous building that ISO 12354-1:2017 Annex L (airborne)

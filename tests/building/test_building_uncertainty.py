@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for ISO 12999-1:2020 measurement uncertainty (building_uncertainty).
 
 The tabulated standard uncertainties are the oracle: every band value and every

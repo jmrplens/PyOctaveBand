@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """ISO 9613-2 outdoor sound propagation prediction fiches (reportlab renderer).
 
 Renders the two outdoor-propagation result types to one-page **prediction**

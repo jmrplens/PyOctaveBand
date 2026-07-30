@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for ISO/PAS 20065:2016 tonal audibility (engineering method).
 
 Anchored on the Annex E combustion-engine worked example: the critical band

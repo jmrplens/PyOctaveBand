@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Behaviour of the room-to-room chain: closed forms, options and validation.
 
 Oracles: the closed form of Norton & Karczub 2e Equation (4.101),

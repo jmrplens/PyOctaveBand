@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the rotorcraft hemisphere method (ECAC Doc 32 / NORAH2).
 
 Oracles: the guidance Table 4 (one-third-octave atmospheric attenuation per km at

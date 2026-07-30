@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """hearing domain of phonometry (see module docstrings)."""
 
 from __future__ import annotations

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the daily vibration exposure ``.report()`` fiche (ISO 5349 / ISO 2631).
 
 The rendered values are checked against a published, library-independent oracle:

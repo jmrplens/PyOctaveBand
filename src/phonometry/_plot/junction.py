@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Plot renderer for the rigid plate-junction transmission result.
 
 Lazy-imported from :meth:`JunctionTransmissionResult.plot`; domain classes are

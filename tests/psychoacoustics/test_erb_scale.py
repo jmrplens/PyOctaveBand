@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the public ERB_N / Cam utilities (Glasberg and Moore 1990).
 
 Oracle: **Moore, An Introduction to the Psychology of Hearing 6th ed., printed

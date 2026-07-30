@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Radiation efficiency of a plate in bending (Hopkins 2007, Sound Insulation,
 Section 2.9; Leppington et al. 1982; Maidanik 1962).

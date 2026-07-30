@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Golden regression arrays captured by ``scripts/bench.py --golden``.
 
 Auto-generated; do not edit by hand. These freeze the numeric outputs of

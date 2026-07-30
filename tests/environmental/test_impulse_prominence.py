@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for :mod:`phonometry.environmental.impulse_prominence` (prominence of impulsive sounds).
 
 Validated against the formulae of NT ACOU 112:2002: the predicted prominence

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Deterministic SVG generator for the experimental-setup diagrams used in the
 documentation. Every diagram is emitted in a light and a dark variant

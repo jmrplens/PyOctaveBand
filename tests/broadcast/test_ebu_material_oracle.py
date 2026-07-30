@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """The EBU loudness test set's authentic-programme cases (Tech 3341 7-8,
 Tech 3342 5-6), which use programme material that cannot be synthesized.
 

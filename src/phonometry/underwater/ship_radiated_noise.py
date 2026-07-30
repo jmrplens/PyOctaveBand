@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Ship radiated noise and equivalent monopole source level (ISO 17208-1/-2).
 

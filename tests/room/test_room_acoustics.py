@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Tests for ISO 3382-1:2009 / ISO 3382-2:2008 room acoustic parameters.
 

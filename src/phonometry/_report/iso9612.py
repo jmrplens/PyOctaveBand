@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """ISO 9612:2009 occupational noise-exposure fiche (reportlab renderer).
 
 Renders an

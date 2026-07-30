@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for ISO 9612:2009 occupational noise exposure (occupational_exposure).
 
 The three worked examples of ISO 9612:2009 Annexes D (task-based), E (job-based)

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Sound-power-from-vibration determination fiche (reportlab, ISO/TS 7849).
 
 Renders a

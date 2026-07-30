@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Mechanical mobility and the frequency-response-function family (ISO 7626-1:2011).
 

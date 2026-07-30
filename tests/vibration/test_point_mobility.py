@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the theoretical point mobilities of Cremer Table 5.1.
 
 Anchored on the closed-form compilation of driving-point impedances and

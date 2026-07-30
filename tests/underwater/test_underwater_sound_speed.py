@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the speed of sound in sea water (UNESCO / Del Grosso / Mackenzie / Medwin).
 
 Oracles: the printed Wong & Zhu (1995) ITS-90 check tables (Tables III and IV,

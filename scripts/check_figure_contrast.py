@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Perceptual contrast gate for the shaded regions of the documentation figures.
 
 A filled region (an acceptance corridor, a period zone, a tolerance band) only

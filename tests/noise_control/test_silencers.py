@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for reactive silencers (Bies §8.8-8.9, four-pole method).
 
 Oracles: the simple-expansion-chamber closed form ``TL = 10 log10[1 + (1/4)

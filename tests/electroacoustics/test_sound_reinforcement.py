@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the gain before feedback of a reinforcement system.
 
 Oracle: **Long, Architectural Acoustics 2nd ed., printed pp. 695-699**,

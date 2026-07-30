@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the reverberation-time prediction models.
 
 The source texts (Arau-Puchades 1988; Carrion Isbert; Everest) carry worked

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Independent FDTD cross-check of a single 2D expansion chamber.
 
 The four-pole expansion-chamber transmission loss (Bies Eq. (8.111)) predicts,

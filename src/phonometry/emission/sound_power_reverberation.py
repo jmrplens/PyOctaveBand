@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Sound power level of a noise source measured in a reverberation test room:
 ISO 3741:2010 (precision method, accuracy grade 1).

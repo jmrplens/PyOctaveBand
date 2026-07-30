@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Sound power from pressure over an enveloping surface: ISO 3744:2010
 (engineering) and ISO 3746:2010 (survey).

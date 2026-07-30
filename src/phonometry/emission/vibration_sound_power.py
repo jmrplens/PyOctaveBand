@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Airborne sound power from surface vibration (ISO/TS 7849-1/-2:2009).
 

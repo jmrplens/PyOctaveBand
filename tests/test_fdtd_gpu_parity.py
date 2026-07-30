@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Parity tests: ``scripts/fdtd_gpu.py`` versus the library FDTD engine.
 
 ``GpuFDTD2D`` is a backend-injectable replica of

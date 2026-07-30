@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Tests for the arbitrary-magnitude sweep synthesis (Mueller & Massarani
 2001, Secs. 4.2-4.3).

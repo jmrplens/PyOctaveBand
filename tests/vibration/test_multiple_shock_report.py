@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the whole-body multiple-shock ``.report()`` fiche (ISO 2631-5).
 
 The rendered values are checked against the standard's own Annex C worked

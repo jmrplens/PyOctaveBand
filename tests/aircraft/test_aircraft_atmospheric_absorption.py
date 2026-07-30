@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for aircraft one-third-octave-band atmospheric absorption (SAE ARP 5534).
 
 Oracles (independent of the implementation): the ISO 9613-1 pure-tone

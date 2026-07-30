@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for NPD event-level interpolation (ECAC Doc 29 §4.2).
 
 Oracles (independent of the implementation): recovery of the tabulated nodes,

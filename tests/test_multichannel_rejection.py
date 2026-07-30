@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Multichannel (2-D) time signals are rejected, never silently flattened.
 
 A raveled stereo signal concatenates the channels into one wrong series;

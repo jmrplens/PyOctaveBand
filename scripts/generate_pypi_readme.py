@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Generate README_PYPI.md, the PyPI long description, from README.md.
 
 PyPI's readme renderer strips ``<picture>``/``<source>`` elements, so the

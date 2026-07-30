@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Fluid-solid coupling of the elastic FDTD solver against exact oracles.
 
 The oracles are transcriptions from Brekhovskikh & Godin, *Acoustics of

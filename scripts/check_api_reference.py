@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Coverage gate for the curated API quick table (``docs/api-reference.md``).
 
 The hand-written table in ``docs/api-reference.md`` is the quick reference for

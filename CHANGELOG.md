@@ -909,6 +909,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   blocks in the documentation already did, and `site/scripts/check-math-render.mjs`
   fails the build on any `katex-error` span left in the output or any `$$` that
   shares a line with content.
+- The maintainer's name is written one way and cited another. The hyphenated
+  `Requena-Plens` is a bibliographic citation form, so it stays in the APA and
+  BibTeX blocks, `CITATION.cff` and `.zenodo.json`; everywhere the name is a
+  name, it is now the full `José Manuel Requena Plens`, which is also what the
+  ORCID record and the canonical Person document hold. That covers the `LICENSE`
+  copyright line, the `authors` field of both `pyproject.toml` files and a
+  documentation example. The copyright header of every file under `src/`,
+  `scripts/` and `tests/` carries the same name without the accent, since a
+  source file is the one place where a mangled byte does real damage.
 
 - The conformance counts quoted outside the report are generated, not typed.
   `docs/CONFORMANCE.md` has always been the authority for "N/N conformance

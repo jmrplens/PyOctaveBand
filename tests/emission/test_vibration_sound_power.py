@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for ISO/TS 7849 airborne sound power from surface vibration.
 
 Anchored on the standard's own worked calibration example (Part 1, Eq. 8:

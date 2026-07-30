@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """EASA ANP fleet loader and its bridge to the ECAC Doc 29 chain.
 
 The primary check is a clean-room round-trip: the loader must recover the ANP

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """The ERB_N scale: auditory-filter bandwidth and the Cam frequency scale.
 
 The cochlea behaves as a bank of overlapping band-pass **auditory filters**.

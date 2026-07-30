@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """ANSI S3.5-1997 speech-intelligibility-index fiche (reportlab renderer).
 
 Renders a :class:`~phonometry.hearing.sii.SIIResult` to a one-page PDF laid out

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Machine-enclosure insertion-loss performance fiche (reportlab renderer).
 
 Renders a :class:`~phonometry.noise_control.enclosures.EnclosureResult` (the

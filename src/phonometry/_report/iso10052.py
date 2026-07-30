@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """ISO 10052 survey-method field sound-insulation fiches (reportlab renderer).
 
 Renders the survey (control) method results of

@@ -1,4 +1,4 @@
-#  Copyright (c) 2020. Jose M. Requena-Plens
+#  Copyright (c) 2020. Jose Manuel Requena Plens
 
 """
 Basic test and usage example for phonometry.

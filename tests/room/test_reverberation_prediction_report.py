@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the reverberation-time prediction report (``.report()`` -> PDF).
 
 The report is a rendering feature, so these tests assert only structural facts:

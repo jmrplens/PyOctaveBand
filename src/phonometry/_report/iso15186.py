@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """ISO 15186-1 intensity sound-insulation test reports (reportlab renderer).
 
 Renders the two ISO 15186-1:2000 sound-intensity insulation quantities of

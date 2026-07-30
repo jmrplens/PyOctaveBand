@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 In-situ sound absorption of road surfaces (ISO 13472-1 / ISO 13472-2).
 

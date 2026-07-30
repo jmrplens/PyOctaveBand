@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Sound power level of a noise source by sound-intensity **scanning**:
 ISO 9614-2:1996 (engineering, grade 2; survey/control, grade 3).

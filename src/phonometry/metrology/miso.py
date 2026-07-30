@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Multiple and partial coherence of a multiple-input/single-output system.
 
 When several partially correlated sources drive one response, the ordinary

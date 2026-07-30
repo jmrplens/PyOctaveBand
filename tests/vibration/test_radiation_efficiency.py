@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the plate radiation efficiency of Hopkins Section 2.9.4.
 
 Anchored on: the closed-form coincidence frequency (Hopkins Eq. 2.201 / Bies

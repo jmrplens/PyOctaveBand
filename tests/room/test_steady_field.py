@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the steady-state room field (Bies 6.4 / Kuttruff 5.6).
 
 The oracles are the closed forms themselves (room constant, the direct- and

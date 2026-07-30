@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Weighting filters (A, B, C, D, G, AU, Z) and time weighting utilities.
 

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the end-to-end duct-borne noise cascade.
 
 Oracle: Long, *Architectural Acoustics* 2nd ed. (Academic Press, 2014),

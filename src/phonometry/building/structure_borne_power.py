@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Structure-borne sound power of building equipment (EN 15657:2018; ISO 9611).
 

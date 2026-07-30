@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Basic physics and determinism tests for the ``fdtd2d`` engine shim.
 
 ``scripts/fdtd2d.py`` re-exports :mod:`phonometry.simulation.fdtd`, and the

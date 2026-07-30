@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Tests for the IEC 61672-1:2013 frequency-weighting class verifier
 (``verify_weighting_class`` / ``weighting_class_limits``).

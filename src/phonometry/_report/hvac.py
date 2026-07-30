@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """HVAC duct-noise-spectrum performance fiche (reportlab renderer).
 
 Renders a :class:`~phonometry.noise_control.hvac.HvacSpectrumResult` (a

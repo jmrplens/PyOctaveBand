@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the sonar equation (passive and active).
 
 Oracles: a hand-worked textbook term balance (Urick via Etter, Table 10.2) —

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the generated API reference (taxonomy + generator).
 
 Covers the contract the site relies on: every public module is mapped to

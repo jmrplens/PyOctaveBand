@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for :mod:`phonometry.metrology.uncertainty` (GUM Guide 98-3 and Supplement 1).
 
 Validated against the Guides' own worked examples: the combined uncertainty of

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Noise-Power-Distance (NPD) event-level interpolation (ECAC Doc 29).
 

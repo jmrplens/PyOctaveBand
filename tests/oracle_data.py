@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Where the heavy, non-redistributable oracle sets come from.
 
 A few suites are validated against reference material that cannot be

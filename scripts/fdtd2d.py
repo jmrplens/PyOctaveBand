@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Compatibility shim for the documentation figure/animation generators.
 
 The 2D acoustic FDTD engine that used to live here was promoted to the

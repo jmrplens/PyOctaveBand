@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Room-noise rating fiche (reportlab renderer, ANSI/ASA S12.2-2019).
 
 Renders the two room-noise ratings of ANSI/ASA S12.2-2019 to a one-page PDF

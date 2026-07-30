@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the duct-path element models of Long, Chapters 13 and 14.
 
 Oracle: Long, *Architectural Acoustics* 2nd ed. (Academic Press, 2014):

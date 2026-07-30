@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Slow-sound slit panels loaded with Helmholtz resonators (perfect absorbers).
 
 A rigid panel perforated by a periodic array of thin closed slits, whose upper

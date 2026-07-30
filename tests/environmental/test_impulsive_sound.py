@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for :mod:`phonometry.environmental.impulsive_sound` (ISO/PAS 1996-3:2022).
 
 ISO/PAS 1996-3 gives no worked numeric example, so the oracle is derived by

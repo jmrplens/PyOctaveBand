@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for :mod:`phonometry.vibration.human_vibration`.
 
 The frequency weightings are validated against the ISO 8041-1:2017 Annex B

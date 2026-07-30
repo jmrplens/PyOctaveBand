@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for ISO 16251-1:2014 floor-covering impact-sound improvement."""
 
 from __future__ import annotations

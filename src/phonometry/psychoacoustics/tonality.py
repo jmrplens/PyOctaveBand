@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Prominent discrete tone assessment per ECMA-418-1:2024 (3rd edition).
 

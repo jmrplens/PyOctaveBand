@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Shared renderer for the sound-power determination fiches.
 
 The enveloping-surface pressure method (ISO 3744/3746 and the ISO 3745

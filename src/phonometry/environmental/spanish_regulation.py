@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Spanish noise regulation: the corrected level LKeq (Real Decreto 1367/2007).
 

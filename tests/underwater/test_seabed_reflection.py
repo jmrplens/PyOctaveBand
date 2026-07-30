@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for plane-wave seabed reflection (fluid-fluid Rayleigh model).
 
 Oracles (independent of the implementation): the normal-incidence impedance

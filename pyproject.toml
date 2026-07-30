@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "phonometry"
 dynamic = ["version"]
 authors = [
-  { name="José M. Requena-Plens", email="mail@jmrp.io" },
+  { name="José Manuel Requena Plens", email="mail@jmrp.io" },
 ]
 description = "Acoustic measurement toolkit: fractional octave-band filters, A/C/Z and time weighting, and sound level metrology per IEC 61260-1 and IEC 61672-1."
 # The PyPI long description is generated from README.md (which uses

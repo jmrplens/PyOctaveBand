@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """One-cycle deprecation shims introduced by the phonometry 3.1 renames.
 
 One :func:`pytest.warns` test per alias (CONTRIBUTING, "Deprecations"):

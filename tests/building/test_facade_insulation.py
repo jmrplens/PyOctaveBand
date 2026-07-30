@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Tests for ISO 16283-3:2016 field façade sound insulation and its ISO 717-1
 weighted rating.

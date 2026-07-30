@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the predicted panel sound reduction index (Bies 5e Section 7.2).
 
 Anchored on: the exact mass law (Bies Eq. 7.40) rising 6 dB per octave and 6 dB

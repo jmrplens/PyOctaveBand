@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Tests for ISO 16283-1:2014 field airborne sound insulation and
 ISO 717-1 weighted ratings (C / Ctr).

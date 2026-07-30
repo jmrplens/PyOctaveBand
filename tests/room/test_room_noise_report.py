@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the room-noise rating reports (``.report()``, ANSI/ASA S12.2-2019).
 
 The report is a rendering feature, so these tests assert only structural

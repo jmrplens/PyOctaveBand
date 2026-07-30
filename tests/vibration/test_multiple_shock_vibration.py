@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the ISO 2631-5:2018 multiple-shock model (Clause 5 + Annex C).
 
 Validated against the standard's own Annex C worked example and the Annex D

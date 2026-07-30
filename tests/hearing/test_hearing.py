@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for :mod:`phonometry.hearing.threshold` (ISO 7029:2017 and ISO 389-7:2005).
 
 The age-related model is validated against the standard's own boundary

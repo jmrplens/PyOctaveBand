@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for slit / aperture transmission (Hopkins Section 4.3.10, Gomperts).
 
 Anchored on: the composite energy sum (Hopkins Eq. 4.92) whose area limit caps a

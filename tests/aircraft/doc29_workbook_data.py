@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Doc 29 5th ed. Vol 3 Part 1 reference-workbook rows (ECAC).
 
 Per-segment assembly oracle for seven receptor events covering every branch

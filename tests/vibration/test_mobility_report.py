@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the ISO 7626 mechanical-mobility ``.report()`` fiche.
 
 The rendered values are checked against the module's closed-form oracle

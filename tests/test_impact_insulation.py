@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Tests for ISO 16283-2 field impact sound insulation and ISO 717-2
 weighted impact ratings (CI).

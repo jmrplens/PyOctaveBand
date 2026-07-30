@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """End-to-end tests over Ainslie's seven numeric sonar worked examples.
 
 Oracle: Ainslie, *Principles of Sonar Performance Modelling* (Springer 2010).

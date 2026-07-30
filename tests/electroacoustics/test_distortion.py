@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for electroacoustic distortion metrics (IEC 60268-3 / AES17).
 
 Every metric has an exact analytic oracle: a signal synthesised with known

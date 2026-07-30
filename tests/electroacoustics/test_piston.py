@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the baffled circular piston (Beranek & Mellow 2e, §4.19 / §13.7).
 
 Oracles are the exact closed forms (``R1 = 1 - 2 J1(x)/x``, ``X1 = 2 H1(x)/x``

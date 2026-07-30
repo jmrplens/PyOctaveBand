@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Zwicker loudness for stationary and time-varying sounds per ISO 532-1:2017.
 

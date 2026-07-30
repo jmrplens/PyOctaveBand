@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Build ``stipa_certified_extract.zip`` from a local copy of the stipa.info
 IEC 60268-16 verification test signals.
 

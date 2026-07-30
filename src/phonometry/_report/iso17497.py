@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """ISO 17497-1/-2 surface-scattering and diffusion fiches (reportlab renderer).
 
 Renders the two sound-scattering surface descriptors of ISO 17497 to one-page

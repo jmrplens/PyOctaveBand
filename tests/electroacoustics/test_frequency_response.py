@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the frequency-response / coherence estimators (Bendat & Piersol).
 
 The H1/H2 estimators recover a known LTI response, the coherence is unity for a

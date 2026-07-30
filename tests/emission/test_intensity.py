@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 p-p sound intensity (IEC 61043:1993) and ISO 9614-1:1993 field indicators.
 

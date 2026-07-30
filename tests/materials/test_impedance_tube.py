@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Impedance-tube material characterisation (ISO 10534-1/-2, ASTM E2611-19).
 

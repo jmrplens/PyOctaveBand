@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for EN 12354-6:2003 sound absorption in enclosed spaces.
 
 Validated against the three worked cases of the standard's Annex E (a

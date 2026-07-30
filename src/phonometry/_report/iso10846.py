@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """ISO 10846 dynamic-transfer-stiffness fiche (reportlab renderer).
 
 Renders a

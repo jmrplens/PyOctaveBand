@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for EN 15657:2018 structure-borne sound power (reception-plate method).
 
 Anchored on the closed-form reception-plate relations: the energetic spatial

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Private cross-cutting helpers (validation, types, warnings, level math).
 
 Internal API: import the submodules directly (``from .._internal.validation

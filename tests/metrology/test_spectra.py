@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the calibrated spectral-density estimators (Bendat & Piersol).
 
 Every oracle is a closed form from Bendat & Piersol, *Random Data* (4th ed.):

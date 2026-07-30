@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Architecture rules for the phonometry package layout (Phase 1 overhaul).
 
 Static (ast-based) enforcement of the dependency policy between the domain
