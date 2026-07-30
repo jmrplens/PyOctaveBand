@@ -57,7 +57,7 @@ medium heavy vehicles, **3** heavy vehicles, **4a** mopeds and **4b**
 motorcycles. (A sixth "open" category exists in the text but carries no
 coefficients.)
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_emission_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_emission.svg" alt="Octave-band source-line power of an urban arterial: bars for the total and marker lines for the light, medium heavy, heavy and motorcycle contributions, showing light vehicles governing below 500 Hz and heavy vehicles at 1 kHz" width="88%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_emission_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_emission.svg" alt="Octave-band source-line power of an urban arterial: grey bars for the total and marker lines for the light, medium heavy, heavy and motorcycle contributions, with the heavy vehicles above the light ones from 125 Hz to 500 Hz and the light ones taking the lead again at 1 kHz" width="88%"></picture>
 
 *Light vehicles carry the flow, but 45 heavy vehicles per hour still take over
 the mid frequencies: the per-metre spectrum shows exactly where each category
@@ -137,8 +137,8 @@ does: below the crossover the source is an engine, above it a tyre.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_speed_law_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_speed_law.svg" alt="A-weighted single-vehicle sound power against speed from 20 to 130 km/h for light and heavy vehicles, with the rolling and propulsion components dashed and dotted and the crossover speed marked on each pair" width="88%"></picture>
 
-*A light vehicle is tyre-dominated from about 30 km/h; a heavy vehicle only
-around 60 km/h, which is why a lorry is still an engine at urban speeds.*
+*A light vehicle is tyre-dominated from about 25 km/h; a heavy vehicle only
+from about 60 km/h, which is why a lorry is still an engine at urban speeds.*
 
 <details>
 <summary>Show the code for this figure</summary>

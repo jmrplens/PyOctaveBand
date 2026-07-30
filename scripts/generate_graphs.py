@@ -8343,7 +8343,7 @@ def generate_cnossos_road_emission(output_dir: str) -> None:
     ax.set_ylim(45.0, 90.0)
     ax.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
-    ax.legend(loc="upper left", fontsize=9, ncol=2)
+    ax.legend(loc="lower left", fontsize=9, ncol=2)
     plt.tight_layout()
     save_figure(output_dir, "cnossos_road_emission.png")
     plt.close()

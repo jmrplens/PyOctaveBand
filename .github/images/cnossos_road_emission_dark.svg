@@ -535,76 +535,76 @@ z
    </g>
    <g id="legend_1">
     <g id="patch_15">
-     <path d="M 47.225781 76.020234 
-L 315.780156 76.020234 
-Q 317.580156 76.020234 317.580156 74.220234 
-L 317.580156 34.618125 
-Q 317.580156 32.818125 315.780156 32.818125 
-L 47.225781 32.818125 
-Q 45.425781 32.818125 45.425781 34.618125 
-L 45.425781 74.220234 
-Q 45.425781 76.020234 47.225781 76.020234 
+     <path d="M 47.225781 410.815781 
+L 315.780156 410.815781 
+Q 317.580156 410.815781 317.580156 409.015781 
+L 317.580156 369.413672 
+Q 317.580156 367.613672 315.780156 367.613672 
+L 47.225781 367.613672 
+Q 45.425781 367.613672 45.425781 369.413672 
+L 45.425781 409.015781 
+Q 45.425781 410.815781 47.225781 410.815781 
 z
 " style="opacity: 0.8; stroke: #cccccc; stroke-linejoin: miter"/>
     </g>
     <g id="line2d_41">
-     <path d="M 49.025781 40.106719 
-L 58.025781 40.106719 
-L 67.025781 40.106719 
+     <path d="M 49.025781 374.902266 
+L 58.025781 374.902266 
+L 67.025781 374.902266 
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.8; stroke-linecap: square"/>
      <g>
-      <use xlink:href="#m0bc33c3d74" x="58.025781" y="40.106719" style="fill: #ffffff; stroke: #1f77b4; stroke-width: 1.3"/>
+      <use xlink:href="#m0bc33c3d74" x="58.025781" y="374.902266" style="fill: #ffffff; stroke: #1f77b4; stroke-width: 1.3"/>
      </g>
     </g>
     <g id="text_22">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="74.225781" y="43.256719" transform="rotate(-0 74.225781 43.256719)">Light vehicles (1)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="74.225781" y="378.052266" transform="rotate(-0 74.225781 378.052266)">Light vehicles (1)</text>
     </g>
     <g id="line2d_42">
-     <path d="M 49.025781 53.607422 
-L 58.025781 53.607422 
-L 67.025781 53.607422 
+     <path d="M 49.025781 388.402969 
+L 58.025781 388.402969 
+L 67.025781 388.402969 
 " style="fill: none; stroke: #2ca02c; stroke-width: 1.8; stroke-linecap: square"/>
      <g>
-      <use xlink:href="#m586dcffccc" x="58.025781" y="53.607422" style="fill: #ffffff; stroke: #2ca02c; stroke-width: 1.3; stroke-linejoin: miter"/>
+      <use xlink:href="#m586dcffccc" x="58.025781" y="388.402969" style="fill: #ffffff; stroke: #2ca02c; stroke-width: 1.3; stroke-linejoin: miter"/>
      </g>
     </g>
     <g id="text_23">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="74.225781" y="56.757422" transform="rotate(-0 74.225781 56.757422)">Medium heavy vehicles (2)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="74.225781" y="391.552969" transform="rotate(-0 74.225781 391.552969)">Medium heavy vehicles (2)</text>
     </g>
     <g id="line2d_43">
-     <path d="M 49.025781 67.108125 
-L 58.025781 67.108125 
-L 67.025781 67.108125 
+     <path d="M 49.025781 401.903672 
+L 58.025781 401.903672 
+L 67.025781 401.903672 
 " style="fill: none; stroke: #d62728; stroke-width: 1.8; stroke-linecap: square"/>
      <g>
-      <use xlink:href="#madd11b5af1" x="58.025781" y="67.108125" style="fill: #ffffff; stroke: #d62728; stroke-width: 1.3; stroke-linejoin: miter"/>
+      <use xlink:href="#madd11b5af1" x="58.025781" y="401.903672" style="fill: #ffffff; stroke: #d62728; stroke-width: 1.3; stroke-linejoin: miter"/>
      </g>
     </g>
     <g id="text_24">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="74.225781" y="70.258125" transform="rotate(-0 74.225781 70.258125)">Heavy vehicles (3)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="74.225781" y="405.053672" transform="rotate(-0 74.225781 405.053672)">Heavy vehicles (3)</text>
     </g>
     <g id="line2d_44">
-     <path d="M 213.697656 40.106719 
-L 222.697656 40.106719 
-L 231.697656 40.106719 
+     <path d="M 213.697656 374.902266 
+L 222.697656 374.902266 
+L 231.697656 374.902266 
 " style="fill: none; stroke: #9467bd; stroke-width: 1.8; stroke-linecap: square"/>
      <g>
-      <use xlink:href="#m027c633f75" x="222.697656" y="40.106719" style="fill: #ffffff; stroke: #9467bd; stroke-width: 1.3; stroke-linejoin: miter"/>
+      <use xlink:href="#m027c633f75" x="222.697656" y="374.902266" style="fill: #ffffff; stroke: #9467bd; stroke-width: 1.3; stroke-linejoin: miter"/>
      </g>
     </g>
     <g id="text_25">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="238.897656" y="43.256719" transform="rotate(-0 238.897656 43.256719)">Motorcycles (4b)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="238.897656" y="378.052266" transform="rotate(-0 238.897656 378.052266)">Motorcycles (4b)</text>
     </g>
     <g id="patch_16">
-     <path d="M 213.697656 56.757422 
-L 231.697656 56.757422 
-L 231.697656 50.457422 
-L 213.697656 50.457422 
+     <path d="M 213.697656 391.552969 
+L 231.697656 391.552969 
+L 231.697656 385.252969 
+L 213.697656 385.252969 
 z
 " style="fill: #9e9e9e; stroke: #ffffff; stroke-width: 0.6; stroke-linejoin: miter"/>
     </g>
     <g id="text_26">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="238.897656" y="56.757422" transform="rotate(-0 238.897656 56.757422)">Total source line</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="238.897656" y="391.552969" transform="rotate(-0 238.897656 391.552969)">Total source line</text>
     </g>
    </g>
   </g>
