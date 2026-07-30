@@ -77,6 +77,13 @@ if TYPE_CHECKING:
 #: Shared x-axis label for the frequency-domain building plots.
 _FREQ_LABEL = "Frequency [Hz]"
 
+#: Shared x-axis label of the plots drawn against band ordinals rather than
+#: centre frequencies (the ISO 717 reference-curve shifts).
+_BAND_INDEX_LABEL = "Band index"
+
+#: Shared y-axis label of the heavy-impact level figures.
+_MAX_IMPACT_LABEL = "Maximum impact sound pressure level [dB]"
+
 #: Shared y-axis label of the path-contribution figures (the simplified
 #: single-number bars and the two detailed per-band ones).
 _SHARE_LABEL = "Share of transmitted energy [%]"
@@ -87,9 +94,9 @@ _SHARE_LABEL = "Share of transmitted energy [%]"
 #: than ``"es"``, so the English output is byte-for-byte identical to the
 #: pre-i18n renderers.
 _STRINGS: dict[str, str] = {
-    "Frequency [Hz]": "Frecuencia [Hz]",
+    _FREQ_LABEL: "Frecuencia [Hz]",
     "Band": "Banda",
-    "Band index": "Índice de banda",
+    _BAND_INDEX_LABEL: "Índice de banda",
     "predicted $R$": "$R$ previsto",
     "Sound reduction index $R$ [dB]": "Índice de reducción acústica $R$ [dB]",
     "Predicted sound insulation": "Aislamiento acústico previsto",
@@ -164,8 +171,7 @@ _STRINGS: dict[str, str] = {
     "$L_{i,Fmax}$ (measured)": "$L_{i,Fmax}$ (medido)",
     "$L'_{i,Fmax,V,T}$ (standardized)": "$L'_{i,Fmax,V,T}$ (estandarizado)",
     "standardization correction": "corrección de estandarización",
-    "Maximum impact sound pressure level [dB]":
-        "Nivel máximo de presión acústica de impactos [dB]",
+    _MAX_IMPACT_LABEL: "Nivel máximo de presión acústica de impactos [dB]",
     "ISO 16283-2 rubber-ball standardization":
         "Estandarización de la pelota de caucho ISO 16283-2",
     "A-weighted contribution": "contribución ponderada A",
@@ -718,7 +724,7 @@ def plot_vibration_reduction(
         _freq_axis(ax, freqs, language=language)
     else:
         ax.plot(np.arange(k_ij.size), k_ij, **kwargs)
-        ax.set_xlabel(_t("Band index", language))
+        ax.set_xlabel(_t(_BAND_INDEX_LABEL, language))
     if result.single_number is not None:
         ax.axhline(
             result.single_number,
@@ -1322,7 +1328,7 @@ def _plot_shaded_band_pair(
     labels = frequencies if frequencies is not None else np.arange(curve.size) + 1.0
     positions = _band_axis(
         ax, labels,
-        xlabel="Frequency [Hz]" if frequencies is not None else "Band index",
+        xlabel=_FREQ_LABEL if frequencies is not None else _BAND_INDEX_LABEL,
         language=language,
     )
     ax.plot(positions, reference, "s--", color=_C_REFERENCE, lw=1.2,
@@ -1411,7 +1417,7 @@ def plot_standardized_maximum_impact(
         reference_label="$L_{i,Fmax}$ (measured)",
         curve_label="$L\'_{i,Fmax,V,T}$ (standardized)",
         fill_label="standardization correction",
-        ylabel="Maximum impact sound pressure level [dB]",
+        ylabel=_MAX_IMPACT_LABEL,
         title=(
             f"{_t('ISO 16283-2 rubber-ball standardization', language)} "
             f"(V = {format_number(result.volume, language, decimals=1)} m$^3$)"
@@ -1447,7 +1453,7 @@ def plot_a_weighted_maximum_impact(
             label=_t("$X_{i,Fmax}$ (unweighted)", language))
     ax.axhline(result.rating, color=_C_SECONDARY, ls="-", lw=1.6, zorder=4,
                label=f"$X_{{iA,Fmax}}$ = {result.rating} dB")
-    ax.set_ylabel(_t("Maximum impact sound pressure level [dB]", language))
+    ax.set_ylabel(_t(_MAX_IMPACT_LABEL, language))
     ax.set_title(
         f"{_t('ISO 717-2 Annex D heavy-impact rating', language)} "
         f"({_t(_HEAVY_IMPACT_BAND_LABELS[result.band], language)}, "

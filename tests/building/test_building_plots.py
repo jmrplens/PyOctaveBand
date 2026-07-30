@@ -222,7 +222,8 @@ def test_plenum_plot_of_the_attenuated_model() -> None:
 def test_plenum_plot_title_carries_the_geometry() -> None:
     ax = _plenum().plot()
     title = ax.get_title()
-    assert "0.43" in title and "4.75" in title
+    assert "0.43" in title
+    assert "4.75" in title
 
 
 def test_plenum_plot_forwards_kwargs() -> None:
@@ -249,7 +250,8 @@ def test_wall_tie_plot_draws_both_curves(language: str) -> None:
     values = [ln.get_ydata() for ln in ax.lines]
     assert any(np.allclose(v, res.coupling_loss_factor) for v in values)
     assert any(np.allclose(v, res.rigid_coupling_loss_factor) for v in values)
-    assert ax.get_xscale() == "log" and ax.get_yscale() == "log"
+    assert ax.get_xscale() == "log"
+    assert ax.get_yscale() == "log"
     assert ax.collections, "the isolation the tie buys was not shaded"
 
 
@@ -287,5 +289,6 @@ def test_wall_tie_plot_forwards_kwargs() -> None:
     ],
 )
 def test_plot_rejects_an_unknown_language(factory) -> None:
+    result = factory()
     with pytest.raises(ValueError):
-        factory().plot(language="fr")
+        result.plot(language="fr")

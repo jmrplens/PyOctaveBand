@@ -227,8 +227,9 @@ def test_force_exposure_level_scales_6_db_per_force_doubling() -> None:
 
 
 def test_force_exposure_level_rejects_a_silent_record() -> None:
+    silent = np.zeros(100)
     with pytest.raises(ValueError, match="non-zero energy"):
-        impact_force_exposure_level(np.zeros(100), 48_000.0)
+        impact_force_exposure_level(silent, 48_000.0)
 
 
 # ---------------------------------------------------------------------------
