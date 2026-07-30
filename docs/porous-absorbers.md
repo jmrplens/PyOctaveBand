@@ -256,6 +256,173 @@ too, so the limits cannot tell the printed form from that variant. The
 decoupling frequency evaluated on the fully specified glass wool of their
 Table 6.1, where pure arithmetic gives 43.27 Hz, is independent of all this.
 
+### Elastic frames: the full Biot layer (Allard & Atalla 6 and 11)
+
+The limp model throws the frame stiffness away. Keep it, and the porous layer
+stops being a fluid: the Biot theory treats the skeleton as an elastic solid
+coupled to the pore fluid through a potential coupling coefficient $Q$ and an
+inertial coupling coefficient, and predicts **three** waves in an isotropic
+material instead of one. Two are compressional and one is shear (Allard &
+Atalla 2e ch. 6). The stress-strain relations are
+
+$$
+\sigma^s_{ij} = \left[(P - 2N)\theta^s + Q\theta^f\right]\delta_{ij}
+  + 2N e^s_{ij}, \qquad
+\sigma^f_{ij} = -\phi p\,\delta_{ij} = (Q\theta^s + R\theta^f)\delta_{ij},
+$$
+
+and for the usual case of a skeleton built from a material far stiffer than the
+skeleton itself ($K_s \to \infty$, true of glass, rock and polymer frames) the
+three elastic coefficients follow from the shear modulus $N$, the Poisson
+coefficient $\nu$ and the bulk modulus $K_f$ of the fluid in the pores
+(Eqs. 6.26-6.29):
+
+$$
+R = \phi K_f, \qquad Q = (1-\phi)K_f, \qquad
+P = \tfrac{4}{3}N + K_b + \frac{(1-\phi)^2}{\phi}K_f, \qquad
+K_b = \frac{2N(1+\nu)}{3(1-2\nu)}.
+$$
+
+With the modified densities $\tilde\rho_{11}$, $\tilde\rho_{12}$,
+$\tilde\rho_{22}$ of Eq. 6.56 the two compressional wavenumbers come out as the
+eigenvalues of a 2x2 problem (Eqs. 6.67-6.69) and the shear wavenumber from
+Eq. 6.83. `biot_waves` returns all three, together with the ratios $\mu$ of the
+fluid displacement over the frame displacement that say which medium each wave
+travels in. The wave whose $|\mu|$ is large is the **airborne** wave, the one an
+equivalent fluid already models; the other is the **frame-borne** wave, which
+has no equivalent-fluid counterpart at all.
+
+`biot_waves` takes the *rigid-frame* equivalent fluid of the pores, normally a
+`johnson_champoux_allard` result. That is deliberate: the frame inertia is the
+Biot model's own business, so handing it a `limp_frame` medium would count that
+inertia twice.
+
+The consequence a designer cares about is a resonance. A layer glued to a rigid
+wall holds its frame still at the wall and free at the front face, so the
+frame-borne wave resonates a quarter wavelength inside the layer, at
+
+$$
+f_r = \frac{1}{4l}\sqrt{\frac{\mathrm{Re}(K_c)}{\rho_1}}, \qquad
+K_c = \frac{2(1-\nu)N}{1-2\nu}
+$$
+
+(Eqs. 6.109-6.111), where $K_c$ is the longitudinal elastic coefficient of the
+frame **in vacuum** and $\rho_1$ its bulk density. `frame_quarter_wave_resonance`
+evaluates it. Nothing in the rigid-frame or limp-frame models can produce that
+peak.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/biot_frame_resonance_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/biot_frame_resonance.svg" alt="Normalised surface impedance against frequency from 200 to 1500 hertz for a 100 millimetre glass-wool layer glued to a rigid wall, comparing the rigid-frame equivalent fluid with the full Biot poroelastic layer. The rigid-frame real part falls smoothly from 3 to 1.5 as a dashed line and its imaginary part rises smoothly from minus 3 to minus 0.9 as a dotted line. The Biot real part instead dips to 1.5 near 450 hertz and rebounds to 2.6 near 520 hertz, while the Biot imaginary part peaks sharply at minus 0.7 near 480 hertz, both features straddling the frame quarter-wave resonance of 460 hertz marked by a dotted vertical line, and both curves rejoin the rigid-frame ones above 700 hertz" width="88%"></picture>
+
+*The glass wool of Allard & Atalla Table 6.1, 100 mm glued to a rigid wall,
+under both models. Away from the resonance the two are indistinguishable, which
+is the plot's own check on the Biot layer; around it the poroelastic prediction
+develops the dip-and-peak in the real part and the sharp maximum in the
+imaginary part that the book measures and plots in its Fig. 6.10.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import (
+    PoroelasticLayer, PorousLayer, biot_waves, frame_elastic_coefficient,
+    frame_quarter_wave_resonance, johnson_champoux_allard, layered_absorber,
+)
+
+# Allard & Atalla Table 6.1: glass wool "Domisol Coffrage", 100 mm, glued.
+f = np.linspace(200.0, 1500.0, 1301)
+shear = 2.2e6 * (1 + 0.1j)          # 220 N/cm2, loss factor 0.1
+med = johnson_champoux_allard(
+    f, 40e3, porosity=0.94, tortuosity=1.06,
+    viscous_length=0.56e-4, thermal_length=1.1e-4,
+)
+
+print(frame_elastic_coefficient(shear, 0.0))       # (4400000+440000j)
+print(round(frame_quarter_wave_resonance(
+    0.10, shear_modulus=shear, poisson_ratio=0.0, frame_density=130.0), 1))
+# 459.9
+
+waves = biot_waves(med, porosity=0.94, tortuosity=1.06,
+                   frame_density=130.0, shear_modulus=shear)
+print(round(float(abs(waves.airborne_velocity_ratio[800])), 1))     # 42.4
+print(np.round(waves.frame_borne_velocity_ratio[-1], 3))  # (0.811+0.473j)
+
+biot = layered_absorber(f, [PoroelasticLayer(0.10, med, 0.94, 1.06, 130.0, shear)])
+rigid = layered_absorber(f, [PorousLayer(0.10, med)])
+
+fig, ax = plt.subplots()
+for res, style in ((rigid, "--"), (biot, "-")):
+    ax.plot(f, res.normalized_impedance.real, style)
+    ax.plot(f, res.normalized_impedance.imag, style)
+ax.set(xlabel="Frequency [Hz]", ylabel="Zs / rho0 c0", ylim=(-3, 3))
+plt.show()
+
+waves.plot()   # the three Biot wavenumbers against frequency
+plt.show()
+```
+
+</details>
+
+Inside a stack, a `PoroelasticLayer` carries the same six variables the theory
+needs, $[v_1^s, v_3^s, v_3^f, \sigma^s_{33}, \sigma^s_{13}, \sigma^f_{33}]$, so
+`layered_absorber` switches from the two-variable chain to the global-matrix
+assembly of Allard & Atalla Sect. 11.5: fluid and sheet layers keep their 2x2
+matrices, each poroelastic layer contributes its 6x6 one, and the two are joined
+by the printed coupling matrices of Sect. 11.4. Two adjacent poroelastic layers
+are coupled as **bonded** frames (their Eq. 11.67); a sheet next to one is
+coupled as a free, mechanically decoupled screen. The returned
+`transfer_matrix` is filled with `nan` for such a stack, because a 2x2 chain
+matrix does not exist for it; the surface impedance, reflection factor and
+absorption are unaffected.
+
+For the same 100 mm layer the resonance moves absorption by up to 0.21 at its
+sharpest; on third-octave centres the largest shift is the 0.12 at 500 Hz:
+
+```python
+import numpy as np
+from phonometry import (
+    PoroelasticLayer, PorousLayer, johnson_champoux_allard, layered_absorber,
+)
+
+bands = np.array([250, 315, 400, 500, 630, 800, 1000], dtype=float)
+med = johnson_champoux_allard(
+    bands, 40e3, porosity=0.94, tortuosity=1.06,
+    viscous_length=0.56e-4, thermal_length=1.1e-4,
+)
+shear = 2.2e6 * (1 + 0.1j)
+for layer in (PorousLayer(0.10, med),
+              PoroelasticLayer(0.10, med, 0.94, 1.06, 130.0, shear)):
+    print(layered_absorber(bands, [layer]).absorption.round(2))
+# [0.55 0.58 0.62 0.65 0.69 0.74 0.78]   rigid frame
+# [0.53 0.56 0.61 0.77 0.71 0.74 0.78]   Biot poroelastic
+```
+
+The layer is worth the extra five parameters when the frame is stiff and heavy
+enough to resonate in the band of interest (dense mineral wool, structural
+foams), when the material is bonded to a plate that shakes it directly, or when
+a measured impedance shows a feature no equivalent fluid can explain. A light,
+soft blanket in free air is better served by `limp_frame`.
+
+**Honest note on validation.** There is no published table of $Z_s(f)$ or
+$\alpha(f)$ for a fully specified Biot layer, here or anywhere else checked, so
+this model cannot be pinned digit by digit the way the standards-based modules
+are. What it is anchored on instead, in decreasing strength: the **rigid-frame
+limit**, where making the frame infinitely stiff and heavy must reproduce the
+JCA equivalent fluid, whose own conformance *is* pinned on published digits, and
+does so with a residual that falls exactly as the inverse of the stiffness over
+eight decades, at four angles of incidence, with and without a rigid backing;
+the **limp limit**, where taking the stiffness to zero reproduces `limp_frame`;
+the agreement to machine precision between the **two independent derivations**
+the book gives, the ch. 6 closed form Eq. 6.107 and the ch. 11 global-matrix
+assembly; and the three computed numbers the book does print in prose for the
+Table 6.1 glass wool, all reproduced: the airborne wave changes root at 495 Hz,
+$|\mu_a| > 40$ above 50 Hz, and $\mu_b$ falls from 1.0 at 50 Hz to 0.82 at
+1500 Hz. The impedance peak of the book's thinner sample is printed as 860 Hz
+and comes out at 863.5 Hz. Everything else, including the whole
+oblique-incidence behaviour beyond its rigid-frame limit, rests on closed forms
+and on structural identities, not on published digits.
+
 ## 2. Multilayer prediction by transfer matrices
 
 Each fluid layer of thickness $d$ contributes the chain matrix (Cox &

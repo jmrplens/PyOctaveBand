@@ -358,6 +358,181 @@ de esa variante. La frecuencia de desacoplo evaluada sobre la lana de vidrio
 completamente especificada de su tabla 6.1, donde la aritmética pura da
 43,27 Hz, es independiente de todo esto.
 
+### Esqueletos elásticos: la capa de Biot completa (Allard & Atalla 6 y 11)
+
+El modelo flexible tira la rigidez del esqueleto a la basura. Consérvala y la
+capa porosa deja de ser un fluido: la teoría de Biot trata el armazón como un
+sólido elástico acoplado al fluido de los poros mediante un coeficiente de
+acoplamiento potencial $Q$ y un coeficiente de acoplamiento inercial, y predice
+**tres** ondas en un material isótropo en lugar de una. Dos son de compresión y
+una de cizalla (Allard & Atalla 2e, cap. 6). Las relaciones tensión-deformación
+son
+
+$$
+\sigma^s_{ij} = \left[(P - 2N)\theta^s + Q\theta^f\right]\delta_{ij}
+  + 2N e^s_{ij}, \qquad
+\sigma^f_{ij} = -\phi p\,\delta_{ij} = (Q\theta^s + R\theta^f)\delta_{ij},
+$$
+
+y para el caso habitual de un armazón fabricado con un material mucho más rígido
+que el propio armazón ($K_s \to \infty$, cierto en esqueletos de vidrio, roca y
+polímero) los tres coeficientes elásticos salen del módulo de cizalla $N$, el
+coeficiente de Poisson $\nu$ y el módulo de compresibilidad $K_f$ del fluido de
+los poros (ecs. 6.26-6.29):
+
+$$
+R = \phi K_f, \qquad Q = (1-\phi)K_f, \qquad
+P = \tfrac{4}{3}N + K_b + \frac{(1-\phi)^2}{\phi}K_f, \qquad
+K_b = \frac{2N(1+\nu)}{3(1-2\nu)}.
+$$
+
+Con las densidades modificadas $\tilde\rho_{11}$, $\tilde\rho_{12}$,
+$\tilde\rho_{22}$ de la ec. 6.56, los dos números de onda de compresión salen
+como los autovalores de un problema 2x2 (ecs. 6.67-6.69) y el de cizalla de la
+ec. 6.83. `biot_waves` devuelve los tres, junto con las razones $\mu$ entre el
+desplazamiento del fluido y el del esqueleto, que indican en qué medio viaja
+cada onda. La onda cuyo $|\mu|$ es grande es la onda **del aire**, la que un
+fluido equivalente ya modela; la otra es la onda **del esqueleto**, que no tiene
+ningún equivalente en un fluido.
+
+`biot_waves` recibe el fluido equivalente de esqueleto *rígido* de los poros,
+normalmente un resultado de `johnson_champoux_allard`. Es deliberado: la inercia
+del esqueleto es asunto del propio modelo de Biot, así que pasarle un medio de
+`limp_frame` contaría esa inercia dos veces.
+
+La consecuencia que le importa a quien diseña es una resonancia. Una capa pegada
+a una pared rígida mantiene su esqueleto quieto en la pared y libre en la cara
+frontal, de modo que la onda del esqueleto resuena a un cuarto de longitud de
+onda dentro de la capa, en
+
+$$
+f_r = \frac{1}{4l}\sqrt{\frac{\mathrm{Re}(K_c)}{\rho_1}}, \qquad
+K_c = \frac{2(1-\nu)N}{1-2\nu}
+$$
+
+(ecs. 6.109-6.111), donde $K_c$ es el coeficiente elástico longitudinal del
+esqueleto **en el vacío** y $\rho_1$ su densidad aparente.
+`frame_quarter_wave_resonance` la evalúa. Nada en los modelos de esqueleto
+rígido o flexible puede producir ese pico.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/biot_frame_resonance.svg" alt="Impedancia superficial normalizada frente a la frecuencia de 200 a 1500 hercios para una capa de lana de vidrio de 100 milímetros pegada a una pared rígida, comparando el fluido equivalente de esqueleto rígido con la capa poroelástica de Biot completa. La parte real del esqueleto rígido cae suavemente de 3 a 1,5 como línea discontinua y su parte imaginaria sube suavemente de menos 3 a menos 0,9 como línea punteada. La parte real de Biot, en cambio, baja hasta 1,5 cerca de 450 hercios y rebota hasta 2,6 cerca de 520 hercios, mientras que la parte imaginaria de Biot alcanza un máximo agudo de menos 0,7 cerca de 480 hercios, ambos rasgos a ambos lados de la resonancia de cuarto de onda del esqueleto de 460 hercios marcada con una línea vertical punteada, y ambas curvas vuelven a las del esqueleto rígido por encima de 700 hercios" width="88%" loading="lazy" />
+
+*La lana de vidrio de la tabla 6.1 de Allard & Atalla, 100 mm pegada a una pared
+rígida, con ambos modelos. Lejos de la resonancia las dos son indistinguibles,
+que es la comprobación que el propio gráfico hace de la capa de Biot; alrededor
+de ella la predicción poroelástica desarrolla el valle y el pico de la parte
+real y el máximo agudo de la parte imaginaria que el libro mide y dibuja en su
+fig. 6.10.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import (
+    PoroelasticLayer, PorousLayer, biot_waves, frame_elastic_coefficient,
+    frame_quarter_wave_resonance, johnson_champoux_allard, layered_absorber,
+)
+
+# Allard & Atalla, tabla 6.1: lana de vidrio "Domisol Coffrage", 100 mm, pegada.
+f = np.linspace(200.0, 1500.0, 1301)
+shear = 2.2e6 * (1 + 0.1j)          # 220 N/cm2, factor de pérdidas 0,1
+med = johnson_champoux_allard(
+    f, 40e3, porosity=0.94, tortuosity=1.06,
+    viscous_length=0.56e-4, thermal_length=1.1e-4,
+)
+
+print(frame_elastic_coefficient(shear, 0.0))       # (4400000+440000j)
+print(round(frame_quarter_wave_resonance(
+    0.10, shear_modulus=shear, poisson_ratio=0.0, frame_density=130.0), 1))
+# 459.9
+
+waves = biot_waves(med, porosity=0.94, tortuosity=1.06,
+                   frame_density=130.0, shear_modulus=shear)
+print(round(float(abs(waves.airborne_velocity_ratio[800])), 1))     # 42.4
+print(np.round(waves.frame_borne_velocity_ratio[-1], 3))  # (0.811+0.473j)
+
+biot = layered_absorber(f, [PoroelasticLayer(0.10, med, 0.94, 1.06, 130.0, shear)])
+rigid = layered_absorber(f, [PorousLayer(0.10, med)])
+
+fig, ax = plt.subplots()
+for res, style in ((rigid, "--"), (biot, "-")):
+    ax.plot(f, res.normalized_impedance.real, style)
+    ax.plot(f, res.normalized_impedance.imag, style)
+ax.set(xlabel="Frecuencia [Hz]", ylabel="Zs / rho0 c0", ylim=(-3, 3))
+plt.show()
+
+waves.plot(language="es")   # los tres números de onda de Biot
+plt.show()
+```
+
+</details>
+
+Dentro de una pila, una `PoroelasticLayer` lleva las seis variables que la
+teoría necesita, $[v_1^s, v_3^s, v_3^f, \sigma^s_{33}, \sigma^s_{13},
+\sigma^f_{33}]$, de modo que `layered_absorber` pasa de la cadena de dos
+variables al ensamblado por matriz global del apdo. 11.5 de Allard & Atalla: las
+capas de fluido y las láminas conservan sus matrices 2x2, cada capa
+poroelástica aporta la suya de 6x6 y ambas se unen mediante las matrices de
+acoplamiento impresas del apdo. 11.4. Dos capas poroelásticas contiguas se
+acoplan como esqueletos **pegados** (su ec. 11.67); una lámina junto a una de
+ellas se acopla como pantalla libre, desacoplada mecánicamente. El
+`transfer_matrix` devuelto se rellena con `nan` en una pila así, porque para
+ella no existe una matriz de cadena 2x2; la impedancia superficial, el factor de
+reflexión y la absorción no se ven afectados.
+
+Para la misma capa de 100 mm la resonancia mueve la absorción hasta 0,21 en su
+punto más agudo; en los centros de tercio de octava el mayor cambio es el 0,12
+de 500 Hz:
+
+```python
+import numpy as np
+from phonometry import (
+    PoroelasticLayer, PorousLayer, johnson_champoux_allard, layered_absorber,
+)
+
+bands = np.array([250, 315, 400, 500, 630, 800, 1000], dtype=float)
+med = johnson_champoux_allard(
+    bands, 40e3, porosity=0.94, tortuosity=1.06,
+    viscous_length=0.56e-4, thermal_length=1.1e-4,
+)
+shear = 2.2e6 * (1 + 0.1j)
+for layer in (PorousLayer(0.10, med),
+              PoroelasticLayer(0.10, med, 0.94, 1.06, 130.0, shear)):
+    print(layered_absorber(bands, [layer]).absorption.round(2))
+# [0.55 0.58 0.62 0.65 0.69 0.74 0.78]   esqueleto rígido
+# [0.53 0.56 0.61 0.77 0.71 0.74 0.78]   Biot poroelástico
+```
+
+La capa compensa los cinco parámetros adicionales cuando el esqueleto es lo
+bastante rígido y pesado como para resonar en la banda de interés (lana mineral
+densa, espumas estructurales), cuando el material está pegado a una placa que lo
+sacude directamente, o cuando una impedancia medida muestra un rasgo que ningún
+fluido equivalente explica. Para una manta ligera y blanda al aire, `limp_frame`
+es mejor opción.
+
+**Nota honesta sobre la validación.** No existe ninguna tabla publicada de
+$Z_s(f)$ ni de $\alpha(f)$ para una capa de Biot completamente especificada, ni
+aquí ni en ninguna otra fuente comprobada, así que este modelo no se puede
+anclar dígito a dígito como sí se hace con los módulos basados en normas. Lo que
+lo ancla, en orden decreciente de fuerza: el **límite de esqueleto rígido**, en
+el que hacer el esqueleto infinitamente rígido y pesado debe reproducir el
+fluido equivalente JCA, cuya conformidad *sí* está anclada en dígitos
+publicados, y lo hace con un residuo que cae exactamente como la inversa de la
+rigidez a lo largo de ocho décadas, con cuatro ángulos de incidencia y con y sin
+respaldo rígido; el **límite flexible**, en el que llevar la rigidez a cero
+reproduce `limp_frame`; la coincidencia a precisión de máquina entre las **dos
+derivaciones independientes** que da el libro, la forma cerrada de la ec. 6.107
+del cap. 6 y el ensamblado por matriz global del cap. 11; y los tres números
+calculados que el libro sí imprime en prosa para la lana de vidrio de la tabla
+6.1, los tres reproducidos: la onda del aire cambia de raíz en 495 Hz,
+$|\mu_a| > 40$ por encima de 50 Hz y $\mu_b$ cae de 1,0 en 50 Hz a 0,82 en
+1500 Hz. El pico de impedancia de la muestra más delgada del libro está impreso
+como 860 Hz y sale en 863,5 Hz. Todo lo demás, incluido el comportamiento en
+incidencia oblicua más allá de su límite de esqueleto rígido, descansa en formas
+cerradas y en identidades estructurales, no en dígitos publicados.
+
 ## 2. Predicción multicapa por matrices de transferencia
 
 Cada capa fluida de espesor $d$ aporta la matriz de cadena (Cox & D'Antonio
