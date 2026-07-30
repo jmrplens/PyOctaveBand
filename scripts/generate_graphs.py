@@ -1481,6 +1481,8 @@ _ES_EXACT = {
         "Ruido transmitido por conductos a la sala: impulsión, retorno y NC 30",
     "Supply": "Impulsión",
     "Return": "Retorno",
+    "Plant room to operator room: what the wall delivers, and NC 45":
+        "Sala de máquinas a sala de control: lo que aporta el muro, y NC 45",
     "Duct higher-order-mode cut-on: 254 mm steam line at 200 m/s":
         "Corte de modos superiores del conducto: línea de vapor de 254 mm a 200 m/s",
     "Panel R": "R del panel",
@@ -12410,6 +12412,71 @@ def generate_duct_path_cascade(output_dir: str) -> None:
     plt.close()
 
 
+def _norton_plant_room_chain() -> Any:
+    """Norton problem 4.18: a blower in a plant room, into the operator room.
+
+    Every number is the one printed in the problem statement, so the figure
+    shows the published calculation rather than a re-derivation: the blower
+    sound power level, the ceiling, floor and wall absorption of the
+    8 x 10 x 3 m plant room, the transmission loss of the separating wall and
+    the carpeted floor of the 5 x 5 x 3 m operator room.
+    """
+    from phonometry import (
+        equivalent_absorption_area,
+        mean_absorption,
+        room_constant,
+        room_to_room_transmission,
+    )
+
+    bands = [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
+    ceiling = [0.07, 0.20, 0.40, 0.52, 0.60, 0.67]
+    walls = [0.03, 0.03, 0.03, 0.04, 0.05, 0.07]
+    plant = [
+        (80.0, [0.01, 0.01, 0.015, 0.02, 0.02, 0.02]),
+        (80.0, ceiling),
+        (108.0, walls),
+    ]
+    operator = [
+        (25.0, [0.08, 0.24, 0.57, 0.69, 0.71, 0.73]),
+        (25.0, ceiling),
+        (60.0, walls),
+    ]
+    return room_to_room_transmission(
+        bands,
+        [39.0, 42.0, 50.0, 58.0, 63.0, 67.0],
+        5.0 * 3.0,
+        equivalent_absorption_area(operator),
+        source_power_level=[105.0, 103.0, 98.0, 108.0, 107.0, 109.0],
+        source_room_constant=room_constant(268.0, mean_absorption(plant)),
+        # The blower sits on the floor along the middle of a wall (Q = 4) and
+        # the problem asks for a conservative estimate, i.e. the constant-volume
+        # sound power model of Norton Table 4.5.
+        source_directivity=4.0,
+        source_model="constant_volume",
+        target=45.0,
+        label="Plant room to operator room",
+    )
+
+
+def generate_room_to_room_chain(output_dir: str) -> None:
+    """Norton problem 4.18: plant room to operator room against NC 45."""
+    print("Generating room_to_room_chain.svg...")
+    result = _norton_plant_room_chain()
+
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    # The result's own .plot() draws both reverberant spectra, the criterion
+    # curve and the band-by-band noise reduction on the twin axis.
+    result.plot(ax=ax, language=_LANG)
+    ax.set_ylim(20.0, 115.0)
+    ax.set_title(
+        "Plant room to operator room: what the wall delivers, and NC 45",
+        fontweight="bold", pad=10,
+    )
+    plt.tight_layout()
+    save_figure(output_dir, "room_to_room_chain.svg")
+    plt.close()
+
+
 def generate_duct_mode_cut_on(output_dir: str) -> None:
     """Higher-order-mode cut-on ladder of a 254 mm steam line at 200 m/s."""
     print("Generating duct_mode_cut_on.svg...")
@@ -13465,6 +13532,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_plenum_geometry,
     generate_hvac_end_reflection,
     generate_duct_path_cascade,
+    generate_room_to_room_chain,
     generate_duct_mode_cut_on,
     generate_enclosure_insertion_loss,
     generate_phase_decomposition,

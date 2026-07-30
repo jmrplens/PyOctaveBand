@@ -1,6 +1,6 @@
 ---
 title: "Control de ruido"
-description: "Control de ruido industrial en el camino: silenciadores reactivos de cuatro polos (cámaras de expansión, resonadores de Helmholtz, de cuarto de onda y de tubo extendido) y la elección entre reactivo y disipativo, atenuación y ruido de flujo en conductos HVAC, y pérdida de inserción de cerramientos de máquina."
+description: "Control de ruido industrial en el camino: silenciadores reactivos de cuatro polos (cámaras de expansión, resonadores de Helmholtz, de cuarto de onda y de tubo extendido) y la elección entre reactivo y disipativo, atenuación y ruido de flujo en conductos HVAC, pérdida de inserción de cerramientos de máquina y la cadena de reducción de ruido entre recintos frente a un criterio de diseño."
 ---
 
 El ruido de maquinaria se ataca por turnos en la fuente, el camino y el
@@ -25,6 +25,10 @@ la propia máquina, y esa se determina en las páginas de
 - [Ruido por conductos: del ventilador a la sala](/phonometry/es/guides/duct-path/):
   el cálculo completo del ventilador a la sala frente a un criterio de ruido de
   fondo, y el corte de modos superiores que limita todo método de onda plana.
+- [Entre recintos: partición, receptor y criterio](/phonometry/es/guides/room-to-room/):
+  la cadena compuesta del recinto emisor al recinto receptor y la pérdida por
+  transmisión que necesita una partición o un encapsulado para cumplir un
+  criterio de ruido de fondo.
 - [Control de ruido industrial: HVAC y cerramientos](/phonometry/es/guides/noise-control/):
   atenuación en conductos, ruido de flujo y pérdida de inserción de
   cerramientos de máquina.

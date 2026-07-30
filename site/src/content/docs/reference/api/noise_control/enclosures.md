@@ -28,6 +28,24 @@ panel `R`; lining the enclosure drives `C` toward its floor
 Bies terms this net reduction the enclosure *noise reduction*; it is the
 insertion loss of the enclosure.
 
+Norton & Karczub, *Fundamentals of Noise and Vibration Analysis for Engineers*
+2nd ed., 4.10 (Equation (4.115)) derive the same design equation from the same
+power balance but **without the `0.3`**:
+
+    IL = R - 10 log10( S_E / R_i ) ,
+
+so a well-lined enclosure keeps rising instead of levelling off at `R + 5.2`.
+The two agree to a few tenths of a decibel while `S_E / R_i` stays above about
+unity (a hard or lightly lined interior) and diverge once the lining takes over,
+where Bies' floor is the safer statement. `model` selects between them, and
+the difference is the reason a published worked answer has to be reproduced with
+the model its author used.
+
+Turned around, the same equation answers the question a designer actually asks:
+*given the noise reduction I need, what transmission loss must the panels have?*
+That is [`enclosure_required_transmission_loss`](/phonometry/reference/api/noise_control/enclosures/#enclosure_required_transmission_loss), which returns the required
+`R` per band in the same [`EnclosureResult`](/phonometry/reference/api/noise_control/enclosures/#enclosureresult).
+
 **The panel transmission loss `R` is supplied by the caller** -- measured, or
 predicted by a panel model -- as a per-band array, a callable of frequency, or
 a panel prediction result (a [`phonometry.building.SoundReductionResult`](/phonometry/reference/api/building/panel-transmission/#soundreductionresult)
@@ -48,6 +66,7 @@ enclosure_insertion_loss(
     internal_absorption: ArrayLike,
     *,
     frequencies: ArrayLike | None = None,
+    model: str = 'bies',
 ) -> EnclosureResult
 ```
 
@@ -65,8 +84,53 @@ constant `R_i = S_i alpha_i / (1 - alpha_i)`.
 | `internal_area` | Internal surface area `S_i` (including the machine), m2. |
 | `internal_absorption` | Mean interior absorption `alpha_i` in `(0, 1)` (scalar or per-band). |
 | `frequencies` | Band centre frequencies, Hz; required when `panel_transmission_loss` is a callable, optional otherwise (used to label the result and the plot). |
+| `model` | Interior build-up model, one of [`ENCLOSURE_MODELS`](/phonometry/reference/api/noise_control/enclosures/#enclosure_models): `"bies"` (default) carries the `0.3` floor of Bies Equation (7.111), `"norton"` the bare `C = 10 lg(S_E / R_i)` of Norton & Karczub Equation (4.115). |
 
 **Returns:** An [`EnclosureResult`](/phonometry/reference/api/noise_control/enclosures/#enclosureresult).
+
+## ENCLOSURE_MODELS
+
+*Constant* (`dict`).
+
+```python
+ENCLOSURE_MODELS = {'bies': 0.3, 'norton': 0.0}
+```
+
+## enclosure_required_transmission_loss
+
+```python
+enclosure_required_transmission_loss(
+    insertion_loss: ArrayLike | Callable[[NDArray[np.float64]], ArrayLike],
+    external_area: float,
+    internal_area: float,
+    internal_absorption: ArrayLike,
+    *,
+    frequencies: ArrayLike | None = None,
+    model: str = 'bies',
+) -> EnclosureResult
+```
+
+Panel `R` an enclosure needs to deliver a given insertion loss.
+
+The design equation of [`enclosure_insertion_loss`](/phonometry/reference/api/noise_control/enclosures/#enclosure_insertion_loss) solved the other
+way, `R = IL + C`: the enclosure geometry and its interior lining fix the
+build-up correction `C`, and the panels have to make up the rest. This is
+the number an enclosure is specified from, and the form Norton & Karczub use
+in 4.10 when the target `IL` is the gap between the level a machine
+produces in the room and a noise-criterion curve.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `insertion_loss` | Required insertion loss `IL` per band, dB (a per-band array, or a callable of the frequency array, in which case `frequencies` is required). |
+| `external_area` | External enclosure surface area `S_E`, m2. |
+| `internal_area` | Internal surface area `S_i`, m2, including the surface of the enclosed machine. |
+| `internal_absorption` | Mean interior absorption `alpha_i` in `(0, 1)` (scalar or per-band); e.g. from [`phonometry.room.mean_absorption`](/phonometry/reference/api/rooms/reverberation-prediction/#mean_absorption) over the lined enclosure walls and the machine surface. |
+| `frequencies` | Band centre frequencies, Hz; required for a callable `insertion_loss`, optional otherwise. |
+| `model` | Interior build-up model, one of [`ENCLOSURE_MODELS`](/phonometry/reference/api/noise_control/enclosures/#enclosure_models) (see [`enclosure_insertion_loss`](/phonometry/reference/api/noise_control/enclosures/#enclosure_insertion_loss)). |
+
+**Returns:** An [`EnclosureResult`](/phonometry/reference/api/noise_control/enclosures/#enclosureresult) whose `panel_transmission_loss` is the **required** `R` and whose `insertion_loss` is the requested target, so it plots and reports like a forward calculation.
 
 ## EnclosureResult
 

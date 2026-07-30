@@ -21,7 +21,12 @@ from .duct_path import (
     combine_duct_paths,
     duct_path,
 )
-from .enclosures import EnclosureResult, enclosure_insertion_loss
+from .enclosures import (
+    ENCLOSURE_MODELS,
+    EnclosureResult,
+    enclosure_insertion_loss,
+    enclosure_required_transmission_loss,
+)
 from .hvac import (
     HvacSpectrumResult,
     air_terminal_damper_correction,
@@ -48,6 +53,7 @@ from .hvac import (
     unlined_circular_duct_attenuation,
     unlined_rectangular_duct_attenuation,
 )
+from .room_to_room import RoomToRoomResult, room_to_room_transmission
 from .silencers import (
     ReactiveSilencerResult,
     cascade,
@@ -64,6 +70,7 @@ from .silencers import (
 )
 
 __all__ = [
+    "ENCLOSURE_MODELS",
     "DuctElement",
     "DuctModeResult",
     "DuctPathResult",
@@ -72,6 +79,7 @@ __all__ = [
     "HvacSpectrumResult",
     "PlaneWaveWarning",
     "ReactiveSilencerResult",
+    "RoomToRoomResult",
     "air_terminal_damper_correction",
     "air_terminal_velocity_limit",
     "blade_passing_frequency",
@@ -83,6 +91,7 @@ __all__ = [
     "duct_path",
     "elbow_insertion_loss",
     "enclosure_insertion_loss",
+    "enclosure_required_transmission_loss",
     "end_reflection_loss",
     "end_reflection_loss_closed_form",
     "equivalent_diameter",
@@ -107,6 +116,7 @@ __all__ = [
     "quarter_wave_resonator",
     "rectangular_duct_cut_on",
     "room_effect",
+    "room_to_room_transmission",
     "shunt_matrix",
     "silencer_self_noise",
     "split_loss",

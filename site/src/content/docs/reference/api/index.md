@@ -217,6 +217,7 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`noise_control.duct_path`](/phonometry/reference/api/noise_control/duct-path/) | End-to-end duct-borne noise calculation: fan to room, element by element. |
 | [`noise_control.duct_modes`](/phonometry/reference/api/noise_control/duct-modes/) | Higher-order acoustic modes in ducts, with the mean-flow cut-on shift. |
 | [`noise_control.enclosures`](/phonometry/reference/api/noise_control/enclosures/) | Insertion loss of a close or free-standing machine enclosure. |
+| [`noise_control.room_to_room`](/phonometry/reference/api/noise_control/room-to-room/) | Room-to-room noise reduction: source room, partition, receiving room, criterion. |
 
 ## Program loudness
 

@@ -115,8 +115,62 @@ def test_result_type_and_plot() -> None:
     assert enclosure_insertion_loss([20.0, 30.0], 6.0, 5.0, 0.3).plot() is not None
 
 
+def test_norton_model_drops_the_floor() -> None:
+    """``model="norton"`` is Norton & Karczub Eq. (4.115): no ``0.3`` inside the log."""
+    r = np.array([20.0, 30.0, 40.0])
+    s_e, s_i, alpha = 6.0, 5.0, 0.3
+    res = enclosure_insertion_loss(r, s_e, s_i, alpha, model="norton")
+    r_i = float(room_constant(s_i, alpha))
+    assert np.allclose(res.correction, 10.0 * math.log10(s_e / r_i))
+    bies = enclosure_insertion_loss(r, s_e, s_i, alpha)
+    assert np.all(res.insertion_loss > bies.insertion_loss)
+
+
+def test_norton_model_has_no_insertion_loss_ceiling() -> None:
+    """Bies' ``0.3`` caps ``IL`` at ``R + 5.2``; Norton's form keeps climbing."""
+    bies = enclosure_insertion_loss([40.0], 6.0, 5.0, 0.999999)
+    norton = enclosure_insertion_loss([40.0], 6.0, 5.0, 0.999999, model="norton")
+    assert bies.insertion_loss[0] == pytest.approx(45.23, abs=0.01)
+    assert norton.insertion_loss[0] > 90.0
+
+
+def test_required_transmission_loss_inverts_the_equation() -> None:
+    """``enclosure_required_transmission_loss`` is the exact inverse."""
+    from phonometry import enclosure_required_transmission_loss
+
+    target = np.array([10.0, 20.0, 30.0])
+    required = enclosure_required_transmission_loss(target, 6.0, 5.0, 0.3)
+    assert np.allclose(required.insertion_loss, target)
+    forward = enclosure_insertion_loss(
+        required.panel_transmission_loss, 6.0, 5.0, 0.3
+    )
+    assert np.allclose(forward.insertion_loss, target)
+    assert np.allclose(forward.correction, required.correction)
+
+
+def test_required_transmission_loss_callable_and_result_shape() -> None:
+    """A callable target and the frequency labelling behave as in the forward call."""
+    from phonometry import enclosure_required_transmission_loss
+
+    freqs = np.array([125.0, 250.0, 500.0])
+    res = enclosure_required_transmission_loss(
+        lambda f: 5.0 + 10.0 * np.log10(f / 125.0), 6.0, 5.0, 0.3, frequencies=freqs
+    )
+    assert isinstance(res, EnclosureResult)
+    assert res.frequencies is not None
+    assert res.panel_transmission_loss.shape == (3,)
+    import matplotlib
+
+    matplotlib.use("Agg")
+    assert res.plot().get_ylabel()
+    with pytest.raises(ValueError, match="frequencies"):
+        enclosure_required_transmission_loss(lambda f: f, 6.0, 5.0, 0.3)
+
+
 def test_validation() -> None:
     with pytest.raises(ValueError):
         enclosure_insertion_loss([20.0], -1.0, 5.0, 0.3)
     with pytest.raises(ValueError):
         enclosure_insertion_loss([20.0], 6.0, 5.0, 1.0)
+    with pytest.raises(ValueError, match="model"):
+        enclosure_insertion_loss([20.0], 6.0, 5.0, 0.3, model="hansen")

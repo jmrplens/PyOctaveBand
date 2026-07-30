@@ -81,6 +81,39 @@ def test_steady_state_spl_direct_and_reverberant_limits() -> None:
     assert near == pytest.approx(Lw + 10.0 * math.log10(1.0 / (4.0 * math.pi * r**2)), abs=0.2)
 
 
+def test_steady_state_spl_reverberant_only() -> None:
+    """``distance=None`` is the reverberant field alone, the r -> inf limit."""
+    Lw, R = 90.0, 25.0
+    reverberant = float(steady_state_spl(Lw, None, R))
+    assert reverberant == pytest.approx(Lw + 10.0 * math.log10(4.0 / R))
+    # Approached from below by a far receiver, and never exceeded.
+    assert float(steady_state_spl(Lw, 1e4, R)) == pytest.approx(reverberant, abs=1e-6)
+    assert float(steady_state_spl(Lw, 1.0, R)) > reverberant
+    # The directivity factor alone does not move it: the reverberant field is
+    # position-independent for a constant-power source.
+    assert float(steady_state_spl(Lw, None, R, directivity=8.0)) == pytest.approx(
+        reverberant
+    )
+
+
+@pytest.mark.parametrize(
+    ("model", "exponent"),
+    [("constant_power", 0.0), ("constant_volume", 1.0), ("constant_pressure", -1.0)],
+)
+def test_steady_state_spl_source_power_models(model: str, exponent: float) -> None:
+    """Norton & Karczub 2e Table 4.5: ``Pi = Pi_0 Q^n`` with ``n`` = 0, 1, -1.
+
+    A source in the intersection of three flat surfaces has ``Q = 8``, so the
+    three models sit at ``+0``, ``+9.03`` and ``-9.03 dB`` of one another. The
+    printed table rounds those to 0, +9 and -9 dB.
+    """
+    Lw, R, q = 100.0, 40.0, 8.0
+    base = Lw + 10.0 * math.log10(4.0 / R)
+    level = float(steady_state_spl(Lw, None, R, directivity=q, source_model=model))
+    assert level - base == pytest.approx(exponent * 10.0 * math.log10(q))
+    assert round(level - base) == pytest.approx(round(exponent * 9.03))
+
+
 def test_steady_state_spl_characteristic_impedance_term() -> None:
     # The optional 10 log10(rho c / 400) term is about +0.14 dB at 20 degC.
     base = float(steady_state_spl(90.0, 2.0, 25.0))
@@ -125,6 +158,8 @@ def test_steady_field_validation() -> None:
         steady_state_spl(90.0, -1.0, 25.0)
     with pytest.raises(ValueError):
         steady_state_spl(90.0, 1.0, -25.0)
+    with pytest.raises(ValueError, match="source_model"):
+        steady_state_spl(90.0, 1.0, 25.0, source_model="constant_intensity")
     with pytest.raises(ValueError):
         schroeder_frequency(-1.0, 200.0)
     empty = np.array([])

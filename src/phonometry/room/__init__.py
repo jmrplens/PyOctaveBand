@@ -80,6 +80,7 @@ from .room_noise import (
     room_criterion,
 )
 from .steady_field import (
+    SOURCE_POWER_MODELS,
     SteadyFieldResult,
     critical_distance,
     room_constant,
@@ -93,6 +94,7 @@ __all__ = [
     "MODE_KINDS",
     "NORMAL_VOICE_POWER_LEVEL",
     "PRIVACY_SNR",
+    "SOURCE_POWER_MODELS",
     "TALKER_DIRECTIVITY",
     "CrowdNoiseResult",
     "DecayCurve",
