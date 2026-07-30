@@ -1172,22 +1172,9 @@ def _termination_admittance(
     rc: float,
 ) -> Complex:
     """Admittance ``G = u/p`` at the termination face of the stack."""
-    if isinstance(termination, str):
-        if termination == "rigid":
-            return np.zeros_like(f, dtype=np.complex128)
-        if termination == "free":
-            return np.full(f.shape, cos_t / rc, dtype=np.complex128)
-        raise ValueError(
-            "'termination' must be 'rigid', 'free' or a complex impedance."
-        )
-    zl_arr = np.asarray(termination, dtype=np.complex128)
-    if zl_arr.ndim > 0 and zl_arr.shape != f.shape:
-        raise ValueError(
-            "'termination' impedance array must be scalar or match the "
-            f"frequency vector length ({f.size}), got {zl_arr.size}."
-        )
-    if not np.all(np.abs(zl_arr) > 0.0):
-        raise ValueError("'termination' impedance must be non-zero.")
+    zl_arr = _termination_impedance(termination, f, cos_t=cos_t, rc=rc)
+    if zl_arr is None:
+        return np.zeros_like(f, dtype=np.complex128)
     return np.asarray(np.ones_like(f) / zl_arr, dtype=np.complex128)
 
 
@@ -1201,8 +1188,9 @@ def _termination_impedance(
     """Impedance ``p/v3`` closing the stack, or ``None`` for a hard wall.
 
     The global-matrix assembly of Allard & Atalla Sect. 11.5 needs the
-    termination as an impedance (their Eq. (11.84)) rather than as the
-    admittance the recursion of :func:`_surface_admittance` consumes.
+    termination as an impedance (their Eq. (11.84)); the admittance the
+    recursion of :func:`_surface_admittance` consumes is its reciprocal, with
+    the hard wall the one case that has no finite impedance.
     """
     if isinstance(termination, str):
         if termination == "rigid":
@@ -1306,7 +1294,7 @@ def _stack_blocks(
             viscosity=viscosity,
         )
         chain = _chain_matrix(terms, f)
-        blocks.append(biot.fluid_block(np.moveaxis(chain, -1, 0)))
+        blocks.append(biot._fluid_block(np.moveaxis(chain, -1, 0)))
         pending.clear()
 
     for layer in layers:
@@ -1327,7 +1315,7 @@ def _stack_blocks(
                 poisson_ratio=layer.poisson_ratio,
             )
             blocks.append(
-                biot.poroelastic_block(waves, thickness, transverse_wavenumber)
+                biot._poroelastic_block(waves, thickness, transverse_wavenumber)
             )
         else:
             pending.append(layer)
@@ -1405,7 +1393,7 @@ def layered_absorber(
         )
         if not blocks:
             raise ValueError("'layers' must contain at least one layer.")
-        zs = biot.stack_surface_impedance(
+        zs = biot._stack_surface_impedance(
             blocks, _termination_impedance(termination, f, cos_t=cos_t, rc=rc)
         )
         finite = np.isfinite(zs)

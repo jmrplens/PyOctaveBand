@@ -669,7 +669,7 @@ class _Block:
         return int(self.front.shape[-1])
 
 
-def fluid_block(transfer_matrix: Complex) -> _Block:
+def _fluid_block(transfer_matrix: Complex) -> _Block:
     """A two-variable block from its ``(nf, 2, 2)`` chain matrix."""
     identity = np.broadcast_to(
         np.eye(2, dtype=np.complex128), transfer_matrix.shape
@@ -677,7 +677,7 @@ def fluid_block(transfer_matrix: Complex) -> _Block:
     return _Block("fluid", transfer_matrix, np.asarray(identity), 1.0)
 
 
-def poroelastic_block(
+def _poroelastic_block(
     waves: BiotWavesResult, thickness: float, transverse_wavenumber: ArrayLike
 ) -> _Block:
     """A six-variable block, parameterised by its wave amplitudes."""
@@ -731,7 +731,7 @@ def _identity_map(n_freq: int) -> Complex:
     )
 
 
-def stack_surface_impedance(
+def _stack_surface_impedance(
     blocks: list[_Block], termination: Complex | None
 ) -> Complex:
     """Surface impedance of a stratified medium by the global-matrix method.
