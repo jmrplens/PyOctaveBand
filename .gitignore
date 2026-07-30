@@ -72,6 +72,13 @@ node_modules/
 plan/
 docs/superpowers/
 
+# Full copies of the heavy oracle sets that cannot be redistributed (the
+# stipa.info certified STIPA bench, the EBU loudness test set, the NORAH2
+# public release). Tests prefer them when present and otherwise fall back to
+# the committed derived data and extracts under tests/data/, which is what CI
+# runs. See tests/data/README.md and tests/oracle_data.py.
+tests/data-local/
+
 # Astro docs site
 site/node_modules/
 site/dist/

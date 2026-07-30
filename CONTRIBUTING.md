@@ -83,13 +83,30 @@ To check coverage locally:
 ```bash
 pytest --cov=src/phonometry --cov-report=term-missing tests/
 ```
-A few tests need reference material that is not committed (its licence forbids
-redistribution) and skip when it is absent. The EBU programme-loudness
-full-chain oracle (`tests/broadcast/test_ebu_material_oracle.py`) needs the free
-[EBU loudness test set](https://tech.ebu.ch/publications/ebu_loudness_test_set):
-drop it under `plan/dsp-sources/ebu-loudness-test-set/` or point
-`EBU_LOUDNESS_TEST_SET` at your copy. CI does not fetch it; the committed
-per-block series in `tests/data/broadcast/` cover the same cases without audio.
+
+### 3b. Oracle data (committed vs local)
+
+Some suites are validated against reference material that is too large or not
+redistributable. Each of them keeps a small committed oracle under
+`tests/data/<dataset>/` (a derived measurement series, or a lossless extract of
+a representative subset) and prefers a full local copy when one is available.
+Resolution order, applied by `tests/oracle_data.py`: the dataset's environment
+variable, then the gitignored `tests/data-local/<dataset>/`, then the committed
+data. **The assertions on the committed data never skip** — that is what CI
+runs. Tests that exist only to exercise the full set, and have no committed
+counterpart, do skip there and say so. `pytest` prints which copy each dataset
+resolved to in its run header.
+
+To run a suite against the full original set, drop it in `tests/data-local/`:
+
+| Dataset | `tests/data-local/…` | Environment override |
+| :--- | :--- | :--- |
+| [stipa.info STIPA verification bench](https://www.stipa.info/index.php/download-test-signals) | `stipa-verification/` | `STIPA_VERIFICATION_DATA` |
+| [EBU loudness test set](https://tech.ebu.ch/publications/ebu_loudness_test_set) | `ebu-loudness-test-set/` | `EBU_LOUDNESS_TEST_SET` |
+| NORAH2 V2.0.74 public release | `norah2/NORAH2_V2.0.74_public.zip` | `NORAH2_DATA` (extraction root) |
+
+See `tests/data/README.md` for the convention and what each committed oracle
+can and cannot assert.
 
 ### 4. Documentation Images (auto-generated)
 Every image under `.github/images/` is generated with the library itself by

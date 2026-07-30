@@ -20,6 +20,21 @@ def pytest_configure(config):
     # to exercise the jitted kernel; an externally-set value must win.
     os.environ.setdefault("NUMBA_DISABLE_JIT", "1")
 
+
+def pytest_report_header(config):
+    """Report which copy of every heavy oracle set this run will read.
+
+    The suites in ``tests/oracle_data.DATASETS`` prefer a full local copy of
+    reference material that cannot be committed and fall back to the small
+    committed oracle under ``tests/data/``. Printing the resolution keeps a
+    green run from being ambiguous about which of the two produced it.
+    """
+    import oracle_data
+
+    lines = [oracle_data.resolve(d).describe() for d in oracle_data.DATASETS]
+    return ["oracle data:", *[f"  {line}" for line in lines]]
+
+
 @pytest.fixture(autouse=True)
 def handle_performance_tests(request):
     """
