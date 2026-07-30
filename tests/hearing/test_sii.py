@@ -521,7 +521,7 @@ def test_sii_wg_s3_79_official_test_cases(
     )
     assert result.method == method
     assert result.sii == pytest.approx(published, abs=5e-4), case
-    assert result.sii == pytest.approx(committee, abs=1e-7), case
+    assert result.sii == pytest.approx(committee, abs=1e-9), case
     if importance is not None:
         np.testing.assert_allclose(result.band_importance, importance)
 
@@ -552,7 +552,7 @@ def test_sii_annex_c1_worked_example() -> None:
         np.array(ANSIS3_5_ANNEX_C1_NOISE),
         method="octave",
     )
-    assert result.sii == pytest.approx(ANSIS3_5_ANNEX_C1, abs=1e-7)
+    assert result.sii == pytest.approx(ANSIS3_5_ANNEX_C1, abs=1e-9)
     assert result.level_distortion[4] == pytest.approx(
         ANSIS3_5_ANNEX_C1_LEVEL_DISTORTION_I5, abs=5e-3
     )
@@ -583,7 +583,7 @@ def test_alternative_importance_reweights_the_same_audibility() -> None:
     assert alt.sii == pytest.approx(
         float(np.sum(np.array(ANSIS3_5_WG_TO1_IMPORTANCE) * base.band_audibility))
     )
-    assert alt.sii == pytest.approx(ANSIS3_5_WG_TO1_SII_EXACT, abs=1e-7)
+    assert alt.sii == pytest.approx(ANSIS3_5_WG_TO1_SII_EXACT, abs=1e-9)
 
 
 def test_default_method_is_unchanged_one_third_octave() -> None:
