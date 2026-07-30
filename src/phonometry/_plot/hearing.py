@@ -219,9 +219,9 @@ def plot_sii(
     return ax
 
 
-#: Spanish labels of the four ANSI S3.5-1997 band procedures, keyed by the
-#: ``method=`` name; the English label is the dictionary value of ``_STRINGS``
-#: for any other language.
+#: English legend label of each of the four ANSI S3.5-1997 band procedures,
+#: keyed by the ``method=`` name. The label doubles as the ``_STRINGS`` key, so
+#: ``_t`` returns it unchanged in English and its Spanish entry otherwise.
 _SII_METHOD_LABELS: dict[str, str] = {
     "critical-band": "Critical band (21)",
     "equally-contributing": "Equally contributing (17)",

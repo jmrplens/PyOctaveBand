@@ -32,15 +32,16 @@ from reference_data import (
     ANSIS3_5_ANNEX_C2_MASKING,
     ANSIS3_5_BAND_IMPORTANCE_SUM,
     ANSIS3_5_CRITICAL_IMPORTANCE_SUM,
-    ANSIS3_5_CRITICAL_TABLE1_HEAD,
+    ANSIS3_5_CRITICAL_TABLE1,
     ANSIS3_5_DISTURBANCE_5000HZ,
     ANSIS3_5_EQUAL_IMPORTANCE_SUM,
     ANSIS3_5_LOUD_1KHZ,
     ANSIS3_5_NOISE_PLUS_LOSS,
     ANSIS3_5_OCTAVE_IMPORTANCE_SUM,
-    ANSIS3_5_OCTAVE_INTERNAL_NOISE_1KHZ,
-    ANSIS3_5_OCTAVE_SPEECH_1KHZ,
+    ANSIS3_5_OCTAVE_TABLE4,
+    ANSIS3_5_OCTAVE_TABLE4_SHARED,
     ANSIS3_5_STANDARD_QUIET,
+    ANSIS3_5_THIRD_OCTAVE_TABLE3,
     ANSIS3_5_WG_CB1_IMPORTANCE,
     ANSIS3_5_WG_CB1_SII,
     ANSIS3_5_WG_CB1_SII_EXACT,
@@ -57,6 +58,7 @@ from reference_data import (
     ANSIS3_5_WG_ECB_SII_EXACT,
     ANSIS3_5_WG_ECB_SPEECH,
     ANSIS3_5_WG_ECB_THRESHOLD,
+    ANSIS3_5_WG_FLAT_CASES,
     ANSIS3_5_WG_OCTAVE1_IMPORTANCE,
     ANSIS3_5_WG_OCTAVE1_SII,
     ANSIS3_5_WG_OCTAVE1_SII_EXACT,
@@ -181,6 +183,36 @@ def test_masking_spectrum_matches_reference() -> None:
     result = sii.speech_intelligibility_index("normal")
     reference_zi = np.array([8.41, -1.6647, 0.7052, 0.3817])
     np.testing.assert_allclose(result.masking[:4], reference_zi, atol=1e-4)
+
+
+def test_masking_slope_keeps_the_printed_summation_order() -> None:
+    """The clause 5.4 slope is summed as printed: ``(Bi + 10 lg fi) - 6.353``.
+
+    Floating-point addition is not associative, so folding the printed 6.353
+    into the bandwidth term first, as ``Bi + (10 lg fi - 6.353)``, shifts the
+    equivalent masking spectrum level in its last bits and with it the shipped
+    index and the report fiche. This asserts bit equality against the slope
+    written out in the standard's own order, independently of how the module
+    happens to factor it, so the association cannot drift again unnoticed.
+    """
+    speech = np.linspace(20.0, 70.0, 18)
+    noise = np.linspace(45.0, 5.0, 18)
+    result = sii.speech_intelligibility_index(speech, noise)
+
+    f = sii.BAND_CENTERS
+    b = np.maximum(noise, speech - 24.0)
+    c = -80.0 + 0.6 * (b + 10.0 * np.log10(f) - 6.353)
+    expected = np.empty(18)
+    expected[0] = b[0]
+    for i in range(1, 18):
+        contrib = 10.0 ** (
+            0.1 * (b[:i] + 3.32 * c[:i] * np.log10(0.89 * f[i] / f[:i]))
+        )
+        expected[i] = 10.0 * np.log10(10.0 ** (0.1 * noise[i]) + np.sum(contrib))
+
+    # Bit equality, not a tolerance: a reassociation shows up here as a few
+    # units in the last place and would pass any reasonable atol.
+    assert result.masking.tolist() == expected.tolist()
 
 
 def test_noise_reduces_index_monotonically() -> None:
@@ -403,32 +435,101 @@ def test_band_importance_sums_of_every_procedure() -> None:
     ).band_importance.sum() == pytest.approx(ANSIS3_5_EQUAL_IMPORTANCE_SUM, abs=1e-12)
 
 
-def test_critical_band_table_head() -> None:
-    # ANSI S3.5-1997 Table 1, first six rows: nominal centre frequency, band
-    # limits, band importance Ii, normal-effort speech spectrum level Ui and
-    # reference internal noise spectrum level Xi.
-    proc = sii.sii_procedure("critical-band")
-    for i, (fc, lo, hi, imp, speech, noise) in enumerate(
-        ANSIS3_5_CRITICAL_TABLE1_HEAD
-    ):
-        assert proc.frequencies[i] == pytest.approx(fc)
-        assert proc.band_edges[i] == pytest.approx(lo)
-        assert proc.band_edges[i + 1] == pytest.approx(hi)
-        assert proc.band_importance[i] == pytest.approx(imp)
-        assert proc.speech_spectrum[i] == pytest.approx(speech)
-        assert proc.internal_noise[i] == pytest.approx(noise)
+@pytest.mark.parametrize(
+    ("method", "table"),
+    [("critical-band", ANSIS3_5_CRITICAL_TABLE1),
+     ("octave", ANSIS3_5_OCTAVE_TABLE4)],
+    ids=["Table 1", "Table 4"],
+)
+def test_band_table_transcription(
+    method: str, table: tuple[tuple[float, ...], ...]
+) -> None:
+    """Every cell of the shipped Tables 1 and 4, asserted directly.
+
+    This is a transcription pin, not an independent oracle: most of these
+    digits come from the same WG S3-79 reference implementation the procedures
+    are anchored on (rows 1 to 6 of Table 1 are additionally corroborated by an
+    independent transcription; see ``tests/reference_data.py`` for the
+    per-column provenance). It exists because the eight official ``.TST`` cases
+    leave most of these cells inert: their strong maskers and their -10 dB
+    bands mean that corrupting, for instance, the reference internal noise of
+    critical band 11 by a whole decibel, or an octave band limit by 100 Hz,
+    changes no published result. Without this test those cells would be
+    unpinned, and a typo in them would ship.
+    """
+    proc = sii.sii_procedure(method)
+    assert proc.frequencies.size == len(table)
+    assert proc.band_edges.size == len(table) + 1
+    for i, (fc, lo, hi, imp, speech, noise) in enumerate(table):
+        assert proc.frequencies[i] == pytest.approx(fc), f"centre, row {i + 1}"
+        assert proc.band_edges[i] == pytest.approx(lo), f"lower edge, row {i + 1}"
+        assert proc.band_edges[i + 1] == pytest.approx(hi), f"upper edge, row {i + 1}"
+        assert proc.band_importance[i] == pytest.approx(imp), f"Ii, row {i + 1}"
+        assert proc.speech_spectrum[i] == pytest.approx(speech), f"Ui, row {i + 1}"
+        assert proc.internal_noise[i] == pytest.approx(noise), f"Xi, row {i + 1}"
+
+
+def test_third_octave_table_transcription() -> None:
+    """Every cell of Table 3, the procedure that was already shipping.
+
+    Table 3 has an independent digit source (the Hornsby worksheet), so unlike
+    the Tables 1 and 4 pin this is a check against a third-party transcription
+    as well as a guard. It is asserted for the same practical reason: a
+    mutation campaign found the reference internal noise at 2500 Hz and
+    3150 Hz surviving a whole-decibel corruption, because the band audibility
+    there is clipped at 1 in every case the rest of the suite runs.
+    """
+    proc = sii.sii_procedure("one-third-octave")
+    assert proc.frequencies.size == len(ANSIS3_5_THIRD_OCTAVE_TABLE3)
+    for i, (fc, imp, speech, noise) in enumerate(ANSIS3_5_THIRD_OCTAVE_TABLE3):
+        assert proc.frequencies[i] == pytest.approx(fc), f"centre, row {i + 1}"
+        assert proc.band_importance[i] == pytest.approx(imp), f"Ii, row {i + 1}"
+        assert proc.speech_spectrum[i] == pytest.approx(speech), f"Ui, row {i + 1}"
+        assert proc.internal_noise[i] == pytest.approx(noise), f"Xi, row {i + 1}"
 
 
 def test_octave_table_is_the_same_spectrum_level_as_table_3() -> None:
-    # ANSI S3.5-1997 Table 4 tabulates Ui and Xi at 1000 Hz as the same
-    # figures Table 3 gives at 1000 Hz: both are spectrum (per-hertz) levels,
-    # so they do not depend on the analysis bandwidth.
-    proc = sii.sii_procedure("octave")
-    k = int(np.flatnonzero(np.isclose(proc.frequencies, 1000.0))[0])
-    assert proc.speech_spectrum[k] == pytest.approx(ANSIS3_5_OCTAVE_SPEECH_1KHZ)
-    assert proc.internal_noise[k] == pytest.approx(
-        ANSIS3_5_OCTAVE_INTERNAL_NOISE_1KHZ
+    # ANSI S3.5-1997 Table 4 tabulates Ui and Xi at all six of its centres as
+    # the figures Table 3 gives at those same centres: both are spectrum
+    # (per-hertz) levels, so they do not depend on the analysis bandwidth.
+    # This is one of the three corroborations the limitations section leans on,
+    # so it is enforced at every shared centre rather than only at 1 kHz.
+    octave = sii.sii_procedure("octave")
+    third = sii.sii_procedure("one-third-octave")
+    for fc, speech, noise in ANSIS3_5_OCTAVE_TABLE4_SHARED:
+        k = int(np.flatnonzero(np.isclose(octave.frequencies, fc))[0])
+        j = int(np.flatnonzero(np.isclose(third.frequencies, fc))[0])
+        assert octave.speech_spectrum[k] == pytest.approx(speech), f"Ui at {fc:g} Hz"
+        assert octave.internal_noise[k] == pytest.approx(noise), f"Xi at {fc:g} Hz"
+        # ... and equal to Table 3's own entry at that centre.
+        assert octave.speech_spectrum[k] == pytest.approx(third.speech_spectrum[j])
+        assert octave.internal_noise[k] == pytest.approx(third.internal_noise[j])
+
+
+@pytest.mark.parametrize(
+    ("method", "regime", "speech", "noise", "committee"),
+    ANSIS3_5_WG_FLAT_CASES,
+    ids=[f"{m}-{r}" for m, r, *_ in ANSIS3_5_WG_FLAT_CASES],
+)
+def test_sii_flat_spectrum_cases_against_committee_code(
+    method: str, regime: str, speech: float, noise: float, committee: float
+) -> None:
+    """Flat-input cases from SII.C that bring every band's Ui and Xi into play.
+
+    The eight official ``.TST`` cases exercise the chain but not the whole of
+    each table. These do: in the quiet regime the disturbance is the reference
+    internal noise in every band, and in the loud regime the clause 5.7
+    level-distortion factor is below unity in every band, so each table's Xi
+    and Ui column respectively moves the answer cell by cell. Expected values
+    are printed by the committee's SII.C, compiled unmodified, on the stated
+    flat input.
+    """
+    proc = sii.sii_procedure(method)
+    n = proc.frequencies.size
+    result = sii.speech_intelligibility_index(
+        np.full(n, speech), np.full(n, noise), method=method
     )
+    assert result.sii == pytest.approx(committee, abs=1e-9), regime
 
 
 def test_equally_contributing_is_the_300_to_6400_hz_span_of_table_1() -> None:
@@ -503,14 +604,16 @@ def test_sii_wg_s3_79_official_test_cases(
 
     These six cases are not six independent confirmations. ``CB_1.TST`` and
     ``ECB_1.TST`` are the same one twice: the equally-contributing bands are
-    critical bands 3 to 19, their two alternative importance functions weight
-    the same physical bands, and the two extra critical bands below 300 Hz sit
-    80 dB under the speech, so their upward spread of masking never reaches a
-    weighted band. Both procedures consequently return the identical
-    0.4104741231, which the kit publishes as 0.410 for each. Counting
-    honestly, the eight official cases give seven independent confirmations.
-    The redundant one still earns its place: it would break the moment either
-    procedure's band mapping went wrong.
+    critical bands 3 to 19, and the two alternative importance functions weight
+    the same physical bands. The two extra critical bands below 300 Hz that the
+    critical-band procedure adds change nothing in those weighted bands, not
+    because they are quiet (their masker is the input's 10 dB noise line) but
+    because their upward spread has decayed to about 1e-19 of the local masking
+    energy by the time it arrives, which is far below double precision. Both
+    procedures therefore return the identical 0.4104741231, published as 0.410
+    for each. Counting honestly, the eight official cases give seven
+    independent confirmations. The redundant one still earns its place: it
+    would break the moment either procedure's band mapping went wrong.
     """
     result = sii.speech_intelligibility_index(
         np.array(speech),

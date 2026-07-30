@@ -1176,12 +1176,16 @@ ANSIS3_5_WG_TO1_SII_EXACT = 0.4382176540  # SII.C run on TO_1.TST
 #
 # CB_1.TST and ECB_1.TST are NOT two independent oracles. They coincide to
 # every printed digit because the equally-contributing bands are critical
-# bands 3 to 19: the two alternative importance functions select the same
-# physical bands, and the two extra critical bands below 300 Hz sit 80 dB
-# below the speech, so their upward spread of masking never reaches a
-# weighted band. The eight official cases therefore carry seven independent
-# confirmations, not eight; the pair is still worth running, because a wrong
-# band mapping in either procedure would break the coincidence.
+# bands 3 to 19 and the two alternative importance functions select the same
+# physical bands. The two extra critical bands below 300 Hz that only the
+# critical-band procedure has do not perturb the weighted bands: their masker
+# is the input's 10 dB noise line, and its upward spread arrives at the first
+# weighted band at roughly 1e-19 of the local masking energy, under double
+# precision. (In the lowest shared band the same contribution is 5e-2 and does
+# matter, but that band carries zero weight in both alternative functions.)
+# The eight official cases therefore carry seven independent confirmations,
+# not eight; the pair is still worth running, because a wrong band mapping in
+# either procedure would break the coincidence.
 ANSIS3_5_WG_CB_SPEECH = (
     -10.0, -10.0, -10.0, 90.0, 5.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0,
     40.0, 40.0, 40.0, 40.0, 40.0, -10.0, -10.0, -10.0, -10.0,
@@ -1241,17 +1245,19 @@ ANSIS3_5_CRITICAL_IMPORTANCE_SUM = 1.0
 ANSIS3_5_OCTAVE_IMPORTANCE_SUM = 1.0
 ANSIS3_5_EQUAL_IMPORTANCE_SUM = 0.9996
 # Table 4 tabulates the standard speech spectrum level Ui and the reference
-# internal noise spectrum level Xi at 1000 Hz as the same figures Table 3 gives
-# at 1000 Hz: both are spectrum (per-hertz) levels, so they do not depend on
-# the analysis bandwidth. SII.C carries both tables independently and its
-# u[]/x[] entries agree.
-ANSIS3_5_OCTAVE_SPEECH_1KHZ = 25.01
-ANSIS3_5_OCTAVE_INTERNAL_NOISE_1KHZ = -12.5
-# Table 1, first six rows: nominal centre frequency, band limits, band
-# importance Ii, normal-effort standard speech spectrum level Ui and reference
-# internal noise spectrum level Xi. Digits from the WG S3-79 reference
-# implementation SII.C (limit[], i_avg[], u[], x[]); the R CRAN package "SII"
-# prints the same six rows of Table 1 from its own transcription.
+# internal noise spectrum level Xi at the six octave centres as the same
+# figures Table 3 gives at those centres: both are spectrum (per-hertz) levels,
+# so they do not depend on the analysis bandwidth. SII.C carries the two tables
+# independently and its u[]/x[] entries agree at all six. Rows: centre
+# frequency in hertz, Ui and Xi in dB SPL.
+ANSIS3_5_OCTAVE_TABLE4_SHARED = (
+    (250.0, 34.75, -3.9),
+    (500.0, 34.27, -9.7),
+    (1000.0, 25.01, -12.5),
+    (2000.0, 17.32, -17.7),
+    (4000.0, 9.33, -25.9),
+    (8000.0, 1.13, -7.1),
+)
 # ANSI S3.5-1997 Annex C.1 worked example (octave-band procedure). Its input is
 # printed in the WG DevelopmentKit readme: equivalent speech spectrum level
 # 50/40/40/30/20/0 dB, equivalent noise spectrum level 70/65/45/25/1/-15 dB,
@@ -1265,13 +1271,114 @@ ANSIS3_5_ANNEX_C1 = 0.5039555062
 # (Ei' = 20 dB, Ui = 9.33 dB) is 1 - (20 - 9.33 - 10)/160 = 0.99581, which is
 # what prints as 1.00 to two decimals.
 ANSIS3_5_ANNEX_C1_LEVEL_DISTORTION_I5 = 1.00
-ANSIS3_5_CRITICAL_TABLE1_HEAD = (
+# ANSI S3.5-1997 Table 1 in full, 21 rows: nominal centre frequency, lower and
+# upper band limit, band importance Ii, normal-effort standard speech spectrum
+# level Ui and reference internal noise spectrum level Xi.
+#
+# Provenance differs by column and is worth stating, because this table is a
+# *pinning* fixture rather than an independent oracle for most of its cells:
+#   - the band limits, Ii, Ui and Xi digits are the WG S3-79 reference
+#     implementation SII.C (its cb() limit[], i_avg[], u[] and x[] arrays);
+#   - the nominal centre frequencies are NOT in SII.C, which works from the
+#     geometric centre of each band's limits. They are the classical
+#     critical-band (Bark) centres, and the R CRAN package "SII" transcribes
+#     the same values as Table 1's fi column;
+#   - rows 1 to 6 are independently corroborated: the CRAN vignette prints
+#     that head verbatim and it agrees cell for cell.
+#
+# The eight official .TST cases do not exercise most of these cells (a gross
+# corruption of, say, Xi row 11 leaves every published result unchanged,
+# because a 70 dB masker drowns it), so the table is asserted directly.
+ANSIS3_5_CRITICAL_TABLE1 = (
     (150.0, 100.0, 200.0, 0.0103, 31.44, 1.5),
     (250.0, 200.0, 300.0, 0.0261, 34.75, -3.9),
     (350.0, 300.0, 400.0, 0.0419, 34.14, -7.2),
     (450.0, 400.0, 510.0, 0.0577, 34.58, -8.9),
     (570.0, 510.0, 630.0, 0.0577, 33.17, -10.3),
     (700.0, 630.0, 770.0, 0.0577, 30.64, -11.4),
+    (840.0, 770.0, 920.0, 0.0577, 27.59, -12.0),
+    (1000.0, 920.0, 1080.0, 0.0577, 25.01, -12.5),
+    (1170.0, 1080.0, 1270.0, 0.0577, 23.52, -13.2),
+    (1370.0, 1270.0, 1480.0, 0.0577, 22.28, -14.0),
+    (1600.0, 1480.0, 1720.0, 0.0577, 20.15, -15.4),
+    (1850.0, 1720.0, 2000.0, 0.0577, 18.29, -16.9),
+    (2150.0, 2000.0, 2320.0, 0.0577, 16.37, -18.8),
+    (2500.0, 2320.0, 2700.0, 0.0577, 13.80, -21.2),
+    (2900.0, 2700.0, 3150.0, 0.0577, 12.21, -23.2),
+    (3400.0, 3150.0, 3700.0, 0.0577, 11.09, -24.9),
+    (4000.0, 3700.0, 4400.0, 0.0577, 9.33, -25.9),
+    (4800.0, 4400.0, 5300.0, 0.0460, 5.84, -24.2),
+    (5800.0, 5300.0, 6400.0, 0.0343, 3.47, -19.0),
+    (7000.0, 6400.0, 7700.0, 0.0226, 1.78, -11.7),
+    (8500.0, 7700.0, 9500.0, 0.0110, -0.14, -6.0),
+)
+# ANSI S3.5-1997 Table 3 in full, 18 rows: centre frequency in hertz, band
+# importance Ii, normal-effort standard speech spectrum level Ui and reference
+# internal noise spectrum level Xi. Unlike Tables 1 and 4 this one has an
+# independent digit source: the Hornsby SII worksheet (ANSIS3_51997SII.xlsx)
+# transcribes it directly from the standard, and SII.C's to()/u[]/x[] arrays
+# agree with it cell for cell. The band limits are omitted because Table 3
+# prints centre frequencies only; the procedure's exact 2**(-+1/6) fi limits
+# are computed, not tabulated.
+#
+# Pinned directly for the same reason as Tables 1 and 4: the mutation campaign
+# showed Xi at 2500 Hz and 3150 Hz surviving a whole-decibel corruption,
+# because the band audibility there is clipped at 1 in every case the suite
+# runs, so nothing else notices.
+ANSIS3_5_THIRD_OCTAVE_TABLE3 = (
+    (160.0, 0.0083, 32.41, 0.6),
+    (200.0, 0.0095, 34.48, -1.7),
+    (250.0, 0.0150, 34.75, -3.9),
+    (315.0, 0.0289, 33.98, -6.1),
+    (400.0, 0.0440, 34.59, -8.2),
+    (500.0, 0.0578, 34.27, -9.7),
+    (630.0, 0.0653, 32.06, -10.8),
+    (800.0, 0.0711, 28.30, -11.9),
+    (1000.0, 0.0818, 25.01, -12.5),
+    (1250.0, 0.0844, 23.00, -13.5),
+    (1600.0, 0.0882, 20.15, -15.4),
+    (2000.0, 0.0898, 17.32, -17.7),
+    (2500.0, 0.0868, 13.18, -21.2),
+    (3150.0, 0.0844, 11.55, -24.2),
+    (4000.0, 0.0771, 9.33, -25.9),
+    (5000.0, 0.0527, 5.31, -23.6),
+    (6300.0, 0.0364, 2.59, -15.8),
+    (8000.0, 0.0185, 1.13, -7.1),
+)
+# ANSI S3.5-1997 Table 4 in full, 6 rows, same column order as Table 1 above.
+# Same provenance: the limits, Ii, Ui and Xi are SII.C's oct() arrays; the
+# nominal centres are the octave centres those limits bracket.
+ANSIS3_5_OCTAVE_TABLE4 = (
+    (250.0, 177.0, 354.0, 0.0617, 34.75, -3.9),
+    (500.0, 354.0, 707.0, 0.1671, 34.27, -9.7),
+    (1000.0, 707.0, 1414.0, 0.2373, 25.01, -12.5),
+    (2000.0, 1414.0, 2828.0, 0.2648, 17.32, -17.7),
+    (4000.0, 2828.0, 5657.0, 0.2142, 9.33, -25.9),
+    (8000.0, 5657.0, 11314.0, 0.0549, 1.13, -7.1),
+)
+# Flat-spectrum cases run through SII.C to bring every band's Ui and Xi into
+# the chain, which the eight official .TST cases do not do (their strong
+# maskers and their -10 dB bands leave many table cells inert). Per row: the
+# method, the flat equivalent speech spectrum level, the flat equivalent noise
+# spectrum level, normal hearing throughout, and the value SII.C prints.
+#   "quiet" (0 / -80 dB): the disturbance is Xi in every band, so every Xi
+#       cell moves the answer.
+#   "loud"  (80 / 20 dB): the clause 5.7 level-distortion factor is below
+#       unity in every band, so every Ui cell moves the answer.
+#   "mid"   (40 / -50 dB): both mechanisms partly active.
+ANSIS3_5_WG_FLAT_CASES = (
+    ("critical-band", "quiet", 0.0, -80.0, 0.9243383333),
+    ("critical-band", "loud", 80.0, 20.0, 0.6892747063),
+    ("critical-band", "mid", 40.0, -50.0, 0.9342973562),
+    ("equally-contributing", "quiet", 0.0, -80.0, 0.9398200000),
+    ("equally-contributing", "loud", 80.0, 20.0, 0.6877689000),
+    ("equally-contributing", "mid", 40.0, -50.0, 0.9330641250),
+    ("one-third-octave", "quiet", 0.0, -80.0, 0.9247666667),
+    ("one-third-octave", "loud", 80.0, 20.0, 0.6891314875),
+    ("one-third-octave", "mid", 40.0, -50.0, 0.9339307437),
+    ("octave", "quiet", 0.0, -80.0, 0.9134180000),
+    ("octave", "loud", 80.0, 20.0, 0.6903270250),
+    ("octave", "mid", 40.0, -50.0, 0.9340358250),
 )
 
 # ---------------------------------------------------------------------------

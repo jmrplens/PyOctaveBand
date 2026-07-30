@@ -475,9 +475,10 @@ print(round(res.sii, 3))          # 0.5  (the 1 kHz octave band alone)
 carrying that procedure's band centre frequencies, band limits, band-importance
 function, reference internal noise spectrum level and normal-effort standard
 speech spectrum level; its `.plot()` draws the band-importance function as a
-step over the band limits, which is the figure above. Tables 1, 2 and 4 are
-tabulated for normal vocal effort only, so `"raised"`, `"loud"` and `"shout"`
-are available on the one-third-octave procedure alone.
+step over the band limits, which is the figure above. Tables 1, 2 and 4 print
+all four vocal-effort columns in the standard, but only their normal-effort
+column is carried here, so `"raised"`, `"loud"` and `"shout"` are available on
+the one-third-octave procedure alone.
 
 ```python
 octave = hearing.sii_procedure("octave")

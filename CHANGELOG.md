@@ -580,13 +580,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   double on every one. Note that `CB_1.TST` and `ECB_1.TST` are the same
   confirmation twice, since the equally-contributing bands are critical bands 3
   to 19 and their two alternative importance functions weight the same physical
-  bands, so the eight cases are seven independent ones. Twelve new conformance
+  bands, the extra low critical bands contributing about 1e-19 of the local
+  masking energy there, so the eight cases are seven independent ones. Twelve new conformance
   checks, a new figure
   `sii_band_procedures` overlaying the four band-importance functions, and a
   new section of the speech-intelligibility guide in English and Spanish.
-  Tables 1, 2 and 4 are implemented with their normal-effort speech spectrum
-  column, the one the level-distortion factor of clause 5.7 uses; the raised,
-  loud and shout spectra remain one-third-octave only.
+  Tables 1, 2 and 4 print all four vocal-effort columns in the standard, but
+  are implemented here with their normal-effort speech spectrum column only,
+  the one the level-distortion factor of clause 5.7 uses; the raised, loud and
+  shout spectra remain one-third-octave only.
 
 ### Changed
 
