@@ -15,7 +15,7 @@
 
 ## Numerical conformance report
 
-&#9989; **509/509 conformance checks pass** across 55 domains and 344 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+&#9989; **517/517 conformance checks pass** across 56 domains and 352 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
 
@@ -991,6 +991,22 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | Norton & Karczub 2e 4.6/4.9 (problem 4.18 answer) | Blower in a plant room to the operator room -> 72.3/60.4/41.4/41.0/33.8/30.7 dB | 0 dB +/-0.1 (max \|diff\| over the 6 bands) | 0.0682 dB | 0.068 dB | &#9989; |
 | Norton & Karczub 2e Eq. (4.115) (problem 4.16 answer) | Lined compressor enclosure against NC-45 -> required TL 14.4/25.2/28.9/34.4/35.2/34.7/34.7/31.6 dB | 0 dB +/-0.15 (max \|diff\| over the 8 bands) | 0.1099 dB | 0.11 dB | &#9989; |
 | Norton & Karczub 2e Table 4.5 (constant-volume source power) | Source in the intersection of two flat surfaces (Q = 4) -> +10 lg 4 = 6.02 dB | 6.0206 dB (+/-0 dB) | 6.0206 dB | 0 dB | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>CNOSSOS-EU railway source (Directive 2002/49/EC Annex II)</b>: 100% (8/8)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| CIRCABC CNOSSOS-EU railway emission test set | Line power of the 123 committed cases of the published test set, both source heights, 8 octave bands each, dB re 1 pW/m | <= 0.01 dB on 984 published band levels (123 cases) | 0.0055 dB | 0.005 dB | &#9989; |
+| Appendix G Tables G-1a and G-1b (roughness) | Wheel roughness by brake type (3 x 32) and rail roughness by class (2 x 35), dB | 166 coefficients identical | 0 mismatches | 0 mismatches | &#9989; |
+| Directive (EU) 2021/1226 Annex pt (20)(b), Table G-2 | Contact filter A3 for 5 wheel load and diameter combinations x 35 wavelengths, dB | 175 coefficients identical | 0 mismatches | 0 mismatches | &#9989; |
+| Appendix G Table G-3 (transfer functions) | Track transfer (8 x 24), wheel transfer (4 x 24) and superstructure transfer (24), dB per axle | 312 coefficients identical | 0 mismatches | 0 mismatches | &#9989; |
+| Appendix G Tables G-4 to G-7 | Impact roughness (35), traction (5 x 2 x 24), aerodynamic (2 x 24) and bridge (2 x 24), dB | 371 coefficients identical | 0 mismatches | 0 mismatches | &#9989; |
+| Annex II 2.3.2, formula (2.3.15) | Horizontal dipole directivity along the track: 10 lg(0,01) at phi = 0 | -20 dB (+/-0 dB) | -20 dB | 0 dB | &#9989; |
+| Annex II 2.3.2, formulae (2.3.13) and (2.3.14) | Aerodynamic speed law at v0 = 300 km/h reduces to Table G-6 verbatim | 50 lg 2 = 15.051 dB on every band | 0 dB | 0 dB | &#9989; |
+| Annex II 2.3.2, formula (2.3.12) | Impact roughness at the tabulated joint density n_l = 0,01 per m | Table G-4 verbatim | 0 dB | 0 dB | &#9989; |
 
 </details>
 

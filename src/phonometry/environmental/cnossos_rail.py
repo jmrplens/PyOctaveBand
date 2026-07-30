@@ -1462,14 +1462,14 @@ def _flow_term(
         # idles contributes no energy at all.
         if idle <= 0.0:
             return -np.inf
-        return 10.0 * np.log10(idle / (reference_time * length))
+        return float(10.0 * np.log10(idle / (reference_time * length)))
     q = _finite(vehicle.flow_rate, "flow_rate")
     if q < 0.0:
         raise ValueError("'flow_rate' must be a non-negative number per hour.")
     # As above: an empty track is a legitimate input and carries -inf.
     if q <= 0.0:
         return -np.inf
-    return 10.0 * np.log10(q / (1000.0 * _speed(vehicle.speed)))
+    return float(10.0 * np.log10(q / (1000.0 * _speed(vehicle.speed))))
 
 
 def _vehicle_spectra(
