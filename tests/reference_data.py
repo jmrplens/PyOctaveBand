@@ -1174,11 +1174,14 @@ ANSIS3_5_WG_TO1_SII_EXACT = 0.4382176540  # SII.C run on TO_1.TST
 #   OCTAVE.TST  0.491   0.4909625062      octave, 6 bands
 #   OCTAVE_1.TST 0.323  0.3229375000      octave, alternative Ii
 #
-# The two "_1" cases coincide to every printed digit because the
-# equally-contributing bands are critical bands 3 to 19: the two alternative
-# importance functions select the same physical bands, and the two extra
-# critical bands below 300 Hz sit 80 dB below the speech, so their upward
-# spread of masking never reaches the weighted bands.
+# CB_1.TST and ECB_1.TST are NOT two independent oracles. They coincide to
+# every printed digit because the equally-contributing bands are critical
+# bands 3 to 19: the two alternative importance functions select the same
+# physical bands, and the two extra critical bands below 300 Hz sit 80 dB
+# below the speech, so their upward spread of masking never reaches a
+# weighted band. The eight official cases therefore carry seven independent
+# confirmations, not eight; the pair is still worth running, because a wrong
+# band mapping in either procedure would break the coincidence.
 ANSIS3_5_WG_CB_SPEECH = (
     -10.0, -10.0, -10.0, 90.0, 5.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0,
     40.0, 40.0, 40.0, 40.0, 40.0, -10.0, -10.0, -10.0, -10.0,

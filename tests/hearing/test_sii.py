@@ -9,7 +9,10 @@ critical-band procedure, ``ECB.TST``/``ECB_1.TST`` for the
 equally-contributing critical-band procedure, ``TO.TST``/``TO_1.TST`` for
 the one-third-octave procedure and ``OCTAVE.TST``/``OCTAVE_1.TST`` for the
 octave-band procedure, the ``_1`` file of each pair exercising an
-alternative band-importance function. They are also validated against the
+alternative band-importance function. Two of the eight, ``CB_1.TST`` and
+``ECB_1.TST``, are the same confirmation twice (see
+``test_sii_wg_s3_79_official_test_cases``), so the eight cases carry seven
+independent confirmations. They are also validated against the
 standard's own tabulated constants and its Annex C.2 worked example (with
 the official errata applied), and against the independent Hornsby worksheet
 and R CRAN "SII" implementations where they overlap. See
@@ -497,6 +500,17 @@ def test_sii_wg_s3_79_official_test_cases(
     DevelopmentKit readme, hence the 5e-4 tolerance on the first assertion;
     the second pins the full precision of the committee's own C program, which
     the library reproduces to within one unit in the last place of a double.
+
+    These six cases are not six independent confirmations. ``CB_1.TST`` and
+    ``ECB_1.TST`` are the same one twice: the equally-contributing bands are
+    critical bands 3 to 19, their two alternative importance functions weight
+    the same physical bands, and the two extra critical bands below 300 Hz sit
+    80 dB under the speech, so their upward spread of masking never reaches a
+    weighted band. Both procedures consequently return the identical
+    0.4104741231, which the kit publishes as 0.410 for each. Counting
+    honestly, the eight official cases give seven independent confirmations.
+    The redundant one still earns its place: it would break the moment either
+    procedure's band mapping went wrong.
     """
     result = sii.speech_intelligibility_index(
         np.array(speech),

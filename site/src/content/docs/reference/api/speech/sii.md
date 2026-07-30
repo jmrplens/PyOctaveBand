@@ -39,9 +39,10 @@ Working Group S3-79 (the committee that maintains ANSI S3.5) to double
 precision on all eight of its official test cases (`CB.TST`, `CB_1.TST`,
 `ECB.TST`, `ECB_1.TST`, `TO.TST`, `TO_1.TST`, `OCTAVE.TST` and
 `OCTAVE_1.TST`, two per procedure, the `_1` variants exercising an
-alternative band-importance function), and computes the Annex C worked
-examples with the working group's official errata applied (see
-`docs/ERRATA.md`).
+alternative band-importance function; `CB_1.TST` and `ECB_1.TST` are the
+same confirmation twice, so the eight are seven independent ones), and
+computes the Annex C worked examples with the working group's official errata
+applied (see `docs/ERRATA.md`).
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
