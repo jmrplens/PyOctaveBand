@@ -28,6 +28,7 @@ if TYPE_CHECKING:
     from ..materials.absorption_rating import AbsorptionRatingResult
     from ..materials.absorption_uncertainty import AbsorptionUncertaintyResult
     from ..materials.airflow_resistance import StaticAirflowResult
+    from ..materials.biot import BiotWavesResult
     from ..materials.diffuser_design import DiffuserPolarResponse
     from ..materials.dynamic_stiffness import DynamicStiffnessResult
     from ..materials.impedance_tube import ImpedanceTubeResult, TransferMatrix
@@ -100,6 +101,11 @@ _STRINGS: dict[str, str] = {
     "Value": "Valor",
     "Porous medium": "Medio poroso",
     "Normalised characteristic value": "Valor característico normalizado",
+    "Biot waves in a poroelastic layer": "Ondas de Biot en una capa poroelástica",
+    "Wavenumber [rad/m]": "Número de onda [rad/m]",
+    "Airborne": "Onda del aire",
+    "Frame-borne": "Onda del esqueleto",
+    "Shear": "Onda de cizalla",
     r"Absorption coefficient $\alpha$": r"Coeficiente de absorción $\alpha$",
     "Reflection factor $|R|$": "Factor de reflexión $|R|$",
     "Panel average": "Media del panel",
@@ -704,6 +710,69 @@ def plot_porous_medium(
         f"{_t('Porous medium', language)} ({result.model}), "
         f"$\\sigma$ = {decimal_comma(f'{result.flow_resistivity:g}', language)} Pa s/m$^2$"
     )
+    ax.legend(loc="best", fontsize="small")
+    ax.grid(True, which="both", alpha=0.3)
+    localize_axes(ax, language)
+    return ax
+
+
+#: Legend suffixes of the Biot wavenumber curves: the mathtext is the same for
+#: every wave, only the wave name in front of it changes.
+_BIOT_REAL_PART = r", Re$(\delta)$"
+_BIOT_IMAG_PART = r", $-$Im$(\delta)$"
+
+
+def plot_biot_waves(
+    result: BiotWavesResult, ax: Axes | None = None, language: str = "en",
+    **kwargs: Any
+) -> Axes:
+    """The three Biot wavenumbers of a poroelastic layer vs frequency.
+
+    Draws the real part (propagation) and the negative imaginary part
+    (attenuation) of the two compressional waves, and the real part of the
+    shear wave, the presentation of Allard & Atalla 2e Fig. 6.6. The shear
+    attenuation is left out because it tracks its own real part closely enough
+    over this range to sit on top of it. The airborne and frame-borne labels follow the
+    ``|mu|`` sorting of
+    :attr:`~phonometry.materials.biot.BiotWavesResult.airborne_is_second`,
+    which is the physical labelling of Sect. 6.5.4, not a smoothing: read that
+    property before reading a step in these curves as physics, because neither
+    labelling of the two compressional roots is continuous in general.
+
+    :param result: A :class:`~phonometry.materials.biot.BiotWavesResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param kwargs: Forwarded to the airborne ``Re`` ``plot`` call.
+    :return: The axes.
+    """
+    from .._i18n import localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    freqs = np.asarray(result.frequency, dtype=np.float64)
+    kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault(
+        "label", _t("Airborne", language) + _BIOT_REAL_PART
+    )
+    ax.semilogx(freqs, result.airborne_wavenumber.real, **kwargs)
+    ax.semilogx(
+        freqs, -result.airborne_wavenumber.imag, ls="--", color=_C_PRIMARY_LIGHT,
+        label=_t("Airborne", language) + _BIOT_IMAG_PART,
+    )
+    ax.semilogx(
+        freqs, result.frame_borne_wavenumber.real, color=_C_REFERENCE,
+        label=_t("Frame-borne", language) + _BIOT_REAL_PART,
+    )
+    ax.semilogx(
+        freqs, -result.frame_borne_wavenumber.imag, ls="--", color=_C_MUTED,
+        label=_t("Frame-borne", language) + _BIOT_IMAG_PART,
+    )
+    ax.semilogx(
+        freqs, result.shear_wavenumber.real, ls=":", color=_C_REFERENCE,
+        label=_t("Shear", language) + _BIOT_REAL_PART,
+    )
+    format_frequency_axis(ax, float(freqs.min()), float(freqs.max()))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
+    ax.set_ylabel(_t("Wavenumber [rad/m]", language))
+    ax.set_title(_t("Biot waves in a poroelastic layer", language))
     ax.legend(loc="best", fontsize="small")
     ax.grid(True, which="both", alpha=0.3)
     localize_axes(ax, language)

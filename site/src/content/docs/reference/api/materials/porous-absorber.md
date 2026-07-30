@@ -359,7 +359,10 @@ contribute the oblique chain matrix of Cox & D'Antonio 3e Eq. (2.29)
 (equivalently the impedance recursion of Bies 5e Eq. (D.95) and the
 scheme of Mechel 2e Sect. D.4); sheet layers ([`PerforatedPlateLayer`](/phonometry/reference/api/materials/porous-absorber/#perforatedplatelayer),
 [`MicroperforatedPlateLayer`](/phonometry/reference/api/materials/porous-absorber/#microperforatedplatelayer), [`MembraneLayer`](/phonometry/reference/api/materials/porous-absorber/#membranelayer)) enter as
-locally reacting series impedances. The chain is closed by a rigid wall
+locally reacting series impedances; a [`PoroelasticLayer`](/phonometry/reference/api/materials/porous-absorber/#poroelasticlayer) carries the
+three Biot waves of its elastic frame and switches the whole stack to the
+six-variable global-matrix assembly of Allard & Atalla 2e Sect. 11.5, with
+the coupling matrices of Sect. 11.4. The chain is closed by a rigid wall
 (`termination="rigid"`), by radiation into free air behind
 (`termination="free"`, `Z_L = rho c / cos(theta)`) or by an arbitrary
 complex impedance. The reflection factor is
@@ -845,6 +848,41 @@ depth) is drawn as a thin sheet.
 | `kwargs` | Forwarded to the front-layer rectangle. |
 
 **Returns:** The axes.
+
+## PoroelasticLayer
+
+```python
+PoroelasticLayer(
+    thickness: float,
+    medium: PorousMediumResult,
+    porosity: float,
+    tortuosity: float,
+    frame_density: float,
+    shear_modulus: complex,
+    poisson_ratio: float = 0.0,
+)
+```
+
+A porous layer whose frame is elastic (full Biot theory).
+
+Where [`PorousLayer`](/phonometry/reference/api/materials/porous-absorber/#porouslayer) collapses the material into a single wave in an
+equivalent fluid, this layer carries the three Biot waves of Allard &
+Atalla 2e chapter 6 - two compressional and one shear - so the frame can
+resonate. It is the only layer type that reproduces the quarter-wavelength
+frame resonance of [`frame_quarter_wave_resonance`](/phonometry/reference/api/materials/biot/#frame_quarter_wave_resonance),
+and the only one for which an air gap behind the layer, a bonded backing or
+an oblique angle change the frame motion rather than only the pore fluid.
+
+`medium` is the **rigid-frame** equivalent fluid of the pores (normally a
+[`johnson_champoux_allard`](/phonometry/reference/api/materials/porous-absorber/#johnson_champoux_allard) result on the solver's frequency vector):
+the frame inertia is added by the Biot model itself, so a limp-corrected
+medium would count it twice. The remaining fields describe the frame.
+
+Adding one of these to a stack switches [`layered_absorber`](/phonometry/reference/api/materials/porous-absorber/#layered_absorber) to the
+global-matrix assembly of Allard & Atalla Sect. 11.5. Two adjacent
+poroelastic layers are coupled as *bonded* frames (their Eq. (11.67)); a
+sheet layer next to a poroelastic layer is coupled as a free, mechanically
+decoupled screen (air on both sides, their Sect. 11.3.6).
 
 ## PorousAbsorberWarning
 

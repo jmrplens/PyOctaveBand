@@ -152,6 +152,7 @@ __all__ = [
     "MembraneLayer",
     "MicroperforatedPlateLayer",
     "PerforatedPlateLayer",
+    "PoroelasticLayer",
     "PorousAbsorberWarning",
     "PorousLayer",
     "PorousMediumResult",
@@ -923,12 +924,46 @@ class MembraneLayer(_DrawableLayer):
     resistance: float = 0.0
 
 
+@dataclass(frozen=True)
+class PoroelasticLayer(_DrawableLayer):
+    """A porous layer whose frame is elastic (full Biot theory).
+
+    Where :class:`PorousLayer` collapses the material into a single wave in an
+    equivalent fluid, this layer carries the three Biot waves of Allard &
+    Atalla 2e chapter 6 - two compressional and one shear - so the frame can
+    resonate. It is the only layer type that reproduces the quarter-wavelength
+    frame resonance of :func:`~phonometry.materials.biot.frame_quarter_wave_resonance`,
+    and the only one for which an air gap behind the layer, a bonded backing or
+    an oblique angle change the frame motion rather than only the pore fluid.
+
+    ``medium`` is the **rigid-frame** equivalent fluid of the pores (normally a
+    :func:`johnson_champoux_allard` result on the solver's frequency vector):
+    the frame inertia is added by the Biot model itself, so a limp-corrected
+    medium would count it twice. The remaining fields describe the frame.
+
+    Adding one of these to a stack switches :func:`layered_absorber` to the
+    global-matrix assembly of Allard & Atalla Sect. 11.5. Two adjacent
+    poroelastic layers are coupled as *bonded* frames (their Eq. (11.67)); a
+    sheet layer next to a poroelastic layer is coupled as a free, mechanically
+    decoupled screen (air on both sides, their Sect. 11.3.6).
+    """
+
+    thickness: float
+    medium: PorousMediumResult
+    porosity: float
+    tortuosity: float
+    frame_density: float
+    shear_modulus: complex
+    poisson_ratio: float = 0.0
+
+
 Layer = (
     AirLayer
     | PorousLayer
     | PerforatedPlateLayer
     | MicroperforatedPlateLayer
     | MembraneLayer
+    | PoroelasticLayer
 )
 
 
@@ -1081,11 +1116,7 @@ def _porous_layer_term(
     if d <= 0.0:
         return None
     medium = layer.medium
-    if not np.array_equal(np.asarray(medium.frequency), f):
-        raise ValueError(
-            "PorousLayer.medium was evaluated on a different frequency "
-            "vector; rebuild the medium on the solver grid."
-        )
+    _check_medium_grid(medium, f, "PorousLayer")
     return _fluid_layer_terms(
         np.asarray(medium.characteristic_impedance, dtype=np.complex128),
         np.asarray(medium.wavenumber, dtype=np.complex128),
@@ -1140,12 +1171,41 @@ def _termination_admittance(
     cos_t: float,
     rc: float,
 ) -> Complex:
-    """Admittance ``G = u/p`` at the termination face of the stack."""
+    """Admittance ``G = u/p`` at the termination face of the stack.
+
+    ``"free"`` is evaluated as the literal ``cos(theta) / rho c`` the
+    recursion has always used, not as the reciprocal of the impedance the
+    global-matrix assembly needs: ``1 / (rho c / cos theta)`` is a different
+    double for about a quarter of the angles in ``[0, pi/2)``, and the
+    equivalent-fluid path must stay bit-identical.
+    """
+    if isinstance(termination, str) and termination == "free":
+        return np.full(f.shape, cos_t / rc, dtype=np.complex128)
+    zl_arr = _termination_impedance(termination, f, cos_t=cos_t, rc=rc)
+    if zl_arr is None:
+        return np.zeros_like(f, dtype=np.complex128)
+    return np.asarray(np.ones_like(f) / zl_arr, dtype=np.complex128)
+
+
+def _termination_impedance(
+    termination: str | complex | ArrayLike,
+    f: Real,
+    *,
+    cos_t: float,
+    rc: float,
+) -> Complex | None:
+    """Impedance ``p/v3`` closing the stack, or ``None`` for a hard wall.
+
+    The global-matrix assembly of Allard & Atalla Sect. 11.5 needs the
+    termination as an impedance (their Eq. (11.84)); the admittance the
+    recursion of :func:`_surface_admittance` consumes is its reciprocal, with
+    the hard wall the one case that has no finite impedance.
+    """
     if isinstance(termination, str):
         if termination == "rigid":
-            return np.zeros_like(f, dtype=np.complex128)
+            return None
         if termination == "free":
-            return np.full(f.shape, cos_t / rc, dtype=np.complex128)
+            return np.full(f.shape, rc / cos_t, dtype=np.complex128)
         raise ValueError(
             "'termination' must be 'rigid', 'free' or a complex impedance."
         )
@@ -1157,7 +1217,7 @@ def _termination_admittance(
         )
     if not np.all(np.abs(zl_arr) > 0.0):
         raise ValueError("'termination' impedance must be non-zero.")
-    return np.asarray(np.ones_like(f) / zl_arr, dtype=np.complex128)
+    return np.asarray(np.broadcast_to(zl_arr, f.shape), dtype=np.complex128)
 
 
 def _surface_admittance(
@@ -1204,6 +1264,149 @@ def _chain_matrix(terms: list[tuple[str, Complex, Complex]], f: Real) -> Complex
     return np.asarray([[t11, t12], [t21, t22]], dtype=np.complex128)
 
 
+def _check_medium_grid(medium: PorousMediumResult, f: Real, owner: str) -> None:
+    """Reject a medium evaluated on a different frequency vector."""
+    if not np.array_equal(np.asarray(medium.frequency), f):
+        raise ValueError(
+            f"{owner}.medium was evaluated on a different frequency "
+            "vector; rebuild the medium on the solver grid."
+        )
+
+
+def _split_fluid_run(
+    terms: list[tuple[str, Complex, Complex]], budget: float, limit: int
+) -> list[list[tuple[str, Complex, Complex]]]:
+    """Group a fluid run into chain blocks of at most *budget* nepers.
+
+    A fluid run that attenuates by ``b`` nepers has chain-matrix entries of
+    order ``e^b`` while the same block's back face is the identity, so the
+    assembled system of Allard & Atalla Sect. 11.6 holds rows differing by
+    ``e^b`` and the elimination of the block loses about ``b / ln(10)``
+    digits; past ``b ~ 710`` the entries overflow float64 outright. The split
+    is algebraically exact, because a homogeneous fluid layer of phase
+    ``kx d`` is the product of ``m`` layers of phase ``kx d / m``.
+
+    Returns the run unchanged, as a single group, whenever it stays inside
+    the budget, so ordinary stacks keep the exact chain product they had.
+    Sheet layers carry no attenuation and never force a split of their own.
+
+    :raises ValueError: when the run would need more than *limit* blocks.
+    """
+    losses = [
+        float(np.max(np.abs(np.imag(b)))) if kind == "fluid" else 0.0
+        for kind, _, b in terms
+    ]
+    attenuation = sum(losses)
+    # Checked before the run is expanded, so an absurd input cannot build the
+    # sub-layer list it would then be refused for.
+    if attenuation > budget * limit:
+        raise ValueError(
+            f"the fluid layers of the stack attenuate by {attenuation:.0f} "
+            f"nepers, which the global-matrix assembly cannot resolve in "
+            f"{limit} blocks. Reduce their thickness: nothing behind such a "
+            "run contributes to the surface impedance."
+        )
+
+    parts: list[tuple[str, Complex, Complex, float]] = []
+    for (kind, a, b), loss in zip(terms, losses):
+        pieces = max(1, int(np.ceil(loss / budget)))
+        if pieces == 1:
+            parts.append((kind, a, b, loss))
+        else:
+            parts.extend([(kind, a, b / pieces, loss / pieces)] * pieces)
+
+    groups: list[list[tuple[str, Complex, Complex]]] = []
+    current: list[tuple[str, Complex, Complex]] = []
+    total = 0.0
+    for kind, a, b, loss in parts:
+        if current and total + loss > budget:
+            groups.append(current)
+            current, total = [], 0.0
+        current.append((kind, a, b))
+        total += loss
+    if current:
+        groups.append(current)
+    # The pre-check bounds the total loss, not the packing. Next-fit needs up
+    # to twice the optimal number of bins (alternating items just over half a
+    # budget open a block each), so a run that clears the sum can still be cut
+    # into more blocks than the assembly resolves. Refuse on what was actually
+    # produced rather than on what was estimated.
+    if len(groups) > limit:
+        raise ValueError(
+            f"the fluid layers of the stack pack into {len(groups)} chain "
+            f"blocks of at most {budget:.0f} nepers, more than the {limit} "
+            "the global-matrix assembly can resolve. Reduce their thickness: "
+            "nothing behind such a run contributes to the surface impedance."
+        )
+    return groups
+
+
+def _stack_blocks(
+    layers: list[Layer] | tuple[Layer, ...],
+    f: Real,
+    *,
+    k0: Real,
+    k0_sin2: Real,
+    rc: float,
+    rho0: float,
+    viscosity: float,
+    transverse_wavenumber: Real,
+) -> list[Any]:
+    """Split a stack into fluid blocks and poroelastic blocks.
+
+    Consecutive fluid and sheet layers collapse into two-variable blocks
+    carrying their chain-matrix product; each :class:`PoroelasticLayer` becomes
+    a six-variable block of Allard & Atalla Sect. 11.3.3. A run or a layer
+    that attenuates by more than ``biot._BLOCK_NEPERS`` is cut into several
+    blocks first, which the global matrix handles exactly as it handles
+    adjacent fluid layers and bonded halves of one poroelastic material.
+    """
+    from . import biot
+
+    blocks: list[Any] = []
+    pending: list[Layer] = []
+
+    def flush() -> None:
+        if not pending:
+            return
+        terms = _layer_terms(
+            pending, f, k0=k0, k0_sin2=k0_sin2, rc=rc, rho0=rho0,
+            viscosity=viscosity,
+        )
+        groups = _split_fluid_run(
+            terms, biot._BLOCK_NEPERS, biot._MAX_BLOCKS
+        )
+        for group in groups:
+            chain = _chain_matrix(group, f)
+            blocks.append(biot._fluid_block(np.moveaxis(chain, -1, 0)))
+        pending.clear()
+
+    for layer in layers:
+        if isinstance(layer, PoroelasticLayer):
+            thickness = require_non_negative(
+                layer.thickness, "PoroelasticLayer.thickness"
+            )
+            if thickness <= 0.0:
+                continue
+            _check_medium_grid(layer.medium, f, "PoroelasticLayer")
+            flush()
+            waves = biot.biot_waves(
+                layer.medium,
+                porosity=layer.porosity,
+                tortuosity=layer.tortuosity,
+                frame_density=layer.frame_density,
+                shear_modulus=layer.shear_modulus,
+                poisson_ratio=layer.poisson_ratio,
+            )
+            blocks.extend(
+                biot._poroelastic_blocks(waves, thickness, transverse_wavenumber)
+            )
+        else:
+            pending.append(layer)
+    flush()
+    return blocks
+
+
 def layered_absorber(
     frequency: ArrayLike,
     layers: list[Layer] | tuple[Layer, ...],
@@ -1222,7 +1425,10 @@ def layered_absorber(
     (equivalently the impedance recursion of Bies 5e Eq. (D.95) and the
     scheme of Mechel 2e Sect. D.4); sheet layers (:class:`PerforatedPlateLayer`,
     :class:`MicroperforatedPlateLayer`, :class:`MembraneLayer`) enter as
-    locally reacting series impedances. The chain is closed by a rigid wall
+    locally reacting series impedances; a :class:`PoroelasticLayer` carries the
+    three Biot waves of its elastic frame and switches the whole stack to the
+    six-variable global-matrix assembly of Allard & Atalla 2e Sect. 11.5, with
+    the coupling matrices of Sect. 11.4. The chain is closed by a rigid wall
     (``termination="rigid"``), by radiation into free air behind
     (``termination="free"``, ``Z_L = rho c / cos(theta)``) or by an arbitrary
     complex impedance. The reflection factor is
@@ -1264,21 +1470,40 @@ def layered_absorber(
     cos_t = float(np.cos(theta))
     rc = rho0 * c0
 
-    terms = _layer_terms(
-        layers, f, k0=k0, k0_sin2=k0_sin2, rc=rc, rho0=rho0, viscosity=viscosity
-    )
-    g = _surface_admittance(
-        terms, _termination_admittance(termination, f, cos_t=cos_t, rc=rc)
-    )
+    if any(isinstance(layer, PoroelasticLayer) for layer in layers):
+        from . import biot
 
-    # G = 0 (lossless stack over a rigid wall) maps to an infinite surface
-    # impedance; everywhere else Zs = 1/G with a safe denominator.
-    nonzero = np.abs(g) > 0.0
-    with np.errstate(divide="ignore", invalid="ignore"):
-        zs = np.where(nonzero, 1.0 / np.where(nonzero, g, 1.0), np.inf + 0j)
+        blocks = _stack_blocks(
+            layers, f, k0=k0, k0_sin2=k0_sin2, rc=rc, rho0=rho0,
+            viscosity=viscosity,
+            transverse_wavenumber=np.asarray(k0 * np.sin(theta)),
+        )
+        if not blocks:
+            raise ValueError("'layers' must contain at least one layer.")
+        zs = biot._stack_surface_impedance(
+            blocks, _termination_impedance(termination, f, cos_t=cos_t, rc=rc)
+        )
+        finite = np.isfinite(zs)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            g = np.where(finite, 1.0 / np.where(finite, zs, 1.0), 0.0 + 0j)
+        tm = np.full((2, 2, f.size), np.nan + 0j, dtype=np.complex128)
+    else:
+        terms = _layer_terms(
+            layers, f, k0=k0, k0_sin2=k0_sin2, rc=rc, rho0=rho0,
+            viscosity=viscosity,
+        )
+        g = _surface_admittance(
+            terms, _termination_admittance(termination, f, cos_t=cos_t, rc=rc)
+        )
+        # G = 0 (lossless stack over a rigid wall) maps to an infinite surface
+        # impedance; everywhere else Zs = 1/G with a safe denominator.
+        nonzero = np.abs(g) > 0.0
+        with np.errstate(divide="ignore", invalid="ignore"):
+            zs = np.where(nonzero, 1.0 / np.where(nonzero, g, 1.0), np.inf + 0j)
+        tm = _chain_matrix(terms, f)
+
     r = (cos_t - rc * g) / (cos_t + rc * g)
     alpha = 1.0 - np.abs(r) ** 2
-    tm = _chain_matrix(terms, f)
     return LayeredAbsorberResult(
         frequency=f,
         angle=theta,

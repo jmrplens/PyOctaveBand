@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 517 numerical conformance checks against 352 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 523 numerical conformance checks against 357 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 517 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 56 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 523 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 56 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -308,6 +308,7 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [materials/absorption-rating](https://jmrplens.github.io/phonometry/reference/api/materials/absorption-rating/)
 - [materials/absorption-uncertainty](https://jmrplens.github.io/phonometry/reference/api/materials/absorption-uncertainty/)
 - [materials/airflow-resistance](https://jmrplens.github.io/phonometry/reference/api/materials/airflow-resistance/)
+- [materials/biot](https://jmrplens.github.io/phonometry/reference/api/materials/biot/)
 - [materials/diffuser-design](https://jmrplens.github.io/phonometry/reference/api/materials/diffuser-design/)
 - [materials/dynamic-stiffness](https://jmrplens.github.io/phonometry/reference/api/materials/dynamic-stiffness/)
 - [materials/impedance-tube](https://jmrplens.github.io/phonometry/reference/api/materials/impedance-tube/)

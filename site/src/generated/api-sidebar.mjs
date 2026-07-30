@@ -123,6 +123,7 @@ export const apiSidebar = {
         'reference/api/materials/dynamic-stiffness',
         'reference/api/materials/impedance-tube',
         'reference/api/materials/porous-absorber',
+        'reference/api/materials/biot',
         'reference/api/materials/slow-sound-absorber',
         'reference/api/materials/scattering-diffusion',
         'reference/api/materials/diffuser-design',

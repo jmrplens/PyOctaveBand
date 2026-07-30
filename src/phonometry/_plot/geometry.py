@@ -86,6 +86,7 @@ _STRINGS: dict[str, str] = {
         "Sección del metadifusor (un periodo)",
     "Air": "Aire",
     "Porous": "Poroso",
+    "Poroelastic": "Poroelástico",
     "Perforated plate": "Placa perforada",
     "Microperforated plate": "Placa microperforada",
     "Membrane": "Membrana",
@@ -467,6 +468,8 @@ def _layer_kind_and_thickness(layer: Any, total: float) -> tuple[str, float, str
         return "air", float(layer.thickness), "Air"
     if name == "PorousLayer":
         return "porous", float(layer.thickness), "Porous"
+    if name == "PoroelasticLayer":
+        return "porous", float(layer.thickness), "Poroelastic"
     if name == "PerforatedPlateLayer":
         return "plate", float(layer.thickness), "Perforated plate"
     if name == "MicroperforatedPlateLayer":

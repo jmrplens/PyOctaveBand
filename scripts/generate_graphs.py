@@ -101,6 +101,18 @@ _ES_EXACT = {
     "rigid frame, imaginary part": "esqueleto rígido, parte imaginaria",
     "limp frame, real part": "esqueleto flexible, parte real",
     "limp frame, imaginary part": "esqueleto flexible, parte imaginaria",
+    "Only an Elastic Frame Resonates":
+        "Solo un esqueleto elástico resuena",
+    r"Normalised surface impedance $Z_s/\rho_0 c_0$":
+        r"Impedancia superficial normalizada $Z_s/\rho_0 c_0$",
+    "Biot poroelastic, real part": "Biot poroelástico, parte real",
+    "Biot poroelastic, imaginary part": "Biot poroelástico, parte imaginaria",
+    "Glass wool, 100 mm glued to a rigid wall: porosity 0.94,\n"
+    "flow resistivity 40 kPa s/m\u00b2, frame density 130 kg/m\u00b3,\n"
+    "shear modulus 2.2 MPa":
+        "Lana de vidrio, 100 mm pegada a una pared r\u00edgida: porosidad 0,94,\n"
+        "resistividad al flujo 40 kPa s/m\u00b2, densidad del esqueleto 130 kg/m\u00b3,\n"
+        "m\u00f3dulo de cizalla 2,2 MPa",
     "2D FDTD wavefront in a hall of columns":
         "Frente de onda FDTD 2D en una sala de columnas",
     "loudspeaker": "altavoz",
@@ -2023,6 +2035,9 @@ _ES_PATTERNS = [
     (r"^apparent total density rho_t/rho0 = (.+)$",
      r"densidad total aparente rho_t/rho0 = \1"),
     (r"^decoupling frequency (.+) Hz$", r"frecuencia de desacoplo \1 Hz"),
+    # biot_frame_resonance annotation (library value baked in).
+    (r"^frame quarter-wave resonance (.+) Hz$",
+     r"resonancia de cuarto de onda del esqueleto \1 Hz"),
     ((r"^Soft fibrous layer: porosity (.+), flow resistivity (.+) kPa s/m², "
       r"frame density (.+) kg/m³$"),
      ("Capa fibrosa blanda: porosidad \\1, resistividad al flujo \\2 kPa s/m², "
@@ -8742,6 +8757,89 @@ def generate_limp_frame_effective_density(output_dir: str) -> None:
     plt.close()
 
 
+def generate_biot_frame_resonance(output_dir: str) -> None:
+    """The frame resonance an equivalent fluid cannot produce (A&A 6.6.3).
+
+    One concept: the surface impedance of a glass-wool layer glued to a rigid
+    wall, computed with the full Biot theory and with the same material treated
+    as a rigid-frame equivalent fluid. The two curves lie on top of each other
+    everywhere except around the quarter-wavelength resonance of the
+    frame-borne wave, where the Biot prediction develops the dip-and-peak in
+    the real part and the sharp maximum in the imaginary part that Allard &
+    Atalla measure and plot in their Figure 6.10. The closed form Eq. (6.110)
+    marks where that resonance is expected.
+    """
+    print("Generating biot_frame_resonance...")
+    from phonometry import (
+        PoroelasticLayer,
+        PorousLayer,
+        frame_quarter_wave_resonance,
+        johnson_champoux_allard,
+        layered_absorber,
+    )
+
+    # Allard & Atalla Table 6.1 (printed p. 124): the glass wool "Domisol
+    # Coffrage", with the characteristic lengths of their printed p. 123.
+    porosity, tortuosity, resistivity = 0.94, 1.06, 40.0e3
+    frame_density, shear_modulus = 130.0, 2.2e6 * (1.0 + 0.1j)
+    thickness = 0.10
+    f = np.linspace(200.0, 1500.0, 1300)
+    medium = johnson_champoux_allard(
+        f, resistivity, porosity=porosity, tortuosity=tortuosity,
+        viscous_length=0.56e-4, thermal_length=1.1e-4,
+    )
+    rigid = layered_absorber(f, [PorousLayer(thickness, medium)])
+    biot = layered_absorber(
+        f,
+        [PoroelasticLayer(thickness, medium, porosity, tortuosity,
+                          frame_density, shear_modulus)],
+    )
+    f_r = frame_quarter_wave_resonance(
+        thickness, shear_modulus=shear_modulus, poisson_ratio=0.0,
+        frame_density=frame_density,
+    )
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    ax.plot(f, np.real(rigid.normalized_impedance), "--",
+            color=COLOR_PRIMARY, linewidth=1.8,
+            label="rigid frame, real part")
+    ax.plot(f, np.imag(rigid.normalized_impedance), ":",
+            color=COLOR_PRIMARY, linewidth=1.8,
+            label="rigid frame, imaginary part")
+    ax.plot(f, np.real(biot.normalized_impedance), "-",
+            color=COLOR_SECONDARY, linewidth=2.4,
+            label="Biot poroelastic, real part")
+    ax.plot(f, np.imag(biot.normalized_impedance), "-",
+            color=COLOR_TERTIARY, linewidth=2.4,
+            label="Biot poroelastic, imaginary part")
+    ax.axvline(f_r, color=COLOR_FG, linestyle=":", linewidth=1.2, alpha=0.7)
+    # Plain symbol names, not mathtext: the Spanish variant rewrites decimal
+    # points to commas everywhere except in mathtext strings.
+    ax.annotate(
+        f"frame quarter-wave resonance {f_r:.0f} Hz",
+        xy=(f_r, 2.7), xytext=(f_r + 25.0, 2.7),
+        ha="left", va="center", fontsize=9, color=COLOR_FG,
+    )
+
+    ax.set_xlim(200.0, 1500.0)
+    ax.set_ylim(-3.0, 3.0)
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel(r"Normalised surface impedance $Z_s/\rho_0 c_0$")
+    ax.set_title("Only an Elastic Frame Resonates", fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower right", fontsize=9)
+    ax.text(0.015, 0.03,
+            "Glass wool, 100 mm glued to a rigid wall: porosity 0.94,\n"
+            "flow resistivity 40 kPa s/m², frame density 130 kg/m³,\n"
+            "shear modulus 2.2 MPa",
+            transform=ax.transAxes, va="bottom", ha="left", fontsize=8.5,
+            color=COLOR_FG)
+    plt.tight_layout()
+    save_figure(output_dir, "biot_frame_resonance.svg")
+    plt.close()
+
+
 def generate_slow_sound_absorber(output_dir: str) -> None:
     """Perfect absorption by critical coupling in a slow-sound slit panel.
 
@@ -13931,6 +14029,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     # Porous materials & multilayer absorbers (Mechel / Bies / Cox & D'Antonio)
     generate_porous_absorber_designs,
     generate_limp_frame_effective_density,
+    generate_biot_frame_resonance,
     generate_absorber_stack_geometry,
     # Slow-sound slit + Helmholtz-resonator perfect absorbers (Jimenez et al.)
     generate_metadiffuser_geometry,

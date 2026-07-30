@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 517 numerical conformance checks against 352 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 523 numerical conformance checks against 357 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 517 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 56 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 523 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 56 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -308,6 +308,7 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [materials/absorption-rating](https://jmrplens.github.io/phonometry/reference/api/materials/absorption-rating/)
 - [materials/absorption-uncertainty](https://jmrplens.github.io/phonometry/reference/api/materials/absorption-uncertainty/)
 - [materials/airflow-resistance](https://jmrplens.github.io/phonometry/reference/api/materials/airflow-resistance/)
+- [materials/biot](https://jmrplens.github.io/phonometry/reference/api/materials/biot/)
 - [materials/diffuser-design](https://jmrplens.github.io/phonometry/reference/api/materials/diffuser-design/)
 - [materials/dynamic-stiffness](https://jmrplens.github.io/phonometry/reference/api/materials/dynamic-stiffness/)
 - [materials/impedance-tube](https://jmrplens.github.io/phonometry/reference/api/materials/impedance-tube/)
@@ -3194,11 +3195,18 @@ cycle and warn on use; they are removed in 4.0.
 | `limp_frame` | `function` | **Limp-frame correction of any rigid-frame model (Allard & Atalla 2e Eqs. 11.53-11.55, Panneton 2007).**<br>• `medium`: a rigid-frame `PorousMediumResult`<br>• `frame_density` ρ₁ [kg/m³] (bulk density of the frame)<br>• `porosity` φ (Default: 1.0)<br>• keeps K_e, corrects ρ_e; → ρ_t = ρ₁ + φρ₀ as ω → 0 and → rigid as ρ₁ → ∞ | `soft = limp_frame(jca, frame_density=30.0, porosity=0.98)`<br><br>• `PorousMediumResult`, model 'limp_frame(...)' |
 | `decoupling_frequency` | `function` | **Zwikker-Kosten decoupling frequency Fd (Allard & Atalla 2e Sect. 11.3.4 / Eq. 6.90).**<br>• `flow_resistivity` σ [Pa·s/m²]<br>• `porosity` φ, `frame_density` ρ₁ [kg/m³]<br>• Fd = σφ²/(2πρ₁): above it the frame stands still | `decoupling_frequency(40e3, porosity=0.94, frame_density=130.0)  # 43.27`<br><br>• [Hz] |
 | `limp_frame_applicable` / `LIMP_FRAME_CRITERIA` | `function` | **Published rule of thumb for treating a frame as limp (Allard & Atalla 2e pp. 253-254).**<br>• `frame_bulk_modulus` K_c [Pa]<br>• `criterion`: 'doutres' (0.2, Default) / 'beranek' (0.05)<br>• `fluid_bulk_modulus` K_f [Pa] (Default: 101325, isothermal air) → the book's "bulk modulus lower than 20 kPa" | `limp_frame_applicable(20e3)  # True`<br><br>• `bool` |
+| `biot_waves` | `function` | **The three Biot waves of a poroelastic layer (Allard & Atalla 2e Eqs. 6.67–6.84).**<br>• `medium`: the **rigid-frame** `PorousMediumResult` of the pores<br>• `porosity` φ, `tortuosity` α∞<br>• `frame_density` ρ₁ [kg/m³], `shear_modulus` N [Pa] (complex, Im ≥ 0)<br>• `poisson_ratio` ν (Default: 0) | `w = biot_waves(jca, porosity=0.94, tortuosity=1.06, frame_density=130.0, shear_modulus=2.2e6*(1+0.1j))`<br><br>• `BiotWavesResult` |
+| `BiotWavesResult` | `dataclass` | **Two compressional waves and one shear wave.**<br>• `compressional_wavenumber_1` / `_2`, `shear_wavenumber` δ [rad/m]<br>• `velocity_ratio_1` / `_2` / `_3` μ (fluid over frame)<br>• `elastic_p` / `_q` / `_r` P, Q, R [Pa]; `density_11` / `_12` / `_22`<br>• `.airborne_wavenumber`, `.frame_borne_wavenumber`, `.airborne_velocity_ratio`, `.frame_borne_velocity_ratio`, `.airborne_is_second`<br>• `.plot()`: the three wavenumbers vs frequency | `w.airborne_wavenumber, w.plot()` |
+| `biot_surface_impedance` | `function` | **Hard-backed Biot layer at normal incidence, closed form (Allard & Atalla 2e Eqs. 6.107–6.108).**<br>• `waves`: a `BiotWavesResult`<br>• `thickness` l [m]<br>• Glued backing; one layer; normal incidence only | `zs = biot_surface_impedance(w, 0.10)`<br><br>• complex [Pa·s/m] |
+| `poroelastic_transfer_matrix` | `function` | **6×6 layer matrix `[T p] = [Γ(−h)][Γ(0)]⁻¹` (Allard & Atalla 2e Eq. 11.34, Table 11.1).**<br>• `waves`, `thickness` h [m]<br>• `transverse_wavenumber` kt = k sin θ [rad/m] (Default: 0)<br>• Field vector [v1s, v3s, v3f, σ33s, σ13s, σ33f] | `t = poroelastic_transfer_matrix(w, 0.05)`<br><br>• (n, 6, 6) complex |
+| `frame_bulk_modulus` | `function` | **Bulk modulus Kb of the frame in vacuum (Allard & Atalla 2e Eq. 6.29).**<br>• `shear_modulus` N [Pa], `poisson_ratio` ν<br>• Kb = 2N(ν+1)/(3(1−2ν)); feeds `limp_frame_applicable` | `frame_bulk_modulus(2.2e6, 0.0)`<br><br>• complex [Pa] |
+| `frame_elastic_coefficient` | `function` | **Longitudinal coefficient Kc of the frame in vacuum (Allard & Atalla 2e Eq. 6.111).**<br>• `shear_modulus` N [Pa], `poisson_ratio` ν<br>• Kc = 2(1−ν)N/(1−2ν) = Kb + 4N/3 | `frame_elastic_coefficient(2.2e6, 0.0)  # 4.4e6`<br><br>• complex [Pa] |
+| `frame_quarter_wave_resonance` | `function` | **λ/4 frame resonance of a glued layer (Allard & Atalla 2e Eq. 6.110).**<br>• `thickness` l [m]<br>• `shear_modulus` N, `poisson_ratio` ν, `frame_density` ρ₁<br>• fr = (1/4l)√(Re(Kc)/ρ₁): the peak no equivalent fluid produces | `frame_quarter_wave_resonance(0.10, shear_modulus=2.2e6*(1+0.1j), poisson_ratio=0.0, frame_density=130.0)  # 459.9`<br><br>• [Hz] |
 | `PorousMediumResult` | `dataclass` | **Equivalent-fluid characterisation.**<br>• `characteristic_impedance` Zc [Pa·s/m], `wavenumber` k [rad/m] (Im < 0)<br>• `effective_density`, `bulk_modulus` (surface-normalised)<br>• `.normalized_impedance`, `.normalized_wavenumber`<br>• `.plot()`: normalised Zc/k components | `med.characteristic_impedance, med.plot()` |
 | `DELANY_BAZLEY_COEFFICIENTS` | `mapping` | **Bies 5e Table D.1 coefficient presets (C1…C8).**<br>'delany_bazley' (rockwool/fibreglass), 'garai_pompoli' (polyester), 'dunn_davern' / 'wu' (foams) | `DELANY_BAZLEY_COEFFICIENTS['garai_pompoli']` |
 | `DELANY_BAZLEY_VALIDITY` | `tuple` | **Stated fit range in X = ρf/σ.**<br>(0.01, 1.0) | `DELANY_BAZLEY_VALIDITY  # (0.01, 1.0)` |
 | `MIKI_VALIDITY` | `tuple` | **Miki fit range in f/σ.**<br>(0.01, 1.0) | `MIKI_VALIDITY  # (0.01, 1.0)` |
-| `layered_absorber` | `function` | **Transfer-matrix multilayer prediction at one angle (Cox & D'Antonio Eq. 2.29; Bies Eq. D.95; Mechel D.4).**<br>• `frequency` f [Hz]<br>• `layers`: stack from the incidence side (`AirLayer`, `PorousLayer`, `PerforatedPlateLayer`, `MicroperforatedPlateLayer`, `MembraneLayer`)<br>• `angle` θ [rad] (Default: 0)<br>• `termination`: 'rigid'/'free'/complex Z [Pa·s/m] (Default: 'rigid')<br>• `speed_of_sound`, `air_density`, `viscosity` | `res = layered_absorber(f, [PorousLayer(0.05, med)])`<br><br>• `LayeredAbsorberResult` |
+| `layered_absorber` | `function` | **Transfer-matrix multilayer prediction at one angle (Cox & D'Antonio Eq. 2.29; Bies Eq. D.95; Mechel D.4).**<br>• `frequency` f [Hz]<br>• `layers`: stack from the incidence side (`AirLayer`, `PorousLayer`, `PoroelasticLayer`, `PerforatedPlateLayer`, `MicroperforatedPlateLayer`, `MembraneLayer`)<br>• `angle` θ [rad] (Default: 0)<br>• `termination`: 'rigid'/'free'/complex Z [Pa·s/m] (Default: 'rigid')<br>• `speed_of_sound`, `air_density`, `viscosity` | `res = layered_absorber(f, [PorousLayer(0.05, med)])`<br><br>• `LayeredAbsorberResult` |
 | `plot_absorber_stack` | `function` | **To-scale cross-section of a layer stack.**<br>• `layers`: front layer first (or a single layer)<br>• `language` | `plot_absorber_stack(layers)`<br><br>• Dimensioned drawing, rigid backing at right; also `LayeredAbsorberResult.plot_geometry()` and `layer.plot()` |
 | `LayeredAbsorberResult` | `dataclass` | **Oblique-incidence prediction.**<br>• `surface_impedance` Zs, `normalized_impedance`<br>• `reflection` R(θ), `absorption` α(θ)<br>• `transfer_matrix`: (2, 2, n) chain matrix (det = 1)<br>• `.plot()`: α(f) with \|R\| overlaid | `res.absorption, res.surface_impedance` |
 | `diffuse_field_absorption` | `function` | **Random-incidence (Paris) absorption (Mechel D.5 Eq. 9).**<br>• `frequency`, `layers`, `termination` as `layered_absorber`<br>• `angle_limit` [rad] (Default: π/2; 75°–87° truncations in use)<br>• `quadrature_points` (Default: 64, Gauss–Legendre) | `dif = diffuse_field_absorption(f, layers)`<br><br>• `DiffuseFieldAbsorptionResult` |
@@ -3206,6 +3214,7 @@ cycle and warn on use; they are removed in 4.0.
 | `statistical_absorption` | `function` | **Closed-form Paris integral, locally reacting plane (Mechel D.5 Eq. 10).**<br>• `normalized_impedance` z = Zs/(ρc) (Re z > 0)<br>• `angle_limit` [rad] (Default: π/2)<br>• Maximum over passive z is the published 0.951 | `statistical_absorption(1.567 + 0j)  # 0.951` |
 | `AirLayer` | `dataclass` | **Plain air gap.**<br>• `thickness` d [m] (0 allowed → transparent) | `AirLayer(0.05)` |
 | `PorousLayer` | `dataclass` | **Porous layer.**<br>• `thickness` d [m]<br>• `medium`: `PorousMediumResult` on the solver frequency grid | `PorousLayer(0.05, med)` |
+| `PoroelasticLayer` | `dataclass` | **Porous layer with an elastic frame (full Biot theory).**<br>• `thickness` d [m]<br>• `medium`: the **rigid-frame** `PorousMediumResult` on the solver grid<br>• `porosity` φ, `tortuosity` α∞, `frame_density` ρ₁ [kg/m³]<br>• `shear_modulus` N [Pa] (complex), `poisson_ratio` ν (Default: 0)<br>• Switches `layered_absorber` to the global-matrix assembly; `transfer_matrix` is then NaN | `PoroelasticLayer(0.05, med, 0.94, 1.06, 130.0, 2.2e6*(1+0.1j))` |
 | `PerforatedPlateLayer` | `dataclass` | **Rigid perforated plate.**<br>• `thickness` t, `hole_radius` a [m]<br>• `open_area` ε (0–1)<br>• `end_correction` δ per end (Default: None → Fok/Nesterov of ε) | `PerforatedPlateLayer(0.006, 0.0025, 0.05)` |
 | `MicroperforatedPlateLayer` | `dataclass` | **Maa microperforated plate.**<br>• `thickness` t, `hole_radius` a [m] (submillimetre)<br>• `open_area` ε<br>• `end_correction` δ (Default: 0.85) | `MicroperforatedPlateLayer(0.0002, 0.0001, 0.005)` |
 | `MembraneLayer` | `dataclass` | **Limp impervious membrane.**<br>• `surface_density` m [kg/m²]<br>• `resistance` r [Pa·s/m] (Default: 0) | `MembraneLayer(5.0)` |
@@ -12053,7 +12062,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/guides/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/guides/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/reference/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 509 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 523 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -24891,6 +24900,182 @@ too, so the limits cannot tell the printed form from that variant. The
 decoupling frequency evaluated on the fully specified glass wool of their
 Table 6.1, where pure arithmetic gives 43.27 Hz, is independent of all this.
 
+### Elastic frames: the full Biot layer (Allard & Atalla 6 and 11)
+
+The limp model throws the frame stiffness away. Keep it, and the porous layer
+stops being a fluid: the Biot theory treats the skeleton as an elastic solid
+coupled to the pore fluid through a potential coupling coefficient $Q$ and an
+inertial coupling coefficient, and predicts **three** waves in an isotropic
+material instead of one. Two are compressional and one is shear (Allard &
+Atalla 2e ch. 6). The stress-strain relations are
+
+$$
+\sigma^s_{ij} = \left[(P - 2N)\theta^s + Q\theta^f\right]\delta_{ij}
+  + 2N e^s_{ij}, \qquad
+\sigma^f_{ij} = -\phi p\,\delta_{ij} = (Q\theta^s + R\theta^f)\delta_{ij},
+$$
+
+and for the usual case of a frame whose solid grains are much stiffer than the
+frame they build ($K_s \to \infty$, true of glass, rock and polymer frames) the
+three elastic coefficients follow from the shear modulus $N$, the Poisson
+coefficient $\nu$ and the bulk modulus $K_f$ of the fluid in the pores
+(Eqs. 6.26-6.29):
+
+$$
+R = \phi K_f, \qquad Q = (1-\phi)K_f, \qquad
+P = \tfrac{4}{3}N + K_b + \frac{(1-\phi)^2}{\phi}K_f, \qquad
+K_b = \frac{2N(1+\nu)}{3(1-2\nu)}.
+$$
+
+With the modified densities $\tilde\rho_{11}$, $\tilde\rho_{12}$,
+$\tilde\rho_{22}$ of Eq. 6.56 the two compressional wavenumbers come out as the
+eigenvalues of a 2x2 problem (Eqs. 6.67-6.69) and the shear wavenumber from
+Eq. 6.83. `biot_waves` returns all three, together with the ratios $\mu$ of the
+fluid displacement over the frame displacement that say which medium each wave
+travels in. The wave whose $|\mu|$ is large is the **airborne** wave, the one an
+equivalent fluid already models; the other is the **frame-borne** wave, which
+has no equivalent-fluid counterpart at all.
+
+`biot_waves` takes the *rigid-frame* equivalent fluid of the pores, normally a
+`johnson_champoux_allard` result. That is deliberate: the frame inertia is the
+Biot model's own business, so handing it a `limp_frame` medium would count that
+inertia twice.
+
+The consequence a designer cares about is a resonance. A layer glued to a rigid
+wall holds its frame still at the wall and free at the front face, so the
+frame-borne wave resonates a quarter wavelength inside the layer, at
+
+$$
+f_r = \frac{1}{4l}\sqrt{\frac{\mathrm{Re}(K_c)}{\rho_1}}, \qquad
+K_c = \frac{2(1-\nu)N}{1-2\nu}
+$$
+
+(Eqs. 6.109-6.111), where $K_c$ is the longitudinal elastic coefficient of the
+frame **in vacuum** and $\rho_1$ its bulk density. `frame_quarter_wave_resonance`
+evaluates it. Nothing in the rigid-frame or limp-frame models can produce that
+peak.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/biot_frame_resonance_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/biot_frame_resonance.svg" alt="Normalised surface impedance against frequency from 200 to 1500 hertz for a 100 millimetre glass-wool layer glued to a rigid wall, comparing the rigid-frame equivalent fluid with the full Biot poroelastic layer. The rigid-frame real part falls smoothly from 3 to 1.5 as a dashed line and its imaginary part rises smoothly from minus 3 to minus 0.9 as a dotted line. The Biot real part instead dips to 1.5 near 450 hertz and rebounds to 2.6 near 520 hertz, while the Biot imaginary part peaks sharply at minus 0.7 near 480 hertz, both features straddling the frame quarter-wave resonance of 460 hertz marked by a dotted vertical line, and both curves rejoin the rigid-frame ones above 700 hertz" width="88%"></picture>
+
+*The glass wool of Allard & Atalla Table 6.1, 100 mm glued to a rigid wall,
+under both models. Away from the resonance the two are indistinguishable, which
+is the plot's own check on the Biot layer; around it the poroelastic prediction
+develops the dip-and-peak in the real part and the sharp maximum in the
+imaginary part that the book measures and plots in its Fig. 6.10.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import (
+    PoroelasticLayer, PorousLayer, biot_waves, frame_elastic_coefficient,
+    frame_quarter_wave_resonance, johnson_champoux_allard, layered_absorber,
+)
+
+# Allard & Atalla Table 6.1: glass wool "Domisol Coffrage", 100 mm, glued.
+f = np.linspace(200.0, 1500.0, 1301)
+shear = 2.2e6 * (1 + 0.1j)          # 220 N/cm2, loss factor 0.1
+med = johnson_champoux_allard(
+    f, 40e3, porosity=0.94, tortuosity=1.06,
+    viscous_length=0.56e-4, thermal_length=1.1e-4,
+)
+
+print(frame_elastic_coefficient(shear, 0.0))       # (4400000+440000j)
+print(round(frame_quarter_wave_resonance(
+    0.10, shear_modulus=shear, poisson_ratio=0.0, frame_density=130.0), 1))
+# 459.9
+
+waves = biot_waves(med, porosity=0.94, tortuosity=1.06,
+                   frame_density=130.0, shear_modulus=shear)
+print(round(float(abs(waves.airborne_velocity_ratio[800])), 1))     # 42.4
+print(np.round(waves.frame_borne_velocity_ratio[-1], 3))  # (0.811+0.473j)
+
+biot = layered_absorber(f, [PoroelasticLayer(0.10, med, 0.94, 1.06, 130.0, shear)])
+rigid = layered_absorber(f, [PorousLayer(0.10, med)])
+
+fig, ax = plt.subplots()
+for res, style in ((rigid, "--"), (biot, "-")):
+    ax.plot(f, res.normalized_impedance.real, style)
+    ax.plot(f, res.normalized_impedance.imag, style)
+ax.set(xlabel="Frequency [Hz]", ylabel="Zs / rho0 c0", ylim=(-3, 3))
+plt.show()
+
+waves.plot()   # the three Biot wavenumbers against frequency
+plt.show()
+```
+
+</details>
+
+Inside a stack, a `PoroelasticLayer` carries the same six variables the theory
+needs, $[v_1^s, v_3^s, v_3^f, \sigma^s_{33}, \sigma^s_{13}, \sigma^f_{33}]$, so
+`layered_absorber` switches from the two-variable chain to the global-matrix
+assembly of Allard & Atalla Sect. 11.5: fluid and sheet layers keep their 2x2
+matrices, each poroelastic layer enters through the six wave amplitudes of its
+own $[\Gamma]$ blocks rather than through a transfer matrix, and the two are
+joined by the printed coupling matrices of Sect. 11.4. Solving for the
+amplitudes directly avoids inverting $[\Gamma(0)]$, which is what makes a very
+soft or very thick frame tractable at all. Two adjacent poroelastic layers
+are coupled as **bonded** frames (their Eq. 11.67); a sheet next to one is
+coupled as a free, mechanically decoupled screen. The returned
+`transfer_matrix` is filled with `nan` for such a stack, because a 2x2 chain
+matrix does not exist for it; the surface impedance, reflection factor and
+absorption are unaffected.
+
+For the same 100 mm layer the resonance moves absorption by up to 0.21 at its
+sharpest; on third-octave centres the largest shift is the 0.12 at 500 Hz:
+
+```python
+import numpy as np
+from phonometry import (
+    PoroelasticLayer, PorousLayer, johnson_champoux_allard, layered_absorber,
+)
+
+bands = np.array([250, 315, 400, 500, 630, 800, 1000], dtype=float)
+med = johnson_champoux_allard(
+    bands, 40e3, porosity=0.94, tortuosity=1.06,
+    viscous_length=0.56e-4, thermal_length=1.1e-4,
+)
+shear = 2.2e6 * (1 + 0.1j)
+for layer in (PorousLayer(0.10, med),
+              PoroelasticLayer(0.10, med, 0.94, 1.06, 130.0, shear)):
+    print(layered_absorber(bands, [layer]).absorption.round(2))
+# [0.55 0.58 0.62 0.65 0.69 0.74 0.78]   rigid frame
+# [0.53 0.56 0.61 0.77 0.71 0.74 0.78]   Biot poroelastic
+```
+
+The layer is worth the extra five parameters when the frame is stiff and heavy
+enough to resonate in the band of interest (dense mineral wool, structural
+foams), when the material is bonded to a plate that shakes it directly, or when
+a measured impedance shows a feature no equivalent fluid can explain. A light,
+soft blanket in free air is better served by `limp_frame`.
+
+**Honest note on validation.** There is no published table of $Z_s(f)$ or
+$\alpha(f)$ for a fully specified Biot layer, here or anywhere else checked, so
+this model cannot be pinned digit by digit the way the standards-based modules
+are. What it is anchored on instead, in decreasing strength: the **rigid-frame
+limit**, where making the frame infinitely stiff and heavy must reproduce the
+JCA equivalent fluid, whose own conformance *is* pinned on published digits, and
+does so with a residual that falls exactly as the inverse of the stiffness over
+eight decades, at four angles of incidence, with and without a rigid backing;
+the **limp limit**, where taking the stiffness to zero reproduces `limp_frame`;
+the agreement to machine precision between the **two independent derivations**
+the book gives, the ch. 6 closed form Eq. 6.107 and the ch. 11 global-matrix
+assembly; and the three computed numbers the book does print in prose for the
+Table 6.1 glass wool, all reproduced: the airborne wave changes root at 495 Hz,
+$|\mu_a| > 40$ above 50 Hz, and $\mu_b$ falls from 1.0 at 50 Hz to 0.82 at
+1500 Hz. That last one is matched by $\mathrm{Re}(\mu_b)$, not by $|\mu_b|$,
+even though the printed sentence says "the ratio modulus": the model gives
+$\mu_b(1500) = 0.811 + 0.473j$, whose real part is 1.1 % from the printed
+value while its modulus, 0.939, is 14.5 % away. That is recorded in
+[Errata](/phonometry/reference/errata/), along with the parameter sweep that
+fails to bring $|\mu_b|$ anywhere near 0.82. The impedance peak of the book's
+thinner sample is printed as 860 Hz and comes out at 863.5 Hz under the
+$\mathrm{Im}(Z_s)$ peak rule. Everything else, including the whole
+oblique-incidence behaviour beyond its rigid-frame limit, rests on closed forms
+and on structural identities, not on published digits.
+
 ## 2. Multilayer prediction by transfer matrices
 
 Each fluid layer of thickness $d$ contributes the chain matrix (Cox &
@@ -25207,7 +25392,9 @@ fluid, and `limp_frame` adds its inertia (Allard & Atalla Eqs 11.53-11.55).
 Use it for felts, screens and light fibreglass, for anything measured
 unconstrained in an impedance tube, and wherever the frame in vacuum is softer
 than about 20 kPa (`limp_frame_applicable`); do not use it, or the rigid model
-either, for a material bonded to a vibrating structure.
+either, for a material bonded to a vibrating structure. When the frame is stiff
+and heavy enough to resonate in the band of interest, neither equivalent fluid
+will do at all: use a `PoroelasticLayer` and the full Biot theory.
 
 **Local vs. bulk reaction.** The layer solver is bulk-reacting (sound
 refracts and travels inside the layers). `statistical_absorption` assumes
@@ -25220,7 +25407,7 @@ printed coefficient tables (Bies Table D.1, Miki Eqs. 30–34), the solver to
 the closed forms above and to the `TransferMatrix` recovery of the
 [impedance-tube page](https://jmrplens.github.io/phonometry/guides/impedance-tube/), the MPP to Maa's own approximation
 (stated ~6 % agreement with the exact Eq. 2), design example and Table I,
-and the Paris integral to its locally reacting closed form. Three misprints
+and the Paris integral to its locally reacting closed form. Misprints
 found in the sources during this work are recorded in the
 [errata registry](https://jmrplens.github.io/phonometry/reference/errata/).
 
@@ -25234,9 +25421,14 @@ found in the sources during this work are recorded in the
   Modelling Sound Absorbing Materials* (2nd ed.). Wiley.
   ISBN 978-0-470-74661-5.
   [doi:10.1002/9780470747339](https://doi.org/10.1002/9780470747339).
-  Section 11.3.4: the rigid and limp frame limits of the Biot theory, the
-  decoupling frequency and the limp effective density (Eqs 11.53-11.55, after
-  Panneton 2007).
+  Chapter 6: the Biot theory of an elastic-framed porous material, its elastic
+  coefficients, its two compressional waves and its shear wave, and the surface
+  impedance and quarter-wave frame resonance of a hard-backed layer
+  (Eqs 6.107-6.111). Chapter 11: the transfer-matrix method, the six-variable
+  poroelastic layer matrix (Table 11.1), the coupling matrices (Sect. 11.4) and
+  the global assembly (Sect. 11.5). Section 11.3.4: the rigid and limp frame
+  limits of the Biot theory, the decoupling frequency and the limp effective
+  density (Eqs 11.53-11.55, after Panneton 2007).
 - Bies, D. A., Hansen, C. H., & Howard, C. Q. (2017). *Engineering noise
   control* (5th ed.). CRC Press.
   [doi:10.1201/9781351228152](https://doi.org/10.1201/9781351228152).
@@ -41848,7 +42040,7 @@ sample from the metrology core:
 | IEC 60942:2017 Table 2 | Calibrator short-term stability limits (frequency-dependent, class 1) in `sensitivity()` | `tests/metrology/test_calibration_validation.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
-509 numerical conformance checks across 55 domains and 344 standards, covering
+523 numerical conformance checks across 56 domains and 357 standards, covering
 psychoacoustics and speech intelligibility, room, building and materials
 acoustics, human and machine vibration, environmental, aircraft, rotorcraft
 and underwater noise, electroacoustics, broadcast loudness, industrial noise
