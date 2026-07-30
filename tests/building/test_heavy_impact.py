@@ -280,6 +280,23 @@ def test_reverberation_correction_is_smooth_across_the_c_equals_one_pole() -> No
     )
 
 
+def test_reverberation_correction_is_accurate_inside_the_pole_guard() -> None:
+    """The closed form for g(C) loses its digits within about 1e-6 of C = 1.
+
+    Evaluated in double precision against a 60-digit reference, the printed
+    expression is already 3,9e-4 dB out at |C - 1| = 5e-7 and 3,5e-3 dB out at
+    1e-7, because the two powers cancel. Inside the guard band the removable
+    limit 1/e is used instead, so the correction is flat to the last bit across
+    the pole rather than wandering.
+    """
+    times = 1.7275 * np.array([1.0 - 5e-7, 1.0 - 1e-7, 1.0, 1.0 + 1e-7, 1.0 + 5e-7])
+    correction = fast_reverberation_correction(times)
+    assert float(np.ptp(correction)) < 1e-6
+    # The exact value at C = 1: g(1) = 1/e, so the correction is
+    # 10 lg[(1/e) / g(C0)] with C0 = 0,5/1,7275.
+    assert float(correction[2]) == pytest.approx(3.234806783, abs=1e-6)
+
+
 def test_standardization_reproduces_a_published_25_band_example() -> None:
     """Reproduction check of ISO 16283-2:2020 Formula (4) over 25 bands.
 
@@ -311,6 +328,31 @@ def test_octave_conversion_sums_three_equal_thirds_to_plus_4_77_db() -> None:
     """Formula (20) is an energy sum: three equal thirds give +10 lg 3 dB."""
     octaves = heavy_impact_octave_levels([60.0] * 6)
     np.testing.assert_allclose(octaves, 60.0 + 10.0 * np.log10(3.0))
+
+
+def test_octave_conversion_groups_consecutive_thirds() -> None:
+    """Formula (20) sums the three thirds *inside* each octave, in band order.
+
+    A flat spectrum cannot tell that apart from striding across the array, so
+    this uses a falling spectrum: with 50 to 630 Hz in 12 thirds, grouping
+    consecutively gives the four octaves below, while striding would put
+    50/125/315 Hz in the first one and land 21,1 dB away.
+    """
+    thirds = np.array(
+        [76.5, 60.8, 51.6, 48.7, 43.6, 42.3, 40.5, 35.9, 29.6, 27.0, 21.5, 19.8]
+    )
+    octaves = heavy_impact_octave_levels(thirds)
+    assert octaves.size == 4
+    expected = [
+        10.0 * np.log10(np.sum(10.0 ** (thirds[3 * i:3 * i + 3] / 10.0)))
+        for i in range(4)
+    ]
+    np.testing.assert_allclose(octaves, expected, atol=1e-12)
+    # And explicitly: the top octave is 400 + 500 + 630 Hz. Striding instead
+    # would put 160 + 400 + 630 Hz there and read 48,9 dB, 20,2 dB too high.
+    np.testing.assert_allclose(
+        octaves, [76.629, 50.570, 42.047, 28.680], atol=0.01
+    )
 
 
 def test_octave_conversion_rejects_a_non_multiple_of_three() -> None:
@@ -376,6 +418,30 @@ def test_rating_rounds_halves_up() -> None:
     res = a_weighted_maximum_impact_level([level] * 4)
     assert res.unrounded == pytest.approx(55.5, abs=1e-9)
     assert res.rating == 56
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        (54.5, 55),   # half-to-even would give 54
+        (55.5, 56),
+        (53.5, 54),
+        (54.4999, 54),
+        (-0.5, 0),    # half-away-from-zero would give -1
+        (-1.5, -1),
+    ],
+)
+def test_annex_d_rounding_is_half_up(value: float, expected: int) -> None:
+    """ISO 717-2:2020 Annex D note a: XX,Y rounds to XX + 1 once Y reaches 5.
+
+    That is half-up toward positive infinity. It differs from Python's
+    round-half-to-even at 54,5 and from half-away-from-zero at -0,5, and the
+    formula's own note warns that a rounding slip here costs a whole decibel
+    in the reported single number.
+    """
+    from phonometry.building.heavy_impact import _round_half_up
+
+    assert _round_half_up(value) == expected
 
 
 def test_rating_is_dominated_by_the_low_bands() -> None:

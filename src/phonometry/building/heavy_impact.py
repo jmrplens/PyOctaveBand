@@ -596,8 +596,15 @@ class AWeightedMaximumImpactResult:
 
 
 def _round_half_up(value: float) -> int:
-    """Round to an integer, halves away from zero (ISO 717-2 Annex D note a)."""
-    return int(np.floor(value + 0.5)) if value >= 0.0 else -int(np.floor(-value + 0.5))
+    """Round to an integer, halves upward (ISO 717-2:2020 Annex D note a).
+
+    The note reads "XX,YZZ Z ... is rounded to XX if Y is less than 5 and to
+    XX + 1 if Y is greater than or equal to 5", i.e. half-up toward positive
+    infinity rather than half-away-from-zero (they differ only for a negative
+    half, e.g. -0,5 rounds to 0) and never half-to-even, which Python's own
+    ``round`` would apply.
+    """
+    return int(np.floor(value + 0.5))
 
 
 def a_weighted_maximum_impact_level(

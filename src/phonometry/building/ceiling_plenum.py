@@ -18,16 +18,29 @@ as ``exp(-m x)`` with the power attenuation coefficient
 ``m = 2 Re{Gamma} = -2 Im{k'}`` (Eqs. (9.15) and (9.16)). Integrating over the
 ceiling length on both sides gives (Eq. (9.18))::
 
-    tau_cl = sS sR tauS tauR LR / (mS LS mR LR h)
+    tau_cl = sS sR tauS tauR LR / (mS LS m'R LR h)
              * (1 - exp(-eps mS LS)) (1 - exp(-eps m'R LR))
 
 with the receiving-side coefficient increased by the leakage back into the room,
 ``m'R = mR + sR tauR / h`` (Eq. (9.17)). Vigran prints the exponents with a
 factor 2 for totally reflecting plenum sidewalls and states that totally
 absorbing ones give the same expression "without the factor 2", so the factor is
-the same ``eps`` that the compact form carries. For a plenum with little
-attenuation (``mS LS``, ``mR LR`` << 1) and ``sS = sR = 0,5`` it collapses to
-the result that makes the geometry visible (Eqs. (9.19) and (9.20))::
+the same ``eps`` that the compact form carries.
+
+.. warning::
+
+   Vigran prints the **unprimed** ``mR`` in that denominator. That is a misprint
+   (see ``docs/ERRATA.md``): the receiving-side integral
+   ``int_0^LR exp(-eps m'R x) dx = (1 - exp(-eps m'R LR))/(eps m'R)`` carries
+   ``m'R``, exactly as the source-side one carries ``mS``, and the printed
+   reading makes ``tau_cl`` non-monotonic in the plenum damping and unbounded
+   as ``mR -> 0``. This module implements the derived ``m'R``.
+
+For a plenum with little attenuation on both sides (``mS LS`` << 1 **and**
+``m'R LR`` << 1, which needs a fairly insulating ceiling as well as a weakly
+damped plenum, since ``m'R`` never falls below ``sR tauR / h``) and
+``sS = sR = 0,5`` it collapses to the result that makes the geometry visible
+(Eqs. (9.19) and (9.20))::
 
     tau_cl = eps**2 tauS tauR LR / (4 h)
     Rcl    = RS + RR - 10 lg[eps**2 LR / (4 h)]
@@ -64,8 +77,11 @@ the shifted contour at 500 Hz (clause 5.5). See
    The one-dimensional plenum model has **no published numeric output**: every
    result in Vigran (Figs. 9.11 to 9.13) and in Mechel's *Formulas of Acoustics*
    (Sections I.21 and I.22) is a figure. The functions here are anchored on the
-   closed forms and on the internal consistency between Eq. (9.18) and its
-   small-attenuation limit Eq. (9.20). The measurement chain
+   closed forms, on the derivation of Eq. (9.18) from the two side integrals,
+   and on structural properties that a wrong reading breaks: monotonicity in
+   the plenum damping, the bound ``tau_cl <= 1``, and the small-attenuation
+   limit Eq. (9.20) taken where it genuinely applies rather than only where the
+   Eq. (9.17) leakage term happens to vanish. The measurement chain
    (:func:`normalized_ceiling_attenuation`, :func:`ceiling_attenuation_class`)
    *is* anchored on accredited ASTM E1414 laboratory reports.
 """
@@ -123,6 +139,25 @@ _MAX_SINGLE_DEFICIENCY = 8.0
 #: ``eps``, which is both the prefactor of the compact form and the factor in
 #: the exponents of the attenuated one.
 _SIDEWALLS: dict[str, float] = {"absorbing": 1.0, "reflecting": 2.0}
+
+
+def _require_transmission_factor(tau: np.ndarray) -> None:
+    """Reject a ceiling/plenum transmission factor above unity.
+
+    ``tau_cl`` is a ratio of powers referred to the ceiling area, so a value
+    above 1 means the model has been pushed outside the range where its
+    diffuse-field power balance means anything, which happens once the ceiling
+    itself is nearly transparent (roughly ``RS + RR`` below the geometry term).
+    Failing loudly beats returning a negative sound reduction index.
+    """
+    worst = float(np.max(tau))
+    if worst > 1.0:
+        raise ValueError(
+            f"the ceiling/plenum transmission factor reaches {worst:.3g}, above "
+            "unity: the one-dimensional model is outside its validity range. "
+            "Check that 'reduction_index_source' and 'reduction_index_receiving' "
+            "exceed the geometry term 10 lg(eps^2 LR/(4h))."
+        )
 
 
 def _require_split(value: float, name: str) -> float:
@@ -345,8 +380,15 @@ def plenum_flanking_reduction_index(
     ``Rcl = RS + RR - 10 lg[eps**2 LR/(4h)]`` (Eq. (9.20)). Supplying the plenum
     power attenuation coefficients ``mS`` and ``mR`` (Eq. (9.16),
     ``m = -2 Im{k'}`` of the lined duct) switches to the full Eq. (9.18), whose
-    receiving-side exponent carries the leakage term ``m'R = mR + sR tauR/h``
-    (Eq. (9.17)).
+    receiving side carries the leakage term ``m'R = mR + sR tauR/h``
+    (Eq. (9.17)) in both the exponent and the denominator. Vigran prints the
+    denominator with the unprimed ``mR``; that is a misprint and the derived
+    reading is implemented here (see ``docs/ERRATA.md``).
+
+    Because ``m'R`` never falls below ``sR tauR / h``, the attenuated form
+    approaches Eq. (9.20) only when the ceiling is insulating enough for
+    ``m'R LR`` to be small as well; at ``R = 20 dB`` with the geometry of
+    Vigran's own example the leakage term is still worth about 0,24 dB.
 
     :param reduction_index_source: Source-side ceiling ``RS`` per band, in dB
         (the ceiling plates and any plenum absorber together, Eq. (9.14)).
@@ -401,6 +443,7 @@ def plenum_flanking_reduction_index(
     if attenuation_source is None or attenuation_receiving is None:
         geometry = float(10.0 * np.log10(eps**2 * lr / (4.0 * h)))
         tau = eps**2 * tau_s * tau_r * lr / (4.0 * h)
+        _require_transmission_factor(tau)
         rcl = rs + rr - geometry
         return PlenumFlankingResult(
             frequencies=freqs,
@@ -424,11 +467,20 @@ def plenum_flanking_reduction_index(
         raise ValueError("the attenuation coefficients must be positive.")
     # Eq. (9.17): the receiving side also loses power back into the room.
     mr_eff = mr + sr * tau_r / h
+    # Vigran's Eq. (9.18) prints the *unprimed* mR in this denominator while
+    # carrying m'R in the exponent. The derivation gives m'R in both: the
+    # receiving-side integral is int_0^LR exp(-eps m'R x) dx =
+    # (1 - exp(-eps m'R LR))/(eps m'R), exactly as the source-side one is in
+    # mS. Taken literally the printed form is not a transmission factor at
+    # all: it is non-monotonic in the plenum damping (adding absorber makes
+    # the predicted path worse) and unbounded as mR -> 0, exceeding unity for
+    # ordinary inputs. See docs/ERRATA.md, "Vigran (2008), Eq. (9.18)".
     tau = (
-        ss * sr * tau_s * tau_r * lr / (ms * ls * mr * lr * h)
+        ss * sr * tau_s * tau_r * lr / (ms * ls * mr_eff * lr * h)
         * (1.0 - np.exp(-eps * ms * ls))
         * (1.0 - np.exp(-eps * mr_eff * lr))
     )
+    _require_transmission_factor(tau)
     rcl = -10.0 * np.log10(tau)
     return PlenumFlankingResult(
         frequencies=freqs,

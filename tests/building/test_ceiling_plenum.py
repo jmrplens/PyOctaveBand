@@ -242,6 +242,23 @@ def test_eight_decibel_rule_can_bind_before_the_sum() -> None:
     assert res.deficiency_sum == pytest.approx(8.0)
 
 
+def test_clause_5_2_rounding_breaks_ties_upward_not_to_even() -> None:
+    """ASTM E413-22 clause 5.2 rounds to the *nearest* integer, halves up.
+
+    Round-half-to-even would send 20,5 to 20 and 21,5 to 22; the fitted contour
+    then sits a step differently on a spectrum whose values end in ,5, which
+    the reviewer measured as CAC 34 versus 33 on real one-decimal data.
+    """
+    contour = np.asarray(
+        [CEILING_ATTENUATION_CONTOUR[f] for f in sorted(CEILING_ATTENUATION_CONTOUR)]
+    )
+    data = contour + 40.5
+    res = ceiling_attenuation_class(data)
+    np.testing.assert_allclose(res.rounded, contour + 41.0)
+    # And the negative-going side: -16 + 40,5 = 24,5 must round to 25, not 24.
+    assert float(res.rounded[0]) == 25.0
+
+
 def test_rating_rejects_a_wrong_band_count() -> None:
     with pytest.raises(ValueError, match="16 one-third-octave values"):
         ceiling_attenuation_class([30.0] * 15)
@@ -359,11 +376,11 @@ def test_transmission_factor_matches_the_reduction_index() -> None:
 
 
 def test_attenuated_model_converges_to_the_undamped_limit() -> None:
-    """Eq. (9.18) collapses to Eq. (9.20) for mS LS, mR LR << 1.
+    """Eq. (9.18) collapses to Eq. (9.20) when mS LS and m'R LR are both small.
 
-    Vigran states the limit explicitly. The receiving-side exponent also
-    carries the leakage term sR tauR/h of Eq. (9.17), so the ceilings are made
-    very insulating (tauR = 1e-10) to keep it far below mR.
+    The receiving-side coefficient is m'R = mR + sR tauR/h (Eq. (9.17)), which
+    never falls below sR tauR/h however weak the plenum damping, so the limit
+    needs an insulating ceiling as well as a small mR. Here tauR = 1e-10.
     """
     undamped = plenum_flanking_reduction_index(
         [50.0], [100.0], ceiling_length=4.75, plenum_height=0.43
@@ -377,6 +394,96 @@ def test_attenuated_model_converges_to_the_undamped_limit() -> None:
     )
     assert attenuated.model == "attenuated"
     assert undamped.model == "undamped"
+
+
+def test_leakage_term_bites_at_a_realistic_ceiling() -> None:
+    """Eq. (9.17)'s sR tauR/h is worth a quarter of a decibel at R = 20 dB.
+
+    With Vigran's geometry (LR = 4,75 m, h = 0,43 m, eps = 2) and a 20 dB
+    ceiling, m'R floors at sR tauR/h = 0,5 x 0,01 / 0,43 = 0,01163 1/m, so
+    m'R LR = 0,055 is not negligible and the attenuated form settles 0,238 dB
+    above Eq. (9.20) however small mR is made. Dropping the leakage term (using
+    mR alone) or mis-forming it (multiplying by h instead of dividing) both
+    move this number.
+    """
+    undamped = plenum_flanking_reduction_index(
+        [20.0], [20.0], ceiling_length=4.75, plenum_height=0.43
+    )
+    attenuated = plenum_flanking_reduction_index(
+        [20.0], [20.0], ceiling_length=4.75, plenum_height=0.43,
+        attenuation_source=[1e-6], attenuation_receiving=[1e-6],
+    )
+    excess = float(attenuated.reduction_index[0] - undamped.reduction_index[0])
+    assert excess == pytest.approx(0.2377, abs=2e-3)
+
+
+def test_attenuated_model_is_monotonic_in_the_plenum_damping() -> None:
+    """More absorption in the plenum can only attenuate the sideways path.
+
+    The structural property that the printed reading of Eq. (9.18) breaks: with
+    the unprimed mR in the denominator, Rcl *falls* as the damping falls below
+    the leakage term, so adding absorber would predict a worse path than none.
+    """
+    values = [
+        float(
+            plenum_flanking_reduction_index(
+                [25.0], [25.0], ceiling_length=5.0, plenum_height=0.6,
+                attenuation_source=[m], attenuation_receiving=[m],
+            ).reduction_index[0]
+        )
+        for m in (1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1.0)
+    ]
+    assert values == sorted(values)
+
+
+def test_attenuated_model_never_exceeds_the_undamped_path() -> None:
+    """Damping the plenum can only help, so Rcl stays at or above Eq. (9.20).
+
+    Another property the printed reading breaks: it returns Rcl below the
+    undamped value over a wide range of realistic damping.
+    """
+    undamped = plenum_flanking_reduction_index(
+        [25.0], [25.0], ceiling_length=5.0, plenum_height=0.6
+    )
+    for m in (1e-6, 1e-4, 1e-2, 1.0):
+        attenuated = plenum_flanking_reduction_index(
+            [25.0], [25.0], ceiling_length=5.0, plenum_height=0.6,
+            attenuation_source=[m], attenuation_receiving=[m],
+        )
+        assert float(attenuated.reduction_index[0]) >= float(
+            undamped.reduction_index[0]
+        ) - 1e-9
+
+
+def test_undamped_transmission_factor_above_unity_is_rejected() -> None:
+    """tau_cl is a power ratio, so a value above 1 is not a result.
+
+    Eq. (9.20) has no such bound built in: a transparent ceiling gives
+    tau = eps**2 LR/(4h) = 8,3 here, i.e. Rcl = -9,2 dB. Failing loudly beats
+    reporting a negative sound reduction index.
+    """
+    with pytest.raises(ValueError, match="above unity"):
+        plenum_flanking_reduction_index(
+            [0.0], [0.0], ceiling_length=5.0, plenum_height=0.6
+        )
+
+
+def test_attenuated_transmission_factor_stays_below_unity() -> None:
+    """Eq. (9.18) as derived conserves energy even for a fully open ceiling.
+
+    With m'R in the denominator the receiving-side factor
+    (1 - exp(-eps m'R LR))/(eps m'R LR) is bounded by 1, so tau_cl approaches
+    but never passes unity. The printed reading has no such bound: at
+    RS = RR = 0 dB and mR = 1e-3 it returns tau = 829, i.e. Rcl = -29 dB.
+    """
+    for m in (1e-4, 1e-2, 1e-1, 1.0):
+        for h in (0.2, 0.43, 0.6):
+            res = plenum_flanking_reduction_index(
+                [0.0], [0.0], ceiling_length=5.0, plenum_height=h,
+                attenuation_source=[m], attenuation_receiving=[m],
+            )
+            assert float(res.transmission_factor[0]) <= 1.0
+            assert float(res.reduction_index[0]) >= 0.0
 
 
 def test_plenum_attenuation_increases_the_reduction_index() -> None:
