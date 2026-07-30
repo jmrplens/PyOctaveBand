@@ -110,6 +110,28 @@ tau_bar_21`` with ``chi = sqrt(fc_2 / fc_1)``) this form is symmetric,
 averages of the two directions are linked by
 ``tau_bar_ij = tau_bar_ji sqrt(h_i cL_i / (h_j cL_j)) = tau_bar_ji sqrt(fc_j /
 fc_i)``, i.e. ``tau_bar_12 = chi tau_bar_21``.
+
+**Two shortcuts for right-angle joints (Norton & Karczub 2003, Section
+6.6.1).** Alongside the angle-resolved wave approach above, the SEA literature
+uses a pair of closed forms that need no integration, which is what the
+experimental SEA of :mod:`phonometry.vibration.experimental_sea` is normally
+compared against:
+
+* :func:`right_angle_transmission_coefficient` (Norton Eqs. 6.53 to 6.55, after
+  Bies & Hamid and Cremer et al.). The normal-incidence coefficient of two
+  plates at right angles is ``tau12(0) = 2 (psi_N**0.5 + psi_N**-0.5)**-2``
+  with ``psi_N = rho_1 cL1**1.5 h1**2.5 / (rho_2 cL2**1.5 h2**2.5)`` (note
+  this is a *different* ``psi`` from Hopkins Eq. 5.11 above), and the random
+  incidence value follows from the empirical factor ``2,754 X / (1 + 3,24 X)``
+  with ``X = h1/h2``. Feeding it to :func:`coupling_loss_factor` reproduces
+  Norton Eq. (6.52), ``eta_12 = 2 cB L tau12 / (pi omega S1)``, identically:
+  that equation and Hopkins Eq. (2.154) are the same expression once
+  ``cg = 2 cB``.
+* :func:`point_connection_coupling_loss_factor` (Norton Eq. 6.56, after
+  Clarkson & Ranky). Plates joined at ``N`` discrete points (bolts, rivets,
+  spot welds) rather than along a line. Use it when the bending wavelength is
+  shorter than the joint length, and the line-junction route above when it is
+  longer.
 """
 
 from __future__ import annotations
@@ -150,6 +172,8 @@ __all__ = [
     "inline_transmission_coefficient",
     "junction_transmission",
     "junction_wave_parameters",
+    "point_connection_coupling_loss_factor",
+    "right_angle_transmission_coefficient",
     "straight_transmission_coefficient",
     "wave_vibration_reduction_index",
 ]
@@ -400,6 +424,134 @@ def coupling_loss_factor(
         raise ValueError("'frequency' must be positive.")
     area = require_positive(plate_area, "plate_area")
     eta = cg * lij * tau / (2.0 * math.pi**2 * freq * area)
+    return np.asarray(eta, dtype=np.float64)
+
+
+def right_angle_transmission_coefficient(
+    thickness1: float,
+    thickness2: float,
+    *,
+    density1: float,
+    density2: float,
+    wave_speed1: float,
+    wave_speed2: float,
+    incidence: str = "random",
+) -> float:
+    """Right-angle plate junction ``tau12`` (Norton Eqs. 6.53 to 6.55).
+
+    The closed form used throughout the SEA literature for two flat plates
+    coupled at right angles along a line, with no angular integration::
+
+        psi_N = rho1 cL1**1.5 h1**2.5 / (rho2 cL2**1.5 h2**2.5)          (6.54)
+        tau12(0) = 2 (sqrt(psi_N) + 1/sqrt(psi_N))**-2                   (6.53)
+        tau12    = tau12(0) 2,754 X / (1 + 3,24 X),  X = h1/h2            (6.55)
+
+    ``tau12(0)`` is symmetric in the two plates (swapping them inverts
+    ``psi_N``, which the expression does not see); the random-incidence factor
+    is not, so ``tau12`` and ``tau21`` differ. Pass the result to
+    :func:`coupling_loss_factor` with the source plate's group velocity
+    ``cg = 2 cB`` to obtain Norton Eq. (6.52).
+
+    ``rho`` here is the **volume** density in kg/m^3, not the surface density
+    of :func:`junction_wave_parameters`.
+
+    :param thickness1: Thickness ``h1`` of the source plate, in m (> 0).
+    :param thickness2: Thickness ``h2`` of the receiving plate, in m (> 0).
+    :param density1: Density ``rho1`` of the source plate, in kg/m^3 (> 0).
+    :param density2: Density ``rho2`` of the receiving plate, in kg/m^3 (> 0).
+    :param wave_speed1: Quasi-longitudinal wave speed ``cL1``, in m/s (> 0).
+    :param wave_speed2: Quasi-longitudinal wave speed ``cL2``, in m/s (> 0).
+    :param incidence: ``"random"`` (Default, Eq. 6.55) or ``"normal"``
+        (Eq. 6.53 alone).
+    :return: The transmission coefficient ``tau12``.
+    :raises ValueError: for a non-positive input or an unknown incidence.
+    """
+    h_1 = require_positive(thickness1, "thickness1")
+    h_2 = require_positive(thickness2, "thickness2")
+    rho_1 = require_positive(density1, "density1")
+    rho_2 = require_positive(density2, "density2")
+    c_1 = require_positive(wave_speed1, "wave_speed1")
+    c_2 = require_positive(wave_speed2, "wave_speed2")
+    mode = require_choice(incidence, "incidence", ("random", "normal"))
+
+    psi_n = (rho_1 * c_1**1.5 * h_1**2.5) / (rho_2 * c_2**1.5 * h_2**2.5)
+    root = math.sqrt(psi_n)
+    tau_0 = 2.0 / (root + 1.0 / root) ** 2
+    if mode == "normal":
+        return float(tau_0)
+    x = h_1 / h_2
+    return float(tau_0 * 2.754 * x / (1.0 + 3.24 * x))
+
+
+def point_connection_coupling_loss_factor(
+    frequency: ArrayLike,
+    n_connections: int,
+    *,
+    thickness1: float,
+    thickness2: float,
+    surface_density1: float,
+    surface_density2: float,
+    wave_speed1: float,
+    wave_speed2: float,
+    plate_area1: float,
+) -> NDArray[np.float64]:
+    """Coupling loss factor of a point-connected plate pair (Norton Eq. 6.56).
+
+    Two homogeneous plates joined by ``N`` bolts, rivets or spot welds rather
+    than along a continuous line::
+
+                 4 N h1 cL1        A1 A2
+        eta_12 = -------------- ------------ ,   Ai = rho_si**2 hi**2 cLi**2
+                 sqrt(3) w S1   (A1 + A2)**2
+
+    with ``rho_si`` the surface density in kg/m^2, ``w = 2 pi f`` and ``S1``
+    the source-plate area. Norton recommends it when the bending wavelength in
+    the plates is shorter than the length of the connected edge, and the line
+    junction (:func:`coupling_loss_factor` on
+    :func:`right_angle_transmission_coefficient`) when it is longer. The
+    result falls as ``1/f``, unlike the line junction's ``1/sqrt(f)``.
+
+    .. note::
+
+       Equation (6.56) is printed in the book with the ``(A1 + A2)`` bracket
+       *not* squared, which is dimensionally inconsistent (the coupling loss
+       factor would not be dimensionless). The squared form implemented here
+       is the one that reproduces the book's own answer to problem 6.13; see
+       ``docs/ERRATA.md``.
+
+    :param frequency: Band centre frequency ``f``, in hertz (scalar/array, >0).
+    :param n_connections: Number of point connections ``N`` (integer >= 1).
+    :param thickness1: Thickness ``h1`` of the source plate, in m (> 0).
+    :param thickness2: Thickness ``h2`` of the receiving plate, in m (> 0).
+    :param surface_density1: ``rho_s1``, in kg/m^2 (> 0).
+    :param surface_density2: ``rho_s2``, in kg/m^2 (> 0).
+    :param wave_speed1: Quasi-longitudinal wave speed ``cL1``, in m/s (> 0).
+    :param wave_speed2: Quasi-longitudinal wave speed ``cL2``, in m/s (> 0).
+    :param plate_area1: Source-plate area ``S1``, in m^2 (> 0).
+    :return: The coupling loss factor ``eta_12`` per band.
+    :raises ValueError: for a non-positive or non-integer input.
+    """
+    freq = np.asarray(frequency, dtype=np.float64)
+    if np.any(freq <= 0.0):
+        raise ValueError("'frequency' must be positive.")
+    n = int(n_connections)
+    if n < 1:
+        raise ValueError("'n_connections' must be a positive integer.")
+    h_1 = require_positive(thickness1, "thickness1")
+    h_2 = require_positive(thickness2, "thickness2")
+    rs_1 = require_positive(surface_density1, "surface_density1")
+    rs_2 = require_positive(surface_density2, "surface_density2")
+    c_1 = require_positive(wave_speed1, "wave_speed1")
+    c_2 = require_positive(wave_speed2, "wave_speed2")
+    area = require_positive(plate_area1, "plate_area1")
+
+    a_1 = (rs_1 * h_1 * c_1) ** 2
+    a_2 = (rs_2 * h_2 * c_2) ** 2
+    omega = 2.0 * math.pi * freq
+    eta = (
+        4.0 * n * h_1 * c_1 / (math.sqrt(3.0) * omega * area)
+        * a_1 * a_2 / (a_1 + a_2) ** 2
+    )
     return np.asarray(eta, dtype=np.float64)
 
 

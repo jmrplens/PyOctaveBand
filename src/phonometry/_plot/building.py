@@ -24,6 +24,7 @@ from .common import (
     _plot_rating,
     _require_rating_curve,
     format_frequency_axis,
+    theme_fill,
 )
 
 if TYPE_CHECKING:
@@ -70,6 +71,7 @@ _STRINGS: dict[str, str] = {
     "predicted $R$": "$R$ previsto",
     "Sound reduction index $R$ [dB]": "Índice de reducción acústica $R$ [dB]",
     "Predicted sound insulation": "Aislamiento acústico previsto",
+    "coincidence plateau (A to B)": "meseta de coincidencia (A a B)",
     "aperture $R$": "$R$ de abertura",
     "Aperture sound transmission (Gomperts / Wilson-Soroka)": "Transmisión sonora por abertura (Gomperts / Wilson-Soroka)",
     "Sound reduction index [dB]": "Índice de reducción acústica [dB]",
@@ -160,6 +162,14 @@ def plot_sound_reduction(
         ax.axvline(
             result.resonance_frequency, color=_C_SECONDARY, ls="--", lw=1.0,
             label=f"$f_0$ = {format_number(result.resonance_frequency, language, decimals=0)} Hz",
+        )
+    if result.plateau_start is not None and result.plateau_end is not None:
+        # Shade the coincidence plateau of the Watters construction, whose two
+        # construction points A and B are what the whole estimate hangs on.
+        ax.axvspan(
+            result.plateau_start, result.plateau_end,
+            color=theme_fill(_C_SECONDARY, ax), lw=0, zorder=0,
+            label=_t("coincidence plateau (A to B)", language),
         )
     format_frequency_axis(ax, float(freq.min()), float(freq.max()))
     ax.set_xlabel(_t(_FREQ_LABEL, language))

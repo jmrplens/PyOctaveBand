@@ -19,6 +19,7 @@ import numpy as np
 import pytest
 
 from phonometry import (
+    SoundReductionResult,
     coincidence_frequency,
     double_wall_transmission_loss,
     field_incidence_correction,
@@ -223,3 +224,309 @@ def test_plot_language_spanish_and_validation() -> None:
     assert ax_en.get_ylabel() == "Sound reduction index $R$ [dB]"
     with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")
+
+
+# ---------------------------------------------------------------------------
+# Plateau method and Cremer coincidence recovery (Norton & Karczub 2003)
+#
+# M. P. Norton and D. G. Karczub, *Fundamentals of Noise and Vibration Analysis
+# for Engineers* (2nd ed., CUP 2003), Section 3.9.1 (Eqs. 3.104, 3.106, 3.110
+# and Table 3.1), with the published answers to problems 3.11 and 3.14.
+#
+# Clean-room oracle:
+#
+# * **Problem 3.11** (printed p. 580; answer p. 611). An 8 m x 3 m solid brick
+#   wall, 110 mm thick, 2,1 kg/m^2 per mm: printed octave-band TL
+#   35,8 / 37 / 37 / 42,5 / 52,5 / 62,5 / 72,5 dB from 63 Hz to 4 kHz. The
+#   63 Hz value is the field-incidence mass law and the 125/250 Hz values are
+#   the tabulated brick plateau height, so all three are reproduced exactly.
+#   The four values above point B are read off the design chart of Fig. 3.24
+#   and sit 0,8 dB below the analytic construction; what *is* exact there is
+#   the 10 dB per octave slope, which the printed values carry to the digit.
+# * **Problem 3.14** (printed p. 580; answer p. 611). A 20 mm particle-board
+#   panel: printed "diffuse field" TL 6,4 / 12,2 / 18,1 / 24,1 / 30,1 / 36,1 /
+#   42,1 / 48,1 dB from 31,5 Hz to 4 kHz, then 27 dB at 8 kHz and 38,6 dB at
+#   16 kHz. With Norton's Appendix 4 particle board (750 kg/m^3, fc.t =
+#   97,7 m/s) and rho0 c0 = 415 rayl, the first eight follow Eq. (3.104) and
+#   the last two Eq. (3.110). See docs/ERRATA.md for the loss factor.
+#
+# Norton uses rho0 = 1,21 kg/m^3 with c0 = 343 m/s throughout.
+# ---------------------------------------------------------------------------
+
+NORTON_AIR_DENSITY = 1.21
+
+#: Norton octave bands of problem 3.11.
+P311_BANDS = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+#: Printed answer to problem 3.11, in dB.
+P311_TL = np.array([35.8, 37.0, 37.0, 42.5, 52.5, 62.5, 72.5])
+
+#: Norton octave bands of problem 3.14.
+P314_BANDS = np.array(
+    [31.5, 63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0, 16000.0]
+)
+#: Printed "diffuse field" answer to problem 3.14, in dB.
+P314_TL = np.array([6.4, 12.2, 18.1, 24.1, 30.1, 36.1, 42.1, 48.1, 27.0, 38.6])
+
+
+def _brick_wall() -> SoundReductionResult:
+    from phonometry import plateau_transmission_loss
+
+    return plateau_transmission_loss(
+        P311_BANDS, material="brick", thickness_mm=110.0,
+        air_density=NORTON_AIR_DENSITY,
+    )
+
+
+#: Printed Table 3.1 (p. 241) in full: surface density in kg/m^2 per mm of
+#: thickness, coincidence plateau height in dB, and the frequency ratio B/A.
+#: The table *is* the feature, so every row is pinned, not just a sample.
+NORTON_TABLE_31 = {
+    "aluminium": (2.66, 29.0, 11.0),
+    "brick": (2.10, 37.0, 4.5),
+    "concrete": (2.28, 38.0, 4.5),
+    "glass": (2.47, 27.0, 10.0),
+    "lead": (11.20, 56.0, 4.0),
+    "plaster": (1.71, 30.0, 8.0),
+    "plywood": (0.57, 19.0, 6.5),
+    "steel": (7.60, 40.0, 11.0),
+}
+
+
+def test_plateau_table_matches_norton_table_31() -> None:
+    # Table 3.1: surface density per mm, plateau height and the B/A ratio of
+    # the eight tabulated materials, transcribed from the printed table. The
+    # whole mapping is compared, so neither a corrupted number nor an extra
+    # material can slip through.
+    from phonometry import PLATEAU_MATERIALS
+
+    assert PLATEAU_MATERIALS == NORTON_TABLE_31
+
+
+@pytest.mark.parametrize(("material", "row"), sorted(NORTON_TABLE_31.items()))
+def test_plateau_table_row_matches_the_printed_row(
+    material: str, row: tuple[float, float, float]
+) -> None:
+    # One case per material, so a corrupted row names itself in the failure.
+    from phonometry import PLATEAU_MATERIALS
+
+    assert PLATEAU_MATERIALS[material] == row
+
+
+def test_plateau_problem_311_mass_law_and_plateau_exactly() -> None:
+    # 63 Hz sits on the field-incidence mass law and 125/250 Hz on the brick
+    # plateau: all three reproduce the printed answer digit for digit.
+    res = _brick_wall()
+    np.testing.assert_allclose(res.transmission_loss[:3], P311_TL[:3], atol=0.05)
+    assert res.model == "plateau"
+    assert res.plateau_height == 37.0
+
+
+def test_plateau_problem_311_recovery_slope_is_exactly_10_db_per_octave() -> None:
+    # Above point B the printed answers rise by exactly 10 dB per octave; so
+    # does the construction, and the two agree to within the 0,8 dB offset of
+    # reading Fig. 3.24 by eye.
+    res = _brick_wall()
+    above = res.transmission_loss[3:]
+    np.testing.assert_allclose(np.diff(above), 10.0, atol=1e-9)
+    np.testing.assert_allclose(np.diff(P311_TL[3:]), 10.0, atol=1e-9)
+    np.testing.assert_allclose(above, P311_TL[3:], atol=1.0)
+
+
+def test_plateau_construction_points() -> None:
+    # Point A is where the mass-law line reaches the plateau height and point B
+    # is B/A times higher, so the whole plateau spans exactly the tabulated
+    # frequency ratio and its two ends sit at the plateau height.
+    res = _brick_wall()
+    assert res.plateau_start is not None and res.plateau_end is not None
+    assert res.plateau_end / res.plateau_start == pytest.approx(4.5, rel=1e-12)
+    mass_law = mass_law_transmission_loss(
+        res.plateau_start, 231.0, incidence="field", field_correction=5.0,
+        air_density=NORTON_AIR_DENSITY,
+    )
+    assert float(mass_law) == pytest.approx(37.0, abs=1e-9)
+
+
+def test_plateau_degenerates_to_the_mass_law_below_point_a() -> None:
+    # Well below the plateau the estimate *is* the field-incidence mass law:
+    # 6 dB per octave and 6 dB per doubling of surface mass.
+    from phonometry import plateau_transmission_loss
+
+    low = np.array([20.0, 40.0])
+    res = plateau_transmission_loss(
+        low, material="brick", thickness_mm=110.0, air_density=NORTON_AIR_DENSITY,
+    )
+    reference = mass_law_transmission_loss(
+        low, 231.0, incidence="field", field_correction=5.0,
+        air_density=NORTON_AIR_DENSITY,
+    )
+    np.testing.assert_allclose(res.transmission_loss, reference, rtol=1e-12)
+    assert res.transmission_loss[1] - res.transmission_loss[0] == pytest.approx(
+        6.0, abs=0.05
+    )
+
+
+def test_plateau_explicit_panel_matches_the_table() -> None:
+    # Giving the three plateau numbers by hand must equal the tabulated route.
+    from phonometry import plateau_transmission_loss
+
+    by_table = _brick_wall()
+    by_hand = plateau_transmission_loss(
+        P311_BANDS, mass_per_area=2.10 * 110.0, plateau_height=37.0,
+        frequency_ratio=4.5, air_density=NORTON_AIR_DENSITY,
+    )
+    np.testing.assert_allclose(
+        by_hand.transmission_loss, by_table.transmission_loss, rtol=1e-12
+    )
+
+
+@pytest.mark.parametrize(("material", "row"), sorted(NORTON_TABLE_31.items()))
+def test_plateau_construction_uses_every_column_of_the_named_row(
+    material: str, row: tuple[float, float, float]
+) -> None:
+    # The named route must read all three columns of its own row: the surface
+    # density feeds the mass-law line (hence point A), the plateau height is
+    # reported as such, and the B/A ratio places point B.
+    from phonometry import plateau_transmission_loss
+
+    density_per_mm, height, ratio = row
+    thickness_mm = 10.0
+    bands = np.array([31.5, 63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+    res = plateau_transmission_loss(
+        bands, material=material, thickness_mm=thickness_mm,
+        air_density=NORTON_AIR_DENSITY,
+    )
+    assert res.plateau_height == height
+    assert res.plateau_end == pytest.approx(ratio * res.plateau_start, rel=1e-12)
+    # Point A is where the field-incidence mass law of this row's surface
+    # density reaches the plateau height, so the two must agree there.
+    at_a = mass_law_transmission_loss(
+        np.array([res.plateau_start]), density_per_mm * thickness_mm,
+        incidence="field", field_correction=5.0,
+        air_density=NORTON_AIR_DENSITY,
+    )
+    assert at_a[0] == pytest.approx(height, abs=1e-9)
+
+
+def test_cremer_problem_314_printed_answers() -> None:
+    # Field-incidence mass law below fc (Eq. 3.104) and Cremer's Eq. (3.110)
+    # above it, against the printed "diffuse field" column of problem 3.14.
+    res = single_panel_transmission_loss(
+        P314_BANDS, 750.0 * 0.020, critical_frequency=97.7 / 0.020,
+        loss_factor=1.5e-3, coincidence_model="cremer", field_correction=5.0,
+        air_density=NORTON_AIR_DENSITY,
+    )
+    assert res.model == "cremer-single"
+    np.testing.assert_allclose(res.transmission_loss, P314_TL, atol=0.1)
+
+
+def test_cremer_is_floored_at_the_coincidence_frequency() -> None:
+    # Eq. (3.110) is singular at f = fc. Eq. (3.109) covers that band: at the
+    # critical frequency theta_CO = 90 deg and the panel "offers no resistance
+    # to incident sound waves", tau = 1, TL = 0 dB. A passive panel can never
+    # do worse, so no band may report tau > 1.
+    fc = 2000.0
+    res = single_panel_transmission_loss(
+        np.array([0.999 * fc, fc, 1.0005 * fc, 1.05 * fc]), 15.0,
+        critical_frequency=fc, loss_factor=0.01, coincidence_model="cremer",
+    )
+    assert res.transmission_loss[1] == 0.0
+    assert np.all(res.transmission_loss >= 0.0)
+    assert np.all(res.transmission_coefficient <= 1.0)
+    # Just above the floor the empirical line is back in charge and rising.
+    assert res.transmission_loss[3] == pytest.approx(12.6, abs=0.5)
+
+
+def test_cremer_rises_ten_db_per_octave_far_above_coincidence() -> None:
+    # Eq. (3.110) adds 6 dB/octave of mass law to 10 lg(f/fc - 1), which tends
+    # to 3 dB/octave far above fc, hence the 10 dB/octave Norton quotes.
+    fc = 500.0
+    f = fc * np.array([64.0, 128.0])
+    res = single_panel_transmission_loss(
+        f, 15.0, critical_frequency=fc, loss_factor=0.01,
+        coincidence_model="cremer",
+    )
+    assert np.diff(res.transmission_loss)[0] == pytest.approx(9.0, abs=0.15)
+
+
+def test_plateau_and_physical_model_agree_in_the_mass_law_region() -> None:
+    # The whole point of the plateau shortcut: below coincidence it is the same
+    # curve as the physical model, and it only replaces the coincidence dip.
+    from phonometry import plateau_transmission_loss
+
+    thickness_mm, fc = 6.0, 2033.0  # 6 mm glass, Norton problem 3.13
+    mass = 2.47 * thickness_mm
+    low = np.array([125.0, 250.0])
+    quick = plateau_transmission_loss(
+        low, material="glass", thickness_mm=thickness_mm, field_correction=5.5,
+    )
+    physical = single_panel_transmission_loss(
+        low, mass, critical_frequency=fc, loss_factor=0.02,
+    )
+    np.testing.assert_allclose(
+        quick.transmission_loss, physical.transmission_loss, atol=0.3
+    )
+
+
+def test_plateau_plot_shades_the_coincidence_plateau() -> None:
+    res = _brick_wall()
+    ax = res.plot()
+    labels = [t.get_text() for t in ax.get_legend().get_texts()]
+    assert any("plateau" in label for label in labels)
+    ax_es = res.plot(language="es")
+    labels_es = [t.get_text() for t in ax_es.get_legend().get_texts()]
+    assert any("meseta" in label for label in labels_es)
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"material": "granite", "thickness_mm": 100.0},
+        {"material": "brick"},
+        {"mass_per_area": 231.0, "plateau_height": 37.0},
+        {"mass_per_area": 231.0, "plateau_height": 37.0, "frequency_ratio": 1.0},
+        {"mass_per_area": -1.0, "plateau_height": 37.0, "frequency_ratio": 4.5},
+        {"mass_per_area": 231.0, "plateau_height": 0.0, "frequency_ratio": 4.5},
+    ],
+)
+def test_plateau_validation(kwargs: dict[str, object]) -> None:
+    from phonometry import plateau_transmission_loss
+
+    with pytest.raises(ValueError):
+        plateau_transmission_loss(P311_BANDS, **kwargs)  # type: ignore[arg-type]
+
+
+def test_plateau_rejects_a_height_that_underflows_point_a() -> None:
+    # Point A inverts 10 lg(1 + (pi f m''/rho0 c0)^2) = height + correction.
+    # A plateau height so small that 10**((height + correction)/10) rounds to
+    # exactly 1.0 leaves nothing to invert and would put point A at 0 Hz, i.e.
+    # the whole spectrum on the plateau. The guard is what stops that.
+    from phonometry import plateau_transmission_loss
+
+    with pytest.raises(ValueError, match="sits below the mass law"):
+        plateau_transmission_loss(
+            P311_BANDS, mass_per_area=231.0, plateau_height=1e-300,
+            frequency_ratio=4.5, field_correction=0.0,
+        )
+
+
+def test_plateau_rejects_bad_frequency_axis() -> None:
+    from phonometry import plateau_transmission_loss
+
+    with pytest.raises(ValueError, match="must be positive"):
+        plateau_transmission_loss(
+            [100.0, -1.0], material="brick", thickness_mm=110.0
+        )
+    with pytest.raises(ValueError, match="non-empty"):
+        plateau_transmission_loss([], material="brick", thickness_mm=110.0)
+
+
+def test_negative_field_correction_rejected() -> None:
+    with pytest.raises(ValueError, match="non-negative"):
+        mass_law_transmission_loss(500.0, 15.0, field_correction=-1.0)
+
+
+def test_unknown_coincidence_model_rejected() -> None:
+    with pytest.raises(ValueError):
+        single_panel_transmission_loss(
+            BANDS, 15.0, critical_frequency=2000.0, coincidence_model="watters"
+        )

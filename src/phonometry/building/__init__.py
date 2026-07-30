@@ -137,11 +137,13 @@ from .lab_insulation import (
     lab_impact_insulation,
 )
 from .panel_transmission import (
+    PLATEAU_MATERIALS,
     SoundReductionResult,
     double_wall_transmission_loss,
     field_incidence_correction,
     mass_law_transmission_loss,
     mass_spring_mass_resonance,
+    plateau_transmission_loss,
     single_panel_transmission_loss,
 )
 from .spanish_building_code import (
@@ -195,6 +197,7 @@ __all__ = [
     "COVERAGE_FACTORS",
     "DB_HR_FREQUENCIES",
     "DB_HR_NORMALISED_SPECTRA",
+    "PLATEAU_MATERIALS",
     "REFERENCE_AREA",
     "AirborneInsulationResult",
     "AirbornePredictionResult",
@@ -304,6 +307,7 @@ __all__ = [
     "outdoor_attenuation",
     "outdoor_level",
     "plate_loss_factor",
+    "plateau_transmission_loss",
     "plot_aperture_geometry",
     "plot_double_wall_geometry",
     "plot_facade_elements",

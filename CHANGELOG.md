@@ -9,6 +9,78 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Kinematic machine fault frequencies (`vibration/machine_diagnostics.py`,
+  Norton & Karczub 2003 Section 8.4): `bearing_fault_frequencies` returns the
+  seven rolling-contact bearing lines after Shahan and Kamperman (shaft, cage
+  and its relative rate, rolling-element rotation and spin, and the outer- and
+  inner-race element pass frequencies BPFO and BPFI, Eqs. 8.4 to 8.14);
+  `gear_mesh_frequencies` the mesh frequency, its harmonics and their sideband
+  families (Eq. 8.3); `induction_motor_frequencies` the supply, slip,
+  pole-pass and rotor-slot harmonic lines with their eccentricity sidebands
+  (Eqs. 8.19 and 8.20); and `blade_pass_frequencies` the blade-passing tones
+  of a fan, blower or pump together with the lobed interaction patterns of a
+  ducted axial fan (Eqs. 8.15 to 8.18), named `lobe n=1 m=2` after the blade
+  harmonic and the lobe count, since Eq. (8.17) carries `n` and the same lobe
+  count reached from another harmonic turns at another speed. The
+  `FaultFrequencyResult` carrier selects lines by name, in shaft orders or by
+  frequency span, merges families with `combine_fault_lines`, and its
+  `.plot(spectrum=...)` draws the predicted lines over a measured envelope
+  spectrum, closing the loop with the existing `envelope_spectrum`, `cepstrum`
+  and `time_synchronous_average` chain. Anchored on the printed answers to
+  Norton's problems 8.5 (BPFO 207 Hz, BPFI 293 Hz), 8.6 and 8.7, plus the
+  exact identities `BPFO + BPFI = Z fs` and `BPFO = Z x FTF`. New guide
+  "Machine fault frequencies" with the bearing-fault envelope figure, in
+  English and Spanish.
+
+- Experimental statistical energy analysis (`vibration/experimental_sea.py`,
+  Norton & Karczub 2003 Sections 6.3.3, 6.3.4 and 6.4.1):
+  `power_injection_clf` inverts the steady-state two-subsystem power balance
+  from measured band energies, giving both coupling loss factors through the
+  consistency relationship and the injected power (Eqs. 6.8, 6.10, 6.11 and
+  6.15), and `power_injection_matrix` solves the full two-drive power-injection
+  problem for all four loss factors with no reciprocity assumed, leaving it as
+  a check on the measurement. The modal densities the inversion needs come with
+  it: `bar_modal_density`, `beam_modal_density`, `flat_plate_modal_density`,
+  `ring_frequency` and `cylindrical_shell_modal_density` (Eqs. 6.23 to 6.29).
+  `PowerInjectionResult` reports the transmitted, dissipated and input powers,
+  the coupling strength and the implied modal-density ratio, and plots the
+  loss-factor budget. Anchored on the printed answer to Norton's problem 6.10
+  (eta12 = 4.26e-4, eta21 = 3.92e-4, 1.31 W).
+
+- Two closed-form junction coupling loss factors in
+  `vibration/junction_transmission.py`: `right_angle_transmission_coefficient`
+  (Norton Eqs. 6.53 to 6.55, the normal- and random-incidence coefficient of
+  two plates meeting at right angles, which reproduces Norton Eq. 6.52 when fed
+  to the existing `coupling_loss_factor`) and
+  `point_connection_coupling_loss_factor` (Eq. 6.56, plates joined at N bolts,
+  rivets or spot welds, falling as 1/f instead of the line junction's
+  1/sqrt(f)). Both anchored on the printed eta12 columns of Norton's problem
+  6.13. New "Experimental SEA" section and comparison figure in the
+  plate-junction guide, in English and Spanish.
+
+- Plateau-method transmission-loss estimate (`plateau_transmission_loss`,
+  `PLATEAU_MATERIALS` in `building/panel_transmission.py`, Norton & Karczub
+  2003 Section 3.9.1 and Table 3.1): the Watters construction of a
+  field-incidence mass law, a horizontal coincidence plateau between points A
+  and B set by the material's tabulated height and frequency ratio, and a 10
+  dB per octave recovery above B, for the eight tabulated materials or an
+  explicit panel. The result carries its plateau height and the two
+  construction frequencies, and `.plot()` shades the plateau with a
+  background-aware wash. `single_panel_transmission_loss` gains
+  `coincidence_model="cremer"` (Norton Eq. 3.110) alongside the existing Sharp
+  model, floored at `TL = 0 dB`, which is the value Eq. (3.109) gives at the
+  critical frequency itself and the hard bound of a passive panel; and both it
+  and `mass_law_transmission_loss` accept an explicit `field_correction`.
+  Anchored on the printed answers to Norton's problems 3.11 and 3.14. New
+  plateau-versus-physical comparison figure in the panel insulation guide, in
+  English and Spanish.
+
+- Four entries in `docs/ERRATA.md` for Norton & Karczub (2003): the missing
+  square in the denominator of Eq. (6.56), the plate areas dropped from the
+  reciprocity step of the problem 6.13 answer, the platform area of problem
+  6.10 that its own answers contradict, and the structural loss factor of
+  problem 3.14 that is a decade away from the value its answers require.
+
 - Normal modes of a rectangular room (`room/room_modes.py`): `room_modes`
   enumerates every eigenfrequency of a rigid-walled shoebox up to a limit,
   sorted and classified as axial, tangential or oblique, and the pieces

@@ -84,6 +84,7 @@ export const sidebar = [
           'guides/time-frequency',
           'guides/cepstrum-echoes',
           'guides/synchronous-averaging',
+          'guides/machine-diagnostics',
           'guides/correlation-delay',
           'guides/test-signals',
           'guides/system-measurement',

@@ -141,6 +141,7 @@ mass_law_transmission_loss(
     *,
     incidence: str = 'field',
     band: str = 'third',
+    field_correction: float | None = None,
     speed_of_sound: float = 343.0,
     air_density: float = 1.205,
 ) -> np.ndarray
@@ -149,7 +150,10 @@ mass_law_transmission_loss(
 Mass-law transmission loss of a limp panel (Bies Eq. 7.40/7.42).
 
 `TL_normal = 10 lg(1 + (pi f m'' / rho0 c0)**2)`; the field-incidence
-value subtracts the band correction of [`field_incidence_correction`](/phonometry/reference/api/building/panel-transmission/#field_incidence_correction).
+value subtracts the band correction of [`field_incidence_correction`](/phonometry/reference/api/building/panel-transmission/#field_incidence_correction),
+or the explicit *field_correction* when one is given (Norton & Karczub
+Eq. 3.106 uses a flat 5 dB, the line [`plateau_transmission_loss`](/phonometry/reference/api/building/panel-transmission/#plateau_transmission_loss)
+builds its estimate on).
 
 **Parameters**
 
@@ -159,6 +163,7 @@ value subtracts the band correction of [`field_incidence_correction`](/phonometr
 | `mass_per_area` | Mass per unit area `m''`, in kg/m^2 (> 0). |
 | `incidence` | `"normal"` or `"field"` (Default: `"field"`). |
 | `band` | Band width for the field correction (`"third"`/`"octave"`). |
+| `field_correction` | Explicit field-incidence correction, in dB (>= 0), overriding the band table (Default: `None`). |
 | `speed_of_sound` | Speed of sound in air `c0` (Default: 343 m/s). |
 | `air_density` | Air density `rho0` (Default: 1.205 kg/m^3). |
 
@@ -211,6 +216,78 @@ softer `s'' = Re(K_e) / d`, lowering `f0`.
 | :--- | :--- |
 | ValueError | for a non-positive input. |
 
+## PLATEAU_MATERIALS
+
+*Constant* (`dict`).
+
+```python
+PLATEAU_MATERIALS = {'aluminium': (2.66, 29.0, 11.0), 'brick': (2.1, 37.0, 4.5), 'concrete': (2.28, 38.0, 4.5), 'glass': (2.47, 27.0, 10.0), 'lead': (11.2, 56.0, 4.0), 'plaster': (1.71, 30.0, 8.0), 'plywood': (0.57, 19.0, 6.5), 'steel': (7.6, 40.0, 11.0)}
+```
+
+## plateau_transmission_loss
+
+```python
+plateau_transmission_loss(
+    frequency: ArrayLike,
+    *,
+    material: str | None = None,
+    thickness_mm: float | None = None,
+    mass_per_area: float | None = None,
+    plateau_height: float | None = None,
+    frequency_ratio: float | None = None,
+    field_correction: float = 5.0,
+    speed_of_sound: float = 343.0,
+    air_density: float = 1.205,
+) -> SoundReductionResult
+```
+
+Plateau-method estimate of a single panel's TL (Norton 3.9.1).
+
+The plateau (Watters) construction is the empirical shortcut practitioners
+draw by hand, and it approximates the whole curve from three numbers per
+material (Norton & Karczub Table 3.1, tabulated in
+[`PLATEAU_MATERIALS`](/phonometry/reference/api/building/panel-transmission/#plateau_materials)):
+
+1. the **field-incidence mass law** `TL = 10 lg(1 + (pi f m''/rho0 c0)^2)
+   - 5` (Eqs. 3.104/3.106), rising 6 dB per octave;
+2. a horizontal **coincidence plateau** at the material's plateau height;
+   point **A** is where the mass-law line reaches it;
+3. point **B** at `frequency_ratio x fA`, above which the estimate
+   recovers at **10 dB per octave**.
+
+Unlike the physical model of [`single_panel_transmission_loss`](/phonometry/reference/api/building/panel-transmission/#single_panel_transmission_loss) it
+needs neither the bending stiffness nor the loss factor: the material's
+tabulated plateau absorbs both. The price is that it is only an estimate,
+and it assumes a diffuse field on both sides of a panel whose length and
+width are at least twenty times its thickness.
+
+Give a tabulated *material* with its *thickness_mm* (the surface density
+then follows from the table), or give *mass_per_area* together with
+*plateau_height* and *frequency_ratio*. An explicit *mass_per_area*,
+*plateau_height* or *frequency_ratio* always overrides the table.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `frequency` | Band centre frequencies `f`, in hertz (array, > 0). |
+| `material` | Key into [`PLATEAU_MATERIALS`](/phonometry/reference/api/building/panel-transmission/#plateau_materials) (Default: `None`). |
+| `thickness_mm` | Panel thickness, in **millimetres** (> 0), used with *material* to get the surface density. |
+| `mass_per_area` | Mass per unit area `m''`, in kg/m^2 (> 0). |
+| `plateau_height` | Coincidence plateau height, in dB (> 0). |
+| `frequency_ratio` | Ratio `B/A` locating the 10 dB/octave recovery (> 1). |
+| `field_correction` | Field-incidence correction of the mass-law line, in dB (Default: 5,0, Norton Eq. 3.106). |
+| `speed_of_sound` | Speed of sound in air `c0` (Default: 343 m/s). |
+| `air_density` | Air density `rho0` (Default: 1.205 kg/m^3). |
+
+**Returns:** A [`SoundReductionResult`](/phonometry/reference/api/building/panel-transmission/#soundreductionresult) (model `"plateau"`) carrying [`plateau_height`](/phonometry/reference/api/building/panel-transmission/#soundreductionresult), [`plateau_start`](/phonometry/reference/api/building/panel-transmission/#soundreductionresult) (point A) and [`plateau_end`](/phonometry/reference/api/building/panel-transmission/#soundreductionresult) (point B).
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for a non-positive input, an unknown material, or an under-specified panel. |
+
 ## plot_double_wall_geometry
 
 ```python
@@ -257,6 +334,8 @@ single_panel_transmission_loss(
     bending_stiffness: float | None = None,
     loss_factor: float = 0.01,
     band: str = 'third',
+    coincidence_model: str = 'sharp',
+    field_correction: float | None = None,
     speed_of_sound: float = 343.0,
     air_density: float = 1.205,
 ) -> SoundReductionResult
@@ -266,6 +345,24 @@ Sound reduction index of a single panel, Sharp's method (Bies 7.2.4.1).
 
 Field-incidence mass law up to `fc/2`, Eq. 7.44 from `fc` upwards, and a
 straight line in `log10 f` across the coincidence region between them.
+
+With `coincidence_model="cremer"` the region above `fc` follows Cremer's
+empirical relationship instead (Norton & Karczub Eq. 3.110),
+
+`TL = TL_0 + 10 lg(f/fc - 1) + 10 lg(eta) - 2 dB`,
+
+which also rises at 10 dB per octave far above coincidence but starts from
+the singularity at `fc` itself rather than from a finite value. Norton
+pairs it with the field-incidence mass law below `fc` and treats the two
+as the whole model, so there is no interpolated bridge: the mass law runs
+all the way to `fc`.
+
+The empirical line is floored at `TL = 0 dB`, which is where it lands at
+`f = fc`: Norton's Eq. (3.109) has `theta_CO = 90 degrees` there and the
+panel "offers no resistance to incident sound waves", `tau = 1`. It is
+also the hard bound of a passive panel, so without the floor a band centre
+landing on `fc` would report an arbitrarily large negative TL and a
+transmission coefficient above one.
 
 Provide the coincidence frequency directly through *critical_frequency*, or
 let it be computed from *bending_stiffness* and *mass_per_area* through
@@ -281,16 +378,18 @@ let it be computed from *bending_stiffness* and *mass_per_area* through
 | `bending_stiffness` | Bending stiffness per unit width `B'`, in N.m, used to compute `fc` when *critical_frequency* is not given. |
 | `loss_factor` | Total loss factor `eta` (> 0, Default: 0.01). |
 | `band` | Band width for the field correction (`"third"`/`"octave"`). |
+| `coincidence_model` | `"sharp"` (Default, Bies Eq. 7.44 above `fc` with the interpolated bridge from `fc/2`) or `"cremer"` (Norton Eq. 3.110, mass law right up to `fc`). |
+| `field_correction` | Explicit field-incidence correction of the mass-law region, in dB (>= 0), overriding the band table (Default: `None`; Norton's Eq. 3.106 uses a flat 5 dB). |
 | `speed_of_sound` | Speed of sound in air `c0` (Default: 343 m/s). |
 | `air_density` | Air density `rho0` (Default: 1.205 kg/m^3). |
 
-**Returns:** A [`SoundReductionResult`](/phonometry/reference/api/building/panel-transmission/#soundreductionresult) (model `"sharp-single"`).
+**Returns:** A [`SoundReductionResult`](/phonometry/reference/api/building/panel-transmission/#soundreductionresult) (model `"sharp-single"` or `"cremer-single"`).
 
 **Raises**
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | for a non-positive input, or if neither *critical_frequency* nor *bending_stiffness* is given. |
+| ValueError | for a non-positive input, an unknown coincidence model, or if neither *critical_frequency* nor *bending_stiffness* is given. |
 
 ## SoundReductionResult
 
@@ -304,6 +403,9 @@ SoundReductionResult(
     mass1: float | None = None,
     mass2: float | None = None,
     gap: float | None = None,
+    plateau_height: float | None = None,
+    plateau_start: float | None = None,
+    plateau_end: float | None = None,
 )
 ```
 
@@ -321,6 +423,9 @@ Predicted airborne sound reduction index `R(f)` of a construction.
 | `mass1` | First-leaf surface density, in kg/m2, retained (with `mass2` and `gap`) by the double-wall constructor so `plot_geometry` can draw the section; `None` otherwise. |
 | `mass2` | Second-leaf surface density, in kg/m2, or `None`. |
 | `gap` | Cavity depth, in metres, or `None`. |
+| `plateau_height` | Height of the coincidence plateau, in dB, or `None` (only the plateau model sets these three). |
+| `plateau_start` | Frequency of point A, where the mass-law line meets the plateau, in hertz, or `None`. |
+| `plateau_end` | Frequency of point B, where the 10 dB/octave recovery starts, in hertz, or `None`. |
 
 ### SoundReductionResult.plot()
 

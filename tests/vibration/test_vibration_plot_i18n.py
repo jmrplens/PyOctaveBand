@@ -95,3 +95,114 @@ def test_unknown_language_raises() -> None:
     result = _result()
     with pytest.raises(ValueError, match="Unknown language"):
         result.plot(language="xx")
+
+
+def test_fault_frequency_overlay_labels() -> None:
+    """The fault-line overlay localises its axes, title and family legend."""
+    pytest.importorskip("matplotlib")
+    import matplotlib
+
+    matplotlib.use("Agg")
+    from phonometry import bearing_fault_frequencies
+
+    res = bearing_fault_frequencies(2000.0, 15, 6.0, 34.0,
+                                    contact_angle_deg=12.96)
+
+    ax_en = res.plot()
+    assert ax_en.get_xlabel() == "Frequency [Hz]"
+    assert "rolling-contact bearing" in ax_en.get_title()
+    assert ax_en.get_ylabel() == "Predicted fault line"
+    labels_en = [t.get_text() for t in ax_en.get_legend().get_texts()]
+    assert {"shaft", "bearing"} <= set(labels_en)
+
+    ax_es = res.plot(language="es")
+    assert ax_es.get_xlabel() == "Frecuencia [Hz]"
+    assert "rodamiento de contacto rodante" in ax_es.get_title()
+    labels_es = [t.get_text() for t in ax_es.get_legend().get_texts()]
+    assert {"eje", "rodamiento"} <= set(labels_es)
+
+    with pytest.raises(ValueError, match="Unknown language"):
+        res.plot(language="xx")
+
+
+def test_fault_frequency_overlay_on_a_measured_spectrum() -> None:
+    """With a spectrum the curve is drawn underneath and named."""
+    pytest.importorskip("matplotlib")
+    import matplotlib
+
+    matplotlib.use("Agg")
+    from phonometry import bearing_fault_frequencies, envelope_spectrum
+
+    res = bearing_fault_frequencies(2000.0, 15, 6.0, 34.0,
+                                    contact_angle_deg=12.96)
+    fs = 8192.0
+    t = np.arange(int(fs)) / fs
+    signal = (1.0 + 0.5 * np.cos(2.0 * np.pi * res["BPFO"] * t)) * np.cos(
+        2.0 * np.pi * 2000.0 * t)
+    spectrum = envelope_spectrum(signal, fs)
+
+    ax = res.plot(spectrum=spectrum, max_frequency=600.0)
+    assert ax.get_ylabel() == "Envelope amplitude"
+    assert ax.get_xlim() == (0.0, 600.0)
+    labels = [t_.get_text() for t_ in ax.get_legend().get_texts()]
+    assert "envelope spectrum" in labels
+
+    empty = res.within(1.0e6, 2.0e6)
+    with pytest.raises(ValueError, match="no fault lines"):
+        empty.plot()
+
+
+def test_crowded_fault_labels_do_not_overlap() -> None:
+    """Names of nearby lines are pushed apart instead of stacking up.
+
+    On a wide axis the low-frequency bearing lines (FTF 13,8 Hz, FTF_rel
+    19,5 Hz and the 33,3 Hz shaft) fall within a few points of each other and
+    their rotated labels used to be drawn on top of one another.
+    """
+    pytest.importorskip("matplotlib")
+    import matplotlib
+
+    matplotlib.use("Agg")
+    from phonometry import bearing_fault_frequencies
+    from phonometry._plot.vibration import _LABEL_WIDTH_PT, _label_offsets
+
+    res = bearing_fault_frequencies(2000.0, 15, 6.0, 34.0,
+                                    contact_angle_deg=12.96)
+    ax = res.plot(max_frequency=1200.0)
+    assert len(ax.texts) == len(res.lines)
+
+    # Every label must clear the previous one across the axis.
+    width_pt, f_max = 450.0, 1200.0
+    freqs = [line.frequency for line in res.lines]
+    offsets = _label_offsets(freqs, f_max, width_pt)
+    placed = sorted(
+        f * width_pt / f_max + offsets[i] for i, f in enumerate(freqs)
+    )
+    assert min(np.diff(placed)) >= _LABEL_WIDTH_PT - 1e-9
+    # An isolated line keeps its label where it was: BPFI has no near neighbour.
+    assert offsets[freqs.index(res["BPFI"])] == pytest.approx(2.0)
+
+
+def test_power_injection_labels() -> None:
+    """The SEA loss-factor budget localises its axes and title."""
+    pytest.importorskip("matplotlib")
+    import matplotlib
+
+    matplotlib.use("Agg")
+    from phonometry import power_injection_clf
+
+    f = np.array([250.0, 500.0, 1000.0])
+    res = power_injection_clf(f, 0.087, 0.013, 4.4e-3, 2.4e-3, 0.557, 0.606)
+
+    ax_en = res.plot()
+    assert ax_en.get_xlabel() == "Frequency [Hz]"
+    assert ax_en.get_ylabel() == "Loss factor"
+    assert "single-drive" in ax_en.get_title()
+
+    ax_es = res.plot(language="es")
+    assert ax_es.get_xlabel() == "Frecuencia [Hz]"
+    assert ax_es.get_ylabel() == "Factor de pérdidas"
+    assert "excitación única" in ax_es.get_title()
+
+    with pytest.raises(ValueError, match="Unknown language"):
+        res.plot(language="xx")

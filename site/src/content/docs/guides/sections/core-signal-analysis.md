@@ -106,6 +106,11 @@ and carrying its statistical quality.
   the comb filter that describes it in the frequency domain, the square-root
   noise-reduction law, and the choice of the number of averages that places a
   comb node on an interfering order (McFadden 1987).
+- [Machine fault frequencies](/phonometry/guides/machine-diagnostics/):
+  the kinematic fault-frequency families of rotating machinery (Norton &
+  Karczub Section 8.4) drawn on top of a measured envelope spectrum: bearing
+  BPFO, BPFI, BSF and cage frequencies, gear-mesh sidebands, induction-motor
+  slip, pole-pass and rotor-slot harmonics, and blade-passing tones.
 - [Correlation, time delay and envelope](/phonometry/guides/correlation-delay/):
   correlation estimates with the Bendat & Piersol random errors, time-delay
   estimation by direct correlation, cross-spectrum phase slope and the

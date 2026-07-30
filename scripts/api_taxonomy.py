@@ -176,6 +176,8 @@ _SECTION_LIST: tuple[Section, ...] = (
             "phonometry.vibration.point_mobility",
             "phonometry.vibration.radiation_efficiency",
             "phonometry.vibration.junction_transmission",
+            "phonometry.vibration.experimental_sea",
+            "phonometry.vibration.machine_diagnostics",
             "phonometry.vibration.transfer_stiffness",
             "phonometry.vibration.human_vibration",
             "phonometry.vibration.multiple_shock_vibration",

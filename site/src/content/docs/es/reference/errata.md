@@ -960,6 +960,99 @@ to the issuing body, with date and reference).
   and the conformance check "Long 2e Eqs. 13.27-13.33".
 - **Status:** unreported (textbook rather than a standard).
 
+## Norton & Karczub, Fundamentals of Noise and Vibration Analysis for Engineers 2e (2003), Eq. (6.56)
+
+- **Location:** Section 6.6.1, Eq. (6.56), the coupling loss factor of two
+  homogeneous plates joined by ``N`` point connections (printed p. 418).
+- **The print:** the denominator bracket
+  ``(rho_s1^2 h1^2 cL1^2 + rho_s2^2 h2^2 cL2^2)`` appears to the first power.
+- **The problem:** as printed the expression is not dimensionless. The
+  prefactor ``4 N h1 cL1 / (sqrt(3) omega S1)`` already has the dimensions of
+  ``m^2 s^-1`` over ``m^2 s^-1``, i.e. unity, so the remaining ratio of the two
+  bracketed products must be dimensionless too. That requires the sum to be
+  squared, ``A1 A2 / (A1 + A2)^2``.
+- **Evidence:** the book's own answer to problem 6.13 (printed p. 617). With
+  the squared denominator the twelve-bolt aluminium pair gives
+  eta_12 = 1,43·10⁻² at 125 Hz against the printed 1,44·10⁻², and matches the
+  whole 125 Hz to 2 kHz column to better than 0,7 %; with the printed
+  (unsquared) denominator the result is not a loss factor at all.
+- **Library behaviour:** `point_connection_coupling_loss_factor` in
+  [`junction_transmission.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/vibration/junction_transmission.py)
+  implements the squared form, with the printed column pinned by a regression
+  test ([`tests/vibration/test_junction_transmission.py`](https://github.com/jmrplens/phonometry/blob/main/tests/vibration/test_junction_transmission.py))
+  and a note at the formula.
+- **Status:** unreported (textbook rather than a standard).
+
+## Norton & Karczub 2e (2003), problem 6.13 answer (eta_21 column)
+
+- **Location:** Answers to problems, problem 6.13 (printed p. 617), the two
+  ``eta_21`` columns of the welded and bolted tables.
+- **The print:** for the two aluminium plates (plate 1: 3 mm, 2,5 m × 1,2 m;
+  plate 2: 5,5 mm, 2,0 m × 1,2 m) the answer gives, at 125 Hz,
+  eta_21 = 5,77·10⁻³ (welded) and 2,64·10⁻² (bolted).
+- **The problem:** both columns are exactly the corresponding ``eta_12``
+  column multiplied by ``h2/h1 = 1,833``. The SEA consistency relationship is
+  ``n_1 eta_12 = n_2 eta_21`` (Eq. 6.8) with the flat-plate modal density
+  ``n = S sqrt(12) / (2 cL h)`` of Eq. (6.25), so the correct factor is
+  ``n_1/n_2 = (S_1 h_2)/(S_2 h_1) = 2,292``. The printed column drops the plate
+  area ratio ``S_1/S_2 = 1,25``.
+- **Evidence:** the ratio of the printed columns is 1,8333 to five digits in
+  every band of both tables, which is ``h2/h1`` exactly; the ``eta_12`` columns
+  themselves reproduce from Eqs. (6.52) to (6.56) to better than 0,7 %.
+- **Library behaviour:** the ``eta_12`` columns are used as the regression
+  oracle; ``eta_21`` is obtained from Eq. (6.8) with the full modal densities,
+  and a test pins the 2,292 ratio explicitly
+  ([`tests/vibration/test_junction_transmission.py`](https://github.com/jmrplens/phonometry/blob/main/tests/vibration/test_junction_transmission.py)).
+- **Status:** unreported (textbook rather than a standard).
+
+## Norton & Karczub 2e (2003), problem 6.10 (platform area)
+
+- **Location:** Problems, problem 6.10 (printed pp. 593-594) and its answer
+  (printed p. 617): a satellite platform coupled to an aluminium cylinder,
+  500 Hz octave, printed answers eta_12 = 4,26·10⁻⁴, eta_21 = 3,92·10⁻⁴ and
+  Pi_in = 1,31 W.
+- **The print:** the statement gives the aluminium platform as
+  "5 mm thick and 3,5 m × 3 m", i.e. 10,5 m².
+- **The problem:** that area is inconsistent with the three printed answers.
+  Eq. (6.12) fixes ``E_1/E_2 = (eta_2 + eta_21)/eta_12 = 6,554`` from the
+  printed loss factors alone, whereas the stated geometry with the printed
+  velocities (27,2 and 13,2 mm/s) gives 7,88. The energy ratio is independent
+  of the modal densities and of the wave speed, so no choice of those can
+  reconcile it; only the platform area can. The area the answers imply is
+  8,73 m², which is 3,5 × 3 minus the π(0,75 m)² footprint of the cylinder
+  that Fig. P6.10 shows standing on the platform.
+- **Evidence:** with 8,73 m² the inversion of Eqs. (6.15), (6.8) and (6.10)
+  returns eta_12 = 4,256·10⁻⁴, eta_21 = 3,910·10⁻⁴ and Pi_in = 1,306 W, i.e.
+  all three printed answers within 0,4 %; the cylinder's own energy and modal
+  density come out unchanged either way.
+- **Library behaviour:** `power_injection_clf` in
+  [`experimental_sea.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/vibration/experimental_sea.py)
+  implements the inversion as published; the regression test uses the free
+  platform area and documents the discrepancy
+  ([`tests/vibration/test_experimental_sea.py`](https://github.com/jmrplens/phonometry/blob/main/tests/vibration/test_experimental_sea.py)).
+- **Status:** unreported (textbook rather than a standard).
+
+## Norton & Karczub 2e (2003), problem 3.14 (structural loss factor)
+
+- **Location:** Problems, problem 3.14 (printed p. 580) and its answer
+  (printed p. 611): the octave-band transmission loss of a 20 mm particle
+  board panel.
+- **The print:** the statement gives the panel a structural loss factor of
+  "~1,5 × 10⁻²"; the answer gives 27 dB at 8 kHz and 38,6 dB at 16 kHz.
+- **The problem:** those two values are above the panel's critical frequency
+  (4885 Hz for Appendix 4 particle board, fc·t = 97,7 m/s) and therefore
+  follow Cremer's Eq. (3.110), which contains ``10 lg(eta)``. With
+  eta = 1,5·10⁻² the equation gives 37,0 dB and 48,5 dB, ten decibels above
+  the printed answers; with eta = 1,5·10⁻³ it gives 27,0 dB and 38,5 dB.
+- **Evidence:** the 10 dB offset is exactly one decade of ``10 lg(eta)``, and
+  the frequency dependence of the printed pair independently fixes
+  fc = 4939 Hz against the Appendix 4 value of 4885 Hz. The eight values below
+  coincidence reproduce exactly from Eq. (3.104) and do not involve eta.
+- **Library behaviour:** the regression test uses eta = 1,5·10⁻³, the value
+  the printed answers require
+  ([`tests/building/test_panel_transmission.py`](https://github.com/jmrplens/phonometry/blob/main/tests/building/test_panel_transmission.py)).
+- **Status:** unreported (textbook rather than a standard).
+
 ---
 
 ## Real Decreto 1367/2007, Annex IV A.3.3 (Kf and Ki threshold tables)

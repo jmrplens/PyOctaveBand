@@ -115,6 +115,12 @@ calibrada y acompañada de su calidad estadística.
   frecuencia, la ley de reducción de ruido en raíz cuadrada, y la elección del
   número de promedios que sitúa un nodo del peine sobre un orden interferente
   (McFadden 1987).
+- [Frecuencias de fallo de máquinas](/phonometry/es/guides/machine-diagnostics/):
+  las familias cinemáticas de frecuencias de fallo de la maquinaria rotativa
+  (Norton y Karczub, sección 8.4) dibujadas sobre un espectro de envolvente
+  medido: frecuencias BPFO, BPFI, BSF y de jaula de los rodamientos, bandas
+  laterales de engrane, deslizamiento, paso de polos y armónicos de ranura de
+  los motores de inducción, y tonos de paso de pala.
 - [Correlación, retardo y envolvente](/phonometry/es/guides/correlation-delay/):
   estimaciones de correlación con los errores aleatorios de Bendat y
   Piersol, estimación del retardo por correlación directa, pendiente de fase
