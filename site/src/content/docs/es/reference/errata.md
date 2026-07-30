@@ -60,6 +60,24 @@ that no change was required.
 Status legend: **unreported** (recorded here only) / **reported** (submitted
 to the issuing body, with date and reference).
 
+## How a defect qualifies for this file
+
+No entry about a constant, a coefficient, an exponent, a symbol or an
+inequality sign may rest on text extracted from a PDF. Extraction tools drop
+glyphs silently: radicals in particular vanish without a trace, so
+`(1/2π)√(N s/m₁)` is emitted as `1/2π N·s/m1` and `√3 π` as `3π`, and the
+result reads like a plausible misprint. Such a claim is admitted only after
+the printed page has been rendered as an image at 600 dpi and read, and the
+entry records the page that was rendered. An entry that cannot survive that
+check does not go in the file. The rule applies from its introduction
+forwards; older entries are re-checked against it as each is revisited.
+
+The discipline exists because it caught one: an earlier draft of this registry
+accused Vigran's Eq. (8.46) of a `2/(3π)` coefficient where `2/(√3 π)` is
+printed. The two differ by exactly the factor √3 = 1,73 that the draft
+reported as the error, which is the signature of a dropped radical rather than
+of an author's slip.
+
 ---
 
 ## ISO 717-2:2020, Annex C, example C.1 (CI of the bare floor)
@@ -375,17 +393,27 @@ to the issuing body, with date and reference).
 - **The print:** the last two rows are "630 to 1 600 -> -10" and
   "1 600 <= f0 <= 5 000 -> -5".
 - **The problem:** 1 600 Hz belongs to both rows, with different values, and
-  Clause D.2.2 requires f0 to be rounded to a one-third-octave centre, so
-  1 600 Hz is a value the table is actually read at rather than an unreachable
-  edge. Every other boundary in the table is a distinct band centre (200, 250,
-  315, 400, 500 Hz), and no other pair of rows overlaps.
-- **Evidence:** the printed table itself; the two rows are adjacent and share
-  the endpoint verbatim. Neither row can be discarded, because 630 Hz to
-  1 250 Hz has no other entry and 2 000 Hz to 5 000 Hz has none either, so the
-  intended reading is one of "630 to 1 250" or "1 600 < f0 <= 5 000".
+  Clause D.2.2 requires f0 to be "rounded to the centre frequency of the
+  one-third-octave band in which fo falls", so 1 600 Hz is a value the table
+  is actually read at rather than an unreachable edge. Because the rounding is
+  mandatory, the ambiguity is not a single point: every raw resonance
+  frequency in the 1 600 Hz band, that is from 1 412,5 Hz to 1 778,3 Hz
+  (ISO 266 band edges), lands on it. Every other boundary in the table is a
+  distinct band centre (200, 250, 315, 400, 500 Hz), and no other pair of rows
+  overlaps.
+- **Evidence:** the printed table itself, on a 600 dpi render of pdf p. 45:
+  the two rows are separately ruled and share the endpoint verbatim, "630 to
+  1 600" and "1 600 <= f0 <= 5 000". Neither row can be discarded, because
+  630 Hz to 1 250 Hz has no other entry and 2 000 Hz to 5 000 Hz has none
+  either. The predecessor edition settles which reading was intended:
+  EN 12354-1:2000 Table D.3 prints the same pair of rows as "630 - 1 600 ->
+  -10" and "> 1 600 -> -5", strictly greater, so in 2000 exactly 1 600 Hz
+  unambiguously took -10 dB. The 2017 rewrite replaced "> 1 600" with
+  "1 600 <= f0 <= 5 000" while leaving "630 to 1 600" untouched, which is what
+  creates the overlap.
 - **Library behaviour:** `weighted_lining_improvement` returns the more
-  conservative -10 dB at exactly 1 600 Hz and -5 dB above it, with the
-  ambiguity named in the docstring and pinned in
+  conservative -10 dB at exactly 1 600 Hz and -5 dB above it, the 2000
+  reading, with the ambiguity named in the docstring and pinned in
   [`tests/building/test_resilient_layers.py`](https://github.com/jmrplens/phonometry/blob/main/tests/building/test_resilient_layers.py).
 - **Status:** unreported.
 
@@ -394,7 +422,12 @@ to the issuing body, with date and reference).
   box Clause D.2.2 states for the table (30 Hz <= f0 <= 160 Hz,
   20 dB <= Rw <= 60 dB) the branch never reaches it: its minimum is
   74,4 - 20 lg(160) - 60/2 = 0,32 dB. The floor is therefore inactive for
-  every input the table is stated for.
+  every input the table is stated for, but it was not always: the 2000 edition
+  tabulated the low branch as four discrete rows ending in
+  "160 -> 28 - Rw/2", whose minimum is 28 - 60/2 = -2 dB, so NOTE 1 was
+  operative there. The 2017 continuous fit sits 2,3 dB above it at that
+  corner and left the note vestigial. The library keeps the floor because the
+  note is still printed.
 
 ## ISO 15186-1:2000, Clause 3.9, Formula (8) (sign of the 10 lg N term)
 
@@ -1231,29 +1264,36 @@ to the issuing body, with date and reference).
   and the conformance check "Long 2e Eqs. 13.27-13.33".
 - **Status:** unreported (textbook rather than a standard).
 
-## Vigran, Building Acoustics (2008), Eq. (8.46) (coefficient of the Ver model)
+## Vigran, Building Acoustics (2008), Figure 8.37 caption (carpet stiffness exponent)
 
 - **Non-normative source** (textbook).
-- **Location:** section 8.4.1, printed p. 309 / pdf p. 331, the "approximate
-  expression" for the improvement of impact sound insulation of a floating
-  floor on discrete resilient mounts.
-- **The print:** `DeltaLn ~= 10 lg[2 cL1 h1 eta1 N/(3 pi) * f^3/f0^4]`,
-  presented as Eq. (8.45) with the floating slab's point impedance inserted.
-- **The problem:** Eq. (8.45)'s dominant term is
-  `Z1 eta1 N f^3/(2 pi m1 f0^4)`, and for an infinite thin plate
-  `Z1 = 8 sqrt(B1 m1) = 2,31 rho cL h^2 = 2,31 m1 cL h`. Substituting gives
-  the coefficient `2,31/(2 pi) = 0,366`, not `2/(3 pi) = 0,212`. The printed
-  form is therefore 1,73 times too small, a fixed 2,4 dB offset; Eq. (8.45)
-  itself is correct and is identical to Hopkins Eq. (4.118).
-- **Evidence:** algebraic substitution of `f0 = sqrt(N s/m1)/(2 pi)` into
-  Eq. (8.45) reduces it exactly to Hopkins Eq. (4.118),
-  `10 lg(2,3 rhos1^2 cL1 h1 eta1 S1 omega^3/(N k^2))`; the two books agree
-  term for term. Only Vigran's own simplified Eq. (8.46) departs, and by a
-  constant factor, which is the signature of a substitution slip rather than a
-  different model.
-- **Library behaviour:** `resilient_mount_improvement` implements Eq. (8.45) /
-  Eq. (4.118), and the cross-source identity is pinned in
-  [`tests/building/test_resilient_layers.py`](https://github.com/jmrplens/phonometry/blob/main/tests/building/test_resilient_layers.py).
+- **Location:** section 8.4.2, the caption of Figure 8.37 on printed p. 320 /
+  pdf p. 341, which labels the predicted improvement curves of two floor
+  coverings laid on a heavyweight floor.
+- **The print:** "Predicted improvement with a linear model: stiffness of
+  carpet squares 3.2·10^6 N/m, vinyl covering 5.2·10^6 N/m." (Vigran writes
+  the decimal separator as a period.)
+- **The problem:** the carpet exponent is one order too high. The body text
+  introducing the figure, on printed p. 321, says of the carpet squares that
+  "we have assumed that the covering has the same stiffness as used in
+  Figure 8.36", and Figure 8.36 is labelled `s = 3.2·10^5 N/m` inside the
+  plot, the same value the body text on printed p. 320 gives for it. The
+  vinyl value in the same caption is correct.
+- **Evidence:** printed p. 320 states `3.2·10^5 N/m` "giving a resonance
+  frequency f0 of approximately 130 Hz with a hammer mass of 0.5 kg", and
+  `sqrt(3.2e5/0.5)/(2 pi) = 127,3 Hz` reproduces that while
+  `sqrt(3.2e6/0.5)/(2 pi) = 402,6 Hz` is a frequency that appears nowhere in
+  the section. The same arithmetic applied to the caption's vinyl value gives
+  `sqrt(5.2e6/0.5)/(2 pi) = 513,3 Hz` against the "approximately 510 Hz"
+  printed on p. 321, which fixes the formula and the hammer mass the author
+  used. Graphically, the two dashed prediction curves of Fig. 8.37 are about
+  two octaves apart, matching the stiffness ratio 5.2e6/3.2e5 = 16,25 (a
+  factor 4,03 in frequency) and not 5.2e6/3.2e6 = 1,63 (a factor 1,27).
+  Verified on 600 dpi renders of pdf pp. 340, 341 and 342.
+- **Library behaviour:** none needed; the library takes the covering stiffness
+  from the user through `covering_contact_stiffness`, and the printed cut-off
+  frequencies it is anchored on come from Hopkins rather than from this
+  caption.
 - **Status:** unreported.
 
 ## Norton & Karczub, Fundamentals of Noise and Vibration Analysis for Engineers 2e (2003), Eq. (6.56)

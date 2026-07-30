@@ -220,9 +220,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `hammer_limiting_frequency`, `plate_contact_stiffness`,
   `covering_contact_stiffness` and `short_pulse_mean_square_force`. A soft
   covering then alters nothing but that force, so `covering_improvement`
-  returns both the force ratio `20 lg(|Fn|without/|Fn|with)` and the two-line
-  design estimate, 0 dB below the covering's cut-off and 12 dB per octave
-  above. Floating floors get their resonance from `160 sqrt(s'/m')`
+  returns the force ratio `20 lg(|Fn|without/|Fn|with)` of Eq. (4.114) both per
+  band (`improvement`, summed in mean square over the Fourier lines the band
+  contains, since the machine excites a line spectrum) and per line
+  (`line_improvement`, which carries the truncation nulls at odd multiples of
+  the cut-off), beside the two-line design estimate, 0 dB below the covering's
+  cut-off and 12 dB per octave above. Floating floors get their resonance from
+  `160 sqrt(s'/m')`
   (`floating_floor_resonance_frequency`), the three improvement laws above it
   through `floating_floor_improvement_spectrum` (the 30 lg law of
   EN 12354-2 for sand-cement screeds, Cremer's 40 lg law for asphalt and dry
@@ -239,14 +243,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   exterior-system and stud fits with their anchor and glued-area corrections,
   and `lining_improvement_in_situ` for the laboratory-to-field transfer.
   Anchored on the 21 printed per-band values of ISO 12354-2:2017 Table G.4 and
-  its `DeltaLw = 32,2 dB`, on Hopkins's printed cut-off frequencies (7 000,
-  2 300 and 100 Hz), on the over/under-critical classification of his four
-  walking surfaces, on the double-floating-floor resonances of his Fig. 4.73
-  (74 Hz and 195 Hz) and the lining resonances of his Fig. 4.48 (104, 123, 247
-  and 542 Hz), and on the identity between Hopkins Eq. (4.118) and Vigran
-  Eq. (8.45), which state the same SEA model in different algebra. Four
-  results with `.plot()`, two figures and a new guide "Predicting
-  Resilient-Layer Performance" in English and Spanish.
+  its `DeltaLw = 32,2 dB`, reproduced to the table's printed precision of
+  0,1 dB, on Hopkins's printed cut-off frequencies (7 000, 2 300 and 100 Hz),
+  on the over/under-critical classification of his four walking surfaces, on
+  the double-floating-floor resonances of his Fig. 4.73 (74 Hz and 195 Hz) and
+  the lining resonances of his Fig. 4.48 (104, 123, 247 and 542 Hz), and on
+  the identity between the dominant term of Vigran Eq. (8.45) and Hopkins
+  Eq. (4.118), which state the same SEA model in different algebra.
+  Table D.1 is read at the one-third-octave band that *contains* the
+  resonance, by ISO 266 band edges rather than by proximity to a nominal
+  label, as Clause D.2.2 requires: the two differ by up to 8,8 dB at the
+  160 Hz to 200 Hz boundary. Where a formula has no published worked example
+  behind it (the cavity stiffness of Formula D.2, the asphalt fit of
+  Formula C.5, and Formulae D.3 to D.8) the guide says so. Four results with
+  `.plot()`, two figures and a new guide "Predicting Resilient-Layer
+  Performance" in English and Spanish.
+
+- Two entries in `docs/ERRATA.md`, and a standing rule at the top of that file.
+  ISO 12354-1:2017 Table D.1 covers 1 600 Hz with two rows carrying different
+  values, "630 to 1 600 -> -10" and "1 600 <= f0 <= 5 000 -> -5"; the
+  predecessor EN 12354-1:2000 Table D.3 printed the second as "> 1 600"
+  strictly, so the 2017 rewrite is what created the overlap, and the library
+  keeps the 2000 reading of -10 dB at exactly 1 600 Hz. Vigran, *Building
+  Acoustics* (2008), gives the carpet-squares stiffness in the caption of
+  Fig. 8.37 as 3.2e6 N/m where the body text on p. 321 says it is the same as
+  Fig. 8.36's, printed as 3.2e5 N/m, the only value that reproduces the
+  "approximately 130 Hz" of p. 320. The standing rule is that no errata claim
+  about a constant, coefficient, exponent or symbol may rest on text extracted
+  from a PDF: extraction drops radicals silently, so the page is rendered as
+  an image at 600 dpi and read.
 
 - Room-to-room noise reduction (`noise_control/room_to_room.py`, Norton &
   Karczub 2003 Section 4.9): `room_to_room_transmission` composes the whole

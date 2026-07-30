@@ -63,11 +63,19 @@ Insulation* (2007) and to Vigran, *Building Acoustics* (2008). Where the two
 books state the same model in different algebra the test suite pins the identity
 rather than either transcription. Two printed defects are relevant here and are
 recorded in ``docs/ERRATA.md``: the overlap of the last two rows of Table D.1 at
-1 600 Hz, and the coefficient of Vigran's approximate Eq. (8.46).
+1 600 Hz, and the carpet stiffness in the caption of Vigran's Fig. 8.37.
+
+Several relations used here carry no published worked example, so they are
+implemented as printed and checked only for self-consistency: the cavity
+stiffness ``0,111/d`` of Formula (D.2), the asphalt fit of Formula (C.5), and
+the exterior-system and stud fits of Formulae (D.3) to (D.8). The guide
+"Predicting Resilient-Layer Performance" says which pieces have an oracle and
+which do not.
 """
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -138,6 +146,10 @@ _GRAVITY: float = 9.81
 #: one-third-octave bands and ``B = 0,707 f`` for octave bands.
 _BANDWIDTH_FACTOR: dict[str, float] = {"third": 0.23, "octave": 0.707}
 
+#: Half-band ratios ``fupper/fcentre`` of the base-ten band system, used to
+#: collect the tapping machine's Fourier lines into each band.
+_HALF_BAND_RATIO: dict[str, float] = {"third": 10.0**0.05, "octave": 10.0**0.15}
+
 #: Coefficient of the short-duration mean-square force ``F²rms = 3,9 B``
 #: (Hopkins Eq. 3.92); the exact value from Eqs. (3.90)/(3.91) is 3,925.
 _SHORT_PULSE_COEFFICIENT: float = 3.9
@@ -183,8 +195,15 @@ _TABLE_D1_HIGH: tuple[tuple[float, float], ...] = (
     (5000.0, -5.0),
 )
 
-#: Validity range of ``fo`` covered by ISO 12354-1:2017 Table D.1, in Hz.
+#: Validity range of ``fo`` covered by ISO 12354-1:2017 Table D.1, in Hz. It
+#: is the only range of lining resonances Annex D puts numbers on, so the
+#: Formula (D.3) to (D.7) fits are warned about outside it too.
 _TABLE_D1_RANGE = (30.0, 5000.0)
+
+#: Validity range of ``Rw`` Clause D.2.2 states Table D.1 for, in dB:
+#: "For basic structural elements with a weighted sound reduction index in the
+#: range of 20 dB <= Rw <= 60 dB".
+_TABLE_D1_RW_RANGE = (20.0, 60.0)
 
 #: ISO 12354-1:2017 Formulae (D.3), (D.4) and (D.7): the reference-situation
 #: single-number ratings as ``(slope, intercept, floor)`` triples for
@@ -218,13 +237,17 @@ _ANNEX_D_GLUE = (-0.05, 2.0)
 _ANNEX_D8_A = (1.35, -3.5)
 _ANNEX_D8_X = (53.0, -10.0, 7.0)
 
-#: Nominal one-third-octave centre frequencies used to round ``fo`` before
-#: reading Table D.1 (Clause D.2.2).
+#: Nominal one-third-octave centre frequencies (ISO 266) used to round ``fo``
+#: before reading Table D.1 (Clause D.2.2), in ascending band order.
 _THIRD_OCTAVE_CENTRES: tuple[float, ...] = (
     12.5, 16.0, 20.0, 25.0, 31.5, 40.0, 50.0, 63.0, 80.0, 100.0, 125.0,
     160.0, 200.0, 250.0, 315.0, 400.0, 500.0, 630.0, 800.0, 1000.0, 1250.0,
     1600.0, 2000.0, 2500.0, 3150.0, 4000.0, 5000.0, 6300.0, 8000.0, 10000.0,
 )
+
+#: Base-ten band index ``n`` of the first entry of ``_THIRD_OCTAVE_CENTRES``:
+#: the nominal 12,5 Hz band has the exact midband frequency ``10^(11/10)``.
+_THIRD_OCTAVE_FIRST_INDEX: int = 11
 
 #: Band width of the mean-square force (Hopkins Eq. 3.91).
 BandWidth = Literal["third", "octave"]
@@ -388,13 +411,21 @@ def force_pulse(
     hammer mass ``m`` on the contact stiffness ``K`` in series with the floor's
     driving-point impedance ``Zdp``. For an **over-critical** oscillation
     (``K m ≥ 4 Zdp²``) the pulse decays to zero without changing sign
-    (Eq. 3.95); for an **under-critical** one it is a decaying sinusoid whose
-    first positive lobe is the impact proper (Eq. 3.96), the later oscillations
-    being suppressed by the machine's hammer-catching mechanism. That
-    suppression is applied here, so the under-critical pulse is returned as
-    zero beyond its first zero crossing at ``t = π/β``; it is the same
-    truncation :func:`tapping_force_spectrum` transforms, so integrating this
-    pulse reproduces that spectrum over any window.
+    (Eq. 3.95); for an **under-critical** one it is a decaying sinusoid
+    (Eq. 3.96) whose first positive lobe is the impact proper. Hopkins's rule
+    is stated in terms of the sign of the force rather than of any mechanism:
+    "only the initial force pulse that has zero or positive force values is
+    used to determine the force spectrum, with all subsequent values of F1(t)
+    due to the oscillations set to zero before taking the Fourier transform",
+    the hammer having rebounded from the plate. That truncation is applied
+    here, so the under-critical pulse is returned as zero beyond its
+    first zero crossing at ``t = π/β``; it is the same truncation
+    :func:`tapping_force_spectrum` transforms, so integrating this pulse over
+    ``0 ≤ t ≤ π/β`` reproduces that spectrum.
+
+    The over-critical pulse has no such cut and decays for all ``t``; it is
+    evaluated in a form that stays finite over the whole 0,1 s between
+    impacts rather than one that overflows partway through it.
 
     :param time: Time ``t`` since the impact, in s (scalar or array, ``≥ 0``).
     :param contact_stiffness: Contact stiffness ``K``, in N/m.
@@ -420,14 +451,24 @@ def force_pulse(
         raise ValueError("'time' must contain only finite, non-negative values.")
     decay = k / (2.0 * z)
     omega0_sq = k / m
-    envelope = v0 * k * np.exp(-decay * t)
     if _is_over_critical(k, z, m):
         gamma = np.sqrt(decay**2 - omega0_sq)
-        # A zero discriminant is the critically damped limit, F1 = v0 K t e^-at.
-        shape = t * np.exp(0.0) if gamma == 0.0 else np.sinh(gamma * t) / gamma
-        return np.asarray(envelope * shape, dtype=np.float64)
+        if gamma == 0.0:
+            # A zero discriminant is the critically damped limit, v0 K t e^-at.
+            return np.asarray(v0 * k * t * np.exp(-decay * t), dtype=np.float64)
+        # e^(-a t) sinh(γ t)/γ is expanded into the difference of two decaying
+        # exponentials rather than evaluated as written. Both a − γ and a + γ
+        # are positive (a² − γ² = ωo² > 0), so each term stays in range for
+        # every t, whereas the literal form multiplies an e^(-a t) that
+        # underflows to zero by a sinh that overflows to infinity and returns
+        # NaN well inside the machine's own 0,1 s impact period.
+        pulse = (
+            v0 * k * (np.exp(-(decay - gamma) * t) - np.exp(-(decay + gamma) * t))
+            / (2.0 * gamma)
+        )
+        return np.asarray(pulse, dtype=np.float64)
     beta = np.sqrt(omega0_sq - decay**2)
-    pulse = envelope * np.sin(beta * t) / beta
+    pulse = v0 * k * np.exp(-decay * t) * np.sin(beta * t) / beta
     return np.asarray(np.where(t <= np.pi / beta, pulse, 0.0), dtype=np.float64)
 
 
@@ -597,15 +638,24 @@ class CoveringImprovementResult:
     """Predicted improvement ``ΔL`` of a soft floor covering (Hopkins 4.4.3.1).
 
     :ivar frequencies: Band centre frequencies ``f``, in Hz.
-    :ivar improvement: Improvement ``ΔL = 20 lg(|Fn|without/|Fn|with)`` from the
-        force spectra, in dB (Eq. 4.114).
+    :ivar improvement: Band improvement ``ΔL``, in dB: Eq. (4.114) evaluated
+        over the tapping machine's Fourier lines and summed in mean square
+        across each band, ``10 lg(Σ|Fn|²without/Σ|Fn|²with)``.
     :ivar two_line: The two-line estimate, in dB: 0 below ``fco`` and
         12 dB/octave (40 dB/decade) above it.
     :ivar cut_off_frequency: Cut-off frequency ``fco`` of the covered floor,
         in Hz.
     :ivar bare_cut_off_frequency: Cut-off frequency of the bare plate, in Hz.
-    :ivar bare: The bare-plate :class:`TappingForceResult`.
-    :ivar covered: The :class:`TappingForceResult` with the covering.
+    :ivar lines: Fourier line frequencies ``n fi`` of the tapping machine, in
+        Hz, covering every band in ``frequencies``.
+    :ivar line_improvement: The per-line ratio
+        ``ΔL = 20 lg(|Fn|without/|Fn|with)`` of Eq. (4.114) at ``lines``, in
+        dB. It carries the deep troughs at odd multiples of ``fco`` that
+        Hopkins notes below Fig. 4.64, which are an artefact of the undamped
+        model and disappear from ``improvement``.
+    :ivar bare: The bare-plate :class:`TappingForceResult`, at ``lines``.
+    :ivar covered: The :class:`TappingForceResult` with the covering, at
+        ``lines``.
     """
 
     frequencies: np.ndarray
@@ -613,6 +663,8 @@ class CoveringImprovementResult:
     two_line: np.ndarray
     cut_off_frequency: float
     bare_cut_off_frequency: float
+    lines: np.ndarray
+    line_improvement: np.ndarray
     bare: TappingForceResult
     covered: TappingForceResult
 
@@ -636,6 +688,7 @@ def covering_improvement(
     impedance: float,
     *,
     mass: float = TAPPING_HAMMER_MASS,
+    impact_rate: float = TAPPING_IMPACT_RATE,
     band: BandWidth = "third",
 ) -> CoveringImprovementResult:
     """Improvement of impact sound insulation by a soft covering (Eq. 4.114).
@@ -646,6 +699,19 @@ def covering_improvement(
     two force spectra, ``ΔL = 20 lg(|Fn|without/|Fn|with)``, computed here from
     :func:`tapping_force_spectrum` with the covering's contact stiffness
     (Eq. 3.98) and with the plate's (Eq. 3.97).
+
+    The tapping machine excites a **line** spectrum, at multiples of the 10 Hz
+    impact rate, so Eq. (4.114) is a statement about one Fourier component and
+    the band value is the ratio of the band mean-square forces (Eq. 3.91),
+    that is the sum over the lines that fall in the band. ``improvement`` is
+    that band value and ``line_improvement`` is the per-line ratio. The
+    distinction matters: the undamped model's transform has exact nulls at odd
+    multiples of ``fco``, so a band centre that happens to land on one reads
+    tens of dB high. With the 100 Hz cut-off of Hopkins's covering No. 2, the
+    line ratio at 500 Hz is 66,8 dB against a two-line estimate of 27,9 dB,
+    while the band value is 29,1 dB. Hopkins notes below Fig. 4.64 that the
+    troughs vanish once the covering's internal damping is included and the
+    spectrum is averaged into bands.
 
     ``two_line`` is Hopkins's design estimate: ``ΔL ≈ 0`` below the covering's
     cut-off and a straight 12 dB/octave above it, that is ``40 lg(f/fco)``.
@@ -661,18 +727,46 @@ def covering_improvement(
     :param impedance: Driving-point impedance ``Zdp`` of the base floor, in
         N.s/m; unchanged by the covering.
     :param mass: Hammer mass ``m``, in kg (Default: 0,5).
+    :param impact_rate: Impact repetition rate ``fi``, in Hz (Default: 10);
+        it sets the spacing of the Fourier lines the bands average over.
     :param band: ``"third"`` or ``"octave"``.
     :return: A :class:`CoveringImprovementResult`.
-    :raises ValueError: If an input is not positive and finite.
+    :raises ValueError: If an input is not positive and finite, or ``band`` is
+        unknown.
     """
     f = require_positive_array(frequencies, "frequencies")
+    fi = require_positive(impact_rate, "impact_rate")
+    require_choice(band, "band", ("third", "octave"))
+    ratio = _HALF_BAND_RATIO[band]
+    count = int(np.ceil(float(f.max()) * ratio / fi))
+    lines = np.arange(1, count + 1, dtype=np.float64) * fi
     bare = tapping_force_spectrum(
-        f, plate_stiffness, impedance, mass=mass, band=band
+        lines, plate_stiffness, impedance, mass=mass, impact_rate=fi, band=band
     )
     covered = tapping_force_spectrum(
-        f, covering_stiffness, impedance, mass=mass, band=band
+        lines, covering_stiffness, impedance, mass=mass, impact_rate=fi, band=band
     )
-    improvement = 20.0 * np.log10(bare.peak_force / covered.peak_force)
+    line_improvement = 20.0 * np.log10(bare.peak_force / covered.peak_force)
+    inside = (lines[None, :] >= f[:, None] / ratio) & (
+        lines[None, :] <= f[:, None] * ratio
+    )
+    bare_ms = inside @ bare.peak_force**2
+    covered_ms = inside @ covered.peak_force**2
+    # A band narrower than the line spacing holds no line; there the single
+    # Fourier component at the band centre is the whole band.
+    empty = ~inside.any(axis=1)
+    if empty.any():
+        edge = tapping_force_spectrum(
+            f[empty], plate_stiffness, impedance, mass=mass, impact_rate=fi,
+            band=band,
+        )
+        edge_covered = tapping_force_spectrum(
+            f[empty], covering_stiffness, impedance, mass=mass, impact_rate=fi,
+            band=band,
+        )
+        bare_ms[empty] = edge.peak_force**2
+        covered_ms[empty] = edge_covered.peak_force**2
+    improvement = 10.0 * np.log10(bare_ms / covered_ms)
     fco = covered.cut_off_frequency
     two_line = np.where(f > fco, _SLOPE_CREMER * np.log10(f / fco), 0.0)
     return CoveringImprovementResult(
@@ -681,6 +775,8 @@ def covering_improvement(
         two_line=np.asarray(two_line, dtype=np.float64),
         cut_off_frequency=fco,
         bare_cut_off_frequency=bare.cut_off_frequency,
+        lines=lines,
+        line_improvement=np.asarray(line_improvement, dtype=np.float64),
         bare=bare,
         covered=covered,
     )
@@ -952,19 +1048,29 @@ def resilient_mount_improvement(
     per unit area of stiffness ``k`` each, with all transmission through the
     mounts and none through the cavity. Hopkins Eq. (4.118) writes it as
 
-    ``ΔL = 10 lg(Zdp1 ρs1 η1 ω³/(N' k²))``
+    ``ΔL ≈ 10 lg(2,3 ρs1² cL1 h1 η1 S1 ω³/(N k²))``
 
-    with ``Zdp1 = 2,3 ρ cL h²`` the walking surface's driving-point impedance;
-    Vigran's Eq. (8.45) writes the same term as
-    ``Z1 η1 N f³/(2 π m1 fo⁴)`` with ``fo = √(N k/m1)/(2 π)``, and the two are
-    algebraically identical. The dominant-term form used here rises at
-    **30 dB per decade** (9 dB per octave), against the 40 dB per decade of a
-    continuous resilient layer: fewer mounts, a thicker walking surface or more
-    internal damping all raise ``ΔL``.
+    where ``k`` is the dynamic stiffness of each mount, ``N`` the **number** of
+    mounts and ``S1`` the area of the walking surface. Since
+    ``2,3 ρs1² cL1 h1 = Zdp1 ρs1`` for ``Zdp1 = 2,3 ρ cL h²`` (Eq. 2.190), the
+    same expression reads ``10 lg(Zdp1 ρs1 η1 ω³/(N/S1 · k²))``, which is the
+    form evaluated here: this function takes the mount **density** ``N/S1``,
+    not the count.
 
-    Vigran's printed approximation Eq. (8.46) substitutes ``Z1`` into
-    Eq. (8.45) with a coefficient ``2/(3 π)`` where ``2,3/(2 π)`` follows, a
-    2,4 dB offset; see ``docs/ERRATA.md``.
+    Vigran's Eq. (8.45) is a sum of three terms, ``Z1/Z2``, ``m1 η1/(m2 η2)``
+    and ``Z1 η1 N f³/(2 π m1 fo⁴)`` with ``fo = √(N k/m1)/(2 π)``. Only the
+    **third** of them is the model implemented here, and that term is
+    algebraically identical to Hopkins Eq. (4.118); the first two are the
+    low-frequency floor, negligible once the third dominates, which is the
+    regime Vigran states the 9 dB per octave slope for. The dominant-term form
+    used here therefore rises at **30 dB per decade** (9 dB per octave),
+    against the 40 dB per decade of a continuous resilient layer: fewer mounts,
+    a thicker walking surface or more internal damping all raise ``ΔL``.
+
+    Vigran's simplified Eq. (8.46) inserts ``Z1`` into that third term and
+    prints the coefficient as ``2/(√3 π) = 0,3676``, which is the same number
+    as the ``2,3094/(2 π) = 0,3676`` the substitution gives; the two forms
+    agree.
 
     :param frequencies: Band centre frequencies ``f``, in Hz.
     :param impedance: Driving-point impedance ``Zdp1`` of the walking surface,
@@ -974,8 +1080,10 @@ def resilient_mount_improvement(
     :param loss_factor: Total loss factor ``η1`` of the walking surface
         (scalar or per band).
     :param mount_stiffness: Dynamic stiffness ``k`` of one mount, in N/m.
-    :param mount_density: Number of mounts per unit area ``N'``, in 1/m².
-    :return: The improvement ``ΔL`` per band, in dB.
+    :param mount_density: Number of mounts per unit area ``N/S1``, in 1/m²
+        (Vigran's ``N``, which is already a density).
+    :return: The improvement ``ΔL`` per band, in dB, and 0 dB at and below
+        ``fo``.
     :raises ValueError: If an input is not positive and finite.
     """
     f = require_positive_array(frequencies, "frequencies")
@@ -985,9 +1093,16 @@ def resilient_mount_improvement(
     k = require_positive(mount_stiffness, "mount_stiffness")
     n = require_positive(mount_density, "mount_density")
     omega = 2.0 * np.pi * f
-    return np.asarray(
-        10.0 * np.log10(z1 * m1 * eta * omega**3 / (n * k**2)), dtype=np.float64
-    )
+    delta = 10.0 * np.log10(z1 * m1 * eta * omega**3 / (n * k**2))
+    # Both books state the law above the mass-spring resonance, where this
+    # term dominates the two Vigran keeps beside it. Below it the dominant
+    # term alone falls without bound and turns negative, which a resilient
+    # mounting cannot do, so it is floored at 0 dB the way Hopkins treats the
+    # bands below fms ("it is simplest to assume that DeltaL = 0 dB in all
+    # frequency bands below the band containing fms", printed p. 521) and the
+    # way :func:`floating_floor_improvement_spectrum` already does.
+    f0 = np.sqrt(n * k / m1) / (2.0 * np.pi)
+    return np.asarray(np.where(f > f0, delta, 0.0), dtype=np.float64)
 
 
 # --------------------------------------------------------------------------- #
@@ -1041,9 +1156,28 @@ def lining_resonance_frequency(
 
 
 def _round_to_third_octave(frequency: float) -> float:
-    """Nearest nominal one-third-octave centre (Clause D.2.2 rounding)."""
-    centres = np.asarray(_THIRD_OCTAVE_CENTRES)
-    return float(centres[int(np.argmin(np.abs(np.log(centres / frequency))))])
+    """Nominal centre of the one-third-octave band containing ``frequency``.
+
+    Clause D.2.2 rounds ``fo`` to "the centre frequency of the one-third-octave
+    band in which fo falls", which is band membership, not proximity to a
+    nominal label. The band is therefore found from the exact midband
+    frequencies of the base-ten system, ``10^(n/10)``, whose edges are
+    ``10^((n ± 0,5)/10)``; the nominal label of that band is returned.
+
+    The distinction is not cosmetic. Nominal labels are rounded, so the
+    midpoint between two of them is not the band edge: the 63 Hz band ends at
+    ``10^1,85 = 70,79 Hz`` while the geometric mean of the labels 63 and 80 is
+    70,99 Hz, and any ``fo`` between the two would be read off the wrong row
+    of Table D.1, by 2,1 dB at that boundary and by 8,8 dB at the 160 Hz to
+    200 Hz one.
+    """
+    index = int(np.floor(10.0 * np.log10(frequency) + 0.5))
+    band = index - _THIRD_OCTAVE_FIRST_INDEX
+    if band < 0:
+        return _THIRD_OCTAVE_CENTRES[0]
+    if band >= len(_THIRD_OCTAVE_CENTRES):
+        return _THIRD_OCTAVE_CENTRES[-1]
+    return _THIRD_OCTAVE_CENTRES[band]
 
 
 def weighted_lining_improvement(
@@ -1081,6 +1215,16 @@ def weighted_lining_improvement(
         raise ValueError(
             f"'resonance_frequency' must lie in [{low:g}, {high:g}] Hz; "
             "ISO 12354-1 Table D.1 is not tabulated outside it."
+        )
+    rw_low, rw_high = _TABLE_D1_RW_RANGE
+    if not rw_low <= rw <= rw_high:
+        warnings.warn(
+            f"base_rating = {rw:g} dB lies outside the "
+            f"{rw_low:g} dB <= Rw <= {rw_high:g} dB range Clause D.2.2 states "
+            "Table D.1 for; the result is an extrapolation of "
+            "74,4 - 20 lg(fo) - Rw/2 and is not covered by the standard.",
+            UserWarning,
+            stacklevel=2,
         )
     nominal = _round_to_third_octave(f0)
     if nominal <= 160.0:
@@ -1167,6 +1311,13 @@ def lining_improvement(
     the 40 % reference. Both corrections are applied after the floor of the
     reference formula, in the order the annex states them.
 
+    The annex places the ``≥ −4 dB`` (or ``≥ −3 dB``) floor inside Formulae
+    (D.3) and (D.4) and says nothing about re-applying it after (D.5) and
+    (D.6), so this function does not: a fully glued system on anchors can
+    return about −6,8 dB, below the reference floor. That is the annex read
+    literally, and the reason the two corrections are exposed as flags rather
+    than folded into the fit.
+
     :param resonance_frequency: Resonance frequency ``fo``, in Hz
         (:func:`lining_resonance_frequency`).
     :param system: ``"mineral_wool"``, ``"foam"`` or ``"studs"``.
@@ -1182,6 +1333,16 @@ def lining_improvement(
     """
     f0 = require_positive(resonance_frequency, "resonance_frequency")
     require_choice(system, "system", tuple(_ANNEX_D_SYSTEMS))
+    low, high = _TABLE_D1_RANGE
+    if not low <= f0 <= high:
+        warnings.warn(
+            f"resonance_frequency = {f0:g} Hz lies outside the "
+            f"{low:g} Hz to {high:g} Hz range Annex D puts lining resonances "
+            "on; the fits are monotonic in lg(fo) and unbounded below it, so "
+            "the result is an extrapolation.",
+            UserWarning,
+            stacklevel=2,
+        )
     ratings = [
         max(floor, slope * float(np.log10(f0)) + intercept)
         for slope, intercept, floor in _ANNEX_D_SYSTEMS[system]

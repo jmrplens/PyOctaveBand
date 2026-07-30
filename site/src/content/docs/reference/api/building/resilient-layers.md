@@ -68,7 +68,14 @@ Insulation* (2007) and to Vigran, *Building Acoustics* (2008). Where the two
 books state the same model in different algebra the test suite pins the identity
 rather than either transcription. Two printed defects are relevant here and are
 recorded in `docs/ERRATA.md`: the overlap of the last two rows of Table D.1 at
-1 600 Hz, and the coefficient of Vigran's approximate Eq. (8.46).
+1 600 Hz, and the carpet stiffness in the caption of Vigran's Fig. 8.37.
+
+Several relations used here carry no published worked example, so they are
+implemented as printed and checked only for self-consistency: the cavity
+stiffness `0,111/d` of Formula (D.2), the asphalt fit of Formula (C.5), and
+the exterior-system and stud fits of Formulae (D.3) to (D.8). The guide
+"Predicting Resilient-Layer Performance" says which pieces have an oracle and
+which do not.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -142,6 +149,7 @@ covering_improvement(
     impedance: float,
     *,
     mass: float = 0.5,
+    impact_rate: float = 10.0,
     band: BandWidth = 'third',
 ) -> CoveringImprovementResult
 ```
@@ -154,6 +162,19 @@ only the force the hammer injects. The improvement is then the ratio of the
 two force spectra, `ΔL = 20 lg(|Fn|without/|Fn|with)`, computed here from
 [`tapping_force_spectrum`](/phonometry/reference/api/building/resilient-layers/#tapping_force_spectrum) with the covering's contact stiffness
 (Eq. 3.98) and with the plate's (Eq. 3.97).
+
+The tapping machine excites a **line** spectrum, at multiples of the 10 Hz
+impact rate, so Eq. (4.114) is a statement about one Fourier component and
+the band value is the ratio of the band mean-square forces (Eq. 3.91),
+that is the sum over the lines that fall in the band. `improvement` is
+that band value and `line_improvement` is the per-line ratio. The
+distinction matters: the undamped model's transform has exact nulls at odd
+multiples of `fco`, so a band centre that happens to land on one reads
+tens of dB high. With the 100 Hz cut-off of Hopkins's covering No. 2, the
+line ratio at 500 Hz is 66,8 dB against a two-line estimate of 27,9 dB,
+while the band value is 29,1 dB. Hopkins notes below Fig. 4.64 that the
+troughs vanish once the covering's internal damping is included and the
+spectrum is averaged into bands.
 
 `two_line` is Hopkins's design estimate: `ΔL ≈ 0` below the covering's
 cut-off and a straight 12 dB/octave above it, that is `40 lg(f/fco)`.
@@ -170,6 +191,7 @@ model identifies the general features rather than replacing a measurement.
 | `plate_stiffness` | Contact stiffness `K` of the bare plate, in N/m ([`plate_contact_stiffness`](/phonometry/reference/api/building/resilient-layers/#plate_contact_stiffness)). |
 | `impedance` | Driving-point impedance `Zdp` of the base floor, in N.s/m; unchanged by the covering. |
 | `mass` | Hammer mass `m`, in kg (Default: 0,5). |
+| `impact_rate` | Impact repetition rate `fi`, in Hz (Default: 10); it sets the spacing of the Fourier lines the bands average over. |
 | `band` | `"third"` or `"octave"`. |
 
 **Returns:** A [`CoveringImprovementResult`](/phonometry/reference/api/building/resilient-layers/#coveringimprovementresult).
@@ -178,7 +200,7 @@ model identifies the general features rather than replacing a measurement.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If an input is not positive and finite. |
+| ValueError | If an input is not positive and finite, or `band` is unknown. |
 
 ## CoveringImprovementResult
 
@@ -189,6 +211,8 @@ CoveringImprovementResult(
     two_line: np.ndarray,
     cut_off_frequency: float,
     bare_cut_off_frequency: float,
+    lines: np.ndarray,
+    line_improvement: np.ndarray,
     bare: TappingForceResult,
     covered: TappingForceResult,
 )
@@ -201,12 +225,14 @@ Predicted improvement `ΔL` of a soft floor covering (Hopkins 4.4.3.1).
 | Name | Description |
 | :--- | :--- |
 | `frequencies` | Band centre frequencies `f`, in Hz. |
-| `improvement` | Improvement `ΔL = 20 lg(\|Fn\|without/\|Fn\|with)` from the force spectra, in dB (Eq. 4.114). |
+| `improvement` | Band improvement `ΔL`, in dB: Eq. (4.114) evaluated over the tapping machine's Fourier lines and summed in mean square across each band, `10 lg(Σ\|Fn\|²without/Σ\|Fn\|²with)`. |
 | `two_line` | The two-line estimate, in dB: 0 below `fco` and 12 dB/octave (40 dB/decade) above it. |
 | `cut_off_frequency` | Cut-off frequency `fco` of the covered floor, in Hz. |
 | `bare_cut_off_frequency` | Cut-off frequency of the bare plate, in Hz. |
-| `bare` | The bare-plate [`TappingForceResult`](/phonometry/reference/api/building/resilient-layers/#tappingforceresult). |
-| `covered` | The [`TappingForceResult`](/phonometry/reference/api/building/resilient-layers/#tappingforceresult) with the covering. |
+| `lines` | Fourier line frequencies `n fi` of the tapping machine, in Hz, covering every band in `frequencies`. |
+| `line_improvement` | The per-line ratio `ΔL = 20 lg(\|Fn\|without/\|Fn\|with)` of Eq. (4.114) at `lines`, in dB. It carries the deep troughs at odd multiples of `fco` that Hopkins notes below Fig. 4.64, which are an artefact of the undamped model and disappear from `improvement`. |
+| `bare` | The bare-plate [`TappingForceResult`](/phonometry/reference/api/building/resilient-layers/#tappingforceresult), at `lines`. |
+| `covered` | The [`TappingForceResult`](/phonometry/reference/api/building/resilient-layers/#tappingforceresult) with the covering, at `lines`. |
 
 ### CoveringImprovementResult.plot()
 
@@ -423,13 +449,21 @@ Lindblad's solution of the mass-spring-dashpot of Hopkins Fig. 3.28, the
 hammer mass `m` on the contact stiffness `K` in series with the floor's
 driving-point impedance `Zdp`. For an **over-critical** oscillation
 (`K m ≥ 4 Zdp²`) the pulse decays to zero without changing sign
-(Eq. 3.95); for an **under-critical** one it is a decaying sinusoid whose
-first positive lobe is the impact proper (Eq. 3.96), the later oscillations
-being suppressed by the machine's hammer-catching mechanism. That
-suppression is applied here, so the under-critical pulse is returned as
-zero beyond its first zero crossing at `t = π/β`; it is the same
-truncation [`tapping_force_spectrum`](/phonometry/reference/api/building/resilient-layers/#tapping_force_spectrum) transforms, so integrating this
-pulse reproduces that spectrum over any window.
+(Eq. 3.95); for an **under-critical** one it is a decaying sinusoid
+(Eq. 3.96) whose first positive lobe is the impact proper. Hopkins's rule
+is stated in terms of the sign of the force rather than of any mechanism:
+"only the initial force pulse that has zero or positive force values is
+used to determine the force spectrum, with all subsequent values of F1(t)
+due to the oscillations set to zero before taking the Fourier transform",
+the hammer having rebounded from the plate. That truncation is applied
+here, so the under-critical pulse is returned as zero beyond its
+first zero crossing at `t = π/β`; it is the same truncation
+[`tapping_force_spectrum`](/phonometry/reference/api/building/resilient-layers/#tapping_force_spectrum) transforms, so integrating this pulse over
+`0 ≤ t ≤ π/β` reproduces that spectrum.
+
+The over-critical pulse has no such cut and decays for all `t`; it is
+evaluated in a form that stays finite over the whole 0,1 s between
+impacts rather than one that overflows partway through it.
 
 **Parameters**
 
@@ -540,6 +574,13 @@ m² (`0,66 ΔRw,ref − 1,2` and its two companions), and `glued_area`
 applies Formula (D.6), `ΔR − 0,05 %So + 2,0`, for a glued area other than
 the 40 % reference. Both corrections are applied after the floor of the
 reference formula, in the order the annex states them.
+
+The annex places the `≥ −4 dB` (or `≥ −3 dB`) floor inside Formulae
+(D.3) and (D.4) and says nothing about re-applying it after (D.5) and
+(D.6), so this function does not: a fully glued system on anchors can
+return about −6,8 dB, below the reference floor. That is the annex read
+literally, and the reason the two corrections are exposed as flags rather
+than folded into the fit.
 
 **Parameters**
 
@@ -744,19 +785,29 @@ bending-wave field, connected to a heavyweight base floor by `N` mounts
 per unit area of stiffness `k` each, with all transmission through the
 mounts and none through the cavity. Hopkins Eq. (4.118) writes it as
 
-`ΔL = 10 lg(Zdp1 ρs1 η1 ω³/(N' k²))`
+`ΔL ≈ 10 lg(2,3 ρs1² cL1 h1 η1 S1 ω³/(N k²))`
 
-with `Zdp1 = 2,3 ρ cL h²` the walking surface's driving-point impedance;
-Vigran's Eq. (8.45) writes the same term as
-`Z1 η1 N f³/(2 π m1 fo⁴)` with `fo = √(N k/m1)/(2 π)`, and the two are
-algebraically identical. The dominant-term form used here rises at
-**30 dB per decade** (9 dB per octave), against the 40 dB per decade of a
-continuous resilient layer: fewer mounts, a thicker walking surface or more
-internal damping all raise `ΔL`.
+where `k` is the dynamic stiffness of each mount, `N` the **number** of
+mounts and `S1` the area of the walking surface. Since
+`2,3 ρs1² cL1 h1 = Zdp1 ρs1` for `Zdp1 = 2,3 ρ cL h²` (Eq. 2.190), the
+same expression reads `10 lg(Zdp1 ρs1 η1 ω³/(N/S1 · k²))`, which is the
+form evaluated here: this function takes the mount **density** `N/S1`,
+not the count.
 
-Vigran's printed approximation Eq. (8.46) substitutes `Z1` into
-Eq. (8.45) with a coefficient `2/(3 π)` where `2,3/(2 π)` follows, a
-2,4 dB offset; see `docs/ERRATA.md`.
+Vigran's Eq. (8.45) is a sum of three terms, `Z1/Z2`, `m1 η1/(m2 η2)`
+and `Z1 η1 N f³/(2 π m1 fo⁴)` with `fo = √(N k/m1)/(2 π)`. Only the
+**third** of them is the model implemented here, and that term is
+algebraically identical to Hopkins Eq. (4.118); the first two are the
+low-frequency floor, negligible once the third dominates, which is the
+regime Vigran states the 9 dB per octave slope for. The dominant-term form
+used here therefore rises at **30 dB per decade** (9 dB per octave),
+against the 40 dB per decade of a continuous resilient layer: fewer mounts,
+a thicker walking surface or more internal damping all raise `ΔL`.
+
+Vigran's simplified Eq. (8.46) inserts `Z1` into that third term and
+prints the coefficient as `2/(√3 π) = 0,3676`, which is the same number
+as the `2,3094/(2 π) = 0,3676` the substitution gives; the two forms
+agree.
 
 **Parameters**
 
@@ -767,9 +818,9 @@ Eq. (8.45) with a coefficient `2/(3 π)` where `2,3/(2 π)` follows, a
 | `mass_per_area` | Mass per unit area `ρs1` of the walking surface, in kg/m². |
 | `loss_factor` | Total loss factor `η1` of the walking surface (scalar or per band). |
 | `mount_stiffness` | Dynamic stiffness `k` of one mount, in N/m. |
-| `mount_density` | Number of mounts per unit area `N'`, in 1/m². |
+| `mount_density` | Number of mounts per unit area `N/S1`, in 1/m² (Vigran's `N`, which is already a density). |
 
-**Returns:** The improvement `ΔL` per band, in dB.
+**Returns:** The improvement `ΔL` per band, in dB, and 0 dB at and below `fo`.
 
 **Raises**
 

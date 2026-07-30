@@ -2976,7 +2976,7 @@ def _chk_hopkins_tapping_cut_off() -> Outcome:
 
 @register(
     "Room & building acoustics",
-    "Hopkins (2007) Figs. 3.30/3.31 and 4.73, printed pp. 281 and 523",
+    "Hopkins (2007) Figs. 3.30/3.31 and 4.73, printed pp. 281 and 524",
     "Over/under-critical case of four walking surfaces; double floating-floor "
     "resonances 74 Hz and 195 Hz",
 )
@@ -3020,9 +3020,14 @@ def _chk_iso12354_2_floating_floor() -> Outcome:
     spectrum = ph.floating_floor_improvement_spectrum(
         bands, resonance_frequency=f0
     )
-    worst = float(np.max(np.abs(
-        spectrum.improvement - np.asarray(ref.ISO12354_ANNEX_G4_DELTA_L)
-    )))
+    printed = np.asarray(ref.ISO12354_ANNEX_G4_DELTA_L)
+    worst = float(np.max(np.abs(spectrum.improvement - printed)))
+    # The printed table is quoted to 0,1 dB, so a residual under 0,05 dB is
+    # the most any correct model can be asked for; requiring the computed
+    # values to round *onto* the printed ones is the exact statement, and
+    # stops the row passing on a near-miss inside the rounding quantum.
+    if not np.array_equal(np.round(spectrum.improvement, 1), printed):
+        worst = float("inf")
     delta_lw = float(ph.weighted_floating_floor_improvement(mass, stiffness))
     worst = max(worst, abs(delta_lw - ref.ISO12354_ANNEX_G10_DELTA_LW))
     # The resonance frequency is in hertz, so it is verified separately rather

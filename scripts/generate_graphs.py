@@ -7577,16 +7577,13 @@ def generate_soft_covering_prediction(output_dir: str) -> None:
         plate_bending_stiffness(modulus, thickness, poisson),
         density * thickness)
 
-    # The tapping machine's force spectrum is a line spectrum at multiples of
-    # the 10 Hz impact rate, so the band improvement is the ratio of the
-    # mean-square forces summed over the lines that fall in each band
-    # (Hopkins Eq. 3.91). Averaging that way removes the narrow-band ripple
-    # of the undamped model, as Hopkins notes below Fig. 4.65.
+    # covering_improvement returns the band value directly: the tapping
+    # machine's force spectrum is a line spectrum at multiples of the 10 Hz
+    # impact rate, and the band improvement is the ratio of the mean-square
+    # forces summed over the lines that fall in each band (Hopkins Eq. 3.91).
     bands = np.array([50.0, 63.0, 80.0, 100.0, 125.0, 160.0, 200.0, 250.0,
                       315.0, 400.0, 500.0, 630.0, 800.0, 1000.0, 1250.0,
                       1600.0, 2000.0, 2500.0, 3150.0, 4000.0, 5000.0])
-    lines = np.arange(1, 700) * 10.0
-    edge = np.log10(2.0) / 6.0
     layer = 0.005
     series = (
         ("No. 1: E/d = 1.5e11 N/m3", 1.5e11, COLOR_SECONDARY, "--"),
@@ -7597,22 +7594,12 @@ def generate_soft_covering_prediction(output_dir: str) -> None:
     labels = []
     for label, stiffness_per_volume, colour, style in series:
         result = covering_improvement(
-            lines,
+            bands,
             covering_contact_stiffness(stiffness_per_volume * layer, layer),
             plate_stiffness, impedance)
-        banded = np.array([
-            10.0 * np.log10(
-                np.mean(result.bare.peak_force[m] ** 2)
-                / np.mean(result.covered.peak_force[m] ** 2)
-            )
-            for m in (np.abs(np.log10(lines / b)) <= edge for b in bands)
-        ])
-        two_line = np.where(bands > result.cut_off_frequency,
-                            40.0 * np.log10(bands / result.cut_off_frequency),
-                            0.0)
-        ax.plot(bands, banded, style, color=colour, linewidth=2.2,
+        ax.plot(bands, result.improvement, style, color=colour, linewidth=2.2,
                 marker="o", markersize=5, label=label)
-        ax.plot(bands, two_line, ":", color=colour, linewidth=1.5)
+        ax.plot(bands, result.two_line, ":", color=colour, linewidth=1.5)
         ax.axvline(result.cut_off_frequency, color=colour, linestyle=":",
                    linewidth=1.0, alpha=0.7)
         labels.append(f"{label.split(':')[0]}: fco = "

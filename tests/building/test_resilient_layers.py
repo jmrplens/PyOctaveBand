@@ -19,6 +19,8 @@ the four walking surfaces used throughout: concrete cast in situ
 
 from __future__ import annotations
 
+import warnings
+
 import numpy as np
 import pytest
 import reference_data as ref
@@ -48,6 +50,10 @@ from phonometry import (
     tapping_force_spectrum,
     weighted_floating_floor_improvement,
     weighted_lining_improvement,
+)
+from phonometry.building.resilient_layers import (
+    _THIRD_OCTAVE_CENTRES,
+    _THIRD_OCTAVE_FIRST_INDEX,
 )
 
 #: Hopkins Table A2 material data as ``(rho, cL, nu)`` (printed p. 608).
@@ -233,15 +239,30 @@ def test_power_input_rises_3_db_per_doubling_below_1_khz() -> None:
         assert np.allclose(np.diff(level), 3.0103, atol=0.35)
 
 
-def test_limiting_frequency_matches_the_printed_figure_4_70_caption() -> None:
-    """H Fig. 4.70 caption, printed p. 521.
+def test_limiting_frequency_matches_the_printed_figure_4_70_panel() -> None:
+    """H Fig. 4.70, printed p. 521 / pdf p. 548.
 
-    "Walking surface: 22 mm chipboard. Resilient layer: s = 4 MN/m3 ... Base
-    floor: 140 mm concrete slab", with "fms = 83 Hz" and "flimit = 521 Hz".
-    The two printed frequencies come from different formulae (Eq. 4.120 and
-    Eq. 3.106) but from one specimen, so the mass per unit area implied by
-    ``fms`` must also reproduce ``flimit`` through the Table A2 chipboard
-    quasi-longitudinal speed.
+    The construction and both frequencies are printed *inside the plot panel*,
+    not in the caption: "Walking surface: 22 mm chipboard", "Resilient layer:
+    s' = 4 MN/m3 (45 mm reconstituted foam formed from two layers of foam)",
+    "Base floor: 140 mm concrete slab", "fms = 83 Hz", "flimit = 521 Hz".
+
+    The two frequencies come from different formulae (Eq. 4.120 and Eq. 3.106)
+    but from one specimen, so the mass per unit area implied by ``fms`` must
+    also reproduce ``flimit`` through the Table A2 chipboard quasi-longitudinal
+    speed. That is what is pinned here, and it is a *consistency* anchor
+    rather than a transcription one.
+
+    It is worth being explicit about how strong it is. Working back from
+    ``fms = 83 Hz`` gives ``rho_s = 14,71 kg/m2``, i.e. a chipboard density of
+    668,5 kg/m3, and working back from ``flimit = 521 Hz`` gives 668,3 kg/m3:
+    the two agree to 0,03 %, which is why the identity holds. But neither is
+    the 760 kg/m3 that Table A2 prints for chipboard and that this file uses
+    everywhere else; with 760 the same construction would give 77,9 Hz and
+    592 Hz, not 83 and 521. Hopkins gives no density for the Fig. 4.70
+    specimen anywhere (the "22 mm chipboard (17 kg/m2)" of Figs. 3.31 to 3.33
+    is a third value again, 773 kg/m3), so the anchor pins the two formulae
+    against each other and not against Table A2.
     """
     printed_fms, printed_flimit = 83.0, 521.0
     thickness, c_l = 0.022, _A2["chipboard"][1]
@@ -323,6 +344,177 @@ def test_over_critical_pulse_stays_positive() -> None:
     assert pulse[-1] < pulse.max() * 1e-3
 
 
+def test_over_critical_pulse_is_finite_over_the_whole_impact_period() -> None:
+    """The pulse must survive the machine's own 0,1 s between impacts.
+
+    The over-critical solution of Eq. (3.95) is
+    ``vo K e^(-a t) sinh(gamma t)/gamma``. Evaluated as printed, the
+    exponential underflows to zero while the hyperbolic sine overflows, and
+    ``0 * inf`` is NaN. For Hopkins's 22 mm chipboard (over-critical, printed
+    p. 280) that happens at t = 0,0278 s, well inside ``Ti = 1/fi = 0,1 s``,
+    so a caller sampling one impact period would get NaN for most of it.
+    """
+    stiffness, impedance = _plate("chipboard", 0.022)
+    time = np.linspace(0.0, 1.0 / 10.0, 1001)
+    pulse = force_pulse(time, stiffness, impedance)
+    assert np.all(np.isfinite(pulse))
+    assert np.all(pulse >= 0.0)
+    assert np.isfinite(force_pulse([0.1], stiffness, impedance)).all()
+    # The tail is a pure decay, so it must be monotonic after the peak and
+    # reach zero rather than diverge.
+    peak = int(np.argmax(pulse))
+    assert np.all(np.diff(pulse[peak:]) <= 0.0)
+    assert pulse[-1] == pytest.approx(0.0, abs=1e-12)
+
+
+def test_over_critical_pulse_is_still_equation_3_95() -> None:
+    """The stable evaluation changes the rounding, not the function.
+
+    Two independent checks of Eq. (3.95),
+    ``F1 = vo K e^(-a t) sinh(gamma t)/gamma``:
+
+    * where the printed form is representable in double precision (up to
+      about 0,025 s for this plate) the two agree to 1e-12 relative;
+    * beyond that, Eq. (3.95) is analytically a pure exponential of rate
+      ``a - gamma``, since the second exponential of
+      ``sinh = (e^(gamma t) - e^(-gamma t))/2`` has long since vanished. The
+      logarithmic slope of the returned pulse must equal ``-(a - gamma)``.
+    """
+    stiffness, impedance = _plate("chipboard", 0.022)
+    v0 = hammer_impact_velocity()
+    decay = stiffness / (2.0 * impedance)
+    gamma = np.sqrt(decay**2 - stiffness / TAPPING_HAMMER_MASS)
+
+    safe = np.linspace(1e-7, 0.02, 4001)
+    printed = v0 * stiffness * np.exp(-decay * safe) * np.sinh(gamma * safe) / gamma
+    assert np.all(np.isfinite(printed))
+    assert np.allclose(force_pulse(safe, stiffness, impedance), printed, rtol=1e-12)
+
+    tail = np.array([0.03, 0.05, 0.08, 0.1])
+    values = force_pulse(tail, stiffness, impedance)
+    assert np.all(values > 0.0)
+    slope = np.diff(np.log(values)) / np.diff(tail)
+    assert np.allclose(slope, -(decay - gamma), rtol=1e-9)
+    # And the amplitude of that exponential is vo K/(2 gamma).
+    assert np.allclose(
+        values, v0 * stiffness * np.exp(-(decay - gamma) * tail) / (2.0 * gamma),
+        rtol=1e-12,
+    )
+
+
+def test_under_critical_pulse_is_truncated_at_the_first_zero_crossing() -> None:
+    """H printed p. 280: "only the initial force pulse that has zero or
+    positive force values is used ... with all subsequent values of F1(t) due
+    to the oscillations set to zero".
+
+    The cut is at ``t = pi/beta`` with ``beta = sqrt(K/m - (K/2 Zdp)^2)``, the
+    first zero of the sine of Eq. (3.96). Neither ``2 pi/beta`` (which keeps a
+    whole negative lobe), nor ``pi/omega_o`` (which cuts the positive lobe
+    short), nor leaving the pulse untruncated satisfies the printed rule.
+    """
+    stiffness, impedance = _plate("concrete", 0.14)
+    decay = stiffness / (2.0 * impedance)
+    omega0 = np.sqrt(stiffness / TAPPING_HAMMER_MASS)
+    beta = np.sqrt(omega0**2 - decay**2)
+    duration = np.pi / beta
+    # Positive right up to the cut, exactly zero just after it.
+    assert force_pulse([duration * 0.999], stiffness, impedance)[0] > 0.0
+    assert force_pulse([duration * 1.001], stiffness, impedance)[0] == 0.0
+    # An untruncated Eq. (3.96) would be negative in the next half period.
+    negative = duration * 1.5
+    assert np.sin(beta * negative) < 0.0
+    assert force_pulse([negative], stiffness, impedance)[0] == 0.0
+    # pi/omega_o is a different, shorter time, and the pulse is still positive
+    # and rising nowhere near zero there.
+    assert np.pi / omega0 < duration
+    assert force_pulse([np.pi / omega0], stiffness, impedance)[0] > 0.0
+    assert np.all(force_pulse(np.linspace(0.0, duration, 401), stiffness,
+                              impedance) >= 0.0)
+
+
+def test_spectrum_truncation_uses_the_same_duration_as_the_pulse() -> None:
+    """The closed-form transform must integrate exactly the truncated pulse.
+
+    :func:`tapping_force_spectrum` multiplies by
+    ``1 + e^(-a T) e^(-i omega T)`` with ``T = pi/beta``. Any other ``T``
+    breaks the agreement with a quadrature of :func:`force_pulse`, which is
+    what this pins; the previous check evaluated the quadrature only over
+    ``[0, pi/beta]``, so a wrong ``T`` in the transform stayed invisible.
+    """
+    stiffness, impedance = _plate("concrete", 0.14)
+    decay = stiffness / (2.0 * impedance)
+    beta = np.sqrt(stiffness / TAPPING_HAMMER_MASS - decay**2)
+    duration = np.pi / beta
+    # Integrate over three times the pulse duration: the extra range is zero
+    # in the pulse, so a transform truncated at 2 pi/beta or pi/omega_o can no
+    # longer agree with it.
+    time = np.linspace(0.0, 3.0 * duration, 300001)
+    pulse = force_pulse(time, stiffness, impedance)
+    assert np.all(pulse[time > duration] == 0.0)
+    freqs = np.array([200.0, 1500.0, 4000.0, 9000.0])
+    quadrature = np.array([
+        np.trapezoid(pulse * np.exp(-2.0j * np.pi * f * time), time) for f in freqs
+    ])
+    result = tapping_force_spectrum(freqs, stiffness, impedance)
+    assert np.allclose(result.peak_force, np.abs(quadrature) * 10.0, rtol=3e-3)
+
+
+def test_spectrum_truncation_holds_for_a_heavily_damped_impact() -> None:
+    """The same identity where ``pi/beta`` and ``pi/omega_o`` are far apart.
+
+    On a concrete slab the hammer impact is barely damped: ``a/omega_o`` is
+    0,029, so ``beta = sqrt(omega_o^2 - a^2)`` is within 0,04 % of
+    ``omega_o`` and *any* test on that specimen accepts either as the
+    truncation time. Just below the critical point they differ by a factor of
+    five, which is where the distinction is actually observable.
+    """
+    stiffness, mass = 1.0e8, TAPPING_HAMMER_MASS
+    impedance = 3600.0                     # 4 Zdp^2 = 5,18e7 > K m = 5,0e7
+    assert stiffness * mass < 4.0 * impedance**2
+    decay = stiffness / (2.0 * impedance)
+    omega0 = np.sqrt(stiffness / mass)
+    beta = np.sqrt(omega0**2 - decay**2)
+    assert np.pi / beta > 5.0 * np.pi / omega0
+    duration = np.pi / beta
+
+    time = np.linspace(0.0, 2.0 * duration, 400001)
+    pulse = force_pulse(time, stiffness, impedance)
+    assert np.all(pulse[time > duration] == 0.0)
+    assert pulse[time < duration].min() >= 0.0
+    freqs = np.array([300.0, 1200.0, 3000.0])
+    quadrature = np.array([
+        np.trapezoid(pulse * np.exp(-2.0j * np.pi * f * time), time) for f in freqs
+    ])
+    result = tapping_force_spectrum(freqs, stiffness, impedance)
+    assert result.over_critical is False
+    assert np.allclose(result.peak_force, np.abs(quadrature) * 10.0, rtol=3e-3)
+
+
+def test_critical_case_is_inclusive_and_finite() -> None:
+    """H printed p. 279 splits the cases at "K m >= 4 Z_dp^2", inclusively.
+
+    The sign is load-bearing rather than cosmetic. At exact equality the
+    under-critical branch has ``beta = 0``: its truncation time ``pi/beta`` is
+    infinite and its spectrum is ``nan + nan j``. The inclusive ``>=`` sends
+    that case to the over-critical branch, whose critically damped limit
+    ``F1 = vo K t e^(-a t)`` is finite.
+    """
+    mass = TAPPING_HAMMER_MASS
+    stiffness = 1.0e8
+    critical = np.sqrt(stiffness * mass) / 2.0        # K m == 4 Zdp^2 exactly
+    assert stiffness * mass == pytest.approx(4.0 * critical**2, rel=1e-12)
+    result = tapping_force_spectrum([100.0, 1000.0], stiffness, critical)
+    assert result.over_critical is True
+    assert np.all(np.isfinite(result.peak_force))
+    assert np.all(result.peak_force > 0.0)
+    pulse = force_pulse([0.0, 1e-4, 1e-3, 0.1], stiffness, critical)
+    assert np.all(np.isfinite(pulse))
+    assert pulse[0] == 0.0
+    # The critically damped limit is the t -> 0 limit of both neighbours.
+    nearby = force_pulse([1e-4], stiffness, critical * (1.0 + 1e-9))[0]
+    assert pulse[1] == pytest.approx(nearby, rel=1e-6)
+
+
 def test_troughs_occur_at_odd_multiples_of_the_cut_off() -> None:
     """H printed p. 514: "deep troughs in the force spectra above the cut-off
     frequency; these occur at frequencies n fco where n = 3, 5, 7, etc."."""
@@ -385,13 +577,24 @@ def test_two_line_estimate_rises_12_db_per_octave() -> None:
     freqs = np.array([200.0, 400.0, 800.0, 1600.0])
     result = covering_improvement(freqs, covering, plate_stiffness, impedance)
     assert np.allclose(np.diff(result.two_line), 12.0411, atol=1e-3)
-    # The force-ratio model approaches the same asymptote from above: 14,0 dB
-    # over the first octave after fco, 12,1 dB three octaves later.
-    assert np.allclose(np.diff(result.improvement), 12.0, atol=2.0)
-    far = covering_improvement(
-        np.array([800.0, 1600.0, 3200.0]), covering, plate_stiffness, impedance
+    # The band model approaches the same asymptote from above. Octave bands
+    # average the truncation ripple (whose period is 4 fco = 400 Hz) far more
+    # evenly than one-third-octave bands do, so the convergence is read there.
+    octaves = covering_improvement(
+        np.array([250.0, 500.0, 1000.0, 2000.0, 4000.0]),
+        covering, plate_stiffness, impedance, band="octave",
     )
-    assert np.allclose(np.diff(far.improvement), 12.0411, atol=0.3)
+    steps = np.diff(octaves.improvement)
+    assert np.all(steps > 11.0)
+    assert np.all(np.diff(steps) < 0.0)          # monotonically approaching
+    assert steps[-1] == pytest.approx(12.0411, abs=0.6)
+    # Above the *bare* slab's own cut-off (about 7 kHz) the uncovered force
+    # falls too and DeltaL stops rising, so the asymptote is not read there.
+    far = covering_improvement(
+        np.array([8000.0, 16000.0]), covering, plate_stiffness, impedance,
+        band="octave",
+    )
+    assert np.diff(far.improvement)[0] < 6.0
 
 
 @pytest.mark.parametrize(
@@ -416,6 +619,113 @@ def test_vigran_covering_resonance_frequencies(
     impedance = 1e9
     fco = tapping_cut_off_frequency(stiffness, impedance)
     assert fco == pytest.approx(printed_f0, rel=0.03)
+
+
+def test_covering_improvement_is_a_band_value_not_a_single_fourier_line() -> None:
+    """The tapping machine excites lines at multiples of ``fi = 10 Hz``.
+
+    H Eq. (4.114) is a statement about one Fourier component, so a band value
+    is the ratio of the band mean-square forces (Eq. 3.91), summed over the
+    lines the band contains. Evaluating the ratio at the band centre alone is
+    not that, and the difference is not small: the undamped model's transform
+    has exact nulls at odd multiples of ``fco`` (H printed p. 514, "deep
+    troughs ... at frequencies n fco where n = 3, 5, 7"), so a band centre
+    that lands on one reads tens of dB high.
+
+    Hopkins's covering No. 2 has ``fco = 100,13 Hz``, which puts 500 Hz within
+    0,2 % of ``5 fco``. Every earlier test of this function used
+    200/400/800/1600/3200 Hz, all *even* multiples, so none of them saw it.
+    """
+    plate_stiffness, impedance = _plate("concrete", 0.14)
+    thickness = 0.005
+    covering = covering_contact_stiffness(2.8e8 * thickness, thickness)
+    odd = np.array([300.0, 500.0, 700.0])          # 3 fco, 5 fco, 7 fco
+    result = covering_improvement(odd, covering, plate_stiffness, impedance)
+    assert result.cut_off_frequency == pytest.approx(100.0, rel=0.01)
+
+    # The per-line ratio still carries the nulls, and is where they belong.
+    line = result.line_improvement[np.isin(result.lines, odd)]
+    assert np.all(line - result.two_line > 35.0)
+
+    # The band value does not: it stays within a few dB of the design
+    # estimate, as the two-line rule of H printed p. 514 requires.
+    assert np.all(np.abs(result.improvement - result.two_line) < 10.0)
+    assert result.improvement[1] < line[1] - 30.0
+
+    # The nulls are genuinely nulls: the covered force at 500 Hz is more than
+    # 30 dB below its neighbours 20 Hz away, so nothing here is a rounding
+    # artefact of the tolerance.
+    index = int(np.argmin(np.abs(result.lines - 500.0)))
+    trough = result.covered.peak_force[index]
+    assert 20.0 * np.log10(result.covered.peak_force[index - 2] / trough) > 25.0
+
+
+def test_covering_band_average_is_independent_of_where_the_grid_falls() -> None:
+    """Neighbouring band centres must not disagree by tens of dB.
+
+    A line-spectrum attribute jumps by 39 dB between 400 Hz and 500 Hz on this
+    specimen; a band average moves smoothly, which is the property that makes
+    the number usable on the standard one-third-octave grid.
+    """
+    plate_stiffness, impedance = _plate("concrete", 0.14)
+    thickness = 0.005
+    covering = covering_contact_stiffness(2.8e8 * thickness, thickness)
+    grid = np.array([125.0, 160.0, 200.0, 250.0, 315.0, 400.0, 500.0, 630.0,
+                     800.0, 1000.0, 1250.0, 1600.0, 2000.0, 2500.0, 3150.0])
+    result = covering_improvement(grid, covering, plate_stiffness, impedance)
+    assert np.all(result.improvement > 0.0)
+    steps = np.diff(result.improvement)
+    assert np.all(steps > -11.0)
+    assert np.all(steps < 17.0)
+    # The line ratio on the same grid is far wilder.
+    lines = result.line_improvement[np.isin(result.lines, grid)]
+    assert np.max(np.abs(np.diff(lines))) > 35.0
+
+
+@pytest.mark.parametrize(
+    ("band", "exponent"), [("third", 1.0 / 6.0), ("octave", 0.5)]
+)
+def test_covering_bands_are_the_iec_61260_base_ten_bands(
+    band: str, exponent: float
+) -> None:
+    """The lines a band averages over are set by the IEC 61260-1 band edges.
+
+    IEC 61260-1 base-ten bands use ``G = 10^(3/10)``, so a one-``b``-th octave
+    band about ``fc`` runs from ``fc G^(-1/(2b))`` to ``fc G^(1/(2b))``: a
+    factor ``10^0,05`` for one-third octaves and ``10^0,15`` for octaves. The
+    base-two convention would give ``2^(1/6)`` and ``sqrt(2)``, 0,04 % and
+    0,12 % wider, which changes which Fourier lines a band contains.
+
+    The edges are pinned through their observable consequence: the band value
+    must equal the mean-square ratio over exactly the lines the IEC definition
+    selects, and nothing else.
+    """
+    plate_stiffness, impedance = _plate("concrete", 0.14)
+    thickness = 0.005
+    covering = covering_contact_stiffness(2.8e8 * thickness, thickness)
+    ratio = (10.0 ** (3.0 / 10.0)) ** exponent
+    centres = np.array([200.0, 1000.0, 4000.0])
+    result = covering_improvement(
+        centres, covering, plate_stiffness, impedance, band=band,  # type: ignore[arg-type]
+    )
+    for i, fc in enumerate(centres):
+        chosen = (result.lines >= fc / ratio) & (result.lines <= fc * ratio)
+        expected = 10.0 * np.log10(
+            np.sum(result.bare.peak_force[chosen] ** 2)
+            / np.sum(result.covered.peak_force[chosen] ** 2)
+        )
+        assert result.improvement[i] == pytest.approx(expected, abs=1e-9)
+    # The octave band at 1 kHz holds exactly 71 lines of the 10 Hz comb,
+    # 710 Hz to 1410 Hz. Edges 1,5 % wider reach 700 Hz and 1430 Hz and hold
+    # 74, which is what makes the constant observable at all.
+    if band == "octave":
+        inside = (result.lines >= 1000.0 / ratio) & (result.lines <= 1000.0 * ratio)
+        assert int(inside.sum()) == 71
+        assert result.lines[inside][0] == 710.0
+        assert result.lines[inside][-1] == 1410.0
+        wide = 1.015 * ratio
+        wider = (result.lines >= 1000.0 / wide) & (result.lines <= 1000.0 * wide)
+        assert int(wider.sum()) == 74
 
 
 def test_covering_improvement_result_carries_both_cut_offs() -> None:
@@ -514,13 +824,24 @@ def test_combined_dynamic_stiffness_is_springs_in_series() -> None:
 
 
 def test_double_floating_floor_matches_printed_74_and_195_hz() -> None:
-    """H Fig. 4.73 caption, printed p. 523.
+    """H Fig. 4.73, printed p. 524 / pdf p. 551 (Eq. 4.125 itself is on 523).
 
-    "Walking surface: 18 mm plywood. Resilient layer: s = 7,25 MN/m3 (25 mm
-    reconstituted foam). Base floor: 140 mm concrete slab ... Single floating
-    floor fms = 118 Hz. Double floating floor fmsms = 74 Hz and 195 Hz."
+    The construction and all three frequencies are printed *inside the plot
+    panel*, not in the caption: "Walking surface: 18 mm plywood", "Resilient
+    layer: s' = 7,25 MN/m3 (25 mm reconstituted foam)", "Base floor: 140 mm
+    concrete slab", "Single floating floor fms = 118 Hz", "Double floating
+    floor fmsms = 74 Hz and 195 Hz". The double floor is the same floor
+    doubled, so both layers are identical.
+
     The mass per unit area comes from the Table A2 plywood density
-    (710 kg/m3), independently of the printed frequencies.
+    (710 kg/m3), independently of the printed frequencies. The three printed
+    numbers are mutually consistent only to about 1,6 %, so the tolerance is
+    2 % rather than tighter: ``sqrt(s'/rho_s)/(2 pi)`` gives 119,9 Hz against
+    the printed 118 Hz, and the printed 74 and 195 imply ``fms = 120,1 Hz``
+    through the identity ``fmsms,lower * fmsms,upper = fms^2`` that holds for
+    two identical floors. The 118 is the odd one out. Values read off a plot
+    panel carry that much slack; the closed-form identity below is the exact
+    anchor.
     """
     mass_per_area = _A2["plywood"][0] * 0.018
     stiffness = 7.25e6
@@ -531,6 +852,44 @@ def test_double_floating_floor_matches_printed_74_and_195_hz() -> None:
     )
     assert lower == pytest.approx(74.0, rel=0.02)
     assert upper == pytest.approx(195.0, rel=0.02)
+
+
+def test_double_floating_floor_asymmetric_matches_the_two_degree_eigenproblem() -> None:
+    """H Eq. (4.125) against the 2-DOF eigenvalue problem it solves.
+
+    Every other test of this function uses two identical floors, where the
+    middle term of ``X`` is unobservable: ``s'2/rho_s1`` and ``s'1/rho_s2``
+    are then the same number, so transposing it survives. This one uses
+    different masses *and* different stiffnesses.
+
+    The oracle is built from the equations of motion rather than from
+    Eq. (4.125). With subsystem 1 the lower floating floor (H Fig. 4.72,
+    printed p. 523, whose layers are labelled ``rho_s2, s'2, rho_s1, s'1``
+    from the top), the displacements obey
+    ``rho_s1 x1'' = -s'1 x1 + s'2 (x2 - x1)`` and
+    ``rho_s2 x2'' = -s'2 (x2 - x1)``, i.e. ``M = diag(rho_s1, rho_s2)`` and
+    ``K = [[s'1 + s'2, -s'2], [-s'2, s'2]]``. The resonances are
+    ``sqrt(eig(M^-1 K))/(2 pi)``, computed here by :func:`numpy.linalg.eigvals`.
+    """
+    # Lower floor: a 45 mm sand-cement screed (110 kg/m2) on a stiff 30 MN/m3
+    # layer. Upper floor: 22 mm chipboard (17 kg/m2) on a soft 4 MN/m3 layer,
+    # the resilient layer of H Fig. 4.70.
+    s1, m1, s2, m2 = 30.0e6, 110.0, 4.0e6, 17.0
+    stiffness_matrix = np.array([[s1 + s2, -s2], [-s2, s2]])
+    mass_matrix = np.diag([m1, m2])
+    omega_sq = np.sort(np.linalg.eigvals(np.linalg.inv(mass_matrix) @ stiffness_matrix))
+    expected = np.sqrt(np.real(omega_sq)) / (2.0 * np.pi)
+
+    lower, upper = double_floating_floor_resonances(s1, m1, s2, m2)
+    assert lower == pytest.approx(expected[0], rel=1e-10)
+    assert upper == pytest.approx(expected[1], rel=1e-10)
+    # The two orderings of the middle term are far apart on this specimen, so
+    # a transposition cannot hide inside the tolerance.
+    transposed_x = s1 / m1 + s1 / m2 + s2 / m2
+    scale = 1.0 / (2.0**1.5 * np.pi)
+    root = np.sqrt(transposed_x**2 - 4.0 * s1 * s2 / (m1 * m2))
+    assert abs(scale * np.sqrt(transposed_x - root) - lower) > 30.0
+    assert abs(scale * np.sqrt(transposed_x + root) - upper) > 100.0
 
 
 def test_double_floating_floor_identical_layers_give_the_golden_ratio() -> None:
@@ -677,6 +1036,64 @@ def test_asphalt_weighted_improvement_exceeds_the_screed_branch() -> None:
         ) == pytest.approx(printed, abs=1e-9)
 
 
+@pytest.mark.parametrize(
+    ("model", "expected_floor", "kwargs"),
+    [
+        ("en12354", "screed", {}),
+        ("cremer", "asphalt", {}),
+        ("cremer_hammer", "asphalt", {"limiting_frequency": 521.0}),
+    ],
+)
+def test_spectrum_picks_the_weighted_fit_of_its_own_construction(
+    model: str, expected_floor: str, kwargs: dict[str, float]
+) -> None:
+    """The 30 lg law is the screed branch (C.1/C.4); the two 40 lg laws are the
+    asphalt and dry floating floors (C.3/C.5), so ``delta_lw`` must follow.
+
+    Every other test supplies either no mass and stiffness at all, or supplies
+    them only with the default model, so swapping the two fits is invisible.
+    Here the mapping is checked on a specimen where the two formulae are
+    9,5 dB apart, well outside any plausible tolerance.
+    """
+    mass, stiffness = 73.5, 8.0e6
+    result = floating_floor_improvement_spectrum(
+        np.array([100.0, 500.0]), resonance_frequency=52.8, model=model,
+        mass_per_area=mass, dynamic_stiffness=stiffness, **kwargs,
+    )
+    expected = weighted_floating_floor_improvement(
+        mass, stiffness, floor=expected_floor  # type: ignore[arg-type]
+    )
+    other = weighted_floating_floor_improvement(
+        mass, stiffness,
+        floor="asphalt" if expected_floor == "screed" else "screed",  # type: ignore[arg-type]
+    )
+    assert abs(expected - other) > 5.0
+    assert result.delta_lw == pytest.approx(expected, abs=1e-9)
+
+
+def test_mount_model_is_zero_at_and_below_its_own_resonance() -> None:
+    """The Ver model is the *dominant* term of V Eq. (8.45), valid above ``fo``.
+
+    Below ``fo = sqrt(N s/m1)/(2 pi)`` the dominant term alone falls without
+    bound and goes negative, which would say a resilient mounting makes the
+    impact insulation worse the softer it is. H printed p. 521 handles the
+    same regime by convention: "it is simplest to assume that DeltaL = 0 dB in
+    all frequency bands below the band containing fms".
+    """
+    impedance, mass_per_area = 3.8e5, 115.0
+    stiffness, density = 2.0e6, 4.0
+    f0 = np.sqrt(density * stiffness / mass_per_area) / (2.0 * np.pi)
+    assert f0 == pytest.approx(41.98, abs=0.05)
+    values = resilient_mount_improvement(
+        np.array([1.0, 10.0, f0, f0 * 1.01, 100.0]), impedance=impedance,
+        mass_per_area=mass_per_area, loss_factor=0.02,
+        mount_stiffness=stiffness, mount_density=density,
+    )
+    assert np.all(values[:3] == 0.0)
+    assert values[3] > 0.0
+    assert values[4] > values[3]
+
+
 # ===========================================================================
 # Wall linings and additional layers (ISO 12354-1 Annex D)
 # ===========================================================================
@@ -762,7 +1179,8 @@ def test_table_d1_low_frequency_branch() -> None:
     assert weighted_lining_improvement(160.0, 60.0) == pytest.approx(
         74.4 - 20.0 * np.log10(160.0) - 30.0, abs=1e-9
     )
-    assert weighted_lining_improvement(160.0, 62.0) == 0.0
+    with pytest.warns(UserWarning, match="outside the 20 dB"):
+        assert weighted_lining_improvement(160.0, 62.0) == 0.0
 
 
 @pytest.mark.parametrize(
@@ -780,12 +1198,91 @@ def test_table_d1_fixed_rows(resonance: float, printed: float) -> None:
     assert weighted_lining_improvement(resonance, 30.0) == printed
 
 
-def test_table_d1_rounds_to_the_third_octave_band() -> None:
+@pytest.mark.parametrize(
+    ("lower_band", "upper_band", "lower_value", "upper_value"),
+    [
+        # ISO 266 band edges are 10^((n +- 0,5)/10) about the exact midband
+        # frequencies 10^(n/10), NOT the geometric mean of the rounded nominal
+        # labels. The two disagree by up to 1,4 % and straddle real inputs.
+        (250.0, 315.0, -3.0, -5.0),
+        (315.0, 400.0, -5.0, -7.0),
+        (400.0, 500.0, -7.0, -9.0),
+        (500.0, 630.0, -9.0, -10.0),
+    ],
+)
+def test_table_d1_reads_the_band_containing_fo_not_the_nearest_label(
+    lower_band: float, upper_band: float, lower_value: float, upper_value: float
+) -> None:
     """ISO 12354-1:2017 Clause D.2.2, printed p. 38: ``fo`` is "rounded to the
-    centre frequency of the one-third-octave band in which fo falls"."""
-    assert weighted_lining_improvement(238.0, 45.0) == -3.0
-    assert weighted_lining_improvement(279.0, 45.0) == -3.0
-    assert weighted_lining_improvement(281.0, 45.0) == -5.0
+    centre frequency of the one-third-octave band in which fo falls".
+
+    Band *containment*, not proximity to a label. The edge between two
+    one-third-octave bands ``n`` and ``n + 1`` is ``10^((n + 0,5)/10)``, which
+    for 250|315 is 281,838 Hz while the geometric mean of the labels is
+    280,624 Hz: a resonance at 281 Hz belongs to the 250 Hz band and reads
+    -3 dB, and a nearest-label rounding would answer -5 dB.
+    """
+    index = int(np.round(10.0 * np.log10(lower_band)))
+    edge = 10.0 ** ((index + 0.5) / 10.0)
+    assert weighted_lining_improvement(edge * 0.999, 45.0) == lower_value
+    assert weighted_lining_improvement(edge * 1.001, 45.0) == upper_value
+    # Every nominal centre must read its own row.
+    assert weighted_lining_improvement(lower_band, 45.0) == lower_value
+    assert weighted_lining_improvement(upper_band, 45.0) == upper_value
+
+
+def test_table_d1_low_branch_evaluates_at_the_rounded_nominal_not_raw_fo() -> None:
+    """Clause D.2.2 rounds ``fo`` *before* Table D.1 is read, and the
+    ``74,4 - 20 lg(fo) - Rw/2`` row is part of Table D.1.
+
+    So the formula is evaluated at the band's nominal centre, not at the raw
+    resonance frequency: two linings whose resonances fall in the same band
+    must get the same rating. Using raw ``fo`` instead is what lets a
+    band-edge error through unnoticed, since the answer then varies smoothly
+    and no boundary test can see it.
+    """
+    # 100 Hz band: 89,1 Hz to 112,2 Hz (ISO 266 edges).
+    expected = 74.4 - 20.0 * np.log10(100.0) - 22.5
+    for f0 in (89.2, 95.0, 100.0, 108.0, 112.0):
+        assert weighted_lining_improvement(f0, 45.0) == pytest.approx(
+            expected, abs=1e-9
+        )
+    # Raw fo would spread these over 2 dB.
+    raw = [74.4 - 20.0 * np.log10(f) - 22.5 for f in (89.2, 112.0)]
+    assert raw[0] - raw[1] == pytest.approx(1.98, abs=0.02)
+
+
+def test_table_d1_band_edges_beat_the_nominal_geometric_mean() -> None:
+    """The two rounding conventions disagree on real inputs, by up to 8,8 dB.
+
+    The worst case is the 160|200 boundary, where Table D.1 changes from the
+    ``74,4 - 20 lg(fo) - Rw/2`` branch to the fixed -1 dB row. The ISO 266
+    edge is ``10^(2,25) = 177,83 Hz``; the geometric mean of the nominal
+    labels 160 and 200 is 178,89 Hz. A resonance at 178,5 Hz belongs to the
+    200 Hz band.
+    """
+    assert 10.0**2.25 < 178.5 < np.sqrt(160.0 * 200.0)
+    assert weighted_lining_improvement(178.5, 45.0) == -1.0
+    assert weighted_lining_improvement(177.0, 45.0) == pytest.approx(
+        74.4 - 20.0 * np.log10(160.0) - 22.5, abs=1e-9
+    )
+    swing = (74.4 - 20.0 * np.log10(160.0) - 22.5) - (-1.0)
+    assert swing == pytest.approx(8.8, abs=0.05)
+
+
+def test_table_d1_63_to_80_boundary() -> None:
+    """The same distinction inside the low-frequency branch, worth 2,1 dB.
+
+    The 63 Hz band ends at ``10^1,85 = 70,79 Hz``; the geometric mean of the
+    labels 63 and 80 is 70,99 Hz. A lining resonance of 70,81 Hz, which the
+    guide's worked stud lining produces, therefore reads off the 80 Hz row.
+    """
+    assert 10.0**1.85 < 70.8115 < np.sqrt(63.0 * 80.0)
+    assert weighted_lining_improvement(70.8115, 45.0) == pytest.approx(
+        74.4 - 20.0 * np.log10(80.0) - 22.5, abs=1e-9
+    )
+    difference = 20.0 * np.log10(80.0 / 63.0)
+    assert difference == pytest.approx(2.08, abs=0.01)
 
 
 def test_table_d1_1600_hz_overlap_takes_the_conservative_value() -> None:
@@ -801,6 +1298,72 @@ def test_table_d1_rejects_untabulated_resonances(resonance: float) -> None:
     """Table D.1 covers 30 Hz to 5 000 Hz only."""
     with pytest.raises(ValueError, match="Table D.1"):
         weighted_lining_improvement(resonance, 45.0)
+
+
+@pytest.mark.parametrize("rating", [-50.0, 0.0, 19.9, 60.1, 80.0])
+def test_table_d1_warns_outside_the_stated_rw_box(rating: float) -> None:
+    """ISO 12354-1:2017 Clause D.2.2, printed p. 38, states Table D.1 "for
+    basic structural elements with a weighted sound reduction index in the
+    range of 20 dB <= Rw <= 60 dB".
+
+    The low branch is linear in ``Rw`` and returns nonsense outside it: an
+    ``Rw`` of -50 dB yields +65,4 dB of improvement from a lining. The value
+    is still returned, because the formula is what it is, but the caller is
+    told the standard does not cover it.
+    """
+    with pytest.warns(UserWarning, match="outside the 20 dB"):
+        weighted_lining_improvement(50.0, rating)
+
+
+@pytest.mark.parametrize("rating", [20.0, 45.0, 60.0])
+def test_table_d1_is_silent_inside_the_stated_rw_box(rating: float) -> None:
+    """No warning at either endpoint, both of which Clause D.2.2 includes."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        weighted_lining_improvement(50.0, rating)
+        weighted_lining_improvement(500.0, rating)
+
+
+@pytest.mark.parametrize("resonance", [1.0, 29.0, 5001.0, 20000.0])
+def test_lining_formulae_warn_outside_the_annex_d_range(resonance: float) -> None:
+    """Formulae (D.3), (D.4) and (D.7) are monotonic in ``lg(fo)`` and
+    unbounded below the range Annex D puts lining resonances on.
+
+    At ``fo = 1 Hz`` the mineral-wool fit returns +82,5 dB, which is more
+    improvement than any lining has ever given. Table D.1 is the only place
+    the annex bounds ``fo``, at 30 Hz to 5 000 Hz, so that is the envelope
+    used.
+    """
+    with pytest.warns(UserWarning, match="outside the 30 Hz"):
+        lining_improvement(resonance)
+    with pytest.warns(UserWarning, match="outside the 30 Hz"):
+        lining_improvement(resonance, system="studs")
+
+
+@pytest.mark.parametrize("resonance", [30.0, 100.0, 5000.0])
+def test_lining_formulae_are_silent_inside_the_annex_d_range(
+    resonance: float,
+) -> None:
+    """Both endpoints included, so plotting the whole range stays quiet."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        for system in ("mineral_wool", "foam", "studs"):
+            lining_improvement(resonance, system=system)  # type: ignore[arg-type]
+
+
+def test_stacked_d5_and_d6_corrections_can_fall_below_the_reference_floor() -> None:
+    """Annex D places the ``>= -4 dB`` floor inside Formulae (D.3)/(D.4) and
+    does not restate it after (D.5) or (D.6), so the library does not either.
+
+    This pins the literal reading, and the size of the excursion, so that
+    changing it later is a deliberate act rather than a silent one.
+    """
+    reference = lining_improvement(5000.0)
+    assert reference.ratings == (-4.0, -4.0, -4.0)
+    corrected = lining_improvement(5000.0, anchors=True, glued_area=100.0)
+    assert corrected.delta_rw == pytest.approx(0.66 * -4.0 - 1.2 - 5.0 + 2.0, abs=1e-9)
+    assert corrected.delta_rw < -4.0
+    assert corrected.delta_rw == pytest.approx(-6.84, abs=0.01)
 
 
 def test_exterior_lining_formulae_d3_and_d4() -> None:
@@ -845,6 +1408,43 @@ def test_stud_system_formula_d7() -> None:
     studs = lining_improvement(100.0, system="studs")
     assert studs.ratings == pytest.approx((48.0 - 40.0, 51.0 - 44.0, 54.0 - 48.0))
     assert lining_improvement(5000.0, system="studs").delta_rw == -4.0
+
+
+@pytest.mark.parametrize(
+    ("system", "floor"),
+    [("mineral_wool", -4.0), ("foam", -3.0), ("studs", -4.0)],
+)
+def test_every_annex_d_rating_has_its_own_printed_floor(
+    system: str, floor: float
+) -> None:
+    """Formulae (D.3), (D.4) and (D.7) print the floor on **all three**
+    ratings, not only on ``DeltaRw``.
+
+    Each is ">= -4 dB" for mineral wool and for studs, ">= -3 dB" for the
+    foams. Testing only ``delta_rw`` leaves the other two floors unpinned, and
+    every fit is steep enough (20 to 42 dB per decade) that 5 000 Hz is well
+    into the floored regime for all three.
+    """
+    result = lining_improvement(5000.0, system=system)  # type: ignore[arg-type]
+    assert result.ratings == (floor, floor, floor)
+    # Unfloored, all three would be far below it.
+    unfloored = lining_improvement(100.0, system=system)  # type: ignore[arg-type]
+    assert all(value > floor + 3.0 for value in unfloored.ratings)
+
+
+def test_third_octave_centres_are_the_iso_266_nominal_series() -> None:
+    """Every entry of the rounding table is the ISO 266 nominal label of its
+    band, i.e. within about 1 % of the exact midband frequency ``10^(n/10)``.
+
+    Without this the entries below 31,5 Hz and above 5 000 Hz are unreachable
+    through Table D.1 and could hold any value at all.
+    """
+    for offset, nominal in enumerate(_THIRD_OCTAVE_CENTRES):
+        exact = 10.0 ** ((offset + _THIRD_OCTAVE_FIRST_INDEX) / 10.0)
+        assert abs(nominal / exact - 1.0) < 0.012, (offset, nominal, exact)
+    assert _THIRD_OCTAVE_CENTRES[0] == 12.5
+    assert _THIRD_OCTAVE_CENTRES[-1] == 10000.0
+    assert len(set(_THIRD_OCTAVE_CENTRES)) == len(_THIRD_OCTAVE_CENTRES)
 
 
 def test_in_situ_transfer_formula_d8() -> None:
