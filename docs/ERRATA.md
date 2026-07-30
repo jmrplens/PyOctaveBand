@@ -25,34 +25,19 @@ that no change was required.
 Status legend: **unreported** (recorded here only) / **reported** (submitted
 to the issuing body, with date and reference).
 
-## How a defect qualifies for this file
-
-No entry about a constant, a coefficient, an exponent, a symbol or an
-inequality sign may rest on text extracted from a PDF. Extraction tools drop
-glyphs silently: radicals in particular vanish without a trace, so
-`(1/2π)√(N s/m₁)` is emitted as `1/2π N·s/m1` and `√3 π` as `3π`, and the
-result reads like a plausible misprint. Such a claim is admitted only after
-the printed page has been rendered as an image at 600 dpi and read, and the
-entry records the page that was rendered. An entry that cannot survive that
-check does not go in the file. The rule applies from its introduction
-forwards; older entries are re-checked against it as each is revisited.
-
-The discipline exists because it caught one: an earlier draft of this registry
-accused Vigran's Eq. (8.46) of a `2/(3π)` coefficient where `2/(√3 π)` is
-printed. The two differ by exactly the factor √3 = 1,73 that the draft
-reported as the error, which is the signature of a dropped radical rather than
-of an author's slip.
-
-Every claim that turns on the exact characters of a formula, constant,
-coefficient, symbol, inequality or table cell is verified against a **rendered
-image** of the cited page, and the Evidence bullet records that render: source
-file, PDF page index, printed folio and dpi. Extracted text may locate a page;
-it is never quoted as "the print". The page offset of each document is
-established empirically, because it differs per document and drifts between
-chapters of the same book. See
-[CONTRIBUTING.md](../CONTRIBUTING.md#filing-an-errata-entry) for the rule and
-for the checks that enforce it
-([`scripts/check_errata_evidence.py`](../scripts/check_errata_evidence.py)).
+A claim that turns on the exact characters of a formula, constant, coefficient,
+symbol, inequality or table cell is verified against a **rendered image** of the
+cited page, and its Evidence bullet records that render: source file, PDF page
+index, printed folio and dpi. Extracted text may locate a page; it is never
+quoted as "the print", because PDF text layers delete glyphs silently (most of
+the sources cited here emit no `√` at all, so `f_T/√2` extracts as `f_T/2`).
+The page offset of each document is established empirically, because it differs
+per document and drifts between chapters of the same book. Entries that rest on
+something other than a render say so, either in a leading notice or on the
+allowlist of
+[`scripts/check_errata_evidence.py`](../scripts/check_errata_evidence.py),
+which is the check that enforces the rule; see
+[CONTRIBUTING.md](../CONTRIBUTING.md#6-filing-an-errata-entry).
 
 
 ---
@@ -246,9 +231,12 @@ for the checks that enforce it
   (printed p. 6).
 - **The print:** `D2m,n = D2m,nT − 10 lg[0,16 V/(T0 A0)] = D2m,nT −
   10 lg 0,32 V dB`.
-- **The problem:** the reduced form is off by a factor of ten. The same page
-  defines `A0 = 10 m²` (clause 3.1.4) and the preceding page defines
-  `T0 = 0,5 s` (clause 3.1.3), so `0,16/(T0·A0) = 0,16/5 = 0,032`, not 0,32.
+- **The problem:** the reduced form is off by a factor of ten. Six lines above
+  it, the where-list of clause 3.1.4 defines `A0` as "the reference equivalent
+  sound absorption area, in square metres, for dwellings given as 10 m²", and
+  the where-list of clause 3.1.3 on the preceding page defines `T0` as "the
+  reference reverberation time, in seconds, for dwellings given as 0,5 s". So
+  `0,16/(T0·A0) = 0,16/5 = 0,032`, not 0,32.
   Applied as printed, the reduced form shifts every normalized façade level
   difference by exactly `10 lg 10 = 10 dB`. The exact analogue in the
   companion part, EN 12354-2:2000 Formula (3), prints the same algebra
