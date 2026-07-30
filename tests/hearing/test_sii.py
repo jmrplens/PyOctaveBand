@@ -442,100 +442,89 @@ def test_equally_contributing_is_the_300_to_6400_hz_span_of_table_1() -> None:
     assert equal.band_edges[-1] == 6400.0
 
 
-def test_sii_wg_s3_79_official_test_case_cb() -> None:
-    # ASA WG S3-79 official test input CB.TST for the critical-band procedure
-    # (DevelopmentKit, sii.to). Published result: SII = 0.273; the committee's
-    # SII.C, compiled unmodified, prints 0.2729353808.
+#: The six official ASA WG S3-79 test cases of the three procedures added
+#: here (DevelopmentKit SOURCES/*.TST, from the WG support site sii.to). Per
+#: case: the ``.TST`` file name, the ``method=`` it exercises, the equivalent
+#: speech spectrum level, the equivalent noise spectrum level, the equivalent
+#: hearing threshold level, an alternative band-importance function or
+#: ``None``, the SII published in the kit's readme (three decimals) and the
+#: value the committee's ``SII.C`` prints when compiled unmodified and run on
+#: the file. The one-third-octave pair ``TO.TST``/``TO_1.TST`` keeps its own
+#: two tests above.
+_WG_OFFICIAL_CASES = (
+    ("CB.TST", "critical-band", ANSIS3_5_WG_CB_SPEECH, ANSIS3_5_WG_CB_NOISE,
+     ANSIS3_5_WG_CB_THRESHOLD, None,
+     ANSIS3_5_WG_CB_SII, ANSIS3_5_WG_CB_SII_EXACT),
+    ("CB_1.TST", "critical-band", ANSIS3_5_WG_CB_SPEECH, ANSIS3_5_WG_CB_NOISE,
+     ANSIS3_5_WG_CB_THRESHOLD, ANSIS3_5_WG_CB1_IMPORTANCE,
+     ANSIS3_5_WG_CB1_SII, ANSIS3_5_WG_CB1_SII_EXACT),
+    ("ECB.TST", "equally-contributing", ANSIS3_5_WG_ECB_SPEECH,
+     ANSIS3_5_WG_ECB_NOISE, ANSIS3_5_WG_ECB_THRESHOLD, None,
+     ANSIS3_5_WG_ECB_SII, ANSIS3_5_WG_ECB_SII_EXACT),
+    ("ECB_1.TST", "equally-contributing", ANSIS3_5_WG_ECB_SPEECH,
+     ANSIS3_5_WG_ECB_NOISE, ANSIS3_5_WG_ECB_THRESHOLD,
+     ANSIS3_5_WG_ECB1_IMPORTANCE,
+     ANSIS3_5_WG_ECB1_SII, ANSIS3_5_WG_ECB1_SII_EXACT),
+    ("OCTAVE.TST", "octave", ANSIS3_5_WG_OCTAVE_SPEECH,
+     ANSIS3_5_WG_OCTAVE_NOISE, ANSIS3_5_WG_OCTAVE_THRESHOLD, None,
+     ANSIS3_5_WG_OCTAVE_SII, ANSIS3_5_WG_OCTAVE_SII_EXACT),
+    ("OCTAVE_1.TST", "octave", ANSIS3_5_WG_OCTAVE_SPEECH,
+     ANSIS3_5_WG_OCTAVE_NOISE, ANSIS3_5_WG_OCTAVE_THRESHOLD,
+     ANSIS3_5_WG_OCTAVE1_IMPORTANCE,
+     ANSIS3_5_WG_OCTAVE1_SII, ANSIS3_5_WG_OCTAVE1_SII_EXACT),
+)
+
+
+@pytest.mark.parametrize(
+    ("case", "method", "speech", "noise", "threshold", "importance",
+     "published", "committee"),
+    _WG_OFFICIAL_CASES,
+    ids=[case[0] for case in _WG_OFFICIAL_CASES],
+)
+def test_sii_wg_s3_79_official_test_cases(
+    case: str,
+    method: str,
+    speech: tuple[float, ...],
+    noise: tuple[float, ...],
+    threshold: tuple[float, ...],
+    importance: tuple[float, ...] | None,
+    published: float,
+    committee: float,
+) -> None:
+    """Each official ``.TST`` case against its published SII and SII.C value.
+
+    The published results are printed to three decimals in the ASA WG S3-79
+    DevelopmentKit readme, hence the 5e-4 tolerance on the first assertion;
+    the second pins the full precision of the committee's own C program, which
+    the library reproduces to within one unit in the last place of a double.
+    """
     result = sii.speech_intelligibility_index(
-        np.array(ANSIS3_5_WG_CB_SPEECH),
-        np.array(ANSIS3_5_WG_CB_NOISE),
-        threshold=np.array(ANSIS3_5_WG_CB_THRESHOLD),
-        method="critical-band",
+        np.array(speech),
+        np.array(noise),
+        threshold=np.array(threshold),
+        method=method,
+        band_importance=None if importance is None else np.array(importance),
     )
-    assert result.method == "critical-band"
-    assert result.sii == pytest.approx(ANSIS3_5_WG_CB_SII, abs=5e-4)
-    assert result.sii == pytest.approx(ANSIS3_5_WG_CB_SII_EXACT, abs=1e-7)
+    assert result.method == method
+    assert result.sii == pytest.approx(published, abs=5e-4), case
+    assert result.sii == pytest.approx(committee, abs=1e-7), case
+    if importance is not None:
+        np.testing.assert_allclose(result.band_importance, importance)
 
 
-def test_sii_wg_s3_79_official_test_case_cb1() -> None:
-    # ASA WG S3-79 official test input CB_1.TST: the critical-band procedure
-    # with an alternative band-importance function. Published result:
-    # SII = 0.410; SII.C prints 0.4104741231.
-    result = sii.speech_intelligibility_index(
-        np.array(ANSIS3_5_WG_CB_SPEECH),
-        np.array(ANSIS3_5_WG_CB_NOISE),
-        threshold=np.array(ANSIS3_5_WG_CB_THRESHOLD),
-        method="critical-band",
-        band_importance=np.array(ANSIS3_5_WG_CB1_IMPORTANCE),
-    )
-    assert result.sii == pytest.approx(ANSIS3_5_WG_CB1_SII, abs=5e-4)
-    assert result.sii == pytest.approx(ANSIS3_5_WG_CB1_SII_EXACT, abs=1e-7)
-    np.testing.assert_allclose(result.band_importance, ANSIS3_5_WG_CB1_IMPORTANCE)
-
-
-def test_sii_wg_s3_79_official_test_case_ecb() -> None:
-    # ASA WG S3-79 official test input ECB.TST for the equally-contributing
-    # critical-band procedure. Published result: SII = 0.278; SII.C prints
-    # 0.2781386550.
-    result = sii.speech_intelligibility_index(
-        np.array(ANSIS3_5_WG_ECB_SPEECH),
-        np.array(ANSIS3_5_WG_ECB_NOISE),
-        threshold=np.array(ANSIS3_5_WG_ECB_THRESHOLD),
-        method="equally-contributing",
-    )
-    assert result.sii == pytest.approx(ANSIS3_5_WG_ECB_SII, abs=5e-4)
-    assert result.sii == pytest.approx(ANSIS3_5_WG_ECB_SII_EXACT, abs=1e-7)
-
-
-def test_sii_wg_s3_79_official_test_case_ecb1() -> None:
-    # ASA WG S3-79 official test input ECB_1.TST: the equally-contributing
-    # procedure with an alternative band-importance function. Published
-    # result: SII = 0.410; SII.C prints 0.4104741231, the same digits as
-    # CB_1.TST because the two alternative functions weight the same
-    # physical bands.
-    result = sii.speech_intelligibility_index(
-        np.array(ANSIS3_5_WG_ECB_SPEECH),
-        np.array(ANSIS3_5_WG_ECB_NOISE),
-        threshold=np.array(ANSIS3_5_WG_ECB_THRESHOLD),
-        method="equally-contributing",
-        band_importance=np.array(ANSIS3_5_WG_ECB1_IMPORTANCE),
-    )
-    assert result.sii == pytest.approx(ANSIS3_5_WG_ECB1_SII, abs=5e-4)
-    assert result.sii == pytest.approx(ANSIS3_5_WG_ECB1_SII_EXACT, abs=1e-7)
-
-
-def test_sii_wg_s3_79_official_test_case_octave() -> None:
-    # ASA WG S3-79 official test input OCTAVE.TST for the octave-band
-    # procedure, the input the DevelopmentKit readme prints as the octave
-    # example of clause C.1. Published result: SII = 0.491; SII.C prints
-    # 0.4909625062.
+def test_octave_procedure_has_no_spread_of_masking() -> None:
+    # ANSI S3.5-1997's octave-band procedure omits the upward spread of
+    # masking, so the equivalent masking spectrum level Zi is the equivalent
+    # noise spectrum level Ni' itself. Checked on the official OCTAVE.TST
+    # input, whose noise spans 85 dB across the six bands.
     result = sii.speech_intelligibility_index(
         np.array(ANSIS3_5_WG_OCTAVE_SPEECH),
         np.array(ANSIS3_5_WG_OCTAVE_NOISE),
         threshold=np.array(ANSIS3_5_WG_OCTAVE_THRESHOLD),
         method="octave",
     )
-    assert result.sii == pytest.approx(ANSIS3_5_WG_OCTAVE_SII, abs=5e-4)
-    assert result.sii == pytest.approx(ANSIS3_5_WG_OCTAVE_SII_EXACT, abs=1e-7)
-    # The octave-band procedure carries no spread of masking: the equivalent
-    # masking spectrum level is the equivalent noise spectrum level itself.
     np.testing.assert_allclose(result.masking, ANSIS3_5_WG_OCTAVE_NOISE)
 
-
-def test_sii_wg_s3_79_official_test_case_octave1() -> None:
-    # ASA WG S3-79 official test input OCTAVE_1.TST: the octave-band
-    # procedure with an alternative band-importance function that puts all
-    # the weight on the 1000 Hz band. Published result: SII = 0.323; SII.C
-    # prints 0.3229375000.
-    result = sii.speech_intelligibility_index(
-        np.array(ANSIS3_5_WG_OCTAVE_SPEECH),
-        np.array(ANSIS3_5_WG_OCTAVE_NOISE),
-        threshold=np.array(ANSIS3_5_WG_OCTAVE_THRESHOLD),
-        method="octave",
-        band_importance=np.array(ANSIS3_5_WG_OCTAVE1_IMPORTANCE),
-    )
-    assert result.sii == pytest.approx(ANSIS3_5_WG_OCTAVE1_SII, abs=5e-4)
-    assert result.sii == pytest.approx(ANSIS3_5_WG_OCTAVE1_SII_EXACT, abs=1e-7)
 
 
 def test_sii_annex_c1_worked_example() -> None:
