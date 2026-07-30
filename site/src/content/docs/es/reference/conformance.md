@@ -181,9 +181,9 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ISO 7626-1:2011 Table 1 / 3.1.2 | Closed-form SDOF driving-point mobility peak mag(Y(f0)) = 1/c  (c=5 N·s/m) | 0.2 m/(N·s) (+/-0.000001 m/(N·s)) | 0.2 m/(N·s) | 0 m/(N·s) | &#9989; |
 | ISO 7626-1:2011 Table 1 / 3.1.2 | Closed-form SDOF static receptance H(0) = 1/k  (k=8000 N/m) | 0.000125 m/N (+/-0.0001%) | 0.000125 m/N | 0 m/N | &#9989; |
 | ISO 7626-1:2011 Table 1 | FRF reciprocity: impedance × mobility = 1  (at 37 Hz) | 1 (= Z·Y) | 1 | 0 | &#9989; |
-| ISO 10846-2:2008 3.17 | Transfer-stiffness level Lk = 20 lg(|k|/k0), k0 = 1 N/m  (|k| = 1 MN/m) | 120 dB (+/-0 dB) | 120 dB | 0 dB | &#9989; |
+| ISO 10846-2:2008 3.17 | Transfer-stiffness level Lk = 20 lg(\|k\|/k0), k0 = 1 N/m  (\|k\| = 1 MN/m) | 120 dB (+/-0 dB) | 120 dB | 0 dB | &#9989; |
 | ISO 10846-3:2002 Formula (1) | Indirect method k2,1 = -(2πf)²·m2·T  (f=500 Hz, m2=10 kg, T=0,01) | -986960.4 N/m (+/-0.1%) | -986960.4 N/m | 0 N/m | &#9989; |
-| ISO 10846-1:2008 Table A.2 | FRF relation k = jω·Z at 250 Hz  (|k| recovered from impedance) | 1001249.2 N/m (+/-0.0001%) | 1001249.2 N/m | 0 N/m | &#9989; |
+| ISO 10846-1:2008 Table A.2 | FRF relation k = jω·Z at 250 Hz  (\|k\| recovered from impedance) | 1001249.2 N/m (+/-0.0001%) | 1001249.2 N/m | 0 N/m | &#9989; |
 | ISO 7626-2:2015 7.5.2 | Rigid-mass calibration: accelerance mag(A) = 1/m  (m=10 kg) | 0.1 1/kg (+/-0 1/kg) | 0.1 1/kg | 0 1/kg | &#9989; |
 | ISO 7626-2:2015 7.5.2 | Rigid-mass calibration: mobility mag(Y) = 1/(2πf·m) at 100 Hz  (m=10 kg) | 0.0001592 m/(N·s) (+/-0.001%) | 0.0001592 m/(N·s) | 0 m/(N·s) | &#9989; |
 | ISO 7626-2:2015 Annex A | Normalized random error ε = √((1−γ²)/(2nγ²)): γ²=0,8, n=75 → 4,08 % (< 5 %) | 4.08 % (+/-0.01 %) | 4.08 % | 0.002 % | &#9989; |
@@ -279,7 +279,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 |:---|:---|:---|:---|:---|:---:|
 | Havelock 2008 Part I Ch. 6 (Xiang), Eq. (2) | Golay pair: sum of periodic autocorrelations = 2L*delta (L = 4096) | 0 (algebraic identity, +/-1e-10) | 0 | 0 | &#9989; |
 | Havelock 2008 Part I Ch. 6 (Xiang), Eq. (4) | Golay chain recovers a delay+gain system IR (noiseless, exact) | 0 (machine precision, +/-1e-13) | 0 | 0 | &#9989; |
-| Kirkeby & Nelson 1999 Eq. (17) / Mueller-Massarani 2001 Sec. 3.1 | In-band equalization residue equals eps/(|H|^2 + eps) bin by bin | 0 (closed form, +/-1e-12) | 0 | 0 | &#9989; |
+| Kirkeby & Nelson 1999 Eq. (17) / Mueller-Massarani 2001 Sec. 3.1 | In-band equalization residue equals eps/(\|H\|^2 + eps) bin by bin | 0 (closed form, +/-1e-12) | 0 | 0 | &#9989; |
 | Kirkeby & Nelson 1999 (max of x/(x^2+eps) = 1/(2*sqrt(eps))) | Out-of-band inverse-filter gain within the regularization cap | <= -6.021 dB (analytic cap) | -6.034 dB | headroom +0.013 dB | &#9989; |
 | Mueller-Massarani 2001 Secs. 4.2-4.3 (group-delay synthesis) | Shaped sweep's Welch spectrum follows the pink target, in-band | 0 dB in-band deviation (+/-0.5 dB) | 0.0652 dB | 0.065 dB | &#9989; |
 
@@ -1017,17 +1017,17 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | Bies 5e Table 8.14 (ASHRAE end reflection, flush) | Duct end reflection D = 200 mm at 125 Hz = 10 dB (table node) | 10 dB (+/-0 dB) | 10 dB | 0 dB | &#9989; |
 | Long 2e Eq. 13.1 with Table 13.5 (ASHRAE 1987 fan model) | Forward-curved fan at Q_REF, P_REF, peak efficiency -> K_F + C_BFI at 500 Hz | 38 dB (+/-0 dB) | 38 dB | 0 dB | &#9989; |
 | Long 2e Eq. 14.12 with Table 14.2 (Reynolds lined rectangular duct) | 18 x 12 in duct, 6 ft, 1 in lining at 1 kHz -> 1.77 (10/3)^0.695 6 dB | 24.5203 dB (+/-0 dB) | 24.5203 dB | 0 dB | &#9989; |
-| Long 2e Table 14.4 (ASHRAE 1995 lined flexible duct) | 8 in diameter, 9 ft long -> 6/8/16/25/28/28/18 dB (table node) | 0 dB (max |diff| over the 7 bands) | 0 dB | 0 dB | &#9989; |
+| Long 2e Table 14.4 (ASHRAE 1995 lined flexible duct) | 8 in diameter, 9 ft long -> 6/8/16/25/28/28/18 dB (table node) | 0 dB (max \|diff\| over the 7 bands) | 0 dB | 0 dB | &#9989; |
 | Long 2e Eq. 14.17 (branch power division) | 25 per cent split with area-matched branches -> -10 lg 0.25 = 6.02 dB | 6.0206 dB (+/-0 dB) | 6.0206 dB | 0 dB | &#9989; |
-| Long 2e Table 14.9 (worked duct-borne sheet, supply path) | Fan to room, 8 octave bands -> 52/42/30/18/9/-2/-2/-1 dB at the receiver | 0 dB +/-1 (max |diff| over the 8 bands) | 1 dB | 1 dB | &#9989; |
-| Long 2e Eqs. 13.27-13.33 (Reynolds diffuser self-noise) | 24 x 24 in rectangular diffuser, 312 cfm, 0.05 in pd -> the 33/32/29/23/15 dB row of Table 14.9 | 0 dB +/-1 (max |diff| over the five bands) | 0.8853 dB | 0.885 dB | &#9989; |
+| Long 2e Table 14.9 (worked duct-borne sheet, supply path) | Fan to room, 8 octave bands -> 52/42/30/18/9/-2/-2/-1 dB at the receiver | 0 dB +/-1 (max \|diff\| over the 8 bands) | 1 dB | 1 dB | &#9989; |
+| Long 2e Eqs. 13.27-13.33 (Reynolds diffuser self-noise) | 24 x 24 in rectangular diffuser, 312 cfm, 0.05 in pd -> the 33/32/29/23/15 dB row of Table 14.9 | 0 dB +/-1 (max \|diff\| over the five bands) | 0.8853 dB | 0.885 dB | &#9989; |
 | ASHRAE 2019 Applications Ch. 49 Table 9 | Max neck velocity of a supply outlet for design RC(30) -> 2.2 m/s | 2.2 m/s (+/-0 m/s) | 2.2 m/s | 0 m/s | &#9989; |
 | Norton & Karczub 2e Eqs. 7.6/7.8/7.9 (problem 7.1 answer) | 254 mm duct, steam, 200 m/s: (1,0) cut-on 812 Hz and k_x = -8.23 1/m | 0 +/-1 (Hz, and 1/m x100) | 0.591 | 0.591 | &#9989; |
-| Norton & Karczub 2e Eq. 7.10 (problem 7.2 answer) | 0.65 x 0.4 m duct, 15 m/s: first three cut-on 264 / 428 / 503 Hz | 0 Hz (max |diff| over the 3 modes) | 0 Hz | 0 Hz | &#9989; |
+| Norton & Karczub 2e Eq. 7.10 (problem 7.2 answer) | 0.65 x 0.4 m duct, 15 m/s: first three cut-on 264 / 428 / 503 Hz | 0 Hz (max \|diff\| over the 3 modes) | 0 Hz | 0 Hz | &#9989; |
 | Bies 5e Eqs. (7.103), (7.111) (enclosure, fully absorbing limit) | Enclosure correction C -> 10 lg 0.3 = -5.23 dB as alpha_i -> 1 | -5.2288 dB (+/-0.001 dB) | -5.2288 dB | 0 dB | &#9989; |
-| Norton & Karczub 2e Eq. (4.101) (problem 4.21 answer) | Double brick wall into an 8 x 9 x 3 m room -> NR 37.5/40.8/49.0/62.8/65.3/65.9 dB | 0 dB +/-0.05 (max |diff| over the 6 bands) | 0.0308 dB | 0.031 dB | &#9989; |
-| Norton & Karczub 2e 4.6/4.9 (problem 4.18 answer) | Blower in a plant room to the operator room -> 72.3/60.4/41.4/41.0/33.8/30.7 dB | 0 dB +/-0.1 (max |diff| over the 6 bands) | 0.0682 dB | 0.068 dB | &#9989; |
-| Norton & Karczub 2e Eq. (4.115) (problem 4.16 answer) | Lined compressor enclosure against NC-45 -> required TL 14.4/25.2/28.9/34.4/35.2/34.7/34.7/31.6 dB | 0 dB +/-0.15 (max |diff| over the 8 bands) | 0.1099 dB | 0.11 dB | &#9989; |
+| Norton & Karczub 2e Eq. (4.101) (problem 4.21 answer) | Double brick wall into an 8 x 9 x 3 m room -> NR 37.5/40.8/49.0/62.8/65.3/65.9 dB | 0 dB +/-0.05 (max \|diff\| over the 6 bands) | 0.0308 dB | 0.031 dB | &#9989; |
+| Norton & Karczub 2e 4.6/4.9 (problem 4.18 answer) | Blower in a plant room to the operator room -> 72.3/60.4/41.4/41.0/33.8/30.7 dB | 0 dB +/-0.1 (max \|diff\| over the 6 bands) | 0.0682 dB | 0.068 dB | &#9989; |
+| Norton & Karczub 2e Eq. (4.115) (problem 4.16 answer) | Lined compressor enclosure against NC-45 -> required TL 14.4/25.2/28.9/34.4/35.2/34.7/34.7/31.6 dB | 0 dB +/-0.15 (max \|diff\| over the 8 bands) | 0.1099 dB | 0.11 dB | &#9989; |
 | Norton & Karczub 2e Table 4.5 (constant-volume source power) | Source in the intersection of two flat surfaces (Q = 4) -> +10 lg 4 = 6.02 dB | 6.0206 dB (+/-0 dB) | 6.0206 dB | 0 dB | &#9989; |
 
 </details>

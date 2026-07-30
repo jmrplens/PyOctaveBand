@@ -33,6 +33,7 @@ import cmath
 import json
 import math
 import pathlib
+import re
 import sys
 import warnings
 from collections.abc import Callable
@@ -3490,9 +3491,9 @@ def _chk_iso10534_1_swr() -> Outcome:
     r_ok = abs(r_mag - ref.ISO10534_1_REFLECTION_MAGNITUDE) <= 1e-9
     # Show both chained values so a |r| failure is visible in the report.
     expected = (
-        f"alpha {out.expected}, \\|r\\| {ref.ISO10534_1_REFLECTION_MAGNITUDE:g}"
+        f"alpha {out.expected}, |r| {ref.ISO10534_1_REFLECTION_MAGNITUDE:g}"
     )
-    computed = f"alpha {out.computed}, \\|r\\| {r_mag:.4f}"
+    computed = f"alpha {out.computed}, |r| {r_mag:.4f}"
     return Outcome(expected, computed, out.delta, out.passed and r_ok)
 
 
@@ -8295,6 +8296,21 @@ def _status(passed: bool) -> str:
     return "&#9989;" if passed else "&#10060;"
 
 
+def _cell(text: object) -> str:
+    """Escape a value so it survives as a single Markdown table cell.
+
+    An unescaped ``|`` reads as a column separator, so a quantity written the
+    way acousticians write it -- ``max |diff|``, ``20 lg(|k|/k0)`` -- silently
+    splits its row into more cells than the header has. Markdown renderers
+    then drop the surplus from the right, which in this table means losing the
+    computed value, the deviation and the pass mark: the row still renders, so
+    nothing looks broken while the evidence is gone.
+
+    Idempotent, so a value that already escapes its own bars is left alone.
+    """
+    return re.sub(r"(?<!\\)\|", r"\\|", str(text))
+
+
 def _domains() -> list[str]:
     seen: list[str] = []
     for chk in CHECKS:
@@ -8451,8 +8467,9 @@ def render_markdown() -> tuple[str, int, int]:
         out.append("|:---|:---|:---|:---|:---|:---:|")
         for chk, outcome in rows:
             out.append(
-                f"| {chk.standard} | {chk.quantity} | {outcome.expected} "
-                f"| {outcome.computed} | {outcome.delta} | {_status(outcome.passed)} |"
+                f"| {_cell(chk.standard)} | {_cell(chk.quantity)} "
+                f"| {_cell(outcome.expected)} | {_cell(outcome.computed)} "
+                f"| {_cell(outcome.delta)} | {_status(outcome.passed)} |"
             )
         out.append("")
         out.append("</details>")
