@@ -38,9 +38,10 @@ smooth away.
 supplies the source power that a prediction starts from, for the one source
 that dominates almost every noise map: road traffic. The common EU method of
 Annex II to Directive 2002/49/EC builds a rolling and a propulsion sound power
-for each vehicle category, corrects them for pavement, air temperature,
-studded tyres, gradient and junctions, and delivers a directional sound power
-per metre of source line.
+for each vehicle category, corrects the rolling term for pavement, air
+temperature and studded tyres and the propulsion term for pavement and road
+gradient, applies the junction correction to both, and delivers a directional
+sound power per metre of source line.
 
 [Impulsive-sound prominence (NT ACOU 112)](/phonometry/guides/impulse-prominence/)
 is the assessment half. Noise containing distinct impulses (hammering,

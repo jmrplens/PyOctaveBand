@@ -1,5 +1,3 @@
-# CNOSSOS-EU source emission oracle data
-
 ## What this folder contains
 
 | File | Kind | Provenance |
@@ -49,6 +47,21 @@ vehicles, 17 280 cases at both source heights, to 0,0055 dB.
   European Union; reuse is authorised under Commission Decision 2011/833/EU,
   provided the source is acknowledged, which the header of every file here and
   the comments in `tests/reference_data.py` do.
+- The workbook is `CNOSSOS_ROAD_EMISSION_TEST.xlsx`, delivered with the
+  *Testing of Emission DLL's for CNOSSOS-EU Road, Rail and Industry Noise
+  Sources* report (Stapelfeldt Ingenieurgesellschaft mbH, Dortmund, doc. rev.
+  1406-2, 7 July 2014) as part of the CNOSSOS-EU source module of the Joint
+  Research Centre of the European Commission. It is distributed through the
+  Commission's CIRCABC document repository
+  (<https://circabc.europa.eu/>, CNOSSOS-EU interest group), retrieved
+  2026-07-29. Its results were produced twice, once by the reference emission
+  library of DGMR and once by an independent implementation, and agree to
+  0,01 dB.
+- The coefficient tables are the text of Commission Directive (EU) 2015/996
+  (OJ L 168, 1.7.2015, p. 1). Official Journal texts are published by the
+  Publications Office of the European Union; reuse is authorised under
+  Commission Decision 2011/833/EU, provided the source is acknowledged, which
+  the header of every file here does.
 - **This repository's MIT licence does not cover these files.** They are
   redistributed under the Commission's reuse policy as Commission publications.
 
@@ -113,29 +126,6 @@ The coefficients of the current text, Tables F-1 to F-4 as they stand after
 machine-transcribed from the Official Journal, and pin the tables shipped in
 `phonometry.environmental.cnossos_road`.
 
-## Source and authorship
-
-- The workbook is `CNOSSOS_ROAD_EMISSION_TEST.xlsx`, delivered with the
-  *Testing of Emission DLL's for CNOSSOS-EU Road, Rail and Industry Noise
-  Sources* report (Stapelfeldt Ingenieurgesellschaft mbH, Dortmund, doc. rev.
-  1406-2, 7 July 2014) as part of the CNOSSOS-EU source module of the Joint
-  Research Centre of the European Commission. It is distributed through the
-  Commission's CIRCABC document repository
-  (<https://circabc.europa.eu/>, CNOSSOS-EU interest group), retrieved
-  2026-07-29. Its results were produced twice, once by the reference emission
-  library of DGMR and once by an independent implementation, and agree to
-  0,01 dB.
-- The coefficient tables are the text of Commission Directive (EU) 2015/996
-  (OJ L 168, 1.7.2015, p. 1). Official Journal texts are published by the
-  Publications Office of the European Union; reuse is authorised under
-  Commission Decision 2011/833/EU, provided the source is acknowledged, which
-  the header of every file here does.
-- **This repository's MIT licence does not cover these files.** The Official
-  Journal material is reused under the Commission's reuse policy; the workbook
-  extract is redistributed under the same policy as a Commission publication.
-
-## Purpose and scope of use
-
 `tests/environmental/test_cnossos_road.py` feeds the shipped equations of
 Annex II 2.2 the superseded 2015 coefficient set and requires the workbook's
 levels back, band by band. That is the only oracle that pins the *equations*:
@@ -157,9 +147,7 @@ If you represent the European Commission, the Joint Research Centre or
 Stapelfeldt Ingenieurgesellschaft and consider that committing this subset
 exceeds the intended reuse of the published material, please open an issue or
 contact the maintainer (see `CITATION.cff`) and it will be removed promptly.
-The suite would then lose its only oracle for the railway emission equations:
-the Appendix G transcriptions and the closed-form assertions would still run,
-but the end-to-end cases would have to go with it.
-The suite would then lose its only oracle for the road emission equations: the
-coefficient-table and closed-form assertions would still run, but the
-end-to-end cases would have to go with it.
+The suite would then lose its only oracle for the railway and road emission
+equations alike: the Appendix F and G transcriptions and the closed-form
+assertions would still run, but the end-to-end cases would have to go with
+them.

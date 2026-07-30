@@ -42,8 +42,9 @@ dependiente de la frecuencia que los términos por banda de octava suavizan.
 suministra la potencia acústica de la que parte una predicción, para la fuente
 que domina casi todos los mapas de ruido: el tráfico viario. El método común
 europeo del Anexo II de la Directiva 2002/49/CE construye una potencia acústica
-de rodadura y otra de propulsión para cada categoría de vehículo, las corrige
-por pavimento, temperatura del aire, neumáticos con clavos, pendiente y cruces,
+de rodadura y otra de propulsión para cada categoría de vehículo, corrige la de
+rodadura por pavimento, temperatura del aire y neumáticos con clavos y la de
+propulsión por pavimento y pendiente, aplica a ambas la corrección por cruces,
 y entrega una potencia acústica direccional por metro de línea fuente.
 
 [Prominencia de sonidos impulsivos (NT ACOU 112)](/phonometry/es/guides/impulse-prominence/)
