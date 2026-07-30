@@ -135,6 +135,7 @@ sample from the metrology core:
 
 The same discipline applies far beyond the metrology core: today the suite runs
 517 numerical conformance checks across 56 domains and 352 standards, covering
+507 numerical conformance checks across 55 domains and 343 standards, covering
 psychoacoustics and speech intelligibility, room, building and materials
 acoustics, human and machine vibration, environmental, aircraft, rotorcraft
 and underwater noise, electroacoustics, broadcast loudness, industrial noise
