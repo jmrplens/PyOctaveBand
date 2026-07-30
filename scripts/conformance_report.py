@@ -3978,27 +3978,123 @@ def _chk_sii_standard_quiet() -> Outcome:
     return numeric(ref.ANSIS3_5_STANDARD_QUIET, result.sii, 1e-6, places=8)
 
 
+def _sii_official_case(
+    method: str,
+    speech: tuple[float, ...],
+    noise: tuple[float, ...],
+    threshold: tuple[float, ...],
+    published: float,
+    importance: tuple[float, ...] | None = None,
+) -> Outcome:
+    """Run one official ASA WG S3-79 ``.TST`` case against its published SII.
+
+    The published results are printed to three decimals in the DevelopmentKit
+    readme, hence the 5e-4 tolerance; the tests pin the same eight cases to the
+    full precision of the committee code.
+    """
+    result = ph.hearing.sii.speech_intelligibility_index(
+        np.array(speech), np.array(noise), threshold=np.array(threshold),
+        method=method,
+        band_importance=None if importance is None else np.array(importance),
+    )
+    return numeric(published, result.sii, 5e-4, places=3)
+
+
 @register(_SII, "ASA WG S3-79 TO.TST", "Official one-third-octave test case")
 def _chk_sii_wg_to_tst() -> Outcome:
-    result = ph.hearing.sii.speech_intelligibility_index(
-        np.array(ref.ANSIS3_5_WG_TO_SPEECH),
-        np.array(ref.ANSIS3_5_WG_TO_NOISE),
-        threshold=np.array(ref.ANSIS3_5_WG_TO_THRESHOLD),
+    return _sii_official_case(
+        "one-third-octave", ref.ANSIS3_5_WG_TO_SPEECH, ref.ANSIS3_5_WG_TO_NOISE,
+        ref.ANSIS3_5_WG_TO_THRESHOLD, ref.ANSIS3_5_WG_TO_SII,
     )
-    return numeric(ref.ANSIS3_5_WG_TO_SII, result.sii, 5e-4, places=3)
 
 
 @register(_SII, "ASA WG S3-79 TO_1.TST", "Official test case, alternative importance")
 def _chk_sii_wg_to1_tst() -> Outcome:
-    result = ph.hearing.sii.speech_intelligibility_index(
-        np.array(ref.ANSIS3_5_WG_TO_SPEECH),
-        np.array(ref.ANSIS3_5_WG_TO_NOISE),
-        threshold=np.array(ref.ANSIS3_5_WG_TO_THRESHOLD),
+    return _sii_official_case(
+        "one-third-octave", ref.ANSIS3_5_WG_TO_SPEECH, ref.ANSIS3_5_WG_TO_NOISE,
+        ref.ANSIS3_5_WG_TO_THRESHOLD, ref.ANSIS3_5_WG_TO1_SII,
+        ref.ANSIS3_5_WG_TO1_IMPORTANCE,
     )
-    sii_alt = float(
-        np.sum(np.array(ref.ANSIS3_5_WG_TO1_IMPORTANCE) * result.band_audibility)
+
+
+@register(_SII, "ASA WG S3-79 CB.TST", "Official critical-band test case")
+def _chk_sii_wg_cb_tst() -> Outcome:
+    return _sii_official_case(
+        "critical-band", ref.ANSIS3_5_WG_CB_SPEECH, ref.ANSIS3_5_WG_CB_NOISE,
+        ref.ANSIS3_5_WG_CB_THRESHOLD, ref.ANSIS3_5_WG_CB_SII,
     )
-    return numeric(ref.ANSIS3_5_WG_TO1_SII, sii_alt, 5e-4, places=3)
+
+
+@register(_SII, "ASA WG S3-79 CB_1.TST", "Critical band, alternative importance")
+def _chk_sii_wg_cb1_tst() -> Outcome:
+    return _sii_official_case(
+        "critical-band", ref.ANSIS3_5_WG_CB_SPEECH, ref.ANSIS3_5_WG_CB_NOISE,
+        ref.ANSIS3_5_WG_CB_THRESHOLD, ref.ANSIS3_5_WG_CB1_SII,
+        ref.ANSIS3_5_WG_CB1_IMPORTANCE,
+    )
+
+
+@register(_SII, "ASA WG S3-79 ECB.TST", "Official equally-contributing test case")
+def _chk_sii_wg_ecb_tst() -> Outcome:
+    return _sii_official_case(
+        "equally-contributing", ref.ANSIS3_5_WG_ECB_SPEECH,
+        ref.ANSIS3_5_WG_ECB_NOISE, ref.ANSIS3_5_WG_ECB_THRESHOLD,
+        ref.ANSIS3_5_WG_ECB_SII,
+    )
+
+
+@register(_SII, "ASA WG S3-79 ECB_1.TST", "Equally contributing, alternative importance")
+def _chk_sii_wg_ecb1_tst() -> Outcome:
+    return _sii_official_case(
+        "equally-contributing", ref.ANSIS3_5_WG_ECB_SPEECH,
+        ref.ANSIS3_5_WG_ECB_NOISE, ref.ANSIS3_5_WG_ECB_THRESHOLD,
+        ref.ANSIS3_5_WG_ECB1_SII, ref.ANSIS3_5_WG_ECB1_IMPORTANCE,
+    )
+
+
+@register(_SII, "ASA WG S3-79 OCTAVE.TST", "Official octave-band test case")
+def _chk_sii_wg_octave_tst() -> Outcome:
+    return _sii_official_case(
+        "octave", ref.ANSIS3_5_WG_OCTAVE_SPEECH, ref.ANSIS3_5_WG_OCTAVE_NOISE,
+        ref.ANSIS3_5_WG_OCTAVE_THRESHOLD, ref.ANSIS3_5_WG_OCTAVE_SII,
+    )
+
+
+@register(_SII, "ASA WG S3-79 OCTAVE_1.TST", "Octave band, alternative importance")
+def _chk_sii_wg_octave1_tst() -> Outcome:
+    return _sii_official_case(
+        "octave", ref.ANSIS3_5_WG_OCTAVE_SPEECH, ref.ANSIS3_5_WG_OCTAVE_NOISE,
+        ref.ANSIS3_5_WG_OCTAVE_THRESHOLD, ref.ANSIS3_5_WG_OCTAVE1_SII,
+        ref.ANSIS3_5_WG_OCTAVE1_IMPORTANCE,
+    )
+
+
+@register(_SII, "ANSI S3.5-1997 Table 1", "Critical-band importance normalisation")
+def _chk_sii_critical_importance_sum() -> Outcome:
+    total = float(ph.sii_procedure("critical-band").band_importance.sum())
+    return numeric(ref.ANSIS3_5_CRITICAL_IMPORTANCE_SUM, total, 1e-9, places=6)
+
+
+@register(_SII, "ANSI S3.5-1997 Table 2", "Equally-contributing importance, 17 x 0.0588")
+def _chk_sii_equal_importance_sum() -> Outcome:
+    total = float(ph.sii_procedure("equally-contributing").band_importance.sum())
+    return numeric(ref.ANSIS3_5_EQUAL_IMPORTANCE_SUM, total, 1e-9, places=6)
+
+
+@register(_SII, "ANSI S3.5-1997 Table 4", "Octave-band importance normalisation")
+def _chk_sii_octave_importance_sum() -> Outcome:
+    total = float(ph.sii_procedure("octave").band_importance.sum())
+    return numeric(ref.ANSIS3_5_OCTAVE_IMPORTANCE_SUM, total, 1e-9, places=6)
+
+
+@register(_SII, "ANSI S3.5-1997 Table 4", "Octave-band speech spectrum level at 1 kHz")
+def _chk_sii_octave_speech_1khz() -> Outcome:
+    proc = ph.sii_procedure("octave")
+    k = int(np.flatnonzero(np.isclose(proc.frequencies, 1000.0))[0])
+    return numeric(
+        ref.ANSIS3_5_OCTAVE_SPEECH_1KHZ, float(proc.speech_spectrum[k]), 1e-9,
+        unit="dB", places=2,
+    )
 
 
 @register(_SII, "ANSI S3.5-1997 Table 3", "Loud-effort speech spectrum level at 1 kHz")

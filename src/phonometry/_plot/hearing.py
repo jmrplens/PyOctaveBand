@@ -258,7 +258,12 @@ def plot_sii_procedure(
     ax.plot(edges, np.append(importance, importance[-1]), drawstyle="steps-post",
             **kwargs)
     ax.set_ylabel(_t("Band importance $I_i$", language))
-    ax.set_ylim(bottom=0.0)
+    # Start at zero, and never let a fixed limit from an earlier procedure clip
+    # a wider-band one: an octave band carries three times the importance of a
+    # one-third-octave band at the same centre frequency.
+    ax.set_ylim(
+        0.0, max(float(ax.get_ylim()[1]), float(importance.max()) * 1.15)
+    )
     ax.set_title(_t("ANSI S3.5-1997 band-importance function", language))
     format_frequency_axis(ax, float(edges[0]), float(edges[-1]))
     ax.set_xlabel(_t("Frequency [Hz]", language))
