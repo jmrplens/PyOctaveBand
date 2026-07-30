@@ -27,9 +27,17 @@ Extras opcionales:
 ```bash
 pip install phonometry[plot]    # matplotlib, para gráficas de respuesta y métodos .plot() de resultados
 pip install phonometry[perf]    # numba, ponderación temporal 'impulse' más rápida
-pip install phonometry[report]  # reportlab + svglib, para que los métodos .report() generen fichas PDF normativas
-pip install phonometry[full]    # todos los anteriores
+pip install phonometry[report]  # reportlab + svglib, para que los métodos .report() generen fichas PDF normativas (su panel de gráfica necesita también [plot])
+pip install phonometry[full]    # todos los anteriores (recomendado)
 ```
+
+Recomiendo `pip install phonometry[full]`: instala de una vez matplotlib,
+numba, reportlab y svglib, con lo que quedan habilitadas todas las
+funcionalidades de la biblioteca. La instalación base calcula todas las
+métricas solo con NumPy y SciPy; lo único que no queda disponible son las
+figuras (`.plot()` y las gráficas de respuesta de los filtros), las fichas PDF
+normativas (`.report()`) y el núcleo compilado que acelera la ponderación
+temporal `impulse`.
 
 **Opción 2: Clonar e instalar**
 

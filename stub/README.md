@@ -11,6 +11,11 @@ but new code should use the new name:
 pip install phonometry
 ```
 
+I recommend `pip install phonometry[full]` instead, which pulls the optional
+matplotlib, numba, reportlab and svglib and so enables every feature: the
+`.plot()` figures, the normative PDF fiches of `.report()` and the compiled
+`impulse` time weighting.
+
 ```python
 import phonometry  # instead of: import pyoctaveband
 ```
