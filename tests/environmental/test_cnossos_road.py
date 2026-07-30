@@ -26,9 +26,7 @@ closed forms of the published equations.
 
 from __future__ import annotations
 
-import csv
 import math
-import pathlib
 
 import matplotlib
 
@@ -56,23 +54,14 @@ from phonometry.environmental.cnossos_road import (
     road_vehicle_sound_power,
 )
 
-DATA = pathlib.Path(__file__).resolve().parents[1] / "data" / "cnossos"
 #: The workbook prints levels rounded to 0,01 dB, so that is the whole budget.
 WORKBOOK_TOLERANCE = 0.01
 CATEGORIES = ("1", "2", "3", "4a", "4b")
 
 
-def _read_csv(name: str) -> list[dict[str, str]]:
-    with (DATA / name).open(newline="", encoding="utf-8") as handle:
-        return list(csv.DictReader(handle))
-
-
 def _coefficients_2015() -> RoadEmissionCoefficients:
     """Table F-1 as published in (EU) 2015/996, the workbook's own database."""
-    table: dict[str, dict[str, tuple[float, ...]]] = {}
-    for row in _read_csv("road_coefficients_2015.csv"):
-        values = tuple(float(row[str(f)]) for f in (63, 125, 250, 500, 1000, 2000, 4000, 8000))
-        table.setdefault(row["category"], {})[row["coefficient"]] = values
+    table = ref.cnossos_road_2015_coefficients()
     return RoadEmissionCoefficients(
         rolling_a={k: v["AR"] for k, v in table.items()},
         rolling_b={k: v["BR"] for k, v in table.items()},
@@ -87,26 +76,16 @@ def _coefficients_2015() -> RoadEmissionCoefficients:
 
 def _surfaces_2015() -> dict[str, RoadSurfaceCoefficients]:
     """Table F-4 as published in (EU) 2015/996, keyed by the workbook's ID."""
-    alpha: dict[str, dict[str, tuple[float, ...]]] = {}
-    beta: dict[str, dict[str, float]] = {}
-    names: dict[str, str] = {}
-    for row in _read_csv("road_surfaces_2015.csv"):
-        sid = row["surface"]
-        names[sid] = row["description"]
-        alpha.setdefault(sid, {})[row["category"]] = tuple(
-            float(row[str(f)]) for f in (63, 125, 250, 500, 1000, 2000, 4000, 8000)
-        )
-        beta.setdefault(sid, {})[row["category"]] = float(row["beta"])
     return {
-        sid: RoadSurfaceCoefficients(
-            name=names[sid], alpha=alpha[sid], beta=beta[sid], speed_range=None
+        surface: RoadSurfaceCoefficients(
+            name=name, alpha=alpha, beta=beta, speed_range=None
         )
-        for sid in names
+        for surface, (name, alpha, beta) in ref.cnossos_road_2015_surfaces().items()
     }
 
 
 def _workbook_cases() -> list[dict[str, str]]:
-    return _read_csv("road_emission_cases.csv")
+    return ref.cnossos_road_workbook_cases()
 
 
 def _run_case(case: dict[str, str]):
@@ -152,7 +131,7 @@ def test_workbook_band_levels(case: dict[str, str]) -> None:
     tables of Commission Directive (EU) 2015/996.
     """
     result = _run_case(case)
-    expected = [float(case[f"lw_{f}"]) for f in (63, 125, 250, 500, 1000, 2000, 4000, 8000)]
+    expected = [float(case[f"lw_{band}"]) for band in ref.CNOSSOS_ROAD_BANDS]
     assert result.total_line_power == pytest.approx(expected, abs=WORKBOOK_TOLERANCE)
 
 

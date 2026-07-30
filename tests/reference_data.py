@@ -30,6 +30,9 @@ _DATA = pathlib.Path(__file__).parent / "data"
 
 INF = math.inf
 
+#: Committed oracle sets that are too large to inline (see tests/data/README.md).
+_DATA = pathlib.Path(__file__).parent / "data"
+
 # ---------------------------------------------------------------------------
 # IEC 61672-1:2013 Table 3 - frequency weightings and class-1 acceptance
 # limits (standard page 22). Z weighting is 0.0 dB at every frequency.
@@ -3179,3 +3182,55 @@ CNOSSOS_ROAD_TABLE_F4_SPEED_RANGE: dict[str, tuple[float, float] | None] = {
 CNOSSOS_ROAD_TEMPERATURE_K: dict[str, float] = {
     "1": 0.08, "2": 0.04, "3": 0.04, "4a": 0.0, "4b": 0.0,
 }
+
+#: The octave bands of the road source, as column names of the committed CSVs.
+CNOSSOS_ROAD_BANDS: tuple[str, ...] = (
+    "63", "125", "250", "500", "1000", "2000", "4000", "8000",
+)
+
+
+def _cnossos_road_rows(name: str) -> list[dict[str, str]]:
+    """Rows of one committed CSV under ``tests/data/cnossos/``."""
+    with (_DATA / "cnossos" / name).open(newline="", encoding="utf-8") as handle:
+        return list(csv.DictReader(handle))
+
+
+def cnossos_road_workbook_cases() -> list[dict[str, str]]:
+    """The 60 committed cases of the CIRCABC road emission test workbook.
+
+    Each row carries the segment description (surface, temperature, studded
+    season, gradient, junction and the flow and speed of the five vehicle
+    categories) and the workbook's own per-band and total line-power levels.
+    See ``tests/data/cnossos/README.md`` for the provenance.
+    """
+    return _cnossos_road_rows("road_emission_cases.csv")
+
+
+def cnossos_road_2015_coefficients() -> dict[str, dict[str, tuple[float, ...]]]:
+    """Table F-1 as published in (EU) 2015/996, keyed by category then ``AR``,
+    ``BR``, ``AP``, ``BP``. This is the superseded database the workbook was
+    computed with, not the one the library ships."""
+    table: dict[str, dict[str, tuple[float, ...]]] = {}
+    for row in _cnossos_road_rows("road_coefficients_2015.csv"):
+        table.setdefault(row["category"], {})[row["coefficient"]] = tuple(
+            float(row[band]) for band in CNOSSOS_ROAD_BANDS
+        )
+    return table
+
+
+def cnossos_road_2015_surfaces() -> dict[
+    str, tuple[str, dict[str, tuple[float, ...]], dict[str, float]]
+]:
+    """Table F-4 as published in (EU) 2015/996, keyed by the ``NLxx`` surface
+    identifier the workbook uses: ``(description, alpha, beta)``."""
+    names: dict[str, str] = {}
+    alpha: dict[str, dict[str, tuple[float, ...]]] = {}
+    beta: dict[str, dict[str, float]] = {}
+    for row in _cnossos_road_rows("road_surfaces_2015.csv"):
+        surface = row["surface"]
+        names[surface] = row["description"]
+        alpha.setdefault(surface, {})[row["category"]] = tuple(
+            float(row[band]) for band in CNOSSOS_ROAD_BANDS
+        )
+        beta.setdefault(surface, {})[row["category"]] = float(row["beta"])
+    return {s: (names[s], alpha[s], beta[s]) for s in names}

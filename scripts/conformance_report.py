@@ -7060,25 +7060,13 @@ def _chk_ac_iec61265() -> Outcome:
 # CNOSSOS-EU road traffic source (Directive 2002/49/EC Annex II, 2.2)
 # ===========================================================================
 _CNOSSOS_ROAD = "CNOSSOS-EU road source (Directive 2002/49/EC Annex II)"
-_CNOSSOS_BANDS = ("63", "125", "250", "500", "1000", "2000", "4000", "8000")
-
-
-def _cnossos_road_csv(name: str) -> list[dict[str, str]]:
-    import csv
-
-    with (_DATA / "cnossos" / name).open(newline="", encoding="utf-8") as handle:
-        return list(csv.DictReader(handle))
 
 
 def _cnossos_road_2015_inputs() -> tuple[Any, dict[str, Any]]:
     """The superseded (EU) 2015/996 Appendix F database the workbook used."""
     from phonometry import RoadEmissionCoefficients, RoadSurfaceCoefficients
 
-    table: dict[str, dict[str, tuple[float, ...]]] = {}
-    for row in _cnossos_road_csv("road_coefficients_2015.csv"):
-        table.setdefault(row["category"], {})[row["coefficient"]] = tuple(
-            float(row[b]) for b in _CNOSSOS_BANDS
-        )
+    table = ref.cnossos_road_2015_coefficients()
     coefficients = RoadEmissionCoefficients(
         rolling_a={k: v["AR"] for k, v in table.items()},
         rolling_b={k: v["BR"] for k, v in table.items()},
@@ -7089,20 +7077,11 @@ def _cnossos_road_2015_inputs() -> tuple[Any, dict[str, Any]]:
         junction_c=ph.ROAD_COEFFICIENTS.junction_c,
         temperature_k=ph.ROAD_COEFFICIENTS.temperature_k,
     )
-    alpha: dict[str, dict[str, tuple[float, ...]]] = {}
-    beta: dict[str, dict[str, float]] = {}
-    names: dict[str, str] = {}
-    for row in _cnossos_road_csv("road_surfaces_2015.csv"):
-        names[row["surface"]] = row["description"]
-        alpha.setdefault(row["surface"], {})[row["category"]] = tuple(
-            float(row[b]) for b in _CNOSSOS_BANDS
-        )
-        beta.setdefault(row["surface"], {})[row["category"]] = float(row["beta"])
     surfaces = {
-        sid: RoadSurfaceCoefficients(
-            name=names[sid], alpha=alpha[sid], beta=beta[sid], speed_range=None
+        surface: RoadSurfaceCoefficients(
+            name=name, alpha=alpha, beta=beta, speed_range=None
         )
-        for sid in names
+        for surface, (name, alpha, beta) in ref.cnossos_road_2015_surfaces().items()
     }
     return coefficients, surfaces
 
@@ -7122,7 +7101,7 @@ def _chk_cnossos_road_workbook() -> Outcome:
     """
     coefficients, surfaces = _cnossos_road_2015_inputs()
     worst = 0.0
-    for case in _cnossos_road_csv("road_emission_cases.csv"):
+    for case in ref.cnossos_road_workbook_cases():
         traffic = [
             ph.RoadTraffic(
                 ph.RoadVehicleCategory(c), float(case[f"q_{c}"]), float(case[f"v_{c}"]),
@@ -7140,7 +7119,7 @@ def _chk_cnossos_road_workbook() -> Outcome:
             junction_type=ph.JunctionType(int(case["junction_type"])),
             coefficients=coefficients,
         )
-        for got, band in zip(result.total_line_power, _CNOSSOS_BANDS):
+        for got, band in zip(result.total_line_power, ref.CNOSSOS_ROAD_BANDS):
             worst = max(worst, abs(float(got) - float(case[f"lw_{band}"])))
     return numeric(0.0, worst, 0.01, unit="dB", places=4,
                    expected_label="<= 0.01 dB on 480 published band levels")
