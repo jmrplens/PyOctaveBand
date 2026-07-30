@@ -983,10 +983,9 @@ which is the check that enforces the rule; see
   body values belong to those spectra: the ΔL column of Tabelle I.2 is the
   audibility of the j = 2 tones (8,53 dB at 627,2 Hz, which the Anmerkung
   below the table calls "die maßgebliche Differenz ΔL_2"), and the a_v column
-  of Tabelle I.10 is the masking index of the j = 24 tones. Both headers are
-  leftovers from the first-spectrum tables of the same annex (Tabelle I.6 is
-  the j = 1 table and legitimately carries `ΔL_1,k` and `a_v 1,k`), which is
-  presumably where they were copied from.
+  of Tabelle I.10 is the masking index of the j = 24 tones. The index 1 is
+  right in exactly one table of the annex, Tabelle I.6, which is the j = 1
+  table of Beispiel I.2 and carries both `ΔL_1,k` and `a_v 1,k` legitimately.
 - **Evidence:** the tables' own captions, their neighbouring column
   subscripts, and the Anmerkung under each. Renders: `plan/DIN 45681 -
   Tonhaltigkeit und Tonzuschlag (63p).pdf`, PDF page 37, printed p. 37,
