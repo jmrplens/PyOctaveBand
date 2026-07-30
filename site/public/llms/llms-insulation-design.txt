@@ -1014,6 +1014,184 @@ Cremer's empirical `TL = TL₀ + 10 lg(f/fc − 1) + 10 lg η − 2 dB`
 bridge. Both rise at about 10 dB per octave far above coincidence; they differ
 in how they leave the dip.
 
+## Orthotropic panels: a coincidence range, not a dip (Vigran 6.5.3)
+
+Ribbed and corrugated cladding is not isotropic. It is very stiff *along* the
+corrugations and almost as limp as a flat sheet *across* them, so instead of one
+coincidence frequency it has a whole **coincidence range** bounded by the two
+principal bending stiffnesses (Vigran Eq. 6.107, the isotropic
+$f_c = (c_0^2/2\pi)\sqrt{m''/B}$ evaluated twice):
+
+$$
+f_{c1} = \frac{c_0^2}{2\pi}\sqrt{\frac{m''}{B_1}}, \qquad
+f_{c2} = \frac{c_0^2}{2\pi}\sqrt{\frac{m''}{B_2}}, \qquad B_1 > B_2 .
+$$
+
+The stiffest direction sets the *lowest* coincidence frequency, which is the
+sting in the tail: corrugating a sheet to gain strength drags $f_{c1}$ down,
+often to a few hundred hertz, while $f_{c2}$ runs up to 15 kHz or 30 kHz. Over
+that whole span the resonant transmission dominates and $R$ flattens far below
+the mass law of a flat plate of the same mass.
+
+The bending-wave impedance now depends on the azimuth $\vartheta$ as well as the
+incidence angle $\varphi$ (Heckl 1960; Hansen 1993; Vigran Eq. 6.108, which is
+Bies Eq. 7.30):
+
+$$
+Z_w = \mathrm{j}\omega m''\left[1 -
+\left(\frac{f}{f_{c1}}\cos^2\vartheta + \frac{f}{f_{c2}}\sin^2\vartheta\right)^2
+(1 + \mathrm{j}\eta)\sin^4\varphi\right],
+$$
+
+and the diffuse-field average of $\tau = |1 + Z_w\cos\varphi/2\rho_0c_0|^{-2}$
+becomes a double integral (Vigran Eq. 6.111 = Bies Eq. 7.38). Setting
+$f_{c1} = f_{c2}$ recovers Cremer's isotropic impedance exactly.
+
+`orthotropic_transmission_loss` offers both published routes:
+
+- `method="integral"` evaluates that double integral numerically. It is the
+  only route that responds to the loss factor, and it is the one that shows how
+  deep the coincidence region really goes. The near-grazing angles are excluded
+  by a limiting angle: pass `area` for the size-dependent limit of Bies
+  Eq. 7.36 (Vigran writes it as Eq. 6.113), or leave it out for the fixed
+  `limiting_angle` (78 degrees by default, Sharp's value, which is Vigran's
+  $\sin^2\varphi = 0.96$).
+- `method="heckl"` is Heckl's closed-form approximation for $\eta = 0$, the
+  design chart of Bies Fig. 7.9(b): field-incidence mass law below $f_{c1}/2$,
+  then
+
+  $$
+  \tau_F \approx \frac{\rho_0c_0}{2\pi^2 m''}\,\frac{f_{c1}}{f^2}
+  \left[\ln\frac{4f}{f_{c1}}\right]^2 \quad (f_{c1} \le f < f_{c2}/2),
+  \qquad
+  \tau_F \approx \frac{\rho_0c_0}{2m''}\,\frac{\sqrt{f_{c1}f_{c2}}}{f^2}
+  \quad (f > 2f_{c2}),
+  $$
+
+  with straight lines in $\log_{10} f$ across the two gaps. It needs no loss
+  factor and no numerical work, but it requires $f_{c2} > 4f_{c1}$ for its four
+  construction points to stay in order.
+
+For the common "wavy" corrugation the equivalent stiffnesses come from
+Timoshenko and Woinowsky-Krieger through `corrugated_plate_stiffness`
+(Vigran Eq. 3.115), and the surface density has to grow with the **developed
+length** of the profile, which is what `corrugated_plate_mass_factor` returns.
+`orthotropic_plate_resonance` is the matching eigenfrequency of a simply
+supported orthotropic plate (Vigran Eq. 3.113 = Bies Eq. 7.27, after Hearmon
+1959); its lowest mode matters because both infinite-panel models are only
+valid above roughly $1.5f_{1,1}$.
+
+```python
+from phonometry import (
+    coincidence_frequency, corrugated_plate_mass_factor,
+    corrugated_plate_stiffness, orthotropic_critical_frequencies,
+    orthotropic_plate_resonance, plate_bending_stiffness,
+)
+
+# Vigran's worked example: a 1 m x 1 m steel sheet 1 mm thick, E = 210 GPa,
+# nu = 0.3, m'' = 7.8 kg/m2, corrugated into a sinusoid 20 mm deep
+# (amplitude H = 10 mm) at a 100 mm pitch.
+flat_b = plate_bending_stiffness(2.1e11, 1.0e-3, 0.3)
+b_x, b_z, b_xz = corrugated_plate_stiffness(
+    1.0e-3, 0.010, 0.100, youngs_modulus=2.1e11, poisson_ratio=0.3,
+)
+mass = 7.8 * corrugated_plate_mass_factor(0.010, 0.100)
+print(round(flat_b, 1), round(b_x, 1), round(b_z))     # 19.2 17.5 2202
+print(round(mass, 2))                                  # 8.52 kg/m2 (+9 %)
+
+flat = {"length_x": 1.0, "length_z": 1.0, "mass_per_area": 7.8,
+        "bending_stiffness_x": flat_b, "bending_stiffness_z": flat_b,
+        "bending_stiffness_xz": flat_b}
+corr = {"length_x": 1.0, "length_z": 1.0, "mass_per_area": mass,
+        "bending_stiffness_x": b_x, "bending_stiffness_z": b_z,
+        "bending_stiffness_xz": b_xz}
+print(round(orthotropic_plate_resonance(1, 1, **flat), 1),
+      round(orthotropic_plate_resonance(2, 2, **flat), 1))    # 4.9 19.7
+print(round(orthotropic_plate_resonance(1, 1, **corr), 1),
+      round(orthotropic_plate_resonance(2, 2, **corr), 1))    # 25.5 102.1
+
+# The same sheet, flat and corrugated, in the coincidence picture:
+print(round(coincidence_frequency(7.8, flat_b)))               # 11925 Hz
+print([round(f) for f in orthotropic_critical_frequencies(mass, b_x, b_z)])
+# [1165, 13064]
+```
+
+The four eigenfrequencies are Vigran's own printed answers (4.9 Hz, 19.7 Hz
+flat; 25.5 Hz, 102 Hz corrugated), and reproducing the corrugated pair is what
+proves the mass factor belongs there: with the flat 7.8 kg/m² the same formulas
+return 26.7 Hz and 106.7 Hz.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/orthotropic_transmission_loss_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/orthotropic_transmission_loss.svg" alt="Transmission loss in decibels against one-third-octave bands from 100 hertz to 16 kilohertz for a 1 mm steel sheet, flat and corrugated. Both curves rise together at 6 decibels per octave from about 11 decibels at 100 hertz to 28 decibels at 800 hertz. Above 1 kilohertz the flat sheet keeps climbing to a peak near 45 decibels at 6.3 kilohertz before its own coincidence dip, while the corrugated sheet collapses to 22 decibels at 1.6 kilohertz inside a shaded band running from 1165 hertz to 13.1 kilohertz and then recovers slowly, staying about 13 decibels below the flat sheet at 2.5 kilohertz. A dashed line shows Heckl's closed-form approximation tracking the same collapse more smoothly" width="88%"></picture>
+
+*The trade corrugating makes, on Vigran's own geometry. Below $f_{c1}$ the two
+panels are within about 2 dB of each other (the corrugated one slightly higher:
+it is 9 % heavier, and the diffuse-field integral uses a 78 degree limiting
+angle rather than Sharp's 5.5 dB band correction). Across the coincidence range
+the corrugated sheet gives away up to 13 dB, and $R_w$ falls from 28 dB to
+25 dB, for a panel that is stiffer and barely heavier.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import (
+    coincidence_frequency, corrugated_plate_mass_factor,
+    corrugated_plate_stiffness, orthotropic_critical_frequencies,
+    orthotropic_transmission_loss, plate_bending_stiffness,
+    single_panel_transmission_loss,
+)
+
+bands = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000,
+                  1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000,
+                  10000, 12500, 16000], dtype=float)
+eta = 0.011
+flat_b = plate_bending_stiffness(2.1e11, 1.0e-3, 0.3)
+b_x, b_z, _ = corrugated_plate_stiffness(
+    1.0e-3, 0.010, 0.100, youngs_modulus=2.1e11, poisson_ratio=0.3,
+)
+mass = 7.8 * corrugated_plate_mass_factor(0.010, 0.100)
+fc1, fc2 = orthotropic_critical_frequencies(mass, b_x, b_z)
+
+flat = single_panel_transmission_loss(
+    bands, 7.8, critical_frequency=coincidence_frequency(7.8, flat_b),
+    loss_factor=eta,
+)
+corrugated = orthotropic_transmission_loss(
+    bands, mass, critical_frequency_lower=fc1, critical_frequency_upper=fc2,
+    loss_factor=eta,
+)
+heckl = orthotropic_transmission_loss(
+    bands, mass, critical_frequency_lower=fc1, critical_frequency_upper=fc2,
+    method="heckl",
+)
+
+# One line: R(f) with the coincidence range shaded between fc1 and fc2.
+corrugated.plot()
+plt.show()
+
+# By hand, all three on one axes:
+fig, ax = plt.subplots()
+ax.axvspan(fc1, fc2, color="0.85", zorder=0)
+ax.semilogx(bands, flat.transmission_loss, "-o", ms=4, label="flat sheet")
+ax.semilogx(bands, corrugated.transmission_loss, "-s", ms=4,
+            label="corrugated, integral")
+ax.semilogx(bands, heckl.transmission_loss, "--", label="Heckl approximation")
+ax.set(xlabel="Frequency [Hz]", ylabel="Transmission loss TL [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+Two caveats Bies attaches to the Heckl branch are worth repeating, because no
+smooth model predicts either. Below about $0.7f_{c1}$ the estimate
+underestimates $R$ on small panels, the error growing as the panel shrinks; and
+real corrugated panels almost always show a dip of up to 5 dB somewhere between
+2 kHz and 4 kHz, which finite-element work traced to resonances of the panel
+sections *between* the ribs rather than to any coincidence effect.
+
 ## Double wall: the mass-spring-mass resonance (Bies 7.2.6)
 
 Two leaves separated by a cavity behave as a mass-spring-mass system. Below its
@@ -1261,6 +1439,12 @@ fig.tight_layout(); plt.show()
   [doi:10.1007/b137728](https://doi.org/10.1007/b137728).
   Chapter 5, Table 5.1: the point impedances and mobilities of infinite
   structures and the injected-power relation.
+- Vigran, T. E. (2008). *Building Acoustics*. Taylor & Francis.
+  ISBN 978-0-415-42853-8.
+  [doi:10.1201/9781482266016](https://doi.org/10.1201/9781482266016).
+  Sections 3.7.3.3 (orthotropic plate eigenfrequencies, Eqs 3.113-3.115 after
+  Timoshenko & Woinowsky-Krieger) and 6.5.3 (orthotropic panel transmission,
+  Eqs 6.107-6.113 after Heckl 1960 and Hansen 1993).
 
 ## See also
 

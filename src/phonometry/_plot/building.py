@@ -84,6 +84,7 @@ _STRINGS: dict[str, str] = {
     "Sound reduction index $R$ [dB]": "Índice de reducción acústica $R$ [dB]",
     "Predicted sound insulation": "Aislamiento acústico previsto",
     "coincidence plateau (A to B)": "meseta de coincidencia (A a B)",
+    "coincidence range ($f_{c1}$ to $f_{c2}$)": "rango de coincidencia ($f_{c1}$ a $f_{c2}$)",
     "aperture $R$": "$R$ de abertura",
     "Aperture sound transmission (Gomperts / Wilson-Soroka)": "Transmisión sonora por abertura (Gomperts / Wilson-Soroka)",
     "Sound reduction index [dB]": "Índice de reducción acústica [dB]",
@@ -170,9 +171,24 @@ def plot_sound_reduction(
     kwargs.setdefault("markersize", 3)
     ax.semilogx(freq, r, label=_t("predicted $R$", language), **kwargs)
     if result.critical_frequency is not None:
+        symbol = "$f_{c1}$" if result.critical_frequency_upper is not None else "$f_c$"
         ax.axvline(
             result.critical_frequency, color=_C_REFERENCE, ls="--", lw=1.0,
-            label=f"$f_c$ = {format_number(result.critical_frequency, language, decimals=0)} Hz",
+            label=f"{symbol} = "
+                  f"{format_number(result.critical_frequency, language, decimals=0)} Hz",
+        )
+    if result.critical_frequency is not None and result.critical_frequency_upper is not None:
+        # An orthotropic panel has a coincidence *range*, not a dip: shade it,
+        # because that band is where R flattens below the mass law.
+        ax.axvspan(
+            result.critical_frequency, result.critical_frequency_upper,
+            color=theme_fill(_C_TERTIARY, ax), lw=0, zorder=0,
+            label=_t("coincidence range ($f_{c1}$ to $f_{c2}$)", language),
+        )
+        ax.axvline(
+            result.critical_frequency_upper, color=_C_REFERENCE, ls="--", lw=1.0,
+            label="$f_{c2}$ = "
+                  f"{format_number(result.critical_frequency_upper, language, decimals=0)} Hz",
         )
     if result.resonance_frequency is not None:
         ax.axvline(

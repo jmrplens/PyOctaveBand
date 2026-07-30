@@ -1,8 +1,8 @@
 # phonometry
 
-> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 474 numerical conformance checks against 316 standards enforced in CI.
+> Acoustic measurement, analysis and prediction in Python. Sound level metrology, psychoacoustics, room and building acoustics, materials, vibration, environmental and transport noise, underwater acoustics, electroacoustics and wave simulation, with every metric implemented from the text of its governing standard and 484 numerical conformance checks against 325 standards enforced in CI.
 
-phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 474 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 55 domains.
+phonometry v3.3.0 is a pure-Python library built on NumPy/SciPy (Python >= 3.13). Each result is a typed, frozen dataclass that carries the inputs it was computed from, draws its own figure with a one-line `.plot()` in English or Spanish, and, where a standard defines a reporting format, renders that format as a PDF with `.report()`. The conformance report pins each of the 484 checks to a standard, a clause or table, the normative expected value and the value the library computes, across 55 domains.
 
 The project was published as **PyOctaveBand** until version 3.0.0. Third-party references and dependency pins still using that name refer to this library.
 
@@ -2535,9 +2535,13 @@ cycle and warn on use; they are removed in 4.0.
 | `mass_law_transmission_loss` / `field_incidence_correction` | `function` | **Panel mass law TL (Bies Eq. 7.40/7.42).**<br>• `frequency` [Hz], `mass_per_area` m'' [kg/m²]<br>• `incidence`: 'normal'/'field', `band`: 'third' (−5.5 dB) / 'octave' (−4.0 dB), or `field_correction` [dB] (Norton uses a flat 5 dB)<br>• +6 dB/octave and +6 dB/mass doubling | `tl = mass_law_transmission_loss(500, 20)` |
 | `single_panel_transmission_loss` | `function` | **Single-panel R, Sharp's method (Bies 7.2.4.1).**<br>• `frequency` [Hz], `mass_per_area` [kg/m²]<br>• `critical_frequency` fc [Hz] or `bending_stiffness` B' [N·m]<br>• `loss_factor` η, `band`, `coincidence_model`: 'sharp' (Bies 7.44) / 'cremer' (Norton 3.110) | `r = single_panel_transmission_loss(f, 15, critical_frequency=2100)`<br><br>• `SoundReductionResult` |
 | `plateau_transmission_loss` / `PLATEAU_MATERIALS` | `function` | **Plateau (Watters) TL estimate (Norton & Karczub 3.9.1, Table 3.1).**<br>• `frequency` [Hz]; `material` + `thickness_mm`, or `mass_per_area` + `plateau_height` + `frequency_ratio`<br>• field-incidence mass law → horizontal coincidence plateau (point A to B) → 10 dB/octave<br>• `PLATEAU_MATERIALS`: 8 materials as (kg/m² per mm, plateau dB, B/A) | `r = plateau_transmission_loss(f, material='brick', thickness_mm=110)`<br><br>• `SoundReductionResult` with `plateau_height`, `plateau_start`, `plateau_end` |
+| `orthotropic_transmission_loss` | `function` | **Orthotropic (ribbed / corrugated) panel R (Vigran 6.5.3; Bies 7.2.4.5).**<br>• `frequency` [Hz], `mass_per_area` m'' [kg/m²]<br>• `critical_frequency_lower` fc1 / `critical_frequency_upper` fc2 [Hz]<br>• `method`: 'integral' (Vigran Eq. 6.111 double integral, uses `loss_factor` η) / 'heckl' (Bies Fig. 7.9b design chart, needs fc2 > 4·fc1)<br>• `area` S [m²] (Bies Eq. 7.36 limit) or `limiting_angle` θL [deg] (Default: 78) | `r = orthotropic_transmission_loss(f, 7.5, critical_frequency_lower=400, critical_frequency_upper=4000)`<br><br>• `SoundReductionResult` with `critical_frequency_upper` |
+| `orthotropic_critical_frequencies` | `function` | **Coincidence range (fc1, fc2) of an orthotropic panel (Vigran Eq. 6.107).**<br>• `mass_per_area` m'' [kg/m²]<br>• `bending_stiffness_1` / `bending_stiffness_2` [N·m] (order irrelevant)<br>• `speed_of_sound` (Default: 343.0)<br>• the stiffest direction gives the lowest fc | `fc1, fc2 = orthotropic_critical_frequencies(8.5, 17.5, 2202)`<br><br>• `(float, float)` [Hz], sorted |
+| `corrugated_plate_stiffness` / `corrugated_plate_mass_factor` | `function` | **Equivalent stiffnesses and developed length of a sinusoidal corrugation (Vigran Eq. 3.115, Timoshenko & Woinowsky-Krieger).**<br>• `thickness` h, `corrugation_amplitude` H, `corrugation_wavelength` L [m]<br>• `youngs_modulus` E [Pa], `poisson_ratio` ν (Default: 0.3)<br>• the mass factor is the arc length of one period over the period | `bx, bz, bxz = corrugated_plate_stiffness(1e-3, 0.01, 0.1, youngs_modulus=2.1e11)`<br>`m = 7.8 * corrugated_plate_mass_factor(0.01, 0.1)`<br><br>• `(Bx, Bz, Bxz)` [N·m]; factor ≥ 1 |
+| `orthotropic_plate_resonance` | `function` | **Eigenfrequency of a simply supported orthotropic plate (Vigran Eq. 3.113 = Bies Eq. 7.27, Hearmon 1959).**<br>• `mode_x` i, `mode_z` n (≥ 1)<br>• `length_x` a, `length_z` b [m], `mass_per_area` m'' [kg/m²]<br>• `bending_stiffness_x` / `_z` / `_xz` [N·m]<br>• the panel TL models are valid above ≈ 1.5·f₁,₁ | `orthotropic_plate_resonance(1, 1, length_x=1.0, length_z=1.0, mass_per_area=7.8, bending_stiffness_x=b, bending_stiffness_z=b, bending_stiffness_xz=b)`<br><br>• [Hz] |
 | `double_wall_transmission_loss` / `mass_spring_mass_resonance` | `function` | **Double-wall R (Bies 7.2.6, Eq. 7.62-7.64).**<br>• `mass1`/`mass2` [kg/m²], `gap` d [m]<br>• `cavity_medium`: porous fill (`PorousMediumResult`) lowers f0<br>• below f0 = total-mass law; f0 = mass-air-mass resonance | `r = double_wall_transmission_loss(f, 12, 12, 0.1)`<br><br>• `SoundReductionResult` |
 | `plot_double_wall_geometry` | `function` | **Mass-spring-mass cross-section to scale.**<br>• `mass1`, `mass2` [kg/m²], `gap` [m]<br>• `resonance_frequency` [Hz] (annotation)<br>• `language` | `plot_double_wall_geometry(8.8, 8.8, 0.1)`<br><br>• Also `SoundReductionResult.plot_geometry()` (double-wall results) |
-| `SoundReductionResult` | `dataclass` | **Predicted R(f) of a construction (Bies 7.2).**<br>• `transmission_loss` R [dB], `transmission_coefficient` τ<br>• `critical_frequency` / `resonance_frequency`<br>• `.rating()` → Rw (ISO 717-1), `.plot()` | `res.transmission_loss, res.rating().rating` |
+| `SoundReductionResult` | `dataclass` | **Predicted R(f) of a construction (Bies 7.2).**<br>• `transmission_loss` R [dB], `transmission_coefficient` τ<br>• `critical_frequency` / `critical_frequency_upper` (orthotropic fc1/fc2) / `resonance_frequency`<br>• `.rating()` → Rw (ISO 717-1), `.plot()` | `res.transmission_loss, res.rating().rating` |
 | `slit_transmission_coefficient` / `slit_resonance_frequencies` | `function` | **Straight slit τ (Hopkins Eq. 4.99, Gomperts).**<br>• `frequency` [Hz], `width` w [m], `depth` d [m]<br>• `field`: 'diffuse'/'normal', `position`: 'mid'/'edge'<br>• maxima at d+2e = zλ/2 | `res = slit_transmission_coefficient(f, 0.002, 0.1)`<br><br>• `ApertureTransmissionResult` |
 | `circular_aperture_transmission_coefficient` | `function` | **Circular hole τ (Hopkins Eq. 4.102, Wilson-Soroka).**<br>• `frequency` [Hz], `radius` a [m], `depth` d [m]<br>• τ → 1 for a large hole | `res = circular_aperture_transmission_coefficient(f, 0.01, 0.002)`<br><br>• `ApertureTransmissionResult` |
 | `plot_aperture_geometry` | `function` | **Wall-aperture section to scale.**<br>• `depth` d [m]<br>• Exactly one of `width` w / `radius` [m]<br>• `language` | `plot_aperture_geometry(0.1, width=0.003)`<br><br>• Also `ApertureTransmissionResult.plot_geometry()` |
@@ -3109,6 +3113,9 @@ cycle and warn on use; they are removed in 4.0.
 | `delany_bazley` | `function` | **Delany–Bazley one-parameter porous model (Mechel 2e G.11; Bies 5e Table D.1).**<br>• `frequency` f [Hz]<br>• `flow_resistivity` σ [Pa·s/m²]<br>• `coefficients`: preset name or (C1…C8) (Default: 'delany_bazley' rockwool/fibreglass)<br>• `speed_of_sound`, `air_density` (Default: 343.0, 1.205)<br>• Warns outside 0.01 < X < 1 (X = ρf/σ) | `med = delany_bazley(f, 20000.0)`<br><br>• `PorousMediumResult` |
 | `miki` | `function` | **Miki (1990) positive-real revision of Delany–Bazley.**<br>• `frequency` f [Hz]<br>• `flow_resistivity` σ [Pa·s/m²]<br>• `speed_of_sound`, `air_density`<br>• Stays passive below the fit range; warns outside 0.01 < f/σ < 1 | `med = miki(f, 20000.0)`<br><br>• `PorousMediumResult` |
 | `johnson_champoux_allard` | `function` | **JCA five-parameter rigid-frame model (Cox & D'Antonio 3e Eqs. 6.19–6.25).**<br>• `frequency` f [Hz], `flow_resistivity` σ [Pa·s/m²]<br>• `porosity` φ, `tortuosity` T = α∞<br>• `viscous_length` Λ / `thermal_length` Λ′ [m]<br>• Air state: `viscosity`, `prandtl_number`, `heat_capacity_ratio`, `atmospheric_pressure` | `med = johnson_champoux_allard(f, 20000.0, porosity=0.98, tortuosity=1.05, viscous_length=8.7e-5, thermal_length=1.7e-4)`<br><br>• `PorousMediumResult` |
+| `limp_frame` | `function` | **Limp-frame correction of any rigid-frame model (Allard & Atalla 2e Eqs. 11.53-11.55, Panneton 2007).**<br>• `medium`: a rigid-frame `PorousMediumResult`<br>• `frame_density` ρ₁ [kg/m³] (bulk density of the frame)<br>• `porosity` φ (Default: 1.0)<br>• keeps K_e, corrects ρ_e; → ρ_t = ρ₁ + φρ₀ as ω → 0 and → rigid as ρ₁ → ∞ | `soft = limp_frame(jca, frame_density=30.0, porosity=0.98)`<br><br>• `PorousMediumResult`, model 'limp_frame(...)' |
+| `decoupling_frequency` | `function` | **Zwikker-Kosten decoupling frequency Fd (Allard & Atalla 2e Sect. 11.3.4 / Eq. 6.90).**<br>• `flow_resistivity` σ [Pa·s/m²]<br>• `porosity` φ, `frame_density` ρ₁ [kg/m³]<br>• Fd = σφ²/(2πρ₁): above it the frame stands still | `decoupling_frequency(40e3, porosity=0.94, frame_density=130.0)  # 43.27`<br><br>• [Hz] |
+| `limp_frame_applicable` / `LIMP_FRAME_CRITERIA` | `function` | **Published rule of thumb for treating a frame as limp (Allard & Atalla 2e pp. 253-254).**<br>• `frame_bulk_modulus` K_c [Pa]<br>• `criterion`: 'doutres' (0.2, Default) / 'beranek' (0.05)<br>• `fluid_bulk_modulus` K_f [Pa] (Default: 101325, isothermal air) → the book's "bulk modulus lower than 20 kPa" | `limp_frame_applicable(20e3)  # True`<br><br>• `bool` |
 | `PorousMediumResult` | `dataclass` | **Equivalent-fluid characterisation.**<br>• `characteristic_impedance` Zc [Pa·s/m], `wavenumber` k [rad/m] (Im < 0)<br>• `effective_density`, `bulk_modulus` (surface-normalised)<br>• `.normalized_impedance`, `.normalized_wavenumber`<br>• `.plot()`: normalised Zc/k components | `med.characteristic_impedance, med.plot()` |
 | `DELANY_BAZLEY_COEFFICIENTS` | `mapping` | **Bies 5e Table D.1 coefficient presets (C1…C8).**<br>'delany_bazley' (rockwool/fibreglass), 'garai_pompoli' (polyester), 'dunn_davern' / 'wu' (foams) | `DELANY_BAZLEY_COEFFICIENTS['garai_pompoli']` |
 | `DELANY_BAZLEY_VALIDITY` | `tuple` | **Stated fit range in X = ρf/σ.**<br>(0.01, 1.0) | `DELANY_BAZLEY_VALIDITY  # (0.01, 1.0)` |
@@ -11377,7 +11384,7 @@ the normative PDF fiche.
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/guides/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/guides/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/reference/why-phonometry/): the conformance-first design philosophy
-- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 474 checks
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 484 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
 
@@ -23123,6 +23130,184 @@ Cremer's empirical `TL = TL₀ + 10 lg(f/fc − 1) + 10 lg η − 2 dB`
 bridge. Both rise at about 10 dB per octave far above coincidence; they differ
 in how they leave the dip.
 
+## Orthotropic panels: a coincidence range, not a dip (Vigran 6.5.3)
+
+Ribbed and corrugated cladding is not isotropic. It is very stiff *along* the
+corrugations and almost as limp as a flat sheet *across* them, so instead of one
+coincidence frequency it has a whole **coincidence range** bounded by the two
+principal bending stiffnesses (Vigran Eq. 6.107, the isotropic
+$f_c = (c_0^2/2\pi)\sqrt{m''/B}$ evaluated twice):
+
+$$
+f_{c1} = \frac{c_0^2}{2\pi}\sqrt{\frac{m''}{B_1}}, \qquad
+f_{c2} = \frac{c_0^2}{2\pi}\sqrt{\frac{m''}{B_2}}, \qquad B_1 > B_2 .
+$$
+
+The stiffest direction sets the *lowest* coincidence frequency, which is the
+sting in the tail: corrugating a sheet to gain strength drags $f_{c1}$ down,
+often to a few hundred hertz, while $f_{c2}$ runs up to 15 kHz or 30 kHz. Over
+that whole span the resonant transmission dominates and $R$ flattens far below
+the mass law of a flat plate of the same mass.
+
+The bending-wave impedance now depends on the azimuth $\vartheta$ as well as the
+incidence angle $\varphi$ (Heckl 1960; Hansen 1993; Vigran Eq. 6.108, which is
+Bies Eq. 7.30):
+
+$$
+Z_w = \mathrm{j}\omega m''\left[1 -
+\left(\frac{f}{f_{c1}}\cos^2\vartheta + \frac{f}{f_{c2}}\sin^2\vartheta\right)^2
+(1 + \mathrm{j}\eta)\sin^4\varphi\right],
+$$
+
+and the diffuse-field average of $\tau = |1 + Z_w\cos\varphi/2\rho_0c_0|^{-2}$
+becomes a double integral (Vigran Eq. 6.111 = Bies Eq. 7.38). Setting
+$f_{c1} = f_{c2}$ recovers Cremer's isotropic impedance exactly.
+
+`orthotropic_transmission_loss` offers both published routes:
+
+- `method="integral"` evaluates that double integral numerically. It is the
+  only route that responds to the loss factor, and it is the one that shows how
+  deep the coincidence region really goes. The near-grazing angles are excluded
+  by a limiting angle: pass `area` for the size-dependent limit of Bies
+  Eq. 7.36 (Vigran writes it as Eq. 6.113), or leave it out for the fixed
+  `limiting_angle` (78 degrees by default, Sharp's value, which is Vigran's
+  $\sin^2\varphi = 0.96$).
+- `method="heckl"` is Heckl's closed-form approximation for $\eta = 0$, the
+  design chart of Bies Fig. 7.9(b): field-incidence mass law below $f_{c1}/2$,
+  then
+
+  $$
+  \tau_F \approx \frac{\rho_0c_0}{2\pi^2 m''}\,\frac{f_{c1}}{f^2}
+  \left[\ln\frac{4f}{f_{c1}}\right]^2 \quad (f_{c1} \le f < f_{c2}/2),
+  \qquad
+  \tau_F \approx \frac{\rho_0c_0}{2m''}\,\frac{\sqrt{f_{c1}f_{c2}}}{f^2}
+  \quad (f > 2f_{c2}),
+  $$
+
+  with straight lines in $\log_{10} f$ across the two gaps. It needs no loss
+  factor and no numerical work, but it requires $f_{c2} > 4f_{c1}$ for its four
+  construction points to stay in order.
+
+For the common "wavy" corrugation the equivalent stiffnesses come from
+Timoshenko and Woinowsky-Krieger through `corrugated_plate_stiffness`
+(Vigran Eq. 3.115), and the surface density has to grow with the **developed
+length** of the profile, which is what `corrugated_plate_mass_factor` returns.
+`orthotropic_plate_resonance` is the matching eigenfrequency of a simply
+supported orthotropic plate (Vigran Eq. 3.113 = Bies Eq. 7.27, after Hearmon
+1959); its lowest mode matters because both infinite-panel models are only
+valid above roughly $1.5f_{1,1}$.
+
+```python
+from phonometry import (
+    coincidence_frequency, corrugated_plate_mass_factor,
+    corrugated_plate_stiffness, orthotropic_critical_frequencies,
+    orthotropic_plate_resonance, plate_bending_stiffness,
+)
+
+# Vigran's worked example: a 1 m x 1 m steel sheet 1 mm thick, E = 210 GPa,
+# nu = 0.3, m'' = 7.8 kg/m2, corrugated into a sinusoid 20 mm deep
+# (amplitude H = 10 mm) at a 100 mm pitch.
+flat_b = plate_bending_stiffness(2.1e11, 1.0e-3, 0.3)
+b_x, b_z, b_xz = corrugated_plate_stiffness(
+    1.0e-3, 0.010, 0.100, youngs_modulus=2.1e11, poisson_ratio=0.3,
+)
+mass = 7.8 * corrugated_plate_mass_factor(0.010, 0.100)
+print(round(flat_b, 1), round(b_x, 1), round(b_z))     # 19.2 17.5 2202
+print(round(mass, 2))                                  # 8.52 kg/m2 (+9 %)
+
+flat = {"length_x": 1.0, "length_z": 1.0, "mass_per_area": 7.8,
+        "bending_stiffness_x": flat_b, "bending_stiffness_z": flat_b,
+        "bending_stiffness_xz": flat_b}
+corr = {"length_x": 1.0, "length_z": 1.0, "mass_per_area": mass,
+        "bending_stiffness_x": b_x, "bending_stiffness_z": b_z,
+        "bending_stiffness_xz": b_xz}
+print(round(orthotropic_plate_resonance(1, 1, **flat), 1),
+      round(orthotropic_plate_resonance(2, 2, **flat), 1))    # 4.9 19.7
+print(round(orthotropic_plate_resonance(1, 1, **corr), 1),
+      round(orthotropic_plate_resonance(2, 2, **corr), 1))    # 25.5 102.1
+
+# The same sheet, flat and corrugated, in the coincidence picture:
+print(round(coincidence_frequency(7.8, flat_b)))               # 11925 Hz
+print([round(f) for f in orthotropic_critical_frequencies(mass, b_x, b_z)])
+# [1165, 13064]
+```
+
+The four eigenfrequencies are Vigran's own printed answers (4.9 Hz, 19.7 Hz
+flat; 25.5 Hz, 102 Hz corrugated), and reproducing the corrugated pair is what
+proves the mass factor belongs there: with the flat 7.8 kg/m² the same formulas
+return 26.7 Hz and 106.7 Hz.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/orthotropic_transmission_loss_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/orthotropic_transmission_loss.svg" alt="Transmission loss in decibels against one-third-octave bands from 100 hertz to 16 kilohertz for a 1 mm steel sheet, flat and corrugated. Both curves rise together at 6 decibels per octave from about 11 decibels at 100 hertz to 28 decibels at 800 hertz. Above 1 kilohertz the flat sheet keeps climbing to a peak near 45 decibels at 6.3 kilohertz before its own coincidence dip, while the corrugated sheet collapses to 22 decibels at 1.6 kilohertz inside a shaded band running from 1165 hertz to 13.1 kilohertz and then recovers slowly, staying about 13 decibels below the flat sheet at 2.5 kilohertz. A dashed line shows Heckl's closed-form approximation tracking the same collapse more smoothly" width="88%"></picture>
+
+*The trade corrugating makes, on Vigran's own geometry. Below $f_{c1}$ the two
+panels are within about 2 dB of each other (the corrugated one slightly higher:
+it is 9 % heavier, and the diffuse-field integral uses a 78 degree limiting
+angle rather than Sharp's 5.5 dB band correction). Across the coincidence range
+the corrugated sheet gives away up to 13 dB, and $R_w$ falls from 28 dB to
+25 dB, for a panel that is stiffer and barely heavier.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import (
+    coincidence_frequency, corrugated_plate_mass_factor,
+    corrugated_plate_stiffness, orthotropic_critical_frequencies,
+    orthotropic_transmission_loss, plate_bending_stiffness,
+    single_panel_transmission_loss,
+)
+
+bands = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000,
+                  1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000,
+                  10000, 12500, 16000], dtype=float)
+eta = 0.011
+flat_b = plate_bending_stiffness(2.1e11, 1.0e-3, 0.3)
+b_x, b_z, _ = corrugated_plate_stiffness(
+    1.0e-3, 0.010, 0.100, youngs_modulus=2.1e11, poisson_ratio=0.3,
+)
+mass = 7.8 * corrugated_plate_mass_factor(0.010, 0.100)
+fc1, fc2 = orthotropic_critical_frequencies(mass, b_x, b_z)
+
+flat = single_panel_transmission_loss(
+    bands, 7.8, critical_frequency=coincidence_frequency(7.8, flat_b),
+    loss_factor=eta,
+)
+corrugated = orthotropic_transmission_loss(
+    bands, mass, critical_frequency_lower=fc1, critical_frequency_upper=fc2,
+    loss_factor=eta,
+)
+heckl = orthotropic_transmission_loss(
+    bands, mass, critical_frequency_lower=fc1, critical_frequency_upper=fc2,
+    method="heckl",
+)
+
+# One line: R(f) with the coincidence range shaded between fc1 and fc2.
+corrugated.plot()
+plt.show()
+
+# By hand, all three on one axes:
+fig, ax = plt.subplots()
+ax.axvspan(fc1, fc2, color="0.85", zorder=0)
+ax.semilogx(bands, flat.transmission_loss, "-o", ms=4, label="flat sheet")
+ax.semilogx(bands, corrugated.transmission_loss, "-s", ms=4,
+            label="corrugated, integral")
+ax.semilogx(bands, heckl.transmission_loss, "--", label="Heckl approximation")
+ax.set(xlabel="Frequency [Hz]", ylabel="Transmission loss TL [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+Two caveats Bies attaches to the Heckl branch are worth repeating, because no
+smooth model predicts either. Below about $0.7f_{c1}$ the estimate
+underestimates $R$ on small panels, the error growing as the panel shrinks; and
+real corrugated panels almost always show a dip of up to 5 dB somewhere between
+2 kHz and 4 kHz, which finite-element work traced to resonances of the panel
+sections *between* the ribs rather than to any coincidence effect.
+
 ## Double wall: the mass-spring-mass resonance (Bies 7.2.6)
 
 Two leaves separated by a cavity behave as a mass-spring-mass system. Below its
@@ -23370,6 +23555,12 @@ fig.tight_layout(); plt.show()
   [doi:10.1007/b137728](https://doi.org/10.1007/b137728).
   Chapter 5, Table 5.1: the point impedances and mobilities of infinite
   structures and the injected-power relation.
+- Vigran, T. E. (2008). *Building Acoustics*. Taylor & Francis.
+  ISBN 978-0-415-42853-8.
+  [doi:10.1201/9781482266016](https://doi.org/10.1201/9781482266016).
+  Sections 3.7.3.3 (orthotropic plate eigenfrequencies, Eqs 3.113-3.115 after
+  Timoshenko & Woinowsky-Krieger) and 6.5.3 (orthotropic panel transmission,
+  Eqs 6.107-6.113 after Heckl 1960 and Hansen 1993).
 
 ## See also
 
@@ -23506,6 +23697,144 @@ prediction physically outside it. A `PorousMediumResult` built from measured
 data (for example the $Z_c$, $k$ recovered by the
 [ASTM E2611 transfer-matrix reduction](https://jmrplens.github.io/phonometry/guides/impedance-tube/)) plugs into the layer
 solver exactly like a modelled one.
+
+### Limp frames: when the skeleton moves (Allard & Atalla 11.3.4)
+
+Every model above assumes the frame stands still. That is only true above the
+**decoupling frequency** of Zwikker and Kosten,
+
+$$
+F_d = \frac{\sigma\,\phi^2}{2\pi\rho_1},
+$$
+
+with $\rho_1$ the bulk density of the frame (the density of the sample as
+weighed, not of the material the fibres are made of). Below $F_d$ the
+visco-inertial coupling is strong enough for the wave in the pores to drag the
+frame along, and a light frame (aeronautic-grade fibreglass, felts, thin
+screens) has real inertia to contribute. Neglecting the *stiffness* of the
+frame but not its *mass* in the Biot mixed pressure-displacement formulation
+leaves an equivalent fluid with the same bulk modulus and a corrected effective
+density (Allard & Atalla 2e Eqs. 11.53-11.55, after Panneton 2007):
+
+$$
+\tilde\rho_{\text{limp}} =
+\frac{\rho_t\,\tilde\rho_{\text{eq}} - \rho_0^2}
+     {\rho_t + \tilde\rho_{\text{eq}} - 2\rho_0},
+\qquad \rho_t = \rho_1 + \phi\rho_0,
+$$
+
+where $\tilde\rho_{\text{eq}}$ is the rigid-frame effective density of any of
+the three models above and $\rho_t$ is the apparent total density of the
+material. What anchors the correction is the printed equation itself,
+transcribed term by term against the page; the book tabulates no computed limp
+density anywhere. Two limits it states in prose are exact as well and are
+checked, but they corroborate rather than pin the form: neither constrains the
+$\rho_0$ terms, and a sign-flipped variant of the same equation satisfies both.
+The limits are:
+
+- **heavy frame**: as $\rho_1$ grows the correction vanishes and the
+  rigid-frame result comes back;
+- **low frequency**: the rigid-frame density diverges as $\sigma/(j\omega)$,
+  while the limp one converges on the finite, real $\rho_t$. A rigid frame
+  forbids rigid-body motion of the sample; a limp one allows it, which is why
+  the limp model is the right one for an unconstrained specimen in an
+  impedance tube.
+
+`limp_frame` takes a `PorousMediumResult` and returns another one, so it drops
+straight into a `PorousLayer` in the stack.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/limp_frame_effective_density_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/limp_frame_effective_density.svg" alt="Normalised effective density against frequency from 0 to 2000 hertz for a soft fibrous layer, comparing the rigid-frame and limp-frame models. The rigid-frame real part is a flat dashed line at 1.2 while its imaginary part dives off the bottom of the plot below the 127 hertz decoupling frequency marked by a dotted vertical line. The limp-frame real part starts at the apparent total density of 25.9 at zero hertz and falls smoothly onto the rigid-frame line by about 1500 hertz, while its imaginary part dips to minus 12 near 130 hertz and then merges with the rigid-frame curve" width="88%"></picture>
+
+*The same 50 mm soft fibrous layer under both models (Allard & Atalla
+Table 11.2, the input set behind their Fig. 11.2). Above the decoupling
+frequency the two predictions are indistinguishable, which is the plot's own
+check on the correction; below it the rigid-frame effective density runs away
+and the limp one settles on $\rho_t/\rho_0 = 25.9$.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import (
+    PorousLayer, decoupling_frequency, johnson_champoux_allard,
+    layered_absorber, limp_frame, limp_frame_applicable,
+)
+
+# Allard & Atalla Table 11.2: soft fibrous layer, 50 mm.
+f = np.linspace(1.0, 2000.0, 800)
+rigid = johnson_champoux_allard(
+    f, 25e3, porosity=0.98, tortuosity=1.02,
+    viscous_length=90e-6, thermal_length=180e-6,
+)
+limp = limp_frame(rigid, frame_density=30.0, porosity=0.98)
+
+print(round(decoupling_frequency(25e3, porosity=0.98, frame_density=30.0), 1))
+# 127.4
+print(round(float(limp.effective_density[0].real), 1))     # 31.2 = rho_t
+print(limp_frame_applicable(20e3), limp_frame_applicable(25e3))  # True False
+
+limp.plot()   # normalised Zc and k of the corrected medium
+plt.show()
+
+# By hand, the Fig. 11.2 view:
+rho0 = rigid.air_density
+fig, ax = plt.subplots()
+for medium, style in ((rigid, "--"), (limp, "-")):
+    ax.plot(f, medium.effective_density.real / rho0, style)
+    ax.plot(f, medium.effective_density.imag / rho0, style)
+ax.set(xlabel="Frequency [Hz]", ylabel="rho_e / rho_0", ylim=(-30, 30))
+plt.show()
+```
+
+</details>
+
+The correction is only worth applying where the frame really is limp. Beranek
+(1947) asked for $|K_c/K_f| < 0.05$ between the bulk modulus of the frame in
+vacuum and that of the fluid in the pores; the frame-structural-interaction
+study of Doutres et al. (2007) relaxed that to $0.2$, which for air
+($K_f \approx P_0 = 101.3$ kPa) is the rule of thumb that the frame must be
+softer than about 20 kPa. `limp_frame_applicable` applies either threshold.
+Neither accounts for mounting: a thin light foam decoupled from a vibrating
+structure by an air gap behaves limply well above the limit, and a material
+bonded to a vibrating structure should not be treated as rigid-framed at all.
+
+The practical consequence, for the 50 mm layer above with a rigid backing, is a
+lower absorption coefficient in the bottom two thirds of an octave and a
+slightly higher one either side of 500 Hz:
+
+```python
+import numpy as np
+from phonometry import (
+    PorousLayer, johnson_champoux_allard, layered_absorber, limp_frame,
+)
+
+bands = np.array([100, 125, 160, 200, 250, 315, 400, 500, 1000], dtype=float)
+rigid = johnson_champoux_allard(
+    bands, 25e3, porosity=0.98, tortuosity=1.02,
+    viscous_length=90e-6, thermal_length=180e-6,
+)
+limp = limp_frame(rigid, frame_density=30.0, porosity=0.98)
+for medium in (rigid, limp):
+    print(layered_absorber(bands, [PorousLayer(0.05, medium)]).absorption.round(2))
+# [0.07 0.11 0.17 0.24 0.32 0.43 0.54 0.64 0.88]   rigid frame
+# [0.04 0.08 0.15 0.24 0.36 0.48 0.61 0.71 0.91]   limp frame
+```
+
+**Honest note on validation.** Allard & Atalla contains exactly one table of
+computed numbers in the whole book, and it is not a surface impedance: every
+prediction-versus-measurement pair in the porous chapters, Fig. 11.2 included,
+is a figure. No published source checked (Allard & Atalla itself, Cox &
+D'Antonio, Mechel, and the round-robin and Biot literature) tabulates the
+quantity either. The anchor is therefore the printed Eq. 11.55 itself,
+transcribed term by term against the printed page. The two exact limits the
+book states in prose (heavy frame and $\omega \to 0$) are checked as well, but
+they are weaker than they look: a sign-flipped variant of the equation
+satisfies both, and reproduces the $1/\rho_1$ decay of the heavy-frame residual
+too, so the limits cannot tell the printed form from that variant. The
+decoupling frequency evaluated on the fully specified glass wool of their
+Table 6.1, where pure arithmetic gives 43.27 Hz, is independent of all this.
 
 ## 2. Multilayer prediction by transfer matrices
 
@@ -23816,6 +24145,15 @@ parameters but behaves physically everywhere; with
 $\Lambda = \Lambda' = \sqrt{8\alpha_\infty\eta/(\phi\sigma)}$ and
 $\alpha_\infty = 1$ it tracks Delany–Bazley over the fit range.
 
+**Rigid or limp frame.** Every equivalent-fluid model above assumes a
+motionless frame, which only holds above the decoupling frequency
+$F_d = \sigma\phi^2/2\pi\rho_1$. Below it a light frame moves with the pore
+fluid, and `limp_frame` adds its inertia (Allard & Atalla Eqs 11.53-11.55).
+Use it for felts, screens and light fibreglass, for anything measured
+unconstrained in an impedance tube, and wherever the frame in vacuum is softer
+than about 20 kPa (`limp_frame_applicable`); do not use it, or the rigid model
+either, for a material bonded to a vibrating structure.
+
 **Local vs. bulk reaction.** The layer solver is bulk-reacting (sound
 refracts and travels inside the layers). `statistical_absorption` assumes
 local reaction, a good approximation for high flow resistivity, partitioned
@@ -23837,6 +24175,13 @@ found in the sources during this work are recorded in the
   [doi:10.1007/978-3-540-76833-3](https://doi.org/10.1007/978-3-540-76833-3).
   Sections D.3–D.6 (layer reflection, multilayer scheme, diffuse-field
   integrals) and G.11 (empirical porous relations).
+- Allard, J. F., & Atalla, N. (2009). *Propagation of Sound in Porous Media:
+  Modelling Sound Absorbing Materials* (2nd ed.). Wiley.
+  ISBN 978-0-470-74661-5.
+  [doi:10.1002/9780470747339](https://doi.org/10.1002/9780470747339).
+  Section 11.3.4: the rigid and limp frame limits of the Biot theory, the
+  decoupling frequency and the limp effective density (Eqs 11.53-11.55, after
+  Panneton 2007).
 - Bies, D. A., Hansen, C. H., & Howard, C. Q. (2017). *Engineering noise
   control* (5th ed.). CRC Press.
   [doi:10.1201/9781351228152](https://doi.org/10.1201/9781351228152).
@@ -25284,8 +25629,9 @@ it; the list grows as guides gain their References sections.
   A compact textbook on sound transmission in buildings, from single and
   double constructions to floating floors.
   Cited by [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/guides/insulation-field/),
-  [Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/guides/insulation-lab/) and
-  [Dynamic stiffness of resilient materials](https://jmrplens.github.io/phonometry/guides/dynamic-stiffness/).
+  [Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/guides/insulation-lab/),
+  [Dynamic stiffness of resilient materials](https://jmrplens.github.io/phonometry/guides/dynamic-stiffness/) and
+  [Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/guides/panel-sound-insulation/).
 - International Organization for Standardization. (2020). *Acoustics —
   Rating of sound insulation in buildings and of building elements — Part 1:
   Airborne sound insulation* (ISO 717-1:2020).

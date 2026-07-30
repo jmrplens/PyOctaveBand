@@ -2058,6 +2058,42 @@ MAA_FIG5_SEPARATION = 2.5e-3
 MAA_FIG5_CAVITY = 0.06
 
 # ---------------------------------------------------------------------------
+# Hopkins, Sound Insulation (2007), Table A2 (printed p. 608 / pdf p. 635):
+# material properties of 25 building-material rows. Each row pairs the
+# quasi-longitudinal thin-plate phase speed cL (m/s) with the printed product
+# h.fc (m.Hz), stated for c0 = 343 m/s. The product follows from
+# h fc = c0^2 sqrt(12) / (2 pi cL) and is independent of density and Poisson
+# ratio, so every row is an independent check on the coincidence frequency.
+# ---------------------------------------------------------------------------
+HOPKINS_TABLE_A2_H_FC: tuple[tuple[float, float], ...] = (
+    (1900.0, 34.1),   # aircrete / AAC blocks (solid)
+    (5100.0, 12.7),   # aluminium
+    (2700.0, 24.0),   # bricks (solid)
+    (2500.0, 25.9),   # calcium-silicate blocks (solid)
+    (2200.0, 29.5),   # chipboard
+    (1850.0, 35.1),   # clinker concrete blocks, 1030 kg/m3
+    (2200.0, 29.5),   # clinker concrete blocks, 1720 kg/m3
+    (1910.0, 34.0),   # clinker concrete slabs
+    (3800.0, 17.1),   # concrete, cast in situ
+    (3200.0, 20.3),   # dense aggregate blocks (solid)
+    (2300.0, 28.2),   # expanded clay blocks (solid)
+    (5200.0, 12.5),   # glass
+    (2200.0, 29.5),   # lightweight aggregate blocks (solid)
+    (2560.0, 25.3),   # medium density fibreboard
+    (2450.0, 26.5),   # mortar
+    (2570.0, 25.2),   # oriented strand board
+    (2350.0, 27.6),   # perspex, plexiglass
+    (1610.0, 40.3),   # plaster, gypsum based
+    (1490.0, 43.5),   # plasterboard, natural gypsum
+    (1810.0, 35.8),   # plasterboard, flue gas plus natural gypsum
+    (2010.0, 32.3),   # plasterboard, gypsum with glass fibre
+    (3850.0, 16.8),   # plywood (birch)
+    (3250.0, 20.0),   # sand-cement screed
+    (5270.0, 12.3),   # steel
+    (5000.0, 13.0),   # timber (soft wood)
+)
+
+# ---------------------------------------------------------------------------
 # Speech transmission index - IEC 60268-16 Annex M worked example (the "full
 # STI" calculation of a public-address system in a reverberant space). The
 # annex prints the adjusted MTF matrix without noise, masking and threshold

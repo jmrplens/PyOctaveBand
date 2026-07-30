@@ -84,6 +84,23 @@ _ES_EXACT = {
     "identical below A; the plateau replaces the whole coincidence region":
         "idénticas por debajo de A; la meseta sustituye toda la región de "
         "coincidencia",
+    "Corrugating a Sheet Flattens Its Sound Reduction Index":
+        "Grecar una chapa aplana su índice de reducción acústica",
+    r"coincidence range $f_{c1}$ to $f_{c2}$":
+        r"rango de coincidencia $f_{c1}$ a $f_{c2}$",
+    r"flat 1 mm sheet (isotropic, single $f_c$)":
+        r"chapa plana de 1 mm (isótropa, un solo $f_c$)",
+    "corrugated sheet (orthotropic, diffuse-field integral)":
+        "chapa grecada (ortótropa, integral en campo difuso)",
+    "Heckl's approximation": "aproximación de Heckl",
+    "A Limp Frame Carries Its Own Inertia":
+        "Un esqueleto flexible arrastra su propia inercia",
+    r"Normalised effective density $\rho_e/\rho_0$":
+        r"Densidad efectiva normalizada $\rho_e/\rho_0$",
+    "rigid frame, real part": "esqueleto rígido, parte real",
+    "rigid frame, imaginary part": "esqueleto rígido, parte imaginaria",
+    "limp frame, real part": "esqueleto flexible, parte real",
+    "limp frame, imaginary part": "esqueleto flexible, parte imaginaria",
     "2D FDTD wavefront in a hall of columns":
         "Frente de onda FDTD 2D en una sala de columnas",
     "loudspeaker": "altavoz",
@@ -1924,6 +1941,25 @@ _ES_PATTERNS = [
     (r"^f = (\d+) Hz \(λ = (.+) m\)$", r"f = \1 Hz (λ = \2 m)"),
     (r"^shadow beyond ≈ (\d+) m \(ray model\)$",
      r"sombra más allá de ≈ \1 m (modelo de rayos)"),
+    # orthotropic_transmission_loss info box (library values baked in).
+    ((r"^1 mm steel sheet, m'' = (.+) kg/m², flat fc = (.+) kHz\n"
+      r"corrugated H = (\d+) mm, L = (\d+) mm, m'' = (.+) kg/m², "
+      r"fc1 = (.+) Hz, fc2 = (.+) kHz\n"
+      r"worst penalty (.+) dB at (.+) Hz, for a stiffer and only 9 % "
+      r"heavier panel$"),
+     ("chapa de acero de 1 mm, m'' = \\1 kg/m², fc plana = \\2 kHz\n"
+      "grecada H = \\3 mm, L = \\4 mm, m'' = \\5 kg/m², "
+      "fc1 = \\6 Hz, fc2 = \\7 kHz\n"
+      "penalización máxima \\8 dB a \\9 Hz, con un panel más rígido y solo "
+      "un 9 % más pesado")),
+    # limp_frame_effective_density annotations (library values baked in).
+    (r"^apparent total density rho_t/rho0 = (.+)$",
+     r"densidad total aparente rho_t/rho0 = \1"),
+    (r"^decoupling frequency (.+) Hz$", r"frecuencia de desacoplo \1 Hz"),
+    ((r"^Soft fibrous layer: porosity (.+), flow resistivity (.+) kPa s/m², "
+      r"frame density (.+) kg/m³$"),
+     ("Capa fibrosa blanda: porosidad \\1, resistividad al flujo \\2 kPa s/m², "
+      "densidad del esqueleto \\3 kg/m³")),
 ]
 
 
@@ -8337,6 +8373,83 @@ def generate_porous_absorber_designs(output_dir: str) -> None:
     plt.close()
 
 
+def generate_limp_frame_effective_density(output_dir: str) -> None:
+    """Rigid-frame against limp-frame effective density (Allard & Atalla 11.3.4).
+
+    One concept: a light frame carries inertia. The rigid-frame equivalent
+    fluid lets the imaginary part of the effective density run away as
+    sigma/(j w) below the decoupling frequency, because a motionless frame
+    forbids rigid-body motion of the sample; the limp correction of
+    Eqs. (11.53)-(11.55) converges instead on the apparent total density
+    rho_t = rho1 + phi rho0. Above the decoupling frequency the two models
+    coincide, which is the plot's own check on the correction.
+    """
+    print("Generating limp_frame_effective_density...")
+    from phonometry import (
+        decoupling_frequency,
+        johnson_champoux_allard,
+        limp_frame,
+    )
+
+    # Allard & Atalla Table 11.2 (printed p. 254): the soft fibrous material
+    # behind their Figure 11.2.
+    porosity, resistivity, frame_density = 0.98, 25.0e3, 30.0
+    f = np.linspace(1.0, 2000.0, 800)
+    rigid = johnson_champoux_allard(
+        f, resistivity, porosity=porosity, tortuosity=1.02,
+        viscous_length=90e-6, thermal_length=180e-6,
+    )
+    limp = limp_frame(rigid, frame_density, porosity=porosity)
+    rho0 = rigid.air_density
+    total = frame_density + porosity * rho0
+    f_d = decoupling_frequency(
+        resistivity, porosity=porosity, frame_density=frame_density
+    )
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    ax.plot(f, np.real(rigid.effective_density) / rho0, "--",
+            color=COLOR_PRIMARY, linewidth=1.8, label="rigid frame, real part")
+    ax.plot(f, np.imag(rigid.effective_density) / rho0, ":",
+            color=COLOR_PRIMARY, linewidth=1.8,
+            label="rigid frame, imaginary part")
+    ax.plot(f, np.real(limp.effective_density) / rho0, "-",
+            color=COLOR_SECONDARY, linewidth=2.4, label="limp frame, real part")
+    ax.plot(f, np.imag(limp.effective_density) / rho0, "-",
+            color=COLOR_TERTIARY, linewidth=2.4,
+            label="limp frame, imaginary part")
+    ax.axhline(total / rho0, color=COLOR_FG, linestyle="-", linewidth=1.0,
+               alpha=0.45)
+    ax.axvline(f_d, color=COLOR_FG, linestyle=":", linewidth=1.2, alpha=0.7)
+    # Plain symbol names, not mathtext: the Spanish variant rewrites decimal
+    # points to commas everywhere except in mathtext strings.
+    ax.annotate(
+        f"apparent total density rho_t/rho0 = {total / rho0:.1f}",
+        xy=(1960.0, total / rho0), xytext=(1960.0, total / rho0 - 1.4),
+        ha="right", va="top", fontsize=9, color=COLOR_FG,
+    )
+    ax.annotate(f"decoupling frequency {f_d:.0f} Hz", xy=(f_d, -18.0),
+                xytext=(f_d + 60.0, -18.0), ha="left", va="center",
+                fontsize=9, color=COLOR_FG)
+
+    ax.set_xlim(0.0, 2000.0)
+    ax.set_ylim(-30.0, 30.0)
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel(r"Normalised effective density $\rho_e/\rho_0$")
+    ax.set_title("A Limp Frame Carries Its Own Inertia", fontweight="bold",
+                 pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower right", fontsize=9)
+    ax.text(0.015, 0.03,
+            "Soft fibrous layer: porosity 0.98, "
+            "flow resistivity 25 kPa s/m², frame density 30 kg/m³",
+            transform=ax.transAxes, va="bottom", ha="left", fontsize=8.5,
+            color=COLOR_FG)
+    plt.tight_layout()
+    save_figure(output_dir, "limp_frame_effective_density.svg")
+    plt.close()
+
+
 def generate_slow_sound_absorber(output_dir: str) -> None:
     """Perfect absorption by critical coupling in a slow-sound slit panel.
 
@@ -11735,6 +11848,99 @@ def generate_plateau_transmission_loss(output_dir: str) -> None:
     plt.close()
 
 
+def generate_orthotropic_transmission_loss(output_dir: str) -> None:
+    """Corrugating a sheet flattens its transmission loss (Vigran 6.5.3).
+
+    One concept: the same steel sheet, flat and corrugated. The flat plate has
+    a single coincidence frequency far above the audio range and follows the
+    mass law; corrugating it drags the lower coincidence frequency down by more
+    than a decade and opens a range over which R collapses, despite the 9 %
+    extra mass the developed length adds.
+    """
+    print("Generating orthotropic_transmission_loss...")
+    from phonometry import (
+        coincidence_frequency,
+        corrugated_plate_mass_factor,
+        corrugated_plate_stiffness,
+        orthotropic_critical_frequencies,
+        orthotropic_transmission_loss,
+        plate_bending_stiffness,
+        single_panel_transmission_loss,
+    )
+
+    # Vigran's worked example (printed p. 96): 1 mm steel, corrugation of total
+    # height 20 mm (H = 10 mm) at a 100 mm pitch, E = 2,1e11 Pa, nu = 0,3.
+    modulus, thickness, poisson, eta = 2.1e11, 1.0e-3, 0.3, 0.011
+    amplitude, pitch, mass_flat = 0.010, 0.100, 7.8
+    flat_b = plate_bending_stiffness(modulus, thickness, poisson)
+    flat_fc = coincidence_frequency(mass_flat, flat_b)
+    b_x, b_z, _b_xz = corrugated_plate_stiffness(
+        thickness, amplitude, pitch, youngs_modulus=modulus,
+        poisson_ratio=poisson,
+    )
+    mass_corr = mass_flat * corrugated_plate_mass_factor(amplitude, pitch)
+    fc1, fc2 = orthotropic_critical_frequencies(mass_corr, b_x, b_z)
+
+    nominal = [*_THIRD_OCTAVE_16, 4000, 5000, 6300, 8000, 10000, 12500, 16000]
+    bands = np.asarray(nominal, dtype=float)
+    flat = single_panel_transmission_loss(
+        bands, mass_flat, critical_frequency=flat_fc, loss_factor=eta,
+    )
+    corrugated = orthotropic_transmission_loss(
+        bands, mass_corr, critical_frequency_lower=fc1,
+        critical_frequency_upper=fc2, loss_factor=eta,
+    )
+    heckl = orthotropic_transmission_loss(
+        bands, mass_corr, critical_frequency_lower=fc1,
+        critical_frequency_upper=fc2, method="heckl",
+    )
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    x = _band_index_axis(ax, nominal)
+    idx_1 = float(np.interp(np.log10(fc1), np.log10(bands), x))
+    idx_2 = float(np.interp(np.log10(fc2), np.log10(bands), x))
+    ax.axvspan(idx_1, idx_2, color=theme_fill(COLOR_TERTIARY, ax), lw=0, zorder=0,
+               label=r"coincidence range $f_{c1}$ to $f_{c2}$")
+    ax.plot(x, flat.transmission_loss, "-o", color=COLOR_PRIMARY,
+            linewidth=2.2, markersize=5, zorder=5,
+            label=r"flat 1 mm sheet (isotropic, single $f_c$)")
+    ax.plot(x, corrugated.transmission_loss, "-s", color=COLOR_SECONDARY,
+            linewidth=2.2, markersize=5, zorder=5,
+            label="corrugated sheet (orthotropic, diffuse-field integral)")
+    ax.plot(x, heckl.transmission_loss, "--", color=COLOR_TERTIARY,
+            linewidth=1.8, zorder=4, label="Heckl's approximation")
+
+    ax.set_ylabel("Transmission loss TL [dB]")
+    ax.set_title("Corrugating a Sheet Flattens Its Sound Reduction Index",
+                 fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", fontsize=9)
+
+    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
+    worst = int(np.argmax(flat.transmission_loss - corrugated.transmission_loss))
+    penalty = float(
+        flat.transmission_loss[worst] - corrugated.transmission_loss[worst]
+    )
+    # Plain symbol names, not mathtext: the Spanish variant rewrites decimal
+    # points to commas everywhere except in mathtext strings.
+    info = [
+        (f"1 mm steel sheet, m'' = {mass_flat:.1f} kg/m², flat "
+         f"fc = {flat_fc / 1000.0:.1f} kHz"),
+        (f"corrugated H = 10 mm, L = 100 mm, m'' = {mass_corr:.1f} kg/m², "
+         f"fc1 = {fc1:.0f} Hz, fc2 = {fc2 / 1000.0:.1f} kHz"),
+        (f"worst penalty {penalty:.0f} dB at {nominal[worst]:g} Hz, "
+         "for a stiffer and only 9 % heavier panel"),
+    ]
+    ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
+            va="bottom", ha="right", fontsize=9, color=COLOR_FG,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+                  "edgecolor": COLOR_GRID})
+    plt.tight_layout()
+    save_figure(output_dir, "orthotropic_transmission_loss.svg")
+    plt.close()
+
+
 def generate_mobility_result_lines(output_dir: str) -> None:
     """ISO 7626 driving-point mobility with its stiffness and mass lines."""
     print("Generating mobility_result_lines...")
@@ -13251,6 +13457,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_bearing_fault_envelope,
     generate_experimental_sea_clf,
     generate_plateau_transmission_loss,
+    generate_orthotropic_transmission_loss,
     generate_transfer_stiffness,
     generate_rigid_mass_calibration,
     generate_vibration_sound_power,
@@ -13273,6 +13480,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_impedance_tube,
     # Porous materials & multilayer absorbers (Mechel / Bies / Cox & D'Antonio)
     generate_porous_absorber_designs,
+    generate_limp_frame_effective_density,
     generate_absorber_stack_geometry,
     # Slow-sound slit + Helmholtz-resonator perfect absorbers (Jimenez et al.)
     generate_metadiffuser_geometry,

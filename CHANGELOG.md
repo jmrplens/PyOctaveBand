@@ -55,6 +55,61 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   reflecting boundaries and radiates `10 lg Q` more (the conservative upper
   bound a design estimate uses), and a constant-pressure source `10 lg Q` less.
 
+- Orthotropic (ribbed and corrugated) panel sound insulation
+  (`building/panel_transmission.py`, Vigran, *Building Acoustics* Sections
+  3.7.3.3 and 6.5.3; Bies, Hansen & Howard 5e Section 7.2.4.5). Cladding that
+  is stiff along the corrugations and limp across them has no single
+  coincidence frequency but a whole range:
+  `orthotropic_critical_frequencies` returns the pair `(fc1, fc2)` from the two
+  principal bending stiffnesses (Vigran Eq. 6.107), and
+  `orthotropic_transmission_loss` predicts the flattened `R(f)` over it, either
+  by numerically averaging the azimuth-dependent transmission coefficient of
+  Heckl (1960) and Hansen (1993) over the diffuse field (Vigran
+  Eqs. 6.108 to 6.111 = Bies Eqs. 7.30, 7.31 and 7.38, with the size-dependent
+  limiting angle of Bies Eq. 7.36 or a fixed one) or by Heckl's closed-form
+  design chart (`method="heckl"`, Bies Fig. 7.9(b) and Eqs. 7.59 and 7.60).
+  `SoundReductionResult` gains `critical_frequency_upper`, and `.plot()` shades
+  the coincidence range. For the common sinusoidal profile,
+  `corrugated_plate_stiffness` gives the Timoshenko and Woinowsky-Krieger
+  equivalent stiffnesses (Vigran Eq. 3.115) and `corrugated_plate_mass_factor`
+  the developed-length increase in surface density that has to accompany them;
+  `orthotropic_plate_resonance` is the matching eigenfrequency of a simply
+  supported orthotropic plate (Vigran Eq. 3.113 = Bies Eq. 7.27, after Hearmon
+  1959), whose lowest mode bounds the validity of both transmission models.
+  Anchored on Vigran's own worked example (a 1 mm steel plate 1 m by 1 m: 4,9
+  and 19,7 Hz flat, 25,5 and 102 Hz corrugated, which only come out with the
+  developed-length mass), on the printed design-chart constants of Bies
+  Fig. 7.9(b) (-54, -13,2, -17 and -23 dB for `rho c` = 414), on the 25 `h fc`
+  products of Hopkins Table A2, and on the exact reduction of the diffuse
+  integral to its elementary mass-law form and of the orthotropic impedance to
+  Cremer's isotropic one. New section and figure in the panel-insulation
+  guide, in English and Spanish.
+
+- Limp-frame equivalent fluid (`limp_frame` in
+  `materials/porous_absorber.py`, Allard & Atalla, *Propagation of Sound in
+  Porous Media* 2e Section 11.3.4, Eqs. 11.53 to 11.55 after Panneton 2007).
+  Delany-Bazley, Miki and Johnson-Champoux-Allard all assume a motionless
+  frame, which only holds above the Zwikker-Kosten decoupling frequency now
+  exposed as `decoupling_frequency`; below it a light frame (felts, screens,
+  aeronautic-grade fibreglass) is dragged along by the pore fluid and its
+  inertia has to be carried. `limp_frame` corrects the effective density of any
+  rigid-frame `PorousMediumResult`, keeping its bulk modulus, and returns
+  another `PorousMediumResult` that drops straight into a `PorousLayer` of the
+  transfer-matrix stack. `limp_frame_applicable` and `LIMP_FRAME_CRITERIA`
+  carry the published rules of thumb for when the frame may be treated as limp
+  at all (Beranek's `|Kc/Kf| < 0,05` and the 0,2 to which Doutres et al. 2007
+  relaxed it, which for air the book states as a "bulk modulus lower than 20
+  kPa"). Closed-form rather than digit-oracled: Allard & Atalla publishes no
+  table of computed limp densities, so what anchors the model is the printed
+  equation itself, transcribed term by term. The book's own two exact limits
+  are verified as well (a heavy frame recovers the rigid-frame result digit for
+  digit; the density converges on the apparent total density
+  `rho_t = rho1 + phi rho0` as the frequency falls, where the rigid model
+  diverges), but they corroborate rather than pin the form: a sign-flipped
+  variant of the same equation satisfies both. The decoupling frequency of
+  their Table 6.1 glass wool, 43,27 Hz, is pure arithmetic. New section and
+  figure in the porous-absorber guide, in English and Spanish.
+
 - Kinematic machine fault frequencies (`vibration/machine_diagnostics.py`,
   Norton & Karczub 2003 Section 8.4): `bearing_fault_frequencies` returns the
   seven rolling-contact bearing lines after Shahan and Kamperman (shaft, cage

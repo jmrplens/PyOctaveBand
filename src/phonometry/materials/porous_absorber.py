@@ -29,6 +29,13 @@ medium has ``Im(k) < 0``):
     equivalent-fluid density and bulk modulus are the surface-normalised
     quantities (they absorb the porosity), so ``Zc = sqrt(rho_e K_e)`` and
     ``k = w sqrt(rho_e / K_e)`` hold for every model.
+  - the **limp-frame** correction of any of the three rigid-frame models
+    (Allard & Atalla, *Propagation of Sound in Porous Media* 2e, Sect. 11.3.4,
+    Eqs. (11.53)-(11.55), printed pp. 251-253): a light frame is dragged along
+    by the pore fluid, so its inertia has to be carried by the equivalent
+    fluid. Only the effective density changes; the bulk modulus is the
+    rigid-frame one. See :func:`limp_frame` and
+    :func:`decoupling_frequency`.
 
 * **Transfer-matrix multilayer prediction**: each fluid layer contributes
   ``[[cos(kx d), j Zx sin(kx d)], [j sin(kx d)/Zx, cos(kx d)]]`` with the
@@ -75,6 +82,7 @@ from scipy import special
 
 from .._internal.types import Real
 from .._internal.validation import (
+    require_choice,
     require_non_negative,
     require_positive,
     require_positive_array,
@@ -101,6 +109,8 @@ _ATMOSPHERIC_PRESSURE = 101325.0
 
 #: Shared validation message for fractional open areas.
 _OPEN_AREA_MESSAGE = "'open_area' must not exceed 1."
+#: Shared validation message for open porosities.
+_POROSITY_MESSAGE = "'porosity' must not exceed 1."
 
 #: Delany-Bazley power-law coefficient presets ``(C1..C8)`` from Bies 5e
 #: Appendix D, Table D.1: ``Zc = rho c (1 + C1 X^-C2 - j C3 X^-C4)`` and
@@ -122,10 +132,19 @@ DELANY_BAZLEY_VALIDITY = (0.01, 1.0)
 #: Fit range of the Miki regression in ``f/sigma`` (Miki 1990, Sect. 4.1: the
 #: Delany-Bazley data below ``f/sigma = 0.01`` are extrapolation).
 MIKI_VALIDITY = (0.01, 1.0)
+#: Published upper limits on ``|K_c / K_f|`` (frame-in-vacuum bulk modulus over
+#: pore-fluid bulk modulus) below which the limp-frame equivalent fluid of
+#: :func:`limp_frame` may be used, from Allard & Atalla 2e printed pp. 253-254:
+#: ``"beranek"`` is Beranek's (1947) original 0,05 and ``"doutres"`` the 0,2
+#: to which Doutres et al. (2007) relaxed it with their frame structural
+#: interaction criterion (which, with ``K_f`` approximated by the isothermal
+#: value of air ``P0 = 101,3 kPa``, is the book's "lower than 20 kPa").
+LIMP_FRAME_CRITERIA: Mapping[str, float] = {"beranek": 0.05, "doutres": 0.2}
 
 __all__ = [
     "DELANY_BAZLEY_COEFFICIENTS",
     "DELANY_BAZLEY_VALIDITY",
+    "LIMP_FRAME_CRITERIA",
     "MIKI_VALIDITY",
     "AirLayer",
     "DiffuseFieldAbsorptionResult",
@@ -136,11 +155,14 @@ __all__ = [
     "PorousAbsorberWarning",
     "PorousLayer",
     "PorousMediumResult",
+    "decoupling_frequency",
     "delany_bazley",
     "diffuse_field_absorption",
     "helmholtz_resonance_frequency",
     "johnson_champoux_allard",
     "layered_absorber",
+    "limp_frame",
+    "limp_frame_applicable",
     "membrane_impedance",
     "membrane_resonance_frequency",
     "microperforated_plate_impedance",
@@ -405,7 +427,7 @@ def johnson_champoux_allard(
     sigma = require_positive(flow_resistivity, "flow_resistivity")
     phi = require_positive(porosity, "porosity")
     if phi > 1.0:
-        raise ValueError("'porosity' must not exceed 1.")
+        raise ValueError(_POROSITY_MESSAGE)
     t_inf = require_positive(tortuosity, "tortuosity")
     if t_inf < 1.0:
         raise ValueError("'tortuosity' must be >= 1.")
@@ -442,6 +464,153 @@ def johnson_champoux_allard(
         model="johnson_champoux_allard",
         flow_resistivity=sigma,
         speed_of_sound=c0,
+        air_density=rho0,
+    )
+
+
+def decoupling_frequency(
+    flow_resistivity: float, *, porosity: float, frame_density: float
+) -> float:
+    """Zwikker-Kosten decoupling frequency ``Fd`` of a porous frame.
+
+    ``Fd = sigma phi**2 / (2 pi rho1)`` (Allard & Atalla 2e, Sect. 11.3.4,
+    printed p. 251; the same closed form as their Eq. (6.90), printed p. 126).
+    Above ``Fd`` the visco-inertial coupling between the pore fluid and the
+    frame is too weak for the acoustic wave to shake the frame, so the
+    rigid-frame equivalent fluid of :func:`johnson_champoux_allard` applies;
+    below it the frame moves and the limp correction of :func:`limp_frame`
+    matters.
+
+    :param flow_resistivity: Airflow resistivity ``sigma``, in Pa s/m2 (> 0).
+    :param porosity: Open porosity ``phi`` (0 < phi <= 1).
+    :param frame_density: Bulk density of the frame ``rho1``, in kg/m3 (> 0):
+        the mass of solid per unit volume of material, i.e. the density of the
+        sample as weighed, not the density of the material the fibres are
+        made of.
+    :return: The decoupling frequency ``Fd``, in hertz.
+    :raises ValueError: for a non-positive input or a porosity above 1.
+    """
+    sigma = require_positive(flow_resistivity, "flow_resistivity")
+    phi = require_positive(porosity, "porosity")
+    if phi > 1.0:
+        raise ValueError(_POROSITY_MESSAGE)
+    rho1 = require_positive(frame_density, "frame_density")
+    return float(sigma * phi**2 / (2.0 * np.pi * rho1))
+
+
+def limp_frame_applicable(
+    frame_bulk_modulus: float,
+    *,
+    criterion: str = "doutres",
+    fluid_bulk_modulus: float = _ATMOSPHERIC_PRESSURE,
+) -> bool:
+    """Whether the limp-frame model may be used, by published rule of thumb.
+
+    Both published criteria compare the bulk modulus of the frame *in vacuum*
+    ``K_c`` with that of the fluid in the pores ``K_f`` (Allard & Atalla 2e,
+    printed pp. 253-254): Beranek (1947) requires ``|K_c/K_f| < 0.05``, and the
+    frame structural interaction study of Doutres et al. (2007) relaxes it to
+    ``|K_c/K_f| < 0.2``. With ``K_f`` taken as the isothermal bulk modulus of
+    air, ``P0 = 101,3 kPa``, the relaxed criterion is the book's statement that
+    "the limp model is applicable for materials having a bulk modulus lower
+    than 20 kPa". Neither criterion accounts for boundary or mounting
+    conditions, and the book notes that a thin light foam decoupled from a
+    vibrating structure by an air gap behaves limply well above the limit.
+
+    :param frame_bulk_modulus: Bulk modulus of the frame in vacuum ``K_c``, in
+        Pa (>= 0; pass ``abs(K_c)`` for a complex modulus).
+    :param criterion: Key into :data:`LIMP_FRAME_CRITERIA`, ``"doutres"``
+        (Default, 0,2) or ``"beranek"`` (0,05).
+    :param fluid_bulk_modulus: Bulk modulus of the pore fluid ``K_f``, in Pa
+        (Default: 101 325, the isothermal value for air).
+    :return: ``True`` when ``|K_c/K_f|`` does not exceed the threshold.
+    :raises ValueError: for a negative modulus or an unknown criterion.
+    """
+    key = require_choice(criterion, "criterion", tuple(LIMP_FRAME_CRITERIA))
+    k_c = require_non_negative(frame_bulk_modulus, "frame_bulk_modulus")
+    k_f = require_positive(fluid_bulk_modulus, "fluid_bulk_modulus")
+    return bool(k_c / k_f <= LIMP_FRAME_CRITERIA[key])
+
+
+def limp_frame(
+    medium: PorousMediumResult,
+    frame_density: float,
+    *,
+    porosity: float = 1.0,
+) -> PorousMediumResult:
+    """Limp-frame correction of a rigid-frame equivalent fluid (A&A 11.3.4).
+
+    A light frame (aeronautic-grade fibreglass, felts, screens) is dragged
+    along by the pore fluid instead of standing still, and the rigid-frame
+    models of :func:`delany_bazley`, :func:`miki` and
+    :func:`johnson_champoux_allard` have no way to carry that inertia.
+    Neglecting the stiffness of the frame altogether in the Biot mixed
+    pressure-displacement formulation leaves an equivalent fluid with the same
+    bulk modulus and a corrected effective density (Allard & Atalla 2e,
+    Eqs. (11.53)-(11.55), printed pp. 252-253, after Panneton 2007):
+
+    ``rho_limp = (rho_t rho_eq - rho0**2) / (rho_t + rho_eq - 2 rho0)``
+
+    with ``rho_eq`` the rigid-frame effective density of *medium*, ``rho0`` the
+    density of the pore fluid and ``rho_t = rho1 + phi rho0`` the apparent
+    total density of the material. What anchors this expression is the printed
+    equation itself, transcribed term by term; Allard & Atalla tabulate no
+    computed limp density anywhere, so there are no published digits to check
+    against. The book also states two exact limits in prose, and both are
+    verified, but they are weaker than they look: neither pins the ``rho0**2``
+    and ``2 rho0`` terms, since a sign-flipped variant of Eq. (11.55) satisfies
+    both of them (and even the ``1/rho1`` decay of the heavy-frame residual).
+    They corroborate the transcription rather than determine it:
+
+    * **heavy frame**: as ``rho1 -> inf`` the correction vanishes and the
+      rigid-frame result is recovered (the book's own reading of Eq. (11.55));
+    * **low frequency**: since ``rho_eq -> sigma / (j w)`` as ``w -> 0``
+      (Eq. (5.37)), ``rho_limp -> rho_t``, a finite real density, where the
+      rigid-frame model diverges. The rigid frame forbids rigid-body motion of
+      the sample; the limp one allows it, which is why the two differ mainly
+      at low frequency and why the limp model is the right one for an
+      unconstrained sample in an impedance tube.
+
+    The corrected medium is a drop-in
+    :class:`PorousMediumResult`, so it can be handed to
+    :class:`PorousLayer` inside :func:`layered_absorber` exactly like the
+    rigid-frame one.
+
+    Use :func:`decoupling_frequency` to see where the frame stops following the
+    fluid and :func:`limp_frame_applicable` for the published bulk-modulus
+    rule of thumb on when the frame may be treated as limp at all.
+
+    :param medium: A rigid-frame :class:`PorousMediumResult` (its
+        ``effective_density`` is ``rho_eq`` and its ``bulk_modulus`` is kept).
+    :param frame_density: Bulk density of the frame ``rho1``, in kg/m3 (> 0).
+    :param porosity: Open porosity ``phi`` (0 < phi <= 1, Default: 1,0, the
+        high-porosity assumption of the one-parameter models).
+    :return: A :class:`PorousMediumResult` with model
+        ``"limp_frame(<base model>)"``.
+    :raises ValueError: for a non-positive input or a porosity above 1.
+    """
+    rho1 = require_positive(frame_density, "frame_density")
+    phi = require_positive(porosity, "porosity")
+    if phi > 1.0:
+        raise ValueError(_POROSITY_MESSAGE)
+    rho0 = medium.air_density
+    rho_eq = np.asarray(medium.effective_density, dtype=np.complex128)
+    k_e = np.asarray(medium.bulk_modulus, dtype=np.complex128)
+    # Apparent total density of the limp medium, A&A Eq. (11.55).
+    rho_t = rho1 + phi * rho0
+    rho_limp = (rho_t * rho_eq - rho0**2) / (rho_t + rho_eq - 2.0 * rho0)
+    omega = 2.0 * np.pi * medium.frequency
+    zc = np.sqrt(k_e * rho_limp)
+    k = omega * np.sqrt(rho_limp / k_e)
+    return PorousMediumResult(
+        frequency=medium.frequency,
+        characteristic_impedance=np.asarray(zc, dtype=np.complex128),
+        wavenumber=np.asarray(k, dtype=np.complex128),
+        effective_density=np.asarray(rho_limp, dtype=np.complex128),
+        bulk_modulus=k_e,
+        model=f"limp_frame({medium.model})",
+        flow_resistivity=medium.flow_resistivity,
+        speed_of_sound=medium.speed_of_sound,
         air_density=rho0,
     )
 
