@@ -511,11 +511,11 @@ Plot the per-metre line power of the two equivalent source heights.
 
 ```python
 RailwayTrack(
-    rail_roughness: tuple[NDArray[np.float64], NDArray[np.float64]],
-    track_transfer: NDArray[np.float64],
-    impact_roughness: tuple[NDArray[np.float64], NDArray[np.float64]] | None = None,
+    rail_roughness: tuple[Any, Any],
+    track_transfer: Any,
+    impact_roughness: tuple[Any, Any] | None = None,
     joint_density: float = 0.01,
-    bridge_transfer: NDArray[np.float64] | None = None,
+    bridge_transfer: Any | None = None,
     squeal_excess: float = 0.0,
     length: float = 100.0,
 )
@@ -604,12 +604,12 @@ function. All three sit at source A.
 ```python
 RollingStock(
     axles: int,
-    wheel_roughness: tuple[NDArray[np.float64], NDArray[np.float64]],
-    contact_filter: tuple[NDArray[np.float64], NDArray[np.float64]],
-    wheel_transfer: NDArray[np.float64],
-    superstructure_transfer: NDArray[np.float64] | None = None,
-    traction: tuple[NDArray[np.float64], NDArray[np.float64]] | None = None,
-    aerodynamic: tuple[NDArray[np.float64], NDArray[np.float64]] | None = None,
+    wheel_roughness: tuple[Any, Any],
+    contact_filter: tuple[Any, Any],
+    wheel_transfer: Any,
+    superstructure_transfer: Any | None = None,
+    traction: tuple[Any, Any] | None = None,
+    aerodynamic: tuple[Any, Any] | None = None,
     aerodynamic_alpha: float = 50.0,
     tram: bool = False,
 )

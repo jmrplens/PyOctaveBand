@@ -394,8 +394,14 @@ equations end to end, against the emission test workbook the European Commission
 published with its reference source module: feeding the shipped equations the
 **2015** coefficient database that workbook was computed with reproduces all
 19 872 of its cases, at both source heights, to 0,005 dB, inside the two
-decimals it prints. A hundred and twenty-one of those cases are committed to the
+decimals it prints. A hundred and twenty-three of those cases are committed to the
 repository and run in CI.
+
+That agreement resolves the loud parts of the database and not the quiet ones:
+a coefficient twenty decibels below its neighbour does not move the total, so
+the placeholder rows of the reference catalogue and the source-A traction
+column, which rolling noise always covers, are carried by the test set without
+being constrained by it. `tests/data/cnossos/README.md` reports the measurement.
 
 **Verified as equations times transcribed tables, not end to end.** Everything
 the 2021 amendment changed. The workbook predates it, so the new curve-squeal
