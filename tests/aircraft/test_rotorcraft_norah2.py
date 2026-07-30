@@ -13,9 +13,12 @@ time, :func:`rotorcraft_event_level` and :func:`rotorcraft_noise_contour`.
 
 The verification subset consumed here (the R22 hemisphere set and the ARP
 single-event cases below) is committed under ``tests/data/norah2/`` with its
-provenance in the README, so the suite runs everywhere including CI. The full
-public release is preferred when present (``plan/NORAH2_V2.0.74_public.zip``,
-or an extraction pointed at by ``NORAH2_DATA``).
+provenance in the README, so the suite runs everywhere including CI and never
+skips. The full public release is preferred when present, resolved by
+``tests/oracle_data.py``: an extraction pointed at by ``NORAH2_DATA``, then
+``tests/data-local/norah2/NORAH2_V2.0.74_public.zip``. Every case below reads
+the same files from either source, so the assertions do not differ; the run
+header names the copy actually used.
 
 Case 1 (terrain screening) is not exercised: the frame of the public release's
 DEM is not reconstructible (a global template match finds no consistent
@@ -50,7 +53,6 @@ Measured deviations on which the tolerances rest (see the module docstring of
 
 from __future__ import annotations
 
-import os
 import pathlib
 import re
 import warnings
@@ -60,6 +62,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import numpy as np
+import oracle_data
 import pytest
 
 from phonometry.aircraft.rotorcraft_noise import (
@@ -68,13 +71,12 @@ from phonometry.aircraft.rotorcraft_noise import (
     rotorcraft_noise_contour,
 )
 
-# NORAH2_DATA points at an existing extraction root and the full archive in
-# the local (gitignored) plan/ workspace comes next; the committed
-# verification subset (see tests/data/norah2/README.md) covers CI.
-_ZIP = pathlib.Path(__file__).parents[2] / "plan" / "NORAH2_V2.0.74_public.zip"
-_EXTRACT = (pathlib.Path(__file__).parents[1] / "data" / "norah2"
-            / "norah2_arp_extract.zip")
-_OVERRIDE = os.environ.get("NORAH2_DATA")
+# Resolution order (tests/oracle_data.py): NORAH2_DATA pointing at an existing
+# extraction root, then the full archive in the gitignored tests/data-local/,
+# then the committed verification subset (see tests/data/norah2/README.md),
+# which is what CI runs.
+_RELEASE = oracle_data.resolve(oracle_data.NORAH2_RELEASE)
+_EXTRACT = oracle_data.DATA / "norah2" / "norah2_arp_extract.zip"
 
 _PREFIXES = (
     "NORAH2_V2.0.74_public/Hemispheres/R22_",
@@ -90,11 +92,18 @@ _PREFIXES = (
 
 @pytest.fixture(scope="session")
 def norah_root(tmp_path_factory: pytest.TempPathFactory) -> pathlib.Path:
-    """The NORAH2 extraction root (from ``NORAH2_DATA`` or the plan/ zip)."""
-    if _OVERRIDE is not None and pathlib.Path(_OVERRIDE).is_dir():
-        return pathlib.Path(_OVERRIDE)
+    """The NORAH2 extraction root, from the best copy available here."""
+    if _RELEASE.origin == "env":
+        # NORAH2_DATA has always pointed at an already extracted release.
+        assert _RELEASE.path is not None
+        return _RELEASE.path
+    source = (
+        _RELEASE.path / _RELEASE.dataset.marker
+        if _RELEASE.path is not None
+        else _EXTRACT
+    )
     root = tmp_path_factory.mktemp("norah2")
-    with zipfile.ZipFile(_ZIP if _ZIP.is_file() else _EXTRACT) as zf:
+    with zipfile.ZipFile(source) as zf:
         members = [m for m in zf.namelist() if m.startswith(_PREFIXES)]
         assert members, "unexpected zip layout"
         zf.extractall(root, members=members)

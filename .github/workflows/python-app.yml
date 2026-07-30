@@ -232,13 +232,12 @@ jobs:
         pip install -r requirements.txt
         pip install -r requirements-dev.txt
         pip install -e .
-    # The EBU authentic-programme loudness oracle is not fetched in CI: its
-    # audio cannot be redistributed (technical-testing licence, third-party
-    # programme content), so the full-chain test in test_ebu_material_oracle.py
-    # is local-only and skips here. CI still validates the gating and
-    # loudness-range stages against the committed per-block loudness series in
-    # tests/data/broadcast/ (see its README.md), and the K-weighting front end
-    # against the synthesizable EBU cases in test_program_loudness.py.
+    # Heavy third-party oracle sets (the EBU loudness test set, the stipa.info
+    # certified STIPA bench, the NORAH2 public release) are never fetched here.
+    # The suites that use them fall back to the committed derived series and
+    # extracts under tests/data/ - see tests/data/README.md - which is the path
+    # CI takes and which never skips. Only the extra cases of the full sets are
+    # local-only; pytest prints the resolution in its run header.
     - name: Run tests
       # -n auto fans the suite out across the runner's cores via pytest-xdist;
       # pytest-cov combines the per-worker coverage into a single coverage.xml.

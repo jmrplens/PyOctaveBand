@@ -600,6 +600,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Oracle test data: the two suites that only ran on a machine holding a private
+  download now run everywhere. The certified IEC 60268-16 STIPA verification
+  bench from stipa.info is 133 MB of PCM that does not compress as audio, so
+  `tests/data/stipa/` carries a lossless 27-of-49-signal extract instead (5.8 MB:
+  each signal stored as an LZMA-compressed difference series with the SHA-256 of
+  its original samples, checked on every load). It keeps the C.3.3 and C.4.2
+  suites complete and the worst-case point of the other three, so
+  `tests/hearing/test_stipa_certified.py` verifies the standard's filter-slope,
+  phase-distortion, modulation-depth and weighting-factor criteria in CI without
+  a single tolerance being relaxed. The EBU loudness test set cannot be
+  redistributed at all (its terms of use forbid copying and distribution, and
+  the authentic-programme cases are licensed film excerpts), so
+  `tests/broadcast/test_ebu_material_oracle.py` now takes the committed
+  block-loudness series as its primary path and asserts the published -23.0 LUFS
+  and 5/15 LU targets everywhere; the full chain from the audio still runs where
+  a local copy exists, and there it also re-measures the committed envelopes so
+  the derived oracle cannot drift from the material it stands for.
+
+- Non-redistributable reference material moves out of `plan/` into the
+  gitignored `tests/data-local/`, and every suite that uses it resolves the same
+  way through the new `tests/oracle_data.py`: environment override, then
+  `tests/data-local/`, then the committed data under `tests/data/` — the path CI
+  takes, which never skips. `pytest` now prints which copy each dataset resolved
+  to in its run header, so a green run says which oracle produced it. The
+  convention, and what each committed oracle can and cannot assert, is written
+  down in `tests/data/README.md`.
+
 - Frequency-weighting guides: the single chart that drew A, B, C, D, AU and Z
   together is split so each guide shows only the curves it documents.
   `weighting_responses` now holds the three curves of IEC 61672-1, and with

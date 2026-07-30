@@ -30,9 +30,12 @@ The subset lets the end-to-end oracle suite run everywhere, including CI cells
 without access to the full archive, validating the flight-condition
 interpolation, kinematics/retarded time, `rotorcraft_event_level` and
 `rotorcraft_noise_contour` against the published prototype outputs. When the
-full public release is available locally (`plan/NORAH2_V2.0.74_public.zip`, or
-an extraction pointed at by `NORAH2_DATA`), the suite prefers it. The data are
-**not** part of the `phonometry` package and are not installed with it.
+full public release is available locally the suite prefers it: an extraction
+pointed at by `NORAH2_DATA`, or
+`tests/data-local/norah2/NORAH2_V2.0.74_public.zip` (see
+`tests/data/README.md`). Every case reads the same files from either source, so
+the assertions do not differ. The data are **not** part of the `phonometry`
+package and are not installed with it.
 
 ## Removal policy
 
