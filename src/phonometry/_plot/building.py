@@ -95,6 +95,10 @@ _MAX_IMPACT_LABEL = "Maximum impact sound pressure level [dB]"
 #: single-number bars and the two detailed per-band ones).
 _SHARE_LABEL = "Share of transmitted energy [%]"
 
+#: Shared y-axis label of the impact-improvement figures (the ISO 16251-1
+#: measurement and the two resilient-layer predictions).
+_IMPROVEMENT_LABEL = "Improvement of impact sound insulation delta-L [dB]"
+
 #: Spanish translations of the fixed labels/titles/legends rendered by the
 #: building-domain ``.plot()`` renderers, keyed by their verbatim English
 #: text. ``_t`` returns the English key unchanged for any language other
@@ -145,7 +149,7 @@ _STRINGS: dict[str, str] = {
     "enlarged range (A.2.1)": "rango ampliado (A.2.1)",
     "Measured": "Medido",
     "Shifted reference (core bands)": "Referencia desplazada (bandas 100-3150 Hz)",
-    "Improvement of impact sound insulation delta-L [dB]": "Mejora del aislamiento a ruido de impacto delta-L [dB]",
+    _IMPROVEMENT_LABEL: "Mejora del aislamiento a ruido de impacto delta-L [dB]",
     "ISO 16251-1 Floor-Covering Impact Sound Improvement": "Mejora del aislamiento a ruido de impacto de revestimiento de suelo ISO 16251-1",
     "band insulation": "aislamiento por banda",
     "transmitted level $L_{x,i} - X_i$": "nivel transmitido $L_{x,i} - X_i$",
@@ -1200,7 +1204,7 @@ def plot_floor_covering_improvement(
             label=_t("limit of measurement (> delta-L)", language),
         )
     _freq_axis(ax, freqs, language=language)
-    ax.set_ylabel(_t("Improvement of impact sound insulation delta-L [dB]", language))
+    ax.set_ylabel(_t(_IMPROVEMENT_LABEL, language))
     ax.set_ylim(bottom=0.0)
     title = _t("ISO 16251-1 Floor-Covering Impact Sound Improvement", language)
     if result.delta_lw is not None:

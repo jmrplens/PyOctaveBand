@@ -453,18 +453,21 @@ def force_pulse(
     omega0_sq = k / m
     if _is_over_critical(k, z, m):
         gamma = np.sqrt(decay**2 - omega0_sq)
-        if gamma == 0.0:
-            # A zero discriminant is the critically damped limit, v0 K t e^-at.
+        if gamma <= 0.0:
+            # A zero discriminant is the critically damped limit, v0 K t e^-at,
+            # which is also the γ → 0 limit of the expression below.
             return np.asarray(v0 * k * t * np.exp(-decay * t), dtype=np.float64)
-        # e^(-a t) sinh(γ t)/γ is expanded into the difference of two decaying
-        # exponentials rather than evaluated as written. Both a − γ and a + γ
-        # are positive (a² − γ² = ωo² > 0), so each term stays in range for
-        # every t, whereas the literal form multiplies an e^(-a t) that
-        # underflows to zero by a sinh that overflows to infinity and returns
-        # NaN well inside the machine's own 0,1 s impact period.
+        # e^(-a t) sinh(γ t)/γ is regrouped as
+        # e^(-(a-γ) t) (1 − e^(-2 γ t))/(2 γ) rather than evaluated as written.
+        # Both a − γ and a + γ are positive (a² − γ² = ωo² > 0), so neither
+        # exponential ever grows, whereas the literal form multiplies an
+        # e^(-a t) that underflows to zero by a sinh that overflows to
+        # infinity and returns NaN well inside the machine's own 0,1 s impact
+        # period. ``expm1`` keeps the near-critical case (γ t ≪ 1, where the
+        # two exponentials nearly cancel) accurate to full precision.
         pulse = (
-            v0 * k * (np.exp(-(decay - gamma) * t) - np.exp(-(decay + gamma) * t))
-            / (2.0 * gamma)
+            v0 * k * np.exp(-(decay - gamma) * t)
+            * -np.expm1(-2.0 * gamma * t) / (2.0 * gamma)
         )
         return np.asarray(pulse, dtype=np.float64)
     beta = np.sqrt(omega0_sq - decay**2)
