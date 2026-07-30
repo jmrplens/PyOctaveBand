@@ -10,14 +10,12 @@ Speech Intelligibility Index (SII) per ANSI S3.5-1997 (R2017).
 Implements all four band procedures of ANSI S3.5-1997, *American National
 Standard Methods for the Calculation of the Speech Intelligibility Index*:
 
-============================ ===== ================= =========================
-`method=`                  bands range             tabulated constants
-============================ ===== ================= =========================
-`"critical-band"`             21 100 Hz - 9500 Hz  Table 1
-`"equally-contributing"`      17 300 Hz - 6400 Hz  Table 2
-`"one-third-octave"`          18 160 Hz - 8000 Hz  Table 3 (default)
-`"octave"`                     6 177 Hz - 11314 Hz Table 4
-============================ ===== ================= =========================
+- `method="critical-band"`: 21 critical bands, 100 Hz to 9500 Hz (Table 1).
+- `method="equally-contributing"`: 17 equally-contributing critical bands,
+  300 Hz to 6400 Hz (Table 2).
+- `method="one-third-octave"`: 18 one-third-octave bands, 160 Hz to 8000 Hz
+  (Table 3). The library default.
+- `method="octave"`: 6 octave bands, 177 Hz to 11314 Hz (Table 4).
 
 From an equivalent speech spectrum level, an equivalent noise spectrum level
 and an equivalent hearing threshold, every procedure runs the same chain: the
