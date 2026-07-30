@@ -636,7 +636,7 @@ def test_idling_excludes_rolling_and_uses_the_idling_flow_term() -> None:
         track, reference_time=12.0,
     )
     assert np.all(np.isneginf(idling.components["rolling"][0]))
-    low, high = traction_sound_power(TractionVehicle.ELECTRIC_LOCO)
+    low, _ = traction_sound_power(TractionVehicle.ELECTRIC_LOCO)
     expected = octave_bands_from_third_octaves(
         np.asarray(low) + 10.0 * math.log10(1.0 / (12.0 * 100.0))
     )

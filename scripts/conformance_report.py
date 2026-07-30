@@ -8701,7 +8701,7 @@ def _cnossos_rail_case(case: dict[str, str]) -> Any:
 @register(
     _CNOSSOS_RAIL,
     "CIRCABC CNOSSOS-EU railway emission test set",
-    "Line power of the 120 committed cases of the published test set, both source heights, 8 octave bands each, dB re 1 pW/m",
+    "Line power of the 121 committed cases of the published test set, both source heights, 8 octave bands each, dB re 1 pW/m",
 )
 def _chk_cnossos_rail_workbook() -> Outcome:
     """Worst per-band deviation from the published test workbook."""
@@ -8713,7 +8713,7 @@ def _chk_cnossos_rail_workbook() -> Outcome:
         for got, band in zip(row, bands):
             worst = max(worst, abs(float(got) - float(case[f"lw_{band}"])))
     return numeric(0.0, worst, 0.01, unit="dB", places=4,
-                   expected_label="<= 0.01 dB on 960 published band levels (120 cases)")
+                   expected_label="<= 0.01 dB on 968 published band levels (121 cases)")
 
 
 @register(

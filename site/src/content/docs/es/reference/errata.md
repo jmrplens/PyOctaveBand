@@ -1502,6 +1502,120 @@ to the issuing body, with date and reference).
   `test_southall_impulsive_peak_spl_is_threshold_at_f0_plus_159_db`.
 - **Status:** reported by the authors themselves (errata published 2019).
 
+## Directive (EU) 2015/996, Annex II 2.3.2 (roughness conversion in km/h)
+
+- **Location:** the "Definition" paragraph of *Wheel and rail roughness*
+  (OJ L 168, 1.7.2015, p. 19) and the first paragraph after formula (2.3.11)
+  (p. 21).
+- **The print:** "it shall be converted to a frequency spectrum f = v/λ, where
+  f is the centre band frequency of a given 1/3 octave band in Hz, λ is the
+  wavelength in m, and **v is the train speed in km/h**", and, for impact
+  noise, "using the relation λ = v/f, where f is the 1/3 octave band centre
+  frequency in Hz and **v is the s-th vehicle speed of the t-th vehicle type in
+  km/h**".
+- **The problem:** dimensionally impossible. A frequency in hertz is a speed in
+  metres per second divided by a wavelength in metres; reading the speed in
+  km/h places the whole roughness spectrum a factor 3,6 too low in frequency,
+  which is more than an octave and a half.
+- **Evidence:** both paragraphs read off rendered page images of the Official
+  Journal PDF, not extracted text. The corrigendum of OJ L 5, 10.1.2018, p. 35
+  replaces "km/h" by "m/s" in both places. The flow equation (2.3.2) genuinely
+  does take its speed in km/h, which is what makes the misprint plausible.
+- **Library behaviour:** `roughness_to_frequency` converts the speed to m/s
+  before dividing, as corrected, and its docstring says so. The reference
+  implementation the Commission published with the source module does the same,
+  and the 121 committed workbook cases would not reproduce otherwise.
+- **Status:** unreported (corrected by the issuing body in 2018).
+
+## Directive (EU) 2015/996, Appendix G, Table G-1, second table (wrong symbol)
+
+- **Location:** Table G-1, "Coefficients Lr,TR,i and Lr,VEH,i for rail and wheel
+  roughness", second table (OJ L 168, 1.7.2015, pp. 130-131).
+- **The print:** the second table is headed **Lr,VEH,i**, the same symbol as the
+  first.
+- **The problem:** its two columns are "EN ISO 3095:2013 (Well maintained and
+  very smooth)" and "Average network (Normally maintained smooth)", which are
+  the rail-roughness classes E and M of digit 2 of the track descriptor in
+  Table [2.3.b]. The table is the **rail** roughness Lr,TR,i, the quantity the
+  table's own title announces and which is otherwise missing from Appendix G.
+- **Evidence:** read off a rendered page image of the Official Journal PDF. The
+  corrigendum of OJ L 5, 10.1.2018 re-titles it Lr,TR,i, and Commission
+  Delegated Directive (EU) 2021/1226 Annex point (20)(a) reprints it under that
+  symbol when it replaces it.
+- **Library behaviour:** `rail_roughness` returns Table G-1b as the rail
+  roughness of (2.3.7) and `wheel_roughness` returns Table G-1a as the wheel
+  roughness, which is the only assignment under which the classes of
+  Table [2.3.b] can be reached at all.
+- **Status:** unreported (corrected by the issuing body in 2018).
+
+## Directive (EU) 2015/996, Appendix G, Table G-5, 6 350 Hz row (50 dB notch)
+
+- **Location:** Table G-5, "Coefficients LW,0,idling for traction noise", the
+  6 350 Hz row of the "Diesel locomotive (c. 2 200 kW)" pair (OJ L 168,
+  1.7.2015, p. 138).
+- **The print:** Source A **31,4** dB and Source B **30,7** dB.
+- **The problem:** both are about 50 dB below their own neighbours in the same
+  column: 90,5 / 89,5 dB at 5 000 Hz and 81,2 / 80,6 dB at 8 000 Hz. No physical
+  traction source has a 50 dB notch one third of an octave wide, and no other
+  column of the table has anything comparable. The leading digit 8 was lost.
+- **Evidence:** read off a rendered page image of the Official Journal PDF.
+  Commission Delegated Directive (EU) 2021/1226 Annex point (20)(f) replaces the
+  4th column, 25th row by "81,4" and the 5th column, 25th row by "80,7",
+  restoring the monotone roll-off. The same two values appear as 31,41 and
+  30,71 in the IMAGINE catalogue file the Commission distributes with its
+  reference source module, so the error predates the Directive.
+- **Library behaviour:** ships the corrected 81,4 / 80,7 and pins them, together
+  with the assertion that neither value is more than 10 dB from either
+  neighbour, in `test_table_g5_carries_the_2021_correction_at_6300_hz`.
+- **Status:** unreported (corrected by the issuing body in 2021).
+
+## Directive (EU) 2015/996, Appendix G, band and wavelength labels
+
+- **Location:** the frequency column of Tables G-3, G-5 and G-6 and the
+  wavelength column of Table G-1 (OJ L 168, 1.7.2015, pp. 129-140).
+- **The print:** the 1/3-octave band centres are labelled **316 Hz**,
+  **3 160 Hz** and **6 350 Hz**, and the wavelengths **120 mm**, **12 mm**,
+  **3,2 mm** and **1,2 mm**.
+- **The problem:** neither series is the preferred one. The nominal 1/3-octave
+  centres of IEC 61260-1 are 315, 3 150 and 6 300 Hz, and the R10 preferred
+  numbers around those wavelengths are 125, 12,5, 3,15 and 1,25 mm. The
+  Commission's own catalogue files, distributed with the reference source
+  module, use the preferred wavelength series throughout.
+- **Evidence:** read off rendered page images of the Official Journal PDF.
+  Commission Delegated Directive (EU) 2021/1226 Annex points (20)(d), (f) and
+  (g) replace the three frequency labels, and the tables it replaces outright
+  carry the preferred wavelengths; but point (20) leaves **Table G-1a**
+  untouched, so the wavelength labels 120, 12, 3,2 and 1,2 mm still stand in
+  the consolidated text, on the one table that keeps them.
+- **Library behaviour:** the frequency grid is the IEC 61260-1 one throughout.
+  The wavelength grids are kept as printed, one per table, and each roughness
+  spectrum is resampled on its own grid rather than forced onto a common one,
+  which is what `_WAVELENGTHS_WHEEL` and `_WAVELENGTHS_STANDARD` are for; the
+  difference between the two is pinned by
+  `test_wheel_roughness_keeps_the_non_standard_wavelength_grid`.
+- **Status:** unreported (frequency labels corrected by the issuing body in
+  2021; the Table G-1a wavelength labels stand).
+
+## Directive (EU) 2015/996, Annex II 2.3.2, curve squeal (unassigned endpoints)
+
+- **Location:** the *Squeal* paragraph (OJ L 168, 1.7.2015, p. 21).
+- **The print:** "The emission level to be used is determined for curves with
+  radius below **or equal to** 500 m and for sharper curves and branch-outs of
+  points with radii below 300 m", and then "squeal noise shall be considered by
+  adding 8 dB for **R < 300 m** and 5 dB for **300 m < R < 500 m**".
+- **The problem:** the two open intervals leave R = 300 m and R = 500 m with no
+  excess at all, and R = 500 m is explicitly inside the scope the same
+  paragraph has just set. A 500 m curve therefore falls out of a rule written
+  to include it.
+- **Evidence:** read off a rendered page image of the Official Journal PDF.
+  Commission Delegated Directive (EU) 2021/1226 Annex point (4)(b) replaces the
+  paragraph with a table whose intervals are closed, "R <= 300 m" and
+  "300 m < R <= 500 m".
+- **Library behaviour:** `curve_squeal_excess` implements the 2021 table, so
+  R = 300 m returns 8 dB and R = 500 m returns 5 dB; the boundaries are pinned
+  in `test_curve_squeal_rule_of_2021`.
+- **Status:** unreported (corrected by the issuing body in 2021).
+
 ---
 
 ## Related source properties that are not errata
@@ -1516,6 +1630,21 @@ published sources:
   Francois-Garrison" claim is marginally exceeded at the extreme corners of
   its stated domain (10,4 % at −6 °C / 1 MHz; 12,3 % at 7 km depth). A
   property of the published fit; both transcriptions verified digit-for-digit.
+- **CNOSSOS-EU Annex II 2.3, missing equation number:** the railway section
+  numbers its formulae (2.3.1), (2.3.2), (2.3.4), (2.3.5)..., with no (2.3.3)
+  anywhere in Annex II. Verified on a rendered page image of OJ L 168, p. 17,
+  where (2.3.2) and (2.3.4) sit one above the other. Nothing is missing from
+  the method; only the numbering skips.
+- **CNOSSOS-EU corrigendum of 2018, Table G-3 column codes:** the corrigendum
+  is reported to head the seven Lr,TR columns "B/S B/M B/H B/S B/M B/H B/H",
+  where the first three should read "M/S M/M M/H" and the last "W", and
+  Commission Delegated Directive (EU) 2021/1226 Annex point (20)(c) does
+  replace that header with the corrected codes plus a new column D. It is left
+  unregistered because the corrigendum itself is published only as HTML on
+  EUR-Lex and no rendering of it could be obtained here, and this registry does
+  not record a claim about a printed symbol that has not been read off the
+  page. The 2015 print of the same table, which was read, carries descriptive
+  headers ("Mono-block sleeper on soft rail pad" and so on) and no defect.
 - **Long, Architectural Acoustics 2e, Chapter 17, adjacent-table level:** the
   restaurant example states that "at an adjacent table 3 m (10 ft) away, the
   direct field level from our conversation is about 54 dB", where his own
