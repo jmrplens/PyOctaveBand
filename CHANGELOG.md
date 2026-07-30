@@ -600,6 +600,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- The filter-bank reuse test asserts the property it is named after instead of a
+  stopwatch. It used to compare `time.time()` deltas and require the class-based
+  path to stay within 1.5x of the functional one, which on a shared runner under
+  a parallel suite measures the scheduler: it failed on a macOS leg at
+  `0.351 < 0.233 * 1.5` while passing everywhere else. The design routine is now
+  counted directly, so the assertions read as the design cache is supposed to
+  behave: ten functional calls with the cache cleared design ten times, a bank
+  plus ten `filter()` calls design exactly once, and five identical
+  `octave_filter` calls share one design while a different sample rate makes a
+  second. Both paths are also compared band for band, so the reuse cannot be a
+  shortcut past the work. Timings are still printed on every run, with a
+  ten-fold guard that no scheduling noise can trip.
+
+- `make graphs` regenerates the figures and stops there. The legibility check it
+  used to end with is now `make figure-contrast`, and `make figures` runs
+  generation, legibility and staleness in that order, one step each, the way CI
+  does. Chaining the checker inside generation meant an illegible fill aborted
+  the generation step and skipped the staleness compare after it, so a single
+  bad fill on `main` reported itself as "the figures could not be regenerated"
+  and blocked every open branch at once.
+
 - Oracle test data: the two suites that only ran on a machine holding a private
   download now run everywhere. The certified IEC 60268-16 STIPA verification
   bench from stipa.info is 133 MB of PCM that does not compress as audio, so

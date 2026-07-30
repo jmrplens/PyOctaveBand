@@ -34,7 +34,8 @@ Regenerated where this change touches them:
       `site/src/generated/api-sidebar.mjs` committed
 - [ ] `make llms`, with `llms.txt`, `llms-full.txt` and the shards under
       `site/public/llms/` committed
-- [ ] `make graphs`, with `python scripts/check_figures.py` passing
+- [ ] `make figures` (generation, then `scripts/check_figure_contrast.py` and
+      `scripts/check_figures.py`), with the regenerated images committed
       (figures come from `scripts/generate_graphs.py`, never by hand)
 - [ ] `make pypi-readme` after editing `README.md`
 

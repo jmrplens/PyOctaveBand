@@ -60,9 +60,21 @@ graphs:
 	find .github/images -maxdepth 1 -type f \( -name '*.svg' -o -name '*.png' -o -name '*.webp' \) -delete
 	$(FIGURE_ENV) $(PYTHON) scripts/generate_graphs.py
 	$(FIGURE_ENV) $(PYTHON) scripts/generate_diagrams.py
-	# Every shaded region has to be visible against the page it is drawn on,
-	# on both themes; the staleness check cannot see that.
+
+# Every shaded region has to be visible against the page it is drawn on, on
+# both themes; the staleness check cannot see that. Deliberately a target of
+# its own rather than the tail of `graphs`: a contrast failure inside the
+# generation step aborts it, and everything meant to run after generation
+# (the staleness compare above all) is then skipped, so one illegible fill
+# reads as "the figures could not be regenerated" instead of "this fill is
+# invisible".
+figure-contrast:
 	$(PYTHON) scripts/check_figure_contrast.py
+
+# What to run locally before committing a figure change: regenerate, then
+# verify legibility and staleness the way CI does, each as its own step.
+figures: graphs figure-contrast
+	$(PYTHON) scripts/check_figures.py
 
 # Regenerate the Tier-1 documentation animations (WebM for the site, GIF for
 # the GitHub docs). Kept out of `graphs`/CI because the ffmpeg encoding is slow
@@ -157,5 +169,6 @@ coverage:
 
 check: lint security test
 
-.PHONY: install lint format security snyk sonar graphs reports animations posters brand lighthouse \
+.PHONY: install lint format security snyk sonar graphs figure-contrast figures reports \
+	animations posters brand lighthouse \
 	llms pypi-readme api-docs site-reports conformance install-hooks test coverage check
