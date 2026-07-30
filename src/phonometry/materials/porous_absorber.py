@@ -1292,19 +1292,13 @@ def _split_fluid_run(
 
     :raises ValueError: when the run would need more than *limit* blocks.
     """
-    parts: list[tuple[str, Complex, Complex, float]] = []
-    attenuation = 0.0
-    for kind, a, b in terms:
-        if kind != "fluid":
-            parts.append((kind, a, b, 0.0))
-            continue
-        loss = float(np.max(np.abs(np.imag(b))))
-        attenuation += loss
-        pieces = max(1, int(np.ceil(loss / budget)))
-        if pieces == 1:
-            parts.append((kind, a, b, loss))
-        else:
-            parts.extend([(kind, a, b / pieces, loss / pieces)] * pieces)
+    losses = [
+        float(np.max(np.abs(np.imag(b)))) if kind == "fluid" else 0.0
+        for kind, _, b in terms
+    ]
+    attenuation = sum(losses)
+    # Checked before the run is expanded, so an absurd input cannot build the
+    # sub-layer list it would then be refused for.
     if attenuation > budget * limit:
         raise ValueError(
             f"the fluid layers of the stack attenuate by {attenuation:.0f} "
@@ -1312,6 +1306,14 @@ def _split_fluid_run(
             f"{limit} blocks. Reduce their thickness: nothing behind such a "
             "run contributes to the surface impedance."
         )
+
+    parts: list[tuple[str, Complex, Complex, float]] = []
+    for (kind, a, b), loss in zip(terms, losses):
+        pieces = max(1, int(np.ceil(loss / budget)))
+        if pieces == 1:
+            parts.append((kind, a, b, loss))
+        else:
+            parts.extend([(kind, a, b / pieces, loss / pieces)] * pieces)
 
     groups: list[list[tuple[str, Complex, Complex]]] = []
     current: list[tuple[str, Complex, Complex]] = []
