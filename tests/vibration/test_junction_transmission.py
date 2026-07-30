@@ -50,10 +50,15 @@ from phonometry import (
     inline_transmission_coefficient,
     junction_transmission,
     junction_wave_parameters,
+    plate_bending_stiffness,
+    point_connection_coupling_loss_factor,
+    right_angle_transmission_coefficient,
     straight_transmission_coefficient,
     wave_vibration_reduction_index,
 )
 from phonometry.vibration import JunctionTransmissionResult
+from phonometry.vibration.experimental_sea import flat_plate_modal_density
+from phonometry.vibration.point_mobility import plate_bending_wave_speed
 
 # Junction constants (Hopkins Eq. 5.12/5.13) reproduced here so the oracle never
 # reads them from the module under test.
@@ -431,3 +436,196 @@ def test_straight_section_undefined_for_t2_and_l() -> None:
         straight_transmission_coefficient(0.0, 1.0, 1.0, "T2")
     with pytest.raises(ValueError):
         straight_transmission_coefficient(0.0, 1.0, 1.0, "L")
+
+
+# ---------------------------------------------------------------------------
+# Norton & Karczub right-angle and point-connected junctions (Section 6.6.1)
+#
+# M. P. Norton and D. G. Karczub, *Fundamentals of Noise and Vibration Analysis
+# for Engineers* (2nd ed., CUP 2003), Eqs. 6.52 to 6.56, with the published
+# answer to problem 6.13 (printed p. 594; answer p. 617).
+#
+# **Problem 6.13.** Two aluminium plates coupled at right angles along a 1,2 m
+# edge: plate 1 is 3 mm thick and 2,5 m x 1,2 m, plate 2 is 5,5 mm thick and
+# 2,0 m x 1,2 m. Printed octave-band eta_12 from 125 Hz to 2 kHz:
+#
+#   welded  3,15e-3  2,23e-3  1,58e-3  1,12e-3  7,89e-4
+#   bolted  1,44e-2  7,19e-3  3,60e-3  1,80e-3  8,99e-4  (twelve bolts)
+#
+# Aluminium from Norton's Appendix 4: rho = 2700 kg/m^3, E = 7,1e10 Pa,
+# nu = 0,33, so the plate wave speed of Eq. (6.25) is 5432,3 m/s.
+#
+# The printed eta_21 column is *not* reproduced here and is not used as an
+# oracle: it equals the eta_12 column times h2/h1 exactly, i.e. it applies the
+# reciprocity relationship with n proportional to 1/h alone and drops the plate
+# area ratio S1/S2 = 1,25 that Eq. (6.25) carries. See docs/ERRATA.md.
+# ---------------------------------------------------------------------------
+
+_AL_RHO = 2700.0
+_AL_CL = math.sqrt(7.1e10 / (_AL_RHO * (1.0 - 0.33**2)))
+_P613_BANDS = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0])
+_P613_WELDED = np.array([3.15e-3, 2.23e-3, 1.58e-3, 1.12e-3, 7.89e-4])
+_P613_BOLTED = np.array([1.44e-2, 7.19e-3, 3.60e-3, 1.80e-3, 8.99e-4])
+_H1, _H2 = 0.003, 0.0055
+_S1, _S2, _L, _NBOLTS = 2.5 * 1.2, 2.0 * 1.2, 1.2, 12
+
+
+def _norton_tau12(incidence: str = "random") -> float:
+    return right_angle_transmission_coefficient(
+        _H1, _H2, density1=_AL_RHO, density2=_AL_RHO,
+        wave_speed1=_AL_CL, wave_speed2=_AL_CL, incidence=incidence,
+    )
+
+
+def test_norton_right_angle_normal_incidence_closed_form() -> None:
+    # Eqs. (6.53)/(6.54) with equal materials collapse to psi = (h1/h2)**2.5,
+    # an expression written here independently of the implementation.
+    psi = (_H1 / _H2) ** 2.5
+    expected = 2.0 / (math.sqrt(psi) + 1.0 / math.sqrt(psi)) ** 2
+    assert _norton_tau12("normal") == pytest.approx(expected, rel=1e-12)
+
+
+def test_norton_right_angle_normal_incidence_is_symmetric() -> None:
+    # tau12(0) does not see which plate is which: swapping them inverts psi and
+    # the (sqrt(psi) + 1/sqrt(psi)) sum is unchanged.
+    swapped = right_angle_transmission_coefficient(
+        _H2, _H1, density1=_AL_RHO, density2=_AL_RHO,
+        wave_speed1=_AL_CL, wave_speed2=_AL_CL, incidence="normal",
+    )
+    assert swapped == pytest.approx(_norton_tau12("normal"), rel=1e-12)
+
+
+def test_norton_right_angle_identical_plates() -> None:
+    # Identical plates give psi = 1, hence tau12(0) = 2/4 = 0,5, and X = 1 so
+    # the random-incidence factor is 2,754/4,24.
+    same = right_angle_transmission_coefficient(
+        0.004, 0.004, density1=_AL_RHO, density2=_AL_RHO,
+        wave_speed1=_AL_CL, wave_speed2=_AL_CL, incidence="normal",
+    )
+    assert same == pytest.approx(0.5, rel=1e-12)
+    random = right_angle_transmission_coefficient(
+        0.004, 0.004, density1=_AL_RHO, density2=_AL_RHO,
+        wave_speed1=_AL_CL, wave_speed2=_AL_CL,
+    )
+    assert random == pytest.approx(0.5 * 2.754 / 4.24, rel=1e-12)
+
+
+def test_norton_problem_613_welded_line_junction() -> None:
+    # Eq. (6.52) via the library's coupling loss factor (Hopkins Eq. 2.154 is
+    # the same expression with cg = 2 cB), against the printed eta_12 column.
+    tau = _norton_tau12()
+    stiffness = plate_bending_stiffness(7.1e10, _H1, 0.33)
+    c_b = plate_bending_wave_speed(_P613_BANDS, stiffness, _AL_RHO * _H1)
+    eta = np.array(
+        [
+            float(coupling_loss_factor(tau, 2.0 * c, _L, f, _S1))
+            for c, f in zip(c_b, _P613_BANDS, strict=True)
+        ]
+    )
+    np.testing.assert_allclose(eta, _P613_WELDED, rtol=0.005)
+
+
+def test_norton_line_junction_falls_as_inverse_root_frequency() -> None:
+    # cB rises as sqrt(f) and Eq. (6.52) divides by omega, so eta ~ 1/sqrt(f):
+    # the printed column falls by 1/sqrt(2) per octave, to the precision its
+    # three significant figures allow.
+    np.testing.assert_allclose(
+        _P613_WELDED[1:] / _P613_WELDED[:-1], 1.0 / math.sqrt(2.0), rtol=0.005
+    )
+
+
+def test_norton_problem_613_bolted_point_connections() -> None:
+    # Eq. (6.56) with twelve bolts, against the printed bolted eta_12 column.
+    eta = point_connection_coupling_loss_factor(
+        _P613_BANDS, _NBOLTS, thickness1=_H1, thickness2=_H2,
+        surface_density1=_AL_RHO * _H1, surface_density2=_AL_RHO * _H2,
+        wave_speed1=_AL_CL, wave_speed2=_AL_CL, plate_area1=_S1,
+    )
+    np.testing.assert_allclose(eta, _P613_BOLTED, rtol=0.007)
+
+
+def test_norton_point_junction_falls_as_inverse_frequency() -> None:
+    # Eq. (6.56) has omega alone in the denominator: the printed column halves
+    # every octave exactly.
+    np.testing.assert_allclose(
+        _P613_BOLTED[1:] / _P613_BOLTED[:-1], 0.5, rtol=0.003
+    )
+
+
+def test_norton_point_junction_scales_with_the_bolt_count() -> None:
+    kwargs = {
+        "thickness1": _H1, "thickness2": _H2,
+        "surface_density1": _AL_RHO * _H1,
+        "surface_density2": _AL_RHO * _H2, "wave_speed1": _AL_CL,
+        "wave_speed2": _AL_CL, "plate_area1": _S1,
+    }
+    one = point_connection_coupling_loss_factor(500.0, 1, **kwargs)  # type: ignore[arg-type]
+    twelve = point_connection_coupling_loss_factor(500.0, 12, **kwargs)  # type: ignore[arg-type]
+    np.testing.assert_allclose(twelve, 12.0 * one, rtol=1e-12)
+
+
+def test_norton_reciprocity_needs_the_plate_areas() -> None:
+    # The correct consistency relationship n1 eta_12 = n2 eta_21 uses
+    # n = S sqrt(12)/(2 cL h), so eta_21/eta_12 = (S1 h2)/(S2 h1) = 2,29 and
+    # not the 1,83 = h2/h1 that the printed eta_21 column of problem 6.13
+    # implies. This pins the ratio the library uses.
+    n_1 = flat_plate_modal_density(_S1, _H1, _AL_CL)
+    n_2 = flat_plate_modal_density(_S2, _H2, _AL_CL)
+    assert n_1 / n_2 == pytest.approx((_S1 * _H2) / (_S2 * _H1), rel=1e-12)
+    assert n_1 / n_2 == pytest.approx(2.2916666, rel=1e-6)
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"thickness1": 0.0},
+        {"thickness2": -1.0},
+        {"density1": 0.0},
+        {"density2": 0.0},
+        {"wave_speed1": 0.0},
+        {"wave_speed2": 0.0},
+        {"incidence": "grazing"},
+    ],
+)
+def test_right_angle_validation(kwargs: dict[str, object]) -> None:
+    base: dict[str, object] = {
+        "thickness1": _H1, "thickness2": _H2, "density1": _AL_RHO,
+        "density2": _AL_RHO, "wave_speed1": _AL_CL, "wave_speed2": _AL_CL,
+    }
+    base.update(kwargs)
+    thickness1 = base.pop("thickness1")
+    thickness2 = base.pop("thickness2")
+    with pytest.raises(ValueError):
+        right_angle_transmission_coefficient(thickness1, thickness2, **base)  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"n_connections": 0},
+        {"thickness1": 0.0},
+        {"surface_density1": 0.0},
+        {"wave_speed2": -1.0},
+        {"plate_area1": 0.0},
+    ],
+)
+def test_point_connection_validation(kwargs: dict[str, object]) -> None:
+    base: dict[str, object] = {
+        "n_connections": 12, "thickness1": _H1, "thickness2": _H2,
+        "surface_density1": _AL_RHO * _H1,
+        "surface_density2": _AL_RHO * _H2,
+        "wave_speed1": _AL_CL, "wave_speed2": _AL_CL, "plate_area1": _S1,
+    }
+    base.update(kwargs)
+    n = base.pop("n_connections")
+    with pytest.raises(ValueError):
+        point_connection_coupling_loss_factor(500.0, n, **base)  # type: ignore[arg-type]
+
+
+def test_point_connection_rejects_non_positive_frequency() -> None:
+    with pytest.raises(ValueError, match="must be positive"):
+        point_connection_coupling_loss_factor(
+            [500.0, 0.0], 12, thickness1=_H1, thickness2=_H2,
+            surface_density1=_AL_RHO * _H1, surface_density2=_AL_RHO * _H2,
+            wave_speed1=_AL_CL, wave_speed2=_AL_CL, plate_area1=_S1,
+        )

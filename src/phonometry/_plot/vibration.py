@@ -33,11 +33,13 @@ _A8_COLOR = _C_EDGE
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
+    from ..vibration.experimental_sea import PowerInjectionResult
     from ..vibration.human_vibration import (
         DailyVibrationExposure,
         WeightedSpectrum,
         WeightingResponse,
     )
+    from ..vibration.machine_diagnostics import FaultFrequencyResult
     from ..vibration.mechanical_mobility import (
         MobilityResult,
         RigidMassCalibrationResult,
@@ -87,6 +89,23 @@ _STRINGS: dict[str, str] = {
     "male": "hombre",
     "female": "mujer",
     r"$R$ = {r},  $\Pi$ = {p} %": r"$R$ = {r},  $\Pi$ = {p} %",
+    "envelope spectrum": "espectro de envolvente",
+    "Envelope amplitude": "Amplitud de la envolvente",
+    "Predicted fault line": "Línea de fallo prevista",
+    "Predicted fault lines: {src}, shaft {fs} Hz": "Líneas de fallo previstas: {src}, eje {fs} Hz",
+    "rolling-contact bearing": "rodamiento de contacto rodante",
+    "gear pair": "engranaje",
+    "induction motor": "motor de inducción",
+    "bladed rotor": "rotor con álabes",
+    "shaft": "eje",
+    "bearing": "rodamiento",
+    "gear": "engranaje",
+    "motor": "motor",
+    "blade": "álabe",
+    "Loss factor": "Factor de pérdidas",
+    "Power-injection SEA loss factors ({method})": "Factores de pérdidas SEA por inyección de potencia ({method})",
+    "single-drive": "excitación única",
+    "two-drive": "doble excitación",
 }
 
 
@@ -502,5 +521,231 @@ def plot_multiple_shock(
     ax.set_ylim(0.0, 100.0)
     ax.legend(loc="lower right", fontsize="small")
     ax.grid(True, alpha=0.3)
+    localize_axes(ax, language)
+    return ax
+
+
+#: Marker colour of each fault-line family, so shaft harmonics never read as
+#: bearing evidence on the overlay.
+_FAMILY_COLORS: dict[str, str] = {
+    "shaft": _C_MUTED,
+    "bearing": _C_REFERENCE,
+    "gear": _C_TERTIARY,
+    "motor": _C_QUATERNARY,
+    "blade": _C_SECONDARY,
+}
+
+
+def _draw_measured_spectrum(
+    ax: Axes,
+    frequencies: Any,
+    amplitude: Any,
+    f_max: float,
+    language: str,
+    kwargs: dict[str, Any],
+) -> float:
+    """Draw the measured curve under the overlay; return its peak amplitude.
+
+    Without a spectrum only the axis label is set and the reference height is
+    1, so the predicted lines fill the axes on their own.
+    """
+    if frequencies is None or amplitude is None:
+        ax.set_ylabel(_t("Predicted fault line", language))
+        return 1.0
+    keep = frequencies <= f_max
+    kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault("lw", 1.0)
+    ax.plot(frequencies[keep], amplitude[keep],
+            label=_t("envelope spectrum", language), **kwargs)
+    ax.set_ylabel(_t("Envelope amplitude", language))
+    return float(np.max(amplitude[keep])) if np.any(keep) else 1.0
+
+
+#: Gap between a fault line and its own rotated label, in points.
+_LABEL_PAD_PT = 2.0
+#: Horizontal room one rotated ``x-small`` label needs, in points. The name is
+#: turned through 90 degrees, so what it occupies across the axis is its text
+#: height, not its length.
+_LABEL_WIDTH_PT = 8.5
+#: Fallback axis width, in points, when the axes geometry is not available.
+_LABEL_FALLBACK_WIDTH_PT = 400.0
+
+
+def _axis_width_points(ax: Axes) -> float:
+    """Width of the axes box in points, for laying labels out across it."""
+    try:
+        width_px = float(ax.get_window_extent().width)
+        dpi = float(ax.get_figure().dpi)  # type: ignore[union-attr]
+    except (AttributeError, ValueError):  # pragma: no cover - defensive
+        return _LABEL_FALLBACK_WIDTH_PT
+    width_pt = width_px * 72.0 / dpi
+    return width_pt if width_pt > 0.0 else _LABEL_FALLBACK_WIDTH_PT
+
+
+def _label_offsets(
+    frequencies: list[float], f_max: float, width_pt: float
+) -> dict[int, float]:
+    """Horizontal label offsets in points, keyed by index into *frequencies*.
+
+    The names are drawn rotated, so each occupies a narrow vertical strip and
+    two of them collide when their lines sit less than :data:`_LABEL_WIDTH_PT`
+    apart across the axis. Walking the lines in frequency order and pushing
+    each label just far enough right to clear the previous one separates a
+    crowded group with the least displacement that fits: an isolated line keeps
+    its label exactly where it was, and a run of evenly spaced sidebands drifts
+    by the difference between the label width and the spacing, no more.
+    """
+    scale = width_pt / f_max if f_max > 0.0 else 0.0
+    offsets: dict[int, float] = {}
+    cursor = -np.inf
+    for i in sorted(range(len(frequencies)), key=lambda i: frequencies[i]):
+        anchor = frequencies[i] * scale + _LABEL_PAD_PT
+        placed = max(anchor, cursor)
+        offsets[i] = placed - frequencies[i] * scale
+        cursor = placed + _LABEL_WIDTH_PT
+    return offsets
+
+
+def _draw_fault_lines(
+    ax: Axes,
+    result: FaultFrequencyResult,
+    f_max: float,
+    top: float,
+    language: str,
+    *,
+    annotate: bool,
+) -> None:
+    """Draw one dashed line per predicted fault frequency, coloured by family.
+
+    Each family contributes a single legend entry, so shaft harmonics never
+    read as bearing evidence.
+    """
+    visible = [line for line in result.lines if line.frequency <= f_max]
+    offsets = _label_offsets(
+        [line.frequency for line in visible], f_max, _axis_width_points(ax)
+    )
+    labelled: set[str] = set()
+    for i, line in enumerate(visible):
+        colour = _FAMILY_COLORS.get(line.family, _C_EDGE)
+        label = None if line.family in labelled else _t(line.family, language)
+        labelled.add(line.family)
+        ax.axvline(line.frequency, color=colour, ls="--", lw=1.0, alpha=0.85,
+                   label=label, zorder=2)
+        if annotate:
+            ax.annotate(
+                line.name, xy=(line.frequency, 1.02 * top),
+                xytext=(offsets[i], 0), textcoords="offset points",
+                rotation=90, fontsize="x-small", color=colour,
+                ha="left", va="bottom",
+            )
+
+
+def plot_fault_frequencies(
+    result: FaultFrequencyResult, ax: Axes | None = None, *,
+    language: str = "en", spectrum: Any | None = None,
+    max_frequency: float | None = None, annotate: bool = True,
+    **kwargs: Any,
+) -> Axes:
+    """Predicted machine fault lines over a measured envelope spectrum.
+
+    The working diagnostic view: the envelope spectrum of a band-passed
+    vibration record with the kinematic lines of the bearing, gear, motor or
+    impeller drawn on top and named. A peak is only evidence when it lands on
+    a named line, which is what the overlay makes readable.
+
+    :param result: A
+        :class:`~phonometry.vibration.machine_diagnostics.FaultFrequencyResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param spectrum: Measured spectrum to draw underneath: an
+        :class:`~phonometry.metrology.envelope.EnvelopeSpectrumResult`, or any
+        object exposing ``frequencies`` and ``amplitude``. Without it the
+        predicted lines are drawn alone.
+    :param max_frequency: Upper limit of the frequency axis, in hertz
+        (Default: the spectrum's own upper limit, or 1,15 x the highest line).
+    :param annotate: Label each line with its name (Default: ``True``).
+    :param kwargs: Forwarded to the spectrum curve.
+    :return: The axes.
+    :raises ValueError: If the result carries no lines.
+    """
+    from .._i18n import format_number, localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    freqs = np.asarray(result.frequencies, dtype=np.float64)
+    if freqs.size == 0:
+        raise ValueError("the result carries no fault lines to plot.")
+
+    f_max = max_frequency
+    spectrum_f = spectrum_a = None
+    if spectrum is not None:
+        spectrum_f = np.asarray(spectrum.frequencies, dtype=np.float64)
+        spectrum_a = np.asarray(spectrum.amplitude, dtype=np.float64)
+        if f_max is None:
+            f_max = float(spectrum_f.max())
+    if f_max is None:
+        f_max = 1.15 * float(freqs.max())
+
+    top = _draw_measured_spectrum(
+        ax, spectrum_f, spectrum_a, f_max, language, kwargs
+    )
+    ax.set_ylim(0.0, 1.24 * top)
+    _draw_fault_lines(ax, result, f_max, top, language, annotate=annotate)
+    ax.set_xlim(0.0, f_max)
+    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_title(
+        _t("Predicted fault lines: {src}, shaft {fs} Hz", language).format(
+            src=_t(result.source, language),
+            fs=format_number(result.shaft_rate, language, decimals=2, trim=True),
+        )
+    )
+    ax.legend(loc="upper right", fontsize="small")
+    ax.grid(True, axis="y", alpha=0.3)
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_power_injection(
+    result: PowerInjectionResult, ax: Axes | None = None, *,
+    language: str = "en", **kwargs: Any,
+) -> Axes:
+    """Loss-factor budget of a two-subsystem SEA model (Norton Ch. 6).
+
+    The measured coupling loss factors against the internal loss factors on
+    one logarithmic axis: SEA is only trustworthy where the coupling stays
+    below the internal damping, so the ordering of the four curves is the
+    diagnosis.
+
+    :param result: A
+        :class:`~phonometry.vibration.experimental_sea.PowerInjectionResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the ``eta_12`` curve.
+    :return: The axes.
+    """
+    from .._i18n import localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    freq = np.asarray(result.frequencies, dtype=np.float64)
+    kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault("marker", "o")
+    kwargs.setdefault("markersize", 4)
+    ax.loglog(freq, result.coupling_loss_factor12, label=r"$\eta_{12}$",
+              **kwargs)
+    ax.loglog(freq, result.coupling_loss_factor21, color=_C_SECONDARY,
+              marker="s", markersize=4, label=r"$\eta_{21}$")
+    ax.loglog(freq, result.internal_loss_factor1, color=_C_TERTIARY, ls="--",
+              lw=1.1, label=r"$\eta_{1}$")
+    ax.loglog(freq, result.internal_loss_factor2, color=_C_QUATERNARY, ls=":",
+              lw=1.3, label=r"$\eta_{2}$")
+    format_frequency_axis(ax, float(freq.min()), float(freq.max()))
+    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_ylabel(_t("Loss factor", language))
+    ax.set_title(
+        _t("Power-injection SEA loss factors ({method})", language).format(
+            method=_t(result.method, language)
+        )
+    )
+    ax.legend(loc="best", fontsize="small", ncol=2)
+    ax.grid(True, which="both", alpha=0.3)
     localize_axes(ax, language)
     return ax

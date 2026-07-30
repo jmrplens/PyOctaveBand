@@ -174,6 +174,11 @@ IEC 61252, ISO 1996-1, IEC 60942, ISO 18233 and the GUM.
 - [Time synchronous averaging](/phonometry/guides/synchronous-averaging/):
   extraction of a periodic waveform of known period, the comb filter that
   describes it and the choice of the number of averages.
+- [Machine fault frequencies](/phonometry/guides/machine-diagnostics/):
+  the kinematic fault-frequency families of rotating machinery (Norton &
+  Karczub Section 8.4) drawn on top of a measured envelope spectrum: bearing
+  BPFO, BPFI, BSF and cage frequencies, gear-mesh sidebands, induction-motor
+  slip, pole-pass and rotor-slot harmonics, and blade-passing tones.
 - [Correlation, time delay and envelope](/phonometry/guides/correlation-delay/):
   correlation with its random errors, time-delay estimation by direct
   correlation and the GCC weightings, and the Hilbert envelope.

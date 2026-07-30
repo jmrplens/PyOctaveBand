@@ -187,6 +187,86 @@ the measured, physical ones.
   description="Two side-by-side elastic FDTD fields of the same 10 mm steel plate lying in air while a sustained plane wave arrives at 45 degrees. At 603 Hz, half the coincidence frequency, the wave reflects almost totally and the faint transmitted level matches the oblique mass law. At 2413 Hz, twice the coincidence frequency, the acoustic trace matches the free bending wavelength and a 45-degree transmitted beam grows below the plate, holding the same level as the low-frequency panel where the mass law predicted 12 dB more insulation, the air below the plate drawn on both panels with an annotated 150-fold display gain (+44 dB) so the transmitted field is legible, with the 1206 Hz coincidence frequency of the library and both measured and mass-law levels annotated."
 />
 
+### Quick estimates: the plateau method (Norton 3.9.1)
+
+Before the physical model there is a shortcut that practitioners have drawn by
+hand for decades. The **plateau method** (Norton & Karczub 2003, Section 3.9.1,
+after Watters) approximates the whole field-incidence curve of a single panel
+from three numbers per material, tabulated in `PLATEAU_MATERIALS` from Norton's
+Table 3.1: the surface density per millimetre of thickness, the height of the
+coincidence plateau in decibels, and the frequency ratio `B/A` that sets its
+width.
+
+The construction has three parts:
+
+1. the **field-incidence mass law** `TL = 10 lg(1 + (π f m''/ρ₀c₀)²) − 5 dB`
+   (Norton Eqs. 3.104 and 3.106), rising 6 dB per octave;
+2. a horizontal **coincidence plateau** at the tabulated height, with point
+   **A** where the mass-law line reaches it;
+3. point **B** at `B/A × f_A`, above which the estimate recovers at
+   **10 dB per octave**.
+
+It needs neither the bending stiffness nor the loss factor - the tabulated
+plateau absorbs both - and it assumes a diffuse field on both sides of a panel
+whose length and width are at least twenty times its thickness.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/plateau_transmission_loss.svg" alt="Transmission loss in decibels against one-third-octave bands from 100 hertz to 10 kilohertz for a 6 mm float glass panel, comparing two curves. Both rise together at 6 decibels per octave from about 15.5 decibels at 100 hertz to 25.5 decibels at 315 hertz. Above that the physical model keeps rising to a peak near 35.5 decibels at 1 kilohertz, dips to about 28.5 decibels at the 2033 hertz critical frequency marked by a dotted vertical line, and then climbs steeply to 49 decibels at 10 kilohertz, while the plateau estimate flattens at the tabulated 27 decibel coincidence height across a shaded band from point A at 374 hertz to point B at 3742 hertz and then recovers at 10 decibels per octave to 41 decibels." width="88%" loading="lazy" />
+
+*The two curves are the same line below point A. Above it the plateau estimate
+replaces the entire coincidence region with one flat value, which is exactly
+what it claims to be: an estimate, not the dip.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import plateau_transmission_loss, single_panel_transmission_loss
+
+# 6 mm float glass: Norton Table 3.1 gives 2.47 kg/m2 per mm, a 27 dB
+# coincidence plateau and B/A = 10; its critical frequency is 2033 Hz.
+bands = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000,
+                  1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000,
+                  10000], dtype=float)
+quick = plateau_transmission_loss(bands, material="glass", thickness_mm=6.0,
+                                  field_correction=5.5)
+physical = single_panel_transmission_loss(bands, 2.47 * 6.0,
+                                          critical_frequency=2033.0,
+                                          loss_factor=0.02)
+
+print(round(quick.plateau_start), round(quick.plateau_end))   # 374 3742
+print(quick.plateau_height)                                   # 27.0
+quick.plot()          # shades the plateau between points A and B
+plt.show()
+```
+
+</details>
+
+A worked check against the book: an 8 m x 3 m solid brick wall 110 mm thick at
+2.1 kg/m² per mm (`m'' = 231 kg/m²`) gives 35.8 dB in the 63 Hz octave, on the
+mass-law line, then the brick plateau of 37 dB across the 125 Hz and 250 Hz
+octaves, then 10 dB per octave above point B - Norton's printed answer to his
+problem 3.11 exactly, band for band, in the two regions the construction fixes
+analytically.
+
+```python
+from phonometry import plateau_transmission_loss
+
+octaves = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
+res = plateau_transmission_loss(octaves, material="brick", thickness_mm=110.0,
+                                air_density=1.21)
+print(res.transmission_loss.round(1))
+# [35.8 37.  37.  43.3 53.3 63.3 73.3]
+```
+
+The physical model has its own Norton-flavoured variant for the region above
+coincidence: `coincidence_model="cremer"` replaces Sharp's Eq. 7.44 with
+Cremer's empirical `TL = TL₀ + 10 lg(f/fc − 1) + 10 lg η − 2 dB`
+(Norton Eq. 3.110), and runs the mass law right up to `fc` with no interpolated
+bridge. Both rise at about 10 dB per octave far above coincidence; they differ
+in how they leave the dip.
+
 ## Double wall: the mass-spring-mass resonance (Bies 7.2.6)
 
 Two leaves separated by a cavity behave as a mass-spring-mass system, with the

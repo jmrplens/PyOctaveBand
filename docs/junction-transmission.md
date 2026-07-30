@@ -277,6 +277,131 @@ velocity level difference) is the separate
 [laboratory flanking-transmission](flanking-lab.md) `vibration_reduction_index`; this
 guide is the closed-form *predicted* value from the wave approach.
 
+## 6. Experimental SEA: coupling loss factors from measured energies
+
+Everything above is the **predictive** route: a coupling loss factor derived
+from a wave model of the junction. Real joints - welds, bolt rows, spot welds,
+adhesives - are not tractable that way, and the **experimental** route inverts
+the steady-state SEA power balance from *measured* subsystem energies instead
+(Norton & Karczub 2003, Sections 6.3.3 and 6.3.4). For two subsystems,
+
+```
+Pi_1 = omega [ (eta_1 + eta_12) E_1 - eta_21 E_2 ]         (6.10)
+0    = omega [ (eta_2 + eta_21) E_2 - eta_12 E_1 ]         (6.11)
+```
+
+with `E_i = M_i <v_i²>` the band energy of subsystem `i` (its mass times the
+space- and time-averaged mean-square velocity). Drive subsystem 1 only, add the
+SEA consistency (reciprocity) relationship `n_1 eta_12 = n_2 eta_21` (Eq. 6.8),
+and both coupling loss factors follow from the two measured energies
+(Eq. 6.15):
+
+```
+eta_12 = eta_2 E_2 / (E_1 - E_2 n_1/n_2)
+eta_21 = eta_12 n_1 / n_2
+Pi_in  = omega (eta_1 E_1 + eta_2 E_2)
+```
+
+The input power collapses to the total dissipated power, as it must in the
+steady state: substituting Eq. (6.11) into Eq. (6.10) cancels the two coupling
+terms exactly, which is a free check on any measurement.
+
+`power_injection_clf` performs that inversion, with the modal densities of
+Norton Section 6.4.1 alongside it: `flat_plate_modal_density` (Eq. 6.25),
+`bar_modal_density` (6.23), `beam_modal_density` (6.24) and
+`cylindrical_shell_modal_density` (6.27 to 6.29, the Szechenyi approximations
+in three regimes about the `ring_frequency` of Eq. 6.26). The flat-plate
+expression `n(f) = S sqrt(12) / (2 cL t)` is the same quantity as EN 12354-4's
+`n = pi S fc / c0²` used by the [flanking model](flanking-lab.md), only
+parametrised by the plate itself rather than by its critical frequency.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/experimental_sea_clf_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/experimental_sea_clf.svg" alt="Two-panel figure. Left panel: coupling loss factor on a logarithmic axis against the octave bands from 125 hertz to 2 kilohertz for two aluminium plates at right angles, with the welded line junction falling from about 3 times 10 to the minus 3 to 8 times 10 to the minus 4 as one over the square root of frequency, the twelve-bolt point connection falling twice as steeply from about 1.4 times 10 to the minus 2 to 9 times 10 to the minus 4 as one over frequency, and a dashed horizontal line marking an internal loss factor of 10 to the minus 2. Right panel: a bar chart of the four loss factors of a satellite platform and cylinder in the 500 hertz octave on a logarithmic axis, the internal loss factors 4.40 times 10 to the minus 3 and 2.40 times 10 to the minus 3 clearly above the coupling loss factors 4.26 times 10 to the minus 4 and 3.91 times 10 to the minus 4, with the injected power of 1.31 watts annotated" width="92%"></picture>
+
+*Left: two ways of joining the same two plates. Right: the loss-factor budget
+inverted from a pair of measured velocities; the coupling stays an order of
+magnitude below the damping, which is the condition for a two-subsystem SEA
+model to be trustworthy.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import math
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import (
+    coupling_loss_factor,
+    cylindrical_shell_modal_density,
+    flat_plate_modal_density,
+    plate_bending_stiffness,
+    point_connection_coupling_loss_factor,
+    power_injection_clf,
+    right_angle_transmission_coefficient,
+)
+from phonometry.vibration.point_mobility import plate_bending_wave_speed
+
+rho, nu, young = 2700.0, 0.33, 7.1e10                 # aluminium
+cl = math.sqrt(young / (rho * (1.0 - nu**2)))         # 5432 m/s (Eq. 6.25)
+bands = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0])
+
+# Predicted: a 3 mm x 2.5 m x 1.2 m plate meeting a 5.5 mm x 2.0 m x 1.2 m
+# plate at right angles along the 1.2 m edge, welded and then bolted.
+h1, h2, area1, length = 0.003, 0.0055, 2.5 * 1.2, 1.2
+tau = right_angle_transmission_coefficient(h1, h2, density1=rho, density2=rho,
+                                           wave_speed1=cl, wave_speed2=cl)
+cb = plate_bending_wave_speed(bands, plate_bending_stiffness(young, h1, nu),
+                              rho * h1)
+welded = [float(coupling_loss_factor(tau, 2.0 * c, length, f, area1))
+          for c, f in zip(cb, bands, strict=True)]
+bolted = point_connection_coupling_loss_factor(
+    bands, 12, thickness1=h1, thickness2=h2, surface_density1=rho * h1,
+    surface_density2=rho * h2, wave_speed1=cl, wave_speed2=cl,
+    plate_area1=area1)
+
+# Measured: a 5 mm platform driven directly, a 3 mm cylinder driven only
+# through the joints; 27.2 and 13.2 mm/s in the 500 Hz octave.
+t_p, t_c, radius = 0.005, 0.003, 0.75
+area_c = 2.0 * math.pi * radius * 2.0
+area_p = 3.5 * 3.0 - math.pi * radius**2
+sea = power_injection_clf(
+    500.0, rho * t_p * area_p * 0.0272**2, rho * t_c * area_c * 0.0132**2,
+    4.4e-3, 2.4e-3,
+    flat_plate_modal_density(area_p, t_p, cl),
+    float(cylindrical_shell_modal_density(500.0, area_c, t_c, radius, cl)[0]))
+
+print(f"{float(sea.coupling_loss_factor12[0]):.2e}")   # 4.26e-04
+print(f"{float(sea.coupling_loss_factor21[0]):.2e}")   # 3.91e-04
+print(round(float(sea.input_power[0]), 2))             # 1.31 W
+sea.plot()
+plt.show()
+```
+
+</details>
+
+Two closed forms sit between the two routes and are what a measured value is
+normally compared against.
+`right_angle_transmission_coefficient` gives the wave transmission coefficient
+of a right-angle plate junction without any angular integration (Eqs. 6.53 to
+6.55, after Bies & Hamid and Cremer et al.); feeding it to
+`coupling_loss_factor` reproduces Norton Eq. (6.52) identically, because that
+equation and Hopkins Eq. (2.154) are the same expression once `cg = 2 cB`. And
+`point_connection_coupling_loss_factor` covers plates joined at `N` discrete
+points instead of along a line (Eq. 6.56). Which one applies is decided by the
+bending wavelength: use the point form when it is shorter than the joint
+length, and the line form when it is longer. The two differ in slope as well as
+in level, `1/f` against `1/sqrt(f)`, so bolting and welding are not
+interchangeable across the spectrum.
+
+When no independent value of the internal loss factors is available, the
+single-drive inversion is underdetermined, and the classical **power-injection
+method** drives each subsystem in turn while measuring both energies each time.
+That gives four equations for `eta_1`, `eta_2`, `eta_12` and `eta_21` with no
+prior assumption at all, which `power_injection_matrix` solves band by band.
+Reciprocity then becomes a *check* on the measurement rather than an input:
+`modal_density_ratio` compares the measured `eta_21/eta_12` against the
+`n_1/n_2` computed from the geometry, and a large disagreement means the
+subsystem boundaries were drawn in the wrong place.
+
 ## See also
 
 - [Predicting Sound Insulation (EN 12354)](insulation-prediction.md): the
@@ -297,5 +422,7 @@ guide is the closed-form *predicted* value from the wave approach.
   statistical energy analysis*. Gower.
 - Hopkins, C. (2007). *Sound insulation* (Section 5.2.1.3).
   Butterworth-Heinemann.
+- Norton, M. P., & Karczub, D. G. (2003). *Fundamentals of noise and vibration
+  analysis for engineers* (2nd ed., Chapter 6). Cambridge University Press.
 
 See the [bibliography](references.md) for full entries.

@@ -190,6 +190,88 @@ siendo comparables, y los niveles anotados son los medidos, los físicos.
   description="Dos campos FDTD elásticos lado a lado de la misma placa de acero de 10 mm tendida en aire mientras llega una onda plana sostenida a 45 grados. A 603 Hz, la mitad de la frecuencia de coincidencia, la onda se refleja casi por completo y el débil nivel transmitido coincide con la ley de masas oblicua. A 2413 Hz, el doble de la frecuencia de coincidencia, la traza acústica iguala la longitud de onda de flexión libre y un haz transmitido a 45 grados crece bajo la placa, manteniendo el mismo nivel que el panel de baja frecuencia donde la ley de masas predecía 12 dB más de aislamiento; el aire bajo la placa se dibuja en los dos paneles con una ganancia de representación anotada de 150 veces (+44 dB) para que el campo transmitido sea legible, con la frecuencia de coincidencia de 1206 Hz de la librería y los niveles medidos y de la ley de masas anotados."
 />
 
+### Estimaciones rápidas: el método de la meseta (Norton 3.9.1)
+
+Antes del modelo físico hay un atajo que los técnicos llevan décadas dibujando
+a mano. El **método de la meseta** (Norton y Karczub 2003, sección 3.9.1, según
+Watters) aproxima toda la curva de incidencia de campo de un panel simple con
+tres números por material, tabulados en `PLATEAU_MATERIALS` a partir de la
+tabla 3.1 de Norton: la densidad superficial por milímetro de espesor, la
+altura en decibelios de la meseta de coincidencia y la relación de frecuencias
+`B/A` que fija su anchura.
+
+La construcción tiene tres partes:
+
+1. la **ley de masas de incidencia de campo**
+   `TL = 10 lg(1 + (π f m''/ρ₀c₀)²) − 5 dB` (Ecs. 3.104 y 3.106 de Norton), que
+   sube 6 dB por octava;
+2. una **meseta de coincidencia** horizontal a la altura tabulada, con el punto
+   **A** donde la recta de la ley de masas la alcanza;
+3. el punto **B** en `B/A × f_A`, por encima del cual la estimación se recupera
+   a **10 dB por octava**.
+
+No necesita ni la rigidez a flexión ni el factor de pérdidas (la meseta
+tabulada absorbe ambos) y supone campo difuso a ambos lados de un panel cuya
+longitud y anchura sean al menos veinte veces su espesor.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/plateau_transmission_loss.svg" alt="Pérdida por transmisión en decibelios frente a las bandas de tercio de octava de 100 hercios a 10 kilohercios para un panel de vidrio float de 6 mm, comparando dos curvas. Ambas suben juntas a 6 decibelios por octava desde unos 15,5 decibelios en 100 hercios hasta 25,5 decibelios en 315 hercios. Por encima, el modelo físico sigue subiendo hasta un máximo próximo a 35,5 decibelios en 1 kilohercio, cae hasta unos 28,5 decibelios en la frecuencia crítica de 2033 hercios marcada por una línea vertical punteada, y luego trepa hasta 49 decibelios en 10 kilohercios, mientras que la estimación por meseta se aplana en la altura de coincidencia tabulada de 27 decibelios a lo largo de una banda sombreada desde el punto A en 374 hercios hasta el punto B en 3742 hercios y después se recupera a 10 decibelios por octava hasta 41 decibelios." width="88%" loading="lazy" />
+
+*Las dos curvas son la misma recta por debajo del punto A. Por encima, la
+estimación por meseta sustituye toda la región de coincidencia por un único
+valor plano, que es exactamente lo que dice ser: una estimación, no la caída.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import plateau_transmission_loss, single_panel_transmission_loss
+
+# Vidrio float de 6 mm: la tabla 3.1 de Norton da 2,47 kg/m2 por mm, una
+# meseta de coincidencia de 27 dB y B/A = 10; su frecuencia crítica es 2033 Hz.
+bands = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000,
+                  1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000,
+                  10000], dtype=float)
+quick = plateau_transmission_loss(bands, material="glass", thickness_mm=6.0,
+                                  field_correction=5.5)
+physical = single_panel_transmission_loss(bands, 2.47 * 6.0,
+                                          critical_frequency=2033.0,
+                                          loss_factor=0.02)
+
+print(round(quick.plateau_start), round(quick.plateau_end))   # 374 3742
+print(quick.plateau_height)                                   # 27.0
+quick.plot(language="es")   # sombrea la meseta entre los puntos A y B
+plt.show()
+```
+
+</details>
+
+Una comprobación trabajada frente al libro: un muro de ladrillo macizo de
+8 m x 3 m y 110 mm de espesor a 2,1 kg/m² por mm (`m'' = 231 kg/m²`) da
+35,8 dB en la octava de 63 Hz, sobre la recta de la ley de masas, luego la
+meseta de ladrillo de 37 dB en las octavas de 125 Hz y 250 Hz, y después 10 dB
+por octava por encima del punto B: exactamente la respuesta publicada de Norton
+a su problema 3.11, banda a banda, en las dos regiones que la construcción fija
+analíticamente.
+
+```python
+from phonometry import plateau_transmission_loss
+
+octaves = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
+res = plateau_transmission_loss(octaves, material="brick", thickness_mm=110.0,
+                                air_density=1.21)
+print(res.transmission_loss.round(1))
+# [35.8 37.  37.  43.3 53.3 63.3 73.3]
+```
+
+El modelo físico tiene su propia variante a lo Norton para la región por encima
+de la coincidencia: `coincidence_model="cremer"` sustituye la Ec. 7.44 de Sharp
+por la empírica de Cremer `TL = TL₀ + 10 lg(f/fc − 1) + 10 lg η − 2 dB`
+(Ec. 3.110 de Norton) y lleva la ley de masas hasta la propia `fc` sin puente
+interpolado. Ambas suben a unos 10 dB por octava muy por encima de la
+coincidencia; se diferencian en cómo salen de la caída.
+
 ## Pared doble: la resonancia masa-muelle-masa (Bies 7.2.6)
 
 Dos hojas separadas por una cámara se comportan como un sistema

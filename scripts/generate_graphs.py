@@ -13,6 +13,7 @@ for _threads_var in (
 ):
     os.environ.setdefault(_threads_var, "1")
 
+import math
 from collections.abc import Callable, Sequence
 from functools import cache, lru_cache
 from typing import Any, Literal, cast
@@ -42,6 +43,47 @@ _LANG = "en"
 _LANG_SUFFIX = ""
 
 _ES_EXACT = {
+    "Bearing Fault Lines on a Measured Envelope Spectrum":
+        "Líneas de fallo del rodamiento sobre un espectro de envolvente medido",
+    "envelope spectrum of the 2-4 kHz band":
+        "espectro de envolvente de la banda 2-4 kHz",
+    "predicted BPFO and harmonics": "BPFO previsto y sus armónicos",
+    "predicted BPFI": "BPFI previsto",
+    "predicted BSF": "BSF previsto",
+    "shaft rate": "frecuencia de giro del eje",
+    "Envelope amplitude": "Amplitud de la envolvente",
+    "15 rollers, D = 34 mm, d = 6 mm, φ = 12.96°, 2000 r/min\n"
+    "BPFO = 207 Hz, BPFI = 293 Hz\n"
+    "the envelope lines fall on BPFO, not on BPFI: outer-race spall":
+        "15 rodillos, D = 34 mm, d = 6 mm, φ = 12,96°, 2000 r/min\n"
+        "BPFO = 207 Hz, BPFI = 293 Hz\n"
+        "las líneas de la envolvente caen en BPFO, no en BPFI: "
+        "descascarillado de la pista exterior",
+    "Coupling Loss Factors: Prediction and Power Injection":
+        "Factores de pérdidas por acoplamiento: predicción e inyección de potencia",
+    "Predicted: Weld Against Bolts":
+        "Predicción: soldadura frente a tornillos",
+    "Measured: Power Injection, 500 Hz Octave":
+        "Medida: inyección de potencia, octava de 500 Hz",
+    "Coupling loss factor": "Factor de pérdidas por acoplamiento",
+    "Loss factor": "Factor de pérdidas",
+    r"welded line junction $\eta_{12}$":
+        r"unión lineal soldada $\eta_{12}$",
+    r"12 bolts, point connections $\eta_{12}$":
+        r"12 tornillos, conexiones puntuales $\eta_{12}$",
+    r"internal loss factor $\eta_1$": r"factor de pérdidas interno $\eta_1$",
+    "Plateau Estimate Against the Physical Panel Model":
+        "Estimación por meseta frente al modelo físico del panel",
+    "coincidence plateau (A to B)": "meseta de coincidencia (A a B)",
+    "physical model (mass law + coincidence + damping)":
+        "modelo físico (ley de masas + coincidencia + amortiguamiento)",
+    "plateau estimate (Norton Table 3.1)":
+        "estimación por meseta (Norton, tabla 3.1)",
+    "critical frequency fc": "frecuencia crítica fc",
+    "Transmission loss TL [dB]": "Pérdida por transmisión TL [dB]",
+    "identical below A; the plateau replaces the whole coincidence region":
+        "idénticas por debajo de A; la meseta sustituye toda la región de "
+        "coincidencia",
     "2D FDTD wavefront in a hall of columns":
         "Frente de onda FDTD 2D en una sala de columnas",
     "loudspeaker": "altavoz",
@@ -1590,6 +1632,21 @@ _ES_EXACT = {
 }
 
 _ES_PATTERNS = [
+    # experimental_sea_clf info box (baked-in input power).
+    ((r"^platform driven, cylinder driven only through the joints\n"
+      r"input power = (.+) W\n"
+      r"coupling stays well below the damping: valid SEA$"),
+     ("plataforma excitada, cilindro excitado solo a través de las uniones\n"
+      "potencia inyectada = \\1 W\n"
+      "el acoplamiento queda muy por debajo del amortiguamiento: SEA válido")),
+    # plateau_transmission_loss info box (baked-in panel and plateau values).
+    ((r"^6 mm float glass, m'' = (.+) kg/m², η = (.+)\n"
+      r"plateau height 27 dB, B/A = 10 → A = (.+) Hz, B = (.+) Hz\n"
+      r"identical below A; the plateau replaces the whole coincidence region$"),
+     ("vidrio float de 6 mm, m'' = \\1 kg/m², η = \\2\n"
+      "altura de meseta 27 dB, B/A = 10 → A = \\3 Hz, B = \\4 Hz\n"
+      "idénticas por debajo de A; la meseta sustituye toda la región de "
+      "coincidencia")),
     # slow_sound_absorber panel-depth annotation (baked-in wavelength ratio).
     (r"^Normal incidence, rigid backing, panel depth L = lambda/(\d+)$",
      r"Incidencia normal, respaldo rígido, profundidad del panel L = lambda/\1"),
@@ -11167,6 +11224,239 @@ def generate_junction_kij_thickness(output_dir: str) -> None:
     plt.close()
 
 
+def generate_bearing_fault_envelope(output_dir: str) -> None:
+    """Predicted bearing fault lines over a measured envelope spectrum."""
+    print("Generating bearing_fault_envelope...")
+    from phonometry import bearing_fault_frequencies, envelope_spectrum, noise_signal
+
+    # Norton problem 8.5 geometry: fifteen rollers, 34 mm pitch diameter,
+    # 6 mm rollers, 12.96 deg contact angle, 2000 r/min.
+    faults = bearing_fault_frequencies(2000.0, 15, 6.0, 34.0,
+                                       contact_angle_deg=12.96)
+    bpfo, fs_shaft = faults["BPFO"], faults.shaft_rate
+
+    # A spalled outer race: one impact per BPFO period ringing a 3 kHz housing
+    # resonance, load-modulated once per revolution, buried in broadband noise.
+    fs, seconds = 20000.0, 2.0
+    t = np.arange(int(fs * seconds)) / fs
+    impacts = np.zeros_like(t)
+    for k in range(int(seconds * bpfo)):
+        idx = round(k / bpfo * fs)
+        if idx < impacts.size:
+            impacts[idx] = 1.0 + 0.35 * np.cos(2.0 * np.pi * fs_shaft * idx / fs)
+    tau = np.arange(int(0.004 * fs)) / fs
+    ring = np.exp(-tau / 6.0e-4) * np.sin(2.0 * np.pi * 3000.0 * tau)
+    x = np.convolve(impacts, ring)[: t.size] * 0.6
+    x += 0.35 * np.sin(2.0 * np.pi * fs_shaft * t)          # residual unbalance
+    x += noise_signal(fs, seconds, color="white", rms=0.25, seed=17)
+
+    res = envelope_spectrum(x, fs, band=(2000.0, 4000.0))
+    keep = res.frequencies <= 4.6 * bpfo
+    freq, amp = res.frequencies[keep], res.amplitude[keep]
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    ax.plot(freq, amp, color=COLOR_PRIMARY, linewidth=1.1,
+            label="envelope spectrum of the 2-4 kHz band")
+    top = float(amp.max())
+    for order in range(1, 5):
+        line = order * bpfo
+        ax.axvline(line, color=COLOR_SECONDARY, linestyle="--", linewidth=1.2,
+                   alpha=0.85, zorder=2,
+                   label="predicted BPFO and harmonics" if order == 1 else None)
+        ax.annotate(f"{order}×BPFO" if order > 1 else "BPFO",
+                    xy=(line, 1.02 * top), xytext=(3, 0),
+                    textcoords="offset points", rotation=90, fontsize=8.5,
+                    color=COLOR_SECONDARY, ha="left", va="bottom")
+    for name, colour in (("BPFI", COLOR_TERTIARY), ("BSF", "#9467bd")):
+        ax.axvline(faults[name], color=colour, linestyle=":", linewidth=1.3,
+                   alpha=0.9, zorder=2, label=f"predicted {name}")
+    ax.axvline(fs_shaft, color=COLOR_FG, linestyle="-.", linewidth=1.0,
+               alpha=0.6, zorder=2, label="shaft rate")
+
+    ax.set_xlim(0.0, 4.6 * bpfo)
+    ax.set_ylim(0.0, 1.55 * top)
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Envelope amplitude")
+    ax.set_title("Bearing Fault Lines on a Measured Envelope Spectrum",
+                 fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper right", fontsize=8, ncol=2)
+
+    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
+    info = [
+        "15 rollers, D = 34 mm, d = 6 mm, φ = 12.96°, 2000 r/min",
+        f"BPFO = {bpfo:.0f} Hz, BPFI = {faults['BPFI']:.0f} Hz",
+        "the envelope lines fall on BPFO, not on BPFI: outer-race spall",
+    ]
+    ax.text(0.985, 0.47, "\n".join(info), transform=ax.transAxes,
+            va="top", ha="right", fontsize=9, color=COLOR_FG,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+                  "edgecolor": COLOR_GRID})
+    plt.tight_layout()
+    save_figure(output_dir, "bearing_fault_envelope.svg")
+    plt.close()
+
+
+def generate_experimental_sea_clf(output_dir: str) -> None:
+    """Measured and predicted coupling loss factors of a plate junction."""
+    print("Generating experimental_sea_clf...")
+    from phonometry import (
+        coupling_loss_factor,
+        cylindrical_shell_modal_density,
+        flat_plate_modal_density,
+        plate_bending_stiffness,
+        point_connection_coupling_loss_factor,
+        power_injection_clf,
+        right_angle_transmission_coefficient,
+    )
+    from phonometry.vibration.point_mobility import plate_bending_wave_speed
+
+    rho, nu, young = 2700.0, 0.33, 7.1e10
+    c_l = math.sqrt(young / (rho * (1.0 - nu**2)))
+    bands = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0])
+
+    # Two aluminium plates at right angles: 3 mm x 2.5 m x 1.2 m coupled to
+    # 5.5 mm x 2.0 m x 1.2 m along the 1.2 m edge (Norton problem 6.13).
+    h1, h2, area1, length = 0.003, 0.0055, 2.5 * 1.2, 1.2
+    tau = right_angle_transmission_coefficient(
+        h1, h2, density1=rho, density2=rho, wave_speed1=c_l, wave_speed2=c_l)
+    c_b = plate_bending_wave_speed(bands, plate_bending_stiffness(young, h1, nu),
+                                   rho * h1)
+    welded = np.array([float(coupling_loss_factor(tau, 2.0 * c, length, f, area1))
+                       for c, f in zip(c_b, bands, strict=True)])
+    bolted = point_connection_coupling_loss_factor(
+        bands, 12, thickness1=h1, thickness2=h2, surface_density1=rho * h1,
+        surface_density2=rho * h2, wave_speed1=c_l, wave_speed2=c_l,
+        plate_area1=area1)
+
+    # The satellite platform and cylinder of Norton problem 6.10, inverted from
+    # its measured energies in the 500 Hz octave.
+    t_p, t_c, radius, cyl_len = 0.005, 0.003, 0.75, 2.0
+    area_c = 2.0 * math.pi * radius * cyl_len
+    area_p = 3.5 * 3.0 - math.pi * radius**2
+    sea = power_injection_clf(
+        500.0,
+        rho * t_p * area_p * 0.0272**2,
+        rho * t_c * area_c * 0.0132**2,
+        4.4e-3, 2.4e-3,
+        flat_plate_modal_density(area_p, t_p, c_l),
+        float(cylindrical_shell_modal_density(500.0, area_c, t_c, radius, c_l)[0]),
+    )
+
+    fig, axes = plt.subplots(1, 2, figsize=(12.5, 5.6))
+    ax = axes[0]
+    x = _band_index_axis(ax, bands, fontsize=9)
+    ax.semilogy(x, welded, "-o", color=COLOR_PRIMARY, linewidth=2.0,
+                markersize=5, label=r"welded line junction $\eta_{12}$")
+    ax.semilogy(x, bolted, "-s", color=COLOR_SECONDARY, linewidth=2.0,
+                markersize=5, label=r"12 bolts, point connections $\eta_{12}$")
+    ax.axhline(1.0e-2, color=COLOR_FG, linestyle="--", linewidth=1.2,
+               alpha=0.7, label=r"internal loss factor $\eta_1$")
+    ax.set_ylabel("Coupling loss factor")
+    ax.set_title("Predicted: Weld Against Bolts", fontweight="bold", pad=10)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper right", fontsize=9)
+
+    ax = axes[1]
+    labels = [r"$\eta_1$", r"$\eta_2$", r"$\eta_{12}$", r"$\eta_{21}$"]
+    values = [4.4e-3, 2.4e-3, float(sea.coupling_loss_factor12[0]),
+              float(sea.coupling_loss_factor21[0])]
+    # COLOR_MUTED, not COLOR_GRID: this is a de-emphasised *bar*, and the
+    # grid colour is tuned to disappear into the page it is drawn on.
+    colours = [COLOR_FG, COLOR_MUTED, COLOR_PRIMARY, COLOR_SECONDARY]
+    ax.bar(labels, values, color=colours, edgecolor=COLOR_FG, linewidth=0.8)
+    ax.set_yscale("log")
+    ax.set_ylim(1.0e-4, 1.0e-2)
+    ax.set_ylabel("Loss factor")
+    ax.set_title("Measured: Power Injection, 500 Hz Octave",
+                 fontweight="bold", pad=10)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, axis="y", which="both")
+    ax.set_axisbelow(True)
+    for label, value in zip(labels, values, strict=True):
+        ax.annotate(f"{value:.2e}", xy=(label, value), xytext=(0, 4),
+                    textcoords="offset points", ha="center", fontsize=8.5,
+                    color=COLOR_FG)
+
+    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
+    info = [
+        "platform driven, cylinder driven only through the joints",
+        f"input power = {float(sea.input_power[0]):.2f} W",
+        r"coupling stays well below the damping: valid SEA",
+    ]
+    ax.text(0.98, 0.97, "\n".join(info), transform=ax.transAxes,
+            va="top", ha="right", fontsize=9, color=COLOR_FG,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+                  "edgecolor": COLOR_GRID})
+    fig.suptitle("Coupling Loss Factors: Prediction and Power Injection",
+                 fontweight="bold", fontsize=13)
+    plt.tight_layout(rect=(0.0, 0.0, 1.0, 0.95))
+    save_figure(output_dir, "experimental_sea_clf.svg")
+    plt.close()
+
+
+def generate_plateau_transmission_loss(output_dir: str) -> None:
+    """Plateau-method TL estimate against the full physical model."""
+    print("Generating plateau_transmission_loss...")
+    from phonometry import (
+        plateau_transmission_loss,
+        single_panel_transmission_loss,
+    )
+
+    # 6 mm float glass, 2.47 kg/m2 per mm (Norton Table 3.1); its critical
+    # frequency from the same book's problem 3.13 is 2033 Hz.
+    thickness_mm, f_c, eta = 6.0, 2033.0, 0.02
+    mass = 2.47 * thickness_mm
+    nominal = [*_THIRD_OCTAVE_16, 4000, 5000, 6300, 8000, 10000]
+    bands = np.asarray(nominal, dtype=float)
+    quick = plateau_transmission_loss(bands, material="glass",
+                                      thickness_mm=thickness_mm,
+                                      field_correction=5.5)
+    physical = single_panel_transmission_loss(bands, mass,
+                                              critical_frequency=f_c,
+                                              loss_factor=eta)
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    x = _band_index_axis(ax, nominal)
+    assert quick.plateau_start is not None and quick.plateau_end is not None
+    idx_a = float(np.interp(np.log10(quick.plateau_start), np.log10(bands), x))
+    idx_b = float(np.interp(np.log10(quick.plateau_end), np.log10(bands), x))
+    ax.axvspan(idx_a, idx_b, color=theme_fill(COLOR_SECONDARY, ax), lw=0, zorder=0,
+               label="coincidence plateau (A to B)")
+    ax.plot(x, physical.transmission_loss, "-o", color=COLOR_PRIMARY,
+            linewidth=2.2, markersize=5, zorder=5,
+            label="physical model (mass law + coincidence + damping)")
+    ax.plot(x, quick.transmission_loss, "--s", color=COLOR_SECONDARY,
+            linewidth=2.0, markersize=5, zorder=5,
+            label="plateau estimate (Norton Table 3.1)")
+    idx_fc = float(np.interp(np.log10(f_c), np.log10(bands), x))
+    ax.axvline(idx_fc, color=COLOR_TERTIARY, linestyle=":", linewidth=1.6,
+               zorder=4, label="critical frequency fc")
+
+    ax.set_ylabel("Transmission loss TL [dB]")
+    ax.set_title("Plateau Estimate Against the Physical Panel Model",
+                 fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", fontsize=9)
+
+    panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
+    info = [
+        f"6 mm float glass, m'' = {mass:.1f} kg/m², η = {eta:g}",
+        (f"plateau height 27 dB, B/A = 10 → A = {quick.plateau_start:.0f} Hz, "
+         f"B = {quick.plateau_end:.0f} Hz"),
+        "identical below A; the plateau replaces the whole coincidence region",
+    ]
+    ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
+            va="bottom", ha="right", fontsize=9, color=COLOR_FG,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
+                  "edgecolor": COLOR_GRID})
+    plt.tight_layout()
+    save_figure(output_dir, "plateau_transmission_loss.svg")
+    plt.close()
+
+
 def generate_mobility_result_lines(output_dir: str) -> None:
     """ISO 7626 driving-point mobility with its stiffness and mass lines."""
     print("Generating mobility_result_lines...")
@@ -12614,6 +12904,9 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_dynamic_stiffness,
     generate_mechanical_mobility,
     generate_junction_transmission,
+    generate_bearing_fault_envelope,
+    generate_experimental_sea_clf,
+    generate_plateau_transmission_loss,
     generate_transfer_stiffness,
     generate_rigid_mass_calibration,
     generate_vibration_sound_power,

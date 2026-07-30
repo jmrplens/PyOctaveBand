@@ -180,6 +180,12 @@ ISO 1996-1, IEC 60942, ISO 18233 y la GUM.
 - [Promediado síncrono en el tiempo](/phonometry/es/guides/synchronous-averaging/):
   extracción de una forma de onda periódica de período conocido, el filtro peine
   que la describe y la elección del número de promedios.
+- [Frecuencias de fallo de máquinas](/phonometry/es/guides/machine-diagnostics/):
+  las familias cinemáticas de frecuencias de fallo de la maquinaria rotativa
+  (Norton y Karczub, sección 8.4) dibujadas sobre un espectro de envolvente
+  medido: frecuencias BPFO, BPFI, BSF y de jaula de los rodamientos, bandas
+  laterales de engrane, deslizamiento, paso de polos y armónicos de ranura de
+  los motores de inducción, y tonos de paso de pala.
 - [Correlación, retardo y envolvente](/phonometry/es/guides/correlation-delay/):
   la correlación con sus errores aleatorios, la estimación de retardo por
   correlación directa y las ponderaciones GCC, y la envolvente de Hilbert.

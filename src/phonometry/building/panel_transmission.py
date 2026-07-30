@@ -53,6 +53,7 @@ mid-band slope is realised without standing-wave dips.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -78,13 +79,45 @@ _GAMMA: float = 1.4
 _FIELD_CORRECTION: dict[str, float] = {"third": 5.5, "octave": 4.0}
 #: Error message for a non-positive frequency (shared by the module funcs).
 _FREQ_POSITIVE_MSG = "'frequency' must be positive."
+#: Error message for a malformed frequency axis (shared by the module funcs).
+_FREQ_1D_MSG = "'frequency' must be a non-empty 1-D array."
+
+#: Norton & Karczub (2003) Table 3.1: plateau-method data for common
+#: materials, as ``(surface density in kg/m2 per mm of thickness, coincidence
+#: plateau height in dB, frequency ratio B/A)``.
+PLATEAU_MATERIALS: dict[str, tuple[float, float, float]] = {
+    "aluminium": (2.66, 29.0, 11.0),
+    "brick": (2.10, 37.0, 4.5),
+    "concrete": (2.28, 38.0, 4.5),
+    "glass": (2.47, 27.0, 10.0),
+    "lead": (11.20, 56.0, 4.0),
+    "plaster": (1.71, 30.0, 8.0),
+    "plywood": (0.57, 19.0, 6.5),
+    "steel": (7.60, 40.0, 11.0),
+}
+#: Field-incidence correction of Norton Eq. (3.106): a flat 5 dB below the
+#: normal-incidence mass law (a diffuse field limited to 78 degrees).
+_NORTON_FIELD_CORRECTION: float = 5.0
+
+
+def _band_axis(frequency: ArrayLike) -> np.ndarray:
+    """Validate a 1-D array of strictly positive band centre frequencies."""
+    f = np.atleast_1d(np.asarray(frequency, dtype=np.float64))
+    if f.ndim != 1 or f.size == 0:
+        raise ValueError(_FREQ_1D_MSG)
+    if np.any(f <= 0.0):
+        raise ValueError(_FREQ_POSITIVE_MSG)
+    return f
+
 
 __all__ = [
+    "PLATEAU_MATERIALS",
     "SoundReductionResult",
     "double_wall_transmission_loss",
     "field_incidence_correction",
     "mass_law_transmission_loss",
     "mass_spring_mass_resonance",
+    "plateau_transmission_loss",
     "single_panel_transmission_loss",
 ]
 
@@ -106,18 +139,24 @@ def mass_law_transmission_loss(
     *,
     incidence: str = "field",
     band: str = "third",
+    field_correction: float | None = None,
     speed_of_sound: float = _SPEED_OF_SOUND,
     air_density: float = _AIR_DENSITY,
 ) -> np.ndarray:
     """Mass-law transmission loss of a limp panel (Bies Eq. 7.40/7.42).
 
     ``TL_normal = 10 lg(1 + (pi f m'' / rho0 c0)**2)``; the field-incidence
-    value subtracts the band correction of :func:`field_incidence_correction`.
+    value subtracts the band correction of :func:`field_incidence_correction`,
+    or the explicit *field_correction* when one is given (Norton & Karczub
+    Eq. 3.106 uses a flat 5 dB, the line :func:`plateau_transmission_loss`
+    builds its estimate on).
 
     :param frequency: Frequency ``f``, in hertz (scalar or array, > 0).
     :param mass_per_area: Mass per unit area ``m''``, in kg/m^2 (> 0).
     :param incidence: ``"normal"`` or ``"field"`` (Default: ``"field"``).
     :param band: Band width for the field correction (``"third"``/``"octave"``).
+    :param field_correction: Explicit field-incidence correction, in dB
+        (>= 0), overriding the band table (Default: ``None``).
     :param speed_of_sound: Speed of sound in air ``c0`` (Default: 343 m/s).
     :param air_density: Air density ``rho0`` (Default: 1.205 kg/m^3).
     :return: The transmission loss ``TL``, in dB.
@@ -133,8 +172,18 @@ def mass_law_transmission_loss(
     ratio = np.pi * f * m2 / (rho0 * c0)
     tl = 10.0 * np.log10(1.0 + ratio**2)
     if incidence == "field":
-        tl = tl - field_incidence_correction(band)
+        tl = tl - _resolve_field_correction(band, field_correction)
     return np.asarray(tl, dtype=np.float64)
+
+
+def _resolve_field_correction(band: str, override: float | None) -> float:
+    """The field-incidence correction to subtract, in dB."""
+    if override is None:
+        return field_incidence_correction(band)
+    value = float(override)
+    if not np.isfinite(value) or value < 0.0:
+        raise ValueError("'field_correction' must be finite and non-negative.")
+    return value
 
 
 @dataclass(frozen=True)
@@ -153,6 +202,12 @@ class SoundReductionResult:
         :meth:`plot_geometry` can draw the section; ``None`` otherwise.
     :ivar mass2: Second-leaf surface density, in kg/m2, or ``None``.
     :ivar gap: Cavity depth, in metres, or ``None``.
+    :ivar plateau_height: Height of the coincidence plateau, in dB, or
+        ``None`` (only the plateau model sets these three).
+    :ivar plateau_start: Frequency of point A, where the mass-law line meets
+        the plateau, in hertz, or ``None``.
+    :ivar plateau_end: Frequency of point B, where the 10 dB/octave recovery
+        starts, in hertz, or ``None``.
     """
 
     frequencies: np.ndarray
@@ -163,6 +218,9 @@ class SoundReductionResult:
     mass1: float | None = None
     mass2: float | None = None
     gap: float | None = None
+    plateau_height: float | None = None
+    plateau_start: float | None = None
+    plateau_end: float | None = None
 
     @property
     def transmission_coefficient(self) -> np.ndarray:
@@ -238,6 +296,8 @@ def single_panel_transmission_loss(
     bending_stiffness: float | None = None,
     loss_factor: float = 0.01,
     band: str = "third",
+    coincidence_model: str = "sharp",
+    field_correction: float | None = None,
     speed_of_sound: float = _SPEED_OF_SOUND,
     air_density: float = _AIR_DENSITY,
 ) -> SoundReductionResult:
@@ -245,6 +305,24 @@ def single_panel_transmission_loss(
 
     Field-incidence mass law up to ``fc/2``, Eq. 7.44 from ``fc`` upwards, and a
     straight line in ``log10 f`` across the coincidence region between them.
+
+    With ``coincidence_model="cremer"`` the region above ``fc`` follows Cremer's
+    empirical relationship instead (Norton & Karczub Eq. 3.110),
+
+    ``TL = TL_0 + 10 lg(f/fc - 1) + 10 lg(eta) - 2 dB``,
+
+    which also rises at 10 dB per octave far above coincidence but starts from
+    the singularity at ``fc`` itself rather than from a finite value. Norton
+    pairs it with the field-incidence mass law below ``fc`` and treats the two
+    as the whole model, so there is no interpolated bridge: the mass law runs
+    all the way to ``fc``.
+
+    The empirical line is floored at ``TL = 0 dB``, which is where it lands at
+    ``f = fc``: Norton's Eq. (3.109) has ``theta_CO = 90 degrees`` there and the
+    panel "offers no resistance to incident sound waves", ``tau = 1``. It is
+    also the hard bound of a passive panel, so without the floor a band centre
+    landing on ``fc`` would report an arbitrarily large negative TL and a
+    transmission coefficient above one.
 
     Provide the coincidence frequency directly through *critical_frequency*, or
     let it be computed from *bending_stiffness* and *mass_per_area* through
@@ -257,21 +335,26 @@ def single_panel_transmission_loss(
         used to compute ``fc`` when *critical_frequency* is not given.
     :param loss_factor: Total loss factor ``eta`` (> 0, Default: 0.01).
     :param band: Band width for the field correction (``"third"``/``"octave"``).
+    :param coincidence_model: ``"sharp"`` (Default, Bies Eq. 7.44 above ``fc``
+        with the interpolated bridge from ``fc/2``) or ``"cremer"`` (Norton
+        Eq. 3.110, mass law right up to ``fc``).
+    :param field_correction: Explicit field-incidence correction of the mass-law
+        region, in dB (>= 0), overriding the band table (Default: ``None``;
+        Norton's Eq. 3.106 uses a flat 5 dB).
     :param speed_of_sound: Speed of sound in air ``c0`` (Default: 343 m/s).
     :param air_density: Air density ``rho0`` (Default: 1.205 kg/m^3).
-    :return: A :class:`SoundReductionResult` (model ``"sharp-single"``).
-    :raises ValueError: for a non-positive input, or if neither
-        *critical_frequency* nor *bending_stiffness* is given.
+    :return: A :class:`SoundReductionResult` (model ``"sharp-single"`` or
+        ``"cremer-single"``).
+    :raises ValueError: for a non-positive input, an unknown coincidence model,
+        or if neither *critical_frequency* nor *bending_stiffness* is given.
     """
+    model = require_choice(coincidence_model, "coincidence_model",
+                          ("sharp", "cremer"))
     m2 = require_positive(mass_per_area, "mass_per_area")
     eta = require_positive(loss_factor, "loss_factor")
     c0 = require_positive(speed_of_sound, "speed_of_sound")
     rho0 = require_positive(air_density, "air_density")
-    f = np.atleast_1d(np.asarray(frequency, dtype=np.float64))
-    if f.ndim != 1 or f.size == 0:
-        raise ValueError("'frequency' must be a non-empty 1-D array.")
-    if np.any(f <= 0.0):
-        raise ValueError(_FREQ_POSITIVE_MSG)
+    f = _band_axis(frequency)
     if critical_frequency is not None:
         fc = require_positive(critical_frequency, "critical_frequency")
     elif bending_stiffness is not None:
@@ -288,8 +371,32 @@ def single_panel_transmission_loss(
             speed_of_sound=c0, air_density=rho0,
         )
 
-    correction = field_incidence_correction(band)
+    correction = _resolve_field_correction(band, field_correction)
     tl = np.empty_like(f)
+    if model == "cremer":
+        # Norton Eqs. (3.104) below fc and (3.110) at and above it.
+        above = f >= fc
+        tl[~above] = _tl_normal(f[~above]) - correction
+        # Eq. (3.110) is singular at f = fc, where 10 lg(f/fc - 1) is -inf.
+        # Norton's own Eq. (3.109) covers that band: at the critical frequency
+        # theta_CO = 90 degrees and "the panel offers no resistance to incident
+        # sound waves", i.e. tau = 1 and TL = 0 dB. That is also the hard bound
+        # of a passive panel (tau <= 1), so the empirical line is floored there
+        # instead of running off to arbitrarily large negative values.
+        with np.errstate(divide="ignore"):
+            cremer = (
+                _tl_normal(f[above])
+                + 10.0 * np.log10(f[above] / fc - 1.0)
+                + 10.0 * np.log10(eta)
+                - 2.0
+            )
+        tl[above] = np.maximum(cremer, 0.0)
+        return SoundReductionResult(
+            frequencies=f,
+            transmission_loss=np.asarray(tl, dtype=np.float64),
+            model="cremer-single",
+            critical_frequency=fc,
+        )
     below = f <= 0.5 * fc
     above = f >= fc
     middle = ~below & ~above
@@ -313,6 +420,144 @@ def single_panel_transmission_loss(
         transmission_loss=np.asarray(tl, dtype=np.float64),
         model="sharp-single",
         critical_frequency=fc,
+    )
+
+
+def _resolve_plateau_panel(
+    material: str | None,
+    thickness_mm: float | None,
+    mass_per_area: float | None,
+    plateau_height: float | None,
+    frequency_ratio: float | None,
+) -> tuple[float, float, float]:
+    """The plateau construction's three numbers, from the table or explicit.
+
+    Returns ``(mass_per_area, plateau_height, frequency_ratio)``; an explicit
+    value always wins over the :data:`PLATEAU_MATERIALS` entry.
+
+    :raises ValueError: for an unknown material or an under-specified panel.
+    """
+    if material is not None:
+        key = require_choice(material, "material", tuple(PLATEAU_MATERIALS))
+        density_per_mm, table_height, table_ratio = PLATEAU_MATERIALS[key]
+        if mass_per_area is None:
+            if thickness_mm is None:
+                raise ValueError(
+                    "give 'thickness_mm' with 'material', or pass "
+                    "'mass_per_area' directly."
+                )
+            mass_per_area = density_per_mm * require_positive(
+                thickness_mm, "thickness_mm"
+            )
+        plateau_height = table_height if plateau_height is None else plateau_height
+        frequency_ratio = table_ratio if frequency_ratio is None else frequency_ratio
+    if mass_per_area is None or plateau_height is None or frequency_ratio is None:
+        raise ValueError(
+            "the plateau construction needs 'mass_per_area', 'plateau_height' "
+            "and 'frequency_ratio'; give a tabulated 'material' (with "
+            "'thickness_mm') or all three explicitly."
+        )
+    ratio = require_positive(frequency_ratio, "frequency_ratio")
+    if ratio <= 1.0:
+        raise ValueError("'frequency_ratio' must be greater than 1.")
+    return (
+        require_positive(mass_per_area, "mass_per_area"),
+        require_positive(plateau_height, "plateau_height"),
+        ratio,
+    )
+
+
+def plateau_transmission_loss(
+    frequency: ArrayLike,
+    *,
+    material: str | None = None,
+    thickness_mm: float | None = None,
+    mass_per_area: float | None = None,
+    plateau_height: float | None = None,
+    frequency_ratio: float | None = None,
+    field_correction: float = _NORTON_FIELD_CORRECTION,
+    speed_of_sound: float = _SPEED_OF_SOUND,
+    air_density: float = _AIR_DENSITY,
+) -> SoundReductionResult:
+    """Plateau-method estimate of a single panel's TL (Norton 3.9.1).
+
+    The plateau (Watters) construction is the empirical shortcut practitioners
+    draw by hand, and it approximates the whole curve from three numbers per
+    material (Norton & Karczub Table 3.1, tabulated in
+    :data:`PLATEAU_MATERIALS`):
+
+    1. the **field-incidence mass law** ``TL = 10 lg(1 + (pi f m''/rho0 c0)^2)
+       - 5`` (Eqs. 3.104/3.106), rising 6 dB per octave;
+    2. a horizontal **coincidence plateau** at the material's plateau height;
+       point **A** is where the mass-law line reaches it;
+    3. point **B** at ``frequency_ratio x fA``, above which the estimate
+       recovers at **10 dB per octave**.
+
+    Unlike the physical model of :func:`single_panel_transmission_loss` it
+    needs neither the bending stiffness nor the loss factor: the material's
+    tabulated plateau absorbs both. The price is that it is only an estimate,
+    and it assumes a diffuse field on both sides of a panel whose length and
+    width are at least twenty times its thickness.
+
+    Give a tabulated *material* with its *thickness_mm* (the surface density
+    then follows from the table), or give *mass_per_area* together with
+    *plateau_height* and *frequency_ratio*. An explicit *mass_per_area*,
+    *plateau_height* or *frequency_ratio* always overrides the table.
+
+    :param frequency: Band centre frequencies ``f``, in hertz (array, > 0).
+    :param material: Key into :data:`PLATEAU_MATERIALS` (Default: ``None``).
+    :param thickness_mm: Panel thickness, in **millimetres** (> 0), used with
+        *material* to get the surface density.
+    :param mass_per_area: Mass per unit area ``m''``, in kg/m^2 (> 0).
+    :param plateau_height: Coincidence plateau height, in dB (> 0).
+    :param frequency_ratio: Ratio ``B/A`` locating the 10 dB/octave recovery
+        (> 1).
+    :param field_correction: Field-incidence correction of the mass-law line,
+        in dB (Default: 5,0, Norton Eq. 3.106).
+    :param speed_of_sound: Speed of sound in air ``c0`` (Default: 343 m/s).
+    :param air_density: Air density ``rho0`` (Default: 1.205 kg/m^3).
+    :return: A :class:`SoundReductionResult` (model ``"plateau"``) carrying
+        :attr:`~SoundReductionResult.plateau_height`,
+        :attr:`~SoundReductionResult.plateau_start` (point A) and
+        :attr:`~SoundReductionResult.plateau_end` (point B).
+    :raises ValueError: for a non-positive input, an unknown material, or an
+        under-specified panel.
+    """
+    m2, height, ratio = _resolve_plateau_panel(
+        material, thickness_mm, mass_per_area, plateau_height, frequency_ratio
+    )
+    correction = _resolve_field_correction("third", field_correction)
+    c0 = require_positive(speed_of_sound, "speed_of_sound")
+    rho0 = require_positive(air_density, "air_density")
+    f = _band_axis(frequency)
+
+    # Point A: invert the field-incidence mass law at the plateau height,
+    # 10 lg(1 + (pi f m''/rho0 c0)^2) = height + correction.
+    target = 10.0 ** ((height + correction) / 10.0) - 1.0
+    if target <= 0.0:
+        raise ValueError(
+            "the plateau height sits below the mass law at every frequency; "
+            "check 'plateau_height' and 'field_correction'."
+        )
+    f_a = rho0 * c0 * math.sqrt(target) / (math.pi * m2)
+    f_b = ratio * f_a
+
+    tl = mass_law_transmission_loss(
+        f, m2, incidence="field", field_correction=correction,
+        speed_of_sound=c0, air_density=rho0,
+    )
+    on_plateau = (f >= f_a) & (f <= f_b)
+    above = f > f_b
+    tl[on_plateau] = height
+    # 10 dB per octave projected upwards from point B.
+    tl[above] = height + 10.0 * np.log2(f[above] / f_b)
+    return SoundReductionResult(
+        frequencies=f,
+        transmission_loss=np.asarray(tl, dtype=np.float64),
+        model="plateau",
+        plateau_height=height,
+        plateau_start=float(f_a),
+        plateau_end=float(f_b),
     )
 
 
@@ -402,11 +647,7 @@ def double_wall_transmission_loss(
     require_positive(loss_factor, "loss_factor")
     c0 = require_positive(speed_of_sound, "speed_of_sound")
     rho0 = require_positive(air_density, "air_density")
-    f = np.atleast_1d(np.asarray(frequency, dtype=np.float64))
-    if f.ndim != 1 or f.size == 0:
-        raise ValueError("'frequency' must be a non-empty 1-D array.")
-    if np.any(f <= 0.0):
-        raise ValueError(_FREQ_POSITIVE_MSG)
+    f = _band_axis(frequency)
 
     f0 = mass_spring_mass_resonance(
         m1, m2, d, cavity_medium=cavity_medium,
