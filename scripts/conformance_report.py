@@ -4110,14 +4110,61 @@ def _chk_sii_octave_importance_sum() -> Outcome:
     return numeric(ref.ANSIS3_5_OCTAVE_IMPORTANCE_SUM, total, 1e-9, places=6)
 
 
-@register(_SII, "ANSI S3.5-1997 Table 4", "Octave-band speech spectrum level at 1 kHz")
-def _chk_sii_octave_speech_1khz() -> Outcome:
-    proc = ph.sii_procedure("octave")
-    k = int(np.flatnonzero(np.isclose(proc.frequencies, 1000.0))[0])
-    return numeric(
-        ref.ANSIS3_5_OCTAVE_SPEECH_1KHZ, float(proc.speech_spectrum[k]), 1e-9,
-        unit="dB", places=2,
-    )
+@register(_SII, "ANSI S3.5-1997 Table 4", "Octave-band Ui and Xi equal Table 3's")
+def _chk_sii_octave_matches_table3() -> Outcome:
+    # Both are spectrum (per-hertz) levels, so Table 4 repeats Table 3's Ui and
+    # Xi at all six shared centre frequencies. Reported as the largest
+    # disagreement over the twelve cells.
+    octave = ph.sii_procedure("octave")
+    third = ph.sii_procedure("one-third-octave")
+    worst = 0.0
+    for fc, speech, noise in ref.ANSIS3_5_OCTAVE_TABLE4_SHARED:
+        k = int(np.flatnonzero(np.isclose(octave.frequencies, fc))[0])
+        j = int(np.flatnonzero(np.isclose(third.frequencies, fc))[0])
+        worst = max(
+            worst,
+            abs(float(octave.speech_spectrum[k]) - speech),
+            abs(float(octave.internal_noise[k]) - noise),
+            abs(float(octave.speech_spectrum[k]) - float(third.speech_spectrum[j])),
+            abs(float(octave.internal_noise[k]) - float(third.internal_noise[j])),
+        )
+    return numeric(0.0, worst, 1e-9, unit="dB", places=2)
+
+
+@register(_SII, "ANSI S3.5-1997 Table 1", "Critical-band table, all 21 rows")
+def _chk_sii_critical_table1() -> Outcome:
+    # Every cell of Table 1 as shipped: centre, both limits, Ii, Ui and Xi.
+    # Reported as the largest absolute disagreement over the 126 cells.
+    proc = ph.sii_procedure("critical-band")
+    worst = 0.0
+    for i, (fc, lo, hi, imp, speech, noise) in enumerate(
+        ref.ANSIS3_5_CRITICAL_TABLE1
+    ):
+        worst = max(
+            worst,
+            abs(float(proc.frequencies[i]) - fc),
+            abs(float(proc.band_edges[i]) - lo),
+            abs(float(proc.band_edges[i + 1]) - hi),
+            abs(float(proc.band_importance[i]) - imp),
+            abs(float(proc.speech_spectrum[i]) - speech),
+            abs(float(proc.internal_noise[i]) - noise),
+        )
+    return numeric(0.0, worst, 1e-9, places=4)
+
+
+@register(_SII, "ASA WG S3-79 SII.C (clause 6)", "Flat-input cases, all four procedures")
+def _chk_sii_flat_cases() -> Outcome:
+    # Flat speech/noise inputs that bring every band's Ui (loud regime) and Xi
+    # (quiet regime) into the chain, which the eight .TST cases leave inert.
+    # Reported as the largest deviation from the committee code over the twelve.
+    worst = 0.0
+    for method, _regime, speech, noise, committee in ref.ANSIS3_5_WG_FLAT_CASES:
+        n = ph.sii_procedure(method).frequencies.size
+        result = ph.hearing.sii.speech_intelligibility_index(
+            np.full(n, speech), np.full(n, noise), method=method
+        )
+        worst = max(worst, abs(result.sii - committee))
+    return numeric(0.0, worst, 1e-9, places=10)
 
 
 @register(_SII, "ANSI S3.5-1997 Table 3", "Loud-effort speech spectrum level at 1 kHz")

@@ -265,9 +265,15 @@ class _BandProcedure:
     :ivar band_importance: Band-importance function ``Ii``.
     :ivar internal_noise: Reference internal noise spectrum level ``Xi``.
     :ivar speech_spectrum: Standard speech spectrum level ``Ui``, normal effort.
-    :ivar bandwidth_db: ``10 log10(Wi)`` with ``Wi`` the band width in hertz,
-        the level-independent part of the masking slope ``Ci`` (clause 5.4),
-        or ``None`` when the procedure has no spread of masking.
+    :ivar bandwidth_db: The level-independent part of the masking slope ``Ci``
+        (clause 5.4), or ``None`` when the procedure has no spread of masking.
+        Together with :attr:`bandwidth_offset_db` it is ``10 log10(Wi)``, split
+        exactly as the standard prints the slope for that procedure; see
+        :func:`_equivalent_masking` for why the split is kept.
+    :ivar bandwidth_offset_db: Constant subtracted from ``Bi + bandwidth_db``
+        inside the slope, in decibels: the printed ``6.353`` of the
+        one-third-octave form, and ``0.0`` for the procedures whose slope is
+        printed directly in terms of the band width.
     :ivar spread_decades: ``log10(Fi / Fk_upper)``, the frequency separation
         that the masking slope is applied over, as a lower-triangular matrix
         indexed ``[i, k]``, or ``None`` when there is no spread of masking.
@@ -280,6 +286,7 @@ class _BandProcedure:
     internal_noise: np.ndarray
     speech_spectrum: np.ndarray
     bandwidth_db: np.ndarray | None
+    bandwidth_offset_db: float
     spread_decades: np.ndarray | None
 
 
@@ -308,10 +315,19 @@ def _third_octave_geometry() -> tuple[np.ndarray, np.ndarray]:
     ``0.89 fi / fk`` (the upper limit of band ``k`` is ``2**(1/6) fk``). The
     printed constants are used as printed, so the procedure reproduces the
     standard's own worked examples digit for digit.
+
+    The ``6.353`` is deliberately *not* folded into the returned array. The
+    standard prints this slope as ``-80 + 0.6 (Bi + 10 lg fi - 6.353)``, which
+    evaluates as ``(Bi + 10 lg fi) - 6.353``; folding the constant in first
+    would evaluate ``Bi + (10 lg fi - 6.353)`` instead, and floating-point
+    addition is not associative. The two differ in the last bits, so the fold
+    would silently shift a shipped, released quantity. It is returned as the
+    procedure's ``bandwidth_offset_db`` and subtracted after the addition.
     """
     f = BAND_CENTERS
-    bandwidth_db = 10.0 * np.log10(f) - 6.353
-    return bandwidth_db, np.log10(0.89 * f[:, np.newaxis] / f[np.newaxis, :])
+    return 10.0 * np.log10(f), np.log10(
+        0.89 * f[:, np.newaxis] / f[np.newaxis, :]
+    )
 
 
 def _build_procedures() -> dict[str, _BandProcedure]:
@@ -330,6 +346,7 @@ def _build_procedures() -> dict[str, _BandProcedure]:
             internal_noise=_CRITICAL_INTERNAL_NOISE,
             speech_spectrum=_CRITICAL_SPEECH_NORMAL,
             bandwidth_db=critical_bandwidth_db,
+            bandwidth_offset_db=0.0,
             spread_decades=critical_spread,
         ),
         "equally-contributing": _BandProcedure(
@@ -340,6 +357,7 @@ def _build_procedures() -> dict[str, _BandProcedure]:
             internal_noise=_CRITICAL_INTERNAL_NOISE[_EQUAL_SPAN],
             speech_spectrum=_CRITICAL_SPEECH_NORMAL[_EQUAL_SPAN],
             bandwidth_db=equal_bandwidth_db,
+            bandwidth_offset_db=0.0,
             spread_decades=equal_spread,
         ),
         "one-third-octave": _BandProcedure(
@@ -355,6 +373,7 @@ def _build_procedures() -> dict[str, _BandProcedure]:
             internal_noise=REFERENCE_INTERNAL_NOISE,
             speech_spectrum=_SPEECH_NORMAL,
             bandwidth_db=third_bandwidth_db,
+            bandwidth_offset_db=6.353,
             spread_decades=third_spread,
         ),
         "octave": _BandProcedure(
@@ -369,6 +388,7 @@ def _build_procedures() -> dict[str, _BandProcedure]:
             # the equivalent masking spectrum level is the equivalent noise
             # spectrum level itself.
             bandwidth_db=None,
+            bandwidth_offset_db=0.0,
             spread_decades=None,
         ),
     }
@@ -592,11 +612,14 @@ def _as_band_vector(
     expected = proc.band_importance.size
     arr = np.atleast_1d(np.asarray(values, dtype=np.float64))
     if arr.ndim != 1 or arr.size != expected:
-        edges = proc.band_edges
+        # The nominal centre frequencies, not the band limits: for the
+        # one-third-octave procedure the limits are the computed 2**(-+1/6) fi,
+        # and "142.544 Hz - 8979.7 Hz" is a worse hint than "160 Hz - 8000 Hz".
+        centres = proc.frequencies
         raise ValueError(
             f"{name!r} must be a 1-D vector of {expected} "
             f"{proc.method} band values "
-            f"({edges[0]:g} Hz - {edges[-1]:g} Hz); got shape {arr.shape}."
+            f"({centres[0]:g} Hz - {centres[-1]:g} Hz); got shape {arr.shape}."
         )
     return arr
 
@@ -612,11 +635,22 @@ def _equivalent_masking(
     of the masked band. The octave-band procedure carries no spread of masking,
     so its equivalent masking spectrum level is the equivalent noise spectrum
     level itself.
+
+    The slope is summed in the order the standard prints it for the procedure
+    at hand: ``(Bi + 10 lg fi) - 6.353`` for the one-third-octave form, and
+    ``Bi + 10 lg Wi`` for the band-limit form, whose offset is ``0.0`` and
+    whose subtraction is therefore exact. Floating-point addition is not
+    associative, so summing in any other order shifts the result by a few
+    units in the last place. That matters here beyond tidiness: this is the
+    library's shipped SII, it feeds a report fiche, and a released quantity
+    should not drift in its last bits because the code was refactored.
     """
     bandwidth_db, spread_decades = procedure.bandwidth_db, procedure.spread_decades
     if bandwidth_db is None or spread_decades is None:
         return noise.copy()
-    slope = -80.0 + 0.6 * (self_masked + bandwidth_db)
+    slope = -80.0 + 0.6 * (
+        self_masked + bandwidth_db - procedure.bandwidth_offset_db
+    )
     masking = np.empty(noise.size, dtype=np.float64)
     masking[0] = self_masked[0]
     for i in range(1, noise.size):
@@ -632,10 +666,11 @@ def _procedure_speech_spectrum(
 ) -> np.ndarray:
     """Standard speech spectrum level ``Ui`` of a procedure, by vocal effort.
 
-    Tables 1, 2 and 4 are carried for normal vocal effort only, which is the
-    column the level-distortion factor of clause 5.7 needs; the four
-    vocal-effort spectra of Table 3 are available on the one-third-octave
-    procedure through :func:`standard_speech_spectrum`.
+    Tables 1, 2 and 4 print all four vocal-effort columns in the standard, but
+    only their normal-effort column is carried here, which is the one the
+    level-distortion factor of clause 5.7 needs; the four vocal-effort spectra
+    of Table 3 are available on the one-third-octave procedure through
+    :func:`standard_speech_spectrum`.
     """
     if procedure.method == "one-third-octave":
         return standard_speech_spectrum(vocal_effort)
@@ -645,7 +680,7 @@ def _procedure_speech_spectrum(
         raise ValueError(
             f"The {procedure.method!r} procedure carries the standard speech "
             f"spectrum for normal vocal effort only; {vocal_effort!r} is "
-            "tabulated for the one-third-octave procedure. Pass an explicit "
+            "carried for the one-third-octave procedure. Pass an explicit "
             "equivalent speech spectrum level instead."
         )
     raise ValueError(

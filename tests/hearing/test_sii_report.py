@@ -207,6 +207,60 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
 # --- rendering contract --------------------------------------------------------
 
 
+@pytest.mark.parametrize(
+    ("method", "basis", "caption"),
+    [
+        ("critical-band", "critical-band method", "Critical band audibility"),
+        ("equally-contributing", "equally-contributing critical-band method",
+         "Equally-contributing critical band audibility"),
+        ("octave", "octave-band method", "Octave band audibility"),
+    ],
+)
+def test_non_default_procedure_fiche_names_its_procedure(
+    tmp_path, method: str, basis: str, caption: str
+) -> None:
+    """A fiche for a non-default procedure names it and tables its own bands.
+
+    The guide claims the fiche follows whichever of the four band procedures
+    produced the result; without this the claim rested on the default alone.
+    """
+    pytest.importorskip("reportlab")
+    pytest.importorskip("matplotlib")
+    from phonometry.hearing import sii_procedure
+
+    proc = sii_procedure(method)
+    n = proc.frequencies.size
+    res = speech_intelligibility_index(
+        "normal", np.full(n, 25.0), method=method
+    )
+    out = tmp_path / f"sii_{method}.pdf"
+    res.report(str(out))
+    _assert_one_page(str(out))
+    text = _extract_text(str(out))
+    assert basis in text
+    assert caption in text
+    # The band column carries this procedure's own centre frequencies, not the
+    # one-third-octave ones: check the lowest and highest, which are unique to
+    # each table.
+    assert f"{round(proc.frequencies[0])}" in text
+    assert f"{round(proc.frequencies[-1])}" in text
+
+
+def test_non_default_procedure_fiche_renders_in_spanish(tmp_path) -> None:
+    """The Spanish fiche translates the procedure name in the basis line."""
+    pytest.importorskip("reportlab")
+    pytest.importorskip("matplotlib")
+    res = speech_intelligibility_index(
+        "normal", np.full(6, 25.0), method="octave"
+    )
+    out = tmp_path / "sii_octave_es.pdf"
+    res.report(str(out), language="es")
+    _assert_one_page(str(out))
+    text = _extract_text(str(out))
+    assert "método de bandas de octava" in text
+    assert "Audibilidad por bandas de octava" in text
+
+
 def test_unknown_engine_rejected(tmp_path) -> None:
     """An unknown rendering engine raises ValueError."""
     res = _example_c2()

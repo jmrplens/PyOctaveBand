@@ -15,7 +15,7 @@
 
 ## Numerical conformance report
 
-&#9989; **499/499 conformance checks pass** across 55 domains and 338 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+&#9989; **501/501 conformance checks pass** across 55 domains and 338 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
 
@@ -367,7 +367,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary>&#9989; <b>Speech intelligibility (ANSI S3.5-1997)</b>: 100% (22/22)</summary>
+<summary>&#9989; <b>Speech intelligibility (ANSI S3.5-1997)</b>: 100% (24/24)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
@@ -391,7 +391,9 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ANSI S3.5-1997 Table 1 | Critical-band importance normalisation | 1 (+/-0) | 1 | 0 | &#9989; |
 | ANSI S3.5-1997 Table 2 | Equally-contributing importance, 17 x 0.0588 | 0.9996 (+/-0) | 0.9996 | 0 | &#9989; |
 | ANSI S3.5-1997 Table 4 | Octave-band importance normalisation | 1 (+/-0) | 1 | 0 | &#9989; |
-| ANSI S3.5-1997 Table 4 | Octave-band speech spectrum level at 1 kHz | 25.01 dB (+/-0 dB) | 25.01 dB | 0 dB | &#9989; |
+| ANSI S3.5-1997 Table 4 | Octave-band Ui and Xi equal Table 3's | 0 dB (+/-0 dB) | 0 dB | 0 dB | &#9989; |
+| ANSI S3.5-1997 Table 1 | Critical-band table, all 21 rows | 0 (+/-0) | 0 | 0 | &#9989; |
+| ASA WG S3-79 SII.C (clause 6) | Flat-input cases, all four procedures | 0 (+/-0.000000001) | 0.0000000001 | 0 | &#9989; |
 | ANSI S3.5-1997 Table 3 | Loud-effort speech spectrum level at 1 kHz | 42.16 dB (+/-0 dB) | 42.16 dB | 0 dB | &#9989; |
 
 </details>
