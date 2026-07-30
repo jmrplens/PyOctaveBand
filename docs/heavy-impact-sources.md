@@ -76,16 +76,33 @@ check.plot()   # measured LFE over the tolerance band (needs matplotlib)
 
 `impact_force_exposure_level` evaluates Formula (A.1) directly from a sampled
 force record, which is what the JIS A 1418-2 Annex C calibration procedure
-measures with a force plate:
+measures with a force plate. The specification is stated **per octave band**,
+and Annex C puts the filter between the transducer and the analyser, so the
+record is band-filtered first and the formula is applied once per band: an
+unfiltered pulse returns the broadband level, which is several decibels above
+any single band value and must not be compared with the table above.
 
 ```python
 import numpy as np
-from phonometry import impact_force_exposure_level
+from phonometry import OctaveFilterBank, impact_force_exposure_level
 
-fs = 200_000.0
+fs = 48_000
 t = np.arange(0.0, 0.020, 1.0 / fs)          # the 20 ms contact time
 force = 1500.0 * np.sin(np.pi * t / 0.020)   # a single-peak half-sine pulse
-print(round(impact_force_exposure_level(force, fs), 2))   # 10 lg(Fp^2 t / 2)
+
+# Broadband, i.e. the whole pulse energy: 10 lg(Fp^2 t / 2) = 43.5 dB.
+# Not a band value, and not comparable with the table above.
+print(round(impact_force_exposure_level(force, fs), 2))
+
+# The five octave-band values the specification is actually written in.
+bank = OctaveFilterBank(fs, fraction=1, limits=[31.5, 500.0])
+_, freqs, bands = bank.filter(force, sigbands=True, calculate_level=False)
+lfe = [impact_force_exposure_level(b, fs) for b in bands]
+print([round(v, 1) for v in lfe])   # [-1.4, 14.0, 22.1, 20.2, 17.1]
+
+# Those five go to the conformance check; this synthetic half-sine is not a
+# rubber ball, so it does not conform:
+#   check_heavy_impact_source(lfe).passed  ->  False
 ```
 
 The construction examples the two standards give are informative, not

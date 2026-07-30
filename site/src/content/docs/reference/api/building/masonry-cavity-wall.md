@@ -52,19 +52,27 @@ eta_ij = N / (omega m_i) * Re{Yj} / |Yi + Yj + Yc|**2
 The plate area cancels (`N/m_i = n/rho_s1` with `n` ties per m2), so
 [`wall_tie_coupling_loss_factor`](/phonometry/reference/api/building/masonry-cavity-wall/#wall_tie_coupling_loss_factor) needs only the tie density. A rigid
 connection (screw, nail, bolt, or a tie so stiff it never yields) is the limit
-`Yc = 0`; a resilient tie rolls the coupling off as `1/f**2` once
-`|Yc|` overtakes the plate mobilities, which is exactly why a butterfly tie
-at 1,7 MN/m and a vertical-twist tie at 94 MN/m behave so differently.
+`Yc = 0`, where the only frequency dependence left is the `1/omega` and
+`eta_ij` falls as `1/f`. Once `|Yc| = omega/k` overtakes the plate
+mobilities a resilient tie adds two more powers, so `eta_ij` falls as
+`1/f**3` and the *ratio* to the rigid ceiling as `1/f**2`. That is exactly
+why a butterfly tie at 1,7 MN/m and a vertical-twist tie at 94 MN/m behave so
+differently: the soft one enters that regime inside the building acoustics
+range, the stiff one stays on the rigid ceiling for another two octaves.
 
 :::note
-The *inputs* of this model are printed data: Table A4 here, corroborated by
-Hopkins, Wilson & Craik (1999) Table 1 (50 mm cavity) and Craik & Wilson
-(1995) Table 1 (85 mm cavity). The *output* is not: every published sound
-reduction index of a bridged masonry cavity wall is a figure, so the
-per-band transmission-loss penalty from wall ties has no printed numeric
-oracle. The resonance shift does: Hopkins Fig. 4.35 prints
-`fmsm = 26 Hz` without ties and `fmsm = 50 Hz` with them for the same
-wall.
+The *inputs* of this model are printed data: Table A4 here, confirmed
+value for value by Hopkins, Wilson & Craik (1999) Table 1, which prints the
+same 1,7 / 16,1 / 94,0 MN/m at a 50 mm cavity. Craik & Wilson (1995)
+Table 1 measures the same *tie types* at an 85 mm cavity and reports
+1,1 and 4,3 MN/m for the butterfly and double-triangle ties, so it
+corroborates the ordering and the order of magnitude but not the values;
+the dynamic stiffness is defined at a given cavity width and changes with
+it. The *output* is not printed anywhere: every published sound reduction
+index of a bridged masonry cavity wall is a figure, so the per-band
+transmission-loss penalty from wall ties has no numeric oracle. The
+resonance shift does: Hopkins Fig. 4.35 prints `fmsm = 26 Hz` without ties
+and `fmsm = 50 Hz` with them for the same wall.
 :::
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.

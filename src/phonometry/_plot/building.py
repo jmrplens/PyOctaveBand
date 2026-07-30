@@ -174,9 +174,9 @@ _STRINGS: dict[str, str] = {
         "Índice de impacto pesado ISO 717-2 Anexo D",
     "one-third octave": "tercio de octava",
     "octave": "octava",
-    "Normalized ceiling attenuation": "Atenuación normalizada del techo",
+    "Normalized ceiling attenuation": "Diferencia de niveles normalizada del techo",
     "Normalized ceiling attenuation $D_{n,c}$ [dB]":
-        "Atenuación normalizada del techo $D_{n,c}$ [dB]",
+        "Diferencia de niveles normalizada del techo $D_{n,c}$ [dB]",
     "$R_S + R_R$ (two ceilings)": "$R_S + R_R$ (dos techos)",
     "$R_{cl}$ (ceiling/plenum path)": "$R_{cl}$ (trayecto techo/plenum)",
     "plenum penalty": "penalización del plenum",

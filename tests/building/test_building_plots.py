@@ -22,7 +22,7 @@ import phonometry as ph
 
 # ISO 717-2:2020 Table D.4, the octave-band field measurement.
 _TABLE_D4 = (65.3, 64.5, 58.0, 55.8)
-# ALA 16-091-5 (2016), tested to ASTM E1414/E1414M-11a: CAC 34.
+# ALA 16-091-4 (2016), tested to ASTM E1414/E1414M-11a: CAC 34.
 _ALA_DNC = (
     14.4, 18.6, 21.7, 24.1, 23.4, 30.3, 33.7, 35.2,
     41.6, 44.2, 42.1, 36.8, 35.7, 36.0, 36.9, 37.9,

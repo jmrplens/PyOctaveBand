@@ -12,10 +12,12 @@ Oracles, with the source reference in each test docstring:
 * **ISO 140-9:1985 clause 3.3** for the ``Dn,c`` normalization and its
   ``A0 = 10 m2``; ASTM E1414 uses ``A0 = 12 m2``.
 * **Vigran (2008) Section 9.2.3** Eqs. (9.13), (9.18), (9.19) and (9.20) for
-  the one-dimensional plenum model, whose only anchors are closed-form: the
-  printed geometry of Figs. 9.11 to 9.13 and the convergence of Eq. (9.18) to
-  Eq. (9.20) as the plenum attenuation vanishes. The model has no published
-  numeric output, so no per-band regression is possible.
+  the one-dimensional plenum model. It has no published numeric output, so the
+  anchors are closed-form and structural: the printed geometry of Figs. 9.11 to
+  9.13, monotonicity in the plenum damping, the bound ``tau_cl <= 1``, the size
+  of the Eq. (9.17) leakage term at a realistic ceiling, and the convergence of
+  Eq. (9.18) to Eq. (9.20). Vigran's Eq. (9.18) misprints the receiving-side
+  coefficient in its denominator; see ``docs/ERRATA.md``.
 """
 
 from __future__ import annotations
@@ -43,7 +45,7 @@ E413_BANDS = (
 )
 E413_CONTOUR = (-16, -13, -10, -7, -4, -1, 0, 1, 2, 3, 4, 4, 4, 4, 4, 4)
 
-#: Acoustic Laboratories Australia, report ALA 16-091-5 (16 April 2016),
+#: Acoustic Laboratories Australia, report ALA 16-091-4 (26 April 2016),
 #: "Airborne sound attenuation between rooms sharing a common ceiling plenum",
 #: tested to ASTM E1414/E1414M-11a: a 600 x 600 x 28 mm perforated plaster
 #: acoustic tile with 25 mm glasswool, in a Rondo Duo T-bar grid. Table 1 of the
@@ -119,7 +121,7 @@ def test_reference_contour_shape() -> None:
 
 
 def test_ala_2016_report_rates_to_its_printed_cac() -> None:
-    """ALA 16-091-5: the printed Dn,c spectrum rates to the printed CAC 34."""
+    """ALA 16-091-4: the printed Dn,c spectrum rates to the printed CAC 34."""
     res = ceiling_attenuation_class(ALA_2016_DNC)
     assert res.rating == ALA_2016_CAC
     assert res.deficiency_sum <= 32.0
@@ -127,7 +129,7 @@ def test_ala_2016_report_rates_to_its_printed_cac() -> None:
 
 
 def test_ala_2016_printed_deficiency_column_pins_the_contour() -> None:
-    """ALA 16-091-5 data sheet: the deficiency column at CAC 34, total 27,5 dB.
+    """ALA 16-091-4 data sheet: the deficiency column at CAC 34, total 27,5 dB.
 
     The report tabulates its deficiencies from the unrounded Dn,c (ASTM E413-22
     clause 5.2 rounds to integers before fitting), so this checks the contour

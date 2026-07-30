@@ -22,10 +22,14 @@ octave-band energy of its force pulse::
     LFE = 10 lg[ (1/Tref) integral_t1^t2 F(t)**2 / F0**2 dt ]   dB re 1 N
 
 with ``F0 = 1 N``, ``Tref = 1 s`` and ``t2 - t1`` the duration of the impact
-force. :func:`impact_force_exposure_level` evaluates it from a sampled force
-waveform; :func:`heavy_impact_source_limits` returns the printed
-octave-band tolerance table and :func:`check_heavy_impact_source` verifies a
-measured source against it.
+force. The specification is stated **per octave band**, so the force record is
+band-filtered before the integral (JIS A 1418-2:2019 Annex C puts the filter
+between the force transducer and the analyser).
+:func:`impact_force_exposure_level` evaluates the integral over whatever record
+it is given, i.e. one band at a time;
+:func:`heavy_impact_source_limits` returns the printed octave-band tolerance
+table and :func:`check_heavy_impact_source` verifies the five band results
+against it.
 
 The two source specifications are printed identically in ISO 16283-2:2020
 Table A.1 and ISO 10140-5:2010 Table F.1 (rubber ball), and in
@@ -174,9 +178,15 @@ _G_SINGULARITY = 1e-6
 class HeavyImpactSourceSpec:
     """Printed specification of a standard heavy and soft impact source.
 
-    The mechanical figures are those of the *example of construction* clauses,
-    which are informative in ISO 16283-2 (A.2.2) and in JIS A 1418-2 (Annex B);
-    the force exposure levels and the impact duration are normative.
+    Annex A is normative in both standards, and the drop height belongs to its
+    requirements clause (ISO 16283-2 A.2.1: dropped in free fall from
+    ``(100 +/- 1) cm`` measured from the bottom of the ball), as do the force
+    exposure levels and the ``20 +/- 2 ms`` single-peak impact duration
+    (JIS A 1418-2 A.2 b)). The remaining mechanical figures, the effective mass,
+    the coefficient of restitution and the ball geometry, come from the
+    *example of construction* clauses, which are informative
+    (ISO 16283-2 A.2.2, JIS A 1418-2 Annex B): a source that meets the printed
+    spectrum by other means still conforms.
 
     :ivar name: ``"rubber_ball"`` or ``"bang_machine"``.
     :ivar frequencies: Octave-band centre frequencies, in Hz.
@@ -299,6 +309,20 @@ def impact_force_exposure_level(
     (ISO 16283-2:2020 Formula (A.1) = ISO 10140-5:2010 Formula (F.2) =
     JIS A 1418-2:2019 Formula (1)). The integral is taken over the whole
     supplied record with the trapezoidal rule, so pass one isolated impact.
+
+    .. important::
+
+       The specification tables are **per octave band**: JIS A 1418-2:2019
+       Annex C measures the force with a band filter between the force
+       transducer and the analyser, and ISO 16283-2 Table A.1 tabulates one
+       ``LFE`` for each of the five octaves. This function integrates whatever
+       record it is given, so feeding it an unfiltered pulse returns the
+       *broadband* level, which is several decibels above any single band value
+       and must not be compared with the table. Band-filter the force record
+       first (for example with
+       :class:`~phonometry.metrology.core.OctaveFilterBank`) and call this once
+       per band, then hand the five results to
+       :func:`check_heavy_impact_source`.
 
     :param force: Sampled instantaneous force ``F(t)``, in newtons (1-D).
     :param sample_rate: Sampling rate of *force*, in hertz (> 0).

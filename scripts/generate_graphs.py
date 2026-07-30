@@ -448,7 +448,7 @@ _ES_EXACT = {
     "Ceiling attenuation class\n(ASTM E1414/E413, CAC = 34 dB)":
         "Clase de atenuación de techo\n(ASTM E1414/E413, CAC = 34 dB)",
     "Normalized ceiling attenuation Dn,c [dB]":
-        "Atenuación normalizada del techo Dn,c [dB]",
+        "Diferencia de niveles normalizada del techo Dn,c [dB]",
     "Dn,c (measured)": "Dn,c (medido)",
     "ASTM E413 contour, fitted": "curva ASTM E413 ajustada",
     "deficiencies": "deficiencias",
@@ -7294,7 +7294,7 @@ def generate_ceiling_plenum_flanking(output_dir: str) -> None:
     ax_path.set_axisbelow(True)
     ax_path.legend(loc="upper left", fontsize=9)
 
-    # ALA 16-091-5 (2016), tested to ASTM E1414/E1414M-11a: CAC 34.
+    # ALA 16-091-4 (2016), tested to ASTM E1414/E1414M-11a: CAC 34.
     dnc = np.array([14.4, 18.6, 21.7, 24.1, 23.4, 30.3, 33.7, 35.2,
                     41.6, 44.2, 42.1, 36.8, 35.7, 36.0, 36.9, 37.9])
     cac = ceiling_attenuation_class(dnc)

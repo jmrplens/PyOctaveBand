@@ -58,7 +58,7 @@ está en
 [Medición del aislamiento en obra (ISO 16283)](/phonometry/es/guides/insulation-field/)
 y [Medición del aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/heavy_impact_sources.svg" alt="Dos paneles: los niveles de exposición a la fuerza de impacto por bandas de octava de la pelota de caucho y de la máquina de neumático con sus bandas de tolerancia impresas de 31,5 Hz a 500 Hz, y la valoración del Anexo D de ISO 717-2 de una medición en obra con los niveles de octava medidos, sus contribuciones ponderadas A y el número único resultante" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/heavy_impact_sources_es.svg" alt="Dos paneles: los niveles de exposición a la fuerza de impacto por bandas de octava de la pelota de caucho y de la máquina de neumático con sus bandas de tolerancia impresas de 31,5 Hz a 500 Hz, y la valoración del Anexo D de ISO 717-2 de una medición en obra con los niveles de octava medidos, sus contribuciones ponderadas A y el número único resultante" width="92%" />
 
 *Izquierda: las dos especificaciones son espectros puros de fuerza, no de
 geometría. Derecha: la valoración suma en energía las contribuciones
@@ -117,16 +117,35 @@ check.plot()   # LFE medido sobre la banda de tolerancia (requiere matplotlib)
 
 `impact_force_exposure_level` evalúa la Fórmula (A.1) directamente desde un
 registro muestreado de fuerza, que es lo que mide el procedimiento de
-calibración del Anexo C de JIS A 1418-2 con una plataforma de fuerza:
+calibración del Anexo C de JIS A 1418-2 con una plataforma de fuerza. La
+especificación está dada **por bandas de octava**, y el Anexo C sitúa el filtro
+entre el transductor y el analizador, así que el registro se filtra por bandas
+primero y la fórmula se aplica una vez por banda: un impulso sin filtrar
+devuelve el nivel de banda ancha, que queda varios decibelios por encima de
+cualquier valor por banda y no debe compararse con la tabla anterior.
 
 ```python
 import numpy as np
-from phonometry import impact_force_exposure_level
+from phonometry import OctaveFilterBank, impact_force_exposure_level
 
-fs = 200_000.0
+fs = 48_000
 t = np.arange(0.0, 0.020, 1.0 / fs)          # el tiempo de contacto de 20 ms
 force = 1500.0 * np.sin(np.pi * t / 0.020)   # un impulso semisenoidal de pico único
-print(round(impact_force_exposure_level(force, fs), 2))   # 10 lg(Fp^2 t / 2)
+
+# Banda ancha, la energía del impulso completo: 10 lg(Fp^2 t / 2) = 43,5 dB.
+# No es un valor por banda ni es comparable con la tabla anterior.
+print(round(impact_force_exposure_level(force, fs), 2))
+
+# Los cinco valores por banda de octava en los que sí está escrita la
+# especificación.
+bank = OctaveFilterBank(fs, fraction=1, limits=[31.5, 500.0])
+_, freqs, bands = bank.filter(force, sigbands=True, calculate_level=False)
+lfe = [impact_force_exposure_level(b, fs) for b in bands]
+print([round(v, 1) for v in lfe])   # [-1.4, 14.0, 22.1, 20.2, 17.1]
+
+# Esos cinco van a la comprobación de conformidad; este semiseno sintético no
+# es una pelota de caucho, así que no cumple:
+#   check_heavy_impact_source(lfe).passed  ->  False
 ```
 
 Los ejemplos de construcción que dan las dos normas son informativos, no

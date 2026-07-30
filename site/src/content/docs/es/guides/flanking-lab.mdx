@@ -43,7 +43,7 @@ references:
     title: "Acoustics — Measurement of sound insulation in buildings and of building elements — Part 9: Laboratory measurement of room-to-room airborne sound insulation of a suspended ceiling with a plenum above it"
     designation: "ISO 140-9:1985"
     url: "https://www.iso.org/standard/3944.html"
-    note: "El apartado 3.3 define la atenuación normalizada del techo Dn,c con A0 = 10 m2, y los apartados de instalación fijan la profundidad del plenum, los volúmenes de los recintos y la absorción exigida al revestimiento."
+    note: "El apartado 3.3 define la diferencia de niveles normalizada del techo suspendido Dn,c con A0 = 10 m2, y los apartados de instalación fijan la profundidad del plenum, los volúmenes de los recintos y la absorción exigida al revestimiento."
   - type: standard
     organization: "ASTM International"
     year: 2022
@@ -231,7 +231,7 @@ tabique y vuelve a bajar a través de las placas del recinto receptor. Ese
 trayecto suele ser el eslabón más débil de una distribución de oficinas, y no
 es lo que describe el $R_w$ de un tabique.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ceiling_plenum_flanking_es.svg" alt="Dos paneles: el índice de reducción del trayecto techo-plenum Rcl por bandas de octava para dos profundidades de plenum frente a la suma de los índices de los dos techos, y la atenuación normalizada del techo de un informe de ensayo acreditado ASTM E1414 con la curva ASTM E413 ajustada y sus deficiencias sombreadas dando CAC 34" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ceiling_plenum_flanking_es.svg" alt="Dos paneles: el índice de reducción del trayecto techo-plenum Rcl por bandas de octava para dos profundidades de plenum frente a la suma de los índices de los dos techos, y la diferencia de niveles normalizada del techo de un informe de ensayo acreditado ASTM E1414 con la curva ASTM E413 ajustada y sus deficiencias sombreadas dando CAC 34" width="92%" />
 
 *Izquierda: el plenum cobra una penalización fija frente a la suma de los dos
 techos, y un plenum más profundo devuelve parte de ella. Derecha: la misma
@@ -291,7 +291,7 @@ print(partition_referenced_reduction_index(res.reduction_index, 2.7, 4.75))
 ```
 
 **La magnitud medida.** Un techo no se valora por $R_{cl}$ sino por la
-**atenuación normalizada del techo** $D_{n,c} = D - 10\lg(A/A_0)$
+**diferencia de niveles normalizada del techo suspendido** $D_{n,c} = D - 10\lg(A/A_0)$
 (ISO 140-9:1985, apartado 3.3), con $A$ el área de absorción acústica
 equivalente del recinto receptor y la referencia $A_0 = 10\ \text{m}^2$. La
 instalación tiene dos recintos de al menos 50 m³ cuyos volúmenes difieren en al

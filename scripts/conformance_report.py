@@ -2441,7 +2441,7 @@ def _chk_iso16283_2_standardization_identity() -> Outcome:
 
 
 # --- Suspended-ceiling plenum flanking (ASTM E1414/E413, ISO 140-9, Vigran) ---
-#: Acoustic Laboratories Australia report ALA 16-091-5 (2016), tested to
+#: Acoustic Laboratories Australia report ALA 16-091-4 (2016), tested to
 #: ASTM E1414/E1414M-11a: the printed one-third-octave Dn,c of a 28 mm plaster
 #: acoustic tile, 125 Hz to 4 kHz, rated CAC 34 in the report.
 _ALA_DNC = (
@@ -2467,7 +2467,7 @@ def _chk_astm_e413_cac() -> Outcome:
         and abs(intertek.deficiency_sum - 24.0) < 1e-9
     )
     return Outcome(
-        expected="CAC 34 (ALA 16-091-5); CAC 25, sum 24 dB (Intertek J7488.04)",
+        expected="CAC 34 (ALA 16-091-4); CAC 25, sum 24 dB (Intertek J7488.04)",
         computed=(
             f"CAC {ala.rating}; CAC {intertek.rating}, "
             f"sum {intertek.deficiency_sum:.1f} dB"
@@ -2489,15 +2489,29 @@ def _chk_iso140_9_normalization() -> Outcome:
 
 @register(
     "Room & building acoustics",
-    "Vigran (2008) Eq. (9.20)",
-    "Suspended-ceiling plenum penalty 10 lg(eps^2 LR/4h), LR = 4,75 m, h = 0,43 m",
+    "Vigran (2008) Eqs. (9.18)-(9.20)",
+    "Plenum model: Eq. (9.18) converges to Eq. (9.20) as the damping vanishes",
 )
-def _chk_vigran_plenum_penalty() -> Outcome:
-    res = ph.plenum_flanking_reduction_index(
-        [30.0], [30.0], ceiling_length=4.75, plenum_height=0.43
+def _chk_vigran_plenum_convergence() -> Outcome:
+    # Vigran prints the geometry of his own example (LS = LR = 4,75 m,
+    # h = 0,43 m, eps = 2) but no numeric output anywhere in Section 9.2.3, so
+    # the check is structural rather than a transcribed value: the full
+    # attenuated form of Eq. (9.18) has to reproduce its own small-attenuation
+    # limit, Eq. (9.20). That fails outright on the printed reading of the
+    # receiving-side coefficient (see docs/ERRATA.md).
+    undamped = ph.plenum_flanking_reduction_index(
+        [50.0], [100.0], ceiling_length=4.75, plenum_height=0.43
     )
-    assert res.geometry_term is not None
-    return numeric(10.4, float(res.geometry_term), 0.05, unit="dB", places=2)
+    attenuated = ph.plenum_flanking_reduction_index(
+        [50.0], [100.0], ceiling_length=4.75, plenum_height=0.43,
+        attenuation_source=[1e-5], attenuation_receiving=[1e-5],
+    )
+    return numeric(
+        float(undamped.reduction_index[0]),
+        float(attenuated.reduction_index[0]),
+        1e-3, unit="dB", places=4,
+        expected_label="Eq. (9.20) value, reproduced by Eq. (9.18)",
+    )
 
 
 # --- Masonry cavity-wall ties (Hopkins 2007) ---

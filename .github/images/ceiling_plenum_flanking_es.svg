@@ -644,7 +644,7 @@ L 923.438438 48.795882
      </g>
     </g>
     <g id="text_35">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="479.073438" y="194.266713" transform="rotate(-90 479.073438 194.266713)">Atenuación normalizada del techo Dn,c [dB]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="479.073438" y="194.266713" transform="rotate(-90 479.073438 194.266713)">Diferencia de niveles normalizada del techo Dn,c [dB]</text>
     </g>
    </g>
    <g id="FillBetweenPolyCollection_1">
