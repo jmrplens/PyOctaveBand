@@ -277,6 +277,7 @@ _ES_EXACT = {
     "4 kHz Toneburst Response vs IEC 61672-1 Table 4 (FAST)":
         "Respuesta a r\u00e1fagas de 4 kHz vs Tabla 4 de IEC 61672-1 (FAST)",
     "A-Weighting": "Ponderaci\u00f3n A",
+    "A-Weighting (reference)": "Ponderaci\u00f3n A (referencia)",
     "B-Weighting (historical)": "Ponderaci\u00f3n B (hist\u00f3rica)",
     "C-Weighting": "Ponderaci\u00f3n C",
     "D-Weighting (aircraft, withdrawn)":
@@ -318,7 +319,13 @@ _ES_EXACT = {
     "A weighting deviation (48 kHz)": "Desviaci\u00f3n de ponderaci\u00f3n A (48 kHz)",
     "C weighting deviation (48 kHz)": "Desviaci\u00f3n de ponderaci\u00f3n C (48 kHz)",
     "Deviation from design goal [dB]": "Desviaci\u00f3n del objetivo de dise\u00f1o [dB]",
-    "Frequency Weighting Curves": "Curvas de ponderaci\u00f3n frecuencial",
+    "Frequency Weighting Curves (IEC 61672-1)":
+        "Curvas de ponderaci\u00f3n frecuencial (IEC 61672-1)",
+    # special_weighting_responses figure (B, D and AU against the A reference)
+    "Special Weighting Curves (B, D, AU)":
+        "Curvas de ponderaci\u00f3n especiales (B, D y AU)",
+    "AU is 13 dB below A at 16 kHz":
+        "AU queda 13 dB por debajo de A en 16 kHz",
     "Group Delay Comparison (1 kHz Octave Band, Order 6)":
         "Comparativa de retardo de grupo (banda de 1 kHz, orden 6)",
     "Hearing threshold $T_f$ (Table 1)": "Umbral de audici\u00f3n $T_f$ (Tabla 1)",
@@ -2524,39 +2531,57 @@ def measure_weighting_response(
     return w, mag_db
 
 
+def _draw_weighting_curves(
+    ax: Any,
+    fs: int,
+    curves: tuple[tuple[str, str, str, str, float], ...],
+    inset: Any = None,
+) -> None:
+    """Draw ``(code, label, colour, linestyle, linewidth)`` curves measured at *fs*.
+
+    Shared by the two weighting-family figures (the IEC 61672-1 A/C/Z chart and
+    the special B/D/AU chart), which differ only in the curves they hold and in
+    the axis they hold them on. Curves are drawn in the order given, so a wide
+    reference line listed first sits behind the curves that follow it.
+    """
+    for code, label, color, style, width in curves:
+        # measure_weighting_response is covered by tests/test_graph_measurements.py
+        w, mag_db = measure_weighting_response(fs, code)
+        ax.semilogx(w, mag_db, label=label, color=color, linestyle=style, linewidth=width)
+        if inset is not None:
+            inset.plot(w, mag_db, color=color, linestyle=style, linewidth=width)
+    ax.axhline(0, color=COLOR_FG, linestyle=":", alpha=0.3, linewidth=1)
+
+
 def generate_weighting_responses(output_dir: str) -> None:
-    """Plot the A/B/C/D/AU/Z weighting frequency responses."""
+    """Plot the IEC 61672-1 A/C/Z weighting frequency responses."""
     print("Generating weighting_responses.png...")
     fs = 48000
 
     _, ax = plt.subplots(figsize=(10, 7))
 
     # Zoom inset: the A curve is POSITIVE (+1.27 dB max at ~2.5 kHz per
-    # IEC 61672-1 Table 2), invisible at the full -50..15 dB scale. Only the
-    # IEC 61672-1 curves are drawn in it: D peaks at +11.5 dB (out of the
-    # inset range) and B/AU hug C/A there.
+    # IEC 61672-1 Table 2), invisible at the full -72..15 dB scale, so all
+    # three curves of this figure are redrawn in it.
     from mpl_toolkits.axes_grid1.inset_locator import inset_axes
     axins = inset_axes(ax, width="42%", height="34%", loc="lower center", borderpad=2)
     axins.set_xscale("log")
 
-    curves = [
-        ("A", "A-Weighting", COLOR_PRIMARY, "-"),
-        ("B", "B-Weighting (historical)", COLOR_TERTIARY, "--"),
-        ("C", "C-Weighting", COLOR_SECONDARY, "-"),
-        ("D", "D-Weighting (aircraft, withdrawn)", "#9467bd", "-."),
-        ("AU", "AU-Weighting (audible + ultrasound)", "#ff7f0e", "--"),
-        ("Z", "Z-Weighting (Flat)", COLOR_FG, "-"),
-    ]
+    # The special B, D and AU curves have their own figure
+    # (generate_special_weighting_responses); the infrasound G curve has
+    # generate_g_weighting_response.
+    curves = (
+        ("A", "A-Weighting", COLOR_PRIMARY, "-", 1.8),
+        ("C", "C-Weighting", COLOR_SECONDARY, "-", 1.8),
+        ("Z", "Z-Weighting (Flat)", COLOR_FG, "--", 1.8),
+    )
+    _draw_weighting_curves(ax, fs, curves, inset=axins)
 
-    for code, label, color, style in curves:
-        # measure_weighting_response is covered by tests/test_graph_measurements.py
-        w, mag_db = measure_weighting_response(fs, code)
-        ax.semilogx(w, mag_db, label=label, color=color, linestyle=style)
-        if code in ("A", "C", "Z"):
-            axins.plot(w, mag_db, color=color)
-
-    ax.axhline(0, color=COLOR_FG, linestyle=":", alpha=0.3, linewidth=1)
-    apply_axis_styling(ax, "Frequency Weighting Curves", xlim=(10, 22000), ylim=(-50, 15))
+    # -72 dB, not the -50 the six-curve version used: with only A, C and Z left
+    # nothing forces the floor up, and A reaches -70.4 dB at 10 Hz, so the whole
+    # curve now fits on the axis instead of running off the bottom-left corner.
+    apply_axis_styling(ax, "Frequency Weighting Curves (IEC 61672-1)",
+                       xlim=(10, 22000), ylim=(-72, 15))
 
     axins.axhline(0, color=COLOR_FG, linestyle=":", alpha=0.4, linewidth=1)
     axins.set_xlim(500, 8000)
@@ -2575,6 +2600,52 @@ def generate_weighting_responses(output_dir: str) -> None:
 
     ax.legend(loc="upper left", fontsize=9)
     save_figure(output_dir, "weighting_responses.png")
+    plt.close()
+
+
+def generate_special_weighting_responses(output_dir: str) -> None:
+    """Plot the special B/D/AU weighting curves against the A reference."""
+    print("Generating special_weighting_responses.png...")
+    # 96 kHz, not the 48 kHz of the IEC 61672-1 figure: the point of AU is the
+    # IEC 61012 U low-pass, specified up to 40 kHz, and a 48 kHz axis would cut
+    # it off mid-slope (the guide says the same about measuring it).
+    fs = 96000
+
+    _, ax = plt.subplots(figsize=(10, 7))
+
+    # A is drawn first, as a wide pale line, so it reads as the reference the
+    # other three are described against: AU runs inside it up to 10 kHz and
+    # then leaves, B stays above it, D crosses it at its 3.15 kHz hump.
+    curves = (
+        ("A", "A-Weighting (reference)", COLOR_MUTED, "-", 4.0),
+        ("B", "B-Weighting (historical)", COLOR_TERTIARY, "--", 1.8),
+        ("D", "D-Weighting (aircraft, withdrawn)", "#9467bd", "-.", 1.8),
+        ("AU", "AU-Weighting (audible + ultrasound)", "#ff7f0e", "-", 1.8),
+    )
+    _draw_weighting_curves(ax, fs, curves)
+
+    apply_axis_styling(ax, "Special Weighting Curves (B, D, AU)",
+                       xlim=(10, 40000), ylim=(-90, 18))
+    # apply_axis_styling stops labelling at 16 kHz; this axis runs into the
+    # ultrasonic decade AU exists for, so it needs the 40 kHz end labelled.
+    ax.set_xticks([16, 63, 250, 1000, 4000, 16000, 40000])
+    ax.set_xticklabels(["16", "63", "250", "1k", "4k", "16k", "40k"])
+
+    # The two numbers the guide quotes from the standards: the D hump of
+    # IEC 537 (+11.5 dB at 3.15 kHz, NASA CR-3406 Table SLD-I) and the U
+    # low-pass of IEC 61012 (-13 dB at 16 kHz, Table 1).
+    ax.annotate(
+        "+11.5 dB @ 3.15 kHz", xy=(3150, 11.6), xytext=(150, 13.5), fontsize=9,
+        color="#9467bd", arrowprops={"arrowstyle": "->", "lw": 0.9, "color": "#9467bd"},
+    )
+    ax.annotate(
+        "AU is 13 dB below A at 16 kHz", xy=(16000, -21.0), xytext=(700, -35.0),
+        fontsize=9, color="#ff7f0e",
+        arrowprops={"arrowstyle": "->", "lw": 0.9, "color": "#ff7f0e"},
+    )
+
+    ax.legend(loc="lower center", fontsize=9)
+    save_figure(output_dir, "special_weighting_responses.png")
     plt.close()
 
 
@@ -12859,6 +12930,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_multichannel_response,
     generate_decomposition_plot,
     generate_weighting_responses,
+    generate_special_weighting_responses,
     generate_g_weighting_response,
     generate_equal_loudness_contours,
     generate_time_weighting_plot,
@@ -19251,7 +19323,8 @@ _FIGURE_WEIGHTS: dict[str, float] = {
     "moore_glasberg_time_loudness": 2.6,
     "numerical_propagation": 2.5,
     "fluctuation_strength": 2.2,
-    "weighting_responses": 1.7,
+    "weighting_responses": 1.1,
+    "special_weighting_responses": 2.6,
     "sti_curve": 1.7,
     "schroeder_decay": 1.3,
     "excitation_signals": 1.2,
