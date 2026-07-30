@@ -52,7 +52,10 @@ marked as such in their entry.
 Entries describe the specific printed editions cited. A defect listed here is
 not a defect of the method; in every case the intended reading could be
 established from the document itself or from physics, and the library
-implements that reading with a regression test pinning it.
+implements that reading. Where the reading changes a number the library
+reports, the entry names the check or test that pins it; where the defect is a
+label, a cross-reference or a table the library never reads, the entry records
+that no change was required.
 
 Status legend: **unreported** (recorded here only) / **reported** (submitted
 to the issuing body, with date and reference).

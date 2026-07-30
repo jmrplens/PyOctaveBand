@@ -53,7 +53,7 @@ level.
 | 200 ms | −1.0 | −0.98 | +0.02 | ✅ PASS |
 | 50 ms | −4.8 | −4.82 | −0.02 | ✅ PASS |
 | 10 ms | −11.1 | −11.14 | −0.04 | ✅ PASS |
-| 1 ms | −20.9 | −20.99 | −0.09 | ✅ PASS |
+| 1 ms | −21.0 | −20.99 | +0.01 | ✅ PASS |
 
 **python-acoustics results (FAST, squared signal passed as required by that
 library):**
@@ -63,7 +63,7 @@ library):**
 | 200 ms | −1.0 | −0.97 | +0.03 | ✅ PASS |
 | 50 ms | −4.8 | −3.93 | **+0.87** | ⚠️ FAIL |
 | 10 ms | −11.1 | −10.90 | +0.20 | ✅ PASS |
-| 1 ms | −20.9 | −20.90 | +0.00 | ✅ PASS |
+| 1 ms | −21.0 | −20.90 | +0.10 | ✅ PASS |
 
 phonometry maintains high precision across all test cases. The block-based
 approach deviates significantly (> 0.8 dB) for the 50 ms burst because 125 ms
@@ -101,7 +101,7 @@ sample from the metrology core:
 | IEC 61672-1:2013 Table 5 | `lc_peak()` one-cycle/half-cycle peak responses, class 1 limits | `tests/metrology/test_levels.py` |
 | IEC 61260-1:2014 Table 1 | Filter-bank class 1/2 acceptance limits via `verify_filter_class()` | `tests/metrology/test_compliance.py` |
 | ISO 7196:1995 Table 2 | G weighting (infrasound) at every nominal response value, 0.25–315 Hz | `tests/metrology/test_g_weighting.py` |
-| ISO 226:2023 Annex B | Equal-loudness contours, loudness levels and hearing threshold against the Annex B tables | `tests/psychoacoustics/test_loudness_contours.py` |
+| ISO 226:2023 Table 1 and Annex B | Equal-loudness contours and loudness levels against the Annex B tables, hearing threshold against the Table 1 `T_f` parameters | `tests/psychoacoustics/test_loudness_contours.py` |
 | ECMA-418-1:2024 | TNR/PR tone prominence: critical bandwidths, proximity spacing and prominence criteria against the worked examples in clauses 10–12 | `tests/psychoacoustics/test_tonality.py` |
 | ISO 1996-1:2016 | `lden()`, `ldn()` and `composite_rating_level()` against hand-computed formula values | `tests/environmental/test_environmental.py` |
 | IEC 60942:2017 Table 2 | Calibrator short-term stability limits (frequency-dependent, class 1) in `sensitivity()` | `tests/metrology/test_calibration_validation.py` |
@@ -138,8 +138,10 @@ wrong equation.
 Those cases are not quietly patched. Each confirmed one is written down in the
 [standards errata](/phonometry/reference/errata/) with the printed edition and
 the exact location, what the document says, why it cannot be right, the
-independent evidence, the reading the library implements, and the regression
-test that pins that reading. There are dozens of them now, across standards,
+independent evidence and the reading the library implements. Where that reading
+changes a number the library reports, the entry names the check or test that
+pins it; where it does not, because the defect is a label, a cross-reference or
+a table the library never reads, the entry says so instead. There are dozens of them now, across standards,
 guidance documents, textbooks and journal papers, each marked as reported to
 the issuing body or not. A defect listed there is never a defect of the
 method: in every case the intended reading could be established from the
@@ -153,23 +155,30 @@ nothing in the port ever notices.
 
 - **python-acoustics** was archived in February 2024 and is no longer
   maintained. Its comparison above reflects the last released code.
-- **acoustic-toolbox**, the community successor to python-acoustics, depends
-  on phonometry for its weighted level computations rather than reimplementing
+- **acoustic-toolbox**, the community successor to python-acoustics, builds
+  its IEC 61672-1 time and frequency weighting on `pyoctaveband`, the former
+  name of this library, which since 2.1.0 is a shim over phonometry. It is only
+  the filters that it takes from here: its own `weighting.py` still carries
+  hard-coded one-third-octave A and C weighting tables.
+- **MoSQITo** focuses on psychoacoustic sound-quality metrics and covers a
+  good part of that ground already: Zwicker loudness, ECMA-418-2 loudness and
+  roughness, DIN 45692 sharpness, ECMA-74 tone-to-noise and prominence ratio,
+  and the ANSI S3.5 speech intelligibility index. phonometry implements the
+  same family, and adds ISO 532-2 and ISO 532-3 loudness, ECMA-418-2 tonality,
+  fluctuation strength and the Fastl & Zwicker annoyance model, none of which
+  MoSQITo exports. What differs most is the setting. Here those metrics sit in
+  the same conformance harness as the metrology core and compose directly with
+  the weighting filters, ballistics, band filtering and calibration that feed
   them.
-- **MoSQITo** focuses on psychoacoustic sound-quality metrics (loudness,
-  sharpness, roughness). That used to be a clean split, and it no longer is:
-  phonometry now implements the same family, with ISO 532-1, ISO 532-2 and
-  ISO 532-3 loudness, ECMA-418-2 tonality, roughness and fluctuation strength,
-  DIN 45692 sharpness and the Fastl & Zwicker annoyance model. What differs is
-  the setting. Here those metrics sit in the same conformance harness as the
-  metrology core and compose directly with the weighting filters, ballistics,
-  band filtering and calibration that feed them.
 - **pyroomacoustics** simulates room impulse responses for audio and machine
   learning pipelines (image sources, ray tracing, beamforming, direction of
-  arrival). phonometry's room and simulation modules answer the measurement
-  question instead: its image-source and FDTD solvers are pinned to published
-  closed forms, and what comes out of them goes through the same ISO 3382
-  parameter analysis as a measured impulse response.
+  arrival), and it does reach the measurement side too, with sweep-based
+  impulse-response acquisition and an RT60 estimator. What it does not carry is
+  the ISO 3382 parameter set. phonometry's image-source and FDTD solvers are
+  pinned to published closed forms, and the image-source impulse response goes
+  through the same `room_parameters` analysis (EDT, T20, T30, C50, C80, D50,
+  Ts, per band, with the ISO 3382 decay-range validity flags) as a measured
+  one.
 
 If your work needs numbers you can defend against a standard's tolerance
 table, whether for measurement reports, environmental assessments or
