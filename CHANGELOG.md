@@ -79,6 +79,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   soft butterfly tie rolls off as `1/f^3` where a rigid connection only falls
   as `1/f`. New section in the panel prediction guide with its own figure, in
   English and Spanish.
+- CNOSSOS-EU railway source emission (`environmental/cnossos_rail.py`,
+  Directive 2002/49/EC Annex II section 2.3 and Appendix G, consolidated text):
+  `railway_source_power` builds the two equivalent source lines of a track, at
+  0,5 m and at 4,0 m, from rail and wheel roughness (Tables G-1a and G-1b), the
+  contact filter (G-2) and the track, wheel and superstructure transfer
+  functions (G-3), adding impact noise at joints and switches (2.3.11, 2.3.12
+  with Table G-4), curve squeal, traction noise (G-5), aerodynamic noise above
+  200 km/h (2.3.13, 2.3.14 with G-6), bridge noise (2.3.18 with G-7) and the
+  source directivity (2.3.15 to 2.3.17), and returns the directional sound
+  power per metre in 1/3-octave bands and energy-summed into octave bands.
+  `RailwayEmissionResult` keeps the per-source breakdown and draws both heights
+  with `.plot()`. The component functions are public, so the roughness
+  conversion (`roughness_to_frequency`), the roughness sum
+  (`total_effective_roughness`), each rolling component (`rolling_sound_power`),
+  the squeal rule (`curve_squeal_excess`), the two directivities and the whole
+  Appendix G database can be used on their own; `VehicleDescriptor` and
+  `TrackDescriptor` parse the four- and six-digit codes of Tables [2.3.a] and
+  [2.3.b]. Which instrument each table comes from is recorded next to it: the
+  corrigendum of OJ L 5, 10.1.2018 replaced the whole of Appendix G and put the
+  roughness conversion in metres per second, and (EU) 2021/1226 then replaced
+  Tables G-1b, G-2, G-3a, G-4 and G-7, the curve-squeal rule, the bridge model
+  and the vertical directivity of source A, which `DirectivityEdition` still
+  offers in its 2015 form for comparison with pre-2021 studies. Two readings of
+  the wavelength-to-frequency resampling, which Annex II describes in prose
+  only, are selectable through `RoughnessInterpolation`. Annex II prints no
+  worked example anywhere in 2.3, so the equations are pinned end to end on the
+  emission test workbook the European Commission published with its reference
+  source module: fed the 2015 coefficient database that workbook was computed
+  with, the shipped model reproduces all 34 560 published rows of the twenty
+  vehicles whose catalogue entries are well formed, 17 280 cases at both source
+  heights, to 0,0055 dB, and 123 of those cases are committed and run in CI.
 
 - Room-to-room noise reduction (`noise_control/room_to_room.py`, Norton &
   Karczub 2003 Section 4.9): `room_to_room_transmission` composes the whole

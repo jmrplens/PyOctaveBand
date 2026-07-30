@@ -18,6 +18,16 @@ visible el desglose término a término, de modo que una predicción nunca es
 una caja negra: se ve exactamente qué mecanismo compra cuántos decibelios a
 qué frecuencia.
 
+[Emisión de la fuente ferroviaria CNOSSOS-EU](/phonometry/es/guides/cnossos-rail-emission/)
+es la mitad de fuente del ferrocarril. El apartado 2.3 del Anexo II de la
+Directiva 2002/49/CE convierte un espectro de rugosidad, un conjunto de
+funciones de transferencia y un flujo de trenes en las dos líneas fuente
+equivalentes de las que parte todo mapa estratégico de ruido de la Unión
+Europea, a 0,5 m y a 4,0 m sobre la cabeza del carril, con el ruido de impacto,
+el chirrido en curva, la tracción, el ruido aerodinámico por encima de
+200 km/h y el término de puente asignados cada uno a la altura desde la que
+radia.
+
 [Efecto suelo esférico y barreras avanzadas](/phonometry/es/guides/ground-barriers/)
 baja de los ajustes de ISO 9613-2 a la acústica ondulatoria que aproximan: el
 coeficiente de reflexión de onda esférica de Weyl-Van der Pol de un suelo de
@@ -48,6 +58,10 @@ y las fuentes que alimentan un cálculo de propagación en las secciones de
 - [Propagación del sonido en exteriores](/phonometry/es/guides/outdoor-propagation/):
   la absorción atmosférica de ISO 9613-1 y el método general de ISO 9613-2
   con desglose de atenuación por término y banda de octava.
+- [Emisión de la fuente ferroviaria CNOSSOS-EU](/phonometry/es/guides/cnossos-rail-emission/):
+  el método común europeo de emisión ferroviaria, de la rugosidad del carril y
+  de la rueda a la potencia acústica direccional por metro de las dos líneas
+  fuente equivalentes.
 - [Efecto suelo esférico y barreras avanzadas](/phonometry/es/guides/ground-barriers/):
   la reflexión de onda esférica de Weyl-Van der Pol en el suelo y la difracción
   de barreras por teoría ondulatoria (Kurze-Anderson, semiplano rígido exacto,

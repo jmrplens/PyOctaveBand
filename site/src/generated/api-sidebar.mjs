@@ -155,6 +155,7 @@ export const apiSidebar = {
         'reference/api/environment/ground-barriers',
         'reference/api/environment/atmospheric-refraction',
         'reference/api/environment/air-absorption',
+        'reference/api/environment/cnossos-rail',
         'reference/api/environment/impulse-prominence',
         'reference/api/environment/impulsive-sound',
         'reference/api/environment/rating',

@@ -21,7 +21,12 @@ requirements but not ``pytest``.
 
 from __future__ import annotations
 
+import csv
 import math
+import pathlib
+
+#: Versioned root of the committed oracle data.
+_DATA = pathlib.Path(__file__).parent / "data"
 
 INF = math.inf
 
@@ -2766,3 +2771,213 @@ ISO12354_2_TABLE_B2: tuple[tuple[str, float, tuple[float, ...], int], ...] = (
     ("lightweight", 260.0, (65.0, 72.0, 78.0, 77.0, 77.0, 76.0, 70.0), 77),
     ("lightweight", 390.0, (64.0, 68.0, 70.0, 70.0, 70.0, 70.0, 64.0), 71),
 )
+
+# ---------------------------------------------------------------------------
+# CNOSSOS-EU railway source, Appendix G of Annex II to Directive 2002/49/EC.
+# Transcribed from the Official Journal text of the instrument named in each
+# comment: Commission Delegated Directive (EU) 2021/1226 (OJ L 269, 28.7.2021)
+# where it replaced the table, Commission Directive (EU) 2015/996 (OJ L 168,
+# 1.7.2015) where it did not. These constants pin the tables shipped in
+# ``phonometry.environmental.cnossos_rail``.
+# ---------------------------------------------------------------------------
+
+#: Wavelength grid of Tables G-1b, G-2 and G-4 as replaced by (EU) 2021/1226, mm.
+CNOSSOS_RAIL_WAVELENGTHS: tuple[float, ...] = (
+    2000, 1600, 1250, 1000, 800, 630, 500, 400, 315, 250, 200, 160, 125, 100,
+    80, 63, 50, 40, 31.5, 25, 20, 16, 12.5, 10, 8, 6.3, 5, 4, 3.15, 2.5, 2,
+    1.6, 1.25, 1, 0.8,
+)
+#: Wavelength grid of Table G-1a, which (EU) 2021/1226 left untouched, mm. It
+#: keeps the non-standard steps 120, 12, 3,2 and 1,2 mm.
+CNOSSOS_RAIL_WHEEL_WAVELENGTHS: tuple[float, ...] = (
+    1000, 800, 630, 500, 400, 315, 250, 200, 160, 120, 100, 80, 63, 50, 40,
+    31.5, 25, 20, 16, 12, 10, 8, 6.3, 5, 4, 3.2, 2.5, 2, 1.6, 1.2, 1, 0.8,
+)
+
+#: Table G-1a wheel roughness (2015/996, unchanged by (EU) 2021/1226).
+CNOSSOS_RAIL_G1A_CAST_IRON: tuple[float, ...] = (
+    2.2, 2.2, 2.2, 2.2, 2.2, 2.2, 2.2, 2.2, 2.4, 0.6, 2.6, 5.8, 8.8, 11.1,
+    11, 9.8, 7.5, 5.1, 3, 1.3, 0.2, -0.7, -1.2, -1, 0.3, 0.2, 1.3, 3.1,
+    3.1, 3.1, 3.1, 3.1,
+)
+
+CNOSSOS_RAIL_G1A_COMPOSITE: tuple[float, ...] = (
+    -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4.3, -4.6, -4.9, -5.2,
+    -6.3, -6.8, -7.2, -7.3, -7.3, -7.1, -6.9, -6.7, -6, -3.7, -2.4, -2.6,
+    -2.5, -2.5, -2.5, -2.5, -2.5,
+)
+
+CNOSSOS_RAIL_G1A_NON_TREAD: tuple[float, ...] = (
+    -5.9, -5.9, -5.9, -5.9, -5.9, -5.9, 2.3, 2.8, 2.6, 1.2, 2.1, 0.9, -0.3,
+    -1.6, -2.9, -4.9, -7, -8.6, -9.3, -9.5, -10.1, -10.3, -10.3, -10.8,
+    -10.9, -9.5, -9.5, -9.5, -9.5, -9.5, -9.5, -9.5,
+)
+
+#: Table G-1b rail roughness, as replaced by (EU) 2021/1226 point (20)(a).
+CNOSSOS_RAIL_G1B_E: tuple[float, ...] = (
+    17.1, 17.1, 17.1, 17.1, 17.1, 17.1, 17.1, 17.1, 15, 13, 11, 9, 7, 4.9,
+    2.9, 0.9, -1.1, -3.2, -5, -5.6, -6.2, -6.8, -7.4, -8, -8.6, -9.2, -9.8,
+    -10.4, -11, -11.6, -12.2, -12.8, -13.4, -14, -14,
+)
+
+CNOSSOS_RAIL_G1B_M: tuple[float, ...] = (
+    35, 31, 28, 25, 23, 20, 17, 13.5, 10.5, 9, 6.5, 5.5, 5, 3.5, 2, 0.1,
+    -0.2, -0.3, -0.8, -3, -5, -7, -8, -9, -10, -12, -13, -14, -15, -16,
+    -17, -18, -19, -19, -19,
+)
+
+#: Table G-2 contact filter, as replaced by (EU) 2021/1226 point (20)(b).
+#: Keys are (wheel load in kN, wheel diameter in mm).
+CNOSSOS_RAIL_G2: dict[tuple[float, float], tuple[float, ...]] = {
+    (50.0, 360.0): (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.1, -0.2, -0.3, -0.6, -1, -1.8, -3.2, -5.4, -8.7, -12.2, -16.7, -17.7, -17.8, -20.7, -22.1, -22.8, -24, -24.5, -24.7, -27, -27.8),
+    (50.0, 680.0): (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.1, -0.2, -0.3, -0.7, -1.2, -2, -4.1, -6, -9.2, -13.8, -17.2, -17.7, -18.6, -21.5, -22.3, -23.1, -24.4, -24.5, -25, -28, -28.8, -29.6),
+    (50.0, 920.0): (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.1, -0.1, -0.3, -0.6, -1.1, -1.3, -3.5, -5.3, -8, -12, -16.8, -17.7, -18, -21.5, -21.8, -22.8, -24, -24.5, -25, -27.3, -28.1, -28.9, -29.7),
+    (25.0, 920.0): (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.1, -0.3, -0.5, -1.1, -1.8, -3.3, -5.3, -7.9, -12.8, -16.8, -17.7, -18.2, -20.5, -22, -22.8, -24.2, -24.5, -25, -27.4, -28.2, -29),
+    (100.0, 920.0): (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.1, -0.2, -0.3, -0.6, -1, -1.8, -3.2, -5.4, -8.7, -12.2, -16.7, -17.7, -17.8, -20.7, -22.1, -22.8, -24, -24.5, -24.7, -27, -27.8, -28.6, -29.4, -30.2),
+}
+
+#: Table G-3a track transfer, as replaced by (EU) 2021/1226 point (20)(c).
+CNOSSOS_RAIL_G3A: dict[str, tuple[float, ...]] = {
+    "M/S": (53.3, 59.3, 67.2, 75.9, 79.2, 81.8, 84.2, 88.6, 91, 94.5, 97, 99.2, 104, 107.1, 108.3, 108.5, 109.7, 110, 110, 110, 110.3, 110, 110.1, 110.6),
+    "M/M": (50.9, 57.8, 66.5, 76.8, 80.9, 83.3, 85.8, 90, 91.6, 93.9, 95.6, 97.4, 101.7, 104.4, 106, 106.8, 108.3, 108.9, 109.1, 109.4, 109.9, 109.9, 110.3, 111),
+    "M/H": (50.1, 57.2, 66.3, 77.2, 81.6, 84, 86.5, 90.7, 92.1, 94.3, 95.8, 97, 100.3, 102.5, 104.2, 105.4, 107.1, 107.9, 108.2, 108.7, 109.4, 109.7, 110.4, 111.4),
+    "B/S": (50.9, 56.6, 64.3, 72.3, 75.4, 78.5, 81.8, 86.6, 89.1, 91.9, 94.5, 97.5, 104, 107.9, 108.9, 108.8, 109.8, 110.2, 110.1, 110.1, 110.3, 109.9, 110, 110.4),
+    "B/M": (50, 56.1, 64.1, 72.5, 75.8, 79.1, 83.6, 88.7, 89.6, 89.7, 90.6, 93.8, 100.6, 104.7, 106.3, 107.1, 108.8, 109.3, 109.4, 109.7, 110, 109.8, 110, 110.5),
+    "B/H": (49.8, 55.9, 64, 72.5, 75.9, 79.4, 84.4, 89.7, 90.2, 90.2, 90.8, 93.1, 97.9, 101.1, 103.4, 105.4, 107.7, 108.5, 108.7, 109.1, 109.6, 109.6, 109.9, 110.6),
+    "W": (44, 51, 59.9, 70.8, 75.1, 76.9, 77.2, 80.9, 85.3, 92.5, 97, 98.7, 102.8, 105.4, 106.5, 106.4, 107.5, 108.1, 108.4, 108.7, 109.1, 109.1, 109.5, 110.2),
+    "D": (75.4, 77.4, 81.4, 87.1, 88, 89.7, 83.4, 87.7, 89.8, 97.5, 99, 100.8, 104.9, 111.8, 113.9, 115.5, 114.9, 118.2, 118.3, 118.4, 118.9, 117.5, 117.9, 118.6),
+}
+
+#: Table G-3b wheel transfer (2015/996 values; band labels corrected
+#: by (EU) 2021/1226 point (20)(d)). Keys are the wheel diameter in mm.
+CNOSSOS_RAIL_G3B: dict[float, tuple[float, ...]] = {
+    920.0: (75.4, 77.3, 81.1, 84.1, 83.3, 84.3, 86, 90.1, 89.8, 89, 88.8, 90.4, 92.4, 94.9, 100.4, 104.6, 109.6, 114.9, 115, 115, 115.5, 115.6, 116, 116.7),
+    840.0: (75.4, 77.3, 81.1, 84.1, 82.8, 83.3, 84.1, 86.9, 87.9, 89.9, 90.9, 91.5, 91.5, 93, 98.7, 101.6, 107.6, 111.9, 114.5, 114.5, 115, 115.1, 115.5, 116.2),
+    680.0: (75.4, 77.3, 81.1, 84.1, 82.8, 83.3, 83.9, 86.3, 88, 92.2, 93.9, 92.5, 90.9, 90.4, 93.2, 93.5, 99.6, 104.9, 108, 111, 111.5, 111.6, 112, 112.7),
+    1200.0: (75.4, 77.3, 81.1, 84.1, 82.8, 83.3, 84.5, 90.4, 90.4, 89.9, 90.1, 91.3, 91.5, 93.6, 100.5, 104.6, 115.6, 115.9, 116, 116, 116.5, 116.6, 117, 117.7),
+}
+
+CNOSSOS_RAIL_G3C: tuple[float, ...] = (
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+)
+
+#: Table G-4 impact roughness, as replaced by (EU) 2021/1226 point (20)(e).
+CNOSSOS_RAIL_G4: tuple[float, ...] = (
+    22, 22, 22, 22, 22, 20, 16, 15, 14, 15, 14, 12, 11, 10, 9, 8, 6, 3, 2,
+    -3, -8, -13, -17, -19, -22, -25, -26, -32, -35, -40, -43, -45, -47,
+    -49, -50,
+)
+
+#: Table G-5 traction sound power (2015/996 values). (EU) 2021/1226
+#: point (20)(f) replaced the 6 300 Hz pair of the 2 200 kW diesel
+#: locomotive, 31,4 / 30,7, by 81,4 / 80,7; the replacement is applied
+#: below at the two marked positions.
+CNOSSOS_RAIL_G5: dict[str, tuple[tuple[float, ...], tuple[float, ...]]] = {
+    "diesel locomotive, c. 800 kW": (
+        (98.9, 94.8, 92.6, 94.6, 92.8, 92.8, 93, 94.8, 94.6, 95.7, 95.6, 98.6, 95.2, 95.1, 95.1, 94.1, 94.1, 99.4, 92.5, 89.5, 87, 84.1, 81.5, 79.2),
+        (103.2, 100, 95.5, 94, 93.3, 93.6, 92.9, 92.7, 92.4, 92.8, 92.8, 96.8, 92.7, 93, 92.9, 93.1, 93.2, 98.3, 91.5, 88.7, 86, 83.4, 80.9, 78.7),
+    ),
+    "diesel locomotive, c. 2 200 kW": (
+        (99.4, 107.3, 103.1, 102.1, 99.3, 99.3, 99.5, 101.3, 101.1, 102.2, 102.1, 101.1, 101.7, 101.6, 99.3, 96, 93.7, 101.9, 89.5, 87.1, 90.5, 81.4, 81.2, 79.6),
+        (103.7, 112.5, 106, 101.5, 99.8, 100.1, 99.4, 99.2, 98.9, 99.3, 99.3, 99.3, 99.2, 99.5, 97.1, 95, 92.8, 100.8, 88.5, 86.3, 89.5, 80.7, 80.6, 79.1),
+    ),
+    "diesel multiple unit": (
+        (82.6, 82.5, 89.3, 90.3, 93.5, 99.5, 98.7, 95.5, 90.3, 91.4, 91.3, 90.3, 90.9, 91.8, 92.8, 92.8, 90.8, 88.1, 85.2, 83.2, 81.7, 78.8, 76.2, 73.9),
+        (86.9, 87.7, 92.2, 89.7, 94, 100.3, 98.6, 93.4, 88.1, 88.5, 88.5, 88.5, 88.4, 89.7, 90.6, 91.8, 89.9, 87, 84.2, 82.4, 80.7, 78.1, 75.6, 73.4),
+    ),
+    "electric locomotive": (
+        (87.9, 90.8, 91.6, 94.6, 94.8, 96.8, 104, 100.8, 99.6, 101.7, 98.6, 95.6, 95.2, 96.1, 92.1, 89.1, 87.1, 85.4, 83.5, 81.5, 80, 78.1, 76.5, 75.2),
+        (92.2, 96, 94.5, 94, 95.3, 97.6, 103.9, 98.7, 97.4, 98.8, 95.8, 93.8, 92.7, 94, 89.9, 88.1, 86.2, 84.3, 82.5, 80.7, 79, 77.4, 75.9, 74.7),
+    ),
+    "electric multiple unit": (
+        (80.5, 81.4, 80.5, 82.2, 80, 79.7, 79.6, 96.4, 80.5, 81.3, 97.2, 79.5, 79.8, 86.7, 81.7, 82.7, 80.7, 78, 75.1, 72.1, 69.6, 66.7, 64.1, 61.8),
+        (84.8, 86.6, 83.4, 81.6, 80.5, 80.5, 79.5, 94.3, 78.3, 78.4, 94.4, 77.7, 77.3, 84.6, 79.5, 81.7, 79.8, 76.9, 74.1, 71.3, 68.6, 66, 63.5, 61.3),
+    ),
+}
+
+#: Table G-6 aerodynamic sound power at v_0 = 300 km/h (2015/996).
+CNOSSOS_RAIL_G6_A: tuple[float, ...] = (
+    112.6, 113.2, 115.7, 117.4, 115.3, 115, 114.9, 116.4, 115.9, 116.3,
+    116.2, 115.2, 115.8, 115.7, 115.7, 114.7, 114.7, 115, 114.5, 113.1,
+    112.1, 110.6, 109.6, 108.8,
+)
+
+CNOSSOS_RAIL_G6_B: tuple[float, ...] = (
+    36.7, 38.5, 39, 37.5, 36.8, 37.1, 36.4, 36.2, 35.9, 36.3, 36.3, 36.3,
+    36.2, 36.5, 36.4, 105.2, 110.3, 110.4, 105.6, 37.2, 37.5, 37.9, 38.4,
+    39.2,
+)
+
+#: Speed exponents alpha_1 = alpha_2 of Table G-6, every band.
+CNOSSOS_RAIL_G6_ALPHA = 50.0
+
+#: Table G-7 bridge transfer, as replaced by (EU) 2021/1226 point (20)(h).
+CNOSSOS_RAIL_G7: dict[str, tuple[float, ...]] = {
+    "+10 dB(A)": (85.2, 87.1, 91, 94, 94.4, 96, 92.5, 96.7, 97.4, 99.4, 100.7, 102.5, 107.1, 109.8, 112, 107.2, 106.8, 107.3, 99.3, 91.4, 86.9, 79.7, 75.1, 70.8),
+    "+15 dB(A)": (90.1, 92.1, 96, 99.5, 99.9, 101.5, 99.6, 103.8, 104.5, 106.5, 107.8, 109.6, 116.1, 118.8, 120.9, 109.5, 109.1, 109.6, 102, 94.1, 89.6, 83.6, 79, 74.7),
+}
+
+
+# ---------------------------------------------------------------------------
+# CNOSSOS-EU railway emission oracle: the 2015 coefficient database the
+# Commission's reference source module was run with, and the extract of its
+# emission test workbook. See ``tests/data/cnossos/README.md`` for provenance.
+# ---------------------------------------------------------------------------
+
+#: 1/3-octave band centres of the railway source, as CSV column names.
+CNOSSOS_RAIL_BANDS: tuple[str, ...] = (
+    "50", "63", "80", "100", "125", "160", "200", "250", "315", "400", "500",
+    "630", "800", "1000", "1250", "1600", "2000", "2500", "3150", "4000",
+    "5000", "6300", "8000", "10000",
+)
+#: Wavelength grid of the 2015 catalogue tables, in mm, as CSV column names.
+CNOSSOS_RAIL_2015_WAVELENGTHS: tuple[str, ...] = (
+    "1000", "800", "630", "500", "400", "315", "250", "200", "160", "125",
+    "100", "80", "63", "50", "40", "31.5", "25", "20", "16", "12.5", "10",
+    "8", "6.3", "5", "4", "3.15", "2.5", "2", "1.6", "1.25", "1", "0.8",
+)
+
+
+def _cnossos_rail_rows(name: str) -> list[dict[str, str]]:
+    """Rows of one committed CSV under ``tests/data/cnossos/``."""
+    with (_DATA / "cnossos" / name).open(newline="", encoding="utf-8") as handle:
+        return list(csv.DictReader(handle))
+
+
+def cnossos_rail_workbook_cases() -> list[dict[str, str]]:
+    """The committed cases of the CIRCABC railway emission test workbook.
+
+    Each row carries the vehicle, the track parameters, the running condition,
+    the two receiver angles and the workbook's own per-octave-band and total
+    line-power levels.
+    """
+    return _cnossos_rail_rows("rail_emission_cases.csv")
+
+
+def cnossos_rail_2015_wavelength_tables() -> dict[tuple[str, str], tuple[float, ...]]:
+    """The 2015 catalogue spectra given against wavelength, keyed by
+    ``(table, id)``: wheel and rail roughness, contact filter, impact."""
+    return {
+        (row["table"], row["id"]): tuple(
+            float(row[w]) for w in CNOSSOS_RAIL_2015_WAVELENGTHS
+        )
+        for row in _cnossos_rail_rows("rail_wavelength_tables_2015.csv")
+    }
+
+
+def cnossos_rail_2015_frequency_tables() -> (
+    dict[tuple[str, str, str], tuple[float, ...]]
+):
+    """The 2015 catalogue spectra given against frequency, keyed by
+    ``(table, id, source)``: transfer functions, traction, aerodynamic."""
+    return {
+        (row["table"], row["id"], row["source"]): tuple(
+            float(row[b]) for b in CNOSSOS_RAIL_BANDS
+        )
+        for row in _cnossos_rail_rows("rail_frequency_tables_2015.csv")
+    }
+
+
+def cnossos_rail_2015_vehicles() -> dict[str, dict[str, str]]:
+    """The 2015 catalogue vehicle definitions, keyed by their reference id."""
+    return {row["id"]: row for row in _cnossos_rail_rows("rail_vehicles_2015.csv")}

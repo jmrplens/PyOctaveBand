@@ -1,0 +1,490 @@
+---
+title: "CNOSSOS-EU railway source emission"
+description: "The common EU method for railway noise emission (Directive 2002/49/EC Annex II, section 2.3 and Appendix G): rail and wheel roughness, the contact filter and the transfer functions, impact noise, curve squeal, traction, aerodynamic noise, bridges, the source directivity and the two equivalent source lines at 0,5 m and 4,0 m."
+references:
+  - type: standard
+    organization: "European Union"
+    year: 2015
+    title: "Commission Directive (EU) 2015/996 establishing common noise assessment methods according to Directive 2002/49/EC of the European Parliament and of the Council"
+    designation: "Directive (EU) 2015/996"
+    url: "https://eur-lex.europa.eu/eli/dir/2015/996/oj"
+    note: "Replaces Annex II of Directive 2002/49/EC with the CNOSSOS-EU methods. The implemented railway source is section 2.3 (formulae 2.3.1 to 2.3.18) with the coefficient database of Appendix G."
+  - type: standard
+    organization: "European Union"
+    year: 2018
+    title: "Corrigendum to Commission Directive (EU) 2015/996"
+    designation: "OJ L 5, 10.1.2018, p. 35"
+    url: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32015L0996R(01)"
+    note: "Replaces the whole of Appendix G and corrects the railway roughness conversion, where the published text read km/h for a speed that has to be in metres per second."
+  - type: standard
+    organization: "European Union"
+    year: 2021
+    title: "Commission Delegated Directive (EU) 2021/1226 amending, for the purposes of adapting to scientific and technical progress, Annex II to Directive 2002/49/EC as regards common assessment methods for noise"
+    designation: "Directive (EU) 2021/1226"
+    url: "https://eur-lex.europa.eu/eli/dir_del/2021/1226/oj"
+    note: "The amendment in force since 31 December 2021. Replaces Tables G-1b, G-2, G-3a, G-4 and G-7, substitutes a new curve-squeal rule and a new bridge model, and rewrites the vertical directivity of source A."
+  - type: report
+    authors: ["Kephalopoulos, S.", "Paviotti, M.", "Anfosso-Lédée, F."]
+    year: 2012
+    title: "Common noise assessment methods in Europe (CNOSSOS-EU)"
+    number: "EUR 25379 EN"
+    institution: "Publications Office of the European Union"
+    doi: "10.2788/31776"
+    url: "https://publications.jrc.ec.europa.eu/repository/handle/JRC72550"
+    note: "The Joint Research Centre reference report the Directive text descends from, with the IMAGINE measurement campaigns behind the Appendix G coefficients."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 1996
+    title: "Acoustics — Attenuation of sound during propagation outdoors — Part 2: General method of calculation"
+    designation: "ISO 9613-2:1996"
+    url: "https://www.iso.org/standard/20649.html"
+    note: "The propagation model used here to carry the emission to a receiver. CNOSSOS-EU has its own propagation method in section 2.5 of Annex II, which is not ISO 9613-2."
+---
+
+import ThemeImage from '../../../components/ThemeImage.astro';
+
+A road is one source line 5 cm above the pavement. A railway track is **two**,
+one at the axles and one at the roof, because a train radiates from places that
+are four metres apart and shield each other differently. Section 2.3 of
+**Annex II of Directive 2002/49/EC**, as replaced by the CNOSSOS-EU methods,
+builds both of them from a roughness spectrum, a handful of transfer functions
+and the traffic flow.
+
+This guide covers the railway source, section 2.3 of Annex II with the
+coefficient database of Appendix G. The road source (2.2, Appendix F) and the
+CNOSSOS-EU propagation model (2.5) are separate.
+
+## 1. Which text is implemented
+
+Annex II is a moving target, and on the railway side the layering is worse than
+on the road side: the corrigendum replaced the **whole** of Appendix G, and the
+2021 amendment then replaced five of its seven tables again and rewrote three
+pieces of the method.
+
+| Instrument | What it does to the railway source |
+| :--- | :--- |
+| Commission Directive (EU) **2015/996** | Replaces the whole of Annex II. Supplies formulae 2.3.1 to 2.3.18 and Tables G-1 to G-7. |
+| **Corrigendum** of OJ L 5, 10.1.2018 | Replaces the **whole of Appendix G** (dropping its Min/Max validity columns and adding the descriptor codes to the column headers) and corrects the roughness conversion `f = v/lambda`, where the published text says the speed is in km/h. It is in **metres per second**: read literally, the printed formula is wrong by a factor 3,6. |
+| Commission Delegated Directive (EU) **2021/1226** | Replaces Tables **G-1b, G-2, G-3a, G-4 and G-7** in their entirety; substitutes a **new curve-squeal rule**; makes bridge noise a **separate source** built on a transfer function instead of a constant; rewrites the **vertical directivity** of source A; corrects three band labels and one pair of values in Table G-5. |
+
+The library implements the consolidated result, and every shipped table records
+in its comment which instrument it came from. Three of the 2021 changes are
+behavioural, not cosmetic, so a comparison with a pre-2021 study has to account
+for them: the rail roughness of an average network is now much higher at long
+wavelengths, the bridge correction has a spectrum instead of a flat 1 dB or
+4 dB, and the vertical directivity is identically zero below the horizon where
+the old form gave a positive correction.
+
+## 2. Two source lines, and what sits on each
+
+The method places **two** incoherent source lines at the centre of the track,
+referred to the plane tangent to the two upper rail surfaces:
+
+| Height | Index | Physical sources allocated to it |
+| :--- | :--- | :--- |
+| **0,5 m** (source A) | `h = 1` | Rolling noise (rail, wheel and freight superstructure), impact noise, curve squeal, bridge noise, and the traction and aerodynamic components that sit low: gears, motors, shrouds and screens. |
+| **4,0 m** (source B) | `h = 2` | The traction and aerodynamic components that sit high: diesel exhausts, roof apparatus, the pantograph recess. |
+
+Nothing in the method decides the traction split for you. Table G-5 tabulates
+the traction sound power **separately for the two heights**, so the split is
+read from the database rather than assumed; the Directive only adds that where
+a real component sits between the two model heights, its energy is distributed
+proportionately over them.
+
+For each 1/3-octave band the flow equation turns a single-vehicle sound power
+into a power per metre of line (2.3.2), or, for a stationary vehicle, into the
+idling equivalent over the reference period (2.3.4):
+
+$$
+L'_{W,\mathrm{eq,line},i}(\psi,\varphi) = L_{W,0,\mathrm{dir},i}(\psi,\varphi)
+  + 10\,\lg\!\left(\frac{Q}{1000\,v}\right),
+\qquad
++\,10\,\lg\!\left(\frac{T_\mathrm{idle}}{T_\mathrm{ref}\,L}\right).
+$$
+
+`Q` is in vehicles per hour, `v` in km/h, `L` the length of the track section in
+metres. Note the unit: the flow term uses km/h, while the roughness conversion
+two sections down uses m/s. Both are correct, and mixing them up is the single
+most expensive mistake available in this model.
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_rail_emission.svg"
+  alt="Octave-band source-line power of a conventional main line: grey bars for the two source heights combined, a blue marker line for source A at 0,5 m and a red one for source B at 4,0 m, with source A twenty to thirty decibels above source B in every band"
+  width="88%"
+  loading="eager"
+/>
+
+*At 160 km/h the track is source A almost everywhere: the 4,0 m line only
+carries the traction noise of the unit, some twenty-five decibels below. It is
+above 200 km/h, when aerodynamic noise appears at the pantograph, that source B
+starts to matter.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import (
+    BrakeType, ContactFilter, RailRoughnessClass, RailwayTrack, RailwayVehicle,
+    RollingStock, TrackTransferClass, TractionVehicle, WheelDiameter,
+    aerodynamic_sound_power, contact_filter, impact_roughness_single,
+    rail_roughness, railway_source_power, track_transfer, traction_sound_power,
+    wheel_roughness, wheel_transfer,
+)
+
+stock = RollingStock(
+    axles=4,
+    wheel_roughness=wheel_roughness(BrakeType.NON_TREAD),
+    contact_filter=contact_filter(ContactFilter.LOAD_50_DIAMETER_920),
+    wheel_transfer=wheel_transfer(WheelDiameter.MM_920),
+    traction=traction_sound_power(TractionVehicle.ELECTRIC_MULTIPLE_UNIT),
+    aerodynamic=aerodynamic_sound_power(),
+)
+track = RailwayTrack(
+    rail_roughness=rail_roughness(RailRoughnessClass.NORMAL),
+    track_transfer=track_transfer(TrackTransferClass.MONOBLOCK_MEDIUM),
+    impact_roughness=impact_roughness_single(),
+)
+result = railway_source_power(
+    RailwayVehicle(stock, flow_rate=96.0, speed=160.0), track, phi=90.0, psi=10.0,
+)
+result.plot()
+plt.show()
+```
+
+</details>
+
+## 3. Rolling noise: roughness in, sound power out
+
+Rolling noise is the wheel and the rail exciting each other through the
+roughness of the two running surfaces. The method separates the cause from the
+radiation:
+
+- **cause**: the rail roughness `Lr,TR` (Table G-1b, selected by digit 2 of the
+  track descriptor) and the wheel roughness `Lr,VEH` (Table G-1a, selected by
+  the brake type, digit 3 of the vehicle descriptor), energy-summed and then
+  filtered by the **contact filter** `A3` (Table G-2), which accounts for the
+  finite size of the contact patch:
+
+$$
+L_{R,\mathrm{TOT},i} = 10\,\lg\!\left(10^{L_{r,TR,i}/10} + 10^{L_{r,VEH,i}/10}\right) + A_{3,i};
+$$
+
+- **radiation**: three speed-independent transfer functions turn that roughness
+  into sound power per axle, one for the track (Table G-3a, selected by the
+  sleeper and rail-pad codes), one for the wheel (Table G-3b, selected by the
+  wheel diameter) and one for the superstructure of a freight wagon
+  (Table G-3c, which is 0,0 dB in every band):
+
+$$
+L_{W,0,TR,i} = L_{R,\mathrm{TOT},i} + L_{H,TR,i} + 10\,\lg N_a,
+$$
+
+and the same addition for the wheel and the superstructure. The three
+components are then energy-summed, and all three sit at source A.
+
+The superstructure term applies to vehicle type `a` (freight) only. A minimum
+speed of **50 km/h**, or 30 km/h for trams and light metro, is used to determine
+the roughness, which freezes the source spectrum below it; the flow term still
+uses the true speed. While a vehicle idles, rolling noise is excluded
+altogether.
+
+## 4. The wavelength-to-frequency conversion
+
+Roughness is tabulated against **wavelength**, and read at `lambda = v/f`, so
+the whole roughness spectrum slides along the frequency axis as the train speeds
+up. That is the reason a fast train is bright and a slow one is not: the same
+millimetre-scale roughness excites a higher band.
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_rail_roughness_shift.svg"
+  alt="Total effective roughness against 1/3-octave frequency for 60, 160 and 300 km/h, three curves of the same shape displaced upward and to the right as speed rises, crossing zero decibels near 400 Hz, 1 kHz and 2 kHz respectively"
+  width="88%"
+/>
+
+*The same track and the same wheel at three speeds. The curve does not change
+shape, it slides: multiplying the speed by 2,7 moves it by rather more than an
+octave and lifts it, because the long wavelengths of an average network are the
+rough ones.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import (
+    RAILWAY_THIRD_OCTAVE_BANDS, BrakeType, ContactFilter, RailRoughnessClass,
+    contact_filter, rail_roughness, roughness_to_frequency,
+    total_effective_roughness, wheel_roughness,
+)
+
+rail = rail_roughness(RailRoughnessClass.NORMAL)
+wheel = wheel_roughness(BrakeType.NON_TREAD)
+filt = contact_filter(ContactFilter.LOAD_50_DIAMETER_920)
+
+fig, ax = plt.subplots()
+for speed in (60.0, 160.0, 300.0):
+    total = total_effective_roughness(
+        roughness_to_frequency(rail[1], rail[0], speed),
+        roughness_to_frequency(wheel[1], wheel[0], speed),
+        roughness_to_frequency(filt[1], filt[0], speed),
+    )
+    ax.semilogx(RAILWAY_THIRD_OCTAVE_BANDS, total, label=f"v = {speed:g} km/h")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+Two things about this conversion deserve to be stated plainly, because neither
+is settled by the Directive.
+
+**The speed is in metres per second.** The published 2015 text says km/h in both
+places where the conversion appears, which would put the spectrum 3,6 times too
+low in frequency. The corrigendum of 2018 corrected both. This library
+implements the corrected form.
+
+**The interpolation rule is prose, not a formula.** All the Directive says is
+that "the two corresponding 1/3 octave bands defined in the wavelength domain
+shall be averaged energetically and proportionally", with no formula and no
+worked example. Two readings are shipped, and the default is the one that
+reproduces the Commission's own reference source module:
+
+```python
+from phonometry import RoughnessInterpolation
+
+RoughnessInterpolation.PROPORTIONAL   # levels interpolated linearly in lambda
+RoughnessInterpolation.ENERGY         # energies interpolated linearly in lambda
+```
+
+They differ by up to about 1 dB on a steep part of a spectrum. This is the
+single largest interpretation risk in the railway model, and any implementation
+that does not say which rule it uses is not comparable with another one.
+
+A third, smaller ambiguity is handled without a switch. The 2021 amendment put
+the tables it replaced on the standard 1/3-octave wavelength series but left
+Table G-1a alone, so the wheel roughness is still printed at 120, 12, 3,2 and
+1,2 mm where every other table now reads 125, 12,5, 3,15 and 1,25 mm. Rather
+than forcing the two onto a common grid, each table is resampled on the grid the
+Directive prints for it.
+
+## 5. Impact noise, and curve squeal
+
+**Impact noise** from joints, switches and crossings is added as a fictitious
+extra roughness, energy-summed into the total before the transfer functions are
+applied (2.3.11). Table G-4 is given for one joint per 100 m, and any other
+density scales it (2.3.12):
+
+$$
+L_{R,\mathrm{IMPACT},i} = L_{R,\mathrm{IMPACT-SINGLE},i}
+  + 10\,\lg\!\left(\frac{n_l}{0{,}01}\right).
+$$
+
+For jointed track a default `nl = 0,01 m⁻¹` is prescribed. Impact noise is not
+modelled below the minimum speed, nor while idling. The increment applies from
+50 m before the joint to 50 m after it, which is a **segmentation** instruction:
+the model gives the source strength, and it is up to the track segmentation to
+place it over the right 100 m.
+
+**Curve squeal** is an excess added to the rolling-noise sound power at all
+frequencies. The rule is the one the 2021 amendment substituted, and it is not
+the 2015 one:
+
+| Vehicle | Condition | Excess |
+| :--- | :--- | :--- |
+| Train | `300 m < R <= 500 m` over at least 50 m of curve | 5 dB |
+| Train | `R <= 300 m` over at least 50 m of curve | 8 dB |
+| Train | switch turnout with `R <= 300 m` | 8 dB |
+| Tram | curve or switch turnout with `R <= 200 m` | 5 dB |
+
+```python
+from phonometry import curve_squeal_excess
+
+curve_squeal_excess(280.0)                       # 8.0 dB
+curve_squeal_excess(450.0)                       # 5.0 dB
+curve_squeal_excess(280.0, tram=True)            # 0.0 dB, trams need R <= 200 m
+curve_squeal_excess(280.0, track_length=20.0)    # 0.0 dB, the curve is too short
+```
+
+The 2015 text read "8 dB for R < 300 m and 5 dB for 300 m < R < 500 m", which
+left the two endpoints with no rule at all even though the same paragraph scoped
+the effect to "curves with radius below **or equal to** 500 m". The 2021 wording
+closes both intervals.
+
+## 6. Traction and aerodynamic noise
+
+**Traction noise** is tabulated per vehicle and per source height (Table G-5).
+The Directive models only two running conditions, constant speed (which it says
+is valid as well when the train accelerates or decelerates) and idling, and
+takes the source strength at maximum load, so `LW,0,const,i = LW,0,idling,i` and
+the one table serves both. Idling is only considered if trains idle for more
+than half an hour.
+
+**Aerodynamic noise** is relevant only above **200 km/h** and follows a
+logarithmic speed law about `v0 = 300 km/h` (2.3.13, 2.3.14):
+
+$$
+L_{W,0,i} = L_{W,0,h,i}(v_0) + \alpha_{h,i}\,\lg\!\left(\frac{v}{v_0}\right),
+$$
+
+with `alpha1 = alpha2 = 50` in every band, so a doubling of speed adds
+15,05 dB. Table G-6 is the reference spectrum of a 20 m vehicle at `v0`: at the
+lower height it is broadband, at the upper one it is essentially silent except
+for a 1,6 kHz to 3,15 kHz plateau at 105 to 110 dB, which is the pantograph.
+
+## 7. Source directivity
+
+Each source is corrected in the two planes before the flow term is added
+(2.3.5). The **horizontal** correction is a dipole (2.3.15), 0 dB broadside and
+`10 lg 0,01 = -20 dB` along the track:
+
+$$
+\Delta L_{W,\mathrm{dir,hor},i} = 10\,\lg\!\left(0{,}01 + 0{,}99\,\sin^2\varphi\right).
+$$
+
+The **vertical** correction of source A (2.3.16) depends on the band, and it is
+one of the pieces the 2021 amendment rewrote. The current text drops the
+absolute-value bars of the 2015 form and makes the correction identically zero
+for `psi <= 0`:
+
+$$
+\Delta L_{W,\mathrm{dir,ver},i} = \frac{40}{3}
+  \left[\tfrac{2}{3}\sin 2\psi - \sin\psi\right]
+  \lg\!\left(\frac{f_{c,i} + 600}{200}\right), \quad 0 < \psi < \pi/2,
+$$
+
+and zero elsewhere. The two editions disagree over the whole lower half space,
+and also above about 41,4 degrees, where the bracket turns negative. Both are
+available, because comparing with a study computed before 2021 needs the old
+one:
+
+```python
+from phonometry import DirectivityEdition, vertical_directivity
+
+vertical_directivity(-30.0)                                        # zeros
+vertical_directivity(-30.0, edition=DirectivityEdition.ORIGINAL_2015)  # positive
+```
+
+At source B, only the aerodynamic source is directional, `10 lg(cos² psi)` for
+`psi < 0` (2.3.17); everything else at 4,0 m is omni-directional, and so is
+bridge noise at 0,5 m.
+
+One point of interpretation: 2.3.15 offers the dipole "by default ... for
+rolling, impact, squeal, braking, fans and aerodynamic effects". Traction noise
+other than the fans is not in that list, and the Directive gives no other
+horizontal directivity for it. This library applies the dipole to every source,
+which is what the Commission's reference source module does.
+
+## 8. Bridges
+
+On a bridge the deck radiates too. The 2015 text added a constant to the rolling
+noise, 1 dB for concrete or masonry and 4 dB for steel with ballasted track. The
+2021 amendment replaced that with a **separate source**, built exactly like a
+rolling-noise component but with the bridge transfer function of Table G-7
+(2.3.18):
+
+$$
+L_{W,0,\mathrm{bridge},i} = L_{R,\mathrm{TOT},i} + L_{H,\mathrm{bridge},i}
+  + 10\,\lg N_a.
+$$
+
+The rolling noise of the vehicle on the bridge is still computed normally, with
+the transfer function of the track system that is actually on the bridge; the
+bridge term is added to it. It sits at source A and is omni-directional, which
+the amendment states explicitly.
+
+```python
+from phonometry import BridgeType, RailwayTrack, bridge_transfer
+
+RailwayTrack(
+    rail_roughness=..., track_transfer=...,
+    bridge_transfer=bridge_transfer(BridgeType.PLUS_10_DBA),
+)
+```
+
+## 9. Handing the source to a propagation model
+
+The railway source is derived in **1/3 octave bands** and then energy-summed
+into octave bands for propagation, which is what 2.3.2 requires and what
+(EU) 2021/1226 point (1) made explicit. The result object carries both:
+
+```python
+result.third_octave_line_power   # (2, 24), the two heights in 1/3 octaves
+result.line_power                # (2, 8), the same in octave bands
+result.total_line_power          # (8,), the two heights energy-summed
+result.components["rolling"]     # the per-source breakdown, before directivity
+```
+
+Splitting a source line into equivalent point sources is, in the words of
+section 2.5.3, "outside the scope of the current methodology": a point source
+standing for a segment of length `dL` simply carries
+`L'W,eq,line,i + 10 lg(dL)`, which is arithmetic.
+
+CNOSSOS-EU has **its own** propagation method in section 2.5 of Annex II, and it
+is not ISO 9613-2. Chaining a CNOSSOS emission onto the ISO 9613-2 propagation
+of this library is a legitimate engineering estimate, but it is not the
+normative CNOSSOS chain and must not be reported as one.
+
+## 10. What is pinned against digits, and what is not
+
+Annex II prints **no worked example and no check value** anywhere in 2.3 or
+Appendix G, so it is worth being explicit about what the agreement in the test
+suite measures.
+
+**Verified against published digits.** Every Appendix G table, against the
+Official Journal text of the instrument that enacted it. And the whole chain of
+equations end to end, against the emission test workbook the European Commission
+published with its reference source module: feeding the shipped equations the
+**2015** coefficient database that workbook was computed with reproduces **all
+34 560 published rows of the twenty vehicles whose catalogue entries are well
+formed**, that is 17 280 cases at both source heights, to 0,0055 dB, inside the
+two decimals it prints. A hundred and twenty-three of those cases are committed
+to the repository and run in CI. The three vehicles left out are described in
+`tests/data/cnossos/README.md`: their rows record defects of the reference
+program, not of the method.
+
+That agreement resolves the loud parts of the database and not the quiet ones:
+a coefficient twenty decibels below its neighbour does not move the total, so
+the placeholder rows of the reference catalogue and the source-A traction
+column, which rolling noise always covers, are carried by the test set without
+being constrained by it. `tests/data/cnossos/README.md` reports the measurement.
+
+**Verified as equations times transcribed tables, not end to end.** Everything
+the 2021 amendment changed. The workbook predates it, so the new curve-squeal
+rule, the bridge transfer function, the current vertical directivity and the
+five replaced tables are each pinned individually, by transcription and by
+closed-form assertion, but their combination has never been checked against an
+independent published result.
+
+**Not anchored on any oracle.** The choice of interpolation rule in section 4;
+the proportional distribution of traction sound power when a real component sits
+between the two model heights, for which the Directive gives no formula; and the
+segmentation of a line into point sources, which the method declares out of
+scope.
+
+## What this guide covers
+
+**Covered.** Section 2.3 of Annex II to Directive 2002/49/EC in the consolidated
+text: the vehicle and track descriptors of Tables [2.3.a] and [2.3.b], the
+traffic-flow line power (2.3.1, 2.3.2, 2.3.4), the directional sound power
+(2.3.5), rolling noise (2.3.6 to 2.3.10), impact noise (2.3.11, 2.3.12), curve
+squeal, traction noise, aerodynamic noise (2.3.13, 2.3.14), the source
+directivity (2.3.15 to 2.3.17) and bridge noise (2.3.18), together with the
+whole Appendix G database, through `railway_source_power` and the component
+functions around it.
+
+**Not covered.** The road source (2.2 and Appendix F), the industrial source
+(2.4 and Appendix H), the aircraft source (2.6 and 2.7) and the CNOSSOS-EU
+propagation method of section 2.5, which is a different model from the
+ISO 9613-2 one implemented in this library. Rail roughness classes `N` (not
+well maintained) and `B` (bad condition) carry no spectrum in Appendix G and
+have to be supplied by the Member State. The other railway sources of 2.3.3,
+such as depots, stations and loudspeakers, are treated by the industrial method.
+
+## See also
+
+- API reference: [`environmental.cnossos_rail`](/phonometry/reference/api/environment/cnossos-rail/).
+- [Outdoor Sound Propagation](/phonometry/guides/outdoor-propagation/): the
+  ISO 9613-2 chain that carries a source power to a receiver.
+- [Environmental noise levels](/phonometry/guides/environmental-levels/): the
+  Lden and Lnight indicators the resulting maps are drawn for.
