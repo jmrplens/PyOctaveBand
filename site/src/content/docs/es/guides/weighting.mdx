@@ -37,12 +37,14 @@ Esta guía cubre **A**, **C** y **Z**, las curvas especificadas en
 la familia, la curva G de infrasonido, las históricas B y D y la curva AU, es
 [Ponderaciones especiales](/phonometry/es/guides/special-weightings/).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_es.svg" alt="Curvas de ponderación A, B, C, D, AU y Z con zoom de la región positiva de la curva A (+1,27 dB en 2,5 kHz)" width="80%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_es.svg" alt="Curvas de ponderación A, C y Z de IEC 61672-1 con zoom de la región positiva de la curva A (+1,27 dB en 2,5 kHz)" width="80%" loading="eager" />
 
-*La familia de ponderaciones del rango audible medida en una sola gráfica.
-Esta guía cubre las respuestas A, C y Z; las curvas B, D y AU dibujadas junto
-a ellas, y la curva G de infrasonido, son el tema de
-[Ponderaciones especiales](/phonometry/es/guides/special-weightings/).*
+*Las tres curvas de IEC 61672-1, medidas con los filtros de la propia
+biblioteca a 48 kHz: A, que descarta los graves; C, que los conserva; y Z,
+que no pondera nada. El recuadro amplía la pequeña región positiva de A en
+torno a 2,5 kHz. Las curvas especiales B, D y AU tienen su propia gráfica en
+[Ponderaciones especiales](/phonometry/es/guides/special-weightings/), junto
+con la curva G de infrasonido.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -60,11 +62,11 @@ impulse[fs // 2] = 1.0
 freqs = np.fft.rfftfreq(fs, 1 / fs)
 
 fig, ax = plt.subplots(figsize=(9, 5))
-for curve in ("A", "B", "C", "D", "AU", "Z"):
+for curve in ("A", "C", "Z"):
     spectrum = np.fft.rfft(metrology.weighting_filter(impulse, fs, curve=curve))
     ax.semilogx(freqs[1:], 20 * np.log10(np.abs(spectrum[1:]) + np.finfo(float).eps),
                 label=curve)
-ax.set(xlim=(10, 20000), ylim=(-80, 15),
+ax.set(xlim=(10, 22000), ylim=(-72, 15),
        xlabel="Frecuencia [Hz]", ylabel="Respuesta [dB]")
 ax.grid(True, which="both", alpha=0.3)
 ax.legend()
@@ -76,10 +78,13 @@ plt.show()
 * **Ponderación A (`A`):** estándar para ruido ambiental (IEC 61672-1).
 * **Ponderación C (`C`):** para presión acústica de pico y ruido de alto nivel.
 * **Ponderación Z (`Z`):** ponderación cero, respuesta completamente plana.
-* **Ponderación G (`G`):** ponderación de infrasonido según ISO 7196 ([Ponderaciones especiales](/phonometry/es/guides/special-weightings/)).
-* **Ponderación B (`B`):** curva intermedia histórica de ANSI S1.4-1983 ([Ponderaciones especiales](/phonometry/es/guides/special-weightings/)).
-* **Ponderación D (`D`):** ponderación de ruido de aeronaves de la retirada IEC 537 ([Ponderaciones especiales](/phonometry/es/guides/special-weightings/)).
-* **Ponderación AU (`AU`):** ponderación A con el corte de ultrasonidos de IEC 61012 ([Ponderaciones especiales](/phonometry/es/guides/special-weightings/)).
+
+El argumento `curve` acepta además las cuatro ponderaciones especiales, con
+gráfica y documentación en
+[Ponderaciones especiales](/phonometry/es/guides/special-weightings/): `'G'`
+para infrasonido (ISO 7196), las históricas `'B'` (ANSI S1.4-1983) y `'D'`
+(IEC 537), y `'AU'` para sonido audible en presencia de ultrasonidos
+(IEC 61012).
 
 ## ¿Cómo aplico la ponderación A a una señal con Python?
 
@@ -182,10 +187,9 @@ weighted_signal = metrology.weighting_filter(recording, fs, curve='A')
 c_weighted_signal = metrology.weighting_filter(recording, fs, curve='C')
 ```
 
-El resto de la familia tiene su propia guía:
-[Ponderaciones especiales](/phonometry/es/guides/special-weightings/): la
-curva G de infrasonido de ISO 7196, las históricas B y D, y la AU para
-sonido audible en presencia de ultrasonidos.
+Las ponderaciones especiales usan el mismo argumento `curve`; cada una está
+documentada, con su propia gráfica de respuesta, en
+[Ponderaciones especiales](/phonometry/es/guides/special-weightings/).
 
 ## 3. Parámetros de `weighting_filter()` / `WeightingFilter`
 

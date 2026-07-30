@@ -37,12 +37,14 @@ Table 3 class verification. The rest of the family, the infrasound G curve,
 the historical B and D and the AU curve, is
 [Special Weightings](/phonometry/guides/special-weightings/).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses.svg" alt="A, B, C, D, AU and Z frequency weighting curves with a zoom showing the positive region of the A curve (+1.27 dB at 2.5 kHz)" width="80%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses.svg" alt="A, C and Z frequency weighting curves of IEC 61672-1 with a zoom showing the positive region of the A curve (+1.27 dB at 2.5 kHz)" width="80%" loading="eager" />
 
-*The audible-range weighting family measured on one chart. This guide covers
-the A, C and Z responses; the B, D and AU curves drawn alongside them, and
-the infrasound G curve, are the subject of
-[Special Weightings](/phonometry/guides/special-weightings/).*
+*The three curves of IEC 61672-1, measured through the library's own filters
+at 48 kHz: A, which discards the bass; C, which keeps it; and Z, which
+weights nothing at all. The inset magnifies the small positive region of A
+around 2.5 kHz. The special B, D and AU curves have their own chart in
+[Special Weightings](/phonometry/guides/special-weightings/), together with
+the infrasound G curve.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -60,11 +62,11 @@ impulse[fs // 2] = 1.0
 freqs = np.fft.rfftfreq(fs, 1 / fs)
 
 fig, ax = plt.subplots(figsize=(9, 5))
-for curve in ("A", "B", "C", "D", "AU", "Z"):
+for curve in ("A", "C", "Z"):
     spectrum = np.fft.rfft(metrology.weighting_filter(impulse, fs, curve=curve))
     ax.semilogx(freqs[1:], 20 * np.log10(np.abs(spectrum[1:]) + np.finfo(float).eps),
                 label=curve)
-ax.set(xlim=(10, 20000), ylim=(-80, 15),
+ax.set(xlim=(10, 22000), ylim=(-72, 15),
        xlabel="Frequency [Hz]", ylabel="Response [dB]")
 ax.grid(True, which="both", alpha=0.3)
 ax.legend()
@@ -76,10 +78,12 @@ plt.show()
 * **A-Weighting (`A`):** Standard for environmental noise (IEC 61672-1).
 * **C-Weighting (`C`):** Used for peak sound pressure and high-level noise.
 * **Z-Weighting (`Z`):** Zero weighting, completely flat response.
-* **G-Weighting (`G`):** Infrasound weighting per ISO 7196 ([Special Weightings](/phonometry/guides/special-weightings/)).
-* **B-Weighting (`B`):** Historical middle curve of ANSI S1.4-1983 ([Special Weightings](/phonometry/guides/special-weightings/)).
-* **D-Weighting (`D`):** Aircraft-noise weighting of the withdrawn IEC 537 ([Special Weightings](/phonometry/guides/special-weightings/)).
-* **AU-Weighting (`AU`):** A-weighting with the IEC 61012 ultrasound cutoff ([Special Weightings](/phonometry/guides/special-weightings/)).
+
+The `curve` argument also accepts the four special weightings, charted and
+documented in [Special Weightings](/phonometry/guides/special-weightings/):
+`'G'` for infrasound (ISO 7196), the historical `'B'` (ANSI S1.4-1983) and
+`'D'` (IEC 537), and `'AU'` for audible sound in the presence of ultrasound
+(IEC 61012).
 
 ## How do I apply A-weighting to a signal in Python?
 
@@ -179,10 +183,9 @@ weighted_signal = metrology.weighting_filter(recording, fs, curve='A')
 c_weighted_signal = metrology.weighting_filter(recording, fs, curve='C')
 ```
 
-The rest of the family has its own guide:
-[Special Weightings](/phonometry/guides/special-weightings/): the
-infrasound G curve of ISO 7196, the historical B and D, and AU for
-audible sound in the presence of ultrasound.
+The special weightings take the same `curve` argument; each is documented,
+with its own response chart, in
+[Special Weightings](/phonometry/guides/special-weightings/).
 
 ## 3. `weighting_filter()` / `WeightingFilter` parameters
 

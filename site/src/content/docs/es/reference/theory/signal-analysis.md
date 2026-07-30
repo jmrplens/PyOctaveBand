@@ -277,9 +277,9 @@ modo `high_accuracy` por defecto diseña y ejecuta el filtro a una frecuencia
 interna sobremuestreada (≥ 144 kHz); consulta
 [Ponderación frecuencial](/phonometry/es/guides/weighting/).
 
-<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_es.svg" alt="Curvas de ponderación A, B, C, D, AU y Z con zoom de la región positiva de la curva A (+1,27 dB en 2,5 kHz)" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_es_dark.svg" alt="Curvas de ponderación A, B, C, D, AU y Z con zoom de la región positiva de la curva A (+1,27 dB en 2,5 kHz)" style="width:80%" loading="lazy">
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_es.svg" alt="Curvas de ponderación A, C y Z de IEC 61672-1 con zoom de la región positiva de la curva A (+1,27 dB en 2,5 kHz)" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_es_dark.svg" alt="Curvas de ponderación A, C y Z de IEC 61672-1 con zoom de la región positiva de la curva A (+1,27 dB en 2,5 kHz)" style="width:80%" loading="lazy">
 
-*Las curvas de ponderación que aplica la biblioteca, con la pequeña región positiva de la curva A ampliada.*
+*Las tres curvas de ponderación de IEC 61672-1 que aplica la biblioteca, con la pequeña región positiva de la curva A ampliada. Las curvas especiales B, D y AU están en [Ponderaciones especiales](/phonometry/es/guides/special-weightings/).*
 
 ## Integración temporal
 

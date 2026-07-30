@@ -120,7 +120,53 @@ expresan como L<sub>pG</sub> (o L<sub>Geq</sub> para el nivel equivalente).
 
 ## 2. Curvas históricas y de propósito especial: B, D y AU
 
-Tres curvas más completan la familia.
+Tres curvas más completan la familia. Las tres trabajan en el rango audible,
+así que comparten una gráfica, dibujada frente a la curva A porque es la
+referencia con la que se define o se describe cada una: B como la curva
+intermedia entre A y C, D como la que tiene una joroba que A no tiene, y AU
+como la propia A con un paso bajo añadido.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/special_weighting_responses_es.svg" alt="Curvas de ponderación B, D y AU medidas a 96 kHz frente a una referencia gris ancha de ponderación A, con la joroba de +11,5 dB de D en 3,15 kHz y el corte de AU 13 dB por debajo de A en 16 kHz anotados" width="80%" />
+
+*Las tres curvas frente a la referencia A (gris ancha), medidas a 96 kHz para
+que el eje llegue a los 40 kHz donde IEC 61012 aún especifica el paso bajo U.
+B (verde, discontinua) descarta menos graves que A; D (morada) lleva la joroba
+de +11,5 dB en 3,15 kHz, donde más molesta el silbido de la turbomaquinaria;
+AU (naranja) recorre el interior de la referencia A hasta 10 kHz y luego se
+desprende con U, hasta quedar 13 dB por debajo de A en 16 kHz. La curva G de
+infrasonido conserva su propia gráfica en la sección 1, y A, C y Z están en
+[Ponderación frecuencial](/phonometry/es/guides/weighting/).*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import metrology
+
+# Medimos la respuesta de cada curva: ponderamos un impulso unitario centrado
+# y tomamos su espectro. 96 kHz, no 48 kHz: así se alcanza la fila de 40 kHz
+# de la tabla de la ponderación U de IEC 61012, que es la razón de ser de AU.
+fs = 96000
+impulse = np.zeros(fs)
+impulse[fs // 2] = 1.0
+freqs = np.fft.rfftfreq(fs, 1 / fs)
+
+fig, ax = plt.subplots(figsize=(9, 5))
+# A va primero y ancha, como referencia con la que se leen las otras tres.
+for curve, width in (("A", 4.0), ("B", 1.8), ("D", 1.8), ("AU", 1.8)):
+    spectrum = np.fft.rfft(metrology.weighting_filter(impulse, fs, curve=curve))
+    ax.semilogx(freqs[1:], 20 * np.log10(np.abs(spectrum[1:]) + np.finfo(float).eps),
+                label=curve, linewidth=width)
+ax.set(xlim=(10, 40000), ylim=(-90, 18),
+       xlabel="Frecuencia [Hz]", ylabel="Respuesta [dB]")
+ax.grid(True, which="both", alpha=0.3)
+ax.legend()
+plt.show()
+```
+
+</details>
 
 ### B (ANSI S1.4-1983, histórica)
 

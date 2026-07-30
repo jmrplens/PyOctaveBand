@@ -293,6 +293,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Frequency-weighting guides: the single chart that drew A, B, C, D, AU and Z
+  together is split so each guide shows only the curves it documents.
+  `weighting_responses` now holds the three curves of IEC 61672-1, and with
+  B/D/AU gone its floor drops from -50 to -72 dB so the A curve no longer
+  runs off the bottom-left corner at 10 Hz. The new
+  `special_weighting_responses` figure gives the special-weightings guide the
+  chart it was missing: B, D and AU against a wide A reference, measured at
+  96 kHz so the axis reaches the 40 kHz where IEC 61012 specifies the U
+  low-pass of AU, with the +11.5 dB D hump at 3.15 kHz and the 13 dB AU
+  cutoff at 16 kHz annotated. Both guides were revised around the split in
+  English and Spanish: the A/C/Z page no longer hedges about curves it does
+  not show, and the special-weightings page describes the three it now draws.
+
 - Documentation animations: a field that sits tens of dB under the one
   setting the colour scale is now drawn with an explicit display gain
   instead of collapsing into the page background. The gain is measured off

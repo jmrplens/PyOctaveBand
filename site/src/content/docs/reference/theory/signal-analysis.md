@@ -273,9 +273,9 @@ transform. Because the bilinear transform compresses frequencies near Nyquist,
 the default `high_accuracy` mode designs and runs the filter at an internally
 oversampled rate (≥ 144 kHz); see [Frequency Weighting](/phonometry/guides/weighting/).
 
-<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses.svg" alt="A, B, C, D, AU and Z frequency weighting curves with a zoom showing the positive region of the A curve (+1.27 dB at 2.5 kHz)" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_dark.svg" alt="A, B, C, D, AU and Z frequency weighting curves with a zoom showing the positive region of the A curve (+1.27 dB at 2.5 kHz)" style="width:80%" loading="lazy">
+<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses.svg" alt="A, C and Z frequency weighting curves of IEC 61672-1 with a zoom showing the positive region of the A curve (+1.27 dB at 2.5 kHz)" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_dark.svg" alt="A, C and Z frequency weighting curves of IEC 61672-1 with a zoom showing the positive region of the A curve (+1.27 dB at 2.5 kHz)" style="width:80%" loading="lazy">
 
-*The weighting curves realized by the library, with the small positive region of the A curve magnified.*
+*The three IEC 61672-1 weighting curves realized by the library, with the small positive region of the A curve magnified. The special B, D and AU curves are charted in [Special Weightings](/phonometry/guides/special-weightings/).*
 
 ## Time Integration
 
