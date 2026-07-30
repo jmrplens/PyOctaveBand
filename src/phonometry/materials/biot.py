@@ -206,9 +206,11 @@ class BiotWavesResult:
 
     All arrays share the shape of ``frequency``. ``compressional_wavenumber_1``
     and ``compressional_wavenumber_2`` are ``delta1`` and ``delta2`` of
-    Eqs. (6.67)-(6.68) (the branch with ``-sqrt(Delta)`` first, as printed),
-    ``shear_wavenumber`` is ``delta3`` of Eq. (6.83), all in rad/m and all
-    taken on the root with non-negative real part. ``velocity_ratio_1``,
+    Eqs. (6.67)-(6.68) (the branch with ``-sqrt(Delta)`` first, as printed,
+    with ``sqrt(Delta)`` taken on the root with non-positive real part so that
+    the numbering matches the book's own example), ``shear_wavenumber`` is
+    ``delta3`` of Eq. (6.83), all in rad/m and all taken on the root with
+    non-negative real part. ``velocity_ratio_1``,
     ``velocity_ratio_2`` and ``velocity_ratio_3`` are the ratios ``mu`` of the
     fluid displacement over the frame displacement (Eqs. (6.71) and (6.84)).
     ``elastic_p``, ``elastic_q`` and ``elastic_r`` are the Biot elastic
@@ -399,10 +401,15 @@ def biot_waves(
     q_coef = (1.0 - phi) * k_f
     p_coef = 4.0 * n_mod / 3.0 + k_b + (1.0 - phi) ** 2 * k_f / phi
 
-    # The two compressional waves, A&A Eqs. (6.67)-(6.69).
+    # The two compressional waves, A&A Eqs. (6.67)-(6.69). The book does not
+    # state the branch of sqrt(Delta); the root with non-positive real part is
+    # the one that reproduces its printed identification of the airborne wave
+    # with (delta1, mu1) below 495 Hz and with (delta2, mu2) above it for the
+    # Table 6.1 glass wool (printed p. 124). Only the *numbering* of the two
+    # roots depends on this choice; every predicted quantity is invariant.
     trace = p_coef * rho22 + r_coef * rho11 - 2.0 * q_coef * rho12
     det_m = p_coef * r_coef - q_coef**2
-    discriminant = np.sqrt(
+    discriminant = -np.sqrt(
         trace**2 - 4.0 * det_m * (rho11 * rho22 - rho12**2)
     )
     delta1_sq = omega**2 * (trace - discriminant) / (2.0 * det_m)
