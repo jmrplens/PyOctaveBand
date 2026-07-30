@@ -1296,6 +1296,52 @@ def plot_db_hr_assessment(
     return ax
 
 
+def _plot_shaded_band_pair(
+    ax: Axes | None,
+    frequencies: np.ndarray | None,
+    reference: np.ndarray,
+    curve: np.ndarray,
+    *,
+    reference_label: str,
+    curve_label: str,
+    fill_label: str,
+    ylabel: str,
+    title: str,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Two band curves on a categorical axis with the gap between them shaded.
+
+    Shared by the heavy-impact standardization figure (measured against
+    standardized level) and the ceiling/plenum figure (the two ceilings against
+    the path they form): both draw a dashed reference, a solid main curve and
+    the difference as a filled band, on band positions labelled either with the
+    centre frequencies or with a plain band index when none were supplied.
+    """
+    ax = ax if ax is not None else _new_axes()
+    labels = frequencies if frequencies is not None else np.arange(curve.size) + 1.0
+    positions = _band_axis(
+        ax, labels,
+        xlabel="Frequency [Hz]" if frequencies is not None else "Band index",
+        language=language,
+    )
+    ax.plot(positions, reference, "s--", color=_C_REFERENCE, lw=1.2,
+            label=_t(reference_label, language))
+    kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault("marker", "o")
+    ax.plot(positions, curve, "-", label=_t(curve_label, language), **kwargs)
+    ax.fill_between(
+        positions, reference, curve,
+        color=theme_fill(_C_SECONDARY, ax), lw=0, zorder=0,
+        label=_t(fill_label, language),
+    )
+    ax.set_ylabel(_t(ylabel, language))
+    ax.set_title(title)
+    ax.grid(True, which="both", alpha=0.3)
+    ax.legend(loc="best", fontsize="small")
+    return ax
+
+
 def plot_heavy_impact_source(
     result: HeavyImpactSourceCheck, ax: Axes | None = None,
     language: str = "en", **kwargs: Any
@@ -1357,34 +1403,22 @@ def plot_standardized_maximum_impact(
     """
     from .._i18n import format_number, localize_axes
 
-    ax = ax if ax is not None else _new_axes()
-    labels = (
-        result.frequencies if result.frequencies is not None
-        else np.arange(result.measured.size) + 1.0
-    )
-    positions = _band_axis(
-        ax, labels,
-        xlabel="Frequency [Hz]" if result.frequencies is not None else "Band index",
+    ax = _plot_shaded_band_pair(
+        ax,
+        result.frequencies,
+        result.measured,
+        result.standardized,
+        reference_label="$L_{i,Fmax}$ (measured)",
+        curve_label="$L\'_{i,Fmax,V,T}$ (standardized)",
+        fill_label="standardization correction",
+        ylabel="Maximum impact sound pressure level [dB]",
+        title=(
+            f"{_t('ISO 16283-2 rubber-ball standardization', language)} "
+            f"(V = {format_number(result.volume, language, decimals=1)} m$^3$)"
+        ),
         language=language,
+        **kwargs,
     )
-    ax.plot(positions, result.measured, "s--", color=_C_REFERENCE, lw=1.2,
-            label=_t("$L_{i,Fmax}$ (measured)", language))
-    kwargs.setdefault("color", _C_PRIMARY)
-    kwargs.setdefault("marker", "o")
-    ax.plot(positions, result.standardized, "-",
-            label=_t("$L'_{i,Fmax,V,T}$ (standardized)", language), **kwargs)
-    ax.fill_between(
-        positions, result.measured, result.standardized,
-        color=theme_fill(_C_SECONDARY, ax), lw=0, zorder=0,
-        label=_t("standardization correction", language),
-    )
-    ax.set_ylabel(_t("Maximum impact sound pressure level [dB]", language))
-    ax.set_title(
-        f"{_t('ISO 16283-2 rubber-ball standardization', language)} "
-        f"(V = {format_number(result.volume, language, decimals=1)} m$^3$)"
-    )
-    ax.grid(True, which="both", alpha=0.3)
-    ax.legend(loc="best", fontsize="small")
     localize_axes(ax, language)
     return ax
 
@@ -1475,37 +1509,24 @@ def plot_plenum_flanking(
     """
     from .._i18n import format_number, localize_axes
 
-    ax = ax if ax is not None else _new_axes()
-    labels = (
-        result.frequencies if result.frequencies is not None
-        else np.arange(result.reduction_index.size) + 1.0
-    )
-    positions = _band_axis(
-        ax, labels,
-        xlabel="Frequency [Hz]" if result.frequencies is not None else "Band index",
+    ax = _plot_shaded_band_pair(
+        ax,
+        result.frequencies,
+        result.reduction_index_source + result.reduction_index_receiving,
+        result.reduction_index,
+        reference_label="$R_S + R_R$ (two ceilings)",
+        curve_label="$R_{cl}$ (ceiling/plenum path)",
+        fill_label="plenum penalty",
+        ylabel="Sound reduction index $R$ [dB]",
+        title=(
+            f"{_t('Suspended-ceiling plenum path', language)} "
+            f"(h = {format_number(result.plenum_height, language, decimals=2)} m, "
+            f"$L_R$ = {format_number(result.ceiling_length, language, decimals=2)} m, "
+            f"$\\varepsilon$ = {result.epsilon:.0f})"
+        ),
         language=language,
+        **kwargs,
     )
-    total = result.reduction_index_source + result.reduction_index_receiving
-    ax.plot(positions, total, "s--", color=_C_REFERENCE, lw=1.2,
-            label=_t("$R_S + R_R$ (two ceilings)", language))
-    kwargs.setdefault("color", _C_PRIMARY)
-    kwargs.setdefault("marker", "o")
-    ax.plot(positions, result.reduction_index, "-",
-            label=_t("$R_{cl}$ (ceiling/plenum path)", language), **kwargs)
-    ax.fill_between(
-        positions, result.reduction_index, total,
-        color=theme_fill(_C_SECONDARY, ax), lw=0, zorder=0,
-        label=_t("plenum penalty", language),
-    )
-    ax.set_ylabel(_t("Sound reduction index $R$ [dB]", language))
-    ax.set_title(
-        f"{_t('Suspended-ceiling plenum path', language)} "
-        f"(h = {format_number(result.plenum_height, language, decimals=2)} m, "
-        f"$L_R$ = {format_number(result.ceiling_length, language, decimals=2)} m, "
-        f"$\\varepsilon$ = {result.epsilon:.0f})"
-    )
-    ax.grid(True, which="both", alpha=0.3)
-    ax.legend(loc="best", fontsize="small")
     localize_axes(ax, language)
     return ax
 
