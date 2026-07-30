@@ -1,10 +1,10 @@
 #  Copyright (c) 2026. Jose M. Requena-Plens
 """The errata evidence gate, exercised on the entry that made it necessary.
 
-``scripts/check_errata_evidence.py`` exists because an entry was published
-accusing an author of printing ``2/(3 pi)`` where the page prints
+``scripts/check_errata_evidence.py`` exists because an entry was drafted that
+accused an author of printing ``2/(3 pi)`` where the page prints
 ``2/(sqrt(3) pi)``: three text extractors had eaten the radical and agreed with
-each other. That entry cited no page render and stated its own ratio twice, as
+each other. It cited no page render and stated its own ratio twice, as
 "1,73 times too small" and as "a fixed 2,4 dB offset". Both tells are
 reproduced below, together with the shapes a passing entry has to have.
 """
@@ -22,8 +22,8 @@ if _SCRIPTS not in sys.path:
 
 import check_errata_evidence as cee
 
-#: The retracted entry, reduced to the two claims that give it away.
-_RETRACTED = """
+#: The withdrawn entry, reduced to the two claims that give it away.
+_WITHDRAWN = """
 ## Vigran, Building Acoustics (2008), Eq. (8.46)
 
 - **Location:** Eq. (8.46).
@@ -61,9 +61,9 @@ def _entries(markdown: str) -> list[cee.Entry]:
     return cee.parse_entries(markdown)
 
 
-def test_the_retracted_entry_trips_both_tells() -> None:
+def test_the_withdrawn_entry_trips_both_tells() -> None:
     """"1,73 times too small" and "2,4 dB offset" are sqrt(3) twice over."""
-    entries = _entries(_RETRACTED)
+    entries = _entries(_WITHDRAWN)
     assert len(entries) == 1
     assert not entries[0].cites_render
     hits = cee.check_ratios(entries)
@@ -75,8 +75,8 @@ def test_the_retracted_entry_trips_both_tells() -> None:
     assert "2,4 dB offset" in quoted
 
 
-def test_the_retracted_entry_fails_the_render_check() -> None:
-    problems = cee.check_renders(_entries(_RETRACTED))
+def test_the_withdrawn_entry_fails_the_render_check() -> None:
+    problems = cee.check_renders(_entries(_WITHDRAWN))
     assert len(problems) == 1
     assert "cites no page render" in problems[0]
 

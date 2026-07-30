@@ -181,10 +181,10 @@ twenty-five source documents whose renders the registry cites, twenty-two emit
 no `√` (U+221A) at all over their whole text layer, so every radical in them
 extracts as if it were not there: `f_T/√2` becomes `f_T/2`. Eleven of the
 twenty-five emit no `−` (U+2212) either, while emitting ASCII hyphens, and
-several replace `+` with a `þ` ligature. One entry was published on that basis
-and accused an author of
-printing `2/(3 π)` where the page prints `2/(√3 π)`; three independent
-extractors agreed with each other and all three were wrong. The registry's
+several replace `+` with a `þ` ligature. An entry drafted on that basis accused an
+author of printing `2/(3 π)` where the page prints `2/(√3 π)`; three
+independent extractors agreed with each other and all three were wrong. It was
+caught in review before it reached this registry. The registry's
 own ISO/PAS 20065 entry is the live example: `pdftotext` reads DIN 45681's
 `f_T/√2` back as `f_T/2` on both edges, which makes the DIN and ISO prints look
 identical when they are not.
@@ -215,7 +215,7 @@ python scripts/check_errata_evidence.py --ratios # only the irrational-ratio lin
    pairs and flags any ratio within 0,5 % of √2, √3, π, 2π, 1/√2, ln 2 or a
    small integer. A flagged entry is not necessarily wrong (a genuine
    factor-of-ten misprint trips it too), but it must then say, in the same
-   entry, that the page was read as an image. The retracted entry above tripped
+   entry, that the page was read as an image. The withdrawn entry above tripped
    it twice on its own text.
 2. **The render-evidence check** requires every entry to name a render or to be
    listed, with a reason, in the allowlist at the top of the script. The
@@ -233,7 +233,7 @@ document with zero `√` has invisible radicals and must not be read through its
 text layer.
 
 An OCR pass over a rendered crop, compared against the extraction, is the
-screen that would have caught the retracted entry directly; `tesseract` is not
+screen that would have caught that entry directly; `tesseract` is not
 installed in this environment, so it is not wired up. If it is added, the
 comparison has to be **asymmetric**: flag tokens that OCR sees and the
 extraction lacks, which is the direction a dropped glyph shows up in.

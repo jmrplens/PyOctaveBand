@@ -8,16 +8,16 @@ have actually shipped, and this script covers both.
 **Extraction, not the page.** PDF text layers silently delete glyphs. Most of
 the maths-bearing documents this project cites emit no ``U+221A`` at all over
 their whole text layer, so every radical in them extracts as if it were absent
-and ``f_T/sqrt(2)`` reads back as ``f_T/2``. One entry was published on that
-basis, accusing an author of printing ``2/(3 pi)`` where the page prints
+and ``f_T/sqrt(2)`` reads back as ``f_T/2``. An entry drafted on that basis
+accused an author of printing ``2/(3 pi)`` where the page prints
 ``2/(sqrt(3) pi)``; three independent extractors agreed with each other and all
-three were wrong. Hence :func:`check_renders`: every entry must record a render
+three were wrong, and it was caught in review. Hence :func:`check_renders`: every entry must record a render
 of the page it quotes (source file, PDF page index, printed folio and dpi), or
 be listed in :data:`RENDER_ALLOWLIST` with a reason.
 
 **The arithmetic tells.** When a glyph is lost the printed and derived values
 differ by the lost factor, so their ratio lands on one of a small set of
-constants. The retracted entry announced its own ratio twice, as "1,73 times
+constants. That entry announced its own ratio twice, as "1,73 times
 too small" and as "a fixed 2,4 dB offset" -- ``sqrt(3)`` and
 ``20 lg sqrt(3)``. Hence :func:`check_ratios`: any multiplicative claim in an
 entry whose value sits within 0,5 % of ``sqrt(2)``, ``sqrt(3)``, ``pi``,
