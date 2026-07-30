@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     from ..hearing.noise_induced_hearing_loss import HtlanResult, NiptsResult
     from ..hearing.objective_intelligibility import STOIResult
     from ..hearing.occupational_exposure import ExposureResult
-    from ..hearing.sii import SIIResult, StandardSpeechSpectrum
+    from ..hearing.sii import SIIProcedure, SIIResult, StandardSpeechSpectrum
     from ..hearing.sti import STIResult
     from ..hearing.threshold import AgeThresholdResult
 
@@ -62,6 +62,12 @@ _STRINGS: dict[str, str] = {
     "ANSI S3.5 SII = {sii}": "ANSI S3.5 SII = {sii}",
     "Speech spectrum level [dB SPL]": "Nivel del espectro de voz [dB SPL]",
     "ANSI S3.5-1997 standard speech spectrum": "ANSI S3.5-1997 espectro de voz estándar",
+    "ANSI S3.5-1997 band-importance function": "ANSI S3.5-1997 función de importancia de banda",
+    "Band importance $I_i$": "Importancia de banda $I_i$",
+    "Critical band (21)": "Banda crítica (21)",
+    "Equally contributing (17)": "Contribución equitativa (17)",
+    "One-third octave (18)": "Tercio de octava (18)",
+    "Octave (6)": "Octava (6)",
     "Normal": "Normal",
     "Raised": "Elevada",
     "Loud": "Fuerte",
@@ -209,6 +215,55 @@ def plot_sii(
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     ax.grid(True, axis="y", alpha=0.3)
     # localize_axes leaves the categorical band axis (a FuncFormatter) alone.
+    localize_axes(ax, language)
+    return ax
+
+
+#: Spanish labels of the four ANSI S3.5-1997 band procedures, keyed by the
+#: ``method=`` name; the English label is the dictionary value of ``_STRINGS``
+#: for any other language.
+_SII_METHOD_LABELS: dict[str, str] = {
+    "critical-band": "Critical band (21)",
+    "equally-contributing": "Equally contributing (17)",
+    "one-third-octave": "One-third octave (18)",
+    "octave": "Octave (6)",
+}
+
+
+def plot_sii_procedure(
+    result: SIIProcedure, ax: Axes | None = None, *, language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """Band-importance function of one ANSI S3.5-1997 band procedure.
+
+    Draws ``Ii`` as a step over the tabulated band limits on a continuous
+    logarithmic frequency axis, so procedures with different band counts and
+    widths overlay directly on the same axes.
+
+    :param result: A :class:`~phonometry.hearing.sii.SIIProcedure`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the step ``plot`` call.
+    :return: The axes.
+    """
+    from .._i18n import localize_axes
+    from .common import format_frequency_axis
+
+    ax = ax if ax is not None else _new_axes()
+    edges = np.asarray(result.band_edges, dtype=np.float64)
+    importance = np.asarray(result.band_importance, dtype=np.float64)
+    kwargs.setdefault("label", _t(_SII_METHOD_LABELS[result.method], language))
+    # A post-step draws each band's Ii flat across its own width, which is what
+    # makes a 6-band and a 21-band function comparable at a glance.
+    ax.plot(edges, np.append(importance, importance[-1]), drawstyle="steps-post",
+            **kwargs)
+    ax.set_ylabel(_t("Band importance $I_i$", language))
+    ax.set_ylim(bottom=0.0)
+    ax.set_title(_t("ANSI S3.5-1997 band-importance function", language))
+    format_frequency_axis(ax, float(edges[0]), float(edges[-1]))
+    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
+    ax.grid(True, alpha=0.3)
     localize_axes(ax, language)
     return ax
 
