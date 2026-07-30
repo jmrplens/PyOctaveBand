@@ -450,6 +450,13 @@ calculó ese libro reproduce sus 19 872 casos, en las dos alturas de fuente, con
 0,005 dB, dentro de los dos decimales que imprime. Ciento veintitrés de esos casos
 están versionados en el repositorio y se ejecutan en integración continua.
 
+Esa concordancia resuelve las partes ruidosas de la base de datos y no las
+silenciosas: un coeficiente veinte decibelios por debajo de su vecino no mueve
+el total, de modo que las filas de relleno del catálogo de referencia y la
+columna de tracción de la fuente A, que el ruido de rodadura siempre tapa, van
+en el conjunto de pruebas sin quedar acotadas por él.
+`tests/data/cnossos/README.md` recoge la medida.
+
 **Verificado como ecuaciones por tablas transcritas, no de extremo a extremo.**
 Todo lo que cambió la modificación de 2021. El libro de pruebas es anterior, así
 que la nueva regla de chirrido en curva, la función de transferencia de puente,

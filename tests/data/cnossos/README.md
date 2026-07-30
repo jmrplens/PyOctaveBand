@@ -63,6 +63,29 @@ track-parameter combinations, all four receiver-angle pairs and both flow
 rates, so the committed subset reaches every level of every factor the full set
 varies; what it does not reach is the sheer number of their combinations.
 
+What the agreement can and cannot resolve is worth stating, because it is a
+property of the source model and not of the test selection. A coefficient that
+sits twenty decibels below the term beside it does not move the total, so the
+workbook constrains the loud rows of the database and not the quiet ones.
+Corrupting every committed coefficient one at a time (sign flip, decimal shift
+up and down, transposition with the neighbouring cell) and recomputing all
+cases kills 1 078 of the 1 116 mutations of the roughness and contact-filter
+tables, but only 3 010 of the 4 015 mutations of the transfer and traction
+tables. The survivors are concentrated in rows the published test set never
+brings to the surface: the all-zero and all-140 dB "min" and "max" placeholders
+of the IMAGINE catalogue, the source-A column of the constant-speed traction,
+which rolling noise always covers, and the two track transfer functions the
+workbook only ever pairs with the 140 dB superstructure placeholder. A
+mistranscription in one of those cells could not change a computed value, so it
+could not turn a wrong model into a passing run either; it would simply go
+unnoticed, and the coverage assertion in the test module keeps at least one
+unmasked case for every committed row.
+
+The published levels themselves are pinned hard: 3 805 of the 3 806 mutations
+of the 984 committed band levels are caught. The single survivor transposes two
+levels of a saturated case that differ by 0,01 dB, the last digit the workbook
+prints.
+
 Because the workbook predates the 2021 amendment, the cases are run with the
 2015 vertical directivity, with the curve-squeal excess and the bridge constant
 of the 2015 text supplied as data columns, and with the roughness speed floor

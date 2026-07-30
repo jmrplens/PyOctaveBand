@@ -1524,7 +1524,7 @@ to the issuing body, with date and reference).
 - **Library behaviour:** `roughness_to_frequency` converts the speed to m/s
   before dividing, as corrected, and its docstring says so. The reference
   implementation the Commission published with the source module does the same,
-  and the 121 committed workbook cases would not reproduce otherwise.
+  and the 123 committed workbook cases would not reproduce otherwise.
 - **Status:** unreported (corrected by the issuing body in 2018).
 
 ## Directive (EU) 2015/996, Appendix G, Table G-1, second table (wrong symbol)
