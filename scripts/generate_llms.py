@@ -304,9 +304,20 @@ def _summary(version: str) -> list[str]:
         (
             "I recommend `pip install phonometry[full]`, which enables every "
             "feature. The base install computes every metric on NumPy and SciPy "
-            "alone; without the extras only the `.plot()` figures, the `.report()` PDF "
-            "fiches (whose figure panel needs matplotlib as well as reportlab and "
-            "svglib) and the compiled `impulse` time weighting are unavailable."
+            "alone; without the extras only the `.plot()` figures and the "
+            "`.report()` PDF fiches (whose figure panel needs matplotlib as well "
+            "as reportlab and svglib) are unavailable. The `impulse` time "
+            "weighting still works without numba, on a pure-Python kernel that "
+            "is only slower."
+        ),
+        "",
+        (
+            "One caveat about `[full]`: numba declares `numpy<2.5`, so "
+            "`phonometry[full]` (like `phonometry[perf]`) resolves NumPy below "
+            "2.5 while a plain install gets the newest release. numba only makes "
+            "the `impulse` time weighting faster, so install "
+            "`phonometry[plot,report]` instead if you would rather keep NumPy "
+            "current."
         ),
         "",
         (

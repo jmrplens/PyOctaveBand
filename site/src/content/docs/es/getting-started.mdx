@@ -39,6 +39,12 @@ figuras (`.plot()` y las gráficas de respuesta de los filtros), las fichas PDF
 normativas (`.report()`) y el núcleo compilado que acelera la ponderación
 temporal `impulse`.
 
+Un matiz sobre `[full]`: numba declara `numpy<2.5`, así que `phonometry[full]`
+(igual que `phonometry[perf]`) resuelve NumPy por debajo de 2.5 mientras que
+una instalación simple obtiene la última versión. numba solo acelera la
+ponderación temporal `impulse`, de modo que si prefieres mantener NumPy al día,
+instala `phonometry[plot,report]` y deja fuera `[perf]`.
+
 **Opción 2: Clonar e instalar**
 
 ```bash

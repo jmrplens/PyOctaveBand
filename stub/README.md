@@ -13,8 +13,13 @@ pip install phonometry
 
 I recommend `pip install phonometry[full]` instead, which pulls the optional
 matplotlib, numba, reportlab and svglib and so enables every feature: the
-`.plot()` figures, the normative PDF fiches of `.report()` and the compiled
-`impulse` time weighting.
+`.plot()` figures, the normative PDF fiches of `.report()` (whose figure panel
+needs matplotlib as well as reportlab and svglib) and the compiled kernel that
+speeds up the `impulse` time weighting, which without numba still works on a
+pure-Python kernel that is only slower. One caveat: numba declares
+`numpy<2.5`, so `[full]` resolves NumPy below 2.5 while a plain install gets
+the newest release; `phonometry[plot,report]` keeps NumPy current and only
+gives up the compiled kernel.
 
 ```python
 import phonometry  # instead of: import pyoctaveband

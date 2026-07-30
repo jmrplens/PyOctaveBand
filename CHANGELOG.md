@@ -652,13 +652,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   on the default bank, and a new section covers what happens when the standard
   itself is what is wrong, with the errata registry as its evidence.
 
+  Four claims on that page are corrected while it is being rewritten. The
+  IEC 61672-1 Table 4 target for the 1 ms toneburst is −21,0 dB, not −20.9;
+  Equation (7) gives 10 lg(1 − e^(−0,001/0,125)) = −20,9865 and the library's own
+  transcription in `tests/metrology/test_iec_compliance.py` reads −21.0. Printed
+  as −20.9 the row reversed its own comparison, showing phonometry at −0.09 and
+  python-acoustics at exactly 0.00, when the errors are +0.01 and +0.10. The
+  three ecosystem entries are corrected too: acoustic-toolbox declares
+  `pyoctaveband>=1.1.3` rather than phonometry, and still hard-codes its own
+  one-third-octave weighting tables; pyroomacoustics does ship measurement
+  routines, so the defensible contrast is the ISO 3382 parameter set it lacks;
+  and MoSQITo already has ECMA-418-2 loudness and roughness and the SII, so what
+  is actually added here is ISO 532-2, ISO 532-3, ECMA-418-2 tonality,
+  fluctuation strength and the Fastl & Zwicker annoyance model. The ISO 3382
+  chain is stated for the image-source solver, which produces an impulse
+  response, and not for the FDTD one, which produces probe pressure histories.
+  The errata paragraph promised a regression test for every entry, which 38 of
+  the 62 do not have (several record that no change was required), so it now
+  says what the entries actually carry, as does the introduction of the errata
+  registry itself. The conformance table credited ISO 226:2023 Annex B for the
+  hearing threshold, which the test pins against the Table 1 `T_f` parameters.
+
 - Every install page recommends `phonometry[full]`. The plain install stays the
   default, with a note that the extra brings matplotlib, numba, reportlab and
   svglib in one go, that the base install computes every metric on NumPy and
   SciPy alone, and that what it leaves unavailable is the `.plot()` figures, the
-  `.report()` PDF fiches and the compiled `impulse` kernel. The extras list also
-  said `[report]` alone renders a fiche, which is not true: its figure panel
-  needs matplotlib as well.
+  `.report()` PDF fiches and the compiled `impulse` kernel. Every install page,
+  in both languages, now also states the one consequence of that
+  recommendation: numba declares `numpy<2.5`, so `phonometry[full]` resolves
+  NumPy below 2.5 where a plain install gets the newest release, and
+  `phonometry[plot,report]` is the route that keeps NumPy current, since numba
+  only affects speed. The llms export and the transition-package README said the
+  `impulse` time weighting is unavailable without numba; it is not, it falls
+  back to a pure-Python kernel that is only slower, which is what `README.md`
+  already said and what they say now.
+
+- The `[report]` extra no longer claims to be enough for a fiche that embeds a
+  figure. 46 of the 49 fiche renderers call `_layout.render_figure_drawing()`
+  and two more (`iec60268_4`, `iec60268_5`) their own equivalent, all of which
+  import matplotlib and svglib before drawing anything, so only the ISO 4871
+  declaration fiche renders on reportlab alone. 35 `.report()` docstrings still
+  documented `:raises ImportError: If reportlab is not installed` on renderers
+  that need matplotlib too, and CI rebuilt 24 pages of the API reference from
+  them on every run; the guides repeated it in prose on 14 topics, in both
+  languages, and the llms exports mirrored that. All of them now say that
+  reportlab is needed and that matplotlib is needed for the figure the fiche
+  embeds, and point at `pip install "phonometry[report,plot]"`.
 
 - One rule now governs how my name is written across the repository: the
   hyphenated "Requena-Plens" is the bibliographic citation form, and everywhere

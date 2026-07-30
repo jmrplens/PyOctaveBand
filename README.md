@@ -55,6 +55,12 @@ leaves unavailable are the figures (`.plot()` and the filter response plots),
 the normative PDF fiches (`.report()`) and the compiled kernel that speeds up
 the `impulse` time weighting.
 
+One caveat about `[full]`: numba declares `numpy<2.5`, so `phonometry[full]`
+(like `phonometry[perf]`) resolves NumPy below 2.5 while a plain install gets
+the newest release. numba only makes the `impulse` time weighting faster, so if
+you would rather keep NumPy current, install `phonometry[plot,report]` and
+leave `[perf]` out.
+
 ## ⚡ Quick start
 
 ```python
