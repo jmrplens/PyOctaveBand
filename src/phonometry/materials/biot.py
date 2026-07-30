@@ -70,7 +70,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import NDArray
+from numpy.typing import ArrayLike, NDArray
 
 from .._internal.types import Real
 from .._internal.validation import require_positive
@@ -496,7 +496,7 @@ def biot_surface_impedance(waves: BiotWavesResult, thickness: float) -> Complex:
 
 
 def _gamma(
-    waves: BiotWavesResult, x3: float, transverse_wavenumber: Real
+    waves: BiotWavesResult, x3: float, transverse_wavenumber: Complex
 ) -> Complex:
     """The matrix ``[Gamma(x3)]`` of Allard & Atalla Table 11.1.
 
@@ -575,7 +575,7 @@ def poroelastic_transfer_matrix(
     waves: BiotWavesResult,
     thickness: float,
     *,
-    transverse_wavenumber: Real | float = 0.0,
+    transverse_wavenumber: ArrayLike = 0.0,
 ) -> Complex:
     """The 6x6 transfer matrix ``[T p]`` of a Biot poroelastic layer.
 
@@ -671,14 +671,15 @@ def fluid_block(transfer_matrix: Complex) -> _Block:
 
 
 def poroelastic_block(
-    waves: BiotWavesResult, thickness: float, transverse_wavenumber: Real
+    waves: BiotWavesResult, thickness: float, transverse_wavenumber: ArrayLike
 ) -> _Block:
     """A six-variable block, parameterised by its wave amplitudes."""
     h = require_positive(thickness, "thickness")
+    k_t = np.asarray(transverse_wavenumber, dtype=np.complex128)
     return _Block(
         "poroelastic",
-        _gamma(waves, -h, transverse_wavenumber),
-        _gamma(waves, 0.0, transverse_wavenumber),
+        _gamma(waves, -h, k_t),
+        _gamma(waves, 0.0, k_t),
         waves.porosity,
     )
 
