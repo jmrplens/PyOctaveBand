@@ -581,14 +581,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   confirmation twice, since the equally-contributing bands are critical bands 3
   to 19 and their two alternative importance functions weight the same physical
   bands, the extra low critical bands contributing about 1e-19 of the local
-  masking energy there, so the eight cases are seven independent ones. Twelve new conformance
-  checks, a new figure
-  `sii_band_procedures` overlaying the four band-importance functions, and a
-  new section of the speech-intelligibility guide in English and Spanish.
+  masking energy there, so the eight cases are seven independent ones. Those
+  eight exercise the chain but not the whole of each table, so Tables 1, 3 and
+  4 are additionally asserted cell by cell and twelve flat-input cases from
+  `SII.C` bring every band's `Ui` and `Xi` into the calculation; a mutation
+  campaign over all 209 tabulated entries confirms none survives corruption.
+  Fourteen new conformance checks, a new figure `sii_band_procedures`
+  overlaying the four band-importance functions, and a new section of the
+  speech-intelligibility guide in English and Spanish.
   Tables 1, 2 and 4 print all four vocal-effort columns in the standard, but
   are implemented here with their normal-effort speech spectrum column only,
   the one the level-distortion factor of clause 5.7 uses; the raised, loud and
-  shout spectra remain one-third-octave only.
+  shout spectra remain one-third-octave only. The one-third-octave procedure
+  itself is unchanged bit for bit: the clause 5.4 masking slope is summed in
+  the order each procedure's printed form implies, since folding the printed
+  `6.353` into the bandwidth term reassociates the sum and moves the index by
+  a few units in the last place.
 
 ### Changed
 
