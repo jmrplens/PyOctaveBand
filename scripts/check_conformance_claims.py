@@ -123,10 +123,10 @@ def expected_counts(root: pathlib.Path = ROOT) -> dict[str, int]:
     :raises ValueError: If the report no longer carries the headline.
     """
     report = report_path(root)
-    match = HEADLINE.search(report.read_text(encoding="utf8"))
+    match = HEADLINE.search(_read(report))
     if match is None:
         raise ValueError(
-            f"{report.relative_to(root)}: headline not found. The report format "
+            f"{_label(report, root)}: headline not found. The report format "
             "changed; update HEADLINE here and in "
             "site/src/data/conformance-stats.mjs."
         )
@@ -237,10 +237,20 @@ def rewrite_text(
     return "".join(out), fixed
 
 
-def describe(path: pathlib.Path, lineno: int, claim: Claim, value: int) -> str:
+def _read(path: pathlib.Path) -> str:
+    """Read a file with its line endings left exactly as they are on disk."""
+    return path.read_text(encoding="utf8", newline="")
+
+
+def _label(path: pathlib.Path, root: pathlib.Path) -> str:
+    """Repo-relative path in a form that reads the same on every platform."""
+    return path.relative_to(root).as_posix()
+
+
+def describe(label: str, lineno: int, claim: Claim, value: int) -> str:
     """One line of diagnostics about a stale claim."""
     return (
-        f"{path}:{lineno}: claims {claim.claimed} {claim.field}, report says "
+        f"{label}:{lineno}: claims {claim.claimed} {claim.field}, report says "
         f"{value} -> {claim.phrase!r}"
     )
 
@@ -249,9 +259,9 @@ def check(root: pathlib.Path, expected: Mapping[str, int]) -> list[str]:
     """Every stale count in the corpus, as printable diagnostics."""
     problems: list[str] = []
     for path in sources(root):
-        _, fixed = rewrite_text(path.read_text(encoding="utf8"), expected)
+        _, fixed = rewrite_text(_read(path), expected)
         problems += [
-            describe(path.relative_to(root), lineno, claim, expected[claim.field])
+            describe(_label(path, root), lineno, claim, expected[claim.field])
             for lineno, claim in fixed
         ]
     return problems
@@ -266,13 +276,15 @@ def write(root: pathlib.Path, expected: Mapping[str, int]) -> list[str]:
     """
     changes: list[str] = []
     for path in sources(root):
-        text = path.read_text(encoding="utf8")
+        text = _read(path)
         corrected, fixed = rewrite_text(text, expected)
         if not fixed:
             continue
+        # `newline=""` on both ends: the file keeps whatever line endings it
+        # already had, so a rewrite is a change of digits and nothing else.
         path.write_text(corrected, encoding="utf8", newline="")
         changes += [
-            f"{path.relative_to(root)}:{lineno}: {claim.claimed} -> "
+            f"{_label(path, root)}:{lineno}: {claim.claimed} -> "
             f"{expected[claim.field]} {claim.field} in {claim.phrase!r}"
             for lineno, claim in fixed
         ]

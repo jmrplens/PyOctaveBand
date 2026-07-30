@@ -53,8 +53,9 @@ DECOY_LINES = (
 
 
 def _write(path: pathlib.Path, text: str) -> None:
+    """Write a fixture file with exactly the bytes given, on every platform."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text, encoding="utf8")
+    path.write_text(text, encoding="utf8", newline="")
 
 
 @pytest.fixture
@@ -209,6 +210,20 @@ def test_write_touches_only_the_files_that_quote_a_count(corpus):
     before = {p: p.read_bytes() for p in untouched}
     assert _run(corpus, "--write") == 0
     assert {p: p.read_bytes() for p in untouched} == before
+
+
+def test_a_crlf_file_stays_crlf(tmp_path):
+    """The writer changes digits, not the file's line endings."""
+    _write(tmp_path / "docs" / "CONFORMANCE.md", REPORT)
+    page = tmp_path / "docs" / "getting-started.md"
+    _write(
+        page,
+        f"Intro paragraph.\r\nThe suite runs {OLD_TOTAL} conformance checks.\r\n",
+    )
+    assert _run(tmp_path, "--write") == 0
+    assert page.read_bytes() == (
+        f"Intro paragraph.\r\nThe suite runs {TOTAL} conformance checks.\r\n"
+    ).encode()
 
 
 def test_line_endings_and_surrounding_prose_are_preserved():
