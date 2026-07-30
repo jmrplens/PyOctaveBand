@@ -446,9 +446,13 @@ contra el texto del Diario Oficial del instrumento que las promulgó. Y toda la
 cadena de ecuaciones de extremo a extremo, contra el libro de pruebas de emisión
 que la Comisión Europea publicó con su módulo de fuente de referencia: alimentar
 las ecuaciones distribuidas con la base de coeficientes de **2015** con la que se
-calculó ese libro reproduce sus 19 872 casos, en las dos alturas de fuente, con
-0,005 dB, dentro de los dos decimales que imprime. Ciento veintitrés de esos casos
-están versionados en el repositorio y se ejecutan en integración continua.
+calculó ese libro reproduce **las 34 560 filas publicadas de los veinte vehículos
+cuyas entradas de catálogo están bien formadas**, es decir 17 280 casos en las
+dos alturas de fuente, con 0,0055 dB, dentro de los dos decimales que imprime.
+Ciento veintitrés de esos casos están versionados en el repositorio y se ejecutan
+en integración continua. Los tres vehículos que quedan fuera se describen en
+`tests/data/cnossos/README.md`: sus filas recogen defectos del programa de
+referencia, no del método.
 
 Esa concordancia resuelve las partes ruidosas de la base de datos y no las
 silenciosas: un coeficiente veinte decibelios por debajo de su vecino no mueve

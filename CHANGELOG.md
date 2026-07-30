@@ -107,8 +107,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   worked example anywhere in 2.3, so the equations are pinned end to end on the
   emission test workbook the European Commission published with its reference
   source module: fed the 2015 coefficient database that workbook was computed
-  with, the shipped model reproduces all 19 872 of its cases at both source
-  heights to 0,005 dB, and 123 of them are committed and run in CI.
+  with, the shipped model reproduces all 34 560 published rows of the twenty
+  vehicles whose catalogue entries are well formed, 17 280 cases at both source
+  heights, to 0,0055 dB, and 123 of those cases are committed and run in CI.
 
 - Room-to-room noise reduction (`noise_control/room_to_room.py`, Norton &
   Karczub 2003 Section 4.9): `room_to_room_transmission` composes the whole

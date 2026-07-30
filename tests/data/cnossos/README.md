@@ -30,7 +30,8 @@ vehicle 15 carries `n` instead of a number in its axle-count and length fields
 and produces no rolling noise at all, and vehicles 24 and 25 have no traction
 data, which makes visible an all-zero aerodynamic spectrum that the program
 energy-sums below 200 km/h. The remaining twenty vehicles are reproduced
-exactly.
+exactly: the shipped model reproduces all 34 560 published rows of those twenty
+vehicles, 17 280 cases at both source heights, to 0,0055 dB.
 
 ## Source and authorship
 
