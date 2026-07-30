@@ -7089,7 +7089,7 @@ def _cnossos_road_2015_inputs() -> tuple[Any, dict[str, Any]]:
 @register(
     _CNOSSOS_ROAD,
     "CIRCABC CNOSSOS-EU road emission test set",
-    "Line power of 60 published test cases, 8 octave bands each, dB re 1 pW/m",
+    "Line power of the 60 committed cases of the 4 875-case published test set, 8 octave bands each, dB re 1 pW/m",
 )
 def _chk_cnossos_road_workbook() -> Outcome:
     """Worst per-band deviation from the published test workbook.
@@ -7122,7 +7122,7 @@ def _chk_cnossos_road_workbook() -> Outcome:
         for got, band in zip(result.total_line_power, ref.CNOSSOS_ROAD_BANDS):
             worst = max(worst, abs(float(got) - float(case[f"lw_{band}"])))
     return numeric(0.0, worst, 0.01, unit="dB", places=4,
-                   expected_label="<= 0.01 dB on 480 published band levels")
+                   expected_label="<= 0.01 dB on 480 published band levels (60 cases)")
 
 
 @register(

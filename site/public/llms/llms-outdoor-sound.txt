@@ -1032,9 +1032,9 @@ failing later.
 
 That mechanism is also what pins the implementation: the European Commission
 published a test set of 4 875 road emission cases computed with the 2015
-coefficients, and feeding the shipped equations that superseded database
-reproduces every published band level to 0,005 dB, inside the two decimals the
-test set prints.
+coefficients, and feeding the shipped equations that superseded database (not
+the 2021 tables the library ships by default) reproduces every published band
+level to 0,005 dB, inside the two decimals the test set prints.
 
 ## What this guide covers
 
