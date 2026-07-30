@@ -692,6 +692,41 @@ to the issuing body, with date and reference).
   so it yields 4,15 dB/km for this condition.
 - **Status:** unreported.
 
+## ANSI S3.5-1997, Annex C worked examples (official WG S3-79 errata)
+
+- **Location:** Annex C, Table C.1 (octave-band worked example, p. 21) and
+  Table C.2 (one-third-octave worked example, p. 22) of the 1997 printing.
+- **The print:** (a) Table C.1, row i = 5, the level-distortion factor Li
+  under Step 6 is printed as 0.10; (b) Table C.2, first row, the
+  self-speech-masking slope Ci is printed as −45.59.
+- **The problem:** both cells contradict the standard's own normative
+  formulas. (a) Clause 5.7 with the example's inputs (E′5 = 20 dB,
+  U5 = 9.33 dB) gives L5 = 1 − (20 − 9.33 − 10)/160 = 0.9958, which prints
+  to two decimals as 1.00, not 0.10. (b) Clause 5.4 with the example's
+  inputs (B1 = 40 dB, f1 = 160 Hz) gives
+  C1 = −80 + 0.6 (40 + 10 lg 160 − 6.353) = −46.587, which prints as −46.59,
+  not −45.59; the example's Zi column is only consistent with the corrected
+  slope (Z2 recomputes to 34.658 = printed 34.66 dB, whereas the misprinted
+  slope would give 34.76 dB).
+- **Evidence:** the official errata list published by ASA Working Group
+  S3-79, the committee that maintains ANSI S3.5, on its support site
+  (sii.to): "Page 21, Table C1, row i=5, column Li under Step 6: the value
+  printed as 0.10 should be changed to 1.00" and "Page 22, Table C2, the
+  first row of numbers, value −45.59 should be −46.59"; plus independent
+  recomputation of both cells from the normative clauses (above). The same
+  list carries five further corrections (a reference spelling, the
+  Tables 1-4 caption wording, the insertion gain Gi missing from Eq. 23,
+  and two Annex B wording fixes about the audio-visual approximation);
+  none of those touches a formula this library implements.
+- **Library behaviour:** unaffected; the library computes the corrected
+  values from the normative clauses and always did. Its Annex C.2 anchors
+  ([`tests/reference_data.py`](../tests/reference_data.py),
+  `ANSIS3_5_ANNEX_C2*`) pin the errata-consistent chain, cross-checked to
+  double precision against the working group's own reference implementation
+  `SII.C` and its published `TO.TST`/`TO_1.TST` test-case results.
+- **Status:** published corrections by the issuing working group; nothing
+  to report upstream.
+
 ## NORAH2 rotorcraft guidance SC01.D1.5d (EASA.2020.FC.06), Eq. (27)
 
 - **Location:** section A.4.2, Eq. (27) (atmospheric absorption coefficient).

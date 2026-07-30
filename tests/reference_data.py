@@ -1080,31 +1080,83 @@ DIRECTIVE_2002_44_WBV_ELV = 1.15  # A(8) m/s^2, Art. 3(2)(b)
 
 # ---------------------------------------------------------------------------
 # ANSI S3.5-1997 Speech Intelligibility Index (one-third-octave method).
-# The band-importance function (Table 3) sums to one; the equivalent masking
-# spectrum level Zi is a tabulated intermediate of the standard procedure for
-# the standard normal-effort spectrum in quiet; the index for that condition
-# with normal hearing is the standard-procedure result.
+# Primary oracle: the reference implementation of ASA Working Group S3-79
+# (the committee that maintains ANSI S3.5), published on its support site
+# sii.to as SII.C together with official test-input files (*.TST) and their
+# published results (DevelopmentKit readme, three decimals). "SII.C run"
+# below is the value printed by that C program, compiled unmodified with gcc
+# and run on the stated input: committee code, independent of this library.
+# Secondary cross-checks retained where they agree: the Hornsby SII
+# worksheet (ANSIS3_51997SII.xlsx) and the R CRAN package "SII", both
+# independent implementations.
 # ---------------------------------------------------------------------------
-ANSIS3_5_BAND_IMPORTANCE_SUM = 1.0  # ANSI S3.5-1997 Table 3, sum of Ii
-ANSIS3_5_MASKING_Z_200HZ = -1.665  # Zi at 200 Hz, standard spectrum in quiet
-# SII for the standard normal-effort spectrum in quiet with normal hearing, at
-# the full precision of the official Hornsby SII worksheet (its column M is the
-# clause 5.6 maximum Di = max(Zi, Xi'); an energy sum instead reads 5e-6 low
-# here but up to 0.042 low in noise-plus-hearing-loss conditions).
+ANSIS3_5_BAND_IMPORTANCE_SUM = 1.0  # Table 3, sum of Ii (identical digits in SII.C i_avg[])
+# Equivalent masking spectrum level Zi at 200 Hz, standard normal-effort
+# spectrum in quiet: SII.C run prints z[1] = -1.664717 (the Hornsby
+# worksheet agrees).
+ANSIS3_5_MASKING_Z_200HZ = -1.665
+# SII for the standard normal-effort spectrum in quiet (-80 dB noise) with
+# normal hearing: SII.C run = 0.9958251667; the Hornsby SII worksheet gives
+# the same digits at full precision (its column M is the clause 5.6 maximum
+# Di = max(Zi, Xi'); an energy sum instead reads 5e-6 low here but up to
+# 0.042 low in noise-plus-hearing-loss conditions).
 ANSIS3_5_STANDARD_QUIET = 0.99582516666667
 # Equivalent disturbance spectrum level Di at 5000 Hz for the same condition:
 # the quiet field leaves Di = Xi' = -23.6 dB (Table 3 reference internal
-# noise), which the clause 5.6 maximum preserves exactly.
+# noise, also SII.C x[15]), which the clause 5.6 maximum preserves exactly.
 ANSIS3_5_DISTURBANCE_5000HZ = -23.6
 # Discriminating adverse-condition oracle (would catch an energy-sum Di):
-# normal speech, flat 30 dB noise spectrum, flat 40 dB hearing loss. Standard
-# procedure (worksheet): SII = 0.2185; the energy-sum variant reads 0.1841.
-ANSIS3_5_NOISE_PLUS_LOSS = 0.2185
-# R CRAN package "SII" worked Example C.2 (one-third-octave method,
-# independent implementation): speech 54 dB in all bands, noise 40/30/20 dB in
-# the first three bands, normal hearing.
-ANSIS3_5_R_EXAMPLE_C2 = 0.8513749
-ANSIS3_5_LOUD_1KHZ = 42.16  # Table 3, loud-effort standard speech spectrum at 1 kHz
+# normal speech, flat 30 dB noise spectrum, flat 40 dB hearing loss.
+# SII.C run = 0.2184539329; the Hornsby worksheet rounds it to 0.2185 (the
+# energy-sum variant reads 0.1841).
+ANSIS3_5_NOISE_PLUS_LOSS = 0.2184539329
+# ANSI S3.5-1997 Annex C.2 worked example (one-third-octave method): speech
+# 54 dB in all bands, noise 40/30/20 dB in the first three bands, normal
+# hearing. SII.C run = 0.8513748619; the R CRAN package "SII" prints
+# 0.8513749 for the same input (its vignette reproduces the standard's
+# Table C.2). Table C.2 carries an official WG S3-79 erratum in its first
+# row (self-masking slope Ci printed -45.59, corrected -46.59, sii.to
+# errata list); the corrected chain is what both implementations compute
+# (C1 = -46.587) and the printed Zi column below is only consistent with it.
+ANSIS3_5_ANNEX_C2 = 0.8513748619
+# Table C.2, printed equivalent masking spectrum level Zi of the first three
+# rows (two decimals, errata-consistent): the misprinted slope would give
+# 34.76 dB at 200 Hz instead of the printed 34.66 dB. The 250 Hz cell is
+# printed 25.04 while the exact chain gives 25.0468 (SII.C z[2] agrees), so
+# that print truncates rather than rounds; tests use a 0.01 dB tolerance.
+ANSIS3_5_ANNEX_C2_MASKING = (40.00, 34.66, 25.04)
+# Table 3, loud-effort standard speech spectrum at 1 kHz. Surrogate-anchored
+# (R CRAN "SII" and Google implementation transcriptions of Table 3): the WG
+# kit's SII.C carries only the normal-effort spectrum.
+ANSIS3_5_LOUD_1KHZ = 42.16
+# Official WG S3-79 test cases for the one-third-octave procedure
+# (DevelopmentKit SOURCES/TO.TST and TO_1.TST): lines are the equivalent
+# speech spectrum level, equivalent noise spectrum level and equivalent
+# hearing threshold level over the 18 bands; TO_1 adds an alternative
+# band-importance function (18 values consumed; the file's spurious 19th
+# entry is ignored by SII.C). Published results (readme, 3 decimals):
+# TO.TST -> 0.445, TO_1.TST -> 0.438; SII.C run at full precision:
+# 0.4453910059 and 0.4382176540.
+ANSIS3_5_WG_TO_SPEECH = (
+    90.0, 5.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0,
+    40.0, 40.0, -10.0, -10.0, -10.0, -10.0,
+)
+ANSIS3_5_WG_TO_NOISE = (
+    10.0, -10.0, -10.0, 75.0, -10.0, -10.0, -10.0, -10.0, -10.0, -10.0,
+    -10.0, -10.0, -10.0, -10.0, 10.0, 10.0, 10.0, 10.0,
+)
+ANSIS3_5_WG_TO_THRESHOLD = (
+    90.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+    0.0, 0.0, 0.0, 0.0,
+)
+ANSIS3_5_WG_TO_SII = 0.445  # published in the WG DevelopmentKit readme
+ANSIS3_5_WG_TO_SII_EXACT = 0.4453910059  # SII.C run on TO.TST
+ANSIS3_5_WG_TO1_IMPORTANCE = (
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.1, 0.1, 0.1, 0.1,
+    0.1, 0.1, 0.3, 0.0,
+)
+ANSIS3_5_WG_TO1_SII = 0.438  # published in the WG DevelopmentKit readme
+ANSIS3_5_WG_TO1_SII_EXACT = 0.4382176540  # SII.C run on TO_1.TST
 
 # ---------------------------------------------------------------------------
 # Prominence of impulsive sounds - NT ACOU 112:2002.

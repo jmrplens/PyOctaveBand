@@ -21,6 +21,12 @@ speech spectrum levels by vocal effort (Table 3) and the reference internal
 noise spectrum level (Table 3) are the standard's own tabulated constants.
 Spectrum levels are as defined in clauses 3.11 and 3.55.
 
+The implementation reproduces the reference implementation `SII.C` of ASA
+Working Group S3-79 (the committee that maintains ANSI S3.5) to double
+precision on its official one-third-octave test cases `TO.TST` and
+`TO_1.TST`, and computes the Annex C worked examples with the working
+group's official errata applied (see `docs/ERRATA.md`).
+
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## SIIResult

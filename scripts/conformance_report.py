@@ -3919,7 +3919,7 @@ def _chk_sii_band_importance_sum() -> Outcome:
     return numeric(ref.ANSIS3_5_BAND_IMPORTANCE_SUM, total, 1e-9, places=6)
 
 
-@register(_SII, "ANSI S3.5-1997 clause 5.4", "Equivalent masking spectrum level at 200 Hz")
+@register(_SII, "ASA WG S3-79 SII.C (clause 5.4)", "Equivalent masking spectrum level at 200 Hz")
 def _chk_sii_masking() -> Outcome:
     result = ph.speech_intelligibility_index("normal")
     return numeric(ref.ANSIS3_5_MASKING_Z_200HZ, float(result.masking[1]), 1e-3, places=3)
@@ -3936,30 +3936,68 @@ def _chk_sii_disturbance_quiet() -> Outcome:
     )
 
 
-@register(_SII, "ANSI S3.5-1997 clause 6", "SII, noise 30 dB plus hearing loss 40 dB")
+@register(_SII, "ASA WG S3-79 SII.C (clause 6)", "SII, noise 30 dB plus hearing loss 40 dB")
 def _chk_sii_noise_plus_loss() -> Outcome:
     result = ph.hearing.sii.speech_intelligibility_index(
         "normal",
         noise_spectrum=np.full(18, 30.0),
         threshold=np.full(18, 40.0),
     )
-    return numeric(ref.ANSIS3_5_NOISE_PLUS_LOSS, result.sii, 1e-4, places=4)
+    return numeric(ref.ANSIS3_5_NOISE_PLUS_LOSS, result.sii, 1e-6, places=6)
 
 
-@register(_SII, "R CRAN 'SII' Example C.2", "One-third-octave method, independent oracle")
-def _chk_sii_r_example() -> Outcome:
+@register(_SII, "ANSI S3.5-1997 Annex C.2", "Worked example (SII.C / R CRAN, errata applied)")
+def _chk_sii_annex_c2() -> Outcome:
     result = ph.hearing.sii.speech_intelligibility_index(
         np.full(18, 54.0),
         np.array([40.0, 30.0, 20.0] + [0.0] * 15),
         threshold=np.zeros(18),
     )
-    return numeric(ref.ANSIS3_5_R_EXAMPLE_C2, result.sii, 1e-4, places=6)
+    return numeric(ref.ANSIS3_5_ANNEX_C2, result.sii, 1e-6, places=6)
 
 
-@register(_SII, "ANSI S3.5-1997 clause 6", "SII, standard speech in quiet, normal hearing")
+@register(_SII, "ANSI S3.5-1997 Table C.2 (errata)", "Masking Zi at 200 Hz, corrected worksheet")
+def _chk_sii_annex_c2_masking() -> Outcome:
+    # The officially corrected first-row slope Ci = -46.59 (WG S3-79 errata;
+    # printed -45.59) is required to reproduce the printed Z2 = 34.66 dB.
+    result = ph.hearing.sii.speech_intelligibility_index(
+        np.full(18, 54.0),
+        np.array([40.0, 30.0, 20.0] + [0.0] * 15),
+        threshold=np.zeros(18),
+    )
+    return numeric(
+        ref.ANSIS3_5_ANNEX_C2_MASKING[1], float(result.masking[1]), 5e-3,
+        unit="dB", places=2,
+    )
+
+
+@register(_SII, "ASA WG S3-79 SII.C (clause 6)", "SII, standard speech in quiet, normal hearing")
 def _chk_sii_standard_quiet() -> Outcome:
     result = ph.speech_intelligibility_index("normal")
     return numeric(ref.ANSIS3_5_STANDARD_QUIET, result.sii, 1e-6, places=8)
+
+
+@register(_SII, "ASA WG S3-79 TO.TST", "Official one-third-octave test case")
+def _chk_sii_wg_to_tst() -> Outcome:
+    result = ph.hearing.sii.speech_intelligibility_index(
+        np.array(ref.ANSIS3_5_WG_TO_SPEECH),
+        np.array(ref.ANSIS3_5_WG_TO_NOISE),
+        threshold=np.array(ref.ANSIS3_5_WG_TO_THRESHOLD),
+    )
+    return numeric(ref.ANSIS3_5_WG_TO_SII, result.sii, 5e-4, places=3)
+
+
+@register(_SII, "ASA WG S3-79 TO_1.TST", "Official test case, alternative importance")
+def _chk_sii_wg_to1_tst() -> Outcome:
+    result = ph.hearing.sii.speech_intelligibility_index(
+        np.array(ref.ANSIS3_5_WG_TO_SPEECH),
+        np.array(ref.ANSIS3_5_WG_TO_NOISE),
+        threshold=np.array(ref.ANSIS3_5_WG_TO_THRESHOLD),
+    )
+    sii_alt = float(
+        np.sum(np.array(ref.ANSIS3_5_WG_TO1_IMPORTANCE) * result.band_audibility)
+    )
+    return numeric(ref.ANSIS3_5_WG_TO1_SII, sii_alt, 5e-4, places=3)
 
 
 @register(_SII, "ANSI S3.5-1997 Table 3", "Loud-effort speech spectrum level at 1 kHz")

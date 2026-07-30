@@ -1,11 +1,14 @@
 #  Copyright (c) 2026. Jose M. Requena-Plens
 """Tests for :mod:`phonometry.hearing.sii` (Speech Intelligibility Index, ANSI S3.5-1997).
 
-The one-third-octave-band procedure is validated against the standard's own
-tabulated constants (the Table 3 band-importance function sums to one) and its
-masking intermediates (the equivalent masking spectrum level ``Zi`` of the
-standard normal-effort spectrum in quiet, used here as reference values), and
-against the known index for speech in quiet with normal hearing.
+The one-third-octave-band procedure is validated against the reference
+implementation of ASA Working Group S3-79, the committee that maintains
+ANSI S3.5 (``SII.C`` and its official test-input files ``TO.TST`` and
+``TO_1.TST`` with published results, from the WG support site sii.to),
+against the standard's own tabulated constants and its Annex C.2 worked
+example (with the official errata applied), and against the independent
+Hornsby worksheet and R CRAN "SII" implementations where they overlap.
+See ``tests/reference_data.py`` for the provenance of every constant.
 """
 
 from __future__ import annotations
@@ -13,12 +16,21 @@ from __future__ import annotations
 import numpy as np
 import pytest
 from reference_data import (
+    ANSIS3_5_ANNEX_C2,
+    ANSIS3_5_ANNEX_C2_MASKING,
     ANSIS3_5_BAND_IMPORTANCE_SUM,
     ANSIS3_5_DISTURBANCE_5000HZ,
     ANSIS3_5_LOUD_1KHZ,
     ANSIS3_5_NOISE_PLUS_LOSS,
-    ANSIS3_5_R_EXAMPLE_C2,
     ANSIS3_5_STANDARD_QUIET,
+    ANSIS3_5_WG_TO1_IMPORTANCE,
+    ANSIS3_5_WG_TO1_SII,
+    ANSIS3_5_WG_TO1_SII_EXACT,
+    ANSIS3_5_WG_TO_NOISE,
+    ANSIS3_5_WG_TO_SII,
+    ANSIS3_5_WG_TO_SII_EXACT,
+    ANSIS3_5_WG_TO_SPEECH,
+    ANSIS3_5_WG_TO_THRESHOLD,
 )
 
 from phonometry.hearing import sii
@@ -54,32 +66,76 @@ def test_sii_standard_speech_in_quiet() -> None:
 
 def test_sii_noise_plus_hearing_loss() -> None:
     # Discriminating oracle for the clause 5.6 maximum (ANSI S3.5-1997):
-    # normal speech, flat 30 dB noise, flat 40 dB hearing loss. The standard
-    # procedure gives 0.2185; an energy-sum disturbance reads 0.1841 -- an
-    # error large enough to flip an intelligibility grade.
+    # normal speech, flat 30 dB noise, flat 40 dB hearing loss. The WG S3-79
+    # reference implementation (SII.C) gives 0.2184539329 (Hornsby worksheet:
+    # 0.2185); an energy-sum disturbance reads 0.1841 -- an error large
+    # enough to flip an intelligibility grade.
     result = sii.speech_intelligibility_index(
         "normal",
         noise_spectrum=np.full(18, 30.0),
         threshold=np.full(18, 40.0),
     )
-    assert result.sii == pytest.approx(ANSIS3_5_NOISE_PLUS_LOSS, abs=1e-4)
+    assert result.sii == pytest.approx(ANSIS3_5_NOISE_PLUS_LOSS, abs=1e-6)
 
 
-def test_sii_r_package_example_c2() -> None:
-    # R CRAN package "SII" worked Example C.2 (independent implementation of
-    # the one-third-octave method): speech 54 dB in every band, noise 40, 30
-    # and 20 dB in the first three bands, normal hearing.
+def test_sii_annex_c2_worked_example() -> None:
+    # ANSI S3.5-1997 Annex C.2 worked example (one-third-octave method):
+    # speech 54 dB in every band, noise 40, 30 and 20 dB in the first three
+    # bands, normal hearing. The WG S3-79 reference implementation (SII.C)
+    # gives 0.8513748619; the R CRAN package "SII" prints 0.8513749.
     result = sii.speech_intelligibility_index(
         np.full(18, 54.0),
         np.array([40.0, 30.0, 20.0] + [0.0] * 15),
         threshold=np.zeros(18),
     )
-    assert result.sii == pytest.approx(ANSIS3_5_R_EXAMPLE_C2, abs=1e-4)
+    assert result.sii == pytest.approx(ANSIS3_5_ANNEX_C2, abs=1e-6)
+    # Table C.2's printed Zi column, first three rows (errata-consistent):
+    # the officially corrected first-row slope Ci = -46.59 (not the printed
+    # -45.59, WG S3-79 errata) is required to reproduce Z2 = 34.66 dB. The
+    # 250 Hz cell is printed 25.04 while the exact chain gives 25.0468 (the
+    # print truncates rather than rounds), hence the half-unit tolerance of
+    # the two-decimal print.
+    np.testing.assert_allclose(
+        result.masking[:3], ANSIS3_5_ANNEX_C2_MASKING, atol=1e-2
+    )
+
+
+def test_sii_wg_s3_79_official_test_case_to() -> None:
+    # ASA WG S3-79 official test input TO.TST for the one-third-octave
+    # procedure (DevelopmentKit, sii.to). Published result: SII = 0.445; the
+    # committee's SII.C, compiled unmodified, prints 0.4453910059.
+    result = sii.speech_intelligibility_index(
+        np.array(ANSIS3_5_WG_TO_SPEECH),
+        np.array(ANSIS3_5_WG_TO_NOISE),
+        threshold=np.array(ANSIS3_5_WG_TO_THRESHOLD),
+    )
+    assert result.sii == pytest.approx(ANSIS3_5_WG_TO_SII, abs=5e-4)
+    assert result.sii == pytest.approx(ANSIS3_5_WG_TO_SII_EXACT, abs=1e-9)
+
+
+def test_sii_wg_s3_79_official_test_case_to1() -> None:
+    # ASA WG S3-79 official test input TO_1.TST: the same procedure with an
+    # alternative band-importance function. Published result: SII = 0.438;
+    # SII.C prints 0.4382176540. The alternative-importance index is the dot
+    # product of the alternative Ii with the per-band audibility Ai (which
+    # already carries the level-distortion factor), exactly as SII.C forms it.
+    result = sii.speech_intelligibility_index(
+        np.array(ANSIS3_5_WG_TO_SPEECH),
+        np.array(ANSIS3_5_WG_TO_NOISE),
+        threshold=np.array(ANSIS3_5_WG_TO_THRESHOLD),
+    )
+    sii_alt = float(
+        np.sum(np.array(ANSIS3_5_WG_TO1_IMPORTANCE) * result.band_audibility)
+    )
+    assert sii_alt == pytest.approx(ANSIS3_5_WG_TO1_SII, abs=5e-4)
+    assert sii_alt == pytest.approx(ANSIS3_5_WG_TO1_SII_EXACT, abs=1e-9)
 
 
 def test_masking_spectrum_matches_reference() -> None:
     # Equivalent masking spectrum level Zi for the standard spectrum in quiet
-    # (reference values for the first four one-third-octave bands).
+    # (first four one-third-octave bands), as printed by the WG S3-79
+    # reference implementation SII.C for this input: z[0..3] = 8.410000,
+    # -1.664717, 0.705214, 0.381701.
     result = sii.speech_intelligibility_index("normal")
     reference_zi = np.array([8.41, -1.6647, 0.7052, 0.3817])
     np.testing.assert_allclose(result.masking[:4], reference_zi, atol=1e-4)
