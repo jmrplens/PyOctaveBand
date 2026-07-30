@@ -347,8 +347,9 @@ que las guías incorporan sus secciones de Referencias.
   La teoría del material poroso que enlaza resistividad al flujo, impedancia
   superficial y absorción.
   Citado por
-  [Resistencia al flujo de aire](/phonometry/es/guides/airflow-resistance/) y
-  [Tubo de impedancia](/phonometry/es/guides/impedance-tube/).
+  [Resistencia al flujo de aire](/phonometry/es/guides/airflow-resistance/),
+  [Tubo de impedancia](/phonometry/es/guides/impedance-tube/) y
+  [Absorbentes porosos y multicapa](/phonometry/es/guides/porous-absorbers/).
 - Cox, T. J., & D'Antonio, P. (2017). *Acoustic absorbers and diffusers:
   Theory, design and application* (3.ª ed.). CRC Press.
   ISBN 978-1-4987-4099-9.
@@ -527,8 +528,9 @@ que las guías incorporan sus secciones de Referencias.
   Un manual compacto sobre la transmisión del sonido en edificios, de las
   construcciones simples y dobles a los suelos flotantes.
   Citado por [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/guides/insulation-field/),
-  [Medición del aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/) y
-  [Rigidez dinámica de materiales resilientes](/phonometry/es/guides/dynamic-stiffness/).
+  [Medición del aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/),
+  [Rigidez dinámica de materiales resilientes](/phonometry/es/guides/dynamic-stiffness/) y
+  [Predicción del aislamiento acústico de paneles](/phonometry/es/guides/panel-sound-insulation/).
 - International Organization for Standardization. (2020). *Acoustics —
   Rating of sound insulation in buildings and of building elements — Part 1:
   Airborne sound insulation* (ISO 717-1:2020).

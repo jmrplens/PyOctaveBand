@@ -49,6 +49,20 @@ gap; a porous fill (a :class:`~phonometry.materials.PorousMediumResult` from
 :mod:`phonometry.materials.porous_absorber`) lowers the resonance through its
 softer, near-isothermal effective bulk modulus and damps the cavity so the
 mid-band slope is realised without standing-wave dips.
+
+**Orthotropic panels (Bies 7.2.4.5; Vigran, Building Acoustics, 3.7.3 and
+6.5.3).** Ribbed and corrugated cladding is stiff along the corrugations and
+limp across them, so a single coincidence frequency no longer exists: the panel
+has a *range* ``fc1 <= f <= fc2`` bounded by the stiffest and the least stiff
+direction (Vigran Eq. 6.107). The bending-wave impedance then depends on the
+azimuth ``theta`` as well as the incidence angle ``phi`` (Heckl 1960; Hansen
+1993; Vigran Eq. 6.108 = Bies Eq. 7.30), and the diffuse-field average is a
+double integral (Vigran Eq. 6.111 = Bies Eq. 7.38). The consequence is the
+whole point of the model: over one to two decades the resonant transmission
+dominates and ``R`` flattens far below the mass law of a flat plate of the same
+mass. See :func:`orthotropic_transmission_loss`,
+:func:`orthotropic_critical_frequencies`, :func:`corrugated_plate_stiffness`
+and :func:`orthotropic_plate_resonance`.
 """
 
 from __future__ import annotations
@@ -59,6 +73,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from numpy.typing import ArrayLike
+from scipy.integrate import quad
+from scipy.special import ellipe
 
 from .._internal.validation import require_choice, require_positive
 from ..vibration.radiation_efficiency import coincidence_frequency
@@ -113,10 +129,15 @@ def _band_axis(frequency: ArrayLike) -> np.ndarray:
 __all__ = [
     "PLATEAU_MATERIALS",
     "SoundReductionResult",
+    "corrugated_plate_mass_factor",
+    "corrugated_plate_stiffness",
     "double_wall_transmission_loss",
     "field_incidence_correction",
     "mass_law_transmission_loss",
     "mass_spring_mass_resonance",
+    "orthotropic_critical_frequencies",
+    "orthotropic_plate_resonance",
+    "orthotropic_transmission_loss",
     "plateau_transmission_loss",
     "single_panel_transmission_loss",
 ]
@@ -208,6 +229,10 @@ class SoundReductionResult:
         the plateau, in hertz, or ``None``.
     :ivar plateau_end: Frequency of point B, where the 10 dB/octave recovery
         starts, in hertz, or ``None``.
+    :ivar critical_frequency_upper: Upper coincidence frequency ``fc2`` of an
+        orthotropic panel, in hertz, or ``None``; ``critical_frequency`` then
+        carries the lower bound ``fc1`` and the pair spans the flattened
+        coincidence range.
     """
 
     frequencies: np.ndarray
@@ -221,6 +246,7 @@ class SoundReductionResult:
     plateau_height: float | None = None
     plateau_start: float | None = None
     plateau_end: float | None = None
+    critical_frequency_upper: float | None = None
 
     @property
     def transmission_coefficient(self) -> np.ndarray:
@@ -558,6 +584,463 @@ def plateau_transmission_loss(
         plateau_height=height,
         plateau_start=float(f_a),
         plateau_end=float(f_b),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Orthotropic (ribbed / corrugated) panels
+# ---------------------------------------------------------------------------
+def corrugated_plate_mass_factor(
+    corrugation_amplitude: float, corrugation_wavelength: float
+) -> float:
+    """Surface-density increase of a sine-corrugated plate.
+
+    Corrugating a sheet does not change its thickness, so its mass per unit
+    area grows in proportion to the **developed** length of the profile.
+    For a sinusoid of amplitude ``H`` and wavelength ``L`` the developed length
+    per period, divided by the period, is the closed form
+
+    ``m''/m''_flat = (2/pi) sqrt(1 + q**2) E(q**2/(1 + q**2))``,
+    ``q = 2 pi H / L``
+
+    with ``E`` the complete elliptic integral of the second kind. Vigran, in
+    the worked example following his Eq. (3.115) (printed p. 96), warns that
+    "we have to take into account the fact that the mass per unit area will
+    increase when making the corrugations", and it is exactly this factor that
+    reproduces his published eigenfrequencies.
+
+    :param corrugation_amplitude: Corrugation amplitude ``H``, in m (> 0); the
+        total peak-to-trough depth of the profile is ``2 H``.
+    :param corrugation_wavelength: Corrugation wavelength ``L``, in m (> 0).
+    :return: The factor (>= 1) multiplying the flat-sheet surface density.
+    :raises ValueError: for a non-positive input.
+    """
+    amplitude = require_positive(corrugation_amplitude, "corrugation_amplitude")
+    wavelength = require_positive(corrugation_wavelength, "corrugation_wavelength")
+    q = 2.0 * math.pi * amplitude / wavelength
+    q2 = q * q
+    return float(2.0 / math.pi * math.sqrt(1.0 + q2) * ellipe(q2 / (1.0 + q2)))
+
+
+def corrugated_plate_stiffness(
+    thickness: float,
+    corrugation_amplitude: float,
+    corrugation_wavelength: float,
+    *,
+    youngs_modulus: float,
+    poisson_ratio: float = 0.3,
+) -> tuple[float, float, float]:
+    """Equivalent orthotropic stiffnesses of a "wavy" corrugated plate.
+
+    Timoshenko & Woinowsky-Krieger's (1959) equivalent bending stiffnesses of a
+    plate of thickness ``h`` whose profile is a sinusoid of amplitude ``H`` and
+    wavelength ``L``, as transcribed by Vigran Eq. (3.115) (printed p. 96):
+
+    ``Bx  = E h**3 / (12 (1 - nu**2) (1 + (pi H / L)**2))``
+    ``Bz  = (E H**2 h / 2) [1 - 0.81 / (1 + 2.5 (H/L)**2)]``
+    ``Bxz = (E h**3 / (12 (1 + nu))) [1 + (pi H / L)**2]``
+
+    ``Bx`` is the stiffness **across** the corrugations (slightly *below* the
+    flat-plate value), ``Bz`` the stiffness **along** them (larger by orders of
+    magnitude: that is what corrugating buys) and ``Bxz`` the twisting term
+    Eq. (3.113) needs. Vigran's footnote records that the same equations appear
+    in Blevins (1979) "unfortunately, with a misprint in the expression for
+    ``Bz``".
+
+    Feed ``(Bx, Bz)`` to :func:`orthotropic_critical_frequencies` for the
+    coincidence range and all three to :func:`orthotropic_plate_resonance` for
+    the eigenfrequencies. Remember to scale the surface density by
+    :func:`corrugated_plate_mass_factor`.
+
+    :param thickness: Sheet thickness ``h``, in m (> 0).
+    :param corrugation_amplitude: Corrugation amplitude ``H``, in m (> 0).
+    :param corrugation_wavelength: Corrugation wavelength ``L``, in m (> 0).
+    :param youngs_modulus: Young's modulus ``E``, in Pa (> 0).
+    :param poisson_ratio: Poisson's ratio ``nu`` (Default: 0,3).
+    :return: The triple ``(Bx, Bz, Bxz)`` in N.m.
+    :raises ValueError: for a non-positive input or ``|nu| >= 1``.
+    """
+    h = require_positive(thickness, "thickness")
+    amplitude = require_positive(corrugation_amplitude, "corrugation_amplitude")
+    wavelength = require_positive(corrugation_wavelength, "corrugation_wavelength")
+    e = require_positive(youngs_modulus, "youngs_modulus")
+    if not -1.0 < poisson_ratio < 1.0:
+        raise ValueError("'poisson_ratio' must lie in (-1, 1).")
+    nu = float(poisson_ratio)
+    shape = (math.pi * amplitude / wavelength) ** 2
+    flat = e * h**3 / 12.0
+    b_x = flat / ((1.0 - nu**2) * (1.0 + shape))
+    b_z = 0.5 * e * amplitude**2 * h * (
+        1.0 - 0.81 / (1.0 + 2.5 * (amplitude / wavelength) ** 2)
+    )
+    b_xz = flat / (1.0 + nu) * (1.0 + shape)
+    return float(b_x), float(b_z), float(b_xz)
+
+
+def orthotropic_plate_resonance(
+    mode_x: int,
+    mode_z: int,
+    *,
+    length_x: float,
+    length_z: float,
+    mass_per_area: float,
+    bending_stiffness_x: float,
+    bending_stiffness_z: float,
+    bending_stiffness_xz: float,
+) -> float:
+    """Eigenfrequency of a simply supported orthotropic plate (Vigran 3.113).
+
+    ``f_in = (pi / (2 sqrt(m''))) sqrt(i**4 Bx / a**4 + n**4 Bz / b**4
+    + 2 i**2 n**2 Bxz / (a**2 b**2))`` (Vigran Eq. (3.113), printed p. 95;
+    identical to Bies Eq. (7.27) after Hearmon 1959). It collapses to the
+    isotropic Eq. (3.109) when ``Bx = Bz = B`` and
+    ``Bxz = B (nu + 2 (1 - nu)/2) = B``.
+
+    The lowest eigenfrequency ``f_1,1`` matters to the transmission-loss
+    prediction because the infinite-panel models of
+    :func:`orthotropic_transmission_loss` and
+    :func:`single_panel_transmission_loss` are only valid above about
+    ``1,5 f_1,1`` (Bies, Sect. 7.2.4).
+
+    :param mode_x: Mode order ``i`` along ``a`` (integer >= 1).
+    :param mode_z: Mode order ``n`` along ``b`` (integer >= 1).
+    :param length_x: Plate dimension ``a``, in m (> 0), along the axis whose
+        bending stiffness is *bending_stiffness_x*.
+    :param length_z: Plate dimension ``b``, in m (> 0).
+    :param mass_per_area: Mass per unit area ``m''``, in kg/m^2 (> 0).
+    :param bending_stiffness_x: ``Bx``, in N.m (> 0).
+    :param bending_stiffness_z: ``Bz``, in N.m (> 0).
+    :param bending_stiffness_xz: ``Bxz``, in N.m (> 0).
+    :return: The eigenfrequency, in hertz.
+    :raises ValueError: for a non-positive input or a mode order below 1.
+    """
+    i = int(mode_x)
+    n = int(mode_z)
+    if i < 1 or n < 1:
+        raise ValueError("'mode_x' and 'mode_z' must be integers >= 1.")
+    a = require_positive(length_x, "length_x")
+    b = require_positive(length_z, "length_z")
+    m2 = require_positive(mass_per_area, "mass_per_area")
+    b_x = require_positive(bending_stiffness_x, "bending_stiffness_x")
+    b_z = require_positive(bending_stiffness_z, "bending_stiffness_z")
+    b_xz = require_positive(bending_stiffness_xz, "bending_stiffness_xz")
+    total = (
+        i**4 * b_x / a**4
+        + n**4 * b_z / b**4
+        + 2.0 * i**2 * n**2 * b_xz / (a**2 * b**2)
+    )
+    return float(math.pi / (2.0 * math.sqrt(m2)) * math.sqrt(total))
+
+
+def orthotropic_critical_frequencies(
+    mass_per_area: float,
+    bending_stiffness_1: float,
+    bending_stiffness_2: float,
+    *,
+    speed_of_sound: float = _SPEED_OF_SOUND,
+) -> tuple[float, float]:
+    """Coincidence range ``(fc1, fc2)`` of an orthotropic panel (Vigran 6.107).
+
+    ``fc = (c0**2 / 2 pi) sqrt(m'' / B)`` evaluated for both principal bending
+    stiffnesses (Vigran Eq. (6.107), printed p. 252; the same closed form as
+    the isotropic
+    :func:`~phonometry.vibration.radiation_efficiency.coincidence_frequency`).
+    The stiffest direction gives the **lowest** coincidence frequency, so the
+    returned pair is sorted: ``fc1`` from the larger stiffness, ``fc2`` from the
+    smaller. For a corrugated sheet ``fc1`` can sit at a few hundred hertz while
+    ``fc2`` reaches 15 kHz to 30 kHz, and the resonant transmission then
+    dominates over most of the useful frequency range.
+
+    :param mass_per_area: Mass per unit area ``m''``, in kg/m^2 (> 0),
+        including the developed-length increase of a corrugated sheet (see
+        :func:`corrugated_plate_mass_factor`).
+    :param bending_stiffness_1: One principal bending stiffness, in N.m (> 0).
+    :param bending_stiffness_2: The other principal bending stiffness, in N.m
+        (> 0). The argument order does not matter.
+    :param speed_of_sound: Speed of sound in air ``c0`` (Default: 343 m/s).
+    :return: The pair ``(fc1, fc2)`` in hertz, with ``fc1 <= fc2``.
+    :raises ValueError: for a non-positive input.
+    """
+    m2 = require_positive(mass_per_area, "mass_per_area")
+    b1 = require_positive(bending_stiffness_1, "bending_stiffness_1")
+    b2 = require_positive(bending_stiffness_2, "bending_stiffness_2")
+    c0 = require_positive(speed_of_sound, "speed_of_sound")
+    scale = c0**2 / (2.0 * math.pi) * math.sqrt(m2)
+    pair = (scale / math.sqrt(b1), scale / math.sqrt(b2))
+    return (min(pair), max(pair))
+
+
+def _limiting_sin_squared(
+    area: float | None, limiting_angle: float, wavelength: float
+) -> float:
+    """Upper limit ``sin^2(theta_L)`` of the diffuse-field integral.
+
+    With an *area* the Davy (2009) limit of Bies Eq. (7.36) applies
+    (``cos^2(theta_L) = min(lambda / (2 pi sqrt(A)), 0.9)``, the finite-size
+    correction Vigran writes as Eq. (6.113)); otherwise the fixed
+    *limiting_angle* is used (Sharp's 78 degrees, the value Vigran also fixes
+    at ``sin^2 = 0,96``).
+    """
+    if area is None:
+        return float(math.sin(math.radians(limiting_angle)) ** 2)
+    cos2 = min(wavelength / (2.0 * math.pi * math.sqrt(area)), 0.9)
+    return float(1.0 - cos2)
+
+
+def _orthotropic_tau(
+    frequency: float,
+    mass_per_area: float,
+    fc1: float,
+    fc2: float,
+    eta: float,
+    z0: float,
+    upper: float,
+) -> float:
+    """Diffuse-field ``tau`` of an infinite orthotropic panel (Vigran 6.111).
+
+    The double integral of Vigran Eq. (6.111) / Bies Eq. (7.38) over the
+    azimuth ``theta`` and ``x = sin^2(phi)``, with the wall impedance of
+    Vigran Eq. (6.108) / Bies Eq. (7.30) and the angular transmission
+    coefficient of Eq. (6.109) / Eq. (7.31).
+
+    Above the coincidence range and at a low loss factor the inner integrand
+    is a narrow spike at the angle where the bracket of Eq. (6.108) vanishes,
+    ``x = 1/sqrt(ratio)``, whose width is set by ``eta``. That location is
+    known in closed form, so it is handed to the quadrature as a break point
+    (``points``, i.e. QUADPACK's QAGP) instead of being left for the adaptive
+    subdivision to stumble on.
+    """
+    omega_m = 2.0 * math.pi * frequency * mass_per_area
+
+    def azimuth(theta: float) -> float:
+        # Vigran Eq. (6.108): the two critical frequencies enter through the
+        # azimuth-weighted ratio, squared.
+        ratio = (
+            frequency / fc1 * math.cos(theta) ** 2
+            + frequency / fc2 * math.sin(theta) ** 2
+        ) ** 2
+
+        def integrand(x: float) -> float:
+            z_w = 1j * omega_m * (1.0 - ratio * (1.0 + 1j * eta) * x * x)
+            return 1.0 / abs(1.0 + z_w * math.sqrt(1.0 - x) / (2.0 * z0)) ** 2
+
+        resonance = 1.0 / math.sqrt(ratio) if ratio > 0.0 else math.inf
+        if 0.0 < resonance < upper:
+            return float(
+                quad(integrand, 0.0, upper, points=(resonance,), limit=200)[0]
+            )
+        return float(quad(integrand, 0.0, upper, limit=200)[0])
+
+    return float(2.0 / math.pi * quad(azimuth, 0.0, 0.5 * math.pi, limit=200)[0])
+
+
+def _heckl_transmission_loss(
+    f: np.ndarray,
+    m2: float,
+    fc1: float,
+    fc2: float,
+    *,
+    speed_of_sound: float,
+    air_density: float,
+    correction: float,
+) -> np.ndarray:
+    """Heckl's (1960) piecewise orthotropic estimate (Bies 7.2.4.5).
+
+    Field-incidence mass law below ``fc1/2``, Bies Eq. (7.59) (= the first of
+    Vigran Eq. (6.112)) from ``fc1`` to ``fc2/2``, Bies Eq. (7.60) (= the
+    second) above ``2 fc2``, and straight lines in ``log10 f`` across the two
+    gaps, as Bies Figure 7.9(b) draws them.
+    """
+    z0 = air_density * speed_of_sound
+
+    def mass_law(freq: np.ndarray) -> np.ndarray:
+        return mass_law_transmission_loss(
+            freq, m2, incidence="normal",
+            speed_of_sound=speed_of_sound, air_density=air_density,
+        ) - correction
+
+    def coincidence(freq: np.ndarray) -> np.ndarray:
+        """Bies Eq. (7.59): the flattened plateau of the coincidence range."""
+        tau = z0 / (2.0 * np.pi**2 * m2) * fc1 / freq**2 * np.log(4.0 * freq / fc1) ** 2
+        return np.asarray(-10.0 * np.log10(tau), dtype=np.float64)
+
+    def recovered(freq: np.ndarray) -> np.ndarray:
+        """Bies Eq. (7.60): 6 dB per octave again above the whole range."""
+        tau = z0 / (2.0 * m2) * math.sqrt(fc1 * fc2) / freq**2
+        return np.asarray(-10.0 * np.log10(tau), dtype=np.float64)
+
+    # The four construction points of Bies Figure 7.9(b), in order.
+    knots = np.array([0.5 * fc1, fc1, 0.5 * fc2, 2.0 * fc2])
+    anchors = np.array(
+        [
+            float(mass_law(knots[:1])[0]),
+            float(coincidence(knots[1:2])[0]),
+            float(coincidence(knots[2:3])[0]),
+            float(recovered(knots[3:4])[0]),
+        ]
+    )
+    tl = np.empty_like(f)
+    plateau = (f >= knots[1]) & (f <= knots[2])
+    below = f < knots[0]
+    above = f > knots[3]
+    tl[below] = mass_law(f[below])
+    tl[plateau] = coincidence(f[plateau])
+    tl[above] = recovered(f[above])
+    for mask, lo, hi in (
+        (~below & (f < knots[1]), 0, 1),
+        (~above & (f > knots[2]), 2, 3),
+    ):
+        if np.any(mask):
+            frac = (np.log10(f[mask]) - np.log10(knots[lo])) / (
+                np.log10(knots[hi]) - np.log10(knots[lo])
+            )
+            tl[mask] = anchors[lo] + frac * (anchors[hi] - anchors[lo])
+    return np.asarray(tl, dtype=np.float64)
+
+
+def orthotropic_transmission_loss(
+    frequency: ArrayLike,
+    mass_per_area: float,
+    *,
+    critical_frequency_lower: float,
+    critical_frequency_upper: float,
+    loss_factor: float = 0.01,
+    method: str = "integral",
+    area: float | None = None,
+    limiting_angle: float = 78.0,
+    band: str = "third",
+    speed_of_sound: float = _SPEED_OF_SOUND,
+    air_density: float = _AIR_DENSITY,
+) -> SoundReductionResult:
+    """Sound reduction index of an orthotropic panel (Vigran 6.5.3, Bies 7.2.4.5).
+
+    A ribbed or corrugated sheet is stiff along the corrugations and limp across
+    them, so instead of one coincidence dip it has a whole **coincidence range**
+    ``fc1`` to ``fc2`` (see :func:`orthotropic_critical_frequencies`). Over that
+    range the resonant transmission dominates and ``R`` flattens well below the
+    mass law of a flat plate of the same surface density, which is the price
+    paid for the strength-to-weight ratio.
+
+    Two prediction routes, both from the same wall impedance (Heckl 1960;
+    Hansen 1993; Vigran Eq. (6.108) = Bies Eq. (7.30))
+
+    ``Zw = j w m'' [1 - ((f/fc1) cos^2(theta) + (f/fc2) sin^2(theta))**2
+    (1 + j eta) sin^4(phi)]``
+
+    * ``method="integral"`` (Default) averages the angular transmission
+      coefficient ``tau = |1 + Zw cos(phi) / (2 rho0 c0)|**-2`` (Vigran
+      Eq. (6.109) = Bies Eq. (7.31)) over azimuth and incidence angle,
+      ``tau_F = (2/pi) int_0^{pi/2} int_0^{sin^2(theta_L)} tau d(sin^2 phi)
+      d(theta)`` (Vigran Eq. (6.111) = Bies Eq. (7.38)), numerically. The
+      near-grazing angles are excluded by the limiting angle: pass *area* for
+      the size-dependent limit of Bies Eq. (7.36) (the correction Vigran writes
+      as Eq. (6.113)) or leave it out for the fixed *limiting_angle*. This is
+      the only route that responds to the loss factor.
+    * ``method="heckl"`` is Heckl's closed-form approximation for ``eta = 0``,
+      the design chart of Bies Figure 7.9(b): field-incidence mass law below
+      ``fc1/2``, Eq. (7.59) (the first of Vigran Eq. (6.112)) from ``fc1`` to
+      ``fc2/2``, Eq. (7.60) (the second) above ``2 fc2``, and straight lines in
+      ``log10 f`` across the two gaps. It is cheap and it needs no loss factor,
+      but it cannot show the depth of the coincidence region and it requires
+      ``fc2 > 4 fc1`` for its four construction points to stay ordered.
+
+    The two routes are not interchangeable. Above ``2 fc2`` they converge as
+    the loss factor falls: with ``eta -> 0`` the integral lands within about
+    0,3 dB of Eq. (7.60), which is a useful independent check on both
+    transcriptions. Across the coincidence range Eq. (7.59) is a much rougher
+    approximation and stays a few decibels above the integral even at
+    ``eta -> 0``, as Vigran's Figure 6.27 shows for its own worked case.
+
+    Both models are infinite-panel models, valid above roughly ``1,5 f_1,1``
+    (:func:`orthotropic_plate_resonance`). Bies also notes two systematic
+    departures of the Heckl branch from measurement: below about ``0,7 fc1`` it
+    underestimates ``R`` on small panels, and real corrugated panels show a dip
+    of up to 5 dB between 2 kHz and 4 kHz caused by resonances of the panel
+    sections between the ribs, which no smooth model predicts.
+
+    :param frequency: Band centre frequencies ``f``, in hertz (array, > 0).
+    :param mass_per_area: Mass per unit area ``m''``, in kg/m^2 (> 0).
+    :param critical_frequency_lower: Lower coincidence frequency ``fc1``, in
+        hertz (> 0), from the stiffest direction.
+    :param critical_frequency_upper: Upper coincidence frequency ``fc2``, in
+        hertz (> ``fc1``).
+    :param loss_factor: Total loss factor ``eta`` (> 0, Default: 0,01); used
+        only by ``method="integral"``, but validated on both routes.
+    :param method: ``"integral"`` (Default) or ``"heckl"``.
+    :param area: Panel area ``S``, in m^2 (> 0), selecting the size-dependent
+        limiting angle of Bies Eq. (7.36) (Default: ``None``); used only by
+        ``method="integral"``, but validated on both routes.
+    :param limiting_angle: Fixed limiting angle ``theta_L``, in degrees
+        (0 < theta_L < 90, Default: 78,0), used when *area* is ``None`` and
+        only by ``method="integral"``, but validated on both routes.
+    :param band: Band width for the field correction of the Heckl mass-law
+        branch (``"third"``/``"octave"``).
+    :param speed_of_sound: Speed of sound in air ``c0`` (Default: 343 m/s).
+    :param air_density: Air density ``rho0`` (Default: 1.205 kg/m^3).
+    :return: A :class:`SoundReductionResult` (model ``"orthotropic-integral"``
+        or ``"orthotropic-heckl"``) carrying ``fc1`` in
+        :attr:`~SoundReductionResult.critical_frequency` and ``fc2`` in
+        :attr:`~SoundReductionResult.critical_frequency_upper`.
+    :raises ValueError: for a non-positive input, an unknown method, a
+        coincidence range that is not increasing, or a Heckl construction whose
+        points would be out of order.
+    """
+    chosen = require_choice(method, "method", ("integral", "heckl"))
+    m2 = require_positive(mass_per_area, "mass_per_area")
+    fc1 = require_positive(critical_frequency_lower, "critical_frequency_lower")
+    fc2 = require_positive(critical_frequency_upper, "critical_frequency_upper")
+    if fc2 <= fc1:
+        raise ValueError(
+            "'critical_frequency_upper' must exceed 'critical_frequency_lower'."
+        )
+    eta = require_positive(loss_factor, "loss_factor")
+    c0 = require_positive(speed_of_sound, "speed_of_sound")
+    rho0 = require_positive(air_density, "air_density")
+    # Validated on both routes, so that an out-of-range argument is rejected
+    # whichever method it was passed with, even where the method ignores it.
+    if area is not None:
+        require_positive(area, "area")
+    elif not 0.0 < limiting_angle < 90.0:
+        raise ValueError("'limiting_angle' must lie in (0, 90) degrees.")
+    f = _band_axis(frequency)
+    z0 = rho0 * c0
+
+    if chosen == "heckl":
+        if fc2 <= 4.0 * fc1:
+            raise ValueError(
+                "the Heckl construction needs 'critical_frequency_upper' above "
+                "four times 'critical_frequency_lower' so its points stay "
+                "ordered; use method='integral' for a narrow coincidence range."
+            )
+        tl = _heckl_transmission_loss(
+            f, m2, fc1, fc2,
+            speed_of_sound=c0, air_density=rho0,
+            correction=field_incidence_correction(band),
+        )
+        return SoundReductionResult(
+            frequencies=f,
+            transmission_loss=tl,
+            model="orthotropic-heckl",
+            critical_frequency=fc1,
+            critical_frequency_upper=fc2,
+        )
+
+    tau = np.array(
+        [
+            _orthotropic_tau(
+                float(freq), m2, fc1, fc2, eta, z0,
+                _limiting_sin_squared(area, limiting_angle, c0 / float(freq)),
+            )
+            for freq in f
+        ],
+        dtype=np.float64,
+    )
+    return SoundReductionResult(
+        frequencies=f,
+        transmission_loss=np.asarray(-10.0 * np.log10(tau), dtype=np.float64),
+        model="orthotropic-integral",
+        critical_frequency=fc1,
+        critical_frequency_upper=fc2,
     )
 
 

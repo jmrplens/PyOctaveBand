@@ -25,6 +25,13 @@ references:
     publisher: "Springer"
     doi: "10.1007/b137728"
     note: "Capítulo 5, Tabla 5.1: la recopilación de impedancias y movilidades puntuales de estructuras infinitas (placa Z = 8 sqrt(B' m''), viga, barra) y la potencia inyectada W = 0.5 |F|^2 Re{Y} (Ec. 5.23). ISBN 978-3-540-22696-3."
+  - type: book
+    authors: ["Vigran, T. E."]
+    year: 2008
+    title: "Building Acoustics"
+    publisher: "Taylor & Francis"
+    doi: "10.1201/9781482266016"
+    note: "Sections 3.7.3.3 (orthotropic plate eigenfrequencies, Eqs 3.113-3.115 after Timoshenko & Woinowsky-Krieger) and 6.5.3 (orthotropic panel transmission, Eqs 6.107-6.113 after Heckl 1960 and Hansen 1993). ISBN 978-0-415-42853-8."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -271,6 +278,186 @@ por la empírica de Cremer `TL = TL₀ + 10 lg(f/fc − 1) + 10 lg η − 2 dB`
 (Ec. 3.110 de Norton) y lleva la ley de masas hasta la propia `fc` sin puente
 interpolado. Ambas suben a unos 10 dB por octava muy por encima de la
 coincidencia; se diferencian en cómo salen de la caída.
+
+## Paneles ortótropos: un rango de coincidencia, no un valle (Vigran 6.5.3)
+
+La chapa grecada y la nervada no son isótropas. Son muy rígidas *en el sentido*
+de las grecas y casi tan flexibles como una chapa plana *en el transversal*, de
+modo que en lugar de una frecuencia de coincidencia tienen todo un **rango de
+coincidencia** delimitado por las dos rigideces principales a flexión (Vigran
+ec. 6.107, la $f_c = (c_0^2/2\pi)\sqrt{m''/B}$ isótropa evaluada dos veces):
+
+$$
+f_{c1} = \frac{c_0^2}{2\pi}\sqrt{\frac{m''}{B_1}}, \qquad
+f_{c2} = \frac{c_0^2}{2\pi}\sqrt{\frac{m''}{B_2}}, \qquad B_1 > B_2 .
+$$
+
+La dirección más rígida fija la frecuencia de coincidencia *más baja*, y ahí
+está la trampa: grecar una chapa para ganar resistencia arrastra $f_{c1}$ hacia
+abajo, a menudo hasta unos pocos cientos de hercios, mientras $f_{c2}$ se sube
+a 15 kHz o 30 kHz. En todo ese tramo domina la transmisión resonante y $R$ se
+aplana muy por debajo de la ley de masas de una placa plana de la misma masa.
+
+La impedancia de onda flexional depende ahora del azimut $\vartheta$ además del
+ángulo de incidencia $\varphi$ (Heckl 1960; Hansen 1993; Vigran ec. 6.108, que
+es la ec. 7.30 de Bies):
+
+$$
+Z_w = \mathrm{j}\omega m''\left[1 -
+\left(\frac{f}{f_{c1}}\cos^2\vartheta + \frac{f}{f_{c2}}\sin^2\vartheta\right)^2
+(1 + \mathrm{j}\eta)\sin^4\varphi\right],
+$$
+
+y el promedio en campo difuso de $\tau = |1 + Z_w\cos\varphi/2\rho_0c_0|^{-2}$
+pasa a ser una integral doble (Vigran ec. 6.111 = Bies ec. 7.38). Con
+$f_{c1} = f_{c2}$ se recupera exactamente la impedancia isótropa de Cremer.
+
+`orthotropic_transmission_loss` ofrece las dos vías publicadas:
+
+- `method="integral"` evalúa numéricamente esa integral doble. Es la única vía
+  sensible al factor de pérdidas y la que muestra hasta dónde baja realmente la
+  región de coincidencia. Los ángulos rasantes se excluyen con un ángulo
+  límite: pasa `area` para el límite dependiente del tamaño de la ec. 7.36 de
+  Bies (Vigran la escribe como ec. 6.113), o déjalo sin pasar para el
+  `limiting_angle` fijo (78 grados por defecto, el valor de Sharp, que es el
+  $\sin^2\varphi = 0{,}96$ de Vigran).
+- `method="heckl"` es la aproximación en forma cerrada de Heckl para
+  $\eta = 0$, el gráfico de diseño de la fig. 7.9(b) de Bies: ley de masas de
+  incidencia de campo por debajo de $f_{c1}/2$, luego
+
+  $$
+  \tau_F \approx \frac{\rho_0c_0}{2\pi^2 m''}\,\frac{f_{c1}}{f^2}
+  \left[\ln\frac{4f}{f_{c1}}\right]^2 \quad (f_{c1} \le f < f_{c2}/2),
+  \qquad
+  \tau_F \approx \frac{\rho_0c_0}{2m''}\,\frac{\sqrt{f_{c1}f_{c2}}}{f^2}
+  \quad (f > 2f_{c2}),
+  $$
+
+  con rectas en $\log_{10} f$ que salvan los dos huecos. No necesita factor de
+  pérdidas ni cálculo numérico, pero exige $f_{c2} > 4f_{c1}$ para que sus
+  cuatro puntos de construcción queden ordenados.
+
+Para la greca sinusoidal habitual las rigideces equivalentes vienen de
+Timoshenko y Woinowsky-Krieger a través de `corrugated_plate_stiffness`
+(Vigran ec. 3.115), y la densidad superficial ha de crecer con la **longitud
+desarrollada** del perfil, que es lo que devuelve
+`corrugated_plate_mass_factor`. `orthotropic_plate_resonance` es la
+autofrecuencia correspondiente de una placa ortótropa simplemente apoyada
+(Vigran ec. 3.113 = Bies ec. 7.27, según Hearmon 1959); su modo más bajo
+importa porque los dos modelos de panel infinito solo valen por encima de unos
+$1{,}5f_{1,1}$.
+
+```python
+from phonometry import (
+    coincidence_frequency, corrugated_plate_mass_factor,
+    corrugated_plate_stiffness, orthotropic_critical_frequencies,
+    orthotropic_plate_resonance, plate_bending_stiffness,
+)
+
+# Ejemplo resuelto de Vigran: chapa de acero de 1 m x 1 m y 1 mm de espesor,
+# E = 210 GPa, nu = 0,3, m'' = 7,8 kg/m2, grecada con una sinusoide de 20 mm
+# de altura total (amplitud H = 10 mm) y paso de 100 mm.
+flat_b = plate_bending_stiffness(2.1e11, 1.0e-3, 0.3)
+b_x, b_z, b_xz = corrugated_plate_stiffness(
+    1.0e-3, 0.010, 0.100, youngs_modulus=2.1e11, poisson_ratio=0.3,
+)
+mass = 7.8 * corrugated_plate_mass_factor(0.010, 0.100)
+print(round(flat_b, 1), round(b_x, 1), round(b_z))     # 19.2 17.5 2202
+print(round(mass, 2))                                  # 8.52 kg/m2 (+9 %)
+
+flat = {"length_x": 1.0, "length_z": 1.0, "mass_per_area": 7.8,
+        "bending_stiffness_x": flat_b, "bending_stiffness_z": flat_b,
+        "bending_stiffness_xz": flat_b}
+corr = {"length_x": 1.0, "length_z": 1.0, "mass_per_area": mass,
+        "bending_stiffness_x": b_x, "bending_stiffness_z": b_z,
+        "bending_stiffness_xz": b_xz}
+print(round(orthotropic_plate_resonance(1, 1, **flat), 1),
+      round(orthotropic_plate_resonance(2, 2, **flat), 1))    # 4.9 19.7
+print(round(orthotropic_plate_resonance(1, 1, **corr), 1),
+      round(orthotropic_plate_resonance(2, 2, **corr), 1))    # 25.5 102.1
+
+# La misma chapa, plana y grecada, en la imagen de la coincidencia:
+print(round(coincidence_frequency(7.8, flat_b)))               # 11925 Hz
+print([round(f) for f in orthotropic_critical_frequencies(mass, b_x, b_z)])
+# [1165, 13064]
+```
+
+Las cuatro autofrecuencias son las respuestas impresas por Vigran (4,9 Hz y
+19,7 Hz en plano; 25,5 Hz y 102 Hz grecada), y reproducir el par de la chapa
+grecada es lo que demuestra que el factor de masa pertenece ahí: con los
+7,8 kg/m² planos las mismas fórmulas devuelven 26,7 Hz y 106,7 Hz.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/orthotropic_transmission_loss.svg" alt="Pérdida por transmisión en decibelios frente a bandas de tercio de octava de 100 hercios a 16 kilohercios para una chapa de acero de 1 mm, plana y grecada. Ambas curvas suben juntas a 6 decibelios por octava desde unos 11 decibelios a 100 hercios hasta 28 decibelios a 800 hercios. Por encima de 1 kilohercio la chapa plana sigue subiendo hasta un máximo cercano a 45 decibelios a 6,3 kilohercios antes de su propio valle de coincidencia, mientras la chapa grecada se desploma a 22 decibelios a 1,6 kilohercios dentro de una banda sombreada que va de 1165 hercios a 13,1 kilohercios y luego recupera lentamente, quedando unos 13 decibelios por debajo de la plana a 2,5 kilohercios. Una línea discontinua muestra la aproximación en forma cerrada de Heckl siguiendo el mismo desplome de forma más suave" width="88%" loading="lazy" />
+
+*El intercambio que hace el grecado, sobre la propia geometría de Vigran. Por
+debajo de $f_{c1}$ los dos paneles quedan a unos 2 dB uno del otro (el grecado
+algo por encima: es un 9 % más pesado, y la integral en campo difuso usa un
+ángulo límite de 78 grados en lugar de la corrección de banda de 5,5 dB de
+Sharp). A lo largo del rango de coincidencia la chapa grecada cede hasta 13 dB,
+y $R_w$ baja de 28 dB a 25 dB, con un panel más rígido y apenas más pesado.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import (
+    coincidence_frequency, corrugated_plate_mass_factor,
+    corrugated_plate_stiffness, orthotropic_critical_frequencies,
+    orthotropic_transmission_loss, plate_bending_stiffness,
+    single_panel_transmission_loss,
+)
+
+bands = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000,
+                  1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000,
+                  10000, 12500, 16000], dtype=float)
+eta = 0.011
+flat_b = plate_bending_stiffness(2.1e11, 1.0e-3, 0.3)
+b_x, b_z, _ = corrugated_plate_stiffness(
+    1.0e-3, 0.010, 0.100, youngs_modulus=2.1e11, poisson_ratio=0.3,
+)
+mass = 7.8 * corrugated_plate_mass_factor(0.010, 0.100)
+fc1, fc2 = orthotropic_critical_frequencies(mass, b_x, b_z)
+
+flat = single_panel_transmission_loss(
+    bands, 7.8, critical_frequency=coincidence_frequency(7.8, flat_b),
+    loss_factor=eta,
+)
+corrugated = orthotropic_transmission_loss(
+    bands, mass, critical_frequency_lower=fc1, critical_frequency_upper=fc2,
+    loss_factor=eta,
+)
+heckl = orthotropic_transmission_loss(
+    bands, mass, critical_frequency_lower=fc1, critical_frequency_upper=fc2,
+    method="heckl",
+)
+
+# Una línea: R(f) con el rango de coincidencia sombreado entre fc1 y fc2.
+corrugated.plot(language="es")
+plt.show()
+
+# A mano, las tres curvas en unos mismos ejes:
+fig, ax = plt.subplots()
+ax.axvspan(fc1, fc2, color="0.85", zorder=0)
+ax.semilogx(bands, flat.transmission_loss, "-o", ms=4, label="chapa plana")
+ax.semilogx(bands, corrugated.transmission_loss, "-s", ms=4,
+            label="grecada, integral")
+ax.semilogx(bands, heckl.transmission_loss, "--", label="aproximación de Heckl")
+ax.set(xlabel="Frecuencia [Hz]", ylabel="Pérdida por transmisión TL [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+Merece la pena repetir dos advertencias que Bies añade a la rama de Heckl,
+porque ningún modelo suave predice ninguna de las dos. Por debajo de unos
+$0{,}7f_{c1}$ la estimación infravalora $R$ en paneles pequeños, y el error
+crece a medida que el panel se reduce; y las chapas grecadas reales casi siempre
+muestran un valle de hasta 5 dB en algún punto entre 2 kHz y 4 kHz, que los
+cálculos por elementos finitos atribuyeron a resonancias de los tramos de panel
+*entre* nervios y no a ningún efecto de coincidencia.
 
 ## Pared doble: la resonancia masa-muelle-masa (Bies 7.2.6)
 
@@ -565,7 +752,15 @@ vigas infinitas de la Tabla 5.1 de Cremer con la relación de potencia
 inyectada, mediante `single_panel_transmission_loss`,
 `double_wall_transmission_loss`, `slit_transmission_coefficient`,
 `composite_transmission_loss`, `radiation_efficiency`,
-`infinite_plate_impedance`, `infinite_beam_mobility` e `injected_power`.
+`infinite_plate_impedance`, `infinite_beam_mobility` e `injected_power`. A
+ellas se suma el capítulo ortótropo de Vigran: el rango de coincidencia de un
+panel nervado o grecado y su pérdida por transmisión aplanada, por la integral
+en campo difuso o por la forma cerrada de Heckl (Ec. 6.107-6.113), las rigideces
+equivalentes de Timoshenko de una greca sinusoidal (Ec. 3.115) y la
+autofrecuencia de placa ortótropa (Ec. 3.113), mediante
+`orthotropic_transmission_loss`, `orthotropic_critical_frequencies`,
+`corrugated_plate_stiffness`, `corrugated_plate_mass_factor` y
+`orthotropic_plate_resonance`.
 
 **No cubierto.** Cada predicción se mantiene dentro del rango de validez
 que declara su fuente, que la guía señala pero no extiende: el método de
@@ -576,6 +771,13 @@ no la ley de masas; el modelo de rendija de Gomperts solo es válido para
 una rendija estrecha, $w < 0{,}3\lambda$, así que una abertura ancha queda
 fuera de él; y solo está implementado el "método n.º 1" de Leppington
 para la eficiencia de radiación, no sus otras formulaciones publicadas.
+Los modelos ortótropos son modelos de panel infinito en las mismas
+condiciones: por debajo de unos $0{,}7f_{c1}$ la rama de Heckl infravalora $R$
+en paneles pequeños, y el valle entre 2 kHz y 4 kHz que muestra la chapa grecada
+real proviene de resonancias de los tramos de panel entre nervios, que ninguna
+de las dos vías predice. Solo la greca sinusoidal tiene aquí rigideces
+equivalentes; la chapa trapezoidal necesita las suyas, de la bibliografía que
+cita Vigran.
 
 ## Véase también
 

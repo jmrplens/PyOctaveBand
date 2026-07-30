@@ -6890,6 +6890,87 @@ def _chk_porous_maa_peak_closed_form() -> Outcome:
                    expected_label=f"4r/(1+r)^2 = {expected:.3f}")
 
 
+# Limp-frame equivalent fluid (Allard & Atalla 2e Sect. 11.3.4). The book
+# publishes no table of computed limp densities (every comparison is a figure),
+# so the anchor is the printed Eq. (11.55) itself, transcribed term by term in
+# tests/materials/test_limp_frame.py. The two limits the book states in prose on
+# printed p. 253 and checked below corroborate that transcription without
+# pinning it: a sign-flipped variant of Eq. (11.55) satisfies both. The
+# decoupling frequency on the fully specified Table 6.1 glass wool is pure
+# arithmetic.
+_AA_TABLE_11_2 = {
+    "porosity": 0.98,
+    "tortuosity": 1.02,
+    "viscous_length": 90e-6,
+    "thermal_length": 180e-6,
+}
+_AA_TABLE_11_2_SIGMA = 25.0e3
+_AA_TABLE_11_2_RHO1 = 30.0
+
+
+@register(
+    _POROUS,
+    "Allard & Atalla 2e Sect. 11.3.4 (Eq. 6.90), Table 6.1 glass wool",
+    "Zwikker-Kosten decoupling frequency Fd, Hz",
+)
+def _chk_limp_decoupling_frequency() -> Outcome:
+    fd = ph.decoupling_frequency(40.0e3, porosity=0.94, frame_density=130.0)
+    return numeric(43.27, fd, 0.005, unit="Hz", places=3)
+
+
+@register(
+    _POROUS,
+    "Allard & Atalla 2e Eq. (11.55), printed p. 253 (prose limit)",
+    "Limp effective density at DC = apparent total density rho_t, kg/m3",
+)
+def _chk_limp_low_frequency_limit() -> Outcome:
+    rigid = ph.johnson_champoux_allard(
+        np.array([1.0e-4]), _AA_TABLE_11_2_SIGMA,
+        speed_of_sound=_PA_C0, air_density=_PA_RHO0, **_AA_TABLE_11_2,
+    )
+    limp = ph.limp_frame(
+        rigid, _AA_TABLE_11_2_RHO1, porosity=_AA_TABLE_11_2["porosity"]
+    )
+    expected = _AA_TABLE_11_2_RHO1 + _AA_TABLE_11_2["porosity"] * _PA_RHO0
+    return numeric(expected, float(np.real(limp.effective_density[0])),
+                   1e-4, rel=True, unit="kg/m3", places=4)
+
+
+@register(
+    _POROUS,
+    "Allard & Atalla 2e Eq. (11.55), printed p. 253 (prose limit)",
+    "Heavy frame recovers the rigid-frame Zc (relative deviation)",
+)
+def _chk_limp_heavy_frame_limit() -> Outcome:
+    f = np.array([50.0, 125.0, 500.0, 2000.0])
+    rigid = ph.johnson_champoux_allard(
+        f, _AA_TABLE_11_2_SIGMA, speed_of_sound=_PA_C0,
+        air_density=_PA_RHO0, **_AA_TABLE_11_2,
+    )
+    limp = ph.limp_frame(
+        rigid, 1.0e12, porosity=_AA_TABLE_11_2["porosity"]
+    )
+    deviation = float(np.max(np.abs(
+        limp.characteristic_impedance / rigid.characteristic_impedance - 1.0
+    )))
+    return numeric(0.0, deviation, 1e-5, places=8)
+
+
+@register(
+    _POROUS,
+    "Allard & Atalla 2e printed p. 254 (Doutres et al. 2007)",
+    "Limp-frame bulk-modulus limit for air, kPa",
+)
+def _chk_limp_frame_criterion_limit() -> Outcome:
+    # The book states "lower than 20 kPa" for |Kc/Kf| < 0.2 with Kf = P0.
+    limit = 0.2 * 101325.0
+    ok = ph.limp_frame_applicable(limit) and not ph.limp_frame_applicable(
+        limit * (1.0 + 1e-9)
+    )
+    return numeric(20.0, limit / 1000.0 if ok else float("nan"),
+                   0.3, unit="kPa", places=2)
+
+
 # ===========================================================================
 # Slow-sound slit + Helmholtz-resonator perfect absorbers (Jimenez et al.)
 # ===========================================================================
@@ -7487,6 +7568,90 @@ def _chk_double_wall_low_frequency() -> Outcome:
 def _chk_composite_open_area_limit() -> Outcome:
     r = float(ph.composite_transmission_loss([0.99, 0.01], [60.0, 0.0]))
     return numeric(10.0 * math.log10(1.0 / 0.01), r, 0.05, unit="dB")
+
+
+@register(_PANEL, "Vigran Building Acoustics Eq. (3.109), printed p. 96",
+          "Flat 1 mm steel plate 1 m x 1 m, f(1,1)")
+def _chk_flat_plate_first_mode() -> Outcome:
+    b = ph.plate_bending_stiffness(2.1e11, 1.0e-3, 0.3)
+    f11 = ph.orthotropic_plate_resonance(
+        1, 1, length_x=1.0, length_z=1.0, mass_per_area=7.8,
+        bending_stiffness_x=b, bending_stiffness_z=b, bending_stiffness_xz=b,
+    )
+    return numeric(4.9, f11, 0.05, unit="Hz", places=2)
+
+
+@register(_PANEL, "Vigran Eqs. (3.113)/(3.115), printed p. 96",
+          "Corrugated 1 mm steel plate (H = 10 mm, L = 100 mm), f(2,2)")
+def _chk_corrugated_plate_mode_22() -> Outcome:
+    b_x, b_z, b_xz = ph.corrugated_plate_stiffness(
+        1.0e-3, 0.010, 0.100, youngs_modulus=2.1e11, poisson_ratio=0.3
+    )
+    mass = 7.8 * ph.corrugated_plate_mass_factor(0.010, 0.100)
+    f22 = ph.orthotropic_plate_resonance(
+        2, 2, length_x=1.0, length_z=1.0, mass_per_area=mass,
+        bending_stiffness_x=b_x, bending_stiffness_z=b_z,
+        bending_stiffness_xz=b_xz,
+    )
+    return numeric(102.0, f22, 0.1, unit="Hz", places=2)
+
+
+@register(_PANEL, "Bies 5e Eq. (7.59) / Vigran Eq. (6.112)",
+          "Heckl coincidence-branch constant, dB (rho c = 414)")
+def _chk_heckl_coincidence_constant() -> Outcome:
+    f, mass, fc1, fc2 = 800.0, 7.5, 400.0, 4000.0
+    tl = float(ph.orthotropic_transmission_loss(
+        [f], mass, critical_frequency_lower=fc1,
+        critical_frequency_upper=fc2, method="heckl",
+        air_density=414.0 / 343.0,
+    ).transmission_loss[0])
+    constant = (
+        tl - 20.0 * math.log10(f) - 10.0 * math.log10(mass)
+        + 10.0 * math.log10(fc1)
+        + 20.0 * math.log10(math.log(4.0 * f / fc1))
+    )
+    return numeric(-13.2, constant, 0.02, unit="dB", places=3)
+
+
+@register(_PANEL, "Bies 5e Eq. (7.60) / Vigran Eq. (6.112)",
+          "Heckl recovery-branch constant, dB (rho c = 414)")
+def _chk_heckl_recovery_constant() -> Outcome:
+    f, mass, fc1, fc2 = 12500.0, 7.5, 400.0, 4000.0
+    tl = float(ph.orthotropic_transmission_loss(
+        [f], mass, critical_frequency_lower=fc1,
+        critical_frequency_upper=fc2, method="heckl",
+        air_density=414.0 / 343.0,
+    ).transmission_loss[0])
+    constant = (
+        tl - 20.0 * math.log10(f) - 10.0 * math.log10(mass)
+        + 5.0 * math.log10(fc1) + 5.0 * math.log10(fc2)
+    )
+    return numeric(-23.0, constant, 0.2, unit="dB", places=3)
+
+
+@register(_PANEL, "Vigran Eq. (6.111) / Bies Eq. (7.38)",
+          "Orthotropic diffuse integral below fc1 vs its exact mass-law form")
+def _chk_orthotropic_mass_law_integral() -> Outcome:
+    mass, f, angle = 7.5, 50.0, 78.0
+    tl = float(ph.orthotropic_transmission_loss(
+        [f], mass, critical_frequency_lower=4.0e5,
+        critical_frequency_upper=4.0e6, limiting_angle=angle,
+    ).transmission_loss[0])
+    q = 2.0 * math.pi * f * mass / (2.0 * 1.205 * 343.0)
+    u = math.sin(math.radians(angle)) ** 2
+    tau = math.log((1.0 + q**2) / (1.0 + q**2 * (1.0 - u))) / q**2
+    return numeric(-10.0 * math.log10(tau), tl, 1e-6, unit="dB", places=6)
+
+
+@register(_PANEL, "Hopkins Table A2, printed p. 608",
+          "h.fc products of 25 building-material rows, worst deviation")
+def _chk_hopkins_table_a2_products() -> Outcome:
+    rho, nu, h = 2500.0, 0.24, 0.01
+    worst = 0.0
+    for c_l, product in ref.HOPKINS_TABLE_A2_H_FC:
+        b = ph.plate_bending_stiffness(rho * c_l**2 * (1.0 - nu**2), h, nu)
+        worst = max(worst, abs(h * ph.coincidence_frequency(rho * h, b) - product))
+    return numeric(0.0, worst, 0.06, unit="m.Hz", places=4)
 
 
 @register(_PANEL, "Hopkins Eq. 4.99/4.101 (Gomperts slit)",

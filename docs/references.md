@@ -632,8 +632,9 @@ it; the list grows as guides gain their References sections.
   A compact textbook on sound transmission in buildings, from single and
   double constructions to floating floors.
   Cited by [Field Insulation Measurement (ISO 16283)](insulation-field.md),
-  [Laboratory Insulation Measurement](insulation-lab.md) and
-  [Dynamic stiffness of resilient materials](dynamic-stiffness.md).
+  [Laboratory Insulation Measurement](insulation-lab.md),
+  [Dynamic stiffness of resilient materials](dynamic-stiffness.md) and
+  [Predicting Panel Sound Insulation](panel-sound-insulation.md).
 - International Organization for Standardization. (2020). *Acoustics —
   Rating of sound insulation in buildings and of building elements — Part 1:
   Airborne sound insulation* (ISO 717-1:2020).

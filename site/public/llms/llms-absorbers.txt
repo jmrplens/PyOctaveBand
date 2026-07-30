@@ -1592,6 +1592,144 @@ data (for example the $Z_c$, $k$ recovered by the
 [ASTM E2611 transfer-matrix reduction](https://jmrplens.github.io/phonometry/guides/impedance-tube/)) plugs into the layer
 solver exactly like a modelled one.
 
+### Limp frames: when the skeleton moves (Allard & Atalla 11.3.4)
+
+Every model above assumes the frame stands still. That is only true above the
+**decoupling frequency** of Zwikker and Kosten,
+
+$$
+F_d = \frac{\sigma\,\phi^2}{2\pi\rho_1},
+$$
+
+with $\rho_1$ the bulk density of the frame (the density of the sample as
+weighed, not of the material the fibres are made of). Below $F_d$ the
+visco-inertial coupling is strong enough for the wave in the pores to drag the
+frame along, and a light frame (aeronautic-grade fibreglass, felts, thin
+screens) has real inertia to contribute. Neglecting the *stiffness* of the
+frame but not its *mass* in the Biot mixed pressure-displacement formulation
+leaves an equivalent fluid with the same bulk modulus and a corrected effective
+density (Allard & Atalla 2e Eqs. 11.53-11.55, after Panneton 2007):
+
+$$
+\tilde\rho_{\text{limp}} =
+\frac{\rho_t\,\tilde\rho_{\text{eq}} - \rho_0^2}
+     {\rho_t + \tilde\rho_{\text{eq}} - 2\rho_0},
+\qquad \rho_t = \rho_1 + \phi\rho_0,
+$$
+
+where $\tilde\rho_{\text{eq}}$ is the rigid-frame effective density of any of
+the three models above and $\rho_t$ is the apparent total density of the
+material. What anchors the correction is the printed equation itself,
+transcribed term by term against the page; the book tabulates no computed limp
+density anywhere. Two limits it states in prose are exact as well and are
+checked, but they corroborate rather than pin the form: neither constrains the
+$\rho_0$ terms, and a sign-flipped variant of the same equation satisfies both.
+The limits are:
+
+- **heavy frame**: as $\rho_1$ grows the correction vanishes and the
+  rigid-frame result comes back;
+- **low frequency**: the rigid-frame density diverges as $\sigma/(j\omega)$,
+  while the limp one converges on the finite, real $\rho_t$. A rigid frame
+  forbids rigid-body motion of the sample; a limp one allows it, which is why
+  the limp model is the right one for an unconstrained specimen in an
+  impedance tube.
+
+`limp_frame` takes a `PorousMediumResult` and returns another one, so it drops
+straight into a `PorousLayer` in the stack.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/limp_frame_effective_density_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/limp_frame_effective_density.svg" alt="Normalised effective density against frequency from 0 to 2000 hertz for a soft fibrous layer, comparing the rigid-frame and limp-frame models. The rigid-frame real part is a flat dashed line at 1.2 while its imaginary part dives off the bottom of the plot below the 127 hertz decoupling frequency marked by a dotted vertical line. The limp-frame real part starts at the apparent total density of 25.9 at zero hertz and falls smoothly onto the rigid-frame line by about 1500 hertz, while its imaginary part dips to minus 12 near 130 hertz and then merges with the rigid-frame curve" width="88%"></picture>
+
+*The same 50 mm soft fibrous layer under both models (Allard & Atalla
+Table 11.2, the input set behind their Fig. 11.2). Above the decoupling
+frequency the two predictions are indistinguishable, which is the plot's own
+check on the correction; below it the rigid-frame effective density runs away
+and the limp one settles on $\rho_t/\rho_0 = 25.9$.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import (
+    PorousLayer, decoupling_frequency, johnson_champoux_allard,
+    layered_absorber, limp_frame, limp_frame_applicable,
+)
+
+# Allard & Atalla Table 11.2: soft fibrous layer, 50 mm.
+f = np.linspace(1.0, 2000.0, 800)
+rigid = johnson_champoux_allard(
+    f, 25e3, porosity=0.98, tortuosity=1.02,
+    viscous_length=90e-6, thermal_length=180e-6,
+)
+limp = limp_frame(rigid, frame_density=30.0, porosity=0.98)
+
+print(round(decoupling_frequency(25e3, porosity=0.98, frame_density=30.0), 1))
+# 127.4
+print(round(float(limp.effective_density[0].real), 1))     # 31.2 = rho_t
+print(limp_frame_applicable(20e3), limp_frame_applicable(25e3))  # True False
+
+limp.plot()   # normalised Zc and k of the corrected medium
+plt.show()
+
+# By hand, the Fig. 11.2 view:
+rho0 = rigid.air_density
+fig, ax = plt.subplots()
+for medium, style in ((rigid, "--"), (limp, "-")):
+    ax.plot(f, medium.effective_density.real / rho0, style)
+    ax.plot(f, medium.effective_density.imag / rho0, style)
+ax.set(xlabel="Frequency [Hz]", ylabel="rho_e / rho_0", ylim=(-30, 30))
+plt.show()
+```
+
+</details>
+
+The correction is only worth applying where the frame really is limp. Beranek
+(1947) asked for $|K_c/K_f| < 0.05$ between the bulk modulus of the frame in
+vacuum and that of the fluid in the pores; the frame-structural-interaction
+study of Doutres et al. (2007) relaxed that to $0.2$, which for air
+($K_f \approx P_0 = 101.3$ kPa) is the rule of thumb that the frame must be
+softer than about 20 kPa. `limp_frame_applicable` applies either threshold.
+Neither accounts for mounting: a thin light foam decoupled from a vibrating
+structure by an air gap behaves limply well above the limit, and a material
+bonded to a vibrating structure should not be treated as rigid-framed at all.
+
+The practical consequence, for the 50 mm layer above with a rigid backing, is a
+lower absorption coefficient in the bottom two thirds of an octave and a
+slightly higher one either side of 500 Hz:
+
+```python
+import numpy as np
+from phonometry import (
+    PorousLayer, johnson_champoux_allard, layered_absorber, limp_frame,
+)
+
+bands = np.array([100, 125, 160, 200, 250, 315, 400, 500, 1000], dtype=float)
+rigid = johnson_champoux_allard(
+    bands, 25e3, porosity=0.98, tortuosity=1.02,
+    viscous_length=90e-6, thermal_length=180e-6,
+)
+limp = limp_frame(rigid, frame_density=30.0, porosity=0.98)
+for medium in (rigid, limp):
+    print(layered_absorber(bands, [PorousLayer(0.05, medium)]).absorption.round(2))
+# [0.07 0.11 0.17 0.24 0.32 0.43 0.54 0.64 0.88]   rigid frame
+# [0.04 0.08 0.15 0.24 0.36 0.48 0.61 0.71 0.91]   limp frame
+```
+
+**Honest note on validation.** Allard & Atalla contains exactly one table of
+computed numbers in the whole book, and it is not a surface impedance: every
+prediction-versus-measurement pair in the porous chapters, Fig. 11.2 included,
+is a figure. No published source checked (Allard & Atalla itself, Cox &
+D'Antonio, Mechel, and the round-robin and Biot literature) tabulates the
+quantity either. The anchor is therefore the printed Eq. 11.55 itself,
+transcribed term by term against the printed page. The two exact limits the
+book states in prose (heavy frame and $\omega \to 0$) are checked as well, but
+they are weaker than they look: a sign-flipped variant of the equation
+satisfies both, and reproduces the $1/\rho_1$ decay of the heavy-frame residual
+too, so the limits cannot tell the printed form from that variant. The
+decoupling frequency evaluated on the fully specified glass wool of their
+Table 6.1, where pure arithmetic gives 43.27 Hz, is independent of all this.
+
 ## 2. Multilayer prediction by transfer matrices
 
 Each fluid layer of thickness $d$ contributes the chain matrix (Cox &
@@ -1901,6 +2039,15 @@ parameters but behaves physically everywhere; with
 $\Lambda = \Lambda' = \sqrt{8\alpha_\infty\eta/(\phi\sigma)}$ and
 $\alpha_\infty = 1$ it tracks Delany–Bazley over the fit range.
 
+**Rigid or limp frame.** Every equivalent-fluid model above assumes a
+motionless frame, which only holds above the decoupling frequency
+$F_d = \sigma\phi^2/2\pi\rho_1$. Below it a light frame moves with the pore
+fluid, and `limp_frame` adds its inertia (Allard & Atalla Eqs 11.53-11.55).
+Use it for felts, screens and light fibreglass, for anything measured
+unconstrained in an impedance tube, and wherever the frame in vacuum is softer
+than about 20 kPa (`limp_frame_applicable`); do not use it, or the rigid model
+either, for a material bonded to a vibrating structure.
+
 **Local vs. bulk reaction.** The layer solver is bulk-reacting (sound
 refracts and travels inside the layers). `statistical_absorption` assumes
 local reaction, a good approximation for high flow resistivity, partitioned
@@ -1922,6 +2069,13 @@ found in the sources during this work are recorded in the
   [doi:10.1007/978-3-540-76833-3](https://doi.org/10.1007/978-3-540-76833-3).
   Sections D.3–D.6 (layer reflection, multilayer scheme, diffuse-field
   integrals) and G.11 (empirical porous relations).
+- Allard, J. F., & Atalla, N. (2009). *Propagation of Sound in Porous Media:
+  Modelling Sound Absorbing Materials* (2nd ed.). Wiley.
+  ISBN 978-0-470-74661-5.
+  [doi:10.1002/9780470747339](https://doi.org/10.1002/9780470747339).
+  Section 11.3.4: the rigid and limp frame limits of the Biot theory, the
+  decoupling frequency and the limp effective density (Eqs 11.53-11.55, after
+  Panneton 2007).
 - Bies, D. A., Hansen, C. H., & Howard, C. Q. (2017). *Engineering noise
   control* (5th ed.). CRC Press.
   [doi:10.1201/9781351228152](https://doi.org/10.1201/9781351228152).

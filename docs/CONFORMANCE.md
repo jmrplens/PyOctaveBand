@@ -15,7 +15,7 @@
 
 ## Numerical conformance report
 
-&#9989; **474/474 conformance checks pass** across 55 domains and 316 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+&#9989; **484/484 conformance checks pass** across 55 domains and 325 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
 
@@ -782,7 +782,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary>&#9989; <b>Porous &amp; multilayer absorbers (Mechel / Bies / Cox &amp; D'Antonio)</b>: 100% (10/10)</summary>
+<summary>&#9989; <b>Porous &amp; multilayer absorbers (Mechel / Bies / Cox &amp; D'Antonio)</b>: 100% (14/14)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
@@ -796,6 +796,10 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | Cox & D'Antonio 3e Eq. (7.9) | Membrane resonance 60/sqrt(m d), m = 5 kg/m2, d = 5 cm, Hz | 120 Hz (+/-2%) | 119.85 Hz | -0.15 Hz | &#9989; |
 | Maa 1998 Fig. 5 / Cox & D'Antonio 3e Fig. 7.28 | Microperforated panel (d=t=0.2 mm, b=2.5 mm, D=6 cm): peak alpha | 0.95 (+/-0.05) | 0.956 | 0.006 | &#9989; |
 | Maa 1998 Eqs. (5a)/(10) | MPP peak absorption vs 4r/(1+r)^2 with Maa's printed resistance | 4r/(1+r)^2 = 0.949 | 0.956 | 0.007 | &#9989; |
+| Allard & Atalla 2e Sect. 11.3.4 (Eq. 6.90), Table 6.1 glass wool | Zwikker-Kosten decoupling frequency Fd, Hz | 43.27 Hz (+/-0.005 Hz) | 43.271 Hz | 0.001 Hz | &#9989; |
+| Allard & Atalla 2e Eq. (11.55), printed p. 253 (prose limit) | Limp effective density at DC = apparent total density rho_t, kg/m3 | 31.1809 kg/m3 (+/-0.01%) | 31.1809 kg/m3 | 0 kg/m3 | &#9989; |
+| Allard & Atalla 2e Eq. (11.55), printed p. 253 (prose limit) | Heavy frame recovers the rigid-frame Zc (relative deviation) | 0 (+/-0.00001) | 0 | 0 | &#9989; |
+| Allard & Atalla 2e printed p. 254 (Doutres et al. 2007) | Limp-frame bulk-modulus limit for air, kPa | 20 kPa (+/-0.3 kPa) | 20.27 kPa | 0.265 kPa | &#9989; |
 
 </details>
 
@@ -869,7 +873,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary>&#9989; <b>Panel &amp; aperture sound insulation (Bies / Hopkins / Cremer)</b>: 100% (11/11)</summary>
+<summary>&#9989; <b>Panel &amp; aperture sound insulation (Bies / Hopkins / Cremer)</b>: 100% (17/17)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
@@ -883,6 +887,12 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | Bies Eq. 7.62 / Hopkins Eq. 4.73 | Mass-air-mass resonance f0, empty cavity | 76.9484 Hz (+/-0.5%) | 76.8521 Hz | -0.096 Hz | &#9989; |
 | Bies Eq. 7.64 (double wall) | Below f0 = mass law of the combined mass | 11.6144 dB (+/-0 dB) | 11.6144 dB | 0 dB | &#9989; |
 | Hopkins Eq. 4.92 (composite) | 1 % open area caps R at 10 lg(S/Sa) | 20 dB (+/-0.05 dB) | 19.9996 dB | 0 dB | &#9989; |
+| Vigran Building Acoustics Eq. (3.109), printed p. 96 | Flat 1 mm steel plate 1 m x 1 m, f(1,1) | 4.9 Hz (+/-0.05 Hz) | 4.93 Hz | 0.033 Hz | &#9989; |
+| Vigran Eqs. (3.113)/(3.115), printed p. 96 | Corrugated 1 mm steel plate (H = 10 mm, L = 100 mm), f(2,2) | 102 Hz (+/-0.1 Hz) | 102.09 Hz | 0.092 Hz | &#9989; |
+| Bies 5e Eq. (7.59) / Vigran Eq. (6.112) | Heckl coincidence-branch constant, dB (rho c = 414) | -13.2 dB (+/-0.02 dB) | -13.217 dB | -0.017 dB | &#9989; |
+| Bies 5e Eq. (7.60) / Vigran Eq. (6.112) | Heckl recovery-branch constant, dB (rho c = 414) | -23 dB (+/-0.2 dB) | -23.16 dB | -0.16 dB | &#9989; |
+| Vigran Eq. (6.111) / Bies Eq. (7.38) | Orthotropic diffuse integral below fc1 vs its exact mass-law form | 6.287723 dB (+/-0.000001 dB) | 6.287723 dB | 0 dB | &#9989; |
+| Hopkins Table A2, printed p. 608 | h.fc products of 25 building-material rows, worst deviation | 0 m.Hz (+/-0.06 m.Hz) | 0.0476 m.Hz | 0.048 m.Hz | &#9989; |
 | Hopkins Eq. 4.99/4.101 (Gomperts slit) | Transmission maximum at first resonance | 1544.9615 Hz (+/-15 Hz) | 1542.9615 Hz | -2 Hz | &#9989; |
 
 </details>

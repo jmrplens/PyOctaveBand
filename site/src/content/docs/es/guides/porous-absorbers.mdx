@@ -80,6 +80,14 @@ references:
     pages: "105-116"
     doi: "10.1016/0003-682X(70)90031-9"
     note: "Las relaciones empíricas originales y su validez declarada."
+  - type: book
+    authors: ["Allard, J. F.", "Atalla, N."]
+    year: 2009
+    title: "Propagation of Sound in Porous Media: Modelling Sound Absorbing Materials"
+    edition: "2nd ed."
+    publisher: "Wiley"
+    doi: "10.1002/9780470747339"
+    note: "Section 11.3.4: the rigid and limp frame limits of the Biot theory, the decoupling frequency and the limp effective density (Eqs 11.53-11.55, after Panneton 2007). ISBN 978-0-470-74661-5."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -206,6 +214,149 @@ comparación); JCA extiende la predicción con base física fuera de él. Un
 $k$ recuperados por la
 [reducción de matriz de transferencia ASTM E2611](/phonometry/es/guides/impedance-tube/))
 se conecta al solucionador de capas exactamente igual que uno modelado.
+
+### Esqueletos flexibles: cuando el armazón se mueve (Allard & Atalla 11.3.4)
+
+Todos los modelos anteriores suponen que el esqueleto no se mueve. Eso solo es
+cierto por encima de la **frecuencia de desacoplo** de Zwikker y Kosten,
+
+$$
+F_d = \frac{\sigma\,\phi^2}{2\pi\rho_1},
+$$
+
+con $\rho_1$ la densidad aparente del esqueleto (la densidad de la muestra tal
+como se pesa, no la del material del que están hechas las fibras). Por debajo
+de $F_d$ el acoplamiento visco-inercial es lo bastante fuerte para que la onda
+en los poros arrastre al esqueleto, y un esqueleto ligero (fibra de vidrio de
+grado aeronáutico, fieltros, velos finos) aporta una inercia nada
+despreciable. Despreciar la *rigidez* del esqueleto pero no su *masa* en la
+formulación mixta presión-desplazamiento de Biot deja un fluido equivalente con
+el mismo módulo de compresibilidad y una densidad efectiva corregida (Allard &
+Atalla 2e, ecs. 11.53-11.55, según Panneton 2007):
+
+$$
+\tilde\rho_{\text{limp}} =
+\frac{\rho_t\,\tilde\rho_{\text{eq}} - \rho_0^2}
+     {\rho_t + \tilde\rho_{\text{eq}} - 2\rho_0},
+\qquad \rho_t = \rho_1 + \phi\rho_0,
+$$
+
+donde $\tilde\rho_{\text{eq}}$ es la densidad efectiva de esqueleto rígido de
+cualquiera de los tres modelos anteriores y $\rho_t$ es la densidad total
+aparente del material. El anclaje de la corrección es la propia ecuación
+impresa, transcrita término a término frente a la página; el libro no tabula
+ninguna densidad flexible calculada. Dos límites que enuncia en prosa también
+son exactos y se comprueban, pero corroboran sin fijar la forma: ninguno
+restringe los términos en $\rho_0$, y una variante de la misma ecuación con el
+signo cambiado satisface ambos. Los límites son:
+
+- **esqueleto pesado**: al crecer $\rho_1$ la corrección se anula y se
+  recupera el resultado de esqueleto rígido;
+- **baja frecuencia**: la densidad de esqueleto rígido diverge como
+  $\sigma/(j\omega)$, mientras que la flexible converge al valor finito y real
+  $\rho_t$. Un esqueleto rígido prohíbe el movimiento de cuerpo rígido de la
+  muestra; uno flexible lo permite, y por eso el modelo flexible es el
+  adecuado para una probeta sin sujeción dentro de un tubo de impedancia.
+
+`limp_frame` recibe un `PorousMediumResult` y devuelve otro, así que encaja
+directamente en un `PorousLayer` de la pila.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/limp_frame_effective_density.svg" alt="Densidad efectiva normalizada frente a la frecuencia de 0 a 2000 hercios para una capa fibrosa blanda, comparando los modelos de esqueleto rígido y flexible. La parte real del esqueleto rígido es una línea discontinua plana en 1,2 mientras su parte imaginaria se hunde por debajo del borde inferior del gráfico bajo la frecuencia de desacoplo de 127 hercios, marcada con una línea vertical punteada. La parte real del esqueleto flexible parte de la densidad total aparente de 25,9 en cero hercios y cae suavemente hasta la línea del esqueleto rígido hacia los 1500 hercios, mientras su parte imaginaria baja hasta menos 12 cerca de 130 hercios y luego se confunde con la curva de esqueleto rígido" width="88%" loading="lazy" />
+
+*La misma capa fibrosa blanda de 50 mm con ambos modelos (Allard & Atalla,
+tabla 11.2, el juego de datos de entrada de su fig. 11.2). Por encima de la
+frecuencia de desacoplo las dos predicciones son indistinguibles, que es la
+comprobación que el propio gráfico hace de la corrección; por debajo, la
+densidad efectiva de esqueleto rígido se dispara y la flexible se asienta en
+$\rho_t/\rho_0 = 25,9$.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import (
+    PorousLayer, decoupling_frequency, johnson_champoux_allard,
+    layered_absorber, limp_frame, limp_frame_applicable,
+)
+
+# Allard & Atalla, tabla 11.2: capa fibrosa blanda, 50 mm.
+f = np.linspace(1.0, 2000.0, 800)
+rigid = johnson_champoux_allard(
+    f, 25e3, porosity=0.98, tortuosity=1.02,
+    viscous_length=90e-6, thermal_length=180e-6,
+)
+limp = limp_frame(rigid, frame_density=30.0, porosity=0.98)
+
+print(round(decoupling_frequency(25e3, porosity=0.98, frame_density=30.0), 1))
+# 127.4
+print(round(float(limp.effective_density[0].real), 1))     # 31.2 = rho_t
+print(limp_frame_applicable(20e3), limp_frame_applicable(25e3))  # True False
+
+limp.plot(language="es")   # Zc y k normalizados del medio corregido
+plt.show()
+
+# A mano, la vista de la fig. 11.2:
+rho0 = rigid.air_density
+fig, ax = plt.subplots()
+for medium, style in ((rigid, "--"), (limp, "-")):
+    ax.plot(f, medium.effective_density.real / rho0, style)
+    ax.plot(f, medium.effective_density.imag / rho0, style)
+ax.set(xlabel="Frecuencia [Hz]", ylabel="rho_e / rho_0", ylim=(-30, 30))
+plt.show()
+```
+
+</details>
+
+La corrección solo merece la pena donde el esqueleto es realmente flexible.
+Beranek (1947) exigía $|K_c/K_f| < 0,05$ entre el módulo de compresibilidad del
+esqueleto en vacío y el del fluido de los poros; el estudio de interacción
+esqueleto-estructura de Doutres et al. (2007) lo relajó a $0,2$, que para el
+aire ($K_f \approx P_0 = 101,3$ kPa) es la regla práctica de que el esqueleto
+ha de ser más blando que unos 20 kPa. `limp_frame_applicable` aplica cualquiera
+de los dos umbrales. Ninguno tiene en cuenta el montaje: una espuma fina y
+ligera desacoplada de una estructura vibrante por una cámara de aire se
+comporta como flexible muy por encima del límite, y un material adherido a una
+estructura vibrante no debe tratarse como de esqueleto rígido en absoluto.
+
+La consecuencia práctica, para la capa de 50 mm anterior con respaldo rígido,
+es un coeficiente de absorción menor en los dos tercios inferiores de una
+octava y algo mayor a ambos lados de 500 Hz:
+
+```python
+import numpy as np
+from phonometry import (
+    PorousLayer, johnson_champoux_allard, layered_absorber, limp_frame,
+)
+
+bands = np.array([100, 125, 160, 200, 250, 315, 400, 500, 1000], dtype=float)
+rigid = johnson_champoux_allard(
+    bands, 25e3, porosity=0.98, tortuosity=1.02,
+    viscous_length=90e-6, thermal_length=180e-6,
+)
+limp = limp_frame(rigid, frame_density=30.0, porosity=0.98)
+for medium in (rigid, limp):
+    print(layered_absorber(bands, [PorousLayer(0.05, medium)]).absorption.round(2))
+# [0.07 0.11 0.17 0.24 0.32 0.43 0.54 0.64 0.88]   esqueleto rígido
+# [0.04 0.08 0.15 0.24 0.36 0.48 0.61 0.71 0.91]   esqueleto flexible
+```
+
+**Nota honesta sobre la validación.** Allard & Atalla contiene exactamente una
+tabla de valores calculados en todo el libro, y no es una impedancia
+superficial: todas las parejas predicción-medida de los capítulos de materiales
+porosos, la fig. 11.2 incluida, son figuras. Ninguna fuente publicada de las
+comprobadas (el propio Allard & Atalla, Cox & D'Antonio, Mechel y la
+bibliografía de Biot y de los ensayos interlaboratorio) tabula tampoco esta
+magnitud. El anclaje es por tanto la propia ec. 11.55 impresa, transcrita
+término a término frente a la página. Los dos límites exactos que el libro
+enuncia en prosa (esqueleto pesado y $\omega \to 0$) también se comprueban,
+pero valen menos de lo que parece: una variante de la ecuación con el signo
+cambiado satisface ambos, y reproduce además la caída como $1/\rho_1$ del
+residuo de esqueleto pesado, así que los límites no distinguen la forma impresa
+de esa variante. La frecuencia de desacoplo evaluada sobre la lana de vidrio
+completamente especificada de su tabla 6.1, donde la aritmética pura da
+43,27 Hz, es independiente de todo esto.
 
 ## 2. Predicción multicapa por matrices de transferencia
 
@@ -527,6 +678,16 @@ debajo del rango deben tratarse como cualitativos. JCA necesita cuatro parámetr
 físicamente en todo el rango; con
 $\Lambda = \Lambda' = \sqrt{8\alpha_\infty\eta/(\phi\sigma)}$ y
 $\alpha_\infty = 1$ sigue a Delany–Bazley dentro del rango de ajuste.
+
+**Esqueleto rígido o flexible.** Todos los modelos de fluido equivalente
+anteriores suponen un esqueleto inmóvil, lo que solo se cumple por encima de la
+frecuencia de desacoplo $F_d = \sigma\phi^2/2\pi\rho_1$. Por debajo, un
+esqueleto ligero se mueve con el fluido de los poros, y `limp_frame` añade su
+inercia (Allard & Atalla, ecs. 11.53-11.55). Úsalo con fieltros, velos y fibra
+de vidrio ligera, con cualquier material medido sin sujeción en un tubo de
+impedancia y siempre que el esqueleto en vacío sea más blando que unos 20 kPa
+(`limp_frame_applicable`); no lo uses, ni tampoco el modelo rígido, con un
+material adherido a una estructura vibrante.
 
 **Reacción local frente a volumétrica.** El solucionador de capas es de
 reacción volumétrica (el sonido refracta y viaja dentro de las capas).
