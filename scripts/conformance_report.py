@@ -2934,6 +2934,134 @@ def _chk_iso12354_annex_g1() -> Outcome:
     )
 
 
+# --- Resilient-layer prediction (tapping force, coverings, floating floors) ---
+def _hopkins_plate(
+    density: float, longitudinal: float, poisson: float, thickness: float
+) -> tuple[float, float]:
+    """``(contact stiffness, driving-point impedance)`` of a Hopkins Table A2 plate."""
+    modulus = density * longitudinal**2 * (1.0 - poisson**2)
+    stiffness = float(ph.plate_contact_stiffness(modulus, poisson_ratio=poisson))
+    impedance = float(
+        ph.infinite_plate_impedance(
+            ph.plate_bending_stiffness(modulus, thickness, poisson),
+            density * thickness,
+        )
+    )
+    return stiffness, impedance
+
+
+@register(
+    "Room & building acoustics",
+    "Hopkins (2007) 3.6.3.1 / 4.4.3.1, printed pp. 276-282 and 513-514",
+    "Tapping machine: vo, cut-off frequencies fco of a bare slab and two soft "
+    "coverings (7 000 / 2 300 / 100 Hz)",
+)
+def _chk_hopkins_tapping_cut_off() -> Outcome:
+    _stiffness, impedance = _hopkins_plate(2200.0, 3800.0, 0.2, 0.14)
+    worst = abs(float(ph.hammer_impact_velocity()) / 0.886 - 1.0)
+    printed = ((None, 7000.0), (1.5e11, 2300.0), (2.8e8, 100.0))
+    for modulus_over_thickness, expected in printed:
+        if modulus_over_thickness is None:
+            stiffness = _stiffness
+        else:
+            stiffness = float(
+                ph.covering_contact_stiffness(
+                    modulus_over_thickness * 0.005, 0.005
+                )
+            )
+        computed = float(ph.tapping_cut_off_frequency(stiffness, impedance))
+        worst = max(worst, abs(computed / expected - 1.0))
+    return numeric(0.0, worst, 0.02, rel=False, places=4)
+
+
+@register(
+    "Room & building acoustics",
+    "Hopkins (2007) Figs. 3.30/3.31 and 4.73, printed pp. 281 and 524",
+    "Over/under-critical case of four walking surfaces; double floating-floor "
+    "resonances 74 Hz and 195 Hz",
+)
+def _chk_hopkins_resilient_layers() -> Outcome:
+    plates = (
+        ("concrete", 2200.0, 3800.0, 0.2, 0.14, False),
+        ("screed", 2000.0, 3250.0, 0.2, 0.065, False),
+        ("chipboard", 760.0, 2200.0, 0.3, 0.022, True),
+        ("osb", 590.0, 2570.0, 0.3, 0.015, True),
+    )
+    cases_ok = True
+    for _label, rho, c_l, nu, thickness, over in plates:
+        stiffness, impedance = _hopkins_plate(rho, c_l, nu, thickness)
+        result = ph.tapping_force_spectrum([100.0], stiffness, impedance)
+        cases_ok = cases_ok and result.over_critical is over
+    mass_per_area = 710.0 * 0.018
+    lower, upper = ph.double_floating_floor_resonances(
+        7.25e6, mass_per_area, 7.25e6, mass_per_area
+    )
+    worst = max(abs(lower / 74.0 - 1.0), abs(upper / 195.0 - 1.0))
+    return Outcome(
+        expected="4/4 critical cases; fmsms = 74 / 195 Hz (+/-2%)",
+        computed=f"{'4/4' if cases_ok else 'mismatch'}; "
+        f"{lower:.1f} / {upper:.1f} Hz",
+        delta=f"{worst * 100.0:.2f}%",
+        passed=cases_ok and worst <= 0.02,
+    )
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 12354-2:2017 Annex C / Annex G Table G.4",
+    "Floating floor: fo = 160 sqrt(s'/m') = 52,8 Hz, DeltaL = 30 lg(f/fo) over "
+    "21 bands, DeltaLw = 32,2 dB",
+)
+def _chk_iso12354_2_floating_floor() -> Outcome:
+    bands = np.asarray(ref.ISO12354_ANNEX_L_BANDS, dtype=np.float64)
+    stiffness = ref.ISO12354_ANNEX_L_FLOATING_STIFFNESS * 1e6
+    mass = ref.ISO12354_ANNEX_L_FLOATING_MASS
+    f0 = float(ph.floating_floor_resonance_frequency(stiffness, mass))
+    spectrum = ph.floating_floor_improvement_spectrum(
+        bands, resonance_frequency=f0
+    )
+    printed = np.asarray(ref.ISO12354_ANNEX_G4_DELTA_L)
+    worst = float(np.max(np.abs(spectrum.improvement - printed)))
+    # The printed table is quoted to 0,1 dB, so a residual under 0,05 dB is
+    # the most any correct model can be asked for; requiring the computed
+    # values to round *onto* the printed ones is the exact statement, and
+    # stops the row passing on a near-miss inside the rounding quantum.
+    if not np.array_equal(np.round(spectrum.improvement, 1), printed):
+        worst = float("inf")
+    delta_lw = float(ph.weighted_floating_floor_improvement(mass, stiffness))
+    worst = max(worst, abs(delta_lw - ref.ISO12354_ANNEX_G10_DELTA_LW))
+    # The resonance frequency is in hertz, so it is verified separately rather
+    # than folded into the decibel residual reported below.
+    if abs(f0 - ref.ISO12354_ANNEX_L_FLOATING_F0) > 0.05:
+        worst = float("inf")
+    return numeric(0.0, worst, 0.05, unit="dB", places=3)
+
+
+@register(
+    "Room & building acoustics",
+    "ISO 12354-1:2017 Annex D / Hopkins (2007) Fig. 4.48, printed p. 486",
+    "Lining resonance (Formula D.1) 542 Hz and the Table D.1 improvement branches",
+)
+def _chk_iso12354_1_annex_d() -> Outcome:
+    f0 = float(ph.lining_resonance_frequency(51.0, 6.3, dynamic_stiffness=65e6))
+    worst = abs(f0 / 542.0 - 1.0)
+    table_ok = all(
+        ph.weighted_lining_improvement(resonance, 45.0) == expected
+        for resonance, expected in (
+            (200.0, -1.0), (250.0, -3.0), (315.0, -5.0), (400.0, -7.0),
+            (500.0, -9.0), (1000.0, -10.0), (2000.0, -5.0),
+        )
+    )
+    branch = float(ph.weighted_lining_improvement(100.0, 40.0))
+    table_ok = table_ok and abs(branch - (74.4 - 40.0 - 20.0)) <= 1e-9
+    return Outcome(
+        expected="fo = 542 Hz (+/-1%); 8/8 Table D.1 rows",
+        computed=f"{f0:.1f} Hz; {'8/8' if table_ok else 'mismatch'}",
+        delta=f"{worst * 100.0:.2f}%",
+        passed=table_ok and worst <= 0.01,
+    )
+
+
 # --- Installed structure-borne sound from equipment (EN 12354-5) ---
 @register(
     "Room & building acoustics",

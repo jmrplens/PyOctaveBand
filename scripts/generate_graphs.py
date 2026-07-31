@@ -477,6 +477,26 @@ _ES_EXACT = {
     "2.5 ties/m2, k = 2 MN/m": "2,5 llaves/m2, k = 2 MN/m",
     "combined-mass range added by the ties":
         "rango de masa combinada añadido por las llaves",
+    # floating_floor_prediction / soft_covering_prediction figures
+    "Floating-Floor Impact Improvement Above the Mass-Spring Resonance":
+        "Mejora a impactos del suelo flotante por encima de la resonancia masa-resorte",
+    "30 lg(f/f0) (sand-cement screed)": "30 lg(f/f0) (solera de mortero de cemento)",
+    "40 lg(f/f0) (asphalt, dry)": "40 lg(f/f0) (asfalto, seco)",
+    "40 lg(f/f0) + hammer term (chipboard)":
+        "40 lg(f/f0) + término del martillo (tablero de partículas)",
+    "ISO 12354-2 Annex G bands": "Bandas del Anexo G de ISO 12354-2",
+    "35 mm screed m' = 73.5 kg/m2 on s' = 8 MN/m3\n"
+    "delta-Lw = 32.2 dB  (ISO 12354-2 Formula C.4)":
+        "solera de 35 mm m' = 73.5 kg/m2 sobre s' = 8 MN/m3\n"
+        "delta-Lw = 32.2 dB  (fórmula C.4 de ISO 12354-2)",
+    "Soft Floor Covering Improvement From the Hammer Contact Stiffness":
+        "Mejora del revestimiento de suelo blando a partir de la rigidez de contacto del martillo",
+    "two-line estimate (0 dB, 12 dB/oct)":
+        "estimación de dos rectas (0 dB, 12 dB/oct)",
+    "140 mm concrete slab, hammer 0.5 kg, r = 15 mm\n"
+    "No. 1: fco = 2318 Hz\nNo. 2: fco = 100 Hz":
+        "losa de hormigón de 140 mm, martillo 0.5 kg, r = 15 mm\n"
+        "N.o 1: fco = 2318 Hz\nN.o 2: fco = 100 Hz",
     # flanking_transmission figure (ISO 10848)
     "ISO 10848 Junction Vibration Reduction Index":
         "Índice de reducción de vibraciones de unión (ISO 10848)",
@@ -7469,6 +7489,145 @@ def generate_masonry_wall_ties(output_dir: str) -> None:
     plt.close()
 
 
+def generate_floating_floor_prediction(output_dir: str) -> None:
+    """Floating-floor improvement DeltaL(f) under the three prediction laws."""
+    print("Generating floating_floor_prediction...")
+    from phonometry import (
+        floating_floor_improvement_spectrum,
+        floating_floor_resonance_frequency,
+        weighted_floating_floor_improvement,
+    )
+
+    # The worked floating floor of ISO 12354-2:2017 Annex G: a 35 mm screed
+    # (m' = 73,5 kg/m2) on a resilient layer of s' = 8 MN/m3.
+    mass_per_area, stiffness = 73.5, 8.0e6
+    f0 = floating_floor_resonance_frequency(stiffness, mass_per_area)
+    delta_lw = weighted_floating_floor_improvement(mass_per_area, stiffness)
+
+    bands = np.array([50.0, 63.0, 80.0, 100.0, 125.0, 160.0, 200.0, 250.0,
+                      315.0, 400.0, 500.0, 630.0, 800.0, 1000.0, 1250.0,
+                      1600.0, 2000.0, 2500.0, 3150.0, 4000.0, 5000.0])
+    freqs = np.logspace(np.log10(40.0), np.log10(5000.0), 400)
+    screed = floating_floor_improvement_spectrum(freqs, resonance_frequency=f0)
+    asphalt = floating_floor_improvement_spectrum(
+        freqs, resonance_frequency=f0, model="cremer")
+    lightweight = floating_floor_improvement_spectrum(
+        freqs, resonance_frequency=f0, model="cremer_hammer",
+        limiting_frequency=521.0)
+    printed = floating_floor_improvement_spectrum(bands, resonance_frequency=f0)
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    ax.fill_betweenx([-5.0, 100.0], 40.0, f0, color=theme_fill(COLOR_FG, ax),
+                     zorder=0)
+    ax.plot(freqs, lightweight.improvement, "-.", color=COLOR_TERTIARY,
+            linewidth=2.0, label="40 lg(f/f0) + hammer term (chipboard)")
+    ax.plot(freqs, asphalt.improvement, "--", color=COLOR_SECONDARY,
+            linewidth=2.0, label="40 lg(f/f0) (asphalt, dry)")
+    ax.plot(freqs, screed.improvement, "-", color=COLOR_PRIMARY, linewidth=2.4,
+            label="30 lg(f/f0) (sand-cement screed)")
+    ax.plot(bands, printed.improvement, "o", color=COLOR_PRIMARY,
+            markersize=5.5, zorder=6, label="ISO 12354-2 Annex G bands")
+    ax.axvline(f0, color=COLOR_FG, linestyle=":", linewidth=1.3)
+    ax.annotate("f0 = 52.8 Hz", xy=(f0, 46.0), xytext=(f0 * 1.15, 46.0),
+                fontsize=10, color=COLOR_FG, va="center")
+
+    ax.set_xscale("log")
+    format_frequency_axis(ax, 40.0, 5000.0)
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Improvement of impact sound insulation [dB]")
+    ax.set_ylim(-5.0, 100.0)
+    ax.set_title("Floating-Floor Impact Improvement Above the Mass-Spring "
+                 "Resonance", fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", fontsize=9)
+
+    info = [
+        "35 mm screed m' = 73.5 kg/m2 on s' = 8 MN/m3",
+        f"delta-Lw = {delta_lw:.1f} dB  (ISO 12354-2 Formula C.4)",
+    ]
+    ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
+            va="bottom", ha="right", fontsize=11, color=COLOR_FG,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
+                  "edgecolor": COLOR_GRID})
+    plt.tight_layout()
+    save_figure(output_dir, "floating_floor_prediction.png")
+    plt.close()
+
+
+def generate_soft_covering_prediction(output_dir: str) -> None:
+    """Soft-covering DeltaL(f) from the tapping-machine contact stiffness."""
+    print("Generating soft_covering_prediction...")
+    from phonometry import (
+        covering_contact_stiffness,
+        covering_improvement,
+        infinite_plate_impedance,
+        plate_bending_stiffness,
+        plate_contact_stiffness,
+    )
+
+    # A 140 mm cast in-situ concrete slab (Hopkins Table A2: 2 200 kg/m3,
+    # cL = 3 800 m/s, nu = 0,2) carrying the two soft coverings of Hopkins
+    # Fig. 4.64: E/d = 1,5e11 N/m3 (a few mm of solid PVC) and 2,8e8 N/m3
+    # (a vinyl or carpet with a resilient backing).
+    density, longitudinal, poisson, thickness = 2200.0, 3800.0, 0.2, 0.14
+    modulus = density * longitudinal**2 * (1.0 - poisson**2)
+    plate_stiffness = plate_contact_stiffness(modulus, poisson_ratio=poisson)
+    impedance = infinite_plate_impedance(
+        plate_bending_stiffness(modulus, thickness, poisson),
+        density * thickness)
+
+    # covering_improvement returns the band value directly: the tapping
+    # machine's force spectrum is a line spectrum at multiples of the 10 Hz
+    # impact rate, and the band improvement is the ratio of the mean-square
+    # forces summed over the lines that fall in each band (Hopkins Eq. 3.91).
+    bands = np.array([50.0, 63.0, 80.0, 100.0, 125.0, 160.0, 200.0, 250.0,
+                      315.0, 400.0, 500.0, 630.0, 800.0, 1000.0, 1250.0,
+                      1600.0, 2000.0, 2500.0, 3150.0, 4000.0, 5000.0])
+    layer = 0.005
+    series = (
+        ("No. 1: E/d = 1.5e11 N/m3", 1.5e11, COLOR_SECONDARY, "--"),
+        ("No. 2: E/d = 2.8e8 N/m3", 2.8e8, COLOR_PRIMARY, "-"),
+    )
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    labels = []
+    for label, stiffness_per_volume, colour, style in series:
+        result = covering_improvement(
+            bands,
+            covering_contact_stiffness(stiffness_per_volume * layer, layer),
+            plate_stiffness, impedance)
+        ax.plot(bands, result.improvement, style, color=colour, linewidth=2.2,
+                marker="o", markersize=5, label=label)
+        ax.plot(bands, result.two_line, ":", color=colour, linewidth=1.5)
+        ax.axvline(result.cut_off_frequency, color=colour, linestyle=":",
+                   linewidth=1.0, alpha=0.7)
+        labels.append(f"{label.split(':')[0]}: fco = "
+                      f"{result.cut_off_frequency:.0f} Hz")
+
+    ax.plot([], [], ":", color=COLOR_MUTED, linewidth=1.5,
+            label="two-line estimate (0 dB, 12 dB/oct)")
+    ax.set_xscale("log")
+    format_frequency_axis(ax, 50.0, 5000.0)
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Improvement of impact sound insulation [dB]")
+    ax.set_ylim(-5.0, 80.0)
+    ax.set_title("Soft Floor Covering Improvement From the Hammer Contact "
+                 "Stiffness", fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", fontsize=9)
+
+    info = ["140 mm concrete slab, hammer 0.5 kg, r = 15 mm", *labels]
+    ax.text(0.02, 0.70, "\n".join(info), transform=ax.transAxes,
+            va="top", ha="left", fontsize=11, color=COLOR_FG,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
+                  "edgecolor": COLOR_GRID})
+    plt.tight_layout()
+    save_figure(output_dir, "soft_covering_prediction.png")
+    plt.close()
+
+
 def generate_flanking_transmission(output_dir: str) -> None:
     """ISO 10848 vibration reduction index Kij per band with the mean K̄ij."""
     print("Generating flanking_transmission...")
@@ -14133,6 +14292,8 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_heavy_impact_sources,
     generate_ceiling_plenum_flanking,
     generate_masonry_wall_ties,
+    generate_floating_floor_prediction,
+    generate_soft_covering_prediction,
     generate_flanking_transmission,
     generate_reverberation_models,
     generate_dynamic_stiffness,

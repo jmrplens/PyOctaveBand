@@ -109,6 +109,7 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`building.detailed_prediction`](/phonometry/reference/api/building/detailed-prediction/) | Detailed per-band building prediction (EN/ISO 12354-1/-2:2017). |
 | [`building.building_uncertainty`](/phonometry/reference/api/building/building-uncertainty/) | Measurement uncertainty in building acoustics (ISO 12999-1:2020). |
 | [`building.floor_covering_improvement`](/phonometry/reference/api/building/floor-covering-improvement/) | Impact-sound improvement of floor coverings on a small mock-up (ISO 16251-1:2014). |
+| [`building.resilient_layers`](/phonometry/reference/api/building/resilient-layers/) | Prediction of resilient-layer performance: tapping force, coverings, floors, linings. |
 | [`building.structure_borne_power`](/phonometry/reference/api/building/structure-borne-power/) | Structure-borne sound power of building equipment (EN 15657:2018; ISO 9611). |
 | [`building.installed_structure_borne`](/phonometry/reference/api/building/installed-structure-borne/) | Installed structure-borne sound from service equipment (EN 12354-5:2009). |
 | [`building.spanish_building_code`](/phonometry/reference/api/building/spanish-building-code/) | Spanish building code CTE DB-HR: global indices and requirement checks. |

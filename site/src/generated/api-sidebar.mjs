@@ -106,6 +106,7 @@ export const apiSidebar = {
         'reference/api/building/detailed-prediction',
         'reference/api/building/building-uncertainty',
         'reference/api/building/floor-covering-improvement',
+        'reference/api/building/resilient-layers',
         'reference/api/building/structure-borne-power',
         'reference/api/building/installed-structure-borne',
         'reference/api/building/spanish-building-code',

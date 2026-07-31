@@ -335,6 +335,10 @@ ISO 10052 y ANSI/ASA S12.2.
 - [Mejora del aislamiento a impacto de suelos (ISO 16251-1)](/phonometry/es/guides/impact-improvement/):
   la mejora ponderada de un revestimiento de suelo blando medida sobre una
   maqueta pesada pequeña.
+- [Predicción del comportamiento de capas elásticas](/phonometry/es/guides/resilient-layers/):
+  el modelo de fuerza de la máquina de impactos, la frecuencia de corte de un
+  revestimiento blando, las leyes de mejora del suelo flotante y la magnitud
+  global de un trasdosado según el anexo D de ISO 12354-1.
 - [Rigidez dinámica de materiales resilientes (EN 29052-1)](/phonometry/es/guides/dynamic-stiffness/):
   la rigidez por unidad de superficie bajo un suelo flotante a partir de la
   resonancia con placa de carga, con el término del gas encerrado.

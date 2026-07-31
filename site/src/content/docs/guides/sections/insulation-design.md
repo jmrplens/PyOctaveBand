@@ -58,6 +58,10 @@ floor, and with it the resonance frequency the whole improvement hangs on.
 - [Floor-Covering Impact Improvement (ISO 16251-1)](/phonometry/guides/impact-improvement/):
   the weighted improvement of a soft floor covering measured on a small
   heavyweight mock-up.
+- [Predicting Resilient-Layer Performance](/phonometry/guides/resilient-layers/):
+  the tapping-machine force model, the cut-off frequency of a soft covering,
+  the floating-floor improvement laws and the ISO 12354-1 Annex D rating of a
+  wall lining.
 - [Dynamic stiffness of resilient materials (EN 29052-1)](/phonometry/guides/dynamic-stiffness/):
   the load-plate resonance measurement, the enclosed-gas term and the
   floating-floor natural frequency.

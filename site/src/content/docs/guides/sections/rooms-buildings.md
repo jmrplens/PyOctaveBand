@@ -87,5 +87,7 @@ and from the physics of the element itself.
   the mass law, coincidence dip, double walls and apertures.
 - [Floor-Covering Impact Improvement (ISO 16251-1)](/phonometry/guides/impact-improvement/):
   the weighted improvement of a soft covering on a small heavyweight mock-up.
+- [Predicting Resilient-Layer Performance](/phonometry/guides/resilient-layers/):
+  the prediction side of coverings, floating floors and wall linings.
 - [Dynamic stiffness of resilient materials (EN 29052-1)](/phonometry/guides/dynamic-stiffness/):
   the load-plate resonance measurement behind every floating-floor prediction.

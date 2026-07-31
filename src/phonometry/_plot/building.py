@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -68,6 +69,12 @@ if TYPE_CHECKING:
     )
     from ..building.masonry_cavity_wall import WallTieCouplingResult
     from ..building.panel_transmission import SoundReductionResult
+    from ..building.resilient_layers import (
+        CoveringImprovementResult,
+        FloatingFloorImprovementResult,
+        LiningImprovementResult,
+        TappingForceResult,
+    )
     from ..building.spanish_building_code import (
         DbHrAssessment,
         DbHrGlobalIndexResult,
@@ -87,6 +94,10 @@ _MAX_IMPACT_LABEL = "Maximum impact sound pressure level [dB]"
 #: Shared y-axis label of the path-contribution figures (the simplified
 #: single-number bars and the two detailed per-band ones).
 _SHARE_LABEL = "Share of transmitted energy [%]"
+
+#: Shared y-axis label of the impact-improvement figures (the ISO 16251-1
+#: measurement and the two resilient-layer predictions).
+_IMPROVEMENT_LABEL = "Improvement of impact sound insulation delta-L [dB]"
 
 #: Spanish translations of the fixed labels/titles/legends rendered by the
 #: building-domain ``.plot()`` renderers, keyed by their verbatim English
@@ -138,7 +149,7 @@ _STRINGS: dict[str, str] = {
     "enlarged range (A.2.1)": "rango ampliado (A.2.1)",
     "Measured": "Medido",
     "Shifted reference (core bands)": "Referencia desplazada (bandas 100-3150 Hz)",
-    "Improvement of impact sound insulation delta-L [dB]": "Mejora del aislamiento a ruido de impacto delta-L [dB]",
+    _IMPROVEMENT_LABEL: "Mejora del aislamiento a ruido de impacto delta-L [dB]",
     "ISO 16251-1 Floor-Covering Impact Sound Improvement": "Mejora del aislamiento a ruido de impacto de revestimiento de suelo ISO 16251-1",
     "band insulation": "aislamiento por banda",
     "transmitted level $L_{x,i} - X_i$": "nivel transmitido $L_{x,i} - X_i$",
@@ -193,7 +204,24 @@ _STRINGS: dict[str, str] = {
     "Coupling loss factor $\\eta_{ij}$": "Factor de pérdidas por acoplamiento $\\eta_{ij}$",
     "Wall-tie structure-borne coupling": "Acoplamiento estructural por llaves de muro",
     "ties/m$^2$": "llaves/m$^2$",
+    "Frequency [Hz]": "Frecuencia [Hz]",
+    "Band index": "Índice de banda",
+    "force spectrum $|F_n|$": "espectro de fuerza $|F_n|$",
+    "Magnitude of the peak force $|F_n|$ [N]": "Magnitud de la fuerza de pico $|F_n|$ [N]",
+    "ISO tapping machine force spectrum": "Espectro de fuerza de la máquina de impactos ISO",
+    "over-critical": "sobrecrítico",
+    "under-critical": "subcrítico",
+    "band force ratio (Eq. 4.114)": "cociente de fuerzas por banda (Ec. 4.114)",
+    "two-line estimate (0 dB, 12 dB/oct)": "estimación de dos rectas (0 dB, 12 dB/oct)",
+    "Soft floor covering improvement (Hopkins 4.4.3.1)": "Reducción por revestimiento de suelo blando (Hopkins 4.4.3.1)",
+    "Floating floor improvement (ISO 12354-2 Annex C)": "Reducción por suelo flotante (ISO 12354-2 Anexo C)",
+    "Sound reduction index improvement [dB]": "Mejora del índice de reducción acústica [dB]",
+    "Additional-layer rating (ISO 12354-1 Annex D)": "Magnitud global de capa adicional (ISO 12354-1 Anexo D)",
 }
+
+#: Shared y-axis label of the impact-improvement figures (the ISO 16251-1
+#: measurement and the two resilient-layer predictions).
+_IMPROVEMENT_LABEL = "Improvement of impact sound insulation delta-L [dB]"
 
 #: Localised names of the two standard heavy and soft impact sources.
 _HEAVY_IMPACT_SOURCE_LABELS = {
@@ -1176,7 +1204,7 @@ def plot_floor_covering_improvement(
             label=_t("limit of measurement (> delta-L)", language),
         )
     _freq_axis(ax, freqs, language=language)
-    ax.set_ylabel(_t("Improvement of impact sound insulation delta-L [dB]", language))
+    ax.set_ylabel(_t(_IMPROVEMENT_LABEL, language))
     ax.set_ylim(bottom=0.0)
     title = _t("ISO 16251-1 Floor-Covering Impact Sound Improvement", language)
     if result.delta_lw is not None:
@@ -1579,5 +1607,204 @@ def plot_wall_tie_coupling(
     )
     ax.grid(True, which="both", alpha=0.3)
     ax.legend(loc="best", fontsize="small")
+    localize_axes(ax, language)
+    return ax
+
+
+# --------------------------------------------------------------------------- #
+# Resilient-layer prediction (tapping force, coverings, floating floors,
+# linings). The two improvement spectra share one drawing helper so the
+# reference-slope decoration is written once.
+# --------------------------------------------------------------------------- #
+def _plot_improvement_spectrum(
+    ax: Axes,
+    freqs: np.ndarray,
+    curves: Sequence[tuple[np.ndarray, str, str, str]],
+    marker_frequency: float | None,
+    marker_label: str,
+    language: str,
+    kwargs: dict[str, Any],
+) -> None:
+    """Draw one or more ``ΔL(f)`` curves with an optional vertical marker."""
+    first, *rest = curves
+    values, label, colour, style = first
+    kwargs.setdefault("color", colour)
+    kwargs.setdefault("ls", style)
+    # The caller may name the curve; do not hand matplotlib two labels.
+    ax.plot(freqs, values, label=kwargs.pop("label", _t(label, language)), **kwargs)
+    for values, label, colour, style in rest:
+        ax.plot(freqs, values, color=colour, ls=style, label=_t(label, language))
+    if marker_frequency is not None:
+        ax.axvline(
+            marker_frequency, color=_C_MUTED, ls=":", lw=1.2,
+            label=f"{_t(marker_label, language)} = {_format_freq(marker_frequency)} Hz",
+        )
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
+    ax.set_ylabel(_t(_IMPROVEMENT_LABEL, language))
+    ax.grid(True, which="both", alpha=0.3)
+    ax.legend(loc="best", fontsize="small")
+    format_frequency_axis(ax, float(freqs.min()), float(freqs.max()))
+
+
+def plot_tapping_force(
+    result: TappingForceResult, ax: Axes | None = None, language: str = "en",
+    **kwargs: Any
+) -> Axes:
+    """Force spectrum of the ISO tapping machine on one walking surface.
+
+    Draws ``|Fn|(f)`` from the mass-spring-dashpot model with the two
+    low-frequency asymptotes ``|Fn|lower`` / ``|Fn|upper`` and the cut-off
+    frequency ``fco`` marked.
+
+    :param result: A
+        :class:`~phonometry.building.resilient_layers.TappingForceResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the force-spectrum ``plot`` call.
+    :return: The axes.
+    """
+    from .._i18n import localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    freqs = np.asarray(result.frequencies, dtype=np.float64)
+    kwargs.setdefault("color", _C_PRIMARY)
+    ax.plot(freqs, result.peak_force,
+            label=kwargs.pop("label", _t("force spectrum $|F_n|$", language)),
+            **kwargs)
+    ax.axhline(result.upper_limit, color=_C_REFERENCE, ls="--", lw=1.2,
+               label="$|F_n|_{upper}$")
+    ax.axhline(result.lower_limit, color=_C_MUTED, ls="--", lw=1.2,
+               label="$|F_n|_{lower}$")
+    ax.axvline(
+        result.cut_off_frequency, color=_C_SECONDARY, ls=":", lw=1.2,
+        label=f"$f_{{co}}$ = {_format_freq(result.cut_off_frequency)} Hz",
+    )
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
+    ax.set_ylabel(_t("Magnitude of the peak force $|F_n|$ [N]", language))
+    ax.set_yscale("log")
+    regime = "over-critical" if result.over_critical else "under-critical"
+    ax.set_title(
+        f"{_t('ISO tapping machine force spectrum', language)} "
+        f"({_t(regime, language)})"
+    )
+    ax.grid(True, which="both", alpha=0.3)
+    ax.legend(loc="best", fontsize="small")
+    format_frequency_axis(ax, float(freqs.min()), float(freqs.max()))
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_covering_improvement(
+    result: CoveringImprovementResult, ax: Axes | None = None, language: str = "en",
+    **kwargs: Any
+) -> Axes:
+    """Predicted ``ΔL`` of a soft floor covering beside its two-line estimate.
+
+    :param result: A
+        :class:`~phonometry.building.resilient_layers.CoveringImprovementResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the force-ratio curve ``plot`` call.
+    :return: The axes.
+    """
+    from .._i18n import localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    freqs = np.asarray(result.frequencies, dtype=np.float64)
+    _plot_improvement_spectrum(
+        ax, freqs,
+        [
+            (result.improvement, "band force ratio (Eq. 4.114)", _C_PRIMARY, "-"),
+            (result.two_line, "two-line estimate (0 dB, 12 dB/oct)",
+             _C_SECONDARY, "--"),
+        ],
+        result.cut_off_frequency, "$f_{co}$", language, kwargs,
+    )
+    ax.set_title(_t("Soft floor covering improvement (Hopkins 4.4.3.1)", language))
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_floating_floor_improvement(
+    result: FloatingFloorImprovementResult, ax: Axes | None = None,
+    language: str = "en", **kwargs: Any
+) -> Axes:
+    """Predicted ``ΔL`` of a floating floor above its mass-spring resonance.
+
+    :param result: A
+        :class:`~phonometry.building.resilient_layers.FloatingFloorImprovementResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the improvement curve ``plot`` call.
+    :return: The axes.
+    """
+    from .._i18n import decimal_comma, localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    freqs = np.asarray(result.frequencies, dtype=np.float64)
+    label = f"{result.model} ({result.slope:.0f} lg(f/$f_o$))"
+    _plot_improvement_spectrum(
+        ax, freqs, [(result.improvement, label, _C_PRIMARY, "-")],
+        result.resonance_frequency, "$f_o$", language, kwargs,
+    )
+    title = _t("Floating floor improvement (ISO 12354-2 Annex C)", language)
+    if result.delta_lw is not None:
+        value = decimal_comma(f"{result.delta_lw:.1f}", language)
+        title += f"  (delta-Lw = {value} dB)"
+    ax.set_title(title)
+    localize_axes(ax, language)
+    return ax
+
+
+def plot_lining_improvement(
+    result: LiningImprovementResult, ax: Axes | None = None, language: str = "en",
+    **kwargs: Any
+) -> Axes:
+    """Annex D single-number ratings of an additional layer against ``fo``.
+
+    Sweeps the resonance frequency over the Annex D range, draws ``ΔRw``,
+    ``ΔRA`` and ``ΔRA,tr`` for this system (the analogue of Figures D.2 and
+    D.3) and marks the result's own resonance frequency.
+
+    :param result: A
+        :class:`~phonometry.building.resilient_layers.LiningImprovementResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the ``ΔRw`` curve ``plot`` call.
+    :return: The axes.
+    """
+    from .._i18n import localize_axes
+    from ..building.resilient_layers import lining_improvement
+
+    ax = ax if ax is not None else _new_axes()
+    # The endpoints are written back exactly: np.logspace lands a few ulps
+    # below 30 Hz, which is outside the range Annex D is stated for and would
+    # make drawing the curve emit an extrapolation warning.
+    sweep = np.logspace(np.log10(30.0), np.log10(5000.0), 300)
+    sweep[0], sweep[-1] = 30.0, 5000.0
+    ratings: list[tuple[float, float, float]] = [
+        lining_improvement(
+            float(f), system=result.system, anchors=result.anchors,
+            glued_area=result.glued_area,
+        ).ratings
+        for f in sweep
+    ]
+    curves = np.asarray(ratings, dtype=np.float64)
+    kwargs.setdefault("color", _C_PRIMARY)
+    ax.plot(sweep, curves[:, 0], label=kwargs.pop("label", r"$\Delta R_w$"), **kwargs)
+    ax.plot(sweep, curves[:, 1], color=_C_SECONDARY, ls="--", label=r"$\Delta R_A$")
+    ax.plot(sweep, curves[:, 2], color=_C_TERTIARY, ls="-.", label=r"$\Delta R_{A,tr}$")
+    ax.plot([result.resonance_frequency], [result.delta_rw], marker="o", ms=8,
+            color=_C_REFERENCE, ls="",
+            label=f"$f_o$ = {_format_freq(result.resonance_frequency)} Hz")
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
+    ax.set_ylabel(_t("Sound reduction index improvement [dB]", language))
+    ax.set_title(
+        f"{_t('Additional-layer rating (ISO 12354-1 Annex D)', language)} "
+        f"— {result.system}"
+    )
+    ax.grid(True, which="both", alpha=0.3)
+    ax.legend(loc="best", fontsize="small")
+    format_frequency_axis(ax, float(sweep.min()), float(sweep.max()))
     localize_axes(ax, language)
     return ax

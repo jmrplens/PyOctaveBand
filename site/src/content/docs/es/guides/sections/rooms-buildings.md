@@ -93,6 +93,8 @@ datos de elemento y a partir de la física del propio elemento.
   la ley de masa, la coincidencia, las dobles hojas y las aberturas.
 - [Mejora del aislamiento a impacto de suelos (ISO 16251-1)](/phonometry/es/guides/impact-improvement/):
   la mejora ponderada de un revestimiento blando en una maqueta pesada pequeña.
+- [Predicción del comportamiento de capas elásticas](/phonometry/es/guides/resilient-layers/):
+  el lado de la predicción de revestimientos, suelos flotantes y trasdosados.
 - [Rigidez dinámica de materiales resilientes (EN 29052-1)](/phonometry/es/guides/dynamic-stiffness/):
   la medición por resonancia de placa de carga detrás de toda predicción de
   suelo flotante.
