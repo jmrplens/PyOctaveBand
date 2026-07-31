@@ -19,7 +19,7 @@
   "dependencies": {
     "@astrojs/starlight": "^0.41.4",
     "astro": "^7.1.4",
-    "katex": "^0.18.1",
+    "katex": "^0.16.47",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
     "satori": "^0.29.0",
