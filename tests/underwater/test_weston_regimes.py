@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for Weston's shallow-water propagation regimes.
 
 Oracles: Ainslie, *Principles of Sonar Performance Modelling* (Springer 2010),

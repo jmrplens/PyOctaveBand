@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """ISO 10848 laboratory flanking-transmission fiches (reportlab renderer).
 
 Renders the three results of the laboratory flanking-transmission measurement

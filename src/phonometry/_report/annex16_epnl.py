@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """ICAO Annex 16 EPNL aircraft-noise-certification fiche (reportlab renderer).
 
 Renders an :class:`~phonometry.aircraft.aircraft_noise.EPNLResult` to a

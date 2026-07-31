@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Measurement uncertainty for sound absorption (ISO 12999-2:2020).
 

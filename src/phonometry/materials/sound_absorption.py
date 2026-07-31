@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Sound absorption in a reverberation room: BS EN ISO 354:2003.
 

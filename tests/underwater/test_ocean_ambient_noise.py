@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for ocean ambient-noise spectrum levels (Wenz framework).
 
 Oracles (independent of the implementation): the wind "rule of fives" anchor

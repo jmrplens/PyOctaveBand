@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for EN 29052-1:1992 dynamic stiffness of resilient materials.
 
 Anchored on hand-computed closed-form values of the resonance relations

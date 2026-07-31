@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Inter-sample peak recovery by polyphase oversampling (private).
 
 The true peak of a band-limited continuous waveform generally falls between

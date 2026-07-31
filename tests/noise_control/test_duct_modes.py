@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the higher-order duct modes with mean flow.
 
 Oracle: Norton & Karczub, *Fundamentals of Noise and Vibration Analysis for

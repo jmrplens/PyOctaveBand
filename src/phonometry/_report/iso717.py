@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """ISO 717 sound-insulation rating fiche (reportlab renderer).
 
 Renders a :class:`~phonometry.building.insulation.WeightedRatingResult`

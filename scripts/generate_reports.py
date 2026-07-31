@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Generate the committed example ``.report()`` fiches.
 
 Mirrors :mod:`scripts.generate_graphs` for the normative report PDFs: it builds

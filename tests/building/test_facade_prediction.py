@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Tests for the EN 12354-3/-4:2000 façade prediction module
 (:mod:`phonometry.building.facade_prediction`).

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Tests for the ISO 16283 field test report (``.report()`` -> PDF).
 
@@ -174,7 +174,7 @@ def test_full_metadata_and_verbose_render_one_page(tmp_path) -> None:
         test_room="Dwelling A living room to dwelling B living room",
         test_date="2026-07-20",
         laboratory="Phonometry Reference Laboratory",
-        operator="J. M. Requena-Plens",
+        operator="Jose Manuel Requena Plens",
         report_id="PHN-2026-0143",
         requirement=25.0,
     )

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 
 """Tests for the ``.plot()`` methods of the heavy-impact, plenum and wall-tie results.
 

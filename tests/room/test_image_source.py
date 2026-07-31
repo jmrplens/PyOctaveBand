@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the image-source room impulse response (Kuttruff 4.1 / Vorlander 11.4).
 
 Oracles, from strongest to softest:

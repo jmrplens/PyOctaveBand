@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """IEC 60268-4 microphone-characteristics fiche (reportlab renderer).
 
 Renders a

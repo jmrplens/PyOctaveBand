@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Tests for the ISO 532-1 Zwicker loudness report (``.report()`` -> PDF).
 
@@ -78,7 +78,7 @@ def test_full_metadata_renders_one_page(tmp_path) -> None:
         measurement_standard="ISO 532-1 method 1",
         test_date="2026-07-20",
         laboratory="Phonometry Reference Laboratory",
-        operator="J. M. Requena-Plens",
+        operator="Jose Manuel Requena Plens",
         report_id="PHN-2026-0532",
     )
     out = tmp_path / "meta.pdf"

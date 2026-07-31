@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for time synchronous averaging (McFadden 1987).
 
 Clean-room oracles derived from P. D. McFadden, "A revised model for the

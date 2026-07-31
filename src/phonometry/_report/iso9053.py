@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """ISO 9053-1:2018 static-method airflow-resistance fiche (reportlab renderer).
 
 Renders a

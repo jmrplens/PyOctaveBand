@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """The example-report generator keeps producing valid one-page fiches.
 
 The rendered PDFs (and their WebP previews) under ``.github/reports/`` are not

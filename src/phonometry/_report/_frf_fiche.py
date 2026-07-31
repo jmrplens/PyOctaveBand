@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Shared reportlab body for the structural-vibration FRF fiches.
 
 The two structural-vibration frequency-response fiches, the ISO 7626 mechanical

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Translated fixed strings for the accredited ``.report()`` fiches.
 
 Every fixed English string the report renderers emit (titles, standard-basis

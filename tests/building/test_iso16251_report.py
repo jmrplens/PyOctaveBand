@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Tests for the ISO 16251-1 floor-covering impact-improvement report (``.report()``).
 
@@ -58,7 +58,7 @@ def _metadata(**overrides) -> ReportMetadata:
         "pressure": 101.2,
         "test_date": "2026-07-21",
         "laboratory": "Phonometry Reference Laboratory",
-        "operator": "J. M. Requena-Plens",
+        "operator": "Jose Manuel Requena Plens",
         "report_id": "PHN-2026-16251",
         "requirement": 17.0,
     }

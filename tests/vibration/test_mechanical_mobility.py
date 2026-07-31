@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for ISO 7626-1:2011 mechanical mobility and the FRF family.
 
 Anchored on the closed-form single-degree-of-freedom resonator (consistent

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Deprecated location of the plot renderers (moved to ``phonometry._plot``).
 
 Kept as a silent re-export for one deprecation cycle (removed in 4.0):

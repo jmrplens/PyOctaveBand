@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Reverberation-time fiches (reportlab renderer).
 
 Two related one-page PDF fiches for the octave-band reverberation time of a

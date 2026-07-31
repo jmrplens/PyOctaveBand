@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Open-plan office acoustics fiche (reportlab renderer, ISO 3382-3:2012).
 
 Renders a :class:`~phonometry.room.open_plan.OpenPlanResult` to a one-page PDF

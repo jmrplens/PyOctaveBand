@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the Biot poroelastic layer (Allard & Atalla 2e, ch. 6 and 11).
 
 **Honest statement of the oracle.** Allard & Atalla contains exactly one table

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Metadiffusers: deep-subwavelength Schroeder-like sound diffusers.
 
 A metadiffuser is a rigidly backed slotted panel whose slits are each loaded

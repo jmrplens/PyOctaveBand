@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for ITU-R BS.1770-5 / EBU R 128 programme loudness and true peak.
 
 Validated against the synthesizable EBU Tech 3341 Table 1 'minimum

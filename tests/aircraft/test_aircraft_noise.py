@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for aircraft-noise EPNL (ICAO Annex 16 Vol. I, Appendix 2).
 
 The oracles are independent of the implementation: the analytic noy breakpoints

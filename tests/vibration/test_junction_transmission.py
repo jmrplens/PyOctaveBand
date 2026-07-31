@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the rigid plate-junction bending-wave transmission coefficients.
 
 Hopkins (2007), *Sound Insulation*, Section 5.2.1.3 (Eqs 5.10-5.14, 5.6, 5.7,

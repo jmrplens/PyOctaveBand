@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for EN 12354-1/-2:2000 building performance prediction.
 
 The primary oracles are the worked examples in the standards' annexes:

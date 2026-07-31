@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Executable payload of the remote GPU FDTD runner.
 
 Runs inside the CuPy container (or on any plain Python with NumPy): loads a

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Reverberation-room sound power determination fiche (reportlab, ISO 3741).
 
 Renders a

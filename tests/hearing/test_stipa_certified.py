@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 End-to-end STIPA verification against the IEC 60268-16:2020 (rev 5)
 certified test bench signals from stipa.info (Embedded Acoustics BV).

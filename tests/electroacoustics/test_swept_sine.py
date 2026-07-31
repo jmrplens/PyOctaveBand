@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for swept-sine harmonic separation (Farina 2000 / Novak 2015).
 
 The oracle is the memoryless polynomial nonlinearity, whose harmonic

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Speech Intelligibility Index (SII) per ANSI S3.5-1997 (R2017).
 

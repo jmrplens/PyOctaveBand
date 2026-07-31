@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """The conformance-count writer rewrites claims and nothing else.
 
 ``scripts/check_conformance_claims.py`` reads the headline of the generated

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Smoke test for the CI numerical conformance harness.
 
 Guarantees the registry runs end to end and that every registered

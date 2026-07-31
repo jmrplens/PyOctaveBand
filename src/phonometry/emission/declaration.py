@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """ISO 4871:1996 declaration of noise emission values of machinery and equipment.
 
 ISO 4871 is the standardised *noise-emission declaration*: the information a

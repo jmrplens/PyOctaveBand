@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Two-microphone (p-p) sound intensity per IEC 61043:1993 and the
 ISO 9614-1:1993 field indicators.

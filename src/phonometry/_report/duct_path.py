@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Duct-borne noise path calculation sheet (reportlab renderer).
 
 Renders a :class:`~phonometry.noise_control.duct_path.DuctPathResult` to a

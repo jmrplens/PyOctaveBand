@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the public 2D FDTD simulation API.
 
 Oracles are analytic and independent of the implementation: the exact

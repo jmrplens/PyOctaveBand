@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Tests for ISO 9053-1:2018 (static) and ISO 9053-2:2020 (alternating) airflow
 resistance.

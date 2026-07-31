@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the multiple/partial coherence of a MISO system (B&P Ch. 7).
 
 Every oracle is a closed form from Bendat & Piersol, *Random Data* (4th ed.):

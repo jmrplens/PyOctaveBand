@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the experimental (power-injection) statistical energy analysis.
 
 M. P. Norton and D. G. Karczub, *Fundamentals of Noise and Vibration Analysis

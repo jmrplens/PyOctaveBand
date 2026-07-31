@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the RD 1367/2007 activity inspection fiche (``.report()`` -> PDF).
 
 The fiche is a rendering feature, so these tests assert structural facts only:

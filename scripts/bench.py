@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Micro-benchmarks and golden-value capture for the performance hotspots.
 
 Phase 0 of the 2026-07 overhaul (quality/performance plan). Three modes:
@@ -236,7 +236,7 @@ def _bench() -> None:
 
 def _write_golden() -> None:
     lines = [
-        "#  Copyright (c) 2026. Jose M. Requena-Plens",
+        "#  Copyright (c) 2026. Jose Manuel Requena Plens",
         '"""Golden regression arrays captured by ``scripts/bench.py --golden``.',
         "",
         "Auto-generated; do not edit by hand. These freeze the numeric outputs of",

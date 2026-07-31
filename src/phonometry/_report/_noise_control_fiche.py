@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Shared renderer for the noise-control performance fiches.
 
 The machine-enclosure insertion loss (:mod:`.enclosure`), the reactive-silencer

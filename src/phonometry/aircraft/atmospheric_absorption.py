@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 One-third-octave-band atmospheric absorption for aircraft noise (SAE ARP 5534).
 

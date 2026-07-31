@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Shared ISO 17497-2 diffuser-prediction helpers (tests + conformance report).
 
 Reproduces, with the library's own Fraunhofer far-field phase-grating model

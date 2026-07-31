@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Shared renderer for the sound-insulation test-report fiches.
 
 The field (ISO 16283, :mod:`.iso16283`) and laboratory (ISO 10140,

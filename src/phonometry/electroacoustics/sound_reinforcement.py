@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Gain before feedback of a sound-reinforcement system.
 
 A public-address system is a closed loop: the loudspeaker feeds the audience,

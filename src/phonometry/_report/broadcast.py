@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """EBU R 128 programme-loudness compliance fiche (reportlab renderer).
 
 Renders a

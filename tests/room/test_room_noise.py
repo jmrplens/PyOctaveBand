@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for :mod:`phonometry.room.room_noise` (ANSI/ASA S12.2-2019 NC and RC Mark II).
 
 The methods are validated against the standard's own tabulated curves: feeding

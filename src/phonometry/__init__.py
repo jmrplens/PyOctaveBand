@@ -1,4 +1,4 @@
-#  Copyright (c) 2020. Jose M. Requena-Plens
+#  Copyright (c) 2020. Jose Manuel Requena Plens
 """
 Octave-Band and Fractional Octave-Band filter for signals in the time domain.
 Implementation according to ANSI s1.11-2004 and IEC 61260-1-2014.

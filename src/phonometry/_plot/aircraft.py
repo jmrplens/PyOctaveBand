@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Plot renderers for the aircraft domain (lazy imports from result .plot())."""
 
 from __future__ import annotations

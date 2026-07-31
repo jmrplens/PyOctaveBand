@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for :mod:`phonometry.hearing.noise_induced_hearing_loss` (noise-induced hearing loss).
 
 Validated against the worked examples of ISO 1999:2013 Annex D (Tables D.1 to

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for underwater transmission loss (spreading + volume absorption).
 
 Oracles: the printed Francois & Garrison (1982, Part II) Table IV absorption

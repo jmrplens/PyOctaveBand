@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tonal audibility assessment fiche (reportlab renderer, ISO 1996-2:2017).
 
 Renders a

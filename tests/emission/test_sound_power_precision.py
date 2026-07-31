@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Precision-grade sound power: ISO 3745:2012 (anechoic / hemi-anechoic) and
 ISO 9614-3:2002 (sound-intensity scanning, precision).

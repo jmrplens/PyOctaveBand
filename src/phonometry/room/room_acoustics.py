@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Room acoustic parameters from impulse responses per ISO 3382-1:2009
 (performance spaces) and ISO 3382-2:2008 (ordinary rooms).

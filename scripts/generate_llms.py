@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Generate llms.txt, the per-area shards and llms-full.txt.
 
 llms.txt is the structured, LLM-oriented summary of the project: what it is,

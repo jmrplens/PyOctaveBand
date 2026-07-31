@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for ISO 1996-2:2017 environmental-noise determination.
 
 Anchored on the Annex C.5 tonal-audibility worked examples and the Annex G.2

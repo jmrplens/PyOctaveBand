@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """IEC 60268-16 speech-transmission-index fiche (reportlab renderer).
 
 Renders a :class:`~phonometry.hearing.sti.STIResult` to a one-page PDF laid out

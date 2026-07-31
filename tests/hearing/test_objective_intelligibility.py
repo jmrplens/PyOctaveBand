@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for :mod:`phonometry.hearing.objective_intelligibility` (STOI / ESTOI).
 
 STOI (Taal et al. 2011) and ESTOI (Jensen & Taal 2016) are validated three

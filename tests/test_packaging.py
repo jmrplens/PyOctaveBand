@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Packaging guarantees: PEP 561 typing marker shipped with the package, and
 the generated PyPI long description in sync with the GitHub README.

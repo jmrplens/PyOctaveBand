@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the ISO 10848 flanking-transmission fiches (``.report()`` -> PDF).
 
 ISO 10848 carries no worked numeric example, so the fiches are exercised with

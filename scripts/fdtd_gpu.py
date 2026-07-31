@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """GPU-portable 2D acoustic FDTD stepping engine for the animation renders.
 
 A backend-agnostic replica of the leapfrog scheme of

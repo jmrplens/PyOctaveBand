@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for ship radiated noise and monopole source level (ISO 17208-1/-2).
 
 The radiated noise level and the Lloyd's-mirror surface correction are exact

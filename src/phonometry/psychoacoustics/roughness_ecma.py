@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Psychoacoustic roughness per ECMA-418-2:2025 (4th ed., Sottek Hearing Model).
 

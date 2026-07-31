@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Numerical conformance report for phonometry.
 
 A maintainable registry of numerical conformance checks. Each entry pins one

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Field airborne sound insulation (ISO 16283-1:2014) and impact sound
 insulation (ISO 16283-2), with single-number weighted ratings and

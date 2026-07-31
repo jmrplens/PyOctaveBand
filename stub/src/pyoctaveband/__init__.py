@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Transition shim: PyOctaveBand has been renamed to phonometry.
 
 Re-exports the complete phonometry API under the legacy ``pyoctaveband``

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for :mod:`phonometry.building.spanish_building_code` (CTE DB-HR).
 
 Two independent oracle families anchor this module.

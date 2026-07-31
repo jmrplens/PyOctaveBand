@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Objective prominence of impulsive sounds and the ``LAeq`` adjustment
 (ISO/PAS 1996-3:2022).

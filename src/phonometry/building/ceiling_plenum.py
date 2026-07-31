@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Suspended-ceiling plenum flanking path (Vigran 9.2.3 after Mechel 1980;
 ISO 140-9 / ISO 10848-2; ASTM E1414 / ASTM E413).

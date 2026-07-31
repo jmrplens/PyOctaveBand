@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Wind-turbine acoustic noise (IEC 61400-11:2012+A1:2018).
 

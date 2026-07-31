@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Sound power level of a noise source from sound pressure measurements over an
 enveloping measurement surface: ISO 3744:2010 (engineering, accuracy grade 2)

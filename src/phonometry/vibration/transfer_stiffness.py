@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Dynamic transfer stiffness of resilient elements (ISO 10846-1/-2/-3).
 

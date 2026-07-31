@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the IEC 61265:1995 aircraft-noise measurement-system verifier.
 
 The oracle is IEC 61265 Table 1 (microphone directional-response tolerances),

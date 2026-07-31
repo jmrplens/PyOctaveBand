@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the duct-borne noise path ``.report()`` fiche.
 
 The sheet is rendered from the published supply path of Long, *Architectural

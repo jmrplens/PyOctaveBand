@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Activity noise inspection fiche (reportlab renderer, RD 1367/2007).
 
 Renders a

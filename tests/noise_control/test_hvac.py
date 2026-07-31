@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the HVAC duct methods (Bies Chapter 8).
 
 Oracles: exact points of the ASHRAE end-reflection table (Bies Table 8.14) and

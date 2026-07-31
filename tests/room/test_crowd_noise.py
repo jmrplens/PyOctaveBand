@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the restaurant crowd self-noise model (Long Chapter 17).
 
 Oracle: **Long, Architectural Acoustics 2nd ed., printed pp. 665-666**, the

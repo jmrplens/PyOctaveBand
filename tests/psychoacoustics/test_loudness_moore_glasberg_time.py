@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 ISO 532-3:2023 (Moore-Glasberg-Schlittenlacher) time-varying loudness tests.
 

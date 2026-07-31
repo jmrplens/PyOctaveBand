@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for ISO 12999-2:2020 sound-absorption measurement uncertainty."""
 
 from __future__ import annotations

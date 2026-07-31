@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """The errata evidence gate, exercised on the entry that made it necessary.
 
 ``scripts/check_errata_evidence.py`` exists because an entry was drafted that

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Dynamic stiffness of resilient materials under floating floors (EN 29052-1:1992).
 

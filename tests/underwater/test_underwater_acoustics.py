@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for underwater reference levels (ISO 18405 / ISO 18406 primitives).
 
 Every quantity is anchored on a synthetic signal of known amplitude and

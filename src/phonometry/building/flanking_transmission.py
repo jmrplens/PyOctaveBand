@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Laboratory measurement of flanking sound transmission (ISO 10848:2006/2010).
 

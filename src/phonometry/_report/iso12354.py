@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """EN/ISO 12354-1/-2/-3 predicted building sound-insulation fiche (reportlab).
 
 Renders a

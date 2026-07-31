@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tolerance-aware staleness check for the committed documentation figures.
 
 The ``Documentation figures up to date`` CI job regenerates ``.github/images``

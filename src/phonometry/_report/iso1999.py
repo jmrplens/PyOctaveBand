@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """ISO 1999:2013 noise-induced hearing-loss prediction fiches (reportlab renderer).
 
 Renders the two occupational-hearing-loss result types of

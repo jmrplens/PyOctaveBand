@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Sound power determination fiche (reportlab renderer, ISO 3744 / ISO 3745).
 
 Renders a :class:`~phonometry.emission.sound_power.SoundPowerResult`

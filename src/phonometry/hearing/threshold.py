@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Age-related hearing threshold (ISO 7029:2017) and audiometric reference zero
 (ISO 389-7:2005).

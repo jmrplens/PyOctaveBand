@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Remote GPU runner for the animation FDTD fields.
 
 Offloads a 2D acoustic FDTD run (the ``fdtd_gpu.GpuFDTD2D`` engine) to a

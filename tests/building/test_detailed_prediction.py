@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the EN/ISO 12354-1/-2:2017 detailed per-band prediction model.
 
 The oracle is the pair of worked examples that ISO 12354-1:2017 Annex L and

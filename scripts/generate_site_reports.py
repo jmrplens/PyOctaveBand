@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Render the committed evidence documents as Starlight pages.
 
 The two documents that carry the project's numerical evidence live under

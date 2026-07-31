@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 IEC 61260-1:2014 filter and IEC 61672-1:2013 weighting class verification.
 

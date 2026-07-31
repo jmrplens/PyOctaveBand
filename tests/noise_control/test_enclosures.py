@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for machine-enclosure insertion loss (Bies §7.4.2).
 
 Oracles: the closed form ``IL = R - C`` with

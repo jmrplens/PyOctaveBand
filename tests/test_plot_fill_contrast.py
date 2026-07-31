@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Background-aware shaded fills and the colour difference behind them.
 
 ``theme_fill`` derives an area wash from the page it will be drawn on, so a

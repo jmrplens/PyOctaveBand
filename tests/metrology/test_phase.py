@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the phase utilities (minimum phase, group delay, excess phase).
 
 Oracles: a strictly minimum-phase biquad (an RBJ peaking EQ, all poles

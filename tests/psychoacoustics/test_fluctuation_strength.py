@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for fluctuation strength (Fastl & Zwicker Ch. 10; Osses et al. 2016).
 
 The closed form for AM broadband noise (Eq. 10.2) is exact and tested against

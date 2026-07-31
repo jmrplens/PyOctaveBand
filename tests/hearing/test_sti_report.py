@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the IEC 60268-16 speech-transmission-index ``.report()`` fiche.
 
 The rendered index is checked against an oracle independent of the renderer: a

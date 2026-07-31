@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for EN 12354-5:2009 installed structure-borne sound from equipment.
 
 Anchored on the standard's closed-form chain: the coupling term (Formula 19b)

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Guard the evidence of every entry in ``docs/ERRATA.md``.
 
 Each entry in the registry is a permanent public statement that a named

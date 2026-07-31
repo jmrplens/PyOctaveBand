@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for psychoacoustic annoyance (Fastl & Zwicker Eqs 16.2-16.4).
 
 The PA model is exact; these tests anchor it on a hand-computed worked tuple and

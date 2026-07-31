@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the enclosed-space absorption/reverberation report (``.report()``).
 
 The report is a rendering feature, so these tests assert only structural facts:
@@ -61,7 +61,7 @@ def _metadata(**overrides) -> ReportMetadata:
         "pressure": 101.3,
         "test_date": "2026-07-21",
         "laboratory": "Phonometry Reference Laboratory",
-        "operator": "J. M. Requena-Plens",
+        "operator": "Jose Manuel Requena Plens",
         "report_id": "PHN-2026-EN12354-6",
     }
     base.update(overrides)

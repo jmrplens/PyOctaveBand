@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Normal modes of a rectangular room: frequencies, kinds, count and density.
 
 Below the Schroeder frequency a room is not a diffuse field but a handful of

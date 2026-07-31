@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """EN/ES internationalisation of the materials-domain ``.plot()`` renderers.
 
 Each result type exposes ``plot(language=...)``: the default English output is

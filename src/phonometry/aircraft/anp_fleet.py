@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """EASA ANP fleet database bridge for the ECAC Doc 29 airport-noise chain.
 
 The ECAC Doc 29 method in :mod:`phonometry.aircraft.airport_noise` places an

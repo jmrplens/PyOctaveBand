@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Tests for the ISO 3382-1/-2 room acoustic parameters report (``.report()``).
 
@@ -97,7 +97,7 @@ def _full_metadata(**overrides) -> ReportMetadata:
         "pressure": 101.1,
         "test_date": "2026-07-20",
         "laboratory": "Phonometry Reference Laboratory",
-        "operator": "J. M. Requena-Plens",
+        "operator": "Jose Manuel Requena Plens",
         "report_id": "PHN-2026-3382",
     }
     base.update(overrides)

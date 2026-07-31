@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Tests for the impulsive-sound prominence report (``.report()`` -> PDF).
 
@@ -119,7 +119,7 @@ def test_metadata_appears_and_one_page(tmp_path) -> None:
         measurement_standard="ISO 1996-2",
         test_date="2026-07-21",
         laboratory="Phonometry Reference Laboratory",
-        operator="J. M. Requena-Plens",
+        operator="Jose Manuel Requena Plens",
         report_id="PHN-2026-NTACOU112",
     )
     out = tmp_path / "meta.pdf"

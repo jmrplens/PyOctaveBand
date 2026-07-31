@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """End-to-end tests of the room-to-room chain against Norton & Karczub's answers.
 
 Oracle: Norton, M. P. & Karczub, D. G., *Fundamentals of Noise and Vibration

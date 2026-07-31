@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """The glyph census verdicts, exercised without needing a PDF.
 
 ``scripts/glyph_census.py`` tells a contributor whether a source document's

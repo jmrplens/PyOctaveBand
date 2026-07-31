@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the room-noise rating reports (``.report()``, ANSI/ASA S12.2-2019).
 
 The report is a rendering feature, so these tests assert only structural
@@ -83,7 +83,7 @@ def _full_metadata(**overrides) -> ReportMetadata:
         "pressure": 101.2,
         "test_date": "2026-07-21",
         "laboratory": "Phonometry Reference Laboratory",
-        "operator": "J. M. Requena-Plens",
+        "operator": "Jose Manuel Requena Plens",
         "report_id": "PHN-2026-S122",
     }
     base.update(overrides)

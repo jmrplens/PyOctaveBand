@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Private plot renderers, one module per domain plus shared helpers.
 
 Result objects import their renderer lazily inside ``.plot()`` so matplotlib

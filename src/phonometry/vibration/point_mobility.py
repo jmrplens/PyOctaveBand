@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Point mobilities and impedances of infinite structures (Cremer, Heckl &
 Petersson 2005, Chapter 5, Table 5.1).

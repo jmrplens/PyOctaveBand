@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Whole-body multiple-shock health-risk fiche (reportlab renderer).
 
 Renders a

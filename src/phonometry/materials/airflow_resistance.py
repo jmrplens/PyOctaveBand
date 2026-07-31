@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Airflow resistance of porous materials: ISO 9053-1 and ISO 9053-2.
 

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Shared reportlab building blocks for the accredited report fiches.
 
 The per-standard renderers (:mod:`.iso717`, :mod:`.iso11654`, ...) all lay out

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """ISO 354 reverberation-room sound-absorption fiche (reportlab renderer).
 
 Renders a

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """PDF report renderers for the library's result objects.
 
 reportlab is a *soft* dependency: importing :mod:`phonometry` and running any

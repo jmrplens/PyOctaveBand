@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the signal toolbox: tone bursts, resampling, fractional delay.
 
 Clean-room oracles, independent of the implementation:

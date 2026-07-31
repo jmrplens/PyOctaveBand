@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Predicted airborne sound reduction index of panels (Bies, Hansen & Howard
 2017, Engineering Noise Control 5e, Section 7.2; Sharp 1973).

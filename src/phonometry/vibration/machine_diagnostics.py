@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Kinematic fault frequencies of rotating machinery (Norton & Karczub Ch. 8).
 

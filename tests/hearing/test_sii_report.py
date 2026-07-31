@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the ANSI S3.5-1997 speech-intelligibility-index ``.report()`` fiche.
 
 The rendered index is checked against oracles independent of the renderer: the

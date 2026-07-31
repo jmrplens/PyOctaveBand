@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """The shaded-region legibility gate reads real matplotlib SVG output.
 
 ``scripts/check_figure_contrast.py`` parses the committed figures rather than

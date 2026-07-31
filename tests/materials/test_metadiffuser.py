@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Metadiffuser panels against the published designs (Sci. Rep. 7:5389, 2017).
 

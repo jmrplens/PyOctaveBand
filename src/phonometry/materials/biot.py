@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Biot poroelastic layers: the three waves and the 6x6 transfer matrix.
 
 An equivalent fluid replaces a porous material by a single wave travelling in

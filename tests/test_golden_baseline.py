@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Golden-baseline regression tests for the overhaul refactors.
 
 Each case recomputes a performance-hotspot scenario (inputs defined once in

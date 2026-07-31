@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Tests for the regularized spectral inversion (Kirkeby & Nelson 1999,
 Mueller & Massarani 2001).

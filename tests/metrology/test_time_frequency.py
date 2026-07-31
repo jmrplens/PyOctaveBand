@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 
 """Calibrated spectrogram and zoom FFT (Bendat & Piersol Ch. 12 / 11.5.4).
 

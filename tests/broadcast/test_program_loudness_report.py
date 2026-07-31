@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Tests for the EBU R 128 programme-loudness report (``.report()`` -> PDF).
 
@@ -101,7 +101,7 @@ def test_full_metadata_renders_one_page(tmp_path) -> None:
         measurement_standard="EBU R 128",
         test_date="2026-07-20",
         laboratory="Phonometry Reference Laboratory",
-        operator="J. M. Requena-Plens",
+        operator="Jose Manuel Requena Plens",
         report_id="PHN-2026-R128",
         requirement=-23.0,
     )

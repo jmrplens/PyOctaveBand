@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 CNOSSOS-EU road traffic source emission (Directive 2002/49/EC Annex II, 2.2).
 

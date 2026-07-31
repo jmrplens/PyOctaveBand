@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the limp-frame equivalent fluid (Allard & Atalla 2e, Sect. 11.3.4).
 
 **Honest statement of the oracle.** Allard & Atalla contains exactly one table

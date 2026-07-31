@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Deprecated module-path aliases for the phonometry 3.2 package layout.
 
 The 3.2 release grouped the flat top-level modules into domain subpackages

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Test-report metadata for the ISO 717 accredited-laboratory fiche.
 
 :class:`ReportMetadata` is the shared, frozen container of the descriptive

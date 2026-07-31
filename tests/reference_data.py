@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Shared normative reference data (single source of truth).
 
 Tables transcribed verbatim from the published standards. Both the test

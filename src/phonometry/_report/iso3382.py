@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Room acoustic parameters fiche (reportlab renderer, ISO 3382-1/-2).
 
 Renders a :class:`~phonometry.room.room_acoustics.RoomAcousticsResult` to a

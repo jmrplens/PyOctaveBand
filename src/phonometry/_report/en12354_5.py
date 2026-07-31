@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Installed structure-borne sound prediction fiche (reportlab, EN 12354-5).
 
 Renders an

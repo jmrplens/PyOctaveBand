@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 Programme loudness and true-peak level (ITU-R BS.1770-5, EBU R 128).
 

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for :mod:`phonometry.environmental.spanish_regulation` (RD 1367/2007).
 
 Two independent oracle families anchor this module.

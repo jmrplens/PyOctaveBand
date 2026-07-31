@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """
 HVAC duct acoustics: fan power, duct losses, plenums and flow-generated noise.
 
