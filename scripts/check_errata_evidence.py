@@ -52,6 +52,33 @@ REGISTRY = ROOT / "docs" / "ERRATA.md"
 #: Evidence bullet, not adding a new line here. A ratio hit is never excused by
 #: membership of this list.
 RENDER_ALLOWLIST: dict[str, str] = {
+    'ISO 12354-1:2017, Table D.1 (1 600 Hz covered by two rows)':
+        'read on a 600 dpi render of the printed table, which showed two separately ruled rows rather than an extraction artefact; the structured citation predates this check',
+    'Vigran, Building Acoustics (2008), Figure 8.37 caption (carpet stiffness exponent)':
+        'read on a 600 dpi render of the caption and of p. 321; the structured citation predates this check',
+    'Vigran, Building Acoustics (2008), Eq. (9.18) (receiving-side coefficient)':
+        'the claim is a derivation of the receiving-side integral, not a character reading; the printed form is quoted as printed and is not in dispute',
+    'Commission Directive (EU) 2015/996, Annex II 2.2.1 (octave-band range of the road source)':
+        'the claim is that the clause contradicts its own Appendix F tables, settled by the corrigendum text fetched from the Publications Office rather than by a character reading',
+    'Directive (EU) 2015/996, Annex II 2.3.2 (roughness conversion in km/h)':
+        'read on a rendered page image of the Official Journal; the structured citation predates this check',
+    'Directive (EU) 2015/996, Appendix G, Table G-1, second table (wrong symbol)':
+        'read on a rendered page image of the Official Journal; the structured citation predates this check',
+    'Directive (EU) 2015/996, Appendix G, Table G-5, 6 350 Hz row (50 dB notch)':
+        'read on a rendered page image of the Official Journal and corroborated by the amendment that restores the two values; the structured citation predates this check',
+    'Directive (EU) 2015/996, Appendix G, band and wavelength labels':
+        'read on a rendered page image of the Official Journal; the structured citation predates this check',
+    'Directive (EU) 2015/996, Annex II 2.3.2, curve squeal (unassigned endpoints)':
+        'the claim is that two printed open intervals leave R = 300 m and 500 m unassigned, a reading of the interval endpoints rather than of a glyph',
+    'Allard & Atalla, Propagation of Sound in Porous Media 2e (2009), Eq. (6.85)':
+        "settled by the book's own Eq. (6.80) on the facing page, a derivation rather than a character reading; independently re-derived in review",
+    'Allard & Atalla 2e (2009), Eq. (11.48) and Table 11.1 (poroelastic layer)':
+        'read on a render in review, which also established the chapter page offsets; the structured citation predates this check',
+    'Allard & Atalla 2e (2009), Sect. 6.6.3 (thickness of the second sample)':
+        'the claim is that two printed statements of the same thickness disagree, a comparison of two sentences rather than a glyph reading',
+    'Allard & Atalla 2e (2009), Sect. 6.5.4 (the frame-borne velocity ratio)':
+        "the claim is that a printed sentence says modulus where the printed value is the real part, settled by computing both from the book's own Table 6.1 inputs",
+
     "ISO 12354-1:2017 Table L.3 / ISO 12354-2:2017 Table G.3 (perimeter sums)":
         "the claim is about five recomputed sums, not about printed characters",
     "ISO 12354-1:2017 Table L.3 / ISO 12354-2:2017 Table G.3 (external wall ηint)":
