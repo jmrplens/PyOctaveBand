@@ -1,6 +1,6 @@
 ← [Documentation index](README.md)
 
-# Heavy and Soft Impact Sources (ISO 16283-2, JIS A 1418-2, ISO 717-2 Annex D)
+# Heavy and Soft Impact Sources (ISO 16283-2)
 
 The ISO tapping machine is a *light* impact source. Its five 500 g hammers fall
 40 mm and produce a hard, quasi-stationary excitation whose energy sits well

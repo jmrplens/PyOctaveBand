@@ -1,6 +1,6 @@
 ← [Documentation index](README.md)
 
-# Predicting Resilient-Layer Performance (Coverings, Floating Floors, Linings)
+# Predicting Resilient-Layer Performance
 
 A resilient layer is the cheapest way to buy impact sound insulation and the
 easiest to get wrong. Whether it is a carpet on a slab, a screed floating on

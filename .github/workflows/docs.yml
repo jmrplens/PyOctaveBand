@@ -1,5 +1,13 @@
-name: Deploy Docs
+name: Docs
 
+# The build job is the only thing in the repository that compiles the site, so
+# until it ran on pull requests a page could break the deploy while its pull
+# request stayed green: nothing in Python CI touches Astro. That is not a
+# hypothetical. A repeated word in an import statement took the deploy down for
+# fifteen hours across five merges, and the over-long page titles that surfaced
+# once the build came back had ridden in the same way. Both would have been
+# caught here before the merge, so the build now runs on pull requests too and
+# only the publishing half is reserved for main.
 on:
   push:
     branches: ["main"]
@@ -18,17 +26,35 @@ on:
       - ".github/brand/**"
       - "scripts/generate_llms.py"
       - ".github/workflows/docs.yml"
+  pull_request:
+    branches: ["main"]
+    # Deliberately the same set as the push trigger above, spelled out because
+    # GitHub Actions does not resolve YAML anchors. Keep the two lists in step:
+    # a path that deploys on push but is not validated here would be exactly the
+    # blind spot this trigger exists to close.
+    paths:
+      - "site/**"
+      - "docs/**"
+      - ".github/brand/**"
+      - "scripts/generate_llms.py"
+      - ".github/workflows/docs.yml"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: pages
+  # Production deploys share a single queue because the Pages environment
+  # accepts one in-flight deployment at a time. A pull-request build must not
+  # join that queue: cancel-in-progress would let a validation run abort a
+  # deploy that is already publishing. Each pull request gets its own group
+  # instead, so a fixup push cancels only that branch's stale build.
+  group: pages-${{ github.event.pull_request.number || 'main' }}
   cancel-in-progress: true
 
 jobs:
   build:
+    name: Site builds and validates
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -81,12 +107,16 @@ jobs:
       - name: Accessibility audit (pa11y, WCAG2AA)
         run: pnpm run pa11y
         working-directory: site
+      # Only the branch that publishes needs the tarball. A pull request has
+      # already got what it came for once the four checks above have run.
       - uses: actions/upload-pages-artifact@v5
+        if: github.event_name != 'pull_request'
         with:
           path: site/dist
 
   deploy:
     needs: build
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       pages: write
