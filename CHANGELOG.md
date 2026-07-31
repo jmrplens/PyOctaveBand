@@ -897,6 +897,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- The eleven documentation clips still encoded as VP9 are now AV1, which is
+  what the other fifteen had already moved to, so all 104 WebM files finally
+  share one codec. Their 44 files come down from 20.1 MB to 15.5 MB, 23 %
+  smaller at the same resolution and frame rate. The GitHub GIFs are
+  transcoded from the WebM rather than from the frames, so their palettes are
+  rebuilt off the new source and they grow by about 10 %; frame-by-frame they
+  are indistinguishable from the previous ones.
 - Three ways of shading a region against the page colour had grown up side by
   side in `_plot`. `theme_fill` mixes the page towards the hue until it sits a
   fixed CIEDE2000 distance away, which is the one the rest of the renderers
