@@ -67,8 +67,8 @@ diameter `D = sqrt(4 S / pi)`.
      Table 14.4 entry for 12 in by 6 ft (3/5/10/15/17/16/9 dB);
    * [`diffuser_sound_power`](/phonometry/reference/api/noise_control/hvac/#diffuser_sound_power) reproduces the supply diffuser row
      (33/32/29/23/15/4/0/0 dB) to better than 1 dB in five of the six bands
-     that carry it (+0,4/+0,4/+0,2/+0,7/+0,9 dB from 63 Hz to 1 kHz) and to
-     1,9 dB in the sixth (2 kHz), reading the device as a 24 x 24 in
+     that carry it (+0.4/+0.4/+0.2/+0.7/+0.9 dB from 63 Hz to 1 kHz) and to
+     1.9 dB in the sixth (2 kHz), reading the device as a 24 x 24 in
      rectangular diffuser;
    * the silencer and grille rows are manufacturer data, which is what a
      real sheet uses and what [`DuctElement`](/phonometry/reference/api/noise_control/duct-path/#ductelement) accepts.

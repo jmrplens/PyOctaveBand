@@ -183,3 +183,19 @@ def test_the_registry_itself_passes() -> None:
 def test_the_allowlist_only_names_real_entries() -> None:
     markdown = cee.REGISTRY.read_text(encoding="utf-8")
     assert cee.check_allowlist(cee.parse_entries(markdown)) == []
+
+
+def test_a_blank_allowlist_reason_is_rejected(monkeypatch: pytest.MonkeyPatch) -> None:
+    """An excuse nobody wrote down is not an excuse.
+
+    Every other check passes for a whitespace-only reason: the title is real,
+    the entry cites no render, and nothing compares the value. That is the
+    whole point of the allowlist, so it has to be the one thing that fails.
+    """
+    markdown = cee.REGISTRY.read_text(encoding="utf-8")
+    entries = cee.parse_entries(markdown)
+    excused = next(iter(cee.RENDER_ALLOWLIST))
+    monkeypatch.setitem(cee.RENDER_ALLOWLIST, excused, "   ")
+    problems = cee.check_allowlist(entries)
+    assert any("blank reason" in problem for problem in problems), problems
+    assert any(excused in problem for problem in problems), problems

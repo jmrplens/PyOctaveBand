@@ -332,6 +332,15 @@ def check_allowlist(entries: list[Entry]) -> list[str]:
         "Delete the line: the allowlist is meant to shrink."
         for title in cleared
     ]
+    # A blank reason is an entry excused by nobody. The point of the allowlist
+    # is that someone said, in writing, what the claim rests on instead of a
+    # render; an empty string passes every other check while saying nothing.
+    problems += [
+        f"RENDER_ALLOWLIST excuses '{title}' with a blank reason. State what "
+        "the claim rests on instead of a render."
+        for title, reason in sorted(RENDER_ALLOWLIST.items())
+        if not reason.strip()
+    ]
     return problems
 
 
