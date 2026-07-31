@@ -15,7 +15,7 @@
 
 ## Numerical conformance report
 
-&#9989; **529/529 conformance checks pass** across 57 domains and 360 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+&#9989; **533/533 conformance checks pass** across 57 domains and 362 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
 
@@ -81,7 +81,7 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 </details>
 
 <details>
-<summary>&#9989; <b>Room &amp; building acoustics</b>: 100% (68/68)</summary>
+<summary>&#9989; <b>Room &amp; building acoustics</b>: 100% (72/72)</summary>
 
 | Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
 |:---|:---|:---|:---|:---|:---:|
@@ -150,6 +150,10 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | ISO 12354-1:2017 Annex L, Tables L.2 to L.4 | In-situ element chain: 10 lg sigma, 10 lg sigma_f, eta_tot, Rsitu, a_situ (21 bands x 5 elements) | 0 dB (+/-0.1 dB) | 0.057 dB | 0.057 dB | &#9989; |
 | ISO 12354-1:2017 Annex L, Table L.1 | Detailed airborne model: 13 paths + R' per band, R'w = 57 dB | max path/total dev <= 0,1 dB; R'w = 57 dB | 0.055 dB; 57 dB | 0.055 dB | &#9989; |
 | ISO 12354-2:2017 Annex G, Tables G.3, G.4 and G.1 | Detailed impact model: Ln,situ, Ln,Dd, Ln,Df, L'n per band, L'n,w = 41 dB | max path/total dev <= 0,1 dB; L'n,w (CI) = 41 (2) dB | 0.077 dB; 41 (2) dB | 0.077 dB | &#9989; |
+| Hopkins (2007) 3.6.3.1 / 4.4.3.1, printed pp. 276-282 and 513-514 | Tapping machine: vo, cut-off frequencies fco of a bare slab and two soft coverings (7 000 / 2 300 / 100 Hz) | 0 (+/-0.02) | 0.0077 | 0.008 | &#9989; |
+| Hopkins (2007) Figs. 3.30/3.31 and 4.73, printed pp. 281 and 524 | Over/under-critical case of four walking surfaces; double floating-floor resonances 74 Hz and 195 Hz | 4/4 critical cases; fmsms = 74 / 195 Hz (+/-2%) | 4/4; 74.1 / 194.0 Hz | 0.53% | &#9989; |
+| ISO 12354-2:2017 Annex C / Annex G Table G.4 | Floating floor: fo = 160 sqrt(s'/m') = 52,8 Hz, DeltaL = 30 lg(f/fo) over 21 bands, DeltaLw = 32,2 dB | 0 dB (+/-0.05 dB) | 0.048 dB | 0.048 dB | &#9989; |
+| ISO 12354-1:2017 Annex D / Hopkins (2007) Fig. 4.48, printed p. 486 | Lining resonance (Formula D.1) 542 Hz and the Table D.1 improvement branches | fo = 542 Hz (+/-1%); 8/8 Table D.1 rows | 541.9 Hz; 8/8 | 0.02% | &#9989; |
 | EN 12354-5:2009 Formula (19b/19c) | Coupling term → force-source limit 10 lg(mag(Ys)/Re{Yi}) as mag(Ys) ≫ mag(Yi) | 40 dB (+/-0.01 dB) | 40.001 dB | 0.001 dB | &#9989; |
 | EN 12354-5:2009 Annex I.3, Table I.9 | Flushing cistern: four paths + Formula (17) total -> 29 dB(A) | max path/total dev <= 0.15 dB; total 29 dB(A) | 0.055 dB; 29.3 dB(A) | 0.055 dB | &#9989; |
 | EN 12354-5:2009 Annex I.2, Table I.6a | Whirlpool floor component: mobility correction + path 11 | max abs(dev vs Table I.6a) <= 0,15 dB | 0.1 dB | 0.1 dB | &#9989; |
