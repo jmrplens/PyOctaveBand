@@ -600,14 +600,14 @@ export default defineConfig({
         },
         // Web app manifest
         { tag: 'link', attrs: { rel: 'manifest', href: `${basePath}/manifest.json` } },
-        // Icons. The SVG favicon carries its own prefers-color-scheme rule, so
-        // the mark lightens itself against a dark browser chrome; the .ico is
-        // there for the clients that still request /favicon.ico by name, and
-        // the touch icon for an iOS home screen, which ignores both.
-        {
-          tag: 'link',
-          attrs: { rel: 'icon', type: 'image/svg+xml', href: `${basePath}/favicon.svg` },
-        },
+        // Icons. The SVG favicon is Starlight's own default (`favicon:
+        // '/favicon.svg'`), which emits its link tag itself; repeating it here
+        // put two links to the same file in the head. These are the variants
+        // the option cannot express, added exactly as the configuration
+        // reference recommends: the .ico for clients that still request
+        // /favicon.ico by name, and the touch icon for an iOS home screen,
+        // which ignores both. The SVG carries its own prefers-color-scheme
+        // rule, so the mark lightens itself against a dark browser chrome.
         { tag: 'link', attrs: { rel: 'icon', sizes: '48x48', href: `${basePath}/favicon.ico` } },
         {
           tag: 'link',
