@@ -138,7 +138,7 @@ los dos puntos publicados están fijados por los tests.
 ```python
 from phonometry import underwater
 
-print(underwater.orca_audiogram(50e3).threshold[0])   # 51,20 dB re 1 uPa
+print(underwater.orca_audiogram(50e3).threshold[0])   # 51.20 dB re 1 uPa
 ```
 
 Ese valor es el umbral de audición del ejemplo de orca frente a salmón de
@@ -204,7 +204,7 @@ plt.show()
 from phonometry import underwater
 
 res = underwater.auditory_weighting(1000.0, "LF", guidance="nmfs-2018")
-print(res.weighting[0])           # -0,06 dB, el valor publicado del Apéndice D
+print(res.weighting[0])           # -0.06 dB, el valor publicado del Apéndice D
 print(res.weighted_tts_onset)     # Tw = K + C
 
 params = underwater.weighting_parameters("OW", guidance="nmfs-2024")

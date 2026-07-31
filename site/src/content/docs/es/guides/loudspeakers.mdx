@@ -442,15 +442,15 @@ from phonometry import electroacoustics as ea
 
 # Un auditorio con Zs = -6 dB, micrófono omnidireccional, uno abierto.
 res = ea.feedback_stability(-6.0, 76.0, 80.0)
-print(res.is_stable, round(res.headroom, 1))          # True 0,0 dB
-print(round(res.maximum_level_at_microphone, 1))      # 76,0 dB = L(H-L) - 4
+print(res.is_stable, round(res.headroom, 1))          # True 0.0 dB
+print(round(res.maximum_level_at_microphone, 1))      # 76.0 dB = L(H-L) - 4
 
 # Un cardioide recupera exactamente su índice de directividad relativo.
 card = ea.feedback_stability(-6.0, 78.0, 80.0, microphone_directivity=-2.0)
-print(round(card.maximum_level_at_microphone, 1))     # 78,0 dB = L(H-L) - 2
+print(round(card.maximum_level_at_microphone, 1))     # 78.0 dB = L(H-L) - 2
 
 # Cuatro micrófonos abiertos cuestan 10 lg 4 = 6 dB de ese margen.
-print(round(ea.open_microphone_correction(4), 1))     # 6,0 dB
+print(round(ea.open_microphone_correction(4), 1))     # 6.0 dB
 
 res.plot()      # la estructura de ganancias frente a la oscilación y el margen
 ```

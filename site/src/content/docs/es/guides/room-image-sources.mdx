@@ -404,7 +404,7 @@ modes = room.room_modes(
     speed_of_sound=344.0,
     reverberation_time=0.8,     # opcional: lleva la frecuencia de Schroeder
 )
-print(modes.orders[0], round(float(modes.frequencies[0]), 1))  # [1 0 0] 24,6 Hz
+print(modes.orders[0], round(float(modes.frequencies[0]), 1))  # [1 0 0] 24.6 Hz
 print(modes.count_by_kind())   # {'axial': 7, 'tangential': 10, 'oblique': 4}
 print(round(modes.schroeder_frequency, 0))                     # 175 Hz
 modes.plot()                    # escalera de modos por familia + densidad modal

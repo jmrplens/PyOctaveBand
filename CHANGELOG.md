@@ -897,6 +897,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Twenty-nine comments in the Spanish guides wrote a value the code prints with
+  a decimal comma, so the page promised `132,4 Hz` where running the snippet
+  gives `132.4`. Python has no locale in `print`, and the comment next to a
+  `print` call is a claim about its output: the reader who types the example in
+  and compares is the person the annotation is for. The rest of the Spanish
+  guides had already settled this, using a point in 543 such comments against
+  49 stragglers. Prose inside the same comment is untouched and keeps the
+  Spanish comma, as do the symbols that only look like decimals, `L1,2m` and
+  the `(1,1)` mode index.
 - Every formula on the site was rendering under a stylesheet written for a
   different version of KaTeX. Two copies decide how a formula looks: the one
   `rehype-katex` renders with, and the one the site imports

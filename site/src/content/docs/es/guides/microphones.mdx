@@ -174,9 +174,9 @@ result = microphone_characteristics(
     polar=(angles, cardioid), polar_frequency=1000.0,
     powering="Phantom P48 (IEC 61938)", supply_current_ma=3.1,
 )
-print(round(result.sensitivity_level_db, 1))            # -38,1 dB re 1 V/Pa
+print(round(result.sensitivity_level_db, 1))            # -38.1 dB re 1 V/Pa
 print(tuple(round(x) for x in result.effective_range))  # Hz
-print(round(result.directivity_index_db, 1))            # 4,8 dB (cardioide)
+print(round(result.directivity_index_db, 1))            # 4.8 dB (cardioide)
 print(round(result.equivalent_noise_level_db, 1))       # dB(A)
 
 result.report("microfono.pdf", metadata=ReportMetadata(measurement_standard="IEC 60268-4"),

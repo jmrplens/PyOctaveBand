@@ -282,7 +282,7 @@ ceiling = [17.0, 21.0, 25.0, 29.0, 32.0, 30.0, 38.0]   # placa de yeso de 9,5 mm
 res = plenum_flanking_reduction_index(
     ceiling, ceiling, ceiling_length=4.75, plenum_height=0.43, frequency=freqs
 )
-print(round(res.geometry_term, 1))    # 10,4 dB cobrados a RS + RR
+print(round(res.geometry_term, 1))    # 10.4 dB cobrados a RS + RR
 res.plot()                            # Rcl frente a los dos techos
 
 # Un plenum revestido atenúa el trayecto lateral (Ec. (9.18) en vez de (9.20)):
@@ -330,7 +330,7 @@ dnc = normalized_ceiling_attenuation(l1, l2, absorption, reference_area=12.0)
 dnc = [14.4, 18.6, 21.7, 24.1, 23.4, 30.3, 33.7, 35.2,
        41.6, 44.2, 42.1, 36.8, 35.7, 36.0, 36.9, 37.9]
 res = ceiling_attenuation_class(dnc)
-print(res.rating, res.deficiency_sum, res.max_deficiency)   # 34; 27,0; 7,0
+print(res.rating, res.deficiency_sum, res.max_deficiency)   # 34, 27.0, 7.0
 res.plot()                                                  # Dn,c frente a la curva
 
 # El número único ISO del mismo espectro, trasladado a A0 = 10 m2:

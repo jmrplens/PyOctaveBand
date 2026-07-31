@@ -103,8 +103,8 @@ from phonometry import (
 )
 
 spec = heavy_impact_source_specification("rubber_ball")
-print(spec.drop_height, spec.effective_mass)      # 1,0 m, 2,5 kg
-print(spec.contact_time, spec.contact_time_tolerance)   # 0,02 s +/- 0,002 s
+print(spec.drop_height, spec.effective_mass)      # 1.0 m, 2.5 kg
+print(spec.contact_time, spec.contact_time_tolerance)   # 0.02 s +/- 0.002 s
 
 freqs, lower, upper = heavy_impact_source_limits("bang_machine")
 print(list(zip(freqs, lower, upper))[0])          # (31.5, 46.0, 48.0)
@@ -195,7 +195,7 @@ li_fmax = [65.3, 64.5, 58.0, 55.8]           # promediado en energía sobre posi
 t = [1.43, 3.70, 3.10, 2.38]                 # tiempo de reverberación del receptor
 
 res = standardized_maximum_impact_level(li_fmax, 41.4, t, frequency=freqs)
-print(res.volume_term)                        # 10 lg(41,4/50) = -0,8 dB
+print(res.volume_term)                        # 10 lg(41.4/50) = -0.8 dB
 print(fast_reverberation_correction([0.5]))   # exactamente 0 dB con T = T0
 res.plot()   # espectros medido y estandarizado (requiere matplotlib)
 
@@ -229,8 +229,8 @@ from phonometry import a_weighted_maximum_impact_level
 
 # ISO 717-2:2020 Tabla D.4: una medición en obra en bandas de octava.
 res = a_weighted_maximum_impact_level([65.3, 64.5, 58.0, 55.8])
-print(list(res.corrected))   # 39,1; 48,3; 49,3; 52,6 dB
-print(res.unrounded)         # 55,350667... dB
+print(list(res.corrected))   # 39.1, 48.3, 49.3, 52.6 dB
+print(res.unrounded)         # 55.350667... dB
 print(res.rating)            # 55 dB
 res.plot()                   # niveles por banda, contribuciones y valoración
 ```

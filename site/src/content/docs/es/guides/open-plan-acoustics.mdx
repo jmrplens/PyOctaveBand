@@ -319,8 +319,8 @@ mutuamente coherentes; la errata queda recogida en el [registro de erratas](http
 ```python
 from phonometry import room
 
-print(round(room.absorption_per_table(1.0, -6.0), 2))   # 6,31 m2 por mesa a 1 m
-print(round(room.absorption_per_table(2.5, -9.0), 1))   # 19,8 m2 con paso de 2,5 m
+print(round(room.absorption_per_table(1.0, -6.0), 2))   # 6.31 m2 por mesa a 1 m
+print(round(room.absorption_per_table(2.5, -9.0), 1))   # 19.8 m2 con paso de 2,5 m
 
 crowd = room.crowd_noise([20.0, 95.0, 190.0], distance=1.2)
 crowd.plot()      # ruido autogenerado vs ocupación, frente al límite de -6 dB

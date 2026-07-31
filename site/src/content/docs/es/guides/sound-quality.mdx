@@ -314,7 +314,7 @@ x = (1.0 + np.cos(2 * np.pi * 4 * t)) * np.sin(2 * np.pi * 1000 * t)
 x *= 2e-5 * 10 ** (60 / 20) / np.sqrt(np.mean(x**2))   # 60 dB SPL globales
 
 res = psychoacoustics.fluctuation_strength_ecma(x, fs, field="free")
-print(f"F = {res.fluctuation_strength:.4f} vacil_HMS")   # 0,9957 vacil_HMS (referencia: 1 vacil_HMS)
+print(f"F = {res.fluctuation_strength:.4f} vacil_HMS")   # 0.9957 vacil_HMS (referencia: 1 vacil_HMS)
 
 res.plot()   # F(l50) temporal + mapa de calor de la específica
 ```
