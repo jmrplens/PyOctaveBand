@@ -58,6 +58,7 @@ from .common import (
     _new_axes,
     _new_axes_column,
     format_frequency_axis,
+    theme_fill,
 )
 
 #: Shared frequency-axis label of the spectral renderers.
@@ -359,7 +360,7 @@ def plot_filter_class(
     # (unbounded attenuation allowed), so it is clipped to the axis top there.
     upper_fill = np.where(finite_upper, upper, y_top)
     ax.fill_between(
-        omega[win], lower[win], upper_fill[win], color=_C_TERTIARY, alpha=0.18,
+        omega[win], lower[win], upper_fill[win], color=theme_fill(_C_TERTIARY, ax),
         lw=0.0, label=_t("Class {cls} pass corridor", language, cls=cls),
     )
     ax.plot(omega[win], lower[win], color=_C_TERTIARY, lw=1.0, ls="--")
@@ -394,22 +395,6 @@ def plot_filter_class(
     localize_axes(ax, language)
     return ax
 
-
-#: Fully opaque greens of the IEC 61043 pass region, for a light and for a
-#: dark axes background. The fiche renders this plot through svglib, which
-#: drops alpha, so a translucent fill would come out as a solid block hiding
-#: the measured curve; two opaque tones keep the region legible either way.
-_C_PASS_FILL_LIGHT = "#d7eccb"  # nosec B105 - hex colour literal, not a password
-_C_PASS_FILL_DARK = "#1d3320"  # nosec B105 - hex colour literal, not a password
-
-
-def _pass_fill(ax: Axes) -> str:
-    """The pass-region green matching the axes background luminance."""
-    from matplotlib.colors import to_rgb
-
-    r, g, b = to_rgb(ax.get_facecolor())
-    luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
-    return _C_PASS_FILL_DARK if luminance < 0.5 else _C_PASS_FILL_LIGHT
 
 #: Fiche/plot prose for each IEC 61043 Table 2 column group.
 _DEVICE_LABELS = {
@@ -457,8 +442,12 @@ def plot_intensity_class(
     y_bot = float(np.floor(min(measured.min(), class2.min()) - 2.0))
     y_top = float(np.ceil(max(measured.max(), class1.max()) + 3.0))
 
+    # Opaque, because the fiche renders this plot through svglib, which drops
+    # alpha: a translucent fill would come out as a solid block over the
+    # measured curve. theme_fill mixes the page towards the hue instead, so the
+    # region reads the same way on either background.
     ax.fill_between(
-        freqs, mask, y_top, step="mid", facecolor=_pass_fill(ax),
+        freqs, mask, y_top, step="mid", facecolor=theme_fill(_C_TERTIARY, ax),
         edgecolor="none", zorder=0,
         label=_t("Class {cls} pass region", language, cls=cls),
     )
