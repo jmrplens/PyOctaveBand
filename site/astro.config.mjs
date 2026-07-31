@@ -459,6 +459,14 @@ export default defineConfig({
       ],
       description: siteDescription,
       lastUpdated: true,
+      // "Edit page" link in each page's footer. The docs live under site/ in
+      // the repository, so the base includes that segment; Starlight appends
+      // the page's own path (src/content/docs/...). The generated API tree
+      // opts out in src/routeData.ts: those files are docstring-derived and a
+      // web edit would be overwritten on the next regeneration.
+      editLink: {
+        baseUrl: `${repositoryUrl}/edit/main/site/`,
+      },
       components: {
         // Per-page structured data (TechArticle / BreadcrumbList) and
         // per-page Twitter card tags, layered on the default head.
