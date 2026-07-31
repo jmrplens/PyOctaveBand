@@ -1200,6 +1200,25 @@ _ES_EXACT = {
     "Total effective roughness LR,TOT [dB re 1 μm]":
         "Rugosidad efectiva total LR,TOT [dB re 1 μm]",
     "Attenuation A [dB]": "Atenuación A [dB]",
+    "CNOSSOS-EU Road Source Line Power (urban arterial, 50 km/h)":
+        "Potencia de la línea fuente viaria CNOSSOS-EU (vía urbana, 50 km/h)",
+    "Total source line": "Línea fuente total",
+    "Light vehicles (1)": "Vehículos ligeros (1)",
+    "Medium heavy vehicles (2)": "Vehículos pesados medios (2)",
+    "Heavy vehicles (3)": "Vehículos pesados (3)",
+    "Motorcycles (4b)": "Motocicletas (4b)",
+    "Light vehicles (1) — total": "Vehículos ligeros (1) — total",
+    "Light vehicles (1) — rolling": "Vehículos ligeros (1) — rodadura",
+    "Light vehicles (1) — propulsion": "Vehículos ligeros (1) — propulsión",
+    "Heavy vehicles (3) — total": "Vehículos pesados (3) — total",
+    "Heavy vehicles (3) — rolling": "Vehículos pesados (3) — rodadura",
+    "Heavy vehicles (3) — propulsion": "Vehículos pesados (3) — propulsión",
+    "CNOSSOS-EU Single-Vehicle Sound Power against Speed (reference conditions)":
+        "Potencia acústica de un vehículo frente a la velocidad "
+        "(CNOSSOS-EU, condiciones de referencia)",
+    "Speed v [km/h]": "Velocidad v [km/h]",
+    "A-weighted sound power LW,A [dB(A) re 1 pW]":
+        "Potencia acústica ponderada A LW,A [dB(A) re 1 pW]",
     "Adiv — divergence": "Adiv — divergencia",
     "Aatm — atmospheric": "Aatm — atmosférica",
     "Agr — ground": "Agr — suelo",
@@ -2020,6 +2039,8 @@ _ES_PATTERNS = [
     (r"^f = (\d+) Hz \(λ = (.+) m\)$", r"f = \1 Hz (λ = \2 m)"),
     (r"^shadow beyond ≈ (\d+) m \(ray model\)$",
      r"sombra más allá de ≈ \1 m (modelo de rayos)"),
+    # cnossos_road_speed_law rolling/propulsion crossover annotation.
+    (r"^crossover (\d+) km/h$", r"cruce \1 km/h"),
     # orthotropic_transmission_loss info box (library values baked in).
     ((r"^1 mm steel sheet, m'' = (.+) kg/m², flat fc = (.+) kHz\n"
       r"corrugated H = (\d+) mm, L = (\d+) mm, m'' = (.+) kg/m², "
@@ -8264,6 +8285,124 @@ def generate_outdoor_attenuation_breakdown(output_dir: str) -> None:
     plt.close()
 
 
+def generate_cnossos_road_emission(output_dir: str) -> None:
+    """CNOSSOS-EU road source-line power of an urban arterial traffic mix."""
+    print("Generating cnossos_road_emission.png...")
+    from phonometry import (
+        JunctionType,
+        RoadSurface,
+        RoadTraffic,
+        RoadVehicleCategory,
+        road_source_power,
+    )
+
+    bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
+    # A two-lane urban arterial on a thin-layer surface: 1 200 light vehicles,
+    # 90 medium heavy and 45 heavy vehicles per hour at 50 km/h, plus 60
+    # motorcycles, 60 m before a signalised crossing, on a 3 % upgrade, at the
+    # 12 degC yearly mean of a temperate city.
+    traffic = [
+        RoadTraffic(RoadVehicleCategory.LIGHT, 1200.0, 50.0),
+        RoadTraffic(RoadVehicleCategory.MEDIUM_HEAVY, 90.0, 50.0),
+        RoadTraffic(RoadVehicleCategory.HEAVY, 45.0, 50.0),
+        RoadTraffic(RoadVehicleCategory.MOTORCYCLES, 60.0, 50.0),
+    ]
+    result = road_source_power(
+        traffic, surface=RoadSurface.THIN_LAYER_A, temperature=12.0, gradient=3.0,
+        junction_distance=60.0, junction_type=JunctionType.CROSSING,
+    )
+    x = np.arange(len(bands))
+    _fig, ax = plt.subplots(figsize=(11, 6.4))
+    ax.bar(x, result.total_line_power, color=COLOR_MUTED, edgecolor=COLOR_FG,
+           linewidth=0.6, label="Total source line", zorder=2)
+    labels = {
+        "1": "Light vehicles (1)",
+        "2": "Medium heavy vehicles (2)",
+        "3": "Heavy vehicles (3)",
+        "4b": "Motorcycles (4b)",
+    }
+    colors = [COLOR_PRIMARY, COLOR_TERTIARY, COLOR_SECONDARY, "#9467bd"]
+    markers = ["o", "s", "D", "^"]
+    for row, category, color, marker in zip(
+        result.line_power, result.categories, colors, markers, strict=True
+    ):
+        ax.plot(x, row, color=color, marker=marker, linewidth=1.8, markersize=6,
+                markerfacecolor="white", markeredgewidth=1.3, zorder=5,
+                label=labels[category.value])
+
+    ax.set_title(
+        "CNOSSOS-EU Road Source Line Power (urban arterial, 50 km/h)",
+        fontweight="bold", pad=12,
+    )
+    ax.set_xlabel("Octave-band centre frequency [Hz]")
+    ax.set_ylabel("Line power L'W,eq,line [dB re 1 pW/m]")
+    ax.set_xticks(x)
+    ax.set_xticklabels([f"{b:g}" for b in bands])
+    ax.set_ylim(45.0, 90.0)
+    ax.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower left", fontsize=9, ncol=2)
+    plt.tight_layout()
+    save_figure(output_dir, "cnossos_road_emission.png")
+    plt.close()
+
+
+def generate_cnossos_road_speed_law(output_dir: str) -> None:
+    """Rolling and propulsion noise against speed, and where they cross over."""
+    print("Generating cnossos_road_speed_law.png...")
+    from phonometry import (
+        CNOSSOS_A_WEIGHTING,
+        road_propulsion_noise,
+        road_rolling_noise,
+        road_vehicle_sound_power,
+    )
+
+    weights = np.asarray(CNOSSOS_A_WEIGHTING)
+
+    def a_weighted(bands: np.ndarray) -> float:
+        return float(10.0 * np.log10(np.sum(10.0 ** ((bands + weights) / 10.0))))
+
+    speeds = np.linspace(20.0, 130.0, 221)
+    _fig, ax = plt.subplots(figsize=(11, 6.4))
+    for category, color, name in [
+        ("1", COLOR_PRIMARY, "Light vehicles (1)"),
+        ("3", COLOR_SECONDARY, "Heavy vehicles (3)"),
+    ]:
+        rolling = np.array([a_weighted(road_rolling_noise(category, v)) for v in speeds])
+        propulsion = np.array(
+            [a_weighted(road_propulsion_noise(category, v)) for v in speeds]
+        )
+        total = np.array([a_weighted(road_vehicle_sound_power(category, v)) for v in speeds])
+        ax.plot(speeds, total, color=color, linewidth=2.4, zorder=5, label=f"{name} — total")
+        ax.plot(speeds, rolling, color=color, linewidth=1.3, linestyle="--", zorder=4,
+                label=f"{name} — rolling")
+        ax.plot(speeds, propulsion, color=color, linewidth=1.3, linestyle=":", zorder=4,
+                label=f"{name} — propulsion")
+        crossing = int(np.argmin(np.abs(rolling - propulsion)))
+        ax.plot(speeds[crossing], rolling[crossing], marker="o", markersize=8,
+                markerfacecolor="white", markeredgecolor=color, markeredgewidth=1.6,
+                zorder=6)
+        ax.annotate(
+            f"crossover {speeds[crossing]:.0f} km/h",
+            xy=(speeds[crossing], rolling[crossing]),
+            xytext=(6, -16), textcoords="offset points", fontsize=9, color=color,
+        )
+
+    ax.set_title(
+        "CNOSSOS-EU Single-Vehicle Sound Power against Speed (reference conditions)",
+        fontweight="bold", pad=12,
+    )
+    ax.set_xlabel("Speed v [km/h]")
+    ax.set_ylabel("A-weighted sound power LW,A [dB(A) re 1 pW]")
+    ax.set_xlim(20.0, 130.0)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower right", fontsize=9, ncol=2)
+    plt.tight_layout()
+    save_figure(output_dir, "cnossos_road_speed_law.png")
+    plt.close()
+
+
 def generate_ground_effect_spherical(output_dir: str) -> None:
     """Spherical-wave ground effect (Weyl-Van der Pol) for four ground types."""
     print("Generating ground_effect_spherical.png...")
@@ -14015,6 +14154,8 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_air_absorption_alpha,
     generate_atmospheric_attenuation,
     generate_outdoor_attenuation_breakdown,
+    generate_cnossos_road_emission,
+    generate_cnossos_road_speed_law,
     generate_ground_effect_spherical,
     generate_atmospheric_refraction,
     # CNOSSOS-EU railway source emission (Directive 2002/49/EC Annex II, 2.3).

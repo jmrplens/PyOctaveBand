@@ -175,7 +175,7 @@ export const en: HomeContent = {
 				name: 'Environment and transport',
 				href: '/phonometry/guides/sections/environment-transport/',
 				summary: 'Outdoor propagation, barriers, refraction, aircraft, rotorcraft and wind turbines.',
-				standards: ['ISO 9613-1/-2', 'ISO 1996-1/-2', 'ISO/PAS 1996-3', 'NT ACOU 112', 'ICAO Annex 16', 'IEC 61265', 'SAE ARP 5534', 'ECAC Doc 29/32', 'IEC 61400-11'],
+				standards: ['ISO 9613-1/-2', 'ISO 1996-1/-2', 'ISO/PAS 1996-3', 'NT ACOU 112', 'CNOSSOS-EU (2002/49/EC Annex II)', 'ICAO Annex 16', 'IEC 61265', 'SAE ARP 5534', 'ECAC Doc 29/32', 'IEC 61400-11'],
 			},
 			{
 				name: 'Underwater acoustics',
@@ -316,7 +316,7 @@ export const es: HomeContent = {
 				name: 'Medio ambiente y transporte',
 				href: '/phonometry/es/guides/sections/environment-transport/',
 				summary: 'Propagación en exteriores, barreras, refracción, aeronaves, helicópteros y aerogeneradores.',
-				standards: ['ISO 9613-1/-2', 'ISO 1996-1/-2', 'ISO/PAS 1996-3', 'NT ACOU 112', 'Anexo 16 OACI', 'IEC 61265', 'SAE ARP 5534', 'Doc 29/32 CEAC', 'IEC 61400-11'],
+				standards: ['ISO 9613-1/-2', 'ISO 1996-1/-2', 'ISO/PAS 1996-3', 'NT ACOU 112', 'CNOSSOS-EU (Anexo II 2002/49/CE)', 'Anexo 16 OACI', 'IEC 61265', 'SAE ARP 5534', 'Doc 29/32 CEAC', 'IEC 61400-11'],
 			},
 			{
 				name: 'Acústica submarina',

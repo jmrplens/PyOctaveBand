@@ -153,6 +153,7 @@ export const apiSidebar = {
       collapsed: true,
       items: [
         'reference/api/environment/outdoor-propagation',
+        'reference/api/environment/cnossos-road',
         'reference/api/environment/ground-barriers',
         'reference/api/environment/atmospheric-refraction',
         'reference/api/environment/air-absorption',

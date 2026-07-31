@@ -70,3 +70,32 @@ def test_plot_spherical_ground_spanish_xaxis_label() -> None:
     ax = result.plot()
     assert ax.get_xlabel() == "Frequency [Hz]"
     plt.close("all")
+
+
+def test_plot_cnossos_road_emission_spanish_labels() -> None:
+    # The road-emission renderer localises its own title, ylabel and category
+    # legend, and takes the shared ``_band_axis`` for the frequency axis.
+    from phonometry.environmental.cnossos_road import (
+        RoadTraffic,
+        RoadVehicleCategory,
+        road_source_power,
+    )
+
+    result = road_source_power(
+        [
+            RoadTraffic(RoadVehicleCategory.LIGHT, 1000.0, 50.0),
+            RoadTraffic(RoadVehicleCategory.HEAVY, 100.0, 50.0),
+        ]
+    )
+    ax = result.plot(language="es")
+    assert ax.get_xlabel() == "Frecuencia [Hz]"
+    assert ax.get_title() == "Potencia de la línea fuente viaria CNOSSOS-EU"
+    labels = [text.get_text() for text in ax.get_legend().get_texts()]
+    assert "Línea total" in labels
+    assert "Vehículos ligeros (1)" in labels
+    assert "Vehículos pesados (3)" in labels
+    plt.close("all")
+    ax = result.plot()
+    assert ax.get_xlabel() == "Frequency [Hz]"
+    assert ax.get_title() == "CNOSSOS-EU road source line power"
+    plt.close("all")

@@ -5,7 +5,8 @@ description: "Sound on its way through open air and the character of what arrive
 
 Outdoor sound assessment has two halves: predicting the level a source
 delivers to a distant receiver, and judging the character of the sound that
-actually arrives. The two pages of this section take one half each.
+actually arrives. The pages of this section split along that line, with the
+prediction half starting one step earlier, at the source itself.
 
 [Outdoor Sound Propagation](/phonometry/guides/outdoor-propagation/) is the
 prediction half. Starting from a source's **sound power**, the ISO 9613-2
@@ -33,6 +34,15 @@ rigid half-plane, thick barriers and the coherent four-path barrier on the
 ground, all resolving the frequency-dependent interference the octave-band terms
 smooth away.
 
+[CNOSSOS-EU road traffic source emission](/phonometry/guides/cnossos-road-emission/)
+supplies the source power that a prediction starts from, for the one source
+that dominates almost every noise map: road traffic. The common EU method of
+Annex II to Directive 2002/49/EC builds a rolling and a propulsion sound power
+for each vehicle category, corrects the rolling term for pavement, air
+temperature and studded tyres and the propulsion term for pavement and road
+gradient, applies the junction correction to both, and delivers a directional
+sound power per metre of source line.
+
 [Impulsive-sound prominence (NT ACOU 112)](/phonometry/guides/impulse-prominence/)
 is the assessment half. Noise containing distinct impulses (hammering,
 riveting, pile driving) annoys more than a steady sound of the same LAeq, and
@@ -59,6 +69,10 @@ sections.
 - [CNOSSOS-EU railway source emission](/phonometry/guides/cnossos-rail-emission/):
   the common EU railway emission method, from rail and wheel roughness to the
   directional sound power per metre of the two equivalent source lines.
+- [CNOSSOS-EU road traffic source emission](/phonometry/guides/cnossos-road-emission/):
+  the road source of Annex II to Directive 2002/49/EC: rolling and propulsion
+  sound power per vehicle category with the Appendix F database, and the
+  directional sound power per metre of source line.
 - [Spherical ground effect and advanced barriers](/phonometry/guides/ground-barriers/):
   the Weyl-Van der Pol spherical-wave ground reflection and wave-theoretic
   barrier diffraction (Kurze-Anderson, exact rigid half-plane, thick barriers

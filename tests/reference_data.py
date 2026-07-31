@@ -30,6 +30,9 @@ _DATA = pathlib.Path(__file__).parent / "data"
 
 INF = math.inf
 
+#: Committed oracle sets that are too large to inline (see tests/data/README.md).
+_DATA = pathlib.Path(__file__).parent / "data"
+
 # ---------------------------------------------------------------------------
 # IEC 61672-1:2013 Table 3 - frequency weightings and class-1 acceptance
 # limits (standard page 22). Z weighting is 0.0 dB at every frequency.
@@ -2981,3 +2984,253 @@ def cnossos_rail_2015_frequency_tables() -> (
 def cnossos_rail_2015_vehicles() -> dict[str, dict[str, str]]:
     """The 2015 catalogue vehicle definitions, keyed by their reference id."""
     return {row["id"]: row for row in _cnossos_rail_rows("rail_vehicles_2015.csv")}
+# CNOSSOS-EU road traffic source (Directive 2002/49/EC Annex II, Appendix F).
+# Machine-transcribed from the Official Journal text of the amending acts:
+#   * Tables F-1 and F-4 from Commission Delegated Directive (EU) 2021/1226,
+#     Annex points (19)(a) and (19)(b) (OJ L 269, 28.7.2021, pp. 96-99), which
+#     replaced the versions published in (EU) 2015/996;
+#   * Tables F-2 and F-3 from Commission Directive (EU) 2015/996 Appendix F
+#     (OJ L 168, 1.7.2015, p. 125), never amended;
+#   * the octave-band A-weighting of 2.5.5 as amended by (EU) 2021/1226 Annex
+#     point (8)(b) (OJ L 269, 28.7.2021, p. 68).
+# Table F-4 keeps the amended layout, in which categories 4a and 4b share a
+# single "4a/4b" row.
+# ---------------------------------------------------------------------------
+CNOSSOS_ROAD_TABLE_F1: dict[str, dict[str, tuple[float, ...]]] = {
+    "1": {
+        "AR": (83.1, 89.2, 87.7, 93.1, 100.1, 96.7, 86.8, 76.2),
+        "BR": (30.0, 41.5, 38.9, 25.7, 32.5, 37.2, 39.0, 40.0),
+        "AP": (97.9, 92.5, 90.7, 87.2, 84.7, 88.0, 84.4, 77.1),
+        "BP": (-1.3, 7.2, 7.7, 8.0, 8.0, 8.0, 8.0, 8.0),
+    },
+    "2": {
+        "AR": (88.7, 93.2, 95.7, 100.9, 101.7, 95.1, 87.8, 83.6),
+        "BR": (30.0, 35.8, 32.6, 23.8, 30.1, 36.2, 38.3, 40.1),
+        "AP": (105.5, 100.2, 100.5, 98.7, 101.0, 97.8, 91.2, 85.0),
+        "BP": (-1.9, 4.7, 6.4, 6.5, 6.5, 6.5, 6.5, 6.5),
+    },
+    "3": {
+        "AR": (91.7, 96.2, 98.2, 104.9, 105.1, 98.5, 91.1, 85.6),
+        "BR": (30.0, 33.5, 31.3, 25.4, 31.8, 37.1, 38.6, 40.6),
+        "AP": (108.8, 104.2, 103.5, 102.9, 102.6, 98.5, 93.8, 87.5),
+        "BP": (0.0, 3.0, 4.6, 5.0, 5.0, 5.0, 5.0, 5.0),
+    },
+    "4a": {
+        "AR": (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+        "BR": (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+        "AP": (93.0, 93.0, 93.5, 95.3, 97.2, 100.4, 95.8, 90.9),
+        "BP": (4.2, 7.4, 9.8, 11.6, 15.7, 18.9, 20.3, 20.6),
+    },
+    "4b": {
+        "AR": (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+        "BR": (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+        "AP": (99.9, 101.9, 96.7, 94.4, 95.2, 94.7, 92.1, 88.6),
+        "BP": (3.2, 5.9, 11.9, 11.6, 11.5, 12.6, 11.1, 12.0),
+    },
+}
+
+CNOSSOS_ROAD_TABLE_F2: dict[str, tuple[float, ...]] = {
+    "ai": (0.0, 0.0, 0.0, 2.6, 2.9, 1.5, 2.3, 9.2),
+    "bi": (0.0, 0.0, 0.0, -3.1, -6.4, -14.0, -22.4, -11.4),
+}
+
+CNOSSOS_ROAD_TABLE_F3: dict[str, dict[int, tuple[float, float]]] = {
+    "1": {
+        1: (-4.5, 5.5),
+        2: (-4.4, 3.1),
+    },
+    "2": {
+        1: (-4.0, 9.0),
+        2: (-2.3, 6.7),
+    },
+    "3": {
+        1: (-4.0, 9.0),
+        2: (-2.3, 6.7),
+    },
+    "4a": {
+        1: (0.0, 0.0),
+        2: (0.0, 0.0),
+    },
+    "4b": {
+        1: (0.0, 0.0),
+        2: (0.0, 0.0),
+    },
+}
+
+CNOSSOS_ROAD_TABLE_F4: dict[str, dict[str, tuple[tuple[float, ...], float]]] = {
+    "reference road surface": {
+        "1": ((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0.0),
+        "2": ((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0.0),
+        "3": ((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0.0),
+        "4a/4b": ((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0.0),
+    },
+    "1-layer ZOAB": {
+        "1": ((0.0, 5.4, 4.3, 4.2, -1.0, -3.2, -2.6, 0.8), -6.5),
+        "2": ((7.9, 4.3, 5.3, -0.4, -5.2, -4.6, -3.0, -1.4), 0.2),
+        "3": ((9.3, 5.0, 5.5, -0.4, -5.2, -4.6, -3.0, -1.4), 0.2),
+        "4a/4b": ((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0.0),
+    },
+    "2-layer ZOAB": {
+        "1": ((1.6, 4.0, 0.3, -3.0, -4.0, -6.2, -4.8, -2.0), -3.0),
+        "2": ((7.3, 2.0, -0.3, -5.2, -6.1, -6.0, -4.4, -3.5), 4.7),
+        "3": ((8.3, 2.2, -0.4, -5.2, -6.2, -6.1, -4.5, -3.5), 4.7),
+        "4a/4b": ((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0.0),
+    },
+    "2-layer ZOAB (fine)": {
+        "1": ((-1.0, 3.0, -1.5, -5.3, -6.3, -8.5, -5.3, -2.4), -0.1),
+        "2": ((7.9, 0.1, -1.9, -5.9, -6.1, -6.8, -4.9, -3.8), -0.8),
+        "3": ((9.4, 0.2, -1.9, -5.9, -6.1, -6.7, -4.8, -3.8), -0.9),
+        "4a/4b": ((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0.0),
+    },
+    "SMA-NL5": {
+        "1": ((10.3, -0.9, 0.9, 1.8, -1.8, -2.7, -2.0, -1.3), -1.6),
+        "2": ((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0.0),
+        "3": ((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0.0),
+        "4a/4b": ((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0.0),
+    },
+    "SMA-NL8": {
+        "1": ((6.0, 0.3, 0.3, 0.0, -0.6, -1.2, -0.7, -0.7), -1.4),
+        "2": ((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0.0),
+        "3": ((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0.0),
+        "4a/4b": ((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0.0),
+    },
+    "brushed down concrete": {
+        "1": ((8.2, -0.4, 2.8, 2.7, 2.5, 0.8, -0.3, -0.1), 1.4),
+        "2": ((0.3, 4.5, 2.5, -0.2, -0.1, -0.5, -0.9, -0.8), 5.0),
+        "3": ((0.2, 5.3, 2.5, -0.2, -0.1, -0.6, -1.0, -0.9), 5.5),
+        "4a/4b": ((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0.0),
+    },
+    "optimised brushed down concrete": {
+        "1": ((-0.2, -0.7, 1.4, 1.2, 1.1, -1.6, -2.0, -1.8), 1.0),
+        "2": ((-0.7, 3.0, -2.0, -1.4, -1.8, -2.7, -2.0, -1.9), -6.6),
+        "3": ((-0.5, 4.2, -1.9, -1.3, -1.7, -2.5, -1.8, -1.8), -6.6),
+        "4a/4b": ((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0.0),
+    },
+    "fine broomed concrete": {
+        "1": ((8.0, -0.7, 4.8, 2.2, 1.2, 2.6, 1.5, -0.6), 7.6),
+        "2": ((0.2, 8.6, 7.1, 3.2, 3.6, 3.1, 0.7, 0.1), 3.2),
+        "3": ((0.1, 9.8, 7.4, 3.2, 3.1, 2.4, 0.4, 0.0), 2.0),
+        "4a/4b": ((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0.0),
+    },
+    "worked surface": {
+        "1": ((8.3, 2.3, 5.1, 4.8, 4.1, 0.1, -1.0, -0.8), -0.3),
+        "2": ((0.1, 6.3, 5.8, 1.8, -0.6, -2.0, -1.8, -1.6), 1.7),
+        "3": ((0.0, 7.4, 6.2, 1.8, -0.7, -2.1, -1.9, -1.7), 1.4),
+        "4a/4b": ((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0.0),
+    },
+    "hard elements in herringbone": {
+        "1": ((27.0, 16.2, 14.7, 6.1, 3.0, -1.0, 1.2, 4.5), 2.5),
+        "2": ((29.5, 20.0, 17.6, 8.0, 6.2, -1.0, 3.1, 5.2), 2.5),
+        "3": ((29.4, 21.2, 18.2, 8.4, 5.6, -1.0, 3.0, 5.8), 2.5),
+        "4a/4b": ((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0.0),
+    },
+    "hard elements not in herringbone": {
+        "1": ((31.4, 19.7, 16.8, 8.4, 7.2, 3.3, 7.8, 9.1), 2.9),
+        "2": ((34.0, 23.6, 19.8, 10.5, 11.7, 8.2, 12.2, 10.0), 2.9),
+        "3": ((33.8, 24.7, 20.4, 10.9, 10.9, 6.8, 12.0, 10.8), 2.9),
+        "4a/4b": ((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0.0),
+    },
+    "quiet hard elements": {
+        "1": ((26.8, 13.7, 11.9, 3.9, -1.8, -5.8, -2.7, 0.2), -1.7),
+        "2": ((9.2, 5.7, 4.8, 2.3, 4.4, 5.1, 5.4, 0.9), 0.0),
+        "3": ((9.1, 6.6, 5.2, 2.6, 3.9, 3.9, 5.2, 1.1), 0.0),
+        "4a/4b": ((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0.0),
+    },
+    "thin layer A": {
+        "1": ((10.4, 0.7, -0.6, -1.2, -3.0, -4.8, -3.4, -1.4), -2.9),
+        "2": ((13.8, 5.4, 3.9, -0.4, -1.8, -2.1, -0.7, -0.2), 0.5),
+        "3": ((14.1, 6.1, 4.1, -0.4, -1.8, -2.1, -0.7, -0.2), 0.3),
+        "4a/4b": ((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0.0),
+    },
+    "thin layer B": {
+        "1": ((6.8, -1.2, -1.2, -0.3, -4.9, -7.0, -4.8, -3.2), -1.8),
+        "2": ((13.8, 5.4, 3.9, -0.4, -1.8, -2.1, -0.7, -0.2), 0.5),
+        "3": ((14.1, 6.1, 4.1, -0.4, -1.8, -2.1, -0.7, -0.2), 0.3),
+        "4a/4b": ((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0.0),
+    },
+}
+
+CNOSSOS_A_WEIGHTING_TABLE: tuple[float, ...] = (-26.2, -16.1, -8.6, -3.2, 0.0, 1.2, 1.0, -1.1)
+
+# Validity speed ranges printed in the two leading columns of Table F-4, in
+# km/h; the reference road surface carries none. Same instrument as
+# CNOSSOS_ROAD_TABLE_F4.
+CNOSSOS_ROAD_TABLE_F4_SPEED_RANGE: dict[str, tuple[float, float] | None] = {
+    "reference road surface": None,
+    "1-layer ZOAB": (50.0, 130.0),
+    "2-layer ZOAB": (50.0, 130.0),
+    "2-layer ZOAB (fine)": (80.0, 130.0),
+    "SMA-NL5": (40.0, 80.0),
+    "SMA-NL8": (40.0, 80.0),
+    "brushed down concrete": (70.0, 120.0),
+    "optimised brushed down concrete": (70.0, 80.0),
+    "fine broomed concrete": (70.0, 120.0),
+    "worked surface": (50.0, 130.0),
+    "hard elements in herringbone": (30.0, 60.0),
+    "hard elements not in herringbone": (30.0, 60.0),
+    "quiet hard elements": (30.0, 60.0),
+    "thin layer A": (40.0, 130.0),
+    "thin layer B": (40.0, 130.0),
+}
+
+# Air-temperature coefficients K_m of formula (2.2.10), in dB per degree
+# Celsius: "a generic coefficient Km=1 = 0,08 dB/degC for light vehicles
+# (category 1) and Km=2 = Km=3 = 0,04 dB/degC for heavy vehicles (categories 2
+# and 3)" (Directive (EU) 2015/996, Annex II 2.2.3, unamended). The powered
+# two-wheelers of category 4 have no rolling noise, so the Directive prints no
+# K_m for them and the correction is identically zero.
+CNOSSOS_ROAD_TEMPERATURE_K: dict[str, float] = {
+    "1": 0.08, "2": 0.04, "3": 0.04, "4a": 0.0, "4b": 0.0,
+}
+
+#: The octave bands of the road source, as column names of the committed CSVs.
+CNOSSOS_ROAD_BANDS: tuple[str, ...] = (
+    "63", "125", "250", "500", "1000", "2000", "4000", "8000",
+)
+
+
+def _cnossos_road_rows(name: str) -> list[dict[str, str]]:
+    """Rows of one committed CSV under ``tests/data/cnossos/``."""
+    with (_DATA / "cnossos" / name).open(newline="", encoding="utf-8") as handle:
+        return list(csv.DictReader(handle))
+
+
+def cnossos_road_workbook_cases() -> list[dict[str, str]]:
+    """The 60 committed cases of the CIRCABC road emission test workbook.
+
+    Each row carries the segment description (surface, temperature, studded
+    season, gradient, junction and the flow and speed of the five vehicle
+    categories) and the workbook's own per-band and total line-power levels.
+    See ``tests/data/cnossos/README.md`` for the provenance.
+    """
+    return _cnossos_road_rows("road_emission_cases.csv")
+
+
+def cnossos_road_2015_coefficients() -> dict[str, dict[str, tuple[float, ...]]]:
+    """Table F-1 as published in (EU) 2015/996, keyed by category then ``AR``,
+    ``BR``, ``AP``, ``BP``. This is the superseded database the workbook was
+    computed with, not the one the library ships."""
+    table: dict[str, dict[str, tuple[float, ...]]] = {}
+    for row in _cnossos_road_rows("road_coefficients_2015.csv"):
+        table.setdefault(row["category"], {})[row["coefficient"]] = tuple(
+            float(row[band]) for band in CNOSSOS_ROAD_BANDS
+        )
+    return table
+
+
+def cnossos_road_2015_surfaces() -> dict[
+    str, tuple[str, dict[str, tuple[float, ...]], dict[str, float]]
+]:
+    """Table F-4 as published in (EU) 2015/996, keyed by the ``NLxx`` surface
+    identifier the workbook uses: ``(description, alpha, beta)``."""
+    names: dict[str, str] = {}
+    alpha: dict[str, dict[str, tuple[float, ...]]] = {}
+    beta: dict[str, dict[str, float]] = {}
+    for row in _cnossos_road_rows("road_surfaces_2015.csv"):
+        surface = row["surface"]
+        names[surface] = row["description"]
+        alpha.setdefault(surface, {})[row["category"]] = tuple(
+            float(row[band]) for band in CNOSSOS_ROAD_BANDS
+        )
+        beta.setdefault(surface, {})[row["category"]] = float(row["beta"])
+    return {s: (names[s], alpha[s], beta[s]) for s in names}
