@@ -897,6 +897,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- The test suite runs in about half the wall time. The report generator
+  tests render each example fiche exactly once and assert its PDF and WebP
+  preview on the same run instead of regenerating the full set twice, the
+  conformance checks compute once per test process through a memoized
+  registry, the expensive FDTD, elastic-wave and ECMA reference fixtures are
+  computed once and shared across xdist workers via load groups, and the
+  heaviest modules dispatch first. No test was removed, no signal shortened
+  and no tolerance or oracle touched; coverage is line-for-line identical.
+
 - The eleven documentation clips still encoded as VP9 are now AV1, which is
   what the other fifteen had already moved to, so all 104 WebM files finally
   share one codec. Their 44 files come down from 20.1 MB to 15.5 MB, 23 %
