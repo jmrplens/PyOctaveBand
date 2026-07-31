@@ -26,7 +26,7 @@ from __future__ import annotations
 
 import argparse
 import os
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from typing import Any
 
 import numpy as np
@@ -3351,15 +3351,20 @@ def _write_preview(pdf_path: str) -> str:
     return preview
 
 
-def generate_reports(output_dir: str) -> list[str]:
+def generate_reports(
+    output_dir: str,
+    examples: Sequence[Callable[[], tuple[object, ReportMetadata, str]]] | None = None,
+) -> list[str]:
     """Write every example fiche (PDF + WebP preview) into ``output_dir``.
 
-    Returns the PDF paths written; each has a paired ``.webp`` preview next to
-    it (see :func:`preview_path_for`).
+    ``examples`` restricts the run to a subset of the registered factories
+    (the test suite renders one fiche per test); the default renders the
+    full registry. Returns the PDF paths written; each has a paired
+    ``.webp`` preview next to it (see :func:`preview_path_for`).
     """
     os.makedirs(output_dir, exist_ok=True)
     written: list[str] = []
-    for factory in _EXAMPLES:
+    for factory in _EXAMPLES if examples is None else examples:
         result, metadata, name = factory()
         path = os.path.join(output_dir, name)
         result.report(path, metadata=metadata)  # type: ignore[attr-defined]
