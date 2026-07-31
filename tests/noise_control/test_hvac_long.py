@@ -454,7 +454,10 @@ def test_diffuser_sound_power_reproduces_the_table_14_9_row() -> None:
     ``312 / (60 x 4 ft2) = 1.3 ft/s``, so the peak frequency
     ``f_P = 48.8 U_G`` falls in the 63 Hz octave and the spectrum decays from
     there by the Eq. 13.31 shape. The sheet floors its own rows at 0 dB, so
-    only the six bands that carry a level are compared.
+    only the six bands that carry a level are compared. Agreement is better
+    than 1 dB in five of those six (+0.4/+0.4/+0.2/+0.7/+0.9 dB from 63 Hz to
+    1 kHz); the 2 kHz band is +1.9 dB, which is why the two assertions below
+    carry different tolerances.
     """
     res = hvac.diffuser_sound_power(
         None, (24.0 * _IN) ** 2, 312.0 * _CFM, 0.05 * _IN_WG

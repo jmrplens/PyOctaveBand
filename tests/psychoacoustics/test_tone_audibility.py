@@ -333,16 +333,81 @@ def test_combined_tone_level_single_tone_equals_tone_level() -> None:
     assert fg == pytest.approx(lt)
 
 
+def _e1_line_energy(indices: list[int]) -> float:
+    """Hanning-corrected energy sum of the Table E.1 lines at *indices*.
+
+    Computed here from the printed narrow-band levels with plain arithmetic,
+    so the expectations below do not come from the code under test.
+    """
+    total = sum(10.0 ** (ref.ISO20065_E1_LEVELS[i] / 10.0) for i in indices)
+    return 10.0 * math.log10(total) - 10.0 * math.log10(HANNING_BANDWIDTH_FACTOR)
+
+
+def test_combined_tone_level_counts_a_shared_line_once() -> None:
+    """Formula (17) with Anmerkung 2: overlapping tonal runs share their lines.
+
+    The Annex E "2 FG" oracle cannot test this. Its three tones at
+    118.4 / 137.3 / 158.8 Hz occupy the disjoint line runs 115.7-121.1,
+    129.2-140.0 and 156.1-161.5 Hz, so counting every line once and summing
+    the three tone levels outright give the same 72.15 dB: the printed value
+    does not discriminate the deduplication from a plain union sum.
+
+    These two cases do. Both pairs lie inside the same committed Table E.1
+    spectrum, and the expected values are built from the printed line levels
+    rather than from ``combined_tone_level``.
+    """
+    lev, freq = ref.ISO20065_E1_LEVELS, ref.ISO20065_E1_FREQUENCIES
+    ls = ref.ISO20065_E1_LS
+
+    # (a) Identical runs. 134.6 Hz and 137.3 Hz both sit inside the run
+    # 129.2-140.0 Hz (Table E.1 indices 12-16), so the union IS that run and
+    # the combined level must equal the single-tone level of Formula (8)
+    # exactly -- not approximately, since the same lines are summed.
+    same_run = _e1_line_energy([12, 13, 14, 15, 16])
+    fg_same = combined_tone_level(lev, freq, [134.6, 137.3], [ls, ls])
+    assert fg_same == pytest.approx(same_run, abs=1e-12)
+    assert fg_same == tone_level(lev, freq, 137.3, ls)
+    # An implementation that summed the two tone levels instead would land
+    # 10 lg 2 = 3.01 dB higher; assert that the gap is real and its exact size.
+    naive_same = energy_sum_level(
+        [tone_level(lev, freq, 134.6, ls), tone_level(lev, freq, 137.3, ls)],
+        effective_bandwidth_factor=1.0,
+    )
+    assert naive_same - fg_same == pytest.approx(10.0 * math.log10(2.0), abs=1e-9)
+
+    # (b) Nested runs. At 156.1 Hz the run is 156.1-164.2 Hz (indices 22-25)
+    # and at 158.8 Hz it is 156.1-161.5 Hz (indices 22-24), the second strictly
+    # inside the first, so the union is the wider run alone.
+    nested = _e1_line_energy([22, 23, 24, 25])
+    fg_nested = combined_tone_level(lev, freq, [156.1, 158.8], [ls, ls])
+    assert fg_nested == pytest.approx(nested, abs=1e-12)
+    assert fg_nested == tone_level(lev, freq, 156.1, ls)
+    naive_nested = energy_sum_level(
+        [tone_level(lev, freq, 156.1, ls), tone_level(lev, freq, 158.8, ls)],
+        effective_bandwidth_factor=1.0,
+    )
+    assert naive_nested - fg_nested == pytest.approx(2.9104, abs=1e-3)
+    assert naive_nested > fg_nested
+
+
 def test_combined_tone_level_no_double_counting() -> None:
-    # Two tones whose line runs overlap must not sum a shared line twice, so the
-    # combined level cannot exceed the plain energy sum of the union of lines.
+    # Regression guard on the ordering of the deduplicated sum: the combined
+    # level of a pair whose runs overlap can never exceed the plain sum of the
+    # two tone levels, and can never fall below the louder of them.
     fg = combined_tone_level(
         ref.ISO20065_E1_LEVELS,
         ref.ISO20065_E1_FREQUENCIES,
         [134.6, 137.3],  # adjacent tones sharing lines
         [49.22, 49.22],
     )
+    singles = [
+        tone_level(ref.ISO20065_E1_LEVELS, ref.ISO20065_E1_FREQUENCIES, f, 49.22)
+        for f in (134.6, 137.3)
+    ]
     assert np.isfinite(fg)
+    assert max(singles) <= fg <= energy_sum_level(
+        singles, effective_bandwidth_factor=1.0
+    )
 
 
 def test_combined_tone_level_rejects_length_mismatch() -> None:

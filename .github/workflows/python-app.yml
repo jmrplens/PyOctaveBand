@@ -146,6 +146,31 @@ jobs:
     - name: Check the transplanted conformance and errata pages
       run: python scripts/generate_site_reports.py --check
 
+  # Evidence gate for docs/ERRATA.md. Each entry there is a permanent public
+  # statement that a named body or author printed something wrong, so it must
+  # cite a render of the page it quotes rather than an extraction: PDF text
+  # layers delete radicals and minus signs silently, and one entry was
+  # published on an extraction that had eaten a square root. The same script
+  # flags any multiplicative claim whose ratio sits on sqrt(2), sqrt(3), pi,
+  # 2 pi, 1/sqrt(2), ln 2 or a small integer, which is the signature of a lost
+  # glyph. See scripts/check_errata_evidence.py and CONTRIBUTING.md.
+  errata-evidence:
+    name: Errata entries cite a page render
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v7
+      with:
+        python-version: "3.13"
+    # Stdlib-only checker: it reads docs/ERRATA.md and nothing else.
+    - name: Check the errata evidence
+      run: python scripts/check_errata_evidence.py
+
   # Coverage gate for the curated quick table in docs/api-reference.md: every
   # phonometry.__all__ name must have a table row (extra rows such as methods
   # or namespace entries are fine). See scripts/check_api_reference.py.
