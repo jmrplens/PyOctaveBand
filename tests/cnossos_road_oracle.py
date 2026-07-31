@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """The (EU) 2015/996 Appendix F database, wrapped once for both readers.
 
 ``tests/reference_data.py`` deliberately imports nothing from the library: it

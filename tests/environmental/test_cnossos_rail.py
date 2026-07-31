@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """CNOSSOS-EU railway source emission (Directive 2002/49/EC Annex II, 2.3).
 
 Three kinds of assertion, kept deliberately separate because they carry very

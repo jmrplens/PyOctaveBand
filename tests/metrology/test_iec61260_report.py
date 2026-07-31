@@ -101,7 +101,7 @@ def test_full_metadata_renders_one_page(tmp_path) -> None:
         measurement_standard="IEC 61260-1:2014",
         test_date="2026-07-20",
         laboratory="Phonometry Reference Laboratory",
-        operator="J. M. Requena-Plens",
+        operator="Jose Manuel Requena Plens",
         report_id="PHN-2026-61260",
         required_class=1,
     )

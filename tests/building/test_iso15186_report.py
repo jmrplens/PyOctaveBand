@@ -116,7 +116,7 @@ def test_full_metadata_and_verbose_render_one_page(tmp_path) -> None:
         measurement_standard="ISO 15186-1",
         test_date="2026-07-21",
         laboratory="Phonometry Reference Laboratory",
-        operator="J. M. Requena-Plens",
+        operator="Jose Manuel Requena Plens",
         report_id="PHN-2026-0150",
         requirement=25.0,
     )

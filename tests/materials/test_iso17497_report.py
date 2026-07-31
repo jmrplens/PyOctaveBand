@@ -111,7 +111,7 @@ def _metadata(**overrides) -> ReportMetadata:
         "pressure": 101.0,
         "test_date": "2026-07-21",
         "laboratory": "Phonometry Reference Laboratory",
-        "operator": "J. M. Requena-Plens",
+        "operator": "Jose Manuel Requena Plens",
         "report_id": "PHN-2026-17497",
     }
     base.update(overrides)

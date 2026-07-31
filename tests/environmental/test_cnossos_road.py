@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the CNOSSOS-EU road traffic source (Annex II 2.2 + Appendix F).
 
 Two independent kinds of oracle are used, and they are kept strictly apart.

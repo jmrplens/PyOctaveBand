@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Report what a PDF's text layer is silently deleting.
 
 A contributor tool, not a CI gate. Run it over a source document *before*

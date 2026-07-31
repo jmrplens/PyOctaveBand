@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the heavy and soft impact sources (rubber ball and bang machine).
 
 Every expected value below is transcribed from a primary printed source, with

@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the resilient-layer prediction chain.
 
 Sources and page references used as oracles below (printed page / pdf page):

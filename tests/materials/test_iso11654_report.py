@@ -184,7 +184,7 @@ def _full_metadata(**overrides) -> ReportMetadata:
         "relative_humidity": 54.0,
         "pressure": 101.0,
         "laboratory": "Phonometry Reference Laboratory",
-        "operator": "J. M. Requena-Plens",
+        "operator": "Jose Manuel Requena Plens",
         "report_id": "PHN-2026-11654",
     }
     base.update(overrides)

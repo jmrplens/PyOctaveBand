@@ -1,4 +1,4 @@
-#  Copyright (c) 2026. Jose M. Requena-Plens
+#  Copyright (c) 2026. Jose Manuel Requena Plens
 """Tests for the suspended-ceiling plenum flanking path.
 
 Oracles, with the source reference in each test docstring:
