@@ -897,6 +897,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Three ways of shading a region against the page colour had grown up side by
+  side in `_plot`. `theme_fill` mixes the page towards the hue until it sits a
+  fixed CIEDE2000 distance away, which is the one the rest of the renderers
+  use; the IEC 61043 pass region instead branched on a hand-computed luminance
+  and picked one of two hard-coded greens, and the IEC 61260-1 pass corridor
+  had never been migrated at all and still asked for `alpha=0.18`. Both now
+  call `theme_fill`, so a single rule decides every themed fill and the two
+  pass regions finally agree on a colour. Only the four `intensity_class`
+  figures move; the filter-class corridor appears in no committed figure, and
+  the fiche it is embedded in renders the same as before. The corridor being
+  opaque also removes the alpha that the fiche pipeline is not guaranteed to
+  carry, which is the reason the pass region had been given opaque tones in the
+  first place.
 - Twenty-nine comments in the Spanish guides wrote a value the code prints with
   a decimal comma, so the page promised `132,4 Hz` where running the snippet
   gives `132.4`. Python has no locale in `print`, and the comment next to a
