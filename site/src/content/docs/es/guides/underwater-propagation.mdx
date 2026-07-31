@@ -268,7 +268,7 @@ from phonometry import underwater
 b = underwater.weston_regime_boundaries(250.0, 50.0, seabed="sand")
 print(b.cylindrical_to_mode_stripping)   # r_CS, en metros
 print(b.cutoff_frequency, b.mode_count)  # la propagación guiada exige f > f_c
-print(underwater.reflection_loss_gradient("sand"))   # 0,278 Np/rad
+print(underwater.reflection_loss_gradient("sand"))   # 0.278 Np/rad
 ```
 
 Al ser un resultado *incoherente*, el flujo describe el campo promediado en
@@ -458,7 +458,7 @@ from phonometry import underwater
 phi = np.linspace(0.0, 90.0, 361)   # ángulo rasante desde la interfase, grados
 bl = underwater.bottom_reflection_loss(phi, rho1=1000.0, c1=1500.0,   # agua
                                rho2=1900.0, c2=1650.0)          # arena
-print(bl.critical_angle)            # 24,6°
+print(bl.critical_angle)            # 24.6°
 bl.plot()   # pérdida por reflexión frente al ángulo rasante
 ```
 
@@ -496,7 +496,7 @@ from phonometry import underwater
 phi = np.linspace(0.0, 90.0, 361)   # ángulo rasante desde la interfase, grados
 sr = underwater.seabed_reflection(phi, rho1=1000.0, c1=1500.0,   # agua
                           rho2=1900.0, c2=1650.0)          # arena
-print(sr.magnitude[-1])             # 0,353 = |R| en incidencia normal
+print(sr.magnitude[-1])             # 0.353 = |R| en incidencia normal
 sr.plot()   # |R| frente al ángulo rasante (necesita matplotlib)
 ```
 

@@ -88,7 +88,7 @@ t_specimen = np.array([8.4, 8.2, 7.7, 7.2, 6.5, 5.7, 4.9, 4.2, 3.6, 3.15,
 m = materials.measure_sound_absorption(
     freqs, t_empty, t_specimen, volume=200.0, area=10.8, temperature=20.0
 )
-print(m.alpha_s[7])   # alpha_s a 500 Hz: 0,328...
+print(m.alpha_s[7])   # alpha_s a 500 Hz: 0.328...
 m.plot()              # alpha_s frente a la frecuencia en tercios de octava
 ```
 
