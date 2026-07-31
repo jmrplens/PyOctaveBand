@@ -121,6 +121,13 @@ relative_files = true
 
 [tool.pytest.ini_options]
 pythonpath = ["tests"]
+# Group-aware distribution for `-n auto` runs: tests marked with
+# `xdist_group` land on one worker, so an expensive module-scoped fixture
+# (FDTD steady states, ECMA-418-2 reference results, the memoized
+# conformance registry) is computed once per run instead of once per worker
+# that happens to pick one of its consumers. Unmarked tests are distributed
+# exactly as with the default `load` mode, and the flag is inert without `-n`.
+addopts = ["--dist=loadgroup"]
 filterwarnings = [
     "ignore:Low sampling rate:UserWarning",
 ]

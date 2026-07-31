@@ -62,6 +62,7 @@ def ref_calibration() -> EcmaFluctuationStrength:
 # --------------------------------------------------------------------------
 
 
+@pytest.mark.xdist_group("ecma-fluctuation-ref")
 def test_calibration_1khz_4hz_is_one_vacil(
     ref_calibration: EcmaFluctuationStrength,
 ) -> None:
@@ -222,6 +223,7 @@ def test_window_rejects_a_quiet_block() -> None:
 # --------------------------------------------------------------------------
 
 
+@pytest.mark.xdist_group("ecma-fluctuation-ref")
 def test_peaks_near_4hz_modulation(
     ref_calibration: EcmaFluctuationStrength,
 ) -> None:
@@ -249,6 +251,7 @@ def test_roughness_domain_modulation_scores_near_zero() -> None:
     assert f70 < 0.05
 
 
+@pytest.mark.xdist_group("ecma-fluctuation-ref")
 def test_grows_with_modulation_depth(
     ref_calibration: EcmaFluctuationStrength,
 ) -> None:
@@ -275,6 +278,7 @@ def test_silence_is_zero() -> None:
 # --------------------------------------------------------------------------
 
 
+@pytest.mark.xdist_group("ecma-fluctuation-ref")
 def test_result_structure(ref_calibration: EcmaFluctuationStrength) -> None:
     res = ref_calibration
     assert res.specific_fluctuation_strength.shape == res.bark.shape == (53,)
@@ -321,6 +325,7 @@ def test_resample_length_clamps_to_one_sample() -> None:
     assert res.fluctuation_strength == 0.0
 
 
+@pytest.mark.xdist_group("ecma-fluctuation-ref")
 def test_deterministic(ref_calibration: EcmaFluctuationStrength) -> None:
     again = fluctuation_strength_ecma(_am_tone(1000.0, 4.0, 1.0, 60.0, 5.0), FS)
     assert again.fluctuation_strength == pytest.approx(
@@ -335,6 +340,7 @@ def test_free_and_diffuse_differ() -> None:
     assert free.fluctuation_strength != diffuse.fluctuation_strength
 
 
+@pytest.mark.xdist_group("ecma-fluctuation-ref")
 def test_plot_smoke(ref_calibration: EcmaFluctuationStrength) -> None:
     import matplotlib
 
@@ -345,6 +351,7 @@ def test_plot_smoke(ref_calibration: EcmaFluctuationStrength) -> None:
     assert single is axes[0]
 
 
+@pytest.mark.xdist_group("ecma-fluctuation-ref")
 def test_plot_accepts_matplotlib_color_alias(
     ref_calibration: EcmaFluctuationStrength,
 ) -> None:

@@ -35,6 +35,7 @@ def ref_1k_40() -> EcmaLoudness:
 # --------------------------------------------------------------------------
 
 
+@pytest.mark.xdist_group("ecma-loudness-ref")
 def test_calibration_1khz_40db_is_one_sone(ref_1k_40: EcmaLoudness) -> None:
     # c_N is defined so the 1 kHz / 40 dB tone gives 1 sone_HMS. With the
     # full Clause 6.2.3 band averaging this chain computes 0.9845 sone_HMS;
@@ -89,6 +90,7 @@ def test_subthreshold_tone_is_inaudible() -> None:
     assert result.loudness < 0.01
 
 
+@pytest.mark.xdist_group("ecma-loudness-ref")
 def test_specific_loudness_peaks_near_tone(ref_1k_40: EcmaLoudness) -> None:
     peak_band = int(np.argmax(ref_1k_40.specific_loudness))
     assert ref_1k_40.centre_frequencies[peak_band] == pytest.approx(1000.0, rel=0.15)
@@ -124,6 +126,7 @@ def test_resampling_matches_native_rate() -> None:
 # --------------------------------------------------------------------------
 
 
+@pytest.mark.xdist_group("ecma-loudness-ref")
 def test_result_structure(ref_1k_40: EcmaLoudness) -> None:
     assert ref_1k_40.specific_loudness.shape == (53,)
     assert ref_1k_40.bark.shape == (53,)
@@ -152,6 +155,7 @@ def test_empty_signal() -> None:
         loudness_ecma(np.array([]), FS)
 
 
+@pytest.mark.xdist_group("ecma-loudness-ref")
 def test_plot_smoke(ref_1k_40: EcmaLoudness) -> None:
     import matplotlib
 

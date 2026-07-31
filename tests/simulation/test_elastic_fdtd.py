@@ -91,6 +91,7 @@ def _arrival(res: ElasticFDTDResult, probe: int, field: int) -> float:
     return float(res.times[1:][np.abs(res.signals[probe, field, 1:]).argmax()])
 
 
+@pytest.mark.xdist_group("elastic-body-waves")
 def test_p_wave_speed_by_time_of_flight(body_waves: ElasticFDTDResult) -> None:
     # P probes 100 and 220 cells below the source: c_P = dr / dt within 1 %
     # (measured: -0.06 %; the pulse spans ~19 cells, so grid dispersion of
@@ -100,6 +101,7 @@ def test_p_wave_speed_by_time_of_flight(body_waves: ElasticFDTDResult) -> None:
     assert c_meas == pytest.approx(CP_AL, rel=0.01)
 
 
+@pytest.mark.xdist_group("elastic-body-waves")
 def test_s_wave_speed_by_time_of_flight(body_waves: ElasticFDTDResult) -> None:
     # S probes 100 and 220 cells beside the force: c_S = dr / dt within 1 %
     # (measured: +0.02 %).
