@@ -107,7 +107,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Spanish Building Code (CTE DB-HR)](https://jmrplens.github.io/phonometry/guides/spanish-building-code/)
 - [Predicting Panel Sound Insulation (mass law, coincidence, double walls)](https://jmrplens.github.io/phonometry/guides/panel-sound-insulation/)
 - [Floor-Covering Impact Improvement (ISO 16251-1)](https://jmrplens.github.io/phonometry/guides/impact-improvement/)
-- [Predicting Resilient-Layer Performance (Coverings, Floating Floors, Linings)](https://jmrplens.github.io/phonometry/guides/resilient-layers/)
+- [Predicting Resilient-Layer Performance](https://jmrplens.github.io/phonometry/guides/resilient-layers/)
 - [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/guides/dynamic-stiffness/)
 
 ## Materials and surfaces
@@ -182,7 +182,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [CNOSSOS-EU road traffic source emission](https://jmrplens.github.io/phonometry/guides/cnossos-road-emission/)
 - [Detailed Per-Band Prediction (ISO 12354)](https://jmrplens.github.io/phonometry/guides/detailed-prediction/)
 - [Duct-borne noise: fan to room](https://jmrplens.github.io/phonometry/guides/duct-path/)
-- [Heavy and Soft Impact Sources (ISO 16283-2, JIS A 1418-2, ISO 717-2 Annex D)](https://jmrplens.github.io/phonometry/guides/heavy-impact-sources/)
+- [Heavy and Soft Impact Sources (ISO 16283-2)](https://jmrplens.github.io/phonometry/guides/heavy-impact-sources/)
 - [Room to room: partition, receiving room, criterion](https://jmrplens.github.io/phonometry/guides/room-to-room/)
 
 ## Theory and reference

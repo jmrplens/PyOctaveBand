@@ -7,7 +7,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 <!-- source: docs/heavy-impact-sources.md | canonical: https://jmrplens.github.io/phonometry/guides/heavy-impact-sources/ -->
 Source: https://jmrplens.github.io/phonometry/guides/heavy-impact-sources/
 
-# Heavy and Soft Impact Sources (ISO 16283-2, JIS A 1418-2, ISO 717-2 Annex D)
+# Heavy and Soft Impact Sources (ISO 16283-2)
 
 The ISO tapping machine is a *light* impact source. Its five 500 g hammers fall
 40 mm and produce a hard, quasi-stationary excitation whose energy sits well

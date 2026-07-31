@@ -897,6 +897,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Nothing in the pull-request pipeline built the documentation site, so a page
+  could break the deploy while its pull request showed twenty-six green checks.
+  The site build lived in a workflow triggered only by a push to `main`, which
+  meant the Astro build, the HTML validation, the formula render check and the
+  accessibility audit all ran for the first time after the merge. A repeated
+  word in an import statement kept the site from deploying for fifteen hours
+  across five merges, and the three over-long page titles that surfaced once
+  the build came back had ridden in the same way. The build job now also runs
+  on pull requests against `main`, on the same paths that trigger the deploy;
+  publishing and the IndexNow submission stay reserved for `main`, and a
+  pull-request run no longer shares the deploy's concurrency queue, so it
+  cannot cancel a deployment that is already publishing.
+- Three documentation pages carried a `<title>` longer than the 70 characters
+  `html-validate` allows once the site name is appended, which is what left the
+  deploy red. The resilient-layer guide now takes the shorter name it was
+  already linked by everywhere else, and the heavy-impact guide names ISO
+  16283-2 alone in its title, with JIS A 1418-2 kept in the description and the
+  body. The English heavy-impact title had been sitting at exactly the limit.
 - The Spanish building-code guide had lost six of its sections, in both
   languages, since the day a display formula was written with its `$$` on the
   same line as the first term. Nothing complained: KaTeX does not fail a build
