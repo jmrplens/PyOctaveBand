@@ -101,6 +101,62 @@ function delimiterProblems(sourceDirs) {
   return problems;
 }
 
+/**
+ * The shipped stylesheet must be the one that matches the renderer.
+ *
+ * Two different copies of KaTeX decide how a formula looks. `rehype-katex`
+ * writes the markup using the katex it depends on, while the site imports
+ * `katex/dist/katex.min.css` from its own katex dependency, and nothing ties
+ * the two versions together. They drifted: the site served 0.18 CSS over 0.16
+ * markup, and the class names for the base box and the strut were renamed
+ * between those lines. Every formula on the site therefore rendered with no
+ * `white-space: nowrap` on its base box and no struts setting its line height,
+ * free to wrap in the middle of an expression.
+ *
+ * Nothing caught it, because each half was valid on its own: the markup parsed,
+ * the stylesheet loaded, the pages validated. The mismatch only exists in the
+ * relationship between them, so that is what this checks. For each class KaTeX
+ * renamed, take the spelling the built markup actually uses and require the
+ * built CSS to carry a rule for that exact spelling.
+ */
+function stylesheetMismatch(distDir) {
+  // Renamed in KaTeX 0.18: `.katex .base` -> `.katex-base`, likewise the strut.
+  const RENAMED = [
+    { html: 'base', legacy: '.katex .base', current: '.katex-base' },
+    { html: 'strut', legacy: '.katex .strut', current: '.katex-strut' },
+  ];
+  const page = walk(distDir, ['.html']).find((file) =>
+    readFileSync(file, 'utf8').includes('class="katex"'),
+  );
+  // No rendered formula anywhere means there is no relationship to check.
+  if (!page) return [];
+  const html = readFileSync(page, 'utf8');
+  const css = walk(distDir, ['.css'])
+    .map((file) => readFileSync(file, 'utf8'))
+    .join('\n');
+
+  const mismatches = [];
+  for (const { html: name, legacy, current } of RENAMED) {
+    const usesLegacy = html.includes(`class="${name}"`);
+    const usesCurrent = html.includes(`class="katex-${name}"`);
+    if (!usesLegacy && !usesCurrent) continue;
+    const wanted = usesCurrent ? current : legacy;
+    // `.katex-base` is a substring of nothing in the legacy sheet and
+    // `.katex .base` of nothing in the current one, so a plain search
+    // discriminates the two spellings even after minification.
+    if (css.includes(wanted)) continue;
+    mismatches.push({
+      page: relative(REPO, page),
+      emitted: usesCurrent ? `katex-${name}` : name,
+      wanted,
+      served: css.includes(usesCurrent ? legacy : current)
+        ? `the other spelling, ${usesCurrent ? legacy : current}`
+        : 'no rule at all',
+    });
+  }
+  return mismatches;
+}
+
 const args = process.argv.slice(2);
 const distArg = args.indexOf('--dist');
 const distDir = resolve(SITE, distArg === -1 ? 'dist' : args[distArg + 1]);
@@ -108,9 +164,13 @@ const sourceDirs = [join(REPO, 'docs'), join(SITE, 'src', 'content')];
 
 const failures = renderFailures(distDir);
 const problems = delimiterProblems(sourceDirs);
+const mismatches = stylesheetMismatch(distDir);
 
-if (failures.length === 0 && problems.length === 0) {
-  console.log('Math renders: no KaTeX parse errors in the build, no stray display delimiters.');
+if (failures.length === 0 && problems.length === 0 && mismatches.length === 0) {
+  console.log(
+    'Math renders: no KaTeX parse errors in the build, no stray display\n' +
+      'delimiters, and the stylesheet matches the markup the renderer emits.',
+  );
   process.exit(0);
 }
 
@@ -133,6 +193,21 @@ if (problems.length > 0) {
   );
   for (const problem of problems) {
     console.error(`  ${problem.file}:${problem.line}: ${problem.text}`);
+  }
+}
+
+if (mismatches.length > 0) {
+  console.error(
+    '\nThe KaTeX stylesheet does not match the markup the renderer emits.\n' +
+      'Every formula on the site is missing the rules for the classes below.\n' +
+      "Align `katex` in site/package.json with the version `rehype-katex`\n" +
+      'resolves (`node -e \'require.resolve("katex", {paths: [require.resolve("rehype-katex")]})\'`):\n',
+  );
+  for (const mismatch of mismatches) {
+    console.error(
+      `  ${mismatch.page}: markup emits class="${mismatch.emitted}", ` +
+        `stylesheet has ${mismatch.served} (wanted \`${mismatch.wanted}\`)`,
+    );
   }
 }
 

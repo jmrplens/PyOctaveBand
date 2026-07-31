@@ -897,6 +897,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Every formula on the site was rendering under a stylesheet written for a
+  different version of KaTeX. Two copies decide how a formula looks: the one
+  `rehype-katex` renders with, and the one the site imports
+  `katex/dist/katex.min.css` from, and nothing tied the two together. The site
+  had reached `katex` 0.18.1 while `rehype-katex` still resolves 0.16.47, and
+  0.18 renamed the classes on the base box and the strut. So the markup asked
+  for `.katex .base` and `.katex .strut` and the stylesheet defined
+  `.katex-base` and `.katex-strut`: the base box lost `white-space: nowrap`,
+  `display: inline-block` and `position: relative`, and the struts that set the
+  line height stopped laying out at all. Measured on the resilient-layer guide,
+  a display block came out 142.9 px tall instead of 130.5, and inline formulas
+  broke across lines in the middle of an expression, splitting `0.886` from its
+  `m/s`. The dependency now follows the line `rehype-katex` resolves, and
+  `check-math-render.mjs` gained a third check that compares the classes the
+  built markup emits against the classes the built stylesheet defines, so the
+  two cannot drift apart again unnoticed. Neither half was invalid on its own,
+  which is why nothing complained for as long as it did.
 - Nothing in the pull-request pipeline built the documentation site, so a page
   could break the deploy while its pull request showed twenty-six green checks.
   The site build lived in a workflow triggered only by a push to `main`, which
