@@ -30,6 +30,7 @@ Design goals: deterministic, fast (< 1 min), no network, pure library calls.
 from __future__ import annotations
 
 import cmath
+import functools
 import json
 import math
 import pathlib
@@ -94,7 +95,10 @@ def register(domain: str, standard: str, quantity: str) -> Callable[
     """Register a check callable under a domain / standard / quantity."""
 
     def deco(fn: Callable[[], Outcome]) -> Callable[[], Outcome]:
-        CHECKS.append(Check(domain, standard, quantity, fn))
+        # Checks are deterministic and argument-free, so the outcome is
+        # cached per process: rendering the full report and re-running an
+        # individual check in the same process computes the check once.
+        CHECKS.append(Check(domain, standard, quantity, functools.cache(fn)))
         return fn
 
     return deco
