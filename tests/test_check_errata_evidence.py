@@ -191,11 +191,36 @@ def test_a_blank_allowlist_reason_is_rejected(monkeypatch: pytest.MonkeyPatch) -
     Every other check passes for a whitespace-only reason: the title is real,
     the entry cites no render, and nothing compares the value. That is the
     whole point of the allowlist, so it has to be the one thing that fails.
+
+    The fixture is local rather than borrowed from the shipped allowlist,
+    which is meant to shrink and may legitimately end up empty.
     """
-    markdown = cee.REGISTRY.read_text(encoding="utf-8")
-    entries = cee.parse_entries(markdown)
-    excused = next(iter(cee.RENDER_ALLOWLIST))
-    monkeypatch.setitem(cee.RENDER_ALLOWLIST, excused, "   ")
+    markdown = """
+## Probe standard, Clause 1
+
+- **The problem:** the printed coefficient cannot be right.
+- **Evidence:** a recomputation, not a character reading.
+- **Status:** unreported.
+"""
+    entries = _entries(markdown)
+    title = entries[0].title
+    monkeypatch.setattr(cee, "RENDER_ALLOWLIST", {title: "   "})
     problems = cee.check_allowlist(entries)
     assert any("blank reason" in problem for problem in problems), problems
-    assert any(excused in problem for problem in problems), problems
+    assert any(title in problem for problem in problems), problems
+
+
+def test_a_stated_allowlist_reason_passes(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The same entry with a real reason raises nothing."""
+    markdown = """
+## Probe standard, Clause 1
+
+- **The problem:** the printed coefficient cannot be right.
+- **Evidence:** a recomputation, not a character reading.
+- **Status:** unreported.
+"""
+    entries = _entries(markdown)
+    monkeypatch.setattr(
+        cee, "RENDER_ALLOWLIST", {entries[0].title: "the claim is a recomputation"}
+    )
+    assert cee.check_allowlist(entries) == []
