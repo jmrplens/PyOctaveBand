@@ -17,8 +17,8 @@
     "lighthouse": "node scripts/lighthouse-audit.mjs"
   },
   "dependencies": {
-    "@astrojs/starlight": "^0.41.4",
-    "astro": "^7.1.4",
+    "@astrojs/starlight": "^0.41.5",
+    "astro": "^7.1.6",
     "katex": "^0.16.47",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
