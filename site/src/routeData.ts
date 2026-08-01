@@ -1,6 +1,6 @@
 import { defineRouteMiddleware } from '@astrojs/starlight/route-data';
 import { getCollection } from 'astro:content';
-import { hasMarkdownCopy, markdownCopyPath } from './lib/page-markdown.mjs';
+import { hasMarkdownCopy, markdownCopyPath, routeOf } from './lib/page-markdown.mjs';
 
 const BASE = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
 
@@ -20,9 +20,10 @@ const BASE = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
  */
 const published = new Set(
   (await getCollection('docs'))
-    // Astro reports the collection root's index as `index`; Starlight's route
-    // ids call it the empty string. Normalise to the route ids.
-    .map((entry) => (entry.id === 'index' ? '' : entry.id))
+    // Astro reports the collection root's index as `index` while Starlight
+    // hands the same page the empty id, so both sides go through the one rule
+    // the generator uses (src/lib/page-markdown.mjs) before they are compared.
+    .map((entry) => routeOf(entry.id))
     .filter(hasMarkdownCopy),
 );
 
@@ -33,9 +34,9 @@ export const onRequest = defineRouteMiddleware(({ locals }) => {
   // Where this page's markdown copy is, or undefined if it has none. Read by
   // Head.astro for the `rel="alternate"` link and by PageActions.astro, which
   // renders nothing without it.
-  const entryId = starlightRoute.entry?.id ?? '';
-  starlightRoute.markdownCopy = published.has(entryId)
-    ? markdownCopyPath(entryId, BASE)
+  const route = routeOf(starlightRoute.entry?.id ?? '');
+  starlightRoute.markdownCopy = published.has(route)
+    ? markdownCopyPath(route, BASE)
     : undefined;
 
   // The API reference is generated from the package docstrings, so its pages
