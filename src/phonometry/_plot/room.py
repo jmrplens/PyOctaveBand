@@ -522,7 +522,7 @@ def plot_open_plan(
     """Spatial decay of speech with the distraction/privacy distances marked.
 
     Redraws the Clause 6.2 regression line ``Lp,A,S(r) = Lp,A,S,4m -
-    D2,S lg(r/4)/lg 2`` over the 2 m to 16 m fitting range (extended to
+    D2,S log10(r/4)/log10 2`` over the 2 m to 16 m fitting range (extended to
     reach ``rP`` when it lies further out) and marks the distraction
     distance ``rD`` and the privacy distance ``rP`` from the STI regression.
 

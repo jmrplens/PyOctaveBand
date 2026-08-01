@@ -291,20 +291,20 @@ L 701.13125 28.798125
    </g>
    <g id="text_17">
     <g id="patch_7">
-     <path d="M 487.624223 81.317062 
+     <path d="M 468.780473 81.317062 
 L 691.288285 81.317062 
 Q 696.288285 81.317062 696.288285 76.317062 
 L 696.288285 40.309641 
 Q 696.288285 35.309641 691.288285 35.309641 
-L 487.624223 35.309641 
-Q 482.624223 35.309641 482.624223 40.309641 
-L 482.624223 76.317062 
-Q 482.624223 81.317062 487.624223 81.317062 
+L 468.780473 35.309641 
+Q 463.780473 35.309641 463.780473 40.309641 
+L 463.780473 76.317062 
+Q 463.780473 81.317062 468.780473 81.317062 
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
     <text style="font-size: 10px; font-family: sans-serif" transform="translate(559.744535 48.908273)">L'n,w = Ln,w,eq - ΔLw + K</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(487.624223 60.911008)">Ln,w,eq = 164 - 35 lg(m'/m'0) = 76,2 dB</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(468.780473 60.911008)">Ln,w,eq = 164 - 35 log10(m'/m'0) = 76,2 dB</text>
     <text style="font-size: 10px; font-family: sans-serif" transform="translate(568.036723 72.913742)">L'n,w = 45,2 dB → 45 dB</text>
    </g>
    <g id="text_18">

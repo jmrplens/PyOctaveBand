@@ -307,7 +307,7 @@ def plot_aperture_transmission(
     result: ApertureTransmissionResult, ax: Axes | None = None,
     language: str = "en", **kwargs: Any
 ) -> Axes:
-    """Aperture sound reduction index ``R(f) = -10 lg(tau)`` (Hopkins 4.3.10).
+    """Aperture sound reduction index ``R(f) = -10 log10(tau)`` (Hopkins 4.3.10).
 
     :param result: An
         :class:`~phonometry.building.aperture_transmission.ApertureTransmissionResult`.
@@ -632,7 +632,7 @@ def plot_facade_prediction(
 ) -> Axes:
     """Predicted façade insulation profile (EN 12354-3:2000).
 
-    Draws the per-element partial indices ``Rp = -10 lg τ`` as thin dashed
+    Draws the per-element partial indices ``Rp = -10 log10 τ`` as thin dashed
     lines, then the façade apparent reduction ``R'`` and the standardized
     level difference ``D2m,nT`` as bold curves, against frequency. Works for
     :class:`~phonometry.facade_prediction.FacadePredictionResult`.
@@ -1742,7 +1742,7 @@ def plot_floating_floor_improvement(
 
     ax = ax if ax is not None else _new_axes()
     freqs = np.asarray(result.frequencies, dtype=np.float64)
-    label = f"{result.model} ({result.slope:.0f} lg(f/$f_o$))"
+    label = f"{result.model} ({result.slope:.0f} log10(f/$f_o$))"
     _plot_improvement_spectrum(
         ax, freqs, [(result.improvement, label, _C_PRIMARY, "-")],
         result.resonance_frequency, "$f_o$", language, kwargs,

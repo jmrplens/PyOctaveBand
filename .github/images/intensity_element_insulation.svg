@@ -438,20 +438,20 @@ L 705.763438 28.318125
    </g>
    <g id="text_25">
     <g id="patch_7">
-     <path d="M 453.667435 384.464631 
+     <path d="M 415.979935 384.464631 
 L 695.790873 384.464631 
 Q 700.790873 384.464631 700.790873 379.464631 
 L 700.790873 355.459162 
 Q 700.790873 350.459162 695.790873 350.459162 
-L 453.667435 350.459162 
-Q 448.667435 350.459162 448.667435 355.459162 
-L 448.667435 379.464631 
-Q 448.667435 384.464631 453.667435 384.464631 
+L 415.979935 350.459162 
+Q 410.979935 350.459162 410.979935 355.459162 
+L 410.979935 379.464631 
+Q 410.979935 384.464631 415.979935 384.464631 
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
     <text style="font-size: 10px; font-family: sans-serif" transform="translate(546.80806 364.058576)">DI,n,e,w(C;Ctr) = 29(-1;-2) dB</text>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(453.667435 376.06131)">DI,n,e = Lp1 - 6 - [LIn + 10 lg(Sm/A0)] + 10 lg N</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(415.979935 376.06131)">DI,n,e = Lp1 - 6 - [LIn + 10 log10(Sm/A0)] + 10 log10 N</text>
    </g>
    <g id="text_26">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="373.344609" y="16.318125" transform="rotate(-0 373.344609 16.318125)">ISO 15186-1 Small-Element Insulation by Intensity</text>

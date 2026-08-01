@@ -480,10 +480,10 @@ _ES_EXACT = {
     # floating_floor_prediction / soft_covering_prediction figures
     "Floating-Floor Impact Improvement Above the Mass-Spring Resonance":
         "Mejora a impactos del suelo flotante por encima de la resonancia masa-resorte",
-    "30 lg(f/f0) (sand-cement screed)": "30 lg(f/f0) (solera de mortero de cemento)",
-    "40 lg(f/f0) (asphalt, dry)": "40 lg(f/f0) (asfalto, seco)",
-    "40 lg(f/f0) + hammer term (chipboard)":
-        "40 lg(f/f0) + término del martillo (tablero de partículas)",
+    "30 log10(f/f0) (sand-cement screed)": "30 log10(f/f0) (solera de mortero de cemento)",
+    "40 log10(f/f0) (asphalt, dry)": "40 log10(f/f0) (asfalto, seco)",
+    "40 log10(f/f0) + hammer term (chipboard)":
+        "40 log10(f/f0) + término del martillo (tablero de partículas)",
     "ISO 12354-2 Annex G bands": "Bandas del Anexo G de ISO 12354-2",
     "35 mm screed m' = 73.5 kg/m2 on s' = 8 MN/m3\n"
     "delta-Lw = 32.2 dB  (ISO 12354-2 Formula C.4)":
@@ -1125,9 +1125,9 @@ _ES_EXACT = {
     "Weston Shallow-Water Propagation Regimes (Ainslie §9.1.1.2)":
         "Regímenes de propagación de Weston en aguas someras (Ainslie §9.1.1.2)",
     "Propagation loss [dB re 1 m²]": "Pérdida de propagación [dB re 1 m²]",
-    "Spherical, 20 lg r": "Esférica, 20 lg r",
-    "Cylindrical, 10 lg r": "Cilíndrica, 10 lg r",
-    "Mode stripping, 15 lg r": "Descamado de modos, 15 lg r",
+    "Spherical, 20 log10 r": "Esférica, 20 log10 r",
+    "Cylindrical, 10 log10 r": "Cilíndrica, 10 log10 r",
+    "Mode stripping, 15 log10 r": "Descamado de modos, 15 log10 r",
     "Single mode": "Modo único",
     "Composite propagation loss": "Pérdida de propagación compuesta",
     # Marine-mammal auditory weighting (NMFS 2024 v3.0).
@@ -1656,8 +1656,8 @@ _ES_EXACT = {
         "Lifter paso bajo: envolvente espectral",
     "Highpass lifter: the echo ripple alone":
         "Lifter paso alto: solo el rizado del eco",
-    "closed-form ripple bounds $20\\lg(1\\pm a)$":
-        "cotas del rizado en forma cerrada $20\\lg(1\\pm a)$",
+    "closed-form ripple bounds $20\\log_{10}(1\\pm a)$":
+        "cotas del rizado en forma cerrada $20\\log_{10}(1\\pm a)$",
     "Correlation Normalizations of a Two-Sensor Delay Model":
         "Normalizaciones de la correlación de un modelo "
         "de dos sensores con retardo",
@@ -1700,8 +1700,8 @@ _ES_EXACT = {
         "$\\hat{G}_{nn}$ (ruido no correlado)",
     "Spectral density [dB re 1/Hz]": "Densidad espectral [dB re 1/Hz]",
     "Spectral SNR [dB]": "SNR espectral [dB]",
-    "closed form $10\\lg(2.56)$ = 4.1 dB":
-        "forma cerrada $10\\lg(2{,}56)$ = 4,1 dB",
+    "closed form $10\\log_{10}(2.56)$ = 4.1 dB":
+        "forma cerrada $10\\log_{10}(2{,}56)$ = 4,1 dB",
     "Golay-Pair Impulse Response: Exact Complementary Recovery":
         "Respuesta al impulso con par de Golay: "
         "recuperación complementaria exacta",
@@ -2020,16 +2020,16 @@ _ES_PATTERNS = [
     ((r"^L'nT,w\(CI\) = (.+) dB\nnote the minus sign: a live room lowers "
       r"L'nT$"),
      "L'nT,w(CI) = \\1 dB\natención al signo menos: un recinto vivo reduce L'nT"),
-    ((r"^LW = Lp,in \+ Cd - R' \+ 10 lg\(S/S0\)\nwall 176 m² \+ industrial "
+    ((r"^LW = Lp,in \+ Cd - R' \+ 10 log10\(S/S0\)\nwall 176 m² \+ industrial "
       r"door 24 m², Cd = -5 dB$"),
-     ("LW = Lp,in + Cd - R' + 10 lg(S/S0)\n"
+     ("LW = Lp,in + Cd - R' + 10 log10(S/S0)\n"
       "muro de 176 m² + puerta industrial de 24 m², Cd = -5 dB")),
     ((r"^Rw\(C;Ctr\) = (.+) dB\n6 mm float glass, m'' = 15 kg/m², "
       r"η = 0\.024$"),
      "Rw(C;Ctr) = \\1 dB\nvidrio flotado de 6 mm, m'' = 15 kg/m², η = 0,024"),
-    ((r"^Kij = 10 lg\(1/τ̄\) \+ 5 lg\(fc2/1000\)\nconcrete, plate 1 fixed "
+    ((r"^Kij = 10 log10\(1/τ̄\) \+ 5 log10\(fc2/1000\)\nconcrete, plate 1 fixed "
       r"at 100 mm$"),
-     "Kij = 10 lg(1/τ̄) + 5 lg(fc2/1000)\nhormigón, placa 1 fija en 100 mm"),
+     "Kij = 10 log10(1/τ̄) + 5 log10(fc2/1000)\nhormigón, placa 1 fija en 100 mm"),
     ((r"^below f0: stiffness-controlled, \|Y\| ~ ω/k\n"
       r"above f0: mass-controlled, \|Y\| ~ 1/\(ωm\)\n"
       r"f0 = (.+) Hz,  1/c = (.+) m/\(N·s\)$"),
@@ -4206,7 +4206,7 @@ def generate_open_plan_decay(output_dir: str) -> None:
     m = open_plan_metrics(r, lp, sti)
 
     # Reconstruct the two regressions the metrics come from (2-16 m window).
-    b_log = -m.d2s / np.log10(2.0)                    # slope vs lg(r/r0)
+    b_log = -m.d2s / np.log10(2.0)                    # slope vs log10(r/r0)
     a_lp = m.lp_as_4m - b_log * np.log10(4.0)
     d_sti, c_sti = np.polyfit(r, sti, 1)              # STI vs distance
 
@@ -4790,7 +4790,7 @@ def generate_psychoacoustic_annoyance(output_dir: str) -> None:
 
     info = [
         "PA = N5 (1 + sqrt(wS^2 + wFR^2))",
-        "wS  = (S - 1.75) 0.25 lg(N5 + 10)",
+        "wS  = (S - 1.75) 0.25 log10(N5 + 10)",
         "wFR = (2.18 / N5^0.4)(0.4 F + 0.6 R)",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
@@ -6112,7 +6112,7 @@ def generate_ship_source_level(output_dir: str) -> None:
 
     info = [
         "Ls = LRN + ΔL",
-        "ΔL = -10 lg[(2u^4+14u^2)/(14+2u^2+u^4)]",
+        "ΔL = -10 log10[(2u^4+14u^2)/(14+2u^2+u^4)]",
         "u = k d_s,  d_s = 0.7 D = 4.2 m",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
@@ -6163,7 +6163,7 @@ def generate_pile_driving(output_dir: str) -> None:
     ax_c.set_ylabel("Cumulative SEL [dB re 1 µPa²·s]")
     ax_c.set_title(
         f"SEL_ss = {res.single_strike_sel:.0f} dB;  "
-        f"SEL_cum = SEL_ss + 10 lg(N)", fontsize=10)
+        f"SEL_cum = SEL_ss + 10 log10(N)", fontsize=10)
     ax_c.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_c.set_axisbelow(True)
     plt.tight_layout()
@@ -6310,11 +6310,11 @@ def generate_weston_regimes(output_dir: str) -> None:
     # asymptotic form extrapolated far outside its own regime is meaningless
     # (the single-mode formula would sit below free field at 10 m).
     for curve, onset, label, color, style in (
-        (res.spherical, 0.0, "Spherical, 20 lg r", "#8c8c8c", ":"),
+        (res.spherical, 0.0, "Spherical, 20 log10 r", "#8c8c8c", ":"),
         (res.cylindrical, bounds.spherical_to_cylindrical,
-         "Cylindrical, 10 lg r", COLOR_SECONDARY, "--"),
+         "Cylindrical, 10 log10 r", COLOR_SECONDARY, "--"),
         (res.mode_stripping, bounds.cylindrical_to_mode_stripping,
-         "Mode stripping, 15 lg r", COLOR_TERTIARY, "-."),
+         "Mode stripping, 15 log10 r", COLOR_TERTIARY, "-."),
         (res.single_mode, bounds.mode_stripping_to_single_mode,
          "Single mode", "#9467bd", (0, (3, 1, 1, 1))),
     ):
@@ -7187,7 +7187,7 @@ def generate_survey_insulation(output_dir: str) -> None:
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     # Shade the reverberation-index correction k between D and DnT.
     ax.fill_between(x, res.d, res.d_nt, color=COLOR_TERTIARY, alpha=0.18,
-                    zorder=0, label="k = 10 lg(T/T0)")
+                    zorder=0, label="k = 10 log10(T/T0)")
     ax.plot(x, res.d, "--", color=COLOR_PRIMARY, linewidth=1.8, marker="o",
             markersize=6, zorder=5, label="D (level difference)")
     ax.plot(x, res.d_nt, "-", color=COLOR_FG, linewidth=2.6, marker="s",
@@ -7520,11 +7520,11 @@ def generate_floating_floor_prediction(output_dir: str) -> None:
     ax.fill_betweenx([-5.0, 100.0], 40.0, f0, color=theme_fill(COLOR_FG, ax),
                      zorder=0)
     ax.plot(freqs, lightweight.improvement, "-.", color=COLOR_TERTIARY,
-            linewidth=2.0, label="40 lg(f/f0) + hammer term (chipboard)")
+            linewidth=2.0, label="40 log10(f/f0) + hammer term (chipboard)")
     ax.plot(freqs, asphalt.improvement, "--", color=COLOR_SECONDARY,
-            linewidth=2.0, label="40 lg(f/f0) (asphalt, dry)")
+            linewidth=2.0, label="40 log10(f/f0) (asphalt, dry)")
     ax.plot(freqs, screed.improvement, "-", color=COLOR_PRIMARY, linewidth=2.4,
-            label="30 lg(f/f0) (sand-cement screed)")
+            label="30 log10(f/f0) (sand-cement screed)")
     ax.plot(bands, printed.improvement, "o", color=COLOR_PRIMARY,
             markersize=5.5, zorder=6, label="ISO 12354-2 Annex G bands")
     ax.axvline(f0, color=COLOR_FG, linestyle=":", linewidth=1.3)
@@ -8042,7 +8042,7 @@ def generate_vibration_sound_power(output_dir: str) -> None:
     ax.legend(loc="upper right", fontsize=9)
 
     info = [
-        "LW = Lv + 10 lg(S/S0) + 10 lg(e) + 10 lg(411/400)",
+        "LW = Lv + 10 log10(S/S0) + 10 log10(e) + 10 log10(411/400)",
         f"S = {area:g} m2,  S0 = 1 m2",
         "Part 1: e = 1 -> upper limit LW,max",
     ]
@@ -8087,7 +8087,7 @@ def generate_structure_borne_power(output_dir: str) -> None:
     ax.legend(loc="upper right", fontsize=9)
 
     info = [
-        "LWs = 10 lg(2 pi f eta m S) + Lv - 60 dB",
+        "LWs = 10 log10(2 pi f eta m S) + Lv - 60 dB",
         "eta = 2.2/(f Ts),  v0 = 1 nm/s",
         "reception-plate method (clause 7)",
     ]
@@ -8148,9 +8148,9 @@ def generate_installed_structure_borne(output_dir: str) -> None:
     ax.legend(loc="upper right", fontsize=9)
 
     info = [
-        "DC = 10 lg(|Ys+Yi|^2 / (|Ys| Re Yi))",
-        "Ln,s,ij = LWs,inst - Dsa - Rij - 10 lg(Si/S0) - 10 lg(A0/4)",
-        "Ln,s = 10 lg(sum 10^(Ln,s,ij/10)),  S0 = A0 = 10 m2",
+        "DC = 10 log10(|Ys+Yi|^2 / (|Ys| Re Yi))",
+        "Ln,s,ij = LWs,inst - Dsa - Rij - 10 log10(Si/S0) - 10 log10(A0/4)",
+        "Ln,s = 10 log10(sum 10^(Ln,s,ij/10)),  S0 = A0 = 10 m2",
     ]
     ax.text(0.015, 0.02, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="left", fontsize=8.5, color=COLOR_FG, family="monospace",
@@ -8202,7 +8202,7 @@ def generate_tone_audibility(output_dir: str) -> None:
 
     info = [
         "dfc = 25 + 75 (1 + 1.4 (fT/1000)^2)^0.69",
-        "LG = LS + 10 lg(dfc/df),  av = -2 - lg(1 + (f/502)^2.5)",
+        "LG = LS + 10 log10(dfc/df),  av = -2 - log10(1 + (f/502)^2.5)",
         "dL = LT - LG - av  (combustion engine, Annex E)",
     ]
     ax.text(0.015, 0.02, "\n".join(info), transform=ax.transAxes,
@@ -10105,7 +10105,7 @@ def generate_sound_power_pressure_result(output_dir: str) -> None:
     # hemisphere positions of ISO 3744 (Annex B) around a machine on one
     # reflecting plane, with a flat 55 dB background, corrected for background
     # (K1) and for the test room (K2 from T = 0.6 s, V = 300 m^3). The library
-    # forms LW = Lp_bar - K1 - K2 + 10 lg(S/S0) per band and the A-weighted
+    # forms LW = Lp_bar - K1 - K2 + 10 log10(S/S0) per band and the A-weighted
     # total LWA.
     freqs = np.array([63, 125, 250, 500, 1000, 2000, 4000, 8000], dtype=float)
     base = np.array([70.0, 74.0, 78.0, 80.0, 79.0, 76.0, 72.0, 66.0])
@@ -10235,7 +10235,7 @@ def generate_precision_anechoic_power(output_dir: str) -> None:
     # array (ISO 3745 Annex E) in a hemi-anechoic room. levels_positions is the
     # (40, NB) surface pressure spectrum: a base machine spectrum peaked near
     # 1 kHz plus a small per-position spatial variation. The library forms the
-    # surface-averaged LW = Lp_bar + 10 lg(S/S0) + C1+C2+C3 and the A-weighted
+    # surface-averaged LW = Lp_bar + 10 log10(S/S0) + C1+C2+C3 and the A-weighted
     # total LWA.
     freqs = np.array([125, 250, 500, 1000, 2000, 4000, 8000], dtype=float)
     base = 70.0 + 8.0 * np.exp(-(np.log2(freqs / 1000.0) ** 2) / 2.0)
@@ -10585,7 +10585,7 @@ def generate_impulse_prominence(output_dir: str) -> None:
     ax_p.set_xscale("log")
     ax_p.set_xlabel("Onset rate [dB/s]")
     ax_p.set_ylabel("Predicted prominence $P$")
-    ax_p.set_title(r"$P = 3\,\lg(\mathrm{OR}) + 2\,\lg(\mathrm{LD})$",
+    ax_p.set_title(r"$P = 3\,\log_{10}(\mathrm{OR}) + 2\,\log_{10}(\mathrm{LD})$",
                    fontweight="bold", pad=10)
     ax_p.grid(which="both", color=COLOR_GRID, linestyle="-", alpha=0.4)
     ax_p.set_axisbelow(True)
@@ -11756,7 +11756,7 @@ def generate_field_airborne_insulation(output_dir: str) -> None:
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     x = _band_index_axis(ax, _THIRD_OCTAVE_16)
     ax.fill_between(x, field.d, field.dnt, color=COLOR_TERTIARY, alpha=0.18,
-                    zorder=0, label="10 lg(T/T0)")
+                    zorder=0, label="10 log10(T/T0)")
     ax.plot(x, field.d, "--o", color=COLOR_PRIMARY, linewidth=1.8,
             markersize=5, zorder=5, label="D (level difference)")
     ax.plot(x, field.dnt, "-s", color=COLOR_FG, linewidth=2.4, markersize=5,
@@ -11848,7 +11848,7 @@ def generate_survey_impact_insulation(output_dir: str) -> None:
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     x = _band_index_axis(ax, bands, fontsize=10)
     ax.fill_between(x, res.l_i, res.l_nt, color=COLOR_TERTIARY, alpha=0.18,
-                    zorder=0, label="-k = -10 lg(T/T0)")
+                    zorder=0, label="-k = -10 log10(T/T0)")
     ax.plot(x, res.l_i, "--o", color=COLOR_PRIMARY, linewidth=1.8,
             markersize=6, zorder=5, label="Li (impact level)")
     ax.plot(x, res.l_nt, "-s", color=COLOR_FG, linewidth=2.4, markersize=6,
@@ -11964,7 +11964,7 @@ def generate_intensity_element_insulation(output_dir: str) -> None:
     info = [
         (f"DI,n,e,w(C;Ctr) = {res.rating.rating}"
          f"({res.rating.c};{res.rating.ctr}) dB"),
-        "DI,n,e = Lp1 - 6 - [LIn + 10 lg(Sm/A0)] + 10 lg N",
+        "DI,n,e = Lp1 - 6 - [LIn + 10 log10(Sm/A0)] + 10 log10 N",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=10, color=COLOR_FG,
@@ -12014,7 +12014,7 @@ def generate_flanking_level_difference(output_dir: str) -> None:
     info = [
         (f"Dn,f,w(C;Ctr) = {res.rating.rating}"
          f"({res.rating.c};{res.rating.ctr}) dB"),
-        "Dn,f = L1 - L2 - 10 lg(A/A0)",
+        "Dn,f = L1 - L2 - 10 log10(A/A0)",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=10, color=COLOR_FG,
@@ -12068,7 +12068,7 @@ def generate_impact_prediction_terms(output_dir: str) -> None:
 
     info = [
         "L'n,w = Ln,w,eq - ΔLw + K",
-        f"Ln,w,eq = 164 - 35 lg(m'/m'0) = {ln_eq:.1f} dB",
+        f"Ln,w,eq = 164 - 35 log10(m'/m'0) = {ln_eq:.1f} dB",
         f"L'n,w = {imp.l_prime_n_w:.1f} dB → 45 dB",
     ]
     ax.text(0.985, 0.97, "\n".join(info), transform=ax.transAxes,
@@ -12151,7 +12151,7 @@ def generate_detailed_prediction_paths(output_dir: str) -> None:
               fontsize=9, ncol=3)
 
     info = [
-        "R' = -10 lg(Σ 10^(-Rij/10))",
+        "R' = -10 log10(Σ 10^(-Rij/10))",
         f"R'w (C; Ctr) = {res.rating.rating} ({res.rating.c}; {res.rating.ctr}) dB",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
@@ -12197,7 +12197,7 @@ def generate_radiated_power_outdoor(output_dir: str) -> None:
     ax.legend(loc="upper right", fontsize=9)
 
     info = [
-        "LW = Lp,in + Cd - R' + 10 lg(S/S0)",
+        "LW = Lp,in + Cd - R' + 10 log10(S/S0)",
         "wall 176 m² + industrial door 24 m², Cd = -5 dB",
     ]
     ax.text(0.015, 0.97, "\n".join(info), transform=ax.transAxes,
@@ -12292,7 +12292,7 @@ def generate_junction_kij_thickness(output_dir: str) -> None:
               ("-", COLOR_SECONDARY), ("-", COLOR_TERTIARY)]
     for (label, values), (ls, color) in zip(curves.items(), styles):
         ax.plot(ratios, values, ls, color=color, linewidth=2.0, label=label)
-    # The identical-plate X-junction: Kij = 10 lg 12 + 5 lg(fc2/1000).
+    # The identical-plate X-junction: Kij = 10 log10 12 + 5 log10(fc2/1000).
     res_eq = junction_transmission("X", h1, cl, rho * h1, h1, cl, rho * h1)
     ax.scatter([1.0], [res_eq.corner_reduction_index], color=COLOR_FG, s=70,
                zorder=6, label="identical plates (τ = 1/12)")
@@ -12308,7 +12308,7 @@ def generate_junction_kij_thickness(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        "Kij = 10 lg(1/τ̄) + 5 lg(fc2/1000)",
+        "Kij = 10 log10(1/τ̄) + 5 log10(fc2/1000)",
         "concrete, plate 1 fixed at 100 mm",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
@@ -13157,10 +13157,10 @@ def generate_intensity_class(output_dir: str) -> None:
     from phonometry import metrology
 
     # A complete instrument verified with the common 12 mm spacer, so the
-    # printed 25 mm minima come down by 10 lg(12/25) = -3,2 dB (Table 2,
+    # printed 25 mm minima come down by 10 log10(12/25) = -3,2 dB (Table 2,
     # Note 1). The measured index is modelled from the physics behind the
     # table: a residual channel phase mismatch phi_s turns into
-    # delta_pI0 = 10 lg(kd/phi_s), so a mismatch that is constant in degrees
+    # delta_pI0 = 10 log10(kd/phi_s), so a mismatch that is constant in degrees
     # already buys 10 dB per decade of index - which is exactly the slope of
     # the Table 2 requirement below 250 Hz. Above 1 kHz the mismatch of a real
     # chain grows with frequency instead of staying put, so the index levels
@@ -13669,7 +13669,7 @@ def generate_lifter_split(output_dir: str) -> None:
     for bound in (20.0 * np.log10(1.5), 20.0 * np.log10(0.5)):
         axes[1].axhline(bound, color=COLOR_TERTIARY, linestyle="--",
                         linewidth=1.2,
-                        label=(r"closed-form ripple bounds $20\lg(1\pm a)$"
+                        label=(r"closed-form ripple bounds $20\log_{10}(1\pm a)$"
                                if bound > 0 else None))
     axes[1].set_ylabel("Magnitude [dB]")
     axes[1].set_xlabel(LABEL_FREQ_HZ)
@@ -13906,7 +13906,7 @@ def generate_coherent_output_snr(output_dir: str) -> None:
                   linewidth=1.1, label="Spectral SNR [dB]")
     ax_s.axhline(10.0 * np.log10(0.64 / 0.25), color=COLOR_SECONDARY,
                  linestyle="--", linewidth=1.4,
-                 label=r"closed form $10\lg(2.56)$ = 4.1 dB")
+                 label=r"closed form $10\log_{10}(2.56)$ = 4.1 dB")
     ax_s.set_ylabel("Spectral SNR [dB]")
     ax_s.set_xlabel(LABEL_FREQ_HZ)
     ax_s.legend(loc="lower left", fontsize=9)
@@ -18542,8 +18542,8 @@ def animate_power_two_rooms(output_dir: str) -> None:
     T = _translate_str
     lw_true = 92.0
     r_mic = 2.05                   # projected mic-ring radius (anechoic)
-    lp_free = 77.5                 # L_W - 10 lg(4 pi 1.5^2)
-    lp_diff = 86.0                 # L_W - 10 lg V + 10 lg T + 14
+    lp_free = 77.5                 # L_W - 10 log10(4 pi 1.5^2)
+    lp_diff = 86.0                 # L_W - 10 log10 V + 10 log10 T + 14
 
     fig = _anim_figure()
     fig.suptitle(T("One source, two rooms, one sound power"),
@@ -18636,9 +18636,9 @@ def animate_power_two_rooms(output_dir: str) -> None:
 
     # --- bottom strip: the two formulas converge on one L_W --------------
     box_a = _flow_box(ax_b, 3.4, 1.55, 6.2, 1.15,
-                      r"$L_W = \bar{L}_p + 10\,\lg(4\pi r^2/S_0)$")
+                      r"$L_W = \bar{L}_p + 10\,\log_{10}(4\pi r^2/S_0)$")
     box_r = _flow_box(ax_b, 12.6, 1.55, 6.2, 1.15,
-                      r"$L_W = \bar{L}_p + 10\,\lg V - 10\,\lg T - 14$")
+                      r"$L_W = \bar{L}_p + 10\,\log_{10} V - 10\,\log_{10} T - 14$")
     lw_box = _flow_box(ax_b, 8.0, 1.3, 2.6, 1.3, "$L_W$")
     arr_a = _make_arrow(ax_b, COLOR_SECONDARY, scale=13.0)
     arr_r = _make_arrow(ax_b, COLOR_SECONDARY, scale=13.0)
@@ -20401,7 +20401,7 @@ def animate_elastic_coincidence(output_dir: str) -> None:
     titles = [T(f"f = f_c/2 = {fc / 2:.0f} Hz, 45° incidence"),
               T(f"f = 2 f_c = {2 * fc:.0f} Hz, 45° incidence")]
     # Each panel is judged against the oblique mass law (Bies Eq. 7.41):
-    # TL(theta) = 10 lg[1 + (pi f m'' cos(theta) / rho0 c0)^2]. Below f_c
+    # TL(theta) = 10 log10[1 + (pi f m'' cos(theta) / rho0 c0)^2]. Below f_c
     # the measured level lands on it; above f_c the trace-matched plate
     # re-radiates and beats it by ~13 dB, so the two panels transmit the
     # same level even though the mass law demands 12 dB more at 4x the

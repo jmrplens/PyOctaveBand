@@ -412,10 +412,10 @@ L 705.6425 28.318125
    <g id="text_18">
     <g id="patch_17">
      <path d="M 44.631009 376.635324 
-L 326.080618 376.635324 
-Q 330.330618 376.635324 330.330618 372.385324 
-L 330.330618 341.733195 
-Q 330.330618 337.483195 326.080618 337.483195 
+L 356.784212 376.635324 
+Q 361.034212 376.635324 361.034212 372.385324 
+L 361.034212 341.733195 
+Q 361.034212 337.483195 356.784212 337.483195 
 L 44.631009 337.483195 
 Q 40.381009 337.483195 40.381009 341.733195 
 L 40.381009 372.385324 
@@ -424,7 +424,7 @@ z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
     <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(44.631009 349.042697)">dfc = 25 + 75 (1 + 1,4 (fT/1000)^2)^0,69</text>
-    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(44.631009 359.290177)">LG = LS + 10 lg(dfc/df),  av = -2 - lg(1 + (f/502)^2,5)</text>
+    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(44.631009 359.290177)">LG = LS + 10 log10(dfc/df),  av = -2 - log10(1 + (f/502)^2,5)</text>
     <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(44.631009 369.492501)">dL = LT - LG - av  (combustion engine, Annex E)</text>
    </g>
    <g id="text_19">

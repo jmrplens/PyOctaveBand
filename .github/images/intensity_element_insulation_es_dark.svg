@@ -438,20 +438,20 @@ L 705.763438 28.53375
    </g>
    <g id="text_25">
     <g id="patch_7">
-     <path d="M 453.667435 384.680256 
+     <path d="M 415.979935 384.680256 
 L 695.790873 384.680256 
 Q 700.790873 384.680256 700.790873 379.680256 
 L 700.790873 355.674787 
 Q 700.790873 350.674787 695.790873 350.674787 
-L 453.667435 350.674787 
-Q 448.667435 350.674787 448.667435 355.674787 
-L 448.667435 379.680256 
-Q 448.667435 384.680256 453.667435 384.680256 
+L 415.979935 350.674787 
+Q 410.979935 350.674787 410.979935 355.674787 
+L 410.979935 379.680256 
+Q 410.979935 384.680256 415.979935 384.680256 
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
     <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(546.80806 364.274201)">DI,n,e,w(C;Ctr) = 29(-1;-2) dB</text>
-    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(453.667435 376.276935)">DI,n,e = Lp1 - 6 - [LIn + 10 lg(Sm/A0)] + 10 lg N</text>
+    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(415.979935 376.276935)">DI,n,e = Lp1 - 6 - [LIn + 10 log10(Sm/A0)] + 10 log10 N</text>
    </g>
    <g id="text_26">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="373.344609" y="16.53375" transform="rotate(-0 373.344609 16.53375)">Aislamiento de elementos pequeños por intensidad ISO 15186-1</text>

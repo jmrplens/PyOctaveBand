@@ -439,20 +439,20 @@ L 705.763438 28.798125
    </g>
    <g id="text_25">
     <g id="patch_7">
-     <path d="M 555.568998 384.944631 
+     <path d="M 541.43306 384.944631 
 L 695.790873 384.944631 
 Q 700.790873 384.944631 700.790873 379.944631 
 L 700.790873 355.939162 
 Q 700.790873 350.939162 695.790873 350.939162 
-L 555.568998 350.939162 
-Q 550.568998 350.939162 550.568998 355.939162 
-L 550.568998 379.944631 
-Q 550.568998 384.944631 555.568998 384.944631 
+L 541.43306 350.939162 
+Q 536.43306 350.939162 536.43306 355.939162 
+L 536.43306 379.944631 
+Q 536.43306 384.944631 541.43306 384.944631 
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
     <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(555.568998 364.538576)">Dn,f,w(C;Ctr) = 60(-1;-3) dB</text>
-    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(560.27681 376.54131)">Dn,f = L1 - L2 - 10 lg(A/A0)</text>
+    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(541.43306 376.54131)">Dn,f = L1 - L2 - 10 log10(A/A0)</text>
    </g>
    <g id="text_26">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="373.344609" y="16.798125" transform="rotate(-0 373.344609 16.798125)">Transmisión aérea por flancos ISO 10848</text>

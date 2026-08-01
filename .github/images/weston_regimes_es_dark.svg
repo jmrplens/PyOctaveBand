@@ -803,7 +803,7 @@ L 73.788281 316.498516
 " style="fill: none; stroke-dasharray: 1.3,2.145; stroke-dashoffset: 0; stroke: #8c8c8c; stroke-width: 1.3"/>
     </g>
     <g id="text_19">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="80.988281" y="319.648516" transform="rotate(-0 80.988281 319.648516)">Esférica, 20 lg r</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="80.988281" y="319.648516" transform="rotate(-0 80.988281 319.648516)">Esférica, 20 log10 r</text>
     </g>
     <g id="line2d_96">
      <path d="M 55.788281 330.359219 
@@ -812,7 +812,7 @@ L 73.788281 330.359219
 " style="fill: none; stroke-dasharray: 4.81,2.08; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.3"/>
     </g>
     <g id="text_20">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="80.988281" y="333.509219" transform="rotate(-0 80.988281 333.509219)">Cilíndrica, 10 lg r</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="80.988281" y="333.509219" transform="rotate(-0 80.988281 333.509219)">Cilíndrica, 10 log10 r</text>
     </g>
     <g id="line2d_97">
      <path d="M 55.788281 343.859922 
@@ -821,7 +821,7 @@ L 73.788281 343.859922
 " style="fill: none; stroke-dasharray: 8.32,2.08,1.3,2.08; stroke-dashoffset: 0; stroke: #2ca02c; stroke-width: 1.3"/>
     </g>
     <g id="text_21">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="80.988281" y="347.009922" transform="rotate(-0 80.988281 347.009922)">Descamado de modos, 15 lg r</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="80.988281" y="347.009922" transform="rotate(-0 80.988281 347.009922)">Descamado de modos, 15 log10 r</text>
     </g>
     <g id="line2d_98">
      <path d="M 55.788281 357.720625 
