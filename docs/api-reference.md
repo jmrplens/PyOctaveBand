@@ -2,7 +2,7 @@
 
 # API Reference
 
-All core functionality lives in seventeen domain subpackages; every public name
+All core functionality lives in eighteen domain subpackages; every public name
 is also re-exported by the top-level `phonometry` package.
 
 > **Note.** This page is the curated quick table for the GitHub/PyPI audience:
@@ -13,7 +13,7 @@ is also re-exported by the top-level `phonometry` package.
 
 ## Namespaces
 
-The library is organized into seventeen domain subpackages, and importing the
+The library is organized into eighteen domain subpackages, and importing the
 domain namespace is the primary form used throughout the documentation:
 
 ```python
@@ -28,7 +28,8 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 | `phonometry.signals` | Levels (Leq, LAeq, percentiles), Welch and multitaper spectra, coherence, time-frequency, correlation, envelope, cepstrum, phase, synchronous averaging, test signals |
 | `phonometry.metrology` | Calibration, GUM uncertainty and Monte Carlo, data qualification (stationarity, trends, peak statistics), IEC 61043 intensity class |
 | `phonometry.psychoacoustics` | Loudness (Zwicker, ECMA, Moore-Glasberg), sharpness, tonality, roughness, fluctuation strength, annoyance, tonal audibility |
-| `phonometry.hearing` | Hearing threshold, NIHL, occupational exposure, SII, STI |
+| `phonometry.speech` | Speech Transmission Index (IEC 60268-16), Speech Intelligibility Index (ANSI S3.5), STOI and ESTOI |
+| `phonometry.hearing` | Audiometric thresholds (ISO 7029/389-7), noise-induced hearing loss (ISO 1999), occupational exposure (ISO 9612) |
 | `phonometry.emission` | Sound power (ISO 3740 family), sound intensity, vibration-based power |
 | `phonometry.room` | Room acoustics (ISO 3382), impulse responses, open-plan, room-noise criteria, reverberation prediction, EN 12354-6 |
 | `phonometry.materials` | Absorption (ISO 354/11654), impedance tube, airflow resistance, scattering/diffusion, road absorption, dynamic stiffness |

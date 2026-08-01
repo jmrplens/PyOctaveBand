@@ -1,5 +1,5 @@
 ---
-title: "hearing.objective_intelligibility"
+title: "speech.objective_intelligibility"
 description: "Short-Time Objective Intelligibility (STOI and ESTOI)."
 sidebar:
   label: "objective_intelligibility"
@@ -9,8 +9,8 @@ Short-Time Objective Intelligibility (STOI and ESTOI).
 
 Implements the two correlation-based objective intelligibility measures that
 predict the intelligibility of time-frequency weighted noisy speech, where the
-speech-transmission index ([`phonometry.hearing.sti`](/phonometry/reference/api/speech/sti/)) and the speech
-intelligibility index ([`phonometry.hearing.sii`](/phonometry/reference/api/speech/sii/)) are less appropriate:
+speech-transmission index ([`phonometry.speech.sti`](/phonometry/reference/api/speech/sti/)) and the speech
+intelligibility index ([`phonometry.speech.sii`](/phonometry/reference/api/speech/sii/)) are less appropriate:
 
 * **STOI** (Taal, Hendriks, Heusdens and Jensen 2011, *An Algorithm for
   Intelligibility Prediction of Time-Frequency Weighted Noisy Speech*, IEEE

@@ -200,7 +200,7 @@ Rendering needs the optional `phonometry[report]` extra (reportlab), plus
 matplotlib for the task-based chart.
 
 ```python
-from phonometry import hearing, ReportMetadata
+from phonometry import ReportMetadata, hearing
 
 res = hearing.task_based_exposure(tasks, warn=False)  # the Annex D day above
 res.report(

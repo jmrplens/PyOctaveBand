@@ -19,7 +19,7 @@ import numpy as np
 import pytest
 
 from phonometry import ReportMetadata
-from phonometry.hearing import speech_intelligibility_index
+from phonometry.speech import speech_intelligibility_index
 
 _PDF_MAGIC = b"%PDF"
 
@@ -226,7 +226,7 @@ def test_non_default_procedure_fiche_names_its_procedure(
     """
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
-    from phonometry.hearing import sii_procedure
+    from phonometry.speech import sii_procedure
 
     proc = sii_procedure(method)
     n = proc.frequencies.size

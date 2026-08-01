@@ -1,8 +1,15 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""hearing domain of phonometry (see module docstrings)."""
+"""hearing domain of phonometry (see module docstrings).
+
+Narrowed in 4.0 to hearing conservation: audiometric thresholds, noise-induced
+hearing loss and occupational exposure. Speech intelligibility (STI, SII, STOI)
+moved to :mod:`phonometry.speech`, which evaluates a transmission channel
+rather than an ear; reading those names from here still works until 5.0.
+"""
 
 from __future__ import annotations
 
+from .._compat import _namespace_dir, _namespace_shim
 from .noise_induced_hearing_loss import (
     HtlanResult,
     NiptsResult,
@@ -11,7 +18,6 @@ from .noise_induced_hearing_loss import (
     htlan,
     nipts,
 )
-from .objective_intelligibility import STOIResult, stoi
 from .occupational_exposure import (
     COVERAGE_FACTOR,
     INSTRUMENT_U2,
@@ -25,17 +31,6 @@ from .occupational_exposure import (
     table_c4_contribution,
     task_based_exposure,
 )
-from .sii import (
-    SII_METHODS,
-    SIIProcedure,
-    SIIResult,
-    StandardSpeechSpectrum,
-    sii_procedure,
-    speech_intelligibility_index,
-    standard_speech_spectra,
-    standard_speech_spectrum,
-)
-from .sti import STIResult, STIWarning, sti_from_impulse_response, stipa, stipa_signal
 from .threshold import (
     AUDIOMETRIC_FREQUENCIES,
     FIELDS,
@@ -45,25 +40,22 @@ from .threshold import (
     reference_threshold,
 )
 
+#: Names that left this namespace in 4.0 keep resolving from here until 5.0.
+_MOVED_TO = ("phonometry.speech",)
+__getattr__ = _namespace_shim(__name__, _MOVED_TO)
+
 __all__ = [
     "AUDIOMETRIC_FREQUENCIES",
     "COVERAGE_FACTOR",
     "FIELDS",
     "INSTRUMENT_U2",
     "SEXES",
-    "SII_METHODS",
     "AgeThresholdResult",
     "ExposureResult",
     "HtlanResult",
     "NiptsResult",
     "NoiseInducedHearingLossWarning",
     "OccupationalExposureWarning",
-    "SIIProcedure",
-    "SIIResult",
-    "STIResult",
-    "STIWarning",
-    "STOIResult",
-    "StandardSpeechSpectrum",
     "Task",
     "TaskContribution",
     "age_threshold",
@@ -74,14 +66,10 @@ __all__ = [
     "minimum_cumulative_duration_hours",
     "nipts",
     "reference_threshold",
-    "sii_procedure",
-    "speech_intelligibility_index",
-    "standard_speech_spectra",
-    "standard_speech_spectrum",
-    "sti_from_impulse_response",
-    "stipa",
-    "stipa_signal",
-    "stoi",
     "table_c4_contribution",
     "task_based_exposure",
 ]
+
+#: ``__getattr__`` is invisible to ``dir()``; keep the moved names listed
+#: while they still resolve.
+__dir__ = _namespace_dir(__all__, _MOVED_TO)

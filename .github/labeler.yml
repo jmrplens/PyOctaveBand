@@ -175,6 +175,10 @@ ci:
   - changed-files:
       - any-glob-to-any-file: ["src/phonometry/room/**", "tests/room/**"]
 
+"area: speech":
+  - changed-files:
+      - any-glob-to-any-file: ["src/phonometry/speech/**", "tests/speech/**"]
+
 "area: signals":
   - changed-files:
       - any-glob-to-any-file: ["src/phonometry/signals/**", "tests/signals/**"]

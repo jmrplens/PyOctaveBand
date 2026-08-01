@@ -29,7 +29,7 @@ from reference_data import (
 )
 
 from phonometry import STIResult, sti_from_impulse_response, stipa, stipa_signal
-from phonometry.hearing.sti import (
+from phonometry.speech.sti import (
     _ALPHA_MALE,
     _BETA_MALE,
     _MOD_FREQS,

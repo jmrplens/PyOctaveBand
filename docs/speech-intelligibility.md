@@ -31,12 +31,12 @@ proportion to its **band-importance function** $I_i$ (ANSI S3.5-1997 Table 3,
 average speech material), which sums to one across the 18 bands.
 
 ```python
-from phonometry import hearing
+from phonometry import speech
 
 # The standard normal-effort speech spectrum (Table 3) in quiet, normal hearing.
-result = hearing.speech_intelligibility_index("normal")
+result = speech.speech_intelligibility_index("normal")
 print(round(result.sii, 3))          # 0.996  (nearly everything audible)
-print(round(hearing.sii.BAND_IMPORTANCE.sum(), 6))   # 1.0
+print(round(speech.sii.BAND_IMPORTANCE.sum(), 6))   # 1.0
 
 result.plot()   # per-band audibility and its weighted contribution (needs matplotlib)
 ```
@@ -97,14 +97,14 @@ $$
 
 ```python
 import numpy as np
-from phonometry import hearing
+from phonometry import speech
 
-speech = hearing.standard_speech_spectrum("normal")
+speech_spectrum = speech.standard_speech_spectrum("normal")
 # A descending broadband masking noise (an office/ventilation-like spectrum).
 noise = np.array([38.0, 37.0, 36.0, 34.0, 32.0, 30.0, 28.0, 26.0, 24.0,
                   22.0, 20.0, 18.0, 16.0, 14.0, 12.0, 10.0, 8.0, 6.0])
 
-result = hearing.speech_intelligibility_index(speech, noise)
+result = speech.speech_intelligibility_index(speech_spectrum, noise)
 print(round(result.sii, 2))                # 0.46
 print(result.band_audibility.round(2))     # per-band Ai
 
@@ -119,12 +119,12 @@ result.plot()   # the figure below: Ai and the weighted contribution per band
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import hearing
+from phonometry import speech
 
-speech = hearing.standard_speech_spectrum("normal")
+speech_spectrum = speech.standard_speech_spectrum("normal")
 noise = np.array([38.0, 37.0, 36.0, 34.0, 32.0, 30.0, 28.0, 26.0, 24.0,
                   22.0, 20.0, 18.0, 16.0, 14.0, 12.0, 10.0, 8.0, 6.0])
-result = hearing.speech_intelligibility_index(speech, noise)
+result = speech.speech_intelligibility_index(speech_spectrum, noise)
 
 # One line:
 result.plot()
@@ -165,16 +165,16 @@ loss shows what that costs, band by band:
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import hearing
+from phonometry import speech
 
 # The same speech and office noise as above, heard through a sloping
 # high-frequency loss (hearing threshold levels at the 18 band centres).
-speech = hearing.standard_speech_spectrum("normal")
+speech_spectrum = speech.standard_speech_spectrum("normal")
 noise = np.array([38.0, 37.0, 36.0, 34.0, 32.0, 30.0, 28.0, 26.0, 24.0,
                   22.0, 20.0, 18.0, 16.0, 14.0, 12.0, 10.0, 8.0, 6.0])
 threshold = np.array([5.0, 5.0, 5.0, 5.0, 8.0, 10.0, 12.0, 15.0, 18.0,
                       22.0, 28.0, 35.0, 42.0, 48.0, 55.0, 60.0, 65.0, 70.0])
-res = hearing.speech_intelligibility_index(speech, noise, threshold=threshold)
+res = speech.speech_intelligibility_index(speech_spectrum, noise, threshold=threshold)
 print(round(res.sii, 3))       # 0.358  (0.458 with normal hearing)
 
 # One line: the same audibility bars, now limited by the hearing threshold.
@@ -202,16 +202,16 @@ the index.
 
 ```python
 import numpy as np
-from phonometry import hearing
+from phonometry import speech
 
 # The same broadband noise, four vocal efforts.
 noise = np.array([48.0, 47.0, 46.0, 44.0, 42.0, 40.0, 38.0, 36.0, 34.0,
                   32.0, 30.0, 28.0, 26.0, 24.0, 22.0, 20.0, 18.0, 16.0])
-for effort in hearing.sii.VOCAL_EFFORTS:
-    print(effort, round(hearing.speech_intelligibility_index(effort, noise).sii, 2))
+for effort in speech.sii.VOCAL_EFFORTS:
+    print(effort, round(speech.speech_intelligibility_index(effort, noise).sii, 2))
 # normal 0.12 | raised 0.36 | loud 0.59 | shout 0.79
 
-print(hearing.standard_speech_spectrum("loud")[8])  # 42.16 dB SPL at 1 kHz
+print(speech.standard_speech_spectrum("loud")[8])  # 42.16 dB SPL at 1 kHz
 ```
 
 The four spectra are also available as one plottable result:
@@ -227,14 +227,14 @@ as one labelled family on the one-third-octave band axis.
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import hearing
+from phonometry import speech
 
 # One line: the whole ANSI S3.5-1997 Table 3 family.
-hearing.standard_speech_spectra().plot()
+speech.standard_speech_spectra().plot()
 plt.show()
 
 # By hand, mirroring what StandardSpeechSpectrum.plot() draws:
-res = hearing.standard_speech_spectra()
+res = speech.standard_speech_spectra()
 pos = np.arange(res.frequencies.size)
 fig, ax = plt.subplots()
 for effort, levels in zip(res.vocal_efforts, res.levels):
@@ -261,19 +261,19 @@ vocal effort lifts the speech spectrum and raises the SII.
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import NullFormatter
-from phonometry import hearing
+from phonometry import speech
 
 # The four ANSI S3.5-1997 Table 3 spectra and the fixed broadband noise above.
 noise = np.array([48.0, 47.0, 46.0, 44.0, 42.0, 40.0, 38.0, 36.0, 34.0,
                   32.0, 30.0, 28.0, 26.0, 24.0, 22.0, 20.0, 18.0, 16.0])
-efforts = hearing.sii.VOCAL_EFFORTS         # ("normal", "raised", "loud", "shout")
-freqs = hearing.sii.BAND_CENTERS            # the 18 one-third-octave band centres
+efforts = speech.sii.VOCAL_EFFORTS         # ("normal", "raised", "loud", "shout")
+freqs = speech.sii.BAND_CENTERS            # the 18 one-third-octave band centres
 
 fig, (ax_s, ax_i) = plt.subplots(1, 2, figsize=(12, 5))
 
 # Left: each higher vocal effort lifts the whole speech spectrum.
 for effort in efforts:
-    ax_s.plot(freqs, hearing.standard_speech_spectrum(effort), "o-",
+    ax_s.plot(freqs, speech.standard_speech_spectrum(effort), "o-",
               label=effort.capitalize())
 ax_s.set_xscale("log")
 ax_s.set_xticks(list(freqs))
@@ -284,7 +284,7 @@ ax_s.set_ylabel("Speech spectrum level [dB SPL]")
 ax_s.legend()
 
 # Right: the SII each spectrum reaches in the fixed noise.
-sii = [hearing.speech_intelligibility_index(e, noise).sii for e in efforts]
+sii = [speech.speech_intelligibility_index(e, noise).sii for e in efforts]
 pos = np.arange(len(efforts))
 ax_i.bar(pos, sii)
 ax_i.set_xticks(pos)
@@ -371,11 +371,11 @@ which makes the four directly comparable:
 
 ```python
 import numpy as np
-from phonometry import hearing
+from phonometry import speech
 
-for method in hearing.SII_METHODS:
-    n_bands = hearing.sii_procedure(method).frequencies.size
-    result = hearing.speech_intelligibility_index(
+for method in speech.SII_METHODS:
+    n_bands = speech.sii_procedure(method).frequencies.size
+    result = speech.speech_intelligibility_index(
         "normal", np.full(n_bands, 25.0), method=method
     )
     print(method, n_bands, round(result.sii, 3))
@@ -415,7 +415,7 @@ only: the audibility chain, and therefore `result.band_audibility`, is
 untouched.
 
 ```python
-res = hearing.speech_intelligibility_index(
+res = speech.speech_intelligibility_index(
     "normal", np.full(6, 25.0), method="octave",
     band_importance=[0.0, 0.0, 1.0, 0.0, 0.0, 0.0],   # all the weight at 1 kHz
 )
@@ -432,12 +432,12 @@ column is carried here, so `"raised"`, `"loud"` and `"shout"` are available on
 the one-third-octave procedure alone.
 
 ```python
-octave = hearing.sii_procedure("octave")
+octave = speech.sii_procedure("octave")
 print(octave.frequencies)          # [ 250.  500. 1000. 2000. 4000. 8000.]
 print(octave.band_importance)      # [0.0617 0.1671 0.2373 0.2648 0.2142 0.0549]
 
 # Table 2 is critical bands 3 to 19 of Table 1, weighted equally.
-equal = hearing.sii_procedure("equally-contributing")
+equal = speech.sii_procedure("equally-contributing")
 print(equal.band_edges[0], equal.band_edges[-1])       # 300.0 6400.0
 print(equal.band_importance.sum().round(4))            # 0.9996
 ```
@@ -484,9 +484,9 @@ reportlab and, for the figure the fiche embeds, matplotlib (`pip install
 `language="es"` for a Spanish fiche.
 
 ```python
-from phonometry import hearing, ReportMetadata
+from phonometry import ReportMetadata, speech
 
-res = hearing.speech_intelligibility_index(speech, noise, threshold=threshold)
+res = speech.speech_intelligibility_index(speech_spectrum, noise, threshold=threshold)
 res.report(
     "sii_fiche.pdf",
     metadata=ReportMetadata(

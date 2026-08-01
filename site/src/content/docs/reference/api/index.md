@@ -80,9 +80,9 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 
 | Module | Summary |
 | :--- | :--- |
-| [`hearing.sti`](/phonometry/reference/api/speech/sti/) | Speech Transmission Index (STI) per IEC 60268-16:2020 (Edition 5). |
-| [`hearing.sii`](/phonometry/reference/api/speech/sii/) | Speech Intelligibility Index (SII) per ANSI S3.5-1997 (R2017). |
-| [`hearing.objective_intelligibility`](/phonometry/reference/api/speech/objective-intelligibility/) | Short-Time Objective Intelligibility (STOI and ESTOI). |
+| [`speech.sti`](/phonometry/reference/api/speech/sti/) | Speech Transmission Index (STI) per IEC 60268-16:2020 (Edition 5). |
+| [`speech.sii`](/phonometry/reference/api/speech/sii/) | Speech Intelligibility Index (SII) per ANSI S3.5-1997 (R2017). |
+| [`speech.objective_intelligibility`](/phonometry/reference/api/speech/objective-intelligibility/) | Short-Time Objective Intelligibility (STOI and ESTOI). |
 
 ## Hearing and exposure
 

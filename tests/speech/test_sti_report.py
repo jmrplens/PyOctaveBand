@@ -19,8 +19,8 @@ import numpy as np
 import pytest
 
 from phonometry import ReportMetadata
-from phonometry.hearing import sti_from_impulse_response
-from phonometry.hearing.sti import _MOD_FREQS, _NUM_BANDS, _sti_from_mtf
+from phonometry.speech import sti_from_impulse_response
+from phonometry.speech.sti import _MOD_FREQS, _NUM_BANDS, _sti_from_mtf
 
 _PDF_MAGIC = b"%PDF"
 

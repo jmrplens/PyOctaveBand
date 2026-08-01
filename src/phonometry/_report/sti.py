@@ -1,7 +1,7 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 """IEC 60268-16 speech-transmission-index fiche (reportlab renderer).
 
-Renders a :class:`~phonometry.hearing.sti.STIResult` to a one-page PDF laid out
+Renders a :class:`~phonometry.speech.sti.STIResult` to a one-page PDF laid out
 like a voice-alarm / public-address intelligibility verification report:
 
 * a title and the standard-basis line (measurement standard + IEC 60268-16),
@@ -50,7 +50,7 @@ from ._layout import (
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..hearing.sti import STIResult
+    from ..speech.sti import STIResult
 
 #: Nominal octave-band centre frequencies of the seven STI bands, in hertz
 #: (IEC 60268-16 A.5.1: 125 Hz to 8 kHz).
@@ -216,7 +216,7 @@ def render_sti_report(
 ) -> str:
     """Render an IEC 60268-16 speech-transmission-index fiche to a PDF at ``path``.
 
-    :param result: A :class:`~phonometry.hearing.sti.STIResult` carrying the
+    :param result: A :class:`~phonometry.speech.sti.STIResult` carrying the
         overall STI, the per-octave-band modulation transfer index ``mti`` and
         the Annex F qualification letter ``rating``.
     :param path: Destination path of the PDF file.

@@ -1,5 +1,5 @@
 ---
-title: "hearing.sii"
+title: "speech.sii"
 description: "Speech Intelligibility Index (SII) per ANSI S3.5-1997 (R2017)."
 sidebar:
   label: "sii"

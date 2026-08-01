@@ -999,6 +999,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- `phonometry.hearing` is two packages. It held two subjects that share a
+  word and nothing else: speech intelligibility, which scores a transmission
+  channel and is read by whoever designs a room or a public address system,
+  and hearing conservation, which is about the ear and is read by an
+  occupational hygienist. The generated reference and the sidebar had already
+  separated them; the code had not, so the `speech` section of the reference
+  drew from a package called something else. STI, SII and STOI are now
+  `phonometry.speech`; the audiometric thresholds, the ISO 1999 hearing loss
+  and the ISO 9612 exposure stay in `phonometry.hearing`. No module is
+  renamed and no page moves: the reference had these three under `speech`
+  already, and the split is what lets its consistency contract say so. Three
+  sections still draw from a package of another name (`rooms`, `environment`
+  and the two that span two parents); each is a later step or a documented
+  exception. The renderers follow, so `_plot/hearing.py` becomes two modules
+  with their own string tables, and the Spanish labels of the speech ones get
+  the test they never had.
+
+  Compatibility is the same as for the other 4.0 splits: `phonometry.hearing.sti`
+  and its two neighbours still import and warn, `hearing.stipa` still resolves
+  from the namespace it left, and both go in 5.0.
+
 - `phonometry.metrology` is three packages. It had grown to 21 modules across
   four unrelated subjects, and every layer above it had already worked around
   that: the generated reference spread it over six sections, the sidebar over

@@ -395,11 +395,15 @@ def test_pre_move_module_path_still_imports(path: str) -> None:
 
 
 # --------------------------------------------------------------------------- #
-# 4.0 taxonomy: metrology split into filters + signal + a narrowed metrology.
+# 4.0 taxonomy: metrology split into filters + signals + a narrowed metrology,
+# and the speech intelligibility of hearing into speech.
 # Frozen snapshot of the pre-split module paths; do NOT regenerate from the
 # live tree. Removed in 5.0 together with the aliases.
 # --------------------------------------------------------------------------- #
 _PRE_SPLIT_MODULE_PATHS = [
+    "phonometry.hearing.objective_intelligibility",
+    "phonometry.hearing.sii",
+    "phonometry.hearing.sti",
     "phonometry.metrology.cepstrum",
     "phonometry.metrology.compliance",
     "phonometry.metrology.core",
@@ -471,6 +475,23 @@ def test_narrowed_namespace_lists_the_moved_names_in_dir() -> None:
     assert listed == sorted(listed)
     # __all__ stays narrow, so `import *` gives the 4.0 API, not the aliases.
     assert "leq" not in metrology.__all__
+
+
+def test_narrowed_hearing_namespace_still_serves_speech() -> None:
+    """``hearing.stipa`` keeps working: the namespace form is documented."""
+    import warnings
+
+    from phonometry import hearing
+
+    with pytest.warns(DeprecationWarning, match="phonometry.speech.stipa"):
+        assert hearing.stipa is ph.stipa
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", DeprecationWarning)
+        assert hearing.age_threshold is ph.age_threshold
+    assert "speech_intelligibility_index" in dir(hearing)
+    assert "speech_intelligibility_index" not in hearing.__all__
+    with pytest.raises(AttributeError, match="phonometry.hearing"):
+        _ = hearing.not_a_name
 
 
 def test_narrowed_namespace_falls_back_to_the_module_alias() -> None:

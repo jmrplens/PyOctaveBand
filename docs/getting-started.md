@@ -141,7 +141,7 @@ safe to pass `wavfile.read` output directly.
 
 ## Where to go next
 
-The octave analysis above uses the `filters` core, one of seventeen domain
+The octave analysis above uses the `filters` core, one of eighteen domain
 namespaces; the documentation index walks through the rest, from
 psychoacoustics and room, building and vibration acoustics to environmental,
 aircraft and underwater noise, electroacoustics and FDTD wave simulation.
