@@ -35,6 +35,10 @@ starlight-image-zoom-zoomable > .starlight-image-zoom-control:not(:focus):not(:f
   background: none;
   border: 0;
   border-radius: 0;
+  /* No ring on the button: it spans the whole reading column, so the browser
+     default would draw a box wider than the figure, around nothing. The ring
+     is drawn on the image instead, by the rule at the bottom of this file. */
+  outline: none;
   /* The image below is what the pointer interacts with. */
   pointer-events: none;
 }

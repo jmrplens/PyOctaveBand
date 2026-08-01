@@ -17,7 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   hiding it. The figure itself is the control, with no icon painted over the
   drawing; the pointer opens it by clicking anywhere on it, and the plugin's
   floating button is kept, emptied and stretched over the whole figure so the
-  keyboard still has something to land on, name and press. The zoomed view is
+  keyboard still has something to land on, name and press; its own focus ring
+  is suppressed and drawn on the image instead, since the button spans the
+  reading column and the figure inside it is narrower, so a ring on the button
+  would box in white space. The zoomed view is
   a native `<dialog>`: Escape closes it, so does a click or tap anywhere, and
   focus returns to the figure it came from. Nothing is fetched from a third
   party and no script evaluates a string, which is what lets the page keep the
