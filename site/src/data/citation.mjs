@@ -113,6 +113,20 @@ for (const field of ['title', 'doi', 'url', 'license', 'authors']) {
 export const version = readFileSync(root('VERSION'), 'utf8').trim();
 
 /**
+ * The Zenodo *concept* DOI, which resolves to the newest archived release.
+ *
+ * The BibTeX entry below is not the only thing that cites it: the site's
+ * structured data publishes it as the software's identifier and among its
+ * `sameAs` addresses. Those used to spell it out, which made three copies of
+ * one string in the repository; they read it from here now, so `CITATION.cff`
+ * is the only place it is written down.
+ */
+export const doi = cff.doi;
+
+/** The same DOI as a resolvable address. */
+export const doiUrl = `https://doi.org/${doi}`;
+
+/**
  * The year of the release named by `VERSION`, taken from its changelog heading
  * (`## [3.3.0] - 2026-07-27`). Between releases those always agree, because the
  * commit that bumps `VERSION` is the one that dates the heading. If they ever

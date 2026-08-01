@@ -7,6 +7,7 @@ import starlightImageZoom from 'starlight-image-zoom';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { sidebar } from './src/data/sidebar.mjs';
+import { doi, doiUrl } from './src/data/citation.mjs';
 import { basePath, siteUrl } from './src/data/site.mjs';
 import { isOurMedia, mediaUrl, REMOTE_PREFIXES } from './src/lib/media.mjs';
 import { rehypeWrappableMath } from './src/lib/wrappable-math.mjs';
@@ -361,7 +362,7 @@ const jsonLd = JSON.stringify({
       identifier: {
         '@type': 'PropertyValue',
         propertyID: 'DOI',
-        value: '10.5281/zenodo.21215280',
+        value: doi,
       },
       datePublished,
       dateModified,
@@ -387,11 +388,7 @@ const jsonLd = JSON.stringify({
       // node states one consistent set instead of a partial one per document.
       creator: { '@id': authorId },
       maintainer: { '@id': authorId },
-      sameAs: [
-        'https://pypi.org/project/phonometry/',
-        'https://doi.org/10.5281/zenodo.21215280',
-        `${fullUrl}/`,
-      ],
+      sameAs: ['https://pypi.org/project/phonometry/', doiUrl, `${fullUrl}/`],
     },
     {
       '@type': 'SoftwareSourceCode',
