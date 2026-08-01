@@ -464,10 +464,10 @@ L 705.765 28.318125
    <g id="text_18">
     <g id="patch_21">
      <path d="M 50.899909 397.963828 
-L 267.631159 397.963828 
-Q 272.131159 397.963828 272.131159 393.463828 
-L 272.131159 360.96082 
-Q 272.131159 356.46082 267.631159 356.46082 
+L 283.886002 397.963828 
+Q 288.386002 397.963828 288.386002 393.463828 
+L 288.386002 360.96082 
+Q 288.386002 356.46082 283.886002 356.46082 
 L 50.899909 356.46082 
 Q 46.399909 356.46082 46.399909 360.96082 
 L 46.399909 393.463828 
@@ -475,7 +475,7 @@ Q 46.399909 397.963828 50.899909 397.963828
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(50.899909 368.748105)">LWs = 10 lg(2 pi f eta m S) + Lv - 60 dB</text>
+    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(50.899909 368.748105)">LWs = 10 log10(2 pi f eta m S) + Lv - 60 dB</text>
     <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(50.899909 379.550566)">eta = 2.2/(f Ts),  v0 = 1 nm/s</text>
     <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(50.899909 390.40084)">reception-plate method (clause 7)</text>
    </g>

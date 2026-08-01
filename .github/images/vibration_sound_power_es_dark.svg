@@ -396,10 +396,10 @@ L 706.165 28.798125
    <g id="text_14">
     <g id="patch_19">
      <path d="M 51.299909 398.443828 
-L 316.79569 398.443828 
-Q 321.29569 398.443828 321.29569 393.943828 
-L 321.29569 361.441523 
-Q 321.29569 356.941523 316.79569 356.941523 
+L 365.560221 398.443828 
+Q 370.060221 398.443828 370.060221 393.943828 
+L 370.060221 361.441523 
+Q 370.060221 356.941523 365.560221 356.941523 
 L 51.299909 356.941523 
 Q 46.799909 356.941523 46.799909 361.441523 
 L 46.799909 393.943828 
@@ -407,7 +407,7 @@ Q 46.799909 398.443828 51.299909 398.443828
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(51.299909 369.228809)">LW = Lv + 10 lg(S/S0) + 10 lg(e) + 10 lg(411/400)</text>
+    <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(51.299909 369.228809)">LW = Lv + 10 log10(S/S0) + 10 log10(e) + 10 log10(411/400)</text>
     <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(51.299909 380.030566)">S = 1,6 m2,  S0 = 1 m2</text>
     <text style="font-size: 9px; font-family: sans-serif; fill: #ffffff" transform="translate(51.299909 390.88084)">Part 1: e = 1 -&gt; upper limit LW,max</text>
    </g>

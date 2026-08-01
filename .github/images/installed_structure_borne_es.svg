@@ -411,10 +411,10 @@ L 700.73125 28.318125
    <g id="text_16">
     <g id="patch_7">
      <path d="M 54.376559 397.713828 
-L 356.29523 397.713828 
-Q 360.54523 397.713828 360.54523 393.463828 
-L 360.54523 362.721387 
-Q 360.54523 358.471387 356.29523 358.471387 
+L 386.998824 397.713828 
+Q 391.248824 397.713828 391.248824 393.463828 
+L 391.248824 362.721387 
+Q 391.248824 358.471387 386.998824 358.471387 
 L 54.376559 358.471387 
 Q 50.126559 358.471387 50.126559 362.721387 
 L 50.126559 393.463828 
@@ -422,9 +422,9 @@ Q 50.126559 397.713828 54.376559 397.713828
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(54.376559 370.076045)">DC = 10 lg(|Ys+Yi|^2 / (|Ys| Re Yi))</text>
-    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(54.376559 380.323525)">Ln,s,ij = LWs,inst - Dsa - Rij - 10 lg(Si/S0) - 10 lg(A0/4)</text>
-    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(54.376559 390.571006)">Ln,s = 10 lg(sum 10^(Ln,s,ij/10)),  S0 = A0 = 10 m2</text>
+    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(54.376559 370.076045)">DC = 10 log10(|Ys+Yi|^2 / (|Ys| Re Yi))</text>
+    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(54.376559 380.323525)">Ln,s,ij = LWs,inst - Dsa - Rij - 10 log10(Si/S0) - 10 log10(A0/4)</text>
+    <text style="font-size: 8.5px; font-family: sans-serif" transform="translate(54.376559 390.571006)">Ln,s = 10 log10(sum 10^(Ln,s,ij/10)),  S0 = A0 = 10 m2</text>
    </g>
    <g id="text_17">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle" x="372.632422" y="16.318125" transform="rotate(-0 372.632422 16.318125)">Ruido estructural instalado EN 12354-5</text>

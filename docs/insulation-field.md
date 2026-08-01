@@ -252,7 +252,7 @@ bands = [100, 125, 160, 200, 250, 315, 400, 500,
 x = np.arange(len(bands))
 w = building.weighted_rating(field.dnt)
 fig, ax = plt.subplots()
-ax.fill_between(x, field.d, field.dnt, alpha=0.2, label="10 lg(T/T0)")
+ax.fill_between(x, field.d, field.dnt, alpha=0.2, label="10 log10(T/T0)")
 ax.plot(x, field.d, "--o", label="D (level difference)")
 ax.plot(x, field.dnt, "-s", label="DnT (standardized)")
 ax.set_xticks(x, [str(b) for b in bands], rotation=45)

@@ -999,6 +999,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- The figures now spell the decimal logarithm the way the pages around them
+  do. Every axis label, legend entry, title, annotation box and diagram
+  caption the generators write still carried the ISO `lg`, so a guide that
+  had just stated $\log_{10}$ in its prose showed `lg` in the picture below
+  it, and the same quantity was named two ways on one screen. They now write
+  `log10` in plain text and $\log_{10}$ in maths, in English and Spanish
+  alike; 44 figures were regenerated for it, the ISO 10846 fiche with them,
+  because its embedded plot carries the same legend, and the two sound power
+  formulas of the free field versus reverberation room clip, which is
+  re-encoded in its four variants. Spelling the
+  logarithm out costs three characters, which pushed eight diagram lines out
+  of the frame that used to hold them: the ISO 3744 formula card, the
+  energetic sum of the installed-paths cascade, the survey relation of the
+  vibration sound power sheet, the junction and noise-control captions, the
+  reception-plate power balance, the detector chain's decibel stage and the
+  impact-setup relations each take a smaller face so the line sits inside its
+  box again. The renderer of the human-vibration fiche also documented the
+  VDV unit as `m/s^1,75`, a decimal comma where the rest of the project
+  writes a point, while what it prints has always followed the reader's
+  language.
+
 - The theory pages author their figures through `ThemeImage` like every other
   page. Thirty-four figures across the six theory pages, in both languages,
   were still two hand-written `<img>` tags on one line with the alt text typed

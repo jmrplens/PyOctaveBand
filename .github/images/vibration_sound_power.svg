@@ -387,10 +387,10 @@ L 705.765 28.318125
    <g id="text_14">
     <g id="patch_19">
      <path d="M 50.899909 397.963828 
-L 316.39569 397.963828 
-Q 320.89569 397.963828 320.89569 393.463828 
-L 320.89569 360.961523 
-Q 320.89569 356.461523 316.39569 356.461523 
+L 365.160221 397.963828 
+Q 369.660221 397.963828 369.660221 393.463828 
+L 369.660221 360.961523 
+Q 369.660221 356.461523 365.160221 356.461523 
 L 50.899909 356.461523 
 Q 46.399909 356.461523 46.399909 360.961523 
 L 46.399909 393.463828 
@@ -398,7 +398,7 @@ Q 46.399909 397.963828 50.899909 397.963828
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 9px; font-family: sans-serif" transform="translate(50.899909 368.748809)">LW = Lv + 10 lg(S/S0) + 10 lg(e) + 10 lg(411/400)</text>
+    <text style="font-size: 9px; font-family: sans-serif" transform="translate(50.899909 368.748809)">LW = Lv + 10 log10(S/S0) + 10 log10(e) + 10 log10(411/400)</text>
     <text style="font-size: 9px; font-family: sans-serif" transform="translate(50.899909 379.550566)">S = 1.6 m2,  S0 = 1 m2</text>
     <text style="font-size: 9px; font-family: sans-serif" transform="translate(50.899909 390.40084)">Part 1: e = 1 -&gt; upper limit LW,max</text>
    </g>

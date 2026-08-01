@@ -1677,7 +1677,7 @@ L 705.748125 309.649701
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_34">
-    <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="383.889297" y="303.649701" transform="rotate(-0 383.889297 303.649701)">SEL_ss = 179 dB;  SEL_cum = SEL_ss + 10 lg(N)</text>
+    <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="383.889297" y="303.649701" transform="rotate(-0 383.889297 303.649701)">SEL_ss = 179 dB;  SEL_cum = SEL_ss + 10 log10(N)</text>
    </g>
   </g>
  </g>

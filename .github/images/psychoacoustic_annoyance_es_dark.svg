@@ -348,7 +348,7 @@ z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
     <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(532.654473 366.875889)">PA = N5 (1 + sqrt(wS^2 + wFR^2))</text>
-    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(527.537207 377.123369)">wS  = (S - 1,75) 0,25 lg(N5 + 10)</text>
+    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(512.18541 377.123369)">wS  = (S - 1,75) 0,25 log10(N5 + 10)</text>
     <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(512.18541 387.325029)">wFR = (2,18 / N5^0,4)(0,4 F + 0,6 R)</text>
    </g>
    <g id="text_18">

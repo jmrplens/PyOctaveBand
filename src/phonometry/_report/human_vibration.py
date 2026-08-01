@@ -96,7 +96,7 @@ _KIND_TOTAL_SYMBOL: dict[str, str] = {
 
 
 def _unit(metric: str, language: str = "en") -> str:
-    """The exposure unit: ``m/s2`` for ``A(8)``, ``m/s^1,75`` for the VDV."""
+    """The exposure unit: ``m/s2`` for ``A(8)``, ``m/s^1.75`` for the VDV."""
     if metric == "vdv":
         return "m/s<sup>" + decimal_comma("1.75", language) + "</sup>"
     return "m/s<sup>2</sup>"

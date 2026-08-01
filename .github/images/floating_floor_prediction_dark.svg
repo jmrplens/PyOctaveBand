@@ -469,10 +469,10 @@ z
    <g id="legend_1">
     <g id="patch_8">
      <path d="M 53.588281 89.520937 
-L 257.261094 89.520937 
-Q 259.061094 89.520937 259.061094 87.720937 
-L 259.061094 34.618125 
-Q 259.061094 32.818125 257.261094 32.818125 
+L 274.220469 89.520937 
+Q 276.020469 89.520937 276.020469 87.720937 
+L 276.020469 34.618125 
+Q 276.020469 32.818125 274.220469 32.818125 
 L 53.588281 32.818125 
 Q 51.788281 32.818125 51.788281 34.618125 
 L 51.788281 87.720937 
@@ -487,7 +487,7 @@ L 73.388281 40.106719
 " style="fill: none; stroke-dasharray: 12.8,3.2,2,3.2; stroke-dashoffset: 0; stroke: #2ca02c; stroke-width: 2"/>
     </g>
     <g id="text_19">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="80.588281" y="43.256719" transform="rotate(-0 80.588281 43.256719)">40 lg(f/f0) + hammer term (chipboard)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="80.588281" y="43.256719" transform="rotate(-0 80.588281 43.256719)">40 log10(f/f0) + hammer term (chipboard)</text>
     </g>
     <g id="line2d_47">
      <path d="M 55.388281 53.607422 
@@ -496,7 +496,7 @@ L 73.388281 53.607422
 " style="fill: none; stroke-dasharray: 7.4,3.2; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 2"/>
     </g>
     <g id="text_20">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="80.588281" y="56.757422" transform="rotate(-0 80.588281 56.757422)">40 lg(f/f0) (asphalt, dry)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="80.588281" y="56.757422" transform="rotate(-0 80.588281 56.757422)">40 log10(f/f0) (asphalt, dry)</text>
     </g>
     <g id="line2d_48">
      <path d="M 55.388281 67.108125 
@@ -505,7 +505,7 @@ L 73.388281 67.108125
 " style="fill: none; stroke: #1f77b4; stroke-width: 2.4; stroke-linecap: square"/>
     </g>
     <g id="text_21">
-     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="80.588281" y="70.258125" transform="rotate(-0 80.588281 70.258125)">30 lg(f/f0) (sand-cement screed)</text>
+     <text style="font-size: 9px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="80.588281" y="70.258125" transform="rotate(-0 80.588281 70.258125)">30 log10(f/f0) (sand-cement screed)</text>
     </g>
     <g id="line2d_49">
      <defs>

@@ -497,7 +497,7 @@ Q 46.298346 68.981523 51.298346 68.981523
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 10px; font-family: sans-serif" transform="translate(51.298346 48.575469)">LW = Lp,in + Cd - R' + 10 lg(S/S0)</text>
+    <text style="font-size: 10px; font-family: sans-serif" transform="translate(51.298346 48.575469)">LW = Lp,in + Cd - R' + 10 log10(S/S0)</text>
     <text style="font-size: 10px; font-family: sans-serif" transform="translate(51.298346 60.578203)">muro de 176 m² + puerta industrial de 24 m², Cd = -5 dB</text>
    </g>
   </g>

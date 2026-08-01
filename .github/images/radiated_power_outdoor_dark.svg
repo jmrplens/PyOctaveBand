@@ -498,7 +498,7 @@ Q 45.898346 68.501523 50.898346 68.501523
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(50.898346 48.095469)">LW = Lp,in + Cd - R' + 10 lg(S/S0)</text>
+    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(50.898346 48.095469)">LW = Lp,in + Cd - R' + 10 log10(S/S0)</text>
     <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(50.898346 60.098203)">wall 176 m² + industrial door 24 m², Cd = -5 dB</text>
    </g>
   </g>

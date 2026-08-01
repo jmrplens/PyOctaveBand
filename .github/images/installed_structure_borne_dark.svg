@@ -411,10 +411,10 @@ L 705.503125 28.318125
    <g id="text_16">
     <g id="patch_7">
      <path d="M 59.148434 397.713828 
-L 361.067105 397.713828 
-Q 365.317105 397.713828 365.317105 393.463828 
-L 365.317105 362.721387 
-Q 365.317105 358.471387 361.067105 358.471387 
+L 391.770699 397.713828 
+Q 396.020699 397.713828 396.020699 393.463828 
+L 396.020699 362.721387 
+Q 396.020699 358.471387 391.770699 358.471387 
 L 59.148434 358.471387 
 Q 54.898434 358.471387 54.898434 362.721387 
 L 54.898434 393.463828 
@@ -422,9 +422,9 @@ Q 54.898434 397.713828 59.148434 397.713828
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(59.148434 370.076045)">DC = 10 lg(|Ys+Yi|^2 / (|Ys| Re Yi))</text>
-    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(59.148434 380.323525)">Ln,s,ij = LWs,inst - Dsa - Rij - 10 lg(Si/S0) - 10 lg(A0/4)</text>
-    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(59.148434 390.571006)">Ln,s = 10 lg(sum 10^(Ln,s,ij/10)),  S0 = A0 = 10 m2</text>
+    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(59.148434 370.076045)">DC = 10 log10(|Ys+Yi|^2 / (|Ys| Re Yi))</text>
+    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(59.148434 380.323525)">Ln,s,ij = LWs,inst - Dsa - Rij - 10 log10(Si/S0) - 10 log10(A0/4)</text>
+    <text style="font-size: 8.5px; font-family: sans-serif; fill: #ffffff" transform="translate(59.148434 390.571006)">Ln,s = 10 log10(sum 10^(Ln,s,ij/10)),  S0 = A0 = 10 m2</text>
    </g>
    <g id="text_17">
     <text style="font-weight: 700; font-size: 12px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="377.404297" y="16.318125" transform="rotate(-0 377.404297 16.318125)">EN 12354-5 Installed Structure-Borne Sound</text>

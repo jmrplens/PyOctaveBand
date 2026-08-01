@@ -497,19 +497,19 @@ L 705.405 28.32
    </g>
    <g id="text_18">
     <g id="patch_7">
-     <path d="M 524.910862 394.739727 
+     <path d="M 496.918675 394.739727 
 L 695.4468 394.739727 
 Q 700.4468 394.739727 700.4468 389.739727 
 L 700.4468 365.734258 
 Q 700.4468 360.734258 695.4468 360.734258 
-L 524.910862 360.734258 
-Q 519.910862 360.734258 519.910862 365.734258 
-L 519.910862 389.739727 
-Q 519.910862 394.739727 524.910862 394.739727 
+L 496.918675 360.734258 
+Q 491.918675 360.734258 491.918675 365.734258 
+L 491.918675 389.739727 
+Q 491.918675 394.739727 496.918675 394.739727 
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(534.606175 374.333672)">Kij = 10 lg(1/τ̄) + 5 lg(fc2/1000)</text>
+    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(496.918675 374.333672)">Kij = 10 log10(1/τ̄) + 5 log10(fc2/1000)</text>
     <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(524.910862 386.336406)">concrete, plate 1 fixed at 100 mm</text>
    </g>
    <g id="text_19">

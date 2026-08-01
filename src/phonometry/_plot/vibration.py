@@ -425,7 +425,7 @@ def plot_transfer_stiffness(
     freq = np.asarray(result.frequencies, dtype=np.float64)
     level = np.asarray(result.level, dtype=np.float64)
     kwargs.setdefault("color", _C_PRIMARY)
-    ax.semilogx(freq, level, label=r"$L_k = 20\,\lg(|k_{2,1}|/k_0)$", **kwargs)
+    ax.semilogx(freq, level, label=r"$L_k = 20\,\log_{10}(|k_{2,1}|/k_0)$", **kwargs)
     format_frequency_axis(ax, float(freq.min()), float(freq.max()))
     ax.set_xlabel(_t("Frequency [Hz]", language))
     ax.set_ylabel(_t("Transfer stiffness level $L_k$ [dB re 1 N/m]", language))

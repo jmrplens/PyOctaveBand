@@ -140,8 +140,8 @@ _ES: dict[str, str] = {
     "Age threshold  H  (HTLA)": "Umbral por edad  H  (HTLA)",
     "ISO 7029 fractile, dB": "fractil ISO 7029, dB",
     "Median NIPTS  N50  (6.3.1)": "NIPTS mediana  N50  (6.3.1)",
-    "N50 = [u + v·lg(t/t0)]·(L − L0)²":
-        "N50 = [u + v·lg(t/t0)]·(L − L0)²",
+    "N50 = [u + v·log10(t/t0)]·(L − L0)²":
+        "N50 = [u + v·log10(t/t0)]·(L − L0)²",
     "Fractile NIPTS  N  (6.3.2)": "NIPTS del fractil  N  (6.3.2)",
     "N = N50 + z·(du if z ≥ 0 else dl)":
         "N = N50 + z·(du si z ≥ 0, si no dl)",
@@ -161,14 +161,14 @@ _ES: dict[str, str] = {
         "OR = pendiente de crecimiento [dB/s],   LD = Le − Ls [dB]",
     "Predicted prominence  P   (clause 7, Formula 1)":
         "Prominencia prevista  P   (cláusula 7, Fórmula 1)",
-    "P = 3·lg(OR) + 2·lg(LD);   highest P over 30 min governs":
-        "P = 3·lg(OR) + 2·lg(LD);   la P más alta en 30 min gobierna",
+    "P = 3·log10(OR) + 2·log10(LD);   highest P over 30 min governs":
+        "P = 3·log10(OR) + 2·log10(LD);   la P más alta en 30 min gobierna",
     "Adjustment  KI   (clause 8, Formula 2)":
         "Ajuste  KI   (cláusula 8, Fórmula 2)",
     "KI = 1.8·(P − 5) dB for P > 5, else 0":
         "KI = 1.8·(P − 5) dB si P > 5, si no 0",
-    "Rating level  LAr,T = 10·lg( (1/T) Σ Δt·10^((LAeq+KI)/10) )":
-        "Nivel de evaluación  LAr,T = 10·lg( (1/T) Σ Δt·10^((LAeq+KI)/10) )",
+    "Rating level  LAr,T = 10·log10( (1/T) Σ Δt·10^((LAeq+KI)/10) )":
+        "Nivel de evaluación  LAr,T = 10·log10( (1/T) Σ Δt·10^((LAeq+KI)/10) )",
     "impulse-adjusted level over the reference time  (Note 1)":
         "nivel ajustado por impulsos sobre el tiempo de referencia  (Nota 1)",
     "Vertical seat acceleration  az(t)":
@@ -389,8 +389,8 @@ _ES: dict[str, str] = {
         "Fd — flanco (emisor) → separador (receptor)",
     "Df — separating (source) → flanking (receiving)":
         "Df — separador (emisor) → flanco (receptor)",
-    "R'w = −10 lg Σ 10^(−Rij,w /10) dB   (EN 12354-1, Formula 26)":
-        "R'w = −10 lg Σ 10^(−Rij,w /10) dB   (EN 12354-1, Fórmula 26)",
+    "R'w = −10 log10 Σ 10^(−Rij,w /10) dB   (EN 12354-1, Formula 26)":
+        "R'w = −10 log10 Σ 10^(−Rij,w /10) dB   (EN 12354-1, Fórmula 26)",
     # d14 - ISO 9613-2 outdoor propagation geometry
     "ISO 9613-2 source–barrier–receiver geometry":
         "Geometría fuente–barrera–receptor (ISO 9613-2)",
@@ -401,8 +401,8 @@ _ES: dict[str, str] = {
     "direct path (blocked)": "trayecto directo (bloqueado)",
     "z = dss + dsr − d   (path difference)":
         "z = dss + dsr − d   (diferencia de camino)",
-    "Dz = 10 lg[ 3 + (C₂/λ) C₃ z Kmet ]   (Eq. 14)":
-        "Dz = 10 lg[ 3 + (C₂/λ) C₃ z Kmet ]   (Ec. 14)",
+    "Dz = 10 log10[ 3 + (C₂/λ) C₃ z Kmet ]   (Eq. 14)":
+        "Dz = 10 log10[ 3 + (C₂/λ) C₃ z Kmet ]   (Ec. 14)",
     # Impedance tube (ISO 10534) setup
     "Impedance tube: two-microphone method (ISO 10534-2)":
         "Tubo de impedancia: método de dos micrófonos (ISO 10534-2)",
@@ -735,10 +735,10 @@ _ES: dict[str, str] = {
         "Sensibilidad característica: Lp a 1 m para 1 W en la impedancia nominal",
     "Up = √(R · 1 W): 2.83 V is 1 W into 8 Ω but 2 W into 4 Ω (+3 dB)":
         "Up = √(R · 1 W): 2,83 V es 1 W en 8 Ω pero 2 W en 4 Ω (+3 dB)",
-    "Lp(1 m) = Lp(r) + 20 lg(r / 1 m)   (far field, inverse-distance law)":
-        "Lp(1 m) = Lp(r) + 20 lg(r / 1 m)   (campo lejano, ley 1/r)",
-    "Microphone (IEC 60268-4): M in mV/Pa, or LM = 20 lg(M / 1 V/Pa) dB":
-        "Micrófono (IEC 60268-4): M en mV/Pa, o LM = 20 lg(M / 1 V/Pa) dB",
+    "Lp(1 m) = Lp(r) + 20 log10(r / 1 m)   (far field, inverse-distance law)":
+        "Lp(1 m) = Lp(r) + 20 log10(r / 1 m)   (campo lejano, ley 1/r)",
+    "Microphone (IEC 60268-4): M in mV/Pa, or LM = 20 log10(M / 1 V/Pa) dB":
+        "Micrófono (IEC 60268-4): M en mV/Pa, o LM = 20 log10(M / 1 V/Pa) dB",
     # Occupational noise exposure (ISO 9612)
     "Occupational noise exposure measurement (ISO 9612)":
         "Medición de la exposición al ruido en el trabajo (ISO 9612)",
@@ -834,8 +834,8 @@ _ES: dict[str, str] = {
         "→ magnitudes de fuente (Fórmulas 15–19):",
     "equivalent blocked force L_Fb,eq ,": "fuerza bloqueada equivalente L_Fb,eq ,",
     "L_Wsn consumed by EN 12354-5": "L_Wsn que consume EN 12354-5",
-    "spatial average:  Lv = 10 lg[(1/N)·Σ 10^(Lv,i/10)]   (Formula 12)":
-        "promedio espacial:  Lv = 10 lg[(1/N)·Σ 10^(Lv,i/10)]   (Fórmula 12)",
+    "spatial average:  Lv = 10 log10[(1/N)·Σ 10^(Lv,i/10)]   (Formula 12)":
+        "promedio espacial:  Lv = 10 log10[(1/N)·Σ 10^(Lv,i/10)]   (Fórmula 12)",
     # Installed structure-borne sound (EN 12354-5)
     "Installed structure-borne sound paths (EN 12354-5)":
         "Vías del sonido estructural de equipos instalados (EN 12354-5)",
@@ -867,8 +867,8 @@ _ES: dict[str, str] = {
     "optional positions 2–4": "posiciones opcionales 2–4",
     "R1 = √(H² + R0²)   slant distance, rotor centre → microphone":
         "R1 = √(H² + R0²)   distancia oblicua, centro del rotor → micrófono",
-    "LWA,i = Lp,i − 6 + 10 lg(4π R1² / S0)   (Formula 26, S0 = 1 m²)":
-        "LWA,i = Lp,i − 6 + 10 lg(4π R1² / S0)   (Fórmula 26, S0 = 1 m²)",
+    "LWA,i = Lp,i − 6 + 10 log10(4π R1² / S0)   (Formula 26, S0 = 1 m²)":
+        "LWA,i = Lp,i − 6 + 10 log10(4π R1² / S0)   (Fórmula 26, S0 = 1 m²)",
     "the −6 dB removes the board's pressure doubling; board-to-R1 angle φ = 25°–40°":
         "los −6 dB descuentan la duplicación de presión de la placa; "
         "ángulo placa–R1 φ = 25°–40°",
@@ -967,8 +967,8 @@ _ES: dict[str, str] = {
     "≥ 4 excitation positions on i; accelerometers ≥ 0.25 m from edges, ≥ 0.5 m apart":
         "≥ 4 posiciones de excitación en i; acelerómetros a ≥ 0,25 m de los "
         "bordes y ≥ 0,5 m entre sí",
-    "Kij = D̄v,ij + 10 lg( lij / √(ai·aj) ),   ai = equivalent absorption length":
-        "Kij = D̄v,ij + 10 lg( lij / √(ai·aj) ),   ai = long. de "
+    "Kij = D̄v,ij + 10 log10( lij / √(ai·aj) ),   ai = equivalent absorption length":
+        "Kij = D̄v,ij + 10 log10( lij / √(ai·aj) ),   ai = long. de "
         "absorción equiv.",
     # Sound power from surface vibration (ISO/TS 7849)
     "Sound power from surface vibration (ISO/TS 7849)":
@@ -1263,8 +1263,8 @@ _ES: dict[str, str] = {
     "rahmonics at n·t0 with heights a, −a²/2, a³/3, …, whatever the source spectrum does":
         "rahmónicos en n·t0 con alturas a, −a²/2, a³/3, …, haga lo que "
         "haga el espectro de la fuente",
-    "the highpass ripple swings between 20·lg(1 ± a) = +3.5 and −6.0 dB; echo_detection reads t0 and a off the peak":
-        "la ondulación paso alto oscila entre 20·lg(1 ± a) = +3,5 y "
+    "the highpass ripple swings between 20·log10(1 ± a) = +3.5 and −6.0 dB; echo_detection reads t0 and a off the peak":
+        "la ondulación paso alto oscila entre 20·log10(1 ± a) = +3,5 y "
         "−6,0 dB; echo_detection lee t0 y a del pico",
     # Time synchronous averaging (McFadden 1987)
     "Time synchronous averaging: trigger, slice, average":
@@ -1284,8 +1284,8 @@ _ES: dict[str, str] = {
     "at every order k/T": "en cada orden k/T",
     "Asynchronous noise falls as 1/√N":
         "El ruido asíncrono cae como 1/√N",
-    "power −10·lg N = −16 dB for N = 40;  amplitude gain √N = 6.3":
-        "potencia −10·lg N = −16 dB con N = 40;  ganancia en amplitud "
+    "power −10·log10 N = −16 dB for N = 40;  amplitude gain √N = 6.3":
+        "potencia −10·log10 N = −16 dB con N = 40;  ganancia en amplitud "
         "√N = 6,3",
     "Residual": "Residual",
     "record − tiled average:": "registro − promedio repetido:",
@@ -1411,8 +1411,8 @@ _ES: dict[str, str] = {
         "LT = 67,96 dB (suma energética)",
     "Masking threshold seen by the ear":
         "Umbral de enmascaramiento visto por el oído",
-    "LG = LS + 10·lg(Δfc/Δf) = 64.97 dB;  masking index av = −2.02 dB":
-        "LG = LS + 10·lg(Δfc/Δf) = 64,97 dB;  índice de enmascaramiento "
+    "LG = LS + 10·log10(Δfc/Δf) = 64.97 dB;  masking index av = −2.02 dB":
+        "LG = LS + 10·log10(Δfc/Δf) = 64,97 dB;  índice de enmascaramiento "
         "av = −2,02 dB",
     "Audibility ΔL = LT − LG − av = 5.01 dB":
         "Audibilidad ΔL = LT − LG − av = 5,01 dB",
@@ -1441,8 +1441,8 @@ _ES: dict[str, str] = {
     "fast modulation, ≈ 70 Hz": "modulación rápida, ≈ 70 Hz",
     "Sharpness weighting wS = 0.1001":
         "Ponderación de la agudeza wS = 0,1001",
-    "wS = (S − 1.75) · 0.25 · lg(N5 + 10)":
-        "wS = (S − 1,75) · 0,25 · lg(N5 + 10)",
+    "wS = (S − 1.75) · 0.25 · log10(N5 + 10)":
+        "wS = (S − 1,75) · 0,25 · log10(N5 + 10)",
     "zero for S ≤ 1.75 acum": "cero para S ≤ 1,75 acum",
     "Roughness and fluctuation wFR = 0.2125":
         "Aspereza y fluctuación wFR = 0,2125",
@@ -1505,8 +1505,8 @@ _ES: dict[str, str] = {
         "−3,01 LKFS",
     "K-weighting: +4 dB spherical-head shelf + RLB high-pass":
         "Ponderación K: estante de +4 dB (cabeza esférica) + paso alto RLB",
-    "LK = −0.691 + 10·lg Σ Gi·zi;  LKFS ≡ LUFS, 1 LU = 1 dB":
-        "LK = −0,691 + 10·lg Σ Gi·zi;  LKFS ≡ LUFS, 1 LU = 1 dB",
+    "LK = −0.691 + 10·log10 Σ Gi·zi;  LKFS ≡ LUFS, 1 LU = 1 dB":
+        "LK = −0,691 + 10·log10 Σ Gi·zi;  LKFS ≡ LUFS, 1 LU = 1 dB",
     "Mean square in 400 ms blocks, 75 % overlap":
         "Media cuadrática en bloques de 400 ms, 75 % de solape",
     "absolute gate: blocks below −70 LUFS are dropped":
@@ -1627,8 +1627,8 @@ _ES: dict[str, str] = {
     "path difference δ = A + B − d = 0.15 m; Fresnel number N = 2δ/λ = 0.44 at 500 Hz":
         "diferencia de caminos δ = A + B − d = 0,15 m; número de Fresnel "
         "N = 2δ/λ = 0,44 a 500 Hz",
-    "Kurze–Anderson: Δbar = 5 + 20 lg( √(2πN) / tanh √(2πN) ) = 10.0 dB at 500 Hz":
-        "Kurze–Anderson: Δbar = 5 + 20 lg( √(2πN) / tanh √(2πN) ) = 10,0 dB "
+    "Kurze–Anderson: Δbar = 5 + 20 log10( √(2πN) / tanh √(2πN) ) = 10.0 dB at 500 Hz":
+        "Kurze–Anderson: Δbar = 5 + 20 log10( √(2πN) / tanh √(2πN) ) = 10,0 dB "
         "a 500 Hz",
     "N grows with frequency: the same screen gives 15.5 dB at 2 kHz (vertical scale exaggerated)":
         "N crece con la frecuencia: la misma pantalla da 15,5 dB a 2 kHz "
@@ -1678,11 +1678,11 @@ _ES: dict[str, str] = {
     "the classic ranking: quiet the source first, treat the path next, shield the receiver last":
         "la jerarquía clásica: primero la fuente, después el camino y por "
         "último el receptor",
-    "enclosure and cabin share IL = R − C, with C = 10 lg(0.3 + S_E/R_i) = 4.9 dB for a lined interior (ᾱ = 0.3)":
-        "encapsulado y cabina: IL = R − C, con C = 10 lg(0,3 + S_E/R_i) = "
+    "enclosure and cabin share IL = R − C, with C = 10 log10(0.3 + S_E/R_i) = 4.9 dB for a lined interior (ᾱ = 0.3)":
+        "encapsulado y cabina: IL = R − C, con C = 10 log10(0,3 + S_E/R_i) = "
         "4,9 dB (interior revestido, ᾱ = 0,3)",
-    "reactive silencer: TL = 10 lg[1 + ¼ (m − 1/m)² sin²(kL)], peaking where the 0.3 m chamber is a quarter wavelength":
-        "silenciador reactivo: TL = 10 lg[1 + ¼ (m − 1/m)² sin²(kL)], "
+    "reactive silencer: TL = 10 log10[1 + ¼ (m − 1/m)² sin²(kL)], peaking where the 0.3 m chamber is a quarter wavelength":
+        "silenciador reactivo: TL = 10 log10[1 + ¼ (m − 1/m)² sin²(kL)], "
         "máximo donde la cámara de 0,3 m mide λ/4",
     # Sound level meter pipeline (IEC 61672-1), one function per stage
     "The sound level meter pipeline: one function per stage":
@@ -2469,13 +2469,15 @@ def _d_impact(s: SVG, th: Theme) -> None:
     s.text(lx, 118, "Impact sound insulation", 18, th.fg, bold=True,
            anchor="start")
     box_items = [
-        (160, "L′nT = Li − 10 lg(T/T₀)", th.primary),
-        (192, "L′n = Li + 10 lg(A/A₀)", th.primary),
+        (160, "L′nT = Li − 10 log10(T/T₀)", th.primary),
+        (192, "L′n = Li + 10 log10(A/A₀)", th.primary),
         (224, "A = 0.16 V/T  (Sabine)", th.muted),
         (256, "T₀ = 0.5 s , A₀ = 10 m²", th.accent),
     ]
     for y, txt, col in box_items:
-        s.text(lx, y, txt, 15, col, anchor="start", mono=True,
+        # The face is the one that keeps the two spelt-out logarithms flush
+        # with the panel below them.
+        s.text(lx, y, txt, 14, col, anchor="start", mono=True,
                bold=(col != th.muted))
     s.rect(lx - 10, 292, 236, 100, "none", th.muted, rx=10, dash="6,5")
     s.text(lx, 320, "Li = energy-averaged", 15, th.fg, anchor="start")
@@ -2493,7 +2495,7 @@ def _d_methods(s: SVG, th: Theme) -> None:
         ("ISO 3744 / 3746", "Free field over a reflecting plane",
          "Grade 2 / 3 (engineering / survey)",
          "Sound pressure · enveloping surface",
-         "LW = L̄p + 10lg(S/S₀) − K1 − K2",
+         "LW = L̄p + 10 log10(S/S₀) − K1 − K2",
          "K2A ≤ 4 dB (3744) / ≤ 7 dB (3746)", th.primary, "hemi"),
         ("ISO 3741", "Reverberation test room",
          "Grade 1 (precision)",
@@ -2503,7 +2505,7 @@ def _d_methods(s: SVG, th: Theme) -> None:
         ("ISO 9614-2", "In situ — any environment",
          "Grade 2 / 3 (engineering / survey)",
          "Sound intensity · scanning",
-         "LW = 10lg |Σ IᵢSᵢ| / W₀",
+         "LW = 10 log10 |Σ IᵢSᵢ| / W₀",
          "no negative-power bands", th.secondary, "probe"),
     ]
     cw, gap = 270.0, 15.0
@@ -2555,9 +2557,11 @@ def _d_methods(s: SVG, th: Theme) -> None:
         for yy, txt, cc, bold in rows:
             s.text(cxc, yy, txt, 14, cc, bold=bold)
 
-        # Headline formula in a boxed footer.
-        s.rect(x + 10, cbot - 96, cw - 20, 46, "none", col, rx=8, dash="5,4")
-        s.text(cxc, cbot - 67, formula, 14, th.fg, bold=True, mono=True)
+        # Headline formula in a boxed footer. The ISO 3744 expression is the
+        # longest of the three, so the shared face is the one that keeps it
+        # inside its box with a margin left over.
+        s.rect(x + 6, cbot - 96, cw - 12, 46, "none", col, rx=8, dash="5,4")
+        s.text(cxc, cbot - 67, formula, 12, th.fg, bold=True, mono=True)
         s.text(cxc, cbot - 26, note, 14, th.muted)
 
 
@@ -2658,7 +2662,7 @@ def _d_flanking(s: SVG, th: Theme) -> None:
         s.text(bl + 58, ly, txt, 19, th.fg, anchor="start")
         ly += 32
     s.text(450.0, ly + 12,
-           "R'w = −10 lg Σ 10^(−Rij,w /10) dB   (EN 12354-1, Formula 26)",
+           "R'w = −10 log10 Σ 10^(−Rij,w /10) dB   (EN 12354-1, Formula 26)",
            19, th.muted, bold=True)
 
 
@@ -2719,7 +2723,7 @@ def _d_outdoor(s: SVG, th: Theme) -> None:
     s.text(450.0, gy + 58.0, "z = dss + dsr − d   (path difference)", 19,
            th.fg, bold=True)
     s.text(450.0, gy + 84.0,
-           "Dz = 10 lg[ 3 + (C₂/λ) C₃ z Kmet ]   (Eq. 14)", 18, th.muted)
+           "Dz = 10 log10[ 3 + (C₂/λ) C₃ z Kmet ]   (Eq. 14)", 18, th.muted)
 
 
 def _d_impedance_tube(s: SVG, th: Theme) -> None:
@@ -3237,7 +3241,7 @@ def _d_precision_anechoic(s: SVG, th: Theme) -> None:
 
     # Governing relations.
     for y, txt, col, bold in (
-        (514, "LW = ⟨Lp⟩ + 10 lg(S/S0) + C1 + C2 + C3", th.fg, True),
+        (514, "LW = ⟨Lp⟩ + 10 log10(S/S0) + C1 + C2 + C3", th.fg, True),
         (540, "S = 2πr² (hemi-anechoic) · 4πr² (anechoic)", th.primary, True),
         (564, "K1: per-position background correction", th.muted, False),
         (587, "C1, C2, C3: meteorological corrections (ps, θ, a(f))",
@@ -3294,7 +3298,7 @@ def _d_intensity_scan(s: SVG, th: Theme) -> None:
     # Governing relations.
     for y, txt, col, bold in (
         (505, "P = Σ I_n,i · S_i   (partial powers per segment)", th.fg, True),
-        (533, "LW = 10 lg(P/P0),  P0 = 1 pW", th.accent, True),
+        (533, "LW = 10 log10(P/P0),  P0 = 1 pW", th.accent, True),
         (559, "Field indicators: F_pIn , FT , FS", th.primary, True),
         (583, "Five acceptance criteria (Annex C); band invalid if P < 0",
          th.muted, False),
@@ -3674,7 +3678,7 @@ def _d_nihl(s: SVG, th: Theme) -> None:
     # --- Right lane: noise component N (NIPTS) ------------------------------
     s.arrow(rxc, 118, rxc, 150, th.fg, 1.8)
     _step(rxc, 150, "Median NIPTS  N50  (6.3.1)",
-          "N50 = [u + v·lg(t/t0)]·(L − L0)²", th.secondary)
+          "N50 = [u + v·log10(t/t0)]·(L − L0)²", th.secondary)
     s.arrow(rxc, 212, rxc, 244, th.fg, 1.8)
     _step(rxc, 244, "Fractile NIPTS  N  (6.3.2)",
           "N = N50 + z·(du if z ≥ 0 else dl)", th.fg)
@@ -3712,7 +3716,7 @@ def _d_impulse_prominence(s: SVG, th: Theme) -> None:
     _step(150, "Per impulse: onset rate OR and level difference LD",
           "OR = onset slope [dB/s],   LD = Le − Ls [dB]", th.primary)
     _step(242, "Predicted prominence  P   (clause 7, Formula 1)",
-          "P = 3·lg(OR) + 2·lg(LD);   highest P over 30 min governs", th.fg)
+          "P = 3·log10(OR) + 2·log10(LD);   highest P over 30 min governs", th.fg)
     _step(334, "Adjustment  KI   (clause 8, Formula 2)",
           "KI = 1.8·(P − 5) dB for P > 5, else 0", th.secondary)
     s.arrow(cx, 210, cx, 242, th.fg, 1.8)
@@ -3721,7 +3725,7 @@ def _d_impulse_prominence(s: SVG, th: Theme) -> None:
 
     # --- Output -------------------------------------------------------------
     s.rect(x0, 426, bw, 60, "none", th.primary, rx=10, sw=2.4)
-    s.text(cx, 452, "Rating level  LAr,T = 10·lg( (1/T) Σ Δt·10^((LAeq+KI)/10) )",
+    s.text(cx, 452, "Rating level  LAr,T = 10·log10( (1/T) Σ Δt·10^((LAeq+KI)/10) )",
            18, th.fg, "middle", bold=True)
     s.text(cx, 473, "impulse-adjusted level over the reference time  (Note 1)",
            13, th.muted, "middle")
@@ -3810,22 +3814,24 @@ def _d_enclosed_space_absorption(s: SVG, th: Theme) -> None:
 
 def _d_time_weighting(s: SVG, th: Theme) -> None:
     """Exponential-detector chain of the sound-level time weightings (IEC 61672-1)."""
+    # The decibel stage spells out the logarithm and is the widest title of the
+    # chain, so it takes a smaller face to keep the padding inside its box.
     stages = [
-        ("p(t)", "band signal", th.fg),
-        ("( · )²", "square", th.primary),
-        ("one-pole RC", "time constant τ", th.primary),
-        ("10·lg(·/p₀²)", "to decibels", th.accent),
-        ("L_τ(t)", "time-weighted level", th.secondary),
+        ("p(t)", "band signal", th.fg, 21),
+        ("( · )²", "square", th.primary, 21),
+        ("one-pole RC", "time constant τ", th.primary, 21),
+        ("10·log10(·/p₀²)", "to decibels", th.accent, 18),
+        ("L_τ(t)", "time-weighted level", th.secondary, 21),
     ]
     bw, bh, gap = 150.0, 90.0, 12.0
     total = len(stages) * bw + (len(stages) - 1) * gap
     x = (900 - total) / 2
     y = 108.0
     last = len(stages) - 1
-    for i, (title, sub, color) in enumerate(stages):
+    for i, (title, sub, color, size) in enumerate(stages):
         fill = "none" if i in (0, last) else th.panel
         s.rect(x, y, bw, bh, fill, color, rx=12, sw=2.2)
-        s.text(x + bw / 2, y + 38, title, 21, th.fg, "middle", bold=True)
+        s.text(x + bw / 2, y + 38, title, size, th.fg, "middle", bold=True)
         s.text(x + bw / 2, y + 64, sub, 14, color, "middle")
         if i < last:
             s.arrow(x + bw + 1, y + bh / 2, x + bw + gap - 2, y + bh / 2, th.fg, 2)
@@ -4300,9 +4306,9 @@ def _d_loudspeaker_freefield(s: SVG, th: Theme) -> None:
          th.fg, True),
         (534, "Up = √(R · 1 W): 2.83 V is 1 W into 8 Ω but 2 W into 4 Ω (+3 dB)",
          th.secondary, True),
-        (559, "Lp(1 m) = Lp(r) + 20 lg(r / 1 m)   (far field, inverse-distance law)",
+        (559, "Lp(1 m) = Lp(r) + 20 log10(r / 1 m)   (far field, inverse-distance law)",
          th.primary, True),
-        (583, "Microphone (IEC 60268-4): M in mV/Pa, or LM = 20 lg(M / 1 V/Pa) dB",
+        (583, "Microphone (IEC 60268-4): M in mV/Pa, or LM = 20 log10(M / 1 V/Pa) dB",
          th.muted, False),
     ):
         s.text(450, y, txt, 19 if bold else 18, col, bold=bold)
@@ -4683,7 +4689,8 @@ def _d_reception_plate(s: SVG, th: Theme) -> None:
     s.text(735, 206, "P = ω·η·(m·S)·⟨v²⟩", 19, th.primary, bold=True,
            mono=True)
     s.text(735, 238, "η = 2.2 / (f·Ts)   (Formula 13)", 15, th.fg, mono=True)
-    s.text(735, 270, "L_Ws = 10 lg(2πf·η·m·S / f₀m₀S₀)", 14, th.fg, mono=True)
+    # Longest line of the panel: a smaller face keeps it inside the dashed box.
+    s.text(735, 270, "L_Ws = 10 log10(2πf·η·m·S / f₀m₀S₀)", 13, th.fg, mono=True)
     s.text(735, 296, "+ Lv − 60   (Formula 14)", 14, th.fg, mono=True)
     s.text(735, 366, "→ source quantities (Formulae 15–19):", 15, th.fg,
            bold=True)
@@ -4692,7 +4699,7 @@ def _d_reception_plate(s: SVG, th: Theme) -> None:
 
     # Footer: the spatial velocity average.
     s.text(450, 516,
-           "spatial average:  Lv = 10 lg[(1/N)·Σ 10^(Lv,i/10)]   (Formula 12)",
+           "spatial average:  Lv = 10 log10[(1/N)·Σ 10^(Lv,i/10)]   (Formula 12)",
            17, th.fg, mono=True)
 
 
@@ -4752,16 +4759,18 @@ def _d_installed_paths(s: SVG, th: Theme) -> None:
 
     # ===== Right column: the prediction cascade =====
     s.text(760, 120, "Prediction cascade", 20, th.fg, bold=True)
+    # The energetic sum is far longer than the other terms, so it carries its
+    # own face to stay inside the column instead of running off the canvas.
     steps = [
-        ("L_Ws,c", "characteristic power (EN 15657)", th.fg),
-        ("− D_C", "coupling at the contacts (19b)", th.secondary),
-        ("L_Ws,inst", "installed power (18b)", th.fg),
-        ("− D_sa − R_ij,ref", "per transmission path (18a)", th.primary),
-        ("10 lg Σ 10^(L_n,s,ij/10)", "energetic sum L_n,s (17)", th.accent),
+        ("L_Ws,c", "characteristic power (EN 15657)", th.fg, 19),
+        ("− D_C", "coupling at the contacts (19b)", th.secondary, 19),
+        ("L_Ws,inst", "installed power (18b)", th.fg, 19),
+        ("− D_sa − R_ij,ref", "per transmission path (18a)", th.primary, 19),
+        ("10 log10 Σ 10^(L_n,s,ij/10)", "energetic sum L_n,s (17)", th.accent, 15),
     ]
     y = 164.0
-    for k, (term, caption, col) in enumerate(steps):
-        s.text(760, y, term, 19, col, bold=True, mono=True)
+    for k, (term, caption, col, size) in enumerate(steps):
+        s.text(760, y, term, size, col, bold=True, mono=True)
         s.text(760, y + 22, caption, 14, th.muted)
         if k < len(steps) - 1:
             s.arrow(760, y + 34, 760, y + 56, th.muted, 1.6)
@@ -4891,7 +4900,7 @@ def _d_wind_turbine(s: SVG, th: Theme) -> None:
            "R1 = √(H² + R0²)   slant distance, rotor centre → microphone",
            19, th.fg, bold=True)
     s.text(450.0, 588.0,
-           "LWA,i = Lp,i − 6 + 10 lg(4π R1² / S0)   (Formula 26, S0 = 1 m²)",
+           "LWA,i = Lp,i − 6 + 10 log10(4π R1² / S0)   (Formula 26, S0 = 1 m²)",
            19, th.primary, bold=True)
     s.text(450.0, 614.0,
            "the −6 dB removes the board's pressure doubling; board-to-R1 angle φ = 25°–40°",
@@ -5262,8 +5271,8 @@ def _d_junction_rig(s: SVG, th: Theme) -> None:
            18, th.fg, anchor="start")
     s.text(80, 564, "≥ 4 excitation positions on i; accelerometers ≥ 0.25 m from edges, ≥ 0.5 m apart",
            18, th.fg, anchor="start")
-    s.text(80, 596, "Kij = D̄v,ij + 10 lg( lij / √(ai·aj) ),   ai = equivalent absorption length",
-           18, th.primary, anchor="start", bold=True, mono=True)
+    s.text(80, 596, "Kij = D̄v,ij + 10 log10( lij / √(ai·aj) ),   ai = equivalent absorption length",
+           17, th.primary, anchor="start", bold=True, mono=True)
 
 
 # ---------------------------------------------------------------------------
@@ -5332,7 +5341,8 @@ def _d_vibration_sound_power(s: SVG, th: Theme) -> None:
     s.text(lx, 220, "one accelerometer per cell of area S/N", 15, th.muted,
            anchor="start")
     s.text(lx, 284, "Survey sound power", 19, th.fg, bold=True, anchor="start")
-    s.text(lx, 314, "LWA = LvA + 10 lg(S/S₀) + 10 lg ε", 15, th.primary,
+    # Two logarithms in one line: the smaller face keeps it inside the column.
+    s.text(lx, 314, "LWA = LvA + 10 log10(S/S₀) + 10 log10 ε", 13, th.primary,
            anchor="start", bold=True, mono=True)
     s.text(lx, 342, "ε = 1 assumed → upper limit LWA,max", 15, th.muted,
            anchor="start")
@@ -5917,7 +5927,7 @@ def _d_test_signals(s: SVG, th: Theme) -> None:
     def spectrum_axes(x: float, y: float) -> None:
         s.line(x, y, x + 190.0, y, th.muted, 1.2)
         s.line(x, y, x, y - 58.0, th.muted, 1.2)
-        s.text(x + 190.0, y + 15.0, "lg f", 12, th.muted, anchor="end")
+        s.text(x + 190.0, y + 15.0, "log10 f", 12, th.muted, anchor="end")
 
     # --- white noise -------------------------------------------------------
     tile(55, 62, 250, "White noise")
@@ -6219,7 +6229,7 @@ def _d_cepstrum_echoes(s: SVG, th: Theme) -> None:
 
     s.text(450, 478, "rahmonics at n·t0 with heights a, −a²/2, a³/3, …, "
            "whatever the source spectrum does", 15, th.fg, bold=True)
-    s.text(450, 504, "the highpass ripple swings between 20·lg(1 ± a) = +3.5 "
+    s.text(450, 504, "the highpass ripple swings between 20·log10(1 ± a) = +3.5 "
            "and −6.0 dB; echo_detection reads t0 and a off the peak", 13,
            th.muted)
 
@@ -6278,7 +6288,7 @@ def _d_synchronous_averaging(s: SVG, th: Theme) -> None:
     s.rect(100, 420, 460, 64, "none", th.accent, rx=10, sw=1.6, dash="6,5")
     s.text(330, 446, "Asynchronous noise falls as 1/√N", 15, th.accent,
            bold=True)
-    s.text(330, 470, "power −10·lg N = −16 dB for N = 40;  amplitude gain "
+    s.text(330, 470, "power −10·log10 N = −16 dB for N = 40;  amplitude gain "
            "√N = 6.3", 13, th.fg)
     s.arrow(470, 366, 470, 416, th.fg, 1.6)
 
@@ -6510,7 +6520,7 @@ def _d_tone_audibility(s: SVG, th: Theme) -> None:
          "masking noise LS = 49.22 dB (iterative mean); tone LT = 67.96 dB "
          "(energy sum)", th.primary)
     step(310, "Masking threshold seen by the ear",
-         "LG = LS + 10·lg(Δfc/Δf) = 64.97 dB;  masking index av = −2.02 dB",
+         "LG = LS + 10·log10(Δfc/Δf) = 64.97 dB;  masking index av = −2.02 dB",
          th.primary)
     s.rect(x0, 396, bw, 60, "none", th.accent, rx=10, sw=2.4)
     s.text(cx, 421, "Audibility ΔL = LT − LG − av = 5.01 dB", 17, th.fg,
@@ -6557,7 +6567,7 @@ def _d_psychoacoustic_annoyance(s: SVG, th: Theme) -> None:
     s.rect(90, 204, 340, 86, th.panel, th.fg, rx=10, sw=2)
     s.text(260, 230, "Sharpness weighting wS = 0.1001", 15, th.fg,
            bold=True)
-    s.text(260, 252, "wS = (S − 1.75) · 0.25 · lg(N5 + 10)", 13,
+    s.text(260, 252, "wS = (S − 1.75) · 0.25 · log10(N5 + 10)", 13,
            th.primary, mono=True)
     s.text(260, 274, "zero for S ≤ 1.75 acum", 12, th.muted)
     s.rect(470, 204, 340, 86, th.panel, th.fg, rx=10, sw=2)
@@ -6659,7 +6669,7 @@ def _d_program_loudness(s: SVG, th: Theme) -> None:
          "anchor: a 0 dB FS 997 Hz sine on one front channel reads "
          "−3.01 LKFS", th.fg)
     step(138, "K-weighting: +4 dB spherical-head shelf + RLB high-pass",
-         "LK = −0.691 + 10·lg Σ Gi·zi;  LKFS ≡ LUFS, 1 LU = 1 dB",
+         "LK = −0.691 + 10·log10 Σ Gi·zi;  LKFS ≡ LUFS, 1 LU = 1 dB",
          th.primary)
     step(224, "Mean square in 400 ms blocks, 75 % overlap",
          "absolute gate: blocks below −70 LUFS are dropped", th.primary)
@@ -7020,7 +7030,7 @@ def _d_ground_barrier(s: SVG, th: Theme) -> None:
            "path difference δ = A + B − d = 0.15 m; Fresnel number N = 2δ/λ = 0.44 at 500 Hz",
            18, th.fg, anchor="start")
     s.text(80, 448,
-           "Kurze–Anderson: Δbar = 5 + 20 lg( √(2πN) / tanh √(2πN) ) = 10.0 dB at 500 Hz",
+           "Kurze–Anderson: Δbar = 5 + 20 log10( √(2πN) / tanh √(2πN) ) = 10.0 dB at 500 Hz",
            18, th.primary, anchor="start", bold=True)
     s.text(80, 476,
            "N grows with frequency: the same screen gives 15.5 dB at 2 kHz (vertical scale exaggerated)",
@@ -7183,12 +7193,14 @@ def _d_noise_control(s: SVG, th: Theme) -> None:
     s.text(80, 540,
            "the classic ranking: quiet the source first, treat the path next, shield the receiver last",
            17, th.fg, anchor="start")
+    # Both caption lines run the full width of the canvas; the smaller face is
+    # what keeps the longest of them (the silencer one) off the right edge.
     s.text(80, 568,
-           "enclosure and cabin share IL = R − C, with C = 10 lg(0.3 + S_E/R_i) = 4.9 dB for a lined interior (ᾱ = 0.3)",
-           16, th.fg, anchor="start")
+           "enclosure and cabin share IL = R − C, with C = 10 log10(0.3 + S_E/R_i) = 4.9 dB for a lined interior (ᾱ = 0.3)",
+           15, th.fg, anchor="start")
     s.text(80, 596,
-           "reactive silencer: TL = 10 lg[1 + ¼ (m − 1/m)² sin²(kL)], peaking where the 0.3 m chamber is a quarter wavelength",
-           16, th.muted, anchor="start")
+           "reactive silencer: TL = 10 log10[1 + ¼ (m − 1/m)² sin²(kL)], peaking where the 0.3 m chamber is a quarter wavelength",
+           15, th.muted, anchor="start")
 
 
 # ---------------------------------------------------------------------------

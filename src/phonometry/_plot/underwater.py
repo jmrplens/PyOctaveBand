@@ -106,9 +106,9 @@ _STRINGS: dict[str, str] = {
     "Parabolic-equation transmission loss": "Pérdida por transmisión por ecuación parabólica",
     "Weston regimes": "Regímenes de Weston",
     "Composite": "Compuesto",
-    "Spherical (20 lg r)": "Esférica (20 lg r)",
-    "Cylindrical (10 lg r)": "Cilíndrica (10 lg r)",
-    "Mode stripping (15 lg r)": "Descamado de modos (15 lg r)",
+    "Spherical (20 log10 r)": "Esférica (20 log10 r)",
+    "Cylindrical (10 log10 r)": "Cilíndrica (10 log10 r)",
+    "Mode stripping (15 log10 r)": "Descamado de modos (15 log10 r)",
     "Single mode": "Modo único",
     "Propagation loss [dB re 1 m²]": "Pérdida de propagación [dB re 1 m²]",
     "Hearing threshold [dB]": "Umbral de audición [dB]",
@@ -612,9 +612,9 @@ def plot_weston_regimes(
     r = np.asarray(result.range_m, dtype=np.float64)
     ax.set_xscale("log")
     for label, curve, color, style in (
-        ("Spherical (20 lg r)", result.spherical, _C_MUTED, ":"),
-        ("Cylindrical (10 lg r)", result.cylindrical, _C_SECONDARY, "--"),
-        ("Mode stripping (15 lg r)", result.mode_stripping, _C_TERTIARY, "-."),
+        ("Spherical (20 log10 r)", result.spherical, _C_MUTED, ":"),
+        ("Cylindrical (10 log10 r)", result.cylindrical, _C_SECONDARY, "--"),
+        ("Mode stripping (15 log10 r)", result.mode_stripping, _C_TERTIARY, "-."),
         ("Single mode", result.single_mode, _C_QUATERNARY, (0, (3, 1, 1, 1))),
     ):
         ax.plot(r, np.asarray(curve, dtype=np.float64), ls=style, lw=1.0, color=color,

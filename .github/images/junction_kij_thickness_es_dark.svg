@@ -506,19 +506,19 @@ L 707.105 28.8
    </g>
    <g id="text_18">
     <g id="patch_7">
-     <path d="M 527.676487 395.219727 
+     <path d="M 498.618675 395.219727 
 L 697.1468 395.219727 
 Q 702.1468 395.219727 702.1468 390.219727 
 L 702.1468 365.814258 
 Q 702.1468 360.814258 697.1468 360.814258 
-L 527.676487 360.814258 
-Q 522.676487 360.814258 522.676487 365.814258 
-L 522.676487 390.219727 
-Q 522.676487 395.219727 527.676487 395.219727 
+L 498.618675 360.814258 
+Q 493.618675 360.814258 493.618675 365.814258 
+L 493.618675 390.219727 
+Q 493.618675 395.219727 498.618675 395.219727 
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(536.306175 374.413672)">Kij = 10 lg(1/τ̄) + 5 lg(fc2/1000)</text>
+    <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(498.618675 374.413672)">Kij = 10 log10(1/τ̄) + 5 log10(fc2/1000)</text>
     <text style="font-size: 10px; font-family: sans-serif; fill: #ffffff" transform="translate(527.676487 386.816406)">hormigón, placa 1 fija en 100 mm</text>
    </g>
    <g id="text_19">

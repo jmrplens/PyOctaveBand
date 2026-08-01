@@ -319,7 +319,7 @@ def plot_filter_class(
     sos = np.asarray(result.sos[idx], dtype=np.float64)
 
     # Recompute the relative attenuation exactly as verify_filter_class does:
-    # -20 lg|H| minus the attenuation at the exact mid-band frequency.
+    # -20 log10|H| minus the attenuation at the exact mid-band frequency.
     eps = np.finfo(float).eps
     w, h = signal.sosfreqz(sos, worN=result.num_points, fs=fsd)
     attenuation = -20.0 * np.log10(np.abs(h) + eps)
@@ -593,7 +593,7 @@ def plot_monte_carlo(
 
 
 def _db10(values: np.ndarray) -> np.ndarray:
-    """``10·lg`` with -inf (not a warning) at empty bins."""
+    """``10·log10`` with -inf (not a warning) at empty bins."""
     with np.errstate(divide="ignore"):
         out: np.ndarray = 10.0 * np.log10(values)
     return out
